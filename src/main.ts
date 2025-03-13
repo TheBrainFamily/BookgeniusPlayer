@@ -654,9 +654,6 @@ async function initPage() {
 
     // Update view once scrolled
     updateView();
-
-    // Hide loading indicator when done
-    loadingIndicator.classList.add("hidden");
   }, 100);
 
   // Set up resize handler for responsive layout
