@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Book, Moon, X, List, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -6,10 +6,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { pageChapters } from "./chapters";
+import { isNightMode, toggleNightMode } from "./helpers/setIsNightMode";
+import { goToPage } from "./helpers/pagesNavigation";
 
 const getTitle = (chapter: number) => {
   const chapterNames = [
-    "Zero",
     "One",
     "Two",
     "Three",
@@ -48,13 +49,25 @@ type ModalType = null | "chapters" | "page";
 export default function BookChaptersModal() {
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
-  const [nightMode, setNightMode] = useState(false);
+  const [nightMode, setNightMode] = useState(isNightMode());
   const [pageNumber, setPageNumber] = useState("");
 
-  const navigateToChapter = (chapterId: number, page: number) => {
-    console.log(`Navigating to chapter ${chapterId}, page ${page}`);
+  // Update the local state when the night mode changes externally
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setNightMode(isNightMode());
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const navigateToChapter = (chapterId: number, page: string) => {
+    const pageNum = parseInt(page, 10);
+    console.log(`Navigating to chapter ${chapterId}, page ${pageNum}`);
     // Implement your navigation logic here
     // For example: router.push(`/book/chapter/${chapterId}`)
+    goToPage(pageNum);
     setActiveModal(null);
     setOverlayOpen(false);
   };
@@ -65,16 +78,16 @@ export default function BookChaptersModal() {
       console.log(`Navigating to page ${page}`);
       // Implement your navigation logic here
       // For example: router.push(`/book/page/${page}`)
+      goToPage(page);
       setActiveModal(null);
       setOverlayOpen(false);
       setPageNumber("");
     }
   };
 
-  const toggleNightMode = () => {
-    setNightMode(!nightMode);
-    // Implement your night mode logic here
-    document.body.classList.toggle("dark");
+  const handleToggleNightMode = () => {
+    toggleNightMode(); // Call the vanilla JS function
+    setNightMode(isNightMode()); // Update the React state
     setOverlayOpen(false);
   };
 
@@ -92,7 +105,7 @@ export default function BookChaptersModal() {
       {overlayOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center" onClick={() => setOverlayOpen(false)}>
           <div className="bg-background rounded-lg p-4 w-64 space-y-2" onClick={(e) => e.stopPropagation()}>
-            <Button variant="ghost" className="w-full justify-start text-left" onClick={toggleNightMode}>
+            <Button variant="ghost" className="w-full justify-start text-left" onClick={handleToggleNightMode}>
               <Moon className="mr-2 h-4 w-4" />
               Night Mode {nightMode ? "(On)" : "(Off)"}
             </Button>

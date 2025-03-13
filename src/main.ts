@@ -1,22 +1,10 @@
-import { pageChapters } from "./chapters";
 import { pagesContent } from "./book";
-import {
-  chaptersListContainer,
-  chaptersModal,
-  goToPageButton,
-  goToPageConfirm,
-  goToPageModal,
-  menuButton,
-  menuOverlay,
-  openChaptersButton,
-  pageInput,
-  toggleNightModeButton,
-} from "./menu";
-import { getPageOffset, setPageOffset } from "./pageOffset";
 
-// Book viewer state
-let currentPageIndex = 0;
-let isNightMode = false;
+import { getPageOffset, setPageOffset } from "./pageOffset";
+import { isNightMode, setIsNightMode } from "@/src/helpers/setIsNightMode";
+import { getCurrentPage, goToNextPage, goToPage, goToPreviousPage, setCurrentPage } from "@/src/helpers/pagesNavigation";
+import { romanNumeralPages } from "@/src/consts";
+
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
 let isMobileNotesVisible = false; // Track if notes panel is open on mobile
@@ -73,9 +61,6 @@ const confirmMappingButton = document.getElementById("confirm-mapping-button")!;
 // Character interaction state
 let currentCharacter: { name: string; imageUrl: string } | null = null;
 let selectedCharacterForMapping: { name: string; imageUrl: string } | null = null;
-
-// Configuration for page numbering
-const romanNumeralPages = 1; // Number of pages that use Roman numerals
 
 // Function to check if the device is mobile
 function isMobile() {
@@ -767,13 +752,7 @@ async function initPage() {
   // Check for saved position
   const savedPosition = parseInt(localStorage.getItem("bookPosition")) || 0;
   if (savedPosition > 0 && savedPosition < pagesContent.length) {
-    currentPageIndex = savedPosition;
-  }
-
-  // Check for saved night mode preference
-  if (localStorage.getItem("nightMode") === "true") {
-    isNightMode = true;
-    document.getElementById("legacy").classList.add("night-mode");
+    setCurrentPage(savedPosition);
   }
 
   // Initialize the viewer
@@ -784,7 +763,7 @@ async function initPage() {
 
   // Scroll to the saved position
   setTimeout(() => {
-    const targetPage = document.getElementById(`page-${currentPageIndex}`);
+    const targetPage = document.getElementById(`page-${getCurrentPage()}`);
     if (targetPage) {
       targetPage.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -815,52 +794,11 @@ function handleResize() {
   }
 }
 
-// Navigation functions updated for scrolling
-async function goToPreviousPage() {
-  if (currentPageIndex > 0) {
-    currentPageIndex--;
-    const targetPage = document.getElementById(`page-${currentPageIndex}`);
-    if (targetPage) {
-      targetPage.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
-}
-
-async function goToNextPage() {
-  if (currentPageIndex < pagesContent.length - 1) {
-    currentPageIndex++;
-    const targetPage = document.getElementById(`page-${currentPageIndex}`);
-    if (targetPage) {
-      targetPage.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
-}
-
-// Jump to a specific page
-export async function goToPage(pageNumber) {
-  // Adjust for front matter (page 1 in the UI is actually index romanNumeralPages in the array)
-  let targetIndex = parseInt(pageNumber) - getPageOffset() + romanNumeralPages - 1;
-
-  // Ensure page number is valid
-  if (isNaN(targetIndex) || targetIndex < 0) {
-    targetIndex = 0;
-  } else if (targetIndex >= pagesContent.length) {
-    targetIndex = pagesContent.length - 1;
-  }
-
-  // Set to the page
-  currentPageIndex = targetIndex;
-  const targetPage = document.getElementById(`page-${currentPageIndex}`);
-  if (targetPage) {
-    targetPage.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-}
-
 // Function to pre-warm the cache for upcoming pages
 async function preWarmCache() {
   // Calculate range to preload (current page plus several before and after)
-  const preloadBefore = Math.max(0, currentPageIndex - 5);
-  const preloadAfter = Math.min(pagesContent.length - 1, currentPageIndex + 10);
+  const preloadBefore = Math.max(0, getCurrentPage() - 5);
+  const preloadAfter = Math.min(pagesContent.length - 1, getCurrentPage() + 10);
 
   // Calculate actual page numbers for API request
   const startPageNumber = preloadBefore - (romanNumeralPages - 1) + 1;
@@ -1182,7 +1120,7 @@ function handlePageOffsetInput(digit) {
       const desiredPageNumber = parseInt(pageOffsetInput);
       if (!isNaN(desiredPageNumber)) {
         // Current displayed page number without offset
-        const currentPageNumber = currentPageIndex - (romanNumeralPages - 1);
+        const currentPageNumber = getCurrentPage() - (romanNumeralPages - 1);
         // Set offset as the difference between desired and current
         setPageOffset(desiredPageNumber - currentPageNumber);
         // Update the view to reflect new page numbers
@@ -1216,77 +1154,8 @@ function enterSetPageNumberMode() {
 }
 
 // Toggle night mode
-function toggleNightMode() {
-  isNightMode = !isNightMode;
-  document.getElementById("legacy").classList.toggle("night-mode", isNightMode);
-  localStorage.setItem("nightMode", String(isNightMode));
-}
-
-// Show menu
-function showMenu() {
-  menuOverlay.classList.add("active");
-}
-
-// Hide menu
-function hideMenu() {
-  menuOverlay.classList.remove("active");
-}
-
-// Show chapters modal
-function showChaptersModal() {
-  hideMenu();
-  populateChaptersList();
-  chaptersModal.classList.add("active");
-}
-
-// Hide chapters modal
-function hideChaptersModal() {
-  chaptersModal.classList.remove("active");
-}
-
-// Populate chapters list
-function populateChaptersList() {
-  chaptersListContainer.innerHTML = "";
-
-  pageChapters.forEach((chapter) => {
-    const chapterItem = document.createElement("div");
-    chapterItem.classList.add("chapter-item");
-    chapterItem.textContent = `Chapter ${chapter.chapter + 1} (${chapter.pageCount} pages)`;
-    chapterItem.dataset.pageId = chapter.pageId;
-    chapterItem.addEventListener("click", () => {
-      goToChapter(chapter.pageId);
-    });
-    chaptersListContainer.appendChild(chapterItem);
-  });
-}
-
-// Go to specific chapter
-function goToChapter(pageId) {
-  hideChaptersModal();
-  const pageNumber = parseInt(pageId.replace("page_", ""));
-  goToPage(pageNumber);
-}
-
-// Show go to page modal
-function showGoToPageModal() {
-  hideMenu();
-  pageInput["value"] = "";
-  goToPageModal.classList.add("active");
-  pageInput.focus();
-}
-
-// Hide go to page modal
-function hideGoToPageModal() {
-  goToPageModal.classList.remove("active");
-}
-
-// Handle go to page input submission
-function handleGoToPageSubmit() {
-  const pageNumber = parseInt(pageInput["value"]);
-  if (!isNaN(pageNumber) && pageNumber > 0) {
-    goToPage(pageNumber);
-    hideGoToPageModal();
-  }
+export function toggleNightMode() {
+  setIsNightMode(!isNightMode());
 }
 
 // Add swipe gesture support for mobile
@@ -1547,39 +1416,12 @@ if (notesEdgeIndicator) {
 }
 
 // Menu event listeners
-menuButton.addEventListener("click", showMenu);
 
 // Add event listeners for closing modals
 document.querySelectorAll(".modal-close").forEach((button) => {
   const modal = button.closest(".modal-overlay");
   button.addEventListener("click", () => {
     modal.classList.remove("active");
-  });
-});
-
-// Menu options event listeners
-toggleNightModeButton.addEventListener("click", () => {
-  toggleNightMode();
-  hideMenu();
-});
-
-openChaptersButton.addEventListener("click", showChaptersModal);
-goToPageButton.addEventListener("click", showGoToPageModal);
-
-// Go to page form submission
-goToPageConfirm.addEventListener("click", handleGoToPageSubmit);
-pageInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    handleGoToPageSubmit();
-  }
-});
-
-// Close modals when clicking outside
-[menuOverlay, chaptersModal, goToPageModal].forEach((modal) => {
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      modal.classList.remove("active");
-    }
   });
 });
 
@@ -1601,11 +1443,13 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
     case "ArrowLeft":
     case "p":
     case "P":
+      console.log("go to previous page");
       await goToPreviousPage();
       break;
     case "ArrowRight":
     case "n":
     case "N":
+      console.log("go to next page");
       await goToNextPage();
       break;
     case "m":
@@ -1647,14 +1491,10 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
 
 // Initialize the app
 document.addEventListener("DOMContentLoaded", function () {
+  console.log("[ELO] ever loaded dom loaded?");
   // Initialize night mode from localStorage
   if (localStorage.getItem("nightMode") === "true") {
-    toggleNightMode();
-  }
-
-  // Setup menu event listeners
-  if (menuButton) {
-    menuButton.addEventListener("click", showMenu);
+    setIsNightMode(true);
   }
 
   // Add event listeners for closing modals
@@ -1666,40 +1506,11 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Menu options event listeners
-  toggleNightModeButton.addEventListener("click", () => {
-    toggleNightMode();
-    hideMenu();
-  });
 
-  if (openChaptersButton) {
-    openChaptersButton.addEventListener("click", showChaptersModal);
-  }
-
-  if (goToPageButton) {
-    goToPageButton.addEventListener("click", showGoToPageModal);
-  }
-
-  // Go to page form submission
-  if (goToPageConfirm && pageInput) {
-    goToPageConfirm.addEventListener("click", handleGoToPageSubmit);
-    pageInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        handleGoToPageSubmit();
-      }
-    });
-  }
-
-  // Close modals when clicking outside
-  [menuOverlay, chaptersModal, goToPageModal].filter(Boolean).forEach((modal) => {
-    modal.addEventListener("click", (event) => {
-      if (event.target === modal) {
-        modal.classList.remove("active");
-      }
-    });
-  });
-
+  console.log("[ELO] setting keydown listener");
   // Keyboard navigation
   document.addEventListener("keydown", async (event) => {
+    console.log("[ELO] keydown executed");
     // Handle Command+S to set page number
     await keyboardNavigationSetup(event);
   });
