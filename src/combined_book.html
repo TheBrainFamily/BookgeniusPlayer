@@ -2,10 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -70,6 +67,9 @@
     <!-- CSS_LINKS -->
     <style></style>
     <title>Book Viewer</title>
+    <script src="https://kit.fontawesome.com/b424391628.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   </head>
 
   <body>
@@ -87,21 +87,13 @@
 
     <div id="extra-controls">
       <button id="menu-button" class="hamburger-button">
-        <div class="hamburger-icon">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
+        <i class="fa-solid fa-bars"></i>
       </button>
     </div>
 
     <!-- Menu overlay -->
     <div id="menu-overlay" class="modal-overlay">
       <div class="menu-container">
-        <div class="modal-header">
-          <div class="modal-title">Menu</div>
-          <button class="modal-close">&times;</button>
-        </div>
         <div class="menu-content">
           <button id="toggle-night-mode-button" class="menu-item">Night Mode (M)</button>
           <button id="open-chapters-button" class="menu-item">Open Chapter</button>
@@ -109,6 +101,8 @@
         </div>
       </div>
     </div>
+
+    <div id="chapters-root">HI DO YO SEE ME?</div>
 
     <!-- Chapters modal -->
     <div id="chapters-modal" class="modal-overlay">
@@ -153,10 +147,7 @@
         </div>
         <div class="modal-content">
           <div id="character-details-info" style="text-align: center">
-            <img
-              id="modal-details-character-image"
-              style="max-width: 100%; max-height: 300px; margin-bottom: 15px; cursor: pointer"
-            />
+            <img id="modal-details-character-image" style="max-width: 100%; max-height: 300px; margin-bottom: 15px; cursor: pointer" />
             <h3 id="modal-details-character-name" style="margin-bottom: 10px"></h3>
             <p id="modal-details-character-summary"></p>
           </div>

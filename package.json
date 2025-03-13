@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm  -rf dist/ && tsx build-config.ts && cp -r dist/* /Users/lukaszgandecki/projects/convert-books-trump/public/src-book",
-    "build:prod": "rm -rf dist/ && tsx build-config-prod.ts && cp ./src/combined_book.html ./dist/ && cp -r dist/* /Users/lukaszgandecki/projects/convert-books-trump/public/src-book"
+    "build": "exit; rm  -rf dist/ && tsx build-config.ts && cp -r dist/* /Users/lukaszgandecki/projects/convert-books-trump/public/src-book",
+    "build:prod": "rm -rf dist/ && tsx build-config-prod.ts && cp ./src/{combined_book.html,styles.css} ./dist/ && cp -r dist/* /Users/lukaszgandecki/projects/convert-books-trump/public/src-book"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.0",

@@ -10,7 +10,7 @@ import {
   menuOverlay,
   openChaptersButton,
   pageInput,
-  toggleNightModeButton
+  toggleNightModeButton,
 } from "./menu";
 import { getPageOffset, setPageOffset } from "./pageOffset";
 
@@ -71,8 +71,8 @@ const cancelMappingButton = document.getElementById("cancel-mapping-button")!;
 const confirmMappingButton = document.getElementById("confirm-mapping-button")!;
 
 // Character interaction state
-let currentCharacter: { name: string, imageUrl: string } | null = null;
-let selectedCharacterForMapping: { name: string, imageUrl: string } | null = null;
+let currentCharacter: { name: string; imageUrl: string } | null = null;
+let selectedCharacterForMapping: { name: string; imageUrl: string } | null = null;
 
 // Configuration for page numbering
 const romanNumeralPages = 1; // Number of pages that use Roman numerals
@@ -323,7 +323,7 @@ async function fetchPageRange(startPage, endPage) {
 
     const data = await response.json();
     // Cache each page's metadata
-    data.forEach((page: { pageNumber: string | number; }) => {
+    data.forEach((page: { pageNumber: string | number }) => {
       pageMetadataCache[page.pageNumber] = page;
     });
 
@@ -425,7 +425,7 @@ function setupPageObserver() {
   const observerOptions = {
     root: document.getElementById("content-container"),
     rootMargin: "0px",
-    threshold: 0.4 // Consider page visible when 40% is in view
+    threshold: 0.4, // Consider page visible when 40% is in view
   };
 
   // Keep track of currently visible pages
@@ -479,6 +479,7 @@ function setupPageObserver() {
 
 // Unified function to update notes for one or more pages
 async function updatePageNotes(pageIndexes) {
+  console.log("[UPDATE PAGE] updatePageNotes", pageIndexes);
   const leftNotes = document.getElementById("left-notes");
   if (!leftNotes) return;
 
@@ -498,12 +499,9 @@ async function updatePageNotes(pageIndexes) {
     actualPageNumber = `${pageNumbers[0]}.5`;
   }
 
-  console.log("notesTitle", notesTitle);
-  console.log("actualPageNumber", actualPageNumber);
+  console.log("[UPDATE PAGE] notesTitle", notesTitle);
 
   // Update the notes header with close button
-  const closeButton = `<button class="close-notes-button">&times;</button>`;
-  leftNotes.innerHTML = `<h3>${notesTitle}</h3>${closeButton}`;
 
   // Add click event to close button
   const closeBtn = leftNotes.querySelector(".close-notes-button");
@@ -513,6 +511,8 @@ async function updatePageNotes(pageIndexes) {
 
   // Array to hold all page metadata
   const pageMetadata = await fetchPageMetadata(actualPageNumber);
+  const closeButton = `<button class="close-notes-button">&times;</button>`;
+  leftNotes.innerHTML = `<h3>${notesTitle}</h3>${closeButton}`;
   const combinedNotes = pageMetadata.metadata.notesForPage;
 
   if (combinedNotes.length > 0) {
@@ -521,7 +521,7 @@ async function updatePageNotes(pageIndexes) {
       createMobileCharacterStrip(combinedNotes);
     }
 
-    console.log("combinedNotes", combinedNotes);
+    console.log("[UPDATE PAGE] combinedNotes", combinedNotes);
     // prepare all notes in the notes panel
     combinedNotes.forEach((entity) => {
       const entityDiv = document.createElement("div");
@@ -878,9 +878,7 @@ async function fetchExistingCharactersWithImages() {
     if (!response.ok) {
       throw new Error(`Failed to fetch characters with images: ${response.statusText}`);
     }
-    return await response.json() as {
-      [name: string]: string;
-    };
+    return (await response.json()) as { [name: string]: string };
   } catch (error) {
     console.error("Error fetching characters with images:", error);
     return {};
@@ -889,11 +887,7 @@ async function fetchExistingCharactersWithImages() {
 
 async function removeCharacter(characterName) {
   try {
-    const response = await fetch("/api/characters/remove", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ characterName })
-    });
+    const response = await fetch("/api/characters/remove", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ characterName }) });
 
     if (!response.ok) {
       throw new Error(`Failed to remove character: ${response.statusText}`);
@@ -910,7 +904,7 @@ async function mapCharacter(characterName, existingCharacterName, existingCharac
     const response = await fetch("/api/characters/map", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ characterName, existingCharacterName, existingCharacterImageUrl })
+      body: JSON.stringify({ characterName, existingCharacterName, existingCharacterImageUrl }),
     });
 
     if (!response.ok) {
@@ -925,11 +919,7 @@ async function mapCharacter(characterName, existingCharacterName, existingCharac
 
 async function createCharacterImage(characterName: string) {
   try {
-    const response = await fetch("/api/characters/createImage", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ characterName })
-    });
+    const response = await fetch("/api/characters/createImage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ characterName }) });
 
     if (!response.ok) {
       throw new Error(`Failed to create character image: ${response.statusText}`);
@@ -1261,7 +1251,7 @@ function populateChaptersList() {
   pageChapters.forEach((chapter) => {
     const chapterItem = document.createElement("div");
     chapterItem.classList.add("chapter-item");
-    chapterItem.textContent = `Chapter ${chapter.chapter}`;
+    chapterItem.textContent = `Chapter ${chapter.chapter + 1} (${chapter.pageCount} pages)`;
     chapterItem.dataset.pageId = chapter.pageId;
     chapterItem.addEventListener("click", () => {
       goToChapter(chapter.pageId);
@@ -1321,7 +1311,7 @@ document.addEventListener(
     // Log touch start position for debugging
     console.log(`Touch start at X: ${touchStartX}, sidebar visible: ${isMobileCharactersVisible}`);
   },
-  { passive: true }
+  { passive: true },
 );
 
 document.addEventListener(
@@ -1398,7 +1388,7 @@ document.addEventListener(
       }
     }
   },
-  { passive: false }
+  { passive: false },
 );
 
 document.addEventListener(
@@ -1479,7 +1469,7 @@ document.addEventListener(
 
     handleSwipe();
   },
-  { passive: true }
+  { passive: true },
 );
 
 function handleSwipe() {
@@ -1542,7 +1532,7 @@ if (notesEdgeIndicator) {
         toggleMobileNotes();
       }
     },
-    { passive: false }
+    { passive: false },
   ); // Use non-passive listener to call preventDefault
 
   // Add regular click event listener
@@ -1656,8 +1646,7 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
 }
 
 // Initialize the app
-document.addEventListener("DOMContentLoaded", function() {
-
+document.addEventListener("DOMContentLoaded", function () {
   // Initialize night mode from localStorage
   if (localStorage.getItem("nightMode") === "true") {
     toggleNightMode();
