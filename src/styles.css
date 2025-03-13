@@ -18,12 +18,14 @@
   font-family: "Georgia", serif;
   background-color: #f0f0f0;
   height: 100vh;
-  height: -webkit-fill-available; /* Fill entire height on iOS */
+  height: calc(100vh + env(safe-area-inset-bottom)); /* Extend to include the bottom safe area */
+  min-height: -webkit-fill-available; /* Fill entire height on iOS */
   overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: background-color 0.3s ease;
   padding: 0;
+  padding-bottom: env(safe-area-inset-bottom); /* Add padding for the safe area */
 }
 
 #legacy.night-mode {
@@ -35,11 +37,12 @@
   display: flex;
   width: 100%;
   height: calc(100vh - 50px);
+  height: calc(100vh - 50px + env(safe-area-inset-bottom)); /* Extend to include the bottom safe area */
   position: relative;
   /* transition: all 0.3s ease; */
   padding: 0 10px;
   padding-top: 0;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom); /* Add padding for the safe area */
 }
 
 #legacy .notes-container {
@@ -91,7 +94,7 @@
   scroll-behavior: smooth;
   padding: 0 20px;
   padding-top: 0;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: 0;
   will-change: padding; /* Optimize for animations */
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -103,7 +106,7 @@
   width: 100%;
   max-width: 800px;
   padding: 0px 40px;
-  padding-bottom: max(0px, env(safe-area-inset-bottom));
+  padding-bottom: 0;
   background-color: white;
   /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); */
   /* border-radius: 5px; */
@@ -525,7 +528,7 @@
   overflow-y: auto;
   padding: 10px;
   padding-top: max(10px, env(safe-area-inset-top));
-  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  padding-bottom: 0;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
   z-index: 40;
   -webkit-overflow-scrolling: touch;
@@ -614,23 +617,35 @@
   #legacy #content-container {
     padding-left: max(80px, calc(env(safe-area-inset-left) + 70px));
     padding-right: max(20px, env(safe-area-inset-right));
-    padding-top: 0;
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
   }
 
   #legacy.characters-hidden #content-container {
     padding-left: max(10px, env(safe-area-inset-left));
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
   }
 
   #legacy #extra-controls {
     right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
   }
 
   #legacy #toggle-characters-button {
     left: max(20px, calc(env(safe-area-inset-left) + 10px));
+    top: max(20px, calc(env(safe-area-inset-top) + 10px));
   }
 
   #legacy .mobile-character-strip {
     padding-left: max(10px, env(safe-area-inset-left));
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    padding-top: max(10px, env(safe-area-inset-top));
+  }
+
+  #legacy .mobile-horizontal-character-strip {
+    padding-bottom: max(5px, env(safe-area-inset-bottom));
+    padding-left: max(15px, env(safe-area-inset-left));
+    padding-right: max(15px, env(safe-area-inset-right));
   }
 }
 
@@ -651,7 +666,7 @@
     margin: 0;
     padding: 20px;
     padding-top: max(20px, env(safe-area-inset-top));
-    padding-bottom: max(20px, env(safe-area-inset-bottom));
+    padding-bottom: 0;
     border-radius: 0;
     z-index: 50;
     transform: translateX(100%); /* Changed from -100% to 100% to slide from right */
@@ -675,6 +690,7 @@
   #legacy #content-container {
     width: 100%;
     height: 100vh;
+    height: calc(100vh + env(safe-area-inset-bottom)); /* Extend to include the bottom safe area */
     margin: 0;
     padding: 10px;
     padding-top: 0;
@@ -859,12 +875,14 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 85px;
+  height: 100px; /* Include the safe area in the height */
   background-color: rgba(255, 255, 255, 0.85);
   overflow-x: auto;
   overflow-y: hidden;
   padding: 5px 0px;
-  padding-bottom: max(12px, calc(env(safe-area-inset-bottom) + 10px));
+  padding-bottom: 0;
+  padding-left: max(15px, env(safe-area-inset-left));
+  padding-right: max(15px, env(safe-area-inset-right));
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
   z-index: 40;
   -webkit-overflow-scrolling: touch;
@@ -879,6 +897,16 @@
   /* Horizontal layout */
   white-space: nowrap;
   /* text-align: center; */
+
+  /* Allow scrolling to reach edge items */
+  scroll-padding: 0;
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+}
+
+/* Hide scrollbar for Webkit browsers */
+#legacy .mobile-horizontal-character-strip::-webkit-scrollbar {
+  display: none;
 }
 
 #legacy.night-mode .mobile-horizontal-character-strip {
@@ -897,11 +925,11 @@
 }
 
 #legacy .mobile-horizontal-character-item:first-child {
-  margin-left: 5px;
+  margin-left: 0px; /* Removed margin since we're adding container padding */
 }
 
 #legacy .mobile-horizontal-character-item:last-child {
-  margin-right: 5px;
+  margin-right: 0px; /* Removed margin since we're adding container padding */
 }
 
 #legacy .mobile-horizontal-character-item img {
@@ -933,9 +961,14 @@
   margin-top: 4px;
 }
 
+/* Add this new style to ensure content is visible above the horizontal character strip */
+#legacy.characters-visible #content-container {
+  padding-bottom: calc(85px + env(safe-area-inset-bottom));
+}
+
 /* Adjust content padding when horizontal strip is visible */
 #legacy.characters-hidden #content-container {
-  padding-bottom: max(90px, calc(85px + env(safe-area-inset-bottom)));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
 }
 
 @media (max-width: 768px) {
