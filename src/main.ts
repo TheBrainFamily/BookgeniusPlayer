@@ -716,8 +716,8 @@ function createMobileCharacterStrip(combinedNotes) {
   });
 
   // Add strips to body
-  document.body.appendChild(mobileStrip);
-  document.body.appendChild(horizontalStrip);
+  document.getElementById("legacy").appendChild(mobileStrip);
+  document.getElementById("legacy").appendChild(horizontalStrip);
 }
 
 // Update view - modified for the infinite scroll approach
