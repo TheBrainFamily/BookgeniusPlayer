@@ -1,7 +1,1 @@
-module.exports = {
-  content: ['./src/**/*.tsx'],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};
+module.exports = { content: ["components/**/*.tsx", "./src/**/*.tsx"], theme: { extend: {} }, plugins: [] };

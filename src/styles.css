@@ -6,7 +6,15 @@
   --safe-area-inset-right: env(safe-area-inset-right);
 }
 
-body {
+/* Prevent horizontal overflow and movement on legacy container for mobile UX */
+#legacy,
+#legacy * {
+  overflow-x: hidden; /* explicitly disable horizontal overflow */
+  overscroll-behavior-x: none; /* prevents accidental horizontal scroll interactions */
+  touch-action: pan-y; /* allows only vertical scrolling on touch */
+}
+
+#legacy {
   font-family: "Georgia", serif;
   background-color: #f0f0f0;
   height: 100vh;

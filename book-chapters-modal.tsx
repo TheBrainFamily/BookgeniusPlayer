@@ -1,82 +1,61 @@
-import React, { useState } from "react";
-import { Book, Moon, X, List, FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { pageChapters } from "./chapters";
+import { useState } from "react"
+import { Book, Moon, X, List, FileText } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
-const getTitle = (chapter: number) => {
-  const chapterNames = [
-    "Zero",
-    "One",
-    "Two",
-    "Three",
-    "Four",
-    "Five",
-    "Six",
-    "Seven",
-    "Eight",
-    "Nine",
-    "Ten",
-    "Eleven",
-    "Twelve",
-    "Thirteen",
-    "Fourteen",
-    "Fifteen",
-    "Sixteen",
-    "Seventeen",
-    "Eighteen",
-    "Nineteen",
-    "Twenty",
-    "Twenty-One",
-    "Twenty-Two",
-    "Twenty-Three",
-    "Twenty-Four",
-    "Twenty-Five",
-    "Twenty-Six",
-    "Twenty-Seven",
-  ];
-  return `Chapter ${chapterNames[chapter] || chapter}`;
-};
 // Sample chapter data - replace with your actual data
-const chapters = [...pageChapters.map((page) => ({ id: page.chapter, title: getTitle(page.chapter), page: page.pageId.replace("page_", "") }))];
+const chapters = [
+  { id: 1, title: "The Beginning", page: 1 },
+  { id: 2, title: "The Journey Begins", page: 15 },
+  { id: 3, title: "Unexpected Challenges", page: 32 },
+  { id: 4, title: "A New Friend", page: 48 },
+  { id: 5, title: "The Discovery", page: 67 },
+  { id: 6, title: "Facing Fears", page: 85 },
+  { id: 7, title: "The Revelation", page: 103 },
+  { id: 8, title: "Turning Point", page: 124 },
+  { id: 9, title: "The Confrontation", page: 142 },
+  { id: 10, title: "Resolution", page: 163 },
+  { id: 11, title: "New Beginnings", page: 185 },
+  { id: 12, title: "Epilogue", page: 201 },
+]
 
-type ModalType = null | "chapters" | "page";
+type ModalType = null | "chapters" | "page"
 
 export default function BookChaptersModal() {
-  const [overlayOpen, setOverlayOpen] = useState(false);
-  const [activeModal, setActiveModal] = useState<ModalType>(null);
-  const [nightMode, setNightMode] = useState(false);
-  const [pageNumber, setPageNumber] = useState("");
+  const [overlayOpen, setOverlayOpen] = useState(false)
+  const [activeModal, setActiveModal] = useState<ModalType>(null)
+  const [nightMode, setNightMode] = useState(false)
+  const [pageNumber, setPageNumber] = useState("")
 
   const navigateToChapter = (chapterId: number, page: number) => {
-    console.log(`Navigating to chapter ${chapterId}, page ${page}`);
+    console.log(`Navigating to chapter ${chapterId}, page ${page}`)
     // Implement your navigation logic here
     // For example: router.push(`/book/chapter/${chapterId}`)
-    setActiveModal(null);
-    setOverlayOpen(false);
-  };
+    setActiveModal(null)
+    setOverlayOpen(false)
+  }
 
   const navigateToPage = () => {
-    const page = Number.parseInt(pageNumber);
+    const page = Number.parseInt(pageNumber)
     if (!isNaN(page) && page > 0) {
-      console.log(`Navigating to page ${page}`);
+      console.log(`Navigating to page ${page}`)
       // Implement your navigation logic here
       // For example: router.push(`/book/page/${page}`)
-      setActiveModal(null);
-      setOverlayOpen(false);
-      setPageNumber("");
+      setActiveModal(null)
+      setOverlayOpen(false)
+      setPageNumber("")
     }
-  };
+  }
 
   const toggleNightMode = () => {
-    setNightMode(!nightMode);
+    setNightMode(!nightMode)
     // Implement your night mode logic here
-    document.body.classList.toggle("dark");
-    setOverlayOpen(false);
-  };
+    document.body.classList.toggle("dark")
+    setOverlayOpen(false)
+  }
 
   return (
     <>
@@ -90,7 +69,10 @@ export default function BookChaptersModal() {
 
       {/* Overlay with options */}
       {overlayOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center" onClick={() => setOverlayOpen(false)}>
+        <div
+          className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center"
+          onClick={() => setOverlayOpen(false)}
+        >
           <div className="bg-background rounded-lg p-4 w-64 space-y-2" onClick={(e) => e.stopPropagation()}>
             <Button variant="ghost" className="w-full justify-start text-left" onClick={toggleNightMode}>
               <Moon className="mr-2 h-4 w-4" />
@@ -101,8 +83,8 @@ export default function BookChaptersModal() {
               variant="ghost"
               className="w-full justify-start text-left"
               onClick={() => {
-                setActiveModal("chapters");
-                setOverlayOpen(false);
+                setActiveModal("chapters")
+                setOverlayOpen(false)
               }}
             >
               <List className="mr-2 h-4 w-4" />
@@ -113,15 +95,20 @@ export default function BookChaptersModal() {
               variant="ghost"
               className="w-full justify-start text-left"
               onClick={() => {
-                setActiveModal("page");
-                setOverlayOpen(false);
+                setActiveModal("page")
+                setOverlayOpen(false)
               }}
             >
               <FileText className="mr-2 h-4 w-4" />
               Go to Page
             </Button>
 
-            <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={() => setOverlayOpen(false)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2"
+              onClick={() => setOverlayOpen(false)}
+            >
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </Button>
@@ -133,7 +120,7 @@ export default function BookChaptersModal() {
       <Sheet
         open={activeModal === "chapters"}
         onOpenChange={(open) => {
-          if (!open) setActiveModal(null);
+          if (!open) setActiveModal(null)
         }}
       >
         <SheetContent side="bottom" className="h-[80vh] rounded-t-xl">
@@ -150,6 +137,7 @@ export default function BookChaptersModal() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
+                      <span className="text-sm font-medium text-muted-foreground">{chapter.id}</span>
                       <span className="font-medium">{chapter.title}</span>
                     </div>
                     <span className="text-sm text-muted-foreground">p. {chapter.page}</span>
@@ -165,7 +153,7 @@ export default function BookChaptersModal() {
       <Sheet
         open={activeModal === "page"}
         onOpenChange={(open) => {
-          if (!open) setActiveModal(null);
+          if (!open) setActiveModal(null)
         }}
       >
         <SheetContent side="bottom" className="rounded-t-xl">
@@ -175,14 +163,26 @@ export default function BookChaptersModal() {
           <div className="py-6 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="page-number">Page Number</Label>
-              <Input id="page-number" type="number" min="1" placeholder="Enter page number" value={pageNumber} onChange={(e) => setPageNumber(e.target.value)} />
+              <Input
+                id="page-number"
+                type="number"
+                min="1"
+                placeholder="Enter page number"
+                value={pageNumber}
+                onChange={(e) => setPageNumber(e.target.value)}
+              />
             </div>
-            <Button className="w-full" onClick={navigateToPage} disabled={!pageNumber || isNaN(Number.parseInt(pageNumber)) || Number.parseInt(pageNumber) < 1}>
+            <Button
+              className="w-full"
+              onClick={navigateToPage}
+              disabled={!pageNumber || isNaN(Number.parseInt(pageNumber)) || Number.parseInt(pageNumber) < 1}
+            >
               Go to Page
             </Button>
           </div>
         </SheetContent>
       </Sheet>
     </>
-  );
+  )
 }
+
