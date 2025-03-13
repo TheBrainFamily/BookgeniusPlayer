@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Book, Moon, X, List, FileText } from "lucide-react";
+import { Book, Moon, X, List, FileText, PanelLeft, PanelBottom } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { pageChapters } from "./chapters";
 import { isNightMode, toggleNightMode } from "./helpers/setIsNightMode";
 import { goToPage } from "./helpers/pagesNavigation";
+import { toggleMobileCharacters, isMobileCharactersVisible } from "./isMobileCharactersVisible";
 
 const getTitle = (chapter: number) => {
   const chapterNames = [
@@ -51,11 +52,13 @@ export default function BookChaptersModal() {
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [nightMode, setNightMode] = useState(isNightMode());
   const [pageNumber, setPageNumber] = useState("");
+  const [charactersVertical, setCharactersVertical] = useState(isMobileCharactersVisible());
 
   // Update the local state when the night mode changes externally
   useEffect(() => {
     const handleStorageChange = () => {
       setNightMode(isNightMode());
+      setCharactersVertical(isMobileCharactersVisible());
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -91,6 +94,13 @@ export default function BookChaptersModal() {
     setOverlayOpen(false);
   };
 
+  const handleToggleCharacters = () => {
+    console.log("[BOOK MODAL] handleToggleCharacters");
+    toggleMobileCharacters();
+    setCharactersVertical(isMobileCharactersVisible());
+    setOverlayOpen(false);
+  };
+
   return (
     <>
       {/* Fixed button in top right corner */}
@@ -108,6 +118,11 @@ export default function BookChaptersModal() {
             <Button variant="ghost" className="w-full justify-start text-left" onClick={handleToggleNightMode}>
               <Moon className="mr-2 h-4 w-4" />
               Night Mode {nightMode ? "(On)" : "(Off)"}
+            </Button>
+
+            <Button variant="ghost" className="w-full justify-start text-left" onClick={handleToggleCharacters}>
+              {charactersVertical ? <PanelBottom className="mr-2 h-4 w-4" /> : <PanelLeft className="mr-2 h-4 w-4" />}
+              Show Characters {charactersVertical ? "Horizontally" : "Vertically"}
             </Button>
 
             <Button

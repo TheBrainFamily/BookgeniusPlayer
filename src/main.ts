@@ -5,6 +5,7 @@ import { isNightMode, setIsNightMode } from "@/src/helpers/setIsNightMode";
 import { getCurrentPage, goToNextPage, goToPage, goToPreviousPage, setCurrentPage } from "@/src/helpers/pagesNavigation";
 import { pagesToSkipFooterGeneration, romanNumeralPages } from "@/src/consts";
 import { isMobileCharactersVisible, getIsTogglingMobileCharacters, toggleMobileCharacters } from "@/src/isMobileCharactersVisible";
+import { startReactComponents } from "./react-components";
 
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
@@ -1341,10 +1342,7 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
       break;
     case "c":
     case "C":
-      // Only toggle if not already in progress
-      if (!getIsTogglingMobileCharacters()) {
-        toggleMobileCharacters();
-      }
+      toggleMobileCharacters();
       break;
     case "Escape":
       // Cancel page number input on Escape
@@ -1398,3 +1396,5 @@ document.addEventListener("DOMContentLoaded", function () {
     await keyboardNavigationSetup(event);
   });
 });
+
+startReactComponents();

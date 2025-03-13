@@ -1,4 +1,4 @@
-let _isMobileCharactersVisible = false; // Track if character strip is visible on mobile
+let _isMobileCharactersVisible = localStorage.getItem("mobileCharactersVisible") === "true" ? true : false; // Track if character strip is visible on mobile
 export const isMobileCharactersVisible = () => _isMobileCharactersVisible;
 export const setIsMobileCharactersVisible = (visible: boolean) => {
   _isMobileCharactersVisible = visible;
@@ -9,12 +9,17 @@ let isTogglingMobileCharacters = false;
 export const getIsTogglingMobileCharacters = () => isTogglingMobileCharacters;
 const setIsTogglingMobileCharacters = (visible: boolean) => {
   isTogglingMobileCharacters = visible;
+  // Save to local storage
+  localStorage.setItem("mobileCharactersVisible", visible.toString());
 };
 
 // Toggle mobile character strip
 export function toggleMobileCharacters() {
+  console.log("running toggleMobileCharacters");
   // Prevent multiple concurrent toggles
   if (getIsTogglingMobileCharacters()) return;
+
+  console.log("continuing, nothing in progress");
 
   const verticalStrip = document.getElementById("mobile-character-strip");
   const horizontalStrip = document.getElementById("mobile-horizontal-character-strip");
@@ -54,13 +59,4 @@ export function toggleMobileCharacters() {
 
     setIsTogglingMobileCharacters(false);
   }, 50);
-}
-
-// Helper function to check if an element is visible in a container
-function isElementVisible(element: HTMLElement, container: HTMLElement) {
-  const containerRect = container.getBoundingClientRect();
-  const elementRect = element.getBoundingClientRect();
-
-  // Element is at least partially visible if:
-  return elementRect.bottom > containerRect.top && elementRect.top < containerRect.bottom;
 }

@@ -6,5 +6,7 @@ const MyFirstComponent = () => {
   return <BookChaptersModal />;
 };
 
-const root = createRoot(document.getElementById("chapters-root"));
-root.render(<MyFirstComponent />);
+export const startReactComponents = () => {
+  const root = createRoot(document.getElementById("chapters-root"));
+  root.render(<MyFirstComponent />);
+};

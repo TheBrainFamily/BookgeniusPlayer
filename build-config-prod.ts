@@ -36,14 +36,7 @@ async function runBuild(): Promise<void> {
   try {
     await prepareBookFile();
     await esbuild.build({ entryPoints: ["./src/main.ts"], bundle: true, platform: "browser", sourcemap: true, outfile: "./dist/main.js", define: { "require.main": "undefined" } });
-    await esbuild.build({
-      entryPoints: ["./src/react-components.tsx"],
-      bundle: true,
-      platform: "browser",
-      sourcemap: true,
-      outfile: "./dist/react-components.js",
-      define: { "require.main": "undefined" },
-    });
+
     await restoreBookFile();
     console.log("✅ Build completed successfully");
   } catch (error) {
