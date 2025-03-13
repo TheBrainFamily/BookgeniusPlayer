@@ -1593,6 +1593,68 @@ pageInput.addEventListener("keydown", (e) => {
   });
 });
 
+async function keyboardNavigationSetup(event: KeyboardEvent) {
+  if (event.key === "s" && (event.metaKey || event.ctrlKey)) {
+    event.preventDefault(); // Prevent browser save dialog
+    enterSetPageNumberMode();
+    return;
+  }
+
+  // Check if the key is a number (0-9)
+  if (/^[0-9]$/.test(event.key) && !event.ctrlKey && !event.altKey && !event.metaKey) {
+    handlePageNumberInput(event.key);
+    return;
+  }
+
+  // Handle other keyboard navigation
+  switch (event.key) {
+    case "ArrowLeft":
+    case "p":
+    case "P":
+      await goToPreviousPage();
+      break;
+    case "ArrowRight":
+    case "n":
+    case "N":
+      await goToNextPage();
+      break;
+    case "m":
+    case "M":
+      toggleNightMode();
+      break;
+    case "c":
+    case "C":
+      // Only toggle if not already in progress
+      if (!isTogglingMobileCharacters) {
+        toggleMobileCharacters();
+      }
+      break;
+    case "Escape":
+      // Cancel page number input on Escape
+      typedPageNumber = "";
+      pageOffsetInput = "";
+      isSettingPageNumber = false;
+      if (pageInputTimeout) {
+        clearTimeout(pageInputTimeout);
+      }
+      if (pageOffsetInputTimeout) {
+        clearTimeout(pageOffsetInputTimeout);
+      }
+      pageNumberIndicator.classList.remove("visible");
+
+      // Close notes panel if open
+      if (isMobileNotesVisible) {
+        toggleMobileNotes();
+      }
+
+      // Close any active modals
+      document.querySelectorAll(".modal-overlay.active").forEach((modal) => {
+        modal.classList.remove("active");
+      });
+      break;
+  }
+}
+
 // Initialize the app
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -1650,64 +1712,6 @@ document.addEventListener("DOMContentLoaded", function() {
   // Keyboard navigation
   document.addEventListener("keydown", async (event) => {
     // Handle Command+S to set page number
-    if (event.key === "s" && (event.metaKey || event.ctrlKey)) {
-      event.preventDefault(); // Prevent browser save dialog
-      enterSetPageNumberMode();
-      return;
-    }
-
-    // Check if the key is a number (0-9)
-    if (/^[0-9]$/.test(event.key) && !event.ctrlKey && !event.altKey && !event.metaKey) {
-      handlePageNumberInput(event.key);
-      return;
-    }
-
-    // Handle other keyboard navigation
-    switch (event.key) {
-      case "ArrowLeft":
-      case "p":
-      case "P":
-        await goToPreviousPage();
-        break;
-      case "ArrowRight":
-      case "n":
-      case "N":
-        await goToNextPage();
-        break;
-      case "m":
-      case "M":
-        toggleNightMode();
-        break;
-      case "c":
-      case "C":
-        // Only toggle if not already in progress
-        if (!isTogglingMobileCharacters) {
-          toggleMobileCharacters();
-        }
-        break;
-      case "Escape":
-        // Cancel page number input on Escape
-        typedPageNumber = "";
-        pageOffsetInput = "";
-        isSettingPageNumber = false;
-        if (pageInputTimeout) {
-          clearTimeout(pageInputTimeout);
-        }
-        if (pageOffsetInputTimeout) {
-          clearTimeout(pageOffsetInputTimeout);
-        }
-        pageNumberIndicator.classList.remove("visible");
-
-        // Close notes panel if open
-        if (isMobileNotesVisible) {
-          toggleMobileNotes();
-        }
-
-        // Close any active modals
-        document.querySelectorAll(".modal-overlay.active").forEach((modal) => {
-          modal.classList.remove("active");
-        });
-        break;
-    }
+    await keyboardNavigationSetup(event);
   });
 });
