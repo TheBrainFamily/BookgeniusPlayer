@@ -584,9 +584,10 @@ function createMobileCharacterStrip(combinedNotes) {
     }
   });
 
+  console.log("adding strips to body");
   // Add strips to body
-  document.getElementById("legacy").appendChild(mobileStrip);
-  document.getElementById("legacy").appendChild(horizontalStrip);
+  document.getElementById("legacy")!.appendChild(mobileStrip);
+  document.getElementById("legacy")!.appendChild(horizontalStrip);
 }
 
 // Update view - modified for the infinite scroll approach
@@ -1369,7 +1370,6 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
 
 // Initialize the app
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("[ELO] ever loaded dom loaded?");
   // Initialize night mode from localStorage
   if (localStorage.getItem("nightMode") === "true") {
     setIsNightMode(true);
@@ -1385,10 +1385,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Menu options event listeners
 
-  console.log("[ELO] setting keydown listener");
   // Keyboard navigation
   document.addEventListener("keydown", async (event) => {
-    console.log("[ELO] keydown executed");
     // Handle Command+S to set page number
     await keyboardNavigationSetup(event);
   });

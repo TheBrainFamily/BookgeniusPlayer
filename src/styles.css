@@ -101,6 +101,7 @@
   backface-visibility: hidden;
   -webkit-perspective: 1000;
   perspective: 1000;
+  font-size: 16px;
 }
 
 #legacy .page {
@@ -115,11 +116,6 @@
   line-height: 1.6;
   position: relative;
   margin: 0px 0px;
-}
-
-/* Add margin to first element of page for visual separation */
-#legacy .page > *:first-child {
-  margin-top: 15px;
 }
 
 /* Make sure the top of the first page has enough space */
@@ -296,7 +292,7 @@
 /* Page footer with page numbers */
 #legacy .page-footer {
   position: absolute;
-  top: 20px;
+  top: 2px;
   right: 2px;
   font-size: 12px;
   color: #666;
@@ -713,8 +709,7 @@
   }
 
   #legacy .page {
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 0px 20px;
     line-height: 1.5;
   }
 
@@ -837,8 +832,7 @@
 /* Adjust font size for small devices */
 @media (max-width: 480px) {
   #legacy .page {
-    font-size: 16px;
-    padding: 10px 15px;
+    padding: 0px 15px;
   }
 }
 

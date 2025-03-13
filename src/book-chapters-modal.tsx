@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Book, Moon, X, List, FileText, PanelLeft, PanelBottom } from "lucide-react";
+import { Book, Moon, X, List, FileText, PanelLeft, PanelBottom, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Separator } from "@/components/ui/separator";
+
 import { pageChapters } from "./chapters";
 import { isNightMode, toggleNightMode } from "./helpers/setIsNightMode";
 import { goToPage } from "./helpers/pagesNavigation";
@@ -61,7 +64,7 @@ export default function BookChaptersModal() {
   const [nightMode, setNightMode] = useState(isNightMode());
   const [pageNumber, setPageNumber] = useState("");
   const [charactersVertical, setCharactersVertical] = useState(isMobileCharactersVisible());
-
+  const [fontSize, setFontSize] = useState(1);
   useEffect(() => {
     applyDarkMode();
   }, [nightMode]);
@@ -113,6 +116,15 @@ export default function BookChaptersModal() {
     setOverlayOpen(false);
   };
 
+  const adjustFontSize = (sizeChange: number) => {
+    console.log(`Adjusting font size to: ${sizeChange}`);
+    setFontSize(sizeChange);
+    // const currentFontSize = parseFloat(getComputedStyle(document.getElementById("content-container")!).fontSize);
+    // console.log("currentFontSize", currentFontSize);
+    const newFontSize = 16 * sizeChange;
+    document.getElementById("content-container")!.style.fontSize = `${newFontSize}px`;
+  };
+
   return (
     <>
       {/* Fixed button in top right corner */}
@@ -161,6 +173,24 @@ export default function BookChaptersModal() {
               Go to Page
             </Button>
 
+            <Separator />
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Type className="h-4 w-4" />
+                <Label htmlFor="font-size" className="text-sm font-medium">
+                  Font Size: {fontSize.toFixed(1)}x
+                </Label>
+              </div>
+
+              <Slider id="font-size" min={0.5} max={1.5} step={0.1} value={[fontSize]} onValueChange={(value) => adjustFontSize(value[0])} aria-label="Font size" />
+
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Small</span>
+                <span>Default</span>
+                <span>Large</span>
+              </div>
+            </div>
             <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={() => setOverlayOpen(false)}>
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>

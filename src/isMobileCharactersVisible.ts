@@ -24,7 +24,9 @@ export function toggleMobileCharacters() {
   const verticalStrip = document.getElementById("mobile-character-strip");
   const horizontalStrip = document.getElementById("mobile-horizontal-character-strip");
   const contentContainer = document.getElementById("content-container");
-
+  console.log("verticalStrip", verticalStrip);
+  console.log("horizontalStrip", horizontalStrip);
+  console.log("contentContainer", contentContainer);
   if (!verticalStrip || !horizontalStrip || !contentContainer) return;
 
   // Set the lock
