@@ -34,6 +34,7 @@
 }
 
 #legacy #book-container {
+  text-align: justify;
   display: flex;
   width: 100%;
   height: calc(100vh - 50px);
@@ -127,7 +128,7 @@
 }
 
 #legacy.night-mode .page {
-  background-color: #333;
+  background-color: #000;
   color: #eee;
   /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); */
 }

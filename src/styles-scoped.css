@@ -19,7 +19,7 @@
 }
 
 #legacy.night-mode {
-  background-color: #222;
+  background-color: #000;
   color: #ddd;
 }
 
@@ -116,7 +116,7 @@
 }
 
 #legacy.night-mode .page {
-  background-color: #333;
+  background-color: #000000;
   color: #eee;
   /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); */
 }

@@ -47,12 +47,24 @@ const chapters = [...pageChapters.map((page) => ({ id: page.chapter, title: getT
 
 type ModalType = null | "chapters" | "page";
 
+const applyDarkMode = () => {
+  if (isNightMode()) {
+    document.body.classList.add("dark");
+  } else {
+    document.body.classList.remove("dark");
+  }
+};
+
 export default function BookChaptersModal() {
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [nightMode, setNightMode] = useState(isNightMode());
   const [pageNumber, setPageNumber] = useState("");
   const [charactersVertical, setCharactersVertical] = useState(isMobileCharactersVisible());
+
+  useEffect(() => {
+    applyDarkMode();
+  }, [nightMode]);
 
   // Update the local state when the night mode changes externally
   useEffect(() => {
@@ -105,8 +117,8 @@ export default function BookChaptersModal() {
     <>
       {/* Fixed button in top right corner */}
       <div className="fixed z-50" style={{ top: "max(env(safe-area-inset-top, 0px), 1rem)", right: "1rem" }}>
-        <Button variant="outline" size="icon" className="rounded-full" onClick={() => setOverlayOpen(true)}>
-          <Book className="h-5 w-5" />
+        <Button variant="outline" size="icon" className="rounded-full dark:bg-black dark:border-gray-700 dark:hover:bg-gray-800" onClick={() => setOverlayOpen(true)}>
+          <Book className="h-5 w-5 dark:text-white" />
           <span className="sr-only">Book options</span>
         </Button>
       </div>
