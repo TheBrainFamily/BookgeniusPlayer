@@ -773,7 +773,7 @@ async function initPage() {
   // Check for saved night mode preference
   if (localStorage.getItem("nightMode") === "true") {
     isNightMode = true;
-    document.body.classList.add("night-mode");
+    document.getElementById("legacy").classList.add("night-mode");
   }
 
   // Initialize the viewer
@@ -1218,7 +1218,7 @@ function enterSetPageNumberMode() {
 // Toggle night mode
 function toggleNightMode() {
   isNightMode = !isNightMode;
-  document.body.classList.toggle("night-mode", isNightMode);
+  document.getElementById("legacy").classList.toggle("night-mode", isNightMode);
   localStorage.setItem("nightMode", String(isNightMode));
 }
 

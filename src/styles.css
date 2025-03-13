@@ -6,7 +6,7 @@
   --safe-area-inset-right: env(safe-area-inset-right);
 }
 
-#legacy {
+body {
   font-family: "Georgia", serif;
   background-color: #f0f0f0;
   height: 100vh;

@@ -22,7 +22,7 @@ const chapters = [
 ];
 
 export default function BookChaptersModal() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const navigateToChapter = (chapterId: number, page: number) => {
     console.log(`Navigating to chapter ${chapterId}, page ${page}`);
