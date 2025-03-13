@@ -4,11 +4,11 @@ import { getPageOffset, setPageOffset } from "./pageOffset";
 import { isNightMode, setIsNightMode } from "@/src/helpers/setIsNightMode";
 import { getCurrentPage, goToNextPage, goToPage, goToPreviousPage, setCurrentPage } from "@/src/helpers/pagesNavigation";
 import { pagesToSkipFooterGeneration, romanNumeralPages } from "@/src/consts";
+import { isMobileCharactersVisible, getIsTogglingMobileCharacters, toggleMobileCharacters } from "@/src/isMobileCharactersVisible";
 
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
 let isMobileNotesVisible = false; // Track if notes panel is open on mobile
-let isMobileCharactersVisible = false; // Track if character strip is visible on mobile
 
 // Number input state for page jumping
 let typedPageNumber = "";
@@ -26,8 +26,6 @@ let touchEndX = 0;
 let touchCurrentX = 0;
 let isSwiping = false;
 let swipeStarted = false;
-// Lock to prevent multiple toggle operations at once
-let isTogglingMobileCharacters = false;
 
 // DOM elements
 const bookContainer = document.getElementById("book-container")!;
@@ -92,135 +90,6 @@ function toggleMobileNotes() {
       notesOverlay.addEventListener("click", clickHandler);
     }
   }
-}
-
-// Get first visible element in content container
-function getFirstVisibleElement(container: HTMLElement) {
-  const elements = container.querySelectorAll("p, h1, h2, h3, h4, li, div.page");
-  const containerRect = container.getBoundingClientRect();
-
-  // Find elements that are at least partially visible
-  const visibleElements = Array.from(elements).filter((el) => {
-    const rect = el.getBoundingClientRect();
-    return rect.bottom > containerRect.top && rect.top < containerRect.bottom;
-  });
-
-  if (visibleElements.length === 0) return null;
-
-  // Find elements that are significantly visible (at least 50px showing)
-  const wellVisibleElements = visibleElements.filter((el) => {
-    const rect = el.getBoundingClientRect();
-    const visibleHeight = Math.min(rect.bottom, containerRect.bottom) - Math.max(rect.top, containerRect.top);
-    return visibleHeight >= 50;
-  });
-
-  // Prefer well-visible elements, but fall back to any visible if needed
-  const targetElements = wellVisibleElements.length > 0 ? wellVisibleElements : visibleElements;
-
-  // Get the element closest to 1/3 from the top of the viewport
-  // This tends to be more stable than the top element
-  const oneThirdPosition = containerRect.top + containerRect.height * 0.33;
-
-  // Sort by distance to the one-third position
-  targetElements.sort((a, b) => {
-    const rectA = a.getBoundingClientRect();
-    const rectB = b.getBoundingClientRect();
-    return Math.abs(rectA.top - oneThirdPosition) - Math.abs(rectB.top - oneThirdPosition);
-  });
-
-  // Return the best element with its offset
-  const bestElement = targetElements[0];
-  const rect = bestElement.getBoundingClientRect();
-  return { element: bestElement, offset: rect.top - containerRect.top };
-}
-
-// Toggle mobile character strip
-function toggleMobileCharacters() {
-  // Prevent multiple concurrent toggles
-  if (isTogglingMobileCharacters) return;
-
-  const verticalStrip = document.getElementById("mobile-character-strip");
-  const horizontalStrip = document.getElementById("mobile-horizontal-character-strip");
-  const contentContainer = document.getElementById("content-container");
-
-  if (!verticalStrip || !horizontalStrip || !contentContainer) return;
-
-  // Set the lock
-  isTogglingMobileCharacters = true;
-
-  // Calculate scroll percentage before toggle (relative to total scrollable area)
-  const scrollHeight = contentContainer.scrollHeight;
-  const scrollTop = contentContainer.scrollTop;
-  const scrollPercentage = scrollTop / scrollHeight;
-
-  // Get visible page elements before toggle for a fallback approach
-  const visiblePageElements = Array.from(document.querySelectorAll(".page.active"));
-  const firstVisiblePage = visiblePageElements.length > 0 ? visiblePageElements[0] : null;
-  const firstVisiblePageId = firstVisiblePage ? firstVisiblePage.id : null;
-
-  // Record the current position and element
-  const firstVisibleElement = getFirstVisibleElement(contentContainer);
-
-  // Toggle visibility state
-  isMobileCharactersVisible = !isMobileCharactersVisible;
-
-  // STEP 1: Immediately toggle the body class to trigger the width change
-  // This forces an immediate reflow of the content
-  document.getElementById("legacy")!.classList.toggle("characters-hidden", !isMobileCharactersVisible);
-  // STEP 3: Immediately restore scroll position after the width change
-  // if (firstVisibleElement && firstVisibleElement.element) {
-  //   // Scroll to the same element that was visible before
-
-  //   // firstVisibleElement.element.scrollIntoView({ behavior: "instant", block: "start" });
-
-  //   // Adjust by the original offset to maintain exact position
-  //   contentContainer.scrollTop -= firstVisibleElement.offset;
-  // } else {
-  //   // Fallback to percentage-based scrolling
-  //   console.log("[TOGGLE MOBILE CHARACTERS] fallback to percentage-based scrolling");
-  //   const newScrollHeight = contentContainer.scrollHeight;
-  //   contentContainer.scrollTop = scrollPercentage * newScrollHeight;
-  // }
-
-  // STEP 4: Now animate the strips with smooth transitions
-  // Toggle vertical strip visibility
-  verticalStrip.classList.toggle("hidden", !isMobileCharactersVisible);
-
-  // Toggle horizontal strip visibility (opposite of vertical)
-  horizontalStrip.classList.toggle("hidden", isMobileCharactersVisible);
-
-  // if (firstVisiblePageId) {
-  //   const targetPage = document.getElementById(firstVisiblePageId);
-  //   if (targetPage && !isElementVisible(targetPage, contentContainer)) {
-  //     // targetPage.scrollIntoView({ behavior: "instant", block: "start" });
-  //     targetPage.scrollIntoView();
-  //   }
-  // }
-
-  // isTogglingMobileCharacters = false;
-
-  // Release the lock after the animation is complete
-  setTimeout(() => {
-    // Do a final position check and adjustment if needed
-    if (firstVisiblePageId) {
-      const targetPage = document.getElementById(firstVisiblePageId);
-      if (targetPage && !isElementVisible(targetPage, contentContainer)) {
-        targetPage.scrollIntoView({ behavior: "instant", block: "start" });
-        // targetPage.scrollIntoView();
-      }
-    }
-
-    isTogglingMobileCharacters = false;
-  }, 50);
-}
-
-// Helper function to check if an element is visible in a container
-function isElementVisible(element: HTMLElement, container: HTMLElement) {
-  const containerRect = container.getBoundingClientRect();
-  const elementRect = element.getBoundingClientRect();
-
-  // Element is at least partially visible if:
-  return elementRect.bottom > containerRect.top && elementRect.top < containerRect.bottom;
 }
 
 // Close mobile notes panel when clicking on the main content area
@@ -617,7 +486,7 @@ function createMobileCharacterStrip(combinedNotes) {
   mobileStrip.id = "mobile-character-strip";
 
   // If we're starting with hidden state, add the class
-  if (!isMobileCharactersVisible) {
+  if (!isMobileCharactersVisible()) {
     mobileStrip.classList.add("hidden");
   }
 
@@ -627,7 +496,7 @@ function createMobileCharacterStrip(combinedNotes) {
   horizontalStrip.id = "mobile-horizontal-character-strip";
 
   // Add hidden class to horizontal strip if vertical strip is visible
-  if (isMobileCharactersVisible) {
+  if (isMobileCharactersVisible()) {
     horizontalStrip.classList.add("hidden");
   }
 
@@ -1192,7 +1061,7 @@ document.addEventListener(
     }
 
     // Log touch start position for debugging
-    console.log(`Touch start at X: ${touchStartX}, sidebar visible: ${isMobileCharactersVisible}`);
+    console.log(`Touch start at X: ${touchStartX}, sidebar visible: ${isMobileCharactersVisible()}`);
   },
   { passive: true },
 );
@@ -1245,8 +1114,8 @@ document.addEventListener(
 
     // For hiding the strip, allow swipes that start on the strip or within a larger area near it
     // For showing, allow swipes from a more generous left area
-    const isStripAreaSwipe = isMobileCharactersVisible && touchStartX < 120; // Increased from 90px
-    const isLeftEdgeSwipe = !isMobileCharactersVisible && touchStartX < 60; // Increased from 30px
+    const isStripAreaSwipe = isMobileCharactersVisible() && touchStartX < 120; // Increased from 90px
+    const isLeftEdgeSwipe = !isMobileCharactersVisible() && touchStartX < 60; // Increased from 30px
 
     // Process the swipe if it's from the appropriate area or if already swiping
     if (isStripAreaSwipe || isLeftEdgeSwipe || isSwiping) {
@@ -1259,7 +1128,7 @@ document.addEventListener(
 
         // Add visual preview of the character strip movement during swipe
         // If the strip is visible, move it left (negative); if hidden, move it from the left (positive)
-        if (isMobileCharactersVisible) {
+        if (isMobileCharactersVisible()) {
           // Calculate how far to slide based on swipe distance (0 to -100%)
           const slidePercent = Math.max(-100, Math.min(0, (diff / window.innerWidth) * 300)); // 300% factor makes it more responsive
           charStrip.style.transform = `translateX(${slidePercent}%)`;
@@ -1400,7 +1269,7 @@ initPage()
     });
   });
 // Add the characters-hidden class to body initially if the character strip is hidden
-document.getElementById("legacy")!.classList.toggle("characters-hidden", !isMobileCharactersVisible);
+document.getElementById("legacy")!.classList.toggle("characters-hidden", !isMobileCharactersVisible());
 
 // Add touch event handling for the notes edge indicator
 const notesEdgeIndicator = document.getElementById("notes-edge-indicator");
@@ -1473,7 +1342,7 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
     case "c":
     case "C":
       // Only toggle if not already in progress
-      if (!isTogglingMobileCharacters) {
+      if (!getIsTogglingMobileCharacters()) {
         toggleMobileCharacters();
       }
       break;
