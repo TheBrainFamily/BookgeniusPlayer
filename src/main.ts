@@ -166,8 +166,7 @@ function toggleMobileCharacters() {
 
   // STEP 1: Immediately toggle the body class to trigger the width change
   // This forces an immediate reflow of the content
-  document.body.classList.toggle("characters-hidden", !isMobileCharactersVisible);
-
+  document.getElementById("legacy")!.classList.toggle("characters-hidden", !isMobileCharactersVisible);
   // STEP 3: Immediately restore scroll position after the width change
   if (firstVisibleElement && firstVisibleElement.element) {
     // Scroll to the same element that was visible before
@@ -1386,7 +1385,7 @@ initPage()
     });
   });
 // Add the characters-hidden class to body initially if the character strip is hidden
-document.body.classList.toggle("characters-hidden", !isMobileCharactersVisible);
+document.getElementById("legacy")!.classList.toggle("characters-hidden", !isMobileCharactersVisible);
 
 // Add touch event handling for the notes edge indicator
 const notesEdgeIndicator = document.getElementById("notes-edge-indicator");

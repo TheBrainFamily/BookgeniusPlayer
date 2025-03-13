@@ -617,7 +617,7 @@
     padding-top: 0;
   }
 
-  #legacy .characters-hidden #content-container {
+  #legacy.characters-hidden #content-container {
     padding-left: max(10px, env(safe-area-inset-left));
   }
 
@@ -691,7 +691,7 @@
   }
 
   /* When character strip is hidden, remove the left padding */
-  #legacy .characters-hidden #content-container {
+  #legacy.characters-hidden #content-container {
     padding-left: max(10px, env(safe-area-inset-left));
   }
 
@@ -934,7 +934,7 @@
 }
 
 /* Adjust content padding when horizontal strip is visible */
-#legacy .characters-hidden #content-container {
+#legacy.characters-hidden #content-container {
   padding-bottom: max(90px, calc(85px + env(safe-area-inset-bottom)));
 }
 
