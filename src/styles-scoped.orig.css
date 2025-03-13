@@ -1,12 +1,11 @@
-/* Scoped legacy CSS */
-#legacy :root {
+:root {
   --safe-area-inset-top: env(safe-area-inset-top);
   --safe-area-inset-bottom: env(safe-area-inset-bottom);
   --safe-area-inset-left: env(safe-area-inset-left);
   --safe-area-inset-right: env(safe-area-inset-right);
 }
 
-#legacy {
+#legacy body {
   font-family: "Georgia", serif;
   background-color: #f0f0f0;
   height: 100vh;
@@ -18,7 +17,7 @@
   padding: 0;
 }
 
-#legacy.night-mode {
+#legacy body.night-mode {
   background-color: #222;
   color: #ddd;
 }
@@ -52,7 +51,7 @@
   flex-shrink: 0;
 }
 
-#legacy.night-mode .notes-container {
+#legacy body.night-mode .notes-container {
   background-color: #252525;
   color: #bbb;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
@@ -69,7 +68,7 @@
   margin-bottom: 0.8em;
 }
 
-#legacy.night-mode .notes-container h3 {
+#legacy body.night-mode .notes-container h3 {
   border-bottom-color: #555;
 }
 
@@ -105,31 +104,31 @@
   margin: 0px 0px;
 }
 
-/* Add margin to first element of page for visual separation */
-#legacy .page > *:first-child {
+#legacy /* Add margin to first element of page for visual separation */
+.page > *:first-child {
   margin-top: 15px;
 }
 
-/* Make sure the top of the first page has enough space */
-#legacy #page-0 > *:first-child {
+#legacy /* Make sure the top of the first page has enough space */
+#page-0 > *:first-child {
   margin-top: 30px;
 }
 
-#legacy.night-mode .page {
+#legacy body.night-mode .page {
   background-color: #333;
   color: #eee;
   /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); */
 }
 
-/* Page separator */
-#legacy .page-separator {
+#legacy /* Page separator */
+.page-separator {
   height: 1px;
   background-color: #ccc;
   margin: 30px auto;
   width: 50%;
 }
 
-#legacy.night-mode .page-separator {
+#legacy body.night-mode .page-separator {
   background-color: #555;
 }
 
@@ -142,7 +141,7 @@
   padding: 2px;
 }
 
-#legacy.night-mode .chapter-header {
+#legacy body.night-mode .chapter-header {
   border-top-color: #555;
 }
 
@@ -197,7 +196,9 @@
 }
 
 #legacy #fullscreen-button,
-#legacy #night-mode-button {
+#night-mode-button,
+#legacy #fullscreen-button,
+#night-mode-button {
   background-color: rgba(0, 0, 0, 0.2);
   color: white;
   border: none;
@@ -210,19 +211,21 @@
 }
 
 #legacy #fullscreen-button:hover,
-#legacy #night-mode-button:hover {
+#night-mode-button:hover,
+#legacy #fullscreen-button:hover,
+#night-mode-button:hover {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
-/* Keyboard shortcut hints */
-#legacy .key-hint {
+#legacy /* Keyboard shortcut hints */
+.key-hint {
   font-size: 12px;
   opacity: 0.7;
   margin-left: 5px;
 }
 
-/* Loading indicator */
-#legacy #loading {
+#legacy /* Loading indicator */
+#loading {
   position: fixed;
   top: 0;
   left: 0;
@@ -237,8 +240,8 @@
   font-size: 24px;
 }
 
-/* Hide loading when done */
-#legacy #loading.hidden {
+#legacy /* Hide loading when done */
+#loading.hidden {
   display: none;
 }
 
@@ -262,8 +265,8 @@
   }
 }
 
-/* Page number indicator */
-#legacy #page-number-indicator {
+#legacy /* Page number indicator */
+#page-number-indicator {
   position: fixed;
   bottom: 70px;
   right: 20px;
@@ -281,8 +284,8 @@
   opacity: 1;
 }
 
-/* Page footer with page numbers */
-#legacy .page-footer {
+#legacy /* Page footer with page numbers */
+.page-footer {
   position: absolute;
   top: 20px;
   right: 2px;
@@ -298,12 +301,12 @@
   right: 40px;
 }
 
-#legacy.night-mode .page-footer {
+#legacy body.night-mode .page-footer {
   color: #999;
 }
 
-/* Modal Styles */
-#legacy .modal-overlay {
+#legacy /* Modal Styles */
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -343,7 +346,7 @@
   transform: translateY(0);
 }
 
-#legacy.night-mode .modal-container {
+#legacy body.night-mode .modal-container {
   background-color: #333;
   color: #eee;
 }
@@ -357,7 +360,7 @@
   padding-bottom: 10px;
 }
 
-#legacy.night-mode .modal-header {
+#legacy body.night-mode .modal-header {
   border-bottom-color: #555;
 }
 
@@ -374,7 +377,7 @@
   color: #777;
 }
 
-#legacy.night-mode .modal-close {
+#legacy body.night-mode .modal-close {
   color: #aaa;
 }
 
@@ -424,17 +427,17 @@
   background-color: #c74545;
 }
 
-#legacy.night-mode .secondary-button {
+#legacy body.night-mode .secondary-button {
   background-color: #555;
   color: #eee;
 }
 
-#legacy.night-mode .secondary-button:hover {
+#legacy body.night-mode .secondary-button:hover {
   background-color: #666;
 }
 
-/* Character selection grid */
-#legacy .character-grid {
+#legacy /* Character selection grid */
+.character-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 15px;
@@ -460,7 +463,7 @@
   background-color: rgba(74, 144, 226, 0.1);
 }
 
-#legacy.night-mode .character-card {
+#legacy body.night-mode .character-card {
   background-color: #444;
 }
 
@@ -488,8 +491,8 @@
   transform: scale(1.05);
 }
 
-/* Mobile Responsive Styles */
-#legacy #toggle-notes-button {
+#legacy /* Mobile Responsive Styles */
+#toggle-notes-button {
   display: none;
 }
 
@@ -505,8 +508,8 @@
   cursor: pointer;
 }
 
-/* Mobile character strip - at bottom of screen */
-#legacy .mobile-character-strip {
+#legacy /* Mobile character strip - at bottom of screen */
+.mobile-character-strip {
   display: none;
   position: fixed;
   top: 0;
@@ -530,7 +533,7 @@
   perspective: 1000;
 }
 
-#legacy.night-mode .mobile-character-strip {
+#legacy body.night-mode .mobile-character-strip {
   background-color: rgba(50, 50, 50, 0.95);
 }
 
@@ -557,7 +560,7 @@
     border-color 0.2s ease;
 }
 
-#legacy.night-mode .mobile-character-item img {
+#legacy body.night-mode .mobile-character-item img {
   border-color: #444;
 }
 
@@ -574,8 +577,8 @@
   line-height: 1.2;
 }
 
-/* Toggle button for character strip */
-#legacy #toggle-characters-button {
+#legacy /* Toggle button for character strip */
+#toggle-characters-button {
   display: none;
   position: fixed;
   top: max(20px, calc(env(safe-area-inset-top) + 10px));
@@ -597,13 +600,13 @@
   background-color: #3a7bc8;
 }
 
-#legacy.night-mode #toggle-characters-button {
+#legacy body.night-mode #toggle-characters-button {
   background-color: #2a5a8e;
 }
 
 /* Styles for iOS landscape mode */
 @media screen and (orientation: landscape) {
-  #legacy #content-container {
+  #content-container {
     padding-left: max(80px, calc(env(safe-area-inset-left) + 70px));
     padding-right: max(20px, env(safe-area-inset-right));
     padding-top: 0;
@@ -628,7 +631,7 @@
 
 /* Media queries for responsive design */
 @media (max-width: 768px) {
-  #legacy #book-container {
+  #book-container {
     flex-direction: column;
     padding: 0;
     height: 100vh;
@@ -652,7 +655,7 @@
     transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1); /* Added smooth transition */
   }
 
-  #legacy.night-mode .notes-container {
+  #legacy body.night-mode .notes-container {
     background-color: #222; /* Dark mode background */
   }
 
@@ -682,8 +685,9 @@
     transform: translateZ(0); /* Force hardware acceleration */
   }
 
-  /* When character strip is hidden, remove the left padding */
-  #legacy .characters-hidden #content-container {
+  #legacy /* When character strip is hidden, remove the left padding */
+  .characters-hidden #content-container, #legacy /* When character strip is hidden, remove the left padding */
+  .characters-hidden #content-container {
     padding-left: max(10px, env(safe-area-inset-left));
   }
 
@@ -704,23 +708,25 @@
   }
 
   #legacy #fullscreen-button,
-  #legacy #night-mode-button {
+  #night-mode-button,
+  #legacy #fullscreen-button,
+  #night-mode-button {
     font-size: 10px;
     padding: 4px 8px;
   }
 
-  /* Show toggle buttons */
-  #legacy #toggle-characters-button {
+  #legacy /* Show toggle buttons */
+  #toggle-characters-button {
     display: block;
   }
 
-  /* Show mobile character strip */
-  #legacy .mobile-character-strip {
+  #legacy /* Show mobile character strip */
+  .mobile-character-strip {
     display: block;
   }
 
-  /* Adjust entity notes for mobile */
-  #legacy .entity-note {
+  #legacy /* Adjust entity notes for mobile */
+  .entity-note {
     flex-direction: column !important;
   }
 
@@ -734,8 +740,8 @@
     display: block;
   }
 
-  /* Modal adjustments for mobile */
-  #legacy .modal-container {
+  #legacy /* Modal adjustments for mobile */
+  .modal-container {
     padding: 15px;
     width: 95%;
   }
@@ -753,8 +759,8 @@
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   }
 
-  /* Notes edge indicator */
-  #legacy .notes-edge-indicator {
+  #legacy /* Notes edge indicator */
+  .notes-edge-indicator {
     display: block;
     position: fixed;
     top: 50%;
@@ -771,8 +777,8 @@
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
   }
 
-  /* Add a pseudo-element to extend the touch area */
-  #legacy .notes-edge-indicator::before {
+  #legacy /* Add a pseudo-element to extend the touch area */
+  .notes-edge-indicator::before {
     content: "";
     position: absolute;
     top: -10px;
@@ -783,8 +789,8 @@
     z-index: 39; /* Below the visible indicator */
   }
 
-  /* Add hover effect for better usability */
-  #legacy .notes-edge-indicator:hover {
+  #legacy /* Add hover effect for better usability */
+  .notes-edge-indicator:hover {
     width: 14px;
     opacity: 0.9;
     background-color: #3a7bc8;
@@ -792,18 +798,20 @@
   }
 
   #legacy .notes-edge-indicator:active,
-  #legacy .notes-edge-indicator.swiping {
+  .notes-edge-indicator.swiping,
+  #legacy .notes-edge-indicator:active,
+  .notes-edge-indicator.swiping {
     width: 12px;
     opacity: 0.9;
     background-color: #3a7bc8;
   }
 
-  #legacy.night-mode .notes-edge-indicator {
+  #legacy body.night-mode .notes-edge-indicator {
     background-color: #2a5a8e;
   }
 
-  /* Hide indicator when notes are visible */
-  #legacy .notes-container.active + .notes-edge-indicator {
+  #legacy /* Hide indicator when notes are visible */
+  .notes-container.active + .notes-edge-indicator {
     opacity: 0;
     pointer-events: none;
   }
@@ -811,14 +819,14 @@
 
 /* Adjust font size for small devices */
 @media (max-width: 480px) {
-  #legacy .page {
+  .page {
     font-size: 16px;
     padding: 10px 15px;
   }
 }
 
-/* Notes overlay for better visual transition */
-#legacy .notes-overlay {
+#legacy /* Notes overlay for better visual transition */
+.notes-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -836,16 +844,16 @@
   pointer-events: auto;
 }
 
-/* Hide character strip when notes are visible */
-#legacy.notes-visible .mobile-character-strip {
+#legacy /* Hide character strip when notes are visible */
+body.notes-visible .mobile-character-strip {
   opacity: 0;
   pointer-events: none;
   transform: translateX(-100%);
   transition: all 0.3s ease;
 }
 
-/* Horizontal character strip for mobile */
-#legacy .mobile-horizontal-character-strip {
+#legacy /* Horizontal character strip for mobile */
+.mobile-horizontal-character-strip {
   display: none;
   position: fixed;
   bottom: 0;
@@ -873,7 +881,7 @@
   /* text-align: center; */
 }
 
-#legacy.night-mode .mobile-horizontal-character-strip {
+#legacy body.night-mode .mobile-horizontal-character-strip {
   background-color: rgba(50, 50, 50, 0.85);
 }
 
@@ -907,7 +915,7 @@
     border-color 0.2s ease;
 }
 
-#legacy.night-mode .mobile-horizontal-character-item img {
+#legacy body.night-mode .mobile-horizontal-character-item img {
   border-color: #444;
 }
 
@@ -925,20 +933,20 @@
   margin-top: 4px;
 }
 
-/* Adjust content padding when horizontal strip is visible */
-#legacy .characters-hidden #content-container {
+#legacy /* Adjust content padding when horizontal strip is visible */
+.characters-hidden #content-container {
   padding-bottom: max(90px, calc(85px + env(safe-area-inset-bottom)));
 }
 
 @media (max-width: 768px) {
   /* Show horizontal strip when vertical is hidden */
-  #legacy.characters-hidden .mobile-horizontal-character-strip {
+  body.characters-hidden .mobile-horizontal-character-strip {
     display: block;
   }
 }
 
-/* Hide the horizontal character strip when notes are visible */
-#legacy.notes-visible .mobile-horizontal-character-strip {
+#legacy /* Hide the horizontal character strip when notes are visible */
+body.notes-visible .mobile-horizontal-character-strip {
   opacity: 0;
   pointer-events: none;
   transform: translateY(100%);
