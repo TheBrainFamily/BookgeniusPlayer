@@ -3,12 +3,12 @@ import { pagesContent } from "./book";
 import { getPageOffset, setPageOffset } from "./pageOffset";
 import { isNightMode, setIsNightMode } from "@/src/helpers/setIsNightMode";
 import { getCurrentPage, goToNextPage, goToPage, goToPreviousPage, setCurrentPage } from "@/src/helpers/pagesNavigation";
-import { romanNumeralPages } from "@/src/consts";
+import { pagesToSkipFooterGeneration, romanNumeralPages } from "@/src/consts";
 
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
 let isMobileNotesVisible = false; // Track if notes panel is open on mobile
-let isMobileCharactersVisible = true; // Track if character strip is visible on mobile
+let isMobileCharactersVisible = false; // Track if character strip is visible on mobile
 
 // Number input state for page jumping
 let typedPageNumber = "";
@@ -393,10 +393,12 @@ function initializePages() {
     pageDiv.innerHTML = content;
 
     // Add page number footer
-    const footer = document.createElement("div");
-    footer.className = "page-footer";
-    footer.textContent = parsePage(index);
-    pageDiv.appendChild(footer);
+    if (index > pagesToSkipFooterGeneration) {
+      const footer = document.createElement("div");
+      footer.className = "page-footer";
+      footer.textContent = parsePage(index);
+      pageDiv.appendChild(footer);
+    }
 
     // Add to content container
     contentContainer.appendChild(pageDiv);
