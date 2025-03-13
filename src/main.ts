@@ -168,17 +168,19 @@ function toggleMobileCharacters() {
   // This forces an immediate reflow of the content
   document.getElementById("legacy")!.classList.toggle("characters-hidden", !isMobileCharactersVisible);
   // STEP 3: Immediately restore scroll position after the width change
-  if (firstVisibleElement && firstVisibleElement.element) {
-    // Scroll to the same element that was visible before
-    firstVisibleElement.element.scrollIntoView({ behavior: "instant", block: "start" });
+  // if (firstVisibleElement && firstVisibleElement.element) {
+  //   // Scroll to the same element that was visible before
 
-    // Adjust by the original offset to maintain exact position
-    contentContainer.scrollTop -= firstVisibleElement.offset;
-  } else {
-    // Fallback to percentage-based scrolling
-    const newScrollHeight = contentContainer.scrollHeight;
-    contentContainer.scrollTop = scrollPercentage * newScrollHeight;
-  }
+  //   // firstVisibleElement.element.scrollIntoView({ behavior: "instant", block: "start" });
+
+  //   // Adjust by the original offset to maintain exact position
+  //   contentContainer.scrollTop -= firstVisibleElement.offset;
+  // } else {
+  //   // Fallback to percentage-based scrolling
+  //   console.log("[TOGGLE MOBILE CHARACTERS] fallback to percentage-based scrolling");
+  //   const newScrollHeight = contentContainer.scrollHeight;
+  //   contentContainer.scrollTop = scrollPercentage * newScrollHeight;
+  // }
 
   // STEP 4: Now animate the strips with smooth transitions
   // Toggle vertical strip visibility
@@ -187,6 +189,16 @@ function toggleMobileCharacters() {
   // Toggle horizontal strip visibility (opposite of vertical)
   horizontalStrip.classList.toggle("hidden", isMobileCharactersVisible);
 
+  // if (firstVisiblePageId) {
+  //   const targetPage = document.getElementById(firstVisiblePageId);
+  //   if (targetPage && !isElementVisible(targetPage, contentContainer)) {
+  //     // targetPage.scrollIntoView({ behavior: "instant", block: "start" });
+  //     targetPage.scrollIntoView();
+  //   }
+  // }
+
+  // isTogglingMobileCharacters = false;
+
   // Release the lock after the animation is complete
   setTimeout(() => {
     // Do a final position check and adjustment if needed
@@ -194,11 +206,12 @@ function toggleMobileCharacters() {
       const targetPage = document.getElementById(firstVisiblePageId);
       if (targetPage && !isElementVisible(targetPage, contentContainer)) {
         targetPage.scrollIntoView({ behavior: "instant", block: "start" });
+        // targetPage.scrollIntoView();
       }
     }
 
     isTogglingMobileCharacters = false;
-  }, 400);
+  }, 50);
 }
 
 // Helper function to check if an element is visible in a container
