@@ -263,7 +263,7 @@ function initializePages() {
     pageDiv.innerHTML = content;
 
     // Add page number footer
-    if (index > pagesToSkipFooterGeneration) {
+    if (index > pagesToSkipFooterGeneration + 1) {
       const footer = document.createElement("div");
       footer.className = "page-footer";
       footer.textContent = parsePage(index);
@@ -364,7 +364,12 @@ async function updatePageNotes(pageIndexes) {
     notesTitle = `Notes for Page ${pageNumbers[0]}`;
     actualPageNumber = pageNumbers[0];
   } else {
-    notesTitle = `Notes for Pages ${pageNumbers.join("-")}`;
+    const joinedPageNumbers = pageNumbers.join("-");
+    if (joinedPageNumbers.includes(`${pagesToSkipFooterGeneration + 1}`)) {
+      notesTitle = `Notes`;
+    } else {
+      notesTitle = `Notes for Pages ${joinedPageNumbers}`;
+    }
     actualPageNumber = `${pageNumbers[0]}.5`;
   }
 
@@ -609,7 +614,9 @@ function createMobileCharacterStrip(combinedNotes) {
 async function updateView() {
   console.log("updateView");
   // Fetch metadata for a range of pages
-  const visiblePageIndexes = Array.from(document.querySelectorAll(".page.active")).map((page) => parseInt(page.id.split("-")[1]));
+  const visiblePageIndexes = Array.from(document.querySelectorAll(".page.active"))
+    .map((page) => parseInt(page.id.split("-")[1]))
+    .filter((index) => index > pagesToSkipFooterGeneration);
 
   if (visiblePageIndexes.length === 0) return;
 
@@ -620,15 +627,17 @@ async function updateView() {
   // Calculate range to preload (current visible pages plus some before and after)
   const preloadBefore = Math.max(0, minPageIndex - 5);
   const preloadAfter = Math.min(pagesContent.length - 1, maxPageIndex + 5);
-
+  console.log("preloadBefore", preloadBefore);
+  console.log("preloadAfter", preloadAfter);
+  console.log("visiblePageIndexes", visiblePageIndexes);
   // Calculate actual page numbers for API request
   const startPageNumber = preloadBefore - (romanNumeralPages - 1) + 1;
   const endPageNumber = preloadAfter - (romanNumeralPages - 1) + 1;
 
   // Preload the range in the background
-  fetchPageRange(startPageNumber, endPageNumber).catch((error) => {
-    console.error("Error fetching page range:", error);
-  });
+  // fetchPageRange(startPageNumber, endPageNumber).catch((error) => {
+  //   console.error("Error fetching page range:", error);
+  // });
 
   // If exactly two adjacent pages are visible, we need to check if we should show combined notes
   if (visiblePageIndexes.length === 2) {
@@ -639,8 +648,10 @@ async function updateView() {
     // If they're adjacent pages, trigger the combined notes
     if (secondPage - firstPage === 1) {
       // We'll call this directly here to ensure it's updated during scroll events
-      await updatePageNotes([firstPage, secondPage]);
+      updatePageNotes([firstPage, secondPage]);
     }
+  } else if (visiblePageIndexes.length === 1) {
+    updatePageNotes([visiblePageIndexes[0]]);
   }
 
   // Save current position to local storage - use the first visible page
@@ -694,8 +705,8 @@ function handleResize() {
 // Function to pre-warm the cache for upcoming pages
 async function preWarmCache() {
   // Calculate range to preload (current page plus several before and after)
-  const preloadBefore = Math.max(0, getCurrentPage() - 5);
-  const preloadAfter = Math.min(pagesContent.length - 1, getCurrentPage() + 10);
+  const preloadBefore = Math.max(0, getCurrentPage() - 2);
+  const preloadAfter = Math.min(pagesContent.length - 1, getCurrentPage() + 4);
 
   // Calculate actual page numbers for API request
   const startPageNumber = preloadBefore - (romanNumeralPages - 1) + 1;

@@ -28,6 +28,14 @@
   padding-bottom: env(safe-area-inset-bottom); /* Add padding for the safe area */
 }
 
+#legacy #page-1 {
+  padding-top: 50px;
+}
+
+#legacy h2 {
+  font-size: 150%;
+}
+
 #legacy.night-mode {
   background-color: #222;
   color: #ddd;
@@ -648,6 +656,10 @@
   }
 }
 
+#legacy #right-notes {
+  margin: auto 20px;
+}
+
 /* Media queries for responsive design */
 @media (max-width: 768px) {
   #legacy #book-container {
@@ -683,7 +695,6 @@
   }
 
   #legacy #right-notes {
-    margin: auto 20px;
     display: none; /* Hide right notes on mobile */
   }
 

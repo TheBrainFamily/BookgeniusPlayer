@@ -9,10 +9,6 @@
     <meta name="apple-mobile-web-app-title" content="Book Viewer" />
     <meta name="theme-color" content="#333333" />
     <meta name="description" content="Interactive book reader with character profiles" />
-    <script src="https://unpkg.com/ios-pwa-splash@1.0.0/cdn.min.js"></script>
-    <script>
-      iosPWASplash("/splashscreen.png", "#aaccdd");
-    </script>
 
     <!-- PWA Icons -->
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
@@ -148,8 +144,13 @@
     <div id="react">
       <div id="chapters-root"></div>
     </div>
-    <script src="/src-book/main.js"></script>
+    <script src="/src-book/main.js" async></script>
     <!-- PWA Service Worker Registration -->
+    <script src="https://unpkg.com/ios-pwa-splash@1.0.0/cdn.min.js"></script>
+    <script>
+      iosPWASplash("/splashscreen.png", "#aaccdd");
+    </script>
+
     <script src="/pwa.js"></script>
   </body>
 </html>
