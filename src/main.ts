@@ -226,8 +226,8 @@ function initializePages() {
   const rightNotesHTML = existingRightNotes
     ? existingRightNotes.innerHTML
     : `
-        <h3>Right Notes</h3>
-        <p>This panel will be used for additional information later.</p>
+        <h3>Page summary</h3>
+        <p></p>
       `;
 
   // Clear container
@@ -380,7 +380,10 @@ async function updatePageNotes(pageIndexes) {
 
   // Array to hold all page metadata
   const pageMetadata = await fetchPageMetadata(actualPageNumber);
-  const closeButton = `<button class="close-notes-button">&times;</button>`;
+  let closeButton = "";
+  if (isMobile()) {
+    closeButton = `<button class="close-notes-button">&times;</button>`;
+  }
   leftNotes.innerHTML = `<h3>${notesTitle}</h3>${closeButton}`;
   const combinedNotes = pageMetadata.metadata.notesForPage;
 
@@ -458,9 +461,21 @@ async function updatePageNotes(pageIndexes) {
 
     // Add combined context information if available
     if (pageMetadata.metadata?.contextForPage?.trim() !== "") {
-      const contextElement = document.createElement("p");
-      contextElement.textContent = pageMetadata.metadata.contextForPage;
-      leftNotes.appendChild(contextElement);
+      const contextText = pageMetadata.metadata.contextForPage
+        .replace("# Current Page Summary", "")
+        .replace("# Page Summary", "")
+        .replace("# Summary", "")
+        .replace(/\n/g, "<br>")
+        .trim()
+        .replace(/^(<br>)+/, "");
+      if (isMobile()) {
+        leftNotes.innerHTML += `<p>${contextText}</p>`;
+      } else {
+        const rightNotes = document.getElementById("right-notes");
+        if (rightNotes) {
+          rightNotes.innerHTML = `<h3>Page summary</h3><p>${contextText}</p>`;
+        }
+      }
     }
   } else {
     leftNotes.innerHTML += "<p>No notes for this page.</p>";

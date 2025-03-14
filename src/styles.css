@@ -34,11 +34,9 @@
 }
 
 #legacy #book-container {
-  text-align: justify;
+  text-align: left;
   display: flex;
   width: 100%;
-  height: calc(100vh - 50px);
-  height: calc(100vh - 50px + env(safe-area-inset-bottom)); /* Extend to include the bottom safe area */
   position: relative;
   /* transition: all 0.3s ease; */
   padding: 0 10px;
@@ -46,9 +44,13 @@
   padding-bottom: env(safe-area-inset-bottom); /* Add padding for the safe area */
 }
 
+#legacy #book-container #content-container {
+  text-align: justify;
+}
+
 #legacy .notes-container {
   width: 25%;
-  height: 100%;
+  /* height: 100%; */
   padding: 20px;
   padding-top: max(20px, env(safe-area-inset-top));
   padding-bottom: max(20px, env(safe-area-inset-bottom));
