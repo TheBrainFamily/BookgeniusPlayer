@@ -138,10 +138,10 @@ export default function BookChaptersModal() {
       {/* Overlay with options */}
       {overlayOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center" onClick={() => setOverlayOpen(false)}>
-          <div className="bg-background rounded-lg p-4 w-64 space-y-2" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-background rounded-lg p-4 w-80 space-y-2" onClick={(e) => e.stopPropagation()}>
             <Button variant="ghost" className="w-full justify-start text-left" onClick={handleToggleNightMode}>
               <Moon className="mr-2 h-4 w-4" />
-              Night Mode {nightMode ? "(On)" : "(Off)"}
+              Turn {nightMode ? "Off" : "On"} Night Mode
             </Button>
 
             <Button variant="ghost" className="w-full justify-start text-left" onClick={handleToggleCharacters}>

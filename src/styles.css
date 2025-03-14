@@ -117,7 +117,7 @@
   /* transition: all 0.3s ease; */
   line-height: 1.6;
   position: relative;
-  margin: 0px 0px;
+  margin: 0px auto;
 }
 
 /* Make sure the top of the first page has enough space */
@@ -683,6 +683,7 @@
   }
 
   #legacy #right-notes {
+    margin: auto 20px;
     display: none; /* Hide right notes on mobile */
   }
 

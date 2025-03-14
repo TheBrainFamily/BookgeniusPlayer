@@ -227,7 +227,7 @@ function initializePages() {
     ? existingRightNotes.innerHTML
     : `
         <h3>Page summary</h3>
-        <p></p>
+        <p>Keep reading...</p>
       `;
 
   // Clear container
