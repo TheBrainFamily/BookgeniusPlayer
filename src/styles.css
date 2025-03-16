@@ -727,6 +727,10 @@
     line-height: 1.5;
   }
 
+  #legacy .page .active {
+    padding: 0px 20px;
+  }
+
   #legacy #toggle-notes-button {
     display: block;
   }

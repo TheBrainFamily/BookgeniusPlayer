@@ -15,6 +15,7 @@ import { toggleMobileCharacters, isMobileCharactersVisible } from "./isMobileCha
 
 const getTitle = (chapter: number) => {
   const chapterNames = [
+    "Zero",
     "One",
     "Two",
     "Three",
