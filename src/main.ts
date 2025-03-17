@@ -434,7 +434,7 @@ async function updatePageNotes(pageIndexes) {
         // Store character data in dataset for use in click handler
         imageElement.dataset.characterName = entity.canonicalName;
         imageElement.dataset.originalImageUrl = entity.imageUrl;
-        imageElement.dataset.summary = entity.summary || "";
+        imageElement.dataset.summary = entity.summary.replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>") || "";
 
         // Add click event to show details modal first
         imageElement.addEventListener("click", () => {
@@ -447,13 +447,14 @@ async function updatePageNotes(pageIndexes) {
       // Entity name in right column
       const nameElement = document.createElement("h4");
       nameElement.textContent = entity.canonicalName;
+      nameElement.style.fontWeight = "bold";
       nameElement.style.marginTop = "0";
       textColumn.appendChild(nameElement);
 
       // Entity summary in right column
       if (entity.summary) {
         const summaryElement = document.createElement("p");
-        summaryElement.textContent = entity.summary;
+        summaryElement.innerHTML = entity.summary.replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>").replace(/•/g, "");
         textColumn.appendChild(summaryElement);
       }
 
