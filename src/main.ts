@@ -163,7 +163,7 @@ async function fetchPageMetadata(pageNumber) {
       return pageMetadataCache[pageNumber];
     }
 
-    const response = await fetch(`/api/pages/${pageNumber}`);
+    const response = await fetch(`/api/pages/${pageNumber}/${getCurrentBookSlug()}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch metadata for page ${pageNumber}`);
     }
@@ -184,7 +184,7 @@ async function fetchPageMetadata(pageNumber) {
 // Fetch metadata for a range of pages
 async function fetchPageRange(startPage, endPage) {
   try {
-    const response = await fetch(`/api/pages?startPage=${startPage}&endPage=${endPage}`);
+    const response = await fetch(`/api/pages/${getCurrentBookSlug()}?startPage=${startPage}&endPage=${endPage}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch metadata for pages ${startPage}-${endPage}`);
     }
@@ -722,7 +722,7 @@ async function preWarmCache() {
 
 async function fetchExistingCharactersWithImages() {
   try {
-    const response = await fetch("/api/characters/images");
+    const response = await fetch(`/api/characters/images/${getCurrentBookSlug()}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch characters with images: ${response.statusText}`);
     }
@@ -735,7 +735,11 @@ async function fetchExistingCharactersWithImages() {
 
 async function removeCharacter(characterName) {
   try {
-    const response = await fetch("/api/characters/remove", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ characterName }) });
+    const response = await fetch(`/api/characters/remove/${getCurrentBookSlug()}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ characterName }),
+    });
 
     if (!response.ok) {
       throw new Error(`Failed to remove character: ${response.statusText}`);
@@ -749,7 +753,7 @@ async function removeCharacter(characterName) {
 
 async function mapCharacter(characterName, existingCharacterName, existingCharacterImageUrl) {
   try {
-    const response = await fetch("/api/characters/map", {
+    const response = await fetch(`/api/characters/map/${getCurrentBookSlug()}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ characterName, existingCharacterName, existingCharacterImageUrl }),
@@ -767,7 +771,11 @@ async function mapCharacter(characterName, existingCharacterName, existingCharac
 
 async function createCharacterImage(characterName: string) {
   try {
-    const response = await fetch("/api/characters/createImage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ characterName }) });
+    const response = await fetch(`/api/characters/createImage/${getCurrentBookSlug()}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ characterName }),
+    });
 
     if (!response.ok) {
       throw new Error(`Failed to create character image: ${response.statusText}`);
