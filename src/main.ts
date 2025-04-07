@@ -6,7 +6,7 @@ import { getCurrentPage, goToNextPage, goToPage, goToPreviousPage, setCurrentPag
 import { pagesToSkipFooterGeneration, romanNumeralPages } from "@/src/consts";
 import { isMobileCharactersVisible, getIsTogglingMobileCharacters, toggleMobileCharacters } from "@/src/isMobileCharactersVisible";
 import { startReactComponents } from "./react-components";
-import { getCurrentBookSlug } from "./helpers/getCurrentBookSlug";
+import { getCurrentBookSlug } from "./getCurrentBookSlug";
 
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
