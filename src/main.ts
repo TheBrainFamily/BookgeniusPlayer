@@ -9,6 +9,9 @@ import { startReactComponents } from "./react-components";
 import { getCurrentBookSlug } from "./getCurrentBookSlug";
 import { pageChapters } from "./chapters";
 
+// Import the sidebar editor utilities
+import { createEditableEntity, createEditablePageSummary, createEditableChapterSummary, createAddCharacterButton, addEditorStyles } from "./utils/sidebarEditor";
+
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
 let isMobileNotesVisible = false; // Track if notes panel is open on mobile
@@ -400,6 +403,9 @@ async function updatePageNotes(pageIndexes) {
   leftNotes.innerHTML = `<h3>${notesTitle}</h3>${closeButton}`;
   const combinedNotes = pageMetadata.metadata.notesForPage;
 
+  // Add editor styles once
+  addEditorStyles();
+
   if (combinedNotes.length > 0) {
     // Create mobile character strip
     if (isMobile()) {
@@ -409,90 +415,68 @@ async function updatePageNotes(pageIndexes) {
     console.log("[UPDATE PAGE] combinedNotes", combinedNotes);
     // prepare all notes in the notes panel
     combinedNotes.forEach((entity) => {
-      const entityDiv = document.createElement("div");
-      entityDiv.className = "entity-note";
-      entityDiv.style.display = "flex";
-      entityDiv.style.marginBottom = "20px";
-      entityDiv.style.gap = "15px";
-
-      // Get resolved character info (if any)
-      // Use resolved image if available, otherwise use the original
-      const imageUrl = entity.imageUrl;
-
-      // Left column for image
-      const imageColumn = document.createElement("div");
-      imageColumn.className = "entity-image-column";
-      imageColumn.style.flex = "1";
-
-      // Right column for text content
-      const textColumn = document.createElement("div");
-      textColumn.className = "entity-text-column";
-      textColumn.style.flex = "1";
-
-      // Entity image in left column
-      if (imageUrl) {
-        const imageElement = document.createElement("img");
-        imageElement.src = imageUrl;
-        imageElement.alt = entity.canonicalName;
-        imageElement.className = "entity-image";
-        imageElement.style.maxWidth = "100%";
-        imageElement.style.display = "block";
-        imageElement.style.cursor = "pointer";
-
-        // Store character data in dataset for use in click handler
-        imageElement.dataset.characterName = entity.canonicalName;
-        imageElement.dataset.originalImageUrl = entity.imageUrl;
-        imageElement.dataset.summary = entity.summary.replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>") || "";
-
-        // Add click event to show details modal first
-        imageElement.addEventListener("click", () => {
-          showCharacterDetailsModal(entity.canonicalName, imageUrl, entity.summary || "");
-        });
-
-        imageColumn.appendChild(imageElement);
-      }
-
-      // Entity name in right column
-      const nameElement = document.createElement("h4");
-      nameElement.textContent = entity.canonicalName;
-      nameElement.style.fontWeight = "bold";
-      nameElement.style.marginTop = "0";
-      textColumn.appendChild(nameElement);
-
-      // Entity summary in right column
-      if (entity.summary) {
-        const summaryElement = document.createElement("p");
-        summaryElement.innerHTML = entity.summary.replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>").replace(/•/g, "");
-        textColumn.appendChild(summaryElement);
-      }
-
-      // Add both columns to the entity div
-      entityDiv.appendChild(imageColumn);
-      entityDiv.appendChild(textColumn);
-
+      // Create editable entity div instead of static one
+      const entityDiv = createEditableEntity(actualPageNumber, entity);
       leftNotes.appendChild(entityDiv);
     });
 
     // Add combined context information if available
     if (pageMetadata.metadata?.contextForPage?.trim() !== "") {
-      const contextText = pageMetadata.metadata.contextForPage
-        .replace("# Current Page Summary", "")
-        .replace("# Page Summary", "")
-        .replace("# Summary", "")
-        .replace(/\n/g, "<br>")
-        .trim()
-        .replace(/^(<br>)+/, "");
+      const contextText = pageMetadata.metadata.contextForPage.replace("# Current Page Summary", "").replace("# Page Summary", "").replace("# Summary", "").trim();
+
       if (isMobile()) {
-        leftNotes.innerHTML += `<p>${contextText}</p>`;
+        const formattedContextText = contextText.replace(/\n/g, "<br>");
+        leftNotes.innerHTML += `<p>${formattedContextText}</p>`;
       } else {
         const rightNotes = document.getElementById("right-notes");
         if (rightNotes) {
-          rightNotes.innerHTML = `<h3>Page summary</h3><p>${contextText}</p>`;
+          // Use editable page summary component
+          rightNotes.innerHTML = "";
+          const editablePageSummary = createEditablePageSummary(actualPageNumber, contextText);
+          rightNotes.appendChild(editablePageSummary);
+
+          // Add chapter summary if available
+          if (pageMetadata.metadata?.chapterSummary?.trim() !== "") {
+            const chapterSummary = pageMetadata.metadata.chapterSummary;
+            const editableChapterSummary = createEditableChapterSummary(actualPageNumber, chapterSummary);
+            rightNotes.appendChild(editableChapterSummary);
+          } else {
+            // Add an empty chapter summary that can be edited
+            const editableChapterSummary = createEditableChapterSummary(actualPageNumber, "");
+            rightNotes.appendChild(editableChapterSummary);
+          }
         }
+      }
+    } else if (!isMobile()) {
+      // Add empty page and chapter summaries that can be edited
+      const rightNotes = document.getElementById("right-notes");
+      if (rightNotes) {
+        rightNotes.innerHTML = "";
+        const editablePageSummary = createEditablePageSummary(actualPageNumber, "");
+        rightNotes.appendChild(editablePageSummary);
+        const editableChapterSummary = createEditableChapterSummary(actualPageNumber, "");
+        rightNotes.appendChild(editableChapterSummary);
       }
     }
   } else {
-    leftNotes.innerHTML += "<p>No notes for this page.</p>";
+    leftNotes.innerHTML += "<p>No notes for this page yet.</p>";
+
+    // Add empty page and chapter summaries that can be edited (if not mobile)
+    if (!isMobile()) {
+      const rightNotes = document.getElementById("right-notes");
+      if (rightNotes) {
+        rightNotes.innerHTML = "";
+        const editablePageSummary = createEditablePageSummary(actualPageNumber, "");
+        rightNotes.appendChild(editablePageSummary);
+        const editableChapterSummary = createEditableChapterSummary(actualPageNumber, "");
+        rightNotes.appendChild(editableChapterSummary);
+      }
+    }
+  }
+  if (!isMobile()) {
+    // Add "Add Character" button at the top of the notes panel
+    const addCharacterBtn = createAddCharacterButton(actualPageNumber, leftNotes, fetchExistingCharactersWithImages, updatePageNotes);
+    leftNotes.appendChild(addCharacterBtn);
   }
 }
 
@@ -1436,3 +1420,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 startReactComponents();
+
+// Make showCharacterDetailsModal available globally for the sidebar editor
+window.showCharacterDetailsModal = showCharacterDetailsModal;
