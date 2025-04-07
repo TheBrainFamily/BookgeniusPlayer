@@ -334,14 +334,17 @@ function setupPageObserver() {
       // Just one page visible - show notes for that page
       updatePageNotes([visiblePages[0]]);
     } else if (visiblePages.length === 2) {
-      // Two adjacent pages visible - show notes for both pages
-      const firstPage = visiblePages[0];
-      const secondPage = visiblePages[1];
+      // for now, always just one page
+      updatePageNotes([visiblePages[0]]);
 
-      // Only process if pages are adjacent
-      if (secondPage - firstPage === 1) {
-        updatePageNotes([firstPage, secondPage]);
-      }
+      // Two adjacent pages visible - show notes for both pages
+      // const firstPage = visiblePages[0];
+      // const secondPage = visiblePages[1];
+
+      // // Only process if pages are adjacent
+      // if (secondPage - firstPage === 1) {
+      //   updatePageNotes([firstPage, secondPage]);
+      // }
     }
   }, observerOptions);
 
@@ -654,7 +657,7 @@ async function updateView() {
     // If they're adjacent pages, trigger the combined notes
     if (secondPage - firstPage === 1) {
       // We'll call this directly here to ensure it's updated during scroll events
-      updatePageNotes([firstPage, secondPage]);
+      updatePageNotes([firstPage]);
     }
   } else if (visiblePageIndexes.length === 1) {
     updatePageNotes([visiblePageIndexes[0]]);
