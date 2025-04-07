@@ -7,6 +7,7 @@ import { pagesToSkipFooterGeneration, romanNumeralPages } from "@/src/consts";
 import { isMobileCharactersVisible, getIsTogglingMobileCharacters, toggleMobileCharacters } from "@/src/isMobileCharactersVisible";
 import { startReactComponents } from "./react-components";
 import { getCurrentBookSlug } from "./getCurrentBookSlug";
+import { pageChapters } from "./chapters";
 
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
@@ -256,18 +257,21 @@ function initializePages() {
   contentContainer.id = "content-container";
   bookContainer.appendChild(contentContainer);
 
+  const addToIndex = parseInt(pageChapters[0].pageId.replace("page_", ""));
+  console.log("[INITIALIZE PAGES] addToIndex", addToIndex);
   // Create all page elements
   pagesContent.forEach((content, index) => {
+    const actualIndex = index + addToIndex;
     const pageDiv = document.createElement("div");
     pageDiv.className = "page";
-    pageDiv.id = `page-${index}`;
+    pageDiv.id = `page-${actualIndex}`;
     pageDiv.innerHTML = content;
 
     // Add page number footer
     if (index > pagesToSkipFooterGeneration + 1) {
       const footer = document.createElement("div");
       footer.className = "page-footer";
-      footer.textContent = parsePage(index);
+      footer.textContent = parsePage(actualIndex);
       pageDiv.appendChild(footer);
     }
 
