@@ -686,7 +686,7 @@
     width: 100%; /* Changed from 85% to 100% to cover whole screen */
     height: 100%;
     margin: 0;
-    padding: 20px;
+    /* padding: 20px; */
     padding-top: max(20px, env(safe-area-inset-top));
     padding-bottom: 0;
     border-radius: 0;

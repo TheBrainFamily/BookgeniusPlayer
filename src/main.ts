@@ -344,7 +344,7 @@ function setupPageObserver() {
 
         // 4. Update notes based on the new active page
         const topVisiblePageIndex = parseInt(topVisiblePageElement.id.split("-")[1]);
-        updatePageNotes([topVisiblePageIndex]);
+        updatePageNotes(topVisiblePageIndex);
       }
     } else {
       // Optional: Handle the case where no pages are intersecting.
@@ -364,50 +364,34 @@ function setupPageObserver() {
   });
 }
 
+let currentPageIndex: number = 0;
+
 // Unified function to update notes for one or more pages
-async function updatePageNotes(pageIndexes) {
-  console.log("[UPDATE PAGE] updatePageNotes", pageIndexes);
+async function updatePageNotes(pageIndex: number) {
+  if (pageIndex === currentPageIndex) return;
+  currentPageIndex = pageIndex;
+  console.log("[UPDATE PAGE] updatePageNotes", pageIndex);
   const leftNotes = document.getElementById("left-notes");
   if (!leftNotes) return;
 
-  // Sort page indexes to ensure consistent order
-  pageIndexes.sort((a, b) => a - b);
-
   // Get the display page numbers for the header
-  const pageNumbers = pageIndexes.map((index) => parseInt(parsePage(index)));
-  let notesTitle;
-  let actualPageNumber;
+  const pageNumber = parseInt(parsePage(pageIndex));
 
-  if (pageNumbers.length === 1) {
-    notesTitle = `Notes for Page ${pageNumbers[0]}`;
-    actualPageNumber = pageNumbers[0];
-  } else {
-    const joinedPageNumbers = pageNumbers.join("-");
-    if (joinedPageNumbers.includes(`${pagesToSkipFooterGeneration + 1}`)) {
-      notesTitle = `Notes`;
-    } else {
-      notesTitle = `Notes for Pages ${joinedPageNumbers}`;
-    }
-    actualPageNumber = `${pageNumbers[0]}.5`;
-  }
-
-  console.log("[UPDATE PAGE] notesTitle", notesTitle);
-
-  // Update the notes header with close button
-
-  // Add click event to close button
-  const closeBtn = leftNotes.querySelector(".close-notes-button");
-  if (closeBtn) {
-    closeBtn.addEventListener("click", toggleMobileNotes);
-  }
+  const actualPageNumber = pageNumber;
 
   // Array to hold all page metadata
   const pageMetadata = await fetchPageMetadata(actualPageNumber);
-  let closeButton = "";
   if (isMobile()) {
-    closeButton = `<button class="close-notes-button">&times;</button>`;
+    const notesTitle = `Notes for Page ${pageNumber}`;
+    const closeButton = `<button class="close-notes-button">&times;</button>`;
+    leftNotes.innerHTML = `<h3>${notesTitle}</h3>${closeButton}`;
+    const closeBtn = leftNotes.querySelector(".close-notes-button");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", toggleMobileNotes);
+    }
+  } else {
+    leftNotes.innerHTML = ``;
   }
-  leftNotes.innerHTML = `<h3>${notesTitle}</h3>${closeButton}`;
   const combinedNotes = pageMetadata.metadata.notesForPage;
 
   // Add editor styles once
@@ -622,37 +606,12 @@ async function updateView() {
 
   // Find the min and max page indexes that are visible
   const minPageIndex = Math.min(...visiblePageIndexes);
-  const maxPageIndex = Math.max(...visiblePageIndexes);
-
-  // Calculate range to preload (current visible pages plus some before and after)
-  const preloadBefore = Math.max(0, minPageIndex - 5);
-  const preloadAfter = Math.min(pagesContent.length - 1, maxPageIndex + 5);
-  console.log("preloadBefore", preloadBefore);
-  console.log("preloadAfter", preloadAfter);
-  console.log("visiblePageIndexes", visiblePageIndexes);
-  // Calculate actual page numbers for API request
-  const startPageNumber = preloadBefore - (romanNumeralPages - 1) + 1;
-  const endPageNumber = preloadAfter - (romanNumeralPages - 1) + 1;
 
   // Preload the range in the background
   // fetchPageRange(startPageNumber, endPageNumber).catch((error) => {
   //   console.error("Error fetching page range:", error);
   // });
-
-  // If exactly two adjacent pages are visible, we need to check if we should show combined notes
-  if (visiblePageIndexes.length === 2) {
-    // Sort the visible pages to ensure proper ordering
-    visiblePageIndexes.sort((a, b) => a - b);
-    const [firstPage, secondPage] = visiblePageIndexes;
-
-    // If they're adjacent pages, trigger the combined notes
-    if (secondPage - firstPage === 1) {
-      // We'll call this directly here to ensure it's updated during scroll events
-      updatePageNotes([firstPage]);
-    }
-  } else if (visiblePageIndexes.length === 1) {
-    updatePageNotes([visiblePageIndexes[0]]);
-  }
+  updatePageNotes(minPageIndex);
 
   // Save current position to local storage - use the first visible page
   localStorage.setItem("bookPosition", `${minPageIndex}`);

@@ -303,7 +303,7 @@ export function createAddCharacterButton(
   pageNumber: number,
   leftNotes: HTMLElement,
   fetchExistingCallback: () => Promise<{ [name: string]: string }>,
-  refreshNotesCallback: (indexes: number[]) => Promise<void>,
+  refreshNotesCallback: (index: number) => Promise<void>,
 ): HTMLElement {
   const container = document.createElement("div");
   container.className = "add-character-container";
@@ -433,7 +433,7 @@ export function createAddCharacterButton(
           await addEntityNote(pageNumber, entityNote, entityDef);
 
           // Refresh the notes panel to show the new character
-          await refreshNotesCallback([pageNumber]);
+          await refreshNotesCallback(pageNumber);
         });
 
         charactersContainer.appendChild(characterCard);
