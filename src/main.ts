@@ -8,6 +8,7 @@ import { isMobileCharactersVisible, getIsTogglingMobileCharacters, toggleMobileC
 import { startReactComponents } from "./react-components";
 import { getCurrentBookSlug } from "./getCurrentBookSlug";
 import { pageChapters } from "./chapters";
+import { initSearchModal, showSearchModal, hideSearchModal, isSearchActive } from "./searchModal";
 
 // Import the sidebar editor utilities
 import { createEditableEntity, createEditablePageSummary, createEditableChapterSummary, createAddCharacterButton, addEditorStyles } from "./utils/sidebarEditor";
@@ -615,6 +616,7 @@ async function updateView() {
 
   // Save current position to local storage - use the first visible page
   localStorage.setItem("bookPosition", `${minPageIndex}`);
+  setCurrentPage(minPageIndex);
 }
 
 // Initialize the viewer and fetch initial metadata
@@ -1301,6 +1303,14 @@ document.querySelectorAll(".modal-close").forEach((button) => {
 });
 
 async function keyboardNavigationSetup(event: KeyboardEvent) {
+  // If search modal is active, let it handle its own keyboard events
+  if (isSearchActive()) {
+    if (event.key === "Escape") {
+      hideSearchModal();
+    }
+    return;
+  }
+
   if (event.key === "s" && (event.metaKey || event.ctrlKey)) {
     event.preventDefault(); // Prevent browser save dialog
     enterSetPageNumberMode();
@@ -1358,6 +1368,14 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
         modal.classList.remove("active");
       });
       break;
+    // Add "f" key to toggle search modal (without modifiers)
+    case "f":
+    case "F":
+      // Only trigger if no modifiers (the Cmd+F/Ctrl+F is handled elsewhere)
+      if (!event.metaKey && !event.ctrlKey && !event.altKey) {
+        showSearchModal();
+      }
+      break;
   }
 }
 
@@ -1367,6 +1385,9 @@ document.addEventListener("DOMContentLoaded", function () {
   if (localStorage.getItem("nightMode") === "true") {
     setIsNightMode(true);
   }
+
+  // Initialize search modal
+  initSearchModal();
 
   // Add event listeners for closing modals
   document.querySelectorAll(".modal-close").forEach((button) => {
@@ -1380,6 +1401,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Keyboard navigation
   document.addEventListener("keydown", async (event) => {
+    // Intercept browser search (Cmd+F or Ctrl+F)
+    if ((event.key === "f" || event.key === "F") && (event.metaKey || event.ctrlKey)) {
+      event.preventDefault(); // Prevent default browser search
+      showSearchModal();
+      return;
+    }
+
     // Handle Command+S to set page number
     await keyboardNavigationSetup(event);
   });

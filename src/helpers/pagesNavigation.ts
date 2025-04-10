@@ -5,6 +5,7 @@ import { romanNumeralPages } from "@/src/consts";
 
 let _currentPageIndex = 0;
 export const getCurrentPage = () => {
+  console.log("getCurrentPage", _currentPageIndex);
   return _currentPageIndex;
 };
 export const setCurrentPage = (page: number) => {
