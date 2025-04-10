@@ -33,6 +33,7 @@ export function createEditableText(text: string, elementType: string, saveCallba
 
   let isEditing = false;
   let originalContent = text;
+  const originalHeight = container.offsetHeight; // Get the original container height
 
   container.addEventListener("click", () => {
     if (!isEditing) {
@@ -44,10 +45,21 @@ export function createEditableText(text: string, elementType: string, saveCallba
 
       // Create textarea
       const textarea = document.createElement("textarea");
-      textarea.value = originalContent.replace(/<br\/?>/g, "\n").replace(/&nbsp;/g, " ");
+      textarea.value = originalContent.replace(/<br\/?>/g, "\\n").replace(/&nbsp;/g, " ");
       textarea.style.width = "100%";
-      textarea.style.minHeight = "100px";
+      textarea.style.height = `${originalHeight}px`; // Set initial height
       textarea.style.padding = "8px";
+      textarea.style.boxSizing = "border-box"; // Include padding in height calculation
+      textarea.style.overflowY = "hidden"; // Hide scrollbar initially
+
+      // Auto-resize textarea function
+      const autoResizeTextarea = () => {
+        textarea.style.height = "auto"; // Reset height to calculate scrollHeight correctly
+        textarea.style.height = `${textarea.scrollHeight}px`; // Set height based on content
+      };
+
+      // Add event listener for input events
+      textarea.addEventListener("input", autoResizeTextarea);
 
       // Create save button
       const saveButton = document.createElement("button");
@@ -93,8 +105,9 @@ export function createEditableText(text: string, elementType: string, saveCallba
       container.innerHTML = "";
       container.appendChild(editContainer);
 
-      // Set focus to textarea
+      // Set focus to textarea and trigger initial resize
       textarea.focus();
+      autoResizeTextarea(); // Call resize initially to set correct height
 
       // Save button click handler
       saveButton.addEventListener("click", () => {

@@ -72,4 +72,4 @@ export const chaptersMetadata = [
 
 export const pageChapters = chaptersMetadata.map((chapter) => ({ pageId: `page_${chapter.firstPage}`, chapter: chapter.chapter }));
 
-export const bookSlug = "pharaon";
+export const bookSlug = "Pharaon";

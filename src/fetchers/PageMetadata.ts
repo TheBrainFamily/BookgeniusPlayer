@@ -31,5 +31,5 @@ export enum BOOK_SLUGS {
   GET_SHORTY = "shorty",
   INNOCENCE = "innocence",
   TRUMP = "trump",
-  PHARAON = "pharaon",
+  PHARAON = "Pharaon",
 }
