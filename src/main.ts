@@ -305,48 +305,55 @@ function setupPageObserver() {
     threshold: 0.4, // Consider page visible when 40% is in view
   };
 
-  // Keep track of currently visible pages
-  let visiblePages = [];
+  // --- State for tracking all currently intersecting pages ---
+  const intersectingPages = new Set<Element>();
+  let currentlyActivePageElement: Element | null = null;
+  // ----------------------------------------------------------
 
   const observer = new IntersectionObserver((entries) => {
-    // Process all entries first
+    // 1. Update the set of intersecting pages based on the current changes
     entries.forEach((entry) => {
-      // Toggle 'active' class based on visibility
-      entry.target.classList.toggle("active", entry.isIntersecting);
-
-      const pageId = entry.target.id;
-      const pageIndex = parseInt(pageId.split("-")[1]);
-
-      // Update our visiblePages array
       if (entry.isIntersecting) {
-        // Add to visible pages if not already there
-        if (!visiblePages.includes(pageIndex)) {
-          visiblePages.push(pageIndex);
-        }
+        intersectingPages.add(entry.target);
       } else {
-        // Remove from visible pages
-        visiblePages = visiblePages.filter((index) => index !== pageIndex);
+        intersectingPages.delete(entry.target);
       }
     });
 
-    // Sort visible pages to determine their order
-    visiblePages.sort((a, b) => a - b);
+    // 2. Determine the topmost page from the *entire set* of intersecting pages
+    if (intersectingPages.size > 0) {
+      // Convert Set to array and sort by viewport top position
+      const sortedIntersectingPages = Array.from(intersectingPages).sort((a, b) => {
+        return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
+      });
 
-    // Now decide what notes to show based on visible pages
-    if (visiblePages.length === 1) {
-      // Just one page visible - show notes for that page
-      updatePageNotes([visiblePages[0]]);
-    } else if (visiblePages.length === 2) {
-      // for now, always just one page
-      updatePageNotes([visiblePages[0]]);
+      const topVisiblePageElement = sortedIntersectingPages[0];
 
-      // Two adjacent pages visible - show notes for both pages
-      // const firstPage = visiblePages[0];
-      // const secondPage = visiblePages[1];
+      // 3. Update active state only if the topmost page has changed
+      if (topVisiblePageElement !== currentlyActivePageElement) {
+        console.log("[Observer] New top visible page:", topVisiblePageElement.id);
 
-      // // Only process if pages are adjacent
-      // if (secondPage - firstPage === 1) {
-      //   updatePageNotes([firstPage, secondPage]);
+        // Remove active class from the previously active page (if any)
+        if (currentlyActivePageElement) {
+          currentlyActivePageElement.classList.remove("active");
+        }
+
+        // Add active class to the new top page
+        topVisiblePageElement.classList.add("active");
+        currentlyActivePageElement = topVisiblePageElement; // Update the tracked active page
+
+        // 4. Update notes based on the new active page
+        const topVisiblePageIndex = parseInt(topVisiblePageElement.id.split("-")[1]);
+        updatePageNotes([topVisiblePageIndex]);
+      }
+    } else {
+      // Optional: Handle the case where no pages are intersecting.
+      // Currently, it leaves the last active page shown.
+      // If you wanted to clear the active state when scrolling fast through gaps:
+      // if (currentlyActivePageElement) {
+      //   currentlyActivePageElement.classList.remove("active");
+      //   currentlyActivePageElement = null;
+      //   // Maybe clear notes panel here too?
       // }
     }
   }, observerOptions);
