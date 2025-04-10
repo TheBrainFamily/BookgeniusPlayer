@@ -205,6 +205,8 @@ export function createEditableEntity(pageNumber: number, entity: IEntityNote): H
   entityDiv.style.display = "flex";
   entityDiv.style.marginBottom = "20px";
   entityDiv.style.gap = "15px";
+  entityDiv.style.alignItems = "center";
+  entityDiv.style.overflow = "visible"; // Allow overflow on the main container
 
   // Get resolved character info (if any)
   // Use resolved image if available, otherwise use the original
@@ -214,36 +216,52 @@ export function createEditableEntity(pageNumber: number, entity: IEntityNote): H
   const imageColumn = document.createElement("div");
   imageColumn.className = "entity-image-column";
   imageColumn.style.flex = "1";
+  imageColumn.style.overflow = "visible"; // Allow overflow
 
   // Right column for text content
   const textColumn = document.createElement("div");
   textColumn.className = "entity-text-column";
-  textColumn.style.flex = "1";
+  textColumn.style.flex = "2";
 
   // Entity image in left column
   if (imageUrl) {
+    // Create a wrapper div for the image
+    const imageWrapper = document.createElement("div");
+    imageWrapper.className = "entity-image-wrapper";
+    imageWrapper.style.width = "100%"; // Or a fixed size if preferred
+    imageWrapper.style.aspectRatio = "1 / 1";
+    imageWrapper.style.borderRadius = "50%";
+    imageWrapper.style.overflow = "hidden";
+    imageWrapper.style.cursor = "pointer";
+    imageWrapper.style.position = "relative"; // Needed for potential future additions like edit icons
+    imageWrapper.style.zIndex = "1";
+
     const imageElement = document.createElement("img");
     imageElement.src = imageUrl;
     imageElement.alt = entity.canonicalName;
     imageElement.className = "entity-image";
-    imageElement.style.maxWidth = "100%";
-    imageElement.style.display = "block";
-    imageElement.style.cursor = "pointer";
+    imageElement.style.width = "100%"; // Make image fill the wrapper
+    imageElement.style.height = "100%"; // Make image fill the wrapper
+    imageElement.style.display = "block"; // Ensure block display
+    imageElement.style.objectFit = "cover";
+    // No border-radius or aspect-ratio needed here anymore, handled by wrapper
 
-    // Store character data in dataset for use in click handler
+    // Store character data in dataset for use in click handler (can remain on image or move to wrapper)
     imageElement.dataset.characterName = entity.canonicalName;
     imageElement.dataset.originalImageUrl = entity.imageUrl;
-    imageElement.dataset.summary = entity.summary.replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>") || "";
+    imageElement.dataset.summary = entity.summary?.replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>") || "";
 
-    // Add click event to show details modal first
-    imageElement.addEventListener("click", () => {
+    // Add click event to wrapper to show details modal
+    imageWrapper.addEventListener("click", () => {
       // Access the global function with proper typing
       if (typeof window.showCharacterDetailsModal === "function") {
         window.showCharacterDetailsModal(entity.canonicalName, imageUrl, entity.summary || "");
       }
     });
 
-    imageColumn.appendChild(imageElement);
+    // Append image to the wrapper, and wrapper to the column
+    imageWrapper.appendChild(imageElement);
+    imageColumn.appendChild(imageWrapper);
   }
 
   // Entity name in right column
@@ -518,6 +536,23 @@ export function addEditorStyles() {
       padding: 4px 8px;
       cursor: pointer;
       margin-top: 10px;
+    }
+
+    /* Styles for the entity image wrapper */
+    .entity-image-wrapper {
+      transition: transform 0.2s ease-in-out, z-index 0s ease-in-out 0.2s; /* Add z-index transition */
+      position: relative; /* Ensure z-index works */
+      z-index: 1;
+    }
+
+    .entity-image-wrapper:hover {
+      transform: scale(1.1); /* Scale the wrapper on hover */
+      z-index: 10; /* Bring to front on hover */
+    }
+
+    /* Ensure image inside the wrapper behaves correctly */
+    .entity-image {
+       /* Styles moved to wrapper or already set in JS */
     }
   `;
 
