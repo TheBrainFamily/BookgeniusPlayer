@@ -21,11 +21,15 @@
   height: calc(100vh + env(safe-area-inset-bottom)); /* Extend to include the bottom safe area */
   min-height: -webkit-fill-available; /* Fill entire height on iOS */
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Arrange items horizontally */
+  justify-content: space-between; /* Push first/last to edges, space between */
+  align-items: stretch; /* Make items fill height by default */
+  width: 100%; /* Ensure it takes full width */
+  gap: 2em;
   transition: background-color 0.3s ease;
   padding: 0;
   padding-bottom: env(safe-area-inset-bottom); /* Add padding for the safe area */
+  display: flex;
 }
 
 #legacy #page-1 {
@@ -69,13 +73,12 @@
   background-color: #f9f9f9;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
   overflow-y: auto;
-  margin: 20px 15px;
+  /* margin: 20px 15px; */
   border-radius: 5px;
   transition: all 0.3s ease;
   line-height: 1.4;
   font-size: 0.85rem;
   color: #444;
-  flex-shrink: 0;
 }
 
 #legacy.night-mode .notes-container {
@@ -100,12 +103,12 @@
 }
 
 #legacy #content-container {
-  width: 50%;
-  height: 100%;
-  overflow-y: auto;
-  margin: 20px 0;
   margin-top: 0;
   flex-grow: 1;
+  flex-shrink: 1;
+  overflow-y: auto;
+  height: 100%;
+
   scroll-behavior: smooth;
   padding: 0 20px;
   padding-top: 0;
@@ -673,6 +676,10 @@
 
 #legacy #right-notes {
   margin: auto 20px;
+}
+
+#legacy #left-notes {
+  margin: 20px;
 }
 
 /* Media queries for responsive design */
