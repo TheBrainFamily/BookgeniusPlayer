@@ -93,10 +93,6 @@
   font-size: 1rem;
 }
 
-#legacy .notes-container p {
-  margin-bottom: 0.8em;
-}
-
 #legacy.night-mode .notes-container h3 {
   border-bottom-color: #555;
 }
@@ -658,6 +654,7 @@
 
 #legacy #right-notes {
   margin: auto 20px;
+  padding-bottom: 0;
 }
 
 #legacy #left-notes {
@@ -830,6 +827,7 @@
   line-height: 1.6;
   color: #444;
   font-size: 0.95rem;
+  text-align: justify;
 }
 
 #right-notes emphasis {
@@ -1326,4 +1324,27 @@
 /* --- Empty Sections (like the unused one in the example) --- */
 #content-container section:empty {
   display: none; /* Hide sections that contain nothing */
+}
+
+.highlight-blink {
+  /* Define the animation */
+  /* name duration timing-function iteration-count */
+  animation: blinkEffect 2s ease-in-out 1; /* Blinks once over 0.75s */
+}
+
+@keyframes blinkEffect {
+  0% {
+    background-color: inherit; /* Start with original background */
+  }
+  50% {
+    background-color: rgb(152, 152, 152); /* Highlight color */
+  }
+  100% {
+    background-color: inherit; /* Return to original background */
+  }
+}
+
+/* Optional: Style for the links themselves */
+a.link-note {
+  cursor: pointer; /* Indicate interactivity */
 }

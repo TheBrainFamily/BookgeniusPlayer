@@ -14,6 +14,7 @@ import { initSearchModal, showSearchModal, hideSearchModal, isSearchActive } fro
 import { createEditableEntity, createEditablePageSummary, createEditableChapterSummary, createAddCharacterButton, addEditorStyles } from "./utils/sidebarEditor";
 import { getParagraphRange } from "./fetchers/getParagraphRange";
 import { getSavedLocation, goToParagraph, setCurrentLocation } from "./helpers/paragraphsNavigation";
+import { setupNoteLinkBlinking } from "./annotationsHandling";
 
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
@@ -362,7 +363,7 @@ const dealWithAnnotations = ({
 
   // Select all paragraphs within chapter sections that have a data-index
   const allParagraphs = document.querySelectorAll("section[data-chapter] p[data-index]");
-
+  let atLeastOneInRange = false;
   allParagraphs.forEach((paragraph) => {
     const paragraphElement = paragraph as HTMLElement;
     const sectionElement = paragraphElement.closest("section[data-chapter]") as HTMLElement | null;
@@ -393,6 +394,8 @@ const dealWithAnnotations = ({
       annotations.forEach((annotation) => {
         const targetId = annotation.getAttribute("href")?.substring(1); // Get href like '#fn3' and remove '#'
         if (targetId) {
+          atLeastOneInRange = true;
+
           const noteElement = document.getElementById(targetId);
           // Ensure the note element exists and is a direct child section of #right-notes
           if (noteElement && noteElement.parentElement?.id === "right-notes") {
@@ -403,7 +406,12 @@ const dealWithAnnotations = ({
     }
   });
 
-  // The previous warning about multi-chapter handling is now resolved by the logic above.
+  const rightNotes = document.getElementById("right-notes");
+  if (!atLeastOneInRange) {
+    rightNotes.style.visibility = "hidden";
+  } else {
+    rightNotes.style.visibility = "visible";
+  }
 };
 
 async function updateParagraphNotesInternal({
@@ -1306,3 +1314,5 @@ startReactComponents();
 
 // Make showCharacterDetailsModal available globally for the sidebar editor
 window.showCharacterDetailsModal = showCharacterDetailsModal;
+
+setupNoteLinkBlinking();
