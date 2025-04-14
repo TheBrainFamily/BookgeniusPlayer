@@ -801,6 +801,43 @@
   padding-bottom: max(10px, env(safe-area-inset-bottom));
 }
 
+#legacy #right-notes section {
+  display: none;
+}
+
+#right-notes {
+  max-width: 800px;
+  margin: 2rem auto;
+  font-family: "Georgia", serif;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+#right-notes section {
+  margin-bottom: 1.2rem;
+}
+
+#right-notes section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+#right-notes p {
+  margin: 0;
+  line-height: 1.6;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+#right-notes emphasis {
+  font-style: italic;
+  font-weight: 600;
+  color: #222;
+}
+
 @media (max-width: 768px) {
   /* Show horizontal strip when vertical is hidden */
   #legacy.characters-hidden .mobile-horizontal-character-strip {

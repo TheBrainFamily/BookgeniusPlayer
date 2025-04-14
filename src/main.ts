@@ -343,6 +343,65 @@ async function updateParagraphNotes({
   }, 100);
 }
 
+const dealWithAnnotations = ({
+  startChapter,
+  startParagraph,
+  endChapter,
+  endParagraph,
+}: {
+  startChapter: number;
+  startParagraph: number;
+  endChapter: number;
+  endParagraph: number;
+}) => {
+  // Hide all footnote sections initially
+  const allNotes = document.querySelectorAll<HTMLElement>("#right-notes section");
+  allNotes.forEach((note) => {
+    note.style.display = "none";
+  });
+
+  // Select all paragraphs within chapter sections that have a data-index
+  const allParagraphs = document.querySelectorAll("section[data-chapter] p[data-index]");
+
+  allParagraphs.forEach((paragraph) => {
+    const paragraphElement = paragraph as HTMLElement;
+    const sectionElement = paragraphElement.closest("section[data-chapter]") as HTMLElement | null;
+
+    if (!sectionElement) return; // Skip if paragraph is not within a chapter section
+
+    const currentChapter = parseInt(sectionElement.dataset.chapter || "-1");
+    const currentParagraph = parseInt(paragraphElement.dataset.index || "-1");
+
+    if (currentChapter < 0 || currentParagraph < 0) return; // Skip if data attributes are invalid
+
+    // Check if the paragraph falls within the visible range
+    const isInRange =
+      // Case 1: Paragraph is in the start chapter and at or after the start paragraph
+      (currentChapter === startChapter && currentParagraph >= startParagraph) ||
+      // Case 2: Paragraph is in a chapter between the start and end chapters
+      (currentChapter > startChapter && currentChapter < endChapter) ||
+      // Case 3: Paragraph is in the end chapter and at or before the end paragraph
+      (currentChapter === endChapter && currentParagraph <= endParagraph);
+
+    if (isInRange) {
+      const annotations = paragraphElement.querySelectorAll<HTMLAnchorElement>(".link-note");
+
+      annotations.forEach((annotation) => {
+        const targetId = annotation.getAttribute("href")?.substring(1); // Get href like '#fn3' and remove '#'
+        if (targetId) {
+          const noteElement = document.getElementById(targetId);
+          // Ensure the note element exists and is a direct child section of #right-notes
+          if (noteElement && noteElement.parentElement?.id === "right-notes") {
+            noteElement.style.display = "block";
+          }
+        }
+      });
+    }
+  });
+
+  // The previous warning about multi-chapter handling is now resolved by the logic above.
+};
+
 async function updateParagraphNotesInternal({
   startChapter,
   startParagraph,
@@ -354,6 +413,7 @@ async function updateParagraphNotesInternal({
   endChapter: number;
   endParagraph: number;
 }) {
+  dealWithAnnotations({ startChapter, startParagraph, endChapter, endParagraph });
   const leftNotes = document.getElementById("left-notes");
   if (!leftNotes) return;
 
