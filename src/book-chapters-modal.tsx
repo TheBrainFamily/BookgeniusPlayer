@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import { Book, Moon, X, List, FileText, PanelLeft, PanelBottom, Type, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -66,10 +66,18 @@ export default function BookChaptersModal() {
   const [nightMode, setNightMode] = useState(isNightMode());
   const [pageNumber, setPageNumber] = useState("");
   const [charactersVertical, setCharactersVertical] = useState(isMobileCharactersVisible());
-  const [fontSize, setFontSize] = useState(1);
+  const [fontSize, setFontSize] = useState(localStorage.getItem("fontSize") ? parseFloat(localStorage.getItem("fontSize")!) : 1);
   useEffect(() => {
     applyDarkMode();
   }, [nightMode]);
+
+  useLayoutEffect(() => {
+    const newFontSize = 16 * fontSize;
+    const contentContainer = document.getElementById("content-container");
+    if (contentContainer) {
+      contentContainer.style.fontSize = `${newFontSize}px`;
+    }
+  }, [fontSize]);
 
   // Update the local state when the night mode changes externally
   useEffect(() => {
@@ -119,12 +127,9 @@ export default function BookChaptersModal() {
   };
 
   const adjustFontSize = (sizeChange: number) => {
-    console.log(`Adjusting font size to: ${sizeChange}`);
+    console.log(`Adjusting font size multiplier to: ${sizeChange}`);
     setFontSize(sizeChange);
-    // const currentFontSize = parseFloat(getComputedStyle(document.getElementById("content-container")!).fontSize);
-    // console.log("currentFontSize", currentFontSize);
-    const newFontSize = 16 * sizeChange;
-    document.getElementById("content-container")!.style.fontSize = `${newFontSize}px`;
+    localStorage.setItem("fontSize", sizeChange.toString()); // Save the multiplier
   };
 
   return (
