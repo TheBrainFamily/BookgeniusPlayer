@@ -13,6 +13,7 @@ import { initSearchModal, showSearchModal, hideSearchModal, isSearchActive } fro
 // Import the sidebar editor utilities
 import { createEditableEntity, createEditablePageSummary, createEditableChapterSummary, createAddCharacterButton, addEditorStyles } from "./utils/sidebarEditor";
 import { getParagraphRange } from "./fetchers/getParagraphRange";
+import { setCurrentLocation } from "./helpers/paragraphsNavigation";
 
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
@@ -306,7 +307,6 @@ function setupPageObserver() {
   const intersectingPages = new Set<Element>();
   let currentlyActivePageElement: Element | null = null;
   // ----------------------------------------------------------
-
   const observer = new IntersectionObserver((entries) => {
     // 1. Update the set of intersecting pages based on the current changes
     entries.forEach((entry) => {
@@ -353,6 +353,7 @@ function setupPageObserver() {
         if (startInfo.chapter !== null && startInfo.paragraph !== null && endInfo.chapter !== null && endInfo.paragraph !== null) {
           console.log(`[Observer] Updating notes for Ch ${startInfo.chapter}:${startInfo.paragraph} to Ch ${endInfo.chapter}:${endInfo.paragraph}`);
           updateParagraphNotes({ startChapter: startInfo.chapter, startParagraph: startInfo.paragraph, endChapter: endInfo.chapter, endParagraph: endInfo.paragraph });
+          setCurrentLocation({ chapter: startInfo.chapter, paragraph: startInfo.paragraph });
         } else {
           console.warn("[Observer] Could not extract chapter/paragraph info for:", topVisiblePageElement, bottomVisiblePageElement);
         }
@@ -373,7 +374,29 @@ function setupPageObserver() {
   });
 }
 
+let updateNotesDebounce: NodeJS.Timeout | null = null;
 async function updateParagraphNotes({
+  startChapter,
+  startParagraph,
+  endChapter,
+  endParagraph,
+}: {
+  startChapter: number;
+  startParagraph: number;
+  endChapter: number;
+  endParagraph: number;
+}) {
+  if (updateNotesDebounce) {
+    clearTimeout(updateNotesDebounce);
+  } else {
+    updateParagraphNotesInternal({ startChapter, startParagraph, endChapter, endParagraph });
+  }
+  updateNotesDebounce = setTimeout(() => {
+    updateParagraphNotesInternal({ startChapter, startParagraph, endChapter, endParagraph });
+  }, 100);
+}
+
+async function updateParagraphNotesInternal({
   startChapter,
   startParagraph,
   endChapter,
@@ -682,7 +705,6 @@ function createMobileCharacterStrip(combinedNotes) {
 
 // Update view - modified for the infinite scroll approach
 async function updateView() {
-  console.log("updateView");
   // Fetch metadata for a range of pages
   const visiblePageIndexes = Array.from(document.querySelectorAll(".page.active"))
     .map((page) => parseInt(page.id.split("-")[1]))
@@ -697,11 +719,11 @@ async function updateView() {
   // fetchPageRange(startPageNumber, endPageNumber).catch((error) => {
   //   console.error("Error fetching page range:", error);
   // });
-  updatePageNotes(minPageIndex);
+  // updatePageNotes(minPageIndex);
 
   // Save current position to local storage - use the first visible page
   localStorage.setItem("bookPosition", `${minPageIndex}`);
-  setCurrentPage(minPageIndex);
+  // setCurrentLocation({ chapter: minPageIndex, paragraph: 0 });
 }
 
 // Initialize the viewer and fetch initial metadata
@@ -759,9 +781,9 @@ async function preWarmCache() {
   const endPageNumber = preloadAfter - (romanNumeralPages - 1) + 1;
 
   // Fetch metadata in the background without awaiting
-  fetchPageRange(startPageNumber, endPageNumber).catch((error) => {
-    console.error("Error pre-warming cache:", error);
-  });
+  // fetchPageRange(startPageNumber, endPageNumber).catch((error) => {
+  //   console.error("Error pre-warming cache:", error);
+  // });
 }
 
 async function fetchExistingCharactersWithImages() {
@@ -1029,92 +1051,6 @@ createImageButton.addEventListener("click", async () => {
 
 cancelMappingButton.addEventListener("click", hideMappingModal);
 
-// Handle page number input
-function handlePageNumberInput(digit) {
-  // If we're in "set page number" mode, handle differently
-  if (isSettingPageNumber) {
-    handlePageOffsetInput(digit);
-    return;
-  }
-
-  // Clear any existing timeout
-  if (pageInputTimeout) {
-    clearTimeout(pageInputTimeout);
-  }
-
-  // Add the digit to the typed number
-  typedPageNumber += digit;
-
-  // Show the page number indicator
-  pageNumberIndicator.textContent = `Go to page: ${typedPageNumber}`;
-  pageNumberIndicator.classList.add("visible");
-
-  // Set a timeout to go to the page after delay
-  pageInputTimeout = setTimeout(() => {
-    if (typedPageNumber) {
-      goToPage(typedPageNumber);
-      // Reset the typed number
-      typedPageNumber = "";
-      // Hide the indicator
-      pageNumberIndicator.classList.remove("visible");
-    }
-  }, PAGE_INPUT_DELAY);
-}
-
-// Handle setting a custom page number
-function handlePageOffsetInput(digit) {
-  // Clear any existing timeout
-  if (pageOffsetInputTimeout) {
-    clearTimeout(pageOffsetInputTimeout);
-  }
-
-  // Add the digit to the offset input
-  pageOffsetInput += digit;
-
-  // Show the page number indicator
-  pageNumberIndicator.textContent = `Set current page to: ${pageOffsetInput}`;
-  pageNumberIndicator.classList.add("visible");
-
-  // Set a timeout to apply the page offset after delay
-  pageOffsetInputTimeout = setTimeout(async () => {
-    if (pageOffsetInput) {
-      // Calculate the new offset based on what the user wants this page to be
-      const desiredPageNumber = parseInt(pageOffsetInput);
-      if (!isNaN(desiredPageNumber)) {
-        // Current displayed page number without offset
-        const currentPageNumber = getCurrentPage() - (romanNumeralPages - 1);
-        // Set offset as the difference between desired and current
-        setPageOffset(desiredPageNumber - currentPageNumber);
-        // Update the view to reflect new page numbers
-        document.querySelectorAll(".page").forEach((page) => {
-          const pageIndex = parseInt(page.id.split("-")[1]);
-          const footer = page.querySelector(".page-footer");
-          if (footer) {
-            footer.textContent = parsePage(pageIndex);
-          }
-        });
-      }
-
-      // Reset the input and mode
-      pageOffsetInput = "";
-      isSettingPageNumber = false;
-
-      // Hide the indicator
-      pageNumberIndicator.classList.remove("visible");
-    }
-  }, PAGE_INPUT_DELAY);
-}
-
-// Enter "set page number" mode
-function enterSetPageNumberMode() {
-  isSettingPageNumber = true;
-  pageOffsetInput = "";
-
-  // Show indicator for setting mode
-  pageNumberIndicator.textContent = "Enter new page number:";
-  pageNumberIndicator.classList.add("visible");
-}
-
 // Toggle night mode
 export function toggleNightMode() {
   setIsNightMode(!isNightMode());
@@ -1338,11 +1274,8 @@ initPage()
     console.log("container exists?", document.getElementById("content-container"));
     // Add scroll event listener to update notes based on visible pages
     document.getElementById("content-container")?.addEventListener("scroll", () => {
-      console.log("scroll");
-      // Use a debounce to avoid excessive updates
       if (scrollDebounce) clearTimeout(scrollDebounce);
       scrollDebounce = setTimeout(() => {
-        console.log("scrollDebounce");
         updateView();
       }, 400);
     });
@@ -1396,17 +1329,17 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
     return;
   }
 
-  if (event.key === "s" && (event.metaKey || event.ctrlKey)) {
-    event.preventDefault(); // Prevent browser save dialog
-    enterSetPageNumberMode();
-    return;
-  }
+  // if (event.key === "s" && (event.metaKey || event.ctrlKey)) {
+  //   event.preventDefault(); // Prevent browser save dialog
+  //   enterSetPageNumberMode();
+  //   return;
+  // }
 
-  // Check if the key is a number (0-9)
-  if (/^[0-9]$/.test(event.key) && !event.ctrlKey && !event.altKey && !event.metaKey) {
-    handlePageNumberInput(event.key);
-    return;
-  }
+  // // Check if the key is a number (0-9)
+  // if (/^[0-9]$/.test(event.key) && !event.ctrlKey && !event.altKey && !event.metaKey) {
+  //   handlePageNumberInput(event.key);
+  //   return;
+  // }
 
   // Handle other keyboard navigation
   switch (event.key) {

@@ -1,6 +1,4 @@
-import { getCurrentPage, goToPage } from "@/src/helpers/pagesNavigation";
-import { getPageOffset } from "@/src/pageOffset";
-import { romanNumeralPages } from "@/src/consts";
+import { goToParagraph, getCurrentLocation } from "@/src/helpers/paragraphsNavigation";
 
 // Create search modal elements
 let searchModal: HTMLDivElement;
@@ -284,6 +282,7 @@ function addSearchModalStyles() {
   document.head.appendChild(style);
 }
 
+let preSearchLocation = { chapter: 0, paragraph: 0 };
 /**
  * Show the search modal
  */
@@ -292,6 +291,7 @@ export function showSearchModal() {
     initSearchModal();
   }
 
+  preSearchLocation = getCurrentLocation();
   searchModal.classList.add("active");
   isSearchModalActive = true;
   searchInput.value = lastSearchQuery;
@@ -315,6 +315,21 @@ export function hideSearchModal() {
 
   searchModal.classList.remove("active");
   isSearchModalActive = false;
+  // Create a return button to go back to pre-search location
+  const returnButton = document.getElementById("return-to-location-button");
+  returnButton.addEventListener("click", () => {
+    goToParagraph(preSearchLocation.chapter, preSearchLocation.paragraph);
+    preSearchLocation = { chapter: 0, paragraph: 0 };
+    returnButton.style.display = "none";
+  });
+
+  // Show the button if we have a valid pre-search location
+  setTimeout(() => {
+    const currentLocation = getCurrentLocation();
+    if (preSearchLocation.chapter !== currentLocation.chapter || preSearchLocation.paragraph !== currentLocation.paragraph) {
+      returnButton.style.display = "block";
+    }
+  }, 100);
 }
 
 /**
@@ -331,25 +346,25 @@ export function performSearch(query: string) {
   if (!query.trim()) return;
 
   lastSearchQuery = query;
-  const currentPageNum = getCurrentPage();
+  const currentLocation = getCurrentLocation();
   searchResults.innerHTML = "";
 
   // Counter for matches
   let totalMatches = 0;
 
   // Go through each page up to the current one
-  for (let i = 0; i <= currentPageNum; i++) {
-    const pageElement = document.getElementById(`page-${i}`);
+  for (let i = 0; i <= currentLocation.chapter; i++) {
+    const pageElement = document.querySelector(`section[data-chapter="${i}"]`);
+    console.log("pageElement", pageElement);
     if (!pageElement) continue;
 
-    const pageText = pageElement.textContent || "";
-    const pageNumber = parsePage(i);
+    // const pageText = pageElement.textContent || "";
 
     // Skip if no match in this page
-    if (!pageText.toLowerCase().includes(query.toLowerCase())) continue;
+    // if (!pageText.toLowerCase().includes(query.toLowerCase())) continue;
 
     // Get paragraphs from this page
-    const paragraphs = pageElement.querySelectorAll("p");
+    const paragraphs = pageElement.querySelectorAll(`p[data-index]`);
 
     // For each paragraph, check if it contains the search term
     paragraphs.forEach((paragraph) => {
@@ -374,19 +389,19 @@ export function performSearch(query: string) {
         const highlightedText = paragraphText.replace(new RegExp(query, "gi"), (match) => `<span class="search-highlight">${match}</span>`);
 
         resultItem.innerHTML = `
-          <div class="search-result-page">Page ${pageNumber}</div>
+          <div class="search-result-page">Chapter ${i}, Paragraph ${paragraph.getAttribute("data-index")}</div>
           <div class="search-result-content">${highlightedText}</div>
         `;
 
         // Add click event to navigate to this result
         resultItem.addEventListener("click", () => {
-          goToPage(pageNumber);
+          goToParagraph(i, parseInt(paragraph.getAttribute("data-index") || "0"));
           hideSearchModal();
 
           // Find and highlight the paragraph on the page
           setTimeout(() => {
             // Find paragraphs on the page and locate the one that contains the text
-            const pageParagraphs = document.querySelectorAll(`#page-${i} p`);
+            const pageParagraphs = document.querySelectorAll(`section[data-chapter="${i}"] p[data-index]`);
             let targetParagraph = null;
 
             pageParagraphs.forEach((p) => {
@@ -413,15 +428,10 @@ export function performSearch(query: string) {
   resultsHeader.className = "search-results-header";
 
   if (totalMatches > 0) {
-    resultsHeader.textContent = `Found ${totalMatches} matches for "${query}" in pages up to page ${parsePage(currentPageNum)}`;
+    resultsHeader.textContent = `Found ${totalMatches} matches for "${query}" in pages up to chapter ${currentLocation.chapter}, paragraph ${currentLocation.paragraph}`;
   } else {
-    resultsHeader.textContent = `No matches found for "${query}" in pages up to page ${parsePage(currentPageNum)}`;
+    resultsHeader.textContent = `No matches found for "${query}" in pages up to chapter ${currentLocation.chapter}, paragraph ${currentLocation.paragraph}`;
   }
 
   searchResults.insertBefore(resultsHeader, searchResults.firstChild);
-}
-
-// Helper function for page number formatting
-function parsePage(pageIndex: number) {
-  return (pageIndex - (romanNumeralPages - 1) + getPageOffset()).toString();
 }
