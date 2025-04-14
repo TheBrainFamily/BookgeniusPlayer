@@ -1265,21 +1265,15 @@
 
 /* Footnote Links (.link-note) */
 #content-container a.link-note {
-  font-size: 0.8em;
-  vertical-align: super;
+  font-size: 0.6em;
+  vertical-align: text-top;
   line-height: 0;
   text-decoration: none;
-  border: 1px solid #aaa;
-  border-radius: 3px;
-  padding: 0.1em 0.25em;
-  color: #444;
-  background-color: #f0f0f0;
-  margin: 0 0.1em;
+  color: #8e8e8e;
 }
 #content-container a.link-note:hover,
 #content-container a.link-note:focus {
   background-color: #e0e0e0;
-  border-color: #888;
   color: #000;
   text-decoration: none;
 }

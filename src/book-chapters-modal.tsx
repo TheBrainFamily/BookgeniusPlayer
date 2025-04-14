@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Book, Moon, X, List, FileText, PanelLeft, PanelBottom, Type } from "lucide-react";
+import { Book, Moon, X, List, FileText, PanelLeft, PanelBottom, Type, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,6 +12,7 @@ import { pageChapters } from "./chapters";
 import { isNightMode, toggleNightMode } from "./helpers/setIsNightMode";
 import { goToPage } from "./helpers/pagesNavigation";
 import { toggleMobileCharacters, isMobileCharactersVisible } from "./isMobileCharactersVisible";
+import { resetFurthestPageLocation } from "./helpers/reset-furthest-page-location";
 
 const getTitle = (chapter: number) => {
   const chapterNames = [
@@ -172,6 +173,18 @@ export default function BookChaptersModal() {
             >
               <FileText className="mr-2 h-4 w-4" />
               Go to Page
+            </Button>
+
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-left"
+              onClick={() => {
+                resetFurthestPageLocation();
+                setOverlayOpen(false);
+              }}
+            >
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Reset Furthest Read Location
             </Button>
 
             <Separator />
