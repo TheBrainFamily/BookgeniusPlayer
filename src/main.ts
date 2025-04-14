@@ -218,77 +218,68 @@ function parsePage(pageIndex: number) {
 // Initialize pages
 function initializePages() {
   // Try to get existing note containers first
-  const existingLeftNotes = document.getElementById("left-notes");
-  const existingRightNotes = document.getElementById("right-notes");
+  // const existingLeftNotes = document.getElementById("left-notes");
+  // const existingRightNotes = document.getElementById("right-notes");
 
-  // Store their contents if they exist
-  const leftNotesHTML = existingLeftNotes
-    ? existingLeftNotes.innerHTML
-    : `
-        <h3>Left Notes</h3>
-        <p>Loading notes...</p>
-      `;
+  // // Store their contents if they exist
+  // const leftNotesHTML = existingLeftNotes
+  //   ? existingLeftNotes.innerHTML
+  //   : `
+  //       <h3>Left Notes</h3>
+  //       <p>Loading notes...</p>
+  //     `;
 
-  const rightNotesHTML = existingRightNotes
-    ? existingRightNotes.innerHTML
-    : `
-        <h3>Page summary</h3>
-        <p>Keep reading...</p>
-      `;
+  // const rightNotesHTML = existingRightNotes
+  //   ? existingRightNotes.innerHTML
+  //   : `
+  //       <h3>Page summary</h3>
+  //       <p>Keep reading...</p>
+  //     `;
 
-  // Clear container
-  bookContainer.innerHTML = "";
-
-  // Create and add left notes container
-  const leftNotesDiv = document.createElement("div");
-  leftNotesDiv.className = "notes-container";
-  leftNotesDiv.id = "left-notes";
-  leftNotesDiv.innerHTML = leftNotesHTML;
+  // // Create and add left notes container
+  // const leftNotesDiv = document.createElement("div");
+  // leftNotesDiv.className = "notes-container";
+  // leftNotesDiv.id = "left-notes";
+  // leftNotesDiv.innerHTML = leftNotesHTML;
 
   // Add close button for mobile
   if (isMobile()) {
-    const closeButton = document.createElement("button");
-    closeButton.className = "close-notes-button";
-    closeButton.innerHTML = "&times;";
-    closeButton.addEventListener("click", toggleMobileNotes);
-    leftNotesDiv.appendChild(closeButton);
+    //TODO APRIL 14 check this mobile addition
+    // const closeButton = document.createElement("button");
+    // closeButton.className = "close-notes-button";
+    // closeButton.innerHTML = "&times;";
+    // closeButton.addEventListener("click", toggleMobileNotes);
+    // leftNotesDiv.appendChild(closeButton);
   }
 
-  bookContainer.appendChild(leftNotesDiv);
+  // bookContainer.appendChild(leftNotesDiv);
 
-  // Create content container for pages
-  const contentContainer = document.createElement("div");
-  contentContainer.id = "content-container";
-  bookContainer.appendChild(contentContainer);
-
-  const addToIndex = parseInt(pageChapters[0].pageId.replace("page_", ""));
-  console.log("[INITIALIZE PAGES] addToIndex", addToIndex);
   // Create all page elements
-  pagesContent.forEach((content, index) => {
-    const actualIndex = index + addToIndex;
-    const pageDiv = document.createElement("div");
-    pageDiv.className = "page";
-    pageDiv.id = `page-${actualIndex}`;
-    pageDiv.innerHTML = content;
+  // pagesContent.forEach((content, index) => {
+  //   const actualIndex = index + addToIndex;
+  //   const pageDiv = document.createElement("div");
+  //   pageDiv.className = "page";
+  //   pageDiv.id = `page-${actualIndex}`;
+  //   pageDiv.innerHTML = content;
 
-    // Add page number footer
-    if (index > pagesToSkipFooterGeneration + 1) {
-      const footer = document.createElement("div");
-      footer.className = "page-footer";
-      footer.textContent = parsePage(actualIndex);
-      pageDiv.appendChild(footer);
-    }
+  //   // Add page number footer
+  //   if (index > pagesToSkipFooterGeneration + 1) {
+  //     const footer = document.createElement("div");
+  //     footer.className = "page-footer";
+  //     footer.textContent = parsePage(actualIndex);
+  //     pageDiv.appendChild(footer);
+  //   }
 
-    // Add to content container
-    contentContainer.appendChild(pageDiv);
-  });
+  //   // Add to content container
+  //   contentContainer.appendChild(pageDiv);
+  // });
 
   // Create and add right notes container (hidden on mobile)
-  const rightNotesDiv = document.createElement("div");
-  rightNotesDiv.className = "notes-container";
-  rightNotesDiv.id = "right-notes";
-  rightNotesDiv.innerHTML = rightNotesHTML;
-  bookContainer.appendChild(rightNotesDiv);
+  // const rightNotesDiv = document.createElement("div");
+  // rightNotesDiv.className = "notes-container";
+  // rightNotesDiv.id = "right-notes";
+  // rightNotesDiv.innerHTML = rightNotesHTML;
+  // bookContainer.appendChild(rightNotesDiv);
 
   // Set up intersection observer to detect visible pages
   setupPageObserver();

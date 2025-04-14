@@ -1004,3 +1004,275 @@
   transform: translateY(100%);
   transition: all 0.3s ease;
 }
+
+/* ============================================ */
+/* Example CSS for FB2-Generated HTML Structure */
+/* ============================================ */
+
+/* --- Basic Setup & Readability --- */
+#content-container {
+  font-family: Georgia, "Times New Roman", Times, serif; /* Classic serif font */
+  font-size: 16px; /* Base font size */
+  line-height: 1.6; /* Spacing between lines */
+  color: #222; /* Dark grey text instead of pure black */
+  background-color: #fdfaf4; /* Slightly off-white background */
+  margin: 2em auto; /* Top/bottom margin, auto left/right for centering */
+  padding: 1em 2em; /* Padding inside the body */
+  max-width: 800px; /* Optimal reading width on wider screens */
+  hyphens: auto; /* Allow automatic hyphenation for justified text */
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+}
+
+/* --- Headings --- */
+#content-container h1,
+#content-container h2,
+#content-container h3,
+#content-container h4,
+#content-container h5,
+#content-container h6 {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; /* Sans-serif for headings */
+  line-height: 1.3;
+  margin-top: 2.5em; /* Space above headings */
+  margin-bottom: 1em; /* Space below headings */
+  font-weight: bold;
+  color: #000;
+  /* Prevent headings from being split across pages (print) */
+  page-break-after: avoid;
+}
+
+#content-container h1 {
+  /* Book Title */
+  font-size: 2.8em;
+  text-align: center;
+  margin-bottom: 1.5em;
+  margin-top: 0; /* No top margin for first element */
+}
+
+#content-container h2 {
+  font-size: 2em;
+} /* e.g., Main Part Title */
+#content-container h3 {
+  font-size: 1.7em;
+} /* e.g., Volume Title */
+#content-container h4 {
+  font-size: 1.4em;
+} /* e.g., Chapter Title */
+
+/* Extra space before actual chapter content */
+#content-container section[data-chapter] {
+  margin-top: 3em;
+  /* Start chapters on new page (print) */
+  /* page-break-before: always; */
+}
+
+/* --- Paragraphs --- */
+#content-container p {
+  margin-top: 0;
+  margin-bottom: 1em;
+  text-align: justify; /* Justify text blocks */
+}
+
+/* First-line indent for paragraphs (common in books) */
+/* Indent paragraphs that follow another paragraph */
+#content-container p + p {
+  text-indent: 1.5em;
+  margin-top: 0; /* Prevent double spacing combined with margin-bottom */
+}
+
+#content-container p:first-of-type::first-letter {
+  font-family: inherit; /* Or use the heading font: 'Palatino Linotype', Palatino... */
+  font-size: 3.5em; /* Make it prominent */
+  font-weight: bold; /* Bold for emphasis */
+  float: left;
+  line-height: 0.8; /* Adjust for vertical alignment */
+  margin-right: 0.1em; /* Space after the letter */
+  padding-top: 0.05em; /* Fine-tune vertical position */
+  padding-bottom: 0.05em; /* Helps with spacing below */
+}
+
+/* Remove first-line indent for paragraphs immediately following headings, blockquotes, etc. */
+#content-container h1 + p,
+#content-container h2 + p,
+#content-container h3 + p,
+#content-container h4 + p,
+#content-container h5 + p,
+#content-container h6 + p,
+#content-container blockquote + p,
+#content-container div.poem + p,
+#content-container div.epigraph + p,
+#content-container div.stanza + p,
+#content-container table + p {
+  text-indent: 0;
+}
+
+/* --- Specific Block Elements --- */
+
+/* Epigraph (.epigraph) */
+#content-container .epigraph {
+  margin: 2.5em 2em 2.5em 4em; /* Indented from left */
+  font-style: italic;
+  color: #555;
+}
+#content-container .epigraph p {
+  text-align: left; /* Align epigraph text left within its block */
+  text-indent: 0;
+  margin-bottom: 0.5em;
+}
+#content-container .epigraph .text-author {
+  text-align: right; /* Align author right */
+  font-style: normal;
+  margin-top: 0.5em;
+}
+
+/* Blockquote / Citation (.cite) */
+#content-container blockquote.cite {
+  margin: 1.5em 2.5em; /* Indent blockquote */
+  padding-left: 1em;
+  border-left: 3px solid #ccc;
+  color: #333;
+}
+#content-container blockquote.cite p {
+  text-indent: 0;
+  text-align: left; /* Usually don't justify quotes */
+  font-style: italic; /* Often italicized */
+  margin-bottom: 0.5em;
+}
+#content-container blockquote.cite .text-author {
+  margin-top: 0.8em;
+  text-align: right;
+  font-style: normal;
+  font-size: 0.9em;
+}
+
+/* Poem (.poem, .stanza, .verse) */
+#content-container .poem {
+  margin: 1.5em 2em 1.5em 4em; /* Indent poems further */
+}
+#content-container .stanza {
+  margin-bottom: 1.2em;
+}
+#content-container .poem .inline-title {
+  /* Title within a poem block */
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1em;
+  font-style: italic;
+  text-indent: 0;
+}
+#content-container p.verse {
+  margin: 0 0 0.3em 0; /* Less space between verses */
+  text-indent: 0;
+  white-space: pre-line; /* Respect line breaks if converter adds them, usually not needed */
+  text-align: left;
+}
+#content-container .poem .text-author {
+  margin-top: 1em;
+  text-align: right;
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+/* --- Inline Elements --- */
+#content-container strong {
+  font-weight: bold;
+} /* Default is usually bold already */
+#content-container em {
+  font-style: italic;
+} /* Default is usually italic already */
+#content-container code {
+  font-family: "Courier New", Courier, monospace;
+  background-color: #f0f0f0;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+#content-container s {
+  text-decoration: line-through;
+}
+#content-container sub,
+#content-container sup {
+  line-height: 0; /* Prevent affecting line spacing */
+  font-size: 0.75em;
+  position: relative;
+  vertical-align: baseline;
+}
+#content-container sub {
+  bottom: -0.25em;
+}
+#content-container sup {
+  top: -0.5em;
+}
+
+/* Links */
+#content-container a {
+  color: #005ea8; /* A slightly muted blue */
+  text-decoration: none;
+}
+#content-container a:hover,
+#content-container a:focus {
+  text-decoration: underline;
+}
+
+/* Footnote Links (.link-note) */
+#content-container a.link-note {
+  font-size: 0.8em;
+  vertical-align: super;
+  line-height: 0;
+  text-decoration: none;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  padding: 0.1em 0.25em;
+  color: #444;
+  background-color: #f0f0f0;
+  margin: 0 0.1em;
+}
+#content-container a.link-note:hover,
+#content-container a.link-note:focus {
+  background-color: #e0e0e0;
+  border-color: #888;
+  color: #000;
+  text-decoration: none;
+}
+
+/* --- Tables (Basic Styling) --- */
+#content-container table {
+  width: auto; /* Adjust as needed */
+  border-collapse: collapse;
+  margin: 1.5em auto; /* Center table if not width 100% */
+  border: 1px solid #ccc;
+  font-size: 0.9em; /* Slightly smaller text in tables */
+}
+#content-container th,
+#content-container td {
+  border: 1px solid #ccc;
+  padding: 0.4em 0.7em;
+  text-align: left;
+  vertical-align: top;
+}
+#content-container th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+/* Alignment classes from FB2 (if generated) */
+#content-container td.align-center,
+#content-container th.align-center {
+  text-align: center;
+}
+#content-container td.align-right,
+#content-container th.align-right {
+  text-align: right;
+}
+#content-container td.valign-middle,
+#content-container th.valign-middle {
+  vertical-align: middle;
+}
+#content-container td.valign-bottom,
+#content-container th.valign-bottom {
+  vertical-align: bottom;
+}
+
+/* --- Empty Sections (like the unused one in the example) --- */
+#content-container section:empty {
+  display: none; /* Hide sections that contain nothing */
+}
