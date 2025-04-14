@@ -405,12 +405,26 @@ async function updatePageNotes(pageIndex: number) {
     }
 
     console.log("[UPDATE PAGE] combinedNotes", combinedNotes);
-    // prepare all notes in the notes panel
-    combinedNotes.forEach((entity) => {
-      // Create editable entity div instead of static one
-      const entityDiv = createEditableEntity(actualPageNumber, entity);
-      leftNotes.appendChild(entityDiv);
-    });
+
+    // Create a container for entity notes if not mobile
+    if (!isMobile()) {
+      const entityContainer = document.createElement("div");
+      entityContainer.className = "entity-notes-container";
+      leftNotes.appendChild(entityContainer);
+
+      // prepare all notes in the notes panel
+      combinedNotes.forEach((entity) => {
+        // Create editable entity div instead of static one
+        const entityDiv = createEditableEntity(actualPageNumber, entity);
+        entityContainer.appendChild(entityDiv);
+      });
+    } else {
+      // On mobile, add directly to leftNotes
+      combinedNotes.forEach((entity) => {
+        const entityDiv = createEditableEntity(actualPageNumber, entity);
+        leftNotes.appendChild(entityDiv);
+      });
+    }
 
     // Add combined context information if available
     if (pageMetadata.metadata?.contextForPage?.trim() !== "") {
@@ -451,7 +465,16 @@ async function updatePageNotes(pageIndex: number) {
       }
     }
   } else {
-    leftNotes.innerHTML += "<p>No notes for this page yet.</p>";
+    if (isMobile()) {
+      leftNotes.innerHTML += "<p>No notes for this page yet.</p>";
+    } else {
+      const entityContainer = document.createElement("div");
+      entityContainer.className = "entity-notes-container";
+      const emptyMessage = document.createElement("p");
+      emptyMessage.textContent = "No notes for this page yet.";
+      entityContainer.appendChild(emptyMessage);
+      leftNotes.appendChild(entityContainer);
+    }
 
     // Add empty page and chapter summaries that can be edited (if not mobile)
     if (!isMobile()) {
@@ -465,11 +488,12 @@ async function updatePageNotes(pageIndex: number) {
       }
     }
   }
-  if (!isMobile()) {
-    // Add "Add Character" button at the top of the notes panel
-    const addCharacterBtn = createAddCharacterButton(actualPageNumber, leftNotes, fetchExistingCharactersWithImages, updatePageNotes);
-    leftNotes.appendChild(addCharacterBtn);
-  }
+
+  // if (!isMobile()) {
+  //   // Add "Add Character" button at the top of the notes panel
+  //   const addCharacterBtn = createAddCharacterButton(actualPageNumber, leftNotes, fetchExistingCharactersWithImages, updatePageNotes);
+  //   leftNotes.appendChild(addCharacterBtn);
+  // }
 }
 
 // Create or update the mobile character strip

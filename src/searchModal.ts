@@ -353,7 +353,16 @@ export function performSearch(query: string) {
 
     // For each paragraph, check if it contains the search term
     paragraphs.forEach((paragraph) => {
-      const paragraphText = paragraph.textContent || "";
+      // Clone the paragraph to avoid modifying the original
+      const paragraphClone = paragraph.cloneNode(true) as HTMLElement;
+
+      // Remove all anchor elements from the clone
+      const anchors = paragraphClone.querySelectorAll("a.anchor");
+      anchors.forEach((anchor) => anchor.remove());
+
+      // Get clean text content without anchors
+      const paragraphText = paragraphClone.textContent || "";
+
       if (paragraphText.toLowerCase().includes(query.toLowerCase())) {
         totalMatches++;
 

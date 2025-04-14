@@ -36,6 +36,10 @@
   font-size: 150%;
 }
 
+#legacy h2.h3 {
+  margin-top: 1.5em;
+}
+
 #legacy.night-mode {
   background-color: #222;
   color: #ddd;

@@ -6,7 +6,7 @@ export async function updatePageMetadata(pageNumber: number, pageMetadata: IPage
     const response = await fetch(`/api/pages/${pageNumber}/${bookSlug}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pageMetadata }),
+      body: JSON.stringify({ metadata: pageMetadata }),
     });
 
     if (!response.ok) {

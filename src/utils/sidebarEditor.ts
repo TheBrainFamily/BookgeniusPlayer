@@ -538,6 +538,18 @@ export function addEditorStyles() {
       margin-top: 10px;
     }
 
+    /* Container for entity notes - center content vertically */
+    .entity-notes-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100%;
+      padding: 10px 0;
+      gap: 15px;
+      width: 100%;
+      overflow: visible;
+    }
+
     /* Styles for the entity image wrapper */
     .entity-image-wrapper {
       transition: transform 0.2s ease-in-out, z-index 0s ease-in-out 0.2s; /* Add z-index transition */
