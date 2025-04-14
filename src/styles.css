@@ -807,6 +807,181 @@
     display: block;
   }
 }
+@media (max-width: 768px) {
+  #legacy #book-container {
+    flex-direction: column;
+    padding: 0;
+    height: 100vh;
+  }
+
+  #legacy .notes-container {
+    position: fixed;
+    top: 0;
+    right: 0; /* Changed from left:0 to right:0 */
+    width: 100%; /* Changed from 85% to 100% to cover whole screen */
+    height: 100%;
+    margin: 0;
+    /* padding: 20px; */
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-bottom: 0;
+    border-radius: 0;
+    z-index: 50;
+    transform: translateX(100%); /* Changed from -100% to 100% to slide from right */
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2); /* Changed shadow direction */
+    background-color: white; /* Ensure background is solid */
+    transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1); /* Added smooth transition */
+  }
+
+  #legacy.night-mode .notes-container {
+    background-color: #222; /* Dark mode background */
+  }
+
+  #legacy .notes-container.active {
+    transform: translateX(0);
+  }
+
+  #legacy #right-notes {
+    display: none; /* Hide right notes on mobile */
+  }
+
+  #legacy #left-notes {
+    display: none; /* Hide left notes on mobile */
+  }
+
+  #legacy #content-container {
+    width: 100%;
+    height: 100vh;
+    height: calc(100vh + env(safe-area-inset-bottom)); /* Extend to include the bottom safe area */
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: 2em; /* Add space for character strip at left */
+    padding-right: 2em;
+    /* Remove transition for instant width change */
+    transition: none !important; /* Force no transition to ensure instant layout change */
+    will-change: padding-left, transform; /* Optimize for animations */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    perspective: 1000;
+    transform: translateZ(0); /* Force hardware acceleration */
+  }
+
+  #legacy #toggle-notes-button {
+    display: block;
+  }
+
+  #legacy #extra-controls {
+    top: 10px;
+    right: 10px;
+    z-index: 45; /* Ensure controls are visible above content */
+  }
+
+  #legacy #fullscreen-button,
+  #legacy #night-mode-button {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  /* Show toggle buttons */
+  #legacy #toggle-characters-button {
+    display: block;
+  }
+
+  /* Show mobile character strip */
+  #legacy .mobile-character-strip {
+    display: block;
+  }
+
+  /* Adjust entity notes for mobile */
+  #legacy .entity-note {
+    flex-direction: column !important;
+  }
+
+  #legacy .entity-image-column {
+    margin-bottom: 10px;
+  }
+
+  #legacy .entity-image {
+    max-width: 120px !important;
+    margin: 0 auto;
+    display: block;
+  }
+
+  /* Modal adjustments for mobile */
+  #legacy .modal-container {
+    padding: 15px;
+    width: 95%;
+  }
+
+  #legacy .modal-buttons {
+    flex-direction: column;
+  }
+
+  #legacy .modal-button {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  #legacy .character-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+
+  /* Notes edge indicator */
+  #legacy .notes-edge-indicator {
+    display: block;
+    position: fixed;
+    top: 50%;
+    right: 0;
+    width: 10px; /* Slightly increased from 8px to 10px */
+    height: 60px;
+    background-color: #4a90e2;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    transform: translateY(-50%);
+    z-index: 40;
+    opacity: 0.7;
+    transition: all 0.2s;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Add a pseudo-element to extend the touch area */
+  #legacy .notes-edge-indicator::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: -20px; /* Extend 20px to the left */
+    width: 30px; /* Total width of extended touch area */
+    height: 80px; /* Slightly taller than the visible indicator */
+    background-color: transparent; /* Invisible extension */
+    z-index: 39; /* Below the visible indicator */
+  }
+
+  /* Add hover effect for better usability */
+  #legacy .notes-edge-indicator:hover {
+    width: 14px;
+    opacity: 0.9;
+    background-color: #3a7bc8;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  }
+
+  #legacy .notes-edge-indicator:active,
+  #legacy .notes-edge-indicator.swiping {
+    width: 12px;
+    opacity: 0.9;
+    background-color: #3a7bc8;
+  }
+
+  #legacy.night-mode .notes-edge-indicator {
+    background-color: #2a5a8e;
+  }
+
+  /* Hide indicator when notes are visible */
+  #legacy .notes-container.active + .notes-edge-indicator {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
 
 /* Hide the horizontal character strip when notes are visible */
 #legacy.notes-visible .mobile-horizontal-character-strip {
