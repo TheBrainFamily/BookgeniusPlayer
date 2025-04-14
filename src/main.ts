@@ -247,12 +247,13 @@ function setupPageObserver() {
   const observerOptions = {
     root: document.getElementById("content-container"),
     rootMargin: "0px",
-    threshold: 0.9, // Consider page visible when 40% is in view
+    threshold: 0.8, // Consider page visible when 40% is in view
   };
 
   // --- State for tracking all currently intersecting pages ---
   const intersectingPages = new Set<Element>();
   let currentlyActivePageElement: Element | null = null;
+  let currentlyLastActivePageElement: Element | null = null;
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
     // 1. Update the set of intersecting pages based on the current changes
@@ -276,13 +277,13 @@ function setupPageObserver() {
 
       // 3. Update active state only if the topmost or bottommost page has changed
       // (We might refine this condition later if needed, for now, update if any intersecting element changes)
-      if (topVisiblePageElement !== currentlyActivePageElement) {
+      if (topVisiblePageElement !== currentlyActivePageElement || bottomVisiblePageElement !== currentlyLastActivePageElement) {
         // TODO: Revisit this condition? Maybe check bottom element too?
         console.log("[Observer] Top visible page:", topVisiblePageElement.id || topVisiblePageElement);
         console.log("[Observer] Bottom visible page:", bottomVisiblePageElement.id || bottomVisiblePageElement);
 
         currentlyActivePageElement = topVisiblePageElement; // Update the tracked active page (using top for now)
-
+        currentlyLastActivePageElement = bottomVisiblePageElement;
         // --- Extract Chapter and Paragraph Info ---
         const getParagraphInfo = (element: Element): { chapter: number | null; paragraph: number | null } => {
           const paragraphStr = (element as HTMLElement).dataset.index;

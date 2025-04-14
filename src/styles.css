@@ -63,6 +63,11 @@
   text-align: justify;
 }
 
+#legacy.night-mode #book-container #content-container {
+  background-color: #000;
+  color: #ddd;
+}
+
 #legacy .notes-container {
   width: 25%;
   /* height: 100%; */
@@ -140,28 +145,12 @@
   margin-top: 30px;
 }
 
-#legacy.night-mode .page {
-  background-color: #333;
-  color: #eee;
-  /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); */
-}
-
-#legacy.night-mode .page.active {
-  background-color: #000;
-  color: #eee;
-  /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); */
-}
-
 /* Page separator */
 #legacy .page-separator {
   height: 1px;
   background-color: #ccc;
   margin: 30px auto;
   width: 50%;
-}
-
-#legacy.night-mode .page-separator {
-  background-color: #555;
 }
 
 #legacy .chapter-header {
@@ -812,6 +801,11 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+#legacy.night-mode #right-notes {
+  background-color: #222;
+  color: #ddd;
+}
+
 #right-notes section {
   margin-bottom: 1.2rem;
 }
@@ -834,6 +828,11 @@
   font-style: italic;
   font-weight: 600;
   color: #222;
+}
+
+#legacy.night-mode #right-notes emphasis,
+#legacy.night-mode #right-notes p {
+  color: #ddd;
 }
 
 @media (max-width: 768px) {
@@ -1090,6 +1089,14 @@
   page-break-after: avoid;
 }
 
+#legacy.night-mode #content-container h1,
+#legacy.night-mode #content-container h2,
+#legacy.night-mode #content-container h3,
+#legacy.night-mode #content-container h4,
+#legacy.night-mode #content-container h5,
+#legacy.night-mode #content-container h6 {
+  color: #ddd;
+}
 #content-container h1 {
   /* Book Title */
   font-size: 2.8em;
