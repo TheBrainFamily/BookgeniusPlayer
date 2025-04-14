@@ -315,21 +315,6 @@ export function hideSearchModal() {
 
   searchModal.classList.remove("active");
   isSearchModalActive = false;
-  // Create a return button to go back to pre-search location
-  const returnButton = document.getElementById("return-to-location-button");
-  returnButton.addEventListener("click", () => {
-    goToParagraph(preSearchLocation.chapter, preSearchLocation.paragraph);
-    preSearchLocation = { chapter: 0, paragraph: 0 };
-    returnButton.style.display = "none";
-  });
-
-  // Show the button if we have a valid pre-search location
-  setTimeout(() => {
-    const currentLocation = getCurrentLocation();
-    if (preSearchLocation.chapter !== currentLocation.chapter || preSearchLocation.paragraph !== currentLocation.paragraph) {
-      returnButton.style.display = "block";
-    }
-  }, 100);
 }
 
 /**

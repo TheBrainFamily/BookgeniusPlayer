@@ -13,7 +13,7 @@ import { initSearchModal, showSearchModal, hideSearchModal, isSearchActive } fro
 // Import the sidebar editor utilities
 import { createEditableEntity, createEditablePageSummary, createEditableChapterSummary, createAddCharacterButton, addEditorStyles } from "./utils/sidebarEditor";
 import { getParagraphRange } from "./fetchers/getParagraphRange";
-import { setCurrentLocation } from "./helpers/paragraphsNavigation";
+import { getSavedLocation, goToParagraph, setCurrentLocation } from "./helpers/paragraphsNavigation";
 
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
@@ -167,60 +167,6 @@ function preloadImagesFromMetadata(metadataArray) {
   });
 }
 
-// Fetch page metadata from API
-async function fetchPageMetadata(pageNumber) {
-  try {
-    if (pageMetadataCache[pageNumber]) {
-      return pageMetadataCache[pageNumber];
-    }
-
-    const response = await fetch(`/api/pages/${pageNumber}/${getCurrentBookSlug()}`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch metadata for page ${pageNumber}`);
-    }
-
-    const data = await response.json();
-    pageMetadataCache[pageNumber] = data;
-
-    // Preload images from this single page metadata
-    preloadImagesFromMetadata([data]);
-
-    return data;
-  } catch (error) {
-    console.error("Error fetching page metadata:", error);
-    return null;
-  }
-}
-
-// Fetch metadata for a range of pages
-async function fetchPageRange(startPage, endPage) {
-  try {
-    const response = await fetch(`/api/pages/${getCurrentBookSlug()}?startPage=${startPage}&endPage=${endPage}`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch metadata for pages ${startPage}-${endPage}`);
-    }
-
-    const data = await response.json();
-    // Cache each page's metadata
-    data.forEach((page: { pageNumber: string | number }) => {
-      pageMetadataCache[page.pageNumber] = page;
-    });
-
-    // Preload images from the fetched metadata
-    preloadImagesFromMetadata(data);
-
-    return data;
-  } catch (error) {
-    console.error("Error fetching page range:", error);
-    return [];
-  }
-}
-
-// Parse page number based on its position
-function parsePage(pageIndex: number) {
-  return (pageIndex - (romanNumeralPages - 1) + getPageOffset()).toString();
-}
-
 // Initialize pages
 function initializePages() {
   // Try to get existing note containers first
@@ -353,6 +299,7 @@ function setupPageObserver() {
         if (startInfo.chapter !== null && startInfo.paragraph !== null && endInfo.chapter !== null && endInfo.paragraph !== null) {
           console.log(`[Observer] Updating notes for Ch ${startInfo.chapter}:${startInfo.paragraph} to Ch ${endInfo.chapter}:${endInfo.paragraph}`);
           updateParagraphNotes({ startChapter: startInfo.chapter, startParagraph: startInfo.paragraph, endChapter: endInfo.chapter, endParagraph: endInfo.paragraph });
+          console.log("setting current locatio from intersection", { chapter: startInfo.chapter, paragraph: startInfo.paragraph });
           setCurrentLocation({ chapter: startInfo.chapter, paragraph: startInfo.paragraph });
         } else {
           console.warn("[Observer] Could not extract chapter/paragraph info for:", topVisiblePageElement, bottomVisiblePageElement);
@@ -448,136 +395,6 @@ async function updateParagraphNotesInternal({
       leftNotes.appendChild(entityDiv);
     });
   }
-}
-
-let currentPageIndex: number = 0;
-
-// Unified function to update notes for one or more pages
-async function updatePageNotes(pageIndex: number) {
-  if (pageIndex === currentPageIndex) return;
-  currentPageIndex = pageIndex;
-  const leftNotes = document.getElementById("left-notes");
-  if (!leftNotes) return;
-
-  // Get the display page numbers for the header
-  const pageNumber = parseInt(parsePage(pageIndex));
-
-  const actualPageNumber = pageNumber;
-
-  // Array to hold all page metadata
-  const pageMetadata = await fetchPageMetadata(actualPageNumber);
-  if (isMobile()) {
-    const notesTitle = `Notes for Page ${pageNumber}`;
-    const closeButton = `<button class="close-notes-button">&times;</button>`;
-    leftNotes.innerHTML = `<h3>${notesTitle}</h3>${closeButton}`;
-    const closeBtn = leftNotes.querySelector(".close-notes-button");
-    if (closeBtn) {
-      closeBtn.addEventListener("click", toggleMobileNotes);
-    }
-  } else {
-    leftNotes.innerHTML = ``;
-  }
-  const combinedNotes = pageMetadata.metadata.notesForPage;
-
-  // Add editor styles once
-  addEditorStyles();
-
-  if (combinedNotes.length > 0) {
-    // Create mobile character strip
-    if (isMobile()) {
-      createMobileCharacterStrip(combinedNotes);
-    }
-
-    console.log("[UPDATE PAGE] combinedNotes", combinedNotes);
-
-    // Create a container for entity notes if not mobile
-    if (!isMobile()) {
-      const entityContainer = document.createElement("div");
-      entityContainer.className = "entity-notes-container";
-      leftNotes.appendChild(entityContainer);
-
-      // prepare all notes in the notes panel
-      combinedNotes.forEach((entity) => {
-        // Create editable entity div instead of static one
-        const entityDiv = createEditableEntity(actualPageNumber, entity);
-        entityContainer.appendChild(entityDiv);
-      });
-    } else {
-      // On mobile, add directly to leftNotes
-      combinedNotes.forEach((entity) => {
-        const entityDiv = createEditableEntity(actualPageNumber, entity);
-        leftNotes.appendChild(entityDiv);
-      });
-    }
-
-    // Add combined context information if available
-    if (pageMetadata.metadata?.contextForPage?.trim() !== "") {
-      const contextText = pageMetadata.metadata.contextForPage.replace("# Current Page Summary", "").replace("# Page Summary", "").replace("# Summary", "").trim();
-
-      if (isMobile()) {
-        const formattedContextText = contextText.replace(/\n/g, "<br>");
-        leftNotes.innerHTML += `<p>${formattedContextText}</p>`;
-      } else {
-        const rightNotes = document.getElementById("right-notes");
-        if (rightNotes) {
-          // Use editable page summary component
-          rightNotes.innerHTML = "";
-          const editablePageSummary = createEditablePageSummary(actualPageNumber, contextText);
-          rightNotes.appendChild(editablePageSummary);
-
-          // Add chapter summary if available
-          if (pageMetadata.metadata?.chapterSummary?.trim() !== "") {
-            const chapterSummary = pageMetadata.metadata.chapterSummary;
-            const editableChapterSummary = createEditableChapterSummary(actualPageNumber, chapterSummary);
-            rightNotes.appendChild(editableChapterSummary);
-          } else {
-            // Add an empty chapter summary that can be edited
-            const editableChapterSummary = createEditableChapterSummary(actualPageNumber, "");
-            rightNotes.appendChild(editableChapterSummary);
-          }
-        }
-      }
-    } else if (!isMobile()) {
-      // Add empty page and chapter summaries that can be edited
-      const rightNotes = document.getElementById("right-notes");
-      if (rightNotes) {
-        rightNotes.innerHTML = "";
-        const editablePageSummary = createEditablePageSummary(actualPageNumber, "");
-        rightNotes.appendChild(editablePageSummary);
-        const editableChapterSummary = createEditableChapterSummary(actualPageNumber, "");
-        rightNotes.appendChild(editableChapterSummary);
-      }
-    }
-  } else {
-    if (isMobile()) {
-      leftNotes.innerHTML += "<p>No notes for this page yet.</p>";
-    } else {
-      const entityContainer = document.createElement("div");
-      entityContainer.className = "entity-notes-container";
-      const emptyMessage = document.createElement("p");
-      emptyMessage.textContent = "No notes for this page yet.";
-      entityContainer.appendChild(emptyMessage);
-      leftNotes.appendChild(entityContainer);
-    }
-
-    // Add empty page and chapter summaries that can be edited (if not mobile)
-    if (!isMobile()) {
-      const rightNotes = document.getElementById("right-notes");
-      if (rightNotes) {
-        rightNotes.innerHTML = "";
-        const editablePageSummary = createEditablePageSummary(actualPageNumber, "");
-        rightNotes.appendChild(editablePageSummary);
-        const editableChapterSummary = createEditableChapterSummary(actualPageNumber, "");
-        rightNotes.appendChild(editableChapterSummary);
-      }
-    }
-  }
-
-  // if (!isMobile()) {
-  //   // Add "Add Character" button at the top of the notes panel
-  //   const addCharacterBtn = createAddCharacterButton(actualPageNumber, leftNotes, fetchExistingCharactersWithImages, updatePageNotes);
-  //   leftNotes.appendChild(addCharacterBtn);
-  // }
 }
 
 // Create or update the mobile character strip
@@ -722,17 +539,13 @@ async function updateView() {
   // updatePageNotes(minPageIndex);
 
   // Save current position to local storage - use the first visible page
-  localStorage.setItem("bookPosition", `${minPageIndex}`);
   // setCurrentLocation({ chapter: minPageIndex, paragraph: 0 });
 }
 
 // Initialize the viewer and fetch initial metadata
 async function initPage() {
   // Check for saved position
-  const savedPosition = parseInt(localStorage.getItem("bookPosition")) || 0;
-  if (savedPosition > 0 && savedPosition < pagesContent.length) {
-    setCurrentPage(savedPosition);
-  }
+  const savedPosition = getSavedLocation();
 
   // Initialize the viewer
   initializePages();
@@ -742,13 +555,7 @@ async function initPage() {
 
   // Scroll to the saved position
   setTimeout(() => {
-    const targetPage = document.getElementById(`page-${getCurrentPage()}`);
-    if (targetPage) {
-      targetPage.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
-    // Update view once scrolled
-    updateView();
+    goToParagraph(savedPosition.chapter, savedPosition.paragraph);
   }, 100);
 
   // Set up resize handler for responsive layout
