@@ -369,19 +369,23 @@ const dealWithAnnotations = ({
 
     if (!sectionElement) return; // Skip if paragraph is not within a chapter section
 
-    const currentChapter = parseInt(sectionElement.dataset.chapter || "-1");
+    const paragraphChapter = parseInt(sectionElement.dataset.chapter || "-1");
     const currentParagraph = parseInt(paragraphElement.dataset.index || "-1");
 
-    if (currentChapter < 0 || currentParagraph < 0) return; // Skip if data attributes are invalid
+    if (paragraphChapter < 0 || currentParagraph < 0) return; // Skip if data attributes are invalid
 
     // Check if the paragraph falls within the visible range
-    const isInRange =
-      // Case 1: Paragraph is in the start chapter and at or after the start paragraph
-      (currentChapter === startChapter && currentParagraph >= startParagraph) ||
-      // Case 2: Paragraph is in a chapter between the start and end chapters
-      (currentChapter > startChapter && currentChapter < endChapter) ||
-      // Case 3: Paragraph is in the end chapter and at or before the end paragraph
-      (currentChapter === endChapter && currentParagraph <= endParagraph);
+    let isInRange = false;
+    if (startChapter === endChapter) {
+      // Case 1: Single Chapter View
+      isInRange = paragraphChapter === startChapter && currentParagraph >= startParagraph && currentParagraph <= endParagraph;
+    } else {
+      // Case 2: Multi-Chapter View
+      const inStartChapter = paragraphChapter === startChapter && currentParagraph >= startParagraph;
+      const inMiddleChapter = paragraphChapter > startChapter && paragraphChapter < endChapter;
+      const inEndChapter = paragraphChapter === endChapter && currentParagraph <= endParagraph;
+      isInRange = inStartChapter || inMiddleChapter || inEndChapter;
+    }
 
     if (isInRange) {
       const annotations = paragraphElement.querySelectorAll<HTMLAnchorElement>(".link-note");
