@@ -52,7 +52,7 @@ export function createEditableText(text: string, elementType: string, saveCallba
       textarea.value = originalContent.replace(/<br\/?>/g, "\\n").replace(/&nbsp;/g, " ");
       textarea.style.width = "100%";
       textarea.style.height = `${originalHeight}px`; // Set initial height
-      textarea.style.padding = "8px";
+      textarea.style.margin = "0";
       textarea.style.boxSizing = "border-box"; // Include padding in height calculation
       textarea.style.overflowY = "hidden"; // Hide scrollbar initially
       textarea.style.border = "none"; // Remove the default border
@@ -73,45 +73,14 @@ export function createEditableText(text: string, elementType: string, saveCallba
       // Add event listener for input events
       textarea.addEventListener("input", autoResizeTextarea);
 
-      // Create save button
-      const saveButton = document.createElement("button");
-      saveButton.textContent = "Save";
-      saveButton.className = "save-button";
-      saveButton.style.marginRight = "8px";
-      saveButton.style.padding = "4px 8px";
-      saveButton.style.backgroundColor = "#4a90e2";
-      saveButton.style.color = "white";
-      saveButton.style.border = "none";
-      saveButton.style.borderRadius = "4px";
-      saveButton.style.cursor = "pointer";
-
-      // Create cancel button
-      const cancelButton = document.createElement("button");
-      cancelButton.textContent = "Cancel";
-      cancelButton.className = "cancel-button";
-      cancelButton.style.padding = "4px 8px";
-      cancelButton.style.backgroundColor = "#ccc";
-      cancelButton.style.color = "black";
-      cancelButton.style.border = "none";
-      cancelButton.style.borderRadius = "4px";
-      cancelButton.style.cursor = "pointer";
-
-      // Create button container
-      const buttonContainer = document.createElement("div");
-      buttonContainer.className = "button-container";
-      buttonContainer.style.marginTop = "8px";
-      buttonContainer.style.display = "flex";
-
-      buttonContainer.appendChild(saveButton);
-      buttonContainer.appendChild(cancelButton);
-
       // Create edit container
       const editContainer = document.createElement("div");
       editContainer.className = "edit-container";
       editContainer.style.width = "100%";
+      editContainer.style.display = "flex";
+      editContainer.style.flexDirection = "column";
 
       editContainer.appendChild(textarea);
-      editContainer.appendChild(buttonContainer);
 
       // Replace container content with edit container
       container.innerHTML = "";
@@ -121,35 +90,49 @@ export function createEditableText(text: string, elementType: string, saveCallba
       textarea.focus();
       autoResizeTextarea(); // Call resize initially to set correct height
 
-      // Save button click handler
-      saveButton.addEventListener("click", (event) => {
-        event.stopPropagation(); // Prevent event from bubbling up to container
+      // --- Event Handling Logic ---
+      const removeEditListeners = () => {
+        document.removeEventListener("click", handleClickOutside, true);
+        textarea.removeEventListener("keydown", handleKeyDown);
+      };
+
+      const performSave = () => {
+        removeEditListeners();
         const newText = textarea.value;
-
-        // Update element with new text
-        element.innerHTML = newText.replace(/\\n/g, "<br>");
-
-        // Restore container
+        element.innerHTML = newText.replace(/\n/g, "<br>");
         container.innerHTML = "";
         container.appendChild(element);
-
-        // Reset editing state
         isEditing = false;
-
-        // Call save callback
         saveCallback(newText);
-      });
+      };
 
-      // Cancel button click handler
-      cancelButton.addEventListener("click", (event) => {
-        event.stopPropagation(); // Prevent event from bubbling up to container
-        // Restore container
+      const performCancel = () => {
+        removeEditListeners();
+        element.innerHTML = originalContent; // Restore original content
         container.innerHTML = "";
         container.appendChild(element);
-
-        // Reset editing state
         isEditing = false;
-      });
+      };
+
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault(); // Prevent newline in textarea
+          performSave();
+        } else if (event.key === "Escape") {
+          performCancel();
+        }
+      };
+
+      const handleClickOutside = (event: MouseEvent) => {
+        if (!editContainer.contains(event.target as Node)) {
+          performCancel();
+        }
+      };
+
+      // Add event listeners
+      textarea.addEventListener("keydown", handleKeyDown);
+      // Use capture phase for click outside to catch clicks on other elements potentially stopping propagation
+      document.addEventListener("click", handleClickOutside, true);
     }
   });
 
@@ -518,28 +501,58 @@ export function addEditorStyles() {
     
     .edit-container {
       width: 100%;
+      display: flex;
+      flex-direction: column;
     }
     
-    .button-container {
+    /* Remove old button container style */
+    /* .button-container {
       margin-top: 8px;
       display: flex;
       gap: 8px;
-    }
+    } */
     
-    .save-button, .cancel-button {
+    /* Remove old button styles */
+    /* .save-button, .cancel-button {
       padding: 4px 8px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
+    } */
+    
+    /* .save-button {
+      background-color: #4a90e2;
+      color: white;
+    } */
+    
+    /* .cancel-button {
+      background-color: #ccc;
+      color: black;
+    } */
+
+    /* Add styles for new icon buttons */
+    .edit-action-button {
+      padding: 2px 6px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .edit-action-button:hover {
+      opacity: 1;
     }
     
-    .save-button {
-      background-color: #4a90e2;
+    .save-icon-button {
+      background-color: rgba(74, 144, 226, 0.8);
       color: white;
     }
     
-    .cancel-button {
-      background-color: #ccc;
+    .cancel-icon-button {
+      background-color: rgba(204, 204, 204, 0.8);
       color: black;
     }
     
