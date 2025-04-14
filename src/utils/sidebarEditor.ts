@@ -199,7 +199,7 @@ export function createEditableChapterSummary(pageNumber: number, summaryText: st
  * @param entity Character/entity data
  * @returns HTML element with editable entity info
  */
-export function createEditableEntity(pageNumber: number, entity: IEntityNote): HTMLElement {
+export function createEditableEntity(paragraphNumber: number, entity: IEntityNote): HTMLElement {
   const entityDiv = document.createElement("div");
   entityDiv.className = "entity-note";
   entityDiv.style.display = "flex";
@@ -274,7 +274,8 @@ export function createEditableEntity(pageNumber: number, entity: IEntityNote): H
   // Create editable entity summary
   const saveCallback = async (newText: string) => {
     console.log(`Saving character summary for ${entity.canonicalName}:`, newText);
-    await updateEntityNote(pageNumber, entity.canonicalName, { summary: newText });
+    throw new Error("Not implemented saving character summary yet!");
+    // await updateEntityNote(pageNumber, entity.canonicalName, { summary: newText });
   };
 
   const summaryText = entity.summary || "";

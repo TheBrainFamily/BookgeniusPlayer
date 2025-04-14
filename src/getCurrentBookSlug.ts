@@ -1,5 +1,6 @@
 import { bookSlug } from "./chapters";
+import { BOOK_SLUGS } from "./fetchers/PageMetadata";
 
-export const getCurrentBookSlug = () => {
-  return bookSlug;
+export const getCurrentBookSlug = (): BOOK_SLUGS => {
+  return bookSlug as BOOK_SLUGS;
 };

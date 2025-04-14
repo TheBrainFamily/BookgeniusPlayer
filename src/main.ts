@@ -12,6 +12,7 @@ import { initSearchModal, showSearchModal, hideSearchModal, isSearchActive } fro
 
 // Import the sidebar editor utilities
 import { createEditableEntity, createEditablePageSummary, createEditableChapterSummary, createAddCharacterButton, addEditorStyles } from "./utils/sidebarEditor";
+import { getParagraphRange } from "./fetchers/getParagraphRange";
 
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
@@ -33,6 +34,10 @@ let touchEndX = 0;
 let touchCurrentX = 0;
 let isSwiping = false;
 let swipeStarted = false;
+
+getParagraphRange({ bookSlug: getCurrentBookSlug(), startChapter: 1, startParagraph: 1, endChapter: 2, endParagraph: 10 }).then((paragraphs) => {
+  console.log("GOZDECKI ELO", paragraphs);
+});
 
 // DOM elements
 const bookContainer = document.getElementById("book-container")!;
@@ -294,7 +299,7 @@ function setupPageObserver() {
   const observerOptions = {
     root: document.getElementById("content-container"),
     rootMargin: "0px",
-    threshold: 0.4, // Consider page visible when 40% is in view
+    threshold: 0.9, // Consider page visible when 40% is in view
   };
 
   // --- State for tracking all currently intersecting pages ---
@@ -312,7 +317,7 @@ function setupPageObserver() {
       }
     });
 
-    // 2. Determine the topmost page from the *entire set* of intersecting pages
+    // 2. Determine the topmost and bottommost pages from the *entire set* of intersecting pages
     if (intersectingPages.size > 0) {
       // Convert Set to array and sort by viewport top position
       const sortedIntersectingPages = Array.from(intersectingPages).sort((a, b) => {
@@ -320,40 +325,106 @@ function setupPageObserver() {
       });
 
       const topVisiblePageElement = sortedIntersectingPages[0];
+      const bottomVisiblePageElement = sortedIntersectingPages[sortedIntersectingPages.length - 1]; // Get the last element
 
-      // 3. Update active state only if the topmost page has changed
+      // 3. Update active state only if the topmost or bottommost page has changed
+      // (We might refine this condition later if needed, for now, update if any intersecting element changes)
       if (topVisiblePageElement !== currentlyActivePageElement) {
-        console.log("[Observer] New top visible page:", topVisiblePageElement.id);
+        // TODO: Revisit this condition? Maybe check bottom element too?
+        console.log("[Observer] Top visible page:", topVisiblePageElement.id || topVisiblePageElement);
+        console.log("[Observer] Bottom visible page:", bottomVisiblePageElement.id || bottomVisiblePageElement);
 
-        // Remove active class from the previously active page (if any)
-        if (currentlyActivePageElement) {
-          currentlyActivePageElement.classList.remove("active");
+        currentlyActivePageElement = topVisiblePageElement; // Update the tracked active page (using top for now)
+
+        // --- Extract Chapter and Paragraph Info ---
+        const getParagraphInfo = (element: Element): { chapter: number | null; paragraph: number | null } => {
+          const paragraphStr = (element as HTMLElement).dataset.index;
+          const chapterElement = element.closest("section[data-chapter]");
+          const chapterStr = chapterElement ? (chapterElement as HTMLElement).dataset.chapter : null;
+
+          return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
+        };
+
+        const startInfo = getParagraphInfo(topVisiblePageElement);
+        const endInfo = getParagraphInfo(bottomVisiblePageElement);
+        // -----------------------------------------
+
+        // 4. Call updateParagraphNotes if we have valid info
+        if (startInfo.chapter !== null && startInfo.paragraph !== null && endInfo.chapter !== null && endInfo.paragraph !== null) {
+          console.log(`[Observer] Updating notes for Ch ${startInfo.chapter}:${startInfo.paragraph} to Ch ${endInfo.chapter}:${endInfo.paragraph}`);
+          updateParagraphNotes({ startChapter: startInfo.chapter, startParagraph: startInfo.paragraph, endChapter: endInfo.chapter, endParagraph: endInfo.paragraph });
+        } else {
+          console.warn("[Observer] Could not extract chapter/paragraph info for:", topVisiblePageElement, bottomVisiblePageElement);
         }
-
-        // Add active class to the new top page
-        topVisiblePageElement.classList.add("active");
-        currentlyActivePageElement = topVisiblePageElement; // Update the tracked active page
-
-        // 4. Update notes based on the new active page
-        const topVisiblePageIndex = parseInt(topVisiblePageElement.id.split("-")[1]);
-        updatePageNotes(topVisiblePageIndex);
       }
     } else {
-      // Optional: Handle the case where no pages are intersecting.
-      // Currently, it leaves the last active page shown.
-      // If you wanted to clear the active state when scrolling fast through gaps:
-      // if (currentlyActivePageElement) {
-      //   currentlyActivePageElement.classList.remove("active");
-      //   currentlyActivePageElement = null;
-      //   // Maybe clear notes panel here too?
-      // }
+      // Handle case where no pages are intersecting (optional)
+      if (currentlyActivePageElement !== null) {
+        console.log("[Observer] No pages intersecting.");
+        currentlyActivePageElement = null;
+        // Potentially clear notes or update state here
+      }
     }
   }, observerOptions);
 
-  // Observe all pages
-  document.querySelectorAll(".page").forEach((page) => {
-    observer.observe(page);
+  // Observe all paragraphs within chapter sections
+  document.querySelectorAll("section[data-chapter] p[data-index]").forEach((paragraph) => {
+    observer.observe(paragraph);
   });
+}
+
+async function updateParagraphNotes({
+  startChapter,
+  startParagraph,
+  endChapter,
+  endParagraph,
+}: {
+  startChapter: number;
+  startParagraph: number;
+  endChapter: number;
+  endParagraph: number;
+}) {
+  const leftNotes = document.getElementById("left-notes");
+  if (!leftNotes) return;
+
+  const paragraphs = await getParagraphRange({ bookSlug: getCurrentBookSlug(), startChapter: startChapter - 1, startParagraph, endChapter: endChapter - 1, endParagraph });
+  addEditorStyles();
+
+  if (isMobile()) {
+    const notesTitle = `Notes for Ch ${startChapter}:${startParagraph} to Ch ${endChapter}:${endParagraph}`;
+    const closeButton = `<button class="close-notes-button">&times;</button>`;
+    leftNotes.innerHTML = `<h3>${notesTitle}</h3>${closeButton}`;
+    const closeBtn = leftNotes.querySelector(".close-notes-button");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", toggleMobileNotes);
+    }
+  } else {
+    leftNotes.innerHTML = ``;
+  }
+
+  if (isMobile()) {
+    createMobileCharacterStrip(paragraphs);
+  }
+
+  // Create a container for entity notes if not mobile
+  if (!isMobile()) {
+    const entityContainer = document.createElement("div");
+    entityContainer.className = "entity-notes-container";
+    leftNotes.appendChild(entityContainer);
+
+    // prepare all notes in the notes panel
+    paragraphs.forEach((entity) => {
+      // Create editable entity div instead of static one
+      const entityDiv = createEditableEntity(10, entity);
+      entityContainer.appendChild(entityDiv);
+    });
+  } else {
+    // On mobile, add directly to leftNotes
+    paragraphs.forEach((entity) => {
+      const entityDiv = createEditableEntity(10, entity);
+      leftNotes.appendChild(entityDiv);
+    });
+  }
 }
 
 let currentPageIndex: number = 0;
@@ -362,7 +433,6 @@ let currentPageIndex: number = 0;
 async function updatePageNotes(pageIndex: number) {
   if (pageIndex === currentPageIndex) return;
   currentPageIndex = pageIndex;
-  console.log("[UPDATE PAGE] updatePageNotes", pageIndex);
   const leftNotes = document.getElementById("left-notes");
   if (!leftNotes) return;
 
