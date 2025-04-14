@@ -8,6 +8,10 @@ declare global {
   }
 }
 
+export const isEditActive = () => {
+  return document.querySelector(".edit-container") !== null;
+};
+
 /**
  * Creates an editable text element
  * @param text Initial text content
@@ -51,6 +55,14 @@ export function createEditableText(text: string, elementType: string, saveCallba
       textarea.style.padding = "8px";
       textarea.style.boxSizing = "border-box"; // Include padding in height calculation
       textarea.style.overflowY = "hidden"; // Hide scrollbar initially
+      textarea.style.border = "none"; // Remove the default border
+      textarea.style.outline = "none"; // Remove the focus outline
+      textarea.style.backgroundColor = "inherit"; // Match background
+      textarea.style.color = "inherit"; // Match text color
+      textarea.style.fontFamily = "inherit"; // Match font family
+      textarea.style.fontSize = "inherit"; // Match font size
+      textarea.style.lineHeight = "inherit"; // Match line height
+      textarea.style.resize = "none"; // Disable resizing handle
 
       // Auto-resize textarea function
       const autoResizeTextarea = () => {
@@ -110,11 +122,12 @@ export function createEditableText(text: string, elementType: string, saveCallba
       autoResizeTextarea(); // Call resize initially to set correct height
 
       // Save button click handler
-      saveButton.addEventListener("click", () => {
+      saveButton.addEventListener("click", (event) => {
+        event.stopPropagation(); // Prevent event from bubbling up to container
         const newText = textarea.value;
 
         // Update element with new text
-        element.innerHTML = newText.replace(/\n/g, "<br>");
+        element.innerHTML = newText.replace(/\\n/g, "<br>");
 
         // Restore container
         container.innerHTML = "";
@@ -128,7 +141,8 @@ export function createEditableText(text: string, elementType: string, saveCallba
       });
 
       // Cancel button click handler
-      cancelButton.addEventListener("click", () => {
+      cancelButton.addEventListener("click", (event) => {
+        event.stopPropagation(); // Prevent event from bubbling up to container
         // Restore container
         container.innerHTML = "";
         container.appendChild(element);

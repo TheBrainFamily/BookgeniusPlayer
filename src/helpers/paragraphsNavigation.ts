@@ -45,7 +45,10 @@ const updateGoBackButton = () => {
   // Show the button if we have a valid pre-search location
   setTimeout(() => {
     const currentLocation = getCurrentLocation();
-    if (getSavedLocation().chapter > currentLocation.chapter) {
+    if (
+      getSavedLocation().chapter > currentLocation.chapter ||
+      (getSavedLocation().chapter === currentLocation.chapter && getSavedLocation().paragraph - 5 > currentLocation.paragraph)
+    ) {
       returnButton.style.display = "block";
     } else {
       returnButton.style.display = "none";

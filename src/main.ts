@@ -11,7 +11,7 @@ import { pageChapters } from "./chapters";
 import { initSearchModal, showSearchModal, hideSearchModal, isSearchActive } from "./searchModal";
 
 // Import the sidebar editor utilities
-import { createEditableEntity, createEditablePageSummary, createEditableChapterSummary, createAddCharacterButton, addEditorStyles } from "./utils/sidebarEditor";
+import { createEditableEntity, createEditablePageSummary, createEditableChapterSummary, createAddCharacterButton, addEditorStyles, isEditActive } from "./utils/sidebarEditor";
 import { getParagraphRange } from "./fetchers/getParagraphRange";
 import { getSavedLocation, goToParagraph, setCurrentLocation } from "./helpers/paragraphsNavigation";
 import { setupNoteLinkBlinking } from "./annotationsHandling";
@@ -591,28 +591,6 @@ function createMobileCharacterStrip(combinedNotes) {
   // Add strips to body
   document.getElementById("legacy")!.appendChild(mobileStrip);
   document.getElementById("legacy")!.appendChild(horizontalStrip);
-}
-
-// Update view - modified for the infinite scroll approach
-async function updateView() {
-  // Fetch metadata for a range of pages
-  const visiblePageIndexes = Array.from(document.querySelectorAll(".page.active"))
-    .map((page) => parseInt(page.id.split("-")[1]))
-    .filter((index) => index > pagesToSkipFooterGeneration);
-
-  if (visiblePageIndexes.length === 0) return;
-
-  // Find the min and max page indexes that are visible
-  const minPageIndex = Math.min(...visiblePageIndexes);
-
-  // Preload the range in the background
-  // fetchPageRange(startPageNumber, endPageNumber).catch((error) => {
-  //   console.error("Error fetching page range:", error);
-  // });
-  // updatePageNotes(minPageIndex);
-
-  // Save current position to local storage - use the first visible page
-  // setCurrentLocation({ chapter: minPageIndex, paragraph: 0 });
 }
 
 // Initialize the viewer and fetch initial metadata
@@ -1208,7 +1186,9 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
     }
     return;
   }
-
+  if (isEditActive()) {
+    return;
+  }
   // if (event.key === "s" && (event.metaKey || event.ctrlKey)) {
   //   event.preventDefault(); // Prevent browser save dialog
   //   enterSetPageNumberMode();
