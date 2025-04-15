@@ -825,7 +825,6 @@ async function showMappingModal(characterName: string) {
         alert(`${characterName} mapped to ${selectedCharacterForMapping.name} successfully`);
         // Clear from cache and update view
         clearCharacterFromCache(characterName);
-        await updateView();
       }
     } catch (error) {
       alert(`Error mapping character: ${error.message}`);
@@ -875,7 +874,6 @@ removeCharacterButton.addEventListener("click", async () => {
       alert(`Character ${currentCharacter.name} removed successfully`);
       // Clear from cache and update view
       clearCharacterFromCache(currentCharacter.name);
-      await updateView();
     }
   } catch (error) {
     alert(`Error removing character: ${error.message}`);
@@ -898,7 +896,6 @@ createImageButton.addEventListener("click", async () => {
       alert(`Image for ${currentCharacter.name} created successfully`);
       // Clear from cache and update view
       clearCharacterFromCache(currentCharacter.name);
-      await updateView();
     }
   } catch (error) {
     alert(`Error creating image: ${error.message}`);
@@ -1133,9 +1130,7 @@ initPage()
     // Add scroll event listener to update notes based on visible pages
     document.getElementById("content-container")?.addEventListener("scroll", () => {
       if (scrollDebounce) clearTimeout(scrollDebounce);
-      scrollDebounce = setTimeout(() => {
-        updateView();
-      }, 400);
+      scrollDebounce = setTimeout(() => {}, 400);
     });
   });
 // Add the characters-hidden class to body initially if the character strip is hidden
