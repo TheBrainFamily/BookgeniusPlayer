@@ -1,1348 +1,1452 @@
-/* Scoped legacy CSS */
-#legacy :root {
-  --safe-area-inset-top: env(safe-area-inset-top);
-  --safe-area-inset-bottom: env(safe-area-inset-bottom);
-  --safe-area-inset-left: env(safe-area-inset-left);
-  --safe-area-inset-right: env(safe-area-inset-right);
+/* ============================================ */
+/* Global Variables & Setup           */
+/* ============================================ */
+
+:root {
+  /* Safe Area Insets */
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+
+  /* Colors - Light Mode */
+  --bg-light: #f0f0f0;
+  --bg-content-light: #fdfaf4; /* FB2 content bg */
+  --bg-page-light: #f5f5f5;
+  --bg-page-active-light: #fff;
+  --bg-notes-light: #f9f9f9;
+  --text-light: #222;
+  --text-muted-light: #666;
+  --text-notes-light: #444;
+  --border-light: #ccc;
+  --border-notes-light: #ddd;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --link-light: #005ea8;
+  --link-note-light: #8e8e8e;
+  --link-note-hover-bg-light: #e0e0e0;
+  --link-note-hover-text-light: #000;
+  --control-bg-light: #333; /* Controls are dark */
+  --control-text-light: white;
+  --button-bg-light: #555;
+  --button-hover-bg-light: #777;
+  --button-disabled-bg-light: #444;
+  --button-disabled-opacity: 0.5;
+  --button-extra-bg-light: rgba(0, 0, 0, 0.2);
+  --button-extra-hover-bg-light: rgba(0, 0, 0, 0.4);
+  --modal-overlay-bg: rgba(0, 0, 0, 0.7);
+  --modal-bg-light: white;
+  --modal-text-light: #333; /* Default modal text */
+  --modal-header-border-light: #ddd;
+  --modal-close-light: #777;
+  --char-card-bg-light: #f5f5f5;
+  --char-card-border-light: #ddd; /* Mobile strip border */
+  --mobile-strip-bg-light: rgba(255, 255, 255, 0.95);
+  --mobile-strip-horizontal-bg-light: rgba(255, 255, 255, 0.85);
+  --highlight-blink-color: rgb(152, 152, 152);
+
+  /* Colors - Dark Mode */
+  --bg-dark: #222;
+  --bg-content-dark: #000; /* FB2 content bg */
+  --bg-notes-dark: #252525;
+  --text-dark: #ddd;
+  --text-muted-dark: #999;
+  --text-notes-dark: #bbb;
+  --border-dark: #555;
+  --border-notes-dark: #555;
+  --shadow-dark: rgba(0, 0, 0, 0.2);
+  --link-dark: #5fadde; /* Lighter blue for dark mode */
+  --link-note-dark: #aaa;
+  --link-note-hover-bg-dark: #444;
+  --link-note-hover-text-dark: #eee;
+  --modal-bg-dark: #333;
+  --modal-text-dark: #eee;
+  --modal-header-border-dark: #555;
+  --modal-close-dark: #aaa;
+  --char-card-bg-dark: #444;
+  --char-card-border-dark: #444; /* Mobile strip border */
+  --mobile-strip-bg-dark: rgba(50, 50, 50, 0.95);
+  --mobile-strip-horizontal-bg-dark: rgba(50, 50, 50, 0.85);
+
+  /* Button Colors (Shared) */
+  --button-primary-bg: #4a90e2;
+  --button-primary-hover-bg: #3a7bc8;
+  --button-primary-text: white;
+  --button-secondary-bg-light: #e2e2e2;
+  --button-secondary-hover-bg-light: #d2d2d2;
+  --button-secondary-text-light: #333;
+  --button-secondary-bg-dark: #555;
+  --button-secondary-hover-bg-dark: #666;
+  --button-secondary-text-dark: #eee;
+  --button-danger-bg: #e25c5c;
+  --button-danger-hover-bg: #c74545;
+  --button-danger-text: white;
+  --return-button-bg: #4a4a4a;
+  --return-button-hover-bg: #333;
+
+  /* Font Families */
+  --font-serif: "Georgia", serif;
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "Courier New", Courier, monospace;
+
+  /* Transitions */
+  --transition-fast: 0.2s;
+  --transition-medium: 0.3s;
+  --transition-slow: 0.4s;
+  --transition-timing: ease;
+  --transition-timing-cubic: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* Spinner */
+  --spinner-bg: #f3f3f3;
+  --spinner-color: #3498db;
 }
 
-/* Prevent horizontal overflow and movement on legacy container for mobile UX */
-#legacy,
-#legacy * {
-  overflow-x: hidden; /* explicitly disable horizontal overflow */
-  overscroll-behavior-x: none; /* prevents accidental horizontal scroll interactions */
-  touch-action: pan-y; /* allows only vertical scrolling on touch */
-}
+/* ============================================ */
+/* Scoped Legacy CSS            */
+/* ============================================ */
 
 #legacy {
-  font-family: "Georgia", serif;
-  background-color: #f0f0f0;
-  height: 100vh;
-  height: calc(100vh + env(safe-area-inset-bottom)); /* Extend to include the bottom safe area */
+  /* --- Base Container Styles --- */
+  font-family: var(--font-serif);
+  background-color: var(--bg-light);
+  color: var(--text-light);
+  width: 100%;
+  height: 100vh; /* Fallback */
+  height: calc(100vh + var(--safe-area-inset-bottom)); /* Extend to include the bottom safe area */
   min-height: -webkit-fill-available; /* Fill entire height on iOS */
-  overflow: hidden;
-  flex-direction: row; /* Arrange items horizontally */
+  overflow: hidden; /* Hide main overflow, content scrolls */
+  display: flex;
+  flex-direction: row; /* Arrange items horizontally (book + notes) */
   justify-content: space-between; /* Push first/last to edges, space between */
   align-items: stretch; /* Make items fill height by default */
-  width: 100%; /* Ensure it takes full width */
-  transition: background-color 0.3s ease;
   padding: 0;
-  padding-bottom: env(safe-area-inset-bottom); /* Add padding for the safe area */
-  display: flex;
-}
+  padding-bottom: var(--safe-area-inset-bottom); /* Add padding only for the safe area */
+  transition: background-color var(--transition-medium) var(--transition-timing);
 
-#legacy #page-1 {
-  padding-top: 50px;
-}
-
-#legacy h2 {
-  font-size: 150%;
-}
-
-#legacy h2.h3 {
-  margin-top: 1.5em;
-}
-
-#legacy.night-mode {
-  background-color: #222;
-  color: #ddd;
-}
-
-#legacy #book-container {
-  text-align: left;
-  display: flex;
-  width: 100%;
-  position: relative;
-  /* transition: all 0.3s ease; */
-  padding: 0 10px;
-  padding-top: 0;
-  padding-bottom: env(safe-area-inset-bottom); /* Add padding for the safe area */
-}
-
-#legacy #book-container #content-container {
-  text-align: justify;
-}
-
-#legacy.night-mode #book-container #content-container {
-  background-color: #000;
-  color: #ddd;
-}
-
-#legacy .notes-container {
-  width: 25%;
-  /* height: 100%; */
-  padding: 20px;
-  padding-top: max(20px, env(safe-area-inset-top));
-  padding-bottom: max(20px, env(safe-area-inset-bottom));
-  background-color: #f9f9f9;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
-  overflow-y: auto;
-  /* margin: 20px 15px; */
-  border-radius: 5px;
-  transition: all 0.3s ease;
-  line-height: 1.4;
-  font-size: 0.85rem;
-  color: #444;
-}
-
-#legacy.night-mode .notes-container {
-  background-color: #252525;
-  color: #bbb;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-}
-
-#legacy .notes-container h3 {
-  margin-bottom: 15px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
-  font-size: 1rem;
-}
-
-#legacy.night-mode .notes-container h3 {
-  border-bottom-color: #555;
-}
-
-#legacy #content-container {
-  margin-top: 0;
-  flex-grow: 1;
-  flex-shrink: 1;
-  overflow-y: auto;
-  height: 100%;
-  scroll-behavior: smooth;
-  padding-top: 0;
-  padding-bottom: 0;
-  will-change: padding; /* Optimize for animations */
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-perspective: 1000;
-  perspective: 1000;
-  font-size: 16px;
-}
-
-#legacy .page {
-  width: 100%;
-  max-width: 800px;
-  padding: 0px 20px;
-  padding-bottom: 0;
-  background-color: #f5f5f5;
-  /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); */
-  /* border-radius: 5px; */
-  /* transition: all 0.3s ease; */
-  line-height: 1.5;
-  position: relative;
-  margin: 0px auto;
-}
-
-#legacy .page.active {
-  background-color: #fff;
-  padding: 0px 20px;
-}
-
-/* Make sure the top of the first page has enough space */
-#legacy #page-0 > *:first-child {
-  margin-top: 30px;
-}
-
-/* Page separator */
-#legacy .page-separator {
-  height: 1px;
-  background-color: #ccc;
-  margin: 30px auto;
-  width: 50%;
-}
-
-#legacy .chapter-header {
-  padding-bottom: 1em;
-  border-top: 1px solid #ccc;
-}
-
-#legacy .chapter-item {
-  padding: 2px;
-}
-
-#legacy.night-mode .chapter-header {
-  border-top-color: #555;
-}
-
-#legacy #controls {
-  display: flex;
-  justify-content: center;
-  padding: 10px;
-  background-color: #333;
-  color: white;
-}
-
-#legacy button {
-  margin: 0 10px;
-  padding: 5px 15px;
-  background-color: #555;
-  color: white;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-#legacy button:hover {
-  background-color: #777;
-}
-
-#legacy button:disabled {
-  background-color: #444;
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-#legacy #page-info {
-  margin: 0 20px;
-  line-height: 30px;
-}
-
-#legacy .book-page p {
-  text-indent: 1.553em;
-}
-
-#legacy .book-page img {
-  max-width: 100%;
-  height: auto;
-}
-
-#legacy #extra-controls {
-  display: flex;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-
-#legacy #fullscreen-button,
-#legacy #night-mode-button {
-  background-color: rgba(0, 0, 0, 0.2);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 5px 10px;
-  margin-left: 10px;
-  cursor: pointer;
-  font-size: 12px;
-  transition: background-color 0.2s;
-}
-
-#legacy #fullscreen-button:hover,
-#legacy #night-mode-button:hover {
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-/* Keyboard shortcut hints */
-#legacy .key-hint {
-  font-size: 12px;
-  opacity: 0.7;
-  margin-left: 5px;
-}
-
-/* Loading indicator */
-#legacy #loading {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  color: white;
-  font-size: 24px;
-}
-
-/* Hide loading when done */
-#legacy #loading.hidden {
-  display: none;
-}
-
-#legacy .spinner {
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #3498db;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  margin-right: 20px;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
+  /* --- Mobile Touch Behavior --- */
+  /* Apply only to direct children for performance, if needed */
+  &,
+  * {
+    /* Be careful with '*' - might have unintended consequences */
+    /* If issues arise, apply only to specific scrollable containers */
+    overflow-x: hidden; /* explicitly disable horizontal overflow */
+    overscroll-behavior-x: none; /* prevents accidental horizontal scroll interactions */
+    touch-action: pan-y; /* allows only vertical scrolling on touch */
   }
 
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Page number indicator */
-#legacy #page-number-indicator {
-  position: fixed;
-  bottom: 70px;
-  right: 20px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 8px 15px;
-  border-radius: 20px;
-  font-size: 18px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 100;
-}
-
-#legacy #page-number-indicator.visible {
-  opacity: 1;
-}
-
-/* Page footer with page numbers */
-#legacy .page-footer {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  font-size: 12px;
-  color: #666;
-}
-
-#legacy .page-footer.left {
-  left: 40px;
-}
-
-#legacy .page-footer.right {
-  right: 40px;
-}
-
-#legacy.night-mode .page-footer {
-  color: #999;
-}
-
-/* Modal Styles */
-#legacy .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 0.3s,
-    visibility 0.3s;
-}
-
-#legacy .modal-overlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-#legacy .modal-container {
-  background-color: white;
-  border-radius: 8px;
-  padding: 25px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s;
-  transform: translateY(-20px);
-}
-
-#legacy .modal-overlay.active .modal-container {
-  transform: translateY(0);
-}
-
-#legacy.night-mode .modal-container {
-  background-color: #333;
-  color: #eee;
-}
-
-#legacy .modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 10px;
-}
-
-#legacy.night-mode .modal-header {
-  border-bottom-color: #555;
-}
-
-#legacy .modal-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-#legacy .modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #777;
-}
-
-#legacy.night-mode .modal-close {
-  color: #aaa;
-}
-
-#legacy .modal-content {
-  margin-bottom: 20px;
-}
-
-#legacy .modal-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-#legacy .modal-button {
-  padding: 8px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s;
-}
-
-#legacy .primary-button {
-  background-color: #4a90e2;
-  color: white;
-}
-
-#legacy .primary-button:hover {
-  background-color: #3a7bc8;
-}
-
-#legacy .secondary-button {
-  background-color: #e2e2e2;
-  color: #333;
-}
-
-#legacy .secondary-button:hover {
-  background-color: #d2d2d2;
-}
-
-#legacy .danger-button {
-  background-color: #e25c5c;
-  color: white;
-}
-
-#legacy .danger-button:hover {
-  background-color: #c74545;
-}
-
-#legacy.night-mode .secondary-button {
-  background-color: #555;
-  color: #eee;
-}
-
-#legacy.night-mode .secondary-button:hover {
-  background-color: #666;
-}
-
-/* Character selection grid */
-#legacy .character-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  margin-top: 15px;
-}
-
-#legacy .character-card {
-  border: 2px solid transparent;
-  border-radius: 5px;
-  padding: 10px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  background-color: #f5f5f5;
-}
-
-#legacy .character-card:hover {
-  border-color: #4a90e2;
-}
-
-#legacy .character-card.selected {
-  border-color: #4a90e2;
-  background-color: rgba(74, 144, 226, 0.1);
-}
-
-#legacy.night-mode .character-card {
-  background-color: #444;
-}
-
-#legacy .character-card img {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 3px;
-  margin-bottom: 8px;
-}
-
-#legacy .character-card .character-name {
-  font-size: 0.9rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-#legacy .entity-image {
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-#legacy .entity-image:hover {
-  transform: scale(1.05);
-}
-
-/* Mobile Responsive Styles */
-#legacy #toggle-notes-button {
-  display: none;
-}
-
-#legacy .close-notes-button {
-  position: absolute;
-  top: max(10px, env(safe-area-inset-top));
-  right: 10px;
-  background-color: rgba(0, 0, 0, 0.2);
-  border: none;
-  color: white;
-  font-size: 16px;
-  z-index: 100;
-  cursor: pointer;
-}
-
-/* Mobile character strip - at bottom of screen */
-#legacy .mobile-character-strip {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 70px;
-  background-color: rgba(255, 255, 255, 0.95);
-  overflow-y: auto;
-  padding: 10px;
-  padding-top: max(10px, env(safe-area-inset-top));
-  padding-bottom: 0;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
-  z-index: 40;
-  -webkit-overflow-scrolling: touch;
-  transform: translateX(0);
-  transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1); /* Enhanced transition just for transform */
-  will-change: transform;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-perspective: 1000;
-  perspective: 1000;
-}
-
-#legacy.night-mode .mobile-character-strip {
-  background-color: rgba(50, 50, 50, 0.95);
-}
-
-#legacy .mobile-character-strip.hidden {
-  transform: translateX(-100%);
-}
-
-#legacy .mobile-character-item {
-  display: block;
-  width: 100%;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-#legacy .mobile-character-item img {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 5px;
-  border: 2px solid #ddd;
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease;
-}
-
-#legacy.night-mode .mobile-character-item img {
-  border-color: #444;
-}
-
-#legacy .mobile-character-item img:active {
-  transform: scale(0.92);
-}
-
-#legacy .mobile-character-item .character-name {
-  font-size: 9px;
-  white-space: normal;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-height: 28px;
-  line-height: 1.2;
-}
-
-/* Toggle button for character strip */
-#legacy #toggle-characters-button {
-  display: none;
-  position: fixed;
-  top: max(20px, calc(env(safe-area-inset-top) + 10px));
-  left: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #4a90e2;
-  color: white;
-  border: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  font-size: 18px;
-  z-index: 41;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-#legacy #toggle-characters-button:hover {
-  background-color: #3a7bc8;
-}
-
-#legacy.night-mode #toggle-characters-button {
-  background-color: #2a5a8e;
-}
-
-/* Styles for iOS landscape mode */
-@media screen and (orientation: landscape) {
-  #legacy #extra-controls {
-    right: max(10px, env(safe-area-inset-right));
-    top: max(10px, env(safe-area-inset-top));
+  /* --- Typography Basics --- */
+  h2 {
+    font-size: 150%;
+    &.h3 {
+      /* Specific case for h2 styled as h3? Reconsider class name */
+      margin-top: 1.5em;
+    }
   }
 
-  #legacy .mobile-character-strip {
-    padding-left: max(10px, env(safe-area-inset-left));
-    padding-bottom: max(10px, env(safe-area-inset-bottom));
-    padding-top: max(10px, env(safe-area-inset-top));
+  /* --- Layout Structure --- */
+  #book-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%; /* Takes remaining space */
+    position: relative;
+    padding: 0 10px;
+    /* padding-top: 0; */ /* Defined below for #content-container */
+    padding-bottom: var(--safe-area-inset-bottom); /* Add padding for the safe area */
+    text-align: left; /* Override default if needed */
   }
 
-  #legacy .mobile-horizontal-character-strip {
-    padding-bottom: max(5px, env(safe-area-inset-bottom));
-    padding-left: max(15px, env(safe-area-inset-left));
-    padding-right: max(15px, env(safe-area-inset-right));
-  }
-}
-
-#legacy #right-notes {
-  margin: auto 20px;
-  padding-bottom: 0;
-}
-
-#legacy #left-notes {
-  margin: 20px;
-}
-
-/* Adjust font size for small devices */
-@media (max-width: 480px) {
-  #legacy .page {
-    padding: 0px 15px;
-  }
-}
-
-/* Notes overlay for better visual transition */
-#legacy .notes-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 49; /* Just below the notes panel */
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-#legacy .notes-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* Hide character strip when notes are visible */
-#legacy.notes-visible .mobile-character-strip {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(-100%);
-  transition: all 0.3s ease;
-}
-
-/* Horizontal character strip for mobile */
-#legacy .mobile-horizontal-character-strip {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100px; /* Include the safe area in the height */
-  background-color: rgba(255, 255, 255, 0.85);
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 5px 0px;
-  padding-bottom: 0;
-  padding-left: max(15px, env(safe-area-inset-left));
-  padding-right: max(15px, env(safe-area-inset-right));
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
-  z-index: 40;
-  -webkit-overflow-scrolling: touch;
-  transform: translateY(0);
-  transition: transform 0.3s ease;
-  will-change: transform;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-perspective: 1000;
-  perspective: 1000;
-
-  /* Horizontal layout */
-  white-space: nowrap;
-  /* text-align: center; */
-
-  /* Allow scrolling to reach edge items */
-  scroll-padding: 0;
-  scrollbar-width: none; /* Hide scrollbar for Firefox */
-  -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
-}
-
-/* Hide scrollbar for Webkit browsers */
-#legacy .mobile-horizontal-character-strip::-webkit-scrollbar {
-  display: none;
-}
-
-#legacy.night-mode .mobile-horizontal-character-strip {
-  background-color: rgba(50, 50, 50, 0.85);
-}
-
-#legacy .mobile-horizontal-character-strip.hidden {
-  transform: translateY(100%);
-}
-
-#legacy .mobile-horizontal-character-item {
-  display: inline-block;
-  width: 60px;
-  text-align: center;
-  vertical-align: top;
-}
-
-#legacy .mobile-horizontal-character-item:first-child {
-  margin-left: 0px; /* Removed margin since we're adding container padding */
-}
-
-#legacy .mobile-horizontal-character-item:last-child {
-  margin-right: 0px; /* Removed margin since we're adding container padding */
-}
-
-#legacy .mobile-horizontal-character-item img {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ddd;
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease;
-}
-
-#legacy.night-mode .mobile-horizontal-character-item img {
-  border-color: #444;
-}
-
-#legacy .mobile-horizontal-character-item img:active {
-  transform: scale(0.92);
-}
-
-#legacy .mobile-horizontal-character-item .character-name {
-  font-size: 9px;
-  white-space: normal;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-height: 20px;
-  line-height: 1.2;
-  margin-top: 4px;
-}
-
-/* Add this new style to ensure content is visible above the horizontal character strip */
-#legacy.characters-visible #content-container {
-  padding-bottom: calc(85px + env(safe-area-inset-bottom));
-}
-
-/* Adjust content padding when horizontal strip is visible */
-#legacy.characters-hidden #content-container {
-  padding-bottom: max(10px, env(safe-area-inset-bottom));
-}
-
-#legacy #right-notes section {
-  display: none;
-}
-
-#right-notes {
-  max-width: 800px;
-  margin: 2rem auto;
-  font-family: "Georgia", serif;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-#legacy.night-mode #right-notes {
-  background-color: #222;
-  color: #ddd;
-}
-
-#right-notes section {
-  margin-bottom: 1.2rem;
-}
-
-#right-notes section:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
-#right-notes p {
-  margin: 0;
-  line-height: 1.6;
-  color: #444;
-  font-size: 0.95rem;
-  text-align: justify;
-}
-
-#right-notes emphasis {
-  font-style: italic;
-  font-weight: 600;
-  color: #222;
-}
-
-#legacy.night-mode #right-notes emphasis,
-#legacy.night-mode #right-notes p {
-  color: #ddd;
-}
-
-@media (max-width: 768px) {
-  /* Show horizontal strip when vertical is hidden */
-  #legacy.characters-hidden .mobile-horizontal-character-strip {
-    display: block;
-  }
-}
-@media (max-width: 768px) {
-  #legacy #book-container {
-    flex-direction: column;
-    padding: 0;
-    height: 100vh;
-  }
-
-  #legacy .notes-container {
-    position: fixed;
-    top: 0;
-    right: 0; /* Changed from left:0 to right:0 */
-    width: 100%; /* Changed from 85% to 100% to cover whole screen */
-    height: 100%;
-    margin: 0;
-    /* padding: 20px; */
-    padding-top: max(20px, env(safe-area-inset-top));
-    padding-bottom: 0;
-    border-radius: 0;
-    z-index: 50;
-    transform: translateX(100%); /* Changed from -100% to 100% to slide from right */
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2); /* Changed shadow direction */
-    background-color: white; /* Ensure background is solid */
-    transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1); /* Added smooth transition */
-  }
-
-  #legacy.night-mode .notes-container {
-    background-color: #222; /* Dark mode background */
-  }
-
-  #legacy .notes-container.active {
-    transform: translateX(0);
-  }
-
-  #legacy #right-notes {
-    display: none; /* Hide right notes on mobile */
-  }
-
-  #legacy #left-notes {
-    display: none; /* Hide left notes on mobile */
-  }
-
-  #legacy #content-container {
-    width: 100%;
-    height: 100vh;
-    height: calc(100vh + env(safe-area-inset-bottom)); /* Extend to include the bottom safe area */
-    margin: 0;
-    padding-top: 0;
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: 2em; /* Add space for character strip at left */
-    padding-right: 2em;
-    /* Remove transition for instant width change */
-    transition: none !important; /* Force no transition to ensure instant layout change */
-    will-change: padding-left, transform; /* Optimize for animations */
+  #content-container {
+    flex: 1;
+    overflow-y: auto;
+    height: 100%; /* Fill the book-container height */
+    scroll-behavior: smooth;
+    padding-top: 0; /* Reset padding */
+    padding-bottom: var(--safe-area-inset-bottom); /* Default bottom padding */
+    margin-top: 0;
+    text-align: justify; /* Default text alignment for content */
+    will-change: padding, transform; /* Optimize for animations */
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-perspective: 1000;
     perspective: 1000;
-    transform: translateZ(0); /* Force hardware acceleration */
+    font-size: 16px; /* Base content font size */
+
+    /* --- FB2 Generated Content Styling (Nested) --- */
+    /* Using high specificity here based on original CSS */
+    & {
+      font-family: var(--font-serif);
+      line-height: 1.6;
+      color: var(--text-light);
+      background-color: var(--bg-content-light);
+      padding: 1em 2em; /* Overrides base padding */
+      max-width: 800px; /* Centered reading column */
+      margin-left: auto; /* Center the content */
+      margin-right: auto; /* Center the content */
+      hyphens: auto;
+      -webkit-hyphens: auto;
+      -ms-hyphens: auto;
+
+      /* Headings */
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: var(--font-sans);
+        line-height: 1.3;
+        margin-top: 2.5em;
+        margin-bottom: 1em;
+        font-weight: bold;
+        color: #000; /* Black headings */
+        page-break-after: avoid;
+      }
+      h1 {
+        font-size: 2.8em;
+        text-align: center;
+        margin-bottom: 1.5em;
+        margin-top: 0;
+      }
+      h2 {
+        font-size: 2em;
+      }
+      h3 {
+        font-size: 1.7em;
+      }
+      h4 {
+        font-size: 1.4em;
+      }
+
+      /* Chapter sections */
+      section[data-chapter] {
+        margin-top: 3em;
+        /* page-break-before: always; */
+      }
+
+      /* Paragraphs */
+      p {
+        margin-top: 0;
+        margin-bottom: 1em;
+        text-align: justify;
+      }
+
+      /* First-line indent (classic book style) */
+      p + p {
+        text-indent: 1.5em;
+        margin-top: 0; /* Avoid double margin */
+      }
+
+      /* Drop Cap - Apply only if needed and style carefully */
+      /* Consider using a class for better control */
+      /* p:first-of-type::first-letter { ... } */
+
+      /* Remove indent after certain elements */
+      h1 + p,
+      h2 + p,
+      h3 + p,
+      h4 + p,
+      h5 + p,
+      h6 + p,
+      blockquote + p,
+      div.poem + p,
+      div.epigraph + p,
+      div.stanza + p,
+      table + p {
+        text-indent: 0;
+      }
+
+      /* Epigraph */
+      .epigraph {
+        margin: 2.5em 2em 2.5em 4em;
+        font-style: italic;
+        color: #555;
+        p {
+          text-align: left;
+          text-indent: 0;
+          margin-bottom: 0.5em;
+        }
+        .text-author {
+          text-align: right;
+          font-style: normal;
+          margin-top: 0.5em;
+        }
+      }
+
+      /* Blockquote / Citation */
+      blockquote.cite {
+        margin: 1.5em 2.5em;
+        padding-left: 1em;
+        border-left: 3px solid var(--border-light);
+        color: #333;
+        p {
+          text-indent: 0;
+          text-align: left;
+          font-style: italic;
+          margin-bottom: 0.5em;
+        }
+        .text-author {
+          margin-top: 0.8em;
+          text-align: right;
+          font-style: normal;
+          font-size: 0.9em;
+        }
+      }
+
+      /* Poem */
+      .poem {
+        margin: 1.5em 2em 1.5em 4em;
+      }
+      .stanza {
+        margin-bottom: 1.2em;
+      }
+      .poem .inline-title {
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 1em;
+        font-style: italic;
+        text-indent: 0;
+      }
+      p.verse {
+        margin: 0 0 0.3em 0;
+        text-indent: 0;
+        white-space: pre-line;
+        text-align: left;
+      }
+      .poem .text-author {
+        margin-top: 1em;
+        text-align: right;
+        font-style: italic;
+        font-size: 0.9em;
+      }
+
+      /* Inline Elements */
+      strong {
+        font-weight: bold;
+      }
+      em {
+        font-style: italic;
+      }
+      code {
+        font-family: var(--font-mono);
+        background-color: #f0f0f0;
+        padding: 0.1em 0.3em;
+        border-radius: 3px;
+        font-size: 0.9em;
+      }
+      s {
+        text-decoration: line-through;
+      }
+      sub,
+      sup {
+        line-height: 0;
+        font-size: 0.75em;
+        position: relative;
+        vertical-align: baseline;
+      }
+      sub {
+        bottom: -0.25em;
+      }
+      sup {
+        top: -0.5em;
+      }
+
+      /* Links */
+      a {
+        color: var(--link-light);
+        text-decoration: none;
+        &:hover,
+        &:focus {
+          text-decoration: underline;
+        }
+      }
+
+      /* Footnote Links */
+      a.link-note {
+        font-size: 0.6em;
+        vertical-align: text-top;
+        line-height: 0;
+        text-decoration: none;
+        color: var(--link-note-light);
+        cursor: pointer;
+        &:hover,
+        &:focus {
+          background-color: var(--link-note-hover-bg-light);
+          color: var(--link-note-hover-text-light);
+          text-decoration: none;
+        }
+      }
+
+      /* Tables */
+      table {
+        width: auto;
+        border-collapse: collapse;
+        margin: 1.5em auto;
+        border: 1px solid var(--border-light);
+        font-size: 0.9em;
+      }
+      th,
+      td {
+        border: 1px solid var(--border-light);
+        padding: 0.4em 0.7em;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+      td.align-center,
+      th.align-center {
+        text-align: center;
+      }
+      td.align-right,
+      th.align-right {
+        text-align: right;
+      }
+      td.valign-middle,
+      th.valign-middle {
+        vertical-align: middle;
+      }
+      td.valign-bottom,
+      th.valign-bottom {
+        vertical-align: bottom;
+      }
+
+      /* Empty sections */
+      section:empty {
+        display: none;
+      }
+    }
   }
 
-  #legacy #toggle-notes-button {
-    display: block;
+  /* Add padding bottom when horizontal character strip is visible */
+  &.characters-visible #content-container {
+    padding-bottom: calc(85px + var(--safe-area-inset-bottom));
+  }
+  /* Remove extra padding when horizontal strip is hidden (but keep safe area) */
+  &.characters-hidden #content-container {
+    padding-bottom: var(--safe-area-inset-bottom);
   }
 
-  #legacy #extra-controls {
+  /* --- Page Structure --- */
+  .page {
+    width: 100%;
+    max-width: 800px; /* Consistent with FB2 content max-width */
+    padding: 0px 20px; /* Horizontal padding */
+    padding-bottom: 0; /* Reset */
+    background-color: var(--bg-page-light);
+    line-height: 1.5;
+    position: relative;
+    margin: 0 auto; /* Centering if content is narrower */
+
+    &.active {
+      background-color: var(--bg-page-active-light);
+    }
+  }
+
+  /* Spacing for first element on first page */
+  #page-0 > *:first-child {
+    margin-top: 30px;
+  }
+
+  /* Specific page padding */
+  #page-1 {
+    padding-top: 50px;
+  }
+
+  /* Page separator */
+  .page-separator {
+    height: 1px;
+    background-color: var(--border-light);
+    margin: 30px auto;
+    width: 50%;
+  }
+
+  /* Page Footer (Numbers) */
+  .page-footer {
+    position: absolute;
+    top: 2px;
+    font-size: 12px;
+    color: var(--text-muted-light);
+    &.left {
+      left: 40px;
+      right: auto;
+    }
+    &.right {
+      right: 40px;
+      left: auto;
+    }
+  }
+
+  /* --- Chapter Styling --- */
+  .chapter-header {
+    padding-bottom: 1em;
+    border-top: 1px solid var(--border-light);
+  }
+  .chapter-item {
+    padding: 2px;
+  }
+
+  /* --- Book Page Specifics --- */
+  .book-page {
+    /* Assuming this class is used within .page */
+    p {
+      text-indent: 1.553em; /* Specific indent for book pages */
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block; /* Prevent extra space below images */
+      margin: 1em auto; /* Center images */
+    }
+  }
+
+  /* --- Notes Panel --- */
+  .notes-container {
+    width: 25%; /* Default width on desktop */
+    padding: 20px;
+    padding-top: max(20px, var(--safe-area-inset-top));
+    padding-bottom: max(20px, var(--safe-area-inset-bottom));
+    background-color: var(--bg-notes-light);
+    box-shadow: 0 0 8px var(--shadow-light);
+    overflow-y: auto;
+    border-radius: 5px;
+    transition: all var(--transition-medium) var(--transition-timing);
+    line-height: 1.4;
+    font-size: 0.85rem;
+    color: var(--text-notes-light);
+
+    h3 {
+      margin-bottom: 15px;
+      border-bottom: 1px solid var(--border-notes-light);
+      padding-bottom: 5px;
+      font-size: 1rem;
+    }
+  }
+
+  /* Specific Notes Panel Instances */
+  #right-notes {
+    flex: 1;
+    /* Desktop styles - appears as a separate block */
+    max-width: 800px; /* Consistent reading width */
+    margin: auto 0;
+    font-family: var(--font-serif);
+    background-color: var(--bg-notes-light);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px var(--shadow-light);
+
+    /* Original margin for desktop layout - might conflict with max-width */
+    /* margin: auto 20px; */
+    /* padding-bottom: 0; */
+
+    section {
+      margin-bottom: 1.2rem;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    p {
+      margin: 0;
+      line-height: 1.6;
+      color: var(--text-notes-light);
+      font-size: 0.95rem;
+      text-align: justify;
+    }
+    emphasis {
+      /* Assuming <emphasis> tag or .emphasis class */
+      font-style: italic;
+      font-weight: 600;
+      color: var(--text-light); /* Slightly darker than notes text */
+    }
+  }
+
+  #left-notes {
+    /* Styles specific to the left notes panel if different */
+    margin: 20px; /* Example margin */
+    flex: 1;
+  }
+
+  /* --- Controls --- */
+  #controls {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Vertically align items */
+    padding: 10px;
+    background-color: var(--control-bg-light);
+    color: var(--control-text-light);
+    flex-shrink: 0; /* Prevent controls from shrinking */
+    /* Consider position: fixed/sticky if needed */
+  }
+
+  #page-info {
+    margin: 0 20px;
+    line-height: 30px; /* Match button height roughly */
+  }
+
+  /* General Button Styles */
+  button, .button, .modal-button /* Apply to button tags and classes */ {
+    margin: 0 5px; /* Reduced margin */
+    padding: 8px 15px; /* Standardized padding */
+    background-color: var(--button-bg-light);
+    color: var(--control-text-light);
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color var(--transition-fast) var(--transition-timing);
+    font-size: 1rem; /* Base button font size */
+    line-height: 1.2; /* Ensure text fits */
+
+    &:hover {
+      background-color: var(--button-hover-bg-light);
+    }
+
+    &:disabled {
+      background-color: var(--button-disabled-bg-light);
+      cursor: not-allowed;
+      opacity: var(--button-disabled-opacity);
+    }
+  }
+
+  /* Extra Controls (Top Right) */
+  #extra-controls {
+    display: flex;
+    position: absolute;
     top: 10px;
     right: 10px;
-    z-index: 45; /* Ensure controls are visible above content */
+    z-index: 20; /* Above content, below modals */
   }
 
-  #legacy #fullscreen-button,
-  #legacy #night-mode-button {
-    font-size: 10px;
-    padding: 4px 8px;
+  #fullscreen-button,
+  #night-mode-button {
+    background-color: var(--button-extra-bg-light);
+    color: white;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-left: 10px;
+    font-size: 12px;
+    /* Inherits base button transitions/cursor */
+    &:hover {
+      background-color: var(--button-extra-hover-bg-light);
+    }
   }
 
-  /* Show toggle buttons */
-  #legacy #toggle-characters-button {
-    display: block;
-  }
-
-  /* Show mobile character strip */
-  #legacy .mobile-character-strip {
-    display: block;
-  }
-
-  /* Adjust entity notes for mobile */
-  #legacy .entity-note {
-    flex-direction: column !important;
-  }
-
-  #legacy .entity-image-column {
-    margin-bottom: 10px;
-  }
-
-  #legacy .entity-image {
-    max-width: 120px !important;
-    margin: 0 auto;
-    display: block;
-  }
-
-  /* Modal adjustments for mobile */
-  #legacy .modal-container {
-    padding: 15px;
-    width: 95%;
-  }
-
-  #legacy .modal-buttons {
-    flex-direction: column;
-  }
-
-  #legacy .modal-button {
-    width: 100%;
-    margin-bottom: 8px;
-  }
-
-  #legacy .character-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  }
-
-  /* Notes edge indicator */
-  #legacy .notes-edge-indicator {
-    display: block;
+  /* Return to Location Button */
+  #return-to-location-button {
     position: fixed;
-    top: 50%;
-    right: 0;
-    width: 10px; /* Slightly increased from 8px to 10px */
-    height: 60px;
-    background-color: #4a90e2;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-    transform: translateY(-50%);
-    z-index: 40;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background-color: var(--return-button-bg);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1001; /* Above modals */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color var(--transition-fast) var(--transition-timing);
+
+    &:hover {
+      background-color: var(--return-button-hover-bg);
+    }
+  }
+
+  /* Keyboard Hints */
+  .key-hint {
+    font-size: 12px;
     opacity: 0.7;
-    transition: all 0.2s;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    margin-left: 5px;
   }
 
-  /* Add a pseudo-element to extend the touch area */
-  #legacy .notes-edge-indicator::before {
-    content: "";
+  /* --- Loading Indicator --- */
+  #loading {
+    position: fixed;
+    inset: 0; /* Replaces top, left, width, height */
+    background-color: var(--modal-overlay-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Below return button, above modals */
+    color: white;
+    font-size: 24px;
+    transition: opacity var(--transition-medium) var(--transition-timing); /* Fade out */
+    opacity: 1; /* Default visible */
+
+    &.hidden {
+      opacity: 0;
+      pointer-events: none;
+      /* Consider display: none after transition if needed */
+    }
+  }
+
+  .spinner {
+    border: 5px solid var(--spinner-bg);
+    border-top-color: var(--spinner-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-right: 20px;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* --- Page Number Indicator --- */
+  #page-number-indicator {
+    position: fixed;
+    bottom: 70px; /* Adjust as needed */
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 18px;
+    opacity: 0;
+    transition: opacity var(--transition-medium) var(--transition-timing);
+    z-index: 100; /* Below controls/modals */
+    pointer-events: none; /* Prevent interaction */
+
+    &.visible {
+      opacity: 1;
+    }
+  }
+
+  /* --- Modal Styles --- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: var(--modal-overlay-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Same level as loading */
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity var(--transition-medium) var(--transition-timing),
+      visibility var(--transition-medium) step-end; /* Hide instantly when fading out */
+
+    &.active {
+      opacity: 1;
+      visibility: visible;
+      transition:
+        opacity var(--transition-medium) var(--transition-timing),
+        visibility 0s; /* Show instantly */
+
+      .modal-container {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  .modal-container {
+    background-color: var(--modal-bg-light);
+    color: var(--modal-text-light);
+    border-radius: 8px;
+    padding: 25px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-20px);
+    transition: transform var(--transition-medium) var(--transition-timing);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--modal-header-border-light);
+    padding-bottom: 10px;
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--modal-close-light);
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+  }
+
+  .modal-content {
+    margin-bottom: 20px;
+  }
+
+  .modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  /* Modal Button Variants */
+  .modal-button {
+    /* Inherits base button styles */
+    margin: 0; /* Reset margin for gap usage */
+    font-weight: bold;
+    /* Specific padding if different from base button */
+    /* padding: 8px 15px; */
+  }
+
+  .primary-button {
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    &:hover {
+      background-color: var(--button-primary-hover-bg);
+    }
+  }
+  .secondary-button {
+    background-color: var(--button-secondary-bg-light);
+    color: var(--button-secondary-text-light);
+    &:hover {
+      background-color: var(--button-secondary-hover-bg-light);
+    }
+  }
+  .danger-button {
+    background-color: var(--button-danger-bg);
+    color: var(--button-danger-text);
+    &:hover {
+      background-color: var(--button-danger-hover-bg);
+    }
+  }
+
+  /* --- Character/Entity Styles --- */
+  .character-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+  }
+
+  .character-card {
+    border: 2px solid transparent;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-fast) var(--transition-timing);
+    background-color: var(--char-card-bg-light);
+
+    &:hover {
+      border-color: var(--button-primary-bg); /* Use primary color for hover/selection */
+    }
+    &.selected {
+      border-color: var(--button-primary-bg);
+      background-color: rgba(74, 144, 226, 0.1); /* Primary color tint */
+    }
+
+    img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 3px;
+      margin-bottom: 8px;
+    }
+    .character-name {
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .entity-image {
+    cursor: pointer;
+    transition: transform var(--transition-fast) var(--transition-timing);
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  /* --- Mobile Specific Elements --- */
+  #toggle-notes-button,
+  #toggle-characters-button {
+    display: none; /* Hidden by default, shown in media query */
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--button-primary-bg);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 18px;
+    z-index: 41; /* Above strips, below modals */
+    cursor: pointer;
+    transition: all var(--transition-medium) var(--transition-timing);
+    &:hover {
+      background-color: var(--button-primary-hover-bg);
+    }
+  }
+
+  #toggle-characters-button {
+    top: max(20px, calc(var(--safe-area-inset-top) + 10px));
+    left: 20px;
+  }
+
+  /* #toggle-notes-button styling applied in media query */
+
+  .close-notes-button {
     position: absolute;
-    top: -10px;
-    left: -20px; /* Extend 20px to the left */
-    width: 30px; /* Total width of extended touch area */
-    height: 80px; /* Slightly taller than the visible indicator */
-    background-color: transparent; /* Invisible extension */
-    z-index: 39; /* Below the visible indicator */
+    top: max(10px, var(--safe-area-inset-top));
+    right: 10px;
+    background-color: var(--button-extra-bg-light);
+    border: none;
+    color: white;
+    font-size: 16px;
+    padding: 5px 10px; /* Added padding */
+    border-radius: 5px; /* Added radius */
+    z-index: 100; /* Above notes content */
+    cursor: pointer;
+    display: none; /* Only shown when notes panel is active on mobile */
+  }
+  .notes-container.active .close-notes-button {
+    display: block; /* Show when parent is active */
   }
 
-  /* Add hover effect for better usability */
-  #legacy .notes-edge-indicator:hover {
-    width: 14px;
-    opacity: 0.9;
-    background-color: #3a7bc8;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  /* Mobile Vertical Character Strip (Left Side) */
+  .mobile-character-strip {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 70px;
+    background-color: var(--mobile-strip-bg-light);
+    overflow-y: auto;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    padding: 10px;
+    padding-top: max(10px, var(--safe-area-inset-top));
+    padding-bottom: max(10px, var(--safe-area-inset-bottom)); /* Add bottom padding */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+    z-index: 40; /* Below toggle buttons */
+    -webkit-overflow-scrolling: touch;
+    transform: translateX(0);
+    transition: transform var(--transition-slow) var(--transition-timing-cubic);
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    perspective: 1000;
+
+    &.hidden {
+      transform: translateX(-100%);
+    }
   }
 
-  #legacy .notes-edge-indicator:active,
-  #legacy .notes-edge-indicator.swiping {
-    width: 12px;
-    opacity: 0.9;
-    background-color: #3a7bc8;
+  .mobile-character-item {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    text-align: center;
+
+    img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 5px;
+      border: 2px solid var(--char-card-border-light);
+      transition:
+        transform var(--transition-fast) var(--transition-timing),
+        border-color var(--transition-fast) var(--transition-timing);
+      &:active {
+        /* Tap feedback */
+        transform: scale(0.92);
+      }
+    }
+    .character-name {
+      font-size: 9px;
+      white-space: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-height: 28px; /* Approx 2 lines */
+      line-height: 1.2;
+      color: var(--text-light); /* Ensure readable text */
+    }
   }
 
-  #legacy.night-mode .notes-edge-indicator {
-    background-color: #2a5a8e;
+  /* Mobile Horizontal Character Strip (Bottom) */
+  .mobile-horizontal-character-strip {
+    display: none; /* Hidden by default */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(85px + var(--safe-area-inset-bottom)); /* Fixed height + safe area */
+    background-color: var(--mobile-strip-horizontal-bg-light);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 5px 0;
+    padding-left: max(15px, var(--safe-area-inset-left));
+    padding-right: max(15px, var(--safe-area-inset-right));
+    padding-bottom: max(5px, var(--safe-area-inset-bottom)); /* Padding below content within safe area */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
+    z-index: 40; /* Same level as vertical strip */
+    -webkit-overflow-scrolling: touch;
+    transform: translateY(0);
+    transition: transform var(--transition-medium) var(--transition-timing);
+    will-change: transform;
+    white-space: nowrap; /* Keep items in a line */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    &::-webkit-scrollbar {
+      display: none;
+    } /* Chrome/Safari/Opera */
+
+    &.hidden {
+      transform: translateY(100%);
+    }
   }
 
-  /* Hide indicator when notes are visible */
-  #legacy .notes-container.active + .notes-edge-indicator {
+  .mobile-horizontal-character-item {
+    display: inline-block;
+    width: 60px;
+    margin: 0 4px; /* Add small gap between items */
+    text-align: center;
+    vertical-align: top;
+
+    &:first-child {
+      margin-left: 0;
+    }
+    &:last-child {
+      margin-right: 0;
+    }
+
+    img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--char-card-border-light);
+      transition:
+        transform var(--transition-fast) var(--transition-timing),
+        border-color var(--transition-fast) var(--transition-timing);
+      &:active {
+        transform: scale(0.92);
+      }
+    }
+    .character-name {
+      font-size: 9px;
+      white-space: normal; /* Allow wrapping */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-height: 20px; /* Approx 1-2 lines */
+      line-height: 1.2;
+      margin-top: 4px;
+      color: var(--text-light); /* Ensure readable text */
+    }
+  }
+
+  /* Notes Overlay (Mobile) */
+  .notes-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 49; /* Just below the notes panel */
     opacity: 0;
     pointer-events: none;
+    transition: opacity var(--transition-medium) var(--transition-timing);
+
+    &.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
   }
-}
 
-/* Hide the horizontal character strip when notes are visible */
-#legacy.notes-visible .mobile-horizontal-character-strip {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(100%);
-  transition: all 0.3s ease;
-}
-
-#legacy #return-to-location-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 10px 15px;
-  background-color: var(--primary-color, #4a4a4a);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  z-index: 1001;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s;
-}
-
-#legacy #return-to-location-button:hover {
-  background-color: var(--primary-color-dark, #333);
-}
-
-@media (max-width: 768px) {
-  #legacy #return-to-location-button {
-    bottom: 10px;
-    right: 10px;
-    font-size: 12px;
-    padding: 8px 12px;
+  /* Hide character strips when notes are open */
+  &.notes-visible {
+    .mobile-character-strip,
+    .mobile-horizontal-character-strip {
+      opacity: 0;
+      pointer-events: none;
+      transition:
+        opacity var(--transition-medium) ease,
+        transform var(--transition-medium) ease; /* Match visibility transition */
+    }
+    .mobile-character-strip {
+      transform: translateX(-100%);
+    }
+    .mobile-horizontal-character-strip {
+      transform: translateY(100%);
+    }
   }
-}
 
-/* ============================================ */
-/* Example CSS for FB2-Generated HTML Structure */
-/* ============================================ */
-
-/* --- Basic Setup & Readability --- */
-#content-container {
-  font-family: Georgia, "Times New Roman", Times, serif; /* Classic serif font */
-  font-size: 16px; /* Base font size */
-  line-height: 1.6; /* Spacing between lines */
-  color: #222; /* Dark grey text instead of pure black */
-  background-color: #fdfaf4; /* Slightly off-white background */
-  padding: 1em 2em; /* Padding inside the body */
-  max-width: 800px; /* Optimal reading width on wider screens */
-  hyphens: auto; /* Allow automatic hyphenation for justified text */
-  -webkit-hyphens: auto;
-  -ms-hyphens: auto;
-}
-
-/* --- Headings --- */
-#content-container h1,
-#content-container h2,
-#content-container h3,
-#content-container h4,
-#content-container h5,
-#content-container h6 {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; /* Sans-serif for headings */
-  line-height: 1.3;
-  margin-top: 2.5em; /* Space above headings */
-  margin-bottom: 1em; /* Space below headings */
-  font-weight: bold;
-  color: #000;
-  /* Prevent headings from being split across pages (print) */
-  page-break-after: avoid;
-}
-
-#legacy.night-mode #content-container h1,
-#legacy.night-mode #content-container h2,
-#legacy.night-mode #content-container h3,
-#legacy.night-mode #content-container h4,
-#legacy.night-mode #content-container h5,
-#legacy.night-mode #content-container h6 {
-  color: #ddd;
-}
-#content-container h1 {
-  /* Book Title */
-  font-size: 2.8em;
-  text-align: center;
-  margin-bottom: 1.5em;
-  margin-top: 0; /* No top margin for first element */
-}
-
-#content-container h2 {
-  font-size: 2em;
-} /* e.g., Main Part Title */
-#content-container h3 {
-  font-size: 1.7em;
-} /* e.g., Volume Title */
-#content-container h4 {
-  font-size: 1.4em;
-} /* e.g., Chapter Title */
-
-/* Extra space before actual chapter content */
-#content-container section[data-chapter] {
-  margin-top: 3em;
-  /* Start chapters on new page (print) */
-  /* page-break-before: always; */
-}
-
-/* --- Paragraphs --- */
-#content-container p {
-  margin-top: 0;
-  margin-bottom: 1em;
-  text-align: justify; /* Justify text blocks */
-}
-
-/* First-line indent for paragraphs (common in books) */
-/* Indent paragraphs that follow another paragraph */
-#content-container p + p {
-  text-indent: 1.5em;
-  margin-top: 0; /* Prevent double spacing combined with margin-bottom */
-}
-
-#content-container p:first-of-type::first-letter {
-  font-family: inherit; /* Or use the heading font: 'Palatino Linotype', Palatino... */
-  font-size: 3.5em; /* Make it prominent */
-  font-weight: bold; /* Bold for emphasis */
-  float: left;
-  line-height: 0.8; /* Adjust for vertical alignment */
-  margin-right: 0.1em; /* Space after the letter */
-  padding-top: 0.05em; /* Fine-tune vertical position */
-  padding-bottom: 0.05em; /* Helps with spacing below */
-}
-
-/* Remove first-line indent for paragraphs immediately following headings, blockquotes, etc. */
-#content-container h1 + p,
-#content-container h2 + p,
-#content-container h3 + p,
-#content-container h4 + p,
-#content-container h5 + p,
-#content-container h6 + p,
-#content-container blockquote + p,
-#content-container div.poem + p,
-#content-container div.epigraph + p,
-#content-container div.stanza + p,
-#content-container table + p {
-  text-indent: 0;
-}
-
-/* --- Specific Block Elements --- */
-
-/* Epigraph (.epigraph) */
-#content-container .epigraph {
-  margin: 2.5em 2em 2.5em 4em; /* Indented from left */
-  font-style: italic;
-  color: #555;
-}
-#content-container .epigraph p {
-  text-align: left; /* Align epigraph text left within its block */
-  text-indent: 0;
-  margin-bottom: 0.5em;
-}
-#content-container .epigraph .text-author {
-  text-align: right; /* Align author right */
-  font-style: normal;
-  margin-top: 0.5em;
-}
-
-/* Blockquote / Citation (.cite) */
-#content-container blockquote.cite {
-  margin: 1.5em 2.5em; /* Indent blockquote */
-  padding-left: 1em;
-  border-left: 3px solid #ccc;
-  color: #333;
-}
-#content-container blockquote.cite p {
-  text-indent: 0;
-  text-align: left; /* Usually don't justify quotes */
-  font-style: italic; /* Often italicized */
-  margin-bottom: 0.5em;
-}
-#content-container blockquote.cite .text-author {
-  margin-top: 0.8em;
-  text-align: right;
-  font-style: normal;
-  font-size: 0.9em;
-}
-
-/* Poem (.poem, .stanza, .verse) */
-#content-container .poem {
-  margin: 1.5em 2em 1.5em 4em; /* Indent poems further */
-}
-#content-container .stanza {
-  margin-bottom: 1.2em;
-}
-#content-container .poem .inline-title {
-  /* Title within a poem block */
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 1em;
-  font-style: italic;
-  text-indent: 0;
-}
-#content-container p.verse {
-  margin: 0 0 0.3em 0; /* Less space between verses */
-  text-indent: 0;
-  white-space: pre-line; /* Respect line breaks if converter adds them, usually not needed */
-  text-align: left;
-}
-#content-container .poem .text-author {
-  margin-top: 1em;
-  text-align: right;
-  font-style: italic;
-  font-size: 0.9em;
-}
-
-/* --- Inline Elements --- */
-#content-container strong {
-  font-weight: bold;
-} /* Default is usually bold already */
-#content-container em {
-  font-style: italic;
-} /* Default is usually italic already */
-#content-container code {
-  font-family: "Courier New", Courier, monospace;
-  background-color: #f0f0f0;
-  padding: 0.1em 0.3em;
-  border-radius: 3px;
-  font-size: 0.9em;
-}
-#content-container s {
-  text-decoration: line-through;
-}
-#content-container sub,
-#content-container sup {
-  line-height: 0; /* Prevent affecting line spacing */
-  font-size: 0.75em;
-  position: relative;
-  vertical-align: baseline;
-}
-#content-container sub {
-  bottom: -0.25em;
-}
-#content-container sup {
-  top: -0.5em;
-}
-
-/* Links */
-#content-container a {
-  color: #005ea8; /* A slightly muted blue */
-  text-decoration: none;
-}
-#content-container a:hover,
-#content-container a:focus {
-  text-decoration: underline;
-}
-
-/* Footnote Links (.link-note) */
-#legacy .link-note {
-  font-size: 0.6em;
-  vertical-align: text-top;
-  line-height: 0;
-  text-decoration: none;
-  color: #8e8e8e;
-}
-#content-container a.link-note:hover,
-#content-container a.link-note:focus {
-  background-color: #e0e0e0;
-  color: #000;
-  text-decoration: none;
-}
-
-/* --- Tables (Basic Styling) --- */
-#content-container table {
-  width: auto; /* Adjust as needed */
-  border-collapse: collapse;
-  margin: 1.5em auto; /* Center table if not width 100% */
-  border: 1px solid #ccc;
-  font-size: 0.9em; /* Slightly smaller text in tables */
-}
-#content-container th,
-#content-container td {
-  border: 1px solid #ccc;
-  padding: 0.4em 0.7em;
-  text-align: left;
-  vertical-align: top;
-}
-#content-container th {
-  background-color: #f2f2f2;
-  font-weight: bold;
-}
-/* Alignment classes from FB2 (if generated) */
-#content-container td.align-center,
-#content-container th.align-center {
-  text-align: center;
-}
-#content-container td.align-right,
-#content-container th.align-right {
-  text-align: right;
-}
-#content-container td.valign-middle,
-#content-container th.valign-middle {
-  vertical-align: middle;
-}
-#content-container td.valign-bottom,
-#content-container th.valign-bottom {
-  vertical-align: bottom;
-}
-
-/* --- Empty Sections (like the unused one in the example) --- */
-#content-container section:empty {
-  display: none; /* Hide sections that contain nothing */
-}
-
-.highlight-blink {
-  /* Define the animation */
-  /* name duration timing-function iteration-count */
-  animation: blinkEffect 2s ease-in-out 1; /* Blinks once over 0.75s */
-}
-
-@keyframes blinkEffect {
-  0% {
-    background-color: inherit; /* Start with original background */
+  /* --- Highlighting --- */
+  .highlight-blink {
+    animation: blinkEffect 2s ease-in-out 1;
   }
-  50% {
-    background-color: rgb(152, 152, 152); /* Highlight color */
-  }
-  100% {
-    background-color: inherit; /* Return to original background */
-  }
-}
 
-/* Optional: Style for the links themselves */
-a.link-note {
-  cursor: pointer; /* Indicate interactivity */
-}
+  @keyframes blinkEffect {
+    0%,
+    100% {
+      background-color: inherit;
+    }
+    50% {
+      background-color: var(--highlight-blink-color);
+    }
+  }
+
+  /* --- Night Mode Overrides --- */
+  &.night-mode {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+
+    #book-container #content-container {
+      background-color: var(--bg-content-dark);
+      color: var(--text-dark);
+
+      /* FB2 Content Night Mode */
+      & {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+          color: var(--text-dark);
+        }
+        blockquote.cite {
+          border-left-color: var(--border-dark);
+          color: #ccc;
+        }
+        .epigraph {
+          color: #aaa;
+        }
+        a {
+          color: var(--link-dark);
+        }
+        a.link-note {
+          color: var(--link-note-dark);
+          &:hover,
+          &:focus {
+            background-color: var(--link-note-hover-bg-dark);
+            color: var(--link-note-hover-text-dark);
+          }
+        }
+        table {
+          border-color: var(--border-dark);
+        }
+        th,
+        td {
+          border-color: var(--border-dark);
+        }
+        th {
+          background-color: #333;
+        } /* Darker header */
+        code {
+          background-color: #333;
+        }
+      }
+    }
+
+    .notes-container,
+    #right-notes {
+      background-color: var(--bg-notes-dark);
+      color: var(--text-notes-dark);
+      box-shadow: 0 0 8px var(--shadow-dark);
+      h3 {
+        border-bottom-color: var(--border-notes-dark);
+      }
+    }
+
+    #right-notes {
+      p {
+        color: var(--text-notes-dark);
+      }
+      emphasis {
+        color: var(--text-dark);
+      } /* Lighter emphasis in dark mode */
+    }
+
+    .page-footer {
+      color: var(--text-muted-dark);
+    }
+    .chapter-header {
+      border-top-color: var(--border-dark);
+    }
+    .modal-container {
+      background-color: var(--modal-bg-dark);
+      color: var(--modal-text-dark);
+    }
+    .modal-header {
+      border-bottom-color: var(--modal-header-border-dark);
+    }
+    .modal-close {
+      color: var(--modal-close-dark);
+    }
+    .secondary-button {
+      background-color: var(--button-secondary-bg-dark);
+      color: var(--button-secondary-text-dark);
+      &:hover {
+        background-color: var(--button-secondary-hover-bg-dark);
+      }
+    }
+    .character-card {
+      background-color: var(--char-card-bg-dark);
+    }
+    .mobile-character-strip {
+      background-color: var(--mobile-strip-bg-dark);
+    }
+    .mobile-character-item img {
+      border-color: var(--char-card-border-dark);
+    }
+    .mobile-horizontal-character-strip {
+      background-color: var(--mobile-strip-horizontal-bg-dark);
+    }
+    .mobile-horizontal-character-item img {
+      border-color: var(--char-card-border-dark);
+    }
+    #toggle-characters-button {
+      background-color: #2a5a8e; /* Darker primary */
+    }
+    .notes-edge-indicator {
+      background-color: #2a5a8e; /* Darker primary */
+    }
+  }
+
+  /* ============================================ */
+  /* Landscape Adjustments            */
+  /* ============================================ */
+  @media screen and (orientation: landscape) {
+    #extra-controls {
+      right: max(10px, var(--safe-area-inset-right));
+      top: max(10px, var(--safe-area-inset-top));
+    }
+
+    .mobile-character-strip {
+      /* Vertical */
+      padding-left: max(10px, var(--safe-area-inset-left));
+      padding-bottom: max(10px, var(--safe-area-inset-bottom));
+      padding-top: max(10px, var(--safe-area-inset-top));
+    }
+
+    .mobile-horizontal-character-strip {
+      /* Horizontal */
+      padding-bottom: max(5px, var(--safe-area-inset-bottom));
+      padding-left: max(15px, var(--safe-area-inset-left));
+      padding-right: max(15px, var(--safe-area-inset-right));
+      height: calc(85px + var(--safe-area-inset-bottom)); /* Ensure height includes safe area */
+    }
+  }
+
+  /* ============================================ */
+  /* Mobile Responsive Styles           */
+  /* ============================================ */
+  @media (max-width: 768px) {
+    /* --- Layout Changes --- */
+    #book-container {
+      flex-direction: row; /* Stack content vertically */
+      padding: 0; /* Remove desktop padding */
+      height: 100vh; /* Ensure it fills viewport */
+    }
+
+    #content-container {
+      flex: 1;
+      height: 100vh; /* Fallback */
+      height: calc(100vh + var(--safe-area-inset-bottom)); /* Extend height */
+      margin: 0; /* Remove auto margins */
+      padding-top: max(10px, var(--safe-area-inset-top)); /* Add top padding respecting safe area */
+      padding-bottom: var(--safe-area-inset-bottom); /* Keep safe area padding */
+      /* Adjust left/right padding based on vertical strip visibility */
+      padding-left: 1em;
+      padding-right: 1em;
+      transition: none !important; /* Prevent transition during resize/orientation change */
+      transform: translateZ(0); /* Promote to hardware layer */
+
+      /* Add padding when vertical character strip is visible */
+      &.has-character-strip {
+        padding-left: calc(70px + 1em); /* Strip width + desired gap */
+      }
+    }
+
+    .page {
+      padding: 0 15px; /* Reduce horizontal padding */
+    }
+
+    /* --- Notes Panel Becomes Overlay --- */
+    .notes-container {
+      position: fixed;
+      top: 0;
+      right: 0; /* Slides in from the right */
+      width: 100%; /* Full screen width */
+      height: 100%;
+      margin: 0;
+      padding: 20px; /* Restore padding */
+      padding-top: max(40px, calc(var(--safe-area-inset-top) + 20px)); /* Space for close button */
+      padding-bottom: max(20px, var(--safe-area-inset-bottom)); /* Respect bottom safe area */
+      border-radius: 0;
+      z-index: 50; /* Above overlay, strips, toggles */
+      transform: translateX(100%); /* Offscreen to the right */
+      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+      background-color: white; /* Ensure solid background */
+      transition: transform var(--transition-medium) var(--transition-timing-cubic);
+
+      &.active {
+        transform: translateX(0); /* Slide in */
+      }
+    }
+    &.night-mode .notes-container {
+      background-color: var(--bg-dark); /* Ensure dark background */
+    }
+
+    /* Hide Desktop Notes */
+    #right-notes,
+    #left-notes {
+      display: none;
+    }
+
+    /* Show Notes Toggle Button */
+    #toggle-notes-button {
+      display: block; /* Show the button */
+      /* Position it (example: top right) */
+      top: max(20px, calc(var(--safe-area-inset-top) + 10px));
+      right: 20px;
+      /* Adjust if it conflicts with #extra-controls */
+      z-index: 45; /* Below notes panel, above strips */
+    }
+
+    /* Adjust Extra Controls Position/Size */
+    #extra-controls {
+      top: max(10px, var(--safe-area-inset-top)); /* Respect safe area */
+      right: max(10px, var(--safe-area-inset-right));
+      z-index: 45; /* Ensure visibility */
+    }
+    #fullscreen-button,
+    #night-mode-button {
+      font-size: 10px;
+      padding: 4px 8px;
+    }
+
+    /* Show Mobile Character UI */
+    #toggle-characters-button {
+      display: block;
+    }
+    .mobile-character-strip {
+      display: block;
+    } /* Show vertical strip */
+    .mobile-horizontal-character-strip {
+      display: block;
+    } /* Also show horizontal */
+
+    /* Adjust Horizontal Strip Visibility Logic */
+    /* Hide horizontal when vertical is shown (default on mobile) */
+    &:not(.characters-hidden) .mobile-horizontal-character-strip {
+      display: none;
+    }
+    /* Show horizontal when vertical is explicitly hidden */
+    &.characters-hidden .mobile-horizontal-character-strip {
+      display: block;
+    }
+
+    /* Adjust Entity Notes Display */
+    .entity-note {
+      /* Assuming a container for entity notes */
+      flex-direction: column !important; /* Stack image and text */
+    }
+    .entity-image-column {
+      /* Container for image */
+      margin-bottom: 10px;
+    }
+    .entity-image {
+      max-width: 120px !important; /* Limit image size */
+      margin: 0 auto;
+      display: block;
+    }
+
+    /* Modal Adjustments */
+    .modal-container {
+      padding: 15px;
+      width: 95%; /* More screen width */
+    }
+    .modal-buttons {
+      flex-direction: column; /* Stack buttons */
+      gap: 8px; /* Adjust gap for vertical layout */
+    }
+    .modal-button {
+      width: 100%;
+      margin-bottom: 0; /* Use gap instead */
+    }
+
+    /* Character Grid Adjustments */
+    .character-grid {
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Smaller cards */
+    }
+
+    /* Notes Edge Indicator (Swipe Hint) */
+    .notes-edge-indicator {
+      display: block; /* Show on mobile */
+      position: fixed;
+      top: 50%;
+      right: 0;
+      width: 10px;
+      height: 60px;
+      background-color: var(--button-primary-bg);
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+      transform: translateY(-50%);
+      z-index: 40; /* Below toggles */
+      opacity: 0.7;
+      transition: all var(--transition-fast) var(--transition-timing);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      cursor: pointer; /* Indicate interactivity */
+
+      /* Touch area extension */
+      &::before {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: -20px;
+        width: 30px;
+        height: 80px;
+        background-color: transparent;
+        z-index: -1; /* Behind the visual indicator */
+      }
+
+      &:hover {
+        /* Might not apply on touch, but good for testing */
+        width: 14px;
+        opacity: 0.9;
+        background-color: var(--button-primary-hover-bg);
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+      }
+      &:active,
+      &.swiping {
+        width: 12px;
+        opacity: 0.9;
+        background-color: var(--button-primary-hover-bg);
+      }
+    }
+    /* Hide indicator when notes are open */
+    .notes-container.active + .notes-edge-indicator {
+      opacity: 0 !important; /* Use !important to override hover/active */
+      pointer-events: none;
+      width: 10px; /* Reset width */
+    }
+
+    /* Return Button Adjustment */
+    #return-to-location-button {
+      bottom: 10px;
+      right: 10px;
+      font-size: 12px;
+      padding: 8px 12px;
+    }
+  }
+
+  /* Further adjustments for very small devices if needed */
+  @media (max-width: 480px) {
+    /* Example: further reduce page padding */
+    /* .page { padding: 0 10px; } */
+  }
+} /* End of #legacy scope */

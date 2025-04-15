@@ -1,3 +1,4 @@
+import { pharaonCharactersData } from "../data/pharaon-apr-10.selfsufficientcharactermetadatas";
 import { BOOK_SLUGS, IEntityNote } from "./PageMetadata";
 
 /**
@@ -121,12 +122,9 @@ type SelfSufficientCharacterMetadata = {
   imageUrl: string;
 };
 
-export function getParagraphRangePure(
-  data: SelfSufficientCharacterMetadata[],
-  { bookSlug, startChapter, startParagraph, endChapter, endParagraph }: GetParagraphRangeParams,
-): SelfSufficientCharacterMetadata[] {
+export function getParagraphRangePure({ bookSlug, startChapter, startParagraph, endChapter, endParagraph }: GetParagraphRangeParams): SelfSufficientCharacterMetadata[] {
   // Filter characters by bookSlug first
-  const charactersByBook = data.filter((character) => character.bookSlug === bookSlug) as SelfSufficientCharacterMetadata[]; // Assert type here
+  const charactersByBook = pharaonCharactersData.filter((character) => character.bookSlug === bookSlug) as SelfSufficientCharacterMetadata[]; // Assert type here
 
   // Now filter based on the paragraph range logic
   const filteredCharacters = charactersByBook.filter((character) => {

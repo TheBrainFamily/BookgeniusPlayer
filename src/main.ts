@@ -425,7 +425,7 @@ async function updateParagraphNotesInternal({
   const leftNotes = document.getElementById("left-notes");
   if (!leftNotes) return;
 
-  const paragraphs = await getParagraphRange({ bookSlug: getCurrentBookSlug(), startChapter: startChapter - 1, startParagraph, endChapter: endChapter - 1, endParagraph });
+  const paragraphs = await getParagraphRangePure({ bookSlug: getCurrentBookSlug(), startChapter: startChapter - 1, startParagraph, endChapter: endChapter - 1, endParagraph });
   const characters = parseParagraphRange(paragraphs);
   addEditorStyles();
 
