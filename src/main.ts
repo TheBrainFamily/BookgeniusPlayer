@@ -12,7 +12,7 @@ import { initSearchModal, showSearchModal, hideSearchModal, isSearchActive } fro
 
 // Import the sidebar editor utilities
 import { createEditableEntity, createEditablePageSummary, createEditableChapterSummary, createAddCharacterButton, addEditorStyles, isEditActive } from "./utils/sidebarEditor";
-import { getParagraphRange } from "./fetchers/getParagraphRange";
+import { getParagraphRange, getParagraphRangePure, ParsedParagraphRange, parseParagraphRange } from "./fetchers/getParagraphRange";
 import { getSavedLocation, goToParagraph, setCurrentLocation } from "./helpers/paragraphsNavigation";
 import { setupNoteLinkBlinking } from "./annotationsHandling";
 
@@ -36,10 +36,6 @@ let touchEndX = 0;
 let touchCurrentX = 0;
 let isSwiping = false;
 let swipeStarted = false;
-
-getParagraphRange({ bookSlug: getCurrentBookSlug(), startChapter: 1, startParagraph: 1, endChapter: 2, endParagraph: 10 }).then((paragraphs) => {
-  console.log("GOZDECKI ELO", paragraphs);
-});
 
 // DOM elements
 const bookContainer = document.getElementById("book-container")!;
@@ -431,6 +427,7 @@ async function updateParagraphNotesInternal({
   if (!leftNotes) return;
 
   const paragraphs = await getParagraphRange({ bookSlug: getCurrentBookSlug(), startChapter: startChapter - 1, startParagraph, endChapter: endChapter - 1, endParagraph });
+  const characters = parseParagraphRange(paragraphs);
   addEditorStyles();
 
   if (isMobile()) {
@@ -446,7 +443,7 @@ async function updateParagraphNotesInternal({
   }
 
   if (isMobile()) {
-    createMobileCharacterStrip(paragraphs);
+    createMobileCharacterStrip(characters);
   }
 
   // Create a container for entity notes if not mobile
@@ -456,14 +453,14 @@ async function updateParagraphNotesInternal({
     leftNotes.appendChild(entityContainer);
 
     // prepare all notes in the notes panel
-    paragraphs.forEach((entity) => {
+    characters.forEach((entity) => {
       // Create editable entity div instead of static one
       const entityDiv = createEditableEntity(10, entity);
       entityContainer.appendChild(entityDiv);
     });
   } else {
     // On mobile, add directly to leftNotes
-    paragraphs.forEach((entity) => {
+    characters.forEach((entity) => {
       const entityDiv = createEditableEntity(10, entity);
       leftNotes.appendChild(entityDiv);
     });
@@ -471,7 +468,7 @@ async function updateParagraphNotesInternal({
 }
 
 // Create or update the mobile character strip
-function createMobileCharacterStrip(combinedNotes) {
+function createMobileCharacterStrip(characters: ParsedParagraphRange[]) {
   // Remove any existing strip first
   const existingStrip = document.getElementById("mobile-character-strip");
   if (existingStrip) {
@@ -531,7 +528,7 @@ function createMobileCharacterStrip(combinedNotes) {
   notesIcon.addEventListener("click", toggleMobileNotes);
 
   // Add characters to strips
-  combinedNotes.forEach((entity) => {
+  characters.forEach((entity) => {
     // Get resolved character info (if any)
     // Use resolved image if available, otherwise use the original
     const imageUrl = entity.imageUrl;

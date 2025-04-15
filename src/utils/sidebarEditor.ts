@@ -1,5 +1,5 @@
-import { updatePageContext, updateChapterSummary, updateEntityNote, removeEntityNote, addEntityNote, EntityDefinition } from "../utils/pageMetadataEditor";
 import { IEntityNote } from "../fetchers/PageMetadata";
+import { updatePageContext, updateChapterSummary, updateEntityNote, removeEntityNote, addEntityNote, EntityDefinition } from "../utils/pageMetadataEditor";
 
 // Define a type for the window with our global functions
 declare global {
@@ -196,7 +196,10 @@ export function createEditableChapterSummary(pageNumber: number, summaryText: st
  * @param entity Character/entity data
  * @returns HTML element with editable entity info
  */
-export function createEditableEntity(paragraphNumber: number, entity: IEntityNote): HTMLElement {
+export function createEditableEntity(
+  paragraphNumber: number,
+  entity: { imageUrl: string; canonicalName: string; summary: string; alias?: string; paragraphNumber: number; chapterNumber: number },
+): HTMLElement {
   const entityDiv = document.createElement("div");
   entityDiv.className = "entity-note";
   entityDiv.style.display = "flex";

@@ -19,7 +19,7 @@ export interface GetParagraphRangeParams {
  * @returns {Promise<IEntityNote[]>} A promise that resolves with the paragraph metadata.
  * @throws {Error} Throws an error if the network response is not ok or if fetching fails.
  */
-export async function getParagraphRange({ bookSlug, startChapter, startParagraph, endChapter, endParagraph }: GetParagraphRangeParams): Promise<IEntityNote[]> {
+export async function getParagraphRange({ bookSlug, startChapter, startParagraph, endChapter, endParagraph }: GetParagraphRangeParams): Promise<SelfSufficientCharacterMetadata[]> {
   // Construct the URL with the bookSlug as a route parameter and others as query parameters
   const queryParams = new URLSearchParams({
     startChapter: startChapter.toString(),
@@ -54,10 +54,111 @@ export async function getParagraphRange({ bookSlug, startChapter, startParagraph
 
     // Parse the JSON response
     const data = await response.json();
+
     return data;
   } catch (error) {
     console.error("Error fetching paragraph range:", error);
     // Re-throw the error so the caller can handle it, potentially enriching it
     throw new Error(`Failed to fetch paragraph range: ${error.message}`);
   }
+}
+
+export type ParsedParagraphRange = { canonicalName: string; summary: string; imageUrl: string; paragraphNumber: number; chapterNumber: number; label?: string };
+
+export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): ParsedParagraphRange[] {
+  // For each character, find their first appearance within the paragraphs listed in the input data.
+  // Assumes 'data' is already filtered for the relevant paragraph range.
+  return data.map((character) => {
+    let firstAppearance: { chapterNumber: number; paragraphNumber: number; summary: string; label?: string } | null = null;
+
+    // Sort chapters to ensure we check them in ascending order.
+    const sortedChapters = [...character.infoPerChapter].sort((a, b) => a.chapter - b.chapter);
+
+    for (const info of sortedChapters) {
+      // Sort paragraphs within the chapter to find the earliest one.
+      const sortedParagraphs = [...info.paragraphsWhereSpotted].sort((a, b) => a - b);
+
+      if (sortedParagraphs.length > 0) {
+        // Found the first paragraph appearance for this character.
+        firstAppearance = {
+          chapterNumber: info.chapter,
+          paragraphNumber: sortedParagraphs[0],
+          summary: info.summary, // Use summary from the chapter of first appearance
+          label: info.label, // Use label from the chapter of first appearance
+        };
+        break; // Stop searching once the first appearance is found.
+      }
+    }
+
+    // If a character in the input data has no listed paragraphs (which shouldn't happen if pre-filtered correctly).
+    if (!firstAppearance) {
+      // Log a warning or throw an error, as this indicates unexpected input data.
+      console.warn(`Character ${character.characterName} (book: ${character.bookSlug}) provided to parseParagraphRange has no paragraphs listed.`);
+      // Depending on desired behavior, you might want to throw an error or return a default object.
+      // For now, let's throw an error to make the issue explicit.
+      throw new Error(`Character ${character.characterName} has no paragraphs listed in the provided data.`);
+      // If you prefer to filter out such characters instead: return null; and add .filter(Boolean) after .map()
+    }
+
+    // Construct the result object for this character.
+    return {
+      canonicalName: firstAppearance.label ? `${firstAppearance.label} (${character.characterName})` : character.characterName,
+      imageUrl: character.imageUrl,
+      summary: firstAppearance.summary,
+      paragraphNumber: firstAppearance.paragraphNumber,
+      chapterNumber: firstAppearance.chapterNumber,
+      label: firstAppearance.label,
+    };
+  });
+  // If returning null for characters without paragraphs, uncomment the filter below:
+  // .filter((item): item is ParsedParagraphRange => item !== null);
+}
+
+type SelfSufficientCharacterMetadata = {
+  characterName: string;
+  bookSlug: BOOK_SLUGS;
+  infoPerChapter: { chapter: number; summary: string; label?: string; paragraphsWhereSpotted: number[] }[];
+  imageUrl: string;
+};
+
+export function getParagraphRangePure(
+  data: SelfSufficientCharacterMetadata[],
+  { bookSlug, startChapter, startParagraph, endChapter, endParagraph }: GetParagraphRangeParams,
+): SelfSufficientCharacterMetadata[] {
+  // Filter characters by bookSlug first
+  const charactersByBook = data.filter((character) => character.bookSlug === bookSlug) as SelfSufficientCharacterMetadata[]; // Assert type here
+
+  // Now filter based on the paragraph range logic
+  const filteredCharacters = charactersByBook.filter((character) => {
+    return character.infoPerChapter.some((info) => {
+      // Check if the chapter itself is within the broader chapter range if it's a multi-chapter search
+      // This avoids unnecessary iteration over paragraphs if the chapter is outside the [startChapter, endChapter] range.
+      if (info.chapter < startChapter || info.chapter > endChapter) {
+        return false;
+      }
+
+      return info.paragraphsWhereSpotted.some((paragraphNumber) => {
+        // Case 4: Single-chapter range
+        if (startChapter === endChapter) {
+          return info.chapter === startChapter && paragraphNumber >= startParagraph && paragraphNumber <= endParagraph;
+        }
+        // Multi-chapter range cases:
+        // Case 1: Paragraphs in the start chapter, at or after startParagraph
+        if (info.chapter === startChapter && paragraphNumber >= startParagraph) {
+          return true;
+        }
+        // Case 2: Paragraphs in chapters strictly between start and end chapters
+        if (info.chapter > startChapter && info.chapter < endChapter) {
+          return true;
+        }
+        // Case 3: Paragraphs in the end chapter, at or before endParagraph
+        if (info.chapter === endChapter && paragraphNumber <= endParagraph) {
+          return true;
+        }
+        return false; // Default case if none of the conditions match
+      });
+    });
+  });
+
+  return filteredCharacters;
 }
