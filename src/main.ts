@@ -431,7 +431,6 @@ async function updateParagraphNotesInternal({
       ? await getParagraphRangePure({ bookSlug: getCurrentBookSlug(), startChapter: startChapter - 1, startParagraph, endChapter: endChapter - 1, endParagraph })
       : await getParagraphRange({ bookSlug: getCurrentBookSlug(), startChapter: startChapter - 1, startParagraph, endChapter: endChapter - 1, endParagraph });
   const characters = parseParagraphRange(paragraphs);
-  addEditorStyles();
 
   if (isMobile()) {
     const notesTitle = `Notes for Ch ${startChapter}:${startParagraph} to Ch ${endChapter}:${endParagraph}`;

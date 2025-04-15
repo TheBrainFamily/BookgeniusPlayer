@@ -1,5 +1,5 @@
 import { pharaonCharactersData } from "../data/pharaon-apr-10.selfsufficientcharactermetadatas";
-import { BOOK_SLUGS, IEntityNote } from "./PageMetadata";
+import { BOOK_SLUGS } from "../consts";
 
 /**
  * Interface for the parameters required by the getParagraphRange function.
@@ -115,7 +115,7 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
   // .filter((item): item is ParsedParagraphRange => item !== null);
 }
 
-type SelfSufficientCharacterMetadata = {
+export type SelfSufficientCharacterMetadata = {
   characterName: string;
   bookSlug: BOOK_SLUGS;
   infoPerChapter: { chapter: number; summary: string; label?: string; paragraphsWhereSpotted: number[] }[];

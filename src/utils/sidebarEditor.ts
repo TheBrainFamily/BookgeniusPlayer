@@ -1,5 +1,6 @@
+import { BOOK_SLUGS } from "../consts";
 import { IEntityNote } from "../fetchers/PageMetadata";
-import { updatePageContext, updateChapterSummary, updateEntityNote, removeEntityNote, addEntityNote, EntityDefinition } from "../utils/pageMetadataEditor";
+import { updateCharacterChapterInfo } from "../fetchers/updateCharacterChapterInfo";
 
 // Define a type for the window with our global functions
 declare global {
@@ -148,7 +149,8 @@ export function createEditableText(text: string, elementType: string, saveCallba
 export function createEditablePageSummary(pageNumber: number, summaryText: string): HTMLElement {
   const saveCallback = async (newText: string) => {
     console.log(`Saving page summary for page ${pageNumber}:`, newText);
-    await updatePageContext(pageNumber, newText);
+    // await updatePageContext(pageNumber, newText);
+    throw new Error("Not implemented saving page summary yet!");
   };
 
   const container = document.createElement("div");
@@ -173,7 +175,7 @@ export function createEditablePageSummary(pageNumber: number, summaryText: strin
 export function createEditableChapterSummary(pageNumber: number, summaryText: string): HTMLElement {
   const saveCallback = async (newText: string) => {
     console.log(`Saving chapter summary for page ${pageNumber}:`, newText);
-    await updateChapterSummary(pageNumber, newText);
+    throw new Error("Not implemented saving chapter summary yet!");
   };
 
   const container = document.createElement("div");
@@ -274,8 +276,18 @@ export function createEditableEntity(
   // Create editable entity summary
   const saveCallback = async (newText: string) => {
     console.log(`Saving character summary for ${entity.canonicalName}:`, newText);
-    throw new Error("Not implemented saving character summary yet!");
-    // await updateEntityNote(pageNumber, entity.canonicalName, { summary: newText });
+    try {
+      const updatedData = await updateCharacterChapterInfo(
+        BOOK_SLUGS.PHARAON, // Example book slug
+        entity.canonicalName, // Example character name
+        entity.chapterNumber, // Example chapter number
+        { summary: newText }, // Data to update
+      );
+      console.log("Update successful:", updatedData);
+    } catch (error) {
+      console.error("Failed to update:", error);
+    }
+    // throw new Error("Not implemented saving character summary yet!");
   };
 
   const summaryText = entity.summary || "";
@@ -449,8 +461,7 @@ export function createAddCharacterButton(
 
           const entityNote: Partial<IEntityNote> = { entity: name, canonicalName: name, summary: `Character description for ${name}`, imageUrl };
 
-          await addEntityNote(pageNumber, entityNote, entityDef);
-
+          throw new Error("Not implemented adding entity note yet!");
           // Refresh the notes panel to show the new character
           await refreshNotesCallback(pageNumber);
         });
@@ -475,20 +486,4 @@ export function createAddCharacterButton(
   });
 
   return container;
-}
-
-// Add CSS styles to the document
-export function addEditorStyles() {
-  // Check if styles already exist
-  if (document.getElementById("sidebar-editor-styles")) {
-    return;
-  }
-
-  const styleElement = document.createElement("style");
-  styleElement.id = "sidebar-editor-styles";
-
-  styleElement.textContent = `
-  `;
-
-  document.head.appendChild(styleElement);
 }
