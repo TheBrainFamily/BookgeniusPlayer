@@ -1,5 +1,4 @@
 import { BOOK_SLUGS } from "../consts";
-import { IEntityNote } from "../fetchers/PageMetadata";
 import { updateCharacterChapterInfo } from "../fetchers/updateCharacterChapterInfo";
 
 // Define a type for the window with our global functions
@@ -8,6 +7,10 @@ declare global {
     showCharacterDetailsModal?: (characterName: string, imageUrl: string, summary: string) => void;
   }
 }
+
+// Define dummy types to resolve linter errors (replace with actual imports/definitions later)
+type EntityDefinition = { name: string; imageUrl: string };
+type IEntityNote = { entity: string; canonicalName: string; summary: string; imageUrl: string };
 
 export const isEditActive = () => {
   return document.querySelector(".edit-container") !== null;
@@ -200,7 +203,7 @@ export function createEditableChapterSummary(pageNumber: number, summaryText: st
  */
 export function createEditableEntity(
   paragraphNumber: number,
-  entity: { imageUrl: string; canonicalName: string; summary: string; alias?: string; paragraphNumber: number; chapterNumber: number },
+  entity: { imageUrl: string; canonicalName: string; summary: string; label?: string; paragraphNumber: number; chapterNumber: number },
 ): HTMLElement {
   const entityDiv = document.createElement("div");
   entityDiv.className = "entity-note";
@@ -268,13 +271,36 @@ export function createEditableEntity(
 
   // Entity name in right column
   const nameElement = document.createElement("h4");
-  nameElement.textContent = entity.canonicalName;
+  // Function to set the display name correctly
+  const setDisplayName = () => {
+    const displayLabel = entity.label && entity.label !== entity.canonicalName ? entity.label : null;
+    nameElement.textContent = displayLabel ? `${displayLabel} (${entity.canonicalName})` : entity.canonicalName;
+  };
+  setDisplayName(); // Set initial display name
+
   nameElement.style.fontWeight = "bold";
   nameElement.style.marginTop = "0";
+  nameElement.contentEditable = "true"; // Make name editable
+  nameElement.style.cursor = "text"; // Indicate text is editable
+  nameElement.style.border = "1px dashed transparent"; // Show border on focus/hover
+  nameElement.style.padding = "2px 4px";
+  nameElement.style.borderRadius = "3px";
+
+  let valueBeforeEdit = ""; // Variable to store the value when editing starts
+
+  // Add focus/blur styling and manage edit state
+  nameElement.addEventListener("focus", () => {
+    nameElement.style.border = "1px dashed #aaa";
+    // Set the editable content to the label if it exists and differs, otherwise the canonical name
+    valueBeforeEdit = entity.label && entity.label !== entity.canonicalName ? entity.label : entity.canonicalName;
+    nameElement.textContent = valueBeforeEdit;
+  });
+  // We will handle save/cancel logic entirely within the blur listener below
+
   textColumn.appendChild(nameElement);
 
-  // Create editable entity summary
-  const saveCallback = async (newText: string) => {
+  // Create editable entity summary save callback
+  const saveSummaryCallback = async (newText: string) => {
     console.log(`Saving character summary for ${entity.canonicalName}:`, newText);
     try {
       const updatedData = await updateCharacterChapterInfo(
@@ -290,8 +316,62 @@ export function createEditableEntity(
     // throw new Error("Not implemented saving character summary yet!");
   };
 
+  // Create save callback specifically for the name (label)
+  const saveNameCallback = async (newLabelValue: string) => {
+    console.log(`Saving character label for ${entity.canonicalName} as: '${newLabelValue}'`);
+    try {
+      const updatedData = await updateCharacterChapterInfo(
+        BOOK_SLUGS.PHARAON, // TODO: Make dynamic if needed
+        entity.canonicalName, // Identifier for the character
+        entity.chapterNumber,
+        { label: newLabelValue }, // Update the label field (can be empty string)
+      );
+      console.log("Label update successful:", updatedData);
+
+      // Find the specific chapter info in the returned data
+      const updatedChapterInfo = updatedData.infoPerChapter.find((info) => info.chapter === entity.chapterNumber);
+
+      if (updatedChapterInfo) {
+        // Update local entity state (important!)
+        entity.label = updatedChapterInfo.label;
+      } else {
+        console.warn("Could not find updated chapter info for chapter", entity.chapterNumber);
+        // Fallback: update with the intended value, though it might be stale if API had other changes
+        entity.label = newLabelValue;
+      }
+
+      // Update display based on the NEW state
+      setDisplayName();
+    } catch (error) {
+      console.error("Failed to update label:", error);
+      // Revert to the value before editing began on error
+      nameElement.textContent = valueBeforeEdit;
+      // Optionally, reset the border style immediately
+      nameElement.style.border = "1px dashed transparent";
+      // Restore the non-edit display format
+      setDisplayName();
+    }
+  };
+
+  // Combined Blur listener for saving/canceling name edit
+  nameElement.addEventListener("blur", () => {
+    nameElement.style.border = "1px dashed transparent";
+    const newName = nameElement.textContent?.trim() ?? ""; // Ensure string, default to empty
+
+    // Check if the trimmed new name is different from the value when editing started
+    if (newName !== valueBeforeEdit) {
+      // If the new name is empty or same as canonical, save empty string to clear label
+      const labelToSave = newName === "" || newName === entity.canonicalName ? "" : newName;
+      saveNameCallback(labelToSave);
+      // The saveNameCallback will handle updating the display on success/failure
+    } else {
+      // No change detected, just reset the display format
+      setDisplayName();
+    }
+  });
+
   const summaryText = entity.summary || "";
-  const editableContent = createEditableText(summaryText.replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>").replace(/•/g, ""), "p", saveCallback);
+  const editableContent = createEditableText(summaryText.replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>").replace(/•/g, ""), "p", saveSummaryCallback);
 
   textColumn.appendChild(editableContent);
 

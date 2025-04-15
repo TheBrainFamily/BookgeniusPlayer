@@ -508,6 +508,7 @@
     display: flex;
     flex: 1;
     flex-direction: column;
+    justify-content: center;
     max-width: 700px;
     /* width: 25%;  */
     padding: 20px;
@@ -1516,7 +1517,6 @@
   .entity-notes-container {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     min-height: 100%;
     padding: 10px 0;
     gap: 15px;

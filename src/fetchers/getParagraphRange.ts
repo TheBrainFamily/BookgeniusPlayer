@@ -103,7 +103,7 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
 
     // Construct the result object for this character.
     return {
-      canonicalName: firstAppearance.label ? `${firstAppearance.label} (${character.characterName})` : character.characterName,
+      canonicalName: character.characterName,
       imageUrl: character.imageUrl,
       summary: firstAppearance.summary,
       paragraphNumber: firstAppearance.paragraphNumber,
