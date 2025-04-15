@@ -128,7 +128,6 @@
   * {
     /* Be careful with '*' - might have unintended consequences */
     /* If issues arise, apply only to specific scrollable containers */
-    overflow-x: hidden; /* explicitly disable horizontal overflow */
     overscroll-behavior-x: none; /* prevents accidental horizontal scroll interactions */
     touch-action: pan-y; /* allows only vertical scrolling on touch */
   }
@@ -145,8 +144,9 @@
   /* --- Layout Structure --- */
   #book-container {
     display: flex;
+    flex: 1;
     flex-direction: row;
-    width: 100%; /* Takes remaining space */
+    /* width: 100%; */
     position: relative;
     padding: 0 10px;
     /* padding-top: 0; */ /* Defined below for #content-container */
@@ -155,9 +155,11 @@
   }
 
   #content-container {
-    flex: 1;
+    display: flex;
+    flex: 2;
+    flex-direction: column;
     overflow-y: auto;
-    height: 100%; /* Fill the book-container height */
+    height: 100%; 
     scroll-behavior: smooth;
     padding-top: 0; /* Reset padding */
     padding-bottom: var(--safe-area-inset-bottom); /* Default bottom padding */
@@ -178,7 +180,6 @@
       color: var(--text-light);
       background-color: var(--bg-content-light);
       padding: 1em 2em; /* Overrides base padding */
-      max-width: 800px; /* Centered reading column */
       margin-left: auto; /* Center the content */
       margin-right: auto; /* Center the content */
       hyphens: auto;
@@ -502,7 +503,10 @@
 
   /* --- Notes Panel --- */
   .notes-container {
-    width: 25%; /* Default width on desktop */
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    /* width: 25%;  */
     padding: 20px;
     padding-top: max(20px, var(--safe-area-inset-top));
     padding-bottom: max(20px, var(--safe-area-inset-bottom));
@@ -525,10 +529,12 @@
 
   /* Specific Notes Panel Instances */
   #right-notes {
+    display: flex;
     flex: 1;
+    margin: 20px;
     /* Desktop styles - appears as a separate block */
-    max-width: 800px; /* Consistent reading width */
-    margin: auto 0;
+    /* max-width: 800px;  */
+    /* margin: auto 0; */
     font-family: var(--font-serif);
     background-color: var(--bg-notes-light);
     border-radius: 8px;
@@ -1444,9 +1450,85 @@
     }
   }
 
-  /* Further adjustments for very small devices if needed */
-  @media (max-width: 480px) {
-    /* Example: further reduce page padding */
-    /* .page { padding: 0 10px; } */
+
+  .editable-text:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+    border-radius: 4px;
+    position: relative;
   }
+  
+  .edit-icon {
+    visibility: hidden;
+  }
+  
+  .editable-container:hover .edit-icon {
+    visibility: visible;
+  }
+  
+  .edit-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Add styles for new icon buttons */
+  .edit-action-button {
+    padding: 2px 6px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+
+  .edit-action-button:hover {
+    opacity: 1;
+  }
+  
+  .save-icon-button {
+    background-color: rgba(74, 144, 226, 0.8);
+    color: white;
+  }
+  
+  .cancel-icon-button {
+    background-color: rgba(204, 204, 204, 0.8);
+    color: black;
+  }
+  
+  .remove-character-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  /* Container for entity notes - center content vertically */
+  .entity-notes-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100%;
+    padding: 10px 0;
+    gap: 15px;
+    width: 100%;
+    overflow: visible;
+  }
+
+  /* Styles for the entity image wrapper */
+  .entity-image-wrapper {
+    transition: transform 0.2s ease-in-out, z-index 0s ease-in-out 0.2s; /* Add z-index transition */
+    position: relative; /* Ensure z-index works */
+    z-index: 1;
+  }
+
+  .entity-image-wrapper:hover {
+    transform: scale(1.1); /* Scale the wrapper on hover */
+    z-index: 10; /* Bring to front on hover */
+  }
+
 } /* End of #legacy scope */
