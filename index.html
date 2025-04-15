@@ -17,12 +17,8 @@
     <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
 
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
+    <!-- <link rel="manifest" href="/manifest.json" /> -->
 
-    <link rel="stylesheet" type="text/css" href="/page_styles.css" />
-    <link rel="stylesheet" type="text/css" href="/stylesheet.css" />
-    <link rel="stylesheet" type="text/css" href="/src-book/styles.css" />
-    <link rel="stylesheet" type="text/css" href="/src-book/output.css" />
     <!-- CSS_LINKS -->
     <style></style>
     <title>Book Viewer</title>
@@ -7073,13 +7069,13 @@
     <div id="react">
       <div id="chapters-root"></div>
     </div>
-    <script src="/src-book/main.js" async></script>
+    <script type="module" src="/src/main.ts" async></script>
     <!-- PWA Service Worker Registration -->
-    <script src="https://unpkg.com/ios-pwa-splash@1.0.0/cdn.min.js"></script>
-    <script>
+    <!-- <script src="https://unpkg.com/ios-pwa-splash@1.0.0/cdn.min.js"></script> -->
+    <!-- <script>
       iosPWASplash("/splashscreen.png", "#aaccdd");
-    </script>
+    </script> -->
 
-    <script src="/pwa.js"></script>
+    <!-- <script src="/pwa.js"></script> -->
   </body>
 </html>

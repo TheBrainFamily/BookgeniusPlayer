@@ -1,4 +1,4 @@
-let _isNightMode = localStorage.getItem("nightMode") === "true";
+let _isNightMode = localStorage.getItem("nightMode") === "true" || !localStorage.getItem("nightMode");
 export const isNightMode = () => {
   return _isNightMode;
 };

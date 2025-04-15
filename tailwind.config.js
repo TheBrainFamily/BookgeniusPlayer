@@ -1,1 +1,1 @@
-module.exports = { content: ["components/**/*.tsx", "./src/**/*.tsx"], theme: { extend: {} }, plugins: [], darkMode: "class" };
+module.exports = { content: ["./index.html", "components/**/*.{js,ts,jsx,tsx}", "./src/**/*.{js,ts,jsx,tsx}"], theme: { extend: {} }, plugins: [], darkMode: "class" };

@@ -1,13 +1,12 @@
-import { pagesContent } from "./book";
+import "./styles.css";
+import "./globals.css";
 
-import { getPageOffset, setPageOffset } from "./pageOffset";
 import { isNightMode, setIsNightMode } from "@/src/helpers/setIsNightMode";
 import { getCurrentPage, goToNextPage, goToPage, goToPreviousPage, setCurrentPage } from "@/src/helpers/pagesNavigation";
 import { pagesToSkipFooterGeneration, romanNumeralPages } from "@/src/consts";
 import { isMobileCharactersVisible, getIsTogglingMobileCharacters, toggleMobileCharacters } from "@/src/isMobileCharactersVisible";
 import { startReactComponents } from "./react-components";
 import { getCurrentBookSlug } from "./getCurrentBookSlug";
-import { pageChapters } from "./chapters";
 import { initSearchModal, showSearchModal, hideSearchModal, isSearchActive } from "./searchModal";
 
 // Import the sidebar editor utilities
@@ -628,17 +627,6 @@ function handleResize() {
 // Function to pre-warm the cache for upcoming pages
 async function preWarmCache() {
   // Calculate range to preload (current page plus several before and after)
-  const preloadBefore = Math.max(0, getCurrentPage() - 2);
-  const preloadAfter = Math.min(pagesContent.length - 1, getCurrentPage() + 4);
-
-  // Calculate actual page numbers for API request
-  const startPageNumber = preloadBefore - (romanNumeralPages - 1) + 1;
-  const endPageNumber = preloadAfter - (romanNumeralPages - 1) + 1;
-
-  // Fetch metadata in the background without awaiting
-  // fetchPageRange(startPageNumber, endPageNumber).catch((error) => {
-  //   console.error("Error pre-warming cache:", error);
-  // });
 }
 
 async function fetchExistingCharactersWithImages() {
