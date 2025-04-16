@@ -77,60 +77,67 @@ export type ParsedParagraphRange = {
 export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): ParsedParagraphRange[] {
   // For each character, find their first appearance within the paragraphs listed in the input data.
   // Assumes 'data' is already filtered for the relevant paragraph range.
-  return data.map((character) => {
-    let firstAppearance: {
-      chapterNumber: number;
-      paragraphNumber: number;
-      summary: string;
-      label?: string;
-      otherAppearances: { chapterNumber: number; paragraphNumber: number }[];
-    } | null = null;
+  return data
+    .map((character) => {
+      let firstAppearance: {
+        chapterNumber: number;
+        paragraphNumber: number;
+        summary: string;
+        label?: string;
+        otherAppearances: { chapterNumber: number; paragraphNumber: number }[];
+      } | null = null;
 
-    // Sort chapters to ensure we check them in ascending order.
-    const sortedChapters = [...character.infoPerChapter].sort((a, b) => a.chapter - b.chapter);
+      // Sort chapters to ensure we check them in ascending order.
+      const sortedChapters = [...character.infoPerChapter].sort((a, b) => a.chapter - b.chapter);
 
-    for (const info of sortedChapters) {
-      // Sort paragraphs within the chapter to find the earliest one.
-      const sortedParagraphs = [...info.paragraphsWhereSpotted].sort((a, b) => a - b);
+      for (const info of sortedChapters) {
+        // Sort paragraphs within the chapter to find the earliest one.
+        const sortedParagraphs = [...info.paragraphsWhereSpotted].sort((a, b) => a - b);
 
-      if (sortedParagraphs.length > 0) {
-        // Found the first paragraph appearance for this character.
-        firstAppearance = {
-          chapterNumber: info.chapter,
-          paragraphNumber: sortedParagraphs[0] + 1,
-          summary: info.summary, // Use summary from the chapter of first appearance
-          label: info.label, // Use label from the chapter of first appearance
-          otherAppearances: [
-            ...sortedParagraphs.slice(1).map((paragraphNumber) => ({ chapterNumber: info.chapter, paragraphNumber: paragraphNumber + 1 })),
-            ...sortedChapters
-              .filter((chapter) => chapter.chapter !== info.chapter)
-              .flatMap((chapter) => chapter.paragraphsWhereSpotted.map((paragraphNumber) => ({ chapterNumber: chapter.chapter, paragraphNumber: paragraphNumber + 1 }))),
-          ],
-        };
+        if (sortedParagraphs.length > 0) {
+          // Found the first paragraph appearance for this character.
+          firstAppearance = {
+            chapterNumber: info.chapter,
+            paragraphNumber: sortedParagraphs[0],
+            summary: info.summary, // Use summary from the chapter of first appearance
+            label: info.label, // Use label from the chapter of first appearance
+            otherAppearances: [
+              ...sortedParagraphs.slice(1).map((paragraphNumber) => ({ chapterNumber: info.chapter, paragraphNumber: paragraphNumber })),
+              ...sortedChapters
+                .filter((chapter) => chapter.chapter !== info.chapter)
+                .flatMap((chapter) => chapter.paragraphsWhereSpotted.map((paragraphNumber) => ({ chapterNumber: chapter.chapter, paragraphNumber: paragraphNumber }))),
+            ],
+          };
+        }
       }
-    }
 
-    // If a character in the input data has no listed paragraphs (which shouldn't happen if pre-filtered correctly).
-    if (!firstAppearance) {
-      // Log a warning or throw an error, as this indicates unexpected input data.
-      console.warn(`Character ${character.characterName} (book: ${character.bookSlug}) provided to parseParagraphRange has no paragraphs listed.`);
-      // Depending on desired behavior, you might want to throw an error or return a default object.
-      // For now, let's throw an error to make the issue explicit.
-      throw new Error(`Character ${character.characterName} has no paragraphs listed in the provided data.`);
-      // If you prefer to filter out such characters instead: return null; and add .filter(Boolean) after .map()
-    }
+      // If a character in the input data has no listed paragraphs (which shouldn't happen if pre-filtered correctly).
+      if (!firstAppearance) {
+        // Log a warning or throw an error, as this indicates unexpected input data.
+        console.warn(`Character ${character.characterName} (book: ${character.bookSlug}) provided to parseParagraphRange has no paragraphs listed.`);
+        // Depending on desired behavior, you might want to throw an error or return a default object.
+        // For now, let's throw an error to make the issue explicit.
+        throw new Error(`Character ${character.characterName} has no paragraphs listed in the provided data.`);
+        // If you prefer to filter out such characters instead: return null; and add .filter(Boolean) after .map()
+      }
 
-    // Construct the result object for this character.
-    return {
-      canonicalName: character.characterName,
-      imageUrl: character.imageUrl,
-      summary: firstAppearance.summary,
-      paragraphNumber: firstAppearance.paragraphNumber,
-      chapterNumber: firstAppearance.chapterNumber,
-      label: firstAppearance.label,
-      otherAppearances: firstAppearance.otherAppearances,
-    };
-  });
+      // Construct the result object for this character.
+      return {
+        canonicalName: character.characterName,
+        imageUrl: character.imageUrl,
+        summary: firstAppearance.summary,
+        paragraphNumber: firstAppearance.paragraphNumber,
+        chapterNumber: firstAppearance.chapterNumber,
+        label: firstAppearance.label,
+        otherAppearances: firstAppearance.otherAppearances,
+      };
+    })
+    .sort((a, b) => {
+      if (a.chapterNumber !== b.chapterNumber) {
+        return a.chapterNumber - b.chapterNumber;
+      }
+      return a.paragraphNumber - b.paragraphNumber;
+    });
   // If returning null for characters without paragraphs, uncomment the filter below:
   // .filter((item): item is ParsedParagraphRange => item !== null);
 }
