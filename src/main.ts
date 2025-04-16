@@ -1263,7 +1263,6 @@ function setupParagraphHighlighting() {
 
         // Find all entity notes in the left sidebar
         const entityNotes = document.querySelectorAll<HTMLElement>("#left-notes .entity-note");
-
         entityNotes.forEach((note) => {
           const appearancesStr = note.dataset.appearances;
           if (!appearancesStr) return;

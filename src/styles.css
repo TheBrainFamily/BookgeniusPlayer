@@ -556,6 +556,10 @@
       &:last-child {
         margin-bottom: 0;
       }
+      /* Add a base transparent outline for animation */
+      outline: 2px solid transparent;
+      outline-offset: 2px; /* Optional offset */
+      /* transition: outline-color 0.1s ease-in-out; */ /* Let animation handle timing */
     }
     p {
       margin: 0;
@@ -1097,19 +1101,15 @@
   }
 
   /* --- Highlighting --- */
+  /* Removed standalone .highlight-blink rule */
+  /*
   .highlight-blink {
-    animation: blinkEffect 2s ease-in-out 1;
+    animation-name: blinkEffect !important; 
+    animation-duration: 0.8s; 
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: 2; 
   }
-
-  @keyframes blinkEffect {
-    0%,
-    100% {
-      background-color: inherit;
-    }
-    50% {
-      background-color: var(--highlight-blink-color);
-    }
-  }
+  */
 
   /* --- Night Mode Overrides --- */
   &.night-mode {
@@ -1555,3 +1555,24 @@
       outline-color 0.2s ease-in-out; /* Smooth transition */
   }
 } /* End of #legacy scope */
+
+/* Apply animation directly to the target section when the class is present */
+#legacy #right-notes section.highlight-blink {
+  animation-name: blinkEffect;
+  animation-duration: 0.8s; /* Faster blink */
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 2; /* Blink twice */
+}
+
+@keyframes blinkEffect {
+  0%,
+  100% {
+    /* background-color: inherit; */ /* Replaced inherit */
+    /* background-color: var(--bg-notes-light); */ /* Explicit base color */
+    outline-color: transparent; /* Animate outline color */
+  }
+  50% {
+    /* background-color: var(--highlight-blink-color); */
+    outline-color: var(--highlight-blink-color); /* Use blink color for outline */
+  }
+}

@@ -4,24 +4,36 @@ export function initializeNoteLinkBlinking() {
   const blinkElement = (element: HTMLElement | null) => {
     if (!element) return;
 
+    // --- End reduced motion check ---
+
+    // --- Ensure the element is visible BEFORE trying to animate ---
+    const computedStyle = window.getComputedStyle(element);
+    if (computedStyle.display === "none") {
+      element.style.display = "block"; // Explicitly set display
+    }
+    // --- End visibility check ---
+
     const blinkClass = "highlight-blink"; // CSS class for the effect
 
     // Add the class to trigger the animation
     element.classList.add(blinkClass);
 
-    // Remove the class after the animation finishes to allow re-triggering
-    // We use 'animationend' event for accurate removal
-    element.addEventListener(
-      "animationend",
-      () => {
-        element.classList.remove(blinkClass);
-      },
-      { once: true },
-    ); // { once: true } ensures the listener is removed after firing
+    const onAnimationStart = () => {
+      element.removeEventListener("animationstart", onAnimationStart);
+    };
+
+    const onAnimationEnd = () => {
+      element.classList.remove(blinkClass);
+    };
+
+    element.addEventListener("animationstart", onAnimationStart, { once: true });
+    element.addEventListener("animationend", onAnimationEnd, { once: true }); // { once: true } ensures the listener is removed after firing
   };
 
   noteLinks.forEach((link) => {
+    console.log("NOTES noteLinks SETUP INTERACTION", link);
     const handleInteraction = (event: MouseEvent | FocusEvent) => {
+      console.log("NOTES handleInteraction", event);
       // For click events, prevent the default jump-to-anchor behavior
       // if you only want the blink without scrolling. Keep it if you want both.
       if (event.type === "click") {
