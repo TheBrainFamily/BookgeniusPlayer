@@ -428,9 +428,10 @@ async function updateParagraphNotesInternal({
   // Use the pure version in development mode, otherwise use the regular version
   const paragraphs =
     import.meta.env.VITE_DEVELOPMENT === "true"
-      ? await getParagraphRangePure({ bookSlug: getCurrentBookSlug(), startChapter: startChapter - 1, startParagraph, endChapter: endChapter - 1, endParagraph })
-      : await getParagraphRange({ bookSlug: getCurrentBookSlug(), startChapter: startChapter - 1, startParagraph, endChapter: endChapter - 1, endParagraph });
+      ? await getParagraphRangePure({ bookSlug: getCurrentBookSlug(), startChapter: startChapter, startParagraph, endChapter: endChapter, endParagraph })
+      : await getParagraphRange({ bookSlug: getCurrentBookSlug(), startChapter: startChapter, startParagraph, endChapter: endChapter, endParagraph });
   const characters = parseParagraphRange(paragraphs);
+  console.log("characters", characters);
 
   if (isMobile()) {
     const notesTitle = `Notes for Ch ${startChapter}:${startParagraph} to Ch ${endChapter}:${endParagraph}`;
@@ -457,13 +458,13 @@ async function updateParagraphNotesInternal({
     // prepare all notes in the notes panel
     characters.forEach((entity) => {
       // Create editable entity div instead of static one
-      const entityDiv = createEditableEntity(10, entity);
+      const entityDiv = createEditableEntity(entity);
       entityContainer.appendChild(entityDiv);
     });
   } else {
     // On mobile, add directly to leftNotes
     characters.forEach((entity) => {
-      const entityDiv = createEditableEntity(10, entity);
+      const entityDiv = createEditableEntity(entity);
       leftNotes.appendChild(entityDiv);
     });
   }

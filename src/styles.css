@@ -1538,4 +1538,10 @@
     transform: scale(1.1); /* Scale the wrapper on hover */
     z-index: 10; /* Bring to front on hover */
   }
+
+  /* Add this rule for highlighting paragraphs */
+  .highlighted-paragraph {
+    background-color: rgba(255, 255, 0, 0.3); /* Example: semi-transparent yellow */
+    transition: background-color 0.2s ease-in-out; /* Smooth transition */
+  }
 } /* End of #legacy scope */

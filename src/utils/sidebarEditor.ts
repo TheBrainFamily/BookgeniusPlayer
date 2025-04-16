@@ -43,7 +43,7 @@ export function createEditableText(text: string, elementType: string, saveCallba
   let originalContent = text;
   const originalHeight = container.offsetHeight; // Get the original container height
 
-  container.addEventListener("click", () => {
+  container.addEventListener("mousedown", () => {
     if (!isEditing) {
       // Switch to edit mode
       isEditing = true;
@@ -201,10 +201,15 @@ export function createEditableChapterSummary(pageNumber: number, summaryText: st
  * @param entity Character/entity data
  * @returns HTML element with editable entity info
  */
-export function createEditableEntity(
-  paragraphNumber: number,
-  entity: { imageUrl: string; canonicalName: string; summary: string; label?: string; paragraphNumber: number; chapterNumber: number },
-): HTMLElement {
+export function createEditableEntity(entity: {
+  imageUrl: string;
+  canonicalName: string;
+  summary: string;
+  label?: string;
+  paragraphNumber: number;
+  chapterNumber: number;
+  otherAppearances: { chapterNumber: number; paragraphNumber: number }[];
+}): HTMLElement {
   const entityDiv = document.createElement("div");
   entityDiv.className = "entity-note";
   entityDiv.style.display = "flex";
@@ -212,6 +217,56 @@ export function createEditableEntity(
   entityDiv.style.gap = "15px";
   entityDiv.style.alignItems = "center";
   entityDiv.style.overflow = "visible"; // Allow overflow on the main container
+
+  // Combine main appearance with other appearances
+  const allAppearances = [
+    { chapterNumber: entity.chapterNumber, paragraphNumber: entity.paragraphNumber },
+    ...(entity.otherAppearances || []), // Ensure otherAppearances exists
+  ];
+
+  // Store all appearances as a JSON string
+  entityDiv.dataset.appearances = JSON.stringify(allAppearances);
+
+  // Add hover listeners for highlighting
+  entityDiv.addEventListener("mouseenter", () => {
+    try {
+      const appearancesStr = entityDiv.dataset.appearances;
+      if (!appearancesStr) return;
+
+      const appearances: { chapterNumber: number; paragraphNumber: number }[] = JSON.parse(appearancesStr);
+
+      appearances.forEach(({ chapterNumber, paragraphNumber }) => {
+        // Use more specific selector to avoid highlighting footnotes etc.
+        const targetParagraph = document.querySelector<HTMLElement>(`section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`);
+        if (targetParagraph) {
+          targetParagraph.classList.add("highlighted-paragraph");
+        } else {
+          console.warn(`Could not find paragraph ${paragraphNumber} in chapter ${chapterNumber} for highlighting.`);
+        }
+      });
+    } catch (e) {
+      console.error("Error parsing or processing appearances for highlighting:", e);
+    }
+  });
+
+  entityDiv.addEventListener("mouseleave", () => {
+    try {
+      const appearancesStr = entityDiv.dataset.appearances;
+      if (!appearancesStr) return;
+
+      const appearances: { chapterNumber: number; paragraphNumber: number }[] = JSON.parse(appearancesStr);
+
+      appearances.forEach(({ chapterNumber, paragraphNumber }) => {
+        // Use more specific selector matching the mouseenter
+        const targetParagraph = document.querySelector<HTMLElement>(`section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`);
+        if (targetParagraph) {
+          targetParagraph.classList.remove("highlighted-paragraph");
+        }
+      });
+    } catch (e) {
+      console.error("Error parsing or processing appearances for unhighlighting:", e);
+    }
+  });
 
   // Get resolved character info (if any)
   // Use resolved image if available, otherwise use the original
@@ -278,12 +333,13 @@ export function createEditableEntity(
   };
   setDisplayName(); // Set initial display name
 
+  nameElement.classList.add("editable-text");
   nameElement.style.fontWeight = "bold";
   nameElement.style.marginTop = "0";
   nameElement.contentEditable = "true"; // Make name editable
   nameElement.style.cursor = "text"; // Indicate text is editable
-  nameElement.style.border = "1px dashed transparent"; // Show border on focus/hover
-  nameElement.style.padding = "2px 4px";
+  // nameElement.style.border = "1px dashed transparent"; // Show border on focus/hover
+  // nameElement.style.padding = "2px 4px";
   nameElement.style.borderRadius = "3px";
 
   let valueBeforeEdit = ""; // Variable to store the value when editing starts

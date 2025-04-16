@@ -64,13 +64,27 @@ export async function getParagraphRange({ bookSlug, startChapter, startParagraph
   }
 }
 
-export type ParsedParagraphRange = { canonicalName: string; summary: string; imageUrl: string; paragraphNumber: number; chapterNumber: number; label?: string };
+export type ParsedParagraphRange = {
+  canonicalName: string;
+  summary: string;
+  imageUrl: string;
+  paragraphNumber: number;
+  chapterNumber: number;
+  label?: string;
+  otherAppearances: { chapterNumber: number; paragraphNumber: number }[];
+};
 
 export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): ParsedParagraphRange[] {
   // For each character, find their first appearance within the paragraphs listed in the input data.
   // Assumes 'data' is already filtered for the relevant paragraph range.
   return data.map((character) => {
-    let firstAppearance: { chapterNumber: number; paragraphNumber: number; summary: string; label?: string } | null = null;
+    let firstAppearance: {
+      chapterNumber: number;
+      paragraphNumber: number;
+      summary: string;
+      label?: string;
+      otherAppearances: { chapterNumber: number; paragraphNumber: number }[];
+    } | null = null;
 
     // Sort chapters to ensure we check them in ascending order.
     const sortedChapters = [...character.infoPerChapter].sort((a, b) => a.chapter - b.chapter);
@@ -83,11 +97,16 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
         // Found the first paragraph appearance for this character.
         firstAppearance = {
           chapterNumber: info.chapter,
-          paragraphNumber: sortedParagraphs[0],
+          paragraphNumber: sortedParagraphs[0] + 1,
           summary: info.summary, // Use summary from the chapter of first appearance
           label: info.label, // Use label from the chapter of first appearance
+          otherAppearances: [
+            ...sortedParagraphs.slice(1).map((paragraphNumber) => ({ chapterNumber: info.chapter, paragraphNumber: paragraphNumber + 1 })),
+            ...sortedChapters
+              .filter((chapter) => chapter.chapter !== info.chapter)
+              .flatMap((chapter) => chapter.paragraphsWhereSpotted.map((paragraphNumber) => ({ chapterNumber: chapter.chapter, paragraphNumber: paragraphNumber + 1 }))),
+          ],
         };
-        break; // Stop searching once the first appearance is found.
       }
     }
 
@@ -109,6 +128,7 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
       paragraphNumber: firstAppearance.paragraphNumber,
       chapterNumber: firstAppearance.chapterNumber,
       label: firstAppearance.label,
+      otherAppearances: firstAppearance.otherAppearances,
     };
   });
   // If returning null for characters without paragraphs, uncomment the filter below:
