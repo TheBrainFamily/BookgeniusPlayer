@@ -1242,6 +1242,65 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
   }
 }
 
+function setupParagraphHighlighting() {
+  const contentContainer = document.getElementById("content-container");
+  if (!contentContainer) return;
+
+  contentContainer.addEventListener("mouseover", (event) => {
+    const target = event.target as HTMLElement;
+    // Check if the mouse is over a paragraph with a data-index inside a chapter section
+    const paragraph = target.closest<HTMLElement>("section[data-chapter] p[data-index]");
+    if (paragraph) {
+      const section = paragraph.closest<HTMLElement>("section[data-chapter]");
+      if (!section) return;
+
+      const chapterNumber = section.dataset.chapter;
+      const paragraphNumber = paragraph.dataset.index;
+
+      if (chapterNumber && paragraphNumber) {
+        const chapterNum = parseInt(chapterNumber);
+        const paragraphNum = parseInt(paragraphNumber);
+
+        // Find all entity notes in the left sidebar
+        const entityNotes = document.querySelectorAll<HTMLElement>("#left-notes .entity-note");
+
+        entityNotes.forEach((note) => {
+          const appearancesStr = note.dataset.appearances;
+          if (!appearancesStr) return;
+
+          try {
+            const appearances: { chapterNumber: number; paragraphNumber: number }[] = JSON.parse(appearancesStr);
+            // Check if this note corresponds to the hovered paragraph
+            const isMatch = appearances.some((app) => app.chapterNumber === chapterNum && app.paragraphNumber === paragraphNum);
+
+            if (isMatch) {
+              note.classList.add("highlighted-entity");
+            } else {
+              // Ensure others are not highlighted if the mouse moved quickly between paragraphs
+              note.classList.remove("highlighted-entity");
+            }
+          } catch (e) {
+            console.error("Error processing appearances for entity highlight:", e);
+          }
+        });
+      }
+    }
+  });
+
+  contentContainer.addEventListener("mouseout", (event) => {
+    const target = event.target as HTMLElement;
+    const paragraph = target.closest<HTMLElement>("section[data-chapter] p[data-index]");
+
+    // When leaving a paragraph, remove highlights from all notes
+    if (paragraph) {
+      const entityNotes = document.querySelectorAll<HTMLElement>("#left-notes .entity-note");
+      entityNotes.forEach((note) => {
+        note.classList.remove("highlighted-entity");
+      });
+    }
+  });
+}
+
 function onDOMLoaded() {
   initializeNoteLinkBlinking();
 
@@ -1274,6 +1333,9 @@ function onDOMLoaded() {
     // Handle Command+S to set page number
     await keyboardNavigationSetup(event);
   });
+
+  // Setup highlighting paragraphs on entity hover and vice-versa
+  setupParagraphHighlighting();
 }
 
 if (document.readyState === "loading") {

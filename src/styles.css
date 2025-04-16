@@ -1544,4 +1544,14 @@
     background-color: rgba(255, 255, 0, 0.3); /* Example: semi-transparent yellow */
     transition: background-color 0.2s ease-in-out; /* Smooth transition */
   }
+
+  /* Add this rule for highlighting entities in the sidebar */
+  .entity-note.highlighted-entity {
+    background-color: rgba(74, 144, 226, 0.15); /* Light blue tint */
+    border-radius: 5px;
+    outline: 1px solid rgba(74, 144, 226, 0.5); /* Subtle blue outline */
+    transition:
+      background-color 0.2s ease-in-out,
+      outline-color 0.2s ease-in-out; /* Smooth transition */
+  }
 } /* End of #legacy scope */
