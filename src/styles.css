@@ -1113,6 +1113,7 @@
 
   /* --- Night Mode Overrides --- */
   &.night-mode {
+    scrollbar-color: #555 #222;
     background-color: var(--bg-dark);
     color: var(--text-dark);
 

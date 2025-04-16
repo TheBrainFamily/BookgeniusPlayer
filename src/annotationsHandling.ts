@@ -1,4 +1,4 @@
-function initializeNoteLinkBlinking() {
+export function initializeNoteLinkBlinking() {
   const noteLinks: NodeListOf<HTMLAnchorElement> = document.querySelectorAll("a.link-note");
 
   const blinkElement = (element: HTMLElement | null) => {
@@ -61,13 +61,3 @@ function initializeNoteLinkBlinking() {
     // link.addEventListener('focus', handleInteraction);
   });
 }
-
-export const setupNoteLinkBlinking = () => {
-  // Call the function to set up the listeners,
-  // ensure this runs after the DOM is fully loaded.
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeNoteLinkBlinking);
-  } else {
-    initializeNoteLinkBlinking(); // DOM is already loaded
-  }
-};

@@ -13,7 +13,7 @@ import { initSearchModal, showSearchModal, hideSearchModal, isSearchActive } fro
 import { createEditableEntity, createEditablePageSummary, createEditableChapterSummary, createAddCharacterButton, addEditorStyles, isEditActive } from "./utils/sidebarEditor";
 import { getParagraphRange, getParagraphRangePure, ParsedParagraphRange, parseParagraphRange } from "./fetchers/getParagraphRange";
 import { getSavedLocation, goToParagraph, setCurrentLocation } from "./helpers/paragraphsNavigation";
-import { setupNoteLinkBlinking } from "./annotationsHandling";
+import { initializeNoteLinkBlinking, setupNoteLinkBlinking } from "./annotationsHandling";
 
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
@@ -1233,6 +1233,7 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
     case "f":
     case "F":
       // Only trigger if no modifiers (the Cmd+F/Ctrl+F is handled elsewhere)
+      console.log("f key pressed", event.metaKey, event.ctrlKey, event.altKey);
       if (!event.metaKey && !event.ctrlKey && !event.altKey) {
         showSearchModal();
       }
@@ -1240,9 +1241,9 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
   }
 }
 
-// Initialize the app
-document.addEventListener("DOMContentLoaded", function () {
-  // Initialize night mode from localStorage
+function onDOMLoaded() {
+  initializeNoteLinkBlinking();
+
   if (localStorage.getItem("nightMode") === "true") {
     setIsNightMode(true);
   }
@@ -1272,11 +1273,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // Handle Command+S to set page number
     await keyboardNavigationSetup(event);
   });
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", onDOMLoaded);
+} else {
+  onDOMLoaded();
+}
 
 startReactComponents();
 
 // Make showCharacterDetailsModal available globally for the sidebar editor
 window.showCharacterDetailsModal = showCharacterDetailsModal;
-
-setupNoteLinkBlinking();
