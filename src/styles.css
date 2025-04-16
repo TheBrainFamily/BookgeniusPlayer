@@ -1528,10 +1528,11 @@
   /* Styles for the entity image wrapper */
   .entity-image-wrapper {
     transition:
-      transform 0.2s ease-in-out,
-      z-index 0s ease-in-out 0.2s; /* Add z-index transition */
+      transform 0.3s ease-out,
+      /* Increased duration for smoother exit */ z-index 0s ease-in-out 0.3s; /* Matching delay for z-index */
     position: relative; /* Ensure z-index works */
     z-index: 1;
+    /* Keep other existing properties */
   }
 
   .entity-image-wrapper:hover {
@@ -1543,6 +1544,19 @@
   .highlighted-paragraph {
     background-color: rgba(255, 255, 0, 0.3); /* Example: semi-transparent yellow */
     transition: background-color 0.2s ease-in-out; /* Smooth transition */
+    border-radius: 3px; /* Add subtle rounding */
+  }
+
+  /* Add this rule for paragraphs where an entity is talking */
+  .talking-paragraph {
+    background-color: rgba(255, 220, 0, 0.4); /* Slightly stronger yellow */
+    border-left: 3px solid rgba(255, 180, 0, 0.8); /* Add a prominent left border */
+    padding-left: 0.01em; /* Add some padding so border isn't tight */
+    transition:
+      background-color 0.2s ease-in-out,
+      border-color 0.2s ease-in-out,
+      padding-left 0.2s ease-in-out;
+    border-radius: 3px;
   }
 
   /* Add this rule for highlighting entities in the sidebar */
@@ -1553,6 +1567,31 @@
     transition:
       background-color 0.2s ease-in-out,
       outline-color 0.2s ease-in-out; /* Smooth transition */
+  }
+
+  /* Add this rule for highlighting talking entities in the sidebar */
+  .entity-note.highlighted-talking-entity {
+    background-color: rgba(74, 144, 226, 0.25); /* Stronger blue tint */
+    border-radius: 5px;
+    outline: 2px solid rgba(74, 144, 226, 0.8); /* Stronger blue outline */
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.3); /* Subtle glow */
+    transition:
+      background-color 0.2s ease-in-out,
+      outline-color 0.2s ease-in-out,
+      box-shadow 0.2s ease-in-out; /* Smooth transition */
+  }
+
+  /* Scale the wrapper for the image within a highlighted talking entity */
+  .entity-note.highlighted-talking-entity .entity-image-wrapper {
+    z-index: 10; /* Bring to front, like hover */
+    animation: pulseScale 1.5s ease-in-out infinite; /* Apply the pulsing animation */
+  }
+
+  /* When no longer highlighted, ensure it returns smoothly */
+  .entity-note:not(.highlighted-talking-entity) .entity-image-wrapper {
+    transform: scale(1); /* Reset to normal scale */
+    animation: none; /* Stop any animation */
+    /* Let the transition property handle the smooth return */
   }
 } /* End of #legacy scope */
 
@@ -1574,5 +1613,18 @@
   50% {
     /* background-color: var(--highlight-blink-color); */
     outline-color: var(--highlight-blink-color); /* Use blink color for outline */
+  }
+}
+
+/* Keyframes for pulsing scale effect */
+@keyframes pulseScale {
+  0% {
+    transform: scale(1.08);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1.08);
   }
 }

@@ -1268,16 +1268,22 @@ function setupParagraphHighlighting() {
           if (!appearancesStr) return;
 
           try {
-            const appearances: { chapterNumber: number; paragraphNumber: number }[] = JSON.parse(appearancesStr);
+            const appearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[] = JSON.parse(appearancesStr);
             // Check if this note corresponds to the hovered paragraph
-            const isMatch = appearances.some((app) => app.chapterNumber === chapterNum && app.paragraphNumber === paragraphNum);
+            const match = appearances.find((app) => app.chapterNumber === chapterNum && app.paragraphNumber === paragraphNum);
 
-            if (isMatch) {
-              note.classList.add("highlighted-entity");
-            } else {
-              // Ensure others are not highlighted if the mouse moved quickly between paragraphs
-              note.classList.remove("highlighted-entity");
+            // Reset classes first
+            note.classList.remove("highlighted-entity", "highlighted-talking-entity");
+
+            if (match) {
+              // Add the specific class based on whether the entity is talking
+              if (match.isTalkingInParagraph) {
+                note.classList.add("highlighted-talking-entity");
+              } else {
+                note.classList.add("highlighted-entity");
+              }
             }
+            // No need for an else here, as we remove classes at the start
           } catch (e) {
             console.error("Error processing appearances for entity highlight:", e);
           }
@@ -1294,7 +1300,8 @@ function setupParagraphHighlighting() {
     if (paragraph) {
       const entityNotes = document.querySelectorAll<HTMLElement>("#left-notes .entity-note");
       entityNotes.forEach((note) => {
-        note.classList.remove("highlighted-entity");
+        // Remove both potential highlight classes
+        note.classList.remove("highlighted-entity", "highlighted-talking-entity");
       });
     }
   });

@@ -1,5 +1,6 @@
 import { BOOK_SLUGS } from "../consts";
 import { updateCharacterChapterInfo } from "../fetchers/updateCharacterChapterInfo";
+import { getCurrentBookSlug } from "../getCurrentBookSlug";
 
 // Define a type for the window with our global functions
 declare global {
@@ -14,6 +15,14 @@ type IEntityNote = { entity: string; canonicalName: string; summary: string; ima
 
 export const isEditActive = () => {
   return document.querySelector(".edit-container") !== null;
+};
+
+export const getPictureFileNameForName = (name: string) => {
+  return `${name.replace(/[\s()\\']+/g, "-").toLowerCase()}.png`;
+};
+
+export const getPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
+  return `./public/${bookSlug}/${getPictureFileNameForName(name)}`;
 };
 
 /**
@@ -207,8 +216,9 @@ export function createEditableEntity(entity: {
   summary: string;
   label?: string;
   paragraphNumber: number;
+  isTalkingInFirstParagraph: boolean;
   chapterNumber: number;
-  otherAppearances: { chapterNumber: number; paragraphNumber: number }[];
+  otherAppearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[];
 }): HTMLElement {
   const entityDiv = document.createElement("div");
   entityDiv.className = "entity-note";
@@ -220,7 +230,7 @@ export function createEditableEntity(entity: {
 
   // Combine main appearance with other appearances
   const allAppearances = [
-    { chapterNumber: entity.chapterNumber, paragraphNumber: entity.paragraphNumber },
+    { chapterNumber: entity.chapterNumber, paragraphNumber: entity.paragraphNumber, isTalkingInParagraph: entity.isTalkingInFirstParagraph },
     ...(entity.otherAppearances || []), // Ensure otherAppearances exists
   ];
 
@@ -233,13 +243,16 @@ export function createEditableEntity(entity: {
       const appearancesStr = entityDiv.dataset.appearances;
       if (!appearancesStr) return;
 
-      const appearances: { chapterNumber: number; paragraphNumber: number }[] = JSON.parse(appearancesStr);
+      const appearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[] = JSON.parse(appearancesStr);
 
-      appearances.forEach(({ chapterNumber, paragraphNumber }) => {
+      appearances.forEach(({ chapterNumber, paragraphNumber, isTalkingInParagraph }) => {
         // Use more specific selector to avoid highlighting footnotes etc.
         const targetParagraph = document.querySelector<HTMLElement>(`section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`);
         if (targetParagraph) {
           targetParagraph.classList.add("highlighted-paragraph");
+          if (isTalkingInParagraph) {
+            targetParagraph.classList.add("talking-paragraph");
+          }
         } else {
           console.warn(`Could not find paragraph ${paragraphNumber} in chapter ${chapterNumber} for highlighting.`);
         }
@@ -254,13 +267,16 @@ export function createEditableEntity(entity: {
       const appearancesStr = entityDiv.dataset.appearances;
       if (!appearancesStr) return;
 
-      const appearances: { chapterNumber: number; paragraphNumber: number }[] = JSON.parse(appearancesStr);
+      const appearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[] = JSON.parse(appearancesStr);
 
-      appearances.forEach(({ chapterNumber, paragraphNumber }) => {
+      appearances.forEach(({ chapterNumber, paragraphNumber, isTalkingInParagraph }) => {
         // Use more specific selector matching the mouseenter
         const targetParagraph = document.querySelector<HTMLElement>(`section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`);
         if (targetParagraph) {
           targetParagraph.classList.remove("highlighted-paragraph");
+          if (isTalkingInParagraph) {
+            targetParagraph.classList.remove("talking-paragraph");
+          }
         }
       });
     } catch (e) {
@@ -297,7 +313,7 @@ export function createEditableEntity(entity: {
     imageWrapper.style.zIndex = "1";
 
     const imageElement = document.createElement("img");
-    imageElement.src = imageUrl;
+    imageElement.src = imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, getCurrentBookSlug()) : imageUrl;
     imageElement.alt = entity.canonicalName;
     imageElement.className = "entity-image";
     imageElement.style.width = "100%"; // Make image fill the wrapper

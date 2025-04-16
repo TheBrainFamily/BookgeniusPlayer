@@ -69,9 +69,10 @@ export type ParsedParagraphRange = {
   summary: string;
   imageUrl: string;
   paragraphNumber: number;
+  isTalkingInFirstParagraph: boolean;
   chapterNumber: number;
   label?: string;
-  otherAppearances: { chapterNumber: number; paragraphNumber: number }[];
+  otherAppearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[];
 };
 
 export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): ParsedParagraphRange[] {
@@ -84,7 +85,8 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
         paragraphNumber: number;
         summary: string;
         label?: string;
-        otherAppearances: { chapterNumber: number; paragraphNumber: number }[];
+        isTalkingInFirstParagraph: boolean;
+        otherAppearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[];
       } | null = null;
 
       // Sort chapters to ensure we check them in ascending order.
@@ -92,20 +94,33 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
 
       for (const info of sortedChapters) {
         // Sort paragraphs within the chapter to find the earliest one.
-        const sortedParagraphs = [...info.paragraphsWhereSpotted].sort((a, b) => a - b);
+        const sortedParagraphs = [...info.paragraphsWhereSpotted, ...info.paragraphsWhereTalking].sort((a, b) => a - b);
 
         if (sortedParagraphs.length > 0) {
           // Found the first paragraph appearance for this character.
           firstAppearance = {
             chapterNumber: info.chapter,
             paragraphNumber: sortedParagraphs[0],
+            isTalkingInFirstParagraph: info.paragraphsWhereTalking.includes(sortedParagraphs[0]),
             summary: info.summary, // Use summary from the chapter of first appearance
             label: info.label, // Use label from the chapter of first appearance
             otherAppearances: [
-              ...sortedParagraphs.slice(1).map((paragraphNumber) => ({ chapterNumber: info.chapter, paragraphNumber: paragraphNumber })),
+              ...sortedParagraphs
+                .slice(1)
+                .map((paragraphNumber) => ({
+                  chapterNumber: info.chapter,
+                  paragraphNumber: paragraphNumber,
+                  isTalkingInParagraph: info.paragraphsWhereTalking.includes(paragraphNumber),
+                })),
               ...sortedChapters
                 .filter((chapter) => chapter.chapter !== info.chapter)
-                .flatMap((chapter) => chapter.paragraphsWhereSpotted.map((paragraphNumber) => ({ chapterNumber: chapter.chapter, paragraphNumber: paragraphNumber }))),
+                .flatMap((chapter) =>
+                  chapter.paragraphsWhereSpotted.map((paragraphNumber) => ({
+                    chapterNumber: chapter.chapter,
+                    paragraphNumber: paragraphNumber,
+                    isTalkingInParagraph: chapter.paragraphsWhereTalking.includes(paragraphNumber),
+                  })),
+                ),
             ],
           };
         }
@@ -126,6 +141,7 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
         canonicalName: character.characterName,
         imageUrl: character.imageUrl,
         summary: firstAppearance.summary,
+        isTalkingInFirstParagraph: firstAppearance.isTalkingInFirstParagraph,
         paragraphNumber: firstAppearance.paragraphNumber,
         chapterNumber: firstAppearance.chapterNumber,
         label: firstAppearance.label,
@@ -145,13 +161,13 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
 export type SelfSufficientCharacterMetadata = {
   characterName: string;
   bookSlug: BOOK_SLUGS;
-  infoPerChapter: { chapter: number; summary: string; label?: string; paragraphsWhereSpotted: number[] }[];
+  infoPerChapter: { chapter: number; summary: string; label?: string; paragraphsWhereSpotted: number[]; paragraphsWhereTalking: number[] }[];
   imageUrl: string;
 };
 
 export function getParagraphRangePure({ bookSlug, startChapter, startParagraph, endChapter, endParagraph }: GetParagraphRangeParams): SelfSufficientCharacterMetadata[] {
   // Filter characters by bookSlug first
-  const charactersByBook = pharaonCharactersData.filter((character) => character.bookSlug === bookSlug) as SelfSufficientCharacterMetadata[]; // Assert type here
+  const charactersByBook = pharaonCharactersData.filter((character) => character.bookSlug === bookSlug); // Assert type here
 
   // Now filter based on the paragraph range logic
   const filteredCharacters = charactersByBook.filter((character) => {
