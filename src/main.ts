@@ -411,6 +411,48 @@ const dealWithAnnotations = ({
   }
 };
 
+const legacyElement = document.getElementById("legacy");
+
+const dealWithBackground = ({ startChapter, startParagraph, endChapter, endParagraph }) => {
+  const backgrounds = [
+    { startChapter: 1, startParagraph: 11, file: "background-army.png", endChapter: 1, endParagraph: 15 },
+    // Add more background definitions here if needed
+  ];
+
+  let backgroundApplied = false;
+
+  if (legacyElement) {
+    for (const background of backgrounds) {
+      if (
+        startChapter === background.startChapter &&
+        startParagraph <= background.endParagraph && // Check if start is before or at end
+        endChapter === background.endChapter &&
+        endParagraph >= background.startParagraph // Check if end is after or at start
+      ) {
+        console.log("setting background", background.file);
+        // Condition met: Set image on ::after and fade it in
+        const newImageUrl = `url("/Pharaon/${background.file}")`;
+        // Only update the image if it's different to potentially avoid unnecessary reflow
+        if (legacyElement.style.getPropertyValue("--bg-image-after") !== newImageUrl) {
+          legacyElement.style.setProperty("--bg-image-after", newImageUrl);
+        }
+        // Fade in the ::after element
+        legacyElement.style.setProperty("--opacity-after", "1");
+        backgroundApplied = true;
+        break; // Apply first matching background
+      }
+    }
+
+    // If no specific background condition was met, revert to default by fading out ::after
+    if (!backgroundApplied) {
+      // Fade out the ::after element, revealing ::before (the default background)
+      legacyElement.style.setProperty("--opacity-after", "0");
+      // Note: We don't need to reset --bg-image-after immediately,
+      // it will be set next time a condition is met.
+    }
+  }
+};
+
 async function updateParagraphNotesInternal({
   startChapter,
   startParagraph,
@@ -422,6 +464,7 @@ async function updateParagraphNotesInternal({
   endChapter: number;
   endParagraph: number;
 }) {
+  dealWithBackground({ startChapter, startParagraph, endChapter, endParagraph });
   dealWithAnnotations({ startChapter, startParagraph, endChapter, endParagraph });
   const leftNotes = document.getElementById("left-notes");
   if (!leftNotes) return;
@@ -1398,14 +1441,14 @@ function initializeNoteLinkBlinking() {
   contentContainer.addEventListener("mouseover", (event) => {
     const target = event.target as HTMLElement;
     if (target.classList.contains("link-note") || target.closest(".link-note")) {
-      const linkNote = target.classList.contains("link-note") ? target : target.closest(".link-note") as HTMLElement;
+      const linkNote = target.classList.contains("link-note") ? target : (target.closest(".link-note") as HTMLElement);
       const targetId = linkNote.getAttribute("href")?.substring(1); // Get href like '#fn3' and remove '#'
 
       if (targetId) {
         const noteElement = document.getElementById(targetId);
         if (noteElement && noteElement.closest("#right-notes-scrollable-container")) {
           // Scroll the note into view smoothly
-          noteElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          noteElement.scrollIntoView({ behavior: "smooth", block: "center" });
 
           // Add highlight-blink class to run animation
           noteElement.classList.add("highlight-blink");
@@ -1423,7 +1466,7 @@ function initializeNoteLinkBlinking() {
   contentContainer.addEventListener("mouseout", (event) => {
     const target = event.target as HTMLElement;
     if (target.classList.contains("link-note") || target.closest(".link-note")) {
-      const linkNote = target.classList.contains("link-note") ? target : target.closest(".link-note") as HTMLElement;
+      const linkNote = target.classList.contains("link-note") ? target : (target.closest(".link-note") as HTMLElement);
       const targetId = linkNote.getAttribute("href")?.substring(1);
 
       if (targetId) {
