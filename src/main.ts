@@ -1250,7 +1250,7 @@ function setupParagraphHighlighting() {
 
   contentContainer.addEventListener("mouseover", (event) => {
     const target = event.target as HTMLElement;
-    const paragraph = target.closest<HTMLElement>("section[data-chapter] p[data-index]");
+    const paragraph = target.closest<HTMLElement>("section[data-chapter] [data-index]");
     if (paragraph) {
       const section = paragraph.closest<HTMLElement>("section[data-chapter]");
       if (!section) return;
@@ -1281,21 +1281,31 @@ function setupParagraphHighlighting() {
                 // Swap image to GIF if talking
                 if (imageElement && imageElement.dataset.originalSrc) {
                   const gifSrc = getMovingPictureFilePathForName(canonicalName, bookSlug);
-                  if (imageElement.src !== gifSrc) {
+                  const currentSrcFilename = imageElement.src.split("/").pop();
+                  const gifSrcFilename = gifSrc.split("/").pop();
+                  if (currentSrcFilename !== gifSrcFilename) {
                     imageElement.src = gifSrc;
                   }
                 }
               } else {
                 note.classList.add("highlighted-entity");
                 // Ensure image is PNG if just mentioned (and was previously GIF)
-                if (imageElement && imageElement.dataset.originalSrc && imageElement.src !== imageElement.dataset.originalSrc) {
-                  imageElement.src = imageElement.dataset.originalSrc;
+                if (imageElement && imageElement.dataset.originalSrc) {
+                  const currentSrcFilename = imageElement.src.split("/").pop();
+                  const originalSrcFilename = imageElement.dataset.originalSrc.split("/").pop();
+                  if (currentSrcFilename !== originalSrcFilename) {
+                    imageElement.src = imageElement.dataset.originalSrc;
+                  }
                 }
               }
             } else {
               // If no match in this paragraph, ensure image is PNG if it was changed
-              if (imageElement && imageElement.dataset.originalSrc && imageElement.src !== imageElement.dataset.originalSrc) {
-                imageElement.src = imageElement.dataset.originalSrc;
+              if (imageElement && imageElement.dataset.originalSrc) {
+                const currentSrcFilename = imageElement.src.split("/").pop();
+                const originalSrcFilename = imageElement.dataset.originalSrc.split("/").pop();
+                if (currentSrcFilename !== originalSrcFilename) {
+                  imageElement.src = imageElement.dataset.originalSrc;
+                }
               }
             }
           } catch (e) {
@@ -1317,8 +1327,14 @@ function setupParagraphHighlighting() {
 
         // Revert image to original PNG
         const imageElement = note.querySelector<HTMLImageElement>(".entity-image");
-        if (imageElement && imageElement.dataset.originalSrc && imageElement.src !== imageElement.dataset.originalSrc) {
-          imageElement.src = imageElement.dataset.originalSrc;
+        if (imageElement && imageElement.dataset.originalSrc) {
+          // Extract just the filenames for comparison
+          const currentSrcFilename = imageElement.src.split("/").pop();
+          const originalSrcFilename = imageElement.dataset.originalSrc.split("/").pop();
+
+          if (currentSrcFilename !== originalSrcFilename) {
+            imageElement.src = imageElement.dataset.originalSrc;
+          }
         }
       });
     }
