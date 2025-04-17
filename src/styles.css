@@ -1528,11 +1528,10 @@
   /* Styles for the entity image wrapper */
   .entity-image-wrapper {
     transition:
-      transform 0.3s ease-out,
-      /* Increased duration for smoother exit */ z-index 0s ease-in-out 0.3s; /* Matching delay for z-index */
+      transform 0.2s ease-in-out,
+      z-index 0s ease-in-out 0.2s; /* Add z-index transition */
     position: relative; /* Ensure z-index works */
     z-index: 1;
-    /* Keep other existing properties */
   }
 
   .entity-image-wrapper:hover {
@@ -1551,11 +1550,11 @@
   .talking-paragraph {
     background-color: rgba(255, 220, 0, 0.4); /* Slightly stronger yellow */
     border-left: 3px solid rgba(255, 180, 0, 0.8); /* Add a prominent left border */
-    padding-left: 0.01em; /* Add some padding so border isn't tight */
+    margin-left: -0.3em;
+    padding-left: 0.1em; /* Add some padding so border isn't tight */
     transition:
       background-color 0.2s ease-in-out,
-      border-color 0.2s ease-in-out,
-      padding-left 0.2s ease-in-out;
+      border-color 0.2s ease-in-out;
     border-radius: 3px;
   }
 
@@ -1583,15 +1582,10 @@
 
   /* Scale the wrapper for the image within a highlighted talking entity */
   .entity-note.highlighted-talking-entity .entity-image-wrapper {
+    /* transform: scale(1.1); /* Use same scale as hover for consistency */
     z-index: 10; /* Bring to front, like hover */
+    /* Transition is already defined on .entity-image-wrapper */
     animation: pulseScale 1.5s ease-in-out infinite; /* Apply the pulsing animation */
-  }
-
-  /* When no longer highlighted, ensure it returns smoothly */
-  .entity-note:not(.highlighted-talking-entity) .entity-image-wrapper {
-    transform: scale(1); /* Reset to normal scale */
-    animation: none; /* Stop any animation */
-    /* Let the transition property handle the smooth return */
   }
 } /* End of #legacy scope */
 
