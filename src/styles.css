@@ -14,7 +14,7 @@
   --bg-content-light: #fdfaf4; /* FB2 content bg */
   --bg-page-light: #f5f5f5;
   --bg-page-active-light: #fff;
-  --bg-notes-light: rgba(249, 249, 249, 0.5);
+  --bg-notes-light: rgba(249, 249, 249, 0);
   --text-light: #222;
   --text-muted-light: #666;
   --text-notes-light: #444;
@@ -585,6 +585,37 @@
       padding-bottom: 5px;
       font-size: 1rem;
     }
+  }
+
+  /* Container for entity notes - center content vertically */
+  .entity-notes-container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+    gap: 15px;
+    overflow-y: scroll;
+    cursor: default;
+    /* Remove the background styling from children divs */
+    & > div {
+      padding: 0.75rem;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+  }
+
+  /* Add styling only to the text column */
+  .entity-text-column {
+    background-color: var(--char-card-bg-light);
+    box-shadow: 0 0 8px var(--shadow-light);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+
+  /* For dark mode */
+  #legacy.night-mode .entity-text-column {
+    background-color: var(--char-card-bg-dark);
+    box-shadow: 0 0 8px var(--shadow-dark);
   }
 
   /* Specific Notes Panel Instances */
