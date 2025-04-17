@@ -42,7 +42,7 @@
   --char-card-border-light: #ddd; /* Mobile strip border */
   --mobile-strip-bg-light: rgba(255, 255, 255, 0.95);
   --mobile-strip-horizontal-bg-light: rgba(255, 255, 255, 0.85);
-  --highlight-blink-color: rgb(152, 152, 152);
+  --highlight-blink-color: rgba(152, 152, 152, 0.1);
   /* RGB versions for transparency */
   --bg-light-rgb: 240, 240, 240;
   --bg-content-light-rgb: 253, 250, 244;
@@ -543,15 +543,7 @@
     flex-direction: column;
     justify-content: center;
     max-width: 700px;
-    /* width: 25%;  */
     padding: 20px;
-    padding-top: max(20px, var(--safe-area-inset-top));
-    padding-bottom: max(20px, var(--safe-area-inset-bottom));
-    /* background-color: var(--bg-notes-light); */
-    background-color: rgba(var(--bg-notes-light-rgb), 0.4); /* Slightly transparent */
-    box-shadow: 0 0 8px var(--shadow-light);
-    overflow-y: auto;
-    border-radius: 5px;
     transition: all var(--transition-medium) var(--transition-timing);
     line-height: 1.4;
     font-size: 1rem;
@@ -570,23 +562,19 @@
     display: flex;
     justify-content: center;
     flex: 1;
-    margin: 20px;
     margin-right: auto;
-    /* Desktop styles - appears as a separate block */
-    /* max-width: 800px;  */
-    /* margin: auto 0; */
     font-family: var(--font-serif);
-    /* background-color: var(--bg-notes-light); */
-    background-color: rgba(var(--bg-notes-light-rgb), 0.4); /* Slightly transparent */
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px var(--shadow-light);
+    height: calc(100vh - 40px);
 
-    /* Original margin for desktop layout - might conflict with max-width */
-    /* margin: auto 20px; */
-    /* padding-bottom: 0; */
+    #right-notes-scrollable-container {
+      overflow-y: scroll;
+    }
 
     section {
+      padding: 20px;
+      border-radius: 8px;
+      background-color: var(--bg-notes-light);
+      box-shadow: 0 0 8px var(--shadow-light);
       margin-bottom: 1.2rem;
       &:last-child {
         margin-bottom: 0;
@@ -612,7 +600,9 @@
   }
 
   #left-notes {
-    /* Styles specific to the left notes panel if different */
+    display: flex;
+    justify-content: center;
+    height: calc(100vh - 40px);
     margin: 20px; /* Example margin */
     margin-left: auto;
     flex: 1;
@@ -1136,17 +1126,6 @@
     }
   }
 
-  /* --- Highlighting --- */
-  /* Removed standalone .highlight-blink rule */
-  /*
-  .highlight-blink {
-    animation-name: blinkEffect !important; 
-    animation-duration: 0.8s; 
-    animation-timing-function: ease-in-out;
-    animation-iteration-count: 2; 
-  }
-  */
-
   /* --- Night Mode Overrides --- */
   &.night-mode {
     scrollbar-color: #555 #222;
@@ -1562,11 +1541,16 @@
   .entity-notes-container {
     display: flex;
     flex-direction: column;
-    min-height: 100%;
     padding: 10px 0;
     gap: 15px;
-    width: 100%;
-    overflow: visible;
+    overflow-y: scroll;
+
+    & > div {
+      background-color: var(--bg-notes-light);
+      box-shadow: 0 0 8px var(--shadow-light);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
   }
 
   /* Styles for the entity image wrapper */
@@ -1634,7 +1618,7 @@
 } /* End of #legacy scope */
 
 /* Apply animation directly to the target section when the class is present */
-#legacy #right-notes section.highlight-blink {
+#legacy #right-notes-scrollable-container section.highlight-blink {
   animation-name: blinkEffect;
   animation-duration: 0.8s; /* Faster blink */
   animation-timing-function: ease-in-out;
@@ -1644,13 +1628,11 @@
 @keyframes blinkEffect {
   0%,
   100% {
-    /* background-color: inherit; */ /* Replaced inherit */
-    /* background-color: var(--bg-notes-light); */ /* Explicit base color */
-    outline-color: transparent; /* Animate outline color */
+    background-color: inherit; /* Replaced inherit */
+    background-color: var(--bg-notes-light); /* Explicit base color */
   }
   50% {
-    /* background-color: var(--highlight-blink-color); */
-    outline-color: var(--highlight-blink-color); /* Use blink color for outline */
+    background-color: var(--highlight-blink-color);
   }
 }
 
