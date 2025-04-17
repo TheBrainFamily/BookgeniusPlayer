@@ -4,7 +4,7 @@ import "./globals.css";
 import { isNightMode, setIsNightMode } from "@/src/helpers/setIsNightMode";
 import { getCurrentPage, goToNextPage, goToPage, goToPreviousPage, setCurrentPage } from "@/src/helpers/pagesNavigation";
 import { pagesToSkipFooterGeneration, romanNumeralPages } from "@/src/consts";
-import { isMobileCharactersVisible, getIsTogglingMobileCharacters, toggleMobileCharacters } from "@/src/isMobileCharactersVisible";
+import { isMobileCharactersVisible, toggleMobileCharacters } from "@/src/isMobileCharactersVisible";
 import { startReactComponents } from "./react-components";
 import { getCurrentBookSlug } from "./getCurrentBookSlug";
 import { initSearchModal, showSearchModal, hideSearchModal, isSearchActive } from "./searchModal";
@@ -14,6 +14,7 @@ import { createEditableEntity, createEditablePageSummary, createEditableChapterS
 import { getParagraphRange, getParagraphRangePure, ParsedParagraphRange, parseParagraphRange } from "./fetchers/getParagraphRange";
 import { getSavedLocation, goToParagraph, setCurrentLocation } from "./helpers/paragraphsNavigation";
 import { initializeNoteLinkBlinking, setupNoteLinkBlinking } from "./annotationsHandling";
+import { getPictureFilePathForName, getMovingPictureFilePathForName } from "./utils/getFilePathsForName";
 
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
@@ -1245,10 +1246,10 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
 function setupParagraphHighlighting() {
   const contentContainer = document.getElementById("content-container");
   if (!contentContainer) return;
+  const bookSlug = getCurrentBookSlug(); // Get book slug once
 
   contentContainer.addEventListener("mouseover", (event) => {
     const target = event.target as HTMLElement;
-    // Check if the mouse is over a paragraph with a data-index inside a chapter section
     const paragraph = target.closest<HTMLElement>("section[data-chapter] p[data-index]");
     if (paragraph) {
       const section = paragraph.closest<HTMLElement>("section[data-chapter]");
@@ -1261,29 +1262,42 @@ function setupParagraphHighlighting() {
         const chapterNum = parseInt(chapterNumber);
         const paragraphNum = parseInt(paragraphNumber);
 
-        // Find all entity notes in the left sidebar
         const entityNotes = document.querySelectorAll<HTMLElement>("#left-notes .entity-note");
         entityNotes.forEach((note) => {
           const appearancesStr = note.dataset.appearances;
-          if (!appearancesStr) return;
+          const canonicalName = note.dataset.canonicalName; // Get canonical name
+          if (!appearancesStr || !canonicalName) return;
 
           try {
             const appearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[] = JSON.parse(appearancesStr);
-            // Check if this note corresponds to the hovered paragraph
             const match = appearances.find((app) => app.chapterNumber === chapterNum && app.paragraphNumber === paragraphNum);
 
-            // Reset classes first
             note.classList.remove("highlighted-entity", "highlighted-talking-entity");
+            const imageElement = note.querySelector<HTMLImageElement>(".entity-image");
 
             if (match) {
-              // Add the specific class based on whether the entity is talking
               if (match.isTalkingInParagraph) {
                 note.classList.add("highlighted-talking-entity");
+                // Swap image to GIF if talking
+                if (imageElement && imageElement.dataset.originalSrc) {
+                  const gifSrc = getMovingPictureFilePathForName(canonicalName, bookSlug);
+                  if (imageElement.src !== gifSrc) {
+                    imageElement.src = gifSrc;
+                  }
+                }
               } else {
                 note.classList.add("highlighted-entity");
+                // Ensure image is PNG if just mentioned (and was previously GIF)
+                if (imageElement && imageElement.dataset.originalSrc && imageElement.src !== imageElement.dataset.originalSrc) {
+                  imageElement.src = imageElement.dataset.originalSrc;
+                }
+              }
+            } else {
+              // If no match in this paragraph, ensure image is PNG if it was changed
+              if (imageElement && imageElement.dataset.originalSrc && imageElement.src !== imageElement.dataset.originalSrc) {
+                imageElement.src = imageElement.dataset.originalSrc;
               }
             }
-            // No need for an else here, as we remove classes at the start
           } catch (e) {
             console.error("Error processing appearances for entity highlight:", e);
           }
@@ -1296,12 +1310,16 @@ function setupParagraphHighlighting() {
     const target = event.target as HTMLElement;
     const paragraph = target.closest<HTMLElement>("section[data-chapter] p[data-index]");
 
-    // When leaving a paragraph, remove highlights from all notes
     if (paragraph) {
       const entityNotes = document.querySelectorAll<HTMLElement>("#left-notes .entity-note");
       entityNotes.forEach((note) => {
-        // Remove both potential highlight classes
         note.classList.remove("highlighted-entity", "highlighted-talking-entity");
+
+        // Revert image to original PNG
+        const imageElement = note.querySelector<HTMLImageElement>(".entity-image");
+        if (imageElement && imageElement.dataset.originalSrc && imageElement.src !== imageElement.dataset.originalSrc) {
+          imageElement.src = imageElement.dataset.originalSrc;
+        }
       });
     }
   });

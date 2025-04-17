@@ -9,5 +9,9 @@ export const getPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) =>
 };
 
 export const getMovingPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
-  return getPictureFilePathForName(name, bookSlug).replace(".png", ".gif");
+  if (name === "Ramzes") {
+    return getPictureFilePathForName(name, bookSlug).replace(".png", ".gif");
+  } else {
+    return getPictureFilePathForName(name, bookSlug);
+  }
 };

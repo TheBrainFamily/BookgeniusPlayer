@@ -1,6 +1,7 @@
 import { BOOK_SLUGS } from "../consts";
 import { updateCharacterChapterInfo } from "../fetchers/updateCharacterChapterInfo";
 import { getCurrentBookSlug } from "../getCurrentBookSlug";
+import { getPictureFilePathForName, getMovingPictureFilePathForName } from "./getFilePathsForName";
 
 // Define a type for the window with our global functions
 declare global {
@@ -15,14 +16,6 @@ type IEntityNote = { entity: string; canonicalName: string; summary: string; ima
 
 export const isEditActive = () => {
   return document.querySelector(".edit-container") !== null;
-};
-
-export const getPictureFileNameForName = (name: string) => {
-  return `${name.replace(/[\s()\\']+/g, "-").toLowerCase()}.png`;
-};
-
-export const getPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
-  return `./public/${bookSlug}/${getPictureFileNameForName(name)}`;
 };
 
 /**
@@ -227,6 +220,7 @@ export function createEditableEntity(entity: {
   entityDiv.style.gap = "15px";
   entityDiv.style.alignItems = "center";
   entityDiv.style.overflow = "visible"; // Allow overflow on the main container
+  entityDiv.dataset.canonicalName = entity.canonicalName; // Store canonical name for easy access
 
   // Combine main appearance with other appearances
   const allAppearances = [
@@ -236,57 +230,6 @@ export function createEditableEntity(entity: {
 
   // Store all appearances as a JSON string
   entityDiv.dataset.appearances = JSON.stringify(allAppearances);
-
-  // Add hover listeners for highlighting
-  entityDiv.addEventListener("mouseenter", () => {
-    try {
-      const appearancesStr = entityDiv.dataset.appearances;
-      if (!appearancesStr) return;
-
-      const appearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[] = JSON.parse(appearancesStr);
-
-      appearances.forEach(({ chapterNumber, paragraphNumber, isTalkingInParagraph }) => {
-        // Use more specific selector to avoid highlighting footnotes etc.
-        const targetParagraph = document.querySelector<HTMLElement>(`section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`);
-        if (targetParagraph) {
-          targetParagraph.classList.add("highlighted-paragraph");
-          if (isTalkingInParagraph) {
-            targetParagraph.classList.add("talking-paragraph");
-          }
-        } else {
-          console.warn(`Could not find paragraph ${paragraphNumber} in chapter ${chapterNumber} for highlighting.`);
-        }
-      });
-    } catch (e) {
-      console.error("Error parsing or processing appearances for highlighting:", e);
-    }
-  });
-
-  entityDiv.addEventListener("mouseleave", () => {
-    try {
-      const appearancesStr = entityDiv.dataset.appearances;
-      if (!appearancesStr) return;
-
-      const appearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[] = JSON.parse(appearancesStr);
-
-      appearances.forEach(({ chapterNumber, paragraphNumber, isTalkingInParagraph }) => {
-        // Use more specific selector matching the mouseenter
-        const targetParagraph = document.querySelector<HTMLElement>(`section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`);
-        if (targetParagraph) {
-          targetParagraph.classList.remove("highlighted-paragraph");
-          if (isTalkingInParagraph) {
-            targetParagraph.classList.remove("talking-paragraph");
-          }
-        }
-      });
-    } catch (e) {
-      console.error("Error parsing or processing appearances for unhighlighting:", e);
-    }
-  });
-
-  // Get resolved character info (if any)
-  // Use resolved image if available, otherwise use the original
-  const imageUrl = entity.imageUrl;
 
   // Left column for image
   const imageColumn = document.createElement("div");
@@ -300,8 +243,10 @@ export function createEditableEntity(entity: {
   textColumn.style.flex = "2";
 
   // Entity image in left column
-  if (imageUrl) {
-    // Create a wrapper div for the image
+  let imageElement: HTMLImageElement | null = null; // Declare imageElement here
+  const bookSlug = getCurrentBookSlug(); // Get book slug once
+
+  if (entity.imageUrl) {
     const imageWrapper = document.createElement("div");
     imageWrapper.className = "entity-image-wrapper";
     imageWrapper.style.width = "100%"; // Or a fixed size if preferred
@@ -312,8 +257,10 @@ export function createEditableEntity(entity: {
     imageWrapper.style.position = "relative"; // Needed for potential future additions like edit icons
     imageWrapper.style.zIndex = "1";
 
-    const imageElement = document.createElement("img");
-    imageElement.src = imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, getCurrentBookSlug()) : imageUrl;
+    imageElement = document.createElement("img"); // Assign here
+    const originalSrc = entity.imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, bookSlug) : entity.imageUrl;
+    imageElement.src = originalSrc;
+    imageElement.dataset.originalSrc = originalSrc; // Store original source
     imageElement.alt = entity.canonicalName;
     imageElement.className = "entity-image";
     imageElement.style.width = "100%"; // Make image fill the wrapper
@@ -324,14 +271,13 @@ export function createEditableEntity(entity: {
 
     // Store character data in dataset for use in click handler (can remain on image or move to wrapper)
     imageElement.dataset.characterName = entity.canonicalName;
-    imageElement.dataset.originalImageUrl = entity.imageUrl;
-    imageElement.dataset.summary = entity.summary?.replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>") || "";
+    imageElement.dataset.summary = entity.summary?.replace(/\\n\\n/g, "<br/>").replace(/\\n/g, "<br/>") || "";
 
     // Add click event to wrapper to show details modal
     imageWrapper.addEventListener("click", () => {
-      // Access the global function with proper typing
-      if (typeof window.showCharacterDetailsModal === "function") {
-        window.showCharacterDetailsModal(entity.canonicalName, imageUrl, entity.summary || "");
+      if (typeof window.showCharacterDetailsModal === "function" && imageElement) {
+        // Check imageElement exists
+        window.showCharacterDetailsModal(entity.canonicalName, imageElement.src, entity.summary || "");
       }
     });
 
@@ -467,6 +413,59 @@ export function createEditableEntity(entity: {
   // });
 
   // textColumn.appendChild(removeButton);
+
+  // Add hover listeners for highlighting and image swap
+  entityDiv.addEventListener("mouseenter", () => {
+    let isTalkingSomewhere = false;
+    try {
+      const appearancesStr = entityDiv.dataset.appearances;
+      if (!appearancesStr) return;
+      const appearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[] = JSON.parse(appearancesStr);
+
+      appearances.forEach(({ chapterNumber, paragraphNumber, isTalkingInParagraph }) => {
+        const targetParagraph = document.querySelector<HTMLElement>(`section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`);
+        if (targetParagraph) {
+          targetParagraph.classList.add("highlighted-paragraph");
+          if (isTalkingInParagraph) {
+            targetParagraph.classList.add("talking-paragraph");
+            isTalkingSomewhere = true; // Mark if talking in any paragraph
+          }
+        }
+      });
+
+      // Swap image to GIF if talking and image exists
+      if (isTalkingSomewhere && imageElement && imageElement.dataset.originalSrc) {
+        const gifSrc = getMovingPictureFilePathForName(entity.canonicalName, bookSlug);
+        if (imageElement.src !== gifSrc) {
+          imageElement.src = gifSrc;
+        }
+      }
+    } catch (e) {
+      console.error("Error processing appearances for highlighting:", e);
+    }
+  });
+
+  entityDiv.addEventListener("mouseleave", () => {
+    try {
+      const appearancesStr = entityDiv.dataset.appearances;
+      if (!appearancesStr) return;
+      const appearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[] = JSON.parse(appearancesStr);
+
+      appearances.forEach(({ chapterNumber, paragraphNumber, isTalkingInParagraph }) => {
+        const targetParagraph = document.querySelector<HTMLElement>(`section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`);
+        if (targetParagraph) {
+          targetParagraph.classList.remove("highlighted-paragraph", "talking-paragraph");
+        }
+      });
+
+      // Revert image to original PNG if it exists
+      if (imageElement && imageElement.dataset.originalSrc && imageElement.src !== imageElement.dataset.originalSrc) {
+        imageElement.src = imageElement.dataset.originalSrc;
+      }
+    } catch (e) {
+      console.error("Error processing appearances for unhighlighting:", e);
+    }
+  });
 
   // Add both columns to the entity div
   entityDiv.appendChild(imageColumn);
