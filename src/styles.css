@@ -1575,11 +1575,12 @@
       transform 0.2s ease-in-out,
       z-index 0s ease-in-out 0.2s; /* Add z-index transition */
     position: relative; /* Ensure z-index works */
+    transform: scale(1); /* Explicitly define base scale */
     z-index: 1;
   }
 
   .entity-image-wrapper:hover {
-    transform: scale(1.1); /* Scale the wrapper on hover */
+    transform: scale(1.2); /* Scale the wrapper on hover */
     z-index: 10; /* Bring to front on hover */
   }
 
@@ -1626,10 +1627,9 @@
 
   /* Scale the wrapper for the image within a highlighted talking entity */
   .entity-note.highlighted-talking-entity .entity-image-wrapper {
-    /* transform: scale(1.1); /* Use same scale as hover for consistency */
+    transform: scale(1.1); /* Define the target scale for the highlighted state */
     z-index: 10; /* Bring to front, like hover */
-    /* Transition is already defined on .entity-image-wrapper */
-    animation: pulseScale 1.5s ease-in-out infinite; /* Apply the pulsing animation */
+    animation: pulseScale 1.5s infinite ease-in-out 0.2s; /* Delay animation start */
   }
 } /* End of #legacy scope */
 
@@ -1657,12 +1657,12 @@
 /* Keyframes for pulsing scale effect */
 @keyframes pulseScale {
   0% {
-    transform: scale(1.08);
+    transform: scale(1.1);
   }
   50% {
     transform: scale(1.12);
   }
   100% {
-    transform: scale(1.08);
+    transform: scale(1.1);
   }
 }
