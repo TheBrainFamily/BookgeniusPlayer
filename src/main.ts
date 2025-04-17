@@ -352,7 +352,7 @@ const dealWithAnnotations = ({
   endParagraph: number;
 }) => {
   // Hide all footnote sections initially
-  const allNotes = document.querySelectorAll<HTMLElement>("#right-notes section");
+  const allNotes = document.querySelectorAll<HTMLElement>("#right-notes-scrollable-container section");
   allNotes.forEach((note) => {
     note.style.display = "none";
   });
@@ -393,8 +393,8 @@ const dealWithAnnotations = ({
           atLeastOneInRange = true;
 
           const noteElement = document.getElementById(targetId);
-          // Ensure the note element exists and is a direct child section of #right-notes
-          if (noteElement && noteElement.parentElement?.id === "right-notes") {
+          // Check if the note element exists and is within the scrollable container
+          if (noteElement && noteElement.closest("#right-notes-scrollable-container")) {
             noteElement.style.display = "block";
           }
         }
