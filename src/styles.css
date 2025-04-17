@@ -567,7 +567,9 @@
   }
 
   #left-notes {
-    /* Styles specific to the left notes panel if different */
+    display: flex;
+    justify-content: center;
+    height: calc(100vh - 40px);
     margin: 20px; /* Example margin */
     margin-left: auto;
     flex: 1;
@@ -1497,11 +1499,16 @@
   .entity-notes-container {
     display: flex;
     flex-direction: column;
-    min-height: 100%;
     padding: 10px 0;
     gap: 15px;
-    width: 100%;
-    overflow: visible;
+    overflow-y: scroll;
+
+    & > div {
+      background-color: var(--bg-notes-light);
+      box-shadow: 0 0 8px var(--shadow-light);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
   }
 
   /* Styles for the entity image wrapper */
