@@ -243,7 +243,7 @@ function setupPageObserver() {
   const observerOptions = {
     root: document.getElementById("content-container"),
     rootMargin: "0px",
-    threshold: 0.8, // Consider page visible when 40% is in view
+    threshold: 0.05, // Adjust threshold if needed, maybe lower if elements are small
   };
 
   // --- State for tracking all currently intersecting pages ---
@@ -252,6 +252,12 @@ function setupPageObserver() {
   let currentlyLastActivePageElement: Element | null = null;
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
+    const rootElement = observerOptions.root;
+    if (!rootElement) {
+      console.error("Observer root element not found:", observerOptions.root);
+      return;
+    }
+
     // 1. Update the set of intersecting pages based on the current changes
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
@@ -261,54 +267,78 @@ function setupPageObserver() {
       }
     });
 
-    // 2. Determine the topmost and bottommost pages from the *entire set* of intersecting pages
+    // 2. Determine the elements within the "focus zone" (30%-60% vertically)
     if (intersectingPages.size > 0) {
-      // Convert Set to array and sort by viewport top position
-      const sortedIntersectingPages = Array.from(intersectingPages).sort((a, b) => {
-        return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
+      const rootRect = rootElement.getBoundingClientRect();
+      const focusZoneTop = rootRect.top + rootRect.height * 0.25;
+      const focusZoneBottom = rootRect.top + rootRect.height * 0.65;
+
+      // Filter intersecting pages to find those overlapping the focus zone
+      const focusedPages = Array.from(intersectingPages).filter((element) => {
+        const elementRect = element.getBoundingClientRect();
+        // Check if element's vertical range overlaps with the focus zone
+        return elementRect.top < focusZoneBottom && elementRect.bottom > focusZoneTop;
       });
 
-      const topVisiblePageElement = sortedIntersectingPages[0];
-      const bottomVisiblePageElement = sortedIntersectingPages[sortedIntersectingPages.length - 1]; // Get the last element
+      if (focusedPages.length > 0) {
+        // Sort the focused pages by their viewport top position
+        focusedPages.sort((a, b) => {
+          return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
+        });
 
-      // 3. Update active state only if the topmost or bottommost page has changed
-      // (We might refine this condition later if needed, for now, update if any intersecting element changes)
-      if (topVisiblePageElement !== currentlyActivePageElement || bottomVisiblePageElement !== currentlyLastActivePageElement) {
-        // TODO: Revisit this condition? Maybe check bottom element too?
-        console.log("[Observer] Top visible page:", topVisiblePageElement.id || topVisiblePageElement);
-        console.log("[Observer] Bottom visible page:", bottomVisiblePageElement.id || bottomVisiblePageElement);
+        const topFocusedPageElement = focusedPages[0];
+        const bottomFocusedPageElement = focusedPages[focusedPages.length - 1];
 
-        currentlyActivePageElement = topVisiblePageElement; // Update the tracked active page (using top for now)
-        currentlyLastActivePageElement = bottomVisiblePageElement;
-        // --- Extract Chapter and Paragraph Info ---
-        const getParagraphInfo = (element: Element): { chapter: number | null; paragraph: number | null } => {
-          const paragraphStr = (element as HTMLElement).dataset.index;
-          const chapterElement = element.closest("section[data-chapter]");
-          const chapterStr = chapterElement ? (chapterElement as HTMLElement).dataset.chapter : null;
+        // 3. Update active state only if the topmost or bottommost focused page has changed
+        if (topFocusedPageElement !== currentlyActivePageElement || bottomFocusedPageElement !== currentlyLastActivePageElement) {
+          console.log("[Observer] Top focused page:", topFocusedPageElement.id || topFocusedPageElement);
+          console.log("[Observer] Bottom focused page:", bottomFocusedPageElement.id || bottomFocusedPageElement);
 
-          return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
-        };
+          currentlyActivePageElement = topFocusedPageElement;
+          currentlyLastActivePageElement = bottomFocusedPageElement;
 
-        const startInfo = getParagraphInfo(topVisiblePageElement);
-        const endInfo = getParagraphInfo(bottomVisiblePageElement);
-        // -----------------------------------------
+          // --- Extract Chapter and Paragraph Info ---
+          const getParagraphInfo = (element: Element): { chapter: number | null; paragraph: number | null } => {
+            const paragraphStr = (element as HTMLElement).dataset.index;
+            const chapterElement = element.closest("section[data-chapter]");
+            const chapterStr = chapterElement ? (chapterElement as HTMLElement).dataset.chapter : null;
+            return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
+          };
 
-        // 4. Call updateParagraphNotes if we have valid info
-        if (startInfo.chapter !== null && startInfo.paragraph !== null && endInfo.chapter !== null && endInfo.paragraph !== null) {
-          console.log(`[Observer] Updating notes for Ch ${startInfo.chapter}:${startInfo.paragraph} to Ch ${endInfo.chapter}:${endInfo.paragraph}`);
-          updateParagraphNotes({ startChapter: startInfo.chapter, startParagraph: startInfo.paragraph, endChapter: endInfo.chapter, endParagraph: endInfo.paragraph });
-          console.log("setting current locatio from intersection", { chapter: startInfo.chapter, paragraph: startInfo.paragraph });
-          setCurrentLocation({ chapter: startInfo.chapter, paragraph: startInfo.paragraph });
-        } else {
-          console.warn("[Observer] Could not extract chapter/paragraph info for:", topVisiblePageElement, bottomVisiblePageElement);
+          const startInfo = getParagraphInfo(topFocusedPageElement);
+          const endInfo = getParagraphInfo(bottomFocusedPageElement);
+          // -----------------------------------------
+
+          // 4. Call updateParagraphNotes if we have valid info
+          if (startInfo.chapter !== null && startInfo.paragraph !== null && endInfo.chapter !== null && endInfo.paragraph !== null) {
+            console.log(`[Observer] Updating notes for Ch ${startInfo.chapter}:${startInfo.paragraph} to Ch ${endInfo.chapter}:${endInfo.paragraph} (Focus Zone)`);
+            updateParagraphNotes({ startChapter: startInfo.chapter, startParagraph: startInfo.paragraph, endChapter: endInfo.chapter, endParagraph: endInfo.paragraph });
+            console.log("setting current location from intersection (focus zone)", { chapter: startInfo.chapter, paragraph: startInfo.paragraph });
+            // Set current location based on the top element in the focus zone
+            setCurrentLocation({ chapter: startInfo.chapter, paragraph: startInfo.paragraph });
+          } else {
+            console.warn("[Observer] Could not extract chapter/paragraph info for focused elements:", topFocusedPageElement, bottomFocusedPageElement);
+          }
+        }
+      } else {
+        // Handle case where intersecting pages exist, but none are in the focus zone
+        if (currentlyActivePageElement !== null) {
+          console.log("[Observer] No pages intersecting the focus zone.");
+          // Decide if you want to clear the active elements or keep the last known ones
+          // currentlyActivePageElement = null;
+          // currentlyLastActivePageElement = null;
+          // updateParagraphNotes({ startChapter: null, startParagraph: null, endChapter: null, endParagraph: null }); // Example: Clear notes
         }
       }
     } else {
-      // Handle case where no pages are intersecting (optional)
+      // Handle case where no pages are intersecting the viewport at all
       if (currentlyActivePageElement !== null) {
-        console.log("[Observer] No pages intersecting.");
+        console.log("[Observer] No pages intersecting viewport.");
         currentlyActivePageElement = null;
+        currentlyLastActivePageElement = null;
         // Potentially clear notes or update state here
+        // updateParagraphNotes({ startChapter: null, startParagraph: null, endChapter: null, endParagraph: null }); // Example: Clear notes
+        // setCurrentLocation({ chapter: null, paragraph: null }); // Example: Clear location
       }
     }
   }, observerOptions);

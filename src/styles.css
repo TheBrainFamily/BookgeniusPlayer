@@ -239,11 +239,11 @@
       /* background-color: var(--bg-content-light); */
       background: linear-gradient(
         to bottom,
-        rgba(var(--bg-content-light-rgb), 0) 0%,
+        rgba(var(--bg-content-light-rgb), 0) 5%,
         rgba(var(--bg-content-light-rgb), 1) 40%,
         rgba(var(--bg-content-light-rgb), 1) 50%,
         rgba(var(--bg-content-light-rgb), 1) 60%,
-        rgba(var(--bg-content-light-rgb), 0) 100%
+        rgba(var(--bg-content-light-rgb), 0) 95%
       ); /* Gradient transparency: more transparent at edges, fully opaque in middle */
       padding: 1em 2em; /* Overrides base padding */
       margin-left: auto; /* Center the content */
