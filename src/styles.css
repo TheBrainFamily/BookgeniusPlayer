@@ -676,9 +676,15 @@
 
     #right-notes-scrollable-container {
       overflow-y: scroll;
-      width: 700px;
+      max-width: 700px;
       @media (max-width: 1900px) {
-        width: 500px;
+        max-width: 500px;
+      }
+      @media (max-width: 1700px) {
+        max-width: 400px;
+      }
+      @media (max-width: 1500px) {
+        max-width: 300px;
       }
     }
 
@@ -1847,9 +1853,15 @@
 
 /* Base style for entity notes to help with transitions */
 .entity-note {
-  width: 700px;
+  max-width: 700px;
   @media (max-width: 1900px) {
-    width: 500px;
+    max-width: 500px;
+  }
+  @media (max-width: 1700px) {
+    max-width: 400px;
+  }
+  @media (max-width: 1500px) {
+    max-width: 300px;
   }
   align-self: center;
   transform: scale(1);
