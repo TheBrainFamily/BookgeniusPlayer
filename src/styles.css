@@ -634,6 +634,10 @@
       overflow-y: scroll;
     }
 
+    #right-notes-scrollable-container section {
+      background-color: white;
+    }
+
     section {
       padding: 20px;
       border-radius: 8px;
@@ -972,7 +976,7 @@
     cursor: pointer;
     transition: transform var(--transition-fast) var(--transition-timing);
     &:hover {
-      transform: scale(1.05);
+      transform: scale(1);
     }
   }
 
@@ -1621,10 +1625,8 @@
   /* Styles for the entity image wrapper */
   .entity-image-wrapper {
     transition:
-      transform 0.2s ease-in-out,
-      z-index 0s ease-in-out 0.2s; /* Add z-index transition */
-    position: relative; /* Ensure z-index works */
-    transform: scale(1); /* Explicitly define base scale */
+      transform 0.3s ease-in-out,
+      box-shadow 0.3s ease-in-out;
     z-index: 1;
   }
 
@@ -1635,51 +1637,133 @@
 
   /* Add this rule for highlighting paragraphs */
   .highlighted-paragraph {
-    background-color: rgba(255, 255, 0, 0.3); /* Example: semi-transparent yellow */
-    transition: background-color 0.2s ease-in-out; /* Smooth transition */
-    border-radius: 3px; /* Add subtle rounding */
+    background-color: rgba(255, 250, 230, 0.5); /* Light warm yellow background */
+    transition: background-color 0.3s ease-in-out;
+    border-radius: 4px;
+    box-shadow: 0 0 8px rgba(255, 220, 160, 0.2);
+    position: relative;
   }
 
   /* Add this rule for paragraphs where an entity is talking */
   .talking-paragraph {
-    background-color: rgba(255, 220, 0, 0.4); /* Slightly stronger yellow */
-    border-left: 3px solid rgba(255, 180, 0, 0.8); /* Add a prominent left border */
+    background-color: rgba(255, 240, 200, 0.6); /* Warmer yellow */
+    position: relative;
+    border-left: 3px solid rgba(255, 190, 100, 0.8); /* Gold border */
+    border-radius: 4px;
+    box-shadow: 0 0 15px rgba(255, 200, 100, 0.25);
     margin-left: -0.3em;
-    padding-left: 0.1em; /* Add some padding so border isn't tight */
-    transition:
-      background-color 0.2s ease-in-out,
-      border-color 0.2s ease-in-out;
-    border-radius: 3px;
+    padding-left: 0.3em;
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* Add subtle animation for talking paragraphs */
+  .talking-paragraph::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(255, 215, 140, 0) 0%, rgba(255, 215, 140, 0.1) 50%, rgba(255, 215, 140, 0) 100%);
+    animation: shimmerEffect 2s infinite;
+    pointer-events: none;
+    border-radius: 4px;
+  }
+
+  @keyframes shimmerEffect {
+    0% {
+      background-position: -100% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Dark mode versions */
+  #legacy.night-mode .highlighted-paragraph {
+    background-color: rgba(70, 70, 90, 0.4);
+    box-shadow: 0 0 8px rgba(80, 80, 120, 0.2);
+  }
+
+  #legacy.night-mode .talking-paragraph {
+    background-color: rgba(80, 80, 110, 0.5);
+    border-left: 3px solid rgba(120, 130, 180, 0.8);
+    box-shadow: 0 0 15px rgba(100, 110, 160, 0.25);
+  }
+
+  #legacy.night-mode .talking-paragraph::after {
+    background: linear-gradient(90deg, rgba(120, 130, 180, 0) 0%, rgba(120, 130, 180, 0.1) 50%, rgba(120, 130, 180, 0) 100%);
   }
 
   /* Add this rule for highlighting entities in the sidebar */
   .entity-note.highlighted-entity {
-    background-color: rgba(249, 249, 249, 0.6); /* Light blue tint */
-    border-radius: 5px;
-    outline: 1px solid rgba(74, 144, 226, 0.5); /* Subtle blue outline */
+    transform: scale(1.1);
     transition:
-      background-color 0.2s ease-in-out,
-      outline-color 0.2s ease-in-out; /* Smooth transition */
+      transform 0.2s ease-in-out,
+      box-shadow 0.2s ease-in-out;
+    box-shadow: 0 0 20px rgba(120, 120, 120, 0.15);
+    z-index: 100; /* Bring to front on hover */
+  }
+
+  .entity-note.highlighted-entity .entity-text-column {
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(74, 144, 226, 0.4);
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.1);
+    transition: all 0.2s ease-in-out;
   }
 
   /* Add this rule for highlighting talking entities in the sidebar */
   .entity-note.highlighted-talking-entity {
-    background-color: rgba(74, 144, 226, 0.5); /* Stronger blue tint */
-    color: white;
-    border-radius: 8px;
-    outline: 2px solid rgba(74, 144, 226, 0.8); /* Stronger blue outline */
-    box-shadow: 0 0 5px rgba(74, 144, 226, 0.3); /* Subtle glow */
+    transform: scale(1.2);
+    z-index: 100; /* Bring to front on hover */
+
     transition:
-      background-color 0.2s ease-in-out,
-      outline-color 0.2s ease-in-out,
-      box-shadow 0.2s ease-in-out; /* Smooth transition */
+      transform 0.3s ease-in-out,
+      box-shadow 0.3s ease-in-out;
+  }
+
+  .entity-note.highlighted-talking-entity .entity-text-column {
+    background-color: rgba(230, 240, 255, 0.85);
+    border: 2px solid rgba(74, 144, 226, 0.6);
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.25);
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* For dark mode */
+  #legacy.night-mode .entity-note.highlighted-entity .entity-text-column {
+    background-color: rgba(60, 60, 70, 0.8);
+    border: 1px solid rgba(100, 150, 220, 0.5);
+  }
+
+  #legacy.night-mode .entity-note.highlighted-talking-entity .entity-text-column {
+    background-color: rgba(50, 60, 90, 0.9);
+    border: 2px solid rgba(100, 150, 220, 0.7);
+    box-shadow: 0 0 12px rgba(100, 150, 220, 0.25);
   }
 
   /* Scale the wrapper for the image within a highlighted talking entity */
   .entity-note.highlighted-talking-entity .entity-image-wrapper {
-    transform: scale(1.1); /* Define the target scale for the highlighted state */
-    z-index: 10; /* Bring to front, like hover */
-    animation: pulseScale 1.5s infinite ease-in-out 0.2s; /* Delay animation start */
+    animation: pulseGlow 2s infinite ease-in-out;
+    z-index: 10;
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(74, 144, 226, 0.4);
+    border: 2px solid rgba(74, 144, 226, 0.5);
+  }
+
+  /* Pulse animation for talking entities */
+  @keyframes pulseGlow {
+    0% {
+      transform: scale(1.12);
+      box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+    }
+    50% {
+      transform: scale(1.15);
+      box-shadow: 0 0 15px rgba(74, 144, 226, 0.6);
+    }
+    100% {
+      transform: scale(1.12);
+      box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+    }
   }
 } /* End of #legacy scope */
 
@@ -1713,4 +1797,36 @@
   100% {
     transform: scale(1.13);
   }
+}
+
+/* Base style for entity notes to help with transitions */
+.entity-note {
+  transform: scale(1);
+  transition:
+    transform 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+  position: relative;
+  z-index: 1;
+}
+
+/* Base style for entity text column to help with transitions */
+.entity-text-column {
+  transition:
+    background-color 0.3s ease-in-out,
+    border 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
+/* Base style for entity image wrapper to help with transitions */
+.entity-image-wrapper {
+  transition:
+    transform 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+  z-index: 1;
+}
+
+/* For dark mode */
+#legacy.night-mode .entity-note.highlighted-talking-entity .entity-image-wrapper {
+  box-shadow: 0 0 15px rgba(100, 150, 220, 0.4);
+  border: 2px solid rgba(100, 150, 220, 0.5);
 }

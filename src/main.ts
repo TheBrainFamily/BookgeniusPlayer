@@ -446,6 +446,7 @@ const legacyElement = document.getElementById("legacy");
 const dealWithBackground = ({ startChapter, startParagraph, endChapter, endParagraph }) => {
   const backgrounds = [
     { startChapter: 1, startParagraph: 11, file: "background-army.png", endChapter: 1, endParagraph: 15 },
+    { startChapter: 3, startParagraph: 20, file: "background-sara.png", endChapter: 3, endParagraph: 30 },
     // Add more background definitions here if needed
   ];
 
