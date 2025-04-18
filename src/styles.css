@@ -112,6 +112,48 @@
   /* Spinner */
   --spinner-bg: #f3f3f3;
   --spinner-color: #3498db;
+
+  /* Entity Highlighting Colors - Light Mode */
+  --highlight-paragraph-bg-light: rgba(255, 250, 230, 0.5);
+  --highlight-paragraph-shadow-light: rgba(255, 220, 160, 0.2);
+  --talking-paragraph-bg-light: rgba(255, 240, 200, 0.6);
+  --talking-paragraph-border-light: rgba(255, 190, 100, 0.8);
+  --talking-paragraph-shadow-light: rgba(255, 200, 100, 0.25);
+  --talking-paragraph-shimmer-light: rgba(255, 215, 140, 0.1);
+  
+  --entity-highlight-shadow-light: rgba(120, 120, 120, 0.15);
+  --entity-highlight-bg-light: rgba(255, 255, 255, 0.7);
+  --entity-highlight-border-light: rgba(74, 144, 226, 0.4);
+  --entity-highlight-shadow-accent-light: rgba(74, 144, 226, 0.1);
+  
+  --entity-talking-highlight-bg-light: rgba(230, 240, 255, 0.85);
+  --entity-talking-highlight-border-light: rgba(74, 144, 226, 0.6);
+  --entity-talking-highlight-shadow-light: rgba(74, 144, 226, 0.25);
+  
+  --entity-image-wrapper-border-light: rgba(74, 144, 226, 0.5);
+  --entity-image-wrapper-shadow-light: rgba(74, 144, 226, 0.4);
+  --entity-image-wrapper-shadow-min-light: rgba(74, 144, 226, 0.3);
+  --entity-image-wrapper-shadow-max-light: rgba(74, 144, 226, 0.6);
+  
+  --highlight-blink-tint-light: rgba(74, 144, 226, 0.5);
+  
+  /* Entity Highlighting Colors - Dark Mode */
+  --highlight-paragraph-bg-dark: rgba(70, 70, 90, 0.4);
+  --highlight-paragraph-shadow-dark: rgba(80, 80, 120, 0.2);
+  --talking-paragraph-bg-dark: rgba(80, 80, 110, 0.5);
+  --talking-paragraph-border-dark: rgba(120, 130, 180, 0.8);
+  --talking-paragraph-shadow-dark: rgba(100, 110, 160, 0.25);
+  --talking-paragraph-shimmer-dark: rgba(120, 130, 180, 0.1);
+  
+  --entity-highlight-bg-dark: rgba(60, 60, 70, 0.8);
+  --entity-highlight-border-dark: rgba(100, 150, 220, 0.5);
+  
+  --entity-talking-highlight-bg-dark: rgba(50, 60, 90, 0.9);
+  --entity-talking-highlight-border-dark: rgba(100, 150, 220, 0.7);
+  --entity-talking-highlight-shadow-dark: rgba(100, 150, 220, 0.25);
+  
+  --entity-image-wrapper-border-dark: rgba(100, 150, 220, 0.5);
+  --entity-image-wrapper-shadow-dark: rgba(100, 150, 220, 0.4);
 }
 
 /* ============================================ */
@@ -1632,20 +1674,20 @@
 
   /* Add this rule for highlighting paragraphs */
   .highlighted-paragraph {
-    background-color: rgba(255, 250, 230, 0.5); /* Light warm yellow background */
+    background-color: var(--highlight-paragraph-bg-light);
     transition: background-color 0.3s ease-in-out;
     border-radius: 4px;
-    box-shadow: 0 0 8px rgba(255, 220, 160, 0.2);
+    box-shadow: 0 0 8px var(--highlight-paragraph-shadow-light);
     position: relative;
   }
 
   /* Add this rule for paragraphs where an entity is talking */
   .talking-paragraph {
-    background-color: rgba(255, 240, 200, 0.6); /* Warmer yellow */
+    background-color: var(--talking-paragraph-bg-light);
     position: relative;
-    border-left: 3px solid rgba(255, 190, 100, 0.8); /* Gold border */
+    border-left: 3px solid var(--talking-paragraph-border-light);
     border-radius: 4px;
-    box-shadow: 0 0 15px rgba(255, 200, 100, 0.25);
+    box-shadow: 0 0 15px var(--talking-paragraph-shadow-light);
     margin-left: -0.3em;
     padding-left: 0.3em;
     transition: all 0.3s ease-in-out;
@@ -1659,7 +1701,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(90deg, rgba(255, 215, 140, 0) 0%, rgba(255, 215, 140, 0.1) 50%, rgba(255, 215, 140, 0) 100%);
+    background: linear-gradient(90deg, rgba(255, 215, 140, 0) 0%, var(--talking-paragraph-shimmer-light) 50%, rgba(255, 215, 140, 0) 100%);
     animation: shimmerEffect 2s infinite;
     pointer-events: none;
     border-radius: 4px;
@@ -1676,18 +1718,18 @@
 
   /* Dark mode versions */
   #legacy.night-mode .highlighted-paragraph {
-    background-color: rgba(70, 70, 90, 0.4);
-    box-shadow: 0 0 8px rgba(80, 80, 120, 0.2);
+    background-color: var(--highlight-paragraph-bg-dark);
+    box-shadow: 0 0 8px var(--highlight-paragraph-shadow-dark);
   }
 
   #legacy.night-mode .talking-paragraph {
-    background-color: rgba(80, 80, 110, 0.5);
-    border-left: 3px solid rgba(120, 130, 180, 0.8);
-    box-shadow: 0 0 15px rgba(100, 110, 160, 0.25);
+    background-color: var(--talking-paragraph-bg-dark);
+    border-left: 3px solid var(--talking-paragraph-border-dark);
+    box-shadow: 0 0 15px var(--talking-paragraph-shadow-dark);
   }
 
   #legacy.night-mode .talking-paragraph::after {
-    background: linear-gradient(90deg, rgba(120, 130, 180, 0) 0%, rgba(120, 130, 180, 0.1) 50%, rgba(120, 130, 180, 0) 100%);
+    background: linear-gradient(90deg, rgba(120, 130, 180, 0) 0%, var(--talking-paragraph-shimmer-dark) 50%, rgba(120, 130, 180, 0) 100%);
   }
 
   /* Add this rule for highlighting entities in the sidebar */
@@ -1696,14 +1738,14 @@
     transition:
       transform 0.2s ease-in-out,
       box-shadow 0.2s ease-in-out;
-    box-shadow: 0 0 20px rgba(120, 120, 120, 0.15);
+    box-shadow: 0 0 20px var(--entity-highlight-shadow-light);
     z-index: 100; /* Bring to front on hover */
   }
 
   .entity-note.highlighted-entity .entity-text-column {
-    background-color: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(74, 144, 226, 0.4);
-    box-shadow: 0 0 10px rgba(74, 144, 226, 0.1);
+    background-color: var(--entity-highlight-bg-light);
+    border: 1px solid var(--entity-highlight-border-light);
+    box-shadow: 0 0 10px var(--entity-highlight-shadow-accent-light);
     transition: all 0.2s ease-in-out;
   }
 
@@ -1718,22 +1760,22 @@
   }
 
   .entity-note.highlighted-talking-entity .entity-text-column {
-    background-color: rgba(230, 240, 255, 0.85);
-    border: 2px solid rgba(74, 144, 226, 0.6);
-    box-shadow: 0 0 15px rgba(74, 144, 226, 0.25);
+    background-color: var(--entity-talking-highlight-bg-light);
+    border: 2px solid var(--entity-talking-highlight-border-light);
+    box-shadow: 0 0 15px var(--entity-talking-highlight-shadow-light);
     transition: all 0.3s ease-in-out;
   }
 
   /* For dark mode */
   #legacy.night-mode .entity-note.highlighted-entity .entity-text-column {
-    background-color: rgba(60, 60, 70, 0.8);
-    border: 1px solid rgba(100, 150, 220, 0.5);
+    background-color: var(--entity-highlight-bg-dark);
+    border: 1px solid var(--entity-highlight-border-dark);
   }
 
   #legacy.night-mode .entity-note.highlighted-talking-entity .entity-text-column {
-    background-color: rgba(50, 60, 90, 0.9);
-    border: 2px solid rgba(100, 150, 220, 0.7);
-    box-shadow: 0 0 12px rgba(100, 150, 220, 0.25);
+    background-color: var(--entity-talking-highlight-bg-dark);
+    border: 2px solid var(--entity-talking-highlight-border-dark);
+    box-shadow: 0 0 12px var(--entity-talking-highlight-shadow-dark);
   }
 
   /* Scale the wrapper for the image within a highlighted talking entity */
@@ -1741,23 +1783,23 @@
     animation: pulseGlow 2s infinite ease-in-out;
     z-index: 10;
     border-radius: 50%;
-    box-shadow: 0 0 12px rgba(74, 144, 226, 0.4);
-    border: 2px solid rgba(74, 144, 226, 0.5);
+    box-shadow: 0 0 12px var(--entity-image-wrapper-shadow-light);
+    border: 2px solid var(--entity-image-wrapper-border-light);
   }
 
   /* Pulse animation for talking entities */
   @keyframes pulseGlow {
     0% {
       transform: scale(1.12);
-      box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+      box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
     }
     50% {
       transform: scale(1.15);
-      box-shadow: 0 0 15px rgba(74, 144, 226, 0.6);
+      box-shadow: 0 0 15px var(--entity-image-wrapper-shadow-max-light);
     }
     100% {
       transform: scale(1.12);
-      box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+      box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
     }
   }
 } /* End of #legacy scope */
@@ -1777,7 +1819,7 @@
     background-color: var(--bg-notes-light); /* Explicit base color */
   }
   50% {
-    background-color: rgba(74, 144, 226, 0.5); /* Stronger blue tint */
+    background-color: var(--highlight-blink-tint-light); /* Stronger blue tint */
   }
 }
 
@@ -1822,6 +1864,6 @@
 
 /* For dark mode */
 #legacy.night-mode .entity-note.highlighted-talking-entity .entity-image-wrapper {
-  box-shadow: 0 0 15px rgba(100, 150, 220, 0.4);
-  border: 2px solid rgba(100, 150, 220, 0.5);
+  box-shadow: 0 0 15px var(--entity-image-wrapper-shadow-dark);
+  border: 2px solid var(--entity-image-wrapper-border-dark);
 }
