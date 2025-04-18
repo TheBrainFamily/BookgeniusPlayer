@@ -216,7 +216,6 @@ export function createEditableEntity(entity: {
   const entityDiv = document.createElement("div");
   entityDiv.className = "entity-note";
   entityDiv.style.display = "flex";
-  entityDiv.style.marginBottom = "20px";
   entityDiv.style.gap = "15px";
   entityDiv.style.alignItems = "center";
   entityDiv.style.overflow = "visible"; // Allow overflow on the main container

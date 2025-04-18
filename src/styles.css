@@ -201,6 +201,7 @@
     display: flex;
     flex: 1;
     flex-direction: row;
+    justify-content: space-evenly;
     /* width: 100%; */
     position: relative;
     padding: 0 10px;
@@ -249,8 +250,6 @@
       mask-image: linear-gradient(to bottom, transparent 0%, black 30%, /* Start fading in */ black 70%, /* Start fading out */ transparent 100%);
       -webkit-mask-image: linear-gradient(/* Add vendor prefix for compatibility */ to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
       padding: 1em 2em; /* Overrides base padding */
-      margin-left: auto; /* Center the content */
-      margin-right: auto; /* Center the content */
       hyphens: auto;
       -webkit-hyphens: auto;
       -ms-hyphens: auto;
@@ -674,8 +673,7 @@
     display: flex;
     justify-content: center;
     height: 100vh;
-    margin: 20px;
-    margin-left: auto;
+    margin: 20px 5px 20px 0;
     flex: 1;
   }
 
@@ -1617,12 +1615,6 @@
     gap: 15px;
     overflow-y: scroll;
     cursor: default;
-    & > div {
-      background-color: var(--bg-notes-light);
-      box-shadow: 0 0 8px var(--shadow-light);
-      border-radius: 8px;
-      padding: 1.5rem;
-    }
   }
 
   /* Styles for the entity image wrapper */
