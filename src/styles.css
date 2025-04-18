@@ -122,18 +122,18 @@
   --talking-paragraph-shimmer-light: rgba(255, 215, 140, 0.1);
   
   --entity-highlight-shadow-light: rgba(120, 120, 120, 0.15);
-  --entity-highlight-bg-light: rgba(255, 255, 255, 0.7);
-  --entity-highlight-border-light: rgba(74, 144, 226, 0.4);
-  --entity-highlight-shadow-accent-light: rgba(74, 144, 226, 0.1);
+  --entity-highlight-bg-light: rgba(250, 239, 197, 0.7);
+  --entity-highlight-border-light: rgba(255, 215, 0, 0.4);
+  --entity-highlight-shadow-accent-light: rgba(255, 215, 0, 0.1);
   
-  --entity-talking-highlight-bg-light: rgba(230, 240, 255, 0.85);
-  --entity-talking-highlight-border-light: rgba(74, 144, 226, 0.6);
-  --entity-talking-highlight-shadow-light: rgba(74, 144, 226, 0.25);
+  --entity-talking-highlight-bg-light: rgba(250, 239, 197, 0.85);
+  --entity-talking-highlight-border-light: rgba(255, 215, 0, 0.6);
+  --entity-talking-highlight-shadow-light: rgba(255, 215, 0, 0.25);
   
-  --entity-image-wrapper-border-light: rgba(74, 144, 226, 0.5);
-  --entity-image-wrapper-shadow-light: rgba(74, 144, 226, 0.4);
-  --entity-image-wrapper-shadow-min-light: rgba(74, 144, 226, 0.3);
-  --entity-image-wrapper-shadow-max-light: rgba(74, 144, 226, 0.6);
+  --entity-image-wrapper-border-light: rgba(255, 215, 0, 0.5);
+  --entity-image-wrapper-shadow-light: rgba(255, 215, 0, 0.4);
+  --entity-image-wrapper-shadow-min-light: rgba(196, 176, 28, 0.3);
+  --entity-image-wrapper-shadow-max-light: rgba(196, 176, 28, 0.6);
   
   --highlight-blink-tint-light: rgba(74, 144, 226, 0.5);
   
@@ -633,6 +633,8 @@
   /* Container for entity notes - center content vertically */
   .entity-notes-container {
     display: flex;
+    flex-grow: 2;
+    justify-content: center;
     flex-direction: column;
     padding: 10px 0;
     gap: 15px;
@@ -1791,21 +1793,6 @@
     border: 2px solid var(--entity-image-wrapper-border-light);
   }
 
-  /* Pulse animation for talking entities */
-  @keyframes pulseGlow {
-    0% {
-      transform: scale(1.12);
-      box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
-    }
-    50% {
-      transform: scale(1.15);
-      box-shadow: 0 0 15px var(--entity-image-wrapper-shadow-max-light);
-    }
-    100% {
-      transform: scale(1.12);
-      box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
-    }
-  }
 } /* End of #legacy scope */
 
 /* Apply animation directly to the target section when the class is present */
@@ -1839,6 +1826,21 @@
     transform: scale(1.13);
   }
 }
+
+@keyframes pulseGlow {
+    0% {
+      transform: scale(1.12);
+      box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
+    }
+    50% {
+      transform: scale(1.15);
+      box-shadow: 0 0 15px var(--entity-image-wrapper-shadow-max-light);
+    }
+    100% {
+      transform: scale(1.12);
+      box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
+    }
+  }
 
 /* Base style for entity notes to help with transitions */
 .entity-note {
