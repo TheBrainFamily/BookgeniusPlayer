@@ -252,9 +252,11 @@
 
   #content-container {
     display: flex;
-    max-width: 900px;
     cursor: default;
-
+    max-width: 900px;
+    @media (max-width: 1900px) {
+      max-width: 700px;
+    }
     flex: 2;
     flex-direction: column;
     overflow-y: auto;
@@ -674,7 +676,10 @@
 
     #right-notes-scrollable-container {
       overflow-y: scroll;
-      max-width: 700px;
+      width: 700px;
+      @media (max-width: 1900px) {
+        width: 500px;
+      }
     }
 
     #right-notes-scrollable-container section {
@@ -1842,7 +1847,10 @@
 
 /* Base style for entity notes to help with transitions */
 .entity-note {
-  max-width: 700px;
+  width: 700px;
+  @media (max-width: 1900px) {
+    width: 500px;
+  }
   align-self: center;
   transform: scale(1);
   transition:
