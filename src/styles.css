@@ -239,12 +239,15 @@
       /* background-color: var(--bg-content-light); */
       background: linear-gradient(
         to bottom,
-        rgba(var(--bg-content-light-rgb), 0) 5%,
+        rgba(var(--bg-content-light-rgb), 0) 12%,
         rgba(var(--bg-content-light-rgb), 1) 40%,
         rgba(var(--bg-content-light-rgb), 1) 50%,
         rgba(var(--bg-content-light-rgb), 1) 60%,
-        rgba(var(--bg-content-light-rgb), 0) 95%
+        rgba(var(--bg-content-light-rgb), 0) 88%
       ); /* Gradient transparency: more transparent at edges, fully opaque in middle */
+      /* Add the mask for text fading */
+      mask-image: linear-gradient(to bottom, transparent 0%, black 30%, /* Start fading in */ black 70%, /* Start fading out */ transparent 100%);
+      -webkit-mask-image: linear-gradient(/* Add vendor prefix for compatibility */ to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
       padding: 1em 2em; /* Overrides base padding */
       margin-left: auto; /* Center the content */
       margin-right: auto; /* Center the content */
