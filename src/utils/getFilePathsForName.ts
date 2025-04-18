@@ -10,7 +10,7 @@ const knownMovingPictures = [
   "Nikotris",
   "Amenhotep",
   "Brat Ramzesa",
-  "Chłop Egipski",
+  "Chłop egipski",
   "Eunana",
   "Herhor",
   "Nikotris",

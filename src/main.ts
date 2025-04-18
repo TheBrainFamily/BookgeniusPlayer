@@ -3,7 +3,7 @@ import "./globals.css";
 
 import { isNightMode, setIsNightMode } from "@/src/helpers/setIsNightMode";
 import { getCurrentPage, goToNextPage, goToPage, goToPreviousPage, setCurrentPage } from "@/src/helpers/pagesNavigation";
-import { pagesToSkipFooterGeneration, romanNumeralPages } from "@/src/consts";
+import { pagesToSkipFooterGeneration, romanNumeralPages, BOOK_SLUGS } from "@/src/consts";
 import { isMobileCharactersVisible, toggleMobileCharacters } from "@/src/isMobileCharactersVisible";
 import { startReactComponents } from "./react-components";
 import { getCurrentBookSlug } from "./getCurrentBookSlug";
@@ -442,45 +442,82 @@ const dealWithAnnotations = ({
 };
 
 const legacyElement = document.getElementById("legacy");
+const videoElement = document.getElementById("bg-video");
 
 const dealWithBackground = ({ startChapter, startParagraph, endChapter, endParagraph }) => {
   const backgrounds = [
-    { startChapter: 1, startParagraph: 11, file: "background-army.png", endChapter: 1, endParagraph: 15 },
+    { startChapter: 1, startParagraph: 11, file: "moving-background.mp4", endChapter: 1, endParagraph: 20 },
+    { startChapter: 1, startParagraph: 21, file: "army.mp4", endChapter: 1, endParagraph: 40 },
     { startChapter: 3, startParagraph: 20, file: "background-sara.png", endChapter: 3, endParagraph: 30 },
     // Add more background definitions here if needed
   ];
 
   let backgroundApplied = false;
 
-  if (legacyElement) {
-    for (const background of backgrounds) {
-      if (
-        startChapter === background.startChapter &&
-        startParagraph <= background.endParagraph && // Check if start is before or at end
-        endChapter === background.endChapter &&
-        endParagraph >= background.startParagraph // Check if end is after or at start
-      ) {
-        console.log("setting background", background.file);
-        // Condition met: Set image on ::after and fade it in
+  for (const background of backgrounds) {
+    if (
+      startChapter === background.startChapter &&
+      startParagraph <= background.endParagraph &&
+      endChapter === background.endChapter &&
+      endParagraph >= background.startParagraph
+    ) {
+      console.log("GOZDECKI IS APPLYING BACKGROUND", background);
+      backgroundApplied = true;
+
+      if (background.file.endsWith(".mp4")) {
+        // Fade out ::after image
+        legacyElement.style.setProperty("--opacity-after", "0");
+
+        const newVideoSrc = `/Pharaon/${background.file}`;
+
+        if (videoElement.getAttribute("src") !== newVideoSrc) {
+          videoElement.style.opacity = "0"; // Fade out current video
+          setTimeout(
+            () => {
+              videoElement.src = newVideoSrc;
+              videoElement.load();
+              videoElement.play();
+              videoElement.style.opacity = "1"; // Fade in new video
+            },
+            parseFloat(getComputedStyle(videoElement).transitionDuration) * 1000,
+          );
+        } else {
+          videoElement.style.opacity = "1"; // Video already loaded
+        }
+      } else if (background.file.endsWith(".png")) {
+        // Fade out video
+        videoElement.style.opacity = "0";
+        setTimeout(
+          () => {
+            videoElement.pause();
+            videoElement.removeAttribute("src");
+          },
+          parseFloat(getComputedStyle(videoElement).transitionDuration) * 1000,
+        );
+
+        // Set new image and fade in
         const newImageUrl = `url("/Pharaon/${background.file}")`;
-        // Only update the image if it's different to potentially avoid unnecessary reflow
         if (legacyElement.style.getPropertyValue("--bg-image-after") !== newImageUrl) {
           legacyElement.style.setProperty("--bg-image-after", newImageUrl);
         }
-        // Fade in the ::after element
         legacyElement.style.setProperty("--opacity-after", "1");
-        backgroundApplied = true;
-        break; // Apply first matching background
       }
-    }
 
-    // If no specific background condition was met, revert to default by fading out ::after
-    if (!backgroundApplied) {
-      // Fade out the ::after element, revealing ::before (the default background)
-      legacyElement.style.setProperty("--opacity-after", "0");
-      // Note: We don't need to reset --bg-image-after immediately,
-      // it will be set next time a condition is met.
+      break; // First matching background handled
     }
+  }
+
+  // Default state: fade out ::after and video
+  if (!backgroundApplied) {
+    legacyElement.style.setProperty("--opacity-after", "0");
+    videoElement.style.opacity = "0";
+    setTimeout(
+      () => {
+        videoElement.pause();
+        videoElement.removeAttribute("src");
+      },
+      parseFloat(getComputedStyle(videoElement).transitionDuration) * 1000,
+    );
   }
 };
 
@@ -543,6 +580,8 @@ async function updateParagraphNotesInternal({
       leftNotes.appendChild(entityDiv);
     });
   }
+
+  activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
 }
 
 // Create or update the mobile character strip
@@ -1321,6 +1360,109 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
   }
 }
 
+function isAppearanceWithinRange(
+  appearance: { chapterNumber: number; paragraphNumber: number },
+  startChapter: number,
+  startParagraph: number,
+  endChapter?: number,
+  endParagraph?: number,
+): boolean {
+  const { chapterNumber, paragraphNumber } = appearance;
+
+  // If no end chapter/paragraph is defined, treat it as a single paragraph check
+  const effectiveEndChapter = endChapter === undefined ? startChapter : endChapter;
+  const effectiveEndParagraph = endParagraph === undefined ? startParagraph : endParagraph;
+
+  // Single chapter range
+  if (startChapter === effectiveEndChapter) {
+    // 10 49 10 1 true
+    return chapterNumber === startChapter && paragraphNumber >= startParagraph && paragraphNumber <= effectiveEndParagraph;
+  }
+
+  // Multi-chapter range cases:
+  // Case 1: Paragraphs in the start chapter, at or after startParagraph
+  if (chapterNumber === startChapter && paragraphNumber >= startParagraph) {
+    return true;
+  }
+  // Case 2: Paragraphs in chapters strictly between start and end chapters
+  if (chapterNumber > startChapter && chapterNumber < effectiveEndChapter) {
+    return true;
+  }
+  // Case 3: Paragraphs in the end chapter, at or before endParagraph
+  if (chapterNumber === effectiveEndChapter && paragraphNumber <= effectiveEndParagraph) {
+    return true;
+  }
+
+  return false; // Not in range
+}
+
+function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: string, endParagraph?: number, endChapter?: number, onlyTalking = false) {
+  const entityNotes = document.querySelectorAll<HTMLElement>("#left-notes .entity-note");
+  entityNotes.forEach((note) => {
+    const appearancesStr = note.dataset.appearances;
+    const canonicalName = note.dataset.canonicalName;
+    if (!appearancesStr || !canonicalName) return;
+
+    try {
+      const appearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[] = JSON.parse(appearancesStr);
+      let isInRange = false;
+      let isTalkingInRange = false;
+
+      // Check if any appearance falls within the specified range
+      for (const app of appearances) {
+        if (isAppearanceWithinRange(app, chapterNum, paragraphNum, endChapter, endParagraph)) {
+          isInRange = true;
+          if (app.isTalkingInParagraph) {
+            isTalkingInRange = true;
+            break; // Found talking in range, no need to check further appearances for this entity
+          } else {
+          }
+        } else {
+        }
+      }
+
+      note.classList.remove("highlighted-entity", "highlighted-talking-entity");
+      const imageElement = note.querySelector<HTMLImageElement>(".entity-image");
+
+      if (isTalkingInRange) {
+        note.classList.add("highlighted-talking-entity");
+        // Swap image to GIF if talking
+        if (imageElement && imageElement.dataset.originalSrc) {
+          const gifSrc = getMovingPictureFilePathForName(canonicalName, bookSlug as BOOK_SLUGS);
+          const currentSrcFilename = imageElement.src.split("/").pop();
+          const gifSrcFilename = gifSrc.split("/").pop();
+          if (currentSrcFilename !== gifSrcFilename) {
+            imageElement.src = gifSrc;
+          }
+        }
+      } else if (isInRange && !onlyTalking) {
+        note.classList.add("highlighted-entity");
+        // Ensure image is PNG if just mentioned (and was previously GIF)
+        if (imageElement && imageElement.dataset.originalSrc) {
+          const currentSrcFilename = imageElement.src.split("/").pop();
+          const originalSrcFilename = imageElement.dataset.originalSrc.split("/").pop();
+          if (currentSrcFilename !== originalSrcFilename) {
+            imageElement.src = imageElement.dataset.originalSrc;
+          }
+        }
+      } else {
+        // If not in range, or only showing talking entities and this one isn't talking in range
+        // console.log(`GOZDECKI NOT IN RANGE OR NOT TALKING IN RANGE FOR ${canonicalName}`);
+        // Ensure image is PNG if it was changed
+        if (imageElement && imageElement.dataset.originalSrc) {
+          const currentSrcFilename = imageElement.src.split("/").pop();
+          const originalSrcFilename = imageElement.dataset.originalSrc.split("/").pop();
+          if (currentSrcFilename !== originalSrcFilename) {
+            imageElement.src = imageElement.dataset.originalSrc;
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Error processing appearances for entity highlight:", e);
+    }
+  });
+}
+
 function setupParagraphHighlighting() {
   const contentContainer = document.getElementById("content-container");
   if (!contentContainer) return;
@@ -1340,57 +1482,7 @@ function setupParagraphHighlighting() {
       if (chapterNumber && paragraphNumber) {
         const chapterNum = parseInt(chapterNumber);
         const paragraphNum = parseInt(paragraphNumber);
-
-        const entityNotes = document.querySelectorAll<HTMLElement>("#left-notes .entity-note");
-        entityNotes.forEach((note) => {
-          const appearancesStr = note.dataset.appearances;
-          const canonicalName = note.dataset.canonicalName; // Get canonical name
-          if (!appearancesStr || !canonicalName) return;
-
-          try {
-            const appearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[] = JSON.parse(appearancesStr);
-            const match = appearances.find((app) => app.chapterNumber === chapterNum && app.paragraphNumber === paragraphNum);
-
-            note.classList.remove("highlighted-entity", "highlighted-talking-entity");
-            const imageElement = note.querySelector<HTMLImageElement>(".entity-image");
-
-            if (match) {
-              if (match.isTalkingInParagraph) {
-                note.classList.add("highlighted-talking-entity");
-                // Swap image to GIF if talking
-                if (imageElement && imageElement.dataset.originalSrc) {
-                  const gifSrc = getMovingPictureFilePathForName(canonicalName, bookSlug);
-                  const currentSrcFilename = imageElement.src.split("/").pop();
-                  const gifSrcFilename = gifSrc.split("/").pop();
-                  if (currentSrcFilename !== gifSrcFilename) {
-                    imageElement.src = gifSrc;
-                  }
-                }
-              } else {
-                note.classList.add("highlighted-entity");
-                // Ensure image is PNG if just mentioned (and was previously GIF)
-                if (imageElement && imageElement.dataset.originalSrc) {
-                  const currentSrcFilename = imageElement.src.split("/").pop();
-                  const originalSrcFilename = imageElement.dataset.originalSrc.split("/").pop();
-                  if (currentSrcFilename !== originalSrcFilename) {
-                    imageElement.src = imageElement.dataset.originalSrc;
-                  }
-                }
-              }
-            } else {
-              // If no match in this paragraph, ensure image is PNG if it was changed
-              if (imageElement && imageElement.dataset.originalSrc) {
-                const currentSrcFilename = imageElement.src.split("/").pop();
-                const originalSrcFilename = imageElement.dataset.originalSrc.split("/").pop();
-                if (currentSrcFilename !== originalSrcFilename) {
-                  imageElement.src = imageElement.dataset.originalSrc;
-                }
-              }
-            }
-          } catch (e) {
-            console.error("Error processing appearances for entity highlight:", e);
-          }
-        });
+        activateCharacters(chapterNum, paragraphNum, bookSlug);
       }
     }
   });
