@@ -560,100 +560,53 @@ async function updateParagraphNotesInternal({
       leftNotes.appendChild(entityDiv);
     });
   } else {
-    // --- Desktop Logic with Granular Animated Updates ---
-    const currentNotesMap = new Map<string, HTMLElement>();
-    const oldEntityContainer = leftNotes.querySelector<HTMLElement>(".entity-notes-container");
-    if (oldEntityContainer) {
-      oldEntityContainer.querySelectorAll<HTMLElement>(".entity-note").forEach((note) => {
-        const name = note.dataset.canonicalName;
-        if (name) {
-          currentNotesMap.set(name, note);
+    const oldEntityContainer = leftNotes.querySelector(".entity-notes-container");
+
+    // Function to create and animate the new container
+    const createAndAnimateNewContainer = () => {
+      const newEntityContainer = document.createElement("div");
+      newEntityContainer.className = "entity-notes-container";
+      // Opacity will be 0 by default due to the :not(.fade-in) CSS rule
+
+      characters.forEach((entity) => {
+        const entityDiv = createEditableEntity(entity);
+        newEntityContainer.appendChild(entityDiv);
+      });
+
+      leftNotes.appendChild(newEntityContainer);
+
+      // Apply staggered animation to items *within* the new container
+      const entityNotes = newEntityContainer.querySelectorAll(".entity-note");
+      entityNotes.forEach((note, index) => {
+        if (note instanceof HTMLElement) {
+          note.style.setProperty("--stagger-delay", `${index * 0.07}s`); // ~70ms delay
+          note.classList.add("sidebar-item-animate");
         }
       });
-    }
 
-    const newCharacterNames = new Set(characters.map((c) => c.canonicalName));
-    const currentCharacterNames = new Set(currentNotesMap.keys());
+      // Fade in the new container (using a minimal timeout)
+      setTimeout(() => {
+        newEntityContainer.classList.add("fade-in");
+        activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
+      }, 10);
+    };
 
-    const namesToRemove = [...currentCharacterNames].filter((name) => !newCharacterNames.has(name));
-    const namesToAdd = [...newCharacterNames].filter((name) => !currentCharacterNames.has(name));
-    const namesToKeep = [...currentCharacterNames].filter((name) => newCharacterNames.has(name));
-
-    const characterDataMap = new Map(characters.map((c) => [c.canonicalName, c]));
-
-    // 1. Handle Removals
-    namesToRemove.forEach((name) => {
-      const elementToRemove = currentNotesMap.get(name);
-      if (elementToRemove) {
-        elementToRemove.classList.add("fade-out");
-        elementToRemove.addEventListener(
-          "transitionend",
-          () => {
-            elementToRemove.remove();
-          },
-          { once: true },
-        );
-      }
-    });
-
-    // 2. Prepare list of final elements (kept + new)
-    const finalElements: { name: string; element: HTMLElement; isNew: boolean }[] = [];
-
-    namesToKeep.forEach((name) => {
-      const element = currentNotesMap.get(name);
-      if (element) {
-        // Ensure kept elements don't have lingering animation classes/styles
-        element.classList.remove("sidebar-item-animate", "fade-in", "fade-out");
-        element.style.opacity = "";
-        element.style.animationDelay = "";
-        finalElements.push({ name, element, isNew: false });
-      }
-    });
-
-    namesToAdd.forEach((name) => {
-      const data = characterDataMap.get(name);
-      if (data) {
-        const newElement = createEditableEntity(data);
-        newElement.style.opacity = "0"; // Start invisible for fade-in
-        finalElements.push({ name, element: newElement, isNew: true });
-      }
-    });
-
-    // 3. Sort final elements (e.g., alphabetically)
-    finalElements.sort((a, b) => a.name.localeCompare(b.name));
-
-    // 4. Ensure container exists and Render
-    let targetContainer = oldEntityContainer;
-    if (!targetContainer) {
-      targetContainer = document.createElement("div");
-      targetContainer.className = "entity-notes-container";
-      targetContainer.style.opacity = "0"; // Start container invisible if new
-      leftNotes.appendChild(targetContainer);
-      // Fade in the container itself only if it's brand new
-      setTimeout(() => targetContainer.classList.add("fade-in"), 10);
+    if (oldEntityContainer) {
+      // If old container exists, fade it out first, then create the new one
+      oldEntityContainer.classList.add("fade-out");
+      oldEntityContainer.addEventListener(
+        "transitionend",
+        () => {
+          oldEntityContainer.remove();
+          createAndAnimateNewContainer(); // Create new one AFTER old one is removed
+        },
+        { once: true },
+      );
     } else {
-      // Ensure existing container is visible if it wasn't (e.g., if it faded out previously)
-      targetContainer.classList.remove("fade-out");
-      targetContainer.classList.add("fade-in");
-      targetContainer.style.opacity = "1"; // Ensure opacity is set if relying on class
+      // If no old container, just create the new one directly
+      createAndAnimateNewContainer();
     }
-
-    // 5. Re-append elements in sorted order and apply animations to new ones
-    targetContainer.innerHTML = ""; // Clear existing content before appending sorted list
-    let staggerIndex = 0;
-    finalElements.forEach((item) => {
-      targetContainer.appendChild(item.element);
-      if (item.isNew) {
-        // Apply animation class and delay
-        item.element.classList.add("sidebar-item-animate");
-        item.element.style.setProperty("--stagger-delay", `${staggerIndex * 0.07}s`);
-        // Trigger fade-in (opacity is handled by the animation keyframes)
-        staggerIndex++;
-      }
-    });
   }
-
-  activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
 }
 
 // Create or update the mobile character strip
