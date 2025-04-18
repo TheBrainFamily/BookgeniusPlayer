@@ -1892,7 +1892,8 @@
   transform: scale(1);
   transition:
     transform 0.3s ease-in-out,
-    box-shadow 0.3s ease-in-out;
+    box-shadow 0.3s ease-in-out,
+    opacity 0.3s ease-out; /* Add opacity transition */
   position: relative;
   z-index: 1;
 }

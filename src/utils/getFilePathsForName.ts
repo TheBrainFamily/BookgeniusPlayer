@@ -20,6 +20,8 @@ const knownMovingPictures = [
   "Ramzes XII",
   "Tutmozis",
 ];
+
+const knownEmotionalPictures = [];
 export const getPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
   if (knownMovingPictures.includes(name)) {
     return `./public/${bookSlug}/${name.toLowerCase().replace(" ", "-")}-listens.gif`;

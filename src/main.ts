@@ -520,6 +520,8 @@ const dealWithBackground = ({ startChapter, startParagraph, endChapter, endParag
     );
   }
 };
+let previousCharacters: string[] = [];
+let isUpdatingNotes = false; // Flag to prevent overlapping updates
 
 async function updateParagraphNotesInternal({
   startChapter,
@@ -537,15 +539,32 @@ async function updateParagraphNotesInternal({
   const leftNotes = document.getElementById("left-notes");
   if (!leftNotes) return;
 
-  // Use the pure version in development mode, otherwise use the regular version
   const paragraphs =
     import.meta.env.VITE_DEVELOPMENT === "true"
       ? await getParagraphRangePure({ bookSlug: getCurrentBookSlug(), startChapter: startChapter, startParagraph, endChapter: endChapter, endParagraph })
       : await getParagraphRange({ bookSlug: getCurrentBookSlug(), startChapter: startChapter, startParagraph, endChapter: endChapter, endParagraph });
-  const characters = parseParagraphRange(paragraphs);
-  console.log("characters", characters);
+  const currentCharactersData = parseParagraphRange(paragraphs);
+  console.log("characters", currentCharactersData);
 
+  const newCharacterNames = currentCharactersData.map((c) => c.canonicalName).sort(); // Sort for comparison
+  const sortedPreviousCharacters = [...previousCharacters].sort(); // Sort previous too
+
+  // Check if character list is identical (after sorting)
+  if (newCharacterNames.length === sortedPreviousCharacters.length && newCharacterNames.every((c, index) => c === sortedPreviousCharacters[index])) {
+    console.log("No change to characters, skipping notes update.");
+    // Even if list is same, activation might need update if range changed
+    activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
+    return;
+  } else {
+    console.log("Changes detected in characters.");
+  }
+
+  // --- Mobile logic remains unchanged ---
   if (isMobile()) {
+    // ... (keep existing mobile code)
+    // ... remember to update previousCharacters for mobile too
+    previousCharacters = newCharacterNames; // Update cache for next comparison
+    // ... (rest of mobile code)
     const notesTitle = `Notes for Ch ${startChapter}:${startParagraph} to Ch ${endChapter}:${endParagraph}`;
     const closeButton = `<button class="close-notes-button">&times;</button>`;
     leftNotes.innerHTML = `<h3>${notesTitle}</h3>${closeButton}`;
@@ -553,59 +572,176 @@ async function updateParagraphNotesInternal({
     if (closeBtn) {
       closeBtn.addEventListener("click", toggleMobileNotes);
     }
-    createMobileCharacterStrip(characters);
+    createMobileCharacterStrip(currentCharactersData);
 
-    characters.forEach((entity) => {
+    currentCharactersData.forEach((entity) => {
       const entityDiv = createEditableEntity(entity);
       leftNotes.appendChild(entityDiv);
     });
+    activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
   } else {
-    const oldEntityContainer = leftNotes.querySelector(".entity-notes-container");
+    // --- Desktop Logic ---
+    if (isUpdatingNotes) {
+      console.log("Notes update already in progress, skipping.");
+      return; // Don't start a new update if one is ongoing
+    }
+    isUpdatingNotes = true; // Set flag
 
-    // Function to create and animate the new container
+    // Find differences
+    const addedNames = newCharacterNames.filter((name) => !sortedPreviousCharacters.includes(name));
+    const removedNames = sortedPreviousCharacters.filter((name) => !newCharacterNames.includes(name));
+
+    const container = leftNotes.querySelector<HTMLElement>(".entity-notes-container");
+
+    // --- Optimized Case: Single Character Added, None Removed ---
+    if (addedNames.length === 1 && removedNames.length === 0 && container) {
+      console.log("Optimized Update: Single character added -", addedNames[0]);
+      const addedCharacterData = currentCharactersData.find((c) => c.canonicalName === addedNames[0]);
+
+      if (addedCharacterData) {
+        const existingNotes = Array.from(container.querySelectorAll<HTMLElement>(".entity-note"));
+
+        // 1. FIRST: Record initial positions
+        const firstPositions = new Map<HTMLElement, DOMRect>();
+        existingNotes.forEach((note) => {
+          firstPositions.set(note, note.getBoundingClientRect());
+        });
+
+        // Create new element and add it (initially invisible)
+        const newEntityDiv = createEditableEntity(addedCharacterData);
+        newEntityDiv.style.opacity = "0";
+        newEntityDiv.style.transition = "none"; // Ensure no transition initially
+        container.appendChild(newEntityDiv);
+
+        // Update the cache *before* the next check
+        previousCharacters = newCharacterNames;
+
+        // 2. LAST: Wait for layout, then record final positions
+        requestAnimationFrame(() => {
+          const lastPositions = new Map<HTMLElement, DOMRect>();
+          const allNotes = Array.from(container.querySelectorAll<HTMLElement>(".entity-note")); // Get all including new
+          allNotes.forEach((note) => {
+            lastPositions.set(note, note.getBoundingClientRect());
+          });
+
+          // 3. INVERT: Apply transforms to old elements
+          existingNotes.forEach((note) => {
+            const firstRect = firstPositions.get(note);
+            const lastRect = lastPositions.get(note);
+            if (firstRect && lastRect) {
+              const deltaX = firstRect.left - lastRect.left;
+              const deltaY = firstRect.top - lastRect.top;
+              if (deltaX !== 0 || deltaY !== 0) {
+                note.style.transition = "none"; // Disable transitions during inversion
+                note.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+              }
+            }
+          });
+
+          // 4. PLAY: Animate in the next frame/tick
+          requestAnimationFrame(() => {
+            existingNotes.forEach((note) => {
+              note.style.transition = "transform 0.3s ease-out"; // Enable transform transition
+              note.style.transform = ""; // Animate to natural position
+            });
+
+            // Fade in the new element by setting transition THEN opacity
+            newEntityDiv.style.transition = "opacity 0.3s ease-out"; // Set the transition property first
+            requestAnimationFrame(() => {
+              // Wait for the next frame to apply opacity change
+              newEntityDiv.style.opacity = "1"; // Now change opacity to trigger the fade-in
+            });
+
+            // Clean up transitions after animation (optional but good practice)
+            setTimeout(() => {
+              existingNotes.forEach((note) => {
+                note.style.transition = "";
+              });
+              newEntityDiv.style.transition = ""; // Also clean up the new div's transition
+            }, 350);
+
+            // Activate characters state after animation starts
+            activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
+            // Unset flag after FLIP animation completes
+            setTimeout(() => {
+              isUpdatingNotes = false;
+            }, 350);
+          });
+        });
+        return; // Exit after handling optimized case
+      }
+      // If addedCharacterData is null, fall through to fallback, but first unset the flag
+      isUpdatingNotes = false;
+    }
+
+    // --- Optimized Case: Single Character Removed (First or Last) ---
+    else if (addedNames.length === 0 && removedNames.length === 1 && container) {
+      const removedName = removedNames[0];
+      const existingNotes = Array.from(container.querySelectorAll<HTMLElement>(".entity-note"));
+      const noteToRemove = existingNotes.find((note) => note.dataset.canonicalName === removedName);
+      const isFirst = noteToRemove === existingNotes[0];
+      const isLast = noteToRemove === existingNotes[existingNotes.length - 1];
+
+      if (noteToRemove && (isFirst || isLast)) {
+        console.log(`Optimized Update: Fading out ${isFirst ? "first" : "last"} character - ${removedName}`);
+        isUpdatingNotes = true; // Set flag for this specific animation
+
+        noteToRemove.classList.add("fade-out");
+        setTimeout(() => {
+          if (document.body.contains(noteToRemove)) {
+            console.log(`Removing faded-out note via setTimeout: ${removedName}`);
+            noteToRemove.remove();
+          }
+          isUpdatingNotes = false; // Unset flag after timeout
+        }, 350); // Match transition duration + buffer
+
+        previousCharacters = newCharacterNames; // Update cache to reflect target state
+        activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
+        return; // Exit after handling optimized case
+      }
+      // If not first/last, fall through to fallback
+      isUpdatingNotes = false; // Reset flag if this specific optimisation didn't run
+    }
+
+    // --- Fallback Case: Multiple changes or no existing container ---
+    console.log("Fallback Update: Replacing entire notes container.");
+    const oldEntityContainer = leftNotes.querySelector<HTMLElement>(".entity-notes-container");
+
+    // Function to create and animate the new container (modified slightly)
     const createAndAnimateNewContainer = () => {
       const newEntityContainer = document.createElement("div");
       newEntityContainer.className = "entity-notes-container";
-      // Opacity will be 0 by default due to the :not(.fade-in) CSS rule
-
-      characters.forEach((entity) => {
+      currentCharactersData.forEach((entity) => {
         const entityDiv = createEditableEntity(entity);
         newEntityContainer.appendChild(entityDiv);
       });
-
       leftNotes.appendChild(newEntityContainer);
-
-      // Apply staggered animation to items *within* the new container
       const entityNotes = newEntityContainer.querySelectorAll(".entity-note");
       entityNotes.forEach((note, index) => {
         if (note instanceof HTMLElement) {
-          note.style.setProperty("--stagger-delay", `${index * 0.07}s`); // ~70ms delay
+          note.style.setProperty("--stagger-delay", `${index * 0.07}s`);
           note.classList.add("sidebar-item-animate");
         }
       });
-
-      // Fade in the new container (using a minimal timeout)
       setTimeout(() => {
         newEntityContainer.classList.add("fade-in");
         activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
+        // Unset the flag after the fade-in duration
+        setTimeout(() => {
+          isUpdatingNotes = false;
+        }, 300); // Match fade-in duration
       }, 10);
+      previousCharacters = newCharacterNames;
     };
 
+    // **Immediate Removal** in fallback
     if (oldEntityContainer) {
-      // If old container exists, fade it out first, then create the new one
-      oldEntityContainer.classList.add("fade-out");
-      oldEntityContainer.addEventListener(
-        "transitionend",
-        () => {
-          oldEntityContainer.remove();
-          createAndAnimateNewContainer(); // Create new one AFTER old one is removed
-        },
-        { once: true },
-      );
-    } else {
-      // If no old container, just create the new one directly
-      createAndAnimateNewContainer();
+      console.log("Immediately removing old container in fallback.");
+      oldEntityContainer.remove(); // Remove instantly, cancelling any transition/listener
     }
+
+    // Always create the new container after potentially removing the old one
+    createAndAnimateNewContainer();
   }
 }
 
