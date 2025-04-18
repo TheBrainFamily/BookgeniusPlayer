@@ -617,7 +617,6 @@
     flex: 1;
     flex-direction: column;
     justify-content: center;
-    max-width: 700px;
     transition: all var(--transition-medium) var(--transition-timing);
     line-height: 1.4;
     font-size: 1rem;
@@ -1745,9 +1744,6 @@
     transform: scale(1.1);
     transition:
       transform 0.2s ease-in-out,
-      box-shadow 0.2s ease-in-out;
-    box-shadow: 0 0 20px var(--entity-highlight-shadow-light);
-    z-index: 100; /* Bring to front on hover */
   }
 
   .entity-note.highlighted-entity .entity-text-column {
@@ -1846,6 +1842,8 @@
 
 /* Base style for entity notes to help with transitions */
 .entity-note {
+  max-width: 700px;
+  align-self: center;
   transform: scale(1);
   transition:
     transform 0.3s ease-in-out,
