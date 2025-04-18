@@ -553,32 +553,58 @@ async function updateParagraphNotesInternal({
     if (closeBtn) {
       closeBtn.addEventListener("click", toggleMobileNotes);
     }
-  } else {
-    leftNotes.innerHTML = ``;
-  }
-
-  if (isMobile()) {
     createMobileCharacterStrip(characters);
-  }
 
-  // Create a container for entity notes if not mobile
-  if (!isMobile()) {
-    const entityContainer = document.createElement("div");
-    entityContainer.className = "entity-notes-container";
-    leftNotes.appendChild(entityContainer);
-
-    // prepare all notes in the notes panel
-    characters.forEach((entity) => {
-      // Create editable entity div instead of static one
-      const entityDiv = createEditableEntity(entity);
-      entityContainer.appendChild(entityDiv);
-    });
-  } else {
-    // On mobile, add directly to leftNotes
     characters.forEach((entity) => {
       const entityDiv = createEditableEntity(entity);
       leftNotes.appendChild(entityDiv);
     });
+  } else {
+    const oldEntityContainer = leftNotes.querySelector(".entity-notes-container");
+
+    // Function to create and animate the new container
+    const createAndAnimateNewContainer = () => {
+      const newEntityContainer = document.createElement("div");
+      newEntityContainer.className = "entity-notes-container";
+      // Opacity will be 0 by default due to the :not(.fade-in) CSS rule
+
+      characters.forEach((entity) => {
+        const entityDiv = createEditableEntity(entity);
+        newEntityContainer.appendChild(entityDiv);
+      });
+
+      leftNotes.appendChild(newEntityContainer);
+
+      // Apply staggered animation to items *within* the new container
+      const entityNotes = newEntityContainer.querySelectorAll(".entity-note");
+      entityNotes.forEach((note, index) => {
+        if (note instanceof HTMLElement) {
+          note.style.setProperty("--stagger-delay", `${index * 0.07}s`); // ~70ms delay
+          note.classList.add("sidebar-item-animate");
+        }
+      });
+
+      // Fade in the new container (using a minimal timeout)
+      setTimeout(() => {
+        newEntityContainer.classList.add("fade-in");
+      }, 10);
+    };
+
+    if (oldEntityContainer) {
+      // If old container exists, fade it out first, then create the new one
+      oldEntityContainer.classList.add("fade-out");
+      oldEntityContainer.addEventListener(
+        "transitionend",
+        () => {
+          oldEntityContainer.remove();
+          createAndAnimateNewContainer(); // Create new one AFTER old one is removed
+        },
+        { once: true },
+      );
+    } else {
+      // If no old container, just create the new one directly
+      createAndAnimateNewContainer();
+    }
   }
 
   activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);

@@ -11,8 +11,8 @@ declare global {
 }
 
 // Define dummy types to resolve linter errors (replace with actual imports/definitions later)
-type EntityDefinition = { name: string; imageUrl: string };
-type IEntityNote = { entity: string; canonicalName: string; summary: string; imageUrl: string };
+// type EntityDefinition = { name: string; imageUrl: string }; // Removed unused type
+// type IEntityNote = { entity: string; canonicalName: string; summary: string; imageUrl: string }; // Removed unused type
 
 export const isEditActive = () => {
   return document.querySelector(".edit-container") !== null;
@@ -450,7 +450,7 @@ export function createEditableEntity(entity: {
       if (!appearancesStr) return;
       const appearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[] = JSON.parse(appearancesStr);
 
-      appearances.forEach(({ chapterNumber, paragraphNumber, isTalkingInParagraph }) => {
+      appearances.forEach(({ chapterNumber, paragraphNumber }) => {
         const targetParagraph = document.querySelector<HTMLElement>(`section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`);
         if (targetParagraph) {
           targetParagraph.classList.remove("highlighted-paragraph", "talking-paragraph");
@@ -606,10 +606,6 @@ export function createAddCharacterButton(
 
         characterCard.addEventListener("click", async () => {
           modal.style.display = "none";
-
-          const entityDef: EntityDefinition = { name, imageUrl };
-
-          const entityNote: Partial<IEntityNote> = { entity: name, canonicalName: name, summary: `Character description for ${name}`, imageUrl };
 
           throw new Error("Not implemented adding entity note yet!");
           // Refresh the notes panel to show the new character

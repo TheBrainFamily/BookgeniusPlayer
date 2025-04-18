@@ -1110,8 +1110,11 @@
     z-index: 40; /* Below toggle buttons */
     -webkit-overflow-scrolling: touch;
     transform: translateX(0);
-    transition: transform var(--transition-slow) var(--transition-timing-cubic);
-    will-change: transform;
+    opacity: 1; /* Start visible for transition */
+    transition:
+      transform var(--transition-slow) var(--transition-timing-cubic),
+      opacity var(--transition-slow) var(--transition-timing-cubic);
+    will-change: transform, opacity; /* Hint browser about changes */
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-perspective: 1000;
@@ -1119,6 +1122,8 @@
 
     &.hidden {
       transform: translateX(-100%);
+      opacity: 0;
+      pointer-events: none; /* Prevent interaction when hidden */
     }
   }
 
@@ -1173,8 +1178,11 @@
     z-index: 40; /* Same level as vertical strip */
     -webkit-overflow-scrolling: touch;
     transform: translateY(0);
-    transition: transform var(--transition-medium) var(--transition-timing);
-    will-change: transform;
+    opacity: 1; /* Start visible for transition */
+    transition:
+      transform var(--transition-medium) var(--transition-timing),
+      opacity var(--transition-medium) var(--transition-timing);
+    will-change: transform, opacity;
     white-space: nowrap; /* Keep items in a line */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE/Edge */
@@ -1184,6 +1192,8 @@
 
     &.hidden {
       transform: translateY(100%);
+      opacity: 0;
+      pointer-events: none; /* Prevent interaction when hidden */
     }
   }
 
@@ -1458,13 +1468,17 @@
       border-radius: 0;
       z-index: 50; /* Above overlay, strips, toggles */
       transform: translateX(100%); /* Offscreen to the right */
+      opacity: 0; /* Start hidden */
       box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
-      /* background-color: white; */ /* Replaced by rgba below */
       background-color: rgba(var(--bg-light-rgb), 0.9); /* Use transparent light mode bg */
-      transition: transform var(--transition-medium) var(--transition-timing-cubic);
+      transition:
+        transform var(--transition-medium) var(--transition-timing-cubic),
+        opacity var(--transition-medium) var(--transition-timing-cubic);
+      will-change: transform, opacity;
 
       &.active {
         transform: translateX(0); /* Slide in */
+        opacity: 1;
       }
     }
     &.night-mode .notes-container {
@@ -1903,4 +1917,73 @@
 #legacy.night-mode .entity-note.highlighted-talking-entity .entity-image-wrapper {
   box-shadow: 0 0 15px var(--entity-image-wrapper-shadow-dark);
   border: 2px solid var(--entity-image-wrapper-border-dark);
+}
+
+/* ============================================ */
+/* Animation Keyframes & Classes      */
+/* ============================================ */
+
+/* Staggered Fade-Up for Sidebar Items */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply this class via JS to items for staggered animation */
+.sidebar-item-animate {
+  opacity: 0; /* Start hidden before animation */
+  animation: fadeUp 0.4s ease-out forwards;
+  /* Set --stagger-delay via JS */
+  animation-delay: var(--stagger-delay, 0s);
+}
+
+/* Skeleton Loader Styles */
+.skeleton {
+  background-color: #eee; /* Base color */
+  background-image: linear-gradient(90deg, #eee 0px, #f5f5f5 40px, #eee 80px);
+  background-size: 200px 100%; /* Adjust size for desired shimmer width */
+  height: 1.5em; /* Example height */
+  margin-bottom: 0.5em; /* Example spacing */
+  border-radius: 4px;
+  animation: shimmer 1.5s infinite linear;
+}
+
+#legacy.night-mode .skeleton {
+  background-color: #333;
+  background-image: linear-gradient(90deg, #333 0px, #444 40px, #333 80px);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  } /* Ensure shimmer moves fully across */
+}
+
+/* ============================================ */
+/* Fade In/Out Classes for Container Transitions */
+/* ============================================ */
+
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+  pointer-events: none; /* Prevent interaction during fade-out */
+}
+
+/* Initially hide elements meant to fade in */
+.entity-notes-container:not(.fade-in) {
+  opacity: 0;
 }
