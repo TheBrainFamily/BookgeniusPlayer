@@ -1183,6 +1183,7 @@ function handleSwipe() {
 }
 
 let scrollDebounce: string | number | NodeJS.Timeout;
+let isScrolling = false;
 // Start the initialization process
 initPage()
   .catch((error) => {
@@ -1194,7 +1195,10 @@ initPage()
     // Add scroll event listener to update notes based on visible pages
     document.getElementById("content-container")?.addEventListener("scroll", () => {
       if (scrollDebounce) clearTimeout(scrollDebounce);
-      scrollDebounce = setTimeout(() => {}, 400);
+      isScrolling = true;
+      scrollDebounce = setTimeout(() => {
+        isScrolling = false;
+      }, 400);
     });
   });
 // Add the characters-hidden class to body initially if the character strip is hidden
@@ -1323,6 +1327,7 @@ function setupParagraphHighlighting() {
   const bookSlug = getCurrentBookSlug(); // Get book slug once
 
   contentContainer.addEventListener("mouseover", (event) => {
+    if (isScrolling) return;
     const target = event.target as HTMLElement;
     const paragraph = target.closest<HTMLElement>("section[data-chapter] [data-index]");
     if (paragraph) {
@@ -1391,6 +1396,7 @@ function setupParagraphHighlighting() {
   });
 
   contentContainer.addEventListener("mouseout", (event) => {
+    if (isScrolling) return;
     const target = event.target as HTMLElement;
     const paragraph = target.closest<HTMLElement>("section[data-chapter] p[data-index]");
 
