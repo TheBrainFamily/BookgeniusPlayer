@@ -113,11 +113,11 @@
   --spinner-bg: #f3f3f3;
   --spinner-color: #3498db;
 
-  /* Entity Highlighting Colors - Light Mode */
-  --highlight-paragraph-bg-light: rgba(255, 250, 230, 0.5);
+  /* Highlighting Colors - Light Mode */
+  --highlight-paragraph-bg-light: rgba(94, 144, 186, 0.2);
   --highlight-paragraph-shadow-light: rgba(255, 220, 160, 0.2);
-  --talking-paragraph-bg-light: rgba(255, 240, 200, 0.6);
-  --talking-paragraph-border-light: rgba(255, 190, 100, 0.8);
+  --talking-paragraph-bg-light: rgba(41, 133, 204, 0.2);
+  --talking-paragraph-border-light: rgba(41, 133, 204, 0.8);
   --talking-paragraph-shadow-light: rgba(255, 200, 100, 0.25);
   --talking-paragraph-shimmer-light: rgba(255, 215, 140, 0.1);
   
@@ -1685,7 +1685,15 @@
   .talking-paragraph {
     background-color: var(--talking-paragraph-bg-light);
     position: relative;
-    border-left: 3px solid var(--talking-paragraph-border-light);
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background-color: var(--talking-paragraph-border-light);
+    }
     border-radius: 4px;
     box-shadow: 0 0 15px var(--talking-paragraph-shadow-light);
     margin-left: -0.3em;
