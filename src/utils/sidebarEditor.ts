@@ -242,46 +242,56 @@ export function createEditableEntity(entity: {
   textColumn.style.flex = "2";
 
   // Entity image in left column
-  let imageElement: HTMLImageElement | null = null; // Declare imageElement here
-  const bookSlug = getCurrentBookSlug(); // Get book slug once
+  let mediaElement: HTMLImageElement | HTMLVideoElement | null = null;
+  const bookSlug = getCurrentBookSlug();
 
   if (entity.imageUrl) {
     const imageWrapper = document.createElement("div");
     imageWrapper.className = "entity-image-wrapper";
-    imageWrapper.style.width = "100%"; // Or a fixed size if preferred
+    imageWrapper.style.width = "100%";
     imageWrapper.style.aspectRatio = "1 / 1";
     imageWrapper.style.borderRadius = "50%";
     imageWrapper.style.overflow = "hidden";
     imageWrapper.style.cursor = "pointer";
-    imageWrapper.style.position = "relative"; // Needed for potential future additions like edit icons
+    imageWrapper.style.position = "relative";
     imageWrapper.style.zIndex = "1";
 
-    imageElement = document.createElement("img"); // Assign here
     const originalSrc = entity.imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, bookSlug) : entity.imageUrl;
-    imageElement.src = originalSrc;
-    imageElement.dataset.originalSrc = originalSrc; // Store original source
-    imageElement.alt = entity.canonicalName;
-    imageElement.className = "entity-image";
-    imageElement.style.width = "100%"; // Make image fill the wrapper
-    imageElement.style.height = "100%"; // Make image fill the wrapper
-    imageElement.style.display = "block"; // Ensure block display
-    imageElement.style.objectFit = "cover";
-    // No border-radius or aspect-ratio needed here anymore, handled by wrapper
 
-    // Store character data in dataset for use in click handler (can remain on image or move to wrapper)
-    imageElement.dataset.characterName = entity.canonicalName;
-    imageElement.dataset.summary = entity.summary?.replace(/\\n\\n/g, "<br/>").replace(/\\n/g, "<br/>") || "";
+    const isVideo = originalSrc.endsWith(".mp4") || originalSrc.endsWith(".webm");
 
-    // Add click event to wrapper to show details modal
+    if (isVideo) {
+      // Handle video avatars
+      mediaElement = document.createElement("video");
+      mediaElement.src = originalSrc;
+      mediaElement.autoplay = true;
+      mediaElement.loop = true;
+      mediaElement.muted = true;
+      mediaElement.playsInline = true;
+    } else {
+      // Handle image avatars
+      mediaElement = document.createElement("img");
+      mediaElement.src = originalSrc;
+      mediaElement.alt = entity.canonicalName;
+    }
+
+    mediaElement.dataset.originalSrc = originalSrc;
+    mediaElement.className = "entity-image";
+    mediaElement.style.width = "100%";
+    mediaElement.style.height = "100%";
+    mediaElement.style.display = "block";
+    mediaElement.style.objectFit = "cover";
+
+    mediaElement.dataset.characterName = entity.canonicalName;
+    mediaElement.dataset.summary = entity.summary?.replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>") || "";
+
     imageWrapper.addEventListener("click", () => {
-      if (typeof window.showCharacterDetailsModal === "function" && imageElement) {
-        // Check imageElement exists
-        window.showCharacterDetailsModal(entity.canonicalName, imageElement.src, entity.summary || "");
+      if (typeof window.showCharacterDetailsModal === "function" && mediaElement) {
+        window.showCharacterDetailsModal(entity.canonicalName, mediaElement.src, entity.summary || "");
       }
     });
 
-    // Append image to the wrapper, and wrapper to the column
-    imageWrapper.appendChild(imageElement);
+    imageWrapper.appendChild(mediaElement);
     imageColumn.appendChild(imageWrapper);
   }
 

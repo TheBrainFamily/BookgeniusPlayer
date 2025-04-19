@@ -15,6 +15,7 @@ import { getParagraphRange, getParagraphRangePure, ParsedParagraphRange, parsePa
 import { getSavedLocation, goToParagraph, setCurrentLocation } from "./helpers/paragraphsNavigation";
 import { initializeNoteLinkBlinking, setupNoteLinkBlinking } from "./annotationsHandling";
 import { getPictureFilePathForName, getMovingPictureFilePathForName } from "./utils/getFilePathsForName";
+import { knownMovingPictures } from "./utils/getFilePathsForName";
 
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
@@ -270,8 +271,8 @@ function setupPageObserver() {
     // 2. Determine the elements within the "focus zone" (30%-60% vertically)
     if (intersectingPages.size > 0) {
       const rootRect = rootElement.getBoundingClientRect();
-      const focusZoneTop = rootRect.top + rootRect.height * 0.25;
-      const focusZoneBottom = rootRect.top + rootRect.height * 0.65;
+      const focusZoneTop = rootRect.top + rootRect.height * 0.05;
+      const focusZoneBottom = rootRect.top + rootRect.height * 0.45;
 
       // Filter intersecting pages to find those overlapping the focus zone
       const focusedPages = Array.from(intersectingPages).filter((element) => {
@@ -446,9 +447,10 @@ const videoElement = document.getElementById("bg-video");
 
 const dealWithBackground = ({ startChapter, startParagraph, endChapter, endParagraph }) => {
   const backgrounds = [
-    { startChapter: 1, startParagraph: 11, file: "moving-background.mp4", endChapter: 1, endParagraph: 20 },
-    { startChapter: 1, startParagraph: 21, file: "army.mp4", endChapter: 1, endParagraph: 40 },
-    { startChapter: 3, startParagraph: 20, file: "background-sara.png", endChapter: 3, endParagraph: 30 },
+    { startChapter: 1, startParagraph: 1, file: "background.png", endChapter: 1, endParagraph: 10 },
+    { startChapter: 1, startParagraph: 11, file: "moving-background.mp4", endChapter: 1, endParagraph: 109 },
+    { startChapter: 2, startParagraph: 1, file: "army.mp4", endChapter: 2, endParagraph: 40 },
+    { startChapter: 3, startParagraph: 15, file: "background-sara.png", endChapter: 3, endParagraph: 80 },
     // Add more background definitions here if needed
   ];
 
@@ -594,114 +596,114 @@ async function updateParagraphNotesInternal({
     const container = leftNotes.querySelector<HTMLElement>(".entity-notes-container");
 
     // --- Optimized Case: Single Character Added, None Removed ---
-    if (addedNames.length === 1 && removedNames.length === 0 && container) {
-      console.log("Optimized Update: Single character added -", addedNames[0]);
-      const addedCharacterData = currentCharactersData.find((c) => c.canonicalName === addedNames[0]);
+    // if (addedNames.length === 1 && removedNames.length === 0 && container) {
+    //   console.log("Optimized Update: Single character added -", addedNames[0]);
+    //   const addedCharacterData = currentCharactersData.find((c) => c.canonicalName === addedNames[0]);
 
-      if (addedCharacterData) {
-        const existingNotes = Array.from(container.querySelectorAll<HTMLElement>(".entity-note"));
+    //   if (addedCharacterData) {
+    //     const existingNotes = Array.from(container.querySelectorAll<HTMLElement>(".entity-note"));
 
-        // 1. FIRST: Record initial positions
-        const firstPositions = new Map<HTMLElement, DOMRect>();
-        existingNotes.forEach((note) => {
-          firstPositions.set(note, note.getBoundingClientRect());
-        });
+    //     // 1. FIRST: Record initial positions
+    //     const firstPositions = new Map<HTMLElement, DOMRect>();
+    //     existingNotes.forEach((note) => {
+    //       firstPositions.set(note, note.getBoundingClientRect());
+    //     });
 
-        // Create new element and add it (initially invisible)
-        const newEntityDiv = createEditableEntity(addedCharacterData);
-        newEntityDiv.style.opacity = "0";
-        newEntityDiv.style.transition = "none"; // Ensure no transition initially
-        container.appendChild(newEntityDiv);
+    //     // Create new element and add it (initially invisible)
+    //     const newEntityDiv = createEditableEntity(addedCharacterData);
+    //     newEntityDiv.style.opacity = "0";
+    //     newEntityDiv.style.transition = "none"; // Ensure no transition initially
+    //     container.appendChild(newEntityDiv);
 
-        // Update the cache *before* the next check
-        previousCharacters = newCharacterNames;
+    //     // Update the cache *before* the next check
+    //     previousCharacters = newCharacterNames;
 
-        // 2. LAST: Wait for layout, then record final positions
-        requestAnimationFrame(() => {
-          const lastPositions = new Map<HTMLElement, DOMRect>();
-          const allNotes = Array.from(container.querySelectorAll<HTMLElement>(".entity-note")); // Get all including new
-          allNotes.forEach((note) => {
-            lastPositions.set(note, note.getBoundingClientRect());
-          });
+    //     // 2. LAST: Wait for layout, then record final positions
+    //     requestAnimationFrame(() => {
+    //       const lastPositions = new Map<HTMLElement, DOMRect>();
+    //       const allNotes = Array.from(container.querySelectorAll<HTMLElement>(".entity-note")); // Get all including new
+    //       allNotes.forEach((note) => {
+    //         lastPositions.set(note, note.getBoundingClientRect());
+    //       });
 
-          // 3. INVERT: Apply transforms to old elements
-          existingNotes.forEach((note) => {
-            const firstRect = firstPositions.get(note);
-            const lastRect = lastPositions.get(note);
-            if (firstRect && lastRect) {
-              const deltaX = firstRect.left - lastRect.left;
-              const deltaY = firstRect.top - lastRect.top;
-              if (deltaX !== 0 || deltaY !== 0) {
-                note.style.transition = "none"; // Disable transitions during inversion
-                note.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-              }
-            }
-          });
+    //       // 3. INVERT: Apply transforms to old elements
+    //       existingNotes.forEach((note) => {
+    //         const firstRect = firstPositions.get(note);
+    //         const lastRect = lastPositions.get(note);
+    //         if (firstRect && lastRect) {
+    //           const deltaX = firstRect.left - lastRect.left;
+    //           const deltaY = firstRect.top - lastRect.top;
+    //           if (deltaX !== 0 || deltaY !== 0) {
+    //             note.style.transition = "none"; // Disable transitions during inversion
+    //             note.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    //           }
+    //         }
+    //       });
 
-          // 4. PLAY: Animate in the next frame/tick
-          requestAnimationFrame(() => {
-            existingNotes.forEach((note) => {
-              note.style.transition = "transform 0.3s ease-out"; // Enable transform transition
-              note.style.transform = ""; // Animate to natural position
-            });
+    //       // 4. PLAY: Animate in the next frame/tick
+    //       requestAnimationFrame(() => {
+    //         existingNotes.forEach((note) => {
+    //           note.style.transition = "transform 0.3s ease-out"; // Enable transform transition
+    //           note.style.transform = ""; // Animate to natural position
+    //         });
 
-            // Fade in the new element by setting transition THEN opacity
-            newEntityDiv.style.transition = "opacity 0.3s ease-out"; // Set the transition property first
-            requestAnimationFrame(() => {
-              // Wait for the next frame to apply opacity change
-              newEntityDiv.style.opacity = "1"; // Now change opacity to trigger the fade-in
-            });
+    //         // Fade in the new element by setting transition THEN opacity
+    //         newEntityDiv.style.transition = "opacity 0.3s ease-out"; // Set the transition property first
+    //         requestAnimationFrame(() => {
+    //           // Wait for the next frame to apply opacity change
+    //           newEntityDiv.style.opacity = "1"; // Now change opacity to trigger the fade-in
+    //         });
 
-            // Clean up transitions after animation (optional but good practice)
-            setTimeout(() => {
-              existingNotes.forEach((note) => {
-                note.style.transition = "";
-              });
-              newEntityDiv.style.transition = ""; // Also clean up the new div's transition
-            }, 350);
+    //         // Clean up transitions after animation (optional but good practice)
+    //         setTimeout(() => {
+    //           existingNotes.forEach((note) => {
+    //             note.style.transition = "";
+    //           });
+    //           newEntityDiv.style.transition = ""; // Also clean up the new div's transition
+    //         }, 350);
 
-            // Activate characters state after animation starts
-            activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
-            // Unset flag after FLIP animation completes
-            setTimeout(() => {
-              isUpdatingNotes = false;
-            }, 350);
-          });
-        });
-        return; // Exit after handling optimized case
-      }
-      // If addedCharacterData is null, fall through to fallback, but first unset the flag
-      isUpdatingNotes = false;
-    }
+    //         // Activate characters state after animation starts
+    //         activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
+    //         // Unset flag after FLIP animation completes
+    //         setTimeout(() => {
+    //           isUpdatingNotes = false;
+    //         }, 350);
+    //       });
+    //     });
+    //     return; // Exit after handling optimized case
+    //   }
+    //   // If addedCharacterData is null, fall through to fallback, but first unset the flag
+    //   isUpdatingNotes = false;
+    // }
 
-    // --- Optimized Case: Single Character Removed (First or Last) ---
-    else if (addedNames.length === 0 && removedNames.length === 1 && container) {
-      const removedName = removedNames[0];
-      const existingNotes = Array.from(container.querySelectorAll<HTMLElement>(".entity-note"));
-      const noteToRemove = existingNotes.find((note) => note.dataset.canonicalName === removedName);
-      const isFirst = noteToRemove === existingNotes[0];
-      const isLast = noteToRemove === existingNotes[existingNotes.length - 1];
+    // // --- Optimized Case: Single Character Removed (First or Last) ---
+    // else if (addedNames.length === 0 && removedNames.length === 1 && container) {
+    //   const removedName = removedNames[0];
+    //   const existingNotes = Array.from(container.querySelectorAll<HTMLElement>(".entity-note"));
+    //   const noteToRemove = existingNotes.find((note) => note.dataset.canonicalName === removedName);
+    //   const isFirst = noteToRemove === existingNotes[0];
+    //   const isLast = noteToRemove === existingNotes[existingNotes.length - 1];
 
-      if (noteToRemove && (isFirst || isLast)) {
-        console.log(`Optimized Update: Fading out ${isFirst ? "first" : "last"} character - ${removedName}`);
-        isUpdatingNotes = true; // Set flag for this specific animation
+    //   if (noteToRemove && (isFirst || isLast)) {
+    //     console.log(`Optimized Update: Fading out ${isFirst ? "first" : "last"} character - ${removedName}`);
+    //     isUpdatingNotes = true; // Set flag for this specific animation
 
-        noteToRemove.classList.add("fade-out");
-        setTimeout(() => {
-          if (document.body.contains(noteToRemove)) {
-            console.log(`Removing faded-out note via setTimeout: ${removedName}`);
-            noteToRemove.remove();
-          }
-          isUpdatingNotes = false; // Unset flag after timeout
-        }, 350); // Match transition duration + buffer
+    //     noteToRemove.classList.add("fade-out");
+    //     setTimeout(() => {
+    //       if (document.body.contains(noteToRemove)) {
+    //         console.log(`Removing faded-out note via setTimeout: ${removedName}`);
+    //         noteToRemove.remove();
+    //       }
+    //       isUpdatingNotes = false; // Unset flag after timeout
+    //     }, 350); // Match transition duration + buffer
 
-        previousCharacters = newCharacterNames; // Update cache to reflect target state
-        activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
-        return; // Exit after handling optimized case
-      }
-      // If not first/last, fall through to fallback
-      isUpdatingNotes = false; // Reset flag if this specific optimisation didn't run
-    }
+    //     previousCharacters = newCharacterNames; // Update cache to reflect target state
+    //     activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
+    //     return; // Exit after handling optimized case
+    //   }
+    //   // If not first/last, fall through to fallback
+    //   isUpdatingNotes = false; // Reset flag if this specific optimisation didn't run
+    // }
 
     // --- Fallback Case: Multiple changes or no existing container ---
     console.log("Fallback Update: Replacing entire notes container.");
@@ -870,6 +872,9 @@ function createMobileCharacterStrip(characters: ParsedParagraphRange[]) {
 
 // Initialize the viewer and fetch initial metadata
 async function initPage() {
+  // Start preloading assets early
+  preloadInitialAssets();
+
   // Check for saved position
   const savedPosition = getSavedLocation();
 
@@ -1771,3 +1776,46 @@ function initializeNoteLinkBlinking() {
     }
   });
 }
+
+// --- Start Preloading Logic ---
+
+async function preloadInitialAssets() {
+  const bookSlug = getCurrentBookSlug();
+  if (!bookSlug) {
+    console.warn("Cannot preload assets: bookSlug is not available yet.");
+    return;
+  }
+
+  console.log(`[Preload] Starting initial asset preload for book: ${bookSlug}`);
+  const urlsToPreload = new Set<string>();
+
+  knownMovingPictures.forEach((name) => {
+    const picturePath = getPictureFilePathForName(name, bookSlug);
+    const movingPath = getMovingPictureFilePathForName(name, bookSlug);
+    if (picturePath) urlsToPreload.add(picturePath);
+    if (movingPath) urlsToPreload.add(movingPath); // Set handles duplicates
+  });
+
+  urlsToPreload.add("/Pharaon/moving-background.mp4");
+  urlsToPreload.add("/Pharaon/army.mp4");
+
+  console.log(`[Preload] Found ${urlsToPreload.size} unique assets to preload.`);
+
+  const preloadPromises = Array.from(urlsToPreload).map((url) => {
+    return fetch(url, { mode: "no-cors" }) // Use no-cors as we just want to cache
+      .then((response) => {
+        // We don't need to process the response, just initiate the request
+        // console.log(`[Preload] Initiated fetch for: ${url}`);
+      })
+      .catch((error) => {
+        console.warn(`[Preload] Failed to preload ${url}:`, error);
+      });
+  });
+
+  // We don't necessarily need to wait for all preloads to finish
+  Promise.allSettled(preloadPromises).then(() => {
+    console.log("[Preload] Initial asset preloading attempted for all items.");
+  });
+}
+
+// --- End Preloading Logic ---

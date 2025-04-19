@@ -768,7 +768,7 @@ export const pharaonCharactersData = [
   },
   {
     _id: { $oid: "67ffdb6f1c917e2577a98eec" },
-    characterName: "Brat Ramzesa (szalony)",
+    characterName: "Brat Ramzesa",
     bookSlug: "Pharaon",
     infoPerChapter: [
       { chapter: 1, summary: "Starszy syn faraona Ramzesa XII.\nOdsunięty od dziedziczenia tronu z powodu obłędu.", paragraphsWhereSpotted: [4], paragraphsWhereTalking: [] },
@@ -790,7 +790,7 @@ export const pharaonCharactersData = [
   },
   {
     _id: { $oid: "67ffdb6f1c917e2577a98ef7" },
-    characterName: "Chłop egipski (samobójca)",
+    characterName: "Chłop egipski",
     bookSlug: "Pharaon",
     infoPerChapter: [
       {

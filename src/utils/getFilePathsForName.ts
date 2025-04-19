@@ -4,9 +4,10 @@ export const getPictureFileNameForName = (name: string) => {
   return `${name.replace(/[\s()\\']+/g, "-").toLowerCase()}.png`;
 };
 
-const knownMovingPictures = [
-  "Sara",
+export const knownMovingPictures = [
   "Ramzes",
+  "Ramzes XII",
+  "Sara",
   "Nikotris",
   "Amenhotep",
   "Brat Ramzesa",
@@ -17,21 +18,27 @@ const knownMovingPictures = [
   "Nitager",
   "Patrokles",
   "Pentuer",
-  "Ramzes XII",
   "Tutmozis",
+  "Pieszczota",
+  "Anupa",
+  "Dagon",
+  "Gedeon",
 ];
 
 const knownEmotionalPictures = [];
 export const getPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
   if (knownMovingPictures.includes(name)) {
-    return `./public/${bookSlug}/${name.toLowerCase().replace(" ", "-")}-listens.gif`;
+    return `/${bookSlug}/${name.toLowerCase().replace(" ", "-")}-listens.mp4`;
   }
-  return `./public/${bookSlug}/${getPictureFileNameForName(name)}`;
+  return `/${bookSlug}/${getPictureFileNameForName(name)}`;
 };
 
 export const getMovingPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
+  if (name == "Patrokles") {
+    return `/${bookSlug}/patrokles-speaks.gif`;
+  }
   if (knownMovingPictures.includes(name)) {
-    return `./public/${bookSlug}/${name.toLowerCase()}-speaks.gif`;
+    return `/${bookSlug}/${name.toLowerCase().replace(" ", "-")}-speaks.mp4`;
   } else {
     return getPictureFilePathForName(name, bookSlug);
   }
