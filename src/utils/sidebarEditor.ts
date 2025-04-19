@@ -239,7 +239,7 @@ export function createEditableEntity(entity: {
   // Right column for text content
   const textColumn = document.createElement("div");
   textColumn.className = "entity-text-column";
-  textColumn.style.flex = "2";
+  textColumn.style.flex = "1.5";
 
   // Entity image in left column
   let mediaElement: HTMLImageElement | HTMLVideoElement | null = null;
