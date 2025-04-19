@@ -40,3 +40,9 @@ export const getMovingPictureFilePathForName = (name: string, bookSlug: BOOK_SLU
     return getPictureFilePathForName(name, bookSlug);
   }
 };
+
+const charactersToShow = ["Ramzes", "Ramzes XII", "Herhor", "Nitager", "Brat Ramzesa", "Amenhotep", "Nikotris"];
+charactersToShow.forEach((character) => {
+  console.log(getPictureFilePathForName(character, "Pharaon"));
+  console.log(getMovingPictureFilePathForName(character, "Pharaon"));
+});
