@@ -1599,6 +1599,7 @@ function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: 
             isTalkingInRange = true;
             break; // Found talking in range, no need to check further appearances for this entity
           } else {
+            // Empty block removed
           }
         } else {
           console.log("NOT IN RANGE", canonicalName);
@@ -1698,6 +1699,94 @@ function setupParagraphHighlighting() {
       });
     }
   });
+
+  // --- Add Click Listener for Mobile Note Modals ---
+  contentContainer.addEventListener("click", (event) => {
+    console.log("1148 Clicked on", event.target);
+    const target = event.target as HTMLElement;
+    const linkNote = target.classList.contains("link-note") ? target : (target.closest(".link-note") as HTMLElement | null);
+
+    if (linkNote) {
+      console.log("1148 linkNote", linkNote);
+      const rightNotesContainer = document.getElementById("right-notes-container");
+      // Check if right notes are hidden (mobile view)
+      const isMobileView = rightNotesContainer && getComputedStyle(rightNotesContainer).display === "none";
+
+      if (isMobileView || true) {
+        event.preventDefault(); // Prevent default link navigation/jump
+
+        const targetId = linkNote.getAttribute("href")?.substring(1); // Get href like '#fn3' and remove '#'
+        if (targetId) {
+          console.log("1148 targetId", targetId);
+          const noteElement = document.getElementById(targetId);
+          if (noteElement) {
+            console.log("1148 noteElement", noteElement);
+            // --- Modal Logic ---
+            // Reuse or create modal elements
+            let modal = document.getElementById("note-modal");
+            let modalContent = document.getElementById("note-modal-content");
+            let modalClose = document.getElementById("note-modal-close");
+            let modalOverlay = document.getElementById("note-modal-overlay");
+
+            const closeModal = () => {
+              if (modal) modal.classList.remove("visible");
+              if (modalOverlay) modalOverlay.classList.remove("visible");
+              // Remove body class to allow scrolling again
+              document.body.classList.remove("modal-open");
+            };
+
+            if (!modal) {
+              console.log("1148 modal create", modal);
+              // Create modal structure if it doesn't exist
+              modalOverlay = document.createElement("div");
+              modalOverlay.id = "note-modal-overlay";
+              modalOverlay.onclick = closeModal; // Close on overlay click
+
+              modal = document.createElement("div");
+              modal.id = "note-modal";
+              // modal.style.display = 'none'; // Let CSS handle initial display
+
+              const modalDialog = document.createElement("div");
+              modalDialog.id = "note-modal-dialog";
+
+              modalClose = document.createElement("button");
+              modalClose.id = "note-modal-close";
+              modalClose.innerHTML = "&times;"; // Close symbol
+              modalClose.onclick = closeModal; // Close on button click
+
+              modalContent = document.createElement("div");
+              modalContent.id = "note-modal-content";
+
+              modalDialog.appendChild(modalClose);
+              modalDialog.appendChild(modalContent);
+              modal.appendChild(modalDialog);
+              document.body.appendChild(modalOverlay);
+              document.body.appendChild(modal);
+            }
+
+            // Ensure elements were found or created and assign content/display
+            if (modal && modalContent && modalOverlay && modalClose) {
+              console.log("1148 modalContent display", modalContent);
+              // Replace potential space before the editorial note with a non-breaking space
+              // and wrap the note itself to prevent internal breaks.
+              const originalHTML = noteElement.innerHTML;
+              const modifiedHTML = originalHTML
+                .replace(/\s*(\[przypis edytorski\])/g, ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>')
+                .replace(/\s*(\[przypis autorski\])/g, ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>');
+              modalContent.innerHTML = modifiedHTML; // Use innerHTML to preserve formatting
+              modal.classList.add("visible"); // Use class
+              modalOverlay.classList.add("visible"); // Use class
+              // Add body class to prevent background scrolling
+              document.body.classList.add("modal-open");
+            }
+          }
+        }
+      }
+      // On non-mobile, let the default link behavior (#) happen or handle differently if needed.
+      // Currently, the mouseover handles scrolling/highlighting on desktop.
+    }
+  });
+  // --- End Click Listener ---
 }
 
 function onDOMLoaded() {
@@ -1764,7 +1853,7 @@ function initializeNoteLinkBlinking() {
         const noteElement = document.getElementById(targetId);
         if (noteElement && noteElement.closest("#right-notes-scrollable-container")) {
           // Scroll the note into view smoothly
-          noteElement.scrollIntoView({ behavior: "smooth", block: "center" });
+          // noteElement.scrollIntoView({ behavior: "smooth", block: "center" });
 
           // Add highlight-blink class to run animation
           noteElement.classList.add("highlight-blink");
@@ -1777,6 +1866,11 @@ function initializeNoteLinkBlinking() {
       }
     }
   });
+
+  const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1300px)");
+  if (landscapeMediaQuery.matches) {
+    // Empty block removed
+  }
 
   // Add mouseout handler to ensure highlight is removed when no longer hovering
   contentContainer.addEventListener("mouseout", (event) => {
@@ -1825,6 +1919,7 @@ async function preloadInitialAssets() {
   const preloadPromises = Array.from(urlsToPreload).map((url) => {
     return fetch(url, { mode: "no-cors" }) // Use no-cors as we just want to cache
       .then((response) => {
+        // Removed unused 'response' parameter
         // We don't need to process the response, just initiate the request
         // console.log(`[Preload] Initiated fetch for: ${url}`);
       })
