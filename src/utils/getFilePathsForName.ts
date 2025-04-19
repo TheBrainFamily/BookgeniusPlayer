@@ -34,9 +34,6 @@ export const getPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) =>
 };
 
 export const getMovingPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
-  if (name == "Patrokles") {
-    return `/${bookSlug}/patrokles-speaks.gif`;
-  }
   if (knownMovingPictures.includes(name)) {
     return `/${bookSlug}/${name.toLowerCase().replace(" ", "-")}-speaks.mp4`;
   } else {

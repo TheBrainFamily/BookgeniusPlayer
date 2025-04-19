@@ -131,6 +131,23 @@ function createImagePreloadContainer() {
   return container;
 }
 
+// Add this function near createImagePreloadContainer
+function createVideoPreloadContainer() {
+  const existingContainer = document.getElementById("preloaded-videos");
+  if (existingContainer) return existingContainer;
+
+  const container = document.createElement("div");
+  container.id = "preloaded-videos";
+  container.style.position = "absolute";
+  container.style.width = "0";
+  container.style.height = "0";
+  container.style.overflow = "hidden";
+  container.style.visibility = "hidden";
+  container.style.pointerEvents = "none"; // Ensure it doesn't interfere
+  document.body.appendChild(container);
+  return container;
+}
+
 // Function to preload images from metadata
 function preloadImagesFromMetadata(metadataArray) {
   if (!metadataArray || !Array.isArray(metadataArray)) return;
@@ -1902,35 +1919,94 @@ async function preloadInitialAssets() {
   }
 
   console.log(`[Preload] Starting initial asset preload for book: ${bookSlug}`);
-  const urlsToPreload = new Set<string>();
+  const imageUrlsToPreload = new Set<string>();
+  const videoUrlsToPreload = new Set<string>();
 
   knownMovingPictures.forEach((name) => {
     const picturePath = getPictureFilePathForName(name, bookSlug);
     const movingPath = getMovingPictureFilePathForName(name, bookSlug);
-    if (picturePath) urlsToPreload.add(picturePath);
-    if (movingPath) urlsToPreload.add(movingPath); // Set handles duplicates
+    if (picturePath) imageUrlsToPreload.add(picturePath);
+    if (movingPath) videoUrlsToPreload.add(movingPath); // Assumes GIFs are also preloaded as images
   });
 
-  urlsToPreload.add("/Pharaon/moving-background.mp4");
-  urlsToPreload.add("/Pharaon/army.mp4");
+  // Separate videos
+  videoUrlsToPreload.add("/Pharaon/moving-background.mp4");
+  videoUrlsToPreload.add("/Pharaon/army.mp4");
 
-  console.log(`[Preload] Found ${urlsToPreload.size} unique assets to preload.`);
+  console.log(`[Preload] Found ${imageUrlsToPreload.size} unique images and ${videoUrlsToPreload.size} unique videos to preload.`);
 
-  const preloadPromises = Array.from(urlsToPreload).map((url) => {
-    return fetch(url, { mode: "no-cors" }) // Use no-cors as we just want to cache
-      .then((response) => {
-        // Removed unused 'response' parameter
-        // We don't need to process the response, just initiate the request
-        // console.log(`[Preload] Initiated fetch for: ${url}`);
-      })
-      .catch((error) => {
-        console.warn(`[Preload] Failed to preload ${url}:`, error);
-      });
+  const preloadImagePromises = Array.from(imageUrlsToPreload).map((url) => {
+    return new Promise<void>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        // console.log(`[Preload] Image loaded: ${url}`);
+        resolve();
+      };
+      img.onerror = (err) => {
+        console.warn(`[Preload] Failed to preload image ${url}:`, err);
+        reject(err); // Reject on error
+      };
+      img.src = url;
+    });
   });
 
-  // We don't necessarily need to wait for all preloads to finish
-  Promise.allSettled(preloadPromises).then(() => {
-    console.log("[Preload] Initial asset preloading attempted for all items.");
+  // Get or create the hidden container for preloading videos
+  const videoPreloadContainer = createVideoPreloadContainer();
+
+  const preloadVideoPromises = Array.from(videoUrlsToPreload).map((url) => {
+    return new Promise<void>((resolve, reject) => {
+      const video = document.createElement("video");
+      video.muted = true; // IMPORTANT: Prevent sound
+      video.playsInline = true; // Good practice for mobile
+      video.preload = "auto"; // Hint to browser to download data
+
+      const onCanPlayThrough = () => {
+        // console.log(`[Preload] Video can play through: ${url}`);
+        // Clean up listeners
+        video.removeEventListener("canplaythrough", onCanPlayThrough);
+        video.removeEventListener("error", onError);
+        // Optional: remove video element from container after load?
+        // Leaving it might help keep it cached, but could consume memory.
+        // Consider removing if memory becomes an issue:
+        // if (video.parentNode) video.parentNode.removeChild(video);
+        resolve();
+      };
+
+      const onError = (e) => {
+        console.warn(`[Preload] Failed to preload video ${url}:`, e);
+        // Clean up listeners
+        video.removeEventListener("canplaythrough", onCanPlayThrough);
+        video.removeEventListener("error", onError);
+        reject(e); // Reject the promise on error
+      };
+
+      video.addEventListener("canplaythrough", onCanPlayThrough);
+      video.addEventListener("error", onError);
+
+      video.src = url;
+      video.load(); // Explicitly call load() after setting src
+
+      // Add to hidden container - helps ensure browser processes it
+      videoPreloadContainer.appendChild(video);
+
+      // Optional: Timeout fallback if needed
+      // setTimeout(() => {
+      //   console.warn(`[Preload] Timeout waiting for canplaythrough: ${url}`);
+      //   video.removeEventListener("canplaythrough", onCanPlayThrough);
+      //   video.removeEventListener("error", onError);
+      //   resolve(); // Resolve anyway? Or reject? Depends on desired behavior.
+      // }, 15000); // 15 seconds
+    });
+  });
+
+  const allPreloadPromises = [...preloadImagePromises, ...preloadVideoPromises];
+
+  // We don't necessarily need to wait for all preloads to finish for the app to start,
+  // but logging completion can be useful.
+  Promise.allSettled(allPreloadPromises).then((results) => {
+    const successfulPreloads = results.filter((r) => r.status === "fulfilled").length;
+    const failedPreloads = results.length - successfulPreloads;
+    console.log(`[Preload] Initial asset preloading attempted. Success: ${successfulPreloads}, Failed: ${failedPreloads}`);
   });
 }
 
