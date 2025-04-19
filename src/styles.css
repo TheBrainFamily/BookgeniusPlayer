@@ -1931,7 +1931,7 @@
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(0px);
   }
   to {
     opacity: 1;
@@ -1995,7 +1995,7 @@
 /* ============================================ */
 /* Mobile Landscape Specific Layout (50/50 Split) */
 /* ============================================ */
-@media screen and (orientation: landscape) and (max-width: 1024px) {
+@media screen and (orientation: landscape) and (max-width: 1300px) {
   /* Adjusted max-width slightly */
   #legacy {
     /* Ensure the flex direction is row */

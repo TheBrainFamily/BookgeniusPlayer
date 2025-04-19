@@ -271,8 +271,20 @@ function setupPageObserver() {
     // 2. Determine the elements within the "focus zone" (30%-60% vertically)
     if (intersectingPages.size > 0) {
       const rootRect = rootElement.getBoundingClientRect();
-      const focusZoneTop = rootRect.top + rootRect.height * 0.05;
-      const focusZoneBottom = rootRect.top + rootRect.height * 0.45;
+
+      // Default multipliers
+      let topMultiplier = 0.15;
+      let bottomMultiplier = 0.65;
+
+      // Check media query for landscape mode on smaller wide screens
+      const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1300px)");
+      if (landscapeMediaQuery.matches) {
+        topMultiplier = 0.05;
+        bottomMultiplier = 0.95; // Use larger bottom zone in this mode
+      }
+
+      const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
+      const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
 
       // Filter intersecting pages to find those overlapping the focus zone
       const focusedPages = Array.from(intersectingPages).filter((element) => {
@@ -1562,7 +1574,7 @@ function isAppearanceWithinRange(
   return false; // Not in range
 }
 
-function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: string, endParagraph?: number, endChapter?: number, onlyTalking = false) {
+function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: string, endChapter?: number, endParagraph?: number, onlyTalking = false) {
   const entityNotes = document.querySelectorAll<HTMLElement>("#left-notes .entity-note");
   entityNotes.forEach((note) => {
     const appearancesStr = note.dataset.appearances;
@@ -1574,9 +1586,14 @@ function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: 
       let isInRange = false;
       let isTalkingInRange = false;
 
+      if (canonicalName === "Ramzes") {
+        console.log("Ramzes IMPORTANT", appearances, { chapterNum, paragraphNum, endChapter, endParagraph, onlyTalking });
+      }
+
       // Check if any appearance falls within the specified range
       for (const app of appearances) {
         if (isAppearanceWithinRange(app, chapterNum, paragraphNum, endChapter, endParagraph)) {
+          console.log("isInRange", canonicalName, app.isTalkingInParagraph);
           isInRange = true;
           if (app.isTalkingInParagraph) {
             isTalkingInRange = true;
@@ -1584,6 +1601,7 @@ function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: 
           } else {
           }
         } else {
+          console.log("NOT IN RANGE", canonicalName);
         }
       }
 
@@ -1591,6 +1609,7 @@ function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: 
       const imageElement = note.querySelector<HTMLImageElement>(".entity-image");
 
       if (isTalkingInRange) {
+        console.log("isTalkingInRange", canonicalName);
         note.classList.add("highlighted-talking-entity");
         // Swap image to GIF if talking
         if (imageElement && imageElement.dataset.originalSrc) {
@@ -1602,6 +1621,7 @@ function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: 
           }
         }
       } else if (isInRange && !onlyTalking) {
+        console.log("are we in this weird !onlyTalking case?", canonicalName);
         note.classList.add("highlighted-entity");
         // Ensure image is PNG if just mentioned (and was previously GIF)
         if (imageElement && imageElement.dataset.originalSrc) {
@@ -1612,6 +1632,7 @@ function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: 
           }
         }
       } else {
+        console.log("GOZDECKI NOT IN RANGE OR NOT TALKING IN RANGE FOR", canonicalName);
         // If not in range, or only showing talking entities and this one isn't talking in range
         // console.log(`GOZDECKI NOT IN RANGE OR NOT TALKING IN RANGE FOR ${canonicalName}`);
         // Ensure image is PNG if it was changed
