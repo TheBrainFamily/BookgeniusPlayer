@@ -317,7 +317,7 @@ function setupPageObserver() {
       let bottomMultiplier = 0.65;
 
       // Check media query for landscape mode on smaller wide screens
-      const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1300px)");
+      const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
       if (landscapeMediaQuery.matches) {
         topMultiplier = 0.05;
         bottomMultiplier = 0.95; // Use larger bottom zone in this mode
@@ -1911,11 +1911,6 @@ function initializeNoteLinkBlinking() {
       }
     }
   });
-
-  const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1300px)");
-  if (landscapeMediaQuery.matches) {
-    // Empty block removed
-  }
 
   // Add mouseout handler to ensure highlight is removed when no longer hovering
   contentContainer.addEventListener("mouseout", (event) => {

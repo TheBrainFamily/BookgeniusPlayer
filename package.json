@@ -6,6 +6,7 @@
   "scripts": {
     "start": "vite",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "VITE_DEVELOPMENT=true npx vite build && rsync -av ./dist root@64.23.230.45:/var/www/faraon/",
     "build": "exit; rm  -rf dist/ && tsx build-config.ts && cp -r dist/* /Users/lukaszgandecki/projects/convert-books-trump/public/src-book",
     "build:css": "npx @tailwindcss/cli -i ./src/globals.css -o ./dist/output.css",
     "build:prod": "rm -rf dist/ && npm run build:css && tsx build-config-prod.ts && cp ./src/{combined_book.html,styles.css} ./dist/ && cp -r dist/* /Users/lukaszgandecki/projects/convert-books-trump/public/src-book"

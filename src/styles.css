@@ -3,6 +3,10 @@
 /* ============================================ */
 
 :root {
+  --top-solid: 15%; /* mask is fully opaque from here down              */
+  --mid-solid: 50%; /* last row that stays fully opaque                 */
+  --edge-fade: 0%; /* width of the fixed left/right edge soft‑fade     */
+
   /* Safe Area Insets */
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
@@ -38,7 +42,7 @@
   --modal-text-light: #333; /* Default modal text */
   --modal-header-border-light: #ddd;
   --modal-close-light: #777;
-  --char-card-bg-light: #f5f5f5;
+  --char-card-bg-light: rgba(255, 255, 255, 30%);
   --char-card-border-light: #ddd; /* Mobile strip border */
   --mobile-strip-bg-light: rgba(255, 255, 255, 0.95);
   --mobile-strip-horizontal-bg-light: rgba(255, 255, 255, 0.85);
@@ -292,18 +296,35 @@
       font-family: var(--font-serif);
       line-height: 1.6;
       color: var(--text-light);
-      /* background-color: var(--bg-content-light); */
       background: linear-gradient(
         to bottom,
-        rgba(var(--bg-content-light-rgb), 0) 12%,
-        rgba(var(--bg-content-light-rgb), 1) 20%,
-        rgba(var(--bg-content-light-rgb), 1) 30%,
-        rgba(var(--bg-content-light-rgb), 1) 40%,
-        rgba(var(--bg-content-light-rgb), 0) 88%
-      ); /* Gradient transparency: more transparent at edges, fully opaque in middle */
+        rgba(var(--bg-content-light-rgb), 0) 0%,
+        rgba(var(--bg-content-light-rgb), 1) 5%,
+        rgba(var(--bg-content-light-rgb), 1) 60%,
+        rgba(var(--bg-content-light-rgb), 0) 100%
+      );
+
+      /* ---------- MASK LAYERS (all intersect) ---------- */
+      mask-image:
+    /* 1 ▸ vertical visibility window */
+        linear-gradient(
+          to bottom,
+          transparent 0%,
+          rgba(0 0 0 / 0.25) 5%,
+          rgba(0 0 0 / 0.65) 10%,
+          rgba(0 0 0 / 0.9) var(--top-solid),
+          rgba(0 0 0 / 0.9) var(--mid-solid),
+          rgba(0 0 0 / 0.2) 70%,
+          transparent 100%
+        ),
+        radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
+
+      /* combine the three α‑channels */
+      mask-composite: intersect; /* spec name            */
+      -webkit-mask-composite: destination-in;
+      /* background-color: var(--bg-content-light); */
+      /* Gradient transparency: more transparent at edges, fully opaque in middle */
       /* Add the mask for text fading */
-      mask-image: linear-gradient(to bottom, transparent 0%, black 30%, /* Start fading in */ black 70%, /* Start fading out */ transparent 100%);
-      -webkit-mask-image: linear-gradient(/* Add vendor prefix for compatibility */ to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
       padding: 1em 2em; /* Overrides base padding */
       hyphens: auto;
       -webkit-hyphens: auto;
@@ -668,6 +689,12 @@
     padding: 1rem;
   }
 
+  .entity-text-column h4 {
+    font-style: italic;
+    font-weight: 600;
+    color: var(--text-light);
+  }
+
   /* For dark mode */
   #legacy.night-mode .entity-text-column {
     background-color: var(--char-card-bg-dark);
@@ -702,7 +729,7 @@
     }
 
     #right-notes-scrollable-container section {
-      background-color: white;
+      background-color: rgb(255, 255, 255, 30%);
     }
 
     section {
