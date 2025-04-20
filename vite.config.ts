@@ -8,39 +8,37 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      /* ---------- core settings ---------- */
-      strategies: "injectManifest", // keep a custom sw.ts (step 3)
-      srcDir: "src",
-      filename: "sw.ts",
-
-      /* ---------- what to precache on FIRST install ---------- */
-
-      /* ---------- tell Workbox mp4s are OK (default 2 MB) ---------- */
-      workbox: {
-        globPatterns: ["Pharaon/*.{png,jpg,mp4,webm}", "public/Pharaon/*.mp4"],
-        maximumFileSizeToCacheInBytes: 20 * 1024 * 1024, // 20MB
-        runtimeCaching: [{ urlPattern: ({ request }) => request.destination === "video", handler: "CacheFirst", options: { cacheName: "video-cache", rangeRequests: true } }],
-      },
-
-      /* ---------- put the rest of your static assets in runtime cache ---------- */
-
-      /* ---------- icons / manifest ---------- */
-      includeAssets: ["icons/*.png"],
-      manifest: {
-        name: "Faraon",
-        short_name: "Faraon",
-        start_url: "/",
-        display: "standalone",
-        background_color: "#333333",
-        theme_color: "#333333",
-        orientation: "landscape",
-        icons: [
-          { src: "public/icon-192x192.png", type: "image/png", sizes: "192x192", purpose: "any maskable" },
-          { src: "public/icon-512x512.png", type: "image/png", sizes: "512x512", purpose: "any maskable" },
+      /*  ---- service‑worker build ---- */
+      srcDir: 'src',
+      filename: 'sw.ts',          // we’ll write this next
+      strategies: 'injectManifest',
+      injectManifest: {
+        globPatterns: [
+          'Pharaon/*.mp4',        // <-- your videos
+          '**/*.{js,css,html,svg,png,webp}'
         ],
+        maximumFileSizeToCacheInBytes: 30000000
       },
-      registerType: "autoUpdate",
-    }),
+
+
+      /*  ---- manifest.json passthrough ---- */
+      manifest: {
+        "name": "Faraon",
+        "short_name": "Faraon",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#333333",
+        "theme_color": "#333333",
+        "orientation": "landscape",
+        "icons": [
+          { "src": "public/icon-192x192.png", "type": "image/png", "sizes": "192x192", "purpose": "any maskable" },
+          { "src": "public/icon-512x512.png", "type": "image/png", "sizes": "512x512", "purpose": "any maskable" }
+        ]
+      },
+
+      /*  ---- live‑reload while dev’ing PWAs ---- */
+      devOptions: { enabled: true }
+    })
   ],
   resolve: {
     alias: {

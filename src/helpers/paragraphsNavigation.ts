@@ -36,10 +36,20 @@ export const goToParagraph = (chapter: number, paragraph: number) => {
 };
 
 const returnButton = document.getElementById("return-to-location-button");
-returnButton.addEventListener("click", () => {
-  goToParagraph(getSavedLocation().chapter, getSavedLocation().paragraph);
-  returnButton.style.display = "none";
-});
+if (returnButton) {
+  returnButton.addEventListener("click", () => {
+    goToParagraph(getSavedLocation().chapter, getSavedLocation().paragraph);
+    returnButton.style.display = "none";
+  });
+} else {
+  console.warn("returnButton not found");
+  setTimeout(() => {
+    returnButton.addEventListener("click", () => {
+      goToParagraph(getSavedLocation().chapter, getSavedLocation().paragraph);
+      returnButton.style.display = "none";
+    });
+  }, 500);
+}
 
 const updateGoBackButton = () => {
   // Show the button if we have a valid pre-search location

@@ -1,4 +1,5 @@
 import "./styles.css";
+import "./styles-narrow.css";
 import "./globals.css";
 
 import { isNightMode, setIsNightMode } from "@/src/helpers/setIsNightMode";
@@ -11,7 +12,7 @@ import { initSearchModal, showSearchModal, hideSearchModal, isSearchActive } fro
 
 // Import the sidebar editor utilities
 import { createEditableEntity, createEditablePageSummary, createEditableChapterSummary, createAddCharacterButton, addEditorStyles, isEditActive } from "./utils/sidebarEditor";
-import { getParagraphRange, getParagraphRangePure, ParsedParagraphRange, parseParagraphRange } from "./fetchers/getParagraphRange";
+import { getParagraphRange, getParagraphRangePure, paragraphMetadataServicePure, ParsedParagraphRange, parseParagraphRange } from "./fetchers/getParagraphRange";
 import { getSavedLocation, goToParagraph, setCurrentLocation } from "./helpers/paragraphsNavigation";
 import { initializeNoteLinkBlinking, setupNoteLinkBlinking } from "./annotationsHandling";
 import { getPictureFilePathForName, getMovingPictureFilePathForName } from "./utils/getFilePathsForName";
@@ -20,21 +21,24 @@ import { Workbox } from "workbox-window";
 
 const splash = document.getElementById("splash")!;
 
+splash.classList.add("hide");
+// register ASAP, but don't hide splash until the SW tells us it's ready
 if ("serviceWorker" in navigator) {
-  const wb = new Workbox("/sw.js");
-  console.log("wb loaded");
-  wb.addEventListener("activated", () => {
-    console.log("wb activated");
-    // service worker is controlling the page AND precache is complete
-    splash.classList.add("hide");
-  });
-
-  wb.register();
+  try {
+    navigator.serviceWorker.register("/sw.js", { type: "module" });
+  } catch (e) {
+    console.error("Service worker registration failed:", e);
+  }
 } else {
-  console.log("no SW support");
-  // no SW support ‑ hide immediately
   splash.classList.add("hide");
+  console.log("Service worker not supported");
 }
+
+navigator.serviceWorker?.addEventListener("message", (evt) => {
+  if (evt.data?.type === "CACHE_COMPLETE") {
+    splash.classList.add("hide"); // triggers your CSS transition
+  }
+});
 
 const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
@@ -498,7 +502,7 @@ const dealWithBackground = ({ startChapter, startParagraph, endChapter, endParag
     { startChapter: 1, startParagraph: 1, file: "background.png", endChapter: 1, endParagraph: 10 },
     { startChapter: 1, startParagraph: 11, file: "moving-background.mp4", endChapter: 1, endParagraph: 109 },
     { startChapter: 2, startParagraph: 1, file: "army.mp4", endChapter: 2, endParagraph: 40 },
-    { startChapter: 3, startParagraph: 15, file: "background-sara.png", endChapter: 3, endParagraph: 80 },
+    { startChapter: 3, startParagraph: 10, file: "background-sara.mp4", endChapter: 3, endParagraph: 80 },
     // Add more background definitions here if needed
   ];
 
@@ -588,10 +592,15 @@ async function updateParagraphNotesInternal({
   dealWithAnnotations({ startChapter, startParagraph, endChapter, endParagraph });
   const leftNotes = document.getElementById("left-notes");
   if (!leftNotes) return;
-
   const paragraphs =
     import.meta.env.VITE_DEVELOPMENT === "true"
-      ? await getParagraphRangePure({ bookSlug: getCurrentBookSlug(), startChapter: startChapter, startParagraph, endChapter: endChapter, endParagraph })
+      ? await paragraphMetadataServicePure.getCharactersMetadataForParagraphRange({
+          bookSlug: getCurrentBookSlug(),
+          startChapter: startChapter,
+          startParagraph,
+          endChapter: endChapter,
+          endParagraph,
+        })
       : await getParagraphRange({ bookSlug: getCurrentBookSlug(), startChapter: startChapter, startParagraph, endChapter: endChapter, endParagraph });
   const currentCharactersData = parseParagraphRange(paragraphs);
   console.log("characters", currentCharactersData);

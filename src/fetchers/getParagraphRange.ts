@@ -1,9 +1,38 @@
+/**
+ * paragraph‑metadata.ts
+ *
+ * Stand‑alone, browser‑friendly version of the server‑side aggregation logic
+ * plus helpers to fetch from an API and to post‑process the result for the UI.
+ * Drop this in your src/ folder, fix the import paths if needed, and it should
+ * compile without any additional tweaks.
+ */
+
 import { pharaonCharactersData } from "../data/pharaon-apr-10.selfsufficientcharactermetadatas";
 import { BOOK_SLUGS } from "../consts";
 
-/**
- * Interface for the parameters required by the getParagraphRange function.
- */
+/* -------------------------------------------------------------------------- */
+/*  Shared types                                                              */
+/* -------------------------------------------------------------------------- */
+
+export interface InfoPerChapter {
+  chapter: number;
+  summary: string;
+  label?: string;
+  paragraphsWhereSpotted: number[];
+  paragraphsWhereTalking: number[];
+}
+
+export interface SelfSufficientCharacterMetadata {
+  characterName: string;
+  bookSlug: string;
+  infoPerChapter: InfoPerChapter[];
+  imageUrl: string;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  1. Client‑side fetch wrapper (used when you DO have the API available)    */
+/* -------------------------------------------------------------------------- */
+
 export interface GetParagraphRangeParams {
   bookSlug: BOOK_SLUGS;
   startChapter: number;
@@ -13,15 +42,12 @@ export interface GetParagraphRangeParams {
 }
 
 /**
- * Fetches paragraph metadata for a given range within a specific book using query parameters.
- *
- * @param {GetParagraphRangeParams} params - The parameters for fetching the paragraph range.
- *   Includes bookSlug, startChapter, startParagraph, endChapter, and endParagraph.
- * @returns {Promise<IEntityNote[]>} A promise that resolves with the paragraph metadata.
- * @throws {Error} Throws an error if the network response is not ok or if fetching fails.
+ * Fetches paragraph metadata for a given range within a specific book using
+ * query parameters.
  */
-export async function getParagraphRange({ bookSlug, startChapter, startParagraph, endChapter, endParagraph }: GetParagraphRangeParams): Promise<SelfSufficientCharacterMetadata[]> {
-  // Construct the URL with the bookSlug as a route parameter and others as query parameters
+export async function getParagraphRange(params: GetParagraphRangeParams): Promise<SelfSufficientCharacterMetadata[]> {
+  const { bookSlug, startChapter, startParagraph, endChapter, endParagraph } = params;
+
   const queryParams = new URLSearchParams({
     startChapter: startChapter.toString(),
     startParagraph: startParagraph.toString(),
@@ -32,39 +58,89 @@ export async function getParagraphRange({ bookSlug, startChapter, startParagraph
   const apiUrl = `/api/paragraphs/${bookSlug}?${queryParams.toString()}`;
 
   console.log("API URL", apiUrl);
+
   try {
-    const response = await fetch(apiUrl, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        // Add any other necessary headers like Authorization if needed
-      },
-    });
+    const response = await fetch(apiUrl, { method: "GET", headers: { "Content-Type": "application/json" } });
 
     if (!response.ok) {
-      // Attempt to parse error message from response body, otherwise use status text
-      let errorBody = null;
+      let errorBody: any = null;
       try {
         errorBody = await response.json();
       } catch {
-        // Ignore if response body is not valid JSON
+        /* swallow – non‑JSON error payloads are fine */
       }
-      const errorMessage = errorBody?.message || errorBody?.error || response.statusText;
-      throw new Error(`Network response was not ok: ${errorMessage} (status: ${response.status})`);
+      const msg = errorBody?.message || errorBody?.error || response.statusText;
+      throw new Error(`Network response was not ok: ${msg} (status: ${response.status})`);
     }
 
-    // Parse the JSON response
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
+    return (await response.json()) as SelfSufficientCharacterMetadata[];
+  } catch (error: any) {
     console.error("Error fetching paragraph range:", error);
-    // Re-throw the error so the caller can handle it, potentially enriching it
     throw new Error(`Failed to fetch paragraph range: ${error.message}`);
   }
 }
 
-export type ParsedParagraphRange = {
+/* -------------------------------------------------------------------------- */
+/*  2. Pure in‑memory implementation (works straight on a JSON dump)          */
+/* -------------------------------------------------------------------------- */
+
+type PureRange = { startChapter: number; endChapter: number; bookSlug: BOOK_SLUGS; startParagraph: number; endParagraph: number };
+
+export const paragraphMetadataServicePure = {
+  /**
+   * Returns the slice of `data` that matches the given range, replicating the
+   * MongoDB aggregation you run on the server.
+   */
+  getCharactersMetadataForParagraphRange(range: PureRange, data: SelfSufficientCharacterMetadata[] = pharaonCharactersData): SelfSufficientCharacterMetadata[] {
+    const { startChapter, endChapter, bookSlug, startParagraph, endParagraph } = range;
+
+    return (
+      data
+        // 1. book filter ───────────────────────────────────────────────────────
+        .filter((d) => d.bookSlug === bookSlug)
+
+        // 2. chapter & paragraph filtering ────────────────────────────────────
+        .map((character) => {
+          const infoPerChapter: InfoPerChapter[] = character.infoPerChapter
+            // keep only chapters inside the chapter range
+            .filter((c) => c.chapter >= startChapter && c.chapter <= endChapter)
+            // for every chapter keep only the paragraphs that satisfy the rules
+            .map((c) => {
+              const keep = (p: number) => {
+                // single‑chapter span
+                if (startChapter === endChapter) {
+                  return p >= startParagraph && p <= endParagraph;
+                }
+                // span across ≥2 chapters
+                if (c.chapter === startChapter) return p >= startParagraph;
+                if (c.chapter === endChapter) return p <= endParagraph;
+                // chapters strictly between start & end
+                return true;
+              };
+
+              const paragraphsWhereSpotted = c.paragraphsWhereSpotted.filter(keep);
+              const paragraphsWhereTalking = c.paragraphsWhereTalking.filter(keep);
+
+              return { ...c, paragraphsWhereSpotted, paragraphsWhereTalking };
+            })
+            // drop chapters whose spotted list is now empty
+            .filter((c) => c.paragraphsWhereSpotted.length > 0);
+
+          // drop characters that vanished entirely
+          if (infoPerChapter.length === 0) return null;
+
+          return { characterName: character.characterName, bookSlug: character.bookSlug, imageUrl: character.imageUrl, infoPerChapter } as SelfSufficientCharacterMetadata;
+        })
+        .filter(Boolean) as SelfSufficientCharacterMetadata[]
+    );
+  },
+};
+
+/* -------------------------------------------------------------------------- */
+/*  3. UI‑oriented post‑processing                                            */
+/* -------------------------------------------------------------------------- */
+
+export interface ParsedParagraphRange {
   canonicalName: string;
   summary: string;
   imageUrl: string;
@@ -73,133 +149,86 @@ export type ParsedParagraphRange = {
   chapterNumber: number;
   label?: string;
   otherAppearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[];
-};
+}
 
+/**
+ * Converts the raw slice returned by the service into a flat list ordered by
+ * (chapter, paragraph).  Each entry represents the character’s *first*
+ * appearance inside the requested range plus an array of their other
+ * appearances within the same range.
+ */
 export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): ParsedParagraphRange[] {
-  // For each character, find their first appearance within the paragraphs listed in the input data.
-  // Assumes 'data' is already filtered for the relevant paragraph range.
   return data
     .map((character) => {
-      let firstAppearance: {
+      let first: {
         chapterNumber: number;
         paragraphNumber: number;
         summary: string;
         label?: string;
-        isTalkingInFirstParagraph: boolean;
-        otherAppearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[];
+        isTalking: boolean;
+        others: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[];
       } | null = null;
 
-      // Sort chapters to ensure we check them in ascending order.
       const sortedChapters = [...character.infoPerChapter].sort((a, b) => a.chapter - b.chapter);
 
       for (const info of sortedChapters) {
-        // Sort paragraphs within the chapter to find the earliest one.
-        const sortedParagraphs = [...info.paragraphsWhereSpotted, ...info.paragraphsWhereTalking].sort((a, b) => a - b);
+        const sortedParagraphs = [...new Set([...info.paragraphsWhereSpotted, ...info.paragraphsWhereTalking])].sort((a, b) => a - b);
 
-        if (sortedParagraphs.length > 0) {
-          // Found the first paragraph appearance for this character.
-          firstAppearance = {
-            chapterNumber: info.chapter,
-            paragraphNumber: sortedParagraphs[0],
-            isTalkingInFirstParagraph: info.paragraphsWhereTalking.includes(sortedParagraphs[0]),
-            summary: info.summary, // Use summary from the chapter of first appearance
-            label: info.label, // Use label from the chapter of first appearance
-            otherAppearances: [
-              ...sortedParagraphs
-                .slice(1)
-                .map((paragraphNumber) => ({
-                  chapterNumber: info.chapter,
-                  paragraphNumber: paragraphNumber,
-                  isTalkingInParagraph: info.paragraphsWhereTalking.includes(paragraphNumber),
-                })),
-              ...sortedChapters
-                .filter((chapter) => chapter.chapter !== info.chapter)
-                .flatMap((chapter) =>
-                  chapter.paragraphsWhereSpotted.map((paragraphNumber) => ({
-                    chapterNumber: chapter.chapter,
-                    paragraphNumber: paragraphNumber,
-                    isTalkingInParagraph: chapter.paragraphsWhereTalking.includes(paragraphNumber),
-                  })),
-                ),
-            ],
-          };
-        }
+        if (sortedParagraphs.length === 0) continue;
+
+        const [firstPara, ...rest] = sortedParagraphs;
+
+        first = {
+          chapterNumber: info.chapter,
+          paragraphNumber: firstPara,
+          isTalking: info.paragraphsWhereTalking.includes(firstPara),
+          summary: info.summary,
+          label: info.label,
+          others: [
+            ...rest.map((p) => ({ chapterNumber: info.chapter, paragraphNumber: p, isTalkingInParagraph: info.paragraphsWhereTalking.includes(p) })),
+            ...sortedChapters
+              .filter((c) => c.chapter !== info.chapter)
+              .flatMap((c) => c.paragraphsWhereSpotted.map((p) => ({ chapterNumber: c.chapter, paragraphNumber: p, isTalkingInParagraph: c.paragraphsWhereTalking.includes(p) }))),
+          ],
+        };
+
+        break; // first appearance found, no need to inspect later chapters
       }
 
-      // If a character in the input data has no listed paragraphs (which shouldn't happen if pre-filtered correctly).
-      if (!firstAppearance) {
-        // Log a warning or throw an error, as this indicates unexpected input data.
-        console.warn(`Character ${character.characterName} (book: ${character.bookSlug}) provided to parseParagraphRange has no paragraphs listed.`);
-        // Depending on desired behavior, you might want to throw an error or return a default object.
-        // For now, let's throw an error to make the issue explicit.
-        throw new Error(`Character ${character.characterName} has no paragraphs listed in the provided data.`);
-        // If you prefer to filter out such characters instead: return null; and add .filter(Boolean) after .map()
+      if (!first) {
+        console.warn(`Character ${character.characterName} has no paragraphs listed in the provided data.`);
+        return null;
       }
 
-      // Construct the result object for this character.
       return {
         canonicalName: character.characterName,
         imageUrl: character.imageUrl,
-        summary: firstAppearance.summary,
-        isTalkingInFirstParagraph: firstAppearance.isTalkingInFirstParagraph,
-        paragraphNumber: firstAppearance.paragraphNumber,
-        chapterNumber: firstAppearance.chapterNumber,
-        label: firstAppearance.label,
-        otherAppearances: firstAppearance.otherAppearances,
+        summary: first.summary,
+        isTalkingInFirstParagraph: first.isTalking,
+        paragraphNumber: first.paragraphNumber,
+        chapterNumber: first.chapterNumber,
+        label: first.label,
+        otherAppearances: first.others,
       };
     })
+    .filter(Boolean)
     .sort((a, b) => {
-      if (a.chapterNumber !== b.chapterNumber) {
-        return a.chapterNumber - b.chapterNumber;
+      if (a!.chapterNumber !== b!.chapterNumber) {
+        return a!.chapterNumber - b!.chapterNumber;
       }
-      return a.paragraphNumber - b.paragraphNumber;
-    });
-  // If returning null for characters without paragraphs, uncomment the filter below:
-  // .filter((item): item is ParsedParagraphRange => item !== null);
+      return a!.paragraphNumber - b!.paragraphNumber;
+    }) as ParsedParagraphRange[];
 }
 
-export type SelfSufficientCharacterMetadata = {
-  characterName: string;
-  bookSlug: BOOK_SLUGS;
-  infoPerChapter: { chapter: number; summary: string; label?: string; paragraphsWhereSpotted: number[]; paragraphsWhereTalking: number[] }[];
-  imageUrl: string;
-};
+/* -------------------------------------------------------------------------- */
+/*  4. Ad‑hoc “does it match?” sanity check                                   */
+/* -------------------------------------------------------------------------- */
 
-export function getParagraphRangePure({ bookSlug, startChapter, startParagraph, endChapter, endParagraph }: GetParagraphRangeParams): SelfSufficientCharacterMetadata[] {
-  // Filter characters by bookSlug first
-  const charactersByBook = pharaonCharactersData.filter((character) => character.bookSlug === bookSlug); // Assert type here
-
-  // Now filter based on the paragraph range logic
-  const filteredCharacters = charactersByBook.filter((character) => {
-    return character.infoPerChapter.some((info) => {
-      // Check if the chapter itself is within the broader chapter range if it's a multi-chapter search
-      // This avoids unnecessary iteration over paragraphs if the chapter is outside the [startChapter, endChapter] range.
-      if (info.chapter < startChapter || info.chapter > endChapter) {
-        return false;
-      }
-
-      return info.paragraphsWhereSpotted.some((paragraphNumber) => {
-        // Case 4: Single-chapter range
-        if (startChapter === endChapter) {
-          return info.chapter === startChapter && paragraphNumber >= startParagraph && paragraphNumber <= endParagraph;
-        }
-        // Multi-chapter range cases:
-        // Case 1: Paragraphs in the start chapter, at or after startParagraph
-        if (info.chapter === startChapter && paragraphNumber >= startParagraph) {
-          return true;
-        }
-        // Case 2: Paragraphs in chapters strictly between start and end chapters
-        if (info.chapter > startChapter && info.chapter < endChapter) {
-          return true;
-        }
-        // Case 3: Paragraphs in the end chapter, at or before endParagraph
-        if (info.chapter === endChapter && paragraphNumber <= endParagraph) {
-          return true;
-        }
-        return false; // Default case if none of the conditions match
-      });
-    });
-  });
-
-  return filteredCharacters;
-}
+const res = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange({
+  startChapter: 3,
+  endChapter: 3,
+  bookSlug: BOOK_SLUGS.PHARAON,
+  startParagraph: 50,
+  endParagraph: 60,
+});
+console.dir(res, { depth: null });

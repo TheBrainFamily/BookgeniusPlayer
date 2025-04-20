@@ -1,21 +1,22 @@
 /// <reference lib="webworker" />
-import { precacheAndRoute } from "workbox-precaching";
-import { clientsClaim } from "workbox-core";
-import { registerRoute } from "workbox-routing";
-import { CacheFirst } from "workbox-strategies";
-import { RangeRequestsPlugin } from "workbox-range-requests";
+import { precacheAndRoute } from 'workbox-precaching'
+import { clientsClaim }      from 'workbox-core'
 
-// tell the new SW to activate right away
-self.skipWaiting();
-clientsClaim();
+// ①  Workbox rewrites __WB_MANIFEST at build time
+precacheAndRoute(self.__WB_MANIFEST)
 
-// ①  Precache everything listed by vite-plugin-pwa (`__WB_MANIFEST`)
-precacheAndRoute(self.__WB_MANIFEST);
-// ②  For any *other* video / image request, stream first → cache after
-registerRoute(
-  ({ request }) => ["video", "image"].includes(request.destination),
-  new CacheFirst({
-    cacheName: "book-assets",
-    plugins: [new RangeRequestsPlugin()], // enables partial mp4 requests
-  }),
-);
+// ②  Take control as soon as we’re ready
+self.skipWaiting()
+clientsClaim()
+
+// ③  Let the page know when the precache finished
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    (async () => {
+      // waitUntil resolves when precache() finishes
+      await self.skipWaiting()
+      const allClients = await self.clients.matchAll({ includeUncontrolled: true })
+      allClients.forEach((c) => c.postMessage({ type: 'CACHE_COMPLETE' }))
+    })()
+  )
+})

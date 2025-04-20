@@ -1,0 +1,328 @@
+/* ============================================ */
+/* Mobile Landscape Specific Layout (50/50 Split) */
+/* ============================================ */
+@media screen and (orientation: landscape) and (max-width: 1400px) {
+  /* Adjusted max-width slightly */
+  #legacy {
+    /* Ensure the flex direction is row */
+    flex-direction: row !important;
+  }
+
+  #legacy #book-container {
+    flex-direction: row !important;
+    justify-content: flex-start !important; /* Align items to the start */
+    padding: 0 !important; /* Reset padding */
+    height: 100vh !important; /* Ensure full height */
+  }
+
+  #legacy #right-notes {
+    display: none !important; /* Hide right notes */
+  }
+
+  #legacy #left-notes {
+    display: flex !important; /* Override mobile portrait display: none */
+    flex: 0 0 50% !important; /* Take 50% width, don't grow or shrink */
+    max-width: 50% !important;
+    height: 100vh !important; /* Full height */
+    margin: 0 !important; /* Reset margins */
+    padding: 0 !important; /* Reset padding */
+    /* Utilize safe areas */
+    padding-left: 0 !important;
+    padding-top: var(--safe-area-inset-top) !important;
+    padding-bottom: 0px !important;
+    box-sizing: border-box !important; /* Include padding in width calculation */
+    overflow-y: auto !important; /* Allow scrolling if content overflows */
+    position: static !important; /* Override fixed positioning from portrait */
+    transform: none !important; /* Override transforms from portrait */
+    opacity: 1 !important; /* Ensure visible */
+    background-color: var(--bg-notes-light); /* Ensure background is visible */
+    font-size: 0.75em;
+    /* Add these to align internal flex items */
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    flex-direction: column !important; /* Ensure vertical stacking if needed */
+  }
+
+  #legacy #content-container {
+    flex: 0 0 50% !important; /* Take 50% width */
+    max-width: 50% !important;
+    height: 100vh !important; /* Ensure full height */
+    margin: 0 !important; /* Reset margins */
+    padding: 0 !important; /* Reset padding */
+    /* Add small gap from left notes and right edge, respect safe areas */
+    padding-left: max(10px, var(--safe-area-inset-right)) !important;
+    padding-right: max(10px, var(--safe-area-inset-right)) !important;
+    padding-top: var(--safe-area-inset-top) !important;
+    padding-bottom: var(--safe-area-inset-bottom) !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important; /* Keep scrolling */
+    /* Override any padding added by character strip logic */
+    &.has-character-strip {
+      padding-left: 5px !important;
+    }
+    & {
+      /* Default: Minimal Blur Gradient */
+      background: linear-gradient(
+        to left,
+        rgba(var(--bg-content-light-rgb), 0) 0%,
+        rgba(var(--bg-content-light-rgb), 1) 7%,
+        rgba(var(--bg-content-light-rgb), 1) 30%,
+        rgba(var(--bg-content-light-rgb), 1) 93%,
+        rgba(var(--bg-content-light-rgb), 0) 100%
+      );
+      /* Mask remains the same */
+      mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+    }
+  }
+
+  /* Apply stronger blur gradient if right safe area exists */
+  #legacy.has-safe-area-inset-right #content-container {
+    & {
+      background: linear-gradient(
+        to left,
+        rgba(var(--bg-content-light-rgb), 0) 0%,
+        rgba(var(--bg-content-light-rgb), 1) 5%,
+        /* Stronger blur start */ rgba(var(--bg-content-light-rgb), 1) 30%,
+        rgba(var(--bg-content-light-rgb), 1) 95%,
+        rgba(var(--bg-content-light-rgb), 0) 100% /* Stronger blur end */
+      );
+    }
+  }
+
+  /* ============================================ */
+  @media screen and (orientation: landscape) and (min-width: 1000px) {
+    #legacy #content-container {
+      & {
+        padding-left: 1.5em !important;
+        padding-right: 1.5em !important;
+        background: linear-gradient(
+          to left,
+          rgba(var(--bg-content-light-rgb), 0) 0%,
+          rgba(var(--bg-content-light-rgb), 1) 2%,
+          /* Stronger blur start */ rgba(var(--bg-content-light-rgb), 1) 30%,
+          rgba(var(--bg-content-light-rgb), 1) 98%,
+          rgba(var(--bg-content-light-rgb), 0) 100% /* Stronger blur end */
+        ) !important;
+      }
+    }
+  }
+
+  /* Hide mobile-specific toggles/strips/overlays that conflict */
+  #legacy #toggle-notes-button,
+  #legacy #toggle-characters-button,
+  #legacy .mobile-character-strip,
+  #legacy .mobile-horizontal-character-strip,
+  #legacy .notes-edge-indicator,
+  #legacy .notes-overlay,
+  #legacy .close-notes-button {
+    display: none !important;
+  }
+
+  /* Night mode adjustments for left notes background */
+  #legacy.night-mode #left-notes {
+    background-color: var(--bg-notes-dark) !important;
+  }
+
+  #legacy #left-notes .entity-notes-container {
+    width: 100% !important; /* Ensure container fills the parent */
+    height: 100%;
+    padding: 10px !important; /* Add some internal padding */
+    padding-left: calc(var(--safe-area-inset-left) - 20px) !important;
+    box-sizing: border-box !important;
+    /* Restore gap for default spacing */
+    gap: 15px !important;
+    /* justify-content: center !important; */
+  }
+
+  #legacy #left-notes .entity-note {
+    max-width: 100% !important; /* Override max-width constraints */
+    width: 100% !important; /* Ensure it takes full available width */
+    box-sizing: border-box !important;
+    position: relative; /* Needed for z-index */
+    /* Remove negative margin */
+    &:not(:first-child) {
+      margin-top: 0 !important;
+    }
+    & > div {
+      /* Targeting the inner flex container */
+      width: 100% !important;
+      gap: 15px !important; /* Increased gap between image and text */
+      align-items: center !important;
+    }
+  }
+
+  /* Ensure the highlighted entity comes to the front */
+  #legacy #left-notes .entity-note.highlighted-talking-entity {
+    z-index: 1 !important;
+  }
+
+  #legacy #left-notes .entity-image-column {
+    /* Simplify sizing for debugging */
+    height: 150px !important; /* Use a fixed height temporarily */
+    margin-right: 15px !important;
+    flex-shrink: 0 !important; /* Prevent shrinking */
+
+    /* Wrapper takes full column width */
+    & .entity-image-wrapper {
+      margin-top: -2em !important;
+      width: 100% !important;
+      /* height: 100% !important; */
+      padding-top: 0 !important; /* Remove padding-top trick for fixed height */
+      position: relative !important;
+      border-radius: 50% !important;
+      overflow: hidden !important; /* Clip the image */
+    }
+    /* Image fills the wrapper */
+    & .entity-image-wrapper img {
+      display: block !important; /* Force display */
+      opacity: 1 !important; /* Force opacity */
+      position: absolute !important;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      border-radius: 0 !important; /* Reset radius on image */
+      z-index: 1 !important;
+    }
+  }
+  @media screen and (orientation: landscape) and (max-width: 1000px) {
+    #legacy #left-notes .entity-image-column {
+      /* Simplify sizing for debugging */
+      width: 100px !important; /* Use a fixed width temporarily */
+      height: 100px !important; /* Use a fixed height temporarily */
+    }
+  }
+
+  #legacy #left-notes .entity-text-column {
+    /* flex-grow: 1 !important;  */
+    /* Remove fixed basis and stretch */
+    /* flex-basis: auto !important; */
+    padding: 1rem !important;
+    align-self: auto !important;
+    /* Restore intended background */
+    background-color: var(--char-card-bg-light);
+    border-radius: 8px; /* Re-add border radius if needed */
+    box-shadow: 0 0 8px var(--shadow-light); /* Re-add shadow if needed */
+  }
+  /* Night mode text column */
+  #legacy.night-mode #left-notes .entity-text-column {
+    background-color: var(--char-card-bg-dark) !important;
+    box-shadow: 0 0 8px var(--shadow-dark) !important;
+  }
+
+  /* Night mode text column */
+  #legacy.night-mode #left-notes .entity-text-column {
+    background-color: var(--char-card-bg-dark) !important;
+    box-shadow: 0 0 8px var(--shadow-dark) !important;
+  }
+  @keyframes pulseGlow {
+    0% {
+      transform: scale(1.2);
+      box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
+    }
+    50% {
+      transform: scale(1.3);
+      box-shadow: 0 0 15px var(--entity-image-wrapper-shadow-max-light);
+    }
+    100% {
+      transform: scale(1.2);
+      box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
+    }
+  }
+}
+
+/* Note Modal Styles */
+body.modal-open {
+  overflow: hidden; /* Prevent background scrolling when modal is open */
+}
+
+#note-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
+  z-index: 1000; /* Below modal, above everything else */
+  display: none; /* Hidden by default */
+}
+#note-modal-overlay.visible {
+  display: block !important; /* Show when visible class is added, force override */
+}
+
+#note-modal {
+  position: fixed;
+  /* Temporarily simplify positioning */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Comment out transform */
+  z-index: 1001; /* Above overlay */
+  display: none; /* Hidden by default */
+  width: 85%; /* Responsive width */
+  max-width: 500px; /* Max width */
+}
+#note-modal.visible {
+  display: block !important; /* Show when visible class is added, force override */
+}
+
+#note-modal p {
+  text-align: justify;
+}
+
+#note-modal p emphasis {
+  font-weight: bold;
+}
+
+#note-modal .przypis {
+  font-style: italic;
+  font-size: 0.8em;
+  text-align: right;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+#note-modal-dialog {
+  background-color: var(--bg-color, #fff);
+  color: var(--text-color, #000);
+  padding: 25px;
+  padding-top: 40px; /* More padding at top for close button */
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  position: relative;
+  max-height: 70vh; /* Limit height and allow scrolling */
+  overflow-y: auto; /* Enable vertical scrolling if content overflows */
+}
+
+#note-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--text-color-light, #aaa);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+#note-modal-close:hover {
+  color: var(--text-color, #000);
+}
+
+#note-modal-content {
+  /* Style the content inside the modal */
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+#note-modal-content a {
+  color: var(--link-color, blue);
+  text-decoration: underline;
+}
+
+#note-modal-content a:visited {
+  color: var(--link-visited-color, purple);
+}
