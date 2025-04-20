@@ -8,12 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 
-import { pageChapters } from "./chapters";
+import { pageChapters } from "./chapters-pharaon";
 import { isNightMode, toggleNightMode } from "./helpers/setIsNightMode";
 import { goToPage } from "./helpers/pagesNavigation";
 import { toggleMobileCharacters, isMobileCharactersVisible } from "./isMobileCharactersVisible";
 import { resetFurthestPageLocation } from "./helpers/reset-furthest-page-location";
-
+import { goToParagraph } from "./helpers/paragraphsNavigation";
 const getTitle = (chapter: number) => {
   const chapterNames = [
     "Zero",
@@ -95,7 +95,7 @@ export default function BookChaptersModal() {
     console.log(`Navigating to chapter ${chapterId}, page ${pageNum}`);
     // Implement your navigation logic here
     // For example: router.push(`/book/chapter/${chapterId}`)
-    goToPage(pageNum);
+    goToParagraph(chapterId, 0);
     setActiveModal(null);
     setOverlayOpen(false);
   };

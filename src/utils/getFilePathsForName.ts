@@ -1,10 +1,6 @@
 import { BOOK_SLUGS } from "../consts";
 import { pharaonCharactersData } from "@/src/data/pharaon-apr-10.selfsufficientcharactermetadatas";
 
-export const getPictureFileNameForName = (name: string) => {
-  return `${name.replace(/[\s()\\']+/g, "-").toLowerCase()}.png`;
-};
-
 export const knownMovingPictures = [
   "Ramzes",
   "Ramzes XII",
@@ -122,6 +118,13 @@ const known = [
   "wioślarz-ramzesa-hyksos-speaks.mp4",
   "żona-chłopa-topionego-speaks.mp4",
 ];
+
+
+export const getPictureFileNameForName = (name: string) => {
+  return `${name.replace(/[\s()\\']+/g, "-").toLowerCase()}.png`;
+};
+
+const LOG_PREFIX = "Generated file path:";
 
 export const getPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
   const listensPath = `${name

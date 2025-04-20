@@ -493,87 +493,125 @@ const dealWithAnnotations = ({
     rightNotes.style.visibility = "visible";
   }
 };
+export const dealWithBackground = ({ startChapter, startParagraph, endChapter, endParagraph }) => {
+  /* ---------- helpers ---------- */
+  const toBackground = ({ chapter, file }) => {
+    return { startChapter: chapter, startParagraph: 1, file, endChapter: chapter, endParagraph: 10000 };
+  };
 
-const legacyElement = document.getElementById("legacy");
-const videoElement = document.getElementById("bg-video");
+  const legacyElement = document.getElementById("legacy");
+  const videoA = document.getElementById("bg-video-a");
+  const videoB = document.getElementById("bg-video-b");
 
-const dealWithBackground = ({ startChapter, startParagraph, endChapter, endParagraph }) => {
-  const backgrounds = [
-    { startChapter: 1, startParagraph: 1, file: "background.png", endChapter: 1, endParagraph: 10 },
-    { startChapter: 1, startParagraph: 11, file: "moving-background.mp4", endChapter: 1, endParagraph: 109 },
-    { startChapter: 2, startParagraph: 1, file: "army.mp4", endChapter: 2, endParagraph: 40 },
-    { startChapter: 3, startParagraph: 10, file: "background-sara.mp4", endChapter: 3, endParagraph: 80 },
-    // Add more background definitions here if needed
+  /* Track which video is currently on top (A starts) */
+  if (!legacyElement.dataset.front) {
+    legacyElement.dataset.front = "a";
+  }
+  const getFront = () => (legacyElement.dataset.front === "a" ? videoA : videoB);
+  const getBack = () => (legacyElement.dataset.front === "a" ? videoB : videoA);
+
+  let front = getFront();
+  let back = getBack();
+
+  /* duration in ms = value of --transition-duration (default 0.8 s) */
+  const fadeMs = parseFloat(getComputedStyle(front).transitionDuration) * 1000 || 800;
+
+  /* -------- cross‑fade core -------- */
+  function crossFadeTo(file) {
+    if (legacyElement.dataset.currentFile === file) {
+      console.log("BACKGROUND already showing", file);
+      return; /* already showing */
+    } else {
+      console.log("BACKGROUND applying background", legacyElement.dataset.currentFile, file);
+    }
+
+    const newSrc = `/Pharaon/${file}`;
+
+    back.src = newSrc;
+    back.load(); /* start buffering */
+
+    back.addEventListener(
+      "loadeddata",
+      () => {
+        console.log("BACKGROUND loadeddata", back);
+        back.currentTime = 0;
+        back.play();
+
+        /* step 1 — be sure the back video starts at opacity 0 */
+        back.classList.add("faded");
+
+        /* step 2 — next frame: fade back in, front out */
+        requestAnimationFrame(() => {
+          back.classList.remove("faded"); /* fades IN */
+          front.classList.add("faded"); /* fades OUT */
+        });
+
+        /* step 3 — after the transition, swap roles */
+        setTimeout(() => {
+          legacyElement.dataset.front = legacyElement.dataset.front === "a" ? "b" : "a";
+          legacyElement.dataset.currentFile = file;
+
+          /* refresh references for the next call */
+          front = getFront();
+          back = getBack();
+          console.log("BACKGROUND swapped — new front/back", front, back);
+        }, fadeMs);
+      },
+      { once: true },
+    );
+  }
+
+  /* ---------- mapping  ---------- */
+  const backgroundsPassedFromGemini = [
+    { chapter: 1, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+    { chapter: 2, file: "background-wawoz-fade.mp4" },
+    { chapter: 3, file: "background-sara-slow-motion-loop.mp4" },
+    { chapter: 4, file: "background-army-fade-loop.mp4" },
+    { chapter: 5, file: "background-sara-estate-fade.mp4" },
+    { chapter: 6, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+    { chapter: 7, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+    { chapter: 8, file: "background-moving-generic-estate-fade.mp4" },
+    { chapter: 9, file: "background-moving-generic-estate-slow-motion-loop.mp4" },
+    { chapter: 10, file: "background-moving-generic-faster-estate-fade.mp4" },
+    { chapter: 11, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+    { chapter: 12, file: "background-generic-pingpong-fade.mp4" },
+    { chapter: 13, file: "background-moving-generic-estate-fade.mp4" },
+    { chapter: 14, file: "background-moving-generic-estate-fade.mp4" },
+    { chapter: 15, file: "background-moving-generic-estate-slow-motion-loop.mp4" },
+    { chapter: 16, file: "background-generic-pingpong-fade.mp4" },
+    { chapter: 17, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+    { chapter: 18, file: "background-generic-pingpong-fade.mp4" },
+    { chapter: 19, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+    { chapter: 20, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+    { chapter: 21, file: "background-generic-pingpong-fade.mp4" },
+    { chapter: 22, file: "background-generic-pingpong-fade.mp4" },
+    { chapter: 23, file: "background-moving-generic-estate-fade.mp4" },
+    { chapter: 24, file: "background-moving-generic-estate-fade.mp4" },
+    { chapter: 25, file: "background-egyptian-streets-palace-visible-loop.mp4" },
   ];
+  const backgrounds = backgroundsPassedFromGemini.map(toBackground);
 
-  let backgroundApplied = false;
+  /* ---------- decide & apply ---------- */
+  let applied = false;
+  console.log("BACKGROUND deciding", { startChapter, startParagraph, endChapter, endParagraph });
 
-  for (const background of backgrounds) {
-    if (
-      startChapter === background.startChapter &&
-      startParagraph <= background.endParagraph &&
-      endChapter === background.endChapter &&
-      endParagraph >= background.startParagraph
-    ) {
-      console.log("GOZDECKI IS APPLYING BACKGROUND", background);
-      backgroundApplied = true;
-
-      if (background.file.endsWith(".mp4")) {
-        // Fade out ::after image
-        legacyElement.style.setProperty("--opacity-after", "0");
-
-        const newVideoSrc = `/Pharaon/${background.file}`;
-
-        if (videoElement.getAttribute("src") !== newVideoSrc) {
-          videoElement.style.opacity = "0"; // Fade out current video
-          setTimeout(
-            () => {
-              videoElement.src = newVideoSrc;
-              videoElement.load();
-              videoElement.play();
-              videoElement.style.opacity = "1"; // Fade in new video
-            },
-            parseFloat(getComputedStyle(videoElement).transitionDuration) * 1000,
-          );
-        } else {
-          videoElement.style.opacity = "1"; // Video already loaded
-        }
-      } else if (background.file.endsWith(".png")) {
-        // Fade out video
-        videoElement.style.opacity = "0";
-        setTimeout(
-          () => {
-            videoElement.pause();
-            videoElement.removeAttribute("src");
-          },
-          parseFloat(getComputedStyle(videoElement).transitionDuration) * 1000,
-        );
-
-        // Set new image and fade in
-        const newImageUrl = `url("/Pharaon/${background.file}")`;
-        if (legacyElement.style.getPropertyValue("--bg-image-after") !== newImageUrl) {
-          legacyElement.style.setProperty("--bg-image-after", newImageUrl);
-        }
-        legacyElement.style.setProperty("--opacity-after", "1");
-      }
-
-      break; // First matching background handled
+  for (const bg of backgrounds) {
+    if (startChapter === bg.startChapter && startParagraph <= bg.endParagraph && endChapter === bg.endChapter && endParagraph >= bg.startParagraph) {
+      applied = true;
+      console.log("BACKGROUND matched", bg.file);
+      crossFadeTo(bg.file);
+      break;
     }
   }
 
-  // Default state: fade out ::after and video
-  if (!backgroundApplied) {
-    legacyElement.style.setProperty("--opacity-after", "0");
-    videoElement.style.opacity = "0";
-    setTimeout(
-      () => {
-        videoElement.pause();
-        videoElement.removeAttribute("src");
-      },
-      parseFloat(getComputedStyle(videoElement).transitionDuration) * 1000,
-    );
-  }
+  /* when no match: fade to blurred PNG only */
+  // if (!applied) {
+  //   videoA.classList.add("faded");
+  //   videoB.classList.add("faded");
+  //   legacyElement.dataset.currentFile = "";
+  // }
 };
+
 let previousCharacters: string[] = [];
 let isUpdatingNotes = false; // Flag to prevent overlapping updates
 

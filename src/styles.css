@@ -200,7 +200,7 @@
     background-repeat: no-repeat;
     filter: blur(3px); /* Apply blur */
     opacity: 1; /* Always fully visible */
-    z-index: -2; /* Ensure it's behind ::after */
+    z-index: -3; /* Ensure it's behind ::after */
     /* No transition needed on this layer */
     /* Optional: Add a slight dimming overlay if needed */
     /* background-color: rgba(0, 0, 0, 0.1); */
@@ -221,6 +221,20 @@
     transition: opacity var(--transition-duration) ease-in-out;
   }
 
+  .bg-video {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity var(--transition-duration) ease-in-out;
+    filter: blur(3px);
+
+    z-index: -2; /* sit below ::after / ::before */
+  }
+  .bg-video.faded {
+    opacity: 0;
+  }
   /* --- Mobile Touch Behavior --- */
   /* Apply only to direct children for performance, if needed */
   &,

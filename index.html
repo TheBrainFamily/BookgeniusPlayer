@@ -19,7 +19,7 @@
     <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
 
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" version="1.0.0" />
+    <link rel="manifest" href="/manifest.json" version="1.0.2" />
 
     <!-- CSS_LINKS -->
     <style></style>
@@ -28,7 +28,8 @@
 
   <body>
     <div id="legacy">
-      <video id="bg-video" autoplay muted loop playsinline></video>
+      <video id="bg-video-a" class="bg-video" autoplay muted loop playsinline></video>
+      <video id="bg-video-b" class="bg-video faded" autoplay muted loop playsinline></video>
 
       <div id="book-container">
         <div class="notes-container" id="left-notes"></div>
@@ -6888,7 +6889,10 @@
           </div>
           <div class="modal-content">
             <div id="character-details-info" style="text-align: center">
-              <img id="modal-details-character-image" style="max-width: 100%; max-height: 300px; margin-bottom: 15px; cursor: pointer; display: block; margin: 0 auto" />
+              <img
+                id="modal-details-character-image"
+                style="max-width: 100%; margin-bottom: 15px; cursor: pointer; display: block; margin: 0 auto; border-radius: 50%; object-fit: cover; aspect-ratio: 1/1"
+              />
               <h3 id="modal-details-character-name" style="margin-bottom: 10px"></h3>
               <p id="modal-details-character-summary"></p>
             </div>

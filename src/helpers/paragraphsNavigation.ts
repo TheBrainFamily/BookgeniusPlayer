@@ -30,8 +30,10 @@ export const setCurrentLocation = (location: { chapter: number; paragraph: numbe
 export const goToParagraph = (chapter: number, paragraph: number) => {
   setCurrentLocation({ chapter, paragraph });
   // Select the paragraph based on data-chapter and data-index attributes
-  const selector = `section[data-chapter="${chapter}"] p[data-index="${paragraph}"]`;
+  const selector = `section[data-chapter="${chapter}"] [data-index="${paragraph}"]`;
+  console.log("selector", selector);
   const targetParagraph = document.querySelector(selector);
+  console.log("targetParagraph", targetParagraph);
   targetParagraph?.scrollIntoView({ behavior: "smooth", block: "start" });
 };
 
