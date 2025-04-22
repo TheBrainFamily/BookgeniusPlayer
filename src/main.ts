@@ -1,15 +1,16 @@
-import "./styles.css";
-import "./styles-narrow.css";
-import "./globals.css";
-import "./main.css";
+/*  THIS FILE IS 100 % VANILLA JS ‑ NOTHING RENDERS HERE
+ *
+ *  We simply copied everything that used to live in main.ts,
+ *  removed the `startReactComponents()` call (React is now started
+ *  from index.tsx) and wrapped the whole thing into `runLegacyInit()`.
+ *  You can continue cutting pieces out of here and turning them into
+ *  real React components whenever you feel like it.
+ */
 
-import { isNightMode, setIsNightMode } from "./helpers/setIsNightMode";
+import { setIsNightMode } from "./helpers/setIsNightMode";
 import { isMobileCharactersVisible } from "./isMobileCharactersVisible";
-import { startReactComponents } from "./react-components";
 import { initSearchModal } from "./searchModal";
 import { initializeNoteLinkBlinking } from "./annotationsHandling";
-
-// Import the extracted modules
 import { dealWithSW } from "./serviceWorker";
 import { setUpdateParagraphNotesFunction } from "./ui/pageObserver";
 import { updateParagraphNotes } from "./ui/paragraphNotes";
@@ -18,80 +19,59 @@ import { setupKeyboardNavigation } from "./utils/keyboardNavigation";
 import { initPage } from "./ui/pageInit";
 import { initCharacterModals, showCharacterDetailsModal } from "./ui/characterModals";
 
-// Set the update notes function for the page observer
-setUpdateParagraphNotesFunction(updateParagraphNotes);
+/* ------------------------------------------------------------------ */
+/*  The only exported symbol                                           */
+/* ------------------------------------------------------------------ */
+export async function runLegacyInit() {
+  /* one‑liners that other modules expect to be set up immediately */
+  setUpdateParagraphNotesFunction(updateParagraphNotes);
+  dealWithSW();
 
-// Initialize service worker
-dealWithSW();
+  /* ----------------------------------------------------------------
+   *  1. Initialise the FB2 pages, scrolling position, SW, etc.
+   * ---------------------------------------------------------------- */
+  const loadingIndicator = document.getElementById("loading");
 
-// DOM elements
-const loadingIndicator = document.getElementById("loading");
-
-// Toggle night mode
-export function toggleNightMode() {
-  setIsNightMode(!isNightMode());
-}
-
-// Start the initialization process
-initPage()
-  .catch((error) => {
+  try {
+    await initPage();
+  } catch (error) {
     console.error("Error initializing page:", error);
     if (loadingIndicator) {
       loadingIndicator.innerHTML = "<div>Error loading book. Please refresh the page.</div>";
     }
-  })
-  .then(() => {
-    console.log("container exists?", document.getElementById("content-container"));
-    // Add scroll event listener to update notes based on visible pages
-    const contentContainer = document.getElementById("content-container");
-    if (contentContainer) {
-      contentContainer.addEventListener("scroll", () => {
-        // Scroll handling is now in paragraphHighlighting.ts
-      });
-    }
-  });
-
-// Add the characters-hidden class to body initially if the character strip is hidden
-document.getElementById("legacy")?.classList.toggle("characters-hidden", !isMobileCharactersVisible());
-
-// Initialize everything when DOM is loaded
-function onDOMLoaded() {
-  initializeNoteLinkBlinking();
-
-  if (localStorage.getItem("nightMode") === "true") {
-    setIsNightMode(true);
   }
 
-  // Initialize search modal
-  initSearchModal();
+  /* ----------------------------------------------------------------
+   *  2.  “DOMContentLoaded” kind of stuff
+   * ---------------------------------------------------------------- */
+  function onDOMLoaded() {
+    initializeNoteLinkBlinking(); // <-- kept here for safety;
+    //     also wrapped in a React hook upstream
+    if (localStorage.getItem("nightMode") === "true") setIsNightMode(true);
 
-  // Initialize character modals
-  initCharacterModals();
+    initSearchModal();
+    initCharacterModals();
 
-  // Add event listeners for closing modals
-  document.querySelectorAll(".modal-close").forEach((button) => {
-    const modal = button.closest(".modal-overlay");
-    if (modal) {
-      button.addEventListener("click", () => {
-        modal.classList.remove("active");
-      });
-    }
-  });
+    document.querySelectorAll(".modal-close").forEach((button) => {
+      const modal = button.closest(".modal-overlay");
+      if (modal) button.addEventListener("click", () => modal.classList.remove("active"));
+    });
 
-  // Setup keyboard navigation
-  setupKeyboardNavigation();
+    setupKeyboardNavigation();
+    setupParagraphHighlighting();
+  }
 
-  // Setup highlighting paragraphs on entity hover and vice-versa
-  setupParagraphHighlighting();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", onDOMLoaded);
+  } else {
+    onDOMLoaded();
+  }
+
+  /* ----------------------------------------------------------------
+   *  3. Anything that other scripts expect to exist on window
+   * ---------------------------------------------------------------- */
+  (window as any).showCharacterDetailsModal = showCharacterDetailsModal;
+
+  /* Characters panel initial state (night mode, mobile characters, …) */
+  document.getElementById("legacy")?.classList.toggle("characters-hidden", !isMobileCharactersVisible());
 }
-
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", onDOMLoaded);
-} else {
-  onDOMLoaded();
-}
-
-startReactComponents();
-
-// Make showCharacterDetailsModal available globally for the sidebar editor
-window.showCharacterDetailsModal = showCharacterDetailsModal;
