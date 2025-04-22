@@ -3,21 +3,18 @@ import "./styles-narrow.css";
 import "./globals.css";
 
 import { isNightMode, setIsNightMode } from "@/src/helpers/setIsNightMode";
-import { getCurrentPage, goToNextPage, goToPage, goToPreviousPage, setCurrentPage } from "@/src/helpers/pagesNavigation";
-import { pagesToSkipFooterGeneration, romanNumeralPages, BOOK_SLUGS } from "@/src/consts";
+import { BOOK_SLUGS } from "@/src/consts";
 import { isMobileCharactersVisible, toggleMobileCharacters } from "@/src/isMobileCharactersVisible";
 import { startReactComponents } from "./react-components";
 import { getCurrentBookSlug } from "./getCurrentBookSlug";
-import { initSearchModal, showSearchModal, hideSearchModal, isSearchActive } from "./searchModal";
+import { hideSearchModal, initSearchModal, isSearchActive, showSearchModal } from "./searchModal";
 
 // Import the sidebar editor utilities
-import { createEditableEntity, createEditablePageSummary, createEditableChapterSummary, createAddCharacterButton, addEditorStyles, isEditActive } from "./utils/sidebarEditor";
-import { getParagraphRange, getParagraphRangePure, paragraphMetadataServicePure, ParsedParagraphRange, parseParagraphRange } from "./fetchers/getParagraphRange";
+import { createEditableEntity, isEditActive } from "./utils/sidebarEditor";
+import { getParagraphRange, paragraphMetadataServicePure, ParsedParagraphRange, parseParagraphRange } from "./fetchers/getParagraphRange";
 import { getSavedLocation, goToParagraph, setCurrentLocation } from "./helpers/paragraphsNavigation";
-import { initializeNoteLinkBlinking, setupNoteLinkBlinking } from "./annotationsHandling";
-import { getPictureFilePathForName, getMovingPictureFilePathForName } from "./utils/getFilePathsForName";
-import { knownMovingPictures } from "./utils/getFilePathsForName";
-import { Workbox } from "workbox-window";
+import { initializeNoteLinkBlinking } from "./annotationsHandling";
+import { getMovingPictureFilePathForName } from "./utils/getFilePathsForName";
 import { dealWithCutScenes } from "./deal-with-cut-scenes";
 
 const splash = document.getElementById("splash")!;
@@ -508,8 +505,8 @@ export const dealWithBackground = ({ startChapter, startParagraph, endChapter, e
   if (!legacyElement.dataset.front) {
     legacyElement.dataset.front = "a";
   }
-  const getFront = () => (legacyElement.dataset.front === "a" ? videoA : videoB);
-  const getBack = () => (legacyElement.dataset.front === "a" ? videoB : videoA);
+  const getFront = () => (legacyElement.dataset.front === "a" ? videoA : videoB) as HTMLVideoElement;
+  const getBack = () => (legacyElement.dataset.front === "a" ? videoB : videoA) as HTMLVideoElement;
 
   let front = getFront();
   let back = getBack();
@@ -623,7 +620,7 @@ async function updateParagraphNotesInternal({
 }) {
   dealWithBackground({ startChapter, startParagraph, endChapter, endParagraph });
   dealWithAnnotations({ startChapter, startParagraph, endChapter, endParagraph });
-  dealWithCutScenes({ startChapter, startParagraph, endChapter, endParagraph });
+  dealWithCutScenes({ startChapter, startParagraph });
   const leftNotes = document.getElementById("left-notes");
   if (!leftNotes) return;
   const paragraphs =
@@ -1558,26 +1555,6 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
 
   // Handle other keyboard navigation
   switch (event.key) {
-    case "ArrowLeft":
-    case "p":
-    case "P":
-      console.log("go to previous page");
-      await goToPreviousPage();
-      break;
-    case "ArrowRight":
-    case "n":
-    case "N":
-      console.log("go to next page");
-      await goToNextPage();
-      break;
-    case "m":
-    case "M":
-      toggleNightMode();
-      break;
-    case "c":
-    case "C":
-      toggleMobileCharacters();
-      break;
     case "Escape":
       // Cancel page number input on Escape
       typedPageNumber = "";
@@ -1902,56 +1879,6 @@ startReactComponents();
 
 // Make showCharacterDetailsModal available globally for the sidebar editor
 window.showCharacterDetailsModal = showCharacterDetailsModal;
-
-function initializeNoteLinkBlinking() {
-  // Set up hover behavior for note links
-  const contentContainer = document.getElementById("content-container");
-  if (!contentContainer) return;
-
-  // Add event delegation for all link-note elements
-  contentContainer.addEventListener("mouseover", (event) => {
-    const target = event.target as HTMLElement;
-    if (target.classList.contains("link-note") || target.closest(".link-note")) {
-      const linkNote = target.classList.contains("link-note") ? target : (target.closest(".link-note") as HTMLElement);
-      const targetId = linkNote.getAttribute("href")?.substring(1); // Get href like '#fn3' and remove '#'
-
-      if (targetId) {
-        const noteElement = document.getElementById(targetId);
-        if (noteElement && noteElement.closest("#right-notes-scrollable-container")) {
-          // Scroll the note into view smoothly
-          // noteElement.scrollIntoView({ behavior: "smooth", block: "center" });
-
-          // Add highlight-blink class to run animation
-          noteElement.classList.add("highlight-blink");
-
-          // Remove the class after animation completes
-          setTimeout(() => {
-            noteElement.classList.remove("highlight-blink");
-          }, 2000); // Adjust timing based on your animation duration
-        }
-      }
-    }
-  });
-
-  // Add mouseout handler to ensure highlight is removed when no longer hovering
-  contentContainer.addEventListener("mouseout", (event) => {
-    const target = event.target as HTMLElement;
-    if (target.classList.contains("link-note") || target.closest(".link-note")) {
-      const linkNote = target.classList.contains("link-note") ? target : (target.closest(".link-note") as HTMLElement);
-      const targetId = linkNote.getAttribute("href")?.substring(1);
-
-      if (targetId) {
-        const noteElement = document.getElementById(targetId);
-        if (noteElement) {
-          // Remove highlight when mouse leaves the link
-          setTimeout(() => {
-            noteElement.classList.remove("highlight-blink");
-          }, 500); // Short delay to allow user to move mouse to the note
-        }
-      }
-    }
-  });
-}
 
 // --- Start Preloading Logic ---
 

@@ -155,8 +155,8 @@ const filesFound: string[] = [];
 pharaonCharactersData.forEach((character) => {
   const { characterName, bookSlug } = character;
 
-  filesFound.push(getPictureFilePathForName(characterName, bookSlug));
-  filesFound.push(getMovingPictureFilePathForName(characterName, bookSlug));
+  filesFound.push(getPictureFilePathForName(characterName, bookSlug as BOOK_SLUGS));
+  filesFound.push(getMovingPictureFilePathForName(characterName, bookSlug as BOOK_SLUGS));
 });
 
 // known.forEach((file) => {

@@ -1,75 +1,49 @@
 export function initializeNoteLinkBlinking() {
-  const noteLinks: NodeListOf<HTMLAnchorElement> = document.querySelectorAll("a.link-note");
+  // Set up hover behavior for note links
+  const contentContainer = document.getElementById("content-container");
+  if (!contentContainer) return;
 
-  const blinkElement = (element: HTMLElement | null) => {
-    if (!element) return;
+  // Add event delegation for all link-note elements
+  contentContainer.addEventListener("mouseover", (event) => {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains("link-note") || target.closest(".link-note")) {
+      const linkNote = target.classList.contains("link-note") ? target : (target.closest(".link-note") as HTMLElement);
+      const targetId = linkNote.getAttribute("href")?.substring(1); // Get href like '#fn3' and remove '#'
 
-    // --- End reduced motion check ---
+      if (targetId) {
+        const noteElement = document.getElementById(targetId);
+        if (noteElement && noteElement.closest("#right-notes-scrollable-container")) {
+          // Scroll the note into view smoothly
+          // noteElement.scrollIntoView({ behavior: "smooth", block: "center" });
 
-    // --- Ensure the element is visible BEFORE trying to animate ---
-    const computedStyle = window.getComputedStyle(element);
-    if (computedStyle.display === "none") {
-      element.style.display = "block"; // Explicitly set display
-    }
-    // --- End visibility check ---
+          // Add highlight-blink class to run animation
+          noteElement.classList.add("highlight-blink");
 
-    const blinkClass = "highlight-blink"; // CSS class for the effect
-
-    // Add the class to trigger the animation
-    element.classList.add(blinkClass);
-
-    const onAnimationStart = () => {
-      element.removeEventListener("animationstart", onAnimationStart);
-    };
-
-    const onAnimationEnd = () => {
-      element.classList.remove(blinkClass);
-    };
-
-    element.addEventListener("animationstart", onAnimationStart, { once: true });
-    element.addEventListener("animationend", onAnimationEnd, { once: true }); // { once: true } ensures the listener is removed after firing
-  };
-
-  noteLinks.forEach((link) => {
-    console.log("NOTES noteLinks SETUP INTERACTION", link);
-    const handleInteraction = (event: MouseEvent | FocusEvent) => {
-      console.log("NOTES handleInteraction", event);
-      // For click events, prevent the default jump-to-anchor behavior
-      // if you only want the blink without scrolling. Keep it if you want both.
-      if (event.type === "click") {
-        event.preventDefault();
-      }
-
-      const href = link.getAttribute("href");
-      if (!href || !href.startsWith("#")) {
-        console.warn("Link-note href is missing or invalid:", link);
-        return;
-      }
-
-      try {
-        // Use querySelector for robustness, getElementById needs IDs without CSS syntax
-        const targetId = href; // Keep the '#' for querySelector
-        const targetElement = document.querySelector<HTMLElement>(targetId);
-
-        if (targetElement) {
-          blinkElement(targetElement);
-          // Optional: If you want to scroll the target into view as well
-          // targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-          console.warn(`Target element with selector "${targetId}" not found.`);
+          // Remove the class after animation completes
+          setTimeout(() => {
+            noteElement.classList.remove("highlight-blink");
+          }, 2000); // Adjust timing based on your animation duration
         }
-      } catch (e) {
-        console.error(`Error finding or processing target for selector "${href}":`, e);
       }
-    };
+    }
+  });
 
-    // Trigger on hover (mouseover)
-    link.addEventListener("mouseover", handleInteraction);
+  // Add mouseout handler to ensure highlight is removed when no longer hovering
+  contentContainer.addEventListener("mouseout", (event) => {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains("link-note") || target.closest(".link-note")) {
+      const linkNote = target.classList.contains("link-note") ? target : (target.closest(".link-note") as HTMLElement);
+      const targetId = linkNote.getAttribute("href")?.substring(1);
 
-    // Trigger on click
-    link.addEventListener("click", handleInteraction);
-
-    // Optional: Trigger on focus (for keyboard navigation)
-    // link.addEventListener('focus', handleInteraction);
+      if (targetId) {
+        const noteElement = document.getElementById(targetId);
+        if (noteElement) {
+          // Remove highlight when mouse leaves the link
+          setTimeout(() => {
+            noteElement.classList.remove("highlight-blink");
+          }, 500); // Short delay to allow user to move mouse to the note
+        }
+      }
+    }
   });
 }
