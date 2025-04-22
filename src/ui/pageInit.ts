@@ -1,11 +1,9 @@
-import { setupPageObserver } from "./pageObserver";
 import { setupMobileInteractions } from "./mobileUI";
 import { getSavedLocation, goToParagraph } from "../helpers/paragraphsNavigation";
 
 // Initialize pages
 export function initializePages() {
   // Set up intersection observer to detect visible pages
-  setupPageObserver();
 
   // Set up mobile interactions
   setupMobileInteractions();
