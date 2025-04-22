@@ -61,7 +61,6 @@ export function activateCharacters(chapterNum: number, paragraphNum: number, boo
         }
       }
 
-      note.classList.remove("highlighted-entity", "highlighted-talking-entity");
       const imageElement = note.querySelector<HTMLImageElement>(".entity-image");
 
       if (isTalkingInRange) {

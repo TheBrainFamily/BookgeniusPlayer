@@ -1,6 +1,6 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useMemo } from "react";
 import { ParsedParagraphRange } from "@/src/fetchers/getParagraphRange";
-import { getPictureFilePathForName } from "@/src/utils/getFilePathsForName";
+import { getPictureFilePathForName, getMovingPictureFilePathForName } from "@/src/utils/getFilePathsForName";
 import { getCurrentBookSlug } from "@/src/getCurrentBookSlug";
 
 /* ------------------------------------------------------------------ */
@@ -27,6 +27,50 @@ export const CharacterCard: React.FC<Props> = ({ entity, index }) => {
     { chapterNumber: entity.chapterNumber, paragraphNumber: entity.paragraphNumber, isTalkingInParagraph: entity.isTalkingInFirstParagraph },
     ...entity.otherAppearances,
   ];
+
+  /* Determine if this character is talking in the current range */
+  const isTalkingInCurrentRange = useMemo(() => {
+    // We can use the entity's appearances to determine if it's talking in the current range
+    return apps.some((app) => app.isTalkingInParagraph);
+  }, [apps]);
+
+  /* Use effect to apply the appropriate classes based on talking state */
+  useEffect(() => {
+    const cardElement = document.querySelector(`.entity-note[data-canonical-name="${entity.canonicalName}"]`);
+    if (!cardElement) return;
+
+    if (isTalkingInCurrentRange) {
+      cardElement.classList.add("highlighted-talking-entity");
+
+      // Update image to animated version if talking
+      const imageElement = cardElement.querySelector<HTMLImageElement>(".entity-image");
+      if (imageElement && imageElement.dataset.originalSrc) {
+        const gifSrc = getMovingPictureFilePathForName(entity.canonicalName, bookSlug);
+        const currentSrcFilename = imageElement.src.split("/").pop();
+        const gifSrcFilename = gifSrc.split("/").pop();
+        if (currentSrcFilename !== gifSrcFilename) {
+          imageElement.src = gifSrc;
+        }
+      }
+    } else {
+      cardElement.classList.add("highlighted-entity");
+
+      // Ensure image is static version
+      const imageElement = cardElement.querySelector<HTMLImageElement>(".entity-image");
+      if (imageElement && imageElement.dataset.originalSrc) {
+        const currentSrcFilename = imageElement.src.split("/").pop();
+        const originalSrcFilename = imageElement.dataset.originalSrc.split("/").pop();
+        if (currentSrcFilename !== originalSrcFilename) {
+          imageElement.src = imageElement.dataset.originalSrc;
+        }
+      }
+    }
+
+    return () => {
+      // Cleanup classes when component unmounts or updates
+      cardElement.classList.remove("highlighted-talking-entity", "highlighted-entity");
+    };
+  }, [entity.canonicalName, isTalkingInCurrentRange, bookSlug]);
 
   /* --------------------------------------------------------------- */
   /*  Smooth hover highlight                                         */

@@ -6,8 +6,6 @@ import { useCharacterNotes } from "@/src/hooks/useCharacterNotes";
 import { CharacterCard } from "./CharacterCard";
 
 import { useLocation } from "@/src/state/LocationContext";
-import { activateCharacters } from "@/src/ui/characterHelpers";
-import { getCurrentBookSlug } from "@/src/getCurrentBookSlug";
 
 /* mount inside the legacy container for CSS */
 const target = document.getElementById("left-notes");
@@ -32,12 +30,6 @@ export const CharacterNotesPanel: React.FC = () => {
   useEffect(() => {
     setFadeInKey((k) => k + 1); // triggers fadeUp on the *new* cards only
   }, [notes]);
-
-  /* mark talking / present characters */
-  useEffect(() => {
-    if (notes.length === 0) return;
-    activateCharacters(range.chapter, range.paragraph, getCurrentBookSlug(), range.endChapter, range.endParagraph, false);
-  }, [range.chapter, range.paragraph, range.endChapter, range.endParagraph, notes]);
 
   if (!target) return null;
 
