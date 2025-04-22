@@ -48,12 +48,10 @@ export async function runLegacyInit() {
 
     initSearchModal();
     initCharacterModals();
-
     document.querySelectorAll(".modal-close").forEach((button) => {
       const modal = button.closest(".modal-overlay");
       if (modal) button.addEventListener("click", () => modal.classList.remove("active"));
     });
-
     setupKeyboardNavigation();
     setupParagraphHighlighting();
   }

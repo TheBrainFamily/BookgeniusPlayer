@@ -23,12 +23,8 @@ export function initializeNoteLinkBlinking() {
   };
 
   noteLinks.forEach((link) => {
-    console.log("NOTES noteLinks SETUP INTERACTION", link);
-    
     // Handle mouseover - add highlight
     link.addEventListener("mouseover", (event) => {
-      console.log("NOTES mouseover", event);
-      
       const href = link.getAttribute("href");
       if (!href || !href.startsWith("#")) {
         console.warn("Link-note href is missing or invalid:", link);
@@ -48,18 +44,16 @@ export function initializeNoteLinkBlinking() {
         console.error(`Error finding or processing target for selector "${href}":`, e);
       }
     });
-    
+
     // Handle mouseout - remove highlight
     link.addEventListener("mouseout", (event) => {
-      console.log("NOTES mouseout", event);
-      
       const href = link.getAttribute("href");
       if (!href || !href.startsWith("#")) return;
 
       try {
         const targetId = href;
         const targetElement = document.querySelector<HTMLElement>(targetId);
-        
+
         if (targetElement) {
           removeHighlight(targetElement);
         }
@@ -71,7 +65,7 @@ export function initializeNoteLinkBlinking() {
     // Handle click for navigation
     link.addEventListener("click", (event) => {
       event.preventDefault();
-      
+
       const href = link.getAttribute("href");
       if (!href || !href.startsWith("#")) {
         console.warn("Link-note href is missing or invalid:", link);
@@ -81,9 +75,9 @@ export function initializeNoteLinkBlinking() {
       try {
         const targetId = href;
         const targetElement = document.querySelector<HTMLElement>(targetId);
-        
+
         if (targetElement) {
-          targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       } catch (e) {
         console.error(`Error finding or processing target for selector "${href}":`, e);

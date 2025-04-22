@@ -43,7 +43,6 @@ export async function keyboardNavigationSetup(event: KeyboardEvent) {
     case "f":
     case "F":
       // Only trigger if no modifiers (the Cmd+F/Ctrl+F is handled elsewhere)
-      console.log("f key pressed", event.metaKey, event.ctrlKey, event.altKey);
       if (!event.metaKey && !event.ctrlKey && !event.altKey) {
         showSearchModal();
       }
