@@ -1,164 +1,4 @@
 /* ============================================ */
-/* Global Variables & Setup           */
-/* ============================================ */
-
-:root {
-  --top-solid: 15%; /* mask is fully opaque from here down              */
-  --mid-solid: 50%; /* last row that stays fully opaque                 */
-  --edge-fade: 0%; /* width of the fixed left/right edge soft‑fade     */
-
-  /* Safe Area Insets */
-  --safe-area-inset-top: env(safe-area-inset-top, 0px);
-  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-area-inset-left: env(safe-area-inset-left, 0px);
-  --safe-area-inset-right: env(safe-area-inset-right, 0px);
-
-  /* Colors - Light Mode */
-  --bg-light: #f0f0f0;
-  --bg-content-light: #fdfaf4; /* FB2 content bg */
-  --bg-page-light: #f5f5f5;
-  --bg-page-active-light: #fff;
-  --bg-notes-light: rgba(249, 249, 249, 0);
-  --text-light: #222;
-  --text-muted-light: #666;
-  --text-notes-light: #444;
-  --border-light: #ccc;
-  --border-notes-light: #ddd;
-  --shadow-light: rgba(0, 0, 0, 0.08);
-  --link-light: #005ea8;
-  --link-note-light: #8e8e8e;
-  --link-note-hover-bg-light: #e0e0e0;
-  --link-note-hover-text-light: #000;
-  --control-bg-light: #333; /* Controls are dark */
-  --control-text-light: white;
-  --button-bg-light: #555;
-  --button-hover-bg-light: #777;
-  --button-disabled-bg-light: #444;
-  --button-disabled-opacity: 0.5;
-  --button-extra-bg-light: rgba(0, 0, 0, 0.2);
-  --button-extra-hover-bg-light: rgba(0, 0, 0, 0.4);
-  --modal-overlay-bg: rgba(0, 0, 0, 0.7);
-  --modal-bg-light: white;
-  --modal-text-light: #333; /* Default modal text */
-  --modal-header-border-light: #ddd;
-  --modal-close-light: #777;
-  --char-card-bg-light: rgba(255, 255, 255, 30%);
-  --char-card-border-light: #ddd; /* Mobile strip border */
-  --mobile-strip-bg-light: rgba(255, 255, 255, 0.95);
-  --mobile-strip-horizontal-bg-light: rgba(255, 255, 255, 0.85);
-  --highlight-blink-color: rgba(152, 152, 152, 0.5);
-  /* RGB versions for transparency */
-  --bg-light-rgb: 240, 240, 240;
-  --bg-content-light-rgb: 253, 250, 244;
-  --bg-notes-light-rgb: 249, 249, 249;
-  --modal-bg-light-rgb: 255, 255, 255;
-  --mobile-strip-bg-light-rgb: 255, 255, 255;
-  --mobile-strip-horizontal-bg-light-rgb: 255, 255, 255;
-
-  /* Colors - Dark Mode */
-  --bg-dark: #222;
-  --bg-content-dark: #000; /* FB2 content bg */
-  --bg-notes-dark: #252525;
-  --text-dark: #ddd;
-  --text-muted-dark: #999;
-  --text-notes-dark: #bbb;
-  --border-dark: #555;
-  --border-notes-dark: #555;
-  --shadow-dark: rgba(0, 0, 0, 0.2);
-  --link-dark: #5fadde; /* Lighter blue for dark mode */
-  --link-note-dark: #aaa;
-  --link-note-hover-bg-dark: #444;
-  --link-note-hover-text-dark: #eee;
-  --modal-bg-dark: #333;
-  --modal-text-dark: #eee;
-  --modal-header-border-dark: #555;
-  --modal-close-dark: #aaa;
-  --char-card-bg-dark: #444;
-  --char-card-border-dark: #444; /* Mobile strip border */
-  --mobile-strip-bg-dark: rgba(50, 50, 50, 0.95);
-  --mobile-strip-horizontal-bg-dark: rgba(50, 50, 50, 0.85);
-  /* RGB versions for transparency */
-  --bg-dark-rgb: 34, 34, 34;
-  --bg-content-dark-rgb: 0, 0, 0;
-  --bg-notes-dark-rgb: 37, 37, 37;
-  --modal-bg-dark-rgb: 51, 51, 51;
-  --mobile-strip-bg-dark-rgb: 50, 50, 50;
-  --mobile-strip-horizontal-bg-dark-rgb: 50, 50, 50;
-
-  /* Button Colors (Shared) */
-  --button-primary-bg: #4a90e2;
-  --button-primary-hover-bg: #3a7bc8;
-  --button-primary-text: white;
-  --button-secondary-bg-light: #e2e2e2;
-  --button-secondary-hover-bg-light: #d2d2d2;
-  --button-secondary-text-light: #333;
-  --button-secondary-bg-dark: #555;
-  --button-secondary-hover-bg-dark: #666;
-  --button-secondary-text-dark: #eee;
-  --button-danger-bg: #e25c5c;
-  --button-danger-hover-bg: #c74545;
-  --button-danger-text: white;
-  --return-button-bg: #4a4a4a;
-  --return-button-hover-bg: #333;
-
-  /* Font Families */
-  --font-serif: "Georgia", serif;
-  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-mono: "Courier New", Courier, monospace;
-
-  /* Transitions */
-  --transition-fast: 0.2s;
-  --transition-medium: 0.3s;
-  --transition-slow: 0.4s;
-  --transition-timing: ease;
-  --transition-timing-cubic: cubic-bezier(0.25, 0.1, 0.25, 1);
-
-  /* Spinner */
-  --spinner-bg: #f3f3f3;
-  --spinner-color: #3498db;
-
-  /* Highlighting Colors - Light Mode */
-  --highlight-paragraph-bg-light: rgba(217, 133, 30, 0.2);
-  --highlight-paragraph-shadow-light: rgba(217, 133, 30, 0.2);
-  --talking-paragraph-bg-light: rgba(166, 83, 10, 0.2);
-  --talking-paragraph-border-light: rgba(166, 83, 10, 0.8);
-  --talking-paragraph-shadow-light: rgba(255, 200, 100, 0.25);
-  --talking-paragraph-shimmer-light: rgba(255, 215, 140, 0.1);
-
-  --entity-highlight-shadow-light: rgba(120, 120, 120, 0.15);
-  --entity-highlight-bg-light: rgba(250, 239, 197, 0.7);
-  --entity-highlight-border-light: rgba(255, 215, 0, 0.4);
-  --entity-highlight-shadow-accent-light: rgba(255, 215, 0, 0.1);
-
-  --entity-talking-highlight-bg-light: rgba(250, 239, 197, 0.85);
-  --entity-talking-highlight-border-light: rgba(255, 215, 0, 0.6);
-  --entity-talking-highlight-shadow-light: rgba(255, 215, 0, 0.25);
-
-  --entity-image-wrapper-border-light: rgba(255, 215, 0, 0.5);
-  --entity-image-wrapper-shadow-light: rgba(255, 215, 0, 0.4);
-  --entity-image-wrapper-shadow-min-light: rgba(196, 176, 28, 0.3);
-  --entity-image-wrapper-shadow-max-light: rgba(196, 176, 28, 0.6);
-
-  /* Entity Highlighting Colors - Dark Mode */
-  --highlight-paragraph-bg-dark: rgba(70, 70, 90, 0.4);
-  --highlight-paragraph-shadow-dark: rgba(80, 80, 120, 0.2);
-  --talking-paragraph-bg-dark: rgba(80, 80, 110, 0.5);
-  --talking-paragraph-border-dark: rgba(120, 130, 180, 0.8);
-  --talking-paragraph-shadow-dark: rgba(100, 110, 160, 0.25);
-  --talking-paragraph-shimmer-dark: rgba(120, 130, 180, 0.1);
-
-  --entity-highlight-bg-dark: rgba(60, 60, 70, 0.8);
-  --entity-highlight-border-dark: rgba(100, 150, 220, 0.5);
-
-  --entity-talking-highlight-bg-dark: rgba(50, 60, 90, 0.9);
-  --entity-talking-highlight-border-dark: rgba(100, 150, 220, 0.7);
-  --entity-talking-highlight-shadow-dark: rgba(100, 150, 220, 0.25);
-
-  --entity-image-wrapper-border-dark: rgba(100, 150, 220, 0.5);
-  --entity-image-wrapper-shadow-dark: rgba(100, 150, 220, 0.4);
-}
-
-/* ============================================ */
 /* Scoped Legacy CSS            */
 /* ============================================ */
 
@@ -658,12 +498,6 @@
     color: var(--text-light);
   }
 
-  /* For dark mode */
-  #legacy.night-mode .entity-text-column {
-    background-color: var(--char-card-bg-dark);
-    box-shadow: 0 0 8px var(--shadow-dark);
-  }
-
   /* Specific Notes Panel Instances */
   #right-notes {
     display: flex;
@@ -680,10 +514,6 @@
     #right-notes-scrollable-container {
       overflow-y: scroll;
       max-width: 700px;
-    }
-
-    .notes-container section {
-      background-color: rgb(255, 255, 255, 30%);
     }
 
     section {
@@ -721,33 +551,6 @@
     height: 100vh;
     margin: 20px 5px 20px 0;
     flex: 1;
-  }
-
-  /* --- Controls --- */
-  #controls {
-    display: flex;
-    justify-content: center;
-    align-items: center; /* Vertically align items */
-    padding: 10px;
-    background-color: var(--control-bg-light);
-    color: var(--control-text-light);
-    flex-shrink: 0; /* Prevent controls from shrinking */
-    /* Consider position: fixed/sticky if needed */
-  }
-
-
-  #fullscreen-button,
-  #night-mode-button {
-    background-color: var(--button-extra-bg-light);
-    color: white;
-    border-radius: 5px;
-    padding: 5px 10px;
-    margin-left: 10px;
-    font-size: 12px;
-    /* Inherits base button transitions/cursor */
-    &:hover {
-      background-color: var(--button-extra-hover-bg-light);
-    }
   }
 
   /* Return to Location Button */
@@ -807,86 +610,7 @@
     }
   }
 
-  /* --- Modal Styles --- */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background-color: var(--modal-overlay-bg);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000; /* Same level as loading */
-    opacity: 0;
-    visibility: hidden;
-    transition:
-      opacity var(--transition-medium) var(--transition-timing),
-      visibility var(--transition-medium) step-end; /* Hide instantly when fading out */
-
-    &.active {
-      opacity: 1;
-      visibility: visible;
-      transition:
-        opacity var(--transition-medium) var(--transition-timing),
-        visibility 0s; /* Show instantly */
-
-      .modal-container {
-        transform: translateY(0);
-      }
-    }
-  }
-
-  .modal-container {
-    background-color: rgba(var(--modal-bg-light-rgb), 0.9); /* Slightly transparent */
-    color: var(--modal-text-light);
-    border-radius: 8px;
-    padding: 25px;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    border-bottom: 1px solid var(--modal-header-border-light);
-    padding-bottom: 10px;
-  }
-
-  .modal-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-  }
-
-  .modal-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--modal-close-light);
-    padding: 0; /* Remove default padding */
-    margin: 0; /* Remove default margin */
-  }
-
-  .modal-content {
-    margin-bottom: 20px;
-  }
-
-  .modal-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-
-  /* Modal Button Variants */
-  .modal-button {
-    /* Inherits base button styles */
-    margin: 0; /* Reset margin for gap usage */
-    font-weight: bold;
-    /* Specific padding if different from base button */
-    /* padding: 8px 15px; */
-  }
+  
 
   .close-notes-button {
     position: absolute;
@@ -1084,356 +808,10 @@
     }
   }
 
-  /* --- Night Mode Overrides --- */
-  &.night-mode {
-    scrollbar-color: #555 #222;
-    /* background-color: var(--bg-dark); */ /* Handled by ::before */
-    background-color: transparent;
-    color: var(--text-dark);
-
-    #book-container #content-container {
-      /* background-color: var(--bg-content-dark); */
-      background-color: rgba(var(--bg-content-dark-rgb), 0.95); /* Slightly transparent */
-      color: var(--text-dark);
-
-      /* FB2 Content Night Mode */
-      & {
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-          color: var(--text-dark);
-        }
-        blockquote.cite {
-          border-left-color: var(--border-dark);
-          color: #ccc;
-        }
-        .epigraph {
-          color: #aaa;
-        }
-        a {
-          color: var(--link-dark);
-        }
-        a.link-note {
-          color: var(--link-note-dark);
-          &:hover,
-          &:focus {
-            background-color: var(--link-note-hover-bg-dark);
-            color: var(--link-note-hover-text-dark);
-          }
-        }
-        table {
-          border-color: var(--border-dark);
-        }
-        th,
-        td {
-          border-color: var(--border-dark);
-        }
-        th {
-          background-color: #333;
-        } /* Darker header */
-        code {
-          background-color: #333;
-        }
-      }
-    }
-
-    .notes-container,
-    #right-notes {
-      /* background-color: var(--bg-notes-dark); */
-      background-color: rgba(var(--bg-notes-dark-rgb), 0.9); /* Slightly transparent */
-      color: var(--text-notes-dark);
-      box-shadow: 0 0 8px var(--shadow-dark);
-      h3 {
-        border-bottom-color: var(--border-notes-dark);
-      }
-    }
-
-    #right-notes {
-      p {
-        color: var(--text-notes-dark);
-      }
-      emphasis {
-        color: var(--text-dark);
-      } /* Lighter emphasis in dark mode */
-    }
-
-    .page-footer {
-      color: var(--text-muted-dark);
-    }
-    .chapter-header {
-      border-top-color: var(--border-dark);
-    }
-    .modal-container {
-      /* background-color: var(--modal-bg-dark); */
-      background-color: rgba(var(--modal-bg-dark-rgb), 0.9); /* Slightly transparent */
-      color: var(--modal-text-dark);
-    }
-    .modal-header {
-      border-bottom-color: var(--modal-header-border-dark);
-    }
-    .modal-close {
-      color: var(--modal-close-dark);
-    }
-    .secondary-button {
-      background-color: var(--button-secondary-bg-dark);
-      color: var(--button-secondary-text-dark);
-      &:hover {
-        background-color: var(--button-secondary-hover-bg-dark);
-      }
-    }
-    .character-card {
-      background-color: var(--char-card-bg-dark);
-    }
-    .mobile-character-strip {
-      /* background-color: var(--mobile-strip-bg-dark); */
-      background-color: rgba(var(--mobile-strip-bg-dark-rgb), 0.9); /* Adjusted transparency */
-    }
-    .mobile-character-item img {
-      border-color: var(--char-card-border-dark);
-    }
-    .mobile-horizontal-character-strip {
-      /* background-color: var(--mobile-strip-horizontal-bg-dark); */
-      background-color: rgba(var(--mobile-strip-horizontal-bg-dark-rgb), 0.85); /* Kept original transparency */
-    }
-    .mobile-horizontal-character-item img {
-      border-color: var(--char-card-border-dark);
-    }
-    .notes-edge-indicator {
-      background-color: #2a5a8e; /* Darker primary */
-    }
-  }
-
-  /* ============================================ */
-  /* Landscape Adjustments            */
-  /* ============================================ */
-  @media screen and (orientation: landscape) {
-    #extra-controls {
-      right: max(10px, var(--safe-area-inset-right));
-      top: max(10px, var(--safe-area-inset-top));
-    }
-
-    .mobile-character-strip {
-      /* Vertical */
-      padding-left: max(10px, var(--safe-area-inset-left));
-      padding-bottom: max(10px, var(--safe-area-inset-bottom));
-      padding-top: max(10px, var(--safe-area-inset-top));
-    }
-
-    .mobile-horizontal-character-strip {
-      /* Horizontal */
-      padding-bottom: max(5px, var(--safe-area-inset-bottom));
-      padding-left: max(15px, var(--safe-area-inset-left));
-      padding-right: max(15px, var(--safe-area-inset-right));
-      height: calc(85px + var(--safe-area-inset-bottom)); /* Ensure height includes safe area */
-    }
-  }
-
-  /* ============================================ */
-  /* Mobile Responsive Styles           */
-  /* ============================================ */
-  @media (max-width: 768px) {
-    /* --- Layout Changes --- */
-    #book-container {
-      flex-direction: row; /* Stack content vertically */
-      padding: 0; /* Remove desktop padding */
-      height: 100vh; /* Ensure it fills viewport */
-    }
-
-    #content-container {
-      flex: 1;
-      height: 100vh; /* Fallback */
-      height: calc(100vh + var(--safe-area-inset-bottom)); /* Extend height */
-      margin: 0; /* Remove auto margins */
-      padding-top: max(10px, var(--safe-area-inset-top)); /* Add top padding respecting safe area */
-      padding-bottom: var(--safe-area-inset-bottom); /* Keep safe area padding */
-      /* Adjust left/right padding based on vertical strip visibility */
-      padding-left: 1em;
-      padding-right: 1em;
-      transition: none !important; /* Prevent transition during resize/orientation change */
-      transform: translateZ(0); /* Promote to hardware layer */
-
-      /* Add padding when vertical character strip is visible */
-      &.has-character-strip {
-        padding-left: calc(70px + 1em); /* Strip width + desired gap */
-      }
-    }
-
-    .page {
-      padding: 0 15px; /* Reduce horizontal padding */
-    }
-
-    /* --- Notes Panel Becomes Overlay --- */
-    .notes-container {
-      position: fixed;
-      top: 0;
-      right: 0; /* Slides in from the right */
-      width: 100%; /* Full screen width */
-      height: 100%;
-      margin: 0;
-      padding: 20px; /* Restore padding */
-      padding-top: max(40px, calc(var(--safe-area-inset-top) + 20px)); /* Space for close button */
-      padding-bottom: max(20px, var(--safe-area-inset-bottom)); /* Respect bottom safe area */
-      border-radius: 0;
-      z-index: 50; /* Above overlay, strips, toggles */
-      transform: translateX(100%); /* Offscreen to the right */
-      opacity: 0; /* Start hidden */
-      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
-      background-color: rgba(var(--bg-light-rgb), 0.9); /* Use transparent light mode bg */
-      transition:
-        transform var(--transition-medium) var(--transition-timing-cubic),
-        opacity var(--transition-medium) var(--transition-timing-cubic);
-      will-change: transform, opacity;
-
-      &.active {
-        transform: translateX(0); /* Slide in */
-        opacity: 1;
-      }
-    }
-    &.night-mode .notes-container {
-      /* background-color: var(--bg-dark); */ /* Ensure dark background */
-      background-color: rgba(var(--bg-dark-rgb), 0.9); /* Use transparent dark mode bg */
-    }
-
-    /* Hide Desktop Notes */
-    #right-notes,
-    #left-notes {
-      display: none;
-    }
-
-    /* Adjust Extra Controls Position/Size */
-    #extra-controls {
-      top: max(10px, var(--safe-area-inset-top)); /* Respect safe area */
-      right: max(10px, var(--safe-area-inset-right));
-      z-index: 45; /* Ensure visibility */
-    }
-    #fullscreen-button,
-    #night-mode-button {
-      font-size: 10px;
-      padding: 4px 8px;
-    }
-
-    /* Show Mobile Character UI */
-    .mobile-character-strip {
-      display: block;
-    } /* Show vertical strip */
-    .mobile-horizontal-character-strip {
-      display: block;
-    } /* Also show horizontal */
-
-    /* Adjust Horizontal Strip Visibility Logic */
-    /* Hide horizontal when vertical is shown (default on mobile) */
-    &:not(.characters-hidden) .mobile-horizontal-character-strip {
-      display: none;
-    }
-    /* Show horizontal when vertical is explicitly hidden */
-    &.characters-hidden .mobile-horizontal-character-strip {
-      display: block;
-    }
-
-    .entity-image-column {
-      /* Container for image */
-      margin-bottom: 10px;
-    }
-    .entity-image {
-      max-width: 120px !important; /* Limit image size */
-      margin: 0 auto;
-      display: block;
-    }
-
-    /* Modal Adjustments */
-    .modal-container {
-      padding: 15px;
-      width: 95%; /* More screen width */
-    }
-    .modal-buttons {
-      flex-direction: column; /* Stack buttons */
-      gap: 8px; /* Adjust gap for vertical layout */
-    }
-    .modal-button {
-      width: 100%;
-      margin-bottom: 0; /* Use gap instead */
-    }
-
-    /* Character Grid Adjustments */
-    .character-grid {
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Smaller cards */
-    }
-
-    /* Notes Edge Indicator (Swipe Hint) */
-    .notes-edge-indicator {
-      display: block; /* Show on mobile */
-      position: fixed;
-      top: 50%;
-      right: 0;
-      width: 10px;
-      height: 60px;
-      background-color: var(--button-primary-bg);
-      border-top-left-radius: 4px;
-      border-bottom-left-radius: 4px;
-      transform: translateY(-50%);
-      z-index: 40; /* Below toggles */
-      opacity: 0.7;
-      transition: all var(--transition-fast) var(--transition-timing);
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-      cursor: pointer; /* Indicate interactivity */
-
-      /* Touch area extension */
-      &::before {
-        content: "";
-        position: absolute;
-        top: -10px;
-        left: -20px;
-        width: 30px;
-        height: 80px;
-        background-color: transparent;
-        z-index: -1; /* Behind the visual indicator */
-      }
-
-      &:hover {
-        /* Might not apply on touch, but good for testing */
-        width: 14px;
-        opacity: 0.9;
-        background-color: var(--button-primary-hover-bg);
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
-      }
-      &:active,
-      &.swiping {
-        width: 12px;
-        opacity: 0.9;
-        background-color: var(--button-primary-hover-bg);
-      }
-    }
-    /* Hide indicator when notes are open */
-    .notes-container.active + .notes-edge-indicator {
-      opacity: 0 !important; /* Use !important to override hover/active */
-      pointer-events: none;
-      width: 10px; /* Reset width */
-    }
-
-    /* Return Button Adjustment */
-    #return-to-location-button {
-      bottom: 10px;
-      right: 10px;
-      font-size: 12px;
-      padding: 8px 12px;
-    }
-  }
-
   .editable-text:hover {
     background-color: rgba(74, 144, 226, 0.1);
     border-radius: 4px;
     position: relative;
-  }
-
-  .edit-icon {
-    visibility: hidden;
-  }
-
-  .editable-container:hover .edit-icon {
-    visibility: visible;
   }
 
   .edit-container {
@@ -1554,22 +932,6 @@
     }
   }
 
-  /* Dark mode versions */
-  #legacy.night-mode .highlighted-paragraph {
-    background-color: var(--highlight-paragraph-bg-dark);
-    box-shadow: 0 0 8px var(--highlight-paragraph-shadow-dark);
-  }
-
-  #legacy.night-mode .talking-paragraph {
-    background-color: var(--talking-paragraph-bg-dark);
-    border-left: 3px solid var(--talking-paragraph-border-dark);
-    box-shadow: 0 0 15px var(--talking-paragraph-shadow-dark);
-  }
-
-  #legacy.night-mode .talking-paragraph::after {
-    background: linear-gradient(90deg, rgba(120, 130, 180, 0) 0%, var(--talking-paragraph-shimmer-dark) 50%, rgba(120, 130, 180, 0) 100%);
-  }
-
   /* Add this rule for highlighting entities in the sidebar */
   .entity-note.highlighted-entity {
     transition: transform 0.2s ease-in-out;
@@ -1600,18 +962,6 @@
     border: 2px solid var(--entity-talking-highlight-border-light);
     box-shadow: 0 0 15px var(--entity-talking-highlight-shadow-light);
     transition: all 0.3s ease-in-out;
-  }
-
-  /* For dark mode */
-  #legacy.night-mode .entity-note.highlighted-entity .entity-text-column {
-    background-color: var(--entity-highlight-bg-dark);
-    border: 1px solid var(--entity-highlight-border-dark);
-  }
-
-  #legacy.night-mode .entity-note.highlighted-talking-entity .entity-text-column {
-    background-color: var(--entity-talking-highlight-bg-dark);
-    border: 2px solid var(--entity-talking-highlight-border-dark);
-    box-shadow: 0 0 12px var(--entity-talking-highlight-shadow-dark);
   }
 
   /* Scale the wrapper for the image within a highlighted talking entity */
@@ -1700,12 +1050,6 @@
   z-index: 1;
 }
 
-/* For dark mode */
-#legacy.night-mode .entity-note.highlighted-talking-entity .entity-image-wrapper {
-  box-shadow: 0 0 15px var(--entity-image-wrapper-shadow-dark);
-  border: 2px solid var(--entity-image-wrapper-border-dark);
-}
-
 /* ============================================ */
 /* Animation Keyframes & Classes      */
 /* ============================================ */
@@ -1739,11 +1083,6 @@
   margin-bottom: 0.5em; /* Example spacing */
   border-radius: 4px;
   animation: shimmer 1.5s infinite linear;
-}
-
-#legacy.night-mode .skeleton {
-  background-color: #333;
-  background-image: linear-gradient(90deg, #333 0px, #444 40px, #333 80px);
 }
 
 @keyframes shimmer {
@@ -1781,13 +1120,6 @@
     position: relative;
     display: flex;
     align-items: flex-start;
-  }
-
-  /* Textarea styling in edit mode */
-  .edit-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
   }
 
   .edit-container textarea {

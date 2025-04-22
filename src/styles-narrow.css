@@ -52,15 +52,9 @@
   /* Hide mobile-specific toggles/strips/overlays that conflict */
   #legacy .mobile-character-strip,
   #legacy .mobile-horizontal-character-strip,
-  #legacy .notes-edge-indicator,
   #legacy .notes-overlay,
   #legacy .close-notes-button {
     display: none;
-  }
-
-  /* Night mode adjustments for left notes background */
-  #legacy.night-mode #left-notes {
-    background-color: var(--bg-notes-dark);
   }
 
   #legacy #left-notes .entity-notes-container {
@@ -94,11 +88,5 @@
       border-radius: 50%;
       overflow: hidden; /* Clip the image */
     }
-  }
-
-  /* Night mode text column */
-  #legacy.night-mode #left-notes .entity-text-column {
-    background-color: var(--char-card-bg-dark);
-    box-shadow: 0 0 8px var(--shadow-dark);
   }
 }
