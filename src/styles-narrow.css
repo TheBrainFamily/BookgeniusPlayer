@@ -24,7 +24,6 @@
     position: static; /* Override fixed positioning from portrait */
     transform: none; /* Override transforms from portrait */
     opacity: 1; /* Ensure visible */
-    background-color: var(--bg-notes-light); /* Ensure background is visible */
     font-size: 0.75em;
     /* Add these to align internal flex items */
     justify-content: flex-start;
