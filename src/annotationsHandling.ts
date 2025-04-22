@@ -1,49 +1,93 @@
 export function initializeNoteLinkBlinking() {
-  // Set up hover behavior for note links
-  const contentContainer = document.getElementById("content-container");
-  if (!contentContainer) return;
+  const noteLinks: NodeListOf<HTMLAnchorElement> = document.querySelectorAll("a.link-note");
 
-  // Add event delegation for all link-note elements
-  contentContainer.addEventListener("mouseover", (event) => {
-    const target = event.target as HTMLElement;
-    if (target.classList.contains("link-note") || target.closest(".link-note")) {
-      const linkNote = target.classList.contains("link-note") ? target : (target.closest(".link-note") as HTMLElement);
-      const targetId = linkNote.getAttribute("href")?.substring(1); // Get href like '#fn3' and remove '#'
+  const handleInteraction = (element: HTMLElement | null) => {
+    if (!element) return;
 
-      if (targetId) {
-        const noteElement = document.getElementById(targetId);
-        if (noteElement && noteElement.closest("#right-notes-scrollable-container")) {
-          // Scroll the note into view smoothly
-          // noteElement.scrollIntoView({ behavior: "smooth", block: "center" });
-
-          // Add highlight-blink class to run animation
-          noteElement.classList.add("highlight-blink");
-
-          // Remove the class after animation completes
-          setTimeout(() => {
-            noteElement.classList.remove("highlight-blink");
-          }, 2000); // Adjust timing based on your animation duration
-        }
-      }
+    // --- Ensure the element is visible BEFORE trying to highlight ---
+    const computedStyle = window.getComputedStyle(element);
+    if (computedStyle.display === "none") {
+      element.style.display = "block"; // Explicitly set display
     }
-  });
+    // --- End visibility check ---
 
-  // Add mouseout handler to ensure highlight is removed when no longer hovering
-  contentContainer.addEventListener("mouseout", (event) => {
-    const target = event.target as HTMLElement;
-    if (target.classList.contains("link-note") || target.closest(".link-note")) {
-      const linkNote = target.classList.contains("link-note") ? target : (target.closest(".link-note") as HTMLElement);
-      const targetId = linkNote.getAttribute("href")?.substring(1);
+    const highlightClass = "highlight-note"; // Consistent highlighting class
 
-      if (targetId) {
-        const noteElement = document.getElementById(targetId);
-        if (noteElement) {
-          // Remove highlight when mouse leaves the link
-          setTimeout(() => {
-            noteElement.classList.remove("highlight-blink");
-          }, 500); // Short delay to allow user to move mouse to the note
-        }
+    // Add the class to trigger the highlight
+    element.classList.add(highlightClass);
+  };
+
+  const removeHighlight = (element: HTMLElement | null) => {
+    if (!element) return;
+    element.classList.remove("highlight-note");
+  };
+
+  noteLinks.forEach((link) => {
+    console.log("NOTES noteLinks SETUP INTERACTION", link);
+    
+    // Handle mouseover - add highlight
+    link.addEventListener("mouseover", (event) => {
+      console.log("NOTES mouseover", event);
+      
+      const href = link.getAttribute("href");
+      if (!href || !href.startsWith("#")) {
+        console.warn("Link-note href is missing or invalid:", link);
+        return;
       }
-    }
+
+      try {
+        const targetId = href; // Keep the '#' for querySelector
+        const targetElement = document.querySelector<HTMLElement>(targetId);
+
+        if (targetElement) {
+          handleInteraction(targetElement);
+        } else {
+          console.warn(`Target element with selector "${targetId}" not found.`);
+        }
+      } catch (e) {
+        console.error(`Error finding or processing target for selector "${href}":`, e);
+      }
+    });
+    
+    // Handle mouseout - remove highlight
+    link.addEventListener("mouseout", (event) => {
+      console.log("NOTES mouseout", event);
+      
+      const href = link.getAttribute("href");
+      if (!href || !href.startsWith("#")) return;
+
+      try {
+        const targetId = href;
+        const targetElement = document.querySelector<HTMLElement>(targetId);
+        
+        if (targetElement) {
+          removeHighlight(targetElement);
+        }
+      } catch (e) {
+        console.error(`Error finding or processing target for selector "${href}":`, e);
+      }
+    });
+
+    // Handle click for navigation
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      
+      const href = link.getAttribute("href");
+      if (!href || !href.startsWith("#")) {
+        console.warn("Link-note href is missing or invalid:", link);
+        return;
+      }
+
+      try {
+        const targetId = href;
+        const targetElement = document.querySelector<HTMLElement>(targetId);
+        
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } catch (e) {
+        console.error(`Error finding or processing target for selector "${href}":`, e);
+      }
+    });
   });
 }

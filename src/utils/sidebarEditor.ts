@@ -1,4 +1,3 @@
-import "./sidebarEditor.css";
 import { BOOK_SLUGS } from "../consts";
 import { updateCharacterChapterInfo } from "../fetchers/updateCharacterChapterInfo";
 import { getCurrentBookSlug } from "../getCurrentBookSlug";

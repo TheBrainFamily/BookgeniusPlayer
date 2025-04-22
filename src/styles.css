@@ -603,38 +603,8 @@
   }
 
   /* Spacing for first element on first page */
-  #page-0 > *:first-child {
-    margin-top: 30px;
-  }
+  
 
-  /* Specific page padding */
-  #page-1 {
-    padding-top: 50px;
-  }
-
-  /* Page separator */
-  .page-separator {
-    height: 1px;
-    background-color: var(--border-light);
-    margin: 30px auto;
-    width: 50%;
-  }
-
-  /* Page Footer (Numbers) */
-  .page-footer {
-    position: absolute;
-    top: 2px;
-    font-size: 12px;
-    color: var(--text-muted-light);
-    &.left {
-      left: 40px;
-      right: auto;
-    }
-    &.right {
-      right: 40px;
-      left: auto;
-    }
-  }
 
   /* --- Chapter Styling --- */
   .chapter-header {
@@ -643,20 +613,6 @@
   }
   .chapter-item {
     padding: 2px;
-  }
-
-  /* --- Book Page Specifics --- */
-  .book-page {
-    /* Assuming this class is used within .page */
-    p {
-      text-indent: 1.553em; /* Specific indent for book pages */
-    }
-    img {
-      max-width: 100%;
-      height: auto;
-      display: block; /* Prevent extra space below images */
-      margin: 1em auto; /* Center images */
-    }
   }
 
   /* --- Notes Panel --- */
@@ -669,13 +625,6 @@
     line-height: 1.4;
     font-size: 1rem;
     color: var(--text-notes-light);
-
-    h3 {
-      margin-bottom: 15px;
-      border-bottom: 1px solid var(--border-notes-light);
-      padding-bottom: 5px;
-      font-size: 1rem;
-    }
   }
 
   /* Container for entity notes - center content vertically */
@@ -731,15 +680,6 @@
     #right-notes-scrollable-container {
       overflow-y: scroll;
       max-width: 700px;
-      @media (max-width: 1900px) {
-        max-width: 500px;
-      }
-      @media (max-width: 1700px) {
-        max-width: 400px;
-      }
-      @media (max-width: 1500px) {
-        max-width: 300px;
-      }
     }
 
     #right-notes-scrollable-container section {
@@ -795,43 +735,6 @@
     /* Consider position: fixed/sticky if needed */
   }
 
-  #page-info {
-    margin: 0 20px;
-    line-height: 30px; /* Match button height roughly */
-  }
-
-  /* General Button Styles */
-  button, .button, .modal-button /* Apply to button tags and classes */ {
-    margin: 0 5px; /* Reduced margin */
-    padding: 8px 15px; /* Standardized padding */
-    background-color: var(--button-bg-light);
-    color: var(--control-text-light);
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color var(--transition-fast) var(--transition-timing);
-    font-size: 1rem; /* Base button font size */
-    line-height: 1.2; /* Ensure text fits */
-
-    &:hover {
-      background-color: var(--button-hover-bg-light);
-    }
-
-    &:disabled {
-      background-color: var(--button-disabled-bg-light);
-      cursor: not-allowed;
-      opacity: var(--button-disabled-opacity);
-    }
-  }
-
-  /* Extra Controls (Top Right) */
-  #extra-controls {
-    display: flex;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 20; /* Above content, below modals */
-  }
 
   #fullscreen-button,
   #night-mode-button {
@@ -865,13 +768,6 @@
     &:hover {
       background-color: var(--return-button-hover-bg);
     }
-  }
-
-  /* Keyboard Hints */
-  .key-hint {
-    font-size: 12px;
-    opacity: 0.7;
-    margin-left: 5px;
   }
 
   /* --- Loading Indicator --- */
@@ -911,26 +807,6 @@
     }
   }
 
-  /* --- Page Number Indicator --- */
-  #page-number-indicator {
-    position: fixed;
-    bottom: 70px; /* Adjust as needed */
-    right: 20px;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 18px;
-    opacity: 0;
-    transition: opacity var(--transition-medium) var(--transition-timing);
-    z-index: 100; /* Below controls/modals */
-    pointer-events: none; /* Prevent interaction */
-
-    &.visible {
-      opacity: 1;
-    }
-  }
-
   /* --- Modal Styles --- */
   .modal-overlay {
     position: fixed;
@@ -960,18 +836,13 @@
   }
 
   .modal-container {
-    /* background-color: var(--modal-bg-light); */
     background-color: rgba(var(--modal-bg-light-rgb), 0.9); /* Slightly transparent */
     color: var(--modal-text-light);
     border-radius: 8px;
     padding: 25px;
-    width: 90%;
     max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transform: translateY(-20px);
-    transition: transform var(--transition-medium) var(--transition-timing);
   }
 
   .modal-header {
@@ -1016,104 +887,6 @@
     /* Specific padding if different from base button */
     /* padding: 8px 15px; */
   }
-
-  .primary-button {
-    background-color: var(--button-primary-bg);
-    color: var(--button-primary-text);
-    &:hover {
-      background-color: var(--button-primary-hover-bg);
-    }
-  }
-  .secondary-button {
-    background-color: var(--button-secondary-bg-light);
-    color: var(--button-secondary-text-light);
-    &:hover {
-      background-color: var(--button-secondary-hover-bg-light);
-    }
-  }
-  .danger-button {
-    background-color: var(--button-danger-bg);
-    color: var(--button-danger-text);
-    &:hover {
-      background-color: var(--button-danger-hover-bg);
-    }
-  }
-
-  /* --- Character/Entity Styles --- */
-  .character-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
-    margin-top: 15px;
-  }
-
-  .character-card {
-    border: 2px solid transparent;
-    border-radius: 5px;
-    padding: 10px;
-    text-align: center;
-    cursor: pointer;
-    transition: all var(--transition-fast) var(--transition-timing);
-    background-color: var(--char-card-bg-light);
-
-    &:hover {
-      border-color: var(--button-primary-bg); /* Use primary color for hover/selection */
-    }
-    &.selected {
-      border-color: var(--button-primary-bg);
-      background-color: rgba(74, 144, 226, 0.1); /* Primary color tint */
-    }
-
-    img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 3px;
-      margin-bottom: 8px;
-    }
-    .character-name {
-      font-size: 0.9rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-
-  .entity-image {
-    cursor: pointer;
-    transition: transform var(--transition-fast) var(--transition-timing);
-    &:hover {
-      transform: scale(1);
-    }
-  }
-
-  /* --- Mobile Specific Elements --- */
-  #toggle-notes-button,
-  #toggle-characters-button {
-    display: none; /* Hidden by default, shown in media query */
-    position: fixed;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: var(--button-primary-bg);
-    color: white;
-    border: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    font-size: 18px;
-    z-index: 41; /* Above strips, below modals */
-    cursor: pointer;
-    transition: all var(--transition-medium) var(--transition-timing);
-    &:hover {
-      background-color: var(--button-primary-hover-bg);
-    }
-  }
-
-  #toggle-characters-button {
-    top: max(20px, calc(var(--safe-area-inset-top) + 10px));
-    left: 20px;
-  }
-
-  /* #toggle-notes-button styling applied in media query */
 
   .close-notes-button {
     position: absolute;
@@ -1428,9 +1201,6 @@
     .mobile-horizontal-character-item img {
       border-color: var(--char-card-border-dark);
     }
-    #toggle-characters-button {
-      background-color: #2a5a8e; /* Darker primary */
-    }
     .notes-edge-indicator {
       background-color: #2a5a8e; /* Darker primary */
     }
@@ -1533,16 +1303,6 @@
       display: none;
     }
 
-    /* Show Notes Toggle Button */
-    #toggle-notes-button {
-      display: block; /* Show the button */
-      /* Position it (example: top right) */
-      top: max(20px, calc(var(--safe-area-inset-top) + 10px));
-      right: 20px;
-      /* Adjust if it conflicts with #extra-controls */
-      z-index: 45; /* Below notes panel, above strips */
-    }
-
     /* Adjust Extra Controls Position/Size */
     #extra-controls {
       top: max(10px, var(--safe-area-inset-top)); /* Respect safe area */
@@ -1556,9 +1316,6 @@
     }
 
     /* Show Mobile Character UI */
-    #toggle-characters-button {
-      display: block;
-    }
     .mobile-character-strip {
       display: block;
     } /* Show vertical strip */
@@ -1576,11 +1333,6 @@
       display: block;
     }
 
-    /* Adjust Entity Notes Display */
-    .entity-note {
-      /* Assuming a container for entity notes */
-      flex-direction: column !important; /* Stack image and text */
-    }
     .entity-image-column {
       /* Container for image */
       margin-bottom: 10px;
@@ -1836,7 +1588,6 @@
 
   /* Add this rule for highlighting talking entities in the sidebar */
   .entity-note.highlighted-talking-entity {
-    transform: scale(1.2);
     z-index: 100; /* Bring to front on hover */
 
     transition:
@@ -1923,15 +1674,6 @@
 /* Base style for entity notes to help with transitions */
 .entity-note {
   max-width: 700px;
-  @media (max-width: 1900px) {
-    max-width: 500px;
-  }
-  @media (max-width: 1700px) {
-    max-width: 400px;
-  }
-  @media (max-width: 1500px) {
-    max-width: 300px;
-  }
   align-self: center;
   transform: scale(1);
   transition:
@@ -2031,4 +1773,186 @@
 /* Initially hide elements meant to fade in */
 .entity-notes-container:not(.fade-in) {
   opacity: 0;
+}
+
+#legacy {
+  /* Editable text container */
+  .editable-container {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  /* Textarea styling in edit mode */
+  .edit-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .edit-container textarea {
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+    overflow-y: hidden;
+    border: none;
+    outline: none;
+    background-color: inherit;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    resize: none;
+  }
+
+  /* Page summary container */
+  .page-summary-container {
+  }
+
+  /* Chapter summary container */
+  .chapter-summary-container {
+    margin-top: 20px;
+  }
+
+  /* Entity note */
+  .entity-note {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    overflow: visible;
+  }
+
+  .entity-image-column {
+    flex: 1;
+    overflow: visible;
+  }
+
+  .entity-text-column {
+    flex: 1.5;
+  }
+
+  .entity-image-wrapper {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+  }
+
+  .entity-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  /* Entity name styling */
+  .entity-note h4.editable-text {
+    font-weight: bold;
+    margin-top: 0;
+    cursor: text;
+    border-radius: 3px;
+    border: 1px dashed transparent;
+  }
+
+  .entity-note h4.editable-text:focus {
+    border: 1px dashed #aaa;
+  }
+
+  /* Highlighted paragraphs */
+  .highlighted-paragraph {
+  }
+
+  .talking-paragraph {
+  }
+
+  /* Add character container and button */
+  .add-character-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .add-character-button {
+    padding: 8px 16px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  /* Character selector modal */
+  .character-selector-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .character-selector-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 90%;
+    max-height: 90%;
+    overflow: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .character-selector-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .character-selector-modal-title {
+    margin: 0;
+  }
+
+  .character-selector-modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .characters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+  }
+
+  .character-card {
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .character-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 8px;
+  }
+
+  .character-card-name {
+    text-align: center;
+    font-size: 14px;
+  }
 }
