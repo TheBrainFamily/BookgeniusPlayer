@@ -511,11 +511,6 @@
     margin-right: 0;
     padding-bottom: 20px;
 
-    #right-notes-scrollable-container {
-      overflow-y: scroll;
-      max-width: 700px;
-    }
-
     section {
       padding: 20px;
       border-radius: 8px;
@@ -973,14 +968,6 @@
     border: 2px solid var(--entity-image-wrapper-border-light);
   }
 } /* End of #legacy scope */
-
-/* Apply animation directly to the target section when the class is present */
-#legacy #right-notes-scrollable-container section.highlight-blink {
-  animation-name: blinkEffect;
-  animation-duration: 2s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite; /* Blink twice */
-}
 
 @keyframes blinkEffect {
   0%,

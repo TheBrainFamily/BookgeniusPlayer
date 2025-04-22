@@ -29,7 +29,7 @@ export const RightNotesPanel: React.FC = () => {
 
   return createPortal(
     <>
-      <div className="notes-container" style={{ overflowY: "auto" }}>
+      <div style={{ overflowY: "auto" }}>
         {notes.map((n) => (
           <section key={n.id} className="right-note" onClick={() => open(n.html)} dangerouslySetInnerHTML={{ __html: n.html }} style={{ cursor: "pointer" }} />
         ))}
