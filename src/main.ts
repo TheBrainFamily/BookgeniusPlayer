@@ -13,7 +13,9 @@ import { initSearchModal } from "./searchModal";
 import { initializeNoteLinkBlinking } from "./annotationsHandling";
 import { dealWithSW } from "./serviceWorker";
 import { setUpdateParagraphNotesFunction } from "./ui/pageObserver";
-import { updateParagraphNotes } from "./ui/paragraphNotes";
+import { dealWithAnnotations } from "./ui/annotations";
+import { dealWithBackground } from "./ui/background";
+import { dealWithCutScenes } from "./deal-with-cut-scenes";
 import { setupParagraphHighlighting } from "./ui/paragraphHighlighting";
 import { setupKeyboardNavigation } from "./utils/keyboardNavigation";
 import { initPage } from "./ui/pageInit";
@@ -24,7 +26,17 @@ import { initCharacterModals, showCharacterDetailsModal } from "./ui/characterMo
 /* ------------------------------------------------------------------ */
 export async function runLegacyInit() {
   /* one‑liners that other modules expect to be set up immediately */
-  setUpdateParagraphNotesFunction(updateParagraphNotes);
+  /* ------------------------------------------------------------
+   * Page‑observer still needs a callback, but the React sidebar
+   * now handles the LEFT notes.  We keep only the parts that
+   * affect background / right‑hand footnotes.
+   * ------------------------------------------------------------ */
+  /* inside runLegacyInit(), replace the ‘setUpdateParagraphNotesFunction’ call */
+  setUpdateParagraphNotesFunction(({ startChapter, startParagraph, endChapter, endParagraph }) => {
+    dealWithBackground({ startChapter, startParagraph, endChapter, endParagraph });
+    dealWithAnnotations({ startChapter, startParagraph, endChapter, endParagraph });
+    dealWithCutScenes({ startChapter, startParagraph });
+  });
   dealWithSW();
 
   /* ----------------------------------------------------------------

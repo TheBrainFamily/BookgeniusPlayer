@@ -8,6 +8,7 @@ import { useBackgroundVideo } from "./hooks/useBackgroundVideo";
 import BookChaptersModal from "./menu-modal";
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
 import { runLegacyInit } from "./main";
+import { CharacterNotesPanel } from "./components/CharacterNotesPanel";
 
 function Shell() {
   /* scroll‑related hooks */
@@ -21,6 +22,7 @@ function Shell() {
     <>
       <BookChaptersModal />
       <NoteLinkBlinker />
+      <CharacterNotesPanel />
     </>
   );
 }

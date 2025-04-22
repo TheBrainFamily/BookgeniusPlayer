@@ -139,8 +139,10 @@ export function setupParagraphHighlighting() {
   contentContainer.addEventListener("scroll", () => {
     if (scrollDebounce) clearTimeout(scrollDebounce);
     isScrolling = true;
+    (window as unknown as { __sidebarScrollingLock: boolean }).__sidebarScrollingLock = true;
     scrollDebounce = setTimeout(() => {
       isScrolling = false;
+      (window as unknown as { __sidebarScrollingLock: boolean }).__sidebarScrollingLock = false;
     }, 400);
   });
 }
