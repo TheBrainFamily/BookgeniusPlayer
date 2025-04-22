@@ -357,10 +357,11 @@ export function performSearch(query: string) {
     // if (!pageText.toLowerCase().includes(query.toLowerCase())) continue;
 
     // Get paragraphs from this page
-    const paragraphs = pageElement.querySelectorAll(`p[data-index]`);
+    const paragraphs = pageElement.querySelectorAll(`[data-index]`);
 
     // For each paragraph, check if it contains the search term
     paragraphs.forEach((paragraph) => {
+      if (parseInt(paragraph.getAttribute("data-index") || "0", 10) > currentLocation.paragraph && i == currentLocation.chapter) return;
       // Clone the paragraph to avoid modifying the original
       const paragraphClone = paragraph.cloneNode(true) as HTMLElement;
 
@@ -388,13 +389,18 @@ export function performSearch(query: string) {
 
         // Add click event to navigate to this result
         resultItem.addEventListener("click", () => {
-          goToParagraph(i, parseInt(paragraph.getAttribute("data-index") || "0"));
+          goToParagraph({
+            chapter: i,
+            paragraph: parseInt(paragraph.getAttribute("data-index") || "0", 10),
+            endChapter: i,
+            endParagraph: parseInt(paragraph.getAttribute("data-index") || "0", 10),
+          });
           hideSearchModal();
 
           // Find and highlight the paragraph on the page
           setTimeout(() => {
             // Find paragraphs on the page and locate the one that contains the text
-            const pageParagraphs = document.querySelectorAll(`section[data-chapter="${i}"] p[data-index]`);
+            const pageParagraphs = document.querySelectorAll(`section[data-chapter="${i}"] [data-index]`);
             let targetParagraph = null;
 
             pageParagraphs.forEach((p) => {
