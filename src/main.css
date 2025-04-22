@@ -1,0 +1,55 @@
+/* Mobile notes icon */
+.mobile-notes-icon {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background-color: #4a90e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 5px auto;
+  border: 2px solid #ddd;
+}
+
+/* Stagger animation delay variable for entity notes */
+.entity-note {
+  --stagger-delay: 0s;
+}
+
+/* Notes visibility */
+#right-notes {
+  /* Default state can be hidden */
+  visibility: hidden;
+}
+
+#right-notes.visible {
+  visibility: visible;
+}
+
+/* Notes display */
+#right-notes-scrollable-container section {
+  /* Default state is hidden */
+  display: none;
+}
+
+/* Modal states */
+.modal-overlay.active,
+#note-modal.visible,
+#note-modal-overlay.visible {
+  /* Visible state for modals */
+  display: block;
+}
+
+/* Fade states */
+.faded {
+  opacity: 0;
+}
+
+.fade-in {
+  opacity: 1;
+}
+
+/* Modal open body state */
+body.modal-open {
+  overflow: hidden;
+}

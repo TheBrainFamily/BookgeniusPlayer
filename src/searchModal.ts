@@ -10,6 +10,7 @@ let searchModalClose: HTMLElement;
 // State for the search functionality
 let isSearchModalActive = false;
 let lastSearchQuery = "";
+let lastSearchTimestamp = 0; // Track when the last search was performed
 
 /**
  * Initialize the search modal and append it to the document
@@ -91,13 +92,12 @@ function addSearchModalStyles() {
       width: 100%;
       height: 100%;
       background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
       z-index: 9999;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.3s, visibility 0.3s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     
     .search-modal.active {
@@ -282,7 +282,6 @@ function addSearchModalStyles() {
   document.head.appendChild(style);
 }
 
-let preSearchLocation = { chapter: 0, paragraph: 0 };
 /**
  * Show the search modal
  */
@@ -291,20 +290,28 @@ export function showSearchModal() {
     initSearchModal();
   }
 
-  preSearchLocation = getCurrentLocation();
-  searchModal.classList.add("active");
-  isSearchModalActive = true;
-  searchInput.value = lastSearchQuery;
+  // Force layout recalculation
+  void searchModal.offsetHeight;
 
-  // Add a small delay to ensure focus happens after the modal is visible
+  // First make sure the modal is properly positioned
+  searchModal.style.display = "flex";
+  searchModal.style.justifyContent = "center";
+  searchModal.style.alignItems = "center";
+
+  // Then make it visible
   setTimeout(() => {
+    searchModal.classList.add("active");
+    isSearchModalActive = true;
+    searchInput.value = "";
     searchInput.focus();
-  }, 50);
 
-  // If there was a previous search, execute it again
-  if (lastSearchQuery) {
-    performSearch(lastSearchQuery);
-  }
+    // If there was a previous search within the last 5 minutes, execute it again
+    const fiveMinutesInMs = 5 * 60 * 1000;
+    const currentTime = Date.now();
+    if (lastSearchQuery && currentTime - lastSearchTimestamp < fiveMinutesInMs) {
+      performSearch(lastSearchQuery);
+    }
+  }, 50);
 }
 
 /**
@@ -331,6 +338,7 @@ export function performSearch(query: string) {
   if (!query.trim()) return;
 
   lastSearchQuery = query;
+  lastSearchTimestamp = Date.now(); // Update the timestamp when search is performed
   const currentLocation = getCurrentLocation();
   searchResults.innerHTML = "";
 
