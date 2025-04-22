@@ -10,7 +10,6 @@ import { Separator } from "@/components/ui/separator";
 
 import { pageChapters } from "./chapters-pharaon";
 import { isNightMode, toggleNightMode } from "./helpers/setIsNightMode";
-import { goToPage } from "./helpers/pagesNavigation";
 import { toggleMobileCharacters, isMobileCharactersVisible } from "./isMobileCharactersVisible";
 import { resetFurthestPageLocation } from "./helpers/reset-furthest-page-location";
 import { goToParagraph } from "./helpers/paragraphsNavigation";
@@ -106,7 +105,6 @@ export default function BookChaptersModal() {
       console.log(`Navigating to page ${page}`);
       // Implement your navigation logic here
       // For example: router.push(`/book/page/${page}`)
-      goToPage(page);
       setActiveModal(null);
       setOverlayOpen(false);
       setPageNumber("");
@@ -146,15 +144,17 @@ export default function BookChaptersModal() {
       {overlayOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center" onClick={() => setOverlayOpen(false)}>
           <div className="bg-background rounded-lg p-4 w-80 space-y-2" onClick={(e) => e.stopPropagation()}>
-            <Button variant="ghost" className="w-full justify-start text-left" onClick={handleToggleNightMode}>
+            {/* <Button variant="ghost" className="w-full justify-start text-left" onClick={handleToggleNightMode}>
               <Moon className="mr-2 h-4 w-4" />
               Turn {nightMode ? "Off" : "On"} Night Mode
-            </Button>
+            </Button> */}
 
-            <Button variant="ghost" className="w-full justify-start text-left" onClick={handleToggleCharacters}>
-              {charactersVertical ? <PanelBottom className="mr-2 h-4 w-4" /> : <PanelLeft className="mr-2 h-4 w-4" />}
-              Show Characters {charactersVertical ? "Horizontally" : "Vertically"}
-            </Button>
+            <div className="md:hidden">
+              <Button variant="ghost" className="w-full justify-start text-left" onClick={handleToggleCharacters}>
+                {charactersVertical ? <PanelBottom className="mr-2 h-4 w-4" /> : <PanelLeft className="mr-2 h-4 w-4" />}
+                Show Characters {charactersVertical ? "Horizontally" : "Vertically"}
+              </Button>
+            </div>
 
             <Button
               variant="ghost"
@@ -166,18 +166,6 @@ export default function BookChaptersModal() {
             >
               <List className="mr-2 h-4 w-4" />
               Open Chapter
-            </Button>
-
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-left"
-              onClick={() => {
-                setActiveModal("page");
-                setOverlayOpen(false);
-              }}
-            >
-              <FileText className="mr-2 h-4 w-4" />
-              Go to Page
             </Button>
 
             <Button

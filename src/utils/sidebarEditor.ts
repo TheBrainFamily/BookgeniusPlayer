@@ -1,7 +1,8 @@
+import "./sidebarEditor.css";
 import { BOOK_SLUGS } from "../consts";
 import { updateCharacterChapterInfo } from "../fetchers/updateCharacterChapterInfo";
 import { getCurrentBookSlug } from "../getCurrentBookSlug";
-import { getPictureFilePathForName, getMovingPictureFilePathForName } from "./getFilePathsForName";
+import { getPictureFilePathForName } from "./getFilePathsForName";
 
 // Define a type for the window with our global functions
 declare global {
@@ -35,9 +36,6 @@ export function createEditableText(text: string, elementType: string, saveCallba
   // Wrap content in container to position edit icon
   const container = document.createElement("div");
   container.className = "editable-container";
-  container.style.position = "relative";
-  container.style.display = "flex";
-  container.style.alignItems = "flex-start";
 
   container.appendChild(element);
 
@@ -56,35 +54,11 @@ export function createEditableText(text: string, elementType: string, saveCallba
       // Create textarea
       const textarea = document.createElement("textarea");
       textarea.value = originalContent.replace(/<br\/?>/g, "\\n").replace(/&nbsp;/g, " ");
-      textarea.style.width = "100%";
       textarea.style.height = `${originalHeight}px`; // Set initial height
-      textarea.style.margin = "0";
-      textarea.style.boxSizing = "border-box"; // Include padding in height calculation
-      textarea.style.overflowY = "hidden"; // Hide scrollbar initially
-      textarea.style.border = "none"; // Remove the default border
-      textarea.style.outline = "none"; // Remove the focus outline
-      textarea.style.backgroundColor = "inherit"; // Match background
-      textarea.style.color = "inherit"; // Match text color
-      textarea.style.fontFamily = "inherit"; // Match font family
-      textarea.style.fontSize = "inherit"; // Match font size
-      textarea.style.lineHeight = "inherit"; // Match line height
-      textarea.style.resize = "none"; // Disable resizing handle
-
-      // Auto-resize textarea function
-      const autoResizeTextarea = () => {
-        textarea.style.height = "auto"; // Reset height to calculate scrollHeight correctly
-        textarea.style.height = `${textarea.scrollHeight}px`; // Set height based on content
-      };
-
-      // Add event listener for input events
-      textarea.addEventListener("input", autoResizeTextarea);
 
       // Create edit container
       const editContainer = document.createElement("div");
       editContainer.className = "edit-container";
-      editContainer.style.width = "100%";
-      editContainer.style.display = "flex";
-      editContainer.style.flexDirection = "column";
 
       editContainer.appendChild(textarea);
 
@@ -95,6 +69,15 @@ export function createEditableText(text: string, elementType: string, saveCallba
       // Set focus to textarea and trigger initial resize
       textarea.focus();
       autoResizeTextarea(); // Call resize initially to set correct height
+
+      // Auto-resize textarea function
+      function autoResizeTextarea() {
+        textarea.style.height = "auto"; // Reset height to calculate scrollHeight correctly
+        textarea.style.height = `${textarea.scrollHeight}px`; // Set height based on content
+      }
+
+      // Add event listener for input events
+      textarea.addEventListener("input", autoResizeTextarea);
 
       // --- Event Handling Logic ---
       const removeEditListeners = () => {
@@ -185,7 +168,6 @@ export function createEditableChapterSummary(pageNumber: number, summaryText: st
 
   const container = document.createElement("div");
   container.className = "chapter-summary-container";
-  container.style.marginTop = "20px";
 
   const heading = document.createElement("h3");
   heading.textContent = "Chapter summary";
@@ -215,10 +197,6 @@ export function createEditableEntity(entity: {
 }): HTMLElement {
   const entityDiv = document.createElement("div");
   entityDiv.className = "entity-note";
-  entityDiv.style.display = "flex";
-  entityDiv.style.gap = "15px";
-  entityDiv.style.alignItems = "center";
-  entityDiv.style.overflow = "visible"; // Allow overflow on the main container
   entityDiv.dataset.canonicalName = entity.canonicalName; // Store canonical name for easy access
 
   // Combine main appearance with other appearances
@@ -233,13 +211,10 @@ export function createEditableEntity(entity: {
   // Left column for image
   const imageColumn = document.createElement("div");
   imageColumn.className = "entity-image-column";
-  imageColumn.style.flex = "1";
-  imageColumn.style.overflow = "visible"; // Allow overflow
 
   // Right column for text content
   const textColumn = document.createElement("div");
   textColumn.className = "entity-text-column";
-  textColumn.style.flex = "1.5";
 
   // Entity image in left column
   let mediaElement: HTMLImageElement | HTMLVideoElement | null = null;
@@ -248,13 +223,6 @@ export function createEditableEntity(entity: {
   if (entity.imageUrl) {
     const imageWrapper = document.createElement("div");
     imageWrapper.className = "entity-image-wrapper";
-    imageWrapper.style.width = "100%";
-    imageWrapper.style.aspectRatio = "1 / 1";
-    imageWrapper.style.borderRadius = "50%";
-    imageWrapper.style.overflow = "hidden";
-    imageWrapper.style.cursor = "pointer";
-    imageWrapper.style.position = "relative";
-    imageWrapper.style.zIndex = "1";
 
     const originalSrc = entity.imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, bookSlug) : entity.imageUrl;
 
@@ -277,11 +245,6 @@ export function createEditableEntity(entity: {
 
     mediaElement.dataset.originalSrc = originalSrc;
     mediaElement.className = "entity-image";
-    mediaElement.style.width = "100%";
-    mediaElement.style.height = "100%";
-    mediaElement.style.display = "block";
-    mediaElement.style.objectFit = "cover";
-
     mediaElement.dataset.characterName = entity.canonicalName;
     mediaElement.dataset.summary = entity.summary?.replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>") || "";
 
@@ -305,19 +268,12 @@ export function createEditableEntity(entity: {
   setDisplayName(); // Set initial display name
 
   nameElement.classList.add("editable-text");
-  nameElement.style.fontWeight = "bold";
-  nameElement.style.marginTop = "0";
   nameElement.contentEditable = "true"; // Make name editable
-  nameElement.style.cursor = "text"; // Indicate text is editable
-  // nameElement.style.border = "1px dashed transparent"; // Show border on focus/hover
-  // nameElement.style.padding = "2px 4px";
-  nameElement.style.borderRadius = "3px";
 
   let valueBeforeEdit = ""; // Variable to store the value when editing starts
 
   // Add focus/blur styling and manage edit state
   nameElement.addEventListener("focus", () => {
-    nameElement.style.border = "1px dashed #aaa";
     // Set the editable content to the label if it exists and differs, otherwise the canonical name
     valueBeforeEdit = entity.label && entity.label !== entity.canonicalName ? entity.label : entity.canonicalName;
     nameElement.textContent = valueBeforeEdit;
@@ -373,8 +329,6 @@ export function createEditableEntity(entity: {
       console.error("Failed to update label:", error);
       // Revert to the value before editing began on error
       nameElement.textContent = valueBeforeEdit;
-      // Optionally, reset the border style immediately
-      nameElement.style.border = "1px dashed transparent";
       // Restore the non-edit display format
       setDisplayName();
     }
@@ -382,7 +336,6 @@ export function createEditableEntity(entity: {
 
   // Combined Blur listener for saving/canceling name edit
   nameElement.addEventListener("blur", () => {
-    nameElement.style.border = "1px dashed transparent";
     const newName = nameElement.textContent?.trim() ?? ""; // Ensure string, default to empty
 
     // Check if the trimmed new name is different from the value when editing started
@@ -402,29 +355,9 @@ export function createEditableEntity(entity: {
 
   textColumn.appendChild(editableContent);
 
-  // Add remove button
-  // const removeButton = document.createElement("button");
-  // removeButton.textContent = "Remove";
-  // removeButton.className = "remove-character-button";
-  // removeButton.style.marginTop = "10px";
-  // removeButton.style.padding = "4px 8px";
-  // removeButton.style.backgroundColor = "#e74c3c";
-  // removeButton.style.color = "white";
-  // removeButton.style.border = "none";
-  // removeButton.style.borderRadius = "4px";
-  // removeButton.style.cursor = "pointer";
-
-  // removeButton.addEventListener("click", async () => {
-  //   if (confirm(`Are you sure you want to remove ${entity.canonicalName} from this page?`)) {
-  //     await removeEntityNote(pageNumber, entity.canonicalName);
-  //     entityDiv.remove();
-  //   }
-  // });
-
-  // textColumn.appendChild(removeButton);
-
   // Add hover listeners for highlighting and image swap
   entityDiv.addEventListener("mouseenter", () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let isTalkingSomewhere = false;
     try {
       const appearancesStr = entityDiv.dataset.appearances;
@@ -441,14 +374,6 @@ export function createEditableEntity(entity: {
           }
         }
       });
-
-      // Swap image to GIF if talking and image exists
-      if (isTalkingSomewhere && imageElement && imageElement.dataset.originalSrc) {
-        const gifSrc = getMovingPictureFilePathForName(entity.canonicalName, bookSlug);
-        if (imageElement.src !== gifSrc) {
-          imageElement.src = gifSrc;
-        }
-      }
     } catch (e) {
       console.error("Error processing appearances for highlighting:", e);
     }
@@ -466,11 +391,6 @@ export function createEditableEntity(entity: {
           targetParagraph.classList.remove("highlighted-paragraph", "talking-paragraph");
         }
       });
-
-      // Revert image to original PNG if it exists
-      if (imageElement && imageElement.dataset.originalSrc && imageElement.src !== imageElement.dataset.originalSrc) {
-        imageElement.src = imageElement.dataset.originalSrc;
-      }
     } catch (e) {
       console.error("Error processing appearances for unhighlighting:", e);
     }
@@ -498,72 +418,36 @@ export function createAddCharacterButton(
 ): HTMLElement {
   const container = document.createElement("div");
   container.className = "add-character-container";
-  container.style.marginTop = "20px";
-  container.style.marginBottom = "20px";
 
   const button = document.createElement("button");
   button.textContent = "Add Character";
   button.className = "add-character-button";
-  button.style.padding = "8px 16px";
-  button.style.backgroundColor = "#4a90e2";
-  button.style.color = "white";
-  button.style.border = "none";
-  button.style.borderRadius = "4px";
-  button.style.cursor = "pointer";
 
   container.appendChild(button);
 
   // Create character selector modal
   const modal = document.createElement("div");
   modal.className = "character-selector-modal";
-  modal.style.display = "none";
-  modal.style.position = "fixed";
-  modal.style.top = "0";
-  modal.style.left = "0";
-  modal.style.width = "100%";
-  modal.style.height = "100%";
-  modal.style.backgroundColor = "rgba(0,0,0,0.7)";
-  modal.style.zIndex = "1000";
-  modal.style.justifyContent = "center";
-  modal.style.alignItems = "center";
 
   const modalContent = document.createElement("div");
   modalContent.className = "character-selector-modal-content";
-  modalContent.style.backgroundColor = "white";
-  modalContent.style.padding = "20px";
-  modalContent.style.borderRadius = "8px";
-  modalContent.style.maxWidth = "90%";
-  modalContent.style.maxHeight = "90%";
-  modalContent.style.overflow = "auto";
-  modalContent.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
 
   const modalHeader = document.createElement("div");
-  modalHeader.style.display = "flex";
-  modalHeader.style.justifyContent = "space-between";
-  modalHeader.style.alignItems = "center";
-  modalHeader.style.marginBottom = "20px";
+  modalHeader.className = "character-selector-modal-header";
 
   const modalTitle = document.createElement("h3");
+  modalTitle.className = "character-selector-modal-title";
   modalTitle.textContent = "Select a Character to Add";
-  modalTitle.style.margin = "0";
 
   const closeButton = document.createElement("button");
+  closeButton.className = "character-selector-modal-close";
   closeButton.innerHTML = "&times;";
-  closeButton.style.background = "none";
-  closeButton.style.border = "none";
-  closeButton.style.cursor = "pointer";
-  closeButton.style.fontSize = "24px";
-  closeButton.style.padding = "0";
-  closeButton.style.lineHeight = "1";
 
   modalHeader.appendChild(modalTitle);
   modalHeader.appendChild(closeButton);
 
   const charactersContainer = document.createElement("div");
   charactersContainer.className = "characters-grid";
-  charactersContainer.style.display = "grid";
-  charactersContainer.style.gridTemplateColumns = "repeat(auto-fill, minmax(120px, 1fr))";
-  charactersContainer.style.gap = "15px";
 
   modalContent.appendChild(modalHeader);
   modalContent.appendChild(charactersContainer);
@@ -589,27 +473,14 @@ export function createAddCharacterButton(
       Object.entries(characters).forEach(([name, imageUrl]) => {
         const characterCard = document.createElement("div");
         characterCard.className = "character-card";
-        characterCard.style.border = "1px solid #eee";
-        characterCard.style.borderRadius = "4px";
-        characterCard.style.padding = "10px";
-        characterCard.style.display = "flex";
-        characterCard.style.flexDirection = "column";
-        characterCard.style.alignItems = "center";
-        characterCard.style.cursor = "pointer";
 
         const img = document.createElement("img");
         img.src = imageUrl;
         img.alt = name;
-        img.style.width = "80px";
-        img.style.height = "80px";
-        img.style.borderRadius = "50%";
-        img.style.objectFit = "cover";
-        img.style.marginBottom = "8px";
 
         const characterName = document.createElement("div");
+        characterName.className = "character-card-name";
         characterName.textContent = name;
-        characterName.style.textAlign = "center";
-        characterName.style.fontSize = "14px";
 
         characterCard.appendChild(img);
         characterCard.appendChild(characterName);
