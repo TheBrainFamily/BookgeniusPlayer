@@ -58,7 +58,7 @@ export const CharacterCard: React.FC<Props> = ({ entity, index }) => {
   const summaryHTML = (entity.summary || "").replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>").replace(/•/g, "");
 
   /* custom CSS property for stagger delay */
-  const style = { ["--stagger-delay"]: `${index * 0.07}s` };
+  const style = { ["--stagger-delay"]: `${index * 0.13}s` };
 
   return (
     <div

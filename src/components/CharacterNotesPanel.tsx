@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { useDebounce } from "@/src/hooks/useDebounce";
@@ -9,45 +9,46 @@ import { useLocation } from "@/src/state/LocationContext";
 import { activateCharacters } from "@/src/ui/characterHelpers";
 import { getCurrentBookSlug } from "@/src/getCurrentBookSlug";
 
-/* render into legacy container so CSS keeps working */
+/* mount inside the legacy container for CSS */
 const target = document.getElementById("left-notes");
 
 export const CharacterNotesPanel: React.FC = () => {
   const { location } = useLocation();
-  const debouncedLoc = useDebounce(location, 120); // ≈ original behaviour
-  const notes = useCharacterNotes(debouncedLoc);
 
-  /* fade‑in effect */
-  const [fadeIn, setFadeIn] = useState(false);
+  /* throttle updates while scrolling */
+  const debounced = useDebounce(location, 200);
+
+  /* stable range object */
+  const range = useMemo(
+    () => ({ chapter: debounced.chapter, paragraph: debounced.paragraph, endChapter: debounced.endChapter, endParagraph: debounced.endParagraph }),
+    [debounced.chapter, debounced.paragraph, debounced.endChapter, debounced.endParagraph],
+  );
+
+  /* characters for that range */
+  const notes = useCharacterNotes(range);
+
+  /* Fade‑in only when the ARRAY REFERENCE actually changes */
+  const [fadeInKey, setFadeInKey] = useState(0);
   useEffect(() => {
-    setFadeIn(false);
-    const id = requestAnimationFrame(() => setFadeIn(true));
-    return () => cancelAnimationFrame(id);
+    setFadeInKey((k) => k + 1); // triggers fadeUp on the *new* cards only
   }, [notes]);
 
-  /* mark characters (talking + present) once list is ready */
+  /* mark talking / present characters */
   useEffect(() => {
     if (notes.length === 0) return;
-    activateCharacters(
-      debouncedLoc.chapter,
-      debouncedLoc.paragraph,
-      getCurrentBookSlug(),
-      debouncedLoc.chapter,
-      debouncedLoc.paragraph,
-      false, // highlight also non‑talking characters present in range
-    );
-  }, [debouncedLoc.chapter, debouncedLoc.paragraph, notes]);
+    activateCharacters(range.chapter, range.paragraph, getCurrentBookSlug(), range.endChapter, range.endParagraph, false);
+  }, [range.chapter, range.paragraph, range.endChapter, range.endParagraph, notes]);
 
   if (!target) return null;
 
   return createPortal(
-    <div
-      className={`entity-notes-container${fadeIn ? " fade-in" : ""}`}
-      /* force remount when chapter changes so stagger anim stays nice */
-      key={`c${debouncedLoc.chapter}`}
-    >
-      {notes.map((n, index) => (
-        <CharacterCard key={n.canonicalName} entity={n} index={index} />
+    <div className="entity-notes-container fade-in">
+      {notes.map((n, i) => (
+        <CharacterCard
+          key={`${n.canonicalName}-${fadeInKey}`} // replay anim only when list truly changes
+          entity={n}
+          index={i}
+        />
       ))}
     </div>,
     target,
