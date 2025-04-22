@@ -4,14 +4,14 @@
  *  public API unchanged.
  */
 
-type Location = { chapter: number; paragraph: number };
+type Location = { chapter: number; paragraph: number; endChapter: number; endParagraph: number };
 
 /* ------------------------------------------------------------- */
 /*  Proxy that React will overwrite from LocationProvider        */
 /* ------------------------------------------------------------- */
 type Bridge = { get: () => Location; set: (l: Location) => void };
 let _bridge: Bridge = {
-  get: () => ({ chapter: 0, paragraph: 0 }),
+  get: () => ({ chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 }),
   // eslint‑disable-next-line @typescript-eslint/no-empty-function
   set: () => {},
 };
@@ -25,7 +25,7 @@ export const __setLocationBridge = (b: Bridge) => {
 /* ------------------------------------------------------------- */
 export const getSavedLocation = (): Location => {
   const raw = localStorage.getItem("furthestLocation");
-  return raw ? JSON.parse(raw) : { chapter: 0, paragraph: 0 };
+  return raw ? JSON.parse(raw) : { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 };
 };
 export const setSavedLocation = (loc: Location) => localStorage.setItem("furthestLocation", JSON.stringify(loc));
 
@@ -36,8 +36,9 @@ export const setCurrentLocation = (loc: Location) => {
 };
 
 /* go‑to‑paragraph logic unchanged ---------------------------------- */
-export const goToParagraph = (chapter: number, paragraph: number) => {
-  setCurrentLocation({ chapter, paragraph });
+export const goToParagraph = (loc: Location) => {
+  setCurrentLocation(loc);
+  const { chapter, paragraph } = loc;
   const selector = `section[data-chapter="${chapter}"] [data-index="${paragraph}"]`;
   document.querySelector(selector)?.scrollIntoView({ behavior: "smooth", block: "start" });
 };
@@ -49,7 +50,7 @@ const returnButton = document.getElementById("return-to-location-button");
 
 if (returnButton) {
   returnButton.addEventListener("click", () => {
-    goToParagraph(getSavedLocation().chapter, getSavedLocation().paragraph);
+    goToParagraph(getSavedLocation());
     returnButton.style.display = "none";
   });
 } else {
@@ -57,7 +58,7 @@ if (returnButton) {
   // late mount fallback
   setTimeout(() => {
     returnButton?.addEventListener("click", () => {
-      goToParagraph(getSavedLocation().chapter, getSavedLocation().paragraph);
+      goToParagraph(getSavedLocation());
       returnButton!.style.display = "none";
     });
   }, 500);

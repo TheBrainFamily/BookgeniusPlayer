@@ -16,12 +16,6 @@
   --stagger-delay: 0s;
 }
 
-/* Notes visibility */
-#right-notes {
-  /* Default state can be hidden */
-  visibility: hidden;
-}
-
 #right-notes.visible {
   visibility: visible;
 }

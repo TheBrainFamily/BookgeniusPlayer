@@ -9,7 +9,7 @@ import BookChaptersModal from "./menu-modal";
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
 import { runLegacyInit } from "./main";
 import { CharacterNotesPanel } from "./components/CharacterNotesPanel";
-
+import { RightNotesPanel } from "./components/RightNotesPanel";
 function Shell() {
   /* scroll‑related hooks */
   usePageObserver();
@@ -23,6 +23,7 @@ function Shell() {
       <BookChaptersModal />
       <NoteLinkBlinker />
       <CharacterNotesPanel />
+      <RightNotesPanel />
     </>
   );
 }

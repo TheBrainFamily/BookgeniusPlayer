@@ -107,10 +107,9 @@ export function setupPageObserver() {
           // 4. Call updateParagraphNotes if we have valid info
           if (startInfo.chapter !== null && startInfo.paragraph !== null && endInfo.chapter !== null && endInfo.paragraph !== null) {
             console.log(`[Observer] Updating notes for Ch ${startInfo.chapter}:${startInfo.paragraph} to Ch ${endInfo.chapter}:${endInfo.paragraph} (Focus Zone)`);
-            updateParagraphNotes({ startChapter: startInfo.chapter, startParagraph: startInfo.paragraph, endChapter: endInfo.chapter, endParagraph: endInfo.paragraph });
             console.log("setting current location from intersection (focus zone)", { chapter: startInfo.chapter, paragraph: startInfo.paragraph });
             // Set current location based on the top element in the focus zone
-            setCurrentLocation({ chapter: startInfo.chapter, paragraph: startInfo.paragraph });
+            setCurrentLocation({ chapter: startInfo.chapter, paragraph: startInfo.paragraph, endChapter: endInfo.chapter, endParagraph: endInfo.paragraph });
           } else {
             console.warn("[Observer] Could not extract chapter/paragraph info for focused elements:", topFocusedPageElement, bottomFocusedPageElement);
           }

@@ -1,6 +1,7 @@
 // Background video handling functions
 
 export const dealWithBackground = ({ startChapter, startParagraph, endChapter, endParagraph }) => {
+  console.log("BACKGROUND deciding", { startChapter, startParagraph, endChapter, endParagraph });
   /* ---------- helpers ---------- */
   const toBackground = ({ chapter, file }) => {
     return { startChapter: chapter, startParagraph: 1, file, endChapter: chapter, endParagraph: 10000 };

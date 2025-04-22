@@ -7,6 +7,8 @@ import { __setLocationBridge } from "@/src/helpers/paragraphsNavigation";
 export interface Location {
   chapter: number;
   paragraph: number;
+  endChapter: number;
+  endParagraph: number;
 }
 interface LocationCtx {
   location: Location;
@@ -18,7 +20,7 @@ interface LocationCtx {
 /* ------------------------------------------------------------------ */
 const loadFromLS = (): Location => {
   const raw = localStorage.getItem("furthestLocation");
-  return raw ? JSON.parse(raw) : { chapter: 0, paragraph: 0 };
+  return raw ? JSON.parse(raw) : { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 };
 };
 const saveToLS = (loc: Location) => localStorage.setItem("furthestLocation", JSON.stringify(loc));
 
@@ -26,7 +28,7 @@ const saveToLS = (loc: Location) => localStorage.setItem("furthestLocation", JSO
 /*  Context + Provider                                                */
 /* ------------------------------------------------------------------ */
 export const LocationContext = createContext<LocationCtx>({
-  location: { chapter: 0, paragraph: 0 },
+  location: { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 },
   // eslint‑disable-next-line @typescript-eslint/no-empty-function
   setLocation: () => {},
 });
