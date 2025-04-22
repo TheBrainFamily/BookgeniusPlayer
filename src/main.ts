@@ -4,7 +4,7 @@ import "./globals.css";
 
 import { isNightMode, setIsNightMode } from "@/src/helpers/setIsNightMode";
 import { BOOK_SLUGS } from "@/src/consts";
-import { isMobileCharactersVisible, toggleMobileCharacters } from "@/src/isMobileCharactersVisible";
+import { isMobileCharactersVisible } from "@/src/isMobileCharactersVisible";
 import { startReactComponents } from "./react-components";
 import { getCurrentBookSlug } from "./getCurrentBookSlug";
 import { hideSearchModal, initSearchModal, isSearchActive, showSearchModal } from "./searchModal";
@@ -42,35 +42,14 @@ const pageMetadataCache = {}; // Cache for page metadata
 const imageCache = {}; // Cache to track which images have been preloaded
 let isMobileNotesVisible = false; // Track if notes panel is open on mobile
 
-// Number input state for page jumping
-let typedPageNumber = "";
-let pageInputTimeout: NodeJS.Timeout | null = null;
-const PAGE_INPUT_DELAY = 400; // ms to wait after typing before jumping to page
-
-// Page offset adjustment state
-let isSettingPageNumber = false;
-let pageOffsetInput = "";
-let pageOffsetInputTimeout: NodeJS.Timeout | null = null;
-
-// Touch state for swipe gestures
-let touchStartX = 0;
-let touchEndX = 0;
-let touchCurrentX = 0;
-let isSwiping = false;
-let swipeStarted = false;
-
 // DOM elements
-const bookContainer = document.getElementById("book-container")!;
 const loadingIndicator = document.getElementById("loading");
-const pageNumberIndicator = document.getElementById("page-number-indicator")!;
 
 // Character modal elements
 const characterModal = document.getElementById("character-modal")!;
 const characterModalClose = characterModal.querySelector(".modal-close")!;
 const modalCharacterImage = document.getElementById("modal-character-image")!;
 const modalCharacterName = document.getElementById("modal-character-name")!;
-const removeCharacterButton = document.getElementById("remove-character-button")!;
-const mapCharacterButton = document.getElementById("map-character-button")!;
 const createImageButton = document.getElementById("create-image-button")!;
 
 // Character details modal elements
@@ -80,17 +59,8 @@ const modalDetailsCharacterImage = document.getElementById("modal-details-charac
 const modalDetailsCharacterName = document.getElementById("modal-details-character-name")!;
 const modalDetailsCharacterSummary = document.getElementById("modal-details-character-summary")!;
 
-// Mapping modal elements
-const mappingModal = document.getElementById("mapping-modal")!;
-const mappingModalClose = mappingModal.querySelector(".modal-close")!;
-const sourceCharacterName = document.getElementById("source-character-name")!;
-const characterGrid = document.getElementById("character-grid")!;
-const cancelMappingButton = document.getElementById("cancel-mapping-button")!;
-const confirmMappingButton = document.getElementById("confirm-mapping-button")!;
-
 // Character interaction state
 let currentCharacter: { name: string; imageUrl: string } | null = null;
-let selectedCharacterForMapping: { name: string; imageUrl: string } | null = null;
 
 // Function to check if the device is mobile
 function isMobile() {
@@ -136,139 +106,8 @@ function setupMobileInteractions() {
   }
 }
 
-// Create a hidden container for preloaded images
-function createImagePreloadContainer() {
-  const existingContainer = document.getElementById("preloaded-images");
-  if (existingContainer) return existingContainer;
-
-  const container = document.createElement("div");
-  container.id = "preloaded-images";
-  container.style.position = "absolute";
-  container.style.width = "0";
-  container.style.height = "0";
-  container.style.overflow = "hidden";
-  container.style.visibility = "hidden";
-  document.body.appendChild(container);
-  return container;
-}
-
-// Add this function near createImagePreloadContainer
-function createVideoPreloadContainer() {
-  const existingContainer = document.getElementById("preloaded-videos");
-  if (existingContainer) return existingContainer;
-
-  const container = document.createElement("div");
-  container.id = "preloaded-videos";
-  container.style.position = "absolute";
-  container.style.width = "0";
-  container.style.height = "0";
-  container.style.overflow = "hidden";
-  container.style.visibility = "hidden";
-  container.style.pointerEvents = "none"; // Ensure it doesn't interfere
-  document.body.appendChild(container);
-  return container;
-}
-
-// Function to preload images from metadata
-function preloadImagesFromMetadata(metadataArray) {
-  if (!metadataArray || !Array.isArray(metadataArray)) return;
-
-  const preloadContainer = createImagePreloadContainer();
-
-  metadataArray.forEach((pageData) => {
-    if (pageData && pageData.metadata && pageData.metadata.notesForPage) {
-      pageData.metadata.notesForPage.forEach((entity) => {
-        if (entity.imageUrl && !imageCache[entity.imageUrl]) {
-          // Create image element for preloading
-          const img = new Image();
-          img.src = entity.imageUrl;
-          img.dataset.entityName = entity.canonicalName;
-          img.style.width = "1px";
-          img.style.height = "1px";
-
-          // Mark this image as being preloaded
-          imageCache[entity.imageUrl] = true;
-
-          // Add to preload container
-          preloadContainer.appendChild(img);
-
-          // Remove from preload container after loaded (but keep in browser cache)
-          img.onload = () => {
-            // Image is now cached by browser, so we can remove the element
-            preloadContainer.removeChild(img);
-          };
-        }
-      });
-    }
-  });
-}
-
 // Initialize pages
 function initializePages() {
-  // Try to get existing note containers first
-  // const existingLeftNotes = document.getElementById("left-notes");
-  // const existingRightNotes = document.getElementById("right-notes");
-
-  // // Store their contents if they exist
-  // const leftNotesHTML = existingLeftNotes
-  //   ? existingLeftNotes.innerHTML
-  //   : `
-  //       <h3>Left Notes</h3>
-  //       <p>Loading notes...</p>
-  //     `;
-
-  // const rightNotesHTML = existingRightNotes
-  //   ? existingRightNotes.innerHTML
-  //   : `
-  //       <h3>Page summary</h3>
-  //       <p>Keep reading...</p>
-  //     `;
-
-  // // Create and add left notes container
-  // const leftNotesDiv = document.createElement("div");
-  // leftNotesDiv.className = "notes-container";
-  // leftNotesDiv.id = "left-notes";
-  // leftNotesDiv.innerHTML = leftNotesHTML;
-
-  // Add close button for mobile
-  if (isMobile()) {
-    //TODO APRIL 14 check this mobile addition
-    // const closeButton = document.createElement("button");
-    // closeButton.className = "close-notes-button";
-    // closeButton.innerHTML = "&times;";
-    // closeButton.addEventListener("click", toggleMobileNotes);
-    // leftNotesDiv.appendChild(closeButton);
-  }
-
-  // bookContainer.appendChild(leftNotesDiv);
-
-  // Create all page elements
-  // pagesContent.forEach((content, index) => {
-  //   const actualIndex = index + addToIndex;
-  //   const pageDiv = document.createElement("div");
-  //   pageDiv.className = "page";
-  //   pageDiv.id = `page-${actualIndex}`;
-  //   pageDiv.innerHTML = content;
-
-  //   // Add page number footer
-  //   if (index > pagesToSkipFooterGeneration + 1) {
-  //     const footer = document.createElement("div");
-  //     footer.className = "page-footer";
-  //     footer.textContent = parsePage(actualIndex);
-  //     pageDiv.appendChild(footer);
-  //   }
-
-  //   // Add to content container
-  //   contentContainer.appendChild(pageDiv);
-  // });
-
-  // Create and add right notes container (hidden on mobile)
-  // const rightNotesDiv = document.createElement("div");
-  // rightNotesDiv.className = "notes-container";
-  // rightNotesDiv.id = "right-notes";
-  // rightNotesDiv.innerHTML = rightNotesHTML;
-  // bookContainer.appendChild(rightNotesDiv);
-
   // Set up intersection observer to detect visible pages
   setupPageObserver();
 
@@ -585,12 +424,10 @@ export const dealWithBackground = ({ startChapter, startParagraph, endChapter, e
   const backgrounds = backgroundsPassedFromGemini.map(toBackground);
 
   /* ---------- decide & apply ---------- */
-  let applied = false;
   console.log("BACKGROUND deciding", { startChapter, startParagraph, endChapter, endParagraph });
 
   for (const bg of backgrounds) {
     if (startChapter === bg.startChapter && startParagraph <= bg.endParagraph && endChapter === bg.endChapter && endParagraph >= bg.startParagraph) {
-      applied = true;
       crossFadeTo(bg.file);
       break;
     }
@@ -674,120 +511,6 @@ async function updateParagraphNotesInternal({
     isUpdatingNotes = true; // Set flag
 
     // Find differences
-    const addedNames = newCharacterNames.filter((name) => !sortedPreviousCharacters.includes(name));
-    const removedNames = sortedPreviousCharacters.filter((name) => !newCharacterNames.includes(name));
-
-    const container = leftNotes.querySelector<HTMLElement>(".entity-notes-container");
-
-    // --- Optimized Case: Single Character Added, None Removed ---
-    // if (addedNames.length === 1 && removedNames.length === 0 && container) {
-    //   console.log("Optimized Update: Single character added -", addedNames[0]);
-    //   const addedCharacterData = currentCharactersData.find((c) => c.canonicalName === addedNames[0]);
-
-    //   if (addedCharacterData) {
-    //     const existingNotes = Array.from(container.querySelectorAll<HTMLElement>(".entity-note"));
-
-    //     // 1. FIRST: Record initial positions
-    //     const firstPositions = new Map<HTMLElement, DOMRect>();
-    //     existingNotes.forEach((note) => {
-    //       firstPositions.set(note, note.getBoundingClientRect());
-    //     });
-
-    //     // Create new element and add it (initially invisible)
-    //     const newEntityDiv = createEditableEntity(addedCharacterData);
-    //     newEntityDiv.style.opacity = "0";
-    //     newEntityDiv.style.transition = "none"; // Ensure no transition initially
-    //     container.appendChild(newEntityDiv);
-
-    //     // Update the cache *before* the next check
-    //     previousCharacters = newCharacterNames;
-
-    //     // 2. LAST: Wait for layout, then record final positions
-    //     requestAnimationFrame(() => {
-    //       const lastPositions = new Map<HTMLElement, DOMRect>();
-    //       const allNotes = Array.from(container.querySelectorAll<HTMLElement>(".entity-note")); // Get all including new
-    //       allNotes.forEach((note) => {
-    //         lastPositions.set(note, note.getBoundingClientRect());
-    //       });
-
-    //       // 3. INVERT: Apply transforms to old elements
-    //       existingNotes.forEach((note) => {
-    //         const firstRect = firstPositions.get(note);
-    //         const lastRect = lastPositions.get(note);
-    //         if (firstRect && lastRect) {
-    //           const deltaX = firstRect.left - lastRect.left;
-    //           const deltaY = firstRect.top - lastRect.top;
-    //           if (deltaX !== 0 || deltaY !== 0) {
-    //             note.style.transition = "none"; // Disable transitions during inversion
-    //             note.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-    //           }
-    //         }
-    //       });
-
-    //       // 4. PLAY: Animate in the next frame/tick
-    //       requestAnimationFrame(() => {
-    //         existingNotes.forEach((note) => {
-    //           note.style.transition = "transform 0.3s ease-out"; // Enable transform transition
-    //           note.style.transform = ""; // Animate to natural position
-    //         });
-
-    //         // Fade in the new element by setting transition THEN opacity
-    //         newEntityDiv.style.transition = "opacity 0.3s ease-out"; // Set the transition property first
-    //         requestAnimationFrame(() => {
-    //           // Wait for the next frame to apply opacity change
-    //           newEntityDiv.style.opacity = "1"; // Now change opacity to trigger the fade-in
-    //         });
-
-    //         // Clean up transitions after animation (optional but good practice)
-    //         setTimeout(() => {
-    //           existingNotes.forEach((note) => {
-    //             note.style.transition = "";
-    //           });
-    //           newEntityDiv.style.transition = ""; // Also clean up the new div's transition
-    //         }, 350);
-
-    //         // Activate characters state after animation starts
-    //         activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
-    //         // Unset flag after FLIP animation completes
-    //         setTimeout(() => {
-    //           isUpdatingNotes = false;
-    //         }, 350);
-    //       });
-    //     });
-    //     return; // Exit after handling optimized case
-    //   }
-    //   // If addedCharacterData is null, fall through to fallback, but first unset the flag
-    //   isUpdatingNotes = false;
-    // }
-
-    // // --- Optimized Case: Single Character Removed (First or Last) ---
-    // else if (addedNames.length === 0 && removedNames.length === 1 && container) {
-    //   const removedName = removedNames[0];
-    //   const existingNotes = Array.from(container.querySelectorAll<HTMLElement>(".entity-note"));
-    //   const noteToRemove = existingNotes.find((note) => note.dataset.canonicalName === removedName);
-    //   const isFirst = noteToRemove === existingNotes[0];
-    //   const isLast = noteToRemove === existingNotes[existingNotes.length - 1];
-
-    //   if (noteToRemove && (isFirst || isLast)) {
-    //     console.log(`Optimized Update: Fading out ${isFirst ? "first" : "last"} character - ${removedName}`);
-    //     isUpdatingNotes = true; // Set flag for this specific animation
-
-    //     noteToRemove.classList.add("fade-out");
-    //     setTimeout(() => {
-    //       if (document.body.contains(noteToRemove)) {
-    //         console.log(`Removing faded-out note via setTimeout: ${removedName}`);
-    //         noteToRemove.remove();
-    //       }
-    //       isUpdatingNotes = false; // Unset flag after timeout
-    //     }, 350); // Match transition duration + buffer
-
-    //     previousCharacters = newCharacterNames; // Update cache to reflect target state
-    //     activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
-    //     return; // Exit after handling optimized case
-    //   }
-    //   // If not first/last, fall through to fallback
-    //   isUpdatingNotes = false; // Reset flag if this specific optimisation didn't run
-    // }
 
     // --- Fallback Case: Multiple changes or no existing container ---
     console.log("Fallback Update: Replacing entire notes container.");
@@ -965,85 +688,10 @@ async function initPage() {
   // Initialize the viewer
   initializePages();
 
-  // Pre-warm the cache for the next several pages in the background
-  preWarmCache();
-
   // Scroll to the saved position
   setTimeout(() => {
     goToParagraph(savedPosition.chapter, savedPosition.paragraph);
   }, 100);
-
-  // Set up resize handler for responsive layout
-  window.addEventListener("resize", handleResize);
-
-  // Initial layout based on screen size
-  handleResize();
-}
-
-// Handle window resize events
-function handleResize() {
-  // Close mobile notes panel when transitioning to desktop
-  if (!isMobile() && isMobileNotesVisible) {
-    isMobileNotesVisible = false;
-    const leftNotes = document.getElementById("left-notes");
-    if (leftNotes) {
-      leftNotes.classList.remove("active");
-    }
-  }
-}
-
-// Function to pre-warm the cache for upcoming pages
-async function preWarmCache() {
-  // Calculate range to preload (current page plus several before and after)
-}
-
-async function fetchExistingCharactersWithImages() {
-  try {
-    const response = await fetch(`/api/characters/images/${getCurrentBookSlug()}`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch characters with images: ${response.statusText}`);
-    }
-    return (await response.json()) as { [name: string]: string };
-  } catch (error) {
-    console.error("Error fetching characters with images:", error);
-    return {};
-  }
-}
-
-async function removeCharacter(characterName) {
-  try {
-    const response = await fetch(`/api/characters/remove/${getCurrentBookSlug()}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ characterName }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to remove character: ${response.statusText}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error removing character:", error);
-    return null;
-  }
-}
-
-async function mapCharacter(characterName, existingCharacterName, existingCharacterImageUrl) {
-  try {
-    const response = await fetch(`/api/characters/map/${getCurrentBookSlug()}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ characterName, existingCharacterName, existingCharacterImageUrl }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to map character: ${response.statusText}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error mapping character:", error);
-    return null;
-  }
 }
 
 async function createCharacterImage(characterName: string) {
@@ -1109,90 +757,6 @@ function hideCharacterModal() {
   currentCharacter = null;
 }
 
-async function showMappingModal(characterName: string) {
-  // Set source character
-  sourceCharacterName.textContent = characterName;
-
-  // Clear previous selection
-  selectedCharacterForMapping = null;
-
-  // Fetch existing characters with images
-  const charactersWithImages = await fetchExistingCharactersWithImages();
-
-  // Clear character grid
-  characterGrid.innerHTML = "";
-
-  // Add character cards to grid
-  Object.entries(charactersWithImages).forEach(([name, imageUrl]) => {
-    // Skip if it's the same character
-    if (name === characterName) return;
-
-    const card = document.createElement("div");
-    card.className = "character-card";
-    card.dataset.characterName = name;
-    card.dataset.imageUrl = imageUrl;
-
-    const img = document.createElement("img");
-    img.src = imageUrl;
-    img.alt = name;
-
-    const nameDiv = document.createElement("div");
-    nameDiv.className = "character-name";
-    nameDiv.textContent = name;
-
-    card.appendChild(img);
-    card.appendChild(nameDiv);
-
-    // Add click event to select character
-    card.addEventListener("click", () => {
-      // Remove selected class from all cards
-      document.querySelectorAll(".character-card").forEach((c) => {
-        c.classList.remove("selected");
-      });
-
-      // Add selected class to this card
-      card.classList.add("selected");
-
-      // Store selected character info
-      selectedCharacterForMapping = { name: name, imageUrl: imageUrl };
-    });
-
-    characterGrid.appendChild(card);
-  });
-
-  // Hide character modal and show mapping modal
-  hideCharacterModal();
-  mappingModal.classList.add("active");
-  confirmMappingButton.addEventListener("click", async () => {
-    if (!characterName || !selectedCharacterForMapping) {
-      console.log("currentCharacter", characterName);
-      console.log("selectedCharacterForMapping", selectedCharacterForMapping);
-      alert("Please select a character to map to");
-      return;
-    }
-
-    try {
-      const result = await mapCharacter(characterName, selectedCharacterForMapping.name, selectedCharacterForMapping.imageUrl);
-
-      if (result) {
-        alert(`${characterName} mapped to ${selectedCharacterForMapping.name} successfully`);
-        // Clear from cache and update view
-        clearCharacterFromCache(characterName);
-      }
-    } catch (error) {
-      alert(`Error mapping character: ${error.message}`);
-    }
-
-    hideMappingModal();
-  });
-}
-
-function hideMappingModal() {
-  mappingModal.classList.remove("active");
-  // Reset selected character
-  selectedCharacterForMapping = null;
-}
-
 // Clear cache for a specific character
 function clearCharacterFromCache(characterName) {
   // Iterate through all cached pages and clear this character's data
@@ -1215,30 +779,6 @@ function clearCharacterFromCache(characterName) {
 // Event listeners for modals
 characterModalClose.addEventListener("click", hideCharacterModal);
 characterDetailsModalClose.addEventListener("click", hideCharacterDetailsModal);
-mappingModalClose.addEventListener("click", hideMappingModal);
-
-// Event listeners for character actions
-removeCharacterButton.addEventListener("click", async () => {
-  if (!currentCharacter) return;
-
-  try {
-    const result = await removeCharacter(currentCharacter.name);
-    if (result) {
-      alert(`Character ${currentCharacter.name} removed successfully`);
-      // Clear from cache and update view
-      clearCharacterFromCache(currentCharacter.name);
-    }
-  } catch (error) {
-    alert(`Error removing character: ${error.message}`);
-  }
-
-  hideCharacterModal();
-});
-
-mapCharacterButton.addEventListener("click", () => {
-  if (!currentCharacter) return;
-  showMappingModal(currentCharacter.name);
-});
 
 createImageButton.addEventListener("click", async () => {
   if (!currentCharacter) return;
@@ -1257,218 +797,9 @@ createImageButton.addEventListener("click", async () => {
   hideCharacterModal();
 });
 
-cancelMappingButton.addEventListener("click", hideMappingModal);
-
 // Toggle night mode
 export function toggleNightMode() {
   setIsNightMode(!isNightMode());
-}
-
-// Add swipe gesture support for mobile
-document.addEventListener(
-  "touchstart",
-  (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-    touchCurrentX = touchStartX;
-    swipeStarted = true;
-    isSwiping = false;
-
-    // Check if touch is starting from right edge for notes panel
-    const rightEdgeThreshold = window.innerWidth - 30; // 30px from right edge
-    if (touchStartX > rightEdgeThreshold && isMobile()) {
-      // Add visual feedback to the edge indicator
-      const indicator = document.getElementById("notes-edge-indicator");
-      if (indicator) {
-        indicator.classList.add("swiping");
-      }
-    }
-
-    // Log touch start position for debugging
-    console.log(`Touch start at X: ${touchStartX}, sidebar visible: ${isMobileCharactersVisible()}`);
-  },
-  { passive: true },
-);
-
-document.addEventListener(
-  "touchmove",
-  (e) => {
-    if (!swipeStarted || !isMobile()) return;
-
-    touchCurrentX = e.changedTouches[0].screenX;
-    const diff = touchCurrentX - touchStartX;
-
-    // PRIORITY: Handle swipes when notes panel is visible
-    if (isMobileNotesVisible) {
-      // Only process left-to-right swipes to close notes panel
-      if (diff > 0) {
-        e.preventDefault(); // Prevent default scrolling
-        const leftNotes = document.getElementById("left-notes");
-
-        // Calculate how far to slide based on swipe distance (max 100%)
-        const slidePercent = Math.min(100, (diff / window.innerWidth) * 200); // 200% factor makes it more responsive
-
-        // Apply transform to notes panel
-        if (leftNotes) {
-          leftNotes.style.transform = `translateX(${slidePercent}%)`;
-        }
-
-        // Adjust overlay opacity
-        const notesOverlay = document.getElementById("notes-overlay");
-        if (notesOverlay) {
-          const newOpacity = Math.max(0, 1 - (slidePercent / 100) * 1.5);
-          notesOverlay.style.opacity = newOpacity.toString();
-        }
-      }
-      return; // Skip the rest of the handler when notes are visible
-    }
-
-    // If notes are not visible, handle other swipe cases...
-
-    // Check if this is a right-edge swipe for notes
-    const rightEdgeThreshold = window.innerWidth - 30; // 30px from right edge
-    const isRightEdgeSwipe = touchStartX > rightEdgeThreshold;
-
-    if (isRightEdgeSwipe && !isMobileNotesVisible && diff < 0) {
-      // This is a right-to-left swipe from the right edge
-      // We could add a preview effect here if desired
-      e.preventDefault(); // Prevent default scrolling
-      return;
-    }
-
-    // For hiding the strip, allow swipes that start on the strip or within a larger area near it
-    // For showing, allow swipes from a more generous left area
-    const isStripAreaSwipe = isMobileCharactersVisible() && touchStartX < 120; // Increased from 90px
-    const isLeftEdgeSwipe = !isMobileCharactersVisible() && touchStartX < 60; // Increased from 30px
-
-    // Process the swipe if it's from the appropriate area or if already swiping
-    if (isStripAreaSwipe || isLeftEdgeSwipe || isSwiping) {
-      isSwiping = true;
-      const charStrip = document.getElementById("mobile-character-strip");
-      const contentContainer = document.getElementById("content-container");
-
-      if (charStrip && contentContainer) {
-        e.preventDefault(); // Prevent scrolling when swiping the strip
-
-        // Add visual preview of the character strip movement during swipe
-        // If the strip is visible, move it left (negative); if hidden, move it from the left (positive)
-        if (isMobileCharactersVisible()) {
-          // Calculate how far to slide based on swipe distance (0 to -100%)
-          const slidePercent = Math.max(-100, Math.min(0, (diff / window.innerWidth) * 300)); // 300% factor makes it more responsive
-          charStrip.style.transform = `translateX(${slidePercent}%)`;
-        } else {
-          // For hidden strip, start from -100% and move toward 0
-          const slidePercent = Math.max(-100, Math.min(0, (diff / window.innerWidth) * 300 - 100));
-          charStrip.style.transform = `translateX(${slidePercent}%)`;
-        }
-      }
-    }
-  },
-  { passive: false },
-);
-
-document.addEventListener(
-  "touchend",
-  (e) => {
-    if (!swipeStarted || !isMobile()) return;
-
-    touchEndX = e.changedTouches[0].screenX;
-    const diff = touchEndX - touchStartX;
-
-    // Remove swiping class from edge indicator
-    const indicator = document.getElementById("notes-edge-indicator");
-    if (indicator) {
-      indicator.classList.remove("swiping");
-    }
-
-    // PRIORITY: Handle swipe completion when notes panel is visible
-    if (isMobileNotesVisible) {
-      const leftNotes = document.getElementById("left-notes");
-      const notesOverlay = document.getElementById("notes-overlay");
-
-      // Reset notes panel inline styles
-      if (leftNotes) {
-        leftNotes.style.transform = "";
-      }
-      if (notesOverlay) {
-        notesOverlay.style.opacity = "";
-      }
-
-      // If significant right swipe, close the notes panel
-      if (diff > window.innerWidth * 0.2) {
-        // 20% of screen width threshold
-        toggleMobileNotes();
-      }
-
-      swipeStarted = false;
-      isSwiping = false;
-      return; // Skip the rest of the handler
-    }
-
-    // Check if this was a right-edge swipe for notes
-    const rightEdgeThreshold = window.innerWidth - 30; // 30px from right edge
-    const isRightEdgeSwipe = touchStartX > rightEdgeThreshold;
-
-    if (isRightEdgeSwipe && !isMobileNotesVisible && diff < -20) {
-      // Right-to-left swipe from right edge - open notes panel
-      toggleMobileNotes();
-      swipeStarted = false;
-      isSwiping = false;
-      return; // Skip the rest of the handler
-    }
-
-    // Log touch end for debugging
-    console.log(`Touch end - diff: ${diff}`);
-
-    // Reset swipe state
-    swipeStarted = false;
-
-    if (isSwiping) {
-      isSwiping = false;
-
-      const charStrip = document.getElementById("mobile-character-strip");
-
-      // Clean up the scroll position marker if it exists
-
-      // Reset the transform style to ensure smooth transition
-      if (charStrip) {
-        charStrip.style.transform = "";
-      }
-
-      // Only toggle if the swipe distance is significant (at least 50px or 15% of screen width)
-      const minSwipeDistance = Math.min(40, window.innerWidth * 0.1);
-      if (Math.abs(diff) > minSwipeDistance) {
-        toggleMobileCharacters();
-      }
-      return; // Don't proceed to the old handleSwipe function
-    }
-
-    handleSwipe();
-  },
-  { passive: true },
-);
-
-function handleSwipe() {
-  const swipeThreshold = 40; // Minimum distance (in px) to trigger swipe - reduced for better responsiveness
-
-  // Check if we have significant horizontal movement
-
-  // Priority: Handle notes panel swipes
-  if (isMobileNotesVisible) {
-    // Left to right swipe (close notes if visible)
-    if (touchEndX > touchStartX + swipeThreshold) {
-      toggleMobileNotes();
-    }
-    return; // Skip other checks when notes are visible
-  }
-
-  // Handle character strip swipes when notes not visible
-
-  // Right to left swipe (open notes if not visible)
-  // We only want to open notes when swiping from the right edge of the screen
-  const rightEdgeThreshold = window.innerWidth - 30; // 30px from right edge
-  if (touchEndX < touchStartX - swipeThreshold && touchStartX > rightEdgeThreshold && !isMobileNotesVisible) {
-    toggleMobileNotes();
-  }
 }
 
 let scrollDebounce: string | number | NodeJS.Timeout;
@@ -1493,33 +824,6 @@ initPage()
 // Add the characters-hidden class to body initially if the character strip is hidden
 document.getElementById("legacy")!.classList.toggle("characters-hidden", !isMobileCharactersVisible());
 
-// Add touch event handling for the notes edge indicator
-const notesEdgeIndicator = document.getElementById("notes-edge-indicator");
-if (notesEdgeIndicator) {
-  // Add touch event listener
-  notesEdgeIndicator.addEventListener(
-    "touchstart",
-    (e) => {
-      if (isMobile() && !isMobileNotesVisible) {
-        e.preventDefault(); // Prevent default to avoid any scrolling
-        e.stopPropagation(); // Stop propagation to prevent other handlers
-        toggleMobileNotes();
-      }
-    },
-    { passive: false },
-  ); // Use non-passive listener to call preventDefault
-
-  // Add regular click event listener
-  notesEdgeIndicator.addEventListener("click", (e) => {
-    console.log("clicked notesEdgeIndicator", isMobile(), !isMobileNotesVisible);
-    if (isMobile() && !isMobileNotesVisible) {
-      e.preventDefault(); // Prevent default just in case
-      e.stopPropagation(); // Stop propagation to prevent other handlers
-      toggleMobileNotes();
-    }
-  });
-}
-
 // Menu event listeners
 
 // Add event listeners for closing modals
@@ -1541,32 +845,11 @@ async function keyboardNavigationSetup(event: KeyboardEvent) {
   if (isEditActive()) {
     return;
   }
-  // if (event.key === "s" && (event.metaKey || event.ctrlKey)) {
-  //   event.preventDefault(); // Prevent browser save dialog
-  //   enterSetPageNumberMode();
-  //   return;
-  // }
-
-  // // Check if the key is a number (0-9)
-  // if (/^[0-9]$/.test(event.key) && !event.ctrlKey && !event.altKey && !event.metaKey) {
-  //   handlePageNumberInput(event.key);
-  //   return;
-  // }
 
   // Handle other keyboard navigation
   switch (event.key) {
     case "Escape":
       // Cancel page number input on Escape
-      typedPageNumber = "";
-      pageOffsetInput = "";
-      isSettingPageNumber = false;
-      if (pageInputTimeout) {
-        clearTimeout(pageInputTimeout);
-      }
-      if (pageOffsetInputTimeout) {
-        clearTimeout(pageOffsetInputTimeout);
-      }
-      pageNumberIndicator.classList.remove("visible");
 
       // Close notes panel if open
       if (isMobileNotesVisible) {
@@ -1605,7 +888,6 @@ function isAppearanceWithinRange(
 
   // Single chapter range
   if (startChapter === effectiveEndChapter) {
-    // 10 49 10 1 true
     return chapterNumber === startChapter && paragraphNumber >= startParagraph && paragraphNumber <= effectiveEndParagraph;
   }
 
@@ -1755,78 +1037,74 @@ function setupParagraphHighlighting() {
       // Check if right notes are hidden (mobile view)
       const isMobileView = rightNotesContainer && getComputedStyle(rightNotesContainer).display === "none";
 
-      if (isMobileView || true) {
-        event.preventDefault(); // Prevent default link navigation/jump
+      event.preventDefault(); // Prevent default link navigation/jump
 
-        const targetId = linkNote.getAttribute("href")?.substring(1); // Get href like '#fn3' and remove '#'
-        if (targetId) {
-          console.log("1148 targetId", targetId);
-          const noteElement = document.getElementById(targetId);
-          if (noteElement) {
-            console.log("1148 noteElement", noteElement);
-            // --- Modal Logic ---
-            // Reuse or create modal elements
-            let modal = document.getElementById("note-modal");
-            let modalContent = document.getElementById("note-modal-content");
-            let modalClose = document.getElementById("note-modal-close");
-            let modalOverlay = document.getElementById("note-modal-overlay");
+      const targetId = linkNote.getAttribute("href")?.substring(1); // Get href like '#fn3' and remove '#'
+      if (targetId) {
+        console.log("1148 targetId", targetId);
+        const noteElement = document.getElementById(targetId);
+        if (noteElement) {
+          console.log("1148 noteElement", noteElement);
+          // --- Modal Logic ---
+          // Reuse or create modal elements
+          let modal = document.getElementById("note-modal");
+          let modalContent = document.getElementById("note-modal-content");
+          let modalClose = document.getElementById("note-modal-close");
+          let modalOverlay = document.getElementById("note-modal-overlay");
 
-            const closeModal = () => {
-              if (modal) modal.classList.remove("visible");
-              if (modalOverlay) modalOverlay.classList.remove("visible");
-              // Remove body class to allow scrolling again
-              document.body.classList.remove("modal-open");
-            };
+          const closeModal = () => {
+            if (modal) modal.classList.remove("visible");
+            if (modalOverlay) modalOverlay.classList.remove("visible");
+            // Remove body class to allow scrolling again
+            document.body.classList.remove("modal-open");
+          };
 
-            if (!modal) {
-              console.log("1148 modal create", modal);
-              // Create modal structure if it doesn't exist
-              modalOverlay = document.createElement("div");
-              modalOverlay.id = "note-modal-overlay";
-              modalOverlay.onclick = closeModal; // Close on overlay click
+          if (!modal) {
+            console.log("1148 modal create", modal);
+            // Create modal structure if it doesn't exist
+            modalOverlay = document.createElement("div");
+            modalOverlay.id = "note-modal-overlay";
+            modalOverlay.onclick = closeModal; // Close on overlay click
 
-              modal = document.createElement("div");
-              modal.id = "note-modal";
-              // modal.style.display = 'none'; // Let CSS handle initial display
+            modal = document.createElement("div");
+            modal.id = "note-modal";
+            // modal.style.display = 'none'; // Let CSS handle initial display
 
-              const modalDialog = document.createElement("div");
-              modalDialog.id = "note-modal-dialog";
+            const modalDialog = document.createElement("div");
+            modalDialog.id = "note-modal-dialog";
 
-              modalClose = document.createElement("button");
-              modalClose.id = "note-modal-close";
-              modalClose.innerHTML = "&times;"; // Close symbol
-              modalClose.onclick = closeModal; // Close on button click
+            modalClose = document.createElement("button");
+            modalClose.id = "note-modal-close";
+            modalClose.innerHTML = "&times;"; // Close symbol
+            modalClose.onclick = closeModal; // Close on button click
 
-              modalContent = document.createElement("div");
-              modalContent.id = "note-modal-content";
+            modalContent = document.createElement("div");
+            modalContent.id = "note-modal-content";
 
-              modalDialog.appendChild(modalClose);
-              modalDialog.appendChild(modalContent);
-              modal.appendChild(modalDialog);
-              document.body.appendChild(modalOverlay);
-              document.body.appendChild(modal);
-            }
+            modalDialog.appendChild(modalClose);
+            modalDialog.appendChild(modalContent);
+            modal.appendChild(modalDialog);
+            document.body.appendChild(modalOverlay);
+            document.body.appendChild(modal);
+          }
 
-            // Ensure elements were found or created and assign content/display
-            if (modal && modalContent && modalOverlay && modalClose) {
-              console.log("1148 modalContent display", modalContent);
-              // Replace potential space before the editorial note with a non-breaking space
-              // and wrap the note itself to prevent internal breaks.
-              const originalHTML = noteElement.innerHTML;
-              const modifiedHTML = originalHTML
-                .replace(/\s*(\[przypis edytorski\])/g, ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>')
-                .replace(/\s*(\[przypis autorski\])/g, ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>');
-              modalContent.innerHTML = modifiedHTML; // Use innerHTML to preserve formatting
-              modal.classList.add("visible"); // Use class
-              modalOverlay.classList.add("visible"); // Use class
-              // Add body class to prevent background scrolling
-              document.body.classList.add("modal-open");
-            }
+          // Ensure elements were found or created and assign content/display
+          if (modal && modalContent && modalOverlay && modalClose) {
+            console.log("1148 modalContent display", modalContent);
+            // Replace potential space before the editorial note with a non-breaking space
+            // and wrap the note itself to prevent internal breaks.
+            const originalHTML = noteElement.innerHTML;
+            const modifiedHTML = originalHTML
+              .replace(/\s*(\[przypis edytorski\])/g, ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>')
+              .replace(/\s*(\[przypis autorski\])/g, ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>');
+            modalContent.innerHTML = modifiedHTML; // Use innerHTML to preserve formatting
+            modal.classList.add("visible"); // Use class
+            modalOverlay.classList.add("visible"); // Use class
+            // Add body class to prevent background scrolling
+            document.body.classList.add("modal-open");
           }
         }
       }
-      // On non-mobile, let the default link behavior (#) happen or handle differently if needed.
-      // Currently, the mouseover handles scrolling/highlighting on desktop.
     }
   });
   // --- End Click Listener ---
@@ -1879,106 +1157,3 @@ startReactComponents();
 
 // Make showCharacterDetailsModal available globally for the sidebar editor
 window.showCharacterDetailsModal = showCharacterDetailsModal;
-
-// --- Start Preloading Logic ---
-
-// async function preloadInitialAssets() {
-//   const bookSlug = getCurrentBookSlug();
-//   if (!bookSlug) {
-//     console.warn("Cannot preload assets: bookSlug is not available yet.");
-//     return;
-//   }
-
-//   console.log(`[Preload] Starting initial asset preload for book: ${bookSlug}`);
-//   const imageUrlsToPreload = new Set<string>();
-//   const videoUrlsToPreload = new Set<string>();
-
-//   knownMovingPictures.forEach((name) => {
-//     const picturePath = getPictureFilePathForName(name, bookSlug);
-//     const movingPath = getMovingPictureFilePathForName(name, bookSlug);
-//     if (picturePath) imageUrlsToPreload.add(picturePath);
-//     if (movingPath) videoUrlsToPreload.add(movingPath); // Assumes GIFs are also preloaded as images
-//   });
-
-//   // Separate videos
-//   videoUrlsToPreload.add("/Pharaon/moving-background.mp4");
-//   videoUrlsToPreload.add("/Pharaon/army.mp4");
-
-//   console.log(`[Preload] Found ${imageUrlsToPreload.size} unique images and ${videoUrlsToPreload.size} unique videos to preload.`);
-
-//   const preloadImagePromises = Array.from(imageUrlsToPreload).map((url) => {
-//     return new Promise<void>((resolve, reject) => {
-//       const img = new Image();
-//       img.onload = () => {
-//         // console.log(`[Preload] Image loaded: ${url}`);
-//         resolve();
-//       };
-//       img.onerror = (err) => {
-//         console.warn(`[Preload] Failed to preload image ${url}:`, err);
-//         reject(err); // Reject on error
-//       };
-//       img.src = url;
-//     });
-//   });
-
-//   // Get or create the hidden container for preloading videos
-//   const videoPreloadContainer = createVideoPreloadContainer();
-
-//   const preloadVideoPromises = Array.from(videoUrlsToPreload).map((url) => {
-//     return new Promise<void>((resolve, reject) => {
-//       const video = document.createElement("video");
-//       video.muted = true; // IMPORTANT: Prevent sound
-//       video.playsInline = true; // Good practice for mobile
-//       video.preload = "auto"; // Hint to browser to download data
-
-//       const onCanPlayThrough = () => {
-//         // console.log(`[Preload] Video can play through: ${url}`);
-//         // Clean up listeners
-//         video.removeEventListener("canplaythrough", onCanPlayThrough);
-//         video.removeEventListener("error", onError);
-//         // Optional: remove video element from container after load?
-//         // Leaving it might help keep it cached, but could consume memory.
-//         // Consider removing if memory becomes an issue:
-//         // if (video.parentNode) video.parentNode.removeChild(video);
-//         resolve();
-//       };
-
-//       const onError = (e) => {
-//         console.warn(`[Preload] Failed to preload video ${url}:`, e);
-//         // Clean up listeners
-//         video.removeEventListener("canplaythrough", onCanPlayThrough);
-//         video.removeEventListener("error", onError);
-//         reject(e); // Reject the promise on error
-//       };
-
-//       video.addEventListener("canplaythrough", onCanPlayThrough);
-//       video.addEventListener("error", onError);
-
-//       video.src = url;
-//       video.load(); // Explicitly call load() after setting src
-
-//       // Add to hidden container - helps ensure browser processes it
-//       videoPreloadContainer.appendChild(video);
-
-//       // Optional: Timeout fallback if needed
-//       // setTimeout(() => {
-//       //   console.warn(`[Preload] Timeout waiting for canplaythrough: ${url}`);
-//       //   video.removeEventListener("canplaythrough", onCanPlayThrough);
-//       //   video.removeEventListener("error", onError);
-//       //   resolve(); // Resolve anyway? Or reject? Depends on desired behavior.
-//       // }, 15000); // 15 seconds
-//     });
-//   });
-
-//   const allPreloadPromises = [...preloadImagePromises, ...preloadVideoPromises];
-
-//   // We don't necessarily need to wait for all preloads to finish for the app to start,
-//   // but logging completion can be useful.
-//   Promise.allSettled(allPreloadPromises).then((results) => {
-//     const successfulPreloads = results.filter((r) => r.status === "fulfilled").length;
-//     const failedPreloads = results.length - successfulPreloads;
-//     console.log(`[Preload] Initial asset preloading attempted. Success: ${successfulPreloads}, Failed: ${failedPreloads}`);
-//   });
-// }
-
-// --- End Preloading Logic ---
