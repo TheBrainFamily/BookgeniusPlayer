@@ -93,8 +93,7 @@ export default function BookChaptersModal() {
     const pageNum = parseInt(page, 10);
     console.log(`Navigating to chapter ${chapterId}, page ${pageNum}`);
     // Implement your navigation logic here
-    // For example: router.push(`/book/chapter/${chapterId}`)
-    goToParagraph(chapterId, 0);
+    goToParagraph({ chapter: chapterId, paragraph: 0, endChapter: chapterId, endParagraph: 0 });
     setActiveModal(null);
     setOverlayOpen(false);
   };
