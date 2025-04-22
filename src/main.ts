@@ -18,6 +18,7 @@ import { initializeNoteLinkBlinking, setupNoteLinkBlinking } from "./annotations
 import { getPictureFilePathForName, getMovingPictureFilePathForName } from "./utils/getFilePathsForName";
 import { knownMovingPictures } from "./utils/getFilePathsForName";
 import { Workbox } from "workbox-window";
+import { dealWithCutScenes } from "./deal-with-cut-scenes";
 
 const splash = document.getElementById("splash")!;
 
@@ -519,10 +520,7 @@ export const dealWithBackground = ({ startChapter, startParagraph, endChapter, e
   /* -------- cross‑fade core -------- */
   function crossFadeTo(file) {
     if (legacyElement.dataset.currentFile === file) {
-      console.log("BACKGROUND already showing", file);
       return; /* already showing */
-    } else {
-      console.log("BACKGROUND applying background", legacyElement.dataset.currentFile, file);
     }
 
     const newSrc = `/Pharaon/${file}`;
@@ -533,7 +531,6 @@ export const dealWithBackground = ({ startChapter, startParagraph, endChapter, e
     back.addEventListener(
       "loadeddata",
       () => {
-        console.log("BACKGROUND loadeddata", back);
         back.currentTime = 0;
         back.play();
 
@@ -554,7 +551,6 @@ export const dealWithBackground = ({ startChapter, startParagraph, endChapter, e
           /* refresh references for the next call */
           front = getFront();
           back = getBack();
-          console.log("BACKGROUND swapped — new front/back", front, back);
         }, fadeMs);
       },
       { once: true },
@@ -598,7 +594,6 @@ export const dealWithBackground = ({ startChapter, startParagraph, endChapter, e
   for (const bg of backgrounds) {
     if (startChapter === bg.startChapter && startParagraph <= bg.endParagraph && endChapter === bg.endChapter && endParagraph >= bg.startParagraph) {
       applied = true;
-      console.log("BACKGROUND matched", bg.file);
       crossFadeTo(bg.file);
       break;
     }
@@ -628,6 +623,7 @@ async function updateParagraphNotesInternal({
 }) {
   dealWithBackground({ startChapter, startParagraph, endChapter, endParagraph });
   dealWithAnnotations({ startChapter, startParagraph, endChapter, endParagraph });
+  dealWithCutScenes({ startChapter, startParagraph, endChapter, endParagraph });
   const leftNotes = document.getElementById("left-notes");
   if (!leftNotes) return;
   const paragraphs =
@@ -641,19 +637,15 @@ async function updateParagraphNotesInternal({
         })
       : await getParagraphRange({ bookSlug: getCurrentBookSlug(), startChapter: startChapter, startParagraph, endChapter: endChapter, endParagraph });
   const currentCharactersData = parseParagraphRange(paragraphs);
-  console.log("characters", currentCharactersData);
 
   const newCharacterNames = currentCharactersData.map((c) => c.canonicalName).sort(); // Sort for comparison
   const sortedPreviousCharacters = [...previousCharacters].sort(); // Sort previous too
 
   // Check if character list is identical (after sorting)
   if (newCharacterNames.length === sortedPreviousCharacters.length && newCharacterNames.every((c, index) => c === sortedPreviousCharacters[index])) {
-    console.log("No change to characters, skipping notes update.");
     // Even if list is same, activation might need update if range changed
     activateCharacters(startChapter, startParagraph, getCurrentBookSlug(), endChapter, endParagraph, true);
     return;
-  } else {
-    console.log("Changes detected in characters.");
   }
 
   // --- Mobile logic remains unchanged ---
@@ -1669,14 +1661,9 @@ function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: 
       let isInRange = false;
       let isTalkingInRange = false;
 
-      if (canonicalName === "Ramzes") {
-        console.log("Ramzes IMPORTANT", appearances, { chapterNum, paragraphNum, endChapter, endParagraph, onlyTalking });
-      }
-
       // Check if any appearance falls within the specified range
       for (const app of appearances) {
         if (isAppearanceWithinRange(app, chapterNum, paragraphNum, endChapter, endParagraph)) {
-          console.log("isInRange", canonicalName, app.isTalkingInParagraph);
           isInRange = true;
           if (app.isTalkingInParagraph) {
             isTalkingInRange = true;
@@ -1684,8 +1671,6 @@ function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: 
           } else {
             // Empty block removed
           }
-        } else {
-          console.log("NOT IN RANGE", canonicalName);
         }
       }
 
@@ -1693,7 +1678,6 @@ function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: 
       const imageElement = note.querySelector<HTMLImageElement>(".entity-image");
 
       if (isTalkingInRange) {
-        console.log("isTalkingInRange", canonicalName);
         note.classList.add("highlighted-talking-entity");
         // Swap image to GIF if talking
         if (imageElement && imageElement.dataset.originalSrc) {
@@ -1716,7 +1700,6 @@ function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: 
           }
         }
       } else {
-        console.log("GOZDECKI NOT IN RANGE OR NOT TALKING IN RANGE FOR", canonicalName);
         // If not in range, or only showing talking entities and this one isn't talking in range
         // console.log(`GOZDECKI NOT IN RANGE OR NOT TALKING IN RANGE FOR ${canonicalName}`);
         // Ensure image is PNG if it was changed

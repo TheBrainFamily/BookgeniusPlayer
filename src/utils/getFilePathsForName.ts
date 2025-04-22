@@ -119,7 +119,6 @@ const known = [
   "żona-chłopa-topionego-speaks.mp4",
 ];
 
-
 export const getPictureFileNameForName = (name: string) => {
   return `${name.replace(/[\s()\\']+/g, "-").toLowerCase()}.png`;
 };
@@ -132,7 +131,6 @@ export const getPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) =>
     .replace(/ /g, "-")
     .replace(/"/g, "")
     .replace(/(\(|\))/g, "")}-listens.mp4`;
-  console.log(`listens: ${listensPath}`);
   if (known.includes(listensPath)) {
     return `/${bookSlug}/${listensPath}`;
   }
@@ -145,7 +143,6 @@ export const getMovingPictureFilePathForName = (name: string, bookSlug: BOOK_SLU
     .replace(/ /g, "-")
     .replace(/"/g, "")
     .replace(/(\(|\))/g, "")}-speaks.mp4`;
-  console.log(`speaks: ${speaksPath}`);
   if (known.includes(speaksPath)) {
     return `/${bookSlug}/${speaksPath}`;
   }
@@ -161,8 +158,6 @@ pharaonCharactersData.forEach((character) => {
   filesFound.push(getPictureFilePathForName(characterName, bookSlug));
   filesFound.push(getMovingPictureFilePathForName(characterName, bookSlug));
 });
-
-console.log(filesFound);
 
 // known.forEach((file) => {
 //   const found = filesFound.find((f) => f.includes(file));
