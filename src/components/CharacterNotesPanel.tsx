@@ -46,8 +46,8 @@ export const CharacterNotesPanel: React.FC = () => {
       /* force remount when chapter changes so stagger anim stays nice */
       key={`c${debouncedLoc.chapter}`}
     >
-      {notes.map((n) => (
-        <CharacterCard key={n.canonicalName} entity={n} />
+      {notes.map((n, index) => (
+        <CharacterCard key={n.canonicalName} entity={n} index={index} />
       ))}
     </div>,
     target,

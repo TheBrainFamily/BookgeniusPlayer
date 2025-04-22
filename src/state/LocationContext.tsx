@@ -1,8 +1,6 @@
-import React, { createContext, useCallback, useMemo, useState } from "react";
+import React, { createContext, useCallback, useMemo, useState, useEffect } from "react";
 import { __setLocationBridge } from "@/src/helpers/paragraphsNavigation";
 
-/* ------------------------------------------------------------------ */
-/*  Types                                                             */
 /* ------------------------------------------------------------------ */
 export interface Location {
   chapter: number;
@@ -10,49 +8,49 @@ export interface Location {
   endChapter: number;
   endParagraph: number;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Load the *initial* reader position from LS — nothing more         */
+const loadFromLS = (): Location => {
+  try {
+    const raw = localStorage.getItem("furthestLocation");
+    return raw ? JSON.parse(raw) : { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 };
+  } catch {
+    return { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 };
+  }
+};
+
+/* ------------------------------------------------------------------ */
 interface LocationCtx {
   location: Location;
   setLocation: (l: Location) => void;
 }
-
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                           */
-/* ------------------------------------------------------------------ */
-const loadFromLS = (): Location => {
-  const raw = localStorage.getItem("furthestLocation");
-  return raw ? JSON.parse(raw) : { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 };
-};
-const saveToLS = (loc: Location) => localStorage.setItem("furthestLocation", JSON.stringify(loc));
-
-/* ------------------------------------------------------------------ */
-/*  Context + Provider                                                */
-/* ------------------------------------------------------------------ */
 export const LocationContext = createContext<LocationCtx>({
   location: { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 },
-  // eslint‑disable-next-line @typescript-eslint/no-empty-function
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   setLocation: () => {},
 });
 
+/* ------------------------------------------------------------------ */
 export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [location, setLocationState] = useState<Location>(loadFromLS());
 
-  /* make sure we write to LS only once per state change */
   const setLocation = useCallback((loc: Location) => {
     setLocationState(loc);
-    saveToLS(loc);
   }, []);
 
   /* ----------------------------------------------------------------
-   *  expose the current getters / setters to legacy code
+   * Expose getters/setters to the legacy proxy so old helpers keep
+   * working transparently.
    * ---------------------------------------------------------------- */
-  __setLocationBridge({ get: () => location, set: setLocation });
+  useEffect(() => {
+    __setLocationBridge({ get: () => location, set: setLocation });
+  }, [location, setLocation]);
 
-  const value = useMemo<LocationCtx>(() => ({ location, setLocation }), [location, setLocation]);
+  const ctxValue = useMemo<LocationCtx>(() => ({ location, setLocation }), [location, setLocation]);
 
-  return <LocationContext.Provider value={value}>{children}</LocationContext.Provider>;
+  return <LocationContext.Provider value={ctxValue}>{children}</LocationContext.Provider>;
 };
 
-/* ------------------------------------------------------------------ */
-/*  Convenience hook                                                  */
-/* ------------------------------------------------------------------ */
+/* convenience hook */
 export const useLocation = () => React.useContext(LocationContext);

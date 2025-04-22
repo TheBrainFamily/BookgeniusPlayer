@@ -8,9 +8,7 @@ type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInP
 
 function toggleClasses(apps: Appearance[], enable: boolean) {
   apps.forEach(({ chapterNumber, paragraphNumber, isTalkingInParagraph }) => {
-    // eslint‑disable-next-line prefer-template
-    const q = `section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`;
-    const p = document.querySelector<HTMLElement>(q);
+    const p = document.querySelector<HTMLElement>(`section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`);
     if (!p) return;
     p.classList.toggle("highlighted-paragraph", enable);
     p.classList.toggle("talking-paragraph", enable && isTalkingInParagraph);
@@ -20,27 +18,26 @@ function toggleClasses(apps: Appearance[], enable: boolean) {
 /* ------------------------------------------------------------------ */
 interface Props {
   entity: ParsedParagraphRange;
+  index: number; // position inside the panel (for stagger anim)
 }
-export const CharacterCard: React.FC<Props> = ({ entity }) => {
+export const CharacterCard: React.FC<Props> = ({ entity, index }) => {
   const bookSlug = getCurrentBookSlug();
 
-  /* merged appearance list (first + others) */
   const apps: Appearance[] = [
     { chapterNumber: entity.chapterNumber, paragraphNumber: entity.paragraphNumber, isTalkingInParagraph: entity.isTalkingInFirstParagraph },
     ...entity.otherAppearances,
   ];
 
   /* --------------------------------------------------------------- */
-  /*  Hover logic throttled to rAF and only if state really changes  */
+  /*  Smooth hover highlight                                         */
   /* --------------------------------------------------------------- */
   const wantOn = useRef(false);
   const rafId = useRef<number>();
 
   const requestToggle = useCallback(
     (enable: boolean) => {
-      if ((window as any).__sidebarScrollingLock) return; // ignore while scrolling
-      if (wantOn.current === enable) return; // nothing to do
-
+      if ((window as unknown as { __sidebarScrollingLock: boolean }).__sidebarScrollingLock) return;
+      if (wantOn.current === enable) return;
       wantOn.current = enable;
       cancelAnimationFrame(rafId.current!);
       rafId.current = requestAnimationFrame(() => toggleClasses(apps, enable));
@@ -49,28 +46,32 @@ export const CharacterCard: React.FC<Props> = ({ entity }) => {
   );
 
   /* --------------------------------------------------------------- */
-  /*  Modal open                                                     */
+  /*  Media                                                          */
   /* --------------------------------------------------------------- */
   const mediaSrc = entity.imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, bookSlug) : entity.imageUrl;
   const isVideo = mediaSrc.endsWith(".mp4") || mediaSrc.endsWith(".webm");
 
   const openDetails = () => typeof window.showCharacterDetailsModal === "function" && window.showCharacterDetailsModal(entity.canonicalName, mediaSrc, entity.summary ?? "");
 
-  const common = { "data-original-src": mediaSrc, "data-character-name": entity.canonicalName, "data-summary": entity.summary ?? "", className: "entity-image" } as const;
+  const commonAttrs = { "data-original-src": mediaSrc, "data-character-name": entity.canonicalName, "data-summary": entity.summary ?? "", className: "entity-image" } as const;
 
   const summaryHTML = (entity.summary || "").replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>").replace(/•/g, "");
 
+  /* custom CSS property for stagger delay */
+  const style = { ["--stagger-delay"]: `${index * 0.07}s` };
+
   return (
     <div
-      className="entity-note"
+      className="entity-note sidebar-item-animate"
       data-canonical-name={entity.canonicalName}
       data-appearances={JSON.stringify(apps)}
+      style={style}
       onMouseEnter={() => requestToggle(true)}
       onMouseLeave={() => requestToggle(false)}
     >
       <div className="entity-image-column">
         <div className="entity-image-wrapper" onClick={openDetails}>
-          {isVideo ? <video {...common} src={mediaSrc} autoPlay loop muted playsInline /> : <img {...common} src={mediaSrc} alt={entity.canonicalName} />}
+          {isVideo ? <video {...commonAttrs} src={mediaSrc} autoPlay loop muted playsInline /> : <img {...commonAttrs} src={mediaSrc} alt={entity.canonicalName} />}
         </div>
       </div>
 
