@@ -2,14 +2,20 @@ import React, { useEffect } from "react";
 
 import { LocationProvider } from "./state/LocationContext";
 import { usePageObserver } from "./hooks/usePageObserver";
+import { useCutScene } from "./hooks/useCutScene";
+import { useBackgroundVideo } from "./hooks/useBackgroundVideo";
 
 import BookChaptersModal from "./menu-modal";
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
 import { runLegacyInit } from "./main";
 
 function Shell() {
-  /* side‑effects that depend on scroll position */
+  /* scroll‑related hooks */
   usePageObserver();
+
+  /* dynamic visual hooks */
+  useCutScene();
+  useBackgroundVideo();
 
   return (
     <>
@@ -20,11 +26,7 @@ function Shell() {
 }
 
 export default function App() {
-  /* -----------------------------------------------------------
-   * Kick the legacy bootstrap ONCE.
-   * (Parent effect → executed before children effects,
-   * so updateParagraphNotes is ready when usePageObserver runs.)
-   * ----------------------------------------------------------- */
+  /* kick the imperative bootstrap once */
   useEffect(() => {
     runLegacyInit();
   }, []);
