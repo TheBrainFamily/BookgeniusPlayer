@@ -442,19 +442,6 @@
     }
   }
 
-  /* Spacing for first element on first page */
-  
-
-
-  /* --- Chapter Styling --- */
-  .chapter-header {
-    padding-bottom: 1em;
-    border-top: 1px solid var(--border-light);
-  }
-  .chapter-item {
-    padding: 2px;
-  }
-
   /* --- Notes Panel --- */
   .notes-container {
     display: flex;
@@ -475,13 +462,6 @@
     gap: 15px;
     overflow-y: scroll;
     cursor: default;
-    /* Remove the background styling from children divs */
-    & > div {
-      padding: 0.75rem;
-      display: flex;
-      gap: 15px;
-      align-items: center;
-    }
   }
 
   /* Add styling only to the text column */
@@ -599,14 +579,6 @@
     margin-right: 20px;
   }
 
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  
-
   .close-notes-button {
     position: absolute;
     top: max(10px, var(--safe-area-inset-top));
@@ -623,184 +595,6 @@
   }
   .notes-container.active .close-notes-button {
     display: block; /* Show when parent is active */
-  }
-
-  /* Mobile Vertical Character Strip (Left Side) */
-  .mobile-character-strip {
-    display: none; /* Hidden by default */
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 70px;
-    background-color: var(--mobile-strip-bg-light);
-    overflow-y: auto;
-    overflow-x: hidden; /* Prevent horizontal scroll */
-    padding: 10px;
-    padding-top: max(10px, var(--safe-area-inset-top));
-    padding-bottom: max(10px, var(--safe-area-inset-bottom)); /* Add bottom padding */
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
-    z-index: 40; /* Below toggle buttons */
-    -webkit-overflow-scrolling: touch;
-    transform: translateX(0);
-    opacity: 1; /* Start visible for transition */
-    transition:
-      transform var(--transition-slow) var(--transition-timing-cubic),
-      opacity var(--transition-slow) var(--transition-timing-cubic);
-    will-change: transform, opacity; /* Hint browser about changes */
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-perspective: 1000;
-    perspective: 1000;
-
-    &.hidden {
-      transform: translateX(-100%);
-      opacity: 0;
-      pointer-events: none; /* Prevent interaction when hidden */
-    }
-  }
-
-  .mobile-character-item {
-    display: block;
-    width: 100%;
-    margin-bottom: 15px;
-    text-align: center;
-
-    img {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 5px;
-      border: 2px solid var(--char-card-border-light);
-      transition:
-        transform var(--transition-fast) var(--transition-timing),
-        border-color var(--transition-fast) var(--transition-timing);
-      &:active {
-        /* Tap feedback */
-        transform: scale(0.92);
-      }
-    }
-    .character-name {
-      font-size: 9px;
-      white-space: normal;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-height: 28px; /* Approx 2 lines */
-      line-height: 1.2;
-      color: var(--text-light); /* Ensure readable text */
-    }
-  }
-
-  /* Mobile Horizontal Character Strip (Bottom) */
-  .mobile-horizontal-character-strip {
-    display: none; /* Hidden by default */
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: calc(85px + var(--safe-area-inset-bottom)); /* Fixed height + safe area */
-    background-color: var(--mobile-strip-horizontal-bg-light);
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 5px 0;
-    padding-left: max(15px, var(--safe-area-inset-left));
-    padding-right: max(15px, var(--safe-area-inset-right));
-    padding-bottom: max(5px, var(--safe-area-inset-bottom)); /* Padding below content within safe area */
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
-    z-index: 40; /* Same level as vertical strip */
-    -webkit-overflow-scrolling: touch;
-    transform: translateY(0);
-    opacity: 1; /* Start visible for transition */
-    transition:
-      transform var(--transition-medium) var(--transition-timing),
-      opacity var(--transition-medium) var(--transition-timing);
-    will-change: transform, opacity;
-    white-space: nowrap; /* Keep items in a line */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
-    &::-webkit-scrollbar {
-      display: none;
-    } /* Chrome/Safari/Opera */
-
-    &.hidden {
-      transform: translateY(100%);
-      opacity: 0;
-      pointer-events: none; /* Prevent interaction when hidden */
-    }
-  }
-
-  .mobile-horizontal-character-item {
-    display: inline-block;
-    width: 60px;
-    margin: 0 4px; /* Add small gap between items */
-    text-align: center;
-    vertical-align: top;
-
-    &:first-child {
-      margin-left: 0;
-    }
-    &:last-child {
-      margin-right: 0;
-    }
-
-    img {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--char-card-border-light);
-      transition:
-        transform var(--transition-fast) var(--transition-timing),
-        border-color var(--transition-fast) var(--transition-timing);
-      &:active {
-        transform: scale(0.92);
-      }
-    }
-    .character-name {
-      font-size: 9px;
-      white-space: normal; /* Allow wrapping */
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-height: 20px; /* Approx 1-2 lines */
-      line-height: 1.2;
-      margin-top: 4px;
-      color: var(--text-light); /* Ensure readable text */
-    }
-  }
-
-  /* Notes Overlay (Mobile) */
-  .notes-overlay {
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 49; /* Just below the notes panel */
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--transition-medium) var(--transition-timing);
-
-    &.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-  }
-
-  /* Hide character strips when notes are open */
-  &.notes-visible {
-    .mobile-character-strip,
-    .mobile-horizontal-character-strip {
-      opacity: 0;
-      pointer-events: none;
-      transition:
-        opacity var(--transition-medium) ease,
-        transform var(--transition-medium) ease; /* Match visibility transition */
-    }
-    .mobile-character-strip {
-      transform: translateX(-100%);
-    }
-    .mobile-horizontal-character-strip {
-      transform: translateY(100%);
-    }
   }
 
   .editable-text:hover {
@@ -862,14 +656,6 @@
     cursor: default;
   }
 
-  /* Styles for the entity image wrapper */
-  .entity-image-wrapper {
-    transition:
-      transform 0.3s ease-in-out,
-      box-shadow 0.3s ease-in-out;
-    z-index: 1;
-  }
-
   .entity-image-wrapper:hover {
     transform: scale(1.2); /* Scale the wrapper on hover */
     z-index: 10; /* Bring to front on hover */
@@ -918,15 +704,6 @@
     border-radius: 4px;
   }
 
-  @keyframes shimmerEffect {
-    0% {
-      background-position: -100% 0;
-    }
-    100% {
-      background-position: 200% 0;
-    }
-  }
-
   /* Add this rule for highlighting entities in the sidebar */
   .entity-note.highlighted-entity {
     transition: transform 0.2s ease-in-out;
@@ -937,10 +714,6 @@
     border: 1px solid var(--entity-highlight-border-light);
     box-shadow: 0 0 10px var(--entity-highlight-shadow-accent-light);
     transition: all 0.2s ease-in-out;
-  }
-
-  .entity-note .entity-image-wrapper {
-    transform: scale(1.2);
   }
 
   /* Add this rule for highlighting talking entities in the sidebar */
@@ -967,141 +740,7 @@
     box-shadow: 0 0 12px var(--entity-image-wrapper-shadow-light);
     border: 2px solid var(--entity-image-wrapper-border-light);
   }
-} /* End of #legacy scope */
 
-@keyframes blinkEffect {
-  0%,
-  100% {
-    background-color: rgba(var(--bg-content-light-rgb), 1); /* Replaced inherit */
-  }
-  50% {
-    background-color: var(--entity-talking-highlight-bg-light); /* Stronger blue tint */
-    /* --entity-talking-highlight-border-light: rgba(255, 215, 0, 0.6); */
-  }
-}
-
-/* Keyframes for pulsing scale effect */
-@keyframes pulseScale {
-  0% {
-    transform: scale(1.13);
-  }
-  50% {
-    transform: scale(1.15);
-  }
-  100% {
-    transform: scale(1.13);
-  }
-}
-
-@keyframes pulseGlow {
-  0% {
-    transform: scale(1.2);
-    box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
-  }
-  50% {
-    transform: scale(1.4);
-    box-shadow: 0 0 15px var(--entity-image-wrapper-shadow-max-light);
-  }
-  100% {
-    transform: scale(1.2);
-    box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
-  }
-}
-
-/* Base style for entity notes to help with transitions */
-.entity-note {
-  max-width: 700px;
-  align-self: center;
-  transform: scale(1);
-  transition:
-    transform 0.3s ease-in-out,
-    box-shadow 0.3s ease-in-out,
-    opacity 0.3s ease-out; /* Add opacity transition */
-  position: relative;
-  z-index: 1;
-}
-
-/* Base style for entity text column to help with transitions */
-.entity-text-column {
-  transition:
-    background-color 0.3s ease-in-out,
-    border 0.3s ease-in-out,
-    box-shadow 0.3s ease-in-out;
-}
-
-/* Base style for entity image wrapper to help with transitions */
-.entity-image-wrapper {
-  transition:
-    transform 0.3s ease-in-out,
-    box-shadow 0.3s ease-in-out;
-  z-index: 1;
-}
-
-/* ============================================ */
-/* Animation Keyframes & Classes      */
-/* ============================================ */
-
-/* Staggered Fade-Up for Sidebar Items */
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(0px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Apply this class via JS to items for staggered animation */
-.sidebar-item-animate {
-  opacity: 0; /* Start hidden before animation */
-  animation: fadeUp 0.4s ease-out forwards;
-  /* Set --stagger-delay via JS */
-  animation-delay: var(--stagger-delay, 0s);
-}
-
-/* Skeleton Loader Styles */
-.skeleton {
-  background-color: #eee; /* Base color */
-  background-image: linear-gradient(90deg, #eee 0px, #f5f5f5 40px, #eee 80px);
-  background-size: 200px 100%; /* Adjust size for desired shimmer width */
-  height: 1.5em; /* Example height */
-  margin-bottom: 0.5em; /* Example spacing */
-  border-radius: 4px;
-  animation: shimmer 1.5s infinite linear;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  } /* Ensure shimmer moves fully across */
-}
-
-/* ============================================ */
-/* Fade In/Out Classes for Container Transitions */
-/* ============================================ */
-
-.fade-in {
-  opacity: 1;
-  transition: opacity 0.3s ease-out;
-}
-
-.fade-out {
-  opacity: 0;
-  transition: opacity 0.3s ease-out;
-  pointer-events: none; /* Prevent interaction during fade-out */
-}
-
-/* Initially hide elements meant to fade in */
-.entity-notes-container:not(.fade-in) {
-  opacity: 0;
-}
-
-#legacy {
   /* Editable text container */
   .editable-container {
     position: relative;
@@ -1123,11 +762,6 @@
     line-height: inherit;
     resize: none;
   }
-
-  /* Page summary container */
-  .page-summary-container {
-  }
-
   /* Chapter summary container */
   .chapter-summary-container {
     margin-top: 20px;
@@ -1178,13 +812,6 @@
 
   .entity-note h4.editable-text:focus {
     border: 1px dashed #aaa;
-  }
-
-  /* Highlighted paragraphs */
-  .highlighted-paragraph {
-  }
-
-  .talking-paragraph {
   }
 
   /* Add character container and button */
@@ -1274,4 +901,69 @@
     text-align: center;
     font-size: 14px;
   }
+} /* End of #legacy scope */
+
+/* Base style for entity notes to help with transitions */
+.entity-note {
+  max-width: 700px;
+  align-self: center;
+  transform: scale(1);
+  transition:
+    transform 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out,
+    opacity 0.3s ease-out; /* Add opacity transition */
+  position: relative;
+  z-index: 1;
+}
+
+/* Base style for entity text column to help with transitions */
+.entity-text-column {
+  transition:
+    background-color 0.3s ease-in-out,
+    border 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
+/* Base style for entity image wrapper to help with transitions */
+.entity-image-wrapper {
+  transition:
+    transform 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+  z-index: 1;
+}
+/* Fade-in animation class */
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+}
+
+/* Fade-out animation class */
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+  pointer-events: none; /* Prevent interaction during fade-out */
+}
+
+/* Hide elements initially meant to fade in */
+.entity-notes-container:not(.fade-in) {
+  opacity: 0;
+}
+
+/* Highlight note styles - light mode */
+#legacy #right-notes-scrollable-container section.highlight-note {
+  background-color: var(--entity-highlight-bg-light);
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Highlight note styles - night mode */
+#legacy.night-mode #right-notes-scrollable-container section.highlight-note {
+  background-color: var(--entity-highlight-bg-dark);
+}
+
+/* Sidebar animation for staggered entrance */
+.sidebar-item-animate {
+  opacity: 0; /* Start hidden before animation */
+  animation: fadeUp 0.4s ease-out forwards;
+  /* Set --stagger-delay via JS */
+  animation-delay: var(--stagger-delay, 0s);
 }
