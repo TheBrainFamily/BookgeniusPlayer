@@ -193,14 +193,14 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
 
       {/* Replace the conditional backdrop with always-rendered element that transitions */}
       <div
-        className={`fixed inset-0 bg-background/80 z-40 transition-all duration-300 ease-in-out ${
+        className={`fixed inset-0 bg-black/80 z-40 transition-all duration-300 ease-in-out ${
           isFocused ? "opacity-100 backdrop-blur-sm" : "opacity-0 backdrop-blur-none pointer-events-none"
         }`}
         onClick={() => setIsFocused(false)}
       />
 
       {/* Input container */}
-      <div className={cn("fixed bottom-0 left-0 right-0 z-50 p-4 bg-background border-t", className)}>
+      <div className={cn("absolute bottom-0 z-50 w-[500px] left-1/2 -translate-x-1/2 p-4 bg-white/50 rounded-2xl mx-auto content-container", className)}>
         <form
           onSubmit={handleSubmit}
           className="max-w-4xl mx-auto"
