@@ -113,9 +113,9 @@
     flex: 1;
     flex-direction: row;
     justify-content: space-evenly;
-    padding-left:0;
     /* width: 100%; */
     position: relative;
+    padding: 0 10px;
     /* padding-top: 0; */ /* Defined below for #content-container */
     padding-bottom: var(--safe-area-inset-bottom); /* Add padding for the safe area */
     text-align: left; /* Override default if needed */
@@ -226,6 +226,9 @@
         margin-top: 0;
         margin-bottom: 1em;
         text-align: justify;
+        hyphens: auto;
+        -webkit-hyphens: auto;
+        -ms-hyphens: auto;
       }
 
       /* First-line indent (classic book style) */
@@ -442,6 +445,17 @@
     }
   }
 
+  /* Spacing for first element on first page */
+
+  /* --- Chapter Styling --- */
+  .chapter-header {
+    padding-bottom: 1em;
+    border-top: 1px solid var(--border-light);
+  }
+  .chapter-item {
+    padding: 2px;
+  }
+
   /* --- Notes Panel --- */
   .notes-container {
     display: flex;
@@ -512,6 +526,7 @@
       color: var(--text-notes-light);
       font-size: 0.95rem;
       text-align: justify;
+      hyphens: auto;
     }
     emphasis {
       /* Assuming <emphasis> tag or .emphasis class */
@@ -579,6 +594,12 @@
     height: 50px;
     animation: spin 1s linear infinite;
     margin-right: 20px;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .close-notes-button {
