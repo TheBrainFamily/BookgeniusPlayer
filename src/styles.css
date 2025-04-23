@@ -113,9 +113,9 @@
     flex: 1;
     flex-direction: row;
     justify-content: space-evenly;
+    padding-left:0;
     /* width: 100%; */
     position: relative;
-    padding: 0 10px;
     /* padding-top: 0; */ /* Defined below for #content-container */
     padding-bottom: var(--safe-area-inset-bottom); /* Add padding for the safe area */
     text-align: left; /* Override default if needed */
@@ -490,6 +490,7 @@
     margin: 20px;
     margin-right: 0;
     padding-bottom: 20px;
+    max-width: 700px;
 
     section {
       padding: 20px;
@@ -524,8 +525,9 @@
     display: flex;
     justify-content: center;
     height: 100vh;
-    margin: 20px 5px 20px 0;
     flex: 1;
+    max-width: 700px;
+    margin: 20px;
   }
 
   /* Return to Location Button */
@@ -646,16 +648,6 @@
     margin-top: 10px;
   }
 
-  /* Container for entity notes - center content vertically */
-  .entity-notes-container {
-    display: flex;
-    flex-direction: column;
-    padding: 50px 0;
-    gap: 15px;
-    overflow-y: scroll;
-    cursor: default;
-  }
-
   .entity-image-wrapper:hover {
     transform: scale(1.2); /* Scale the wrapper on hover */
     z-index: 10; /* Bring to front on hover */
@@ -773,6 +765,15 @@
     gap: 15px;
     align-items: center;
     overflow: visible;
+    margin-left:70px;
+  }
+
+  .entity-note:first-child {
+    padding-top: 50px;
+  }
+
+  .entity-note:last-child {
+    padding-bottom: 50px;
   }
 
   .entity-image-column {

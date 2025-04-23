@@ -1,8 +1,8 @@
 /* ============================================ */
 /* Mobile Landscape Specific Layout (50/50 Split) */
 /* ============================================ */
-@media screen and (orientation: landscape) and (max-width: 1400px) {
-  /* Adjusted max-width slightly */
+/* TODO ipad pro portrait mode 1024x1366 make entities visible, hide description, add name below image */
+@media screen and (max-width: 1400px) {
 
   #legacy #right-notes {
     display: none; /* Hide right notes */
@@ -10,15 +10,12 @@
 
   #legacy #left-notes {
     display: flex; /* Override mobile portrait display: none */
-    flex: 0 0 50% ; /* Take 50% width, don't grow or shrink */
-    max-width: 50%;
+    flex: 0 0 45% ; /* Take 45% width, don't grow or shrink */
+    max-width: 45%;
     height: 100vh ; /* Full height */
     margin: 0 ; /* Reset margins */
-    padding: 0; /* Reset padding */
     /* Utilize safe areas */
-    padding-left: 0 ;
-    padding-top: var(--safe-area-inset-top);
-    padding-bottom: 0px;
+    padding: var(--safe-area-inset-top) 30px 0 30px;
     box-sizing: border-box; /* Include padding in width calculation */
     overflow-y: auto; /* Allow scrolling if content overflows */
     position: static; /* Override fixed positioning from portrait */
@@ -26,7 +23,7 @@
     opacity: 1; /* Ensure visible */
     font-size: 0.75em;
     /* Add these to align internal flex items */
-    justify-content: flex-start;
+    justify-content: center;
     align-items: flex-start;
     flex-direction: column; /* Ensure vertical stacking if needed */
   }
@@ -59,33 +56,33 @@
   #legacy #left-notes .entity-notes-container {
     padding-left: calc(var(--safe-area-inset-left) - 20px);
     box-sizing: border-box;
-    /* justify-content: center; */
+    gap: 20px;
+    overflow: visible;
   }
 
   #legacy #left-notes .entity-note {
     width: 100%; /* Ensure it takes full available width */
     position: relative; /* Needed for z-index */
-    /* Remove negative margin */
     & > div {
       display: flex;
-      /* Targeting the inner flex container */
-      gap: 15px; /* Increased gap between image and text */
+      gap: 15px; 
       justify-content: center;
     }
     .entity-text-column {
+      flex-direction: column;
+      gap: 0;
       justify-content: flex-start;
     }
   }
 
   #legacy #left-notes .entity-image-column {
+    flex: unset;
     & .entity-image-wrapper {
-      margin-top: -2em;
       width: 150px;
       height: 150px;
-      padding-top: 0; /* Remove padding-top trick for fixed height */
+      padding-top: 0;
       position: relative;
       border-radius: 50%;
-      overflow: hidden; /* Clip the image */
     }
   }
 }
