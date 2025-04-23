@@ -4,6 +4,7 @@
 
 #legacy {
   /* --- Base Container Styles --- */
+  contain: paint;
   font-family: var(--font-serif);
   /* background-color: var(--bg-light); */ /* Replaced by ::before */
   background-color: transparent; /* Make container transparent */
@@ -24,41 +25,13 @@
   z-index: 0; /* Ensure content stays above the ::before pseudo-element */
 
   /* Background Variables */
-  --bg-image-before: url("/Pharaon/background.png"); /* Base/Default background */
-  --bg-image-after: url("/Pharaon/background.png"); /* Default for the top layer */
   --opacity-after: 0; /* Top layer starts transparent */
   --transition-duration: 0.8s; /* Control transition speed */
 
   /* Blurred Background Pseudo-element (Bottom Layer) */
-  &::before {
-    content: "";
-    position: fixed;
-    inset: 0; /* Cover the entire viewport */
-    background-image: var(--bg-image-before);
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    filter: blur(3px); /* Apply blur */
-    opacity: 1; /* Always fully visible */
-    z-index: -3; /* Ensure it's behind ::after */
-    /* No transition needed on this layer */
-    /* Optional: Add a slight dimming overlay if needed */
-    /* background-color: rgba(0, 0, 0, 0.1); */
-  }
 
-  /* Second Background Pseudo-element for Transitions (Top Layer) */
-  &::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image: var(--bg-image-after);
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    filter: blur(3px);
-    opacity: var(--opacity-after);
-    z-index: -1; /* Ensure it's on top of ::before */
-    transition: opacity var(--transition-duration) ease-in-out;
+  #video-blur-container {
+    backdrop-filter: blur(3px);
   }
 
   .bg-video {
@@ -67,9 +40,10 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    will-change: opacity; /* compositor knows an opacity change is coming */
+    transform: translateZ(0); /* forces a dedicated GPU layer                */
     transition: opacity var(--transition-duration) ease-in-out;
-    filter: blur(3px);
-
+    opacity: 1;
     z-index: -2; /* sit below ::after / ::before */
   }
   .bg-video.faded {
@@ -83,19 +57,6 @@
     /* If issues arise, apply only to specific scrollable containers */
     overscroll-behavior-x: none; /* prevents accidental horizontal scroll interactions */
     touch-action: pan-y; /* allows only vertical scrolling on touch */
-  }
-
-  #bg-video {
-    position: fixed; /* Match existing pseudo-elements */
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0; /* Initially transparent */
-    filter: blur(3px); /* Match your existing blur */
-    transition: opacity var(--transition-duration) ease-in-out;
-    z-index: -1; /* Match ::after (so it can overlap) */
-    pointer-events: none; /* Ensure no interaction issues */
   }
 
   /* --- Typography Basics --- */
@@ -786,7 +747,7 @@
     gap: 15px;
     align-items: center;
     overflow: visible;
-    margin-left:70px;
+    margin-left: 70px;
   }
 
   .entity-note:first-child {

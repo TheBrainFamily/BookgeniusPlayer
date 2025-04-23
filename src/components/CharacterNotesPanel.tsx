@@ -14,7 +14,7 @@ export const CharacterNotesPanel: React.FC = () => {
   const { location } = useLocation();
 
   /* throttle updates while scrolling */
-  const debounced = useDebounce(location, 1000);
+  const debounced = useDebounce(location, 1500);
 
   /* stable range object */
   const range = useMemo(

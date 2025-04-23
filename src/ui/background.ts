@@ -1,113 +1,141 @@
-// Background video handling functions
+// -----------------------------------------------------------------------------
+//  background-videos.ts   (copy-paste entire file)
+// -----------------------------------------------------------------------------
 
-export const dealWithBackground = ({ startChapter, startParagraph, endChapter, endParagraph }) => {
-  console.log("BACKGROUND deciding", { startChapter, startParagraph, endChapter, endParagraph });
-  /* ---------- helpers ---------- */
-  const toBackground = ({ chapter, file }) => {
-    return { startChapter: chapter, startParagraph: 1, file, endChapter: chapter, endParagraph: 10000 };
+// ---- generic debounce -------------------------------------------------------
+function debounce<T extends (...args: unknown[]) => void>(fn: T, wait: number): (...args: Parameters<T>) => void {
+  let t: number | null = null;
+  return (...args: Parameters<T>) => {
+    if (t !== null) clearTimeout(t);
+    t = window.setTimeout(() => {
+      t = null;
+      fn(...args);
+    }, wait);
   };
+}
 
-  const legacyElement = document.getElementById("legacy");
-  const videoA = document.getElementById("bg-video-a");
-  const videoB = document.getElementById("bg-video-b");
+// ---- globals ----------------------------------------------------------------
+let debouncedHandler: ((p: { startChapter: number; startParagraph: number; endChapter: number; endParagraph: number }) => void) | null = null;
 
-  /* Track which video is currently on top (A starts) */
-  if (!legacyElement.dataset.front) {
-    legacyElement.dataset.front = "a";
+let isTransitioning = false;
+
+// ---- public API -------------------------------------------------------------
+export const dealWithBackground = ({
+  startChapter,
+  startParagraph,
+  endChapter,
+  endParagraph,
+}: {
+  startChapter: number;
+  startParagraph: number;
+  endChapter: number;
+  endParagraph: number;
+}) => {
+  const legacy = document.getElementById("legacy")!;
+  const videoA = document.getElementById("bg-video-a") as HTMLVideoElement;
+  const videoB = document.getElementById("bg-video-b") as HTMLVideoElement;
+  if (!legacy || !videoA || !videoB) {
+    console.error("Background video elements not found");
+    return;
   }
-  const getFront = () => (legacyElement.dataset.front === "a" ? videoA : videoB) as HTMLVideoElement;
-  const getBack = () => (legacyElement.dataset.front === "a" ? videoB : videoA) as HTMLVideoElement;
 
-  let front = getFront();
-  let back = getBack();
+  // initialise once -----------------------------------------------------------
+  if (!debouncedHandler) {
+    debouncedHandler = debounce(async (p: { startChapter: number; startParagraph: number; endChapter: number; endParagraph: number }) => {
+      // ---------- mapping -----------------------------------------------------
+      const toBackground = ({ chapter, file }: { chapter: number; file: string }) => ({
+        startChapter: chapter,
+        startParagraph: 1,
+        file,
+        endChapter: chapter,
+        endParagraph: 10_000,
+      });
 
-  /* duration in ms = value of --transition-duration (default 0.8 s) */
-  const fadeMs = parseFloat(getComputedStyle(front).transitionDuration) * 1000 || 800;
+      const backgroundsPassedFromGemini = [
+        { chapter: 1, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+        { chapter: 2, file: "background-wawoz-fade.mp4" },
+        { chapter: 3, file: "background-sara-slow-motion-loop.mp4" },
+        { chapter: 4, file: "background-army-fade-loop.mp4" },
+        { chapter: 5, file: "background-sara-estate-fade.mp4" },
+        { chapter: 6, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+        { chapter: 7, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+        { chapter: 8, file: "background-moving-generic-estate-fade.mp4" },
+        { chapter: 9, file: "background-moving-generic-estate-slow-motion-loop.mp4" },
+        { chapter: 10, file: "background-moving-generic-faster-estate-fade.mp4" },
+        { chapter: 11, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+        { chapter: 12, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 13, file: "background-moving-generic-estate-fade.mp4" },
+        { chapter: 14, file: "background-moving-generic-estate-fade.mp4" },
+        { chapter: 15, file: "background-moving-generic-estate-slow-motion-loop.mp4" },
+        { chapter: 16, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 17, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+        { chapter: 18, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 19, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+        { chapter: 20, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+        { chapter: 21, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 22, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 23, file: "background-moving-generic-estate-fade.mp4" },
+        { chapter: 24, file: "background-moving-generic-estate-fade.mp4" },
+        { chapter: 25, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+      ];
+      const backgrounds = backgroundsPassedFromGemini.map(toBackground);
 
-  /* -------- cross‑fade core -------- */
-  function crossFadeTo(file) {
-    if (legacyElement.dataset.currentFile === file) {
-      return; /* already showing */
-    }
+      // ---------- helpers -----------------------------------------------------
+      if (!legacy.dataset.front) legacy.dataset.front = "a";
+      if (legacy.dataset.currentFile === undefined) legacy.dataset.currentFile = "";
 
-    const newSrc = `/Pharaon/${file}`;
+      const getFront = () => (legacy.dataset.front === "a" ? videoA : videoB);
+      const getBack = () => (legacy.dataset.front === "a" ? videoB : videoA);
 
-    back.src = newSrc;
-    back.load(); /* start buffering */
+      const fadeMs = parseFloat(getComputedStyle(videoA).transitionDuration) * 1000 || 800;
 
-    back.addEventListener(
-      "loadeddata",
-      () => {
-        back.currentTime = 0;
-        back.play();
+      // ---------- main fade function -----------------------------------------
+      async function crossFadeTo(file: string) {
+        const front = getFront();
+        const back = getBack();
 
-        /* step 1 — be sure the back video starts at opacity 0 */
-        back.classList.add("faded");
+        if (legacy.dataset.currentFile === file || isTransitioning) return;
+        isTransitioning = true;
 
-        /* step 2 — next frame: fade back in, front out */
+        const newSrc = `/Pharaon/${file}`;
+        back.classList.add("faded"); // start hidden
+
+        back.src = newSrc;
+        back.load(); // begin buffering
+
+        // --- wait until the first real frame is ready ------------------------
+        try {
+          await back.play(); // warm decoder
+          await new Promise<void>((ok) => back.requestVideoFrameCallback(() => ok()));
+        } catch (e) {
+          console.error("Video play error:", e);
+          isTransitioning = false;
+          return;
+        }
+
+        // --- start GPU-only cross-fade ---------------------------------------
         requestAnimationFrame(() => {
-          back.classList.remove("faded"); /* fades IN */
-          front.classList.add("faded"); /* fades OUT */
+          back.classList.remove("faded"); // fades IN
+          front.classList.add("faded"); // fades OUT
         });
 
-        /* step 3 — after the transition, swap roles */
-        setTimeout(() => {
-          legacyElement.dataset.front = legacyElement.dataset.front === "a" ? "b" : "a";
-          legacyElement.dataset.currentFile = file;
+        // --- swap references exactly when fade ends --------------------------
+        window.setTimeout(() => {
+          legacy.dataset.front = legacy.dataset.front === "a" ? "b" : "a";
+          legacy.dataset.currentFile = file;
+          front.pause(); // stop hidden video
+          isTransitioning = false;
+        }, 1500); // tiny safety margin
+      }
 
-          /* refresh references for the next call */
-          front = getFront();
-          back = getBack();
-        }, fadeMs);
-      },
-      { once: true },
-    );
+      // ---------- choose background for this chapter -------------------------
+      const found = backgrounds.find((bg) => p.startChapter === bg.startChapter);
+      console.log("found", found);
+      if (found) crossFadeTo(found.file);
+      else console.log(`No background for chapter ${p.startChapter}`);
+    }, 150);
   }
 
-  /* ---------- mapping  ---------- */
-  const backgroundsPassedFromGemini = [
-    { chapter: 1, file: "background-egyptian-streets-palace-visible-loop.mp4" },
-    { chapter: 2, file: "background-wawoz-fade.mp4" },
-    { chapter: 3, file: "background-sara-slow-motion-loop.mp4" },
-    { chapter: 4, file: "background-army-fade-loop.mp4" },
-    { chapter: 5, file: "background-sara-estate-fade.mp4" },
-    { chapter: 6, file: "background-egyptian-streets-palace-visible-loop.mp4" },
-    { chapter: 7, file: "background-egyptian-streets-palace-visible-loop.mp4" },
-    { chapter: 8, file: "background-moving-generic-estate-fade.mp4" },
-    { chapter: 9, file: "background-moving-generic-estate-slow-motion-loop.mp4" },
-    { chapter: 10, file: "background-moving-generic-faster-estate-fade.mp4" },
-    { chapter: 11, file: "background-egyptian-streets-palace-visible-loop.mp4" },
-    { chapter: 12, file: "background-generic-pingpong-fade.mp4" },
-    { chapter: 13, file: "background-moving-generic-estate-fade.mp4" },
-    { chapter: 14, file: "background-moving-generic-estate-fade.mp4" },
-    { chapter: 15, file: "background-moving-generic-estate-slow-motion-loop.mp4" },
-    { chapter: 16, file: "background-generic-pingpong-fade.mp4" },
-    { chapter: 17, file: "background-egyptian-streets-palace-visible-loop.mp4" },
-    { chapter: 18, file: "background-generic-pingpong-fade.mp4" },
-    { chapter: 19, file: "background-egyptian-streets-palace-visible-loop.mp4" },
-    { chapter: 20, file: "background-egyptian-streets-palace-visible-loop.mp4" },
-    { chapter: 21, file: "background-generic-pingpong-fade.mp4" },
-    { chapter: 22, file: "background-generic-pingpong-fade.mp4" },
-    { chapter: 23, file: "background-moving-generic-estate-fade.mp4" },
-    { chapter: 24, file: "background-moving-generic-estate-fade.mp4" },
-    { chapter: 25, file: "background-egyptian-streets-palace-visible-loop.mp4" },
-  ];
-  const backgrounds = backgroundsPassedFromGemini.map(toBackground);
-
-  /* ---------- decide & apply ---------- */
-  console.log("BACKGROUND deciding", { startChapter, startParagraph, endChapter, endParagraph });
-
-  for (const bg of backgrounds) {
-    if (startChapter === bg.startChapter && startParagraph <= bg.endParagraph && endChapter === bg.endChapter && endParagraph >= bg.startParagraph) {
-      crossFadeTo(bg.file);
-      break;
-    }
-  }
-
-  /* when no match: fade to blurred PNG only */
-  // if (!applied) {
-  //   videoA.classList.add("faded");
-  //   videoB.classList.add("faded");
-  //   legacyElement.dataset.currentFile = "";
-  // }
+  // ---- invoke debounced handler --------------------------------------------
+  debouncedHandler({ startChapter, startParagraph, endChapter, endParagraph });
 };

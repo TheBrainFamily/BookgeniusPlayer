@@ -35,9 +35,7 @@ function Shell() {
 const ChatContainer = () => {
   const { sendMessage } = useWebSocket();
 
-  return (
-      <BottomInput placeholder="Ask a question..." onSubmit={sendMessage} />
-  );
+  return <BottomInput placeholder="Ask a question..." onSubmit={sendMessage} />;
 };
 
 export default function App() {
@@ -48,7 +46,7 @@ export default function App() {
 
   return (
     <LocationProvider>
-        <PageProvider>
+      <PageProvider>
         <RealtimeProvider>
           <WebSocketProvider>
             <Shell />
