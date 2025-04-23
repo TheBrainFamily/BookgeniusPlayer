@@ -1,8 +1,44 @@
+@media screen and (max-width: 1024px) {
+  #legacy .entity-notes-container {
+    padding: 10px 45px 70px;
+  }
+  #left-notes {
+    display: flex; /* Override mobile portrait display: none */
+    flex: 0 0 20% ; /* Take 45% width, don't grow or shrink */
+    max-width: 20%;
+    overflow-y: auto; /* Allow scrolling if content overflows */
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column; /* Ensure vertical stacking if needed */
+  }
+  #legacy #right-notes {
+    display: none; /* Hide right notes */
+  }
+  #legacy .entity-note {
+    flex-direction: column;
+    margin-left: 0;
+  }
+  #legacy #return-to-location-button {
+    bottom: 100px;
+  }
+  @media screen and (max-width: 950px) and (orientation: landscape) {
+    #legacy #return-to-location-button {
+      bottom: 70px;
+    }
+    #legacy #left-notes {
+      margin: 0;
+    }
+    #character-details-modal .modal-container {
+      max-height: 100vh;
+    }
+  }
+
+}
 /* ============================================ */
 /* Mobile Landscape Specific Layout (50/50 Split) */
 /* ============================================ */
 /* TODO ipad pro portrait mode 1024x1366 make entities visible, hide description, add name below image */
-@media screen and (max-width: 1400px) {
+@media screen and (max-width: 1400px) and (min-width: 1025px) {
 
   #legacy #right-notes {
     display: none; /* Hide right notes */

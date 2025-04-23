@@ -17,13 +17,34 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   const [value, setValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [isLandscape, setIsLandscape] = useState(false);
   const { startRecording, stopRecording, response } = useRealtime();
   const { receivedMessages, isLoading, currentStreamingMessage } = useWebSocket();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputContainerRef = useRef<HTMLDivElement>(null);
 
   const { currentPage } = usePage();
   // New state: store the last sent user message
   const [lastSentUserMessage, setLastSentUserMessage] = useState<{ role: "user"; content: string } | null>(null);
+
+  // Detect landscape mode for phones
+  useEffect(() => {
+    const checkOrientation = () => {
+      const isLandscapeMode = window.matchMedia("(max-width: 950px) and (orientation: landscape)").matches;
+      setIsLandscape(isLandscapeMode);
+      setIsExpanded(!isLandscapeMode);
+    };
+    
+    checkOrientation();
+    window.addEventListener("resize", checkOrientation);
+    window.addEventListener("orientationchange", checkOrientation);
+    
+    return () => {
+      window.removeEventListener("resize", checkOrientation);
+      window.removeEventListener("orientationchange", checkOrientation);
+    };
+  }, []);
 
   // Handle recording response
   useEffect(() => {
@@ -109,6 +130,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   // Handle recording start
   const handleRecordingStart = () => {
     setIsRecording(true);
+    setIsExpanded(true);
 
     startRecording().catch((error) => {
       console.error("Error starting recording:", error);
@@ -124,6 +146,39 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
       console.error("Error stopping recording:", error);
     });
   };
+
+  // Toggle expanded state when in landscape mode
+  const toggleExpanded = () => {
+    if (isLandscape) {
+      setIsExpanded(!isExpanded);
+      if (!isExpanded) {
+        setIsFocused(true);
+      }
+    }
+  };
+
+  // Handle clicks outside the input container to collapse in landscape mode
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isLandscape && 
+        isExpanded && 
+        inputContainerRef.current && 
+        !inputContainerRef.current.contains(event.target as Node)
+      ) {
+        setIsExpanded(false);
+        setIsFocused(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [isLandscape, isExpanded]);
 
   return (
     <>
@@ -196,37 +251,58 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
         className={`fixed inset-0 bg-black/80 z-40 transition-all duration-300 ease-in-out ${
           isFocused ? "opacity-100 backdrop-blur-sm" : "opacity-0 backdrop-blur-none pointer-events-none"
         }`}
-        onClick={() => setIsFocused(false)}
+        onClick={() => {
+          setIsFocused(false);
+          if (isLandscape) {
+            setIsExpanded(false);
+          }
+        }}
       />
 
       {/* Input container */}
-      <div className={cn("absolute bottom-0 z-50 w-[500px] left-1/2 -translate-x-1/2 p-4 bg-white/50 rounded-2xl mx-auto content-container", className)}>
+      <div 
+        ref={inputContainerRef}
+        className={cn(
+          "absolute bottom-0 z-50 transition-all duration-300",
+          isLandscape && !isExpanded 
+            ? "right-4 bottom-4 left-auto translate-x-0 p-1 bg-white/70 rounded-full" 
+            : "w-[500px] left-1/2 -translate-x-1/2 p-4 bg-white/50 rounded-2xl mx-auto",
+          "max-[1025px]:w-full max-[1025px]:mx-0",
+          isLandscape && !isExpanded && "max-[1025px]:w-auto",
+          className
+        )}
+      >
         <form
           onSubmit={handleSubmit}
-          className="max-w-4xl mx-auto"
+          className={cn(
+            "max-w-4xl mx-auto",
+            isLandscape && !isExpanded && "flex justify-center"
+          )}
           style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
         >
-          <div className="relative flex items-center">
-            <input
-              type="text"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onFocus={() => setIsFocused(true)}
-              // onBlur={(e) => {
-              //   // Only blur if not clicking inside the form
-              //   if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-              //     setIsFocused(false);
-              //   }
-              // }}
-              placeholder={isRecording ? "Listening..." : placeholder}
-              className={cn(
-                "w-full p-3 pr-24 rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-primary transition-colors",
-                isRecording && "bg-muted text-muted-foreground"
-              )}
-              disabled={isRecording}
-            />
+          <div className={cn(
+            "relative flex items-center",
+            isLandscape && !isExpanded && "gap-1"
+          )}>
+            {(isExpanded || !isLandscape) && (
+              <input
+                type="text"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onFocus={() => setIsFocused(true)}
+                placeholder={isRecording ? "Listening..." : placeholder}
+                className={cn(
+                  "w-full p-3 pr-24 rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-primary transition-colors",
+                  isRecording && "bg-muted text-muted-foreground"
+                )}
+                disabled={isRecording}
+              />
+            )}
 
-            <div className="absolute right-2 flex items-center space-x-1">
+            <div className={cn(
+              "flex items-center",
+              isLandscape && !isExpanded ? "space-x-1" : "absolute right-2 space-x-1"
+            )}>
               {/* Push to talk button */}
               <motion.button
                 type="button"
@@ -249,10 +325,15 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                   handleRecordingEnd();
                 }}
                 onMouseDown={(e) => {
+                  if (!isExpanded && isLandscape) {
+                    toggleExpanded();
+                    return;
+                  }
                   e.preventDefault();
                   handleRecordingStart();
                 }}
                 onMouseUp={(e) => {
+                  if (!isExpanded && isLandscape) return;
                   e.preventDefault();
                   handleRecordingEnd();
                 }}
@@ -268,8 +349,14 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                 className="p-2 rounded-full bg-primary text-primary-foreground flex items-center justify-center"
                 style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
                 whileTap={{ scale: 0.92 }}
-                onClick={() => handleSubmit()}
-                disabled={!value.trim()}
+                onClick={() => {
+                  if (!isExpanded && isLandscape) {
+                    toggleExpanded();
+                    return;
+                  }
+                  handleSubmit();
+                }}
+                disabled={!isExpanded && isLandscape ? false : !value.trim()}
               >
                 <Send size={18} />
               </motion.button>
