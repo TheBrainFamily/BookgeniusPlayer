@@ -10,6 +10,8 @@ import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
 import { runLegacyInit } from "./main";
 import { CharacterNotesPanel } from "./components/CharacterNotesPanel";
 import { RightNotesPanel } from "./components/RightNotesPanel";
+import { PageProvider } from "./context/PageContext";
+import { WebSocketProvider } from "./context/WebSocketContext";
 function Shell() {
   /* scroll‑related hooks */
   usePageObserver();
@@ -36,7 +38,11 @@ export default function App() {
 
   return (
     <LocationProvider>
-      <Shell />
+      <PageProvider>
+        <WebSocketProvider>
+          <Shell />
+        </WebSocketProvider>
+      </PageProvider>
     </LocationProvider>
   );
 }
