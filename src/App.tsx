@@ -15,8 +15,7 @@ import { BottomInput } from "./components/BottomInput";
 import { RealtimeProvider } from "./context/RealtimeContext";
 import { DeepResearchModal } from "./ui/DeepResearchModal";
 
-function Shell({ setShowDeepResearch, showDeepResearch }: { setShowDeepResearch: (show: boolean) => void; showDeepResearch: boolean }) {
-
+function Shell({ setShowDeepResearch, showDeepResearch, passedText }: { setShowDeepResearch: (show: boolean) => void; showDeepResearch: boolean; passedText?: string }) {
   /* scroll‑related hooks */
   usePageObserver();
 
@@ -30,12 +29,12 @@ function Shell({ setShowDeepResearch, showDeepResearch }: { setShowDeepResearch:
       <NoteLinkBlinker />
       <CharacterNotesPanel />
       <RightNotesPanel />
-      <DeepResearchModal isOpen={showDeepResearch} onClose={() => setShowDeepResearch(false)} />
+      <DeepResearchModal isOpen={showDeepResearch} onClose={() => setShowDeepResearch(false)} passedText={passedText} />
     </>
   );
 }
 
-const ChatContainer = ({ onShowDeepResearch, onCloseDeepResearch }: { onShowDeepResearch: () => void; onCloseDeepResearch: () => void }) => {
+const ChatContainer = ({ onShowDeepResearch, onCloseDeepResearch }: { onShowDeepResearch: (result: string) => void; onCloseDeepResearch: () => void }) => {
   const { sendMessage } = useWebSocket();
 
   return <BottomInput placeholder="Ask a question..." onSubmit={sendMessage} onShowDeepResearch={onShowDeepResearch} onCloseDeepResearch={onCloseDeepResearch} />;
@@ -44,6 +43,7 @@ const ChatContainer = ({ onShowDeepResearch, onCloseDeepResearch }: { onShowDeep
 export default function App() {
   /* State for Deep Research Modal */
   const [showDeepResearch, setShowDeepResearch] = useState(false);
+  const [deepResearchResult, setDeepResearchResult] = useState<string | null>(null);
   /* kick the imperative bootstrap once */
   useEffect(() => {
     runLegacyInit();
@@ -53,8 +53,14 @@ export default function App() {
     <LocationProvider>
       <RealtimeProvider>
         <WebSocketProvider>
-          <Shell setShowDeepResearch={setShowDeepResearch} showDeepResearch={showDeepResearch} />
-          <ChatContainer onShowDeepResearch={() => setShowDeepResearch(true)} onCloseDeepResearch={() => setShowDeepResearch(false)} />
+          <Shell setShowDeepResearch={setShowDeepResearch} showDeepResearch={showDeepResearch} passedText={deepResearchResult} />
+          <ChatContainer
+            onShowDeepResearch={(result) => {
+              setDeepResearchResult(result);
+              setShowDeepResearch(true);
+            }}
+            onCloseDeepResearch={() => setShowDeepResearch(false)}
+          />
         </WebSocketProvider>
       </RealtimeProvider>
     </LocationProvider>

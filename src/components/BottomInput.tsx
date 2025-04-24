@@ -7,12 +7,13 @@ import { Message, useWebSocket } from "../context/WebSocketContext";
 import { getCurrentBookSlug } from "../getCurrentBookSlug";
 import { useLocation } from "../state/LocationContext";
 import { showSearchModal, performSearch, hideSearchModal, isSearchActive } from "../searchModal";
+import { deepResearchCall } from "../deepResearchCall";
 
 interface BottomInputProps {
   placeholder?: string;
   onSubmit?: (message: Message) => void;
   className?: string;
-  onShowDeepResearch: () => void;
+  onShowDeepResearch: (result: string) => void;
   onCloseDeepResearch: () => void;
 }
 
@@ -132,20 +133,19 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
 
       if (isDeepResearchActive) {
         setIsThinking(true);
-        // Simulate deep research processing
-        setTimeout(() => {
+        deepResearchCall(value, location).then((result) => {
+          setIsDeepResearchActive(false);
+          onShowDeepResearch(result);
           setIsThinking(false);
-          // Here we would normally process the deep research response
-          onShowDeepResearch();
-        }, 2000);
+        });
+      } else {
+        onSubmit({ query: value, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: getCurrentBookSlug() } });
+        setLastSentUserMessage({ role: "user", content: value });
+        setTimeout(scrollToTop, 100);
       }
-
-      onSubmit({ query: value, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: getCurrentBookSlug() } });
       // Set the pending user message to immediately update the UI
-      setLastSentUserMessage({ role: "user", content: value });
       setValue("");
       // Force scroll to top when submitting
-      setTimeout(scrollToTop, 100);
     }
   };
 
@@ -254,9 +254,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
 
       {/* Replace the conditional backdrop with always-rendered element that transitions */}
       <div
-        className={`fixed inset-0 bg-black/80 z-40 transition-all duration-300 ease-in-out ${
-          isFocused ? "opacity-100 backdrop-blur-sm" : "opacity-0 backdrop-blur-none pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-black/80 z-40 transition-all duration-300 ease-in-out opacity-0 backdrop-blur-none pointer-events-none`}
         onClick={() => {
           setIsFocused(false);
           if (isLandscape) {
@@ -295,7 +293,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                   setValue(newVal);
 
                   // Trigger search modal and perform search while typing
-                  if (newVal.trim().length > 2) {
+                  if (newVal.trim().length > 2 && !isDeepResearchActive) {
                     // Show the modal if it's not visible yet
                     if (!isSearchActive()) {
                       showSearchModal();
