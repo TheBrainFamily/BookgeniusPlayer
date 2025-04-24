@@ -1,6 +1,14 @@
 import { goToParagraph, getCurrentLocation } from "@/src/helpers/paragraphsNavigation";
 import type { Location } from "@/src/state/LocationContext";
 import { searchParagraphsFromServer } from "./utils/searchParagraphsFromServer";
+import debounce from "lodash.debounce";
+
+// Create a debounced version of searchParagraphsFromServer
+const debouncedSearchParagraphsFromServer = debounce(searchParagraphsFromServer, 500, {
+  leading: true, // Execute on the leading edge (immediately)
+  trailing: true, // Execute on the trailing edge (after delay)
+  maxWait: 2000, // Maximum time to wait before forced execution
+});
 
 // Create search modal elements
 let searchModal: HTMLDivElement;
@@ -488,14 +496,14 @@ export async function performSearch(query: string) {
 
     console.log("totalMatches", totalMatches);
     if (totalMatches === 0) {
-      const serverMatches = await searchParagraphsFromServer(query, currentLocation);
+      const serverMatches = await debouncedSearchParagraphsFromServer(query, currentLocation);
       totalServerMatches = serverMatches.length;
 
       serverMatches.forEach((match) => {
         const resultItem = document.createElement("div");
         resultItem.className = "search-result-item";
 
-        // Limit text to first 50 characters
+        // Limit text to first 75 characters
         const textPreview = match.text.length > 75 ? `${match.text.substring(0, 75)}...` : match.text;
 
         resultItem.innerHTML = `
