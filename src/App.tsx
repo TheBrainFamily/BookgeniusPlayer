@@ -15,9 +15,7 @@ import { BottomInput } from "./components/BottomInput";
 import { RealtimeProvider } from "./context/RealtimeContext";
 import { DeepResearchModal } from "./ui/DeepResearchModal";
 
-function Shell() {
-  /* State for Deep Research Modal */
-  const [showDeepResearch, setShowDeepResearch] = useState(false);
+function Shell({ setShowDeepResearch, showDeepResearch }: { setShowDeepResearch: (show: boolean) => void; showDeepResearch: boolean }) {
 
   /* scroll‑related hooks */
   usePageObserver();
@@ -37,13 +35,15 @@ function Shell() {
   );
 }
 
-const ChatContainer = () => {
+const ChatContainer = ({ onShowDeepResearch, onCloseDeepResearch }: { onShowDeepResearch: () => void; onCloseDeepResearch: () => void }) => {
   const { sendMessage } = useWebSocket();
 
-  return <BottomInput placeholder="Ask a question..." onSubmit={sendMessage} />;
+  return <BottomInput placeholder="Ask a question..." onSubmit={sendMessage} onShowDeepResearch={onShowDeepResearch} onCloseDeepResearch={onCloseDeepResearch} />;
 };
 
 export default function App() {
+  /* State for Deep Research Modal */
+  const [showDeepResearch, setShowDeepResearch] = useState(false);
   /* kick the imperative bootstrap once */
   useEffect(() => {
     runLegacyInit();
@@ -53,8 +53,8 @@ export default function App() {
     <LocationProvider>
       <RealtimeProvider>
         <WebSocketProvider>
-          <Shell />
-          <ChatContainer />
+          <Shell setShowDeepResearch={setShowDeepResearch} showDeepResearch={showDeepResearch} />
+          <ChatContainer onShowDeepResearch={() => setShowDeepResearch(true)} onCloseDeepResearch={() => setShowDeepResearch(false)} />
         </WebSocketProvider>
       </RealtimeProvider>
     </LocationProvider>

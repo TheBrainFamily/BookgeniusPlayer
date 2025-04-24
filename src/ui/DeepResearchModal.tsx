@@ -79,14 +79,14 @@ export const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ isOpen, on
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black/70 z-[999]" // High z-index, below the modal content
+        className="fixed inset-0 z-[9]" // High z-index, below the modal content
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Modal Content */}
       <div
-        className="fixed inset-0 z-[1000] flex items-center justify-center p-4" // Highest z-index
+        className="fixed inset-0 z-[99] flex items-center justify-center p-4" // Highest z-index
         role="dialog"
         aria-modal="true"
         aria-labelledby="deep-research-title"
