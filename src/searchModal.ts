@@ -30,10 +30,6 @@ export function initSearchModal() {
         <span class="modal-close">&times;</span>
       </div>
       <div class="modal-body">
-        <div class="search-input-container">
-          <input type="text" id="search-input" placeholder="Search text...">
-          <button id="search-button">Search</button>
-        </div>
         <div id="search-results"></div>
       </div>
     </div>
@@ -44,30 +40,10 @@ export function initSearchModal() {
 
   // Get references to elements
   searchModalClose = searchModal.querySelector(".modal-close")!;
-  searchInput = document.getElementById("search-input") as HTMLInputElement;
-  searchButton = document.getElementById("search-button") as HTMLButtonElement;
   searchResults = document.getElementById("search-results") as HTMLDivElement;
 
   // Add event listeners
   searchModalClose.addEventListener("click", hideSearchModal);
-  // Add input event listener to search as you type
-  searchInput.addEventListener("input", (e) => {
-    const query = (e.target as HTMLInputElement).value;
-    if (query.trim().length > 3) {
-      // Only search if at least 3 characters
-      performSearch(query);
-    } else if (query.trim().length === 0) {
-      // Clear results if search box is emptied
-      searchResults.innerHTML = "";
-      lastSearchQuery = "";
-    }
-  });
-  searchButton.addEventListener("click", () => performSearch(searchInput.value));
-  searchInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      performSearch(searchInput.value);
-    }
-  });
 
   // Add styles
   addSearchModalStyles();
@@ -92,7 +68,7 @@ function addSearchModalStyles() {
       width: 100%;
       height: 100%;
       background-color: rgba(0, 0, 0, 0.5);
-      z-index: 9999;
+      z-index: 99;
       opacity: 0;
       visibility: hidden;
       display: flex;

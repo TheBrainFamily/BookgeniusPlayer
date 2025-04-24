@@ -25,6 +25,9 @@
       }
     }
   }
+  .modal-overlay.search-modal.active {
+    background-color: rgba(0, 0, 0, 0);
+  }
 
   .modal-container {
     background-color: rgba(var(--modal-bg-light-rgb), 0.9); /* Slightly transparent */
