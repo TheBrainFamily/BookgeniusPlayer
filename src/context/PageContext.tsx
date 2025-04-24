@@ -1,8 +1,10 @@
 import React, { createContext, useContext, useState } from "react";
 
 interface PageContextType {
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
+  currentChapter: number;
+  setCurrentChapter: (chapter: number) => void;
+  currentParagraph: number;
+  setCurrentParagraph: (paragraph: number) => void;
   totalPages: number;
   setTotalPages: (pages: number) => void;
 }
@@ -18,19 +20,9 @@ export const usePage = () => {
 };
 
 export const PageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentPage, setCurrentPage] = useState(15);
-  const [totalPages, setTotalPages] = useState(100);
+  const [currentChapter, setCurrentChapter] = useState(1);
+  const [currentParagraph, setCurrentParagraph] = useState(1);
+  const [totalPages, setTotalPages] = useState(250);
 
-  return (
-    <PageContext.Provider
-      value={{
-        currentPage,
-        setCurrentPage,
-        totalPages,
-        setTotalPages,
-      }}
-    >
-      {children}
-    </PageContext.Provider>
-  );
+  return <PageContext.Provider value={{ currentChapter, setCurrentChapter, currentParagraph, setCurrentParagraph, totalPages, setTotalPages }}>{children}</PageContext.Provider>;
 };

@@ -10,7 +10,6 @@ import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
 import { runLegacyInit } from "./main";
 import { CharacterNotesPanel } from "./components/CharacterNotesPanel";
 import { RightNotesPanel } from "./components/RightNotesPanel";
-import { PageProvider } from "./context/PageContext";
 import { useWebSocket, WebSocketProvider } from "./context/WebSocketContext";
 import { BottomInput } from "./components/BottomInput";
 import { RealtimeProvider } from "./context/RealtimeContext";
@@ -46,14 +45,12 @@ export default function App() {
 
   return (
     <LocationProvider>
-      <PageProvider>
-        <RealtimeProvider>
-          <WebSocketProvider>
-            <Shell />
-            <ChatContainer />
-          </WebSocketProvider>
-        </RealtimeProvider>
-      </PageProvider>
+      <RealtimeProvider>
+        <WebSocketProvider>
+          <Shell />
+          <ChatContainer />
+        </WebSocketProvider>
+      </RealtimeProvider>
     </LocationProvider>
   );
 }

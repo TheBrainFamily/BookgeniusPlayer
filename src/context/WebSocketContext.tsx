@@ -2,26 +2,13 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import { QUESTIONS_SERVER_WS_URL } from "../lib/consts";
 
 // Types for the streamed messages
-type StreamMessage = {
-  type: "stream";
-  content: string;
-};
+type StreamMessage = { type: "stream"; content: string };
 
-type CompleteMessage = {
-  type: "complete";
-  message: string;
-};
+type CompleteMessage = { type: "complete"; message: string };
 
 type WebSocketMessage = StreamMessage | CompleteMessage;
 
-export type Message = {
-  query: string;
-  filter: {
-    bookSlug: string;
-    pageFrom?: number;
-    pageTo?: number;
-  };
-};
+export type Message = { query: string; filter: { bookSlug: string; chapterFrom?: number; chapterTo?: number; paragraphFrom?: number; paragraphTo?: number } };
 
 interface WebSocketContextType {
   isConnected: boolean;
@@ -148,7 +135,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       socketRef.current.send(JSON.stringify(message));
       setIsLoading(true);
     },
-    [connect]
+    [connect],
   );
 
   // Auto-connect on first render
@@ -162,17 +149,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [connect, disconnect]);
 
   return (
-    <WebSocketContext.Provider
-      value={{
-        isConnected,
-        isLoading,
-        connect,
-        disconnect,
-        sendMessage,
-        receivedMessages,
-        currentStreamingMessage,
-      }}
-    >
+    <WebSocketContext.Provider value={{ isConnected, isLoading, connect, disconnect, sendMessage, receivedMessages, currentStreamingMessage }}>
       {children}
     </WebSocketContext.Provider>
   );

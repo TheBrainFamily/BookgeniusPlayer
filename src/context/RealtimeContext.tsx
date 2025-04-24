@@ -5,6 +5,7 @@ import { getCurrentBookSlug } from "../getCurrentBookSlug.js";
 import { QUESTIONS_SERVER_URL } from "../lib/consts.js";
 import { usePage } from "./PageContext.js";
 import { instructions } from "../utils/conversation_config.js";
+import { useLocation } from "../state/LocationContext.js";
 // Define the conversation item type
 interface ConversationItem {
   id: string;
@@ -46,14 +47,16 @@ export const useRealtime = () => {
 };
 
 export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  if (import.meta.env.VITE_DEVELOPMENT === "true") {
-    return <>{children}</>;
-  }
+  // if (import.meta.env.VITE_DEVELOPMENT === "true") {
+  //   return <>{children}</>;
+  // }
   const [apiKey, setApiKey] = useState<string>("");
   const clientRef = useRef<RealtimeClient | null>(null);
   const wavRecorderRef = useRef<WavRecorder>(new WavRecorder({ sampleRate: 24000 }));
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(new WavStreamPlayer({ sampleRate: 24000 }));
-  const { currentPage, totalPages } = usePage();
+
+  const { location } = useLocation();
+  const { chapter: currentChapter, paragraph: currentParagraph } = location;
 
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -104,11 +107,9 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
           // Calculate the pageFrom and pageTo based on current page
           // We're using dynamic page range based on current reading position
-          const pageFrom = 1;
           // we set the pageTo to the current page so we avoid spoilers
-          const pageTo = currentPage;
 
-          const filter = { pageFrom, pageTo, bookSlug: getCurrentBookSlug() };
+          const filter = { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: getCurrentBookSlug() };
           console.log("filter", filter);
           const response = await fetch(`${QUESTIONS_SERVER_URL}/ask?question=${encodeURIComponent(question)}&filter=${encodeURIComponent(JSON.stringify(filter))}`);
           const data = await response.text();
@@ -155,7 +156,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // Cleanup
       client.reset();
     };
-  }, [clientRef.current, isMuted, currentPage, totalPages]);
+  }, [clientRef.current, isMuted, currentChapter, currentParagraph]);
 
   // Connect to conversation
   const connectConversation = useCallback(async () => {

@@ -4,9 +4,8 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useRealtime } from "../context/RealtimeContext";
 import { Message, useWebSocket } from "../context/WebSocketContext";
-import { usePage } from "../context/PageContext";
 import { getCurrentBookSlug } from "../getCurrentBookSlug";
-
+import { useLocation } from "../state/LocationContext";
 interface BottomInputProps {
   placeholder?: string;
   onSubmit?: (message: Message) => void;
@@ -14,9 +13,9 @@ interface BottomInputProps {
 }
 
 export function BottomInput({ placeholder = "Type something...", onSubmit, className }: BottomInputProps) {
-  if (import.meta.env.VITE_DEVELOPMENT === "true") {
-    return <></>;
-  }
+  // if (import.meta.env.VITE_DEVELOPMENT === "true") {
+  //   return <></>;
+  // }
   const [value, setValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -27,7 +26,8 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputContainerRef = useRef<HTMLDivElement>(null);
 
-  const { currentPage } = usePage();
+  const { location } = useLocation();
+  const { chapter: currentChapter, paragraph: currentParagraph } = location;
   // New state: store the last sent user message
   const [lastSentUserMessage, setLastSentUserMessage] = useState<{ role: "user"; content: string } | null>(null);
 
@@ -115,7 +115,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (value.trim() && onSubmit) {
-      onSubmit({ query: value, filter: { pageFrom: 1, pageTo: currentPage, bookSlug: getCurrentBookSlug() } });
+      onSubmit({ query: value, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: getCurrentBookSlug() } });
       // Set the pending user message to immediately update the UI
       setLastSentUserMessage({ role: "user", content: value });
       setValue("");
