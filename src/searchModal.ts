@@ -1,4 +1,14 @@
 import { goToParagraph, getCurrentLocation } from "@/src/helpers/paragraphsNavigation";
+import type { Location } from "@/src/state/LocationContext";
+import { searchParagraphsFromServer } from "./utils/searchParagraphsFromServer";
+import debounce from "lodash.debounce";
+
+// Create a debounced version of searchParagraphsFromServer
+const debouncedSearchParagraphsFromServer = debounce(searchParagraphsFromServer, 500, {
+  leading: true, // Execute on the leading edge (immediately)
+  trailing: true, // Execute on the trailing edge (after delay)
+  maxWait: 2000, // Maximum time to wait before forced execution
+});
 
 // Create search modal elements
 let searchModal: HTMLDivElement;
@@ -6,11 +16,13 @@ let searchInput: HTMLInputElement;
 let searchButton: HTMLButtonElement;
 let searchResults: HTMLDivElement;
 let searchModalClose: HTMLElement;
+let searchLoader: HTMLDivElement; // Add loader element
 
 // State for the search functionality
 let isSearchModalActive = false;
 let lastSearchQuery = "";
 let lastSearchTimestamp = 0; // Track when the last search was performed
+let isSearching = false; // Track if search is in progress
 
 /**
  * Initialize the search modal and append it to the document
@@ -30,6 +42,10 @@ export function initSearchModal() {
         <span class="modal-close">&times;</span>
       </div>
       <div class="modal-body">
+        <div id="search-loader" class="search-loader hidden">
+          <div class="loader-spinner"></div>
+          <div class="loader-text">Searching...</div>
+        </div>
         <div id="search-results"></div>
       </div>
     </div>
@@ -41,9 +57,28 @@ export function initSearchModal() {
   // Get references to elements
   searchModalClose = searchModal.querySelector(".modal-close")!;
   searchResults = document.getElementById("search-results") as HTMLDivElement;
+  searchLoader = document.getElementById("search-loader") as HTMLDivElement;
 
   // Add event listeners
   searchModalClose.addEventListener("click", hideSearchModal);
+  // Add input event listener to search as you type
+  // searchInput.addEventListener("input", (e) => {
+  //   const query = (e.target as HTMLInputElement).value;
+  //   if (query.trim().length > 3) {
+  //     // Only search if at least 3 characters
+  //     performSearch(query);
+  //   } else if (query.trim().length === 0) {
+  //     // Clear results if search box is emptied
+  //     searchResults.innerHTML = "";
+  //     lastSearchQuery = "";
+  //   }
+  // });
+  // searchButton.addEventListener("click", () => performSearch(searchInput.value));
+  // searchInput.addEventListener("keypress", (e) => {
+  //   if (e.key === "Enter") {
+  //     performSearch(searchInput.value);
+  //   }
+  // });
 
   // Add styles
   addSearchModalStyles();
@@ -168,6 +203,12 @@ function addSearchModalStyles() {
     .search-result-content {
       line-height: 1.5;
     }
+
+    .search-result-summary {
+      font-style: italic;
+      color: #666;
+      margin-bottom: 8px;
+    }
     
     .search-highlight {
       background-color: yellow;
@@ -187,6 +228,38 @@ function addSearchModalStyles() {
       border-radius: 4px;
       font-weight: bold;
       border-left: 4px solid #4a90e2;
+    }
+    
+    .search-loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 0;
+    }
+    
+    .search-loader.hidden {
+      display: none;
+    }
+    
+    .loader-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4a90e2;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 10px;
+    }
+    
+    .loader-text {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     
     @keyframes highlight-fade {
@@ -231,6 +304,19 @@ function addSearchModalStyles() {
     body.dark .search-highlight {
       background-color: #b58900;
       color: #000;
+    }
+
+    body.dark .search-result-summary {
+      color: #aaa;
+    }
+    
+    body.dark .loader-spinner {
+      border-color: #444;
+      border-top-color: #6a90b2;
+    }
+    
+    body.dark .loader-text {
+      color: #aaa;
     }
     
     @keyframes highlight-fade-night {
@@ -310,84 +396,124 @@ export function isSearchActive() {
 /**
  * Perform search within book content up to current page
  */
-export function performSearch(query: string) {
+export async function performSearch(query: string) {
   if (!query.trim()) return;
+  if (isSearching) return; // Prevent multiple concurrent searches
+
+  isSearching = true;
+  searchLoader.classList.remove("hidden");
+  searchResults.innerHTML = "";
 
   lastSearchQuery = query;
   lastSearchTimestamp = Date.now(); // Update the timestamp when search is performed
   const currentLocation = getCurrentLocation();
-  searchResults.innerHTML = "";
 
   // Counter for matches
   let totalMatches = 0;
+  let totalServerMatches = 0;
 
-  // Go through each page up to the current one
-  for (let i = 0; i <= currentLocation.chapter; i++) {
-    const pageElement = document.querySelector(`section[data-chapter="${i}"]`);
-    console.log("pageElement", pageElement);
-    if (!pageElement) continue;
+  try {
+    // Go through each page up to the current one
+    for (let i = 0; i <= currentLocation.chapter; i++) {
+      const pageElement = document.querySelector(`section[data-chapter="${i}"]`);
+      if (!pageElement) continue;
 
-    // const pageText = pageElement.textContent || "";
+      // Get paragraphs from this page
+      const paragraphs = pageElement.querySelectorAll(`[data-index]`);
 
-    // Skip if no match in this page
-    // if (!pageText.toLowerCase().includes(query.toLowerCase())) continue;
+      // For each paragraph, check if it contains the search term
+      paragraphs.forEach((paragraph) => {
+        if (parseInt(paragraph.getAttribute("data-index") || "0", 10) > currentLocation.paragraph && i == currentLocation.chapter) return;
+        // Clone the paragraph to avoid modifying the original
+        const paragraphClone = paragraph.cloneNode(true) as HTMLElement;
 
-    // Get paragraphs from this page
-    const paragraphs = pageElement.querySelectorAll(`[data-index]`);
+        // Remove all anchor elements from the clone
+        const anchors = paragraphClone.querySelectorAll("a.anchor");
+        anchors.forEach((anchor) => anchor.remove());
 
-    // For each paragraph, check if it contains the search term
-    paragraphs.forEach((paragraph) => {
-      if (parseInt(paragraph.getAttribute("data-index") || "0", 10) > currentLocation.paragraph && i == currentLocation.chapter) return;
-      // Clone the paragraph to avoid modifying the original
-      const paragraphClone = paragraph.cloneNode(true) as HTMLElement;
+        // Get clean text content without anchors
+        const paragraphText =
+          paragraphClone.textContent
+            ?.replace(/[\n\r]/g, " ")
+            .replace(/\s+/g, " ")
+            .trim() || "";
 
-      // Remove all anchor elements from the clone
-      const anchors = paragraphClone.querySelectorAll("a.anchor");
-      anchors.forEach((anchor) => anchor.remove());
+        if (paragraphText.toLowerCase().includes(query.toLowerCase())) {
+          totalMatches++;
 
-      // Get clean text content without anchors
-      const paragraphText =
-        paragraphClone.textContent
-          ?.replace(/[\n\r]/g, " ")
-          .replace(/\s+/g, " ")
-          .trim() || "";
+          // Create a result item
+          const resultItem = document.createElement("div");
+          resultItem.className = "search-result-item";
 
-      if (paragraphText.toLowerCase().includes(query.toLowerCase())) {
-        totalMatches++;
+          // Highlight the matching text in the paragraph
+          const highlightedText = paragraphText.replace(new RegExp(query, "gi"), (match) => `<span class="search-highlight">${match}</span>`);
 
-        // Create a result item
+          resultItem.innerHTML = `
+            <div class="search-result-page">Chapter ${i}, Paragraph ${paragraph.getAttribute("data-index")}</div>
+            <div class="search-result-content">${highlightedText}</div>
+          `;
+
+          // Add click event to navigate to this result
+          resultItem.addEventListener("click", () => {
+            goToParagraph({
+              chapter: i,
+              paragraph: parseInt(paragraph.getAttribute("data-index") || "0", 10),
+              endChapter: i,
+              endParagraph: parseInt(paragraph.getAttribute("data-index") || "0", 10),
+            });
+            hideSearchModal();
+
+            // Find and highlight the paragraph on the page
+            setTimeout(() => {
+              // Find paragraphs on the page and locate the one that contains the text
+              const pageParagraphs = document.querySelectorAll(`section[data-chapter="${i}"] [data-index]`);
+              let targetParagraph = null;
+
+              pageParagraphs.forEach((p) => {
+                if (p.textContent && p.textContent.includes(paragraphText.substring(0, 30))) {
+                  targetParagraph = p;
+                }
+              });
+
+              if (targetParagraph) {
+                targetParagraph.scrollIntoView({ behavior: "smooth", block: "center" });
+                targetParagraph.classList.add("highlight-paragraph");
+                setTimeout(() => targetParagraph.classList.remove("highlight-paragraph"), 2000);
+              }
+            }, 300);
+          });
+
+          searchResults.appendChild(resultItem);
+        }
+      });
+    }
+
+    console.log("totalMatches", totalMatches);
+    if (totalMatches === 0) {
+      const serverMatches = await debouncedSearchParagraphsFromServer(query, currentLocation);
+      totalServerMatches = serverMatches.length;
+
+      serverMatches.forEach((match) => {
         const resultItem = document.createElement("div");
         resultItem.className = "search-result-item";
 
-        // Highlight the matching text in the paragraph
-        const highlightedText = paragraphText.replace(new RegExp(query, "gi"), (match) => `<span class="search-highlight">${match}</span>`);
+        // Limit text to first 75 characters
+        const textPreview = match.text.length > 75 ? `${match.text.substring(0, 75)}...` : match.text;
 
         resultItem.innerHTML = `
-          <div class="search-result-page">Chapter ${i}, Paragraph ${paragraph.getAttribute("data-index")}</div>
-          <div class="search-result-content">${highlightedText}</div>
+          <div class="search-result-page">Chapter ${match.chapter}, Paragraph ${match.paragraphNumber}</div>
+          <div class="search-result-summary">${match.summary}</div>
+          <div class="search-result-content">${textPreview}</div>
         `;
 
-        // Add click event to navigate to this result
+        // Add click event to navigate to this paragraph
         resultItem.addEventListener("click", () => {
-          goToParagraph({
-            chapter: i,
-            paragraph: parseInt(paragraph.getAttribute("data-index") || "0", 10),
-            endChapter: i,
-            endParagraph: parseInt(paragraph.getAttribute("data-index") || "0", 10),
-          });
+          goToParagraph({ chapter: match.chapter, paragraph: match.paragraphNumber, endChapter: match.chapter, endParagraph: match.paragraphNumber });
           hideSearchModal();
 
           // Find and highlight the paragraph on the page
           setTimeout(() => {
-            // Find paragraphs on the page and locate the one that contains the text
-            const pageParagraphs = document.querySelectorAll(`section[data-chapter="${i}"] [data-index]`);
-            let targetParagraph = null;
-
-            pageParagraphs.forEach((p) => {
-              if (p.textContent && p.textContent.includes(paragraphText.substring(0, 30))) {
-                targetParagraph = p;
-              }
-            });
+            const targetParagraph = document.querySelector(`section[data-chapter="${match.chapter}"] [data-index="${match.paragraphNumber}"]`);
 
             if (targetParagraph) {
               targetParagraph.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -398,19 +524,25 @@ export function performSearch(query: string) {
         });
 
         searchResults.appendChild(resultItem);
-      }
-    });
+      });
+    }
+
+    // Display summary of results
+    const resultsHeader = document.createElement("div");
+    resultsHeader.className = "search-results-header";
+
+    if (totalMatches > 0) {
+      resultsHeader.textContent = `Found ${totalMatches} matches for "${query}" in pages up to chapter ${currentLocation.chapter}, paragraph ${currentLocation.paragraph}`;
+    } else if (totalServerMatches > 0) {
+      resultsHeader.textContent = `Found ${totalServerMatches} places matching "${query}" in pages up to chapter ${currentLocation.chapter}, paragraph ${currentLocation.paragraph}`;
+    } else {
+      resultsHeader.textContent = `No matches found for "${query}" in pages up to chapter ${currentLocation.chapter}, paragraph ${currentLocation.paragraph}`;
+    }
+
+    searchResults.insertBefore(resultsHeader, searchResults.firstChild);
+  } finally {
+    // Always hide the loader and reset the searching state
+    isSearching = false;
+    searchLoader.classList.add("hidden");
   }
-
-  // Display summary of results
-  const resultsHeader = document.createElement("div");
-  resultsHeader.className = "search-results-header";
-
-  if (totalMatches > 0) {
-    resultsHeader.textContent = `Found ${totalMatches} matches for "${query}" in pages up to chapter ${currentLocation.chapter}, paragraph ${currentLocation.paragraph}`;
-  } else {
-    resultsHeader.textContent = `No matches found for "${query}" in pages up to chapter ${currentLocation.chapter}, paragraph ${currentLocation.paragraph}`;
-  }
-
-  searchResults.insertBefore(resultsHeader, searchResults.firstChild);
 }

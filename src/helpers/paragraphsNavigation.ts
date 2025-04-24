@@ -6,7 +6,7 @@
  */
 
 /* ------------------------------------------------------------------ */
-import { Location } from "@/src/state/LocationContext";
+import type { Location } from "@/src/state/LocationContext";
 /* ------------------------------------------------------------------ */
 /*  Proxy that React overwrites                                       */
 type Bridge = { get: () => Location; set: (l: Location) => void };

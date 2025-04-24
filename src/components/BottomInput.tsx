@@ -129,7 +129,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
       if (isSearchActive()) {
         hideSearchModal();
       }
-      
+
       if (isDeepResearchActive) {
         setIsThinking(true);
         // Simulate deep research processing
@@ -139,7 +139,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
           onShowDeepResearch();
         }, 2000);
       }
-      
+
       onSubmit({ query: value, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: getCurrentBookSlug() } });
       // Set the pending user message to immediately update the UI
       setLastSentUserMessage({ role: "user", content: value });
@@ -295,7 +295,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                   setValue(newVal);
 
                   // Trigger search modal and perform search while typing
-                  if (newVal.trim().length > 0) {
+                  if (newVal.trim().length > 2) {
                     // Show the modal if it's not visible yet
                     if (!isSearchActive()) {
                       showSearchModal();
@@ -304,7 +304,9 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                         inputRef.current?.focus();
                       }, 100);
                     }
-                    performSearch(newVal);
+                    if (newVal.trim().length > 2) {
+                      performSearch(newVal);
+                    }
 
                     // Keep the modal input in sync
                     const modalInput = document.getElementById("search-input") as HTMLInputElement | null;
@@ -318,10 +320,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                 }}
                 onFocus={() => setIsFocused(true)}
                 placeholder={isRecording ? "Listening..." : placeholder}
-                className={cn(
-                  "w-full p-3 outline-none transition-colors mb-2 placeholder:text-white text-white",
-                  isRecording && "bg-gray-200 text-muted-foreground"
-                )}
+                className={cn("w-full p-3 outline-none transition-colors mb-2 placeholder:text-white text-white", isRecording && "bg-gray-200 text-muted-foreground")}
                 disabled={isRecording}
               />
             )}
@@ -332,19 +331,12 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                 {/* Deep Research button */}
                 <button
                   type="button"
-                  className={cn(
-                    "py-1 px-3 rounded-md flex items-center",
-                    isDeepResearchActive
-                      ? "bg-green-500 text-white"
-                      : "bg-white border border-gray-300 text-gray-500"
-                  )}
+                  className={cn("py-1 px-3 rounded-md flex items-center", isDeepResearchActive ? "bg-green-500 text-white" : "bg-white border border-gray-300 text-gray-500")}
                   onClick={toggleDeepResearch}
                 >
                   <Telescope size={18} className="mr-1" />
                   <span className="text-sm whitespace-nowrap">Deep Research</span>
-                  {isThinking && (
-                    <div className="w-3 h-3 ml-1 border-2 border-t-transparent rounded-full animate-spin border-current"></div>
-                  )}
+                  {isThinking && <div className="w-3 h-3 ml-1 border-2 border-t-transparent rounded-full animate-spin border-current"></div>}
                 </button>
 
                 {/* Send/Mic button */}
