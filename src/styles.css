@@ -115,7 +115,6 @@
     justify-content: space-evenly;
     /* width: 100%; */
     position: relative;
-    padding: 0 10px;
     /* padding-top: 0; */ /* Defined below for #content-container */
     padding-bottom: var(--safe-area-inset-bottom); /* Add padding for the safe area */
     text-align: left; /* Override default if needed */
@@ -543,6 +542,7 @@
     flex: 1;
     max-width: 700px;
     margin: 20px;
+    margin-top: 0;
   }
 
   /* Return to Location Button */
@@ -788,11 +788,11 @@
     overflow: visible;
     margin-left:70px;
   }
-
+  /* when first entity is talking there is no space for scale effect */
   .entity-note:first-child {
     padding-top: 50px;
   }
-
+  /* when last entity is talking there is no space for scale effect */
   .entity-note:last-child {
     padding-bottom: 50px;
   }

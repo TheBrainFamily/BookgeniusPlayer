@@ -3,20 +3,21 @@
   /* ============================================ */
   @media (max-width: 768px) {
     /* --- Layout Changes --- */
-    #book-container {
+    #legacy #book-container {
       flex-direction: row; /* Stack content vertically */
       padding: 0; /* Remove desktop padding */
       height: 100vh; /* Ensure it fills viewport */
+      justify-content: center;
     }
 
-    #content-container {
+    #legacy #content-container {
+      max-width: unset;
       flex: 1;
       height: 100vh; /* Fallback */
       height: calc(100vh + var(--safe-area-inset-bottom)); /* Extend height */
       margin: 0; /* Remove auto margins */
       padding-top: max(10px, var(--safe-area-inset-top)); /* Add top padding respecting safe area */
       padding-bottom: var(--safe-area-inset-bottom); /* Keep safe area padding */
-      /* Adjust left/right padding based on vertical strip visibility */
       padding-left: 1em;
       padding-right: 1em;
       transition: none !important; /* Prevent transition during resize/orientation change */
@@ -26,10 +27,6 @@
       &.has-character-strip {
         padding-left: calc(70px + 1em); /* Strip width + desired gap */
       }
-    }
-
-    .page {
-      padding: 0 15px; /* Reduce horizontal padding */
     }
 
     /* --- Notes Panel Becomes Overlay --- */
@@ -59,14 +56,10 @@
         opacity: 1;
       }
     }
-    &.night-mode .notes-container {
-      /* background-color: var(--bg-dark); */ /* Ensure dark background */
-      background-color: rgba(var(--bg-dark-rgb), 0.9); /* Use transparent dark mode bg */
-    }
 
     /* Hide Desktop Notes */
-    #right-notes,
-    #left-notes {
+    #legacy #right-notes,
+    #legacy #left-notes {
       display: none;
     }
 

@@ -293,7 +293,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                 placeholder={isRecording ? "Listening..." : placeholder}
                 className={cn(
                   "w-full p-3 pr-24 rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-primary transition-colors",
-                  isRecording && "bg-muted text-muted-foreground"
+                  isRecording && "bg-gray-200 text-muted-foreground"
                 )}
                 disabled={isRecording}
               />

@@ -1,22 +1,31 @@
 @media screen and (max-width: 1024px) {
-  #legacy .entity-notes-container {
-    padding: 10px 45px 70px;
+  #legacy #content-container {
+   flex: 1;
   }
-  #left-notes {
+  #legacy .entity-notes-container {
+    padding: 10px;
+  }
+  #legacy #left-notes {
     display: flex; /* Override mobile portrait display: none */
-    flex: 0 0 20% ; /* Take 45% width, don't grow or shrink */
-    max-width: 20%;
+    flex: 0 0 50% ; /* Take 45% width, don't grow or shrink */
+    max-width: 50%;
     overflow-y: auto; /* Allow scrolling if content overflows */
     justify-content: center;
     align-items: flex-start;
     flex-direction: column; /* Ensure vertical stacking if needed */
+    margin: 0;
   }
   #legacy #right-notes {
     display: none; /* Hide right notes */
   }
   #legacy .entity-note {
-    flex-direction: column;
+    flex-direction: row;
     margin-left: 0;
+    p {
+      hyphens: auto;
+      word-wrap: break-word;
+      font-size: 12px;
+    }
   }
   #legacy #return-to-location-button {
     bottom: 100px;
@@ -46,12 +55,12 @@
 
   #legacy #left-notes {
     display: flex; /* Override mobile portrait display: none */
-    flex: 0 0 45% ; /* Take 45% width, don't grow or shrink */
-    max-width: 45%;
+    flex: 0 0 50% ; /* Take 45% width, don't grow or shrink */
+    max-width: 50%;
     height: 100vh ; /* Full height */
     margin: 0 ; /* Reset margins */
     /* Utilize safe areas */
-    padding: var(--safe-area-inset-top) 30px 0 30px;
+    padding: var(--safe-area-inset-top) 10px 0 0;
     box-sizing: border-box; /* Include padding in width calculation */
     overflow-y: auto; /* Allow scrolling if content overflows */
     position: static; /* Override fixed positioning from portrait */
@@ -61,24 +70,6 @@
     /* Add these to align internal flex items */
     justify-content: center;
     align-items: flex-start;
-    flex-direction: column; /* Ensure vertical stacking if needed */
-  }
-
-  /* ============================================ */
-  @media screen and (orientation: landscape) and (min-width: 1000px) {
-    #legacy #content-container {
-      & {
-        padding-left: 1.5em;
-        padding-right: 1.5em;
-      }
-    }
-  }
-  @media screen and (orientation: landscape) and (max-width: 1000px) {
-    #legacy #left-notes .entity-image-column {
-      /* Simplify sizing for debugging */
-      width: 100px; /* Use a fixed width temporarily */
-      height: 100px; /* Use a fixed height temporarily */
-    }
   }
 
   /* Hide mobile-specific toggles/strips/overlays that conflict */
@@ -89,16 +80,10 @@
     display: none;
   }
 
-  #legacy #left-notes .entity-notes-container {
-    padding-left: calc(var(--safe-area-inset-left) - 20px);
-    box-sizing: border-box;
-    gap: 20px;
-    overflow: visible;
-  }
-
   #legacy #left-notes .entity-note {
     width: 100%; /* Ensure it takes full available width */
     position: relative; /* Needed for z-index */
+    margin-left: 0;
     & > div {
       display: flex;
       gap: 15px; 
@@ -108,6 +93,11 @@
       flex-direction: column;
       gap: 0;
       justify-content: flex-start;
+    }
+    p {
+      hyphens: auto;
+      word-wrap: break-word;
+      font-size: 12px;
     }
   }
 

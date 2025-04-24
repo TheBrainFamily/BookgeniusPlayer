@@ -36,7 +36,7 @@ export const CharacterCard: React.FC<Props> = ({ entity, index }) => {
 
   /* Use effect to apply the appropriate classes based on talking state */
   useEffect(() => {
-    const cardElement = document.querySelector(`.entity-note[data-canonical-name="${entity.canonicalName}"]`);
+    const cardElement = document.querySelector(`.entity-note[data-canonical-name="${entity.canonicalName.replace(/\"/g, "")}"]`);
     if (!cardElement) return;
 
     if (isTalkingInCurrentRange) {

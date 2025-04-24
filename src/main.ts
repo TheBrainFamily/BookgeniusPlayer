@@ -44,7 +44,9 @@ export async function runLegacyInit() {
   function onDOMLoaded() {
     initializeNoteLinkBlinking(); // <-- kept here for safety;
     //     also wrapped in a React hook upstream
-    if (localStorage.getItem("nightMode") === "true") setIsNightMode(true);
+    // NO DARK MODE
+    setIsNightMode(false)
+    // if (localStorage.getItem("nightMode") === "true") setIsNightMode(true);
 
     initSearchModal();
     initCharacterModals();
