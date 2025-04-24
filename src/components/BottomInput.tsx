@@ -284,7 +284,9 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                         inputRef.current?.focus();
                       }, 100);
                     }
-                    performSearch(newVal);
+                    if (newVal.trim().length > 2) {
+                      performSearch(newVal);
+                    }
 
                     // Keep the modal input in sync
                     const modalInput = document.getElementById("search-input") as HTMLInputElement | null;
@@ -300,7 +302,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                 placeholder={isRecording ? "Listening..." : placeholder}
                 className={cn(
                   "w-full p-3 pr-24 rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-primary transition-colors",
-                  isRecording && "bg-gray-200 text-muted-foreground"
+                  isRecording && "bg-gray-200 text-muted-foreground",
                 )}
                 disabled={isRecording}
               />
