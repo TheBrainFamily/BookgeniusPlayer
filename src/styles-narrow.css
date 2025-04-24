@@ -27,6 +27,14 @@
       font-size: 12px;
     }
   }
+  /* when first entity is talking there is no space for scale effect */
+  #legacy .entity-note:first-child {
+    padding-top: 0px;
+  }
+  /* when last entity is talking there is no space for scale effect */
+  #legacy .entity-note:last-child {
+    padding-bottom: 50px;
+  }
   #legacy #return-to-location-button {
     bottom: 100px;
   }
@@ -36,6 +44,7 @@
     }
     #legacy #left-notes {
       margin: 0;
+      justify-content: flex-start
     }
     #character-details-modal .modal-container {
       max-height: 100vh;
