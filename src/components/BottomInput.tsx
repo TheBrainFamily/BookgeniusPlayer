@@ -307,63 +307,64 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
             )}
 
             <div className={cn("flex items-center", isLandscape && !isExpanded ? "space-x-1" : "absolute right-2 space-x-1")}>
-              {/* Push to talk button */}
-              <motion.button
-                type="button"
-                className={cn(
-                  "p-2 rounded-full flex items-center justify-center",
-                  isRecording ? "bg-destructive text-destructive-foreground" : "bg-secondary text-secondary-foreground",
-                )}
-                style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
-                whileTap={{ scale: 0.92 }}
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  handleRecordingStart();
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  handleRecordingEnd();
-                }}
-                onTouchCancel={(e) => {
-                  e.preventDefault();
-                  handleRecordingEnd();
-                }}
-                onMouseDown={(e) => {
-                  if (!isExpanded && isLandscape) {
-                    toggleExpanded();
-                    return;
-                  }
-                  e.preventDefault();
-                  handleRecordingStart();
-                }}
-                onMouseUp={(e) => {
-                  if (!isExpanded && isLandscape) return;
-                  e.preventDefault();
-                  handleRecordingEnd();
-                }}
-                onMouseLeave={() => isRecording && handleRecordingEnd()}
-                onContextMenu={(e) => e.preventDefault()}
-              >
-                <Mic size={18} />
-              </motion.button>
-
-              {/* Send button */}
-              <motion.button
-                type="button"
-                className="p-2 rounded-full bg-primary text-primary-foreground flex items-center justify-center"
-                style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
-                whileTap={{ scale: 0.92 }}
-                onClick={() => {
-                  if (!isExpanded && isLandscape) {
-                    toggleExpanded();
-                    return;
-                  }
-                  handleSubmit();
-                }}
-                disabled={!isExpanded && isLandscape ? false : !value.trim()}
-              >
-                <Send size={18} />
-              </motion.button>
+              {value.trim() ? (
+                /* Send button */
+                <motion.button
+                  type="button"
+                  className="p-2 rounded-full bg-primary text-primary-foreground flex items-center justify-center"
+                  style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
+                  whileTap={{ scale: 0.92 }}
+                  onClick={() => {
+                    if (!isExpanded && isLandscape) {
+                      toggleExpanded();
+                      return;
+                    }
+                    handleSubmit();
+                  }}
+                >
+                  <Send size={18} />
+                </motion.button>
+              ) : (
+                /* Push to talk button */
+                <motion.button
+                  type="button"
+                  className={cn(
+                    "p-2 rounded-full flex items-center justify-center",
+                    isRecording ? "bg-destructive text-destructive-foreground" : "bg-secondary text-secondary-foreground",
+                  )}
+                  style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
+                  whileTap={{ scale: 0.92 }}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    handleRecordingStart();
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    handleRecordingEnd();
+                  }}
+                  onTouchCancel={(e) => {
+                    e.preventDefault();
+                    handleRecordingEnd();
+                  }}
+                  onMouseDown={(e) => {
+                    if (!isExpanded && isLandscape) {
+                      toggleExpanded();
+                      return;
+                    }
+                    e.preventDefault();
+                    handleRecordingStart();
+                  }}
+                  onMouseUp={(e) => {
+                    if (!isExpanded && isLandscape) return;
+                    e.preventDefault();
+                    handleRecordingEnd();
+                  }}
+                  onMouseLeave={() => isRecording && handleRecordingEnd()}
+                  onContextMenu={(e) => e.preventDefault()}
+                >
+                  <Mic size={18} />
+                </motion.button>
+              )}
             </div>
           </div>
         </form>
