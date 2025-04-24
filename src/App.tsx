@@ -37,7 +37,7 @@ function Shell({ setShowDeepResearch, showDeepResearch, passedText }: { setShowD
 const ChatContainer = ({ onShowDeepResearch, onCloseDeepResearch }: { onShowDeepResearch: (result: string) => void; onCloseDeepResearch: () => void }) => {
   const { sendMessage } = useWebSocket();
 
-  return <BottomInput placeholder="Ask a question..." onSubmit={sendMessage} onShowDeepResearch={onShowDeepResearch} onCloseDeepResearch={onCloseDeepResearch} />;
+  return <BottomInput placeholder="Poszukaj albo zapytaj" onSubmit={sendMessage} onShowDeepResearch={onShowDeepResearch} onCloseDeepResearch={onCloseDeepResearch} />;
 };
 
 export default function App() {

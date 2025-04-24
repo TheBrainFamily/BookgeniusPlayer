@@ -33,7 +33,7 @@ export const RightNotesPanel: React.FC = () => {
         {notes.map((n) => (
           <section key={n.id} className="right-note" onClick={() => open(n.html)} dangerouslySetInnerHTML={{ __html: n.html }} style={{ cursor: "pointer" }} />
         ))}
-        {notes.length === 0 && <p style={{ opacity: 0.6, padding: "1rem" }}>No notes here…</p>}
+        {notes.length === 0 && <p style={{ opacity: 0.6, padding: "1rem" }}>&nbsp;</p>}
       </div>
 
       <FootnoteModal open={!!modalHtml} html={modalHtml || ""} onClose={close} />

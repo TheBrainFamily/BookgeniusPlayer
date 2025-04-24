@@ -319,7 +319,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                 }}
                 onFocus={() => setIsFocused(true)}
                 placeholder={isRecording ? "Listening..." : placeholder}
-                className={cn("w-full p-3 outline-none transition-colors mb-2 placeholder:text-white text-white", isRecording && "bg-gray-200 text-muted-foreground")}
+                className={cn("w-full p-0 pb-1 outline-none transition-colors mb-2 placeholder:text-gray text-white", isRecording && "bg-gray-200 text-muted-foreground")}
                 disabled={isRecording}
               />
             )}
@@ -330,7 +330,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                 {/* Deep Research button */}
                 <button
                   type="button"
-                  className={cn("py-1 px-3 rounded-md flex items-center", isDeepResearchActive ? "bg-green-500 text-white" : "bg-white border border-gray-300 text-gray-500")}
+                  className={cn("py-1 px-3 rounded-md flex items-center", isDeepResearchActive ? "bg-orange-500 text-white" : "bg-white border border-gray-300 text-gray-500")}
                   onClick={toggleDeepResearch}
                 >
                   <Telescope size={18} className="mr-1" />
