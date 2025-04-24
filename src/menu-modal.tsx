@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import { Book, Moon, X, List, FileText, PanelLeft, PanelBottom, Type, RotateCcw } from "lucide-react";
+import { Book, X, List, FileText, PanelLeft, PanelBottom, Type, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,7 +9,7 @@ import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 
 import { pageChapters } from "./chapters-pharaon";
-import { isNightMode, toggleNightMode } from "./helpers/setIsNightMode";
+import { isNightMode } from "./helpers/setIsNightMode";
 import { toggleMobileCharacters, isMobileCharactersVisible } from "./isMobileCharactersVisible";
 import { resetFurthestPageLocation } from "./helpers/reset-furthest-page-location";
 import { goToParagraph } from "./helpers/paragraphsNavigation";
@@ -51,6 +51,10 @@ const chapters = [...pageChapters.map((page) => ({ id: page.chapter, title: getT
 
 type ModalType = null | "chapters" | "page";
 
+interface BookChaptersModalProps {
+  onShowDeepResearch: () => void;
+}
+
 const applyDarkMode = () => {
   if (isNightMode()) {
     document.body.classList.add("dark");
@@ -59,7 +63,7 @@ const applyDarkMode = () => {
   }
 };
 
-export default function BookChaptersModal() {
+export default function BookChaptersModal({ onShowDeepResearch }: BookChaptersModalProps) {
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [nightMode, setNightMode] = useState(isNightMode());
@@ -110,12 +114,6 @@ export default function BookChaptersModal() {
     }
   };
 
-  const handleToggleNightMode = () => {
-    toggleNightMode(); // Call the vanilla JS function
-    setNightMode(isNightMode()); // Update the React state
-    setOverlayOpen(false);
-  };
-
   const handleToggleCharacters = () => {
     console.log("[BOOK MODAL] handleToggleCharacters");
     toggleMobileCharacters();
@@ -143,11 +141,6 @@ export default function BookChaptersModal() {
       {overlayOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center" onClick={() => setOverlayOpen(false)}>
           <div className="bg-background rounded-lg p-4 w-80 space-y-2" onClick={(e) => e.stopPropagation()}>
-            {/* <Button variant="ghost" className="w-full justify-start text-left" onClick={handleToggleNightMode}>
-              <Moon className="mr-2 h-4 w-4" />
-              Turn {nightMode ? "Off" : "On"} Night Mode
-            </Button> */}
-
             <div className="md:hidden">
               <Button variant="ghost" className="w-full justify-start text-left" onClick={handleToggleCharacters}>
                 {charactersVertical ? <PanelBottom className="mr-2 h-4 w-4" /> : <PanelLeft className="mr-2 h-4 w-4" />}
@@ -180,6 +173,18 @@ export default function BookChaptersModal() {
             </Button>
 
             <Separator />
+
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-left"
+              onClick={() => {
+                onShowDeepResearch();
+                setOverlayOpen(false);
+              }}
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              Show Deep Research
+            </Button>
 
             <div className="space-y-3">
               <div className="flex items-center gap-2">
