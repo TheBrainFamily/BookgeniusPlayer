@@ -6961,6 +6961,7 @@
     <div id="root">
       <div id="chapters-root"></div>
     </div>
+    <div id="deep-research-root"></div>
     <style>
       #splash {
         position: fixed;
@@ -6983,7 +6984,7 @@
     <div id="splash">Loading chapter&nbsp;1…</div>
     <script>
       document.querySelectorAll("#legacy p, #legacy span, #legacy li").forEach((el) => {
-        el.innerHTML = el.innerHTML.replace(/(\s|^)([aiouwz]|na|do|od|za|po|we|ku|ze|co|że|bo|iż|ni|nad|pod|bez|dla|oraz|ale|lub|czy|ani)\s/gi, "$1$2\u00A0");
+        // el.innerHTML = el.innerHTML.replace(/(\s|^)([aiouwz]|na|do|od|za|po|we|ku|ze|co|że|bo|iż|ni|nad|pod|bez|dla|oraz|ale|lub|czy|ani)\s/gi, "$1$2\u00A0");
       });
     </script>
     <script type="module" src="/src/index.tsx" async></script>

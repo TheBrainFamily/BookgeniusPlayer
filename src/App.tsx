@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { LocationProvider } from "./state/LocationContext";
 import { usePageObserver } from "./hooks/usePageObserver";
@@ -13,7 +13,12 @@ import { RightNotesPanel } from "./components/RightNotesPanel";
 import { useWebSocket, WebSocketProvider } from "./context/WebSocketContext";
 import { BottomInput } from "./components/BottomInput";
 import { RealtimeProvider } from "./context/RealtimeContext";
+import { DeepResearchModal } from "./ui/DeepResearchModal";
+
 function Shell() {
+  /* State for Deep Research Modal */
+  const [showDeepResearch, setShowDeepResearch] = useState(false);
+
   /* scroll‑related hooks */
   usePageObserver();
 
@@ -23,10 +28,11 @@ function Shell() {
 
   return (
     <>
-      <BookChaptersModal />
+      <BookChaptersModal onShowDeepResearch={() => setShowDeepResearch(true)} />
       <NoteLinkBlinker />
       <CharacterNotesPanel />
       <RightNotesPanel />
+      <DeepResearchModal isOpen={showDeepResearch} onClose={() => setShowDeepResearch(false)} />
     </>
   );
 }

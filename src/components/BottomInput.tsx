@@ -6,6 +6,8 @@ import { useRealtime } from "../context/RealtimeContext";
 import { Message, useWebSocket } from "../context/WebSocketContext";
 import { getCurrentBookSlug } from "../getCurrentBookSlug";
 import { useLocation } from "../state/LocationContext";
+import { showSearchModal, performSearch, hideSearchModal, isSearchActive } from "../searchModal";
+
 interface BottomInputProps {
   placeholder?: string;
   onSubmit?: (message: Message) => void;
@@ -25,6 +27,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   const { receivedMessages, isLoading, currentStreamingMessage } = useWebSocket();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const { location } = useLocation();
   const { chapter: currentChapter, paragraph: currentParagraph } = location;
@@ -115,6 +118,9 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (value.trim() && onSubmit) {
+      if (isSearchActive()) {
+        hideSearchModal();
+      }
       onSubmit({ query: value, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: getCurrentBookSlug() } });
       // Set the pending user message to immediately update the UI
       setLastSentUserMessage({ role: "user", content: value });
@@ -261,9 +267,35 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
           <div className={cn("relative flex items-center", isLandscape && !isExpanded && "gap-1")}>
             {(isExpanded || !isLandscape) && (
               <input
+                ref={inputRef}
                 type="text"
                 value={value}
-                onChange={(e) => setValue(e.target.value)}
+                onChange={(e) => {
+                  const newVal = e.target.value;
+                  setValue(newVal);
+
+                  // Trigger search modal and perform search while typing
+                  if (newVal.trim().length > 0) {
+                    // Show the modal if it's not visible yet
+                    if (!isSearchActive()) {
+                      showSearchModal();
+                      // Re-focus the bottom input so the user may continue typing
+                      setTimeout(() => {
+                        inputRef.current?.focus();
+                      }, 100);
+                    }
+                    performSearch(newVal);
+
+                    // Keep the modal input in sync
+                    const modalInput = document.getElementById("search-input") as HTMLInputElement | null;
+                    if (modalInput) modalInput.value = newVal;
+                  } else {
+                    // Hide the modal when input is cleared
+                    if (isSearchActive()) {
+                      hideSearchModal();
+                    }
+                  }
+                }}
                 onFocus={() => setIsFocused(true)}
                 placeholder={isRecording ? "Listening..." : placeholder}
                 className={cn(

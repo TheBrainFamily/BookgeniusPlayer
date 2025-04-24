@@ -370,7 +370,11 @@ export function performSearch(query: string) {
       anchors.forEach((anchor) => anchor.remove());
 
       // Get clean text content without anchors
-      const paragraphText = paragraphClone.textContent || "";
+      const paragraphText =
+        paragraphClone.textContent
+          ?.replace(/[\n\r]/g, " ")
+          .replace(/\s+/g, " ")
+          .trim() || "";
 
       if (paragraphText.toLowerCase().includes(query.toLowerCase())) {
         totalMatches++;
