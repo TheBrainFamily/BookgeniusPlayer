@@ -285,6 +285,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
             {/* First row: Input field */}
             {(isExpanded || !isLandscape) && (
               <input
+                id="bottom-input"
                 ref={inputRef}
                 type="text"
                 value={value}
