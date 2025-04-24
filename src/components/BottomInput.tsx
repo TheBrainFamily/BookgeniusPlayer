@@ -4,9 +4,8 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useRealtime } from "../context/RealtimeContext";
 import { Message, useWebSocket } from "../context/WebSocketContext";
-import { usePage } from "../context/PageContext";
 import { getCurrentBookSlug } from "../getCurrentBookSlug";
-
+import { useLocation } from "../state/LocationContext";
 interface BottomInputProps {
   placeholder?: string;
   onSubmit?: (message: Message) => void;
@@ -14,6 +13,9 @@ interface BottomInputProps {
 }
 
 export function BottomInput({ placeholder = "Type something...", onSubmit, className }: BottomInputProps) {
+  // if (import.meta.env.VITE_DEVELOPMENT === "true") {
+  //   return <></>;
+  // }
   const [value, setValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -24,7 +26,8 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputContainerRef = useRef<HTMLDivElement>(null);
 
-  const { currentPage } = usePage();
+  const { location } = useLocation();
+  const { chapter: currentChapter, paragraph: currentParagraph } = location;
   // New state: store the last sent user message
   const [lastSentUserMessage, setLastSentUserMessage] = useState<{ role: "user"; content: string } | null>(null);
 
@@ -35,11 +38,11 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
       setIsLandscape(isLandscapeMode);
       setIsExpanded(!isLandscapeMode);
     };
-    
+
     checkOrientation();
     window.addEventListener("resize", checkOrientation);
     window.addEventListener("orientationchange", checkOrientation);
-    
+
     return () => {
       window.removeEventListener("resize", checkOrientation);
       window.removeEventListener("orientationchange", checkOrientation);
@@ -59,10 +62,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
       ? { role: "assistant", content: currentStreamingMessage }
       : currentStreamingMessage
     : null;
-  const verifiedMessages = receivedMessages.filter((m) => typeof m !== "string") as {
-    role: "user" | "assistant";
-    content: string;
-  }[];
+  const verifiedMessages = receivedMessages.filter((m) => typeof m !== "string") as { role: "user" | "assistant"; content: string }[];
 
   // Get only the most recent user message and AI response, prioritizing a freshly sent user message
   const recentMessages = (() => {
@@ -91,10 +91,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   // Clear lastSentUserMessage when it appears in receivedMessages
   useEffect(() => {
     if (lastSentUserMessage) {
-      const userMessages = receivedMessages.filter((m) => typeof m !== "string") as {
-        role: "user" | "assistant";
-        content: string;
-      }[];
+      const userMessages = receivedMessages.filter((m) => typeof m !== "string") as { role: "user" | "assistant"; content: string }[];
       const lastUser = [...userMessages].reverse().find((m) => m.role === "user");
       if (lastUser && lastUser.content === lastSentUserMessage.content) {
         setLastSentUserMessage(null);
@@ -118,7 +115,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (value.trim() && onSubmit) {
-      onSubmit({ query: value, filter: { pageFrom: 1, pageTo: currentPage, bookSlug: getCurrentBookSlug() } });
+      onSubmit({ query: value, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: getCurrentBookSlug() } });
       // Set the pending user message to immediately update the UI
       setLastSentUserMessage({ role: "user", content: value });
       setValue("");
@@ -160,12 +157,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   // Handle clicks outside the input container to collapse in landscape mode
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isLandscape && 
-        isExpanded && 
-        inputContainerRef.current && 
-        !inputContainerRef.current.contains(event.target as Node)
-      ) {
+      if (isLandscape && isExpanded && inputContainerRef.current && !inputContainerRef.current.contains(event.target as Node)) {
         setIsExpanded(false);
         setIsFocused(false);
       }
@@ -173,7 +165,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
 
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("touchstart", handleClickOutside);
-    
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("touchstart", handleClickOutside);
@@ -198,9 +190,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
                   "p-3 rounded-lg mb-2 max-w-[80%] break-words",
-                  message.role === "user"
-                    ? "bg-primary text-primary-foreground ml-auto rounded-br-none"
-                    : "bg-muted text-muted-foreground mr-auto rounded-bl-none"
+                  message.role === "user" ? "bg-primary text-primary-foreground ml-auto rounded-br-none" : "bg-muted text-muted-foreground mr-auto rounded-bl-none",
                 )}
               >
                 {message.content}
@@ -214,7 +204,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
               >
                 {message.content}
               </motion.div>
-            )
+            ),
           )}
 
           {/* Typing indicator when messages are streaming */}
@@ -226,18 +216,9 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
             >
               <div className="flex items-center">
                 <div className="flex space-x-1">
-                  <span
-                    className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce"
-                    style={{ animationDelay: "0ms" }}
-                  />
-                  <span
-                    className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce"
-                    style={{ animationDelay: "100ms" }}
-                  />
-                  <span
-                    className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce"
-                    style={{ animationDelay: "200ms" }}
-                  />
+                  <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: "100ms" }} />
+                  <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: "200ms" }} />
                 </div>
               </div>
             </motion.div>
@@ -260,30 +241,24 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
       />
 
       {/* Input container */}
-      <div 
+      <div
         ref={inputContainerRef}
         className={cn(
           "absolute bottom-0 z-50 transition-all duration-300",
-          isLandscape && !isExpanded 
-            ? "right-4 bottom-4 left-auto translate-x-0 p-1 bg-white/70 rounded-full" 
+          isLandscape && !isExpanded
+            ? "right-4 bottom-4 left-auto translate-x-0 p-1 bg-white/70 rounded-full"
             : "w-[500px] left-1/2 -translate-x-1/2 p-4 bg-white/50 rounded-2xl mx-auto",
           "max-[1025px]:w-full max-[1025px]:mx-0",
           isLandscape && !isExpanded && "max-[1025px]:w-auto",
-          className
+          className,
         )}
       >
         <form
           onSubmit={handleSubmit}
-          className={cn(
-            "max-w-4xl mx-auto",
-            isLandscape && !isExpanded && "flex justify-center"
-          )}
+          className={cn("max-w-4xl mx-auto", isLandscape && !isExpanded && "flex justify-center")}
           style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
         >
-          <div className={cn(
-            "relative flex items-center",
-            isLandscape && !isExpanded && "gap-1"
-          )}>
+          <div className={cn("relative flex items-center", isLandscape && !isExpanded && "gap-1")}>
             {(isExpanded || !isLandscape) && (
               <input
                 type="text"
@@ -299,16 +274,13 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
               />
             )}
 
-            <div className={cn(
-              "flex items-center",
-              isLandscape && !isExpanded ? "space-x-1" : "absolute right-2 space-x-1"
-            )}>
+            <div className={cn("flex items-center", isLandscape && !isExpanded ? "space-x-1" : "absolute right-2 space-x-1")}>
               {/* Push to talk button */}
               <motion.button
                 type="button"
                 className={cn(
                   "p-2 rounded-full flex items-center justify-center",
-                  isRecording ? "bg-destructive text-destructive-foreground" : "bg-secondary text-secondary-foreground"
+                  isRecording ? "bg-destructive text-destructive-foreground" : "bg-secondary text-secondary-foreground",
                 )}
                 style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
                 whileTap={{ scale: 0.92 }}

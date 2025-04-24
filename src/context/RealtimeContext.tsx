@@ -5,6 +5,7 @@ import { getCurrentBookSlug } from "../getCurrentBookSlug.js";
 import { QUESTIONS_SERVER_URL } from "../lib/consts.js";
 import { usePage } from "./PageContext.js";
 import { instructions } from "../utils/conversation_config.js";
+import { useLocation } from "../state/LocationContext.js";
 // Define the conversation item type
 interface ConversationItem {
   id: string;
@@ -46,11 +47,16 @@ export const useRealtime = () => {
 };
 
 export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // if (import.meta.env.VITE_DEVELOPMENT === "true") {
+  //   return <>{children}</>;
+  // }
   const [apiKey, setApiKey] = useState<string>("");
   const clientRef = useRef<RealtimeClient | null>(null);
   const wavRecorderRef = useRef<WavRecorder>(new WavRecorder({ sampleRate: 24000 }));
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(new WavStreamPlayer({ sampleRate: 24000 }));
-  const { currentPage, totalPages } = usePage();
+
+  const { location } = useLocation();
+  const { chapter: currentChapter, paragraph: currentParagraph } = location;
 
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -76,10 +82,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Initialize RealtimeClient when apiKey is available
   useEffect(() => {
     if (apiKey) {
-      clientRef.current = new RealtimeClient({
-        apiKey: apiKey,
-        dangerouslyAllowAPIKeyInBrowser: true,
-      });
+      clientRef.current = new RealtimeClient({ apiKey: apiKey, dangerouslyAllowAPIKeyInBrowser: true });
     }
   }, [apiKey]);
 
@@ -96,16 +99,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       {
         name: "get_book_information",
         description: "Answers the questions about the book.",
-        parameters: {
-          type: "object",
-          properties: {
-            question: {
-              type: "string",
-              description: "The question to answer.",
-            },
-          },
-          required: ["question"],
-        },
+        parameters: { type: "object", properties: { question: { type: "string", description: "The question to answer." } }, required: ["question"] },
       },
       async ({ question }: { question: string }) => {
         try {
@@ -113,17 +107,11 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
           // Calculate the pageFrom and pageTo based on current page
           // We're using dynamic page range based on current reading position
-          const pageFrom = 1;
           // we set the pageTo to the current page so we avoid spoilers
-          const pageTo = currentPage;
 
-          const filter = { pageFrom, pageTo, bookSlug: getCurrentBookSlug() };
+          const filter = { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: getCurrentBookSlug() };
           console.log("filter", filter);
-          const response = await fetch(
-            `${QUESTIONS_SERVER_URL}/ask?question=${encodeURIComponent(question)}&filter=${encodeURIComponent(
-              JSON.stringify(filter)
-            )}`
-          );
+          const response = await fetch(`${QUESTIONS_SERVER_URL}/ask?question=${encodeURIComponent(question)}&filter=${encodeURIComponent(JSON.stringify(filter))}`);
           const data = await response.text();
           console.log("Response from book information service:", data);
           return data;
@@ -131,7 +119,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           console.log("error");
           return { error: (error as Error).message };
         }
-      }
+      },
     );
 
     client.on("error", (event: unknown) => console.error(event));
@@ -144,40 +132,31 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     });
 
-    client.on(
-      "conversation.updated",
-      async ({
-        item,
-        delta,
-      }: {
-        item: ConversationItem;
-        delta: { audio?: Uint8Array | Int16Array; [key: string]: unknown };
-      }) => {
-        const items = client.conversation.getItems() as ConversationItem[];
+    client.on("conversation.updated", async ({ item, delta }: { item: ConversationItem; delta: { audio?: Uint8Array | Int16Array; [key: string]: unknown } }) => {
+      const items = client.conversation.getItems() as ConversationItem[];
 
-        if (delta?.audio && !isMuted) {
-          wavStreamPlayer.add16BitPCM(delta.audio as Uint8Array, item.id);
-        }
-
-        if (item.status === "completed" && item.formatted.audio?.length) {
-          const wavFile = await WavRecorder.decode(item.formatted.audio as Uint8Array, 24000, 24000);
-          item.formatted.file = wavFile;
-        }
-
-        setItems(items);
-
-        // Update the response text if this is an assistant message
-        if (item.role === "assistant" && item.formatted.text) {
-          setResponse(item.formatted.text);
-        }
+      if (delta?.audio && !isMuted) {
+        wavStreamPlayer.add16BitPCM(delta.audio as Uint8Array, item.id);
       }
-    );
+
+      if (item.status === "completed" && item.formatted.audio?.length) {
+        const wavFile = await WavRecorder.decode(item.formatted.audio as Uint8Array, 24000, 24000);
+        item.formatted.file = wavFile;
+      }
+
+      setItems(items);
+
+      // Update the response text if this is an assistant message
+      if (item.role === "assistant" && item.formatted.text) {
+        setResponse(item.formatted.text);
+      }
+    });
 
     return () => {
       // Cleanup
       client.reset();
     };
-  }, [clientRef.current, isMuted, currentPage, totalPages]);
+  }, [clientRef.current, isMuted, currentChapter, currentParagraph]);
 
   // Connect to conversation
   const connectConversation = useCallback(async () => {
@@ -213,7 +192,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         content: [
           {
             type: "input_text",
-            text: `Help me with the book. The characters are, among others: "Leo Argyle", "Mary Durrant", "Miss Vaughan", "Hester", "Kirsten Lindstrom", "Mrs Argyle". If I mispronounce a character's name, use this list to guide you.  When I ask a question, use the get_book_information tool to answer the question.`,
+            text: `Pomóz mi z książką. Odpowiadaj tylko na podstawie tekstu z get_book_information tool. Postacie z ksiazki to: Ksiąze Ramzes, Sara, Hester, Dagon, Tutmozis i inni.`,
             // text: `Help me with the book. The characters are: "Chilli", "Harry", "Karen", "Catlett", "Michael", "Leo", "Tommy", "Nicki", "Fay". If I mispronounce a character's name, use this list to guide you. When I ask a question, use the get_book_information tool to answer the question.`,
           },
         ],
@@ -287,33 +266,11 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (!client) throw new Error("RealtimeClient is not initialized");
 
     if (message.trim()) {
-      client.realtime.send("conversation.item.create", {
-        item: {
-          type: "message",
-          role: "user",
-          content: [
-            {
-              type: "input_text",
-              text: message.trim(),
-            },
-          ],
-        },
-      });
+      client.realtime.send("conversation.item.create", { item: { type: "message", role: "user", content: [{ type: "input_text", text: message.trim() }] } });
     }
   }, []);
 
-  const value = {
-    isConnected,
-    isRecording,
-    isMuted,
-    response,
-    connectConversation,
-    disconnectConversation,
-    startRecording,
-    stopRecording,
-    toggleMute,
-    sendTextMessage,
-  };
+  const value = { isConnected, isRecording, isMuted, response, connectConversation, disconnectConversation, startRecording, stopRecording, toggleMute, sendTextMessage };
 
   return <RealtimeContext.Provider value={value}>{children}</RealtimeContext.Provider>;
 };

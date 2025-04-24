@@ -22,6 +22,7 @@ export const __setLocationBridge = (b: Bridge) => (_bridge = b);
 export const getSavedLocation = (): Location => {
   try {
     const raw = localStorage.getItem("furthestLocation");
+    console.log("getSavedLocation", raw);
     return raw ? JSON.parse(raw) : { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 };
   } catch {
     return { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 };
