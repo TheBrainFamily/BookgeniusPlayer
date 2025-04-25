@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Mic, Send, Search, Telescope } from "lucide-react";
+import { Mic, Send, Search, Telescope, Expand } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useRealtime } from "../context/RealtimeContext";
@@ -18,9 +18,6 @@ interface BottomInputProps {
 }
 
 export function BottomInput({ placeholder = "Type something...", onSubmit, className, onShowDeepResearch, onCloseDeepResearch }: BottomInputProps) {
-  // if (import.meta.env.VITE_DEVELOPMENT === "true") {
-  //   return <></>;
-  // }
   const [value, setValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -283,7 +280,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
         >
           <div className={cn("flex flex-col", isLandscape && !isExpanded && "items-center")}>
             {/* First row: Input field */}
-            {(isExpanded || !isLandscape) && (
+            {isExpanded && (
               <input
                 id="bottom-input"
                 ref={inputRef}
@@ -325,9 +322,9 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
             )}
 
             {/* Second row: Buttons */}
-            {(isExpanded || !isLandscape) && (
-              <div className="w-full flex justify-between items-center">
-                {/* Deep Research button */}
+            <div className="w-full flex justify-between items-center">
+              {/* Deep Research button */}
+              {isExpanded && (
                 <button
                   type="button"
                   className={cn("py-1 px-3 rounded-md flex items-center", isDeepResearchActive ? "bg-orange-500 text-white" : "bg-white border border-gray-300 text-gray-500")}
@@ -337,70 +334,87 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                   <span className="text-sm whitespace-nowrap">Deep Research</span>
                   {isThinking && <div className="w-3 h-3 ml-1 border-2 border-t-transparent rounded-full animate-spin border-current"></div>}
                 </button>
+              )}
 
-                {/* Send/Mic button */}
-                <div className="flex items-center">
-                  {value.trim() ? (
-                    /* Send button */
-                    <motion.button
-                      type="button"
-                      className="p-2 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center"
-                      style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
-                      whileTap={{ scale: 0.92 }}
-                      onClick={() => {
-                        if (!isExpanded && isLandscape) {
-                          toggleExpanded();
-                          return;
-                        }
-                        handleSubmit();
-                      }}
-                    >
-                      <Send size={18} />
-                    </motion.button>
-                  ) : (
-                    /* Push to talk button */
-                    <motion.button
-                      type="button"
-                      className={cn(
-                        "p-2 rounded-full flex items-center justify-center",
-                        isRecording ? "bg-destructive text-destructive-foreground" : "bg-secondary text-secondary-foreground",
-                      )}
-                      style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
-                      whileTap={{ scale: 0.92 }}
-                      onTouchStart={(e) => {
-                        e.preventDefault();
-                        handleRecordingStart();
-                      }}
-                      onTouchEnd={(e) => {
-                        e.preventDefault();
-                        handleRecordingEnd();
-                      }}
-                      onTouchCancel={(e) => {
-                        e.preventDefault();
-                        handleRecordingEnd();
-                      }}
-                      onMouseDown={(e) => {
-                        if (!isExpanded && isLandscape) {
-                          toggleExpanded();
-                          return;
-                        }
-                        e.preventDefault();
-                        handleRecordingStart();
-                      }}
-                      onMouseUp={(e) => {
-                        if (!isExpanded && isLandscape) return;
-                        e.preventDefault();
-                        handleRecordingEnd();
-                      }}
-                      onMouseLeave={() => isRecording && handleRecordingEnd()}
-                      onContextMenu={(e) => e.preventDefault()}
-                    >
-                      <Mic size={18} />
-                    </motion.button>
-                  )}
-                </div>
+              {!isExpanded && isLandscape && (
+                /* Send button */
+                <motion.button
+                  type="button"
+                  className="p-2 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center"
+                  style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
+                  whileTap={{ scale: 0.92 }}
+                  onClick={() => {
+                    if (!isExpanded && isLandscape) {
+                      toggleExpanded();
+                      return;
+                    }
+                  }}
+                >
+                  <Expand size={18} />
+                </motion.button>
+              )}
+
+              <div className="flex items-center">
+                {value.trim() ? (
+                  /* Send button */
+                  <motion.button
+                    type="button"
+                    className="p-2 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center"
+                    style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
+                    whileTap={{ scale: 0.92 }}
+                    onClick={() => {
+                      if (!isExpanded && isLandscape) {
+                        toggleExpanded();
+                        return;
+                      }
+                      handleSubmit();
+                    }}
+                  >
+                    <Send size={18} />
+                  </motion.button>
+                ) : (
+                  /* Push to talk button */
+                  <motion.button
+                    type="button"
+                    className={cn(
+                      "p-2 rounded-full flex items-center justify-center",
+                      isRecording ? "bg-destructive text-destructive-foreground" : "bg-secondary text-secondary-foreground",
+                    )}
+                    style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
+                    whileTap={{ scale: 0.92 }}
+                    onTouchStart={(e) => {
+                      e.preventDefault();
+                      handleRecordingStart();
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      handleRecordingEnd();
+                    }}
+                    onTouchCancel={(e) => {
+                      e.preventDefault();
+                      handleRecordingEnd();
+                    }}
+                    onMouseDown={(e) => {
+                      if (!isExpanded && isLandscape) {
+                        toggleExpanded();
+                        return;
+                      }
+                      e.preventDefault();
+                      handleRecordingStart();
+                    }}
+                    onMouseUp={(e) => {
+                      if (!isExpanded && isLandscape) return;
+                      e.preventDefault();
+                      handleRecordingEnd();
+                    }}
+                    onMouseLeave={() => isRecording && handleRecordingEnd()}
+                    onContextMenu={(e) => e.preventDefault()}
+                  >
+                    <Mic size={18} />
+                  </motion.button>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </form>
       </div>
