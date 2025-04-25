@@ -4,12 +4,69 @@ import type { Location } from "@/src/state/LocationContext";
 import { searchParagraphsFromServer } from "./utils/searchParagraphsFromServer";
 import debounce from "lodash.debounce";
 
-// Create a debounced version of searchParagraphsFromServer
-const debouncedSearchParagraphsFromServer = debounce(searchParagraphsFromServer, 500, {
-  leading: true, // Execute on the leading edge (immediately)
-  trailing: true, // Execute on the trailing edge (after delay)
-  maxWait: 2000, // Maximum time to wait before forced execution
-});
+// Create a debounced version of the server search portion of performSearch
+const performServerSearch = debounce(
+  async (query: string, currentLocation: Location, searchResults: HTMLDivElement) => {
+    const serverMatches = await searchParagraphsFromServer(query, currentLocation);
+    const totalServerMatches = serverMatches.length;
+
+    // Clear previous results before adding new ones
+    searchResults.innerHTML = "";
+
+    // Display summary of results
+    const resultsHeader = document.createElement("div");
+    resultsHeader.className = "search-results-header";
+
+    if (totalServerMatches > 0) {
+      resultsHeader.textContent = `Found ${totalServerMatches} places matching "${query}" in pages up to chapter ${currentLocation.chapter}, paragraph ${currentLocation.paragraph}`;
+    } else {
+      resultsHeader.textContent = `No matches found for "${query}" in pages up to chapter ${currentLocation.chapter}, paragraph ${currentLocation.paragraph}`;
+    }
+
+    searchResults.appendChild(resultsHeader);
+
+    serverMatches.forEach((match) => {
+      const resultItem = document.createElement("div");
+      resultItem.className = "search-result-item";
+
+      // Limit text to first 75 characters
+      const textPreview = match.text.length > 75 ? `${match.text.substring(0, 75)}...` : match.text;
+
+      resultItem.innerHTML = `
+      <div class="search-result-page">Chapter ${match.chapter}, Paragraph ${match.paragraphNumber}</div>
+      <div class="search-result-summary">${match.summary}</div>
+      <div class="search-result-content">${textPreview}</div>
+    `;
+
+      // Add click event to navigate to this paragraph
+      resultItem.addEventListener("click", () => {
+        goToParagraph({ chapter: match.chapter, paragraph: match.paragraphNumber, endChapter: match.chapter, endParagraph: match.paragraphNumber });
+        hideSearchModal();
+
+        // Find and highlight the paragraph on the page
+        setTimeout(() => {
+          const targetParagraph = document.querySelector(`section[data-chapter="${match.chapter}"] [data-index="${match.paragraphNumber}"]`);
+
+          if (targetParagraph) {
+            targetParagraph.scrollIntoView({ behavior: "smooth", block: "center" });
+            targetParagraph.classList.add("highlight-paragraph");
+            setTimeout(() => targetParagraph.classList.remove("highlight-paragraph"), 2000);
+          }
+        }, 300);
+      });
+
+      searchResults.appendChild(resultItem);
+    });
+
+    // Hide the loader when search is complete
+    searchLoader.classList.add("hidden");
+  },
+  350,
+  {
+    leading: false, // Don't execute immediately
+    trailing: true, // Execute after delay
+  },
+);
 
 // Create search modal elements
 let searchModal: HTMLDivElement;
@@ -22,7 +79,6 @@ let searchLoader: HTMLDivElement; // Add loader element
 let isSearchModalActive = false;
 let lastSearchQuery = "";
 let lastSearchTimestamp = 0; // Track when the last search was performed
-let isSearching = false; // Track if search is in progress
 
 /**
  * Initialize the search modal and append it to the document
@@ -42,6 +98,7 @@ export function initSearchModal() {
         <span class="modal-close">&times;</span>
       </div>
       <div class="modal-body">
+
         <div id="search-loader" class="search-loader hidden">
           <div class="loader-spinner"></div>
           <div class="loader-text">Searching...</div>
@@ -117,10 +174,10 @@ export function isSearchActive() {
  */
 export async function performSearch(query: string) {
   if (!query.trim()) return;
-  if (isSearching) return; // Prevent multiple concurrent searches
 
-  isSearching = true;
   searchLoader.classList.remove("hidden");
+
+  // For local search, always clear and start fresh
   searchResults.innerHTML = "";
 
   lastSearchQuery = query;
@@ -129,7 +186,6 @@ export async function performSearch(query: string) {
 
   // Counter for matches
   let totalMatches = 0;
-  let totalServerMatches = 0;
 
   try {
     // Go through each page up to the current one
@@ -207,61 +263,24 @@ export async function performSearch(query: string) {
       });
     }
 
-    console.log("totalMatches", totalMatches);
-    if (totalMatches === 0) {
-      const serverMatches = await debouncedSearchParagraphsFromServer(query, currentLocation);
-      totalServerMatches = serverMatches.length;
-
-      serverMatches.forEach((match) => {
-        const resultItem = document.createElement("div");
-        resultItem.className = "search-result-item";
-
-        // Limit text to first 75 characters
-        const textPreview = match.text.length > 75 ? `${match.text.substring(0, 75)}...` : match.text;
-
-        resultItem.innerHTML = `
-          <div class="search-result-page">Chapter ${match.chapter}, Paragraph ${match.paragraphNumber}</div>
-          <div class="search-result-summary">${match.summary}</div>
-          <div class="search-result-content">${textPreview}</div>
-        `;
-
-        // Add click event to navigate to this paragraph
-        resultItem.addEventListener("click", () => {
-          goToParagraph({ chapter: match.chapter, paragraph: match.paragraphNumber, endChapter: match.chapter, endParagraph: match.paragraphNumber });
-          hideSearchModal();
-
-          // Find and highlight the paragraph on the page
-          setTimeout(() => {
-            const targetParagraph = document.querySelector(`section[data-chapter="${match.chapter}"] [data-index="${match.paragraphNumber}"]`);
-
-            if (targetParagraph) {
-              targetParagraph.scrollIntoView({ behavior: "smooth", block: "center" });
-              targetParagraph.classList.add("highlight-paragraph");
-              setTimeout(() => targetParagraph.classList.remove("highlight-paragraph"), 2000);
-            }
-          }, 300);
-        });
-
-        searchResults.appendChild(resultItem);
-      });
-    }
-
-    // Display summary of results
-    const resultsHeader = document.createElement("div");
-    resultsHeader.className = "search-results-header";
-
+    // Display summary of results for local search
     if (totalMatches > 0) {
+      const resultsHeader = document.createElement("div");
+      resultsHeader.className = "search-results-header";
       resultsHeader.textContent = `Found ${totalMatches} matches for "${query}" in pages up to chapter ${currentLocation.chapter}, paragraph ${currentLocation.paragraph}`;
-    } else if (totalServerMatches > 0) {
-      resultsHeader.textContent = `Found ${totalServerMatches} places matching "${query}" in pages up to chapter ${currentLocation.chapter}, paragraph ${currentLocation.paragraph}`;
+      searchResults.insertBefore(resultsHeader, searchResults.firstChild);
+      searchLoader.classList.add("hidden");
     } else {
-      resultsHeader.textContent = `No matches found for "${query}" in pages up to chapter ${currentLocation.chapter}, paragraph ${currentLocation.paragraph}`;
-    }
+      // If no local matches, use the debounced server search
+      // Cancel any pending searches first
 
-    searchResults.insertBefore(resultsHeader, searchResults.firstChild);
-  } finally {
-    // Always hide the loader and reset the searching state
-    isSearching = false;
+      // Start a new debounced search
+      performServerSearch(query, currentLocation, searchResults);
+
+      // Note: The searchLoader will be hidden by performServerSearch when it completes
+    }
+  } catch (error) {
+    console.error("Search error:", error);
     searchLoader.classList.add("hidden");
   }
 }
