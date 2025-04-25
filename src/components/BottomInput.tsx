@@ -39,7 +39,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   // Detect landscape mode for phones
   useEffect(() => {
     const checkOrientation = () => {
-      const isLandscapeMode = window.matchMedia("(max-width: 950px) and (orientation: landscape)").matches;
+      const isLandscapeMode = window.matchMedia("(max-width: 980px) and (orientation: landscape)").matches;
       setIsLandscape(isLandscapeMode);
       setIsExpanded(!isLandscapeMode);
     };
