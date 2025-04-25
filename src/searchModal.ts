@@ -70,7 +70,6 @@ const performServerSearch = debounce(
 
 // Create search modal elements
 let searchModal: HTMLDivElement;
-let searchInput: HTMLInputElement;
 let searchResults: HTMLDivElement;
 let searchModalClose: HTMLElement;
 let searchLoader: HTMLDivElement; // Add loader element
@@ -140,8 +139,6 @@ export function showSearchModal() {
   setTimeout(() => {
     searchModal.classList.add("active");
     isSearchModalActive = true;
-    searchInput.value = "";
-    searchInput.focus();
 
     // If there was a previous search within the last 5 minutes, execute it again
     const fiveMinutesInMs = 5 * 60 * 1000;
