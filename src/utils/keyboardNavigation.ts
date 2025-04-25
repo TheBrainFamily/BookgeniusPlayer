@@ -1,8 +1,8 @@
 import { isEditActive } from "./sidebarEditor";
-import { hideSearchModal, isSearchActive, showSearchModal } from "../searchModal";
+import { hideSearchModal, isSearchActive } from "../searchModal";
 
 // Handle keyboard navigation events
-export async function keyboardNavigationSetup(event: KeyboardEvent) {
+export function keyboardNavigationSetup(event: KeyboardEvent) {
   // If search modal is active, let it handle its own keyboard events
   if (isSearchActive()) {
     if (event.key === "Escape") {
@@ -45,15 +45,19 @@ export async function keyboardNavigationSetup(event: KeyboardEvent) {
 // Set up keyboard event listeners
 export function setupKeyboardNavigation() {
   // Keyboard navigation
-  document.addEventListener("keydown", async (event) => {
+  document.addEventListener("keydown", (event) => {
     // Intercept browser search (Cmd+F or Ctrl+F)
     if ((event.key === "f" || event.key === "F") && (event.metaKey || event.ctrlKey)) {
       event.preventDefault(); // Prevent default browser search
-      showSearchModal();
+      // Focus the bottom input instead of showing the modal
+      const bottomInput = document.getElementById("bottom-input");
+      if (bottomInput) {
+        bottomInput.focus();
+      }
       return;
     }
 
     // Handle Command+S to set page number
-    await keyboardNavigationSetup(event);
+    keyboardNavigationSetup(event);
   });
 }

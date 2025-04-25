@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Mic, Send, Search, Telescope } from "lucide-react";
+import { Mic, Send, Search, Telescope, Expand } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useRealtime } from "../context/RealtimeContext";
@@ -7,19 +7,17 @@ import { Message, useWebSocket } from "../context/WebSocketContext";
 import { getCurrentBookSlug } from "../getCurrentBookSlug";
 import { useLocation } from "../state/LocationContext";
 import { showSearchModal, performSearch, hideSearchModal, isSearchActive } from "../searchModal";
+import { deepResearchCall } from "../deepResearchCall";
 
 interface BottomInputProps {
   placeholder?: string;
   onSubmit?: (message: Message) => void;
   className?: string;
-  onShowDeepResearch: () => void;
+  onShowDeepResearch: (result: string) => void;
   onCloseDeepResearch: () => void;
 }
 
 export function BottomInput({ placeholder = "Type something...", onSubmit, className, onShowDeepResearch, onCloseDeepResearch }: BottomInputProps) {
-  // if (import.meta.env.VITE_DEVELOPMENT === "true") {
-  //   return <></>;
-  // }
   const [value, setValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -132,20 +130,19 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
 
       if (isDeepResearchActive) {
         setIsThinking(true);
-        // Simulate deep research processing
-        setTimeout(() => {
+        deepResearchCall(value, location).then((result) => {
+          setIsDeepResearchActive(false);
+          onShowDeepResearch(result);
           setIsThinking(false);
-          // Here we would normally process the deep research response
-          onShowDeepResearch();
-        }, 2000);
+        });
+      } else {
+        onSubmit({ query: value, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: getCurrentBookSlug() } });
+        setLastSentUserMessage({ role: "user", content: value });
+        setTimeout(scrollToTop, 100);
       }
-
-      onSubmit({ query: value, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: getCurrentBookSlug() } });
       // Set the pending user message to immediately update the UI
-      setLastSentUserMessage({ role: "user", content: value });
       setValue("");
       // Force scroll to top when submitting
-      setTimeout(scrollToTop, 100);
     }
   };
 
@@ -254,9 +251,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
 
       {/* Replace the conditional backdrop with always-rendered element that transitions */}
       <div
-        className={`fixed inset-0 bg-black/80 z-40 transition-all duration-300 ease-in-out ${
-          isFocused ? "opacity-100 backdrop-blur-sm" : "opacity-0 backdrop-blur-none pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-black/80 z-40 transition-all duration-300 ease-in-out opacity-0 backdrop-blur-none pointer-events-none`}
         onClick={() => {
           setIsFocused(false);
           if (isLandscape) {
@@ -285,8 +280,9 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
         >
           <div className={cn("flex flex-col", isLandscape && !isExpanded && "items-center")}>
             {/* First row: Input field */}
-            {(isExpanded || !isLandscape) && (
+            {isExpanded && (
               <input
+                id="bottom-input"
                 ref={inputRef}
                 type="text"
                 value={value}
@@ -295,7 +291,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                   setValue(newVal);
 
                   // Trigger search modal and perform search while typing
-                  if (newVal.trim().length > 2) {
+                  if (newVal.trim().length > 2 && !isDeepResearchActive) {
                     // Show the modal if it's not visible yet
                     if (!isSearchActive()) {
                       showSearchModal();
@@ -320,88 +316,105 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                 }}
                 onFocus={() => setIsFocused(true)}
                 placeholder={isRecording ? "Listening..." : placeholder}
-                className={cn("w-full p-3 outline-none transition-colors mb-2 placeholder:text-white text-white", isRecording && "bg-gray-200 text-muted-foreground")}
+                className={cn("w-full p-0 pb-1 outline-none transition-colors mb-2 placeholder:text-gray text-white", isRecording && "bg-gray-200 text-muted-foreground")}
                 disabled={isRecording}
               />
             )}
 
             {/* Second row: Buttons */}
-            {(isExpanded || !isLandscape) && (
-              <div className="w-full flex justify-between items-center">
-                {/* Deep Research button */}
+            <div className="w-full flex justify-between items-center">
+              {/* Deep Research button */}
+              {isExpanded && (
                 <button
                   type="button"
-                  className={cn("py-1 px-3 rounded-md flex items-center", isDeepResearchActive ? "bg-green-500 text-white" : "bg-white border border-gray-300 text-gray-500")}
+                  className={cn("py-1 px-3 rounded-md flex items-center", isDeepResearchActive ? "bg-orange-500 text-white" : "bg-white border border-gray-300 text-gray-500")}
                   onClick={toggleDeepResearch}
                 >
                   <Telescope size={18} className="mr-1" />
                   <span className="text-sm whitespace-nowrap">Deep Research</span>
                   {isThinking && <div className="w-3 h-3 ml-1 border-2 border-t-transparent rounded-full animate-spin border-current"></div>}
                 </button>
+              )}
 
-                {/* Send/Mic button */}
-                <div className="flex items-center">
-                  {value.trim() ? (
-                    /* Send button */
-                    <motion.button
-                      type="button"
-                      className="p-2 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center"
-                      style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
-                      whileTap={{ scale: 0.92 }}
-                      onClick={() => {
-                        if (!isExpanded && isLandscape) {
-                          toggleExpanded();
-                          return;
-                        }
-                        handleSubmit();
-                      }}
-                    >
-                      <Send size={18} />
-                    </motion.button>
-                  ) : (
-                    /* Push to talk button */
-                    <motion.button
-                      type="button"
-                      className={cn(
-                        "p-2 rounded-full flex items-center justify-center",
-                        isRecording ? "bg-destructive text-destructive-foreground" : "bg-secondary text-secondary-foreground",
-                      )}
-                      style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
-                      whileTap={{ scale: 0.92 }}
-                      onTouchStart={(e) => {
-                        e.preventDefault();
-                        handleRecordingStart();
-                      }}
-                      onTouchEnd={(e) => {
-                        e.preventDefault();
-                        handleRecordingEnd();
-                      }}
-                      onTouchCancel={(e) => {
-                        e.preventDefault();
-                        handleRecordingEnd();
-                      }}
-                      onMouseDown={(e) => {
-                        if (!isExpanded && isLandscape) {
-                          toggleExpanded();
-                          return;
-                        }
-                        e.preventDefault();
-                        handleRecordingStart();
-                      }}
-                      onMouseUp={(e) => {
-                        if (!isExpanded && isLandscape) return;
-                        e.preventDefault();
-                        handleRecordingEnd();
-                      }}
-                      onMouseLeave={() => isRecording && handleRecordingEnd()}
-                      onContextMenu={(e) => e.preventDefault()}
-                    >
-                      <Mic size={18} />
-                    </motion.button>
-                  )}
-                </div>
+              {!isExpanded && isLandscape && (
+                /* Send button */
+                <motion.button
+                  type="button"
+                  className="p-2 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center"
+                  style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
+                  whileTap={{ scale: 0.92 }}
+                  onClick={() => {
+                    if (!isExpanded && isLandscape) {
+                      toggleExpanded();
+                      return;
+                    }
+                  }}
+                >
+                  <Expand size={18} />
+                </motion.button>
+              )}
+
+              <div className="flex items-center">
+                {value.trim() ? (
+                  /* Send button */
+                  <motion.button
+                    type="button"
+                    className="p-2 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center"
+                    style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
+                    whileTap={{ scale: 0.92 }}
+                    onClick={() => {
+                      if (!isExpanded && isLandscape) {
+                        toggleExpanded();
+                        return;
+                      }
+                      handleSubmit();
+                    }}
+                  >
+                    <Send size={18} />
+                  </motion.button>
+                ) : (
+                  /* Push to talk button */
+                  <motion.button
+                    type="button"
+                    className={cn(
+                      "p-2 rounded-full flex items-center justify-center",
+                      isRecording ? "bg-destructive text-destructive-foreground" : "bg-secondary text-secondary-foreground",
+                    )}
+                    style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
+                    whileTap={{ scale: 0.92 }}
+                    onTouchStart={(e) => {
+                      e.preventDefault();
+                      handleRecordingStart();
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      handleRecordingEnd();
+                    }}
+                    onTouchCancel={(e) => {
+                      e.preventDefault();
+                      handleRecordingEnd();
+                    }}
+                    onMouseDown={(e) => {
+                      if (!isExpanded && isLandscape) {
+                        toggleExpanded();
+                        return;
+                      }
+                      e.preventDefault();
+                      handleRecordingStart();
+                    }}
+                    onMouseUp={(e) => {
+                      if (!isExpanded && isLandscape) return;
+                      e.preventDefault();
+                      handleRecordingEnd();
+                    }}
+                    onMouseLeave={() => isRecording && handleRecordingEnd()}
+                    onContextMenu={(e) => e.preventDefault()}
+                  >
+                    <Mic size={18} />
+                  </motion.button>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </form>
       </div>

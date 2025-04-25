@@ -6,6 +6,7 @@ import { DeepResearchWithText, LLMAnswerViewer } from "./MarkdownComponent"; // 
 interface DeepResearchModalProps {
   isOpen: boolean;
   onClose: () => void;
+  passedText?: string;
 }
 
 const text = `Oto fragmenty z tekstu, które mogą posłużyć do odpowiedzi na zadane pytania:
@@ -63,7 +64,7 @@ W żadnym z tych fragmentów nie ma sugestii, że ojcem dziecka mógłby być kt
 
 Podsumowując, choć Dagon próbował, Sara wyraźnie odrzuciła jego zaloty. Tekst nie daje żadnych podstaw do wątpienia w ojcostwo Ramzesa nad dzieckiem Sary.`;
 
-export const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ isOpen, onClose }) => {
+export const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ isOpen, onClose, passedText }) => {
   if (!isOpen) {
     return null;
   }
@@ -108,7 +109,7 @@ export const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ isOpen, on
 
           {/* Scrollable Content Area */}
           <div className="flex-1 overflow-y-auto p-6">
-            <LLMAnswerViewer answerMarkdown={text} />
+            <LLMAnswerViewer answerMarkdown={passedText || text} />
             {/* <LLMAnswerViewer answerMarkdown={'"Masz moją wdzięczność i przekonasz się, że jest coś warta"'} /> */}
           </div>
         </div>
