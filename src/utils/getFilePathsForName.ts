@@ -117,6 +117,8 @@ const known = [
   "wielki-pisarz-speaks.mp4",
   "wioślarz-ramzesa-hyksos-speaks.mp4",
   "żona-chłopa-topionego-speaks.mp4",
+  "phut-beroes-speaks.mp4",
+  "phut-beroes-listens.mp4",
 ];
 
 export const getPictureFileNameForName = (name: string) => {
