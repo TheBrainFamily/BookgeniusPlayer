@@ -7,7 +7,7 @@
  * compile without any additional tweaks.
  */
 
-import { pharaonCharactersData } from "../data/pharaon-apr-10.selfsufficientcharactermetadatas";
+import { pharaonCharactersData } from "../data/pharaon-apr-28.charactersmetadatas";
 import { BOOK_SLUGS } from "../consts";
 
 /* -------------------------------------------------------------------------- */
