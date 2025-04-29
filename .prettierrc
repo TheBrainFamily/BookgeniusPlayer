@@ -1,1 +1,1 @@
-{ "printWidth": 180, "objectWrap": "collapse" }
+{ "printWidth": 180, "objectWrap": "collapse", "xmlWhitespaceSensitivity": "ignore" }
