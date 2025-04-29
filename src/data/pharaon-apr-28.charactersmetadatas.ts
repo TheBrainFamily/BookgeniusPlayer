@@ -310,8 +310,8 @@ export const pharaonCharactersData = [
           166, 167, 168, 169, 171,
         ],
         paragraphsWhereTalking: [
-          6, 7, 43, 51, 55, 59, 61, 63, 65, 66, 68, 70, 75, 78, 80, 88, 90, 94, 98, 99, 110, 112, 114, 116, 119, 139, 141, 143, 145, 148, 150, 154, 156, 158, 160, 163, 165, 166,
-          169, 171,
+          6, 7, 43, 51, 55, 59, 61, 63, 65, 66, 68, 70, 75, 78, 80, 88, 94, 98, 99, 110, 112, 114, 116, 119, 139, 141, 143, 145, 148, 150, 154, 156, 158, 160, 163, 165, 166, 169,
+          171,
         ],
       },
       {
@@ -700,7 +700,7 @@ export const pharaonCharactersData = [
         chapter: 3,
         summary: "Krewny i adiutant następcy tronu Ramzesa. Znany jako pierwszy elegant w Memfis, lubiący luksus i rozrywki.",
         paragraphsWhereSpotted: [1, 4, 5, 7, 9, 12, 14, 21, 23, 29, 41, 47, 52, 55, 58, 60, 62, 65, 71, 77, 81, 85, 87],
-        paragraphsWhereTalking: [5, 7, 9, 12, 14, 17, 19, 21, 23, 24, 29, 30, 41, 47, 52, 55, 56, 58, 60, 62, 65, 71, 77, 81, 85],
+        paragraphsWhereTalking: [5, 7, 9, 12, 14, 17, 19, 21, 23, 24, 29, 30, 41, 47, 52, 56, 58, 60, 62, 65, 71, 77, 81, 85],
       },
       {
         chapter: 4,
