@@ -1,42 +1,37 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ebook id="demo-single-source"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="ebook.xsd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<ebook id="demo-single-source" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ebook.xsd">
+  <CharactersMaster>
+    <Faraon display="Faraon" summary="Obecny władca Egiptu" />
+    <Ksiaze-Ramzes display="Książe Ramzes" summary="Młodszy syn faraona" />
+    <Sara display="Sara" summary="Piękna Hebrajka, ukochana Ramzesa" />
+  </CharactersMaster>
 
-    <!-- 1 · Character roster (only place you ever touch) -->
-    <CharactersMaster>
-        <Faraon display="Faraon" summary="Obecny władca Egiptu" />
-        <Książe-Ramzes
-            display="Książe Ramzes" summary="Młodszy syn faraona" />
-        <Sara display="Sara"
-            summary="Piękna Hebrajka, ukochana Ramzesa" />
-    </CharactersMaster>
+  <Chapter id="1">
+    <BookTitle>Bolesław Prus, Faraon</BookTitle>
+    <p>
+      W trzydziestym trzecim roku szczęśliwego panowania Ramzesa XII Egipt święcił dwie uroczystości, które prawowiernych jego mieszkańców napełniły dumą i słodyczą.
+      <charactersMentioned>
+        <Faraon />
+      </charactersMentioned>
+    </p>
 
-    <!-- 2 · Story -->
-    <body>
+    <p>
+      — Gdyby bogowie, zamiast młodszym synem królewskim, uczynili mnie faraonem, podbiłbym dziewięć narodów…
+    <Faraon talking="true"/>
+    <Sara />
+    </p>
 
-        <p data-index="1">
-            <charactersTalking>
-                <Książe-Ramzes />
-                <Faraon />
-            </charactersTalking>
-            <charactersMentioned>
-                <Sara />
-            </charactersMentioned> — Gdyby bogowie, zamiast młodszym synem
-            królewskim, uczynili mnie faraonem, podbiłbym dziewięć narodów… </p>
+    <p>
+      <Ksiaze-Ramzes />
+      <Sara />
+      Książe Ramzes spojrzał na Sarę, a jego wzrok złagodniał.
+    </p>
 
-        <p data-index="2">
-            <charactersMentioned>
-                <Książe-Ramzes />
-                <Sara />
-            </charactersMentioned> Książe Ramzes spojrzał
-            na Sarę, a jego wzrok złagodniał. </p>
-
-        <p data-index="3">
-            <charactersTalking>
-                <Sara />
-            </charactersTalking> — Panie mój, twe słowa są jak światło w
-            ciemności — wyszeptała. </p>
-
-    </body>
+    <p>
+      <charactersTalking>
+        <Sara />
+      </charactersTalking>
+      — Panie mój, twe słowa są jak światło w ciemności — wyszeptała.
+    </p>
+  </Chapter>
 </ebook>

@@ -32,14 +32,8 @@
                     </xs:complexType>
                 </xs:element>
 
-                <!-- 1.2 body -->
-                <xs:element name="body">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="p" type="paragraphType" minOccurs="1" maxOccurs="unbounded"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
+                <!-- 1.2 Chapters -->
+                <xs:element name="Chapter" type="chapterType" minOccurs="1" maxOccurs="unbounded"/>
 
             </xs:sequence>
             <xs:attribute name="id" type="xs:string" use="required"/>
@@ -47,14 +41,24 @@
     </xs:element>
 
     <!-- ─────────────────────────────
-         2 · paragraph and helpers
+         2 · Chapter and helpers
+         ───────────────────────────── -->
+    <xs:complexType name="chapterType">
+        <xs:sequence>
+            <xs:element name="BookTitle" type="xs:string" minOccurs="0"/>
+            <xs:element name="p" type="paragraphType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <!-- ─────────────────────────────
+         3 · paragraph and helpers
          ───────────────────────────── -->
     <xs:complexType name="paragraphType" mixed="true">
         <xs:sequence>
             <xs:element name="charactersTalking"  type="characterListType" minOccurs="0"/>
             <xs:element name="charactersMentioned" type="characterListType" minOccurs="0"/>
         </xs:sequence>
-        <xs:attribute name="data-index" type="xs:positiveInteger" use="required"/>
     </xs:complexType>
 
     <!-- list that may contain ANY character element -->
@@ -64,7 +68,7 @@
         </xs:sequence>
 
         <!-- XSD 1.1 assertion:
-             every child’s local-name() must match a name declared under CharactersMaster -->
+             every child's local-name() must match a name declared under CharactersMaster -->
         <xs:assert test="
       every $c in * satisfies
         local-name($c) = distinct-values(ancestor::ebook/CharactersMaster/*/local-name())
