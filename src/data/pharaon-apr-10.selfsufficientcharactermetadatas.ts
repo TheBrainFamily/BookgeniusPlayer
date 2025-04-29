@@ -1703,20 +1703,4 @@ export const pharaonCharactersData = [
     imageUrl: "UNKNOWN",
     __v: 0,
   },
-  {
-    _id: { $oid: "67ffdb6f1c917e2577a99072" },
-    characterName: "Kama",
-    bookSlug: "Pharaon",
-    infoPerChapter: [
-      {
-        chapter: 25,
-        summary:
-          "Szesnastoletnia fenicka tancerka przysłana przez Dagona, by udobruchać księcia.\nPrzedstawia się jako kapłanka i służebnica, próbująca rozproszyć gniew Ramzesa swoim tańcem i pieszczotami.",
-        paragraphsWhereSpotted: [174, 175, 176],
-        paragraphsWhereTalking: [],
-      },
-    ],
-    imageUrl: "UNKNOWN",
-    __v: 0,
-  },
 ];
