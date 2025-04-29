@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ebook.xsd — no-character-duplication version (requires an XSD 1.1-aware validator) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+           vc:minVersion="1.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+    <!-- ─────────────────────────────
+         0 · reusable character type
+         ───────────────────────────── -->
+    <xs:complexType name="characterType">
+        <xs:attribute name="display" type="xs:string" use="required"/>
+        <xs:attribute name="summary" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <!-- ─────────────────────────────
+         1 · root element <ebook>
+         ───────────────────────────── -->
+    <xs:element name="ebook">
+        <xs:complexType>
+            <xs:sequence>
+
+                <!-- 1.1 CharactersMaster — any elements allowed, each unique -->
+                <xs:element name="CharactersMaster">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <!-- allow any element, but make sure its name is unique -->
+                            <xs:any minOccurs="1" maxOccurs="unbounded" processContents="lax"/>
+                        </xs:sequence>
+                        <xs:assert test="count(*) = count(distinct-values(local-name(*)))"/>
+                    </xs:complexType>
+                </xs:element>
+
+                <!-- 1.2 body -->
+                <xs:element name="body">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="p" type="paragraphType" minOccurs="1" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- ─────────────────────────────
+         2 · paragraph and helpers
+         ───────────────────────────── -->
+    <xs:complexType name="paragraphType" mixed="true">
+        <xs:sequence>
+            <xs:element name="charactersTalking"  type="characterListType" minOccurs="0"/>
+            <xs:element name="charactersMentioned" type="characterListType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="data-index" type="xs:positiveInteger" use="required"/>
+    </xs:complexType>
+
+    <!-- list that may contain ANY character element -->
+    <xs:complexType name="characterListType">
+        <xs:sequence>
+            <xs:any minOccurs="1" maxOccurs="unbounded" processContents="lax"/>
+        </xs:sequence>
+
+        <!-- XSD 1.1 assertion:
+             every child’s local-name() must match a name declared under CharactersMaster -->
+        <xs:assert test="
+      every $c in * satisfies
+        local-name($c) = distinct-values(ancestor::ebook/CharactersMaster/*/local-name())
+    "/>
+    </xs:complexType>
+
+</xs:schema>

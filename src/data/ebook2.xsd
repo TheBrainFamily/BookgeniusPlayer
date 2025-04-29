@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"> 
+           <xs:element name="ebook">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="metadata" type="metadataType"/>
+                <xs:element name="content" type="contentType"/>
+            </xs:sequence>
+        </xs:complexType>
+
+        <xs:key name="characterIdKey">
+            <xs:selector xpath="metadata/characterList/character"/>
+             <xs:field xpath="@charId"/> 
+        </xs:key>
+
+        <xs:keyref name="characterRefKey" refer="characterIdKey">
+            <xs:selector xpath=".//characterRef"/> 
+            <xs:field xpath="@ref"/>
+        </xs:keyref>
+
+    </xs:element>
+
+    <xs:complexType name="metadataType">
+        <xs:sequence>
+            <xs:element name="characterList" type="characterListType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="characterListType">
+        <xs:sequence>
+            <xs:element name="character" type="characterType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="characterType">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="description" type="xs:string" minOccurs="0"/> 
+        </xs:sequence>
+        <xs:attribute name="charId" type="xs:ID" use="required"/> 
+    </xs:complexType>
+
+    <xs:complexType name="contentType">
+        <xs:sequence>
+            <xs:element name="p" type="paragraphType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="paragraphType" mixed="true"> 
+        <xs:sequence>
+            <xs:element name="CharactersMentioned" type="characterRefListType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="CharactersTalking" type="characterRefListType" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="data-index" type="xs:integer" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="characterRefListType">
+        <xs:sequence>
+             <xs:element name="characterRef" type="characterRefType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="characterRefType">
+        <xs:attribute name="ref" type="xs:IDREF" use="required"/> 
+    </xs:complexType>
+
+</xs:schema>

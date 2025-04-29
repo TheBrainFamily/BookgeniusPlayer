@@ -21,7 +21,7 @@ export const setUpdateParagraphNotesFunction = (fn: UpdateParagraphNotesType) =>
 };
 
 // Set up intersection observer to detect visible pages
-export function setupPageObserver() {
+export function setupPageObserver(): IntersectionObserver | null {
   // Threshold values for determining when a page is "visible enough"
   const observerOptions = {
     root: document.getElementById("content-container"),
@@ -29,17 +29,24 @@ export function setupPageObserver() {
     threshold: 0.05, // Adjust threshold if needed, maybe lower if elements are small
   };
 
+  // Ensure the root element exists before creating the observer
+  if (!observerOptions.root) {
+    console.error("Observer root element 'content-container' not found. Cannot setup page observer.");
+    return null; // Return null if root doesn't exist
+  }
+
   // --- State for tracking all currently intersecting pages ---
   const intersectingPages = new Set<Element>();
   let currentlyActivePageElement: Element | null = null;
   let currentlyLastActivePageElement: Element | null = null;
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
-    const rootElement = observerOptions.root;
-    if (!rootElement) {
-      console.error("Observer root element not found:", observerOptions.root);
-      return;
-    }
+    // const rootElement = observerOptions.root; // root is guaranteed to exist here
+    // if (!rootElement) { // No longer needed
+    //   console.error("Observer root element not found:", observerOptions.root);
+    //   return;
+    // }
+    console.log("entries", entries);
 
     // 1. Update the set of intersecting pages based on the current changes
     entries.forEach((entry) => {
@@ -52,7 +59,7 @@ export function setupPageObserver() {
 
     // 2. Determine the elements within the "focus zone" (30%-60% vertically)
     if (intersectingPages.size > 0) {
-      const rootRect = rootElement.getBoundingClientRect();
+      const rootRect = observerOptions.root.getBoundingClientRect();
 
       // Default multipliers
       let topMultiplier = 0.15;
@@ -138,7 +145,16 @@ export function setupPageObserver() {
   }, observerOptions);
 
   // Observe all paragraphs within chapter sections
-  document.querySelectorAll("section[data-chapter] p[data-index]").forEach((paragraph) => {
-    observer.observe(paragraph);
-  });
+  const paragraphsToObserve = document.querySelectorAll("section[data-chapter] [data-index]");
+  if (paragraphsToObserve.length === 0) {
+    console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
+    // We still return the observer, it just won't observe anything initially.
+  } else {
+    console.log("Observing paragraphs:", paragraphsToObserve);
+    paragraphsToObserve.forEach((paragraph) => {
+      observer.observe(paragraph);
+    });
+  }
+
+  return observer; // Return the created observer instance
 }

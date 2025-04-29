@@ -4,6 +4,8 @@ import { LocationProvider } from "./state/LocationContext";
 import { usePageObserver } from "./hooks/usePageObserver";
 import { useCutScene } from "./hooks/useCutScene";
 import { useBackgroundVideo } from "./hooks/useBackgroundVideo";
+import { useBookContent } from "./hooks/useBookContent";
+import { faraonBookXml } from "./data/faraon-book-xml";
 
 import BookChaptersModal from "./menu-modal";
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
@@ -16,8 +18,11 @@ import { RealtimeProvider } from "./context/RealtimeContext";
 import { DeepResearchModal } from "./ui/DeepResearchModal";
 
 function Shell({ setShowDeepResearch, showDeepResearch, passedText }: { setShowDeepResearch: (show: boolean) => void; showDeepResearch: boolean; passedText?: string }) {
+  /* Inject book content first */
+  useBookContent(faraonBookXml, "content-container");
+
   /* scroll‑related hooks */
-  usePageObserver();
+  usePageObserver(faraonBookXml);
 
   /* dynamic visual hooks */
   useCutScene();

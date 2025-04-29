@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ebook id="demo-single-source"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="ebook.xsd">
+
+    <!-- 1 · Character roster (only place you ever touch) -->
+    <CharactersMaster>
+        <Faraon display="Faraon" summary="Obecny władca Egiptu" />
+        <Książe-Ramzes
+            display="Książe Ramzes" summary="Młodszy syn faraona" />
+        <Sara display="Sara"
+            summary="Piękna Hebrajka, ukochana Ramzesa" />
+    </CharactersMaster>
+
+    <!-- 2 · Story -->
+    <body>
+
+        <p data-index="1">
+            <charactersTalking>
+                <Książe-Ramzes />
+                <Faraon />
+            </charactersTalking>
+            <charactersMentioned>
+                <Sara />
+            </charactersMentioned> — Gdyby bogowie, zamiast młodszym synem
+            królewskim, uczynili mnie faraonem, podbiłbym dziewięć narodów… </p>
+
+        <p data-index="2">
+            <charactersMentioned>
+                <Książe-Ramzes />
+                <Sara />
+            </charactersMentioned> Książe Ramzes spojrzał
+            na Sarę, a jego wzrok złagodniał. </p>
+
+        <p data-index="3">
+            <charactersTalking>
+                <Sara />
+            </charactersTalking> — Panie mój, twe słowa są jak światło w
+            ciemności — wyszeptała. </p>
+
+    </body>
+</ebook>

@@ -1,4 +1,4 @@
-import { paragraphMetadataServicePure, getParagraphRange, parseParagraphRange, ParsedParagraphRange } from "@/src/fetchers/getParagraphRange";
+import { paragraphMetadataServicePure, getParagraphRange, parseParagraphRange, ParsedParagraphRange, SelfSufficientCharacterMetadata } from "@/src/fetchers/getParagraphRange";
 import { BOOK_SLUGS } from "@/src/consts";
 import { useEffect, useState } from "react";
 import { Location } from "@/src/state/LocationContext";
@@ -9,7 +9,7 @@ function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {
   return a.every((v, i) => v.canonicalName === b[i].canonicalName);
 }
 
-export function useCharacterNotes(loc: Location): ParsedParagraphRange[] {
+export function useCharacterNotes(loc: Location, charactersData: SelfSufficientCharacterMetadata[]): ParsedParagraphRange[] {
   const [notes, setNotes] = useState<ParsedParagraphRange[]>([]);
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export function useCharacterNotes(loc: Location): ParsedParagraphRange[] {
     return () => {
       cancelled = true;
     };
-  }, [loc.chapter, loc.paragraph]);
+  }, [loc.chapter, loc.paragraph, charactersData]);
 
   return notes;
 }

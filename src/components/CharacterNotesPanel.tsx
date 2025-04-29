@@ -6,6 +6,7 @@ import { useCharacterNotes } from "@/src/hooks/useCharacterNotes";
 import { CharacterCard } from "./CharacterCard";
 
 import { useLocation } from "@/src/state/LocationContext";
+import { pharaonCharactersData } from "@/src/data/pharaon-apr-28.charactersmetadatas";
 
 /* mount inside the legacy container for CSS */
 const target = document.getElementById("left-notes");
@@ -23,7 +24,7 @@ export const CharacterNotesPanel: React.FC = () => {
   );
 
   /* characters for that range */
-  const notes = useCharacterNotes(range);
+  const notes = useCharacterNotes(range, pharaonCharactersData);
 
   /* Fade‑in only when the ARRAY REFERENCE actually changes */
   const [fadeInKey, setFadeInKey] = useState(0);
