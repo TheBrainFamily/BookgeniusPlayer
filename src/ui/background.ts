@@ -77,6 +77,20 @@ export const dealWithBackground = ({
         { chapter: 23, file: "background-moving-generic-estate-fade.mp4" },
         { chapter: 24, file: "background-moving-generic-estate-fade.mp4" },
         { chapter: 25, file: "background-egyptian-streets-palace-visible-loop.mp4" },
+        { chapter: 26, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 27, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 28, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 29, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 30, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 31, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 32, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 33, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 34, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 35, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 36, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 37, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 38, file: "background-generic-pingpong-fade.mp4" },
+        { chapter: 39, file: "background-generic-pingpong-fade.mp4" },
       ];
       const backgrounds = backgroundsPassedFromGemini.map(toBackground);
 

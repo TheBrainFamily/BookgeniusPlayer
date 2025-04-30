@@ -26,40 +26,69 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 }
 
 /**
- * Creates and configures a video element based on the placeholder span's data.
+ * Creates and configures a video or image element based on the placeholder span's data.
  */
-function createVideoElement(placeholder: HTMLSpanElement): HTMLVideoElement | null {
+function createMediaElement(placeholder: HTMLSpanElement): HTMLVideoElement | HTMLImageElement | null {
   const character = placeholder.dataset.character;
   const isTalking = placeholder.dataset.isTalking === "true";
-  const movingSrc = placeholder.dataset.srcMoving;
-  const pictureSrc = placeholder.dataset.srcPicture;
+  const movingSrc = placeholder.dataset.srcMoving; // Assumed to be video
+  const pictureSrc = placeholder.dataset.srcPicture; // Can be video or image
 
   if (!character) return null;
 
-  const video = document.createElement("video");
-  video.classList.add("inline-avatar");
-  video.dataset.character = character;
-  video.src = isTalking ? movingSrc || pictureSrc || "" : pictureSrc || ""; // Fallback for talking
+  let element: HTMLVideoElement | HTMLImageElement | null = null;
+  let finalSrc: string | undefined = undefined;
 
-  if (!video.src) {
-    console.warn("Could not determine video source for placeholder:", placeholder);
+  // Determine the source and element type
+  if (isTalking && movingSrc) {
+    // Talking, use moving source (must be video)
+    finalSrc = movingSrc;
+    const video = document.createElement("video");
+    video.autoplay = true;
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+    element = video;
+  } else if (pictureSrc) {
+    // Not talking (or no movingSrc), use picture source
+    finalSrc = pictureSrc;
+    if (pictureSrc.toLowerCase().endsWith(".png")) {
+      // It's an image
+      element = document.createElement("img");
+    } else {
+      // Assume it's a video (fallback or primary)
+      const video = document.createElement("video");
+      // Even static videos might be short loops, keep consistent attributes
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+      element = video;
+    }
+  } else {
+    // No source available
+    console.warn("Could not determine media source for placeholder:", placeholder);
     return null;
   }
 
-  video.autoplay = true;
-  video.loop = true;
-  video.muted = true;
-  video.playsInline = true;
-  // Add error handling for video loading if needed
-  // video.onerror = () => console.error(`Failed to load video: ${video.src}`);
+  // Configure and return the element
+  if (element && finalSrc) {
+    element.src = finalSrc;
+    element.classList.add("inline-avatar");
+    if (character) element.dataset.character = character; // Assign character data if available
+    // Add basic error handling for loading
+    element.onerror = () => console.error(`Failed to load media: ${element?.src}`);
+    return element;
+  }
 
-  return video;
+  console.warn("Failed to create media element for placeholder:", placeholder); // Should not happen ideally
+  return null;
 }
 
 /**
- * Manages video loading and playback for paragraphs within the visible range.
+ * Manages media loading and playback for paragraphs within the visible range.
  */
-function activateVideosInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number) {
+function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] p[data-index]");
 
   allParagraphs.forEach((p) => {
@@ -74,15 +103,16 @@ function activateVideosInRange(startChapter: number, startParagraph: number, end
       const placeholders = p.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
       placeholders.forEach((placeholder) => {
-        const videoInjected = placeholder.dataset.videoInjected === "true";
-        let videoElement = placeholder.querySelector<HTMLVideoElement>("video.inline-avatar");
+        const mediaInjected = placeholder.dataset.mediaInjected === "true";
+        // Query for either video or image with the class
+        let mediaElement = placeholder.querySelector<HTMLVideoElement | HTMLImageElement>("video.inline-avatar, img.inline-avatar");
 
         if (inView) {
-          if (!videoInjected) {
-            // Inject video
-            videoElement = createVideoElement(placeholder);
-            if (videoElement) {
-              // If it's a mention, hide the original text content of the span before adding video
+          if (!mediaInjected) {
+            // Inject media
+            mediaElement = createMediaElement(placeholder);
+            if (mediaElement) {
+              // If it's a mention, hide the original text content of the span before adding media
               if (placeholder.classList.contains("character-mention") && placeholder.firstChild && placeholder.firstChild.nodeType === Node.TEXT_NODE) {
                 const textNode = placeholder.firstChild as Text;
                 const wrapper = document.createElement("span");
@@ -91,30 +121,32 @@ function activateVideosInRange(startChapter: number, startParagraph: number, end
                 wrapper.textContent = textNode.textContent;
                 placeholder.replaceChild(wrapper, textNode);
               }
-              placeholder.appendChild(videoElement); // Append video
-              placeholder.dataset.videoInjected = "true";
-              videoElement.play().catch((e) => console.warn("Video play interrupted or failed:", e)); // Autoplay
-              console.log(`[Video Inject] Injected video for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
+              placeholder.appendChild(mediaElement); // Append media
+              placeholder.dataset.mediaInjected = "true"; // Use new dataset attribute
+
+              // Only play if it's a video
+              if (mediaElement instanceof HTMLVideoElement) {
+                mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e)); // Autoplay
+              }
+              console.log(`[Media Inject] Injected media for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
             }
-          } else if (videoElement && videoElement.paused) {
+          } else if (mediaElement instanceof HTMLVideoElement && mediaElement.paused) {
             // Play existing video if paused
-            videoElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+            mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
           }
         } else {
           // Out of view
-          if (videoInjected && videoElement) {
-            // Pause video
-            // videoElement.pause();
-            // Optional: Remove video to save memory. Requires re-creating it when it comes back into view.
-            placeholder.removeChild(videoElement);
-            delete placeholder.dataset.videoInjected;
-            // // Restore original text if it was hidden
+          if (mediaInjected && mediaElement) {
+            // No need to pause images, just remove the element
+            placeholder.removeChild(mediaElement);
+            delete placeholder.dataset.mediaInjected; // Use new dataset attribute
+            // Restore original text if it was hidden (Optional, currently commented out in original code)
             // const hiddenText = placeholder.querySelector('span[data-original-text]');
             // if (hiddenText && hiddenText.parentNode === placeholder) {
             //     const textNode = document.createTextNode(hiddenText.textContent || '');
             //     placeholder.replaceChild(textNode, hiddenText);
             // }
-            // console.log(`[Video Unload] Unloaded video for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
+            console.log(`[Media Unload] Unloaded media for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
           }
         }
       });
@@ -220,8 +252,8 @@ export function setupPageObserver(): IntersectionObserver | null {
             // Set current location based on the top element in the focus zone
             setCurrentLocation({ chapter: startInfo.chapter, paragraph: startInfo.paragraph, endChapter: endInfo.chapter, endParagraph: endInfo.paragraph });
 
-            // --- Activate/Deactivate Videos ---
-            activateVideosInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph);
+            // --- Activate/Deactivate Media ---
+            activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph);
             // ----------------------------------
           } else {
             console.warn("[Observer] Could not extract chapter/paragraph info for focused elements:", topFocusedPageElement, bottomFocusedPageElement);

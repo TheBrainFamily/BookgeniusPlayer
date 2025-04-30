@@ -26,63 +26,67 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
 
   const chapters = xmlDoc.getElementsByTagName("Chapter");
 
-  let paragraphCount = 0;
   for (const chapter of chapters) {
     const chapterId = chapter.getAttribute("id");
     htmlResult += `\n      <section><section data-chapter="${chapterId}">`;
     let dataIndex = 0;
 
-    const bookTitle = chapter.getElementsByTagName("BookTitle")[0];
-    if (bookTitle) {
-      htmlResult += `\n    <h5 data-index="${dataIndex++}" class="book-title">${bookTitle.textContent || ""}</h5>`;
-    }
+    // Iterate over direct child nodes of the chapter
+    for (let j = 0; j < chapter.childNodes.length; j++) {
+      const node = chapter.childNodes[j];
 
-    const paragraphs = chapter.getElementsByTagName("p");
-    for (const p of paragraphs) {
-      let pContent = ""; // Build content for the paragraph, including spans
-      for (let i = 0; i < p.childNodes.length; i++) {
-        const node = p.childNodes[i];
-        // Check if the node is a text node (nodeType 3) and append its content
-        if (node.nodeType === 3 /* Node.TEXT_NODE */) {
-          pContent += node.textContent;
-        }
-        // If it's an element node (nodeType 1)
-        else if (node.nodeType === 1 /* Node.ELEMENT_NODE */) {
-          const element = node as unknown as Element;
-          const characterInfo = characterMap.get(element.tagName);
+      // Check if it's an element node
+      if (node.nodeType === 1 /* Node.ELEMENT_NODE */) {
+        const childElement = node as unknown as Element;
+        const tagName = childElement.tagName;
 
-          if (characterInfo) {
-            paragraphCount++;
-            // Limit initial placeholders for performance, logic to load more will be in pageObserver
-            // Increased limit slightly, actual loading is deferred
-            const isTalking = element.getAttribute("talking") === "true";
-            const movingSrc = getMovingPictureFilePathForName(characterInfo.display, bookSlug);
-            const pictureSrc = getPictureFilePathForName(characterInfo.display, bookSlug);
-
-            if (isTalking) {
-              // Generate placeholder span for talking character
-              pContent += `<span class="character-placeholder character-talking" data-character="${characterInfo.display}" data-src-moving="${movingSrc}" data-is-talking="true"></span>`;
-            } else {
-              // Generate placeholder span for mentioned character, preserving text content
-              pContent += `${element.textContent || ""} <span class="character-placeholder character-mention" data-character="${characterInfo.display}" data-src-picture="${pictureSrc}" data-is-talking="false"></span>`;
+        if (tagName === "p") {
+          // Process paragraph element
+          let pContent = "";
+          for (let k = 0; k < childElement.childNodes.length; k++) {
+            const pNode = childElement.childNodes[k];
+            // Check if the node is a text node (nodeType 3) and append its content
+            if (pNode.nodeType === 3 /* Node.TEXT_NODE */) {
+              pContent += pNode.textContent;
             }
-          } else {
-            // Handle other potential elements if needed, e.g., <b>, <i>
-            // For now, we ignore unknown tags within <p>
-          }
-        }
-      }
+            // If it's an element node (nodeType 1)
+            else if (pNode.nodeType === 1 /* Node.ELEMENT_NODE */) {
+              const pElement = pNode as unknown as Element;
+              const characterInfo = characterMap.get(pElement.tagName);
 
-      // Only add paragraph if it contains non-whitespace content after processing
-      // Check the processed content, not just trimmed text
-      if (pContent.trim()) {
-        // Ensure text nodes adjacent to spans have correct spacing
-        // Replace multiple spaces resulting from node concatenation/trimming with single spaces
-        // Also trim leading/trailing whitespace for the final paragraph content
-        let cleanedContent = pContent.replace(/\s+/g, " ").trim();
-        // Fix potential issue where empty spans might leave unwanted spaces by removing spaces around the captured span
-        cleanedContent = cleanedContent.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
-        htmlResult += `\n    <p data-index="${dataIndex++}">\n      ${cleanedContent}\n    </p>`;
+              if (characterInfo) {
+                const isTalking = pElement.getAttribute("talking") === "true";
+                const movingSrc = getMovingPictureFilePathForName(characterInfo.display, bookSlug);
+                const pictureSrc = getPictureFilePathForName(characterInfo.display, bookSlug);
+
+                if (isTalking) {
+                  // Generate placeholder span for talking character
+                  pContent += `<span class="character-placeholder character-talking" data-character="${characterInfo.display}" data-src-moving="${movingSrc}" data-is-talking="true"></span>`;
+                } else {
+                  // Generate placeholder span for mentioned character, preserving text content
+                  pContent += `${pElement.textContent || ""} <span class="character-placeholder character-mention" data-character="${characterInfo.display}" data-src-picture="${pictureSrc}" data-is-talking="false"></span>`;
+                }
+              } else {
+                // Handle other potential elements if needed, e.g., <b>, <i>
+                // For now, we ignore unknown tags within <p>
+              }
+            }
+          }
+
+          // Only add paragraph if it contains non-whitespace content after processing
+          if (pContent.trim()) {
+            let cleanedContent = pContent.replace(/\s+/g, " ").trim();
+            cleanedContent = cleanedContent.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
+            htmlResult += `\n    <p data-index="${dataIndex++}">\n      ${cleanedContent}\n    </p>`;
+          }
+        } else if (tagName === "h4") {
+          // Handle h4 element (e.g., chapter title)
+          htmlResult += `\n    <h4 data-index="${dataIndex++}">${childElement.textContent || ""}</h4>`;
+        } else if (tagName === "h5") {
+          // Handle h5 element (e.g., book title)
+          htmlResult += `\n    <h5 data-index="${dataIndex++}">${childElement.textContent || ""}</h5>`;
+        }
+        // Add handlers for other potential top-level tags (h1, h2, h3, h6, etc.) if needed
       }
     }
 

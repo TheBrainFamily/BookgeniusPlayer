@@ -362,6 +362,206 @@ export const pharaonCharactersData = [
           108
         ],
         "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 39,
+        "summary": "Faraon Egiptu w 33. roku panowania. Ojciec Ramzesa, następcy tronu.",
+        "paragraphsWhereSpotted": [
+          9,
+          57,
+          58,
+          60,
+          61,
+          62,
+          67,
+          68,
+          80,
+          83,
+          96,
+          101
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 40,
+        "summary": "Faraon Egiptu w 33. roku panowania. Ojciec Ramzesa, następcy tronu.",
+        "paragraphsWhereSpotted": [
+          21,
+          42,
+          49,
+          55,
+          115
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 41,
+        "summary": "Faraon Egiptu w 33. roku panowania. Ojciec Ramzesa, następcy tronu.",
+        "paragraphsWhereSpotted": [
+          2,
+          6,
+          136,
+          263
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 42,
+        "summary": "Faraon Egiptu w 33. roku panowania. Ojciec Ramzesa, następcy tronu.",
+        "paragraphsWhereSpotted": [
+          21
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 44,
+        "summary": "Faraon Egiptu w 33. roku panowania. Ojciec Ramzesa, następcy tronu.",
+        "paragraphsWhereSpotted": [
+          89
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 45,
+        "summary": "Faraon Egiptu w 33. roku panowania. Ojciec Ramzesa, następcy tronu.",
+        "paragraphsWhereSpotted": [
+          8,
+          10,
+          15,
+          21,
+          23,
+          32,
+          84,
+          97,
+          100,
+          105,
+          107,
+          108,
+          109
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 47,
+        "summary": "Faraon Egiptu w 33. roku panowania. Ojciec Ramzesa, następcy tronu.",
+        "paragraphsWhereSpotted": [
+          27,
+          76,
+          77
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 48,
+        "summary": "Faraon Egiptu w 33. roku panowania. Ojciec Ramzesa, następcy tronu.",
+        "paragraphsWhereSpotted": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          15,
+          17,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          26,
+          27,
+          28,
+          30,
+          31,
+          32,
+          33,
+          34,
+          36,
+          37,
+          38,
+          39,
+          40,
+          42,
+          43,
+          45,
+          46,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          59,
+          61,
+          62,
+          64,
+          66,
+          67,
+          69,
+          72,
+          73,
+          76,
+          81,
+          83,
+          84,
+          85,
+          88,
+          90,
+          97,
+          99,
+          102,
+          105,
+          115,
+          119,
+          120,
+          121
+        ],
+        "paragraphsWhereTalking": [
+          14,
+          16,
+          18,
+          35,
+          37,
+          47,
+          49,
+          57,
+          60,
+          68,
+          74,
+          77,
+          79,
+          84,
+          121,
+          123,
+          125
+        ]
+      },
+      {
+        "chapter": 49,
+        "summary": "Faraon Egiptu w 33. roku panowania. Ojciec Ramzesa, następcy tronu.",
+        "paragraphsWhereSpotted": [
+          6,
+          21,
+          43,
+          48,
+          59,
+          61,
+          86,
+          87,
+          88
+        ],
+        "paragraphsWhereTalking": []
       }
     ],
     "imageUrl": "UNKNOWN"
@@ -2631,6 +2831,777 @@ export const pharaonCharactersData = [
           126,
           129
         ]
+      },
+      {
+        "chapter": 39,
+        "summary": "Syn faraona Ramzesa XII i królowej Nikotris, w wieku 22 lat mianowany następcą tronu (erpatrem). Młody, ambitny, o porywczym usposobieniu i zainteresowaniach wojskowych.",
+        "paragraphsWhereSpotted": [
+          0,
+          3,
+          5,
+          8,
+          11,
+          14,
+          16,
+          19,
+          21,
+          22,
+          24,
+          26,
+          29,
+          30,
+          33,
+          38,
+          39,
+          43,
+          49,
+          53,
+          54,
+          56,
+          57,
+          59,
+          60,
+          63,
+          65,
+          67,
+          69,
+          72,
+          74,
+          76,
+          79,
+          80,
+          82,
+          86,
+          88,
+          89,
+          91,
+          93,
+          95,
+          100,
+          104,
+          108,
+          110,
+          112,
+          113,
+          114,
+          116,
+          118,
+          122,
+          126,
+          129,
+          148,
+          152,
+          155
+        ],
+        "paragraphsWhereTalking": [
+          3,
+          6,
+          9,
+          14,
+          16,
+          20,
+          22,
+          24,
+          26,
+          29,
+          40,
+          43,
+          45,
+          47,
+          49,
+          51,
+          55,
+          57,
+          59,
+          61,
+          63,
+          65,
+          67,
+          69,
+          72,
+          74,
+          76,
+          78,
+          80,
+          82,
+          84,
+          86,
+          91,
+          93,
+          96,
+          98,
+          100,
+          102,
+          104,
+          106,
+          108,
+          110,
+          116,
+          119,
+          122,
+          127,
+          130,
+          132,
+          134,
+          148,
+          152,
+          155
+        ]
+      },
+      {
+        "chapter": 40,
+        "summary": "Syn faraona Ramzesa XII i królowej Nikotris, w wieku 22 lat mianowany następcą tronu (erpatrem). Młody, ambitny, o porywczym usposobieniu i zainteresowaniach wojskowych.",
+        "paragraphsWhereSpotted": [
+          4,
+          5,
+          10,
+          11,
+          13,
+          15,
+          17,
+          20,
+          22,
+          24,
+          31,
+          32,
+          36,
+          40,
+          42,
+          48,
+          50,
+          53,
+          55,
+          58,
+          59,
+          62,
+          65,
+          69,
+          71,
+          76,
+          78,
+          84,
+          86,
+          102,
+          107,
+          113,
+          123,
+          133,
+          134,
+          135,
+          142,
+          143,
+          144,
+          145,
+          152,
+          154,
+          156,
+          157,
+          158,
+          159,
+          161
+        ],
+        "paragraphsWhereTalking": [
+          7,
+          15,
+          17,
+          20,
+          22,
+          25,
+          28,
+          30,
+          32,
+          34,
+          36,
+          38,
+          40,
+          42,
+          44,
+          46,
+          49,
+          50,
+          53,
+          55,
+          57,
+          60,
+          63,
+          69,
+          76,
+          78,
+          80,
+          82,
+          84,
+          86,
+          88
+        ]
+      },
+      {
+        "chapter": 41,
+        "summary": "Syn faraona Ramzesa XII i królowej Nikotris, w wieku 22 lat mianowany następcą tronu (erpatrem). Młody, ambitny, o porywczym usposobieniu i zainteresowaniach wojskowych.",
+        "paragraphsWhereSpotted": [
+          2,
+          5,
+          7,
+          10,
+          11,
+          12,
+          13,
+          14,
+          18,
+          19,
+          20,
+          24,
+          43,
+          44,
+          49,
+          65,
+          92,
+          96,
+          100,
+          103,
+          110,
+          119,
+          120,
+          128,
+          129,
+          132,
+          133,
+          135,
+          137,
+          169,
+          170,
+          187,
+          189,
+          190,
+          194,
+          198,
+          199,
+          201,
+          205,
+          206,
+          219,
+          221,
+          230,
+          240,
+          248,
+          251,
+          254,
+          259,
+          263,
+          271,
+          273,
+          282,
+          283
+        ],
+        "paragraphsWhereTalking": [
+          8,
+          16,
+          18,
+          21,
+          97,
+          100
+        ]
+      },
+      {
+        "chapter": 42,
+        "summary": "Syn faraona Ramzesa XII i królowej Nikotris, w wieku 22 lat mianowany następcą tronu (erpatrem). Młody, ambitny, o porywczym usposobieniu i zainteresowaniach wojskowych.",
+        "paragraphsWhereSpotted": [
+          29,
+          30,
+          45,
+          48
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 43,
+        "summary": "Syn faraona Ramzesa XII i królowej Nikotris, w wieku 22 lat mianowany następcą tronu (erpatrem). Młody, ambitny, o porywczym usposobieniu i zainteresowaniach wojskowych.",
+        "paragraphsWhereSpotted": [
+          1,
+          2,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          12,
+          14,
+          16,
+          25,
+          26,
+          28,
+          30,
+          34,
+          36,
+          40,
+          45,
+          48,
+          50,
+          51,
+          55,
+          59,
+          60,
+          62,
+          63,
+          64,
+          67,
+          69,
+          71,
+          72,
+          73,
+          74,
+          80,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          91,
+          94,
+          96,
+          97,
+          100,
+          102,
+          108,
+          114,
+          116,
+          123,
+          126,
+          128,
+          130,
+          132,
+          134,
+          136,
+          138,
+          140,
+          144,
+          147,
+          149,
+          152,
+          154,
+          158,
+          159,
+          163
+        ],
+        "paragraphsWhereTalking": [
+          16,
+          30,
+          35,
+          37,
+          48,
+          52,
+          67,
+          69,
+          71,
+          74,
+          80,
+          92,
+          94,
+          98,
+          124,
+          126,
+          128,
+          130,
+          136,
+          147,
+          150,
+          154,
+          156,
+          158,
+          159,
+          161,
+          164
+        ]
+      },
+      {
+        "chapter": 44,
+        "summary": "Syn faraona Ramzesa XII i królowej Nikotris, w wieku 22 lat mianowany następcą tronu (erpatrem). Młody, ambitny, o porywczym usposobieniu i zainteresowaniach wojskowych.",
+        "paragraphsWhereSpotted": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          11,
+          12,
+          13,
+          14,
+          18,
+          20,
+          24,
+          25,
+          28,
+          32,
+          35,
+          38,
+          41,
+          45,
+          47,
+          50,
+          51,
+          55,
+          59,
+          61,
+          62,
+          71,
+          80,
+          82,
+          84,
+          87,
+          93,
+          94,
+          96,
+          99,
+          102,
+          103,
+          106,
+          108,
+          111,
+          114,
+          119,
+          121,
+          126,
+          130,
+          133,
+          135,
+          140,
+          145,
+          150,
+          152,
+          155,
+          157,
+          162,
+          166,
+          169,
+          172,
+          175,
+          182,
+          187,
+          189,
+          191,
+          193,
+          194,
+          195,
+          196,
+          198,
+          199
+        ],
+        "paragraphsWhereTalking": [
+          2,
+          6,
+          9,
+          11,
+          15,
+          20,
+          28,
+          30,
+          35,
+          37,
+          41,
+          43,
+          45,
+          48,
+          51,
+          53,
+          57,
+          59,
+          62,
+          63,
+          65,
+          72,
+          74,
+          94,
+          97,
+          100,
+          102,
+          108,
+          111,
+          114,
+          117,
+          119,
+          122,
+          124,
+          136,
+          138,
+          141,
+          143,
+          145,
+          150,
+          152,
+          155,
+          158,
+          160,
+          162,
+          167,
+          173,
+          175,
+          182,
+          184,
+          187,
+          189,
+          191,
+          193,
+          196
+        ]
+      },
+      {
+        "chapter": 45,
+        "summary": "Syn faraona Ramzesa XII i królowej Nikotris, w wieku 22 lat mianowany następcą tronu (erpatrem). Młody, ambitny, o porywczym usposobieniu i zainteresowaniach wojskowych.",
+        "paragraphsWhereSpotted": [
+          0,
+          1,
+          2,
+          4,
+          6,
+          8,
+          9,
+          10,
+          11,
+          19,
+          20,
+          26,
+          31,
+          36,
+          40,
+          47,
+          48,
+          52,
+          56,
+          58,
+          62,
+          67,
+          69,
+          71,
+          72,
+          74,
+          75,
+          76,
+          77,
+          78,
+          83,
+          84,
+          89,
+          95,
+          98,
+          100,
+          102,
+          103,
+          104,
+          106,
+          108,
+          110,
+          113,
+          115
+        ],
+        "paragraphsWhereTalking": [
+          2,
+          7,
+          20,
+          22,
+          24,
+          27,
+          29,
+          34,
+          36,
+          38,
+          40,
+          52,
+          54,
+          56,
+          58,
+          60,
+          62,
+          64,
+          67,
+          73,
+          81,
+          84,
+          86,
+          92,
+          100,
+          111
+        ]
+      },
+      {
+        "chapter": 46,
+        "summary": "Syn faraona Ramzesa XII i królowej Nikotris, w wieku 22 lat mianowany następcą tronu (erpatrem). Młody, ambitny, o porywczym usposobieniu i zainteresowaniach wojskowych.",
+        "paragraphsWhereSpotted": [
+          1,
+          2,
+          3,
+          5,
+          9,
+          12,
+          13,
+          15,
+          18,
+          19,
+          21,
+          24,
+          30,
+          33,
+          41,
+          42,
+          44,
+          46,
+          48,
+          50,
+          52,
+          55,
+          57,
+          67,
+          68,
+          70,
+          73,
+          77,
+          79,
+          82,
+          83,
+          85,
+          90,
+          94
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 47,
+        "summary": "Syn faraona Ramzesa XII i królowej Nikotris, w wieku 22 lat mianowany następcą tronu (erpatrem). Młody, ambitny, o porywczym usposobieniu i zainteresowaniach wojskowych.",
+        "paragraphsWhereSpotted": [
+          0,
+          4,
+          5,
+          8,
+          11,
+          14,
+          19,
+          22,
+          24,
+          27,
+          29,
+          30,
+          35,
+          40,
+          42,
+          46,
+          48,
+          53,
+          57,
+          60,
+          61,
+          62,
+          63,
+          65,
+          67,
+          69,
+          72,
+          73,
+          78,
+          82
+        ],
+        "paragraphsWhereTalking": [
+          6,
+          9,
+          11,
+          15,
+          20,
+          22,
+          25,
+          27,
+          29,
+          35,
+          41,
+          46,
+          48,
+          53,
+          57,
+          61,
+          63,
+          65,
+          70,
+          72,
+          75,
+          77,
+          78,
+          80,
+          82
+        ]
+      },
+      {
+        "chapter": 48,
+        "summary": "Syn faraona Ramzesa XII i królowej Nikotris, w wieku 22 lat mianowany następcą tronu (erpatrem). Młody, ambitny, o porywczym usposobieniu i zainteresowaniach wojskowych.",
+        "paragraphsWhereSpotted": [
+          0,
+          37,
+          38,
+          99
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 49,
+        "summary": "Syn faraona Ramzesa XII i królowej Nikotris, w wieku 22 lat mianowany następcą tronu (erpatrem). Młody, ambitny, o porywczym usposobieniu i zainteresowaniach wojskowych.",
+        "paragraphsWhereSpotted": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          9,
+          11,
+          12,
+          14,
+          18,
+          19,
+          24,
+          25,
+          26,
+          27,
+          30,
+          32,
+          36,
+          40,
+          42,
+          48,
+          55,
+          59,
+          64,
+          70,
+          72,
+          75,
+          76,
+          79,
+          91,
+          92,
+          104,
+          105,
+          106,
+          109,
+          111
+        ],
+        "paragraphsWhereTalking": [
+          6,
+          11,
+          14,
+          24,
+          26,
+          32,
+          34,
+          36,
+          40,
+          43,
+          55,
+          59,
+          64,
+          70,
+          72,
+          74,
+          92,
+          94,
+          96,
+          106,
+          111
+        ]
       }
     ],
     "imageUrl": "UNKNOWN"
@@ -2836,6 +3807,26 @@ export const pharaonCharactersData = [
           92,
           94
         ]
+      },
+      {
+        "chapter": 39,
+        "summary": "Królowa, druga żona faraona Ramzesa XII, matka następcy tronu Ramzesa. Córka arcykapłana Amenhotepa.",
+        "paragraphsWhereSpotted": [
+          80,
+          92,
+          99
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 48,
+        "summary": "Królowa, druga żona faraona Ramzesa XII, matka następcy tronu Ramzesa. Córka arcykapłana Amenhotepa.",
+        "paragraphsWhereSpotted": [
+          23,
+          30,
+          32
+        ],
+        "paragraphsWhereTalking": []
       }
     ],
     "imageUrl": "UNKNOWN"
@@ -3350,6 +4341,93 @@ export const pharaonCharactersData = [
           107
         ],
         "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 39,
+        "summary": "Minister wojny i arcykapłan świątyni Amona w Tebach. Wpływowa osobistość w państwie, mężczyzna w średnim wieku, opanowany i zamknięty w sobie.",
+        "paragraphsWhereSpotted": [
+          75,
+          92,
+          99
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 40,
+        "summary": "Minister wojny i arcykapłan świątyni Amona w Tebach. Wpływowa osobistość w państwie, mężczyzna w średnim wieku, opanowany i zamknięty w sobie.",
+        "paragraphsWhereSpotted": [
+          49,
+          119
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 41,
+        "summary": "Minister wojny i arcykapłan świątyni Amona w Tebach. Wpływowa osobistość w państwie, mężczyzna w średnim wieku, opanowany i zamknięty w sobie.",
+        "paragraphsWhereSpotted": [
+          4
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 42,
+        "summary": "Minister wojny i arcykapłan świątyni Amona w Tebach. Wpływowa osobistość w państwie, mężczyzna w średnim wieku, opanowany i zamknięty w sobie.",
+        "paragraphsWhereSpotted": [
+          23,
+          24,
+          25,
+          29,
+          31
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 43,
+        "summary": "Minister wojny i arcykapłan świątyni Amona w Tebach. Wpływowa osobistość w państwie, mężczyzna w średnim wieku, opanowany i zamknięty w sobie.",
+        "paragraphsWhereSpotted": [
+          1,
+          2,
+          3,
+          8,
+          10,
+          17
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 44,
+        "summary": "Minister wojny i arcykapłan świątyni Amona w Tebach. Wpływowa osobistość w państwie, mężczyzna w średnim wieku, opanowany i zamknięty w sobie.",
+        "paragraphsWhereSpotted": [
+          189
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 45,
+        "summary": "Minister wojny i arcykapłan świątyni Amona w Tebach. Wpływowa osobistość w państwie, mężczyzna w średnim wieku, opanowany i zamknięty w sobie.",
+        "paragraphsWhereSpotted": [
+          28
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 48,
+        "summary": "Minister wojny i arcykapłan świątyni Amona w Tebach. Wpływowa osobistość w państwie, mężczyzna w średnim wieku, opanowany i zamknięty w sobie.",
+        "paragraphsWhereSpotted": [
+          8,
+          30,
+          32,
+          36,
+          38,
+          46,
+          51,
+          52,
+          53
+        ],
+        "paragraphsWhereTalking": [
+          36,
+          52
+        ]
       }
     ],
     "imageUrl": "UNKNOWN"
@@ -3734,6 +4812,238 @@ export const pharaonCharactersData = [
           8
         ],
         "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 40,
+        "summary": "Kapłan i pisarz ministra Herhora. Pochodzi z ludu, znany z wyjątkowych zdolności i pamięci, ma wygląd ascety.",
+        "paragraphsWhereSpotted": [
+          49,
+          119
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 43,
+        "summary": "Kapłan i pisarz ministra Herhora. Pochodzi z ludu, znany z wyjątkowych zdolności i pamięci, ma wygląd ascety.",
+        "paragraphsWhereSpotted": [
+          8,
+          10,
+          26,
+          28,
+          31,
+          36,
+          38,
+          46,
+          49,
+          50,
+          53,
+          73,
+          105,
+          112,
+          129,
+          152,
+          158,
+          160
+        ],
+        "paragraphsWhereTalking": [
+          29,
+          31,
+          33,
+          38,
+          47,
+          50,
+          106,
+          112,
+          129,
+          153,
+          155,
+          160,
+          162,
+          165
+        ]
+      },
+      {
+        "chapter": 44,
+        "summary": "Kapłan i pisarz ministra Herhora. Pochodzi z ludu, znany z wyjątkowych zdolności i pamięci, ma wygląd ascety.",
+        "paragraphsWhereSpotted": [
+          3,
+          7,
+          8,
+          9,
+          17,
+          19,
+          21,
+          34,
+          40,
+          41,
+          42,
+          44,
+          49,
+          52,
+          55,
+          60,
+          61,
+          64,
+          66,
+          67,
+          71,
+          73,
+          75,
+          80,
+          83,
+          96,
+          106,
+          109,
+          112,
+          113,
+          114,
+          115,
+          120,
+          122,
+          123,
+          126,
+          128,
+          132,
+          133,
+          134,
+          135,
+          136,
+          139,
+          141,
+          146,
+          153,
+          156,
+          159,
+          161,
+          164,
+          173,
+          174,
+          176,
+          183,
+          185,
+          188,
+          190
+        ],
+        "paragraphsWhereTalking": [
+          3,
+          7,
+          19,
+          44,
+          46,
+          49,
+          52,
+          54,
+          56,
+          58,
+          60,
+          64,
+          66,
+          73,
+          76,
+          81,
+          83,
+          85,
+          107,
+          109,
+          116,
+          118,
+          123,
+          125,
+          129,
+          131,
+          137,
+          139,
+          142,
+          144,
+          147,
+          151,
+          154,
+          156,
+          159,
+          165,
+          174,
+          176,
+          183,
+          185,
+          188,
+          190
+        ]
+      },
+      {
+        "chapter": 45,
+        "summary": "Kapłan i pisarz ministra Herhora. Pochodzi z ludu, znany z wyjątkowych zdolności i pamięci, ma wygląd ascety.",
+        "paragraphsWhereSpotted": [
+          5,
+          11,
+          32,
+          46,
+          91,
+          93,
+          95
+        ],
+        "paragraphsWhereTalking": [
+          5,
+          12,
+          94
+        ]
+      },
+      {
+        "chapter": 46,
+        "summary": "Kapłan i pisarz ministra Herhora. Pochodzi z ludu, znany z wyjątkowych zdolności i pamięci, ma wygląd ascety.",
+        "paragraphsWhereSpotted": [
+          3,
+          16,
+          33,
+          35,
+          42,
+          46,
+          54,
+          59
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 49,
+        "summary": "Kapłan i pisarz ministra Herhora. Pochodzi z ludu, znany z wyjątkowych zdolności i pamięci, ma wygląd ascety.",
+        "paragraphsWhereSpotted": [
+          8,
+          12,
+          26,
+          30,
+          33,
+          35,
+          52,
+          54,
+          56,
+          58,
+          60,
+          69,
+          73,
+          75,
+          81,
+          88,
+          90,
+          94,
+          95,
+          99,
+          104,
+          105,
+          107
+        ],
+        "paragraphsWhereTalking": [
+          33,
+          35,
+          37,
+          41,
+          54,
+          58,
+          69,
+          73,
+          91,
+          93,
+          100,
+          107
+        ]
       }
     ],
     "imageUrl": "UNKNOWN"
@@ -3921,6 +5231,75 @@ export const pharaonCharactersData = [
         "summary": "Generał dowodzący greckimi pułkami najemnymi w służbie Egiptu.",
         "paragraphsWhereSpotted": [
           23
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 43,
+        "summary": "Generał dowodzący greckimi pułkami najemnymi w służbie Egiptu.",
+        "paragraphsWhereSpotted": [
+          8,
+          17,
+          26,
+          29,
+          38,
+          47,
+          48,
+          66,
+          73,
+          106,
+          119,
+          142,
+          148,
+          151,
+          156,
+          158
+        ],
+        "paragraphsWhereTalking": [
+          143,
+          145,
+          148,
+          151
+        ]
+      },
+      {
+        "chapter": 45,
+        "summary": "Generał dowodzący greckimi pułkami najemnymi w służbie Egiptu.",
+        "paragraphsWhereSpotted": [
+          9,
+          13,
+          16,
+          30,
+          61,
+          67,
+          69,
+          96,
+          111
+        ],
+        "paragraphsWhereTalking": [
+          10,
+          14,
+          17,
+          19
+        ]
+      },
+      {
+        "chapter": 46,
+        "summary": "Generał dowodzący greckimi pułkami najemnymi w służbie Egiptu.",
+        "paragraphsWhereSpotted": [
+          84,
+          86,
+          89
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 47,
+        "summary": "Generał dowodzący greckimi pułkami najemnymi w służbie Egiptu.",
+        "paragraphsWhereSpotted": [
+          1,
+          2,
+          82
         ],
         "paragraphsWhereTalking": []
       }
@@ -4416,6 +5795,178 @@ export const pharaonCharactersData = [
         ],
         "paragraphsWhereTalking": [
           20
+        ]
+      },
+      {
+        "chapter": 39,
+        "summary": "Krewny i adiutant następcy tronu Ramzesa. Znany jako pierwszy elegant w Memfis, lubiący luksus i rozrywki.",
+        "paragraphsWhereSpotted": [
+          56,
+          58,
+          60,
+          62,
+          68,
+          70,
+          77,
+          81,
+          87,
+          89,
+          97,
+          103,
+          107,
+          111
+        ],
+        "paragraphsWhereTalking": [
+          58,
+          60,
+          62,
+          64,
+          66,
+          68,
+          71,
+          73,
+          75,
+          77,
+          83,
+          85,
+          90,
+          92,
+          94,
+          97,
+          99,
+          101,
+          103,
+          105,
+          107,
+          109
+        ]
+      },
+      {
+        "chapter": 40,
+        "summary": "Krewny i adiutant następcy tronu Ramzesa. Znany jako pierwszy elegant w Memfis, lubiący luksus i rozrywki.",
+        "paragraphsWhereSpotted": [
+          7,
+          8,
+          62,
+          75,
+          77,
+          79,
+          81,
+          85,
+          87
+        ],
+        "paragraphsWhereTalking": [
+          8,
+          79,
+          81,
+          83,
+          85,
+          87
+        ]
+      },
+      {
+        "chapter": 41,
+        "summary": "Krewny i adiutant następcy tronu Ramzesa. Znany jako pierwszy elegant w Memfis, lubiący luksus i rozrywki.",
+        "paragraphsWhereSpotted": [
+          15,
+          17,
+          96,
+          98
+        ],
+        "paragraphsWhereTalking": [
+          17,
+          99,
+          101
+        ]
+      },
+      {
+        "chapter": 43,
+        "summary": "Krewny i adiutant następcy tronu Ramzesa. Znany jako pierwszy elegant w Memfis, lubiący luksus i rozrywki.",
+        "paragraphsWhereSpotted": [
+          49,
+          53,
+          156,
+          158
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 45,
+        "summary": "Krewny i adiutant następcy tronu Ramzesa. Znany jako pierwszy elegant w Memfis, lubiący luksus i rozrywki.",
+        "paragraphsWhereSpotted": [
+          26,
+          30,
+          33,
+          39,
+          40,
+          51,
+          61,
+          65,
+          68
+        ],
+        "paragraphsWhereTalking": [
+          28,
+          30,
+          33,
+          35,
+          37,
+          39,
+          53,
+          55,
+          57,
+          59,
+          61,
+          63,
+          66
+        ]
+      },
+      {
+        "chapter": 46,
+        "summary": "Krewny i adiutant następcy tronu Ramzesa. Znany jako pierwszy elegant w Memfis, lubiący luksus i rozrywki.",
+        "paragraphsWhereSpotted": [
+          82
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 47,
+        "summary": "Krewny i adiutant następcy tronu Ramzesa. Znany jako pierwszy elegant w Memfis, lubiący luksus i rozrywki.",
+        "paragraphsWhereSpotted": [
+          62,
+          64,
+          67,
+          68,
+          74,
+          78
+        ],
+        "paragraphsWhereTalking": [
+          64,
+          68,
+          71,
+          74,
+          76,
+          79,
+          81
+        ]
+      },
+      {
+        "chapter": 49,
+        "summary": "Krewny i adiutant następcy tronu Ramzesa. Znany jako pierwszy elegant w Memfis, lubiący luksus i rozrywki.",
+        "paragraphsWhereSpotted": [
+          8,
+          10,
+          12,
+          30,
+          101,
+          105,
+          108
+        ],
+        "paragraphsWhereTalking": [
+          10,
+          12,
+          102,
+          105,
+          109
         ]
       }
     ],
@@ -5092,6 +6643,123 @@ export const pharaonCharactersData = [
           87,
           93
         ]
+      },
+      {
+        "chapter": 39,
+        "summary": "Młoda, piękna Żydówka o greckich rysach, córka Gedeona. Mieszka z ojcem w izolowanej, żyznej dolinie na pustyni.",
+        "paragraphsWhereSpotted": [
+          1,
+          2,
+          7,
+          15,
+          90,
+          91,
+          97,
+          111,
+          112,
+          113,
+          117,
+          119,
+          121
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 41,
+        "summary": "Młoda, piękna Żydówka o greckich rysach, córka Gedeona. Mieszka z ojcem w izolowanej, żyznej dolinie na pustyni.",
+        "paragraphsWhereSpotted": [
+          24,
+          43,
+          112,
+          119,
+          123,
+          132,
+          136,
+          138,
+          139,
+          141,
+          146,
+          148,
+          150,
+          152,
+          154,
+          155,
+          157,
+          159,
+          171,
+          172,
+          174,
+          178,
+          182,
+          187,
+          188,
+          191,
+          194,
+          200,
+          205,
+          216,
+          219,
+          228,
+          240,
+          274,
+          275,
+          277,
+          280,
+          282
+        ],
+        "paragraphsWhereTalking": [
+          142,
+          144,
+          150,
+          152,
+          154,
+          157,
+          175,
+          177,
+          276,
+          279,
+          281,
+          283
+        ]
+      },
+      {
+        "chapter": 43,
+        "summary": "Młoda, piękna Żydówka o greckich rysach, córka Gedeona. Mieszka z ojcem w izolowanej, żyznej dolinie na pustyni.",
+        "paragraphsWhereSpotted": [
+          5,
+          6
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 44,
+        "summary": "Młoda, piękna Żydówka o greckich rysach, córka Gedeona. Mieszka z ojcem w izolowanej, żyznej dolinie na pustyni.",
+        "paragraphsWhereSpotted": [
+          65
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 46,
+        "summary": "Młoda, piękna Żydówka o greckich rysach, córka Gedeona. Mieszka z ojcem w izolowanej, żyznej dolinie na pustyni.",
+        "paragraphsWhereSpotted": [
+          61,
+          71,
+          76
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 47,
+        "summary": "Młoda, piękna Żydówka o greckich rysach, córka Gedeona. Mieszka z ojcem w izolowanej, żyznej dolinie na pustyni.",
+        "paragraphsWhereSpotted": [
+          6,
+          21,
+          25,
+          64,
+          72
+        ],
+        "paragraphsWhereTalking": []
       }
     ],
     "imageUrl": "UNKNOWN"
@@ -5616,6 +7284,14 @@ export const pharaonCharactersData = [
           94
         ],
         "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 44,
+        "summary": "Zamożny fenicki bankier z Memfis. Znany w mieście jako najznakomitszy w swoim fachu.",
+        "paragraphsWhereSpotted": [
+          66
+        ],
+        "paragraphsWhereTalking": []
       }
     ],
     "imageUrl": "UNKNOWN"
@@ -6061,6 +7737,167 @@ export const pharaonCharactersData = [
           61,
           63
         ]
+      },
+      {
+        "chapter": 39,
+        "summary": "Piękna fenicka tancerka i kapłanka bogini Astoreth. Przysłana przez Dagona do Ramzesa jako forma przeprosin.",
+        "paragraphsWhereSpotted": [
+          0,
+          1,
+          8,
+          9,
+          10,
+          11,
+          15,
+          17,
+          19,
+          23,
+          26,
+          27,
+          38,
+          41,
+          43,
+          53,
+          55,
+          89,
+          111,
+          113,
+          115,
+          117,
+          118,
+          120,
+          130,
+          147,
+          148,
+          151,
+          153,
+          154
+        ],
+        "paragraphsWhereTalking": [
+          2,
+          4,
+          7,
+          10,
+          13,
+          15,
+          18,
+          42,
+          44,
+          46,
+          48,
+          50,
+          52,
+          115,
+          117,
+          121,
+          124,
+          128,
+          131,
+          133,
+          147,
+          151,
+          154
+        ]
+      },
+      {
+        "chapter": 40,
+        "summary": "Piękna fenicka tancerka i kapłanka bogini Astoreth. Przysłana przez Dagona do Ramzesa jako forma przeprosin.",
+        "paragraphsWhereSpotted": [
+          121,
+          135
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 41,
+        "summary": "Piękna fenicka tancerka i kapłanka bogini Astoreth. Przysłana przez Dagona do Ramzesa jako forma przeprosin.",
+        "paragraphsWhereSpotted": [
+          23,
+          32,
+          34,
+          39,
+          45,
+          51,
+          59,
+          63,
+          73,
+          75,
+          84,
+          166,
+          167,
+          182,
+          187,
+          188,
+          192,
+          209,
+          210,
+          211,
+          213,
+          225,
+          228,
+          241,
+          255,
+          280,
+          281
+        ],
+        "paragraphsWhereTalking": [
+          25,
+          28,
+          30,
+          32,
+          35,
+          40,
+          41,
+          43,
+          46,
+          49,
+          51,
+          53,
+          55,
+          57,
+          60,
+          65,
+          69,
+          71,
+          78,
+          81,
+          83,
+          86,
+          89,
+          91,
+          212,
+          215,
+          217,
+          219,
+          221,
+          223,
+          225
+        ]
+      },
+      {
+        "chapter": 43,
+        "summary": "Piękna fenicka tancerka i kapłanka bogini Astoreth. Przysłana przez Dagona do Ramzesa jako forma przeprosin.",
+        "paragraphsWhereSpotted": [
+          5
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 46,
+        "summary": "Piękna fenicka tancerka i kapłanka bogini Astoreth. Przysłana przez Dagona do Ramzesa jako forma przeprosin.",
+        "paragraphsWhereSpotted": [
+          43
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 47,
+        "summary": "Piękna fenicka tancerka i kapłanka bogini Astoreth. Przysłana przez Dagona do Ramzesa jako forma przeprosin.",
+        "paragraphsWhereSpotted": [
+          58,
+          59
+        ],
+        "paragraphsWhereTalking": []
       }
     ],
     "imageUrl": "UNKNOWN"
@@ -6281,6 +8118,219 @@ export const pharaonCharactersData = [
           28,
           30,
           32
+        ]
+      },
+      {
+        "chapter": 39,
+        "summary": "Święty ojciec, kapłan towarzyszący Ramzesowi w podróży po Dolnym Egipcie jako doradca duchowy.",
+        "paragraphsWhereSpotted": [
+          76
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 40,
+        "summary": "Święty ojciec, kapłan towarzyszący Ramzesowi w podróży po Dolnym Egipcie jako doradca duchowy.",
+        "paragraphsWhereSpotted": [
+          4,
+          12,
+          14,
+          16,
+          18,
+          21,
+          26,
+          29,
+          31,
+          39,
+          41,
+          45,
+          47,
+          54,
+          61,
+          64,
+          66,
+          70,
+          89,
+          91,
+          93,
+          101,
+          106,
+          110,
+          122,
+          130,
+          136,
+          148,
+          160
+        ],
+        "paragraphsWhereTalking": [
+          16,
+          19,
+          21,
+          27,
+          29,
+          33,
+          39,
+          41,
+          43,
+          45,
+          47,
+          54,
+          61,
+          68,
+          70,
+          91,
+          93,
+          95,
+          97,
+          101,
+          106,
+          110,
+          113,
+          115,
+          117,
+          119,
+          148,
+          160
+        ]
+      },
+      {
+        "chapter": 41,
+        "summary": "Święty ojciec, kapłan towarzyszący Ramzesowi w podróży po Dolnym Egipcie jako doradca duchowy.",
+        "paragraphsWhereSpotted": [
+          4,
+          119
+        ],
+        "paragraphsWhereTalking": [
+          5
+        ]
+      },
+      {
+        "chapter": 43,
+        "summary": "Święty ojciec, kapłan towarzyszący Ramzesowi w podróży po Dolnym Egipcie jako doradca duchowy.",
+        "paragraphsWhereSpotted": [
+          0,
+          1,
+          3,
+          5,
+          6,
+          10,
+          17,
+          26,
+          32,
+          33,
+          35,
+          85,
+          96,
+          110,
+          117,
+          156
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 45,
+        "summary": "Święty ojciec, kapłan towarzyszący Ramzesowi w podróży po Dolnym Egipcie jako doradca duchowy.",
+        "paragraphsWhereSpotted": [
+          1,
+          8,
+          10,
+          15,
+          18,
+          21,
+          23,
+          27,
+          30,
+          39,
+          95,
+          98,
+          102,
+          104,
+          108,
+          110,
+          114
+        ],
+        "paragraphsWhereTalking": [
+          3,
+          15,
+          18,
+          21,
+          23,
+          25,
+          99,
+          101,
+          103,
+          112
+        ]
+      },
+      {
+        "chapter": 46,
+        "summary": "Święty ojciec, kapłan towarzyszący Ramzesowi w podróży po Dolnym Egipcie jako doradca duchowy.",
+        "paragraphsWhereSpotted": [
+          33,
+          38,
+          80,
+          94
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 47,
+        "summary": "Święty ojciec, kapłan towarzyszący Ramzesowi w podróży po Dolnym Egipcie jako doradca duchowy.",
+        "paragraphsWhereSpotted": [
+          0,
+          1,
+          2,
+          4,
+          6,
+          7,
+          10,
+          13,
+          15,
+          16,
+          23,
+          25,
+          28,
+          31,
+          44,
+          47,
+          49,
+          54,
+          57,
+          60,
+          62,
+          73
+        ],
+        "paragraphsWhereTalking": [
+          2,
+          7,
+          10,
+          13,
+          16,
+          21,
+          23,
+          26,
+          28,
+          30,
+          36,
+          44,
+          47,
+          49,
+          54,
+          60
+        ]
+      },
+      {
+        "chapter": 49,
+        "summary": "Święty ojciec, kapłan towarzyszący Ramzesowi w podróży po Dolnym Egipcie jako doradca duchowy.",
+        "paragraphsWhereSpotted": [
+          4,
+          7,
+          8,
+          9,
+          26
+        ],
+        "paragraphsWhereTalking": [
+          5
         ]
       }
     ],
@@ -6970,6 +9020,43 @@ export const pharaonCharactersData = [
           37
         ],
         "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 39,
+        "summary": "Książę tyryjski, członek najwyższej rady i wpływowy kupiec fenicki.",
+        "paragraphsWhereSpotted": [
+          21,
+          24,
+          27,
+          30,
+          33,
+          36
+        ],
+        "paragraphsWhereTalking": [
+          25,
+          27,
+          31,
+          33,
+          36
+        ]
+      },
+      {
+        "chapter": 41,
+        "summary": "Książę tyryjski, członek najwyższej rady i wpływowy kupiec fenicki.",
+        "paragraphsWhereSpotted": [
+          187,
+          188,
+          231
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 47,
+        "summary": "Książę tyryjski, członek najwyższej rady i wpływowy kupiec fenicki.",
+        "paragraphsWhereSpotted": [
+          68
+        ],
+        "paragraphsWhereTalking": []
       }
     ],
     "imageUrl": "UNKNOWN"
@@ -7181,6 +9268,15 @@ export const pharaonCharactersData = [
           5,
           19,
           33
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 42,
+        "summary": "Poseł asyryjski, którego przybycie do Egiptu w celu zawarcia traktatu jest zapowiadane.",
+        "paragraphsWhereSpotted": [
+          23,
+          27
         ],
         "paragraphsWhereTalking": []
       }
@@ -7428,6 +9524,76 @@ export const pharaonCharactersData = [
           42
         ],
         "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 40,
+        "summary": "Tajemniczy podróżny z Harranu, podający się za Chetytę. Zatrzymuje się w zajeździe Asarhadona. Wygląda na mędrca lub kapłana.",
+        "paragraphsWhereSpotted": [
+          49,
+          93,
+          96,
+          119,
+          137,
+          139,
+          140,
+          143
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 42,
+        "summary": "Tajemniczy podróżny z Harranu, podający się za Chetytę. Zatrzymuje się w zajeździe Asarhadona. Wygląda na mędrca lub kapłana.",
+        "paragraphsWhereSpotted": [
+          23
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 44,
+        "summary": "Tajemniczy podróżny z Harranu, podający się za Chetytę. Zatrzymuje się w zajeździe Asarhadona. Wygląda na mędrca lub kapłana.",
+        "paragraphsWhereSpotted": [
+          81,
+          83,
+          85
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 48,
+        "summary": "Tajemniczy podróżny z Harranu, podający się za Chetytę. Zatrzymuje się w zajeździe Asarhadona. Wygląda na mędrca lub kapłana.",
+        "paragraphsWhereSpotted": [
+          51,
+          53,
+          54,
+          59,
+          61,
+          63,
+          64,
+          73,
+          75,
+          80,
+          119,
+          120,
+          124,
+          125,
+          126
+        ],
+        "paragraphsWhereTalking": [
+          55,
+          59,
+          65,
+          67,
+          69,
+          71,
+          73,
+          75,
+          78,
+          81,
+          82,
+          120,
+          122,
+          124
+        ]
       }
     ],
     "imageUrl": "UNKNOWN"
@@ -7639,6 +9805,181 @@ export const pharaonCharactersData = [
           106
         ],
         "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 39,
+        "summary": "Arcykapłan świątyni Ptah w Memfis. Spotyka się potajemnie z Beroesem.",
+        "paragraphsWhereSpotted": [
+          76,
+          100,
+          101,
+          107,
+          109
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 40,
+        "summary": "Arcykapłan świątyni Ptah w Memfis. Spotyka się potajemnie z Beroesem.",
+        "paragraphsWhereSpotted": [
+          4,
+          12,
+          14,
+          24,
+          35,
+          49,
+          51,
+          56,
+          58,
+          62,
+          63,
+          64,
+          66,
+          71,
+          89,
+          94,
+          96,
+          103,
+          106,
+          108,
+          111,
+          119,
+          122,
+          130,
+          136,
+          140,
+          142,
+          144,
+          151,
+          153,
+          156,
+          158,
+          161
+        ],
+        "paragraphsWhereTalking": [
+          24,
+          35,
+          52,
+          56,
+          58,
+          67,
+          90,
+          92,
+          94,
+          96,
+          103,
+          108,
+          111,
+          123,
+          140,
+          142,
+          144,
+          151,
+          153,
+          156,
+          158
+        ]
+      },
+      {
+        "chapter": 41,
+        "summary": "Arcykapłan świątyni Ptah w Memfis. Spotyka się potajemnie z Beroesem.",
+        "paragraphsWhereSpotted": [
+          5,
+          6,
+          119,
+          120,
+          121,
+          129,
+          131,
+          135,
+          136,
+          139,
+          141,
+          146,
+          148,
+          150,
+          151,
+          153,
+          155,
+          161,
+          163,
+          169,
+          170,
+          172,
+          173,
+          176,
+          180,
+          182,
+          188,
+          190,
+          191,
+          194,
+          196,
+          197,
+          205,
+          213,
+          226,
+          228,
+          232,
+          244,
+          251,
+          257,
+          260,
+          261,
+          269,
+          271,
+          273
+        ],
+        "paragraphsWhereTalking": [
+          6,
+          121,
+          129,
+          131,
+          140,
+          146,
+          148,
+          151,
+          153,
+          156,
+          163,
+          165,
+          169,
+          173,
+          176,
+          180,
+          182,
+          184,
+          192,
+          194,
+          196,
+          228,
+          230,
+          232,
+          251,
+          258,
+          261,
+          271,
+          273
+        ]
+      },
+      {
+        "chapter": 43,
+        "summary": "Arcykapłan świątyni Ptah w Memfis. Spotyka się potajemnie z Beroesem.",
+        "paragraphsWhereSpotted": [
+          5
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 47,
+        "summary": "Arcykapłan świątyni Ptah w Memfis. Spotyka się potajemnie z Beroesem.",
+        "paragraphsWhereSpotted": [
+          71,
+          72,
+          73,
+          77
+        ],
+        "paragraphsWhereTalking": []
       }
     ],
     "imageUrl": "UNKNOWN"
@@ -7696,6 +10037,22 @@ export const pharaonCharactersData = [
         "paragraphsWhereTalking": [
           23
         ]
+      }
+    ],
+    "imageUrl": "UNKNOWN"
+  },
+  {
+    "characterName": "Kalipos",
+    "bookSlug": "Pharaon",
+    "infoPerChapter": [
+      {
+        "chapter": 46,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          83,
+          87
+        ],
+        "paragraphsWhereTalking": []
       }
     ],
     "imageUrl": "UNKNOWN"
@@ -7785,6 +10142,107 @@ export const pharaonCharactersData = [
           50
         ],
         "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 39,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          16,
+          18,
+          20,
+          21,
+          23,
+          27,
+          28,
+          33,
+          34
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 41,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          46,
+          47,
+          54,
+          63,
+          67,
+          72,
+          74,
+          76,
+          79,
+          84,
+          87,
+          90,
+          94,
+          188,
+          217,
+          218,
+          221,
+          222,
+          232,
+          246,
+          248,
+          249,
+          250,
+          252,
+          257,
+          269,
+          273,
+          280,
+          281,
+          282
+        ],
+        "paragraphsWhereTalking": [
+          47,
+          48,
+          50,
+          52,
+          54,
+          56,
+          58,
+          61,
+          62,
+          64,
+          68,
+          70,
+          72,
+          77,
+          80,
+          82,
+          85,
+          88,
+          94,
+          253,
+          255
+        ]
+      },
+      {
+        "chapter": 46,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          43,
+          44,
+          53,
+          58,
+          72,
+          76
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 47,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          57,
+          63,
+          65,
+          68,
+          73,
+          77
+        ],
+        "paragraphsWhereTalking": []
       }
     ],
     "imageUrl": "UNKNOWN"
@@ -7827,6 +10285,29 @@ export const pharaonCharactersData = [
           126,
           127,
           129
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 39,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          91,
+          92,
+          119,
+          121,
+          124,
+          153,
+          154
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 41,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          144,
+          177
         ],
         "paragraphsWhereTalking": []
       }
@@ -7921,25 +10402,243 @@ export const pharaonCharactersData = [
   {
     "characterName": "Sem",
     "bookSlug": "Pharaon",
-    "infoPerChapter": [],
+    "infoPerChapter": [
+      {
+        "chapter": 40,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          98,
+          100,
+          102,
+          104,
+          107,
+          112,
+          120,
+          123,
+          124,
+          130,
+          136,
+          138,
+          141,
+          142,
+          145,
+          149,
+          152,
+          157,
+          159
+        ],
+        "paragraphsWhereTalking": [
+          99,
+          100,
+          102,
+          105,
+          107,
+          109,
+          112,
+          114,
+          116,
+          118,
+          121,
+          139,
+          141,
+          143,
+          146,
+          147,
+          149,
+          150,
+          152,
+          154,
+          155,
+          157,
+          159
+        ]
+      },
+      {
+        "chapter": 41,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          5,
+          172,
+          178,
+          183,
+          190,
+          191,
+          213,
+          224,
+          233,
+          244,
+          249,
+          254,
+          256,
+          270,
+          274
+        ],
+        "paragraphsWhereTalking": [
+          179,
+          181,
+          183,
+          224,
+          249,
+          254,
+          256,
+          270
+        ]
+      }
+    ],
     "imageUrl": "UNKNOWN"
   },
   {
     "characterName": "Musawasa",
     "bookSlug": "Pharaon",
-    "infoPerChapter": [],
-    "imageUrl": "UNKNOWN"
-  },
-  {
-    "characterName": "Kalipos",
-    "bookSlug": "Pharaon",
-    "infoPerChapter": [],
+    "infoPerChapter": [
+      {
+        "chapter": 40,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          1,
+          7,
+          125
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 42,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          36,
+          38,
+          41,
+          43,
+          45
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 43,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          13,
+          14,
+          15,
+          16,
+          21,
+          148,
+          150
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 44,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          9,
+          28,
+          29,
+          30,
+          31,
+          37
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 45,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          53,
+          96,
+          99,
+          103
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 46,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          3,
+          5,
+          7,
+          9,
+          11,
+          12,
+          15,
+          19,
+          24,
+          25,
+          29,
+          30,
+          69,
+          82
+        ],
+        "paragraphsWhereTalking": []
+      }
+    ],
     "imageUrl": "UNKNOWN"
   },
   {
     "characterName": "Tehenna",
     "bookSlug": "Pharaon",
-    "infoPerChapter": [],
+    "infoPerChapter": [
+      {
+        "chapter": 42,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          38,
+          41,
+          47,
+          49
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 43,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          13,
+          21
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 44,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          29,
+          34,
+          35,
+          36,
+          102,
+          104
+        ],
+        "paragraphsWhereTalking": [
+          36
+        ]
+      },
+      {
+        "chapter": 45,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          2,
+          31,
+          96,
+          103
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 46,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          3,
+          9,
+          13,
+          67,
+          68,
+          82
+        ],
+        "paragraphsWhereTalking": []
+      }
+    ],
     "imageUrl": "UNKNOWN"
   },
   {
@@ -7951,6 +10650,90 @@ export const pharaonCharactersData = [
         "summary": "",
         "paragraphsWhereSpotted": [
           27
+        ],
+        "paragraphsWhereTalking": []
+      },
+      {
+        "chapter": 39,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          21,
+          25,
+          28,
+          30,
+          32,
+          35
+        ],
+        "paragraphsWhereTalking": [
+          23,
+          28,
+          32,
+          35
+        ]
+      },
+      {
+        "chapter": 41,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          187,
+          189,
+          190,
+          193,
+          195,
+          197,
+          200,
+          207,
+          208,
+          211,
+          213,
+          216,
+          222,
+          227,
+          229,
+          231,
+          232,
+          234,
+          236,
+          238,
+          242,
+          244,
+          247,
+          257,
+          259,
+          262,
+          267,
+          269,
+          274
+        ],
+        "paragraphsWhereTalking": [
+          198,
+          201,
+          203,
+          207,
+          211,
+          213,
+          216,
+          218,
+          220,
+          222,
+          229,
+          231,
+          236,
+          238,
+          246,
+          259,
+          263,
+          265,
+          267
+        ]
+      },
+      {
+        "chapter": 47,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          65,
+          68,
+          71
         ],
         "paragraphsWhereTalking": []
       }

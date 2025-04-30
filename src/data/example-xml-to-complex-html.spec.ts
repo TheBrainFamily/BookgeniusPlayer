@@ -9,6 +9,7 @@ describe("example-xml-to-complex-html", () => {
   it("should convert xml to html", () => {
     const htmlString = xmlToComplexHtml(xmlString);
     console.log(htmlString);
+
     expect(htmlString).toContain("— Gdyby bogowie, zamiast młodszym synem królewskim, uczynili mnie faraonem, podbiłbym dziewięć narodów…");
     expect(htmlString).toContain(`<h5 data-index="0" class="book-title">Bolesław Prus, Faraon</h5>`);
     expect(htmlString).toContain(`<span class="character-mention" data-character="Sara">Sarę</span>`);
