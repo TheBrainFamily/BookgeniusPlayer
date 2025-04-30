@@ -200,7 +200,8 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
       <div
         style={{ paddingTop: "calc(1rem + 2 * env(safe-area-inset-top, 0px))" }}
         className={`fixed top-0 left-0 right-0 max-h-[calc(100vh-120px)] overflow-y-auto pb-2 z-50 transition-all duration-500 ease-in-out messages-container ${
-          isFocused ? "opacity-100 backdrop-blur-sm" : "opacity-0 backdrop-blur-none pointer-events-none"
+          "opacity-0 backdrop-blur-none pointer-events-none"
+          // isFocused ? "opacity-100 backdrop-blur-sm" : "opacity-0 backdrop-blur-none pointer-events-none"
         }`}
       >
         <div className="max-w-4xl mx-auto px-4 flex flex-col">
