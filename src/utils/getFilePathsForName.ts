@@ -1,8 +1,8 @@
 import { BOOK_SLUGS } from "../consts";
-import { pharaonCharactersData } from "../data/pharaon-apr-28.charactersmetadatas";
+import { pharaonCharactersData } from "../data/metadata";
 
 export const knownMovingPictures = [
-  "Ramzes",
+  "Książę Ramzes",
   "Ramzes XII",
   "Sara",
   "Nikotris",
@@ -56,7 +56,7 @@ const known = [
   "pentuer-listens.mp4",
   "pieszczota-listens.mp4",
   "rabsun-listens.mp4",
-  "ramzes-listens.mp4",
+  "książę-ramzes-listens.mp4",
   "ramzes-xii-listens.mp4",
   "ranuzer-listens.mp4",
   "samuel-syn-ezdreasza-listens.mp4",
@@ -103,7 +103,7 @@ const known = [
   "pentuer-speaks.mp4",
   "pieszczota-speaks.mp4",
   "rabsun-speaks.mp4",
-  "ramzes-speaks.mp4",
+  "książę-ramzes-speaks.mp4",
   "ramzes-xii-speaks.mp4",
   "ranuzer-speaks.mp4",
   "samuel-syn-ezdreasza-speaks.mp4",

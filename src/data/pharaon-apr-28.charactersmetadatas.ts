@@ -1,4 +1,4 @@
-export const pharaonCharactersData = [
+export const pharaonCharactersDataOld = [
   {
     _id: { $oid: "680f5af20e46e65aa59cd29b" },
     characterName: "Ramzes XII",

@@ -7,7 +7,7 @@
  * compile without any additional tweaks.
  */
 
-import { pharaonCharactersData } from "../data/pharaon-apr-28.charactersmetadatas";
+import { pharaonCharactersData } from "../data/metadata";
 import { BOOK_SLUGS } from "../consts";
 
 /* -------------------------------------------------------------------------- */
@@ -27,6 +27,11 @@ export interface SelfSufficientCharacterMetadata {
   bookSlug: string;
   infoPerChapter: InfoPerChapter[];
   imageUrl: string;
+}
+
+export interface SimpleCharacterMetadata {
+  characterName: string;
+  infoPerChapter: { chapter: number; paragraphsWhereSpotted: number[]; paragraphsWhereTalking: number[] }[];
 }
 
 /* -------------------------------------------------------------------------- */

@@ -12,10 +12,6 @@ export const faraonBookXml = `
                   >, który przez trzy lata i dziewięć miesięcy podróżował w kraju Buchten<a href="#fn16" class="link-note">[16]</a>, uzdrowił tam córkę królewską imieniem
                   Bent-res<a href="#fn17" class="link-note">[17]</a> i wypędził złego ducha nie tylko z rodziny króla, ale nawet z fortecy Buchtenu.
                 </p>
-                <p data-index="3">
-                  Zaś w miesiącu Farmuti, w lutym, pan Górnego i Dolnego Egiptu, władca Fenicji i dziewięciu narodów, Mer-amen-Ramzes XII<a href="#fn18" class="link-note">[18]</a>,
-                  po naradzeniu się z bogami, którym jest równy, mianował swoim erpatrem, czyli następcą tronu, dwudziestodwuletniego syna Chamsem-merer-amen-Ramzesa.
-                </p>
                 <p data-index="4">
                   Wybór ten wielce uradował pobożnych kapłanów, dostojnych nomarchów<a href="#fn19" class="link-note">[19]</a>, waleczną armię, wierny lud i wszelkie żyjące na
                   ziemi egipskiej stworzenie. Starsi bowiem synowie faraona, urodzeni z królewny chetyjskiej<a href="#fn20" class="link-note">[20]</a>, za sprawą czarów, których
@@ -23,14 +19,15 @@ export const faraonBookXml = `
                   umarł, a trzeci przez zatrute wino, którego nie chciał się wyrzec, wpadł w szaleństwo i mniemając, że jest małpą, całe dnie przepędzał na drzewach.
                 </p>
                 <p data-index="5">
-                  Dopiero czwarty syn, Ramzes, urodzony z królowej Nikotris, córki arcykapłana Amenhotepa<a href="#fn21" class="link-note">[21]</a>, był silny jak wół Apis<a
+                  Dopiero czwarty syn, Ramzes, <span class="character-mention"><video class="inline-avatar" data-character="Ramzes" src="/Pharaon/ramzes-listens.mp4" autoPlay loop muted playsInline></video></span> urodzony z królowej Nikotris <span class="character-mention"><video class="inline-avatar" data-character="Ramzes" src="/Pharaon/nikotris-listens.mp4" autoPlay loop muted playsInline></video></span>, córki arcykapłana
+                   Amenhotepa<a href="#fn21" class="link-note">[21]</a>, był silny jak wół Apis<a
                     href="#fn22"
                     class="link-note"
                     >[22]</a
                   >, odważny jak lew i mądry jak kapłani. Od dzieciństwa otaczał się wojskowymi i jeszcze będąc zwyczajnym księciem, mawiał:
                 </p>
                 <p data-index="6">
-                  — Gdyby bogowie, zamiast młodszym synem królewskim, uczynili mnie faraonem, podbiłbym, jak Ramzes Wielki<a href="#fn23" class="link-note">[23]</a>, dziewięć
+                  <span class="character-talking"><video class="inline-avatar" data-character="Ramzes" src="/Pharaon/ramzes-speaks.mp4" autoPlay loop muted playsInline></video></span>— Gdyby bogowie, zamiast młodszym synem królewskim, uczynili mnie faraonem, podbiłbym, jak Ramzes Wielki<a href="#fn23" class="link-note">[23]</a>, dziewięć
                   narodów, o których nigdy w Egipcie nie słyszano, zbudowałbym świątynię większą aniżeli całe Teby, a dla siebie wzniósłbym piramidę, przy której grób Cheopsa<a
                     href="#fn24"
                     class="link-note"

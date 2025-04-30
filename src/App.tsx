@@ -5,7 +5,7 @@ import { usePageObserver } from "./hooks/usePageObserver";
 import { useCutScene } from "./hooks/useCutScene";
 import { useBackgroundVideo } from "./hooks/useBackgroundVideo";
 import { useBookContent } from "./hooks/useBookContent";
-import { faraonBookXml } from "./data/faraon-book-xml";
+import { faraonBookXml } from "./data/chapters";
 
 import BookChaptersModal from "./menu-modal";
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";

@@ -9,6 +9,7 @@ import "./globals.css";
 import "./main.css";
 import "./modals.css";
 import "./mobile.css";
+import "./styles/inline-avatars.css";
 
 const container = document.getElementById("root")!;
 createRoot(container).render(
