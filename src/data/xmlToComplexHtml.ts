@@ -58,7 +58,7 @@ export const xmlToComplexHtml = (xmlString: string): string => {
               if (isTalking) {
                 pContent += `<span class="character-talking"><video class="inline-avatar" data-character="${characterInfo.display}" src="${getMovingPictureFilePathForName(characterInfo.display, "Pharaon" as BOOK_SLUGS)}" autoPlay loop muted playsInline></video></span>`;
               } else {
-                pContent += `<span class="character-mention"><video class="inline-avatar" data-character="${characterInfo.display}" src="${getPictureFilePathForName(characterInfo.display, "Pharaon" as BOOK_SLUGS)}" autoPlay loop muted playsInline></video></span>`;
+                pContent += `<span class="character-mention"><video class="inline-avatar" data-character="${characterInfo.display}" src="${getPictureFilePathForName(characterInfo.display, "Pharaon" as BOOK_SLUGS)}" autoPlay loop muted playsInline></video></span>${element.textContent || ""}`;
               }
             }
           } else {
