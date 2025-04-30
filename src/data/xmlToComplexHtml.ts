@@ -2,9 +2,9 @@ import { DOMParser } from "@xmldom/xmldom";
 import fs from "fs";
 import path from "path";
 import { getMovingPictureFilePathForName, getPictureFilePathForName } from "../utils/getFilePathsForName";
-import { BOOK_SLUGS } from "../types/book-slugs";
+import { BOOK_SLUGS } from "../consts";
 
-export const xmlToComplexHtml = (xmlString: string): string => {
+export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): string => {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xmlString, "text/xml");
   let htmlResult = "";
@@ -53,13 +53,18 @@ export const xmlToComplexHtml = (xmlString: string): string => {
 
           if (characterInfo) {
             paragraphCount++;
-            if (paragraphCount <= 10) {
-              const isTalking = element.getAttribute("talking") === "true";
-              if (isTalking) {
-                pContent += `<span class="character-talking"><video class="inline-avatar" data-character="${characterInfo.display}" src="${getMovingPictureFilePathForName(characterInfo.display, "Pharaon" as BOOK_SLUGS)}" autoPlay loop muted playsInline></video></span>`;
-              } else {
-                pContent += `<span class="character-mention"><video class="inline-avatar" data-character="${characterInfo.display}" src="${getPictureFilePathForName(characterInfo.display, "Pharaon" as BOOK_SLUGS)}" autoPlay loop muted playsInline></video></span>${element.textContent || ""}`;
-              }
+            // Limit initial placeholders for performance, logic to load more will be in pageObserver
+            // Increased limit slightly, actual loading is deferred
+            const isTalking = element.getAttribute("talking") === "true";
+            const movingSrc = getMovingPictureFilePathForName(characterInfo.display, bookSlug);
+            const pictureSrc = getPictureFilePathForName(characterInfo.display, bookSlug);
+
+            if (isTalking) {
+              // Generate placeholder span for talking character
+              pContent += `<span class="character-placeholder character-talking" data-character="${characterInfo.display}" data-src-moving="${movingSrc}" data-is-talking="true"></span>`;
+            } else {
+              // Generate placeholder span for mentioned character, preserving text content
+              pContent += `${element.textContent || ""} <span class="character-placeholder character-mention" data-character="${characterInfo.display}" data-src-picture="${pictureSrc}" data-is-talking="false"></span>`;
             }
           } else {
             // Handle other potential elements if needed, e.g., <b>, <i>
@@ -91,6 +96,7 @@ export const xmlToComplexHtml = (xmlString: string): string => {
 
 if (require.main === module) {
   const xmlString = fs.readFileSync(path.join(__dirname, "chapters.xml"), "utf8");
-  const htmlString = xmlToComplexHtml(xmlString);
+  // Example usage: Provide the book slug when calling
+  const htmlString = xmlToComplexHtml(xmlString, "Pharaon" as BOOK_SLUGS);
   fs.writeFileSync(path.join(__dirname, "chapters.ts"), `export const faraonBookXml = \`<section>${htmlString}</section>\`;`);
 }

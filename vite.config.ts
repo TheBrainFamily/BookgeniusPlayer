@@ -9,36 +9,35 @@ export default defineConfig({
     react(),
     VitePWA({
       /*  ---- service‑worker build ---- */
-      srcDir: 'src',
-      filename: 'sw.ts',          // we’ll write this next
-      strategies: 'injectManifest',
+      srcDir: "src",
+      filename: "sw.ts", // we’ll write this next
+      strategies: "injectManifest",
       injectManifest: {
         globPatterns: [
-          'Pharaon/*.mp4',        // <-- your videos
-          '**/*.{js,css,html,svg,png,webp}'
+          "Pharaon/*.mp4", // <-- your videos
+          "**/*.{js,css,html,svg,png,webp}",
         ],
-        maximumFileSizeToCacheInBytes: 30000000
+        maximumFileSizeToCacheInBytes: 30000000,
       },
-
 
       /*  ---- manifest.json passthrough ---- */
       manifest: {
-        "name": "Faraon",
-        "short_name": "Faraon",
-        "start_url": "/",
-        "display": "standalone",
-        "background_color": "#333333",
-        "theme_color": "#333333",
-        "orientation": "landscape",
-        "icons": [
-          { "src": "public/icon-192x192.png", "type": "image/png", "sizes": "192x192", "purpose": "any maskable" },
-          { "src": "public/icon-512x512.png", "type": "image/png", "sizes": "512x512", "purpose": "any maskable" }
-        ]
+        name: "Faraon",
+        short_name: "Faraon",
+        start_url: "/",
+        display: "standalone",
+        background_color: "#333333",
+        theme_color: "#333333",
+        orientation: "landscape",
+        icons: [
+          { src: "public/icon-192x192.png", type: "image/png", sizes: "192x192", purpose: "any maskable" },
+          { src: "public/icon-512x512.png", type: "image/png", sizes: "512x512", purpose: "any maskable" },
+        ],
       },
 
       /*  ---- live‑reload while dev’ing PWAs ---- */
-      devOptions: { enabled: true }
-    })
+      devOptions: { enabled: true },
+    }),
   ],
   resolve: {
     alias: {
@@ -57,5 +56,6 @@ export default defineConfig({
     port: 5173, // Or any port you prefer
     open: true,
     proxy: { "/api": "http://localhost:3000" },
+    watch: { ignored: ["**/src/data/*.xml"] },
   },
 });

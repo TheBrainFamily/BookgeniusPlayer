@@ -1,24 +1,126 @@
 import { setCurrentLocation } from "../helpers/paragraphsNavigation";
 
-// Function to update paragraph notes with visible paragraphs
-// This is a type declaration for the updateParagraphNotes function that we'll import
-type UpdateParagraphNotesType = ({
-  startChapter,
-  startParagraph,
-  endChapter,
-  endParagraph,
-}: {
-  startChapter: number;
-  startParagraph: number;
-  endChapter: number;
-  endParagraph: number;
-}) => void;
+// --- Helper Functions ---
 
-let updateParagraphNotes: UpdateParagraphNotesType;
+/**
+ * Checks if a given chapter and paragraph index falls within the specified range.
+ */
+function isInRange(currentChapter: number, currentParagraph: number, startChapter: number, startParagraph: number, endChapter: number, endParagraph: number): boolean {
+  // Single chapter range
+  if (startChapter === endChapter) {
+    return currentChapter === startChapter && currentParagraph >= startParagraph && currentParagraph <= endParagraph;
+  }
 
-export const setUpdateParagraphNotesFunction = (fn: UpdateParagraphNotesType) => {
-  updateParagraphNotes = fn;
-};
+  // Multi-chapter range
+  if (currentChapter === startChapter && currentParagraph >= startParagraph) {
+    return true; // In the first chapter, at or after the start paragraph
+  }
+  if (currentChapter > startChapter && currentChapter < endChapter) {
+    return true; // In a middle chapter
+  }
+  if (currentChapter === endChapter && currentParagraph <= endParagraph) {
+    return true; // In the last chapter, at or before the end paragraph
+  }
+
+  return false;
+}
+
+/**
+ * Creates and configures a video element based on the placeholder span's data.
+ */
+function createVideoElement(placeholder: HTMLSpanElement): HTMLVideoElement | null {
+  const character = placeholder.dataset.character;
+  const isTalking = placeholder.dataset.isTalking === "true";
+  const movingSrc = placeholder.dataset.srcMoving;
+  const pictureSrc = placeholder.dataset.srcPicture;
+
+  if (!character) return null;
+
+  const video = document.createElement("video");
+  video.classList.add("inline-avatar");
+  video.dataset.character = character;
+  video.src = isTalking ? movingSrc || pictureSrc || "" : pictureSrc || ""; // Fallback for talking
+
+  if (!video.src) {
+    console.warn("Could not determine video source for placeholder:", placeholder);
+    return null;
+  }
+
+  video.autoplay = true;
+  video.loop = true;
+  video.muted = true;
+  video.playsInline = true;
+  // Add error handling for video loading if needed
+  // video.onerror = () => console.error(`Failed to load video: ${video.src}`);
+
+  return video;
+}
+
+/**
+ * Manages video loading and playback for paragraphs within the visible range.
+ */
+function activateVideosInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number) {
+  const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] p[data-index]");
+
+  allParagraphs.forEach((p) => {
+    const chapterElement = p.closest("section[data-chapter]") as HTMLElement;
+    const chapterStr = chapterElement?.dataset.chapter;
+    const paragraphStr = p.dataset.index;
+
+    if (chapterStr && paragraphStr) {
+      const currentChapter = parseInt(chapterStr, 10);
+      const currentParagraph = parseInt(paragraphStr, 10);
+      const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph, endChapter, endParagraph);
+      const placeholders = p.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+
+      placeholders.forEach((placeholder) => {
+        const videoInjected = placeholder.dataset.videoInjected === "true";
+        let videoElement = placeholder.querySelector<HTMLVideoElement>("video.inline-avatar");
+
+        if (inView) {
+          if (!videoInjected) {
+            // Inject video
+            videoElement = createVideoElement(placeholder);
+            if (videoElement) {
+              // If it's a mention, hide the original text content of the span before adding video
+              if (placeholder.classList.contains("character-mention") && placeholder.firstChild && placeholder.firstChild.nodeType === Node.TEXT_NODE) {
+                const textNode = placeholder.firstChild as Text;
+                const wrapper = document.createElement("span");
+                wrapper.style.display = "none"; // Hide the text
+                wrapper.setAttribute("data-original-text", "true");
+                wrapper.textContent = textNode.textContent;
+                placeholder.replaceChild(wrapper, textNode);
+              }
+              placeholder.appendChild(videoElement); // Append video
+              placeholder.dataset.videoInjected = "true";
+              videoElement.play().catch((e) => console.warn("Video play interrupted or failed:", e)); // Autoplay
+              console.log(`[Video Inject] Injected video for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
+            }
+          } else if (videoElement && videoElement.paused) {
+            // Play existing video if paused
+            videoElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+          }
+        } else {
+          // Out of view
+          if (videoInjected && videoElement) {
+            // Pause video
+            // videoElement.pause();
+            // Optional: Remove video to save memory. Requires re-creating it when it comes back into view.
+            placeholder.removeChild(videoElement);
+            delete placeholder.dataset.videoInjected;
+            // // Restore original text if it was hidden
+            // const hiddenText = placeholder.querySelector('span[data-original-text]');
+            // if (hiddenText && hiddenText.parentNode === placeholder) {
+            //     const textNode = document.createTextNode(hiddenText.textContent || '');
+            //     placeholder.replaceChild(textNode, hiddenText);
+            // }
+            // console.log(`[Video Unload] Unloaded video for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
+          }
+        }
+      });
+    }
+  });
+}
 
 // Set up intersection observer to detect visible pages
 export function setupPageObserver(): IntersectionObserver | null {
@@ -111,12 +213,16 @@ export function setupPageObserver(): IntersectionObserver | null {
           const endInfo = getParagraphInfo(bottomFocusedPageElement);
           // -----------------------------------------
 
-          // 4. Call updateParagraphNotes if we have valid info
+          // 4. Call update logic if we have valid info
           if (startInfo.chapter !== null && startInfo.paragraph !== null && endInfo.chapter !== null && endInfo.paragraph !== null) {
             console.log(`[Observer] Updating notes for Ch ${startInfo.chapter}:${startInfo.paragraph} to Ch ${endInfo.chapter}:${endInfo.paragraph} (Focus Zone)`);
             console.log("setting current location from intersection (focus zone)", { chapter: startInfo.chapter, paragraph: startInfo.paragraph });
             // Set current location based on the top element in the focus zone
             setCurrentLocation({ chapter: startInfo.chapter, paragraph: startInfo.paragraph, endChapter: endInfo.chapter, endParagraph: endInfo.paragraph });
+
+            // --- Activate/Deactivate Videos ---
+            activateVideosInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph);
+            // ----------------------------------
           } else {
             console.warn("[Observer] Could not extract chapter/paragraph info for focused elements:", topFocusedPageElement, bottomFocusedPageElement);
           }
@@ -150,7 +256,6 @@ export function setupPageObserver(): IntersectionObserver | null {
     console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
     // We still return the observer, it just won't observe anything initially.
   } else {
-    console.log("Observing paragraphs:", paragraphsToObserve);
     paragraphsToObserve.forEach((paragraph) => {
       observer.observe(paragraph);
     });
