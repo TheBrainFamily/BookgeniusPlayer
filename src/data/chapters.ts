@@ -8215,13 +8215,13 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Prawdę mówisz — wtrącił książę <span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="27">
-      — Ale tymczasem twój ogranicza nasze wydatki. Owszem, chciałby nawet pozbawić nas dziewcząt służebnych, bez których przecie nie możemy umyć się ani uczesać.
+      — Ale tymczasem twój skarbnik <span class="character-placeholder character-mention" data-character="Skarbnik Ramzesa" data-src-picture="/Pharaon/skarbnik-ramzesa.png" data-is-talking="false"></span> ogranicza nasze wydatki. Owszem, chciałby nawet pozbawić nas dziewcząt służebnych, bez których przecie nie możemy umyć się ani uczesać.
     </p>
     <p data-index="28">
-      Ramzes <span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> wezwał i surowo zapowiedział mu, ażeby jego kobiety miały wszystko, co należy się ich urodzeniu i wielkim stanowiskom.
+      Ramzes <span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> wezwał skarbnika <span class="character-placeholder character-mention" data-character="Skarbnik Ramzesa" data-src-picture="/Pharaon/skarbnik-ramzesa.png" data-is-talking="false"></span> i surowo zapowiedział mu, ażeby jego kobiety miały wszystko, co należy się ich urodzeniu i wielkim stanowiskom.
     </p>
     <p data-index="29">
-      upadł na twarz przed księciem <span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> i obiecał spełniać rozkazy kobiet. Zaś w parę dni później wybuchnął bunt między dworskimi niewolnikami, którzy skarżyli się, że ich pozbawiają wina.
+      Skarbnik <span class="character-placeholder character-mention" data-character="Skarbnik Ramzesa" data-src-picture="/Pharaon/skarbnik-ramzesa.png" data-is-talking="false"></span> upadł na twarz przed księciem <span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> i obiecał spełniać rozkazy kobiet. Zaś w parę dni później wybuchnął bunt między dworskimi niewolnikami, którzy skarżyli się, że ich pozbawiają wina.
     </p>
     <p data-index="30">
       Następca <span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> kazał im wydawać wino. Lecz nazajutrz, w czasie przeglądu wojsk, przyszły do niego deputacje pułków z najpokorniejszą skargą, że zmniejszono im porcje mięsa i chleba.
@@ -8233,22 +8233,22 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       W parę dni później obudził go z rana wielki hałas pod pałacem. Ramzes <span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> spytał o przyczynę, a oficer dyżurny, objaśnił, że zebrali się robotnicy królewscy i wołają o zaległy żołd.
     </p>
     <p data-index="33">
-      Wezwano , na którego książę <span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> wpadł z wielkim gniewem.
+      Wezwano skarbnika <span class="character-placeholder character-mention" data-character="Skarbnik Ramzesa" data-src-picture="/Pharaon/skarbnik-ramzesa.png" data-is-talking="false"></span>, na którego książę <span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> wpadł z wielkim gniewem.
     </p>
     <p data-index="34">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Co się tu dzieje?… — wołał. — Od chwili mego przyjazdu nie ma dnia, aby nie skarżono się na krzywdy. Jeżeli jeszcze raz powtórzy się coś podobnego, ustanowię śledztwo i położę kres waszym złodziejstwom!…
     </p>
     <p data-index="35">
-      Drżący znowu upadł na twarz i jęknął:
+      Drżący skarbnik <span class="character-placeholder character-mention" data-character="Skarbnik Ramzesa" data-src-picture="/Pharaon/skarbnik-ramzesa.png" data-is-talking="false"></span> znowu upadł na twarz i jęknął:
     </p>
     <p data-index="36">
-      — Zabij mnie, panie!… Ale cóż poradzę, gdy twój skarbiec, stodoły i spiżarnie są puste…
+      <span class="character-placeholder character-talking" data-character="Skarbnik Ramzesa" data-src-moving="/Pharaon/skarbnik-ramzesa.png" data-is-talking="true"></span>— Zabij mnie, panie!… Ale cóż poradzę, gdy twój skarbiec, stodoły i spiżarnie są puste…
     </p>
     <p data-index="37">
-      Pomimo gniewu książę <span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zmiarkował, że może być niewinnym. Kazał mu więc odejść, a wezwał Tutmozisa <span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>.
+      Pomimo gniewu książę <span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zmiarkował, że skarbnik <span class="character-placeholder character-mention" data-character="Skarbnik Ramzesa" data-src-picture="/Pharaon/skarbnik-ramzesa.png" data-is-talking="false"></span> może być niewinnym. Kazał mu więc odejść, a wezwał Tutmozisa <span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="38">
-      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Słuchaj no — rzekł Ramzes <span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> do ulubieńca — dzieją się tu rzeczy, których nie rozumiem i do których nie przywykłem. Moje kobiety, niewolnicy, wojsko i robotnicy królewscy nie otrzymują należności lub są ograniczani w wydatkach. Gdym zaś spytał : co to znaczy? — odpowiedział, że nic już nie mamy w skarbcu ani stodołach.
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Słuchaj no — rzekł Ramzes <span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> do ulubieńca — dzieją się tu rzeczy, których nie rozumiem i do których nie przywykłem. Moje kobiety, niewolnicy, wojsko i robotnicy królewscy nie otrzymują należności lub są ograniczani w wydatkach. Gdym zaś spytał skarbnika <span class="character-placeholder character-mention" data-character="Skarbnik Ramzesa" data-src-picture="/Pharaon/skarbnik-ramzesa.png" data-is-talking="false"></span>: co to znaczy? — odpowiedział, że nic już nie mamy w skarbcu ani stodołach.
     </p>
     <p data-index="39">
       <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span>— Powiedział prawdę.

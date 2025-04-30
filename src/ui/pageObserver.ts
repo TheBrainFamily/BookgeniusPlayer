@@ -31,7 +31,7 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 function createMediaElement(placeholder: HTMLSpanElement): HTMLVideoElement | HTMLImageElement | null {
   const character = placeholder.dataset.character;
   const isTalking = placeholder.dataset.isTalking === "true";
-  const movingSrc = placeholder.dataset.srcMoving; // Assumed to be video
+  const movingSrc = placeholder.dataset.srcMoving; // Can be video or image
   const pictureSrc = placeholder.dataset.srcPicture; // Can be video or image
 
   if (!character) return null;
@@ -41,25 +41,31 @@ function createMediaElement(placeholder: HTMLSpanElement): HTMLVideoElement | HT
 
   // Determine the source and element type
   if (isTalking && movingSrc) {
-    // Talking, use moving source (must be video)
+    // Talking, use moving source
     finalSrc = movingSrc;
-    const video = document.createElement("video");
-    video.autoplay = true;
-    video.loop = true;
-    video.muted = true;
-    video.playsInline = true;
-    element = video;
+    if (movingSrc.toLowerCase().endsWith(".png")) {
+      // Moving source is an image
+      element = document.createElement("img");
+      // Add specific attributes for talking image if needed, otherwise uses common ones below
+    } else {
+      // Moving source is a video
+      const video = document.createElement("video");
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+      element = video;
+    }
   } else if (pictureSrc) {
     // Not talking (or no movingSrc), use picture source
     finalSrc = pictureSrc;
     if (pictureSrc.toLowerCase().endsWith(".png")) {
-      // It's an image
+      // Picture source is an image
       element = document.createElement("img");
     } else {
-      // Assume it's a video (fallback or primary)
+      // Picture source is a video
       const video = document.createElement("video");
-      // Even static videos might be short loops, keep consistent attributes
-      video.autoplay = true;
+      video.autoplay = true; // Keep consistent attributes even for static video
       video.loop = true;
       video.muted = true;
       video.playsInline = true;

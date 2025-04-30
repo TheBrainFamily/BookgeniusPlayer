@@ -58,6 +58,7 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
     <Musawasa display="Musawasa" summary="" />
     <Tehenna display="Tehenna" summary="" />
     <Naczelnik-policji-w-Pi-Bast display="Naczelnik policji w Pi-Bast" summary="" />
+    <Skarbnik-Ramzesa display="Skarbnik Ramzesa" summary="" />
 </CharactersMaster>
 
       

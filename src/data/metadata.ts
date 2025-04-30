@@ -10739,5 +10739,28 @@ export const pharaonCharactersData = [
       }
     ],
     "imageUrl": "UNKNOWN"
+  },
+  {
+    "characterName": "Skarbnik Ramzesa",
+    "bookSlug": "Pharaon",
+    "infoPerChapter": [
+      {
+        "chapter": 29,
+        "summary": "",
+        "paragraphsWhereSpotted": [
+          26,
+          27,
+          28,
+          32,
+          34,
+          36,
+          37
+        ],
+        "paragraphsWhereTalking": [
+          35
+        ]
+      }
+    ],
+    "imageUrl": "UNKNOWN"
   }
 ]
