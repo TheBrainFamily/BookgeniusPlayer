@@ -45,20 +45,20 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
     <Asarhadon display="Asarhadon" summary="Fenicjanin z Tyru, właściciel zajazdu „Pod Okrętem” w Memfis, w którym obowiązkowo zatrzymują się wszyscy cudzoziemcy." />
     <Phut-Beroes display="Phut (Beroes)" summary="Tajemniczy podróżny z Harranu, podający się za Chetytę. Zatrzymuje się w zajeździe Asarhadona. Wygląda na mędrca lub kapłana." />
     <Mefres display="Mefres" summary="Arcykapłan świątyni Ptah w Memfis. Spotyka się potajemnie z Beroesem." />
-    <Wielki-prorok-swiatyni-Hator display="Wielki prorok świątyni Hator" summary="" />
-    <Wielki-lekarz-swiatyni-Hator display="Wielki lekarz świątyni Hator" summary="" />
-    <Arcykaplan-Hatory display="Arcykapłan Hatory" summary="" />
-    <Kalipos display="Kalipos" summary="" />
-    <Nomarcha-Habu display="Nomarcha Habu" summary="" />
-    <Sargon display="Sargon" summary="" />
+    <Wielki-prorok-swiatyni-Hator display="Wielki prorok świątyni Hator" summary="Duchowy przełożony świątyni Hator. Poucza Ramzesa o potrzebie dalszej nauki w szkołach świątynnych." />
+    <Wielki-lekarz-swiatyni-Hator display="Wielki lekarz świątyni Hator" summary="Towarzyszy Ramzesowi podczas wizyty w świątynnej szkole lekarskiej. Przełożony szkoły lekarskiej przy świątyni Hator." />
+    <Arcykaplan-Hatory display="Arcykapłan Hatory" summary="Główny kapłan świątyni Hator. Osoba, której Pentuer zdaje relację z postępu przygotowań do uroczystości." />
+    <Kalipos display="Kalipos" summary="Grecki oficer. Dowodzący deputacją oficerów greckich do księcia Ramzesa." />
+    <Nomarcha-Habu display="Nomarcha Habu" summary="Zarządca nomu Habu. Wita księcia Ramzesa przy bramie miasta Pi-Bast." />
+    <Sargon display="Sargon" summary="Asyryjski poseł przybywający do Egiptu z darami. Ma zawrzeć traktat dotyczący podziału ziem między Asyrią a Egiptem." />
     <Lykon display="Lykon" summary="" />
     <Seti display="Seti" summary="" />
-    <Istubar display="Istubar" summary="" />
-    <Sem display="Sem" summary="" />
-    <Musawasa display="Musawasa" summary="" />
-    <Tehenna display="Tehenna" summary="" />
-    <Naczelnik-policji-w-Pi-Bast display="Naczelnik policji w Pi-Bast" summary="" />
-    <Skarbnik-Ramzesa display="Skarbnik Ramzesa" summary="" />
+    <Istubar display="Istubar" summary="Chaldejski kapłan. Przybył do Egiptu z listami od króla Assara mianującymi Sargona posłem." />
+    <Sem display="Sem" summary="Arcykapłan świątyni Ptah. Entuzjastycznie nastawiony do wojny prowadzonej przez Ramzesa." />
+    <Musawasa display="Musawasa" summary="Groźny wódz libijski. Rzekomo ogłosił świętą wojnę przeciw Egiptowi i wysłał bandy najeźdźców." />
+    <Tehenna display="Tehenna" summary="Syn wodza libijskiego Musawasy. Dowodzi korpusem atakującym Egipt" />
+    <Naczelnik-policji-w-Pi-Bast display="Naczelnik policji w Pi-Bast" summary="Szef policji miasta Pi-Bast. Odbył długą, prywatną rozmowę z księciem Ramzesem." />
+    <Skarbnik-Ramzesa display="Skarbnik Ramzesa" summary="Urzędnik zarządzający finansami dworu księcia Ramzesa. Ograniczył wydatki dworzan, co wywołało ich skargi." />
 </CharactersMaster>
 
       

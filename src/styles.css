@@ -2,6 +2,20 @@
 /* Scoped Legacy CSS            */
 /* ============================================ */
 
+@supports (padding: max(0px)) {
+  .keyboard-safe-area {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), env(keyboard-inset-height, 0px));
+    /* Optional: Add transition for smoother keyboard appearance */
+    transition: padding-bottom 0.2s ease-out;
+  }
+}
+/* Allow scrolling only within the messages container */
+.messages-container {
+  height: calc(100% - 60px); /* Example: Adjust based on footer height */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
 #legacy {
   /* --- Base Container Styles --- */
   contain: paint;
@@ -431,6 +445,7 @@
 
   /* Container for entity notes - center content vertically */
   .entity-notes-container {
+    width: 95%;
     display: flex;
     flex-direction: column;
     padding: 10px 0;
@@ -505,6 +520,7 @@
     max-width: 700px;
     margin: 20px;
     margin-top: 0;
+    margin-right: 0;
   }
 
   /* Return to Location Button */

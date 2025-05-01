@@ -130,7 +130,7 @@ export default function BookChaptersModal({ onShowDeepResearch }: BookChaptersMo
   return (
     <>
       {/* Fixed button in top right corner */}
-      <div className="fixed z-50" style={{ top: "max(env(safe-area-inset-top, 0px), 1rem)", right: "1rem" }}>
+      <div className="fixed z-50" style={{ top: "max(env(safe-area-inset-top, 0px), 1rem)", left: "1rem" }}>
         <Button variant="outline" size="icon" className="rounded-full dark:bg-black dark:border-gray-700 dark:hover:bg-gray-800" onClick={() => setOverlayOpen(true)}>
           <Book className="h-5 w-5 dark:text-white" />
           <span className="sr-only">Book options</span>

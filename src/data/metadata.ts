@@ -9990,7 +9990,7 @@ export const pharaonCharactersData = [
     "infoPerChapter": [
       {
         "chapter": 26,
-        "summary": "",
+        "summary": "Duchowy przełożony świątyni Hator. Poucza Ramzesa o potrzebie dalszej nauki w szkołach świątynnych.",
         "paragraphsWhereSpotted": [
           52
         ],
@@ -10005,7 +10005,7 @@ export const pharaonCharactersData = [
     "infoPerChapter": [
       {
         "chapter": 26,
-        "summary": "",
+        "summary": "Towarzyszy Ramzesowi podczas wizyty w świątynnej szkole lekarskiej. Przełożony szkoły lekarskiej przy świątyni Hator.",
         "paragraphsWhereSpotted": [
           68,
           72,
@@ -10030,7 +10030,7 @@ export const pharaonCharactersData = [
     "infoPerChapter": [
       {
         "chapter": 27,
-        "summary": "",
+        "summary": "Główny kapłan świątyni Hator. Osoba, której Pentuer zdaje relację z postępu przygotowań do uroczystości.",
         "paragraphsWhereSpotted": [
           6
         ],
@@ -10047,7 +10047,7 @@ export const pharaonCharactersData = [
     "infoPerChapter": [
       {
         "chapter": 46,
-        "summary": "",
+        "summary": "Grecki oficer. Dowodzący deputacją oficerów greckich do księcia Ramzesa.",
         "paragraphsWhereSpotted": [
           83,
           87
@@ -10063,7 +10063,7 @@ export const pharaonCharactersData = [
     "infoPerChapter": [
       {
         "chapter": 29,
-        "summary": "",
+        "summary": "Zarządca nomu Habu. Wita księcia Ramzesa przy bramie miasta Pi-Bast.",
         "paragraphsWhereSpotted": [
           11,
           16,
@@ -10076,7 +10076,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 31,
-        "summary": "",
+        "summary": "Zarządca nomu Habu. Wita księcia Ramzesa przy bramie miasta Pi-Bast.",
         "paragraphsWhereSpotted": [
           3
         ],
@@ -10320,7 +10320,7 @@ export const pharaonCharactersData = [
     "infoPerChapter": [
       {
         "chapter": 34,
-        "summary": "",
+        "summary": "Chaldejski kapłan. Przybył do Egiptu z listami od króla Assara mianującymi Sargona posłem.",
         "paragraphsWhereSpotted": [
           25
         ],
@@ -10328,7 +10328,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 35,
-        "summary": "",
+        "summary": "Chaldejski kapłan. Przybył do Egiptu z listami od króla Assara mianującymi Sargona posłem.",
         "paragraphsWhereSpotted": [
           24,
           25,
@@ -10354,7 +10354,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 36,
-        "summary": "",
+        "summary": "Chaldejski kapłan. Przybył do Egiptu z listami od króla Assara mianującymi Sargona posłem.",
         "paragraphsWhereSpotted": [
           39,
           40,
@@ -10382,7 +10382,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 37,
-        "summary": "",
+        "summary": "Chaldejski kapłan. Przybył do Egiptu z listami od króla Assara mianującymi Sargona posłem.",
         "paragraphsWhereSpotted": [
           2
         ],
@@ -10390,7 +10390,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 38,
-        "summary": "",
+        "summary": "Chaldejski kapłan. Przybył do Egiptu z listami od króla Assara mianującymi Sargona posłem.",
         "paragraphsWhereSpotted": [
           5
         ],
@@ -10405,7 +10405,7 @@ export const pharaonCharactersData = [
     "infoPerChapter": [
       {
         "chapter": 40,
-        "summary": "",
+        "summary": "Arcykapłan świątyni Ptah. Entuzjastycznie nastawiony do wojny prowadzonej przez Ramzesa.",
         "paragraphsWhereSpotted": [
           98,
           100,
@@ -10455,7 +10455,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 41,
-        "summary": "",
+        "summary": "Arcykapłan świątyni Ptah. Entuzjastycznie nastawiony do wojny prowadzonej przez Ramzesa.",
         "paragraphsWhereSpotted": [
           5,
           172,
@@ -10493,7 +10493,7 @@ export const pharaonCharactersData = [
     "infoPerChapter": [
       {
         "chapter": 40,
-        "summary": "",
+        "summary": "Groźny wódz libijski. Rzekomo ogłosił świętą wojnę przeciw Egiptowi i wysłał bandy najeźdźców.",
         "paragraphsWhereSpotted": [
           1,
           7,
@@ -10503,7 +10503,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 42,
-        "summary": "",
+        "summary": "Groźny wódz libijski. Rzekomo ogłosił świętą wojnę przeciw Egiptowi i wysłał bandy najeźdźców.",
         "paragraphsWhereSpotted": [
           36,
           38,
@@ -10515,7 +10515,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 43,
-        "summary": "",
+        "summary": "Groźny wódz libijski. Rzekomo ogłosił świętą wojnę przeciw Egiptowi i wysłał bandy najeźdźców.",
         "paragraphsWhereSpotted": [
           13,
           14,
@@ -10529,7 +10529,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 44,
-        "summary": "",
+        "summary": "Groźny wódz libijski. Rzekomo ogłosił świętą wojnę przeciw Egiptowi i wysłał bandy najeźdźców.",
         "paragraphsWhereSpotted": [
           9,
           28,
@@ -10542,7 +10542,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 45,
-        "summary": "",
+        "summary": "Groźny wódz libijski. Rzekomo ogłosił świętą wojnę przeciw Egiptowi i wysłał bandy najeźdźców.",
         "paragraphsWhereSpotted": [
           53,
           96,
@@ -10553,7 +10553,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 46,
-        "summary": "",
+        "summary": "Groźny wódz libijski. Rzekomo ogłosił świętą wojnę przeciw Egiptowi i wysłał bandy najeźdźców.",
         "paragraphsWhereSpotted": [
           3,
           5,
@@ -10581,7 +10581,7 @@ export const pharaonCharactersData = [
     "infoPerChapter": [
       {
         "chapter": 42,
-        "summary": "",
+        "summary": "Syn wodza libijskiego Musawasy. Dowodzi korpusem atakującym Egipt",
         "paragraphsWhereSpotted": [
           38,
           41,
@@ -10592,7 +10592,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 43,
-        "summary": "",
+        "summary": "Syn wodza libijskiego Musawasy. Dowodzi korpusem atakującym Egipt",
         "paragraphsWhereSpotted": [
           13,
           21
@@ -10601,7 +10601,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 44,
-        "summary": "",
+        "summary": "Syn wodza libijskiego Musawasy. Dowodzi korpusem atakującym Egipt",
         "paragraphsWhereSpotted": [
           29,
           34,
@@ -10616,7 +10616,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 45,
-        "summary": "",
+        "summary": "Syn wodza libijskiego Musawasy. Dowodzi korpusem atakującym Egipt",
         "paragraphsWhereSpotted": [
           2,
           31,
@@ -10627,7 +10627,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 46,
-        "summary": "",
+        "summary": "Syn wodza libijskiego Musawasy. Dowodzi korpusem atakującym Egipt",
         "paragraphsWhereSpotted": [
           3,
           9,
@@ -10647,7 +10647,7 @@ export const pharaonCharactersData = [
     "infoPerChapter": [
       {
         "chapter": 38,
-        "summary": "",
+        "summary": "Szef policji miasta Pi-Bast. Odbył długą, prywatną rozmowę z księciem Ramzesem.",
         "paragraphsWhereSpotted": [
           27
         ],
@@ -10655,7 +10655,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 39,
-        "summary": "",
+        "summary": "Szef policji miasta Pi-Bast. Odbył długą, prywatną rozmowę z księciem Ramzesem.",
         "paragraphsWhereSpotted": [
           21,
           25,
@@ -10673,7 +10673,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 41,
-        "summary": "",
+        "summary": "Szef policji miasta Pi-Bast. Odbył długą, prywatną rozmowę z księciem Ramzesem.",
         "paragraphsWhereSpotted": [
           187,
           189,
@@ -10729,7 +10729,7 @@ export const pharaonCharactersData = [
       },
       {
         "chapter": 47,
-        "summary": "",
+        "summary": "Szef policji miasta Pi-Bast. Odbył długą, prywatną rozmowę z księciem Ramzesem.",
         "paragraphsWhereSpotted": [
           65,
           68,
@@ -10746,7 +10746,7 @@ export const pharaonCharactersData = [
     "infoPerChapter": [
       {
         "chapter": 29,
-        "summary": "",
+        "summary": "Urzędnik zarządzający finansami dworu księcia Ramzesa. Ograniczył wydatki dworzan, co wywołało ich skargi.",
         "paragraphsWhereSpotted": [
           26,
           27,
