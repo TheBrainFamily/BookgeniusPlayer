@@ -2,6 +2,11 @@
 /* Mobile Landscape Specific Layout (50/50 Split) */
 /* ============================================ */
 /* TODO ipad pro portrait mode 1024x1366 make entities visible, hide description, add name below image */
+#legacy #left-notes .entity-note {
+  margin-left: 2em;
+  margin-right: 2em;
+}
+
 @media screen and (orientation: landscape) and (max-height: 769px) {
   #legacy #right-notes {
     display: none;
