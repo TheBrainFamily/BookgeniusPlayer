@@ -1,13 +1,13 @@
 @media screen and (max-width: 1024px) {
   #legacy #content-container {
-   flex: 1;
+    flex: 1;
   }
   #legacy .entity-notes-container {
     padding: 10px;
   }
   #legacy #left-notes {
     display: flex; /* Override mobile portrait display: none */
-    flex: 0 0 50% ; /* Take 45% width, don't grow or shrink */
+    flex: 0 0 50%; /* Take 45% width, don't grow or shrink */
     max-width: 50%;
     overflow-y: auto; /* Allow scrolling if content overflows */
     justify-content: center;
@@ -35,39 +35,37 @@
   #legacy .entity-note:last-child {
     padding-bottom: 50px;
   }
-  #legacy #return-to-location-button {
+  #return-to-location-button {
     bottom: 100px;
   }
   @media screen and (max-width: 950px) and (orientation: landscape) {
-    #legacy #return-to-location-button {
+    #return-to-location-button {
       bottom: 70px;
     }
     #legacy #left-notes {
       margin: 0;
-      justify-content: flex-start
+      justify-content: flex-start;
     }
     #character-details-modal .modal-container {
       max-height: 100vh;
     }
   }
-
 }
 /* ============================================ */
 /* Mobile Landscape Specific Layout (50/50 Split) */
 /* ============================================ */
 /* TODO ipad pro portrait mode 1024x1366 make entities visible, hide description, add name below image */
 @media screen and (max-width: 1400px) and (min-width: 1025px) {
-
   #legacy #right-notes {
     display: none; /* Hide right notes */
   }
 
   #legacy #left-notes {
     display: flex; /* Override mobile portrait display: none */
-    flex: 0 0 50% ; /* Take 45% width, don't grow or shrink */
+    flex: 0 0 50%; /* Take 45% width, don't grow or shrink */
     max-width: 50%;
-    height: 100vh ; /* Full height */
-    margin: 0 ; /* Reset margins */
+    height: 100vh; /* Full height */
+    margin: 0; /* Reset margins */
     /* Utilize safe areas */
     padding: var(--safe-area-inset-top) 10px 0 0;
     box-sizing: border-box; /* Include padding in width calculation */
@@ -95,7 +93,7 @@
     margin-left: 0;
     & > div {
       display: flex;
-      gap: 15px; 
+      gap: 15px;
       justify-content: center;
     }
     .entity-text-column {

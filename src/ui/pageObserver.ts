@@ -105,20 +105,39 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
     if (chapterStr && paragraphStr) {
       const currentChapter = parseInt(chapterStr, 10);
       const currentParagraph = parseInt(paragraphStr, 10);
-      const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph, endChapter, endParagraph);
+      const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - 3, endChapter, endParagraph + 3);
       const placeholders = p.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
       placeholders.forEach((placeholder) => {
         const mediaInjected = placeholder.dataset.mediaInjected === "true";
-        // Query for either video or image with the class
+        // Query for either video or image with the class OR the dummy placeholder
         let mediaElement = placeholder.querySelector<HTMLVideoElement | HTMLImageElement>("video.inline-avatar, img.inline-avatar");
+        const dummyPlaceholder = placeholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
 
         if (inView) {
-          if (!mediaInjected) {
-            // Inject media
-            mediaElement = createMediaElement(placeholder);
-            if (mediaElement) {
-              // If it's a mention, hide the original text content of the span before adding media
+          if (dummyPlaceholder) {
+            // Found a dummy, replace it with actual media
+            const newMediaElement = createMediaElement(placeholder);
+            if (newMediaElement) {
+              placeholder.replaceChild(newMediaElement, dummyPlaceholder);
+              placeholder.dataset.mediaInjected = "true"; // Mark as injected
+              mediaElement = newMediaElement; // Update mediaElement reference
+
+              // NOTE: Text was already hidden when media was first injected,
+              // and remains hidden while the dummy is shown. No action needed here.
+
+              // Play video if applicable
+              if (mediaElement instanceof HTMLVideoElement) {
+                mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+              }
+              console.log(`[Media Inject] Replaced dummy with media for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
+            }
+          } else if (!mediaInjected) {
+            // No dummy and no media injected yet, inject for the first time
+            const newMediaElement = createMediaElement(placeholder);
+            if (newMediaElement) {
+              mediaElement = newMediaElement; // Update mediaElement reference
+              // Hide original text content if it's a mention
               if (placeholder.classList.contains("character-mention") && placeholder.firstChild && placeholder.firstChild.nodeType === Node.TEXT_NODE) {
                 const textNode = placeholder.firstChild as Text;
                 const wrapper = document.createElement("span");
@@ -128,31 +147,41 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
                 placeholder.replaceChild(wrapper, textNode);
               }
               placeholder.appendChild(mediaElement); // Append media
-              placeholder.dataset.mediaInjected = "true"; // Use new dataset attribute
+              placeholder.dataset.mediaInjected = "true"; // Mark as injected
 
-              // Only play if it's a video
+              // Play video if applicable
               if (mediaElement instanceof HTMLVideoElement) {
-                mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e)); // Autoplay
+                mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
               }
               console.log(`[Media Inject] Injected media for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
             }
           } else if (mediaElement instanceof HTMLVideoElement && mediaElement.paused) {
-            // Play existing video if paused
+            // Media already injected, just play existing video if paused
             mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
           }
         } else {
           // Out of view
+          // Check if actual media is injected (not a dummy)
           if (mediaInjected && mediaElement) {
-            // No need to pause images, just remove the element
-            placeholder.removeChild(mediaElement);
-            delete placeholder.dataset.mediaInjected; // Use new dataset attribute
-            // Restore original text if it was hidden (Optional, currently commented out in original code)
-            // const hiddenText = placeholder.querySelector('span[data-original-text]');
-            // if (hiddenText && hiddenText.parentNode === placeholder) {
-            //     const textNode = document.createTextNode(hiddenText.textContent || '');
-            //     placeholder.replaceChild(textNode, hiddenText);
-            // }
-            console.log(`[Media Unload] Unloaded media for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
+            // Create dummy placeholder
+            const dummyElement = document.createElement("span");
+            // Add classes for styling (assuming CSS defines size, display, etc.)
+            dummyElement.classList.add("dummy-avatar-placeholder");
+            // Add inline-avatar if it helps with consistent styling (like margins, alignment)
+            if (mediaElement.classList.contains("inline-avatar")) {
+              dummyElement.classList.add("inline-avatar");
+            }
+            // Ensure necessary styles for sizing and alignment are present, either via CSS or inline
+            dummyElement.style.display = "inline-block"; // Needed to respect width/height
+            dummyElement.style.verticalAlign = mediaElement.style.verticalAlign || "bottom"; // Match original or default
+
+            // Replace media with dummy
+            placeholder.replaceChild(dummyElement, mediaElement);
+            delete placeholder.dataset.mediaInjected; // Mark as not injected (dummy is present)
+
+            // NOTE: Text remains hidden in its wrapper span. No need to restore/re-hide.
+
+            console.log(`[Media Unload] Replaced media with dummy for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
           }
         }
       });

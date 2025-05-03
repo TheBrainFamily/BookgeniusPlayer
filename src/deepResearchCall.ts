@@ -1,7 +1,7 @@
 import { Location } from "./state/LocationContext";
 
 export async function deepResearchCall(searchQuery: string, location: Location): Promise<string> {
-  const baseUrl = "http://localhost:3000/deepResearch"; // Assuming localhost for now
+  const baseUrl = "/api/deepResearch"; // Assuming localhost for now
   const filter = {
     chapterFrom: 1, // Based on the curl example
     chapterTo: location.endChapter,

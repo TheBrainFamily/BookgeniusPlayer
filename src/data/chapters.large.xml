@@ -7,11 +7,11 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
 
 <CharactersMaster>
     <Ramzes-XII display="Ramzes XII" summary="Faraon Egiptu w 33. roku panowania. Ojciec Ramzesa, następcy tronu." />
-    <Ksiaze-Ramzes display="Książę Ramzes" summary="Syn faraona Ramzesa XII i królowej Nikotris, w wieku 22 lat mianowany następcą tronu (erpatrem). Młody, ambitny, o porywczym usposobieniu i zainteresowaniach wojskowych." />
+    <Ksiaze-Ramzes display="Książę Ramzes" summary="Syn faraona i królowej Nikotris, w wieku 22 lat mianowany następcą tronu." />
     <Nikotris display="Nikotris" summary="Królowa, druga żona faraona Ramzesa XII, matka następcy tronu Ramzesa. Córka arcykapłana Amenhotepa." />
     <Amenhotep display="Amenhotep" summary="Arcykapłan, ojciec królowej Nikotris. Dziadek następcy tronu Ramzesa." />
-    <Herhor display="Herhor" summary="Minister wojny i arcykapłan świątyni Amona w Tebach. Wpływowa osobistość w państwie, mężczyzna w średnim wieku, opanowany i zamknięty w sobie." />
-    <Nitager display="Nitager" summary="Jenerał, naczelny wódz armii strzegącej wschodnich granic Egiptu." />
+    <Herhor display="Herhor" summary="Minister wojny i arcykapłan. Wpływowa osobistość, mężczyzna w średnim wieku, opanowany i zamknięty w sobie." />
+    <Nitager display="Nitager" summary="Generał, naczelny wódz armii strzegącej wschodnich granic Egiptu." />
     <Pentuer display="Pentuer" summary="Kapłan i pisarz ministra Herhora. Pochodzi z ludu, znany z wyjątkowych zdolności i pamięci, ma wygląd ascety." />
     <Eunana display="Eunana" summary="Oficer w sztabie następcy tronu Ramzesa, pochodzenia hetyckiego, znany z noszenia wielu amuletów. Stara się przypodobać księciu." />
     <Patrokles display="Patrokles" summary="Generał dowodzący greckimi pułkami najemnymi w służbie Egiptu." />
@@ -43,7 +43,7 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
     <Hiram display="Hiram" summary="Książę tyryjski, członek najwyższej rady i wpływowy kupiec fenicki." />
     <Sargon display="Sargon" summary="Poseł asyryjski, którego przybycie do Egiptu w celu zawarcia traktatu jest zapowiadane." />
     <Asarhadon display="Asarhadon" summary="Fenicjanin z Tyru, właściciel zajazdu „Pod Okrętem” w Memfis, w którym obowiązkowo zatrzymują się wszyscy cudzoziemcy." />
-    <Phut-Beroes display="Phut (Beroes)" summary="Tajemniczy podróżny z Harranu, podający się za Chetytę. Zatrzymuje się w zajeździe Asarhadona. Wygląda na mędrca lub kapłana." />
+    <Phut-Beroes display="Phut (Beroes)" summary="Tajemniczy podróżny z Harranu, podający się za Chetytę. Wygląda na mędrca lub kapłana." />
     <Mefres display="Mefres" summary="Arcykapłan świątyni Ptah w Memfis. Spotyka się potajemnie z Beroesem." />
     <Wielki-prorok-swiatyni-Hator display="Wielki prorok świątyni Hator" summary="" />
     <Wielki-lekarz-swiatyni-Hator display="Wielki lekarz świątyni Hator" summary="" />

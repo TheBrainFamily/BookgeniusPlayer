@@ -44,7 +44,7 @@ interface BottomInputProps {
 export function BottomInput({ placeholder = "Type something...", onSubmit, className, onShowDeepResearch }: BottomInputProps) {
   const [value, setValue] = useState("");
   // isFocused might not be needed anymore if backdrop is removed
-  // const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isInputExpanded, setIsInputExpanded] = useState(true);
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
@@ -96,6 +96,14 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
     } else if (newVal.trim().length === 0 && isSearchActive()) {
       hideSearchModal();
     }
+  };
+
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
   };
 
   const handleSubmit = (e?: React.FormEvent) => {
@@ -172,15 +180,17 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
       >
         <div
           className={cn(
-            "keyboard-safe-area", // Apply CSS class for padding
+            "keyboard-safe-area",
             "w-full mx-auto",
             "lg:max-w-[700px]",
-            "bg-gradient-to-b from-black/0 to-black/30", // Gradient transparency from top to bottom
-            // "backdrop-blur-sm", // Added subtle blur effect
-            "rounded-lg", // Added soft edges
-            // "border-t border-black/10", // Added one line black border at the top
+            "bg-gradient-to-b from-black/0 to-[var(--footer-stop)]",
+            "rounded-lg",
+            "dark:bg-inherit",
             isCollapsed ? "p-0" : "px-4 pt-3 pb-1",
+            // keep these *last* so they win the cascade
+            "transition-[--footer-stop] duration-300 ease-in-out",
           )}
+          style={{ "--footer-stop": isFocused ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.3)" } as React.CSSProperties}
         >
           {isCollapsed ? (
             <motion.button /* Collapsed Button - unchanged */
@@ -194,18 +204,18 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
             </motion.button>
           ) : (
             // --- Expanded State ---
-            <form onSubmit={handleSubmit} className="flex flex-col w-full">
-              <input /* Input field - unchanged */
+            <form onSubmit={handleSubmit} className="flex w-full items-center space-x-2 h-12">
+              <input /* Input field - adjusted styles */
                 id="bottom-input"
                 ref={inputRef}
                 type="text"
                 value={value}
                 onChange={handleInputChange}
-                // onFocus={handleFocus} // Remove if not needed
-                // onBlur={handleBlur} // Remove if not needed
+                onFocus={handleFocus} // Remove if not needed
+                onBlur={handleBlur} // Remove if not needed
                 placeholder={isRecording ? "Listening..." : isDeepResearchActive ? "Enter deep research query..." : placeholder}
                 className={cn(
-                  "w-full p-0 pb-2 pr-1 outline-none transition-colors bg-transparent text-white dark:text-white",
+                  "flex-grow p-0 pr-1 outline-none transition-colors bg-transparent text-white dark:text-white", // Use flex-grow, remove w-full and pb-2
                   "placeholder:text-gray-500 dark:placeholder:text-gray-400",
                   "text-base",
                   isRecording ? "opacity-50" : "",
@@ -213,62 +223,62 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                 disabled={isRecording || isThinking}
                 autoComplete="off"
               />
-              <div className="w-full flex justify-between items-center h-12">
-                {/* Deep Research Button - unchanged */}
+              {/* Combined button container */}
+              <div className="flex items-center space-x-2">
+                {/* Deep Research Button - Moved here */}
                 <button
                   type="button"
                   aria-pressed={isDeepResearchActive}
                   className={cn(
-                    "py-1 px-3 rounded-lg flex items-center transition-colors duration-200 h-8",
+                    "py-1 px-3 rounded-lg flex items-center transition-colors duration-200 h-8 cursor-pointer", // Kept h-8 for now
                     isDeepResearchActive
                       ? "bg-orange-500 text-white hover:bg-orange-600"
-                      : "bg-gray-200 dark:bg-zinc-700 border border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-400 dark:hover:border-zinc-500",
+                      : "bg-secondary/80 dark:bg-zinc-700 border border-transparent text-gray-600 dark:text-gray-300 hover:bg-secondary/50 hover:border-gray-400 dark:hover:border-zinc-500",
                     isThinking ? "opacity-50 cursor-default" : "",
                   )}
                   onClick={toggleDeepResearch}
                   disabled={isThinking || isRecording}
                 >
                   <Telescope size={16} className="mr-1.5 flex-shrink-0" />
-                  <span className="text-sm whitespace-nowrap leading-none">Deep Research</span>
+                  <span className="text-sm whitespace-nowrap leading-none">Research</span>
                   {isThinking && <div className="w-3 h-3 ml-2 border-2 border-t-transparent rounded-full animate-spin border-current"></div>}
                 </button>
-                <div className="flex items-center space-x-2">
-                  {value.trim() && !isRecording ? (
-                    <motion.button /* Send Button - unchanged */
-                      type="submit"
-                      aria-label="Send message"
-                      className="p-3 rounded-full bg-blue-500 text-white flex items-center justify-center shadow hover:bg-blue-600"
-                      whileTap={{ scale: 0.92 }}
-                      disabled={isThinking}
-                    >
-                      <Send size={18} />
-                    </motion.button>
-                  ) : (
-                    <motion.button /* Mic Button - unchanged */
-                      type="button"
-                      aria-label={isRecording ? "Stop recording" : "Start recording"}
-                      className={cn(
-                        "p-3 rounded-full flex items-center justify-center shadow transition-colors duration-150",
-                        isRecording ? "bg-red-500 text-white animate-pulse" : "bg-secondary text-secondary-foreground hover:bg-secondary/90",
-                      )}
-                      whileTap={{ scale: isRecording ? 1 : 0.92 }}
-                      onPointerDown={(e) => {
-                        if (e.pointerType === "touch") e.preventDefault();
-                        handleRecordingStart();
-                      }}
-                      onPointerUp={() => {
-                        if (isRecording) handleRecordingEnd();
-                      }}
-                      onPointerLeave={() => {
-                        if (isRecording) handleRecordingEnd();
-                      }}
-                      onContextMenu={(e) => e.preventDefault()}
-                      disabled={isThinking}
-                    >
-                      <Mic size={18} />
-                    </motion.button>
-                  )}
-                </div>
+                {/* Send/Mic Button Logic - Unchanged */}
+                {value.trim() && !isRecording ? (
+                  <motion.button /* Send Button */
+                    type="submit"
+                    aria-label="Send message"
+                    className="p-3 rounded-full bg-blue-500 text-white flex items-center justify-center shadow hover:bg-blue-600"
+                    whileTap={{ scale: 0.92 }}
+                    disabled={isThinking}
+                  >
+                    <Send size={18} />
+                  </motion.button>
+                ) : (
+                  <motion.button /* Mic Button */
+                    type="button"
+                    aria-label={isRecording ? "Stop recording" : "Start recording"}
+                    className={cn(
+                      "p-3 rounded-full flex items-center justify-center shadow transition-colors duration-150 cursor-pointer",
+                      isRecording ? "bg-red-500 text-white animate-pulse" : "bg-secondary/80 text-secondary-foreground hover:bg-secondary/50",
+                    )}
+                    whileTap={{ scale: isRecording ? 1 : 0.92 }}
+                    onPointerDown={(e) => {
+                      if (e.pointerType === "touch") e.preventDefault();
+                      handleRecordingStart();
+                    }}
+                    onPointerUp={() => {
+                      if (isRecording) handleRecordingEnd();
+                    }}
+                    onPointerLeave={() => {
+                      if (isRecording) handleRecordingEnd();
+                    }}
+                    onContextMenu={(e) => e.preventDefault()}
+                    disabled={isThinking}
+                  >
+                    <Mic size={18} />
+                  </motion.button>
+                )}
               </div>
             </form>
           )}

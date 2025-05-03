@@ -460,6 +460,13 @@
     box-shadow: 0 0 8px var(--shadow-light);
     border-radius: 8px;
     padding: 1rem;
+    text-align: justify;
+    text-align-last: left;
+    hyphens: auto;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    text-wrap: pretty;
+    font-size: 0.9rem;
   }
 
   .entity-text-column h4 {
@@ -521,26 +528,6 @@
     margin: 20px;
     margin-top: 0;
     margin-right: 0;
-  }
-
-  /* Return to Location Button */
-  #return-to-location-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 10px 15px;
-    background-color: var(--return-button-bg);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    z-index: 1001; /* Above modals */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transition: background-color var(--transition-fast) var(--transition-timing);
-
-    &:hover {
-      background-color: var(--return-button-hover-bg);
-    }
   }
 
   /* --- Loading Indicator --- */
@@ -966,4 +953,24 @@
   animation: fadeUp 0.4s ease-out forwards;
   /* Set --stagger-delay via JS */
   animation-delay: var(--stagger-delay, 0s);
+}
+
+/* Return to Location Button */
+#return-to-location-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 15px;
+  background-color: var(--return-button-bg);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 1001; /* Above modals */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color var(--transition-fast) var(--transition-timing);
+
+  &:hover {
+    background-color: var(--return-button-hover-bg);
+  }
 }
