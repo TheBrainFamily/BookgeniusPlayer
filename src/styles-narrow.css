@@ -81,7 +81,8 @@
   #legacy #left-notes .entity-note {
     width: 100%; /* Ensure it takes full available width */
     position: relative; /* Needed for z-index */
-    margin-left: 0;
+    margin-left: 2em;
+    margin-right: 2em;
     & > div {
       display: flex;
       gap: 15px;

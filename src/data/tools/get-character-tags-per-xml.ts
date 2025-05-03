@@ -83,67 +83,74 @@ function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<string>):
       }
       const chapterId = parseInt(chapterIdAttr, 10);
 
-      const paragraphs = chapterElement.getElementsByTagName("p");
+      let dataIndex = 0;
 
-      // --- Process Each Paragraph ---
-      for (let pIndex = 0; pIndex < paragraphs.length; pIndex++) {
-        const paragraph = paragraphs[pIndex];
-        const spottedInPara = new Set<string>(); // Track characters spotted in this para
-        const talksInPara = new Set<string>(); // Track characters talking in this para
+      // Iterate over direct child nodes of the chapter
+      for (let j = 0; j < chapterElement.childNodes.length; j++) {
+        const node = chapterElement.childNodes[j];
 
-        // Iterate through all direct children of the paragraph
-        for (let i = 0; i < paragraph.childNodes.length; i++) {
-          const node = paragraph.childNodes[i];
+        // Check if it's an element node
+        if (node.nodeType === 1 /* Node.ELEMENT_NODE */) {
+          // --- Process Each Paragraph ---
+          const paragraph = node as Element;
+          const spottedInPara = new Set<string>(); // Track characters spotted in this para
+          const talksInPara = new Set<string>(); // Track characters talking in this para
 
-          // We only care about element nodes (tags)
-          if (node.nodeType === node.ELEMENT_NODE) {
-            const element = node as Element;
-            const tagName = element.tagName;
+          // Iterate through all direct children of the paragraph
+          for (let i = 0; i < paragraph.childNodes.length; i++) {
+            const node = paragraph.childNodes[i];
 
-            // Check if this tag is one of our characters
-            if (characterTags.has(tagName)) {
-              // Check for the specific talking="true" attribute
-              if (element.getAttribute("talking") === "true") {
-                talksInPara.add(tagName);
-              } else {
-                // It's a regular mention (e.g., <Tag>Text</Tag>)
-                // Check if it actually contains text or other nodes,
-                // to potentially distinguish from empty leftover tags if needed,
-                // but generally, its presence means spotted.
-                spottedInPara.add(tagName);
+            // We only care about element nodes (tags)
+            if (node.nodeType === node.ELEMENT_NODE) {
+              const element = node as Element;
+              const tagName = element.tagName;
+
+              // Check if this tag is one of our characters
+              if (characterTags.has(tagName)) {
+                // Check for the specific talking="true" attribute
+                if (element.getAttribute("talking") === "true") {
+                  talksInPara.add(tagName);
+                } else {
+                  // It's a regular mention (e.g., <Tag>Text</Tag>)
+                  // Check if it actually contains text or other nodes,
+                  // to potentially distinguish from empty leftover tags if needed,
+                  // but generally, its presence means spotted.
+                  spottedInPara.add(tagName);
+                }
               }
+              // Could add recursive check here if tags might be nested deeper,
+              // but based on your example, they are direct children of <p>
             }
-            // Could add recursive check here if tags might be nested deeper,
-            // but based on your example, they are direct children of <p>
-          }
-        } // End loop through paragraph children
+          } // End loop through paragraph children
 
-        // --- Update Results Based on Findings in this Paragraph ---
-        const updateCharacterInfo = (charTag: string, listType: "spotted" | "talking") => {
-          const data = resultsMap.get(charTag);
-          if (!data) return; // Should not happen if initialized correctly
+          // --- Update Results Based on Findings in this Paragraph ---
+          const updateCharacterInfo = (charTag: string, listType: "spotted" | "talking") => {
+            const data = resultsMap.get(charTag);
+            if (!data) return; // Should not happen if initialized correctly
 
-          // Find or create the entry for the current chapter
-          let chapterEntry = data.infoPerChapter.find((info) => info.chapter === chapterId);
-          if (!chapterEntry) {
-            chapterEntry = { chapter: chapterId, summary: getSummaryForCharacter(charTag, doc), paragraphsWhereSpotted: [], paragraphsWhereTalking: [] };
-            data.infoPerChapter.push(chapterEntry);
-            // Keep chapter entries sorted by chapter number
-            data.infoPerChapter.sort((a, b) => a.chapter - b.chapter);
-          }
+            // Find or create the entry for the current chapter
+            let chapterEntry = data.infoPerChapter.find((info) => info.chapter === chapterId);
+            if (!chapterEntry) {
+              chapterEntry = { chapter: chapterId, summary: getSummaryForCharacter(charTag, doc), paragraphsWhereSpotted: [], paragraphsWhereTalking: [] };
+              data.infoPerChapter.push(chapterEntry);
+              // Keep chapter entries sorted by chapter number
+              data.infoPerChapter.sort((a, b) => a.chapter - b.chapter);
+            }
 
-          // Add the current paragraph index if not already present
-          const targetArray = listType === "talking" ? chapterEntry.paragraphsWhereTalking : chapterEntry.paragraphsWhereSpotted;
+            // Add the current paragraph index if not already present
+            const targetArray = listType === "talking" ? chapterEntry.paragraphsWhereTalking : chapterEntry.paragraphsWhereSpotted;
 
-          if (!targetArray.includes(pIndex)) {
-            targetArray.push(pIndex);
-            // Keep paragraph indices sorted
-            // targetArray.sort((a, b) => a - b); // Sorting done later globally
-          }
-        };
+            if (!targetArray.includes(dataIndex)) {
+              targetArray.push(dataIndex);
+              // Keep paragraph indices sorted
+              // targetArray.sort((a, b) => a - b); // Sorting done later globally
+            }
+          };
 
-        talksInPara.forEach((charTag) => updateCharacterInfo(charTag, "talking"));
-        spottedInPara.forEach((charTag) => updateCharacterInfo(charTag, "spotted"));
+          talksInPara.forEach((charTag) => updateCharacterInfo(charTag, "talking"));
+          spottedInPara.forEach((charTag) => updateCharacterInfo(charTag, "spotted"));
+          dataIndex++;
+        }
       } // End loop through paragraphs
     } // End loop through chapters
 
