@@ -1,5 +1,7 @@
 import { setCurrentLocation } from "../helpers/paragraphsNavigation";
 
+const SHOULD_SHOW_EVERYONE = false;
+
 // --- Helper Functions ---
 
 /**
@@ -58,18 +60,20 @@ function createMediaElement(placeholder: HTMLSpanElement): HTMLVideoElement | HT
     }
   } else if (pictureSrc) {
     // Not talking (or no movingSrc), use picture source
-    finalSrc = pictureSrc;
-    if (pictureSrc.toLowerCase().endsWith(".png")) {
-      // Picture source is an image
-      element = document.createElement("img");
-    } else {
-      // Picture source is a video
-      const video = document.createElement("video");
-      video.autoplay = true; // Keep consistent attributes even for static video
-      video.loop = true;
-      video.muted = true;
-      video.playsInline = true;
-      element = video;
+    if (SHOULD_SHOW_EVERYONE) {
+      finalSrc = pictureSrc;
+      if (pictureSrc.toLowerCase().endsWith(".png")) {
+        // Picture source is an image
+        element = document.createElement("img");
+      } else {
+        // Picture source is a video
+        const video = document.createElement("video");
+        video.autoplay = true; // Keep consistent attributes even for static video
+        video.loop = true;
+        video.muted = true;
+        video.playsInline = true;
+        element = video;
+      }
     }
   } else {
     // No source available

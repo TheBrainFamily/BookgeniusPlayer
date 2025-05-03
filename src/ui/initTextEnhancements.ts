@@ -1,5 +1,4 @@
 import { setupParagraphHighlighting } from "./paragraphHighlighting";
-import { setupInlineAvatars } from "./inlineAvatars";
 
 /**
  * Initialize all text enhancement features
@@ -7,7 +6,4 @@ import { setupInlineAvatars } from "./inlineAvatars";
 export function initTextEnhancements(): void {
   // Set up paragraph highlighting (existing functionality)
   setupParagraphHighlighting();
-
-  // Set up inline character avatars (new functionality)
-  setupInlineAvatars();
 }
