@@ -1,4 +1,4 @@
-import { pharaonCharactersData } from "@/src/data/pharaon-metadata";
-import { faraonBookXml } from "@/src/data/chapters-pharaon";
+import { _1984CharactersData } from "@/src/data/metadata-1984";
+import { _1984BookXml } from "@/src/data/chapters-1984";
 
-export const bookData = { slug: "Pharaon", metadata: { title: "Pharaon" }, charactersData: pharaonCharactersData, bookXml: faraonBookXml, chapters: 100 };
+export const bookData = { slug: "1984", metadata: { title: "1984" }, charactersData: _1984CharactersData, bookXml: _1984BookXml, chapters: 100 };

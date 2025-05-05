@@ -90,8 +90,9 @@ function createMediaElement(placeholder: HTMLSpanElement): HTMLVideoElement | HT
     element.onerror = () => console.error(`Failed to load media: ${element?.src}`);
     return element;
   }
-
-  console.warn("Failed to create media element for placeholder:", placeholder); // Should not happen ideally
+  if (SHOULD_SHOW_EVERYONE) {
+    console.warn("Failed to create media element for placeholder:", placeholder); // Should not happen ideally
+  }
   return null;
 }
 

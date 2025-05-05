@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import { Book, X, List, FileText, PanelLeft, PanelBottom, Type, RotateCcw } from "lucide-react";
+import { Book, X, List, FileText, PanelLeft, PanelBottom, Type, RotateCcw, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,6 +12,7 @@ import { isNightMode } from "./helpers/setIsNightMode";
 import { toggleMobileCharacters, isMobileCharactersVisible } from "./isMobileCharactersVisible";
 import { resetFurthestPageLocation } from "./helpers/reset-furthest-page-location";
 import { goToParagraph } from "./helpers/paragraphsNavigation";
+import { preloadBackgroundTracks } from "./deal-with-background-songs";
 const getTitle = (chapter: number) => {
   const chapterNames = [
     "Zero",
@@ -164,6 +165,18 @@ export default function BookChaptersModal({ onShowDeepResearch }: BookChaptersMo
             >
               <List className="mr-2 h-4 w-4" />
               Open Chapter
+            </Button>
+
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-left"
+              onClick={() => {
+                preloadBackgroundTracks();
+                setOverlayOpen(false);
+              }}
+            >
+              <Music className="mr-2 h-4 w-4" />
+              Background Music
             </Button>
 
             <Button

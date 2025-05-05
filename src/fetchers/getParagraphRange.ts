@@ -185,7 +185,6 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
         isTalking: boolean;
         others: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[];
       } | null = null;
-      console.log("CONSIDERING character", character);
 
       const sortedChapters = [...character.infoPerChapter].sort((a, b) => a.chapter - b.chapter);
 

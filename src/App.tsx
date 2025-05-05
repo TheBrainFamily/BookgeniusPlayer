@@ -16,7 +16,7 @@ import { BottomInput } from "./components/BottomInput";
 import { RealtimeProvider } from "./context/RealtimeContext";
 import { DeepResearchModal } from "./ui/DeepResearchModal";
 import { bookData } from "./rexportedBookData";
-
+import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
 function Shell({ setShowDeepResearch, showDeepResearch, passedText }: { setShowDeepResearch: (show: boolean) => void; showDeepResearch: boolean; passedText?: string }) {
   /* Inject book content first */
   useBookContent(bookData.bookXml, "content-container");
@@ -27,6 +27,7 @@ function Shell({ setShowDeepResearch, showDeepResearch, passedText }: { setShowD
   /* dynamic visual hooks */
   useCutScene();
   useBackgroundVideo();
+  useBackgroundSongs();
 
   return (
     <>

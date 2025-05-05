@@ -2,6 +2,10 @@
 //  background-videos.ts   (copy-paste entire file)
 // -----------------------------------------------------------------------------
 
+import { BOOK_SLUGS } from "../consts";
+
+import { CURRENT_BOOK } from "../consts";
+
 // ---- generic debounce -------------------------------------------------------
 function debounce<T extends (...args: unknown[]) => void>(fn: T, wait: number): (...args: Parameters<T>) => void {
   let t: number | null = null;
@@ -51,7 +55,7 @@ export const dealWithBackground = ({
         endParagraph: 10_000,
       });
 
-      const backgroundsPassedFromGemini = [
+      const backgroundsInput = [
         { chapter: 1, file: "background-egyptian-streets-palace-visible-loop.mp4" },
         { chapter: 2, file: "background-wawoz-fade.mp4" },
         { chapter: 3, file: "background-sara-slow-motion-loop.mp4" },
@@ -102,7 +106,16 @@ export const dealWithBackground = ({
         { chapter: 48, file: "chapter48-slow-fade-sw-q20.mp4" },
         { chapter: 49, file: "chapter49-slow-fade-sw-q20.mp4" },
       ];
-      const backgrounds = backgroundsPassedFromGemini.map(toBackground);
+      let backgrounds = backgroundsInput.map(toBackground);
+
+      if (CURRENT_BOOK === BOOK_SLUGS._1984) {
+        const backgroundsInput = [
+          { chapter: 1, file: "1984-chapter-1.mp4" },
+          { chapter: 2, file: "1984-chapter-2.mp4" },
+          { chapter: 3, file: "1984-chapter-3.mp4" },
+        ];
+        backgrounds = backgroundsInput.map(toBackground);
+      }
 
       // ---------- helpers -----------------------------------------------------
       if (!legacy.dataset.front) legacy.dataset.front = "a";
@@ -121,7 +134,7 @@ export const dealWithBackground = ({
         if (legacy.dataset.currentFile === file || isTransitioning) return;
         isTransitioning = true;
 
-        const newSrc = `/Pharaon/${file}`;
+        const newSrc = `/${CURRENT_BOOK}/${file}`;
         back.classList.add("faded"); // start hidden
 
         back.src = newSrc;
