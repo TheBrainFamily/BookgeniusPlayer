@@ -10,5 +10,5 @@
     { "src": "public/icon-192x192.png", "type": "image/png", "sizes": "192x192", "purpose": "any maskable" },
     { "src": "public/icon-512x512.png", "type": "image/png", "sizes": "512x512", "purpose": "any maskable" }
   ],
-  "version": "1.0.21"
+  "version": "1.0.22"
 }
