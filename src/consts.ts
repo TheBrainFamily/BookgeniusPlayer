@@ -9,4 +9,4 @@ export enum BOOK_SLUGS {
   _1984 = "1984",
 }
 
-export const CURRENT_BOOK = BOOK_SLUGS._1984;
+export const CURRENT_BOOK = BOOK_SLUGS.PHARAON;

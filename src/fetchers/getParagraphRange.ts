@@ -110,7 +110,7 @@ export const paragraphMetadataServicePure = {
         .filter((d) => d.bookSlug === bookSlug)
         // 2. chapter & paragraph filtering ────────────────────────────────────
         .map((character) => {
-          if (character.characterName === "Dziewczyna z ciemnymi włosami (Julia)") {
+          if (character.characterName === "Eunana") {
             console.log("character", character.characterName, character.infoPerChapter);
             console.log(
               "character filtered",
