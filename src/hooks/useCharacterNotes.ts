@@ -11,7 +11,7 @@ function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {
 
 export function useCharacterNotes(loc: Location, charactersData: SelfSufficientCharacterMetadata[]): ParsedParagraphRange[] {
   const [notes, setNotes] = useState<ParsedParagraphRange[]>([]);
-
+  console.log("GOZDECKI MAy 3notes", notes);
   useEffect(() => {
     let cancelled = false;
 
@@ -32,16 +32,18 @@ export function useCharacterNotes(loc: Location, charactersData: SelfSufficientC
       if (cancelled) return;
 
       const parsed = parseParagraphRange(raw);
+      console.log("parsed", parsed);
 
       /* only update when list really changed */
       setNotes((prev) => (sameList(prev, parsed) ? prev : parsed));
     };
 
     load();
+    console.log("GOZDECKI LOADED");
     return () => {
       cancelled = true;
     };
-  }, [loc.chapter, loc.paragraph, charactersData]);
+  }, [loc.chapter, loc.paragraph, loc.endChapter, loc.endParagraph, charactersData]);
 
   return notes;
 }

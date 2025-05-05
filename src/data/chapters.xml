@@ -17,9 +17,6 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
     <Patrokles display="Patrokles" summary="Generał dowodzący greckimi pułkami najemnymi w służbie Egiptu." />
     <Tutmozis display="Tutmozis" summary="Krewny i adiutant następcy tronu Ramzesa. Znany jako pierwszy elegant w Memfis, lubiący luksus i rozrywki." />
     <Chlop-egipski display="Chłop egipski" summary="Stary, nagi niewolnik należący do Sezofrisa. Przez dziesięć lat w tajemnicy kopał kanał na pustyni, licząc na obiecaną wolność dla siebie i dzieci." />
-    <Sezofris display="Sezofris" summary="Ekonom u pisarza pana Chairesa. Pan starego chłopa kopiącego kanał." />
-    <Nomarcha-Memfis display="Nomarcha Memfis" summary="Dostojnik zarządzający nomesem (prowincją) Memfis i jego okolicami." />
-    <Chaires display="Chaires" summary="Pan, u którego Sezofris jest pisarzem. Sam nosi wachlarz nad nomarchą Memfisu, co świadczy o jego wysokiej pozycji." />
     <Sara display="Sara" summary="Młoda, piękna Żydówka o greckich rysach, córka Gedeona. Mieszka z ojcem w izolowanej, żyznej dolinie na pustyni." />
     <Gedeon display="Gedeon" summary="Żyd, rządca folwarku należącego do Sezofrisa. Ojciec Sary." />
     <Wielki-pisarz display="Wielki pisarz" summary="Wysoki urzędnik na dworze faraona, kapłan jednej ze świątyń w Memfis. Prawa ręka faraona w administracji." />
@@ -29,7 +26,7 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
     <Tafet display="Tafet" summary="Krewna i służąca Sary, mieszkająca z nią w folwarku podarowanym przez Ramzesa. Znana z gadatliwości." />
     <Dutmoze display="Dutmoze" summary="Egipski chłop oskarżony o udział w napadzie na dom Sary podczas świętowania przyboru Nilu." />
     <Anupa display="Anupa" summary="Egipski chłop oskarżony o udział w napadzie na dom Sary podczas świętowania przyboru Nilu." />
-    <Pieszczota-Kama display="Pieszczota (Kama)" summary="Piękna fenicka tancerka i kapłanka bogini Astoreth. Przysłana przez Dagona do Ramzesa jako forma przeprosin." />
+    <Pieszczota display="Pieszczota (Kama)" summary="Piękna fenicka tancerka i kapłanka bogini Astoreth. Przysłana przez Dagona do Ramzesa jako forma przeprosin." />
     <Mentezufis display="Mentezufis" summary="Święty ojciec, kapłan towarzyszący Ramzesowi w podróży po Dolnym Egipcie jako doradca duchowy." />
     <Otoes display="Otoes" summary="Nomarcha (zarządca prowincji) nomesu Aa, sąsiadującego z Memfisem." />
     <Ester display="Ester" summary="Młoda Żydówka o wylęknionych oczach, krewna i służebnica Sary." />
@@ -2292,34 +2289,34 @@ Chodź ze mną, <Tutmozis>kuzynie</Tutmozis> — rzekł do <Tutmozis>Tutmozisa</
   <p>Od tej pory Fenicjanin nie pokazywał się <Ksiaze-Ramzes>następcy tronu</Ksiaze-Ramzes>. Lecz gdy pewnego dnia <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> przyszedł do swojej willi, zastał w pokoju sypialnym piękną szesnastoletnią tancerkę fenicką, która za cały strój miała złotą obręcz na głowie i delikatny jak pajęczyna szal na ramionach.</p>
   <p><Ksiaze-Ramzes talking="true"/>
 — Któż ty jesteś? — zapytał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-  <p><Pieszczota-Kama talking="true"/>
+  <p><Pieszczota talking="true"/>
 — Jestem kapłanką i twoją służebnicą, a przysłał mnie pan <Dagon>Dagon</Dagon>, ażebym wypłoszyła twój gniew na niego.</p>
   <p><Ksiaze-Ramzes talking="true"/>
 — Jakże potrafisz to zrobić?</p>
-  <p><Pieszczota-Kama talking="true"/>
+  <p><Pieszczota talking="true"/>
 — O tak… Siądź tutaj — mówiła, sadowiąc go na fotelu — ja stanę na palcach, ażeby zrobić się wyższą aniżeli twój gniew, i tym szalem, który jest poświęcony, będę odpędzać od ciebie złe duchy… A kysz!… a kysz!… — szeptała, tańcząc wkoło <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes>. — Niech moje ręce zdejmą ponurość z włosów twoich… niech moje pocałunki przywrócą jasne spojrzenie oczom twym… niech bicie mego serca napełni muzyką uszy twoje, <Ksiaze-Ramzes>panie Egiptu</Ksiaze-Ramzes>… A kysz!… a kysz!… on nie wasz, ale mój… Miłość potrzebuje takiej ciszy, że wobec niej nawet gniew musi umilknąć…</p>
   <p>Tańcząc, bawiła się włosami <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes>, obejmowała go za szyję, całowała w oczy. Wreszcie zmęczona siadła u nóg <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> i oparłszy głowę na jego kolanach, bystro przypatrywała mu się, dysząc rozchylonymi ustami.</p>
-  <p><Pieszczota-Kama talking="true"/>
+  <p><Pieszczota talking="true"/>
 — Już nie gniewasz się na twego sługę <Dagon>Dagona</Dagon>?… — szeptała, głaszcząc twarz <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>.</p>
   <p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> chciał ją pocałować w usta, lecz zerwała się z jego kolan i uciekła, wołając:</p>
-  <p><Pieszczota-Kama talking="true"/>
+  <p><Pieszczota talking="true"/>
 — O, nie, nie można!…</p>
   <p><Ksiaze-Ramzes talking="true"/>
 — Dlaczego?</p>
-  <p><Pieszczota-Kama talking="true"/>
+  <p><Pieszczota talking="true"/>
 — Jestem dziewicą i kapłanką wielkiej bogini Astoreth… Musiałbyś bardzo kochać i czcić moją opiekunkę, zanim byłoby ci wolno pocałować mnie.</p>
   <p><Ksiaze-Ramzes talking="true"/>
 — A tobie wolno?…</p>
-  <p><Pieszczota-Kama talking="true"/>
+  <p><Pieszczota talking="true"/>
 — Mnie wszystko wolno, bo ja jestem kapłanka i przysięgłam zachować czystość.</p>
   <p><Ksiaze-Ramzes talking="true"/>
 — Więc po cóżeś tu przyszła?</p>
-  <p><Pieszczota-Kama talking="true"/>
+  <p><Pieszczota talking="true"/>
 — Rozpędzić gniew twój. Zrobiłam to i odchodzę. Bądź zdrów i zawsze dobry!… — dodała z przejmującym wejrzeniem.</p>
   <p><Ksiaze-Ramzes talking="true"/>
 — Gdzie mieszkasz?… jak się nazywasz?… — pytał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-  <p><Pieszczota-Kama talking="true"/>
-— Nazywam się <Pieszczota-Kama>Pieszczota</Pieszczota-Kama>. A mieszkam… Ech, po co mam mówić. Jeszcze nieprędko przyjdziesz do mnie.</p>
+  <p><Pieszczota talking="true"/>
+— Nazywam się <Pieszczota>Pieszczota</Pieszczota>. A mieszkam… Ech, po co mam mówić. Jeszcze nieprędko przyjdziesz do mnie.</p>
   <p>Skinęła ręką i znikła, a <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, jak odurzony, nie ruszył się z fotelu. Gdy zaś po chwili wyjrzał oknem, zobaczył bogatą lektykę, którą czterej Nubijczycy szybko nieśli w stronę Nilu.</p>
   <p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> nie żałował odchodzącej: zdziwiła go, ale nie porwała.</p>
   <p>„<Sara>Sara</Sara> jest spokojniejsza od niej — myślał — i ładniejsza. Zresztą… zdaje mi się, że ta Fenicjanka musi być zimna, a jej pieszczoty wyuczone.'</p>
@@ -4093,7 +4090,7 @@ Serce we mnie zamarło, kiedym to usłyszał — ciągnął gospodarz. — Ale c
 <p><Dagon>Dagon</Dagon> machnął ręką.</p>
 <p><Dagon talking="true"/>— Głupie dziewczęta — odparł. — One tylko myślą, ażeby ustroić się, wymalować i pachnidłami namaścić… Ale skąd się biorą te pachnidła i kto je przywozi do Egiptu, o tym już nie wiedzą.</p>
 <p><Hiram talking="true"/>— Trzeba mu podsunąć taką kochankę, ażeby o tym wiedziała — rzekł <Hiram>Hiram</Hiram>.</p>
-<p><Dagon talking="true"/>— Skąd ją wziąć?… — spytał <Dagon>Dagon</Dagon>. — A… mam!… — zawołał, uderzając się w czoło. — Znasz ty <Pieszczota-Kama>Kamę</Pieszczota-Kama>, kapłankę Astoreth?…</p>
+<p><Dagon talking="true"/>— Skąd ją wziąć?… — spytał <Dagon>Dagon</Dagon>. — A… mam!… — zawołał, uderzając się w czoło. — Znasz ty <Pieszczota>Kamę</Pieszczota>, kapłankę Astoreth?…</p>
 <p><Rabsun talking="true"/>— Co?… — przerwał <Rabsun>Rabsun</Rabsun>. — Kapłanka świętej bogini Astoreth będzie kochanką Egipcjanina?…</p>
 <p><Dagon talking="true"/>— Ty byś wolał, ażeby ona była twoją?… — szydził <Dagon>Dagon</Dagon>. — Ona nawet zostanie arcykapłanką, gdy będzie trzeba zbliżyć ją do dworu…</p>
 <p><Hiram talking="true"/>— Prawdę mówisz — rzekł <Hiram>Hiram</Hiram>.</p>
@@ -4891,7 +4888,7 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 <p><Hiram talking="true"/>— I niech bogowie czuwają nad waszą dostojnością — dorzucił <Hiram>Hiram</Hiram>, zostawiając ich.</p>
 <p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> poszedł za kapłanem. Nieco z boku świątyni, między największym gąszczem, stała kamienna ławka, a może o sto kroków od niej niewielki pałacyk, pod którym rozlegały się śpiewy.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Tam modlą się? — zapytał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p>— Nie!… — odparł kapłan, nie ukrywając niechęci. — To zbierają się wielbiciele <Pieszczota-Kama>Kamy</Pieszczota-Kama>, naszej kapłanki, pilnującej ognia przed ołtarzem Astoreth.</p>
+<p>— Nie!… — odparł kapłan, nie ukrywając niechęci. — To zbierają się wielbiciele <Pieszczota>Kamy</Pieszczota>, naszej kapłanki, pilnującej ognia przed ołtarzem Astoreth.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Któregoż ona dziś przyjmie?</p>
 <p>— Żadnego, nigdy!… — odparł zgorszony przewodnik. — Gdyby kapłanka od ognia nie dotrzymała ślubu czystości, musiałaby umrzeć.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Okrutne prawo! — rzekł <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
@@ -4899,7 +4896,7 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 <p><Ksiaze-Ramzes talking="true"/>— Sam?…</p>
 <p>— Tak.</p>
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> usiadł na ławce, w cieniu oliwki, i słuchał śmiechów kobiecych rozlegających się w pałacyku.</p>
-<p>„<Pieszczota-Kama>Kama</Pieszczota-Kama>? — myślał. — Ładne imię!… Musi być młoda, a może jest piękna, i ci głupi Fenicjanie grożą jej śmiercią, gdyby… Czy w ten sposób pragną zapewnić sobie posiadanie choćby kilkunastu dziewic na cały kraj?…'</p>
+<p>„<Pieszczota>Kama</Pieszczota>? — myślał. — Ładne imię!… Musi być młoda, a może jest piękna, i ci głupi Fenicjanie grożą jej śmiercią, gdyby… Czy w ten sposób pragną zapewnić sobie posiadanie choćby kilkunastu dziewic na cały kraj?…'</p>
 <p>Śmiał się, ale było mu smutno. Nie wiadomo dlaczego żałował tej nieznanej kobiety, dla której miłość była wejściem do grobu.</p>
 <p>„Wyobrażam sobie <Tutmozis>Tutmozisa</Tutmozis>, gdyby go mianowano kapłanką Astoreth!… Musiałby biedak umrzeć, zanim przed boginią wypaliłaby się jedna lampa…'</p>
 <p>W tej chwili pod pałacykiem rozległ się dźwięk fletu i odegrał jakąś tęskną melodię, której towarzyszyły głosy kobiet śpiewających:</p>
@@ -4943,32 +4940,32 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> przez chwilę myślał, że stoi przed wielkim lustrem, jakiego nawet faraon nie posiadał. Wnet jednak przekonał się, że jego sobowtór nie jest wizerunkiem, ale żywym człowiekiem.</p>
 <p>W tej chwili uczuł pocałunek na szyi. Znowu odwrócił się, lecz nie było nikogo, a tymczasem i jego sobowtór zniknął.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Kto tu jest?… Chcę wiedzieć!… — zawołał rozgniewany <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>— To ja… <Pieszczota-Kama>Kama</Pieszczota-Kama>… — odpowiedział słodki głos.</p>
+<p><Pieszczota talking="true"/>— To ja… <Pieszczota>Kama</Pieszczota>… — odpowiedział słodki głos.</p>
 <p>I w świetlnej smudze ukazała się prześliczna kobieta, naga, w złotej przepasce około bioder.</p>
 <p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> pobiegł i schwycił ją za rękę. Nie uciekła.</p>
-<p><Ksiaze-Ramzes talking="true"/>— Ty jesteś <Pieszczota-Kama>Kama</Pieszczota-Kama>?… Nie, ty jesteś… Tak, ciebie kiedyś przysłał do mnie <Dagon>Dagon</Dagon>, ale wówczas nazywałaś się <Pieszczota-Kama>Pieszczotą</Pieszczota-Kama>…</p>
-<p><Pieszczota-Kama talking="true"/>— Bo ja jestem i <Pieszczota-Kama>Pieszczota</Pieszczota-Kama> — odpowiedziała naiwnie.</p>
+<p><Ksiaze-Ramzes talking="true"/>— Ty jesteś <Pieszczota>Kama</Pieszczota>?… Nie, ty jesteś… Tak, ciebie kiedyś przysłał do mnie <Dagon>Dagon</Dagon>, ale wówczas nazywałaś się <Pieszczota>Pieszczotą</Pieszczota>…</p>
+<p><Pieszczota talking="true"/>— Bo ja jestem i <Pieszczota>Pieszczota</Pieszczota> — odpowiedziała naiwnie.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Ty mnie dotykałaś rękoma?…</p>
-<p><Pieszczota-Kama talking="true"/>— Ja.</p>
+<p><Pieszczota talking="true"/>— Ja.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Jakim sposobem?…</p>
-<p><Pieszczota-Kama talking="true"/>— A o, takim… — odpowiedziała, zarzucając mu ręce na szyję i całując go.</p>
+<p><Pieszczota talking="true"/>— A o, takim… — odpowiedziała, zarzucając mu ręce na szyję i całując go.</p>
 <p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> pochwycił ją w objęcia, ale wydarła mu się z siłą, której nie można było podejrzewać w tak drobnej postaci.</p>
-<p><Ksiaze-Ramzes talking="true"/>— Więc to ty jesteś kapłanka <Pieszczota-Kama>Kama</Pieszczota-Kama>?… Więc to do ciebie śpiewał dzisiaj ten Grek… — mówił <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, namiętnie ściskając jej ręce. — Co za jeden ten śpiewak?…</p>
-<p><Pieszczota-Kama>Kama</Pieszczota-Kama> pogardliwie wzruszyła ramionami.</p>
-<p><Pieszczota-Kama talking="true"/>— On jest przy naszej świątyni — rzekła.</p>
+<p><Ksiaze-Ramzes talking="true"/>— Więc to ty jesteś kapłanka <Pieszczota>Kama</Pieszczota>?… Więc to do ciebie śpiewał dzisiaj ten Grek… — mówił <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, namiętnie ściskając jej ręce. — Co za jeden ten śpiewak?…</p>
+<p><Pieszczota>Kama</Pieszczota> pogardliwie wzruszyła ramionami.</p>
+<p><Pieszczota talking="true"/>— On jest przy naszej świątyni — rzekła.</p>
 <p><Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes> płonęły oczy, rozszerzały się nozdrza, szumiało mu w głowie. Ta sama kobieta przed kilkoma miesiącami zrobiła na nim małe wrażenie, ale dziś gotów był dla niej popełnić szaleństwo. Zazdrościł Grekowi, a jednocześnie czuł nieopisany żal na myśl, że gdyby ona została jego kochanką, musiałaby umrzeć.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Jakaś ty piękna — mówił. — Gdzie mieszkasz?… Ach, wiem, w tamtym pałacyku… Czy można cię odwiedzić?… Naturalnie, jeżeli przyjmujesz wizyty śpiewaków, musisz i mnie przyjąć… Czy naprawdę jesteś kapłanką pilnującą ognia?…</p>
-<p><Pieszczota-Kama talking="true"/>— Tak.</p>
+<p><Pieszczota talking="true"/>— Tak.</p>
 <p><Ksiaze-Ramzes talking="true"/>— I wasze prawa są tak okrutne, że nie pozwalają ci kochać?… Ech, to są pogróżki!… Dla mnie zrobisz wyjątek…</p>
-<p><Pieszczota-Kama talking="true"/>— Przeklęłaby mnie cała Fenicja, zemściliby się bogowie… — odparła ze śmiechem.</p>
+<p><Pieszczota talking="true"/>— Przeklęłaby mnie cała Fenicja, zemściliby się bogowie… — odparła ze śmiechem.</p>
 <p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> znowu przyciągnął ją do siebie, ona znowu wydarła się.</p>
-<p><Pieszczota-Kama talking="true"/>— Strzeż się, <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — mówiła z wyzywającym spojrzeniem. — Fenicja jest potężna, a jej bogowie…</p>
+<p><Pieszczota talking="true"/>— Strzeż się, <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — mówiła z wyzywającym spojrzeniem. — Fenicja jest potężna, a jej bogowie…</p>
 <p><Ksiaze-Ramzes talking="true"/>— Co mnie obchodzą twoi bogowie albo Fenicja… Gdyby ci włos spadł, zdeptałbym Fenicję jak złą gadzinę…</p>
-<p>— <Pieszczota-Kama>Kama</Pieszczota-Kama>!… <Pieszczota-Kama>Kama</Pieszczota-Kama>!… — odezwał się od posągu głos.</p>
+<p>— <Pieszczota>Kama</Pieszczota>!… <Pieszczota>Kama</Pieszczota>!… — odezwał się od posągu głos.</p>
 <p>Przeraziła się.</p>
-<p><Pieszczota-Kama talking="true"/>— O widzisz, wołają mnie… Może nawet słyszeli twoje bluźnierstwa…</p>
+<p><Pieszczota talking="true"/>— O widzisz, wołają mnie… Może nawet słyszeli twoje bluźnierstwa…</p>
 <p><Ksiaze-Ramzes talking="true"/>— Bodajby nie usłyszeli mego gniewu!… — wybuchnął <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>— Gniew bogów jest straszniejszy…</p>
+<p><Pieszczota talking="true"/>— Gniew bogów jest straszniejszy…</p>
 <p>Szarpnęła się i znikła w cieniach świątyni. <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> rzucił się za nią, lecz nagle cofnął się. Całą świątynię, między ołtarzem i nim, zalał ogromny, krwawy płomień, wśród którego zaczęły ukazywać się potworne figury: wielkie niedoperze<note id='228'></note>, gady z ludzkimi twarzami, cienie…</p>
 <p>Płomień szedł prosto na niego całą szerokością gmachu, a oszołomiony nie znanym sobie widokiem <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> cofał się wstecz. Nagle owionęło go świeże powietrze. Odwrócił głowę — był już na zewnątrz świątyni, a jednocześnie spiżowe drzwi z łoskotem zatrzasnęły się przed nim.</p>
 <p>Przetarł oczy, rozejrzał się. Księżyc z najwyższego punktu na niebie zniżał się już ku zachodowi. Obok kolumny <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> znalazł swój miecz i burnus. Podniósł je i zeszedł<note id='229'></note> ze schodów jak pijany.</p>
@@ -4995,7 +4992,7 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 — Od czasu kiedy wasza dostojność okazujesz im swoją łaskę.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Tak?… — spytał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> i zamyślił się. Przypomniał sobie wczorajszą scenę w świątyni Astoreth i porównywał ją z podobnymi zjawiskami w świątyni Hator.</p>
-<p>„Wołano na mnie — mówił do siebie — i tu, i tam. Ale tam moja cela była bardzo ciasna i grube mury, tu zaś wołający, a właściwie <Pieszczota-Kama>Kama</Pieszczota-Kama> mogła schować się za kolumnę i szeptać… Wreszcie tu było strasznie ciemno, a w mojej celi widno…'</p>
+<p>„Wołano na mnie — mówił do siebie — i tu, i tam. Ale tam moja cela była bardzo ciasna i grube mury, tu zaś wołający, a właściwie <Pieszczota>Kama</Pieszczota> mogła schować się za kolumnę i szeptać… Wreszcie tu było strasznie ciemno, a w mojej celi widno…'</p>
 <p>Nagle rzekł do <Tutmozis>Tutmozisa</Tutmozis>:</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Kiedyż się to stało?</p>
@@ -5097,17 +5094,17 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 <p>Dostojny minister nawet nie odpowiadał na te wzmianki, co dowodziło, że hulatykę <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> uważa za rzecz naturalną, a może nawet pożyteczną.</p>
 <p>Przy takim nastroju najbliższego otoczenia <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> zyskał dużo swobody. Prawie każdego wieczora, gdy przepici winem dworzanie zaczynali tracić świadomość, <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — wymykał się z pałacu.</p>
 <p>Okryty ciemnym burnusem oficera, przebiegał puste ulice i wydostawał się za miasto, do ogrodów świątyni Astoreth.</p>
-<p>Tam odnajdywał swoją ławkę naprzeciw pałacyku <Pieszczota-Kama>Kamy</Pieszczota-Kama> i ukryty między drzewami patrzył na płonące pochodnie, słuchał śpiewu wielbicieli kapłanki i — marzył o niej.</p>
+<p>Tam odnajdywał swoją ławkę naprzeciw pałacyku <Pieszczota>Kamy</Pieszczota> i ukryty między drzewami patrzył na płonące pochodnie, słuchał śpiewu wielbicieli kapłanki i — marzył o niej.</p>
 <p>Księżyc wschodził coraz później, zbliżając się do nowiu, noce były szare, efekta<note id='230'></note> świetlne przepadły, ale <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> mimo to wciąż widział jasność owej pierwszej nocy i słyszał namiętne strofy Greka.</p>
-<p>Nieraz powstawał z ławki, ażeby wprost pójść do mieszkania <Pieszczota-Kama>Kamy</Pieszczota-Kama>; ale ogarniał go wstyd. Czuł on, że nie wypada następcy tronu ukazywać się w domu kapłanki, którą odwiedzał każdy pielgrzym, byle złożył hojniejszą dla świątyni ofiarę. Co dziwniejsza — bał się, ażeby widok <Pieszczota-Kama>Kamy</Pieszczota-Kama>, otoczonej dzbanami i nieszczęśliwymi wielbicielami, nie zatarł mu cudownego obrazu księżycowej nocy.</p>
-<p>Wówczas gdy ją przysłał <Dagon>Dagon</Dagon>, ażeby odwrócić gniew księcia, <Pieszczota-Kama>Kama</Pieszczota-Kama> wydała się <Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes> młodą dziewczyną, dosyć powabną, dla której jednak można nie stracić głowy. Lecz gdy pierwszy raz w życiu on, wódz i namiestnik, musiał siedzieć pod domem kobiety, gdy go rozmarzyła noc, gdy usłyszał gorące oświadczyny innego mężczyzny, wtedy, także pierwszy raz w życiu zrodziło się w nim szczególne uczucie: mieszanina pożądania, tęsknoty i zazdrości.</p>
-<p>Gdyby mógł mieć <Pieszczota-Kama>Kamę</Pieszczota-Kama> na każde zawołanie, sprzykrzyłaby się mu bardzo prędko, a może nawet nie ubiegałby się za nią. Ale śmierć stojąca na progu jej sypialni, zakochany śpiewak, a nareszcie to upakarzające stanowisko najwyższego dostojnika wobec kapłanki, wszystko to wytwarzało sytuację <Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes> dotychczas nie znaną, a więc ponętną.</p>
+<p>Nieraz powstawał z ławki, ażeby wprost pójść do mieszkania <Pieszczota>Kamy</Pieszczota>; ale ogarniał go wstyd. Czuł on, że nie wypada następcy tronu ukazywać się w domu kapłanki, którą odwiedzał każdy pielgrzym, byle złożył hojniejszą dla świątyni ofiarę. Co dziwniejsza — bał się, ażeby widok <Pieszczota>Kamy</Pieszczota>, otoczonej dzbanami i nieszczęśliwymi wielbicielami, nie zatarł mu cudownego obrazu księżycowej nocy.</p>
+<p>Wówczas gdy ją przysłał <Dagon>Dagon</Dagon>, ażeby odwrócić gniew księcia, <Pieszczota>Kama</Pieszczota> wydała się <Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes> młodą dziewczyną, dosyć powabną, dla której jednak można nie stracić głowy. Lecz gdy pierwszy raz w życiu on, wódz i namiestnik, musiał siedzieć pod domem kobiety, gdy go rozmarzyła noc, gdy usłyszał gorące oświadczyny innego mężczyzny, wtedy, także pierwszy raz w życiu zrodziło się w nim szczególne uczucie: mieszanina pożądania, tęsknoty i zazdrości.</p>
+<p>Gdyby mógł mieć <Pieszczota>Kamę</Pieszczota> na każde zawołanie, sprzykrzyłaby się mu bardzo prędko, a może nawet nie ubiegałby się za nią. Ale śmierć stojąca na progu jej sypialni, zakochany śpiewak, a nareszcie to upakarzające stanowisko najwyższego dostojnika wobec kapłanki, wszystko to wytwarzało sytuację <Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes> dotychczas nie znaną, a więc ponętną.</p>
 <p>I oto dlaczego, prawie co wieczór, od dziesięciu dni przychodził do ogrodów bogini Astoreth, zasłaniając twarz wobec przechodniów.</p>
-<p>Pewnego wieczoru, kiedy na uczcie w swoim pałacu wypił dużo wina, <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> wymknął się ze stanowczym zamiarem. Powiedział sobie, że dzisiaj wejdzie do mieszkania <Pieszczota-Kama>Kamy</Pieszczota-Kama>, a jej wielbiciele — niech sobie śpiewają pod oknami.</p>
+<p>Pewnego wieczoru, kiedy na uczcie w swoim pałacu wypił dużo wina, <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> wymknął się ze stanowczym zamiarem. Powiedział sobie, że dzisiaj wejdzie do mieszkania <Pieszczota>Kamy</Pieszczota>, a jej wielbiciele — niech sobie śpiewają pod oknami.</p>
 <p>Szedł prędko przez miasto, lecz w ogrodach należących do świątyni zwolnił kroku: znowu bowiem uczuł wstyd.</p>
 <p>„Czy słyszano kiedykolwiek — myślał — ażeby <Ksiaze-Ramzes>następca faraona</Ksiaze-Ramzes> biegał za kobietami jak biedny pisarz, który znikąd nie może pożyczyć dziesięciu drachm? Wszystkie przychodziły do mnie, więc i ta powinna przyjść…'</p>
 <p>I już chciał wrócić.</p>
-<p>„A jednak ta nie może przyjść — mówił w duchu — gdyż zabiliby ją…' Stanął i wahał się. „Kto by ją zabił?… <Hiram>Hiram</Hiram>, który w nic nie wierzy, czy <Dagon>Dagon</Dagon>, który już sam nie wie, czym jest?… Tak, ale jest tu mnóstwo innych Fenicjan i przewijają się setki tysięcy pielgrzymów fanatycznych i dzikich. W oczach tych głupców <Pieszczota-Kama>Kama</Pieszczota-Kama>, odwiedzając mnie, popełniłaby świętokradztwo…'</p>
+<p>„A jednak ta nie może przyjść — mówił w duchu — gdyż zabiliby ją…' Stanął i wahał się. „Kto by ją zabił?… <Hiram>Hiram</Hiram>, który w nic nie wierzy, czy <Dagon>Dagon</Dagon>, który już sam nie wie, czym jest?… Tak, ale jest tu mnóstwo innych Fenicjan i przewijają się setki tysięcy pielgrzymów fanatycznych i dzikich. W oczach tych głupców <Pieszczota>Kama</Pieszczota>, odwiedzając mnie, popełniłaby świętokradztwo…'</p>
 <p>Więc znowu poszedł w stronę pałacyku kapłanki. Ani pomyślał, że jemu grozić tu może niebezpieczeństwo. Jemu, który nie wydobywając miecza, samym spojrzeniem cały świat może powalić do swych stóp. On, <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>, i niebezpieczeństwo!…</p>
 <p>Gdy <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> wyszedł spośród drzew, spostrzegł, że dom kapłanki jest bardziej oświetlony i hałaśliwszy niż zwykle. Istotnie w pokojach i na tarasach było pełno gości, a i dokoła pałacyku kręcił się tłum.</p>
 <p>„Co to za banda?' — pomyślał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
@@ -5123,11 +5120,11 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 <p><Ksiaze-Ramzes talking="true"/>
 — Asyryjczycy!… — powtórzył <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>. — Więc to są Asyryjczycy?… A co oni tu robią?…</p>
 <p>
-— Ich pan, <Sargon>Sargon</Sargon>, zaleca się do kapłanki, do świętej <Pieszczota-Kama>Kamy</Pieszczota-Kama>, a oni go pilnują… Oby ich trąd stoczył, świńskich synów…</p>
+— Ich pan, <Sargon>Sargon</Sargon>, zaleca się do kapłanki, do świętej <Pieszczota>Kamy</Pieszczota>, a oni go pilnują… Oby ich trąd stoczył, świńskich synów…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Możesz odejść.</p>
 <p>Nagi człowiek nisko ukłonił się <Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes> i pobiegł zapewne do kuchni.</p>
-<p>„Więc to są Asyryjczycy?… — myślał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, przypatrując się dziwacznym postaciom i wsłuchując w nienawistny, choć niezrozumiały język. — Więc Asyryjczycy już są nad Nilem, ażeby zbratać się z nami czy oszukać nas, a ich dostojnik <Sargon>Sargon</Sargon> zaleca się do <Pieszczota-Kama>Kamy</Pieszczota-Kama>?…'</p>
+<p>„Więc to są Asyryjczycy?… — myślał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, przypatrując się dziwacznym postaciom i wsłuchując w nienawistny, choć niezrozumiały język. — Więc Asyryjczycy już są nad Nilem, ażeby zbratać się z nami czy oszukać nas, a ich dostojnik <Sargon>Sargon</Sargon> zaleca się do <Pieszczota>Kamy</Pieszczota>?…'</p>
 <p>Zawrócił do domu. Jego rozmarzenie zgasło przy blasku nowej, choć dopiero budzącej się namiętności. On, człowiek szlachetny i łagodny, poczuł śmiertelną nienawiść do odwiecznych wrogów Egiptu, z którymi zetknął się po raz pierwszy.</p>
 <p>Kiedy po opuszczeniu świątyni Hator i rozmowie z <Hiram>Hiramem</Hiram> począł rozmyślać o rozpoczęciu wojny z Azją, to były tylko rozmyślania. Egipt potrzebował ludzi, a faraon skarbów, a że wojna była najłatwiejszym sposobem zdobycia ich, że wreszcie dogadzała jego potrzebie sławy, więc projektował sobie wojnę.</p>
 <p>Ale w tej chwili nie obchodziły go skarby, niewolnicy ani sława, bo odezwał się w nim potężniejszy nad wszystko głos nienawiści. Faraonowie tak długo walczyli z Asyryjczykami, obie strony tyle przelały krwi, walka tak głębokie zapuściła korzenie w serca, że <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> na sam widok żołnierzy asyryjskich chwytał za miecz. Zdawało się, że wszystkie duchy poległych wojowników, wszystkie ich trudy i cierpienia zmartwychwstały w duszy królewskiego dziecięcia i wołały o zemstę.</p>
@@ -5147,86 +5144,86 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 — Głupstwo Fenicjanie!… — ciągnął jakby do siebie <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>. — Fenicjanin, Filistyn, Saszu, Libijczyk, nawet Etiopa, to jakby członkowie naszej rodziny. Kiedy nie płacą danin, gniewamy się na nich, gdy zapłacą, zapominamy…</p>
 <p>Ale Asyryjczyk jest to coś tak obcego, tak wrogiego, że… Nie będę szczęśliwym, dopóki nie ujrzę pola zasłanego ich trupami, dopóki nie naliczę ze sto tysięcy odciętych rąk…</p>
 <p><Tutmozis>Tutmozis</Tutmozis> nigdy nie widział <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes> w podobnym nastroju.</p></Chapter><Chapter id="33"><h4>Rozdział VIII</h4>
-<p>W parę dni <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> wysłał swego ulubieńca z wezwaniem do <Pieszczota-Kama>Kamy</Pieszczota-Kama>. Przybyła natychmiast w szczelnie zasłoniętej lektyce.</p>
+<p>W parę dni <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> wysłał swego ulubieńca z wezwaniem do <Pieszczota>Kamy</Pieszczota>. Przybyła natychmiast w szczelnie zasłoniętej lektyce.</p>
 <p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> przyjął ją w osobnym pokoju.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Byłem — rzekł — jednego wieczora pod twoim domem.</p>
-<p><Pieszczota-Kama talking="true"/>
-— O Astoreth!… — zawołała <Pieszczota-Kama>kapłanka</Pieszczota-Kama>. — Czemuż zawdzięczam najwyższą łaskę?… I co przeszkodziło ci, dostojny panie, że nie raczyłeś zawołać twojej niewolnicy?…</p>
+<p><Pieszczota talking="true"/>
+— O Astoreth!… — zawołała <Pieszczota>kapłanka</Pieszczota>. — Czemuż zawdzięczam najwyższą łaskę?… I co przeszkodziło ci, dostojny panie, że nie raczyłeś zawołać twojej niewolnicy?…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Stały tam jakieś bydlęta. Podobno Asyryjczykowie<note id='232'></note>.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Więc wasza dostojność trudziłeś się wieczorem?… Nigdy nie śmiałabym przypuścić, że nasz władca znajduje się o kilka kroków ode mnie pod gołym niebem.</p>
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> zarumienił się. Jakżeby była zdziwiona dowiedziawszy się, że <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> z dziesięć wieczorów przepędził pod jej oknami!</p>
 <p>A może ona i wiedziała o tym, gdyby sądzić z jej półuśmiechniętych ust i obłudnie spuszczonych oczu.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Więc teraz, <Pieszczota-Kama>Kamo</Pieszczota-Kama> — mówił <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — przyjmujesz i u siebie Asyryjczyków?</p>
-<p><Pieszczota-Kama talking="true"/>
-— To wielki magnat!… — zawołała <Pieszczota-Kama>Kama</Pieszczota-Kama>. — To powinowaty króla, <Sargon>Sargon</Sargon>, który pięć talentów ofiarował naszej bogini…</p>
+— Więc teraz, <Pieszczota>Kamo</Pieszczota> — mówił <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — przyjmujesz i u siebie Asyryjczyków?</p>
+<p><Pieszczota talking="true"/>
+— To wielki magnat!… — zawołała <Pieszczota>Kama</Pieszczota>. — To powinowaty króla, <Sargon>Sargon</Sargon>, który pięć talentów ofiarował naszej bogini…</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— A ty mu wywzajemnisz się, <Pieszczota-Kama>Kamo</Pieszczota-Kama> — szydził <Ksiaze-Ramzes>następca</Ksiaze-Ramzes>. — I ponieważ jest tak hojnym magnatem, bogowie feniccy nie ukażą cię śmiercią…</p>
-<p><Pieszczota-Kama talking="true"/>
+— A ty mu wywzajemnisz się, <Pieszczota>Kamo</Pieszczota> — szydził <Ksiaze-Ramzes>następca</Ksiaze-Ramzes>. — I ponieważ jest tak hojnym magnatem, bogowie feniccy nie ukażą cię śmiercią…</p>
+<p><Pieszczota talking="true"/>
 — Co mówisz, panie?… — odparła, składając ręce. — Czyli i nie wiesz, że Azjata, choćby mnie znalazł w pustyni, nie podniesie na mnie ręki, gdybym nawet oddała mu się sama. Oni lękają się bogów…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Po cóż więc przychodzi do ciebie ten śmierdzący… nie — ten pobożny Azjata?</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Chce mnie namówić, ażebym wyjechała do świątyni Astoreth babilońskiej.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — I pojedziesz?…</p>
-<p><Pieszczota-Kama talking="true"/>
-— Pojadę… jeżeli ty, panie, każesz… — odpowiedziała <Pieszczota-Kama>Kama</Pieszczota-Kama>, zasłaniając twarz welonem.</p>
+<p><Pieszczota talking="true"/>
+— Pojadę… jeżeli ty, panie, każesz… — odpowiedziała <Pieszczota>Kama</Pieszczota>, zasłaniając twarz welonem.</p>
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> milcząc ujął ją za rękę. Usta mu drżały.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Nie dotykaj mnie, panie — szeptała wzruszona. — Jesteś władcą i oporą moją i wszystkich Fenicjan w tym kraju, ale… bądź miłosierny…</p>
 <p><Ksiaze-Ramzes>Namiestnik</Ksiaze-Ramzes> puścił ją i zaczął chodzić po pokoju.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Gorący dzień, prawda?… — rzekł. — Podobno są kraje, gdzie w miesiącu Mechir spada z nieba na ziemię biały puch, który na ogniu zmienia się w wodę i robi zimno. O, <Pieszczota-Kama>Kamo</Pieszczota-Kama>, poproś twoich bogów, ażeby zesłali mi trochę tego pierza!… Choć, co ja mówię?… Gdyby pokryli nim cały Egipt, wszystek ten puch zamieniłby się na wodę, ale nie ostudziłby mego serca.</p>
-<p><Pieszczota-Kama talking="true"/>
-— Bo jesteś jak boski Amon, jesteś słońce ukryte w ludzkiej postaci — odparła <Pieszczota-Kama>Kama</Pieszczota-Kama>. — Ciemność pierzcha stamtąd, gdzie zwrócisz twoje oblicze, a pod blaskiem twoich spojrzeń rosną kwiaty…</p>
+— Gorący dzień, prawda?… — rzekł. — Podobno są kraje, gdzie w miesiącu Mechir spada z nieba na ziemię biały puch, który na ogniu zmienia się w wodę i robi zimno. O, <Pieszczota>Kamo</Pieszczota>, poproś twoich bogów, ażeby zesłali mi trochę tego pierza!… Choć, co ja mówię?… Gdyby pokryli nim cały Egipt, wszystek ten puch zamieniłby się na wodę, ale nie ostudziłby mego serca.</p>
+<p><Pieszczota talking="true"/>
+— Bo jesteś jak boski Amon, jesteś słońce ukryte w ludzkiej postaci — odparła <Pieszczota>Kama</Pieszczota>. — Ciemność pierzcha stamtąd, gdzie zwrócisz twoje oblicze, a pod blaskiem twoich spojrzeń rosną kwiaty…</p>
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> znowu zbliżył się do niej.</p>
-<p><Pieszczota-Kama talking="true"/>
-— Ale bądź miłosierny — szepnęła. — Przecieżeś ty dobry bóg, więc nie możesz zrobić krzywdy twojej <Pieszczota-Kama>kapłance</Pieszczota-Kama>…</p>
-<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> znowu odsunął się i otrząsnął, jakby pragnąc zrzucić z siebie ciężar. <Pieszczota-Kama>Kama</Pieszczota-Kama> patrzyła na niego spod opuszczonej powieki i uśmiechnęła się nieznacznie.</p>
+<p><Pieszczota talking="true"/>
+— Ale bądź miłosierny — szepnęła. — Przecieżeś ty dobry bóg, więc nie możesz zrobić krzywdy twojej <Pieszczota>kapłance</Pieszczota>…</p>
+<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> znowu odsunął się i otrząsnął, jakby pragnąc zrzucić z siebie ciężar. <Pieszczota>Kama</Pieszczota> patrzyła na niego spod opuszczonej powieki i uśmiechnęła się nieznacznie.</p>
 <p>Gdy milczenie trwało zbyt długo, spytała:</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Kazałeś mnie wezwać, władco. Oto jestem i czekam, abyś mi objawił wolę twoją.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Aha!… — ocknął się <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>. — Powiedz no mi, <Pieszczota-Kama>kapłanko</Pieszczota-Kama>… Aha!… Kto to był ten, tak podobny do mnie, którego widziałem w waszej świątyni, wówczas?…</p>
-<p><Pieszczota-Kama>Kama</Pieszczota-Kama> położyła palec na ustach.</p>
-<p><Pieszczota-Kama talking="true"/>
+— Aha!… — ocknął się <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>. — Powiedz no mi, <Pieszczota>kapłanko</Pieszczota>… Aha!… Kto to był ten, tak podobny do mnie, którego widziałem w waszej świątyni, wówczas?…</p>
+<p><Pieszczota>Kama</Pieszczota> położyła palec na ustach.</p>
+<p><Pieszczota talking="true"/>
 — Święta tajemnica… — szepnęła.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Jedno jest tajemnicą, drugiego nie wolno — odparł <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>. — Niechże przynajmniej dowiem się, kto on taki: człowiek czy duch?…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Duch.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — A jednak ten duch wyśpiewywał pod twoimi oknami…</p>
-<p><Pieszczota-Kama>Kama</Pieszczota-Kama> uśmiechnęła się.</p>
+<p><Pieszczota>Kama</Pieszczota> uśmiechnęła się.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Nie chcę gwałcić tajemnic waszej świątyni… — ciągnął <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
-— Przyrzekłeś to, panie, <Hiram>Hiramowi</Hiram> — wtrąciła <Pieszczota-Kama>kapłanka</Pieszczota-Kama>.</p>
+<p><Pieszczota talking="true"/>
+— Przyrzekłeś to, panie, <Hiram>Hiramowi</Hiram> — wtrąciła <Pieszczota>kapłanka</Pieszczota>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Dobrze… dobrze!… — przerwał rozdrażniony <Ksiaze-Ramzes>namiestnik</Ksiaze-Ramzes>. — Dlatego ani z <Hiram>Hiramem</Hiram>, ani z kim innym, nie będę rozmawiał o tym cudzie, tylko z tobą… Otóż, <Pieszczota-Kama>Kamo</Pieszczota-Kama>, powiedz duchowi czy człowiekowi, który jest tak do mnie podobny, ażeby jak najprędzej wyjeżdżał z Egiptu i nikomu nie pokazywał się. Bo widzisz… w żadnym państwie nie może być dwu następców tronu…</p>
-<p>Nagle uderzył się w czoło. Dotychczas mówił tak, ażeby zakłopotać <Pieszczota-Kama>Kamę</Pieszczota-Kama>, lecz teraz przyszła mu myśl całkiem poważna.</p>
+— Dobrze… dobrze!… — przerwał rozdrażniony <Ksiaze-Ramzes>namiestnik</Ksiaze-Ramzes>. — Dlatego ani z <Hiram>Hiramem</Hiram>, ani z kim innym, nie będę rozmawiał o tym cudzie, tylko z tobą… Otóż, <Pieszczota>Kamo</Pieszczota>, powiedz duchowi czy człowiekowi, który jest tak do mnie podobny, ażeby jak najprędzej wyjeżdżał z Egiptu i nikomu nie pokazywał się. Bo widzisz… w żadnym państwie nie może być dwu następców tronu…</p>
+<p>Nagle uderzył się w czoło. Dotychczas mówił tak, ażeby zakłopotać <Pieszczota>Kamę</Pieszczota>, lecz teraz przyszła mu myśl całkiem poważna.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Ciekawym — rzekł, ostro patrząc na <Pieszczota-Kama>Kamę</Pieszczota-Kama> — dlaczego twoi rodacy pokazali mi mój żywy wizerunek?… Czy chcą ostrzec, że mają dla mnie zastępcę?… Istotnie, zadziwia mnie ich czyn.</p>
-<p><Pieszczota-Kama>Kama</Pieszczota-Kama> upadła mu do nóg.</p>
-<p><Pieszczota-Kama talking="true"/>
+— Ciekawym — rzekł, ostro patrząc na <Pieszczota>Kamę</Pieszczota> — dlaczego twoi rodacy pokazali mi mój żywy wizerunek?… Czy chcą ostrzec, że mają dla mnie zastępcę?… Istotnie, zadziwia mnie ich czyn.</p>
+<p><Pieszczota>Kama</Pieszczota> upadła mu do nóg.</p>
+<p><Pieszczota talking="true"/>
 — O panie! — szepnęła. — Ty, który nosisz na piersiach nasz najwyższy talizman, czy możesz przypuścić, ażeby Fenicjanie robili co na twoją szkodę?… Ale pomyśl tylko… W wypadku, gdyby groziło ci niebezpieczeństwo albo gdybyś chciał omylić swoich nieprzyjaciół, czy taki człowiek nie przyda się?… Fenicjanie to tylko chcieli pokazać ci w świątyni…</p>
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> pomyślał i wzruszył ramionami.</p>
 <p>„Tak — rzekł do siebie. — Gdybym potrzebował czyjejkolwiek opieki!… Ale czy Fenicjanie sądzą, że ja sam nie dam sobie rady?… W takim razie złego wybrali protektora dla siebie.'</p>
-<p><Pieszczota-Kama talking="true"/>
-— Panie — szepnęła <Pieszczota-Kama>Kama</Pieszczota-Kama> — alboż nie jest ci wiadome, że Ramzes Wielki miał oprócz swojej własnej postaci dwie inne dla wrogów?… I tamte dwa cienie królewskie zginęły, a on żył…</p>
+<p><Pieszczota talking="true"/>
+— Panie — szepnęła <Pieszczota>Kama</Pieszczota> — alboż nie jest ci wiadome, że Ramzes Wielki miał oprócz swojej własnej postaci dwie inne dla wrogów?… I tamte dwa cienie królewskie zginęły, a on żył…</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— No, dosyć… — przerwał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>. — Aby zaś ludy Azji wiedziały, że jestem łaskawy, przeznaczam, <Pieszczota-Kama>Kamo</Pieszczota-Kama>, pięć talentów na igrzyska na cześć Astoreth, a kosztowny puchar do jej świątyni. Dziś jeszcze odbierzesz to.</p>
-<p>Skinieniem głowy pożegnał <Pieszczota-Kama>kapłankę</Pieszczota-Kama>.</p>
+— No, dosyć… — przerwał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>. — Aby zaś ludy Azji wiedziały, że jestem łaskawy, przeznaczam, <Pieszczota>Kamo</Pieszczota>, pięć talentów na igrzyska na cześć Astoreth, a kosztowny puchar do jej świątyni. Dziś jeszcze odbierzesz to.</p>
+<p>Skinieniem głowy pożegnał <Pieszczota>kapłankę</Pieszczota>.</p>
 <p>Po jej wyjściu opanowała go nowa fala myśli:</p>
 <p>„Zaprawdę, przebiegli są Fenicjanie. Jeżeli ten mój żyjący wizerunek jest człowiekiem, mogą mi zrobić z niego wielki podarunek, a ja czyniłbym kiedyś cuda, o jakich bodaj że nie słyszano w Egipcie. Faraon mieszka w Memfis, a jednocześnie ukazuje się w Tebach<note id='233'></note> albo w Tanis<note id='234'></note>!… Faraon posuwa się z armią na Babilon, Asyryjczycy tam gromadzą główne siły, a jednocześnie — faraon z inną armią zdobywa Niniwę… Sądzę, że Asyryjczycy byliby bardzo zdumieni takim wypadkiem…'</p>
 <p>I znowu obudziła się w nim głucha nienawiść do potężnych Azjatów, i znowu widział swój triumfalny wóz, przejeżdżający pobojowisko pełne asyryjskich trupów i całe kosze odciętych rąk.</p>
 <p>Teraz wojna stała się dla jego duszy taką koniecznością jak chleb dla ciała. Bo nie tylko mógł przez nią zbogacić<note id='235'></note> Egipt, napełnić skarb i zdobyć wiecznotrwałą sławę, ale jeszcze — mógł zaspokoić, dotychczas nieświadomy, dziś potężnie rozbudzony instynkt zniszczenia Asyrii.</p>
 <p>Dopóki nie zobaczył tych wojowników z kudłatymi brodami, nie myślał o nich. Ale dziś zawadzali mu. Było mu tak ciasno z nimi na świecie, że ktoś musiał ustąpić: oni albo on.</p>
-<p>Jaką rolę w obecnym jego nastroju odegrał <Hiram>Hiram</Hiram> i <Pieszczota-Kama>Kama</Pieszczota-Kama>? — z tego nie zdawał sobie sprawy. Czuł tylko, że musi mieć wojnę z Asyrią, jak ptak przelotny czuje, że w miesiącu Pachono musi odejść na północ.</p>
+<p>Jaką rolę w obecnym jego nastroju odegrał <Hiram>Hiram</Hiram> i <Pieszczota>Kama</Pieszczota>? — z tego nie zdawał sobie sprawy. Czuł tylko, że musi mieć wojnę z Asyrią, jak ptak przelotny czuje, że w miesiącu Pachono musi odejść na północ.</p>
 <p>Namiętność wojny szybko ogarniała <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>. Mniej mówił, rzadziej uśmiechał się, przy ucztach siedział zamyślony, a zarazem coraz częściej przestawał z wojskiem i arystokracją. Widząc łaski, jakie <Ksiaze-Ramzes>namiestnik</Ksiaze-Ramzes> zlewał na tych, którzy noszą broń, szlachecka młodzież, a nawet ludzie starsi poczęli zaciągać się do pułków. Zwróciło to uwagę świętego <Mentezufis>Mentezufisa</Mentezufis>, który wysłał do <Herhor>Herhora</Herhor> list tej treści:</p>
 <p>„Od przybycia Asyryjczyków do Pi-Bast <Ksiaze-Ramzes>następca tronu</Ksiaze-Ramzes> jest rozgorączkowany, a jego dwór usposobiony bardzo wojowniczo. Piją i grają w kości jak poprzednio, ale wszyscy odrzucili cienkie szaty i peruki i bez względu na straszny upał chodzą w żołnierskich czepcach i kaftanach.</p>
 <p>Obawiam się, ażeby ta zbrojna gotowość nie obraziła dostojnego <Sargon>Sargona</Sargon>.'</p>
@@ -5255,11 +5252,11 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 — Mamy nawet obowiązek zrobić małą grzeczność Fenicjanom po zawarciu takiego traktatu z Asyrią!… — wtrącił śmiejąc się dostojny <Mentezufis>Mentezufis</Mentezufis>.</p>
 <p>Cyrk, do którego <Ksiaze-Ramzes>namiestnik</Ksiaze-Ramzes> wraz z nomarchą i najprzedniejszymi oficerami udał się o godzinie czwartej po południu, był zbudowany w ogrodzie świątyni Astoreth. Składał się on z okrągłego placu, który otaczał parkan wysoki na dwu ludzi, zaś dokoła parkanu było mnóstwo lóż i ławek wznoszących się amfiteatralnie. Dachu budynek nie posiadał; natomiast nad lożami rozciągały się różnokolorowe płachty w formie motylich skrzydeł, które skrapiano pachnącą wodą i poruszano dla chłodzenia powietrza.</p>
 <p>Gdy <Ksiaze-Ramzes>namiestnik</Ksiaze-Ramzes> ukazał się w swej loży, zgromadzeni w cyrku Azjaci i Egipcjanie wydali wielki krzyk. Po czym zaczęło się przedstawienie procesją muzyków, śpiewaków i tancerek.</p>
-<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> rozejrzał się. Miał po prawej ręce lożę <Hiram>Hirama</Hiram> i najznakomitszych Fenicjan, na lewo lożę fenickich kapłanów i kapłanek, między którymi <Pieszczota-Kama>Kama</Pieszczota-Kama>, zajmująca jedno z pierwszych miejsc, zwracała na siebie uwagę bogatym strojem i pięknością. Miała przezroczystą szatę ozdobioną różnokolorowymi haftami, złote bransolety na rękach i nogach, a na głowie przepaskę z kwiatem lotosu wyrobionym bardzo kunsztownie z drogich kamieni.</p>
-<p><Pieszczota-Kama>Kama</Pieszczota-Kama>, oddawszy wraz z kolegami swymi głęboki ukłon <Ksiaze-Ramzes>księciu</Ksiaze-Ramzes>, zwróciła się do loży na lewo i zaczęła ożywioną rozmowę z cudzoziemcem o wspaniałej postawie i nieco szpakowatych włosach. Człowiek ten i jego towarzysze mieli brody i włosy zaplecione w mnóstwo warkoczyków.</p>
-<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>, który przyszedł do cyrku prawie wprost z pokoju swego syna, był w wesołym usposobieniu. Lecz gdy zobaczył, że <Pieszczota-Kama>Kama</Pieszczota-Kama> rozmawia z jakimś obcym człowiekiem, spochmurniał.</p>
+<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> rozejrzał się. Miał po prawej ręce lożę <Hiram>Hirama</Hiram> i najznakomitszych Fenicjan, na lewo lożę fenickich kapłanów i kapłanek, między którymi <Pieszczota>Kama</Pieszczota>, zajmująca jedno z pierwszych miejsc, zwracała na siebie uwagę bogatym strojem i pięknością. Miała przezroczystą szatę ozdobioną różnokolorowymi haftami, złote bransolety na rękach i nogach, a na głowie przepaskę z kwiatem lotosu wyrobionym bardzo kunsztownie z drogich kamieni.</p>
+<p><Pieszczota>Kama</Pieszczota>, oddawszy wraz z kolegami swymi głęboki ukłon <Ksiaze-Ramzes>księciu</Ksiaze-Ramzes>, zwróciła się do loży na lewo i zaczęła ożywioną rozmowę z cudzoziemcem o wspaniałej postawie i nieco szpakowatych włosach. Człowiek ten i jego towarzysze mieli brody i włosy zaplecione w mnóstwo warkoczyków.</p>
+<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>, który przyszedł do cyrku prawie wprost z pokoju swego syna, był w wesołym usposobieniu. Lecz gdy zobaczył, że <Pieszczota>Kama</Pieszczota> rozmawia z jakimś obcym człowiekiem, spochmurniał.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Czy nie wiesz — zapytał <Tutmozis>Tutmozisa</Tutmozis> — co to za drab, do którego wdzięczy się <Pieszczota-Kama>kapłanka</Pieszczota-Kama>?…</p>
+— Czy nie wiesz — zapytał <Tutmozis>Tutmozisa</Tutmozis> — co to za drab, do którego wdzięczy się <Pieszczota>kapłanka</Pieszczota>?…</p>
 <p><Tutmozis talking="true"/>
 — To jest właśnie ów znakomity pielgrzym babiloński, dostojny <Sargon>Sargon</Sargon>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
@@ -5270,7 +5267,7 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 — Czyliż taki barbarzyńca może być pięknym!… — oburzył się <Ksiaze-Ramzes>namiestnik</Ksiaze-Ramzes>. — Jestem pewny, że śmierdzi łojem…</p>
 <p>Obaj umilkli: <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> z gniewu, <Tutmozis>Tutmozis</Tutmozis> ze strachu, że ośmielił się pochwalić człowieka, który nie podoba się jego panu.</p>
 <p>Tymczasem na arenie widowisko szło za widowiskiem. Kolejno występowali gimnastycy, poskramiacze wężów, tancerze, kuglarze i błazny, wywołując okrzyki widzów.</p>
-<p>Ale <Ksiaze-Ramzes>namiestnik</Ksiaze-Ramzes> był chmurny. W jego duszy odżyły chwilowo uśpione namiętności: nienawiść do Asyryjczyków i zazdrość o <Pieszczota-Kama>Kamę</Pieszczota-Kama>.</p>
+<p>Ale <Ksiaze-Ramzes>namiestnik</Ksiaze-Ramzes> był chmurny. W jego duszy odżyły chwilowo uśpione namiętności: nienawiść do Asyryjczyków i zazdrość o <Pieszczota>Kamę</Pieszczota>.</p>
 <p>„Jak może — myślał — ta kobieta mizdrzyć się do człowieka starego, który w dodatku ma twarz koloru wyprawnej skóry, niespokojne czarne oczy i brodę capa…'</p>
 <p>Raz tylko <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> zwrócił pilniejszą uwagę na arenę.</p>
 <p>Weszło kilku nagich Chaldejczyków. Najstarszy osadził w ziemi trzy krótkie włócznie ostrzami do góry i za pomocą ruchów rąk uśpił najmłodszego. Po czym inni wzięli go na ręce i położyli na włóczniach w ten sposób, że jedna podpierała mu głowę, druga krzyż, trzecia nogi.</p>
@@ -5291,7 +5288,7 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 <p>Na znak dany przez księcia uciekli przewodnicy, a jeden ze zbrojnych zdarł bykowi płachtę. Zwierzę przez kilka chwil stało oszołomione, następnie poczęło uganiać się za włóczniarzami, którzy drażnili je kłuciem.</p>
 <p>Ta walka jałowa ciągnęła się kilkanaście minut. Ludzie dręczyli byka, a on zapieniony, oblany krwią stawał dęba i gonił po całej arenie swoich nieprzyjaciół, nie mogąc żadnego dosięgnąć.</p>
 <p>Wreszcie padł wśród śmiechu publiczności.</p>
-<p>Znudzony <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, zamiast na arenę, patrzył na lożę kapłanów fenickich. I widział, że <Pieszczota-Kama>Kama</Pieszczota-Kama> przesiadłszy się bliżej <Sargon>Sargona</Sargon> prowadziła z nim żywą rozmowę. Asyryjczyk pożerał ją wzrokiem, a ona uśmiechnięta i zawstydzona niekiedy szeptała z nim, pochylając się tak, że jej włosy mieszały się z kudłami barbarzyńcy, niekiedy odwracała się od niego z udanym gniewem.</p>
+<p>Znudzony <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, zamiast na arenę, patrzył na lożę kapłanów fenickich. I widział, że <Pieszczota>Kama</Pieszczota> przesiadłszy się bliżej <Sargon>Sargona</Sargon> prowadziła z nim żywą rozmowę. Asyryjczyk pożerał ją wzrokiem, a ona uśmiechnięta i zawstydzona niekiedy szeptała z nim, pochylając się tak, że jej włosy mieszały się z kudłami barbarzyńcy, niekiedy odwracała się od niego z udanym gniewem.</p>
 <p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> uczuł ból w sercu. Pierwszy raz zdarzyło mu się, że jakaś kobieta innemu mężczyźnie przed nim dawała pierwszeństwo. W dodatku człowiekowi prawie staremu, Asyryjczykowi!…</p>
 <p>Tymczasem między publicznością rozległ się szmer. Na arenie człowiek uzbrojony mieczem kazał sobie przywiązać do piersi lewą rękę, inni obejrzeli swoje włócznie i — wprowadzono drugiego byka.</p>
 <p>Kiedy jeden zbrojny zerwał mu płachtę z oczu, byk obrócił się i obejrzał wkoło, jakby chcąc porachować przeciwników. A gdy zaczęli go kłuć, cofnął się pod parkan dla zabezpieczenia sobie tyłu. Potem zniżył głowę i spod oka śledził ruchy napastujących go ludzi.</p>
@@ -5304,86 +5301,86 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 <p>Stała się rzecz niesłychana dotychczas w cyrkach: na arenie leżało pięciu ludzi, inni, źle broniąc się, uciekali przed zwierzęciem, a publiczność ryczała z gniewu lub ze strachu.</p>
 <p>Wtem wszystko ucichło, widzowie powstali i wychylili się ze swych miejsc, przerażony <Hiram>Hiram</Hiram> zbladł i rozkrzyżował ręce… Na arenę, z lóż dostojników, wyskoczyli dwaj: <Ksiaze-Ramzes>książę Ramzes</Ksiaze-Ramzes> z dobytym mieczem i <Sargon>Sargon</Sargon> z krótką siekierką.</p>
 <p>Byk ze spuszczonym łbem i zadartym ogonem biegł wkoło areny wzniecając tuman kurzu. Pędził prosto na <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>, lecz jakby odepchnięty przez majestat królewskiego dziecięcia, wyminął <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes>, rzucił się na <Sargon>Sargona</Sargon> i — padł na miejscu. Zręczny a olbrzymio silny Asyryjczyk powalił go jednym uderzeniem toporka między oczy.</p>
-<p>Publiczność zawyła z radości i poczęła sypać kwiaty na <Sargon>Sargona</Sargon> i jego ofiarę. <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> tymczasem stał z wydobytym mieczem zdziwiony i rozgniewany, patrząc, jak <Pieszczota-Kama>Kama</Pieszczota-Kama> wydzierała swoim sąsiadom kwiaty i rzucała je na Asyryjczyka.</p>
+<p>Publiczność zawyła z radości i poczęła sypać kwiaty na <Sargon>Sargona</Sargon> i jego ofiarę. <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> tymczasem stał z wydobytym mieczem zdziwiony i rozgniewany, patrząc, jak <Pieszczota>Kama</Pieszczota> wydzierała swoim sąsiadom kwiaty i rzucała je na Asyryjczyka.</p>
 <p><Sargon>Sargon</Sargon> obojętnie przyjmował objawy publicznego zachwytu. Trącił nogą byka, aby przekonać się, czy jeszcze żyje, a potem zbliżył się na parę kroków do <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> i coś przemówiwszy w swoim języku, ukłonił się z godnością wielkiego pana.</p>
 <p><Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes> przed oczyma przesunęła się krwawa mgła: chętnie wbiłby miecz w piersi temu zwycięzcy. Ale opanował się, chwilę pomyślał i, zdjąwszy ze swej szyi złoty łańcuch, podał go <Sargon>Sargonowi</Sargon>.</p>
 <p>Asyryjczyk znowu skłonił się, pocałował łańcuch i włożył go sobie na szyję. A <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, z sinawymi rumieńcami na policzkach, skierował się do furtki, którą wchodzili na arenę aktorowie<note id='237'></note>, i wśród okrzyków publiczności, głęboko upokorzony, opuścił cyrk.</p></Chapter><Chapter id="34"><h4>Rozdział IX</h4>
 <p>Był już miesiąc Tot (koniec czerwca, początek lipca). W mieście Pi-Bast i jego okolicach zaczął zmniejszać się napływ ludności z powodu gorąca. Ale na dworze <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes> wciąż jeszcze bawiono się i rozpowiadano o wypadkach w cyrku.</p>
 <p>Dworzanie wychwalali odwagę <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>, niezręczni podziwiali siłę <Sargon>Sargona</Sargon>, kapłani z poważnymi minami szeptali, że jednak <Ksiaze-Ramzes>następca tronu</Ksiaze-Ramzes> nie powinien był mieszać się do walki z bykami. Od tego bowiem są inni ludzie, płatni i bynajmniej nie cieszący się publicznym szacunkiem.</p>
-<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> albo nie słyszał tych rozmaitych zdań, albo nie zwracał na nie uwagi. W jego pamięci z widowiska utrwaliły się dwa epizody: <Sargon>Asyryjczyk</Sargon> wydarł mu zwycięstwo nad bykiem i — umizgał się do <Pieszczota-Kama>Kamy</Pieszczota-Kama>, która bardzo życzliwie przyjmowała jego zaloty!</p>
-<p>Ponieważ nie wypadało mu sprowadzać do siebie <Pieszczota-Kama>fenickiej kapłanki</Pieszczota-Kama>, więc pewnego dnia wysłał do niej list, w którym donosił, że chce ją zobaczyć, i pytał: kiedy go przyjmie? Przez tego samego posłańca <Pieszczota-Kama>Kama</Pieszczota-Kama> odpowiedziała, że będzie czekać na niego dziś wieczorem.</p>
+<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> albo nie słyszał tych rozmaitych zdań, albo nie zwracał na nie uwagi. W jego pamięci z widowiska utrwaliły się dwa epizody: <Sargon>Asyryjczyk</Sargon> wydarł mu zwycięstwo nad bykiem i — umizgał się do <Pieszczota>Kamy</Pieszczota>, która bardzo życzliwie przyjmowała jego zaloty!</p>
+<p>Ponieważ nie wypadało mu sprowadzać do siebie <Pieszczota>fenickiej kapłanki</Pieszczota>, więc pewnego dnia wysłał do niej list, w którym donosił, że chce ją zobaczyć, i pytał: kiedy go przyjmie? Przez tego samego posłańca <Pieszczota>Kama</Pieszczota> odpowiedziała, że będzie czekać na niego dziś wieczorem.</p>
 <p>Ledwie ukazały się gwiazdy, <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> w największej tajemnicy, według swego przekonania, wysunął się z pałacu i poszedł.</p>
-<p>Ogród świątyni Astoreth był prawie pusty, szczególniej w okolicach otaczających dom <Pieszczota-Kama>kapłanki</Pieszczota-Kama>. Dom był cichy i paliło się w nim zaledwie parę światełek.</p>
-<p>Kiedy <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> nieśmiało zapukał, <Pieszczota-Kama>kapłanka</Pieszczota-Kama> otworzyła mu sama. W ciemnym przysionku ucałowała mu ręce szepcząc, że umarłaby, gdyby wtedy, w cyrku, rozjuszone zwierzę zrobiło mu jaką krzywdę.</p>
+<p>Ogród świątyni Astoreth był prawie pusty, szczególniej w okolicach otaczających dom <Pieszczota>kapłanki</Pieszczota>. Dom był cichy i paliło się w nim zaledwie parę światełek.</p>
+<p>Kiedy <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> nieśmiało zapukał, <Pieszczota>kapłanka</Pieszczota> otworzyła mu sama. W ciemnym przysionku ucałowała mu ręce szepcząc, że umarłaby, gdyby wtedy, w cyrku, rozjuszone zwierzę zrobiło mu jaką krzywdę.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Ale teraz musisz być spokojna — odparł z gniewem <Ksiaze-Ramzes>następca</Ksiaze-Ramzes> — skoro ocalił mnie twój kochanek…</p>
-<p>Kiedy weszli do komnaty oświetlonej, <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> spostrzegł, że <Pieszczota-Kama>Kama</Pieszczota-Kama> płacze.</p>
+<p>Kiedy weszli do komnaty oświetlonej, <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> spostrzegł, że <Pieszczota>Kama</Pieszczota> płacze.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Cóż to znaczy? — zapytał.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Odwróciło się ode mnie serce pana mego — rzekła. — A może i słusznie.</p>
 <p><Ksiaze-Ramzes>Następca</Ksiaze-Ramzes> gorzko roześmiał się.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Więc już jesteś jego kochanką, czy dopiero masz nią zostać ty, święta dziewico?…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Kochanką?… nigdy!… Ale mogę zostać żoną tego strasznego człowieka.</p>
 <p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> zerwał się z siedzenia.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Śpię?… — zawołał — czy Set rzucił na mnie przekleństwo?… Ty, <Pieszczota-Kama>kapłanka</Pieszczota-Kama>, która pilnujesz ognia przy ołtarzu Astoreth i pod grozą śmierci musisz być dziewicą, ty wychodzisz za mąż?… Zaprawdę, fenickie kłamstwo gorsze jest, aniżeli opowiadają o nim ludzie!…</p>
-<p><Pieszczota-Kama talking="true"/>
-— Posłuchaj mnie, panie — rzekła, ocierając łzy — i potęp, jeżeli zasłużyłam. <Sargon>Sargon</Sargon> chce mnie pojąć za żonę, za swoją pierwszą żonę. Według naszych ustaw, <Pieszczota-Kama>kapłanka</Pieszczota-Kama>, w bardzo wyjątkowych wypadkach, może zostać żoną, ale tylko mężczyzny pochodzącego ze krwi królewskiej. <Sargon>Sargon</Sargon> zaś jest powinowatym króla Assara…</p>
+— Śpię?… — zawołał — czy Set rzucił na mnie przekleństwo?… Ty, <Pieszczota>kapłanka</Pieszczota>, która pilnujesz ognia przy ołtarzu Astoreth i pod grozą śmierci musisz być dziewicą, ty wychodzisz za mąż?… Zaprawdę, fenickie kłamstwo gorsze jest, aniżeli opowiadają o nim ludzie!…</p>
+<p><Pieszczota talking="true"/>
+— Posłuchaj mnie, panie — rzekła, ocierając łzy — i potęp, jeżeli zasłużyłam. <Sargon>Sargon</Sargon> chce mnie pojąć za żonę, za swoją pierwszą żonę. Według naszych ustaw, <Pieszczota>kapłanka</Pieszczota>, w bardzo wyjątkowych wypadkach, może zostać żoną, ale tylko mężczyzny pochodzącego ze krwi królewskiej. <Sargon>Sargon</Sargon> zaś jest powinowatym króla Assara…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — I ty wyjdziesz za niego?</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Jeżeli najwyższa rada kapłanów tyryjskich rozkaże mi, co pocznę?… — odparła, znowu zalewając się łzami.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — A cóż tą radę może obchodzić <Sargon>Sargon</Sargon>? — spytał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Podobno obchodzi ją bardzo wiele — mówiła z westchnieniem. — Fenicję mają podobno zabrać Asyryjczycy a <Sargon>Sargon</Sargon> ma zostać jej satrapą…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Tyś oszalała!… — zawołał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Mówię, co wiem. Już w naszej świątyni po raz drugi zaczynają się modły o odwrócenie nieszczęścia od Fenicji…</p>
 <p>Pierwszy raz odprawiliśmy je, nimeś ty przyjechał do nas, panie…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Dlaczego znowu teraz?…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Bo podobno w tych dniach przybył do Egiptu chaldejski kapłan <Istubar>Istubar</Istubar> z listami, w których król Assar mianuje <Sargon>Sargona</Sargon> swoim posłem i pełnomocnikiem do zawarcia traktatu z wami o zabór Fenicji.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Ależ ja… — przerwał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
 <p>Chciał powiedzieć: „nic nie wiem', lecz wstrzymał się. Zaczął się śmiać i odparł:</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— <Pieszczota-Kama>Kamo</Pieszczota-Kama>, przysięgam ci na cześć mego ojca, że dopóki ja żyję, Asyria nie zabierze Fenicji. Czy to dość?</p>
-<p><Pieszczota-Kama talking="true"/>
+— <Pieszczota>Kamo</Pieszczota>, przysięgam ci na cześć mego ojca, że dopóki ja żyję, Asyria nie zabierze Fenicji. Czy to dość?</p>
+<p><Pieszczota talking="true"/>
 — O panie!… panie!… — zawołała, upadając mu do nóg.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Więc chyba teraz nie zostaniesz żoną tego gbura?</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Och!… — otrząsnęła się. — Czy możesz o to pytać?</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — I będziesz moją… — szepnął <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Zatem chcesz mojej śmierci?… — odparła przerażona. — Ha!… jeżeli tego chcesz, jestem gotowa…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Chcę, ażebyś żyła… — szeptał roznamiętniony. — Żyła, należąc do mnie…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — To być nie może…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — A najwyższa rada kapłanów tyryjskich?…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Może mnie tylko wydać za mąż…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Wszak wejdziesz do mego domu…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Gdybym weszła tam nie jako żona twoja — umrę… Ale jestem gotowa… nawet na to, aby nie ujrzeć jutrzejszego słońca…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Bądź spokojna — odpowiedział z powagą <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>. — Kto posiadł moją łaskę, nie dozna krzywdy.</p>
-<p><Pieszczota-Kama>Kama</Pieszczota-Kama> znowu uklękła przed nim.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota>Kama</Pieszczota> znowu uklękła przed nim.</p>
+<p><Pieszczota talking="true"/>
 — Jak się to może stać?… — spytała, składając ręce.</p>
-<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> był tak podniecony, tak już zapomniał o swoim stanowisku i obowiązkach, iż gotów był przyrzec <Pieszczota-Kama>kapłance</Pieszczota-Kama> małżeństwo. Powstrzymał go od tego kroku nie rozsądek, ale jakiś głuchy instynkt.</p>
-<p><Pieszczota-Kama talking="true"/>
-— Jak to może być?… Jak to może być?… — szeptała <Pieszczota-Kama>Kama</Pieszczota-Kama>, pożerając go wzrokiem i całując jego nogi.</p>
+<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> był tak podniecony, tak już zapomniał o swoim stanowisku i obowiązkach, iż gotów był przyrzec <Pieszczota>kapłance</Pieszczota> małżeństwo. Powstrzymał go od tego kroku nie rozsądek, ale jakiś głuchy instynkt.</p>
+<p><Pieszczota talking="true"/>
+— Jak to może być?… Jak to może być?… — szeptała <Pieszczota>Kama</Pieszczota>, pożerając go wzrokiem i całując jego nogi.</p>
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> podniósł ją, posadził z daleka od siebie i odparł z uśmiechem:</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Pytasz, jak to być może?… Zaraz cię objaśnię. Ostatnim moim nauczycielem, zanim doszedłem do pełnoletności, był pewien stary kapłan, który umiał na pamięć mnóstwo dziwnych historii z życia bogów, królów, kapłanów, nawet niskich urzędników i chłopów.</p>
@@ -5470,79 +5467,79 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 <p>— Rączki?… Dobrześ nie powiedziała, że to ręce, bo takimi rękoma nic byś zrobić nie potrafiła, nawet udoić owcy.</p>
 <p>— Moje rączki nie są do roboty.</p>
 <p>— Tylko do czego? — zdziwił się pisarz, rozstawiając jej palce…</p>
-<p>(Jak ja twoje, <Pieszczota-Kama>Kamo</Pieszczota-Kama> — rzekł <Ksiaze-Ramzes>następca</Ksiaze-Ramzes>, pieszcząc drobną rączkę <Pieszczota-Kama>kapłanki</Pieszczota-Kama>.)</p>
+<p>(Jak ja twoje, <Pieszczota>Kamo</Pieszczota> — rzekł <Ksiaze-Ramzes>następca</Ksiaze-Ramzes>, pieszcząc drobną rączkę <Pieszczota>kapłanki</Pieszczota>.)</p>
 <p>— Tylko do czego są takie ręce? — pytał pisarz figury.</p>
 <p>— Ażebym nimi ciebie obejmowała za szyję.</p>
 <p>— Chcesz mówić: za kark?… — wrzasnął przerażony pisarz, którego kapłani zawsze chwytali za kark, gdy miał otrzymać plagi.</p>
 <p>— Nie za kark — rzekła postać — tylko o tak…</p>
-<p>I objęła go — ciągnął <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — rękoma za szyję, o tak… (Tu otoczył się rękoma <Pieszczota-Kama>kapłanki</Pieszczota-Kama>.) — I przytuliła go do swej piersi o tak, o… (Tu przytulił się do <Pieszczota-Kama>Kamy</Pieszczota-Kama>.)</p>
-<p><Pieszczota-Kama talking="true"/>
-— Panie, co robisz?… — szepnęła <Pieszczota-Kama>Kama</Pieszczota-Kama>. — Wszakże to śmierć moja…</p>
+<p>I objęła go — ciągnął <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — rękoma za szyję, o tak… (Tu otoczył się rękoma <Pieszczota>kapłanki</Pieszczota>.) — I przytuliła go do swej piersi o tak, o… (Tu przytulił się do <Pieszczota>Kamy</Pieszczota>.)</p>
+<p><Pieszczota talking="true"/>
+— Panie, co robisz?… — szepnęła <Pieszczota>Kama</Pieszczota>. — Wszakże to śmierć moja…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Bądź spokojna — odparł <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — ja ci tylko pokazuję, co tamta postać robiła z pisarzem…</p>
 <p>…Wtem zadrżała ziemia, pałac zniknął, znikły psy, konie i niewolnicy. Wzgórze pokryte winogradem zmieniło się w opokę, drzewa oliwne w cierń, a pszenica w piasek…</p>
 <p>Pisarz, gdy ocknął się w objęciach kochanki, zrozumiał, że jest takim nędzarzem, jakim był wczoraj na gościńcu. Ale nie żałował swoich bogactw, ponieważ miał kobietę, która kochała go i pieściła!</p>
-<p><Pieszczota-Kama talking="true"/>
-— Więc wszystko znikło, a ona nie znikła!… — zawołała naiwnie <Pieszczota-Kama>Kama</Pieszczota-Kama>.</p>
+<p><Pieszczota talking="true"/>
+— Więc wszystko znikło, a ona nie znikła!… — zawołała naiwnie <Pieszczota>Kama</Pieszczota>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Litościwy Amon zostawił mu ją na pociechę — rzekł <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
-— O, to Amon był tylko dla pisarza litościwym — odparła <Pieszczota-Kama>Kama</Pieszczota-Kama>. — Ale co ma znaczyć ta historia?</p>
+<p><Pieszczota talking="true"/>
+— O, to Amon był tylko dla pisarza litościwym — odparła <Pieszczota>Kama</Pieszczota>. — Ale co ma znaczyć ta historia?</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Zgadnij. Wreszcie słyszałaś, czego biedny pisarz wyrzekł się za pocałunek kobiety…</p>
-<p><Pieszczota-Kama talking="true"/>
-— Ale tronu nie wyrzekłby się! — przerwała <Pieszczota-Kama>kapłanka</Pieszczota-Kama>.</p>
+<p><Pieszczota talking="true"/>
+— Ale tronu nie wyrzekłby się! — przerwała <Pieszczota>kapłanka</Pieszczota>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Kto wie?… gdyby go bardzo o to poproszono — szeptał namiętnie <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
-— O nie!… — zawołała <Pieszczota-Kama>Kama</Pieszczota-Kama>, wydzierając mu się z objęć. — Tronu niech się nie wyrzeka, bo w takim razie cóż by zostało z jego obietnic dla Fenicji…</p>
-<p>Oboje spojrzeli sobie w oczy długo… długo… W tej chwili <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> uczuł niby ranę w sercu i niby że z tej rany uciekło mu jakieś uczucie. Nie namiętność, bo namiętność została, ale — szacunek i wiara w <Pieszczota-Kama>Kamę</Pieszczota-Kama>.</p>
+<p><Pieszczota talking="true"/>
+— O nie!… — zawołała <Pieszczota>Kama</Pieszczota>, wydzierając mu się z objęć. — Tronu niech się nie wyrzeka, bo w takim razie cóż by zostało z jego obietnic dla Fenicji…</p>
+<p>Oboje spojrzeli sobie w oczy długo… długo… W tej chwili <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> uczuł niby ranę w sercu i niby że z tej rany uciekło mu jakieś uczucie. Nie namiętność, bo namiętność została, ale — szacunek i wiara w <Pieszczota>Kamę</Pieszczota>.</p>
 <p>„Dziwne te Fenicjanki — pomyślał <Ksiaze-Ramzes>następca</Ksiaze-Ramzes> — można za nimi szaleć, lecz niepodobna im ufać…'</p>
-<p>Uczuł się znużonym i pożegnał <Pieszczota-Kama>Kamę</Pieszczota-Kama>. Spojrzał po komnacie, jakby trudno mu było rozstać się z nią, i odchodząc, rzekł do siebie:</p>
+<p>Uczuł się znużonym i pożegnał <Pieszczota>Kamę</Pieszczota>. Spojrzał po komnacie, jakby trudno mu było rozstać się z nią, i odchodząc, rzekł do siebie:</p>
 <p>„A jednak ty zostaniesz moją i bogowie feniccy nie zabiją cię, jeżeli dbają o swoje świątynie i kapłanów.'</p>
-<p>Ledwie <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> opuścił willę <Pieszczota-Kama>Kamy</Pieszczota-Kama>, do pokoju <Pieszczota-Kama>kapłanki</Pieszczota-Kama> wpadł młody <Lykon>Grek</Lykon>, uderzająco piękny i uderzająco podobny do egipskiego <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>. Na jego twarzy malowała się wściekłość.</p>
-<p><Pieszczota-Kama talking="true"/>
-— <Lykon>Lykon</Lykon>!… — zawołała przerażona <Pieszczota-Kama>Kama</Pieszczota-Kama>. — Co tu robisz?…</p>
+<p>Ledwie <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> opuścił willę <Pieszczota>Kamy</Pieszczota>, do pokoju <Pieszczota>kapłanki</Pieszczota> wpadł młody <Lykon>Grek</Lykon>, uderzająco piękny i uderzająco podobny do egipskiego <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>. Na jego twarzy malowała się wściekłość.</p>
+<p><Pieszczota talking="true"/>
+— <Lykon>Lykon</Lykon>!… — zawołała przerażona <Pieszczota>Kama</Pieszczota>. — Co tu robisz?…</p>
 <p><Lykon talking="true"/>
 — Podła gadzino!… — odparł <Lykon>Grek</Lykon> dźwięcznym głosem. — Jeszcze miesiąc nie upłynął od wieczora, kiedy przysięgłaś, że mnie kochasz, że uciekniesz ze mną do Grecji, a już drugiemu kochankowi rzucasz się na szyję… Czy pomarli bogowie, czy uciekła od nich sprawiedliwość?…</p>
-<p><Pieszczota-Kama talking="true"/>
-— Szalony zazdrośniku — przerwała <Pieszczota-Kama>kapłanka</Pieszczota-Kama> — ty mnie zabijesz…</p>
+<p><Pieszczota talking="true"/>
+— Szalony zazdrośniku — przerwała <Pieszczota>kapłanka</Pieszczota> — ty mnie zabijesz…</p>
 <p><Lykon talking="true"/>
 — Z pewnością, że ja cię zabiję, nie twoja skamieniała bogini… Tymi rękoma — wołał, wyciągając ręce jak szpony — uduszę cię, gdybyś została kochanką…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Czyją?…</p>
 <p><Lykon talking="true"/>
 — Alboż ja wiem!… Zapewne obu: tego starego <Sargon>Asyryjczyka</Sargon> i tego <Ksiaze-Ramzes>książątka</Ksiaze-Ramzes>, któremu kamieniem łeb rozwalę, jeżeli będzie się tu włóczył… <Ksiaze-Ramzes>Książę</Ksiaze-Ramzes>!… ma wszystkie niewiasty z całego Egiptu i… jeszcze mu się zachciewa cudzych kapłanek… Kapłanki są dla kapłanów, nie dla obcych…</p>
-<p><Pieszczota-Kama>Kama</Pieszczota-Kama> odzyskała już zimną krew.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota>Kama</Pieszczota> odzyskała już zimną krew.</p>
+<p><Pieszczota talking="true"/>
 — A ty nie jesteś dla nas obcy? — rzekła wyniośle.</p>
 <p><Lykon talking="true"/>
 — Żmijo!… — wybuchnął <Lykon>Grek</Lykon> powtórnie. — Ja nie mogę być obcym dla was, gdy dar mego głosu, którym ozdobili mnie bogowie, obracam na służbę waszym bogom… A ileż to razy za pomocą mej postaci oszukiwaliście głupich Azjatów, że <Ksiaze-Ramzes>następca</Ksiaze-Ramzes> egipskiego tronu potajemnie wyznaje waszą wiarę?…</p>
-<p><Pieszczota-Kama talking="true"/>
-— Cicho!… cicho!… — zasyczała <Pieszczota-Kama>kapłanka</Pieszczota-Kama>, zamykając mu ręką usta.</p>
+<p><Pieszczota talking="true"/>
+— Cicho!… cicho!… — zasyczała <Pieszczota>kapłanka</Pieszczota>, zamykając mu ręką usta.</p>
 <p>Coś w jej dotknięciu musiało być czarującego, gdyż <Lykon>Grek</Lykon> uspokoił się i począł mówić ciszej:</p>
 <p><Lykon talking="true"/>
-— Słuchaj, <Pieszczota-Kama>Kama</Pieszczota-Kama>. W tych czasach przypłynie do Zatoki Sebenickiej grecki statek prowadzony przez mego brata. Postarajże się, aby cię arcykapłan wysłał do Pi-Uto, skąd uciekniemy nareszcie do północnej Grecji, w takie miejsce, które jeszcze nie widziało Fenicjan…</p>
-<p><Pieszczota-Kama talking="true"/>
-— Zobaczy ich, jeśli ja się tam skryję — przerwała <Pieszczota-Kama>kapłanka</Pieszczota-Kama>.</p>
+— Słuchaj, <Pieszczota>Kama</Pieszczota>. W tych czasach przypłynie do Zatoki Sebenickiej grecki statek prowadzony przez mego brata. Postarajże się, aby cię arcykapłan wysłał do Pi-Uto, skąd uciekniemy nareszcie do północnej Grecji, w takie miejsce, które jeszcze nie widziało Fenicjan…</p>
+<p><Pieszczota talking="true"/>
+— Zobaczy ich, jeśli ja się tam skryję — przerwała <Pieszczota>kapłanka</Pieszczota>.</p>
 <p><Lykon talking="true"/>
 — Gdyby tobie włos spadł — szeptał rozwścieczony <Lykon>Grek</Lykon> — przysięgam, że <Dagon>Dagon</Dagon>… że wszyscy tutejsi Fenicjanie oddadzą głowy lub zdechną w kopalniach! Poznają oni, co może <Lykon>Grek</Lykon>…</p>
-<p><Pieszczota-Kama talking="true"/>
-— A ja ci mówię — odparła tym samym głosem <Pieszczota-Kama>kapłanka</Pieszczota-Kama> — że dopóki nie zbiorę dwudziestu talentów, nie ruszę się stąd… A mam dopiero osiem…</p>
+<p><Pieszczota talking="true"/>
+— A ja ci mówię — odparła tym samym głosem <Pieszczota>kapłanka</Pieszczota> — że dopóki nie zbiorę dwudziestu talentów, nie ruszę się stąd… A mam dopiero osiem…</p>
 <p><Lykon talking="true"/>
 — Skądże weźmiesz resztę?</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Dadzą mi <Sargon>Sargon</Sargon> i <Ksiaze-Ramzes>namiestnik</Ksiaze-Ramzes>.</p>
 <p><Lykon talking="true"/>
 — Na <Sargon>Sargona</Sargon> zgoda, ale <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> nie chcę!…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Głupi <Lykon>Lykonie</Lykon>, czyli nie widzisz, dlaczego trochę podoba mi się ten młodzik?… Ciebie przypomina!…</p>
 <p><Lykon>Grek</Lykon> zupełnie uspokoił się.</p>
 <p><Lykon talking="true"/>
 — No, no!… — mruczał. — Rozumiem, że gdy kobieta ma do wyboru między <Ksiaze-Ramzes>następcą tronu</Ksiaze-Ramzes> i takim jak ja śpiewakiem, nie mam potrzeby lękać się… Ale jestem zazdrosny i gwałtowny, więc proszę cię, ażebyś go jak najmniej spoufalała do siebie.</p>
 <p>Ucałował ją, wymknął się z willi i zniknął w ciemnym ogrodzie.</p>
-<p><Pieszczota-Kama>Kama</Pieszczota-Kama> wyciągnęła za nim zaciśniętą pięść.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota>Kama</Pieszczota> wyciągnęła za nim zaciśniętą pięść.</p>
+<p><Pieszczota talking="true"/>
 — Nikczemny pajacu!… — szepnęła — który zaledwie mógłbyś być u mnie śpiewającym niewolnikiem…</p></Chapter><Chapter id="35"><h4>Rozdział X</h4>
 <p>Kiedy <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> przyszedł nazajutrz odwiedzić swego <Seti>syna</Seti>, znalazł <Sara>Sarę</Sara> rozpływającą się we łzach. Zapytał o powód. Z początku odpowiedziała, że nic jej nie jest, potem, że jej smutno, wreszcie — upadła do nóg <Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes> z wielkim płaczem.</p>
 <p><Sara talking="true"/>
@@ -5554,10 +5551,10 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 <p><Ksiaze-Ramzes talking="true"/>
 — A… więc o to chodzi…</p>
 <p><Sara talking="true"/>
-— I jeszcze narażasz się dla czwartej… dla przewrotnej <Pieszczota-Kama>Fenicjanki</Pieszczota-Kama>…</p>
-<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> zmieszał się. Skąd <Sara>Sara</Sara> mogła dowiedzieć się o <Pieszczota-Kama>Kamie</Pieszczota-Kama> i odgadnąć, że jest przewrotna?…</p>
+— I jeszcze narażasz się dla czwartej… dla przewrotnej <Pieszczota>Fenicjanki</Pieszczota>…</p>
+<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> zmieszał się. Skąd <Sara>Sara</Sara> mogła dowiedzieć się o <Pieszczota>Kamie</Pieszczota> i odgadnąć, że jest przewrotna?…</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Jak pył wciska się do skrzyni, tak niegodziwe wieści wpadają do najspokojniejszych domów — rzekł <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>. — Któż ci mówił o <Pieszczota-Kama>Fenicjance</Pieszczota-Kama>?</p>
+— Jak pył wciska się do skrzyni, tak niegodziwe wieści wpadają do najspokojniejszych domów — rzekł <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>. — Któż ci mówił o <Pieszczota>Fenicjance</Pieszczota>?</p>
 <p><Sara talking="true"/>
 — Czy ja wiem kto? Zła wróżba i serce moje.</p>
 <p><Ksiaze-Ramzes talking="true"/>
@@ -5571,7 +5568,7 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 <p><Ksiaze-Ramzes talking="true"/>
 — Zatem ta stara mówiła ci o Fenicjanach? — pytał <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>.</p>
 <p><Sara talking="true"/>
-— Ona wróżyła mi dawniej, jeszcze pod Memfisem, że powinnam wystrzegać się <Pieszczota-Kama>Fenicjanki</Pieszczota-Kama> — odparła <Sara>Sara</Sara>. — Ale dopiero tu wszyscy mówią o jakiejś kapłance fenickiej. Czy ja wiem, może tylko coś majaczy mi się w stroskanej głowie. Powiadali nawet, że gdyby nie jej uroki, nie skoczyłbyś, panie, wtedy do areny… Ach, gdyby cię byk zabił!… Jeszcze i teraz, kiedy myślę o nieszczęściu, jakie cię mogło spotkać, serce we mnie zastyga…</p>
+— Ona wróżyła mi dawniej, jeszcze pod Memfisem, że powinnam wystrzegać się <Pieszczota>Fenicjanki</Pieszczota> — odparła <Sara>Sara</Sara>. — Ale dopiero tu wszyscy mówią o jakiejś kapłance fenickiej. Czy ja wiem, może tylko coś majaczy mi się w stroskanej głowie. Powiadali nawet, że gdyby nie jej uroki, nie skoczyłbyś, panie, wtedy do areny… Ach, gdyby cię byk zabił!… Jeszcze i teraz, kiedy myślę o nieszczęściu, jakie cię mogło spotkać, serce we mnie zastyga…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Śmiej się z tego, <Sara>Saro</Sara> — przerwał wesoło <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>. — Kogo ja przygarnę do siebie, stoi tak wysoko, że go żaden strach nie powinien dosięgać… Tym mniej głupie wieści.</p>
 <p><Sara talking="true"/>
@@ -5583,8 +5580,8 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 <p><Ksiaze-Ramzes talking="true"/>
 — Ja powiedziałem: Grek?… Nic o tym nie wiem. Może wymknął mi się podobny wyraz, a może ty przesłyszałaś się.</p>
 <p>Ucałował <Sara>Sarę</Sara> i swego <Seti>syna</Seti> i pożegnał ich. Ale nie odpędził niepokoju.</p>
-<p>„Raz trzeba sobie powiedzieć — myślał — że w Egipcie nie ukryje się żadna tajemnica. Mnie śledzą kapłani i moi dworzanie nawet wówczas, gdy są czy tylko udają pijanych, a nad <Pieszczota-Kama>Kamą</Pieszczota-Kama> czuwają wężowe źrenice Fenicjan. Jeżeli dotychczas nie ukryli jej przede mną, niewiele muszą dbać o jej cnotę. Zresztą wobec kogo?… Wobec mnie, któremu sami odsłonili oszustwa swojej świątyni!… <Pieszczota-Kama>Kama</Pieszczota-Kama> będzie należała do mnie… Zbyt wiele mają w tym interesu, ażeby chcieli ściągać mój gniew na siebie…'</p>
-<p>W parę dni przyszedł do <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> święty kapłan <Mentezufis>Mentezufis</Mentezufis>, pomocnik dostojnego <Herhor>Herhora</Herhor> w ministerium wojny. <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> patrząc na bladą twarz i spuszczone oczy <Mentezufis>proroka</Mentezufis> odgadł, że i ten już wie o <Pieszczota-Kama>Fenicjance</Pieszczota-Kama>, a może nawet, z kapłańskiego stanowiska, zechce mu robić wymówki. Ale <Mentezufis>Mentezufis</Mentezufis> tym razem nie dotknął sercowych spraw <Ksiaze-Ramzes>następcy</Ksiaze-Ramzes>.</p>
+<p>„Raz trzeba sobie powiedzieć — myślał — że w Egipcie nie ukryje się żadna tajemnica. Mnie śledzą kapłani i moi dworzanie nawet wówczas, gdy są czy tylko udają pijanych, a nad <Pieszczota>Kamą</Pieszczota> czuwają wężowe źrenice Fenicjan. Jeżeli dotychczas nie ukryli jej przede mną, niewiele muszą dbać o jej cnotę. Zresztą wobec kogo?… Wobec mnie, któremu sami odsłonili oszustwa swojej świątyni!… <Pieszczota>Kama</Pieszczota> będzie należała do mnie… Zbyt wiele mają w tym interesu, ażeby chcieli ściągać mój gniew na siebie…'</p>
+<p>W parę dni przyszedł do <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> święty kapłan <Mentezufis>Mentezufis</Mentezufis>, pomocnik dostojnego <Herhor>Herhora</Herhor> w ministerium wojny. <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> patrząc na bladą twarz i spuszczone oczy <Mentezufis>proroka</Mentezufis> odgadł, że i ten już wie o <Pieszczota>Fenicjance</Pieszczota>, a może nawet, z kapłańskiego stanowiska, zechce mu robić wymówki. Ale <Mentezufis>Mentezufis</Mentezufis> tym razem nie dotknął sercowych spraw <Ksiaze-Ramzes>następcy</Ksiaze-Ramzes>.</p>
 <p>Przywitawszy <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> z urzędową miną, <Mentezufis>prorok</Mentezufis> usiadł na wskazanym miejscu i zaczął:</p>
 <p><Mentezufis talking="true"/>
 — Z memfijskiego pałacu <Ramzes-XII>pana wieczności</Ramzes-XII> zawiadomiono mnie, że w tych czasach przyjechał do Pi-Bast wielki kapłan chaldejski <Istubar>Istubar</Istubar>, nadworny astrolog i doradca jego miłości króla Assara…</p>
@@ -5698,17 +5695,17 @@ Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną częś�
 <p>„Swoją drogą święty <Mentezufis>Mentezufis</Mentezufis> zdradził się. Więc to tak jest, że w razie potrzeby Egipt może wystawić półmilionową armię?… Nawet nie marzyłem o podobnej sile!… i oni myślą, że ja będę lękał się ich bajek o losie, który nam każe rozwiązywać zagadki… Niechbym miał tylko dwieście tysięcy wojska, wymusztrowanego jak nasze greckie i libijskie pułki, a podejmę się rozwiązać wszystkie zagadki na ziemi i niebie.'</p>
 <p>Zaś czcigodny <Mentezufis>prorok Mentezufis</Mentezufis>, wracając do swej celi, mówił w sobie:</p>
 <p>„Zapalona to głowa, kobieciarz, awanturnik, ale potężny charakter. Po słabym dzisiejszym <Ramzes-XII>faraonie</Ramzes-XII> bodaj że ten przypomni nam czasy Ramzesa Wielkiego. Za dziesięć lat złe gwiazdy odmienią się, on dojrzeje i skruszy Asyrię. Z Niniwy zostaną gruzy, święty Babilon odzyska należne dostojeństwo, a jeden najwyższy Bóg, Bóg egipskich i chaldejskich proroków, zapanuje od pustyni Libijskiej aż het do najświętszej rzeki Gangesu…</p>
-<p>Byle tylko nasz młodzik nie ośmieszył się nocnymi wędrówkami do <Pieszczota-Kama>kapłanki fenickiej</Pieszczota-Kama>!… Gdyby go zobaczono w ogrodzie Astoreth, lud mógłby myśleć, że <Ksiaze-Ramzes>następca tronu</Ksiaze-Ramzes> nakłania uszu do fenickiej wiary… A Dolnemu Egiptowi już niewiele potrzeba, aby wyprzeć się starych bogów… Cóż to za mieszanina narodów!…'</p>
+<p>Byle tylko nasz młodzik nie ośmieszył się nocnymi wędrówkami do <Pieszczota>kapłanki fenickiej</Pieszczota>!… Gdyby go zobaczono w ogrodzie Astoreth, lud mógłby myśleć, że <Ksiaze-Ramzes>następca tronu</Ksiaze-Ramzes> nakłania uszu do fenickiej wiary… A Dolnemu Egiptowi już niewiele potrzeba, aby wyprzeć się starych bogów… Cóż to za mieszanina narodów!…'</p>
 <p>W kilka dni później dostojny <Sargon>Sargon</Sargon> urzędownie<note id='240'></note> zawiadomił <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> o swej roli asyryjskiego posła, oświadczył chęć powitania <Ksiaze-Ramzes>następcy tronu</Ksiaze-Ramzes> i prosił o orszak egipski, który by go odprowadził ze wszelkim bezpieczeństwem i honorami do stóp <Ramzes-XII>jego świątobliwości faraona</Ramzes-XII>.</p>
-<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> zatrzymał się z odpowiedzią dwa dni i wyznaczył <Sargon>Sargonowi</Sargon> posłuchanie znowu po upływie dwu dni. <Sargon>Asyryjczyk</Sargon>, przywykły do wschodniej powolności w podróżach i interesach, wcale się tym nie martwił i nie marnował czasu. Pił od rana do wieczora, grał w kości z <Hiram>Hiramem</Hiram> i innymi azjatyckimi bogaczami, a w chwilach wolnych, podobnie jak <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>, wymykał się do <Pieszczota-Kama>Kamy</Pieszczota-Kama>.</p>
-<p>Tam, jako człowiek starszy i praktyczny, za każdą wizytą ofiarowywał <Pieszczota-Kama>kapłance</Pieszczota-Kama> bogate podarunki. Swoje zaś uczucia dla niej wyrażał w ten sposób:</p>
+<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> zatrzymał się z odpowiedzią dwa dni i wyznaczył <Sargon>Sargonowi</Sargon> posłuchanie znowu po upływie dwu dni. <Sargon>Asyryjczyk</Sargon>, przywykły do wschodniej powolności w podróżach i interesach, wcale się tym nie martwił i nie marnował czasu. Pił od rana do wieczora, grał w kości z <Hiram>Hiramem</Hiram> i innymi azjatyckimi bogaczami, a w chwilach wolnych, podobnie jak <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>, wymykał się do <Pieszczota>Kamy</Pieszczota>.</p>
+<p>Tam, jako człowiek starszy i praktyczny, za każdą wizytą ofiarowywał <Pieszczota>kapłance</Pieszczota> bogate podarunki. Swoje zaś uczucia dla niej wyrażał w ten sposób:</p>
 <p><Sargon talking="true"/>
-— Co ty, <Pieszczota-Kama>Kama</Pieszczota-Kama>, siedzisz w Pi-Bast i chudniesz? Dopókiś młoda, bawi cię służba przy ołtarzach bogini Astoreth; ale gdy się zestarzejesz, nędzna czeka cię dola. Obedrą z ciebie kosztowne szaty, na twoje miejsce przyjmą młodszą, a ty musisz zarabiać na garstkę prażonego jęczmienia wróżbami lub dozorowaniem położnic.</p>
+— Co ty, <Pieszczota>Kama</Pieszczota>, siedzisz w Pi-Bast i chudniesz? Dopókiś młoda, bawi cię służba przy ołtarzach bogini Astoreth; ale gdy się zestarzejesz, nędzna czeka cię dola. Obedrą z ciebie kosztowne szaty, na twoje miejsce przyjmą młodszą, a ty musisz zarabiać na garstkę prażonego jęczmienia wróżbami lub dozorowaniem położnic.</p>
 <p><Sargon talking="true"/>
 Ja — ciągnął <Sargon>Sargon</Sargon> — gdyby bogowie za karę stworzyli mnie kobietą, wolałbym sam być położnicą aniżeli pielęgnować takowe.</p>
 <p><Sargon talking="true"/>
 Dlatego mówię ci, jak człowiek mądry, rzuć świątynię i przystań do mego haremu. Dam za ciebie dziesięć talentów złotem, czterdzieści krów i sto mierzyc pszenicy. Kapłani z początku będą obawiali się kary bogów, ażeby więcej wyłudzić ode mnie. Ale że ja nie postąpię już ani drachmy, co najwyżej dorzucę kilka owieczek, więc odprawią uroczyste nabożeństwo i zaraz objawi się im niebieska Astoreth, która zwolni cię od ślubów, bylem<note id='241'></note> jeszcze dorzucił złoty łańcuch albo puchar.</p>
-<p><Pieszczota-Kama>Kama</Pieszczota-Kama>, słuchając tych poglądów, gryzła wargi ze śmiechu, a on ciągnął:</p>
+<p><Pieszczota>Kama</Pieszczota>, słuchając tych poglądów, gryzła wargi ze śmiechu, a on ciągnął:</p>
 <p><Sargon talking="true"/>
 — Gdy zaś pojedziesz ze mną do Niniwy, zostaniesz wielką panią. Dam ci pałac, konie, lektykę, służebne i niewolników. Przez jeden miesiąc więcej wylejesz na siebie wonności, aniżeli tu przez cały rok ofiarujecie ich bogini.</p>
 <p><Sargon talking="true"/>
@@ -5777,7 +5774,7 @@ A kto wie — kończył — może spodobasz się królowi Assarowi i on zechce c
 — Jeżeli pozwolisz, <Ksiaze-Ramzes>namiestniku</Ksiaze-Ramzes>, okażę ci jeszcze inną jej zaletę — mówił <Sargon>Sargon</Sargon>, który, mogąc pochwalić się wyborną na owe czasy bronią asyryjską, zapomniał o gniewie.</p>
 <p>Na jego żądanie jeden z egipskich oficerów wydobył swój miecz spiżowy i trzymał go jak do ataku. Wtedy <Sargon>Sargon</Sargon> podniósł miecz stalowy, uderzył i odciął kawałek broni przeciwnika.</p>
 <p>W sali rozległ się szmer zdziwienia, a na twarz <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes> wystąpiły silne rumieńce.</p>
-<p>„Ten cudzoziemiec — myślał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — odebrał mi byka w cyrku, chce ożenić się z <Pieszczota-Kama>Kamą</Pieszczota-Kama> i pokazuje mi broń, która kraje nasze miecze jak wióry!…'</p>
+<p>„Ten cudzoziemiec — myślał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — odebrał mi byka w cyrku, chce ożenić się z <Pieszczota>Kamą</Pieszczota> i pokazuje mi broń, która kraje nasze miecze jak wióry!…'</p>
 <p>I jeszcze gorszą poczuł nienawiść do króla Assara, do wszystkich Asyryjczyków w ogóle, a do <Sargon>Sargona</Sargon> w szczególności.</p>
 <p>Mimo to usiłował panować nad sobą i z całą uprzejmością poprosił posła o pokazanie mu darów dla <Ramzes-XII>faraona</Ramzes-XII>.</p>
 <p>Wnet przyniesiono ogromne paki z wonnego drzewa, z których wyżsi urzędnicy asyryjscy wydobywali sztuki wzorzystych materii, puchary, dzbany, stalową broń, łuki z rogów koziorożca, złociste zbroje i puklerze wysadzane drogimi kamieniami.</p>
@@ -5804,7 +5801,7 @@ A kto wie — kończył — może spodobasz się królowi Assarowi i on zechce c
 <CharactersMaster talking="true"/>
 — Oczywiście — szeptali panowie w dalszym ciągu — że dynastia jest opętana przez kapłanów, nie ufa szlachcie, Egiptowi zaś grożą wielkie nieszczęścia…</p>
 <p>Ciche gniewy prędko zamieniły się w ciche narady mające nawet pozór spisku. Ale choć bardzo wiele osób brało w tym udział, pewny siebie czy zaślepiony stan kapłański nic o nich nie wiedział, a <Sargon>Sargon</Sargon>, choć przeczuwał nienawiść, nie przywiązywał do niej wagi.</p>
-<p>Poznał on, że <Ksiaze-Ramzes>książę Ramzes</Ksiaze-Ramzes> jest mu niechętny, ale przypisywał to wypadkowi w cyrku, a więcej — zazdrości o <Pieszczota-Kama>Kamę</Pieszczota-Kama>. Ufny jednak w swoją poselską nietykalność, pił, ucztował i prawie co wieczór wymykał się do fenickiej <Pieszczota-Kama>kapłanki</Pieszczota-Kama>, która coraz łaskawiej przyjmowała jego zaloty i dary.</p>
+<p>Poznał on, że <Ksiaze-Ramzes>książę Ramzes</Ksiaze-Ramzes> jest mu niechętny, ale przypisywał to wypadkowi w cyrku, a więcej — zazdrości o <Pieszczota>Kamę</Pieszczota>. Ufny jednak w swoją poselską nietykalność, pił, ucztował i prawie co wieczór wymykał się do fenickiej <Pieszczota>kapłanki</Pieszczota>, która coraz łaskawiej przyjmowała jego zaloty i dary.</p>
 <p>Taki był nastrój kół najwyższych, gdy pewnej nocy wpadł do mieszkania <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes> święty <Mentezufis>Mentezufis</Mentezufis> i oświadczył, że natychmiast musi zobaczyć się z <Ksiaze-Ramzes>księciem</Ksiaze-Ramzes>.</p>
 <p>Dworzanie odpowiedzieli, że u <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> znajduje się jedna z jego kobiet, że więc nie śmią niepokoić swego pana. Lecz gdy <Mentezufis>Mentezufis</Mentezufis> coraz natarczywiej nalegał, wywołali <Ksiaze-Ramzes>następcę</Ksiaze-Ramzes>.</p>
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> po chwili ukazał się, nawet nierozgniewany.</p>
@@ -5826,7 +5823,7 @@ A kto wie — kończył — może spodobasz się królowi Assarowi i on zechce c
 <p><Ksiaze-Ramzes talking="true"/>
 — Jacy?… gdzie?…</p>
 <p><Mentezufis talking="true"/>
-— Pod willą fenickiej kapłanki, nazwiskiem <Pieszczota-Kama>Kamy</Pieszczota-Kama> — ciągnął <Mentezufis>Mentezufis</Mentezufis>, pilnie śledząc fizjognomię <Ksiaze-Ramzes>następcy</Ksiaze-Ramzes>.</p>
+— Pod willą fenickiej kapłanki, nazwiskiem <Pieszczota>Kamy</Pieszczota> — ciągnął <Mentezufis>Mentezufis</Mentezufis>, pilnie śledząc fizjognomię <Ksiaze-Ramzes>następcy</Ksiaze-Ramzes>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Odważne chłopaki! — odparł <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, wzruszając ramionami. — Napadać takiego siłacza!… Przypuszczam, że musiała tam pęknąć niejedna kość.</p>
 <p><Mentezufis talking="true"/>
@@ -5970,11 +5967,11 @@ Czyliż Fenicjanie byliby tak spokojni, gdyby nie mieli pewności, że młody <K
 <p><Ksiaze-Ramzes talking="true"/>
 — Gdybyście wy, święci mężowie — odparł — pożyczali mi pieniędzy i mieli przy świątyniach ładne dziewczęta, z wami musiałbym się widywać częściej. A tak z biedy muszę przyjaźnić się z Fenicjanami!</p>
 <p><Mefres talking="true"/>
-— Mówią, że wasza dostojność odwiedzasz w nocy tę <Pieszczota-Kama>Fenicjankę</Pieszczota-Kama>…</p>
+— Mówią, że wasza dostojność odwiedzasz w nocy tę <Pieszczota>Fenicjankę</Pieszczota>…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — I muszę tak robić, dopóki dziewczyna, nabrawszy rozumu, nie przeprowadzi się do mego domu. Ale nie bójcie się, chodzę z mieczem i gdyby mi kto zastąpił drogę…</p>
 <p><Mefres talking="true"/>
-— Przez tę jednak <Pieszczota-Kama>Fenicjankę</Pieszczota-Kama> nabrałeś, wasza dostojność, wstrętu do pełnomocnika asyryjskiego króla.</p>
+— Przez tę jednak <Pieszczota>Fenicjankę</Pieszczota> nabrałeś, wasza dostojność, wstrętu do pełnomocnika asyryjskiego króla.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Wcale nie przez nią, tylko że <Sargon>Sargon</Sargon> śmierdzi łojem… Wreszcie do czego to prowadzi?… Wy, święci ojcowie, nie jesteście dozorcami moich kobiet; sądzę, że dostojny <Sargon>Sargon</Sargon> nie powierzył wam swoich, więc — czego chcecie?…</p>
 <p><Mefres>Mefres</Mefres> tak zmieszał się, że aż na wygolonym czole zapłonął mu rumieniec.</p>
@@ -6093,9 +6090,9 @@ Oho! minęły te czasy — ciągnął <Tutmozis>Tutmozis</Tutmozis> — kiedy ca
 <p><Sara talking="true"/>
 — Już nie będę… — odparła, lecz jeszcze obfitszy strumień polał się z jej oczu.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Cóż to? — spytał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — czy znowu sprowadziłaś sobie jakąś wróżkę, która straszy cię <Pieszczota-Kama>Fenicjankami</Pieszczota-Kama>?</p>
+— Cóż to? — spytał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — czy znowu sprowadziłaś sobie jakąś wróżkę, która straszy cię <Pieszczota>Fenicjankami</Pieszczota>?</p>
 <p><Sara talking="true"/>
-— Nie <Pieszczota-Kama>Fenicjanek</Pieszczota-Kama> lękam się, ale Fenicji… — rzekła. — O, ty nie wiesz, panie, jacy to nikczemni ludzie…</p>
+— Nie <Pieszczota>Fenicjanek</Pieszczota> lękam się, ale Fenicji… — rzekła. — O, ty nie wiesz, panie, jacy to nikczemni ludzie…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Palą dzieci? — roześmiał się <Ksiaze-Ramzes>namiestnik</Ksiaze-Ramzes>.</p>
 <p><Sara talking="true"/>
@@ -6117,44 +6114,44 @@ Oho! minęły te czasy — ciągnął <Tutmozis>Tutmozis</Tutmozis> — kiedy ca
 <p><Sara talking="true"/>
 — Alboż nie słyszę, jak mój ojciec, nasi krewni i znajomi szepcą o tym, trwożnie oglądając się, aby ich kto nie podsłuchał? Czyliż wreszcie ja nie znam Fenicjan? Przed tobą, panie, oni leżą na brzuchach i ty nie widzisz ich obłudnych spojrzeń, ale ja nieraz przypatrywałam się ich oczom, zielonym z chciwości albo żółtym z gniewu.</p>
 <p>O, strzeż się, panie, Fenicjan jak jadowitej żmii!…</p>
-<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> patrzył na <Sara>Sarę</Sara> i mimo woli porównywał jej szczerą miłość — z wyrachowaniem <Pieszczota-Kama>Fenicjanki</Pieszczota-Kama>, jej tkliwe wybuchy — z podstępnym chłodem <Pieszczota-Kama>Kamy</Pieszczota-Kama>.</p>
+<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> patrzył na <Sara>Sarę</Sara> i mimo woli porównywał jej szczerą miłość — z wyrachowaniem <Pieszczota>Fenicjanki</Pieszczota>, jej tkliwe wybuchy — z podstępnym chłodem <Pieszczota>Kamy</Pieszczota>.</p>
 <p>„Zaprawdę! — myślał. — Fenicjanie są jadowitymi gadami. Ale jeżeli <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> Wielki posługiwał się na wojnie lwem, dlaczego ja przeciw wrogom Egiptu nie miałbym użyć żmii?'</p>
-<p>I im plastyczniej wyobrażał sobie przewrotność <Pieszczota-Kama>Kamy</Pieszczota-Kama>, tym bardziej pożądał jej. Dusze bohaterskie niekiedy szukają niebezpieczeństw.</p>
+<p>I im plastyczniej wyobrażał sobie przewrotność <Pieszczota>Kamy</Pieszczota>, tym bardziej pożądał jej. Dusze bohaterskie niekiedy szukają niebezpieczeństw.</p>
 <p>Pożegnał <Sara>Sarę</Sara> i nagle, nie wiadomo skąd, przypomniał sobie, że <Sargon>Sargon</Sargon> jego podejrzewał o udział w napadzie.</p>
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> uderzył się w czoło.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Czyby to ten mój sobowtór — rzekł — urządził bijatykę posłowi?… A w takim razie kto go namówił?… Chyba Fenicjanie?… A jeżeli oni chcieli do tak brudnej rzeczy wmieszać moją osobę, więc słusznie mówi <Sara>Sara</Sara>, że to są nikczemnicy, których powinienem się wystrzegać…</p>
-<p>Znowu odezwał się w nim gniew i <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> postanowił kwestię rozstrzygnąć natychmiast. A ponieważ właśnie zapadał wieczór, więc <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>, nie wstępując do siebie, poszedł do <Pieszczota-Kama>Kamy</Pieszczota-Kama>.</p>
+<p>Znowu odezwał się w nim gniew i <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> postanowił kwestię rozstrzygnąć natychmiast. A ponieważ właśnie zapadał wieczór, więc <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>, nie wstępując do siebie, poszedł do <Pieszczota>Kamy</Pieszczota>.</p>
 <p>Mało obchodziło go, że może być poznany; na wypadek zaś niebezpieczeństwa miał przecie miecz…</p>
 <p>W pałacyku kapłanki świeciło się, ale ze służby nikt nie kręcił się w przysionku.</p>
-<p>„Dotychczas — pomyślał — <Pieszczota-Kama>Kama</Pieszczota-Kama> wyprawiała swoją służbę, kiedy ja miałem przyjść do niej. Dziś — czy przeczuwa mnie, czy może przyjmuje szczęśliwszego ode mnie kochanka?…'</p>
-<p>Wszedł na piętro, stanął przed komnatą <Pieszczota-Kama>Fenicjanki</Pieszczota-Kama> i nagle odsunął kotarę. W pokoju była <Pieszczota-Kama>Kama</Pieszczota-Kama> i <Hiram>Hiram</Hiram> i o czymś szeptali.</p>
+<p>„Dotychczas — pomyślał — <Pieszczota>Kama</Pieszczota> wyprawiała swoją służbę, kiedy ja miałem przyjść do niej. Dziś — czy przeczuwa mnie, czy może przyjmuje szczęśliwszego ode mnie kochanka?…'</p>
+<p>Wszedł na piętro, stanął przed komnatą <Pieszczota>Fenicjanki</Pieszczota> i nagle odsunął kotarę. W pokoju była <Pieszczota>Kama</Pieszczota> i <Hiram>Hiram</Hiram> i o czymś szeptali.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — O!… w zły czas przychodzę… — roześmiał się <Ksiaze-Ramzes>następca</Ksiaze-Ramzes>. — Cóż to, i wy, <Hiram>książę</Hiram>, zalecacie się do kobiety, której pod karą śmierci nie wolno być łaskawą dla mężczyzn?</p>
-<p><Hiram>Hiram</Hiram> i <Pieszczota-Kama>kapłanka</Pieszczota-Kama> oboje zerwali się z taburetów<note id='244'></note>.</p>
+<p><Hiram>Hiram</Hiram> i <Pieszczota>kapłanka</Pieszczota> oboje zerwali się z taburetów<note id='244'></note>.</p>
 <p><Hiram talking="true"/>
 — Widocznie — rzekł <Hiram>Fenicjanin</Hiram>, kłaniając się — jakiś dobry duch ostrzegł cię, panie, że o tobie mówimy…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Przygotowujecie mi jaką niespodziankę? — spytał <Ksiaze-Ramzes>namiestnik</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
-— Może!… Kto to wie?… — odparła <Pieszczota-Kama>Kama</Pieszczota-Kama>, patrząc na niego w sposób wyzywający.</p>
+<p><Pieszczota talking="true"/>
+— Może!… Kto to wie?… — odparła <Pieszczota>Kama</Pieszczota>, patrząc na niego w sposób wyzywający.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 Ale <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> odparł chłodno:
 — Oby ci, którzy zechcą nadal robić mi niespodzianki, nie zawadzili własną szyją o topór albo powróz… To by więcej ich zdziwiło aniżeli mnie ich postępki.</p>
-<p><Pieszczota-Kama>Kamie</Pieszczota-Kama> uśmiech zastygł na półotwartych ustach; <Hiram>Hiram</Hiram> pobladł i pokornie odezwał się:</p>
+<p><Pieszczota>Kamie</Pieszczota> uśmiech zastygł na półotwartych ustach; <Hiram>Hiram</Hiram> pobladł i pokornie odezwał się:</p>
 <p><Hiram talking="true"/>
 — Czym zasłużyliśmy na gniew pana i opiekuna naszego?</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Chcę wiedzieć prawdę — rzekł <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, siadając i groźnie patrząc na <Hiram>Hirama</Hiram>. — Chcę wiedzieć: kto urządził napad na asyryjskiego posła i wmieszał w tę nikczemność człowieka tak podobnego do mnie, jak moja ręka prawa jest podobna do lewej.</p>
 <p><Hiram talking="true"/>
-— Widzisz, <Pieszczota-Kama>Kamo</Pieszczota-Kama> — odezwał się struchlały <Hiram>Hiram</Hiram> — mówiłem, że poufałość tego łotra do ciebie może sprowadzić wielkie nieszczęście… A oto masz!… Nawet nie czekaliśmy długo.</p>
-<p><Pieszczota-Kama>Fenicjanka</Pieszczota-Kama> rzuciła się do nóg <Ksiaze-Ramzes>księciu</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
+— Widzisz, <Pieszczota>Kamo</Pieszczota> — odezwał się struchlały <Hiram>Hiram</Hiram> — mówiłem, że poufałość tego łotra do ciebie może sprowadzić wielkie nieszczęście… A oto masz!… Nawet nie czekaliśmy długo.</p>
+<p><Pieszczota>Fenicjanka</Pieszczota> rzuciła się do nóg <Ksiaze-Ramzes>księciu</Ksiaze-Ramzes>.</p>
+<p><Pieszczota talking="true"/>
 — Wszystko powiem — zawołała, jęcząc — tylko wyrzuć, panie, ze swego serca urazę do Fenicji… Mnie zabij, mnie uwięź, ale nie gniewaj się na nich.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Kto napadł <Sargon>Sargona</Sargon>?</p>
-<p><Pieszczota-Kama talking="true"/>
-— <Lykon>Lykon</Lykon>, Grek, który śpiewa w naszej świątyni — odparła wciąż klęcząc <Pieszczota-Kama>Fenicjanka</Pieszczota-Kama>.</p>
+<p><Pieszczota talking="true"/>
+— <Lykon>Lykon</Lykon>, Grek, który śpiewa w naszej świątyni — odparła wciąż klęcząc <Pieszczota>Fenicjanka</Pieszczota>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Aha!… więc to on wtedy śpiewał pod twoim domem i on jest tak podobny do mnie?…</p>
 <p><Hiram>Hiram</Hiram> schylił głowę i położył rękę na sercu.</p>
@@ -6165,34 +6162,34 @@ Ale <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> odparł chłodno:
 <p><Hiram>Hiram</Hiram> rozłożył ręce.</p>
 <p><Hiram talking="true"/>
 — Uciekł, łotr, ale my go znajdziemy — odparł. — Chyba, że zamieni się w muchę albo glistę ziemną…</p>
-<p><Pieszczota-Kama talking="true"/>
-— A mnie przebaczysz, panie?… — szepnęła <Pieszczota-Kama>Fenicjanka</Pieszczota-Kama>, opierając się na kolanach <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>.</p>
+<p><Pieszczota talking="true"/>
+— A mnie przebaczysz, panie?… — szepnęła <Pieszczota>Fenicjanka</Pieszczota>, opierając się na kolanach <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Wiele przebacza się kobietom — rzekł <Ksiaze-Ramzes>następca</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — I wy nie będziecie mścili się na mnie?… — trwożnie zapytała <Hiram>Hirama</Hiram>.</p>
 <p><Hiram talking="true"/>
 — Fenicja — odparł <Hiram>starzec</Hiram> powoli i dobitnie — największy występek zapomni temu, kto posiądzie łaskę pana naszego, <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes> — oby żył wiecznie!…</p>
 <p><Hiram talking="true"/>
 Co się zaś tyczy <Lykon>Lykona</Lykon> — dodał, zwracając się do <Ksiaze-Ramzes>następcy</Ksiaze-Ramzes> — będziesz go miał, panie, żywym lub zmarłym…</p>
-<p>To powiedziawszy, <Hiram>Hiram</Hiram> nisko ukłonił się i opuścił pokój, zostawiając <Pieszczota-Kama>kapłankę</Pieszczota-Kama> z <Ksiaze-Ramzes>księciem</Ksiaze-Ramzes>.</p>
-<p><Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes> krew uderzyła do głowy. Objął klęczącą <Pieszczota-Kama>Kamę</Pieszczota-Kama> i szepnął:</p>
+<p>To powiedziawszy, <Hiram>Hiram</Hiram> nisko ukłonił się i opuścił pokój, zostawiając <Pieszczota>kapłankę</Pieszczota> z <Ksiaze-Ramzes>księciem</Ksiaze-Ramzes>.</p>
+<p><Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes> krew uderzyła do głowy. Objął klęczącą <Pieszczota>Kamę</Pieszczota> i szepnął:</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Słyszałaś, co powiedział dostojny <Hiram>Hiram</Hiram>?… Fenicja zapomni ci największy występek!… Zaprawdę, ten człowiek jest mi wierny… A jeżeli on tak powiedział, jaką znajdziesz wymówkę?…</p>
-<p><Pieszczota-Kama>Kama</Pieszczota-Kama> całowała jego ręce, szepcząc:</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota>Kama</Pieszczota> całowała jego ręce, szepcząc:</p>
+<p><Pieszczota talking="true"/>
 — Zdobyłeś mnie… jestem twoją niewolnicą… Ale dziś zostaw mnie w spokoju… uszanuj dom, który należy do boskiej Astoreth…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Więc przeprowadzisz się do mego pałacu? — spytał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — O bogowie, co wyrzekłeś?… Od czasu jak słońce wschodzi i zachodzi, nie było jeszcze wypadku, ażeby kapłanka Astoreth… Ale trudno!… Fenicja, panie, daje ci taki dowód czci i przywiązania, jakiego nigdy nie otrzymał żaden z jej synów…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Więc… — przerwał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, tuląc ją.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Tylko nie dziś i nie tutaj… — błagała.</p></Chapter><Chapter id="38"><h4>Rozdział XIII</h4>
 <p>Dowiedziawszy się od <Hiram>Hirama</Hiram>, że Fenicjanie darowali mu kapłankę, <Ksiaze-Ramzes>następca</Ksiaze-Ramzes> jak najprędzej chciał ją mieć w swym domu, nie dlatego, ażeby bez niej nie mógł żyć, lecz że stanowiła dla niego nowość.</p>
-<p>Ale <Pieszczota-Kama>Kama</Pieszczota-Kama> ociągała się z przybyciem, błagając <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>, aby zostawił ją w spokoju, dopóki nie zmniejszy się napływ pielgrzymów, a nade wszystko dopóki z Pi-Bast nie wyjadą najznakomitsi. Gdyby bowiem za ich bytności została kochanką <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>, mogły zmniejszyć się dochody świątyni, a <Pieszczota-Kama>kapłance</Pieszczota-Kama> groziłoby niebezpieczeństwo.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p>Ale <Pieszczota>Kama</Pieszczota> ociągała się z przybyciem, błagając <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>, aby zostawił ją w spokoju, dopóki nie zmniejszy się napływ pielgrzymów, a nade wszystko dopóki z Pi-Bast nie wyjadą najznakomitsi. Gdyby bowiem za ich bytności została kochanką <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>, mogły zmniejszyć się dochody świątyni, a <Pieszczota>kapłance</Pieszczota> groziłoby niebezpieczeństwo.</p>
+<p><Pieszczota talking="true"/>
 — Nasi mądrzy i wielcy — mówiła <Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes> — przebaczą mi zdradę. Ale pospólstwo będzie wzywać pomsty bogów na moją głowę, a ty, panie, wiesz, że bogowie mają długie ręce…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Oby ich nie stracili, gdy wsuną je pod mój dach! — odparł <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
@@ -6233,65 +6230,65 @@ Powiedz wreszcie, jakom słyszał od Fenicjan (o czym <Ramzes-XII>jego świątob
 Zakończ jednak, że mądrość <Ramzes-XII>ojca mego</Ramzes-XII> jest większa aniżeli wszystkich ludzi i że zatem będę postępował tak, jak on mi rozkaże, byle nie oddał Fenicji w ręce Assara, bo inaczej zginiemy. Fenicja to drzwi spiżowe do naszego skarbca, a gdzież jest człowiek, który by złodziejowi oddawał swoje drzwi?</p>
 <p><Tutmozis>Tutmozis</Tutmozis> odjechał do Memfisu w miesiącu Paofi (lipiec, sierpień). Nil zaczął mocno przybierać, skutkiem czego zmniejszył się napływ azjatyckich pielgrzymów do świątyni Astoreth. Ludność też miejscowa wyległa na pola, aby czym prędzej uprzątnąć winogrona, len i pewien gatunek rośliny wydającej bawełnę.</p>
 <p>Słowem okolica uspokoiła się, a ogrody otaczające świątynię Astoreth były prawie puste.</p>
-<p>W tej porze <Ksiaze-Ramzes>książę Ramzes</Ksiaze-Ramzes>, wolny od zabaw i obowiązków państwowych, zajął się sprawą swej miłości dla <Pieszczota-Kama>Kamy</Pieszczota-Kama>. Jednego dnia odbył tajemną naradę z <Hiram>Hiramem</Hiram>, który z jego polecenia ofiarował świątyni Astoreth dwanaście talentów w złocie, posążek bogini cudnie wyrzeźbiony z malachitu, pięćdziesiąt krów i sto pięćdziesiąt miar pszenicy. Był to dar tak hojny, że sam arcykapłan świątyni przyszedł do <Ksiaze-Ramzes>namiestnika</Ksiaze-Ramzes>, ażeby upaść przed nim na brzuch swój i podziękować za łaskę, o której, jak mówił, po wsze wieki nie zapomną ludy kochające boginię Astoreth.</p>
+<p>W tej porze <Ksiaze-Ramzes>książę Ramzes</Ksiaze-Ramzes>, wolny od zabaw i obowiązków państwowych, zajął się sprawą swej miłości dla <Pieszczota>Kamy</Pieszczota>. Jednego dnia odbył tajemną naradę z <Hiram>Hiramem</Hiram>, który z jego polecenia ofiarował świątyni Astoreth dwanaście talentów w złocie, posążek bogini cudnie wyrzeźbiony z malachitu, pięćdziesiąt krów i sto pięćdziesiąt miar pszenicy. Był to dar tak hojny, że sam arcykapłan świątyni przyszedł do <Ksiaze-Ramzes>namiestnika</Ksiaze-Ramzes>, ażeby upaść przed nim na brzuch swój i podziękować za łaskę, o której, jak mówił, po wsze wieki nie zapomną ludy kochające boginię Astoreth.</p>
 <p>Załatwiwszy się ze świątynią, <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> wezwał do siebie <Naczelnik-policji-w-Pi-Bast>naczelnika policji w Pi-Bast</Naczelnik-policji-w-Pi-Bast> i przepędził z nim długą godzinę. Zaś w kilka dni później całe miasto zatrzęsło się pod wpływem nadzwyczajnej nowiny.</p>
-<p><Pieszczota-Kama>Kama</Pieszczota-Kama>, kapłanka Astoreth, została porwana, gdzieś uprowadzona i — przepadła jak ziarno piasku w pustyni!…</p>
+<p><Pieszczota>Kama</Pieszczota>, kapłanka Astoreth, została porwana, gdzieś uprowadzona i — przepadła jak ziarno piasku w pustyni!…</p>
 <p>Niesłychany ten wypadek zdarzył się w następnych warunkach.</p>
-<p>Arcykapłan świątyni wysłał <Pieszczota-Kama>Kamę</Pieszczota-Kama> do miasta Sabne-Chetam nad jeziorem Menzaleh, z ofiarami dla tamtejszej kaplicy Astoreth. <Pieszczota-Kama>Kapłanka</Pieszczota-Kama> odbywała podróż czółnem w nocy, już to aby uniknąć letniego skwaru, już dla zabezpieczenia się przed ciekawością i hołdami mieszkańców.</p>
-<p>Nad ranem, kiedy czterej wioślarze zmęczeni zdrzemnęli się, spomiędzy zarośli nadbrzeżnych wypłynęły nagle czółna prowadzone przez Greków i Chetów<note id='245'></note>, otoczyły łódź wiozącą kapłankę i porwały <Pieszczota-Kama>Kamę</Pieszczota-Kama>. Napad był tak szybki, że feniccy wioślarze nie stawiali żadnego oporu; <Pieszczota-Kama>kapłance</Pieszczota-Kama> zaś widocznie zatkano usta, nawet bowiem nie zdążyła krzyknąć.</p>
+<p>Arcykapłan świątyni wysłał <Pieszczota>Kamę</Pieszczota> do miasta Sabne-Chetam nad jeziorem Menzaleh, z ofiarami dla tamtejszej kaplicy Astoreth. <Pieszczota>Kapłanka</Pieszczota> odbywała podróż czółnem w nocy, już to aby uniknąć letniego skwaru, już dla zabezpieczenia się przed ciekawością i hołdami mieszkańców.</p>
+<p>Nad ranem, kiedy czterej wioślarze zmęczeni zdrzemnęli się, spomiędzy zarośli nadbrzeżnych wypłynęły nagle czółna prowadzone przez Greków i Chetów<note id='245'></note>, otoczyły łódź wiozącą kapłankę i porwały <Pieszczota>Kamę</Pieszczota>. Napad był tak szybki, że feniccy wioślarze nie stawiali żadnego oporu; <Pieszczota>kapłance</Pieszczota> zaś widocznie zatkano usta, nawet bowiem nie zdążyła krzyknąć.</p>
 <p>Dokonawszy świętokradzkiego czynu Chetowie i Grecy zniknęli w zaroślach, aby następnie wydobyć się na morze. Celem zaś zabezpieczenia się od pościgu wywrócili czółno należące do świątyni Astoreth.</p>
-<p>W Pi-Bast zawrzało jak w ulu: cała ludność mówiła tylko o tym. Nawet domyślano się sprawców zbrodni. Jedni posądzali Asyryjczyka <Sargon>Sargona</Sargon>, który ofiarowywał <Pieszczota-Kama>Kamie</Pieszczota-Kama> tytuł małżonki, byle chciała opuścić świątynię i pojechać z nim do Niniwy. Inni zaś podejrzewali Greka <Lykon>Lykona</Lykon>, który był śpiewakiem Astoreth i od dawna gorzał namiętnością do <Pieszczota-Kama>Kamy</Pieszczota-Kama>. Był też o tyle bogatym, że mógł pozwolić sobie na wynajęcie greckich rabusiów, a o tyle bezbożny, że zapewne nie wahałby się porwać kapłanki.</p>
-<p>Rozumie się, że w świątyni Astoreth natychmiast zwołano radę najbogatszych i najpobożniejszych wyznawców. Rada zaś przede wszystkim uchwaliła, ażeby uwolnić <Pieszczota-Kama>Kamę</Pieszczota-Kama> od kapłańskich obowiązków, i zdjąć z niej klątwy grożące dziewicom, które w służbie bogini utraciły niewinność.</p>
-<p>Było to rozporządzenie świątobliwe i mądre: jeżeli bowiem ktoś gwałtem porwał <Pieszczota-Kama>kapłankę</Pieszczota-Kama> i pozbawił święceń wbrew jej woli, to nie godziło się jej karać.</p>
-<p>W parę dni później, przy odgłosie rogów, ogłoszono wiernym w świątyni Astoreth, że <Pieszczota-Kama>kapłanka Kama</Pieszczota-Kama> umarła i że gdyby kto spotkał kobietę podobną do niej, nie ma prawa mścić się, a nawet czynić jej wyrzutów. Nie ona bowiem, nie kapłanka, opuściła boginię, ale porwały ją złe duchy, za co będą ukarane.</p>
+<p>W Pi-Bast zawrzało jak w ulu: cała ludność mówiła tylko o tym. Nawet domyślano się sprawców zbrodni. Jedni posądzali Asyryjczyka <Sargon>Sargona</Sargon>, który ofiarowywał <Pieszczota>Kamie</Pieszczota> tytuł małżonki, byle chciała opuścić świątynię i pojechać z nim do Niniwy. Inni zaś podejrzewali Greka <Lykon>Lykona</Lykon>, który był śpiewakiem Astoreth i od dawna gorzał namiętnością do <Pieszczota>Kamy</Pieszczota>. Był też o tyle bogatym, że mógł pozwolić sobie na wynajęcie greckich rabusiów, a o tyle bezbożny, że zapewne nie wahałby się porwać kapłanki.</p>
+<p>Rozumie się, że w świątyni Astoreth natychmiast zwołano radę najbogatszych i najpobożniejszych wyznawców. Rada zaś przede wszystkim uchwaliła, ażeby uwolnić <Pieszczota>Kamę</Pieszczota> od kapłańskich obowiązków, i zdjąć z niej klątwy grożące dziewicom, które w służbie bogini utraciły niewinność.</p>
+<p>Było to rozporządzenie świątobliwe i mądre: jeżeli bowiem ktoś gwałtem porwał <Pieszczota>kapłankę</Pieszczota> i pozbawił święceń wbrew jej woli, to nie godziło się jej karać.</p>
+<p>W parę dni później, przy odgłosie rogów, ogłoszono wiernym w świątyni Astoreth, że <Pieszczota>kapłanka Kama</Pieszczota> umarła i że gdyby kto spotkał kobietę podobną do niej, nie ma prawa mścić się, a nawet czynić jej wyrzutów. Nie ona bowiem, nie kapłanka, opuściła boginię, ale porwały ją złe duchy, za co będą ukarane.</p>
 <p>Tego zaś samego dnia dostojny <Hiram>Hiram</Hiram> był u <Ksiaze-Ramzes>księcia Ramzesa</Ksiaze-Ramzes> i ofiarował mu, w złotej puszce, pargamin<note id='246'></note> opatrzony mnóstwem pieczęci kapłańskich i podpisami najznakomitszych Fenicjan.</p>
-<p>Był to wyrok duchownego sądu Astoreth, który uwalniał <Pieszczota-Kama>Kamę</Pieszczota-Kama> od ślubów i zdejmował z niej klątwę niebios, byle tylko wyrzekła się swego kapłańskiego imienia.</p>
+<p>Był to wyrok duchownego sądu Astoreth, który uwalniał <Pieszczota>Kamę</Pieszczota> od ślubów i zdejmował z niej klątwę niebios, byle tylko wyrzekła się swego kapłańskiego imienia.</p>
 <p>Z tym dokumentem, gdy słońce zaszło, udał się <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> do pewnej samotnej willi w swoim ogrodzie. Otworzył drzwi nieznanym sposobem i wszedł na piętro do niewielkiego pokoju.</p>
-<p>Przy świetle rzeźbionego kagańca, w którym paliła się wonna oliwa, <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> zobaczył <Pieszczota-Kama>Kamę</Pieszczota-Kama>.</p>
+<p>Przy świetle rzeźbionego kagańca, w którym paliła się wonna oliwa, <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> zobaczył <Pieszczota>Kamę</Pieszczota>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Nareszcie!… — zawołał, oddając jej złotą puszkę. — Masz wszystko, czego chciałaś!</p>
-<p><Pieszczota-Kama>Fenicjanka</Pieszczota-Kama> była rozgorączkowana; płonęły jej oczy. Porwała puszkę i, obejrzawszy ją, rzuciła na podłogę.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota>Fenicjanka</Pieszczota> była rozgorączkowana; płonęły jej oczy. Porwała puszkę i, obejrzawszy ją, rzuciła na podłogę.</p>
+<p><Pieszczota talking="true"/>
 — Myślisz, że ona jest złota?… — rzekła. — Oddam mój naszyjnik, że ta puszka jest miedziana i tylko pokryta z dwu stron cienkimi blaszkami!…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Także<note id='247'></note> mnie witasz?… — spytał zdziwiony <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Bo znam moich braci — odparła. — Oni fałszują nie tylko złoto, ale rubiny i szafiry…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Kobieto… — przerwał <Ksiaze-Ramzes>następca</Ksiaze-Ramzes> — ależ w tej puszce jest twoje bezpieczeństwo…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Co mi tam bezpieczeństwo!… — odparła. — Nudzę się i boję… Siedzę tu już ze cztery dni jak w więzieniu…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Brakuje ci czego?…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Brakuje mi światła… oddechu… śmiechów, śpiewów, ludzi… O mściwa bogini, jakże mnie ciężko karzesz!…</p>
-<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> słuchał zdumiony. We wściekłej kobiecie nie mógł poznać tej <Pieszczota-Kama>Kamy</Pieszczota-Kama>, którą widział w świątyni, tej kobiety, nad którą unosiła się namiętna pieśń <Lykon>Greka</Lykon>.</p>
+<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> słuchał zdumiony. We wściekłej kobiecie nie mógł poznać tej <Pieszczota>Kamy</Pieszczota>, którą widział w świątyni, tej kobiety, nad którą unosiła się namiętna pieśń <Lykon>Greka</Lykon>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Jutro — rzekł <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — będziesz mogła wyjść do ogrodu… A gdy pojedziemy do Memfis, do Tebów, będziesz bawiła się jak nigdy… Spojrzyj na mnie. Czyliż nie kocham cię i czyliż kobiecie nie wystarcza zaszczyt, że należy do mnie?…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Tak — odparła nadąsana — ale cztery miałeś przede mną.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Jeżeli ciebie kocham najlepiej…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Gdybyś mnie kochał najlepiej, uczyniłbyś mnie pierwszą, osadziłbyś mnie w pałacu, który zajmuje ta… <Sara>Żydówka Sara</Sara> i mnie dałbyś wartę, nie jej… Tam przed posągiem Astoreth byłam najpierwszą… Ci, którzy składali hołd bogini, klękając przed nią, patrzyli na mnie… A tu co?… Wojsko bębni i gra na fletach, urzędnicy składają ręce na piersiach i schylają głowy przed domem <Sara>Żydówki</Sara>…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Przed moim pierworodnym <Seti>synem</Seti> — przerwał zniecierpliwiony <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — a on nie jest Żydem…</p>
-<p><Pieszczota-Kama talking="true"/>
-— Jest Żydem!… — wrzasnęła <Pieszczota-Kama>Kama</Pieszczota-Kama>.</p>
+<p><Pieszczota talking="true"/>
+— Jest Żydem!… — wrzasnęła <Pieszczota>Kama</Pieszczota>.</p>
 <p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> zerwał się.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Szalona jesteś?… — rzekł, nagle uspokoiwszy się. — Czy nie wiesz, że mój <Seti>syn</Seti> Żydem być nie może…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — A ja ci mówię, że jest!… — krzyczała, bijąc pięścią w stolik. — Jest Żydem, jak jego dziad, jak jego wujowie, i nazywa się Izaak…</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Coś powiedziała, <Pieszczota-Kama>Fenicjanko</Pieszczota-Kama>?… Czy chcesz, ażebym cię wypędził?…</p>
-<p><Pieszczota-Kama talking="true"/>
+— Coś powiedziała, <Pieszczota>Fenicjanko</Pieszczota>?… Czy chcesz, ażebym cię wypędził?…</p>
+<p><Pieszczota talking="true"/>
 — Dobrze, wypędź mnie, jeżeli kłamstwo wyszło z ust moich… Ale jeżeli rzekłam prawdę, wypędź tamtą… <Sara>Żydówkę</Sara> wraz z jej <Seti>pomiotem</Seti> i mnie oddaj pałac… Ja chcę, ja zasługuję na to, ażeby być pierwszą w twoim domu… Bo tamta oszukuje cię… drwi z ciebie… A ja dla ciebie wyparłam się mojej bogini… narażam się na jej zemstę…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Daj mi dowód, a pałac będzie twoim… Nie, to fałsz!… — mówił <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>. — <Sara>Sara</Sara> nie dopuściłaby się takiej zbrodni… Mój pierworodny <Seti>syn</Seti>…</p>
-<p><Pieszczota-Kama talking="true"/>
-— Izaak!… Izaak!… — krzyczała <Pieszczota-Kama>Kama</Pieszczota-Kama>. — Idź do niej i przekonaj się.</p>
-<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> na pół nieprzytomny wybiegł od <Pieszczota-Kama>Kamy</Pieszczota-Kama> i skierował się do willi, gdzie mieszkała <Sara>Sara</Sara>. Pomimo gwiaździstej nocy zbłądził i przez pewien czas tułał się po ogrodzie. Lecz otrzeźwiło go chłodne powietrze, odnalazł drogę i do domu <Sara>Sary</Sara> wszedł prawie spokojny.</p>
+<p><Pieszczota talking="true"/>
+— Izaak!… Izaak!… — krzyczała <Pieszczota>Kama</Pieszczota>. — Idź do niej i przekonaj się.</p>
+<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> na pół nieprzytomny wybiegł od <Pieszczota>Kamy</Pieszczota> i skierował się do willi, gdzie mieszkała <Sara>Sara</Sara>. Pomimo gwiaździstej nocy zbłądził i przez pewien czas tułał się po ogrodzie. Lecz otrzeźwiło go chłodne powietrze, odnalazł drogę i do domu <Sara>Sary</Sara> wszedł prawie spokojny.</p>
 <p>Mimo późnego wieczoru czuwano tam. <Sara>Sara</Sara> własnymi rękoma prała pieluszki <Seti>syna</Seti>, a jej służba skracała sobie czas jedzeniem, piciem i muzyką.</p>
 <p>Kiedy <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> blady ze wzruszenia stanął na progu, <Sara>Sara</Sara> krzyknęła, lecz wnet uspokoiła się.</p>
 <p><Sara talking="true"/>
@@ -6400,54 +6397,54 @@ Wyprowadzić tę kobietę do izby czeladnej!…</p>
 — Źle jest — rzekł — gdy krowa, zamiast karmić swoje cielątko, idzie do pługa i jest bita kijem. Więc choć ta <Sara>Żydówka</Sara> popełniła wielki występek, nie chcę, ażeby cierpiał jej niewinny <Seti>pomiot</Seti>… Dlatego <Sara>Sara</Sara> nie będzie już myła nóg nowej pani i nie będzie przez nią kopana w oczy. W czeladnim domu dasz jej osobną izbę, parę sprzętów i pokarm, jaki należy się niedawnej położnicy. I niech w spokoju karmi swoje <Seti>dziecko</Seti>.</p>
 <p>
       — Obyś żył wiecznie, władco nasz! — odparł rządca i szybko pobiegł spełnić rozkazy <Ksiaze-Ramzes>namiestnika</Ksiaze-Ramzes>.</p>
-<p>Cała bowiem służba lubiła <Sara>Sarę</Sara>, a w ciągu paru godzin miała sposobność znienawidzić gniewną i wrzaskliwą <Pieszczota-Kama>Kamę</Pieszczota-Kama>.</p></Chapter><Chapter id="39"><h4>Rozdział XIV</h4>
-<p><Pieszczota-Kama>Kapłanka fenicka</Pieszczota-Kama> niewiele szczęścia przyniosła <Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes>.</p>
-<p>Gdy pierwszy raz przyszedł odwiedzić ją w pałacyku, dotychczas zajmowanym przez <Sara>Sarę</Sara>, myślał, że będzie powitany z zachwytem i wdzięcznością. Tymczasem <Pieszczota-Kama>Kama</Pieszczota-Kama> przyjęła go prawie z gniewem.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p>Cała bowiem służba lubiła <Sara>Sarę</Sara>, a w ciągu paru godzin miała sposobność znienawidzić gniewną i wrzaskliwą <Pieszczota>Kamę</Pieszczota>.</p></Chapter><Chapter id="39"><h4>Rozdział XIV</h4>
+<p><Pieszczota>Kapłanka fenicka</Pieszczota> niewiele szczęścia przyniosła <Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes>.</p>
+<p>Gdy pierwszy raz przyszedł odwiedzić ją w pałacyku, dotychczas zajmowanym przez <Sara>Sarę</Sara>, myślał, że będzie powitany z zachwytem i wdzięcznością. Tymczasem <Pieszczota>Kama</Pieszczota> przyjęła go prawie z gniewem.</p>
+<p><Pieszczota talking="true"/>
 — Cóż to? — zawołała — już po upływie pół dnia przywróciłeś do łask nędzną <Sara>Żydówkę</Sara>?…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Czyliż nie mieszka w izbie czeladniej? — odparł <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Ale mój rządca powiedział, że już nie będzie mi nóg myła….</p>
 <p><Ksiaze-Ramzes>Pan</Ksiaze-Ramzes>, słuchając tego, doznał uczucia niesmaku.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Nie jesteś, widzę, zadowolona — rzekł.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — I nie będę nią!… — wybuchła — dopóki nie upokorzę tej <Sara>Żydówki</Sara>… Dopóki służąc mi i klęcząc u moich nóg nie zapomni, że kiedyś była twoją pierwszą kobietą i panią tego domu… Dopóki moja służba nie przestanie patrzeć na mnie ze strachem i nieufnością, a na nią z litością…</p>
-<p><Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes> coraz mniej zaczęła podobać się <Pieszczota-Kama>Fenicjanka</Pieszczota-Kama>.</p>
+<p><Ksiaze-Ramzes>Ramzesowi</Ksiaze-Ramzes> coraz mniej zaczęła podobać się <Pieszczota>Fenicjanka</Pieszczota>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— <Pieszczota-Kama>Kamo</Pieszczota-Kama> — rzekł — rozważ, co ci powiem. Gdyby w moim domu sługa kopnął w zęby sukę, która karmi szczenięta, wygnałbym go… Ty zaś uderzyłaś nogą między oczy kobietę i matkę… A w Egipcie, <Pieszczota-Kama>Kamo</Pieszczota-Kama>, matka to wielkie słowo, bo dobry Egipcjanin trzy rzeczy najbardziej szanuje na ziemi: bogów, <Ramzes-XII>faraona</Ramzes-XII> i matkę…</p>
-<p><Pieszczota-Kama talking="true"/>
-— O biada mi!… — zawołała <Pieszczota-Kama>Kama</Pieszczota-Kama>, rzucając się na łóżko. — Oto mam nagrodę, nędzna, żem zaparła się mojej bogini… Jeszcze tydzień temu składano mi kwiaty u nóg i okadzano wonnościami, a dziś…</p>
-<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> cicho wysunął się z komnaty i odwiedził <Pieszczota-Kama>Fenicjankę</Pieszczota-Kama> dopiero po kilku dniach.</p>
+— <Pieszczota>Kamo</Pieszczota> — rzekł — rozważ, co ci powiem. Gdyby w moim domu sługa kopnął w zęby sukę, która karmi szczenięta, wygnałbym go… Ty zaś uderzyłaś nogą między oczy kobietę i matkę… A w Egipcie, <Pieszczota>Kamo</Pieszczota>, matka to wielkie słowo, bo dobry Egipcjanin trzy rzeczy najbardziej szanuje na ziemi: bogów, <Ramzes-XII>faraona</Ramzes-XII> i matkę…</p>
+<p><Pieszczota talking="true"/>
+— O biada mi!… — zawołała <Pieszczota>Kama</Pieszczota>, rzucając się na łóżko. — Oto mam nagrodę, nędzna, żem zaparła się mojej bogini… Jeszcze tydzień temu składano mi kwiaty u nóg i okadzano wonnościami, a dziś…</p>
+<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> cicho wysunął się z komnaty i odwiedził <Pieszczota>Fenicjankę</Pieszczota> dopiero po kilku dniach.</p>
 <p>Lecz znowu zastał ją w złym humorze.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Błagam cię, panie — wykrzyknęła — dbaj o mnie trochę więcej!… Bo już i służba zaczyna mnie lekceważyć, żołnierze patrzą spode łba i lękam się, ażeby w kuchni nie zatruł mi kto potraw…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Byłem zajęty wojskiem — odparł <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> — więc nie mogłem odwiedzać cię…</p>
-<p><Pieszczota-Kama talking="true"/>
-— To prawda!… — odparła gniewnie <Pieszczota-Kama>Kama</Pieszczota-Kama>. — Byłeś wczoraj pod moim gankiem, a następnie poszedłeś ku czeladniej izbie, gdzie mieszka ta <Sara>Żydówka</Sara>… Chciałeś mi pokazać…</p>
+<p><Pieszczota talking="true"/>
+— To prawda!… — odparła gniewnie <Pieszczota>Kama</Pieszczota>. — Byłeś wczoraj pod moim gankiem, a następnie poszedłeś ku czeladniej izbie, gdzie mieszka ta <Sara>Żydówka</Sara>… Chciałeś mi pokazać…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Dość! — przerwał <Ksiaze-Ramzes>następca</Ksiaze-Ramzes>. — Nie byłem ani pod gankiem, ani pod izbą. Jeżeli więc zdawało ci się, iż widziałaś mnie, to znaczy, że twój kochanek, ten nikczemny <Lykon>Grek</Lykon>, nie tylko nie opuścił Egiptu, ale nawet śmie krążyć po moim ogrodzie…</p>
-<p><Pieszczota-Kama>Fenicjanka</Pieszczota-Kama> słuchała go przerażona.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota>Fenicjanka</Pieszczota> słuchała go przerażona.</p>
+<p><Pieszczota talking="true"/>
 — O Astoreth!… — krzyknęła nagle — ratuj mnie… O ziemio, ukryj mnie!… Bo jeżeli nędzny <Lykon>Lykon</Lykon> powrócił, grozi mi wielkie nieszczęście…</p>
-<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> roześmiał się, ale już nie miał cierpliwości słuchać biadań <Pieszczota-Kama>eks-kapłanki</Pieszczota-Kama>.</p>
+<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> roześmiał się, ale już nie miał cierpliwości słuchać biadań <Pieszczota>eks-kapłanki</Pieszczota>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Zostań w spokoju — rzekł, wychodząc — i nie zdziw się, jeżeli w tych dniach przyprowadzę ci twego <Lykon>Lykona</Lykon> związanego jak szakal. Zuchwalec ten już wyczerpał moją cierpliwość.</p>
 <p>Wróciwszy do siebie, <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> wezwał natychmiast <Hiram>Hirama</Hiram> i <Naczelnik-policji-w-Pi-Bast>naczelnika policji w Pi-Bast</Naczelnik-policji-w-Pi-Bast>. Opowiedział im obydwom, że <Lykon>Lykon</Lykon>, <Lykon>Grek</Lykon> z twarzy podobny do niego, kręci się około pałaców, i rozkazał schwytać go. <Hiram>Hiram</Hiram> przysiągł, że gdy Fenicjanie połączą się z policją, <Lykon>Grek</Lykon> musi wpaść w ich ręce. Ale <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast> począł trząść głową.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Wątpisz? — spytał go <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>
-— Tak, panie. W Pi-Bast mieszka wielu bardzo pobożnych Azjatów, według zdania których, kapłanka rzucająca ołtarz zasługuje na śmierć. Jeżeli więc ten <Lykon>Grek</Lykon> zobowiązał się zabić <Pieszczota-Kama>Kamę</Pieszczota-Kama>, oni będą mu pomagali, ukryją go i ułatwią mu ucieczkę.</p>
+— Tak, panie. W Pi-Bast mieszka wielu bardzo pobożnych Azjatów, według zdania których, kapłanka rzucająca ołtarz zasługuje na śmierć. Jeżeli więc ten <Lykon>Grek</Lykon> zobowiązał się zabić <Pieszczota>Kamę</Pieszczota>, oni będą mu pomagali, ukryją go i ułatwią mu ucieczkę.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Cóż wy na to, <Hiram>książę</Hiram>? — spytał <Ksiaze-Ramzes>następca</Ksiaze-Ramzes> <Hiram>Hirama</Hiram>.</p>
 <p><Hiram talking="true"/>
 — Dostojny <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast> mądrze mówi — odparł starzec.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Wszakże uwolniliście <Pieszczota-Kama>Kamę</Pieszczota-Kama> od klątwy! — zawołał <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>.</p>
+— Wszakże uwolniliście <Pieszczota>Kamę</Pieszczota> od klątwy! — zawołał <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>.</p>
 <p><Hiram talking="true"/>
-— Za Fenicjan — odparł <Hiram>Hiram</Hiram> — ręczę, że nie tkną <Pieszczota-Kama>Kamy</Pieszczota-Kama> i będą ścigali <Lykon>Greka</Lykon>. Ale co zrobić z innymi wyznawcami Astoreth?…</p>
+— Za Fenicjan — odparł <Hiram>Hiram</Hiram> — ręczę, że nie tkną <Pieszczota>Kamy</Pieszczota> i będą ścigali <Lykon>Greka</Lykon>. Ale co zrobić z innymi wyznawcami Astoreth?…</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>
 — Ośmielę się mniemać — rzekł <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast> — że tymczasem kobiecie tej nic nie grozi. Gdyby zaś była odważną, moglibyśmy użyć jej do zwabienia <Lykon>Greka</Lykon> i złapania go tu, w pałacach waszej dostojności.</p>
 <p><Ksiaze-Ramzes talking="true"/>
@@ -6465,37 +6462,37 @@ Wyprowadzić tę kobietę do izby czeladnej!…</p>
 <p><Hiram talking="true"/>
 — Powiedziałeś — rzekł <Hiram>Hiram</Hiram>, ściskając go za rękę. — Wszelka zaś pomoc, jakiej zażądasz od Fenicjan, będzie ci udzielona.</p>
 <p>Rozstali się jak dwaj przyjaciele polujący na grubego zwierza, którzy wiedzą, że nie o to chodzi: czyj oszczep trafi, lecz ażeby zdobycz była dobrze trafiona i nie wpadła w cudze ręce.</p>
-<p>Po kilku dniach <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> znowu odwiedził <Pieszczota-Kama>Kamę</Pieszczota-Kama>, lecz znalazł ją w stanie, który graniczył z obłędem. Kryła się w najciaśniejszej izbie swego pałacu, głodna, nieczesana, nawet niemyta, i wydawała najsprzeczniejsze rozkazy swojej służbie. Raz kazała się zgromadzać wszystkim, drugi raz wypędzała wszystkich od siebie. W nocy wołała do siebie wartę żołnierską, a po chwili uciekła od żołnierzy na strych krzycząc, że ją chcą zabić.</p>
+<p>Po kilku dniach <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> znowu odwiedził <Pieszczota>Kamę</Pieszczota>, lecz znalazł ją w stanie, który graniczył z obłędem. Kryła się w najciaśniejszej izbie swego pałacu, głodna, nieczesana, nawet niemyta, i wydawała najsprzeczniejsze rozkazy swojej służbie. Raz kazała się zgromadzać wszystkim, drugi raz wypędzała wszystkich od siebie. W nocy wołała do siebie wartę żołnierską, a po chwili uciekła od żołnierzy na strych krzycząc, że ją chcą zabić.</p>
 <p>Wobec takich postępków z duszy <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> zniknęła miłość, a zostało tylko uczucie wielkiego kłopotu. Schwycił się za głowę, gdy rządca pałacu i oficer opowiedzieli mu o tych dziwach, i szepnął:</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Zaprawdę, źle uczyniłem, odbierając tę kobietę jej bogini. Gdyż tylko bogini mogła cierpliwie znosić jej kaprysy!…</p>
-<p>Mimo to poszedł do <Pieszczota-Kama>Kamy</Pieszczota-Kama> i znalazł ją mizerną, potarganą i drżącą.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p>Mimo to poszedł do <Pieszczota>Kamy</Pieszczota> i znalazł ją mizerną, potarganą i drżącą.</p>
+<p><Pieszczota talking="true"/>
 — Biada mi!… — zawołała. — Żyję między samymi wrogami. Moja szatna chce mnie otruć, a fryzjerka nabawić jakiej ciężkiej choroby… Żołnierze tylko czekają okazji, ażeby w mej piersi utopić włócznie i miecze, a w kuchni, jestem pewna, że zamiast potraw gotują się czarodziejskie zioła… Wszyscy dybią na moje życie…</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— <Pieszczota-Kama>Kamo</Pieszczota-Kama>… — przerwał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
+— <Pieszczota>Kamo</Pieszczota>… — przerwał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
+<p><Pieszczota talking="true"/>
 — Nie nazywaj mnie tak!… — szepnęła przerażona — bo mi to nieszczęście przyniesie…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Ale skąd ci te myśli przychodzą do głowy?…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Skąd!… Czy sądzisz, że w dzień nie widuję obcych ludzi, którzy ukazują się pod pałacem i znikają, nim zdołam zawołać na służbę?… A w nocy czy nie słyszę szeptów za ścianą?…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Zdaje ci się.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Przeklęci!… przeklęci!… — zawołała z płaczem. — Wszyscy mówicie, że mi się zdaje… A przecież onegdaj jakaś zbrodnicza ręka podrzuciła mi do sypialni welon, który nosiłam pół dnia, zanim poznałam, że to nie mój… żem nigdy nie miała takiego…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Gdzież ten welon? — spytał już zaniepokojony <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Spaliłam go, alem go pierwej pokazała moim służebnicom.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Więc choćby był nie twój, cóż ci się stało?</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Jeszcze nic. Ale gdybym tą szmatę przez parę dni potrzymała w domu, z pewnością otrułabym się albo zapadłabym w nieleczącą się chorobę… Znam Azjatów i ich sposoby!…</p>
-<p>Znudzony i zirytowany <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> opuścił ją czym prędzej pomimo błagań, aby został. Gdy jednak spytał służbę o ów welon, szatna przyznała, że to nie był welon <Pieszczota-Kama>Kamy</Pieszczota-Kama>, ale został podrzucony przez kogoś.</p>
+<p>Znudzony i zirytowany <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> opuścił ją czym prędzej pomimo błagań, aby został. Gdy jednak spytał służbę o ów welon, szatna przyznała, że to nie był welon <Pieszczota>Kamy</Pieszczota>, ale został podrzucony przez kogoś.</p>
 <p><Ksiaze-Ramzes>Następca</Ksiaze-Ramzes> kazał podwoić warty w pałacu i dokoła pałacu i zdesperowany wracał do swego mieszkania.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-„Nigdy bym nie uwierzył — myślał — że jedna słaba kobieta może narobić tyle zamętu!… Cztery świeżo złapane hieny nie dorównają w niespokojności tej <Pieszczota-Kama>Fenicjance</Pieszczota-Kama>!…'</p>
+„Nigdy bym nie uwierzył — myślał — że jedna słaba kobieta może narobić tyle zamętu!… Cztery świeżo złapane hieny nie dorównają w niespokojności tej <Pieszczota>Fenicjance</Pieszczota>!…'</p>
 <p>U siebie znalazł <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> <Tutmozis>Tutmozisa</Tutmozis>, który właśnie przyjechał z Memfis i ledwie miał czas wykąpać się i przebrać po podróży.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Co mi powiesz? — spytał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> ulubieńca, odgadując, że nie przywiózł dobrych nowin. — Widziałeś <Ramzes-XII>jego świątobliwość</Ramzes-XII>?</p>
@@ -6556,7 +6553,7 @@ Wyprowadzić tę kobietę do izby czeladnej!…</p>
 — Dosyć — zakończył <Ksiaze-Ramzes>następca</Ksiaze-Ramzes>. — Niechże sobie teraz uwalniają najemne pułki… niech podpisują traktaty… niech kryją się przede mną jak niedoperze<note id='248'></note> i niech oszukują nas wszystkich… Ale przyjdzie czas…</p>
 <p>A teraz, <Tutmozis>Tutmozisie</Tutmozis>, odpocznij po podróży i bądź u mnie na uczcie dziś wieczór… Ci ludzie tak mnie spętali, że mogę tylko bawić się… Więc będę się bawił… Ale kiedyś pokażę im, kto jest władcą Egiptu: oni czy ja…</p>
 <p>Od tego dnia znowu zaczęły się uczty. <Ksiaze-Ramzes>Książę</Ksiaze-Ramzes>, jakby wstydząc się wojska, nie odbywał z nim ćwiczeń. Natomiast pałac jego roił się szlachtą, oficerami, sztukmistrzami i śpiewaczkami, a po nocach odbywały się wielkie orgie, wśród których dźwięki arf mieszały się z wrzaskami pijanych biesiadników i spazmatycznym śmiechem kobiet.</p>
-<p>Na jedną z tych uczt <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> zaprosił <Pieszczota-Kama>Kamę</Pieszczota-Kama>, ale odmówiła. <Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> obraził się na nią, co spostrzegłszy, <Tutmozis>Tutmozis</Tutmozis> rzekł:</p>
+<p>Na jedną z tych uczt <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> zaprosił <Pieszczota>Kamę</Pieszczota>, ale odmówiła. <Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> obraził się na nią, co spostrzegłszy, <Tutmozis>Tutmozis</Tutmozis> rzekł:</p>
 <p><Tutmozis talking="true"/>
 — Mówiono mi, panie, że <Sara>Sara</Sara> straciła twoje łaski?</p>
 <p><Ksiaze-Ramzes talking="true"/>
@@ -6598,41 +6595,41 @@ Wyprowadzić tę kobietę do izby czeladnej!…</p>
 — Podobno w świętych papirusach są wzmianki, że dawnymi czasy bywali u nas prorocy posiadający dar wznoszenia się w powietrze, więc kapłanów nie dziwią chęci <Mefres>Mefresa</Mefres>. A że, jak ci wiadomo, u nas podwładni widzą to, co podoba się zwierzchnikom, więc niektórzy święci mężowie twierdzą, że <Mefres>Mefres</Mefres> naprawdę podnosi się w czasie modlitwy na grubość paru palców nad ziemię…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Cha!… cha!… cha!… I tą wielką tajemnicą bawi się cały dwór, a my tu jak chłopi albo kopacze nawet nie domyślamy się cudów sprawianych pod naszym bokiem… Nędzna dola następcy egipskiego tronu! — śmiał się <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<p>Gdy się zaś uspokoił, na powtórną prośbę <Tutmozis>Tutmozisa</Tutmozis> rozkazał przenieść <Sara>Sarę</Sara> z dzieckiem z izby czeladniej do pałacyku, który w pierwszych dniach zajmowała <Pieszczota-Kama>Kama</Pieszczota-Kama>.</p>
+<p>Gdy się zaś uspokoił, na powtórną prośbę <Tutmozis>Tutmozisa</Tutmozis> rozkazał przenieść <Sara>Sarę</Sara> z dzieckiem z izby czeladniej do pałacyku, który w pierwszych dniach zajmowała <Pieszczota>Kama</Pieszczota>.</p>
 <p>Służba <Ksiaze-Ramzes>następcy</Ksiaze-Ramzes> była zachwycona tym rozporządzeniem pana, a wszystkie służebne, niewolnicy i nawet pisarze odprowadzili <Sara>Sarę</Sara> do nowej siedziby z muzyką i okrzykami radości.</p>
-<p><Pieszczota-Kama>Fenicjanka</Pieszczota-Kama>, usłyszawszy hałas, spytała o przyczynę. A gdy jej odpowiedziano, że <Sara>Sara</Sara> wróciła już do łask <Ksiaze-Ramzes>następcy</Ksiaze-Ramzes> i że z domu niewolnic znowu przeniosła się do pałacu, rozwścieczona <Pieszczota-Kama>eks-kapłanka</Pieszczota-Kama> wezwała do siebie <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes>.</p>
+<p><Pieszczota>Fenicjanka</Pieszczota>, usłyszawszy hałas, spytała o przyczynę. A gdy jej odpowiedziano, że <Sara>Sara</Sara> wróciła już do łask <Ksiaze-Ramzes>następcy</Ksiaze-Ramzes> i że z domu niewolnic znowu przeniosła się do pałacu, rozwścieczona <Pieszczota>eks-kapłanka</Pieszczota> wezwała do siebie <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes>.</p>
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> przyszedł.</p>
-<p><Pieszczota-Kama talking="true"/>
-— Więc tak poczynasz sobie ze mną?… — wrzasnęła nie panująca nad sobą <Pieszczota-Kama>Kama</Pieszczota-Kama>. — Więc to tak?… Obiecałeś mi, że będę pierwszą twoją kobietą, lecz zanim księżyc obiegł połowę nieba, złamałeś przyrzeczenie?… Może myślisz, że zemsta Astoreth pada tylko na kapłanki, a nie dosięga książąt?…</p>
+<p><Pieszczota talking="true"/>
+— Więc tak poczynasz sobie ze mną?… — wrzasnęła nie panująca nad sobą <Pieszczota>Kama</Pieszczota>. — Więc to tak?… Obiecałeś mi, że będę pierwszą twoją kobietą, lecz zanim księżyc obiegł połowę nieba, złamałeś przyrzeczenie?… Może myślisz, że zemsta Astoreth pada tylko na kapłanki, a nie dosięga książąt?…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Powiedz twojej Astoreth — odparł spokojnie <Ksiaze-Ramzes>następca</Ksiaze-Ramzes> — aby nigdy nie groziła książętom, bo i ona pójdzie do izby czeladniej.</p>
-<p><Pieszczota-Kama talking="true"/>
-— Rozumiem — wołała <Pieszczota-Kama>Kama</Pieszczota-Kama>. — Ja pójdę do czeladzi, może nawet do więzienia, a ty przez ten czas będziesz spędzał noce u swojej <Sara>Żydówki</Sara>!… Za to, żem dla ciebie wyparła się bogów… ściągnęła na moją głowę przekleństwo… Za to, że nie mam godziny spokojnej, że zmarnowałam dla ciebie młodość, życie, nawet duszę, ty tak mi płacisz…</p>
-<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> przyznał w sercu, że istotnie <Pieszczota-Kama>Kama</Pieszczota-Kama> wiele poświęciła dla niego, i uczuł skruchę.</p>
+<p><Pieszczota talking="true"/>
+— Rozumiem — wołała <Pieszczota>Kama</Pieszczota>. — Ja pójdę do czeladzi, może nawet do więzienia, a ty przez ten czas będziesz spędzał noce u swojej <Sara>Żydówki</Sara>!… Za to, żem dla ciebie wyparła się bogów… ściągnęła na moją głowę przekleństwo… Za to, że nie mam godziny spokojnej, że zmarnowałam dla ciebie młodość, życie, nawet duszę, ty tak mi płacisz…</p>
+<p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> przyznał w sercu, że istotnie <Pieszczota>Kama</Pieszczota> wiele poświęciła dla niego, i uczuł skruchę.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Nie byłem i nie będę u <Sara>Sary</Sara> — odparł. — Ale co tobie szkodzi, że nieszczęśliwa kobieta odzyska wygody i będzie mogła wykarmić swoje <Seti>dziecko</Seti>?</p>
-<p><Pieszczota-Kama>Fenicjanka</Pieszczota-Kama> zatrzęsła się. Podniosła w górę zaciśnięte pięści, włosy jej najeżyły się, a w oczach zapłonął brudny ogień nienawiści.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota>Fenicjanka</Pieszczota> zatrzęsła się. Podniosła w górę zaciśnięte pięści, włosy jej najeżyły się, a w oczach zapłonął brudny ogień nienawiści.</p>
+<p><Pieszczota talking="true"/>
 — Także<note id='249'></note> mi odpowiadasz?… <Sara>Żydówka</Sara> jest nieszczęśliwą, boś ją wygnał z pałacu; a ja muszę być zadowolona, chociaż bogowie wygnali mnie ze wszystkich swoich świątyń… A dusza moja… dusza kapłanki tonącej we łzach i obawie czyliż nie znaczy więcej u ciebie aniżeli ten żydowski pomiot, to <Seti>dziecko</Seti>, które… oby już nie żyło… oby go…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Milcz!… — krzyknął <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, zamykając jej usta.</p>
 <p>Cofnęła się wylękniona.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Więc nie wolno nawet skarżyć się na moją nędzę?… — spytała. — Lecz jeżeli aż tak dbasz o to <Seti>dziecko</Seti>, po cóż wykradłeś mnie ze świątyni, dlaczego obiecywałeś, że będę u ciebie pierwszą kobietą?…</p>
 <p>Strzeż się — znowu podniosła głos — ażeby Egipt, poznawszy moją dolę, nie nazwał cię wiarołomcą!…</p>
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> kręcił głową i uśmiechał się. Wreszcie usiadł i rzekł:</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Zaiste, mój nauczyciel miał słuszność, ostrzegając mnie przed kobietami. Jesteście jak dojrzała brzoskwinia w oczach człowieka, któremu język wysuszyło pragnienie… Lecz tylko na pozór… Bo biada głupcowi, który ośmieli się rozgryźć ten piękny owoc: zamiast chłodzącej słodyczy, znajdzie gniazdo os, które poranią mu nie tylko wargi, ale i serce.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Już narzekasz?… Nawet tego nie oszczędzasz mi wstydu?… Za to, żem ci poświęciła godność kapłanki i cnotę!…</p>
 <p><Ksiaze-Ramzes>Następca</Ksiaze-Ramzes> ciągle trząsł głową i uśmiechał się.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Nigdy bym nie myślał — rzekł po chwili — ażeby sprawdziła się bajka opowiadana przez chłopów zabierających się do snu. Ale dziś widzę, że tak jest. Posłuchaj więc, <Pieszczota-Kama>Kamo</Pieszczota-Kama>, a może zastanowisz się i nie zmusisz mnie do cofnięcia życzliwości, jaką mam dla ciebie…</p>
-<p><Pieszczota-Kama talking="true"/>
+— Nigdy bym nie myślał — rzekł po chwili — ażeby sprawdziła się bajka opowiadana przez chłopów zabierających się do snu. Ale dziś widzę, że tak jest. Posłuchaj więc, <Pieszczota>Kamo</Pieszczota>, a może zastanowisz się i nie zmusisz mnie do cofnięcia życzliwości, jaką mam dla ciebie…</p>
+<p><Pieszczota talking="true"/>
 — Jemu się chce teraz bajki opowiadać!… — odparła z goryczą kapłanka. — Jużeś mi jedną mówił i dobrzem wyszła, usłuchawszy jej…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Ta z pewnością wyjdzie ci na pożytek, byleś ją chciała zrozumieć.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Będzie w niej co o żydowskich bachorach?…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — I o kapłankach, tylko uważnie posłuchaj:</p>
@@ -6648,19 +6645,19 @@ Wyprowadzić tę kobietę do izby czeladnej!…</p>
 <p>„Dom ten będzie twoim. Lecz ponieważ nie jestem ladacznicą, tylko dziewczyną niewinną, jeżeli więc chcesz mnie posiadać, to niech twoje dzieci zrobią akt zrzeczenia się majątku, aby później nie procesowały się z moimi dziećmi.'</p>
 <p>Satni zawołał dzieci na górę i kazał im podpisać akt zrzeczenia się majątku, co uczyniły. Lecz gdy odurzony długim oporem chciał zbliżyć się do Tbubui, ta go znowu zatrzymała…</p>
 <p>„Dom ten będzie twoim — rzekła. — Ale ja nie jestem pierwszą lepszą; jestem czystą dziewicą. Jeżeli więc kochasz mnie, każ pozabijać twoje dzieci, ażeby kiedyś nie wydarły majątku moim…'</p>
-<p><Pieszczota-Kama talking="true"/>
-— Jakaż to długa historia!… — przerwała niecierpliwie <Pieszczota-Kama>Kama</Pieszczota-Kama>.</p>
+<p><Pieszczota talking="true"/>
+— Jakaż to długa historia!… — przerwała niecierpliwie <Pieszczota>Kama</Pieszczota>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Zaraz się skończy — odparł <Ksiaze-Ramzes>następca</Ksiaze-Ramzes>. — I wiesz, <Pieszczota-Kama>Kamo</Pieszczota-Kama>, co odpowiedział Satni:</p>
+— Zaraz się skończy — odparł <Ksiaze-Ramzes>następca</Ksiaze-Ramzes>. — I wiesz, <Pieszczota>Kamo</Pieszczota>, co odpowiedział Satni:</p>
 <p>„Jeżeli pragniesz tego, więc… niech się spełni zbrodnia!…'</p>
 <p>Tbubui nie trzeba było dwa razy powtarzać. W oczach ojca kazała pomordować dzieci, a okrwawione ich członki wyrzuciła przez okno psom i kotom. No i dopiero wtedy Satni wszedł do jej pokoju i spoczął na jej hebanowym łożu, wykładanym kością słoniową.<note id='250'></note></p>
-<p><Pieszczota-Kama talking="true"/>
-— Tbubui dobrze robiła, nie wierząc zapewnieniom mężczyzn — rzekła zirytowana <Pieszczota-Kama>Fenicjanka</Pieszczota-Kama>.</p>
+<p><Pieszczota talking="true"/>
+— Tbubui dobrze robiła, nie wierząc zapewnieniom mężczyzn — rzekła zirytowana <Pieszczota>Fenicjanka</Pieszczota>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Ale Satni — odparł <Ksiaze-Ramzes>następca</Ksiaze-Ramzes> — zrobił jeszcze lepiej: obudził się… gdyż jego straszna zbrodnia była tylko snem…</p>
-<p>I ty, <Pieszczota-Kama>Kamo</Pieszczota-Kama>, zapamiętaj sobie, że najpewniejszym sposobem obudzenia mężczyzny z miłosnych upojeń jest — miotać klątwy na jego <Seti>syna</Seti>…</p>
-<p><Pieszczota-Kama talking="true"/>
-— Bądź spokojny, panie, już ci nigdy nie wspomnę ani o mojej niedoli, ani o twoim <Seti>synu</Seti> — posępnie odpowiedziała <Pieszczota-Kama>Fenicjanka</Pieszczota-Kama>.</p>
+<p>I ty, <Pieszczota>Kamo</Pieszczota>, zapamiętaj sobie, że najpewniejszym sposobem obudzenia mężczyzny z miłosnych upojeń jest — miotać klątwy na jego <Seti>syna</Seti>…</p>
+<p><Pieszczota talking="true"/>
+— Bądź spokojny, panie, już ci nigdy nie wspomnę ani o mojej niedoli, ani o twoim <Seti>synu</Seti> — posępnie odpowiedziała <Pieszczota>Fenicjanka</Pieszczota>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — A ja nie cofnę ci moich łask i będziesz szczęśliwą — zakończył <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>.</p></Chapter><Chapter id="40"><h4>Rozdział XV</h4>
 <p>Już i między ludem miasta Pi-Bast zaczęły rozchodzić się groźne wieści o Libijczykach. Opowiadano, że rozpuszczeni przez kapłanów żołnierze barbarzyńscy, wracając do swej ojczyzny, z początku żebrali, potem kradli, a w końcu zaczęli rabować i palić wsie egipskie, mordując przy tym mieszkańców.</p>
@@ -6872,7 +6869,7 @@ Słyszana rzecz?… — ciągnął już nie panując nad sobą <Ksiaze-Ramzes>Ra
 — I od kogoś dowiedział się o przybyciu <Phut-Beroes>Beroesa</Phut-Beroes>, a nawet o jego widzeniu się z <Mefres>Mefresem</Mefres>, <Herhor>Herhorem</Herhor> i <Pentuer>Pentuerem</Pentuer> w świątyni Seta…</p>
 <p>Arcykapłan <Sem>Sem</Sem> porwał się oburącz za głowę i począł biegać po celi.</p>
 <p><Sem talking="true"/>
-— Niepodobna… — mówił. — Niepodobna!… Chyba rzucił kto urok na tego młodzieńca… Może owa <Pieszczota-Kama>kapłanka</Pieszczota-Kama> fenicka, którą wykradł ze świątyni?…</p>
+— Niepodobna… — mówił. — Niepodobna!… Chyba rzucił kto urok na tego młodzieńca… Może owa <Pieszczota>kapłanka</Pieszczota> fenicka, którą wykradł ze świątyni?…</p>
 <p><Mentezufis>Mentezufisowi</Mentezufis> uwaga ta wydała się tak trafną, że spojrzał na <Mefres>Mefresa</Mefres>. Ale rozdrażniony <Mefres>arcykapłan</Mefres> nie dał się zbić z toru.</p>
 <p><Mefres talking="true"/>
 — Zobaczymy — odparł. — Pierwej jednak trzeba przeprowadzić śledztwo, ażebyśmy dzień po dniu wiedzieli: co robił <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> od powrotu ze świątyni Hator? Za dużo miał swobody, za dużo stosunków z niewiernymi i nieprzyjaciółmi Egiptu. A ty, dostojny <Sem>Semie</Sem>, pomożesz nam…</p>
@@ -6887,7 +6884,7 @@ Słyszana rzecz?… — ciągnął już nie panując nad sobą <Ksiaze-Ramzes>Ra
 <p>Wiadomości zaś zebrano następujące:</p>
 <p>Między wojskiem krążyła pogłoska, że byle <Ksiaze-Ramzes>książę Ramzes</Ksiaze-Ramzes> wstąpił na tron, rozpocznie z Asyrią wojnę, która przyjmującym w niej udział zapewni wielkie zyski. Najniższy żołnierz, mówiono, nie wróci z tej wyprawy bez tysiąca drachm, jeżeli nie lepiej. Między ludem szeptano, że gdy <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes> po zwycięstwie wróci z Niniwy, wszystkich chłopów obdarzy niewolnikami i na pewną liczbę lat daruje Egiptowi podatki.</p>
 <p>Arystokracja zaś sądziła, że nowy <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes> przede wszystkim — odbierze kapłanom, a zwróci szlachcie wszystkie dobra, które stały się własnością świątyń, jako pokrycie zaciągniętych długów. Mówiono też, że przyszły <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes> będzie rządził samowładnie, bez udziału najwyższej rady kapłańskiej.</p>
-<p>W końcu we wszystkich warstwach społecznych panowało przekonanie, że <Ksiaze-Ramzes>książę Ramzes</Ksiaze-Ramzes>, aby zapewnić sobie pomoc Fenicjan, nawrócił się do bogini Istar i do niej szczególne okazywał nabożeństwo. W każdym razie było rzeczą pewną, że <Ksiaze-Ramzes>następca</Ksiaze-Ramzes> odwiedzał raz świątynię Istar w nocy i widział tam jakieś cuda. Zresztą między bogatymi Azjatami krążyły pogłoski, że <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> złożył świątyni wielkie dary, a w zamian dostał stamtąd <Pieszczota-Kama>kapłankę</Pieszczota-Kama>, która miała go utwierdzać w wierze.</p>
+<p>W końcu we wszystkich warstwach społecznych panowało przekonanie, że <Ksiaze-Ramzes>książę Ramzes</Ksiaze-Ramzes>, aby zapewnić sobie pomoc Fenicjan, nawrócił się do bogini Istar i do niej szczególne okazywał nabożeństwo. W każdym razie było rzeczą pewną, że <Ksiaze-Ramzes>następca</Ksiaze-Ramzes> odwiedzał raz świątynię Istar w nocy i widział tam jakieś cuda. Zresztą między bogatymi Azjatami krążyły pogłoski, że <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> złożył świątyni wielkie dary, a w zamian dostał stamtąd <Pieszczota>kapłankę</Pieszczota>, która miała go utwierdzać w wierze.</p>
 <p>Wszystkie te wiadomości zebrał najdostojniejszy <Sem>Sem</Sem> i jego kapłani. Zaś ojcowie święci: <Mefres>Mefres</Mefres> i <Mentezufis>Mentezufis</Mentezufis>, zakomunikowali mu inną nowinę, która przyszła do nich z Memfisu.</p>
 <p>Oto — kapłana chaldejskiego i cudotwórcę, <Phut-Beroes>Beroesa</Phut-Beroes>, przyjmował w podziemiach świątyni Seta kapłan Osochor, który we dwa miesiące później wydając za mąż swoją córkę obdarował ją bogatymi klejnotami i kupił nowożeńcom duży folwark. A ponieważ Osochor nie miał tak znacznych dochodów, rodziło się więc podejrzenie, że ów kapłan, podsłuchawszy rozmowę <Phut-Beroes>Beroesa</Phut-Beroes> z egipskimi dostojnikami, sprzedał następnie tajemnicę traktatu Fenicjanom i otrzymał od nich wielki majątek.</p>
 <p>Wysłuchawszy tego, arcykapłan <Sem>Sem</Sem> rzekł:</p>
@@ -6966,118 +6963,118 @@ W podobnych sprawach nie to jest złem, że ludzie mają skłonność do grzechu
 <p><Ksiaze-Ramzes talking="true"/>
 — Tu już nie znajdą mnie — mruknął — ani kapłani, ani baby…</p>
 <p>Wnet zasnął jak kamień.</p>
-<p>Od kilku dni <Pieszczota-Kama>Fenicjanka Kama</Pieszczota-Kama> czuła się niezdrową. Do rozdrażnienia przyłączyło się jakieś szczególne niedomaganie i bóle w stawach. Przy tym swędziła ją twarz, a szczególniej czoło nad brwiami.</p>
+<p>Od kilku dni <Pieszczota>Fenicjanka Kama</Pieszczota> czuła się niezdrową. Do rozdrażnienia przyłączyło się jakieś szczególne niedomaganie i bóle w stawach. Przy tym swędziła ją twarz, a szczególniej czoło nad brwiami.</p>
 <p>Drobne te przypadłości wydały się jej tak niepokojącymi, że przestała obawiać się, ażeby jej nie zabito, a natomiast ciągle siedziała przed lustrem, zapowiedziawszy sługom, że mogą robić, co im się podoba, byle ją zostawili w spokoju. W tych czasach nie myślała ani o <Ksiaze-Ramzes>Ramzesie</Ksiaze-Ramzes>, ani o nienawistnej <Sara>Sarze</Sara>; cała jej bowiem uwaga była zajęta — plamami na czole, których nienawykłe oko nie mogłoby nawet dostrzec.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 „Plama… tak, są plamy… — mówiła do siebie pełna bojaźni. — Dwie… trzy… O Astoreth, przecie w taki sposób nie zechcesz ukarać swej kapłanki!… Lepsza śmierć… Ale co znowu za głupstwo… Gdy czoło pocieram palcami, plamy robią się czerwieńsze… Widocznie coś mnie pokąsało albo namaściłam się nieczystą oliwą… Umyję się, a do jutra plamy zginą…'</p>
 <p>Przyszło jutro, ale plamy nie zginęły.</p>
 <p>Zawołała służącą.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Słuchaj — rzekła — spojrzyj na mnie…</p>
 <p>Lecz powiedziawszy to, usiadła w mniej oświetlonej części pokoju.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Słuchaj i patrz… — mówiła zduszonym głosem. — Czy… czy na mojej twarzy widzisz jakie plamy?… Tylko… nie zbliżaj się!…</p>
 <p>
       — Nie widzę nic — odparła służąca.</p>
-<p><Pieszczota-Kama talking="true"/>
-— Ani pod lewym okiem?… ani nad brwiami?… — pytała z wzrastającym rozdrażnieniem <Pieszczota-Kama>Fenicjanka</Pieszczota-Kama>.</p>
+<p><Pieszczota talking="true"/>
+— Ani pod lewym okiem?… ani nad brwiami?… — pytała z wzrastającym rozdrażnieniem <Pieszczota>Fenicjanka</Pieszczota>.</p>
 <p>
       — Niech pani raczy łaskawie usiąść boskim obliczem do światła — rzekła służąca.</p>
-<p>Naturalne to żądanie do wściekłości doprowadziło <Pieszczota-Kama>Kamę</Pieszczota-Kama>.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p>Naturalne to żądanie do wściekłości doprowadziło <Pieszczota>Kamę</Pieszczota>.</p>
+<p><Pieszczota talking="true"/>
 — Precz, nędznico!… — zawołała — i nie pokazuj mi się…</p>
 <p>A gdy służąca uciekła, jej pani rzuciła się gorączkowo do swej tualety<note id='262'></note> i otworzywszy parę słoików, za pomocą pędzelka umalowała sobie twarz na różowy kolor.</p>
 <p>Nad wieczorem, czując wciąż ból w stawach i gorszy od bólu niepokój, kazała wezwać do siebie lekarza. Gdy powiedziano jej, że przyszedł, spojrzała w lustro i — napadł ją nowy atak jakby szaleństwa. Rzuciła lustro na podłogę i zawołała z płaczem, że nie chce lekarza.</p>
 <p>W ciągu szóstego Hator cały dzień nie jadła i nie chciała się z nikim widzieć.</p>
-<p>Gdy po zachodzie słońca weszła niewolnica ze światłem, <Pieszczota-Kama>Kama</Pieszczota-Kama> położyła się na łóżku, owinąwszy głowę szalem. Kazała czym prędzej wynosić się niewolnicy, potem usiadła na fotelu z daleka od kagańca i przepędziła kilka godzin w półsennym odrętwieniu.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p>Gdy po zachodzie słońca weszła niewolnica ze światłem, <Pieszczota>Kama</Pieszczota> położyła się na łóżku, owinąwszy głowę szalem. Kazała czym prędzej wynosić się niewolnicy, potem usiadła na fotelu z daleka od kagańca i przepędziła kilka godzin w półsennym odrętwieniu.</p>
+<p><Pieszczota talking="true"/>
 „Nie ma żadnych plam — myślała — a jeżeli są, to przecież nie te… To nie trąd…'</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Bogowie!… — krzyknęła, rzucając się na ziemię — nie może być, ażebym ja… Bogowie, ratujcie!… Wrócę do świątyni… odpokutuję całym życiem…</p>
 <p>I znowu uspokoiła się, i znowu myślała:</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 „Nie ma żadnych plam… Od kilku dni trę sobie skórę, więc jest zaczerwieniona… Skądże by znowu?… Czy kto słyszał, ażeby kapłanka i kobieta <Ksiaze-Ramzes>następcy tronu</Ksiaze-Ramzes> mogła zachorować na trąd… O bogowie!… Tego nigdy nie było, jak świat światem… Tylko rybacy, więźniowie i nędzni Żydzi… O, ta podła <Sara>Żydówka</Sara>!… na nią spuśćcie trąd, moce niebieskie…'</p>
 <p>W tej chwili w oknie, które było na pierwszym piętrze, mignął jakiś cień. Potem rozległ się szelest i ze dworu na środek pokoju skoczył <Ksiaze-Ramzes>książę Ramzes</Ksiaze-Ramzes>.</p>
-<p><Pieszczota-Kama>Kama</Pieszczota-Kama> osłupiała. Nagle schwyciła się za głowę, a w jej oczach odmalował się — strach bezgraniczny.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota>Kama</Pieszczota> osłupiała. Nagle schwyciła się za głowę, a w jej oczach odmalował się — strach bezgraniczny.</p>
+<p><Pieszczota talking="true"/>
 — <Lykon>Lykon</Lykon>?… — szepnęła, chwytając się za głowę. — <Lykon>Lykon</Lykon>, tyś tu?… Zginiesz!… Ścigają cię…</p>
 <p><Lykon talking="true"/>
 — Wiem — odparł <Lykon>Grek</Lykon>, śmiejąc się szyderczo. — Ścigają mnie wszyscy Fenicjanie i cała policja jego świątobliwości…</p>
 <p><Lykon talking="true"/>
 Mimo to — dodał — jestem u ciebie i byłem u twego pana…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Byłeś u <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>?…</p>
 <p><Lykon talking="true"/>
 — Tak, w jego własnej komnacie… I zostawiłbym sztylet w piersi, gdyby złe duchy nie usunęły go… Widocznie twój kochanek poszedł do innej kobiety, nie do ciebie…</p>
-<p><Pieszczota-Kama talking="true"/>
-— Czego tu chcesz?… Uciekaj!… — szeptała <Pieszczota-Kama>Kama</Pieszczota-Kama>.</p>
+<p><Pieszczota talking="true"/>
+— Czego tu chcesz?… Uciekaj!… — szeptała <Pieszczota>Kama</Pieszczota>.</p>
 <p><Lykon talking="true"/>
 — Ale z tobą — odparł. — Na ulicy czeka wóz, którym dojedziemy do Nilu, a tam moja barka…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Oszalałeś!… Ależ miasto i drogi pełne wojska…</p>
 <p><Lykon talking="true"/>
 — Właśnie dlatego mogłem wejść do pałacu i oboje wymkniemy się najłatwiej — mówił <Lykon>Lykon</Lykon>. — Zabierz wszystkie kosztowności… Wnet wrócę i zabiorę cię…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Gdzie idziesz?…</p>
 <p><Lykon talking="true"/>
 — Poszukam twego pana — odparł. — Nie odejdę przecie bez zostawienia mu pamiątki…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Tyś szalony…</p>
 <p><Lykon talking="true"/>
 — Milcz!… — przerwał blady z gniewu. — Jeszcze go chcesz bronić?…</p>
-<p><Pieszczota-Kama>Fenicjanka</Pieszczota-Kama> zadumała się, zacisnęła pięści, a w jej oczach błysnęło złowrogie światło.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota>Fenicjanka</Pieszczota> zadumała się, zacisnęła pięści, a w jej oczach błysnęło złowrogie światło.</p>
+<p><Pieszczota talking="true"/>
 — A jeżeli nie znajdziesz go?… — spytała.</p>
 <p><Lykon talking="true"/>
 — To zabiję paru śpiących jego żołnierzy… podpalę pałac…</p>
 <p><Lykon talking="true"/>
 Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
-<p>Wielkie oczy <Pieszczota-Kama>Fenicjanki</Pieszczota-Kama> miały tak okropny wyraz, że <Lykon>Lykon</Lykon> zdziwił się.</p>
+<p>Wielkie oczy <Pieszczota>Fenicjanki</Pieszczota> miały tak okropny wyraz, że <Lykon>Lykon</Lykon> zdziwił się.</p>
 <p><Lykon talking="true"/>
 — Co tobie?… — spytał.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Nic. Słuchaj. Nigdy nie byłeś tak podobny do <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> jak dziś!… Jeżeli więc chcesz zrobić coś dobrego…</p>
 <p>Zbliżyła twarz do jego ucha i zaczęła szeptać.</p>
 <p><Lykon>Grek</Lykon> słuchał zdumiony.</p>
 <p><Lykon talking="true"/>
 — Kobieto — rzekł — najgorsze duchy mówią przez ciebie… Tak, na niego zwróci się podejrzenie…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — To lepsze aniżeli sztylet — odparła ze śmiechem. — Co?…</p>
 <p><Lykon talking="true"/>
 — Nigdy nie wpadłbym na taki pomysł!… A może oboje?…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Nie!… Ona niech żyje… To będzie moja zemsta…</p>
 <p><Lykon talking="true"/>
 — Cóż to za przewrotna dusza!… — szepnął <Lykon>Lykon</Lykon>. — podobasz mi się… Po królewsku zapłacimy im…</p>
-<p>Cofnął się do okna i zniknął. <Pieszczota-Kama>Kama</Pieszczota-Kama> wychyliła się za nim i rozgorączkowana, zapomniawszy o sobie, słuchała.</p>
+<p>Cofnął się do okna i zniknął. <Pieszczota>Kama</Pieszczota> wychyliła się za nim i rozgorączkowana, zapomniawszy o sobie, słuchała.</p>
 <p>Może w kwadrans po odejściu <Lykon>Lykona</Lykon> w stronie gaju figowego rozległ się przeraźliwy krzyk kobiecy. Powtórzył się parę razy i ucichł.</p>
-<p><Pieszczota-Kama>Fenicjankę</Pieszczota-Kama>, zamiast spodziewanej radości, ogarnął strach. Upadła na kolana i obłąkanymi oczyma wpatrywała się w ciemny ogród.</p>
+<p><Pieszczota>Fenicjankę</Pieszczota>, zamiast spodziewanej radości, ogarnął strach. Upadła na kolana i obłąkanymi oczyma wpatrywała się w ciemny ogród.</p>
 <p>Na dole rozległ się cichy bieg, zatrzeszczał słup ganku i w oknie znowu ukazał się <Lykon>Lykon</Lykon> w ciemnym płaszczu. Gwałtownie dyszał i ręce mu drżały.</p>
 <p><Lykon talking="true"/>
 — Gdzie klejnoty?… — szepnął.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Daj mi spokój — odparła.</p>
 <p><Lykon>Grek</Lykon> pochwycił ją za kark.</p>
 <p><Lykon talking="true"/>
 — Nędznico!… — rzekł — czy nie rozumiesz, że nim słońce wejdzie, uwiężą cię i za parę dni uduszą?…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Jestem chora…</p>
 <p><Lykon talking="true"/>
 — Gdzie klejnoty?…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Stoją pod łóżkiem.</p>
-<p><Lykon>Lykon</Lykon> wszedł do komnaty, przy świetle kaganka wydobył ciężką skrzyneczkę, zarzucił na <Pieszczota-Kama>Kamę</Pieszczota-Kama> płaszcz i targnął ją za ramię.</p>
+<p><Lykon>Lykon</Lykon> wszedł do komnaty, przy świetle kaganka wydobył ciężką skrzyneczkę, zarzucił na <Pieszczota>Kamę</Pieszczota> płaszcz i targnął ją za ramię.</p>
 <p><Lykon talking="true"/>
 — Zabieraj się. Gdzie są drzwi, którymi wchodzi do ciebie ten… ten twój pan?…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Zostaw mnie…</p>
 <p><Lykon>Grek</Lykon> pochylił się nad nią i szeptał:</p>
 <p><Lykon talking="true"/>
 — Aha!… myślisz, że cię tu zostawię?… Dziś tyle dbam o ciebie, co o sukę, która węch straciła… Ale musisz iść ze mną… Niech dowie się twój pan, że jest ktoś lepszy od niego. On wykradł kapłankę bogini, a ja zabieram kochankę jemu…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Mówię ci, że jestem chora…</p>
 <p><Lykon>Grek</Lykon> wydobył cienki sztylet i oparł jej na karku. Zatrzęsła się i szepnęła:</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Już idę…</p>
 <p>Przez ukryte drzwi wyszli do ogrodu. Od strony książęcego pałacu dolatywał ich szmer żołnierzy, którzy palili ognie. Tu i owdzie, między drzewami, widać było światła; od czasu do czasu minął ich ktoś ze służby <Ksiaze-Ramzes>następcy</Ksiaze-Ramzes>. W bramie zatrzymała ich warta:</p>
 <p>
@@ -7197,9 +7194,9 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
       — Wasza dostojność myślisz…</p>
 <p><Mefres talking="true"/>
 — Jestem pewny, że bogowie znajdą i osądzą prawdziwego mordercę…</p>
-<p>Przy furcie ogrodowej zabiegł im drogę rządca pałacu <Pieszczota-Kama>Kamy</Pieszczota-Kama>, wołając:</p>
+<p>Przy furcie ogrodowej zabiegł im drogę rządca pałacu <Pieszczota>Kamy</Pieszczota>, wołając:</p>
 <p>
-      — Nie ma <Pieszczota-Kama>Fenicjanki</Pieszczota-Kama>!… Zniknęła tej nocy…</p>
+      — Nie ma <Pieszczota>Fenicjanki</Pieszczota>!… Zniknęła tej nocy…</p>
 <p>
       — Nowe nieszczęście… — szepnął nomarcha.</p>
 <p><Mefres talking="true"/>
@@ -7224,20 +7221,20 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Sem talking="true"/>
 — Więc kto?…</p>
 <p><Mefres talking="true"/>
-— Ten, którego widziała służba, kiedy wpadł do domu <Sara>Sary</Sara> i w chwilę później uciekł… Ten, który idąc na nieprzyjaciela zabrał ze sobą fenicką kapłankę <Pieszczota-Kama>Kamę</Pieszczota-Kama>, która splugawiła ołtarz… Ten wreszcie — dokończył z uniesieniem <Mefres>Mefres</Mefres> — który wygnał z domu <Sara>Sarę</Sara> i uczynił ją niewolnicą za to, że jej syn został Żydem…</p>
+— Ten, którego widziała służba, kiedy wpadł do domu <Sara>Sary</Sara> i w chwilę później uciekł… Ten, który idąc na nieprzyjaciela zabrał ze sobą fenicką kapłankę <Pieszczota>Kamę</Pieszczota>, która splugawiła ołtarz… Ten wreszcie — dokończył z uniesieniem <Mefres>Mefres</Mefres> — który wygnał z domu <Sara>Sarę</Sara> i uczynił ją niewolnicą za to, że jej syn został Żydem…</p>
 <p><Sem talking="true"/>
 — Okropne są twoje słowa! — odparł zatrwożony <Sem>Sem</Sem>.</p>
 <p><Mefres talking="true"/>
 — Zbrodnia jest gorszą i pomimo uporu tej głupiej kobiety zostanie odkryta.</p>
 <p>Ani przypuszczał święty mąż, że bardzo prędko spełni się jego proroctwo.</p>
 <p>A stało się to następującym sposobem.</p>
-<p>Jeszcze <Ksiaze-Ramzes>książę Ramzes</Ksiaze-Ramzes>, wyruszając z wojskiem z Pi-Bast, nie zdążył opuścić pałacu, kiedy <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast> już wiedział o zabiciu dziecka <Sara>Sary</Sara>, o ucieczce <Pieszczota-Kama>Kamy</Pieszczota-Kama> i o tym, że służba <Sara>Sary</Sara> widziała <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> wchodzącego w nocy do jej domu. <Naczelnik-policji-w-Pi-Bast>Naczelnik policji</Naczelnik-policji-w-Pi-Bast> był człowiek bystry; domyślił się, kto mógł popełnić zbrodnię, i zamiast prowadzić na miejscu śledztwo, popędził za miasto ścigać winnych, uprzedziwszy o tym, co zaszło, <Hiram>Hirama</Hiram>.</p>
-<p>I otóż w tym czasie, gdy <Mefres>Mefres</Mefres> usiłował wydobyć zeznanie <Sara>Sary</Sara>, najdzielniejsi agenci pi-basteńskiej policji tudzież wszyscy Fenicjanie, pod przewództwem <Hiram>Hirama</Hiram>, już ścigali <Lykon>Greka Lykona</Lykon> i kapłankę <Pieszczota-Kama>Kamę</Pieszczota-Kama>.</p>
+<p>Jeszcze <Ksiaze-Ramzes>książę Ramzes</Ksiaze-Ramzes>, wyruszając z wojskiem z Pi-Bast, nie zdążył opuścić pałacu, kiedy <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast> już wiedział o zabiciu dziecka <Sara>Sary</Sara>, o ucieczce <Pieszczota>Kamy</Pieszczota> i o tym, że służba <Sara>Sary</Sara> widziała <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> wchodzącego w nocy do jej domu. <Naczelnik-policji-w-Pi-Bast>Naczelnik policji</Naczelnik-policji-w-Pi-Bast> był człowiek bystry; domyślił się, kto mógł popełnić zbrodnię, i zamiast prowadzić na miejscu śledztwo, popędził za miasto ścigać winnych, uprzedziwszy o tym, co zaszło, <Hiram>Hirama</Hiram>.</p>
+<p>I otóż w tym czasie, gdy <Mefres>Mefres</Mefres> usiłował wydobyć zeznanie <Sara>Sary</Sara>, najdzielniejsi agenci pi-basteńskiej policji tudzież wszyscy Fenicjanie, pod przewództwem <Hiram>Hirama</Hiram>, już ścigali <Lykon>Greka Lykona</Lykon> i kapłankę <Pieszczota>Kamę</Pieszczota>.</p>
 <p>Jakoż trzeciej nocy po wymaszerowaniu <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast> wrócił do Pi-Bast, prowadząc ze sobą dużą, okrytą płótnem klatkę, w której jakaś kobieta krzyczała wniebogłosy. Nie kładąc się spać, <Naczelnik-policji-w-Pi-Bast>naczelnik</Naczelnik-policji-w-Pi-Bast> wezwał oficera, który prowadził śledztwo, i z uwagą wysłuchał jego raportu.</p>
 <p>O wschodzie słońca dwaj arcykapłani, <Sem>Sem</Sem> i <Mefres>Mefres</Mefres>, tudzież pi-basteński nomarcha otrzymali najpokorniejsze wezwanie, aby raczyli natychmiast, jeżeli taka będzie ich wola, przybyć do <Naczelnik-policji-w-Pi-Bast>naczelnika policji</Naczelnik-policji-w-Pi-Bast>. Jakoż wszyscy trzej zeszli się o tej samej godzinie; zaś <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast>, nisko kłaniając się, począł błagać ich, aby mu opowiedzieli wszystko, co wiedzą o zabójstwie dziecka <Ksiaze-Ramzes>następcy tronu</Ksiaze-Ramzes>.</p>
 <p>Nomarcha, choć wielki dostojnik, pobladł, usłyszawszy to pokorne wezwanie i odpowiedział, że nic nie wie. Prawie to samo powtórzył <Sem>arcykapłan Sem</Sem>, dodając od siebie uwagę, że <Sara>Sara</Sara> wydaje mu się niewinną. Gdy zaś przyszła kolej na świętego <Mefres>Mefresa</Mefres>, ten rzekł:</p>
 <p><Mefres talking="true"/>
-— Nie wiem, czy wasza dostojność słyszałeś, że w nocy, kiedy spełniono zbrodnię, uciekła jedna z książęcych kobiet imieniem <Pieszczota-Kama>Kama</Pieszczota-Kama>?</p>
+— Nie wiem, czy wasza dostojność słyszałeś, że w nocy, kiedy spełniono zbrodnię, uciekła jedna z książęcych kobiet imieniem <Pieszczota>Kama</Pieszczota>?</p>
 <p><Naczelnik-policji-w-Pi-Bast>Naczelnik policji</Naczelnik-policji-w-Pi-Bast> zdawał się być mocno zdziwionym.</p>
 <p><Mefres talking="true"/>
 — Nie wiem również — ciągnął <Mefres>Mefres</Mefres> — czy powiedziano waszej dostojności, że <Ksiaze-Ramzes>następca tronu</Ksiaze-Ramzes> nie nocował w pałacu i że był w domu <Sara>Sary</Sara>. Odźwierny i dwie służące poznały go, gdyż noc była dość widna.</p>
@@ -7265,42 +7262,42 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 — A teraz — odezwał się <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast> — raczcie, najczcigodniejsi, udać się ze mną do więzienia. Zobaczymy tam jeszcze jednego świadka…</p>
 <p>Zeszli na dół, do podziemnej sali, gdzie pod oknem stała wielka klatka przykryta płótnem. <Naczelnik-policji-w-Pi-Bast>Naczelnik policji</Naczelnik-policji-w-Pi-Bast> odrzucił kijem płótno, a obecni zobaczyli w kącie leżącą kobietę.</p>
 <p>
-      — Ależ to jest pani <Pieszczota-Kama>Kama</Pieszczota-Kama>!… — zawołał nomarcha.</p>
-<p>Była to istotnie <Pieszczota-Kama>Kama</Pieszczota-Kama>, chora i bardzo zmieniona. Gdy na widok dostojników podniosła się i stanęła w świetle, obecni zobaczyli jej twarz pokrytą miedzianymi plamami. Oczy miała jak obłąkane.</p>
+      — Ależ to jest pani <Pieszczota>Kama</Pieszczota>!… — zawołał nomarcha.</p>
+<p>Była to istotnie <Pieszczota>Kama</Pieszczota>, chora i bardzo zmieniona. Gdy na widok dostojników podniosła się i stanęła w świetle, obecni zobaczyli jej twarz pokrytą miedzianymi plamami. Oczy miała jak obłąkane.</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>
-— <Pieszczota-Kama>Kamo</Pieszczota-Kama> — rzekł <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast> — bogini Astoreth dotknęła cię trądem…</p>
-<p><Pieszczota-Kama talking="true"/>
+— <Pieszczota>Kamo</Pieszczota> — rzekł <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast> — bogini Astoreth dotknęła cię trądem…</p>
+<p><Pieszczota talking="true"/>
 — To nie bogini!… — odezwała się zmienionym głosem. — To nikczemni Azjaci podrzucili mi zatruty welon… O, ja nieszczęśliwa!…</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>
-— <Pieszczota-Kama>Kamo</Pieszczota-Kama> — ciągnął <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast> — nad nędzą twoją ulitowali się najznakomitsi nasi arcykapłani, święci <Sem>Sem</Sem> i <Mefres>Mefres</Mefres>. Jeżeli odpowiesz prawdę, pomodlą się za ciebie i — może wszechmocny Ozyrys odwróci od ciebie klęskę. Jeszcze czas, choroba dopiero się zaczyna, a nasi bogowie dużo mogą…</p>
+— <Pieszczota>Kamo</Pieszczota> — ciągnął <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast> — nad nędzą twoją ulitowali się najznakomitsi nasi arcykapłani, święci <Sem>Sem</Sem> i <Mefres>Mefres</Mefres>. Jeżeli odpowiesz prawdę, pomodlą się za ciebie i — może wszechmocny Ozyrys odwróci od ciebie klęskę. Jeszcze czas, choroba dopiero się zaczyna, a nasi bogowie dużo mogą…</p>
 <p>Chora kobieta upadła na kolana i przyciskając twarz do kraty, mówiła złamanym głosem:</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Ulitujcie się nade mną… Wyrzekłam się bogów fenickich i służbę moją do końca życia poświęcę wielkim bogom Egiptu… Tylko oddalcie ode mnie…</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>
 — Odpowiedz, ale prawdę — pytał <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast> — a bogowie nie odmówią ci swej łaski: kto zabił dziecko <Sara>Żydówki Sary</Sara>?…</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Zdrajca <Lykon>Lykon</Lykon>, <Lykon>Grek</Lykon>… Był śpiewakiem przy naszej świątyni i mówił, że mnie kocha… A teraz rzucił mnie, nikczemnik, zabrawszy moje klejnoty!…</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>
 — Dlaczego <Lykon>Lykon</Lykon> zabił dziecko?</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Chciał zabić <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>, lecz nie znalazłszy go w pałacu, pobiegł do domu <Sara>Sary</Sara> i…</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>
 — Jakim sposobem zbrodniarz dostał się do pilnowanego domu?</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Albo to nie wiesz, panie, że <Lykon>Lykon</Lykon> jest podobny do <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>?… Podobni są jak dwa liście jednej palmy…</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>
 — Jak był ubrany <Lykon>Lykon</Lykon> tej nocy?… — pytał dalej <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast>.</p>
-<p><Pieszczota-Kama talking="true"/>
+<p><Pieszczota talking="true"/>
 — Miał… miał kaftan w żółte i czarne pasy… takiż czepek i fartuszek czerwony z niebieskim… Już nie męczcie mnie… wróćcie mi zdrowie… Zlitujcie się… będę wierna waszym bogom… Czy już wychodzicie?… O, niemiłosierni!…</p>
 <p><Sem talking="true"/>
 — Biedna kobieto — odezwał się <Sem>arcykapłan Sem</Sem> — przyślę ci tu potężnego cudotwórcę i może…</p>
-<p><Pieszczota-Kama talking="true"/>
-— O, niech was błogosławi Astoreth… Nie, niech was błogosławią wasi bogowie wszechmocni i litościwi… — szeptała okrutnie znękana <Pieszczota-Kama>Fenicjanka</Pieszczota-Kama>.</p>
+<p><Pieszczota talking="true"/>
+— O, niech was błogosławi Astoreth… Nie, niech was błogosławią wasi bogowie wszechmocni i litościwi… — szeptała okrutnie znękana <Pieszczota>Fenicjanka</Pieszczota>.</p>
 <p>Dostojnicy wyszli z więzienia i wrócili do biura. Nomarcha, widząc, że <Mefres>arcykapłan Mefres</Mefres> ma wciąż spuszczone oczy i zacięte usta, zapytał go:</p>
 <p>
       — Czy nie cieszysz się, mężu święty, z tych cudownych odkryć, jakie porobił nasz sławny <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast>?</p>
 <p><Mefres talking="true"/>
-— Nie mam powodu do radości — odparł szorstko <Mefres>Mefres</Mefres>. — Sprawa, zamiast uprościć, wikła się… Bo przecież <Sara>Sara</Sara> wciąż twierdzi, że ona zabiła dziecko, a zaś <Pieszczota-Kama>Fenicjanka</Pieszczota-Kama> tak odpowiada, jakby ją wyuczono…</p>
+— Nie mam powodu do radości — odparł szorstko <Mefres>Mefres</Mefres>. — Sprawa, zamiast uprościć, wikła się… Bo przecież <Sara>Sara</Sara> wciąż twierdzi, że ona zabiła dziecko, a zaś <Pieszczota>Fenicjanka</Pieszczota> tak odpowiada, jakby ją wyuczono…</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>
 — Nie wierzysz zatem, wasza dostojność?… — wtrącił <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast>.</p>
 <p><Mefres talking="true"/>
@@ -7322,7 +7319,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>
       — Rzekłeś wielkie słowa — odpowiedział nomarcha, ściskając go za rękę — a jakiś głos wewnętrzny mówi mi, że jeszcze ujrzę cię najwyższym naczelnikiem policji przy boku jego świątobliwości.</p>
 <p>Znowu upłynęło parę dni. Przez ten czas paraszytowie ubezpieczyli od zepsucia zwłoki <Ksiaze-Ramzes>Ramzesowego</Ksiaze-Ramzes> synka, a <Sara>Sara</Sara> wciąż przebywała w więzieniu, czekając na sąd, pewna, że ją potępią.</p>
-<p><Pieszczota-Kama>Kama</Pieszczota-Kama> również siedziała w więzieniu, w klatce; obawiano się jej bowiem, jako dotkniętej trądem. Wprawdzie odwiedził ją cudowny lekarz, odmówił przy niej modlitwy i dał jej do picia wszystkoleczącą wodę. Mimo to <Pieszczota-Kama>Fenicjanki</Pieszczota-Kama> nie opuszczała gorączka, miedziane plamy nad brwiami i na policzkach robiły się coraz wyraźniejsze. Więc z biura nomarchy wyszedł rozkaz wywiezienia jej na pustynię wschodnią, gdzie, odsunięta od ludzi, istniała kolonia trędowatych.</p>
+<p><Pieszczota>Kama</Pieszczota> również siedziała w więzieniu, w klatce; obawiano się jej bowiem, jako dotkniętej trądem. Wprawdzie odwiedził ją cudowny lekarz, odmówił przy niej modlitwy i dał jej do picia wszystkoleczącą wodę. Mimo to <Pieszczota>Fenicjanki</Pieszczota> nie opuszczała gorączka, miedziane plamy nad brwiami i na policzkach robiły się coraz wyraźniejsze. Więc z biura nomarchy wyszedł rozkaz wywiezienia jej na pustynię wschodnią, gdzie, odsunięta od ludzi, istniała kolonia trędowatych.</p>
 <p>Pewnego wieczora do świątyni Ptah przyszedł <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast>, mówiąc, że chce rozmówić się z arcykapłanami. <Naczelnik-policji-w-Pi-Bast>Naczelnik</Naczelnik-policji-w-Pi-Bast> miał ze sobą dwu ajentów i człowieka od stóp do głów odzianego w wór.</p>
 <p>Po chwili odpowiedziano mu, że arcykapłani oczekują go w izbie świętej, pod posągiem bóstwa.</p>
 <p><Naczelnik-policji-w-Pi-Bast>Naczelnik</Naczelnik-policji-w-Pi-Bast> zostawił ajentów przed bramą, wziął za ramię człowieka odzianego w wór i prowadzony przez kapłana udał się do świętej izby. Gdy wszedł tam, zastał <Mefres>Mefresa</Mefres> i <Sem>Sema</Sem> ubranych w arcykapłańskie szaty, ze srebrnymi blachami na piersiach.</p>
@@ -7342,7 +7339,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Sem talking="true"/>
 — Co ci winien <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, zbrodniarzu?… — spytał oburzony <Sem>Sem</Sem>.</p>
 <p><Lykon talking="true"/>
-— Co winien!… Porwał mi <Pieszczota-Kama>Kamę</Pieszczota-Kama> i wtrącił ją w chorobę, z której nie ma wyjścia… Byłem wolny, mogłem uciec z majątkiem i życiem, ale postanowiłem zemścić się, i oto macie mnie… Jego szczęście, że wasi bogowie mocniejsi są od mojej nienawiści… Dziś możecie mnie zabić… Im prędzej, tym lepiej.</p>
+— Co winien!… Porwał mi <Pieszczota>Kamę</Pieszczota> i wtrącił ją w chorobę, z której nie ma wyjścia… Byłem wolny, mogłem uciec z majątkiem i życiem, ale postanowiłem zemścić się, i oto macie mnie… Jego szczęście, że wasi bogowie mocniejsi są od mojej nienawiści… Dziś możecie mnie zabić… Im prędzej, tym lepiej.</p>
 <p><Sem talking="true"/>
 — Wielki to zbrodniarz — odezwał się <Sem>arcykapłan Sem</Sem>.</p>
 <p><Mefres>Mefres</Mefres> milczał i wpatrywał się w pałające wściekłością oczy <Lykon>Greka</Lykon>. Podziwiał jego odwagę i rozmyślał. Nagle rzekł do <Naczelnik-policji-w-Pi-Bast>naczelnika policji</Naczelnik-policji-w-Pi-Bast>.</p>
@@ -7384,9 +7381,9 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Sara talking="true"/>
 — Ja… ja zabiłam… tylko ja!</p>
 <p>
-      — Syna twego, uważaj, <Sara>Saro</Sara>, zabił mężczyzna, <Lykon>Grek</Lykon>, nazwiskiem <Lykon>Lykon</Lykon>, kochanek <Pieszczota-Kama>Fenicjanki Kamy</Pieszczota-Kama>…</p>
+      — Syna twego, uważaj, <Sara>Saro</Sara>, zabił mężczyzna, <Lykon>Grek</Lykon>, nazwiskiem <Lykon>Lykon</Lykon>, kochanek <Pieszczota>Fenicjanki Kamy</Pieszczota>…</p>
 <p><Sara talking="true"/>
-— Co mówisz?… — wyszeptała, chwytając go za ręce. — O, ta <Pieszczota-Kama>Fenicjanka</Pieszczota-Kama>!… Wiedziałam, że nas zgubi… Ale <Lykon>Grek</Lykon>?… Ja nie znam żadnego <Lykon>Greka</Lykon>… Cóż wreszcie mógłby zawinić <Lykon>Grekom</Lykon> mój syn…</p>
+— Co mówisz?… — wyszeptała, chwytając go za ręce. — O, ta <Pieszczota>Fenicjanka</Pieszczota>!… Wiedziałam, że nas zgubi… Ale <Lykon>Grek</Lykon>?… Ja nie znam żadnego <Lykon>Greka</Lykon>… Cóż wreszcie mógłby zawinić <Lykon>Grekom</Lykon> mój syn…</p>
 <p>
       — Nie wiem o tym — ciągnął nomarcha. — <Lykon>Grek</Lykon> ten już nie żyje. Ale uważaj, <Sara>Saro</Sara>: ten człowiek był tak podobny do <Ksiaze-Ramzes>księcia Ramzesa</Ksiaze-Ramzes>, że gdy wszedł do twego pokoju, myślałaś, że to nasz pan… I wolałaś oskarżyć samą siebie aniżeli swego i naszego pana.</p>
 <p><Sara talking="true"/>
@@ -7450,7 +7447,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>„Niewielka przegrana — pisał <Herhor>Herhor</Herhor> — byłaby nauką ostrożności i pokory dla księcia <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes>, który już dziś, choć jeszcze nic nie zrobił, uważa się za równego najdoświadczeńszym wojownikom.'</p>
 <p>Gdy zaś <Mentezufis>Mentezufis</Mentezufis> odpowiedział, że trudno przypuścić, aby następca doznał porażki, <Herhor>Herhor</Herhor> dał mu do zrozumienia, że w takim razie triumf nie powinien być zanadto wielki.</p>
 <p>„Państwo — mówił — nic na tym nie straci, jeżeli wojowniczy i popędliwy następca tronu będzie miał przez kilka lat zabawkę na zachodniej granicy. On sam nabierze biegłości w sztuce wojennej, a rozpróżniaczeni i zuchwali nasi żołnierze znajdą właściwe dla siebie zajęcie.'</p>
-<p>Drugą korespondencję prowadził <Mentezufis>Mentezufis</Mentezufis> ze świętym ojcem <Mefres>Mefresem</Mefres>, i ta wydawała mu się ważniejszą. <Mefres>Mefres</Mefres>, obrażony kiedyś przez księcia, dziś z okazji sprawy o zabicie dziecka <Sara>Sary</Sara> bez ogródek oskarżał następcę o dzieciobójstwo dokonane pod wpływem <Pieszczota-Kama>Kamy</Pieszczota-Kama>. A gdy w ciągu tygodnia wyszła na jaw niewinność <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes>, arcykapłan, jeszcze bardziej rozdrażniony, nie przestawał twierdzić, że <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> jest zdolny do wszystkiego, jako nieprzyjaciel ojczystych bogów i sprzymierzeniec nędznych Fenicjan.</p>
+<p>Drugą korespondencję prowadził <Mentezufis>Mentezufis</Mentezufis> ze świętym ojcem <Mefres>Mefresem</Mefres>, i ta wydawała mu się ważniejszą. <Mefres>Mefres</Mefres>, obrażony kiedyś przez księcia, dziś z okazji sprawy o zabicie dziecka <Sara>Sary</Sara> bez ogródek oskarżał następcę o dzieciobójstwo dokonane pod wpływem <Pieszczota>Kamy</Pieszczota>. A gdy w ciągu tygodnia wyszła na jaw niewinność <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes>, arcykapłan, jeszcze bardziej rozdrażniony, nie przestawał twierdzić, że <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> jest zdolny do wszystkiego, jako nieprzyjaciel ojczystych bogów i sprzymierzeniec nędznych Fenicjan.</p>
 <p>Sprawa zabójstwa dziecka <Sara>Sary</Sara> tak podejrzanie wyglądała w pierwszych dniach, że nawet rada najwyższa z Memfisu zapytała <Mentezufis>Mentezufisa</Mentezufis>: co o tym sądzi? <Mentezufis>Mentezufis</Mentezufis> jednak odpowiedział, że całymi dniami przypatruje się <Ksiaze-Ramzes>księciu</Ksiaze-Ramzes>, lecz ani na chwilę nie przypuszcza, ażeby on był mordercą.</p>
 <p>Takie to korespondencje, niby stado drapieżnych ptaków, krążyły dokoła <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes>, podczas gdy on rozsyłał zwiady w kierunku nieprzyjaciela, naradzał się z wodzami lub zachęcał wojska do szybkiego pochodu.</p>
 <p>Dnia czternastego cała armia następcy tronu skoncentrowała się na południe od miasta Terenuthis. Ku wielkiej radości <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> przyszedł <Patrokles>Patrokles</Patrokles> z greckimi pułkami, a wraz z nim kapłan <Pentuer>Pentuer</Pentuer>, wysłany przez <Herhor>Herhora</Herhor> na drugiego dozorcę przy wodzu naczelnym.</p>
@@ -8031,7 +8028,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Ksiaze-Ramzes>Książę Ramzes</Ksiaze-Ramzes> wsparł obie ręce o krawędź wozu i z wysokości pagórka patrzył na Libijczyków i swoje wojsko jak żółtogłowy orzeł na pstre kuropatwy. Duma wypełniała go od stóp do głów i wszyscy czuli, że nie można być potężniejszym nad tego zwycięskiego wodza.</p>
 <p>W jednej chwili oczy <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> utraciły swój blask, a na twarzy odmalowało się przykre zdziwienie. To stojący za nim <Pentuer>Pentuer</Pentuer> szepnął:</p>
 <Pentuer talking="true"/>
-<p>— Nakłoń, panie, ucha twego… Od czasu kiedy opuściłeś miasto Pi-Bast, zaszły tam dziwne wydarzenia… Twoja kobieta, <Pieszczota-Kama>Kama</Pieszczota-Kama> Fenicjanka, uciekła z Grekiem <Lykon>Lykonem</Lykon>…</p>
+<p>— Nakłoń, panie, ucha twego… Od czasu kiedy opuściłeś miasto Pi-Bast, zaszły tam dziwne wydarzenia… Twoja kobieta, <Pieszczota>Kama</Pieszczota> Fenicjanka, uciekła z Grekiem <Lykon>Lykonem</Lykon>…</p>
 <Ksiaze-Ramzes talking="true"/>
 <p>— Z <Lykon>Lykonem</Lykon>?… — powtórzył <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
 <Pentuer talking="true"/>
@@ -8173,8 +8170,8 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>Gdy człowiek umrze, cień jego żyje i ukazuje się ludziom. W naszych księgach zapisano tysiące podobnych wypadków. Jedne cienie upominały się o jadło, inne chodziły po mieszkaniu, pracowały w ogrodzie albo polowały w górach z cieniami swoich psów i kotów. Inne cienie straszyły ludzi, niszczyły ich majątek, wypijały ich krew, nawet pociągały żyjących do rozpusty… Bywały jednak cienie dobre: matki opiekujące się dziećmi, poległych żołnierzy ostrzegających o zasadzce nieprzyjacielskiej, kapłanów, którzy odkrywali nam ważne tajemnice.</p>
 <p>Jeszcze za osiemnastej dynastii cień faraona Cheopsa (który pokutuje za ucisk ludu przy wznoszeniu piramidy dla siebie) ukazywał się w nubijskich kopalniach złota i litując się nad cierpieniami pracujących więźniów, wskazał im nowe źródło wody.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Opowiadasz ciekawe rzeczy, <Mentezufis>święty mężu</Mentezufis> — odparł <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> — pozwól więc, że i ja ci coś powiem. Jednej nocy, w Pi-Bast, pokazano mi „mój cień'… Był zupełnie podobny do mnie i nawet tak ubrany jak ja. Wnet jednak przekonałem się, że to nie jest żaden cień, ale żywy człowiek, niejaki <Lykon>Lykon</Lykon>, nikczemny morderca mego syna…</p>
-<p>Występki swoje zaczął od tego, że straszył Fenicjankę <Pieszczota-Kama>Kamę</Pieszczota-Kama>. Wyznaczyłem nagrodę za schwytanie go… Ale nasza policja nie tylko nie pojmała go, lecz nawet pozwoliła mu wykraść tą samą <Pieszczota-Kama>Kamę</Pieszczota-Kama> i zabić niewinne dziecko.</p>
-<p>Dziś słyszę, że schwytano <Pieszczota-Kama>Kamę</Pieszczota-Kama>; ale o tym nędzniku nic nie wiem. Zapewne żyje na swobodzie zdrów, wesół i zasobny w skradzione skarby; może nawet sposobi się do nowej zbrodni!…</p>
+<p>Występki swoje zaczął od tego, że straszył Fenicjankę <Pieszczota>Kamę</Pieszczota>. Wyznaczyłem nagrodę za schwytanie go… Ale nasza policja nie tylko nie pojmała go, lecz nawet pozwoliła mu wykraść tą samą <Pieszczota>Kamę</Pieszczota> i zabić niewinne dziecko.</p>
+<p>Dziś słyszę, że schwytano <Pieszczota>Kamę</Pieszczota>; ale o tym nędzniku nic nie wiem. Zapewne żyje na swobodzie zdrów, wesół i zasobny w skradzione skarby; może nawet sposobi się do nowej zbrodni!…</p>
 <p><Mentezufis talking="true"/>— Zbyt wiele osób ściga tego nikczemnika, ażeby w końcu nie został pojmany — rzekł <Mentezufis>Mentezufis</Mentezufis>. — A gdy raz wpadnie w nasze ręce, Egipt zapłaci mu za zgryzoty, jakie uczynił jego <Ksiaze-Ramzes>następcy tronu</Ksiaze-Ramzes>. Wierzaj mi, panie, możesz mu z góry przebaczyć wszystkie występki, kara bowiem odpowie ich wielkości.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Wolałbym go sam mieć w rękach — odparł <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>. — Zawsze to niebezpieczna rzecz taki „cień' za życia!…<note id='292'></note></p>
 <p>Nie bardzo zbudowany podobnym zakończeniem swego wykładu, <Mentezufis>święty Mentezufis</Mentezufis> pożegnał <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>. Po nim wszedł do namiotu <Tutmozis>Tutmozis</Tutmozis>, zawiadamiając, że Grecy już układają stos dla swojego wodza i że kilkanaście libijskich kobiet zgodziło się płakać w czasie pogrzebowego obchodu.</p>

@@ -635,7 +635,7 @@
   }
 
   .entity-image-wrapper:hover {
-    transform: scale(1.2); /* Scale the wrapper on hover */
+    transform: scale(1.7); /* Scale the wrapper on hover */
     z-index: 10; /* Bring to front on hover */
   }
 
@@ -913,6 +913,7 @@
 
 /* Base style for entity image wrapper to help with transitions */
 .entity-image-wrapper {
+  transform: scale(1.2);
   transition:
     transform 0.3s ease-in-out,
     box-shadow 0.3s ease-in-out;

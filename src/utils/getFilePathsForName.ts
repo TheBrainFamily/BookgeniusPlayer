@@ -102,6 +102,8 @@ const known = [
   "patrokles-speaks.mp4",
   "pentuer-speaks.mp4",
   "pieszczota-speaks.mp4",
+  "pieszczota-kama-speaks.mp4",
+  "pieszczota-kama-listens.mp4",
   "rabsun-speaks.mp4",
   "książę-ramzes-speaks.mp4",
   "ramzes-xii-speaks.mp4",
@@ -167,3 +169,6 @@ pharaonCharactersData.forEach((character) => {
 //     console.log(`File not found: ${file}`);
 //   }
 // });
+
+console.log(getPictureFilePathForName("Pieszczota Kama", "pharaon"));
+console.log(getPictureFilePathForName("Pieszczota Kama", "pharaon"));

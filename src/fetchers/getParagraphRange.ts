@@ -68,20 +68,25 @@ export async function getParagraphRange(params: GetParagraphRangeParams): Promis
     const response = await fetch(apiUrl, { method: "GET", headers: { "Content-Type": "application/json" } });
 
     if (!response.ok) {
-      let errorBody: any = null;
+      let errorBody: { message?: string; error?: string } | string | null = null;
       try {
         errorBody = await response.json();
       } catch {
-        /* swallow – non‑JSON error payloads are fine */
+        try {
+          errorBody = await response.text();
+        } catch {
+          errorBody = null;
+        }
       }
-      const msg = errorBody?.message || errorBody?.error || response.statusText;
+      const msg = typeof errorBody === "object" && errorBody !== null ? errorBody.message || errorBody.error : typeof errorBody === "string" ? errorBody : response.statusText;
       throw new Error(`Network response was not ok: ${msg} (status: ${response.status})`);
     }
 
     return (await response.json()) as SelfSufficientCharacterMetadata[];
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching paragraph range:", error);
-    throw new Error(`Failed to fetch paragraph range: ${error.message}`);
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to fetch paragraph range: ${message}`);
   }
 }
 
@@ -128,8 +133,8 @@ export const paragraphMetadataServicePure = {
 
               return { ...c, paragraphsWhereSpotted, paragraphsWhereTalking };
             })
-            // drop chapters whose spotted list is now empty
-            .filter((c) => c.paragraphsWhereSpotted.length > 0);
+            // drop chapters whose spotted OR talking list is now empty
+            .filter((c) => c.paragraphsWhereSpotted.length > 0 || c.paragraphsWhereTalking.length > 0);
 
           // drop characters that vanished entirely
           if (infoPerChapter.length === 0) return null;
@@ -158,7 +163,7 @@ export interface ParsedParagraphRange {
 
 /**
  * Converts the raw slice returned by the service into a flat list ordered by
- * (chapter, paragraph).  Each entry represents the character’s *first*
+ * (chapter, paragraph).  Each entry represents the character's *first*
  * appearance inside the requested range plus an array of their other
  * appearances within the same range.
  */
@@ -173,6 +178,7 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
         isTalking: boolean;
         others: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[];
       } | null = null;
+      console.log("CONSIDERING character", character);
 
       const sortedChapters = [...character.infoPerChapter].sort((a, b) => a.chapter - b.chapter);
 
@@ -226,7 +232,7 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
 }
 
 /* -------------------------------------------------------------------------- */
-/*  4. Ad‑hoc “does it match?” sanity check                                   */
+/*  4. Ad‑hoc "does it match?" sanity check                                   */
 /* -------------------------------------------------------------------------- */
 
 const res = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange({

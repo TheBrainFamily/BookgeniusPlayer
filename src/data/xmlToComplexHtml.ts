@@ -64,7 +64,7 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
                   pContent += `<span class="character-placeholder character-talking" data-character="${characterInfo.display}" data-src-moving="${movingSrc}" data-is-talking="true"></span>`;
                 } else {
                   // Generate placeholder span for mentioned character, preserving text content
-                  pContent += `${pElement.textContent || ""} <span class="character-placeholder character-mention" data-character="${characterInfo.display}" data-src-picture="${pictureSrc}" data-is-talking="false"></span>`;
+                  pContent += `${pElement.textContent || ""}<span class="character-placeholder character-mention" data-character="${characterInfo.display}" data-src-picture="${pictureSrc}" data-is-talking="false"></span>`;
                 }
               } else {
                 // Handle other potential elements if needed, e.g., <b>, <i>

@@ -6,7 +6,7 @@ function isDevelopment(): boolean {
 }
 
 // Base URLs that adapt to the environment
-const DEV_SERVER_URL = "http://192.168.1.26:3000";
+const DEV_SERVER_URL = "http://127.0.0.1:3000";
 const DEV_WS_URL = "ws://192.168.1.26:3000";
 
 // In production, use relative URLs that will point to the same domain

@@ -3,8 +3,11 @@
 /* ============================================ */
 /* TODO ipad pro portrait mode 1024x1366 make entities visible, hide description, add name below image */
 #legacy #left-notes .entity-note {
-  margin-left: 2em;
-  margin-right: 2em;
+  margin-left: 3em;
+  margin-right: 1em;
+}
+#legacy #left-notes .entity-text-column {
+  padding-left: 2%;
 }
 
 @media screen and (orientation: landscape) and (max-height: 769px) {
