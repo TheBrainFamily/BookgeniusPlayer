@@ -6,6 +6,7 @@ export enum BOOK_SLUGS {
   INNOCENCE = "innocence",
   TRUMP = "trump",
   PHARAON = "Pharaon",
+  _1984 = "1984",
 }
 
-export const CURRENT_BOOK = BOOK_SLUGS.PHARAON;
+export const CURRENT_BOOK = BOOK_SLUGS._1984;

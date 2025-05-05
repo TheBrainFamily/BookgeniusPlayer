@@ -249,7 +249,7 @@
       }
 
       /* Blockquote / Citation */
-      blockquote.cite {
+      blockquote {
         margin: 1.5em 2.5em;
         padding-left: 1em;
         border-left: 3px solid var(--border-light);

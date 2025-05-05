@@ -3,6 +3,31 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
 import { fileURLToPath } from "url";
+
+//TODO build per book
+// Manifest file should be different for each book
+// All these files should be imported and rexported in some central file like
+// bookData.ts which should be replaced while building and inside it: (bookDataPharaon.ts, bookData1984.ts)
+// metadata.ts should be replaced
+// src/getCurrentBookSlug.ts
+// src/data/faraon-book-xml.ts
+// Example from esbuild
+//       plugins: [
+//   {
+//     name: "alias-modules",
+//     setup(build) {
+//       // Redirect ./chapters import
+//       build.onResolve({ filter: /^\.\/chapters$/ }, () => {
+//         return { path: path.resolve("./src/chapters-pharaon.ts") };
+//       });
+//       // Redirect ./book import
+//       build.onResolve({ filter: /^\.\/book$/ }, () => {
+//         return { path: path.resolve("./src/book-pharaon.ts") };
+//       });
+//     },
+//   },
+// ],
+
 export default defineConfig({
   optimizeDeps: { include: ["workbox-core", "workbox-precaching", "workbox-routing", "workbox-strategies", "workbox-range-requests"] },
   plugins: [

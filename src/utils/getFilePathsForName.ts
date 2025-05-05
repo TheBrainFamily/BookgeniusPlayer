@@ -1,5 +1,5 @@
 import { BOOK_SLUGS } from "../consts";
-import { pharaonCharactersData } from "../data/metadata";
+import { pharaonCharactersData } from "../data/pharaon-metadata";
 
 export const knownMovingPictures = [
   "Książę Ramzes",
@@ -169,6 +169,3 @@ pharaonCharactersData.forEach((character) => {
 //     console.log(`File not found: ${file}`);
 //   }
 // });
-
-console.log(getPictureFilePathForName("Pieszczota Kama", "pharaon"));
-console.log(getPictureFilePathForName("Pieszczota Kama", "pharaon"));

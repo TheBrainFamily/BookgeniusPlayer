@@ -1,6 +1,6 @@
 import { setCurrentLocation } from "../helpers/paragraphsNavigation";
 
-const SHOULD_SHOW_EVERYONE = false;
+const SHOULD_SHOW_EVERYONE = true;
 
 // --- Helper Functions ---
 
@@ -101,6 +101,7 @@ function createMediaElement(placeholder: HTMLSpanElement): HTMLVideoElement | HT
 function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] p[data-index]");
 
+  console.log("activate media in range", { startChapter, startParagraph, endChapter, endParagraph });
   allParagraphs.forEach((p) => {
     const chapterElement = p.closest("section[data-chapter]") as HTMLElement;
     const chapterStr = chapterElement?.dataset.chapter;

@@ -1,12 +1,13 @@
-import { DOMParser } from "@xmldom/xmldom";
+import { DOMParser, XMLSerializer, Node } from "@xmldom/xmldom";
 import fs from "fs";
 import path from "path";
 import { getMovingPictureFilePathForName, getPictureFilePathForName } from "../utils/getFilePathsForName";
-import { BOOK_SLUGS } from "../consts";
+import { BOOK_SLUGS, CURRENT_BOOK } from "../consts";
 
 export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): string => {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+  const serializer = new XMLSerializer();
   let htmlResult = "";
 
   // Parse CharactersMaster
@@ -85,6 +86,14 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
         } else if (tagName === "h5") {
           // Handle h5 element (e.g., book title)
           htmlResult += `\n    <h5 data-index="${dataIndex++}">${childElement.textContent || ""}</h5>`;
+        } else {
+          // Serialize child nodes to preserve inner HTML
+          let innerHtml = "";
+          for (let k = 0; k < childElement.childNodes.length; k++) {
+            // Cast ChildNode to unknown, then to the imported Node type
+            innerHtml += serializer.serializeToString(childElement.childNodes[k] as unknown as Node);
+          }
+          htmlResult += `\n    <${tagName} data-index="${dataIndex++}">${innerHtml}</${tagName}>`;
         }
         // Add handlers for other potential top-level tags (h1, h2, h3, h6, etc.) if needed
       }
@@ -99,8 +108,13 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
 };
 
 if (require.main === module) {
-  const xmlString = fs.readFileSync(path.join(__dirname, "chapters.xml"), "utf8");
+  const bookSlug: BOOK_SLUGS = CURRENT_BOOK;
+  const xmlString = fs.readFileSync(path.join(__dirname, `${bookSlug}-chapters.xml`), "utf8");
   // Example usage: Provide the book slug when calling
-  const htmlString = xmlToComplexHtml(xmlString, "Pharaon" as BOOK_SLUGS);
-  fs.writeFileSync(path.join(__dirname, "chapters.ts"), `export const faraonBookXml = \`<section>${htmlString}</section>\`;`);
+  const htmlString = xmlToComplexHtml(xmlString, bookSlug);
+  if (bookSlug === "1984") {
+    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const _${bookSlug}BookXml = \`<section>${htmlString}</section>\`;`);
+  } else {
+    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const ${bookSlug}BookXml = \`<section>${htmlString}</section>\`;`);
+  }
 }

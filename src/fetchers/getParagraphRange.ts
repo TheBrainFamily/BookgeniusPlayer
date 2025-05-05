@@ -7,8 +7,8 @@
  * compile without any additional tweaks.
  */
 
-import { pharaonCharactersData } from "../data/metadata";
 import { BOOK_SLUGS } from "../consts";
+import { bookData } from "../rexportedBookData";
 
 /* -------------------------------------------------------------------------- */
 /*  Shared types                                                              */
@@ -101,16 +101,23 @@ export const paragraphMetadataServicePure = {
    * Returns the slice of `data` that matches the given range, replicating the
    * MongoDB aggregation you run on the server.
    */
-  getCharactersMetadataForParagraphRange(range: PureRange, data: SelfSufficientCharacterMetadata[] = pharaonCharactersData): SelfSufficientCharacterMetadata[] {
+  getCharactersMetadataForParagraphRange(range: PureRange, data: SelfSufficientCharacterMetadata[] = bookData.charactersData): SelfSufficientCharacterMetadata[] {
     const { startChapter, endChapter, bookSlug, startParagraph, endParagraph } = range;
 
     return (
       data
         // 1. book filter ───────────────────────────────────────────────────────
         .filter((d) => d.bookSlug === bookSlug)
-
         // 2. chapter & paragraph filtering ────────────────────────────────────
         .map((character) => {
+          if (character.characterName === "Dziewczyna z ciemnymi włosami (Julia)") {
+            console.log("character", character.characterName, character.infoPerChapter);
+            console.log(
+              "character filtered",
+              character.characterName,
+              character.infoPerChapter.filter((c) => c.chapter >= startChapter && c.chapter <= endChapter),
+            );
+          }
           const infoPerChapter: InfoPerChapter[] = character.infoPerChapter
             // keep only chapters inside the chapter range
             .filter((c) => c.chapter >= startChapter && c.chapter <= endChapter)

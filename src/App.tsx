@@ -5,7 +5,6 @@ import { usePageObserver } from "./hooks/usePageObserver";
 import { useCutScene } from "./hooks/useCutScene";
 import { useBackgroundVideo } from "./hooks/useBackgroundVideo";
 import { useBookContent } from "./hooks/useBookContent";
-import { faraonBookXml } from "./data/chapters";
 
 import BookChaptersModal from "./menu-modal";
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
@@ -16,13 +15,14 @@ import { useWebSocket, WebSocketProvider } from "./context/WebSocketContext";
 import { BottomInput } from "./components/BottomInput";
 import { RealtimeProvider } from "./context/RealtimeContext";
 import { DeepResearchModal } from "./ui/DeepResearchModal";
+import { bookData } from "./rexportedBookData";
 
 function Shell({ setShowDeepResearch, showDeepResearch, passedText }: { setShowDeepResearch: (show: boolean) => void; showDeepResearch: boolean; passedText?: string }) {
   /* Inject book content first */
-  useBookContent(faraonBookXml, "content-container");
+  useBookContent(bookData.bookXml, "content-container");
 
   /* scroll‑related hooks */
-  usePageObserver(faraonBookXml);
+  usePageObserver(bookData.bookXml);
 
   /* dynamic visual hooks */
   useCutScene();

@@ -1,5 +1,5 @@
 import { paragraphMetadataServicePure, getParagraphRange, parseParagraphRange, ParsedParagraphRange, SelfSufficientCharacterMetadata } from "@/src/fetchers/getParagraphRange";
-import { BOOK_SLUGS } from "@/src/consts";
+import { BOOK_SLUGS, CURRENT_BOOK } from "@/src/consts";
 import { useEffect, useState } from "react";
 import { Location } from "@/src/state/LocationContext";
 
@@ -18,16 +18,13 @@ export function useCharacterNotes(loc: Location, charactersData: SelfSufficientC
     const load = async () => {
       const { chapter, paragraph, endChapter, endParagraph } = loc;
 
-      const raw =
-        import.meta.env.VITE_DEVELOPMENT === "true"
-          ? paragraphMetadataServicePure.getCharactersMetadataForParagraphRange({
-              bookSlug: BOOK_SLUGS.PHARAON,
-              startChapter: chapter,
-              startParagraph: paragraph,
-              endChapter: endChapter,
-              endParagraph: endParagraph,
-            })
-          : await getParagraphRange({ bookSlug: BOOK_SLUGS.PHARAON, startChapter: chapter, startParagraph: paragraph, endChapter: endChapter, endParagraph: endParagraph });
+      const raw = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange({
+        bookSlug: CURRENT_BOOK,
+        startChapter: chapter,
+        startParagraph: paragraph,
+        endChapter: endChapter,
+        endParagraph: endParagraph,
+      });
 
       if (cancelled) return;
 

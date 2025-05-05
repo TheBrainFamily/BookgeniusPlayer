@@ -6,7 +6,7 @@ import { useCharacterNotes } from "@/src/hooks/useCharacterNotes";
 import { CharacterCard } from "./CharacterCard";
 
 import { useLocation } from "@/src/state/LocationContext";
-import { pharaonCharactersData } from "@/src/data/metadata";
+import { pharaonCharactersData } from "@/src/data/pharaon-metadata";
 
 /* mount inside the legacy container for CSS */
 const target = document.getElementById("left-notes");

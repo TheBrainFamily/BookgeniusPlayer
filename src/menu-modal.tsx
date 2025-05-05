@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
-
-import { pageChapters } from "./chapters-pharaon";
+import { bookData } from "./bookDatasForReplacement/pharaonRexportedBookData";
 import { isNightMode } from "./helpers/setIsNightMode";
 import { toggleMobileCharacters, isMobileCharactersVisible } from "./isMobileCharactersVisible";
 import { resetFurthestPageLocation } from "./helpers/reset-furthest-page-location";
@@ -47,7 +46,9 @@ const getTitle = (chapter: number) => {
   return `Chapter ${chapterNames[chapter] || chapter}`;
 };
 // Sample chapter data - replace with your actual data
-const chapters = [...pageChapters.map((page) => ({ id: page.chapter, title: getTitle(page.chapter), page: page.pageId.replace("page_", "") }))];
+
+const pageChapters = Array.from({ length: bookData.chapters }, (_, i) => ({ chapter: i + 1 }));
+const chapters = [...pageChapters.map((page) => ({ id: page.chapter, title: getTitle(page.chapter) }))];
 
 type ModalType = null | "chapters" | "page";
 

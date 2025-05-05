@@ -1,3 +1,5 @@
+import { CURRENT_BOOK } from "@/src/consts";
+import { BOOK_SLUGS } from "@/src/consts";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import { Node, Element, XMLDocument } from "@xmldom/xmldom/lib/dom"; // Import types if needed for strict typing
 import fs from "fs";
@@ -53,7 +55,7 @@ function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<string>):
   // Initialize results map keyed by character tag name
   const resultsMap = new Map<string, SimpleCharacterMetadata>();
   characterTags.forEach((tag) => {
-    resultsMap.set(tag, { characterName: getDisplayForCharacter(tag, doc), bookSlug: "Pharaon", infoPerChapter: [], imageUrl: "UNKNOWN" });
+    resultsMap.set(tag, { characterName: getDisplayForCharacter(tag, doc), bookSlug: CURRENT_BOOK, infoPerChapter: [], imageUrl: "UNKNOWN" });
   });
 
   try {
@@ -224,17 +226,28 @@ const getDisplayForCharacter = (characterName: string, doc: XMLDocument) => {
 
 // --- Example Usage ---
 
-const chaptersXml = fs.readFileSync(path.join(__dirname, "../chapters.xml"), "utf8");
+const doIt = () => {
+  const bookSlug: BOOK_SLUGS = CURRENT_BOOK;
+  const chaptersXml = fs.readFileSync(path.join(__dirname, `../${bookSlug}-chapters.xml`), "utf8");
 
-const parser = new DOMParser();
-const doc = parser.parseFromString(chaptersXml.replace(`<?xml version="1.0" encoding="UTF-8" ?>`, ""), "text/xml");
-// 1. Get the list of character tags
-const characterTags = getCharacterTags(doc);
-console.log("Character Tags:", characterTags);
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(chaptersXml.replace(`<?xml version="1.0" encoding="UTF-8" ?>`, ""), "text/xml");
+  // 1. Get the list of character tags
+  const characterTags = getCharacterTags(doc);
+  console.log("Character Tags:", characterTags);
 
-// 2. Analyze the generated chapter
-const metadata = extractCharacterMetadata(doc, characterTags);
+  // 2. Analyze the generated chapter
+  const metadata = extractCharacterMetadata(doc, characterTags);
 
-// 3. Output the result
-console.log("Extracted Metadata:", JSON.stringify(metadata, null, 2));
-fs.writeFileSync(path.join(__dirname, "../metadata.ts"), `export const pharaonCharactersData = ${JSON.stringify(metadata, null, 2)}`);
+  // 3. Output the result
+  console.log("Extracted Metadata:", JSON.stringify(metadata, null, 2));
+  if (bookSlug === "1984") {
+    fs.writeFileSync(path.join(__dirname, `../metadata-${bookSlug}.ts`), `export const _${bookSlug}CharactersData = ${JSON.stringify(metadata, null, 2)}`);
+  } else {
+    fs.writeFileSync(path.join(__dirname, `../metadata-${bookSlug}.ts`), `export const ${bookSlug}CharactersData = ${JSON.stringify(metadata, null, 2)}`);
+  }
+};
+
+if (require.main === module) {
+  doIt();
+}

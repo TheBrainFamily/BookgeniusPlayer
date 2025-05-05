@@ -1,6 +1,6 @@
 #!/bin/bash
 
-fswatch -o src/data/chapters.xml | while read num; do ## ZMIENIAMY ZE WSZYSTKIE CHAPTERY
+fswatch -o src/data/chapters-1984.xml | while read num; do ## ZMIENIAMY ZE WSZYSTKIE CHAPTERY
   echo "File changed, running scripts..."
   # Command to process includes and save to a new file
   # xmllint --xinclude src/data/chapter-1.xml > src/data/chapter-1-resolved.tmp.xml
