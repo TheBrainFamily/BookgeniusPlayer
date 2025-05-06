@@ -9,13 +9,7 @@ import {
 } from "./audio-crossfader";
 import { CURRENT_BOOK } from "./consts";
 import { BOOK_SLUGS } from "./consts";
-
-const getChapterForTom = (tom: number, chapter: number) => {
-  if (tom === 2) {
-    return chapter + 25;
-  }
-  return chapter;
-};
+import { getCurrentLocation } from "@/src/helpers/paragraphsNavigation"; // Added import
 
 // Updated structure
 let backgroundSongsDefined = [
@@ -155,14 +149,46 @@ if (CURRENT_BOOK === BOOK_SLUGS._1984) {
 }
 
 export const preloadBackgroundTracks = async () => {
-  console.log("Preloading background tracks...");
+  console.log("Attempting to preload background tracks dynamically...");
+
   if (!initAudioContext()) {
-    console.warn("Cannot preload tracks, AudioContext not ready.");
+    // Call once and check
+    console.warn("Cannot preload tracks, AudioContext not ready or already initialized by user gesture.");
+    // It might already be initialized, or it might fail.
+    // If it's essential for it to be ready here and it's not, we can't proceed.
+    // However, initAudioContext() should ideally be callable multiple times safely,
+    // returning true if ready, false if not.
+    // For now, if it returns false, we assume we can't preload.
     return;
-  } else {
-    initAudioContext(); // Call this only once from a user gesture
   }
-  for (const section of backgroundSongsDefined) {
+
+  const location = getCurrentLocation();
+  const currentChapter = location ? location.chapter : 0;
+  const chaptersToPreloadAhead = 2; // Number of upcoming chapters to preload
+
+  console.log(`Current chapter for preloading: ${currentChapter}`);
+
+  let chaptersToConsider: number[];
+  if (currentChapter > 0) {
+    chaptersToConsider = Array.from({ length: chaptersToPreloadAhead + 1 }, (_, i) => currentChapter + i);
+  } else {
+    // If no specific chapter (e.g., initial load, chapter is 0), preload first few chapters
+    console.log("No specific current chapter, preloading initial chapters.");
+    chaptersToConsider = [1, 2, 3]; // Default to preloading for chapters 1, 2, and 3
+  }
+
+  console.log("Preloading tracks for chapters:", chaptersToConsider);
+
+  const tracksToPreload = backgroundSongsDefined.filter((section) => chaptersToConsider.includes(section.chapter));
+
+  if (tracksToPreload.length === 0) {
+    console.log("No background tracks found for the current chapter range to preload.");
+    return;
+  }
+
+  console.log(`Preloading ${tracksToPreload.length} sections...`);
+
+  for (const section of tracksToPreload) {
     for (const file of section.files) {
       const trackId = file.replace(".mp3", "");
       // TODO: How to handle transition points if they differ per track in a section?
@@ -170,7 +196,7 @@ export const preloadBackgroundTracks = async () => {
       await loadTrack(trackId /*, section.transitionPoints */); // Pass points if available/needed
     }
   }
-  console.log("Background tracks preloading complete.");
+  console.log("Dynamic background tracks preloading complete.");
 };
 
 export const dealWithBackgroundSongs = ({ startChapter, startParagraph }) => {
