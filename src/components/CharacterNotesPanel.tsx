@@ -1,17 +1,20 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 
 import { useDebounce } from "@/src/hooks/useDebounce";
 import { useCharacterNotes } from "@/src/hooks/useCharacterNotes";
-import { CharacterCard } from "./CharacterCard";
-
 import { useLocation } from "@/src/state/LocationContext";
-import { pharaonCharactersData } from "@/src/data/pharaon-metadata";
+import { CharacterCard } from "./CharacterCard";
+import { BookData } from "@/src/booksData/types";
 
 /* mount inside the legacy container for CSS */
 const target = document.getElementById("left-notes");
 
-export const CharacterNotesPanel: React.FC = () => {
+interface CharacterNotesPanelProps {
+  bookData: BookData;
+}
+
+export const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
   const { location } = useLocation();
 
   /* throttle updates while scrolling */
@@ -24,10 +27,10 @@ export const CharacterNotesPanel: React.FC = () => {
   );
 
   /* characters for that range */
-  const notes = useCharacterNotes(range, pharaonCharactersData);
+  const notes = useCharacterNotes(range, bookData.charactersData);
 
   /* Fade‑in only when the ARRAY REFERENCE actually changes */
-  const [fadeInKey, setFadeInKey] = useState(0);
+  // const [fadeInKey, setFadeInKey] = useState(0);
   useEffect(() => {
     // setFadeInKey((k) => k + 1); // triggers fadeUp on the *new* cards only
   }, [notes]);

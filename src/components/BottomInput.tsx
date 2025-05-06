@@ -39,6 +39,7 @@ interface BottomInputProps {
   className?: string; // Keep for potential footer styling overrides
   onShowDeepResearch: (result: string) => void;
   // No longer needs onCloseDeepResearch unless used elsewhere
+  onCloseDeepResearch?: () => void; // ToDo: remove if not needed
 }
 
 export function BottomInput({ placeholder = "Type something...", onSubmit, className, onShowDeepResearch }: BottomInputProps) {

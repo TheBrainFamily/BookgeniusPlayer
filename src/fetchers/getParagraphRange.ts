@@ -8,7 +8,6 @@
  */
 
 import { BOOK_SLUGS } from "../consts";
-import { bookData } from "../booksData";
 
 /* -------------------------------------------------------------------------- */
 /*  Shared types                                                              */
@@ -101,7 +100,7 @@ export const paragraphMetadataServicePure = {
    * Returns the slice of `data` that matches the given range, replicating the
    * MongoDB aggregation you run on the server.
    */
-  getCharactersMetadataForParagraphRange(range: PureRange, data: SelfSufficientCharacterMetadata[] = bookData.charactersData): SelfSufficientCharacterMetadata[] {
+  getCharactersMetadataForParagraphRange(range: PureRange, data: SelfSufficientCharacterMetadata[]): SelfSufficientCharacterMetadata[] {
     const { startChapter, endChapter, bookSlug, startParagraph, endParagraph } = range;
 
     return (
@@ -241,11 +240,23 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
 /*  4. Ad‑hoc "does it match?" sanity check                                   */
 /* -------------------------------------------------------------------------- */
 
-const res = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange({
-  startChapter: 3,
-  endChapter: 3,
-  bookSlug: BOOK_SLUGS.PHARAON,
-  startParagraph: 50,
-  endParagraph: 60,
-});
-console.dir(res, { depth: null });
+import { getBookData } from "../booksData/getBookData";
+
+async function runTest() {
+  try {
+    const currentBookData = await getBookData();
+    if (currentBookData && currentBookData.charactersData) {
+      const res = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange(
+        { startChapter: 3, endChapter: 3, bookSlug: BOOK_SLUGS.PHARAON, startParagraph: 50, endParagraph: 60 },
+        currentBookData.charactersData,
+      );
+      console.dir(res, { depth: null });
+    } else {
+      console.log("Book data or charactersData not available for test.");
+    }
+  } catch (error) {
+    console.error("Error running ad-hoc test:", error);
+  }
+}
+
+runTest();

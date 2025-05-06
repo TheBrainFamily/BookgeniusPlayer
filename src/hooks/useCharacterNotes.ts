@@ -17,13 +17,10 @@ export function useCharacterNotes(loc: Location, charactersData: SelfSufficientC
     const load = async () => {
       const { chapter, paragraph, endChapter, endParagraph } = loc;
 
-      const raw = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange({
-        bookSlug: CURRENT_BOOK,
-        startChapter: chapter,
-        startParagraph: paragraph,
-        endChapter: endChapter,
-        endParagraph: endParagraph,
-      });
+      const raw = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange(
+        { bookSlug: CURRENT_BOOK, startChapter: chapter, startParagraph: paragraph, endChapter: endChapter, endParagraph: endParagraph },
+        charactersData,
+      );
 
       if (cancelled) return;
 

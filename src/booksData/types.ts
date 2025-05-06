@@ -1,10 +1,7 @@
-type CharacterData = { name?: string; description?: string; [key: string]: string | number | boolean | undefined | null | object };
+type InfoPerChapter = { chapter: number; summary: string; label?: string; paragraphsWhereSpotted: number[]; paragraphsWhereTalking: number[] };
 
-type BookMetadata = {
-  title: string;
-  // author?: string;
-  // year?: number;
-  // description?: string;
-};
+type CharacterData = { characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; imageUrl: string };
+
+type BookMetadata = { title: string };
 
 export type BookData = { slug: string; metadata: BookMetadata; charactersData: CharacterData[]; bookXml: string; chapters: number };
