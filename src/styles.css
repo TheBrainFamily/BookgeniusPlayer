@@ -468,6 +468,7 @@
     word-break: break-word;
     text-wrap: pretty;
     font-size: 0.9rem;
+    border: 1px solid transparent;
   }
 
   .entity-text-column h4 {
