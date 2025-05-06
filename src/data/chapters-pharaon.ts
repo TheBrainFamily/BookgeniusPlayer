@@ -396,7 +396,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Eunana" data-src-moving="/Pharaon/eunana-speaks.mp4" data-is-talking="true"></span> — A ty jak śmiesz złorzeczyć wojownikom jego świątobliwości? — zapytał go, już obecny w tym miejscu, Eunana<span class="character-placeholder character-mention" data-character="Eunana" data-src-picture="/Pharaon/eunana-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="22">
-      <span class="character-placeholder character-talking" data-character="Chłop egipski" data-src-moving="/Pharaon/chłop-egipski-speaks.mp4" data-is-talking="true"></span> — Widzę, że musisz być wielkim i Egipcjaninem — odparł chłop<span class="character-placeholder character-mention" data-character="Chłop egipski" data-src-picture="/Pharaon/chłop-egipski-listens.mp4" data-is-talking="false"></span> — więc odpowiem ci, że ten kanał należy do potężnego pana: jest on ekonomem u pisarza przy takim, co nosi wachlarz jego dostojności . Baczcie więc, ażeby was nieszczęście nie spotkało!…
+      <span class="character-placeholder character-talking" data-character="Chłop egipski" data-src-moving="/Pharaon/chłop-egipski-speaks.mp4" data-is-talking="true"></span> — Widzę, że musisz być wielkim i Egipcjaninem — odparł chłop<span class="character-placeholder character-mention" data-character="Chłop egipski" data-src-picture="/Pharaon/chłop-egipski-listens.mp4" data-is-talking="false"></span> — więc odpowiem ci, że ten kanał należy do potężnego pana: jest on ekonomem u pisarza przy takim, co nosi wachlarz jego dostojności <Nomarcha-Memfis>nomarchy Memfis</Nomarcha-Memfis>. Baczcie więc, ażeby was nieszczęście nie spotkało!…
     </p>
     <p data-index="23">
       <span class="character-placeholder character-talking" data-character="Eunana" data-src-moving="/Pharaon/eunana-speaks.mp4" data-is-talking="true"></span> — Róbcie swoje — rzekł protekcjonalnym tonem Eunana<span class="character-placeholder character-mention" data-character="Eunana" data-src-picture="/Pharaon/eunana-listens.mp4" data-is-talking="false"></span> do żołnierzy greckich, którzy zaczęli przypatrywać się chłopu. Nie rozumieli jego mowy, ale zastanowił ich ton.
@@ -563,13 +563,13 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Dlaczego nie wolno?
     </p>
     <p data-index="36">
-      <span class="character-placeholder character-talking" data-character="Sara" data-src-moving="/Pharaon/sara-speaks.mp4" data-is-talking="true"></span>— Bo to jest ziemia wielkiego pana, …
+      <span class="character-placeholder character-talking" data-character="Sara" data-src-moving="/Pharaon/sara-speaks.mp4" data-is-talking="true"></span>— Bo to jest ziemia wielkiego pana, <Sezofris>Sezofrisa</Sezofris>…
     </p>
     <p data-index="37">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Ho! ho!… — uśmiechnął się Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="38">
-      <span class="character-placeholder character-talking" data-character="Sara" data-src-moving="/Pharaon/sara-speaks.mp4" data-is-talking="true"></span>— Nie śmiej się, bo wnet zbledniesz. Pan jest pisarzem pana , który nosi wachlarz nad najdostojniejszym … A mój ojciec<span class="character-placeholder character-mention" data-character="Gedeon" data-src-picture="/Pharaon/gedeon-listens.mp4" data-is-talking="false"></span> widział go i padał przed nim na twarz.
+      <span class="character-placeholder character-talking" data-character="Sara" data-src-moving="/Pharaon/sara-speaks.mp4" data-is-talking="true"></span>— Nie śmiej się, bo wnet zbledniesz. Pan <Sezofris>Sezofris</Sezofris> jest pisarzem pana <Chaires>Chairesa</Chaires>, który nosi wachlarz nad najdostojniejszym <Nomarcha-Memfis>nomarchą Memfisu</Nomarcha-Memfis>… A mój ojciec<span class="character-placeholder character-mention" data-character="Gedeon" data-src-picture="/Pharaon/gedeon-listens.mp4" data-is-talking="false"></span> widział go i padał przed nim na twarz.
     </p>
     <p data-index="39">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Ho! ho! ho!… — powtarzał, wciąż śmiejąc się, Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
@@ -635,7 +635,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Sara" data-src-moving="/Pharaon/sara-speaks.mp4" data-is-talking="true"></span>— Dotychczas mówiłeś prawdę, ale teraz kłamiesz — odezwała się Sara<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span>. — Żydówka nie będzie niczyją kochanką! — dodała dumnie.
     </p>
     <p data-index="60">
-      <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span>— Nawet kochanką pisarza u takiego pana, który nosi wachlarz nad ?… — zapytał drwiącym tonem Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>.
+      <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span>— Nawet kochanką pisarza u takiego pana, który nosi wachlarz nad <Nomarcha-Memfis>nomarchą memfijskim</Nomarcha-Memfis>?… — zapytał drwiącym tonem Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="61">
       <span class="character-placeholder character-talking" data-character="Sara" data-src-moving="/Pharaon/sara-speaks.mp4" data-is-talking="true"></span>— Nawet…
@@ -656,7 +656,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Dziewczynie opadły ręce. Ze zdziwieniem spoglądała kolejno na obu młodych ludzi; usta jej drżały, a oczy zachodziły łzami.
     </p>
     <p data-index="67">
-      <span class="character-placeholder character-talking" data-character="Sara" data-src-moving="/Pharaon/sara-speaks.mp4" data-is-talking="true"></span>— Kto wy jesteście?… — pytała zatrwożona. — Zeszliście tu z gór, jak podróżni, którzy chcą wody i chleba… Ale mówicie do mnie jak najwięksi panowie… Coście wy za jedni?… Twój miecz — zwróciła się do Ramzesa<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — jest wysadzany szmaragdami, a na szyi masz łańcuch takiej roboty, jakiego w swoim skarbcu nie posiada nasz pan, miłościwy …
+      <span class="character-placeholder character-talking" data-character="Sara" data-src-moving="/Pharaon/sara-speaks.mp4" data-is-talking="true"></span>— Kto wy jesteście?… — pytała zatrwożona. — Zeszliście tu z gór, jak podróżni, którzy chcą wody i chleba… Ale mówicie do mnie jak najwięksi panowie… Coście wy za jedni?… Twój miecz — zwróciła się do Ramzesa<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — jest wysadzany szmaragdami, a na szyi masz łańcuch takiej roboty, jakiego w swoim skarbcu nie posiada nasz pan, miłościwy <Sezofris>Sezofris</Sezofris>…
     </p>
     <p data-index="68">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Odpowiedz mi lepiej, czy ci się podobam?… — spytał z naleganiem Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, ściskając jej rękę i tkliwie patrząc w oczy.
@@ -671,13 +671,13 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span>— Wzywają cię — zawołał Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="72">
-      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— A gdybym ja był taki wielki pan jak wasz ?… — pytał książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— A gdybym ja był taki wielki pan jak wasz <Sezofris>Sezofris</Sezofris>?… — pytał książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="73">
       <span class="character-placeholder character-talking" data-character="Sara" data-src-moving="/Pharaon/sara-speaks.mp4" data-is-talking="true"></span>— Ty możesz być… — szepnęła Sara<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="74">
-      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— A gdybym ja nosił wachlarz nad ?…
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— A gdybym ja nosił wachlarz nad <Nomarcha-Memfis>nomarchą Memfisu</Nomarcha-Memfis>?…
     </p>
     <p data-index="75">
       <span class="character-placeholder character-talking" data-character="Sara" data-src-moving="/Pharaon/sara-speaks.mp4" data-is-talking="true"></span>— Ty możesz być nawet i tak wielkim…
@@ -1263,7 +1263,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Cóż jej ojciec?…
     </p>
     <p data-index="65">
-      <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span> — To jakiś uczciwy człowiek i rozumny. Nazywa się Gedeon<span class="character-placeholder character-mention" data-character="Gedeon" data-src-picture="/Pharaon/gedeon-listens.mp4" data-is-talking="false"></span>. Kiedy mu powiedziałem, że chcesz wziąć jego córkę, upadł na ziemię i zaczął wydzierać sobie włosy. Rozumie się, przeczekałem ten wylew ojcowskiej boleści, trochę zjadłem, wypiłem wina i — przystąpiliśmy nareszcie do układów. Zapłakany Gedeon<span class="character-placeholder character-mention" data-character="Gedeon" data-src-picture="/Pharaon/gedeon-listens.mp4" data-is-talking="false"></span> najpierwej przysiągł, że woli widzieć córkę swoją trupem aniżeli czyjąkolwiek kochanką. Wówczas powiedziałem, że pod Memfis, nad Nilem, dostanie folwark, który przynosi dwa talenty rocznego dochodu i nie płaci podatków. Oburzył się. Wtedy oświadczyłem, że może jeszcze dostać co roku talent złotem i srebrem. Westchnął i wspomniał, że jego córka przez trzy lata kształciła się w Pi-Bailos. Postąpiłem jeszcze talent. Teraz Gedeon<span class="character-placeholder character-mention" data-character="Gedeon" data-src-picture="/Pharaon/gedeon-listens.mp4" data-is-talking="false"></span>, wciąż niepocieszony, nadmienił, że traci bardzo dobre miejsce rządcy u pana . Powiedziałem, że tej posady rzucać nie potrzebuje, i dorzuciłem mu dziesięć krów dojnych z twoich obór. Czoło wyjaśniło mu się trochę, więc wyznał mi, pod największym sekretem, że na jego Sarę<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span> zwrócił już uwagę pewien strasznie wielki pan, , który nosi wachlarz nad nomarchą Memfisu. Ja zaś obiecałem mu dodać byczka, mniejszy łańcuch złoty i większą bransoletę. Tym sposobem twoja Sara<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span> będzie cię kosztowała: folwark i dwa talenty rocznie gotowizną, a dziesięć krów, byczka, łańcuch i bransoletę złotą jednorazowo. To dasz jej ojcu, zacnemu Gedeon<span class="character-placeholder character-mention" data-character="Gedeon" data-src-picture="/Pharaon/gedeon-listens.mp4" data-is-talking="false"></span>owi; jej zaś samej — co ci się podoba.
+      <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span> — To jakiś uczciwy człowiek i rozumny. Nazywa się Gedeon<span class="character-placeholder character-mention" data-character="Gedeon" data-src-picture="/Pharaon/gedeon-listens.mp4" data-is-talking="false"></span>. Kiedy mu powiedziałem, że chcesz wziąć jego córkę, upadł na ziemię i zaczął wydzierać sobie włosy. Rozumie się, przeczekałem ten wylew ojcowskiej boleści, trochę zjadłem, wypiłem wina i — przystąpiliśmy nareszcie do układów. Zapłakany Gedeon<span class="character-placeholder character-mention" data-character="Gedeon" data-src-picture="/Pharaon/gedeon-listens.mp4" data-is-talking="false"></span> najpierwej przysiągł, że woli widzieć córkę swoją trupem aniżeli czyjąkolwiek kochanką. Wówczas powiedziałem, że pod Memfis, nad Nilem, dostanie folwark, który przynosi dwa talenty rocznego dochodu i nie płaci podatków. Oburzył się. Wtedy oświadczyłem, że może jeszcze dostać co roku talent złotem i srebrem. Westchnął i wspomniał, że jego córka przez trzy lata kształciła się w Pi-Bailos. Postąpiłem jeszcze talent. Teraz Gedeon<span class="character-placeholder character-mention" data-character="Gedeon" data-src-picture="/Pharaon/gedeon-listens.mp4" data-is-talking="false"></span>, wciąż niepocieszony, nadmienił, że traci bardzo dobre miejsce rządcy u pana <Sezofris>Sezofrisa</Sezofris>. Powiedziałem, że tej posady rzucać nie potrzebuje, i dorzuciłem mu dziesięć krów dojnych z twoich obór. Czoło wyjaśniło mu się trochę, więc wyznał mi, pod największym sekretem, że na jego Sarę<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span> zwrócił już uwagę pewien strasznie wielki pan, <Chaires>Chaires</Chaires>, który nosi wachlarz nad nomarchą Memfisu. Ja zaś obiecałem mu dodać byczka, mniejszy łańcuch złoty i większą bransoletę. Tym sposobem twoja Sara<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span> będzie cię kosztowała: folwark i dwa talenty rocznie gotowizną, a dziesięć krów, byczka, łańcuch i bransoletę złotą jednorazowo. To dasz jej ojcu, zacnemu Gedeon<span class="character-placeholder character-mention" data-character="Gedeon" data-src-picture="/Pharaon/gedeon-listens.mp4" data-is-talking="false"></span>owi; jej zaś samej — co ci się podoba.
     </p>
     <p data-index="66">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Cóż na to Sara<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span>? — spytał książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
@@ -2102,7 +2102,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Sara" data-src-moving="/Pharaon/sara-speaks.mp4" data-is-talking="true"></span>— Przecież, ojcze, sam mnie oddałeś księciu<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>?… — szepnęła Sara<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="19">
-      <span class="character-placeholder character-talking" data-character="Gedeon" data-src-moving="/Pharaon/gedeon-speaks.mp4" data-is-talking="true"></span>— Oddałem, bo cóż miałem robić? Zresztą mnie się tylko tak zdaje, że mnie pokazują i opluwają. Z Egipcjan, kto mnie zna, kłania mi się tym niżej, im sam jest wyższy. Przez czas, kiedy tu jesteś, nasz pan, , mówił, że trzeba mi dom powiększyć; pan darował mi stągiew najlepszego wina, a sam najdostojniejszy nasz przysyłał do mnie zaufanego sługę pytać: czy ty jesteś zdrowa i czy ja nie zostałbym u niego rządcą?
+      <span class="character-placeholder character-talking" data-character="Gedeon" data-src-moving="/Pharaon/gedeon-speaks.mp4" data-is-talking="true"></span>— Oddałem, bo cóż miałem robić? Zresztą mnie się tylko tak zdaje, że mnie pokazują i opluwają. Z Egipcjan, kto mnie zna, kłania mi się tym niżej, im sam jest wyższy. Przez czas, kiedy tu jesteś, nasz pan, <Sezofris>Sezofris</Sezofris>, mówił, że trzeba mi dom powiększyć; pan <Chaires>Chaires</Chaires> darował mi stągiew najlepszego wina, a sam najdostojniejszy nasz <Nomarcha-Memfis>nomarcha</Nomarcha-Memfis> przysyłał do mnie zaufanego sługę pytać: czy ty jesteś zdrowa i czy ja nie zostałbym u niego rządcą?
     </p>
     <p data-index="20">
       <span class="character-placeholder character-talking" data-character="Sara" data-src-moving="/Pharaon/sara-speaks.mp4" data-is-talking="true"></span>— A Żydzi?… — spytała Sara<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span>.
@@ -2147,7 +2147,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Gedeon" data-src-moving="/Pharaon/gedeon-speaks.mp4" data-is-talking="true"></span>— Co martwić się przyszłymi dniami, które są w ręku Boga? Przyszedłem spędzić u ciebie szabas…
     </p>
     <p data-index="34">
-      <span class="character-placeholder character-talking" data-character="Tafet" data-src-moving="/Pharaon/tafet-speaks.mp4" data-is-talking="true"></span>— A ja mam doskonałe ryby, mięso, placki i wino koszerne — szybko wtrąciła Tafet<span class="character-placeholder character-mention" data-character="Tafet" data-src-picture="/Pharaon/tafet-listens.mp4" data-is-talking="false"></span>. — Kupiłam też w Memfis siedmioramienny świecznik i świece woskowe… Będzie kolacja lepsza niż u samego pana .
+      <span class="character-placeholder character-talking" data-character="Tafet" data-src-moving="/Pharaon/tafet-speaks.mp4" data-is-talking="true"></span>— A ja mam doskonałe ryby, mięso, placki i wino koszerne — szybko wtrąciła Tafet<span class="character-placeholder character-mention" data-character="Tafet" data-src-picture="/Pharaon/tafet-listens.mp4" data-is-talking="false"></span>. — Kupiłam też w Memfis siedmioramienny świecznik i świece woskowe… Będzie kolacja lepsza niż u samego pana <Chaires>Chairesa</Chaires>.
     </p>
     <p data-index="35">
       Gedeon<span class="character-placeholder character-mention" data-character="Gedeon" data-src-picture="/Pharaon/gedeon-listens.mp4" data-is-talking="false"></span> wyszedł z córką na taras. Gdy zostali we dwoje, rzekł:
@@ -5342,7 +5342,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Odprowadzony do przystani memfiskiej przez kapłanów, najwyższych urzędników państwa, gwardię jego świątobliwości faraona i tłumy ludu, książę namiestnik<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, wszedł do złocistej barki około dziesiątej rano. Pod pomostem, na którym stały kosztowne namioty, dwudziestu żołnierzy robiło wiosłami; zaś pod masztem i na obu końcach łodzi zajęli miejsca najlepsi inżynierowie wodni. Jedni pilnowali żagla, drudzy komenderowali wioślarzami, inni nadawali kierunek statkowi.
     </p>
     <p data-index="4">
-      Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zaprosił do swej barki najczcigodniejszego arcykapłana Mefresa<span class="character-placeholder character-mention" data-character="Mefres" data-src-picture="/Pharaon/mefres.png" data-is-talking="false"></span> i świętego ojca Mentezufisa<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span>, którzy mieli mu towarzyszyć w podróży i pełnieniu władzy. Wezwał też dostojnego , który księcia odprowadzał do granic swojej prowincji.
+      Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zaprosił do swej barki najczcigodniejszego arcykapłana Mefresa<span class="character-placeholder character-mention" data-character="Mefres" data-src-picture="/Pharaon/mefres.png" data-is-talking="false"></span> i świętego ojca Mentezufisa<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span>, którzy mieli mu towarzyszyć w podróży i pełnieniu władzy. Wezwał też dostojnego <Nomarcha-Memfis>nomarchę Memfisu</Nomarcha-Memfis>, który księcia odprowadzał do granic swojej prowincji.
     </p>
     <p data-index="5">
       Na kilkaset kroków przed namiestnikiem<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> płynął piękny statek dostojnego Otoesa<span class="character-placeholder character-mention" data-character="Otoes" data-src-picture="/Pharaon/otoes-listens.mp4" data-is-talking="false"></span>, który był nomarchą Aa, prowincji sąsiadującej z Memfisem. Zaś za księciem<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> uszykowały się niezliczone statki, zajęte przez dwór, kapłanów, oficerów i urzędników.
@@ -5375,22 +5375,22 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Statek nieco zbliżył się ku lewemu brzegowi, postacie tłumu zarysowały się wyraźniej i książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> spostrzegł coś, czego się nie spodziewał. Podczas gdy pierwsze szeregi ludu klaskały i śpiewały, w dalszych widać było kije, gęsto i szybko spadające na niewidzialne grzbiety.
     </p>
     <p data-index="15">
-      Zdziwiony namiestnik<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zwrócił się do .
+      Zdziwiony namiestnik<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zwrócił się do <Nomarcha-Memfis>nomarchy Memfisu</Nomarcha-Memfis>.
     </p>
     <p data-index="16">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Spojrzyj no, wasza dostojność… Tam kije są w robocie?…
     </p>
     <p data-index="17">
-      przysłonił ręką oczy, szyja poczerwieniała mu…
+      <Nomarcha-Memfis>Nomarcha</Nomarcha-Memfis> przysłonił ręką oczy, szyja poczerwieniała mu…
     </p>
     <p data-index="18">
-      — Wybacz, najdostojniejszy panie, ale ja źle widzę…
+      <Nomarcha-Memfis></Nomarcha-Memfis> — Wybacz, najdostojniejszy panie, ale ja źle widzę…
     </p>
     <p data-index="19">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Biją… z pewnością biją — powtarzał książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="20">
-      — To jest możliwe — odparł . — Zapewne policja schwytała bandę złodziei…
+      <Nomarcha-Memfis></Nomarcha-Memfis> — To jest możliwe — odparł <Nomarcha-Memfis>nomarcha</Nomarcha-Memfis>. — Zapewne policja schwytała bandę złodziei…
     </p>
     <p data-index="21">
       Niezbyt zadowolony następca<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> poszedł na tył statku, między inżynierów, którzy nagle skręcili ku środkowi rzeki, i z tego punktu spojrzał ku Memfisowi.
@@ -7138,13 +7138,13 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <section><section data-chapter="26">
     <h4 data-index="0">Rozdział I</h4>
     <p data-index="1">
-      Niedaleko miasta Pi-Bast znajdowała się wielka świątynia bogini Hator.
+      Niedaleko miasta Pi-Bast<a href="#fn183" class="link-note"></a> znajdowała się wielka świątynia bogini Hator<a href="#fn184" class="link-note"></a>.
     </p>
     <p data-index="2">
       W miesiącu Paoni (marzec-kwiecień), w dniu porównania wiosennego, około dziewiątej wieczór, gdy gwiazda Syriusz miała się ku zachodowi, pod bramą świątyni stanęli dwaj podróżni kapłani i jeden pokutnik. Szedł on boso, miał popiół na głowie i był przykryty grubą płachtą, którą twarz zasłaniał.
     </p>
     <p data-index="3">
-      Pomimo widnej nocy fizjognomii podróżnych nie można było poznać, stali bowiem w cieniu dwu olbrzymich posągów bóstwa z krowią głową, które pilnowały wejścia do świątnicy i łaskawymi oczyma strzegły nomesu Habu od pomoru, złego wylewu i południowych wiatrów.
+      Pomimo widnej nocy fizjognomii<a href="#fn185" class="link-note"></a> podróżnych nie można było poznać, stali bowiem w cieniu dwu olbrzymich posągów bóstwa z krowią głową, które pilnowały wejścia do świątnicy i łaskawymi oczyma strzegły nomesu Habu od pomoru, złego wylewu i południowych wiatrów.
     </p>
     <p data-index="4">
       Odpocząwszy nieco, pokutnik upadł piersiami na ziemię i długo modlił się. Potem podniósł się, ujął miedzianą kołatkę i uderzył. Potężny dźwięk metalowy obiegł wszystkie dziedzińce, odbił się od grubych murów świątyni i poleciał ponad łany pszenicy, nad gliniane chaty chłopów, nad srebrzyste wody Nilu, gdzie słabym okrzykiem odpowiedziało mu zbudzone ptactwo.
@@ -7222,22 +7222,22 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Nagle usłyszał szmer. Z daleka, z bocznej nawy, wysunął się szereg białych figurek idących parami. Była to nocna procesja kapłanów, którzy oddawali hołd posągowi bogini śpiewając na dwa chóry:
     </p>
     <p data-index="29">
-      . „Ja jestem Tym, który niebo i ziemię stworzył i wszystkie na nich stworzenia zrobił.
+      <strong>Chór I</strong>. „Ja jestem Tym, który niebo i ziemię stworzył i wszystkie na nich stworzenia zrobił.
     </p>
     <p data-index="30">
-      . Ja jestem Tym, który wody zrobił i wielką powódź stworzył, Tym, co wołu jego matce zrobił, który rodzicem jest.
+      <strong>Chór II</strong>. Ja jestem Tym, który wody zrobił i wielką powódź stworzył, Tym, co wołu jego matce zrobił, który rodzicem jest.
     </p>
     <p data-index="31">
-      . Ja jestem Tym, który niebo stworzył i tajemnice widnokręgów jego i dusze bogów w nie włożyłem.
+      <strong>Chór I</strong>. Ja jestem Tym, który niebo stworzył i tajemnice widnokręgów jego i dusze bogów w nie włożyłem.
     </p>
     <p data-index="32">
-      . Ja jestem Tym, który gdy oczy otwiera, jasno się robi, a gdy je zamyka, ciemność się staje.
+      <strong>Chór II</strong>. Ja jestem Tym, który gdy oczy otwiera, jasno się robi, a gdy je zamyka, ciemność się staje.
     </p>
     <p data-index="33">
-      . Wody Nilu płyną, gdy rozkazuję…
+      <strong>Chór I</strong>. Wody Nilu płyną, gdy rozkazuję…
     </p>
     <p data-index="34">
-      . Ale bogowie nie znają jego imienia.'
+      <strong>Chór II</strong>. Ale bogowie nie znają jego imienia.'<a href="#fn186" class="link-note"></a>
     </p>
     <p data-index="35">
       Głosy, z początku niewyraźne, potężniały tak, że słychać było każde słowo; a gdy zniknął orszak, zaczęły rozpraszać się między kolumnami, słabnąć… Wreszcie umilkły.
@@ -7306,10 +7306,10 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Gdy książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> wszedł, uczniowie (prawie wszyscy jednego wieku z nim) upadli na twarz. Nauczyciel zaś, skłoniwszy się, przerwał dotychczasowe zajęcie, aby wypowiedzieć chłopcom wykład o wielkim znaczeniu nauki.
     </p>
     <p data-index="57">
-      — Moi kochani! — mówił. — „Człowiek, który nie ma serca do mądrości, musi zajmować się pracą ręczną i męczyć oczy. Ale ten, kto rozumie wartość nauk i kształci się w nich, może osiągnąć wszystkie władze, wszystkie dworskie urzędy. Pamiętajcie o tym.'
+      — Moi kochani! — mówił. — „Człowiek, który nie ma serca do mądrości, musi zajmować się pracą ręczną i męczyć oczy. Ale ten, kto rozumie wartość nauk i kształci się w nich, może osiągnąć wszystkie władze, wszystkie dworskie urzędy. Pamiętajcie o tym.'<a href="#fn187" class="link-note"></a>
     </p>
     <p data-index="58">
-      Przypatrzcie się nędznemu życiu ludzi, którzy nie znają pisma. „Kowal jest czarny, posmolony, ma palce pełne nagniotków, a pracuje dzień i noc. Kamieniarz zrywa sobie ramię, ażeby napełnić żołądek. Mularz budujący kapitele w formie lotosu bywa strącany przez wicher ze szczytu dachu. Tkacz ma zgięte kolana, fabrykant broni ciągle podróżuje: ledwo przyjedzie do domu wieczorem, już musi go opuszczać. Malarzowi pokojowemu cuchną palce, a czas upływa mu na krajaniu gałganów. Zaś szybkobiegacz, ten, żegnając się z rodziną, powinien zostawić testament, bo naraża się na niebezpieczeństwo spotkania dzikich zwierząt lub Azjatów.'
+      Przypatrzcie się nędznemu życiu ludzi, którzy nie znają pisma. „Kowal jest czarny, posmolony, ma palce pełne nagniotków, a pracuje dzień i noc. Kamieniarz zrywa sobie ramię, ażeby napełnić żołądek. Mularz<a href="#fn188" class="link-note"></a> budujący kapitele w formie lotosu bywa strącany przez wicher ze szczytu dachu. Tkacz ma zgięte kolana, fabrykant broni ciągle podróżuje: ledwo przyjedzie do domu wieczorem, już musi go opuszczać. Malarzowi pokojowemu cuchną palce, a czas upływa mu na krajaniu gałganów. Zaś szybkobiegacz, ten, żegnając się z rodziną, powinien zostawić testament, bo naraża się na niebezpieczeństwo spotkania dzikich zwierząt lub Azjatów.'
     </p>
     <p data-index="59">
       Pokazałem wam dolę różnych rzemiosł, bo chcę, ażebyście kochali sztukę pisania, która jest waszą matką, a teraz przedstawię wam jej piękności. Ona nie jest pustym słowem na ziemi, ona jest ważniejszą od wszelkich innych zajęć. Ten, który korzysta ze sztuki pisania, jest szanowanym od dzieciństwa; on spełnia wielkie posłannictwa. Lecz ten, który nie bierze w niej udziału, żyje w nędzy.
@@ -7318,7 +7318,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Nauki szkolne są ciężkie jak góry; ale jeden ich dzień wystarczy wam na całą wieczność. Więc prędko, jak najprędzej poznajcie się z nimi i pokochajcie… Stan pisarza jest książęcym stanem, jego kałamarz i księga dają mu przyjemności i bogactwa!…
     </p>
     <p data-index="61">
-      Po szumnej przemowie o dostojeństwie nauk, czego od trzech tysięcy lat bez zmiany słuchali egipscy uczniowie, mistrz wziął kredkę i na alabastrowej ścianie zaczął pisać — alfabet. Każda litera wyrażała się za pomocą kilku symbolów hieroglificznych lub kilku znaków demotycznych. Rysunek oka, ptaka lub pióra oznaczał — A. Owca albo doniczka — B, człowiek stojący lub czółno — K, wąż — R, człowiek siedzący albo gwiazda — S. Obfitość znaków wyrażających każdą literę sprawiała, że nauka czytania i pisania była bardzo mozolnym zajęciem.
+      Po szumnej przemowie o dostojeństwie nauk, czego od trzech tysięcy lat bez zmiany słuchali egipscy uczniowie, mistrz wziął kredkę i na alabastrowej ścianie zaczął pisać — alfabet. Każda litera wyrażała się za pomocą kilku symbolów hieroglificznych lub kilku znaków demotycznych<a href="#fn189" class="link-note"></a>. Rysunek oka, ptaka lub pióra oznaczał — A. Owca albo doniczka — B, człowiek stojący lub czółno — K, wąż — R, człowiek siedzący albo gwiazda — S. Obfitość znaków wyrażających każdą literę sprawiała, że nauka czytania i pisania była bardzo mozolnym zajęciem.
     </p>
     <p data-index="62">
       Toteż Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zmęczył się samym słuchaniem, wśród którego jedyną rozrywkę stanowiło to, gdy nauczyciel kazał któremu z uczniów wyrysować lub nazwać literę i walił go kijem, gdy się omylił.
@@ -7339,7 +7339,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Pewnej ciężko chorej kobiecie kapłan podawał w kubku jakąś miksturę, mówiąc:
     </p>
     <p data-index="68">
-      „Chodź, leku, chodź, wypędź to z mego serca, z tych moich członków, silny w czary przy tym leku.'
+      „Chodź, leku, chodź, wypędź to z mego serca, z tych moich członków, silny w czary przy tym leku.'<a href="#fn190" class="link-note"></a>
     </p>
     <p data-index="69">
       Następnie książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> w towarzystwie wielkiego lekarza<span class="character-placeholder character-mention" data-character="Wielki lekarz świątyni Hator" data-src-picture="/Pharaon/wielki-lekarz-świątyni-hator.png" data-is-talking="false"></span> poszedł do apteki, gdzie jeden z kapłanów przygotowywał lekarstwa z ziół, miodu, oliwy, skórek wężowych i jaszczurczych, kości i tłuszczów zwierzęcych. Na zapytanie Ramzesa<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> laborant nie oderwał oczu od swej pracy. Tylko wciąż ważył i rozcierał materiały, odmawiając przy tym modlitwę:
@@ -7348,7 +7348,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       „Uzdrowiło Izydę, uzdrowiło Izydę, uzdrowiło Horusa… O Izydo, wielka czarodziejko, uzdrów mnie, wyzwól ze wszystkich złych, szkodliwych, czerwonych rzeczy, od gorączki boga i gorączki bogini…
     </p>
     <p data-index="71">
-      O Schauagat', eenagate' synie! Erukate'! Kauaruschagate'!… Paparuka paparaka paparuka…'
+      O Schauagat', eenagate' synie! Erukate'! Kauaruschagate'!… Paparuka paparaka paparuka…'<a href="#fn191" class="link-note"></a>
     </p>
     <p data-index="72">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Co on mówi? — spytał książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
@@ -7369,10 +7369,10 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Wielki lekarz świątyni Hator" data-src-moving="/Pharaon/wielki-lekarz-świątyni-hator.png" data-is-talking="true"></span>— Co to jest choroba, jakim sposobem spada na ludzkie ciało, o tym nie mogę powiedzieć ci, Ramzesie<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>. Ale objaśnię ci, bo zostałeś oczyszczony, czym kierujemy się przy wydawaniu lekarstw.
     </p>
     <p data-index="78">
-      Wyobraź sobie, że człowiek jest chory na wątrobę. Otóż my, kapłani, wiemy, że wątroba znajduje się pod wpływem gwiazdy Peneter-Dewa i że leczenie musi zależyć od tej gwiazdy.
+      Wyobraź sobie, że człowiek jest chory na wątrobę. Otóż my, kapłani, wiemy, że wątroba znajduje się pod wpływem gwiazdy Peneter-Dewa<a href="#fn192" class="link-note"></a> i że leczenie musi zależyć od tej gwiazdy.
     </p>
     <p data-index="79">
-      Lecz tu mędrcy dzielą się na dwie szkoły. Jedni twierdzą, że potrzeba choremu na wątrobę podawać wszystko to, nad czym Peneter-Dewa ma władzę, a zatem: miedź, lapis-lazuli, wywary z kwiatów, przede wszystkim z werweny i waleriany, nareszcie różne części ciała turkawki i kozła. Inni zaś lekarze sądzą, że gdy wątroba jest chora, to właśnie trzeba ją leczyć środkami przeciwnymi. A ponieważ przeciwnikiem Peneter-Dewy jest Sebeg, więc lekarstwami będą: żywe srebro, szmaragd i agat, leszczyna i podbiał tudzież części ciała żaby i sowy utarte na proszek.
+      Lecz tu mędrcy dzielą się na dwie szkoły. Jedni twierdzą, że potrzeba choremu na wątrobę podawać wszystko to, nad czym Peneter-Dewa ma władzę, a zatem: miedź, lapis-lazuli, wywary z kwiatów, przede wszystkim z werweny i waleriany, nareszcie różne części ciała turkawki i kozła. Inni zaś lekarze sądzą, że gdy wątroba jest chora, to właśnie trzeba ją leczyć środkami przeciwnymi. A ponieważ przeciwnikiem Peneter-Dewy jest Sebeg<a href="#fn193" class="link-note"></a>, więc lekarstwami będą: żywe srebro, szmaragd i agat, leszczyna i podbiał tudzież części ciała żaby i sowy utarte na proszek.
     </p>
     <p data-index="80">
       Lecz nie jest to jeszcze wszystko. Trzeba bowiem pamiętać o dniu, miesiącu i porze dnia, każdy bowiem z tych przeciągów czasu zostaje pod wpływem gwiazdy, która może wspierać lub osłabiać działanie lekarstwa. Trzeba nareszcie pamiętać: jaka gwiazda i jaki znak Zodiaku panuje nad chorym. Dopiero gdy lekarz wszystkie te rzeczy weźmie pod uwagę, może przepisać środek niezawodny.
@@ -7522,7 +7522,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Szmer zadowolenia rozległ się między uczczonymi w taki sposób kapłanami. Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> zwrócił się do księcia:
     </p>
     <p data-index="41">
-      <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Od kilku miesięcy, sługo boży, Ramzesie<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, jak zbłąkany podróżny szuka drogi w pustyni, tak ty szukasz odpowiedzi na pytanie: dlaczego zmniejszyły się i zmniejszają dochody świątobliwego faraona? Zapytywałeś nomarchów, a choć objaśnili cię wedle swojej możności, nie zadowolniłeś się, pomimo że najwyższa mądrość ludzka jest udziałem tych dostojników. Zwracałeś się do wielkich pisarzy, lecz pomimo usiłowań, ludzie ci, jak ptaki z sieci, sami nie mogli wyplątać się z trudności, gdyż rozum człowieka, nawet ukształconego w szkole pisarzy, ogromu tych rzeczy ogarnąć nie jest w stanie. W końcu, zmęczony jałowymi objaśnieniami, zacząłeś przyglądać się gruntom nomesów, ich ludziom i dziełom ich rąk, ale nic nie dojrzałeś. Są bowiem rzeczy, o których ludzie milczą jak kamienie, ale o których opowie ci nawet kamień, jeżeli padnie na niego światło bogów.
+      <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Od kilku miesięcy, sługo boży, Ramzesie<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, jak zbłąkany podróżny szuka drogi w pustyni, tak ty szukasz odpowiedzi na pytanie: dlaczego zmniejszyły się i zmniejszają dochody świątobliwego faraona? Zapytywałeś nomarchów, a choć objaśnili cię wedle swojej możności, nie zadowolniłeś<a href="#fn194" class="link-note"></a> się, pomimo że najwyższa mądrość ludzka jest udziałem tych dostojników. Zwracałeś się do wielkich pisarzy, lecz pomimo usiłowań, ludzie ci, jak ptaki z sieci, sami nie mogli wyplątać się z trudności, gdyż rozum człowieka, nawet ukształconego w szkole pisarzy, ogromu tych rzeczy ogarnąć nie jest w stanie. W końcu, zmęczony jałowymi objaśnieniami, zacząłeś przyglądać się gruntom nomesów, ich ludziom i dziełom ich rąk, ale nic nie dojrzałeś. Są bowiem rzeczy, o których ludzie milczą jak kamienie, ale o których opowie ci nawet kamień, jeżeli padnie na niego światło bogów.
     </p>
     <p data-index="42">
       Gdy tym sposobem zawiodły cię wszystkie ziemskie rozumy i potęgi, zwróciłeś się do bogów. Boso, z głową posypaną popiołem, przyszedłeś jako pokutnik do tej wielkiej świątyni, gdzie za pomocą modlitw i umartwień oczyściłeś ciało swoje, a wzmocniłeś ducha. Bogowie, a w szczególności potężna Hator wysłuchała twych próśb i przez niegodne moje usta da ci odpowiedź, którą obyś głęboko zapisał w sercu!…
@@ -7534,7 +7534,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Posłuchaj — mówił Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> — a odsłonię ci, za pozwoleniem obecnych tu dostojników, czym był Egipt czterysta lat temu, za panowania najsławniejszej i najpobożniejszej dynastii dziewiętnastej, tebeńskiej, a czym jest dziś…
     </p>
     <p data-index="45">
-      Kiedy pierwszy faraon tamtej dynastii, Ramen-pehuti-Ramessu, objął władzę nad krajem, dochody skarbu państwa w zbożu, bydle, piwie, skórach, kruszcach i rozmaitych wyrobach wynosiły sto trzydzieści tysięcy talentów. Gdyby istniał naród, który wszystkie te towary mógłby nami wymienić na złoto, faraon miałby rocznie sto trzydzieści trzy tysiące min złota. A że jeden żołnierz może dźwigać na plecach dwadzieścia sześć min ciężaru, więc dla przeniesienia tego złota trzeba by użyć około pięciu tysięcy żołnierzy.
+      Kiedy pierwszy faraon tamtej dynastii, Ramen-pehuti-Ramessu, objął władzę nad krajem, dochody skarbu państwa w zbożu, bydle, piwie, skórach, kruszcach i rozmaitych wyrobach wynosiły sto trzydzieści tysięcy talentów. Gdyby istniał naród, który wszystkie te towary mógłby nami wymienić na złoto, faraon miałby rocznie sto trzydzieści trzy tysiące min<a href="#fn195" class="link-note"></a> złota. A że jeden żołnierz może dźwigać na plecach dwadzieścia sześć min ciężaru, więc dla przeniesienia tego złota trzeba by użyć około pięciu tysięcy żołnierzy.
     </p>
     <p data-index="46">
       Kapłani zaczęli szeptać między sobą, nie ukrywając zdziwienia. Nawet książę zapomniał o człowieku zamęczonym w podziemiach.
@@ -7636,7 +7636,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       — To Nil!… To Egipt!… — wołali kapłani.
     </p>
     <p data-index="79">
-      <span class="character-placeholder character-talking" data-character="Mefres" data-src-moving="/Pharaon/mefres.png" data-is-talking="true"></span> — Uważajcie no — przerwał wzruszony Mefres<span class="character-placeholder character-mention" data-character="Mefres" data-src-picture="/Pharaon/mefres.png" data-is-talking="false"></span>. — Obnażam rękę… Czy widzicie te dwie niebieskie żyły, biegnące od łokcia do pięści?… Nie jestże to Nil i jego kanał, który poczyna się naprzeciw Gór Alabastrowych i płynie aż do Fajum?… A spojrzyjcie na wierzch mojej pięści: jest tu tyle żył, na ile odnóg dzieli się święta rzeka za Memfisem. A moje palce czyliż nie przypominają liczby odnóg, którymi Nil wlewa się do morza?…
+      <span class="character-placeholder character-talking" data-character="Mefres" data-src-moving="/Pharaon/mefres.png" data-is-talking="true"></span> — Uważajcie no — przerwał wzruszony Mefres<span class="character-placeholder character-mention" data-character="Mefres" data-src-picture="/Pharaon/mefres.png" data-is-talking="false"></span>. — Obnażam rękę… Czy widzicie te dwie niebieskie żyły, biegnące od łokcia do pięści?… Nie jestże to Nil i jego kanał, który poczyna się naprzeciw Gór Alabastrowych<a href="#fn196" class="link-note"></a> i płynie aż do Fajum?… A spojrzyjcie na wierzch mojej pięści: jest tu tyle żył, na ile odnóg dzieli się święta rzeka za Memfisem. A moje palce czyliż nie przypominają liczby odnóg, którymi Nil wlewa się do morza?…
     </p>
     <p data-index="80">
       — Wielka prawda!… — wołali kapłani, oglądając swoje ręce.
@@ -7666,10 +7666,10 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Macie słuszność, dostojnicy — zaczął znowu Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>. — Ta struga, ze swymi rozgałęzieniami, jest obrazem Nilu; wąski pasek murawy, obsadzony kamieniami i piaskiem, to Egipt Górny, a ten trójkąt, poprzecinany żyłkami wody, to wizerunek Egiptu Dolnego, najobszerniejszej i najbogatszej części państwa.
     </p>
     <p data-index="89">
-      Otóż w początkach dziewiętnastej dynastii cały Egipt, od katarakt Nilowych do morza, obejmował pięćset tysięcy miar ziemi. Zaś na każdej miarze ziemi żyło szesnastu ludzi: mężczyzn, kobiet i dzieci. Lecz przez czterysta lat następnych prawie z każdym pokoleniem ubywało Egiptowi po kawałku ziemi żyznej…
+      Otóż w początkach dziewiętnastej dynastii cały Egipt, od katarakt Nilowych do morza, obejmował pięćset tysięcy miar ziemi. Zaś na każdej miarze<a href="#fn197" class="link-note"></a> ziemi żyło szesnastu ludzi: mężczyzn, kobiet i dzieci. Lecz przez czterysta lat następnych prawie z każdym pokoleniem ubywało Egiptowi po kawałku ziemi żyznej…
     </p>
     <p data-index="90">
-      Mówca dał znak. Kilkunastu młodych kapłanów wybiegło z budynku i poczęli sypać piasek na rozmaite punkta murawy.
+      Mówca dał znak. Kilkunastu młodych kapłanów wybiegło z budynku i poczęli sypać piasek na rozmaite punkta<a href="#fn198" class="link-note"></a> murawy.
     </p>
     <p data-index="91">
       <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Za każdym pokoleniem — ciągnął kapłan — ubywało ziemi żyznej, a wąski jej pasek zwężał się coraz bardziej. Dziś — tu podniósł głos — ojczyzna nasza, zamiast pięciuset tysięcy miar, posiada tylko czterysta tysięcy miar… Czyli że przez ciąg panowania dwu dynastii Egipt stracił ziemię, która wykarmiała blisko dwa miliony ludzi!…
@@ -7702,7 +7702,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Wskazał ręką na dziedziniec, gdzie w dwu rzędach, jeden przy drugim, leżało osiem wielkich kwadratów ułożonych z czerwonej fasoli.
     </p>
     <p data-index="101">
-      <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Figura ta ma sześćdziesiąt kroków długości, trzydzieści szerokości i jak widzicie, pobożni ojcowie, składa się z jednakowych ziarn; niby ówczesna ludność, kiedy wszyscy byli z dziada-pradziada Egipcjanami.
+      <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Figura ta ma sześćdziesiąt kroków długości, trzydzieści szerokości i jak widzicie, pobożni ojcowie, składa się z jednakowych ziarn<a href="#fn199" class="link-note"></a>; niby ówczesna ludność, kiedy wszyscy byli z dziada-pradziada Egipcjanami.
     </p>
     <p data-index="102">
       A dziś, spojrzyjcie!…
@@ -7738,7 +7738,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       — A figury?… figury!… — wołał matematyk.
     </p>
     <p data-index="113">
-      <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Przecież na takie figury dzielą się nasze pola, a jeometrowie państwowi uczą się o nich w szkołach.
+      <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Przecież na takie figury dzielą się nasze pola, a jeometrowie<a href="#fn200" class="link-note"></a> państwowi uczą się o nich w szkołach.
     </p>
     <p data-index="114">
       <span class="character-placeholder character-talking" data-character="Mefres" data-src-moving="/Pharaon/mefres.png" data-is-talking="true"></span> — Nie wiadomo, co więcej podziwiać w tym człowieku: jego mądrość czy pokorę!… — rzekł Mefres<span class="character-placeholder character-mention" data-character="Mefres" data-src-picture="/Pharaon/mefres.png" data-is-talking="false"></span>. — O, nie zapomnieli o nas bogowie, jeżeli mamy takiego…
@@ -7771,7 +7771,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Widzieliście, dostojnicy, że od czasów dziewiętnastej dynastii ubyło nam sto tysięcy miar ziemi i dwa miliony ludności. To wyjaśnia, dlaczego dochód państwa zmniejszył się o trzydzieści dwa tysiące talentów, i o tym wiemy wszyscy. Jest to przecie dopiero początek klęsk Egiptu i skarbu. Na pozór bowiem zostało jego świątobliwości jeszcze dziewięćdziesiąt osiem tysięcy talentów dochodu. Czy jednak sądzicie, że faraon otrzymuje cały ten dochód?
     </p>
     <p data-index="4">
-      Za przykład opowiem wam, co jego dostojność Herhor<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span> odkrył w powiecie Zajęczym.
+      Za przykład opowiem wam, co jego dostojność Herhor<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span> odkrył w powiecie Zajęczym<a href="#fn201" class="link-note"></a>.
     </p>
     <p data-index="5">
       Za dziewiętnastej dynastii mieszkało tam dwadzieścia tysięcy ludzi, którzy płacili podatku trzysta pięćdziesiąt talentów rocznie. Dziś mieszka zaledwie piętnaście tysięcy, i ci, naturalnie, płacą na rzecz skarbu tylko dwieście siedemdziesiąt talentów. Tymczasem faraon, zamiast dwustu siedemdziesięciu, otrzymuje sto siedemdziesiąt talentów!…
@@ -7828,7 +7828,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Podnieście teraz oczy wyżej, na urzędników. Chodzą oni w pelerynach, ale każdy chłop w dniu świątecznym przywdziewał taką samą. Żywią się zupełnie tak samo jak chłopi, to jest dostatnio, ale skromnie. Sprzęty mają trochę ozdobniejsze od chłopskich i częściej trafiają się w ich skrzyniach złote pierścienie. Podróże odbywają na osłach lub wozach ciągnionych przez woły.
     </p>
     <p data-index="23">
-      Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> klasnął i w żywym obrazie zapanował ruch. Chłopi zaczęli podawać urzędnikom kosze winogron, wory jęczmienia, grochu i pszenicy, dzbany wina, piwa, mleka i miodu, mnóstwo zwierzyny i liczne sztuki białych lub kolorowych tkanin. Urzędnicy odebrali te produkta, część ich zostawiali sobie, ale przedmioty najpiękniejsze i najkosztowniejsze odsunęli wyżej, dla tronu. Platforma, gdzie znajdował się symbol władzy faraona, była zasypana produktami tworzącymi jakby pagórek.
+      Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> klasnął i w żywym obrazie zapanował ruch. Chłopi zaczęli podawać urzędnikom kosze winogron, wory jęczmienia, grochu i pszenicy, dzbany wina, piwa, mleka i miodu, mnóstwo zwierzyny i liczne sztuki białych lub kolorowych tkanin. Urzędnicy odebrali te produkta<a href="#fn202" class="link-note"></a>, część ich zostawiali sobie, ale przedmioty najpiękniejsze i najkosztowniejsze odsunęli wyżej, dla tronu. Platforma, gdzie znajdował się symbol władzy faraona, była zasypana produktami tworzącymi jakby pagórek.
     </p>
     <p data-index="24">
       <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Widzicie, dostojni — rzekł Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> — że w owych czasach, kiedy chłopi byli syci i zamożni, skarb jego świątobliwości ledwo mógł pomieścić dary poddanych. A teraz zobaczcie: co jest dzisiaj…
@@ -7855,7 +7855,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — A teraz spojrzyjcie na urzędników: jacy oni czerstwi, uróżowani, jak pięknie ubrani!… Żony ich noszą złote bransolety i zausznice, i tak cienkie szaty, że książęta mogliby im pozazdrościć. Wśród chłopów nie widać wołu ani osła; za to urzędnicy podróżują na koniach albo w lektykach… Piją zaś tylko wino, i to — dobre wino!…
     </p>
     <p data-index="32">
-      Klasnął w ręce i znowu zrobił się ruch. Chłopi zaczęli podawać urzędnikom: wory zboża, kosze owoców, wino, zwierzęta… Przedmioty te urzędnicy jak pierwej ustawiali obok tronu, ale — w ilości znacznie mniejszej. Na kondygnacji królewskiej już nie było pagórka produktów. Za to kondygnacja urzędników była zasypana.
+      Klasnął w ręce i znowu zrobił się ruch. Chłopi zaczęli podawać urzędnikom: wory zboża, kosze owoców, wino, zwierzęta… Przedmioty te urzędnicy jak pierwej<a href="#fn203" class="link-note"></a> ustawiali obok tronu, ale — w ilości znacznie mniejszej. Na kondygnacji królewskiej już nie było pagórka produktów. Za to kondygnacja urzędników była zasypana.
     </p>
     <p data-index="33">
       <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Oto jest Egipt dzisiejszy — mówił Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>. — Nędzni chłopi, bogaci pisarze, skarb nie tak pełny jak dawniej. A teraz…
@@ -7921,7 +7921,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Obecni szemrali ze zgrozy.
     </p>
     <p data-index="54">
-      <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Powiedziałem, że dwie miary gruntu i trzydziestu dwu ludzi bierze Fenicjanin na trzy lat dzierżawy, za pożyczenie jednego talentu złotem. Przypatrzcie się, jaki to kawał ziemi i jaka gromada ludzi, a teraz — spojrzyjcie na moją rękę…
+      <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Powiedziałem, że dwie miary gruntu i trzydziestu dwu ludzi bierze Fenicjanin na trzy lat<a href="#fn204" class="link-note"></a> dzierżawy, za pożyczenie jednego talentu złotem. Przypatrzcie się, jaki to kawał ziemi i jaka gromada ludzi, a teraz — spojrzyjcie na moją rękę…
     </p>
     <p data-index="55">
       Ten kawałek złota, który trzymam, ta bryłka mniejsza od kurzego jaja to talent!…
@@ -7978,7 +7978,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Dziękuję ci za wielkie słowa, którymi rozproszyłeś naszą niewiadomość… Błogosławię cię i proszę bogów, aby — gdy mnie powołają na swój sąd, ciebie mianowali moim następcą…
     </p>
     <p data-index="73">
-      Przeciągły okrzyk reszty słuchaczów poparł błogosławieństwo najwyższego dostojnika. Kapłani tym więcej byli zadowoleni, że nieustannie wisiała nad nimi trwoga, aby Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> po raz drugi nie zaczepił o kwestię pisarzy. Ale mędrzec umiał być powściągliwym: wskazał wewnętrzną ranę państwa, lecz nie zaognił jej i dlatego odniósł zupełny triumf.
+      Przeciągły okrzyk reszty słuchaczów<a href="#fn205" class="link-note"></a> poparł błogosławieństwo najwyższego dostojnika. Kapłani tym więcej byli zadowoleni, że nieustannie wisiała nad nimi trwoga, aby Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> po raz drugi nie zaczepił o kwestię pisarzy. Ale mędrzec umiał być powściągliwym: wskazał wewnętrzną ranę państwa, lecz nie zaognił jej i dlatego odniósł zupełny triumf.
     </p>
     <p data-index="74">
       Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> nie dziękował Pentuerowi<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>, tylko przytulił jego głowę do swej piersi. Nikt jednak nie wątpił, że kazanie wielkiego proroka wstrząsnęło duszę następcy i jest ziarnem, z którego może wyrosnąć chwała i pomyślność Egiptu.
@@ -7990,7 +7990,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> przez kilka dni z nikim nie rozmawiał: siedział w celi albo przechadzał się po cienistych korytarzach i rozmyślał. W jego duszy odbywała się praca.
     </p>
     <p data-index="77">
-      W gruncie rzeczy Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> nie powiedział nic nowego: wszyscy narzekali na ubytek ziemi i ludności w Egipcie, na nędzę chłopów, nadużycia pisarzów i wyzysk Fenicjan. Ale kazanie proroka uporządkowało w nim dotychczasowe bezładne wiadomości, nadało dotykalne formy i lepiej oświetliło pewne fakta.
+      W gruncie rzeczy Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> nie powiedział nic nowego: wszyscy narzekali na ubytek ziemi i ludności w Egipcie, na nędzę chłopów, nadużycia pisarzów<a href="#fn206" class="link-note"></a> i wyzysk Fenicjan. Ale kazanie proroka uporządkowało w nim dotychczasowe bezładne wiadomości, nadało dotykalne formy i lepiej oświetliło pewne fakta<a href="#fn207" class="link-note"></a>.
     </p>
     <p data-index="78">
       Fenicjanie przerazili go: książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> nie oceniał dotychczas ogromu nieszczęść wyrządzonych przez ten naród jego państwu. Zgroza była tym silniejszą, że przecie on sam własnych poddanych wypuścił w dzierżawę Dagonowi<span class="character-placeholder character-mention" data-character="Dagon" data-src-picture="/Pharaon/dagon-listens.mp4" data-is-talking="false"></span> i — był świadkiem, w jaki sposób bankier wybierał od nich należności!…
@@ -7999,7 +7999,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Lecz to splątanie księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> z wyzyskiem Fenicjan wywołało dziwny skutek: Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — nie chciał myśleć o Fenicjanach, a ile razy zapalił się w nim gniew na tych ludzi, tyle razy gasiło go uczucie wstydu. W pewnej części był on ich wspólnikiem.
     </p>
     <p data-index="80">
-      Natomiast książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> doskonale zrozumiał ważność ubytku ziemi i ludności i na te punkta położył główny nacisk w swych samotnych medytacjach.
+      Natomiast książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> doskonale zrozumiał ważność ubytku ziemi i ludności i na te punkta<a href="#fn208" class="link-note"></a> położył główny nacisk w swych samotnych medytacjach.
     </p>
     <p data-index="81">
       „Gdybyśmy posiadali — mówił w sobie — te dwa miliony ludzi, których Egipt utracił, można by za ich pomocą odzyskać od pustyni urodzajne grunta, nawet powiększyć obszary… A wówczas, pomimo Fenicjan, nasi chłopi mieliby się lepiej, a dochody państwa wzrosłyby…'
@@ -8008,7 +8008,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Ale skąd wziąć ludzi?
     </p>
     <p data-index="83">
-      Wypadek nasunął mu odpowiedź. Pewnego wieczora książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> przechadzając się po ogrodach świątyni spotkał gromadę niewolników, których jenerał Nitager pochwycił na granicy wschodniej i przysłał bogini Hator. Ludzie ci byli doskonale zbudowani, pracowali więcej niż Egipcjanie, a ponieważ ich karmiono dobrze, więc byli nawet zadowoleni ze swego losu.
+      Wypadek nasunął mu odpowiedź. Pewnego wieczora książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> przechadzając się po ogrodach świątyni spotkał gromadę niewolników, których jenerał<a href="#fn209" class="link-note"></a> Nitager pochwycił na granicy wschodniej i przysłał bogini Hator. Ludzie ci byli doskonale zbudowani, pracowali więcej niż Egipcjanie, a ponieważ ich karmiono dobrze, więc byli nawet zadowoleni ze swego losu.
     </p>
     <p data-index="84">
       Na ich widok błyskawica oświeciła umysł następcy: prawie utracił przytomność ze wzruszenia. Egipt potrzebuje ludzi, dużo ludzi, setki tysięcy, a nawet milion i dwa miliony ludzi… I otóż ludzie są!… Trzeba tylko wkroczyć do Azji, zabierać wszystko, co się spotka na drodze i — odsyłać do Egiptu… Dopóty zaś nie kończyć wojny, dopóki nie zbierze się tylu, ażeby każdy chłop egipski miał swego niewolnika…
@@ -8074,7 +8074,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> przyrzekł, lekarz opowiedział:
     </p>
     <p data-index="105">
-      — Pewien kapłan egipski, zwiedzając świątynie pogańskiego kraju Aram, przy jednej z nich spotkał człowieka, który wydał mu się bardzo tłustym i zadowolonym, choć nosił nędzne szaty.
+      — Pewien kapłan egipski, zwiedzając świątynie pogańskiego kraju Aram<a href="#fn210" class="link-note"></a>, przy jednej z nich spotkał człowieka, który wydał mu się bardzo tłustym i zadowolonym, choć nosił nędzne szaty.
     </p>
     <p data-index="106">
       „Wytłumacz mi — spytał kapłan wesołego biedaka — czym się to dzieje, że choć jesteś ubogi, jednak ciało twoje wygląda, jakbyś był przełożonym świątyni?'
@@ -8137,13 +8137,13 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <section><section data-chapter="29">
     <h4 data-index="0">Rozdział IV</h4>
     <p data-index="1">
-      Konno, w towarzystwie paru oficerów, jechał książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> do Pi-Bast, sławnej stolicy nomesu Habu.
+      Konno, w towarzystwie paru oficerów, jechał książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> do Pi-Bast, sławnej stolicy nomesu Habu<a href="#fn211" class="link-note"></a>.
     </p>
     <p data-index="2">
       Minął miesiąc Paoni, zaczynał się Epifi (kwiecień, maj). Słońce stało wysoko, zapowiadając najgorszą dla Egiptu porę upałów. Już w tym czasie kilka razy zrywał się straszny wiatr pustyni; ludzie i zwierzęta padali z gorąca, a na polach i drzewach zaczął osiadać szary pył, pod którym umierają rośliny.
     </p>
     <p data-index="3">
-      Zebrano róże i przerabiano je na olejek; sprzątnięto zboża i drugi ukos koniczyny. Żurawie z kubłami pracowały ze zdwojoną gorliwością, rozlewając brudną wodę po ziemi, aby ją przygotować do nowego siewu. Zaczynano też zrywać figi i winogrona.
+      Zebrano róże i przerabiano je na olejek; sprzątnięto zboża i drugi ukos<a href="#fn212" class="link-note"></a> koniczyny. Żurawie z kubłami pracowały ze zdwojoną gorliwością, rozlewając brudną wodę po ziemi, aby ją przygotować do nowego siewu. Zaczynano też zrywać figi i winogrona.
     </p>
     <p data-index="4">
       Woda Nilu opadła, kanały były płytkie i cuchnące. Nad całym krajem unosił się delikatny pył, wśród potoków palącego słońca.
@@ -8155,13 +8155,13 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Przy tym okolica, choć płaska i jednostajnie poprzerzynana siecią kanałów, była interesująca. W nomesie Habu mieszkała inna ludność; nie rodowici Egipcjanie, ale potomkowie walecznych Hyksosów, którzy ongi zdobyli Egipt i rządzili nim przez kilka wieków.
     </p>
     <p data-index="7">
-      Prawowici Egipcjanie gardzili tą resztką wypędzonych zdobywców; ale Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> patrzył na nich z przyjemnością. Byli to ludzie rośli, silni, z dumną postawą i męską energią w fizjognomii. Wobec księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> i oficerów nie padali na twarz jak Egipcjanie; przypatrywali się dostojnikom bez niechęci, ale i bez trwogi. Nie mieli także pleców okrytych bliznami po kijach; pisarze bowiem szanowali ich, wiedząc, że bity Hyksos oddaje plagi, a niekiedy morduje swego ciemiężcę. Wreszcie posiadali Hyksosowie łaskę faraona<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span>, ich bowiem ludność dostarczała najlepszych żołnierzy.
+      Prawowici Egipcjanie gardzili tą resztką wypędzonych zdobywców; ale Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> patrzył na nich z przyjemnością. Byli to ludzie rośli, silni, z dumną postawą i męską energią w fizjognomii<a href="#fn213" class="link-note"></a>. Wobec księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> i oficerów nie padali na twarz jak Egipcjanie; przypatrywali się dostojnikom bez niechęci, ale i bez trwogi. Nie mieli także pleców okrytych bliznami po kijach; pisarze bowiem szanowali ich, wiedząc, że bity Hyksos oddaje plagi, a niekiedy morduje swego ciemiężcę. Wreszcie posiadali Hyksosowie łaskę faraona<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span>, ich bowiem ludność dostarczała najlepszych żołnierzy.
     </p>
     <p data-index="8">
       Im bardziej orszak następcy<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zbliżał się do Pi-Bast, którego świątynie i pałace jak przez muślin widać było przez mgłę pyłu, tym okolica stawała się ruchliwszą. Szerokim gościńcem i pobliskimi kanałami transportowano: bydło, pszenicę, owoce, wino, kwiaty, chleby i mnóstwo innych przedmiotów codziennego użytku. Potok ludzi i towarów dążących w stronę miasta, hałaśliwy i gęsty jak pod Memfisem w dni świąteczne, w tym miejscu był zjawiskiem zwykłym. Dokoła Pi-Bastu przez cały rok panował zgiełk jarmarczny, który uspakajał się tylko w nocy.
     </p>
     <p data-index="9">
-      Przyczyna tego była prosta: miasto cieszyło się posiadaniem starej i sławnej świątyni Astarty, czczonej przez całą Azję zachodnią i ściągającej tłumy pielgrzymów. Bez przesady można powiedzieć, że pod Pi-Bast codziennie obozowało ze trzydzieści tysięcy cudzoziemców: Saschu, czyli Arabów, Fenicjan, Żydów, Filistynów, Chetów, Asyryjczyków i innych. Rząd egipski życzliwie zachowywał się wobec pielgrzymów, którzy przynosili mu znaczne dochody; kapłani tolerowali ich, a ludność kilku sąsiednich nomesów prowadziła z nimi żwawy handel.
+      Przyczyna tego była prosta: miasto cieszyło się posiadaniem starej i sławnej świątyni Astarty<a href="#fn214" class="link-note"></a>, czczonej przez całą Azję zachodnią i ściągającej tłumy pielgrzymów. Bez przesady można powiedzieć, że pod Pi-Bast codziennie obozowało ze trzydzieści tysięcy cudzoziemców: Saschu<a href="#fn215" class="link-note"></a>, czyli Arabów, Fenicjan, Żydów, Filistynów<a href="#fn216" class="link-note"></a>, Chetów<a href="#fn217" class="link-note"></a>, Asyryjczyków i innych. Rząd egipski życzliwie zachowywał się wobec pielgrzymów<a href="#fn218" class="link-note"></a>, którzy przynosili mu znaczne dochody; kapłani tolerowali ich, a ludność kilku sąsiednich nomesów prowadziła z nimi żwawy handel.
     </p>
     <p data-index="10">
       Już na godzinę drogi przed miastem widać było lepianki i namioty przybyszów rozbite na nagiej ziemi. W miarę zbliżania się do Pi-Bast liczba ich wzrastała i coraz gęściej roili się ich czasowi mieszkańcy. Jedni pod otwartym niebem przygotowywali pokarm, inni kupowali wciąż napływające towary, inni szli procesją do świątyni. Tu i ówdzie skupiały się wielkie gromady przed miejscami zabaw, gdzie popisywali się pogromcy zwierząt, zaklinacze wężów, atleci, tancerki i kuglarze.
@@ -8443,7 +8443,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Gdy namiestnik<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> wskazał mu fotel i kazał odejść dworzanom, Hiram<span class="character-placeholder character-mention" data-character="Hiram" data-src-picture="/Pharaon/hiram-listens.mp4" data-is-talking="false"></span> odezwał się:
     </p>
     <p data-index="5">
-      <span class="character-placeholder character-talking" data-character="Hiram" data-src-moving="/Pharaon/hiram-speaks.mp4" data-is-talking="true"></span> — Wczoraj sługa waszej dostojności, Dagon<span class="character-placeholder character-mention" data-character="Dagon" data-src-picture="/Pharaon/dagon-listens.mp4" data-is-talking="false"></span>, powiedział mi, że książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> potrzebujesz stu talentów. Zaraz wysłałem moich kurierów do Sabne-Chetam, Sethroe, Pi-Uto i innych miast, gdzie stoją fenickie okręty, ażeby wyładowały wszystek towar. I myślę, że za parę dni wasza dostojność otrzyma tę drobną sumkę.
+      <span class="character-placeholder character-talking" data-character="Hiram" data-src-moving="/Pharaon/hiram-speaks.mp4" data-is-talking="true"></span> — Wczoraj sługa waszej dostojności, Dagon<span class="character-placeholder character-mention" data-character="Dagon" data-src-picture="/Pharaon/dagon-listens.mp4" data-is-talking="false"></span>, powiedział mi, że książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> potrzebujesz stu talentów. Zaraz wysłałem moich kurierów do Sabne-Chetam<a href="#fn219" class="link-note"></a>, Sethroe<a href="#fn220" class="link-note"></a>, Pi-Uto<a href="#fn221" class="link-note"></a> i innych miast, gdzie stoją fenickie okręty, ażeby wyładowały wszystek towar. I myślę, że za parę dni wasza dostojność otrzyma tę drobną sumkę.
     </p>
     <p data-index="6">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Drobna! — przerwał książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> ze śmiechem. — Szczęśliwy jesteś, wasza dostojność, jeżeli sto talentów nazywasz drobną sumką.
@@ -8452,7 +8452,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Hiram<span class="character-placeholder character-mention" data-character="Hiram" data-src-picture="/Pharaon/hiram-listens.mp4" data-is-talking="false"></span> pokiwał głową.
     </p>
     <p data-index="8">
-      <span class="character-placeholder character-talking" data-character="Hiram" data-src-moving="/Pharaon/hiram-speaks.mp4" data-is-talking="true"></span> — Dziad waszej dostojności — rzekł po namyśle — wiecznie żyjący Ramesses-sa-Ptah zaszczycał mnie swoją przyjaźnią; znam też jego świątobliwość waszego ojca<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> (oby żył wiecznie!) i nawet spróbuję złożyć mu hołd, jeżeli będę dopuszczony…
+      <span class="character-placeholder character-talking" data-character="Hiram" data-src-moving="/Pharaon/hiram-speaks.mp4" data-is-talking="true"></span> — Dziad waszej dostojności — rzekł po namyśle — wiecznie żyjący Ramesses-sa-Ptah<a href="#fn222" class="link-note"></a> zaszczycał mnie swoją przyjaźnią; znam też jego świątobliwość waszego ojca<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> (oby żył wiecznie!) i nawet spróbuję złożyć mu hołd, jeżeli będę dopuszczony…
     </p>
     <p data-index="9">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Skądże ta wątpliwość?… — przerwał książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
@@ -8470,7 +8470,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Skąd?… — zawołał Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="14">
-      <span class="character-placeholder character-talking" data-character="Hiram" data-src-moving="/Pharaon/hiram-speaks.mp4" data-is-talking="true"></span> — Jak to skąd?… Z danin od ludów azjatyckich. Fenicja winna wam pięć tysięcy, no i ja ręczę, że odda, jeżeli nie trafią się jakieś wypadki… Ale oprócz niej Izrael winien trzy tysiące, Filistyni i Moabici po dwa tysiące, Chetowie trzydzieści tysięcy… Wreszcie nie pamiętam pozycji szczegółowych, ale wiem, że ogół wynosi sto trzy czy sto pięć tysięcy talentów.
+      <span class="character-placeholder character-talking" data-character="Hiram" data-src-moving="/Pharaon/hiram-speaks.mp4" data-is-talking="true"></span> — Jak to skąd?… Z danin od ludów azjatyckich. Fenicja winna wam pięć tysięcy, no i ja ręczę, że odda, jeżeli nie trafią się jakieś wypadki… Ale oprócz niej Izrael winien trzy tysiące, Filistyni i Moabici<a href="#fn223" class="link-note"></a> po dwa tysiące, Chetowie trzydzieści tysięcy… Wreszcie nie pamiętam pozycji szczegółowych, ale wiem, że ogół wynosi sto trzy czy sto pięć tysięcy talentów.
     </p>
     <p data-index="15">
       Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> gryzł wargi; na jego ruchliwej twarzy widać było bezsilny gniew. Spuścił oczy i milczał.
@@ -8797,7 +8797,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       „A gdyby Egipt nie mógł przeprowadzić zwycięskiej wojny z Asyrią?…'
     </p>
     <p data-index="123">
-      Lecz przy tym pytaniu zagotowała się w nim krew. Jak to Egipt, jak Egipt może nie zdeptać Asyrii, gdy na czele wojsk stanie on, Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, on, potomek Ramzesa Wielkiego, który sam jeden rzucił się na chetyjskie wozy wojenne i rozbił je!…
+      Lecz przy tym pytaniu zagotowała się w nim krew. Jak to Egipt, jak Egipt może nie zdeptać Asyrii, gdy na czele wojsk stanie on, Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, on, potomek Ramzesa Wielkiego, który sam jeden rzucił się na chetyjskie<a href="#fn224" class="link-note"></a> wozy wojenne i rozbił je!…
     </p>
     <p data-index="124">
       Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> wszystko mógł pojąć wyjąwszy tego, ażeby on mógł być pokonanym, mógł nie wydrzeć zwycięstwa największym mocarzom. Czuł w sobie bezmiar odwagi i zdziwiłby się, gdyby jakikolwiek nieprzyjaciel nie uciekł na widok jego rozpuszczonych koni. Przecież na wojennym wozie faraona<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> stają sami bogowie, ażeby go zasłaniać tarczą, a nieprzyjaciół razić niebieskimi pociskami.
@@ -8818,13 +8818,13 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Potrzeby dworu były hojnie zaopatrzone. Trzy kochanki namiestnika<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> otrzymały nowe szaty, mnóstwo osobliwych pachnideł i po kilka niewolnic rozmaitej barwy. Służba miała obfitość jedzenia i wina, robotnicy królewscy odebrali zaległy żołd, wojsku wydawano nadzwyczajne porcje.
     </p>
     <p data-index="4">
-      Dwór był zachwycony tym więcej, że Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span> i inni szlachetni młodzieńcy, na rozkaz Hirama<span class="character-placeholder character-mention" data-character="Hiram" data-src-picture="/Pharaon/hiram-listens.mp4" data-is-talking="false"></span>, otrzymali od Fenicjan dość wysokie pożyczki, a nomarcha prowincji Habu<span class="character-placeholder character-mention" data-character="Nomarcha Habu" data-src-picture="/Pharaon/nomarcha-habu.png" data-is-talking="false"></span> i jego wyżsi urzędnicy dostali kosztowne prezenta.
+      Dwór był zachwycony tym więcej, że Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span> i inni szlachetni młodzieńcy, na rozkaz Hirama<span class="character-placeholder character-mention" data-character="Hiram" data-src-picture="/Pharaon/hiram-listens.mp4" data-is-talking="false"></span>, otrzymali od Fenicjan dość wysokie pożyczki, a nomarcha prowincji Habu<span class="character-placeholder character-mention" data-character="Nomarcha Habu" data-src-picture="/Pharaon/nomarcha-habu.png" data-is-talking="false"></span> i jego wyżsi urzędnicy dostali kosztowne prezenta<a href="#fn225" class="link-note"></a>.
     </p>
     <p data-index="5">
       Toteż uczta następowała po uczcie, zabawa po zabawie, mimo ciągle wzrastającego upału. Namiestnik<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, widząc powszechną radość, sam był zadowolony. Trapiła go tylko jedna rzecz: zachowanie się Mefresa<span class="character-placeholder character-mention" data-character="Mefres" data-src-picture="/Pharaon/mefres.png" data-is-talking="false"></span> i innych kapłanów. Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> myślał, iż dostojnicy ci będą mu robili wymówki za to, że zaciągnął tak wielki dług u Hirama<span class="character-placeholder character-mention" data-character="Hiram" data-src-picture="/Pharaon/hiram-listens.mp4" data-is-talking="false"></span> wbrew naukom, jakie odebrał w świątyni. Tymczasem święci ojcowie milczeli i nawet nie pokazywali się u dworu.
     </p>
     <p data-index="6">
-      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Co to znaczy — rzekł pewnego dnia Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> do Tutmozisa<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span> — że kapłani nie udzielają nam upomnień?… Przecież takich zbytków jak obecnie nie dopuszczaliśmy się nigdy. Muzyka gra od rana do nocy, a my pijemy od wschodu słońca i zasypiamy z kobietami w objęciach albo ze dzbanami pod głową…
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Co to znaczy — rzekł pewnego dnia Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> do Tutmozisa<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span> — że kapłani nie udzielają nam upomnień?… Przecież takich zbytków jak obecnie nie dopuszczaliśmy się nigdy. Muzyka gra od rana do nocy, a my pijemy od wschodu słońca i zasypiamy z kobietami w objęciach albo ze dzbanami<a href="#fn226" class="link-note"></a> pod głową…
     </p>
     <p data-index="7">
       <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span>— Za co mieliby nas upominać? — odparł oburzony Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>. — Czyliż nie przebywamy w mieście Astarty, dla której najmilszym nabożeństwem jest zabawa, a najpożądańszą ofiarą — miłość? Zresztą kapłani rozumieją, że po tak długich umartwieniach i postach należy ci się odpoczynek.
@@ -8863,7 +8863,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Przez ten czas świątynia Astarty, jej liczne ogrody i dziedzińce roiły się od tłumu pobożnych. Co dzień, jeżeli nie co godzina, z głębi Azji, mimo strasznego upału, nadciągała do wielkiej bogini jakaś kompania pielgrzymów.
     </p>
     <p data-index="19">
-      Dziwni to byli pielgrzymowie. Zmęczeni, zlani potem, okryci kurzem szli z muzyką, tańcząc i śpiewając niekiedy bardzo wszeteczne piosenki. Dzień upływał im na pijatyce, noc na wyuzdanej rozpuście ku czci bogini Astoreth. Każdą taką kompanię można było nie tylko poznać, ale wyczuć z daleka: nieśli bowiem ogromne bukiety ciągle świeżych kwiatów w rękach, a — zdechłe w ciągu roku koty w węzełkach.
+      Dziwni to byli pielgrzymowie<a href="#fn227" class="link-note"></a>. Zmęczeni, zlani potem, okryci kurzem szli z muzyką, tańcząc i śpiewając niekiedy bardzo wszeteczne piosenki. Dzień upływał im na pijatyce, noc na wyuzdanej rozpuście ku czci bogini Astoreth. Każdą taką kompanię można było nie tylko poznać, ale wyczuć z daleka: nieśli bowiem ogromne bukiety ciągle świeżych kwiatów w rękach, a — zdechłe w ciągu roku koty w węzełkach.
     </p>
     <p data-index="20">
       Koty te oddawali pobożni do balsamowania lub wypychania paraszytom mieszkającym pod Pi-Bast, a następnie odnosili je z powrotem do domów, jako szanowne relikwie.
@@ -9286,13 +9286,13 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Pieszczota (Kama)" data-src-moving="/Pharaon/pieszczota-kama-speaks.mp4" data-is-talking="true"></span>— Gniew bogów jest straszniejszy…
     </p>
     <p data-index="160">
-      Szarpnęła się i znikła w cieniach świątyni. Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> rzucił się za nią, lecz nagle cofnął się. Całą świątynię, między ołtarzem i nim, zalał ogromny, krwawy płomień, wśród którego zaczęły ukazywać się potworne figury: wielkie niedoperze, gady z ludzkimi twarzami, cienie…
+      Szarpnęła się i znikła w cieniach świątyni. Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> rzucił się za nią, lecz nagle cofnął się. Całą świątynię, między ołtarzem i nim, zalał ogromny, krwawy płomień, wśród którego zaczęły ukazywać się potworne figury: wielkie niedoperze<a href="#fn228" class="link-note"></a>, gady z ludzkimi twarzami, cienie…
     </p>
     <p data-index="161">
       Płomień szedł prosto na niego całą szerokością gmachu, a oszołomiony nie znanym sobie widokiem książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> cofał się wstecz. Nagle owionęło go świeże powietrze. Odwrócił głowę — był już na zewnątrz świątyni, a jednocześnie spiżowe drzwi z łoskotem zatrzasnęły się przed nim.
     </p>
     <p data-index="162">
-      Przetarł oczy, rozejrzał się. Księżyc z najwyższego punktu na niebie zniżał się już ku zachodowi. Obok kolumny Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> znalazł swój miecz i burnus. Podniósł je i zeszedł ze schodów jak pijany.
+      Przetarł oczy, rozejrzał się. Księżyc z najwyższego punktu na niebie zniżał się już ku zachodowi. Obok kolumny Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> znalazł swój miecz i burnus. Podniósł je i zeszedł<a href="#fn229" class="link-note"></a> ze schodów jak pijany.
     </p>
     <p data-index="163">
       Kiedy późno wrócił do pałacu, Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>, widząc jego pobladłą twarz i mętne spojrzenie, zawołał z trwogą:
@@ -9367,7 +9367,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — No, no… — odparł książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> i znowu myślał:
     </p>
     <p data-index="14">
-      „Dotykano mnie tu i tam jednakowo zręcznie… Czy była jaka różnica?… Zdaje się, że była, może dlatego, że tu byłem, a tam nie byłem przygotowany na zobaczenie cudu… Ale tu pokazano mi drugiego, czego tam nie potrafili zrobić… Bardzo mądrzy są kapłani!… Ciekawym, kto mnie tak dobrze udawał, bożek czy człowiek?… O, bardzo mądrzy są kapłani i nawet nie wiem, którym z nich lepiej wierzyć: naszym czy fenickim?…'
+      „Dotykano mnie tu i tam jednakowo zręcznie… Czy była jaka różnica?… Zdaje się, że była, może dlatego, że tu byłem, a tam nie byłem przygotowany na zobaczenie cudu… Ale tu pokazano mi drugiego <strong>mnie</strong>, czego tam nie potrafili zrobić… Bardzo mądrzy są kapłani!… Ciekawym, kto mnie tak dobrze udawał, bożek czy człowiek?… O, bardzo mądrzy są kapłani i nawet nie wiem, którym z nich lepiej wierzyć: naszym czy fenickim?…'
     </p>
     <p data-index="15">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Słuchaj, Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span> — rzekł głośno — słuchaj, Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>… Trzeba, ażeby tu przyjechali… Muszę przecie zobaczyć mego syna… Nareszcie już nikt nie będzie miał prawa uważać się za lepszego ode mnie…
@@ -9538,7 +9538,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Tam odnajdywał swoją ławkę naprzeciw pałacyku Kamy<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span> i ukryty między drzewami patrzył na płonące pochodnie, słuchał śpiewu wielbicieli kapłanki i — marzył o niej.
     </p>
     <p data-index="71">
-      Księżyc wschodził coraz później, zbliżając się do nowiu, noce były szare, efekta świetlne przepadły, ale Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> mimo to wciąż widział jasność owej pierwszej nocy i słyszał namiętne strofy Greka.
+      Księżyc wschodził coraz później, zbliżając się do nowiu, noce były szare, efekta<a href="#fn230" class="link-note"></a> świetlne przepadły, ale Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> mimo to wciąż widział jasność owej pierwszej nocy i słyszał namiętne strofy Greka.
     </p>
     <p data-index="72">
       Nieraz powstawał z ławki, ażeby wprost pójść do mieszkania Kamy<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span>; ale ogarniał go wstyd. Czuł on, że nie wypada następcy tronu ukazywać się w domu kapłanki, którą odwiedzał każdy pielgrzym, byle złożył hojniejszą dla świątyni ofiarę. Co dziwniejsza — bał się, ażeby widok Kamy<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span>, otoczonej dzbanami i nieszczęśliwymi wielbicielami, nie zatarł mu cudownego obrazu księżycowej nocy.
@@ -9637,7 +9637,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Szybko chodził po komnacie, zadyszany, rozgorączkowany.
     </p>
     <p data-index="104">
-      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Myślałem — mówił Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — że pogardzam złodziejstwami pisarzy, obłudą nomarchów, że nienawidzę chytrych i ambitnych kapłanów… Miałem wstręt do Żydów i lękałem się Fenicjan… Ale dziś przekonywam się, że tamto były zabawki. Teraz dopiero wiem, co jest nienawiść, kiedym zobaczył i usłyszał Asyryjczyków, teraz rozumiem, dlaczego pies rozdziera kota, który mu przeszedł drogę…
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Myślałem — mówił Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — że pogardzam złodziejstwami pisarzy, obłudą nomarchów, że nienawidzę chytrych i ambitnych kapłanów… Miałem wstręt do Żydów i lękałem się Fenicjan… Ale dziś przekonywam<a href="#fn231" class="link-note"></a> się, że tamto były zabawki. Teraz dopiero wiem, co jest nienawiść, kiedym zobaczył i usłyszał Asyryjczyków, teraz rozumiem, dlaczego pies rozdziera kota, który mu przeszedł drogę…
     </p>
     <p data-index="105">
       <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span> — Do Żydów i Fenicjan przywykłeś, wasza dostojność, Asyryjczyków spotkałeś po raz pierwszy — wtrącił Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>.
@@ -9667,7 +9667,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Pieszczota (Kama)" data-src-moving="/Pharaon/pieszczota-kama-speaks.mp4" data-is-talking="true"></span> — O Astoreth!… — zawołała kapłanka<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span>. — Czemuż zawdzięczam najwyższą łaskę?… I co przeszkodziło ci, dostojny panie, że nie raczyłeś zawołać twojej niewolnicy?…
     </p>
     <p data-index="5">
-      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Stały tam jakieś bydlęta. Podobno Asyryjczykowie.
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Stały tam jakieś bydlęta. Podobno Asyryjczykowie<a href="#fn232" class="link-note"></a>.
     </p>
     <p data-index="6">
       <span class="character-placeholder character-talking" data-character="Pieszczota (Kama)" data-src-moving="/Pharaon/pieszczota-kama-speaks.mp4" data-is-talking="true"></span> — Więc wasza dostojność trudziłeś się wieczorem?… Nigdy nie śmiałabym przypuścić, że nasz władca znajduje się o kilka kroków ode mnie pod gołym niebem.
@@ -9793,13 +9793,13 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Po jej wyjściu opanowała go nowa fala myśli:
     </p>
     <p data-index="47">
-      „Zaprawdę, przebiegli są Fenicjanie. Jeżeli ten mój żyjący wizerunek jest człowiekiem, mogą mi zrobić z niego wielki podarunek, a ja czyniłbym kiedyś cuda, o jakich bodaj że nie słyszano w Egipcie. Faraon mieszka w Memfis, a jednocześnie ukazuje się w Tebach albo w Tanis!… Faraon posuwa się z armią na Babilon, Asyryjczycy tam gromadzą główne siły, a jednocześnie — faraon z inną armią zdobywa Niniwę… Sądzę, że Asyryjczycy byliby bardzo zdumieni takim wypadkiem…'
+      „Zaprawdę, przebiegli są Fenicjanie. Jeżeli ten mój żyjący wizerunek jest człowiekiem, mogą mi zrobić z niego wielki podarunek, a ja czyniłbym kiedyś cuda, o jakich bodaj że nie słyszano w Egipcie. Faraon mieszka w Memfis, a jednocześnie ukazuje się w Tebach<a href="#fn233" class="link-note"></a> albo w Tanis<a href="#fn234" class="link-note"></a>!… Faraon posuwa się z armią na Babilon, Asyryjczycy tam gromadzą główne siły, a jednocześnie — faraon z inną armią zdobywa Niniwę… Sądzę, że Asyryjczycy byliby bardzo zdumieni takim wypadkiem…'
     </p>
     <p data-index="48">
       I znowu obudziła się w nim głucha nienawiść do potężnych Azjatów, i znowu widział swój triumfalny wóz, przejeżdżający pobojowisko pełne asyryjskich trupów i całe kosze odciętych rąk.
     </p>
     <p data-index="49">
-      Teraz wojna stała się dla jego duszy taką koniecznością jak chleb dla ciała. Bo nie tylko mógł przez nią zbogacić Egipt, napełnić skarb i zdobyć wiecznotrwałą sławę, ale jeszcze — mógł zaspokoić, dotychczas nieświadomy, dziś potężnie rozbudzony instynkt zniszczenia Asyrii.
+      Teraz wojna stała się dla jego duszy taką koniecznością jak chleb dla ciała. Bo nie tylko mógł przez nią zbogacić<a href="#fn235" class="link-note"></a> Egipt, napełnić skarb i zdobyć wiecznotrwałą sławę, ale jeszcze — mógł zaspokoić, dotychczas nieświadomy, dziś potężnie rozbudzony instynkt zniszczenia Asyrii.
     </p>
     <p data-index="50">
       Dopóki nie zobaczył tych wojowników z kudłatymi brodami, nie myślał o nich. Ale dziś zawadzali mu. Było mu tak ciasno z nimi na świecie, że ktoś musiał ustąpić: oni albo on.
@@ -9847,7 +9847,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Patrz, Tutmozisie<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span> — mówił raz do ulubieńca — jakie to piękne dziecko: istny płatek róży. No, i z tego ma kiedyś wyrosnąć człowiek, z tego drobiazgu!… I to różowe pisklę będzie kiedyś chodziło, rozmawiało, nawet uczyło się mądrości w kapłańskich szkołach…
     </p>
     <p data-index="65">
-      Czy ty widzisz jego ręczyny, Tutmozisie<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>?… — wołał zachwycony Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>. — Zapamiętaj sobie te drobne ręce, ażebyś opowiedział o nich kiedyś, gdy mu daruję pułk i każę nosić za sobą mój topór… I to jest mój syn, mój syn rodzony!…
+      Czy ty widzisz jego ręczyny<a href="#fn236" class="link-note"></a>, Tutmozisie<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>?… — wołał zachwycony Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>. — Zapamiętaj sobie te drobne ręce, ażebyś opowiedział o nich kiedyś, gdy mu daruję pułk i każę nosić za sobą mój topór… I to jest mój syn, mój syn rodzony!…
     </p>
     <p data-index="66">
       Nic dziwnego, że gdy tak mówił pan, jego dworzanie martwili się, że nie mogą zostać niańkami, a nawet mamkami dziecka, które lubo nie miało żadnych praw dynastycznych, było jednak pierwszym synem przyszłego faraona.
@@ -10009,7 +10009,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Ramzesowi<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> przed oczyma przesunęła się krwawa mgła: chętnie wbiłby miecz w piersi temu zwycięzcy. Ale opanował się, chwilę pomyślał i, zdjąwszy ze swej szyi złoty łańcuch, podał go Sargonowi<span class="character-placeholder character-mention" data-character="Sargon" data-src-picture="/Pharaon/sargon-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="119">
-      Asyryjczyk znowu skłonił się, pocałował łańcuch i włożył go sobie na szyję. A książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, z sinawymi rumieńcami na policzkach, skierował się do furtki, którą wchodzili na arenę aktorowie, i wśród okrzyków publiczności, głęboko upokorzony, opuścił cyrk.
+      Asyryjczyk znowu skłonił się, pocałował łańcuch i włożył go sobie na szyję. A książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, z sinawymi rumieńcami na policzkach, skierował się do furtki, którą wchodzili na arenę aktorowie<a href="#fn237" class="link-note"></a>, i wśród okrzyków publiczności, głęboko upokorzony, opuścił cyrk.
     </p>
   </section></section>
       <section><section data-chapter="34">
@@ -10732,13 +10732,13 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Mentezufis" data-src-moving="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true"></span> — A któż waszej dostojności powiedział, że u nas nie staną?
     </p>
     <p data-index="63">
-      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Ty sam. Sto dwadzieścia tysięcy ludzi muszą ustąpić przed trzystoma tysiącami. No, a gdyby Asyryjczycy raz do nas weszli, z Egiptu zostałaby pustynia…
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Ty sam. Sto dwadzieścia tysięcy ludzi muszą<a href="#fn238" class="link-note"></a> ustąpić przed trzystoma tysiącami. No, a gdyby Asyryjczycy raz do nas weszli, z Egiptu zostałaby pustynia…
     </p>
     <p data-index="64">
       Mentezufisowi<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> zapłonęły oczy.
     </p>
     <p data-index="65">
-      <span class="character-placeholder character-talking" data-character="Mentezufis" data-src-moving="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true"></span> — Gdyby weszli do nas — zawołał — kości ich nigdy nie zobaczyłyby swej ziemi!… Uzbroilibyśmy całą szlachtę, pułki robotnicze, nawet przestępców z kopalń… Wydobylibyśmy skarby ze wszystkich świątyń… I spotkałaby się Asyria z pięciomaset tysiącami egipskich wojowników…
+      <span class="character-placeholder character-talking" data-character="Mentezufis" data-src-moving="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true"></span> — Gdyby weszli do nas — zawołał — kości ich nigdy nie zobaczyłyby swej ziemi!… Uzbroilibyśmy całą szlachtę, pułki robotnicze, nawet przestępców z kopalń… Wydobylibyśmy skarby ze wszystkich świątyń… I spotkałaby się Asyria z pięciomaset<a href="#fn239" class="link-note"></a> tysiącami egipskich wojowników…
     </p>
     <p data-index="66">
       Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> był zachwycony tym wybuchem patriotyzmu kapłana<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span>. Schwycił go za rękę i rzekł:
@@ -10825,7 +10825,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Byle tylko nasz młodzik nie ośmieszył się nocnymi wędrówkami do kapłanki fenickiej<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span>!… Gdyby go zobaczono w ogrodzie Astoreth, lud mógłby myśleć, że następca tronu<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> nakłania uszu do fenickiej wiary… A Dolnemu Egiptowi już niewiele potrzeba, aby wyprzeć się starych bogów… Cóż to za mieszanina narodów!…'
     </p>
     <p data-index="94">
-      W kilka dni później dostojny Sargon<span class="character-placeholder character-mention" data-character="Sargon" data-src-picture="/Pharaon/sargon-listens.mp4" data-is-talking="false"></span> urzędownie zawiadomił księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> o swej roli asyryjskiego posła, oświadczył chęć powitania następcy tronu<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> i prosił o orszak egipski, który by go odprowadził ze wszelkim bezpieczeństwem i honorami do stóp jego świątobliwości faraona<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span>.
+      W kilka dni później dostojny Sargon<span class="character-placeholder character-mention" data-character="Sargon" data-src-picture="/Pharaon/sargon-listens.mp4" data-is-talking="false"></span> urzędownie<a href="#fn240" class="link-note"></a> zawiadomił księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> o swej roli asyryjskiego posła, oświadczył chęć powitania następcy tronu<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> i prosił o orszak egipski, który by go odprowadził ze wszelkim bezpieczeństwem i honorami do stóp jego świątobliwości faraona<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="95">
       Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zatrzymał się z odpowiedzią dwa dni i wyznaczył Sargonowi<span class="character-placeholder character-mention" data-character="Sargon" data-src-picture="/Pharaon/sargon-listens.mp4" data-is-talking="false"></span> posłuchanie znowu po upływie dwu dni. Asyryjczyk<span class="character-placeholder character-mention" data-character="Sargon" data-src-picture="/Pharaon/sargon-listens.mp4" data-is-talking="false"></span>, przywykły do wschodniej powolności w podróżach i interesach, wcale się tym nie martwił i nie marnował czasu. Pił od rana do wieczora, grał w kości z Hiramem<span class="character-placeholder character-mention" data-character="Hiram" data-src-picture="/Pharaon/hiram-listens.mp4" data-is-talking="false"></span> i innymi azjatyckimi bogaczami, a w chwilach wolnych, podobnie jak Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, wymykał się do Kamy<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span>.
@@ -10840,7 +10840,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Sargon" data-src-moving="/Pharaon/sargon-speaks.mp4" data-is-talking="true"></span> Ja — ciągnął Sargon<span class="character-placeholder character-mention" data-character="Sargon" data-src-picture="/Pharaon/sargon-listens.mp4" data-is-talking="false"></span> — gdyby bogowie za karę stworzyli mnie kobietą, wolałbym sam być położnicą aniżeli pielęgnować takowe.
     </p>
     <p data-index="99">
-      <span class="character-placeholder character-talking" data-character="Sargon" data-src-moving="/Pharaon/sargon-speaks.mp4" data-is-talking="true"></span> Dlatego mówię ci, jak człowiek mądry, rzuć świątynię i przystań do mego haremu. Dam za ciebie dziesięć talentów złotem, czterdzieści krów i sto mierzyc pszenicy. Kapłani z początku będą obawiali się kary bogów, ażeby więcej wyłudzić ode mnie. Ale że ja nie postąpię już ani drachmy, co najwyżej dorzucę kilka owieczek, więc odprawią uroczyste nabożeństwo i zaraz objawi się im niebieska Astoreth, która zwolni cię od ślubów, bylem jeszcze dorzucił złoty łańcuch albo puchar.
+      <span class="character-placeholder character-talking" data-character="Sargon" data-src-moving="/Pharaon/sargon-speaks.mp4" data-is-talking="true"></span> Dlatego mówię ci, jak człowiek mądry, rzuć świątynię i przystań do mego haremu. Dam za ciebie dziesięć talentów złotem, czterdzieści krów i sto mierzyc pszenicy. Kapłani z początku będą obawiali się kary bogów, ażeby więcej wyłudzić ode mnie. Ale że ja nie postąpię już ani drachmy, co najwyżej dorzucę kilka owieczek, więc odprawią uroczyste nabożeństwo i zaraz objawi się im niebieska Astoreth, która zwolni cię od ślubów, bylem<a href="#fn241" class="link-note"></a> jeszcze dorzucił złoty łańcuch albo puchar.
     </p>
     <p data-index="100">
       Kama<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span>, słuchając tych poglądów, gryzła wargi ze śmiechu, a on ciągnął:
@@ -11029,19 +11029,19 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Fenicjanie opowiadali, pod największym rozumie się sekretem, że kapłani, nie wiadomo z jakiego powodu, nie tylko darowali Asyrii zaległe daniny, nie tylko uwolnili ją raz na zawsze od ich płacenia, ale nadto, ażeby ułatwić Asyryjczykom jakąś wojnę północną, zawarli z nimi traktat pokojowy na długie lata.
     </p>
     <p data-index="3">
-      — Faraon<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> — mówili Fenicjanie — aż mocniej zachorował dowiedziawszy się o ustępstwach robionych barbarzyńcom. Książę Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> martwi się i chodzi smutny, lecz obaj muszą ulegać kapłanom, nie będąc pewni uczuć szlachty i wojska.
+      <CharactersMaster></CharactersMaster> — Faraon<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> — mówili Fenicjanie — aż mocniej zachorował dowiedziawszy się o ustępstwach robionych barbarzyńcom. Książę Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> martwi się i chodzi smutny, lecz obaj muszą ulegać kapłanom, nie będąc pewni uczuć szlachty i wojska.
     </p>
     <p data-index="4">
       To najwięcej oburzało egipską arystokrację.
     </p>
     <p data-index="5">
-      — Jak to — szeptali między sobą zadłużeni magnaci — więc dynastia już nam nie ufa?… Więc kapłani uwzięli się, ażeby zhańbić i zrujnować Egipt?… Bo przecie jasne jest, że jeżeli Asyria ma wojnę gdzieś na dalekiej północy, to właśnie teraz trzeba ją napaść i zdobytymi łupami podźwignąć zubożały skarb królewski i arystokrację…
+      <CharactersMaster></CharactersMaster> — Jak to — szeptali między sobą zadłużeni magnaci — więc dynastia już nam nie ufa?… Więc kapłani uwzięli się, ażeby zhańbić i zrujnować Egipt?… Bo przecie jasne jest, że jeżeli Asyria ma wojnę gdzieś na dalekiej północy, to właśnie teraz trzeba ją napaść i zdobytymi łupami podźwignąć zubożały skarb królewski i arystokrację…
     </p>
     <p data-index="6">
       Ten i ów z młodych panów ośmielał się zapytywać następcy<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>: co myśli o asyryjskich barbarzyńcach? Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> milczał, ale błysk jego oczu i zacięte usta dostatecznie wyrażały uczucia.
     </p>
     <p data-index="7">
-      — Oczywiście — szeptali panowie w dalszym ciągu — że dynastia jest opętana przez kapłanów, nie ufa szlachcie, Egiptowi zaś grożą wielkie nieszczęścia…
+      <CharactersMaster></CharactersMaster> — Oczywiście — szeptali panowie w dalszym ciągu — że dynastia jest opętana przez kapłanów, nie ufa szlachcie, Egiptowi zaś grożą wielkie nieszczęścia…
     </p>
     <p data-index="8">
       Ciche gniewy prędko zamieniły się w ciche narady mające nawet pozór spisku. Ale choć bardzo wiele osób brało w tym udział, pewny siebie czy zaślepiony stan kapłański nic o nich nie wiedział, a Sargon<span class="character-placeholder character-mention" data-character="Sargon" data-src-picture="/Pharaon/sargon-listens.mp4" data-is-talking="false"></span>, choć przeczuwał nienawiść, nie przywiązywał do niej wagi.
@@ -11281,7 +11281,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Sargon<span class="character-placeholder character-mention" data-character="Sargon" data-src-picture="/Pharaon/sargon-listens.mp4" data-is-talking="false"></span> pokiwał głową.
     </p>
     <p data-index="87">
-      <span class="character-placeholder character-talking" data-character="Sargon" data-src-moving="/Pharaon/sargon-speaks.mp4" data-is-talking="true"></span> — Oj, wy mędrcy!… uczeni w piśmie!… znawcy gwiazdowych obrotów!… — mówił szydząc. — Ja prostak, zwyczajny sobie jenerał, który bez pieczęci nie zawsze umiałbym wyżłobić moje nazwisko… Wy mędrcy, ja prostak, ale na brodę mego króla, nie zamieniłbym się na waszą mądrość…
+      <span class="character-placeholder character-talking" data-character="Sargon" data-src-moving="/Pharaon/sargon-speaks.mp4" data-is-talking="true"></span> — Oj, wy mędrcy!… uczeni w piśmie!… znawcy gwiazdowych obrotów!… — mówił szydząc. — Ja prostak, zwyczajny sobie jenerał<a href="#fn242" class="link-note"></a>, który bez pieczęci nie zawsze umiałbym wyżłobić moje nazwisko… Wy mędrcy, ja prostak, ale na brodę mego króla, nie zamieniłbym się na waszą mądrość…
     </p>
     <p data-index="88">
       Bo wy jesteście ludźmi, dla których otworzył się świat cegieł i papirusów, ale zamknął się ten prawdziwy, na którym wszyscy żyjemy… Ja prostak! Ale ja mam psi węch. A jak pies z dala wyczuje niedźwiedzia, tak ja moim zaczerwienionym nosem poznam bohatera.
@@ -11473,7 +11473,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Wysłuchawszy żalów księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span> podniósł się z krzesła, z uwagą przejrzał sąsiednie komnaty, czy kto w nich nie podsłuchuje, potem znowu usiadł przy Ramzesie<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> i zaczął szeptać:
     </p>
     <p data-index="50">
-      <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span> — Bądź dobrej myśli, panie! O ile wiem, cała arystokracja, wszyscy nomarchowie, wszyscy wyżsi oficerowie słyszeli coś o tym traktacie i są oburzeni. Daj więc tylko znak, a rozbijemy traktatowe cegły na łbach , nawet Assara…
+      <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span> — Bądź dobrej myśli, panie! O ile wiem, cała arystokracja, wszyscy nomarchowie, wszyscy wyżsi oficerowie słyszeli coś o tym traktacie i są oburzeni. Daj więc tylko znak, a rozbijemy traktatowe cegły na łbach <Sargona>Sargona</Sargona>, nawet Assara…
     </p>
     <p data-index="51">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Ależ to byłby bunt przeciw jego świątobliwości… — równie cicho odparł książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
@@ -11503,7 +11503,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Łatwiej — rzekł — podpisać traktat aniżeli go zerwać…
     </p>
     <p data-index="60">
-      <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span> — I zerwać łatwo! — uśmiechnął się Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>. — Czyliż w Azji nie ma plemion niesfornych, które wpadną w nasze granice?… Czyliż boski Nitager nie czuwa ze swoją armią, aby odparł ich i przeniósł wojnę do ich krajów?… A czy myślisz, że Egipt nie znajdzie ludzi do oręża i skarbów na wojnę?… Pójdziemy wszyscy, bo każdy może coś zyskać i jako tako ubezpieczyć sobie życie… Skarby zaś leżą w świątyniach… A w Labiryncie!…
+      <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span> — I zerwać łatwo! — uśmiechnął się Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>. — Czyliż w Azji nie ma plemion niesfornych, które wpadną w nasze granice?… Czyliż boski Nitager nie czuwa ze swoją armią, aby odparł ich i przeniósł wojnę do ich krajów?… A czy myślisz, że Egipt nie znajdzie ludzi do oręża i skarbów na wojnę?… Pójdziemy wszyscy, bo każdy może coś zyskać i jako tako ubezpieczyć sobie życie… Skarby zaś leżą w świątyniach… A w Labiryncie<a href="#fn243" class="link-note"></a>!…
     </p>
     <p data-index="61">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Kto je wydobędzie stamtąd! — wtrącił z powątpiewaniem książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
@@ -11575,7 +11575,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Ale postanowiwszy wojnę, chciał działać rozważnie. Chciał powoli przekonać do niej stan kapłański, a dopiero w razie oporu — zgnieść go za pomocą wojska i szlachty.
     </p>
     <p data-index="84">
-      I właśnie wówczas, gdy święty Mefres<span class="character-placeholder character-mention" data-character="Mefres" data-src-picture="/Pharaon/mefres.png" data-is-talking="false"></span> i Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> żartowali z przepowiedni , że następca<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> nie podda się kapłanom, ale ich zmusi do posłuszeństwa, już wówczas książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> miał gotowy plan ujarzmienia ich i widział, jakie posiada do tego środki. Zaś chwilę rozpoczęcia walki i sposób przeprowadzenia jej pozostawiał przyszłości.
+      I właśnie wówczas, gdy święty Mefres<span class="character-placeholder character-mention" data-character="Mefres" data-src-picture="/Pharaon/mefres.png" data-is-talking="false"></span> i Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> żartowali z przepowiedni <Sargona>Sargona</Sargona>, że następca<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> nie podda się kapłanom, ale ich zmusi do posłuszeństwa, już wówczas książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> miał gotowy plan ujarzmienia ich i widział, jakie posiada do tego środki. Zaś chwilę rozpoczęcia walki i sposób przeprowadzenia jej pozostawiał przyszłości.
     </p>
     <p data-index="85">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> „Czas przynosi najlepsze rady!' — rzekł do siebie. Był spokojny i zadowolony jak człowiek, który po długim wahaniu wie, co ma robić, i posiada wiarę we własne siły. Toteż ażeby pozbyć się nawet śladów niedawnego wzburzenia, poszedł do Sary<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span>.
@@ -11668,7 +11668,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — O!… w zły czas przychodzę… — roześmiał się następca<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>. — Cóż to, i wy, książę<span class="character-placeholder character-mention" data-character="Hiram" data-src-picture="/Pharaon/hiram-listens.mp4" data-is-talking="false"></span>, zalecacie się do kobiety, której pod karą śmierci nie wolno być łaskawą dla mężczyzn?
     </p>
     <p data-index="115">
-      Hiram<span class="character-placeholder character-mention" data-character="Hiram" data-src-picture="/Pharaon/hiram-listens.mp4" data-is-talking="false"></span> i kapłanka<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span> oboje zerwali się z taburetów.
+      Hiram<span class="character-placeholder character-mention" data-character="Hiram" data-src-picture="/Pharaon/hiram-listens.mp4" data-is-talking="false"></span> i kapłanka<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span> oboje zerwali się z taburetów<a href="#fn244" class="link-note"></a>.
     </p>
     <p data-index="116">
       <span class="character-placeholder character-talking" data-character="Hiram" data-src-moving="/Pharaon/hiram-speaks.mp4" data-is-talking="true"></span> — Widocznie — rzekł Fenicjanin<span class="character-placeholder character-mention" data-character="Hiram" data-src-picture="/Pharaon/hiram-listens.mp4" data-is-talking="false"></span>, kłaniając się — jakiś dobry duch ostrzegł cię, panie, że o tobie mówimy…
@@ -11863,7 +11863,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Arcykapłan świątyni wysłał Kamę<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span> do miasta Sabne-Chetam nad jeziorem Menzaleh, z ofiarami dla tamtejszej kaplicy Astoreth. Kapłanka<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span> odbywała podróż czółnem w nocy, już to aby uniknąć letniego skwaru, już dla zabezpieczenia się przed ciekawością i hołdami mieszkańców.
     </p>
     <p data-index="32">
-      Nad ranem, kiedy czterej wioślarze zmęczeni zdrzemnęli się, spomiędzy zarośli nadbrzeżnych wypłynęły nagle czółna prowadzone przez Greków i Chetów, otoczyły łódź wiozącą kapłankę i porwały Kamę<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span>. Napad był tak szybki, że feniccy wioślarze nie stawiali żadnego oporu; kapłance<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span> zaś widocznie zatkano usta, nawet bowiem nie zdążyła krzyknąć.
+      Nad ranem, kiedy czterej wioślarze zmęczeni zdrzemnęli się, spomiędzy zarośli nadbrzeżnych wypłynęły nagle czółna prowadzone przez Greków i Chetów<a href="#fn245" class="link-note"></a>, otoczyły łódź wiozącą kapłankę i porwały Kamę<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span>. Napad był tak szybki, że feniccy wioślarze nie stawiali żadnego oporu; kapłance<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span> zaś widocznie zatkano usta, nawet bowiem nie zdążyła krzyknąć.
     </p>
     <p data-index="33">
       Dokonawszy świętokradzkiego czynu Chetowie i Grecy zniknęli w zaroślach, aby następnie wydobyć się na morze. Celem zaś zabezpieczenia się od pościgu wywrócili czółno należące do świątyni Astoreth.
@@ -11881,7 +11881,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       W parę dni później, przy odgłosie rogów, ogłoszono wiernym w świątyni Astoreth, że kapłanka Kama<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span> umarła i że gdyby kto spotkał kobietę podobną do niej, nie ma prawa mścić się, a nawet czynić jej wyrzutów. Nie ona bowiem, nie kapłanka, opuściła boginię, ale porwały ją złe duchy, za co będą ukarane.
     </p>
     <p data-index="38">
-      Tego zaś samego dnia dostojny Hiram<span class="character-placeholder character-mention" data-character="Hiram" data-src-picture="/Pharaon/hiram-listens.mp4" data-is-talking="false"></span> był u księcia Ramzesa<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> i ofiarował mu, w złotej puszce, pargamin opatrzony mnóstwem pieczęci kapłańskich i podpisami najznakomitszych Fenicjan.
+      Tego zaś samego dnia dostojny Hiram<span class="character-placeholder character-mention" data-character="Hiram" data-src-picture="/Pharaon/hiram-listens.mp4" data-is-talking="false"></span> był u księcia Ramzesa<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> i ofiarował mu, w złotej puszce, pargamin<a href="#fn246" class="link-note"></a> opatrzony mnóstwem pieczęci kapłańskich i podpisami najznakomitszych Fenicjan.
     </p>
     <p data-index="39">
       Był to wyrok duchownego sądu Astoreth, który uwalniał Kamę<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span> od ślubów i zdejmował z niej klątwę niebios, byle tylko wyrzekła się swego kapłańskiego imienia.
@@ -11902,7 +11902,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Pieszczota (Kama)" data-src-moving="/Pharaon/pieszczota-kama-speaks.mp4" data-is-talking="true"></span> — Myślisz, że ona jest złota?… — rzekła. — Oddam mój naszyjnik, że ta puszka jest miedziana i tylko pokryta z dwu stron cienkimi blaszkami!…
     </p>
     <p data-index="45">
-      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Także mnie witasz?… — spytał zdziwiony książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Także<a href="#fn247" class="link-note"></a> mnie witasz?… — spytał zdziwiony książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="46">
       <span class="character-placeholder character-talking" data-character="Pieszczota (Kama)" data-src-moving="/Pharaon/pieszczota-kama-speaks.mp4" data-is-talking="true"></span> — Bo znam moich braci — odparła. — Oni fałszują nie tylko złoto, ale rubiny i szafiry…
@@ -12427,7 +12427,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span> — Ja, cała szlachta i wojsko, przysięgam ci!…
     </p>
     <p data-index="87">
-      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Dosyć — zakończył następca<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>. — Niechże sobie teraz uwalniają najemne pułki… niech podpisują traktaty… niech kryją się przede mną jak niedoperze i niech oszukują nas wszystkich… Ale przyjdzie czas…
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Dosyć — zakończył następca<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>. — Niechże sobie teraz uwalniają najemne pułki… niech podpisują traktaty… niech kryją się przede mną jak niedoperze<a href="#fn248" class="link-note"></a> i niech oszukują nas wszystkich… Ale przyjdzie czas…
     </p>
     <p data-index="88">
       A teraz, Tutmozisie<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>, odpocznij po podróży i bądź u mnie na uczcie dziś wieczór… Ci ludzie tak mnie spętali, że mogę tylko bawić się… Więc będę się bawił… Ale kiedyś pokażę im, kto jest władcą Egiptu: oni czy ja…
@@ -12532,7 +12532,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Fenicjanka<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span> zatrzęsła się. Podniosła w górę zaciśnięte pięści, włosy jej najeżyły się, a w oczach zapłonął brudny ogień nienawiści.
     </p>
     <p data-index="122">
-      <span class="character-placeholder character-talking" data-character="Pieszczota (Kama)" data-src-moving="/Pharaon/pieszczota-kama-speaks.mp4" data-is-talking="true"></span> — Także mi odpowiadasz?… Żydówka<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span> jest nieszczęśliwą, boś ją wygnał z pałacu; a ja muszę być zadowolona, chociaż bogowie wygnali mnie ze wszystkich swoich świątyń… A dusza moja… dusza kapłanki tonącej we łzach i obawie czyliż nie znaczy więcej u ciebie aniżeli ten żydowski pomiot, to dziecko<span class="character-placeholder character-mention" data-character="Seti" data-src-picture="/Pharaon/seti.png" data-is-talking="false"></span>, które… oby już nie żyło… oby go…
+      <span class="character-placeholder character-talking" data-character="Pieszczota (Kama)" data-src-moving="/Pharaon/pieszczota-kama-speaks.mp4" data-is-talking="true"></span> — Także<a href="#fn249" class="link-note"></a> mi odpowiadasz?… Żydówka<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span> jest nieszczęśliwą, boś ją wygnał z pałacu; a ja muszę być zadowolona, chociaż bogowie wygnali mnie ze wszystkich swoich świątyń… A dusza moja… dusza kapłanki tonącej we łzach i obawie czyliż nie znaczy więcej u ciebie aniżeli ten żydowski pomiot, to dziecko<span class="character-placeholder character-mention" data-character="Seti" data-src-picture="/Pharaon/seti.png" data-is-talking="false"></span>, które… oby już nie żyło… oby go…
     </p>
     <p data-index="123">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Milcz!… — krzyknął książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, zamykając jej usta.
@@ -12619,7 +12619,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       „Jeżeli pragniesz tego, więc… niech się spełni zbrodnia!…'
     </p>
     <p data-index="151">
-      Tbubui nie trzeba było dwa razy powtarzać. W oczach ojca kazała pomordować dzieci, a okrwawione ich członki wyrzuciła przez okno psom i kotom. No i dopiero wtedy Satni wszedł do jej pokoju i spoczął na jej hebanowym łożu, wykładanym kością słoniową.
+      Tbubui nie trzeba było dwa razy powtarzać. W oczach ojca kazała pomordować dzieci, a okrwawione ich członki wyrzuciła przez okno psom i kotom. No i dopiero wtedy Satni wszedł do jej pokoju i spoczął na jej hebanowym łożu, wykładanym kością słoniową.<a href="#fn250" class="link-note"></a>
     </p>
     <p data-index="152">
       <span class="character-placeholder character-talking" data-character="Pieszczota (Kama)" data-src-moving="/Pharaon/pieszczota-kama-speaks.mp4" data-is-talking="true"></span> — Tbubui dobrze robiła, nie wierząc zapewnieniom mężczyzn — rzekła zirytowana Fenicjanka<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span>.
@@ -12643,10 +12643,10 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Już i między ludem miasta Pi-Bast zaczęły rozchodzić się groźne wieści o Libijczykach. Opowiadano, że rozpuszczeni przez kapłanów żołnierze barbarzyńscy, wracając do swej ojczyzny, z początku żebrali, potem kradli, a w końcu zaczęli rabować i palić wsie egipskie, mordując przy tym mieszkańców.
     </p>
     <p data-index="2">
-      W ten sposób w ciągu kilku dni zostały napadnięte i zniszczone miasta: Chinensu, Pimat i Kasa na południe do jeziora Moeris. W ten sposób zginęła karawana kupców i pielgrzymów egipskich wracających z oazy Uit-Mehe. Cała zachodnia granica państwa była w niebezpieczeństwie, a nawet z Terenuthis zaczęli uciekać mieszkańcy. I w tamtej bowiem okolicy od strony morza ukazały się bandy libijskie, jakoby wysłane przez groźnego wodza Musawasę<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span>, który podobno w całej pustyni miał ogłosić świętą wojnę przeciw Egiptowi.
+      W ten sposób w ciągu kilku dni zostały napadnięte i zniszczone miasta: Chinensu<a href="#fn251" class="link-note"></a>, Pimat<a href="#fn252" class="link-note"></a> i Kasa<a href="#fn253" class="link-note"></a> na południe do jeziora Moeris. W ten sposób zginęła karawana kupców i pielgrzymów egipskich wracających z oazy Uit-Mehe. Cała zachodnia granica państwa była w niebezpieczeństwie, a nawet z Terenuthis<a href="#fn254" class="link-note"></a> zaczęli uciekać mieszkańcy. I w tamtej bowiem okolicy od strony morza ukazały się bandy libijskie, jakoby wysłane przez groźnego wodza Musawasę<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span>, który podobno w całej pustyni miał ogłosić świętą wojnę przeciw Egiptowi.
     </p>
     <p data-index="3">
-      Toteż jeżeli którego wieczoru zachodni pas nieba czerwienił się zbyt długo, na mieszkańców Pi-Bast padała trwoga. Ludzie gromadzili się po ulicach, niektórzy wchodzili na płaskie dachy lub wdrapywali się na drzewa i stamtąd ogłaszali, że — widzą pożar w Menuf albo w Sechem. Byli nawet i tacy, którzy pomimo zmroku dostrzegali uciekających mieszkańców albo libijskie bandy maszerujące w kierunku Pi-Bast długimi, czarnymi szeregami.
+      Toteż jeżeli którego wieczoru zachodni pas nieba czerwienił się zbyt długo, na mieszkańców Pi-Bast padała trwoga. Ludzie gromadzili się po ulicach, niektórzy wchodzili na płaskie dachy lub wdrapywali się na drzewa i stamtąd ogłaszali, że — widzą pożar w Menuf<a href="#fn255" class="link-note"></a> albo w Sechem<a href="#fn256" class="link-note"></a>. Byli nawet i tacy, którzy pomimo zmroku dostrzegali uciekających mieszkańców albo libijskie bandy maszerujące w kierunku Pi-Bast długimi, czarnymi szeregami.
     </p>
     <p data-index="4">
       Pomimo wzburzenia ludności rządcy nomesu zachowywali się obojętnie; władza bowiem centralna nie przysłała im żadnych rozkazów.
@@ -12661,7 +12661,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       W końcu przestał odwiedzać stojące pod Pi-Bast pułki, a natomiast, zgromadziwszy do pałacu całą szlachecką młodzież, bawił się i ucztował, tłumiąc w sercu oburzenie na kapłanów i obawę o losy państwa.
     </p>
     <p data-index="8">
-      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Zobaczysz!… — powiedział raz do Tutmozisa<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>. — Święci prorocy wykierują nas tak, że Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> zabierze Dolny Egipt, a my będziemy musieli uciekać do Tebów, jeżeli nie do Sunnu, o ile znowu stamtąd nie wypędzą nas Etiopowie…
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Zobaczysz!… — powiedział raz do Tutmozisa<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>. — Święci prorocy wykierują nas tak, że Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> zabierze Dolny Egipt, a my będziemy musieli uciekać do Tebów, jeżeli nie do Sunnu<a href="#fn257" class="link-note"></a>, o ile znowu stamtąd nie wypędzą nas Etiopowie<a href="#fn258" class="link-note"></a>…
     </p>
     <p data-index="9">
       <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span> — Prawdę rzekłeś — odparł Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span> — że nasi władcy poczynają sobie, jakby byli zdrajcami.
@@ -12910,7 +12910,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Tymczasem Mefres<span class="character-placeholder character-mention" data-character="Mefres" data-src-picture="/Pharaon/mefres.png" data-is-talking="false"></span> i Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> wracali do swych mieszkań, przy świątyni Ptah. Gdy znaleźli się sami w celi, arcykapłan<span class="character-placeholder character-mention" data-character="Mefres" data-src-picture="/Pharaon/mefres.png" data-is-talking="false"></span> podniósł ręce do góry i zawołał:
     </p>
     <p data-index="91">
-      <span class="character-placeholder character-talking" data-character="Mefres" data-src-moving="/Pharaon/mefres.png" data-is-talking="true"></span> — Trójco nieśmiertelnych bogów: Ozyrysie, Izydo i Horusie — ratujcie Egipt od zagłady!… Jak świat światem, żaden faraon nie wypowiedział tylu bluźnierstw, ile dziś usłyszeliśmy od tego dzieciaka… Co mówię — faraon?… Żaden wróg Egiptu, żaden Cheta, Fenicjanin, Libijczyk nie ośmieliłby się tak znieważać kapłańskiej nietykalności…
+      <span class="character-placeholder character-talking" data-character="Mefres" data-src-moving="/Pharaon/mefres.png" data-is-talking="true"></span> — Trójco nieśmiertelnych bogów: Ozyrysie, Izydo i Horusie — ratujcie Egipt od zagłady!… Jak świat światem, żaden faraon nie wypowiedział tylu bluźnierstw, ile dziś usłyszeliśmy od tego dzieciaka… Co mówię — faraon?… Żaden wróg Egiptu, żaden Cheta<a href="#fn259" class="link-note"></a>, Fenicjanin, Libijczyk nie ośmieliłby się tak znieważać kapłańskiej nietykalności…
     </p>
     <p data-index="92">
       <span class="character-placeholder character-talking" data-character="Mentezufis" data-src-moving="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true"></span> — Wino robi człowieka przezroczystym — odparł Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span>.
@@ -13033,7 +13033,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Kiedy po zakończeniu uroczystości trzej dostojnicy: Sem<span class="character-placeholder character-mention" data-character="Sem" data-src-picture="/Pharaon/sem.png" data-is-talking="false"></span>, Mefres<span class="character-placeholder character-mention" data-character="Mefres" data-src-picture="/Pharaon/mefres.png" data-is-talking="false"></span> i Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span>, zeszli się na poufną naradę, sytuacja była już wyjaśniona.
     </p>
     <p data-index="132">
-      Nabożeństwo przyniosło świątyni około czterdziestu talentów dochodu; lecz około sześćdziesięciu talentów wydano na prezenta lub spłatę długów rozmaitych osób z arystokracji tudzież wyższych wojskowych.
+      Nabożeństwo przyniosło świątyni około czterdziestu talentów dochodu; lecz około sześćdziesięciu talentów wydano na prezenta<a href="#fn260" class="link-note"></a> lub spłatę długów rozmaitych osób z arystokracji tudzież wyższych wojskowych.
     </p>
     <p data-index="133">
       Wiadomości zaś zebrano następujące:
@@ -13165,7 +13165,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       W całym mieście roili się żołnierze, a przy pałacu następcy<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> obozował pułk, który jadł, pił i śpiewał, ani myśląc o odpoczynku.
     </p>
     <p data-index="12">
-      Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> odszedł do najodleglejszego pokoju, lecz i tu nie pozwolono mu rozebrać się. Co kilka minut przylatywał jakiś adiutant z nic nie znaczącym raportem lub po rozkazy w sprawach, które mógł na miejscu rozstrzygnąć dowódca pułku. Przyprowadzano szpiegów, którzy nie przynosili żadnych nowych wiadomości; zgłaszali się wielcy panowie z małym pocztem ludzi, pragnąc księciu<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> ofiarować usługi jako ochotnicy. Dobijali się kupcy feniccy, pragnący wziąć dostawy dla wojska, lub dostawcy, którzy skarżyli się na wymagania jenerałów.
+      Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> odszedł do najodleglejszego pokoju, lecz i tu nie pozwolono mu rozebrać się. Co kilka minut przylatywał jakiś adiutant z nic nie znaczącym raportem lub po rozkazy w sprawach, które mógł na miejscu rozstrzygnąć dowódca pułku. Przyprowadzano szpiegów, którzy nie przynosili żadnych nowych wiadomości; zgłaszali się wielcy panowie z małym pocztem ludzi, pragnąc księciu<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> ofiarować usługi jako ochotnicy. Dobijali się kupcy feniccy, pragnący wziąć dostawy dla wojska, lub dostawcy, którzy skarżyli się na wymagania jenerałów<a href="#fn261" class="link-note"></a>.
     </p>
     <p data-index="13">
       Nie brakło nawet wróżbitów i astrologów, którzy w ostatniej chwili przed wymarszem chcieli księciu<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> stawiać horoskopy, tudzież czarnoksiężników, mających do sprzedania niezawodne amulety przeciw pociskom.
@@ -13240,7 +13240,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Pieszczota (Kama)" data-src-moving="/Pharaon/pieszczota-kama-speaks.mp4" data-is-talking="true"></span> — Precz, nędznico!… — zawołała — i nie pokazuj mi się…
     </p>
     <p data-index="37">
-      A gdy służąca uciekła, jej pani rzuciła się gorączkowo do swej tualety i otworzywszy parę słoików, za pomocą pędzelka umalowała sobie twarz na różowy kolor.
+      A gdy służąca uciekła, jej pani rzuciła się gorączkowo do swej tualety<a href="#fn262" class="link-note"></a> i otworzywszy parę słoików, za pomocą pędzelka umalowała sobie twarz na różowy kolor.
     </p>
     <p data-index="38">
       Nad wieczorem, czując wciąż ból w stawach i gorszy od bólu niepokój, kazała wezwać do siebie lekarza. Gdy powiedziano jej, że przyszedł, spojrzała w lustro i — napadł ją nowy atak jakby szaleństwa. Rzuciła lustro na podłogę i zawołała z płaczem, że nie chce lekarza.
@@ -14035,7 +14035,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Jest to oaza, niby wyspa wśród piaszczystego oceanu.
     </p>
     <p data-index="15">
-      Takich oaz za czasów faraonów było bardzo wiele, może kilkadziesiąt. Tworzyły one łańcuch wysp pustynnych wzdłuż zachodniej granicy Egiptu. Leżały w odległości dziesięciu, piętnastu lub dwudziestu mil jeograficznych od Nilu, a obejmowały po kilkanaście i kilkadziesiąt kilometrów kwadratowych powierzchni.
+      Takich oaz za czasów faraonów było bardzo wiele, może kilkadziesiąt. Tworzyły one łańcuch wysp pustynnych wzdłuż zachodniej granicy Egiptu. Leżały w odległości dziesięciu, piętnastu lub dwudziestu mil jeograficznych<a href="#fn263" class="link-note"></a> od Nilu, a obejmowały po kilkanaście i kilkadziesiąt kilometrów kwadratowych powierzchni.
     </p>
     <p data-index="16">
       Opiewane przez arabskich poetów oazy naprawdę nigdy nie były przedsionkami raju. Ich jeziora są najczęściej bagnami; z podziemnych źródlisk wypływa woda ciepła, niekiedy cuchnąca i obrzydliwie słona; roślinność ani mogła porównywać się z egipską. Niemniej ustronia te wydawały się cudem dla pustynnych wędrowców, którzy znajdowali w nich trochę zieloności dla oka tudzież odrobinę chłodu, wilgoci i daktylów.
@@ -14068,7 +14068,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       A ponieważ pełnomocnik króla Assara zdawał się nie ufać przysięgom, więc Herhor<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span> postanowił złożyć mu materialny dowód życzliwości i w tym celu wydał rozkaz natychmiastowego uwolnienia dwudziestu tysięcy wojsk najemnych, przeważnie Libijczyków.
     </p>
     <p data-index="26">
-      Dla uwolnionych, a nic niewinnych i zawsze wiernych żołnierzy postanowienie to było nieszczęściem nieomal równającym się karze śmierci. Przed Egiptem otwierało się niebezpieczeństwo wojny z Libią, która w żaden sposób nie mogła dać przytułku takiej masie ludzi, przywykłych tylko do musztry i wygód, nie zaś do pracy i nędzy. Ale Herhor<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span> i kapłani nie krępowali się drobiazgami, gdy chodziło o wielkie interesa państwowe.
+      Dla uwolnionych, a nic niewinnych i zawsze wiernych żołnierzy postanowienie to było nieszczęściem nieomal równającym się karze śmierci. Przed Egiptem otwierało się niebezpieczeństwo wojny z Libią, która w żaden sposób nie mogła dać przytułku takiej masie ludzi, przywykłych tylko do musztry i wygód, nie zaś do pracy i nędzy. Ale Herhor<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span> i kapłani nie krępowali się drobiazgami, gdy chodziło o wielkie interesa<a href="#fn264" class="link-note"></a> państwowe.
     </p>
     <p data-index="27">
       Naprawdę bowiem wypędzenie najemników libijskich przynosiło duże korzyści.
@@ -14083,7 +14083,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Po trzecie — wojna z Libią na zachodniej granicy była upustem dla bohaterskich instynktów następcy tronu<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> i na długi czas mogła odwrócić jego uwagę od spraw azjatyckich i od granicy wschodniej. Jego dostojność Herhor<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span> i rada najwyższa bardzo mądrze przypuszczali, że upłynie kilka lat, zanim Libijczycy, zużywszy się w partyzanckich walkach, zechcą prosić o pokój.
     </p>
     <p data-index="31">
-      Plan był rozsądny, lecz autorowie jego popełnili jeden błąd: nie przeczuli, że w księciu Ramzesie<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> tkwi materiał na genialnego wojownika.
+      Plan był rozsądny, lecz autorowie<a href="#fn265" class="link-note"></a> jego popełnili jeden błąd: nie przeczuli, że w księciu Ramzesie<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> tkwi materiał na genialnego wojownika.
     </p>
     <p data-index="32">
       Rozpuszczone pułki libijskie, rabując po drodze, bardzo prędko dotarły do swej ojczyzny; tym łatwiej, że Herhor<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span> nie kazał stawiać im przeszkód. Najpierwsi zaś spomiędzy wypędzonych stanąwszy na libijskiej ziemi niestworzone rzeczy opowiadali swoim rodakom.
@@ -14110,7 +14110,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> — choć przebiegły wódz i dyplomata — dał się złapać. Jako człowiek energiczny, natychmiast ogłosił przeciw Egiptowi świętą wojnę i — mając pod ręką tysiące dzielnych wojowników, pchnął pierwszy korpus ku wschodowi, pod dowództwem swego syna, dwudziestoletniego Tehenny<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span>.
     </p>
     <p data-index="40">
-      Stary barbarzyniec znał wojnę i rozumiał, że kto chce zwyciężyć, musi działać szybko, zadawać pierwsze ciosy.
+      Stary barbarzyniec<a href="#fn266" class="link-note"></a> znał wojnę i rozumiał, że kto chce zwyciężyć, musi działać szybko, zadawać pierwsze ciosy.
     </p>
     <p data-index="41">
       Przygotowania libijskie trwały bardzo krótko. Eks-żołnierze jego świątobliwości wprawdzie przyszli bez broni, lecz znali swoje rzemiosło, a w owych czasach o broń nie było trudno. Parę rzemyków czy parę kawałków sznurka na procę, włócznia albo zaostrzony kij, topór albo ciężka pałka, jedna torba kamyków a druga — daktylów, oto wszystko.
@@ -14122,7 +14122,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Dawno w pustyni nie panował taki ruch jak dzisiaj. Z każdej oazy wychodziła gromada za gromadą tak strasznych proletariuszów, że choć już byli prawie nadzy, jeszcze zasługiwali na nazwę oberwańców.
     </p>
     <p data-index="44">
-      Opierając się na zdaniu swoich doradców, którzy jeszcze miesiąc temu byli oficerami jego świątobliwości, Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> całkiem rozsądnie przypuszczał, że jego syn pierwej zrabuje kilkaset wsi i miasteczek od Terenuthis do Senti-Nofer, zanim spotka jakieś poważniejsze siły egipskie. Wreszcie doniesiono mu, że na pierwszą wieść o ruchu Libijczyków nie tylko uciekli wszyscy robotnicy z wielkiej huty szklannej, ale nawet, że cofnęło się wojsko zajmujące forteczki w Sochet-Hemau, nad Jeziorami Sodowymi.
+      Opierając się na zdaniu swoich doradców, którzy jeszcze miesiąc temu byli oficerami jego świątobliwości, Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> całkiem rozsądnie przypuszczał, że jego syn pierwej zrabuje kilkaset wsi i miasteczek od Terenuthis do Senti-Nofer<a href="#fn267" class="link-note"></a>, zanim spotka jakieś poważniejsze siły egipskie. Wreszcie doniesiono mu, że na pierwszą wieść o ruchu Libijczyków nie tylko uciekli wszyscy robotnicy z wielkiej huty szklannej<a href="#fn268" class="link-note"></a>, ale nawet, że cofnęło się wojsko zajmujące forteczki w Sochet-Hemau, nad Jeziorami Sodowymi<a href="#fn269" class="link-note"></a>.
     </p>
     <p data-index="45">
       Była to bardzo dobra wróżba dla barbarzyńców: huta bowiem szklanna stanowiła poważne źródło dochodów dla faraonowego skarbca.
@@ -14134,7 +14134,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Nie można nawet zarzucać Libijczykom nieprzezorności.
     </p>
     <p data-index="48">
-      Tehenna<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span> i jego sztab utworzyli bardzo porządną służbę wywiadowczą. Ich szpiegowie niejednokrotnie byli w Melcatis, Naucratis, Sai, Menuf, Terenuthis i przepływali kanopijskie i bolbityńskie ramiona Nilu. Nigdzie jednak nie spotkali wojsk, których ruchy musiał paraliżować wylew, a zaś prawie wszędzie widzieli popłoch ludności osiadłej, która po prostu uciekała ze wsi pogranicznych.
+      Tehenna<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span> i jego sztab utworzyli bardzo porządną służbę wywiadowczą. Ich szpiegowie<a href="#fn270" class="link-note"></a> niejednokrotnie byli w Melcatis<a href="#fn271" class="link-note"></a>, Naucratis<a href="#fn272" class="link-note"></a>, Sai<a href="#fn273" class="link-note"></a>, Menuf, Terenuthis i przepływali kanopijskie i bolbityńskie ramiona Nilu. Nigdzie jednak nie spotkali wojsk, których ruchy musiał paraliżować wylew, a zaś prawie wszędzie widzieli popłoch ludności osiadłej, która po prostu uciekała ze wsi pogranicznych.
     </p>
     <p data-index="49">
       Przynosili więc swemu dowódcy jak najlepsze wiadomości. A tymczasem armia księcia Ramzesa<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, pomimo wylewu, w osiem dni po uruchomieniu dotarła brzegu pustyni i zaopatrzona w wodę i żywność przepadła między górami Sodowych Jezior.
@@ -14149,7 +14149,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Od chwili kiedy wojska Dolnego Egiptu wyszły z Pi-Bast, towarzyszący księciu prorok Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> odbierał i wysyłał po kilka depesz dziennie.
     </p>
     <p data-index="2">
-      Jedną korespondencję prowadził z ministrem Herhorem<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span>. Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> posyłał raporta do Memfisu o posuwaniu się wojsk i o działalności następcy, dla której nie ukrywał podziwu; zaś dostojny Herhor<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span> robił uwagi w tym sensie, ażeby następcy tronu zostawiono wszelką swobodę i — że gdyby Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> przegrał pierwszą potyczkę, rada najwyższa nie byłaby tym zmartwiona.
+      Jedną korespondencję prowadził z ministrem Herhorem<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span>. Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> posyłał raporta<a href="#fn274" class="link-note"></a> do Memfisu o posuwaniu się wojsk i o działalności następcy, dla której nie ukrywał podziwu; zaś dostojny Herhor<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span> robił uwagi w tym sensie, ażeby następcy tronu zostawiono wszelką swobodę i — że gdyby Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> przegrał pierwszą potyczkę, rada najwyższa nie byłaby tym zmartwiona.
     </p>
     <p data-index="3">
       „Niewielka przegrana — pisał Herhor<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span> — byłaby nauką ostrożności i pokory dla księcia Ramzesa<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, który już dziś, choć jeszcze nic nie zrobił, uważa się za równego najdoświadczeńszym wojownikom.'
@@ -14185,7 +14185,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Przede wszystkim Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, za pośrednictwem swoich agentów, w wielu wsiach pogranicznych rozpuścił pogłoskę, że Libijczycy posuwają się w ogromnych masach, że będą niszczyć i mordować. Skutkiem tego przestraszona ludność zaczęła uciekać na wschód i — wpadła na egipskie pułki. Wówczas książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zabrał mężczyzn do dźwigania ciężarów za wojskiem, a kobiety i dzieci posłał w głąb kraju.
     </p>
     <p data-index="14">
-      Następnie naczelny wódz wyprawił szpiegów naprzeciw zbliżającym się Libijczykom, aby zbadać ich liczbę i porządek. Szpiegowie niebawem wrócili, przynosząc dokładne wskazówki co do miejsca pobytu, a bardzo przesadzone co do liczby nieprzyjaciół. Mylnie też twierdzili, choć z wielką pewnością siebie, że na czele band libijskich idzie sam Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> w towarzystwie swego syna Tehenny<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span>.
+      Następnie naczelny wódz wyprawił szpiegów naprzeciw zbliżającym się Libijczykom, aby zbadać ich liczbę i porządek. Szpiegowie<a href="#fn275" class="link-note"></a> niebawem wrócili, przynosząc dokładne wskazówki co do miejsca pobytu, a bardzo przesadzone co do liczby nieprzyjaciół. Mylnie też twierdzili, choć z wielką pewnością siebie, że na czele band libijskich idzie sam Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> w towarzystwie swego syna Tehenny<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span>.
     </p>
     <p data-index="15">
       Książę-wódz<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> aż zarumienił się z radości na myśl, że w pierwszej wojnie będzie miał tak doświadczonego przeciwnika jak Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span>.
@@ -14197,7 +14197,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Powiedzcie im — mówił Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> do swych agentów — powiedzcie im, że mam topory dla zuchwałych, a miłosierdzie dla pokornych. Jeżeli w nadchodzącej bitwie rzucą broń i opuszczą Musawasę<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span>, przyjmę ich na powrót do wojsk jego świątobliwości i każę wypłacić żołd zaległy, jak gdyby nigdy nie wychodzili ze służby.
     </p>
     <p data-index="18">
-      Patrokles<span class="character-placeholder character-mention" data-character="Patrokles" data-src-picture="/Pharaon/patrokles-listens.mp4" data-is-talking="false"></span> i inni jenerałowie uznali środek ten za bardzo roztropny; kapłani milczeli, a Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> wysłał depeszę do Herhora<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span> i w ciągu doby otrzymał odpowiedź.
+      Patrokles<span class="character-placeholder character-mention" data-character="Patrokles" data-src-picture="/Pharaon/patrokles-listens.mp4" data-is-talking="false"></span> i inni jenerałowie<a href="#fn276" class="link-note"></a> uznali środek ten za bardzo roztropny; kapłani milczeli, a Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> wysłał depeszę do Herhora<span class="character-placeholder character-mention" data-character="Herhor" data-src-picture="/Pharaon/herhor-listens.mp4" data-is-talking="false"></span> i w ciągu doby otrzymał odpowiedź.
     </p>
     <p data-index="19">
       Okolica Sodowych Jezior była to dolina mająca kilkadziesiąt kilometrów długości, zamknięta między dwoma pasmami wzgórz biegnących od południowego wschodu ku północnemu zachodowi. Największa jej szerokość nie przechodziła dziesięciu kilometrów; były zaś miejsca znakomicie węższe, prawie wąwozy.
@@ -14209,10 +14209,10 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Cały krajobraz, o barwach żółtych i białych, miał charakter strasznej martwoty, którą potęgowało gorąco i cisza. Żaden ptak nie odzywał się tutaj, a jeżeli kiedy rozległ się jaki szelest, to chyba staczającego się kamienia.
     </p>
     <p data-index="22">
-      Mniej więcej w połowie doliny wznosiły się dwie grupy budynków oddalonych od siebie na kilka kilometrów; były nimi — od wschodu forteczka, od zachodu huty szklane, do których opału dostarczali handlarze libijscy. Obie te miejscowości skutkiem wojennych niepokojów zostały opuszczone. Korpus Tehenny<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span> miał obowiązek zająć i osadzić oba te punkta, które armii Musawasy<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> ubezpieczały drogę do Egiptu.
+      Mniej więcej w połowie doliny wznosiły się dwie grupy budynków oddalonych od siebie na kilka kilometrów; były nimi — od wschodu forteczka, od zachodu huty szklane, do których opału dostarczali handlarze libijscy. Obie te miejscowości skutkiem wojennych niepokojów zostały opuszczone. Korpus Tehenny<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span> miał obowiązek zająć i osadzić oba te punkta<a href="#fn277" class="link-note"></a>, które armii Musawasy<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> ubezpieczały drogę do Egiptu.
     </p>
     <p data-index="23">
-      Libijczycy z wolna posuwali się od miasta Glaukus ku południowi i wieczorem dnia czternastego Hator znaleźli się u wejścia do doliny Sodowych Jezior, pewni, że przejdą ją dwoma marszami, bez przeszkód. Tegoż dnia, równo z zachodem słońca, armia egipska ruszyła ku pustyni i uszedłszy po piaskach przeszło czterdzieści kilometrów w ciągu dwunastu godzin, następnego ranka stanęła na wzgórzach między forteczką a hutami i ukryła się w licznych wąwozach.
+      Libijczycy z wolna posuwali się od miasta Glaukus<a href="#fn278" class="link-note"></a> ku południowi i wieczorem dnia czternastego Hator znaleźli się u wejścia do doliny Sodowych Jezior, pewni, że przejdą ją dwoma marszami, bez przeszkód. Tegoż dnia, równo z zachodem słońca, armia egipska ruszyła ku pustyni i uszedłszy po piaskach przeszło czterdzieści kilometrów w ciągu dwunastu godzin, następnego ranka stanęła na wzgórzach między forteczką a hutami i ukryła się w licznych wąwozach.
     </p>
     <p data-index="24">
       Gdyby owej nocy powiedział kto Libijczykom, że w dolinie Sodowych Jezior wyrosły palmy i pszenica, mniej zdziwiliby się aniżeli temu, że armia egipska zastąpiła im drogę.
@@ -14494,7 +14494,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       — Oto wódz potężny!… Zdeptał nieprzyjaciół Egiptu!… Amon jest po jego prawej i po lewej ręce, więc któż mu się oprze?…
     </p>
     <p data-index="117">
-      Tymczasem Libijczycy, wciąż cofając się, weszli na południowe pagórki piaszczyste, a za nimi Egipcjanie. Teraz co chwilę wynurzali się z obłoków kurzu jezdni i przybiegali do Ramzesa<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
+      Tymczasem Libijczycy, wciąż cofając się, weszli na południowe pagórki piaszczyste, a za nimi Egipcjanie. Teraz co chwilę wynurzali się z obłoków kurzu jezdni<a href="#fn279" class="link-note"></a> i przybiegali do Ramzesa<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="118">
       — Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> zabrał im tyły!… — krzyczał jeden.
@@ -14578,7 +14578,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Patrokles" data-src-moving="/Pharaon/patrokles-speaks.mp4" data-is-talking="true"></span> — Psy parszywe! — zawołał — którzy podnieśliście grzeszne ręce na wojsko jego świątobliwości (oby was robaki zjadły!), wyginiecie jak wszy pod paznogciem pobożnego Egipcjanina, jeżeli natychmiast nie odpowiecie: gdzie podział się wasz dowódca, bodaj mu trąd stoczył nozdrza i wypił kaprawe oczy!…
     </p>
     <p data-index="145">
-      W tej chwili nadjechał następca<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>. Jenerał powitał go z szacunkiem, ale nie przerywał śledztwa:
+      W tej chwili nadjechał następca<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>. Jenerał<a href="#fn280" class="link-note"></a> powitał go z szacunkiem, ale nie przerywał śledztwa:
     </p>
     <p data-index="146">
       <span class="character-placeholder character-talking" data-character="Patrokles" data-src-moving="/Pharaon/patrokles-speaks.mp4" data-is-talking="true"></span> — Pasy każę z was drzeć!… powbijam na pale, jeżeli natychmiast nie dowiem się, gdzie jest ta jadowita gadzina, ten pomiot dzikiej świni rzucony w mierzwę…
@@ -15016,7 +15016,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Co to robisz? — spytał kapłana<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="124">
-      <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span>— Tyle tylko mogę powiedzieć waszej dostojności — rzekł Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> — że bóstwo jedną ręką wskazuje gwiazdę Eshmun. Ona to w czasie nocy prowadzi przez morza fenickie okręty.
+      <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span>— Tyle tylko mogę powiedzieć waszej dostojności — rzekł Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> — że bóstwo jedną ręką wskazuje gwiazdę Eshmun<a href="#fn281" class="link-note"></a>. Ona to w czasie nocy prowadzi przez morza fenickie okręty.
     </p>
     <p data-index="125">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Więc i Fenicjanie mają tego boga?
@@ -15055,7 +15055,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zalecił czujność swemu oddziałowi i wziąwszy Pentuera<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>, wysunął się o kilkadziesiąt kroków naprzód.
     </p>
     <p data-index="137">
-      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Pentuerze<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> — odezwał się — od tej chwili mianuję cię moim doradcą i na teraz, i wówczas gdy podoba się bogom oddać mi koronę Górnego i Dolnego Egiptu…
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Pentuerze<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> — odezwał się — od tej chwili mianuję cię moim doradcą i na teraz, i wówczas gdy podoba<a href="#fn282" class="link-note"></a> się bogom oddać mi koronę Górnego i Dolnego Egiptu…
     </p>
     <p data-index="138">
       <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span>— Czymże zasłużyłem na tą łaskę?
@@ -15094,7 +15094,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       „Robak pożarł połowę jego zbioru, nosorożec drugą; na polach mnóstwo myszy, spadła szarańcza, bydło wygniotło, ukradły wróble. Co jeszcze zostało na klepisku, temu złodzieje zrobili koniec. O nędzo rolnika! Teraz dopiero przybywa pisarz na brzeg i upomina się o zbiór, towarzysze jego przynieśli kije, a Murzyni palmowe rózgi. Mówią: daj tu zboże!
     </p>
     <p data-index="150">
-      — Nie ma żadnego. — Biją go wtenczas, rozciągają jak długi i wiążą, rzucają do kanału, gdzie się topi, głową na dół. Żonę jego wiążą przed nim i dzieci takoż. Sąsiedzi uciekają, ratując swoje zboże…'
+      — Nie ma żadnego. — Biją go wtenczas, rozciągają jak długi i wiążą, rzucają do kanału, gdzie się topi, głową na dół. Żonę jego wiążą przed nim i dzieci takoż. Sąsiedzi uciekają, ratując swoje zboże…'<a href="#fn283" class="link-note"></a>
     </p>
     <p data-index="151">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Sam to widziałem — odparł zamyślony książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — i nawet odpędziłem jednego podobnego pisarza. Lecz czyliż mogę być wszędzie obecnym, ażeby zapobiegać niesprawiedliwości?
@@ -15169,7 +15169,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Czy w rzeczy samej — zapytał kapłana<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> — w pustyni ukazują się potwory?
     </p>
     <p data-index="175">
-      <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span>— Zapewne — rzekł Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> — że w miejscu tak odludnym snują się niedobre duchy w najosobliwszych postaciach. Zdaje mi się jednak, że to, co przeszło obok nas, jest raczej zwierzęciem. Podobne ono jest do osiodłanego konia, tylko większe i prędsze w biegu. Mówią zaś mieszkańcy oazów, że zwierzę to może wcale nie pić wody, a przynajmniej bardzo rzadko. Gdyby tak było, przyszłe pokolenia mogłyby używać do przebiegania pustyń tej dziwnej istoty, która dziś tylko strach budzi.
+      <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span>— Zapewne — rzekł Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> — że w miejscu tak odludnym snują się niedobre duchy w najosobliwszych postaciach. Zdaje mi się jednak, że to, co przeszło obok nas, jest raczej zwierzęciem. Podobne ono jest do osiodłanego konia, tylko większe i prędsze w biegu. Mówią zaś mieszkańcy oazów<a href="#fn284" class="link-note"></a>, że zwierzę to może wcale nie pić wody, a przynajmniej bardzo rzadko. Gdyby tak było, przyszłe pokolenia mogłyby używać do przebiegania pustyń tej dziwnej istoty, która dziś tylko strach budzi.
     </p>
     <p data-index="176">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Nie śmiałbym siąść na grzbiecie takiej poczwary! — odparł książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, potrząsając głową.
@@ -15325,7 +15325,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Nie mógłżeś więc zaczekać do mego powrotu?
     </p>
     <p data-index="26">
-      <span class="character-placeholder character-talking" data-character="Mentezufis" data-src-moving="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true"></span>— Ustawa każe zabijać, więc spełniłem jej wymagania.
+      <span class="character-placeholder character-talking" data-character="Mentezufis" data-src-moving="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true"></span>— Ustawa każe zabijać <strong>natychmiast</strong>, więc spełniłem jej wymagania.
     </p>
     <p data-index="27">
       Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> był tak oszołomiony, że przerwał dalszą rozmowę i udał się do swego namiotu. Tam dopiero upadłszy na fotel, rzekł do Tutmozisa<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>:
@@ -15409,7 +15409,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Cóż?… — spytał książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="54">
-      <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span>— Szpiegowie od granicy libijskiej przynoszą dziwne wieści — odparł ulubieniec. — Ku naszemu wąwozowi zbliża się wielki tłum, ale to nie jest wojsko, lecz bezbronni, kobiety i dzieci, a na ich czele Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> i najprzedniejsi Libijczycy…
+      <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-moving="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span>— Szpiegowie<a href="#fn285" class="link-note"></a> od granicy libijskiej przynoszą dziwne wieści — odparł ulubieniec. — Ku naszemu wąwozowi zbliża się wielki tłum, ale to nie jest wojsko, lecz bezbronni, kobiety i dzieci, a na ich czele Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> i najprzedniejsi Libijczycy…
     </p>
     <p data-index="55">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Cóż by to znaczyło?
@@ -15460,7 +15460,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> bardzo kochał wiernego jak pies Patroklesa<span class="character-placeholder character-mention" data-character="Patrokles" data-src-picture="/Pharaon/patrokles-listens.mp4" data-is-talking="false"></span>. Mógł zapomnieć wiele własnych krzywd, ale jego śmierci nie przebaczy nigdy.
     </p>
     <p data-index="71">
-      Przed południem do książęcego obozu nadciągnął z Egiptu świeży pułk tebański, a oprócz tego parę tysięcy ludzi i kilkaset osłów przyniosły wielkie zapasy żywności i namioty. Jednocześnie od strony Libii znowu nadbiegli szpiegowie donosząc, że banda ludzi bezbronnych, idących ku wąwozowi, wciąż powiększa się.
+      Przed południem do książęcego obozu nadciągnął z Egiptu świeży pułk tebański, a oprócz tego parę tysięcy ludzi i kilkaset osłów przyniosły wielkie zapasy żywności i namioty. Jednocześnie od strony Libii znowu nadbiegli szpiegowie<a href="#fn286" class="link-note"></a> donosząc, że banda ludzi bezbronnych, idących ku wąwozowi, wciąż powiększa się.
     </p>
     <p data-index="72">
       Z rozkazu następcy<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> gęste oddziałki jazdy we wszystkich kierunkach zbadały okolicę: czy nie ukrywa się gdzie nieprzyjacielska armia? Nawet kapłani, wziąwszy ze sobą małą kapliczkę Amona, weszli na szczyt najwyższego wzgórza i odprawili tam nabożeństwo. A wróciwszy do obozu zapewnili następcę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, że wprawdzie nadciąga kilkutysięczny tłum bezbronnych Libijczyków, ale armii nie ma nigdzie, co najmniej w trzymilowym promieniu.
@@ -15610,7 +15610,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       O dziewiątej rano przed namiot księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zajechał jego złocisty wóz wojenny. Konie ubrane w strusie pióra rwały się tak, że każdego z nich musiało pilnować dwu masztalerzy.
     </p>
     <p data-index="4">
-      Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> wyszedł z namiotu, siadł na wóz i sam ujął cugle, a miejsce woźnicy zajął przy nim kapłan Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>, doradca. Jeden z jenerałów roztoczył nad księciem<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> duży, zielony parasol, a z tyłu i po obu stronach wozu szli greccy oficerowie w pozłocistych zbrojach. W pewnej odległości za orszakiem księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> posuwał się mały oddział gwardii, a wśród niego Tehenna<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span>, syn libijskiego wodza Musawasy<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span>.
+      Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> wyszedł z namiotu, siadł na wóz i sam ujął cugle, a miejsce woźnicy zajął przy nim kapłan Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>, doradca. Jeden z jenerałów<a href="#fn287" class="link-note"></a> roztoczył nad księciem<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> duży, zielony parasol, a z tyłu i po obu stronach wozu szli greccy oficerowie w pozłocistych zbrojach. W pewnej odległości za orszakiem księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> posuwał się mały oddział gwardii, a wśród niego Tehenna<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span>, syn libijskiego wodza Musawasy<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span>.
     </p>
     <p data-index="5">
       O kilkaset kroków od Egipcjan, przy wyjściu z glaukońskiego wąwozu, stała smutna gromada Libijczyków błagających zwycięzcy o miłosierdzie.
@@ -15619,7 +15619,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Kiedy Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> wjechał ze swoją świtą na wzgórze, kędy miał przyjmować nieprzyjacielskie poselstwo, armia ku jego czci podniosła taki okrzyk, że chytry Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> zmartwił się jeszcze bardziej i szepnął do libijskiej starszyzny:
     </p>
     <p data-index="7">
-      — Zaprawdę mówię wam, jest to krzyk wojska, które miłuje swego wodza!…
+      <span class="character-placeholder character-talking" data-character="Musawasa" data-src-moving="/Pharaon/musawasa.png" data-is-talking="true"></span>— Zaprawdę mówię wam, jest to krzyk wojska, które miłuje swego wodza!…
     </p>
     <p data-index="8">
       Wówczas jeden z niespokojniejszych książąt libijskich, wielki bandyta, rzekł do Musawasy<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span>:
@@ -15628,7 +15628,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       — Czy nie myślisz, że w takiej chwili roztropniej uczynimy, ufając chyżości naszych koni, aniżeli łasce faraonowego syna?… Ma to być wściekły lew, który nawet głaszcząc zdziera skórę; my zaś jesteśmy jako jagnięta oderwane od cycków swej matki.
     </p>
     <p data-index="10">
-      — Czyń, jak chcesz — odparł Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> — całą pustynię masz przed sobą. Ale mnie lud wysłał na odkupienie swoich grzechów, a nade wszystko mam syna Tehennę<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span>, nad którym książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> rozleje swój gniew, jeżeli nie potrafię go przebłagać.
+      <span class="character-placeholder character-talking" data-character="Musawasa" data-src-moving="/Pharaon/musawasa.png" data-is-talking="true"></span>— Czyń, jak chcesz — odparł Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> — całą pustynię masz przed sobą. Ale mnie lud wysłał na odkupienie swoich grzechów, a nade wszystko mam syna Tehennę<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span>, nad którym książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> rozleje swój gniew, jeżeli nie potrafię go przebłagać.
     </p>
     <p data-index="11">
       Do gromady Libijczyków przycwałowali dwaj jezdni Azjaci, donosząc, że pan czeka na ich pokorę.
@@ -15652,31 +15652,31 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Przez ten czas Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> stojący na książęcym wozie szeptał swojemu panu:
     </p>
     <p data-index="18">
-      — Niech oblicze twoje nie pokaże im ani srogości, ani uciechy. Raczej bądź spokojny jak bóg Amon, który pogardza swymi wrogami i nie cieszy się z lada jakich triumfów…
+      <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span>— Niech oblicze twoje nie pokaże im ani srogości, ani uciechy. Raczej bądź spokojny jak bóg Amon, który pogardza swymi wrogami i nie cieszy się z lada jakich triumfów…
     </p>
     <p data-index="19">
       Nareszcie pokutujący Libijczycy stanęli przed obliczem księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, który ze złocistego wozu patrzył na nich jak srogi hipopotam na kaczęta nie mające gdzie ukryć się przed jego mocą.
     </p>
     <p data-index="20">
-      — Tyżeś to — nagle odezwał się Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — tyżeś to jest Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span>, mądry wódz libijski?
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Tyżeś to — nagle odezwał się Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — tyżeś to jest Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span>, mądry wódz libijski?
     </p>
     <p data-index="21">
-      — Jam jest twój sługa — odparł zapytany i znowu rzucił się na ziemię.
+      <span class="character-placeholder character-talking" data-character="Musawasa" data-src-moving="/Pharaon/musawasa.png" data-is-talking="true"></span>— Jam jest twój sługa — odparł zapytany i znowu rzucił się na ziemię.
     </p>
     <p data-index="22">
       Gdy mu kazano wstać, książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> mówił:
     </p>
     <p data-index="23">
-      — Jak mogłeś dopuścić się tak ciężkiego grzechu i podnieść rękę na ziemię bogów? Czyliżby opuściła cię dawna roztropność?
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> Jak mogłeś dopuścić się tak ciężkiego grzechu i podnieść rękę na ziemię bogów? Czyliżby opuściła cię dawna roztropność?
     </p>
     <p data-index="24">
-      — Panie! — odparł chytry Libijczyk — żal pomieszał rozumy wygnanym żołnierzom jego świątobliwości, więc biegli na własną zgubę, ciągnąc za sobą mnie i moich. I wiedzą bogowie, jak długo ciągnęłaby się ta brzydka wojna, gdyby na czele armii wiecznie żyjącego faraona nie stanął sam Amon w twojej postaci. Jak pustynny wicher spadłeś, kiedy cię nie oczekiwano, tam, gdzie cię nie oczekiwano, a jak byk łamie trzcinę, tak ty skruszyłeś zaślepionego nieprzyjaciela. Po czym wszystkie ludy nasze zrozumiały, że nawet straszne pułki libijskie dopóty są coś warte, dopóki rzuca nimi twoja ręka.
+      <span class="character-placeholder character-talking" data-character="Musawasa" data-src-moving="/Pharaon/musawasa.png" data-is-talking="true"></span>— Panie! — odparł chytry Libijczyk — żal pomieszał rozumy wygnanym żołnierzom jego świątobliwości, więc biegli na własną zgubę, ciągnąc za sobą mnie i moich. I wiedzą bogowie, jak długo ciągnęłaby się ta brzydka wojna, gdyby na czele armii wiecznie żyjącego faraona nie stanął sam Amon w twojej postaci. Jak pustynny wicher spadłeś, kiedy cię nie oczekiwano, tam, gdzie cię nie oczekiwano, a jak byk łamie trzcinę, tak ty skruszyłeś zaślepionego nieprzyjaciela. Po czym wszystkie ludy nasze zrozumiały, że nawet straszne pułki libijskie dopóty są coś warte, dopóki rzuca nimi twoja ręka.
     </p>
     <p data-index="25">
-      — Mądrze mówisz, Musawaso<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> — rzekł książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — a jeszcze lepiej uczyniłeś, żeś wyszedł naprzeciw armii boskiego faraona, nie czekając, aż ona przyjdzie do was. Rad bym jednak dowiedzieć się: o ile prawdziwą jest wasza pokora?
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Mądrze mówisz, Musawaso<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> — rzekł książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — a jeszcze lepiej uczyniłeś, żeś wyszedł naprzeciw armii boskiego faraona, nie czekając, aż ona przyjdzie do was. Rad bym jednak dowiedzieć się: o ile prawdziwą jest wasza pokora?
     </p>
     <p data-index="26">
-      — „Rozjaśnij oblicze, wielki mocarzu egipski — odpowiedział na to Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span>. — Przychodzimy do ciebie jako poddani, ażeby imię twoje było wielkim w Libii i ażebyś był naszym słońcem, jak jesteś słońcem dziewięciu ludów.
+      <span class="character-placeholder character-talking" data-character="Musawasa" data-src-moving="/Pharaon/musawasa.png" data-is-talking="true"></span>— „Rozjaśnij oblicze, wielki mocarzu egipski — odpowiedział na to Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span>. — Przychodzimy do ciebie jako poddani, ażeby imię twoje było wielkim w Libii i ażebyś był naszym słońcem, jak jesteś słońcem dziewięciu ludów.
     </p>
     <p data-index="27">
       Rozkaż tylko podwładnym twoim, aby byli sprawiedliwymi dla zawojowanego i do potęgi twej przyłączonego ludu. Niech twoi naczelnicy rządzą nami sumiennie i sprawiedliwie, a nie według złych chęci swoich, donosząc o nas fałszywie i pobudzając niełaskę twoją przeciw nam i dzieciom naszym. Rozkaż im, namiestniku dobrotliwego faraona, aby rządzili nami według woli twojej, oszczędzając swobodę, mienie, język i obyczaje ojców i przodków naszych.
@@ -15685,13 +15685,13 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Niech prawa twoje będą dla wszystkich poddanych ci ludów równe, niech urzędnicy twoi nie pobłażają jednym, a nie będą zbyt srogimi dla drugich. Niech wyroki ich będą dla wszystkich jednakie. Niech pobierają opłatę przeznaczoną na twe potrzeby i twój użytek, lecz nie podnoszą od nas innej w tajemnicy przed tobą, takiej, która nie wejdzie do skarbca twego, lecz wzbogaci tylko sługi twoje i sługi sług twoich.
     </p>
     <p data-index="29">
-      Każ rządzić nami bez krzywdy dla nas i dla dzieci naszych, wszak jesteś bogiem naszym i władcą na wieki. Naśladuj słońce, które dla wszystkich rozsiewa swój blask dający siłę i życie. Błagamy cię o twe łaski, my, libijscy poddani, i padamy czołem przed tobą, następco wielkiego i potężnego faraona.'
+      Każ rządzić nami bez krzywdy dla nas i dla dzieci naszych, wszak jesteś bogiem naszym i władcą na wieki. Naśladuj słońce, które dla wszystkich rozsiewa swój blask dający siłę i życie. Błagamy cię o twe łaski, my, libijscy poddani, i padamy czołem przed tobą, następco wielkiego i potężnego faraona.'<a href="#fn288" class="link-note"></a>
     </p>
     <p data-index="30">
       Tak mówił przebiegły książę libijski Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> i skończywszy, znowu upadł brzuchem na ziemię. A następcy faraona, kiedy słuchał tych mądrych słów, błyszczały oczy i rozszerzały się nozdrza jak młodemu ogierowi, który po sytnej paszy wybiega na łąkę między klacze.
     </p>
     <p data-index="31">
-      — Powstań, Musawaso<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> — odezwał się książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — i posłuchaj, co ci odpowiem. Los twój i twoich narodów nie zależy ode mnie, lecz od miłościwego pana, który tak wznosi się ponad nami wszystkimi jak niebo nad ziemią. Radzę ci więc, ażebyś ty i starszyzna libijska udali się stąd do Memfisu i tam, upadłszy na twarz przed władcą i bogiem tego świata, powtórzyli pokorną mowę, której tu wysłuchałem.
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Powstań, Musawaso<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span> — odezwał się książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — i posłuchaj, co ci odpowiem. Los twój i twoich narodów nie zależy ode mnie, lecz od miłościwego pana, który tak wznosi się ponad nami wszystkimi jak niebo nad ziemią. Radzę ci więc, ażebyś ty i starszyzna libijska udali się stąd do Memfisu i tam, upadłszy na twarz przed władcą i bogiem tego świata, powtórzyli pokorną mowę, której tu wysłuchałem.
     </p>
     <p data-index="32">
       Nie wiem, jaki będzie skutek waszych próśb; lecz ponieważ bogowie nigdy nie odwracają się od skruszonych i błagających, więc przeczuwam, że nie będziecie źle przyjęci.
@@ -15702,187 +15702,225 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
     <p data-index="34">
       W tej chwili Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> dał znak stojącemu na wozie księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> Pentuerowi<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>. A gdy ten zeszedł i zbliżył się ze czcią do świętego męża, Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> szepnął:
     </p>
-    <p data-index="35">
+    <Mentezufis data-index="35"></Mentezufis>
+    <p data-index="36">
       — Boję się, ażeby młodemu panu naszemu triumf nie za mocno uderzył do głowy. Czy nie sądzisz, że byłoby roztropnym przerwać w jaki sposób uroczystość?…
     </p>
-    <p data-index="36">
+    <Pentuer data-index="37"></Pentuer>
+    <p data-index="38">
       — Przeciwnie — odparł Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> — nie przerywajcie uroczystości, a ja wam ręczę, że podczas triumfu nie będzie miał wesołej twarzy.
     </p>
-    <p data-index="37">
+    <Mentezufis data-index="39"></Mentezufis>
+    <p data-index="40">
       — Zrobisz cud?
     </p>
-    <p data-index="38">
+    <Pentuer data-index="41"></Pentuer>
+    <p data-index="42">
       — Czyliżbym potrafił? Pokażę mu tylko, że na tym świecie wielkiej radości towarzyszą wielkie strapienia.
     </p>
-    <p data-index="39">
+    <Mentezufis data-index="43"></Mentezufis>
+    <p data-index="44">
       — Czyń, jak chcesz — rzekł Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> — gdyż bogowie dali ci mądrość godną członka najwyższej rady.
     </p>
-    <p data-index="40">
+    <p data-index="45">
       Odezwały się trąby i bębny i rozpoczęto pochód triumfalny.
     </p>
-    <p data-index="41">
+    <p data-index="46">
       Na czele szli nadzy niewolnicy z darami, pilnowani przez możnych Libijczyków. Więc niesiono złote i srebrne bogi, szkatułki napełnione wonnościami, emaliowane naczynia, tkaniny, sprzęty, wreszcie złote misy zasypane rubinami, szafirami i szmaragdami. Niewolnicy niosący je mieli ogolone głowy i opaski na ustach, ażeby który nie ukradł cennego klejnotu.
     </p>
-    <p data-index="42">
+    <p data-index="47">
       Książę Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> wsparł obie ręce o krawędź wozu i z wysokości pagórka patrzył na Libijczyków i swoje wojsko jak żółtogłowy orzeł na pstre kuropatwy. Duma wypełniała go od stóp do głów i wszyscy czuli, że nie można być potężniejszym nad tego zwycięskiego wodza.
     </p>
-    <p data-index="43">
+    <p data-index="48">
       W jednej chwili oczy księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> utraciły swój blask, a na twarzy odmalowało się przykre zdziwienie. To stojący za nim Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> szepnął:
     </p>
-    <p data-index="44">
+    <Pentuer data-index="49"></Pentuer>
+    <p data-index="50">
       — Nakłoń, panie, ucha twego… Od czasu kiedy opuściłeś miasto Pi-Bast, zaszły tam dziwne wydarzenia… Twoja kobieta, Kama<span class="character-placeholder character-mention" data-character="Pieszczota (Kama)" data-src-picture="/Pharaon/pieszczota-kama-listens.mp4" data-is-talking="false"></span> Fenicjanka, uciekła z Grekiem Lykonem<span class="character-placeholder character-mention" data-character="Lykon" data-src-picture="/Pharaon/lykon.png" data-is-talking="false"></span>…
     </p>
-    <p data-index="45">
+    <Ksiaze-Ramzes data-index="51"></Ksiaze-Ramzes>
+    <p data-index="52">
       — Z Lykonem<span class="character-placeholder character-mention" data-character="Lykon" data-src-picture="/Pharaon/lykon.png" data-is-talking="false"></span>?… — powtórzył książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
-    <p data-index="46">
+    <Pentuer data-index="53"></Pentuer>
+    <p data-index="54">
       — Nie poruszaj się, panie, i nie okazuj tysiącom twoich niewolników, że masz smutek w dniu triumfu…
     </p>
-    <p data-index="47">
+    <p data-index="55">
       W tej chwili przechodził u stóp księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> bardzo długi sznur Libijczyków niosących w koszach owoce i chleby, a w ogromnych dzbanach wino i oliwę dla wojska. Na ten widok wśród karnego żołnierstwa rozległ się szmer radości, ale Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> nie spostrzegł tego, zajęty opowiadaniem Pentuera<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>.
     </p>
-    <p data-index="48">
+    <Pentuer data-index="56"></Pentuer>
+    <p data-index="57">
       — Bogowie — szeptał prorok — ukarali zdradziecką Fenicjankę…
     </p>
-    <p data-index="49">
+    <Ksiaze-Ramzes data-index="58"></Ksiaze-Ramzes>
+    <p data-index="59">
       — Złapana?… — spytał książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
-    <p data-index="50">
+    <Pentuer data-index="60"></Pentuer>
+    <p data-index="61">
       — Złapana, ale musiano ją wysłać do wschodnich kolonii… Spadł bowiem na nią trąd…
     </p>
-    <p data-index="51">
+    <Ksiaze-Ramzes data-index="62"></Ksiaze-Ramzes>
+    <p data-index="63">
       — O bogowie!… — szepnął Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>. — Czy aby mnie on nie grozi?…
     </p>
-    <p data-index="52">
+    <Pentuer data-index="64"></Pentuer>
+    <p data-index="65">
       — Bądź spokojny, panie: gdybyś się zaraził, już byś go miał…
     </p>
-    <p data-index="53">
+    <p data-index="66">
       Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> poczuł zimno we wszystkich członkach. Jakże łatwo bogom z najwyższych szczytów zepchnąć człowieka w przepaść najgłębszej nędzy!…
     </p>
-    <p data-index="54">
+    <Ksiaze-Ramzes data-index="67"></Ksiaze-Ramzes>
+    <p data-index="68">
       — A tenże nikczemny Lykon<span class="character-placeholder character-mention" data-character="Lykon" data-src-picture="/Pharaon/lykon.png" data-is-talking="false"></span>?…
     </p>
-    <p data-index="55">
+    <Pentuer data-index="69"></Pentuer>
+    <p data-index="70">
       — Jest to wielki zbrodniarz — mówi Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> — zbrodniarz, jakich niewielu wydała ziemia…
     </p>
-    <p data-index="56">
+    <Ksiaze-Ramzes data-index="71"></Ksiaze-Ramzes>
+    <p data-index="72">
       — Znam go. Jest podobny do mnie jak obraz odbity w lustrze… — odparł Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
-    <p data-index="57">
+    <p data-index="73">
       Teraz nadciągnęła gromada Libijczyków prowadzących osobliwe zwierzęta. Na czele szedł jednogarbny wielbłąd z białawym włosem, jeden z pierwszych, jakiego złapano w pustyni. Za nim dwa nosorożce, stado koni i oswojony lew w klatce. A dalej mnóstwo klatek z różnobarwnymi ptakami, małpkami i małymi pieskami, przeznaczonymi dla dam dworskich. W końcu pędzono wielkie stada wołów i baranów na mięso dla wojska.
     </p>
-    <p data-index="58">
+    <p data-index="74">
       Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> ledwo rzucił okiem na wędrujący zwierzyniec i pytał kapłana:
     </p>
-    <p data-index="59">
+    <Ksiaze-Ramzes data-index="75"></Ksiaze-Ramzes>
+    <p data-index="76">
       — A Lykon<span class="character-placeholder character-mention" data-character="Lykon" data-src-picture="/Pharaon/lykon.png" data-is-talking="false"></span> schwytany?…
     </p>
-    <p data-index="60">
+    <Pentuer data-index="77"></Pentuer>
+    <p data-index="78">
       — Teraz powiem ci najgorszą rzecz, nieszczęśliwy panie — szeptał Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>. — Pamiętaj jednak, aby nieprzyjaciele Egiptu nie dostrzegli smutku w tobie…
     </p>
-    <p data-index="61">
+    <p data-index="79">
       Następca poruszył się.
     </p>
-    <p data-index="62">
+    <Pentuer data-index="80"></Pentuer>
+    <p data-index="81">
       — Twoja druga kobieta, Sara<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span> Żydówka…
     </p>
-    <p data-index="63">
+    <Ksiaze-Ramzes data-index="82"></Ksiaze-Ramzes>
+    <p data-index="83">
       — Czy także uciekła?…
     </p>
-    <p data-index="64">
+    <Pentuer data-index="84"></Pentuer>
+    <p data-index="85">
       — Zmarła w więzieniu…
     </p>
-    <p data-index="65">
+    <Ksiaze-Ramzes data-index="86"></Ksiaze-Ramzes>
+    <p data-index="87">
       — O bogowie!… Któż śmiał ją wtrącić?…
     </p>
-    <p data-index="66">
+    <Pentuer data-index="88"></Pentuer>
+    <p data-index="89">
       — Sama oskarżyła się o zabójstwo syna twego…
     </p>
-    <p data-index="67">
+    <Ksiaze-Ramzes data-index="90"></Ksiaze-Ramzes>
+    <p data-index="91">
       — Co?…
     </p>
-    <p data-index="68">
+    <p data-index="92">
       Wielki krzyk rozległ się u stóp księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>: maszerowali jeńcy libijscy wzięci podczas bitwy, a na ich czele smutny Tehenna<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span>.
     </p>
-    <p data-index="69">
+    <p data-index="93">
       Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> miał w tej chwili serce tak przepełnione bólem, że skinął na Tehennę<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span> i rzekł:
     </p>
-    <p data-index="70">
+    <Ksiaze-Ramzes data-index="94"></Ksiaze-Ramzes>
+    <p data-index="95">
       — Stań przy ojcu twoim, Musawasie<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span>, ażeby widział i dotknął cię, że żyjesz…
     </p>
-    <p data-index="71">
+    <p data-index="96">
       Na te słowa wszyscy Libijczycy i całe wojsko wydało potężny okrzyk; ale książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> nie słuchał go.
     </p>
-    <p data-index="72">
+    <Ksiaze-Ramzes data-index="97"></Ksiaze-Ramzes>
+    <p data-index="98">
       — Syn mój nie żyje?… — pytał kapłana. — Sara<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span> oskarżyła się o dzieciobójstwo?… Czy szaleństwo padło na jej duszę?…
     </p>
-    <p data-index="73">
+    <Pentuer data-index="99"></Pentuer>
+    <p data-index="100">
       — Dziecko zabił nikczemny Lykon<span class="character-placeholder character-mention" data-character="Lykon" data-src-picture="/Pharaon/lykon.png" data-is-talking="false"></span>…
     </p>
-    <p data-index="74">
+    <Ksiaze-Ramzes data-index="101"></Ksiaze-Ramzes>
+    <p data-index="102">
       — O bogowie, dajcie mi siły!… — jęknął książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
-    <p data-index="75">
+    <Pentuer data-index="103"></Pentuer>
+    <p data-index="104">
       — Hamuj się, panie, jak przystało na zwycięskiego wodza…
     </p>
-    <p data-index="76">
+    <Ksiaze-Ramzes data-index="105"></Ksiaze-Ramzes>
+    <p data-index="106">
       — Czyliż podobna zwyciężyć taką boleść!… O niemiłosierni bogowie!…
     </p>
-    <p data-index="77">
+    <Pentuer data-index="107"></Pentuer>
+    <p data-index="108">
       — Dziecko zabił Lykon<span class="character-placeholder character-mention" data-character="Lykon" data-src-picture="/Pharaon/lykon.png" data-is-talking="false"></span>, Sara<span class="character-placeholder character-mention" data-character="Sara" data-src-picture="/Pharaon/sara-listens.mp4" data-is-talking="false"></span> zaś oskarżyła się, ażeby ciebie ocalić… Widząc bowiem mordercę w nocy, myślała, że to ty sam byłeś…
     </p>
-    <p data-index="78">
+    <Ksiaze-Ramzes data-index="109"></Ksiaze-Ramzes>
+    <p data-index="110">
       — A ja ją wygnałem z mego domu!… A ja zrobiłem ją służebnicą Fenicjanki!… — szeptał książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
-    <p data-index="79">
+    <p data-index="111">
       Teraz ukazali się egipscy żołnierze, niosący pełne kosze rąk uciętych poległym Libijczykom.
     </p>
-    <p data-index="80">
+    <p data-index="112">
       Na ten widok książę Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zasłonił twarz swoją i gorzko zapłakał.
     </p>
-    <p data-index="81">
+    <p data-index="113">
       Natychmiast jenerałowie otoczyli wóz, pocieszając pana. Zaś święty prorok Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> podał wniosek, który przyjęto bez namysłu, ażeby od tej pory wojsko egipskie już nigdy nie ucinało rąk poległym w boju nieprzyjaciołom.
     </p>
-    <p data-index="82">
+    <p data-index="114">
       Tym nieprzewidzianym wypadkiem zakończył się pierwszy triumf następcy egipskiego tronu. Ale łzy, jakie wylał nad uciętymi rękoma, mocniej aniżeli zwycięska bitwa przywiązały do niego Libijczyków. Nikt też nie dziwił się, że dokoła ognisk zasiedli w zgodzie żołnierze egipscy i Libijczycy, dzieląc się chlebem i pijąc wino z tych samych kubków. Miejsce wojny i nienawiści, które miały trwać całe lata, zajęło głębokie uczucie spokoju i zaufania.
     </p>
-    <p data-index="83">
+    <p data-index="115">
       Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> polecił, ażeby Musawasa<span class="character-placeholder character-mention" data-character="Musawasa" data-src-picture="/Pharaon/musawasa.png" data-is-talking="false"></span>, Tehenna<span class="character-placeholder character-mention" data-character="Tehenna" data-src-picture="/Pharaon/tehenna.png" data-is-talking="false"></span> i najprzedniejsi Libijczycy natychmiast jechali z darami do Memfisu, i dał im eskortę, nie tyle do pilnowania ich, ile dla bezpieczeństwa ich osób i wiezionych skarbów. Sam zaś ukrył się w namiocie i nie pokazał się przez kilka godzin. Nie przyjął nawet Tutmozisa<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>, jak człowiek, któremu boleść starczy za najmilsze towarzystwo.
     </p>
-    <p data-index="84">
+    <p data-index="116">
       Ku wieczorowi przyszła do księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> deputacja greckich oficerów pod dowództwem Kaliposa<span class="character-placeholder character-mention" data-character="Kalipos" data-src-picture="/Pharaon/kalipos.png" data-is-talking="false"></span>. Kiedy następca zapytał: czego chcą?… Kalipos<span class="character-placeholder character-mention" data-character="Kalipos" data-src-picture="/Pharaon/kalipos.png" data-is-talking="false"></span> odparł:
     </p>
-    <p data-index="85">
+    <Kalipos data-index="117"></Kalipos>
+    <p data-index="118">
       — Przychodzimy błagać cię, panie, ażeby ciało naszego wodza, a twego sługi, Patroklesa<span class="character-placeholder character-mention" data-character="Patrokles" data-src-picture="/Pharaon/patrokles-listens.mp4" data-is-talking="false"></span>, nie było wydane egipskim kapłanom, lecz spalone według greckiego obyczaju.
     </p>
-    <p data-index="86">
+    <p data-index="119">
       Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zdziwił się.
     </p>
-    <p data-index="87">
+    <Ksiaze-Ramzes data-index="120"></Ksiaze-Ramzes>
+    <p data-index="121">
       — Chyba wiadomo wam — rzekł — że ze zwłok Patroklesa<span class="character-placeholder character-mention" data-character="Patrokles" data-src-picture="/Pharaon/patrokles-listens.mp4" data-is-talking="false"></span> kapłani chcą zrobić mumię pierwszej klasy i umieścić ją przy grobach faraonów. Czy może większy zaszczyt spotkać człowieka na tym świecie?
     </p>
-    <p data-index="88">
+    <p data-index="122">
       Grecy wahali się, wreszcie Kalipos<span class="character-placeholder character-mention" data-character="Kalipos" data-src-picture="/Pharaon/kalipos.png" data-is-talking="false"></span>, zebrawszy odwagę, odpowiedział:
     </p>
-    <p data-index="89">
+    <Kalipos data-index="123"></Kalipos>
+    <p data-index="124">
       — Panie nasz, pozwól otworzyć serce przed tobą. Dobrze wiemy, że zrobienie mumii jest dla człowieka korzystniejszym niż spalenie go. Gdy bowiem dusza spalonego natychmiast przenosi się do krajów wiekuistych, dusza zabalsamowanego może tysiące lat żyć na tej ziemi i cieszyć się jej pięknością.
     </p>
-    <p data-index="90">
+    <p data-index="125">
       Ale egipscy kapłani, wodzu (niech to nie obraża twoich uszu!), nienawidzili Patroklesa<span class="character-placeholder character-mention" data-character="Patrokles" data-src-picture="/Pharaon/patrokles-listens.mp4" data-is-talking="false"></span>. Któż więc nas zapewni, że kapłani, zrobiwszy jego mumię, nie w tym celu zatrzymają duszę na ziemi, aby ją poddać udręczeniom?… I co my bylibyśmy warci, gdybyśmy, podejrzewając zemstę, nie uchronili od niej duszy naszego ziomka i dowódcy?…
     </p>
-    <p data-index="91">
+    <p data-index="126">
       Zdziwienie Ramzesa<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> jeszcze bardziej wzrosło.
     </p>
-    <p data-index="92">
+    <Ksiaze-Ramzes data-index="127"></Ksiaze-Ramzes>
+    <p data-index="128">
       — Czyńcie — rzekł — jak uważacie za potrzebne.
     </p>
-    <p data-index="93">
+    <Kalipos data-index="129"></Kalipos>
+    <p data-index="130">
       — A jeżeli nie wydadzą nam ciała?…
     </p>
-    <p data-index="94">
+    <Ksiaze-Ramzes data-index="131"></Ksiaze-Ramzes>
+    <p data-index="132">
       — Tylko przygotujcie stos, a resztą sam się zajmę.
     </p>
-    <p data-index="95">
+    <p data-index="133">
       Grecy wyszli, książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> posłał po Mentezufisa<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span>.
     </p>
   </section></section>
@@ -15982,28 +16020,28 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Mentezufis" data-src-moving="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true"></span>— Ale możemy powiedzieć następcy faraona<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="32">
-      Wasza dostojność wiesz — ciągnął kapłan<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> — że ludzka istota składa się z trzech części: ciała, iskry bożej i cienia, czyli, który łączy ciało z iskrą bożą.
+      Wasza dostojność wiesz — ciągnął kapłan<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> — że ludzka istota składa się z trzech części: ciała, iskry bożej i cienia, czyli <strong>Ka</strong>, który łączy ciało z iskrą bożą.
     </p>
     <p data-index="33">
-      Gdy człowiek umiera, jego cień tudzież iskra odłączają się od ciała. Gdyby człowiek żył bez grzechu, jego iskra boża wraz z cieniem natychmiast poszłaby między bogów, na wiekuiste życie. Ale każdy człowiek grzeszy, plami się na tym świecie, skutkiem czego jego cień,, musi się oczyszczać, niekiedy przez tysiące lat. Zaś oczyszcza się w ten sposób, że niewidzialny błąka się po naszej ziemi, pomiędzy ludźmi, i spełnia dobre uczynki. Chociaż cienie zbrodniarzy nawet w zagrobowym życiu dopuszczają się występków i ostatecznie gubią i siebie, i zawartą w nich iskrę bożą.
+      Gdy człowiek umiera, jego cień tudzież iskra odłączają się od ciała. Gdyby człowiek żył bez grzechu, jego iskra boża wraz z cieniem natychmiast poszłaby między bogów, na wiekuiste życie. Ale każdy człowiek grzeszy, plami się na tym świecie, skutkiem czego jego cień, <strong>Ka</strong>, musi się oczyszczać, niekiedy przez tysiące lat. Zaś oczyszcza się w ten sposób, że niewidzialny błąka się po naszej ziemi, pomiędzy ludźmi, i spełnia dobre uczynki. Chociaż cienie zbrodniarzy nawet w zagrobowym życiu dopuszczają się występków i ostatecznie gubią i siebie, i zawartą w nich iskrę bożą.
     </p>
     <p data-index="34">
-      Otóż, co dla waszej dostojności nie jest chyba tajemnicą, ów cień,, jest zupełnie podobny do człowieka, tylko wygląda, jakby był utkany z bardzo delikatnej mgły. Cień ma głowę, ręce i tułów, może chodzić, mówić, rzucać lub podnosić przedmioty, ubiera się jak człowiek, a nawet, osobliwie przez kilkaset pierwszych lat po śmierci, musi od czasu do czasu nieco posilać się. Później bowiem wystarczają mu wizerunki pokarmów…
+      Otóż, co dla waszej dostojności nie jest chyba tajemnicą, ów cień, <strong>Ka</strong>, jest zupełnie podobny do człowieka, tylko wygląda, jakby był utkany z bardzo delikatnej mgły. Cień ma głowę, ręce i tułów, może chodzić, mówić, rzucać lub podnosić przedmioty, ubiera się jak człowiek, a nawet, osobliwie przez kilkaset pierwszych lat po śmierci, musi od czasu do czasu nieco posilać się. Później bowiem wystarczają mu wizerunki pokarmów…
     </p>
     <p data-index="35">
-      Główną jednak siłę swoją cień czerpie z ciała, które po nim zostaje na ziemi. Gdy więc ciało rzucimy do grobu, ono prędko psuje się i cień musi nasycać się prochem i zgnilizną. Gdy ciało spalimy, cień ma tylko popioły do krzepienia się. Ale gdy z ciała zrobimy mumię, czyli gdy ciało zabalsamujemy na tysiące lat, cieńzawsze jest zdrów i silny i epokę swego oczyszczenia przepędza spokojnie, nawet przyjemnie.
+      Główną jednak siłę swoją cień czerpie z ciała, które po nim zostaje na ziemi. Gdy więc ciało rzucimy do grobu, ono prędko psuje się i cień musi nasycać się prochem i zgnilizną. Gdy ciało spalimy, cień ma tylko popioły do krzepienia się. Ale gdy z ciała zrobimy mumię, czyli gdy ciało zabalsamujemy na tysiące lat, cień <strong>Ka</strong>zawsze jest zdrów i silny i epokę swego oczyszczenia przepędza spokojnie, nawet przyjemnie.
     </p>
     <p data-index="36">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Dziwne rzeczy!… — szepnął następca<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="37">
-      <span class="character-placeholder character-talking" data-character="Mentezufis" data-src-moving="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true"></span>— O życiu zagrobowym kapłani, w ciągu tysiącletnich badań, dowiedzieli się bardzo ważnych szczegółów. Przekonano się, że gdy w ciele zmarłego zostają wnętrzności, jego cieńma ogromny apetyt, potrzebuje tyleż pokarmów, co człowiek; a gdy pokarmu zabraknie, wówczas rzuca się na żyjących i wysysa z nich krew. Lecz gdy usuwa się ze zwłok wnętrzności, jak my to robimy, wówczas cień prawie obywa się bez pokarmu: jego własne ciało, zabalsamowane i napełnione silnie pachnącymi ziołami, wystarcza mu na miliony lat.
+      <span class="character-placeholder character-talking" data-character="Mentezufis" data-src-moving="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true"></span>— O życiu zagrobowym kapłani, w ciągu tysiącletnich badań, dowiedzieli się bardzo ważnych szczegółów. Przekonano się, że gdy w ciele zmarłego zostają wnętrzności, jego cień <strong>Ka</strong>ma ogromny apetyt, potrzebuje tyleż pokarmów, co człowiek; a gdy pokarmu zabraknie, wówczas rzuca się na żyjących i wysysa z nich krew. Lecz gdy usuwa się ze zwłok wnętrzności, jak my to robimy, wówczas cień prawie obywa się bez pokarmu: jego własne ciało, zabalsamowane i napełnione silnie pachnącymi ziołami, wystarcza mu na miliony lat.
     </p>
     <p data-index="38">
       Również sprawdzono, że gdy grób zmarłego jest pusty, cień tęskni za światem i włóczy się po ziemi bez potrzeby. Lecz gdy w kaplicy pośmiertnej złożymy odzienie, sprzęty, broń, naczynia i narzędzia, które zmarły lubił, gdy ściany pokryjemy malowidłami przedstawiającymi: uczty, polowania, nabożeństwa, wojny i w ogóle wypadki, w których nieboszczyk przyjmował udział, gdy jeszcze dodamy mu posążki osób z jego rodziny, służby, koni, psów i bydła, wówczas cień nie wychodzi bez potrzeby na świat, gdyż znajduje go w swym domu zmarłych.
     </p>
     <p data-index="39">
-      Nareszcie przekonano się, że wiele cieniów, nawet po odbyciu pokuty, nie może wejść do krainy wiecznego szczęścia, ponieważ nie znają stosownych modlitw, zaklęć i rozmów z bogami. Zapobiegamy temu owijając mumię w papirusy, na których są wypisane sentencje, i — kładąc im do trumien Księgę Zmarłych.
+      Nareszcie przekonano się, że wiele cieniów, nawet po odbyciu pokuty, nie może wejść do krainy wiecznego szczęścia, ponieważ nie znają stosownych modlitw, zaklęć i rozmów z bogami. Zapobiegamy temu owijając mumię w papirusy, na których są wypisane sentencje, i — kładąc im do trumien Księgę Zmarłych<a href="#fn289" class="link-note"></a>.
     </p>
     <p data-index="40">
       Jednym słowem nasz rytuał pogrzebowy zapewnia cieniowi siły, chroni go od niewygód i tęsknoty za ziemią, ułatwia mu wejście między bogów i — zabezpiecza żywych ludzi od szkód, jakie mogłyby im wyrządzić cienie. Nasza wielka troskliwość o zmarłych to właśnie ma na celu; dlatego stawiamy im prawie pałace, a w nich — najozdobniejsze mieszkania.
@@ -16015,7 +16053,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Rozumiem, że wyświadczacie wielką łaskę bezsilnym i bezbronnym cieniom, zaopatrując ich w ten sposób. Lecz… kto mi powie, że cienie istnieją…
     </p>
     <p data-index="43">
-      O tym, że jest bezwodna pustynia — ciągnął książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — wiem, bo ją widzę, bom tonął w jej piaskach i doświadczyłem jej żarów. O tym, że są krainy, w których woda kamienieje, a para zamienia się na białe puchy, także wiem, bo mówili wiarogodni świadkowie…
+      O tym, że jest bezwodna pustynia — ciągnął książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — wiem, bo ją widzę, bom tonął w jej piaskach i doświadczyłem jej żarów. O tym, że są krainy, w których woda kamienieje, a para zamienia się na białe puchy, także wiem, bo mówili wiarogodni<a href="#fn290" class="link-note"></a> świadkowie…
     </p>
     <p data-index="44">
       Ale skąd wy wiecie o cieniach, których nikt nie widział, i o ich życiu pośmiertnym, skoro stamtąd nie wrócił żaden człowiek?
@@ -16039,7 +16077,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Mentezufis" data-src-moving="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true"></span>— Wiedz o tym, panie — prawił Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> — że cień jest w każdym żyjącym człowieku. A jak są ludzie odznaczający się ogromną siłą lub arcybystrym wzrokiem, tak są i tacy ludzie, którzy posiadają niezwykły dar, że — mogą za życia wydzielać swój własny cień…
     </p>
     <p data-index="51">
-      Nasze tajemne księgi pełne są najwiarogodniejszych opowiadań w tej sprawie. Niejeden prorok umiał zapadać w sen podobny do śmierci. Wówczas jego cień oddzieliwszy się od ciała w jednej chwili przenosił się do Tyru, Niniwy, Babilonu, oglądał rzeczy potrzebne, przysłuchiwał się naradom obchodzącym nas i — po przebudzeniu się proroka — zdawał jak najdokładniejsze sprawozdanie. Niejeden zły czarownik również zasnąwszy wysyłał swój cień do domu nienawidzonego człowieka, a tam wywracał lub niszczył sprzęty i straszył całą rodzinę.
+      Nasze tajemne księgi pełne są najwiarogodniejszych<a href="#fn291" class="link-note"></a> opowiadań w tej sprawie. Niejeden prorok umiał zapadać w sen podobny do śmierci. Wówczas jego cień oddzieliwszy się od ciała w jednej chwili przenosił się do Tyru, Niniwy, Babilonu, oglądał rzeczy potrzebne, przysłuchiwał się naradom obchodzącym nas i — po przebudzeniu się proroka — zdawał jak najdokładniejsze sprawozdanie. Niejeden zły czarownik również zasnąwszy wysyłał swój cień do domu nienawidzonego człowieka, a tam wywracał lub niszczył sprzęty i straszył całą rodzinę.
     </p>
     <p data-index="52">
       Zdarzało się, że człowiek napastowany przez cienia czarnoksiężnika uderzał go włócznią lub mieczem. Wówczas w domu nawiedzanym ukazywały się krwawe ślady, a czarnoksiężnik miał na swym ciele tę właśnie ranę, którą zadano cieniowi.
@@ -16072,7 +16110,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Mentezufis" data-src-moving="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true"></span>— Zbyt wiele osób ściga tego nikczemnika, ażeby w końcu nie został pojmany — rzekł Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span>. — A gdy raz wpadnie w nasze ręce, Egipt zapłaci mu za zgryzoty, jakie uczynił jego następcy tronu<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>. Wierzaj mi, panie, możesz mu z góry przebaczyć wszystkie występki, kara bowiem odpowie ich wielkości.
     </p>
     <p data-index="62">
-      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Wolałbym go sam mieć w rękach — odparł książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>. — Zawsze to niebezpieczna rzecz taki „cień' za życia!…
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span>— Wolałbym go sam mieć w rękach — odparł książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>. — Zawsze to niebezpieczna rzecz taki „cień' za życia!…<a href="#fn292" class="link-note"></a>
     </p>
     <p data-index="63">
       Nie bardzo zbudowany podobnym zakończeniem swego wykładu, święty Mentezufis<span class="character-placeholder character-mention" data-character="Mentezufis" data-src-picture="/Pharaon/mentezufis-listens.mp4" data-is-talking="false"></span> pożegnał księcia<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>. Po nim wszedł do namiotu Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span>, zawiadamiając, że Grecy już układają stos dla swojego wodza i że kilkanaście libijskich kobiet zgodziło się płakać w czasie pogrzebowego obchodu.
@@ -16327,7 +16365,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Po przychylnej odpowiedzi pana<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> Chaldejczyk<span class="character-placeholder character-mention" data-character="Phut (Beroes)" data-src-picture="/Pharaon/phut-beroes-listens.mp4" data-is-talking="false"></span> zażądał komnaty mającej tylko jedne drzwi i przez nikogo nie zamieszkiwanej. I tego samego dnia, na godzinę przed zachodem słońca, kazał przenieść tam jego świątobliwość<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span>.
     </p>
     <p data-index="63">
-      W oznaczonej porze czterech najwyższych kapłanów ubrali faraona<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> w nową, lnianą szatę, odmówili nad nim wielką modlitwę, która stanowczo odpędzała złe moce, i usadowiwszy go w prostą lektykę z cedrowego drzewa, zanieśli pana<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> do owej pustej komnaty, gdzie znajdował się tylko mały stolik.
+      W oznaczonej porze czterech najwyższych kapłanów ubrali<a href="#fn293" class="link-note"></a> faraona<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> w nową, lnianą szatę, odmówili nad nim wielką modlitwę, która stanowczo odpędzała złe moce, i usadowiwszy go w prostą lektykę z cedrowego drzewa, zanieśli pana<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> do owej pustej komnaty, gdzie znajdował się tylko mały stolik.
     </p>
     <p data-index="64">
       Był tam już Beroes<span class="character-placeholder character-mention" data-character="Phut (Beroes)" data-src-picture="/Pharaon/phut-beroes-listens.mp4" data-is-talking="false"></span> i zwrócony do wschodu modlił się.
@@ -16438,7 +16476,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Modły tych i tamtych, jak dwa stada jastrzębi, starły się nad ziemią i spadły na pustynię. Amon nawet ich nie dojrzał.
     </p>
     <p data-index="100">
-      I gdziekolwiek zwrócił faraon<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> umęczoną źrenicę, wszędzie było to samo. Chłopi modlili się o wypoczynek i zniżenie podatków; pisarze — aby rosły podatki i nigdy nie kończyła się praca. Kapłani błagali Amona o długie życie dla Ramzesa XII<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> i wytępienie Fenicjan, którzy psuli im operacje pieniężne; nomarchowie wzywali bóstwa, aby zachowało Fenicjan i prędzej pozwoliło wejść na tron Ramzesowi XIII<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, gdyż ten ukróci samowolę kapłanów. Lwy, szakale i hieny dyszały głodem i pożądaniem świeżej krwi; jelenie, sarny i zające z trwogą opuszczały kryjówki, myśląc o zachowaniu nędznego życia jeszcze przez jedną dobę. Choć mówiło doświadczenie, że i tej nocy kilkunaścioro ich musi zginąć, ażeby nie pomarły drapieżniki.
+      I gdziekolwiek zwrócił faraon<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> umęczoną źrenicę, wszędzie było to samo. Chłopi modlili się o wypoczynek i zniżenie podatków; pisarze — aby rosły podatki i nigdy nie kończyła się praca. Kapłani błagali Amona o długie życie dla Ramzesa XII<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> i wytępienie Fenicjan, którzy psuli im operacje pieniężne; nomarchowie wzywali bóstwa, aby zachowało Fenicjan i prędzej pozwoliło wejść na tron Ramzesowi XIII<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span>, gdyż ten ukróci samowolę kapłanów. Lwy, szakale i hieny dyszały głodem i pożądaniem świeżej krwi; jelenie, sarny i zające z trwogą opuszczały kryjówki, myśląc o zachowaniu nędznego życia jeszcze przez jedną dobę. Choć mówiło doświadczenie, że i tej nocy kilkunaścioro<a href="#fn294" class="link-note"></a> ich musi zginąć, ażeby nie pomarły drapieżniki.
     </p>
     <p data-index="101">
       I tak na całym świecie panowała rozterka. Każdy chciał tego, co lękiem napełniało innych; każdy prosił o własne dobro, nie pytając, czy nie zrobi szkody bliźniemu.
@@ -16528,7 +16566,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       O wschodzie słońca dwudziestego pierwszego Hator do obozu nad Sodowymi Jeziorami przyszedł z Memfisu rozkaz, według którego trzy pułki miały pomaszerować do Libii i stanąć załogami w miastach, reszta zaś armii egipskiej wraz z księciem<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> miała wrócić do domu.
     </p>
     <p data-index="2">
-      Wojska okrzykami radości powitały to rozporządzenie; kilkudniowy bowiem pobyt w pustyni już zaczynał im dokuczać. Pomimo dowozów i z Egiptu, i z upokorzonej Libii nie było nadmiaru żywności; woda w studniach naprędce wykopanych wyczerpała się; żar słoneczny wypalał ciała, a rudy piasek raził płuca i oczy. Żołnierze poczęli chorować na dysenterię i złośliwe zapalenie powiek.
+      Wojska okrzykami radości powitały to rozporządzenie; kilkudniowy bowiem pobyt w pustyni już zaczynał im dokuczać. Pomimo dowozów i z Egiptu, i z upokorzonej Libii nie było nadmiaru żywności; woda w studniach naprędce wykopanych wyczerpała się; żar słoneczny wypalał ciała, a rudy piasek raził płuca i oczy. Żołnierze poczęli chorować na dysenterię<a href="#fn295" class="link-note"></a> i złośliwe zapalenie powiek.
     </p>
     <p data-index="3">
       Ramzes<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> kazał zwinąć obóz. Trzy pułki rodowitych Egipcjan wyprawił do Libii, zalecając żołnierzom, aby łagodnie traktowali mieszkańców i — nigdy nie włóczyli się pojedynczo. Właściwą zaś armię skierował do Memfisu, zostawiając małą załogę w forteczce i hutach szklanych.
@@ -16609,10 +16647,10 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Konie były pomęczone i należało wytchnąć. Posłał więc książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> paru jezdnych, aby zamówili statki na rzece, a resztę orszaku zatrzymał pod kępą palm, które wówczas rosły między grupą piramid i sfinksem.
     </p>
     <p data-index="29">
-      Grupa ta stanowi północny kraniec niezmiernego cmentarzyska. Na placu mającym około kilometra kwadratowego powierzchni, porosłym w owych czasach pustynną roślinnością, tłoczy się mnóstwo grobów i małych piramid, nad którymi górują trzy piramidy największe: Cheopsa, Khefrena i Mykerina, tudzież sfinks. Kolosalne te budowle są oddalone jedna od drugiej ledwo na kilkaset kroków. Trzy piramidy stoją w jednym rzędzie od północo-wschodu ku południo-zachodowi, na wschód zaś od tej linii, najbliżej Nilu, leży sfinks, u stóp którego ciągnęła się podziemna świątynia Horusa.
+      Grupa ta stanowi północny kraniec niezmiernego cmentarzyska. Na placu mającym około kilometra kwadratowego powierzchni, porosłym w owych czasach pustynną roślinnością, tłoczy się mnóstwo grobów i małych piramid, nad którymi górują trzy piramidy największe: Cheopsa, Khefrena i Mykerina<a href="#fn296" class="link-note"></a>, tudzież sfinks. Kolosalne te budowle są oddalone jedna od drugiej ledwo na kilkaset kroków. Trzy piramidy stoją w jednym rzędzie od północo-wschodu ku południo-zachodowi, na wschód zaś od tej linii, najbliżej Nilu, leży sfinks, u stóp którego ciągnęła się podziemna świątynia Horusa.
     </p>
     <p data-index="30">
-      Piramidy, a szczególniej Cheopsa, jako utwór ludzkiej pracy przeraża swoją wielkością. Jest to kamienny pagórek szpiczasty, wysoki na trzydzieści pięć piątr(sto trzydzieści siedem metrów), stojący na podstawie kwadratowej, której każdy bok ma około trzystu pięćdziesięciu kroków (dwustu dwudziestu siedmiu metrów) długości. Piramida zajmuje dziesięć morgów powierzchni, a jej cztery trójkątne ściany pokryłyby siedemnastomorgową przestrzeń. Na budowę jej zużyto takie mnóstwo kamieni, że można by wznieść mur wyższy od wzrostu człowieka, szeroki na pół metra, długi na dwa tysiące pięćset kilometrów!…
+      Piramidy, a szczególniej Cheopsa, jako utwór ludzkiej pracy przeraża swoją wielkością. Jest to kamienny pagórek szpiczasty, wysoki na trzydzieści pięć piątr<a href="#fn297" class="link-note"></a>(sto trzydzieści siedem metrów), stojący na podstawie kwadratowej, której każdy bok ma około trzystu pięćdziesięciu kroków (dwustu dwudziestu siedmiu metrów) długości. Piramida zajmuje dziesięć morgów<a href="#fn298" class="link-note"></a> powierzchni, a jej cztery trójkątne ściany pokryłyby siedemnastomorgową przestrzeń. Na budowę jej zużyto takie mnóstwo kamieni, że można by wznieść mur wyższy od wzrostu człowieka, szeroki na pół metra, długi na dwa tysiące pięćset kilometrów!…
     </p>
     <p data-index="31">
       Kiedy orszak książęcy<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> rozłożył się pod mizernymi drzewami, kilku żołnierzy zajęło się wyszukaniem wody, inni wydobyli suchary, a Tutmozis<span class="character-placeholder character-mention" data-character="Tutmozis" data-src-picture="/Pharaon/tutmozis-listens.mp4" data-is-talking="false"></span> upadł na ziemię i zasnął. Książę<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> zaś i Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> zaczęli przechadzać się rozmawiając.
@@ -16621,7 +16659,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Noc była o tyle jasna, że można było widzieć z jednej strony niezmierne sylwetki piramid, z drugiej figurę sfinksa, który w porównaniu z nimi wydawał się małym.
     </p>
     <p data-index="33">
-      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Jestem tu już czwarty raz — rzekł następca<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — a zawsze moje serce napełnia się zdumieniem i żalem. Kiedym był jeszcze uczniem wyższej szkoły, myślałem, że wstąpiwszy na tron wzniosę coś dostojniejszego aniżeli piramida Cheopsa. Ale dzisiaj śmiać mi się chce z mego zuchwalstwa, kiedy pomyślę, że wielki faraon przy budowie swego grobowca zapłacił tysiąc sześćset talentów za same jarzyny dla robotników… Skądbym ja wziął tysiąc sześćset talentów, a choćby tylko ludzi!…
+      <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Jestem tu już czwarty raz — rzekł następca<span class="character-placeholder character-mention" data-character="Książę Ramzes" data-src-picture="/Pharaon/książę-ramzes-listens.mp4" data-is-talking="false"></span> — a zawsze moje serce napełnia się zdumieniem i żalem. Kiedym był jeszcze uczniem wyższej szkoły, myślałem, że wstąpiwszy na tron wzniosę coś dostojniejszego aniżeli piramida Cheopsa. Ale dzisiaj śmiać mi się chce z mego zuchwalstwa, kiedy pomyślę, że wielki faraon przy budowie swego grobowca zapłacił tysiąc sześćset talentów<a href="#fn299" class="link-note"></a> za same jarzyny dla robotników… Skądbym ja wziął tysiąc sześćset talentów, a choćby tylko ludzi!…
     </p>
     <p data-index="34">
       <span class="character-placeholder character-talking" data-character="Pentuer" data-src-moving="/Pharaon/pentuer-speaks.mp4" data-is-talking="true"></span> — Nie zazdrość, panie, Cheopsowi — odparł kapłan<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>. — Inni faraonowie lepsze zostawili po sobie dzieła: jeziora, kanały, gościńce, świątynie i szkoły…
@@ -16657,7 +16695,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Książę Ramzes" data-src-moving="/Pharaon/książę-ramzes-speaks.mp4" data-is-talking="true"></span> — Mój świątobliwy ojciec<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> — rzekł po chwili — inaczej przedstawił mi te sprawy. Kiedy byliśmy tutaj przed pięcioma laty, boski pan<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> opowiedział mi taką historię:
     </p>
     <p data-index="45">
-      Za faraona Tutmozisa I przyjechali posłowie etiopscy umawiać się o wysokość płaconych przez siebie danin. Hardy to był naród! Mówili, że jedna przegrana wojna nic nie stanowi, w drugiej bowiem los na nich może być łaskaw — i przez parę miesięcy targowali się o haracz.
+      Za faraona Tutmozisa I<a href="#fn300" class="link-note"></a> przyjechali posłowie etiopscy umawiać się o wysokość płaconych przez siebie danin. Hardy to był naród! Mówili, że jedna przegrana wojna nic nie stanowi, w drugiej bowiem los na nich może być łaskaw — i przez parę miesięcy targowali się o haracz.
     </p>
     <p data-index="46">
       Na próżno mądry król, chcąc łagodnie oświecić ich, pokazywał im nasze gościńce i kanały. Odpowiadali, że w ich kraju wodę mają darmo, gdzie chcą. Na próżno odsłaniano im skarbce świątyń: mówili, że ich ziemia kryje daleko więcej złota i klejnotów aniżeli cały Egipt. Nadaremnie pan musztrował wobec nich swoje wojska, gdyż twierdzili, że Etiopów jest bez porównania więcej, aniżeli jego świątobliwość ma żołnierzy.
@@ -16681,7 +16719,7 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Nie o to bowiem chodzi: czy były potrzebne piramidy? Ale o to, ażeby wola faraona, gdy ją raz wypowiedziano, była spełniona.
     </p>
     <p data-index="53">
-      Tak, Pentuerze<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>, piramida to nie grób Cheopsa, lecz —Cheopsa. Wola, która posiada tylu wykonawców, jak żaden król na świecie, a taki porządek i wytrwałość w działaniu, jak bogowie.
+      Tak, Pentuerze<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>, piramida to nie grób Cheopsa, lecz — <strong>wola</strong>Cheopsa. Wola, która posiada tylu wykonawców, jak żaden król na świecie, a taki porządek i wytrwałość w działaniu, jak bogowie.
     </p>
     <p data-index="54">
       Jeszcze w szkołach uczono mnie, że wola ludzka to wielka siła, największa siła pod słońcem. A przecie wola ludzka może podnieść ledwie jeden kamień. Jakże wielką zatem jest wola faraona, który wzniósł górę kamieni tylko dlatego, że mu się tak podobało, że on tak chciał choćby nawet bez celu.
@@ -16771,22 +16809,22 @@ export const faraonBookXml = `<section><section><section data-chapter="1">
       Tymczasem Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span> znalazł okno, przez które z podziemiów rozlewała się jękliwa pieśń kapłańska:
     </p>
     <p data-index="83">
-      . „Wstawaj, promieniejący jak Izis, jak wstaje Sotis na firmamencie rano, z początkiem stałego roku.
+      <strong>Chór I</strong>. „Wstawaj, promieniejący jak Izis, jak wstaje Sotis na firmamencie rano, z początkiem stałego roku.
     </p>
     <p data-index="84">
-      . Bóg Amon-Ra był po prawicy i po lewicy mojej. Sam oddał mi w ręce panowanie nad całym światem, przyczyniając się do upadku nieprzyjaciół moich.
+      <strong>Chór II</strong>. Bóg Amon-Ra<a href="#fn301" class="link-note"></a> był po prawicy i po lewicy mojej. Sam oddał mi w ręce panowanie nad całym światem, przyczyniając się do upadku nieprzyjaciół moich.
     </p>
     <p data-index="85">
-      . Byłeś jeszcze młody, nosiłeś splecione włosy, lecz w Egipcie nic nie działo się bez twego rozkazu i nie położono kamienia węgielnego pod żaden gmach bez twojej obecności.
+      <strong>Chór I</strong>. Byłeś jeszcze młody, nosiłeś splecione włosy<a href="#fn302" class="link-note"></a>, lecz w Egipcie nic nie działo się bez twego rozkazu i nie położono kamienia węgielnego pod żaden gmach bez twojej obecności.
     </p>
     <p data-index="86">
-      . Przyszedłem do Ciebie, władco bogów, wielki bogu, panie słońca. Tum obiecuje mi, że ukaże się słońce i że będę podobny do niego, a Nil, że osięgnę tron Ozyrysa i będę go posiadał na wieki.
+      <strong>Chór II</strong>. Przyszedłem do Ciebie, władco bogów, wielki bogu, panie słońca. Tum obiecuje mi, że ukaże się słońce i że będę podobny do niego, a Nil, że osięgnę tron Ozyrysa i będę go posiadał na wieki.
     </p>
     <p data-index="87">
-      . Wróciłeś w spokoju szanowany przez bogów, władco dwu światów, Ra-Mer-amen-Ramzesie<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span>. Zapewniam ci panowanie wieczne, królowie zbliżą się do ciebie i złożą ci hołdy.
+      <strong>Chór I</strong>. Wróciłeś w spokoju szanowany przez bogów, władco dwu światów, Ra-Mer-amen-Ramzesie<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span>. Zapewniam ci panowanie wieczne, królowie zbliżą się do ciebie i złożą ci hołdy.
     </p>
     <p data-index="88">
-      . O ty, ty! Ozyrys-Ramzesie<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span>, wiecznie żyjący synu nieba, zrodzony z bogini Nut. Niech matka twoja otoczy cię tajemnicą nieba i niech zezwoli, abyś został bogiem, o ty, ty, Ozyrys-Ramzesie<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span>.'
+      <strong>Chór II</strong>. O ty, ty! Ozyrys-Ramzesie<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span>, wiecznie żyjący synu nieba, zrodzony z bogini Nut. Niech matka twoja otoczy cię tajemnicą nieba i niech zezwoli, abyś został bogiem, o ty, ty, Ozyrys-Ramzesie<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span>.'<a href="#fn303" class="link-note"></a>
     </p>
     <p data-index="89">
       „A więc pan świątobliwy<span class="character-placeholder character-mention" data-character="Ramzes XII" data-src-picture="/Pharaon/ramzes-xii-listens.mp4" data-is-talking="false"></span> już umarł!…' — rzekł do siebie Pentuer<span class="character-placeholder character-mention" data-character="Pentuer" data-src-picture="/Pharaon/pentuer-listens.mp4" data-is-talking="false"></span>.
