@@ -1,3 +1,4 @@
+import { initAudioContext } from "../audio-crossfader";
 import { setCurrentLocation } from "../helpers/paragraphsNavigation";
 
 const SHOULD_SHOW_EVERYONE = false;
@@ -216,6 +217,10 @@ export function setupPageObserver(): IntersectionObserver | null {
   let currentlyLastActivePageElement: Element | null = null;
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
+    const audioReady = initAudioContext();
+    if (!audioReady) {
+      console.warn("AudioContext could not be started automatically. User interaction (e.g., clicking 'Enable Audio') might be required.");
+    }
     // const rootElement = observerOptions.root; // root is guaranteed to exist here
     // if (!rootElement) { // No longer needed
     //   console.error("Observer root element not found:", observerOptions.root);
@@ -237,8 +242,8 @@ export function setupPageObserver(): IntersectionObserver | null {
       const rootRect = observerOptions.root.getBoundingClientRect();
 
       // Default multipliers
-      let topMultiplier = 0.15;
-      let bottomMultiplier = 0.65;
+      let topMultiplier = 0.05;
+      let bottomMultiplier = 0.4;
 
       // Check media query for landscape mode on smaller wide screens
       const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
@@ -294,7 +299,7 @@ export function setupPageObserver(): IntersectionObserver | null {
             setCurrentLocation({ chapter: startInfo.chapter, paragraph: startInfo.paragraph, endChapter: endInfo.chapter, endParagraph: endInfo.paragraph });
 
             // --- Activate/Deactivate Media ---
-            activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph);
+            activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph + 2);
             // ----------------------------------
           } else {
             console.warn("[Observer] Could not extract chapter/paragraph info for focused elements:", topFocusedPageElement, bottomFocusedPageElement);

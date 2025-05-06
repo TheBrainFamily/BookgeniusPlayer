@@ -174,7 +174,7 @@ export const preloadBackgroundTracks = async () => {
   } else {
     // If no specific chapter (e.g., initial load, chapter is 0), preload first few chapters
     console.log("No specific current chapter, preloading initial chapters.");
-    chaptersToConsider = [1, 2, 3]; // Default to preloading for chapters 1, 2, and 3
+    chaptersToConsider = [1, 2]; // Default to preloading for chapters 1, 2, and 3
   }
 
   console.log("Preloading tracks for chapters:", chaptersToConsider);
@@ -199,15 +199,31 @@ export const preloadBackgroundTracks = async () => {
   console.log("Dynamic background tracks preloading complete.");
 };
 
-export const dealWithBackgroundSongs = ({ startChapter, startParagraph }) => {
-  console.log("dealWithBackgroundSongs", { startChapter, startParagraph });
+export const dealWithBackgroundSongs = ({ startChapter, startParagraph, endChapter, endParagraph }) => {
+  console.log("dealWithBackgroundSongs", { startChapter, startParagraph, endChapter, endParagraph });
   // Ensure AudioContext is ready (should have been initialized by user gesture)
   // if (!audioContext) { /* Check state */ return; }
+
+  let chapterToConsider: number;
+  let paragraphToConsider: number;
+  if (startChapter === endChapter) {
+    chapterToConsider = startChapter;
+    paragraphToConsider = Math.floor((startParagraph + endParagraph) / 2);
+  } else {
+    // When view spans chapters, prioritize the new chapter (endChapter)
+    // to switch music earlier.
+    chapterToConsider = endChapter;
+    // Reference point is the last visible paragraph of the new chapter.
+    // (endParagraph is the paragraph number within endChapter)
+    paragraphToConsider = 1;
+  }
+  // Add a console log for the calculated consideration point for debugging
+  console.log(`Calculated consideration point: Chapter ${chapterToConsider}, Paragraph ${paragraphToConsider} `);
 
   const foundBackgroundSections = backgroundSongsDefined
     .filter((section) => {
       // Find the section that STARTS at or before the current position
-      return section.chapter < startChapter || (section.chapter === startChapter && section.paragraph <= startParagraph);
+      return section.chapter < chapterToConsider || (section.chapter === chapterToConsider && section.paragraph <= paragraphToConsider);
 
       // --- OR --- Find section that ENCOMPASSES the current range (more complex if ranges overlap)
       // This depends on exact definition: Does the song start when entering the range, or must the entire range be inside?
