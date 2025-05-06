@@ -15,8 +15,9 @@ import { useWebSocket, WebSocketProvider } from "./context/WebSocketContext";
 import { BottomInput } from "./components/BottomInput";
 import { RealtimeProvider } from "./context/RealtimeContext";
 import { DeepResearchModal } from "./ui/DeepResearchModal";
-import { bookData } from "./rexportedBookData";
+import { bookData } from "./booksData";
 import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
+
 function Shell({ setShowDeepResearch, showDeepResearch, passedText }: { setShowDeepResearch: (show: boolean) => void; showDeepResearch: boolean; passedText?: string }) {
   /* Inject book content first */
   useBookContent(bookData.bookXml, "content-container");

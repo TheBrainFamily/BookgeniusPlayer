@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"; // Assuming you have this utility
 import { useRealtime } from "../context/RealtimeContext"; // Adjust path
 // Removed WebSocket dependency if isLoading isn't used in footer
 // import { Message, useWebSocket } from "../context/WebSocketContext"; // Adjust path
-import { getCurrentBookSlug } from "../getCurrentBookSlug"; // Adjust path
+import { CURRENT_BOOK } from "../consts"; // Adjust path
 import { useLocation } from "../state/LocationContext"; // Adjust path
 import { showSearchModal, performSearch, hideSearchModal, isSearchActive } from "../searchModal"; // Adjust path
 import { deepResearchCall } from "../deepResearchCall"; // Adjust path
@@ -126,7 +126,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
       onSubmit({
         // Send the structured data
         query: trimmedValue,
-        filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: getCurrentBookSlug() },
+        filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: CURRENT_BOOK },
       });
     }
     setValue("");

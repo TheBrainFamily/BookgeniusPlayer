@@ -8,7 +8,7 @@
  */
 
 import { BOOK_SLUGS } from "../consts";
-import { bookData } from "../rexportedBookData";
+import { bookData } from "../booksData";
 
 /* -------------------------------------------------------------------------- */
 /*  Shared types                                                              */

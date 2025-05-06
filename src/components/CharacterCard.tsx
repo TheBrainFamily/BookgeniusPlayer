@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useMemo } from "react";
 import { ParsedParagraphRange } from "@/src/fetchers/getParagraphRange";
 import { getPictureFilePathForName, getMovingPictureFilePathForName } from "@/src/utils/getFilePathsForName";
-import { getCurrentBookSlug } from "@/src/getCurrentBookSlug";
+import { CURRENT_BOOK } from "@/src/consts";
 
 /* ------------------------------------------------------------------ */
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
@@ -21,8 +21,6 @@ interface Props {
   index: number; // position inside the panel (for stagger anim)
 }
 export const CharacterCard: React.FC<Props> = ({ entity, index }) => {
-  const bookSlug = getCurrentBookSlug();
-
   const apps: Appearance[] = [
     { chapterNumber: entity.chapterNumber, paragraphNumber: entity.paragraphNumber, isTalkingInParagraph: entity.isTalkingInFirstParagraph },
     ...entity.otherAppearances,
@@ -45,7 +43,7 @@ export const CharacterCard: React.FC<Props> = ({ entity, index }) => {
       // Update image to animated version if talking
       const imageElement = cardElement.querySelector<HTMLImageElement>(".entity-image");
       if (imageElement && imageElement.dataset.originalSrc) {
-        const gifSrc = getMovingPictureFilePathForName(entity.canonicalName, bookSlug);
+        const gifSrc = getMovingPictureFilePathForName(entity.canonicalName, CURRENT_BOOK);
         const currentSrcFilename = imageElement.src.split("/").pop();
         const gifSrcFilename = gifSrc.split("/").pop();
         if (currentSrcFilename !== gifSrcFilename) {
@@ -70,13 +68,13 @@ export const CharacterCard: React.FC<Props> = ({ entity, index }) => {
       // Cleanup classes when component unmounts or updates
       cardElement.classList.remove("highlighted-talking-entity", "highlighted-entity");
     };
-  }, [entity.canonicalName, isTalkingInCurrentRange, bookSlug]);
+  }, [entity.canonicalName, isTalkingInCurrentRange, CURRENT_BOOK]);
 
   /* --------------------------------------------------------------- */
   /*  Smooth hover highlight                                         */
   /* --------------------------------------------------------------- */
   const wantOn = useRef(false);
-  const rafId = useRef<number>();
+  const rafId = useRef<number>(0);
 
   const requestToggle = useCallback(
     (enable: boolean) => {
@@ -92,7 +90,7 @@ export const CharacterCard: React.FC<Props> = ({ entity, index }) => {
   /* --------------------------------------------------------------- */
   /*  Media                                                          */
   /* --------------------------------------------------------------- */
-  const mediaSrc = entity.imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, bookSlug) : entity.imageUrl;
+  const mediaSrc = entity.imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, CURRENT_BOOK) : entity.imageUrl;
   const isVideo = mediaSrc.endsWith(".mp4") || mediaSrc.endsWith(".webm");
 
   const openDetails = () => typeof window.showCharacterDetailsModal === "function" && window.showCharacterDetailsModal(entity.canonicalName, mediaSrc, entity.summary ?? "");

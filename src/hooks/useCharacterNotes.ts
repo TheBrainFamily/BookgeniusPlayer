@@ -1,5 +1,5 @@
-import { paragraphMetadataServicePure, getParagraphRange, parseParagraphRange, ParsedParagraphRange, SelfSufficientCharacterMetadata } from "@/src/fetchers/getParagraphRange";
-import { BOOK_SLUGS, CURRENT_BOOK } from "@/src/consts";
+import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange, SelfSufficientCharacterMetadata } from "@/src/fetchers/getParagraphRange";
+import { CURRENT_BOOK } from "@/src/consts";
 import { useEffect, useState } from "react";
 import { Location } from "@/src/state/LocationContext";
 
