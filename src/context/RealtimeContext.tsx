@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from "react";
 import { RealtimeClient } from "@openai/realtime-api-beta";
 import { WavRecorder, WavStreamPlayer } from "../lib/wavtools/index.js";
-import { getCurrentBookSlug } from "../getCurrentBookSlug.js";
+import { CURRENT_BOOK } from "../consts.js";
 import { QUESTIONS_SERVER_URL } from "../lib/consts.js";
-import { usePage } from "./PageContext.js";
+// import { usePage } from "./PageContext.js";
 import { instructions } from "../utils/conversation_config.js";
 import { useLocation } from "../state/LocationContext.js";
+
 // Define the conversation item type
 interface ConversationItem {
   id: string;
@@ -109,7 +110,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           // We're using dynamic page range based on current reading position
           // we set the pageTo to the current page so we avoid spoilers
 
-          const filter = { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: getCurrentBookSlug() };
+          const filter = { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: CURRENT_BOOK };
           console.log("filter", filter);
           const response = await fetch(`${QUESTIONS_SERVER_URL}/ask?question=${encodeURIComponent(question)}&filter=${encodeURIComponent(JSON.stringify(filter))}`);
           const data = await response.text();

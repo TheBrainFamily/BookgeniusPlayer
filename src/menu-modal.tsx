@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect, useMemo } from "react";
 import { Book, X, List, FileText, PanelLeft, PanelBottom, Type, RotateCcw, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -7,12 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
-import { bookData } from "./bookDatasForReplacement/pharaonRexportedBookData";
 import { isNightMode } from "./helpers/setIsNightMode";
 import { toggleMobileCharacters, isMobileCharactersVisible } from "./isMobileCharactersVisible";
 import { resetFurthestPageLocation } from "./helpers/reset-furthest-page-location";
 import { goToParagraph } from "./helpers/paragraphsNavigation";
 import { preloadBackgroundTracks } from "./deal-with-background-songs";
+import { BookData } from "./booksData/types";
+
 const getTitle = (chapter: number) => {
   const chapterNames = [
     "Zero",
@@ -46,15 +47,12 @@ const getTitle = (chapter: number) => {
   ];
   return `Chapter ${chapterNames[chapter] || chapter}`;
 };
-// Sample chapter data - replace with your actual data
-
-const pageChapters = Array.from({ length: bookData.chapters }, (_, i) => ({ chapter: i + 1 }));
-const chapters = [...pageChapters.map((page) => ({ id: page.chapter, title: getTitle(page.chapter) }))];
 
 type ModalType = null | "chapters" | "page";
 
 interface BookChaptersModalProps {
   onShowDeepResearch: () => void;
+  bookData: BookData;
 }
 
 const applyDarkMode = () => {
@@ -65,13 +63,22 @@ const applyDarkMode = () => {
   }
 };
 
-export default function BookChaptersModal({ onShowDeepResearch }: BookChaptersModalProps) {
+export default function BookChaptersModal({ onShowDeepResearch, bookData }: BookChaptersModalProps) {
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [nightMode, setNightMode] = useState(isNightMode());
   const [pageNumber, setPageNumber] = useState("");
   const [charactersVertical, setCharactersVertical] = useState(isMobileCharactersVisible());
   const [fontSize, setFontSize] = useState(localStorage.getItem("fontSize") ? parseFloat(localStorage.getItem("fontSize")!) : 1);
+
+  const chapters = useMemo(() => {
+    if (!bookData || typeof bookData.chapters !== "number") {
+      return [];
+    }
+    const pageChapters = Array.from({ length: bookData.chapters }, (_, i) => ({ chapter: i + 1, page: (i + 1).toString() }));
+    return pageChapters.map((page) => ({ id: page.chapter, title: getTitle(page.chapter), page: page.page }));
+  }, [bookData]);
+
   useEffect(() => {
     applyDarkMode();
   }, [nightMode]);
