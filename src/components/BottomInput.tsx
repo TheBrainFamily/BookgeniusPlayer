@@ -173,27 +173,30 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
       <footer
         className={cn(
           "fixed bottom-0 inset-x-0 z-50 transition-all duration-200 ease-out",
-          "bg-white/0 dark:bg-zinc-900/80 dark:border-white/10",
+          "bg-white/0 dark:bg-zinc-900/80 dark:border-white/10 flex",
           isCollapsed ? "w-auto right-4 left-auto rounded-full p-1" : "w-full",
           className,
         )}
       >
+        {/* ToDo: Remove when layout will be refactored */}
+        <div id="remove-later" className="m-5 mr-0 pb-5 flex align-center justify-center flex-1 max-md:hidden"></div>
         <div
           className={cn(
             "keyboard-safe-area",
             "w-full mx-auto",
-            "lg:max-w-[700px]",
+            "max-w-[900px] [@media(max-width:1900px)]:max-w-[700px]",
             "bg-gradient-to-b from-black/0 to-[var(--footer-stop)]",
             "rounded-lg",
             "dark:bg-inherit",
             isCollapsed ? "p-0" : "px-4 pt-3 pb-1",
             // keep these *last* so they win the cascade
             "transition-[--footer-stop] duration-300 ease-in-out",
+            "flex-2",
           )}
-          style={{ "--footer-stop": isFocused ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.3)" } as React.CSSProperties}
+          style={{ "--footer-stop": isFocused ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.4)" } as React.CSSProperties}
         >
           {isCollapsed ? (
-            <motion.button /* Collapsed Button - unchanged */
+            <motion.button
               type="button"
               aria-label="Expand input"
               className="p-3 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center shadow-md"
@@ -204,7 +207,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
             </motion.button>
           ) : (
             // --- Expanded State ---
-            <form onSubmit={handleSubmit} className="flex w-full items-center space-x-2 h-12">
+            <form onSubmit={handleSubmit} className="flex w-full items-center space-x-2 h-16">
               <input /* Input field - adjusted styles */
                 id="bottom-input"
                 ref={inputRef}
@@ -214,12 +217,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
                 onFocus={handleFocus} // Remove if not needed
                 onBlur={handleBlur} // Remove if not needed
                 placeholder={isRecording ? "Listening..." : isDeepResearchActive ? "Enter deep research query..." : placeholder}
-                className={cn(
-                  "flex-grow p-0 pr-1 outline-none transition-colors bg-transparent text-white dark:text-white", // Use flex-grow, remove w-full and pb-2
-                  "placeholder:text-gray-500 dark:placeholder:text-gray-400",
-                  "text-base",
-                  isRecording ? "opacity-50" : "",
-                )}
+                className={cn("flex-grow p-0 pr-1 outline-none transition-colors bg-transparent text-black dark:text-white", "text-base", isRecording ? "opacity-50" : "")}
                 disabled={isRecording || isThinking}
                 autoComplete="off"
               />
@@ -283,6 +281,8 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
             </form>
           )}
         </div>
+        {/* ToDo: Remove when layout will be refactored */}
+        <div className="m-5 mr-0 pb-5 flex align-center justify-center flex-1 max-md:hidden"></div>
       </footer>
 
       {/* Backdrop REMOVED - Less necessary without focus state/internal messages */}
