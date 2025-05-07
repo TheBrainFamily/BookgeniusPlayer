@@ -18,7 +18,6 @@ export const RightNotesPanel: React.FC = () => {
   );
 
   const notes = useFootnotes(range);
-  console.log("notes", notes);
   /* modal */
   const [modalHtml, setModalHtml] = useState<string | null>(null);
 

@@ -1,12 +1,13 @@
-import { DOMParser } from "@xmldom/xmldom";
+import { DOMParser, XMLSerializer, Node } from "@xmldom/xmldom";
 import fs from "fs";
 import path from "path";
 import { getMovingPictureFilePathForName, getPictureFilePathForName } from "../utils/getFilePathsForName";
-import { BOOK_SLUGS } from "../consts";
+import { BOOK_SLUGS, CURRENT_BOOK } from "../consts";
 
 export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): string => {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+  const serializer = new XMLSerializer();
   let htmlResult = "";
 
   // Parse CharactersMaster
@@ -67,9 +68,28 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
                   pContent += `${pElement.textContent || ""}<span class="character-placeholder character-mention" data-character="${characterInfo.display}" data-src-picture="${pictureSrc}" data-is-talking="false"></span>`;
                 }
               } else {
-                // Handle other potential elements if needed, e.g., <b>, <i>
-                // For now, we ignore unknown tags within <p>
+                switch (pElement.tagName) {
+                  case "note":
+                    // previously it looked like this: <a href="#fn14" class="link-note">[14]</a>
+                    pContent += `<a href="#fn${pElement.getAttribute("id")}" class="link-note">${pElement.textContent || ""}</a>`;
+
+                    break;
+                  case "b":
+                    pContent += `<span class="bold">${pElement.textContent || ""}</span>`;
+                    break;
+                  case "i":
+                    pContent += `<span class="italic">${pElement.textContent || ""}</span>`;
+                    break;
+                  case "strong":
+                    pContent += ` <strong>${pElement.textContent.trim() || ""}</strong>`;
+                    break;
+                  default:
+                    pContent += `<${pElement.tagName}>${pElement.textContent || ""}</${pElement.tagName}>`;
+                    break;
+                }
               }
+            } else {
+              console.log("unknown tag again", tagName);
             }
           }
 
@@ -85,6 +105,26 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
         } else if (tagName === "h5") {
           // Handle h5 element (e.g., book title)
           htmlResult += `\n    <h5 data-index="${dataIndex++}">${childElement.textContent || ""}</h5>`;
+        } else {
+          // Serialize child nodes to preserve inner HTML
+          let innerHtml = "";
+          for (let k = 0; k < childElement.childNodes.length; k++) {
+            // Cast ChildNode to unknown, then to the imported Node type
+            const node = childElement.childNodes[k] as unknown as Node;
+            // Skip nodes that start with capital letter (XML tags for Characters)
+            if (
+              node.nodeType === 1 /* Element node */ &&
+              node.nodeName &&
+              node.nodeName.charAt(0) === node.nodeName.charAt(0).toUpperCase() &&
+              node.nodeName.charAt(0) !== node.nodeName.charAt(0).toLowerCase()
+            ) {
+              console.log("skipping tag", node.nodeName);
+              continue;
+            }
+            console.log("adding tag", node.nodeName);
+            innerHtml += serializer.serializeToString(node);
+          }
+          htmlResult += `\n    <${tagName} data-index="${dataIndex++}">${innerHtml}</${tagName}>`;
         }
         // Add handlers for other potential top-level tags (h1, h2, h3, h6, etc.) if needed
       }
@@ -99,8 +139,14 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
 };
 
 if (require.main === module) {
-  const xmlString = fs.readFileSync(path.join(__dirname, "chapters.xml"), "utf8");
+  const bookSlug: BOOK_SLUGS = CURRENT_BOOK;
+  const xmlString = fs.readFileSync(path.join(__dirname, `${bookSlug}-chapters.xml`), "utf8");
   // Example usage: Provide the book slug when calling
-  const htmlString = xmlToComplexHtml(xmlString, "Pharaon" as BOOK_SLUGS);
-  fs.writeFileSync(path.join(__dirname, "chapters.ts"), `export const faraonBookXml = \`<section>${htmlString}</section>\`;`);
+  console.log("bookSlug", bookSlug);
+  const htmlString = xmlToComplexHtml(xmlString, bookSlug);
+  if (bookSlug === "1984") {
+    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const _${bookSlug}BookXml = \`<section>${htmlString}</section>\`;`);
+  } else {
+    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const ${bookSlug}BookXml = \`<section>${htmlString}</section>\`;`);
+  }
 }

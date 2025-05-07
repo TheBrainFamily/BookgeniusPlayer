@@ -1,6 +1,6 @@
+import { CURRENT_BOOK } from "../consts";
 import { BOOK_SLUGS } from "../consts";
 import { updateCharacterChapterInfo } from "../fetchers/updateCharacterChapterInfo";
-import { getCurrentBookSlug } from "../getCurrentBookSlug";
 import { getPictureFilePathForName } from "./getFilePathsForName";
 
 // Define a type for the window with our global functions
@@ -217,13 +217,12 @@ export function createEditableEntity(entity: {
 
   // Entity image in left column
   let mediaElement: HTMLImageElement | HTMLVideoElement | null = null;
-  const bookSlug = getCurrentBookSlug();
 
   if (entity.imageUrl) {
     const imageWrapper = document.createElement("div");
     imageWrapper.className = "entity-image-wrapper";
 
-    const originalSrc = entity.imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, bookSlug) : entity.imageUrl;
+    const originalSrc = entity.imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, CURRENT_BOOK) : entity.imageUrl;
 
     const isVideo = originalSrc.endsWith(".mp4") || originalSrc.endsWith(".webm");
 
@@ -286,7 +285,7 @@ export function createEditableEntity(entity: {
     console.log(`Saving character summary for ${entity.canonicalName}:`, newText);
     try {
       const updatedData = await updateCharacterChapterInfo(
-        BOOK_SLUGS.PHARAON, // Example book slug
+        CURRENT_BOOK, // Example book slug
         entity.canonicalName, // Example character name
         entity.chapterNumber, // Example chapter number
         { summary: newText }, // Data to update
@@ -303,7 +302,7 @@ export function createEditableEntity(entity: {
     console.log(`Saving character label for ${entity.canonicalName} as: '${newLabelValue}'`);
     try {
       const updatedData = await updateCharacterChapterInfo(
-        BOOK_SLUGS.PHARAON, // TODO: Make dynamic if needed
+        CURRENT_BOOK,
         entity.canonicalName, // Identifier for the character
         entity.chapterNumber,
         { label: newLabelValue }, // Update the label field (can be empty string)

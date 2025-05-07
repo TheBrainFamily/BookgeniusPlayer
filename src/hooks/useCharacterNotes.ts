@@ -1,5 +1,5 @@
-import { paragraphMetadataServicePure, getParagraphRange, parseParagraphRange, ParsedParagraphRange, SelfSufficientCharacterMetadata } from "@/src/fetchers/getParagraphRange";
-import { BOOK_SLUGS } from "@/src/consts";
+import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange, SelfSufficientCharacterMetadata } from "@/src/fetchers/getParagraphRange";
+import { CURRENT_BOOK } from "@/src/consts";
 import { useEffect, useState } from "react";
 import { Location } from "@/src/state/LocationContext";
 
@@ -11,35 +11,26 @@ function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {
 
 export function useCharacterNotes(loc: Location, charactersData: SelfSufficientCharacterMetadata[]): ParsedParagraphRange[] {
   const [notes, setNotes] = useState<ParsedParagraphRange[]>([]);
-  console.log("GOZDECKI MAy 3notes", notes);
   useEffect(() => {
     let cancelled = false;
 
     const load = async () => {
       const { chapter, paragraph, endChapter, endParagraph } = loc;
 
-      const raw =
-        import.meta.env.VITE_DEVELOPMENT === "true"
-          ? paragraphMetadataServicePure.getCharactersMetadataForParagraphRange({
-              bookSlug: BOOK_SLUGS.PHARAON,
-              startChapter: chapter,
-              startParagraph: paragraph,
-              endChapter: endChapter,
-              endParagraph: endParagraph,
-            })
-          : await getParagraphRange({ bookSlug: BOOK_SLUGS.PHARAON, startChapter: chapter, startParagraph: paragraph, endChapter: endChapter, endParagraph: endParagraph });
+      const raw = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange(
+        { bookSlug: CURRENT_BOOK, startChapter: chapter, startParagraph: paragraph, endChapter: endChapter, endParagraph: endParagraph },
+        charactersData,
+      );
 
       if (cancelled) return;
 
       const parsed = parseParagraphRange(raw);
-      console.log("parsed", parsed);
 
       /* only update when list really changed */
       setNotes((prev) => (sameList(prev, parsed) ? prev : parsed));
     };
 
     load();
-    console.log("GOZDECKI LOADED");
     return () => {
       cancelled = true;
     };

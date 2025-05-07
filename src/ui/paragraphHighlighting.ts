@@ -1,4 +1,4 @@
-import { getCurrentBookSlug } from "../getCurrentBookSlug";
+import { CURRENT_BOOK } from "../consts";
 import { activateCharacters } from "./characterHelpers";
 
 // Variables to track scrolling state
@@ -8,7 +8,6 @@ let scrollDebounce: NodeJS.Timeout;
 export function setupParagraphHighlighting() {
   const contentContainer = document.getElementById("content-container");
   if (!contentContainer) return;
-  const bookSlug = getCurrentBookSlug(); // Get book slug once
 
   contentContainer.addEventListener("mouseover", (event) => {
     if (isScrolling) return;
@@ -24,7 +23,7 @@ export function setupParagraphHighlighting() {
       if (chapterNumber && paragraphNumber) {
         const chapterNum = parseInt(chapterNumber);
         const paragraphNum = parseInt(paragraphNumber);
-        activateCharacters(chapterNum, paragraphNum, bookSlug);
+        activateCharacters(chapterNum, paragraphNum, CURRENT_BOOK);
       }
     }
   });
