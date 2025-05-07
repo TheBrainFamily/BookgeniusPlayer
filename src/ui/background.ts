@@ -5,6 +5,8 @@
 import { BOOK_SLUGS } from "../consts";
 
 import { CURRENT_BOOK } from "../consts";
+import { getBackgrounds } from "./getBackgrounds";
+export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number }
 
 // ---- generic debounce -------------------------------------------------------
 function debounce<T extends (...args: unknown[]) => void>(fn: T, wait: number): (...args: Parameters<T>) => void {
@@ -43,81 +45,41 @@ export const dealWithBackground = ({
     return;
   }
 
+  // Define Z-index constants for managing video layers
+  // These will be captured by the debouncedHandler closure
+  const Z_INDEX_FRONT = "-1"; // Video on top
+  const Z_INDEX_BACK = "-2";  // Video underneath
+
   // initialise once -----------------------------------------------------------
   if (!debouncedHandler) {
+    // Perform one-time setup for video elements and legacy dataset attributes
+    if (videoA && videoB) {
+        let initialFrontVideo = videoA;
+        let initialBackVideo = videoB;
+
+        // Respect legacy.dataset.front if already set (e.g., by HTML), otherwise default to 'a'.
+        if (legacy.dataset.front === "b") {
+            initialFrontVideo = videoB;
+            initialBackVideo = videoA;
+        } else if (legacy.dataset.front !== "a") { // If undefined or any other value, default to 'a'
+            legacy.dataset.front = "a";
+        }
+        
+        initialFrontVideo.style.zIndex = Z_INDEX_FRONT;
+        initialFrontVideo.classList.remove("faded"); // Ensure front is visible
+
+        initialBackVideo.style.zIndex = Z_INDEX_BACK;
+        initialBackVideo.classList.add("faded");    // Ensure back is hidden
+    }
+
+    if (legacy.dataset.currentFile === undefined) {
+        legacy.dataset.currentFile = ""; // Initialize if not present
+    }
+
     debouncedHandler = debounce(async (p: { startChapter: number; startParagraph: number; endChapter: number; endParagraph: number }) => {
-      // ---------- mapping -----------------------------------------------------
-      const toBackground = ({ chapter, file }: { chapter: number; file: string }) => ({
-        startChapter: chapter,
-        startParagraph: 1,
-        file,
-        endChapter: chapter,
-        endParagraph: 10_000,
-      });
-
-      const backgroundsInput = [
-        { chapter: 1, file: "background-egyptian-streets-palace-visible-loop.mp4" },
-        { chapter: 2, file: "background-wawoz-fade.mp4" },
-        { chapter: 3, file: "background-sara-slow-motion-loop.mp4" },
-        { chapter: 4, file: "background-army-fade-loop.mp4" },
-        { chapter: 5, file: "background-sara-estate-fade.mp4" },
-        { chapter: 6, file: "chapter6-slow-fade-sw-q20.mp4" },
-        { chapter: 7, file: "chapter7-slow-fade-sw-q20.mp4" },
-        { chapter: 8, file: "background-moving-generic-estate-fade.mp4" },
-        { chapter: 9, file: "chapter9-slow-fade-sw-q20.mp4" },
-        { chapter: 10, file: "chapter10-slow-fade-sw-q20.mp4" },
-        { chapter: 11, file: "chapter11-slow-fade-sw-q20.mp4" },
-        { chapter: 12, file: "chapter12-slow-fade-sw-q20.mp4" },
-        { chapter: 13, file: "background-moving-generic-estate-fade.mp4" },
-        { chapter: 14, file: "background-moving-generic-estate-fade.mp4" },
-        { chapter: 15, file: "background-moving-generic-estate-slow-motion-loop.mp4" },
-        { chapter: 16, file: "background-generic-pingpong-fade.mp4" },
-        { chapter: 17, file: "background-egyptian-streets-palace-visible-loop.mp4" },
-        { chapter: 18, file: "background-generic-pingpong-fade.mp4" },
-        { chapter: 19, file: "background-egyptian-streets-palace-visible-loop.mp4" },
-        { chapter: 20, file: "background-egyptian-streets-palace-visible-loop.mp4" },
-        { chapter: 21, file: "background-generic-pingpong-fade.mp4" },
-        { chapter: 22, file: "background-generic-pingpong-fade.mp4" },
-        { chapter: 23, file: "background-moving-generic-estate-fade.mp4" },
-        { chapter: 24, file: "background-moving-generic-estate-fade.mp4" },
-        { chapter: 25, file: "background-egyptian-streets-palace-visible-loop.mp4" },
-        { chapter: 26, file: "chapter26-slow-fade-sw-q20.mp4" },
-        { chapter: 27, file: "chapter27-slow-fade-sw-q20.mp4" },
-        { chapter: 28, file: "chapter28-slow-fade-sw-q20.mp4" },
-        { chapter: 29, file: "chapter29-slow-fade-sw-q20.mp4" },
-        { chapter: 30, file: "chapter30-slow-fade-sw-q20.mp4" },
-        { chapter: 31, file: "chapter31-slow-fade-sw-q20.mp4" },
-        { chapter: 32, file: "chapter32-slow-fade-sw-q20.mp4" },
-        { chapter: 33, file: "chapter33-slow-fade-sw-q20.mp4" },
-        { chapter: 34, file: "chapter34-slow-fade-sw-q20.mp4" },
-        { chapter: 35, file: "chapter35-slow-fade-sw-q20.mp4" },
-        { chapter: 36, file: "chapter36-slow-fade-sw-q20.mp4" },
-        { chapter: 37, file: "chapter37-slow-fade-sw-q20.mp4" },
-        { chapter: 38, file: "chapter38-slow-fade-sw-q20.mp4" },
-        { chapter: 39, file: "chapter39-slow-fade-sw-q20.mp4" },
-        { chapter: 40, file: "chapter40-slow-fade-sw-q20.mp4" },
-        { chapter: 41, file: "chapter41-slow-fade-sw-q20.mp4" },
-        { chapter: 42, file: "chapter42-slow-fade-sw-q20.mp4" },
-        { chapter: 43, file: "chapter43-slow-fade-sw-q20.mp4" },
-        { chapter: 44, file: "chapter44-slow-fade-sw-q20.mp4" },
-        { chapter: 45, file: "chapter45-slow-fade-sw-q20.mp4" },
-        { chapter: 46, file: "chapter46-slow-fade-sw-q20.mp4" },
-        { chapter: 47, file: "chapter47-slow-fade-sw-q20.mp4" },
-        { chapter: 48, file: "chapter48-slow-fade-sw-q20.mp4" },
-        { chapter: 49, file: "chapter49-slow-fade-sw-q20.mp4" },
-      ];
-      let backgrounds = backgroundsInput.map(toBackground);
-
-      if (CURRENT_BOOK === BOOK_SLUGS._1984) {
-        const backgroundsInput = [
-          { chapter: 1, file: "1984-chapter-1.mp4" },
-          { chapter: 2, file: "1984-chapter-2.mp4" },
-          { chapter: 3, file: "1984-chapter-3.mp4" },
-        ];
-        backgrounds = backgroundsInput.map(toBackground);
-      }
-
-      // ---------- helpers -----------------------------------------------------
+      const backgrounds = getBackgrounds() as Background[];
+      
+      // Ensure dataset attributes are initialized (should be by the one-time setup)
       if (!legacy.dataset.front) legacy.dataset.front = "a";
       if (legacy.dataset.currentFile === undefined) legacy.dataset.currentFile = "";
 
@@ -125,47 +87,69 @@ export const dealWithBackground = ({
       const getBack = () => (legacy.dataset.front === "a" ? videoB : videoA);
 
       const fadeMs = parseFloat(getComputedStyle(videoA).transitionDuration) * 1000 || 800;
+      const videoTransitionStyle = `opacity ${getComputedStyle(videoA).transitionDuration} ${getComputedStyle(videoA).transitionTimingFunction}`;
 
-      // ---------- main fade function -----------------------------------------
       async function crossFadeTo(file: string) {
-        const front = getFront();
-        const back = getBack();
+        const front = getFront(); // Current visible video
+        const back = getBack();   // Video to load new content into
 
-        if (legacy.dataset.currentFile === file || isTransitioning) return;
+        if (legacy.dataset.currentFile === file || isTransitioning) {
+          return;
+        }
         isTransitioning = true;
 
         const newSrc = `/${CURRENT_BOOK}/${file}`;
-        back.classList.add("faded"); // start hidden
-
+        
         back.src = newSrc;
-        back.load(); // begin buffering
+        back.load(); 
 
-        // --- wait until the first real frame is ready ------------------------
+        // --- Make 'back' video instantly opaque and position it underneath ---
+        const originalBackTransition = back.style.transition;
+        back.style.transition = 'none'; // Disable transition for immediate opacity change
+        
+        back.classList.remove("faded"); // Opacity should now be 1 immediately
+        back.style.zIndex = Z_INDEX_BACK;  
+        
+        // Force a reflow to ensure the style changes are applied before restoring transition
+        // Reading a property like offsetHeight is a common way to do this.
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        back.offsetHeight; 
+        
+        back.style.transition = originalBackTransition || videoTransitionStyle; // Restore transition
+        
+        front.style.zIndex = Z_INDEX_FRONT;
+        
         try {
-          await back.play(); // warm decoder
-          await new Promise<void>((ok) => back.requestVideoFrameCallback(() => ok()));
+          await back.play(); 
+          await new Promise<void>((ok) => {
+            back.requestVideoFrameCallback(() => {
+              ok();
+            });
+          });
         } catch (e) {
-          console.error("Video play error:", e);
           isTransitioning = false;
           return;
         }
 
-        // --- start GPU-only cross-fade ---------------------------------------
         requestAnimationFrame(() => {
-          back.classList.remove("faded"); // fades IN
-          front.classList.add("faded"); // fades OUT
+          front.classList.add("faded"); 
         });
 
-        // --- swap references exactly when fade ends --------------------------
+        const safetyMargin = 100; // ms, tiny safety margin
+
         window.setTimeout(() => {
+          front.pause(); 
+          
+          back.style.zIndex = Z_INDEX_FRONT;
+
+          front.style.zIndex = Z_INDEX_BACK;
+          
           legacy.dataset.front = legacy.dataset.front === "a" ? "b" : "a";
           legacy.dataset.currentFile = file;
-          front.pause(); // stop hidden video
           isTransitioning = false;
-        }, 1500); // tiny safety margin
+        }, fadeMs + safetyMargin);
       }
 
-      // ---------- choose background for this chapter -------------------------
       const found = backgrounds.find((bg) => p.startChapter === bg.startChapter);
       console.log("found", found);
       if (found) crossFadeTo(found.file);
@@ -173,6 +157,5 @@ export const dealWithBackground = ({
     }, 150);
   }
 
-  // ---- invoke debounced handler --------------------------------------------
   debouncedHandler({ startChapter, startParagraph, endChapter, endParagraph });
 };
