@@ -68,9 +68,28 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
                   pContent += `${pElement.textContent || ""}<span class="character-placeholder character-mention" data-character="${characterInfo.display}" data-src-picture="${pictureSrc}" data-is-talking="false"></span>`;
                 }
               } else {
-                // Handle other potential elements if needed, e.g., <b>, <i>
-                // For now, we ignore unknown tags within <p>
+                switch (pElement.tagName) {
+                  case "note":
+                    // previously it looked like this: <a href="#fn14" class="link-note">[14]</a>
+                    pContent += `<a href="#fn${pElement.getAttribute("id")}" class="link-note">${pElement.textContent || ""}</a>`;
+
+                    break;
+                  case "b":
+                    pContent += `<span class="bold">${pElement.textContent || ""}</span>`;
+                    break;
+                  case "i":
+                    pContent += `<span class="italic">${pElement.textContent || ""}</span>`;
+                    break;
+                  case "strong":
+                    pContent += ` <strong>${pElement.textContent.trim() || ""}</strong>`;
+                    break;
+                  default:
+                    pContent += `<${pElement.tagName}>${pElement.textContent || ""}</${pElement.tagName}>`;
+                    break;
+                }
               }
+            } else {
+              console.log("unknown tag again", tagName);
             }
           }
 
@@ -91,7 +110,19 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
           let innerHtml = "";
           for (let k = 0; k < childElement.childNodes.length; k++) {
             // Cast ChildNode to unknown, then to the imported Node type
-            innerHtml += serializer.serializeToString(childElement.childNodes[k] as unknown as Node);
+            const node = childElement.childNodes[k] as unknown as Node;
+            // Skip nodes that start with capital letter (XML tags for Characters)
+            if (
+              node.nodeType === 1 /* Element node */ &&
+              node.nodeName &&
+              node.nodeName.charAt(0) === node.nodeName.charAt(0).toUpperCase() &&
+              node.nodeName.charAt(0) !== node.nodeName.charAt(0).toLowerCase()
+            ) {
+              console.log("skipping tag", node.nodeName);
+              continue;
+            }
+            console.log("adding tag", node.nodeName);
+            innerHtml += serializer.serializeToString(node);
           }
           htmlResult += `\n    <${tagName} data-index="${dataIndex++}">${innerHtml}</${tagName}>`;
         }
@@ -111,6 +142,7 @@ if (require.main === module) {
   const bookSlug: BOOK_SLUGS = CURRENT_BOOK;
   const xmlString = fs.readFileSync(path.join(__dirname, `${bookSlug}-chapters.xml`), "utf8");
   // Example usage: Provide the book slug when calling
+  console.log("bookSlug", bookSlug);
   const htmlString = xmlToComplexHtml(xmlString, bookSlug);
   if (bookSlug === "1984") {
     fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const _${bookSlug}BookXml = \`<section>${htmlString}</section>\`;`);

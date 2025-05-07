@@ -9,13 +9,7 @@ import {
 } from "./audio-crossfader";
 import { CURRENT_BOOK } from "./consts";
 import { BOOK_SLUGS } from "./consts";
-
-const getChapterForTom = (tom: number, chapter: number) => {
-  if (tom === 2) {
-    return chapter + 25;
-  }
-  return chapter;
-};
+import { getCurrentLocation } from "@/src/helpers/paragraphsNavigation"; // Added import
 
 // Updated structure
 let backgroundSongsDefined = [
@@ -155,14 +149,46 @@ if (CURRENT_BOOK === BOOK_SLUGS._1984) {
 }
 
 export const preloadBackgroundTracks = async () => {
-  console.log("Preloading background tracks...");
+  console.log("Attempting to preload background tracks dynamically...");
+
   if (!initAudioContext()) {
-    console.warn("Cannot preload tracks, AudioContext not ready.");
+    // Call once and check
+    console.warn("Cannot preload tracks, AudioContext not ready or already initialized by user gesture.");
+    // It might already be initialized, or it might fail.
+    // If it's essential for it to be ready here and it's not, we can't proceed.
+    // However, initAudioContext() should ideally be callable multiple times safely,
+    // returning true if ready, false if not.
+    // For now, if it returns false, we assume we can't preload.
     return;
-  } else {
-    initAudioContext(); // Call this only once from a user gesture
   }
-  for (const section of backgroundSongsDefined) {
+
+  const location = getCurrentLocation();
+  const currentChapter = location ? location.chapter : 0;
+  const chaptersToPreloadAhead = 2; // Number of upcoming chapters to preload
+
+  console.log(`Current chapter for preloading: ${currentChapter}`);
+
+  let chaptersToConsider: number[];
+  if (currentChapter > 0) {
+    chaptersToConsider = Array.from({ length: chaptersToPreloadAhead + 1 }, (_, i) => currentChapter + i);
+  } else {
+    // If no specific chapter (e.g., initial load, chapter is 0), preload first few chapters
+    console.log("No specific current chapter, preloading initial chapters.");
+    chaptersToConsider = [1, 2]; // Default to preloading for chapters 1, 2, and 3
+  }
+
+  console.log("Preloading tracks for chapters:", chaptersToConsider);
+
+  const tracksToPreload = backgroundSongsDefined.filter((section) => chaptersToConsider.includes(section.chapter));
+
+  if (tracksToPreload.length === 0) {
+    console.log("No background tracks found for the current chapter range to preload.");
+    return;
+  }
+
+  console.log(`Preloading ${tracksToPreload.length} sections...`);
+
+  for (const section of tracksToPreload) {
     for (const file of section.files) {
       const trackId = file.replace(".mp3", "");
       // TODO: How to handle transition points if they differ per track in a section?
@@ -170,18 +196,34 @@ export const preloadBackgroundTracks = async () => {
       await loadTrack(trackId /*, section.transitionPoints */); // Pass points if available/needed
     }
   }
-  console.log("Background tracks preloading complete.");
+  console.log("Dynamic background tracks preloading complete.");
 };
 
-export const dealWithBackgroundSongs = ({ startChapter, startParagraph }) => {
-  console.log("dealWithBackgroundSongs", { startChapter, startParagraph });
+export const dealWithBackgroundSongs = ({ startChapter, startParagraph, endChapter, endParagraph }) => {
+  console.log("dealWithBackgroundSongs", { startChapter, startParagraph, endChapter, endParagraph });
   // Ensure AudioContext is ready (should have been initialized by user gesture)
   // if (!audioContext) { /* Check state */ return; }
+
+  let chapterToConsider: number;
+  let paragraphToConsider: number;
+  if (startChapter === endChapter) {
+    chapterToConsider = startChapter;
+    paragraphToConsider = Math.floor((startParagraph + endParagraph) / 2);
+  } else {
+    // When view spans chapters, prioritize the new chapter (endChapter)
+    // to switch music earlier.
+    chapterToConsider = endChapter;
+    // Reference point is the last visible paragraph of the new chapter.
+    // (endParagraph is the paragraph number within endChapter)
+    paragraphToConsider = 1;
+  }
+  // Add a console log for the calculated consideration point for debugging
+  console.log(`Calculated consideration point: Chapter ${chapterToConsider}, Paragraph ${paragraphToConsider} `);
 
   const foundBackgroundSections = backgroundSongsDefined
     .filter((section) => {
       // Find the section that STARTS at or before the current position
-      return section.chapter < startChapter || (section.chapter === startChapter && section.paragraph <= startParagraph);
+      return section.chapter < chapterToConsider || (section.chapter === chapterToConsider && section.paragraph <= paragraphToConsider);
 
       // --- OR --- Find section that ENCOMPASSES the current range (more complex if ranges overlap)
       // This depends on exact definition: Does the song start when entering the range, or must the entire range be inside?

@@ -16,9 +16,9 @@ if (import.meta.hot) {
 export function useBackgroundSongs() {
   const { location } = useLocation();
 
-  const { chapter, paragraph } = useDebounce(location, 300);
+  const { chapter, paragraph, endChapter, endParagraph } = useDebounce(location, 300);
 
   useEffect(() => {
-    implRef.current({ startChapter: location.chapter, startParagraph: location.paragraph });
-  }, [chapter, paragraph]);
+    implRef.current({ startChapter: location.chapter, startParagraph: location.paragraph, endChapter: location.endChapter, endParagraph: location.endParagraph });
+  }, [chapter, paragraph, endChapter, endParagraph]);
 }

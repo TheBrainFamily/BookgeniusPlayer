@@ -183,7 +183,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
           className={cn(
             "keyboard-safe-area",
             "w-full mx-auto",
-            "lg:max-w-[700px]",
+            "max-w-[900px] until-1900:max-w-[700px]",
             "bg-gradient-to-b from-black/0 to-[var(--footer-stop)]",
             "rounded-lg",
             "dark:bg-inherit",
