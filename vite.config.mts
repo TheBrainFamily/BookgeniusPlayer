@@ -5,8 +5,32 @@ import { viteStaticCopy, type Target } from "vite-plugin-static-copy";
 
 import { fileURLToPath } from "url";
 import path from "path";
+import fs from "fs";
 
 import { CURRENT_BOOK, BOOK_SLUGS } from "./src/consts";
+
+// Workaround to remove unnecessary books chunks from the build
+// ToDo: Do not create them in the first place
+const removeChunksPlugin = () => {
+  return {
+    name: "remove-specified-chunks",
+    apply: "build" as const,
+    closeBundle() {
+      console.log(`Removing chunks for books other than the: ${CURRENT_BOOK}`);
+      const distDir = path.resolve(__dirname, "dist/assets");
+      const toRemove = Object.values(BOOK_SLUGS)
+        .filter((slug) => slug !== CURRENT_BOOK)
+        .map((slug) => `${slug.toLowerCase()}`);
+
+      toRemove.forEach((base) =>
+        fs
+          .readdirSync(distDir)
+          .filter((f) => f.includes(base))
+          .forEach((f) => fs.unlinkSync(path.join(distDir, f))),
+      );
+    },
+  };
+};
 
 interface BookBuildData {
   name: string;
@@ -30,12 +54,7 @@ if (!activeBookConfig) {
 // Prepare targets for vite-plugin-static-copy
 const staticCopyTargets: Target[] = [];
 if (activeBookConfig.staticAssetSourceDir && activeBookConfig.staticAssetDestDir) {
-  staticCopyTargets.push({
-    // Copy contents of the book's asset source directory
-    src: path.join(activeBookConfig.staticAssetSourceDir, "*"),
-    // To the book's specific destination directory in 'dist'
-    dest: activeBookConfig.staticAssetDestDir,
-  });
+  staticCopyTargets.push({ src: path.join(activeBookConfig.staticAssetSourceDir, "*"), dest: activeBookConfig.staticAssetDestDir });
 }
 
 export default defineConfig({
@@ -63,6 +82,7 @@ export default defineConfig({
       },
       devOptions: { enabled: true },
     }),
+    removeChunksPlugin(),
   ],
   resolve: {
     alias: {
@@ -80,15 +100,6 @@ export default defineConfig({
     outDir: "dist",
     sourcemap: true,
     emptyOutDir: true, // Clean 'dist' before each build
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          if (id.includes("/src/booksData/")) {
-            return "book-data";
-          }
-        },
-      },
-    },
   },
   server: {
     port: 5173, // Or any port you prefer
