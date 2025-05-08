@@ -1,4 +1,5 @@
-export const faraonAnnotationsXml = `
+export const faraonAnnotationsXml = ``;
+export const faraonAnnotationsXmlOld = `
             <section id="fn1">
               <p>
                 <emphasis>Aleksandria</emphasis> — miasto założone przez Aleksandra Wielkiego po podboju Egiptu, położone nad Morzem Śródziemnym, w zachodniej części delty Nilu.

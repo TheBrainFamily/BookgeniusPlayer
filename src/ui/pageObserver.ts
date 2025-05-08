@@ -103,6 +103,7 @@ function createMediaElement(placeholder: HTMLSpanElement): HTMLVideoElement | HT
 function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] p[data-index]");
 
+  const charactersDisplayed = [];
   console.log("activate media in range", { startChapter, startParagraph, endChapter, endParagraph });
   allParagraphs.forEach((p) => {
     const chapterElement = p.closest("section[data-chapter]") as HTMLElement;
@@ -120,7 +121,10 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
         // Query for either video or image with the class OR the dummy placeholder
         let mediaElement = placeholder.querySelector<HTMLVideoElement | HTMLImageElement>("video.inline-avatar, img.inline-avatar");
         const dummyPlaceholder = placeholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
-
+        if (charactersDisplayed.includes(placeholder.dataset.character)) {
+          console.log("character already displayed", placeholder.dataset.character);
+          return;
+        }
         if (inView) {
           if (dummyPlaceholder) {
             // Found a dummy, replace it with actual media
@@ -161,6 +165,7 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
                 mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
               }
               console.log(`[Media Inject] Injected media for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
+              charactersDisplayed.push(placeholder.dataset.character);
             }
           } else if (mediaElement instanceof HTMLVideoElement && mediaElement.paused) {
             // Media already injected, just play existing video if paused
