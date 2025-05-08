@@ -1,5 +1,6 @@
 /* --- Modal Styles --- */
 .modal-overlay {
+  font-family: var(--font-serif);
     position: fixed;
     inset: 0;
     background-color: var(--modal-overlay-bg);

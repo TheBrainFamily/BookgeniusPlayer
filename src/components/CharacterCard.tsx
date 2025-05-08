@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useMemo } from "react";
 import { ParsedParagraphRange } from "@/src/fetchers/getParagraphRange";
 import { getPictureFilePathForName, getMovingPictureFilePathForName } from "@/src/utils/getFilePathsForName";
 import { CURRENT_BOOK } from "@/src/consts";
+import { useModal } from "../context/ModalContext";
 
 /* ------------------------------------------------------------------ */
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
@@ -93,14 +94,29 @@ export const CharacterCard: React.FC<Props> = ({ entity, index }) => {
   const mediaSrc = entity.imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, CURRENT_BOOK) : entity.imageUrl;
   const isVideo = mediaSrc.endsWith(".mp4") || mediaSrc.endsWith(".webm");
 
-  const openDetails = () => typeof window.showCharacterDetailsModal === "function" && window.showCharacterDetailsModal(entity.canonicalName, mediaSrc, entity.summary ?? "");
-
-  const commonAttrs = { "data-original-src": mediaSrc, "data-character-name": entity.canonicalName, "data-summary": entity.summary ?? "", className: "entity-image" } as const;
-
   const summaryHTML = (entity.summary || "").replace(/\n\n/g, "<br/>").replace(/\n/g, "<br/>").replace(/•/g, "");
+  const commonAttrs = { "data-original-src": mediaSrc, "data-character-name": entity.canonicalName, "data-summary": entity.summary ?? "", className: "entity-image" } as const;
+  
+  const { openModal } = useModal();
+
+  const openDetailsModal = () => {
+    openModal(
+      <div className="flex flex-row lg:flex-col gap-4 max-w-full lg:max-w-120 max-h-full">
+        <div className="rounded-full overflow-hidden max-h-[90vh] max-w-[90vh] lg:max-h-120 lg:max-w-120 border-4 border-[var(--entity-highlight-border-light)]">
+          {isVideo ? <video {...commonAttrs} src={mediaSrc} autoPlay loop muted playsInline /> : <img {...commonAttrs} src={mediaSrc} alt={entity.canonicalName} />}
+        </div>
+        <div className="flex flex-col self-center p-4 rounded-lg bg-[var(--entity-highlight-bg-light)] border-2 border-[var(--entity-highlight-border-light)]">
+        <h4 className="editable-text italic font-bold text-center">{entity.label || entity.canonicalName}</h4>
+        <p className="text-center">
+          {summaryHTML}
+        </p>
+      </div>
+      </div>
+    );
+  };
 
   /* custom CSS property for stagger delay */
-  const style = { ["--stagger-delay"]: `${index * 0.13}s` };
+  const style = { "--stagger-delay": `${index * 0.13}s` } as React.CSSProperties;
 
   return (
     <div
@@ -112,7 +128,7 @@ export const CharacterCard: React.FC<Props> = ({ entity, index }) => {
       onMouseLeave={() => requestToggle(false)}
     >
       <div className="entity-image-column">
-        <div className="entity-image-wrapper" onClick={openDetails}>
+        <div className="entity-image-wrapper" onClick={openDetailsModal}>
           {isVideo ? <video {...commonAttrs} src={mediaSrc} autoPlay loop muted playsInline /> : <img {...commonAttrs} src={mediaSrc} alt={entity.canonicalName} />}
         </div>
       </div>

@@ -971,7 +971,7 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  z-index: 1001; /* Above modals */
+  z-index: 999; /* Below modal overlay from modal context */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transition: background-color var(--transition-fast) var(--transition-timing);
 
