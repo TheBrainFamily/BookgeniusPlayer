@@ -1,6 +1,6 @@
 import { BOOK_SLUGS } from "../consts";
 import { pharaonCharactersData } from "../data/pharaon-metadata";
-
+import { _1984CharactersData } from "../data/metadata-1984";
 export const knownMovingPictures = [
   "Książę Ramzes",
   "Ramzes XII",
@@ -22,7 +22,7 @@ export const knownMovingPictures = [
   "Gedeon",
 ];
 
-const known = [
+const knownPharaon = [
   "abeb-listens.mp4",
   "amenhotep-listens.mp4",
   "anupa-listens.mp4",
@@ -123,6 +123,21 @@ const known = [
   "phut-beroes-listens.mp4",
 ];
 
+const known1984 = [
+  "wielki-brat-listens.mp4",
+  "winston-smith-listens.mp4",
+  "winston-smith-speaks.mp4",
+  "sąsiadka-winstona-z-pracy-drobna-kobieta-o-włosach-w-kolorze-piasku-listens.mp4",
+  "sąsiadka-winstona-z-pracy-drobna-kobieta-o-włosach-w-kolorze-piasku-speaks.mp4",
+  "dziewczyna-z-ciemnymi-włosami-julia-speaks.mp4",
+  "dziewczyna-z-ciemnymi-włosami-julia-listens.mp4",
+  "pani-parson-speaks.mp4",
+  "pani-parson-listens.mp4",
+  "o-brien-listens.mp4",
+  "o-brien-speaks.mp4",
+];
+
+const known = [...knownPharaon, ...known1984];
 export const getPictureFileNameForName = (name: string) => {
   return `${name.replace(/[\s()\\']+/g, "-").toLowerCase()}.png`;
 };
@@ -147,6 +162,9 @@ export const getMovingPictureFilePathForName = (name: string, bookSlug: BOOK_SLU
     .replace(/ /g, "-")
     .replace(/"/g, "")
     .replace(/(\(|\))/g, "")}-speaks.mp4`;
+  if (name.includes("Julia")) {
+    console.log(`${name} - ${speaksPath}`);
+  }
   if (known.includes(speaksPath)) {
     return `/${bookSlug}/${speaksPath}`;
   }
@@ -155,13 +173,13 @@ export const getMovingPictureFilePathForName = (name: string, bookSlug: BOOK_SLU
 
 // const charactersToShow = ["Ramzes", "Ramzes XII", "Herhor", "Nitager", "Brat Ramzesa", "Amenhotep", "Nikotris"];
 
-const filesFound: string[] = [];
-pharaonCharactersData.forEach((character) => {
-  const { characterName, bookSlug } = character;
+// const filesFound: string[] = [];
+// pharaonCharactersData.forEach((character) => {
+//   const { characterName, bookSlug } = character;
 
-  filesFound.push(getPictureFilePathForName(characterName, bookSlug as BOOK_SLUGS));
-  filesFound.push(getMovingPictureFilePathForName(characterName, bookSlug as BOOK_SLUGS));
-});
+//   filesFound.push(getPictureFilePathForName(characterName, bookSlug as BOOK_SLUGS));
+//   filesFound.push(getMovingPictureFilePathForName(characterName, bookSlug as BOOK_SLUGS));
+// });
 
 // known.forEach((file) => {
 //   const found = filesFound.find((f) => f.includes(file));
@@ -169,3 +187,53 @@ pharaonCharactersData.forEach((character) => {
 //     console.log(`File not found: ${file}`);
 //   }
 // });
+
+// const filesFound: { characterName: string; filePath: string }[] = [];
+
+// _1984CharactersData.forEach((character) => {
+//   const { characterName, bookSlug } = character;
+
+//   filesFound.push({ characterName, filePath: getPictureFilePathForName(characterName, bookSlug as BOOK_SLUGS) });
+
+//   filesFound.push({ characterName, filePath: getMovingPictureFilePathForName(characterName, bookSlug as BOOK_SLUGS) });
+// });
+
+// const notFoundInfo: { characterName: string; spottedIn: number; talkingIn: number; inChapters: number; filePath: string }[] = [];
+
+// filesFound.forEach((file) => {
+//   if (!file.filePath.includes(".mp4")) {
+//     const found = _1984CharactersData.find((c) => c.characterName === file.characterName);
+
+//     if (found && notFoundInfo.find((c) => c.characterName === file.characterName) === undefined) {
+//       let spottedIn = 0;
+
+//       let talkingIn = 0;
+
+//       let inChapters = 0;
+
+//       found.infoPerChapter.forEach((chapter) => {
+//         if (chapter.chapter) {
+//           chapter.paragraphsWhereSpotted.forEach((paragraph) => {
+//             spottedIn++;
+//           });
+
+//           chapter.paragraphsWhereTalking.forEach((paragraph) => {
+//             talkingIn++;
+//           });
+
+//           inChapters++;
+//         }
+//       });
+
+//       notFoundInfo.push({ characterName: file.characterName, spottedIn, talkingIn, inChapters, filePath: file.filePath });
+//     }
+//   }
+// });
+
+// console.log(
+//   notFoundInfo
+
+//     .sort((a, b) => b.inChapters - a.inChapters)
+
+//     .map((c) => `${c.characterName} - In number of chapters: ${c.inChapters} - Paragraphs spotted: ${c.spottedIn} - Paragraphs talking: ${c.talkingIn} - File path: ${c.filePath}`),
+// );

@@ -143,8 +143,13 @@ let backgroundSongsDefined = [
 
 if (CURRENT_BOOK === BOOK_SLUGS._1984) {
   backgroundSongsDefined = [
-    { chapter: 1, paragraph: 1, files: ["chapter_1_part_1.mp3", "chapter_1_part_1b.mp3"] },
-    { chapter: 1, paragraph: 24, files: ["chapter_1_part_2.mp3", "chapter_1_part_2b.mp3"] },
+    { chapter: 1, paragraph: 1, files: ["1984-chapter-1-paragraph-1.mp3"] },
+    { chapter: 1, paragraph: 22, files: ["1984-chapter-1-paragraph-22.mp3", "1984-chapter-1-paragraph-22b.mp3"] },
+    { chapter: 2, paragraph: 1, files: ["1984-chapter-2-paragraph-1.mp3", "1984-chapter-2-paragraph-1b.mp3"] },
+    { chapter: 2, paragraph: 26, files: ["1984-chapter-2-paragraph-26.mp3", "1984-chapter-2-paragraph-26b.mp3"] },
+    { chapter: 3, paragraph: 1, files: ["1984-chapter-3-paragraph-1.mp3", "1984-chapter-3-paragraph-1b.mp3"] },
+    { chapter: 4, paragraph: 1, files: ["1984-chapter-4-paragraph-1.mp3", "1984-chapter-4-paragraph-1b.mp3"] },
+    { chapter: 4, paragraph: 13, files: ["1984-chapter-4-paragraph-13.mp3", "1984-chapter-4-paragraph-13b.mp3"] },
   ];
 }
 
