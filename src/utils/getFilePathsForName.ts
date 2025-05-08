@@ -136,6 +136,21 @@ const known1984 = [
   "pani-parson-listens.mp4",
   "o-brien-listens.mp4",
   "o-brien-speaks.mp4",
+  "aaronson-listens.mp4",
+  "ampleforth-listens.mp4",
+  "ampleforth-speaks.mp4",
+  "boomerang-gemini-fade.py",
+  "emmanuel-goldstein-listens.mp4",
+  "jones-listens.mp4",
+  "katharine-listens.mp4",
+  "matka-winstona-listens.mp4",
+  "ojciec-winstona-listens.mp4",
+  "pan-charrington-listens.mp4",
+  "pan-charrington-speaks.mp4",
+  "rutheford_listens.mp4",
+  "siostra-winstona_listens.mp4",
+  "tom-parsons-speaks.mp4",
+  "tom-parsons_listens.mp4",
 ];
 
 const known = [...knownPharaon, ...known1984];
