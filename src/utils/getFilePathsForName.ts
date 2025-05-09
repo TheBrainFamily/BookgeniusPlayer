@@ -122,6 +122,8 @@ const knownPharaon = [
   "żona-chłopa-topionego-speaks.mp4",
   "phut-beroes-speaks.mp4",
   "phut-beroes-listens.mp4",
+  "tillotson-listens.mp4",
+  "tillotson-speaks.mp4",
 ];
 
 const known1984 = [
@@ -204,52 +206,52 @@ export const getMovingPictureFilePathForName = (name: string, bookSlug: BOOK_SLU
 //   }
 // });
 
-const filesFound: { characterName: string; filePath: string }[] = [];
+// const filesFound: { characterName: string; filePath: string }[] = [];
 
-bookData.charactersData.forEach((character) => {
-  const { characterName, bookSlug } = character;
+// bookData.charactersData.forEach((character) => {
+//   const { characterName, bookSlug } = character;
 
-  filesFound.push({ characterName, filePath: getPictureFilePathForName(characterName, bookSlug as BOOK_SLUGS) });
+//   filesFound.push({ characterName, filePath: getPictureFilePathForName(characterName, bookSlug as BOOK_SLUGS) });
 
-  filesFound.push({ characterName, filePath: getMovingPictureFilePathForName(characterName, bookSlug as BOOK_SLUGS) });
-});
+//   filesFound.push({ characterName, filePath: getMovingPictureFilePathForName(characterName, bookSlug as BOOK_SLUGS) });
+// });
 
-const notFoundInfo: { characterName: string; spottedIn: number; talkingIn: number; inChapters: number; filePath: string }[] = [];
+// const notFoundInfo: { characterName: string; spottedIn: number; talkingIn: number; inChapters: number; filePath: string }[] = [];
 
-filesFound.forEach((file) => {
-  if (!file.filePath.includes(".mp4")) {
-    const found = bookData.charactersData.find((c) => c.characterName === file.characterName);
+// filesFound.forEach((file) => {
+//   if (!file.filePath.includes(".mp4")) {
+//     const found = bookData.charactersData.find((c) => c.characterName === file.characterName);
 
-    if (found && notFoundInfo.find((c) => c.characterName === file.characterName) === undefined) {
-      let spottedIn = 0;
+//     if (found && notFoundInfo.find((c) => c.characterName === file.characterName) === undefined) {
+//       let spottedIn = 0;
 
-      let talkingIn = 0;
+//       let talkingIn = 0;
 
-      let inChapters = 0;
+//       let inChapters = 0;
 
-      found.infoPerChapter.forEach((chapter) => {
-        if (chapter.chapter) {
-          chapter.paragraphsWhereSpotted.forEach((paragraph) => {
-            spottedIn++;
-          });
+//       found.infoPerChapter.forEach((chapter) => {
+//         if (chapter.chapter) {
+//           chapter.paragraphsWhereSpotted.forEach((paragraph) => {
+//             spottedIn++;
+//           });
 
-          chapter.paragraphsWhereTalking.forEach((paragraph) => {
-            talkingIn++;
-          });
+//           chapter.paragraphsWhereTalking.forEach((paragraph) => {
+//             talkingIn++;
+//           });
 
-          inChapters++;
-        }
-      });
+//           inChapters++;
+//         }
+//       });
 
-      notFoundInfo.push({ characterName: file.characterName, spottedIn, talkingIn, inChapters, filePath: file.filePath });
-    }
-  }
-});
+//       notFoundInfo.push({ characterName: file.characterName, spottedIn, talkingIn, inChapters, filePath: file.filePath });
+//     }
+//   }
+// });
 
-console.log(
-  notFoundInfo
+// console.log(
+//   notFoundInfo
 
-    .sort((a, b) => b.inChapters - a.inChapters)
+//     .sort((a, b) => b.inChapters - a.inChapters)
 
-    .map((c) => `${c.characterName} - In number of chapters: ${c.inChapters} - Paragraphs spotted: ${c.spottedIn} - Paragraphs talking: ${c.talkingIn} - File path: ${c.filePath}`),
-);
+//     .map((c) => `${c.characterName} - In number of chapters: ${c.inChapters} - Paragraphs spotted: ${c.spottedIn} - Paragraphs talking: ${c.talkingIn} - File path: ${c.filePath}`),
+// );
