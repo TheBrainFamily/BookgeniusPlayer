@@ -1,4 +1,5 @@
 const loadingPhraseElement = document.getElementById("loading-phrase");
+
 const loadingPhrases = [
   "Kreowanie wirtualnej biblioteki...",
   "Przywoływanie fikcyjnych postaci...",
@@ -12,34 +13,36 @@ const loadingPhrases = [
   "Uwalnianie narracyjnej magii...",
 ];
 
+let phrasesCount = 0;
+let intervalId = null;
+let phrase = "";
+
 function getRandomPhrase() {
-  return loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)];
+  do {
+    phrase = loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)];
+  } while (phrase === loadingPhraseElement.textContent);
+
+  return phrase;
 }
 
-loadingPhraseElement.textContent = getRandomPhrase();
-
-let phrasesCount = 0;
-let phraseInterval = null;
-
 function updatePhrase() {
-  loadingPhraseElement.classList.add("phrase-transition");
+  loadingPhraseElement.classList.add("loading-phrase--show");
+  loadingPhraseElement.textContent = getRandomPhrase();
 
-  setTimeout(() => {
-    loadingPhraseElement.textContent = getRandomPhrase();
-  }, 300);
-
-  setTimeout(() => {
-    loadingPhraseElement.classList.remove("phrase-transition");
-  }, 600);
+  const timeoutId = setTimeout(() => {
+    loadingPhraseElement.classList.remove("loading-phrase--show");
+  }, 2000);
 
   phrasesCount++;
 
-  if (phrasesCount >= 3) {
-    clearInterval(phraseInterval);
+  if (phrasesCount >= 10) {
+    clearInterval(intervalId);
+    clearTimeout(timeoutId);
   }
 }
 
-phraseInterval = setInterval(updatePhrase, 3000);
+updatePhrase();
+intervalId = setInterval(updatePhrase, 2500);
 
 document.querySelectorAll("#legacy p, #legacy span, #legacy li").forEach((el) => {
   el.innerHTML = el.innerHTML.replace(/(\s|^)([aiouwz]|na|do|od|za|po|we|ku|ze|co|że|bo|iż|ni|nad|pod|bez|dla|oraz|ale|lub|czy|ani)\s/gi, "$1$2\u00A0");

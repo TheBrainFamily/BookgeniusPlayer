@@ -18,12 +18,12 @@ export const dealWithSW = () => {
   let swTimeoutId: number | undefined;
 
   const tryHideSplash = () => {
-    if (splash.classList.contains("hide")) {
+    if (splash.classList.contains("splash--hide")) {
       return;
     }
 
     if (serviceWorkerHandled && videoReady) {
-      splash.classList.add("hide");
+      splash.classList.add("splash--hide");
 
       if (videoTimeoutId) clearTimeout(videoTimeoutId);
       if (swTimeoutId) clearTimeout(swTimeoutId);
