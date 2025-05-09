@@ -1,63 +1,66 @@
 <!doctype html>
+
 <html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <!-- PWA Meta Tags -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Book Viewer" />
-  <meta name="theme-color" content="#333333" />
-  <meta name="description" content="Interactive book reader with character profiles" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Book Viewer" />
+    <meta name="theme-color" content="#333333" />
+    <meta name="description" content="Interactive book reader with character profiles" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-  <!-- PWA Icons -->
-  <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-  <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
-  <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
 
-  <!-- PWA Manifest - Already added by vite build ??? -->
-  <!-- <link rel="manifest" href="/manifest.json" version="1.0.22" /> -->
+    <!-- Preload -->
+    <link rel="preload" href="/loading.gif" as="image" />
 
-  <!-- CSS_LINKS -->
-  <style></style>
-  <title>Book Viewer</title>
-</head>
+    <!-- Splash screen styles -->
+    <link rel="stylesheet" href="/src/styles/splash.css" />
 
-<body>
-  <div id="legacy">
-    <video id="bg-video-a" class="bg-video" autoplay muted loop playsinline></video>
-    <video id="bg-video-b" class="bg-video faded" autoplay muted loop playsinline></video>
-    <video id="cutscene-video" class="cutscene-video" playsinline></video>
-    <p id="cutscene-text"></p>
-    <div id="book-container">
-      <div class="notes-container" id="left-notes"></div>
-      <div id="content-container"></div>
-      <div class="notes-container" id="right-notes">
-        <div id="right-notes-scrollable-container"></div>
-      </div>
-    </div>
+    <title>Book Viewer</title>
+  </head>
 
-    <div class="notes-edge-indicator" id="notes-edge-indicator"></div>
-    <div class="notes-overlay" id="notes-overlay"></div>
+  <body>
+    <div id="legacy">
+      <video id="bg-video-a" class="bg-video" autoplay muted loop playsinline></video>
+      <video id="bg-video-b" class="bg-video faded" autoplay muted loop playsinline></video>
 
-    <!-- Menu overlay -->
-    <div id="menu-overlay" class="modal-overlay">
-      <div class="menu-container">
-        <div class="menu-content">
-          <button id="toggle-night-mode-button" class="menu-item">Night Mode (M)</button>
-          <button id="open-chapters-button" class="menu-item">Open Chapter</button>
-          <button id="go-to-page-button" class="menu-item">Go to Page</button>
+      <video id="cutscene-video" class="cutscene-video" playsinline></video>
+      <p id="cutscene-text"></p>
+
+      <div id="book-container">
+        <div class="notes-container" id="left-notes"></div>
+        <div id="content-container"></div>
+        <div class="notes-container" id="right-notes">
+          <div id="right-notes-scrollable-container"></div>
         </div>
       </div>
-    </div>
 
-    <!-- Chapters modal -->
-    <!-- <div id="chapters-modal" class="modal-overlay">
+      <div class="notes-edge-indicator" id="notes-edge-indicator"></div>
+      <div class="notes-overlay" id="notes-overlay"></div>
+
+      <!-- Menu overlay -->
+      <div id="menu-overlay" class="modal-overlay">
+        <div class="menu-container">
+          <div class="menu-content">
+            <button id="toggle-night-mode-button" class="menu-item">Night Mode (M)</button>
+            <button id="open-chapters-button" class="menu-item">Open Chapter</button>
+            <button id="go-to-page-button" class="menu-item">Go to Page</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chapters modal -->
+      <!-- <div id="chapters-modal" class="modal-overlay">
       <div class="modal-container">
         <div class="modal-header">
           <div class="modal-title">Chapters</div>
@@ -65,14 +68,14 @@
         </div>
         <div class="modal-content">
           <div id="chapters-list" class="chapters-list"> -->
-            <!-- Chapters will be dynamically inserted here -->
-          <!-- </div>
+      <!-- Chapters will be dynamically inserted here -->
+      <!-- </div>
         </div>
       </div>
     </div> -->
 
-    <!-- Go to page modal -->
-    <!-- <div id="go-to-page-modal" class="modal-overlay">
+      <!-- Go to page modal -->
+      <!-- <div id="go-to-page-modal" class="modal-overlay">
       <div class="modal-container">
         <div class="modal-header">
           <div class="modal-title">Go to Page</div>
@@ -87,11 +90,11 @@
       </div>
     </div> -->
 
-    <!-- Page number indicator that appears when typing numbers -->
-    <!-- <div id="page-number-indicator"></div> -->
+      <!-- Page number indicator that appears when typing numbers -->
+      <!-- <div id="page-number-indicator"></div> -->
 
-    <!-- Character Details Modal -->
-    <!-- <div id="character-details-modal" class="modal-overlay">
+      <!-- Character Details Modal -->
+      <!-- <div id="character-details-modal" class="modal-overlay">
       <div class="modal-container">
         <div class="modal-header">
           <div class="modal-title">Character Details</div>
@@ -108,89 +111,63 @@
       </div>
     </div> -->
 
-    <!-- Character Action Modal -->
-    <div id="character-modal" class="modal-overlay">
-      <div class="modal-container">
-        <div class="modal-header">
-          <div class="modal-title">Character Options</div>
-          <button class="modal-close">&times;</button>
-        </div>
-        <div class="modal-content">
-          <div id="character-info">
-            <video autoplay loop id="modal-character-image" style="max-width: 100%; margin-bottom: 15px" />
-            <h3 id="modal-character-name"></h3>
+      <!-- Character Action Modal -->
+      <div id="character-modal" class="modal-overlay">
+        <div class="modal-container">
+          <div class="modal-header">
+            <div class="modal-title">Character Options</div>
+            <button class="modal-close">&times;</button>
+          </div>
+          <div class="modal-content">
+            <div id="character-info">
+              <video autoplay loop id="modal-character-image" style="max-width: 100%; margin-bottom: 15px" />
+              <h3 id="modal-character-name"></h3>
+            </div>
+          </div>
+          <div class="modal-buttons">
+            <button id="remove-character-button" class="modal-button danger-button">Remove Character</button>
+            <button id="map-character-button" class="modal-button secondary-button">Map to Existing Character</button>
+            <button id="create-image-button" class="modal-button primary-button">Create/Regenerate Image</button>
           </div>
         </div>
-        <div class="modal-buttons">
-          <button id="remove-character-button" class="modal-button danger-button">Remove Character</button>
-          <button id="map-character-button" class="modal-button secondary-button">Map to Existing Character</button>
-          <button id="create-image-button" class="modal-button primary-button">Create/Regenerate Image</button>
-        </div>
       </div>
-    </div>
 
-    <!-- Character Mapping Modal -->
-    <div id="mapping-modal" class="modal-overlay">
-      <div class="modal-container">
-        <div class="modal-header">
-          <div class="modal-title">Select Existing Character</div>
-          <button class="modal-close">&times;</button>
-        </div>
-        <div class="modal-content">
-          <p>Select a character to map <strong id="source-character-name"></strong> to:</p>
-          <div id="character-grid" class="character-grid">
-            <!-- Character cards will be inserted here -->
+      <!-- Character Mapping Modal -->
+      <div id="mapping-modal" class="modal-overlay">
+        <div class="modal-container">
+          <div class="modal-header">
+            <div class="modal-title">Select Existing Character</div>
+            <button class="modal-close">&times;</button>
+          </div>
+          <div class="modal-content">
+            <p>Select a character to map <strong id="source-character-name"></strong> to:</p>
+            <div id="character-grid" class="character-grid">
+              <!-- Character cards will be inserted here -->
+            </div>
+          </div>
+          <div class="modal-buttons">
+            <button id="cancel-mapping-button" class="modal-button secondary-button">Cancel</button>
+            <button id="confirm-mapping-button" class="modal-button primary-button">Map Character</button>
           </div>
         </div>
-        <div class="modal-buttons">
-          <button id="cancel-mapping-button" class="modal-button secondary-button">Cancel</button>
-          <button id="confirm-mapping-button" class="modal-button primary-button">Map Character</button>
-        </div>
       </div>
+
+      <!-- return to location button -->
     </div>
 
-    <!-- return to location button -->
-  </div>
+    <div id="root">
+      <div id="chapters-root"></div>
+    </div>
 
-  <div id="root">
-    <div id="chapters-root"></div>
-  </div>
-  <div id="return-to-location-button" style="display: none">Go Back</div>
-  <div id="deep-research-root"></div>
-  <style>
-    #splash {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-      color: #fff;
-      font: 1.2rem/1 sans-serif;
-      z-index: 9999;
-    }
+    <div id="return-to-location-button" style="display: none">Go Back</div>
+    <div id="deep-research-root"></div>
 
-    #splash.hide {
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-  </style>
+    <div id="splash">
+      <img src="/loading.gif" alt="" width="100" height="100" />
+      <div id="loading-phrase"></div>
+    </div>
 
-  <div id="splash">Loading chapter&nbsp;1…</div>
-  <script>
-    document.querySelectorAll("#legacy p, #legacy span, #legacy li").forEach((el) => {
-      el.innerHTML = el.innerHTML.replace(/(\s|^)([aiouwz]|na|do|od|za|po|we|ku|ze|co|że|bo|iż|ni|nad|pod|bez|dla|oraz|ale|lub|czy|ani)\s/gi, "$1$2\u00A0");
-    });
-  </script>
-  <script type="module" src="/src/index.tsx" async></script>
-  <!-- PWA Service Worker Registration -->
-  <!-- <script src="https://unpkg.com/ios-pwa-splash@1.0.0/cdn.min.js"></script> -->
-  <!-- <script>
-      iosPWASplash("/splashscreen.png", "#aaccdd");
-    </script> -->
-
-  <!-- <script src="/pwa.js"></script> -->
-</body>
-
+    <script type="module" src="/src/index-scripts.ts" async></script>
+    <script type="module" src="/src/index.tsx" async></script>
+  </body>
 </html>
