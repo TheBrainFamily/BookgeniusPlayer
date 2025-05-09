@@ -122,7 +122,7 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
         let mediaElement = placeholder.querySelector<HTMLVideoElement | HTMLImageElement>("video.inline-avatar, img.inline-avatar");
         const dummyPlaceholder = placeholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
         if (charactersDisplayed.includes(placeholder.dataset.character)) {
-          console.log("character already displayed", placeholder.dataset.character);
+          // console.log("character already displayed", placeholder.dataset.character);
           return;
         }
         if (inView) {

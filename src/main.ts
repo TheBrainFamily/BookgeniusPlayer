@@ -1,4 +1,4 @@
-/*  THIS FILE IS 100 % VANILLA JS ‑ NOTHING RENDERS HERE
+/*  THIS FILE IS 100% VANILLA JS ‑ NOTHING RENDERS HERE
  *
  *  We simply copied everything that used to live in main.ts,
  *  removed the `startReactComponents()` call (React is now started
@@ -6,7 +6,6 @@
  *  You can continue cutting pieces out of here and turning them into
  *  real React components whenever you feel like it.
  */
-import debounce from "lodash.debounce";
 
 import { setIsNightMode } from "./helpers/setIsNightMode";
 import { isMobileCharactersVisible } from "./isMobileCharactersVisible";
@@ -16,7 +15,7 @@ import { dealWithSW } from "./serviceWorker";
 import { setupParagraphHighlighting } from "./ui/paragraphHighlighting";
 import { setupKeyboardNavigation } from "./utils/keyboardNavigation";
 import { initPage } from "./ui/pageInit";
-import { initCharacterModals, showCharacterDetailsModal } from "./ui/characterModals";
+// import { initCharacterModals, showCharacterDetailsModal } from "./ui/characterModals";
 
 /* ------------------------------------------------------------------ */
 /*  The only exported symbol                                           */
@@ -39,17 +38,17 @@ export async function runLegacyInit() {
   }
 
   /* ----------------------------------------------------------------
-   *  2.  “DOMContentLoaded” kind of stuff
+   *  2.  “DOMContentLoaded” kind of stuff
    * ---------------------------------------------------------------- */
   function onDOMLoaded() {
     initializeNoteLinkBlinking(); // <-- kept here for safety;
     //     also wrapped in a React hook upstream
     // NO DARK MODE
-    setIsNightMode(false)
+    setIsNightMode(false);
     // if (localStorage.getItem("nightMode") === "true") setIsNightMode(true);
 
     initSearchModal();
-    initCharacterModals();
+    // initCharacterModals();
     document.querySelectorAll(".modal-close").forEach((button) => {
       const modal = button.closest(".modal-overlay");
       if (modal) button.addEventListener("click", () => modal.classList.remove("active"));
@@ -67,7 +66,7 @@ export async function runLegacyInit() {
   /* ----------------------------------------------------------------
    *  3. Anything that other scripts expect to exist on window
    * ---------------------------------------------------------------- */
-  (window as any).showCharacterDetailsModal = showCharacterDetailsModal;
+  // (window as any).showCharacterDetailsModal = showCharacterDetailsModal;
 
   /* Characters panel initial state (night mode, mobile characters, …) */
   document.getElementById("legacy")?.classList.toggle("characters-hidden", !isMobileCharactersVisible());
