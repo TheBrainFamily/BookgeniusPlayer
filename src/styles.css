@@ -756,6 +756,7 @@
     align-items: center;
     overflow: visible;
     margin-left: 70px;
+    width: 85%;
   }
   /* when first entity is talking there is no space for scale effect */
   .entity-note:first-child {

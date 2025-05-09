@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { createPortal } from "react-dom";
 
 import { useDebounce } from "@/src/hooks/useDebounce";
@@ -28,12 +28,6 @@ export const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
 
   /* characters for that range */
   const notes = useCharacterNotes(range, bookData.charactersData);
-
-  /* Fade‑in only when the ARRAY REFERENCE actually changes */
-  // const [fadeInKey, setFadeInKey] = useState(0);
-  useEffect(() => {
-    // setFadeInKey((k) => k + 1); // triggers fadeUp on the *new* cards only
-  }, [notes]);
 
   if (!target) return null;
 
