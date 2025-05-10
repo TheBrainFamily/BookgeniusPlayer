@@ -88,9 +88,7 @@ export default function App() {
     runLegacyInit();
   }, []);
 
-  if (isLoading) {
-    return <div>Loading book content...</div>;
-  }
+  if (isLoading) return null;
 
   if (error) {
     return <div>Error loading book: {error}</div>;
