@@ -6,50 +6,43 @@ interface TrackState {
   audioBuffer?: AudioBuffer;
   sourceNode?: AudioBufferSourceNode | null;
   gainNode?: GainNode | null;
+  duration?: number; // Added for pre-emptive transition
+  preemptiveTransitionTimeout?: ReturnType<typeof setTimeout> | null; // Added for managing pre-emptive transition
 }
 
 // --- Configuration ---
 const FADE_DURATION_SECONDS = 8.0;
-// Unused for now as transition point logic is simplified
-// const MIN_LOOKAHEAD_SECONDS = 1.5;
-// const MAX_LOOKAHEAD_SECONDS = 15.0;
+const PRE_END_TRANSITION_TRIGGER_SECONDS = 4.0; // Time before track end to trigger transition
 
 // --- Module-level State ---
 let audioContext: AudioContext | null = null;
 const tracks: Map<string, TrackState> = new Map();
 
 let currentTrackId: string | null = null;
-let nextTrackId: string | null = null; // Track being faded TO
+let nextTrackId: string | null = null; // Track being faded TO (during active crossfade)
 let isTransitioning = false; // Is a crossfade actively happening?
 let transitionTimeout: ReturnType<typeof setTimeout> | null = null;
 
-// --- NEW State for Section Sequence ---
-let currentSectionTracks: string[] | null = null; // List of track IDs for the current section
-let currentTrackIndexInSection: number = -1; // Index of currentTrackId within currentSectionTracks
-// ---
+let currentSectionTracks: string[] | null = null;
+let currentTrackIndexInSection: number = -1;
+// undefined: no pending change; null: pending clear; string[]: pending set
+let pendingSectionTracks: string[] | null | undefined = undefined;
 
 // --- Core Functions ---
 
 export function initAudioContext(): boolean {
-  // ... (initAudioContext function remains the same)
   if (!audioContext) {
     try {
-      // More specific type assertion for window
-      const AudioContextClass = window.AudioContext || (window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!AudioContextClass) {
         console.error("Web Audio API not supported by this browser.");
         return false;
       }
-
       audioContext = new AudioContextClass();
       console.log(`AudioContext initialised. State: ${audioContext.state}`);
-
-      // Add listener for state changes
       audioContext.onstatechange = () => {
         console.log(`AudioContext state changed to: ${audioContext?.state}`);
       };
-
-      // Immediately try to resume if suspended (often needed initially)
       if (audioContext.state === "suspended") {
         audioContext.resume().then(
           () => console.log("AudioContext resumed on init."),
@@ -61,57 +54,43 @@ export function initAudioContext(): boolean {
       return false;
     }
   } else if (audioContext.state === "suspended") {
-    // If already exists but suspended, try resuming
     audioContext.resume().catch((e) => console.error("Error resuming existing AudioContext:", e));
   }
-
-  return audioContext.state === "running";
+  return audioContext?.state === "running";
 }
 
 export async function loadTrack(trackId: string, transitionPoints?: number[]): Promise<boolean> {
-  // ... (loadTrack function remains largely the same)
-  // Added check for AudioContext readiness at the start
   if (!audioContext) {
     if (!initAudioContext()) {
-      // Attempt to init/resume if not ready
-      console.error("AudioContext could not be initialized/resumed. Cannot load track.");
+      console.error("loadTrack: AudioContext could not be initialized/resumed. Cannot load track.");
       return false;
     }
-    // If initAudioContext succeeds, audioContext will be available now
   }
-  // Ensure context is running after potential init attempt
-  if (audioContext.state !== "running") {
-    console.warn("AudioContext is not running. Loading may succeed but playback won't start yet.");
-    // Potentially try resuming again, though init should handle it.
-    audioContext.resume().catch((e) => console.error("Error resuming AudioContext before load:", e));
+  if (audioContext!.state !== "running") {
+    // audioContext is guaranteed to be non-null here
+    console.warn("loadTrack: AudioContext is not running. Loading may succeed but playback won't start yet.");
+    // await audioContext!.resume().catch((e) => console.error("Error resuming AudioContext before load:", e));
+    // Resuming here might be too late if the user gesture is already "spent". initAudioContext should handle it.
   }
 
   const existing = tracks.get(trackId);
-  // ... (rest of the loading logic is the same)
   if (existing?.audioBuffer) {
-    // Already decoded — just update transition points if new data supplied
     if (transitionPoints && existing.transitionPoints !== transitionPoints) {
       existing.transitionPoints = transitionPoints;
-      console.log(`Updated transition points for '${trackId}'.`);
     }
+    // console.log(`Track '${trackId}' already loaded.`);
     return true;
   }
 
   const audioPath = `/${CURRENT_BOOK}/${trackId}.mp3`;
-  console.log(`Loading '${trackId}' → ${audioPath}`);
-
+  console.log(`Loading '${trackId}' from ${audioPath}...`);
   try {
     const response = await fetch(audioPath);
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} – ${response.statusText}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP ${response.status} – ${response.statusText}`);
     const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-    tracks.set(trackId, { audioBuffer, transitionPoints, sourceNode: null, gainNode: null });
-
-    console.log(`Decoded '${trackId}'.` + (transitionPoints ? ` Transition points: ${transitionPoints.join(", ")}` : " No transition points supplied."));
+    const audioBuffer = await audioContext!.decodeAudioData(arrayBuffer);
+    tracks.set(trackId, { audioBuffer, duration: audioBuffer.duration, transitionPoints, sourceNode: null, gainNode: null });
+    console.log(`Decoded '${trackId}'. Duration: ${audioBuffer.duration.toFixed(2)}s.` + (transitionPoints ? ` Transition points: ${transitionPoints.join(", ")}` : ""));
     return true;
   } catch (e) {
     console.error(`Error loading '${trackId}':`, e);
@@ -120,15 +99,10 @@ export async function loadTrack(trackId: string, transitionPoints?: number[]): P
   }
 }
 
-/**
- * Schedules / (re)starts a looping BufferSource for the given track.
- * Returns true on success.
- */
 function playTrack(trackId: string, startTime: number = 0, offset: number = 0): boolean {
   if (!audioContext || audioContext.state !== "running") {
-    console.error(`Cannot play track '${trackId}', AudioContext not ready or not running.`);
-    // Attempt to resume just in case
-    initAudioContext();
+    console.error(`Cannot play track '${trackId}', AudioContext not ready/running. State: ${audioContext?.state}`);
+    initAudioContext(); // Attempt to re-init/resume
     return false;
   }
 
@@ -142,36 +116,41 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0): 
 
   const source = audioContext.createBufferSource();
   const gainNode = audioContext.createGain();
-  const beginGain = startTime <= audioContext.currentTime ? 1 : 0; // Start at full volume if starting now
-
   source.buffer = state.audioBuffer;
-  source.loop = false; // Don't loop, let onended fire naturally
-  gainNode.gain.setValueAtTime(beginGain, startTime); // Set initial gain
-
+  source.loop = false; // onended will handle sequence
+  gainNode.gain.setValueAtTime(startTime <= audioContext.currentTime ? 1 : 0, startTime);
   source.connect(gainNode).connect(audioContext.destination);
 
-  // *** Add the onended handler ***
-  source.onended = () => {
-    // Check if this 'onended' event is for the *currently active* track
-    // and if it ended *naturally* (i.e., not because we called .stop() during a transition or stopAll).
-    const wasCurrentTrack = trackId === currentTrackId;
-    const stateStillExists = tracks.has(trackId) && tracks.get(trackId)?.sourceNode === source; // Check if sourceNode is still the same one
+  // Clear any existing preemptive transition timeout for this track if it's being re-played
+  const existingStateForTimeout = tracks.get(trackId);
+  if (existingStateForTimeout?.preemptiveTransitionTimeout) {
+    clearTimeout(existingStateForTimeout.preemptiveTransitionTimeout);
+    existingStateForTimeout.preemptiveTransitionTimeout = null;
+  }
 
-    // Log the context state when onended fires
-    console.log(
-      `onended for '${trackId}': Context state: ${audioContext?.state}, wasCurrent: ${wasCurrentTrack}, isTransitioning: ${isTransitioning}, stateExists: ${stateStillExists}, sectionTracks: ${!!currentSectionTracks}`,
-    );
+  source.onended = async () => {
+    const stateAtEnd = tracks.get(trackId);
+    const thisSourceInstanceEnded = stateAtEnd?.sourceNode === source;
 
-    if (wasCurrentTrack && !isTransitioning && stateStillExists && currentSectionTracks && currentSectionTracks.length > 0) {
-      console.log(`Track '${trackId}' (index ${currentTrackIndexInSection}) ended naturally.`);
-      // Only proceed if it was the current track and we are not in a crossfade
-      playNextTrackInSection();
+    // Conditions for this onended handler to take action:
+    // 1. This track (trackId) must be the currentTrackId.
+    // 2. No transition should be currently active (isTransitioning === false).
+    //    This means either the track ended naturally without a pre-emptive fade,
+    //    OR a fade completed, isTransitioning is now false, and *then* the new track ended.
+    // 3. This specific source instance (source) must be the one that ended, not one already stopped/replaced.
+    if (trackId === currentTrackId && !isTransitioning && thisSourceInstanceEnded) {
+      console.log(`onended for current track '${trackId}'. No active transition. Attempting to play next in section.`);
+      if (currentSectionTracks && currentSectionTracks.length > 0) {
+        await playNextTrackInSection();
+      } else {
+        console.log(`Track '${trackId}' ended, but no section or section empty. Clearing currentTrackId.`);
+        currentTrackId = null;
+        currentTrackIndexInSection = -1;
+      }
     } else {
       console.log(
-        `Track '${trackId}' ended. Conditions not met for auto-play next (wasCurrent: ${wasCurrentTrack}, isTransitioning: ${isTransitioning}, stateExists: ${stateStillExists}, sectionTracks: ${!!currentSectionTracks})`,
+        `onended for '${trackId}': Conditions not met for auto-play next. currentTrackId: ${currentTrackId}, isTransitioning: ${isTransitioning}, thisSourceInstanceEnded: ${thisSourceInstanceEnded}, sourceNodeAtEnd: ${stateAtEnd?.sourceNode === source}`,
       );
-      // Optional: Clean up if the node ended but wasn't the active track anymore?
-      // stopTrackInternal(trackId); // Might be redundant if stopTrackInternal was called elsewhere
     }
   };
 
@@ -179,162 +158,197 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0): 
     source.start(startTime, offset % state.audioBuffer.duration);
     state.sourceNode = source;
     state.gainNode = gainNode;
-    console.log(`Scheduled '${trackId}' @ ${startTime.toFixed(2)}s (offset ${offset.toFixed(2)}s).`);
+    console.log(`Scheduled '${trackId}' @ ${startTime.toFixed(2)}s (offset ${offset.toFixed(2)}s). Duration: ${state.audioBuffer.duration.toFixed(2)}s`);
+
+    // Schedule pre-emptive transition
+    if (currentSectionTracks && currentSectionTracks.length > 0 && state.duration && audioContext) {
+      const effectiveTrackDurationSecs = state.duration - (offset % state.audioBuffer.duration);
+      const timeUntilPreemptiveTrigger = effectiveTrackDurationSecs - PRE_END_TRANSITION_TRIGGER_SECONDS;
+
+      if (timeUntilPreemptiveTrigger > FADE_DURATION_SECONDS / 2 && timeUntilPreemptiveTrigger > 0.2) {
+        // Ensure there's enough time for a meaningful fade trigger
+        const preemptiveTimeoutId = setTimeout(() => {
+          const currentAudioContext = audioContext; // Capture current audioContext
+          if (!currentAudioContext) return;
+
+          // Check conditions again inside timeout, as state might have changed
+          if (trackId === currentTrackId && !isTransitioning && currentSectionTracks && currentSectionTracks.length > 0) {
+            const currentIndex = currentSectionTracks.indexOf(trackId);
+            if (currentIndex !== -1) {
+              const nextIndex = (currentIndex + 1) % currentSectionTracks.length;
+              const nextTrackToPlay = currentSectionTracks[nextIndex];
+              console.log(`Pre-emptive transition: Current '${trackId}' nearing end. Triggering transition to '${nextTrackToPlay}'.`);
+
+              (async () => {
+                const loaded = await loadTrack(nextTrackToPlay); // Ensure next track is loaded
+                // Re-check critical conditions after await, especially audioContext and current track/transition state
+                if (audioContext && audioContext.state === "running" && trackId === currentTrackId && !isTransitioning && tracks.has(trackId)) {
+                  console.log(`Pre-emptive: initiating crossfade from ${trackId} to ${nextTrackToPlay} at ${audioContext.currentTime.toFixed(2)}s`);
+                  await performCrossfade(trackId, nextTrackToPlay, audioContext.currentTime);
+                } else {
+                  console.warn(`Pre-emptive transition for ${trackId} -> ${nextTrackToPlay} aborted. Load failed: ${!loaded}, or audio context/track state changed.`);
+                }
+              })();
+            }
+          }
+          const trackStateForTimeout = tracks.get(trackId);
+          if (trackStateForTimeout) trackStateForTimeout.preemptiveTransitionTimeout = null;
+        }, timeUntilPreemptiveTrigger * 1000);
+
+        if (tracks.has(trackId)) tracks.get(trackId)!.preemptiveTransitionTimeout = preemptiveTimeoutId;
+        console.log(`Scheduled pre-emptive transition for '${trackId}' in ${timeUntilPreemptiveTrigger.toFixed(2)}s.`);
+      } else {
+        console.log(
+          `Track '${trackId}' is too short or offset too large for a pre-emptive transition starting ${PRE_END_TRANSITION_TRIGGER_SECONDS}s before end and ensuring enough fade time. Effective duration for trigger calc: ${effectiveTrackDurationSecs.toFixed(2)}s. Relies on onended.`,
+        );
+      }
+    }
     return true;
   } catch (err) {
     console.error(`Error starting source node for '${trackId}':`, err);
-    stopTrackInternal(trackId); // Clean up nodes if start failed
+    stopTrackInternal(trackId);
     return false;
   }
 }
 
-/** Internal helper: stops and disconnects nodes for a track. */
 function stopTrackInternal(trackId: string) {
   const state = tracks.get(trackId);
   if (!state) return;
 
+  if (state.preemptiveTransitionTimeout) {
+    clearTimeout(state.preemptiveTransitionTimeout);
+    state.preemptiveTransitionTimeout = null;
+    // console.log(`Cleared pre-emptive transition timeout for '${trackId}' during stop.`);
+  }
+
   if (state.sourceNode) {
-    // Remove onended handler before stopping to prevent triggering sequence logic incorrectly
-    state.sourceNode.onended = null;
+    state.sourceNode.onended = null; // Crucial: remove handler before stopping
     try {
       state.sourceNode.stop();
-    } catch (e) {
-      // Ignore errors (e.g., if already stopped), but log warning just in case
-      console.warn(`Ignoring error stopping source node for ${trackId}:`, e);
+    } catch {
+      // Linter: Unused 'e' -> _ignoredError -> empty catch
+      /* console.warn(`Ignoring error stopping source node for ${trackId}:`, e); */
     }
     try {
       state.sourceNode.disconnect();
-    } catch (e) {
-      // Ignore error disconnecting source node
-      console.warn(`Ignoring error disconnecting source node for ${trackId}:`, e);
+    } catch {
+      // Linter: Unused 'e' -> empty catch
+      /* console.warn(`Ignoring error disconnecting source node for ${trackId}:`, e); */
     }
     state.sourceNode = null;
   }
   if (state.gainNode) {
     try {
       state.gainNode.disconnect();
-    } catch (e) {
-      // Ignore error disconnecting gain node
-      console.warn(`Ignoring error disconnecting gain node for ${trackId}:`, e);
+    } catch {
+      // Linter: Unused 'e' -> empty catch
+      /* console.warn(`Ignoring error disconnecting gain node for ${trackId}:`, e); */
     }
     state.gainNode = null;
   }
-  // console.log(`Stopped internal nodes for ${trackId}`); // Optional logging
+  // console.log(`Stopped internal nodes for ${trackId}`);
 }
 
-/** Plays the next track in the current section sequence */
-function playNextTrackInSection() {
-  if (!currentSectionTracks || currentSectionTracks.length === 0 || isTransitioning || !audioContext) {
-    console.log("playNextTrackInSection: Conditions not met (no section/tracks, transitioning, or no context).");
+async function playNextTrackInSection(): Promise<void> {
+  if (!audioContext || !currentSectionTracks || currentSectionTracks.length === 0 || isTransitioning) {
+    console.log(
+      `playNextTrackInSection: Conditions not met. Context: ${!!audioContext}, Section: ${!!currentSectionTracks}, Tracks: ${currentSectionTracks?.length}, Transitioning: ${isTransitioning}`,
+    );
+    if (currentTrackId && !isTransitioning && currentSectionTracks && currentSectionTracks.length > 0) {
+      // Current track ended, but we decided not to play next (e.g. end of non-looping section)
+      // This logic may need refinement based on whether sections should loop or stop.
+      // For now, assume sections are sequences that play once through unless explicitly re-triggered.
+      console.log(`playNextTrackInSection: Current track ${currentTrackId} ended. Section sequence completed or not progressing.`);
+      currentTrackId = null; // Nothing is actively being made to play by this function
+      currentTrackIndexInSection = -1;
+    }
     return;
   }
 
-  // Calculate next index, wrapping around
   const nextIndex = (currentTrackIndexInSection + 1) % currentSectionTracks.length;
+  // Simple: if we are at the last track and wrap around, it means the section ended.
+  // More complex logic could be: if nextIndex is 0 and currentTrackIndexInSection was last index, then section ended.
+  // For now, assume it always loops for simplicity of this example until product requirements say otherwise.
+  // If sections should NOT loop, this needs adjustment (e.g., stop if nextIndex is 0 and previous was last).
+
   const nextTrackIdToPlay = currentSectionTracks[nextIndex];
+  console.log(`playNextTrackInSection: Attempting to play next track '${nextTrackIdToPlay}' (index ${nextIndex}) in section [${currentSectionTracks.join(", ")}].`);
 
-  console.log(`Auto-playing next track in section: '${nextTrackIdToPlay}' (index ${nextIndex})`);
+  const previousTrackId = currentTrackId;
+  const previousIndex = currentTrackIndexInSection;
 
-  const previousTrackId = currentTrackId; // Keep for potential rollback
+  const loaded = await loadTrack(nextTrackIdToPlay);
+  if (loaded && audioContext && audioContext.state === "running") {
+    // Check context state again
+    // Update state *just before* playing, now that we know track is loaded
+    currentTrackId = nextTrackIdToPlay;
+    currentTrackIndexInSection = nextIndex;
 
-  // Update state *before* playing
-  currentTrackId = nextTrackIdToPlay; // Logically, this is now the current track
-  currentTrackIndexInSection = nextIndex;
-
-  // Immediately play the next track (no fade, it's a direct switch upon the previous one ending)
-  loadTrack(nextTrackIdToPlay).then((loaded) => {
-    // Ensure loaded
-    if (loaded && audioContext) {
-      // Play immediately from the beginning (offset 0)
-      if (!playTrack(nextTrackIdToPlay, audioContext.currentTime, 0)) {
-        console.error(`Failed to play next track in sequence: ${nextTrackIdToPlay}`);
-        // Rollback state? Stop all?
-        currentTrackId = previousTrackId; // Revert logical track
-        currentTrackIndexInSection = (nextIndex - 1 + currentSectionTracks.length) % currentSectionTracks.length; // Revert index
-        stopAllPlayback(); // Safer to stop if sequence fails
-      } else {
-        console.log(`Successfully started next track in sequence: '${nextTrackIdToPlay}'`);
-      }
-    } else if (!loaded) {
-      console.error(`Cannot play next track '${nextTrackIdToPlay}', failed to load.`);
-      currentTrackId = previousTrackId; // Revert
-      currentTrackIndexInSection = (nextIndex - 1 + currentSectionTracks.length) % currentSectionTracks.length;
-      stopAllPlayback();
+    if (!playTrack(nextTrackIdToPlay, audioContext.currentTime, 0)) {
+      console.error(`playNextTrackInSection: Failed to play next track '${nextTrackIdToPlay}'. Rolling back state.`);
+      currentTrackId = previousTrackId; // Rollback
+      currentTrackIndexInSection = previousIndex;
+      // Consider stopping all if sequence play fails catastrophically
+      // stopAllPlayback();
+    } else {
+      console.log(`playNextTrackInSection: Successfully started next track '${nextTrackIdToPlay}'.`);
     }
-  });
-}
-
-// --- findNextTransitionPoint function remains the same ---
-// (Currently not used based on the prompt, but kept for potential future use)
-function findNextTransitionPoint(trackId: string): number | null {
-  if (!audioContext) return null;
-
-  const state = tracks.get(trackId);
-  // Ensure we check sourceNode *exists* and isn't already stopped/stopping
-  if (!state?.sourceNode || !state.audioBuffer || !state.gainNode) return null;
-
-  // *** SIMPLIFIED/TEMP: Return a fixed short delay for testing crossfades ***
-  // Replace this with your actual transition point logic when ready
-  console.warn(`Using fixed transition delay for '${trackId}'`);
-  return audioContext.currentTime + 1.0; // Start fade 1 second from now
-
-  /* // Your original logic (keep commented out if not using transition points yet)
-  const points = state.transitionPoints;
-  if (!points || points.length === 0) {
-      console.warn(`No transition points for '${trackId}'. Cannot find transition point.`);
-      return null; // No points defined, cannot find a time based on them
+  } else {
+    console.error(`playNextTrackInSection: Cannot play next track '${nextTrackIdToPlay}'. Load failed: ${!loaded}, Context not running: ${audioContext?.state !== "running"}.`);
+    // Don't roll back currentTrackId/Index here, as they weren't updated for the new track
+    // If loading failed, the previous track effectively "ended" and nothing new started.
+    // The onended handler for the previous track should have already cleared currentTrackId if applicable.
+    // If we want to be super safe, and loading the next track fails, we could stop everything.
+    // stopAllPlayback();
   }
-
-  const now = audioContext.currentTime;
-  // Calculate current playback position within the loop
-  // This requires knowing when the current source *started* and the current time.
-  // AudioBufferSourceNode doesn't expose playback position directly in a reliable way for looping.
-  // This is a common challenge. A workaround involves tracking start time and offsets.
-  // For simplicity, let's assume we can estimate loop position (THIS IS OFTEN INACCURATE).
-  // A more robust solution might involve setting up a separate timer/requestAnimationFrame loop.
-  // --- Placeholder for loop position calculation ---
-   console.error("Accurate loop position calculation needed for findNextTransitionPoint!");
-   const loopPos = now % state.audioBuffer.duration; // <<< HIGHLY APPROXIMATE
-
-  // ... (rest of your original logic using `loopPos` and `points`)
-  */
 }
 
-/** Cross-fades two tracks beginning at `transitionStartTime`. */
-function performCrossfade(fadeOutId: string, fadeInId: string, transitionStartTime: number) {
-  if (!audioContext || isTransitioning) {
-    console.warn(`Cannot perform crossfade: Context issue (${!audioContext}) or already transitioning (${isTransitioning})`);
+function findNextTransitionPoint(trackIdForFadeOut: string): number | null {
+  if (!audioContext) return null;
+  const state = tracks.get(trackIdForFadeOut);
+  if (!state?.sourceNode || !state.audioBuffer || !state.gainNode || state.gainNode.gain.value === 0) {
+    console.warn(`findNextTransitionPoint: No valid source/buffer/gain for '${trackIdForFadeOut}' or gain is 0. Cannot determine transition point.`);
+    return null;
+  }
+  // console.warn(`Using fixed transition delay for '${trackIdForFadeOut}' for testing.`);
+  return audioContext.currentTime + 1.0; // Simplified: start fade 1 second from now
+}
+
+async function performCrossfade(fadeOutId: string, fadeInId: string, transitionStartTime: number) {
+  if (!audioContext) {
+    console.warn("performCrossfade: AudioContext not available.");
+    isTransitioning = false; // Ensure this is reset if we bail early
+    nextTrackId = null;
     return;
   }
 
   const fadeOutState = tracks.get(fadeOutId);
-  const fadeInState = tracks.get(fadeInId); // We only need the buffer initially
+  const fadeInStateExists = tracks.has(fadeInId) && tracks.get(fadeInId)!.audioBuffer; // Check buffer specifically
 
-  if (!fadeOutState?.gainNode || !fadeInState?.audioBuffer) {
-    console.error(`Cannot perform cross-fade: missing data for ${fadeOutId} or ${fadeInId}.`);
+  if (!fadeOutState?.gainNode || !fadeInStateExists) {
+    console.error(`performCrossfade: Missing data. FadeOutGain: ${!!fadeOutState?.gainNode}, FadeInBuffer: ${fadeInStateExists}. Cannot cross-fade ${fadeOutId} -> ${fadeInId}.`);
+    isTransitioning = false;
+    nextTrackId = null;
     return;
   }
 
-  console.log(`Performing crossfade: ${fadeOutId} -> ${fadeInId} starting at ${transitionStartTime.toFixed(2)}s`);
+  console.log(`Performing crossfade: ${fadeOutId} -> ${fadeInId} scheduled at ${transitionStartTime.toFixed(2)}s`);
   isTransitioning = true;
   nextTrackId = fadeInId; // Mark the track we are fading *to*
 
   const fadeEnd = transitionStartTime + FADE_DURATION_SECONDS;
 
-  // --- Fade Out ---
+  // Fade Out
   const gOut = fadeOutState.gainNode.gain;
-  // Cancel any future ramps, set value now, then ramp down
   gOut.cancelScheduledValues(audioContext.currentTime);
-  gOut.setValueAtTime(gOut.value, audioContext.currentTime); // Start fade from current gain
+  gOut.setValueAtTime(gOut.value, audioContext.currentTime);
   gOut.linearRampToValueAtTime(0, fadeEnd);
-  console.log(`Fading out ${fadeOutId} from ${gOut.value.toFixed(2)} to 0 over ${FADE_DURATION_SECONDS}s`);
 
-  // --- Fade In ---
-  // Start the fadeIn track scheduled for the transition time, initially silent
-  if (!playTrack(fadeInId, transitionStartTime, 0)) {
-    // Start playing scheduled, offset 0
-    console.error(`Failed to schedule playTrack for fadeInId: ${fadeInId}. Aborting crossfade.`);
-    // Abort fade: Ramp volume back up on the original track
+  // Fade In - Ensure track is loaded before scheduling play
+  // `transitionToTrack` should have pre-loaded it. This is a safety check.
+  const loaded = await loadTrack(fadeInId);
+  if (!loaded) {
+    console.error(`performCrossfade: Failed to ensure ${fadeInId} is loaded. Aborting crossfade.`);
     gOut.cancelScheduledValues(audioContext.currentTime); // Cancel the fade out
     gOut.linearRampToValueAtTime(1, audioContext.currentTime + 0.2); // Quick ramp back up
     isTransitioning = false;
@@ -342,233 +356,272 @@ function performCrossfade(fadeOutId: string, fadeInId: string, transitionStartTi
     return;
   }
 
-  // Get the gain node that playTrack just created
-  const fadeInGainNode = tracks.get(fadeInId)?.gainNode;
-  if (!fadeInGainNode) {
-    console.error(`GainNode for fadeInId ${fadeInId} not found after playTrack. Aborting.`);
-    // Abort fade: Ramp volume back up on the original track
+  if (!playTrack(fadeInId, transitionStartTime, 0)) {
+    console.error(`performCrossfade: Failed to schedule playTrack for fadeInId: ${fadeInId}. Aborting crossfade.`);
     gOut.cancelScheduledValues(audioContext.currentTime);
     gOut.linearRampToValueAtTime(1, audioContext.currentTime + 0.2);
-    stopTrackInternal(fadeInId); // Stop the track we tried to start
+    isTransitioning = false;
+    nextTrackId = null;
+    return;
+  }
+
+  const fadeInGainNode = tracks.get(fadeInId)?.gainNode;
+  if (!fadeInGainNode) {
+    console.error(`performCrossfade: GainNode for fadeInId ${fadeInId} not found after playTrack. Aborting.`);
+    gOut.cancelScheduledValues(audioContext.currentTime);
+    gOut.linearRampToValueAtTime(1, audioContext.currentTime + 0.2);
+    stopTrackInternal(fadeInId);
     isTransitioning = false;
     nextTrackId = null;
     return;
   }
   const gIn = fadeInGainNode.gain;
-  gIn.setValueAtTime(0, transitionStartTime); // Ensure it starts silent at the scheduled time
-  gIn.linearRampToValueAtTime(1, fadeEnd); // Ramp up to full volume
-  console.log(`Fading in ${fadeInId} from 0 to 1 over ${FADE_DURATION_SECONDS}s`);
+  // Ensure it starts silent IF scheduled in future, or from 0 if starting now due to scheduling quirks
+  gIn.setValueAtTime(0, audioContext.currentTime); // Set to 0 now
+  gIn.linearRampToValueAtTime(0, transitionStartTime); // Ensure it stays 0 until transitionStartTime
+  gIn.linearRampToValueAtTime(1, fadeEnd); // Then ramp up
 
-  // --- Cleanup Timeout ---
-  clearTimeout(transitionTimeout!);
+  // Cleanup Timeout
+  if (transitionTimeout) clearTimeout(transitionTimeout);
   transitionTimeout = setTimeout(
     () => {
-      console.log(`Crossfade timeout reached for ${fadeOutId} -> ${fadeInId}.`);
-      stopTrackInternal(fadeOutId); // Stop the track that faded out completely
+      console.log(`Crossfade timeout reached for ${fadeOutId} -> ${fadeInId}. Cleaning up.`);
+      stopTrackInternal(fadeOutId);
 
-      // Update state: the fadeIn track is now the current track
-      currentTrackId = fadeInId;
-      // Update index based on the newly current track within the section
+      currentTrackId = fadeInId; // fadeInId is now officially the current track
+
+      // Apply pending section if one was set during the transition
+      if (pendingSectionTracks !== undefined) {
+        console.log(`Crossfade complete: Applying pending section: ${pendingSectionTracks ? "[" + pendingSectionTracks.join(", ") + "]" : "None"}`);
+        currentSectionTracks = pendingSectionTracks ? [...pendingSectionTracks] : null;
+        pendingSectionTracks = undefined; // Reset pending state
+      }
+
+      // Update index based on the (potentially new) current section
       if (currentSectionTracks) {
         currentTrackIndexInSection = currentSectionTracks.indexOf(fadeInId);
         if (currentTrackIndexInSection === -1) {
-          console.warn(`Track ${fadeInId} finished transition but not found in current section list? Section:`, currentSectionTracks);
-          // This might indicate the section changed *during* the fade.
-          // Might need to re-evaluate section state here. For now, just log.
-          setActiveSection(null); // Clear potentially invalid section state
+          console.warn(
+            `Crossfade complete: Track ${fadeInId} NOT found in active section [${currentSectionTracks.join(", ")}]. This might indicate a state issue if the section was expected to contain this track.`,
+          );
         } else {
-          console.log(`Cross-fade complete. Now playing '${fadeInId}' (index ${currentTrackIndexInSection}).`);
+          console.log(`Crossfade complete. Now playing '${fadeInId}' (index ${currentTrackIndexInSection} in section [${currentSectionTracks.join(", ")}]).`);
         }
       } else {
-        console.log(`Cross-fade complete. Now playing '${fadeInId}' (no active section).`);
-        currentTrackIndexInSection = -1; // No section
+        currentTrackIndexInSection = -1;
+        console.log(`Crossfade complete. Now playing '${fadeInId}' (no active section).`);
       }
 
-      nextTrackId = null; // No longer heading towards a specific track
+      nextTrackId = null;
       isTransitioning = false;
+      console.log("Crossfade transition fully completed and state updated.");
     },
-    // Use duration from now until fade ends
-    Math.max(0, fadeEnd - audioContext.currentTime) * 1000 + 50, // Add small buffer (50ms)
-  );
+    Math.max(0, fadeEnd - audioContext.currentTime) * 1000 + 100,
+  ); // 100ms buffer
 }
 
-// --- Public API ---
+export function setActiveSection(newSectionTrackIds: string[] | null): void {
+  if (!audioContext) {
+    console.warn("setActiveSection: AudioContext not ready.");
+    return;
+  }
 
-/** Sets the tracks considered the "current section" */
-export function setActiveSection(sectionTrackIds: string[] | null): void {
-  if (!audioContext) return; // Need context
+  if (isTransitioning) {
+    const newPendingKey = newSectionTrackIds ? newSectionTrackIds.join(",") : "null";
+    const currentPendingKeyIsUndefined = pendingSectionTracks === undefined;
+    const currentPendingKeyValue = currentPendingKeyIsUndefined ? "undefined" : pendingSectionTracks === null ? "null" : pendingSectionTracks.join(",");
 
-  const newSectionKey = sectionTrackIds ? sectionTrackIds.join(",") : "null";
+    if (newPendingKey !== currentPendingKeyValue) {
+      console.log(
+        `setActiveSection: Deferring section change. New pending: [${newSectionTrackIds ? newSectionTrackIds.join(", ") : "null"}]. Current pending was: ${currentPendingKeyValue}`,
+      );
+      pendingSectionTracks = newSectionTrackIds ? [...newSectionTrackIds] : null;
+    } else {
+      // console.log("setActiveSection: Deferring, but requested section is same as pending. No change to pendingSectionTracks.");
+    }
+    return;
+  }
+
+  // Not transitioning, apply immediately and clear any pending definition.
+  // console.log("setActiveSection: Applying change immediately, clearing any pending definition.");
+  pendingSectionTracks = undefined;
+
+  const newSectionKey = newSectionTrackIds ? newSectionTrackIds.join(",") : "null";
   const oldSectionKey = currentSectionTracks ? currentSectionTracks.join(",") : "null";
 
   if (newSectionKey === oldSectionKey) {
-    // console.log("setActiveSection: Section is the same, no change.");
+    // console.log("setActiveSection: Section is the same as current, no change needed.");
     return; // No change needed
   }
 
-  console.log(`Setting active section: ${sectionTrackIds ? `[${sectionTrackIds.join(", ")}]` : "None"}`);
-  currentSectionTracks = sectionTrackIds ? [...sectionTrackIds] : null; // Store copy or null
+  console.log(`Setting active section directly: ${newSectionTrackIds ? `[${newSectionTrackIds.join(", ")}]` : "None"}`);
+  currentSectionTracks = newSectionTrackIds ? [...newSectionTrackIds] : null;
 
-  // If a new section is set, reset the index. The index will be correctly
-  // set when a track from this section actually starts playing (via startFirstTrack or transitionToTrack).
-  // If the section is cleared (null), also reset the index.
-  currentTrackIndexInSection = -1;
-
-  // Optional: If clearing the section should also stop music, do it here.
-  // if (currentSectionTracks === null && currentTrackId) {
-  //    console.log("Active section cleared, stopping playback.");
-  //    stopAllPlayback();
-  // }
+  if (currentTrackId && currentSectionTracks && currentSectionTracks.includes(currentTrackId)) {
+    currentTrackIndexInSection = currentSectionTracks.indexOf(currentTrackId);
+    console.log(`Active section updated. Current track '${currentTrackId}' (index ${currentTrackIndexInSection}) is part of new section.`);
+  } else {
+    if (currentTrackId && currentSectionTracks && !currentSectionTracks.includes(currentTrackId)) {
+      console.log(`Active section updated. Current track '${currentTrackId}' is NOT part of new section [${currentSectionTracks.join(", ")}]. Index reset.`);
+    } else if (currentTrackId && !currentSectionTracks) {
+      console.log(`Active section cleared. Current track '${currentTrackId}' no longer in a section. Index reset.`);
+    } else if (!currentTrackId && currentSectionTracks) {
+      // console.log(`Active section set to [${currentSectionTracks.join(", ")}]. No current track. Index reset.`);
+    } else {
+      // console.log("Active section updated/cleared. No current track or section unchanged regarding current track. Index reset.");
+    }
+    currentTrackIndexInSection = -1;
+  }
 }
 
-/** Checks if the currentTrackId belongs to the provided section list AND that list is the active one */
 export function isCurrentTrackInSection(sectionTrackIdsToCheck: string[]): boolean {
   if (!currentTrackId || !currentSectionTracks || !sectionTrackIdsToCheck) {
     return false;
   }
-
-  // Check if the provided list *matches* the internally stored active section list
   const isActiveSectionSameAsChecked =
     currentSectionTracks.length === sectionTrackIdsToCheck.length && currentSectionTracks.every((track, index) => track === sectionTrackIdsToCheck[index]);
 
   if (!isActiveSectionSameAsChecked) {
-    // The section defined externally doesn't match what the audio player thinks is active
+    // console.log(`isCurrentTrackInSection: Provided section [${sectionTrackIdsToCheck.join(',')}] does not match active internal section [${currentSectionTracks.join(',')}]`);
     return false;
   }
-
-  // If the sections match, check if the current track is in that list
   return currentSectionTracks.includes(currentTrackId);
 }
 
-export function startFirstTrack(trackId: string): boolean {
+export async function startFirstTrack(trackId: string): Promise<boolean> {
   if (!audioContext) {
     console.error("startFirstTrack: AudioContext not ready.");
     return false;
   }
-  if (currentTrackId || isTransitioning) {
-    console.warn(`startFirstTrack: Cannot start '${trackId}', already playing '${currentTrackId}' or transitioning.`);
-    return false; // Don't start if something is already playing or mid-transition
+  // This check for currentTrackId MUST allow starting if currentTrackId is set but refers to a track that has naturally ended.
+  // The key is `tracks.get(currentTrackId)?.sourceNode` being null.
+  const currentTrackState = currentTrackId ? tracks.get(currentTrackId) : null;
+  if ((currentTrackId && currentTrackState?.sourceNode) || isTransitioning) {
+    // Check if sourceNode exists
+    console.warn(
+      `startFirstTrack: Cannot start '${trackId}'. Reason: ${currentTrackId && currentTrackState?.sourceNode ? `already playing '${currentTrackId}' (source exists)` : ""}${isTransitioning ? "transition in progress" : ""}.`,
+    );
+    return false;
   }
-  if (!tracks.get(trackId)?.audioBuffer) {
-    console.error(`startFirstTrack: '${trackId}' not loaded.`);
-    // Attempt to load it now? Or rely on preloading? Let's try loading.
-    loadTrack(trackId).then((loaded) => {
-      if (loaded) {
-        console.log(`Loaded '${trackId}' on demand, trying to start again.`);
-        startFirstTrack(trackId); // Retry after loading
-      } else {
-        console.error(`Failed to load '${trackId}' on demand.`);
-      }
-    });
-    return false; // Return false for now, retry will happen async
+
+  if (!tracks.has(trackId) || !tracks.get(trackId)!.audioBuffer) {
+    console.log(`startFirstTrack: '${trackId}' not loaded. Attempting to load...`);
+    const loaded = await loadTrack(trackId);
+    if (!loaded) {
+      console.error(`startFirstTrack: Failed to load '${trackId}' on demand.`);
+      return false;
+    }
+    console.log(`startFirstTrack: Successfully loaded '${trackId}' on demand.`);
   }
 
   console.log(`Starting first track: ${trackId}`);
   if (playTrack(trackId, audioContext.currentTime, 0)) {
     currentTrackId = trackId;
-    // Update index based on the newly current track within the section
     if (currentSectionTracks) {
       currentTrackIndexInSection = currentSectionTracks.indexOf(trackId);
       if (currentTrackIndexInSection === -1) {
-        console.warn(`Started track ${trackId} but not found in current section list? Section:`, currentSectionTracks);
-        // This implies setActiveSection wasn't called correctly before startFirstTrack
-        setActiveSection(null); // Clear potentially invalid section state
+        console.warn(
+          `Started track ${trackId}, but it's NOT in the current active section [${currentSectionTracks.join(", ")}]. Section state may be inconsistent or section not set yet for this track.`,
+        );
       } else {
-        console.log(`Started track ${trackId} at index ${currentTrackIndexInSection}`);
+        console.log(`Started track ${trackId} at index ${currentTrackIndexInSection} in section [${currentSectionTracks.join(", ")}].`);
       }
     } else {
+      currentTrackIndexInSection = -1;
       console.log(`Started track ${trackId} (no active section).`);
-      currentTrackIndexInSection = -1; // No section
     }
     return true;
+  } else {
+    console.warn(`startFirstTrack: playTrack call failed for ${trackId}.`);
+    return false;
   }
-  return false;
 }
 
-export function transitionToTrack(targetId: string): boolean {
+export async function transitionToTrack(targetId: string): Promise<boolean> {
+  console.log(`transitionToTrack: Attempting to transition to targetId='${targetId}'. Current: '${currentTrackId}', Transitioning: ${isTransitioning}, Next: '${nextTrackId}'`);
   if (!audioContext) {
     console.error("transitionToTrack: AudioContext not ready.");
     return false;
   }
+
   if (isTransitioning) {
-    console.warn(`transitionToTrack: Cannot transition to '${targetId}', transition already in progress (to '${nextTrackId}').`);
-    return false; // Don't allow new transition if one is active
-  }
-
-  // Case 1: Nothing is currently playing - just start the target track.
-  if (!currentTrackId) {
-    console.log(`transitionToTrack: No current track, using startFirstTrack for ${targetId}`);
-    // Ensure the target track belongs to the currently set section (if any) before starting
-    if (currentSectionTracks && !currentSectionTracks.includes(targetId)) {
-      console.warn(`transitionToTrack: Target track ${targetId} does not belong to the active section [${currentSectionTracks.join(", ")}]. Section state might be inconsistent.`);
-      // Decide: Clear section? Force set section based on target? For now, proceed but log warning.
-    } else if (!currentSectionTracks) {
-      console.log(`transitionToTrack: Starting ${targetId} with no active section set.`);
+    if (nextTrackId === targetId) {
+      console.log(`transitionToTrack: Already transitioning to '${targetId}'. Considered successful.`);
+      return true;
+    } else {
+      console.warn(`transitionToTrack: Cannot transition to '${targetId}', another transition (to '${nextTrackId}') is already in progress.`);
+      return false;
     }
-    return startFirstTrack(targetId);
   }
 
-  // Case 2: Target track is already playing - do nothing.
-  if (currentTrackId === targetId) {
-    console.log(`transitionToTrack: Target track '${targetId}' is already playing.`);
-    // Ensure index is correct if section context was somehow lost/reset
+  if (currentTrackId === targetId && tracks.get(targetId)?.sourceNode) {
+    // Also check if sourceNode exists
+    console.log(`transitionToTrack: Target track '${targetId}' is already current and playing. Ensuring index is correct.`);
     if (currentSectionTracks && currentTrackIndexInSection === -1) {
       currentTrackIndexInSection = currentSectionTracks.indexOf(targetId);
     }
     return true;
   }
 
-  // Case 3: Target track is different, need to transition.
-  if (!tracks.get(targetId)?.audioBuffer) {
-    console.error(`transitionToTrack: Target track '${targetId}' not loaded.`);
-    // Attempt to load?
-    loadTrack(targetId).then((loaded) => {
-      if (loaded) {
-        console.log(`Loaded '${targetId}' on demand, trying transition again.`);
-        transitionToTrack(targetId); // Retry async
-      } else {
-        console.error(`Failed to load '${targetId}' on demand for transition.`);
-      }
-    });
-    return false; // Return false now, retry happens async
+  if (!tracks.has(targetId) || !tracks.get(targetId)!.audioBuffer) {
+    console.log(`transitionToTrack: Target track '${targetId}' not loaded. Attempting to load...`);
+    const loaded = await loadTrack(targetId);
+    if (!loaded) {
+      console.error(`transitionToTrack: Failed to load '${targetId}' on demand for transition.`);
+      return false; // Failed to load, cannot proceed.
+    }
+    console.log(`transitionToTrack: Successfully loaded '${targetId}' on demand.`);
   }
 
-  // Find a suitable time to start the crossfade
-  // Using the simplified version for now
-  const startTime = findNextTransitionPoint(currentTrackId);
-  if (startTime === null) {
-    console.warn(`transitionToTrack: Could not find a transition point for '${currentTrackId}'. Cannot transition.`);
-    // Fallback? Maybe just cut immediately? Or log and fail?
-    // Let's try an immediate cut as a fallback for now
-    console.log(`Falling back to immediate cut for transition ${currentTrackId} -> ${targetId}`);
-    stopTrackInternal(currentTrackId);
-    const started = startFirstTrack(targetId); // Use startFirstTrack to handle index update
+  // Case 1: Nothing is effectively playing (no currentTrackId, or currentTrackId's sourceNode is gone)
+  const currentTrackState = currentTrackId ? tracks.get(currentTrackId) : null;
+  if (!currentTrackId || !currentTrackState?.sourceNode) {
+    console.log(`transitionToTrack: No current track playing or source gone ('${currentTrackId}'). Using startFirstTrack for '${targetId}'.`);
+    currentTrackId = null; // Ensure it's null if source was gone
+    currentTrackIndexInSection = -1;
+    return await startFirstTrack(targetId);
+  }
+
+  // Case 2: Current track is different, need to transition.
+  const transitionPointTime = findNextTransitionPoint(currentTrackId);
+  if (transitionPointTime === null) {
+    console.warn(`transitionToTrack: Could not find a transition point for '${currentTrackId}'. Falling back to immediate cut to '${targetId}'.`);
+    const oldTrackId = currentTrackId;
+    stopTrackInternal(currentTrackId); // Stop the current one
+    currentTrackId = null; // CRITICAL: Clear currentTrackId before calling startFirstTrack
+    currentTrackIndexInSection = -1; // Reset index
+
+    const started = await startFirstTrack(targetId); // Attempt to start the new one
+    if (started) {
+      console.log(`transitionToTrack: Immediate cut from '${oldTrackId}' to '${targetId}' succeeded.`);
+    } else {
+      console.warn(`transitionToTrack: Immediate cut from '${oldTrackId}', but failed to start '${targetId}'.`);
+      // currentTrackId is already null, which is correct state if target didn't start.
+    }
     return started;
-    // return false; // Original behavior: fail if no point found
   }
 
-  console.log(`transitionToTrack: Initiating transition from '${currentTrackId}' to '${targetId}' at ${startTime.toFixed(2)}s`);
-  performCrossfade(currentTrackId, targetId, startTime);
-  return true; // Transition initiated
+  console.log(`transitionToTrack: Initiating crossfade from '${currentTrackId}' to '${targetId}' scheduled at ${transitionPointTime.toFixed(2)}s`);
+  await performCrossfade(currentTrackId, targetId, transitionPointTime); // performCrossfade is async due to await loadTrack inside
+  return true; // Transition initiated (crossfade process is async)
 }
 
 export function stopAllPlayback() {
   if (!audioContext) return;
+  console.log("Stopping all playback and resetting state...");
+  if (transitionTimeout) clearTimeout(transitionTimeout);
+  transitionTimeout = null;
 
-  console.log("Stopping all playback...");
-  clearTimeout(transitionTimeout!); // Cancel any pending transition cleanup
-
-  // Stop all currently playing/scheduled nodes
   tracks.forEach((_, id) => {
     stopTrackInternal(id);
   });
 
-  // Reset state variables
   currentTrackId = null;
   nextTrackId = null;
   isTransitioning = false;
-  currentSectionTracks = null; // Clear section
-  currentTrackIndexInSection = -1; // Clear index
+  currentSectionTracks = null;
+  currentTrackIndexInSection = -1;
+  pendingSectionTracks = undefined; // Clear any pending section changes
 
   console.log("All playback stopped and state reset.");
 }
@@ -585,7 +638,7 @@ export function isCurrentlyTransitioning(): boolean {
 }
 export function getCurrentSectionTracks(): string[] | null {
   return currentSectionTracks ? [...currentSectionTracks] : null;
-} // Return copy
+}
 export function getCurrentTrackIndexInSection(): number {
   return currentTrackIndexInSection;
 }
