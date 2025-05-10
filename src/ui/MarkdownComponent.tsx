@@ -9,7 +9,7 @@ import React, { useEffect, useMemo, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { getCurrentLocation } from "../helpers/paragraphsNavigation";
 import { goToParagraph } from "../helpers/paragraphsNavigation";
 import { locateQuotes } from "./utils/locateQuotes";
