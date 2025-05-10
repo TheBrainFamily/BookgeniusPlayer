@@ -17,38 +17,33 @@ interface CharacterNotesPanelProps {
 
 export const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
   const { location } = useLocation();
-
-  /* throttle updates while scrolling */
-  const debounced = useDebounce(location, 100);
+  const debouncedLocation = useDebounce(location, 150);
 
   /* stable range object */
   const range = useMemo(
-    () => ({ chapter: debounced.chapter, paragraph: debounced.paragraph, endChapter: debounced.endChapter, endParagraph: debounced.endParagraph }),
-    [debounced.chapter, debounced.paragraph, debounced.endChapter, debounced.endParagraph],
+    () => ({ chapter: debouncedLocation.chapter, paragraph: debouncedLocation.paragraph, endChapter: debouncedLocation.endChapter, endParagraph: debouncedLocation.endParagraph }),
+    [debouncedLocation.chapter, debouncedLocation.paragraph, debouncedLocation.endChapter, debouncedLocation.endParagraph],
   );
 
-  /* characters for that range */
-  const notes = useCharacterNotes(range, bookData.charactersData);
+  const characterNotes = useCharacterNotes(range, bookData.charactersData, true, true);
 
   if (!target) return null;
 
   return createPortal(
-    <motion.div layout className="entity-notes-container">
+    <motion.div className="entity-notes-container">
       <AnimatePresence>
-        {notes
-          .sort((a, b) => a.canonicalName.localeCompare(b.canonicalName))
-          .map((n, i) => (
-            <motion.div
-              key={n.canonicalName}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20, transition: { duration: 0.2, ease: "easeInOut" } }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-            >
-              <CharacterCard entity={n} index={i} />
-            </motion.div>
-          ))}
+        {characterNotes.map((n, i) => (
+          <motion.div
+            key={n.canonicalName}
+            layout="preserve-aspect"
+            initial={{ opacity: 0, x: -100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            transition={{ duration: 0.4, delay: 0.2 * i, exit: { duration: 0.2 }, layout: { delay: 0.2 } }}
+          >
+            <CharacterCard entity={n} index={i} />
+          </motion.div>
+        ))}
       </AnimatePresence>
     </motion.div>,
     target,

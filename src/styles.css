@@ -462,12 +462,11 @@
 
   /* when first entity is talking there is no space for scale effect */
   .entity-notes-container > div:first-child {
-    padding-top: 50px;
+    margin-top: 50px;
   }
 
   .entity-notes-container > div:last-child {
     margin-bottom: 0;
-    padding-bottom: 50px;
   }
 
   /* Add styling only to the text column */

@@ -1,40 +1,67 @@
+import { useEffect, useState } from "react";
 import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange, SelfSufficientCharacterMetadata } from "@/src/fetchers/getParagraphRange";
 import { CURRENT_BOOK } from "@/src/consts";
-import { useEffect, useState } from "react";
 import { Location } from "@/src/state/LocationContext";
 
-/* very light equality check : length + canonicalName order */
+/** Very light equality check: same length and same canonicalName order */
 function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {
-  if (a.length !== b.length) return false;
-  return a.every((v, i) => v.canonicalName === b[i].canonicalName);
+  return a.length === b.length && a.every((v, i) => v.canonicalName === b[i].canonicalName);
 }
 
-export function useCharacterNotes(loc: Location, charactersData: SelfSufficientCharacterMetadata[]): ParsedParagraphRange[] {
+/**
+ * @param loc                 current paragraph-range location
+ * @param charactersData      raw metadata array
+ * @param addNewAtEnd         if true, keeps existing order and appends new chars;
+ *                            if false, just replaces list on any change
+ * @param sortAlphabetically  when appending, whether to sort the new items (and initial load) alphabetically
+ */
+export function useCharacterNotes(loc: Location, charactersData: SelfSufficientCharacterMetadata[], addNewAtEnd = false, sortAlphabetically = true): ParsedParagraphRange[] {
   const [notes, setNotes] = useState<ParsedParagraphRange[]>([]);
+
   useEffect(() => {
     let cancelled = false;
 
-    const load = async () => {
+    async function load() {
       const { chapter, paragraph, endChapter, endParagraph } = loc;
-
       const raw = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange(
-        { bookSlug: CURRENT_BOOK, startChapter: chapter, startParagraph: paragraph, endChapter: endChapter, endParagraph: endParagraph },
+        { bookSlug: CURRENT_BOOK, startChapter: chapter, startParagraph: paragraph, endChapter, endParagraph },
         charactersData,
       );
-
       if (cancelled) return;
 
       const parsed = parseParagraphRange(raw);
 
-      /* only update when list really changed */
-      setNotes((prev) => (sameList(prev, parsed) ? prev : parsed));
-    };
+      setNotes((prev) => {
+        if (sameList(prev, parsed)) {
+          return prev;
+        }
+
+        if (!addNewAtEnd) {
+          return parsed;
+        }
+
+        if (prev.length === 0) {
+          return sortAlphabetically ? [...parsed].sort((a, b) => a.canonicalName.localeCompare(b.canonicalName)) : parsed;
+        }
+
+        const existingNames = new Set(prev.map((ch) => ch.canonicalName));
+        const remaining = prev.filter((ch) => parsed.some((p) => p.canonicalName === ch.canonicalName));
+        const newChars = parsed.filter((ch) => !existingNames.has(ch.canonicalName));
+
+        const updatedRemaining = remaining.map((oldCh) => parsed.find((p) => p.canonicalName === oldCh.canonicalName) || oldCh);
+
+        const appended = sortAlphabetically ? [...newChars].sort((a, b) => a.canonicalName.localeCompare(b.canonicalName)) : newChars;
+
+        return [...updatedRemaining, ...appended];
+      });
+    }
 
     load();
+
     return () => {
       cancelled = true;
     };
-  }, [loc.chapter, loc.paragraph, loc.endChapter, loc.endParagraph, charactersData]);
+  }, [loc.chapter, loc.paragraph, loc.endChapter, loc.endParagraph, charactersData, addNewAtEnd, sortAlphabetically]);
 
   return notes;
 }
