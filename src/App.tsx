@@ -19,6 +19,7 @@ import { getBookData } from "./booksData/getBookData";
 import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
 import { BookData } from "./booksData/types";
 import { ModalProvider } from "./context/ModalContext";
+import { BookContentWrapper } from "./components/BookContentWrapper";
 
 function Shell({
   bookData,
@@ -99,16 +100,18 @@ export default function App() {
     <LocationProvider>
       <RealtimeProvider>
         <WebSocketProvider>
-          <ModalProvider>
-            <Shell bookData={currentBookData} setShowDeepResearch={setShowDeepResearch} showDeepResearch={showDeepResearch} passedText={deepResearchResult} />
-            <ChatContainer
-              onShowDeepResearch={(result) => {
-                setDeepResearchResult(result);
-                setShowDeepResearch(true);
-              }}
-              onCloseDeepResearch={() => setShowDeepResearch(false)}
-            />
-          </ModalProvider>
+          <BookContentWrapper>
+            <ModalProvider>
+              <Shell bookData={currentBookData} setShowDeepResearch={setShowDeepResearch} showDeepResearch={showDeepResearch} passedText={deepResearchResult} />
+              <ChatContainer
+                onShowDeepResearch={(result) => {
+                  setDeepResearchResult(result);
+                  setShowDeepResearch(true);
+                }}
+                onCloseDeepResearch={() => setShowDeepResearch(false)}
+              />
+            </ModalProvider>
+          </BookContentWrapper>
         </WebSocketProvider>
       </RealtimeProvider>
     </LocationProvider>
