@@ -71,3 +71,7 @@ export async function runLegacyInit() {
   /* Characters panel initial state (night mode, mobile characters, …) */
   document.getElementById("legacy")?.classList.toggle("characters-hidden", !isMobileCharactersVisible());
 }
+
+export async function runLegacyInitJustSW() {
+  dealWithSW();
+}

@@ -7,7 +7,26 @@ import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs";
 
-import { CURRENT_BOOK, BOOK_SLUGS } from "./src/consts";
+// Import BOOK_SLUGS directly, but CURRENT_BOOK will now be effectively determined here
+import { BOOK_SLUGS } from "./src/consts"; // We only need the enum here
+
+// --- START: Dynamic Book Configuration ---
+const desiredBookSlug = process.env.VITE_BOOK;
+let currentBookSlug: BOOK_SLUGS;
+
+if (desiredBookSlug && Object.values(BOOK_SLUGS).includes(desiredBookSlug as BOOK_SLUGS)) {
+  currentBookSlug = desiredBookSlug as BOOK_SLUGS;
+  console.log(`Using book from VITE_BOOK environment variable: ${currentBookSlug}`);
+} else {
+  currentBookSlug = BOOK_SLUGS.PHARAON; // Default book
+  if (desiredBookSlug) {
+    console.warn(`VITE_BOOK="${desiredBookSlug}" is not a valid book slug. Defaulting to ${currentBookSlug}. Valid slugs are: ${Object.values(BOOK_SLUGS).join(", ")}`);
+  } else {
+    console.log(`VITE_BOOK environment variable not set or invalid. Defaulting to book: ${currentBookSlug}`);
+  }
+}
+// --- END: Dynamic Book Configuration ---
+
 
 // Workaround to remove unnecessary books chunks from the build
 // ToDo: Do not create them in the first place
@@ -16,16 +35,16 @@ const removeChunksPlugin = () => {
     name: "remove-specified-chunks",
     apply: "build" as const,
     closeBundle() {
-      console.log(`Removing chunks for books other than the: ${CURRENT_BOOK}`);
+      console.log(`Removing chunks for books other than: ${currentBookSlug}`); // Use the resolved currentBookSlug
       const distDir = path.resolve(__dirname, "dist/assets");
       const toRemove = Object.values(BOOK_SLUGS)
-        .filter((slug) => slug !== CURRENT_BOOK)
+        .filter((slug) => slug !== currentBookSlug) // Use the resolved currentBookSlug
         .map((slug) => `${slug.toLowerCase()}`);
 
       toRemove.forEach((base) =>
         fs
           .readdirSync(distDir)
-          .filter((f) => f.includes(base))
+          .filter((f) => f.toLowerCase().includes(base)) // Make comparison case-insensitive if needed
           .forEach((f) => fs.unlinkSync(path.join(distDir, f))),
       );
     },
@@ -45,10 +64,10 @@ const bookBuildConfigs: Partial<Record<BOOK_SLUGS, BookBuildData>> = {
   [BOOK_SLUGS._1984]: { name: "1984", short_name: "1984", staticAssetSourceDir: `public_books/${BOOK_SLUGS._1984}`, staticAssetDestDir: BOOK_SLUGS._1984 },
 };
 
-const activeBookConfig = bookBuildConfigs[CURRENT_BOOK];
+const activeBookConfig = bookBuildConfigs[currentBookSlug]; // Use the resolved currentBookSlug
 
 if (!activeBookConfig) {
-  throw new Error(`Build configuration for book "${CURRENT_BOOK}" is not defined in vite.config.ts.`);
+  throw new Error(`Build configuration for book "${currentBookSlug}" is not defined in vite.config.ts.`);
 }
 
 // Prepare targets for vite-plugin-static-copy
@@ -58,6 +77,11 @@ if (activeBookConfig.staticAssetSourceDir && activeBookConfig.staticAssetDestDir
 }
 
 export default defineConfig({
+  // This define will replace all instances of __SELECTED_BOOK_SLUG__ in your client code
+  // with the actual string value of currentBookSlug.
+  define: {
+    '__SELECTED_BOOK_SLUG__': JSON.stringify(currentBookSlug), // Important: JSON.stringify to make it a string literal
+  },
   optimizeDeps: { include: ["workbox-core", "workbox-precaching", "workbox-routing", "workbox-strategies", "workbox-range-requests"] },
   plugins: [
     react(),
@@ -86,23 +110,20 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // Map '@/' just like in tsconfig.json paths ["./*"]
-      // This assumes your tsconfig.json's baseUrl is '.' (the default)
-      // or not set, meaning paths are relative to the project root.
       "@": fileURLToPath(new URL("./", import.meta.url)),
       // The above maps '@/' to the project root directory where vite.config.ts is.
       // So an import like '@/src/helpers/...' will correctly resolve to
       // '<project_root>/src/helpers/...'
     },
   },
-  root: "./", // Adjust if your source files are in a subfolder
+  root: "./",
   build: {
     outDir: "dist",
     sourcemap: true,
-    emptyOutDir: true, // Clean 'dist' before each build
+    emptyOutDir: true,
   },
   server: {
-    port: 5173, // Or any port you prefer
+    port: 5173,
     open: true,
     proxy: { "/api": "http://localhost:3000" },
     watch: { ignored: ["**/src/data/*.xml"] },
