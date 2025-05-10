@@ -449,12 +449,25 @@
   /* Container for entity notes - center content vertically */
   .entity-notes-container {
     width: 95%;
-    display: flex;
-    flex-direction: column;
+    height: 100%;
     padding: 10px 0;
-    gap: 15px;
     overflow-y: scroll;
     cursor: default;
+    align-content: center;
+  }
+
+  .entity-notes-container > div {
+    margin-bottom: 15px;
+  }
+
+  /* when first entity is talking there is no space for scale effect */
+  .entity-notes-container > div:first-child {
+    padding-top: 50px;
+  }
+
+  .entity-notes-container > div:last-child {
+    margin-bottom: 0;
+    padding-bottom: 50px;
   }
 
   /* Add styling only to the text column */
@@ -758,14 +771,6 @@
     margin-left: 70px;
     width: 85%;
   }
-  /* when first entity is talking there is no space for scale effect */
-  .entity-note:first-child {
-    padding-top: 50px;
-  }
-  /* when last entity is talking there is no space for scale effect */
-  .entity-note:last-child {
-    padding-bottom: 50px;
-  }
 
   .entity-image-column {
     flex: 1;
@@ -935,11 +940,6 @@
   opacity: 0;
   transition: opacity 0.3s ease-out;
   pointer-events: none; /* Prevent interaction during fade-out */
-}
-
-/* Hide elements initially meant to fade in */
-.entity-notes-container:not(.fade-in) {
-  opacity: 0;
 }
 
 /* Highlight note styles - light mode */

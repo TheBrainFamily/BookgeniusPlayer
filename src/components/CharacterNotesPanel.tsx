@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "motion/react";
 
 import { useDebounce } from "@/src/hooks/useDebounce";
 import { useCharacterNotes } from "@/src/hooks/useCharacterNotes";
@@ -32,17 +33,24 @@ export const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
   if (!target) return null;
 
   return createPortal(
-    <div className="entity-notes-container fade-in">
-      {notes
-        .sort((a, b) => a.canonicalName.localeCompare(b.canonicalName))
-        .map((n, i) => (
-          <CharacterCard
-            key={`${n.canonicalName}`} // replay anim only when list truly changes
-            entity={n}
-            index={i}
-          />
-        ))}
-    </div>,
+    <motion.div layout className="entity-notes-container">
+      <AnimatePresence>
+        {notes
+          .sort((a, b) => a.canonicalName.localeCompare(b.canonicalName))
+          .map((n, i) => (
+            <motion.div
+              key={n.canonicalName}
+              layout
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20, transition: { duration: 0.2, ease: "easeInOut" } }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              <CharacterCard entity={n} index={i} />
+            </motion.div>
+          ))}
+      </AnimatePresence>
+    </motion.div>,
     target,
   );
 };

@@ -118,7 +118,7 @@ const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, 
         key="videoA"
         {...commonAttrs}
         src={videoA_Src}
-        style={{ opacity: 1, transition: "opacity 0.3s ease-in-out", position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }}
+        style={{ opacity: videoA_Loaded ? 1 : 0, transition: "opacity 0.3s ease-in-out", position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }}
         autoPlay
         loop
         muted
