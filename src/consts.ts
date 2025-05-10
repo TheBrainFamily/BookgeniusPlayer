@@ -1,7 +1,3 @@
-// Configuration for page numbering
-export const romanNumeralPages = 1; // Number of pages that use Roman numerals
-export const pagesToSkipFooterGeneration = 0; //also used for where to start prefetching
-
 export enum BOOK_SLUGS {
   GET_SHORTY = "shorty",
   INNOCENCE = "innocence",
@@ -10,4 +6,12 @@ export enum BOOK_SLUGS {
   _1984 = "1984",
 }
 
-export const CURRENT_BOOK: BOOK_SLUGS = BOOK_SLUGS._1984;
+// This will be replaced by Vite's `define` feature in vite.config.mts
+// We need to declare it globally for TypeScript to know about it during type checking
+// in other files that might import CURRENT_BOOK before Vite's define kicks in for them.
+// However, for this specific file, the cast is sufficient.
+declare global {
+  const __SELECTED_BOOK_SLUG__: BOOK_SLUGS;
+}
+
+export const CURRENT_BOOK: BOOK_SLUGS = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : (process.env.VITE_BOOK as BOOK_SLUGS); // Default fallback
