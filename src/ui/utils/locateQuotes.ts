@@ -1,4 +1,5 @@
 import DiffMatchPatch from "diff-match-patch";
+
 import { normalise } from "./normalise";
 import type { ParagraphInfo, QuoteHit } from "../MarkdownComponent";
 

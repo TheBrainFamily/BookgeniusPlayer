@@ -1,13 +1,14 @@
 import { useEffect } from "react";
-import { useLocation } from "@/src/state/LocationContext";
-import { dealWithBackgroundSongs as impl } from "@/src/deal-with-background-songs";
+
+import { useLocation } from "@/state/LocationContext";
+import { dealWithBackgroundSongs as impl } from "@/deal-with-background-songs";
 import { useDebounce } from "./useDebounce";
 
 /* We keep a mutable ref so we can swap the implementation on HMR */
 const implRef = { current: impl };
 
 if (import.meta.hot) {
-  import.meta.hot.accept("@/src/deal-with-background-songs", (mod) => {
+  import.meta.hot.accept("@/deal-with-background-songs", (mod) => {
     implRef.current = mod.dealWithBackgroundSongs;
     console.info("[HMR] dealWithBackgroundSongs updated");
   });

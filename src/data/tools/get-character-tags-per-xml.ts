@@ -1,9 +1,11 @@
-import { CURRENT_BOOK } from "@/src/consts";
-import { BOOK_SLUGS } from "@/src/consts";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
-import { Node, Element, XMLDocument } from "@xmldom/xmldom/lib/dom"; // Import types if needed for strict typing
+import { Element, XMLDocument } from "@xmldom/xmldom/lib/dom"; // Import types if needed for strict typing
 import fs from "fs";
 import path from "path";
+
+import { CURRENT_BOOK } from "@/consts";
+import { BOOK_SLUGS } from "@/consts";
+
 interface ChapterInfo {
   chapter: number;
   summary: string;

@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from "react";
 import { RealtimeClient } from "@openai/realtime-api-beta";
-import { WavRecorder, WavStreamPlayer } from "../lib/wavtools/index.js";
-import { CURRENT_BOOK } from "../consts.js";
-import { QUESTIONS_SERVER_URL } from "../lib/consts.js";
+
+import { WavRecorder, WavStreamPlayer } from "@/lib/wavtools/index.js";
+import { CURRENT_BOOK } from "@/consts.js";
+import { QUESTIONS_SERVER_URL } from "@/lib/consts.js";
 // import { usePage } from "./PageContext.js";
-import { instructions } from "../utils/conversation_config.js";
-import { useLocation } from "../state/LocationContext.js";
+import { instructions } from "@/utils/conversation_config.js";
+import { useLocation } from "@/state/LocationContext.js";
 
 // Define the conversation item type
 interface ConversationItem {

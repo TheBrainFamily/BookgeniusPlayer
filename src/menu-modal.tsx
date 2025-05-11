@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useLayoutEffect, useMemo } from "react";
 import { Book, X, List, FileText, PanelLeft, PanelBottom, Type, RotateCcw, Music } from "lucide-react";
-import { Button } from "@/src/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/src/components/ui/sheet";
-import { ScrollArea } from "@/src/components/ui/scroll-area";
-import { Input } from "@/src/components/ui/input";
-import { Label } from "@/src/components/ui/label";
-import { Slider } from "@/src/components/ui/slider";
-import { Separator } from "@/src/components/ui/separator";
+
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Separator } from "@/components/ui/separator";
 import { isNightMode } from "./helpers/setIsNightMode";
 import { toggleMobileCharacters, isMobileCharactersVisible } from "./isMobileCharactersVisible";
 import { resetFurthestPageLocation } from "./helpers/reset-furthest-page-location";

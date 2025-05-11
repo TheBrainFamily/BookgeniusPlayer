@@ -2,7 +2,7 @@
 //  background-videos.ts   (copy-paste entire file)
 // -----------------------------------------------------------------------------
 
-import { CURRENT_BOOK } from "../consts";
+import { CURRENT_BOOK } from "@/consts";
 import { getBackgrounds } from "./getBackgrounds";
 export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number };
 
@@ -125,7 +125,7 @@ export const dealWithBackground = ({
               ok();
             });
           });
-        } catch (e) {
+        } catch {
           isTransitioning = false;
           return;
         }

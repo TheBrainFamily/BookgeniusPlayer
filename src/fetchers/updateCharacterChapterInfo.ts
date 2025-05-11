@@ -1,4 +1,4 @@
-import { BOOK_SLUGS } from "../consts";
+import { BOOK_SLUGS } from "@/consts";
 import { SelfSufficientCharacterMetadata } from "./getParagraphRange";
 
 /**

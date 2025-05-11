@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
-import { QUESTIONS_SERVER_WS_URL } from "../lib/consts";
+import { QUESTIONS_SERVER_WS_URL } from "@/lib/consts";
 
 // Types for the streamed messages
 type StreamMessage = { type: "stream"; content: string };

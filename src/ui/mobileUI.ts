@@ -1,5 +1,5 @@
-import { ParsedParagraphRange } from "../fetchers/getParagraphRange";
-import { isMobileCharactersVisible } from "../isMobileCharactersVisible";
+import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
+import { isMobileCharactersVisible } from "@/isMobileCharactersVisible";
 import { showCharacterDetailsModal } from "./characterModals";
 
 // Function to check if the device is mobile

@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef, useMemo, useState } from "react";
-import { ParsedParagraphRange } from "@/src/fetchers/getParagraphRange";
-import { getPictureFilePathForName, getMovingPictureFilePathForName } from "@/src/utils/getFilePathsForName";
-import { CURRENT_BOOK } from "@/src/consts";
-import { useModal } from "../context/ModalContext";
-import { useHighlight } from "../context/HighlightContext";
+
+import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
+import { getPictureFilePathForName, getMovingPictureFilePathForName } from "@/utils/getFilePathsForName";
+import { CURRENT_BOOK } from "@/consts";
+import { useModal } from "@/context/ModalContext";
+import { useHighlight } from "@/context/HighlightContext";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 

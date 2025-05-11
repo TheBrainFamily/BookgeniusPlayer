@@ -2,12 +2,12 @@ import React, { useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 
-import { useDebounce } from "@/src/hooks/useDebounce";
-import { useCharacterNotes } from "@/src/hooks/useCharacterNotes";
-import { useLocation } from "@/src/state/LocationContext";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useCharacterNotes } from "@/hooks/useCharacterNotes";
+import { useLocation } from "@/state/LocationContext";
 import { CharacterCard } from "./CharacterCard";
-import { BookData } from "@/src/booksData/types";
-import useSplashHidden from "@/src/hooks/useSplashHidden";
+import { BookData } from "@/booksData/types";
+import useSplashHidden from "@/hooks/useSplashHidden";
 
 /* mount inside the legacy container for CSS */
 const target = document.getElementById("left-notes");

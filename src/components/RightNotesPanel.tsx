@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { useLocation } from "@/src/state/LocationContext";
-import { useDebounce } from "@/src/hooks/useDebounce";
-import { useFootnotes } from "@/src/hooks/src/hooks/useFootnotes";
+
+import { useLocation } from "@/state/LocationContext";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useFootnotes } from "@/hooks/src/hooks/useFootnotes";
 import { FootnoteModal } from "./FootnoteModal";
 
 const target = document.getElementById("right-notes");

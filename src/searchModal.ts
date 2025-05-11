@@ -1,8 +1,9 @@
-import "./searchModal.css";
-import { goToParagraph, getCurrentLocation } from "@/src/helpers/paragraphsNavigation";
-import type { Location } from "@/src/state/LocationContext";
-import { searchParagraphsFromServer } from "./utils/searchParagraphsFromServer";
 import debounce from "lodash.debounce";
+
+import "./searchModal.css";
+import { goToParagraph, getCurrentLocation } from "@/helpers/paragraphsNavigation";
+import type { Location } from "@/state/LocationContext";
+import { searchParagraphsFromServer } from "./utils/searchParagraphsFromServer";
 
 // Create a debounced version of the server search portion of performSearch
 const performServerSearch = debounce(

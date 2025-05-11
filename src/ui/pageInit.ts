@@ -1,8 +1,8 @@
-import { setupPageObserver } from "./pageObserver";
+// import { setupPageObserver } from "./pageObserver";
 import { setupMobileInteractions } from "./mobileUI";
-import { getSavedLocation, goToInitialLocationFromHash, goToParagraph } from "../helpers/paragraphsNavigation";
-// import { faraonBookXml } from "../data/faraon-book-xml"; // Removed import
-import { faraonAnnotationsXml } from "../data/faraon-annotations-xml";
+import { goToInitialLocationFromHash } from "@/helpers/paragraphsNavigation";
+// import { faraonBookXml } from "@/data/faraon-book-xml"; // Removed import
+import { faraonAnnotationsXml } from "@/data/faraon-annotations-xml";
 
 // Initialize pages
 export function initializePages() {

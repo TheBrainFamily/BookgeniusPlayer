@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Mic, Send, Telescope, Expand } from "lucide-react";
 import { motion } from "motion/react";
-import { cn } from "@/src/lib/utils"; // Assuming you have this utility
-import { useRealtime } from "../context/RealtimeContext"; // Adjust path
+
+import { cn } from "@/lib/utils"; // Assuming you have this utility
+import { useRealtime } from "@/context/RealtimeContext"; // Adjust path
 // Removed WebSocket dependency if isLoading isn't used in footer
-// import { Message, useWebSocket } from "../context/WebSocketContext"; // Adjust path
-import { CURRENT_BOOK } from "../consts"; // Adjust path
-import { useLocation } from "../state/LocationContext"; // Adjust path
-import { showSearchModal, performSearch, hideSearchModal, isSearchActive } from "../searchModal"; // Adjust path
-import { deepResearchCall } from "../deepResearchCall"; // Adjust path
+// import { Message, useWebSocket } from "@/context/WebSocketContext"; // Adjust path
+import { CURRENT_BOOK } from "@/consts"; // Adjust path
+import { useLocation } from "@/state/LocationContext"; // Adjust path
+import { showSearchModal, performSearch, hideSearchModal, isSearchActive } from "@/searchModal"; // Adjust path
+import { deepResearchCall } from "@/deepResearchCall"; // Adjust path
 
 // --- Helper Hook for Landscape Detection ---
 const useDeviceOrientation = () => {

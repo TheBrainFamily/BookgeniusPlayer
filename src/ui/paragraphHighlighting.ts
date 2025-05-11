@@ -1,4 +1,4 @@
-import { CURRENT_BOOK } from "../consts";
+import { CURRENT_BOOK } from "@/consts";
 import { activateCharacters } from "./characterHelpers";
 
 // Variables to track scrolling state
