@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Mic, Send, Telescope, Expand } from "lucide-react";
 import { motion } from "motion/react";
-import { cn } from "@/lib/utils"; // Assuming you have this utility
+import { cn } from "@/src/lib/utils"; // Assuming you have this utility
 import { useRealtime } from "../context/RealtimeContext"; // Adjust path
 // Removed WebSocket dependency if isLoading isn't used in footer
 // import { Message, useWebSocket } from "../context/WebSocketContext"; // Adjust path
