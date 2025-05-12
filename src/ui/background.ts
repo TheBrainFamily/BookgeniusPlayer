@@ -1,7 +1,3 @@
-// -----------------------------------------------------------------------------
-//  background-videos.ts   (copy-paste entire file)
-// -----------------------------------------------------------------------------
-
 import { CURRENT_BOOK } from "@/consts";
 import { getBackgrounds } from "./getBackgrounds";
 export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number };
@@ -21,9 +17,32 @@ function debounce<T extends (...args: unknown[]) => void>(fn: T, wait: number): 
 // ---- globals ----------------------------------------------------------------
 let debouncedHandler: ((p: { startChapter: number; startParagraph: number; endChapter: number; endParagraph: number }) => void) | null = null;
 
-let isTransitioning = false;
+enum TransitionState {
+  Idle = "idle", // nothing in progress
+  Preparing = "prep", // loading / first-frame wait
+  Fading = "fade", // CSS cross-fade running
+}
+let transitionState: TransitionState = TransitionState.Idle;
 
-// ---- public API -------------------------------------------------------------
+// ---- helper -----------------------------------------------------------------
+function cancelAllImageZoom(imgA: HTMLDivElement, imgB: HTMLDivElement) {
+  imgA.classList.remove("zooming");
+  imgB.classList.remove("zooming");
+}
+
+// ---- Helper Function --------------------------------------------------------
+function getFileType(filename: string): "video" | "image" | "unknown" {
+  const ext = filename.split(".").pop()?.toLowerCase();
+  if (!ext) return "unknown";
+  if (["mp4", "webm", "ogv"].includes(ext)) return "video";
+  if (["png", "jpg", "jpeg", "gif", "webp", "avif", "svg"].includes(ext)) return "image";
+  return "unknown";
+}
+
+// ---- Constants --------------------------------------------------------------
+const FADE_DURATION_MS = 800; // fallback
+
+// ---- Main Function ----------------------------------------------------------
 export const dealWithBackground = ({
   startChapter,
   startParagraph,
@@ -38,123 +57,167 @@ export const dealWithBackground = ({
   const legacy = document.getElementById("legacy")!;
   const videoA = document.getElementById("bg-video-a") as HTMLVideoElement;
   const videoB = document.getElementById("bg-video-b") as HTMLVideoElement;
-  if (!legacy || !videoA || !videoB) {
-    console.error("Background video elements not found");
+  const imageA = document.getElementById("bg-image-a") as HTMLDivElement;
+  const imageB = document.getElementById("bg-image-b") as HTMLDivElement;
+
+  if (!legacy || !videoA || !videoB || !imageA || !imageB) {
+    console.error("Background elements (video or image) not found");
     return;
   }
 
-  // Define Z-index constants for managing video layers
-  // These will be captured by the debouncedHandler closure
-  const Z_INDEX_FRONT = "-1"; // Video on top
-  const Z_INDEX_BACK = "-2"; // Video underneath
+  // Z-indices captured by closure
+  const Z_INDEX_FRONT = "-1";
+  const Z_INDEX_BACK = "-2";
 
   // initialise once -----------------------------------------------------------
   if (!debouncedHandler) {
-    // Perform one-time setup for video elements and legacy dataset attributes
-    if (videoA && videoB) {
-      let initialFrontVideo = videoA;
-      let initialBackVideo = videoB;
+    /* ---------- one-time bootstrap ---------------------------------------- */
+    const initialFrontId = legacy.dataset.front === "b" ? "b" : "a";
+    const initialType = legacy.dataset.type === "image" ? "image" : "video";
+    legacy.dataset.front = initialFrontId;
+    legacy.dataset.type = initialType;
+    if (legacy.dataset.currentFile === undefined) legacy.dataset.currentFile = "";
 
-      // Respect legacy.dataset.front if already set (e.g., by HTML), otherwise default to 'a'.
-      if (legacy.dataset.front === "b") {
-        initialFrontVideo = videoB;
-        initialBackVideo = videoA;
-      } else if (legacy.dataset.front !== "a") {
-        // If undefined or any other value, default to 'a'
-        legacy.dataset.front = "a";
-      }
+    const elements = { video: { a: videoA, b: videoB }, image: { a: imageA, b: imageB } };
 
-      initialFrontVideo.style.zIndex = Z_INDEX_FRONT;
-      initialFrontVideo.classList.remove("faded"); // Ensure front is visible
-
-      initialBackVideo.style.zIndex = Z_INDEX_BACK;
-      initialBackVideo.classList.add("faded"); // Ensure back is hidden
+    // hide everything, then reveal the initial front
+    [videoA, videoB, imageA, imageB].forEach((el) => {
+      el.classList.add("faded");
+      el.style.zIndex = Z_INDEX_BACK;
+    });
+    const initialFrontEl = elements[initialType][initialFrontId];
+    initialFrontEl.style.zIndex = Z_INDEX_FRONT;
+    initialFrontEl.classList.remove("faded");
+    if (initialType === "image" && legacy.dataset.currentFile && getFileType(legacy.dataset.currentFile) === "image") {
+      initialFrontEl.classList.add("zooming");
     }
 
-    if (legacy.dataset.currentFile === undefined) {
-      legacy.dataset.currentFile = ""; // Initialize if not present
-    }
+    /* ---------- timing helpers ------------------------------------------- */
+    const transDur = parseFloat(getComputedStyle(videoA).transitionDuration) || FADE_DURATION_MS / 1000;
+    const fadeMs = transDur * 1000;
+    const safetyMargin = 100; // ms
 
+    /* ---------- main debounced handler ----------------------------------- */
     debouncedHandler = debounce(async (p: { startChapter: number; startParagraph: number; endChapter: number; endParagraph: number }) => {
       const backgrounds = getBackgrounds() as Background[];
+      const found = backgrounds.find((bg) => p.startChapter >= bg.startChapter && p.startChapter <= bg.endChapter);
 
-      // Ensure dataset attributes are initialized (should be by the one-time setup)
-      if (!legacy.dataset.front) legacy.dataset.front = "a";
-      if (legacy.dataset.currentFile === undefined) legacy.dataset.currentFile = "";
+      /* ---- cancel zooms *before* any early-return --------------------- */
 
-      const getFront = () => (legacy.dataset.front === "a" ? videoA : videoB);
-      const getBack = () => (legacy.dataset.front === "a" ? videoB : videoA);
-
-      const fadeMs = parseFloat(getComputedStyle(videoA).transitionDuration) * 1000 || 800;
-      const videoTransitionStyle = `opacity ${getComputedStyle(videoA).transitionDuration} ${getComputedStyle(videoA).transitionTimingFunction}`;
-
-      async function crossFadeTo(file: string) {
-        const front = getFront(); // Current visible video
-        const back = getBack(); // Video to load new content into
-
-        if (legacy.dataset.currentFile === file || isTransitioning) {
-          return;
-        }
-        isTransitioning = true;
-
-        const newSrc = `/${CURRENT_BOOK}/${file}`;
-
-        back.src = newSrc;
-        back.load();
-
-        // --- Make 'back' video instantly opaque and position it underneath ---
-        const originalBackTransition = back.style.transition;
-        back.style.transition = "none"; // Disable transition for immediate opacity change
-
-        back.classList.remove("faded"); // Opacity should now be 1 immediately
-        back.style.zIndex = Z_INDEX_BACK;
-
-        // Force a reflow to ensure the style changes are applied before restoring transition
-        // Reading a property like offsetHeight is a common way to do this.
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        back.offsetHeight;
-
-        back.style.transition = originalBackTransition || videoTransitionStyle; // Restore transition
-
-        front.style.zIndex = Z_INDEX_FRONT;
-
-        try {
-          await back.play();
-          await new Promise<void>((ok) => {
-            back.requestVideoFrameCallback(() => {
-              ok();
-            });
-          });
-        } catch {
-          isTransitioning = false;
-          return;
-        }
-
-        requestAnimationFrame(() => {
-          front.classList.add("faded");
-        });
-
-        const safetyMargin = 100; // ms, tiny safety margin
-
-        window.setTimeout(() => {
-          front.pause();
-
-          back.style.zIndex = Z_INDEX_FRONT;
-
-          front.style.zIndex = Z_INDEX_BACK;
-
-          legacy.dataset.front = legacy.dataset.front === "a" ? "b" : "a";
-          legacy.dataset.currentFile = file;
-          isTransitioning = false;
-        }, fadeMs + safetyMargin);
+      if (!found) {
+        cancelAllImageZoom(imageA, imageB);
+        console.log(`No background definition found for chapter ${p.startChapter}`);
+        return;
+      }
+      if (found.file === legacy.dataset.currentFile) {
+        cancelAllImageZoom(imageA, imageB);
+        console.log("Background file hasn't changed.");
+        return;
+      }
+      if (transitionState !== TransitionState.Idle) {
+        cancelAllImageZoom(imageA, imageB);
+        console.log("Transition already in progress.");
+        return;
       }
 
-      const found = backgrounds.find((bg) => p.startChapter === bg.startChapter);
-      console.log("found", found);
-      if (found) crossFadeTo(found.file);
-      else console.log(`No background for chapter ${p.startChapter}`);
-    }, 150);
+      /* ---------- PREPARING phase -------------------------------------- */
+      transitionState = TransitionState.Preparing;
+
+      const newFile = found.file;
+      const newType = getFileType(newFile); // "video" | "image"
+      if (newType === "unknown") {
+        console.error("Unknown file type:", newFile);
+        transitionState = TransitionState.Idle;
+        return;
+      }
+      const newSrc = `/${CURRENT_BOOK}/${newFile}`;
+
+      const curType = legacy.dataset.type as "video" | "image";
+      const curFrontId = legacy.dataset.front as "a" | "b";
+      const nextFrontId = curFrontId === "a" ? "b" : "a";
+
+      const el = { video: { a: videoA, b: videoB }, image: { a: imageA, b: imageB } };
+      const curFront = el[curType][curFrontId];
+      const curBack = el[curType][nextFrontId];
+      const nextBack = el[newType][nextFrontId];
+
+      /* ---------- load / prime incoming layer -------------------------- */
+      nextBack.style.transition = "none";
+      nextBack.classList.remove("faded", "zooming");
+      nextBack.style.zIndex = Z_INDEX_BACK;
+
+      let prep: Promise<void> = Promise.resolve();
+      if (newType === "video") {
+        const vid = nextBack as HTMLVideoElement;
+        vid.src = newSrc;
+        vid.load();
+        prep = vid
+          .play()
+          .then(() => new Promise<void>((ok) => vid.requestVideoFrameCallback(() => ok())))
+          .catch((e) => {
+            console.error("Video play/load error:", e);
+            throw e;
+          });
+      } else {
+        const img = nextBack as HTMLDivElement;
+        img.style.backgroundImage = `url('${newSrc}')`;
+        img.classList.add("zooming");
+      }
+
+      /* eslint-disable @typescript-eslint/no-unused-expressions */
+      nextBack.offsetHeight; // reflow
+      nextBack.style.transition = ""; // restore CSS
+      /* eslint-enable  @typescript-eslint/no-unused-expressions */
+
+      try {
+        await prep; // <-- asset ready
+        transitionState = TransitionState.Fading;
+
+        /* ---------- kick off the cross-fade --------------------------- */
+        nextBack.classList.remove("faded"); // now visible (back layer)
+
+        requestAnimationFrame(() => {
+          curFront.classList.add("faded");
+        });
+
+        window.setTimeout(() => {
+          /* ------ fade complete -------------------------------------- */
+          if (curType === "video") (curFront as HTMLVideoElement).pause();
+
+          nextBack.style.zIndex = Z_INDEX_FRONT;
+          curFront.style.zIndex = Z_INDEX_BACK;
+          if (curType !== newType) {
+            curBack.classList.add("faded");
+            curBack.style.zIndex = Z_INDEX_BACK;
+            if (curType === "video") (curBack as HTMLVideoElement).pause();
+          }
+
+          legacy.dataset.front = nextFrontId;
+          legacy.dataset.type = newType;
+          legacy.dataset.currentFile = newFile;
+          if (curType === "image") curFront.classList.remove("zooming");
+
+          transitionState = TransitionState.Idle;
+          console.log("Transition complete:", legacy.dataset.type, legacy.dataset.front, legacy.dataset.currentFile);
+        }, fadeMs + safetyMargin);
+      } catch (err) {
+        /* ---------- prep failed → roll back --------------------------- */
+        console.error("Background preparation failed:", err);
+
+        curFront.classList.remove("faded");
+        curFront.style.zIndex = Z_INDEX_FRONT;
+        if (curType === "image") curFront.classList.add("zooming");
+
+        nextBack.classList.add("faded");
+        nextBack.style.zIndex = Z_INDEX_BACK;
+        if (newType === "video") (nextBack as HTMLVideoElement).pause();
+        if (newType === "image") (nextBack as HTMLDivElement).style.backgroundImage = "none";
+
+        transitionState = TransitionState.Idle;
+      }
+    }, 150); // debounce
   }
 
+  /* ---------- invoke the handler ----------------------------------------- */
   debouncedHandler({ startChapter, startParagraph, endChapter, endParagraph });
 };
