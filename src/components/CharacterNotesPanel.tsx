@@ -56,8 +56,8 @@ export const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
 
 const variants: Record<string, Variants> = {
   container: {
-    hidden: { opacity: 0, x: -120, scale: 0.95, rotate: -2 },
-    visible: { opacity: 1, x: 0, scale: 1, rotate: 0, transition: { duration: 1, delay: 1, type: "spring", stiffness: 70, damping: 15, mass: 1.2 } },
+    hidden: { opacity: 0, x: -150, scale: 0.95, rotate: -2 },
+    visible: { opacity: 1, x: 0, scale: 1, rotate: 0, transition: { duration: 0.5, delay: 0.5, type: "linear" } },
   },
   character: {
     hidden: { opacity: 0, x: -100, y: 10 },
