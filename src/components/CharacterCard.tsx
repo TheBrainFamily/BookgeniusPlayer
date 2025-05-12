@@ -90,7 +90,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
   return (
     <div
       ref={cardRef}
-      className={cn("w-[85%] max-w-[200px] mx-auto relative pb-4")}
+      className={cn("w-[85%] max-w-[250px] mx-auto relative pb-4")}
       data-canonical-name={entity.canonicalName}
       data-appearances={JSON.stringify(apps)}
       onMouseEnter={() => requestToggle(true)}
@@ -105,11 +105,11 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
         )}
         onClick={openDetailsModal}
       >
-        <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.canonicalName} />
+        <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.canonicalName} isTalking={isTalkingInCurrentRange} />
       </div>
       <div
         className={cn(
-          "max-w-full absolute right-0 bottom-0 px-5 py-2 min-w-1/2 rounded-lg text-center italic font-bold",
+          "max-w-full w-full absolute right-0 bottom-0 px-5 py-2 min-w-1/2 rounded-lg text-center italic font-bold",
           isTalkingInCurrentRange
             ? "bg-[var(--entity-talking-highlight-bg-light)] border-2 border-[var(--entity-talking-highlight-border-light)] shadow-lg transition-all duration-300 ease-in-out"
             : "bg-[var(--entity-highlight-bg-light)] border border-[var(--entity-highlight-border-light)] shadow transition-all duration-200 ease-in-out",
