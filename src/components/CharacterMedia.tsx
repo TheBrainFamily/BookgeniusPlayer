@@ -2,130 +2,176 @@ import React, { useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
-type CharacterMediaProps = {
+type VideoState = "listens" | "speaks";
+
+interface CharacterMediaProps {
   mediaSrc: string;
   commonAttrs: { "data-original-src": string; "data-character-name": string; "data-summary": string; className: string };
   isVideo: boolean;
   canonicalName: string;
-};
+  isTalking?: boolean;
+}
 
-const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, isVideo, canonicalName }) => {
-  const [videoA_Src, setVideoA_Src] = useState<string | null>(null);
-  const [videoB_Src, setVideoB_Src] = useState<string | null>(null);
-  const [videoA_Loaded, setVideoA_Loaded] = useState<boolean>(false);
-  const [videoB_Loaded, setVideoB_Loaded] = useState<boolean>(false);
-  const [isA_Current, setIsA_Current] = useState<boolean>(true);
+const useVideoState = (mediaSrc: string, isVideo: boolean, isTalking?: boolean) => {
+  const [videoListensSrc, setVideoListensSrc] = useState<string | null>(null);
+  const [videoSpeaksSrc, setVideoSpeaksSrc] = useState<string | null>(null);
+  const [videoListensLoaded, setVideoListensLoaded] = useState<boolean>(false);
+  const [videoSpeaksLoaded, setVideoSpeaksLoaded] = useState<boolean>(false);
+  const [isListeningMode, setIsListeningMode] = useState<boolean>(true);
 
   useEffect(() => {
-    if (isVideo && videoA_Src === null && videoB_Src === null && mediaSrc !== "") {
-      setVideoA_Loaded(false);
-      setVideoA_Src(mediaSrc);
-      setIsA_Current(true);
+    if (isVideo && videoListensSrc === null && videoSpeaksSrc === null && mediaSrc !== "") {
+      // Set up idle state video (listening mode)
+      setVideoListensLoaded(false);
+      setVideoListensSrc(mediaSrc);
+
+      // Create talking state video path if possible
+      if (mediaSrc.includes(".mp4")) {
+        const talkingSrc = mediaSrc.replace("listens.mp4", "speaks.mp4");
+        setVideoSpeaksSrc(talkingSrc);
+        setVideoSpeaksLoaded(false);
+      }
+
+      setIsListeningMode(true);
     } else if (!isVideo && mediaSrc) {
-      setVideoA_Src(mediaSrc);
-      setVideoA_Loaded(true);
-      setVideoB_Src(null);
-      setVideoB_Loaded(false);
-      setIsA_Current(true);
+      // Reset to image state
+      setVideoListensSrc(mediaSrc);
+      setVideoListensLoaded(true);
+      setVideoSpeaksSrc(null);
+      setVideoSpeaksLoaded(false);
+      setIsListeningMode(true);
     }
   }, [mediaSrc, isVideo]);
 
+  // Handle video source and talking state changes
   useEffect(() => {
     if (!isVideo) {
-      if (videoA_Src !== mediaSrc) setVideoA_Src(mediaSrc);
-      if (!isA_Current) setIsA_Current(true);
-      setVideoA_Loaded(true);
-      if (videoB_Src !== null) setVideoB_Src(null);
-      setVideoB_Loaded(false);
+      if (videoListensSrc !== mediaSrc) setVideoListensSrc(mediaSrc);
+      if (!isListeningMode) setIsListeningMode(true);
+      setVideoListensLoaded(true);
+      if (videoSpeaksSrc !== null) setVideoSpeaksSrc(null);
+      setVideoSpeaksLoaded(false);
       return;
     }
 
-    const currentVideoPlayerSrc = isA_Current ? videoA_Src : videoB_Src;
-    const currentVideoPlayerLoaded = isA_Current ? videoA_Loaded : videoB_Loaded;
+    if (isTalking !== undefined) {
+      setIsListeningMode(!isTalking);
+      return;
+    }
+
+    const currentVideoPlayerSrc = isListeningMode ? videoListensSrc : videoSpeaksSrc;
+    const currentVideoPlayerLoaded = isListeningMode ? videoListensLoaded : videoSpeaksLoaded;
 
     if (currentVideoPlayerSrc === mediaSrc && currentVideoPlayerLoaded) {
       return;
     }
 
-    if (videoA_Src === mediaSrc && videoA_Loaded && !isA_Current) {
-      setIsA_Current(true);
-      return;
-    }
-    if (videoB_Src === mediaSrc && videoB_Loaded && isA_Current) {
-      setIsA_Current(false);
+    if (videoListensSrc === mediaSrc && videoListensLoaded && !isListeningMode) {
+      setIsListeningMode(true);
       return;
     }
 
-    if (isA_Current) {
-      if (videoB_Src !== mediaSrc) {
-        setVideoB_Loaded(false);
-        setVideoB_Src(mediaSrc);
+    if (videoSpeaksSrc === mediaSrc && videoSpeaksLoaded && isListeningMode) {
+      setIsListeningMode(false);
+      return;
+    }
+
+    if (isListeningMode) {
+      if (videoSpeaksSrc !== mediaSrc) {
+        setVideoSpeaksLoaded(false);
+        setVideoSpeaksSrc(mediaSrc);
       }
     } else {
-      if (videoA_Src !== mediaSrc) {
-        setVideoA_Loaded(false);
-        setVideoA_Src(mediaSrc);
+      if (videoListensSrc !== mediaSrc) {
+        setVideoListensLoaded(false);
+        setVideoListensSrc(mediaSrc);
       }
     }
-  }, [mediaSrc, isVideo, isA_Current, videoA_Src, videoB_Src, videoA_Loaded, videoB_Loaded]);
+  }, [mediaSrc, isVideo, isListeningMode, videoListensSrc, videoSpeaksSrc, videoListensLoaded, videoSpeaksLoaded, isTalking]);
 
-  const handleLoadedData = (videoIdentity: "A" | "B") => {
-    if (videoIdentity === "A") {
-      setVideoA_Loaded(true);
-      if (videoA_Src === mediaSrc && !isA_Current) {
-        setIsA_Current(true);
+  const handleLoadedData = (videoState: VideoState) => {
+    if (videoState === "listens") {
+      setVideoListensLoaded(true);
+      if (videoListensSrc === mediaSrc && !isListeningMode) {
+        setIsListeningMode(true);
       }
-    } else if (videoIdentity === "B") {
-      setVideoB_Loaded(true);
-      if (videoB_Src === mediaSrc && isA_Current) {
-        setIsA_Current(false);
+    } else if (videoState === "speaks") {
+      setVideoSpeaksLoaded(true);
+      if (videoSpeaksSrc === mediaSrc && isListeningMode) {
+        setIsListeningMode(false);
       }
     }
   };
 
+  const handleVideoError = (videoState: VideoState) => {
+    if (videoState === "listens") {
+      console.error(`Error loading listening video: ${videoListensSrc}`);
+      setVideoListensLoaded(false);
+    } else {
+      console.error(`Error loading speaking video: ${videoSpeaksSrc}`);
+      setVideoSpeaksLoaded(false);
+    }
+  };
+
+  return { videoListensSrc, videoSpeaksSrc, videoListensLoaded, videoSpeaksLoaded, isListeningMode, handleLoadedData, handleVideoError };
+};
+
+interface VideoPlayerProps {
+  state: VideoState;
+  src: string | null;
+  isActive: boolean;
+  commonAttrs: CharacterMediaProps["commonAttrs"];
+  onLoaded: (state: VideoState) => void;
+  onError: (state: VideoState) => void;
+  isTalking?: boolean;
+}
+
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ state, src, isActive, commonAttrs, onLoaded, onError, isTalking }) => {
+  const stateValue = isTalking !== undefined ? (state === "listens" ? (isTalking ? "idle" : "talking") : isTalking ? "talking" : "idle") : "default";
+
+  return (
+    <video
+      key={`video-${state}`}
+      {...commonAttrs}
+      src={src || null}
+      className={cn("absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out", isActive ? "opacity-100" : "opacity-0")}
+      autoPlay
+      loop
+      muted
+      playsInline
+      onLoadedData={() => src && onLoaded(state)}
+      onError={() => onError(state)}
+      data-state={stateValue}
+    />
+  );
+};
+
+const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, isVideo, canonicalName, isTalking }) => {
+  const { videoListensSrc, videoSpeaksSrc, isListeningMode, handleLoadedData, handleVideoError } = useVideoState(mediaSrc, isVideo, isTalking);
+
   if (!isVideo) {
-    return <img {...commonAttrs} src={mediaSrc || videoA_Src || ""} alt={canonicalName} />;
+    return <img {...commonAttrs} src={mediaSrc || videoListensSrc || ""} alt={canonicalName} />;
   }
 
   return (
     <div className="relative w-full h-full">
-      <video
-        key="videoA"
-        {...commonAttrs}
-        src={videoA_Src || null}
-        className={cn(
-          "absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out",
-          isA_Current ? "opacity-100" : "opacity-0",
-          videoA_Loaded && "opacity-100",
-        )}
-        autoPlay
-        loop
-        muted
-        playsInline
-        onLoadedData={() => videoA_Src && handleLoadedData("A")}
-        onError={() => {
-          console.error(`Error loading video A: ${videoA_Src}`);
-          setVideoA_Loaded(false);
-        }}
+      <VideoPlayer
+        state="listens"
+        src={videoListensSrc}
+        isActive={isListeningMode}
+        commonAttrs={commonAttrs}
+        onLoaded={handleLoadedData}
+        onError={handleVideoError}
+        isTalking={isTalking}
       />
-      <video
-        key="videoB"
-        {...commonAttrs}
-        src={videoB_Src || null}
-        className={cn(
-          "absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out",
-          !isA_Current ? "opacity-100" : "opacity-0",
-          videoB_Loaded && "opacity-100",
-        )}
-        autoPlay
-        loop
-        muted
-        playsInline
-        onLoadedData={() => videoB_Src && handleLoadedData("B")}
-        onError={() => {
-          console.error(`Error loading video B: ${videoB_Src}`);
-          setVideoB_Loaded(false);
-        }}
+      <VideoPlayer
+        state="speaks"
+        src={videoSpeaksSrc}
+        isActive={!isListeningMode}
+        commonAttrs={commonAttrs}
+        onLoaded={handleLoadedData}
+        onError={handleVideoError}
+        isTalking={isTalking}
       />
     </div>
   );
