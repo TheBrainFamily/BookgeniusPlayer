@@ -8,7 +8,7 @@ import { useBookContent } from "./hooks/useBookContent";
 
 import BookChaptersModal from "./menu-modal";
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
-import { runLegacyInitJustSW } from "./main";
+import { runLegacyInit } from "./main";
 import { CharacterNotesPanel } from "./components/CharacterNotesPanel";
 import { RightNotesPanel } from "./components/RightNotesPanel";
 import { useWebSocket, WebSocketProvider } from "./context/WebSocketContext";
@@ -85,7 +85,7 @@ export default function App() {
     };
 
     loadData();
-    runLegacyInitJustSW();
+    runLegacyInit();
   }, []);
 
   if (isLoading) return null;
