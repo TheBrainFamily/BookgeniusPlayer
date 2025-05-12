@@ -10,7 +10,7 @@
   padding-left: 2%;
 }
 
-@media screen and (orientation: landscape) and (max-height: 769px) {
+@media screen and (orientation: landscape) and (max-height: 850px) {
   #legacy #right-notes {
     display: none;
   }
@@ -19,9 +19,10 @@
   }
 
   #legacy #left-notes {
-    display: flex; /* Override mobile portrait display: none */
-    flex: 0 0 40%; /* Take 45% width, don't grow or shrink */
-    max-width: 40%;
+    /* Override mobile portrait display: none */
+    /* display: flex;  */
+    flex: 0 0 25%; /* Take % width, don't grow or shrink */
+    max-width: 25%;
     height: 100vh; /* Full height */
     margin: 0; /* Reset margins */
     /* Utilize safe areas */
@@ -36,6 +37,7 @@
     justify-content: center;
     align-items: flex-start;
   }
+
   #legacy #left-notes .entity-note {
     width: 100%; /* Ensure it takes full available width */
     position: relative; /* Needed for z-index */
@@ -60,13 +62,15 @@
 
 @media screen and (max-width: 1400px) and (orientation: landscape) and (min-height: 770px) {
   #legacy #left-notes {
-    display: flex; /* Override mobile portrait display: none */
-    flex: 0 0 25%; /* Take 45% width, don't grow or shrink */
+    /* Override mobile portrait display: none */
+    /* display: flex; */
+    /* Take 45% width, don't grow or shrink */
+    flex: 0 0 25%;
     max-width: 25%;
     height: 100vh; /* Full height */
     margin: 0; /* Reset margins */
     /* Utilize safe areas */
-    padding: var(--safe-area-inset-top) 10px 0 0;
+    /* padding: var(--safe-area-inset-top) 10px 0 0; */
     box-sizing: border-box; /* Include padding in width calculation */
     overflow-y: auto; /* Allow scrolling if content overflows */
     position: static; /* Override fixed positioning from portrait */
@@ -76,6 +80,7 @@
     /* Add these to align internal flex items */
     justify-content: center;
     align-items: flex-start;
+    /* background-color: red; */
   }
 
   /* Hide mobile-specific toggles/strips/overlays that conflict */

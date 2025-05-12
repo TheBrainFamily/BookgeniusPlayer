@@ -177,15 +177,19 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
           "fixed bottom-0 inset-x-0 z-50 transition-all duration-200 ease-out",
           "bg-white/0 dark:bg-zinc-900/80 dark:border-white/10 flex",
           isCollapsed ? "w-auto right-4 left-auto rounded-full p-1" : "w-full",
+          "justify-around",
           className,
         )}
       >
         {/* ToDo: Remove when layout will be refactored */}
-        <div id="remove-later" className="m-5 mr-0 pb-5 flex align-center justify-center flex-1 max-md:hidden"></div>
+        <div
+          id="remove-later"
+          className="mx-5 py-5 max-w-[700px] flex align-center justify-center flex-1 max-md:hidden [@media(max-width:1400px)]:mr-0 [@media(max-height:850px)]:flex-[0_0_25%] [@media(max-height:850px)]:m-0 [@media(max-height:850px)]:max-w-[25%]"
+        ></div>
         <div
           className={cn(
             "keyboard-safe-area",
-            "w-full mx-auto",
+            "w-full",
             "max-w-[900px] [@media(max-width:1900px)]:max-w-[700px]",
             "bg-gradient-to-b from-black/0 to-[var(--footer-stop)]",
             "rounded-lg",
@@ -194,6 +198,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
             // keep these *last* so they win the cascade
             "transition-[--footer-stop] duration-300 ease-in-out",
             "flex-2",
+            "[@media(max-height:850px)]:m-0",
           )}
           style={{ "--footer-stop": isFocused ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.4)" } as React.CSSProperties}
         >
@@ -284,7 +289,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
           )}
         </div>
         {/* ToDo: Remove when layout will be refactored */}
-        <div className="m-5 mr-0 pb-5 flex align-center justify-center flex-1 max-md:hidden"></div>
+        <div className="mx-5 py-5 max-w-[700px] flex align-center justify-center flex-1 max-md:hidden [@media(max-height:850px)]:hidden"></div>
       </footer>
 
       {/* Backdrop REMOVED - Less necessary without focus state/internal messages */}
