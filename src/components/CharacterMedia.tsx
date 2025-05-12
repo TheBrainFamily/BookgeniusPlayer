@@ -105,10 +105,10 @@ const useVideoState = (mediaSrc: string, isVideo: boolean, isTalking?: boolean) 
 
   const handleVideoError = (videoState: VideoState) => {
     if (videoState === "listens") {
-      console.error(`Error loading listening video: ${videoListensSrc}`);
+      // console.error(`Error loading listening video: ${videoListensSrc}`);
       setVideoListensLoaded(false);
     } else {
-      console.error(`Error loading speaking video: ${videoSpeaksSrc}`);
+      // console.error(`Error loading speaking video: ${videoSpeaksSrc}`);
       setVideoSpeaksLoaded(false);
     }
   };
