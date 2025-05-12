@@ -1,5 +1,5 @@
-import { Location } from "@/src/state/LocationContext";
-import { QUESTIONS_SERVER_URL } from "@/src/lib/consts";
+import { Location } from "@/state/LocationContext";
+import { QUESTIONS_SERVER_URL } from "@/lib/consts";
 
 const extractSummary = (text: string): string => {
   const summaryMatch = text.match(/<Summary>(.*?)<\/Summary>/);

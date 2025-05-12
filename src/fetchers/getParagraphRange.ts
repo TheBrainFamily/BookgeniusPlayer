@@ -7,7 +7,7 @@
  * compile without any additional tweaks.
  */
 
-import { BOOK_SLUGS } from "../consts";
+import { BOOK_SLUGS } from "@/consts";
 
 /* -------------------------------------------------------------------------- */
 /*  Shared types                                                              */
@@ -240,7 +240,7 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
 /*  4. Ad‑hoc "does it match?" sanity check                                   */
 /* -------------------------------------------------------------------------- */
 
-import { getBookData } from "../booksData/getBookData";
+import { getBookData } from "@/booksData/getBookData";
 
 async function runTest() {
   try {

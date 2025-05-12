@@ -1,12 +1,13 @@
 import { useEffect } from "react";
-import { useLocation } from "@/src/state/LocationContext";
-import { dealWithBackground as impl } from "@/src/ui/background";
-import { useDebounce } from "@/src/hooks/useDebounce";
+
+import { useLocation } from "@/state/LocationContext";
+import { dealWithBackground as impl } from "@/ui/background";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const implRef = { current: impl };
 
 if (import.meta.hot) {
-  import.meta.hot.accept("@/src/ui/background", (mod) => {
+  import.meta.hot.accept("@/ui/background", (mod) => {
     implRef.current = mod.dealWithBackground;
     console.info("[HMR] dealWithBackground updated");
   });

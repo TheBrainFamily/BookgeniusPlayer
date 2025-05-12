@@ -1,5 +1,6 @@
-module.exports = {
-  content: ["./index.html", "components/**/*.{js,ts,jsx,tsx}", "./src/**/*.{js,ts,jsx,tsx}"],
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       screens: {
@@ -9,6 +10,6 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [import("tailwindcss-animate")],
   darkMode: "class",
 };

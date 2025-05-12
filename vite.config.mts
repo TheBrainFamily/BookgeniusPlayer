@@ -3,7 +3,6 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { viteStaticCopy, type Target } from "vite-plugin-static-copy";
 
-import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs";
 
@@ -26,7 +25,6 @@ if (desiredBookSlug && Object.values(BOOK_SLUGS).includes(desiredBookSlug as BOO
   }
 }
 // --- END: Dynamic Book Configuration ---
-
 
 // Workaround to remove unnecessary books chunks from the build
 // ToDo: Do not create them in the first place
@@ -80,7 +78,7 @@ export default defineConfig({
   // This define will replace all instances of __SELECTED_BOOK_SLUG__ in your client code
   // with the actual string value of currentBookSlug.
   define: {
-    '__SELECTED_BOOK_SLUG__': JSON.stringify(currentBookSlug), // Important: JSON.stringify to make it a string literal
+    __SELECTED_BOOK_SLUG__: JSON.stringify(currentBookSlug), // Important: JSON.stringify to make it a string literal
   },
   optimizeDeps: { include: ["workbox-core", "workbox-precaching", "workbox-routing", "workbox-strategies", "workbox-range-requests"] },
   plugins: [
@@ -108,24 +106,8 @@ export default defineConfig({
     }),
     removeChunksPlugin(),
   ],
-  resolve: {
-    alias: {
-      "@": fileURLToPath(new URL("./", import.meta.url)),
-      // The above maps '@/' to the project root directory where vite.config.ts is.
-      // So an import like '@/src/helpers/...' will correctly resolve to
-      // '<project_root>/src/helpers/...'
-    },
-  },
   root: "./",
-  build: {
-    outDir: "dist",
-    sourcemap: true,
-    emptyOutDir: true,
-  },
-  server: {
-    port: 5173,
-    open: true,
-    proxy: { "/api": "http://localhost:3000" },
-    watch: { ignored: ["**/src/data/*.xml"] },
-  },
+  resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
+  build: { outDir: "dist", sourcemap: true, emptyOutDir: true },
+  server: { port: 5173, open: true, proxy: { "/api": "http://localhost:3000" }, watch: { ignored: ["**/src/data/*.xml"] } },
 });

@@ -1,5 +1,5 @@
 import { isEditActive } from "./sidebarEditor";
-import { hideSearchModal, isSearchActive } from "../searchModal";
+import { hideSearchModal, isSearchActive } from "@/searchModal";
 
 // Handle keyboard navigation events
 export function keyboardNavigationSetup(event: KeyboardEvent) {

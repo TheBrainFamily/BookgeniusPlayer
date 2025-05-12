@@ -1,11 +1,13 @@
 import React, { useMemo } from "react";
 import { createPortal } from "react-dom";
+import { motion, AnimatePresence, Variants } from "motion/react";
 
-import { useDebounce } from "@/src/hooks/useDebounce";
-import { useCharacterNotes } from "@/src/hooks/useCharacterNotes";
-import { useLocation } from "@/src/state/LocationContext";
-import { CharacterCard } from "./CharacterCard";
-import { BookData } from "@/src/booksData/types";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useCharacterNotes } from "@/hooks/useCharacterNotes";
+import { useLocation } from "@/state/LocationContext";
+import CharacterCard from "./CharacterCard";
+import { BookData } from "@/booksData/types";
+import useSplashHidden from "@/hooks/useSplashHidden";
 
 /* mount inside the legacy container for CSS */
 const target = document.getElementById("left-notes");
@@ -16,33 +18,49 @@ interface CharacterNotesPanelProps {
 
 export const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
   const { location } = useLocation();
-
-  /* throttle updates while scrolling */
-  const debounced = useDebounce(location, 100);
+  const debouncedLocation = useDebounce(location, 150);
+  const isSplashHidden = useSplashHidden();
 
   /* stable range object */
   const range = useMemo(
-    () => ({ chapter: debounced.chapter, paragraph: debounced.paragraph, endChapter: debounced.endChapter, endParagraph: debounced.endParagraph }),
-    [debounced.chapter, debounced.paragraph, debounced.endChapter, debounced.endParagraph],
+    () => ({ chapter: debouncedLocation.chapter, paragraph: debouncedLocation.paragraph, endChapter: debouncedLocation.endChapter, endParagraph: debouncedLocation.endParagraph }),
+    [debouncedLocation.chapter, debouncedLocation.paragraph, debouncedLocation.endChapter, debouncedLocation.endParagraph],
   );
 
-  /* characters for that range */
-  const notes = useCharacterNotes(range, bookData.charactersData);
+  const characterNotes = useCharacterNotes(range, bookData.charactersData, true, true);
 
-  if (!target) return null;
+  if (!target || !isSplashHidden) return null;
 
   return createPortal(
-    <div className="entity-notes-container fade-in">
-      {notes
-        .sort((a, b) => a.canonicalName.localeCompare(b.canonicalName))
-        .map((n, i) => (
-          <CharacterCard
-            key={`${n.canonicalName}`} // replay anim only when list truly changes
-            entity={n}
-            index={i}
-          />
+    <motion.div className="flex flex-col justify-center gap-2" initial="hidden" animate="visible" variants={variants.container}>
+      <AnimatePresence>
+        {characterNotes.map((characterNote, index) => (
+          <motion.div
+            key={characterNote.canonicalName}
+            layout="preserve-aspect"
+            variants={variants.character}
+            initial="hidden"
+            animate="visible"
+            custom={index}
+            exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
+            transition={{ layout: { delay: 0.2 } }}
+          >
+            <CharacterCard entity={characterNote} />
+          </motion.div>
         ))}
-    </div>,
+      </AnimatePresence>
+    </motion.div>,
     target,
   );
+};
+
+const variants: Record<string, Variants> = {
+  container: {
+    hidden: { opacity: 0, x: -120, scale: 0.95, rotate: -2 },
+    visible: { opacity: 1, x: 0, scale: 1, rotate: 0, transition: { duration: 1, delay: 1, type: "spring", stiffness: 70, damping: 15, mass: 1.2 } },
+  },
+  character: {
+    hidden: { opacity: 0, x: -100, y: 10 },
+    visible: (i: number) => ({ opacity: 1, x: 0, y: 0, transition: { duration: 0.6, delay: 0.8 + 0.15 * i, type: "spring", stiffness: 100 } }),
+  },
 };

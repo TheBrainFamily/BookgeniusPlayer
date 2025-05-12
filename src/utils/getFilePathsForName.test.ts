@@ -1,5 +1,5 @@
 import { getPictureFilePathForName } from "./getFilePathsForName";
-import { BOOK_SLUGS } from "@/src/consts";
+import { BOOK_SLUGS } from "@/consts";
 import { describe, expect, test } from "@jest/globals";
 
 describe("getPictureFilePathForName", () => {

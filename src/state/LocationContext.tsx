@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useMemo, useState, useEffect } from "react";
-import { __setLocationBridge } from "@/src/helpers/paragraphsNavigation";
+import { __setLocationBridge } from "@/helpers/paragraphsNavigation";
 
 /* ------------------------------------------------------------------ */
 export interface Location {

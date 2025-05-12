@@ -1,6 +1,4 @@
-import { bookData } from "../booksData/books/pharaonBookData";
-import { BOOK_SLUGS } from "../consts";
-import { _1984CharactersData } from "../data/metadata-1984";
+import { BOOK_SLUGS } from "@/consts";
 
 export const knownMovingPictures = [
   "Książę Ramzes",
@@ -160,7 +158,7 @@ export const getPictureFileNameForName = (name: string) => {
   return `${name.replace(/[\s()\\']+/g, "-").toLowerCase()}.png`;
 };
 
-const LOG_PREFIX = "Generated file path:";
+// const LOG_PREFIX = "Generated file path:";
 
 export const getPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
   const listensPath = `${name

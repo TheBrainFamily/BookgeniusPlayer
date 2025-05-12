@@ -1,5 +1,5 @@
-import { initAudioContext } from "../audio-crossfader";
-import { setCurrentLocation } from "../helpers/paragraphsNavigation";
+import { initAudioContext } from "@/audio-crossfader";
+import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
 
 const SHOULD_SHOW_EVERYONE = false;
 

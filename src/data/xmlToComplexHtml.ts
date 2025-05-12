@@ -1,8 +1,9 @@
 import { DOMParser, XMLSerializer, Node } from "@xmldom/xmldom";
 import fs from "fs";
 import path from "path";
-import { getMovingPictureFilePathForName, getPictureFilePathForName } from "../utils/getFilePathsForName";
-import { BOOK_SLUGS, CURRENT_BOOK } from "../consts";
+
+import { getMovingPictureFilePathForName, getPictureFilePathForName } from "@/utils/getFilePathsForName";
+import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
 
 export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): string => {
   const parser = new DOMParser();

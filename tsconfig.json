@@ -7,7 +7,8 @@
     "forceConsistentCasingInFileNames": true,
     "strict": false,
     "skipLibCheck": true,
-    "paths": { "@/*": ["./*"] },
+    "baseUrl": ".",
+    "paths": { "@/*": ["./src/*"] },
     "jsx": "react",
     "types": ["vite/client"]
   }

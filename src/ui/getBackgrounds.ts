@@ -1,4 +1,4 @@
-import { BOOK_SLUGS, CURRENT_BOOK } from "../consts";
+import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
 import type { Background } from "./background";
 
 export const getBackgrounds = (): Background[] => {

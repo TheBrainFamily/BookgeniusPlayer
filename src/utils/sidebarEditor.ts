@@ -1,6 +1,5 @@
-import { CURRENT_BOOK } from "../consts";
-import { BOOK_SLUGS } from "../consts";
-import { updateCharacterChapterInfo } from "../fetchers/updateCharacterChapterInfo";
+import { CURRENT_BOOK } from "@/consts";
+import { updateCharacterChapterInfo } from "@/fetchers/updateCharacterChapterInfo";
 import { getPictureFilePathForName } from "./getFilePathsForName";
 
 // Define a type for the window with our global functions

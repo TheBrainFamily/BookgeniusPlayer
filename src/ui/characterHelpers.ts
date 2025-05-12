@@ -1,5 +1,5 @@
-import { BOOK_SLUGS } from "../consts";
-import { getMovingPictureFilePathForName } from "../utils/getFilePathsForName";
+import { BOOK_SLUGS } from "@/consts";
+import { getMovingPictureFilePathForName } from "@/utils/getFilePathsForName";
 
 export function isAppearanceWithinRange(
   appearance: { chapterNumber: number; paragraphNumber: number },

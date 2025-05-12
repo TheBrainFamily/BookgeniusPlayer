@@ -4,7 +4,8 @@
  * and benefits from Fast‑Refresh.
  */
 import { useEffect } from "react";
-import { setupPageObserver } from "@/src/ui/pageObserver";
+
+import { setupPageObserver } from "@/ui/pageObserver";
 
 export const usePageObserver = (htmlContent: string) => {
   useEffect(() => {

@@ -27,6 +27,9 @@ export const dealWithSW = () => {
 
       if (videoTimeoutId) clearTimeout(videoTimeoutId);
       if (swTimeoutId) clearTimeout(swTimeoutId);
+
+      // Dispatch custom event for components to listen to (for useSplashHidden)
+      window.dispatchEvent(new CustomEvent("splashHidden"));
     }
   };
 
