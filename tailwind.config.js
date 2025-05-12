@@ -10,6 +10,6 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [import("tailwindcss-animate")],
   darkMode: "class",
 };
