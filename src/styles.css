@@ -435,7 +435,7 @@
   }
 
   /* --- Notes Panel --- */
-  .notes-container {
+  /* .notes-container {
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -444,33 +444,33 @@
     line-height: 1.4;
     font-size: 1rem;
     color: var(--text-notes-light);
-  }
+  } */
 
   /* Container for entity notes - center content vertically */
-  .entity-notes-container {
+  /* .entity-notes-container {
     width: 95%;
     height: 100%;
     padding: 10px 0;
     overflow-y: scroll;
     cursor: default;
     align-content: center;
-  }
+  } */
 
-  .entity-notes-container > div {
+  /* .entity-notes-container > div {
     margin-bottom: 15px;
-  }
+  } */
 
   /* when first entity is talking there is no space for scale effect */
-  .entity-notes-container > div:first-child {
+  /* .entity-notes-container > div:first-child {
     margin-top: 50px;
-  }
+  } */
 
-  .entity-notes-container > div:last-child {
+  /* .entity-notes-container > div:last-child {
     margin-bottom: 0;
-  }
+  } */
 
   /* Add styling only to the text column */
-  .entity-text-column {
+  /* .entity-text-column {
     background-color: var(--char-card-bg-light);
     box-shadow: 0 0 8px var(--shadow-light);
     border-radius: 8px;
@@ -483,13 +483,13 @@
     text-wrap: pretty;
     font-size: 0.9rem;
     border: 1px solid transparent;
-  }
+  } */
 
-  .entity-text-column h4 {
+  /* .entity-text-column h4 {
     font-style: italic;
     font-weight: 600;
     color: var(--text-light);
-  }
+  } */
 
   /* Specific Notes Panel Instances */
   #right-notes {
@@ -536,14 +536,18 @@
   }
 
   #left-notes {
-    display: flex;
-    justify-content: center;
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* justify-content: center; */
+    align-content: center;
     height: 100vh;
     flex: 1;
     max-width: 700px;
-    margin: 20px;
-    margin-top: 0;
-    margin-right: 0;
+    margin: 0 20px;
+    padding: 50px 0;
+    overflow: scroll;
+    /* margin-top: 0;
+    margin-right: 0; */
   }
 
   /* --- Loading Indicator --- */
@@ -601,11 +605,11 @@
     display: block; /* Show when parent is active */
   }
 
-  .editable-text:hover {
+  /* .editable-text:hover {
     background-color: rgba(74, 144, 226, 0.1);
     border-radius: 4px;
     position: relative;
-  }
+  } */
 
   .edit-container {
     width: 100%;
@@ -651,7 +655,7 @@
   }
 
   .entity-image-wrapper:hover {
-    transform: scale(1.7); /* Scale the wrapper on hover */
+    transform: scale(1.5); /* Scale the wrapper on hover */
     z-index: 10; /* Bring to front on hover */
   }
 
@@ -699,41 +703,41 @@
   }
 
   /* Add this rule for highlighting entities in the sidebar */
-  .entity-note.highlighted-entity {
+  /* .highlighted-entity {
     transition: transform 0.2s ease-in-out;
-  }
+  } */
 
-  .entity-note.highlighted-entity .entity-text-column {
+  /* .highlighted-entity .entity-text-column {
     background-color: var(--entity-highlight-bg-light);
     border: 1px solid var(--entity-highlight-border-light);
     box-shadow: 0 0 10px var(--entity-highlight-shadow-accent-light);
     transition: all 0.2s ease-in-out;
-  }
+  } */
 
   /* Add this rule for highlighting talking entities in the sidebar */
-  .entity-note.highlighted-talking-entity {
-    z-index: 100; /* Bring to front on hover */
+  /* .highlighted-talking-entity {
+    z-index: 100; Bring to front on hover 
 
     transition:
       transform 0.3s ease-in-out,
       box-shadow 0.3s ease-in-out;
-  }
+  } */
 
-  .entity-note.highlighted-talking-entity .entity-text-column {
+  /* .highlighted-talking-entity .entity-text-column {
     background-color: var(--entity-talking-highlight-bg-light);
     border: 2px solid var(--entity-talking-highlight-border-light);
     box-shadow: 0 0 15px var(--entity-talking-highlight-shadow-light);
     transition: all 0.3s ease-in-out;
-  }
+  } */
 
   /* Scale the wrapper for the image within a highlighted talking entity */
-  .entity-note.highlighted-talking-entity .entity-image-wrapper {
+  /* .highlighted-talking-entity .entity-image-wrapper {
     animation: pulseGlow 3s infinite ease-in-out;
     z-index: 10;
     border-radius: 50%;
     box-shadow: 0 0 12px var(--entity-image-wrapper-shadow-light);
     border: 2px solid var(--entity-image-wrapper-border-light);
-  }
+  } */
 
   /* Editable text container */
   .editable-container {
@@ -786,8 +790,8 @@
     border-radius: 50%;
     overflow: hidden;
     cursor: pointer;
-    position: relative;
-    z-index: 1;
+    /* position: relative; */
+    /* z-index: 1; */
   }
 
   .entity-image {
@@ -922,11 +926,11 @@
 
 /* Base style for entity image wrapper to help with transitions */
 .entity-image-wrapper {
-  transform: scale(1.2);
+  /* transform: scale(1.2); */
   transition:
     transform 0.3s ease-in-out,
     box-shadow 0.3s ease-in-out;
-  z-index: 1;
+  /* z-index: 1; */
 }
 /* Fade-in animation class */
 .fade-in {

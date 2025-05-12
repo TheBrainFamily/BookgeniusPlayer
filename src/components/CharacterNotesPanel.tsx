@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useCharacterNotes } from "@/hooks/useCharacterNotes";
 import { useLocation } from "@/state/LocationContext";
-import { CharacterCard } from "./CharacterCard";
+import CharacterCard from "./CharacterCard";
 import { BookData } from "@/booksData/types";
 import useSplashHidden from "@/hooks/useSplashHidden";
 
@@ -32,20 +32,19 @@ export const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
   if (!target || !isSplashHidden) return null;
 
   return createPortal(
-    <motion.div className="entity-notes-container" initial="hidden" animate="visible" variants={variants.container}>
+    <motion.div className="entity-notes-container flex flex-col justify-center gap-2 " initial="hidden" animate="visible" variants={variants.container}>
       <AnimatePresence>
-        {characterNotes.map((n, i) => (
+        {characterNotes.map((characterNote) => (
           <motion.div
-            key={n.canonicalName}
+            key={characterNote.canonicalName}
             layout="preserve-aspect"
-            custom={i}
             variants={variants.character}
             initial="hidden"
             animate="visible"
             exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
             transition={{ layout: { delay: 0.2 } }}
           >
-            <CharacterCard entity={n} index={i} />
+            <CharacterCard entity={characterNote} />
           </motion.div>
         ))}
       </AnimatePresence>

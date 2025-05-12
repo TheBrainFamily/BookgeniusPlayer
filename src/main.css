@@ -60,7 +60,7 @@ body.modal-open {
 }
 
 /* Keyframes for pulsing scale effect */
-@keyframes pulseScale {
+/* @keyframes pulseScale {
   0% {
     transform: scale(1.13);
   }
@@ -70,22 +70,22 @@ body.modal-open {
   100% {
     transform: scale(1.13);
   }
-}
+} */
 
-@keyframes pulseGlow {
+/* @keyframes pulseGlow {
   0% {
-    transform: scale(1.2) rotate(0.1deg);
+    transform: scale(1) rotate(0.1deg);
     box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
   }
   50% {
-    transform: scale(1.4) rotate(0.1deg);
+    transform: scale(1.2) rotate(0.1deg);
     box-shadow: 0 0 15px var(--entity-image-wrapper-shadow-max-light);
   }
   100% {
-    transform: scale(1.2) rotate(0.1deg);
+    transform: scale(1) rotate(0.1deg);
     box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
   }
-}
+} */
 
 @keyframes fadeUp {
   from {
