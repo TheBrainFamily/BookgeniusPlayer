@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, Variants } from "motion/react";
 
 import { useDebounce } from "@/hooks/useDebounce";
 import { useCharacterNotes } from "@/hooks/useCharacterNotes";
@@ -32,15 +32,16 @@ export const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
   if (!target || !isSplashHidden) return null;
 
   return createPortal(
-    <motion.div className="entity-notes-container flex flex-col justify-center gap-2 " initial="hidden" animate="visible" variants={variants.container}>
+    <motion.div className="flex flex-col justify-center gap-2" initial="hidden" animate="visible" variants={variants.container}>
       <AnimatePresence>
-        {characterNotes.map((characterNote) => (
+        {characterNotes.map((characterNote, index) => (
           <motion.div
             key={characterNote.canonicalName}
             layout="preserve-aspect"
             variants={variants.character}
             initial="hidden"
             animate="visible"
+            custom={index}
             exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
             transition={{ layout: { delay: 0.2 } }}
           >
@@ -53,7 +54,13 @@ export const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
   );
 };
 
-const variants = {
-  container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.5, delay: 0.2 } } },
-  character: { hidden: { opacity: 0, x: -100 }, visible: (i: number) => ({ opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.4 + 0.15 * i } }) },
+const variants: Record<string, Variants> = {
+  container: {
+    hidden: { opacity: 0, x: -120, scale: 0.95, rotate: -2 },
+    visible: { opacity: 1, x: 0, scale: 1, rotate: 0, transition: { duration: 1, delay: 1, type: "spring", stiffness: 70, damping: 15, mass: 1.2 } },
+  },
+  character: {
+    hidden: { opacity: 0, x: -100, y: 10 },
+    visible: (i: number) => ({ opacity: 1, x: 0, y: 0, transition: { duration: 0.6, delay: 0.8 + 0.15 * i, type: "spring", stiffness: 100 } }),
+  },
 };
