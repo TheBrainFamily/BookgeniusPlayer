@@ -105,5 +105,24 @@ export const getBackgrounds = (): Background[] => {
     backgrounds = backgroundsInput.map(toBackground);
   }
 
+  if (CURRENT_BOOK === BOOK_SLUGS.Conrad_Tajny_Agent) {
+    const backgroundsInput = [
+      { chapter: 1, file: "openai-high-1.png" },
+      { chapter: 2, file: "openai-high-2.png" },
+      { chapter: 3, file: "openai-high-3.png" },
+      { chapter: 4, file: "openai-high-4.png" },
+      { chapter: 5, file: "openai-high-5.png" },
+      { chapter: 6, file: "openai-high-6.png" },
+      { chapter: 7, file: "openai-high-7.png" },
+      { chapter: 8, file: "openai-high-8.png" },
+      { chapter: 9, file: "openai-high-9.png" },
+      { chapter: 10, file: "openai-high-10.png" },
+      { chapter: 11, file: "openai-high-11.png" },
+      { chapter: 12, file: "openai-high-12.png" },
+      { chapter: 13, file: "openai-high-13.png" },
+    ];
+    backgrounds = backgroundsInput.map(toBackground);
+  }
+
   return backgrounds;
 };
