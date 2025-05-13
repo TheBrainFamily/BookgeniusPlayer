@@ -20,6 +20,7 @@ import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
 import { BookData } from "./booksData/types";
 import { ModalProvider } from "./context/ModalContext";
 import { BookContentWrapper } from "./components/BookContentWrapper";
+import { CharacterPlaceholderHandler } from "./components/CharacterPlaceholderHandler";
 
 function Shell({
   bookData,
@@ -100,6 +101,7 @@ export default function App() {
         <WebSocketProvider>
           <BookContentWrapper>
             <ModalProvider>
+              <CharacterPlaceholderHandler bookData={currentBookData} />
               <Shell bookData={currentBookData} setShowDeepResearch={setShowDeepResearch} showDeepResearch={showDeepResearch} passedText={deepResearchResult} />
               <ChatContainer
                 onShowDeepResearch={(result) => {
