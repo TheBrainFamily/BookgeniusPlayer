@@ -148,8 +148,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ state, src, isActive, commonA
 
 const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, isVideo, canonicalName, isTalking }) => {
   const { videoListensSrc, videoSpeaksSrc, isListeningMode, handleLoadedData, handleVideoError } = useVideoState(mediaSrc, isVideo, isTalking);
+  const _isVideo = mediaSrc.includes(".mp4");
 
-  if (!isVideo) {
+  if (!_isVideo) {
     return <img {...commonAttrs} src={mediaSrc || videoListensSrc || ""} alt={canonicalName} />;
   }
 

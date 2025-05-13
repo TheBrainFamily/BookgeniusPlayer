@@ -55,7 +55,6 @@ export function setupParagraphHighlighting() {
 
   // --- Add Click Listener for Mobile Note Modals ---
   contentContainer.addEventListener("click", (event) => {
-    console.log("1148 Clicked on", event.target);
     const target = event.target as HTMLElement;
     const linkNote = target.classList.contains("link-note") ? target : (target.closest(".link-note") as HTMLElement | null);
 
@@ -66,10 +65,8 @@ export function setupParagraphHighlighting() {
 
       const targetId = linkNote.getAttribute("href")?.substring(1); // Get href like '#fn3' and remove '#'
       if (targetId) {
-        console.log("1148 targetId", targetId);
         const noteElement = document.getElementById(targetId);
         if (noteElement) {
-          console.log("1148 noteElement", noteElement);
           // --- Modal Logic ---
           // Reuse or create modal elements
           let modal = document.getElementById("note-modal");
@@ -85,7 +82,6 @@ export function setupParagraphHighlighting() {
           };
 
           if (!modal) {
-            console.log("1148 modal create", modal);
             // Create modal structure if it doesn't exist
             modalOverlay = document.createElement("div");
             modalOverlay.id = "note-modal-overlay";
@@ -115,7 +111,6 @@ export function setupParagraphHighlighting() {
 
           // Ensure elements were found or created and assign content/display
           if (modal && modalContent && modalOverlay && modalClose) {
-            console.log("1148 modalContent display", modalContent);
             // Replace potential space before the editorial note with a non-breaking space
             // and wrap the note itself to prevent internal breaks.
             const originalHTML = noteElement.innerHTML;
