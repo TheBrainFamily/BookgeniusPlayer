@@ -60,6 +60,12 @@ interface BookBuildData {
 const bookBuildConfigs: Partial<Record<BOOK_SLUGS, BookBuildData>> = {
   [BOOK_SLUGS.PHARAON]: { name: "Faraon", short_name: "Faraon", staticAssetSourceDir: `public_books/${BOOK_SLUGS.PHARAON}`, staticAssetDestDir: BOOK_SLUGS.PHARAON },
   [BOOK_SLUGS._1984]: { name: "1984", short_name: "1984", staticAssetSourceDir: `public_books/${BOOK_SLUGS._1984}`, staticAssetDestDir: BOOK_SLUGS._1984 },
+  [BOOK_SLUGS.Conrad_Tajny_Agent]: {
+    name: "Conrad Tajny Agent",
+    short_name: "Conrad-Tajny-Agent",
+    staticAssetSourceDir: `public_books/${BOOK_SLUGS.Conrad_Tajny_Agent}`,
+    staticAssetDestDir: BOOK_SLUGS.Conrad_Tajny_Agent,
+  },
 };
 
 const activeBookConfig = bookBuildConfigs[currentBookSlug]; // Use the resolved currentBookSlug

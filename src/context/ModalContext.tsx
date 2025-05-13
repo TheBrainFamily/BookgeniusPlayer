@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { createPortal } from 'react-dom';
+import React, { createContext, useContext, useState, ReactNode } from "react";
+import { createPortal } from "react-dom";
 
-interface ModalContextType {
+export interface ModalContextType {
   openModal: (content: ReactNode) => void;
   closeModal: () => void;
   modalContent: ReactNode | null;
@@ -27,7 +27,8 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   return (
     <ModalContext.Provider value={{ openModal, closeModal, modalContent, isModalOpen }}>
       {children}
-      {isModalOpen && modalContent &&
+      {isModalOpen &&
+        modalContent &&
         createPortal(
           <div className="modal-overlay active bg-black items-center justify-center" onClick={closeModal}>
             <div className="bg-transparent flex h-full items-center justify-center">
@@ -36,7 +37,7 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               {modalContent}
             </div>
           </div>,
-          document.body
+          document.body,
         )}
     </ModalContext.Provider>
   );
@@ -45,7 +46,7 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 export const useModal = (): ModalContextType => {
   const context = useContext(ModalContext);
   if (context === undefined) {
-    throw new Error('useModal must be used within a ModalProvider');
+    throw new Error("useModal must be used within a ModalProvider");
   }
   return context;
 };

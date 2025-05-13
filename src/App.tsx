@@ -18,7 +18,7 @@ import { DeepResearchModal } from "./ui/DeepResearchModal";
 import { getBookData } from "./booksData/getBookData";
 import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
 import { BookData } from "./booksData/types";
-import { ModalProvider } from "./context/ModalContext";
+import { ModalProvider, useModal } from "./context/ModalContext";
 import { BookContentWrapper } from "./components/BookContentWrapper";
 import { BookThemeProvider } from "./context/BookThemeContext";
 
@@ -37,7 +37,7 @@ function Shell({
   useBookContent(bookData.bookXml, "content-container");
 
   /* scroll‑related hooks */
-  usePageObserver(bookData.bookXml);
+  usePageObserver(bookData.bookXml, useModal());
 
   /* dynamic visual hooks */
   useCutScene();
@@ -102,7 +102,7 @@ export default function App() {
           <BookThemeProvider>
             <BookContentWrapper>
               <ModalProvider>
-                <Shell bookData={currentBookData} setShowDeepResearch={setShowDeepResearch} showDeepResearch={showDeepResearch} passedText={deepResearchResult} />
+              <Shell bookData={currentBookData} setShowDeepResearch={setShowDeepResearch} showDeepResearch={showDeepResearch} passedText={deepResearchResult} />
                 <ChatContainer
                   onShowDeepResearch={(result) => {
                     setDeepResearchResult(result);

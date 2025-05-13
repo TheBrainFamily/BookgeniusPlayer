@@ -241,8 +241,10 @@ const _1984BackgroundSongsDefined = [
   { chapter: 23, paragraph: 1, files: ["1984-chapter-23-paragraph-1.mp3", "1984-chapter-23-paragraph-1b.mp3"] },
   { chapter: 23, paragraph: 18, files: ["1984-chapter-23-paragraph-18.mp3", "1984-chapter-23-paragraph-18b.mp3"] },
   { chapter: 24, paragraph: 1, files: ["1984-chapter-24-paragraph-1.mp3", "1984-chapter-24-paragraph-1b.mp3"] },
-  { chapter: 24, paragraph: 36, files: ["1984-chapter-24-paragraph-36.mp3", "1984-chapter-24-paragraph-36b.mp3"] }
+  { chapter: 24, paragraph: 36, files: ["1984-chapter-24-paragraph-36.mp3", "1984-chapter-24-paragraph-36b.mp3"] },
 ];
+
+const conradTajnyAgentBackgroundSongsDefined = [{ chapter: 1, paragraph: 1, files: ["LondonNoirAmbience.mp3", "script-one.mp3"] }];
 
 export const getBackgroundSongsForBook = (bookSlug: string) => {
   switch (bookSlug) {
@@ -250,6 +252,8 @@ export const getBackgroundSongsForBook = (bookSlug: string) => {
       return _1984BackgroundSongsDefined;
     case BOOK_SLUGS.PHARAON:
       return pharaonBackgroundSongsDefined;
+    case BOOK_SLUGS.Conrad_Tajny_Agent:
+      return conradTajnyAgentBackgroundSongsDefined;
     default:
       return [];
   }

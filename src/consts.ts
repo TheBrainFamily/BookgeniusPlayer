@@ -4,6 +4,7 @@ export enum BOOK_SLUGS {
   TRUMP = "trump",
   PHARAON = "Pharaon",
   _1984 = "1984",
+  Conrad_Tajny_Agent = "Conrad-Tajny-Agent",
 }
 
 // This will be replaced by Vite's `define` feature in vite.config.mts

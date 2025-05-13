@@ -160,7 +160,7 @@ export const getPictureFileNameForName = (name: string) => {
 
 // const LOG_PREFIX = "Generated file path:";
 
-export const getPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
+export const getListeningMediaFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
   const listensPath = `${name
     .toLowerCase()
     .replace(/ /g, "-")
@@ -172,7 +172,7 @@ export const getPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) =>
   return `/${bookSlug}/${getPictureFileNameForName(name)}`;
 };
 
-export const getMovingPictureFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
+export const getTalkingMediaFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
   const speaksPath = `${name
     .toLowerCase()
     .replace(/ /g, "-")
@@ -184,7 +184,7 @@ export const getMovingPictureFilePathForName = (name: string, bookSlug: BOOK_SLU
   if (known.includes(speaksPath)) {
     return `/${bookSlug}/${speaksPath}`;
   }
-  return getPictureFilePathForName(name, bookSlug);
+  return getListeningMediaFilePathForName(name, bookSlug);
 };
 
 // const charactersToShow = ["Ramzes", "Ramzes XII", "Herhor", "Nitager", "Brat Ramzesa", "Amenhotep", "Nikotris"];
