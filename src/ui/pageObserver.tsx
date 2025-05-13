@@ -40,7 +40,6 @@ function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextTyp
   const listeningSrc = placeholder.dataset.srcListening; // Can be video or image
 
   if (!character) return null;
-  console.log(`talkingSrc: ${talkingSrc}, listeningSrc: ${listeningSrc}, character: ${character}, placeholder: ${placeholder}`);
 
   let element: HTMLVideoElement | HTMLImageElement | null = null;
   let finalSrc: string | undefined = undefined;
@@ -69,13 +68,7 @@ function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextTyp
   // Configure and return the element
   if (element && finalSrc) {
     element.addEventListener("click", () => {
-      modal.openModal(
-        <div className="flex flex-row lg:flex-col gap-4 max-w-full lg:max-w-120 max-h-full">
-          <div className="rounded-full overflow-hidden max-h-[90vh] max-w-[90vh] lg:max-h-120 lg:max-w-120 border-4 border-[var(--entity-highlight-border-light)]">
-            <img src={finalSrc} alt={character} />
-          </div>
-        </div>,
-      );
+      modal.openCharacterDetailsModal(character, isTalking, finalSrc);
     });
     element.src = finalSrc;
     element.classList.add("inline-avatar");
@@ -91,18 +84,12 @@ function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextTyp
 }
 
 function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType) {
-  console.log("highlighting character", character.dataset.character);
   const characterName = character.dataset.character;
   const listeningSrc = character.dataset.srcListening;
+  const isTalking = character.dataset.isTalking === "true";
   character.classList.add("character-highlighted-activated");
   character.addEventListener("click", () => {
-    modal.openModal(
-      <div className="flex flex-row lg:flex-col gap-4 max-w-full lg:max-w-120 max-h-full">
-        <div className="rounded-full overflow-hidden max-h-[90vh] max-w-[90vh] lg:max-h-120 lg:max-w-120 border-4 border-[var(--entity-highlight-border-light)]">
-          <img src={listeningSrc} alt={characterName} />
-        </div>
-      </div>,
-    );
+    modal.openCharacterDetailsModal(characterName, isTalking, listeningSrc);
   });
 }
 
@@ -121,7 +108,7 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
     if (chapterStr && paragraphStr) {
       const currentChapter = parseInt(chapterStr, 10);
       const currentParagraph = parseInt(paragraphStr, 10);
-      const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - 3, endChapter, endParagraph + 3);
+      const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - 3, endChapter, endParagraph + 12);
       const placeholders = p.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
       const charactersDisplayed = [];
@@ -179,7 +166,6 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
             // Media already injected, just play existing video if paused
             mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
           }
-          charactersDisplayed.push(placeholder.dataset.character);
         } else {
           // Out of view
           // Check if actual media is injected (not a dummy)
@@ -203,8 +189,28 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
             // NOTE: Text remains hidden in its wrapper span. No need to restore/re-hide.
 
             console.log(`[Media Unload] Replaced media with dummy for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
+          } else {
+            // We are out of view, and it's NOT (mediaInjected && mediaElement is valid)
+            // `dummyPlaceholder` was queried at the start of the loop for this placeholder.
+            if (!dummyPlaceholder && placeholder.dataset.isTalking === "true") {
+              const newDummyElement = document.createElement("span");
+              newDummyElement.classList.add("dummy-avatar-placeholder");
+              newDummyElement.classList.add("inline-avatar");
+              newDummyElement.style.display = "inline-block";
+              newDummyElement.style.verticalAlign = "bottom";
+
+
+              placeholder.appendChild(newDummyElement);
+
+              // Ensure mediaInjected is false, as we are showing a dummy or no media was ever injected.
+              if (placeholder.dataset.mediaInjected === "true") {
+                delete placeholder.dataset.mediaInjected;
+              }
+              console.log(`[Media Initial Dummy] Created initial dummy for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph} (out of view, no prior dummy)`);
+            }
           }
         }
+        charactersDisplayed.push(placeholder.dataset.character);
       });
       const charactersToHighlight = p.querySelectorAll<HTMLSpanElement>(".character-highlighted");
       const seenCharactersInParentP = new Set<string>();
@@ -250,7 +256,6 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
     //   console.error("Observer root element not found:", observerOptions.root);
     //   return;
     // }
-    console.log("entries", entries);
 
     // 1. Update the set of intersecting pages based on the current changes
     entries.forEach((entry) => {
@@ -323,7 +328,7 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
             setCurrentLocation({ chapter: startInfo.chapter, paragraph: startInfo.paragraph, endChapter: endInfo.chapter, endParagraph: endInfo.paragraph });
 
             // --- Activate/Deactivate Media ---
-            activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph + 2, modal);
+            activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, modal);
             // ----------------------------------
           } else {
             console.warn("[Observer] Could not extract chapter/paragraph info for focused elements:", topFocusedPageElement, bottomFocusedPageElement);

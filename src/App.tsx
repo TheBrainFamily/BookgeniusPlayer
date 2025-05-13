@@ -101,7 +101,7 @@ export default function App() {
         <WebSocketProvider>
           <BookThemeProvider>
             <BookContentWrapper>
-              <ModalProvider>
+              <ModalProvider bookData={currentBookData}>
               <Shell bookData={currentBookData} setShowDeepResearch={setShowDeepResearch} showDeepResearch={showDeepResearch} passedText={deepResearchResult} />
                 <ChatContainer
                   onShowDeepResearch={(result) => {

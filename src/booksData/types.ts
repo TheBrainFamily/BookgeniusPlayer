@@ -1,6 +1,6 @@
 type InfoPerChapter = { chapter: number; summary: string; label?: string; paragraphsWhereSpotted: number[]; paragraphsWhereTalking: number[] };
 
-type CharacterData = { characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; imageUrl: string };
+export type CharacterData = { characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; imageUrl: string };
 
 type BookMetadata = { title: string };
 

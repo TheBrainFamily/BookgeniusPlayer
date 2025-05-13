@@ -5,7 +5,6 @@ import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
 import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { CURRENT_BOOK } from "@/consts";
 import { useModal } from "@/context/ModalContext";
-import { formatSummaryHTML } from "@/utils/formatters";
 import { useHighlight } from "@/context/HighlightContext";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +15,7 @@ interface CharacterCardProps {
 }
 
 const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
-  const { openModal } = useModal();
+  const { openCharacterDetailsModal } = useModal();
   const { highlightParagraphs, isScrollingLocked } = useHighlight();
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -36,8 +35,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
     if (isTalkingInCurrentRange) {
       setCurrentMediaSrc(getTalkingMediaFilePathForName(entity.canonicalName, CURRENT_BOOK));
     } else {
-      const staticSrc = entity.imageUrl === "UNKNOWN" ? getListeningMediaFilePathForName(entity.canonicalName, CURRENT_BOOK) : entity.imageUrl;
-      setCurrentMediaSrc(staticSrc);
+      setCurrentMediaSrc(getListeningMediaFilePathForName(entity.canonicalName, CURRENT_BOOK));
     }
   }, [isTalkingInCurrentRange, entity.canonicalName, entity.imageUrl]);
 
@@ -62,10 +60,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
     };
   }, []);
 
-  const mediaSrc = currentMediaSrc || (entity.imageUrl === "UNKNOWN" ? getListeningMediaFilePathForName(entity.canonicalName, CURRENT_BOOK) : entity.imageUrl);
+  const mediaSrc = currentMediaSrc || getListeningMediaFilePathForName(entity.canonicalName, CURRENT_BOOK);
   const isVideo = mediaSrc.endsWith(".mp4") || mediaSrc.endsWith(".webm");
 
-  const summaryHTML = formatSummaryHTML(entity.summary);
   const commonAttrs = {
     "data-original-src": mediaSrc,
     "data-character-name": entity.canonicalName,
@@ -73,19 +70,6 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
     className: "w-full h-full object-cover",
   } as const;
 
-  const openDetailsModal = () => {
-    openModal(
-      <div className="flex flex-row lg:flex-col gap-4 max-w-full lg:max-w-120 max-h-full">
-        <div className="rounded-full overflow-hidden max-h-[90vh] max-w-[90vh] lg:max-h-120 lg:max-w-120 border-4 border-(--book-primary-color) aspect-square">
-          <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.canonicalName} />
-        </div>
-        <div className="flex flex-col self-center p-4 rounded-lg bg-(--book-secondary-color)/70 border-2 border-(--book-primary-color) text-white">
-          <h4 className="italic font-bold text-center">{entity.label || entity.canonicalName}</h4>
-          <p className="text-center" dangerouslySetInnerHTML={{ __html: summaryHTML }} />
-        </div>
-      </div>,
-    );
-  };
 
   return (
     <div
@@ -103,7 +87,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
             ? "z-10 shadow-lg border-2 border-(--book-primary-color) animate-pulse-glow"
             : "transition-transform duration-300 ease-in-out hover:scale-110 hover:z-10",
         )}
-        onClick={openDetailsModal}
+        onClick={() => openCharacterDetailsModal(entity.canonicalName, isTalkingInCurrentRange, mediaSrc)}
       >
         <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.canonicalName} isTalking={isTalkingInCurrentRange} />
       </div>

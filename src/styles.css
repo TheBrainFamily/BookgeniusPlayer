@@ -1030,6 +1030,7 @@
   padding: 0.5rem; /* p-2 = 0.5rem */
   background-color: floralwhite;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 h3[data-index="0"] {
