@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import CharacterMedia from "./CharacterMedia";
 import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
-import { getPictureFilePathForName, getMovingPictureFilePathForName } from "@/utils/getFilePathsForName";
+import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { CURRENT_BOOK } from "@/consts";
 import { useModal } from "@/context/ModalContext";
 import { formatSummaryHTML } from "@/utils/formatters";
@@ -34,9 +34,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
     if (!cardRef.current) return;
 
     if (isTalkingInCurrentRange) {
-      setCurrentMediaSrc(getMovingPictureFilePathForName(entity.canonicalName, CURRENT_BOOK));
+      setCurrentMediaSrc(getTalkingMediaFilePathForName(entity.canonicalName, CURRENT_BOOK));
     } else {
-      const staticSrc = entity.imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, CURRENT_BOOK) : entity.imageUrl;
+      const staticSrc = entity.imageUrl === "UNKNOWN" ? getListeningMediaFilePathForName(entity.canonicalName, CURRENT_BOOK) : entity.imageUrl;
       setCurrentMediaSrc(staticSrc);
     }
   }, [isTalkingInCurrentRange, entity.canonicalName, entity.imageUrl]);
@@ -62,7 +62,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
     };
   }, []);
 
-  const mediaSrc = currentMediaSrc || (entity.imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, CURRENT_BOOK) : entity.imageUrl);
+  const mediaSrc = currentMediaSrc || (entity.imageUrl === "UNKNOWN" ? getListeningMediaFilePathForName(entity.canonicalName, CURRENT_BOOK) : entity.imageUrl);
   const isVideo = mediaSrc.endsWith(".mp4") || mediaSrc.endsWith(".webm");
 
   const summaryHTML = formatSummaryHTML(entity.summary);

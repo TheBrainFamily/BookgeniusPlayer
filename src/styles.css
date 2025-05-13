@@ -1024,3 +1024,11 @@
     background-color: var(--return-button-hover-bg);
   }
 }
+
+.character-highlighted-activated {
+  border: 1px dashed gray;
+  border-radius: 0.375rem; /* md = 0.375rem */
+  padding: 0.5rem; /* p-2 = 0.5rem */
+  background-color: floralwhite;
+  cursor: pointer;
+}

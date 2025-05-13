@@ -1,5 +1,5 @@
 import { BOOK_SLUGS } from "@/consts";
-import { getMovingPictureFilePathForName } from "@/utils/getFilePathsForName";
+import { getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
 
 export function isAppearanceWithinRange(
   appearance: { chapterNumber: number; paragraphNumber: number },
@@ -67,7 +67,7 @@ export function activateCharacters(chapterNum: number, paragraphNum: number, boo
         note.classList.add("highlighted-talking-entity");
         // Swap image to GIF if talking
         if (imageElement && imageElement.dataset.originalSrc) {
-          const gifSrc = getMovingPictureFilePathForName(canonicalName, bookSlug as BOOK_SLUGS);
+          const gifSrc = getTalkingMediaFilePathForName(canonicalName, bookSlug as BOOK_SLUGS);
           const currentSrcFilename = imageElement.src.split("/").pop();
           const gifSrcFilename = gifSrc.split("/").pop();
           if (currentSrcFilename !== gifSrcFilename) {

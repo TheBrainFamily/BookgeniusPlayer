@@ -1,6 +1,6 @@
 import { CURRENT_BOOK } from "@/consts";
 import { updateCharacterChapterInfo } from "@/fetchers/updateCharacterChapterInfo";
-import { getPictureFilePathForName } from "./getFilePathsForName";
+import { getListeningMediaFilePathForName } from "./getFilePathsForName";
 
 // Define a type for the window with our global functions
 declare global {
@@ -221,7 +221,7 @@ export function createEditableEntity(entity: {
     const imageWrapper = document.createElement("div");
     imageWrapper.className = "entity-image-wrapper";
 
-    const originalSrc = entity.imageUrl === "UNKNOWN" ? getPictureFilePathForName(entity.canonicalName, CURRENT_BOOK) : entity.imageUrl;
+    const originalSrc = entity.imageUrl === "UNKNOWN" ? getListeningMediaFilePathForName(entity.canonicalName, CURRENT_BOOK) : entity.imageUrl;
 
     const isVideo = originalSrc.endsWith(".mp4") || originalSrc.endsWith(".webm");
 

@@ -6,11 +6,12 @@
 import { useEffect } from "react";
 
 import { setupPageObserver } from "@/ui/pageObserver";
+import { ModalContextType } from "@/context/ModalContext";
 
-export const usePageObserver = (htmlContent: string) => {
+export const usePageObserver = (htmlContent: string, modal: ModalContextType) => {
   useEffect(() => {
     console.log("setting up page observer due to content change");
-    const observer = setupPageObserver();
+    const observer = setupPageObserver(modal);
 
     // Cleanup function to disconnect the observer when the component unmounts
     // or before the effect runs again due to content change.

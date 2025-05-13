@@ -2,7 +2,7 @@ import React from "react";
 
 import { useModal } from "@/context/ModalContext";
 
-const openDetailsModal = (name: string, isVideo: boolean, mediaSrc: string, summaryHTML: string) => {
+export const openDetailsModal = (name: string, isVideo: boolean, mediaSrc: string, summaryHTML: string) => {
   const { openModal } = useModal();
   openModal(
     <div className="flex flex-row lg:flex-col gap-4 max-w-full lg:max-w-120 max-h-full">

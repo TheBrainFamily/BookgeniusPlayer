@@ -1,5 +1,7 @@
 import { initAudioContext } from "@/audio-crossfader";
+import { ModalContextType } from "@/context/ModalContext";
 import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
+import React from "react";
 
 const SHOULD_SHOW_EVERYONE = false;
 
@@ -31,22 +33,23 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 /**
  * Creates and configures a video or image element based on the placeholder span's data.
  */
-function createMediaElement(placeholder: HTMLSpanElement): HTMLVideoElement | HTMLImageElement | null {
+function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextType): HTMLVideoElement | HTMLImageElement | null {
   const character = placeholder.dataset.character;
   const isTalking = placeholder.dataset.isTalking === "true";
-  const movingSrc = placeholder.dataset.srcMoving; // Can be video or image
-  const pictureSrc = placeholder.dataset.srcPicture; // Can be video or image
+  const talkingSrc = placeholder.dataset.srcTalking; // Can be video or image
+  const listeningSrc = placeholder.dataset.srcListening; // Can be video or image
 
   if (!character) return null;
+  console.log(`talkingSrc: ${talkingSrc}, listeningSrc: ${listeningSrc}, character: ${character}, placeholder: ${placeholder}`);
 
   let element: HTMLVideoElement | HTMLImageElement | null = null;
   let finalSrc: string | undefined = undefined;
 
   // Determine the source and element type
-  if (isTalking && movingSrc) {
+  if (isTalking) {
     // Talking, use moving source
-    finalSrc = movingSrc;
-    if (movingSrc.toLowerCase().endsWith(".png")) {
+    finalSrc = talkingSrc;
+    if (talkingSrc.toLowerCase().endsWith(".png")) {
       // Moving source is an image
       element = document.createElement("img");
       // Add specific attributes for talking image if needed, otherwise uses common ones below
@@ -59,31 +62,21 @@ function createMediaElement(placeholder: HTMLSpanElement): HTMLVideoElement | HT
       video.playsInline = true;
       element = video;
     }
-  } else if (pictureSrc) {
-    // Not talking (or no movingSrc), use picture source
-    if (SHOULD_SHOW_EVERYONE) {
-      finalSrc = pictureSrc;
-      if (pictureSrc.toLowerCase().endsWith(".png")) {
-        // Picture source is an image
-        element = document.createElement("img");
-      } else {
-        // Picture source is a video
-        const video = document.createElement("video");
-        video.autoplay = true; // Keep consistent attributes even for static video
-        video.loop = true;
-        video.muted = true;
-        video.playsInline = true;
-        element = video;
-      }
-    }
   } else {
-    // No source available
-    console.warn("Could not determine media source for placeholder:", placeholder);
-    return null;
+    // Not talking (or no movingSrc), use picture source
   }
 
   // Configure and return the element
   if (element && finalSrc) {
+    element.addEventListener("click", () => {
+      modal.openModal(
+        <div className="flex flex-row lg:flex-col gap-4 max-w-full lg:max-w-120 max-h-full">
+          <div className="rounded-full overflow-hidden max-h-[90vh] max-w-[90vh] lg:max-h-120 lg:max-w-120 border-4 border-[var(--entity-highlight-border-light)]">
+            <img src={finalSrc} alt={character} />
+          </div>
+        </div>,
+      );
+    });
     element.src = finalSrc;
     element.classList.add("inline-avatar");
     if (character) element.dataset.character = character; // Assign character data if available
@@ -97,10 +90,26 @@ function createMediaElement(placeholder: HTMLSpanElement): HTMLVideoElement | HT
   return null;
 }
 
+function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType) {
+  console.log("highlighting character", character.dataset.character);
+  const characterName = character.dataset.character;
+  const listeningSrc = character.dataset.srcListening;
+  character.classList.add("character-highlighted-activated");
+  character.addEventListener("click", () => {
+    modal.openModal(
+      <div className="flex flex-row lg:flex-col gap-4 max-w-full lg:max-w-120 max-h-full">
+        <div className="rounded-full overflow-hidden max-h-[90vh] max-w-[90vh] lg:max-h-120 lg:max-w-120 border-4 border-[var(--entity-highlight-border-light)]">
+          <img src={listeningSrc} alt={characterName} />
+        </div>
+      </div>,
+    );
+  });
+}
+
 /**
  * Manages media loading and playback for paragraphs within the visible range.
  */
-function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number) {
+function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, modal: ModalContextType) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] p[data-index]");
 
   const charactersDisplayed = [];
@@ -115,6 +124,12 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
       const currentParagraph = parseInt(paragraphStr, 10);
       const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - 3, endChapter, endParagraph + 3);
       const placeholders = p.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+      const charactersToHighlight = p.querySelectorAll<HTMLSpanElement>(".character-highlighted");
+
+      charactersToHighlight.forEach((character) => {
+        // TODO show only first character apperance in the paragraph
+        highlightCharacter(character, modal);
+      });
 
       placeholders.forEach((placeholder) => {
         const mediaInjected = placeholder.dataset.mediaInjected === "true";
@@ -128,7 +143,7 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
         if (inView) {
           if (dummyPlaceholder) {
             // Found a dummy, replace it with actual media
-            const newMediaElement = createMediaElement(placeholder);
+            const newMediaElement = createMediaElement(placeholder, modal);
             if (newMediaElement) {
               placeholder.replaceChild(newMediaElement, dummyPlaceholder);
               placeholder.dataset.mediaInjected = "true"; // Mark as injected
@@ -145,7 +160,7 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
             }
           } else if (!mediaInjected) {
             // No dummy and no media injected yet, inject for the first time
-            const newMediaElement = createMediaElement(placeholder);
+            const newMediaElement = createMediaElement(placeholder, modal);
             if (newMediaElement) {
               mediaElement = newMediaElement; // Update mediaElement reference
               // Hide original text content if it's a mention
@@ -202,7 +217,7 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
 }
 
 // Set up intersection observer to detect visible pages
-export function setupPageObserver(): IntersectionObserver | null {
+export function setupPageObserver(modal: ModalContextType): IntersectionObserver | null {
   // Threshold values for determining when a page is "visible enough"
   const observerOptions = {
     root: document.getElementById("content-container"),
@@ -304,7 +319,7 @@ export function setupPageObserver(): IntersectionObserver | null {
             setCurrentLocation({ chapter: startInfo.chapter, paragraph: startInfo.paragraph, endChapter: endInfo.chapter, endParagraph: endInfo.paragraph });
 
             // --- Activate/Deactivate Media ---
-            activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph + 2);
+            activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph + 2, modal);
             // ----------------------------------
           } else {
             console.warn("[Observer] Could not extract chapter/paragraph info for focused elements:", topFocusedPageElement, bottomFocusedPageElement);

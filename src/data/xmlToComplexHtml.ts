@@ -2,7 +2,7 @@ import { DOMParser, XMLSerializer, Node } from "@xmldom/xmldom";
 import fs from "fs";
 import path from "path";
 
-import { getMovingPictureFilePathForName, getPictureFilePathForName } from "@/utils/getFilePathsForName";
+import { getTalkingMediaFilePathForName, getListeningMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
 
 export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): string => {
@@ -58,15 +58,15 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
 
               if (characterInfo) {
                 const isTalking = pElement.getAttribute("talking") === "true";
-                const movingSrc = getMovingPictureFilePathForName(characterInfo.display, bookSlug);
-                const pictureSrc = getPictureFilePathForName(characterInfo.display, bookSlug);
+                const talkingSrc = getTalkingMediaFilePathForName(characterInfo.display, bookSlug);
+                const listeningSrc = getListeningMediaFilePathForName(characterInfo.display, bookSlug);
 
                 if (isTalking) {
                   // Generate placeholder span for talking character
-                  pContent += `<span class="character-placeholder character-talking" data-character="${characterInfo.display}" data-src-moving="${movingSrc}" data-is-talking="true"></span>`;
+                  pContent += `<span class="character-placeholder character-talking" data-character="${characterInfo.display}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
                 } else {
                   // Generate placeholder span for mentioned character, preserving text content
-                  pContent += `${pElement.textContent || ""}<span class="character-placeholder character-mention" data-character="${characterInfo.display}" data-src-picture="${pictureSrc}" data-is-talking="false"></span>`;
+                  pContent += `<span class="character-highlighted" data-character="${characterInfo.display}" data-src-listening="${listeningSrc}" >${pElement.textContent || ""}</span>`;
                 }
               } else {
                 switch (pElement.tagName) {
@@ -148,6 +148,6 @@ if (require.main === module) {
   if (bookSlug === "1984") {
     fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const _${bookSlug}BookXml = \`<section>${htmlString}</section>\`;`);
   } else {
-    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const ${bookSlug}BookXml = \`<section>${htmlString}</section>\`;`);
+    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const ${bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlString}</section>\`;`);
   }
 }
