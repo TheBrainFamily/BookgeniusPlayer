@@ -13518,7 +13518,7 @@ export const PharaonCharactersData = [
     "infoPerChapter": [
       {
         "chapter": 31,
-        "summary": "",
+        "summary": "Śpiewak przy świątyni Astoreth.",
         "paragraphsWhereSpotted": [],
         "paragraphsWhereTalking": [
           96,
@@ -13529,7 +13529,7 @@ export const PharaonCharactersData = [
       },
       {
         "chapter": 34,
-        "summary": "",
+        "summary": "Śpiewak przy świątyni Astoreth.",
         "paragraphsWhereSpotted": [
           152,
           153,
@@ -13554,7 +13554,7 @@ export const PharaonCharactersData = [
       },
       {
         "chapter": 37,
-        "summary": "",
+        "summary": "Śpiewak przy świątyni Astoreth.",
         "paragraphsWhereSpotted": [
           127,
           138
@@ -13563,7 +13563,7 @@ export const PharaonCharactersData = [
       },
       {
         "chapter": 38,
-        "summary": "",
+        "summary": "Śpiewak przy świątyni Astoreth.",
         "paragraphsWhereSpotted": [
           34,
           51
@@ -13572,7 +13572,7 @@ export const PharaonCharactersData = [
       },
       {
         "chapter": 39,
-        "summary": "",
+        "summary": "Śpiewak przy świątyni Astoreth.",
         "paragraphsWhereSpotted": [
           17,
           19,
@@ -13588,7 +13588,7 @@ export const PharaonCharactersData = [
       },
       {
         "chapter": 41,
-        "summary": "",
+        "summary": "Śpiewak przy świątyni Astoreth.",
         "paragraphsWhereSpotted": [
           47,
           48,
@@ -13647,7 +13647,7 @@ export const PharaonCharactersData = [
       },
       {
         "chapter": 46,
-        "summary": "",
+        "summary": "Śpiewak przy świątyni Astoreth.",
         "paragraphsWhereSpotted": [
           50,
           52,
@@ -13660,7 +13660,7 @@ export const PharaonCharactersData = [
       },
       {
         "chapter": 47,
-        "summary": "",
+        "summary": "Śpiewak przy świątyni Astoreth.",
         "paragraphsWhereSpotted": [
           58,
           64,
@@ -13673,7 +13673,7 @@ export const PharaonCharactersData = [
       },
       {
         "chapter": 61,
-        "summary": "",
+        "summary": "Śpiewak przy świątyni Astoreth.",
         "paragraphsWhereSpotted": [
           155,
           158,
@@ -13696,7 +13696,7 @@ export const PharaonCharactersData = [
       },
       {
         "chapter": 62,
-        "summary": "",
+        "summary": "Śpiewak przy świątyni Astoreth.",
         "paragraphsWhereSpotted": [
           87,
           88
@@ -13705,7 +13705,7 @@ export const PharaonCharactersData = [
       },
       {
         "chapter": 63,
-        "summary": "",
+        "summary": "Śpiewak przy świątyni Astoreth.",
         "paragraphsWhereSpotted": [
           46,
           53,
@@ -13735,7 +13735,7 @@ export const PharaonCharactersData = [
       },
       {
         "chapter": 65,
-        "summary": "",
+        "summary": "Śpiewak przy świątyni Astoreth.",
         "paragraphsWhereSpotted": [
           140,
           142,
@@ -13746,7 +13746,7 @@ export const PharaonCharactersData = [
       },
       {
         "chapter": 66,
-        "summary": "",
+        "summary": "Śpiewak przy świątyni Astoreth.",
         "paragraphsWhereSpotted": [
           26,
           27,
