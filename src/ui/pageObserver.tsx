@@ -110,9 +110,8 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
  * Manages media loading and playback for paragraphs within the visible range.
  */
 function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, modal: ModalContextType) {
-  const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] p[data-index]");
+  const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
 
-  const charactersDisplayed = [];
   console.log("activate media in range", { startChapter, startParagraph, endChapter, endParagraph });
   allParagraphs.forEach((p) => {
     const chapterElement = p.closest("section[data-chapter]") as HTMLElement;
@@ -124,22 +123,17 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
       const currentParagraph = parseInt(paragraphStr, 10);
       const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - 3, endChapter, endParagraph + 3);
       const placeholders = p.querySelectorAll<HTMLSpanElement>(".character-placeholder");
-      const charactersToHighlight = p.querySelectorAll<HTMLSpanElement>(".character-highlighted");
 
-      charactersToHighlight.forEach((character) => {
-        // TODO show only first character apperance in the paragraph
-        highlightCharacter(character, modal);
-      });
-
+      const charactersDisplayed = [];
       placeholders.forEach((placeholder) => {
         const mediaInjected = placeholder.dataset.mediaInjected === "true";
         // Query for either video or image with the class OR the dummy placeholder
         let mediaElement = placeholder.querySelector<HTMLVideoElement | HTMLImageElement>("video.inline-avatar, img.inline-avatar");
         const dummyPlaceholder = placeholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
-        if (charactersDisplayed.includes(placeholder.dataset.character)) {
-          // console.log("character already displayed", placeholder.dataset.character);
-          return;
-        }
+        // if (charactersDisplayed.includes(placeholder.dataset.character)) {
+        //   // console.log("character already displayed", placeholder.dataset.character);
+        //   return;
+        // }
         if (inView) {
           if (dummyPlaceholder) {
             // Found a dummy, replace it with actual media
@@ -180,12 +174,12 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
                 mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
               }
               console.log(`[Media Inject] Injected media for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
-              charactersDisplayed.push(placeholder.dataset.character);
             }
           } else if (mediaElement instanceof HTMLVideoElement && mediaElement.paused) {
             // Media already injected, just play existing video if paused
             mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
           }
+          charactersDisplayed.push(placeholder.dataset.character);
         } else {
           // Out of view
           // Check if actual media is injected (not a dummy)
@@ -210,6 +204,16 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
 
             console.log(`[Media Unload] Replaced media with dummy for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
           }
+        }
+      });
+      const charactersToHighlight = p.querySelectorAll<HTMLSpanElement>(".character-highlighted");
+      const seenCharactersInParentP = new Set<string>();
+
+      charactersToHighlight.forEach((character) => {
+        const charText = character.dataset.character;
+        if (charText && !seenCharactersInParentP.has(charText) && !charactersDisplayed.includes(charText)) {
+          seenCharactersInParentP.add(charText);
+          highlightCharacter(character, modal);
         }
       });
     }
