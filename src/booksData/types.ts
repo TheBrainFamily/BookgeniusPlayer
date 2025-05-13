@@ -4,4 +4,11 @@ type CharacterData = { characterName: string; bookSlug: string; infoPerChapter: 
 
 type BookMetadata = { title: string };
 
-export type BookData = { slug: string; metadata: BookMetadata; charactersData: CharacterData[]; bookXml: string; chapters: number };
+export interface BookThemeColors {
+  primaryColor: string;
+  secondaryColor: string;
+  tertiaryColor: string;
+  quaternaryColor: string;
+}
+
+export type BookData = { slug: string; metadata: BookMetadata; charactersData: CharacterData[]; bookXml: string; chapters: number; themeColors: BookThemeColors };

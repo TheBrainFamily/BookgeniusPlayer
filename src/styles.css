@@ -230,14 +230,14 @@
         font-size: 1.4em;
       }
 
+      & > section {
+        padding: 10vh 0 50vh;
+      }
+
       /* Chapter sections */
       section[data-chapter] {
         margin-top: 3em;
         /* page-break-before: always; */
-      }
-
-      section[data-chapter="1"] {
-        margin-top: 10em;
       }
 
       /* Paragraphs */
