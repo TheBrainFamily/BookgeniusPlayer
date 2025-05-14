@@ -57,16 +57,17 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
               const characterInfo = characterMap.get(pElement.tagName);
 
               if (characterInfo) {
+                const characterSlug = pElement.tagName;
                 const isTalking = pElement.getAttribute("talking") === "true";
-                const talkingSrc = getTalkingMediaFilePathForName(characterInfo.display, bookSlug);
-                const listeningSrc = getListeningMediaFilePathForName(characterInfo.display, bookSlug);
+                const talkingSrc = getTalkingMediaFilePathForName(characterSlug, bookSlug);
+                const listeningSrc = getListeningMediaFilePathForName(characterSlug, bookSlug);
 
                 if (isTalking) {
                   // Generate placeholder span for talking character
-                  pContent += `<span class="character-placeholder character-talking" data-character="${characterInfo.display}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
+                  pContent += `<span class="character-placeholder character-talking" data-character="${characterSlug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
                 } else {
                   // Generate placeholder span for mentioned character, preserving text content
-                  pContent += `<span class="character-highlighted" data-character="${characterInfo.display}" data-src-listening="${listeningSrc}" >${pElement.textContent || ""}</span>`;
+                  pContent += `<span class="character-highlighted" data-character="${characterSlug}" data-src-listening="${listeningSrc}" >${pElement.textContent || ""}</span>`;
                 }
               } else {
                 switch (pElement.tagName) {

@@ -10,7 +10,7 @@ fswatch -o ../src/data/chapters-1984.xml | while read num; do ## ZMIENIAMY ZE WS
   # xmllint --xinclude --schema ebook.xsd ebook.xml --output ebook_resolved.xml
 
   bun ../src/data/xmlToComplexHtml.ts ## To generuje ./src/data/chapters.ts
-  bun ../src/data/tools/get-character-tags-per-xml.ts  ## To generuje ./src/data/metadata.ts
+  bun ../src/data/tools/create-book-metadata.ts  ## To generuje ./src/data/metadata.ts
   echo "Scripts executed successfully."
 done
 

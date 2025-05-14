@@ -199,14 +199,12 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
               newDummyElement.style.display = "inline-block";
               newDummyElement.style.verticalAlign = "bottom";
 
-
               placeholder.appendChild(newDummyElement);
 
               // Ensure mediaInjected is false, as we are showing a dummy or no media was ever injected.
               if (placeholder.dataset.mediaInjected === "true") {
                 delete placeholder.dataset.mediaInjected;
               }
-              console.log(`[Media Initial Dummy] Created initial dummy for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph} (out of view, no prior dummy)`);
             }
           }
         }

@@ -14,7 +14,8 @@ interface ChapterInfo {
 }
 
 interface SimpleCharacterMetadata {
-  characterName: string; // The XML tag name, e.g., "Ksiaze-Ramzes"
+  slug: string; // The XML tag name, e.g., "Ksiaze-Ramzes"
+  characterName: string; // The display name, e.g., "Książe Ramzes"
   bookSlug: string;
   infoPerChapter: ChapterInfo[];
   imageUrl: string;
@@ -57,7 +58,7 @@ function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<string>):
   // Initialize results map keyed by character tag name
   const resultsMap = new Map<string, SimpleCharacterMetadata>();
   characterTags.forEach((tag) => {
-    resultsMap.set(tag, { characterName: getDisplayForCharacter(tag, doc), bookSlug: CURRENT_BOOK, infoPerChapter: [], imageUrl: "UNKNOWN" });
+    resultsMap.set(tag, { slug: tag, characterName: getDisplayForCharacter(tag, doc), bookSlug: CURRENT_BOOK, infoPerChapter: [], imageUrl: "UNKNOWN" });
   });
 
   try {
@@ -174,7 +175,7 @@ function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<string>):
   }
 }
 
-const getSummaryForCharacter = (characterName: string, doc: XMLDocument) => {
+const getSummaryForCharacter = (slug: string, doc: XMLDocument) => {
   try {
     const masterElement = doc.getElementsByTagName("CharactersMaster")[0];
 
@@ -187,12 +188,12 @@ const getSummaryForCharacter = (characterName: string, doc: XMLDocument) => {
       const node = masterElement.childNodes[i];
       if (node.nodeType === node.ELEMENT_NODE) {
         const element = node as Element;
-        if (element.tagName === characterName) {
+        if (element.tagName === slug) {
           return element.getAttribute("summary");
         }
       }
     }
-    console.warn(`Could not find character ${characterName} in <CharactersMaster> element.`);
+    console.warn(`Could not find character ${slug} in <CharactersMaster> element.`);
     return "FIX ME";
   } catch (error) {
     console.error("Error parsing CharactersMaster XML:", error);
@@ -200,7 +201,7 @@ const getSummaryForCharacter = (characterName: string, doc: XMLDocument) => {
   }
 };
 
-const getDisplayForCharacter = (characterName: string, doc: XMLDocument) => {
+const getDisplayForCharacter = (slug: string, doc: XMLDocument) => {
   try {
     const masterElement = doc.getElementsByTagName("CharactersMaster")[0];
 
@@ -213,12 +214,12 @@ const getDisplayForCharacter = (characterName: string, doc: XMLDocument) => {
       const node = masterElement.childNodes[i];
       if (node.nodeType === node.ELEMENT_NODE) {
         const element = node as Element;
-        if (element.tagName === characterName) {
+        if (element.tagName === slug) {
           return element.getAttribute("display");
         }
       }
     }
-    console.warn(`Could not find character ${characterName} in <CharactersMaster> element.`);
+    console.warn(`Could not find character ${slug} in <CharactersMaster> element.`);
     return "FIX ME";
   } catch (error) {
     console.error("Error parsing CharactersMaster XML:", error);

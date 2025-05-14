@@ -1,27 +1,6 @@
 import { BOOK_SLUGS } from "@/consts";
 
-export const knownMovingPictures = [
-  "Książę Ramzes",
-  "Ramzes XII",
-  "Sara",
-  "Nikotris",
-  "Amenhotep",
-  "Brat Ramzesa",
-  "Chłop egipski",
-  "Eunana",
-  "Herhor",
-  "Nikotris",
-  "Nitager",
-  "Patrokles",
-  "Pentuer",
-  "Tutmozis",
-  "Pieszczota",
-  "Anupa",
-  "Dagon",
-  "Gedeon",
-];
-
-const knownPharaon = [
+export const knownPharaon = [
   "abeb-listens.mp4",
   "abeb-speaks.mp4",
   "amenhotep-listens.mp4",
@@ -82,8 +61,8 @@ const knownPharaon = [
   "kapłanka-domu-zielonej-gwiazdy-speaks.mp4",
   "król-assar-listens.mp4",
   "król-assar-speaks.mp4",
-  "książę-ramzes-listens.mp4",
-  "książę-ramzes-speaks.mp4",
+  "książe-ramzes-listens.mp4",
+  "książe-ramzes-speaks.mp4",
   "lykon-listens.mp4",
   "lykon-speaks.mp4",
   "mefres-listens.mp4",
@@ -149,7 +128,7 @@ const knownPharaon = [
   "wioślarz-ramzesa-hyksos-listens.mp4",
   "wioślarz-ramzesa-hyksos-speaks.mp4",
   "żona-chłopa-topionego-listens.mp4",
-  "żona-chłopa-topionego-speaks.mp4"
+  "żona-chłopa-topionego-speaks.mp4",
 ];
 
 const known1984 = [
@@ -188,28 +167,27 @@ export const getPictureFileNameForName = (name: string) => {
 
 // const LOG_PREFIX = "Generated file path:";
 
-export const getListeningMediaFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
+export const getListeningMediaFilePathForName = (name: string, bookSlug: BOOK_SLUGS, forceKnown = false) => {
   const listensPath = `${name
     .toLowerCase()
     .replace(/ /g, "-")
     .replace(/"/g, "")
     .replace(/(\(|\))/g, "")}-listens.mp4`;
-  if (known.includes(listensPath)) {
+
+  if (forceKnown || known.includes(listensPath)) {
     return `/${bookSlug}/${listensPath}`;
   }
   return `/${bookSlug}/${getPictureFileNameForName(name)}`;
 };
 
-export const getTalkingMediaFilePathForName = (name: string, bookSlug: BOOK_SLUGS) => {
+export const getTalkingMediaFilePathForName = (name: string, bookSlug: BOOK_SLUGS, forceKnown = false) => {
   const speaksPath = `${name
     .toLowerCase()
     .replace(/ /g, "-")
     .replace(/"/g, "")
     .replace(/(\(|\))/g, "")}-speaks.mp4`;
-  if (name.includes("Julia")) {
-    console.log(`${name} - ${speaksPath}`);
-  }
-  if (known.includes(speaksPath)) {
+
+  if (forceKnown || known.includes(speaksPath)) {
     return `/${bookSlug}/${speaksPath}`;
   }
   return getListeningMediaFilePathForName(name, bookSlug);
