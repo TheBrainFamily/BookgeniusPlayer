@@ -1,6 +1,6 @@
 import debounce from "lodash.debounce";
 
-import "./searchModal.css";
+import "./styles/searchModal.css";
 import { goToParagraph, getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import type { Location } from "@/state/LocationContext";
 import { searchParagraphsFromServer } from "./utils/searchParagraphsFromServer";
