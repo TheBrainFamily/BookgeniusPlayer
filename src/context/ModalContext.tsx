@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useMemo, useEffect } from "react";
+import React, { createContext, useContext, useState, ReactNode, useMemo } from "react";
 import { createPortal } from "react-dom";
 import CharacterMedia from "@/components/CharacterMedia";
 import { useLocation } from "@/state/LocationContext";
@@ -22,16 +22,13 @@ const ModalContext = createContext<ModalContextType | undefined>(undefined);
 export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }> = ({ children, bookData }) => {
   const { location } = useLocation();
   const debouncedLocation = useDebounce(location, 150);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<{ slug: string; isVideo: boolean; mediaSrc: string } | null>(null);
 
   const openCharacterDetailsModal = (slug: string, isVideo: boolean, mediaSrc: string) => {
     setModalContent({ slug, isVideo, mediaSrc });
-    setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setIsModalOpen(false);
     setModalContent(null);
   };
 
@@ -47,8 +44,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
   return (
     <ModalContext.Provider value={{ openCharacterDetailsModal }}>
       {children}
-      {isModalOpen &&
-        modalContent &&
+      {modalContent &&
         createPortal(
           <div className="modal-overlay active bg-black items-center justify-center" onClick={closeModal}>
             <div className="bg-transparent flex h-full items-center justify-center">
