@@ -84,12 +84,12 @@ function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextTyp
 }
 
 function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType) {
-  const characterName = character.dataset.character;
+  const characterSlug = character.dataset.character;
   const listeningSrc = character.dataset.srcListening;
   const isTalking = character.dataset.isTalking === "true";
   character.classList.add("character-highlighted-activated");
   character.addEventListener("click", () => {
-    modal.openCharacterDetailsModal(characterName, isTalking, listeningSrc);
+    modal.openCharacterDetailsModal(characterSlug, isTalking, listeningSrc);
   });
 }
 

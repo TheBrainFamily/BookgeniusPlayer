@@ -94,7 +94,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
         )}
       >
         <div className="py-1.5 px-3 flex flex-col items-center justify-center">
-          <h4 className="w-full whitespace-nowrap overflow-hidden overflow-ellipsis text-xs font-bold text-white tracking-wide uppercase">{entity.label || entity.slug}</h4>
+          <h4 className="w-full whitespace-nowrap overflow-hidden overflow-ellipsis text-xs font-bold text-white tracking-wide uppercase">
+            {entity.label || entity.characterName}
+          </h4>
           <p className={cn("w-full whitespace-nowrap overflow-hidden overflow-ellipsis text-xs text-gray-200 italic", isTalkingInCurrentRange ? "" : "text-gray-200")}>
             {entity.summary}
           </p>

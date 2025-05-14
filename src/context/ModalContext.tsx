@@ -14,7 +14,7 @@ const findLatestSummaryInRange = (character: CharacterData, endChapter: number) 
   return latestSummary;
 };
 export interface ModalContextType {
-  openCharacterDetailsModal: (name: string, isVideo: boolean, mediaSrc: string) => void;
+  openCharacterDetailsModal: (slug: string, isVideo: boolean, mediaSrc: string) => void;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -23,10 +23,10 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
   const { location } = useLocation();
   const debouncedLocation = useDebounce(location, 150);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState<{ name: string; isVideo: boolean; mediaSrc: string } | null>(null);
+  const [modalContent, setModalContent] = useState<{ slug: string; isVideo: boolean; mediaSrc: string } | null>(null);
 
-  const openCharacterDetailsModal = (name: string, isVideo: boolean, mediaSrc: string) => {
-    setModalContent({ name, isVideo, mediaSrc });
+  const openCharacterDetailsModal = (slug: string, isVideo: boolean, mediaSrc: string) => {
+    setModalContent({ slug, isVideo, mediaSrc });
     setIsModalOpen(true);
   };
 
@@ -40,7 +40,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
     [debouncedLocation.chapter, debouncedLocation.paragraph, debouncedLocation.endChapter, debouncedLocation.endParagraph],
   );
 
-  const matchingCharacter = bookData?.charactersData.find((character) => character.slug === modalContent?.name);
+  const matchingCharacter = bookData?.charactersData.find((character) => character.slug === modalContent?.slug);
   console.log("matchingCharacter", matchingCharacter);
   console.log("modalContent", modalContent);
 
@@ -57,17 +57,17 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
                   <CharacterMedia
                     mediaSrc={modalContent.mediaSrc}
                     isVideo={modalContent.isVideo}
-                    canonicalName={modalContent.name}
+                    canonicalName={matchingCharacter.slug}
                     commonAttrs={{
                       "data-original-src": modalContent.mediaSrc,
-                      "data-character-name": modalContent.name,
+                      "data-character-name": matchingCharacter.characterName,
                       "data-summary": findLatestSummaryInRange(matchingCharacter, range.endChapter),
                       className: "w-full h-full object-cover",
                     }}
                   />
                 </div>
                 <div className="flex flex-col self-center p-4 rounded-lg bg-[var(--entity-highlight-bg-light)] border-2 border-[var(--entity-highlight-border-light)]">
-                  <h4 className="italic font-bold text-center">{modalContent.name}</h4>
+                  <h4 className="italic font-bold text-center">{matchingCharacter.characterName}</h4>
                   <p className="text-center" dangerouslySetInnerHTML={{ __html: findLatestSummaryInRange(matchingCharacter, range.endChapter) }} />
                 </div>
               </div>
