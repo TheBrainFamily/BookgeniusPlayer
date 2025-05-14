@@ -1,5 +1,27 @@
 import { BOOK_SLUGS } from "@/consts";
 
+export const knownMovingPictures = [
+  "Książę Ramzes",
+  "Ramzes XII",
+  "Sara",
+  "Nikotris",
+  "Amenhotep",
+  "Brat Ramzesa",
+  "Chłop egipski",
+  "Eunana",
+  "Herhor",
+  "Nikotris",
+  "Nitager",
+  "Patrokles",
+  "Pentuer",
+  "Tutmozis",
+  "Pieszczota",
+  "Anupa",
+  "Dagon",
+  "Gedeon",
+];
+
+
 export const knownPharaon = [
   "abeb-listens.mp4",
   "abeb-speaks.mp4",
@@ -130,6 +152,20 @@ export const knownPharaon = [
   "wioślarz-ramzesa-hyksos-speaks.mp4",
   "żona-chłopa-topionego-listens.mp4",
   "żona-chłopa-topionego-speaks.mp4",
+  "tamar-listens.mp4",
+  "tamar-speaks.mp4",
+  "stary-pastuch-delegat-speaks.mp4",
+  "stary-pastuch-delegat-listens.mp4",
+  "naczelnik-policji-w-pi-bast-speaks.mp4",
+  "naczelnik-policji-w-pi-bast-listens.mp4",
+  "wielki-skarbnik-panstwowy-speaks.mp4",
+  "wielki-skarbnik-panstwowy-listens.mp4",
+  "istubar-speaks.mp4",
+  "istubar-listens.mp4",
+  "kalipos-speaks.mp4",
+  "kalipos-listens.mp4",
+  "mlody-kaplan-poslannik-samentu-listens.mp4",
+  "mlody-kaplan-poslannik-samentu-speaks.mp4",
 ];
 
 const known1984 = [
