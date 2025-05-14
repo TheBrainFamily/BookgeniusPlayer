@@ -151,6 +151,7 @@ export const paragraphMetadataServicePure = {
 
 export interface ParsedParagraphRange {
   slug: string;
+  characterName: string;
   summary: string;
   imageUrl: string;
   paragraphNumber: number;
@@ -214,6 +215,7 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
       }
       return {
         slug: character.slug,
+        characterName: character.characterName,
         imageUrl: character.imageUrl,
         summary: first.summary,
         isTalkingInFirstParagraph: first.isTalking,
