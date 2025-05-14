@@ -1,5 +1,6 @@
 export const _1984CharactersData = [
   {
+    "slug": "Winston-Smith",
     "characterName": "Winston Smith",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -942,6 +943,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Wielki-Brat",
     "characterName": "Wielki Brat",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -1115,6 +1117,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Emmanuel-Goldstein",
     "characterName": "Emmanuel Goldstein",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -1222,6 +1225,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Dziewczyna-z-ciemnymi-wlosami-Julia",
     "characterName": "Dziewczyna z ciemnymi włosami (Julia)",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -1631,6 +1635,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "OBrien",
     "characterName": "O'Brien",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2043,6 +2048,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Sasiadka-Winstona-z-pracy-drobna-kobieta-o-wlosach-w-kolorze-piasku",
     "characterName": "Sąsiadka Winstona z pracy (drobna kobieta o włosach w kolorze piasku)",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2077,6 +2083,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Pani-Parsons",
     "characterName": "Pani Parsons",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2123,6 +2130,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Tom-Parsons",
     "characterName": "Tom Parsons",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2207,6 +2215,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Dzieci-panstwa-Parsons",
     "characterName": "Dzieci państwa Parsons",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2267,6 +2276,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Matka-Winstona",
     "characterName": "Matka Winstona",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2324,6 +2334,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Siostra-Winstona",
     "characterName": "Siostra Winstona",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2362,6 +2373,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Ojciec-Winstona",
     "characterName": "Ojciec Winstona",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2387,6 +2399,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Katharine",
     "characterName": "Katharine",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2436,6 +2449,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Tillotson",
     "characterName": "Tillotson",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2454,6 +2468,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Ampleforth",
     "characterName": "Ampleforth",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2501,6 +2516,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Syme",
     "characterName": "Syme",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2569,6 +2585,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Wilsher",
     "characterName": "Wilsher",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2584,6 +2601,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Jones",
     "characterName": "Jones",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2626,6 +2644,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Aaronson",
     "characterName": "Aaronson",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2669,6 +2688,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Rutheford",
     "characterName": "Rutheford",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2713,6 +2733,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Pan-Charrington",
     "characterName": "Pan Charrington",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2809,6 +2830,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Martin",
     "characterName": "Martin",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2828,6 +2850,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Wiezniarka-Smith",
     "characterName": "Więźniarka (Smith)",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2848,6 +2871,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Wiezien-Bumstead",
     "characterName": "Więzień (Bumstead)",
     "bookSlug": "1984",
     "infoPerChapter": [
@@ -2863,6 +2887,7 @@ export const _1984CharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Wiezien-o-twarzy-kosciotrupa",
     "characterName": "Więzień (o twarzy kościotrupa)",
     "bookSlug": "1984",
     "infoPerChapter": [],
