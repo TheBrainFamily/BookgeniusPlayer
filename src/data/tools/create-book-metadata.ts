@@ -247,7 +247,7 @@ const doIt = () => {
   if (bookSlug === "1984") {
     fs.writeFileSync(path.join(__dirname, `../metadata-${bookSlug}.ts`), `export const _${bookSlug}CharactersData = ${JSON.stringify(metadata, null, 2)}`);
   } else {
-    fs.writeFileSync(path.join(__dirname, `../metadata-${bookSlug}.ts`), `export const ${bookSlug}CharactersData = ${JSON.stringify(metadata, null, 2)}`);
+    fs.writeFileSync(path.join(__dirname, `../metadata-${bookSlug}.ts`), `export const ${bookSlug.replaceAll("-", "")}CharactersData = ${JSON.stringify(metadata, null, 2)}`);
   }
 };
 
