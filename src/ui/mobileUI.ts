@@ -114,20 +114,20 @@ export function createMobileCharacterStrip(characters: ParsedParagraphRange[]) {
 
       const img = document.createElement("img");
       img.src = imageUrl;
-      img.alt = entity.canonicalName;
-      img.dataset.characterName = entity.canonicalName;
+      img.alt = entity.slug;
+      img.dataset.characterName = entity.slug;
       img.dataset.summary = entity.summary || "";
 
       const name = document.createElement("div");
       name.className = "character-name";
-      name.textContent = entity.canonicalName;
+      name.textContent = entity.slug;
 
       characterItem.appendChild(img);
       characterItem.appendChild(name);
 
       // Add click event to show character details modal first
       img.addEventListener("click", () => {
-        showCharacterDetailsModal(entity.canonicalName, imageUrl, entity.summary || "");
+        showCharacterDetailsModal(entity.slug, imageUrl, entity.summary || "");
       });
 
       mobileStrip.appendChild(characterItem);
@@ -138,20 +138,20 @@ export function createMobileCharacterStrip(characters: ParsedParagraphRange[]) {
 
       const horizontalImg = document.createElement("img");
       horizontalImg.src = imageUrl;
-      horizontalImg.alt = entity.canonicalName;
-      horizontalImg.dataset.characterName = entity.canonicalName;
+      horizontalImg.alt = entity.slug;
+      horizontalImg.dataset.characterName = entity.slug;
       horizontalImg.dataset.summary = entity.summary || "";
 
       const horizontalName = document.createElement("div");
       horizontalName.className = "character-name";
-      horizontalName.textContent = entity.canonicalName;
+      horizontalName.textContent = entity.slug;
 
       horizontalCharacterItem.appendChild(horizontalImg);
       horizontalCharacterItem.appendChild(horizontalName);
 
       // Add click event to show character details modal
       horizontalImg.addEventListener("click", () => {
-        showCharacterDetailsModal(entity.canonicalName, imageUrl, entity.summary || "");
+        showCharacterDetailsModal(entity.slug, imageUrl, entity.summary || "");
       });
 
       horizontalStrip.appendChild(horizontalCharacterItem);

@@ -36,7 +36,7 @@ export const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
       <AnimatePresence>
         {characterNotes.map((characterNote, index) => (
           <motion.div
-            key={characterNote.canonicalName}
+            key={characterNote.slug}
             layout="preserve-aspect"
             variants={variants.character}
             initial="hidden"
