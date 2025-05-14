@@ -1,6 +1,6 @@
 type InfoPerChapter = { chapter: number; summary: string; label?: string; paragraphsWhereSpotted: number[]; paragraphsWhereTalking: number[] };
 
-export type CharacterData = { characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; imageUrl: string };
+export type CharacterData = { slug: string; characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; imageUrl: string };
 
 type BookMetadata = { title: string };
 
@@ -11,4 +11,4 @@ export interface BookThemeColors {
   quaternaryColor: string;
 }
 
-export type BookData = { slug: string; metadata: BookMetadata; charactersData: CharacterData[]; bookXml: string; chapters: number; themeColors: BookThemeColors };
+export type BookData = { metadata: BookMetadata; charactersData: CharacterData[]; bookXml: string; chapters: number; themeColors: BookThemeColors };

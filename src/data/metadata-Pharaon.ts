@@ -1,5 +1,6 @@
 export const PharaonCharactersData = [
   {
+    "slug": "Ramzes-XII",
     "characterName": "Ramzes XII",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -709,6 +710,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Ksiaze-Ramzes",
     "characterName": "Książę Ramzes",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -4845,6 +4847,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Nikotris",
     "characterName": "Nikotris",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -5302,6 +5305,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Amenhotep",
     "characterName": "Amenhotep",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -5397,6 +5401,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Herhor",
     "characterName": "Herhor",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -6391,6 +6396,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Nitager",
     "characterName": "Nitager",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -6576,6 +6582,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Pentuer",
     "characterName": "Pentuer",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -7344,6 +7351,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Eunana",
     "characterName": "Eunana",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -7524,6 +7532,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Patrokles",
     "characterName": "Patrokles",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -7685,6 +7694,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Tutmozis",
     "characterName": "Tutmozis",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -8668,6 +8678,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Chlop-egipski",
     "characterName": "Chłop egipski",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -8737,6 +8748,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Sara",
     "characterName": "Sara",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -9347,6 +9359,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Gedeon",
     "characterName": "Gedeon",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -9446,6 +9459,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Wielki-pisarz",
     "characterName": "Wielki pisarz",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -9621,6 +9635,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Sedzia",
     "characterName": "Sędzia",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -9715,6 +9730,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Dagon",
     "characterName": "Dagon",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -10080,6 +10096,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Tamar",
     "characterName": "Tamar",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -10105,6 +10122,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Tafet",
     "characterName": "Tafet",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -10184,6 +10202,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Dutmoze",
     "characterName": "Dutmoze",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -10206,6 +10225,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Anupa",
     "characterName": "Anupa",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -10232,6 +10252,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Pieszczota",
     "characterName": "Pieszczota (Kama)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -10686,6 +10707,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Mentezufis",
     "characterName": "Mentezufis",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -11142,6 +11164,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Otoes",
     "characterName": "Otoes",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -11216,6 +11239,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Ester",
     "characterName": "Ester",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -11231,6 +11255,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Samuel-syn-Ezdreasza",
     "characterName": "Samuel, syn Ezdreasza",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -11246,6 +11271,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Ezechiel-syn-Rubena",
     "characterName": "Ezechiel, syn Rubena",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -11271,6 +11297,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Aod-syn-Baraka",
     "characterName": "Aod, syn Baraka",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -11286,6 +11313,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Sofra",
     "characterName": "Sofra",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -11341,6 +11369,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Bakura",
     "characterName": "Bakura",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -11370,6 +11399,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Abeb",
     "characterName": "Abeb",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -11397,6 +11427,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Rabsun",
     "characterName": "Rabsun",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -11479,6 +11510,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Hiram",
     "characterName": "Hiram",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -12072,6 +12104,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Sargon",
     "characterName": "Sargon",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -12335,6 +12368,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Asarhadon",
     "characterName": "Asarhadon",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -12415,6 +12449,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Phut-Beroes",
     "characterName": "Phut (Beroes)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -12676,6 +12711,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Mefres",
     "characterName": "Mefres",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -13378,6 +13414,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Wielki-prorok-swiatyni-Hator",
     "characterName": "Wielki prorok świątyni Hator",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -13393,6 +13430,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Wielki-lekarz-swiatyni-Hator",
     "characterName": "Wielki lekarz świątyni Hator",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -13418,6 +13456,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Arcykaplan-Hatory",
     "characterName": "Arcykapłan Hatory",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -13435,6 +13474,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Kalipos",
     "characterName": "Kalipos",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -13485,6 +13525,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Nomarcha-Habu",
     "characterName": "Nomarcha Habu",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -13513,6 +13554,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Lykon",
     "characterName": "Lykon",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -13764,6 +13806,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Seti",
     "characterName": "Seti",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -13831,6 +13874,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Istubar",
     "characterName": "Istubar",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -13916,6 +13960,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Sem",
     "characterName": "Sem",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14113,6 +14158,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Musawasa",
     "characterName": "Musawasa",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14207,6 +14253,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Tehenna",
     "characterName": "Tehenna",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14297,6 +14344,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Naczelnik-policji-w-Pi-Bast",
     "characterName": "Naczelnik policji w Pi-Bast",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14424,6 +14472,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Skarbnik-Ramzesa",
     "characterName": "Skarbnik Ramzesa",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14447,6 +14496,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Krol-Assar",
     "characterName": "Król Assar",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14503,6 +14553,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Wielki-skarbnik-panstwowy",
     "characterName": "Wielki skarbnik (państwowy)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14658,6 +14709,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Kaplan-czuwajacy-nad-kuchnia",
     "characterName": "Kapłan czuwający nad kuchnią",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14673,6 +14725,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Starszy-kaplan-kuchenny",
     "characterName": "Starszy kapłan (kuchenny)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14688,6 +14741,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Mlodszy-kaplan-kuchenny",
     "characterName": "Młodszy kapłan (kuchenny)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14703,6 +14757,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Kaplan-astrolog",
     "characterName": "Kapłan-astrolog",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14723,6 +14778,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Adiutant-faraona",
     "characterName": "Adiutant (faraona)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14742,6 +14798,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Prorocy-dwaj-asystujacy-Ramzesowi-XII",
     "characterName": "Prorocy (dwaj, asystujący Ramzesowi XII)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14757,6 +14814,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Kaplan-pukajacy-do-bramy-dzielnicy-zmarlych",
     "characterName": "Kapłan (pukający do bramy dzielnicy zmarłych)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14773,6 +14831,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Kaplan-balsamista-zasloniety",
     "characterName": "Kapłan-balsamista (zasłonięty)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14790,6 +14849,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Balsamista-krytykujacy-kradziez",
     "characterName": "Balsamista (krytykujący kradzież)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14807,6 +14867,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Balsamista-optymista",
     "characterName": "Balsamista (optymista)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14826,6 +14887,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Balsamista-pesymista",
     "characterName": "Balsamista (pesymista)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14847,6 +14909,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Izyda-kaplanka-w-ceremonii",
     "characterName": "Izyda (kapłanka w ceremonii)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14884,6 +14947,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Horus-osoba-w-ceremonii-pogrzebowej",
     "characterName": "Horus (osoba w ceremonii pogrzebowej)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14908,6 +14972,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Paraszyta-przebrany-za-Tyfona",
     "characterName": "Paraszyta (przebrany za Tyfona)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14938,6 +15003,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Najstarszy-kaplan-dzielnicy-zmarlych",
     "characterName": "Najstarszy kapłan (dzielnicy zmarłych)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14958,6 +15024,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Anubis-kaplan-w-ceremonii",
     "characterName": "Anubis (kapłan w ceremonii)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14982,6 +15049,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Tot-kaplan-w-ceremonii",
     "characterName": "Tot (kapłan w ceremonii)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -14997,6 +15065,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Naczelnik-palacow-Ramzesa-XIII",
     "characterName": "Naczelnik pałaców (Ramzesa XIII)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15014,6 +15083,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Samentu",
     "characterName": "Samentu",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15236,6 +15306,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Arcykaplan-Labiryntu",
     "characterName": "Arcykapłan Labiryntu",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15319,12 +15390,14 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Arcykaplan-swiatyni-Setiego-w-Abydos",
     "characterName": "Arcykapłan świątyni Setiego w Abydos",
     "bookSlug": "Pharaon",
     "infoPerChapter": [],
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Horus-dziecko-w-swiatyni-Setiego",
     "characterName": "Horus (dziecko w świątyni Setiego)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15340,6 +15413,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Arcykaplan-swiatyni-Hator-w-Tan-ta-ren",
     "characterName": "Arcykapłan świątyni Hator w Tan-ta-ren",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15361,6 +15435,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Arcykaplan-astronom-w-Tan-ta-ren",
     "characterName": "Arcykapłan-astronom (w Tan-ta-ren)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15383,6 +15458,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Antef",
     "characterName": "Antef",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15435,6 +15511,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Hebron",
     "characterName": "Hebron",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15535,6 +15612,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Dion-Grek",
     "characterName": "Dion (Grek)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15550,6 +15628,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Menes-kaplan-gwiazdziarz",
     "characterName": "Menes (kapłan-gwiaździarz)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15683,12 +15762,14 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Gluchoniemy-sluga-Menesa",
     "characterName": "Głuchoniemy (sługa Menesa)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [],
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Naczelnik-lucznikow",
     "characterName": "Naczelnik łuczników",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15704,6 +15785,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Naczelnik-konnicy",
     "characterName": "Naczelnik konnicy",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15719,6 +15801,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Najwyzszy-sedzia-Tebow",
     "characterName": "Najwyższy sędzia Tebów",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15767,6 +15850,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Nomarcha-Abs",
     "characterName": "Nomarcha Abs",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15787,6 +15871,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Nomarcha-Horti",
     "characterName": "Nomarcha Horti",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15814,6 +15899,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Nomarcha-Emsuch",
     "characterName": "Nomarcha Emsuch",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15840,6 +15926,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Stary-pastuch-delegat",
     "characterName": "Stary pastuch (delegat)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15857,6 +15944,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Nomarcha-Sebes",
     "characterName": "Nomarcha Sebes",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15878,6 +15966,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Nomarcha-Aa",
     "characterName": "Nomarcha Aa",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15905,6 +15994,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Nomarcha-Ament",
     "characterName": "Nomarcha Ament",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15922,6 +16012,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Robotnik-olbrzymiego-wzrostu",
     "characterName": "Robotnik olbrzymiego wzrostu",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15943,6 +16034,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Adiutant-pulku-z-Memfisu",
     "characterName": "Adiutant pułku (z Memfisu)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -15968,6 +16060,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Mlody-kaplan-poslannik-Samentu",
     "characterName": "Młody kapłan (posłannik Samentu)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -16020,6 +16113,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Dozorcy-Labiryntu-trzej-zabojcy-Mefresa",
     "characterName": "Dozorcy Labiryntu (trzej zabójcy Mefresa)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -16076,6 +16170,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Setnicy-dwaj-z-policji-Pi-Bast",
     "characterName": "Setnicy (dwaj, z policji Pi-Bast)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -16091,6 +16186,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Nomarcha-memfijski",
     "characterName": "Nomarcha memfijski",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -16110,6 +16206,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Arcykaplan-Ozyrysa-koronacja-Herhora",
     "characterName": "Arcykapłan Ozyrysa (koronacja Herhora)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -16125,6 +16222,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Arcykaplan-Horusa-koronacja-Herhora",
     "characterName": "Arcykapłan Horusa (koronacja Herhora)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -16140,6 +16238,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Bogaty-dzierzawca",
     "characterName": "Bogaty dzierżawca",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -16155,6 +16254,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Ubogi-kaplan-z-chlopcem",
     "characterName": "Ubogi kapłan (z chłopcem)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [
@@ -16176,6 +16276,7 @@ export const PharaonCharactersData = [
     "imageUrl": "UNKNOWN"
   },
   {
+    "slug": "Maly-chlopiec-z-kaplanem",
     "characterName": "Mały chłopiec (z kapłanem)",
     "bookSlug": "Pharaon",
     "infoPerChapter": [

@@ -34,12 +34,12 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
  * Creates and configures a video or image element based on the placeholder span's data.
  */
 function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextType): HTMLVideoElement | HTMLImageElement | null {
-  const character = placeholder.dataset.character;
+  const characterSlug = placeholder.dataset.character;
   const isTalking = placeholder.dataset.isTalking === "true";
   const talkingSrc = placeholder.dataset.srcTalking; // Can be video or image
   const listeningSrc = placeholder.dataset.srcListening; // Can be video or image
 
-  if (!character) return null;
+  if (!characterSlug) return null;
 
   let element: HTMLVideoElement | HTMLImageElement | null = null;
   let finalSrc: string | undefined = undefined;
@@ -68,11 +68,11 @@ function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextTyp
   // Configure and return the element
   if (element && finalSrc) {
     element.addEventListener("click", () => {
-      modal.openCharacterDetailsModal(character, isTalking, finalSrc);
+      modal.openCharacterDetailsModal(characterSlug, isTalking, finalSrc);
     });
     element.src = finalSrc;
     element.classList.add("inline-avatar");
-    if (character) element.dataset.character = character; // Assign character data if available
+    if (characterSlug) element.dataset.character = characterSlug; // Assign character data if available
     // Add basic error handling for loading
     element.onerror = () => console.error(`Failed to load media: ${element?.src}`);
     return element;
@@ -199,14 +199,12 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
               newDummyElement.style.display = "inline-block";
               newDummyElement.style.verticalAlign = "bottom";
 
-
               placeholder.appendChild(newDummyElement);
 
               // Ensure mediaInjected is false, as we are showing a dummy or no media was ever injected.
               if (placeholder.dataset.mediaInjected === "true") {
                 delete placeholder.dataset.mediaInjected;
               }
-              console.log(`[Media Initial Dummy] Created initial dummy for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph} (out of view, no prior dummy)`);
             }
           }
         }

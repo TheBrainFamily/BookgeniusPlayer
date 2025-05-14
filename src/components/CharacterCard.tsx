@@ -33,11 +33,11 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
     if (!cardRef.current) return;
 
     if (isTalkingInCurrentRange) {
-      setCurrentMediaSrc(getTalkingMediaFilePathForName(entity.canonicalName, CURRENT_BOOK));
+      setCurrentMediaSrc(getTalkingMediaFilePathForName(entity.slug, CURRENT_BOOK));
     } else {
-      setCurrentMediaSrc(getListeningMediaFilePathForName(entity.canonicalName, CURRENT_BOOK));
+      setCurrentMediaSrc(getListeningMediaFilePathForName(entity.slug, CURRENT_BOOK));
     }
-  }, [isTalkingInCurrentRange, entity.canonicalName, entity.imageUrl]);
+  }, [isTalkingInCurrentRange, entity.slug, entity.imageUrl]);
 
   const requestToggle = useCallback(
     (enable: boolean) => {
@@ -60,22 +60,16 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
     };
   }, []);
 
-  const mediaSrc = currentMediaSrc || getListeningMediaFilePathForName(entity.canonicalName, CURRENT_BOOK);
+  const mediaSrc = currentMediaSrc || getListeningMediaFilePathForName(entity.slug, CURRENT_BOOK);
   const isVideo = mediaSrc.endsWith(".mp4") || mediaSrc.endsWith(".webm");
 
-  const commonAttrs = {
-    "data-original-src": mediaSrc,
-    "data-character-name": entity.canonicalName,
-    "data-summary": entity.summary ?? "",
-    className: "w-full h-full object-cover",
-  } as const;
-
+  const commonAttrs = { "data-original-src": mediaSrc, "data-character-name": entity.slug, "data-summary": entity.summary ?? "", className: "w-full h-full object-cover" } as const;
 
   return (
     <div
       ref={cardRef}
       className={cn("w-[85%] max-w-[200px] mx-auto relative pb-4")}
-      data-canonical-name={entity.canonicalName}
+      data-canonical-name={entity.slug}
       data-appearances={JSON.stringify(apps)}
       onMouseEnter={() => requestToggle(true)}
       onMouseLeave={() => requestToggle(false)}
@@ -87,9 +81,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
             ? "z-10 shadow-lg border-2 border-(--book-primary-color) animate-pulse-glow"
             : "transition-transform duration-300 ease-in-out hover:scale-110 hover:z-10",
         )}
-        onClick={() => openCharacterDetailsModal(entity.canonicalName, isTalkingInCurrentRange, mediaSrc)}
+        onClick={() => openCharacterDetailsModal(entity.slug, isTalkingInCurrentRange, mediaSrc)}
       >
-        <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.canonicalName} isTalking={isTalkingInCurrentRange} />
+        <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />
       </div>
       <div
         className={cn(
@@ -100,9 +94,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
         )}
       >
         <div className="py-1.5 px-3 flex flex-col items-center justify-center">
-          <h4 className="w-full whitespace-nowrap overflow-hidden overflow-ellipsis text-xs font-bold text-white tracking-wide uppercase">
-            {entity.label || entity.canonicalName}
-          </h4>
+          <h4 className="w-full whitespace-nowrap overflow-hidden overflow-ellipsis text-xs font-bold text-white tracking-wide uppercase">{entity.label || entity.slug}</h4>
           <p className={cn("w-full whitespace-nowrap overflow-hidden overflow-ellipsis text-xs text-gray-200 italic", isTalkingInCurrentRange ? "" : "text-gray-200")}>
             {entity.summary}
           </p>

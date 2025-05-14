@@ -6,7 +6,7 @@ import { Location } from "@/state/LocationContext";
 
 /** Very light equality check: same length and same canonicalName order */
 function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {
-  return a.length === b.length && a.every((v, i) => v.canonicalName === b[i].canonicalName);
+  return a.length === b.length && a.every((v, i) => v.slug === b[i].slug);
 }
 
 /**
@@ -42,16 +42,16 @@ export function useCharacterNotes(loc: Location, charactersData: SelfSufficientC
         }
 
         if (prev.length === 0) {
-          return sortAlphabetically ? [...parsed].sort((a, b) => a.canonicalName.localeCompare(b.canonicalName)) : parsed;
+          return sortAlphabetically ? [...parsed].sort((a, b) => a.slug.localeCompare(b.slug)) : parsed;
         }
 
-        const existingNames = new Set(prev.map((ch) => ch.canonicalName));
-        const remaining = prev.filter((ch) => parsed.some((p) => p.canonicalName === ch.canonicalName));
-        const newChars = parsed.filter((ch) => !existingNames.has(ch.canonicalName));
+        const existingNames = new Set(prev.map((ch) => ch.slug));
+        const remaining = prev.filter((ch) => parsed.some((p) => p.slug === ch.slug));
+        const newChars = parsed.filter((ch) => !existingNames.has(ch.slug));
 
-        const updatedRemaining = remaining.map((oldCh) => parsed.find((p) => p.canonicalName === oldCh.canonicalName) || oldCh);
+        const updatedRemaining = remaining.map((oldCh) => parsed.find((p) => p.slug === oldCh.slug) || oldCh);
 
-        const appended = sortAlphabetically ? [...newChars].sort((a, b) => a.canonicalName.localeCompare(b.canonicalName)) : newChars;
+        const appended = sortAlphabetically ? [...newChars].sort((a, b) => a.slug.localeCompare(b.slug)) : newChars;
 
         return [...updatedRemaining, ...appended];
       });

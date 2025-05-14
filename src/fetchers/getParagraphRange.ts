@@ -22,6 +22,7 @@ export interface InfoPerChapter {
 }
 
 export interface SelfSufficientCharacterMetadata {
+  slug: string;
   characterName: string;
   bookSlug: string;
   infoPerChapter: InfoPerChapter[];
@@ -109,14 +110,6 @@ export const paragraphMetadataServicePure = {
         .filter((d) => d.bookSlug === bookSlug)
         // 2. chapter & paragraph filtering ────────────────────────────────────
         .map((character) => {
-          if (character.characterName === "Eunana") {
-            console.log("character", character.characterName, character.infoPerChapter);
-            console.log(
-              "character filtered",
-              character.characterName,
-              character.infoPerChapter.filter((c) => c.chapter >= startChapter && c.chapter <= endChapter),
-            );
-          }
           const infoPerChapter: InfoPerChapter[] = character.infoPerChapter
             // keep only chapters inside the chapter range
             .filter((c) => c.chapter >= startChapter && c.chapter <= endChapter)
@@ -145,7 +138,7 @@ export const paragraphMetadataServicePure = {
           // drop characters that vanished entirely
           if (infoPerChapter.length === 0) return null;
 
-          return { characterName: character.characterName, bookSlug: character.bookSlug, imageUrl: character.imageUrl, infoPerChapter } as SelfSufficientCharacterMetadata;
+          return { ...character, infoPerChapter } as SelfSufficientCharacterMetadata;
         })
         .filter(Boolean) as SelfSufficientCharacterMetadata[]
     );
@@ -157,7 +150,7 @@ export const paragraphMetadataServicePure = {
 /* -------------------------------------------------------------------------- */
 
 export interface ParsedParagraphRange {
-  canonicalName: string;
+  slug: string;
   summary: string;
   imageUrl: string;
   paragraphNumber: number;
@@ -216,8 +209,11 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
         return null;
       }
 
+      if (!character.slug) {
+        console.log(`KURWA: character`, character);
+      }
       return {
-        canonicalName: character.characterName,
+        slug: character.slug,
         imageUrl: character.imageUrl,
         summary: first.summary,
         isTalkingInFirstParagraph: first.isTalking,

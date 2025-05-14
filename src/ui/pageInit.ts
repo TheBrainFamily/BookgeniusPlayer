@@ -1,5 +1,4 @@
 // import { setupPageObserver } from "./pageObserver";
-import { setupMobileInteractions } from "./mobileUI";
 import { goToInitialLocationFromHash } from "@/helpers/paragraphsNavigation";
 // import { faraonBookXml } from "@/data/faraon-book-xml"; // Removed import
 import { faraonAnnotationsXml } from "@/data/faraon-annotations-xml";
@@ -15,7 +14,6 @@ export function initializePages() {
   // Set up intersection observer to detect visible pages
   // setupPageObserver(); // This should likely be removed if usePageObserver hook is used
   // Set up mobile interactions
-  setupMobileInteractions();
 }
 
 // Initialize the viewer and fetch initial metadata
