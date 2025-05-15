@@ -121,13 +121,13 @@
   --mobile-strip-bg-light: rgba(255, 255, 255, 0.95);
   --mobile-strip-horizontal-bg-light: rgba(255, 255, 255, 0.85);
   --highlight-blink-color: rgba(152, 152, 152, 0.5);
+
   /* RGB versions for transparency */
   --bg-light-rgb: 240, 240, 240;
   --bg-content-light-rgb: 253, 250, 244;
   --bg-notes-light-rgb: 249, 249, 249;
   --modal-bg-light-rgb: 255, 255, 255;
   --mobile-strip-bg-light-rgb: 255, 255, 255;
-  --mobile-strip-horizontal-bg-light-rgb: 255, 255, 255;
 
   /* Colors - Dark Mode */
   --bg-dark: #222;

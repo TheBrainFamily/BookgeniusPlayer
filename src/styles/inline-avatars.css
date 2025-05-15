@@ -21,6 +21,7 @@
   display: inline-block;
   object-fit: cover;
   position: relative;
+  transition: transform 0.2s ease;
 }
 
 .character-talking .inline-avatar {
