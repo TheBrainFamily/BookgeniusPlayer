@@ -30,6 +30,10 @@ let pendingSectionTracks: string[] | null | undefined = undefined;
 
 // --- Core Functions ---
 
+export function getAudioContext(): AudioContext | null {
+  return audioContext;
+}
+
 export function initAudioContext(): boolean {
   if (!audioContext) {
     try {

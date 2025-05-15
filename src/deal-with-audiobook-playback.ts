@@ -11,7 +11,7 @@
 import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { getAudiobookTracksForBook, AudiobookTracksSection } from "@/getAudiobookTracksForBook"; // Adjust path as needed
-import { playTrack } from "./audiobook-player";
+import { loadTrack, playTrack } from "./audiobook-player";
 
 let isProcessingAudiobookTracks = false; // Module-level flag to prevent re-entrancy
 
@@ -99,7 +99,8 @@ export const dealWithAudiobookTracks = async ({ startChapter, startParagraph, en
       .sort((a: AudiobookTracksSection, b: AudiobookTracksSection) => {
         if (b.chapter !== a.chapter) return b.chapter - a.chapter;
         return b.paragraph - a.paragraph;
-      });
+      })
+      .reverse();
 
     const sectionToApply = foundAudiobookSections[0];
 
@@ -110,7 +111,10 @@ export const dealWithAudiobookTracks = async ({ startChapter, startParagraph, en
       console.log(`Audiobook song check: Section is [${sectionToApply}]. Currently playing: ${currentPlayingTrackId}.`);
 
       console.log("PINGWING: 112 sectionToApply.file, 0, sectionToApply[clip-begin]", sectionToApply.file, 0, sectionToApply["clip-begin"]);
-      playTrack(sectionToApply.file, 0, sectionToApply["clip-begin"]);
+      loadTrack(sectionToApply.file).then(() => {
+        console.log("audio loaded", sectionToApply.file);
+        playTrack(sectionToApply.file, 0, sectionToApply["clip-begin"]);
+      });
     }
   } catch (error) {
     console.error("Error during dealWithAudiobookTracks execution:", error);

@@ -1,4 +1,5 @@
-import { initAudioContext, loadTrack } from "@/audio-crossfader";
+import { getAudioContext, initAudioContext } from "@/audio-crossfader";
+import { CURRENT_BOOK } from "./consts";
 
 let audioContext: AudioContext | null = null;
 const tracks: Map<string, TrackState> = new Map();
@@ -11,6 +12,42 @@ interface TrackState {
   gainNode?: GainNode | null;
   duration?: number; // Added for pre-emptive transition
   preemptiveTransitionTimeout?: ReturnType<typeof setTimeout> | null; // Added for managing pre-emptive transition
+}
+
+export async function loadTrack(trackId: string): Promise<boolean> {
+  audioContext = getAudioContext();
+  if (!audioContext) {
+    initAudioContext();
+    audioContext = getAudioContext();
+  }
+  if (audioContext!.state !== "running") {
+    // audioContext is guaranteed to be non-null here
+    console.warn("loadTrack: AudioContext is not running. Loading may succeed but playback won't start yet.");
+    // await audioContext!.resume().catch((e) => console.error("Error resuming AudioContext before load:", e));
+    // Resuming here might be too late if the user gesture is already "spent". initAudioContext should handle it.
+  }
+
+  const existing = tracks.get(trackId);
+  if (existing?.audioBuffer) {
+    // console.log(`Track '${trackId}' already loaded.`);
+    return true;
+  }
+
+  const audioPath = `/${CURRENT_BOOK}/${trackId}`;
+  console.log(`Loading '${trackId}' from ${audioPath}...`);
+  try {
+    const response = await fetch(audioPath);
+    if (!response.ok) throw new Error(`HTTP ${response.status} – ${response.statusText}`);
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await audioContext!.decodeAudioData(arrayBuffer);
+    tracks.set(trackId, { audioBuffer, duration: audioBuffer.duration, sourceNode: null, gainNode: null });
+    console.log(`Decoded '${trackId}'. Duration: ${audioBuffer.duration.toFixed(2)}s.`);
+    return true;
+  } catch (e) {
+    console.error(`Error loading '${trackId}':`, e);
+    tracks.delete(trackId);
+    return false;
+  }
 }
 
 export function playTrack(trackId: string, startTime: number = 0, offset: number = 0): boolean {
