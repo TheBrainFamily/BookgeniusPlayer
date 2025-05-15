@@ -10,6 +10,7 @@ import { CURRENT_BOOK } from "@/consts"; // Adjust path
 import { useLocation } from "@/state/LocationContext"; // Adjust path
 import { showSearchModal, performSearch, hideSearchModal, isSearchActive } from "@/searchModal"; // Adjust path
 import { deepResearchCall } from "@/deepResearchCall"; // Adjust path
+import { isMobileOrTabletDevice } from "@/utils/deviceDetection";
 
 // --- Helper Hook for Landscape Detection ---
 const useDeviceOrientation = () => {
@@ -51,6 +52,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   const [isInputExpanded, setIsInputExpanded] = useState(true);
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
+  const [isRightNotesBlankHidden, setIsRightNotesBlankHidden] = useState(false);
 
   const { isLandscape } = useDeviceOrientation();
   const { startRecording, stopRecording, response } = useRealtime();
@@ -73,6 +75,10 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
       setValue(response);
     }
   }, [response, isRecording]);
+
+  useEffect(() => {
+    if (isMobileOrTabletDevice()) setIsRightNotesBlankHidden(true);
+  }, []);
 
   // --- Event Handlers ---
   // const handleFocus = () => setIsFocused(true); // Remove if not needed
@@ -277,7 +283,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
         )}
       </div>
       {/* ToDo: Remove when layout will be refactored */}
-      <div id="right-notes-blank" className="hidden lg:block lg:flex-1 max-w-[700px]" />
+      {!isRightNotesBlankHidden && <div id="right-notes-blank" className="hidden lg:block lg:flex-1 max-w-[700px]" />}
     </footer>
   );
 }
