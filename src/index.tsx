@@ -1,14 +1,12 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
+
 import App from "./App";
 
-/* Tailwind / global styles – exactly the same imports you already had */
-import "./styles.css";
-import "./styles-narrow.css";
 import "./styles/globals.css";
-import "./main.css";
-import "./modals.css";
-import "./mobile.css";
+import "./styles/styles.css";
+import "./styles/main.css";
+import "./styles/modals.css";
 import "./styles/inline-avatars.css";
 
 const container = document.getElementById("root")!;

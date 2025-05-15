@@ -1,9 +1,13 @@
 // Service worker registration and handling
 
+import { isMobileOrTablet } from "./utils/isMobileOrTablet";
+
 const VIDEO_TIMEOUT_MS = 5000;
 const SW_TIMEOUT_MS = 7000;
 
 export const dealWithSW = () => {
+  updateRightNotesVisibility();
+
   const splash = document.getElementById("splash");
   const bgVideoA = document.getElementById("bg-video-a") as HTMLVideoElement | null;
 
@@ -119,4 +123,31 @@ export const dealWithSW = () => {
   if (videoReady && serviceWorkerHandled) {
     tryHideSplash();
   }
+};
+
+const updateRightNotesVisibility = (): void => {
+  if (typeof window === "undefined") return;
+
+  const rightNotesElement = document.getElementById("right-notes");
+  if (!rightNotesElement) {
+    console.warn("Element with id 'right-notes' not found");
+    return;
+  }
+
+  if (isMobileOrTablet()) {
+    rightNotesElement.classList.add("hide");
+  } else {
+    rightNotesElement.classList.remove("hide");
+  }
+
+  const handleResize = () => {
+    if (isMobileOrTablet()) {
+      rightNotesElement.classList.add("hide");
+    } else {
+      rightNotesElement.classList.remove("hide");
+    }
+  };
+
+  window.addEventListener("resize", handleResize);
+  window.addEventListener("orientationchange", handleResize);
 };

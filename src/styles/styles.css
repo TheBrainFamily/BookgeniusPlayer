@@ -2,35 +2,10 @@
 /* Scoped Legacy CSS            */
 /* ============================================ */
 
-@supports (padding: max(0px)) {
-  .keyboard-safe-area {
-    padding-bottom: max(env(safe-area-inset-bottom, 0px), env(keyboard-inset-height, 0px));
-    /* Optional: Add transition for smoother keyboard appearance */
-    transition: padding-bottom 0.2s ease-out;
-  }
-}
-/* Allow scrolling only within the messages container */
-.messages-container {
-  height: calc(100% - 60px); /* Example: Adjust based on footer height */
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-}
-
-/* --- Keyframes for the zoom animation --- */
-@keyframes zoomInOutEffect {
-  /* Renamed slightly for clarity, ensure it's unique if you had other zoomInOut */
-  0% {
-    transform: scale(1) translateZ(0);
-  }
-  50% {
-    transform: scale(1.2); /* Your desired zoom amount */
-  }
-  100% {
-    transform: scale(1) translateZ(0);
-  }
-}
-
 #legacy {
+  overscroll-behavior: none;
+  touch-action: none;
+
   /* --- Base Container Styles --- */
   contain: paint;
   font-family: var(--font-serif);
@@ -124,33 +99,13 @@
   }
 
   /* --- Layout Structure --- */
-  #book-container {
-    display: flex;
-    flex: 1;
-    flex-direction: row;
-    justify-content: space-evenly;
-    /* width: 100%; */
-    position: relative;
-    /* padding-top: 0; */ /* Defined below for #content-container */
-    padding-bottom: var(--safe-area-inset-bottom); /* Add padding for the safe area */
-    text-align: left; /* Override default if needed */
-  }
 
   #content-container {
     display: flex;
     cursor: default;
-    max-width: 900px;
-    @media (max-width: 1900px) {
-      max-width: 700px;
-    }
-    flex: 2;
-    flex-direction: column;
     overflow-y: auto;
     height: 100%;
     scroll-behavior: smooth;
-    padding-top: 0; /* Reset padding */
-    padding-bottom: var(--safe-area-inset-bottom); /* Default bottom padding */
-    margin-top: 0;
     text-align: justify; /* Default text alignment for content */
     will-change: padding, transform; /* Optimize for animations */
     -webkit-backface-visibility: hidden;
@@ -165,6 +120,7 @@
       font-family: var(--font-serif);
       line-height: 1.6;
       color: var(--text-light);
+
       background: linear-gradient(
         to bottom,
         rgba(var(--bg-content-light-rgb), 0) 0%,
@@ -173,9 +129,7 @@
         rgba(var(--bg-content-light-rgb), 0) 100%
       );
 
-      /* ---------- MASK LAYERS (all intersect) ---------- */
       mask-image:
-    /* 1 ▸ vertical visibility window */
         linear-gradient(
           to bottom,
           transparent 0%,
@@ -186,18 +140,21 @@
           rgba(0 0 0 / 0.2) 70%,
           transparent 100%
         ),
+        linear-gradient(
+          to right,
+          transparent 0,
+          rgba(0 0 0 / 0.4) 1%,
+          rgba(0 0 0 / 0.7) 2%,
+          rgba(0 0 0 / 1) 4%,
+          rgba(0 0 0 / 1) 96%,
+          rgba(0 0 0 / 0.7) 98%,
+          rgba(0 0 0 / 0.4) 99%,
+          transparent 100%
+        ),
         radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
 
-      /* combine the three α‑channels */
-      mask-composite: intersect; /* spec name            */
-      -webkit-mask-composite: destination-in;
-      /* background-color: var(--bg-content-light); */
-      /* Gradient transparency: more transparent at edges, fully opaque in middle */
-      /* Add the mask for text fading */
-      padding: 1em 2em; /* Overrides base padding */
+      mask-composite: intersect;
       hyphens: auto;
-      -webkit-hyphens: auto;
-      -ms-hyphens: auto;
 
       /* Headings */
       h1,
@@ -210,27 +167,31 @@
         margin-top: 2.5em;
         margin-bottom: 1em;
         font-weight: bold;
-        color: #000; /* Black headings */
+        color: #000;
         page-break-after: avoid;
       }
+
       h1 {
         font-size: 2.8em;
         text-align: center;
         margin-bottom: 1.5em;
         margin-top: 0;
       }
+
       h2 {
         font-size: 2em;
       }
+
       h3 {
         font-size: 2em;
       }
+
       h4 {
         font-size: 1.4em;
       }
 
       & > section {
-        padding: 10vh 0 50vh;
+        padding: 10vh 3rem 50vh;
       }
 
       /* Chapter sections */
@@ -533,18 +494,6 @@
 
   /* Specific Notes Panel Instances */
   #right-notes {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-    margin-right: auto;
-    font-family: var(--font-serif);
-    height: 100vh;
-    margin: 20px;
-    margin-right: 0;
-    padding-bottom: 20px;
-    max-width: 700px;
-
     section {
       padding: 20px;
       border-radius: 8px;
@@ -573,21 +522,6 @@
       font-weight: 600;
       color: var(--text-light); /* Slightly darker than notes text */
     }
-  }
-
-  #left-notes {
-    /* display: flex; */
-    /* flex-direction: column; */
-    /* justify-content: center; */
-    align-content: center;
-    height: 100vh;
-    flex: 1;
-    max-width: 700px;
-    margin: 0 20px;
-    padding: 50px 0;
-    overflow: scroll;
-    /* margin-top: 0;
-    margin-right: 0; */
   }
 
   /* --- Loading Indicator --- */
@@ -625,24 +559,6 @@
     to {
       transform: rotate(360deg);
     }
-  }
-
-  .close-notes-button {
-    position: absolute;
-    top: max(10px, var(--safe-area-inset-top));
-    right: 10px;
-    background-color: var(--button-extra-bg-light);
-    border: none;
-    color: white;
-    font-size: 16px;
-    padding: 5px 10px; /* Added padding */
-    border-radius: 5px; /* Added radius */
-    z-index: 100; /* Above notes content */
-    cursor: pointer;
-    display: none; /* Only shown when notes panel is active on mobile */
-  }
-  .notes-container.active .close-notes-button {
-    display: block; /* Show when parent is active */
   }
 
   /* .editable-text:hover {
@@ -941,37 +857,10 @@
     text-align: center;
     font-size: 14px;
   }
-} /* End of #legacy scope */
-
-/* Base style for entity notes to help with transitions */
-.entity-note {
-  max-width: 700px;
-  align-self: center;
-  transform: scale(1);
-  transition:
-    transform 0.3s ease-in-out,
-    box-shadow 0.3s ease-in-out,
-    opacity 0.3s ease-out; /* Add opacity transition */
-  position: relative;
-  z-index: 1;
 }
 
-/* Base style for entity text column to help with transitions */
-.entity-text-column {
-  transition:
-    background-color 0.3s ease-in-out,
-    border 0.3s ease-in-out,
-    box-shadow 0.3s ease-in-out;
-}
+/* End of #legacy scope */
 
-/* Base style for entity image wrapper to help with transitions */
-.entity-image-wrapper {
-  /* transform: scale(1.2); */
-  transition:
-    transform 0.3s ease-in-out,
-    box-shadow 0.3s ease-in-out;
-  /* z-index: 1; */
-}
 /* Fade-in animation class */
 .fade-in {
   opacity: 1;
@@ -996,31 +885,32 @@
   background-color: var(--entity-highlight-bg-dark);
 }
 
-/* Sidebar animation for staggered entrance */
-.sidebar-item-animate {
-  opacity: 0; /* Start hidden before animation */
-  animation: fadeUp 0.4s ease-out forwards;
-  /* Set --stagger-delay via JS */
-  animation-delay: var(--stagger-delay, 0s);
-}
-
 /* Return to Location Button */
 #return-to-location-button {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 10px 15px;
-  background-color: var(--return-button-bg);
-  color: white;
+  font-size: 16px;
+  font-family: var(--default-font-family);
+  bottom: 14px;
+  right: 12px;
+  padding: 4px 14px;
+  background-color: color-mix(in oklab, var(--secondary) 80%, transparent);
+  color: var(--color-gray-600);
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
   z-index: 999; /* Below modal overlay from modal context */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transition: background-color var(--transition-fast) var(--transition-timing);
 
   &:hover {
-    background-color: var(--return-button-hover-bg);
+    background-color: color-mix(in oklab, var(--secondary) 50%, transparent);
+  }
+}
+
+@media (max-width: 1028px) {
+  #return-to-location-button {
+    bottom: 65px;
+    right: 48px;
   }
 }
 
