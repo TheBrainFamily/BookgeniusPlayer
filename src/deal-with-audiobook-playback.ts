@@ -11,7 +11,7 @@
 import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { getAudiobookTracksForBook, AudiobookTracksSection } from "@/getAudiobookTracksForBook"; // Adjust path as needed
-import { loadTrack, playTrack, stopAllTracks } from "./audiobook-player";
+import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audiobook-player";
 
 let isProcessingAudiobookTracks = false; // Module-level flag to prevent re-entrancy
 
@@ -73,15 +73,17 @@ export const dealWithAudiobookTracks = async ({ startChapter, startParagraph, en
   console.log("dealWithAudiobookTracks invoked with:", { startChapter, startParagraph, endChapter, endParagraph });
 
   try {
+    let newChapter = false;
     let chapterToConsider: number;
     let paragraphToConsider: number;
 
     if (startChapter === endChapter) {
       chapterToConsider = startChapter;
-      paragraphToConsider = Math.floor((startParagraph + endParagraph) / 2);
+      paragraphToConsider = startParagraph;
     } else {
       chapterToConsider = endChapter; // Prioritize new chapter
-      paragraphToConsider = 1; // Consider start of the new chapter
+      paragraphToConsider = 0; // Consider start of the new chapter
+      newChapter = true;
     }
     console.log(`Calculated consideration point: Chapter ${chapterToConsider}, Paragraph ${paragraphToConsider}`);
 
@@ -114,11 +116,65 @@ export const dealWithAudiobookTracks = async ({ startChapter, startParagraph, en
       loadTrack(sectionToApply.file).then(() => {
         console.log("audio loaded", sectionToApply.file);
         stopAllTracks();
-        playTrack(sectionToApply.file, 0, sectionToApply["clip-begin"]);
 
-        document
-          .querySelector(`section[data-chapter='${sectionToApply.chapter}'] [data-index='${sectionToApply.paragraph}']`)
-          .scrollIntoView({ behavior: "smooth", block: "start" });
+        const createEventsForAudiobook = () => {
+          const bookTracks = getAudiobookTracksForBook(CURRENT_BOOK);
+          const sectionsToApply = bookTracks.filter(
+            (section: AudiobookTracksSection) => section.chapter === chapterToConsider || (section.chapter === chapterToConsider + 1 && section.paragraph === 0),
+          );
+          if (!sectionsToApply) {
+            console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot determine Audiobook song.`);
+            isProcessingAudiobookTracks = false; // Reset flag before early exit
+            return;
+          }
+
+          const events: AudiobookTrackEvent[] = sectionsToApply
+            .filter((section) => section.chapter === chapterToConsider)
+            .map((section: AudiobookTracksSection, index: number) => {
+              return {
+                timestamp: section["clip-end"],
+                callback: () => {
+                  console.log("PINGWING: 112 sectionToApply.file, 0, sectionToApply[clip-begin]", section.file, 0, section["clip-begin"]);
+                  const currentChapter = sectionsToApply[index].chapter;
+                  const nextSectionChapter = sectionsToApply[index + 1].chapter;
+                  const nextElementSelector = `section[data-chapter='${nextSectionChapter}'] [data-index='${sectionsToApply[index + 1].paragraph + 1}']`;
+                  console.log("PINGWING: 112 nextElementSelector", nextElementSelector);
+                  if (currentChapter === nextSectionChapter) {
+                    isProcessingAudiobookTracks = true;
+
+                    setTimeout(() => {
+                      isProcessingAudiobookTracks = false;
+                    }, 1000);
+                    const nextElement = document.querySelector(nextElementSelector);
+                    if (nextElement) {
+                      nextElement.scrollIntoView({ behavior: "smooth", block: "start" });
+                    } else {
+                      console.log("next element not found");
+                    }
+                  } else {
+                    const nextChapterElementSelector = `section[data-chapter='${nextSectionChapter}'] [data-index='${sectionsToApply[index + 1].paragraph}']`;
+                    console.log("PINGWING: 112 nextChapterElementSelector", nextChapterElementSelector);
+                    const nextChapterElement = document.querySelector(nextChapterElementSelector);
+                    if (nextChapterElement) {
+                      nextChapterElement.scrollIntoView({ behavior: "smooth", block: "start" });
+                    } else {
+                      console.log("next chapter element not found");
+                    }
+                  }
+                },
+                triggered: false,
+              };
+            });
+          return events;
+        };
+        const events: AudiobookTrackEvent[] = createEventsForAudiobook();
+
+        playTrack(sectionToApply.file, 0, sectionToApply["clip-begin"], events);
+
+        const scrollToSelectorAgain = `section[data-chapter='${sectionToApply.chapter}'] [data-index='${sectionToApply.paragraph + (newChapter ? 0 : 1)}']`;
+
+        console.log("PINGWING: 164 scrollToSelector", scrollToSelectorAgain);
+        document.querySelector(scrollToSelectorAgain).scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
   } catch (error) {
@@ -126,7 +182,9 @@ export const dealWithAudiobookTracks = async ({ startChapter, startParagraph, en
     // Potentially stop all music on unhandled error to prevent broken states
     // stopAllPlayback();
   } finally {
-    isProcessingAudiobookTracks = false;
+    setTimeout(() => {
+      isProcessingAudiobookTracks = false;
+    }, 1000);
   }
 };
 

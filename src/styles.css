@@ -1046,9 +1046,9 @@ section[data-chapter] [data-index="1"]::first-letter {
   font-weight: bold;
 } */
 
-section[data-chapter] p {
+section[data-chapter] [data-index] {
   /* 1 line-height (≈ 1 text line) */
-  scroll-margin-top: 3lh; /* Chrome 92+, Firefox 96+, Safari 17+ */
+  scroll-margin-top: 3lh;
 
   /* …or fall back to two ems */
   /* scroll-margin-top: 2em; */
