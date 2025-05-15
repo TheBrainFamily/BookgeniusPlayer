@@ -1,6 +1,6 @@
 // Service worker registration and handling
 
-import { isMobileOrTabletDevice } from "./utils/deviceDetection";
+import { isMobileOrTabletDevice } from "./utils/isMobileOrTabletDevice";
 
 const VIDEO_TIMEOUT_MS = 5000;
 const SW_TIMEOUT_MS = 7000;

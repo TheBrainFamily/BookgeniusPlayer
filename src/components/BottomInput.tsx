@@ -10,7 +10,7 @@ import { CURRENT_BOOK } from "@/consts"; // Adjust path
 import { useLocation } from "@/state/LocationContext"; // Adjust path
 import { showSearchModal, performSearch, hideSearchModal, isSearchActive } from "@/searchModal"; // Adjust path
 import { deepResearchCall } from "@/deepResearchCall"; // Adjust path
-import { isMobileOrTabletDevice } from "@/utils/deviceDetection";
+import { isMobileOrTabletDevice } from "@/utils/isMobileOrTabletDevice";
 
 // --- Helper Hook for Landscape Detection ---
 const useDeviceOrientation = () => {
