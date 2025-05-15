@@ -66,6 +66,12 @@ const bookBuildConfigs: Partial<Record<BOOK_SLUGS, BookBuildData>> = {
     staticAssetSourceDir: `public_books/${BOOK_SLUGS.Conrad_Tajny_Agent}`,
     staticAssetDestDir: BOOK_SLUGS.Conrad_Tajny_Agent,
   },
+  [BOOK_SLUGS.Krolowa_Sniegu]: {
+    name: "Krolowa Sniegu",
+    short_name: "Krolowa-Sniegu",
+    staticAssetSourceDir: `public_books/${BOOK_SLUGS.Krolowa_Sniegu}`,
+    staticAssetDestDir: BOOK_SLUGS.Krolowa_Sniegu,
+  },
 };
 
 const activeBookConfig = bookBuildConfigs[currentBookSlug]; // Use the resolved currentBookSlug

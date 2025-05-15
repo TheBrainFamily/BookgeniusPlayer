@@ -2,7 +2,13 @@ import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
 import type { Background } from "./background";
 
 export const getBackgrounds = (): Background[] => {
-  const toBackground = ({ chapter, file }: { chapter: number; file: string }) => ({ startChapter: chapter, startParagraph: 1, file, endChapter: chapter, endParagraph: 10_000 });
+  const toBackground = ({ chapter, file, startParagraph }: { chapter: number; file: string; startParagraph?: number }) => ({
+    startChapter: chapter,
+    startParagraph: startParagraph ?? 1,
+    file,
+    endChapter: chapter,
+    endParagraph: 10_000,
+  });
 
   const backgroundsInput = [
     { chapter: 1, file: "background-egyptian-streets-palace-visible-loop.mp4" },
@@ -120,6 +126,27 @@ export const getBackgrounds = (): Background[] => {
       { chapter: 11, file: "openai-high-11.png" },
       { chapter: 12, file: "openai-high-12.png" },
       { chapter: 13, file: "openai-high-13.png" },
+    ];
+    backgrounds = backgroundsInput.map(toBackground);
+  }
+
+  if (CURRENT_BOOK === BOOK_SLUGS.Krolowa_Sniegu) {
+    const backgroundsInput = [
+      { chapter: 1, startParagraph: 1, file: "forest-at-twilight.mp4" },
+      { chapter: 1, startParagraph: 6, file: "frozen-plain.mp4" },
+      { chapter: 2, startParagraph: 1, file: "grandmother-house.mp4" },
+      { chapter: 2, startParagraph: 24, file: "snow-covered-forest.mp4" },
+      { chapter: 3, startParagraph: 1, file: "riverbank.mp4" },
+      { chapter: 3, startParagraph: 20, file: "cottage-with-flower-covered-walls.mp4" },
+      { chapter: 4, startParagraph: 1, file: "forest-at-twilight.mp4" },
+      { chapter: 4, startParagraph: 22, file: "palace-interior.mp4" },
+      { chapter: 5, startParagraph: 1, file: "robbers-camp.mp4" },
+      { chapter: 5, startParagraph: 36, file: "frozen-plain.mp4" },
+      { chapter: 6, startParagraph: 1, file: "lapland-tent.mp4" },
+      { chapter: 6, startParagraph: 6, file: "finland-cottage.mp4" },
+      { chapter: 6, startParagraph: 28, file: "ice-castle-exterior.mp4" },
+      { chapter: 7, startParagraph: 0, file: "ice-castle-interior.mp4" },
+      { chapter: 7, startParagraph: 25, file: "summer-garden.mp4" },
     ];
     backgrounds = backgroundsInput.map(toBackground);
   }

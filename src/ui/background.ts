@@ -100,7 +100,14 @@ export const dealWithBackground = ({
     /* ---------- main debounced handler ----------------------------------- */
     debouncedHandler = debounce(async (p: { startChapter: number; startParagraph: number; endChapter: number; endParagraph: number }) => {
       const backgrounds = getBackgrounds() as Background[];
-      const found = backgrounds.find((bg) => p.startChapter >= bg.startChapter && p.startChapter <= bg.endChapter);
+      const found = backgrounds
+        .filter((bg) => p.startChapter >= bg.startChapter && (p.startChapter < bg.endChapter || (p.startChapter === bg.endChapter && p.startParagraph >= (bg.startParagraph ?? 0))))
+        .sort((a, b) => {
+          if (b.startChapter !== a.startChapter) return b.startChapter - a.startChapter;
+          return (b.startParagraph ?? 0) - (a.startParagraph ?? 0);
+        })[0];
+
+      console.log("GOZDECKI FOUND BACKGROUND", found);
 
       /* ---- cancel zooms *before* any early-return --------------------- */
 
