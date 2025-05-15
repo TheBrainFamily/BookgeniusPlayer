@@ -2,17 +2,18 @@ import { getAudioContext, initAudioContext } from "@/audio-crossfader";
 import { CURRENT_BOOK } from "./consts";
 
 let audioContext: AudioContext | null = null;
-const tracks: Map<string, TrackState> = new Map();
+type TrackState = { id: string; audioBuffer: AudioBuffer; duration: number; sourceNode: AudioBufferSourceNode | null; gainNode: GainNode | null };
+const tracks: TrackState[] = [];
 
 // --- Interfaces and Types ---
-interface TrackState {
-  transitionPoints?: number[];
-  audioBuffer?: AudioBuffer;
-  sourceNode?: AudioBufferSourceNode | null;
-  gainNode?: GainNode | null;
-  duration?: number; // Added for pre-emptive transition
-  preemptiveTransitionTimeout?: ReturnType<typeof setTimeout> | null; // Added for managing pre-emptive transition
-}
+// interface TrackState {
+//   transitionPoints?: number[];
+//   audioBuffer?: AudioBuffer;
+//   sourceNode?: AudioBufferSourceNode | null;
+//   gainNode?: GainNode | null;
+//   duration?: number; // Added for pre-emptive transition
+//   preemptiveTransitionTimeout?: ReturnType<typeof setTimeout> | null; // Added for managing pre-emptive transition
+// }
 
 export async function loadTrack(trackId: string): Promise<boolean> {
   audioContext = getAudioContext();
@@ -27,8 +28,8 @@ export async function loadTrack(trackId: string): Promise<boolean> {
     // Resuming here might be too late if the user gesture is already "spent". initAudioContext should handle it.
   }
 
-  const existing = tracks.get(trackId);
-  if (existing?.audioBuffer) {
+  const existing = tracks.find((track) => track.id === trackId && track.audioBuffer);
+  if (existing) {
     // console.log(`Track '${trackId}' already loaded.`);
     return true;
   }
@@ -40,12 +41,12 @@ export async function loadTrack(trackId: string): Promise<boolean> {
     if (!response.ok) throw new Error(`HTTP ${response.status} – ${response.statusText}`);
     const arrayBuffer = await response.arrayBuffer();
     const audioBuffer = await audioContext!.decodeAudioData(arrayBuffer);
-    tracks.set(trackId, { audioBuffer, duration: audioBuffer.duration, sourceNode: null, gainNode: null });
+    tracks.push({ id: trackId, audioBuffer, duration: audioBuffer.duration, sourceNode: null, gainNode: null });
     console.log(`Decoded '${trackId}'. Duration: ${audioBuffer.duration.toFixed(2)}s.`);
     return true;
   } catch (e) {
     console.error(`Error loading '${trackId}':`, e);
-    tracks.delete(trackId);
+    // tracks = tracks.filter((track) => track.id !== trackId);
     return false;
   }
 }
@@ -56,11 +57,14 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
     initAudioContext(); // Attempt to re-init/resume
   }
 
-  const state = tracks.get(trackId);
+  const state = tracks.find((track) => track.id === trackId && track.audioBuffer);
   if (!state?.audioBuffer) {
     console.error(`AudioBuffer missing for '${trackId}'. Cannot play.`);
     return false;
   }
+
+  stopTrackInternal(trackId);
+  stopAllTracks();
 
   const source = audioContext.createBufferSource();
   const gainNode = audioContext.createGain();
@@ -70,41 +74,21 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
   source.connect(gainNode).connect(audioContext.destination);
 
   // Clear any existing preemptive transition timeout for this track if it's being re-played
-  const existingStateForTimeout = tracks.get(trackId);
-  if (existingStateForTimeout?.preemptiveTransitionTimeout) {
-    clearTimeout(existingStateForTimeout.preemptiveTransitionTimeout);
-    existingStateForTimeout.preemptiveTransitionTimeout = null;
-  }
+  // const existingStateForTimeout = tracks.find((track) => track.id === trackId && track.preemptiveTransitionTimeout);
+  // if (existingStateForTimeout?.preemptiveTransitionTimeout) {
+  //   clearTimeout(existingStateForTimeout.preemptiveTransitionTimeout);
+  //   existingStateForTimeout.preemptiveTransitionTimeout = null;
+  // }
 
-  // PINGWING TODO
-  // source.onended = async () => {
-  //   const stateAtEnd = tracks.get(trackId);
-  //   const thisSourceInstanceEnded = stateAtEnd?.sourceNode === source;
-  //
-  //   // Conditions for this onended handler to take action:
-  //   // 1. This track (trackId) must be the currentTrackId.
-  //   // 3. This specific source instance (source) must be the one that ended, not one already stopped/replaced.
-  //   if (trackId === currentTrackId && thisSourceInstanceEnded) {
-  //     console.log(`onended for current track '${trackId}'. No active transition. Attempting to play next in section.`);
-  //     if (currentSectionTracks && currentSectionTracks.length > 0) {
-  //       await playNextTrackInSection();
-  //     } else {
-  //       console.log(`Track '${trackId}' ended, but no section or section empty. Clearing currentTrackId.`);
-  //       currentTrackId = null;
-  //       currentTrackIndexInSection = -1;
-  //     }
-  //   } else {
-  //     console.log(
-  //       `onended for '${trackId}': Conditions not met for auto-play next, thisSourceInstanceEnded: ${thisSourceInstanceEnded}, sourceNodeAtEnd: ${stateAtEnd?.sourceNode === source}`,
-  //     );
-  //   }
-  // };
+  const calculatedOffset = offset % state.audioBuffer.duration;
+  console.log(`offset: ${offset}, audioBufferDuration: ${state.audioBuffer.duration}, calculated offset: ${calculatedOffset}`);
 
   try {
-    source.start(startTime, offset % state.audioBuffer.duration);
+    source.start(startTime, calculatedOffset);
+
     state.sourceNode = source;
     state.gainNode = gainNode;
-    console.log(`Scheduled '${trackId}' @ ${startTime.toFixed(2)}s (offset ${offset.toFixed(2)}s). Duration: ${state.audioBuffer.duration.toFixed(2)}s`);
+    console.log(`Scheduled '${trackId}' @ ${startTime.toFixed(2)}s (offset ${calculatedOffset.toFixed(2)}s). Duration: ${state.audioBuffer.duration.toFixed(2)}s`);
 
     return true;
   } catch (err) {
@@ -112,4 +96,49 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
     // stopTrackInternal(trackId);
     return false;
   }
+}
+
+export function stopAllTracks() {
+  tracks.forEach((state) => {
+    console.log(`GOZDECKI Stopping track '${state.id}'`);
+    stopTrackInternal(state.id);
+  });
+}
+
+function stopTrackInternal(trackId: string) {
+  const state = tracks.find((track) => track.id === trackId && track.audioBuffer);
+  if (!state) return;
+
+  // if (state.preemptiveTransitionTimeout) {
+  //   clearTimeout(state.preemptiveTransitionTimeout);
+  //   state.preemptiveTransitionTimeout = null;
+  //   // console.log(`Cleared pre-emptive transition timeout for '${trackId}' during stop.`);
+  // }
+
+  if (state.sourceNode) {
+    state.sourceNode.onended = null; // Crucial: remove handler before stopping
+    try {
+      state.sourceNode.stop();
+    } catch {
+      // Linter: Unused 'e' -> _ignoredError -> empty catch
+      console.warn(`GOZDECKI Ignoring error stopping source node for ${trackId}:`, e);
+    }
+    try {
+      state.sourceNode.disconnect();
+    } catch {
+      // Linter: Unused 'e' -> empty catch
+      console.warn(`GOZDECKI Ignoring error disconnecting source node for ${trackId}:`, e);
+    }
+    state.sourceNode = null;
+  }
+  if (state.gainNode) {
+    try {
+      state.gainNode.disconnect();
+    } catch {
+      // Linter: Unused 'e' -> empty catch
+      console.warn(`GOZDECKI Ignoring error disconnecting gain node for ${trackId}:`, e);
+    }
+    state.gainNode = null;
+  }
+  // console.log(`Stopped internal nodes for ${trackId}`);
 }

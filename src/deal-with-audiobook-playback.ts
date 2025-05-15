@@ -11,7 +11,7 @@
 import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { getAudiobookTracksForBook, AudiobookTracksSection } from "@/getAudiobookTracksForBook"; // Adjust path as needed
-import { loadTrack, playTrack } from "./audiobook-player";
+import { loadTrack, playTrack, stopAllTracks } from "./audiobook-player";
 
 let isProcessingAudiobookTracks = false; // Module-level flag to prevent re-entrancy
 
@@ -99,9 +99,9 @@ export const dealWithAudiobookTracks = async ({ startChapter, startParagraph, en
       .sort((a: AudiobookTracksSection, b: AudiobookTracksSection) => {
         if (b.chapter !== a.chapter) return b.chapter - a.chapter;
         return b.paragraph - a.paragraph;
-      })
-      .reverse();
+      });
 
+    console.log(`foundAudiobookSections: ${JSON.stringify(foundAudiobookSections)}`);
     const sectionToApply = foundAudiobookSections[0];
 
     if (sectionToApply && sectionToApply.file) {
@@ -113,7 +113,12 @@ export const dealWithAudiobookTracks = async ({ startChapter, startParagraph, en
       console.log("PINGWING: 112 sectionToApply.file, 0, sectionToApply[clip-begin]", sectionToApply.file, 0, sectionToApply["clip-begin"]);
       loadTrack(sectionToApply.file).then(() => {
         console.log("audio loaded", sectionToApply.file);
+        stopAllTracks();
         playTrack(sectionToApply.file, 0, sectionToApply["clip-begin"]);
+
+        document
+          .querySelector(`section[data-chapter='${sectionToApply.chapter}'] [data-index='${sectionToApply.paragraph}']`)
+          .scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
   } catch (error) {
