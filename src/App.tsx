@@ -21,6 +21,7 @@ import { BookData } from "./booksData/types";
 import { ModalProvider, useModal } from "./context/ModalContext";
 import { BookContentWrapper } from "./components/BookContentWrapper";
 import { BookThemeProvider } from "./context/BookThemeContext";
+import { useAudiobookTracks } from "@/hooks/useAudiobookTracks";
 
 function Shell({
   bookData,
@@ -42,7 +43,10 @@ function Shell({
   /* dynamic visual hooks */
   useCutScene();
   useBackgroundVideo();
-  useBackgroundSongs();
+
+  /* dynamic audio hooks */
+  // useBackgroundSongs(); // TODO PINGWING restore this
+  useAudiobookTracks()
 
   return (
     <>
