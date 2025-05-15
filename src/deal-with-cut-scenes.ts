@@ -1,4 +1,4 @@
-import "./cutscene-video.css";
+import "./styles/cutscene-video.css";
 
 export const dealWithCutScenes = ({ startChapter, startParagraph }) => {
   const cutscenesDefined = [

@@ -106,7 +106,7 @@ export default function App() {
           <BookThemeProvider>
             <BookContentWrapper>
               <ModalProvider bookData={currentBookData}>
-              <Shell bookData={currentBookData} setShowDeepResearch={setShowDeepResearch} showDeepResearch={showDeepResearch} passedText={deepResearchResult} />
+                <Shell bookData={currentBookData} setShowDeepResearch={setShowDeepResearch} showDeepResearch={showDeepResearch} passedText={deepResearchResult} />
                 <ChatContainer
                   onShowDeepResearch={(result) => {
                     setDeepResearchResult(result);

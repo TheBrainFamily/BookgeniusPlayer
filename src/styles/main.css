@@ -1,0 +1,74 @@
+/* Mobile notes icon */
+.mobile-notes-icon {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background-color: #4a90e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 5px auto;
+  border: 2px solid #ddd;
+}
+
+#right-notes.visible {
+  visibility: visible;
+}
+
+#right-notes.hide {
+  display: none;
+}
+
+/* Notes display */
+#right-notes-scrollable-container {
+  /* Default state is hidden */
+  display: none;
+}
+
+/* Modal states */
+.modal-overlay.active,
+#note-modal.visible,
+#note-modal-overlay.visible {
+  /* Visible state for modals */
+  display: block;
+}
+
+/* Fade states */
+.faded {
+  opacity: 0;
+}
+
+.fade-in {
+  opacity: 1;
+}
+
+/* Modal open body state */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Keyframes */
+
+@keyframes shimmerEffect {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  } /* Ensure shimmer moves fully across */
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
