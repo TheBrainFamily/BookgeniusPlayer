@@ -1344,7 +1344,7 @@ export const _1984AudiobookTracksDefined = [
 export const getAudiobookTracksForBook = (bookSlug: string) => {
   switch (bookSlug) {
     case BOOK_SLUGS._1984:
-      return _1984AudiobookTracksDefined.map((track) => ({ ...track, paragraph: track.paragraph - 1 }));
+      return _1984AudiobookTracksDefined;
     // case BOOK_SLUGS.PHARAON:
     //   return pharaonBackgroundTracksDefined;
     // case BOOK_SLUGS.Conrad_Tajny_Agent:

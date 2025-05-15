@@ -45,8 +45,8 @@ function Shell({
   useBackgroundVideo();
 
   /* dynamic audio hooks */
-  // useBackgroundSongs(); // TODO PINGWING restore this
-  useAudiobookTracks()
+  useBackgroundSongs();
+  useAudiobookTracks();
 
   return (
     <>

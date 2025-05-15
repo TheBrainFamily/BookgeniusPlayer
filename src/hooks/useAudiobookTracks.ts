@@ -20,6 +20,6 @@ export function useAudiobookTracks() {
   const { currentChapter, currentParagraph } = useDebounce(location, 300);
 
   useEffect(() => {
-    implRef.current({ currentChapter, currentParagraph });
+    // implRef.current({ currentChapter, currentParagraph });
   }, [currentChapter, currentParagraph]);
 }

@@ -938,8 +938,11 @@ section[data-chapter] [data-index="1"]::first-letter {
 
 section[data-chapter] [data-index] {
   /* 1 line-height (≈ 1 text line) */
-  scroll-margin-top: 3lh;
+  scroll-margin-top: 4.5lh;
 
   /* …or fall back to two ems */
   /* scroll-margin-top: 2em; */
+}
+
+.active-paragraph {
 }

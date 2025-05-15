@@ -62,6 +62,7 @@ interface DealWithBackgroundSongsParams {
 }
 
 export const dealWithBackgroundSongs = async ({ currentChapter, currentParagraph }: DealWithBackgroundSongsParams): Promise<void> => {
+  console.log("PONTON deal with background songs");
   if (isProcessingBackgroundSongs) {
     console.log("dealWithBackgroundSongs: Already processing, skipping this call.");
     return;

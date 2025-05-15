@@ -224,17 +224,12 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
   });
 }
 
-let threeLineHeightPx = 0;
-
 function getThreeLineHeightPx(): number {
-  if (threeLineHeightPx > 0) return threeLineHeightPx;
-
   const element = document.querySelector("#content-container p");
   if (!element) return 0;
 
   const lineHeight = parseFloat(window.getComputedStyle(element).lineHeight);
-  threeLineHeightPx = lineHeight * 3;
-  return threeLineHeightPx;
+  return lineHeight * 2;
 }
 
 // --- Extract Chapter and Paragraph Info ---
@@ -247,7 +242,6 @@ const getParagraphInfo = (element: Element): { chapter: number | null; paragraph
 
 export function setupPageObserver(modal: ModalContextType): IntersectionObserver | null {
   const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.9] };
-  const scrollMarginTopPx = getThreeLineHeightPx();
 
   // --- State for tracking all currently intersecting pages ---
   const intersectingPages = new Set<Element>();
@@ -256,6 +250,8 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
   let currentlyActiveParagraph: { chapter: number; paragraph: number } | null = null;
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
+    const scrollMarginTopPx = getThreeLineHeightPx();
+
     const audioReady = initAudioContext();
     if (!audioReady) {
       console.warn("AudioContext could not be started automatically. User interaction (e.g., clicking 'Enable Audio') might be required.");
@@ -271,11 +267,23 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
 
     const rootRect = observerOptions.root.getBoundingClientRect();
     const zoneTop = rootRect.top + scrollMarginTopPx;
-    const zoneBottom = zoneTop + 0.2 * rootRect.height; // 20% height below this point
+    const zoneBottom = zoneTop + 0.1 * rootRect.height; // 10% height below this point
+
+    console.log("WILCZYNSKA: 276 zoneTop", zoneTop);
+    console.log("WILCZYNSKA: 277 zoneBottom", zoneBottom);
+    console.log("WILCZYNSKA: 278 rootRect", rootRect);
+    console.log("WILCZYNSKA: 279 scrollMarginTopPx", scrollMarginTopPx);
+
+    // Keep track of overlaps clearly:
+    interface Candidate {
+      element: Element;
+      overlap: number;
+      distanceToZoneTop: number;
+    }
 
     let activeParagraph: { chapter: number | null; paragraph: number | null } | null = null;
     let largestOverlap = 0;
-
+    let chosenElement: Element | null = null;
     intersectingPages.forEach((element) => {
       const rect = element.getBoundingClientRect();
       const overlapTop = Math.max(rect.top, zoneTop);
@@ -284,8 +292,16 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
       if (overlap > largestOverlap) {
         largestOverlap = overlap;
         activeParagraph = getParagraphInfo(element);
+        chosenElement = element;
       }
     });
+
+    console.log("WILCZYNSKA: 298 activeParagraph", currentlyActiveParagraph, activeParagraph, largestOverlap, chosenElement);
+
+    document.querySelectorAll(".active-paragraph").forEach((element) => {
+      element.classList.remove("active-paragraph");
+    });
+    chosenElement?.classList.add("active-paragraph");
 
     if (intersectingPages.size > 0) {
       // Default multipliers

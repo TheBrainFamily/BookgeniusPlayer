@@ -97,7 +97,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
 
       console.log(`Audiobook song check: Section is [${sectionToApply}]. Currently playing: ${currentPlayingTrackId}.`);
 
-      console.log("PINGWING: 112 sectionToApply.file, 0, sectionToApply[clip-begin]", sectionToApply.file, 0, sectionToApply["clip-begin"]);
+      console.log("WILCZYNSKA: 112 sectionToApply.file, 0, sectionToApply[clip-begin]", sectionToApply.file, 0, sectionToApply["clip-begin"]);
       loadTrack(sectionToApply.file).then(() => {
         console.log("audio loaded", sectionToApply.file);
         stopAllTracks();
@@ -150,7 +150,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
 
         const scrollToSelectorAgain = `section[data-chapter='${sectionToApply.chapter}'] [data-index='${sectionToApply.paragraph}']`;
 
-        console.log("PINGWING: 164 scrollToSelector", scrollToSelectorAgain);
+        console.log("WILCZYNSKA: 164 scrollToSelector", scrollToSelectorAgain);
         document.querySelector(scrollToSelectorAgain).scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
