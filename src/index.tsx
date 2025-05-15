@@ -5,10 +5,8 @@ import App from "./App";
 
 import "./styles/globals.css";
 import "./styles/styles.css";
-import "./styles/styles-narrow.css";
 import "./styles/main.css";
 import "./styles/modals.css";
-import "./styles/mobile.css";
 import "./styles/inline-avatars.css";
 
 const container = document.getElementById("root")!;

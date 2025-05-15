@@ -11,13 +11,12 @@
   border: 2px solid #ddd;
 }
 
-/* Stagger animation delay variable for entity notes */
-.entity-note {
-  --stagger-delay: 0s;
-}
-
 #right-notes.visible {
   visibility: visible;
+}
+
+#right-notes.hide {
+  display: none;
 }
 
 /* Notes display */
@@ -48,55 +47,7 @@ body.modal-open {
   overflow: hidden;
 }
 
-@keyframes blinkEffect {
-  0%,
-  100% {
-    background-color: rgba(var(--bg-content-light-rgb), 1); /* Replaced inherit */
-  }
-  50% {
-    background-color: var(--entity-talking-highlight-bg-light); /* Stronger blue tint */
-    /* --entity-talking-highlight-border-light: rgba(255, 215, 0, 0.6); */
-  }
-}
-
-/* Keyframes for pulsing scale effect */
-/* @keyframes pulseScale {
-  0% {
-    transform: scale(1.13);
-  }
-  50% {
-    transform: scale(1.15);
-  }
-  100% {
-    transform: scale(1.13);
-  }
-} */
-
-/* @keyframes pulseGlow {
-  0% {
-    transform: scale(1) rotate(0.1deg);
-    box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
-  }
-  50% {
-    transform: scale(1.2) rotate(0.1deg);
-    box-shadow: 0 0 15px var(--entity-image-wrapper-shadow-max-light);
-  }
-  100% {
-    transform: scale(1) rotate(0.1deg);
-    box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
-  }
-} */
-
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(0px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* Keyframes */
 
 @keyframes shimmerEffect {
   0% {

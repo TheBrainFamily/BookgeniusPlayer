@@ -274,3 +274,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+@theme {
+  --animate-pulse-glow: pulseGlow 3s infinite ease-in-out;
+
+  @keyframes pulseGlow {
+    0% {
+      transform: scale(1) rotate(0.1deg);
+      box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
+    }
+    50% {
+      transform: scale(1.1) rotate(0.1deg);
+      box-shadow: 0 0 15px var(--entity-image-wrapper-shadow-max-light);
+    }
+    100% {
+      transform: scale(1) rotate(0.1deg);
+      box-shadow: 0 0 8px var(--entity-image-wrapper-shadow-min-light);
+    }
+  }
+}

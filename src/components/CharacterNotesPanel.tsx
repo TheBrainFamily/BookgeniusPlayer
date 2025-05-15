@@ -32,7 +32,7 @@ export const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
   if (!target || !isSplashHidden) return null;
 
   return createPortal(
-    <motion.div className="flex flex-col justify-center gap-2" initial="hidden" animate="visible" variants={variants.container}>
+    <motion.div className="content-center h-full space-y-3 py-4 overflow-x-hidden" initial="hidden" animate="visible" variants={variants.container}>
       <AnimatePresence>
         {characterNotes.map((characterNote, index) => (
           <motion.div

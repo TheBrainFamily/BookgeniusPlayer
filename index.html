@@ -3,7 +3,7 @@
 <html lang="pl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 
     <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -39,10 +39,10 @@
       <video id="cutscene-video" class="cutscene-video" playsinline></video>
       <p id="cutscene-text"></p>
 
-      <div id="book-container">
-        <div class="notes-container" id="left-notes"></div>
-        <div id="content-container"></div>
-        <div class="notes-container" id="right-notes">
+      <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto px-4 max-w-[120rem] w-full">
+        <div id="left-notes" class="hidden md:block md:flex-1 max-w-[700px] content-center bg-green-700/50 overflow-y-auto"></div>
+        <div id="content-container" class="flex-2 max-w-[900px]"></div>
+        <div id="right-notes" class="hidden lg:block lg:flex-1 max-w-[700px] bg- bg-red-700/50">
           <div id="right-notes-scrollable-container"></div>
         </div>
       </div>
