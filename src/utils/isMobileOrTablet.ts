@@ -5,7 +5,7 @@
  *
  * @returns {boolean} `true` if the device is identified as a mobile or tablet, otherwise `false`.
  */
-export const isMobileOrTabletDevice = (): boolean => {
+export const isMobileOrTablet = (): boolean => {
   if (typeof window === "undefined") return false;
 
   const userAgent = navigator.userAgent || navigator.vendor || ("opera" in window ? (window as { opera: string }).opera : undefined);
@@ -17,7 +17,7 @@ export const isMobileOrTabletDevice = (): boolean => {
 
   // Alternative: check viewport width for a responsive approach
   // 1024px is a common breakpoint for tablets
-  const isSmallViewport = window.innerWidth <= 1024;
+  const isSmallViewport = window.innerWidth <= 1280;
 
   return mobileRegex.test(userAgent) || tabletRegex.test(userAgent) || isSmallViewport;
 };

@@ -3,8 +3,8 @@
 /* ============================================ */
 
 #legacy {
-  /* overscroll-behavior: none;
-  touch-action: none; */
+  overscroll-behavior: none;
+  touch-action: none;
 
   /* --- Base Container Styles --- */
   contain: paint;
@@ -120,6 +120,7 @@
       font-family: var(--font-serif);
       line-height: 1.6;
       color: var(--text-light);
+
       background: linear-gradient(
         to bottom,
         rgba(var(--bg-content-light-rgb), 0) 0%,
@@ -128,9 +129,7 @@
         rgba(var(--bg-content-light-rgb), 0) 100%
       );
 
-      /* ---------- MASK LAYERS (all intersect) ---------- */
       mask-image:
-    /* 1 ▸ vertical visibility window */
         linear-gradient(
           to bottom,
           transparent 0%,
@@ -141,18 +140,21 @@
           rgba(0 0 0 / 0.2) 70%,
           transparent 100%
         ),
+        linear-gradient(
+          to right,
+          transparent 0,
+          rgba(0 0 0 / 0.4) 1%,
+          rgba(0 0 0 / 0.7) 2%,
+          rgba(0 0 0 / 1) 4%,
+          rgba(0 0 0 / 1) 96%,
+          rgba(0 0 0 / 0.7) 98%,
+          rgba(0 0 0 / 0.4) 99%,
+          transparent 100%
+        ),
         radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
 
-      /* combine the three α‑channels */
-      mask-composite: intersect; /* spec name            */
-      -webkit-mask-composite: destination-in;
-      /* background-color: var(--bg-content-light); */
-      /* Gradient transparency: more transparent at edges, fully opaque in middle */
-      /* Add the mask for text fading */
-      padding: 1em 2em; /* Overrides base padding */
+      mask-composite: intersect;
       hyphens: auto;
-      -webkit-hyphens: auto;
-      -ms-hyphens: auto;
 
       /* Headings */
       h1,
@@ -165,27 +167,31 @@
         margin-top: 2.5em;
         margin-bottom: 1em;
         font-weight: bold;
-        color: #000; /* Black headings */
+        color: #000;
         page-break-after: avoid;
       }
+
       h1 {
         font-size: 2.8em;
         text-align: center;
         margin-bottom: 1.5em;
         margin-top: 0;
       }
+
       h2 {
         font-size: 2em;
       }
+
       h3 {
         font-size: 2em;
       }
+
       h4 {
         font-size: 1.4em;
       }
 
       & > section {
-        padding: 10vh 0 50vh;
+        padding: 10vh 3rem 50vh;
       }
 
       /* Chapter sections */
@@ -883,7 +889,7 @@
 #return-to-location-button {
   position: fixed;
   font-size: 16px;
-  /* font-family: var(--default-font-family); */
+  font-family: var(--default-font-family);
   bottom: 14px;
   right: 12px;
   padding: 4px 14px;
@@ -897,7 +903,7 @@
   transition: background-color var(--transition-fast) var(--transition-timing);
 
   &:hover {
-    background-color: var(--return-button-hover-bg);
+    background-color: color-mix(in oklab, var(--secondary) 50%, transparent);
   }
 }
 

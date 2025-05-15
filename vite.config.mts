@@ -121,5 +121,5 @@ export default defineConfig({
   root: "./",
   resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
   build: { outDir: "dist", sourcemap: true, emptyOutDir: true },
-  server: { port: 5173, open: true, proxy: { "/api": "http://localhost:3000" }, watch: { ignored: ["**/src/data/*.xml"] } },
+  server: { port: 5173, open: false, proxy: { "/api": "http://localhost:3000" }, watch: { ignored: ["**/src/data/*.xml"] } },
 });
