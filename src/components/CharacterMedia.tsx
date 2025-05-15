@@ -134,7 +134,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ state, src, isActive, commonA
       key={`video-${state}`}
       {...commonAttrs}
       src={src || null}
-      className={cn("absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out", isActive ? "opacity-100" : "opacity-0")}
+      className={cn("absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out rounded-full", isActive ? "opacity-100" : "opacity-0")}
       autoPlay
       loop
       muted
@@ -151,7 +151,7 @@ const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, 
   const _isVideo = mediaSrc.includes(".mp4");
 
   if (!_isVideo) {
-    return <img {...commonAttrs} src={mediaSrc || videoListensSrc || ""} alt={canonicalName} />;
+    return <img {...commonAttrs} src={mediaSrc || videoListensSrc || ""} alt={canonicalName} className="rounded-full" />;
   }
 
   return (
