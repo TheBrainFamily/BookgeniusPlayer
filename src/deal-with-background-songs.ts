@@ -27,16 +27,10 @@ export const preloadBackgroundTracks = async () => {
   }
 
   const location = getCurrentLocation();
-  const currentChapter = location ? location.chapter : 0;
-  const chaptersToPreloadAhead = 2;
+  const currentChapter = location.currentChapter;
+  const chaptersToPreloadAhead = 1;
 
-  let chaptersToConsider: number[];
-  if (currentChapter > 0) {
-    chaptersToConsider = Array.from({ length: chaptersToPreloadAhead + 1 }, (_, i) => currentChapter + i);
-  } else {
-    console.log("No specific current chapter for preloading, preloading initial chapters.");
-    chaptersToConsider = [1, 2, 3]; // e.g. Chapters 1, 2, 3
-  }
+  const chaptersToConsider = Array.from({ length: chaptersToPreloadAhead + 1 }, (_, i) => currentChapter + i);
   console.log("Preloading tracks for chapters:", chaptersToConsider);
 
   const bookSongs = getBackgroundSongsForBook(CURRENT_BOOK);
@@ -56,41 +50,29 @@ export const preloadBackgroundTracks = async () => {
   for (const section of sectionsToPreload) {
     for (const file of section.files) {
       const trackId = file.replace(".mp3", "");
-      // loadTrack is now async, so await it
-      await loadTrack(trackId /*, section.transitionPoints */);
+      loadTrack(trackId);
     }
   }
   console.log("Dynamic background tracks preloading complete.");
 };
 
 interface DealWithBackgroundSongsParams {
-  startChapter: number;
-  startParagraph: number;
-  endChapter: number;
-  endParagraph: number;
+  currentChapter: number;
+  currentParagraph: number;
 }
 
-export const dealWithBackgroundSongs = async ({ startChapter, startParagraph, endChapter, endParagraph }: DealWithBackgroundSongsParams): Promise<void> => {
+export const dealWithBackgroundSongs = async ({ currentChapter, currentParagraph }: DealWithBackgroundSongsParams): Promise<void> => {
+  console.log("PONTON deal with background songs");
   if (isProcessingBackgroundSongs) {
     console.log("dealWithBackgroundSongs: Already processing, skipping this call.");
     return;
   }
   isProcessingBackgroundSongs = true;
 
-  console.log("dealWithBackgroundSongs invoked with:", { startChapter, startParagraph, endChapter, endParagraph });
+  console.log("dealWithBackgroundSongs invoked with:", { currentChapter, currentParagraph });
 
   try {
-    let chapterToConsider: number;
-    let paragraphToConsider: number;
-
-    if (startChapter === endChapter) {
-      chapterToConsider = startChapter;
-      paragraphToConsider = Math.floor((startParagraph + endParagraph) / 2);
-    } else {
-      chapterToConsider = endChapter; // Prioritize new chapter
-      paragraphToConsider = 1; // Consider start of the new chapter
-    }
-    console.log(`Calculated consideration point: Chapter ${chapterToConsider}, Paragraph ${paragraphToConsider}`);
+    console.log(`Calculated consideration point: Chapter ${currentChapter}, Paragraph ${currentParagraph}`);
 
     const bookSongs = getBackgroundSongsForBook(CURRENT_BOOK);
     if (!bookSongs) {
@@ -101,7 +83,7 @@ export const dealWithBackgroundSongs = async ({ startChapter, startParagraph, en
 
     const foundBackgroundSections = bookSongs
       .filter((section: BackgroundSongSection) => {
-        return section.chapter < chapterToConsider || (section.chapter === chapterToConsider && section.paragraph <= paragraphToConsider);
+        return section.chapter < currentChapter || (section.chapter === currentChapter && section.paragraph <= currentParagraph);
       })
       .sort((a: BackgroundSongSection, b: BackgroundSongSection) => {
         if (b.chapter !== a.chapter) return b.chapter - a.chapter;
@@ -150,7 +132,7 @@ export const dealWithBackgroundSongs = async ({ startChapter, startParagraph, en
         }
       }
     } else {
-      console.log(`No background song section defined for current location (Ch ${chapterToConsider}, P ${paragraphToConsider}).`);
+      console.log(`No background song section defined for current location (Ch ${currentChapter}, P ${currentParagraph}).`);
       // What to do if no section applies?
       // Option 1: Stop any current music if it's not part of *any* section (more complex to check)
       // Option 2: Let current music play out (current behavior if nothing transitions it)

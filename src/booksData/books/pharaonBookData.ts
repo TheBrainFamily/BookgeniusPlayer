@@ -5,7 +5,7 @@ import { getBookThemeColors } from "../bookThemes";
 import { BOOK_SLUGS } from "@/consts";
 
 export const bookData: BookData = {
-  slug: "Pharaon",
+  slug: BOOK_SLUGS.PHARAON,
   metadata: { title: "Pharaon" },
   charactersData: PharaonCharactersData,
   bookXml: PharaonBookXml,

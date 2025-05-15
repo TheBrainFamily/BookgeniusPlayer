@@ -90,7 +90,7 @@ const DeepResearchMarkdown: React.FC<DMProps> = ({ text, className = "" }) => {
       const paragraph = Number(sup.dataset.para);
 
       // global helper you already have
-      goToParagraph({ chapter, paragraph, endChapter: chapter, endParagraph: paragraph });
+      goToParagraph({ currentChapter: chapter, currentParagraph: paragraph });
     };
 
     const el = ref.current;

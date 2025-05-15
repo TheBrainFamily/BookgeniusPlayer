@@ -1,7 +1,4 @@
 export enum BOOK_SLUGS {
-  GET_SHORTY = "shorty",
-  INNOCENCE = "innocence",
-  TRUMP = "trump",
   PHARAON = "Pharaon",
   _1984 = "1984",
   Conrad_Tajny_Agent = "Conrad-Tajny-Agent",

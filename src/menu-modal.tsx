@@ -107,7 +107,7 @@ export default function BookChaptersModal({ onShowDeepResearch, bookData }: Book
     const pageNum = parseInt(page, 10);
     console.log(`Navigating to chapter ${chapterId}, page ${pageNum}`);
     // Implement your navigation logic here
-    goToParagraph({ chapter: chapterId, paragraph: 0, endChapter: chapterId, endParagraph: 0 });
+    goToParagraph({ currentChapter: chapterId, currentParagraph: 0 });
     setActiveModal(null);
     setOverlayOpen(false);
   };

@@ -4,8 +4,8 @@ export async function deepResearchCall(searchQuery: string, location: Location):
   const baseUrl = "/api/deepResearch"; // Assuming localhost for now
   const filter = {
     chapterFrom: 1, // Based on the curl example
-    chapterTo: location.endChapter,
-    paragraphTo: location.endParagraph,
+    chapterTo: location.chapter,
+    paragraphTo: location.paragraph + 1,
   };
 
   const params = new URLSearchParams({ question: searchQuery, filter: JSON.stringify(filter) });

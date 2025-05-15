@@ -1,4 +1,3 @@
-import { isEditActive } from "./sidebarEditor";
 import { hideSearchModal, isSearchActive } from "@/searchModal";
 
 // Handle keyboard navigation events
@@ -10,28 +9,11 @@ export function keyboardNavigationSetup(event: KeyboardEvent) {
     }
     return;
   }
-  if (isEditActive()) {
-    return;
-  }
 
   // Handle other keyboard navigation
   switch (event.key) {
     case "Escape": {
       // Cancel page number input on Escape
-
-      // Close notes panel if open on mobile
-      const isMobileNotesVisible = document.body.classList.contains("notes-visible");
-      if (isMobileNotesVisible) {
-        const leftNotes = document.getElementById("left-notes");
-        if (leftNotes) {
-          leftNotes.classList.remove("active");
-          document.body.classList.remove("notes-visible");
-          const notesOverlay = document.getElementById("notes-overlay");
-          if (notesOverlay) {
-            notesOverlay.classList.remove("active");
-          }
-        }
-      }
 
       // Close any active modals
       document.querySelectorAll(".modal-overlay.active").forEach((modal) => {

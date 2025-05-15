@@ -23,8 +23,22 @@ export const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
 
   /* stable range object */
   const range = useMemo(
-    () => ({ chapter: debouncedLocation.chapter, paragraph: debouncedLocation.paragraph, endChapter: debouncedLocation.endChapter, endParagraph: debouncedLocation.endParagraph }),
-    [debouncedLocation.chapter, debouncedLocation.paragraph, debouncedLocation.endChapter, debouncedLocation.endParagraph],
+    () => ({
+      chapter: debouncedLocation.chapter,
+      paragraph: debouncedLocation.paragraph,
+      endChapter: debouncedLocation.endChapter,
+      endParagraph: debouncedLocation.endParagraph,
+      currentChapter: debouncedLocation.currentChapter,
+      currentParagraph: debouncedLocation.currentParagraph,
+    }),
+    [
+      debouncedLocation.chapter,
+      debouncedLocation.paragraph,
+      debouncedLocation.endChapter,
+      debouncedLocation.endParagraph,
+      debouncedLocation.currentChapter,
+      debouncedLocation.currentParagraph,
+    ],
   );
 
   const characterNotes = useCharacterNotes(range, bookData.charactersData, true, true);
