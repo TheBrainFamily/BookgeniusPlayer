@@ -1,7 +1,6 @@
 import { initAudioContext } from "@/audio-crossfader";
 import { ModalContextType } from "@/context/ModalContext";
 import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
-import React from "react";
 
 const SHOULD_SHOW_EVERYONE = false;
 
@@ -37,7 +36,6 @@ function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextTyp
   const characterSlug = placeholder.dataset.character;
   const isTalking = placeholder.dataset.isTalking === "true";
   const talkingSrc = placeholder.dataset.srcTalking; // Can be video or image
-  const listeningSrc = placeholder.dataset.srcListening; // Can be video or image
 
   if (!characterSlug) return null;
 
@@ -61,8 +59,6 @@ function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextTyp
       video.playsInline = true;
       element = video;
     }
-  } else {
-    // Not talking (or no movingSrc), use picture source
   }
 
   // Configure and return the element
@@ -87,10 +83,19 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
   const characterSlug = character.dataset.character;
   const listeningSrc = character.dataset.srcListening;
   const isTalking = character.dataset.isTalking === "true";
+
+  // Check if a listener has already been attached
+  if (character.dataset.clickListenerAttached === "true") {
+    return;
+  }
+
   character.classList.add("character-highlighted-activated");
   character.addEventListener("click", () => {
     modal.openCharacterDetailsModal(characterSlug, isTalking, listeningSrc);
   });
+
+  // Mark that a listener has been attached
+  character.dataset.clickListenerAttached = "true";
 }
 
 /**
@@ -99,7 +104,6 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
 function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, modal: ModalContextType) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
 
-  console.log("activate media in range", { startChapter, startParagraph, endChapter, endParagraph });
   allParagraphs.forEach((p) => {
     const chapterElement = p.closest("section[data-chapter]") as HTMLElement;
     const chapterStr = chapterElement?.dataset.chapter;
@@ -117,10 +121,6 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
         // Query for either video or image with the class OR the dummy placeholder
         let mediaElement = placeholder.querySelector<HTMLVideoElement | HTMLImageElement>("video.inline-avatar, img.inline-avatar");
         const dummyPlaceholder = placeholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
-        // if (charactersDisplayed.includes(placeholder.dataset.character)) {
-        //   // console.log("character already displayed", placeholder.dataset.character);
-        //   return;
-        // }
         if (inView) {
           if (dummyPlaceholder) {
             // Found a dummy, replace it with actual media
