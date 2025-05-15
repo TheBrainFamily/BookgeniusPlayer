@@ -57,35 +57,21 @@ let isProcessingAudiobookTracks = false; // Module-level flag to prevent re-entr
 // };
 
 interface DealWithAudiobookTracksParams {
-  startChapter: number;
-  startParagraph: number;
-  endChapter: number;
-  endParagraph: number;
+  currentChapter: number;
+  currentParagraph: number;
 }
 
-export const dealWithAudiobookTracks = async ({ startChapter, startParagraph, endChapter, endParagraph }: DealWithAudiobookTracksParams): Promise<void> => {
+export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph }: DealWithAudiobookTracksParams): Promise<void> => {
   if (isProcessingAudiobookTracks) {
     console.log("dealWithAudiobookTracks: Already processing, skipping this call.");
     return;
   }
   isProcessingAudiobookTracks = true;
 
-  console.log("dealWithAudiobookTracks invoked with:", { startChapter, startParagraph, endChapter, endParagraph });
+  console.log("dealWithAudiobookTracks invoked with:", { currentChapter, currentParagraph });
 
   try {
-    let newChapter = false;
-    let chapterToConsider: number;
-    let paragraphToConsider: number;
-
-    if (startChapter === endChapter) {
-      chapterToConsider = startChapter;
-      paragraphToConsider = startParagraph;
-    } else {
-      chapterToConsider = endChapter; // Prioritize new chapter
-      paragraphToConsider = 0; // Consider start of the new chapter
-      newChapter = true;
-    }
-    console.log(`Calculated consideration point: Chapter ${chapterToConsider}, Paragraph ${paragraphToConsider}`);
+    console.log(`Calculated consideration point: Chapter ${currentChapter}, Paragraph ${currentParagraph}`);
 
     const bookTracks = getAudiobookTracksForBook(CURRENT_BOOK);
     if (!bookTracks) {
@@ -96,14 +82,13 @@ export const dealWithAudiobookTracks = async ({ startChapter, startParagraph, en
 
     const foundAudiobookSections = bookTracks
       .filter((section: AudiobookTracksSection) => {
-        return section.chapter < chapterToConsider || (section.chapter === chapterToConsider && section.paragraph <= paragraphToConsider);
+        return section.chapter === currentChapter - 1 || (section.chapter === currentChapter && section.paragraph <= currentParagraph);
       })
       .sort((a: AudiobookTracksSection, b: AudiobookTracksSection) => {
         if (b.chapter !== a.chapter) return b.chapter - a.chapter;
         return b.paragraph - a.paragraph;
       });
 
-    console.log(`foundAudiobookSections: ${JSON.stringify(foundAudiobookSections)}`);
     const sectionToApply = foundAudiobookSections[0];
 
     if (sectionToApply && sectionToApply.file) {
@@ -120,7 +105,7 @@ export const dealWithAudiobookTracks = async ({ startChapter, startParagraph, en
         const createEventsForAudiobook = () => {
           const bookTracks = getAudiobookTracksForBook(CURRENT_BOOK);
           const sectionsToApply = bookTracks.filter(
-            (section: AudiobookTracksSection) => section.chapter === chapterToConsider || (section.chapter === chapterToConsider + 1 && section.paragraph === 0),
+            (section: AudiobookTracksSection) => section.chapter === currentChapter || (section.chapter === currentChapter + 1 && section.paragraph <= 1),
           );
           if (!sectionsToApply) {
             console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot determine Audiobook song.`);
@@ -129,7 +114,7 @@ export const dealWithAudiobookTracks = async ({ startChapter, startParagraph, en
           }
 
           const events: AudiobookTrackEvent[] = sectionsToApply
-            .filter((section) => section.chapter === chapterToConsider)
+            .filter((section) => section.chapter === currentChapter)
             .map((section: AudiobookTracksSection, index: number) => {
               return {
                 timestamp: section["clip-end"],
@@ -137,29 +122,21 @@ export const dealWithAudiobookTracks = async ({ startChapter, startParagraph, en
                   console.log("PINGWING: 112 sectionToApply.file, 0, sectionToApply[clip-begin]", section.file, 0, section["clip-begin"]);
                   const currentChapter = sectionsToApply[index].chapter;
                   const nextSectionChapter = sectionsToApply[index + 1].chapter;
-                  const nextElementSelector = `section[data-chapter='${nextSectionChapter}'] [data-index='${sectionsToApply[index + 1].paragraph + 1}']`;
+                  const nextElementSelector = `section[data-chapter='${nextSectionChapter}'] [data-index='${sectionsToApply[index + 1].paragraph}']`;
+                  const nextElement = document.querySelector(nextElementSelector);
+
                   console.log("PINGWING: 112 nextElementSelector", nextElementSelector);
                   if (currentChapter === nextSectionChapter) {
                     isProcessingAudiobookTracks = true;
-
                     setTimeout(() => {
                       isProcessingAudiobookTracks = false;
                     }, 1000);
-                    const nextElement = document.querySelector(nextElementSelector);
-                    if (nextElement) {
-                      nextElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                    } else {
-                      console.log("next element not found");
-                    }
+                  }
+
+                  if (nextElement) {
+                    nextElement.scrollIntoView({ behavior: "smooth", block: "start" });
                   } else {
-                    const nextChapterElementSelector = `section[data-chapter='${nextSectionChapter}'] [data-index='${sectionsToApply[index + 1].paragraph}']`;
-                    console.log("PINGWING: 112 nextChapterElementSelector", nextChapterElementSelector);
-                    const nextChapterElement = document.querySelector(nextChapterElementSelector);
-                    if (nextChapterElement) {
-                      nextChapterElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                    } else {
-                      console.log("next chapter element not found");
-                    }
+                    console.log("next chapter element not found");
                   }
                 },
                 triggered: false,
@@ -171,7 +148,7 @@ export const dealWithAudiobookTracks = async ({ startChapter, startParagraph, en
 
         playTrack(sectionToApply.file, 0, sectionToApply["clip-begin"], events);
 
-        const scrollToSelectorAgain = `section[data-chapter='${sectionToApply.chapter}'] [data-index='${sectionToApply.paragraph + (newChapter ? 0 : 1)}']`;
+        const scrollToSelectorAgain = `section[data-chapter='${sectionToApply.chapter}'] [data-index='${sectionToApply.paragraph}']`;
 
         console.log("PINGWING: 164 scrollToSelector", scrollToSelectorAgain);
         document.querySelector(scrollToSelectorAgain).scrollIntoView({ behavior: "smooth", block: "start" });

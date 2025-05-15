@@ -46,6 +46,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
+    "@types/lodash": "^4.17.16",
     "@types/lodash.debounce": "^4.0.9",
     "@types/mime-types": "^2.1.4",
     "@types/morgan": "^1.9.9",

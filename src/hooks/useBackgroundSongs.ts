@@ -9,17 +9,17 @@ const implRef = { current: impl };
 
 if (import.meta.hot) {
   import.meta.hot.accept("@/deal-with-background-songs", (mod) => {
-    implRef.current = mod.dealWithAudiobookTracks;
-    console.info("[HMR] dealWithAudiobookTracks updated");
+    implRef.current = mod.dealWithBackgroundSongs;
+    console.info("[HMR] useBackgroundSongs updated");
   });
 }
 
 export function useBackgroundSongs() {
   const { location } = useLocation();
 
-  const { chapter, paragraph, endChapter, endParagraph } = useDebounce(location, 300);
+  const { currentChapter, currentParagraph } = useDebounce(location, 300);
 
   useEffect(() => {
-    implRef.current({ startChapter: location.chapter, startParagraph: location.paragraph, endChapter: location.endChapter, endParagraph: location.endParagraph });
-  }, [chapter, paragraph, endChapter, endParagraph]);
+    implRef.current({ currentChapter, currentParagraph });
+  }, [currentChapter, currentParagraph]);
 }

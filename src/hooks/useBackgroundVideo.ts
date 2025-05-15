@@ -15,9 +15,9 @@ if (import.meta.hot) {
 
 export function useBackgroundVideo() {
   const { location } = useLocation();
-  const { chapter } = useDebounce(location, 300);
+  const { currentChapter, currentParagraph } = useDebounce(location, 300);
 
   useEffect(() => {
-    implRef.current({ startChapter: chapter, startParagraph: 1, endChapter: chapter, endParagraph: 10_000 });
-  }, [chapter]);
+    implRef.current({ currentChapter, currentParagraph });
+  }, [currentChapter, currentParagraph]);
 }

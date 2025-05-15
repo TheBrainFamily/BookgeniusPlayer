@@ -41,7 +41,7 @@ const performServerSearch = debounce(
 
       // Add click event to navigate to this paragraph
       resultItem.addEventListener("click", () => {
-        goToParagraph({ chapter: match.chapter, paragraph: match.paragraphNumber, endChapter: match.chapter, endParagraph: match.paragraphNumber });
+        goToParagraph({ currentChapter: match.chapter, currentParagraph: match.paragraphNumber });
         hideSearchModal();
 
         // Find and highlight the paragraph on the page
@@ -228,12 +228,7 @@ export async function performSearch(query: string) {
 
           // Add click event to navigate to this result
           resultItem.addEventListener("click", () => {
-            goToParagraph({
-              chapter: i,
-              paragraph: parseInt(paragraph.getAttribute("data-index") || "0", 10),
-              endChapter: i,
-              endParagraph: parseInt(paragraph.getAttribute("data-index") || "0", 10),
-            });
+            goToParagraph({ currentChapter: i, currentParagraph: parseInt(paragraph.getAttribute("data-index") || "0", 10) });
             hideSearchModal();
 
             // Find and highlight the paragraph on the page

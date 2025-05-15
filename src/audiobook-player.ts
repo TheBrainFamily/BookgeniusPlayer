@@ -220,13 +220,13 @@ function stopTrackInternal(trackId: string) {
     state.sourceNode.onended = null; // Crucial: remove handler before stopping
     try {
       state.sourceNode.stop();
-    } catch {
+    } catch (e) {
       // Linter: Unused 'e' -> _ignoredError -> empty catch
       console.warn(`GOZDECKI Ignoring error stopping source node for ${trackId}:`, e);
     }
     try {
       state.sourceNode.disconnect();
-    } catch {
+    } catch (e) {
       // Linter: Unused 'e' -> empty catch
       console.warn(`GOZDECKI Ignoring error disconnecting source node for ${trackId}:`, e);
     }
@@ -235,7 +235,7 @@ function stopTrackInternal(trackId: string) {
   if (state.gainNode) {
     try {
       state.gainNode.disconnect();
-    } catch {
+    } catch (e) {
       // Linter: Unused 'e' -> empty catch
       console.warn(`GOZDECKI Ignoring error disconnecting gain node for ${trackId}:`, e);
     }

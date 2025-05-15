@@ -224,38 +224,43 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
   });
 }
 
-// Set up intersection observer to detect visible pages
-export function setupPageObserver(modal: ModalContextType): IntersectionObserver | null {
-  // Threshold values for determining when a page is "visible enough"
-  const observerOptions = {
-    root: document.getElementById("content-container"),
-    rootMargin: "0px",
-    threshold: 0.05, // Adjust threshold if needed, maybe lower if elements are small
-  };
+let threeLineHeightPx = 0;
 
-  // Ensure the root element exists before creating the observer
-  if (!observerOptions.root) {
-    console.error("Observer root element 'content-container' not found. Cannot setup page observer.");
-    return null; // Return null if root doesn't exist
-  }
+function getThreeLineHeightPx(): number {
+  if (threeLineHeightPx > 0) return threeLineHeightPx;
+
+  const element = document.querySelector("#content-container p");
+  if (!element) return 0;
+
+  const lineHeight = parseFloat(window.getComputedStyle(element).lineHeight);
+  threeLineHeightPx = lineHeight * 3;
+  return threeLineHeightPx;
+}
+
+// --- Extract Chapter and Paragraph Info ---
+const getParagraphInfo = (element: Element): { chapter: number | null; paragraph: number | null } => {
+  const paragraphStr = (element as HTMLElement).dataset.index;
+  const chapterElement = element.closest("section[data-chapter]");
+  const chapterStr = chapterElement ? (chapterElement as HTMLElement).dataset.chapter : null;
+  return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
+};
+
+export function setupPageObserver(modal: ModalContextType): IntersectionObserver | null {
+  const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.9] };
+  const scrollMarginTopPx = getThreeLineHeightPx();
 
   // --- State for tracking all currently intersecting pages ---
   const intersectingPages = new Set<Element>();
   let currentlyActivePageElement: Element | null = null;
   let currentlyLastActivePageElement: Element | null = null;
+  let currentlyActiveParagraph: { chapter: number; paragraph: number } | null = null;
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
     const audioReady = initAudioContext();
     if (!audioReady) {
       console.warn("AudioContext could not be started automatically. User interaction (e.g., clicking 'Enable Audio') might be required.");
     }
-    // const rootElement = observerOptions.root; // root is guaranteed to exist here
-    // if (!rootElement) { // No longer needed
-    //   console.error("Observer root element not found:", observerOptions.root);
-    //   return;
-    // }
 
-    // 1. Update the set of intersecting pages based on the current changes
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         intersectingPages.add(entry.target);
@@ -264,18 +269,32 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
       }
     });
 
-    // 2. Determine the elements within the "focus zone" (30%-60% vertically)
-    if (intersectingPages.size > 0) {
-      const rootRect = observerOptions.root.getBoundingClientRect();
+    const rootRect = observerOptions.root.getBoundingClientRect();
+    const zoneTop = rootRect.top + scrollMarginTopPx;
+    const zoneBottom = zoneTop + 0.2 * rootRect.height; // 20% height below this point
 
+    let activeParagraph: { chapter: number | null; paragraph: number | null } | null = null;
+    let largestOverlap = 0;
+
+    intersectingPages.forEach((element) => {
+      const rect = element.getBoundingClientRect();
+      const overlapTop = Math.max(rect.top, zoneTop);
+      const overlapBottom = Math.min(rect.bottom, zoneBottom);
+      const overlap = Math.max(0, overlapBottom - overlapTop);
+      if (overlap > largestOverlap) {
+        largestOverlap = overlap;
+        activeParagraph = getParagraphInfo(element);
+      }
+    });
+
+    if (intersectingPages.size > 0) {
       // Default multipliers
-      let topMultiplier = 0.05;
-      let bottomMultiplier = 0.4;
+      const topMultiplier = 0.05;
+      let bottomMultiplier = 0.3;
 
       // Check media query for landscape mode on smaller wide screens
       const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
       if (landscapeMediaQuery.matches) {
-        topMultiplier = 0.05;
         bottomMultiplier = 0.95; // Use larger bottom zone in this mode
       }
 
@@ -299,31 +318,32 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
         const bottomFocusedPageElement = focusedPages[focusedPages.length - 1];
 
         // 3. Update active state only if the topmost or bottommost focused page has changed
-        if (topFocusedPageElement !== currentlyActivePageElement || bottomFocusedPageElement !== currentlyLastActivePageElement) {
-          console.log("[Observer] Top focused page:", topFocusedPageElement.id || topFocusedPageElement);
-          console.log("[Observer] Bottom focused page:", bottomFocusedPageElement.id || bottomFocusedPageElement);
+        if (topFocusedPageElement !== currentlyActivePageElement || bottomFocusedPageElement !== currentlyLastActivePageElement || activeParagraph !== currentlyActiveParagraph) {
+          console.log("[Observer] Top focused page:", topFocusedPageElement);
+          console.log("[Observer] Bottom focused page:", bottomFocusedPageElement);
+          console.log("[Observer] Active paragraph:", activeParagraph);
 
           currentlyActivePageElement = topFocusedPageElement;
           currentlyLastActivePageElement = bottomFocusedPageElement;
-
-          // --- Extract Chapter and Paragraph Info ---
-          const getParagraphInfo = (element: Element): { chapter: number | null; paragraph: number | null } => {
-            const paragraphStr = (element as HTMLElement).dataset.index;
-            const chapterElement = element.closest("section[data-chapter]");
-            const chapterStr = chapterElement ? (chapterElement as HTMLElement).dataset.chapter : null;
-            return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
-          };
+          currentlyActiveParagraph = activeParagraph;
 
           const startInfo = getParagraphInfo(topFocusedPageElement);
           const endInfo = getParagraphInfo(bottomFocusedPageElement);
           // -----------------------------------------
 
           // 4. Call update logic if we have valid info
-          if (startInfo.chapter !== null && startInfo.paragraph !== null && endInfo.chapter !== null && endInfo.paragraph !== null) {
+          if (startInfo.chapter !== null && startInfo.paragraph !== null && endInfo.chapter !== null && endInfo.paragraph !== null && activeParagraph !== null) {
             console.log(`[Observer] Updating notes for Ch ${startInfo.chapter}:${startInfo.paragraph} to Ch ${endInfo.chapter}:${endInfo.paragraph} (Focus Zone)`);
             console.log("setting current location from intersection (focus zone)", { chapter: startInfo.chapter, paragraph: startInfo.paragraph });
             // Set current location based on the top element in the focus zone
-            setCurrentLocation({ chapter: startInfo.chapter, paragraph: startInfo.paragraph, endChapter: endInfo.chapter, endParagraph: endInfo.paragraph });
+            setCurrentLocation({
+              chapter: startInfo.chapter,
+              paragraph: startInfo.paragraph,
+              endChapter: endInfo.chapter,
+              endParagraph: endInfo.paragraph,
+              currentChapter: activeParagraph.chapter,
+              currentParagraph: activeParagraph.paragraph,
+            });
 
             // --- Activate/Deactivate Media ---
             activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, modal);
@@ -348,23 +368,18 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
         console.log("[Observer] No pages intersecting viewport.");
         currentlyActivePageElement = null;
         currentlyLastActivePageElement = null;
-        // Potentially clear notes or update state here
-        // updateParagraphNotes({ startChapter: null, startParagraph: null, endChapter: null, endParagraph: null }); // Example: Clear notes
-        // setCurrentLocation({ chapter: null, paragraph: null }); // Example: Clear location
       }
     }
   }, observerOptions);
 
-  // Observe all paragraphs within chapter sections
   const paragraphsToObserve = document.querySelectorAll("section[data-chapter] [data-index]");
   if (paragraphsToObserve.length === 0) {
     console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
-    // We still return the observer, it just won't observe anything initially.
   } else {
     paragraphsToObserve.forEach((paragraph) => {
       observer.observe(paragraph);
     });
   }
 
-  return observer; // Return the created observer instance
+  return observer;
 }

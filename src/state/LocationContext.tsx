@@ -7,6 +7,8 @@ export interface Location {
   paragraph: number;
   endChapter: number;
   endParagraph: number;
+  currentChapter: number;
+  currentParagraph: number;
 }
 
 /* ------------------------------------------------------------------ */
@@ -14,9 +16,9 @@ export interface Location {
 const loadFromLS = (): Location => {
   try {
     const raw = localStorage.getItem("furthestLocation");
-    return raw ? JSON.parse(raw) : { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 };
+    return raw ? JSON.parse(raw) : { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 };
   } catch {
-    return { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 };
+    return { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 };
   }
 };
 
@@ -26,7 +28,7 @@ interface LocationCtx {
   setLocation: (l: Location) => void;
 }
 export const LocationContext = createContext<LocationCtx>({
-  location: { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 },
+  location: { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 },
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   setLocation: () => {},
 });
