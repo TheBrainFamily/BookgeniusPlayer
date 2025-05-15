@@ -243,3 +243,5 @@ function stopTrackInternal(trackId: string) {
   }
   // console.log(`Stopped internal nodes for ${trackId}`);
 }
+
+window.stopAllTracks = stopAllTracks;

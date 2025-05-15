@@ -9,7 +9,6 @@
 //   getCurrentSectionTracks,
 // } from "./audio-crossfader"; // Adjust path as needed
 import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
-import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { getAudiobookTracksForBook, AudiobookTracksSection } from "@/getAudiobookTracksForBook"; // Adjust path as needed
 import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audiobook-player";
 

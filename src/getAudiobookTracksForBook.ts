@@ -3,13 +3,7 @@ import { BOOK_SLUGS } from "@/consts";
 export type AudiobookTracksSection = { chapter: number; paragraph: number; file: string; smile_id: string; "clip-begin": number; "clip-end": number };
 
 export const _1984AudiobookTracksDefined = [
-  { chapter: 1, paragraph: 0, smile_id: "sec2", file: "audiobook_data/book0.mp3", "clip-begin": 0, "clip-end": 0.72 },
-  { chapter: 1, paragraph: 1, smile_id: "sec3", file: "audiobook_data/book0.mp3", "clip-begin": 0.72, "clip-end": 6.04 },
-  { chapter: 1, paragraph: 2, smile_id: "sec4", file: "audiobook_data/book0.mp3", "clip-begin": 6.04, "clip-end": 8.08 },
-  { chapter: 1, paragraph: 3, smile_id: "sec5", file: "audiobook_data/book0.mp3", "clip-begin": 8.08, "clip-end": 134.88 },
-  { chapter: 1, paragraph: 4, smile_id: "sec6", file: "audiobook_data/book0.mp3", "clip-begin": 134.88, "clip-end": 138.4 },
-  { chapter: 1, paragraph: 5, smile_id: "sec7", file: "audiobook_data/book0.mp3", "clip-begin": 138.4, "clip-end": 140.84 },
-  { chapter: 1, paragraph: 6, smile_id: "sec8", file: "audiobook_data/book0.mp3", "clip-begin": 140.84, "clip-end": 142.92 },
+  { chapter: 1, paragraph: 6, smile_id: "sec8", file: "audiobook_data/book0.mp3", "clip-begin": 138.4, "clip-end": 142.92 },
   { chapter: 1, paragraph: 7, smile_id: "sec9", file: "audiobook_data/book0.mp3", "clip-begin": 142.92, "clip-end": 163.84 },
   { chapter: 1, paragraph: 8, smile_id: "sec10", file: "audiobook_data/book0.mp3", "clip-begin": 163.84, "clip-end": 234.48 },
   { chapter: 1, paragraph: 9, smile_id: "sec11", file: "audiobook_data/book0.mp3", "clip-begin": 234.48, "clip-end": 282.16 },
@@ -1344,7 +1338,13 @@ export const _1984AudiobookTracksDefined = [
 export const getAudiobookTracksForBook = (bookSlug: string) => {
   switch (bookSlug) {
     case BOOK_SLUGS._1984:
-      return _1984AudiobookTracksDefined;
+      return _1984AudiobookTracksDefined.map((track) => {
+        if (track.chapter === 1) {
+          return { ...track, paragraph: track.paragraph - 6 };
+        } else {
+          return track;
+        }
+      });
     // case BOOK_SLUGS.PHARAON:
     //   return pharaonBackgroundTracksDefined;
     // case BOOK_SLUGS.Conrad_Tajny_Agent:
