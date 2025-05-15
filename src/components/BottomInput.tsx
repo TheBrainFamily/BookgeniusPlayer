@@ -10,7 +10,7 @@ import { CURRENT_BOOK } from "@/consts"; // Adjust path
 import { useLocation } from "@/state/LocationContext"; // Adjust path
 import { showSearchModal, performSearch, hideSearchModal, isSearchActive } from "@/searchModal"; // Adjust path
 import { deepResearchCall } from "@/deepResearchCall"; // Adjust path
-import { isMobileOrTabletDevice } from "@/utils/isMobileOrTabletDevice";
+import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
 
 // --- Helper Hook for Landscape Detection ---
 const useDeviceOrientation = () => {
@@ -76,9 +76,11 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
     }
   }, [response, isRecording]);
 
+  const isMobileOrTablet = useIsMobileOrTablet();
+
   useEffect(() => {
-    if (isMobileOrTabletDevice()) setIsRightNotesBlankHidden(true);
-  }, []);
+    setIsRightNotesBlankHidden(isMobileOrTablet);
+  }, [isMobileOrTablet]);
 
   // --- Event Handlers ---
   // const handleFocus = () => setIsFocused(true); // Remove if not needed
@@ -285,7 +287,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
       </div>
 
       {/* ToDo: Remove when layout will be refactored */}
-      {!isRightNotesBlankHidden && <div id="right-notes-blank" className="hidden lg:block lg:flex-1 max-w-[700px]" />}
+      {!isRightNotesBlankHidden && <div id="right-notes-blank" className="hidden xl:block xl:flex-1 max-w-[700px]" />}
     </footer>
   );
 }

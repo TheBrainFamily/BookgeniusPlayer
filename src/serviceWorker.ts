@@ -1,6 +1,6 @@
 // Service worker registration and handling
 
-import { isMobileOrTabletDevice } from "./utils/isMobileOrTabletDevice";
+import { isMobileOrTablet } from "./utils/isMobileOrTablet";
 
 const VIDEO_TIMEOUT_MS = 5000;
 const SW_TIMEOUT_MS = 7000;
@@ -134,9 +134,20 @@ const updateRightNotesVisibility = (): void => {
     return;
   }
 
-  if (isMobileOrTabletDevice()) {
+  if (isMobileOrTablet()) {
     rightNotesElement.classList.add("hide");
   } else {
     rightNotesElement.classList.remove("hide");
   }
+
+  const handleResize = () => {
+    if (isMobileOrTablet()) {
+      rightNotesElement.classList.add("hide");
+    } else {
+      rightNotesElement.classList.remove("hide");
+    }
+  };
+
+  window.addEventListener("resize", handleResize);
+  window.addEventListener("orientationchange", handleResize);
 };
