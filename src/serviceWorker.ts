@@ -6,7 +6,7 @@ const VIDEO_TIMEOUT_MS = 5000;
 const SW_TIMEOUT_MS = 10000;
 const START_TIME = Date.now();
 
-const ENABLE_SPLASH_LOGS = true;
+const ENABLE_SPLASH_LOGS = false;
 
 const logWithTime = (message: string) => {
   if (!ENABLE_SPLASH_LOGS) return;
