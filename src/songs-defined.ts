@@ -246,7 +246,7 @@ const _1984BackgroundSongsDefined = [
 
 const conradTajnyAgentBackgroundSongsDefined = [{ chapter: 1, paragraph: 1, files: ["LondonNoirAmbience.mp3", "script-one.mp3"] }];
 
-const krolowaSnieguBackgroundSongsDefined: BackgroundSongSection[] = [
+const krolowaSnieguBackgroundSongsDefined = [
   { chapter: 1, paragraph: 1, files: ["chapter_1_paragraph_1.mp3", "chapter_1_paragraph_1b.mp3"] },
   { chapter: 2, paragraph: 1, files: ["chapter_2_paragraph_1.mp3", "chapter_2_paragraph_1b.mp3"] },
   { chapter: 2, paragraph: 24, files: ["chapter_2_paragraph_24.mp3", "chapter_2_paragraph_24b.mp3"] },
@@ -274,6 +274,8 @@ export const getBackgroundSongsForBook = (bookSlug: string) => {
       return pharaonBackgroundSongsDefined;
     case BOOK_SLUGS.Conrad_Tajny_Agent:
       return conradTajnyAgentBackgroundSongsDefined;
+    case BOOK_SLUGS.Krolowa_Sniegu: 
+       return krolowaSnieguBackgroundSongsDefined;
     default:
       return [];
   }
