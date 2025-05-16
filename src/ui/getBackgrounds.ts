@@ -2,13 +2,36 @@ import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
 import type { Background } from "./background";
 
 export const getBackgrounds = (): Background[] => {
-  const toBackground = ({ chapter, file, startParagraph }: { chapter: number; file: string; startParagraph?: number }) => ({
-    startChapter: chapter,
-    startParagraph: startParagraph ?? 1,
-    file,
-    endChapter: chapter,
-    endParagraph: 10_000,
-  });
+  // Helper function to process background inputs and set proper end paragraphs
+  const processBackgroundInputs = (inputs: { chapter: number; file: string; startParagraph?: number }[]): Background[] => {
+    // Group by chapter
+    const chapterGroups: Record<number, { chapter: number; file: string; startParagraph: number }[]> = {};
+
+    // First, normalize and group by chapter
+    inputs.forEach(({ chapter, file, startParagraph = 0 }) => {
+      if (!chapterGroups[chapter]) {
+        chapterGroups[chapter] = [];
+      }
+      chapterGroups[chapter].push({ chapter, file, startParagraph });
+    });
+
+    // Process each chapter group
+    const result: Background[] = [];
+    Object.values(chapterGroups).forEach((backgrounds) => {
+      // Sort by startParagraph
+      backgrounds.sort((a, b) => a.startParagraph - b.startParagraph);
+
+      // Set endParagraph for each background
+      backgrounds.forEach((bg, index) => {
+        const nextBg = backgrounds[index + 1];
+        const endParagraph = nextBg ? nextBg.startParagraph - 1 : 10_000; // 10,000 for the last bg in chapter
+
+        result.push({ startChapter: bg.chapter, startParagraph: bg.startParagraph, file: bg.file, endChapter: bg.chapter, endParagraph });
+      });
+    });
+
+    return result;
+  };
 
   const backgroundsInput = [
     { chapter: 1, file: "background-egyptian-streets-palace-visible-loop.mp4" },
@@ -79,7 +102,7 @@ export const getBackgrounds = (): Background[] => {
     { chapter: 66, file: "chapter_66.mp4" },
     { chapter: 67, file: "chapter_67.mp4" },
   ];
-  let backgrounds = backgroundsInput.map(toBackground);
+  let backgrounds = processBackgroundInputs(backgroundsInput);
 
   if (CURRENT_BOOK === BOOK_SLUGS._1984) {
     const backgroundsInput = [
@@ -108,7 +131,7 @@ export const getBackgrounds = (): Background[] => {
       { chapter: 23, file: "chapter_23.mp4" },
       { chapter: 24, file: "chapter_24.mp4" },
     ];
-    backgrounds = backgroundsInput.map(toBackground);
+    backgrounds = processBackgroundInputs(backgroundsInput);
   }
 
   if (CURRENT_BOOK === BOOK_SLUGS.Conrad_Tajny_Agent) {
@@ -127,28 +150,27 @@ export const getBackgrounds = (): Background[] => {
       { chapter: 12, file: "openai-high-12.png" },
       { chapter: 13, file: "openai-high-13.png" },
     ];
-    backgrounds = backgroundsInput.map(toBackground);
+    backgrounds = processBackgroundInputs(backgroundsInput);
   }
 
   if (CURRENT_BOOK === BOOK_SLUGS.Krolowa_Sniegu) {
     const backgroundsInput = [
-      { chapter: 1, startParagraph: 1, file: "forest-at-twilight.mp4" },
-      { chapter: 1, startParagraph: 6, file: "frozen-plain.mp4" },
-      { chapter: 2, startParagraph: 1, file: "grandmother-house.mp4" },
+      { chapter: 1, startParagraph: 0, file: "chapter-1-background.mp4" },
+      { chapter: 2, startParagraph: 0, file: "grandmother-house.mp4" },
       { chapter: 2, startParagraph: 24, file: "snow-covered-forest.mp4" },
-      { chapter: 3, startParagraph: 1, file: "riverbank.mp4" },
+      { chapter: 3, startParagraph: 0, file: "riverbank.mp4" },
       { chapter: 3, startParagraph: 20, file: "cottage-with-flower-covered-walls.mp4" },
-      { chapter: 4, startParagraph: 1, file: "forest-at-twilight.mp4" },
+      { chapter: 4, startParagraph: 0, file: "forest-at-twilight.mp4" },
       { chapter: 4, startParagraph: 22, file: "palace-interior.mp4" },
-      { chapter: 5, startParagraph: 1, file: "robbers-camp.mp4" },
+      { chapter: 5, startParagraph: 0, file: "robbers-camp.mp4" },
       { chapter: 5, startParagraph: 36, file: "frozen-plain.mp4" },
-      { chapter: 6, startParagraph: 1, file: "lapland-tent.mp4" },
+      { chapter: 6, startParagraph: 0, file: "lapland-tent.mp4" },
       { chapter: 6, startParagraph: 6, file: "finland-cottage.mp4" },
       { chapter: 6, startParagraph: 28, file: "ice-castle-exterior.mp4" },
       { chapter: 7, startParagraph: 0, file: "ice-castle-interior.mp4" },
       { chapter: 7, startParagraph: 25, file: "summer-garden.mp4" },
     ];
-    backgrounds = backgroundsInput.map(toBackground);
+    backgrounds = processBackgroundInputs(backgroundsInput);
   }
 
   return backgrounds;
