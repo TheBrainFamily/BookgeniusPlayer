@@ -8,6 +8,7 @@ import { useBookContent } from "./hooks/useBookContent";
 
 import BookChaptersModal from "./menu-modal";
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
+import AudioPlayer from "./components/AudioPlayer";
 import { runLegacyInit } from "./main";
 import { CharacterNotesPanel } from "./components/CharacterNotesPanel";
 import { RightNotesPanel } from "./components/RightNotesPanel";
@@ -55,6 +56,7 @@ function Shell({
       <CharacterNotesPanel bookData={bookData} />
       <RightNotesPanel />
       <DeepResearchModal isOpen={showDeepResearch} onClose={() => setShowDeepResearch(false)} passedText={passedText} />
+      <AudioPlayer />
     </>
   );
 }

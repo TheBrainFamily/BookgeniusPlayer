@@ -29,13 +29,23 @@ export function useAudiobookTracks() {
   }, [currentChapter, currentParagraph]);
 }
 
-window.playAudiobook = () => {
+export const playAudiobook = () => {
   shouldPlayAudiobook = true;
   const { currentChapter, currentParagraph } = getCurrentLocation();
   implRef.current({ currentChapter, currentParagraph });
 };
 
-window.stopAudiobook = () => {
+export const stopAudiobook = () => {
   shouldPlayAudiobook = false;
   stopAllTracks();
 };
+
+// Add TypeScript declarations for window properties
+declare global {
+  interface Window {
+    playAudiobook: typeof playAudiobook;
+    stopAudiobook: typeof stopAudiobook;
+  }
+}
+window.playAudiobook = playAudiobook;
+window.stopAudiobook = stopAudiobook;

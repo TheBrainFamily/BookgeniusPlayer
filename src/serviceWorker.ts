@@ -3,13 +3,24 @@
 import { isMobileOrTablet } from "./utils/isMobileOrTablet";
 
 const VIDEO_TIMEOUT_MS = 5000;
-const SW_TIMEOUT_MS = 7000;
+const SW_TIMEOUT_MS = 10000;
+const START_TIME = Date.now();
+
+const ENABLE_SPLASH_LOGS = false;
+
+const logWithTime = (message: string) => {
+  if (!ENABLE_SPLASH_LOGS) return;
+  const elapsedMs = Date.now() - START_TIME;
+  console.log(`[SPLASH ${elapsedMs}ms] ${message}`);
+};
 
 export const dealWithSW = () => {
+  logWithTime("Initializing splash screen handling");
   updateRightNotesVisibility();
 
   const splash = document.getElementById("splash");
   const bgVideoA = document.getElementById("bg-video-a") as HTMLVideoElement | null;
+  const bgVideoB = document.getElementById("bg-video-b") as HTMLVideoElement | null;
 
   if (!splash) {
     console.error("Splash screen element 'splash' not found.");
@@ -17,70 +28,113 @@ export const dealWithSW = () => {
   }
 
   let serviceWorkerHandled = false;
-  let videoReady = false;
-  let videoTimeoutId: number | undefined;
+  let videoAReady = false;
+  let videoBReady = false;
+  let videoTimeoutId: number | undefined = undefined;
   let swTimeoutId: number | undefined;
+
+  const videoReady = () => videoAReady || videoBReady;
 
   const tryHideSplash = () => {
     if (splash.classList.contains("splash--hide")) {
       return;
     }
 
-    if (serviceWorkerHandled && videoReady) {
+    logWithTime(`Trying to hide splash: videoAReady=${videoAReady}, videoBReady=${videoBReady}`);
+
+    if (videoReady()) {
+      logWithTime("All conditions met, hiding splash screen");
       splash.classList.add("splash--hide");
 
       if (videoTimeoutId) clearTimeout(videoTimeoutId);
       if (swTimeoutId) clearTimeout(swTimeoutId);
 
-      // Dispatch custom event for components to listen to (for useSplashHidden)
       window.dispatchEvent(new CustomEvent("splashHidden"));
     }
   };
 
   if (bgVideoA) {
-    const setVideoAsReady = () => {
-      if (!videoReady) {
-        videoReady = true;
+    logWithTime(`Background video A found: readyState=${bgVideoA.readyState}, paused=${bgVideoA.paused}, src=${bgVideoA.src || "none"}`);
 
-        bgVideoA.removeEventListener("playing", handleVideoReadyEvent);
-        bgVideoA.removeEventListener("canplay", handleVideoReadyEvent);
+    const setVideoAAsReady = () => {
+      if (!videoAReady) {
+        videoAReady = true;
+        logWithTime("Video A marked as ready");
 
-        if (videoTimeoutId) {
-          clearTimeout(videoTimeoutId);
-        }
+        bgVideoA.removeEventListener("playing", handleVideoAReadyEvent);
+        bgVideoA.removeEventListener("canplay", handleVideoAReadyEvent);
 
         tryHideSplash();
       }
     };
 
-    const handleVideoReadyEvent = () => {
-      setVideoAsReady();
+    const handleVideoAReadyEvent = (event: Event) => {
+      logWithTime(`Video A event received: ${event.type}`);
+      setVideoAAsReady();
     };
 
     // Check if video is already playing or has enough data to play
     // HTMLMediaElement.HAVE_FUTURE_DATA (readyState 3) or HAVE_ENOUGH_DATA (readyState 4)
     if (!bgVideoA.paused || bgVideoA.readyState >= 3) {
-      setVideoAsReady();
+      logWithTime(`Video A already ready: readyState=${bgVideoA.readyState}, paused=${bgVideoA.paused}`);
+      setVideoAAsReady();
     } else {
       // Listen for events that indicate the video is ready to play
-      bgVideoA.addEventListener("playing", handleVideoReadyEvent);
-      bgVideoA.addEventListener("canplay", handleVideoReadyEvent);
-
-      videoTimeoutId = window.setTimeout(() => {
-        if (!videoReady) {
-          console.warn(`Timeout (${VIDEO_TIMEOUT_MS}ms) waiting for background video 'bg-video-a'. Assuming ready.`);
-          setVideoAsReady();
-        }
-      }, VIDEO_TIMEOUT_MS);
+      logWithTime("Video A not ready, adding event listeners");
+      bgVideoA.addEventListener("playing", handleVideoAReadyEvent);
+      bgVideoA.addEventListener("canplay", handleVideoAReadyEvent);
     }
   } else {
-    console.warn("Background video 'bg-video-a' not found. Assuming video part is ready.");
-    videoReady = true;
+    logWithTime("Background video 'bg-video-a' not found. Assuming video A is ready.");
+    videoAReady = true;
   }
+
+  if (bgVideoB) {
+    logWithTime(`Background video B found: readyState=${bgVideoB.readyState}, paused=${bgVideoB.paused}, src=${bgVideoB.src || "none"}`);
+
+    const setVideoBAsReady = () => {
+      if (!videoBReady) {
+        videoBReady = true;
+        logWithTime("Video B marked as ready");
+
+        bgVideoB.removeEventListener("playing", handleVideoBReadyEvent);
+        bgVideoB.removeEventListener("canplay", handleVideoBReadyEvent);
+
+        tryHideSplash();
+      }
+    };
+
+    const handleVideoBReadyEvent = (event: Event) => {
+      logWithTime(`Video B event received: ${event.type}`);
+      setVideoBAsReady();
+    };
+
+    if (!bgVideoB.paused || bgVideoB.readyState >= 3) {
+      logWithTime(`Video B already ready: readyState=${bgVideoB.readyState}, paused=${bgVideoB.paused}`);
+      setVideoBAsReady();
+    } else {
+      logWithTime("Video B not ready, adding event listeners");
+      bgVideoB.addEventListener("playing", handleVideoBReadyEvent);
+      bgVideoB.addEventListener("canplay", handleVideoBReadyEvent);
+    }
+  } else {
+    logWithTime("Background video 'bg-video-b' not found. Assuming video B is ready.");
+    videoBReady = true;
+  }
+
+  videoTimeoutId = window.setTimeout(() => {
+    if (!videoAReady || !videoBReady) {
+      logWithTime(`Video timeout (${VIDEO_TIMEOUT_MS}ms) reached. Assuming all videos ready.`);
+      videoAReady = true;
+      videoBReady = true;
+      tryHideSplash();
+    }
+  }, VIDEO_TIMEOUT_MS);
 
   const setServiceWorkerAsHandled = () => {
     if (!serviceWorkerHandled) {
       serviceWorkerHandled = true;
+      logWithTime("Service Worker marked as handled");
 
       if (swTimeoutId) {
         clearTimeout(swTimeoutId);
@@ -91,36 +145,52 @@ export const dealWithSW = () => {
   };
 
   if ("serviceWorker" in navigator) {
+    logWithTime("Service Worker supported, starting registration");
+
+    // Check if there's already an active service worker
+    if (navigator.serviceWorker.controller) {
+      logWithTime("Active Service Worker controller already exists");
+    }
+
     navigator.serviceWorker
       .register("/sw.js", { type: "module" })
       .then((registration) => {
-        console.log("Service Worker registered successfully with scope:", registration.scope);
-        // We still wait for CACHE_COMPLETE message or timeout
+        logWithTime(`Service Worker registered successfully with scope: ${registration.scope}`);
+
+        if (registration.active) {
+          logWithTime(`Service Worker is active: ${registration.active.state}`);
+        } else if (registration.installing) {
+          logWithTime(`Service Worker is installing: ${registration.installing.state}`);
+        } else if (registration.waiting) {
+          logWithTime(`Service Worker is waiting: ${registration.waiting.state}`);
+        }
       })
       .catch((error) => {
-        console.error("Service Worker registration failed:", error);
-        setServiceWorkerAsHandled(); // SW part handled due to failure
+        logWithTime(`Service Worker registration failed: ${error.message}`);
+        setServiceWorkerAsHandled();
       });
 
     navigator.serviceWorker.addEventListener("message", (event) => {
       if (event.data?.type === "CACHE_COMPLETE") {
-        console.log("Received CACHE_COMPLETE from Service Worker.");
-        setServiceWorkerAsHandled(); // SW part handled due to message
+        logWithTime("Received CACHE_COMPLETE from Service Worker");
+        setServiceWorkerAsHandled();
       }
     });
 
     swTimeoutId = window.setTimeout(() => {
       if (!serviceWorkerHandled) {
-        console.warn(`Timeout (${SW_TIMEOUT_MS}ms) waiting for SW CACHE_COMPLETE. Assuming SW part handled.`);
-        setServiceWorkerAsHandled(); // SW part handled due to timeout
+        logWithTime(`Service Worker timeout (${SW_TIMEOUT_MS}ms) reached. Assuming handled.`);
+        setServiceWorkerAsHandled();
       }
     }, SW_TIMEOUT_MS);
   } else {
-    console.log("Service Worker not supported. Assuming SW part handled.");
+    logWithTime("Service Worker not supported. Assuming SW part handled.");
     setServiceWorkerAsHandled();
   }
 
-  if (videoReady && serviceWorkerHandled) {
+  logWithTime(`Initial state check: videoReady=${videoReady()}, serviceWorkerHandled=${serviceWorkerHandled}`);
+
+  if (videoReady() && serviceWorkerHandled) {
     tryHideSplash();
   }
 };
