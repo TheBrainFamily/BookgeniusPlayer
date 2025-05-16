@@ -183,6 +183,16 @@ export default function AudioPlayer() {
   };
 
   const toggleMute = () => {
+    if (isMuted) {
+      setVolume(1);
+      setMasterVolume(1);
+    } else {
+      setVolume(0);
+      setMasterVolume(0);
+      stopAudiobook();
+      setIsPlayingAudiobook(false);
+    }
+
     setIsMuted(!isMuted);
   };
 
