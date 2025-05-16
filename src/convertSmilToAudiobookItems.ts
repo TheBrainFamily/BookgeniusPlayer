@@ -181,8 +181,8 @@ export function convertSmilToAudiobookItems(xmlString: string): OutputItem[] {
 }
 
 const allItems: OutputItem[] = [];
-Array.from(Array(28).keys()).forEach((i) => {
-  const contentFilePath = `/Users/lukaszgandecki/projects/book-frontend-from-scratch-no-react/public_books/1984/audiobook_data/content${i}.smil`;
+Array.from(Array(8).keys()).forEach((i) => {
+  const contentFilePath = `/Users/tomaszgierczynski/projects/bookgenius-frontend/public_books/Krolowa-Sniegu/audiobook_data/xtkq000${i+1}.smil`;
   console.log(`Processing ${contentFilePath}`);
   const content = fs.readFileSync(contentFilePath, "utf8");
   const items = convertSmilToAudiobookItems(content);
@@ -191,4 +191,4 @@ Array.from(Array(28).keys()).forEach((i) => {
 
 console.log(allItems);
 
-fs.writeFileSync("1984_audiobook_items.json", JSON.stringify(allItems, null, 2));
+fs.writeFileSync("krolowa-sniegu_audiobook_items.json", JSON.stringify(allItems, null, 2));
