@@ -920,7 +920,6 @@
   padding: 0.5rem; /* p-2 = 0.5rem */
   background-color: floralwhite;
   cursor: pointer;
-  white-space: nowrap;
 }
 
 h3[data-index="0"] {
@@ -945,4 +944,13 @@ section[data-chapter] [data-index] {
 }
 
 .active-paragraph {
+  background-color: rgba(255, 215, 140, 0.3);
+}
+
+#dev-zone-visualizer {
+  position: fixed;
+  background-color: rgba(255, 215, 140, 0.2);
+  border: 1px dashed red;
+  z-index: 9999;
+  pointer-events:;
 }
