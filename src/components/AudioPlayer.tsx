@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { Play, Pause, SkipForward, SkipBack, ListMusic, X, Music, Book, BookHeadphones, Volume2, VolumeX, Download, Check, Square } from "lucide-react";
 import { motion, AnimatePresence, Variants } from "motion/react";
 
-import { getMasterVolume, setMasterVolume, setBackgroundVolume } from "@/audio-crossfader";
+import { getMasterVolume, setMasterVolume, setBackgroundVolume, initAudioContext } from "@/audio-crossfader";
 import { stopAudiobook, playAudiobook } from "@/hooks/useAudiobookTracks";
+import { dealWithBackgroundSongs } from "@/deal-with-background-songs";
+import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 
 const variants: Record<string, Variants> = {
   player: {
@@ -191,7 +193,10 @@ export default function AudioPlayer() {
       setIsPlayingAudiobook(false);
       stopAudiobook();
     } else {
+      initAudioContext();
       setIsPlayingAudiobook(true);
+      const { currentChapter, currentParagraph } = getCurrentLocation();
+      dealWithBackgroundSongs({ currentChapter, currentParagraph });
       playAudiobook();
     }
   };
