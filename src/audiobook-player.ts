@@ -1,4 +1,4 @@
-import { getAudioContext, initAudioContext } from "@/audio-crossfader";
+import { getAudioContext, initAudioContext, getAudiobookGainNode } from "@/audio-crossfader";
 import { CURRENT_BOOK } from "./consts";
 
 export type AudiobookTrackEvent = {
@@ -6,6 +6,11 @@ export type AudiobookTrackEvent = {
   callback: () => void;
   triggered: boolean;
 };
+
+// Add type for custom event
+interface AudiobookStopEvent extends CustomEvent {
+  detail: { backgroundVolume: number };
+}
 
 let audioContext: AudioContext | null = null;
 type TrackState = {
@@ -19,6 +24,27 @@ type TrackState = {
   startTimeInContext?: number; // AudioContext's time when this track started
 };
 const tracks: TrackState[] = [];
+
+// --- Initialization and event registration ---
+export function initAudiobookPlayer(): void {
+  // Set up event listener for volume-related stops
+  window.addEventListener("audiobookShouldStop", ((event: AudiobookStopEvent) => {
+    console.log("Audiobook event:", event.detail);
+
+    // Check if this is an actual stop request or just a background music change
+    // If the backgroundVolume is 1.0 (100% background), truly stop the audiobook
+    // Otherwise, let background music transitions happen without stopping audiobook
+    if (event.detail.backgroundVolume === 1.0) {
+      console.log("Stopping audiobook tracks (100% background)");
+      stopAllTracks();
+    } else {
+      console.log("Background music change - audiobook continues playing");
+    }
+  }) as EventListener);
+}
+
+// Call init when this module is loaded
+initAudiobookPlayer();
 
 // --- Interfaces and Types ---
 // interface TrackState {
@@ -91,7 +117,11 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
   const gainNode = audioContext.createGain();
   source.buffer = state.audioBuffer;
   source.loop = false;
-  source.connect(gainNode).connect(audioContext.destination);
+
+  // Connect to the audiobook gain node instead of directly to destination
+  const audiobookGainNode = getAudiobookGainNode();
+  source.connect(gainNode);
+  gainNode.connect(audiobookGainNode || audioContext.destination);
 
   const calculatedOffset = offset % state.audioBuffer.duration;
   console.log(`offset: ${offset}, audioBufferDuration: ${state.audioBuffer.duration}, calculated offset: ${calculatedOffset}`);
@@ -155,10 +185,12 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
 
     // Handle track ending naturally
     source.onended = () => {
-      try {
-        state.events[state.events.length - 1].callback();
-      } catch (e) {
-        console.error(`Error executing event callback for ${trackId} at ${state.audioBuffer.duration}s:`, e);
+      if (state.events && state.events.length > 0) {
+        try {
+          state.events[state.events.length - 1].callback();
+        } catch (e) {
+          console.error(`Error executing event callback for ${trackId} at ${state.audioBuffer.duration}s:`, e);
+        }
       }
       console.log(`Track '${trackId}' ended naturally.`);
       if (state.playbackIntervalId) {
@@ -172,13 +204,17 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
       if (state.sourceNode) {
         try {
           state.sourceNode.disconnect();
-        } catch {}
+        } catch {
+          // Ignore disconnection errors
+        }
         state.sourceNode = null;
       }
       if (state.gainNode) {
         try {
           state.gainNode.disconnect();
-        } catch {}
+        } catch {
+          // Ignore disconnection errors
+        }
         state.gainNode = null;
       }
       // Check if all events have been triggered, especially if the track ends before some event times.
@@ -244,4 +280,11 @@ function stopTrackInternal(trackId: string) {
   // console.log(`Stopped internal nodes for ${trackId}`);
 }
 
+// Make function available on window for testing/debugging
+// Use proper type declaration to avoid TypeScript errors
+declare global {
+  interface Window {
+    stopAllTracks: typeof stopAllTracks;
+  }
+}
 window.stopAllTracks = stopAllTracks;

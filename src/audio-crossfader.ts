@@ -17,6 +17,9 @@ const PRE_END_TRANSITION_TRIGGER_SECONDS = 4.0; // Time before track end to trig
 // --- Module-level State ---
 let audioContext: AudioContext | null = null;
 const tracks: Map<string, TrackState> = new Map();
+let masterGainNode: GainNode | null = null;
+let backgroundGainNode: GainNode | null = null;
+let audiobookGainNode: GainNode | null = null;
 
 let currentTrackId: string | null = null;
 let nextTrackId: string | null = null; // Track being faded TO (during active crossfade)
@@ -53,6 +56,25 @@ export function initAudioContext(): boolean {
           (e) => console.error("Failed to resume AudioContext on init:", e),
         );
       }
+
+      // Create master gain node
+      masterGainNode = audioContext.createGain();
+      masterGainNode.gain.value = 1.0; // Default volume: 100%
+
+      // Create separate gain nodes for background music and audiobook
+      backgroundGainNode = audioContext.createGain();
+      audiobookGainNode = audioContext.createGain();
+
+      // Set default volumes (50/50 split)
+      backgroundGainNode.gain.value = 0.5;
+      audiobookGainNode.gain.value = 0.5;
+
+      // Connect both to master gain
+      backgroundGainNode.connect(masterGainNode);
+      audiobookGainNode.connect(masterGainNode);
+
+      // Connect master to destination
+      masterGainNode.connect(audioContext.destination);
     } catch (e) {
       console.error("Error creating AudioContext:", e);
       return false;
@@ -116,6 +138,11 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0): 
     return false;
   }
 
+  // Update background volume without stopping audiobook
+  if (backgroundGainNode) {
+    setBackgroundVolume(backgroundGainNode.gain.value, false);
+  }
+
   stopTrackInternal(trackId); // Stop any previous instance of this specific track
 
   const source = audioContext.createBufferSource();
@@ -123,7 +150,10 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0): 
   source.buffer = state.audioBuffer;
   source.loop = false; // onended will handle sequence
   gainNode.gain.setValueAtTime(startTime <= audioContext.currentTime ? 1 : 0, startTime);
-  source.connect(gainNode).connect(audioContext.destination);
+
+  // Connect to background gain node instead of master gain
+  source.connect(gainNode);
+  gainNode.connect(backgroundGainNode || masterGainNode);
 
   // Clear any existing preemptive transition timeout for this track if it's being re-played
   const existingStateForTimeout = tracks.get(trackId);
@@ -518,6 +548,11 @@ export async function startFirstTrack(trackId: string): Promise<boolean> {
     console.log(`startFirstTrack: Successfully loaded '${trackId}' on demand.`);
   }
 
+  // Update background volume without stopping audiobook
+  if (backgroundGainNode) {
+    setBackgroundVolume(backgroundGainNode.gain.value, false);
+  }
+
   console.log(`Starting first track: ${trackId}`);
   if (playTrack(trackId, audioContext.currentTime, 0)) {
     currentTrackId = trackId;
@@ -646,3 +681,91 @@ export function getCurrentSectionTracks(): string[] | null {
 export function getCurrentTrackIndexInSection(): number {
   return currentTrackIndexInSection;
 }
+
+// --- Volume control functions ---
+/**
+ * Get the current master volume level (0.0 to 1.0)
+ * @returns Current volume as a number between 0 and 1, or null if audio context is not initialized
+ */
+export function getMasterVolume(): number | null {
+  if (!audioContext || !masterGainNode) {
+    return null;
+  }
+  return masterGainNode.gain.value;
+}
+
+/**
+ * Set the master volume level
+ * @param volume Volume level between 0.0 (silent) and 1.0 (full volume)
+ * @returns Whether the operation was successful
+ */
+export function setMasterVolume(volume: number): boolean {
+  if (!audioContext || !masterGainNode) {
+    return false;
+  }
+
+  // Clamp volume between 0 and 1
+  const safeVolume = Math.max(0, Math.min(1, volume));
+
+  try {
+    masterGainNode.gain.value = safeVolume;
+    return true;
+  } catch (e) {
+    console.error("Error setting master volume:", e);
+    return false;
+  }
+}
+
+/**
+ * Get the audiobook gain node for external connection
+ * @returns The audiobook gain node or null if not initialized
+ */
+export function getAudiobookGainNode(): GainNode | null {
+  return audiobookGainNode;
+}
+
+/**
+ * Set the balance between background music and audiobook narration
+ * @param volume Background volume level between 0.0 and 1.0
+ *        1.0 = 100% background music, 0% audiobook
+ *        0.5 = 50% each (default)
+ * @param isUserAction Whether this is a user-initiated action (true) or automatic transition (false)
+ * @returns Whether the operation was successful
+ */
+export function setBackgroundVolume(volume: number, isUserAction: boolean = true): boolean {
+  if (!audioContext || !backgroundGainNode || !audiobookGainNode) {
+    return false;
+  }
+
+  // Clamp input between 0 and 1
+  const safeVolume = Math.max(0, Math.min(1, volume));
+
+  try {
+    backgroundGainNode.gain.value = safeVolume;
+    audiobookGainNode.gain.value = 1 - safeVolume;
+
+    // Only stop the audiobook if this is a user action or volume is 100% background
+    if (isUserAction || safeVolume === 1.0) {
+      const event = new CustomEvent("audiobookShouldStop", { detail: { backgroundVolume: safeVolume } });
+      window.dispatchEvent(event);
+    }
+
+    return true;
+  } catch (e) {
+    console.error("Error setting background/audiobook balance:", e);
+    return false;
+  }
+}
+
+// Add TypeScript declarations for window properties
+declare global {
+  interface Window {
+    setMasterVolume: typeof setMasterVolume;
+    getMasterVolume: typeof getMasterVolume;
+    setBackgroundVolume: typeof setBackgroundVolume;
+  }
+}
+
+window.setMasterVolume = setMasterVolume;
+window.getMasterVolume = getMasterVolume;
+window.setBackgroundVolume = setBackgroundVolume;
