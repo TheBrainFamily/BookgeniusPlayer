@@ -277,6 +277,8 @@ const knownKrolowaSniegu = [
   "zlosliwy-czarodziej-listens.mp4",
   "zlosliwy-czarodziej-speaks.mp4",
   "zlosliwy-czarodziej.mp4",
+  "eskimoska-listens.mp4",
+  "eskimoska-speaks.mp4",
 ];
 
 const known = [...knownPharaon, ...known1984, ...knownKrolowaSniegu];
