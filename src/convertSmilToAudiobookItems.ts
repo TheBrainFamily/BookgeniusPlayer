@@ -139,7 +139,7 @@ export function convertSmilToAudiobookItems(xmlString: string): OutputItem[] {
     } else {
       const dolMatch = textSrc.match(/#dol_1_(\d+)_/i);
       if (dolMatch && dolMatch[1]) {
-        chapter = parseInt(dolMatch[1], 10);
+        chapter = parseInt(dolMatch[1], 10) - 1;
       } else {
         // If both bookMatch and dolMatch fail, then warn and skip.
         console.warn(`Could not determine chapter number from text src: "${textSrc}" for <par> (ID: ${parId}). Tried bookN.html and #dol_1_N_ patterns. Skipping.`);

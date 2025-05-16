@@ -19,9 +19,7 @@ export function useBackgroundSongs() {
 
   const { currentChapter, currentParagraph } = useDebounce(location, 300);
 
-  console.log("PONTON useBackgroundSongs", currentChapter, currentParagraph);
   useEffect(() => {
-    console.log("PONTON useBackgroundSongs", currentChapter, currentParagraph);
     implRef.current({ currentChapter, currentParagraph });
   }, [currentChapter, currentParagraph]);
 }
