@@ -229,7 +229,7 @@ function getThreeLineHeightPx(): number {
   if (!element) return 0;
 
   const lineHeight = parseFloat(window.getComputedStyle(element).lineHeight);
-  return lineHeight * 2;
+  return lineHeight * 2.5;
 }
 
 // --- Extract Chapter and Paragraph Info ---
@@ -267,36 +267,98 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
 
     const rootRect = observerOptions.root.getBoundingClientRect();
     const zoneTop = rootRect.top + scrollMarginTopPx;
-    const zoneBottom = zoneTop + 0.1 * rootRect.height; // 10% height below this point
+    const zoneBottom = zoneTop + 0.2 * rootRect.height; // 10% height below this point
+
+    // --- Development Zone Visualizer ---
+    let zoneVisualizer = document.getElementById("dev-zone-visualizer");
+    if (!zoneVisualizer) {
+      zoneVisualizer = document.createElement("div");
+      zoneVisualizer.id = "dev-zone-visualizer";
+      document.body.appendChild(zoneVisualizer);
+    }
+    zoneVisualizer.style.left = `${rootRect.left}px`;
+    zoneVisualizer.style.top = `${zoneTop}px`;
+    zoneVisualizer.style.width = `${rootRect.width}px`;
+    zoneVisualizer.style.height = `${zoneBottom - zoneTop}px`;
+    // --- End Development Zone Visualizer ---
 
     console.log("WILCZYNSKA: 276 zoneTop", zoneTop);
     console.log("WILCZYNSKA: 277 zoneBottom", zoneBottom);
     console.log("WILCZYNSKA: 278 rootRect", rootRect);
     console.log("WILCZYNSKA: 279 scrollMarginTopPx", scrollMarginTopPx);
 
-    // Keep track of overlaps clearly:
-    interface Candidate {
-      element: Element;
-      overlap: number;
-      distanceToZoneTop: number;
-    }
-
     let activeParagraph: { chapter: number | null; paragraph: number | null } | null = null;
-    let largestOverlap = 0;
+    let maxPercentageOverlapRatio = -1;
     let chosenElement: Element | null = null;
+    let foundFullyVisible = false;
+    // Minimum overlap threshold in pixels to consider an element
+    const MIN_OVERLAP_THRESHOLD = 20;
+
+    // First pass: look for fully visible elements
     intersectingPages.forEach((element) => {
       const rect = element.getBoundingClientRect();
-      const overlapTop = Math.max(rect.top, zoneTop);
-      const overlapBottom = Math.min(rect.bottom, zoneBottom);
-      const overlap = Math.max(0, overlapBottom - overlapTop);
-      if (overlap > largestOverlap) {
-        largestOverlap = overlap;
-        activeParagraph = getParagraphInfo(element);
-        chosenElement = element;
+      // Check if element is fully contained within the zone
+      if (rect.top >= zoneTop && rect.bottom <= zoneBottom) {
+        // Element is fully visible in the zone
+        if (!foundFullyVisible) {
+          // This is the first fully visible element found
+          foundFullyVisible = true;
+          activeParagraph = getParagraphInfo(element);
+          chosenElement = element;
+          maxPercentageOverlapRatio = 1.0; // 100% visible
+        }
       }
     });
 
-    console.log("WILCZYNSKA: 298 activeParagraph", currentlyActiveParagraph, activeParagraph, largestOverlap, chosenElement);
+    // Only proceed to second pass if no fully visible elements were found
+    if (!foundFullyVisible) {
+      let maxAbsoluteOverlap = 0; // Track the maximum absolute pixel overlap
+
+      intersectingPages.forEach((element) => {
+        const rect = element.getBoundingClientRect();
+        const overlapTop = Math.max(rect.top, zoneTop);
+        const overlapBottom = Math.min(rect.bottom, zoneBottom);
+        const overlap = Math.max(0, overlapBottom - overlapTop);
+
+        // Skip elements with minimal overlap
+        if (overlap < MIN_OVERLAP_THRESHOLD) return;
+
+        const elementHeight = rect.height;
+        let currentOverlapRatio = 0;
+
+        if (elementHeight > 0) {
+          currentOverlapRatio = overlap / elementHeight;
+        }
+
+        // Use a weighted combination of absolute overlap and percentage overlap
+        // This gives preference to elements that occupy more space in the zone
+        // while still considering how much of the element is visible
+        const ABSOLUTE_WEIGHT = 0.7;
+        const PERCENTAGE_WEIGHT = 0.3;
+
+        const zoneHeight = zoneBottom - zoneTop;
+        const normalizedAbsoluteOverlap = overlap / zoneHeight; // Normalize to 0-1 range
+        const weightedScore = normalizedAbsoluteOverlap * ABSOLUTE_WEIGHT + currentOverlapRatio * PERCENTAGE_WEIGHT;
+
+        if (weightedScore > maxPercentageOverlapRatio) {
+          maxPercentageOverlapRatio = weightedScore;
+          maxAbsoluteOverlap = overlap;
+          activeParagraph = getParagraphInfo(element);
+          chosenElement = element;
+        }
+      });
+
+      console.log("WILCZYNSKA: Absolute overlap of selected element:", maxAbsoluteOverlap);
+    }
+
+    console.log(
+      "WILCZYNSKA: 298 activeParagraph",
+      currentlyActiveParagraph,
+      activeParagraph,
+      maxPercentageOverlapRatio,
+      chosenElement,
+      foundFullyVisible ? "fully-visible" : "partial",
+    );
 
     document.querySelectorAll(".active-paragraph").forEach((element) => {
       element.classList.remove("active-paragraph");
