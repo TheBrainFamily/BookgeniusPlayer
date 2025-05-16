@@ -20,7 +20,9 @@ export const dealWithCutScenes = ({ currentChapter, currentParagraph }) => {
     // Ensure video and text are reset if function is called again while playing/fading
     cutsceneVideo.style.visibility = "hidden";
     cutsceneVideo.style.opacity = "0";
+    cutsceneVideo.style.transition = "opacity 4s ease-in-out";
     cutsceneVideo.onended = null; // Remove previous video listener
+    cutsceneText.style.transition = "opacity 4s ease-in-out";
     cutsceneText.style.visibility = "hidden"; // Reset text visibility
     cutsceneText.style.opacity = "0"; // Reset text opacity
     cutsceneText.textContent = ""; // Clear text content
@@ -36,7 +38,9 @@ export const dealWithCutScenes = ({ currentChapter, currentParagraph }) => {
 
     // --- Fade Out Logic ---
     const fadeOutVideo = () => {
+      cutsceneVideo.style.transition = "opacity 2s ease-in-out";
       cutsceneVideo.style.opacity = "0";
+      cutsceneText.style.transition = "opacity 2s ease-in-out";
       cutsceneText.style.opacity = "0"; // Fade out text too
 
       // Use transitionend event to set visibility hidden *after* fade
@@ -58,6 +62,23 @@ export const dealWithCutScenes = ({ currentChapter, currentParagraph }) => {
     cutsceneText.textContent = cutSceneToApply.text; // Set the text content
     cutsceneVideo.src = `/${CURRENT_BOOK}/${cutSceneToApply.file}`;
     cutsceneVideo.load();
+
+    // Add a listener to schedule the fade out 4 seconds before the end
+    const scheduleFadeOut = () => {
+      if (cutsceneVideo.duration && cutsceneVideo.duration > 2) {
+        const fadeStartTime = cutsceneVideo.duration - 2;
+        const checkTime = () => {
+          if (cutsceneVideo.currentTime >= fadeStartTime) {
+            fadeOutVideo();
+            cutsceneVideo.removeEventListener("timeupdate", checkTime);
+          }
+        };
+        cutsceneVideo.addEventListener("timeupdate", checkTime);
+      }
+    };
+
+    cutsceneVideo.addEventListener("loadedmetadata", scheduleFadeOut);
+
     if (cutSceneToApply.delayInMs) {
       setTimeout(() => {
         cutsceneVideo

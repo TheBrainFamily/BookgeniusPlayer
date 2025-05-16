@@ -194,9 +194,9 @@ export default function AudioPlayer() {
       stopAudiobook();
     } else {
       initAudioContext();
-      setIsPlayingAudiobook(true);
       const { currentChapter, currentParagraph } = getCurrentLocation();
       dealWithBackgroundSongs({ currentChapter, currentParagraph });
+      setIsPlayingAudiobook(true);
       playAudiobook();
     }
   };
