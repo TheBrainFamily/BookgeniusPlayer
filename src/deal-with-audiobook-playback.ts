@@ -96,7 +96,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
 
       console.log(`Audiobook song check: Section is [${sectionToApply}]. Currently playing: ${currentPlayingTrackId}.`);
 
-      console.log("WILCZYNSKA: 112 sectionToApply.file, 0, sectionToApply[clip-begin]", sectionToApply.file, 0, sectionToApply["clip-begin"]);
+      // console.log("WILCZYNSKA: 112 sectionToApply.file, 0, sectionToApply[clip-begin]", sectionToApply.file, 0, sectionToApply["clip-begin"]);
       loadTrack(sectionToApply.file).then(() => {
         console.log("audio loaded", sectionToApply.file);
         stopAllTracks();
@@ -118,13 +118,13 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
               return {
                 timestamp: section["clip-end"],
                 callback: () => {
-                  console.log("PINGWING: 112 sectionToApply.file, 0, sectionToApply[clip-begin]", section.file, 0, section["clip-begin"]);
+                  // console.log("PINGWING: 112 sectionToApply.file, 0, sectionToApply[clip-begin]", section.file, 0, section["clip-begin"]);
                   const currentChapter = sectionsToApply[index].chapter;
                   const nextSectionChapter = sectionsToApply[index + 1].chapter;
                   const nextElementSelector = `section[data-chapter='${nextSectionChapter}'] [data-index='${sectionsToApply[index + 1].paragraph}']`;
                   const nextElement = document.querySelector(nextElementSelector);
 
-                  console.log("PINGWING: 112 nextElementSelector", nextElementSelector);
+                  // console.log("PINGWING: 112 nextElementSelector", nextElementSelector);
                   if (currentChapter === nextSectionChapter) {
                     isProcessingAudiobookTracks = true;
                     setTimeout(() => {
@@ -132,7 +132,8 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                     }, 1000);
                   }
 
-                  if (nextElement) {
+                  if (nextElement && currentParagraph !== sectionsToApply[index].paragraph) {
+                    
                     nextElement.scrollIntoView({ behavior: "smooth", block: "start" });
                   } else {
                     console.log("next chapter element not found");
@@ -149,7 +150,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
 
         const scrollToSelectorAgain = `section[data-chapter='${sectionToApply.chapter}'] [data-index='${sectionToApply.paragraph}']`;
 
-        console.log("WILCZYNSKA: 164 scrollToSelector", scrollToSelectorAgain);
+        // console.log("WILCZYNSKA: 164 scrollToSelector", scrollToSelectorAgain);
         document.querySelector(scrollToSelectorAgain).scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
