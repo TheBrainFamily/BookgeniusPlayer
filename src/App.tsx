@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 import { LocationProvider } from "./state/LocationContext";
 import { usePageObserver } from "./hooks/usePageObserver";
@@ -73,23 +73,26 @@ export default function App() {
   const [showDeepResearch, setShowDeepResearch] = useState(false);
   const [deepResearchResult, setDeepResearchResult] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true);
-        const data = await getBookData();
-        setCurrentBookData(data);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to load book data:", err);
-        setError(err instanceof Error ? err.message : "An unknown error occurred");
-        setCurrentBookData(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const loadData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const data = await getBookData();
+      setCurrentBookData(data);
+      setError(null);
+    } catch (err) {
+      console.error("Failed to load book data:", err);
+      setError(err instanceof Error ? err.message : "An unknown error occurred");
+      setCurrentBookData(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
     loadData();
+  }, [loadData]);
+
+  useEffect(() => {
     runLegacyInit();
   }, []);
 
