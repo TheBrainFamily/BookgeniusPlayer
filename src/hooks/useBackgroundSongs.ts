@@ -10,16 +10,18 @@ const implRef = { current: impl };
 if (import.meta.hot) {
   import.meta.hot.accept("@/deal-with-background-songs", (mod) => {
     implRef.current = mod.dealWithBackgroundSongs;
-    console.info("[HMR] dealWithBackgroundSongs updated");
+    console.info("[HMR] useBackgroundSongs updated");
   });
 }
 
 export function useBackgroundSongs() {
   const { location } = useLocation();
 
-  const { chapter, paragraph, endChapter, endParagraph } = useDebounce(location, 300);
+  const { currentChapter, currentParagraph } = useDebounce(location, 300);
 
+  console.log("PONTON useBackgroundSongs", currentChapter, currentParagraph);
   useEffect(() => {
-    implRef.current({ startChapter: location.chapter, startParagraph: location.paragraph, endChapter: location.endChapter, endParagraph: location.endParagraph });
-  }, [chapter, paragraph, endChapter, endParagraph]);
+    console.log("PONTON useBackgroundSongs", currentChapter, currentParagraph);
+    implRef.current({ currentChapter, currentParagraph });
+  }, [currentChapter, currentParagraph]);
 }

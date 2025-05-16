@@ -15,7 +15,7 @@ function debounce<T extends (...args: unknown[]) => void>(fn: T, wait: number): 
 }
 
 // ---- globals ----------------------------------------------------------------
-let debouncedHandler: ((p: { startChapter: number; startParagraph: number; endChapter: number; endParagraph: number }) => void) | null = null;
+let debouncedHandler: ((currentLocation: { currentChapter: number; currentParagraph: number }) => void) | null = null;
 
 enum TransitionState {
   Idle = "idle", // nothing in progress
@@ -43,17 +43,7 @@ function getFileType(filename: string): "video" | "image" | "unknown" {
 const FADE_DURATION_MS = 800; // fallback
 
 // ---- Main Function ----------------------------------------------------------
-export const dealWithBackground = ({
-  startChapter,
-  startParagraph,
-  endChapter,
-  endParagraph,
-}: {
-  startChapter: number;
-  startParagraph: number;
-  endChapter: number;
-  endParagraph: number;
-}) => {
+export const dealWithBackground = ({ currentChapter, currentParagraph }: { currentChapter: number; currentParagraph: number }) => {
   const legacy = document.getElementById("legacy")!;
   const videoA = document.getElementById("bg-video-a") as HTMLVideoElement;
   const videoB = document.getElementById("bg-video-b") as HTMLVideoElement;
@@ -98,22 +88,21 @@ export const dealWithBackground = ({
     const safetyMargin = 100; // ms
 
     /* ---------- main debounced handler ----------------------------------- */
-    debouncedHandler = debounce(async (p: { startChapter: number; startParagraph: number; endChapter: number; endParagraph: number }) => {
+    debouncedHandler = debounce(async (currentLocation: { currentChapter: number; currentParagraph: number }) => {
       const backgrounds = getBackgrounds() as Background[];
-      const found = backgrounds
-        .filter((bg) => p.startChapter >= bg.startChapter && (p.startChapter < bg.endChapter || (p.startChapter === bg.endChapter && p.startParagraph >= (bg.startParagraph ?? 0))))
-        .sort((a, b) => {
-          if (b.startChapter !== a.startChapter) return b.startChapter - a.startChapter;
-          return (b.startParagraph ?? 0) - (a.startParagraph ?? 0);
-        })[0];
-
-      console.log("GOZDECKI FOUND BACKGROUND", found);
+      const found = backgrounds.find(
+        (bg) =>
+          currentLocation.currentChapter >= bg.startChapter &&
+          currentLocation.currentChapter <= bg.endChapter &&
+          currentLocation.currentParagraph >= bg.startParagraph &&
+          currentLocation.currentParagraph <= bg.endParagraph,
+      );
 
       /* ---- cancel zooms *before* any early-return --------------------- */
 
       if (!found) {
         cancelAllImageZoom(imageA, imageB);
-        console.log(`No background definition found for chapter ${p.startChapter}`);
+        console.log(`No background definition found for chapter ${currentLocation.currentChapter}`);
         return;
       }
       if (found.file === legacy.dataset.currentFile) {
@@ -226,5 +215,5 @@ export const dealWithBackground = ({
   }
 
   /* ---------- invoke the handler ----------------------------------------- */
-  debouncedHandler({ startChapter, startParagraph, endChapter, endParagraph });
+  debouncedHandler({ currentChapter, currentParagraph });
 };

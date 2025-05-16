@@ -14,8 +14,15 @@ export const RightNotesPanel: React.FC = () => {
 
   /* stable range object so children can memoise easily */
   const range = useMemo(
-    () => ({ chapter: debounced.chapter, paragraph: debounced.paragraph, endChapter: debounced.endChapter, endParagraph: debounced.endParagraph }),
-    [debounced.chapter, debounced.paragraph, debounced.endChapter, debounced.endParagraph],
+    () => ({
+      chapter: debounced.chapter,
+      paragraph: debounced.paragraph,
+      endChapter: debounced.endChapter,
+      endParagraph: debounced.endParagraph,
+      currentChapter: debounced.currentChapter,
+      currentParagraph: debounced.currentParagraph,
+    }),
+    [debounced.chapter, debounced.paragraph, debounced.endChapter, debounced.endParagraph, debounced.currentChapter, debounced.currentParagraph],
   );
 
   const notes = useFootnotes(range);

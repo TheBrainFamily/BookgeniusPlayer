@@ -38,8 +38,6 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
   );
 
   const matchingCharacter = bookData?.charactersData.find((character) => character.slug === modalContent?.slug);
-  console.log("matchingCharacter", matchingCharacter);
-  console.log("modalContent", modalContent);
 
   return (
     <ModalContext.Provider value={{ openCharacterDetailsModal }}>

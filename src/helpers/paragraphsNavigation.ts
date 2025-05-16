@@ -12,7 +12,7 @@ import type { Location } from "@/state/LocationContext";
 /*  Proxy that React overwrites                                       */
 type Bridge = { get: () => Location; set: (l: Location) => void };
 let _bridge: Bridge = {
-  get: () => ({ chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 }),
+  get: () => ({ chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 }),
   // eslint‑disable-next-line @typescript-eslint/no-empty-function
   set: () => {},
 };
@@ -24,9 +24,9 @@ export const getSavedLocation = (): Location => {
   try {
     const raw = localStorage.getItem("furthestLocation");
     console.log("getSavedLocation", raw);
-    return raw ? JSON.parse(raw) : { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 };
+    return raw ? JSON.parse(raw) : { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 };
   } catch {
-    return { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0 };
+    return { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 };
   }
 };
 
@@ -44,11 +44,11 @@ export const setCurrentLocation = (loc: Location) => {
 
   // Update URL hash
   setTimeout(() => {
-    window.location.hash = `${loc.chapter}-${loc.paragraph}`;
-  }, 500);
+    window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
+  }, 2000);
 
   const saved = getSavedLocation();
-  const ahead = loc.chapter > saved.chapter || (loc.chapter === saved.chapter && loc.paragraph > saved.paragraph);
+  const ahead = loc.currentChapter > saved.currentChapter || (loc.currentChapter === saved.currentChapter && loc.currentParagraph > saved.currentParagraph);
 
   if (ahead) setSavedLocation(loc);
 
@@ -57,9 +57,16 @@ export const setCurrentLocation = (loc: Location) => {
 
 /* ------------------------------------------------------------------ */
 /*  Scroll helper                                                     */
-export const goToParagraph = (loc: Location, fast = false) => {
-  setCurrentLocation(loc);
-  const selector = `section[data-chapter="${loc.chapter}"] [data-index="${loc.paragraph}"]`;
+export const goToParagraph = (loc: { currentChapter: number; currentParagraph: number }, fast = false) => {
+  // setCurrentLocation({
+  //   chapter: loc.currentChapter,
+  //   paragraph: loc.currentParagraph,
+  //   endChapter: loc.currentChapter,
+  //   endParagraph: loc.currentParagraph,
+  //   currentChapter: loc.currentChapter,
+  //   currentParagraph: loc.currentParagraph,
+  // });
+  const selector = `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
   document.querySelector(selector)?.scrollIntoView({ behavior: fast ? "instant" : "smooth", block: "start" });
 };
 
@@ -80,7 +87,7 @@ const updateGoBackButton = () => {
   setTimeout(() => {
     const current = getCurrentLocation();
     const saved = getSavedLocation();
-    const shouldShow = saved.chapter > current.chapter || (saved.chapter === current.chapter && saved.paragraph - 5 > current.paragraph);
+    const shouldShow = saved.currentChapter > current.currentChapter || (saved.currentChapter === current.currentChapter && saved.currentParagraph - 5 > current.currentParagraph);
 
     if (returnButton) returnButton.style.display = shouldShow ? "block" : "none";
   }, 100);
@@ -108,15 +115,11 @@ const handleResizeOrOrientationChange = debounce(() => {
   const locationFromHash = parseLocationFromHash();
 
   if (locationFromHash) {
-    let paragraph = locationFromHash.paragraph;
-    if (paragraph > 0) paragraph--;
-    const selector = `section[data-chapter="${locationFromHash.chapter}"] [data-index="${paragraph}"]`;
-    // Use scrollIntoView without smooth behavior for instant adjustment
-    document.querySelector(selector)?.scrollIntoView({ behavior: "instant", block: "start" });
+    goToParagraph({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph }, true);
   }
   // If hash is invalid or missing, we probably don't want to scroll unexpectedly.
   // The browser's default reflow behavior will apply.
-}, 250); // Debounce for 250ms
+}, 400);
 
 // Add listeners
 window.addEventListener("resize", handleResizeOrOrientationChange);
@@ -125,23 +128,18 @@ window.addEventListener("orientationchange", handleResizeOrOrientationChange);
 /* ------------------------------------------------------------------ */
 /*  URL Hash Helpers                                                  */
 
-const parseLocationFromHash = (): Location | null => {
+const parseLocationFromHash = (): { currentChapter: number; currentParagraph: number } | null => {
   const hash = window.location.hash.substring(1); // Remove leading #
   if (!hash) return null;
 
   const parts = hash.split("-");
   if (parts.length === 2) {
-    const chapter = parseInt(parts[0], 10);
-    const paragraph = parseInt(parts[1], 10);
+    const currentChapter = parseInt(parts[0], 10);
+    const currentParagraph = parseInt(parts[1], 10);
 
-    if (!isNaN(chapter) && !isNaN(paragraph)) {
+    if (!isNaN(currentChapter) && !isNaN(currentParagraph)) {
       // Create a partial Location object - endChapter/endParagraph aren't in the hash
-      return {
-        chapter,
-        paragraph,
-        endChapter: 0, // Or determine appropriate default/logic
-        endParagraph: 0, // Or determine appropriate default/logic
-      };
+      return { currentChapter, currentParagraph };
     }
   }
   console.warn("Invalid location hash:", hash);
@@ -155,9 +153,11 @@ export const goToInitialLocationFromHash = () => {
 
   if (locationFromHash) {
     // Use goToParagraph which handles setting current location and scrolling
-    goToParagraph(locationFromHash, true);
+    console.log("going to location from hash", locationFromHash);
+    goToParagraph({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph }, true);
   } else {
     // Fallback if hash is invalid or missing: go to furthest saved location
-    goToParagraph(getSavedLocation(), true);
+    console.warn("no location in hash, using saved location");
+    goToParagraph({ currentChapter: getSavedLocation().currentChapter, currentParagraph: getSavedLocation().currentParagraph }, true);
   }
 };

@@ -934,3 +934,14 @@ section[data-chapter] [data-index="1"]::first-letter {
   font-family: serif;
   font-weight: bold;
 } */
+
+section[data-chapter] [data-index] {
+  /* 1 line-height (≈ 1 text line) */
+  scroll-margin-top: 4.5lh;
+
+  /* …or fall back to two ems */
+  /* scroll-margin-top: 2em; */
+}
+
+.active-paragraph {
+}
