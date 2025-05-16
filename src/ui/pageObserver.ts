@@ -224,12 +224,20 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
   });
 }
 
-function getThreeLineHeightPx(): number {
+function getScrollMarginTopPx(): number {
   const element = document.querySelector("#content-container p");
   if (!element) return 0;
 
+  const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1024px)");
   const lineHeight = parseFloat(window.getComputedStyle(element).lineHeight);
-  return lineHeight * 2.5;
+  if (landscapeMediaQuery.matches) {
+    return 30;
+  }
+
+  // Assuming 'line-height: 1.6;' for 'p' elements (as per file_context_2),
+  // 1em (font-size of p) = lineHeight / 1.6.
+  // So, 6em = 6 * (lineHeight / 1.6) = (6 / 1.6) * lineHeight = 3.75 * lineHeight.
+  return 130;
 }
 
 // --- Extract Chapter and Paragraph Info ---
@@ -241,7 +249,7 @@ const getParagraphInfo = (element: Element): { chapter: number | null; paragraph
 };
 
 export function setupPageObserver(modal: ModalContextType): IntersectionObserver | null {
-  const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.9] };
+  const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
 
   // --- State for tracking all currently intersecting pages ---
   const intersectingPages = new Set<Element>();
@@ -250,7 +258,7 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
   let currentlyActiveParagraph: { chapter: number; paragraph: number } | null = null;
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
-    const scrollMarginTopPx = getThreeLineHeightPx();
+    const scrollMarginTopPx = getScrollMarginTopPx();
 
     const audioReady = initAudioContext();
     if (!audioReady) {
@@ -267,20 +275,19 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
 
     const rootRect = observerOptions.root.getBoundingClientRect();
     const zoneTop = rootRect.top + scrollMarginTopPx;
-    const zoneBottom = zoneTop + 0.2 * rootRect.height; // 10% height below this point
+    const zoneBottom = zoneTop + 0.1 * rootRect.height; // 10% height below this point
 
     // --- Development Zone Visualizer ---
-    let zoneVisualizer = document.getElementById("dev-zone-visualizer");
-    if (!zoneVisualizer) {
-      zoneVisualizer = document.createElement("div");
-      zoneVisualizer.id = "dev-zone-visualizer";
-      document.body.appendChild(zoneVisualizer);
-    }
-    zoneVisualizer.style.left = `${rootRect.left}px`;
-    zoneVisualizer.style.top = `${zoneTop}px`;
-    zoneVisualizer.style.width = `${rootRect.width}px`;
-    zoneVisualizer.style.height = `${zoneBottom - zoneTop}px`;
-    // --- End Development Zone Visualizer ---
+    // let zoneVisualizer = document.getElementById("dev-zone-visualizer");
+    // if (!zoneVisualizer) {
+    //   zoneVisualizer = document.createElement("div");
+    //   zoneVisualizer.id = "dev-zone-visualizer";
+    //   document.body.appendChild(zoneVisualizer);
+    // }
+    // zoneVisualizer.style.left = `${rootRect.left}px`;
+    // zoneVisualizer.style.top = `${zoneTop}px`;
+    // zoneVisualizer.style.width = `${rootRect.width}px`;
+    // zoneVisualizer.style.height = `${zoneBottom - zoneTop}px`;
 
     console.log("WILCZYNSKA: 276 zoneTop", zoneTop);
     console.log("WILCZYNSKA: 277 zoneBottom", zoneBottom);

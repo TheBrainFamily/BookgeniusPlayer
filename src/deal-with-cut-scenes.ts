@@ -58,37 +58,74 @@ export const dealWithCutScenes = ({ currentChapter, currentParagraph }) => {
     cutsceneText.textContent = cutSceneToApply.text; // Set the text content
     cutsceneVideo.src = `/${CURRENT_BOOK}/${cutSceneToApply.file}`;
     cutsceneVideo.load();
-    cutsceneVideo
-      .play()
-      .then(() => {
-        // Start fade-in *after* play begins successfully
-        cutsceneVideo.style.visibility = "visible";
-        if (cutSceneToApply.text.trim() !== "") {
-          cutsceneText.style.visibility = "visible"; // Make text visible
-        }
-
-        // Use requestAnimationFrame to ensure visibility change is applied before opacity transition
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            // Double RAF for robustness in some browsers
-            cutsceneVideo.style.opacity = "1";
+    if (cutSceneToApply.delayInMs) {
+      setTimeout(() => {
+        cutsceneVideo
+          .play()
+          .then(() => {
+            // Start fade-in *after* play begins successfully
+            cutsceneVideo.style.visibility = "visible";
             if (cutSceneToApply.text.trim() !== "") {
-              cutsceneText.style.opacity = "1"; // Fade in text
+              cutsceneText.style.visibility = "visible"; // Make text visible
             }
-          });
-        });
 
-        // Add listeners
-        cutsceneVideo.onended = fadeOutVideo; // Fade out when naturally finished
-        document.addEventListener("keydown", handleEscape); // Listen for Escape key
-      })
-      .catch((error) => {
-        console.error("Video play failed:", error);
-        // Handle error - maybe hide video and text immediately
-        cutsceneVideo.style.visibility = "hidden";
-        cutsceneVideo.style.opacity = "0";
-        cutsceneText.style.visibility = "hidden"; // Hide text on error
-        cutsceneText.style.opacity = "0";
-      });
+            // Use requestAnimationFrame to ensure visibility change is applied before opacity transition
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                // Double RAF for robustness in some browsers
+                cutsceneVideo.style.opacity = "1";
+                if (cutSceneToApply.text.trim() !== "") {
+                  cutsceneText.style.opacity = "1"; // Fade in text
+                }
+              });
+            });
+
+            // Add listeners
+            cutsceneVideo.onended = fadeOutVideo; // Fade out when naturally finished
+            document.addEventListener("keydown", handleEscape); // Listen for Escape key
+          })
+          .catch((error) => {
+            console.error("Video play failed:", error);
+            // Handle error - maybe hide video and text immediately
+            cutsceneVideo.style.visibility = "hidden";
+            cutsceneVideo.style.opacity = "0";
+            cutsceneText.style.visibility = "hidden"; // Hide text on error
+            cutsceneText.style.opacity = "0";
+          });
+      }, cutSceneToApply.delayInMs);
+    } else {
+      cutsceneVideo
+        .play()
+        .then(() => {
+          // Start fade-in *after* play begins successfully
+          cutsceneVideo.style.visibility = "visible";
+          if (cutSceneToApply.text.trim() !== "") {
+            cutsceneText.style.visibility = "visible"; // Make text visible
+          }
+
+          // Use requestAnimationFrame to ensure visibility change is applied before opacity transition
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              // Double RAF for robustness in some browsers
+              cutsceneVideo.style.opacity = "1";
+              if (cutSceneToApply.text.trim() !== "") {
+                cutsceneText.style.opacity = "1"; // Fade in text
+              }
+            });
+          });
+
+          // Add listeners
+          cutsceneVideo.onended = fadeOutVideo; // Fade out when naturally finished
+          document.addEventListener("keydown", handleEscape); // Listen for Escape key
+        })
+        .catch((error) => {
+          console.error("Video play failed:", error);
+          // Handle error - maybe hide video and text immediately
+          cutsceneVideo.style.visibility = "hidden";
+          cutsceneVideo.style.opacity = "0";
+          cutsceneText.style.visibility = "hidden"; // Hide text on error
+          cutsceneText.style.opacity = "0";
+        });
+    }
   }
 };

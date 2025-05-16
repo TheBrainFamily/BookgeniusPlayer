@@ -10,7 +10,7 @@
   object-fit: cover;
   visibility: hidden;
   opacity: 0;
-  transition: opacity 0.5s ease-in-out; /* Only transition opacity */
+  transition: opacity 4s ease-in-out; /* Only transition opacity */
 }
 
 #cutscene-text {

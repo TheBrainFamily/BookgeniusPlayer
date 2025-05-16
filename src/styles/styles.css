@@ -157,19 +157,6 @@
       hyphens: auto;
 
       /* Headings */
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        line-height: 1.3;
-        margin-top: 2.5em;
-        margin-bottom: 1em;
-        font-weight: bold;
-        color: #000;
-        page-break-after: avoid;
-      }
 
       h1 {
         font-size: 2.8em;
@@ -934,13 +921,17 @@ section[data-chapter] [data-index="1"]::first-letter {
   font-family: serif;
   font-weight: bold;
 } */
+/* Default scroll margin */
 
 section[data-chapter] [data-index] {
-  /* 1 line-height (≈ 1 text line) */
-  scroll-margin-top: 4.5lh;
+  scroll-margin-top: 30px;
+}
 
-  /* …or fall back to two ems */
-  /* scroll-margin-top: 2em; */
+/* Scroll margin for landscape orientation on wider screens */
+@media screen and (min-width: 1024px) {
+  section[data-chapter] [data-index] {
+    scroll-margin-top: 150px;
+  }
 }
 
 .active-paragraph {
@@ -950,4 +941,9 @@ section[data-chapter] [data-index] {
 }
 
 #dev-zone-visualizer {
+  position: fixed;
+  background-color: rgba(255, 215, 140, 0.2);
+  border: 1px dashed red;
+  z-index: 999;
+  pointer-events: none;
 }
