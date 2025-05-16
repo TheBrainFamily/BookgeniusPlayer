@@ -255,6 +255,8 @@ const knownKrolowaSniegu = [
   "summer-garden.mp4",
   "towarzysz-rena-listens.mp4",
   "towarzysz-rena-speaks.mp4",
+  "uczniowie-czarodzieja-speaks.mp4",
+  "uczniowie-czarodzieja-listens.mp4",
   "woznica-listens.mp4",
   "woznica-speaks.mp4",
   "wroble-listens.mp4",
