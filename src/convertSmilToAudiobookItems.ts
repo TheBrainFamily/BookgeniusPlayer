@@ -97,7 +97,7 @@ export function convertSmilToAudiobookItems(xmlString: string): OutputItem[] {
   const parNodeList = seqElements[0].getElementsByTagName("par");
   const parElements: Element[] = Array.from(parNodeList);
 
-  parElements.forEach((parElement) => {
+  parElements.forEach((parElement, index) => {
     // Removed index as it's no longer primary for paragraph num
     const parId = parElement.getAttribute("id");
 
@@ -137,8 +137,14 @@ export function convertSmilToAudiobookItems(xmlString: string): OutputItem[] {
     if (bookMatch && bookMatch[1]) {
       chapter = parseInt(bookMatch[1], 10) + 1;
     } else {
-      console.warn(`Could not determine chapter number from text src: "${textSrc}" for <par> (ID: ${parId}). Skipping.`);
-      return;
+      const dolMatch = textSrc.match(/#dol_1_(\d+)_/i);
+      if (dolMatch && dolMatch[1]) {
+        chapter = parseInt(dolMatch[1], 10) - 1;
+      } else {
+        // If both bookMatch and dolMatch fail, then warn and skip.
+        console.warn(`Could not determine chapter number from text src: "${textSrc}" for <par> (ID: ${parId}). Tried bookN.html and #dol_1_N_ patterns. Skipping.`);
+        return;
+      }
     }
 
     // 2. Determine Paragraph Number from parId
@@ -147,8 +153,8 @@ export function convertSmilToAudiobookItems(xmlString: string): OutputItem[] {
     if (parIdMatch && parIdMatch[1]) {
       paragraph = parseInt(parIdMatch[1], 10);
     } else {
-      console.warn(`Could not parse paragraph number from id: "${parId}". Skipping.`);
-      return;
+      paragraph = index + 1;
+      console.warn(`Could not parse paragraph number from id: "${parId}". Using index: ${index}.`);
     }
 
     // 3. Determine smile_id
@@ -180,15 +186,17 @@ export function convertSmilToAudiobookItems(xmlString: string): OutputItem[] {
   return outputItems;
 }
 
-const allItems: OutputItem[] = [];
-Array.from(Array(28).keys()).forEach((i) => {
-  const contentFilePath = `/Users/lukaszgandecki/projects/book-frontend-from-scratch-no-react/public_books/1984/audiobook_data/content${i}.smil`;
-  console.log(`Processing ${contentFilePath}`);
-  const content = fs.readFileSync(contentFilePath, "utf8");
-  const items = convertSmilToAudiobookItems(content);
-  allItems.push(...items);
-});
+if (require.main === module) {
+  const allItems: OutputItem[] = [];
+  Array.from(Array(8).keys()).forEach((i) => {
+    const contentFilePath = `/Users/tomaszgierczynski/projects/bookgenius-frontend/public_books/Krolowa-Sniegu/audiobook_data/xtkq000${i + 1}.smil`;
+    console.log(`Processing ${contentFilePath}`);
+    const content = fs.readFileSync(contentFilePath, "utf8");
+    const items = convertSmilToAudiobookItems(content);
+    allItems.push(...items);
+  });
 
-console.log(allItems);
+  console.log(allItems);
 
-fs.writeFileSync("1984_audiobook_items.json", JSON.stringify(allItems, null, 2));
+  fs.writeFileSync("krolowa-sniegu_audiobook_items.json", JSON.stringify(allItems, null, 2));
+}

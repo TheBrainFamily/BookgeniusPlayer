@@ -951,6 +951,6 @@ section[data-chapter] [data-index] {
   position: fixed;
   background-color: rgba(255, 215, 140, 0.2);
   border: 1px dashed red;
-  z-index: 9999;
-  pointer-events:;
+  z-index: 999;
+  pointer-events: none;
 }
