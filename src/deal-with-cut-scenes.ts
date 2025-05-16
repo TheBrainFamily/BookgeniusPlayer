@@ -1,16 +1,18 @@
+import { CURRENT_BOOK } from "./consts";
+import { getCutScenes } from "./cut-scenes-per-book";
 import "./styles/cutscene-video.css";
 
-export const dealWithCutScenes = ({ startChapter, startParagraph }) => {
-  const cutscenesDefined = [
-    { chapter: 3, paragraph: 31, file: "ramzes-sara-cutscene.mp4", text: "Sara uspokoiła się powoli, a jej aksamitne oczy przybrały wyraz łagodnego smutku..." },
-  ];
+export const dealWithCutScenes = ({ currentChapter, currentParagraph }) => {
+  const cutscenesDefined = getCutScenes();
+  console.log("cut scenes got", cutscenesDefined);
   // const cutScenes = document.querySelectorAll<HTMLElement>(".cut-scene");
   // cutScenes.forEach((cutScene) => {
   //   cutScene.style.display = "none";
   // });
   const cutSceneToApply = cutscenesDefined.find((cutscene) => {
-    return cutscene.chapter === startChapter && cutscene.paragraph === startParagraph;
+    return cutscene.chapter === currentChapter && cutscene.paragraph === currentParagraph;
   });
+  console.log("cut scene to apply", cutSceneToApply);
   if (cutSceneToApply) {
     const cutsceneVideo = document.getElementById("cutscene-video") as HTMLVideoElement;
     const cutsceneText = document.getElementById("cutscene-text") as HTMLElement; // Get the text element
@@ -54,21 +56,25 @@ export const dealWithCutScenes = ({ startChapter, startParagraph }) => {
 
     // --- Setup and Play ---
     cutsceneText.textContent = cutSceneToApply.text; // Set the text content
-    cutsceneVideo.src = `/Pharaon/${cutSceneToApply.file}`;
+    cutsceneVideo.src = `/${CURRENT_BOOK}/${cutSceneToApply.file}`;
     cutsceneVideo.load();
     cutsceneVideo
       .play()
       .then(() => {
         // Start fade-in *after* play begins successfully
         cutsceneVideo.style.visibility = "visible";
-        cutsceneText.style.visibility = "visible"; // Make text visible
+        if (cutSceneToApply.text.trim() !== "") {
+          cutsceneText.style.visibility = "visible"; // Make text visible
+        }
 
         // Use requestAnimationFrame to ensure visibility change is applied before opacity transition
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             // Double RAF for robustness in some browsers
             cutsceneVideo.style.opacity = "1";
-            cutsceneText.style.opacity = "1"; // Fade in text
+            if (cutSceneToApply.text.trim() !== "") {
+              cutsceneText.style.opacity = "1"; // Fade in text
+            }
           });
         });
 

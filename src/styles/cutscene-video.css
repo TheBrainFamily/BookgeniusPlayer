@@ -5,7 +5,7 @@
   width: 100vw;
   height: 100vh;
   background-color: black;
-  z-index: 9999; /* Ensure it's on top */
+  z-index: 999999; /* Ensure it's on top */
   /* Add any other styles you might need, e.g., object-fit */
   object-fit: cover;
   visibility: hidden;
@@ -27,7 +27,7 @@
   text-align: center;
   font-size: 1.2em; /* Adjust as needed */
   font-family: sans-serif;
-  z-index: 10000; /* Higher than the video */
+  z-index: 100000; /* Higher than the video */
   visibility: hidden;
   opacity: 0;
   transition: opacity 0.5s ease-in-out; /* Match video fade */

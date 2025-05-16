@@ -916,9 +916,9 @@
 
 .character-highlighted-activated {
   border: 1px dashed gray;
-  border-radius: 0.375rem; /* md = 0.375rem */
-  padding: 0.5rem; /* p-2 = 0.5rem */
-  background-color: floralwhite;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  background-color: rgba(255, 250, 240, 0.5);
   cursor: pointer;
 }
 
@@ -944,13 +944,10 @@ section[data-chapter] [data-index] {
 }
 
 .active-paragraph {
-  background-color: rgba(255, 215, 140, 0.3);
+  background: #254c942b;
+  box-shadow: 0 0 0 100vmax #254c942b;
+  clip-path: inset(0 -100vmax); /* stops the shadow from showing above/below */
 }
 
 #dev-zone-visualizer {
-  position: fixed;
-  background-color: rgba(255, 215, 140, 0.2);
-  border: 1px dashed red;
-  z-index: 999;
-  pointer-events: none;
 }
