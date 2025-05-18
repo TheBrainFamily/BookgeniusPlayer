@@ -8,6 +8,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*          # everything …
+            !/public_books/** # …except the assets folder
       - uses: pnpm/action-setup@0609f0983b7a228f052f81ef4c3d6510cae254ad
         with:
           version: 6.10.0
@@ -18,4 +23,4 @@ jobs:
       - run: pnpm install
       - run: pnpm test
       - run: pnpm typecheck
-      - run: pnpm build
+      - run: pnpm
