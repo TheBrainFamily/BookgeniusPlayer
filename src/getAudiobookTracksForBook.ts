@@ -1,8 +1,9 @@
 import { BOOK_SLUGS } from "@/consts";
-import { AudiobookTracksDefined as _1984AudiobookTracksDefined } from "../public_books/1984/audiobook_data/1984AudiobookTracks";
-import { AudiobookTracksDefined as KrolowaSnieguAudiobookTracksDefined } from "../public_books/Krolowa-Sniegu/audiobook_data/KrolowaSnieguAudiobookTracks";
+import { AudiobookTracksDefined as _1984AudiobookTracksDefined } from "./booksData/1984AudiobookTracks";
+import { AudiobookTracksDefined as KrolowaSnieguAudiobookTracksDefined } from "./booksData/KrolowaSnieguAudiobookTracks";
 
 export type AudiobookTracksSection = { chapter: number; paragraph: number; file: string; smile_id: string; "clip-begin": number; "clip-end": number };
+
 
 export const getAudiobookTracksForBook = (bookSlug: string) => {
   switch (bookSlug) {
