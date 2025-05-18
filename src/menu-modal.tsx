@@ -139,7 +139,7 @@ export default function BookChaptersModal({ onShowDeepResearch, bookData }: Book
 
   return (
     <>
-      <div className="fixed z-50" style={{ top: "max(env(safe-area-inset-top, 0px), 1rem)", left: "1rem" }}>
+      <div className="fixed z-50 optional-element" style={{ top: "max(env(safe-area-inset-top, 0px), 1rem)", left: "1rem" }}>
         <Button size="icon" className="bg-white/20 backdrop-blur-md rounded-3xl p-[1.35rem] text-white" onClick={() => setOverlayOpen(true)}>
           <Book className="h-5 w-5 " />
           <span className="sr-only">Book options</span>

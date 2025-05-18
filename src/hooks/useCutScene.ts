@@ -15,8 +15,9 @@ if (import.meta.hot) {
 
 export function useCutScene() {
   const { location } = useLocation();
+  const { currentChapter, currentParagraph } = location;
 
   useEffect(() => {
-    implRef.current({ startChapter: location.chapter, startParagraph: location.paragraph });
-  }, [location.chapter, location.paragraph]);
+    implRef.current({ currentChapter, currentParagraph });
+  }, [currentChapter, currentParagraph]);
 }

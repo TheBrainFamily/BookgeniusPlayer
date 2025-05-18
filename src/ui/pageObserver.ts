@@ -94,6 +94,75 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
     modal.openCharacterDetailsModal(characterSlug, isTalking, listeningSrc);
   });
 
+  // Add hover functionality to show floating avatar
+  character.addEventListener("mouseover", (e) => {
+    // Create floating avatar container
+    const floatingAvatar = document.createElement("div");
+    floatingAvatar.classList.add("floating-avatar");
+    floatingAvatar.style.position = "fixed";
+    floatingAvatar.style.zIndex = "1000";
+    floatingAvatar.style.opacity = "0";
+    floatingAvatar.style.transition = "opacity 500ms ease-in-out";
+
+    // Create media element based on source type
+    if (listeningSrc) {
+      let mediaElement;
+      if (listeningSrc.toLowerCase().endsWith(".png")) {
+        // Create image element
+        mediaElement = document.createElement("img");
+      } else {
+        // Create video element
+        mediaElement = document.createElement("video");
+        mediaElement.autoplay = true;
+        mediaElement.loop = true;
+        mediaElement.muted = true;
+        mediaElement.playsInline = true;
+      }
+
+      mediaElement.src = listeningSrc;
+      mediaElement.classList.add("avatar-preview");
+
+      floatingAvatar.appendChild(mediaElement);
+      document.body.appendChild(floatingAvatar);
+
+      // Position next to cursor
+      const updatePosition = (mouseEvent: MouseEvent) => {
+        floatingAvatar.style.left = `${mouseEvent.clientX + 15}px`;
+        floatingAvatar.style.top = `${mouseEvent.clientY - 30}px`;
+      };
+
+      updatePosition(e as MouseEvent);
+
+      // Add mousemove listener to update position
+      const handleMouseMove = (mouseEvent: MouseEvent) => {
+        updatePosition(mouseEvent);
+      };
+
+      document.addEventListener("mousemove", handleMouseMove);
+
+      // Fade in
+      setTimeout(() => {
+        floatingAvatar.style.opacity = "1";
+      }, 10);
+
+      // Handle mouseout
+      const handleMouseOut = () => {
+        // Fade out
+        floatingAvatar.style.opacity = "0";
+
+        // Remove after transition completes
+        setTimeout(() => {
+          document.body.removeChild(floatingAvatar);
+          document.removeEventListener("mousemove", handleMouseMove);
+        }, 500);
+
+        character.removeEventListener("mouseout", handleMouseOut);
+      };
+
+      character.addEventListener("mouseout", handleMouseOut);
+    }
+  });
+
   // Mark that a listener has been attached
   character.dataset.clickListenerAttached = "true";
 }
@@ -224,12 +293,19 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
   });
 }
 
-function getThreeLineHeightPx(): number {
+function getScrollMarginTopPx(): number {
   const element = document.querySelector("#content-container p");
   if (!element) return 0;
 
-  const lineHeight = parseFloat(window.getComputedStyle(element).lineHeight);
-  return lineHeight * 2.5;
+  const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1024px)");
+  if (landscapeMediaQuery.matches) {
+    return 30;
+  }
+
+  // Assuming 'line-height: 1.6;' for 'p' elements (as per file_context_2),
+  // 1em (font-size of p) = lineHeight / 1.6.
+  // So, 6em = 6 * (lineHeight / 1.6) = (6 / 1.6) * lineHeight = 3.75 * lineHeight.
+  return 130;
 }
 
 // --- Extract Chapter and Paragraph Info ---
@@ -241,7 +317,7 @@ const getParagraphInfo = (element: Element): { chapter: number | null; paragraph
 };
 
 export function setupPageObserver(modal: ModalContextType): IntersectionObserver | null {
-  const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.9] };
+  const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
 
   // --- State for tracking all currently intersecting pages ---
   const intersectingPages = new Set<Element>();
@@ -250,7 +326,7 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
   let currentlyActiveParagraph: { chapter: number; paragraph: number } | null = null;
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
-    const scrollMarginTopPx = getThreeLineHeightPx();
+    const scrollMarginTopPx = getScrollMarginTopPx();
 
     const audioReady = initAudioContext();
     if (!audioReady) {
@@ -267,20 +343,19 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
 
     const rootRect = observerOptions.root.getBoundingClientRect();
     const zoneTop = rootRect.top + scrollMarginTopPx;
-    const zoneBottom = zoneTop + 0.2 * rootRect.height; // 10% height below this point
+    const zoneBottom = zoneTop + 0.1 * rootRect.height; // 10% height below this point
 
     // --- Development Zone Visualizer ---
-    let zoneVisualizer = document.getElementById("dev-zone-visualizer");
-    if (!zoneVisualizer) {
-      zoneVisualizer = document.createElement("div");
-      zoneVisualizer.id = "dev-zone-visualizer";
-      document.body.appendChild(zoneVisualizer);
-    }
-    zoneVisualizer.style.left = `${rootRect.left}px`;
-    zoneVisualizer.style.top = `${zoneTop}px`;
-    zoneVisualizer.style.width = `${rootRect.width}px`;
-    zoneVisualizer.style.height = `${zoneBottom - zoneTop}px`;
-    // --- End Development Zone Visualizer ---
+    // let zoneVisualizer = document.getElementById("dev-zone-visualizer");
+    // if (!zoneVisualizer) {
+    //   zoneVisualizer = document.createElement("div");
+    //   zoneVisualizer.id = "dev-zone-visualizer";
+    //   document.body.appendChild(zoneVisualizer);
+    // }
+    // zoneVisualizer.style.left = `${rootRect.left}px`;
+    // zoneVisualizer.style.top = `${zoneTop}px`;
+    // zoneVisualizer.style.width = `${rootRect.width}px`;
+    // zoneVisualizer.style.height = `${zoneBottom - zoneTop}px`;
 
     console.log("WILCZYNSKA: 276 zoneTop", zoneTop);
     console.log("WILCZYNSKA: 277 zoneBottom", zoneBottom);
@@ -368,7 +443,7 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
     if (intersectingPages.size > 0) {
       // Default multipliers
       const topMultiplier = 0.05;
-      let bottomMultiplier = 0.3;
+      let bottomMultiplier = 0.5;
 
       // Check media query for landscape mode on smaller wide screens
       const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");

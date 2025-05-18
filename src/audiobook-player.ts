@@ -128,7 +128,11 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
 
   // Store events and reset triggered status
   if (events) {
-    state.events = events.map((event) => ({ ...event, triggered: false }));
+    state.events = events.map((event) => ({
+      ...event,
+      // skip events that are already in the past relative to the offset we begin at
+      triggered: event.timestamp <= calculatedOffset,
+    }));
   } else {
     state.events = null;
   }
