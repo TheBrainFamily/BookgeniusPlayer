@@ -9,6 +9,6 @@ export const bookData: BookData = {
   metadata: { title: "Pharaon" },
   charactersData: PharaonCharactersData,
   bookXml: PharaonBookXml,
-  chapters: 100,
+  chapters: 68,
   themeColors: getBookThemeColors(BOOK_SLUGS.PHARAON),
 };

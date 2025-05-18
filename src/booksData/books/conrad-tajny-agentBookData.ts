@@ -9,6 +9,6 @@ export const bookData: BookData = {
   metadata: { title: "Conrad Tajny Agent" },
   charactersData: ConradTajnyAgentCharactersData,
   bookXml: ConradTajnyAgentBookXml,
-  chapters: 100,
+  chapters: 13,
   themeColors: getBookThemeColors(BOOK_SLUGS.Conrad_Tajny_Agent),
 };
