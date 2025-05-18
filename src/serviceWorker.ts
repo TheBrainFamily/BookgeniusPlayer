@@ -57,18 +57,6 @@ export const dealWithSW = () => {
         startButton = document.createElement("button");
         startButton.id = "splash-start-button";
         startButton.innerText = "Start";
-        startButton.style.position = "absolute";
-        startButton.style.top = "75%";
-        startButton.style.left = "50%";
-        startButton.style.transform = "translate(-50%, -50%)";
-        startButton.style.padding = "12px 24px";
-        startButton.style.fontSize = "18px";
-        startButton.style.cursor = "pointer";
-        startButton.style.backgroundColor = "#4285f4";
-        startButton.style.color = "white";
-        startButton.style.border = "none";
-        startButton.style.borderRadius = "4px";
-        startButton.style.zIndex = "10000";
 
         startButton.addEventListener("click", async () => {
           startButton.remove();
