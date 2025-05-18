@@ -7,7 +7,6 @@
  *  real React components whenever you feel like it.
  */
 
-import { setIsNightMode } from "./helpers/setIsNightMode";
 import { isMobileCharactersVisible } from "./isMobileCharactersVisible";
 import { initSearchModal } from "./searchModal";
 import { initializeNoteLinkBlinking } from "./annotationsHandling";
@@ -43,9 +42,6 @@ export async function runLegacyInit() {
   function onDOMLoaded() {
     initializeNoteLinkBlinking(); // <-- kept here for safety;
     //     also wrapped in a React hook upstream
-    // NO DARK MODE
-    setIsNightMode(false);
-    // if (localStorage.getItem("nightMode") === "true") setIsNightMode(true);
 
     initSearchModal();
     // initCharacterModals();
