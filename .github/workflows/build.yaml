@@ -8,6 +8,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /**           # everything
+            !/public_books/**   # except big assets
+          filter: blob:none
       - uses: pnpm/action-setup@v4
         with:
           version: 10
