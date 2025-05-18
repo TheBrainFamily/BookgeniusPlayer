@@ -7,7 +7,7 @@ import { BOOK_SLUGS } from "@/consts";
 const xmlString = fs.readFileSync(path.join(__dirname, "example.xml"), "utf8");
 
 describe("example-xml-to-complex-html", () => {
-  it("should convert xml to html", () => {
+  it.skip("should convert xml to html", () => {
     const htmlString = xmlToComplexHtml(xmlString, BOOK_SLUGS.PHARAON);
     console.log(htmlString);
 

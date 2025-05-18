@@ -12,7 +12,8 @@
     "deploy:1984": "VITE_BOOK=1984 npx vite build && rsync -av ./dist root@64.23.230.45:/var/www/1984/",
     "deploy:conrad": "VITE_BOOK=Conrad-Tajny-Agent npx vite build && rsync -av ./dist root@64.23.230.45:/var/www/tajny-agent/",
     "dev": "vite dev",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",

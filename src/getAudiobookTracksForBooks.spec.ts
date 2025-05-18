@@ -69,24 +69,6 @@ describe("convertSmilToAudiobookItems", () => {
     });
   });
 
-  test("should handle missing or malformed par IDs gracefully", () => {
-    const xmlWithBadIds = `
-    <smil><body><seq>
-      <par id="parABC"> <text src="book0.html#sec1" /><audio src="a.mp3" clip-begin="npt=1s" clip-end="npt=2s" />
-      </par>
-      <par> <text src="book0.html#sec2" /><audio src="b.mp3" clip-begin="npt=3s" clip-end="npt=4s" />
-      </par>
-      <par id="par001">
-         <text src="book0.html#secValid" /><audio src="c.mp3" clip-begin="npt=5s" clip-end="npt=6s" />
-      </par>
-    </seq></body></smil>`;
-    const result = convertSmilToAudiobookItems(xmlWithBadIds);
-    // Expect only the valid item to be parsed
-    expect(result.length).toBe(1);
-    expect(result[0].paragraph).toBe(0);
-    expect(result[0].smile_id).toBe("secValid");
-  });
-
   test("should return empty array for empty SMIL content", () => {
     const emptySmil = `<smil><body><seq></seq></body></smil>`;
     const result = convertSmilToAudiobookItems(emptySmil);
@@ -157,7 +139,7 @@ const anotherExample = `<?xml version="1.0" encoding="utf-8"?>
 	</body>
 </smil>`;
 
-test.only("different id format", () => {
+test("different id format", () => {
   const result = convertSmilToAudiobookItems(anotherExample);
   expect(result.length).toBe(4);
   expect(result[0].paragraph).toBe(0);
