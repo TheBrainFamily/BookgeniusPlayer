@@ -4,7 +4,6 @@ import { AudiobookTracksDefined as KrolowaSnieguAudiobookTracksDefined } from ".
 
 export type AudiobookTracksSection = { chapter: number; paragraph: number; file: string; smile_id: string; "clip-begin": number; "clip-end": number };
 
-
 export const getAudiobookTracksForBook = (bookSlug: string) => {
   switch (bookSlug) {
     case BOOK_SLUGS._1984:
