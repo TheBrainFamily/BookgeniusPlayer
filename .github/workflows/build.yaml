@@ -32,6 +32,6 @@ jobs:
           cache: "pnpm"
       - run: pnpm install
       - run: pnpm test
-      - run: pnpm typecheck
-      - run: pnpm lint
+      - run: pnpm typecheck:ci
+      - run: pnpm lint:ci
       - run: pnpm prettier:check

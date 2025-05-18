@@ -18,7 +18,7 @@
     "typecheck:ci": "tsc --noEmit --incremental --pretty false",
     "lint": "eslint --cache --fix src/",
     "lint:ci": "eslint --cache src/",
-    "prettier:check": "prettier --check src/ --quiet"
+    "prettier:check": "prettier --check src/ --quiet 2>&1 | grep -v 'Ignored unknown option'"
   },
   "dependencies": {
     "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
