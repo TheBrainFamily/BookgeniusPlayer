@@ -25,4 +25,4 @@ jobs:
       - run: pnpm install
       - run: pnpm test
       - run: pnpm typecheck
-      - run: pnpm
+      - run: pnpm lint
