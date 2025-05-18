@@ -28,7 +28,7 @@ export function extractQuotes(raw: string): string[] {
       /* crush internal line-breaks introduced by bullet wraps */
       .replace(/\n\s*\*\s+/g, " ")
       /* leading list markers (*, -, +) */
-      .replace(/^[\s>*+\-]+\s*/, "")
+      .replace(/^[\s>*+-]+\s*/, "")
       .trim();
 
     if (clean && !seen.has(clean)) {

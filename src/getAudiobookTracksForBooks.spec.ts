@@ -1,5 +1,4 @@
 import { test, expect, describe } from "@jest/globals";
-import { DOMParser, Element } from "@xmldom/xmldom"; // Using @xmldom/xmldom
 import { convertSmilToAudiobookItems } from "./convertSmilToAudiobookItems";
 // Note: In a real Jest setup, you might need to configure Jest to handle ES modules
 // or ensure your tsconfig.json output is CommonJS if Jest expects that.

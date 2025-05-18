@@ -13,7 +13,8 @@
     "deploy:conrad": "VITE_BOOK=Conrad-Tajny-Agent npx vite build && rsync -av ./dist root@64.23.230.45:/var/www/tajny-agent/",
     "dev": "vite dev",
     "test": "jest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/"
   },
   "dependencies": {
     "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",

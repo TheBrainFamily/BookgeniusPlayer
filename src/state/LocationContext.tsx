@@ -29,7 +29,7 @@ interface LocationCtx {
 }
 export const LocationContext = createContext<LocationCtx>({
   location: { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 },
-  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+   
   setLocation: () => {},
 });
 

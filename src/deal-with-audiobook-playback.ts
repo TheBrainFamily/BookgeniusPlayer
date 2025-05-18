@@ -152,11 +152,6 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
         const events: AudiobookTrackEvent[] = createEventsForAudiobook();
 
         playTrack(sectionToApply.file, 0, sectionToApply["clip-begin"], events);
-
-        const scrollToSelectorAgain = `section[data-chapter='${sectionToApply.chapter}'] [data-index='${sectionToApply.paragraph}']`;
-
-        // console.log("WILCZYNSKA: 164 scrollToSelector", scrollToSelectorAgain);
-        // document.querySelector(scrollToSelectorAgain).scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
   } catch (error) {
