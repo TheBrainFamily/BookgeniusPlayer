@@ -37,7 +37,7 @@ export function getAudioContext(): AudioContext | null {
   return audioContext;
 }
 
-export function initAudioContext(): boolean {
+export async function initAudioContext(): Promise<boolean> {
   if (!audioContext) {
     try {
       const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
@@ -50,12 +50,6 @@ export function initAudioContext(): boolean {
       audioContext.onstatechange = () => {
         console.log(`AudioContext state changed to: ${audioContext?.state}`);
       };
-      if (audioContext.state === "suspended") {
-        audioContext.resume().then(
-          () => console.log("AudioContext resumed on init."),
-          (e) => console.error("Failed to resume AudioContext on init:", e),
-        );
-      }
 
       // Create master gain node
       masterGainNode = audioContext.createGain();
@@ -75,13 +69,30 @@ export function initAudioContext(): boolean {
 
       // Connect master to destination
       masterGainNode.connect(audioContext.destination);
+
+      // Resume the context if needed
+      if (audioContext.state === "suspended") {
+        try {
+          await audioContext.resume();
+          console.log("AudioContext resumed on init.");
+        } catch (e) {
+          console.error("Failed to resume AudioContext on init:", e);
+        }
+      }
     } catch (e) {
       console.error("Error creating AudioContext:", e);
       return false;
     }
   } else if (audioContext.state === "suspended") {
-    audioContext.resume().catch((e) => console.error("Error resuming existing AudioContext:", e));
+    try {
+      await audioContext.resume();
+      console.log("Existing AudioContext resumed.");
+    } catch (e) {
+      console.error("Error resuming existing AudioContext:", e);
+    }
   }
+
+  // Return true only if the context is running
   return audioContext?.state === "running";
 }
 

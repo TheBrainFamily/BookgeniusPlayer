@@ -1,5 +1,9 @@
 // Service worker registration and handling
 
+import { initAudioContext } from "./audio-crossfader";
+import { dealWithBackgroundSongs } from "./deal-with-background-songs";
+import { getCurrentLocation } from "./helpers/paragraphsNavigation";
+import { playAudiobook } from "./hooks/useAudiobookTracks";
 import { isMobileOrTablet } from "./utils/isMobileOrTablet";
 
 const VIDEO_TIMEOUT_MS = 5000;
@@ -43,13 +47,37 @@ export const dealWithSW = () => {
     logWithTime(`Trying to hide splash: videoAReady=${videoAReady}, videoBReady=${videoBReady}`);
 
     if (videoReady()) {
-      logWithTime("All conditions met, hiding splash screen");
-      splash.classList.add("splash--hide");
-
+      logWithTime("All conditions met, showing start button");
       if (videoTimeoutId) clearTimeout(videoTimeoutId);
       if (swTimeoutId) clearTimeout(swTimeoutId);
 
-      window.dispatchEvent(new CustomEvent("splashHidden"));
+      // Create start button if it doesn't exist yet
+      let startButton = document.getElementById("splash-start-button");
+      if (!startButton) {
+        startButton = document.createElement("button");
+        startButton.id = "splash-start-button";
+        startButton.innerText = "Start";
+
+        startButton.addEventListener("click", async () => {
+          startButton.remove();
+          const result = await initAudioContext();
+          console.log("initAudioContext", result);
+          if (result) {
+            dealWithBackgroundSongs({ currentChapter: 1, currentParagraph: 0 });
+            console.log("dealWithBackgroundSongs after");
+            splash.classList.add("splash--hide");
+            window.dispatchEvent(new CustomEvent("splashHidden"));
+            playAudiobook();
+          } else {
+            console.error("Failed to initialize audio context");
+            // Still proceed with UI to ensure user isn't stuck
+            splash.classList.add("splash--hide");
+            window.dispatchEvent(new CustomEvent("splashHidden"));
+          }
+        });
+
+        splash.appendChild(startButton);
+      }
     }
   };
 

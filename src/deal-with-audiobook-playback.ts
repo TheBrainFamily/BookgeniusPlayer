@@ -132,11 +132,16 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                     }, 1000);
                   }
 
-                  if (nextElement && currentParagraph !== sectionsToApply[index].paragraph) {
-                    
-                    nextElement.scrollIntoView({ behavior: "smooth", block: "start" });
+                  if (nextElement) {
+                    if (currentParagraph !== sectionsToApply[index + 1].paragraph) {
+                      console.log("PONTONO DIFFERENT PARAGRAPH   found", nextElement);
+                      nextElement.scrollIntoView({ behavior: "smooth", block: "start" });
+                    } else {
+                      console.log("PONTONO SAME PARAGRAPH found", nextElement);
+                      // nextElement.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
                   } else {
-                    console.log("next chapter element not found");
+                    console.log("PONTONO nextElement not found", nextElementSelector);
                   }
                 },
                 triggered: false,
@@ -151,7 +156,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
         const scrollToSelectorAgain = `section[data-chapter='${sectionToApply.chapter}'] [data-index='${sectionToApply.paragraph}']`;
 
         // console.log("WILCZYNSKA: 164 scrollToSelector", scrollToSelectorAgain);
-        document.querySelector(scrollToSelectorAgain).scrollIntoView({ behavior: "smooth", block: "start" });
+        // document.querySelector(scrollToSelectorAgain).scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
   } catch (error) {

@@ -4,7 +4,7 @@ export function useBookContent(htmlContent: string, containerId: string) {
   useEffect(() => {
     const container = document.getElementById(containerId);
     if (container) {
-      container.innerHTML = htmlContent;
+      container.innerHTML = htmlContent.replace(/<\/section>(?!.*<\/section>)/s, '<div style="height: 50vh;"></div></section>');
     } else {
       console.warn(`Container with id '${containerId}' not found for content injection.`);
     }
