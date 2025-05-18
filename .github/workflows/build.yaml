@@ -1,0 +1,37 @@
+name: Node.js CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            package.json
+            .prettierrc
+            eslint.config.mjs
+            jest.config.js
+            pnpm-lock.yaml
+            postcss.config.js
+            tailwind.config.js
+            tsconfig.json
+            vite.config.mts
+            src/
+            tests/
+          sparse-checkout-cone-mode: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - run: ls -al
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+      - run: pnpm install
+      - run: pnpm test
+      - run: pnpm typecheck:ci
+      - run: pnpm lint:ci
+      - run: pnpm prettier:check

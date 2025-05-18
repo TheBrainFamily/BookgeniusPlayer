@@ -64,7 +64,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isRecording, setIsRecording] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [response, setResponse] = useState("");
-  const [items, setItems] = useState<ConversationItem[]>([]);
+  const [, setItems] = useState<ConversationItem[]>([]);
 
   // Initialize API key from localStorage
   useEffect(() => {

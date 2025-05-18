@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { CURRENT_BOOK } from "@/consts";
-import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName, knownPharaon } from "./getFilePathsForName";
+import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "./getFilePathsForName";
 import { getBookData } from "@/booksData/getBookData";
 
 type InfoPerChapter = { chapter: number; summary: string; label?: string; paragraphsWhereSpotted: number[]; paragraphsWhereTalking: number[] };

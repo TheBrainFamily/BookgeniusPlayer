@@ -1,15 +1,12 @@
-import React, { useState, useEffect, useLayoutEffect, useMemo } from "react";
-import { Book, X, List, FileText, PanelLeft, PanelBottom, Type, RotateCcw, Music } from "lucide-react";
+import React, { useState, useLayoutEffect, useMemo } from "react";
+import { Book, X, List, FileText, Type, RotateCcw, Music } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
-import { isNightMode } from "./helpers/setIsNightMode";
-import { toggleMobileCharacters, isMobileCharactersVisible } from "./isMobileCharactersVisible";
 import { resetFurthestPageLocation } from "./helpers/reset-furthest-page-location";
 import { goToParagraph } from "./helpers/paragraphsNavigation";
 import { preloadBackgroundTracks } from "./deal-with-background-songs";
@@ -56,20 +53,9 @@ interface BookChaptersModalProps {
   bookData: BookData;
 }
 
-const applyDarkMode = () => {
-  if (isNightMode()) {
-    document.body.classList.add("dark");
-  } else {
-    document.body.classList.remove("dark");
-  }
-};
-
 export default function BookChaptersModal({ onShowDeepResearch, bookData }: BookChaptersModalProps) {
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
-  const [nightMode, setNightMode] = useState(isNightMode());
-  const [pageNumber, setPageNumber] = useState("");
-  const [charactersVertical, setCharactersVertical] = useState(isMobileCharactersVisible());
   const [fontSize, setFontSize] = useState(localStorage.getItem("fontSize") ? parseFloat(localStorage.getItem("fontSize")!) : 1);
 
   const chapters = useMemo(() => {
@@ -80,10 +66,6 @@ export default function BookChaptersModal({ onShowDeepResearch, bookData }: Book
     return pageChapters.map((page) => ({ id: page.chapter, title: getTitle(page.chapter), page: page.page }));
   }, [bookData]);
 
-  useEffect(() => {
-    applyDarkMode();
-  }, [nightMode]);
-
   useLayoutEffect(() => {
     const newFontSize = 16 * fontSize;
     const contentContainer = document.getElementById("content-container");
@@ -92,42 +74,12 @@ export default function BookChaptersModal({ onShowDeepResearch, bookData }: Book
     }
   }, [fontSize]);
 
-  // Update the local state when the night mode changes externally
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setNightMode(isNightMode());
-      setCharactersVertical(isMobileCharactersVisible());
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
   const navigateToChapter = (chapterId: number, page: string) => {
     const pageNum = parseInt(page, 10);
     console.log(`Navigating to chapter ${chapterId}, page ${pageNum}`);
     // Implement your navigation logic here
     goToParagraph({ currentChapter: chapterId, currentParagraph: 0 });
     setActiveModal(null);
-    setOverlayOpen(false);
-  };
-
-  const navigateToPage = () => {
-    const page = Number.parseInt(pageNumber);
-    if (!isNaN(page) && page > 0) {
-      console.log(`Navigating to page ${page}`);
-      // Implement your navigation logic here
-      // For example: router.push(`/book/page/${page}`)
-      setActiveModal(null);
-      setOverlayOpen(false);
-      setPageNumber("");
-    }
-  };
-
-  const handleToggleCharacters = () => {
-    console.log("[BOOK MODAL] handleToggleCharacters");
-    toggleMobileCharacters();
-    setCharactersVertical(isMobileCharactersVisible());
     setOverlayOpen(false);
   };
 
@@ -150,13 +102,6 @@ export default function BookChaptersModal({ onShowDeepResearch, bookData }: Book
       {overlayOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center" onClick={() => setOverlayOpen(false)}>
           <div className="bg-background rounded-lg p-4 w-80 space-y-2" onClick={(e) => e.stopPropagation()}>
-            <div className="md:hidden">
-              <Button variant="ghost" className="w-full justify-start text-left" onClick={handleToggleCharacters}>
-                {charactersVertical ? <PanelBottom className="mr-2 h-4 w-4" /> : <PanelLeft className="mr-2 h-4 w-4" />}
-                Show Characters {charactersVertical ? "Horizontally" : "Vertically"}
-              </Button>
-            </div>
-
             <Button
               variant="ghost"
               className="w-full justify-start text-left"
@@ -260,29 +205,6 @@ export default function BookChaptersModal({ onShowDeepResearch, bookData }: Book
               ))}
             </div>
           </ScrollArea>
-        </SheetContent>
-      </Sheet>
-
-      {/* Go to Page Modal */}
-      <Sheet
-        open={activeModal === "page"}
-        onOpenChange={(open) => {
-          if (!open) setActiveModal(null);
-        }}
-      >
-        <SheetContent side="bottom" className="rounded-t-xl">
-          <SheetHeader className="border-b pb-4">
-            <SheetTitle className="text-lg font-medium">Go to Page</SheetTitle>
-          </SheetHeader>
-          <div className="py-6 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="page-number">Page Number</Label>
-              <Input id="page-number" type="number" min="1" placeholder="Enter page number" value={pageNumber} onChange={(e) => setPageNumber(e.target.value)} />
-            </div>
-            <Button className="w-full" onClick={navigateToPage} disabled={!pageNumber || isNaN(Number.parseInt(pageNumber)) || Number.parseInt(pageNumber) < 1}>
-              Go to Page
-            </Button>
-          </div>
         </SheetContent>
       </Sheet>
     </>

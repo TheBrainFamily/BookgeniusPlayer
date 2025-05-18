@@ -24,7 +24,7 @@ export function initializeNoteLinkBlinking() {
 
   noteLinks.forEach((link) => {
     // Handle mouseover - add highlight
-    link.addEventListener("mouseover", (event) => {
+    link.addEventListener("mouseover", () => {
       const href = link.getAttribute("href");
       if (!href || !href.startsWith("#")) {
         console.warn("Link-note href is missing or invalid:", link);
@@ -46,7 +46,7 @@ export function initializeNoteLinkBlinking() {
     });
 
     // Handle mouseout - remove highlight
-    link.addEventListener("mouseout", (event) => {
+    link.addEventListener("mouseout", () => {
       const href = link.getAttribute("href");
       if (!href || !href.startsWith("#")) return;
 

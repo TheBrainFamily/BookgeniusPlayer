@@ -1,30 +1,5 @@
 import { DOMParser, Element } from "@xmldom/xmldom"; // Using @xmldom/xmldom
 import fs from "fs";
-// Note: In a real Jest setup, you might need to configure Jest to handle ES modules
-// or ensure your tsconfig.json output is CommonJS if Jest expects that.
-// For this example, we're assuming the import works in the execution environment.
-
-// Corrected and completed exampleData for the test
-const exampleData = `
-<smil>
-  <body>
-    <seq>
-      <par id="par000007" endsync="last">
-        <text src="book0.html#sec8" />
-        <audio src="book0.mp3" clip-begin="npt=140.840s" clip-end="npt=142.920s" />
-      </par>
-      <par id="par000008" endsync="last">
-        <text src="book0.html#sec9" />
-        <audio src="book0.mp3" clip-begin="npt=142.920s" clip-end="npt=163.840s" />
-      </par>
-      <par id="par000015" endsync="last">
-        <text src="book1.html#sectionAlpha" />
-        <audio src="book1_audio.mp3" clip-begin="npt=5.5s" clip-end="npt=10.0s" />
-      </par>
-    </seq>
-  </body>
-</smil>
-`;
 
 // Interface for the desired output object
 interface OutputItem {

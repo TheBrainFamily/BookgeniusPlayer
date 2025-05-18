@@ -89,8 +89,6 @@ class StreamProcessor extends AudioWorkletProcessor {
 registerProcessor('stream_processor', StreamProcessor);
 `;
 
-const script = new Blob([StreamProcessorWorklet], {
-  type: 'application/javascript',
-});
+const script = new Blob([StreamProcessorWorklet], { type: "application/javascript" });
 const src = URL.createObjectURL(script);
 export const StreamProcessorSrc = src;

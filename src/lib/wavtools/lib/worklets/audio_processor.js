@@ -207,8 +207,6 @@ class AudioProcessor extends AudioWorkletProcessor {
 registerProcessor('audio_processor', AudioProcessor);
 `;
 
-const script = new Blob([AudioProcessorWorklet], {
-  type: 'application/javascript',
-});
+const script = new Blob([AudioProcessorWorklet], { type: "application/javascript" });
 const src = URL.createObjectURL(script);
 export const AudioProcessorSrc = src;

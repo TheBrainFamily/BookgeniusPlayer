@@ -1,9 +1,4 @@
-import {
-  noteFrequencies,
-  noteFrequencyLabels,
-  voiceFrequencies,
-  voiceFrequencyLabels,
-} from './constants.js';
+import { noteFrequencies, noteFrequencyLabels, voiceFrequencies, voiceFrequencyLabels } from "./constants.js";
 
 /**
  * Output of AudioAnalysis for the frequency domain of the audio
@@ -29,14 +24,7 @@ export class AudioAnalysis {
    * @param {number} [maxDecibels] default -30
    * @returns {AudioAnalysisOutputType}
    */
-  static getFrequencies(
-    analyser,
-    sampleRate,
-    fftResult,
-    analysisType = 'frequency',
-    minDecibels = -100,
-    maxDecibels = -30,
-  ) {
+  static getFrequencies(analyser, sampleRate, fftResult, analysisType = "frequency", minDecibels = -100, maxDecibels = -30) {
     if (!fftResult) {
       fftResult = new Float32Array(analyser.frequencyBinCount);
       analyser.getFloatFrequencyData(fftResult);
@@ -46,9 +34,8 @@ export class AudioAnalysis {
     let outputValues;
     let frequencies;
     let labels;
-    if (analysisType === 'music' || analysisType === 'voice') {
-      const useFrequencies =
-        analysisType === 'voice' ? voiceFrequencies : noteFrequencies;
+    if (analysisType === "music" || analysisType === "voice") {
+      const useFrequencies = analysisType === "voice" ? voiceFrequencies : noteFrequencies;
       const aggregateOutput = Array(useFrequencies.length).fill(minDecibels);
       for (let i = 0; i < fftResult.length; i++) {
         const frequency = i * frequencyStep;
@@ -61,10 +48,8 @@ export class AudioAnalysis {
         }
       }
       outputValues = aggregateOutput;
-      frequencies =
-        analysisType === 'voice' ? voiceFrequencies : noteFrequencies;
-      labels =
-        analysisType === 'voice' ? voiceFrequencyLabels : noteFrequencyLabels;
+      frequencies = analysisType === "voice" ? voiceFrequencies : noteFrequencies;
+      labels = analysisType === "voice" ? voiceFrequencyLabels : noteFrequencyLabels;
     } else {
       outputValues = Array.from(fftResult);
       frequencies = outputValues.map((_, i) => frequencyStep * i);
@@ -72,17 +57,10 @@ export class AudioAnalysis {
     }
     // We normalize to {0, 1}
     const normalizedOutput = outputValues.map((v) => {
-      return Math.max(
-        0,
-        Math.min((v - minDecibels) / (maxDecibels - minDecibels), 1),
-      );
+      return Math.max(0, Math.min((v - minDecibels) / (maxDecibels - minDecibels), 1));
     });
     const values = new Float32Array(normalizedOutput);
-    return {
-      values,
-      frequencies,
-      labels,
-    };
+    return { values, frequencies, labels };
   }
 
   /**
@@ -103,10 +81,7 @@ export class AudioAnalysis {
        * This has a non-zero RAM cost so we only opt-in to run it on Safari, Chrome is better
        */
       const { length, sampleRate } = audioBuffer;
-      const offlineAudioContext = new OfflineAudioContext({
-        length,
-        sampleRate,
-      });
+      const offlineAudioContext = new OfflineAudioContext({ length, sampleRate });
       const source = offlineAudioContext.createBufferSource();
       source.buffer = audioBuffer;
       const analyser = offlineAudioContext.createAnalyser();
@@ -163,28 +138,14 @@ export class AudioAnalysis {
    * @param {number} [maxDecibels] default -30
    * @returns {AudioAnalysisOutputType}
    */
-  getFrequencies(
-    analysisType = 'frequency',
-    minDecibels = -100,
-    maxDecibels = -30,
-  ) {
+  getFrequencies(analysisType = "frequency", minDecibels = -100, maxDecibels = -30) {
     let fftResult = null;
     if (this.audioBuffer && this.fftResults.length) {
       const pct = this.audio.currentTime / this.audio.duration;
-      const index = Math.min(
-        (pct * this.fftResults.length) | 0,
-        this.fftResults.length - 1,
-      );
+      const index = Math.min((pct * this.fftResults.length) | 0, this.fftResults.length - 1);
       fftResult = this.fftResults[index];
     }
-    return AudioAnalysis.getFrequencies(
-      this.analyser,
-      this.sampleRate,
-      fftResult,
-      analysisType,
-      minDecibels,
-      maxDecibels,
-    );
+    return AudioAnalysis.getFrequencies(this.analyser, this.sampleRate, fftResult, analysisType, minDecibels, maxDecibels);
   }
 
   /**
@@ -193,7 +154,7 @@ export class AudioAnalysis {
    * @returns {Promise<true>}
    */
   async resumeIfSuspended() {
-    if (this.context.state === 'suspended') {
+    if (this.context.state === "suspended") {
       await this.context.resume();
     }
     return true;

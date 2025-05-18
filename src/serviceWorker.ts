@@ -63,7 +63,8 @@ export const dealWithSW = () => {
           const result = await initAudioContext();
           console.log("initAudioContext", result);
           if (result) {
-            dealWithBackgroundSongs({ currentChapter: 1, currentParagraph: 0 });
+            const { currentChapter, currentParagraph } = getCurrentLocation();
+            dealWithBackgroundSongs({ currentChapter, currentParagraph });
             console.log("dealWithBackgroundSongs after");
             splash.classList.add("splash--hide");
             window.dispatchEvent(new CustomEvent("splashHidden"));

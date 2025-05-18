@@ -9,6 +9,6 @@ export const bookData: BookData = {
   metadata: { title: "Krolowa Sniegu" },
   charactersData: KrolowaSnieguCharactersData,
   bookXml: KrolowaSnieguBookXml,
-  chapters: 100,
+  chapters: 7,
   themeColors: getBookThemeColors(BOOK_SLUGS.Krolowa_Sniegu),
 };
