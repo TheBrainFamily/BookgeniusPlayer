@@ -94,6 +94,75 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
     modal.openCharacterDetailsModal(characterSlug, isTalking, listeningSrc);
   });
 
+  // Add hover functionality to show floating avatar
+  character.addEventListener("mouseover", (e) => {
+    // Create floating avatar container
+    const floatingAvatar = document.createElement("div");
+    floatingAvatar.classList.add("floating-avatar");
+    floatingAvatar.style.position = "fixed";
+    floatingAvatar.style.zIndex = "1000";
+    floatingAvatar.style.opacity = "0";
+    floatingAvatar.style.transition = "opacity 500ms ease-in-out";
+
+    // Create media element based on source type
+    if (listeningSrc) {
+      let mediaElement;
+      if (listeningSrc.toLowerCase().endsWith(".png")) {
+        // Create image element
+        mediaElement = document.createElement("img");
+      } else {
+        // Create video element
+        mediaElement = document.createElement("video");
+        mediaElement.autoplay = true;
+        mediaElement.loop = true;
+        mediaElement.muted = true;
+        mediaElement.playsInline = true;
+      }
+
+      mediaElement.src = listeningSrc;
+      mediaElement.classList.add("avatar-preview");
+
+      floatingAvatar.appendChild(mediaElement);
+      document.body.appendChild(floatingAvatar);
+
+      // Position next to cursor
+      const updatePosition = (mouseEvent: MouseEvent) => {
+        floatingAvatar.style.left = `${mouseEvent.clientX + 15}px`;
+        floatingAvatar.style.top = `${mouseEvent.clientY - 30}px`;
+      };
+
+      updatePosition(e as MouseEvent);
+
+      // Add mousemove listener to update position
+      const handleMouseMove = (mouseEvent: MouseEvent) => {
+        updatePosition(mouseEvent);
+      };
+
+      document.addEventListener("mousemove", handleMouseMove);
+
+      // Fade in
+      setTimeout(() => {
+        floatingAvatar.style.opacity = "1";
+      }, 10);
+
+      // Handle mouseout
+      const handleMouseOut = () => {
+        // Fade out
+        floatingAvatar.style.opacity = "0";
+
+        // Remove after transition completes
+        setTimeout(() => {
+          document.body.removeChild(floatingAvatar);
+          document.removeEventListener("mousemove", handleMouseMove);
+        }, 500);
+
+        character.removeEventListener("mouseout", handleMouseOut);
+      };
+
+      character.addEventListener("mouseout", handleMouseOut);
+    }
+  });
+
   // Mark that a listener has been attached
   character.dataset.clickListenerAttached = "true";
 }
@@ -229,7 +298,6 @@ function getScrollMarginTopPx(): number {
   if (!element) return 0;
 
   const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1024px)");
-  const lineHeight = parseFloat(window.getComputedStyle(element).lineHeight);
   if (landscapeMediaQuery.matches) {
     return 30;
   }
@@ -375,7 +443,7 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
     if (intersectingPages.size > 0) {
       // Default multipliers
       const topMultiplier = 0.05;
-      let bottomMultiplier = 0.3;
+      let bottomMultiplier = 0.5;
 
       // Check media query for landscape mode on smaller wide screens
       const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");

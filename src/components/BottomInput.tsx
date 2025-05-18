@@ -183,6 +183,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
         isCollapsed ? "w-auto right-4 left-auto rounded-full p-1" : "w-full",
         "justify-around",
         className,
+        "optional-element",
       )}
     >
       {/* ToDo: Remove when layout will be refactored */}

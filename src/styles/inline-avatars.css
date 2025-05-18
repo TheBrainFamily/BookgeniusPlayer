@@ -75,3 +75,31 @@
 #content-container p {
   line-height: 2.5em;
 }
+
+/* Floating Avatar Styles */
+.floating-avatar {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+}
+
+.avatar-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 2px solid #ddd;
+}
+
+/* Character highlighted styles */
+.character-highlighted-activated {
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.character-highlighted-activated:hover {
+  color: #5e5e5e;
+}

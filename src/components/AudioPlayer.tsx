@@ -231,7 +231,7 @@ export default function AudioPlayer() {
   );
 
   return (
-    <div className="absolute top-[1rem] left-20 z-10">
+    <div className="absolute top-[1rem] left-20 z-10 optional-element">
       <audio ref={audioRef} src={getCurrentAudioSrc()} />
 
       <AnimatePresence mode="wait">
