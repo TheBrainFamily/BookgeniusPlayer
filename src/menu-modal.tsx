@@ -1,10 +1,9 @@
 import React, { useState, useLayoutEffect, useMemo } from "react";
-import { Book, X, List, FileText, PanelLeft, PanelBottom, Type, RotateCcw, Music } from "lucide-react";
+import { Book, X, List, FileText, Type, RotateCcw, Music } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";

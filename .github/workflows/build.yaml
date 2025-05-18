@@ -20,3 +20,4 @@ jobs:
       - run: pnpm test
       - run: pnpm typecheck
       - run: pnpm lint
+      - run: pnpm prettier:check

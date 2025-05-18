@@ -14,7 +14,8 @@
     "dev": "vite dev",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "prettier:check": "prettier --check src/ --quiet"
   },
   "dependencies": {
     "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
@@ -65,6 +66,7 @@
     "@xmldom/xmldom": "^0.9.8",
     "autoprefixer": "^10.4.21",
     "copyfiles": "^2.4.1",
+    "dependency-cruiser": "^16.10.2",
     "diacritics": "^1.3.0",
     "esbuild-jest-transform": "^2.0.1",
     "eslint": "^9.22.0",

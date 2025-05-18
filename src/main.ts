@@ -7,7 +7,6 @@
  *  real React components whenever you feel like it.
  */
 
-import { isMobileCharactersVisible } from "./isMobileCharactersVisible";
 import { initSearchModal } from "./searchModal";
 import { initializeNoteLinkBlinking } from "./annotationsHandling";
 import { dealWithSW } from "./serviceWorker";
@@ -103,7 +102,6 @@ export async function runLegacyInit() {
   // (window as any).showCharacterDetailsModal = showCharacterDetailsModal;
 
   /* Characters panel initial state (night mode, mobile characters, …) */
-  document.getElementById("legacy")?.classList.toggle("characters-hidden", !isMobileCharactersVisible());
 }
 
 export async function runLegacyInitJustSW() {
