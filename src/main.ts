@@ -53,7 +53,7 @@ export async function runLegacyInit() {
 
     // Setup optional elements hiding on user inactivity
     let inactivityTimer: number | null = null;
-    const INACTIVITY_TIMEOUT = 10000; // 10 seconds
+    const INACTIVITY_TIMEOUT = 5000; // 10 seconds
 
     const hideOptionalElements = () => {
       const optionalElements = document.querySelectorAll(".optional-element");

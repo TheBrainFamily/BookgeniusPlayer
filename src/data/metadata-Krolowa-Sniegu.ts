@@ -44,7 +44,7 @@ export const KrolowaSnieguCharactersData = [
         chapter: 2,
         summary: "Chłopiec mieszkający na poddaszu w starym mieście, sąsiad i przyjaciel Gerdy, z którą kochał się jak brat z siostrą. Bawił się z nią w małym ogródku na dachu.",
         paragraphsWhereSpotted: [1, 2, 3, 8, 17, 19, 22, 25, 27, 31, 33, 34, 35, 39, 40, 42, 43, 45, 51, 55],
-        paragraphsWhereTalking: [17, 25, 27, 29, 36, 50],
+        paragraphsWhereTalking: [15, 17, 25, 27, 29, 36, 50],
       },
       {
         chapter: 3,
@@ -88,8 +88,8 @@ export const KrolowaSnieguCharactersData = [
         chapter: 2,
         summary:
           "Dziewczynka mieszkająca na poddaszu w starym mieście, sąsiadka i przyjaciółka Kaja, z którym kochała się jak siostra z bratem. Bawiła się z nim w małym ogródku na dachu.",
-        paragraphsWhereSpotted: [1, 2, 3, 5, 8, 13, 16, 22, 26, 33, 34, 36, 37, 51],
-        paragraphsWhereTalking: [13, 16, 26, 31],
+        paragraphsWhereSpotted: [1, 2, 3, 8, 13, 16, 22, 26, 33, 34, 36, 37, 51],
+        paragraphsWhereTalking: [13, 15, 16, 26, 31],
       },
       {
         chapter: 3,
@@ -143,7 +143,20 @@ export const KrolowaSnieguCharactersData = [
     ],
     imageUrl: "UNKNOWN",
   },
-  { slug: "Rodzice-Gerdy", characterName: "Rodzice Gerdy", bookSlug: "Krolowa-Sniegu", infoPerChapter: [], imageUrl: "UNKNOWN" },
+  {
+    slug: "Rodzice-Gerdy",
+    characterName: "Rodzice Gerdy",
+    bookSlug: "Krolowa-Sniegu",
+    infoPerChapter: [
+      {
+        chapter: 2,
+        summary: "Rodzice Gerdy, którzy mieszkali na poddaszu i wraz z rodzicami Kaja ustawiali skrzynie z kwiatami i warzywami na dachu, tworząc tam mały ogródek dla dzieci.",
+        paragraphsWhereSpotted: [5],
+        paragraphsWhereTalking: [],
+      },
+    ],
+    imageUrl: "UNKNOWN",
+  },
   {
     slug: "Babka-Gerdy",
     characterName: "Babka Gerdy",
@@ -503,7 +516,7 @@ export const KrolowaSnieguCharactersData = [
       {
         chapter: 2,
         summary: "Żywe, powiększające się płatki śniegu o groźnych kształtach, służące jako straż przednia Królowej Śniegu.",
-        paragraphsWhereSpotted: [12, 19, 44],
+        paragraphsWhereSpotted: [44],
         paragraphsWhereTalking: [],
       },
       {
