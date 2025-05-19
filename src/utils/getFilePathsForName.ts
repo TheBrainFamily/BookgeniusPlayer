@@ -177,8 +177,8 @@ const known1984 = [
   "jones-listens.mp4",
   "katharine-listens.mp4",
   "matka-winstona-listens.mp4",
-  "o-brien-listens.mp4",
-  "o-brien-speaks.mp4",
+  "obrien-listens.mp4",
+  "obrien-speaks.mp4",
   "ojciec-winstona-listens.mp4",
   "pan-charrington-listens.mp4",
   "pan-charrington-speaks.mp4",
@@ -306,7 +306,7 @@ const knownConradTajnyAgent = [
   "winnie-verloc-speaks.mp4",
 ];
 
-const known = [...knownPharaon, ...known1984, ...knownKrolowaSniegu, ...knownConradTajnyAgent,];
+const known = [...knownPharaon, ...known1984, ...knownKrolowaSniegu, ...knownConradTajnyAgent];
 export const getPictureFileNameForName = (name: string) => {
   return `${name.replace(/[\s()\\']+/g, "-").toLowerCase()}.png`;
 };
