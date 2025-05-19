@@ -1,5 +1,5 @@
 export default {
-  testEnvironment: "node",
+  testEnvironment: "jsdom",
   roots: ["<rootDir>/src"],
   transform: { "^.+\\.[tj]sx?$": "esbuild-jest-transform" },
   moduleNameMapper: { "^(\\.{1,2}/.*)\\.js$": "$1", "^@/(.*)$": "<rootDir>/src/$1" },

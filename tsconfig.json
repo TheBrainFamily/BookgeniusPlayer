@@ -10,6 +10,6 @@
     "baseUrl": ".",
     "paths": { "@/*": ["./src/*"] },
     "jsx": "react",
-    "types": ["vite/client"]
+    "types": ["vite/client", "jest"]
   }
 }

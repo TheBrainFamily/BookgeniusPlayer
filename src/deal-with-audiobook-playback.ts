@@ -11,7 +11,7 @@
 import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
 import { getAudiobookTracksForBook, AudiobookTracksSection } from "@/getAudiobookTracksForBook"; // Adjust path as needed
 import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audiobook-player";
-import { wrapWord } from "./wrapWord";
+import { highlightNthOccurrence } from "./highlightWord";
 
 let isProcessingAudiobookTracks = false; // Module-level flag to prevent re-entrancy
 
@@ -176,40 +176,27 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
           return sectionsToApply
             .filter((section) => section.chapter === currentChapter)
             .flatMap((section: AudiobookTracksSection) => {
-              return section.words.map((wp) => {
+              const wordOccurrenceCounterWithinSection = new Map<string, number>();
+              const numWordsInSection = section.words.length;
+              return section.words.map((wp, wordIndex) => {
+                const wordStr = wp[0];
+                const timestamp = wp[1];
+                const isLastWord = wordIndex === numWordsInSection - 1;
+
+                const occurrenceIndex = wordOccurrenceCounterWithinSection.get(wordStr) || 0;
+                wordOccurrenceCounterWithinSection.set(wordStr, occurrenceIndex + 1);
+
                 return {
-                  timestamp: wp[1],
-                  callback: (previousWordIndex: number) => {
-                    // console.log("179: previousWordIndex BANG!", previousWordIndex);
-                    const sectionChapter = section.chapter;
-                    const elementSelector = `section[data-chapter='${sectionChapter}'] [data-index='${section.paragraph}']`;
-                    const element = document.querySelector(elementSelector);
-                    if (element) {
-                      const allWordsInParagraph = element.textContent?.split(" ");
-                      const { foundWordIndex } = wrapWord(wp[0], allWordsInParagraph);
-                      //replace all words with index lower than foundWordIndex with '@'
-                      // const newText = allWordsInParagraph?.map((w, i) => (i < foundWordIndex ? '@' : w)).join(' ');
-                      const newText = allWordsInParagraph?.map((w, i) => (i < foundWordIndex ? "@" : w));
-                      // console.log(`wordIndex: ${foundWordIndex}`);
+                  timestamp,
+                  callback: () => {
+                    const paragraphSelector = `section[data-chapter='${section.chapter}'] [data-index='${section.paragraph}']`;
+                    const paragraphElement = document.querySelector(paragraphSelector);
 
-                      if (foundWordIndex !== -1) {
-                        const wordElement = document.createElement("span");
-                        wordElement.textContent = wp[0];
-                        wordElement.setAttribute("data-nth-word", `${foundWordIndex}`);
-                        wordElement.classList.add("current-word");
-
-                        const gowno = newText.map((word, index) => (word === "@" ? allWordsInParagraph[index] : word));
-                        // newText.splice(0, numberOfAts);
-
-                        // const text = element.textContent;
-                        // const replacedText = gowno.replace(wp[0], wordElement.outerHTML);
-                        const replacedText = gowno.map((item, index) => (index === foundWordIndex ? wordElement.outerHTML : item)).join(" ");
-                        element.innerHTML = replacedText;
-                        return foundWordIndex;
-                      }
+                    if (paragraphElement) {
+                      paragraphElement.innerHTML = highlightNthOccurrence(paragraphElement.innerHTML, wordStr, occurrenceIndex, "current-word", isLastWord);
                     }
-                    console.log(`now playing section`, wp[0]);
-                    return previousWordIndex; // Return previous word index if no new index was found
+
+                    return 0;
                   },
                   triggered: false,
                 };
