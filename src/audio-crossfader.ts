@@ -3,7 +3,7 @@ import { parseBlob } from "music-metadata";
 import { CURRENT_BOOK } from "./consts";
 
 // --- Interfaces and Types ---
-interface TrackState {
+export interface TrackState {
   transitionPoints?: number[];
   audioBuffer?: AudioBuffer;
   sourceNode?: AudioBufferSourceNode | null;
@@ -152,24 +152,11 @@ export async function loadTrack(trackId: string, transitionPoints?: number[]): P
 
     if (metadata.picture?.[0]) {
       const picture = metadata.picture[0];
-      const blob = new Blob([picture.data], { type: picture.format });
+      const blob = new Blob([new Uint8Array(picture.data)], { type: picture.format });
       coverArtUrl = URL.createObjectURL(blob);
-
-      // Debug image (optional)
-      const debugImage = document.createElement("img");
-      debugImage.src = coverArtUrl;
-      debugImage.style.cssText = `
-        position: fixed; top: 10px; right: 10px;
-        border: 1px solid white; z-index: 10000;
-        max-width: 100px; max-height: 100px;
-        background: white; cursor: pointer;
-      `;
-
-      document.body.appendChild(debugImage);
     }
 
     // Continue with audio processing
-
     tracks.set(trackId, {
       audioBuffer,
       duration: audioBuffer.duration,
@@ -769,6 +756,32 @@ export function getCurrentTrackPosition(): number | null {
   return Math.min(pos, state.audioBuffer?.duration ?? Infinity);
 }
 
+export function setCurrentTrackPosition(position: number): boolean {
+  if (!audioContext || !currentTrackId) return false;
+  const state = tracks.get(currentTrackId);
+  if (!state || !state.audioBuffer) return false;
+
+  // Clamp position to valid range
+  const safePosition = Math.max(0, Math.min(position, state.audioBuffer.duration));
+
+  try {
+    const wasPlaying = state.sourceNode !== null;
+    stopTrackInternal(currentTrackId);
+
+    // If it was playing, start a new instance at the specified position
+    if (wasPlaying) {
+      playTrack(currentTrackId, audioContext.currentTime, safePosition);
+    } else {
+      // If it was paused, update the pausedAt value
+      state.pausedAt = safePosition;
+    }
+    return true;
+  } catch (e) {
+    console.error("Error setting track position:", e);
+    return false;
+  }
+}
+
 // --- Volume control functions ---
 /**
  * Get the current master volume level (0.0 to 1.0)
@@ -872,6 +885,7 @@ declare global {
     setBackgroundVolume: typeof setBackgroundVolume;
     getCurrentTrackData: typeof getCurrentTrackData;
     getCurrentTrackPosition: typeof getCurrentTrackPosition;
+    setCurrentTrackPosition: typeof setCurrentTrackPosition;
     pauseCurrentTrack: typeof pauseCurrentTrack;
     resumeCurrentTrack: typeof resumeCurrentTrack;
   }
@@ -882,5 +896,6 @@ window.getMasterVolume = getMasterVolume;
 window.setBackgroundVolume = setBackgroundVolume;
 window.getCurrentTrackData = getCurrentTrackData;
 window.getCurrentTrackPosition = getCurrentTrackPosition;
+window.setCurrentTrackPosition = setCurrentTrackPosition;
 window.pauseCurrentTrack = pauseCurrentTrack;
 window.resumeCurrentTrack = resumeCurrentTrack;
