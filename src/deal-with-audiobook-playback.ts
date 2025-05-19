@@ -88,7 +88,12 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
         return b.paragraph - a.paragraph;
       });
 
+    console.log("91: foundAudiobookSections BANG!", foundAudiobookSections);
+
     const sectionToApply = foundAudiobookSections[0];
+    // TODO: PINGWING: Why we filter the whole book if need only first index
+
+    console.log("94: sectionToApply.words BANG!", sectionToApply.words);
 
     if (sectionToApply && sectionToApply.file) {
       console.log("Applicable Audiobook section found:", sectionToApply);
@@ -120,8 +125,9 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                 callback: () => {
                   // console.log("PINGWING: 112 sectionToApply.file, 0, sectionToApply[clip-begin]", section.file, 0, section["clip-begin"]);
                   const currentChapter = sectionsToApply[index].chapter;
-                  const nextSectionChapter = sectionsToApply[index + 1].chapter;
-                  const nextElementSelector = `section[data-chapter='${nextSectionChapter}'] [data-index='${sectionsToApply[index + 1].paragraph}']`;
+                  const nextSection = sectionsToApply[index + 1];
+                  const nextSectionChapter = nextSection.chapter;
+                  const nextElementSelector = `section[data-chapter='${nextSectionChapter}'] [data-index='${nextSection.paragraph}']`;
                   const nextElement = document.querySelector(nextElementSelector);
 
                   // console.log("PINGWING: 112 nextElementSelector", nextElementSelector);
@@ -133,7 +139,9 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                   }
 
                   if (nextElement) {
-                    if (currentParagraph !== sectionsToApply[index + 1].paragraph) {
+                    if (currentParagraph !== nextSection.paragraph) {
+                      console.log("143: nextElement BANG!", nextElement);
+                      console.log("143: sectionToApply BANG!", nextSection["words"]);
                       console.log("PONTONO DIFFERENT PARAGRAPH   found", nextElement);
                       nextElement.scrollIntoView({ behavior: "smooth", block: "start" });
                     } else {
@@ -151,7 +159,34 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
         };
         const events: AudiobookTrackEvent[] = createEventsForAudiobook();
 
-        playTrack(sectionToApply.file, 0, sectionToApply["clip-begin"], events);
+        const createWordLevelEvents = () => {
+          const bookTracks = getAudiobookTracksForBook(CURRENT_BOOK);
+          const sectionsToApply = bookTracks.filter(
+            (section: AudiobookTracksSection) => section.chapter === currentChapter || (section.chapter === currentChapter + 1 && section.paragraph <= 1),
+          );
+          if (!sectionsToApply) {
+            console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot determine Audiobook song.`);
+            isProcessingAudiobookTracks = false; // Reset flag before early exit
+            return;
+          }
+          return sectionsToApply
+            .filter((section) => section.chapter === currentChapter)
+            .flatMap((section: AudiobookTracksSection) => {
+              return section.words.map((wp) => {
+                return {
+                  timestamp: wp[1],
+                  callback: () => {
+                    console.log(`now playing section`, wp[0]);
+                  },
+                  triggered: false,
+                };
+              });
+            });
+        };
+        const wordLevelEvents: AudiobookTrackEvent[] = createWordLevelEvents();
+        console.log(`wordLevelEvents: ${wordLevelEvents.splice(0, 3)}`);
+
+        playTrack(sectionToApply.file, 0, sectionToApply["clip-begin"], [...events, ...wordLevelEvents]);
       });
     }
   } catch (error) {

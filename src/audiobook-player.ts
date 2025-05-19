@@ -139,6 +139,7 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
 
   try {
     const actualStartTimeInContext = audioContext.currentTime + (startTime > 0 ? startTime - audioContext.currentTime : 0);
+
     source.start(actualStartTimeInContext, calculatedOffset);
 
     state.sourceNode = source;
