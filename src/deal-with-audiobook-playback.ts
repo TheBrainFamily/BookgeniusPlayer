@@ -152,7 +152,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                   } else {
                     console.log("PONTONO nextElement not found", nextElementSelector);
                   }
-                  
+
                   // Return a number to match AudiobookTrackEvent callback signature
                   return 0;
                 },
@@ -180,13 +180,13 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                 return {
                   timestamp: wp[1],
                   callback: (previousWordIndex: number) => {
-                    console.log('179: previousWordIndex BANG!', previousWordIndex);
+                    console.log("179: previousWordIndex BANG!", previousWordIndex);
                     const sectionChapter = section.chapter;
                     const elementSelector = `section[data-chapter='${sectionChapter}'] [data-index='${section.paragraph}']`;
                     const element = document.querySelector(elementSelector);
                     if (element) {
                       const { innerHtml, wordIndex } = wrapWord(previousWordIndex, wp[0], element as HTMLElement);
-                      console.log(`wordIndex: ${wordIndex}`)
+                      console.log(`wordIndex: ${wordIndex}`);
 
                       if (wordIndex !== -1) {
                         element.innerHTML = innerHtml;
@@ -194,14 +194,15 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                         // wordElement.textContent = wp[0];
                         // wordElement.setAttribute('data-nth-word', `${wordIndex}`);
                         // wordElement.classList.add('current-word');
-                        
+
                         // const text = element.textContent;
                         // const newText = text.replace(wp[0], wordElement.outerHTML);
                         // element.innerHTML = newText;
-                        // return wordIndex;
+                        return wordIndex;
                       }
                     }
                     console.log(`now playing section`, wp[0]);
+                    return previousWordIndex; // Return previous word index if no new index was found
                   },
                   triggered: false,
                 };
