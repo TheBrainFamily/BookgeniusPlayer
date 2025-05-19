@@ -180,25 +180,32 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                 return {
                   timestamp: wp[1],
                   callback: (previousWordIndex: number) => {
-                    console.log("179: previousWordIndex BANG!", previousWordIndex);
+                    // console.log("179: previousWordIndex BANG!", previousWordIndex);
                     const sectionChapter = section.chapter;
                     const elementSelector = `section[data-chapter='${sectionChapter}'] [data-index='${section.paragraph}']`;
                     const element = document.querySelector(elementSelector);
                     if (element) {
-                      const { innerHtml, wordIndex } = wrapWord(previousWordIndex, wp[0], element as HTMLElement);
-                      console.log(`wordIndex: ${wordIndex}`);
+                      const allWordsInParagraph = element.textContent?.split(" ");
+                      const { foundWordIndex } = wrapWord(wp[0], allWordsInParagraph);
+                      //replace all words with index lower than foundWordIndex with '@'
+                      // const newText = allWordsInParagraph?.map((w, i) => (i < foundWordIndex ? '@' : w)).join(' ');
+                      const newText = allWordsInParagraph?.map((w, i) => (i < foundWordIndex ? "@" : w));
+                      // console.log(`wordIndex: ${foundWordIndex}`);
 
-                      if (wordIndex !== -1) {
-                        element.innerHTML = innerHtml;
-                        // const wordElement = document.createElement('span');
-                        // wordElement.textContent = wp[0];
-                        // wordElement.setAttribute('data-nth-word', `${wordIndex}`);
-                        // wordElement.classList.add('current-word');
+                      if (foundWordIndex !== -1) {
+                        const wordElement = document.createElement("span");
+                        wordElement.textContent = wp[0];
+                        wordElement.setAttribute("data-nth-word", `${foundWordIndex}`);
+                        wordElement.classList.add("current-word");
+
+                        const gowno = newText.map((word, index) => (word === "@" ? allWordsInParagraph[index] : word));
+                        // newText.splice(0, numberOfAts);
 
                         // const text = element.textContent;
-                        // const newText = text.replace(wp[0], wordElement.outerHTML);
-                        // element.innerHTML = newText;
-                        return wordIndex;
+                        // const replacedText = gowno.replace(wp[0], wordElement.outerHTML);
+                        const replacedText = gowno.map((item, index) => (index === foundWordIndex ? wordElement.outerHTML : item)).join(" ");
+                        element.innerHTML = replacedText;
+                        return foundWordIndex;
                       }
                     }
                     console.log(`now playing section`, wp[0]);
