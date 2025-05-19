@@ -1,3 +1,5 @@
+import { parseBlob } from "music-metadata";
+
 import { CURRENT_BOOK } from "./consts";
 
 // --- Interfaces and Types ---
@@ -8,6 +10,9 @@ interface TrackState {
   gainNode?: GainNode | null;
   duration?: number; // Added for pre-emptive transition
   preemptiveTransitionTimeout?: ReturnType<typeof setTimeout> | null; // Added for managing pre-emptive transition
+  coverArtUrl: string;
+  title: string;
+  trackLength: number;
 }
 
 // --- Configuration ---
@@ -30,6 +35,12 @@ let currentSectionTracks: string[] | null = null;
 let currentTrackIndexInSection: number = -1;
 // undefined: no pending change; null: pending clear; string[]: pending set
 let pendingSectionTracks: string[] | null | undefined = undefined;
+
+export function getCurrentTrackData(): TrackState | null {
+  console.log(`currentTrackId: ${currentTrackId}`);
+  console.log(`tracks`, tracks);
+  return tracks.get(currentTrackId) || null;
+}
 
 // --- Core Functions ---
 
@@ -98,16 +109,10 @@ export async function initAudioContext(): Promise<boolean> {
 
 export async function loadTrack(trackId: string, transitionPoints?: number[]): Promise<boolean> {
   if (!audioContext) {
-    if (!initAudioContext()) {
+    if (!(await initAudioContext())) {
       console.error("loadTrack: AudioContext could not be initialized/resumed. Cannot load track.");
       return false;
     }
-  }
-  if (audioContext!.state !== "running") {
-    // audioContext is guaranteed to be non-null here
-    console.warn("loadTrack: AudioContext is not running. Loading may succeed but playback won't start yet.");
-    // await audioContext!.resume().catch((e) => console.error("Error resuming AudioContext before load:", e));
-    // Resuming here might be too late if the user gesture is already "spent". initAudioContext should handle it.
   }
 
   const existing = tracks.get(trackId);
@@ -115,7 +120,6 @@ export async function loadTrack(trackId: string, transitionPoints?: number[]): P
     if (transitionPoints && existing.transitionPoints !== transitionPoints) {
       existing.transitionPoints = transitionPoints;
     }
-    // console.log(`Track '${trackId}' already loaded.`);
     return true;
   }
 
@@ -124,9 +128,51 @@ export async function loadTrack(trackId: string, transitionPoints?: number[]): P
   try {
     const response = await fetch(audioPath);
     if (!response.ok) throw new Error(`HTTP ${response.status} – ${response.statusText}`);
+
+    // Get audio as ArrayBuffer (read the response only once)
     const arrayBuffer = await response.arrayBuffer();
+
+    // Create a Blob from the ArrayBuffer for metadata parsing
+    const blob = new Blob([arrayBuffer], { type: "audio/mpeg" });
+
+    // Parse metadata
+    const { common: metadata } = await parseBlob(blob);
+    console.log(`metadata`, metadata);
+
+    // Decode audio from the same ArrayBuffer
     const audioBuffer = await audioContext!.decodeAudioData(arrayBuffer);
-    tracks.set(trackId, { audioBuffer, duration: audioBuffer.duration, transitionPoints, sourceNode: null, gainNode: null });
+    let coverArtUrl: string | undefined;
+
+    if (metadata.picture?.[0]) {
+      const picture = metadata.picture[0];
+      const blob = new Blob([picture.data], { type: picture.format });
+      coverArtUrl = URL.createObjectURL(blob);
+
+      // Debug image (optional)
+      const debugImage = document.createElement("img");
+      debugImage.src = coverArtUrl;
+      debugImage.style.cssText = `
+        position: fixed; top: 10px; right: 10px;
+        border: 1px solid white; z-index: 10000;
+        max-width: 100px; max-height: 100px;
+        background: white; cursor: pointer;
+      `;
+
+      document.body.appendChild(debugImage);
+    }
+
+    // Continue with audio processing
+
+    tracks.set(trackId, {
+      audioBuffer,
+      duration: audioBuffer.duration,
+      transitionPoints,
+      sourceNode: null,
+      gainNode: null,
+      coverArtUrl,
+      title: metadata.title || trackId,
+      trackLength: audioBuffer.duration,
+    });
     console.log(`Decoded '${trackId}'. Duration: ${audioBuffer.duration.toFixed(2)}s.` + (transitionPoints ? ` Transition points: ${transitionPoints.join(", ")}` : ""));
     return true;
   } catch (e) {
@@ -774,9 +820,11 @@ declare global {
     setMasterVolume: typeof setMasterVolume;
     getMasterVolume: typeof getMasterVolume;
     setBackgroundVolume: typeof setBackgroundVolume;
+    getCurrentTrackData: typeof getCurrentTrackData;
   }
 }
 
 window.setMasterVolume = setMasterVolume;
 window.getMasterVolume = getMasterVolume;
 window.setBackgroundVolume = setBackgroundVolume;
+window.getCurrentTrackData = getCurrentTrackData;
