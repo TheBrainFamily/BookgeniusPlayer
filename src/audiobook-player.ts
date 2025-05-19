@@ -3,7 +3,7 @@ import { CURRENT_BOOK } from "./consts";
 
 export type AudiobookTrackEvent = {
   timestamp: number; // Time in seconds within the track
-  callback: () => void;
+  callback: (previousWordIndex?: number) => number| undefined;
   triggered: boolean;
 };
 
@@ -152,6 +152,7 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
       if (state.playbackIntervalId) {
         clearInterval(state.playbackIntervalId); // Clear any lingering interval
       }
+      let previousWordIndex = 0;
       state.playbackIntervalId = setInterval(() => {
         if (!audioContext || !state.sourceNode || !state.startTimeInContext) {
           // If context is lost, source is gone, or startTimeInContext isn't set, stop interval
@@ -171,7 +172,11 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
           if (!event.triggered && currentTrackTime >= event.timestamp) {
             try {
               // console.log(`Triggering event for ${trackId} at ${event.timestamp}s (currentTrackTime: ${currentTrackTime.toFixed(2)})`);
-              event.callback();
+              const result = event.callback(previousWordIndex);
+              console.log('200: result BANG!', result);
+              if (result && result > previousWordIndex) {
+                previousWordIndex = result;
+              }
             } catch (e) {
               console.error(`Error executing event callback for ${trackId} at ${event.timestamp}s:`, e);
             }

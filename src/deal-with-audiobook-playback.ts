@@ -11,6 +11,7 @@
 import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
 import { getAudiobookTracksForBook, AudiobookTracksSection } from "@/getAudiobookTracksForBook"; // Adjust path as needed
 import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audiobook-player";
+import { wrapWord } from "./wrapWord";
 
 let isProcessingAudiobookTracks = false; // Module-level flag to prevent re-entrancy
 
@@ -151,6 +152,9 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                   } else {
                     console.log("PONTONO nextElement not found", nextElementSelector);
                   }
+                  
+                  // Return a number to match AudiobookTrackEvent callback signature
+                  return 0;
                 },
                 triggered: false,
               };
@@ -175,7 +179,28 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
               return section.words.map((wp) => {
                 return {
                   timestamp: wp[1],
-                  callback: () => {
+                  callback: (previousWordIndex: number) => {
+                    console.log('179: previousWordIndex BANG!', previousWordIndex);
+                    const sectionChapter = section.chapter;
+                    const elementSelector = `section[data-chapter='${sectionChapter}'] [data-index='${section.paragraph}']`;
+                    const element = document.querySelector(elementSelector);
+                    if (element) {
+                      const { innerHtml, wordIndex } = wrapWord(previousWordIndex, wp[0], element as HTMLElement);
+                      console.log(`wordIndex: ${wordIndex}`)
+
+                      if (wordIndex !== -1) {
+                        element.innerHTML = innerHtml;
+                        // const wordElement = document.createElement('span');
+                        // wordElement.textContent = wp[0];
+                        // wordElement.setAttribute('data-nth-word', `${wordIndex}`);
+                        // wordElement.classList.add('current-word');
+                        
+                        // const text = element.textContent;
+                        // const newText = text.replace(wp[0], wordElement.outerHTML);
+                        // element.innerHTML = newText;
+                        // return wordIndex;
+                      }
+                    }
                     console.log(`now playing section`, wp[0]);
                   },
                   triggered: false,

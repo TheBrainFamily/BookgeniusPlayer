@@ -973,3 +973,11 @@ section[data-chapter] [data-index] {
   z-index: 10000;
   animation: pulse 2.5s infinite ease-in-out;
 }
+
+.current-word {
+  background-color:white;
+  padding: 4px;
+  margin: -4px;
+  border-radius: 4px;
+  transition: background-color 1s fade-in;
+}
