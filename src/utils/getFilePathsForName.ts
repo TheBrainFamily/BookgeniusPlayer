@@ -269,7 +269,44 @@ const knownKrolowaSniegu = [
   "zlosliwy-czarodziej-speaks.mp4",
 ];
 
-const known = [...knownPharaon, ...known1984, ...knownKrolowaSniegu];
+const knownConradTajnyAgent = [
+  "baron-stott-wartenheim-listens.mp4",
+  "cheesemann-listens.mp4",
+  "cheesemann-speaks.mp4",
+  "karl-yundt-listens.mp4",
+  "karl-yundt-speaks.mp4",
+  "komisarz-heat-listens.mp4",
+  "komisarz-heat-speaks.mp4",
+  "matka-winnie-listens.mp4",
+  "matka-winnie-speaks.mp4",
+  "miejscowy-policjant-listens.mp4",
+  "miejscowy-policjant-speaks.mp4",
+  "nadinspektorowa-annie.mp4",
+  "opiekunka-michaelisa-listens.mp4",
+  "opiekunka-michaelisa-speaks.mp4",
+  "pan-verloc-listens.mp4",
+  "pan-verloc-speaks.mp4",
+  "pan-wladimir-listens.mp4",
+  "pan-wladimir-speaks.mp4",
+  "pani-neale-listens.mp4",
+  "pani-neale-speaks.mp4",
+  "profesor-listens.mp4",
+  "profesor-speaks.mp4",
+  "sir-ethelred-listens.mp4",
+  "sir-ethelred-speaks.mp4",
+  "stevie-listens.mp4",
+  "stevie-speaks.mp4",
+  "tajny-radca-wurmt-listens.mp4",
+  "tajny-radca-wurmt-speaks.mp4",
+  "toodles-listens.mp4",
+  "toodles-speaks.mp4",
+  "towarzysz-aleksander-ossipon-listens.mp4",
+  "towarzysz-aleksander-ossipon-speaks.mp4",
+  "winnie-verloc-listens.mp4",
+  "winnie-verloc-speaks.mp4",
+];
+
+const known = [...knownPharaon, ...known1984, ...knownKrolowaSniegu, ...knownConradTajnyAgent,];
 export const getPictureFileNameForName = (name: string) => {
   return `${name.replace(/[\s()\\']+/g, "-").toLowerCase()}.png`;
 };
