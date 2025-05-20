@@ -18,6 +18,7 @@ import { stopAudiobook, playAudiobook } from "@/hooks/useAudiobookTracks";
 import { dealWithBackgroundSongs } from "@/deal-with-background-songs";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { Slider } from "@/components/ui/slider";
+import { cn } from "@/lib/utils";
 
 const AudioPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(true);
@@ -392,11 +393,10 @@ const AudioPlayer = () => {
       <AnimatePresence>
         {showSongNotification && !isBigPlayerHovered && !isVolumeHovered && currentTrackData && (
           <motion.div
-            className={`px-4 py-3 flex items-center gap-4 text-white bg-black/60 backdrop-blur-md rounded-2xl border shadow-xl border-white/30 absolute z-20 ${
-              windowWidth < 1400
-                ? "w-80 bottom-0 left-0 ml-4 mb-4" // Position at bottom-left for smaller screens
-                : "w-100 top-0 right-0 mr-4 mt-4" // Position at top-right for larger screens
-            }`}
+            className={cn(
+              "px-4 py-3 flex items-center gap-4 text-white bg-black/60 backdrop-blur-md rounded-2xl border shadow-xl border-white/30 absolute z-20 max-w-full overflow-hidden",
+              windowWidth < 1400 ? "w-80 bottom-0 left-0 ml-4 mb-4" : "w-100 top-0 right-0 mr-4 mt-4",
+            )}
             variants={variants.songNotification}
             initial="initial"
             animate="animate"
@@ -407,7 +407,8 @@ const AudioPlayer = () => {
             <div className={`bg-white/10 rounded-lg overflow-hidden flex-shrink-0 ${windowWidth < 1400 ? "w-24 h-24" : "w-36 h-36"}`}>
               {currentTrackData.coverArtUrl && <img src={currentTrackData.coverArtUrl} alt="Now playing" className="w-full h-full object-cover" />}
             </div>
-            <div className="flex flex-col">
+
+            <div className="flex flex-col flex-1 min-w-0">
               <div className="text-sm font-medium">Now Playing</div>
               <div className="text-base font-medium truncate">{currentTrackData.title || "Unknown Track"}</div>
             </div>
