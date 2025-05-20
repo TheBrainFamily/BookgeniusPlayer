@@ -89,12 +89,8 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
         return b.paragraph - a.paragraph;
       });
 
-    console.log("91: foundAudiobookSections BANG!", foundAudiobookSections);
-
     const sectionToApply = foundAudiobookSections[0];
     // TODO: PINGWING: Why we filter the whole book if need only first index
-
-    console.log("94: sectionToApply.words BANG!", sectionToApply.words);
 
     if (sectionToApply && sectionToApply.file) {
       console.log("Applicable Audiobook section found:", sectionToApply);
@@ -141,8 +137,6 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
 
                   if (nextElement) {
                     if (currentParagraph !== nextSection.paragraph) {
-                      console.log("143: nextElement BANG!", nextElement);
-                      console.log("143: sectionToApply BANG!", nextSection["words"]);
                       console.log("PONTONO DIFFERENT PARAGRAPH   found", nextElement);
                       nextElement.scrollIntoView({ behavior: "smooth", block: "start" });
                     } else {
@@ -220,7 +214,6 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                 return {
                   timestamp,
                   callback: () => {
-                    // Remove highlights from other paragraphs before applying new highlight
                     removeHighlightsFromOtherParagraphs();
 
                     const paragraphSelector = `section[data-chapter='${section.chapter}'] [data-index='${section.paragraph}']`;
@@ -229,8 +222,6 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                     if (paragraphElement) {
                       paragraphElement.innerHTML = highlightNthOccurrence(paragraphElement.innerHTML, wordStr, occurrenceIndex, "current-word", isLastWord);
                     }
-
-                    return 0;
                   },
                   triggered: false,
                 };
