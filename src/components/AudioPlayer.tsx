@@ -262,22 +262,6 @@ const AudioPlayer = () => {
     await transitionToTrack(prevTrackId);
   };
 
-  const debugTriggerSongNotification = () => {
-    console.log("Manual notification trigger");
-
-    if (!currentTrackData) {
-      const testTrack: TrackState = { title: "Test Track", coverArtUrl: "https://picsum.photos/200", trackLength: 180 };
-      setCurrentTrackData(testTrack);
-    }
-
-    setShowSongNotification(true);
-    console.log("Manually set showSongNotification to true");
-
-    setTimeout(() => {
-      setShowSongNotification(false);
-    }, 6000);
-  };
-
   const handleDownloadTrack = (trackId: string) => {
     if (!trackId) return;
     const trackUrl = `/${CURRENT_BOOK}/${trackId}.mp3`;
@@ -481,11 +465,6 @@ const AudioPlayer = () => {
               )}
             </AnimatePresence>
           </div>
-
-          {/* Debug/Testing Button */}
-          <motion.button onClick={debugTriggerSongNotification} className="p-2 hover:text-white rounded-full" whileHover="hover" whileTap="tap" variants={variants.buttonHover}>
-            <Play className="w-5 h-5 cursor-pointer" />
-          </motion.button>
         </motion.div>
       </div>
 
