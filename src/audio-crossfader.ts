@@ -39,6 +39,10 @@ let currentTrackIndexInSection: number = -1;
 // undefined: no pending change; null: pending clear; string[]: pending set
 let pendingSectionTracks: string[] | null | undefined = undefined;
 
+export function getTrackDetailsById(id: string): TrackState | null {
+  return tracks.get(id) || null;
+}
+
 export function getCurrentTrackData(): TrackState | null {
   console.log(`currentTrackId: ${currentTrackId}`);
   console.log(`tracks`, tracks);
