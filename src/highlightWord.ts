@@ -25,134 +25,158 @@ export function highlightNthOccurrence(htmlText: string, wordToFind: string, occ
   const FADE_CLASS = "last-word-auto-fade";
   const GENERATED_SPAN_MARKER = "data-highlight-generated";
 
-  // --- 1. Cleanup Logic ---
-  const elementsWithHighlight: NodeListOf<HTMLElement> = tempDiv.querySelectorAll(`.${primaryHighlightClass}`);
-  elementsWithHighlight.forEach((el) => {
-    const wasGeneratedByUs = el.getAttribute(GENERATED_SPAN_MARKER) === "true";
-
-    el.classList.remove(primaryHighlightClass);
-    el.classList.remove(FADE_CLASS);
-
-    if (wasGeneratedByUs) {
-      const parent = el.parentNode;
-      if (parent) {
-        // If the highlight wrapper contains a single element (e.g., a span), unwrap it cleanly
-        if (el.childNodes.length === 1 && el.firstChild && el.firstChild.nodeType === Node.ELEMENT_NODE) {
-          parent.insertBefore(el.firstChild, el);
-        } else {
-          while (el.firstChild) {
-            parent.insertBefore(el.firstChild, el);
-          }
-        }
-        parent.removeChild(el);
-        if (typeof parent.normalize === "function") {
-          parent.normalize();
-        }
-      }
-    }
-  });
-  // --- End of Cleanup Logic ---
-
-  let currentTextMatchCount: number = 0;
-  let highlighted: boolean = false;
-
-  const walker: TreeWalker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT, null);
-  const nodesToProcess: Text[] = [];
-  let currentNodeFromWalker: Node | null;
-  while ((currentNodeFromWalker = walker.nextNode())) {
-    if (currentNodeFromWalker.nodeType === Node.TEXT_NODE && currentNodeFromWalker.nodeValue && currentNodeFromWalker.nodeValue.trim() !== "") {
-      nodesToProcess.push(currentNodeFromWalker as Text);
-    }
-  }
-
+  // Helper function to check if a character is a word character
   const isWordChar = (char: string): boolean => {
     if (!char || char.length !== 1) return false;
     return /^[a-zA-Z0-9À-ÖØ-öø-ÿĄĆĘŁŃÓŚŹŻąćęłńóśźż_]$/.test(char);
   };
 
-  // Decode HTML entities in wordToFind for comparison
-  const decodedWordToFind = wordToFind
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
+  // Helper function to decode HTML entities
+  const decodeHtmlEntities = (text: string): string => {
+    return text
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+  };
 
-  for (let i = 0; i < nodesToProcess.length; i++) {
-    if (highlighted) break;
+  // Helper function to clean up existing highlights
+  const cleanupExistingHighlights = () => {
+    const elementsWithHighlight: NodeListOf<HTMLElement> = tempDiv.querySelectorAll(`.${primaryHighlightClass}`);
+    elementsWithHighlight.forEach((el) => {
+      const wasGeneratedByUs = el.getAttribute(GENERATED_SPAN_MARKER) === "true";
 
-    const textNodeToSearch: Text = nodesToProcess[i];
-    const nodeText: string = textNodeToSearch.nodeValue || "";
-    const LcNodeText = nodeText.toLowerCase();
-    const LcWordToFind = decodedWordToFind.toLowerCase();
+      el.classList.remove(primaryHighlightClass);
+      el.classList.remove(FADE_CLASS);
 
-    if (LcWordToFind.length === 0) continue;
-
-    let searchIndexInLcText = 0;
-
-    while (searchIndexInLcText < LcNodeText.length) {
-      const matchStartIndexInLcText = LcNodeText.indexOf(LcWordToFind, searchIndexInLcText);
-      if (matchStartIndexInLcText === -1) break;
-
-      const matchStartIndexInOriginalText = matchStartIndexInLcText;
-      const actualFoundWordInText = nodeText.substring(matchStartIndexInOriginalText, matchStartIndexInOriginalText + LcWordToFind.length);
-
-      const charBefore = matchStartIndexInOriginalText > 0 ? nodeText[matchStartIndexInOriginalText - 1] : " ";
-      const charAfter = matchStartIndexInOriginalText + LcWordToFind.length < nodeText.length ? nodeText[matchStartIndexInOriginalText + LcWordToFind.length] : " ";
-
-      if (!isWordChar(charBefore) && !isWordChar(charAfter)) {
-        // DEBUG LOG
-         
-        console.log("DEBUG:", { currentTextMatchCount, occurrenceIndex, nodeText, matchStartIndexInLcText, actualFoundWordInText });
-        if (currentTextMatchCount === occurrenceIndex) {
-          const parentElement = textNodeToSearch.parentNode as HTMLElement | null;
-
-          // If the match's parent is a <span>, wrap the <span>. Otherwise, just wrap the word itself.
-          if (parentElement && parentElement.nodeName === "SPAN" && parentElement.parentNode && !parentElement.hasAttribute(GENERATED_SPAN_MARKER)) {
-            const grandParentElement = parentElement.parentNode;
-            const newHighlightWrapperSpan = document.createElement("span");
-            newHighlightWrapperSpan.className = primaryHighlightClass;
-            if (isLastWordInParagraph) {
-              newHighlightWrapperSpan.classList.add(FADE_CLASS);
+      if (wasGeneratedByUs) {
+        const parent = el.parentNode;
+        if (parent) {
+          if (el.childNodes.length === 1 && el.firstChild && el.firstChild.nodeType === Node.ELEMENT_NODE) {
+            parent.insertBefore(el.firstChild, el);
+          } else {
+            while (el.firstChild) {
+              parent.insertBefore(el.firstChild, el);
             }
-            newHighlightWrapperSpan.setAttribute(GENERATED_SPAN_MARKER, "true");
-            grandParentElement.insertBefore(newHighlightWrapperSpan, parentElement);
-            newHighlightWrapperSpan.appendChild(parentElement);
-            highlighted = true;
-            break;
-          } else if (parentElement) {
-            // Create a new SPAN for this specific word segment
-            const textBeforeVal: string = nodeText.substring(0, matchStartIndexInOriginalText);
-            const textAfterVal: string = nodeText.substring(matchStartIndexInOriginalText + actualFoundWordInText.length);
-
-            const newSpan: HTMLSpanElement = document.createElement("span");
-            newSpan.className = primaryHighlightClass;
-            if (isLastWordInParagraph) {
-              newSpan.classList.add(FADE_CLASS);
-            }
-            newSpan.setAttribute(GENERATED_SPAN_MARKER, "true");
-            newSpan.textContent = actualFoundWordInText;
-
-            if (textBeforeVal.length > 0) {
-              parentElement.insertBefore(document.createTextNode(textBeforeVal), textNodeToSearch);
-            }
-            parentElement.insertBefore(newSpan, textNodeToSearch);
-            if (textAfterVal.length > 0) {
-              parentElement.insertBefore(document.createTextNode(textAfterVal), textNodeToSearch);
-            }
-            parentElement.removeChild(textNodeToSearch);
-            if (typeof parentElement.normalize === "function") {
-              parentElement.normalize();
-            }
-            highlighted = true;
-            break;
+          }
+          parent.removeChild(el);
+          if (typeof parent.normalize === "function") {
+            parent.normalize();
           }
         }
-        currentTextMatchCount++;
       }
-      searchIndexInLcText = matchStartIndexInLcText + LcWordToFind.length;
+    });
+  };
+
+  // Helper function to collect text nodes
+  const collectTextNodes = (): Text[] => {
+    const nodesToProcess: Text[] = [];
+    const walker: TreeWalker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT, null);
+    let currentNodeFromWalker: Node | null;
+    while ((currentNodeFromWalker = walker.nextNode())) {
+      if (currentNodeFromWalker.nodeType === Node.TEXT_NODE && currentNodeFromWalker.nodeValue && currentNodeFromWalker.nodeValue.trim() !== "") {
+        nodesToProcess.push(currentNodeFromWalker as Text);
+      }
     }
-    if (highlighted) break;
-  }
+    return nodesToProcess;
+  };
+
+  // Helper function to create highlight span
+  const createHighlightSpan = (text: string): HTMLSpanElement => {
+    const newSpan: HTMLSpanElement = document.createElement("span");
+    newSpan.className = primaryHighlightClass;
+    if (isLastWordInParagraph) {
+      //TODO: be sure that we want to fade out the last word in a paragraph like this
+      newSpan.classList.add(FADE_CLASS);
+    }
+    newSpan.setAttribute(GENERATED_SPAN_MARKER, "true");
+    newSpan.textContent = text;
+    return newSpan;
+  };
+
+  // Helper function to wrap existing span
+  const wrapExistingSpan = (parentElement: HTMLElement): boolean => {
+    const grandParentElement = parentElement.parentNode;
+    if (!grandParentElement) return false;
+
+    const newHighlightWrapperSpan = document.createElement("span");
+    newHighlightWrapperSpan.className = primaryHighlightClass;
+    if (isLastWordInParagraph) {
+      newHighlightWrapperSpan.classList.add(FADE_CLASS);
+    }
+    newHighlightWrapperSpan.setAttribute(GENERATED_SPAN_MARKER, "true");
+    grandParentElement.insertBefore(newHighlightWrapperSpan, parentElement);
+    newHighlightWrapperSpan.appendChild(parentElement);
+    return true;
+  };
+
+  // Helper function to wrap word in text node
+  const wrapWordInTextNode = (textNode: Text, startIndex: number, wordLength: number): boolean => {
+    const parentElement = textNode.parentNode as HTMLElement | null;
+    if (!parentElement) return false;
+
+    const nodeText = textNode.nodeValue || "";
+    const textBeforeVal = nodeText.substring(0, startIndex);
+    const textAfterVal = nodeText.substring(startIndex + wordLength);
+    const actualFoundWordInText = nodeText.substring(startIndex, startIndex + wordLength);
+
+    const newSpan = createHighlightSpan(actualFoundWordInText);
+
+    if (textBeforeVal.length > 0) {
+      parentElement.insertBefore(document.createTextNode(textBeforeVal), textNode);
+    }
+    parentElement.insertBefore(newSpan, textNode);
+    if (textAfterVal.length > 0) {
+      parentElement.insertBefore(document.createTextNode(textAfterVal), textNode);
+    }
+    parentElement.removeChild(textNode);
+    if (typeof parentElement.normalize === "function") {
+      parentElement.normalize();
+    }
+    return true;
+  };
+
+  // Main processing logic
+  const processTextNodes = (): boolean => {
+    const nodesToProcess = collectTextNodes();
+    const decodedWordToFind = decodeHtmlEntities(wordToFind);
+    let currentTextMatchCount = 0;
+
+    for (const textNode of nodesToProcess) {
+      const nodeText = textNode.nodeValue || "";
+      const LcNodeText = nodeText;
+      const LcWordToFind = decodedWordToFind;
+
+      if (LcWordToFind.length === 0) continue;
+
+      let searchIndexInLcText = 0;
+      while (searchIndexInLcText < LcNodeText.length) {
+        const matchStartIndexInLcText = LcNodeText.indexOf(LcWordToFind, searchIndexInLcText);
+        if (matchStartIndexInLcText === -1) break;
+
+        const charBefore = matchStartIndexInLcText > 0 ? nodeText[matchStartIndexInLcText - 1] : " ";
+        const charAfter = matchStartIndexInLcText + LcWordToFind.length < nodeText.length ? nodeText[matchStartIndexInLcText + LcWordToFind.length] : " ";
+
+        if (!isWordChar(charBefore) && !isWordChar(charAfter)) {
+          if (currentTextMatchCount === occurrenceIndex) {
+            const parentElement = textNode.parentNode as HTMLElement | null;
+            if (parentElement && parentElement.nodeName === "SPAN" && parentElement.parentNode && !parentElement.hasAttribute(GENERATED_SPAN_MARKER)) {
+              return wrapExistingSpan(parentElement);
+            } else if (parentElement) {
+              return wrapWordInTextNode(textNode, matchStartIndexInLcText, LcWordToFind.length);
+            }
+          }
+          currentTextMatchCount++;
+        }
+        searchIndexInLcText = matchStartIndexInLcText + LcWordToFind.length;
+      }
+    }
+    return false;
+  };
+
+  // Execute the main logic
+  cleanupExistingHighlights();
+  processTextNodes();
   return tempDiv.innerHTML;
 }

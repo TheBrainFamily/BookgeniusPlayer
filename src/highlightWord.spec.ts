@@ -47,10 +47,10 @@ describe("highlightNthOccurrence", () => {
     expect(result).toBe(expected);
   });
 
-  test("should be case-insensitive when finding word and preserve original case in highlight", () => {
-    const html = "<p>Hello World example.</p>";
-    const expected = `<p>Hello <span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}>World</span> example.</p>`;
-    const result = highlightNthOccurrence(html, "world", 0, DEFAULT_CLASS);
+  test("should be case-sensitive when finding word and preserve original case in highlight", () => {
+    const html = "<p>Hello world example World.</p>";
+    const expected = `<p>Hello world example <span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}>World</span>.</p>`;
+    const result = highlightNthOccurrence(html, "World", 0, DEFAULT_CLASS);
     expect(result).toBe(expected);
   });
 
@@ -129,6 +129,28 @@ describe("highlightNthOccurrence", () => {
       const html = "<p>A plain word in a paragraph.</p>";
       const expected = `<p>A plain <span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}>word</span> in a paragraph.</p>`;
       const result = highlightNthOccurrence(html, "word", 0, DEFAULT_CLASS);
+      expect(result).toBe(expected);
+    });
+
+    test("should create specific inner span for word directly in a SPAN tag", () => {
+      const html =
+        'stawał <span class="character-highlighted character-highlighted-activated" data-character="Pan-Verloc" data-src-listening="/Conrad-Tajny-Agent/pan-verloc.png" data-click-listener-attached="true">pan Verloc</span>, wyłaniając';
+      const expected =
+        'stawał <span class="current-word" data-highlight-generated="true"><span class="character-highlighted character-highlighted-activated" data-character="Pan-Verloc" data-src-listening="/Conrad-Tajny-Agent/pan-verloc.png" data-click-listener-attached="true">pan Verloc</span></span>, wyłaniając';
+      const result = highlightNthOccurrence(html, "Verloc", 0, DEFAULT_CLASS);
+      expect(result).toBe(expected);
+    });
+
+    test("should create specific inner span for word directly in a SPAN tag with additional word that it's looking", () => {
+      const currentWordSpan = (innerElement: string) => `<span class="current-word" data-highlight-generated="true">${innerElement}</span>`;
+      const paniVerlocHtml =
+        '<span class="character-highlighted character-highlighted-activated" data-character="Winnie-Verloc" data-src-listening="/Conrad-Tajny-Agent/winnie-verloc.png" data-click-listener-attached="true">pani Verloc</span>';
+      const winniVerlocHtml = '<span class="character-highlighted" data-character="Winnie-Verloc" data-src-listening="/Conrad-Tajny-Agent/winnie-verloc.png">Winnie Verloc</span>';
+
+      const html = `czasem na wezwanie pękniętego dzwonka ukazywałą się ${paniVerlocHtml}. ${winniVerlocHtml} była młodą kobietą`;
+      const expected = `czasem na wezwanie pękniętego dzwonka ukazywałą się ${currentWordSpan(paniVerlocHtml)}. ${winniVerlocHtml} była młodą kobietą`;
+
+      const result = highlightNthOccurrence(html, "pani", 0, DEFAULT_CLASS);
       expect(result).toBe(expected);
     });
 

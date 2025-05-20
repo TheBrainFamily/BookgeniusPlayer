@@ -179,7 +179,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
               const wordOccurrenceCounterWithinSection = new Map<string, number>();
               const numWordsInSection = section.words.length;
               return section.words.map((wp, wordIndex) => {
-                const wordStr = wp[0];
+                const wordStr = wp[0].replace(/[.,!?;:]/g, "");
                 const timestamp = wp[1];
                 const isLastWord = wordIndex === numWordsInSection - 1;
 
