@@ -238,7 +238,7 @@ const krolowaSnieguBackgroundSongsDefined = [
   { chapter: 2, paragraph: 1, files: ["chapter_2_paragraph_1.mp3", "chapter_2_paragraph_1b.mp3"] },
   { chapter: 2, paragraph: 24, files: ["chapter_2_paragraph_24.mp3", "chapter_2_paragraph_24b.mp3"] },
   { chapter: 3, paragraph: 1, files: ["chapter_3_paragraph_1.mp3", "chapter_3_paragraph_1b.mp3"] },
-  { chapter: 3, paragraph: 20, files: ["chapter_3_paragraph_20.mp3", "chapter_3_paragraph_20b.mp3"] },
+  { chapter: 3, paragraph: 20, files: ["chapter_3_paragraph_20b.mp3", "chapter_3_paragraph_20.mp3"] },
   { chapter: 3, paragraph: 37, files: ["chapter_3_paragraph_37.mp3", "chapter_3_paragraph_37b.mp3"] },
   { chapter: 4, paragraph: 1, files: ["chapter_4_paragraph_1.mp3", "chapter_4_paragraph_1b.mp3"] },
   { chapter: 4, paragraph: 35, files: ["chapter_4_paragraph_35.mp3", "chapter_4_paragraph_35b.mp3"] },

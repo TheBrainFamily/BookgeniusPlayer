@@ -973,3 +973,17 @@ section[data-chapter] [data-index] {
   z-index: 10000;
   animation: pulse 2.5s infinite ease-in-out;
 }
+
+/* --- Keyframes for the zoom animation --- */
+@keyframes zoomInOutEffect {
+  /* Renamed slightly for clarity, ensure it's unique if you had other zoomInOut */
+  0% {
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    transform: scale(1.2); /* Your desired zoom amount */
+  }
+  100% {
+    transform: scale(1) translateZ(0);
+  }
+}
