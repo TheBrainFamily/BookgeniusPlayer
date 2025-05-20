@@ -34,7 +34,7 @@ const AudioPlayer = () => {
   const [volume, setVolume] = useState(getMasterVolume() ?? 0.5);
   const [balance, setBalance] = useState(0.5);
   const [isMuted, setIsMuted] = useState(false);
-  const [isVolumeHovered, setIsVolumeHovered] = useState(true);
+  const [isVolumeHovered, setIsVolumeHovered] = useState(false);
   const [isBigPlayerHovered, setIsBigPlayerHovered] = useState(false);
   const [currentTrackData, setCurrentTrackData] = useState<TrackState | null>(null);
   const [showSongNotification, setShowSongNotification] = useState(false);
@@ -307,18 +307,18 @@ const AudioPlayer = () => {
                   onMouseEnter={() => setIsVolumeHovered(true)}
                   onMouseLeave={() => setIsVolumeHovered(false)}
                 >
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: isVolumeHovered ? 1 : 0, y: isVolumeHovered ? 0 : 10 }} transition={{ delay: 0.05 }}>
+                  <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.05 }}>
                     <div className="flex justify-between text-xs my-2">Głośność</div>
-                    <Slider value={[isMuted ? 0 : volume]} min={0} max={1} step={0.01} onValueChange={handleVolumeChange} />
+                    <Slider value={[isMuted ? 0 : volume]} min={0} max={1} step={0.01} onValueChange={handleVolumeChange} variant="secondary" />
                     <div className="flex justify-between text-xs mt-2">
                       <span>0%</span>
                       <span>100%</span>
                     </div>
                   </motion.div>
 
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: isVolumeHovered ? 1 : 0, y: isVolumeHovered ? 0 : 10 }} transition={{ delay: 0.1 }}>
+                  <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.1 }}>
                     <div className="flex justify-between text-xs my-2">Balans</div>
-                    <Slider value={[balance]} min={0} max={1} step={0.01} onValueChange={handleBalanceChange} />
+                    <Slider value={[balance]} min={0} max={1} step={0.01} onValueChange={handleBalanceChange} variant="secondary" />
                     <div className="flex justify-between text-xs mt-2">
                       <span>Audiobook</span>
                       <span>Muzyka</span>
@@ -363,7 +363,7 @@ const AudioPlayer = () => {
 
                   <motion.div className="mb-2" variants={variants.popUpItem} initial="closed" animate="open">
                     <div className="w-full group hover:opacity-100">
-                      <Slider value={[currentTime]} min={0} max={currentTrackData?.duration || 100} step={0.1} onValueChange={handleProgressChange} />
+                      <Slider value={[currentTime]} min={0} max={currentTrackData?.duration || 100} step={0.1} onValueChange={handleProgressChange} variant="secondary" />
                     </div>
                   </motion.div>
 
@@ -384,14 +384,14 @@ const AudioPlayer = () => {
                       <SkipBack className="w-5 h-5" />
                     </motion.button>
 
-                    <motion.div whileTap={{ scale: 0.95 }}>
+                    <motion.div variants={variants.playButtonHover} whileTap="tap">
                       <motion.button
                         onClick={togglePlay}
                         className="hover:text-white bg-white/40 rounded-full p-3 relative z-10 cursor-pointer"
                         whileHover="hover"
                         whileTap="tap"
                         variants={variants.playButtonHover}
-                        initial={{ scale: 0.9 }}
+                        initial="initial"
                       >
                         <AnimatePresence mode="wait" initial={false}>
                           {isPlaying ? (
@@ -424,10 +424,7 @@ const AudioPlayer = () => {
                     {playlistTracks.map((track) => (
                       <motion.div
                         key={track.id}
-                        className={cn(
-                          "flex items-center justify-between px-2 py-1 rounded-md cursor-pointer",
-                          currentTrackIdFromState === track.id ? "bg-white/20" : "hover:bg-white/10",
-                        )}
+                        className={cn("flex items-center justify-between px-2 py-1 rounded-md cursor-pointer", currentTrackIdFromState === track.id && "bg-white/10")}
                         variants={variants.trackItemHover}
                         whileHover="hover"
                         onClick={() => transitionToTrack(track.id)}
@@ -438,7 +435,7 @@ const AudioPlayer = () => {
                         <div className="flex items-center gap-2">
                           <span className="text-white/70">{formatTime(track.duration)}</span>
                           <button
-                            className="text-white/70 hover:text-white p-1 rounded-full hover:bg-white/20"
+                            className="text-white/70 hover:text-white p-1 rounded-full hover:bg-black/60"
                             title="Download track"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -489,56 +486,51 @@ const AudioPlayer = () => {
   );
 };
 
-const springTransition = (stiffness = 350, damping = 30, duration?: number): Transition => {
-  const trans: Transition = { type: "spring", stiffness, damping };
-  if (duration) trans.duration = duration;
-  return trans;
-};
-
-const easeTransition = (duration = 0.25, ease: string | string[] = "easeIn"): Transition => ({ duration, ease });
-
-const commonItemStates = {
-  open: (customY = 0, customScale = 1) => ({ opacity: 1, y: customY, scale: customScale }),
-  closed: (customY = 10, customScale = 0.95) => ({ opacity: 0, y: customY, scale: customScale }),
+const transitions = {
+  spring: (options?: { stiffness?: number; damping?: number; duration?: number }): Transition => ({
+    type: "spring",
+    stiffness: options?.stiffness ?? 350,
+    damping: options?.damping ?? 30,
+    ...(options?.duration ? { duration: options.duration } : {}),
+  }),
+  ease: (options?: { duration?: number; ease?: string | string[] }): Transition => ({ duration: options?.duration ?? 0.25, ease: options?.ease ?? "easeInOut" }),
 };
 
 const variants: Record<string, Variants> = {
-  popUp: {
-    open: { ...commonItemStates.open(0, 1), boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)", transition: { ...springTransition(), when: "beforeChildren", staggerChildren: 0.05 } },
-    closed: {
-      ...commonItemStates.closed(-10, 0.95),
-      boxShadow: "0 0 0 rgba(0, 0, 0, 0)",
-      transition: { ...easeTransition(0.25, "easeIn"), when: "afterChildren", staggerChildren: 0.03, staggerDirection: -1 },
-    },
-  },
-  popUpItem: {
-    open: { ...commonItemStates.open(), transition: springTransition(350, 15, 0.4) },
-    closed: { ...commonItemStates.closed(10, 0.95), transition: easeTransition(0.25, "easeIn") },
-  },
+  // Button hover animations
+  buttonHover: { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)" }, tap: { scale: 0.9 } },
+  playButtonHover: { initial: { scale: 0.9 }, hover: { backgroundColor: "rgba(255,255,255,0.6)", boxShadow: "0 0 18px rgba(255, 255, 255, 0.5)" }, tap: { scale: 0.95 } },
+  navButtonHover: { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.1)" }, tap: { scale: 0.95 } },
+  // Icon animations
   iconFadeScale: {
     initial: { opacity: 0, scale: 1 },
-    animate: { opacity: 1, scale: 1.05, transition: easeTransition(0.15, "linear") },
-    exit: { opacity: 0, scale: 1, transition: easeTransition(0.15, "linear") },
+    animate: { opacity: 1, scale: 1.05, transition: transitions.ease({ duration: 0.15, ease: "linear" }) },
+    exit: { opacity: 0, scale: 1, transition: transitions.ease({ duration: 0.15, ease: "linear" }) },
   },
   iconRotatePause: {
     initial: { opacity: 0, scale: 0.8, rotateZ: 10 },
-    animate: { opacity: 1, scale: 1, rotateZ: 0, transition: easeTransition(0.2, "linear") },
-    exit: { opacity: 0, scale: 0.8, rotateZ: -10, transition: easeTransition(0.2, "linear") },
+    animate: { opacity: 1, scale: 1, rotateZ: 0, transition: transitions.ease({ duration: 0.2, ease: "linear" }) },
+    exit: { opacity: 0, scale: 0.8, rotateZ: -10, transition: transitions.ease({ duration: 0.2, ease: "linear" }) },
   },
   iconRotatePlay: {
     initial: { opacity: 0, scale: 0.8, rotateZ: -10 },
-    animate: { opacity: 1, scale: 1, rotateZ: 0, transition: easeTransition(0.2, "linear") },
-    exit: { opacity: 0, scale: 0.8, rotateZ: 10, transition: easeTransition(0.2, "linear") },
+    animate: { opacity: 1, scale: 1, rotateZ: 0, transition: transitions.ease({ duration: 0.2, ease: "linear" }) },
+    exit: { opacity: 0, scale: 0.8, rotateZ: 10, transition: transitions.ease({ duration: 0.2, ease: "linear" }) },
   },
+  // Container animations for dropdowns and panels
+  popUpItem: {
+    open: { opacity: 1, y: 0, scale: 1, transition: transitions.spring({ stiffness: 350, damping: 15, duration: 0.4 }) },
+    closed: { opacity: 0, y: 10, scale: 0.95, transition: transitions.ease({ duration: 0.25, ease: "easeIn" }) },
+  },
+  volumeMenuItem: { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0, transition: transitions.ease({ duration: 0.2 }) } },
+  // Track item hover effect
+  trackItemHover: { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.1)", borderRadius: "6px", boxShadow: "0 0 5px rgba(255, 255, 255, 0.2)" } },
+  // Song notification
   songNotification: {
     initial: { opacity: 0, y: -5, scale: 0.98, filter: "blur(1px)" },
-    animate: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", transition: { type: "spring", stiffness: 100, damping: 30, duration: 3.5 } },
+    animate: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", transition: transitions.spring({ stiffness: 100, damping: 30, duration: 3.5 }) },
     exit: { opacity: 0, y: 5, scale: 0.98, filter: "blur(1px)" },
   },
-  buttonHover: { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)" }, tap: { scale: 0.9 } },
-  playButtonHover: { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.6)", boxShadow: "0 0 18px rgba(255, 255, 255, 0.5)" }, tap: { scale: 0.95 } },
-  navButtonHover: { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.1)" }, tap: { scale: 0.95 } },
-  trackItemHover: { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.1)", borderRadius: "6px", boxShadow: "0 0 5px rgba(255, 255, 255, 0.2)" } },
 };
 
 export default AudioPlayer;
