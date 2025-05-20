@@ -687,8 +687,8 @@ export const AudiobookTracksDefined = [
   { chapter: 7, paragraph: 15, smile_id: "dol_1_8_8_wsst_0682", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 236.984, "clip-end": 248.277 },
   { chapter: 7, paragraph: 16, smile_id: "dol_1_8_8_wsst_0683", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 248.277, "clip-end": 257.074 },
   { chapter: 7, paragraph: 17, smile_id: "dol_1_8_8_wsst_0684", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 257.074, "clip-end": 259.257 },
-  { chapter: 7, paragraph: 18, smile_id: "dol_1_8_8_wsst_0685", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 259.257, "clip-end": 261.137 },
-  { chapter: 7, paragraph: 19, smile_id: "dol_1_8_8_wsst_0686", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 261.137, "clip-end": 263.439 },
+  { chapter: 7, paragraph: 17, smile_id: "dol_1_8_8_wsst_0685", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 259.257, "clip-end": 261.137 },
+  { chapter: 7, paragraph: 17, smile_id: "dol_1_8_8_wsst_0686", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 261.137, "clip-end": 263.439 },
   { chapter: 7, paragraph: 20, smile_id: "dol_1_8_8_wsst_0687", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 263.439, "clip-end": 265.794 },
   { chapter: 7, paragraph: 20, smile_id: "dol_1_8_8_wsst_0688", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 265.794, "clip-end": 289.836 },
   { chapter: 7, paragraph: 21, smile_id: "dol_1_8_8_wsst_0689", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 289.836, "clip-end": 301.888 },
@@ -755,8 +755,11 @@ export const AudiobookTracksDefined = [
   { chapter: 7, paragraph: 57, smile_id: "dol_1_8_8_wsst_0750", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 597.793, "clip-end": 600.564 },
   { chapter: 7, paragraph: 58, smile_id: "dol_1_8_8_wsst_0751", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 600.564, "clip-end": 605.146 },
 ].map((data) => {
-  if (data.chapter === 2 && data.paragraph >= 23) {
+  if (data.chapter === 2 && data.paragraph > 23) {
     return { ...data, paragraph: data.paragraph - 9 };
+  }
+  if (data.chapter === 7 && data.paragraph >= 20) {
+    return { ...data, paragraph: data.paragraph - 2 };
   } else {
     return data;
   }

@@ -156,22 +156,26 @@ export const getBackgrounds = (): Background[] => {
   if (CURRENT_BOOK === BOOK_SLUGS.Krolowa_Sniegu) {
     const backgroundsInput = [
       { chapter: 1, startParagraph: 0, file: "chapter-1-background.mp4" },
-      { chapter: 2, startParagraph: 0, file: "krolowa-chapter-2-paragraph-0-no-loop.mp4" },
+      { chapter: 2, startParagraph: 0, file: "krolowa-chapter-2-paragraph-0-loop.mp4" },
       { chapter: 2, startParagraph: 37, file: "krolowa-chapter-2-paragraph-37.png" },
       { chapter: 2, startParagraph: 42, file: "snow-covered-forest.mp4" },
       { chapter: 3, startParagraph: 0, file: "riverbank.mp4" },
       { chapter: 3, startParagraph: 20, file: "cottage-with-flower-covered-walls.mp4" },
-      { chapter: 3, startParagraph: 43, file: "krolowa-chapter-3-paragraph-43.png" },
+      { chapter: 3, startParagraph: 43, file: "krolowa-chapter-3-paragraph-43.mp4" },
       { chapter: 4, startParagraph: 0, file: "forest-at-twilight.mp4" },
       { chapter: 4, startParagraph: 22, file: "palace-interior.mp4" },
-      { chapter: 4, startParagraph: 39, file: "gerda-w-palacu-fixed.png" },
-      { chapter: 5, startParagraph: 0, file: "chapter-5-zamek-zbojow.png" },
+      { chapter: 4, startParagraph: 39, file: "gerda-w-palacu-fixed.mp4" },
+      { chapter: 5, startParagraph: 0, file: "chapter-5-zamek-zbojow.mp4" },
       { chapter: 5, startParagraph: 36, file: "frozen-plain.mp4" },
       { chapter: 6, startParagraph: 0, file: "lapland-tent.mp4" },
       { chapter: 6, startParagraph: 6, file: "finland-cottage.mp4" },
+      { chapter: 6, startParagraph: 23, file: "krolowa-chapter-6-23.mp4" },
       { chapter: 6, startParagraph: 28, file: "ice-castle-exterior.mp4" },
       { chapter: 7, startParagraph: 0, file: "ice-castle-interior.mp4" },
-      { chapter: 7, startParagraph: 25, file: "summer-garden.mp4" },
+      { chapter: 7, startParagraph: 4, file: "krolowa-chapter-7-4.mp4" },
+      { chapter: 7, startParagraph: 27, file: "summer-garden.mp4" },
+      { chapter: 7, startParagraph: 40, file: "krolowa-town-loop2.mp4" },
+      { chapter: 7, startParagraph: 43, file: "grandmother-house.mp4" },
     ];
     backgrounds = processBackgroundInputs(backgroundsInput);
   }

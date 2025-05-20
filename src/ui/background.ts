@@ -106,7 +106,6 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
         return;
       }
       if (found.file === legacy.dataset.currentFile) {
-        cancelAllImageZoom(imageA, imageB);
         console.log("Background file hasn't changed.");
         return;
       }

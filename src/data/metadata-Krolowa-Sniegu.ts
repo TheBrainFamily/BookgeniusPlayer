@@ -183,7 +183,7 @@ export const KrolowaSnieguCharactersData = [
       {
         chapter: 7,
         summary: "Stara babka Gerdy, która opowiadała dzieciom, w tym Gerdzie i Kajowi, o białych pszczołach (płatkach śniegu) i Królowej Śniegu.",
-        paragraphsWhereSpotted: [18, 25],
+        paragraphsWhereSpotted: [18, 25, 43],
         paragraphsWhereTalking: [],
       },
     ],

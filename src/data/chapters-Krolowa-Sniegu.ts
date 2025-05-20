@@ -838,7 +838,7 @@ export const KrolowaSnieguBookXml = `<section><section><section data-chapter="1"
       Nic się tu nic zmieniło: sprzęty stały na swoim miejscu, na zegarze posuwały się wskazówki, a wahadło biegało w tę i ową stronę, powtarzając tym samym jednostajnym głosem: tik-tak!
     </p>
     <p data-index="43">
-      Wchodząc we drzwi, zauważyły dopiero, jak urosły w przeciągu tego czasu. A tam, przy oknie, stały ich małe krzesełka! Babunia siedziała na starym fotelu i modliła się z książki, a słońce oblewało złotym blaskiem jej siwą głowę.
+      Wchodząc we drzwi, zauważyły dopiero, jak urosły w przeciągu tego czasu. A tam, przy oknie, stały ich małe krzesełka! <span class="character-highlighted" data-character="Babka-Gerdy" data-src-listening="/Krolowa-Sniegu/babka-gerdy-listens.mp4" >Babunia</span> siedziała na starym fotelu i modliła się z książki, a słońce oblewało złotym blaskiem jej siwą głowę.
     </p>
     <p data-index="44">
       Jak tu ślicznie, jak jasno, jak wesoło!
