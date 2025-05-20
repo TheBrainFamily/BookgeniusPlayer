@@ -173,6 +173,37 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
             isProcessingAudiobookTracks = false; // Reset flag before early exit
             return;
           }
+
+          // Remove highlights from all paragraphs except current ones
+          const removeHighlightsFromOtherParagraphs = () => {
+            const allParagraphs = document.querySelectorAll("section[data-chapter] [data-index]");
+            allParagraphs.forEach((paragraph) => {
+              const section = paragraph.closest("section[data-chapter]");
+              if (!section) return;
+
+              const chapterNum = parseInt(section.getAttribute("data-chapter") || "0");
+              const paragraphNum = parseInt(paragraph.getAttribute("data-index") || "0");
+
+              // Skip current chapter and paragraph
+              if (chapterNum === currentChapter && paragraphNum === currentParagraph) return;
+
+              // Remove all current-word spans from this paragraph
+              const currentWordSpans = paragraph.querySelectorAll(".current-word");
+              currentWordSpans.forEach((span) => {
+                const parent = span.parentNode;
+                if (parent) {
+                  while (span.firstChild) {
+                    parent.insertBefore(span.firstChild, span);
+                  }
+                  parent.removeChild(span);
+                  if (typeof parent.normalize === "function") {
+                    parent.normalize();
+                  }
+                }
+              });
+            });
+          };
+
           return sectionsToApply
             .filter((section) => section.chapter === currentChapter)
             .flatMap((section: AudiobookTracksSection) => {
@@ -189,6 +220,9 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                 return {
                   timestamp,
                   callback: () => {
+                    // Remove highlights from other paragraphs before applying new highlight
+                    removeHighlightsFromOtherParagraphs();
+
                     const paragraphSelector = `section[data-chapter='${section.chapter}'] [data-index='${section.paragraph}']`;
                     const paragraphElement = document.querySelector(paragraphSelector);
 
