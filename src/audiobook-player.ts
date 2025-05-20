@@ -169,7 +169,6 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
         state.events?.forEach((event) => {
           if (!event.triggered && currentTrackTime >= event.timestamp) {
             try {
-              // console.log(`Triggering event for ${trackId} at ${event.timestamp}s (currentTrackTime: ${currentTrackTime.toFixed(2)})`);
               event.callback();
             } catch (e) {
               console.error(`Error executing event callback for ${trackId} at ${event.timestamp}s:`, e);

@@ -1012,3 +1012,28 @@ section[data-chapter] [data-index] {
     transform: scale(1) translateZ(0);
   }
 }
+
+.current-word {
+  padding: 4px;
+  margin: -4px;
+  border-radius: 4px;
+  background-color: white;
+}
+
+/* Class to make the highlight on the last word fade out */
+.last-word-auto-fade.current-word { /* Be specific to the highlighted state */
+  animation-name: fadeLastWordHighlightEffect;
+  animation-duration: 0.8s;    /* Duration of the fade effect */
+  animation-delay: 1.5s;     /* Delay before the fade starts (e.g., word duration + pause) */
+  animation-fill-mode: forwards; /* Keep the state of the last keyframe (faded) */
+  animation-timing-function: ease-out;
+}
+
+@keyframes fadeLastWordHighlightEffect {
+  to {
+    background-color: transparent; /* Fades the background highlight */
+    /* If you also change text color, you might want to revert it or fade opacity */
+    /* opacity: 0; */ /* This would make the text itself invisible */
+  }
+}
+
