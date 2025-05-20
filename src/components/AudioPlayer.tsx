@@ -206,12 +206,12 @@ const AudioPlayer = () => {
   return (
     <>
       <div className="absolute top-[1rem] left-20 z-10 optional-element">
-        <motion.div className="bg-black/60 backdrop-blur-md rounded-3xl px-2 py-1 flex items-center gap-1 text-white shadow-xl border border-white/30 relative origin-top-left">
+        <motion.div className="bg-black/60 backdrop-blur-md rounded-3xl px-2 flex items-center gap-1 text-white shadow-xl border border-white/30 relative origin-top-left">
           {/* Volume Control Button and Dropdown */}
-          <div onMouseEnter={() => handleVolumeHover(true)} onMouseLeave={() => handleVolumeHover(false)}>
+          <div onClick={toggleMute} onMouseEnter={() => handleVolumeHover(true)} onMouseLeave={() => handleVolumeHover(false)}>
             <motion.button
               onClick={toggleMute}
-              className="p-2 hover:text-white transition rounded-full cursor-pointer"
+              className="p-2 my-1 hover:text-white rounded-full cursor-pointer pointer-none"
               whileHover="hover"
               whileTap="tap"
               variants={variants.buttonHover}
@@ -228,51 +228,41 @@ const AudioPlayer = () => {
                 )}
               </AnimatePresence>
             </motion.button>
+            <AnimatePresence>
+              {isVolumeHovered && (
+                <>
+                  {/* Invisible bridge element */}
+                  <div className="absolute w-45 h-5 top-full left-0 z-10"></div>
+                  <div className="bg-black/60 backdrop-blur-md rounded-3xl border shadow-xl border-white/30 absolute top-full left-0 mt-2 z-10">
+                    <div className="px-4 pt-2 pb-3 w-48 flex gap-3 flex-col">
+                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: isVolumeHovered ? 1 : 0, y: isVolumeHovered ? 0 : 10 }} transition={{ delay: 0.05 }}>
+                        <div className="flex justify-between text-xs text-white my-2">Głośność</div>
+                        <Slider value={[isMuted ? 0 : volume]} min={0} max={1} step={0.01} onValueChange={handleVolumeChange} />
+                        <div className="flex justify-between text-xs text-white mt-2">
+                          <span>0%</span>
+                          <span>100%</span>
+                        </div>
+                      </motion.div>
 
-            {/* Volume controls with stable backdrop-blur */}
-            <div className="absolute top-full left-0 mt-2 z-10">
-              {/* Invisible bridge element */}
-              <div className="absolute w-30 h-5 -top-5 left-0 z-10"></div>
-
-              {/* Stable backdrop blur container with opacity transition */}
-              <div
-                className="bg-black/60 backdrop-blur-md rounded-3xl border shadow-xl border-white/30"
-                style={{
-                  isolation: "isolate",
-                  transform: "translateZ(0)",
-                  opacity: isVolumeHovered ? 1 : 0,
-                  pointerEvents: isVolumeHovered ? "auto" : "none",
-                  transition: "opacity 0.2s ease",
-                }}
-              >
-                {/* Content inside the stable container */}
-                <div className="px-4 pt-2 pb-3 w-48 flex gap-3 flex-col">
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: isVolumeHovered ? 1 : 0, y: isVolumeHovered ? 0 : 10 }} transition={{ delay: 0.05 }}>
-                    <div className="flex justify-between text-xs text-white my-2">Głośność</div>
-                    <Slider value={[isMuted ? 0 : volume]} min={0} max={1} step={0.01} onValueChange={handleVolumeChange} />
-                    <div className="flex justify-between text-xs text-white mt-2">
-                      <span>0%</span>
-                      <span>100%</span>
+                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: isVolumeHovered ? 1 : 0, y: isVolumeHovered ? 0 : 10 }} transition={{ delay: 0.1 }}>
+                        <div className="flex justify-between text-xs text-white my-2">Balans</div>
+                        <Slider value={[balance]} min={0} max={1} step={0.01} onValueChange={handleBalanceChange} />
+                        <div className="flex justify-between text-xs text-white mt-2">
+                          <span>Audiobook</span>
+                          <span>Muzyka</span>
+                        </div>
+                      </motion.div>
                     </div>
-                  </motion.div>
-
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: isVolumeHovered ? 1 : 0, y: isVolumeHovered ? 0 : 10 }} transition={{ delay: 0.1 }}>
-                    <div className="flex justify-between text-xs text-white my-2">Balans</div>
-                    <Slider value={[balance]} min={0} max={1} step={0.01} onValueChange={handleBalanceChange} />
-                    <div className="flex justify-between text-xs text-white mt-2">
-                      <span>Audiobook</span>
-                      <span>Muzyka</span>
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
-            </div>
+                  </div>
+                </>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Audiobook Toggle Button */}
           <motion.button
             onClick={toggleAudiobookState}
-            className="p-2 hover:text-white transition relative rounded-full cursor-pointer"
+            className="p-2 hover:text-white relative rounded-full cursor-pointer"
             whileHover="hover"
             whileTap="tap"
             variants={variants.buttonHover}
@@ -282,35 +272,16 @@ const AudioPlayer = () => {
           </motion.button>
 
           {/* Big Player Button and Dropdown */}
-          <div onMouseEnter={() => handleBigPlayerHover(true)} onMouseLeave={() => handleBigPlayerHover(false)}>
-            <motion.button
-              onClick={() => setIsBigPlayerHovered((prev) => !prev)}
-              className="p-2 hover:text-white transition rounded-full cursor-pointer"
-              whileHover="hover"
-              whileTap="tap"
-              variants={variants.buttonHover}
-            >
+          <div onClick={() => setIsBigPlayerHovered((prev) => !prev)} onMouseEnter={() => handleBigPlayerHover(true)} onMouseLeave={() => handleBigPlayerHover(false)}>
+            <motion.button className="p-2 my-1 hover:text-white rounded-full cursor-pointer" whileHover="hover" whileTap="tap" variants={variants.buttonHover}>
               <ListMusic className="w-5 h-5" />
             </motion.button>
-
-            {/* Big player with stable backdrop-blur */}
-            <div className="absolute top-full left-0 mt-2 z-10">
-              {/* Invisible bridge element */}
-              <div className="absolute w-30 h-5 -top-5 left-0 z-10"></div>
-
-              {/* Stable backdrop blur container */}
-              <div
-                className="bg-black/60 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl min-w-xs"
-                style={{
-                  isolation: "isolate",
-                  transform: "translateZ(0)",
-                  opacity: isBigPlayerHovered ? 1 : 0,
-                  pointerEvents: isBigPlayerHovered ? "auto" : "none",
-                  transition: "opacity 0.2s ease",
-                }}
-              >
-                {isBigPlayerHovered && (
-                  <div className="px-4 py-2">
+            <AnimatePresence>
+              {isBigPlayerHovered && (
+                <>
+                  {/* Invisible bridge element */}
+                  <div className="absolute w-30 h-45 top-full left-0 z-10" />
+                  <div className="px-4 py-2 absolute top-full left-0 mt-2 z-10 bg-black/60 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl min-w-xs">
                     <motion.div className="flex justify-center pt-4 mb-4" variants={variants.popUpItem} initial="closed" animate="open">
                       <div className="w-32 h-32 bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg">
                         {currentTrackData?.coverArtUrl && (
@@ -406,23 +377,18 @@ const AudioPlayer = () => {
                       ))}
                     </motion.div>
                   </div>
-                )}
-              </div>
-            </div>
+                </>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Debug/Testing Button */}
-          <motion.button
-            onClick={debugTriggerSongNotification}
-            className="p-2 hover:text-white transition rounded-full"
-            whileHover="hover"
-            whileTap="tap"
-            variants={variants.buttonHover}
-          >
+          <motion.button onClick={debugTriggerSongNotification} className="p-2 hover:text-white rounded-full" whileHover="hover" whileTap="tap" variants={variants.buttonHover}>
             <Play className="w-5 h-5 cursor-pointer" />
           </motion.button>
         </motion.div>
       </div>
+
       <AnimatePresence>
         {showSongNotification && !isBigPlayerHovered && !isVolumeHovered && currentTrackData && (
           <motion.div
