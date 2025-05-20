@@ -183,7 +183,7 @@ export const KrolowaSnieguCharactersData = [
       {
         chapter: 7,
         summary: "Stara babka Gerdy, która opowiadała dzieciom, w tym Gerdzie i Kajowi, o białych pszczołach (płatkach śniegu) i Królowej Śniegu.",
-        paragraphsWhereSpotted: [18, 25],
+        paragraphsWhereSpotted: [18, 25, 43],
         paragraphsWhereTalking: [],
       },
     ],
@@ -299,7 +299,7 @@ export const KrolowaSnieguCharactersData = [
         summary:
           "Duża, szara wrona, która spotkała Gerdę w lesie. Wyraziła współczucie dla dziewczynki i opowiedziała jej o mądrej księżniczce, sugerując, że Kaj mógł zostać jej mężem.",
         paragraphsWhereSpotted: [1, 3, 4, 6, 7, 9, 16, 18, 20, 22, 24, 27, 29, 37, 38, 42],
-        paragraphsWhereTalking: [5, 7, 9, 22, 26],
+        paragraphsWhereTalking: [2, 5, 7, 9, 11, 12, 14, 16, 18, 20, 22, 24, 26],
       },
       {
         chapter: 7,
@@ -331,7 +331,20 @@ export const KrolowaSnieguCharactersData = [
     ],
     imageUrl: "UNKNOWN",
   },
-  { slug: "Damy-dworu-ksiezniczki", characterName: "Damy dworu księżniczki", bookSlug: "Krolowa-Sniegu", infoPerChapter: [], imageUrl: "UNKNOWN" },
+  {
+    slug: "Damy-dworu-ksiezniczki",
+    characterName: "Damy dworu księżniczki",
+    bookSlug: "Krolowa-Sniegu",
+    infoPerChapter: [
+      {
+        chapter: 4,
+        summary: "Damy dworu księżniczki, które według opowieści wrony pochwaliły jej pomysł na znalezienie mądrego męża.",
+        paragraphsWhereSpotted: [11],
+        paragraphsWhereTalking: [],
+      },
+    ],
+    imageUrl: "UNKNOWN",
+  },
   {
     slug: "Kruk-czarnopiory",
     characterName: "Kruk czarnopióry",
@@ -360,7 +373,7 @@ export const KrolowaSnieguCharactersData = [
       {
         chapter: 4,
         summary: "Młody człowiek o opalonej szyi, który został mężem księżniczki. Gerda początkowo myślała, że to Kaj, ale obudził się, gdy zawołała.",
-        paragraphsWhereSpotted: [33, 35, 39, 42],
+        paragraphsWhereSpotted: [39, 42],
         paragraphsWhereTalking: [],
       },
     ],
@@ -543,4 +556,18 @@ export const KrolowaSnieguCharactersData = [
     imageUrl: "UNKNOWN",
   },
   { slug: "Towarzysz-rena", characterName: "Towarzysz rena", bookSlug: "Krolowa-Sniegu", infoPerChapter: [], imageUrl: "UNKNOWN" },
+  {
+    slug: "Slonce",
+    characterName: "Słońce",
+    bookSlug: "Krolowa-Sniegu",
+    infoPerChapter: [{ chapter: 3, summary: "Wiosenne Słońce.", paragraphsWhereSpotted: [], paragraphsWhereTalking: [6] }],
+    imageUrl: "UNKNOWN",
+  },
+  {
+    slug: "Jaskolka",
+    characterName: "Jaskółka",
+    bookSlug: "Krolowa-Sniegu",
+    infoPerChapter: [{ chapter: 3, summary: "Pomocna Jaskółka, która wróciła na jesień do gniazda.", paragraphsWhereSpotted: [], paragraphsWhereTalking: [9] }],
+    imageUrl: "UNKNOWN",
+  },
 ];
