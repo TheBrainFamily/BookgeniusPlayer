@@ -222,7 +222,7 @@ const knownKrolowaSniegu = [
   "krolowa-sniegu-listens.mp4",
   "krolowa-sniegu-speaks.mp4",
   "kruk-czarnopiory-listens.mp4",
-  "kryk-czarnopiory-speaks.mp4",
+  "kruk-czarnopiory-speaks.mp4",
   "ksiaze-listens.mp4",
   "ksiaze-speaks.mp4",
   "ksiezniczka-listens.mp4",
