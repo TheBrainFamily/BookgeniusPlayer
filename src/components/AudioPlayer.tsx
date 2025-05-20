@@ -22,6 +22,7 @@ import {
 } from "@/audio-crossfader";
 import { stopAudiobook, playAudiobook } from "@/hooks/useAudiobookTracks";
 import { dealWithBackgroundSongs } from "@/deal-with-background-songs";
+import { hasAudiobookForCurrentBook } from "@/deal-with-audiobook-playback";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
@@ -41,42 +42,6 @@ const AudioPlayer = () => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1920);
   const [playlistTracks, setPlaylistTracks] = useState<{ id: string; title: string; duration: number }[]>([]);
   const [currentTrackIdFromState, setCurrentTrackIdFromState] = useState<string | null>(null);
-
-  useEffect(() => {
-    const updatePlaylist = async () => {
-      const sectionTrackIds = getCurrentSectionTracks();
-
-      if (sectionTrackIds && sectionTrackIds.length > 0) {
-        const loadPromises = sectionTrackIds.map((id) => {
-          if (!getTrackDetailsById(id)) {
-            console.log(`Details for track ${id} missing in playlist, attempting to load...`);
-            return loadTrack(id);
-          }
-          return Promise.resolve(true);
-        });
-
-        await Promise.all(loadPromises);
-
-        const detailedTracks = sectionTrackIds
-          .map((id) => {
-            const details = getTrackDetailsById(id);
-            if (details) {
-              const title = details.title || id;
-              const duration = typeof details.trackLength === "number" && !isNaN(details.trackLength) ? details.trackLength : 0;
-              return { id, title, duration };
-            }
-            return null;
-          })
-          .filter((track): track is { id: string; title: string; duration: number } => track !== null);
-
-        setPlaylistTracks(detailedTracks);
-      } else {
-        setPlaylistTracks([]);
-      }
-    };
-
-    updatePlaylist();
-  }, [currentTrackData]);
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -121,6 +86,42 @@ const AudioPlayer = () => {
       clearInterval(timer);
     };
   }, [isPlaying]);
+
+  useEffect(() => {
+    const updatePlaylist = async () => {
+      const sectionTrackIds = getCurrentSectionTracks();
+
+      if (sectionTrackIds && sectionTrackIds.length > 0) {
+        const loadPromises = sectionTrackIds.map((id) => {
+          if (!getTrackDetailsById(id)) {
+            console.log(`Details for track ${id} missing in playlist, attempting to load...`);
+            return loadTrack(id);
+          }
+          return Promise.resolve(true);
+        });
+
+        await Promise.all(loadPromises);
+
+        const detailedTracks = sectionTrackIds
+          .map((id) => {
+            const details = getTrackDetailsById(id);
+            if (details) {
+              const title = details.title || id;
+              const duration = typeof details.trackLength === "number" && !isNaN(details.trackLength) ? details.trackLength : 0;
+              return { id, title, duration };
+            }
+            return null;
+          })
+          .filter((track): track is { id: string; title: string; duration: number } => track !== null);
+
+        setPlaylistTracks(detailedTracks);
+      } else {
+        setPlaylistTracks([]);
+      }
+    };
+
+    updatePlaylist();
+  }, [currentTrackData]);
 
   useEffect(() => {
     let notificationTimer: ReturnType<typeof setTimeout> | null = null;
@@ -277,16 +278,18 @@ const AudioPlayer = () => {
             </div>
 
             {/* Audiobook Toggle Button */}
-            <motion.button
-              onClick={toggleAudiobookState}
-              className="p-2 hover:text-white relative rounded-full cursor-pointer"
-              whileHover="hover"
-              whileTap="tap"
-              variants={variants.buttonHover}
-            >
-              <BookHeadphones className="w-5 h-5" />
-              <motion.div className="absolute bottom-0 right-0">{isPlayingAudioBook ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}</motion.div>
-            </motion.button>
+            {hasAudiobookForCurrentBook && (
+              <motion.button
+                onClick={toggleAudiobookState}
+                className="p-2 hover:text-white relative rounded-full cursor-pointer"
+                whileHover="hover"
+                whileTap="tap"
+                variants={variants.buttonHover}
+              >
+                <BookHeadphones className="w-5 h-5" />
+                <motion.div className="absolute bottom-0 right-0">{isPlayingAudioBook ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}</motion.div>
+              </motion.button>
+            )}
 
             {/* Big Player Button */}
             <div onClick={() => setIsBigPlayerHovered((prev) => !prev)} onMouseEnter={() => setIsBigPlayerHovered(true)} onMouseLeave={() => setIsBigPlayerHovered(false)}>
@@ -316,14 +319,16 @@ const AudioPlayer = () => {
                     </div>
                   </motion.div>
 
-                  <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.1 }}>
-                    <div className="flex justify-between text-xs my-2">Balans</div>
-                    <Slider value={[balance]} min={0} max={1} step={0.01} onValueChange={handleBalanceChange} variant="secondary" />
-                    <div className="flex justify-between text-xs mt-2">
-                      <span>Audiobook</span>
-                      <span>Muzyka</span>
-                    </div>
-                  </motion.div>
+                  {hasAudiobookForCurrentBook && (
+                    <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.1 }}>
+                      <div className="flex justify-between text-xs my-2">Balans</div>
+                      <Slider value={[balance]} min={0} max={1} step={0.01} onValueChange={handleBalanceChange} variant="secondary" />
+                      <div className="flex justify-between text-xs mt-2">
+                        <span>Audiobook</span>
+                        <span>Muzyka</span>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
               </>
             )}
@@ -374,7 +379,10 @@ const AudioPlayer = () => {
 
                   <motion.div className="flex justify-center items-center gap-8 mb-4 relative" variants={variants.popUpItem} initial="closed" animate="open">
                     <motion.button
-                      onClick={skipToPrevious}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        skipToPrevious();
+                      }}
                       className="hover:text-white/80 p-2 rounded-full cursor-pointer"
                       whileHover="hover"
                       whileTap="tap"
@@ -386,7 +394,10 @@ const AudioPlayer = () => {
 
                     <motion.div variants={variants.playButtonHover} whileTap="tap">
                       <motion.button
-                        onClick={togglePlay}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          togglePlay();
+                        }}
                         className="hover:text-white bg-white/40 rounded-full p-3 relative z-10 cursor-pointer"
                         whileHover="hover"
                         whileTap="tap"
@@ -408,7 +419,10 @@ const AudioPlayer = () => {
                     </motion.div>
 
                     <motion.button
-                      onClick={skipToNext}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        skipToNext();
+                      }}
                       className="hover:text-white/80 p-2 rounded-full cursor-pointer"
                       whileHover="hover"
                       whileTap="tap"
@@ -424,10 +438,13 @@ const AudioPlayer = () => {
                     {playlistTracks.map((track) => (
                       <motion.div
                         key={track.id}
-                        className={cn("flex items-center justify-between px-2 py-1 rounded-md cursor-pointer", currentTrackIdFromState === track.id && "bg-white/10")}
+                        className={cn("flex items-center justify-between px-2 py-1 rounded-md cursor-pointer gap-2", currentTrackIdFromState === track.id && "bg-white/10")}
                         variants={variants.trackItemHover}
                         whileHover="hover"
-                        onClick={() => transitionToTrack(track.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          transitionToTrack(track.id);
+                        }}
                       >
                         <div className="flex items-center gap-2">
                           <span className={"text-white/70"}>{track.title || track.id}</span>
@@ -472,11 +489,11 @@ const AudioPlayer = () => {
             style={{ willChange: "opacity, transform" }}
           >
             <div className={`bg-white/10 rounded-lg overflow-hidden flex-shrink-0 ${windowWidth < 1400 ? "w-24 h-24" : "w-36 h-36"}`}>
-              {currentTrackData.coverArtUrl && <img src={currentTrackData.coverArtUrl} alt="Now playing" className="w-full h-full object-cover" />}
+              {currentTrackData.coverArtUrl && <img src={currentTrackData.coverArtUrl} alt="Teraz gra" className="w-full h-full object-cover" />}
             </div>
 
             <div className="flex flex-col flex-1 min-w-0">
-              <div className="text-sm font-medium">Now Playing</div>
+              <div className="text-sm font-medium">Teraz gra</div>
               <div className="text-base font-medium truncate">{currentTrackData.title || "Unknown Track"}</div>
             </div>
           </motion.div>
