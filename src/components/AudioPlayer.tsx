@@ -10,15 +10,22 @@ import {
   getCurrentTrackData,
   TrackState,
   getCurrentTrackPosition,
-  setCurrentTrackPosition,
   pauseCurrentTrack,
   resumeCurrentTrack,
+  getCurrentSectionTracks,
+  setCurrentTrackPosition,
+  getCurrentTrackId,
+  getCurrentTrackIndexInSection,
+  transitionToTrack,
+  getTrackDetailsById,
+  loadTrack,
 } from "@/audio-crossfader";
 import { stopAudiobook, playAudiobook } from "@/hooks/useAudiobookTracks";
 import { dealWithBackgroundSongs } from "@/deal-with-background-songs";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { CURRENT_BOOK } from "@/consts";
 
 const AudioPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(true);
@@ -27,11 +34,49 @@ const AudioPlayer = () => {
   const [volume, setVolume] = useState(getMasterVolume() ?? 0.5);
   const [balance, setBalance] = useState(0.5);
   const [isMuted, setIsMuted] = useState(false);
-  const [isVolumeHovered, setIsVolumeHovered] = useState(true);
+  const [isVolumeHovered, setIsVolumeHovered] = useState(false);
   const [isBigPlayerHovered, setIsBigPlayerHovered] = useState(false);
   const [currentTrackData, setCurrentTrackData] = useState<TrackState | null>(null);
   const [showSongNotification, setShowSongNotification] = useState(false);
   const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1920);
+  const [playlistTracks, setPlaylistTracks] = useState<{ id: string; title: string; duration: number }[]>([]);
+  const [currentTrackIdFromState, setCurrentTrackIdFromState] = useState<string | null>(null);
+
+  useEffect(() => {
+    const updatePlaylist = async () => {
+      const sectionTrackIds = getCurrentSectionTracks();
+
+      if (sectionTrackIds && sectionTrackIds.length > 0) {
+        const loadPromises = sectionTrackIds.map((id) => {
+          if (!getTrackDetailsById(id)) {
+            console.log(`Details for track ${id} missing in playlist, attempting to load...`);
+            return loadTrack(id);
+          }
+          return Promise.resolve(true);
+        });
+
+        await Promise.all(loadPromises);
+
+        const detailedTracks = sectionTrackIds
+          .map((id) => {
+            const details = getTrackDetailsById(id);
+            if (details) {
+              const title = details.title || id;
+              const duration = typeof details.trackLength === "number" && !isNaN(details.trackLength) ? details.trackLength : 0;
+              return { id, title, duration };
+            }
+            return null;
+          })
+          .filter((track): track is { id: string; title: string; duration: number } => track !== null);
+
+        setPlaylistTracks(detailedTracks);
+      } else {
+        setPlaylistTracks([]);
+      }
+    };
+
+    updatePlaylist();
+  }, [currentTrackData]);
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -86,7 +131,8 @@ const AudioPlayer = () => {
       console.log("Current track data:", newCurrentTrack);
 
       setCurrentTrackData(newCurrentTrack);
-      setIsPlaying(true); // Ensure playing state reflects the new track
+      setIsPlaying(true);
+      setCurrentTrackIdFromState(getCurrentTrackId());
 
       if (notificationTimer) {
         clearTimeout(notificationTimer);
@@ -98,6 +144,8 @@ const AudioPlayer = () => {
         setShowSongNotification(false);
       }, 6000);
     };
+
+    setCurrentTrackIdFromState(getCurrentTrackId());
 
     window.addEventListener("songTransition", handleSongTransition);
 
@@ -184,9 +232,35 @@ const AudioPlayer = () => {
     setIsBigPlayerHovered(isHovering);
   };
 
-  const skipToNext = () => {};
+  const skipToNext = async () => {
+    const currentTracks = getCurrentSectionTracks();
+    const currentIndex = getCurrentTrackIndexInSection();
 
-  const skipToPrevious = () => {};
+    if (!currentTracks?.length) {
+      console.log("Cannot go to next: no playlist");
+      return;
+    }
+
+    const nextIndex = (currentIndex + 1) % currentTracks.length;
+    const nextTrackId = currentTracks[nextIndex];
+
+    await transitionToTrack(nextTrackId);
+  };
+
+  const skipToPrevious = async () => {
+    const currentTracks = getCurrentSectionTracks();
+    const currentIndex = getCurrentTrackIndexInSection();
+
+    if (!currentTracks?.length) {
+      console.log("Cannot go to previous: no playlist");
+      return;
+    }
+
+    const prevIndex = (currentIndex - 1 + currentTracks.length) % currentTracks.length;
+    const prevTrackId = currentTracks[prevIndex];
+
+    await transitionToTrack(prevTrackId);
+  };
 
   const debugTriggerSongNotification = () => {
     console.log("Manual notification trigger");
@@ -204,9 +278,20 @@ const AudioPlayer = () => {
     }, 6000);
   };
 
+  const handleDownloadTrack = (trackId: string) => {
+    if (!trackId) return;
+    const trackUrl = `/${CURRENT_BOOK}/${trackId}.mp3`;
+    const link = document.createElement("a");
+    link.href = trackUrl;
+    link.download = `${trackId}.mp3`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <>
-      <div className="absolute top-[1rem] left-20 z-10 optional-element">
+      <div className="absolute top-[1rem] left-20 z-10">
         <motion.div className="bg-black/60 rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1 relative origin-top-left">
           {/* Volume Control Button and Dropdown */}
           <div onClick={toggleMute} onMouseEnter={() => handleVolumeHover(true)} onMouseLeave={() => handleVolumeHover(false)}>
@@ -361,14 +446,30 @@ const AudioPlayer = () => {
 
                     <motion.div className="space-y-2" variants={variants.popUpItem} initial="closed" animate="open">
                       <div className="text-sm font-medium mb-2">Playlist:</div>
-                      {musicTracks.map((track, index) => (
-                        <motion.div key={index} className="flex items-center justify-between px-2 py-1" variants={variants.trackItemHover} whileHover="hover">
+                      {playlistTracks.map((track) => (
+                        <motion.div
+                          key={track.id}
+                          className={cn(
+                            "flex items-center justify-between px-2 py-1 rounded-md cursor-pointer",
+                            currentTrackIdFromState === track.id ? "bg-white/20" : "hover:bg-white/10",
+                          )}
+                          variants={variants.trackItemHover}
+                          whileHover="hover"
+                          onClick={() => transitionToTrack(track.id)}
+                        >
                           <div className="flex items-center gap-2">
-                            <span className="text-white/70 cursor-pointer">{track.name}</span>
+                            <span className={"text-white/70"}>{track.title || track.id}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-white/70">{track.duration}</span>
-                            <button className="text-white/70 hover:text-white" title="Download track">
+                            <span className="text-white/70">{formatTime(track.duration)}</span>
+                            <button
+                              className="text-white/70 hover:text-white p-1 rounded-full hover:bg-white/20"
+                              title="Download track"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownloadTrack(track.id);
+                              }}
+                            >
                               <Download className="w-4 h-4" />
                             </button>
                           </div>
@@ -389,7 +490,7 @@ const AudioPlayer = () => {
       </div>
 
       <AnimatePresence>
-        {!showSongNotification && !isBigPlayerHovered && !isVolumeHovered && currentTrackData && (
+        {showSongNotification && !isBigPlayerHovered && !isVolumeHovered && currentTrackData && (
           <motion.div
             className={cn(
               "bg-black/60 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30",
@@ -469,10 +570,5 @@ const variants: Record<string, Variants> = {
   navButtonHover: { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.1)" }, tap: { scale: 0.95 } },
   trackItemHover: { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.1)", borderRadius: "6px", boxShadow: "0 0 5px rgba(255, 255, 255, 0.2)" } },
 };
-
-const musicTracks = [
-  { name: "Audio name", duration: "3:15", src: "/sample-audio.mp3" },
-  { name: "Another audio here", duration: "4:29", src: "/sample-audio.mp3" },
-];
 
 export default AudioPlayer;
