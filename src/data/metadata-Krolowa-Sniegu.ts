@@ -123,7 +123,7 @@ export const KrolowaSnieguCharactersData = [
         chapter: 7,
         summary:
           "Dziewczynka mieszkająca na poddaszu w starym mieście, sąsiadka i przyjaciółka Kaja, z którym kochała się jak siostra z bratem. Bawiła się z nim w małym ogródku na dachu.",
-        paragraphsWhereSpotted: [11, 12, 15, 23, 30, 31, 33, 37],
+        paragraphsWhereSpotted: [11, 12, 15, 18, 23, 30, 31, 33, 37],
         paragraphsWhereTalking: [13, 33, 35, 37],
       },
     ],
@@ -138,6 +138,18 @@ export const KrolowaSnieguCharactersData = [
         chapter: 2,
         summary: "Rodzice Kaja, którzy mieszkali na poddaszu i wraz z rodzicami Gerdy ustawiali skrzynie z kwiatami i warzywami na dachu, tworząc tam mały ogródek dla dzieci.",
         paragraphsWhereSpotted: [5],
+        paragraphsWhereTalking: [],
+      },
+      {
+        chapter: 3,
+        summary: "Rodzice Kaja, którzy mieszkali na poddaszu i wraz z rodzicami Gerdy ustawiali skrzynie z kwiatami i warzywami na dachu, tworząc tam mały ogródek dla dzieci.",
+        paragraphsWhereSpotted: [3],
+        paragraphsWhereTalking: [],
+      },
+      {
+        chapter: 7,
+        summary: "Rodzice Kaja, którzy mieszkali na poddaszu i wraz z rodzicami Gerdy ustawiali skrzynie z kwiatami i warzywami na dachu, tworząc tam mały ogródek dla dzieci.",
+        paragraphsWhereSpotted: [18],
         paragraphsWhereTalking: [],
       },
     ],
@@ -198,7 +210,7 @@ export const KrolowaSnieguCharactersData = [
         chapter: 2,
         summary:
           "Postać, o której opowiadała babka Gerdy, opisywana jako największy płatek śniegu. Ukazała się Kajowi jako piękna pani w długiej, białej szacie, która wzywała go do siebie.",
-        paragraphsWhereSpotted: [13, 16, 45, 51, 55],
+        paragraphsWhereSpotted: [16, 45, 51, 55],
         paragraphsWhereTalking: [46, 48],
       },
       {
@@ -555,7 +567,20 @@ export const KrolowaSnieguCharactersData = [
     ],
     imageUrl: "UNKNOWN",
   },
-  { slug: "Towarzysz-rena", characterName: "Towarzysz rena", bookSlug: "Krolowa-Sniegu", infoPerChapter: [], imageUrl: "UNKNOWN" },
+  {
+    slug: "Towarzysz-rena",
+    characterName: "Towarzysz rena",
+    bookSlug: "Krolowa-Sniegu",
+    infoPerChapter: [
+      {
+        chapter: 7,
+        summary: "Drugi ren, którego oswojony ren przyprowadził, aby pomóc Gerdzie i Kajowi w drodze powrotnej.",
+        paragraphsWhereSpotted: [26],
+        paragraphsWhereTalking: [],
+      },
+    ],
+    imageUrl: "UNKNOWN",
+  },
   {
     slug: "Slonce",
     characterName: "Słońce",
