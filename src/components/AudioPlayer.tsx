@@ -27,7 +27,7 @@ const AudioPlayer = () => {
   const [volume, setVolume] = useState(getMasterVolume() ?? 0.5);
   const [balance, setBalance] = useState(0.5);
   const [isMuted, setIsMuted] = useState(false);
-  const [isVolumeHovered, setIsVolumeHovered] = useState(false);
+  const [isVolumeHovered, setIsVolumeHovered] = useState(true);
   const [isBigPlayerHovered, setIsBigPlayerHovered] = useState(false);
   const [currentTrackData, setCurrentTrackData] = useState<TrackState | null>(null);
   const [showSongNotification, setShowSongNotification] = useState(false);
@@ -42,10 +42,6 @@ const AudioPlayer = () => {
 
     setIsPlaying(!isPlaying);
   };
-
-  const skipToNext = () => {};
-
-  const skipToPrevious = () => {};
 
   const handleProgressChange = (value: number[]) => {
     const newTime = value[0];
@@ -188,6 +184,10 @@ const AudioPlayer = () => {
     setIsBigPlayerHovered(isHovering);
   };
 
+  const skipToNext = () => {};
+
+  const skipToPrevious = () => {};
+
   const debugTriggerSongNotification = () => {
     console.log("Manual notification trigger");
 
@@ -207,7 +207,7 @@ const AudioPlayer = () => {
   return (
     <>
       <div className="absolute top-[1rem] left-20 z-10 optional-element">
-        <motion.div className="bg-black/60 backdrop-blur-md rounded-3xl px-2 flex items-center gap-1 text-white shadow-xl border border-white/30 relative origin-top-left">
+        <motion.div className="bg-black/60 rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1 relative origin-top-left">
           {/* Volume Control Button and Dropdown */}
           <div onClick={toggleMute} onMouseEnter={() => handleVolumeHover(true)} onMouseLeave={() => handleVolumeHover(false)}>
             <motion.button
@@ -233,27 +233,25 @@ const AudioPlayer = () => {
               {isVolumeHovered && (
                 <>
                   {/* Invisible bridge element */}
-                  <div className="absolute w-45 h-5 top-full left-0 z-10"></div>
-                  <div className="bg-black/60 backdrop-blur-md rounded-3xl border shadow-xl border-white/30 absolute top-full left-0 mt-2 z-10">
-                    <div className="px-4 pt-2 pb-3 w-48 flex gap-3 flex-col">
-                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: isVolumeHovered ? 1 : 0, y: isVolumeHovered ? 0 : 10 }} transition={{ delay: 0.05 }}>
-                        <div className="flex justify-between text-xs text-white my-2">Głośność</div>
-                        <Slider value={[isMuted ? 0 : volume]} min={0} max={1} step={0.01} onValueChange={handleVolumeChange} />
-                        <div className="flex justify-between text-xs text-white mt-2">
-                          <span>0%</span>
-                          <span>100%</span>
-                        </div>
-                      </motion.div>
+                  <div className="absolute w-45 h-2 top-full left-0 z-10" />
+                  <div className="bg-black/60 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 absolute top-full left-0 mt-2 z-10 px-4 pt-2 pb-3 w-48 flex gap-3 flex-col">
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: isVolumeHovered ? 1 : 0, y: isVolumeHovered ? 0 : 10 }} transition={{ delay: 0.05 }}>
+                      <div className="flex justify-between text-xs my-2">Głośność</div>
+                      <Slider value={[isMuted ? 0 : volume]} min={0} max={1} step={0.01} onValueChange={handleVolumeChange} />
+                      <div className="flex justify-between text-xs mt-2">
+                        <span>0%</span>
+                        <span>100%</span>
+                      </div>
+                    </motion.div>
 
-                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: isVolumeHovered ? 1 : 0, y: isVolumeHovered ? 0 : 10 }} transition={{ delay: 0.1 }}>
-                        <div className="flex justify-between text-xs text-white my-2">Balans</div>
-                        <Slider value={[balance]} min={0} max={1} step={0.01} onValueChange={handleBalanceChange} />
-                        <div className="flex justify-between text-xs text-white mt-2">
-                          <span>Audiobook</span>
-                          <span>Muzyka</span>
-                        </div>
-                      </motion.div>
-                    </div>
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: isVolumeHovered ? 1 : 0, y: isVolumeHovered ? 0 : 10 }} transition={{ delay: 0.1 }}>
+                      <div className="flex justify-between text-xs my-2">Balans</div>
+                      <Slider value={[balance]} min={0} max={1} step={0.01} onValueChange={handleBalanceChange} />
+                      <div className="flex justify-between text-xs mt-2">
+                        <span>Audiobook</span>
+                        <span>Muzyka</span>
+                      </div>
+                    </motion.div>
                   </div>
                 </>
               )}
@@ -282,7 +280,7 @@ const AudioPlayer = () => {
                 <>
                   {/* Invisible bridge element */}
                   <div className="absolute w-30 h-45 top-full left-0 z-10" />
-                  <div className="px-4 py-2 absolute top-full left-0 mt-2 z-10 bg-black/60 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl min-w-xs">
+                  <div className="bg-black/60 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs">
                     <motion.div className="flex justify-center pt-4 mb-4" variants={variants.popUpItem} initial="closed" animate="open">
                       <div className="w-32 h-32 bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg">
                         {currentTrackData?.coverArtUrl && (
@@ -317,7 +315,7 @@ const AudioPlayer = () => {
                     <motion.div className="flex justify-center items-center gap-8 mb-4 relative" variants={variants.popUpItem} initial="closed" animate="open">
                       <motion.button
                         onClick={skipToPrevious}
-                        className="hover:text-white/80 transition p-2 rounded-full"
+                        className="hover:text-white/80 p-2 rounded-full cursor-pointer"
                         whileHover="hover"
                         whileTap="tap"
                         variants={variants.navButtonHover}
@@ -329,7 +327,7 @@ const AudioPlayer = () => {
                       <motion.div whileTap={{ scale: 0.95 }}>
                         <motion.button
                           onClick={togglePlay}
-                          className="hover:text-white transition bg-white/40 rounded-full p-3 relative z-10"
+                          className="hover:text-white bg-white/40 rounded-full p-3 relative z-10 cursor-pointer"
                           whileHover="hover"
                           whileTap="tap"
                           variants={variants.playButtonHover}
@@ -351,7 +349,7 @@ const AudioPlayer = () => {
 
                       <motion.button
                         onClick={skipToNext}
-                        className="hover:text-white/80 transition p-2 rounded-full"
+                        className="hover:text-white/80 p-2 rounded-full cursor-pointer"
                         whileHover="hover"
                         whileTap="tap"
                         variants={variants.navButtonHover}
@@ -391,11 +389,12 @@ const AudioPlayer = () => {
       </div>
 
       <AnimatePresence>
-        {showSongNotification && !isBigPlayerHovered && !isVolumeHovered && currentTrackData && (
+        {!showSongNotification && !isBigPlayerHovered && !isVolumeHovered && currentTrackData && (
           <motion.div
             className={cn(
-              "px-4 py-3 flex items-center gap-4 text-white bg-black/60 backdrop-blur-md rounded-2xl border shadow-xl border-white/30 absolute z-20 max-w-full overflow-hidden",
-              windowWidth < 1400 ? "w-80 bottom-0 left-0 ml-4 mb-4" : "w-100 top-0 right-0 mr-4 mt-4",
+              "bg-black/60 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30",
+              "px-4 py-3 flex items-center gap-4 absolute z-20 max-w-full overflow-hidden",
+              windowWidth < 1400 ? "w-80 bottom-4 left-4" : "w-100 top-4 right-4",
             )}
             variants={variants.songNotification}
             initial="initial"
