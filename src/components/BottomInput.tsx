@@ -177,7 +177,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   return (
     <footer
       className={cn(
-        "flex flex-row gap-2 justify-center mx-auto px-2 md:px-4 max-w-[120rem] w-full",
+        "flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 max-w-[120rem] w-full",
         "fixed bottom-0 inset-x-0 z-50 transition-all duration-200 ease-out",
         "bg-white/0 flex",
         isCollapsed ? "w-auto right-4 left-auto rounded-full p-1" : "w-full",

@@ -1,17 +1,17 @@
 #!/bin/bash
 
-fswatch -o ../src/data/chapters-1984.xml | while read num; do ## ZMIENIAMY ZE WSZYSTKIE CHAPTERY
-  echo "File changed, running scripts..."
-  # Command to process includes and save to a new file
-  # xmllint --xinclude ../src/data/chapter-1.xml > ../src/data/chapter-1-resolved.tmp.xml
-
-  # # Or, if you want to validate against the schema at the same time
-  # # (xmllint processes includes *before* validation)
-  # xmllint --xinclude --schema ebook.xsd ebook.xml --output ebook_resolved.xml
-
-  bun ../src/data/xmlToComplexHtml.ts ## To generuje ./src/data/chapters.ts
-  bun ../src/data/tools/create-book-metadata.ts  ## To generuje ./src/data/metadata.ts
-  echo "Scripts executed successfully."
+fswatch -0 src/data | while IFS= read -r -d '' file; do
+  case "$file" in
+    *.xml)
+      filename=$(basename "$file")
+      book="${filename%.xml}"
+      book="${book#chapters-}"
+      book="${book%-chapters}"
+      echo "File $filename changed, running scripts for $book..."
+      VITE_BOOK="$book" bun src/data/xmlToComplexHtml.ts
+      VITE_BOOK="$book" bun src/data/tools/create-book-metadata.ts
+      echo "Scripts executed successfully for $book.";;
+  esac
 done
 
 

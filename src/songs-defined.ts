@@ -231,14 +231,40 @@ const _1984BackgroundSongsDefined = [
   { chapter: 24, paragraph: 36, files: ["1984-chapter-24-paragraph-36.mp3", "1984-chapter-24-paragraph-36b.mp3"] },
 ];
 
-const conradTajnyAgentBackgroundSongsDefined = [{ chapter: 1, paragraph: 1, files: ["LondonNoirAmbience.mp3", "script-one.mp3"] }];
+const conradTajnyAgentBackgroundSongsDefined = [
+  { chapter: 1, paragraph: 0, files: ["tajny-agent-chapter-1-paragraph-1.mp3", "tajny-agent-chapter-1-paragraph-1b.mp3"] },
+  { chapter: 2, paragraph: 1, files: ["tajny-agent-chapter-2-paragraph-1.mp3", "tajny-agent-chapter-2-paragraph-1b.mp3"] },
+  { chapter: 2, paragraph: 60, files: ["tajny-agent-chapter-2-paragraph-60.mp3", "tajny-agent-chapter-2-paragraph-60b.mp3"] },
+  { chapter: 3, paragraph: 1, files: ["tajny-agent-chapter-3-paragraph-1.mp3", "tajny-agent-chapter-3-paragraph-1b.mp3"] },
+  { chapter: 3, paragraph: 54, files: ["tajny-agent-chapter-3-paragraph-54.mp3", "tajny-agent-chapter-3-paragraph-54b.mp3"] },
+  { chapter: 4, paragraph: 1, files: ["tajny-agent-chapter-4-paragraph-1.mp3", "tajny-agent-chapter-4-paragraph-1b.mp3"] },
+  { chapter: 4, paragraph: 80, files: ["tajny-agent-chapter-4-paragraph-80.mp3", "tajny-agent-chapter-4-paragraph-80b.mp3"] },
+  { chapter: 5, paragraph: 1, files: ["tajny-agent-chapter-5-paragraph-1.mp3", "tajny-agent-chapter-5-paragraph-1b.mp3"] },
+  { chapter: 5, paragraph: 68, files: ["tajny-agent-chapter-5-paragraph-68.mp3", "tajny-agent-chapter-5-paragraph-68b.mp3"] },
+  { chapter: 6, paragraph: 1, files: ["tajny-agent-chapter-6-paragraph-1.mp3", "tajny-agent-chapter-6-paragraph-1b.mp3"] },
+  { chapter: 6, paragraph: 33, files: ["tajny-agent-chapter-6-paragraph-33.mp3", "tajny-agent-chapter-6-paragraph-33b.mp3"] },
+  { chapter: 7, paragraph: 1, files: ["tajny-agent-chapter-7-paragraph-1.mp3", "tajny-agent-chapter-7-paragraph-1b.mp3"] },
+  { chapter: 7, paragraph: 78, files: ["tajny-agent-chapter-7-paragraph-78.mp3", "tajny-agent-chapter-7-paragraph-78b.mp3"] },
+  { chapter: 8, paragraph: 1, files: ["tajny-agent-chapter-8-paragraph-1.mp3", "tajny-agent-chapter-8-paragraph-1b.mp3"] },
+  { chapter: 8, paragraph: 81, files: ["tajny-agent-chapter-8-paragraph-81.mp3", "tajny-agent-chapter-8-paragraph-81b.mp3"] },
+  { chapter: 9, paragraph: 1, files: ["tajny-agent-chapter-9-paragraph-1.mp3", "tajny-agent-chapter-9-paragraph-1b.mp3"] },
+  { chapter: 9, paragraph: 149, files: ["tajny-agent-chapter-9-paragraph-149.mp3", "tajny-agent-chapter-9-paragraph-149b.mp3"] },
+  { chapter: 10, paragraph: 1, files: ["tajny-agent-chapter-10-paragraph-1.mp3", "tajny-agent-chapter-10-paragraph-1b.mp3"] },
+  { chapter: 10, paragraph: 64, files: ["tajny-agent-chapter-10-paragraph-64.mp3", "tajny-agent-chapter-10-paragraph-64b.mp3"] },
+  { chapter: 11, paragraph: 1, files: ["tajny-agent-chapter-11-paragraph-1.mp3", "tajny-agent-chapter-11-paragraph-1b.mp3"] },
+  { chapter: 11, paragraph: 71, files: ["tajny-agent-chapter-11-paragraph-71.mp3", "tajny-agent-chapter-11-paragraph-71b.mp3"] },
+  { chapter: 12, paragraph: 1, files: ["tajny-agent-chapter-12-paragraph-1.mp3", "tajny-agent-chapter-12-paragraph-1b.mp3"] },
+  { chapter: 12, paragraph: 135, files: ["tajny-agent-chapter-12-paragraph-135.mp3", "tajny-agent-chapter-12-paragraph-135b.mp3"] },
+  { chapter: 13, paragraph: 1, files: ["tajny-agent-chapter-13-paragraph-1.mp3", "tajny-agent-chapter-13-paragraph-1b.mp3"] },
+  { chapter: 13, paragraph: 29, files: ["tajny-agent-chapter-13-paragraph-29.mp3", "tajny-agent-chapter-13-paragraph-29b.mp3"] },
+];
 
 const krolowaSnieguBackgroundSongsDefined = [
   { chapter: 1, paragraph: 0, files: ["chapter_1_paragraph_1.mp3", "chapter_1_paragraph_1b.mp3"] },
   { chapter: 2, paragraph: 1, files: ["chapter_2_paragraph_1.mp3", "chapter_2_paragraph_1b.mp3"] },
   { chapter: 2, paragraph: 24, files: ["chapter_2_paragraph_24.mp3", "chapter_2_paragraph_24b.mp3"] },
   { chapter: 3, paragraph: 1, files: ["chapter_3_paragraph_1.mp3", "chapter_3_paragraph_1b.mp3"] },
-  { chapter: 3, paragraph: 20, files: ["chapter_3_paragraph_20.mp3", "chapter_3_paragraph_20b.mp3"] },
+  { chapter: 3, paragraph: 20, files: ["chapter_3_paragraph_20b.mp3", "chapter_3_paragraph_20.mp3"] },
   { chapter: 3, paragraph: 37, files: ["chapter_3_paragraph_37.mp3", "chapter_3_paragraph_37b.mp3"] },
   { chapter: 4, paragraph: 1, files: ["chapter_4_paragraph_1.mp3", "chapter_4_paragraph_1b.mp3"] },
   { chapter: 4, paragraph: 35, files: ["chapter_4_paragraph_35.mp3", "chapter_4_paragraph_35b.mp3"] },

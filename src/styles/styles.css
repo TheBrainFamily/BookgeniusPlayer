@@ -156,6 +156,30 @@
       mask-composite: intersect;
       hyphens: auto;
 
+      /* Media query for tablets - no right side fade */
+      @media (min-width: 768px) and (max-width: 1279px) {
+        mask-image:
+          linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(0 0 0 / 0.25) 5%,
+            rgba(0 0 0 / 0.65) 10%,
+            rgba(0 0 0 / 0.9) var(--top-solid),
+            rgba(0 0 0 / 0.9) var(--mid-solid),
+            rgba(0 0 0 / 0.2) 70%,
+            transparent 100%
+          ),
+          linear-gradient(
+            to right,
+            transparent 0,
+            rgba(0 0 0 / 0.4) 1%,
+            rgba(0 0 0 / 0.7) 2%,
+            rgba(0 0 0 / 1) 4%,
+            rgba(0 0 0 / 1) 100%
+          ),
+          radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
+      }
+
       /* Headings */
 
       h1 {
@@ -894,7 +918,7 @@
   }
 }
 
-@media (max-width: 1028px) {
+@media (max-width: 1280px) {
   #return-to-location-button {
     bottom: 65px;
     right: 48px;
@@ -907,6 +931,7 @@
   padding: 0.5rem;
   background-color: rgba(255, 250, 240, 0.5);
   cursor: pointer;
+  white-space: nowrap;
 }
 
 h3[data-index="0"] {
@@ -972,6 +997,20 @@ section[data-chapter] [data-index] {
   border-radius: 4px;
   z-index: 10000;
   animation: pulse 2.5s infinite ease-in-out;
+}
+
+/* --- Keyframes for the zoom animation --- */
+@keyframes zoomInOutEffect {
+  /* Renamed slightly for clarity, ensure it's unique if you had other zoomInOut */
+  0% {
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    transform: scale(1.2); /* Your desired zoom amount */
+  }
+  100% {
+    transform: scale(1) translateZ(0);
+  }
 }
 
 .current-word {

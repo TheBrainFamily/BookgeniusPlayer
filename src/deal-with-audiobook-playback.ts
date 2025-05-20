@@ -14,6 +14,7 @@ import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audi
 import { highlightNthOccurrence } from "./highlightWord";
 
 let isProcessingAudiobookTracks = false; // Module-level flag to prevent re-entrancy
+export let hasAudiobookForCurrentBook = false; // Flag to indicate if audiobook tracks exist for the current book
 
 // Preload function - can be async if loadTrack is async (it is now)
 // export const preloadAudiobookTracks = async () => {
@@ -76,9 +77,11 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
     const bookTracks = getAudiobookTracksForBook(CURRENT_BOOK);
     if (!bookTracks) {
       console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot determine Audiobook song.`);
-      isProcessingAudiobookTracks = false; // Reset flag before early exit
+      hasAudiobookForCurrentBook = false; // Update flag
+      isProcessingAudiobookTracks = false;
       return;
     }
+    hasAudiobookForCurrentBook = true;
 
     const foundAudiobookSections = bookTracks
       .filter((section: AudiobookTracksSection) => {

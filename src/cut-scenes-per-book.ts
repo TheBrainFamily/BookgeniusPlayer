@@ -8,7 +8,11 @@ export const getCutScenes = (): CutScene[] => {
       return [];
     case BOOK_SLUGS.Krolowa_Sniegu:
       console.log("returning cut scene for krolowa sniegu");
-      return [{ chapter: 1, paragraph: 6, file: "mirror-crashing.mp4", text: "", delayInMs: 15000 }];
+      return [
+        { chapter: 1, paragraph: 6, file: "mirror-crashing.mp4", text: "", delayInMs: 15000 },
+        { chapter: 7, paragraph: 21, file: "kocham-slow.mp4", text: "", delayInMs: 5000 },
+        { chapter: 7, paragraph: 19, file: "dzieci-spotkanie.mp4", text: "", delayInMs: 10000 },
+      ];
     case BOOK_SLUGS.PHARAON:
       return [{ chapter: 3, paragraph: 31, file: "ramzes-sara-cutscene.mp4", text: "Sara uspokoiła się powoli, a jej aksamitne oczy przybrały wyraz łagodnego smutku..." }];
     case BOOK_SLUGS._1984:

@@ -31,7 +31,10 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
 <Eskimoska display="Eskimoska" summary="Mała, tęga kobieta mieszkająca w bardzo gorącej chacie niedaleko pałacu Królowej Śniegu; słynie z mądrości i potrafi odczytywać listy na rybich skórkach." />
 <Platki-sniezne-Straze-Krolowej-Sniegu display="Płatki śnieżne (Straże Królowej Śniegu)" summary="Żywe, powiększające się płatki śniegu o groźnych kształtach, służące jako straż przednia Królowej Śniegu." />
 <Male-aniolki display="Małe aniołki" summary="Postacie zrodzone z widzialnego oddechu Gerdy podczas modlitwy, które chroniły ją przed płatkami-strażnikami." />
-<Towarzysz-rena display="Towarzysz rena" summary="Drugi ren, którego oswojony ren przyprowadził, aby pomóc Gerdzie i Kajowi w drodze powrotnej." /></CharactersMaster>
+<Towarzysz-rena display="Towarzysz rena" summary="Drugi ren, którego oswojony ren przyprowadził, aby pomóc Gerdzie i Kajowi w drodze powrotnej." />
+<Slonce display="Słońce" summary="Wiosenne Słońce." />
+<Jaskolka display="Jaskółka" summary="Pomocna Jaskółka, która wróciła na jesień do gniazda." />
+</CharactersMaster>
 
 
 <Chapter id="1"><h3>I. Czarodziejskie zwierciadło</h3>
@@ -58,7 +61,7 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
 <p>— Dobrze, dobrze!</p>
 <p>W lecie tak łatwo było przejść z jednego mieszkania do drugiego, ale w zimie musiały dzieci zbiegać na dół i znów wchodzić na schody tak wysoko! A tam na dole śnieg i wicher!</p>
 <p><Babka-Gerdy talking="true"/>— Patrz, patrz! Białe pszczoły wyleciały z ula — mówiła <Babka-Gerdy>stara babka</Babka-Gerdy>, ukazując wnuczce chwiejące się w powietrzu płatki śniegu.</p>
-<p><Gerda talking="true"/>— Pszczoły, pszczoły — powtarzała wesoło <Gerda>Gerda</Gerda>. — A czy mają swoją <Krolowa-Sniegu>królową</Krolowa-Sniegu>?</p>
+<p><Gerda talking="true"/>— Pszczoły, pszczoły — powtarzała wesoło <Gerda>Gerda</Gerda>. — A czy mają swoją królową?</p>
 <p><Babka-Gerdy talking="true"/>— Rozumie się, że mają — odpowiedziała <Babka-Gerdy>babka</Babka-Gerdy>. — Największy ze wszystkich płatków, a zawsze tam leci, gdzie śnieg najgęściej pada. Jeśli spadnie na ziemię, wzbija się natychmiast znowu ku ciemnym chmurom i nigdy nie spocznie. Czasem przebiega nocą po ulicach miasta i zagląda do okien, a wtedy wyrastają na nich śnieżne kwiaty i brylantowe liście.</p>
 <p><Gerda talking="true"/>     <Kaj talking="true"/>— Tak! Tak! Widzieliśmy! — wołały dzieci, zachwycone słowami <Babka-Gerdy>babki</Babka-Gerdy>.</p>
 <p><Gerda talking="true"/>— A czy <Krolowa-Sniegu>królowa śniegu</Krolowa-Sniegu> mogłaby przyjść tutaj? — zapytała <Gerda>Gerda</Gerda>.</p>
@@ -103,13 +106,13 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
 <p>I tak płynęła długa noc zimowa, a gdy nastąpił ranek, <Kaj>Kaj</Kaj> spał u nóg <Krolowa-Sniegu>królowej śniegu</Krolowa-Sniegu>.</p></Chapter><Chapter id="3"><h3>III. W ogródku wróżki</h3>
 <p>Jakże smutno i strasznie było biednej <Gerda>Gerdzie</Gerda>, kiedy wieczorem <Kaj>Kaj</Kaj> nie wrócił do domu!</p>
 <p>Nikt nie wiedział, gdzie się podział i co się z nim stało. <Chlopcy-z-rynku>Chłopcy</Chlopcy-z-rynku> opowiadali, że jeździł po rynku, a potem swoje saneczki uczepił do wielkich sań, które pomknęły za miasto. Tyle go widziano.</p>
-<p>Płakali rodzice, <Babka-Gerdy>babka</Babka-Gerdy> i <Gerda>Gerda</Gerda>, bo myśleli, że z mostu zsunął się w rzekę i utonął. <Gerda>Gerda</Gerda> płakała gorzko całą zimę.</p>
+<p>Płakali <Rodzice-Kaja>rodzice</Rodzice-Kaja>, <Babka-Gerdy>babka</Babka-Gerdy> i <Gerda>Gerda</Gerda>, bo myśleli, że z mostu zsunął się w rzekę i utonął. <Gerda>Gerda</Gerda> płakała gorzko całą zimę.</p>
 <p>Wreszcie nadeszła wiosna, zajaśniało piękne słoneczko.</p>
 <p><Gerda talking="true"/>— <Kaj>Kaj</Kaj> nie żyje! — rzekła do niego <Gerda>Gerda</Gerda>.</p>
-<p>— Albo to prawda! — odpowiedziało słońce.</p>
+<p><Slonce talking="true"/>— Albo to prawda! — odpowiedziało słońce.</p>
 <p>Powróciły jaskółki do gniazd zeszłorocznych.</p>
 <p><Gerda talking="true"/>— <Kaj>Kaj</Kaj> nie żyje! — oznajmiła im <Gerda>Gerda</Gerda>.</p>
-<p>— Nieprawda! — odpowiedziały jaskółki.</p>
+<p><Jaskolka talking="true"/>— Nieprawda! — odpowiedziały jaskółki.</p>
 <p>A wtedy i <Gerda>Gerda</Gerda> przestała w to wierzyć.</p>
 <p><Gerda talking="true"/>— Włożę czerwone buciki, których <Kaj>Kaj</Kaj> jeszcze nie widział i pójdę do rzeki zapytać o niego — pomyślała pewnego ranka.</p>
 <p>Było bardzo wcześnie, ale wstała zaraz, ubrała się cichutko, żeby nie obudzić <Babka-Gerdy>babki</Babka-Gerdy>, włożyła swoje czerwone buciki, leciuchno pocałowała <Babka-Gerdy>babunię</Babka-Gerdy> i pobiegła do rzeki.</p>
@@ -151,29 +154,29 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
 <p>Szła bosymi nóżkami po kamienistej drodze, a dokoła było smutno i ponuro. Czuła wielkie zmęczenie, ale się nie zatrzymywała. Z wierzb przydrożnych padały długie, żółte liście lub ciężkie krople chłodnej rosy. Na tarninowych krzakach były jeszcze jagody, ale tak cierpkie, że wykrzywiały usta.</p>
 <p>Szaro i smutno było na szerokim świecie, otulonym w szare, ciężkie, ołowiane chmury.</p></Chapter><Chapter id="4"><h3>IV. U księżniczki</h3>
 <p>Długo szła tak <Gerda>Gerda</Gerda>, w końcu zmęczyła się bardzo i usiadła znowu pod drzewem. Właśnie pierwszy śnieg pokrył ziemię i bose nożyny dziewczynki poczerwieniały z zimna. Wtem tuż przed nią stanęła duża, szara <Wrona>wrona</Wrona>: popatrzyła na nią, pokręciła łebkiem, podleciała w prawo i w lewo i zawołała: „Kra! Kra!'</p>
-<p>Znaczyło to: „Dzień dobry, kochana dziewczynko, musisz być bardzo biedna, kiedy w takie zimno sama idziesz w świat szeroki. Gdzież ty idziesz, dziewczynko? Czego szukasz?'</p>
+<p><Wrona talking="true"/>Znaczyło to: „Dzień dobry, kochana dziewczynko, musisz być bardzo biedna, kiedy w takie zimno sama idziesz w świat szeroki. Gdzież ty idziesz, dziewczynko? Czego szukasz?'</p>
 <p><Gerda>Gerda</Gerda> zrozumiała, co chce powiedzieć <Wrona>wrona</Wrona> i tak jej była wdzięczna za współczucie, tak się jej ciepło zrobiło w serduszku, że natychmiast opowiedziała jej całą historię i spytała zarazem, czy nic nie wie o <Kaj>Kaju</Kaj>.</p>
 <p><Wrona>Wrona</Wrona> kręciła łebkiem w zamyśleniu, podlatywała na prawo i lewo i powtarzała jak gdyby do siebie:</p>
 <p><Wrona talking="true"/>— A może? A być może? A kto wie? Kto wie? Kto wie?</p>
-<p><Gerda talking="true"/>— Widziałaś go! — zawołała uszczęśliwiona <Gerda>Gerda</Gerda> i zaczęła całować i ściskać <Wrona>wronę</Wrona> tak gwałtownie, że o mało jej nie udusiła.</p>
+<p><Gerda talking="true"/>- Widziałaś go! — zawołała uszczęśliwiona <Gerda>Gerda</Gerda> i zaczęła całować i ściskać <Wrona>wronę</Wrona> tak gwałtownie, że o mało jej nie udusiła.</p>
 <p><Wrona talking="true"/>— Spokojnie! Spokojnie! — powtarzała <Wrona>wrona</Wrona>. — Powiedziałam: kto wie! Może — może! — ale on dawno zapomniał o tobie. I przy tym tak mi trudno mówić twoim językiem. Co innego, gdybyś mogła rozmawiać ze mną po wroniemu, wtedy bym ci dokładnie opowiedziała wszystko.</p>
 <p><Gerda talking="true"/>— Ach, nie umiem! — z żalem szepnęła <Gerda>Gerda</Gerda>. — <Babka-Gerdy>Babka</Babka-Gerdy> umiała dobrze, ale się nie nauczyłam. Czemuż się nie nauczyłam!</p>
 <p><Wrona talking="true"/>— Kra! Kra! Nic nie szkodzi — rzekła <Wrona>wrona</Wrona>. — I tak się rozumiemy. Będę mówiła, jak potrafię.</p>
 <p>I zaczęła opowiadać:</p>
-<p>— W tym państwie, gdzie jesteśmy, rządzi bardzo mądra, bardzo mądra <Ksiezniczka>księżniczka</Ksiezniczka>. Razu jednego przyszło jej do głowy, aby sobie wybrać męża. Ale chciała takiego męża, który by umiał odpowiadać na wszystkie jej pytania, a nie nudnego mruka, co się odezwać nie umie i tylko udaje pana. Gdy powiedziała o tym swoim damom dworu, ucieszyły się wszystkie i wychwalały ją za ten mądry pomysł. Wtedy ogłoszono w gazetach, że każdy młodzieniec, który pragnie się ożenić z <Ksiezniczka>księżniczką</Ksiezniczka>, może przyjść do pałacu, a jeśli potrafi odpowiedzieć na jej pytania, może zostać jej mężem.</p>
-<p>Oj, żebyś wiedziała, co się wtedy działo, jakie tłumy cisnęły się do zamku! Ale cóż, nikomu jakoś się nie wiodło. Na ulicy wszyscy rozmawiali głośno, kłócili się, krzyczeli, obracali językami, jakby mieli za to obiecaną nagrodę, ale ktokolwiek minął zamkowe podwórze, zobaczył straż wspaniałą, postrojoną służbę, wielką tronową salę i piękną <Ksiezniczka>księżniczkę</Ksiezniczka>, zapominał języka w gębie, stawał jak słup niemy i zamiast odpowiedzi, powtarzał pytania <Ksiezniczka>księżniczki</Ksiezniczka>. To naturalnie było bardzo nudne, więc żadnego wybrać nie chciała.</p>
+<p><Wrona talking="true"/>— W tym państwie, gdzie jesteśmy, rządzi bardzo mądra, bardzo mądra <Ksiezniczka>księżniczka</Ksiezniczka>. Razu jednego przyszło jej do głowy, aby sobie wybrać męża. Ale chciała takiego męża, który by umiał odpowiadać na wszystkie jej pytania, a nie nudnego mruka, co się odezwać nie umie i tylko udaje pana. Gdy powiedziała o tym swoim <Damy-dworu-ksiezniczki>damom dworu</Damy-dworu-ksiezniczki>, ucieszyły się wszystkie i wychwalały ją za ten mądry pomysł. Wtedy ogłoszono w gazetach, że każdy młodzieniec, który pragnie się ożenić z <Ksiezniczka>księżniczką</Ksiezniczka>, może przyjść do pałacu, a jeśli potrafi odpowiedzieć na jej pytania, może zostać jej mężem.</p>
+<p><Wrona talking="true"/>- Oj, żebyś wiedziała, co się wtedy działo, jakie tłumy cisnęły się do zamku! Ale cóż, nikomu jakoś się nie wiodło. Na ulicy wszyscy rozmawiali głośno, kłócili się, krzyczeli, obracali językami, jakby mieli za to obiecaną nagrodę, ale ktokolwiek minął zamkowe podwórze, zobaczył straż wspaniałą, postrojoną służbę, wielką tronową salę i piękną <Ksiezniczka>księżniczkę</Ksiezniczka>, zapominał języka w gębie, stawał jak słup niemy i zamiast odpowiedzi, powtarzał pytania <Ksiezniczka>księżniczki</Ksiezniczka>. To naturalnie było bardzo nudne, więc żadnego wybrać nie chciała.</p>
 <p><Gerda talking="true"/>— A <Kaj>Kaj</Kaj>? — przerwała nieśmiała <Gerda>Gerda</Gerda>.</p>
-<p>— Otóż właśnie, moja kochana, dwa dni tak upłynęły, aż trzeciego przyszedł pieszo chłopczyk z ogorzałą twarzyczką, długimi włosami, bardzo biednie ubrany.</p>
+<p><Wrona talking="true"/>— Otóż właśnie, moja kochana, dwa dni tak upłynęły, aż trzeciego przyszedł pieszo chłopczyk z ogorzałą twarzyczką, długimi włosami, bardzo biednie ubrany.</p>
 <p><Gerda talking="true"/>— To <Kaj>Kaj</Kaj>! — zawołała, klaszcząc w ręce, <Gerda>Gerda</Gerda>.</p>
-<p>— Na plecach miał tornister — ciągnęła dalej <Wrona>wrona</Wrona>.</p>
+<p><Wrona talking="true"/>— Na plecach miał tornister — ciągnęła dalej <Wrona>wrona</Wrona>.</p>
 <p><Gerda talking="true"/>— Ach, nie, to były pewno jego sanki. Właśnie z sankami zginął.</p>
-<p>— Ha, może sanki — zgodziła się <Wrona>wrona</Wrona>. — Dobrze się nie przyglądałam. Poszedł śmiało ku schodom, a gdy zobaczył straże, spojrzał zdziwiony i zaraz powiedział: „To musi być okropnie nudno, tak stać tu ciągle!' Następnie wszedł do sali. Buty jego skrzypiały strasznie, ale widać było, że sobie z tego nic nie robi.</p>
+<p><Wrona talking="true"/>— Ha, może sanki — zgodziła się <Wrona>wrona</Wrona>. — Dobrze się nie przyglądałam. Poszedł śmiało ku schodom, a gdy zobaczył straże, spojrzał zdziwiony i zaraz powiedział: „To musi być okropnie nudno, tak stać tu ciągle!' Następnie wszedł do sali. Buty jego skrzypiały strasznie, ale widać było, że sobie z tego nic nie robi.</p>
 <p><Gerda talking="true"/>— O, to z pewnością <Kaj>Kaj</Kaj>! — krzyknęła <Gerda>Gerda</Gerda>. — Właśnie miał skrzypiące buty, jeszcze nowe, które mu <Babka-Gerdy>babka</Babka-Gerdy> kupiła.</p>
-<p>— Bardzo być może — potwierdziła <Wrona>wrona</Wrona>. — Szedł do samej <Ksiezniczka>księżniczki</Ksiezniczka> i nie zmieszał się wcale, chociaż ogromna sala pełna była dworzan, urzędników i dygnitarzy<note id='4'></note>, każdemu umiał odpowiedzieć, no i dostał <Ksiezniczka>księżniczkę</Ksiezniczka>.</p>
+<p><Wrona talking="true"/>— Bardzo być może — potwierdziła <Wrona>wrona</Wrona>. — Szedł do samej <Ksiezniczka>księżniczki</Ksiezniczka> i nie zmieszał się wcale, chociaż ogromna sala pełna była dworzan, urzędników i dygnitarzy<note id='4'></note>, każdemu umiał odpowiedzieć, no i dostał <Ksiezniczka>księżniczkę</Ksiezniczka>.</p>
 <p><Gerda talking="true"/>— To z pewnością <Kaj>Kaj</Kaj> — rzekła uszczęśliwiona <Gerda>Gerda</Gerda>. — On był zawsze ogromnie mądry, umiał liczyć na pamięć nawet z ułamkami. O, zaprowadź mnie do pałacu!</p>
 <p><Wrona talking="true"/>— Bah! — zakrakała <Wrona>wrona</Wrona>. — Łatwo to powiedzieć. Przecież takiej obdartej i bosej dziewczynki nie wpuszczą do królewskiego pałacu!</p>
 <p><Gerda talking="true"/>— Powiedz tylko <Kaj>Kajowi</Kaj>, że tu jestem, a sam przyjdzie po mnie natychmiast.</p>
-<p>— Zaczekaj tu przy płocie — rzekła <Wrona>wrona</Wrona> i poleciała do pałacu.</p>
+<p><Wrona talking="true"/>— Zaczekaj tu przy płocie — rzekła <Wrona>wrona</Wrona> i poleciała do pałacu.</p>
 <p>Ciemno już było, kiedy powróciła.</p>
 <p><Wrona talking="true"/>— To wszystko na nic — rzekła. — Boso cię tu nie wpuszczą, straż i <Lokaj>lokaje</Lokaj> bardzo zważają na nogi. Ale nie płacz. Poradzimy jakoś na to. Mam w pałacu krewnego, który jest w wielkich łaskach u <Ksiezniczka>księżniczki</Ksiezniczka> i zna wszystkie zakątki jak swoje własne gniazdo. On otworzy ci małą furtkę i ukrytymi schodami zaprowadzi prosto do sypialni księstwa.</p>
 <p><Gerda talking="true"/>— O, moja droga <Wrona>wrono</Wrona>! — cicho szepnęła <Gerda>Gerda</Gerda>, idąc do zamku długą, cienistą aleją, w której liście spadały z drzew jak krople deszczu. A kiedy w zamku pogaszono światła, weszły przez małą furtkę, tylko przymkniętą z lekka.</p>
@@ -182,9 +185,9 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
 <p><Kruk-czarnopiory>Kruk</Kruk-czarnopiory> uważnie popatrzył na nią i odezwał się wreszcie:</p>
 <p><Kruk-czarnopiory talking="true"/>— Pójdę naprzód, a wy za mną. Droga prosta i nikogo na niej nie spotkamy.</p>
 <p><Gerda talking="true"/>— A mnie się zdaje, że ktoś za nami idzie — powiedziała <Gerda>Gerda</Gerda> i obejrzała się z trwogą. W istocie przesunęło się coś szybko po ścianie jak gdyby cienie jeźdźców, psów i koni.</p>
-<p><Kruk-czarnopiory talking="true"/>— To sny o polowaniu śpieszą do <Ksiaze>księcia</Ksiaze> pana i <Ksiezniczka>księżniczki</Ksiezniczka> — uspokoił ją <Kruk-czarnopiory>kruk</Kruk-czarnopiory> natychmiast.</p>
+<p><Kruk-czarnopiory talking="true"/>— To sny o polowaniu śpieszą do księcia pana i <Ksiezniczka>księżniczki</Ksiezniczka> — uspokoił ją <Kruk-czarnopiory>kruk</Kruk-czarnopiory> natychmiast.</p>
 <p>Mijali szereg przepysznych<note id='5'></note> pokoi, których ściany obite były czerwonym, błękitnym lub żółtym atłasem<note id='6'></note>, sztuczne kwiaty pokrywały je wieńcami, wszędzie lśniły kosztowne sprzęty i klejnoty; wreszcie stanęli w królewskiej sypialni. Tu sufit przypominał piękną koronę<note id='7'></note> palmy o wspaniałych, szklanych liściach, a na środku, na grubej łodydze ze złota, wisiały dwa łóżeczka w kształcie lilii: jedno białe, gdzie spoczywała <Ksiezniczka>księżniczka</Ksiezniczka>, drugie purpurowe, gdzie może <Kaj>Kaj</Kaj> sypiał.</p>
-<p><Gerda>Gerda</Gerda> pochyliła się nad nim ciekawie i zobaczyła jego opaloną szyję. Ucieszona, krzyknęła głośno; sny natychmiast pomknęły wzdłuż ściany z pokoju, a <Ksiaze>książę</Ksiaze> się obudził, podniósł głowę i — to nie był <Kaj>Kaj</Kaj>.</p>
+<p><Gerda>Gerda</Gerda> pochyliła się nad nim ciekawie i zobaczyła jego opaloną szyję. Ucieszona, krzyknęła głośno; sny natychmiast pomknęły wzdłuż ściany z pokoju, a książę się obudził, podniósł głowę i — to nie był <Kaj>Kaj</Kaj>.</p>
 <p>Z drugiej lilii wychyliła się główka <Ksiezniczka>księżniczki</Ksiezniczka>, która patrzyła także, co się stało.</p>
 <p><Gerda>Gerda</Gerda> zaczęła płakać i opowiedziała wszystko od początku, nie zapominając o wielkiej przysłudze, jaką oddali jej <Kruk-czarnopiory>kruk</Kruk-czarnopiory> i <Wrona>wrona</Wrona>.</p>
 <p><Ksiezniczka talking="true"/>— Biedne dziecię — rzekła z litością <Ksiezniczka>księżniczka</Ksiezniczka>. — Nie martw się, nie gniewamy się na ciebie, ani na <Wrona>wronę</Wrona>, ani na <Kruk-czarnopiory>kruka</Kruk-czarnopiory>. Chcę nawet wynagrodzić ich za dobre serce. Odtąd mają prawo przebywania w zamku i otrzymają żywność z naszej kuchni, ale muszą nam przyrzec, że bez naszej wiedzy nie wprowadzą więcej nikogo do zamku.</p>
@@ -285,7 +288,7 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
 <p><Gerda>Gerda</Gerda> wybuchnęła płaczem. Jej łzy gorące padały mu na piersi, przenikały mu do serca, roztopiły lodową bryłę i spłukały z niej okruszynę czarodziejskiego zwierciadła, które było przyczyną całego nieszczęścia.</p>
 <p>I nagle serce zabiło mu mocniej, zimny dreszcz przebiegł ciało, zdumiony podniósł oczy na Gerdę, a ona zaczęła śpiewać:</p>
 <blockquote><div class='poem'> <div class='stanza'> <p class='verse'>Co ja kocham na tym świecie?</p> <p class='verse'>Złote słonko, jasne kwiecie!</p> <p class='verse'>Boże ptaszki śpiewające… </p> </div> </div></blockquote>
-<p>A kiedy wymówiła słowa: „Wszystko kocham serca biciem, a przestanę chyba z życiem!' — <Kaj>Kaj</Kaj> przypomniał sobie nagle krzaczek róży, dom, rodziców, <Babka-Gerdy>babkę</Babka-Gerdy>, Gerdę i wszystko, co się stało i zrobiło mu się tak smutno, tak smutno w tej wielkiej, białej, pustej, strasznej sali, że wybuchnął ogromnym płaczem, a ze łzami spłynął natychmiast i drugi okruch szkła czarodziejskiego, który mu tkwił w oku.</p>
+<p>A kiedy wymówiła słowa: „Wszystko kocham serca biciem, a przestanę chyba z życiem!' — <Kaj>Kaj</Kaj> przypomniał sobie nagle krzaczek róży, dom, <Rodzice-Kaja>rodziców</Rodzice-Kaja>, <Babka-Gerdy>babkę</Babka-Gerdy>, <Gerda>Gerdę</Gerda> i wszystko, co się stało i zrobiło mu się tak smutno, tak smutno w tej wielkiej, białej, pustej, strasznej sali, że wybuchnął ogromnym płaczem, a ze łzami spłynął natychmiast i drugi okruch szkła czarodziejskiego, który mu tkwił w oku.</p>
 <p>Wówczas dopiero poznał naprawdę Gerdę i wydawała mu się tak piękną jak dawniej i uczuł, że ją kocha tak mocno jak dawniej i aż krzyknął z radości i objął ją także rękami. I ściskali się serdecznie oboje, płacząc i śmiejąc się razem ze szczęścia.</p>
 <p>Po raz pierwszy w białym pałacu, u stóp tronu <Krolowa-Sniegu>królowej śniegu</Krolowa-Sniegu> rozległy się nieznane tu głosy wesela; toteż zdumione lodowe jezioro pękać zaczęło z wielkiego podziwu, a kawałeczki lodu, dotąd nieruchome, kręciły się w szalonym tańcu, podskakując i uderzając o siebie, aż zmęczone upadły znowu i same ułożyły się w ten dziwny wyraz, za który <Kaj>Kaj</Kaj> miał otrzymać wolność, świat cały i nowe łyżwy.</p>
 <p>W pałacu <Krolowa-Sniegu>królowej śniegu</Krolowa-Sniegu>, na lodowym jeziorze, u stóp wysokiego lodowatego tronu, jaśniał w blaskach zorzy północnej nieznany tu, tajemniczy wyraz:</p>
@@ -293,7 +296,7 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
 <p>A dzieci stały przy nim uśmiechnięte, opromienione złotem i różowym światłem. <Gerda>Gerda</Gerda> pocałowała <Kaj>Kaja</Kaj> w twarz — a sina twarz jego stała się rumianą — pocałowała go w oczy i stały się znowu jasne i błyszczące — całowała mu ręce i stały się silne — całowała mu nogi i utraciły sztywność i stały się zdrowe, i <Kaj>Kaj</Kaj> powstał z lodowego krzesła, raźny, zdrów, silny i dobry jak niegdyś.</p>
 <p>Teraz mogła powrócić i <Krolowa-Sniegu>królowa śniegu</Krolowa-Sniegu>; był zupełnie wolny! Wolność jego jaśniała u stóp wysokiego tronu tajemniczym wyrazem w blaskach północnej zorzy.</p>
 <p>Dzieci wzięły się za ręce i wyszły z okropnego pałacu. Rozmawiały o domu, rodzicach i <Babka-Gerdy>babce</Babka-Gerdy>, o kwiatach na dachu i o krzaczku róży, a gdzie się zwróciły, uciszały się wiatry i słońce wychylało się z ciemnych obłoków.</p>
-<p>Gdy stanęły przy krzaku z czerwonymi jagodami, zastały tam dwa <Ren>reny</Ren>: stary <Ren>ren</Ren> przyprowadził towarzysza. Dobre zwierzęta zaniosły Gerdę i <Kaj>Kaja</Kaj> najpierw do starej <Eskimoska>Eskimoski</Eskimoska>, gdzie dzieci wygrzały się w gorącej izbie, a następnie do <Laponka>Laponki</Laponka>, która przygotowała im na drogę nowe suknie<note id='20'></note> i powiedziała, którędy iść mają.</p>
+<p>Gdy stanęły przy krzaku z czerwonymi jagodami, zastały tam dwa <Ren>reny</Ren>: stary <Ren>ren</Ren> przyprowadził <Towarzysz-rena>towarzysza</Towarzysz-rena>. Dobre zwierzęta zaniosły Gerdę i <Kaj>Kaja</Kaj> najpierw do starej <Eskimoska>Eskimoski</Eskimoska>, gdzie dzieci wygrzały się w gorącej izbie, a następnie do <Laponka>Laponki</Laponka>, która przygotowała im na drogę nowe suknie<note id='20'></note> i powiedziała, którędy iść mają.</p>
 <p>Oba <Ren>reny</Ren> odprowadziły dzieci do granicy swego kraju i pożegnały tam, gdzie zniknęły śniegi, a ziemię i lasy okrywa świeża zieloność.</p>
 <p><Ren talking="true"/>— Bądźcie zdrowi! — Bądźcie zdrowi! — powiedziały sobie nawzajem.</p>
 <p>W powietrzu zaświergotały małe ptaszki, las zaszemrał młodymi listeczkami i na małym, ślicznym koniku wyjechała spomiędzy drzew jakaś dziewczynka w czerwonej czapeczce i z pistoletem za pasem.</p>
@@ -310,7 +313,7 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
 <p>Tak zbliżyły się do wielkiego miasta. Dzwony odezwały się z wieży kościelnej i dzieci poznały ten dobrze znany głos. I poznały ulice, domy, sklepy, bramy.</p>
 <p>Ściskając się za ręce, biegły do swego domu, po znanych schodach, na znane poddasze, do izdebki, gdzie upłynęło im dzieciństwo.</p>
 <p>Nic się tu nic zmieniło: sprzęty stały na swoim miejscu, na zegarze posuwały się wskazówki, a wahadło biegało w tę i ową stronę, powtarzając tym samym jednostajnym głosem: tik-tak!</p>
-<p>Wchodząc we drzwi, zauważyły dopiero, jak urosły w przeciągu tego czasu. A tam, przy oknie, stały ich małe krzesełka! Babunia siedziała na starym fotelu i modliła się z książki, a słońce oblewało złotym blaskiem jej siwą głowę.</p>
+<p>Wchodząc we drzwi, zauważyły dopiero, jak urosły w przeciągu tego czasu. A tam, przy oknie, stały ich małe krzesełka! <Babka-Gerdy>Babunia</Babka-Gerdy> siedziała na starym fotelu i modliła się z książki, a słońce oblewało złotym blaskiem jej siwą głowę.</p>
 <p>Jak tu ślicznie, jak jasno, jak wesoło!</p>
 <p>O pałacu <Krolowa-Sniegu>królowej śniegu</Krolowa-Sniegu> zapomnieli. Usiedli znowu na małych stołeczkach jak dawniej i spojrzeli na drewnianą skrzynkę, w której rosły powoje i groszki pachnące. Na krzaczkach róż rozwinęły się prześliczne kwiaty i zdawały się uśmiechać do nich, nachylając różane główki w stronę okna.</p>
 <p>A dzieci zaśpiewały razem:</p>
