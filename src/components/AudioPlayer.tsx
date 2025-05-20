@@ -238,12 +238,13 @@ const AudioPlayer = () => {
     await transitionToTrack(prevTrackId);
   };
 
-  const handleDownloadTrack = (trackId: string) => {
-    if (!trackId) return;
-    const trackUrl = `/${CURRENT_BOOK}/${trackId}.mp3`;
+  const handleDownloadTrack = (id: string, title: string) => {
+    if (!id) return;
+
+    const trackUrl = `/${CURRENT_BOOK}/${id}.mp3`;
     const link = document.createElement("a");
     link.href = trackUrl;
-    link.download = `${trackId}.mp3`;
+    link.download = `${title}.mp3`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -457,7 +458,7 @@ const AudioPlayer = () => {
                         }}
                       >
                         <div className="flex items-center gap-2">
-                          <span className={"text-white/70"}>{track.title || track.id}</span>
+                          <span className={"text-white/70"}>{track.title}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-white/70">{formatTime(track.duration)}</span>
@@ -466,7 +467,7 @@ const AudioPlayer = () => {
                             title="Download track"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDownloadTrack(track.id);
+                              handleDownloadTrack(track.id, track.title);
                             }}
                           >
                             <Download className="w-4 h-4" />
