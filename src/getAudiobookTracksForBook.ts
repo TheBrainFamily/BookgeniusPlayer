@@ -19,7 +19,7 @@ export const getAudiobookTracksForBook = (bookSlug: string): AudiobookTracksSect
         }
       });
     case BOOK_SLUGS.Krolowa_Sniegu:
-      return KrolowaSnieguAudiobookTracksDefined;
+      return KrolowaSnieguAudiobookTracksDefined as AudiobookTracksSection[];
     case BOOK_SLUGS.Conrad_Tajny_Agent:
       return ConradTajnyAgentAudiobookTracksDefined as AudiobookTracksSection[];
     // case BOOK_SLUGS.PHARAON:
