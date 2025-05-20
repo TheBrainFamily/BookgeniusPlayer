@@ -261,7 +261,7 @@ const AudioPlayer = () => {
 
   return (
     <>
-      <div className="absolute top-[1rem] left-20 z-10">
+      <div className="absolute top-[1rem] left-20 z-10 optional-element">
         <div className="relative origin-top-left">
           <motion.div className="bg-black/60 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1">
             {/* Volume Control Button */}
