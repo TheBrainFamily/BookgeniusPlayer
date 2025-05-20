@@ -249,13 +249,23 @@ const AudioPlayer = () => {
     document.body.removeChild(link);
   };
 
+  const handleOpenBigPlayerDropdownOpen = () => {
+    setIsBigPlayerHovered(true);
+    setIsVolumeHovered(false);
+  };
+
+  const handleOpenVolumeDropdownOpen = () => {
+    setIsVolumeHovered(true);
+    setIsBigPlayerHovered(false);
+  };
+
   return (
     <>
       <div className="absolute top-[1rem] left-20 z-10">
         <div className="relative origin-top-left">
           <motion.div className="bg-black/60 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1">
             {/* Volume Control Button */}
-            <div onClick={toggleMute} onMouseEnter={() => setIsVolumeHovered(true)} onMouseLeave={() => setIsVolumeHovered(false)} className="relative">
+            <div onClick={toggleMute} onMouseEnter={handleOpenVolumeDropdownOpen} onMouseLeave={() => setIsVolumeHovered(false)} className="relative">
               <motion.button
                 onClick={toggleMute}
                 className="p-2 my-1 hover:text-white rounded-full cursor-pointer"
@@ -292,7 +302,7 @@ const AudioPlayer = () => {
             )}
 
             {/* Big Player Button */}
-            <div onClick={() => setIsBigPlayerHovered((prev) => !prev)} onMouseEnter={() => setIsBigPlayerHovered(true)} onMouseLeave={() => setIsBigPlayerHovered(false)}>
+            <div onClick={() => setIsBigPlayerHovered((prev) => !prev)} onMouseEnter={handleOpenBigPlayerDropdownOpen} onMouseLeave={() => setIsBigPlayerHovered(false)}>
               <motion.button className="p-2 my-1 hover:text-white rounded-full cursor-pointer" whileHover="hover" whileTap="tap" variants={variants.buttonHover}>
                 <ListMusic className="w-5 h-5" />
               </motion.button>
@@ -304,10 +314,10 @@ const AudioPlayer = () => {
             {isVolumeHovered && (
               <>
                 {/* Invisible bridge element to ensure smooth hover transition */}
-                <div className="absolute w-48 h-4 top-full left-0 z-10 -mt-1" onMouseEnter={() => setIsVolumeHovered(true)} />
+                <div className="absolute w-48 h-4 top-full left-0 z-10 -mt-1" onMouseEnter={handleOpenVolumeDropdownOpen} />
                 <div
                   className="bg-black/60 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 absolute top-full left-0 mt-2 z-10 px-4 pt-2 pb-3 w-48 flex gap-3 flex-col"
-                  onMouseEnter={() => setIsVolumeHovered(true)}
+                  onMouseEnter={handleOpenVolumeDropdownOpen}
                   onMouseLeave={() => setIsVolumeHovered(false)}
                 >
                   <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.05 }}>
@@ -339,11 +349,11 @@ const AudioPlayer = () => {
             {isBigPlayerHovered && (
               <>
                 {/* Invisible bridge element */}
-                <div className="absolute w-80 h-4 top-full left-0 z-10 -mt-1" onMouseEnter={() => setIsBigPlayerHovered(true)} />
+                <div className="absolute w-80 h-4 top-full left-0 z-10 -mt-1" onMouseEnter={handleOpenBigPlayerDropdownOpen} />
                 <div
                   className="bg-black/60 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs"
                   onClick={() => setIsBigPlayerHovered((prev) => !prev)}
-                  onMouseEnter={() => setIsBigPlayerHovered(true)}
+                  onMouseEnter={handleOpenBigPlayerDropdownOpen}
                   onMouseLeave={() => setIsBigPlayerHovered(false)}
                 >
                   <motion.div className="flex justify-center pt-4 mb-4" variants={variants.popUpItem} initial="closed" animate="open">
@@ -452,7 +462,7 @@ const AudioPlayer = () => {
                         <div className="flex items-center gap-2">
                           <span className="text-white/70">{formatTime(track.duration)}</span>
                           <button
-                            className="text-white/70 hover:text-white p-1 rounded-full hover:bg-black/60"
+                            className="text-white/70 hover:text-white p-2 rounded-full transition hover:bg-black/40 cursor-pointer"
                             title="Download track"
                             onClick={(e) => {
                               e.stopPropagation();
