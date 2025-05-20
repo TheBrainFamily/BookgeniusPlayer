@@ -101,15 +101,15 @@ export const AudiobookTracksDefined = [
   { chapter: 2, paragraph: 21, smile_id: "dol_1_3_3_wsst_0094", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 334.661, "clip-end": 346.397 },
   { chapter: 2, paragraph: 22, smile_id: "dol_1_3_3_wsst_0095", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 346.397, "clip-end": 352.396 },
   { chapter: 2, paragraph: 23, smile_id: "dol_1_3_3_wsst_0096", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 352.396, "clip-end": 354.4 },
-  { chapter: 2, paragraph: 24, smile_id: "dol_1_3_3_wsst_0097", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 354.4, "clip-end": 356.488 },
-  { chapter: 2, paragraph: 25, smile_id: "dol_1_3_3_wsst_0098", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 356.488, "clip-end": 358.354 },
-  { chapter: 2, paragraph: 26, smile_id: "dol_1_3_3_wsst_0099", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 358.354, "clip-end": 360.701 },
-  { chapter: 2, paragraph: 27, smile_id: "dol_1_3_3_wsst_0100", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 360.701, "clip-end": 362.727 },
-  { chapter: 2, paragraph: 28, smile_id: "dol_1_3_3_wsst_0101", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 362.727, "clip-end": 364.579 },
-  { chapter: 2, paragraph: 29, smile_id: "dol_1_3_3_wsst_0102", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 364.579, "clip-end": 366.466 },
-  { chapter: 2, paragraph: 30, smile_id: "dol_1_3_3_wsst_0103", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 366.466, "clip-end": 368.397 },
-  { chapter: 2, paragraph: 31, smile_id: "dol_1_3_3_wsst_0105", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 368.397, "clip-end": 370.579 },
-  { chapter: 2, paragraph: 32, smile_id: "dol_1_3_3_wsst_0106", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 370.579, "clip-end": 374.271 },
+  { chapter: 2, paragraph: 23, smile_id: "dol_1_3_3_wsst_0097", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 354.4, "clip-end": 356.488 },
+  { chapter: 2, paragraph: 23, smile_id: "dol_1_3_3_wsst_0098", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 356.488, "clip-end": 358.354 },
+  { chapter: 2, paragraph: 23, smile_id: "dol_1_3_3_wsst_0099", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 358.354, "clip-end": 360.701 },
+  { chapter: 2, paragraph: 23, smile_id: "dol_1_3_3_wsst_0100", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 360.701, "clip-end": 362.727 },
+  { chapter: 2, paragraph: 23, smile_id: "dol_1_3_3_wsst_0101", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 362.727, "clip-end": 364.579 },
+  { chapter: 2, paragraph: 23, smile_id: "dol_1_3_3_wsst_0102", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 364.579, "clip-end": 366.466 },
+  { chapter: 2, paragraph: 23, smile_id: "dol_1_3_3_wsst_0103", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 366.466, "clip-end": 368.397 },
+  { chapter: 2, paragraph: 23, smile_id: "dol_1_3_3_wsst_0105", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 368.397, "clip-end": 370.579 },
+  { chapter: 2, paragraph: 23, smile_id: "dol_1_3_3_wsst_0106", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 370.579, "clip-end": 374.271 },
   { chapter: 2, paragraph: 33, smile_id: "dol_1_3_3_wsst_0107", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 374.271, "clip-end": 381.789 },
   { chapter: 2, paragraph: 33, smile_id: "dol_1_3_3_wsst_0108", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 381.789, "clip-end": 384.373 },
   { chapter: 2, paragraph: 34, smile_id: "dol_1_3_3_wsst_0109", file: "audiobook_data/3_II__S_siedzi.mp3", "clip-begin": 384.373, "clip-end": 385.082 },
@@ -754,4 +754,10 @@ export const AudiobookTracksDefined = [
   { chapter: 7, paragraph: 56, smile_id: "dol_1_8_8_wsst_0749", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 595.501, "clip-end": 597.793 },
   { chapter: 7, paragraph: 57, smile_id: "dol_1_8_8_wsst_0750", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 597.793, "clip-end": 600.564 },
   { chapter: 7, paragraph: 58, smile_id: "dol_1_8_8_wsst_0751", file: "audiobook_data/8_VII__W_pa_acu_kr_l.mp3", "clip-begin": 600.564, "clip-end": 605.146 },
-];
+].map((data) => {
+  if (data.chapter === 2 && data.paragraph >= 23) {
+    return { ...data, paragraph: data.paragraph - 9 };
+  } else {
+    return data;
+  }
+});

@@ -3,7 +3,7 @@ import { parseBlob } from "music-metadata";
 import { CURRENT_BOOK } from "./consts";
 
 // --- Interfaces and Types ---
-interface TrackState {
+export interface TrackState {
   transitionPoints?: number[];
   audioBuffer?: AudioBuffer;
   sourceNode?: AudioBufferSourceNode | null;
@@ -13,6 +13,9 @@ interface TrackState {
   coverArtUrl: string;
   title: string;
   trackLength: number;
+  startedAtCtxTime?: number | null; // AudioContext.currentTime when playback (this instance) started
+  offsetAtStart?: number; // Offset (in seconds) passed to source.start()
+  pausedAt?: number | null; // Position (in seconds) frozen when paused
 }
 
 // --- Configuration ---
@@ -22,6 +25,7 @@ const PRE_END_TRANSITION_TRIGGER_SECONDS = 4.0; // Time before track end to trig
 // --- Module-level State ---
 let audioContext: AudioContext | null = null;
 const tracks: Map<string, TrackState> = new Map();
+const liveSources = new Set<AudioBufferSourceNode>(); // keep track of every live node
 let masterGainNode: GainNode | null = null;
 let backgroundGainNode: GainNode | null = null;
 let audiobookGainNode: GainNode | null = null;
@@ -29,7 +33,6 @@ let audiobookGainNode: GainNode | null = null;
 let currentTrackId: string | null = null;
 let nextTrackId: string | null = null; // Track being faded TO (during active crossfade)
 let isTransitioning = false; // Is a crossfade actively happening?
-let transitionTimeout: ReturnType<typeof setTimeout> | null = null;
 
 let currentSectionTracks: string[] | null = null;
 let currentTrackIndexInSection: number = -1;
@@ -46,6 +49,10 @@ export function getCurrentTrackData(): TrackState | null {
 
 export function getAudioContext(): AudioContext | null {
   return audioContext;
+}
+
+function announceSongTransition() {
+  window.dispatchEvent(new CustomEvent("songTransition"));
 }
 
 export async function initAudioContext(): Promise<boolean> {
@@ -145,24 +152,11 @@ export async function loadTrack(trackId: string, transitionPoints?: number[]): P
 
     if (metadata.picture?.[0]) {
       const picture = metadata.picture[0];
-      const blob = new Blob([picture.data], { type: picture.format });
+      const blob = new Blob([new Uint8Array(picture.data)], { type: picture.format });
       coverArtUrl = URL.createObjectURL(blob);
-
-      // Debug image (optional)
-      const debugImage = document.createElement("img");
-      debugImage.src = coverArtUrl;
-      debugImage.style.cssText = `
-        position: fixed; top: 10px; right: 10px;
-        border: 1px solid white; z-index: 10000;
-        max-width: 100px; max-height: 100px;
-        background: white; cursor: pointer;
-      `;
-
-      document.body.appendChild(debugImage);
     }
 
     // Continue with audio processing
-
     tracks.set(trackId, {
       audioBuffer,
       duration: audioBuffer.duration,
@@ -212,6 +206,8 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0): 
   source.connect(gainNode);
   gainNode.connect(backgroundGainNode || masterGainNode);
 
+  liveSources.add(source);
+
   // Clear any existing preemptive transition timeout for this track if it's being re-played
   const existingStateForTimeout = tracks.get(trackId);
   if (existingStateForTimeout?.preemptiveTransitionTimeout) {
@@ -220,6 +216,7 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0): 
   }
 
   source.onended = async () => {
+    liveSources.delete(source);
     const stateAtEnd = tracks.get(trackId);
     const thisSourceInstanceEnded = stateAtEnd?.sourceNode === source;
 
@@ -249,6 +246,9 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0): 
     source.start(startTime, offset % state.audioBuffer.duration);
     state.sourceNode = source;
     state.gainNode = gainNode;
+    state.startedAtCtxTime = startTime;
+    state.offsetAtStart = offset;
+    state.pausedAt = null;
     console.log(`Scheduled '${trackId}' @ ${startTime.toFixed(2)}s (offset ${offset.toFixed(2)}s). Duration: ${state.audioBuffer.duration.toFixed(2)}s`);
 
     // Schedule pre-emptive transition
@@ -313,7 +313,8 @@ function stopTrackInternal(trackId: string) {
   }
 
   if (state.sourceNode) {
-    state.sourceNode.onended = null; // Crucial: remove handler before stopping
+    liveSources.delete(state.sourceNode);
+    state.sourceNode.onended = null;
     try {
       state.sourceNode.stop();
     } catch {
@@ -377,20 +378,14 @@ async function playNextTrackInSection(): Promise<void> {
 
     if (!playTrack(nextTrackIdToPlay, audioContext.currentTime, 0)) {
       console.error(`playNextTrackInSection: Failed to play next track '${nextTrackIdToPlay}'. Rolling back state.`);
-      currentTrackId = previousTrackId; // Rollback
+      currentTrackId = previousTrackId;
       currentTrackIndexInSection = previousIndex;
-      // Consider stopping all if sequence play fails catastrophically
-      // stopAllPlayback();
     } else {
+      announceSongTransition();
       console.log(`playNextTrackInSection: Successfully started next track '${nextTrackIdToPlay}'.`);
     }
   } else {
     console.error(`playNextTrackInSection: Cannot play next track '${nextTrackIdToPlay}'. Load failed: ${!loaded}, Context not running: ${audioContext?.state !== "running"}.`);
-    // Don't roll back currentTrackId/Index here, as they weren't updated for the new track
-    // If loading failed, the previous track effectively "ended" and nothing new started.
-    // The onended handler for the previous track should have already cleared currentTrackId if applicable.
-    // If we want to be super safe, and loading the next track fails, we could stop everything.
-    // stopAllPlayback();
   }
 }
 
@@ -401,20 +396,19 @@ function findNextTransitionPoint(trackIdForFadeOut: string): number | null {
     console.warn(`findNextTransitionPoint: No valid source/buffer/gain for '${trackIdForFadeOut}' or gain is 0. Cannot determine transition point.`);
     return null;
   }
-  // console.warn(`Using fixed transition delay for '${trackIdForFadeOut}' for testing.`);
-  return audioContext.currentTime + 1.0; // Simplified: start fade 1 second from now
+  return audioContext.currentTime + 1.0;
 }
 
 async function performCrossfade(fadeOutId: string, fadeInId: string, transitionStartTime: number) {
   if (!audioContext) {
     console.warn("performCrossfade: AudioContext not available.");
-    isTransitioning = false; // Ensure this is reset if we bail early
+    isTransitioning = false;
     nextTrackId = null;
     return;
   }
 
   const fadeOutState = tracks.get(fadeOutId);
-  const fadeInStateExists = tracks.has(fadeInId) && tracks.get(fadeInId)!.audioBuffer; // Check buffer specifically
+  const fadeInStateExists = tracks.has(fadeInId) && tracks.get(fadeInId)!.audioBuffer;
 
   if (!fadeOutState?.gainNode || !fadeInStateExists) {
     console.error(`performCrossfade: Missing data. FadeOutGain: ${!!fadeOutState?.gainNode}, FadeInBuffer: ${fadeInStateExists}. Cannot cross-fade ${fadeOutId} -> ${fadeInId}.`);
@@ -425,23 +419,22 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
 
   console.log(`Performing crossfade: ${fadeOutId} -> ${fadeInId} scheduled at ${transitionStartTime.toFixed(2)}s`);
   isTransitioning = true;
-  nextTrackId = fadeInId; // Mark the track we are fading *to*
+  nextTrackId = fadeInId;
 
   const fadeEnd = transitionStartTime + FADE_DURATION_SECONDS;
 
-  // Fade Out
+  // ---------- fade-OUT ramp ----------
   const gOut = fadeOutState.gainNode.gain;
   gOut.cancelScheduledValues(audioContext.currentTime);
   gOut.setValueAtTime(gOut.value, audioContext.currentTime);
   gOut.linearRampToValueAtTime(0, fadeEnd);
 
-  // Fade In - Ensure track is loaded before scheduling play
-  // `transitionToTrack` should have pre-loaded it. This is a safety check.
+  // ---------- fade-IN preparation ----------
   const loaded = await loadTrack(fadeInId);
   if (!loaded) {
     console.error(`performCrossfade: Failed to ensure ${fadeInId} is loaded. Aborting crossfade.`);
-    gOut.cancelScheduledValues(audioContext.currentTime); // Cancel the fade out
-    gOut.linearRampToValueAtTime(1, audioContext.currentTime + 0.2); // Quick ramp back up
+    gOut.cancelScheduledValues(audioContext.currentTime);
+    gOut.linearRampToValueAtTime(1, audioContext.currentTime + 0.2);
     isTransitioning = false;
     nextTrackId = null;
     return;
@@ -454,6 +447,11 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
     isTransitioning = false;
     nextTrackId = null;
     return;
+  } else {
+    currentTrackId = fadeInId;
+    if (currentSectionTracks) {
+      currentTrackIndexInSection = currentSectionTracks.indexOf(fadeInId);
+    }
   }
 
   const fadeInGainNode = tracks.get(fadeInId)?.gainNode;
@@ -466,49 +464,53 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
     nextTrackId = null;
     return;
   }
+
+  // ---------- fade-IN ramp ----------
   const gIn = fadeInGainNode.gain;
-  // Ensure it starts silent IF scheduled in future, or from 0 if starting now due to scheduling quirks
-  gIn.setValueAtTime(0, audioContext.currentTime); // Set to 0 now
-  gIn.linearRampToValueAtTime(0, transitionStartTime); // Ensure it stays 0 until transitionStartTime
-  gIn.linearRampToValueAtTime(1, fadeEnd); // Then ramp up
+  gIn.setValueAtTime(0, audioContext.currentTime);
+  gIn.linearRampToValueAtTime(0, transitionStartTime);
+  gIn.linearRampToValueAtTime(1, fadeEnd);
 
-  // Cleanup Timeout
-  if (transitionTimeout) clearTimeout(transitionTimeout);
-  transitionTimeout = setTimeout(
-    () => {
-      console.log(`Crossfade timeout reached for ${fadeOutId} -> ${fadeInId}. Cleaning up.`);
-      stopTrackInternal(fadeOutId);
+  // Hand-off immediately so pause / resume target the audible track
+  currentTrackId = fadeInId;
+  if (currentSectionTracks) {
+    currentTrackIndexInSection = currentSectionTracks.indexOf(fadeInId);
+  }
+  announceSongTransition();
+  // ---------- unified clean-up helper ----------
+  const finishCrossfade = () => {
+    if (!isTransitioning) return; // already cleaned once
+    stopTrackInternal(fadeOutId);
 
-      currentTrackId = fadeInId; // fadeInId is now officially the current track
+    if (pendingSectionTracks !== undefined) {
+      console.log(`Crossfade complete: Applying pending section: ${pendingSectionTracks ? "[" + pendingSectionTracks.join(", ") + "]" : "None"}`);
+      currentSectionTracks = pendingSectionTracks ? [...pendingSectionTracks] : null;
+      pendingSectionTracks = undefined;
+    }
 
-      // Apply pending section if one was set during the transition
-      if (pendingSectionTracks !== undefined) {
-        console.log(`Crossfade complete: Applying pending section: ${pendingSectionTracks ? "[" + pendingSectionTracks.join(", ") + "]" : "None"}`);
-        currentSectionTracks = pendingSectionTracks ? [...pendingSectionTracks] : null;
-        pendingSectionTracks = undefined; // Reset pending state
-      }
-
-      // Update index based on the (potentially new) current section
-      if (currentSectionTracks) {
-        currentTrackIndexInSection = currentSectionTracks.indexOf(fadeInId);
-        if (currentTrackIndexInSection === -1) {
-          console.warn(
-            `Crossfade complete: Track ${fadeInId} NOT found in active section [${currentSectionTracks.join(", ")}]. This might indicate a state issue if the section was expected to contain this track.`,
-          );
-        } else {
-          console.log(`Crossfade complete. Now playing '${fadeInId}' (index ${currentTrackIndexInSection} in section [${currentSectionTracks.join(", ")}]).`);
-        }
+    if (currentSectionTracks) {
+      currentTrackIndexInSection = currentSectionTracks.indexOf(fadeInId);
+      if (currentTrackIndexInSection === -1) {
+        console.warn(`Crossfade complete: Track ${fadeInId} NOT found in active section [${currentSectionTracks.join(", ")}].`);
       } else {
-        currentTrackIndexInSection = -1;
-        console.log(`Crossfade complete. Now playing '${fadeInId}' (no active section).`);
+        console.log(`Crossfade complete. Now playing '${fadeInId}' (index ${currentTrackIndexInSection} in section [${currentSectionTracks.join(", ")}]).`);
       }
+    } else {
+      currentTrackIndexInSection = -1;
+      console.log(`Crossfade complete. Now playing '${fadeInId}' (no active section).`);
+    }
 
-      nextTrackId = null;
-      isTransitioning = false;
-      console.log("Crossfade transition fully completed and state updated.");
-    },
-    Math.max(0, fadeEnd - audioContext.currentTime) * 1000 + 100,
-  ); // 100ms buffer
+    nextTrackId = null;
+    isTransitioning = false;
+    console.log("Crossfade transition fully completed and state updated.");
+  };
+
+  // 1) call finishCrossfade as soon as the ramp mathematically ends
+  const msUntilFadeEnd = Math.max(0, fadeEnd - audioContext.currentTime) * 1000 + 50; // +50 ms cushion
+  setTimeout(finishCrossfade, msUntilFadeEnd);
+
+  // 2) …and also if the old source ends earlier for any reason
+  fadeOutState.sourceNode!.onended = finishCrossfade;
 }
 
 export function setActiveSection(newSectionTrackIds: string[] | null): void {
@@ -573,7 +575,6 @@ export function isCurrentTrackInSection(sectionTrackIdsToCheck: string[]): boole
     currentSectionTracks.length === sectionTrackIdsToCheck.length && currentSectionTracks.every((track, index) => track === sectionTrackIdsToCheck[index]);
 
   if (!isActiveSectionSameAsChecked) {
-    // console.log(`isCurrentTrackInSection: Provided section [${sectionTrackIdsToCheck.join(',')}] does not match active internal section [${currentSectionTracks.join(',')}]`);
     return false;
   }
   return currentSectionTracks.includes(currentTrackId);
@@ -584,11 +585,8 @@ export async function startFirstTrack(trackId: string): Promise<boolean> {
     console.error("startFirstTrack: AudioContext not ready.");
     return false;
   }
-  // This check for currentTrackId MUST allow starting if currentTrackId is set but refers to a track that has naturally ended.
-  // The key is `tracks.get(currentTrackId)?.sourceNode` being null.
   const currentTrackState = currentTrackId ? tracks.get(currentTrackId) : null;
   if ((currentTrackId && currentTrackState?.sourceNode) || isTransitioning) {
-    // Check if sourceNode exists
     console.warn(
       `startFirstTrack: Cannot start '${trackId}'. Reason: ${currentTrackId && currentTrackState?.sourceNode ? `already playing '${currentTrackId}' (source exists)` : ""}${isTransitioning ? "transition in progress" : ""}.`,
     );
@@ -605,7 +603,6 @@ export async function startFirstTrack(trackId: string): Promise<boolean> {
     console.log(`startFirstTrack: Successfully loaded '${trackId}' on demand.`);
   }
 
-  // Update background volume without stopping audiobook
   if (backgroundGainNode) {
     setBackgroundVolume(backgroundGainNode.gain.value, false);
   }
@@ -626,6 +623,7 @@ export async function startFirstTrack(trackId: string): Promise<boolean> {
       currentTrackIndexInSection = -1;
       console.log(`Started track ${trackId} (no active section).`);
     }
+    announceSongTransition();
     return true;
   } else {
     console.warn(`startFirstTrack: playTrack call failed for ${trackId}.`);
@@ -651,7 +649,6 @@ export async function transitionToTrack(targetId: string): Promise<boolean> {
   }
 
   if (currentTrackId === targetId && tracks.get(targetId)?.sourceNode) {
-    // Also check if sourceNode exists
     console.log(`transitionToTrack: Target track '${targetId}' is already current and playing. Ensuring index is correct.`);
     if (currentSectionTracks && currentTrackIndexInSection === -1) {
       currentTrackIndexInSection = currentSectionTracks.indexOf(targetId);
@@ -664,49 +661,58 @@ export async function transitionToTrack(targetId: string): Promise<boolean> {
     const loaded = await loadTrack(targetId);
     if (!loaded) {
       console.error(`transitionToTrack: Failed to load '${targetId}' on demand for transition.`);
-      return false; // Failed to load, cannot proceed.
+      return false;
     }
     console.log(`transitionToTrack: Successfully loaded '${targetId}' on demand.`);
   }
 
-  // Case 1: Nothing is effectively playing (no currentTrackId, or currentTrackId's sourceNode is gone)
   const currentTrackState = currentTrackId ? tracks.get(currentTrackId) : null;
   if (!currentTrackId || !currentTrackState?.sourceNode) {
     console.log(`transitionToTrack: No current track playing or source gone ('${currentTrackId}'). Using startFirstTrack for '${targetId}'.`);
-    currentTrackId = null; // Ensure it's null if source was gone
+    currentTrackId = null;
     currentTrackIndexInSection = -1;
     return await startFirstTrack(targetId);
   }
 
-  // Case 2: Current track is different, need to transition.
   const transitionPointTime = findNextTransitionPoint(currentTrackId);
   if (transitionPointTime === null) {
     console.warn(`transitionToTrack: Could not find a transition point for '${currentTrackId}'. Falling back to immediate cut to '${targetId}'.`);
     const oldTrackId = currentTrackId;
-    stopTrackInternal(currentTrackId); // Stop the current one
-    currentTrackId = null; // CRITICAL: Clear currentTrackId before calling startFirstTrack
-    currentTrackIndexInSection = -1; // Reset index
+    stopTrackInternal(currentTrackId);
+    currentTrackId = null;
+    currentTrackIndexInSection = -1;
 
-    const started = await startFirstTrack(targetId); // Attempt to start the new one
+    const started = await startFirstTrack(targetId);
     if (started) {
       console.log(`transitionToTrack: Immediate cut from '${oldTrackId}' to '${targetId}' succeeded.`);
     } else {
       console.warn(`transitionToTrack: Immediate cut from '${oldTrackId}', but failed to start '${targetId}'.`);
-      // currentTrackId is already null, which is correct state if target didn't start.
     }
     return started;
   }
 
   console.log(`transitionToTrack: Initiating crossfade from '${currentTrackId}' to '${targetId}' scheduled at ${transitionPointTime.toFixed(2)}s`);
-  await performCrossfade(currentTrackId, targetId, transitionPointTime); // performCrossfade is async due to await loadTrack inside
-  return true; // Transition initiated (crossfade process is async)
+  await performCrossfade(currentTrackId, targetId, transitionPointTime);
+  return true;
 }
 
 export function stopAllPlayback() {
   if (!audioContext) return;
   console.log("Stopping all playback and resetting state...");
-  if (transitionTimeout) clearTimeout(transitionTimeout);
-  transitionTimeout = null;
+
+  liveSources.forEach((src) => {
+    try {
+      src.stop();
+    } catch {
+      /* */
+    }
+    try {
+      src.disconnect();
+    } catch {
+      /* */
+    }
+  });
+  liveSources.clear();
 
   tracks.forEach((_, id) => {
     stopTrackInternal(id);
@@ -717,7 +723,7 @@ export function stopAllPlayback() {
   isTransitioning = false;
   currentSectionTracks = null;
   currentTrackIndexInSection = -1;
-  pendingSectionTracks = undefined; // Clear any pending section changes
+  pendingSectionTracks = undefined;
 
   console.log("All playback stopped and state reset.");
 }
@@ -737,6 +743,43 @@ export function getCurrentSectionTracks(): string[] | null {
 }
 export function getCurrentTrackIndexInSection(): number {
   return currentTrackIndexInSection;
+}
+
+/** Pure getter for current playback position (in seconds) */
+export function getCurrentTrackPosition(): number | null {
+  if (!audioContext || !currentTrackId) return null;
+  const state = tracks.get(currentTrackId);
+  if (!state) return null;
+  if (state.pausedAt != null) return state.pausedAt;
+  if (state.startedAtCtxTime == null) return 0;
+  const pos = audioContext.currentTime - state.startedAtCtxTime + (state.offsetAtStart ?? 0);
+  return Math.min(pos, state.audioBuffer?.duration ?? Infinity);
+}
+
+export function setCurrentTrackPosition(position: number): boolean {
+  if (!audioContext || !currentTrackId) return false;
+  const state = tracks.get(currentTrackId);
+  if (!state || !state.audioBuffer) return false;
+
+  // Clamp position to valid range
+  const safePosition = Math.max(0, Math.min(position, state.audioBuffer.duration));
+
+  try {
+    const wasPlaying = state.sourceNode !== null;
+    stopTrackInternal(currentTrackId);
+
+    // If it was playing, start a new instance at the specified position
+    if (wasPlaying) {
+      playTrack(currentTrackId, audioContext.currentTime, safePosition);
+    } else {
+      // If it was paused, update the pausedAt value
+      state.pausedAt = safePosition;
+    }
+    return true;
+  } catch (e) {
+    console.error("Error setting track position:", e);
+    return false;
+  }
 }
 
 // --- Volume control functions ---
@@ -814,6 +857,26 @@ export function setBackgroundVolume(volume: number, isUserAction: boolean = true
   }
 }
 
+// --- Pause / Resume helpers ---
+export function pauseCurrentTrack(): void {
+  if (!audioContext) return;
+  // remember position of the one we want to resume
+  if (currentTrackId) {
+    const s = tracks.get(currentTrackId);
+    if (s?.sourceNode) s.pausedAt = audioContext.currentTime - (s.startedAtCtxTime ?? 0) + (s.offsetAtStart ?? 0);
+  }
+
+  // stop every active source so nothing keeps playing
+  tracks.forEach((_, id) => stopTrackInternal(id));
+}
+
+export function resumeCurrentTrack(): void {
+  if (!audioContext || !currentTrackId) return;
+  const s = tracks.get(currentTrackId);
+  if (!s || s.pausedAt == null) return;
+  playTrack(currentTrackId, audioContext.currentTime, s.pausedAt);
+}
+
 // Add TypeScript declarations for window properties
 declare global {
   interface Window {
@@ -821,6 +884,10 @@ declare global {
     getMasterVolume: typeof getMasterVolume;
     setBackgroundVolume: typeof setBackgroundVolume;
     getCurrentTrackData: typeof getCurrentTrackData;
+    getCurrentTrackPosition: typeof getCurrentTrackPosition;
+    setCurrentTrackPosition: typeof setCurrentTrackPosition;
+    pauseCurrentTrack: typeof pauseCurrentTrack;
+    resumeCurrentTrack: typeof resumeCurrentTrack;
   }
 }
 
@@ -828,3 +895,7 @@ window.setMasterVolume = setMasterVolume;
 window.getMasterVolume = getMasterVolume;
 window.setBackgroundVolume = setBackgroundVolume;
 window.getCurrentTrackData = getCurrentTrackData;
+window.getCurrentTrackPosition = getCurrentTrackPosition;
+window.setCurrentTrackPosition = setCurrentTrackPosition;
+window.pauseCurrentTrack = pauseCurrentTrack;
+window.resumeCurrentTrack = resumeCurrentTrack;
