@@ -49,7 +49,7 @@ const getTitle = (chapter: number) => {
 type ModalType = null | "chapters" | "page";
 
 interface BookChaptersModalProps {
-  onShowDeepResearch: () => void;
+  onShowDeepResearch?: () => void;
   bookData: BookData;
 }
 

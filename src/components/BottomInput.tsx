@@ -8,9 +8,10 @@ import { useRealtime } from "@/context/RealtimeContext"; // Adjust path
 // import { Message, useWebSocket } from "@/context/WebSocketContext"; // Adjust path
 import { CURRENT_BOOK } from "@/consts"; // Adjust path
 import { useLocation } from "@/state/LocationContext"; // Adjust path
-import { showSearchModal, performSearch, hideSearchModal, isSearchActive } from "@/searchModal"; // Adjust path
+import { performSearch, hideSearchModal, isSearchActive } from "@/searchModal"; // Adjust path
 import { deepResearchCall } from "@/deepResearchCall"; // Adjust path
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
+import { useModal } from "@/context/ModalContext";
 
 // --- Helper Hook for Landscape Detection ---
 const useDeviceOrientation = () => {
@@ -39,7 +40,7 @@ interface BottomInputProps {
   placeholder?: string;
   onSubmit?: (message: SubmitMessageData) => void; // Use the specific data type
   className?: string; // Keep for potential footer styling overrides
-  onShowDeepResearch: (result: string) => void;
+  onShowDeepResearch?: (result: string) => void;
   // No longer needs onCloseDeepResearch unless used elsewhere
   onCloseDeepResearch?: () => void; // ToDo: remove if not needed
 }
@@ -53,6 +54,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [isRightNotesBlankHidden, setIsRightNotesBlankHidden] = useState(false);
+  const { openSearchModal, currentModal } = useModal();
 
   const { isLandscape } = useDeviceOrientation();
   const { startRecording, stopRecording, response } = useRealtime();
@@ -82,10 +84,6 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
     setIsRightNotesBlankHidden(isMobileOrTablet);
   }, [isMobileOrTablet]);
 
-  // --- Event Handlers ---
-  // const handleFocus = () => setIsFocused(true); // Remove if not needed
-  // const handleBlur = () => setIsFocused(false); // Remove if not needed
-
   const toggleDeepResearch = () => {
     setIsDeepResearchActive(!isDeepResearchActive);
   };
@@ -96,8 +94,9 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
 
     // Search modal logic (keep as is)
     if (newVal.trim().length > 2 && !isDeepResearchActive) {
-      if (!isSearchActive()) {
-        showSearchModal();
+      if (!isSearchActive() && !currentModal) {
+        // showSearchModal();
+        openSearchModal(true, true);
         setTimeout(() => inputRef.current?.focus(), 100);
       }
       performSearch(newVal);
