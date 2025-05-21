@@ -2,14 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Mic, Send, Telescope, Expand } from "lucide-react";
 import { motion } from "motion/react";
 
-import { cn } from "@/lib/utils"; // Assuming you have this utility
-import { useRealtime } from "@/context/RealtimeContext"; // Adjust path
-// Removed WebSocket dependency if isLoading isn't used in footer
-// import { Message, useWebSocket } from "@/context/WebSocketContext"; // Adjust path
-import { CURRENT_BOOK } from "@/consts"; // Adjust path
-import { useLocation } from "@/state/LocationContext"; // Adjust path
-import { performSearch, hideSearchModal, isSearchActive } from "@/searchModal"; // Adjust path
-import { deepResearchCall } from "@/deepResearchCall"; // Adjust path
+import { cn } from "@/lib/utils";
+import { useRealtime } from "@/context/RealtimeContext";
+import { CURRENT_BOOK } from "@/consts";
+import { useLocation } from "@/state/LocationContext";
+import { deepResearchCall } from "@/deepResearchCall";
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
 import { useModal } from "@/context/ModalContext";
 
@@ -40,26 +37,22 @@ interface BottomInputProps {
   placeholder?: string;
   onSubmit?: (message: SubmitMessageData) => void; // Use the specific data type
   className?: string; // Keep for potential footer styling overrides
-  onShowDeepResearch?: (result: string) => void;
-  // No longer needs onCloseDeepResearch unless used elsewhere
-  onCloseDeepResearch?: () => void; // ToDo: remove if not needed
 }
 
-export function BottomInput({ placeholder = "Type something...", onSubmit, className, onShowDeepResearch }: BottomInputProps) {
+export function BottomInput({ placeholder = "Type something...", onSubmit, className }: BottomInputProps) {
   const [value, setValue] = useState("");
-  // isFocused might not be needed anymore if backdrop is removed
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false); // Keep for now for styling purposes
   const [isRecording, setIsRecording] = useState(false);
   const [isInputExpanded, setIsInputExpanded] = useState(true);
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [isRightNotesBlankHidden, setIsRightNotesBlankHidden] = useState(false);
-  const { openSearchModal, currentModal } = useModal();
+
+  // Get all the functions and state from the modal context
+  const { openSearchModal, closeModal, currentModal, performSearchInModal, searchQuery: modalSearchQuery } = useModal();
 
   const { isLandscape } = useDeviceOrientation();
   const { startRecording, stopRecording, response } = useRealtime();
-  // Removed useWebSocket - add back ONLY if isLoading indicator is needed IN FOOTER
-  // const { isLoading } = useWebSocket();
   const { location } = useLocation();
   const { chapter: currentChapter, paragraph: currentParagraph } = location;
 
@@ -67,16 +60,39 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
 
   const isCollapsed = isLandscape && !isInputExpanded;
 
-  // --- Effects ---
   useEffect(() => {
     setIsInputExpanded(!isLandscape);
   }, [isLandscape]);
 
+  // Add keyboard listener for Cmd+F / Ctrl+F
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Intercept browser search (Cmd+F or Ctrl+F)
+      if ((event.key === "f" || event.key === "F") && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault(); // Prevent default browser search
+        // Focus the bottom input instead of showing the modal
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+        return;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   useEffect(() => {
     if (response && !isRecording) {
       setValue(response);
+      // If modal is open, also update its search query
+      if (currentModal?.type === "search") {
+        performSearchInModal(response);
+      }
     }
-  }, [response, isRecording]);
+  }, [response, isRecording, currentModal?.type, performSearchInModal]);
 
   const isMobileOrTablet = useIsMobileOrTablet();
 
@@ -84,26 +100,41 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
     setIsRightNotesBlankHidden(isMobileOrTablet);
   }, [isMobileOrTablet]);
 
+  // Sync BottomInput's value with modalSearchQuery from context when modal is open
+  useEffect(() => {
+    if (currentModal?.type === "search" && modalSearchQuery !== value) {
+      setValue(modalSearchQuery);
+    }
+  }, [modalSearchQuery, currentModal?.type, value]);
+
   const toggleDeepResearch = () => {
-    setIsDeepResearchActive(!isDeepResearchActive);
+    const newDeepResearchState = !isDeepResearchActive;
+    setIsDeepResearchActive(newDeepResearchState);
+    if (newDeepResearchState && currentModal?.type === "search") {
+      closeModal(); // Close search modal if deep research is activated
+    }
+    if (newDeepResearchState) {
+      setValue(""); // Clear input when activating deep research
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVal = e.target.value;
     setValue(newVal);
 
-    // Search modal logic (keep as is)
-    if (newVal.trim().length > 2 && !isDeepResearchActive) {
-      if (!isSearchActive() && !currentModal) {
-        // showSearchModal();
-        openSearchModal(true, true);
+    // Don't trigger search functionality if deep research is active
+    if (isDeepResearchActive) return;
+
+    // Improved search modal integration using ModalContext
+    if (newVal.trim().length > 0) {
+      if (currentModal?.type !== "search") {
+        openSearchModal(true, true, newVal.trim());
         setTimeout(() => inputRef.current?.focus(), 100);
+      } else {
+        performSearchInModal(newVal); // Update query in already open modal
       }
-      performSearch(newVal);
-      const modalInput = document.getElementById("search-input") as HTMLInputElement | null;
-      if (modalInput) modalInput.value = newVal;
-    } else if (newVal.trim().length === 0 && isSearchActive()) {
-      hideSearchModal();
+    } else if (newVal.trim().length === 0 && currentModal?.type === "search") {
+      performSearchInModal(""); // Clear results in modal or show placeholder
     }
   };
 
@@ -118,27 +149,32 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     const trimmedValue = value.trim();
-    if (!trimmedValue || !onSubmit) return;
+    if (!trimmedValue) return;
 
-    if (isSearchActive()) hideSearchModal();
+    // Handle submission while search modal is open
+    if (currentModal?.type === "search") {
+      performSearchInModal(trimmedValue); // Ensure latest query is processed
+      // The modal will stay open to show the search results
+      return;
+    }
 
     if (isDeepResearchActive) {
       setIsThinking(true);
       deepResearchCall(trimmedValue, location)
-        .then(onShowDeepResearch) // Simplified .then
         .catch((error) => console.error("Deep research failed:", error))
         .finally(() => {
           setIsThinking(false);
           setIsDeepResearchActive(false); // Turn off after call completes
+          setValue(""); // Clear after deep research submission
         });
-    } else {
+    } else if (onSubmit) {
       onSubmit({
         // Send the structured data
         query: trimmedValue,
         filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: CURRENT_BOOK },
       });
+      setValue(""); // Clear after general submission
     }
-    setValue("");
   };
 
   const handleRecordingStart = useCallback(() => {
@@ -146,11 +182,13 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
     setIsRecording(true);
     if (isLandscape && !isInputExpanded) setIsInputExpanded(true);
     setValue("");
+    // Clear search if starting voice input while search modal is open
+    if (currentModal?.type === "search") performSearchInModal("");
     startRecording().catch((error) => {
       console.error("Error starting recording:", error);
       setIsRecording(false);
     });
-  }, [isRecording, startRecording, isLandscape, isInputExpanded]);
+  }, [isRecording, startRecording, isLandscape, isInputExpanded, currentModal?.type, performSearchInModal]);
 
   const handleRecordingEnd = useCallback(() => {
     if (!isRecording) return;
