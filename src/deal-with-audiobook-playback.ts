@@ -204,6 +204,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
           return sectionsToApply
             .filter((section) => section.chapter === currentChapter)
             .flatMap((section: AudiobookTracksSection) => {
+              if (!section?.words) return;
               const wordOccurrenceCounterWithinSection = new Map<string, number>();
               const numWordsInSection = section.words.length;
               return section.words.map((wp, wordIndex) => {
