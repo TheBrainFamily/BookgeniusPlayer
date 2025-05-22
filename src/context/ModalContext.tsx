@@ -132,7 +132,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
 
         return (
           <ModalUI onClose={closeModal} className="bg-transparent">
-            <div className="flex flex-row lg:flex-col gap-4 items-center">
+            <div className="flex flex-col md:flex-row lg:flex-col gap-4 items-center">
               <div className="rounded-full overflow-hidden h-full w-full max-h-[90vh] max-w-[90vh] lg:max-h-120 lg:max-w-120 border-4 border-[var(--entity-highlight-border-light)] aspect-square">
                 <CharacterMedia
                   mediaSrc={modal.mediaSrc}
@@ -146,7 +146,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
                   }}
                 />
               </div>
-              <div className="flex flex-col self-center p-4 rounded-lg bg-[var(--entity-highlight-bg-light)] border-2 border-[var(--entity-highlight-border-light)]">
+              <div className="flex flex-col self-center p-4 rounded-lg bg-[var(--entity-highlight-bg-light)] border-2 border-[var(--entity-highlight-border-light)] max-w-2xl">
                 <h4 className="italic font-bold text-center">{matchingCharacter.characterName}</h4>
                 <p className="text-center" dangerouslySetInnerHTML={{ __html: findLatestSummaryInRange(matchingCharacter, range.endChapter) || "" }} />
               </div>
