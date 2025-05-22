@@ -9,23 +9,7 @@ import { useLocation } from "@/state/LocationContext";
 import { deepResearchCall } from "@/deepResearchCall";
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
 import { useModal } from "@/context/ModalContext";
-
-// --- Helper Hook for Landscape Detection ---
-const useDeviceOrientation = () => {
-  const [isLandscape, setIsLandscape] = useState(false);
-
-  useEffect(() => {
-    const checkOrientation = () => {
-      const landscape = window.matchMedia("(orientation: landscape) and (max-height: 500px)").matches;
-      setIsLandscape(landscape);
-    };
-    checkOrientation();
-    const mediaQueryList = window.matchMedia("(orientation: landscape) and (max-height: 500px)");
-    mediaQueryList.addEventListener("change", checkOrientation);
-    return () => mediaQueryList.removeEventListener("change", checkOrientation);
-  }, []);
-  return { isLandscape };
-};
+import useDeviceOrientation from "@/hooks/useDeviceOrientation";
 
 // Type for the onSubmit prop data structure (assuming Message was defined in WebSocket context)
 interface SubmitMessageData {
@@ -35,11 +19,10 @@ interface SubmitMessageData {
 
 interface BottomInputProps {
   placeholder?: string;
-  onSubmit?: (message: SubmitMessageData) => void; // Use the specific data type
-  className?: string; // Keep for potential footer styling overrides
+  onSubmit?: (message: SubmitMessageData) => void;
 }
 
-export function BottomInput({ placeholder = "Type something...", onSubmit, className }: BottomInputProps) {
+export function BottomInput({ placeholder = "Type something...", onSubmit }: BottomInputProps) {
   const [value, setValue] = useState("");
   const [isFocused, setIsFocused] = useState(false); // Keep for now for styling purposes
   const [isRecording, setIsRecording] = useState(false);
@@ -148,17 +131,18 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
+
     const trimmedValue = value.trim();
     if (!trimmedValue) return;
 
-    // Handle submission while search modal is open
     if (currentModal?.type === "search") {
-      performSearchInModal(trimmedValue); // Ensure latest query is processed
-      // The modal will stay open to show the search results
+      performSearchInModal(trimmedValue);
       return;
     }
 
     if (isDeepResearchActive) {
+      console.log("STOJANISKO Deep research");
+
       setIsThinking(true);
       deepResearchCall(trimmedValue, location)
         .then((deepResearchResponse) => {
@@ -222,7 +206,6 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
         "bg-white/0 flex",
         isCollapsed ? "w-auto right-4 left-auto rounded-full p-1" : "w-full",
         "justify-around",
-        className,
         "optional-element",
       )}
     >

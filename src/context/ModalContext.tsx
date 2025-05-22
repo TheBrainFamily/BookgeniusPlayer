@@ -131,9 +131,9 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
         if (!matchingCharacter) return null;
 
         return (
-          <ModalUI title={matchingCharacter.characterName} onClose={closeModal} width="lg" height="xl" className="bg-transparent">
+          <ModalUI title={matchingCharacter.characterName} onClose={closeModal} className="bg-transparent">
             <div className="flex flex-row lg:flex-col gap-4 items-center">
-              <div className="rounded-full overflow-hidden max-h-[90vh] max-w-[90vh] lg:max-h-120 lg:max-w-120 border-4 border-[var(--entity-highlight-border-light)] aspect-square">
+              <div className="rounded-full overflow-hidden h-full w-full max-h-[90vh] max-w-[90vh] lg:max-h-120 lg:max-w-120 border-4 border-[var(--entity-highlight-border-light)] aspect-square">
                 <CharacterMedia
                   mediaSrc={modal.mediaSrc}
                   isVideo={modal.isVideo}
@@ -157,7 +157,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
 
       case "search":
         return (
-          <ModalUI title="Research" onClose={closeModal} width="xl" height="lg" layoutView={modal.layoutView} hideOverlay={modal.hideOverlay}>
+          <ModalUI title="Search" onClose={closeModal} layoutView={modal.layoutView} hideOverlay={modal.hideOverlay}>
             <div className="flex flex-col h-full p-4">
               <input
                 type="text"
@@ -214,7 +214,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
 
       case "deepResearch":
         return (
-          <ModalUI title="Deep Research" onClose={closeModal} width="xl" height="xl" layoutView={modal.layoutView} hideOverlay={modal.hideOverlay}>
+          <ModalUI title="Deep Research" onClose={closeModal} layoutView={modal.layoutView} hideOverlay={modal.hideOverlay}>
             <div className="prose dark:prose-invert max-w-none p-4">
               <LLMAnswerViewer answerMarkdown={modal.content} />
             </div>
@@ -223,7 +223,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
 
       case "bookChapter":
         return (
-          <ModalUI title={`Chapter ${modal.chapter}`} onClose={closeModal} width="lg" height="md">
+          <ModalUI title={`Chapter ${modal.chapter}`} onClose={closeModal}>
             <div className="prose dark:prose-invert max-w-none p-4">
               <p>Chapter {modal.chapter} content goes here</p>
             </div>

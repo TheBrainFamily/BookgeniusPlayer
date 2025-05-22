@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 import { useLocation } from "@/state/LocationContext";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useFootnotes } from "@/hooks/src/hooks/useFootnotes";
+import { useFootnotes } from "@/hooks/useFootnotes";
 import { FootnoteModal } from "./FootnoteModal";
 
 const target = document.getElementById("right-notes");
