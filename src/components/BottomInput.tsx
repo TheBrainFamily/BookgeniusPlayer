@@ -49,7 +49,7 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   const [isRightNotesBlankHidden, setIsRightNotesBlankHidden] = useState(false);
 
   // Get all the functions and state from the modal context
-  const { openSearchModal, closeModal, currentModal, performSearchInModal, searchQuery: modalSearchQuery } = useModal();
+  const { openSearchModal, closeModal, currentModal, performSearchInModal, searchQuery: modalSearchQuery, openDeepResearchModal } = useModal();
 
   const { isLandscape } = useDeviceOrientation();
   const { startRecording, stopRecording, response } = useRealtime();
@@ -161,6 +161,9 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
     if (isDeepResearchActive) {
       setIsThinking(true);
       deepResearchCall(trimmedValue, location)
+        .then((deepResearchResponse) => {
+          openDeepResearchModal(deepResearchResponse, true, true); // Open modal with the response
+        })
         .catch((error) => console.error("Deep research failed:", error))
         .finally(() => {
           setIsThinking(false);

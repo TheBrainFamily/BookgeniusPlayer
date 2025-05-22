@@ -10,6 +10,7 @@ import { performLocalDOMSearch, SearchResultsData, SearchResultItemData } from "
 import { goToParagraph } from "@/helpers/paragraphsNavigation";
 
 import ModalUI from "@/components/ModalUI";
+import { LLMAnswerViewer } from "@/ui/MarkdownComponent";
 
 const findLatestSummaryInRange = (character: CharacterData, endChapter: number) => {
   const latestSummary = character.infoPerChapter.filter((info) => info.chapter <= endChapter).sort((a, b) => b.chapter - a.chapter)[0]?.summary; // Corrected newline issue
@@ -20,13 +21,13 @@ const findLatestSummaryInRange = (character: CharacterData, endChapter: number) 
 export type ModalType =
   | { type: "character"; slug: string; isVideo: boolean; mediaSrc: string }
   | { type: "search"; layoutView?: boolean; hideOverlay?: boolean; initialQuery?: string }
-  | { type: "deepResearch"; content?: string }
+  | { type: "deepResearch"; content?: string; layoutView?: boolean; hideOverlay?: boolean }
   | { type: "bookChapter"; chapter: number };
 
 export interface ModalContextType {
   openCharacterDetailsModal: (slug: string, isVideo: boolean, mediaSrc: string) => void;
   openSearchModal: (layoutView?: boolean, hideOverlay?: boolean, initialQuery?: string) => void;
-  openDeepResearchModal: (content?: string) => void;
+  openDeepResearchModal: (content?: string, layoutView?: boolean, hideOverlay?: boolean) => void;
   openBookChapterModal: (chapter: number) => void;
   closeModal: () => void;
   currentModal: ModalType | null;
@@ -55,8 +56,8 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
     setCurrentModal({ type: "search", layoutView, hideOverlay, initialQuery });
   };
 
-  const openDeepResearchModal = (content?: string) => {
-    setCurrentModal({ type: "deepResearch", content });
+  const openDeepResearchModal = (content?: string, layoutView?: boolean, hideOverlay?: boolean) => {
+    setCurrentModal({ type: "deepResearch", content, layoutView, hideOverlay });
     setSearchResults(null);
     setSearchQuery("");
   };
@@ -213,9 +214,9 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
 
       case "deepResearch":
         return (
-          <ModalUI title="Deep Research" onClose={closeModal} width="xl" height="xl">
+          <ModalUI title="Deep Research" onClose={closeModal} width="xl" height="xl" layoutView={modal.layoutView} hideOverlay={modal.hideOverlay}>
             <div className="prose dark:prose-invert max-w-none p-4">
-              {modal.content ? <div dangerouslySetInnerHTML={{ __html: modal.content }} /> : <p>No content available</p>}
+              <LLMAnswerViewer answerMarkdown={modal.content} />
             </div>
           </ModalUI>
         );
