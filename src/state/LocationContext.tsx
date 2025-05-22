@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useMemo, useState, useEffect } from "react";
-import { __setLocationBridge } from "@/helpers/paragraphsNavigation";
+import { __setLocationBridge, parseLocationFromHash } from "@/helpers/paragraphsNavigation";
 
 /* ------------------------------------------------------------------ */
 export interface Location {
@@ -35,7 +35,7 @@ export const LocationContext = createContext<LocationCtx>({
 
 /* ------------------------------------------------------------------ */
 export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [location, setLocationState] = useState<Location>(loadFromLS());
+  const [location, setLocationState] = useState<Location>(parseLocationFromHash() || loadFromLS());
 
   const setLocation = useCallback((loc: Location) => {
     setLocationState(loc);
