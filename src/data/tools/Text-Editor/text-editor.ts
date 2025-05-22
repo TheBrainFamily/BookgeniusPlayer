@@ -20,9 +20,33 @@ export class TextEditor {
     fs.writeFileSync(`./src/data/chapters-${this.bookSlug}.ts`, `export const ${this.bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlString}</section>\`;`);
   }
 
+  private isSimilarParagraph(original: string, updated: string): boolean {
+    // Use DOMParser to extract text content from both strings
+    const parser = new DOMParser();
+    const getTextContent = (str: string) => {
+      const doc = parser.parseFromString(str, "text/xml");
+      return doc.documentElement && doc.documentElement.textContent ? doc.documentElement.textContent.trim() : "";
+    };
+
+    const originalText = getTextContent(original);
+    const updatedText = getTextContent(updated);
+
+    // Check if the text content is the same
+    return originalText === updatedText;
+  }
+
   public addCharacter(chapterNumber: number, paragraphNumber: number, updatedParagraphText: string) {
-    const paragraphText = this.getParagraphByNumber(chapterNumber, paragraphNumber);
-    const updatedXml = this.bookXml.replace(paragraphText, updatedParagraphText);
+    const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
+
+    if (!originalParagraph) {
+      throw new Error("Paragraph not found");
+    }
+
+    if (!this.isSimilarParagraph(originalParagraph, updatedParagraphText)) {
+      throw new Error("Updated paragraph text is too different from the original");
+    }
+
+    const updatedXml = this.bookXml.replace(originalParagraph, updatedParagraphText);
     this.regenerateXml(updatedXml);
     fs.writeFileSync(`./src/data/${this.bookSlug}-chapters.xml`, updatedXml, "utf-8");
     return updatedXml;
@@ -48,6 +72,45 @@ export class TextEditor {
     const paragraph = paragraphs[paragraphNumber];
     return paragraph.toString();
   }
+
+  public removeCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1): string {
+    const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
+
+    if (!originalParagraph) {
+      throw new Error("Paragraph not found");
+    }
+
+    // Create a regex pattern to match the character tag with the specified name
+    const characterPattern = new RegExp(`<${characterName}[^>]*>.*?</${characterName}>`, "g");
+
+    // Count total occurrences
+    const matches = originalParagraph.match(characterPattern) || [];
+    if (occurrence < 1 || occurrence > matches.length) {
+      throw new Error(`Invalid occurrence number. There are ${matches.length} occurrences of ${characterName} in this paragraph.`);
+    }
+
+    // Remove the specific occurrence of the character tag while preserving the content inside
+    let currentOccurrence = 0;
+    const updatedParagraph = originalParagraph.replace(characterPattern, (match) => {
+      currentOccurrence++;
+      if (currentOccurrence === occurrence) {
+        // Extract the text content between the tags for the specified occurrence
+        return match.replace(new RegExp(`<${characterName}[^>]*>|</${characterName}>`, "g"), "");
+      }
+      return match;
+    });
+
+    // Verify that we only removed the specified occurrence of the character tag
+    const remainingMatches = updatedParagraph.match(characterPattern) || [];
+    if (remainingMatches.length !== matches.length - 1) {
+      throw new Error("Failed to remove character tag properly");
+    }
+
+    const updatedXml = this.bookXml.replace(originalParagraph, updatedParagraph);
+    this.regenerateXml(updatedXml);
+    fs.writeFileSync(`./src/data/${this.bookSlug}-chapters.xml`, updatedXml, "utf-8");
+    return updatedXml;
+  }
 }
 
 if (require.main === module) {
@@ -56,6 +119,8 @@ if (require.main === module) {
 
     const textEditor = new TextEditor(BOOK_SLUG);
 
-    textEditor.addCharacter(3, 5, `<p><Gerda talking="true"/>— <Kaj>Kaj</Kaj> nie żyje! — rzekła do niego Gerda.</p>`);
+    // textEditor.addCharacter(3, 5, `<p><Gerda talking="true"/>— <Kaj>Kaj</Kaj> nie żyje! — rzekła do niego Gerda.</p>`);
+
+    textEditor.removeCharacter(1, 1, "Kaj", 1);
   })();
 }
