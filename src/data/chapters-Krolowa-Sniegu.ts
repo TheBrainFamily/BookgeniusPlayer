@@ -1,7 +1,7 @@
 export const KrolowaSnieguBookXml = `<section><section><section data-chapter="1">
     <h3 data-index="0">I. Czarodziejskie zwierciadło</h3>
     <p data-index="1">
-      Żył sobie niegdyś bardzo <span class="character-highlighted" data-character="Zlosliwy-czarodziej" data-src-listening="/Krolowa-Sniegu/zlosliwy-czarodziej-listens.mp4" >złośliwy czarodziej</span>. Całą jego przyjemnością było dokuczać ludziom, czynić źle, ze wszystkiego się wyśmiewać i każdą rzecz przedstawiać z najgorszej strony.
+      Żył sobie niegdyś bardzo <span class="character-highlighted" data-character="Zlosliwy-czarodziej" data-src-listening="/Krolowa-Sniegu/zlosliwy-czarodziej-listens.mp4" >złośliwy czarodziej</span>. Całą jego przyjemnością było dokuczać ludziom, czynić źle, ze wszystkiego się <span class="character-highlighted" data-character="Kaj" data-src-listening="/Krolowa-Sniegu/kaj-listens.mp4" >wyśmiewać</span> i każdą rzecz przedstawiać z najgorszej strony.
     </p>
     <p data-index="2">
       Wymyślił wreszcie i zrobił takie sztuczne zwierciadło<a href="#fn1" class="link-note"></a>, iż wszystkie rzeczy piękne i dobre wyglądały w nim szkaradnie, a nawet śmiesznie, ponieważ były wykrzywione, zamazane, niewyraźne — za to złe rzeczy widać w nim było doskonale.
@@ -215,7 +215,7 @@ export const KrolowaSnieguBookXml = `<section><section><section data-chapter="1"
       Wreszcie nadeszła wiosna, zajaśniało piękne słoneczko.
     </p>
     <p data-index="5">
-      <span class="character-placeholder character-talking" data-character="Gerda" data-src-talking="/Krolowa-Sniegu/gerda-speaks.mp4" data-is-talking="true"></span>— <span class="character-highlighted" data-character="Kaj" data-src-listening="/Krolowa-Sniegu/kaj-listens.mp4" >Kaj</span> nie żyje! — rzekła do niego <span class="character-highlighted" data-character="Gerda" data-src-listening="/Krolowa-Sniegu/gerda-listens.mp4" >Gerda</span>.
+      <span class="character-placeholder character-talking" data-character="Gerda" data-src-talking="/Krolowa-Sniegu/gerda-speaks.mp4" data-is-talking="true"></span>— <span class="character-highlighted" data-character="Kaj" data-src-listening="/Krolowa-Sniegu/kaj-listens.mp4" >Kaj</span> nie żyje! — rzekła do niego Gerda.
     </p>
     <p data-index="6">
       <span class="character-placeholder character-talking" data-character="Slonce" data-src-talking="/Krolowa-Sniegu/slonce.png" data-is-talking="true"></span>— Albo to prawda! — odpowiedziało słońce.
