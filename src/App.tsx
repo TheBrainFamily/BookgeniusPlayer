@@ -6,7 +6,6 @@ import { useCutScene } from "./hooks/useCutScene";
 import { useBackgroundVideo } from "./hooks/useBackgroundVideo";
 import { useBookContent } from "./hooks/useBookContent";
 
-import BookChaptersModal from "./menu-modal";
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
 import AudioPlayer from "./components/AudioPlayer";
 import { runLegacyInit } from "./main";
@@ -22,6 +21,7 @@ import { ModalProvider, useModal } from "./context/ModalContext";
 import { BookContentWrapper } from "./components/BookContentWrapper";
 import { BookThemeProvider } from "./context/BookThemeContext";
 import { useAudiobookTracks } from "@/hooks/useAudiobookTracks";
+import MenuButton from "./components/MenuButton";
 
 function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
   /* Inject book content first */
@@ -43,7 +43,7 @@ function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
 
   return (
     <>
-      <BookChaptersModal bookData={bookData} />
+      <MenuButton />
       <NoteLinkBlinker />
       <CharacterNotesPanel bookData={bookData} />
       <RightNotesPanel />

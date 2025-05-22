@@ -8,9 +8,13 @@ import { BookData } from "@/booksData/types";
 import { CharacterData } from "@/booksData/types";
 import { performLocalDOMSearch, SearchResultsData, SearchResultItemData } from "@/searchModal";
 import { goToParagraph } from "@/helpers/paragraphsNavigation";
+import { resetFurthestPageLocation } from "@/helpers/reset-furthest-page-location";
+import { preloadBackgroundTracks } from "@/deal-with-background-songs";
 
-import ModalUI from "@/components/ModalUI";
+import ModalUI from "@/components/modals/ModalUI";
 import { LLMAnswerViewer } from "@/ui/MarkdownComponent";
+import BookChaptersModal from "@/components/modals/BookChaptersModal";
+import BookMenuModal from "@/components/modals/BookMenuModal";
 
 const findLatestSummaryInRange = (character: CharacterData, endChapter: number) => {
   const latestSummary = character.infoPerChapter.filter((info) => info.chapter <= endChapter).sort((a, b) => b.chapter - a.chapter)[0]?.summary; // Corrected newline issue
@@ -22,13 +26,15 @@ export type ModalType =
   | { type: "character"; slug: string; isVideo: boolean; mediaSrc: string }
   | { type: "search"; layoutView?: boolean; hideOverlay?: boolean; initialQuery?: string }
   | { type: "deepResearch"; content?: string; layoutView?: boolean; hideOverlay?: boolean }
-  | { type: "bookChapter"; chapter: number };
+  | { type: "bookChapter"; chapter: number }
+  | { type: "bookMenu" };
 
 export interface ModalContextType {
   openCharacterDetailsModal: (slug: string, isVideo: boolean, mediaSrc: string) => void;
   openSearchModal: (layoutView?: boolean, hideOverlay?: boolean, initialQuery?: string) => void;
   openDeepResearchModal: (content?: string, layoutView?: boolean, hideOverlay?: boolean) => void;
-  openBookChapterModal: (chapter: number) => void;
+  openBookChapterModal: (chapter?: number) => void;
+  openBookMenuModal: () => void;
   closeModal: () => void;
   currentModal: ModalType | null;
   performSearchInModal: (query: string) => void;
@@ -62,8 +68,14 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
     setSearchQuery("");
   };
 
-  const openBookChapterModal = (chapter: number) => {
+  const openBookChapterModal = (chapter?: number) => {
     setCurrentModal({ type: "bookChapter", chapter });
+    setSearchResults(null);
+    setSearchQuery("");
+  };
+
+  const openBookMenuModal = () => {
+    setCurrentModal({ type: "bookMenu" });
     setSearchResults(null);
     setSearchQuery("");
   };
@@ -213,13 +225,20 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
         );
 
       case "bookChapter":
+        return <BookChaptersModal open={true} onClose={closeModal} bookData={bookData} />;
+
+      case "bookMenu": {
         return (
-          <ModalUI title={`Chapter ${modal.chapter}`} onClose={closeModal}>
-            <div className="prose dark:prose-invert max-w-none p-4">
-              <p>Chapter {modal.chapter} content goes here</p>
-            </div>
-          </ModalUI>
+          <BookMenuModal
+            onClose={closeModal}
+            bookData={bookData}
+            openBookChapterModal={openBookChapterModal}
+            openDeepResearchModal={openDeepResearchModal}
+            preloadBackgroundTracks={preloadBackgroundTracks}
+            resetFurthestPageLocation={resetFurthestPageLocation}
+          />
         );
+      }
 
       default:
         return null;
@@ -241,6 +260,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
         openSearchModal,
         openDeepResearchModal,
         openBookChapterModal,
+        openBookMenuModal,
         closeModal,
         currentModal,
         performSearchInModal,
