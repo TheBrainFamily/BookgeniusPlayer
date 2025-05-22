@@ -261,7 +261,7 @@ const conradTajnyAgentBackgroundSongsDefined = [
 
 const krolowaSnieguBackgroundSongsDefined = [
   { chapter: 1, paragraph: 0, files: ["chapter_1_paragraph_1.mp3", "chapter_1_paragraph_1b.mp3"] },
-  { chapter: 2, paragraph: 1, files: ["chapter_2_paragraph_1.mp3", "chapter_2_paragraph_1b.mp3"] },
+  { chapter: 2, paragraph: 0, files: ["chapter_2_paragraph_1.mp3", "chapter_2_paragraph_1b.mp3"] },
   { chapter: 2, paragraph: 24, files: ["chapter_2_paragraph_24.mp3", "chapter_2_paragraph_24b.mp3"] },
   { chapter: 3, paragraph: 1, files: ["chapter_3_paragraph_1.mp3", "chapter_3_paragraph_1b.mp3"] },
   { chapter: 3, paragraph: 20, files: ["chapter_3_paragraph_20b.mp3", "chapter_3_paragraph_20.mp3"] },
