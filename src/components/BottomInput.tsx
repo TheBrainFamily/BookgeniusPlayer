@@ -151,8 +151,6 @@ export function BottomInput({ placeholder = "Type something...", onSubmit }: Bot
         .catch((error) => console.error("Deep research failed:", error))
         .finally(() => {
           setIsThinking(false);
-          setIsDeepResearchActive(false); // Turn off after call completes
-          setValue(""); // Clear after deep research submission
         });
     } else if (onSubmit) {
       onSubmit({

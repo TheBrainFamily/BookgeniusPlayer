@@ -131,7 +131,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
         if (!matchingCharacter) return null;
 
         return (
-          <ModalUI title={matchingCharacter.characterName} onClose={closeModal} className="bg-transparent">
+          <ModalUI onClose={closeModal} className="bg-transparent">
             <div className="flex flex-row lg:flex-col gap-4 items-center">
               <div className="rounded-full overflow-hidden h-full w-full max-h-[90vh] max-w-[90vh] lg:max-h-120 lg:max-w-120 border-4 border-[var(--entity-highlight-border-light)] aspect-square">
                 <CharacterMedia
@@ -159,15 +159,6 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
         return (
           <ModalUI title="Search" onClose={closeModal} layoutView={modal.layoutView} hideOverlay={modal.hideOverlay}>
             <div className="flex flex-col h-full p-4">
-              <input
-                type="text"
-                id="search-modal-input"
-                value={searchQuery}
-                onChange={(e) => performSearchInModal(e.target.value)}
-                placeholder="Search in book..."
-                className="p-2 border rounded mb-4 dark:bg-gray-800 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                autoFocus
-              />
               {searchResults?.isLoading && (
                 <div className="flex items-center justify-center my-4 py-4">
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -215,7 +206,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
       case "deepResearch":
         return (
           <ModalUI title="Deep Research" onClose={closeModal} layoutView={modal.layoutView} hideOverlay={modal.hideOverlay}>
-            <div className="prose dark:prose-invert max-w-none p-4">
+            <div className="prose dark:prose-invert max-w-none">
               <LLMAnswerViewer answerMarkdown={modal.content} />
             </div>
           </ModalUI>
