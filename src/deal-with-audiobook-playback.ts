@@ -233,7 +233,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
             });
         };
         const wordLevelEvents: AudiobookTrackEvent[] = createWordLevelEvents();
-        console.log(`wordLevelEvents: ${wordLevelEvents.splice(0, 3)}`);
+        // console.log(`wordLevelEvents: ${wordLevelEvents.splice(0, 3)}`);
 
         playTrack(sectionToApply.file, 0, sectionToApply["clip-begin"], [...events, ...wordLevelEvents]);
       });
