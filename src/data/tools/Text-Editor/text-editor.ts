@@ -38,7 +38,8 @@ export class TextEditor {
     }
 
     const paragraph = paragraphs[paragraphNumber];
-    return paragraph.toString();
+    // Get the exact XML string by using the node's outerHTML equivalent
+    return paragraph.toString().replace(/^<[^>]+>|<\/[^>]+>$/g, "");
   }
 
   public async editParagraph(chapterNumber: number, paragraphNumber: number): Promise<void> {
@@ -50,14 +51,50 @@ export class TextEditor {
 
     const updatedParagraphText = await this.openParagraphInVSCode(originalParagraph);
 
-    console.log("53: updatedParagraphText BANG!", updatedParagraphText);
+    const text = this.getBookXml();
 
-    const updatedXml = this.getBookXml().replace(originalParagraph, updatedParagraphText);
-
-    console.log("57: updatedXml BANG!", updatedXml);
+    const updatedXml = this.replaceParagraphInXml(text, originalParagraph, updatedParagraphText);
 
     fs.writeFileSync(`./src/data/${this.bookSlug}-chapters.xml`, updatedXml, "utf-8");
     this.regenerateXml(updatedXml);
+  }
+
+  public addCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, word: string, wordIndex: number): string {
+    const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
+
+    if (!originalParagraph) {
+      throw new Error("Paragraph not found");
+    }
+
+    const characterTag = `<span class="character-highlighted" data-character="${characterName}" data-src-listening="/Krolowa-Sniegu/${characterName.toLowerCase()}-listens.mp4">${word}</span>`;
+
+    const words = originalParagraph.split(/\s+/).filter((word) => word.length > 0 && /[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(word));
+
+    if (wordIndex < 0 || wordIndex >= words.length) {
+      console.error("Invalid word index");
+    }
+
+    if (words[wordIndex] !== word) {
+      console.error("Word at specified index does not match the provided word");
+    }
+
+    console.log("78: characterTag BANG!", characterTag);
+
+    const updatedParagraph = originalParagraph.replace(new RegExp(`\\b${word}\\b`, "g"), (match, offset) => {
+      const beforeMatch = originalParagraph.substring(0, offset);
+      console.log("80: beforeMatch BANG!", beforeMatch);
+      const wordCount = beforeMatch.split(/\s+/).filter((w) => w.length > 0 && /[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(w)).length;
+      console.log("82: wordCount BANG!", wordCount);
+      console.log("83: wordIndex BANG!", wordIndex);
+      return wordCount === wordIndex ? characterTag : match;
+    });
+
+    console.log("84: updatedParagraph BANG!", updatedParagraph);
+
+    const updatedXml = this.getBookXml().replace(originalParagraph, updatedParagraph);
+    fs.writeFileSync(`./src/data/${this.bookSlug}-chapters.xml`, updatedXml, "utf-8");
+    this.regenerateXml(this.getBookXml());
+    return updatedXml;
   }
 
   public removeCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1): string {
@@ -94,8 +131,8 @@ export class TextEditor {
     }
 
     const updatedXml = this.getBookXml().replace(originalParagraph, updatedParagraph);
-    this.regenerateXml(updatedXml);
     fs.writeFileSync(`./src/data/${this.bookSlug}-chapters.xml`, updatedXml, "utf-8");
+    this.regenerateXml(this.getBookXml());
     return updatedXml;
   }
 
@@ -143,6 +180,11 @@ export class TextEditor {
         reject(error);
       });
     });
+  }
+
+  private replaceParagraphInXml(text: string, originalParagraph: string, updatedParagraphText: string): string {
+    const paragraphRegex = new RegExp(originalParagraph.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "s");
+    return text.replace(paragraphRegex, updatedParagraphText);
   }
 }
 

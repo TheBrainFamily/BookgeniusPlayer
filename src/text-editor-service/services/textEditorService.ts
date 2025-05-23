@@ -16,6 +16,10 @@ export class TextEditorService {
     return this.textEditor.removeCharacter(chapterNumber, paragraphNumber, characterName, occurrenceNumber);
   }
 
+  public addCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, word: string, wordIndex: number) {
+    return this.textEditor.addCharacter(chapterNumber, paragraphNumber, characterName, word, wordIndex);
+  }
+
   // public addCharacter(chapterNumber: number, paragraphNumber: number, updatedParagraphText: string) {
   //   return this.textEditor.addCharacter(chapterNumber, paragraphNumber, updatedParagraphText);
   // }

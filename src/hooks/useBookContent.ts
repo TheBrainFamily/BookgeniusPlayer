@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { handleRemoveCharacter } from "@/text-editor-service/listeners/handleRemoveCharacter";
 import { handleEditParagraph } from "@/text-editor-service/listeners/handleEditParagraph";
+import { handleAddCharacter } from "@/text-editor-service/listeners/handleAddCharacter";
 
 export function useBookContent(htmlContent: string, containerId: string) {
   useEffect(() => {
@@ -13,34 +14,46 @@ export function useBookContent(htmlContent: string, containerId: string) {
 
     if (import.meta.env.VITE_EDITOR === "true") {
       const handleClick = async (event: MouseEvent) => {
-        if (event.metaKey) {
-          const target = event.target as HTMLElement;
-          let chapterNumber: number = null;
-          let paragraphNumber: number = null;
+        const target = event.target as HTMLElement;
 
-          const paragraphTag = target.getAttribute("data-index");
-          const characterTag = target.getAttribute("data-character");
+        const paragraphTag = target.getAttribute("data-index");
+        const characterTag = target.getAttribute("data-character");
 
-          if (paragraphTag) {
-            chapterNumber = parseInt((target.parentNode as HTMLElement).attributes["data-chapter"].value);
-            paragraphNumber = parseInt(target.attributes["data-index"].value);
-            const response = confirm("Are you sure you want to edit this content?");
+        if (paragraphTag) {
+          const chapterNumber = parseInt((target.parentNode as HTMLElement).attributes["data-chapter"].value);
+          const paragraphNumber = parseInt(target.attributes["data-index"].value);
+
+          if (event.metaKey && event.altKey) {
+            const target = event.target as HTMLElement;
+            if (event.detail === 2) {
+              const response = confirm("Are you sure you want to add the CHARACTER_NAME here?");
+
+              if (response) {
+                return handleAddCharacter(target, chapterNumber, paragraphNumber);
+              }
+              return;
+            }
+            return;
+          }
+
+          if (event.metaKey && !event.altKey) {
+            const response = confirm("Are you sure you want to edit this paragraph?");
 
             if (response) {
               return handleEditParagraph(chapterNumber, paragraphNumber);
             }
             return;
           }
+        }
 
-          if (characterTag) {
-            paragraphNumber = parseInt((target.parentNode as HTMLElement).attributes["data-index"].value);
-            chapterNumber = parseInt((target.parentNode.parentNode as HTMLElement).attributes["data-chapter"].value);
-            const response = confirm(`Are you sure you want to remove ${characterTag}?`);
-            if (response) {
-              return handleRemoveCharacter(target, chapterNumber, paragraphNumber, characterTag);
-            }
-            return;
+        if (event.metaKey && !event.altKey && characterTag) {
+          const paragraphNumber = parseInt((target.parentNode as HTMLElement).attributes["data-index"].value);
+          const chapterNumber = parseInt((target.parentNode.parentNode as HTMLElement).attributes["data-chapter"].value);
+          const response = confirm(`Are you sure you want to remove ${characterTag}?`);
+          if (response) {
+            return handleRemoveCharacter(target, chapterNumber, paragraphNumber, characterTag);
           }
+          return;
         }
       };
 

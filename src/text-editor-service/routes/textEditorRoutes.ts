@@ -8,6 +8,8 @@ router.post("/edit-paragraph", textEditorController.editParagraph);
 
 router.post("/remove-character", textEditorController.removeCharacter);
 
+router.post("/add-character", textEditorController.addCharacter);
+
 // // Add a character to a paragraph
 // router.post("/character", textEditorController.addCharacter);
 //
