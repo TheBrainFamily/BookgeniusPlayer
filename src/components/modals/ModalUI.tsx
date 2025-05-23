@@ -7,7 +7,7 @@ interface ModalUIProps {
   onClose: () => void;
   children: ReactNode;
   className?: string;
-  preventClickOutside?: boolean; // todo: verify
+  preventClickOutside?: boolean;
   layoutView?: boolean;
   hideOverlay?: boolean;
 }
@@ -22,7 +22,7 @@ const ModalUI: React.FC<ModalUIProps> = ({ title, onClose, children, className =
         {layoutView && <div id="left-notes-blank" className={cn("hidden max-w-[700px] ", "lg:flex lg:order-2 lg:flex-2 lg:max-w-[900px]", "xl:flex-1 xl:order-1")} />}
         <div
           className={cn(
-            `bg-white rounded-lg overflow-hidden w-full flex flex-col align-center justify-center h-fit pointer-events-all ${className}`,
+            `bg-white rounded-lg overflow-hidden w-full flex flex-col align-center justify-center h-fit pointer-events-auto ${className}`,
             layoutView && "shadow-xl max-w-[700px] overflow-hidden max-h-[80vh]",
             layoutView && "lg:order-1 lg:max-w-[700px] lg:flex-1",
             layoutView && "xl:flex-1 xl:max-w-[700px] xl:order-3",

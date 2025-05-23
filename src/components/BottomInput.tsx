@@ -11,7 +11,6 @@ import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
 import { useModal } from "@/context/ModalContext";
 import useDeviceOrientation from "@/hooks/useDeviceOrientation";
 
-// Type for the onSubmit prop data structure (assuming Message was defined in WebSocket context)
 interface SubmitMessageData {
   query: string;
   filter: { chapterFrom: number; chapterTo: number | undefined; paragraphFrom: number; paragraphTo: number | undefined; bookSlug: string };
@@ -22,17 +21,16 @@ interface BottomInputProps {
   onSubmit?: (message: SubmitMessageData) => void;
 }
 
-export function BottomInput({ placeholder = "Type something...", onSubmit }: BottomInputProps) {
+const BottomInput: React.FC<BottomInputProps> = ({ placeholder = "Type something...", onSubmit }) => {
   const [value, setValue] = useState("");
-  const [isFocused, setIsFocused] = useState(false); // Keep for now for styling purposes
+  const [isFocused, setIsFocused] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isInputExpanded, setIsInputExpanded] = useState(true);
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [isRightNotesBlankHidden, setIsRightNotesBlankHidden] = useState(false);
 
-  // Get all the functions and state from the modal context
-  const { openSearchModal, closeModal, currentModal, performSearchInModal, searchQuery: modalSearchQuery, openDeepResearchModal } = useModal();
+  const { openSearchModal, closeModal, currentModal, performSearchInModal, openDeepResearchModal } = useModal();
 
   const { isLandscape } = useDeviceOrientation();
   const { startRecording, stopRecording, response } = useRealtime();
@@ -47,16 +45,12 @@ export function BottomInput({ placeholder = "Type something...", onSubmit }: Bot
     setIsInputExpanded(!isLandscape);
   }, [isLandscape]);
 
-  // Add keyboard listener for Cmd+F / Ctrl+F
   useEffect(() => {
+    // Add keyboard listener for Cmd+F / Ctrl+F
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Intercept browser search (Cmd+F or Ctrl+F)
       if ((event.key === "f" || event.key === "F") && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault(); // Prevent default browser search
-        // Focus the bottom input instead of showing the modal
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
+        event.preventDefault();
+        if (inputRef.current) inputRef.current.focus();
         return;
       }
     };
@@ -70,7 +64,6 @@ export function BottomInput({ placeholder = "Type something...", onSubmit }: Bot
   useEffect(() => {
     if (response && !isRecording) {
       setValue(response);
-      // If modal is open, also update its search query
       if (currentModal?.type === "search") {
         performSearchInModal(response);
       }
@@ -82,13 +75,6 @@ export function BottomInput({ placeholder = "Type something...", onSubmit }: Bot
   useEffect(() => {
     setIsRightNotesBlankHidden(isMobileOrTablet);
   }, [isMobileOrTablet]);
-
-  // Sync BottomInput's value with modalSearchQuery from context when modal is open
-  useEffect(() => {
-    if (currentModal?.type === "search" && modalSearchQuery !== value) {
-      setValue(modalSearchQuery);
-    }
-  }, [modalSearchQuery, currentModal?.type, value]);
 
   const toggleDeepResearch = () => {
     const newDeepResearchState = !isDeepResearchActive;
@@ -105,19 +91,18 @@ export function BottomInput({ placeholder = "Type something...", onSubmit }: Bot
     const newVal = e.target.value;
     setValue(newVal);
 
-    // Don't trigger search functionality if deep research is active
     if (isDeepResearchActive) return;
 
-    // Improved search modal integration using ModalContext
-    if (newVal.trim().length > 0) {
-      if (currentModal?.type !== "search") {
-        openSearchModal(true, true, newVal.trim());
-        setTimeout(() => inputRef.current?.focus(), 100);
-      } else {
-        performSearchInModal(newVal); // Update query in already open modal
-      }
-    } else if (newVal.trim().length === 0 && currentModal?.type === "search") {
-      performSearchInModal(""); // Clear results in modal or show placeholder
+    const trimmedValue = newVal.trim();
+    if (!trimmedValue.length && currentModal?.type === "search") {
+      performSearchInModal("");
+      return;
+    }
+
+    if (currentModal?.type !== "search") {
+      openSearchModal(true, true, trimmedValue);
+    } else {
+      performSearchInModal(trimmedValue);
     }
   };
 
@@ -141,8 +126,6 @@ export function BottomInput({ placeholder = "Type something...", onSubmit }: Bot
     }
 
     if (isDeepResearchActive) {
-      console.log("STOJANISKO Deep research");
-
       setIsThinking(true);
       deepResearchCall(trimmedValue, location)
         .then((deepResearchResponse) => {
@@ -312,4 +295,6 @@ export function BottomInput({ placeholder = "Type something...", onSubmit }: Bot
       {!isRightNotesBlankHidden && <div id="right-notes-blank" className="hidden xl:block xl:flex-1 max-w-[700px]" />}
     </footer>
   );
-}
+};
+
+export default BottomInput;

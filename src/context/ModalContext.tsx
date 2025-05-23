@@ -20,14 +20,14 @@ import { modalReducer, initialModalState } from "./modalReducer";
 // Different types of modals the application can display
 export type ModalType =
   | { type: "character"; slug: string; isVideo: boolean; mediaSrc: string }
-  | { type: "search"; layoutView?: boolean; hideOverlay?: boolean; initialQuery?: string }
-  | { type: "deepResearch"; content?: string; layoutView?: boolean; hideOverlay?: boolean }
+  | { type: "search"; layoutView?: boolean; hideOverlay?: boolean; query?: string; isLoading?: boolean }
+  | { type: "deepResearch"; content?: string; layoutView?: boolean; hideOverlay?: boolean; isLoading?: boolean }
   | { type: "bookChapter"; chapter: number }
   | { type: "bookMenu" };
 
 export interface ModalContextType {
   openCharacterDetailsModal: (slug: string, isVideo: boolean, mediaSrc: string) => void;
-  openSearchModal: (layoutView?: boolean, hideOverlay?: boolean, initialQuery?: string) => void;
+  openSearchModal: (layoutView?: boolean, hideOverlay?: boolean, query?: string) => void;
   openDeepResearchModal: (content?: string, layoutView?: boolean, hideOverlay?: boolean) => void;
   openBookChapterModal: (chapter?: number) => void;
   openBookMenuModal: () => void;
@@ -50,12 +50,45 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
     dispatch({ type: "OPEN_CHARACTER_MODAL", payload: { slug, isVideo, mediaSrc } });
   }, []);
 
-  const openSearchModal = useCallback((layoutView?: boolean, hideOverlay?: boolean, initialQuery: string = "") => {
-    dispatch({ type: "OPEN_SEARCH_MODAL", payload: { layoutView, hideOverlay, initialQuery } });
-  }, []);
+  const debouncedPerformSearch = useMemo(
+    () =>
+      debounce((query: string, loc: typeof debouncedLocation) => {
+        if (!query?.trim()) {
+          dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: "Please enter a search term.", items: [], isLoading: false } } });
+          return;
+        }
+
+        const results = performLocalDOMSearch(query, loc);
+        dispatch({ type: "SET_SEARCH_RESULTS", payload: { results } });
+      }, 350),
+    [debouncedLocation],
+  );
+
+  const openSearchModal = useCallback(
+    (layoutView?: boolean, hideOverlay?: boolean, query: string = "") => {
+      dispatch({ type: "OPEN_SEARCH_MODAL", payload: { layoutView, hideOverlay, query, isLoading: true } });
+
+      // Set initial search results with loading state immediately
+      if (query.trim()) {
+        dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: `Searching for "${query}"...`, items: [], isLoading: true } } });
+
+        // Then trigger the actual search
+        setTimeout(() => {
+          debouncedPerformSearch(query, debouncedLocation);
+        }, 0);
+      }
+    },
+    [dispatch, debouncedPerformSearch, debouncedLocation],
+  );
 
   const openDeepResearchModal = useCallback((content?: string, layoutView?: boolean, hideOverlay?: boolean) => {
-    dispatch({ type: "OPEN_DEEP_RESEARCH_MODAL", payload: { content, layoutView, hideOverlay } });
+    // First, open with loading state if no content is provided
+    if (!content) {
+      dispatch({ type: "OPEN_DEEP_RESEARCH_MODAL", payload: { content: undefined, layoutView, hideOverlay, isLoading: true } });
+    } else {
+      // When content is provided, show it without loading state
+      dispatch({ type: "OPEN_DEEP_RESEARCH_MODAL", payload: { content, layoutView, hideOverlay, isLoading: false } });
+    }
   }, []);
 
   const openBookChapterModal = useCallback((chapter?: number) => {
@@ -84,44 +117,22 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
     };
   }, [currentModal, closeModal]);
 
-  const debouncedPerformSearch = useMemo(
-    () =>
-      debounce((query: string, loc: typeof debouncedLocation) => {
-        if (!query?.trim()) {
-          dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: "Please enter a search term.", items: [], isLoading: false } } });
-          return;
-        }
-
-        dispatch({
-          type: "SET_SEARCH_RESULTS",
-          payload: { results: { header: searchResults?.header || `Searching for "${query}"...`, items: searchResults?.items || [], isLoading: true } },
-        });
-
-        const results = performLocalDOMSearch(query, loc);
-        dispatch({ type: "SET_SEARCH_RESULTS", payload: { results } });
-      }, 350),
-    [debouncedLocation, searchResults],
-  );
-
   const performSearchInModal = useCallback(
     (query: string) => {
       dispatch({ type: "SET_SEARCH_QUERY", payload: { query } });
-      debouncedPerformSearch(query, debouncedLocation);
-    },
-    [debouncedPerformSearch, debouncedLocation],
-  );
 
-  useEffect(() => {
-    if (currentModal?.type === "search" && currentModal.initialQuery && currentModal.initialQuery.trim() !== "") {
-      if (
-        searchQuery !== currentModal.initialQuery ||
-        searchResults === null ||
-        (searchResults && searchResults.items.length === 0 && searchResults.header.includes("Enter a term"))
-      ) {
-        performSearchInModal(currentModal.initialQuery);
+      if (query.trim()) {
+        // Set loading state immediately
+        dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: `Searching for "${query}"...`, items: [], isLoading: true } } });
+
+        // Then perform the actual search
+        debouncedPerformSearch(query, debouncedLocation);
+      } else {
+        dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: "Please enter a search term.", items: [], isLoading: false } } });
       }
-    }
-  }, [currentModal, searchQuery, searchResults, performSearchInModal]);
+    },
+    [debouncedPerformSearch, debouncedLocation, dispatch],
+  );
 
   const range = useMemo(
     () => ({ chapter: debouncedLocation.chapter, paragraph: debouncedLocation.paragraph, endChapter: debouncedLocation.endChapter, endParagraph: debouncedLocation.endParagraph }),
@@ -139,10 +150,17 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
         }
 
         case "search":
-          return <SearchModal onClose={closeModal} layoutView={modal.layoutView} hideOverlay={modal.hideOverlay} searchResults={searchResults} />;
+          return (
+            <SearchModal
+              onClose={closeModal}
+              layoutView={modal.layoutView}
+              hideOverlay={modal.hideOverlay}
+              searchResults={searchResults || { header: "Enter search query...", items: [], isLoading: modal.isLoading || false }}
+            />
+          );
 
         case "deepResearch":
-          return <DeepResearchModal onClose={closeModal} content={modal.content} layoutView={modal.layoutView} hideOverlay={modal.hideOverlay} />;
+          return <DeepResearchModal onClose={closeModal} content={modal.content} layoutView={modal.layoutView} hideOverlay={modal.hideOverlay} isLoading={modal.isLoading} />;
 
         case "bookChapter":
           return <BookChaptersModal open={true} onClose={closeModal} bookData={bookData} />;

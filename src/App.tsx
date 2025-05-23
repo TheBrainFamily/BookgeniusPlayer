@@ -12,7 +12,7 @@ import { runLegacyInit } from "./main";
 import { CharacterNotesPanel } from "./components/CharacterNotesPanel";
 import { RightNotesPanel } from "./components/RightNotesPanel";
 import { useWebSocket, WebSocketProvider } from "./context/WebSocketContext";
-import { BottomInput } from "./components/BottomInput";
+import BottomInput from "./components/BottomInput";
 import { RealtimeProvider } from "./context/RealtimeContext";
 import { getBookData } from "./booksData/getBookData";
 import { useBackgroundSongs } from "./hooks/useBackgroundSongs";

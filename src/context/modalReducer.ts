@@ -7,8 +7,8 @@ export const initialModalState: ModalState = { currentModal: null, searchResults
 
 export type ModalAction =
   | { type: "OPEN_CHARACTER_MODAL"; payload: { slug: string; isVideo: boolean; mediaSrc: string } }
-  | { type: "OPEN_SEARCH_MODAL"; payload: { layoutView?: boolean; hideOverlay?: boolean; initialQuery?: string } }
-  | { type: "OPEN_DEEP_RESEARCH_MODAL"; payload: { content?: string; layoutView?: boolean; hideOverlay?: boolean } }
+  | { type: "OPEN_SEARCH_MODAL"; payload: { layoutView?: boolean; hideOverlay?: boolean; query?: string; isLoading?: boolean } }
+  | { type: "OPEN_DEEP_RESEARCH_MODAL"; payload: { content?: string; layoutView?: boolean; hideOverlay?: boolean; isLoading?: boolean } }
   | { type: "OPEN_BOOK_CHAPTER_MODAL"; payload: { chapter?: number } }
   | { type: "OPEN_BOOK_MENU_MODAL" }
   | { type: "CLOSE_MODAL" }
@@ -28,14 +28,26 @@ export function modalReducer(state: ModalState, action: ModalAction): ModalState
     case "OPEN_SEARCH_MODAL":
       return {
         ...state,
-        currentModal: { type: "search", layoutView: action.payload.layoutView, hideOverlay: action.payload.hideOverlay, initialQuery: action.payload.initialQuery || "" },
-        searchQuery: action.payload.initialQuery || "",
+        currentModal: {
+          type: "search",
+          layoutView: action.payload.layoutView,
+          hideOverlay: action.payload.hideOverlay,
+          query: action.payload.query || "",
+          isLoading: action.payload.isLoading ?? false,
+        },
+        searchQuery: action.payload.query || state.searchQuery,
       };
 
     case "OPEN_DEEP_RESEARCH_MODAL":
       return {
         ...state,
-        currentModal: { type: "deepResearch", content: action.payload.content, layoutView: action.payload.layoutView, hideOverlay: action.payload.hideOverlay },
+        currentModal: {
+          type: "deepResearch",
+          content: action.payload.content,
+          layoutView: action.payload.layoutView,
+          hideOverlay: action.payload.hideOverlay,
+          isLoading: action.payload.isLoading ?? false,
+        },
         searchResults: null,
         searchQuery: "",
       };
