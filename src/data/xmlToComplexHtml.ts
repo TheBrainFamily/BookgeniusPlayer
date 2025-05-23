@@ -6,7 +6,6 @@ import { getTalkingMediaFilePathForName, getListeningMediaFilePathForName } from
 import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
 
 export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): string => {
-  console.log("9: xmlString BANG!", xmlString);
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xmlString, "text/xml");
   const serializer = new XMLSerializer();

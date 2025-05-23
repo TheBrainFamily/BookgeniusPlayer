@@ -2,13 +2,13 @@ import { BOOK_SLUGS } from "@/consts";
 import { DOMParser } from "@xmldom/xmldom";
 import fs from "fs";
 import { xmlToComplexHtml } from "@/data/xmlToComplexHtml";
+import { spawn } from "child_process";
+import * as path from "path";
+import * as os from "os";
 
 export class TextEditor {
-  private readonly bookXml: string;
-
   constructor(private readonly bookSlug: BOOK_SLUGS) {
     this.bookSlug = bookSlug;
-    this.bookXml = this.getBookXml();
   }
 
   private getBookXml() {
@@ -35,26 +35,28 @@ export class TextEditor {
     return originalText === updatedText;
   }
 
-  public addCharacter(chapterNumber: number, paragraphNumber: number, updatedParagraphText: string) {
+  public async addCharacter(chapterNumber: number, paragraphNumber: number, updatedParagraphText?: string) {
     const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
 
     if (!originalParagraph) {
       throw new Error("Paragraph not found");
     }
 
-    if (!this.isSimilarParagraph(originalParagraph, updatedParagraphText)) {
-      throw new Error("Updated paragraph text is too different from the original");
-    }
+    // if (!this.isSimilarParagraph(originalParagraph, updatedParagraphText)) {
+    //   throw new Error("Updated paragraph text is too different from the original");
+    // }
 
-    const updatedXml = this.bookXml.replace(originalParagraph, updatedParagraphText);
-    this.regenerateXml(updatedXml);
+    updatedParagraphText = await this.openInVSCode(originalParagraph);
+
+    const updatedXml = this.getBookXml().replace(originalParagraph, updatedParagraphText);
     fs.writeFileSync(`./src/data/${this.bookSlug}-chapters.xml`, updatedXml, "utf-8");
+    this.regenerateXml(updatedXml);
     return updatedXml;
   }
 
   public getParagraphByNumber(chapterNumber: number, paragraphNumber: number): string | null {
     const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(this.bookXml, "text/xml");
+    const xmlDoc = parser.parseFromString(this.getBookXml(), "text/xml");
 
     const chapters = xmlDoc.getElementsByTagName("Chapter");
 
@@ -106,10 +108,46 @@ export class TextEditor {
       throw new Error("Failed to remove character tag properly");
     }
 
-    const updatedXml = this.bookXml.replace(originalParagraph, updatedParagraph);
+    const updatedXml = this.getBookXml().replace(originalParagraph, updatedParagraph);
     this.regenerateXml(updatedXml);
     fs.writeFileSync(`./src/data/${this.bookSlug}-chapters.xml`, updatedXml, "utf-8");
     return updatedXml;
+  }
+
+  public async openInVSCode(content: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      // Create a temporary file
+      const tempDir = os.tmpdir();
+      const tempFile = path.join(tempDir, `temp-${Date.now()}.xml`);
+
+      // Write the initial content to the file
+      fs.writeFileSync(tempFile, content);
+
+      // Spawn VS Code process
+      const vscode = spawn("code", ["--wait", tempFile], { stdio: "inherit" });
+
+      // Handle process exit
+      vscode.on("close", (code) => {
+        if (code === 0) {
+          try {
+            // Read the modified content
+            const modifiedContent = fs.readFileSync(tempFile, "utf-8");
+            // Clean up the temporary file
+            fs.unlinkSync(tempFile);
+            console.log("Modified content:", modifiedContent);
+            resolve(modifiedContent);
+          } catch (error) {
+            reject(error);
+          }
+        } else {
+          reject(new Error(`VS Code exited with code ${code}`));
+        }
+      });
+
+      vscode.on("error", (error) => {
+        reject(error);
+      });
+    });
   }
 }
 
