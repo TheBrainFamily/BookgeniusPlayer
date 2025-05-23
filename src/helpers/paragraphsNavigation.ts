@@ -58,14 +58,6 @@ export const setCurrentLocation = (loc: Location) => {
 /* ------------------------------------------------------------------ */
 /*  Scroll helper                                                     */
 export const goToParagraph = (loc: { currentChapter: number; currentParagraph: number }, fast = false) => {
-  // setCurrentLocation({
-  //   chapter: loc.currentChapter,
-  //   paragraph: loc.currentParagraph,
-  //   endChapter: loc.currentChapter,
-  //   endParagraph: loc.currentParagraph,
-  //   currentChapter: loc.currentChapter,
-  //   currentParagraph: loc.currentParagraph,
-  // });
   const selector = `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
   document.querySelector(selector)?.scrollIntoView({ behavior: fast ? "instant" : "smooth", block: "start" });
 };
@@ -128,7 +120,7 @@ window.addEventListener("orientationchange", handleResizeOrOrientationChange);
 /* ------------------------------------------------------------------ */
 /*  URL Hash Helpers                                                  */
 
-const parseLocationFromHash = (): { currentChapter: number; currentParagraph: number } | null => {
+export const parseLocationFromHash = (): Location | null => {
   const hash = window.location.hash.substring(1); // Remove leading #
   if (!hash) return null;
 
@@ -139,7 +131,7 @@ const parseLocationFromHash = (): { currentChapter: number; currentParagraph: nu
 
     if (!isNaN(currentChapter) && !isNaN(currentParagraph)) {
       // Create a partial Location object - endChapter/endParagraph aren't in the hash
-      return { currentChapter, currentParagraph };
+      return { chapter: currentChapter, paragraph: currentParagraph, endChapter: currentChapter, endParagraph: currentParagraph, currentChapter, currentParagraph };
     }
   }
   console.warn("Invalid location hash:", hash);

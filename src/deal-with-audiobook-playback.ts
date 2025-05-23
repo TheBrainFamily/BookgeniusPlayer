@@ -13,6 +13,8 @@ import { getAudiobookTracksForBook, AudiobookTracksSection } from "@/getAudioboo
 import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audiobook-player";
 import { highlightNthOccurrence } from "./highlightWord";
 
+const AUDIO_SYNC_SHIFT = -0.1;
+
 let isProcessingAudiobookTracks = false; // Module-level flag to prevent re-entrancy
 export let hasAudiobookForCurrentBook = false; // Flag to indicate if audiobook tracks exist for the current book
 
@@ -235,7 +237,10 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
         const wordLevelEvents: AudiobookTrackEvent[] = createWordLevelEvents();
         // console.log(`wordLevelEvents: ${wordLevelEvents.splice(0, 3)}`);
 
-        playTrack(sectionToApply.file, 0, sectionToApply["clip-begin"], [...events, ...wordLevelEvents]);
+        const clipBeginCalculated = sectionToApply["clip-begin"] + AUDIO_SYNC_SHIFT;
+        const clipBeginToUse = clipBeginCalculated > 0 ? clipBeginCalculated : 0; // THIS PREVENTS A LOUD AUDIBLE CLICK / AUDIO ARTIFACT
+
+        playTrack(sectionToApply.file, 0, clipBeginToUse, [...events, ...wordLevelEvents]);
       });
     }
   } catch (error) {
