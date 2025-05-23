@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_BOOK: string;
+  readonly VITE_EDITOR: string;
 }
 
 interface ImportMeta {
