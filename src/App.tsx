@@ -36,7 +36,7 @@ function Shell({
   passedText?: string;
 }) {
   /* Inject book content first */
-  useBookContent(bookData.bookXml, "content-container", bookData.charactersData);
+  useBookContent(bookData.bookXml, "content-container");
 
   /* scroll‑related hooks */
   usePageObserver(bookData.bookXml, useModal());
