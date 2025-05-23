@@ -2,34 +2,15 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Mic, Send, Telescope, Expand } from "lucide-react";
 import { motion } from "motion/react";
 
-import { cn } from "@/lib/utils"; // Assuming you have this utility
-import { useRealtime } from "@/context/RealtimeContext"; // Adjust path
-// Removed WebSocket dependency if isLoading isn't used in footer
-// import { Message, useWebSocket } from "@/context/WebSocketContext"; // Adjust path
-import { CURRENT_BOOK } from "@/consts"; // Adjust path
-import { useLocation } from "@/state/LocationContext"; // Adjust path
-import { showSearchModal, performSearch, hideSearchModal, isSearchActive } from "@/searchModal"; // Adjust path
-import { deepResearchCall } from "@/deepResearchCall"; // Adjust path
+import { cn } from "@/lib/utils";
+import { useRealtime } from "@/context/RealtimeContext";
+import { CURRENT_BOOK } from "@/consts";
+import { useLocation } from "@/state/LocationContext";
+import { deepResearchCall } from "@/deepResearchCall";
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
+import { useModal } from "@/context/ModalContext";
+import useDeviceOrientation from "@/hooks/useDeviceOrientation";
 
-// --- Helper Hook for Landscape Detection ---
-const useDeviceOrientation = () => {
-  const [isLandscape, setIsLandscape] = useState(false);
-
-  useEffect(() => {
-    const checkOrientation = () => {
-      const landscape = window.matchMedia("(orientation: landscape) and (max-height: 500px)").matches;
-      setIsLandscape(landscape);
-    };
-    checkOrientation();
-    const mediaQueryList = window.matchMedia("(orientation: landscape) and (max-height: 500px)");
-    mediaQueryList.addEventListener("change", checkOrientation);
-    return () => mediaQueryList.removeEventListener("change", checkOrientation);
-  }, []);
-  return { isLandscape };
-};
-
-// Type for the onSubmit prop data structure (assuming Message was defined in WebSocket context)
 interface SubmitMessageData {
   query: string;
   filter: { chapterFrom: number; chapterTo: number | undefined; paragraphFrom: number; paragraphTo: number | undefined; bookSlug: string };
@@ -37,16 +18,11 @@ interface SubmitMessageData {
 
 interface BottomInputProps {
   placeholder?: string;
-  onSubmit?: (message: SubmitMessageData) => void; // Use the specific data type
-  className?: string; // Keep for potential footer styling overrides
-  onShowDeepResearch: (result: string) => void;
-  // No longer needs onCloseDeepResearch unless used elsewhere
-  onCloseDeepResearch?: () => void; // ToDo: remove if not needed
+  onSubmit?: (message: SubmitMessageData) => void;
 }
 
-export function BottomInput({ placeholder = "Type something...", onSubmit, className, onShowDeepResearch }: BottomInputProps) {
+const BottomInput: React.FC<BottomInputProps> = ({ placeholder = "Type something...", onSubmit }) => {
   const [value, setValue] = useState("");
-  // isFocused might not be needed anymore if backdrop is removed
   const [isFocused, setIsFocused] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isInputExpanded, setIsInputExpanded] = useState(true);
@@ -54,10 +30,10 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
   const [isThinking, setIsThinking] = useState(false);
   const [isRightNotesBlankHidden, setIsRightNotesBlankHidden] = useState(false);
 
+  const { openSearchModal, closeModal, currentModal, performSearchInModal, openDeepResearchModal } = useModal();
+
   const { isLandscape } = useDeviceOrientation();
   const { startRecording, stopRecording, response } = useRealtime();
-  // Removed useWebSocket - add back ONLY if isLoading indicator is needed IN FOOTER
-  // const { isLoading } = useWebSocket();
   const { location } = useLocation();
   const { chapter: currentChapter, paragraph: currentParagraph } = location;
 
@@ -65,16 +41,34 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
 
   const isCollapsed = isLandscape && !isInputExpanded;
 
-  // --- Effects ---
   useEffect(() => {
     setIsInputExpanded(!isLandscape);
   }, [isLandscape]);
 
   useEffect(() => {
+    // Add keyboard listener for Cmd+F / Ctrl+F
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.key === "f" || event.key === "F") && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        if (inputRef.current) inputRef.current.focus();
+        return;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
     if (response && !isRecording) {
       setValue(response);
+      if (currentModal?.type === "search") {
+        performSearchInModal(response);
+      }
     }
-  }, [response, isRecording]);
+  }, [response, isRecording, currentModal?.type, performSearchInModal]);
 
   const isMobileOrTablet = useIsMobileOrTablet();
 
@@ -82,29 +76,33 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
     setIsRightNotesBlankHidden(isMobileOrTablet);
   }, [isMobileOrTablet]);
 
-  // --- Event Handlers ---
-  // const handleFocus = () => setIsFocused(true); // Remove if not needed
-  // const handleBlur = () => setIsFocused(false); // Remove if not needed
-
   const toggleDeepResearch = () => {
-    setIsDeepResearchActive(!isDeepResearchActive);
+    const newDeepResearchState = !isDeepResearchActive;
+    setIsDeepResearchActive(newDeepResearchState);
+    if (newDeepResearchState && currentModal?.type === "search") {
+      closeModal(); // Close search modal if deep research is activated
+    }
+    if (newDeepResearchState) {
+      setValue(""); // Clear input when activating deep research
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVal = e.target.value;
     setValue(newVal);
 
-    // Search modal logic (keep as is)
-    if (newVal.trim().length > 2 && !isDeepResearchActive) {
-      if (!isSearchActive()) {
-        showSearchModal();
-        setTimeout(() => inputRef.current?.focus(), 100);
-      }
-      performSearch(newVal);
-      const modalInput = document.getElementById("search-input") as HTMLInputElement | null;
-      if (modalInput) modalInput.value = newVal;
-    } else if (newVal.trim().length === 0 && isSearchActive()) {
-      hideSearchModal();
+    if (isDeepResearchActive) return;
+
+    const trimmedValue = newVal.trim();
+    if (!trimmedValue.length && currentModal?.type === "search") {
+      performSearchInModal("");
+      return;
+    }
+
+    if (currentModal?.type !== "search") {
+      openSearchModal(true, true, trimmedValue);
+    } else {
+      performSearchInModal(trimmedValue);
     }
   };
 
@@ -118,28 +116,33 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
-    const trimmedValue = value.trim();
-    if (!trimmedValue || !onSubmit) return;
 
-    if (isSearchActive()) hideSearchModal();
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return;
+
+    if (currentModal?.type === "search") {
+      performSearchInModal(trimmedValue);
+      return;
+    }
 
     if (isDeepResearchActive) {
       setIsThinking(true);
       deepResearchCall(trimmedValue, location)
-        .then(onShowDeepResearch) // Simplified .then
+        .then((deepResearchResponse) => {
+          openDeepResearchModal(deepResearchResponse, true, true); // Open modal with the response
+        })
         .catch((error) => console.error("Deep research failed:", error))
         .finally(() => {
           setIsThinking(false);
-          setIsDeepResearchActive(false); // Turn off after call completes
         });
-    } else {
+    } else if (onSubmit) {
       onSubmit({
         // Send the structured data
         query: trimmedValue,
         filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: CURRENT_BOOK },
       });
+      setValue(""); // Clear after general submission
     }
-    setValue("");
   };
 
   const handleRecordingStart = useCallback(() => {
@@ -147,11 +150,13 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
     setIsRecording(true);
     if (isLandscape && !isInputExpanded) setIsInputExpanded(true);
     setValue("");
+    // Clear search if starting voice input while search modal is open
+    if (currentModal?.type === "search") performSearchInModal("");
     startRecording().catch((error) => {
       console.error("Error starting recording:", error);
       setIsRecording(false);
     });
-  }, [isRecording, startRecording, isLandscape, isInputExpanded]);
+  }, [isRecording, startRecording, isLandscape, isInputExpanded, currentModal?.type, performSearchInModal]);
 
   const handleRecordingEnd = useCallback(() => {
     if (!isRecording) return;
@@ -182,7 +187,6 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
         "bg-white/0 flex",
         isCollapsed ? "w-auto right-4 left-auto rounded-full p-1" : "w-full",
         "justify-around",
-        className,
         "optional-element",
       )}
     >
@@ -291,4 +295,6 @@ export function BottomInput({ placeholder = "Type something...", onSubmit, class
       {!isRightNotesBlankHidden && <div id="right-notes-blank" className="hidden xl:block xl:flex-1 max-w-[700px]" />}
     </footer>
   );
-}
+};
+
+export default BottomInput;

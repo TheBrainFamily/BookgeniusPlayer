@@ -6,16 +6,14 @@ import { useCutScene } from "./hooks/useCutScene";
 import { useBackgroundVideo } from "./hooks/useBackgroundVideo";
 import { useBookContent } from "./hooks/useBookContent";
 
-import BookChaptersModal from "./menu-modal";
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
 import AudioPlayer from "./components/AudioPlayer";
 import { runLegacyInit } from "./main";
 import { CharacterNotesPanel } from "./components/CharacterNotesPanel";
 import { RightNotesPanel } from "./components/RightNotesPanel";
 import { useWebSocket, WebSocketProvider } from "./context/WebSocketContext";
-import { BottomInput } from "./components/BottomInput";
+import BottomInput from "./components/BottomInput";
 import { RealtimeProvider } from "./context/RealtimeContext";
-import { DeepResearchModal } from "./ui/DeepResearchModal";
 import { getBookData } from "./booksData/getBookData";
 import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
 import { BookData } from "./booksData/types";
@@ -23,18 +21,9 @@ import { ModalProvider, useModal } from "./context/ModalContext";
 import { BookContentWrapper } from "./components/BookContentWrapper";
 import { BookThemeProvider } from "./context/BookThemeContext";
 import { useAudiobookTracks } from "@/hooks/useAudiobookTracks";
+import MenuButton from "./components/MenuButton";
 
-function Shell({
-  bookData,
-  setShowDeepResearch,
-  showDeepResearch,
-  passedText,
-}: {
-  bookData: BookData;
-  setShowDeepResearch: (show: boolean) => void;
-  showDeepResearch: boolean;
-  passedText?: string;
-}) {
+function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
   /* Inject book content first */
   useBookContent(bookData.bookXml, "content-container");
 
@@ -49,31 +38,25 @@ function Shell({
   useBackgroundSongs();
   useAudiobookTracks();
 
+  /* websocket */
+  const { sendMessage } = useWebSocket();
+
   return (
     <>
-      <BookChaptersModal bookData={bookData} onShowDeepResearch={() => setShowDeepResearch(true)} />
+      <MenuButton />
       <NoteLinkBlinker />
       <CharacterNotesPanel bookData={bookData} />
       <RightNotesPanel />
-      <DeepResearchModal isOpen={showDeepResearch} onClose={() => setShowDeepResearch(false)} passedText={passedText} />
       <AudioPlayer />
+      <BottomInput placeholder="Poszukaj albo zapytaj" onSubmit={sendMessage} />
     </>
   );
 }
-
-const ChatContainer = ({ onShowDeepResearch, onCloseDeepResearch }: { onShowDeepResearch: (result: string) => void; onCloseDeepResearch: () => void }) => {
-  const { sendMessage } = useWebSocket();
-
-  return <BottomInput placeholder="Poszukaj albo zapytaj" onSubmit={sendMessage} onShowDeepResearch={onShowDeepResearch} onCloseDeepResearch={onCloseDeepResearch} />;
-};
 
 export default function App() {
   const [currentBookData, setCurrentBookData] = useState<BookData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const [showDeepResearch, setShowDeepResearch] = useState(false);
-  const [deepResearchResult, setDeepResearchResult] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -111,14 +94,7 @@ export default function App() {
           <BookThemeProvider>
             <BookContentWrapper>
               <ModalProvider bookData={currentBookData}>
-                <Shell bookData={currentBookData} setShowDeepResearch={setShowDeepResearch} showDeepResearch={showDeepResearch} passedText={deepResearchResult} />
-                <ChatContainer
-                  onShowDeepResearch={(result) => {
-                    setDeepResearchResult(result);
-                    setShowDeepResearch(true);
-                  }}
-                  onCloseDeepResearch={() => setShowDeepResearch(false)}
-                />
+                <Shell bookData={currentBookData} />
               </ModalProvider>
             </BookContentWrapper>
           </BookThemeProvider>

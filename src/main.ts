@@ -7,13 +7,10 @@
  *  real React components whenever you feel like it.
  */
 
-import { initSearchModal } from "./searchModal";
 import { initializeNoteLinkBlinking } from "./annotationsHandling";
 import { dealWithSW } from "./serviceWorker";
 import { setupParagraphHighlighting } from "./ui/paragraphHighlighting";
-import { setupKeyboardNavigation } from "./utils/keyboardNavigation";
 import { initPage } from "./ui/pageInit";
-// import { initCharacterModals, showCharacterDetailsModal } from "./ui/characterModals";
 
 /* ------------------------------------------------------------------ */
 /*  The only exported symbol                                           */
@@ -42,13 +39,10 @@ export async function runLegacyInit() {
     initializeNoteLinkBlinking(); // <-- kept here for safety;
     //     also wrapped in a React hook upstream
 
-    initSearchModal();
-    // initCharacterModals();
     document.querySelectorAll(".modal-close").forEach((button) => {
       const modal = button.closest(".modal-overlay");
       if (modal) button.addEventListener("click", () => modal.classList.remove("active"));
     });
-    setupKeyboardNavigation();
     setupParagraphHighlighting();
 
     // Setup optional elements hiding on user inactivity
