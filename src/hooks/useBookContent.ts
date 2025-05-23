@@ -1,4 +1,7 @@
 import { useEffect } from "react";
+import { handleRemoveCharacter } from "@/text-editor-service/listeners/handleRemoveCharacter";
+import { handleEditParagraph } from "@/text-editor-service/listeners/handleEditParagraph";
+
 export function useBookContent(htmlContent: string, containerId: string) {
   useEffect(() => {
     const container = document.getElementById(containerId);
@@ -10,24 +13,34 @@ export function useBookContent(htmlContent: string, containerId: string) {
 
     if (import.meta.env.VITE_EDITOR === "true") {
       const handleClick = async (event: MouseEvent) => {
-        const target = event.target as HTMLElement;
         if (event.metaKey) {
-          // Handle cmd + click on paragraph
-          event.preventDefault();
-          event.stopPropagation();
+          const target = event.target as HTMLElement;
+          let chapterNumber: number = null;
+          let paragraphNumber: number = null;
 
-          const chapter = (target.parentNode as HTMLElement).attributes["data-chapter"].value;
-          const paragraph = target.attributes["data-index"].value;
+          const paragraphTag = target.getAttribute("data-index");
+          const characterTag = target.getAttribute("data-character");
 
-          const response = confirm("Are you sure you want to edit this content?");
+          if (paragraphTag) {
+            chapterNumber = parseInt((target.parentNode as HTMLElement).attributes["data-chapter"].value);
+            paragraphNumber = parseInt(target.attributes["data-index"].value);
+            const response = confirm("Are you sure you want to edit this content?");
 
-          if (!response) return;
+            if (response) {
+              return handleEditParagraph(chapterNumber, paragraphNumber);
+            }
+            return;
+          }
 
-          await fetch(`http://localhost:3000/api/text-editor/character`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ chapterNumber: chapter, paragraphNumber: paragraph, updatedParagraphText: `ss` }),
-          });
+          if (characterTag) {
+            paragraphNumber = parseInt((target.parentNode as HTMLElement).attributes["data-index"].value);
+            chapterNumber = parseInt((target.parentNode.parentNode as HTMLElement).attributes["data-chapter"].value);
+            const response = confirm(`Are you sure you want to remove ${characterTag}?`);
+            if (response) {
+              return handleRemoveCharacter(target, chapterNumber, paragraphNumber, characterTag);
+            }
+            return;
+          }
         }
       };
 

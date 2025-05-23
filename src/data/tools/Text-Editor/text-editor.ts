@@ -2,7 +2,7 @@ import { BOOK_SLUGS } from "@/consts";
 import { DOMParser } from "@xmldom/xmldom";
 import fs from "fs";
 import { xmlToComplexHtml } from "@/data/xmlToComplexHtml";
-import { spawn } from "child_process";
+import { spawn, spawnSync } from "child_process";
 import * as path from "path";
 import * as os from "os";
 
@@ -11,47 +11,13 @@ export class TextEditor {
     this.bookSlug = bookSlug;
   }
 
-  private getBookXml() {
+  private getBookXml(): string {
     return fs.readFileSync(`./src/data/${this.bookSlug}-chapters.xml`, "utf8");
   }
 
-  private regenerateXml(xmlString: string) {
+  public regenerateXml(xmlString: string) {
     const htmlString = xmlToComplexHtml(xmlString, this.bookSlug);
     fs.writeFileSync(`./src/data/chapters-${this.bookSlug}.ts`, `export const ${this.bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlString}</section>\`;`);
-  }
-
-  private isSimilarParagraph(original: string, updated: string): boolean {
-    // Use DOMParser to extract text content from both strings
-    const parser = new DOMParser();
-    const getTextContent = (str: string) => {
-      const doc = parser.parseFromString(str, "text/xml");
-      return doc.documentElement && doc.documentElement.textContent ? doc.documentElement.textContent.trim() : "";
-    };
-
-    const originalText = getTextContent(original);
-    const updatedText = getTextContent(updated);
-
-    // Check if the text content is the same
-    return originalText === updatedText;
-  }
-
-  public async addCharacter(chapterNumber: number, paragraphNumber: number, updatedParagraphText?: string) {
-    const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
-
-    if (!originalParagraph) {
-      throw new Error("Paragraph not found");
-    }
-
-    // if (!this.isSimilarParagraph(originalParagraph, updatedParagraphText)) {
-    //   throw new Error("Updated paragraph text is too different from the original");
-    // }
-
-    updatedParagraphText = await this.openInVSCode(originalParagraph);
-
-    const updatedXml = this.getBookXml().replace(originalParagraph, updatedParagraphText);
-    fs.writeFileSync(`./src/data/${this.bookSlug}-chapters.xml`, updatedXml, "utf-8");
-    this.regenerateXml(updatedXml);
-    return updatedXml;
   }
 
   public getParagraphByNumber(chapterNumber: number, paragraphNumber: number): string | null {
@@ -73,6 +39,25 @@ export class TextEditor {
 
     const paragraph = paragraphs[paragraphNumber];
     return paragraph.toString();
+  }
+
+  public async editParagraph(chapterNumber: number, paragraphNumber: number): Promise<void> {
+    const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
+
+    if (!originalParagraph) {
+      throw new Error("Paragraph not found");
+    }
+
+    const updatedParagraphText = await this.openParagraphInVSCode(originalParagraph);
+
+    console.log("53: updatedParagraphText BANG!", updatedParagraphText);
+
+    const updatedXml = this.getBookXml().replace(originalParagraph, updatedParagraphText);
+
+    console.log("57: updatedXml BANG!", updatedXml);
+
+    fs.writeFileSync(`./src/data/${this.bookSlug}-chapters.xml`, updatedXml, "utf-8");
+    this.regenerateXml(updatedXml);
   }
 
   public removeCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1): string {
@@ -114,14 +99,24 @@ export class TextEditor {
     return updatedXml;
   }
 
-  public async openInVSCode(content: string): Promise<string> {
+  public async openParagraphInVSCode(paragraph: string): Promise<string> {
+    try {
+      // Check if VS Code is installed by trying to get its version
+      const vscodeVersion = spawnSync("code", ["--version"], { stdio: "pipe" });
+      if (vscodeVersion.status !== 0) {
+        throw new Error("VS Code is not installed or not in PATH");
+      }
+    } catch (error) {
+      throw new Error("VS Code is not installed or not in PATH. Please install VS Code to use this feature.", error);
+    }
+
     return new Promise((resolve, reject) => {
       // Create a temporary file
       const tempDir = os.tmpdir();
       const tempFile = path.join(tempDir, `temp-${Date.now()}.xml`);
 
       // Write the initial content to the file
-      fs.writeFileSync(tempFile, content);
+      fs.writeFileSync(tempFile, paragraph);
 
       // Spawn VS Code process
       const vscode = spawn("code", ["--wait", tempFile], { stdio: "inherit" });
@@ -153,12 +148,9 @@ export class TextEditor {
 
 if (require.main === module) {
   (async () => {
-    const BOOK_SLUG = BOOK_SLUGS.Krolowa_Sniegu;
-
-    const textEditor = new TextEditor(BOOK_SLUG);
-
+    // const BOOK_SLUG = BOOK_SLUGS.Krolowa_Sniegu;
+    // const textEditor = new TextEditor(BOOK_SLUG);
     // textEditor.addCharacter(3, 5, `<p><Gerda talking="true"/>— <Kaj>Kaj</Kaj> nie żyje! — rzekła do niego Gerda.</p>`);
-
-    textEditor.removeCharacter(1, 1, "Kaj", 1);
+    // textEditor.handleRemoveCharacter(1, 1, "Kaj", 1);
   })();
 }

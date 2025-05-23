@@ -8,15 +8,23 @@ export class TextEditorService {
     this.textEditor = new TextEditor(bookSlug);
   }
 
-  public addCharacter(chapterNumber: number, paragraphNumber: number, updatedParagraphText: string) {
-    return this.textEditor.addCharacter(chapterNumber, paragraphNumber, updatedParagraphText);
+  public editParagraph(chapterNumber: number, paragraphNumber: number) {
+    return this.textEditor.editParagraph(chapterNumber, paragraphNumber);
   }
 
-  public getParagraphByNumber(chapterNumber: number, paragraphNumber: number) {
-    return this.textEditor.getParagraphByNumber(chapterNumber, paragraphNumber);
+  public removeCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrenceNumber: number) {
+    return this.textEditor.removeCharacter(chapterNumber, paragraphNumber, characterName, occurrenceNumber);
   }
 
-  public removeCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1) {
-    return this.textEditor.removeCharacter(chapterNumber, paragraphNumber, characterName, occurrence);
-  }
+  // public addCharacter(chapterNumber: number, paragraphNumber: number, updatedParagraphText: string) {
+  //   return this.textEditor.addCharacter(chapterNumber, paragraphNumber, updatedParagraphText);
+  // }
+  //
+  // public getParagraphByNumber(chapterNumber: number, paragraphNumber: number) {
+  //   return this.textEditor.getParagraphByNumber(chapterNumber, paragraphNumber);
+  // }
+  //
+  // public handleRemoveCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1) {
+  //   return this.textEditor.handleRemoveCharacter(chapterNumber, paragraphNumber, characterName, occurrence);
+  // }
 }
