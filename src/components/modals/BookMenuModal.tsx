@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
-import { List, FileText, Type, RotateCcw, Music } from "lucide-react";
+import { List, Type, RotateCcw, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import ModalUI from "@/components/modals/ModalUI";
@@ -9,14 +8,13 @@ import { BookData } from "@/booksData/types";
 
 interface BookMenuModalProps {
   onClose: () => void;
-  bookData: BookData; // Kept for future use with bookData
+  bookData: BookData;
   openBookChapterModal: () => void;
-  openDeepResearchModal: (content?: string) => void;
   preloadBackgroundTracks: () => void;
   resetFurthestPageLocation: () => void;
 }
 
-const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, openDeepResearchModal, preloadBackgroundTracks, resetFurthestPageLocation }) => {
+const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, preloadBackgroundTracks, resetFurthestPageLocation }) => {
   const currentFontSize = Number(localStorage.getItem("fontSize") || "1");
 
   useEffect(() => {
@@ -56,7 +54,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
         <Button
           variant="ghost"
-          className="w-full justify-start text-left"
+          className="w-full justify-start text-left mb-5"
           onClick={() => {
             resetFurthestPageLocation();
             onClose();
@@ -66,28 +64,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           Reset Furthest Read Location
         </Button>
 
-        <Separator />
-
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-left"
-          onClick={() => {
-            // Check if deep research is enabled
-            // Note: we're removing the specific enableDeepResearch check
-            // and will rely on the context to handle this
-            // Dispatch a custom event that can be caught by components with custom handlers
-            const event = new CustomEvent("showDeepResearch");
-            document.dispatchEvent(event);
-            // Also use the default handler
-            openDeepResearchModal();
-            onClose();
-          }}
-        >
-          <FileText className="mr-2 h-4 w-4" />
-          Show Deep Research
-        </Button>
-
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center gap-2">
             <Type className="h-4 w-4" />
             <Label htmlFor="font-size" className="text-sm font-medium">

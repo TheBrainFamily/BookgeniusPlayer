@@ -18,7 +18,7 @@ const ModalUI: React.FC<ModalUIProps> = ({ title, onClose, children, className =
       className={cn("fixed inset-0 flex items-center justify-center self-center z-999", hideOverlay ? "pointer-events-none" : "bg-black/50 h-full w-full")}
       onClick={preventClickOutside ? undefined : onClose}
     >
-      <div className="flex flex-row gap-2 justify-center items-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 max-w-[150rem] w-full h-full">
+      <div className={cn("flex flex-row gap-2 justify-center items-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 max-w-[150rem] h-full", layoutView && "w-full")}>
         {layoutView && <div id="left-notes-blank" className={cn("hidden max-w-[700px] ", "lg:flex lg:order-2 lg:flex-2 lg:max-w-[900px]", "xl:flex-1 xl:order-1")} />}
         <div
           className={cn(

@@ -171,7 +171,6 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
               onClose={closeModal}
               bookData={bookData}
               openBookChapterModal={openBookChapterModal}
-              openDeepResearchModal={openDeepResearchModal}
               preloadBackgroundTracks={preloadBackgroundTracks}
               resetFurthestPageLocation={resetFurthestPageLocation}
             />
@@ -182,7 +181,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
           return null;
       }
     },
-    [bookData, closeModal, range, searchResults, openBookChapterModal, openDeepResearchModal],
+    [bookData, closeModal, range, searchResults, openBookChapterModal],
   );
 
   const renderModal = useCallback(() => {

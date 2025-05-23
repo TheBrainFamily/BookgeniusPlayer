@@ -2,40 +2,7 @@ import React, { useMemo } from "react";
 import ModalUI from "@/components/modals/ModalUI";
 import { BookData } from "@/booksData/types";
 import { goToParagraph } from "@/helpers/paragraphsNavigation";
-
-const getTitle = (chapter: number) => {
-  const chapterNames = [
-    "Zero",
-    "One",
-    "Two",
-    "Three",
-    "Four",
-    "Five",
-    "Six",
-    "Seven",
-    "Eight",
-    "Nine",
-    "Ten",
-    "Eleven",
-    "Twelve",
-    "Thirteen",
-    "Fourteen",
-    "Fifteen",
-    "Sixteen",
-    "Seventeen",
-    "Eighteen",
-    "Nineteen",
-    "Twenty",
-    "Twenty-One",
-    "Twenty-Two",
-    "Twenty-Three",
-    "Twenty-Four",
-    "Twenty-Five",
-    "Twenty-Six",
-    "Twenty-Seven",
-  ];
-  return `Chapter ${chapterNames[chapter] || chapter}`;
-};
+import { getTitle } from "@/utils/getChapterTitle";
 
 interface BookChaptersModalProps {
   open: boolean;
@@ -60,8 +27,8 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ open, onClose, bo
   if (!open) return null;
 
   return (
-    <ModalUI title="Chapters" onClose={onClose}>
-      <div className="h-[60vh] overflow-y-auto space-y-1">
+    <ModalUI title="Rozdziały" onClose={onClose}>
+      <div className="h-max-[60vh] overflow-y-auto space-y-1">
         {chapters.map((chapter) => (
           <button
             key={chapter.id}
