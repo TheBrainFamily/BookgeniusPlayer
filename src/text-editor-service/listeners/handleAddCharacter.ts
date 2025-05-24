@@ -8,27 +8,35 @@ export const handleAddCharacter = async (target: HTMLElement, chapterNumber: num
     // First split by HTML tags
     const parts = paragraphText.split(/(<[^>]+>.*?<\/[^>]+>|<[^>]+\/>)/);
 
+    console.log("11: parts BANG!", parts);
+
     // Process each part
     const words: string[] = [];
+
     for (const part of parts) {
       if (part.trim()) {
         if (part.match(/<[^>]+>.*?<\/[^>]+>|<[^>]+\/>/)) {
-          // Keep the tag
           words.push(part);
         } else {
-          // Process regular text, but first split by potential attached tags
           const subParts = part.split(/(<[^>]+>.*?<\/[^>]+>|<[^>]+\/>)/);
           for (const subPart of subParts) {
             if (subPart.trim()) {
               if (subPart.match(/<[^>]+>.*?<\/[^>]+>|<[^>]+\/>/)) {
                 words.push(subPart);
               } else {
-                words.push(
-                  ...subPart
-                    .split(/\s+/)
-                    .map((w) => w.replace(/[.,!?;:()[\]{}"'\-–—]/g, ""))
-                    .filter((w) => w.length > 0 && /[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(w)),
-                );
+                // Split by whitespace and preserve punctuation
+                const tokens = subPart.split(/(\s+|[.,!?;:()[\]{}"'\-–—])/);
+                for (const token of tokens) {
+                  if (token.trim()) {
+                    if (token.match(/[.,!?;:()[\]{}"'\-–—]/)) {
+                      // Add punctuation as separate element
+                      words.push(token);
+                    } else if (token.match(/[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/)) {
+                      // Add word if it contains letters
+                      words.push(token);
+                    }
+                  }
+                }
               }
             }
           }
