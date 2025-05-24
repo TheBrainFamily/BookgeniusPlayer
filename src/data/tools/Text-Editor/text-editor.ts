@@ -1,5 +1,5 @@
 import { BOOK_SLUGS } from "@/consts";
-import { DOMParser } from "@xmldom/xmldom";
+import { DOMParser, Document, XMLSerializer } from "@xmldom/xmldom";
 import fs from "fs";
 import { xmlToComplexHtml } from "@/data/xmlToComplexHtml";
 import { spawn, spawnSync } from "child_process";
@@ -59,41 +59,103 @@ export class TextEditor {
     this.regenerateXml(updatedXml);
   }
 
-  public addCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, word: string, wordIndex: number): string {
-    const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
+  private decodeHtmlEntities(text: string): string {
+    const entities: { [key: string]: string } = { "&lt;": "<", "&gt;": ">", "&amp;": "&", "&quot;": '"', "&#39;": "'" };
+    return text.replace(/&(?:lt|gt|amp|quot|#39);/g, (match) => entities[match]);
+  }
 
-    if (!originalParagraph) {
+  private replaceParagraphUsingDOMParser(xmlDoc: Document, chapterNumber: number, paragraphNumber: number, newContent: string): string {
+    const chapters = xmlDoc.getElementsByTagName("Chapter");
+    const chapter = chapters[chapterNumber - 1];
+    const paragraphs = Array.from(chapter.childNodes).filter((node) => node.nodeType === 1);
+    const paragraph = paragraphs[paragraphNumber];
+
+    // Create a new text node with the updated content
+    const newTextNode = xmlDoc.createTextNode(newContent);
+
+    // Clear the existing paragraph content and append the new content
+    while (paragraph.firstChild) {
+      paragraph.removeChild(paragraph.firstChild);
+    }
+    paragraph.appendChild(newTextNode);
+
+    // Use XMLSerializer to get raw XML output and decode HTML entities
+    const serializer = new XMLSerializer();
+    const serializedXml = serializer.serializeToString(xmlDoc);
+    return this.decodeHtmlEntities(serializedXml);
+  }
+
+  public addCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, word: string, wordIndex: number): string {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(this.getBookXml(), "text/xml");
+    const chapters = xmlDoc.getElementsByTagName("Chapter");
+
+    if (chapterNumber <= 0 || chapterNumber > chapters.length) {
+      throw new Error("Chapter not found");
+    }
+
+    const chapter = chapters[chapterNumber - 1];
+    const paragraphs = Array.from(chapter.childNodes).filter((node) => node.nodeType === 1);
+
+    if (paragraphNumber < 0 || paragraphNumber >= paragraphs.length) {
       throw new Error("Paragraph not found");
     }
 
-    const characterTag = `<span class="character-highlighted" data-character="${characterName}" data-src-listening="/Krolowa-Sniegu/${characterName.toLowerCase()}-listens.mp4">${word}</span>`;
+    const paragraph = paragraphs[paragraphNumber];
+    const paragraphText = paragraph.toString().replace(/^<[^>]+>|<\/[^>]+>$/g, "");
 
-    const words = originalParagraph.split(/\s+/).filter((word) => word.length > 0 && /[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(word));
+    const characterTag = `<${characterName}>${word}</${characterName}>`;
 
-    if (wordIndex < 0 || wordIndex >= words.length) {
-      console.error("Invalid word index");
+    const parts = paragraphText.split(/(<[^>]+>.*?<\/[^>]+>|<[^>]+\/>)/);
+    const words: string[] = [];
+
+    for (const part of parts) {
+      if (part.trim()) {
+        if (part.match(/<[^>]+>.*?<\/[^>]+>|<[^>]+\/>/)) {
+          words.push(part);
+        } else {
+          const subParts = part.split(/(<[^>]+>.*?<\/[^>]+>|<[^>]+\/>)/);
+          for (const subPart of subParts) {
+            if (subPart.trim()) {
+              if (subPart.match(/<[^>]+>.*?<\/[^>]+>|<[^>]+\/>/)) {
+                words.push(subPart);
+              } else {
+                words.push(
+                  ...subPart
+                    .split(/\s+/)
+                    .map((w) => w.replace(/[.,!?;:()[\]{}"'\-–—]/g, ""))
+                    .filter((w) => w.length > 0 && /[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(w)),
+                );
+              }
+            }
+          }
+        }
+      }
     }
 
-    if (words[wordIndex] !== word) {
-      console.error("Word at specified index does not match the provided word");
+    let currentWordIndex = 0;
+    for (let i = 0; i < words.length; i++) {
+      const currentWord = words[i];
+      if (currentWord.startsWith("<")) continue;
+
+      if (currentWordIndex === wordIndex) {
+        if (currentWord !== word) {
+          console.error("Word at specified index does not match the provided word");
+          return this.getBookXml();
+        }
+        words[i] = characterTag;
+        break;
+      }
+      currentWordIndex++;
     }
 
-    console.log("78: characterTag BANG!", characterTag);
+    const updatedParagraphText = words.join(" ").replace(/\s+(<note id="\d+"\/>)/g, "$1");
 
-    const updatedParagraph = originalParagraph.replace(new RegExp(`\\b${word}\\b`, "g"), (match, offset) => {
-      const beforeMatch = originalParagraph.substring(0, offset);
-      console.log("80: beforeMatch BANG!", beforeMatch);
-      const wordCount = beforeMatch.split(/\s+/).filter((w) => w.length > 0 && /[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(w)).length;
-      console.log("82: wordCount BANG!", wordCount);
-      console.log("83: wordIndex BANG!", wordIndex);
-      return wordCount === wordIndex ? characterTag : match;
-    });
+    // Replace the paragraph content using DOMParser
+    const updatedXml = this.replaceParagraphUsingDOMParser(xmlDoc, chapterNumber, paragraphNumber, updatedParagraphText);
 
-    console.log("84: updatedParagraph BANG!", updatedParagraph);
-
-    const updatedXml = this.getBookXml().replace(originalParagraph, updatedParagraph);
     fs.writeFileSync(`./src/data/${this.bookSlug}-chapters.xml`, updatedXml, "utf-8");
-    this.regenerateXml(this.getBookXml());
+    this.regenerateXml(updatedXml);
     return updatedXml;
   }
 
@@ -183,7 +245,26 @@ export class TextEditor {
   }
 
   private replaceParagraphInXml(text: string, originalParagraph: string, updatedParagraphText: string): string {
-    const paragraphRegex = new RegExp(originalParagraph.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "s");
+    // First, temporarily replace XML tags with placeholders
+    const xmlTagPlaceholders: { [key: string]: string } = {};
+    let placeholderCounter = 0;
+
+    const paragraphWithPlaceholders = originalParagraph.replace(/<[^>]+>/g, (match) => {
+      const placeholder = `__XML_TAG_${placeholderCounter}__`;
+      xmlTagPlaceholders[placeholder] = match;
+      placeholderCounter++;
+      return placeholder;
+    });
+
+    // Escape special regex characters in the text between XML tags
+    const escapedText = paragraphWithPlaceholders.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    // Restore XML tags
+    const finalRegex = escapedText.replace(/__XML_TAG_\d+__/g, (placeholder) => {
+      return xmlTagPlaceholders[placeholder].replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    });
+
+    const paragraphRegex = new RegExp(finalRegex, "s");
     return text.replace(paragraphRegex, updatedParagraphText);
   }
 }
