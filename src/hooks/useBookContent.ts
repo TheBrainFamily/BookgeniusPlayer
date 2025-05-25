@@ -19,21 +19,29 @@ export function useBookContent(htmlContent: string, containerId: string) {
         const paragraphTag = target.getAttribute("data-index");
         const characterTag = target.getAttribute("data-character");
 
+        // if (event.altKey) {
+        //   const selection = window.getSelection();
+        //   if (!selection) return;
+        //
+        //   const selectedText = selection.toString().trim();
+        //   console.log("27: selectedText BANG!", selectedText);
+        // }
+
         if (paragraphTag) {
           const chapterNumber = parseInt((target.parentNode as HTMLElement).attributes["data-chapter"].value);
           const paragraphNumber = parseInt(target.attributes["data-index"].value);
 
-          if (event.metaKey && event.altKey) {
+          if (event.altKey) {
             const target = event.target as HTMLElement;
-            if (event.detail === 2) {
-              const response = confirm("Are you sure you want to add the CHARACTER_NAME here?");
+            // if (event.detail === 2) {
+            const response = confirm("Are you sure you want to add the CHARACTER_NAME here?");
 
-              if (response) {
-                return handleAddCharacter(target, chapterNumber, paragraphNumber);
-              }
-              return;
+            if (response) {
+              return handleAddCharacter(target, chapterNumber, paragraphNumber);
             }
             return;
+            // }
+            // return;
           }
 
           if (event.metaKey && !event.altKey) {

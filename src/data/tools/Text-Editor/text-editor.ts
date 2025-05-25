@@ -2,6 +2,7 @@ import { BOOK_SLUGS } from "@/consts";
 import { XmlManager } from "./xml-manager";
 import { FileManager } from "./file-manager";
 import { EditorManager } from "./editor-manager";
+import { extractWords } from "@/utils/extractWords";
 
 export class TextEditor {
   private readonly fileManager: FileManager;
@@ -43,7 +44,14 @@ export class TextEditor {
     this.fileManager.regenerateXml(updatedXml);
   }
 
-  public addCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, word: string, wordIndex: number): string {
+  public addCharacter(
+    chapterNumber: number,
+    paragraphNumber: number,
+    characterName: string,
+    selectedText: string,
+    startSelectedWordIndex: number,
+    endSelectedWordIndex: number,
+  ): string {
     const xmlDoc = XmlManager.parseXml(this.fileManager.readXmlFile());
     const chapter = XmlManager.getChapter(xmlDoc, chapterNumber);
 
@@ -58,26 +66,29 @@ export class TextEditor {
 
     const paragraph = paragraphs[paragraphNumber];
     const paragraphText = XmlManager.getParagraphText(paragraph);
-    const characterTag = `<${characterName}>${word}</${characterName}>`;
+    const characterTag = `<${characterName}>${selectedText}</${characterName}>`;
 
-    const words = this.extractWords(paragraphText);
-    let currentWordIndex = 0;
+    const words = extractWords(paragraphText);
 
-    for (let i = 0; i < words.length; i++) {
-      const currentWord = words[i];
-      if (currentWord.startsWith("<")) continue;
+    const updatedWords = [...words.slice(0, startSelectedWordIndex), characterTag, ...words.slice(endSelectedWordIndex + 1)];
 
-      if (currentWordIndex === wordIndex) {
-        if (currentWord !== word) {
-          throw new Error("Word at specified index does not match the provided word");
-        }
-        words[i] = characterTag;
-        break;
-      }
-      currentWordIndex++;
-    }
+    // let currentWordIndex = 0;
+    //
+    // for (let i = 0; i < words.length; i++) {
+    //   const currentWord = words[i];
+    //   if (currentWord.startsWith("<")) continue;
+    //
+    //   if (currentWordIndex === wordIndex) {
+    //     if (currentWord !== word) {
+    //       throw new Error("Word at specified index does not match the provided word");
+    //     }
+    //     words[i] = characterTag;
+    //     break;
+    //   }
+    //   currentWordIndex++;
+    // }
 
-    const updatedParagraphText = words
+    const updatedParagraphText = updatedWords
       .join(" ")
       .replace(/\s+(<note id="\d+"\/>)/g, "$1")
       .replace(/\s+([.,!?;:])/g, "$1");
@@ -125,43 +136,6 @@ export class TextEditor {
     this.fileManager.writeXmlFile(updatedXml);
     this.fileManager.regenerateXml(updatedXml);
     return updatedXml;
-  }
-
-  private extractWords(text: string): string[] {
-    const parts = text.split(/(<[^>]+>.*?<\/[^>]+>|<[^>]+\/>)/);
-    const words: string[] = [];
-
-    for (const part of parts) {
-      if (part.trim()) {
-        if (part.match(/<[^>]+>.*?<\/[^>]+>|<[^>]+\/>/)) {
-          words.push(part);
-        } else {
-          const subParts = part.split(/(<[^>]+>.*?<\/[^>]+>|<[^>]+\/>)/);
-          for (const subPart of subParts) {
-            if (subPart.trim()) {
-              if (subPart.match(/<[^>]+>.*?<\/[^>]+>|<[^>]+\/>/)) {
-                words.push(subPart);
-              } else {
-                // Split by whitespace and preserve punctuation
-                const tokens = subPart.split(/(\s+|[.,!?;:()[\]{}"'\-–—])/);
-                for (const token of tokens) {
-                  if (token.trim()) {
-                    if (token.match(/[.,!?;:()[\]{}"'\-–—]/)) {
-                      // Add punctuation as separate element
-                      words.push(token);
-                    } else if (token.match(/[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/)) {
-                      // Add word if it contains letters
-                      words.push(token);
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    return words;
   }
 }
 

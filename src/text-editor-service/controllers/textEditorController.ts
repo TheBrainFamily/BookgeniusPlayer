@@ -45,18 +45,25 @@ export class TextEditorController {
 
   public addCharacter: RequestHandler = async (req, res) => {
     try {
-      const { chapterNumber, paragraphNumber, characterName, word, wordIndex } = req.body;
+      const { chapterNumber, paragraphNumber, characterName, selectedText, startSelectedWordIndex, endSelectedWordIndex } = req.body;
 
       console.log("50: req.body BANG!", req.body);
 
-      if (!chapterNumber || !paragraphNumber || !characterName || !word || !wordIndex) {
+      if (!chapterNumber || !paragraphNumber || !characterName || !selectedText || !startSelectedWordIndex || !endSelectedWordIndex) {
         res.status(400).json({ error: "Missing required parameters" });
         return;
       }
 
       console.log("57: req.bodu BANG!", req.body);
 
-      const result = this.textEditorService.addCharacter(Number(chapterNumber), Number(paragraphNumber), characterName, word, Number(wordIndex));
+      const result = this.textEditorService.addCharacter(
+        Number(chapterNumber),
+        Number(paragraphNumber),
+        characterName,
+        selectedText,
+        Number(startSelectedWordIndex),
+        Number(endSelectedWordIndex),
+      );
 
       console.log("61: result BANG!", result);
 

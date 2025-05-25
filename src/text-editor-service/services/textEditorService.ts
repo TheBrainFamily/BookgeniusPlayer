@@ -16,19 +16,7 @@ export class TextEditorService {
     return this.textEditor.removeCharacter(chapterNumber, paragraphNumber, characterName, occurrenceNumber);
   }
 
-  public addCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, word: string, wordIndex: number) {
-    return this.textEditor.addCharacter(chapterNumber, paragraphNumber, characterName, word, wordIndex);
+  public addCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, selectedText: string, startSelectedWordIndex: number, endSelectedWordIndex: number) {
+    return this.textEditor.addCharacter(chapterNumber, paragraphNumber, characterName, selectedText, startSelectedWordIndex, endSelectedWordIndex);
   }
-
-  // public addCharacter(chapterNumber: number, paragraphNumber: number, updatedParagraphText: string) {
-  //   return this.textEditor.addCharacter(chapterNumber, paragraphNumber, updatedParagraphText);
-  // }
-  //
-  // public getParagraphByNumber(chapterNumber: number, paragraphNumber: number) {
-  //   return this.textEditor.getParagraphByNumber(chapterNumber, paragraphNumber);
-  // }
-  //
-  // public handleRemoveCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1) {
-  //   return this.textEditor.handleRemoveCharacter(chapterNumber, paragraphNumber, characterName, occurrence);
-  // }
 }
