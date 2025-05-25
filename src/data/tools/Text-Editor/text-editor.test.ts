@@ -144,7 +144,7 @@ describe("TextEditor", () => {
       jest.resetAllMocks();
       const originalXml = `<?xml version="1.0" encoding="UTF-8" ?>\n<ebook>\n    <Chapter id="1">\n        <p>First paragraph with John character</p>\n    </Chapter>\n</ebook>`;
       jest.spyOn(fs, "readFileSync").mockReturnValue(originalXml);
-      const result = textEditor.addCharacter(1, 0, "John", "John", 3);
+      const result = textEditor.addCharacter(1, 0, "John", "John", 3, 3);
       expect(result).toContain("<John>John</John>");
     });
 
@@ -152,14 +152,14 @@ describe("TextEditor", () => {
       jest.resetAllMocks();
       const originalXml = `<?xml version="1.0" encoding="UTF-8" ?>\n<ebook>\n    <Chapter id="1">\n        <p>First paragraph with John character</p>\n    </Chapter>\n</ebook>`;
       jest.spyOn(fs, "readFileSync").mockReturnValue(originalXml);
-      expect(() => textEditor.addCharacter(1, 5, "John", "John", 3)).toThrow("Paragraph not found");
+      expect(() => textEditor.addCharacter(1, 5, "John", "John", 3, 3)).toThrow("Paragraph not found");
     });
 
     it("should throw error when word at index doesn't match provided word", () => {
       jest.resetAllMocks();
       const originalXml = `<?xml version="1.0" encoding="UTF-8" ?>\n<ebook>\n    <Chapter id="1">\n        <p>First paragraph with John character</p>\n    </Chapter>\n</ebook>`;
       jest.spyOn(fs, "readFileSync").mockReturnValue(originalXml);
-      expect(() => textEditor.addCharacter(1, 0, "John", "Jane", 3)).toThrow("Word at specified index does not match the provided word");
+      expect(() => textEditor.addCharacter(1, 0, "John", "Jane", 3, 3)).toThrow("Word at specified index does not match the provided word");
     });
   });
 

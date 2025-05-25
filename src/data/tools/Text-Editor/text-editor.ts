@@ -72,22 +72,6 @@ export class TextEditor {
 
     const updatedWords = [...words.slice(0, startSelectedWordIndex), characterTag, ...words.slice(endSelectedWordIndex + 1)];
 
-    // let currentWordIndex = 0;
-    //
-    // for (let i = 0; i < words.length; i++) {
-    //   const currentWord = words[i];
-    //   if (currentWord.startsWith("<")) continue;
-    //
-    //   if (currentWordIndex === wordIndex) {
-    //     if (currentWord !== word) {
-    //       throw new Error("Word at specified index does not match the provided word");
-    //     }
-    //     words[i] = characterTag;
-    //     break;
-    //   }
-    //   currentWordIndex++;
-    // }
-
     const updatedParagraphText = updatedWords
       .join(" ")
       .replace(/\s+(<note id="\d+"\/>)/g, "$1")
