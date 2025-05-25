@@ -23,6 +23,7 @@ import { ModalProvider, useModal } from "./context/ModalContext";
 import { BookContentWrapper } from "./components/BookContentWrapper";
 import { BookThemeProvider } from "./context/BookThemeContext";
 import { useAudiobookTracks } from "@/hooks/useAudiobookTracks";
+import { EditorMode } from "@/components/EditorMode";
 
 function Shell({
   bookData,
@@ -57,6 +58,7 @@ function Shell({
       <RightNotesPanel />
       <DeepResearchModal isOpen={showDeepResearch} onClose={() => setShowDeepResearch(false)} passedText={passedText} />
       <AudioPlayer />
+      {import.meta.env.VITE_EDITOR === "true" && <EditorMode />}
     </>
   );
 }

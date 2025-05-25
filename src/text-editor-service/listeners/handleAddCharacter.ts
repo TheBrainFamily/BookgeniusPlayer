@@ -9,9 +9,13 @@ export const handleAddCharacter = async (target: HTMLElement, chapterNumber: num
     const paragraphText = target.innerHTML || "";
     const words: string[] = extractWords(paragraphText);
 
+    console.log("12: words BANG!", words);
+
     const selectedWords: string[] = extractWords(selectedText);
 
-    const startSelectedWordIndex = words.findIndex((word) => word === selectedWords[0] || word.startsWith(selectedWords[0]));
+    console.log("16: selectedWords BANG!", selectedWords);
+
+    const startSelectedWordIndex = words.findIndex((word) => word === selectedWords[0]);
     const endSelectedWordIndex = selectedWords.length > 1 ? words.findIndex((word) => word === selectedWords[selectedWords.length - 1]) : startSelectedWordIndex;
 
     await fetch(`http://localhost:3000/api/text-editor/add-character`, {
