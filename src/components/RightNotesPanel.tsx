@@ -1,31 +1,15 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { createPortal } from "react-dom";
 
-import { useLocation } from "@/state/LocationContext";
-import { useDebounce } from "@/hooks/useDebounce";
 import { useFootnotes } from "@/hooks/useFootnotes";
 import { FootnoteModal } from "./FootnoteModal";
+import { useLocationRange } from "@/hooks/useLocationRange";
 
 const target = document.getElementById("right-notes");
 
 export const RightNotesPanel: React.FC = () => {
-  const loc = useLocation().location;
-  const debounced = useDebounce(loc, 200);
-
-  /* stable range object so children can memoise easily */
-  const range = useMemo(
-    () => ({
-      chapter: debounced.chapter,
-      paragraph: debounced.paragraph,
-      endChapter: debounced.endChapter,
-      endParagraph: debounced.endParagraph,
-      currentChapter: debounced.currentChapter,
-      currentParagraph: debounced.currentParagraph,
-    }),
-    [debounced.chapter, debounced.paragraph, debounced.endChapter, debounced.endParagraph, debounced.currentChapter, debounced.currentParagraph],
-  );
-
-  const notes = useFootnotes(range);
+  const { locationRange } = useLocationRange();
+  const notes = useFootnotes(locationRange);
   /* modal */
   const [modalHtml, setModalHtml] = useState<string | null>(null);
 
