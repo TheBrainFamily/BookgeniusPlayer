@@ -23,8 +23,8 @@
     <!-- Preload -->
     <link rel="preload" href="/loading.gif" as="image" />
 
-    <!-- Splash screen styles -->
-    <link rel="stylesheet" href="/src/styles/splash.css" />
+    <!-- Preloaded styles - earlier than React -->
+    <link rel="stylesheet" href="/src/styles/preload.css" />
 
     <title>Book Viewer</title>
   </head>
@@ -154,21 +154,10 @@
           </div>
         </div>
       </div>
-
-      <!-- return to location button -->
     </div>
 
-    <div id="root">
-      <div id="chapters-root"></div>
-    </div>
-
-    <div id="return-to-location-button" style="display: none">Go Back</div>
-    <div id="deep-research-root"></div>
-
-    <div id="splash">
-      <img src="/loading.gif" alt="" width="100" height="100" />
-      <div id="loading-phrase"></div>
-    </div>
+    <div id="root"></div>
+    <div id="splash-screen"></div>
 
     <script type="module" src="/src/index-scripts.ts" async></script>
     <script type="module" src="/src/index.tsx" async></script>

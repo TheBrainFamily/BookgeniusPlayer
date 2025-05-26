@@ -1,0 +1,12 @@
+#splash-screen {
+  position: fixed;
+  inset: 0;
+  background-color: oklch(0.205 0 0);
+  z-index: 9999;
+}
+
+#splash-screen.splash-screen--hide {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease-in-out;
+}

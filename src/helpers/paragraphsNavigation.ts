@@ -62,6 +62,16 @@ export const goToParagraph = (loc: { currentChapter: number; currentParagraph: n
   document.querySelector(selector)?.scrollIntoView({ behavior: fast ? "instant" : "smooth", block: "start" });
 };
 
+/**
+ * Determines if the return-to-location button should be shown
+ * based on the current location vs. saved location
+ */
+export const shouldShowReturnButton = (): boolean => {
+  const current = getCurrentLocation();
+  const saved = getSavedLocation();
+  return saved.currentChapter > current.currentChapter || (saved.currentChapter === current.currentChapter && saved.currentParagraph - 5 > current.currentParagraph);
+};
+
 /* ------------------------------------------------------------------ */
 /*  Return‑to‑location button logic                                   */
 const returnButton = document.getElementById("return-to-location-button");

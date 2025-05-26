@@ -180,14 +180,13 @@ const BottomInput: React.FC<BottomInputProps> = ({ placeholder = "Type something
   };
 
   return (
-    <footer
+    <div
       className={cn(
         "flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 max-w-[120rem] w-full",
-        "fixed bottom-0 inset-x-0 z-50 transition-all duration-200 ease-out",
+        "transition-all duration-200 ease-out",
         "bg-white/0 flex",
         isCollapsed ? "w-auto right-4 left-auto rounded-full p-1" : "w-full",
         "justify-around",
-        "optional-element",
       )}
     >
       {/* ToDo: Remove when layout will be refactored */}
@@ -293,7 +292,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ placeholder = "Type something
 
       {/* ToDo: Remove when layout will be refactored */}
       {!isRightNotesBlankHidden && <div id="right-notes-blank" className="hidden xl:block xl:flex-1 max-w-[700px]" />}
-    </footer>
+    </div>
   );
 };
 
