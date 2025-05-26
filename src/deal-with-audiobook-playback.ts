@@ -1,13 +1,3 @@
-// import {
-//   transitionToTrack,
-//   loadTrack,
-//   initAudioContext, // Keep if used elsewhere, but dealWithAudiobookTracks relies on crossfader's init
-//   getCurrentTrackId,
-//   stopAllPlayback,
-//   setActiveSection,
-//   isCurrentTrackInSection,
-//   getCurrentSectionTracks,
-// } from "./audio-crossfader"; // Adjust path as needed
 import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
 import { getAudiobookTracksForBook, AudiobookTracksSection } from "@/getAudiobookTracksForBook"; // Adjust path as needed
 import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audiobook-player";
@@ -16,7 +6,6 @@ import { highlightNthOccurrence } from "./highlightWord";
 const AUDIO_SYNC_SHIFT = -0.1;
 
 let isProcessingAudiobookTracks = false; // Module-level flag to prevent re-entrancy
-export let hasAudiobookForCurrentBook = false; // Flag to indicate if audiobook tracks exist for the current book
 
 // Preload function - can be async if loadTrack is async (it is now)
 // export const preloadAudiobookTracks = async () => {
@@ -79,11 +68,9 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
     const bookTracks = getAudiobookTracksForBook(CURRENT_BOOK);
     if (!bookTracks) {
       console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot determine Audiobook song.`);
-      hasAudiobookForCurrentBook = false; // Update flag
       isProcessingAudiobookTracks = false;
       return;
     }
-    hasAudiobookForCurrentBook = true;
 
     const foundAudiobookSections = bookTracks
       .filter((section: AudiobookTracksSection) => {

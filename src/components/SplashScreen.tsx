@@ -200,7 +200,7 @@ const SplashScreen = () => {
       setTimeout(() => {
         // Dispatch the event only once with a clear timing after animation completes
         window.dispatchEvent(new CustomEvent("splashHidden"));
-        playAudiobook();
+        playAudiobook(true);
       }, ANIMATION_DURATION_MS);
     } catch (error) {
       console.error("Error during splash screen exit:", error);
@@ -215,7 +215,7 @@ const SplashScreen = () => {
       // Dispatch the event for other components and play audio after a short delay
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent("splashHidden"));
-        playAudiobook();
+        playAudiobook(true);
       }, 100);
     }
   };
@@ -239,7 +239,7 @@ const SplashScreen = () => {
         setTimeout(() => {
           // Check if the event was dispatched externally (not from handleStartClick)
           if (!document.querySelector(".splash-screen--hide")) {
-            playAudiobook();
+            playAudiobook(true);
           }
         }, ANIMATION_DURATION_MS);
       }
