@@ -11,6 +11,7 @@ export type ModalAction =
   | { type: "OPEN_DEEP_RESEARCH_MODAL"; payload: { content?: string; layoutView?: boolean; hideOverlay?: boolean; isLoading?: boolean } }
   | { type: "OPEN_BOOK_CHAPTER_MODAL"; payload: { chapter?: number } }
   | { type: "OPEN_BOOK_MENU_MODAL" }
+  | { type: "EDITOR_MODE_MODAL" }
   | { type: "CLOSE_MODAL" }
   | { type: "SET_SEARCH_QUERY"; payload: { query: string } }
   | { type: "SET_SEARCH_RESULTS"; payload: { results: SearchResultsData } };
@@ -57,6 +58,9 @@ export function modalReducer(state: ModalState, action: ModalAction): ModalState
 
     case "OPEN_BOOK_MENU_MODAL":
       return { ...state, currentModal: { type: "bookMenu" }, searchResults: null, searchQuery: "" };
+
+    case "EDITOR_MODE_MODAL":
+      return { ...state, currentModal: { type: "editorMode" }, searchResults: null, searchQuery: "" };
 
     case "CLOSE_MODAL":
       return { ...state, currentModal: null, searchResults: null, searchQuery: "" };

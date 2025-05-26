@@ -16,6 +16,7 @@ import DeepResearchModal from "@/components/modals/DeepResearchModal";
 import BookChaptersModal from "@/components/modals/BookChaptersModal";
 import BookMenuModal from "@/components/modals/BookMenuModal";
 import { modalReducer, initialModalState } from "./modalReducer";
+import EditorModeModal from "@/components/modals/EditorModeModal";
 
 // Different types of modals the application can display
 export type ModalType =
@@ -23,7 +24,8 @@ export type ModalType =
   | { type: "search"; layoutView?: boolean; hideOverlay?: boolean; query?: string; isLoading?: boolean }
   | { type: "deepResearch"; content?: string; layoutView?: boolean; hideOverlay?: boolean; isLoading?: boolean }
   | { type: "bookChapter"; chapter: number }
-  | { type: "bookMenu" };
+  | { type: "bookMenu" }
+  | { type: "editorMode" };
 
 export interface ModalContextType {
   openCharacterDetailsModal: (slug: string, isVideo: boolean, mediaSrc: string) => void;
@@ -31,6 +33,7 @@ export interface ModalContextType {
   openDeepResearchModal: (content?: string, layoutView?: boolean, hideOverlay?: boolean) => void;
   openBookChapterModal: (chapter?: number) => void;
   openBookMenuModal: () => void;
+  openEditorModeModal: () => void;
   closeModal: () => void;
   currentModal: ModalType | null;
   performSearchInModal: (query: string) => void;
@@ -97,6 +100,10 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
 
   const openBookMenuModal = useCallback(() => {
     dispatch({ type: "OPEN_BOOK_MENU_MODAL" });
+  }, []);
+
+  const openEditorModeModal = useCallback(() => {
+    dispatch({ type: "EDITOR_MODE_MODAL" });
   }, []);
 
   const closeModal = useCallback(() => {
@@ -177,6 +184,10 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
           );
         }
 
+        case "editorMode": {
+          return <EditorModeModal onClose={closeModal} bookData={bookData} />;
+        }
+
         default:
           return null;
       }
@@ -202,6 +213,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
       openDeepResearchModal,
       openBookChapterModal,
       openBookMenuModal,
+      openEditorModeModal,
       closeModal,
       currentModal,
       performSearchInModal,
@@ -214,6 +226,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
       openDeepResearchModal,
       openBookChapterModal,
       openBookMenuModal,
+      openEditorModeModal,
       closeModal,
       currentModal,
       performSearchInModal,

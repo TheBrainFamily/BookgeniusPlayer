@@ -1,9 +1,12 @@
 import { useEffect } from "react";
 import { handleRemoveCharacter } from "@/text-editor-service/listeners/handleRemoveCharacter";
-import { handleEditParagraph } from "@/text-editor-service/listeners/handleEditParagraph";
+// import { handleEditParagraph } from "@/text-editor-service/listeners/handleEditParagraph";
 import { handleAddCharacter } from "@/text-editor-service/listeners/handleAddCharacter";
+import { useModal } from "@/context/ModalContext";
 
 export function useBookContent(htmlContent: string, containerId: string) {
+  const { openEditorModeModal } = useModal();
+
   useEffect(() => {
     const container = document.getElementById(containerId);
     if (container) {
@@ -34,11 +37,13 @@ export function useBookContent(htmlContent: string, containerId: string) {
           }
 
           if (event.metaKey && !event.altKey) {
-            const response = confirm("Are you sure you want to edit this paragraph?");
+            openEditorModeModal();
 
-            if (response) {
-              return handleEditParagraph(chapterNumber, paragraphNumber);
-            }
+            // const response = confirm("Are you sure you want to edit this paragraph?");
+
+            // if (response) {
+            //   return handleEditParagraph(chapterNumber, paragraphNumber);
+            // }
             return;
           }
         }
