@@ -22,7 +22,7 @@ export function useBookContent(htmlContent: string, containerId: string) {
         const paragraphNumber = parseInt(paragraphTag.attributes["data-index"].value);
         const characterTag = target.getAttribute("data-character");
 
-        if (paragraphTag) {
+        if (paragraphTag && !characterTag) {
           if (!event.metaKey && event.altKey) {
             const target = event.target as HTMLElement;
             const response = confirm("Are you sure you want to add the CHARACTER_NAME here?");
