@@ -16,13 +16,13 @@ export function useBookContent(htmlContent: string, containerId: string) {
       const handleClick = async (event: MouseEvent) => {
         const target = event.target as HTMLElement;
 
-        const paragraphTag = target.getAttribute("data-index");
+        const paragraphTag = target.closest("[data-index]");
+        const chapterTag = target.closest("[data-chapter]");
+        const chapterNumber = parseInt((chapterTag as HTMLElement).attributes["data-chapter"].value);
+        const paragraphNumber = parseInt(paragraphTag.attributes["data-index"].value);
         const characterTag = target.getAttribute("data-character");
 
         if (paragraphTag) {
-          const chapterNumber = parseInt((target.parentNode as HTMLElement).attributes["data-chapter"].value);
-          const paragraphNumber = parseInt(target.attributes["data-index"].value);
-
           if (!event.metaKey && event.altKey) {
             const target = event.target as HTMLElement;
             const response = confirm("Are you sure you want to add the CHARACTER_NAME here?");
@@ -44,8 +44,6 @@ export function useBookContent(htmlContent: string, containerId: string) {
         }
 
         if (event.metaKey && !event.altKey && characterTag) {
-          const paragraphNumber = parseInt((target.parentNode as HTMLElement).attributes["data-index"].value);
-          const chapterNumber = parseInt((target.parentNode.parentNode as HTMLElement).attributes["data-chapter"].value);
           const response = confirm(`Are you sure you want to remove ${characterTag}?`);
           if (response) {
             return handleRemoveCharacter(target, chapterNumber, paragraphNumber, characterTag);
