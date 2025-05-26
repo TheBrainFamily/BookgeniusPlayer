@@ -1,20 +1,41 @@
-import React, { createContext, useContext, useState, ReactNode, useMemo } from "react";
+import React, { createContext, useContext, useReducer, useCallback, ReactNode, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
-import CharacterMedia from "@/components/CharacterMedia";
+
 import { useLocation } from "@/state/LocationContext";
 import { useDebounce } from "@/hooks/useDebounce";
+import debounce from "lodash.debounce";
 import { BookData } from "@/booksData/types";
-import { CharacterData } from "@/booksData/types";
+import { performLocalDOMSearch, SearchResultsData } from "@/searchModal";
+import { resetFurthestPageLocation } from "@/helpers/reset-furthest-page-location";
+import { preloadBackgroundTracks } from "@/deal-with-background-songs";
 
-const findLatestSummaryInRange = (character: CharacterData, endChapter: number) => {
-  const latestSummary = character.infoPerChapter
-    .filter((info) => info.chapter <= endChapter)
-    .sort((a, b) => b.chapter - a.chapter)
-    .reverse()[0].summary;
-  return latestSummary;
-};
+// Modal Components
+import CharacterModal from "@/components/modals/CharacterModal";
+import SearchModal from "@/components/modals/SearchModal";
+import DeepResearchModal from "@/components/modals/DeepResearchModal";
+import BookChaptersModal from "@/components/modals/BookChaptersModal";
+import BookMenuModal from "@/components/modals/BookMenuModal";
+import { modalReducer, initialModalState } from "./modalReducer";
+
+// Different types of modals the application can display
+export type ModalType =
+  | { type: "character"; slug: string; isVideo: boolean; mediaSrc: string }
+  | { type: "search"; layoutView?: boolean; hideOverlay?: boolean; query?: string; isLoading?: boolean }
+  | { type: "deepResearch"; content?: string; layoutView?: boolean; hideOverlay?: boolean; isLoading?: boolean }
+  | { type: "bookChapter"; chapter: number }
+  | { type: "bookMenu" };
+
 export interface ModalContextType {
   openCharacterDetailsModal: (slug: string, isVideo: boolean, mediaSrc: string) => void;
+  openSearchModal: (layoutView?: boolean, hideOverlay?: boolean, query?: string) => void;
+  openDeepResearchModal: (content?: string, layoutView?: boolean, hideOverlay?: boolean) => void;
+  openBookChapterModal: (chapter?: number) => void;
+  openBookMenuModal: () => void;
+  closeModal: () => void;
+  currentModal: ModalType | null;
+  performSearchInModal: (query: string) => void;
+  searchQuery: string;
+  searchResults: SearchResultsData | null;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -22,53 +43,189 @@ const ModalContext = createContext<ModalContextType | undefined>(undefined);
 export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }> = ({ children, bookData }) => {
   const { location } = useLocation();
   const debouncedLocation = useDebounce(location, 150);
-  const [modalContent, setModalContent] = useState<{ slug: string; isVideo: boolean; mediaSrc: string } | null>(null);
+  const [state, dispatch] = useReducer(modalReducer, initialModalState);
+  const { currentModal, searchResults, searchQuery } = state;
 
-  const openCharacterDetailsModal = (slug: string, isVideo: boolean, mediaSrc: string) => {
-    setModalContent({ slug, isVideo, mediaSrc });
-  };
+  const openCharacterDetailsModal = useCallback((slug: string, isVideo: boolean, mediaSrc: string) => {
+    dispatch({ type: "OPEN_CHARACTER_MODAL", payload: { slug, isVideo, mediaSrc } });
+  }, []);
 
-  const closeModal = () => {
-    setModalContent(null);
-  };
+  const debouncedPerformSearch = useMemo(
+    () =>
+      debounce((query: string, loc: typeof debouncedLocation) => {
+        if (!query?.trim()) {
+          dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: "Please enter a search term.", items: [], isLoading: false } } });
+          return;
+        }
+
+        const results = performLocalDOMSearch(query, loc);
+        dispatch({ type: "SET_SEARCH_RESULTS", payload: { results } });
+      }, 350),
+    [debouncedLocation],
+  );
+
+  const openSearchModal = useCallback(
+    (layoutView?: boolean, hideOverlay?: boolean, query: string = "") => {
+      dispatch({ type: "OPEN_SEARCH_MODAL", payload: { layoutView, hideOverlay, query, isLoading: true } });
+
+      // Set initial search results with loading state immediately
+      if (query.trim()) {
+        dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: `Searching for "${query}"...`, items: [], isLoading: true } } });
+
+        // Then trigger the actual search
+        setTimeout(() => {
+          debouncedPerformSearch(query, debouncedLocation);
+        }, 0);
+      }
+    },
+    [dispatch, debouncedPerformSearch, debouncedLocation],
+  );
+
+  const openDeepResearchModal = useCallback((content?: string, layoutView?: boolean, hideOverlay?: boolean) => {
+    // First, open with loading state if no content is provided
+    if (!content) {
+      dispatch({ type: "OPEN_DEEP_RESEARCH_MODAL", payload: { content: undefined, layoutView, hideOverlay, isLoading: true } });
+    } else {
+      // When content is provided, show it without loading state
+      dispatch({ type: "OPEN_DEEP_RESEARCH_MODAL", payload: { content, layoutView, hideOverlay, isLoading: false } });
+    }
+  }, []);
+
+  const openBookChapterModal = useCallback((chapter?: number) => {
+    dispatch({ type: "OPEN_BOOK_CHAPTER_MODAL", payload: { chapter } });
+  }, []);
+
+  const openBookMenuModal = useCallback(() => {
+    dispatch({ type: "OPEN_BOOK_MENU_MODAL" });
+  }, []);
+
+  const closeModal = useCallback(() => {
+    dispatch({ type: "CLOSE_MODAL" });
+  }, []);
+
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && currentModal) {
+        closeModal();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscKey);
+
+    return () => {
+      document.removeEventListener("keydown", handleEscKey);
+    };
+  }, [currentModal, closeModal]);
+
+  const performSearchInModal = useCallback(
+    (query: string) => {
+      dispatch({ type: "SET_SEARCH_QUERY", payload: { query } });
+
+      if (query.trim()) {
+        // Set loading state immediately
+        dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: `Searching for "${query}"...`, items: [], isLoading: true } } });
+
+        // Then perform the actual search
+        debouncedPerformSearch(query, debouncedLocation);
+      } else {
+        dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: "Please enter a search term.", items: [], isLoading: false } } });
+      }
+    },
+    [debouncedPerformSearch, debouncedLocation, dispatch],
+  );
 
   const range = useMemo(
     () => ({ chapter: debouncedLocation.chapter, paragraph: debouncedLocation.paragraph, endChapter: debouncedLocation.endChapter, endParagraph: debouncedLocation.endParagraph }),
     [debouncedLocation.chapter, debouncedLocation.paragraph, debouncedLocation.endChapter, debouncedLocation.endParagraph],
   );
 
-  const matchingCharacter = bookData?.charactersData.find((character) => character.slug === modalContent?.slug);
+  const getModalContent = useCallback(
+    (modal: ModalType) => {
+      switch (modal.type) {
+        case "character": {
+          const matchingCharacter = bookData?.charactersData.find((character) => character.slug === modal.slug);
+          if (!matchingCharacter) return null;
+
+          return <CharacterModal onClose={closeModal} isVideo={modal.isVideo} mediaSrc={modal.mediaSrc} matchingCharacter={matchingCharacter} endChapter={range.endChapter} />;
+        }
+
+        case "search":
+          return (
+            <SearchModal
+              onClose={closeModal}
+              layoutView={modal.layoutView}
+              hideOverlay={modal.hideOverlay}
+              searchResults={searchResults || { header: "Enter search query...", items: [], isLoading: modal.isLoading || false }}
+            />
+          );
+
+        case "deepResearch":
+          return <DeepResearchModal onClose={closeModal} content={modal.content} layoutView={modal.layoutView} hideOverlay={modal.hideOverlay} isLoading={modal.isLoading} />;
+
+        case "bookChapter":
+          return <BookChaptersModal open={true} onClose={closeModal} bookData={bookData} />;
+
+        case "bookMenu": {
+          return (
+            <BookMenuModal
+              onClose={closeModal}
+              bookData={bookData}
+              openBookChapterModal={openBookChapterModal}
+              preloadBackgroundTracks={preloadBackgroundTracks}
+              resetFurthestPageLocation={resetFurthestPageLocation}
+            />
+          );
+        }
+
+        default:
+          return null;
+      }
+    },
+    [bookData, closeModal, range, searchResults, openBookChapterModal],
+  );
+
+  const renderModal = useCallback(() => {
+    if (!currentModal) return null;
+
+    const modalContent = getModalContent(currentModal);
+    if (!modalContent) return null;
+
+    return createPortal(modalContent, document.body);
+  }, [currentModal, getModalContent]);
+
+  // Memoize the context value to prevent unnecessary re-renders
+  // ToDO: Is there a better way to do this?
+  const contextValue = useMemo(
+    () => ({
+      openCharacterDetailsModal,
+      openSearchModal,
+      openDeepResearchModal,
+      openBookChapterModal,
+      openBookMenuModal,
+      closeModal,
+      currentModal,
+      performSearchInModal,
+      searchQuery,
+      searchResults,
+    }),
+    [
+      openCharacterDetailsModal,
+      openSearchModal,
+      openDeepResearchModal,
+      openBookChapterModal,
+      openBookMenuModal,
+      closeModal,
+      currentModal,
+      performSearchInModal,
+      searchQuery,
+      searchResults,
+    ],
+  );
 
   return (
-    <ModalContext.Provider value={{ openCharacterDetailsModal }}>
+    <ModalContext.Provider value={contextValue}>
       {children}
-      {modalContent &&
-        createPortal(
-          <div className="modal-overlay active bg-black items-center justify-center" onClick={closeModal}>
-            <div className="bg-transparent flex h-full items-center justify-center">
-              <div className="flex flex-row lg:flex-col gap-4 max-w-full lg:max-w-120 max-h-full">
-                <div className="rounded-full overflow-hidden max-h-[90vh] max-w-[90vh] lg:max-h-120 lg:max-w-120 border-4 border-[var(--entity-highlight-border-light)] aspect-square">
-                  <CharacterMedia
-                    mediaSrc={modalContent.mediaSrc}
-                    isVideo={modalContent.isVideo}
-                    canonicalName={matchingCharacter.slug}
-                    commonAttrs={{
-                      "data-original-src": modalContent.mediaSrc,
-                      "data-character-name": matchingCharacter.characterName,
-                      "data-summary": findLatestSummaryInRange(matchingCharacter, range.endChapter),
-                      className: "w-full h-full object-cover",
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col self-center p-4 rounded-lg bg-[var(--entity-highlight-bg-light)] border-2 border-[var(--entity-highlight-border-light)]">
-                  <h4 className="italic font-bold text-center">{matchingCharacter.characterName}</h4>
-                  <p className="text-center" dangerouslySetInnerHTML={{ __html: findLatestSummaryInRange(matchingCharacter, range.endChapter) }} />
-                </div>
-              </div>
-            </div>
-          </div>,
-          document.body,
-        )}
+      {renderModal()}
     </ModalContext.Provider>
   );
 };
@@ -78,5 +235,6 @@ export const useModal = (): ModalContextType => {
   if (context === undefined) {
     throw new Error("useModal must be used within a ModalProvider");
   }
+
   return context;
 };
