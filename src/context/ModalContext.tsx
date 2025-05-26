@@ -25,7 +25,7 @@ export type ModalType =
   | { type: "deepResearch"; content?: string; layoutView?: boolean; hideOverlay?: boolean; isLoading?: boolean }
   | { type: "bookChapter"; chapter: number }
   | { type: "bookMenu" }
-  | { type: "editorMode" };
+  | { type: "editorMode"; modalType: "edit-paragraph" | "add-character" | "remove-character"; onSubmit: (characterSlug?: string) => Promise<void> };
 
 export interface ModalContextType {
   openCharacterDetailsModal: (slug: string, isVideo: boolean, mediaSrc: string) => void;
@@ -33,7 +33,7 @@ export interface ModalContextType {
   openDeepResearchModal: (content?: string, layoutView?: boolean, hideOverlay?: boolean) => void;
   openBookChapterModal: (chapter?: number) => void;
   openBookMenuModal: () => void;
-  openEditorModeModal: () => void;
+  openEditorModeModal: (modalType: "edit-paragraph" | "add-character" | "remove-character", onSubmit: (characterSlug?: string) => Promise<void>) => void;
   closeModal: () => void;
   currentModal: ModalType | null;
   performSearchInModal: (query: string) => void;
@@ -102,8 +102,8 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
     dispatch({ type: "OPEN_BOOK_MENU_MODAL" });
   }, []);
 
-  const openEditorModeModal = useCallback(() => {
-    dispatch({ type: "EDITOR_MODE_MODAL" });
+  const openEditorModeModal = useCallback((modalType: "edit-paragraph" | "add-character" | "remove-character", onSubmit: (characterSlug?: string) => Promise<void>) => {
+    dispatch({ type: "EDITOR_MODE_MODAL", payload: { modalType, onSubmit } });
   }, []);
 
   const closeModal = useCallback(() => {

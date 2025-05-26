@@ -3,6 +3,7 @@ import { handleRemoveCharacter } from "@/text-editor-service/listeners/handleRem
 // import { handleEditParagraph } from "@/text-editor-service/listeners/handleEditParagraph";
 import { handleAddCharacter } from "@/text-editor-service/listeners/handleAddCharacter";
 import { useModal } from "@/context/ModalContext";
+import { handleEditParagraph } from "@/text-editor-service/listeners/handleEditParagraph";
 
 export function useBookContent(htmlContent: string, containerId: string) {
   const { openEditorModeModal } = useModal();
@@ -27,33 +28,16 @@ export function useBookContent(htmlContent: string, containerId: string) {
 
         if (paragraphTag && !characterTag) {
           if (!event.metaKey && event.altKey) {
-            const target = event.target as HTMLElement;
-            const response = confirm("Are you sure you want to add the CHARACTER_NAME here?");
-
-            if (response) {
-              return handleAddCharacter(target, chapterNumber, paragraphNumber);
-            }
-            return;
+            return openEditorModeModal("add-character", (characterSlug: string) => handleAddCharacter(target, chapterNumber, paragraphNumber, characterSlug));
           }
 
           if (event.metaKey && !event.altKey) {
-            openEditorModeModal();
-
-            // const response = confirm("Are you sure you want to edit this paragraph?");
-
-            // if (response) {
-            //   return handleEditParagraph(chapterNumber, paragraphNumber);
-            // }
-            return;
+            return openEditorModeModal("edit-paragraph", () => handleEditParagraph(chapterNumber, paragraphNumber));
           }
         }
 
         if (event.metaKey && !event.altKey && characterTag) {
-          const response = confirm(`Are you sure you want to remove ${characterTag}?`);
-          if (response) {
-            return handleRemoveCharacter(target, chapterNumber, paragraphNumber, characterTag);
-          }
-          return;
+          return openEditorModeModal("remove-character", () => handleRemoveCharacter(target, chapterNumber, paragraphNumber, characterTag));
         }
       };
 

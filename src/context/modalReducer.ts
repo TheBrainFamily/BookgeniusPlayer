@@ -11,7 +11,7 @@ export type ModalAction =
   | { type: "OPEN_DEEP_RESEARCH_MODAL"; payload: { content?: string; layoutView?: boolean; hideOverlay?: boolean; isLoading?: boolean } }
   | { type: "OPEN_BOOK_CHAPTER_MODAL"; payload: { chapter?: number } }
   | { type: "OPEN_BOOK_MENU_MODAL" }
-  | { type: "EDITOR_MODE_MODAL" }
+  | { type: "EDITOR_MODE_MODAL"; payload: { modalType: "edit-paragraph" | "add-character" | "remove-character"; onSubmit: (characterSlug?: string) => Promise<void> } }
   | { type: "CLOSE_MODAL" }
   | { type: "SET_SEARCH_QUERY"; payload: { query: string } }
   | { type: "SET_SEARCH_RESULTS"; payload: { results: SearchResultsData } };
@@ -60,7 +60,7 @@ export function modalReducer(state: ModalState, action: ModalAction): ModalState
       return { ...state, currentModal: { type: "bookMenu" }, searchResults: null, searchQuery: "" };
 
     case "EDITOR_MODE_MODAL":
-      return { ...state, currentModal: { type: "editorMode" }, searchResults: null, searchQuery: "" };
+      return { ...state, currentModal: { type: "editorMode", modalType: action.payload.modalType, onSubmit: action.payload.onSubmit }, searchResults: null, searchQuery: "" };
 
     case "CLOSE_MODAL":
       return { ...state, currentModal: null, searchResults: null, searchQuery: "" };
