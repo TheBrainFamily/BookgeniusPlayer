@@ -926,10 +926,13 @@
 .character-highlighted-activated {
   border: 1px dashed gray;
   border-radius: 0.375rem;
-  padding: 0.25rem;
+  padding-right: 0.25rem;
+  padding-left: 0.25rem;
+  text-indent: 0;
   background-color: rgba(255, 250, 240, 0.5);
   cursor: pointer;
-  white-space: nowrap;
+  display: inline-block;
+  line-height: 1.5rem;
 }
 
 h3[data-index="0"] {
