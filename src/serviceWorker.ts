@@ -68,7 +68,7 @@ export const dealWithSW = () => {
             console.log("dealWithBackgroundSongs after");
             splash.classList.add("splash--hide");
             window.dispatchEvent(new CustomEvent("splashHidden"));
-            playAudiobook();
+            playAudiobook(true);
           } else {
             console.error("Failed to initialize audio context");
             // Still proceed with UI to ensure user isn't stuck

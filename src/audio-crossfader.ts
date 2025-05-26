@@ -30,6 +30,11 @@ let masterGainNode: GainNode | null = null;
 let backgroundGainNode: GainNode | null = null;
 let audiobookGainNode: GainNode | null = null;
 
+// localStorage keys used by AudioPlayer.tsx via useLocalStorageState
+const LS_VOLUME_KEY = "volume";
+const LS_BALANCE_KEY = "balance";
+const LS_MUTED_KEY = "isMuted";
+
 let currentTrackId: string | null = null;
 let nextTrackId: string | null = null; // Track being faded TO (during active crossfade)
 let isTransitioning = false; // Is a crossfade actively happening?
@@ -75,15 +80,37 @@ export async function initAudioContext(): Promise<boolean> {
 
       // Create master gain node
       masterGainNode = audioContext.createGain();
-      masterGainNode.gain.value = 1.0; // Default volume: 100%
-
       // Create separate gain nodes for background music and audiobook
       backgroundGainNode = audioContext.createGain();
       audiobookGainNode = audioContext.createGain();
 
-      // Set default volumes (50/50 split)
-      backgroundGainNode.gain.value = 0.5;
-      audiobookGainNode.gain.value = 0.5;
+      // --- Initialize volume, balance, and mute state from localStorage ---
+      const defaultVolume = 0.5;
+      const defaultBalance = 0.5;
+      // useLocalStorageState stores booleans as "true" or "false" strings
+      const defaultIsMutedSerialized = "false";
+
+      const storedVolumeStr = localStorage.getItem(LS_VOLUME_KEY);
+      const storedBalanceStr = localStorage.getItem(LS_BALANCE_KEY);
+      const storedMutedStr = localStorage.getItem(LS_MUTED_KEY);
+
+      let initialVolume = storedVolumeStr !== null ? parseFloat(storedVolumeStr) : defaultVolume;
+      if (isNaN(initialVolume)) initialVolume = defaultVolume;
+
+      let initialBalance = storedBalanceStr !== null ? parseFloat(storedBalanceStr) : defaultBalance;
+      if (isNaN(initialBalance)) initialBalance = defaultBalance;
+
+      // Ensure values are within the expected 0-1 range
+      initialVolume = Math.max(0, Math.min(1, initialVolume));
+      initialBalance = Math.max(0, Math.min(1, initialBalance));
+
+      const isInitiallyMuted = (storedMutedStr !== null ? storedMutedStr : defaultIsMutedSerialized) === "true";
+
+      // Set initial gains based on localStorage values
+      masterGainNode.gain.value = isInitiallyMuted ? 0 : initialVolume;
+      backgroundGainNode.gain.value = initialBalance;
+      audiobookGainNode.gain.value = 1.0 - initialBalance;
+      // --- End of localStorage initialization ---
 
       // Connect both to master gain
       backgroundGainNode.connect(masterGainNode);

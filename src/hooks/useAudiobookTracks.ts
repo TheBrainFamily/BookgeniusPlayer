@@ -16,27 +16,48 @@ if (import.meta.hot) {
   });
 }
 
-let shouldPlayAudiobook = false;
-export function useAudiobookTracks() {
-  const { location } = useLocation();
+const IS_PLAYING_AUDIO_BOOK_KEY = "isPlayingAudioBook";
 
+export function useAudiobookTracks() {
+  // Read the localStorage setting ONCE when the hook initializes.
+  const initialIsPlayingAudioBookSetting = localStorage.getItem(IS_PLAYING_AUDIO_BOOK_KEY);
+  const { location } = useLocation();
   const { currentChapter, currentParagraph } = useDebounce(location, 300);
 
   useEffect(() => {
-    if (shouldPlayAudiobook) {
+    // This effect runs on chapter/paragraph change. Only start audiobook playback
+    // if the INITIAL setting from localStorage (when the component/hook was first set up)
+    // was explicitly "true". This prevents it from starting if the user had it off.
+    if (initialIsPlayingAudioBookSetting === "true") {
       implRef.current({ currentChapter, currentParagraph });
     }
-  }, [currentChapter, currentParagraph]);
+  }, [currentChapter, currentParagraph, initialIsPlayingAudioBookSetting]); // Added initialIsPlayingAudioBookSetting to dependencies
 }
 
-export const playAudiobook = () => {
-  shouldPlayAudiobook = true;
+export const playAudiobook = (getSavedState: boolean = false) => {
+  const currentPlayStateFromStorage = localStorage.getItem(IS_PLAYING_AUDIO_BOOK_KEY);
+  if (getSavedState) {
+    // When called with getSavedState: true (e.g., on initial load via dealWithSW)
+    // Only proceed if localStorage is EXPLICITLY "true".
+    if (currentPlayStateFromStorage !== "true") {
+      console.log(`PONTON playAudiobook (getSavedState=true): Not playing because localStorage is not "true". Value: "${currentPlayStateFromStorage}"`);
+      return;
+    }
+    // If currentPlayStateFromStorage is "true", fall through to play.
+    console.log('PONTON playAudiobook (getSavedState=true): Proceeding to play because localStorage is "true".');
+  } else {
+    // When called with getSavedState: false (e.g., user manually clicks play button)
+    // Set localStorage to "true" and play.
+    console.log('PONTON playAudiobook (getSavedState=false): User action, setting localStorage to "true" and playing.');
+    localStorage.setItem(IS_PLAYING_AUDIO_BOOK_KEY, "true");
+  }
+
   const { currentChapter, currentParagraph } = getCurrentLocation();
   implRef.current({ currentChapter, currentParagraph });
 };
 
 export const stopAudiobook = () => {
-  shouldPlayAudiobook = false;
+  localStorage.setItem(IS_PLAYING_AUDIO_BOOK_KEY, "false");
   stopAllTracks();
 };
 

@@ -22,19 +22,20 @@ import {
 } from "@/audio-crossfader";
 import { stopAudiobook, playAudiobook } from "@/hooks/useAudiobookTracks";
 import { dealWithBackgroundSongs } from "@/deal-with-background-songs";
-import { hasAudiobookForCurrentBook } from "@/deal-with-audiobook-playback";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { CURRENT_BOOK } from "@/consts";
+import useLocalStorageState from "use-local-storage-state";
+import { getAudiobookTracksForBook } from "@/getAudiobookTracksForBook";
 
 const AudioPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isPlayingAudioBook, setIsPlayingAudiobook] = useState(true);
+  const [isPlayingAudioBook, setIsPlayingAudiobook] = useLocalStorageState("isPlayingAudioBook", { defaultValue: true });
   const [currentTime, setCurrentTime] = useState(0);
-  const [volume, setVolume] = useState(getMasterVolume() ?? 0.5);
-  const [balance, setBalance] = useState(0.5);
-  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useLocalStorageState("volume", { defaultValue: getMasterVolume() ?? 0.5 });
+  const [balance, setBalance] = useLocalStorageState("balance", { defaultValue: 0.5 });
+  const [isMuted, setIsMuted] = useLocalStorageState("isMuted", { defaultValue: false });
   const [isVolumeHovered, setIsVolumeHovered] = useState(false);
   const [isBigPlayerHovered, setIsBigPlayerHovered] = useState(false);
   const [currentTrackData, setCurrentTrackData] = useState<TrackState | null>(null);
@@ -42,6 +43,7 @@ const AudioPlayer = () => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1920);
   const [playlistTracks, setPlaylistTracks] = useState<{ id: string; title: string; duration: number }[]>([]);
   const [currentTrackIdFromState, setCurrentTrackIdFromState] = useState<string | null>(null);
+  const hasAudiobookForCurrentBook = !!getAudiobookTracksForBook(CURRENT_BOOK).length;
 
   const togglePlay = () => {
     if (isPlaying) {
