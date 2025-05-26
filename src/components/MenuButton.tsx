@@ -18,4 +18,4 @@ const MenuButton = () => {
 
 export default MenuButton;
 
-const buttonVariants: Variants = { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)" }, tap: { scale: 0.9 } };
+const buttonVariants: Variants = { hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)" }, tap: { scale: 0.9 } };
