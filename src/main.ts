@@ -52,17 +52,15 @@ export async function runLegacyInit() {
     const hideOptionalElements = () => {
       const optionalElements = document.querySelectorAll(".optional-element");
       optionalElements.forEach((element) => {
-        (element as HTMLElement).style.transition = "filter 8s ease-in, opacity 8s ease-in";
-        (element as HTMLElement).style.filter = "blur(10px)";
+        (element as HTMLElement).style.transition = "opacity 8s ease-in";
         (element as HTMLElement).style.opacity = "0";
       });
     };
 
     const showOptionalElements = () => {
-      const optionalElements = document.querySelectorAll(".optional-element[style*='filter: blur(10px)'], .optional-element[style*='opacity: 0']");
+      const optionalElements = document.querySelectorAll(".optional-element[style*='opacity: 0']");
       optionalElements.forEach((element) => {
-        (element as HTMLElement).style.transition = "filter 1s ease-out, opacity 1s ease-out";
-        (element as HTMLElement).style.filter = "blur(0px)";
+        (element as HTMLElement).style.transition = "opacity 1s ease-out";
         (element as HTMLElement).style.opacity = "1";
       });
     };

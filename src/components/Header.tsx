@@ -31,4 +31,4 @@ const Header = () => {
 
 export default Header;
 
-const headerVariants: Variants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 2, delay: 2.5 } } };
+const headerVariants: Variants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 4, delay: 2 } } };

@@ -324,7 +324,7 @@ const SplashScreen = () => {
                     boxShadow: ["0 0 0px rgba(255,255,255,0.0)", "0 0 15px rgba(255,255,255,0.3)", "0 0 0px rgba(255,255,255,0.0)"],
                     borderColor: ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.4)", "rgba(255,255,255,0.2)"],
                   }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 />
               )}
             </motion.button>
