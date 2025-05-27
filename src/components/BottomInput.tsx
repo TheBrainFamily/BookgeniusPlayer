@@ -370,17 +370,14 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                             whileHover={!isRecording ? "hover" : undefined}
                             whileTap={!isRecording ? "tap" : undefined}
                             variants={buttonVariants}
-                            onPointerDown={(e) => {
-                              if (e.pointerType === "touch") e.preventDefault();
+                            onClick={() => {
+                              if (isRecording) {
+                                setIsRecording(false);
+                                handleRecordingEnd();
+                              }
+                              setIsRecording(true);
                               handleRecordingStart();
                             }}
-                            onPointerUp={() => {
-                              if (isRecording) handleRecordingEnd();
-                            }}
-                            onPointerLeave={() => {
-                              if (isRecording) handleRecordingEnd();
-                            }}
-                            onContextMenu={(e) => e.preventDefault()}
                             disabled={isThinking}
                           >
                             <Mic size={18} />
