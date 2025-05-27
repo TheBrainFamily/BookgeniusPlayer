@@ -95,7 +95,7 @@ export const KrolowaSnieguCharactersData = [
         chapter: 3,
         summary:
           "Dziewczynka mieszkająca na poddaszu w starym mieście, sąsiadka i przyjaciółka Kaja, z którym kochała się jak siostra z bratem. Bawiła się z nim w małym ogródku na dachu.",
-        paragraphsWhereSpotted: [1, 3, 5, 8, 10, 15, 16, 18, 20, 21, 25, 27, 29, 30, 32, 33, 35, 37, 40, 44, 46],
+        paragraphsWhereSpotted: [1, 3, 8, 10, 15, 16, 18, 20, 21, 25, 27, 29, 30, 32, 33, 35, 37, 40, 44, 46],
         paragraphsWhereTalking: [5, 8, 11, 13, 20, 38, 40, 42, 46],
       },
       {

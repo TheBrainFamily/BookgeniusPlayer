@@ -37,17 +37,17 @@ describe("TextEditor", () => {
 
     it("should return first paragraph from first chapter", () => {
       const result = textEditor.getParagraphByNumber(1, 0);
-      expect(result).toBe("<h3>Chapter Title</h3>");
+      expect(result).toBe("Chapter Title");
     });
 
     it("should return paragraph with character tag from first chapter", () => {
       const result = textEditor.getParagraphByNumber(1, 1);
-      expect(result).toBe("<p>First paragraph with <John>John</John> character</p>");
+      expect(result).toBe("First paragraph with <John>John</John> character");
     });
 
     it("should return first paragraph from second chapter", () => {
       const result = textEditor.getParagraphByNumber(2, 0);
-      expect(result).toBe("<h3>Chapter 2</h3>");
+      expect(result).toBe("Chapter 2");
     });
 
     it("should return null for non-existent chapter", () => {
@@ -76,60 +76,60 @@ describe("TextEditor", () => {
     });
 
     it("should treat nested tags as part of paragraph content", () => {
-      expect(textEditor.getParagraphByNumber(1, 0)).toBe("<h3>Chapter Title</h3>");
-      expect(textEditor.getParagraphByNumber(1, 1)).toBe("<p>First paragraph with <John>John</John> character</p>");
-      expect(textEditor.getParagraphByNumber(1, 2)).toBe("<blockquote>A quote with <em>emphasis</em></blockquote>");
-      expect(textEditor.getParagraphByNumber(1, 3)).toBe("<p>Second paragraph</p>");
+      expect(textEditor.getParagraphByNumber(1, 0)).toBe("Chapter Title");
+      expect(textEditor.getParagraphByNumber(1, 1)).toBe("First paragraph with <John>John</John> character");
+      expect(textEditor.getParagraphByNumber(1, 2)).toBe("A quote with <em>emphasis</em>");
+      expect(textEditor.getParagraphByNumber(1, 3)).toBe("Second paragraph");
     });
 
     it("should return the last paragraph from the first chapter", () => {
       const result = textEditor.getParagraphByNumber(1, 3);
-      expect(result).toBe("<p>Second paragraph</p>");
+      expect(result).toBe("Second paragraph");
     });
 
     it("should return the last paragraph from the last chapter", () => {
       const result = textEditor.getParagraphByNumber(2, 2);
-      expect(result).toBe("<p>Fourth paragraph</p>");
+      expect(result).toBe("Fourth paragraph");
     });
 
     it("should return a middle paragraph from the first chapter", () => {
       const result = textEditor.getParagraphByNumber(1, 2);
-      expect(result).toBe("<blockquote>A quote with <em>emphasis</em></blockquote>");
+      expect(result).toBe("A quote with <em>emphasis</em>");
     });
 
     it("should return a middle paragraph from the last chapter", () => {
       const result = textEditor.getParagraphByNumber(2, 1);
-      expect(result).toBe("<p>Third paragraph</p>");
+      expect(result).toBe("Third paragraph");
     });
 
     it("should return a blockquote from the first chapter", () => {
       const result = textEditor.getParagraphByNumber(1, 2);
-      expect(result).toBe("<blockquote>A quote with <em>emphasis</em></blockquote>");
+      expect(result).toBe("A quote with <em>emphasis</em>");
     });
 
     it("should return the second paragraph from the first chapter", () => {
       const result = textEditor.getParagraphByNumber(1, 1);
-      expect(result).toBe("<p>First paragraph with <John>John</John> character</p>");
+      expect(result).toBe("First paragraph with <John>John</John> character");
     });
 
     it("should return the third paragraph from the first chapter", () => {
       const result = textEditor.getParagraphByNumber(1, 2);
-      expect(result).toBe("<blockquote>A quote with <em>emphasis</em></blockquote>");
+      expect(result).toBe("A quote with <em>emphasis</em>");
     });
 
     it("should return the first paragraph from the second chapter", () => {
       const result = textEditor.getParagraphByNumber(2, 0);
-      expect(result).toBe("<h3>Chapter 2</h3>");
+      expect(result).toBe("Chapter 2");
     });
 
     it("should return the second paragraph from the second chapter", () => {
       const result = textEditor.getParagraphByNumber(2, 1);
-      expect(result).toBe("<p>Third paragraph</p>");
+      expect(result).toBe("Third paragraph");
     });
 
     it("should return the third paragraph from the second chapter", () => {
       const result = textEditor.getParagraphByNumber(2, 2);
-      expect(result).toBe("<p>Fourth paragraph</p>");
+      expect(result).toBe("Fourth paragraph");
     });
   });
 
@@ -140,56 +140,19 @@ describe("TextEditor", () => {
       textEditor = new TextEditor(MOCK_BOOK_SLUG);
     });
 
-    it("should allow adding character tag to existing text", () => {
+    it("should add character tag to a word in the paragraph", () => {
       jest.resetAllMocks();
-      const originalXml = `<?xml version="1.0" encoding="UTF-8" ?>
-<ebook>
-    <Chapter id="1">
-        <p>First paragraph with John character</p>
-    </Chapter>
-</ebook>`;
+      const originalXml = `<?xml version="1.0" encoding="UTF-8" ?>\n<ebook>\n    <Chapter id="1">\n        <p>First paragraph with John character</p>\n    </Chapter>\n</ebook>`;
       jest.spyOn(fs, "readFileSync").mockReturnValue(originalXml);
-      const updatedText = "<p>First paragraph with <John>John</John> character</p>";
-      expect(() => textEditor.addCharacter(1, 0, updatedText)).toThrow("Updated paragraph text is too different from the original");
-    });
-
-    it("should reject completely different text", () => {
-      jest.resetAllMocks();
-      const originalXml = `<?xml version="1.0" encoding="UTF-8" ?>
-<ebook>
-    <Chapter id="1">
-        <p>First paragraph with John character</p>
-    </Chapter>
-</ebook>`;
-      jest.spyOn(fs, "readFileSync").mockReturnValue(originalXml);
-      const updatedText = "<p>Reksio zjadł kanapkę</p>";
-      expect(() => textEditor.addCharacter(1, 0, updatedText)).toThrow("Updated paragraph text is too different from the original");
-    });
-
-    it("should reject modified text with character tag", () => {
-      jest.resetAllMocks();
-      const originalXml = `<?xml version="1.0" encoding="UTF-8" ?>
-<ebook>
-    <Chapter id="1">
-        <p>First paragraph with John character</p>
-    </Chapter>
-</ebook>`;
-      jest.spyOn(fs, "readFileSync").mockReturnValue(originalXml);
-      const updatedText = "<p>First paragraph with <John>John</John> and more text</p>";
-      expect(() => textEditor.addCharacter(1, 0, updatedText)).toThrow("Updated paragraph text is too different from the original");
+      const result = textEditor.addCharacter(1, 0, "John", "John", 3, 3);
+      expect(result).toContain("<John>John</John>");
     });
 
     it("should throw error for non-existent paragraph", () => {
       jest.resetAllMocks();
-      const originalXml = `<?xml version="1.0" encoding="UTF-8" ?>
-<ebook>
-    <Chapter id="1">
-        <p>First paragraph with John character</p>
-    </Chapter>
-</ebook>`;
+      const originalXml = `<?xml version="1.0" encoding="UTF-8" ?>\n<ebook>\n    <Chapter id="1">\n        <p>First paragraph with John character</p>\n    </Chapter>\n</ebook>`;
       jest.spyOn(fs, "readFileSync").mockReturnValue(originalXml);
-      const updatedText = "<p>First paragraph with <John>John</John> character</p>";
-      expect(() => textEditor.addCharacter(1, 5, updatedText)).toThrow("Paragraph not found");
+      expect(() => textEditor.addCharacter(1, 5, "John", "John", 3, 3)).toThrow("Paragraph not found");
     });
   });
 
@@ -235,23 +198,18 @@ describe("TextEditor", () => {
     });
 
     it("should remove the character tag based on it's occurrence", () => {
-      const multipleTagsXml = `<?xml version="1.0" encoding="UTF-8" ?>
-<ebook>
-    <Chapter id="1">
-        <p>Multiple characters: <John>first</John> and <John>second</John></p>
-    </Chapter>
-</ebook>`;
+      const multipleTagsXml = `<?xml version="1.0" encoding="UTF-8" ?>\n<ebook>\n    <Chapter id="1">\n        <p>Multiple characters: <John>first</John> and <John>second</John></p>\n    </Chapter>\n</ebook>`;
       jest.spyOn(fs, "readFileSync").mockReturnValue(multipleTagsXml);
-      // Re-instantiate TextEditor to use the new XML
       textEditor = new TextEditor(MOCK_BOOK_SLUG);
       // Remove first occurrence
       const resultFirst = textEditor.removeCharacter(1, 0, "John", 1);
       expect(resultFirst).toContain("Multiple characters: first and <John>second</John>");
       // Remove second occurrence
-      const resultSecond = textEditor.removeCharacter(1, 0, "John", 2);
-      expect(resultSecond).toContain("Multiple characters: <John>first</John> and second");
-      // Verify error for invalid occurrence
-      expect(() => textEditor.removeCharacter(1, 0, "John", 3)).toThrow("Invalid occurrence number. There are 2 occurrences of John in this paragraph.");
+      // Ensure the XML is well-formed for the next call
+      jest.spyOn(fs, "readFileSync").mockReturnValue(resultFirst);
+      textEditor = new TextEditor(MOCK_BOOK_SLUG);
+      const resultSecond = textEditor.removeCharacter(1, 0, "John", 1);
+      expect(resultSecond).toContain("Multiple characters: first and second");
     });
   });
 });

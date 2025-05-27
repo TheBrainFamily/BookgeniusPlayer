@@ -5,7 +5,6 @@ import { DOMParser } from "@xmldom/xmldom";
 import { TextEditor } from "@/data/tools/Text-Editor/text-editor";
 
 const BOOK_SLUG = CURRENT_BOOK;
-// process.env.VISUAL = 'code --wait' // you can define anything you want
 
 const questions = {
   askAboutChapter: (chapters: { id: string; title: string }[]) => ({
@@ -22,7 +21,6 @@ const questions = {
     choices: paragraphs.map((paragraph) => ({ name: `${paragraph.id}. ${paragraph.text}`, value: paragraph.id })),
     loop: false,
   }),
-  editParagraph: (paragraphText: string) => ({ type: "editor", name: "editParagraph", message: "Edit the paragraph as you want:", default: paragraphText }),
 } as const;
 
 (async () => {
@@ -45,15 +43,7 @@ const questions = {
 
   const chosenParagraph = paragraphs[paragraph];
 
-  const { editParagraph } = await inquirer.prompt(questions.editParagraph(chosenParagraph.text) as never);
-
-  if (chosenParagraph.text === editParagraph) {
-    console.log("Content has not been changed, process exit...");
-    process.exit(0);
-  }
-
   const textEditor = new TextEditor(BOOK_SLUG);
 
-  textEditor.addCharacter(chapter, chosenParagraph.id, editParagraph);
-  // textEditor.removeCharacter(chapter, chosenParagraph.id, "Kaj", 1);
+  await textEditor.editParagraph(chapter, chosenParagraph.id);
 })();

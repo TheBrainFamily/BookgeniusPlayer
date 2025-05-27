@@ -24,6 +24,7 @@ import CharacterNotesPanel from "./components/CharacterNotesPanel";
 import ContentContainerWrapper from "./components/ContentContainerWrapper";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { EditorMode } from "@/components/EditorMode";
 
 function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
   /* Inject book content first */
@@ -48,6 +49,7 @@ function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
       <ContentContainerWrapper />
       <RightNotesPanel />
       <Footer />
+      {import.meta.env.VITE_EDITOR === "true" && <EditorMode />}
     </>
   );
 }

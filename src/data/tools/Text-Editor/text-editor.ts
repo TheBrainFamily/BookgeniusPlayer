@@ -1,126 +1,130 @@
 import { BOOK_SLUGS } from "@/consts";
-import { DOMParser } from "@xmldom/xmldom";
-import fs from "fs";
-import { xmlToComplexHtml } from "@/data/xmlToComplexHtml";
+import { XmlManager } from "./xml-manager";
+import { FileManager } from "./file-manager";
+import { EditorManager } from "./editor-manager";
+import { extractWords } from "@/utils/extractWords";
 
 export class TextEditor {
-  private readonly bookXml: string;
+  private readonly fileManager: FileManager;
 
   constructor(private readonly bookSlug: BOOK_SLUGS) {
-    this.bookSlug = bookSlug;
-    this.bookXml = this.getBookXml();
-  }
-
-  private getBookXml() {
-    return fs.readFileSync(`./src/data/${this.bookSlug}-chapters.xml`, "utf8");
-  }
-
-  private regenerateXml(xmlString: string) {
-    const htmlString = xmlToComplexHtml(xmlString, this.bookSlug);
-    fs.writeFileSync(`./src/data/chapters-${this.bookSlug}.ts`, `export const ${this.bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlString}</section>\`;`);
-  }
-
-  private isSimilarParagraph(original: string, updated: string): boolean {
-    // Use DOMParser to extract text content from both strings
-    const parser = new DOMParser();
-    const getTextContent = (str: string) => {
-      const doc = parser.parseFromString(str, "text/xml");
-      return doc.documentElement && doc.documentElement.textContent ? doc.documentElement.textContent.trim() : "";
-    };
-
-    const originalText = getTextContent(original);
-    const updatedText = getTextContent(updated);
-
-    // Check if the text content is the same
-    return originalText === updatedText;
-  }
-
-  public addCharacter(chapterNumber: number, paragraphNumber: number, updatedParagraphText: string) {
-    const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
-
-    if (!originalParagraph) {
-      throw new Error("Paragraph not found");
-    }
-
-    if (!this.isSimilarParagraph(originalParagraph, updatedParagraphText)) {
-      throw new Error("Updated paragraph text is too different from the original");
-    }
-
-    const updatedXml = this.bookXml.replace(originalParagraph, updatedParagraphText);
-    this.regenerateXml(updatedXml);
-    fs.writeFileSync(`./src/data/${this.bookSlug}-chapters.xml`, updatedXml, "utf-8");
-    return updatedXml;
+    this.fileManager = new FileManager(bookSlug);
   }
 
   public getParagraphByNumber(chapterNumber: number, paragraphNumber: number): string | null {
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(this.bookXml, "text/xml");
+    const xmlDoc = XmlManager.parseXml(this.fileManager.readXmlFile());
+    const chapter = XmlManager.getChapter(xmlDoc, chapterNumber);
 
-    const chapters = xmlDoc.getElementsByTagName("Chapter");
-
-    if (chapterNumber <= 0 || chapterNumber > chapters.length) {
+    if (!chapter) {
       return null;
     }
 
-    const chapter = chapters[chapterNumber - 1];
-    const paragraphs = Array.from(chapter.childNodes).filter((node) => node.nodeType === 1);
-
+    const paragraphs = XmlManager.getParagraphs(chapter);
     if (paragraphNumber < 0 || paragraphNumber >= paragraphs.length) {
       return null;
     }
 
-    const paragraph = paragraphs[paragraphNumber];
-    return paragraph.toString();
+    return XmlManager.getParagraphText(paragraphs[paragraphNumber]);
   }
 
-  public removeCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1): string {
+  public async editParagraph(chapterNumber: number, paragraphNumber: number): Promise<void> {
     const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
-
     if (!originalParagraph) {
       throw new Error("Paragraph not found");
     }
 
-    // Create a regex pattern to match the character tag with the specified name
-    const characterPattern = new RegExp(`<${characterName}[^>]*>.*?</${characterName}>`, "g");
+    const updatedParagraphText = await EditorManager.openInVSCode(originalParagraph);
+    const xmlDoc = XmlManager.parseXml(this.fileManager.readXmlFile());
+    const chapter = XmlManager.getChapter(xmlDoc, chapterNumber);
+    const paragraphs = XmlManager.getParagraphs(chapter!);
+    XmlManager.updateParagraphContent(xmlDoc, paragraphs[paragraphNumber], updatedParagraphText);
 
-    // Count total occurrences
+    const updatedXml = XmlManager.serializeXml(xmlDoc);
+    this.fileManager.regenerateXml(updatedXml);
+  }
+
+  public addCharacter(
+    chapterNumber: number,
+    paragraphNumber: number,
+    characterName: string,
+    selectedText: string,
+    startSelectedWordIndex: number,
+    endSelectedWordIndex: number,
+  ): string {
+    const xmlDoc = XmlManager.parseXml(this.fileManager.readXmlFile());
+    const chapter = XmlManager.getChapter(xmlDoc, chapterNumber);
+
+    if (!chapter) {
+      throw new Error("Chapter not found");
+    }
+
+    const paragraphs = XmlManager.getParagraphs(chapter);
+    if (paragraphNumber < 0 || paragraphNumber >= paragraphs.length) {
+      throw new Error("Paragraph not found");
+    }
+
+    const paragraph = paragraphs[paragraphNumber];
+    const paragraphText = XmlManager.getParagraphText(paragraph);
+    const characterTag = `<${characterName}>${selectedText}</${characterName}>`;
+
+    const words = extractWords(paragraphText, "xml");
+
+    const updatedWords = [...words.slice(0, startSelectedWordIndex), characterTag, ...words.slice(endSelectedWordIndex + 1)];
+
+    const updatedParagraphText = updatedWords
+      .join(" ")
+      .replace(/\s+(<note id="\d+"\/>)/g, "$1")
+      .replace(/\s+([.,!?;:])/g, "$1");
+    XmlManager.updateParagraphContent(xmlDoc, paragraph, updatedParagraphText);
+
+    const updatedXml = XmlManager.serializeXml(xmlDoc);
+    this.fileManager.regenerateXml(updatedXml);
+    return updatedXml;
+  }
+
+  public removeCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1): string {
+    const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
+    if (!originalParagraph) {
+      throw new Error("Paragraph not found");
+    }
+
+    const characterPattern = new RegExp(`<${characterName}[^>]*>.*?</${characterName}>`, "g");
     const matches = originalParagraph.match(characterPattern) || [];
+
     if (occurrence < 1 || occurrence > matches.length) {
       throw new Error(`Invalid occurrence number. There are ${matches.length} occurrences of ${characterName} in this paragraph.`);
     }
 
-    // Remove the specific occurrence of the character tag while preserving the content inside
     let currentOccurrence = 0;
     const updatedParagraph = originalParagraph.replace(characterPattern, (match) => {
       currentOccurrence++;
       if (currentOccurrence === occurrence) {
-        // Extract the text content between the tags for the specified occurrence
         return match.replace(new RegExp(`<${characterName}[^>]*>|</${characterName}>`, "g"), "");
       }
       return match;
     });
 
-    // Verify that we only removed the specified occurrence of the character tag
     const remainingMatches = updatedParagraph.match(characterPattern) || [];
     if (remainingMatches.length !== matches.length - 1) {
       throw new Error("Failed to remove character tag properly");
     }
 
-    const updatedXml = this.bookXml.replace(originalParagraph, updatedParagraph);
-    this.regenerateXml(updatedXml);
-    fs.writeFileSync(`./src/data/${this.bookSlug}-chapters.xml`, updatedXml, "utf-8");
+    const xmlDoc = XmlManager.parseXml(this.fileManager.readXmlFile());
+    const chapter = XmlManager.getChapter(xmlDoc, chapterNumber);
+    const paragraphs = XmlManager.getParagraphs(chapter!);
+    XmlManager.updateParagraphContent(xmlDoc, paragraphs[paragraphNumber], updatedParagraph);
+
+    const updatedXml = XmlManager.serializeXml(xmlDoc);
+    this.fileManager.regenerateXml(updatedXml);
     return updatedXml;
   }
 }
 
 if (require.main === module) {
   (async () => {
-    const BOOK_SLUG = BOOK_SLUGS.Krolowa_Sniegu;
-
-    const textEditor = new TextEditor(BOOK_SLUG);
-
+    // const BOOK_SLUG = BOOK_SLUGS.Krolowa_Sniegu;
+    // const textEditor = new TextEditor(BOOK_SLUG);
     // textEditor.addCharacter(3, 5, `<p><Gerda talking="true"/>— <Kaj>Kaj</Kaj> nie żyje! — rzekła do niego Gerda.</p>`);
-
-    textEditor.removeCharacter(1, 1, "Kaj", 1);
+    // textEditor.handleRemoveCharacter(1, 1, "Kaj", 1);
   })();
 }
