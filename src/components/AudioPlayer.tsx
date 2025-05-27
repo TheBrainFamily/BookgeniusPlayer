@@ -285,11 +285,11 @@ const AudioPlayer = () => {
               <AnimatePresence mode="wait" initial={false}>
                 {isMuted ? (
                   <motion.div key="muted" variants={variants.iconFadeScale}>
-                    <VolumeX className="w-5 h-5" />
+                    <VolumeX className="w-4 h-4 lg:w-5 lg:h-5" />
                   </motion.div>
                 ) : (
                   <motion.div key="unmuted" variants={variants.iconFadeScale}>
-                    <Volume2 className="w-5 h-5" />
+                    <Volume2 className="w-4 h-4 lg:w-5 lg:h-5" />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -305,7 +305,7 @@ const AudioPlayer = () => {
               whileTap="tap"
               variants={variants.buttonHover}
             >
-              <BookHeadphones className="w-5 h-5" />
+              <BookHeadphones className="w-4 h-4 lg:w-5 lg:h-5" />
               <motion.div className="absolute bottom-0 right-0">{isPlayingAudioBook ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}</motion.div>
             </motion.button>
           )}
@@ -313,7 +313,7 @@ const AudioPlayer = () => {
           {/* Big Player Button */}
           <div onClick={() => setIsBigPlayerHovered((prev) => !prev)} onMouseEnter={handleOpenBigPlayerDropdownOpen} onMouseLeave={() => setIsBigPlayerHovered(false)}>
             <motion.button className="p-2 my-1 hover:text-white rounded-full cursor-pointer" whileHover="hover" whileTap="tap" variants={variants.buttonHover}>
-              <ListMusic className="w-5 h-5" />
+              <ListMusic className="w-4 h-4 lg:w-5 lg:h-5" />
             </motion.button>
           </div>
         </div>
@@ -408,7 +408,7 @@ const AudioPlayer = () => {
                     variants={variants.navButtonHover}
                     title="Previous track"
                   >
-                    <SkipBack className="w-5 h-5" />
+                    <SkipBack className="w-4 h-4 lg:w-5 lg:h-5" />
                   </motion.button>
 
                   <motion.div variants={variants.playButtonHover} whileTap="tap">
@@ -448,7 +448,7 @@ const AudioPlayer = () => {
                     variants={variants.navButtonHover}
                     title="Next track"
                   >
-                    <SkipForward className="w-5 h-5" />
+                    <SkipForward className="w-4 h-4 lg:w-5 lg:h-5" />
                   </motion.button>
                 </motion.div>
 

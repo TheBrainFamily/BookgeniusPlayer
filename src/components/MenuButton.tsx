@@ -10,7 +10,7 @@ const MenuButton = () => {
   return (
     <div className="bg-black/40 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center">
       <motion.button onClick={openBookMenuModal} className="p-2 my-1 hover:text-white rounded-full cursor-pointer flex" whileHover="hover" whileTap="tap" variants={buttonVariants}>
-        <Book className="h-5 w-5 " />
+        <Book className="w-4 h-4 lg:w-5 lg:h-5" />
       </motion.button>
     </div>
   );
