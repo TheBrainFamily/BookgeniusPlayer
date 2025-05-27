@@ -278,7 +278,7 @@ const AudioPlayer = () => {
   return (
     <>
       <div className="relative origin-top-left">
-        <div className="bg-black/40 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1">
+        <div className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1">
           {/* Volume Control Button */}
           <div onClick={toggleMute} onMouseEnter={handleOpenVolumeDropdownOpen} onMouseLeave={() => setIsVolumeHovered(false)} className="relative">
             <motion.button onClick={toggleMute} className="p-2 my-1 hover:text-white rounded-full cursor-pointer" whileHover="hover" whileTap="tap" variants={variants.buttonHover}>
@@ -325,7 +325,7 @@ const AudioPlayer = () => {
               {/* Invisible bridge element to ensure smooth hover transition */}
               <div className="absolute w-48 h-4 top-full left-0 z-10 -mt-1" onMouseEnter={handleOpenVolumeDropdownOpen} />
               <div
-                className="bg-black/40 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 absolute top-full left-0 mt-2 z-10 px-4 pt-2 pb-3 w-48 flex gap-3 flex-col"
+                className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 absolute top-full left-0 mt-2 z-10 px-4 pt-2 pb-3 w-48 flex gap-3 flex-col"
                 onMouseEnter={handleOpenVolumeDropdownOpen}
                 onMouseLeave={() => setIsVolumeHovered(false)}
               >
@@ -360,7 +360,7 @@ const AudioPlayer = () => {
               {/* Invisible bridge element */}
               <div className="absolute w-80 h-4 top-full left-0 z-10 -mt-1" onMouseEnter={handleOpenBigPlayerDropdownOpen} />
               <div
-                className="bg-black/40 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs"
+                className="bg-black/70 textured-bg textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs"
                 onClick={() => setIsBigPlayerHovered((prev) => !prev)}
                 onMouseEnter={handleOpenBigPlayerDropdownOpen}
                 onMouseLeave={() => setIsBigPlayerHovered(false)}
@@ -495,7 +495,7 @@ const AudioPlayer = () => {
         {showSongNotification && currentTrackData && windowWidth && (
           <motion.div
             className={cn(
-              "bg-black/40 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 p-4",
+              "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-4",
               "flex items-center gap-4 z-20 max-w-full overflow-hidden",
               windowWidth < 1400 ? "fixed w-80 bottom-4 left-4" : "absolute w-100 top-4 right-4",
             )}
