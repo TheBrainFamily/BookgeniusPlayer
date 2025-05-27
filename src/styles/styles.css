@@ -212,6 +212,11 @@
         hyphens: auto;
         -webkit-hyphens: auto;
         -ms-hyphens: auto;
+        transition: all 0.3s ease-in-out;
+        scale: 1;
+        &.talking-paragraph {
+          scale: 1.05;
+        }
       }
 
       /* First-line indent (classic book style) */
@@ -648,7 +653,6 @@
     }
     border-radius: 4px;
     box-shadow: 0 0 15px var(--talking-paragraph-shadow-light);
-    scale: 1.05;
     transition: all 0.3s ease-in-out;
   }
 
