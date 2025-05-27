@@ -1055,6 +1055,7 @@ section[data-chapter] [data-index] {
 
 .textured-bg {
   background:
-    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, color-mix(in srgb, var(--book-secondary-color) 30%, transparent) 0%, transparent 50%), 
+    radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--book-primary-color) 15%, transparent) 0%, transparent 50%),
     linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(30, 30, 30, 0.9) 100%);
 }

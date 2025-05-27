@@ -40,4 +40,4 @@ const Footer = () => {
 
 export default Footer;
 
-const footerVariants: Variants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 2, delay: 4 } } };
+const footerVariants: Variants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 2, delay: 2.5 } } };

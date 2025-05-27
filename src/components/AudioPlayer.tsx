@@ -494,25 +494,29 @@ const AudioPlayer = () => {
       <AnimatePresence>
         {showSongNotification && currentTrackData && windowWidth && (
           <motion.div
-            className={cn(
-              "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-4",
-              "flex items-center gap-4 z-20 max-w-full overflow-hidden",
-              windowWidth < 1400 ? "fixed w-80 bottom-4 left-4" : "absolute w-100 top-4 right-4",
-            )}
+            className={cn(windowWidth < 1400 ? "fixed w-80 bottom-0 top-0 left-4 h-[100vh] flex" : "absolute w-100 top-4 right-4")}
             variants={variants.songNotification}
             initial="initial"
             animate="animate"
             exit="exit"
           >
             <div
-              className={`bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg flex-shrink-0 ${windowWidth < 1400 ? "w-24 h-24" : "w-32 h-32"}`}
+              className={cn(
+                "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-4",
+                "flex items-center gap-4 z-20 max-w-full overflow-hidden",
+                "mb-20 mt-auto",
+              )}
             >
-              {currentTrackData.coverArtUrl && <img src={currentTrackData.coverArtUrl} alt="Teraz gra" className="w-full h-full object-cover" />}
-            </div>
+              <div
+                className={`bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg flex-shrink-0 ${windowWidth < 1400 ? "w-24 h-24" : "w-32 h-32"}`}
+              >
+                {currentTrackData.coverArtUrl && <img src={currentTrackData.coverArtUrl} alt="Teraz gra" className="w-full h-full object-cover" />}
+              </div>
 
-            <div className="flex flex-col flex-1 min-w-0">
-              <div className="text-sm font-medium">Teraz gra</div>
-              <div className="text-base font-medium truncate">{currentTrackData.title || "Unknown Track"}</div>
+              <div className="flex flex-col flex-1 min-w-0">
+                <div className="text-sm font-medium">Teraz gra</div>
+                <div className="text-base font-medium truncate">{currentTrackData.title || "Unknown Track"}</div>
+              </div>
             </div>
           </motion.div>
         )}
