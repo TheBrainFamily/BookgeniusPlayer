@@ -180,18 +180,22 @@
         text-align: center;
         margin-bottom: 1.5em;
         margin-top: 0;
+        padding: 0 3rem;
       }
 
       h2 {
         font-size: 2em;
+        padding: 0 3rem;
       }
 
       h3 {
         font-size: 2em;
+        padding: 0 3rem;
       }
 
       h4 {
         font-size: 1.4em;
+        padding: 0 3rem;
       }
 
       & > section {
@@ -637,19 +641,20 @@
   .talking-paragraph {
     background-color: var(--talking-paragraph-bg-light);
     position: relative;
+
     &::before {
       content: "";
       position: absolute;
-      left: 0;
+      left: 1em;
       top: 0;
       bottom: 0;
       width: 3px;
       background-color: var(--talking-paragraph-border-light);
+      transition: all 0.3s ease-in-out;
     }
+
     border-radius: 4px;
     box-shadow: 0 0 15px var(--talking-paragraph-shadow-light);
-    margin-left: -0.3em;
-    padding-left: 0.3em;
     transition: all 0.3s ease-in-out;
   }
 
@@ -962,6 +967,7 @@ section[data-chapter] [data-index] {
 
 .active-paragraph {
   background: #254c942b;
+  transition: all 0.3s ease-in-out;
 }
 
 #dev-zone-visualizer {
