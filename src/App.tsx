@@ -7,12 +7,9 @@ import { useBackgroundVideo } from "./hooks/useBackgroundVideo";
 import { useBookContent } from "./hooks/useBookContent";
 
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
-import AudioPlayer from "./components/AudioPlayer";
 import { runLegacyInit } from "./main";
-import { CharacterNotesPanel } from "./components/CharacterNotesPanel";
 import { RightNotesPanel } from "./components/RightNotesPanel";
-import { useWebSocket, WebSocketProvider } from "./context/WebSocketContext";
-import BottomInput from "./components/BottomInput";
+import { WebSocketProvider } from "./context/WebSocketContext";
 import { RealtimeProvider } from "./context/RealtimeContext";
 import { getBookData } from "./booksData/getBookData";
 import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
@@ -21,8 +18,13 @@ import { ModalProvider, useModal } from "./context/ModalContext";
 import { BookContentWrapper } from "./components/BookContentWrapper";
 import { BookThemeProvider } from "./context/BookThemeContext";
 import { useAudiobookTracks } from "@/hooks/useAudiobookTracks";
+
+import SplashScreen from "./components/SplashScreen";
+import CharacterNotesPanel from "./components/CharacterNotesPanel";
+import ContentContainerWrapper from "./components/ContentContainerWrapper";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 import { EditorMode } from "@/components/EditorMode";
-import MenuButton from "./components/MenuButton";
 
 function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
   /* Inject book content first */
@@ -39,18 +41,15 @@ function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
   useBackgroundSongs();
   useAudiobookTracks();
 
-  /* websocket */
-  const { sendMessage } = useWebSocket();
-
   return (
     <>
-      <MenuButton />
+      <Header />
       <NoteLinkBlinker />
       <CharacterNotesPanel bookData={bookData} />
+      <ContentContainerWrapper />
       <RightNotesPanel />
-      <AudioPlayer />
+      <Footer />
       {import.meta.env.VITE_EDITOR === "true" && <EditorMode />}
-      <BottomInput placeholder="Poszukaj albo zapytaj" onSubmit={sendMessage} />
     </>
   );
 }
@@ -97,6 +96,7 @@ export default function App() {
             <BookContentWrapper>
               <ModalProvider bookData={currentBookData}>
                 <Shell bookData={currentBookData} />
+                <SplashScreen />
               </ModalProvider>
             </BookContentWrapper>
           </BookThemeProvider>

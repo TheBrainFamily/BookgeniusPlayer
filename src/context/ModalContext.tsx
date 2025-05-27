@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useReducer, useCallback, ReactNode, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
 
-import { useLocation } from "@/state/LocationContext";
-import { useDebounce } from "@/hooks/useDebounce";
 import debounce from "lodash.debounce";
 import { BookData } from "@/booksData/types";
 import { performLocalDOMSearch, SearchResultsData } from "@/searchModal";
@@ -16,6 +14,7 @@ import DeepResearchModal from "@/components/modals/DeepResearchModal";
 import BookChaptersModal from "@/components/modals/BookChaptersModal";
 import BookMenuModal from "@/components/modals/BookMenuModal";
 import { modalReducer, initialModalState } from "./modalReducer";
+import { useLocationRange } from "@/hooks/useLocationRange";
 import EditorModeModal from "@/components/modals/EditorModeModal";
 
 // Different types of modals the application can display
@@ -44,8 +43,7 @@ export interface ModalContextType {
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
 
 export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }> = ({ children, bookData }) => {
-  const { location } = useLocation();
-  const debouncedLocation = useDebounce(location, 150);
+  const { locationRange, debouncedLocation } = useLocationRange();
   const [state, dispatch] = useReducer(modalReducer, initialModalState);
   const { currentModal, searchResults, searchQuery } = state;
 
@@ -141,11 +139,6 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
     [debouncedPerformSearch, debouncedLocation, dispatch],
   );
 
-  const range = useMemo(
-    () => ({ chapter: debouncedLocation.chapter, paragraph: debouncedLocation.paragraph, endChapter: debouncedLocation.endChapter, endParagraph: debouncedLocation.endParagraph }),
-    [debouncedLocation.chapter, debouncedLocation.paragraph, debouncedLocation.endChapter, debouncedLocation.endParagraph],
-  );
-
   const getModalContent = useCallback(
     (modal: ModalType) => {
       switch (modal.type) {
@@ -153,7 +146,9 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
           const matchingCharacter = bookData?.charactersData.find((character) => character.slug === modal.slug);
           if (!matchingCharacter) return null;
 
-          return <CharacterModal onClose={closeModal} isVideo={modal.isVideo} mediaSrc={modal.mediaSrc} matchingCharacter={matchingCharacter} endChapter={range.endChapter} />;
+          return (
+            <CharacterModal onClose={closeModal} isVideo={modal.isVideo} mediaSrc={modal.mediaSrc} matchingCharacter={matchingCharacter} endChapter={locationRange.endChapter} />
+          );
         }
 
         case "search":
@@ -192,7 +187,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
           return null;
       }
     },
-    [bookData, closeModal, range, searchResults, openBookChapterModal],
+    [bookData, closeModal, locationRange, searchResults, openBookChapterModal],
   );
 
   const renderModal = useCallback(() => {
