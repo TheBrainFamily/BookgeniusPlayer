@@ -278,18 +278,18 @@ const AudioPlayer = () => {
   return (
     <>
       <div className="relative origin-top-left">
-        <div className="bg-black/40 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1">
+        <div className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1">
           {/* Volume Control Button */}
           <div onClick={toggleMute} onMouseEnter={handleOpenVolumeDropdownOpen} onMouseLeave={() => setIsVolumeHovered(false)} className="relative">
             <motion.button onClick={toggleMute} className="p-2 my-1 hover:text-white rounded-full cursor-pointer" whileHover="hover" whileTap="tap" variants={variants.buttonHover}>
               <AnimatePresence mode="wait" initial={false}>
                 {isMuted ? (
                   <motion.div key="muted" variants={variants.iconFadeScale}>
-                    <VolumeX className="w-5 h-5" />
+                    <VolumeX className="w-4 h-4 lg:w-5 lg:h-5" />
                   </motion.div>
                 ) : (
                   <motion.div key="unmuted" variants={variants.iconFadeScale}>
-                    <Volume2 className="w-5 h-5" />
+                    <Volume2 className="w-4 h-4 lg:w-5 lg:h-5" />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -305,7 +305,7 @@ const AudioPlayer = () => {
               whileTap="tap"
               variants={variants.buttonHover}
             >
-              <BookHeadphones className="w-5 h-5" />
+              <BookHeadphones className="w-4 h-4 lg:w-5 lg:h-5" />
               <motion.div className="absolute bottom-0 right-0">{isPlayingAudioBook ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}</motion.div>
             </motion.button>
           )}
@@ -313,7 +313,7 @@ const AudioPlayer = () => {
           {/* Big Player Button */}
           <div onClick={() => setIsBigPlayerHovered((prev) => !prev)} onMouseEnter={handleOpenBigPlayerDropdownOpen} onMouseLeave={() => setIsBigPlayerHovered(false)}>
             <motion.button className="p-2 my-1 hover:text-white rounded-full cursor-pointer" whileHover="hover" whileTap="tap" variants={variants.buttonHover}>
-              <ListMusic className="w-5 h-5" />
+              <ListMusic className="w-4 h-4 lg:w-5 lg:h-5" />
             </motion.button>
           </div>
         </div>
@@ -325,7 +325,7 @@ const AudioPlayer = () => {
               {/* Invisible bridge element to ensure smooth hover transition */}
               <div className="absolute w-48 h-4 top-full left-0 z-10 -mt-1" onMouseEnter={handleOpenVolumeDropdownOpen} />
               <div
-                className="bg-black/40 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 absolute top-full left-0 mt-2 z-10 px-4 pt-2 pb-3 w-48 flex gap-3 flex-col"
+                className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 absolute top-full left-0 mt-2 z-10 px-4 pt-2 pb-3 w-48 flex gap-3 flex-col"
                 onMouseEnter={handleOpenVolumeDropdownOpen}
                 onMouseLeave={() => setIsVolumeHovered(false)}
               >
@@ -360,7 +360,7 @@ const AudioPlayer = () => {
               {/* Invisible bridge element */}
               <div className="absolute w-80 h-4 top-full left-0 z-10 -mt-1" onMouseEnter={handleOpenBigPlayerDropdownOpen} />
               <div
-                className="bg-black/40 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs"
+                className="bg-black/70 textured-bg textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs"
                 onClick={() => setIsBigPlayerHovered((prev) => !prev)}
                 onMouseEnter={handleOpenBigPlayerDropdownOpen}
                 onMouseLeave={() => setIsBigPlayerHovered(false)}
@@ -408,7 +408,7 @@ const AudioPlayer = () => {
                     variants={variants.navButtonHover}
                     title="Previous track"
                   >
-                    <SkipBack className="w-5 h-5" />
+                    <SkipBack className="w-4 h-4 lg:w-5 lg:h-5" />
                   </motion.button>
 
                   <motion.div variants={variants.playButtonHover} whileTap="tap">
@@ -448,7 +448,7 @@ const AudioPlayer = () => {
                     variants={variants.navButtonHover}
                     title="Next track"
                   >
-                    <SkipForward className="w-5 h-5" />
+                    <SkipForward className="w-4 h-4 lg:w-5 lg:h-5" />
                   </motion.button>
                 </motion.div>
 
@@ -494,25 +494,29 @@ const AudioPlayer = () => {
       <AnimatePresence>
         {showSongNotification && currentTrackData && windowWidth && (
           <motion.div
-            className={cn(
-              "bg-black/40 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 p-4",
-              "flex items-center gap-4 z-20 max-w-full overflow-hidden",
-              windowWidth < 1400 ? "fixed w-80 bottom-4 left-4" : "absolute w-100 top-4 right-4",
-            )}
+            className={cn(windowWidth < 1400 ? "fixed w-80 bottom-0 top-0 left-4 h-[100vh] flex" : "absolute w-100 top-4 right-4")}
             variants={variants.songNotification}
             initial="initial"
             animate="animate"
             exit="exit"
           >
             <div
-              className={`bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg flex-shrink-0 ${windowWidth < 1400 ? "w-24 h-24" : "w-32 h-32"}`}
+              className={cn(
+                "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-4",
+                "flex items-center gap-4 z-20 max-w-full overflow-hidden",
+                "mb-20 mt-auto",
+              )}
             >
-              {currentTrackData.coverArtUrl && <img src={currentTrackData.coverArtUrl} alt="Teraz gra" className="w-full h-full object-cover" />}
-            </div>
+              <div
+                className={`bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg flex-shrink-0 ${windowWidth < 1400 ? "w-24 h-24" : "w-32 h-32"}`}
+              >
+                {currentTrackData.coverArtUrl && <img src={currentTrackData.coverArtUrl} alt="Teraz gra" className="w-full h-full object-cover" />}
+              </div>
 
-            <div className="flex flex-col flex-1 min-w-0">
-              <div className="text-sm font-medium">Teraz gra</div>
-              <div className="text-base font-medium truncate">{currentTrackData.title || "Unknown Track"}</div>
+              <div className="flex flex-col flex-1 min-w-0">
+                <div className="text-sm font-medium">Teraz gra</div>
+                <div className="text-base font-medium truncate">{currentTrackData.title || "Unknown Track"}</div>
+              </div>
             </div>
           </motion.div>
         )}

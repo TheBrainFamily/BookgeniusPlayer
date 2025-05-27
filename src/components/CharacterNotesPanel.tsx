@@ -49,7 +49,7 @@ const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
 };
 
 const variants: Record<string, Variants> = {
-  container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 2, delay: 2, when: "afterChildren" } } },
+  container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 4, delay: 2, when: "afterChildren" } } },
   character: {
     hidden: { opacity: 0, x: -100, y: 10 },
     visible: (i: number) => ({ opacity: 1, x: 0, y: 0, transition: { duration: 0.6, delay: 0.5 + 0.15 * i, type: "spring", stiffness: 100 } }),

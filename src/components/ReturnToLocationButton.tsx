@@ -29,7 +29,7 @@ const ReturnToLocationButton = () => {
   return (
     <AnimatePresence mode="wait" initial={false}>
       {isVisible && (
-        <div className="bg-black/40 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center">
+        <div className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center">
           <Tooltip>
             <TooltipTrigger asChild>
               <motion.button

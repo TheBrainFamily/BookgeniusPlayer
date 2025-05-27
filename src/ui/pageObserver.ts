@@ -338,16 +338,6 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
     const zoneBottom = zoneTop + 0.1 * rootRect.height; // 10% height below this point
 
     // --- Development Zone Visualizer ---
-    // let zoneVisualizer = document.getElementById("dev-zone-visualizer");
-    // if (!zoneVisualizer) {
-    //   zoneVisualizer = document.createElement("div");
-    //   zoneVisualizer.id = "dev-zone-visualizer";
-    //   document.body.appendChild(zoneVisualizer);
-    // }
-    // zoneVisualizer.style.left = `${rootRect.left}px`;
-    // zoneVisualizer.style.top = `${zoneTop}px`;
-    // zoneVisualizer.style.width = `${rootRect.width}px`;
-    // zoneVisualizer.style.height = `${zoneBottom - zoneTop}px`;
 
     console.log("WILCZYNSKA: 276 zoneTop", zoneTop);
     console.log("WILCZYNSKA: 277 zoneBottom", zoneBottom);
@@ -432,19 +422,30 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
     });
     chosenElement?.classList.add("active-paragraph");
 
+    const topMultiplier = 0.05;
+    let bottomMultiplier = 0.5;
+
+    // Check media query for landscape mode on smaller wide screens
+    const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
+    if (landscapeMediaQuery.matches) {
+      bottomMultiplier = 0.95; // Use larger bottom zone in this mode
+    }
+
+    const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
+    const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
+    // let zoneVisualizer = document.getElementById("dev-zone-visualizer");
+    // if (!zoneVisualizer) {
+    //   zoneVisualizer = document.createElement("div");
+    //   zoneVisualizer.id = "dev-zone-visualizer";
+    //   document.body.appendChild(zoneVisualizer);
+    // }
+    // zoneVisualizer.style.left = `${rootRect.left}px`;
+    // zoneVisualizer.style.top = `${focusZoneTop}px`;
+    // zoneVisualizer.style.width = `${rootRect.width}px`;
+    // zoneVisualizer.style.height = `${focusZoneBottom - focusZoneTop}px`;
+
     if (intersectingPages.size > 0) {
       // Default multipliers
-      const topMultiplier = 0.05;
-      let bottomMultiplier = 0.5;
-
-      // Check media query for landscape mode on smaller wide screens
-      const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
-      if (landscapeMediaQuery.matches) {
-        bottomMultiplier = 0.95; // Use larger bottom zone in this mode
-      }
-
-      const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
-      const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
 
       // Filter intersecting pages to find those overlapping the focus zone
       const focusedPages = Array.from(intersectingPages).filter((element) => {

@@ -110,8 +110,8 @@ export default defineConfig({
         theme_color: "#333333",
         orientation: "landscape",
         icons: [
-          { src: "public/icon-192x192.png", type: "image/png", sizes: "192x192", purpose: "any maskable" },
-          { src: "public/icon-512x512.png", type: "image/png", sizes: "512x512", purpose: "any maskable" },
+          { src: "icons/icon-192x192.png", type: "image/png", sizes: "192x192", purpose: "any maskable" },
+          { src: "icons/icon-512x512.png", type: "image/png", sizes: "512x512", purpose: "any maskable" },
         ],
       },
       devOptions: { enabled: true },

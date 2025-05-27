@@ -180,18 +180,22 @@
         text-align: center;
         margin-bottom: 1.5em;
         margin-top: 0;
+        padding: 0 3rem;
       }
 
       h2 {
         font-size: 2em;
+        padding: 0 3rem;
       }
 
       h3 {
         font-size: 2em;
+        padding: 0 3rem;
       }
 
       h4 {
         font-size: 1.4em;
+        padding: 0 3rem;
       }
 
       & > section {
@@ -642,15 +646,18 @@
   .talking-paragraph {
     background-color: var(--talking-paragraph-bg-light);
     position: relative;
+
     &::before {
       content: "";
       position: absolute;
-      left: 0;
+      left: 1em;
       top: 0;
       bottom: 0;
       width: 3px;
       background-color: var(--talking-paragraph-border-light);
+      transition: all 0.3s ease-in-out;
     }
+
     border-radius: 4px;
     box-shadow: 0 0 15px var(--talking-paragraph-shadow-light);
     transition: all 0.3s ease-in-out;
@@ -965,6 +972,7 @@ section[data-chapter] [data-index] {
 
 .active-paragraph {
   background: #254c942b;
+  transition: all 0.3s ease-in-out;
 }
 
 #dev-zone-visualizer {
@@ -1048,4 +1056,11 @@ section[data-chapter] [data-index] {
     /* If you also change text color, you might want to revert it or fade opacity */
     /* opacity: 0; */ /* This would make the text itself invisible */
   }
+}
+
+.textured-bg {
+  background:
+    radial-gradient(circle at 20% 80%, color-mix(in srgb, var(--book-tertiary-color) 30%, transparent) 0%, transparent 50%), 
+    radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--book-primary-color) 15%, transparent) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(30, 30, 30, 0.9) 100%);
 }
