@@ -33,7 +33,7 @@ export class TextEditor {
       throw new Error("Paragraph not found");
     }
 
-    const updatedParagraphText = await EditorManager.openInVSCode(originalParagraph);
+    const updatedParagraphText = await EditorManager.openInCursor(originalParagraph);
     const xmlDoc = XmlManager.parseXml(this.fileManager.readXmlFile());
     const chapter = XmlManager.getChapter(xmlDoc, chapterNumber);
     const paragraphs = XmlManager.getParagraphs(chapter!);

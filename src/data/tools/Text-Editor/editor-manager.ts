@@ -4,8 +4,8 @@ import * as os from "os";
 import fs from "fs";
 
 export class EditorManager {
-  public static async openInVSCode(content: string): Promise<string> {
-    this.verifyVSCodeInstallation();
+  public static async openInCursor(content: string): Promise<string> {
+    this.verifyCursorInstallation();
 
     return new Promise((resolve, reject) => {
       const tempDir = os.tmpdir();
@@ -13,7 +13,7 @@ export class EditorManager {
 
       fs.writeFileSync(tempFile, content);
 
-      const vscode = spawn("code", ["--wait", tempFile], { stdio: "inherit" });
+      const vscode = spawn("cursor", ["--wait", tempFile], { stdio: "inherit" });
 
       vscode.on("close", (code) => {
         if (code === 0) {
@@ -25,7 +25,7 @@ export class EditorManager {
             reject(error);
           }
         } else {
-          reject(new Error(`VS Code exited with code ${code}`));
+          reject(new Error(`Cursor exited with code ${code}`));
         }
       });
 
@@ -35,14 +35,14 @@ export class EditorManager {
     });
   }
 
-  private static verifyVSCodeInstallation(): void {
+  private static verifyCursorInstallation(): void {
     try {
-      const vscodeVersion = spawnSync("code", ["--version"], { stdio: "pipe" });
+      const vscodeVersion = spawnSync("cursor", ["--version"], { stdio: "pipe" });
       if (vscodeVersion.status !== 0) {
-        throw new Error("VS Code is not installed or not in PATH");
+        throw new Error("Cursor is not installed or not in PATH");
       }
     } catch {
-      throw new Error("VS Code is not installed or not in PATH. Please install VS Code to use this feature.");
+      throw new Error("Cursor is not installed or not in PATH. Please install Cursor to use this feature.");
     }
   }
 }

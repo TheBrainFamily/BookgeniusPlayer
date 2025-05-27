@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { handleRemoveCharacter } from "@/text-editor-service/listeners/handleRemoveCharacter";
-// import { handleEditParagraph } from "@/text-editor-service/listeners/handleEditParagraph";
 import { handleAddCharacter } from "@/text-editor-service/listeners/handleAddCharacter";
 import { useModal } from "@/context/ModalContext";
 import { handleEditParagraph } from "@/text-editor-service/listeners/handleEditParagraph";
@@ -32,7 +31,7 @@ export function useBookContent(htmlContent: string, containerId: string) {
           }
 
           if (event.metaKey && !event.altKey) {
-            return openEditorModeModal("edit-paragraph", () => handleEditParagraph(chapterNumber, paragraphNumber));
+            return handleEditParagraph(chapterNumber, paragraphNumber);
           }
         }
 
