@@ -1,23 +1,29 @@
 import { DOMParser, Document, XMLSerializer, Element } from "@xmldom/xmldom";
 
 export class XmlManager {
-  private static decodeHtmlEntities(text: string): string {
+  private readonly xmlSerializer: XMLSerializer;
+  private readonly domParser: DOMParser;
+
+  constructor() {
+    this.xmlSerializer = new XMLSerializer();
+    this.domParser = new DOMParser();
+  }
+
+  private decodeHtmlEntities(text: string): string {
     const entities: { [key: string]: string } = { "&lt;": "<", "&gt;": ">", "&amp;": "&", "&quot;": '"', "&#39;": "'" };
     return text.replace(/&(?:lt|gt|amp|quot|#39);/g, (match) => entities[match]);
   }
 
-  public static parseXml(xmlString: string): Document {
-    const parser = new DOMParser();
-    return parser.parseFromString(xmlString, "text/xml");
+  public parseXml(xmlString: string): Document {
+    return this.domParser.parseFromString(xmlString, "text/xml");
   }
 
-  public static serializeXml(xmlDoc: Document): string {
-    const serializer = new XMLSerializer();
-    const serializedXml = serializer.serializeToString(xmlDoc);
+  public serializeXml(xmlDoc: Document): string {
+    const serializedXml = this.xmlSerializer.serializeToString(xmlDoc);
     return this.decodeHtmlEntities(serializedXml);
   }
 
-  public static getChapter(xmlDoc: Document, chapterNumber: number): Element | null {
+  public getChapter(xmlDoc: Document, chapterNumber: number): Element | null {
     const chapters = xmlDoc.getElementsByTagName("Chapter");
     if (chapterNumber <= 0 || chapterNumber > chapters.length) {
       return null;
@@ -25,15 +31,34 @@ export class XmlManager {
     return chapters[chapterNumber - 1];
   }
 
-  public static getParagraphs(chapter: Element): Element[] {
+  public getCharacters(xmlString: string): Element | null {
+    const xmlDoc = this.domParser.parseFromString(xmlString, "text/xml");
+    const charactersMaster = xmlDoc.getElementsByTagName("CharactersMaster")[0];
+    if (!charactersMaster) {
+      return null;
+    }
+    return charactersMaster;
+  }
+
+  public getCharactersTags(xmlString: string) {
+    const charactersMaster = this.getCharacters(xmlString);
+    if (!charactersMaster) {
+      return null;
+    }
+    return Array.from(charactersMaster.childNodes)
+      .filter((node): node is Element => node.nodeType === 1)
+      .map((child) => `<${child.tagName} />`);
+  }
+
+  public getParagraphs(chapter: Element): Element[] {
     return Array.from(chapter.childNodes).filter((node) => node.nodeType === 1) as Element[];
   }
 
-  public static getParagraphText(paragraph: Element): string {
+  public getParagraphText(paragraph: Element): string {
     return paragraph.toString().replace(/^<[^>]+>|<\/[^>]+>$/g, "");
   }
 
-  public static updateParagraphContent(xmlDoc: Document, paragraph: Element, newContent: string): void {
+  public updateParagraphContent(xmlDoc: Document, paragraph: Element, newContent: string): void {
     while (paragraph.firstChild) {
       paragraph.removeChild(paragraph.firstChild);
     }

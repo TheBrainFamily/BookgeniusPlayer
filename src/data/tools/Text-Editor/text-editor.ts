@@ -3,28 +3,35 @@ import { XmlManager } from "./xml-manager";
 import { FileManager } from "./file-manager";
 import { EditorManager } from "./editor-manager";
 import { extractWords } from "@/utils/extractWords";
+import { PromptsManager } from "@/data/tools/Text-Editor/prompts-manager";
 
 export class TextEditor {
   private readonly fileManager: FileManager;
+  private readonly editorManager: EditorManager;
+  private readonly promptsManager: PromptsManager;
+  private readonly xmlManager: XmlManager;
 
   constructor(private readonly bookSlug: BOOK_SLUGS) {
+    this.editorManager = new EditorManager();
     this.fileManager = new FileManager(bookSlug);
+    this.promptsManager = new PromptsManager(bookSlug);
+    this.xmlManager = new XmlManager();
   }
 
   public getParagraphByNumber(chapterNumber: number, paragraphNumber: number): string | null {
-    const xmlDoc = XmlManager.parseXml(this.fileManager.readXmlFile());
-    const chapter = XmlManager.getChapter(xmlDoc, chapterNumber);
+    const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+    const chapter = this.xmlManager.getChapter(xmlDoc, chapterNumber);
 
     if (!chapter) {
       return null;
     }
 
-    const paragraphs = XmlManager.getParagraphs(chapter);
+    const paragraphs = this.xmlManager.getParagraphs(chapter);
     if (paragraphNumber < 0 || paragraphNumber >= paragraphs.length) {
       return null;
     }
 
-    return XmlManager.getParagraphText(paragraphs[paragraphNumber]);
+    return this.xmlManager.getParagraphText(paragraphs[paragraphNumber]);
   }
 
   public async editParagraph(chapterNumber: number, paragraphNumber: number): Promise<void> {
@@ -33,13 +40,14 @@ export class TextEditor {
       throw new Error("Paragraph not found");
     }
 
-    const updatedParagraphText = await EditorManager.openInCursor(originalParagraph);
-    const xmlDoc = XmlManager.parseXml(this.fileManager.readXmlFile());
-    const chapter = XmlManager.getChapter(xmlDoc, chapterNumber);
-    const paragraphs = XmlManager.getParagraphs(chapter!);
-    XmlManager.updateParagraphContent(xmlDoc, paragraphs[paragraphNumber], updatedParagraphText);
+    this.promptsManager.generateWrapCharactersRule();
+    const updatedParagraphText = await this.editorManager.openInCursor(originalParagraph);
+    const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+    const chapter = this.xmlManager.getChapter(xmlDoc, chapterNumber);
+    const paragraphs = this.xmlManager.getParagraphs(chapter!);
+    this.xmlManager.updateParagraphContent(xmlDoc, paragraphs[paragraphNumber], updatedParagraphText);
 
-    const updatedXml = XmlManager.serializeXml(xmlDoc);
+    const updatedXml = this.xmlManager.serializeXml(xmlDoc);
     this.fileManager.regenerateXml(updatedXml);
   }
 
@@ -51,20 +59,20 @@ export class TextEditor {
     startSelectedWordIndex: number,
     endSelectedWordIndex: number,
   ): string {
-    const xmlDoc = XmlManager.parseXml(this.fileManager.readXmlFile());
-    const chapter = XmlManager.getChapter(xmlDoc, chapterNumber);
+    const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+    const chapter = this.xmlManager.getChapter(xmlDoc, chapterNumber);
 
     if (!chapter) {
       throw new Error("Chapter not found");
     }
 
-    const paragraphs = XmlManager.getParagraphs(chapter);
+    const paragraphs = this.xmlManager.getParagraphs(chapter);
     if (paragraphNumber < 0 || paragraphNumber >= paragraphs.length) {
       throw new Error("Paragraph not found");
     }
 
     const paragraph = paragraphs[paragraphNumber];
-    const paragraphText = XmlManager.getParagraphText(paragraph);
+    const paragraphText = this.xmlManager.getParagraphText(paragraph);
     const characterTag = `<${characterName}>${selectedText}</${characterName}>`;
 
     const words = extractWords(paragraphText, "xml");
@@ -75,9 +83,9 @@ export class TextEditor {
       .join(" ")
       .replace(/\s+(<note id="\d+"\/>)/g, "$1")
       .replace(/\s+([.,!?;:])/g, "$1");
-    XmlManager.updateParagraphContent(xmlDoc, paragraph, updatedParagraphText);
+    this.xmlManager.updateParagraphContent(xmlDoc, paragraph, updatedParagraphText);
 
-    const updatedXml = XmlManager.serializeXml(xmlDoc);
+    const updatedXml = this.xmlManager.serializeXml(xmlDoc);
     this.fileManager.regenerateXml(updatedXml);
     return updatedXml;
   }
@@ -109,12 +117,12 @@ export class TextEditor {
       throw new Error("Failed to remove character tag properly");
     }
 
-    const xmlDoc = XmlManager.parseXml(this.fileManager.readXmlFile());
-    const chapter = XmlManager.getChapter(xmlDoc, chapterNumber);
-    const paragraphs = XmlManager.getParagraphs(chapter!);
-    XmlManager.updateParagraphContent(xmlDoc, paragraphs[paragraphNumber], updatedParagraph);
+    const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+    const chapter = this.xmlManager.getChapter(xmlDoc, chapterNumber);
+    const paragraphs = this.xmlManager.getParagraphs(chapter!);
+    this.xmlManager.updateParagraphContent(xmlDoc, paragraphs[paragraphNumber], updatedParagraph);
 
-    const updatedXml = XmlManager.serializeXml(xmlDoc);
+    const updatedXml = this.xmlManager.serializeXml(xmlDoc);
     this.fileManager.regenerateXml(updatedXml);
     return updatedXml;
   }

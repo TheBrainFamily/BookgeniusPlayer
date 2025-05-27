@@ -1,16 +1,16 @@
 import { spawn, spawnSync } from "child_process";
-import * as path from "path";
-import * as os from "os";
 import fs from "fs";
 
 export class EditorManager {
-  public static async openInCursor(content: string): Promise<string> {
+  private userCursorSettings: string = null;
+  private readonly vsCodeSettingsFile: string = ".vscode/settings.json";
+
+  public async openInCursor(content: string): Promise<string> {
     this.verifyCursorInstallation();
+    this.adjustSettings();
 
     return new Promise((resolve, reject) => {
-      const tempDir = os.tmpdir();
-      const tempFile = path.join(tempDir, `temp-${Date.now()}.xml`);
-
+      const tempFile = `./src/data/tools/Text-Editor/temp-${Date.now()}.xml`;
       fs.writeFileSync(tempFile, content);
 
       const vscode = spawn("cursor", ["--wait", tempFile], { stdio: "inherit" });
@@ -20,6 +20,7 @@ export class EditorManager {
           try {
             const modifiedContent = fs.readFileSync(tempFile, "utf-8");
             fs.unlinkSync(tempFile);
+            this.restoreSettings();
             resolve(modifiedContent);
           } catch (error) {
             reject(error);
@@ -35,7 +36,27 @@ export class EditorManager {
     });
   }
 
-  private static verifyCursorInstallation(): void {
+  public adjustSettings(): void {
+    if (!fs.existsSync(this.vsCodeSettingsFile)) {
+      return fs.writeFileSync(this.vsCodeSettingsFile, '{ "editor.wordWrap": "on" }');
+    }
+
+    this.userCursorSettings = fs.readFileSync(this.vsCodeSettingsFile, "utf-8");
+    const settingsJson = JSON.parse(this.userCursorSettings);
+    settingsJson["editor.wordWrap"] = "on";
+    fs.writeFileSync(this.vsCodeSettingsFile, JSON.stringify(settingsJson, null, 2));
+  }
+
+  public restoreSettings(): void {
+    if (!this.userCursorSettings) {
+      fs.rmSync(this.vsCodeSettingsFile);
+      return;
+    }
+    fs.writeFileSync(this.vsCodeSettingsFile, this.userCursorSettings);
+    this.userCursorSettings = null;
+  }
+
+  private verifyCursorInstallation(): void {
     try {
       const vscodeVersion = spawnSync("cursor", ["--version"], { stdio: "pipe" });
       if (vscodeVersion.status !== 0) {
