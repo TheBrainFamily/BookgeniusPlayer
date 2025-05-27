@@ -648,8 +648,7 @@
     }
     border-radius: 4px;
     box-shadow: 0 0 15px var(--talking-paragraph-shadow-light);
-    margin-left: -0.3em;
-    padding-left: 0.3em;
+    scale: 1.05;
     transition: all 0.3s ease-in-out;
   }
 
