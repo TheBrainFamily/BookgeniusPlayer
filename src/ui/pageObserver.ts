@@ -95,7 +95,7 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
   });
 
   // Add hover functionality to show floating avatar
-  character.addEventListener("mouseover", (e) => {
+  character.addEventListener("mouseover", () => {
     // Create floating avatar container
     const floatingAvatar = document.createElement("div");
     floatingAvatar.classList.add("floating-avatar");
@@ -103,6 +103,9 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
     floatingAvatar.style.zIndex = "1000";
     floatingAvatar.style.opacity = "0";
     floatingAvatar.style.transition = "opacity 500ms ease-in-out";
+
+    // Get trigger element's position
+    const triggerRect = character.getBoundingClientRect();
 
     // Create media element based on source type
     if (listeningSrc) {
@@ -125,20 +128,9 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
       floatingAvatar.appendChild(mediaElement);
       document.body.appendChild(floatingAvatar);
 
-      // Position next to cursor
-      const updatePosition = (mouseEvent: MouseEvent) => {
-        floatingAvatar.style.left = `${mouseEvent.clientX + 15}px`;
-        floatingAvatar.style.top = `${mouseEvent.clientY - 30}px`;
-      };
-
-      updatePosition(e as MouseEvent);
-
-      // Add mousemove listener to update position
-      const handleMouseMove = (mouseEvent: MouseEvent) => {
-        updatePosition(mouseEvent);
-      };
-
-      document.addEventListener("mousemove", handleMouseMove);
+      // Position the floating avatar relative to the trigger element
+      floatingAvatar.style.left = `${triggerRect.right + 10}px`; // 10px to the right of the trigger
+      floatingAvatar.style.top = `${triggerRect.top + triggerRect.height / 2 - floatingAvatar.offsetHeight / 2}px`; // Vertically centered with the trigger, adjust as needed
 
       // Fade in
       setTimeout(() => {
@@ -153,7 +145,7 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
         // Remove after transition completes
         setTimeout(() => {
           document.body.removeChild(floatingAvatar);
-          document.removeEventListener("mousemove", handleMouseMove);
+          // document.removeEventListener("mousemove", handleMouseMove);
         }, 500);
 
         character.removeEventListener("mouseout", handleMouseOut);
