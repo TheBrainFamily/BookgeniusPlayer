@@ -26,7 +26,7 @@ interface SimpleCharacterMetadata {
  * @param charactersXml The XML string containing <CharactersMaster>.
  * @returns A Set containing the tag names of the characters.
  */
-function getCharacterTags(doc: XMLDocument): Set<string> {
+export function getCharacterTags(doc: XMLDocument): Set<string> {
   const characterTags = new Set<string>();
   try {
     const masterElement = doc.getElementsByTagName("CharactersMaster")[0];
@@ -54,7 +54,7 @@ function getCharacterTags(doc: XMLDocument): Set<string> {
  * @param characterTags A Set containing the valid character tag names.
  * @returns An array of SimpleCharacterMetadata objects.
  */
-function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<string>): SimpleCharacterMetadata[] {
+export function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<string>): SimpleCharacterMetadata[] {
   // Initialize results map keyed by character tag name
   const resultsMap = new Map<string, SimpleCharacterMetadata>();
   characterTags.forEach((tag) => {

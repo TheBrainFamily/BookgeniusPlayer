@@ -40,7 +40,6 @@ export class TextEditor {
     XmlManager.updateParagraphContent(xmlDoc, paragraphs[paragraphNumber], updatedParagraphText);
 
     const updatedXml = XmlManager.serializeXml(xmlDoc);
-    this.fileManager.writeXmlFile(updatedXml);
     this.fileManager.regenerateXml(updatedXml);
   }
 
@@ -79,7 +78,6 @@ export class TextEditor {
     XmlManager.updateParagraphContent(xmlDoc, paragraph, updatedParagraphText);
 
     const updatedXml = XmlManager.serializeXml(xmlDoc);
-    this.fileManager.writeXmlFile(updatedXml);
     this.fileManager.regenerateXml(updatedXml);
     return updatedXml;
   }
@@ -117,7 +115,6 @@ export class TextEditor {
     XmlManager.updateParagraphContent(xmlDoc, paragraphs[paragraphNumber], updatedParagraph);
 
     const updatedXml = XmlManager.serializeXml(xmlDoc);
-    this.fileManager.writeXmlFile(updatedXml);
     this.fileManager.regenerateXml(updatedXml);
     return updatedXml;
   }
