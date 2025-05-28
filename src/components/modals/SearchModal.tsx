@@ -1,7 +1,7 @@
 import React from "react";
-import ModalUI from "./ModalUI";
 import { SearchResultsData, SearchResultItemData } from "@/searchModal";
 import { goToParagraph } from "@/helpers/paragraphsNavigation";
+import ModalUIOld from "./ModalUIOld";
 
 interface SearchModalProps {
   onClose: () => void;
@@ -12,7 +12,7 @@ interface SearchModalProps {
 
 const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults }) => {
   return (
-    <ModalUI title="Search" onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
+    <ModalUIOld title="Search" onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
       <div className="flex flex-col h-full p-4">
         {searchResults?.isLoading && (
           <div className="flex items-center justify-center my-4 py-4">
@@ -55,7 +55,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
           </div>
         )}
       </div>
-    </ModalUI>
+    </ModalUIOld>
   );
 };
 

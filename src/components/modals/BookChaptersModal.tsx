@@ -3,14 +3,14 @@ import ModalUI from "@/components/modals/ModalUI";
 import { BookData } from "@/booksData/types";
 import { goToParagraph } from "@/helpers/paragraphsNavigation";
 import { getTitle } from "@/utils/getChapterTitle";
+import { Button } from "../ui/button";
 
 interface BookChaptersModalProps {
-  open: boolean;
   onClose: () => void;
   bookData: BookData;
 }
 
-const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ open, onClose, bookData }) => {
+const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose, bookData }) => {
   const chapters = useMemo(() => {
     if (!bookData || typeof bookData.chapters !== "number") {
       return [];
@@ -24,24 +24,19 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ open, onClose, bo
     onClose();
   };
 
-  if (!open) return null;
-
   return (
     <ModalUI title="Rozdziały" onClose={onClose}>
-      <div className="h-max-[60vh] overflow-y-auto space-y-1">
+      <div className="h-max-[60vh] overflow-y-auto space-y-2">
         {chapters.map((chapter) => (
-          <button
+          <Button
+            variant="ghost"
             key={chapter.id}
             onClick={() => navigateToChapter(chapter.id)}
-            className="w-full rounded-md px-4 py-3 text-left transition-colors hover:bg-muted active:bg-muted/80"
+            className="w-full justify-between text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="font-medium">{chapter.title}</span>
-              </div>
-              <span className="text-sm text-muted-foreground">p. {chapter.page}</span>
-            </div>
-          </button>
+            <div className="flex items-center gap-3 font-medium">{chapter.title}</div>
+            <span className="text-sm text-muted-foreground">p. {chapter.page}</span>
+          </Button>
         ))}
       </div>
     </ModalUI>
