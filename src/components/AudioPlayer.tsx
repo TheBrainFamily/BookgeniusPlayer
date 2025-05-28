@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Play, Pause, SkipForward, SkipBack, ListMusic, BookHeadphones, Volume2, VolumeX, Download } from "lucide-react";
 import { motion, AnimatePresence, Variants, Transition } from "motion/react";
+import useLocalStorageState from "use-local-storage-state";
 
 import {
   getMasterVolume,
@@ -24,20 +25,21 @@ import { stopAudiobook, playAudiobook } from "@/hooks/useAudiobookTracks";
 import { dealWithBackgroundSongs } from "@/deal-with-background-songs";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { Slider } from "@/components/ui/slider";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { CURRENT_BOOK } from "@/consts";
-import useLocalStorageState from "use-local-storage-state";
 import { getAudiobookTracksForBook } from "@/getAudiobookTracksForBook";
 
 const AudioPlayer = () => {
-  const [isPlaying, setIsPlaying] = useState(true);
   const [isPlayingAudioBook, setIsPlayingAudiobook] = useLocalStorageState("isPlayingAudioBook", { defaultValue: true });
-  const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useLocalStorageState("volume", { defaultValue: getMasterVolume() ?? 0.5 });
   const [balance, setBalance] = useLocalStorageState("balance", { defaultValue: 0.5 });
   const [isMuted, setIsMuted] = useLocalStorageState("isMuted", { defaultValue: false });
-  const [isVolumeHovered, setIsVolumeHovered] = useState(false);
-  const [isBigPlayerHovered, setIsBigPlayerHovered] = useState(false);
+
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [isVolumeOpen, setIsVolumeOpen] = useState(false);
+  const [isBigPlayerOpen, setIsBigPlayerOpen] = useState(false);
   const [currentTrackData, setCurrentTrackData] = useState<TrackState | null>(null);
   const [showSongNotification, setShowSongNotification] = useState(false);
   const [windowWidth, setWindowWidth] = useState(undefined);
@@ -265,22 +267,18 @@ const AudioPlayer = () => {
     document.body.removeChild(link);
   };
 
-  const handleOpenBigPlayerDropdownOpen = () => {
-    setIsBigPlayerHovered(true);
-    setIsVolumeHovered(false);
-  };
-
-  const handleOpenVolumeDropdownOpen = () => {
-    setIsVolumeHovered(true);
-    setIsBigPlayerHovered(false);
-  };
-
   return (
     <>
       <div className="relative origin-top-left">
-        <div className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1">
-          {/* Volume Control Button */}
-          <div onClick={toggleMute} onMouseEnter={handleOpenVolumeDropdownOpen} onMouseLeave={() => setIsVolumeHovered(false)} className="relative">
+        <div className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1 relative">
+          {/* Volume Control Button with Dropdown */}
+          <div
+            onMouseEnter={() => {
+              setIsVolumeOpen(true);
+              setIsBigPlayerOpen(false);
+            }}
+            onMouseLeave={() => setIsVolumeOpen(false)}
+          >
             <motion.button onClick={toggleMute} className="p-2 my-1 hover:text-white rounded-full cursor-pointer" whileHover="hover" whileTap="tap" variants={variants.buttonHover}>
               <AnimatePresence mode="wait" initial={false}>
                 {isMuted ? (
@@ -294,207 +292,224 @@ const AudioPlayer = () => {
                 )}
               </AnimatePresence>
             </motion.button>
+            {/* Invisible bridge to cover the gap */}
+            {isVolumeOpen && <div className="absolute top-full left-0 w-48 h-2 z-5" />}
+            <AnimatePresence>
+              {isVolumeOpen && (
+                <motion.div
+                  className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 absolute top-full left-0 mt-2 z-10 px-4 pt-2 pb-3 w-48 flex gap-3 flex-col"
+                  variants={variants.dropdownContainer}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                >
+                  <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.05 }}>
+                    <div className="flex justify-between text-xs my-2">Głośność</div>
+                    <Slider value={[isMuted ? 0 : volume]} min={0} max={1} step={0.01} onValueChange={handleVolumeChange} variant="secondary" />
+                    <div className="flex justify-between text-xs mt-2">
+                      <span>0%</span>
+                      <span>100%</span>
+                    </div>
+                  </motion.div>
+
+                  {isAudiobookAvailable && (
+                    <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.1 }}>
+                      <div className="flex justify-between text-xs my-2">Balans</div>
+                      <Slider value={[balance]} min={0} max={1} step={0.01} onValueChange={handleBalanceChange} variant="secondary" />
+                      <div className="flex justify-between text-xs mt-2">
+                        <span>Audiobook</span>
+                        <span>Muzyka</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Audiobook Toggle Button */}
           {isAudiobookAvailable && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <motion.button
+                  onClick={toggleAudiobookState}
+                  className="p-2 hover:text-white relative rounded-full cursor-pointer"
+                  whileHover="hover"
+                  whileTap="tap"
+                  variants={variants.buttonHover}
+                >
+                  <BookHeadphones className="w-4 h-4 lg:w-5 lg:h-5" />
+                  <motion.div className="absolute bottom-0 right-0">{isPlayingAudioBook ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}</motion.div>
+                </motion.button>
+              </TooltipTrigger>
+              <TooltipContent>{isPlayingAudioBook ? "Zatrzymaj audiobook" : "Odtwórz audiobook"}</TooltipContent>
+            </Tooltip>
+          )}
+
+          {/* Big Player Button with Dropdown */}
+          <div
+            onMouseEnter={() => {
+              setIsBigPlayerOpen(true);
+              setIsVolumeOpen(false);
+            }}
+            onMouseLeave={() => setIsBigPlayerOpen(false)}
+          >
             <motion.button
-              onClick={toggleAudiobookState}
-              className="p-2 hover:text-white relative rounded-full cursor-pointer"
+              onClick={() => setIsBigPlayerOpen((prev) => !prev)}
+              className="p-2 my-1 hover:text-white rounded-full cursor-pointer"
               whileHover="hover"
               whileTap="tap"
               variants={variants.buttonHover}
             >
-              <BookHeadphones className="w-4 h-4 lg:w-5 lg:h-5" />
-              <motion.div className="absolute bottom-0 right-0">{isPlayingAudioBook ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}</motion.div>
-            </motion.button>
-          )}
-
-          {/* Big Player Button */}
-          <div onClick={() => setIsBigPlayerHovered((prev) => !prev)} onMouseEnter={handleOpenBigPlayerDropdownOpen} onMouseLeave={() => setIsBigPlayerHovered(false)}>
-            <motion.button className="p-2 my-1 hover:text-white rounded-full cursor-pointer" whileHover="hover" whileTap="tap" variants={variants.buttonHover}>
               <ListMusic className="w-4 h-4 lg:w-5 lg:h-5" />
             </motion.button>
-          </div>
-        </div>
-
-        {/* Volume Control Dropdown */}
-        <AnimatePresence>
-          {isVolumeHovered && (
-            <>
-              {/* Invisible bridge element to ensure smooth hover transition */}
-              <div className="absolute w-48 h-4 top-full left-0 z-10 -mt-1" onMouseEnter={handleOpenVolumeDropdownOpen} />
-              <div
-                className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 absolute top-full left-0 mt-2 z-10 px-4 pt-2 pb-3 w-48 flex gap-3 flex-col"
-                onMouseEnter={handleOpenVolumeDropdownOpen}
-                onMouseLeave={() => setIsVolumeHovered(false)}
-              >
-                <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.05 }}>
-                  <div className="flex justify-between text-xs my-2">Głośność</div>
-                  <Slider value={[isMuted ? 0 : volume]} min={0} max={1} step={0.01} onValueChange={handleVolumeChange} variant="secondary" />
-                  <div className="flex justify-between text-xs mt-2">
-                    <span>0%</span>
-                    <span>100%</span>
-                  </div>
-                </motion.div>
-
-                {isAudiobookAvailable && (
-                  <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.1 }}>
-                    <div className="flex justify-between text-xs my-2">Balans</div>
-                    <Slider value={[balance]} min={0} max={1} step={0.01} onValueChange={handleBalanceChange} variant="secondary" />
-                    <div className="flex justify-between text-xs mt-2">
-                      <span>Audiobook</span>
-                      <span>Muzyka</span>
+            {/* Invisible bridge to cover the gap */}
+            {isBigPlayerOpen && <div className="absolute top-full left-0 w-full min-w-xs h-2 z-5" />}
+            <AnimatePresence>
+              {isBigPlayerOpen && (
+                <motion.div
+                  className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs"
+                  variants={variants.dropdownContainer}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <motion.div className="flex justify-center pt-4 mb-4" variants={variants.popUpItem} initial="closed" animate="open">
+                    <div className="w-32 h-32 bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg">
+                      {currentTrackData?.coverArtUrl && (
+                        <motion.img
+                          key={currentTrackData?.coverArtUrl}
+                          src={currentTrackData?.coverArtUrl}
+                          alt="Music album art"
+                          className="w-full h-full object-cover"
+                          variants={variants.iconFadeScale}
+                          initial="initial"
+                          animate="animate"
+                        />
+                      )}
                     </div>
                   </motion.div>
-                )}
-              </div>
-            </>
-          )}
-        </AnimatePresence>
 
-        {/* Big Player Dropdown */}
-        <AnimatePresence>
-          {isBigPlayerHovered && (
-            <>
-              {/* Invisible bridge element */}
-              <div className="absolute w-80 h-4 top-full left-0 z-10 -mt-1" onMouseEnter={handleOpenBigPlayerDropdownOpen} />
-              <div
-                className="bg-black/70 textured-bg textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs"
-                onClick={() => setIsBigPlayerHovered((prev) => !prev)}
-                onMouseEnter={handleOpenBigPlayerDropdownOpen}
-                onMouseLeave={() => setIsBigPlayerHovered(false)}
-              >
-                <motion.div className="flex justify-center pt-4 mb-4" variants={variants.popUpItem} initial="closed" animate="open">
-                  <div className="w-32 h-32 bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg">
-                    {currentTrackData?.coverArtUrl && (
-                      <motion.img
-                        key={currentTrackData?.coverArtUrl}
-                        src={currentTrackData?.coverArtUrl}
-                        alt="Music album art"
-                        className="w-full h-full object-cover"
-                        variants={variants.iconFadeScale}
-                        initial="initial"
-                        animate="animate"
-                      />
-                    )}
-                  </div>
-                </motion.div>
+                  <motion.div className="text-lg mb-4 text-center" variants={variants.popUpItem} initial="closed" animate="open">
+                    {currentTrackData?.title}
+                  </motion.div>
 
-                <motion.div className="text-lg mb-4 text-center" variants={variants.popUpItem} initial="closed" animate="open">
-                  {currentTrackData?.title}
-                </motion.div>
+                  <motion.div className="mb-2" variants={variants.popUpItem} initial="closed" animate="open">
+                    <div className="w-full group hover:opacity-100">
+                      <Slider value={[currentTime]} min={0} max={currentTrackData?.duration || 100} step={0.1} onValueChange={handleProgressChange} variant="secondary" />
+                    </div>
+                  </motion.div>
 
-                <motion.div className="mb-2" variants={variants.popUpItem} initial="closed" animate="open">
-                  <div className="w-full group hover:opacity-100">
-                    <Slider value={[currentTime]} min={0} max={currentTrackData?.duration || 100} step={0.1} onValueChange={handleProgressChange} variant="secondary" />
-                  </div>
-                </motion.div>
+                  <motion.div className="flex justify-between text-xs mb-4" variants={variants.popUpItem} initial="closed" animate="open">
+                    <span>{formatTime(currentTime)}</span>
+                    <span>{formatTime(currentTrackData?.duration)}</span>
+                  </motion.div>
 
-                <motion.div className="flex justify-between text-xs mb-4" variants={variants.popUpItem} initial="closed" animate="open">
-                  <span>{formatTime(currentTime)}</span>
-                  <span>{formatTime(currentTrackData?.duration)}</span>
-                </motion.div>
-
-                <motion.div className="flex justify-center items-center gap-8 mb-4 relative" variants={variants.popUpItem} initial="closed" animate="open">
-                  <motion.button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      skipToPrevious();
-                    }}
-                    className="hover:text-white/80 p-2 rounded-full cursor-pointer"
-                    whileHover="hover"
-                    whileTap="tap"
-                    variants={variants.navButtonHover}
-                    title="Previous track"
-                  >
-                    <SkipBack className="w-4 h-4 lg:w-5 lg:h-5" />
-                  </motion.button>
-
-                  <motion.div variants={variants.playButtonHover} whileTap="tap">
+                  <motion.div className="flex justify-center items-center gap-8 mb-4 relative" variants={variants.popUpItem} initial="closed" animate="open">
                     <motion.button
                       onClick={(e) => {
                         e.stopPropagation();
-                        togglePlay();
+                        skipToPrevious();
                       }}
-                      className="hover:text-white bg-white/40 rounded-full p-3 relative z-10 cursor-pointer"
+                      className="hover:text-white/80 p-2 rounded-full cursor-pointer"
                       whileHover="hover"
                       whileTap="tap"
-                      variants={variants.playButtonHover}
-                      initial="initial"
+                      variants={variants.navButtonHover}
+                      title="Previous track"
                     >
-                      <AnimatePresence mode="wait" initial={false}>
-                        {isPlaying ? (
-                          <motion.div key="pause" variants={variants.iconRotatePause} initial="initial" animate="animate" exit="exit">
-                            <Pause className="w-6 h-6" />
-                          </motion.div>
-                        ) : (
-                          <motion.div key="play" variants={variants.iconRotatePlay} initial="initial" animate="animate" exit="exit">
-                            <Play className="w-6 h-6" />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      <SkipBack className="w-4 h-4 lg:w-5 lg:h-5" />
+                    </motion.button>
+
+                    <motion.div variants={variants.playButtonHover} whileTap="tap">
+                      <motion.button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          togglePlay();
+                        }}
+                        className="hover:text-white bg-white/40 rounded-full p-3 relative z-10 cursor-pointer"
+                        whileHover="hover"
+                        whileTap="tap"
+                        variants={variants.playButtonHover}
+                        initial="initial"
+                      >
+                        <AnimatePresence mode="wait" initial={false}>
+                          {isPlaying ? (
+                            <motion.div key="pause" variants={variants.iconRotatePause} initial="initial" animate="animate" exit="exit">
+                              <Pause className="w-6 h-6" />
+                            </motion.div>
+                          ) : (
+                            <motion.div key="play" variants={variants.iconRotatePlay} initial="initial" animate="animate" exit="exit">
+                              <Play className="w-6 h-6" />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.button>
+                    </motion.div>
+
+                    <motion.button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        skipToNext();
+                      }}
+                      className="hover:text-white/80 p-2 rounded-full cursor-pointer"
+                      whileHover="hover"
+                      whileTap="tap"
+                      variants={variants.navButtonHover}
+                      title="Next track"
+                    >
+                      <SkipForward className="w-4 h-4 lg:w-5 lg:h-5" />
                     </motion.button>
                   </motion.div>
 
-                  <motion.button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      skipToNext();
-                    }}
-                    className="hover:text-white/80 p-2 rounded-full cursor-pointer"
-                    whileHover="hover"
-                    whileTap="tap"
-                    variants={variants.navButtonHover}
-                    title="Next track"
-                  >
-                    <SkipForward className="w-4 h-4 lg:w-5 lg:h-5" />
-                  </motion.button>
+                  <motion.div className="space-y-2 pb-3" variants={variants.popUpItem} initial="closed" animate="open">
+                    <div className="text-sm font-medium mb-2">Playlist:</div>
+                    {playlistTracks.map((track) => (
+                      <motion.div
+                        key={track.id}
+                        className={cn("flex items-center justify-between px-2 py-1 rounded-md cursor-pointer gap-2", currentTrackIdFromState === track.id && "bg-white/10")}
+                        variants={variants.trackItemHover}
+                        whileHover="hover"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          transitionToTrack(track.id);
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className={"text-white/70"}>{track.title}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-white/70">{formatTime(track.duration)}</span>
+                          <button
+                            className="text-white/70 hover:text-white p-2 rounded-full transition hover:bg-black/40 cursor-pointer"
+                            title="Download track"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDownloadTrack(track.id, track.title);
+                            }}
+                          >
+                            <Download className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
                 </motion.div>
-
-                <motion.div className="space-y-2 pb-3" variants={variants.popUpItem} initial="closed" animate="open">
-                  <div className="text-sm font-medium mb-2">Playlist:</div>
-                  {playlistTracks.map((track) => (
-                    <motion.div
-                      key={track.id}
-                      className={cn("flex items-center justify-between px-2 py-1 rounded-md cursor-pointer gap-2", currentTrackIdFromState === track.id && "bg-white/10")}
-                      variants={variants.trackItemHover}
-                      whileHover="hover"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        transitionToTrack(track.id);
-                      }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className={"text-white/70"}>{track.title}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-white/70">{formatTime(track.duration)}</span>
-                        <button
-                          className="text-white/70 hover:text-white p-2 rounded-full transition hover:bg-black/40 cursor-pointer"
-                          title="Download track"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDownloadTrack(track.id, track.title);
-                          }}
-                        >
-                          <Download className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </motion.div>
-              </div>
-            </>
-          )}
-        </AnimatePresence>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
 
       {/* Song Notification */}
       <AnimatePresence>
         {showSongNotification && currentTrackData && windowWidth && (
           <motion.div
-            className={cn(windowWidth < 1400 ? "fixed w-80 bottom-0 top-0 left-4 h-[100vh] flex" : "absolute w-100 top-4 right-4")}
+            className={cn(
+              windowWidth >= 1280 && "absolute w-100 top-5 right-5",
+              windowWidth < 1280 && windowWidth >= 965 && "fixed w-80 bottom-5 left-5",
+              windowWidth < 965 && "fixed w-80 bottom-20 left-5",
+            )}
             variants={variants.songNotification}
             initial="initial"
             animate="animate"
@@ -504,15 +519,15 @@ const AudioPlayer = () => {
               className={cn(
                 "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-4",
                 "flex items-center gap-4 z-20 max-w-full overflow-hidden",
-                "mb-20 mt-auto",
+                "cursor-pointer",
               )}
+              onClick={() => setShowSongNotification(false)}
             >
               <div
-                className={`bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg flex-shrink-0 ${windowWidth < 1400 ? "w-24 h-24" : "w-32 h-32"}`}
+                className={`bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg flex-shrink-0 ${windowWidth < 1280 ? "w-24 h-24" : "w-32 h-32"}`}
               >
                 {currentTrackData.coverArtUrl && <img src={currentTrackData.coverArtUrl} alt="Teraz gra" className="w-full h-full object-cover" />}
               </div>
-
               <div className="flex flex-col flex-1 min-w-0">
                 <div className="text-sm font-medium">Teraz gra</div>
                 <div className="text-base font-medium truncate">{currentTrackData.title || "Unknown Track"}</div>
@@ -558,6 +573,11 @@ const variants: Record<string, Variants> = {
     exit: { opacity: 0, scale: 0.8, rotateZ: 10, transition: transitions.ease({ duration: 0.2, ease: "linear" }) },
   },
   // Container animations for dropdowns and panels
+  dropdownContainer: {
+    initial: { opacity: 0, y: -10, scale: 0.95 },
+    animate: { opacity: 1, y: 0, scale: 1, transition: transitions.spring({ stiffness: 300, damping: 25, duration: 0.4 }) },
+    exit: { opacity: 0, y: -5, scale: 0.98, transition: transitions.ease({ duration: 0.2, ease: "easeIn" }) },
+  },
   popUpItem: {
     open: { opacity: 1, y: 0, scale: 1, transition: transitions.spring({ stiffness: 350, damping: 15, duration: 0.4 }) },
     closed: { opacity: 0, y: 10, scale: 0.95, transition: transitions.ease({ duration: 0.25, ease: "easeIn" }) },
