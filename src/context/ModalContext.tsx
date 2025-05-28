@@ -165,7 +165,7 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
           return <DeepResearchModal onClose={closeModal} content={modal.content} layoutView={modal.layoutView} hideOverlay={modal.hideOverlay} isLoading={modal.isLoading} />;
 
         case "bookChapter":
-          return <BookChaptersModal open={true} onClose={closeModal} bookData={bookData} />;
+          return <BookChaptersModal onClose={closeModal} bookData={bookData} />;
 
         case "bookMenu": {
           return (

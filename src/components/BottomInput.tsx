@@ -240,6 +240,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                           whileHover={!isRecording ? "hover" : undefined}
                           whileTap={!isRecording ? "tap" : undefined}
                           variants={buttonVariants}
+                          animate={isRecording ? "recording" : "idle"}
                           onClick={() => {
                             if (isRecording) {
                               setIsRecording(false);
@@ -271,4 +272,11 @@ export default BottomInput;
 const buttonVariants: Variants = {
   hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
   tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
+  idle: { scale: 1 },
+  recording: {
+    scale: [1, 1.1, 1],
+    backgroundColor: ["rgba(239, 68, 68, 0.2)", "rgba(239, 68, 68, 0.4)", "rgba(239, 68, 68, 0.2)"],
+    boxShadow: ["0px 0px 0px rgba(239, 68, 68, 0.4)", "0px 0px 15px rgba(239, 68, 68, 0.6)", "0px 0px 0px rgba(239, 68, 68, 0.4)"],
+    transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+  },
 };

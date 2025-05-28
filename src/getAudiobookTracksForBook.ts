@@ -1,17 +1,22 @@
 import { BOOK_SLUGS } from "@/consts";
-import { AudiobookTracksDefined as _1984AudiobookTracksDefined } from "./booksData/1984AudiobookTracks";
-import { AudiobookTracksDefined as KrolowaSnieguAudiobookTracksDefined } from "./booksData/KrolowaSnieguAudiobookTracks";
-import { AudiobookTracksDefined as ConradTajnyAgentAudiobookTracksDefined } from "./booksData/ConradTajnyAgentAudiobookTracks";
+import { getAudiobookData } from "./booksData/getAudiobookData";
+import { getBookData } from "./booksData/getBookData";
 
 // word, start
 export type WordPosition = [string, number];
 
 export type AudiobookTracksSection = { chapter: number; paragraph: number; file: string; smile_id: string; "clip-begin": number; "clip-end": number; words?: WordPosition[] };
 
-export const getAudiobookTracksForBook = (bookSlug: string): AudiobookTracksSection[] => {
+export const getAudiobookTracksForBook = async (): Promise<AudiobookTracksSection[]> => {
+  const bookData = await getBookData();
+  if (!bookData.hasAudiobook) {
+    return [];
+  }
+  const audiobookTracks = await getAudiobookData();
+  const bookSlug = bookData.slug;
   switch (bookSlug) {
     case BOOK_SLUGS._1984:
-      return _1984AudiobookTracksDefined.map((track) => {
+      return audiobookTracks.map((track) => {
         if (track.chapter === 1) {
           return { ...track, paragraph: track.paragraph - 6 };
         } else {
@@ -19,13 +24,9 @@ export const getAudiobookTracksForBook = (bookSlug: string): AudiobookTracksSect
         }
       });
     case BOOK_SLUGS.Krolowa_Sniegu:
-      return KrolowaSnieguAudiobookTracksDefined as AudiobookTracksSection[];
+      return audiobookTracks;
     case BOOK_SLUGS.Conrad_Tajny_Agent:
-      return ConradTajnyAgentAudiobookTracksDefined as AudiobookTracksSection[];
-    // case BOOK_SLUGS.PHARAON:
-    //   return pharaonBackgroundTracksDefined;
-    // case BOOK_SLUGS.Conrad_Tajny_Agent:
-    //   return conradTajnyAgentBackgroundTracksDefined;
+      return audiobookTracks;
     default:
       return [];
   }
