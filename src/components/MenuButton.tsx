@@ -3,15 +3,27 @@ import { Book } from "lucide-react";
 import { motion, Variants } from "motion/react";
 
 import { useModal } from "@/context/ModalContext";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const MenuButton = () => {
   const { openBookMenuModal } = useModal();
 
   return (
     <div className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center">
-      <motion.button onClick={openBookMenuModal} className="p-2 my-1 hover:text-white rounded-full cursor-pointer flex" whileHover="hover" whileTap="tap" variants={buttonVariants}>
-        <Book className="w-4 h-4 lg:w-5 lg:h-5" />
-      </motion.button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <motion.button
+            onClick={openBookMenuModal}
+            className="p-2 my-1 hover:text-white rounded-full cursor-pointer flex"
+            whileHover="hover"
+            whileTap="tap"
+            variants={buttonVariants}
+          >
+            <Book className="w-4 h-4 lg:w-5 lg:h-5" />
+          </motion.button>
+        </TooltipTrigger>
+        <TooltipContent className="ml-1">Otwórz Menu Książki</TooltipContent>
+      </Tooltip>
     </div>
   );
 };
