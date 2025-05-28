@@ -108,6 +108,9 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
     <Bogaty-dzierzawca display="Bogaty dzierżawca" summary="" />
     <Ubogi-kaplan-z-chlopcem display="Ubogi kapłan (z chłopcem)" summary="" />
     <Maly-chlopiec-z-kaplanem display="Mały chłopiec (z kapłanem)" summary="" />
+    <Sezofris display="Sezofris" summary="" />
+    <Chaires display="Chaires" summary="" />
+    <Nomarcha-Memfis display="Nomarcha Memfis" summary="" />
 </CharactersMaster>
 
       

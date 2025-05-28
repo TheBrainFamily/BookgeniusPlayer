@@ -463,25 +463,74 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
         const topFocusedPageElement = focusedPages[0];
         const bottomFocusedPageElement = focusedPages[focusedPages.length - 1];
 
-        // 3. Update active state only if the topmost or bottommost focused page has changed
-        if (topFocusedPageElement !== currentlyActivePageElement || bottomFocusedPageElement !== currentlyLastActivePageElement || activeParagraph !== currentlyActiveParagraph) {
-          console.log("[Observer] Top focused page:", topFocusedPageElement);
-          console.log("[Observer] Bottom focused page:", bottomFocusedPageElement);
-          console.log("[Observer] Active paragraph:", activeParagraph);
+        let activeParagraphChanged = false;
+        if (!currentlyActiveParagraph && activeParagraph) {
+          activeParagraphChanged = true;
+        } else if (currentlyActiveParagraph && !activeParagraph) {
+          activeParagraphChanged = true;
+        } else if (currentlyActiveParagraph && activeParagraph) {
+          if (currentlyActiveParagraph.chapter !== activeParagraph.chapter || currentlyActiveParagraph.paragraph !== activeParagraph.paragraph) {
+            activeParagraphChanged = true;
+          }
+        }
 
+        // --- Determine if topFocusedPageElement has changed (value-based) ---
+        let topElementChanged = false;
+        const newTopInfo = topFocusedPageElement ? getParagraphInfo(topFocusedPageElement) : null;
+        // Get info for currentlyActivePageElement (which was the top element from the PREVIOUS run)
+        const currentTopInfoFromState = currentlyActivePageElement ? getParagraphInfo(currentlyActivePageElement) : null;
+
+        if ((!newTopInfo && currentTopInfoFromState) || (newTopInfo && !currentTopInfoFromState)) {
+          topElementChanged = true;
+        } else if (newTopInfo && currentTopInfoFromState) {
+          if (newTopInfo.chapter !== currentTopInfoFromState.chapter || newTopInfo.paragraph !== currentTopInfoFromState.paragraph) {
+            topElementChanged = true;
+          }
+        }
+
+        // --- Determine if bottomFocusedPageElement has changed (value-based) ---
+        let bottomElementChanged = false;
+        const newBottomInfo = bottomFocusedPageElement ? getParagraphInfo(bottomFocusedPageElement) : null;
+        // Get info for currentlyLastActivePageElement (which was the bottom element from the PREVIOUS run)
+        const currentBottomInfoFromState = currentlyLastActivePageElement ? getParagraphInfo(currentlyLastActivePageElement) : null;
+
+        if ((!newBottomInfo && currentBottomInfoFromState) || (newBottomInfo && !currentBottomInfoFromState)) {
+          bottomElementChanged = true;
+        } else if (newBottomInfo && currentBottomInfoFromState) {
+          if (newBottomInfo.chapter !== currentBottomInfoFromState.chapter || newBottomInfo.paragraph !== currentBottomInfoFromState.paragraph) {
+            bottomElementChanged = true;
+          }
+        }
+
+        if (topElementChanged || bottomElementChanged || activeParagraphChanged) {
+          console.log(`[Observer] Change detected. TopEl C: ${topElementChanged}, BotEl C: ${bottomElementChanged}, Pgh C: ${activeParagraphChanged}`);
+          console.log(`[Observer] Prev Top Pgh: ${JSON.stringify(currentTopInfoFromState)}, New Top Pgh: ${JSON.stringify(newTopInfo)}`);
+          console.log(`[Observer] Prev Bottom Pgh: ${JSON.stringify(currentBottomInfoFromState)}, New Bottom Pgh: ${JSON.stringify(newBottomInfo)}`);
+          console.log(`[Observer] Prev Active Pgh: ${JSON.stringify(currentlyActiveParagraph)}, New Active Pgh: ${JSON.stringify(activeParagraph)}`);
+
+          // Update persisted state with the NEW DOM element references for the next comparison cycle
           currentlyActivePageElement = topFocusedPageElement;
           currentlyLastActivePageElement = bottomFocusedPageElement;
-          currentlyActiveParagraph = activeParagraph;
+          currentlyActiveParagraph = activeParagraph ? { chapter: activeParagraph.chapter, paragraph: activeParagraph.paragraph } : null;
 
-          const startInfo = getParagraphInfo(topFocusedPageElement);
-          const endInfo = getParagraphInfo(bottomFocusedPageElement);
-          // -----------------------------------------
+          // Use startInfo and endInfo derived from the NEW topFocusedPageElement and bottomFocusedPageElement
+          const startInfo = newTopInfo; // Already derived
+          const endInfo = newBottomInfo; // Already derived
 
-          // 4. Call update logic if we have valid info
-          if (startInfo.chapter !== null && startInfo.paragraph !== null && endInfo.chapter !== null && endInfo.paragraph !== null && activeParagraph !== null) {
+          if (
+            activeParagraph &&
+            activeParagraph.chapter !== null &&
+            activeParagraph.paragraph !== null &&
+            startInfo &&
+            startInfo.chapter !== null &&
+            startInfo.paragraph !== null &&
+            endInfo &&
+            endInfo.chapter !== null &&
+            endInfo.paragraph !== null
+          ) {
             console.log(`[Observer] Updating notes for Ch ${startInfo.chapter}:${startInfo.paragraph} to Ch ${endInfo.chapter}:${endInfo.paragraph} (Focus Zone)`);
             console.log("setting current location from intersection (focus zone)", { chapter: startInfo.chapter, paragraph: startInfo.paragraph });
-            // Set current location based on the top element in the focus zone
+
             setCurrentLocation({
               chapter: startInfo.chapter,
               paragraph: startInfo.paragraph,
@@ -491,12 +540,16 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
               currentParagraph: activeParagraph.paragraph,
             });
 
-            // --- Activate/Deactivate Media ---
             activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, modal);
-            // ----------------------------------
           } else {
-            console.warn("[Observer] Could not extract chapter/paragraph info for focused elements:", topFocusedPageElement, bottomFocusedPageElement);
+            console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {
+              activePgh: activeParagraph,
+              startInfo: startInfo,
+              endInfo: endInfo,
+            });
           }
+        } else {
+          console.log(`[Observer] No relevant change detected in active/boundary elements or paragraph. Skipping update.`);
         }
       } else {
         // Handle case where intersecting pages exist, but none are in the focus zone
@@ -512,8 +565,8 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
       // Handle case where no pages are intersecting the viewport at all
       if (currentlyActivePageElement !== null) {
         console.log("[Observer] No pages intersecting viewport.");
-        currentlyActivePageElement = null;
-        currentlyLastActivePageElement = null;
+        // currentlyActivePageElement = null;
+        // currentlyLastActivePageElement = null;
       }
     }
   }, observerOptions);
@@ -522,6 +575,7 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
   if (paragraphsToObserve.length === 0) {
     console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
   } else {
+    console.log(`GOZDECKI MAY 28 paragraphsToObserve.length`, paragraphsToObserve.length);
     paragraphsToObserve.forEach((paragraph) => {
       observer.observe(paragraph);
     });

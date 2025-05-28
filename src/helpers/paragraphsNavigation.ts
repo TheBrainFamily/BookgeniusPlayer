@@ -43,17 +43,17 @@ export const setCurrentLocation = (loc: Location) => {
   _bridge.set(loc);
 
   // Update URL hash
-  setTimeout(() => {
-    window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
-  }, 2000);
+  // setTimeout(() => {
+  //   window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
+  // }, 2000);
 
   const saved = getSavedLocation();
   const ahead = loc.currentChapter > saved.currentChapter || (loc.currentChapter === saved.currentChapter && loc.currentParagraph > saved.currentParagraph);
 
   if (ahead) setSavedLocation(loc);
-
-  updateGoBackButton();
 };
+
+window.setCurrentLocation = setCurrentLocation;
 
 /* ------------------------------------------------------------------ */
 /*  Scroll helper                                                     */
@@ -70,29 +70,6 @@ export const shouldShowReturnButton = (): boolean => {
   const current = getCurrentLocation();
   const saved = getSavedLocation();
   return saved.currentChapter > current.currentChapter || (saved.currentChapter === current.currentChapter && saved.currentParagraph - 5 > current.currentParagraph);
-};
-
-/* ------------------------------------------------------------------ */
-/*  Return‑to‑location button logic                                   */
-const returnButton = document.getElementById("return-to-location-button");
-
-/* ensure listener once */
-if (returnButton) {
-  returnButton.addEventListener("click", () => {
-    goToParagraph(getSavedLocation());
-    returnButton.style.display = "none";
-  });
-}
-
-const updateGoBackButton = () => {
-  /* slight delay like the old code (DOM settling after scroll) */
-  setTimeout(() => {
-    const current = getCurrentLocation();
-    const saved = getSavedLocation();
-    const shouldShow = saved.currentChapter > current.currentChapter || (saved.currentChapter === current.currentChapter && saved.currentParagraph - 5 > current.currentParagraph);
-
-    if (returnButton) returnButton.style.display = shouldShow ? "block" : "none";
-  }, 100);
 };
 
 /* ------------------------------------------------------------------ */

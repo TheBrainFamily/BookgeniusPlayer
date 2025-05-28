@@ -8,13 +8,6 @@ export function useBookContent(htmlContent: string, containerId: string) {
   const { openEditorModeModal } = useModal();
 
   useEffect(() => {
-    const container = document.getElementById(containerId);
-    if (container) {
-      container.innerHTML = htmlContent.replace(/<\/section>(?!.*<\/section>)/s, '<div style="height: 50vh;"></div></section>');
-    } else {
-      console.warn(`Container with id '${containerId}' not found for content injection.`);
-    }
-
     if (import.meta.env.VITE_EDITOR === "true") {
       const handleClick = async (event: MouseEvent) => {
         const target = event.target as HTMLElement;
@@ -38,13 +31,6 @@ export function useBookContent(htmlContent: string, containerId: string) {
         if (event.metaKey && !event.altKey && characterTag) {
           return handleRemoveCharacter(target, chapterNumber, paragraphNumber, characterTag);
         }
-      };
-
-      container?.addEventListener("click", handleClick);
-
-      // Clean up the event listener when the component unmounts or when dependencies change
-      return () => {
-        container?.removeEventListener("click", handleClick);
       };
     }
   }, [htmlContent, containerId]); // Rerun if content or ID changes
