@@ -4,6 +4,7 @@ import { BookData } from "@/booksData/types";
 import { goToParagraph } from "@/helpers/paragraphsNavigation";
 import { getTitle } from "@/utils/getChapterTitle";
 import { Button } from "../ui/button";
+import { ScrollArea } from "../ui/scroll-area";
 
 interface BookChaptersModalProps {
   onClose: () => void;
@@ -26,19 +27,21 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose, bookData
 
   return (
     <ModalUI title="Rozdziały" onClose={onClose}>
-      <div className="h-max-[60vh] overflow-y-auto space-y-2">
-        {chapters.map((chapter) => (
-          <Button
-            variant="ghost"
-            key={chapter.id}
-            onClick={() => navigateToChapter(chapter.id)}
-            className="w-full justify-between text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
-          >
-            <div className="flex items-center gap-3 font-medium">{chapter.title}</div>
-            <span className="text-sm text-muted-foreground">p. {chapter.page}</span>
-          </Button>
-        ))}
-      </div>
+      <ScrollArea className="max-h-[60vh]">
+        <div className="space-y-2">
+          {chapters.map((chapter) => (
+            <Button
+              variant="ghost"
+              key={chapter.id}
+              onClick={() => navigateToChapter(chapter.id)}
+              className="w-full justify-between text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
+            >
+              <div className="flex items-center gap-3 font-medium">{chapter.title}</div>
+              <span className="text-sm text-muted-foreground">p. {chapter.page}</span>
+            </Button>
+          ))}
+        </div>
+      </ScrollArea>
     </ModalUI>
   );
 };

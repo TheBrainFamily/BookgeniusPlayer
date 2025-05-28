@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogOverlay, DialogPortal, DialogTitle } from "@/components/ui/dialog";
 
 interface ModalUIProps {
   title?: string;
@@ -23,6 +23,7 @@ const ModalUI: React.FC<ModalUIProps> = ({ title, onClose, children, className =
             onClick={preventClickOutside ? undefined : onClose}
           />
         )}
+        <DialogTitle>{title}</DialogTitle>
         <DialogContent className={cn("bg-transparent border-none shadow-none p-0", layoutView ? "w-full max-w-none" : "max-w-lg")}>
           <div
             className={cn("flex flex-row gap-2 justify-center items-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 h-full", layoutView ? "w-full max-w-none" : "max-w-[100rem]")}

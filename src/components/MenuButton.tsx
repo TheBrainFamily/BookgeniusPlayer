@@ -22,7 +22,7 @@ const MenuButton = () => {
             <Book className="w-4 h-4 lg:w-5 lg:h-5" />
           </motion.button>
         </TooltipTrigger>
-        <TooltipContent className="ml-1">Otwórz Menu Książki</TooltipContent>
+        <TooltipContent>Otwórz Menu Książki</TooltipContent>
       </Tooltip>
     </div>
   );
