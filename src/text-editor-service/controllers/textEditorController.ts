@@ -47,10 +47,14 @@ export class TextEditorController {
     try {
       const { chapterNumber, paragraphNumber, characterName, selectedText, startSelectedWordIndex, endSelectedWordIndex } = req.body;
 
+      console.log("50: req.body BANG!", req.body);
+
       if (!chapterNumber || !paragraphNumber || !characterName || !selectedText || !startSelectedWordIndex || !endSelectedWordIndex) {
         res.status(400).json({ error: "Missing required parameters" });
         return;
       }
+
+      console.log("57: req.body BANG!", req.body);
 
       const result = this.textEditorService.addCharacter(
         Number(chapterNumber),

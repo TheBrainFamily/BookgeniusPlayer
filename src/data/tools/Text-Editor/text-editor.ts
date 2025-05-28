@@ -2,8 +2,8 @@ import { BOOK_SLUGS } from "@/consts";
 import { XmlManager } from "./xml-manager";
 import { FileManager } from "./file-manager";
 import { EditorManager } from "./editor-manager";
-import { extractWords } from "@/utils/extractWords";
 import { PromptsManager } from "@/data/tools/Text-Editor/prompts-manager";
+import { joinParsedText, parseHtmlText } from "@/utils/parseHtmlText";
 
 export class TextEditor {
   private readonly fileManager: FileManager;
@@ -85,16 +85,14 @@ export class TextEditor {
 
       const paragraph = paragraphs[paragraphNumber];
       const paragraphText = this.xmlManager.getParagraphText(paragraph);
+
       const characterTag = `<${characterName}>${selectedText}</${characterName}>`;
 
-      const words = extractWords(paragraphText, "xml");
+      const words = parseHtmlText(paragraphText);
 
-      const updatedWords = [...words.slice(0, startSelectedWordIndex), characterTag, ...words.slice(endSelectedWordIndex + 1)];
+      const updatedWords = [...words.slice(0, startSelectedWordIndex), { text: characterTag, whitespace: " " }, ...words.slice(endSelectedWordIndex + 1)];
 
-      const updatedParagraphText = updatedWords
-        .join(" ")
-        .replace(/\s+(<note id="\d+"\/>)/g, "$1")
-        .replace(/\s+([.,!?;:])/g, "$1");
+      const updatedParagraphText = joinParsedText(updatedWords);
       this.xmlManager.updateParagraphContent(xmlDoc, paragraph, updatedParagraphText);
 
       const updatedXml = this.xmlManager.serializeXml(xmlDoc);
