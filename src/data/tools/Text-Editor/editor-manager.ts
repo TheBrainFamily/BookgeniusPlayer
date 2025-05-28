@@ -48,7 +48,9 @@ export class EditorManager {
   public adjustSettings(): void {
     try {
       if (!fs.existsSync(this.vsCodeSettingsFile)) {
-        fs.mkdirSync(".vscode");
+        if (!fs.existsSync(".vscode")) {
+          fs.mkdirSync(".vscode");
+        }
         return fs.writeFileSync(this.vsCodeSettingsFile, '{ "editor.wordWrap": "on" }');
       }
 

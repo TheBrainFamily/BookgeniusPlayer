@@ -29,7 +29,10 @@ export class FileManager {
     try {
       this.writeXmlFile(xmlString);
       const htmlString = xmlToComplexHtml(xmlString, this.bookSlug);
-      fs.writeFileSync(`./src/data/chapters-${this.bookSlug}.ts`, `export const ${this.bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlString}</section>\`;`);
+      fs.writeFileSync(
+        `./src/data/chapters-${this.bookSlug}.ts`,
+        `export const ${this.bookSlugAsVariable(this.bookSlug).replace(/-/g, "")}BookXml = \`<section>${htmlString}</section>\`;`,
+      );
       this.regenerateMetadata();
     } catch (error) {
       console.error("Error regenerating XML:", error);
@@ -44,10 +47,17 @@ export class FileManager {
       const doc = parser.parseFromString(chaptersXml.replace(`<?xml version="1.0" encoding="UTF-8" ?>`, ""), "text/xml");
       const characterTags = getCharacterTags(doc);
       const metadata = extractCharacterMetadata(doc, characterTags);
-      fs.writeFileSync(`./src/data/metadata-${this.bookSlug}.ts`, `export const ${this.bookSlug.replaceAll("-", "")}CharactersData = ${JSON.stringify(metadata, null, 2)}`);
+      fs.writeFileSync(
+        `./src/data/metadata-${this.bookSlug}.ts`,
+        `export const ${this.bookSlugAsVariable(this.bookSlug).replaceAll("-", "")}CharactersData = ${JSON.stringify(metadata, null, 2)}`,
+      );
     } catch (error) {
       console.error("Error regenerating metadata:", error);
       throw new Error(`Failed to regenerate metadata: ${error.message}`);
     }
+  }
+
+  private bookSlugAsVariable(bookSlug: string): string {
+    return /^\d/.test(bookSlug) ? `_${bookSlug}` : bookSlug;
   }
 }
