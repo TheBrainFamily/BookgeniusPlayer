@@ -1,5 +1,4 @@
 import { initAudioContext } from "@/audio-crossfader";
-import { ModalContextType } from "@/context/ModalContext";
 import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
 
 const SHOULD_SHOW_EVERYONE = false;
@@ -32,7 +31,10 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 /**
  * Creates and configures a video or image element based on the placeholder span's data.
  */
-function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextType): HTMLVideoElement | HTMLImageElement | null {
+function createMediaElement(
+  placeholder: HTMLSpanElement,
+  openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void,
+): HTMLVideoElement | HTMLImageElement | null {
   const characterSlug = placeholder.dataset.character;
   const isTalking = placeholder.dataset.isTalking === "true";
   const talkingSrc = placeholder.dataset.srcTalking; // Can be video or image
@@ -64,7 +66,7 @@ function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextTyp
   // Configure and return the element
   if (element && finalSrc) {
     element.addEventListener("click", () => {
-      modal.openCharacterDetailsModal(characterSlug, isTalking, finalSrc);
+      openCharacterDetailsModal(characterSlug, isTalking, finalSrc);
     });
     element.src = finalSrc;
     element.classList.add("inline-avatar");
@@ -79,7 +81,7 @@ function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextTyp
   return null;
 }
 
-function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType) {
+function highlightCharacter(character: HTMLSpanElement, openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void) {
   const characterSlug = character.dataset.character;
   const listeningSrc = character.dataset.srcListening;
   const isTalking = character.dataset.isTalking === "true";
@@ -91,7 +93,7 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
 
   character.classList.add("character-highlighted-activated");
   character.addEventListener("click", () => {
-    modal.openCharacterDetailsModal(characterSlug, isTalking, listeningSrc);
+    openCharacterDetailsModal(characterSlug, isTalking, listeningSrc);
   });
 
   // Add hover functionality to show floating avatar
@@ -109,7 +111,7 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
 
     // Create media element based on source type
     if (listeningSrc) {
-      let mediaElement;
+      let mediaElement: HTMLVideoElement | HTMLImageElement;
       if (listeningSrc.toLowerCase().endsWith(".png")) {
         // Create image element
         mediaElement = document.createElement("img");
@@ -162,7 +164,13 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
 /**
  * Manages media loading and playback for paragraphs within the visible range.
  */
-function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, modal: ModalContextType) {
+function activateMediaInRange(
+  startChapter: number,
+  startParagraph: number,
+  endChapter: number,
+  endParagraph: number,
+  openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void,
+) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
 
   allParagraphs.forEach((p) => {
@@ -185,7 +193,7 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
         if (inView) {
           if (dummyPlaceholder) {
             // Found a dummy, replace it with actual media
-            const newMediaElement = createMediaElement(placeholder, modal);
+            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal);
             if (newMediaElement) {
               placeholder.replaceChild(newMediaElement, dummyPlaceholder);
               placeholder.dataset.mediaInjected = "true"; // Mark as injected
@@ -202,7 +210,7 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
             }
           } else if (!mediaInjected) {
             // No dummy and no media injected yet, inject for the first time
-            const newMediaElement = createMediaElement(placeholder, modal);
+            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal);
             if (newMediaElement) {
               mediaElement = newMediaElement; // Update mediaElement reference
               // Hide original text content if it's a mention
@@ -278,7 +286,7 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
         const charText = character.dataset.character;
         if (charText && !seenCharactersInParentP.has(charText) && !charactersDisplayed.includes(charText)) {
           seenCharactersInParentP.add(charText);
-          highlightCharacter(character, modal);
+          highlightCharacter(character, openCharacterDetailsModal);
         }
       });
     }
@@ -308,7 +316,7 @@ const getParagraphInfo = (element: Element): { chapter: number | null; paragraph
   return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
 };
 
-export function setupPageObserver(modal: ModalContextType): IntersectionObserver | null {
+export function setupPageObserver(openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void): IntersectionObserver | null {
   const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
 
   // --- State for tracking all currently intersecting pages ---
@@ -540,7 +548,7 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
               currentParagraph: activeParagraph.paragraph,
             });
 
-            activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, modal);
+            activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal);
           } else {
             console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {
               activePgh: activeParagraph,
@@ -574,12 +582,12 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
   const paragraphsToObserve = document.querySelectorAll("section[data-chapter] [data-index]");
   if (paragraphsToObserve.length === 0) {
     console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
+    return null;
   } else {
     console.log(`GOZDECKI MAY 28 paragraphsToObserve.length`, paragraphsToObserve.length);
     paragraphsToObserve.forEach((paragraph) => {
       observer.observe(paragraph);
     });
+    return observer;
   }
-
-  return observer;
 }
