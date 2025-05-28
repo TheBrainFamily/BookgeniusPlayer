@@ -19,37 +19,47 @@ export class TextEditor {
   }
 
   public getParagraphByNumber(chapterNumber: number, paragraphNumber: number): string | null {
-    const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
-    const chapter = this.xmlManager.getChapter(xmlDoc, chapterNumber);
+    try {
+      const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+      const chapter = this.xmlManager.getChapter(xmlDoc, chapterNumber);
 
-    if (!chapter) {
-      return null;
+      if (!chapter) {
+        return null;
+      }
+
+      const paragraphs = this.xmlManager.getParagraphs(chapter);
+      if (paragraphNumber < 0 || paragraphNumber >= paragraphs.length) {
+        return null;
+      }
+
+      return this.xmlManager.getParagraphText(paragraphs[paragraphNumber]);
+    } catch (error) {
+      console.error("Error in getParagraphByNumber:", error);
+      throw new Error(`Failed to get paragraph: ${error.message}`);
     }
-
-    const paragraphs = this.xmlManager.getParagraphs(chapter);
-    if (paragraphNumber < 0 || paragraphNumber >= paragraphs.length) {
-      return null;
-    }
-
-    return this.xmlManager.getParagraphText(paragraphs[paragraphNumber]);
   }
 
   public async editParagraph(chapterNumber: number, paragraphNumber: number): Promise<void> {
-    const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
-    if (!originalParagraph) {
-      throw new Error("Paragraph not found");
+    try {
+      const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
+      if (!originalParagraph) {
+        throw new Error("Paragraph not found");
+      }
+
+      this.promptsManager.generateWrapCharactersRule();
+      const updatedParagraphText = await this.editorManager.openInCursor(originalParagraph);
+      const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+      const chapter = this.xmlManager.getChapter(xmlDoc, chapterNumber);
+      const paragraphs = this.xmlManager.getParagraphs(chapter!);
+      this.xmlManager.updateParagraphContent(xmlDoc, paragraphs[paragraphNumber], updatedParagraphText);
+
+      const updatedXml = this.xmlManager.serializeXml(xmlDoc);
+      this.fileManager.regenerateXml(updatedXml);
+      this.promptsManager.removeWrapCharactersRule();
+    } catch (error) {
+      console.error("Error in editParagraph:", error);
+      throw new Error(`Failed to edit paragraph: ${error.message}`);
     }
-
-    this.promptsManager.generateWrapCharactersRule();
-    const updatedParagraphText = await this.editorManager.openInCursor(originalParagraph);
-    const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
-    const chapter = this.xmlManager.getChapter(xmlDoc, chapterNumber);
-    const paragraphs = this.xmlManager.getParagraphs(chapter!);
-    this.xmlManager.updateParagraphContent(xmlDoc, paragraphs[paragraphNumber], updatedParagraphText);
-
-    const updatedXml = this.xmlManager.serializeXml(xmlDoc);
-    this.fileManager.regenerateXml(updatedXml);
-    this.promptsManager.removeWrapCharactersRule();
   }
 
   public addCharacter(
@@ -60,72 +70,82 @@ export class TextEditor {
     startSelectedWordIndex: number,
     endSelectedWordIndex: number,
   ): string {
-    const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
-    const chapter = this.xmlManager.getChapter(xmlDoc, chapterNumber);
+    try {
+      const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+      const chapter = this.xmlManager.getChapter(xmlDoc, chapterNumber);
 
-    if (!chapter) {
-      throw new Error("Chapter not found");
+      if (!chapter) {
+        throw new Error("Chapter not found");
+      }
+
+      const paragraphs = this.xmlManager.getParagraphs(chapter);
+      if (paragraphNumber < 0 || paragraphNumber >= paragraphs.length) {
+        throw new Error("Paragraph not found");
+      }
+
+      const paragraph = paragraphs[paragraphNumber];
+      const paragraphText = this.xmlManager.getParagraphText(paragraph);
+      const characterTag = `<${characterName}>${selectedText}</${characterName}>`;
+
+      const words = extractWords(paragraphText, "xml");
+
+      const updatedWords = [...words.slice(0, startSelectedWordIndex), characterTag, ...words.slice(endSelectedWordIndex + 1)];
+
+      const updatedParagraphText = updatedWords
+        .join(" ")
+        .replace(/\s+(<note id="\d+"\/>)/g, "$1")
+        .replace(/\s+([.,!?;:])/g, "$1");
+      this.xmlManager.updateParagraphContent(xmlDoc, paragraph, updatedParagraphText);
+
+      const updatedXml = this.xmlManager.serializeXml(xmlDoc);
+      this.fileManager.regenerateXml(updatedXml);
+      return updatedXml;
+    } catch (error) {
+      console.error("Error in addCharacter:", error);
+      throw new Error(`Failed to add character: ${error.message}`);
     }
-
-    const paragraphs = this.xmlManager.getParagraphs(chapter);
-    if (paragraphNumber < 0 || paragraphNumber >= paragraphs.length) {
-      throw new Error("Paragraph not found");
-    }
-
-    const paragraph = paragraphs[paragraphNumber];
-    const paragraphText = this.xmlManager.getParagraphText(paragraph);
-    const characterTag = `<${characterName}>${selectedText}</${characterName}>`;
-
-    const words = extractWords(paragraphText, "xml");
-
-    const updatedWords = [...words.slice(0, startSelectedWordIndex), characterTag, ...words.slice(endSelectedWordIndex + 1)];
-
-    const updatedParagraphText = updatedWords
-      .join(" ")
-      .replace(/\s+(<note id="\d+"\/>)/g, "$1")
-      .replace(/\s+([.,!?;:])/g, "$1");
-    this.xmlManager.updateParagraphContent(xmlDoc, paragraph, updatedParagraphText);
-
-    const updatedXml = this.xmlManager.serializeXml(xmlDoc);
-    this.fileManager.regenerateXml(updatedXml);
-    return updatedXml;
   }
 
   public removeCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1): string {
-    const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
-    if (!originalParagraph) {
-      throw new Error("Paragraph not found");
-    }
-
-    const characterPattern = new RegExp(`<${characterName}[^>]*>.*?</${characterName}>`, "g");
-    const matches = originalParagraph.match(characterPattern) || [];
-
-    if (occurrence < 1 || occurrence > matches.length) {
-      throw new Error(`Invalid occurrence number. There are ${matches.length} occurrences of ${characterName} in this paragraph.`);
-    }
-
-    let currentOccurrence = 0;
-    const updatedParagraph = originalParagraph.replace(characterPattern, (match) => {
-      currentOccurrence++;
-      if (currentOccurrence === occurrence) {
-        return match.replace(new RegExp(`<${characterName}[^>]*>|</${characterName}>`, "g"), "");
+    try {
+      const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
+      if (!originalParagraph) {
+        throw new Error("Paragraph not found");
       }
-      return match;
-    });
 
-    const remainingMatches = updatedParagraph.match(characterPattern) || [];
-    if (remainingMatches.length !== matches.length - 1) {
-      throw new Error("Failed to remove character tag properly");
+      const characterPattern = new RegExp(`<${characterName}[^>]*>.*?</${characterName}>`, "g");
+      const matches = originalParagraph.match(characterPattern) || [];
+
+      if (occurrence < 1 || occurrence > matches.length) {
+        throw new Error(`Invalid occurrence number. There are ${matches.length} occurrences of ${characterName} in this paragraph.`);
+      }
+
+      let currentOccurrence = 0;
+      const updatedParagraph = originalParagraph.replace(characterPattern, (match) => {
+        currentOccurrence++;
+        if (currentOccurrence === occurrence) {
+          return match.replace(new RegExp(`<${characterName}[^>]*>|</${characterName}>`, "g"), "");
+        }
+        return match;
+      });
+
+      const remainingMatches = updatedParagraph.match(characterPattern) || [];
+      if (remainingMatches.length !== matches.length - 1) {
+        throw new Error("Failed to remove character tag properly");
+      }
+
+      const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+      const chapter = this.xmlManager.getChapter(xmlDoc, chapterNumber);
+      const paragraphs = this.xmlManager.getParagraphs(chapter!);
+      this.xmlManager.updateParagraphContent(xmlDoc, paragraphs[paragraphNumber], updatedParagraph);
+
+      const updatedXml = this.xmlManager.serializeXml(xmlDoc);
+      this.fileManager.regenerateXml(updatedXml);
+      return updatedXml;
+    } catch (error) {
+      console.error("Error in removeCharacter:", error);
+      throw new Error(`Failed to remove character: ${error.message}`);
     }
-
-    const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
-    const chapter = this.xmlManager.getChapter(xmlDoc, chapterNumber);
-    const paragraphs = this.xmlManager.getParagraphs(chapter!);
-    this.xmlManager.updateParagraphContent(xmlDoc, paragraphs[paragraphNumber], updatedParagraph);
-
-    const updatedXml = this.xmlManager.serializeXml(xmlDoc);
-    this.fileManager.regenerateXml(updatedXml);
-    return updatedXml;
   }
 }
 
