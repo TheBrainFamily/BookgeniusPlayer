@@ -507,8 +507,8 @@ const AudioPlayer = () => {
           <motion.div
             className={cn(
               windowWidth >= 1280 && "absolute w-100 top-5 right-5",
-              windowWidth < 1280 && windowWidth >= 768 && "fixed w-80 bottom-5 left-5 z-50",
-              windowWidth < 768 && "fixed w-80 bottom-20 left-5 flex z-50",
+              windowWidth < 1280 && windowWidth >= 965 && "fixed w-80 bottom-5 left-5",
+              windowWidth < 965 && "fixed w-80 bottom-20 left-5",
             )}
             variants={variants.songNotification}
             initial="initial"
