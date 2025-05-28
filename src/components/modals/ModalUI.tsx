@@ -1,7 +1,8 @@
 import React, { ReactNode } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogOverlay, DialogPortal, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogPortal, DialogTitle } from "@/components/ui/dialog";
+import { AnimatePresence, motion } from "motion/react";
 
 interface ModalUIProps {
   title?: string;
@@ -17,13 +18,19 @@ const ModalUI: React.FC<ModalUIProps> = ({ title, onClose, children, className =
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogPortal>
-        {!layoutView && (
-          <DialogOverlay
-            className={cn("bg-black/50 backdrop-blur-sm", hideOverlay && "bg-transparent backdrop-blur-none pointer-events-none")}
-            onClick={preventClickOutside ? undefined : onClose}
-          />
-        )}
-        <DialogTitle>{title}</DialogTitle>
+        <AnimatePresence>
+          {!hideOverlay && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15, ease: "easeInOut" }}
+              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+              onClick={preventClickOutside ? undefined : onClose}
+            />
+          )}
+        </AnimatePresence>
+        <DialogTitle className="hidden">{title}</DialogTitle>
         <DialogContent className={cn("bg-transparent border-none shadow-none p-0", layoutView ? "w-full max-w-none" : "max-w-lg")}>
           <div
             className={cn("flex flex-row gap-2 justify-center items-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 h-full", layoutView ? "w-full max-w-none" : "max-w-[100rem]")}
