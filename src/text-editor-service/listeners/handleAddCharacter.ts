@@ -1,4 +1,4 @@
-import { parseHtmlText } from "@/utils/parseHtmlText";
+import { joinParsedText, parseHtmlText } from "@/utils/parseHtmlText";
 import { findWordIndices } from "@/utils/findWordIndex";
 
 const getSelectedHtmlContent = (target: HTMLElement, selection: Selection): string => {
@@ -34,6 +34,8 @@ export const handleAddCharacter = async (target: HTMLElement, chapterNumber: num
 
     const { startIndex, endIndex } = findWordIndices(parsedWords, selectedText, selectionStart);
 
+    const selectedWords = joinParsedText(parsedWords.slice(startIndex, endIndex + 1));
+
     if (startIndex === -1 || endIndex === -1) {
       // TODO: maybe a toast here?
       console.error("Could not find the selected text in the parsed text");
@@ -43,7 +45,14 @@ export const handleAddCharacter = async (target: HTMLElement, chapterNumber: num
     await fetch(`http://localhost:3000/api/text-editor/add-character`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chapterNumber, paragraphNumber, characterName: characterSlug, selectedText, startSelectedWordIndex: startIndex, endSelectedWordIndex: endIndex }),
+      body: JSON.stringify({
+        chapterNumber,
+        paragraphNumber,
+        characterName: characterSlug,
+        selectedText: selectedWords,
+        startSelectedWordIndex: startIndex,
+        endSelectedWordIndex: endIndex,
+      }),
     });
   }
 };

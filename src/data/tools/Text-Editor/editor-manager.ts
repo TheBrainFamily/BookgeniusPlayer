@@ -23,19 +23,8 @@ export class EditorManager {
 
   public adjustSettings(): void {
     try {
-      if (!fs.existsSync(".vscode")) {
-        fs.mkdirSync(".vscode");
-      }
-
-      if (!fs.existsSync(SETTINGS.VSCODE_SETTINGS_FILE)) {
-        fs.writeFileSync(SETTINGS.VSCODE_SETTINGS_FILE, JSON.stringify(SETTINGS.DEFAULT_SETTINGS, null, 2));
-        return;
-      }
-
-      this.userCursorSettings = fs.readFileSync(SETTINGS.VSCODE_SETTINGS_FILE, "utf-8");
-      const settingsJson = JSON.parse(this.userCursorSettings);
-      settingsJson["editor.wordWrap"] = "on";
-      fs.writeFileSync(SETTINGS.VSCODE_SETTINGS_FILE, JSON.stringify(settingsJson, null, 2));
+      this.ensureVSCodeDirectory();
+      this.updateSettings();
     } catch (error) {
       throw new SettingsError(`Failed to adjust settings: ${error.message}`);
     }
@@ -55,11 +44,28 @@ export class EditorManager {
     }
   }
 
+  private ensureVSCodeDirectory(): void {
+    if (!fs.existsSync(".vscode")) {
+      fs.mkdirSync(".vscode");
+    }
+  }
+
+  private updateSettings(): void {
+    if (!fs.existsSync(SETTINGS.VSCODE_SETTINGS_FILE)) {
+      fs.writeFileSync(SETTINGS.VSCODE_SETTINGS_FILE, JSON.stringify(SETTINGS.DEFAULT_SETTINGS, null, 2));
+      return;
+    }
+
+    this.userCursorSettings = fs.readFileSync(SETTINGS.VSCODE_SETTINGS_FILE, "utf-8");
+    const settingsJson = JSON.parse(this.userCursorSettings);
+    settingsJson["editor.wordWrap"] = "on";
+    fs.writeFileSync(SETTINGS.VSCODE_SETTINGS_FILE, JSON.stringify(settingsJson, null, 2));
+  }
+
   private async editContentInCursor(content: string, tempFile: string): Promise<string> {
     return new Promise((resolve, reject) => {
       try {
         fs.writeFileSync(tempFile, content);
-
         const vscode = spawn("cursor", ["--wait", tempFile], { stdio: "inherit" });
 
         vscode.on("close", (code) => {
