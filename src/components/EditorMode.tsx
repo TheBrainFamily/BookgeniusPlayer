@@ -2,7 +2,7 @@ import React from "react";
 
 export const EditorMode = () => {
   return (
-    <div className="absolute top-[1rem] right-4 z-10 optional-element">
+    <div className="absolute top-[1rem] right-4 z-100 optional-element">
       <div className="relative origin-top-right group">
         <div className="bg-black/60 backdrop-blur-md rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1 p-2">Editor Mode</div>
         <div className="absolute right-0 top-full mt-2 hidden group-hover:block">
