@@ -10,9 +10,19 @@ interface ModalUIProps {
   preventClickOutside?: boolean;
   layoutView?: boolean;
   hideOverlay?: boolean;
+  showCloseButton?: boolean;
 }
 
-const ModalUI: React.FC<ModalUIProps> = ({ title, onClose, children, className = "", preventClickOutside = false, layoutView = false, hideOverlay = false }) => {
+const ModalUI: React.FC<ModalUIProps> = ({
+  title,
+  onClose,
+  children,
+  className = "",
+  preventClickOutside = false,
+  layoutView = false,
+  hideOverlay = false,
+  showCloseButton = false,
+}) => {
   return (
     <div
       className={cn("fixed inset-0 flex items-center justify-center self-center z-999", hideOverlay ? "pointer-events-none" : "bg-black/50 h-full w-full")}
@@ -29,14 +39,11 @@ const ModalUI: React.FC<ModalUIProps> = ({ title, onClose, children, className =
           )}
           onClick={(e) => e.stopPropagation()}
         >
-          {title && (
-            <div className="flex justify-between items-center p-4 border-b">
-              <h3 className="text-lg font-semibold">{title}</h3>
-              <button
-                onClick={onClose}
-                className="p-1 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                aria-label="Close modal"
-              >
+          {(title || showCloseButton) && (
+            <div className="flex justify-between items-center p-4">
+              {title && <h3 className="text-lg font-semibold">{title}</h3>}
+              {!title && <div />}
+              <button onClick={onClose} className="p-1 rounded-md text-white cursor-pointer" aria-label="Zamknij modal">
                 <X size={20} />
               </button>
             </div>
