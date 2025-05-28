@@ -17,7 +17,7 @@ export const handleAddCharacter = async (target: HTMLElement, chapterNumber: num
 
   if (selectedText) {
     const paragraphText = target.innerHTML || "";
-    const parsedWords = parseHtmlText(paragraphText);
+    const parsedWords = parseHtmlText(paragraphText.trim());
     const selectedHtmlContent = getSelectedHtmlContent(selection);
 
     if (/<[^>]*>/.test(selectedHtmlContent)) {
