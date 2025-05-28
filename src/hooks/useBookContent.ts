@@ -36,7 +36,7 @@ export function useBookContent(htmlContent: string, containerId: string) {
         }
 
         if (event.metaKey && !event.altKey && characterTag) {
-          return openEditorModeModal("remove-character", () => handleRemoveCharacter(target, chapterNumber, paragraphNumber, characterTag));
+          return handleRemoveCharacter(target, chapterNumber, paragraphNumber, characterTag);
         }
       };
 
