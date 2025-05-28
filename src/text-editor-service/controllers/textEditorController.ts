@@ -13,7 +13,7 @@ export class TextEditorController {
     try {
       const { chapterNumber, paragraphNumber } = req.body;
 
-      if (!chapterNumber || !paragraphNumber) {
+      if (!chapterNumber || paragraphNumber === null) {
         res.status(400).json({ error: "Missing required parameters" });
         return;
       }

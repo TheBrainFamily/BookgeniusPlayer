@@ -1,7 +1,7 @@
 import { joinParsedText, parseHtmlText } from "@/utils/parseHtmlText";
 import { findWordIndices } from "@/utils/findWordIndex";
 
-const getSelectedHtmlContent = (target: HTMLElement, selection: Selection): string => {
+const getSelectedHtmlContent = (selection: Selection): string => {
   const range = selection.getRangeAt(0);
   const fragment = range.cloneContents();
   const tempDiv = document.createElement("div");
@@ -18,7 +18,7 @@ export const handleAddCharacter = async (target: HTMLElement, chapterNumber: num
   if (selectedText) {
     const paragraphText = target.innerHTML || "";
     const parsedWords = parseHtmlText(paragraphText);
-    const selectedHtmlContent = getSelectedHtmlContent(target, selection);
+    const selectedHtmlContent = getSelectedHtmlContent(selection);
 
     if (/<[^>]*>/.test(selectedHtmlContent)) {
       // TODO: maybe a toast here?
