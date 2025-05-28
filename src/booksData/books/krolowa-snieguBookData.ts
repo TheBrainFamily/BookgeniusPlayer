@@ -11,4 +11,5 @@ export const bookData: BookData = {
   bookXml: KrolowaSnieguBookXml,
   chapters: 7,
   themeColors: getBookThemeColors(BOOK_SLUGS.Krolowa_Sniegu),
+  hasAudiobook: true,
 };

@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { BookData } from "@/booksData/types";
+import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
+import useLocalStorageState from "use-local-storage-state";
 import { cn } from "@/lib/utils";
 import ModalUI from "./ModalUI";
 
@@ -16,50 +18,84 @@ interface BookMenuModalProps {
   resetFurthestPageLocation: () => void;
 }
 
-const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, preloadBackgroundTracks, resetFurthestPageLocation }) => {
-  const currentFontSize = Number(localStorage.getItem("fontSize") || "1");
-  const [hideOverlay, setHideOverlay] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    // Initialize the font size display when the component mounts
-    const fontSizeValueElement = document.getElementById("font-size-value");
-    if (fontSizeValueElement) {
-      fontSizeValueElement.textContent = `${currentFontSize.toFixed(1)}x`;
+const hideNonVisibleParagraphs = (currentChapter: number, currentParagraph: number) => {
+  document.querySelectorAll("[data-chapter]").forEach((chapter: HTMLElement) => {
+    const id = parseInt(chapter.dataset.chapter || "0");
+    if (Math.abs(id - currentChapter) > 0) {
+      chapter.style.display = "none";
+    } else {
+      chapter.style.display = "block";
     }
-  }, [currentFontSize]);
+  });
+  console.log(`currentChapter: ${currentChapter}, currentParagraph: ${currentParagraph}`);
+  console.log(``);
+  document.querySelectorAll(`[data-chapter="${currentChapter}"] [data-index]`).forEach((paragraph: HTMLElement) => {
+    const id = parseInt(paragraph.dataset.index || "0");
+    if (id < currentParagraph) {
+      paragraph.style.display = "none";
+    } else {
+      paragraph.style.display = "block";
+    }
+  });
+};
+
+const displayAllChapters = () => {
+  document.querySelectorAll("[data-chapter]").forEach((chapter: HTMLElement) => {
+    chapter.style.display = "block";
+  });
+  document.querySelectorAll("[data-index]").forEach((paragraph: HTMLElement) => {
+    paragraph.style.display = "block";
+  });
+};
+
+const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, preloadBackgroundTracks, resetFurthestPageLocation }) => {
+  const [currentFontSize, setCurrentFontSize] = useLocalStorageState("fontSize", { defaultValue: 1 });
+  const [hideOverlay, setHideOverlay] = useState(false);
+  const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hiddenParagraphsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleFontSizeChange = (value: number[]) => {
     const fontSize = value[0];
 
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+    if (overlayTimeoutRef.current) {
+      clearTimeout(overlayTimeoutRef.current);
     }
 
-    const fontSizeValueElement = document.getElementById("font-size-value");
-    if (fontSizeValueElement) {
-      fontSizeValueElement.textContent = `${fontSize.toFixed(1)}x`;
-    }
-    localStorage.setItem("fontSize", fontSize.toString());
-    const newFontSize = 16 * fontSize;
-    const contentContainer = document.getElementById("content-container");
-    if (contentContainer) {
-      contentContainer.style.fontSize = `${newFontSize}px`;
-    }
+    const currentLocation = getCurrentLocation();
+    console.log("location currentChapter", currentLocation.currentChapter);
+    hideNonVisibleParagraphs(currentLocation.currentChapter, currentLocation.currentParagraph);
+    setTimeout(() => {
+      setCurrentFontSize(fontSize);
+    }, 200);
 
     if (!hideOverlay) {
       setHideOverlay(true);
     }
 
-    timeoutRef.current = setTimeout(() => {
+    if (hiddenParagraphsTimeoutRef.current) {
+      clearTimeout(hiddenParagraphsTimeoutRef.current);
+    }
+
+    if (overlayTimeoutRef.current) {
+      clearTimeout(overlayTimeoutRef.current);
+    }
+
+    overlayTimeoutRef.current = setTimeout(() => {
       setHideOverlay(false);
+    }, 1500);
+    hiddenParagraphsTimeoutRef.current = setTimeout(() => {
+      displayAllChapters();
     }, 1500);
   };
 
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      if (overlayTimeoutRef.current) {
+        clearTimeout(overlayTimeoutRef.current);
+      }
+      if (hiddenParagraphsTimeoutRef.current) {
+        clearTimeout(hiddenParagraphsTimeoutRef.current);
+        displayAllChapters();
       }
     };
   }, []);
