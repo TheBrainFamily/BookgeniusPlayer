@@ -505,7 +505,11 @@ const AudioPlayer = () => {
       <AnimatePresence>
         {showSongNotification && currentTrackData && windowWidth && (
           <motion.div
-            className={cn(windowWidth < 1400 ? "fixed w-80 bottom-0 top-0 left-4 h-[100vh] flex" : "absolute w-100 top-4 right-4")}
+            className={cn(
+              windowWidth >= 1280 && "absolute w-100 top-5 right-5",
+              windowWidth < 1280 && windowWidth >= 768 && "fixed w-80 bottom-5 left-5 z-50",
+              windowWidth < 768 && "fixed w-80 bottom-20 left-5 flex z-50",
+            )}
             variants={variants.songNotification}
             initial="initial"
             animate="animate"
@@ -515,12 +519,12 @@ const AudioPlayer = () => {
               className={cn(
                 "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-4",
                 "flex items-center gap-4 z-20 max-w-full overflow-hidden",
-                "mb-20 mt-auto cursor-pointer",
+                "cursor-pointer",
               )}
               onClick={() => setShowSongNotification(false)}
             >
               <div
-                className={`bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg flex-shrink-0 ${windowWidth < 1400 ? "w-24 h-24" : "w-32 h-32"}`}
+                className={`bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg flex-shrink-0 ${windowWidth < 1280 ? "w-24 h-24" : "w-32 h-32"}`}
               >
                 {currentTrackData.coverArtUrl && <img src={currentTrackData.coverArtUrl} alt="Teraz gra" className="w-full h-full object-cover" />}
               </div>

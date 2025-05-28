@@ -29,7 +29,7 @@ const Footer = () => {
         >
           {/* Left blank space */}
           <div id="left-notes-blank" className="hidden md:block md:flex-1 max-w-[700px]" />
-          <BottomInput onSubmit={sendMessage} className="flex-2 md:min-w-[600px] max-w-[900px] px-4" />
+          <BottomInput onSubmit={sendMessage} className="flex-2 md:min-w-[600px] max-w-[900px] px-3 md:px-4" />
           {/* Right blank space */}
           {!isRightNotesBlankHidden && <div id="right-notes-blank" className="hidden xl:block xl:flex-1 max-w-[700px]" />}
         </motion.footer>
