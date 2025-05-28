@@ -1,15 +1,16 @@
 ---
 description: {{description}}
 globs: *.xml
-alwaysApply: true
+alwaysApply: false
 ---
-There are all characters we have:
+
+# There are all characters we have:
 
 {{characters}}
 
 # Character Tagging Guidelines
 
-When I ask you to "wrap by tags," "apply tags," "add character tags," or perform a similar character tagging action on selected text, please adhere to the following guidelines using **THE CHARACTER LIST YOU PROVIDE ABOVE**:
+When I ask you to "wrap by tags," "apply tags," "add character tags," or perform a similar character tagging action on selected text, please adhere to the following guidelines using **THE CHARACTER LIST YOU PROVIDE ABOVE** (where `{{characters}}` is):
 
 1.  **Identify Characters**: Scan the selected text to identify mentions of characters whose tags are defined in YOUR CHARACTER LIST.
     * Be mindful of different grammatical forms or cases. For example, if a character "Exemplar" (associated with `<Exemplar />` in your list) is mentioned, then textual occurrences like "Exemplar's," "Exemplars," "exemplar" (lowercase), or other inflections should all be recognized as relating to that character.
@@ -19,6 +20,7 @@ When I ask you to "wrap by tags," "apply tags," "add character tags," or perform
     * For example, from a list entry like `<SampleTag />`, the tag name is `SampleTag`.
     * From a list entry like `<Another-Example-Tag />`, the tag name is `Another-Example-Tag`.
     * If your list has an entry like `<IrregularEntryFormat "/>`, the tag name to be used is `IrregularEntryFormat`.
+    * **These derived tag names are the ONLY valid tag names to be used for wrapping characters according to this rule.**
 
 3.  **Wrapping Format**: Enclose the *exact text* of the identified character mention (including its specific grammatical form and original casing as found in the input text) within the opening and closing tags derived in step 2.
     * For example, if "[ActualTextFoundInInput]" is identified, and its corresponding tag name derived from your list is `[TagNameFromYourList]`, it should be wrapped as `<[TagNameFromYourList]>[ActualTextFoundInInput]</[TagNameFromYourList]>`.
@@ -31,11 +33,16 @@ When I ask you to "wrap by tags," "apply tags," "add character tags," or perform
     * For instance, if the text has "[A Multi Word Character Name From Text]", it should become `<[TagForMultiWordConceptFromYourList]>[A Multi Word Character Name From Text]</[TagForMultiWordConceptFromYourList]>`.
     * If the text has "[KeyPartOfNameFromText]" (and context implies it refers to the character associated with `[TagForMultiWordConceptFromYourList]`), it should become `<[TagForMultiWordConceptFromYourList]>[KeyPartOfNameFromText]</[TagForMultiWordConceptFromYourList]>`.
 
-5.  **Specificity**: Only wrap words or phrases that clearly represent the characters from YOUR CHARACTER LIST. Do not wrap other unrelated words. If there's ambiguity for a word that is not a clear character reference from your list, it's generally better to not tag it or to ask for clarification if in an interactive mode.
+5.  **Strict Adherence to Provided List & Tag Exclusivity**:
+    * **Crucially, you MUST ONLY use tag names derived directly from YOUR CHARACTER LIST as instructed in Point 2.**
+    * **DO NOT invent, create, or infer any new tag names that are not explicitly derivable from your provided list.** For instance, if your character list does not define tags that would result in `<Szwagier>` or `<Zona-Verloca>`, you must not generate these tags.
+    * If a word, name, or phrase in the selected text *appears* to be a character but it (or its base/recognizable form) cannot be confidently mapped to an entry in YOUR CHARACTER LIST, that word, name, or phrase **MUST be left untagged**. Do not attempt to create a new tag for it.
+    * Only wrap words or phrases that are clear and unambiguous mentions of the characters defined in YOUR CHARACTER LIST.
+    * If there is any doubt as to whether a piece of text corresponds to a character in your list, **err on the side of not tagging it.**
 
 **Examples of Application:**
 
-**(In these examples, imagine YOUR CHARACTER LIST includes entries like `<Hero />` for a character often referred to as "Alex" or "alex", and `<AncientGuide />` for a character known as "The Old Sage" or sometimes just "Sage".)**
+**(In these examples, imagine YOUR CHARACTER LIST (represented by `{{characters}}`) includes entries like `<Hero />` for a character often referred to as "Alex" or "alex", and `<AncientGuide />` for a character known as "The Old Sage" or sometimes just "Sage".)**
 
 * **Instruction:** `Wrap Alex by its tag.`
     * **Input Text:** `In the story, Alex met the Sage.`

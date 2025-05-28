@@ -45,9 +45,15 @@ export class XmlManager {
     if (!charactersMaster) {
       return null;
     }
+
     return Array.from(charactersMaster.childNodes)
       .filter((node): node is Element => node.nodeType === 1)
-      .map((child) => `<${child.tagName} />`);
+      .map((child) => {
+        const attributes = Array.from(child.attributes)
+          .map((attr) => `${attr.name}="${attr.value}"`)
+          .join(" ");
+        return `<${child.tagName}${attributes ? " " + attributes : ""} />`;
+      });
   }
 
   public getParagraphs(chapter: Element): Element[] {

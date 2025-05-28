@@ -1,12 +1,12 @@
 import { RequestHandler } from "express";
 import { TextEditorService } from "../services/textEditorService";
-import { BOOK_SLUGS } from "@/consts";
+import { CURRENT_BOOK } from "@/consts";
 
 export class TextEditorController {
   private textEditorService: TextEditorService;
 
   constructor() {
-    this.textEditorService = new TextEditorService(BOOK_SLUGS.Krolowa_Sniegu);
+    this.textEditorService = new TextEditorService(CURRENT_BOOK);
   }
 
   public editParagraph: RequestHandler = async (req, res) => {
@@ -47,14 +47,10 @@ export class TextEditorController {
     try {
       const { chapterNumber, paragraphNumber, characterName, selectedText, startSelectedWordIndex, endSelectedWordIndex } = req.body;
 
-      console.log("50: req.body BANG!", req.body);
-
       if (!chapterNumber || !paragraphNumber || !characterName || !selectedText || !startSelectedWordIndex || !endSelectedWordIndex) {
         res.status(400).json({ error: "Missing required parameters" });
         return;
       }
-
-      console.log("57: req.bodu BANG!", req.body);
 
       const result = this.textEditorService.addCharacter(
         Number(chapterNumber),
@@ -64,8 +60,6 @@ export class TextEditorController {
         Number(startSelectedWordIndex),
         Number(endSelectedWordIndex),
       );
-
-      console.log("61: result BANG!", result);
 
       res.json({ success: true, data: result });
     } catch (error) {

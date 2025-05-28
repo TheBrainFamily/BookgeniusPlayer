@@ -49,6 +49,7 @@ export class TextEditor {
 
     const updatedXml = this.xmlManager.serializeXml(xmlDoc);
     this.fileManager.regenerateXml(updatedXml);
+    this.promptsManager.removeWrapCharactersRule();
   }
 
   public addCharacter(

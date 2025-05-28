@@ -8,7 +8,11 @@ export class FileManager {
   constructor(private readonly bookSlug: BOOK_SLUGS) {}
 
   public readXmlFile(): string {
-    return fs.readFileSync(`./src/data/${this.bookSlug}-chapters.xml`, "utf8");
+    try {
+      return fs.readFileSync(`./src/data/${this.bookSlug}-chapters.xml`, "utf8");
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   public writeXmlFile(xmlContent: string): void {
