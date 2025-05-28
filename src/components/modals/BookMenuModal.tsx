@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { List, Type, RotateCcw, Music } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { BookData } from "@/booksData/types";
+import { cn } from "@/lib/utils";
 import ModalUI from "./ModalUI";
 
 interface BookMenuModalProps {
@@ -17,6 +18,8 @@ interface BookMenuModalProps {
 
 const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, preloadBackgroundTracks, resetFurthestPageLocation }) => {
   const currentFontSize = Number(localStorage.getItem("fontSize") || "1");
+  const [hideOverlay, setHideOverlay] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Initialize the font size display when the component mounts
@@ -26,8 +29,43 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
     }
   }, [currentFontSize]);
 
+  const handleFontSizeChange = (value: number[]) => {
+    const fontSize = value[0];
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    const fontSizeValueElement = document.getElementById("font-size-value");
+    if (fontSizeValueElement) {
+      fontSizeValueElement.textContent = `${fontSize.toFixed(1)}x`;
+    }
+    localStorage.setItem("fontSize", fontSize.toString());
+    const newFontSize = 16 * fontSize;
+    const contentContainer = document.getElementById("content-container");
+    if (contentContainer) {
+      contentContainer.style.fontSize = `${newFontSize}px`;
+    }
+
+    if (!hideOverlay) {
+      setHideOverlay(true);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      setHideOverlay(false);
+    }, 1500);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <ModalUI title="Ustawienia Książki" onClose={onClose}>
+    <ModalUI title="Ustawienia Książki" onClose={onClose} hideOverlay={hideOverlay}>
       <div className="space-y-2 mb-6">
         <Button
           variant="ghost"
@@ -62,7 +100,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           Resetuj Pozycję Czytania
         </Button>
       </div>
-      <div className="p-4 rounded-lg bg-black/50 border border-white/20">
+      <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300")}>
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <Type className="h-4 w-4 text-white" />
@@ -77,19 +115,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             max={1.5}
             step={0.1}
             value={[currentFontSize]}
-            onValueChange={(value) => {
-              const fontSize = value[0];
-              const fontSizeValueElement = document.getElementById("font-size-value");
-              if (fontSizeValueElement) {
-                fontSizeValueElement.textContent = `${fontSize.toFixed(1)}x`;
-              }
-              localStorage.setItem("fontSize", fontSize.toString());
-              const newFontSize = 16 * fontSize;
-              const contentContainer = document.getElementById("content-container");
-              if (contentContainer) {
-                contentContainer.style.fontSize = `${newFontSize}px`;
-              }
-            }}
+            onValueChange={handleFontSizeChange}
             aria-label="Rozmiar tekstu"
             className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
           />
