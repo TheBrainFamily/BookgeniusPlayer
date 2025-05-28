@@ -17,9 +17,9 @@ export class PromptsManager {
       const bookXml = fs.readFileSync(`./src/data/${this.bookSlug}-chapters.xml`, "utf8");
       const charactersTags = this.xmlManager.getCharactersTags(bookXml);
 
-      const wrapCharactersRulePattern = fs.readFileSync(`${this.promptsPath}/wrapCharactersRulePattern.mdc`, "utf-8");
+      const wrapCharactersRuleInitialPrompt = fs.readFileSync(`${this.promptsPath}/wrapCharactersRuleInitialPrompt.mdc`, "utf-8");
 
-      const wrapCharactersRule = wrapCharactersRulePattern
+      const wrapCharactersRulePrompt = wrapCharactersRuleInitialPrompt
         .replace("{{characters}}", charactersTags.join("\n"))
         .replace("{{description}}", `Rule for wrapping ${this.bookSlug} characters by their tags from provided list.`);
 
@@ -28,7 +28,7 @@ export class PromptsManager {
         fs.mkdirSync(`${this.cursorRulesPath}/rules`);
       }
 
-      fs.writeFileSync(`${this.cursorRulesPath}/rules/wrap${this.bookSlug}CharactersRulePattern.mdc`, wrapCharactersRule);
+      fs.writeFileSync(`${this.cursorRulesPath}/rules/wrap${this.bookSlug}CharactersRulePrompt.mdc`, wrapCharactersRulePrompt);
     } catch (err) {
       console.error(err);
     }
@@ -36,9 +36,9 @@ export class PromptsManager {
 
   public removeWrapCharactersRule(): void {
     try {
-      fs.rmSync(`${this.cursorRulesPath}/rules/wrap${this.bookSlug}CharactersRulePattern.mdc`);
+      fs.rmSync(`${this.cursorRulesPath}/rules/wrap${this.bookSlug}CharactersRulePrompt.mdc`);
     } catch (err) {
-      console.error(`Fail during removeWrapCharactersRule: ${err}`);
+      console.error(`Fail during removeWrapCharactersRulePrompt: ${err}`);
     }
   }
 }
