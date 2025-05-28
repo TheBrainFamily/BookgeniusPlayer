@@ -11,4 +11,5 @@ export const bookData: BookData = {
   bookXml: ConradTajnyAgentBookXml,
   chapters: 13,
   themeColors: getBookThemeColors(BOOK_SLUGS.Conrad_Tajny_Agent),
+  hasAudiobook: true,
 };

@@ -25,6 +25,7 @@ import ContentContainerWrapper from "./components/ContentContainerWrapper";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { EditorMode } from "@/components/EditorMode";
+import useLocalStorageState from "use-local-storage-state";
 
 function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
   /* Inject book content first */
@@ -56,6 +57,7 @@ function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
 
 export default function App() {
   const [currentBookData, setCurrentBookData] = useState<BookData | null>(null);
+  const [fontSize] = useLocalStorageState("fontSize", { defaultValue: 1 });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -81,6 +83,14 @@ export default function App() {
   useEffect(() => {
     runLegacyInit();
   }, []);
+
+  useEffect(() => {
+    const newFontSize = 16 * fontSize;
+    const contentContainer = document.getElementById("content-container");
+    if (contentContainer) {
+      contentContainer.style.fontSize = `${newFontSize}px`;
+    }
+  }, [fontSize]);
 
   if (isLoading) return null;
 

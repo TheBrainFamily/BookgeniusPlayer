@@ -28,7 +28,6 @@ import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { CURRENT_BOOK } from "@/consts";
-import { getAudiobookTracksForBook } from "@/getAudiobookTracksForBook";
 
 const AudioPlayer = () => {
   const [isPlayingAudioBook, setIsPlayingAudiobook] = useLocalStorageState("isPlayingAudioBook", { defaultValue: true });
@@ -45,7 +44,7 @@ const AudioPlayer = () => {
   const [windowWidth, setWindowWidth] = useState(undefined);
   const [playlistTracks, setPlaylistTracks] = useState<{ id: string; title: string; duration: number }[]>([]);
   const [currentTrackIdFromState, setCurrentTrackIdFromState] = useState<string | null>(null);
-  const isAudiobookAvailable = !!getAudiobookTracksForBook(CURRENT_BOOK).length;
+  const isAudiobookAvailable = true;
 
   const togglePlay = () => {
     if (isPlaying) {
