@@ -68,7 +68,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
   return (
     <div
       ref={cardRef}
-      className={cn("w-[85%] max-w-[200px] mx-auto relative pb-4")}
+      className={cn("w-[85%] max-w-[250px] mx-auto relative pb-4")}
       data-canonical-name={entity.slug}
       data-appearances={JSON.stringify(apps)}
       onMouseEnter={() => requestToggle(true)}
@@ -87,7 +87,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
       </div>
       <div
         className={cn(
-          "max-w-full w-full absolute right-0 bottom-0 rounded-sm text-center bg-(--book-secondary-color)/70",
+          "max-w-full w-full absolute right-0 bottom-0 rounded-sm text-center textured-bg",
           isTalkingInCurrentRange
             ? "border-t-2 border-(--book-primary-color) shadow-lg transition-all duration-300 ease-in-out"
             : "border-t border-gray-400/30 shadow transition-all duration-200 ease-in-out",

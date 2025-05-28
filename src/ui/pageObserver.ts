@@ -95,7 +95,7 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
   });
 
   // Add hover functionality to show floating avatar
-  character.addEventListener("mouseover", (e) => {
+  character.addEventListener("mouseover", () => {
     // Create floating avatar container
     const floatingAvatar = document.createElement("div");
     floatingAvatar.classList.add("floating-avatar");
@@ -103,6 +103,9 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
     floatingAvatar.style.zIndex = "1000";
     floatingAvatar.style.opacity = "0";
     floatingAvatar.style.transition = "opacity 500ms ease-in-out";
+
+    // Get trigger element's position
+    const triggerRect = character.getBoundingClientRect();
 
     // Create media element based on source type
     if (listeningSrc) {
@@ -125,20 +128,9 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
       floatingAvatar.appendChild(mediaElement);
       document.body.appendChild(floatingAvatar);
 
-      // Position next to cursor
-      const updatePosition = (mouseEvent: MouseEvent) => {
-        floatingAvatar.style.left = `${mouseEvent.clientX + 15}px`;
-        floatingAvatar.style.top = `${mouseEvent.clientY - 30}px`;
-      };
-
-      updatePosition(e as MouseEvent);
-
-      // Add mousemove listener to update position
-      const handleMouseMove = (mouseEvent: MouseEvent) => {
-        updatePosition(mouseEvent);
-      };
-
-      document.addEventListener("mousemove", handleMouseMove);
+      // Position the floating avatar relative to the trigger element
+      floatingAvatar.style.left = `${triggerRect.right + 10}px`; // 10px to the right of the trigger
+      floatingAvatar.style.top = `${triggerRect.top + triggerRect.height / 2 - floatingAvatar.offsetHeight / 2}px`; // Vertically centered with the trigger, adjust as needed
 
       // Fade in
       setTimeout(() => {
@@ -153,7 +145,7 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
         // Remove after transition completes
         setTimeout(() => {
           document.body.removeChild(floatingAvatar);
-          document.removeEventListener("mousemove", handleMouseMove);
+          // document.removeEventListener("mousemove", handleMouseMove);
         }, 500);
 
         character.removeEventListener("mouseout", handleMouseOut);
@@ -346,16 +338,6 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
     const zoneBottom = zoneTop + 0.1 * rootRect.height; // 10% height below this point
 
     // --- Development Zone Visualizer ---
-    // let zoneVisualizer = document.getElementById("dev-zone-visualizer");
-    // if (!zoneVisualizer) {
-    //   zoneVisualizer = document.createElement("div");
-    //   zoneVisualizer.id = "dev-zone-visualizer";
-    //   document.body.appendChild(zoneVisualizer);
-    // }
-    // zoneVisualizer.style.left = `${rootRect.left}px`;
-    // zoneVisualizer.style.top = `${zoneTop}px`;
-    // zoneVisualizer.style.width = `${rootRect.width}px`;
-    // zoneVisualizer.style.height = `${zoneBottom - zoneTop}px`;
 
     console.log("WILCZYNSKA: 276 zoneTop", zoneTop);
     console.log("WILCZYNSKA: 277 zoneBottom", zoneBottom);
@@ -440,19 +422,30 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
     });
     chosenElement?.classList.add("active-paragraph");
 
+    const topMultiplier = 0.05;
+    let bottomMultiplier = 0.5;
+
+    // Check media query for landscape mode on smaller wide screens
+    const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
+    if (landscapeMediaQuery.matches) {
+      bottomMultiplier = 0.95; // Use larger bottom zone in this mode
+    }
+
+    const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
+    const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
+    // let zoneVisualizer = document.getElementById("dev-zone-visualizer");
+    // if (!zoneVisualizer) {
+    //   zoneVisualizer = document.createElement("div");
+    //   zoneVisualizer.id = "dev-zone-visualizer";
+    //   document.body.appendChild(zoneVisualizer);
+    // }
+    // zoneVisualizer.style.left = `${rootRect.left}px`;
+    // zoneVisualizer.style.top = `${focusZoneTop}px`;
+    // zoneVisualizer.style.width = `${rootRect.width}px`;
+    // zoneVisualizer.style.height = `${focusZoneBottom - focusZoneTop}px`;
+
     if (intersectingPages.size > 0) {
       // Default multipliers
-      const topMultiplier = 0.05;
-      let bottomMultiplier = 0.5;
-
-      // Check media query for landscape mode on smaller wide screens
-      const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
-      if (landscapeMediaQuery.matches) {
-        bottomMultiplier = 0.95; // Use larger bottom zone in this mode
-      }
-
-      const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
-      const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
 
       // Filter intersecting pages to find those overlapping the focus zone
       const focusedPages = Array.from(intersectingPages).filter((element) => {

@@ -258,19 +258,15 @@ const SplashScreen = () => {
     <AnimatePresence mode="wait">
       {showSplash && (
         <motion.div
-          className={`
-              fixed inset-0 h-screen flex flex-col items-center justify-center 
-              text-white
-              text-xl font-sans z-[9999] overflow-hidden
-            `}
+          className="fixed inset-0 h-screen flex flex-col items-center justify-center text-white text-xl font-sans z-[9999] overflow-hidden p-2"
           variants={variants.mainContainer}
           initial="hidden"
           animate="visible"
           exit="exit"
         >
-          <motion.div className="relative z-10 flex flex-col items-center w-full w-max-lg" variants={variants.container} initial="hidden" animate="visible">
-            <motion.div className="mb-20" variants={variants.titleContainer} animate="visible" initial="hidden">
-              <motion.div className="text-white text-5xl font-bold mb-3 tracking-wider text-center" variants={variants.title}>
+          <motion.div className="relative z-10 flex flex-col items-center w-full w-max-lg gap-8" variants={variants.container} initial="hidden" animate="visible">
+            <motion.div variants={variants.titleContainer} animate="visible" initial="hidden">
+              <motion.div className="text-white text-5xl font-bold pb-2 tracking-wider text-center" variants={variants.title}>
                 BookGenius
               </motion.div>
               <motion.div className="text-sm uppercase tracking-widest text-center text-white/80" variants={variants.subtitle}>
@@ -278,7 +274,7 @@ const SplashScreen = () => {
               </motion.div>
             </motion.div>
 
-            <motion.div className="relative w-40 h-40 flex items-center justify-center mb-16 rounded-full overflow-visible" variants={variants.imageContainer} id="book-container">
+            <motion.div className="relative w-40 h-40 flex items-center justify-center rounded-full overflow-visible" variants={variants.imageContainer} id="book-container">
               <motion.div
                 className="absolute top-2 -bottom-2 inset-x-0 rounded-full bg-gradient-to-br from-white/10 to-transparent"
                 variants={variants.glowRing}
@@ -287,7 +283,7 @@ const SplashScreen = () => {
               <motion.img src="/loading.gif" alt="Loading..." className="w-28 h-28 relative z-10" variants={variants.image} animate={["visible", "pulse"]} />
             </motion.div>
 
-            <motion.div className="h-16 flex items-center justify-center overflow-hidden mb-6 w-full" variants={variants.textContainer}>
+            <motion.div className="h-16 flex items-center justify-center overflow-hidden w-full" variants={variants.textContainer}>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.p
                   className="text-center italic text-lg text-white/90"
@@ -306,7 +302,7 @@ const SplashScreen = () => {
             <motion.button
               className={cn(
                 "bg-black/20 rounded-full border border-white/20 shadow-xl text-white font-semibold text-lg",
-                "mt-6 px-10 py-4 flex items-center justify-center gap-5 backdrop-blur-sm",
+                "px-10 py-4 flex items-center justify-center gap-5 backdrop-blur-sm",
                 showStartButton ? "cursor-pointer" : "pointer-events-none",
               )}
               onClick={handleStartClick}
@@ -328,7 +324,7 @@ const SplashScreen = () => {
                     boxShadow: ["0 0 0px rgba(255,255,255,0.0)", "0 0 15px rgba(255,255,255,0.3)", "0 0 0px rgba(255,255,255,0.0)"],
                     borderColor: ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.4)", "rgba(255,255,255,0.2)"],
                   }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 />
               )}
             </motion.button>
