@@ -1,6 +1,14 @@
 import { parseHtmlText } from "@/utils/parseHtmlText";
 import { findWordIndices } from "@/utils/findWordIndex";
 
+const getSelectedHtmlContent = (target: HTMLElement, selection: Selection): string => {
+  const range = selection.getRangeAt(0);
+  const fragment = range.cloneContents();
+  const tempDiv = document.createElement("div");
+  tempDiv.appendChild(fragment);
+  return tempDiv.innerHTML;
+};
+
 export const handleAddCharacter = async (target: HTMLElement, chapterNumber: number, paragraphNumber: number, characterSlug: string) => {
   const selection = window.getSelection();
   if (!selection) return;
@@ -10,12 +18,14 @@ export const handleAddCharacter = async (target: HTMLElement, chapterNumber: num
   if (selectedText) {
     const paragraphText = target.innerHTML || "";
     const parsedWords = parseHtmlText(paragraphText);
+    const selectedHtmlContent = getSelectedHtmlContent(target, selection);
 
-    console.log("14: selectedText BANG!", selectedText);
+    if (/<[^>]*>/.test(selectedHtmlContent)) {
+      // TODO: maybe a toast here?
+      console.error("The selected text already includes a tag!");
+      return;
+    }
 
-    console.log("14: parsedWords BANG!", parsedWords);
-
-    // Get the selection start position relative to the paragraph
     const range = selection.getRangeAt(0);
     const preSelectionRange = range.cloneRange();
     preSelectionRange.selectNodeContents(target);
@@ -23,9 +33,9 @@ export const handleAddCharacter = async (target: HTMLElement, chapterNumber: num
     const selectionStart = preSelectionRange.toString().length;
 
     const { startIndex, endIndex } = findWordIndices(parsedWords, selectedText, selectionStart);
-    console.log("24: indices BANG!", { startIndex, endIndex });
 
     if (startIndex === -1 || endIndex === -1) {
+      // TODO: maybe a toast here?
       console.error("Could not find the selected text in the parsed text");
       return;
     }
