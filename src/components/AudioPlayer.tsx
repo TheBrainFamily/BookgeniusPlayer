@@ -515,8 +515,9 @@ const AudioPlayer = () => {
               className={cn(
                 "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-4",
                 "flex items-center gap-4 z-20 max-w-full overflow-hidden",
-                "mb-20 mt-auto",
+                "mb-20 mt-auto cursor-pointer",
               )}
+              onClick={() => setShowSongNotification(false)}
             >
               <div
                 className={`bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg flex-shrink-0 ${windowWidth < 1400 ? "w-24 h-24" : "w-32 h-32"}`}
