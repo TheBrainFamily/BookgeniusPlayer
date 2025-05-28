@@ -87,10 +87,8 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
       </div>
       <div
         className={cn(
-          "max-w-full w-full absolute right-0 bottom-0 rounded-sm text-center textured-bg",
-          isTalkingInCurrentRange
-            ? "border-t-2 border-(--book-primary-color) shadow-lg transition-all duration-300 ease-in-out"
-            : "border-t border-gray-400/30 shadow transition-all duration-200 ease-in-out",
+          "max-w-full w-full absolute right-0 bottom-0 rounded-xl text-center bg-black/70 textured-bg border shadow-xl",
+          isTalkingInCurrentRange ? "border-2 border-(--book-primary-color) transition-all duration-300 ease-in-out" : "border-white/30 transition-all duration-200 ease-in-out",
         )}
       >
         <div className="py-1.5 px-3 flex flex-col items-center justify-center">

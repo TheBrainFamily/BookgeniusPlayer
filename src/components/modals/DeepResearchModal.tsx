@@ -1,5 +1,5 @@
 import React from "react";
-import ModalUI from "./ModalUI";
+import ModalUIOld from "./ModalUIOld";
 import { LLMAnswerViewer } from "@/ui/MarkdownComponent";
 
 interface DeepResearchModalProps {
@@ -12,7 +12,7 @@ interface DeepResearchModalProps {
 
 const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content, layoutView, hideOverlay, isLoading }) => {
   return (
-    <ModalUI title="Deep Research" onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
+    <ModalUIOld title="Deep Research" onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
       <div className="prose dark:prose-invert max-w-none">
         {isLoading ? (
           <div className="flex items-center justify-center my-4 py-4">
@@ -30,7 +30,7 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content,
           <LLMAnswerViewer answerMarkdown={content} />
         )}
       </div>
-    </ModalUI>
+    </ModalUIOld>
   );
 };
 

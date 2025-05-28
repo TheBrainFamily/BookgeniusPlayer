@@ -4,22 +4,15 @@ import { UndoDot } from "lucide-react";
 
 import { shouldShowReturnButton, goToParagraph, getSavedLocation } from "@/helpers/paragraphsNavigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useLocation } from "@/state/LocationContext";
 
 const ReturnToLocationButton = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const { location } = useLocation();
 
-  // ToDo: Check visibility whenever location changes
   useEffect(() => {
-    const checkVisibility = () => {
-      setIsVisible(shouldShowReturnButton());
-    };
-
-    checkVisibility();
-
-    const intervalId = setInterval(checkVisibility, 1000);
-
-    return () => clearInterval(intervalId);
-  }, []);
+    setIsVisible(shouldShowReturnButton());
+  }, [location.currentParagraph, location.currentChapter]);
 
   const onGoBackClick = () => {
     goToParagraph(getSavedLocation());

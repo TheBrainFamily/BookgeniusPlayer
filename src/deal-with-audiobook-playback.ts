@@ -65,7 +65,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
   try {
     console.log(`Calculated consideration point: Chapter ${currentChapter}, Paragraph ${currentParagraph}`);
 
-    const bookTracks = getAudiobookTracksForBook(CURRENT_BOOK);
+    const bookTracks = await getAudiobookTracksForBook();
     if (!bookTracks) {
       console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot determine Audiobook song.`);
       isProcessingAudiobookTracks = false;
@@ -96,7 +96,6 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
         stopAllTracks();
 
         const createEventsForAudiobook = () => {
-          const bookTracks = getAudiobookTracksForBook(CURRENT_BOOK);
           const sectionsToApply = bookTracks.filter(
             (section: AudiobookTracksSection) => section.chapter === currentChapter || (section.chapter === currentChapter + 1 && section.paragraph <= 1),
           );
@@ -150,7 +149,6 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
         const events: AudiobookTrackEvent[] = createEventsForAudiobook();
 
         const createWordLevelEvents = () => {
-          const bookTracks = getAudiobookTracksForBook(CURRENT_BOOK);
           const sectionsToApply = bookTracks.filter(
             (section: AudiobookTracksSection) => section.chapter === currentChapter || (section.chapter === currentChapter + 1 && section.paragraph <= 1),
           );

@@ -11,4 +11,5 @@ export const bookData: BookData = {
   bookXml: PharaonBookXml,
   chapters: 68,
   themeColors: getBookThemeColors(BOOK_SLUGS.PHARAON),
+  hasAudiobook: false,
 };
