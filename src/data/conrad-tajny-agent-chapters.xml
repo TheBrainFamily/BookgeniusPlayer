@@ -38,6 +38,8 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
 <Miejscowy-policjant display="Miejscowy policjant" summary="Policjant znający dorożkarza kalekę." />
 <Pani-Neale display="Pani Neale" summary="Posługaczka w domu Verloców." />
 <Starszy-lokaj display="Starszy lokaj" summary="Lokaj w domu opiekunki Michaelisa." />
+<Towarzysz-Ossipon display="Towarzysz Ossipon" summary="" />
+<Mlody-rzeznik display="Młody rzeźnik" summary="" />
 </CharactersMaster>
 
 <Chapter id="1"><h3>I</h3>

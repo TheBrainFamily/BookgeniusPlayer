@@ -1,25 +1,74 @@
-/**
- * Wraps the existing vanilla `setupPageObserver` in a React‑friendly hook.
- * You still get all original behaviour, but the hook registers only once
- * and benefits from Fast‑Refresh.
- */
-import { useEffect } from "react";
-
+import { useEffect, useRef, useCallback } from "react";
 import { setupPageObserver } from "@/ui/pageObserver";
-import { ModalContextType } from "@/context/ModalContext";
 
-export const usePageObserver = (htmlContent: string, modal: ModalContextType) => {
+interface UsePageObserverOptions {
+  /** Whether the observer should be active */
+  enabled: boolean;
+  /** Stable callback coming from ModalContext */
+  openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void;
+}
+
+/**
+ * React-idiomatic wrapper around the legacy `setupPageObserver` util.
+ *
+ * It takes care of:
+ *  • creating the IntersectionObserver once `enabled` becomes true
+ *  • cleaning it up automatically on unmount or when `enabled` turns false
+ *  • exposing `observeNewParagraphs` and `cleanupRemovedParagraphs` helpers
+ */
+export const usePageObserver = ({ enabled, openCharacterDetailsModal }: UsePageObserverOptions) => {
+  type LegacyObserver = NonNullable<ReturnType<typeof setupPageObserver>>;
+  const legacyRef = useRef<LegacyObserver | null>(null);
+
+  /* ------------------------------------------------------------------ */
+  /*  (Re)create / teardown observer when `enabled` changes               */
+  /* ------------------------------------------------------------------ */
   useEffect(() => {
-    console.log("setting up page observer due to content change");
-    const observer = setupPageObserver(modal);
+    if (!enabled) {
+      // Teardown if we previously had one
+      if (legacyRef.current) {
+        legacyRef.current.observer.disconnect();
+        legacyRef.current = null;
+      }
+      return;
+    }
 
-    // Cleanup function to disconnect the observer when the component unmounts
-    // or before the effect runs again due to content change.
+    // Already initialised – nothing to do
+    if (legacyRef.current) return;
+
+    createObserver();
+
+    // Cleanup on unmount
     return () => {
-      if (observer) {
-        console.log("disconnecting page observer due to content change or unmount");
-        observer.disconnect();
+      if (legacyRef.current) {
+        legacyRef.current.observer.disconnect();
+        legacyRef.current = null;
       }
     };
-  }, [htmlContent]); // Dependency array includes htmlContent
+  }, [enabled, openCharacterDetailsModal]);
+
+  /* ------------------------------------------------------------------ */
+  /*  Public helpers                                                     */
+  /* ------------------------------------------------------------------ */
+  const createObserver = useCallback(() => {
+    if (!enabled) return null;
+    const result = setupPageObserver(openCharacterDetailsModal);
+    if (result) legacyRef.current = result;
+    return legacyRef.current;
+  }, [enabled, openCharacterDetailsModal]);
+
+  const observeNewParagraphs = useCallback(() => {
+    if (!legacyRef.current) {
+      // paragraphs might not have been ready during initial attempt – try again now
+      createObserver();
+    }
+    return legacyRef.current?.observeNewParagraphs() ?? 0;
+  }, [createObserver]);
+
+  const cleanupRemovedParagraphs = useCallback(() => {
+    if (!legacyRef.current) return 0;
+    return legacyRef.current.cleanupRemovedParagraphs();
+  }, []);
+
+  return { observeNewParagraphs, cleanupRemovedParagraphs };
 };

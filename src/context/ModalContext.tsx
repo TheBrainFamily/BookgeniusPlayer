@@ -51,19 +51,32 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
     dispatch({ type: "OPEN_CHARACTER_MODAL", payload: { slug, isVideo, mediaSrc } });
   }, []);
 
-  const debouncedPerformSearch = useMemo(
-    () =>
-      debounce((query: string, loc: typeof debouncedLocation) => {
-        if (!query?.trim()) {
-          dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: "Please enter a search term.", items: [], isLoading: false } } });
-          return;
-        }
+  const debouncedPerformSearch = useMemo(() => {
+    let latestSearchId = 0;
 
-        const results = performLocalDOMSearch(query, loc);
-        dispatch({ type: "SET_SEARCH_RESULTS", payload: { results } });
-      }, 350),
-    [debouncedLocation],
-  );
+    return debounce(async (query: string, loc: typeof debouncedLocation, bookSlug: string) => {
+      if (!query?.trim()) {
+        dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: "Please enter a search term.", items: [], isLoading: false } } });
+        return;
+      }
+
+      const searchId = ++latestSearchId;
+
+      try {
+        const results = await performLocalDOMSearch(query, loc, bookSlug);
+
+        // Only dispatch if this is still the latest search
+        if (searchId === latestSearchId) {
+          dispatch({ type: "SET_SEARCH_RESULTS", payload: { results } });
+        }
+      } catch {
+        // Only dispatch error if this is still the latest search
+        if (searchId === latestSearchId) {
+          dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: "Search failed. Please try again.", items: [], isLoading: false } } });
+        }
+      }
+    }, 350);
+  }, [debouncedLocation, bookData.slug]);
 
   const openSearchModal = useCallback(
     (layoutView?: boolean, hideOverlay?: boolean, query: string = "") => {
@@ -75,11 +88,11 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
 
         // Then trigger the actual search
         setTimeout(() => {
-          debouncedPerformSearch(query, debouncedLocation);
+          debouncedPerformSearch(query, debouncedLocation, bookData.slug);
         }, 0);
       }
     },
-    [dispatch, debouncedPerformSearch, debouncedLocation],
+    [dispatch, debouncedPerformSearch, debouncedLocation, bookData.slug],
   );
 
   const openDeepResearchModal = useCallback((content?: string, layoutView?: boolean, hideOverlay?: boolean) => {
@@ -131,12 +144,12 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
         dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: `Searching for "${query}"...`, items: [], isLoading: true } } });
 
         // Then perform the actual search
-        debouncedPerformSearch(query, debouncedLocation);
+        debouncedPerformSearch(query, debouncedLocation, bookData.slug);
       } else {
         dispatch({ type: "SET_SEARCH_RESULTS", payload: { results: { header: "Please enter a search term.", items: [], isLoading: false } } });
       }
     },
-    [debouncedPerformSearch, debouncedLocation, dispatch],
+    [debouncedPerformSearch, debouncedLocation, dispatch, bookData.slug],
   );
 
   const getModalContent = useCallback(
@@ -147,7 +160,14 @@ export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }
           if (!matchingCharacter) return null;
 
           return (
-            <CharacterModal onClose={closeModal} isVideo={modal.isVideo} mediaSrc={modal.mediaSrc} matchingCharacter={matchingCharacter} endChapter={locationRange.endChapter} />
+            <CharacterModal
+              onClose={closeModal}
+              isVideo={modal.isVideo}
+              mediaSrc={modal.mediaSrc}
+              matchingCharacter={matchingCharacter}
+              endChapter={locationRange.endChapter}
+              bookSlug={bookData.slug}
+            />
           );
         }
 

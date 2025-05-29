@@ -1,5 +1,5 @@
 import fs from "fs";
-import { xmlToComplexHtml } from "@/data/xmlToComplexHtml";
+import { xmlToReactChapters } from "@/data/xmlToReact";
 import { BOOK_SLUGS } from "@/consts";
 import { DOMParser } from "@xmldom/xmldom";
 import { extractCharacterMetadata, getCharacterTags } from "@/data/tools/create-book-metadata";
@@ -35,10 +35,7 @@ export class FileManager {
   public regenerateXml(xmlString: string): void {
     try {
       this.writeXmlFile(xmlString);
-      const htmlString = xmlToComplexHtml(xmlString, this.bookSlug);
-      const variableName = this.bookSlugAsVariable(this.bookSlug).replace(/-/g, "");
-
-      fs.writeFileSync(this.htmlFilePath, `export const ${variableName}BookXml = \`<section>${htmlString}</section>\`;`);
+      xmlToReactChapters(xmlString, this.bookSlug);
 
       this.regenerateMetadata();
     } catch (error) {

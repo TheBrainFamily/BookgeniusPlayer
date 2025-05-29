@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import ModalUI from "@/components/modals/ModalUI";
 import { BookData } from "@/booksData/types";
-import { goToParagraph } from "@/helpers/paragraphsNavigation";
+import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
 import { getTitle } from "@/utils/getChapterTitle";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
@@ -21,7 +21,7 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose, bookData
   }, [bookData]);
 
   const navigateToChapter = (chapterId: number) => {
-    goToParagraph({ currentChapter: chapterId, currentParagraph: 0 });
+    systemNavigateTo({ currentChapter: chapterId, currentParagraph: 0 });
     onClose();
   };
 

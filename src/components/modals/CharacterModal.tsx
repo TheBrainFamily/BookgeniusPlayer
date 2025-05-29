@@ -1,8 +1,8 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import ModalUI from "./ModalUI";
 import CharacterMedia from "@/components/CharacterMedia";
 import { CharacterData } from "@/booksData/types";
-import { performLocalDOMSearch } from "@/searchModal";
+import { performLocalDOMSearch, SearchResultItemData } from "@/searchModal";
 import { useLocation } from "@/state/LocationContext";
 
 interface CharacterModalProps {
@@ -11,6 +11,7 @@ interface CharacterModalProps {
   mediaSrc: string;
   matchingCharacter: CharacterData;
   endChapter: number;
+  bookSlug: string;
 }
 
 export const findLatestSummaryInRange = (character: CharacterData, endChapter: number) => {
@@ -18,15 +19,29 @@ export const findLatestSummaryInRange = (character: CharacterData, endChapter: n
   return latestSummary;
 };
 
-const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, matchingCharacter, endChapter }) => {
+const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, matchingCharacter, endChapter, bookSlug }) => {
   const { location } = useLocation();
+  const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Search for character appearances in the text up to the current location
-  const characterAppearances = useMemo(() => {
-    const searchResults = performLocalDOMSearch(matchingCharacter.characterName, location);
-    // Return first 3 appearances
-    return searchResults.items.slice(0, 3);
-  }, [matchingCharacter.characterName, location]);
+  useEffect(() => {
+    const searchAppearances = async () => {
+      setIsLoading(true);
+      try {
+        const searchResults = await performLocalDOMSearch(matchingCharacter.characterName, location, bookSlug);
+        // Return first 3 appearances
+        setCharacterAppearances(searchResults.items.slice(0, 3));
+      } catch (error) {
+        console.error("Error searching for character appearances:", error);
+        setCharacterAppearances([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    searchAppearances();
+  }, [matchingCharacter.characterName, location, bookSlug]);
 
   return (
     <ModalUI onClose={onClose} className="bg-transparent pointer-events-none">
@@ -54,18 +69,24 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
           {characterAppearances.length > 0 && (
             <div className="mt-4">
               <h5 className="text-md font-semibold text-white mb-3 text-center">Wystąpienia postaci w tekście</h5>
-              <div className="space-y-3">
-                {characterAppearances.map((appearance) => (
-                  <div key={appearance.id} className="p-3 rounded-lg bg-black/20 border border-white/20 hover:bg-black/40 transition-colors cursor-pointer">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-xs font-medium text-blue-300">
-                        Rozdział {appearance.chapter}, Paragraf {appearance.paragraphNumber}
-                      </span>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-4">
+                  <div className="text-gray-300">Szukanie wystąpień...</div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {characterAppearances.map((appearance) => (
+                    <div key={appearance.id} className="p-3 rounded-lg bg-black/20 border border-white/20 hover:bg-black/40 transition-colors cursor-pointer">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-xs font-medium text-blue-300">
+                          Rozdział {appearance.chapter}, Paragraf {appearance.paragraphNumber}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-300 leading-relaxed">{appearance.text}</p>
                     </div>
-                    <p className="text-sm text-gray-300 leading-relaxed">{appearance.text}</p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

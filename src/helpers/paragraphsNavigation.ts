@@ -9,11 +9,15 @@
 import type { Location } from "@/state/LocationContext";
 
 /* ------------------------------------------------------------------ */
-/*  Proxy that React overwrites                                       */
-type Bridge = { get: () => Location; set: (l: Location) => void };
+/*  Bridge interface for legacy helpers                               */
+interface Bridge {
+  get: () => Location;
+  set: (loc: Location, source?: "user" | "system") => void;
+}
+
 let _bridge: Bridge = {
   get: () => ({ chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 }),
-  // eslint‑disable-next-line @typescript-eslint/no-empty-function
+
   set: () => {},
 };
 export const __setLocationBridge = (b: Bridge) => (_bridge = b);
@@ -42,7 +46,6 @@ export const getCurrentLocation = (): Location => _bridge.get();
 export const setCurrentLocation = (loc: Location) => {
   _bridge.set(loc);
 
-  // Update URL hash
   setTimeout(() => {
     window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
   }, 2000);
@@ -51,8 +54,35 @@ export const setCurrentLocation = (loc: Location) => {
   const ahead = loc.currentChapter > saved.currentChapter || (loc.currentChapter === saved.currentChapter && loc.currentParagraph > saved.currentParagraph);
 
   if (ahead) setSavedLocation(loc);
+};
 
-  updateGoBackButton();
+/* ------------------------------------------------------------------ */
+/*  System Navigation Helper                                          */
+/**
+ * Navigate to a specific location with system source (triggers scrolling)
+ */
+export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph: number }) => {
+  const fullLocation: Location = {
+    chapter: loc.currentChapter,
+    paragraph: loc.currentParagraph,
+    endChapter: loc.currentChapter,
+    endParagraph: loc.currentParagraph,
+    currentChapter: loc.currentChapter,
+    currentParagraph: loc.currentParagraph,
+  };
+
+  // Use the bridge to set location with system source
+  _bridge.set(fullLocation, "system");
+
+  // Update the saved location to prevent conflicts
+  const saved = getSavedLocation();
+  const ahead = loc.currentChapter > saved.currentChapter || (loc.currentChapter === saved.currentChapter && loc.currentParagraph > saved.currentParagraph);
+  if (ahead) {
+    setSavedLocation(fullLocation);
+  }
+
+  // Update hash immediately for system navigation
+  window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
 };
 
 /* ------------------------------------------------------------------ */
@@ -70,29 +100,6 @@ export const shouldShowReturnButton = (): boolean => {
   const current = getCurrentLocation();
   const saved = getSavedLocation();
   return saved.currentChapter > current.currentChapter || (saved.currentChapter === current.currentChapter && saved.currentParagraph - 5 > current.currentParagraph);
-};
-
-/* ------------------------------------------------------------------ */
-/*  Return‑to‑location button logic                                   */
-const returnButton = document.getElementById("return-to-location-button");
-
-/* ensure listener once */
-if (returnButton) {
-  returnButton.addEventListener("click", () => {
-    goToParagraph(getSavedLocation());
-    returnButton.style.display = "none";
-  });
-}
-
-const updateGoBackButton = () => {
-  /* slight delay like the old code (DOM settling after scroll) */
-  setTimeout(() => {
-    const current = getCurrentLocation();
-    const saved = getSavedLocation();
-    const shouldShow = saved.currentChapter > current.currentChapter || (saved.currentChapter === current.currentChapter && saved.currentParagraph - 5 > current.currentParagraph);
-
-    if (returnButton) returnButton.style.display = shouldShow ? "block" : "none";
-  }, 100);
 };
 
 /* ------------------------------------------------------------------ */
@@ -154,12 +161,13 @@ export const goToInitialLocationFromHash = () => {
   const locationFromHash = parseLocationFromHash();
 
   if (locationFromHash) {
-    // Use goToParagraph which handles setting current location and scrolling
+    // Use system navigation for initial load from hash
     console.log("going to location from hash", locationFromHash);
-    goToParagraph({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph }, true);
+    systemNavigateTo({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph });
   } else {
     // Fallback if hash is invalid or missing: go to furthest saved location
     console.warn("no location in hash, using saved location");
-    goToParagraph({ currentChapter: getSavedLocation().currentChapter, currentParagraph: getSavedLocation().currentParagraph }, true);
+    const saved = getSavedLocation();
+    systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph });
   }
 };

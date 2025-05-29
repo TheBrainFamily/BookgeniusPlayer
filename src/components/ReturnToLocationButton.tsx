@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 import { UndoDot } from "lucide-react";
 
-import { shouldShowReturnButton, goToParagraph, getSavedLocation } from "@/helpers/paragraphsNavigation";
+import { shouldShowReturnButton, systemNavigateTo, getSavedLocation } from "@/helpers/paragraphsNavigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLocation } from "@/state/LocationContext";
 
@@ -15,7 +15,8 @@ const ReturnToLocationButton = () => {
   }, [location.currentParagraph, location.currentChapter]);
 
   const onGoBackClick = () => {
-    goToParagraph(getSavedLocation());
+    const savedLocation = getSavedLocation();
+    systemNavigateTo({ currentChapter: savedLocation.currentChapter, currentParagraph: savedLocation.currentParagraph });
     setIsVisible(false);
   };
 

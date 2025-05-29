@@ -304,8 +304,8 @@ const knownConradTajnyAgent = [
   "tajny-radca-wurmt-speaks.mp4",
   "toodles-listens.mp4",
   "toodles-speaks.mp4",
-  "towarzysz-aleksander-ossipon-listens.mp4",
-  "towarzysz-aleksander-ossipon-speaks.mp4",
+  "towarzysz-ossipon-listens.mp4",
+  "towarzysz-ossipon-speaks.mp4",
   "winnie-verloc-listens.mp4",
   "winnie-verloc-speaks.mp4",
 ];

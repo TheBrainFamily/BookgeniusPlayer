@@ -1,7 +1,8 @@
-import React from "react";
-import { SearchResultsData, SearchResultItemData } from "@/searchModal";
-import { goToParagraph } from "@/helpers/paragraphsNavigation";
+import React, { useCallback, useEffect } from "react";
+import { SearchResultsData, SearchResultItemData, cleanupSearchChapters } from "@/searchModal";
+import { useLocation } from "@/state/LocationContext";
 import ModalUIOld from "./ModalUIOld";
+import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
 
 interface SearchModalProps {
   onClose: () => void;
@@ -11,6 +12,28 @@ interface SearchModalProps {
 }
 
 const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults }) => {
+  const { setLocation } = useLocation();
+
+  // Cleanup search chapters when modal unmounts
+  useEffect(() => {
+    return () => {
+      cleanupSearchChapters();
+    };
+  }, []);
+
+  const handleSearchResultClick = useCallback(
+    (item: SearchResultItemData) => {
+      console.log(`SearchModal: Navigating to chapter ${item.chapter}, paragraph ${item.paragraphNumber}`);
+
+      // Update location with 'system' source to trigger scrolling
+      systemNavigateTo({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber });
+
+      // Close the modal
+      onClose();
+    },
+    [onClose, setLocation],
+  );
+
   return (
     <ModalUIOld title="Search" onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
       <div className="flex flex-col h-full p-4">
@@ -36,10 +59,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                   <li
                     key={item.id}
                     className="search-result-item p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-md transition-colors duration-150"
-                    onClick={() => {
-                      goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber });
-                      onClose();
-                    }}
+                    onClick={() => handleSearchResultClick(item)}
                   >
                     <div className="search-result-page font-semibold text-blue-600 dark:text-blue-400">
                       Chapter {item.chapter}, Paragraph {item.paragraphNumber}
