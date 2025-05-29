@@ -294,41 +294,47 @@ export const Chapter46: React.FC = () => {
         </span>{" "}
         szepnął:
       </p>
-      <Mentezufis data-index="35"> </Mentezufis>
+      <p data-index="35">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Boję się,
+        ażeby młodemu panu naszemu triumf nie za mocno uderzył do głowy. Czy nie sądzisz, że byłoby roztropnym przerwać w jaki sposób uroczystość?…
+      </p>
       <p data-index="36">
         {" "}
-        — Boję się, ażeby młodemu panu naszemu triumf nie za mocno uderzył do głowy. Czy nie sądzisz, że byłoby roztropnym przerwać w jaki sposób uroczystość?…
-      </p>
-      <Pentuer data-index="37"> </Pentuer>
-      <p data-index="38">
-        {" "}
-        — Przeciwnie — odparł{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Przeciwnie —
+        odparł{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
         </span>{" "}
         — nie przerywajcie uroczystości, a ja wam ręczę, że podczas triumfu nie będzie miał wesołej twarzy.
       </p>
-      <Mentezufis data-index="39"> </Mentezufis>
-      <p data-index="40"> — Zrobisz cud?</p>
-      <Pentuer data-index="41"> </Pentuer>
-      <p data-index="42"> — Czyliżbym potrafił? Pokażę mu tylko, że na tym świecie wielkiej radości towarzyszą wielkie strapienia.</p>
-      <Mentezufis data-index="43"> </Mentezufis>
-      <p data-index="44">
+      <p data-index="37">
         {" "}
-        — Czyń, jak chcesz — rzekł{" "}
+        <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Zrobisz
+        cud?
+      </p>
+      <p data-index="38">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Czyliżbym
+        potrafił? Pokażę mu tylko, że na tym świecie wielkiej radości towarzyszą wielkie strapienia.
+      </p>
+      <p data-index="39">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Czyń, jak
+        chcesz — rzekł{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
           Mentezufis
         </span>{" "}
         — gdyż bogowie dali ci mądrość godną członka najwyższej rady.
       </p>
-      <p data-index="45"> Odezwały się trąby i bębny i rozpoczęto pochód triumfalny.</p>
-      <p data-index="46">
+      <p data-index="40"> Odezwały się trąby i bębny i rozpoczęto pochód triumfalny.</p>
+      <p data-index="41">
         {" "}
         Na czele szli nadzy niewolnicy z darami, pilnowani przez możnych Libijczyków. Więc niesiono złote i srebrne bogi, szkatułki napełnione wonnościami, emaliowane naczynia,
         tkaniny, sprzęty, wreszcie złote misy zasypane rubinami, szafirami i szmaragdami. Niewolnicy niosący je mieli ogolone głowy i opaski na ustach, ażeby który nie ukradł
         cennego klejnotu.
       </p>
-      <p data-index="47">
+      <p data-index="42">
         {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę Ramzes
@@ -336,7 +342,7 @@ export const Chapter46: React.FC = () => {
         wsparł obie ręce o krawędź wozu i z wysokości pagórka patrzył na Libijczyków i swoje wojsko jak żółtogłowy orzeł na pstre kuropatwy. Duma wypełniała go od stóp do głów i
         wszyscy czuli, że nie można być potężniejszym nad tego zwycięskiego wodza.
       </p>
-      <p data-index="48">
+      <p data-index="43">
         {" "}
         W jednej chwili oczy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -348,10 +354,10 @@ export const Chapter46: React.FC = () => {
         </span>{" "}
         szepnął:
       </p>
-      <Pentuer data-index="49"> </Pentuer>
-      <p data-index="50">
+      <p data-index="44">
         {" "}
-        — Nakłoń, panie, ucha twego… Od czasu kiedy opuściłeś miasto Pi-Bast, zaszły tam dziwne wydarzenia… Twoja kobieta,{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Nakłoń, panie,
+        ucha twego… Od czasu kiedy opuściłeś miasto Pi-Bast, zaszły tam dziwne wydarzenia… Twoja kobieta,{" "}
         <span className="character-highlighted" data-character="Pieszczota" data-src-listening="/Pharaon/pieszczota-listens.mp4">
           Kama
         </span>{" "}
@@ -361,10 +367,9 @@ export const Chapter46: React.FC = () => {
         </span>
         …
       </p>
-      <Ksiaze-Ramzes data-index="51"> </Ksiaze-Ramzes>
-      <p data-index="52">
+      <p data-index="45">
         {" "}
-        — Z{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Z{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
           Lykonem
         </span>
@@ -374,9 +379,12 @@ export const Chapter46: React.FC = () => {
         </span>
         .
       </p>
-      <Pentuer data-index="53"> </Pentuer>
-      <p data-index="54"> — Nie poruszaj się, panie, i nie okazuj tysiącom twoich niewolników, że masz smutek w dniu triumfu…</p>
-      <p data-index="55">
+      <p data-index="46">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Nie poruszaj
+        się, panie, i nie okazuj tysiącom twoich niewolników, że masz smutek w dniu triumfu…
+      </p>
+      <p data-index="47">
         {" "}
         W tej chwili przechodził u stóp{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -393,116 +401,139 @@ export const Chapter46: React.FC = () => {
         </span>
         .
       </p>
-      <Pentuer data-index="56"> </Pentuer>
-      <p data-index="57"> — Bogowie — szeptał prorok — ukarali zdradziecką Fenicjankę…</p>
-      <Ksiaze-Ramzes data-index="58"> </Ksiaze-Ramzes>
-      <p data-index="59">
+      <p data-index="48">
         {" "}
-        — Złapana?… — spytał{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Bogowie —
+        szeptał prorok — ukarali zdradziecką Fenicjankę…
+      </p>
+      <p data-index="49">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Złapana?… — spytał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
         </span>
         .
       </p>
-      <Pentuer data-index="60"> </Pentuer>
-      <p data-index="61"> — Złapana, ale musiano ją wysłać do wschodnich kolonii… Spadł bowiem na nią trąd…</p>
-      <Ksiaze-Ramzes data-index="62"> </Ksiaze-Ramzes>
-      <p data-index="63">
+      <p data-index="50">
         {" "}
-        — O bogowie!… — szepnął{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Złapana, ale
+        musiano ją wysłać do wschodnich kolonii… Spadł bowiem na nią trąd…
+      </p>
+      <p data-index="51">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— O
+        bogowie!… — szepnął{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
         </span>
         . — Czy aby mnie on nie grozi?…
       </p>
-      <Pentuer data-index="64"> </Pentuer>
-      <p data-index="65"> — Bądź spokojny, panie: gdybyś się zaraził, już byś go miał…</p>
-      <p data-index="66">
+      <p data-index="52">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Bądź spokojny,
+        panie: gdybyś się zaraził, już byś go miał…
+      </p>
+      <p data-index="53">
         {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę
         </span>{" "}
         poczuł zimno we wszystkich członkach. Jakże łatwo bogom z najwyższych szczytów zepchnąć człowieka w przepaść najgłębszej nędzy!…
       </p>
-      <Ksiaze-Ramzes data-index="67"> </Ksiaze-Ramzes>
-      <p data-index="68">
+      <p data-index="54">
         {" "}
-        — A tenże nikczemny{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        tenże nikczemny{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
           Lykon
         </span>
         ?…
       </p>
-      <Pentuer data-index="69"> </Pentuer>
-      <p data-index="70">
+      <p data-index="55">
         {" "}
-        — Jest to wielki zbrodniarz — mówi{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Jest to wielki
+        zbrodniarz — mówi{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
         </span>{" "}
         — zbrodniarz, jakich niewielu wydała ziemia…
       </p>
-      <Ksiaze-Ramzes data-index="71"> </Ksiaze-Ramzes>
-      <p data-index="72">
+      <p data-index="56">
         {" "}
-        — Znam go. Jest podobny do mnie jak obraz odbity w lustrze… — odparł{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Znam go. Jest podobny do mnie jak obraz odbity w lustrze… — odparł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
         </span>
         .
       </p>
-      <p data-index="73">
+      <p data-index="57">
         {" "}
         Teraz nadciągnęła gromada Libijczyków prowadzących osobliwe zwierzęta. Na czele szedł jednogarbny wielbłąd z białawym włosem, jeden z pierwszych, jakiego złapano w pustyni.
         Za nim dwa nosorożce, stado koni i oswojony lew w klatce. A dalej mnóstwo klatek z różnobarwnymi ptakami, małpkami i małymi pieskami, przeznaczonymi dla dam dworskich. W
         końcu pędzono wielkie stada wołów i baranów na mięso dla wojska.
       </p>
-      <p data-index="74">
+      <p data-index="58">
         {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę
         </span>{" "}
         ledwo rzucił okiem na wędrujący zwierzyniec i pytał kapłana:
       </p>
-      <Ksiaze-Ramzes data-index="75"> </Ksiaze-Ramzes>
-      <p data-index="76">
+      <p data-index="59">
         {" "}
-        — A{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
           Lykon
         </span>{" "}
         schwytany?…
       </p>
-      <Pentuer data-index="77"> </Pentuer>
-      <p data-index="78">
+      <p data-index="60">
         {" "}
-        — Teraz powiem ci najgorszą rzecz, nieszczęśliwy panie — szeptał{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Teraz powiem ci
+        najgorszą rzecz, nieszczęśliwy panie — szeptał{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
         </span>
         . — Pamiętaj jednak, aby nieprzyjaciele Egiptu nie dostrzegli smutku w tobie…
       </p>
-      <p data-index="79"> Następca poruszył się.</p>
-      <Pentuer data-index="80"> </Pentuer>
-      <p data-index="81">
+      <p data-index="61"> Następca poruszył się.</p>
+      <p data-index="62">
         {" "}
-        — Twoja druga kobieta,{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Twoja druga
+        kobieta,{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sara
         </span>{" "}
         Żydówka…
       </p>
-      <Ksiaze-Ramzes data-index="82"> </Ksiaze-Ramzes>
-      <p data-index="83"> — Czy także uciekła?…</p>
-      <Pentuer data-index="84"> </Pentuer>
-      <p data-index="85"> — Zmarła w więzieniu…</p>
-      <Ksiaze-Ramzes data-index="86"> </Ksiaze-Ramzes>
-      <p data-index="87"> — O bogowie!… Któż śmiał ją wtrącić?…</p>
-      <Pentuer data-index="88"> </Pentuer>
-      <p data-index="89"> — Sama oskarżyła się o zabójstwo syna twego…</p>
-      <Ksiaze-Ramzes data-index="90"> </Ksiaze-Ramzes>
-      <p data-index="91"> — Co?…</p>
-      <p data-index="92">
+      <p data-index="63">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Czy
+        także uciekła?…
+      </p>
+      <p data-index="64">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Zmarła w
+        więzieniu…
+      </p>
+      <p data-index="65">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— O
+        bogowie!… Któż śmiał ją wtrącić?…
+      </p>
+      <p data-index="66">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Sama oskarżyła
+        się o zabójstwo syna twego…
+      </p>
+      <p data-index="67">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Co?…
+      </p>
+      <p data-index="68">
         {" "}
         Wielki krzyk rozległ się u stóp{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -514,7 +545,7 @@ export const Chapter46: React.FC = () => {
         </span>
         .
       </p>
-      <p data-index="93">
+      <p data-index="69">
         {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
@@ -525,16 +556,16 @@ export const Chapter46: React.FC = () => {
         </span>{" "}
         i rzekł:
       </p>
-      <Ksiaze-Ramzes data-index="94"> </Ksiaze-Ramzes>
-      <p data-index="95">
+      <p data-index="70">
         {" "}
-        — Stań przy ojcu twoim,{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Stań przy ojcu twoim,{" "}
         <span className="character-highlighted" data-character="Musawasa" data-src-listening="/Pharaon/musawasa.png">
           Musawasie
         </span>
         , ażeby widział i dotknął cię, że żyjesz…
       </p>
-      <p data-index="96">
+      <p data-index="71">
         {" "}
         Na te słowa wszyscy Libijczycy i całe wojsko wydało potężny okrzyk; ale{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -542,41 +573,46 @@ export const Chapter46: React.FC = () => {
         </span>{" "}
         nie słuchał go.
       </p>
-      <Ksiaze-Ramzes data-index="97"> </Ksiaze-Ramzes>
-      <p data-index="98">
+      <p data-index="72">
         {" "}
-        — Syn mój nie żyje?… — pytał kapłana. —{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Syn
+        mój nie żyje?… — pytał kapłana. —{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sara
         </span>{" "}
         oskarżyła się o dzieciobójstwo?… Czy szaleństwo padło na jej duszę?…
       </p>
-      <Pentuer data-index="99"> </Pentuer>
-      <p data-index="100">
+      <p data-index="73">
         {" "}
-        — Dziecko zabił nikczemny{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Dziecko zabił
+        nikczemny{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
           Lykon
         </span>
         …
       </p>
-      <Ksiaze-Ramzes data-index="101"> </Ksiaze-Ramzes>
-      <p data-index="102">
+      <p data-index="74">
         {" "}
-        — O bogowie, dajcie mi siły!… — jęknął{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— O
+        bogowie, dajcie mi siły!… — jęknął{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
         </span>
         .
       </p>
-      <Pentuer data-index="103"> </Pentuer>
-      <p data-index="104"> — Hamuj się, panie, jak przystało na zwycięskiego wodza…</p>
-      <Ksiaze-Ramzes data-index="105"> </Ksiaze-Ramzes>
-      <p data-index="106"> — Czyliż podobna zwyciężyć taką boleść!… O niemiłosierni bogowie!…</p>
-      <Pentuer data-index="107"> </Pentuer>
-      <p data-index="108">
+      <p data-index="75">
         {" "}
-        — Dziecko zabił{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Hamuj się,
+        panie, jak przystało na zwycięskiego wodza…
+      </p>
+      <p data-index="76">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Czyliż podobna zwyciężyć taką boleść!… O niemiłosierni bogowie!…
+      </p>
+      <p data-index="77">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Dziecko zabił{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
           Lykon
         </span>
@@ -586,17 +622,17 @@ export const Chapter46: React.FC = () => {
         </span>{" "}
         zaś oskarżyła się, ażeby ciebie ocalić… Widząc bowiem mordercę w nocy, myślała, że to ty sam byłeś…
       </p>
-      <Ksiaze-Ramzes data-index="109"> </Ksiaze-Ramzes>
-      <p data-index="110">
+      <p data-index="78">
         {" "}
-        — A ja ją wygnałem z mego domu!… A ja zrobiłem ją służebnicą Fenicjanki!… — szeptał{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        ja ją wygnałem z mego domu!… A ja zrobiłem ją służebnicą Fenicjanki!… — szeptał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
         </span>
         .
       </p>
-      <p data-index="111"> Teraz ukazali się egipscy żołnierze, niosący pełne kosze rąk uciętych poległym Libijczykom.</p>
-      <p data-index="112">
+      <p data-index="79"> Teraz ukazali się egipscy żołnierze, niosący pełne kosze rąk uciętych poległym Libijczykom.</p>
+      <p data-index="80">
         {" "}
         Na ten widok{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -604,7 +640,7 @@ export const Chapter46: React.FC = () => {
         </span>{" "}
         zasłonił twarz swoją i gorzko zapłakał.
       </p>
-      <p data-index="113">
+      <p data-index="81">
         {" "}
         Natychmiast jenerałowie otoczyli wóz, pocieszając pana. Zaś święty prorok{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
@@ -612,13 +648,13 @@ export const Chapter46: React.FC = () => {
         </span>{" "}
         podał wniosek, który przyjęto bez namysłu, ażeby od tej pory wojsko egipskie już nigdy nie ucinało rąk poległym w boju nieprzyjaciołom.
       </p>
-      <p data-index="114">
+      <p data-index="82">
         {" "}
         Tym nieprzewidzianym wypadkiem zakończył się pierwszy triumf następcy egipskiego tronu. Ale łzy, jakie wylał nad uciętymi rękoma, mocniej aniżeli zwycięska bitwa
         przywiązały do niego Libijczyków. Nikt też nie dziwił się, że dokoła ognisk zasiedli w zgodzie żołnierze egipscy i Libijczycy, dzieląc się chlebem i pijąc wino z tych
         samych kubków. Miejsce wojny i nienawiści, które miały trwać całe lata, zajęło głębokie uczucie spokoju i zaufania.
       </p>
-      <p data-index="115">
+      <p data-index="83">
         {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
@@ -638,7 +674,7 @@ export const Chapter46: React.FC = () => {
         </span>
         , jak człowiek, któremu boleść starczy za najmilsze towarzystwo.
       </p>
-      <p data-index="116">
+      <p data-index="84">
         {" "}
         Ku wieczorowi przyszła do{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -654,7 +690,7 @@ export const Chapter46: React.FC = () => {
         </span>{" "}
         odparł:
       </p>
-      <p data-index="117">
+      <p data-index="85">
         {" "}
         <span className="character-placeholder character-talking" data-character="Kalipos" data-src-talking="/Pharaon/kalipos-speaks.mp4" data-is-talking="true" />— Przychodzimy
         błagać cię, panie, ażeby ciało naszego wodza, a twego sługi,{" "}
@@ -663,23 +699,23 @@ export const Chapter46: React.FC = () => {
         </span>
         , nie było wydane egipskim kapłanom, lecz spalone według greckiego obyczaju.
       </p>
-      <p data-index="118">
+      <p data-index="86">
         {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę
         </span>{" "}
         zdziwił się.
       </p>
-      <Ksiaze-Ramzes data-index="119"> </Ksiaze-Ramzes>
-      <p data-index="120">
+      <p data-index="87">
         {" "}
-        — Chyba wiadomo wam — rzekł — że ze zwłok{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Chyba wiadomo wam — rzekł — że ze zwłok{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
           Patroklesa
         </span>{" "}
         kapłani chcą zrobić mumię pierwszej klasy i umieścić ją przy grobach faraonów. Czy może większy zaszczyt spotkać człowieka na tym świecie?
       </p>
-      <p data-index="121">
+      <p data-index="88">
         {" "}
         Grecy wahali się, wreszcie{" "}
         <span className="character-highlighted" data-character="Kalipos" data-src-listening="/Pharaon/kalipos-listens.mp4">
@@ -687,13 +723,13 @@ export const Chapter46: React.FC = () => {
         </span>
         , zebrawszy odwagę, odpowiedział:
       </p>
-      <Kalipos data-index="122"> </Kalipos>
-      <p data-index="123">
+      <p data-index="89">
         {" "}
-        — Panie nasz, pozwól otworzyć serce przed tobą. Dobrze wiemy, że zrobienie mumii jest dla człowieka korzystniejszym niż spalenie go. Gdy bowiem dusza spalonego natychmiast
-        przenosi się do krajów wiekuistych, dusza zabalsamowanego może tysiące lat żyć na tej ziemi i cieszyć się jej pięknością.
+        <span className="character-placeholder character-talking" data-character="Kalipos" data-src-talking="/Pharaon/kalipos-speaks.mp4" data-is-talking="true" />— Panie nasz,
+        pozwól otworzyć serce przed tobą. Dobrze wiemy, że zrobienie mumii jest dla człowieka korzystniejszym niż spalenie go. Gdy bowiem dusza spalonego natychmiast przenosi się
+        do krajów wiekuistych, dusza zabalsamowanego może tysiące lat żyć na tej ziemi i cieszyć się jej pięknością.
       </p>
-      <p data-index="124">
+      <p data-index="90">
         {" "}
         Ale egipscy kapłani, wodzu (niech to nie obraża twoich uszu!), nienawidzili{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
@@ -702,7 +738,7 @@ export const Chapter46: React.FC = () => {
         . Któż więc nas zapewni, że kapłani, zrobiwszy jego mumię, nie w tym celu zatrzymają duszę na ziemi, aby ją poddać udręczeniom?… I co my bylibyśmy warci, gdybyśmy,
         podejrzewając zemstę, nie uchronili od niej duszy naszego ziomka i dowódcy?…
       </p>
-      <p data-index="125">
+      <p data-index="91">
         {" "}
         Zdziwienie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -710,13 +746,22 @@ export const Chapter46: React.FC = () => {
         </span>{" "}
         jeszcze bardziej wzrosło.
       </p>
-      <Ksiaze-Ramzes data-index="126"> </Ksiaze-Ramzes>
-      <p data-index="127"> — Czyńcie — rzekł — jak uważacie za potrzebne.</p>
-      <Kalipos data-index="128"> </Kalipos>
-      <p data-index="129"> — A jeżeli nie wydadzą nam ciała?…</p>
-      <Ksiaze-Ramzes data-index="130"> </Ksiaze-Ramzes>
-      <p data-index="131"> — Tylko przygotujcie stos, a resztą sam się zajmę.</p>
-      <p data-index="132">
+      <p data-index="92">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Czyńcie — rzekł — jak uważacie za potrzebne.
+      </p>
+      <p data-index="93">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Kalipos" data-src-talking="/Pharaon/kalipos-speaks.mp4" data-is-talking="true" />— A jeżeli nie
+        wydadzą nam ciała?…
+      </p>
+      <p data-index="94">
+        {" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Tylko przygotujcie stos, a resztą sam się zajmę.
+      </p>
+      <p data-index="95">
         {" "}
         Grecy wyszli,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">

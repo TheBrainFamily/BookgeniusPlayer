@@ -1569,7 +1569,11 @@ export const Chapter61: React.FC = () => {
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
           Herhora
         </span>{" "}
-        i <Mefresa>Mefresa</Mefresa>…
+        i{" "}
+        <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
+          Mefresa
+        </span>
+        …
       </p>
       <p data-index="156"> Na twarzy królowej błysnęła nadzieja, lecz tylko na chwilę.</p>
       <p data-index="157">

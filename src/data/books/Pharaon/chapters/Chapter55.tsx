@@ -735,7 +735,11 @@ export const Chapter55: React.FC = () => {
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
           Herhor
         </span>{" "}
-        złożył nawet wizytę świętemu <Mefresowi>Mefresowi</Mefresowi> i rzekł mu:
+        złożył nawet wizytę świętemu{" "}
+        <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
+          Mefresowi
+        </span>{" "}
+        i rzekł mu:
       </p>
       <p data-index="106">
         {" "}
@@ -1209,7 +1213,11 @@ export const Chapter55: React.FC = () => {
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Pan
         </span>{" "}
-        chwilę czekał, w końcu zwrócił się do <Herhora>Herhora</Herhora>:
+        chwilę czekał, w końcu zwrócił się do{" "}
+        <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
+          Herhora
+        </span>
+        :
       </p>
       <p data-index="165">
         {" "}
@@ -1334,8 +1342,16 @@ export const Chapter55: React.FC = () => {
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Faraon
         </span>{" "}
-        przypomniał sobie ukłony <Herhora>Herhora</Herhora>, spojrzenia <Mefresa>Mefresa</Mefresa> i ton głosu obydwu. Spod pozorów uprzejmości co chwilę wynurzała się ich duma i
-        lekceważenie jego. On potrzebuje pieniędzy, a oni obiecują mu modlitwy, ba!… ośmielają się mówić, że nie jest wyłącznym{" "}
+        przypomniał sobie ukłony{" "}
+        <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
+          Herhora
+        </span>
+        , spojrzenia{" "}
+        <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
+          Mefresa
+        </span>{" "}
+        i ton głosu obydwu. Spod pozorów uprzejmości co chwilę wynurzała się ich duma i lekceważenie jego. On potrzebuje pieniędzy, a oni obiecują mu modlitwy, ba!… ośmielają się
+        mówić, że nie jest wyłącznym{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           władcą
         </span>{" "}
@@ -1441,7 +1457,11 @@ export const Chapter55: React.FC = () => {
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           pan
         </span>{" "}
-        wzruszył ramionami i wezwał do siebie <Tutmozisa>Tutmozisa</Tutmozisa>. Mimo późnej nocy królewski ulubieniec zjawił się natychmiast.
+        wzruszył ramionami i wezwał do siebie{" "}
+        <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
+          Tutmozisa
+        </span>
+        . Mimo późnej nocy królewski ulubieniec zjawił się natychmiast.
       </p>
       <p data-index="198">
         {" "}
@@ -1516,8 +1536,11 @@ export const Chapter55: React.FC = () => {
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
           Tutmozis
         </span>{" "}
-        — że od czasu kiedy wasza świątobliwość kazałeś <Pentuerowi>Pentuerowi</Pentuerowi> zbadać położenie chłopów i robotników, kapłani podburzają nomarchów i szlachtę… Mówią,
-        panie, że chcesz zrujnować szlachtę dla chłopów…
+        — że od czasu kiedy wasza świątobliwość kazałeś{" "}
+        <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
+          Pentuerowi
+        </span>{" "}
+        zbadać położenie chłopów i robotników, kapłani podburzają nomarchów i szlachtę… Mówią, panie, że chcesz zrujnować szlachtę dla chłopów…
       </p>
       <p data-index="209"> — I szlachta wierzy temu?…</p>
       <p data-index="210">
@@ -1605,7 +1628,11 @@ export const Chapter55: React.FC = () => {
       </p>
       <p data-index="223">
         {" "}
-        Wieczorem, znowu pod opieką <Tutmozisa>Tutmozisa</Tutmozisa>, stanął w gabinecie jego świątobliwości dostojny{" "}
+        Wieczorem, znowu pod opieką{" "}
+        <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
+          Tutmozisa
+        </span>
+        , stanął w gabinecie jego świątobliwości dostojny{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
           Hiram
         </span>
@@ -1927,8 +1954,11 @@ export const Chapter55: React.FC = () => {
       <p data-index="270">
         {" "}
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Kogo?… —
-        zapytał kapłan. — Czy takich, którzy wobec <Herhora>Herhora</Herhora> byli bezsilni, czy takich, którzy by mnie oskarżyli przed nim i narazili na śmierć w męczarniach?…
-        Powiedziałem{" "}
+        zapytał kapłan. — Czy takich, którzy wobec{" "}
+        <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
+          Herhora
+        </span>{" "}
+        byli bezsilni, czy takich, którzy by mnie oskarżyli przed nim i narazili na śmierć w męczarniach?… Powiedziałem{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
           Hiramowi
         </span>
@@ -2106,7 +2136,15 @@ export const Chapter55: React.FC = () => {
       <p data-index="299">
         {" "}
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Należałoby
-        wytoczyć <Herhorowi>Herhorowi</Herhorowi> i <Mefresowi>Mefresowi</Mefresowi> proces o zdradę państwa za tajemne stosunki z Asyrią…
+        wytoczyć{" "}
+        <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
+          Herhorowi
+        </span>{" "}
+        i{" "}
+        <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
+          Mefresowi
+        </span>{" "}
+        proces o zdradę państwa za tajemne stosunki z Asyrią…
       </p>
       <p data-index="300"> — A dowody?…</p>
       <p data-index="301">
@@ -2215,8 +2253,15 @@ export const Chapter55: React.FC = () => {
       <p data-index="316">
         {" "}
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />A gdy
-        przeniesiemy skarb do waszego pałacu, gdy sąd potępi <Herhora>Herhora</Herhora> i <Mefresa>Mefresa</Mefresa>, których wasza świątobliwość może potem ułaskawić, wówczas za
-        waszym pozwoleniem wystąpię jawnie… I przestanę być kapłanem Seta, który tylko ludzi odstrasza ode mnie…
+        przeniesiemy skarb do waszego pałacu, gdy sąd potępi{" "}
+        <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
+          Herhora
+        </span>{" "}
+        i{" "}
+        <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
+          Mefresa
+        </span>
+        , których wasza świątobliwość może potem ułaskawić, wówczas za waszym pozwoleniem wystąpię jawnie… I przestanę być kapłanem Seta, który tylko ludzi odstrasza ode mnie…
       </p>
       <p data-index="317"> — I myślisz, że wszystko dobrze pójdzie?…</p>
       <p data-index="318">

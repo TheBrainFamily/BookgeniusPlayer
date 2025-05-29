@@ -204,7 +204,11 @@ export const Chapter66: React.FC = () => {
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
           Eunana
         </span>{" "}
-        podniósł topór i z całej siły uderzył <Tutmozisa>Tutmozisa</Tutmozisa> między szyję i prawy obojczyk, aż krew trysnęła na wszystkie strony. Ulubieniec{" "}
+        podniósł topór i z całej siły uderzył{" "}
+        <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
+          Tutmozisa
+        </span>{" "}
+        między szyję i prawy obojczyk, aż krew trysnęła na wszystkie strony. Ulubieniec{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           faraona
         </span>{" "}
@@ -269,7 +273,10 @@ export const Chapter66: React.FC = () => {
           Mefres
         </span>{" "}
         podając Grekowi wąziutką stal. — Weź ten sztylet i idź do pałacowego ogrodu… Tam stań w figowym klombie i czekaj na tego, który zabrał ci i uwiódł{" "}
-        <Pieszczota-Kama>Kamę</Pieszczota-Kama>…
+        <span className="character-highlighted" data-character="Pieszczota" data-src-listening="/Pharaon/pieszczota-listens.mp4">
+          Kamę
+        </span>
+        …
       </p>
       <p data-index="30">
         {" "}
@@ -400,8 +407,15 @@ export const Chapter66: React.FC = () => {
       </p>
       <p data-index="43">
         {" "}
-        Trzej tak samo ubrani ludzie uganiali się za <Lykonem>Lykonem</Lykonem> prawie od chwili, gdy wypuszczony ze świątyni przez <Mefresa>Mefresa</Mefresa>, znalazł się na
-        pustej ulicy.
+        Trzej tak samo ubrani ludzie uganiali się za{" "}
+        <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
+          Lykonem
+        </span>{" "}
+        prawie od chwili, gdy wypuszczony ze świątyni przez{" "}
+        <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
+          Mefresa
+        </span>
+        , znalazł się na pustej ulicy.
       </p>
       <p data-index="44">
         {" "}
@@ -424,7 +438,11 @@ export const Chapter66: React.FC = () => {
       </p>
       <p data-index="47">
         {" "}
-        Obie łodzie zawzięcie ścigały <Lykona>Lykona</Lykona>.
+        Obie łodzie zawzięcie ścigały{" "}
+        <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
+          Lykona
+        </span>
+        .
       </p>
       <p data-index="48">
         {" "}
@@ -458,8 +476,12 @@ export const Chapter66: React.FC = () => {
       </p>
       <p data-index="50">
         {" "}
-        Drobna łódka <Lykona>Lykona</Lykona> przybiła do drugiego brzegu. Uśpiony Grek wyskoczył z niej i szybkim krokiem począł iść ku pałacowym ogrodom. Niekiedy zataczał się,
-        stawał i chwytał się za głowę; lecz po chwili znowu szedł jakby ciągniony przez niepojętą siłę.
+        Drobna łódka{" "}
+        <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
+          Lykona
+        </span>{" "}
+        przybiła do drugiego brzegu. Uśpiony Grek wyskoczył z niej i szybkim krokiem począł iść ku pałacowym ogrodom. Niekiedy zataczał się, stawał i chwytał się za głowę; lecz po
+        chwili znowu szedł jakby ciągniony przez niepojętą siłę.
       </p>
       <p data-index="51">
         {" "}
@@ -711,7 +733,11 @@ export const Chapter66: React.FC = () => {
       <p data-index="74"> Owinęli się w burnusy i legli na trawie.</p>
       <p data-index="75">
         {" "}
-        Natychmiast po wyjeździe <Tutmozisa>Tutmozisa</Tutmozisa> czcigodna pani{" "}
+        Natychmiast po wyjeździe{" "}
+        <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
+          Tutmozisa
+        </span>{" "}
+        czcigodna pani{" "}
         <span className="character-highlighted" data-character="Nikotris" data-src-listening="/Pharaon/nikotris-listens.mp4">
           Nikotris
         </span>{" "}
@@ -869,7 +895,11 @@ export const Chapter66: React.FC = () => {
         <span className="character-highlighted" data-character="Hebron" data-src-listening="/Pharaon/hebron-listens.mp4">
           Hebron
         </span>{" "}
-        ma wiadomość od <Tutmozisa>Tutmozisa</Tutmozisa>?…
+        ma wiadomość od{" "}
+        <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
+          Tutmozisa
+        </span>
+        ?…
       </p>
       <p data-index="91">
         {" "}
@@ -941,7 +971,11 @@ export const Chapter66: React.FC = () => {
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
         </span>{" "}
-        szybko przebiegł odległość dzielącą jego willę od pałacyku <Tutmozisa>Tutmozisa</Tutmozisa>. Gdy wszedł do pokoju,{" "}
+        szybko przebiegł odległość dzielącą jego willę od pałacyku{" "}
+        <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
+          Tutmozisa
+        </span>
+        . Gdy wszedł do pokoju,{" "}
         <span className="character-highlighted" data-character="Hebron" data-src-listening="/Pharaon/hebron-listens.mp4">
           Hebron
         </span>{" "}
@@ -955,7 +989,11 @@ export const Chapter66: React.FC = () => {
       <p data-index="98">
         {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
-        Lękasz się o <Tutmozisa>Tutmozisa</Tutmozisa>?
+        Lękasz się o{" "}
+        <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
+          Tutmozisa
+        </span>
+        ?
       </p>
       <p data-index="99">
         {" "}
@@ -987,7 +1025,11 @@ export const Chapter66: React.FC = () => {
         <span className="character-highlighted" data-character="Hebron" data-src-listening="/Pharaon/hebron-listens.mp4">
           Hebron
         </span>
-        . — Co poczniesz, jeżeli <Tutmozisowi>Tutmozisowi</Tutmozisowi> nie uda się opanować świątyni?
+        . — Co poczniesz, jeżeli{" "}
+        <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
+          Tutmozisowi
+        </span>{" "}
+        nie uda się opanować świątyni?
       </p>
       <p data-index="102">
         {" "}

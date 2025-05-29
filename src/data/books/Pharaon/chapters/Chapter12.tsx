@@ -480,7 +480,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="68"> Urzędnik widząc, że ma poparcie strony głównie zainteresowanej, wystąpił naprzód i zaczął znowu przez nos:</p>
       <p data-index="69">
         {" "}
-        — Od czasu jak słońce wschodzi za pałacem królewskim, a zachodzi nad piramidami, działy się w tym kraju różne dziwowiska… Za faraona Semempsesaukazywały się około piramidy
+        — Od czasu jak słońce wschodzi za pałacem królewskim, a zachodzi nad piramidami, działy się w tym kraju różne dziwowiska… Za faraona Semempsesa ukazywały się około piramidy
         Kochom zjawiska cudowne i dżuma spadła na Egipt. Za Boetosa rozwarła się ziemia pod Bubastis i pochłonęła wielu ludzi… Za panowania Neferchesa wody Nilu przez jedenaście
         dni były słodkie jak miód. To widziano i wiele innych rzeczy, o których wiem, bo jestem pełen mądrości. Ale nigdy nie widziano, ażeby z wody wyszedł jakiś nieznany człowiek
         i w majątkach najdostojniejszego{" "}

@@ -22,7 +22,7 @@ export const Chapter36: React.FC = () => {
         na zawsze od ich płacenia, ale nadto, ażeby ułatwić Asyryjczykom jakąś wojnę północną, zawarli z nimi traktat pokojowy na długie lata.
       </p>
       <p data-index="3">
-        <CharactersMaster></CharactersMaster>—{" "}
+        —{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           Faraon
         </span>{" "}
@@ -34,9 +34,8 @@ export const Chapter36: React.FC = () => {
       </p>
       <p data-index="4"> To najwięcej oburzało egipską arystokrację.</p>
       <p data-index="5">
-        <CharactersMaster></CharactersMaster>— Jak to — szeptali między sobą zadłużeni magnaci — więc dynastia już nam nie ufa?… Więc kapłani uwzięli się, ażeby zhańbić i zrujnować
-        Egipt?… Bo przecie jasne jest, że jeżeli Asyria ma wojnę gdzieś na dalekiej północy, to właśnie teraz trzeba ją napaść i zdobytymi łupami podźwignąć zubożały skarb
-        królewski i arystokrację…
+        — Jak to — szeptali między sobą zadłużeni magnaci — więc dynastia już nam nie ufa?… Więc kapłani uwzięli się, ażeby zhańbić i zrujnować Egipt?… Bo przecie jasne jest, że
+        jeżeli Asyria ma wojnę gdzieś na dalekiej północy, to właśnie teraz trzeba ją napaść i zdobytymi łupami podźwignąć zubożały skarb królewski i arystokrację…
       </p>
       <p data-index="6">
         {" "}
@@ -50,10 +49,7 @@ export const Chapter36: React.FC = () => {
         </span>{" "}
         milczał, ale błysk jego oczu i zacięte usta dostatecznie wyrażały uczucia.
       </p>
-      <p data-index="7">
-        <CharactersMaster></CharactersMaster>— Oczywiście — szeptali panowie w dalszym ciągu — że dynastia jest opętana przez kapłanów, nie ufa szlachcie, Egiptowi zaś grożą
-        wielkie nieszczęścia…
-      </p>
+      <p data-index="7">— Oczywiście — szeptali panowie w dalszym ciągu — że dynastia jest opętana przez kapłanów, nie ufa szlachcie, Egiptowi zaś grożą wielkie nieszczęścia…</p>
       <p data-index="8">
         {" "}
         Ciche gniewy prędko zamieniły się w ciche narady mające nawet pozór spisku. Ale choć bardzo wiele osób brało w tym udział, pewny siebie czy zaślepiony stan kapłański nic o

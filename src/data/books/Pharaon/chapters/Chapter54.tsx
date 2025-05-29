@@ -361,7 +361,11 @@ export const Chapter54: React.FC = () => {
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
           Herhorem
         </span>{" "}
-        i <Mefresem>Mefresem</Mefresem>, aby nam dały świątynie.
+        i{" "}
+        <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
+          Mefresem
+        </span>
+        , aby nam dały świątynie.
       </p>
       <p data-index="65">
         {" "}
