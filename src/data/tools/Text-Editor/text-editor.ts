@@ -75,7 +75,7 @@ export class TextEditor {
 
       const paragraphText = this.xmlManager.getParagraphText(paragraph);
       const characterTag = `<${characterName}>${selectedText}</${characterName}>`;
-      const words = parseHtmlText(paragraphText);
+      const words = parseHtmlText(paragraphText.trim());
 
       const updatedWords = [...words.slice(0, startSelectedWordIndex), { text: characterTag, whitespace: " " }, ...words.slice(endSelectedWordIndex + 1)];
 
