@@ -90,6 +90,23 @@ export class XmlManager {
     }
   }
 
+  public getParagraphHtml(paragraph: Element): string {
+    try {
+      return paragraph.toString();
+    } catch (error) {
+      throw new XmlError(`Failed to get paragraph html: ${error.message}`);
+    }
+  }
+
+  public stringToElement(htmlString: string): Element {
+    try {
+      const doc = this.domParser.parseFromString(htmlString, "text/xml");
+      return doc.documentElement;
+    } catch (error) {
+      throw new XmlError(`Failed to convert string to element: ${error.message}`);
+    }
+  }
+
   public updateParagraphContent(xmlDoc: Document, paragraph: Element, newContent: string): void {
     try {
       while (paragraph.firstChild) {
