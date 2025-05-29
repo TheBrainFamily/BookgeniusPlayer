@@ -36,25 +36,45 @@ export class TextEditor {
 
   public async editParagraph(chapterNumber: number, paragraphNumber: number): Promise<void> {
     try {
-      const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
-      if (!originalParagraph) {
-        throw new ParagraphNotFoundError(chapterNumber, paragraphNumber);
-      }
-
-      this.promptsManager.generateWrapCharactersRule();
-      const updatedParagraphText = await this.editorManager.openInCursor(originalParagraph);
-
       const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
       const { paragraph } = this.xmlManager.getParagraphElement(xmlDoc, chapterNumber, paragraphNumber);
-      if (!paragraph) {
-        throw new ParagraphNotFoundError(chapterNumber, paragraphNumber);
+      const originalParagraph = this.xmlManager.getParagraphHtml(paragraph);
+
+      this.promptsManager.generateWrapCharactersRule();
+      const updatedParagraph = await this.editorManager.openInCursor(originalParagraph);
+      const updatedParagraphElement = this.xmlManager.stringToElement(updatedParagraph);
+      const updatedParagraphText = this.xmlManager.getParagraphText(updatedParagraphElement);
+
+      if (updatedParagraph !== originalParagraph) {
+        const updatedXml = this.xmlManager.updateAndSaveXml(xmlDoc, paragraph, updatedParagraphText);
+        this.fileManager.regenerateXml(updatedXml);
       }
 
-      const updatedXml = this.xmlManager.updateAndSaveXml(xmlDoc, paragraph, updatedParagraphText);
-      this.fileManager.regenerateXml(updatedXml);
       this.promptsManager.removeWrapCharactersRule();
     } catch (error) {
       this.handleError("edit paragraph", error);
+    }
+  }
+
+  public async addMusicShiftSuggestionToParagraph(chapterNumber: number, paragraphNumber: number): Promise<void> {
+    try {
+      const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+      const { paragraph } = this.xmlManager.getParagraphElement(xmlDoc, chapterNumber, paragraphNumber);
+      const originalParagraph = this.xmlManager.getParagraphHtml(paragraph);
+
+      this.promptsManager.generateMusicShiftRule();
+      const updatedParagraph = await this.editorManager.openInCursor(originalParagraph);
+      const updatedParagraphElement = this.xmlManager.stringToElement(updatedParagraph);
+      const updatedParagraphText = this.xmlManager.getParagraphText(updatedParagraphElement);
+
+      if (updatedParagraph !== originalParagraph) {
+        const updatedXml = this.xmlManager.updateAndSaveXml(xmlDoc, paragraph, updatedParagraphText);
+        this.fileManager.regenerateXml(updatedXml);
+      }
+
+      this.promptsManager.removeMusicShiftRule();
+    } catch (error) {
+      this.handleError("add music shift suggestion to paragraph", error);
     }
   }
 
@@ -75,7 +95,7 @@ export class TextEditor {
 
       const paragraphText = this.xmlManager.getParagraphText(paragraph);
       const characterTag = `<${characterName}>${selectedText}</${characterName}>`;
-      const words = parseHtmlText(paragraphText);
+      const words = parseHtmlText(paragraphText.trim());
 
       const updatedWords = [...words.slice(0, startSelectedWordIndex), { text: characterTag, whitespace: " " }, ...words.slice(endSelectedWordIndex + 1)];
 
@@ -85,6 +105,21 @@ export class TextEditor {
     } catch (error) {
       this.handleError("add character", error);
     }
+  }
+
+  public removeMusicShift(chapterNumber: number, paragraphNumber: number): string {
+    const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+    const { paragraph } = this.xmlManager.getParagraphElement(xmlDoc, chapterNumber, paragraphNumber);
+    if (!paragraph) {
+      throw new ParagraphNotFoundError(chapterNumber, paragraphNumber);
+    }
+
+    const paragraphText = this.xmlManager.getParagraphText(paragraph);
+    const updatedParagraph = paragraphText.replace(/<musicShift[^>]*>.*?<\/musicShift>|<musicShift[^>]*\/>/g, "");
+
+    const updatedXml = this.xmlManager.updateAndSaveXml(xmlDoc, paragraph, updatedParagraph);
+    this.fileManager.regenerateXml(updatedXml);
+    return updatedXml;
   }
 
   public removeCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1): string {

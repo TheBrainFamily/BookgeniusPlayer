@@ -12,6 +12,15 @@ export class PromptsManager {
     this.xmlManager = new XmlManager();
   }
 
+  private makeRulesDirectory(): void {
+    if (!fs.existsSync(this.cursorRulesPath)) {
+      fs.mkdirSync(this.cursorRulesPath);
+    }
+    if (!fs.existsSync(`${this.cursorRulesPath}/rules`)) {
+      fs.mkdirSync(`${this.cursorRulesPath}/rules`);
+    }
+  }
+
   public generateWrapCharactersRule(): void {
     try {
       const bookXml = fs.readFileSync(`./src/data/${this.bookSlug}-chapters.xml`, "utf8");
@@ -23,14 +32,31 @@ export class PromptsManager {
         .replace("{{characters}}", charactersTags.join("\n"))
         .replace("{{description}}", `Rule for wrapping ${this.bookSlug} characters by their tags from provided list.`);
 
-      if (!fs.existsSync(this.cursorRulesPath)) {
-        fs.mkdirSync(this.cursorRulesPath);
-        fs.mkdirSync(`${this.cursorRulesPath}/rules`);
-      }
+      this.makeRulesDirectory();
 
       fs.writeFileSync(`${this.cursorRulesPath}/rules/wrap${this.bookSlug}CharactersRulePrompt.mdc`, wrapCharactersRulePrompt);
     } catch (err) {
       console.error(err);
+    }
+  }
+
+  public generateMusicShiftRule(): void {
+    try {
+      const musicShiftInitialPrompt = fs.readFileSync(`${this.promptsPath}/musicShiftInitialPrompt.mdc`, "utf-8");
+
+      this.makeRulesDirectory();
+
+      fs.writeFileSync(`${this.cursorRulesPath}/rules/musicShiftRulePrompt.mdc`, musicShiftInitialPrompt);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  public removeMusicShiftRule(): void {
+    try {
+      fs.rmSync(`${this.cursorRulesPath}/rules/musicShiftRulePrompt.mdc`);
+    } catch (err) {
+      console.error(`Fail during musicShiftRulePrompt: ${err}`);
     }
   }
 

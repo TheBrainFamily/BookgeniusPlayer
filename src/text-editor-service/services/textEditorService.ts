@@ -19,4 +19,12 @@ export class TextEditorService {
   public addCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, selectedText: string, startSelectedWordIndex: number, endSelectedWordIndex: number) {
     return this.textEditor.addCharacter(chapterNumber, paragraphNumber, characterName, selectedText, startSelectedWordIndex, endSelectedWordIndex);
   }
+
+  public addMusicShiftSuggestionToParagraph(chapterNumber: number, paragraphNumber: number) {
+    return this.textEditor.addMusicShiftSuggestionToParagraph(chapterNumber, paragraphNumber);
+  }
+
+  public removeMusicShift(chapterNumber: number, paragraphNumber: number) {
+    return this.textEditor.removeMusicShift(chapterNumber, paragraphNumber);
+  }
 }

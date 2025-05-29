@@ -10,6 +10,10 @@ router.post("/remove-character", textEditorController.removeCharacter);
 
 router.post("/add-character", textEditorController.addCharacter);
 
+router.post("/add-music-shift", textEditorController.addMusicSuggestionToParagraph);
+
+router.post("/remove-music-shift", textEditorController.removeMusicShift);
+
 // // Add a character to a paragraph
 // router.post("/character", textEditorController.addCharacter);
 //
