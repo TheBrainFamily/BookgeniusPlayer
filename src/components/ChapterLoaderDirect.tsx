@@ -1,5 +1,5 @@
 // src/components/ChapterLoaderDirect.tsx (adjust path as needed)
-import React, { useEffect, useState, ReactNode } from 'react';
+import React, { useEffect, useState, ReactNode } from "react";
 
 interface ChapterLoaderDirectProps {
   bookSlug: string;
@@ -7,29 +7,28 @@ interface ChapterLoaderDirectProps {
   // Optional: Pass a more specific skeleton or loading UI
   loadingFallback?: ReactNode;
   errorFallback?: (error: string) => ReactNode;
+  /** Fired once the Chapter component has appeared in the DOM */
+  onChapterRendered?: () => void;
 }
 
 const DefaultLoadingFallback: React.FC<{ chapterId: number }> = ({ chapterId }) => (
   <section data-chapter={chapterId} className="chapter-loading-placeholder">
     <div>Loading Chapter {chapterId}...</div>
     {/* You can reuse your ChapterSkeleton structure here if desired */}
-    <div style={{ height: '50px', background: '#eee', margin: '10px 0' }} />
-    <div style={{ height: '100px', background: '#eee', margin: '10px 0' }} />
+    <div style={{ height: "50px", background: "#eee", margin: "10px 0" }} />
+    <div style={{ height: "100px", background: "#eee", margin: "10px 0" }} />
   </section>
 );
 
 const DefaultErrorFallback: React.FC<{ chapterId: number; error: string }> = ({ chapterId, error }) => (
   <section data-chapter={chapterId} className="chapter-error-placeholder">
-    <div>Error loading Chapter {chapterId}: {error}</div>
+    <div>
+      Error loading Chapter {chapterId}: {error}
+    </div>
   </section>
 );
 
-const ChapterLoaderDirect: React.FC<ChapterLoaderDirectProps> = ({
-                                                                   bookSlug,
-                                                                   chapterId,
-                                                                   loadingFallback,
-                                                                   errorFallback,
-                                                                 }) => {
+const ChapterLoaderDirect: React.FC<ChapterLoaderDirectProps> = ({ bookSlug, chapterId, loadingFallback, errorFallback, onChapterRendered }) => {
   const [ChapterComponent, setChapterComponent] = useState<React.ComponentType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -52,12 +51,12 @@ const ChapterLoaderDirect: React.FC<ChapterLoaderDirectProps> = ({
 
         if (!isMounted) return;
 
-        if (module.default && typeof module.default === 'function') {
+        if (module.default && typeof module.default === "function") {
           setChapterComponent(() => module.default); // Store the component type
         } else {
           // Fallback for named exports like `export const Chapter1 = ...`
           const expectedComponentName = `Chapter${chapterId}`;
-          if (module[expectedComponentName] && typeof module[expectedComponentName] === 'function') {
+          if (module[expectedComponentName] && typeof module[expectedComponentName] === "function") {
             setChapterComponent(() => module[expectedComponentName]);
           } else {
             console.error(`Chapter ${chapterId} module for slug ${bookSlug} does not have a 'default' or '${expectedComponentName}' export.`);
@@ -87,6 +86,12 @@ const ChapterLoaderDirect: React.FC<ChapterLoaderDirectProps> = ({
       isMounted = false; // Cleanup to prevent setting state on unmounted component
     };
   }, [bookSlug, chapterId]); // Re-run effect if bookSlug or chapterId changes
+
+  useEffect(() => {
+    if (!isLoading && ChapterComponent && onChapterRendered) {
+      onChapterRendered();
+    }
+  }, [isLoading, ChapterComponent, onChapterRendered]);
 
   if (isLoading) {
     return loadingFallback ? <>{loadingFallback}</> : <DefaultLoadingFallback chapterId={chapterId} />;

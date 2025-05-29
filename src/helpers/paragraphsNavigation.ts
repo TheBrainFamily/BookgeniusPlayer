@@ -42,18 +42,15 @@ export const getCurrentLocation = (): Location => _bridge.get();
 export const setCurrentLocation = (loc: Location) => {
   _bridge.set(loc);
 
-  // Update URL hash
-  // setTimeout(() => {
-  //   window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
-  // }, 2000);
+  setTimeout(() => {
+    window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
+  }, 2000);
 
   const saved = getSavedLocation();
   const ahead = loc.currentChapter > saved.currentChapter || (loc.currentChapter === saved.currentChapter && loc.currentParagraph > saved.currentParagraph);
 
   if (ahead) setSavedLocation(loc);
 };
-
-window.setCurrentLocation = setCurrentLocation;
 
 /* ------------------------------------------------------------------ */
 /*  Scroll helper                                                     */
