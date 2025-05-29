@@ -1,5 +1,5 @@
 // Converter: xmlToReactChapters.ts
-import { DOMParser } from "@journeyapps/domparser";
+import { DOMParser, XMLElement } from "@journeyapps/domparser";
 import fs from "fs";
 import path from "path";
 import { getTalkingMediaFilePathForName, getListeningMediaFilePathForName } from "@/utils/getFilePathsForName";
@@ -50,6 +50,7 @@ export const xmlToReactChapters = (xmlString: string, bookSlug: BOOK_SLUGS): voi
 
     // Find chapter title (first h3, h4, or h5)
     let chapterTitle = "";
+    // @ts-expect-error(wrong package types)
     const titleElements = chapter.getElementsByTagName("h3");
     if (titleElements.length > 0) {
       chapterTitle = titleElements[0].textContent || "";
@@ -69,7 +70,7 @@ export const xmlToReactChapters = (xmlString: string, bookSlug: BOOK_SLUGS): voi
   generateTypesFile(bookSlug);
 };
 
-function generateChapterComponent(chapter: Element, chapterId: string, characterMap: Map<string, CharacterInfo>, bookSlug: BOOK_SLUGS): string {
+function generateChapterComponent(chapter: XMLElement, chapterId: string, characterMap: Map<string, CharacterInfo>, bookSlug: BOOK_SLUGS): string {
   let componentCode = `import React from 'react';\n\n`;
   componentCode += `export const Chapter${chapterId}: React.FC = () => {\n`;
   componentCode += `  return (\n`;
@@ -144,6 +145,7 @@ function processParagraph(
 
       default:
         if (element.tagName[0] === element.tagName[0].toUpperCase()) {
+          // @ts-expect-error(wrong package types)
           const location = paragraphElement.ownerDocument.locator.position(paragraphElement.openStart);
 
           errorCount++;
@@ -157,6 +159,7 @@ function processParagraph(
   // for proper type checking instead of using 'as any'.
 
   if (tagName[0] === tagName[0].toUpperCase()) {
+    // @ts-expect-error(wrong package types)
     const location = paragraphElement.ownerDocument.locator.position(paragraphElement.openStart);
     errorCount++;
     console.warn(
