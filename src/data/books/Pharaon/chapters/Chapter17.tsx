@@ -3,8 +3,9 @@ import React from "react";
 export const Chapter17: React.FC = () => {
   return (
     <section data-chapter="17">
-      <p data-index="0">Rozdział XVII</p>
+      <p data-index="0"> Rozdział XVII</p>
       <p data-index="1">
+        {" "}
         Od owego wieczoru, kiedy{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sara
@@ -16,11 +17,13 @@ export const Chapter17: React.FC = () => {
         począł nudzić się na dobre.
       </p>
       <p data-index="2">
+        {" "}
         Nadchodził miesiąc Mechir, grudzień. Wody opadały niżej, ziemia rozlegała się coraz szerzej, trawa była co dzień wyższa i gęstsza, a wśród niej, jak barwne iskry, zapalały
         się kwiaty przerozmaitych kolorów, niezrównanego zapachu. Niby wyspy na zielonym morzu ukazywały się w ciągu jednego dnia kwieciste kępy: białe, niebieskie, żółte, różowe
         albo pstre kobierce, z których dyszała woń upajająca.
       </p>
       <p data-index="3">
+        {" "}
         Mimo to{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -47,8 +50,9 @@ export const Chapter17: React.FC = () => {
         </span>{" "}
         i pot występował mu na czoło, a nogi ziębły.
       </p>
-      <p data-index="5">Co on począłby w takim razie?</p>
+      <p data-index="5"> Co on począłby w takim razie?</p>
       <p data-index="6">
+        {" "}
         W dodatku —{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sara
@@ -68,6 +72,7 @@ export const Chapter17: React.FC = () => {
         nie mógł znosić za jej gadulstwo i bardzo mizerne praktyki.
       </p>
       <p data-index="8">
+        {" "}
         Parę razy na przykład widział{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następca
@@ -92,6 +97,7 @@ export const Chapter17: React.FC = () => {
         — że ta gadatliwa jędza okrada mnie dla swoich Żydów, którzy w dzień znikają z Memfisu, ale w nocy roją się po najbrudniejszych zaułkach jak szczury!…'
       </p>
       <p data-index="10">
+        {" "}
         W tych czasach jedyną rozrywką{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           księcia
@@ -99,11 +105,13 @@ export const Chapter17: React.FC = () => {
         było przypatrywać się zbieraniu daktyli.
       </p>
       <p data-index="11">
+        {" "}
         Nagi chłop stawał pod wysoką, bezgałęzistą palmą, otaczał pień i siebie sznurem, jak luźną obręczą, i wchodził na drzewo piętami, całym ciałem odsadzony w tył. Sznur zaś
         utrzymywał go, przyciskając do drzewa. Potem sznurową obręcz posuwał na pniu o kilka cali wyżej, wspinał się, znowu posuwał sznur i w ten sposób, ciągle narażając się na
         złamanie karku, właził niekiedy o parę piętr wysoko, na szczyt, gdzie rosła kępa dużych liści i daktyle.
       </p>
       <p data-index="12">
+        {" "}
         Świadkiem tych ćwiczeń gimnastycznych był nie tylko{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -123,16 +131,18 @@ export const Chapter17: React.FC = () => {
         </span>{" "}
         owocami. Z początku przynosiły mu najlepsze, później gorsze, w końcu całkiem zepsute.
       </p>
-      <p data-index="13">Przyszły władca świata zamyślił się i rzekł w duchu:</p>
+      <p data-index="13"> Przyszły władca świata zamyślił się i rzekł w duchu:</p>
       <p data-index="14">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
         „Oni wszędzie wlezą i zawsze tak mnie będą częstować: dobrym na przynętę, zepsutym na podziękowanie!…'
       </p>
       <p data-index="15">
+        {" "}
         Wstał i odszedł pochmurny, a dziatwa Izraela, jak rój ptaków, rzuciła się na pracę egipskiego chłopa, który wysoko, nad ich głowami, nucił piosenkę nie myśląc ani o swoich
         kościach, ani o tym, że zbiera nie dla siebie.
       </p>
       <p data-index="16">
+        {" "}
         Niezrozumiała choroba{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sary
@@ -144,8 +154,9 @@ export const Chapter17: React.FC = () => {
         ten piękny zakątek ziemi. Nie pływał już czółnem, nie polował, nie patrzył na zbieranie daktylów, lecz pochmurny błąkał się po ogrodzie lub z tarasu śledził zamek
         królewski.
       </p>
-      <p data-index="17">Nie wezwany, nigdy nie wróciłby do dworu, ale już zaczął myśleć o wyjeździe do dóbr położonych w Dolnym Egipcie, obok morza.</p>
+      <p data-index="17"> Nie wezwany, nigdy nie wróciłby do dworu, ale już zaczął myśleć o wyjeździe do dóbr położonych w Dolnym Egipcie, obok morza.</p>
       <p data-index="18">
+        {" "}
         W takim nastroju ducha znalazł go{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
           Tutmozis
@@ -189,6 +200,7 @@ export const Chapter17: React.FC = () => {
         , wydającej ze siebie piętnaście różnych zapachów, nie spostrzegł jego tuniki i płaszcza, delikatniejszego od mgły, ani sandałów zdobnych złotem i paciorkami.
       </p>
       <p data-index="21">
+        {" "}
         Po niejakim czasie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
@@ -229,6 +241,7 @@ export const Chapter17: React.FC = () => {
         ze zmartwienia całe dnie pije i klnie…
       </p>
       <p data-index="24">
+        {" "}
         A więc{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -306,7 +319,7 @@ export const Chapter17: React.FC = () => {
         </span>{" "}
         — ale nie przyniósł mi szczęścia.
       </p>
-      <p data-index="33">Na statku królewskim zatrąbiono, powtarzając sygnał dany w górze rzeki.</p>
+      <p data-index="33"> Na statku królewskim zatrąbiono, powtarzając sygnał dany w górze rzeki.</p>
       <p data-index="34">
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sara
@@ -358,6 +371,7 @@ export const Chapter17: React.FC = () => {
         i dopędził go w lekkim czółnie.
       </p>
       <p data-index="41">
+        {" "}
         Na widok{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następcy
@@ -419,13 +433,14 @@ export const Chapter17: React.FC = () => {
         nieprędko rzuci ich towarzystwo.
       </p>
       <p data-index="47">
+        {" "}
         Im bardziej posuwali się w górę rzeki, tym gęściej było ludu na obu brzegach i czółen na Nilu, tym więcej płynęło kwiatów, wieńców i bukietów rzucanych pod statek{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraona
         </span>
         .
       </p>
-      <p data-index="48">O milę za Memfisem stały ciżby z chorągwiami, bogami i muzyką i rozlegał się wielki gwar, podobny do zgiełku burzy.</p>
+      <p data-index="48"> O milę za Memfisem stały ciżby z chorągwiami, bogami i muzyką i rozlegał się wielki gwar, podobny do zgiełku burzy.</p>
       <p data-index="49">
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Otóż i{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -438,6 +453,7 @@ export const Chapter17: React.FC = () => {
         .
       </p>
       <p data-index="50">
+        {" "}
         Oczom patrzących ukazał się jedyny widok. Środkiem szerokiego zakrętu płynęła ogromna łódź{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraona
@@ -450,6 +466,7 @@ export const Chapter17: React.FC = () => {
         .
       </p>
       <p data-index="51">
+        {" "}
         Kto żył — krzyczał, śpiewał, klaskał lub rzucał kwiaty do stóp{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           panu
@@ -461,11 +478,13 @@ export const Chapter17: React.FC = () => {
         .
       </p>
       <p data-index="52">
+        {" "}
         Ludzie w łódkach byli jak pijani, ludzie na brzegu jak oszaleli. Co chwilę jakieś czółno potrącało lub wywracało inne i ktoś wpadał w wodę, z której na szczęście uciekły
         krokodyle spłoszone niebywałym hałasem. Na brzegach popychano się, nikt bowiem nie patrzył na sąsiada, na ojca, na dziecko, ale obłąkane oczy wlepiał w złocisty dziób łodzi
         i namiot królewski. Nawet ludzie tratowani, kórym rozhukany tłum bezmyślnie gniótł żebra i skręcał stawy, nie mieli innego okrzyku nad ten:
       </p>
       <p data-index="53">
+        {" "}
         — Żyj wiecznie,{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           władco nasz
@@ -477,6 +496,7 @@ export const Chapter17: React.FC = () => {
         !…
       </p>
       <p data-index="54">
+        {" "}
         Szał powitalny niebawem udzielił się i łodzi{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następcy tronu
@@ -492,6 +512,7 @@ export const Chapter17: React.FC = () => {
         , wdarł się na wysoki przód statku i o mało nie wleciał w wodę.
       </p>
       <p data-index="55">
+        {" "}
         Wtem z królewskiej łodzi zatrąbiono i po chwili odpowiedziała trąbka ze statku{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzesa
@@ -507,6 +528,7 @@ export const Chapter17: React.FC = () => {
         .
       </p>
       <p data-index="56">
+        {" "}
         Jakiś urzędnik wezwał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzesa
@@ -518,6 +540,7 @@ export const Chapter17: React.FC = () => {
         znalazł się wobec ojca.
       </p>
       <p data-index="57">
+        {" "}
         Widok{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraona
@@ -533,6 +556,7 @@ export const Chapter17: React.FC = () => {
         przycisnął go do swej boskiej piersi.
       </p>
       <p data-index="58">
+        {" "}
         W chwilę później podniesiono boczne ściany namiotu i cały lud z obu brzegów Nilu ujrzał swego{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           władcę
@@ -544,10 +568,12 @@ export const Chapter17: React.FC = () => {
         .
       </p>
       <p data-index="59">
+        {" "}
         Stała się taka cisza, że było słychać szelest chorągiewek na statkach. I nagle wybuchnął ogromny krzyk, większy aniżeli wszystkie dotychczasowe. Uczcił nim lud egipski
         pojednanie ojca z synem, pozdrawiał obecnego, witał przyszłego pana.
       </p>
       <p data-index="60">
+        {" "}
         Jeżeli ktokolwiek rachował na niesnaski w świętej rodzinie{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraona
@@ -570,6 +596,7 @@ export const Chapter17: React.FC = () => {
         postępki, potrafi hamować się i ma poczucie interesów państwowych.
       </p>
       <p data-index="63">
+        {" "}
         A gdy wzruszony{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -625,6 +652,7 @@ export const Chapter17: React.FC = () => {
         rządzenia państwem i śledzenia obrotów nieprzyjaciół. Obyś z czasem padł na nich jak orzeł na płoche kuropatwy!
       </p>
       <p data-index="69">
+        {" "}
         Łódź królewska i jej strojny orszak przybiły pod pałac. Strudzony{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           pan
@@ -704,6 +732,7 @@ export const Chapter17: React.FC = () => {
         , ażeby nie śpiewała pieśni religijnych.
       </p>
       <p data-index="78">
+        {" "}
         A gdy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
@@ -789,6 +818,7 @@ export const Chapter17: React.FC = () => {
         darem.
       </p>
       <p data-index="88">
+        {" "}
         Ale bardziej doniosłe znaczenie miały słowa{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           księcia
@@ -820,6 +850,7 @@ export const Chapter17: React.FC = () => {
         ?…
       </p>
       <p data-index="89">
+        {" "}
         Było to ulubione marzenie{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
           ministra

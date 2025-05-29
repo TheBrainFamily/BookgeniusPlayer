@@ -3,8 +3,9 @@ import React from "react";
 export const Chapter21: React.FC = () => {
   return (
     <section data-chapter="21">
-      <p data-index="0">Rozdział XXI</p>
+      <p data-index="0"> Rozdział XXI</p>
       <p data-index="1">
+        {" "}
         Podróż{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           księcia następcy
@@ -12,10 +13,12 @@ export const Chapter21: React.FC = () => {
         zaczęła się w najpiękniejszej porze roku, w miesięcu Famenut (koniec grudnia, początek stycznia).
       </p>
       <p data-index="2">
+        {" "}
         Woda spadła do połowy wysokości, odsłaniając coraz nowe płaty ziemi. Od Tebów płynęły do morza mnogie tratwy z pszenicą; w Dolnym Egipcie zbierano koniczynę i senes. Drzewa
         pomarańczowe i granaty okryły się kwiatami, a na polach siano: łubin, len, jęczmień, bób, fasolę, ogórki i inne rośliny ogrodowe.
       </p>
       <p data-index="3">
+        {" "}
         Odprowadzony do przystani memfiskiej przez kapłanów, najwyższych urzędników państwa, gwardię jego świątobliwości faraona i tłumy ludu,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę namiestnik
@@ -28,6 +31,7 @@ export const Chapter21: React.FC = () => {
         łodzi zajęli miejsca najlepsi inżynierowie wodni. Jedni pilnowali żagla, drudzy komenderowali wioślarzami, inni nadawali kierunek statkowi.
       </p>
       <p data-index="4">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
         </span>{" "}
@@ -46,6 +50,7 @@ export const Chapter21: React.FC = () => {
         , który księcia odprowadzał do granic swojej prowincji.
       </p>
       <p data-index="5">
+        {" "}
         Na kilkaset kroków przed{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           namiestnikiem
@@ -60,12 +65,14 @@ export const Chapter21: React.FC = () => {
         </span>{" "}
         uszykowały się niezliczone statki, zajęte przez dwór, kapłanów, oficerów i urzędników.
       </p>
-      <p data-index="6">Żywność i służba odjechały wcześniej.</p>
+      <p data-index="6"> Żywność i służba odjechały wcześniej.</p>
       <p data-index="7">
+        {" "}
         Nil do Memfisu płynie między dwoma pasmami gór. Dalej góry skręcają na wschód i zachód, a rzeka dzieli się na kilka ramion, których wody toczą się ku morzu przez wielką
         równinę.
       </p>
       <p data-index="8">
+        {" "}
         Gdy statek odbił od przystani,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -81,14 +88,17 @@ export const Chapter21: React.FC = () => {
         musiał wyjść spod namiotu i ukazać się ludowi.
       </p>
       <p data-index="9">
+        {" "}
         Lecz wrzawa zamiast zmniejszyć się rosła. Na obu brzegach stały i wciąż zwiększały się tłumy półnagich wyrobników lub odzianych w świąteczne szaty mieszczan. Bardzo wielu
         miało wieńce na głowach, prawie wszyscy zielone gałązki w rękach. Niektóre grupy śpiewały, wśród innych rozlegał się łoskot bębnów i dźwięki fletów.
       </p>
       <p data-index="10">
+        {" "}
         Gęsto ustawione wzdłuż rzeki żurawie z kubłami próżnowały. Natomiast krążył po Nilu rój drobnych czółenek, których osady rzucały kwiaty pod barkę następcy. Niektórzy sami
         skakali w wodę i płynęli za książęcym statkiem.
       </p>
       <p data-index="11">
+        {" "}
         „Ależ oni tak mnie pozdrawiają jak jego świątobliwość!…' — pomyślał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -96,10 +106,12 @@ export const Chapter21: React.FC = () => {
         .
       </p>
       <p data-index="12">
+        {" "}
         I wielka duma opanowała jego serce na widok tylu strojnych statków, które mógł zatrzymać jednym skinieniem, i tych tysięcy ludzi, którzy porzucili swoje zajęcia i narażali
         się na kalectwo, nawet na śmierć, byle spojrzeć w jego boskie oblicze.
       </p>
       <p data-index="13">
+        {" "}
         Szczególniej upajał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzesa
@@ -108,6 +120,7 @@ export const Chapter21: React.FC = () => {
         dosięgnąłby wody, bo zapał ludu porwałby go i uniósł ku niebu jak ptaka.
       </p>
       <p data-index="14">
+        {" "}
         Statek nieco zbliżył się ku lewemu brzegowi, postacie tłumu zarysowały się wyraźniej i{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -116,6 +129,7 @@ export const Chapter21: React.FC = () => {
         grzbiety.
       </p>
       <p data-index="15">
+        {" "}
         Zdziwiony{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           namiestnik
@@ -131,6 +145,7 @@ export const Chapter21: React.FC = () => {
         Spojrzyj no, wasza dostojność… Tam kije są w robocie?…
       </p>
       <p data-index="17">
+        {" "}
         <span className="character-highlighted" data-character="Nomarcha-Memfis" data-src-listening="/Pharaon/nomarcha-memfis.png">
           Nomarcha
         </span>{" "}
@@ -157,13 +172,14 @@ export const Chapter21: React.FC = () => {
         . — Zapewne policja schwytała bandę złodziei…
       </p>
       <p data-index="21">
+        {" "}
         Niezbyt zadowolony{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następca
         </span>{" "}
         poszedł na tył statku, między inżynierów, którzy nagle skręcili ku środkowi rzeki, i z tego punktu spojrzał ku Memfisowi.
       </p>
-      <p data-index="22">Brzegi w górze Nilu były prawie puste, czółenka znikły, żurawie czerpiące wodę pracowały, jak gdyby nic nie zaszło.</p>
+      <p data-index="22"> Brzegi w górze Nilu były prawie puste, czółenka znikły, żurawie czerpiące wodę pracowały, jak gdyby nic nie zaszło.</p>
       <p data-index="23">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Już
         skończyła się uroczystość?… — zapytał{" "}
@@ -172,13 +188,14 @@ export const Chapter21: React.FC = () => {
         </span>{" "}
         jednego z inżynierów, wskazując w górę rzeki.
       </p>
-      <p data-index="24">— Tak… Ludzie wrócili do roboty — odparł inżynier.</p>
+      <p data-index="24"> — Tak… Ludzie wrócili do roboty — odparł inżynier.</p>
       <p data-index="25">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Bardzo prędko!…
       </p>
-      <p data-index="26">— Muszą odzyskać czas stracony — rzekł nieostrożnie inżynier.</p>
+      <p data-index="26"> — Muszą odzyskać czas stracony — rzekł nieostrożnie inżynier.</p>
       <p data-index="27">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Następca
         </span>{" "}
@@ -186,10 +203,12 @@ export const Chapter21: React.FC = () => {
         pogardę dla tłumu, który tak prędko przechodzi od zapału do żurawi czerpiących błoto.
       </p>
       <p data-index="28">
+        {" "}
         W tej okolicy Nil zaczyna dzielić się na odnogi. Statek naczelnika nomesu Aa skręcił ku zachodowi i po godzinnej jeździe przybił do brzegu. Tłumy były jeszcze liczniejsze
         aniżeli pod Memfisem. Ustawiono mnóstwo słupów z chorągwiami i bram triumfalnych owiniętych zielenią. Między ludem coraz częściej można było napotkać obce twarze i ubiory.
       </p>
       <p data-index="29">
+        {" "}
         Gdy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -209,10 +228,12 @@ export const Chapter21: React.FC = () => {
         nomes z jego świątyniami, urzędnikami, ludem, bydłem, zbożem i wszystkim, co się tu znajduje.
       </p>
       <p data-index="31">
+        {" "}
         Następnie zaprezentował mu grupę młodych elegantów, pachnących, uróżowanych, ubranych w szaty haftowane złotem. Byli to bliżsi i dalsi krewni nomarchy, miejscowa
         arystokracja.
       </p>
       <p data-index="32">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
         </span>{" "}
@@ -234,6 +255,7 @@ export const Chapter21: React.FC = () => {
         .
       </p>
       <p data-index="35">
+        {" "}
         Po tym objaśnieniu jeden z młodych ludzi stanął za{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           księciem
@@ -242,6 +264,7 @@ export const Chapter21: React.FC = () => {
         kilka młodych dziewcząt rzucających róże na ścieżkę, którą książę miał przechodzić.
       </p>
       <p data-index="36">
+        {" "}
         Lud w świątecznych strojach, z gałązkami w rękach, tworzył szpaler i krzyczał, śpiewał lub padał na twarz przed{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           zastępcą faraona
@@ -254,11 +277,13 @@ export const Chapter21: React.FC = () => {
         odbywa się na komendę. I znowu uczuł w sercu chłód pogardy dla tego motłochu, który nawet cieszyć się nie umie.
       </p>
       <p data-index="37">
+        {" "}
         Z wolna orszak zbliżył się do murowanej kolumny, która odgraniczała nomes Aa od nomesu memfijskiego. Na kolumnie, z trzech stron, znajdowały się napisy dotyczące:
         rozległości, ludności i liczby miast prowincji, z czwartej strony stał posąg bożka Ptah, okręconego od stóp do piersi w powijaki, w zwykłym czepcu na głowie, z laską w
         ręku.
       </p>
       <p data-index="38">
+        {" "}
         Jeden z kapłanów podał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           księciu
@@ -270,6 +295,7 @@ export const Chapter21: React.FC = () => {
         , odmawiając przepisane modlitwy, wyciągnął kadzielnicę na wysokość oblicza bóstwa i kilkakrotnie nisko się skłonił.
       </p>
       <p data-index="39">
+        {" "}
         Okrzyki ludu i kapłanów wzmogły się jeszcze bardziej, choć między arystokratyczną młodzieżą widać było uśmieszki i drwinki.{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę
@@ -282,6 +308,7 @@ export const Chapter21: React.FC = () => {
         kolumną.
       </p>
       <p data-index="40">
+        {" "}
         „Zaprawdę! — pomyślał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -290,6 +317,7 @@ export const Chapter21: React.FC = () => {
         do swoich obór i warsztatów…'
       </p>
       <p data-index="41">
+        {" "}
         Teraz, lepiej niż kiedykolwiek, zmierzył odległość, jaka istniała pomiędzy nim i prostakami. I zrozumiał, że tylko arystokracja jest klasą, z którą łączy go wspólność
         uczuć. Gdyby nagle znikli ci strojni młodzieńcy i piękne kobiety, których płonące spojrzenia śledzą każdy jego ruch, ażeby natychmiast służyć mu i spełniać rozkazy, gdyby
         ci znikli,{" "}
@@ -299,6 +327,7 @@ export const Chapter21: React.FC = () => {
         wśród niezliczonych tłumów ludu czułby się samotniejszym aniżeli w pustyni.
       </p>
       <p data-index="42">
+        {" "}
         Ośmiu Murzynów przyniosło lektykę ozdobioną nad baldachimem strusimi piórami i{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -306,6 +335,7 @@ export const Chapter21: React.FC = () => {
         , wsiadłszy w nią, udał się do stolicy nomesu, Sochem, gdzie zamieszkał w rządowym pałacu.
       </p>
       <p data-index="43">
+        {" "}
         Pobyt{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzesa
@@ -314,10 +344,12 @@ export const Chapter21: React.FC = () => {
         urzędników i ucztach.
       </p>
       <p data-index="44">
+        {" "}
         Uczty odbywały się podwójne: jedne w pałacu, w których przyjmowała udział tylko arystokracja, drugie — w dziedzińcu zewnętrznym, gdzie pieczono całe woły, zjadano setki
         sztuk chleba i wypijano setki dzbanów piwa. Tu raczyła się służba książęca i niżsi urzędnicy nomesu.
       </p>
       <p data-index="45">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
         </span>{" "}
@@ -328,6 +360,7 @@ export const Chapter21: React.FC = () => {
         i przywiązanie wielkich panów, którzy dniem i nocą otaczali namiestnika, czujni na każde jego skinienie i gotowi spełniać rozkazy.
       </p>
       <p data-index="46">
+        {" "}
         Nareszcie, zmęczony zabawami,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -339,6 +372,7 @@ export const Chapter21: React.FC = () => {
         , że chce bliżej poznać gospodarstwo prowincji. Taki bowiem otrzymał rozkaz od jego świątobliwości faraona.
       </p>
       <p data-index="47">
+        {" "}
         Życzeniu stało się zadość.{" "}
         <span className="character-highlighted" data-character="Otoes" data-src-listening="/Pharaon/otoes-listens.mp4">
           Nomarcha
@@ -358,6 +392,7 @@ export const Chapter21: React.FC = () => {
         na szczyt jednego z pylonów i sam mu towarzyszył.
       </p>
       <p data-index="48">
+        {" "}
         Ze szczytu sześciopiętrowej wieży, skąd kapłani obserwowali niebo i za pomocą kolorowych chorągwi porozumiewali się z sąsiednimi świątyniami w Memfis, Athribis i Anu, wzrok
         ogarniał w kilkumilowym promieniu prawie całą prowincję. Z tego też miejsca dostojny{" "}
         <span className="character-highlighted" data-character="Otoes" data-src-listening="/Pharaon/otoes-listens.mp4">
@@ -371,6 +406,7 @@ export const Chapter21: React.FC = () => {
         gdzie bagna zarośnięte lotosem i papirusem, które pola zostały zasypane piaskiem i tak dalej.
       </p>
       <p data-index="49">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
         </span>{" "}
@@ -382,6 +418,7 @@ export const Chapter21: React.FC = () => {
         rozszerzyły się.
       </p>
       <p data-index="50">
+        {" "}
         Po paru dniach znowu zażądał od{" "}
         <span className="character-highlighted" data-character="Otoes" data-src-listening="/Pharaon/otoes-listens.mp4">
           Otoesa
@@ -397,6 +434,7 @@ export const Chapter21: React.FC = () => {
         , który w głównym dziedzińcu siedział na wzniesieniu.
       </p>
       <p data-index="51">
+        {" "}
         Więc przesuwali się około{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           namiestnika
@@ -422,6 +460,7 @@ export const Chapter21: React.FC = () => {
         wcale ich nie znał i nawet nie słyszał ich nazwisk.
       </p>
       <p data-index="52">
+        {" "}
         Zmęczony i znudzony jałowym przeglądem urzędników,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -429,6 +468,7 @@ export const Chapter21: React.FC = () => {
         upadł na duchu. Przerażała go myśl, że on nic nie pojmuje, że więc jest niezdolny do kierowania państwem. Lecz nawet przed samym sobą lękał się przyznać do tego.
       </p>
       <p data-index="53">
+        {" "}
         Bo jeżeli nie potrafi rządzić Egiptem, a inni poznają się na tym, co mu pozostanie?… Tylko śmierć.{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
@@ -436,6 +476,7 @@ export const Chapter21: React.FC = () => {
         czuł, że poza tronem nie ma dla niego szczęścia, że bez władzy — nie mógłby istnieć.
       </p>
       <p data-index="54">
+        {" "}
         Lecz gdy parę dni odpoczął, o ile można było odpocząć w chaosie dworskiego życia, znowu wezwał do siebie{" "}
         <span className="character-highlighted" data-character="Otoes" data-src-listening="/Pharaon/otoes-listens.mp4">
           Otoesa
@@ -448,6 +489,7 @@ export const Chapter21: React.FC = () => {
         człowiek w podziemiach naszych świątyń, który widzi dokoła siebie tyle dróg, że w końcu nie może wyjść na świat.
       </p>
       <p data-index="56">
+        {" "}
         <span className="character-highlighted" data-character="Otoes" data-src-listening="/Pharaon/otoes-listens.mp4">
           Nomarcha
         </span>{" "}
@@ -458,6 +500,7 @@ export const Chapter21: React.FC = () => {
         zawołał. — Czego chcesz ode mnie, władco?… Rzeknij tylko słowo, a oddam ci mój urząd, majątek, nawet głowę.
       </p>
       <p data-index="58">
+        {" "}
         A widząc, że{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -487,6 +530,7 @@ export const Chapter21: React.FC = () => {
         . — Objaśnij mi więc dwie rzeczy: jedną — dlaczego zmniejszyły się dochody jego świątobliwości faraona, drugą — co ty sam robisz w nomesie?…
       </p>
       <p data-index="63">
+        {" "}
         <span className="character-highlighted" data-character="Otoes" data-src-listening="/Pharaon/otoes-listens.mp4">
           Otoes
         </span>{" "}
@@ -525,6 +569,7 @@ export const Chapter21: React.FC = () => {
         . — Ale trzeba nam wydostać się w miejsce, gdzie nie ma tej wrzawy…
       </p>
       <p data-index="68">
+        {" "}
         Istotnie w pałacu, który zajmował{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -533,6 +578,7 @@ export const Chapter21: React.FC = () => {
         namiestnika, którego byli sługami.
       </p>
       <p data-index="69">
+        {" "}
         Jakoż około trzeciej po południu{" "}
         <span className="character-highlighted" data-character="Otoes" data-src-listening="/Pharaon/otoes-listens.mp4">
           nomarcha
@@ -543,7 +589,7 @@ export const Chapter21: React.FC = () => {
         </span>{" "}
         wyjechali z miasta na zachód. Dwór zaś został w pałacu i bawił się jeszcze weselej.
       </p>
-      <p data-index="70">Dzień był piękny, chłodny, ziemia okryta zielonością i kwieciem. Nad głowami jeźdźców rozlegały się śpiewy ptaków, powietrze było pełne woni.</p>
+      <p data-index="70"> Dzień był piękny, chłodny, ziemia okryta zielonością i kwieciem. Nad głowami jeźdźców rozlegały się śpiewy ptaków, powietrze było pełne woni.</p>
       <p data-index="71">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Jak
         tu przyjemnie! — zawołał{" "}
@@ -561,10 +607,12 @@ export const Chapter21: React.FC = () => {
         .
       </p>
       <p data-index="73">
+        {" "}
         Stanęli na wzgórzu. U stóp ich leżała ogromna łąka przecięta błękitną strugą. Na północy i na południu bieliły się mury miasteczek, za łąką, aż do krańca horyzontu,
         ciągnęły się czerwone piaski pustyni zachodniej, od której niekiedy wiało tchnienie upalnego wiatru jak z pieca.
       </p>
       <p data-index="74">
+        {" "}
         Na łące pasły się niezliczone stada zwierząt domowych: rogate i bezrogie woły, owce, kozy, osły, antylopy, nawet nosorożce. Tu i ówdzie było widać kępy moczarów obrosłych
         roślinami wodnymi i krzakami, w których roiły się dzikie gęsi, kaczki, gołębie, bociany, ibisy i pelikany.
       </p>
@@ -658,6 +706,7 @@ export const Chapter21: React.FC = () => {
         Gdzie bogowie walczą, człowiek nie poradzi; gdzie Set zwycięża Ozyrysa, któż mu zabiegnie drogę?
       </p>
       <p data-index="88">
+        {" "}
         Dostojny{" "}
         <span className="character-highlighted" data-character="Otoes" data-src-listening="/Pharaon/otoes-listens.mp4">
           Otoes
@@ -669,8 +718,9 @@ export const Chapter21: React.FC = () => {
         zwiesił głowę. Niemało nasłuchał się on w szkołach o łasce Ozyrysa i niegodziwościach Seta i jeszcze dzieckiem będąc, gniewał się, że z Setem nie zrobiono ostatecznych
         rachunków.
       </p>
-      <p data-index="89">„Jak ja urosnę — myślał wówczas — a udźwignę włócznię, poszukam Seta i spróbujemy się!…'</p>
+      <p data-index="89"> „Jak ja urosnę — myślał wówczas — a udźwignę włócznię, poszukam Seta i spróbujemy się!…'</p>
       <p data-index="90">
+        {" "}
         I oto patrzył dziś na niezmierny obszar piasków, państwo złowrogiego boga, który umniejszał dochody Egiptu; ale o walce z nim nie myślał. Jak tu walczyć z pustynią?… Można
         ją tylko omijać albo w niej zginąć.
       </p>

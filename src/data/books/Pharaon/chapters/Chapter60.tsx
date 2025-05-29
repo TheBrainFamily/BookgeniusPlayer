@@ -3,8 +3,9 @@ import React from "react";
 export const Chapter60: React.FC = () => {
   return (
     <section data-chapter="60">
-      <h4 data-index="0">Rozdział XI</h4>
+      <h4 data-index="0"> Rozdział XI</h4>
       <p data-index="1">
+        {" "}
         Tymczasem{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
@@ -14,6 +15,7 @@ export const Chapter60: React.FC = () => {
         nadużycia, jakim ulegały klasy pracujące.
       </p>
       <p data-index="2">
+        {" "}
         Niemniej{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
@@ -21,6 +23,7 @@ export const Chapter60: React.FC = () => {
         był kapłanem i nie tylko nie pragnął upadku swego stanu, ale nawet nie chciał zrywać węzłów, jakie go z nim łączyły.
       </p>
       <p data-index="3">
+        {" "}
         Toteż aby zaznaczyć swoją wierność,{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
@@ -31,8 +34,9 @@ export const Chapter60: React.FC = () => {
         </span>
         .
       </p>
-      <p data-index="4">Potężny niegdyś dostojnik przyjął go z uśmiechem.</p>
+      <p data-index="4"> Potężny niegdyś dostojnik przyjął go z uśmiechem.</p>
       <p data-index="5">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Rzadki gość…
         rzadki gość… — zawołał{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
@@ -42,6 +46,7 @@ export const Chapter60: React.FC = () => {
         jeszcze bardziej unikał.
       </p>
       <p data-index="6">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Ani jestem
         doradcą pana naszego, ani unikam waszej dostojności, którego łasce zawdzięczam to, czym dziś jestem… — odparł{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -50,6 +55,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="7">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Wiem, wiem! —
         przerwał{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
@@ -59,6 +65,7 @@ export const Chapter60: React.FC = () => {
         nami rządzi… Z pewnością nie pozwoliłbyś mu otaczać się zdrajcami, którzy go zgubią…
       </p>
       <p data-index="8">
+        {" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
         </span>
@@ -69,6 +76,7 @@ export const Chapter60: React.FC = () => {
         , po co jedzie do Dolnego Egiptu.
       </p>
       <p data-index="9">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Owszem — odparł{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
           Herhor
@@ -80,10 +88,12 @@ export const Chapter60: React.FC = () => {
         zwołuje zebranie wszystkich stanów… Ma do tego prawo.
       </p>
       <p data-index="10">
+        {" "}
         Ale — dodał nagle — szkoda mi, że ty się w to mieszasz… Duże zmiany zaszły w tobie!… Pamiętasz, co mówiłeś w czasie owych manewrów pod Pi-Bailos do mego adiutanta?…
         Przypomnę ci: mówiłeś, że potrzeba ograniczyć nadużycia i rozpustę faraonów. A dziś… sam popierasz dziecinne pretensje największego rozpustnika, jakiego miał kiedy Egipt.
       </p>
       <p data-index="11">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes XIII
@@ -95,20 +105,24 @@ export const Chapter60: React.FC = () => {
         — chce poprawić dolę ludu. Byłbym więc głupim i nikczemnym, gdybym ja, syn chłopów, nie służył mu w tej sprawie.
       </p>
       <p data-index="12">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Nie pytasz
         jednak, czy to nie zaszkodzi nam, kapłaństwu?…
       </p>
       <p data-index="13">
+        {" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
         </span>{" "}
         zdziwił się.
       </p>
       <p data-index="14">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Wszakże sami
         dajecie wielkie ulgi chłopom należącym do świątyń! — zawołał. — Mam zresztą wasze pozwolenie…
       </p>
       <p data-index="15">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Co?… jakie?… —
         spytał{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
@@ -117,6 +131,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="16">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Przypomnij
         sobie, wasza dostojność, tę noc, podczas której, w świątyni Seta, witaliśmy najświątobliwszego{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
@@ -130,6 +145,7 @@ export const Chapter60: React.FC = () => {
         odpowiedziałeś:
       </p>
       <p data-index="17">
+        {" "}
         „Niech{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
           Mefres
@@ -141,6 +157,7 @@ export const Chapter60: React.FC = () => {
         poprawą losu chłopstwa… Ja zaś będę zapobiegał zgubnej wojnie między Egiptem i Asyrią…'
       </p>
       <p data-index="18">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— A widzisz —
         przerwał arcykapłan — więc masz obowiązek działać z nami, nie z{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -149,6 +166,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="19">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Alboż on chce
         wojny z Asyrią?… — odparł energicznie{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -159,6 +177,7 @@ export const Chapter60: React.FC = () => {
         niewolnik.
       </p>
       <p data-index="20">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Ależ ja nic nie
         mam przeciw ulgom dla pospólstwa! — zawołał{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
@@ -171,10 +190,12 @@ export const Chapter60: React.FC = () => {
         nie zrobi nic dla ludu.
       </p>
       <p data-index="21">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Z pewnością —
         nie, jeżeli odmówicie mu pieniędzy…
       </p>
       <p data-index="22">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Choćbyśmy mu dali
         piramidę złota i srebra, a drugą klejnotów, nic nie zrobi, bo to rozhukany dzieciak, którego asyryjski poseł{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -183,10 +204,12 @@ export const Chapter60: React.FC = () => {
         nigdy nie nazywał inaczej, tylko — chłystkiem…
       </p>
       <p data-index="23">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Faraon ma
         wielkie zdolności…
       </p>
       <p data-index="24">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Ale nic nie wie,
         niczego nie umie! — mówił{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
@@ -196,9 +219,11 @@ export const Chapter60: React.FC = () => {
         nie ma pojęcia o grze w warcaby.
       </p>
       <p data-index="25">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Jednak rządzi…
       </p>
       <p data-index="26">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Co to za rządy,{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuerze
@@ -207,11 +232,13 @@ export const Chapter60: React.FC = () => {
         się z daleka od niego, więc nic nie wiesz; lecz ja zapewniam cię, że on, wydając rozkazy, wcale nie zastanawia się: kto to zrobi? czy są środki? jakie będą następstwa?…
       </p>
       <p data-index="27">
+        {" "}
         Tobie się zdaje, że on rządzi. To ja rządzę, ja ciągle rządzę, ja, którego on wypędził od siebie… Ja robię to, że dziś mniej wpływa podatków do skarbu, ale ja też
         zapobiegam buntowi chłopstwa, który już by wybuchnął; ja sprawiam, że nie porzucono robót przy kanałach, groblach i gościńcach. Ja w końcu już dwa razy powstrzymałem Asyrię
         od wypowiedzenia nam wojny, którą ten szaleniec wywołuje wojskowymi rozporządzeniami…
       </p>
       <p data-index="28">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
         </span>{" "}
@@ -219,6 +246,7 @@ export const Chapter60: React.FC = () => {
         ale nic, zupełnie nic nie rozumiał. Co zaś najgorsze: wdał się z Fenicjanami, ze zbankrutowaną szlachtą i rozmaitego gatunku zdrajcami, którzy pchają go do zguby…
       </p>
       <p data-index="29">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— A zwycięstwo
         nad Sodowymi Jeziorami?… — spytał{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -227,6 +255,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="30">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Przyznaję mu
         energię i znajomość sztuki wojskowej — odparł{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
@@ -252,6 +281,7 @@ export const Chapter60: React.FC = () => {
         to dopiero czeladnik.
       </p>
       <p data-index="31">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Więc czym
         skończy się wasza nienawiść? — zapytał{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -260,6 +290,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="32">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Nienawiść!… —
         powtórzył arcykapłan. — Alboż ja mogę nienawidzieć chłystka, który w dodatku jest tak obsaczony jak jeleń w wąwozach przez myśliwców. Muszę jednak przyznać, iż jego rządy
         są tak szkodliwe dla Egiptu, że gdyby{" "}
@@ -273,6 +304,7 @@ export const Chapter60: React.FC = () => {
         był młodszy, już usunęlibyśmy dzisiejszego faraona…
       </p>
       <p data-index="33">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— A wasza
         dostojność zostałbyś jego następcą!… — wybuchnął{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -281,12 +313,14 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="34">
+        {" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
           Herhor
         </span>{" "}
         wcale nie obraził się.
       </p>
       <p data-index="35">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Dziwnie
         zgłupiałeś,{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -297,6 +331,7 @@ export const Chapter60: React.FC = () => {
         wypędzony minister wojny, nie robię w państwie tego, co uważam za potrzebne?…
       </p>
       <p data-index="36">
+        {" "}
         Ci sami arcykapłani, skarbnicy, sędziowie, nomarchowie, a nawet jenerałowie
         <a href="#fn126" className="link-note">
           [126]
@@ -305,6 +340,7 @@ export const Chapter60: React.FC = () => {
         spełnił?… Czy ty sam ośmielibyś się im opierać?…
       </p>
       <p data-index="37">
+        {" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
         </span>{" "}
@@ -319,10 +355,12 @@ export const Chapter60: React.FC = () => {
         albo musi jej ulec, albo stoczyć z nią walkę na życie i śmierć.
       </p>
       <p data-index="38">
+        {" "}
         Faraon miał za sobą cały naród, całe wojsko, wielu kapłanów i większość cywilnych dostojników. Rada mogła rachować ledwo na parę tysięcy stronników, na swoje skarby i
         niesłychanie mądrą organizację. Siły najzupełniej nierówne, ale wynik walki — bardzo wątpliwy.
       </p>
       <p data-index="39">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Więc wy
         postanowiliście zgubić faraona!… — szepnął{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -331,10 +369,12 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="40">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Wcale nie. Chcemy
         tylko uratować państwo.
       </p>
       <p data-index="41">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— W takim razie:
         cóż powinien robić{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -343,6 +383,7 @@ export const Chapter60: React.FC = () => {
         ?…
       </p>
       <p data-index="42">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Co on zrobi?… nie
         wiem — odparł{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
@@ -351,6 +392,7 @@ export const Chapter60: React.FC = () => {
         . — Ale wiem, co robił jego ojciec.
       </p>
       <p data-index="43">
+        {" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           Ramzes XII
         </span>{" "}
@@ -362,6 +404,7 @@ export const Chapter60: React.FC = () => {
         … I po kilkunastu latach doszedł do tego, że sam został arcykapłanem nie tylko pobożnym, ale nawet bardzo uczonym.
       </p>
       <p data-index="44">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— A jeżeli faraon
         nie usłucha tej rady? — spytał{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -370,6 +413,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="45">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— To obejdziemy się
         bez niego — rzekł{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
@@ -377,8 +421,9 @@ export const Chapter60: React.FC = () => {
         </span>
         .
       </p>
-      <p data-index="46">Po chwili zaś ciągnął dalej:</p>
+      <p data-index="46"> Po chwili zaś ciągnął dalej:</p>
       <p data-index="47">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Posłuchaj mnie,{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuerze
@@ -387,17 +432,20 @@ export const Chapter60: React.FC = () => {
         zrobić kapłanów swoimi sługami, a siebie — jedynym panem Egiptu.
       </p>
       <p data-index="48">
+        {" "}
         Ale taki zamiar jest głupstwem, a nawet zdradą. Nie faraonowie — o czym dobrze wiesz — stworzyli Egipt, lecz bogowie i kapłani. Nie faraonowie oznaczają przybór Nilu i
         regulują jego wylewy; nie faraonowie nauczyli lud siać, zbierać płody, hodować bydło. Nie faraonowie leczą choroby mieszkańców i czuwają nad bezpieczeństwem państwa od
         zewnętrznych wrogów…
       </p>
       <p data-index="49">
+        {" "}
         Cóż by zatem było, sam powiedz, gdyby nasz stan wydał Egipt na łaskę faraonów? Najmędrszy z nich ma za sobą doświadczenie z lat kilkudziesięciu; ale stan kapłański badał i
         uczył się przez dziesiątki tysięcy lat… Najpotężniejszy władca ma jedną parę oczu i rąk — przy sobie; podczas gdy my posiadamy tysiące oczu i rąk we wszystkich nomesach i
         nawet w obcych państwach…
       </p>
-      <p data-index="50">Czy więc działalność faraona może porównywać się z naszą i — w razie różnicy zdań — kto powinien ustąpić: my czy on?…</p>
+      <p data-index="50"> Czy więc działalność faraona może porównywać się z naszą i — w razie różnicy zdań — kto powinien ustąpić: my czy on?…</p>
       <p data-index="51">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— A cóż ja teraz
         mam robić? — wtrącił{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -406,6 +454,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="52">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Rób, co ci każe
         ten młodzik, byleś nie zdradził świętych tajemnic. A resztę… zostaw czasowi… Szczerze pragnę, ażeby młodzieniec, nazywany{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -414,15 +463,17 @@ export const Chapter60: React.FC = () => {
         , upamiętał się, i przypuszczam, że zrobiłby to, gdyby… Gdyby nie związał się z obmierzłymi zdrajcami, nad którymi już zawisła ręka bogów.
       </p>
       <p data-index="53">
+        {" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
         </span>{" "}
         pożegnał arcykapłana, pełen smutnych przeczuć. Nie upadł jednak na duchu, wiedząc, że cokolwiek dziś zdobędzie dla poprawienia bytu ludowi, to już zostanie, choćby faraon
         ugiął się przed potęgą kapłanów.
       </p>
-      <p data-index="54">„W najgorszym położeniu — myślał — trzeba robić, co możemy i co do nas należy. Kiedyś poprawią się stosunki, a teraźniejszy zasiew wyda owoce.'</p>
-      <p data-index="55">Niemniej jednak postanowił wyrzec się agitacji między ludem. Owszem, gotów był uspakajać niecierpliwych, aby nie powiększali kłopotów faraonowi.</p>
+      <p data-index="54"> „W najgorszym położeniu — myślał — trzeba robić, co możemy i co do nas należy. Kiedyś poprawią się stosunki, a teraźniejszy zasiew wyda owoce.'</p>
+      <p data-index="55"> Niemniej jednak postanowił wyrzec się agitacji między ludem. Owszem, gotów był uspakajać niecierpliwych, aby nie powiększali kłopotów faraonowi.</p>
       <p data-index="56">
+        {" "}
         W parę tygodni później{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
@@ -431,16 +482,19 @@ export const Chapter60: React.FC = () => {
         zwoływał faraon.
       </p>
       <p data-index="57">
+        {" "}
         Wszędzie na drodze spotykał oznaki najwyższego wzburzenia: zarówno chłopi, jak rzemieślnicy domagali się, aby im dano siódmy dzień wypoczynku i płacono za wszelkie
         publiczne roboty, jak było dawniej. A tylko upomnieniom kapłanów różnych świątyń należało zawdzięczać, że nie wybuchnął bunt ogólny, a przynajmniej, że robót nie
         przerywano.
       </p>
-      <p data-index="58">Zarazem uderzyło go kilka nowych zjawisk, których miesiąc temu nie dostrzegał.</p>
+      <p data-index="58"> Zarazem uderzyło go kilka nowych zjawisk, których miesiąc temu nie dostrzegał.</p>
       <p data-index="59">
+        {" "}
         Przede wszystkim lud podzielił się na dwie partie. Jedni byli stronnikami faraona i wrogami kapłanów, drudzy — burzyli się przeciw Fenicjanom. Jedni dowodzili, że kapłani
         powinni wydać faraonowi skarby Labiryntu, drudzy szeptali, że — faraon zanadto proteguje cudzoziemców.
       </p>
       <p data-index="60">
+        {" "}
         Najdziwniejszą jednak była pogłoska, nie wiadomo skąd powstała, że{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes XIII
@@ -448,6 +502,7 @@ export const Chapter60: React.FC = () => {
         — zdradza objawy obłąkania jak jego brat przyrodni i starszy, który właśnie dlatego został usunięty od tronu. O wieści tej mówili kapłani, pisarze, nawet chłopi.
       </p>
       <p data-index="61">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Kto wam
         opowiada takie kłamstwa?… — zapytał{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -456,6 +511,7 @@ export const Chapter60: React.FC = () => {
         jednego ze znajomych inżynierów.
       </p>
       <p data-index="62">
+        {" "}
         — To nie kłamstwo — odparł inżynier — ale smutna prawda. W pałacach tebańskich widziano faraona, jak biegał nagi po ogrodach… A pewnego wieczora jego świątobliwość w nocy,
         pod oknami królowej{" "}
         <span className="character-highlighted" data-character="Nikotris" data-src-listening="/Pharaon/nikotris-listens.mp4">
@@ -464,12 +520,14 @@ export const Chapter60: React.FC = () => {
         , wlazł na drzewo i rozmawiał z nią samą.
       </p>
       <p data-index="63">
+        {" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
         </span>{" "}
         zapewnił go, że nie dawniej jak przed pół miesiącem widział faraona, który cieszy się najlepszym zdrowiem. Wnet jednak poznał, że inżynier nie ufa mu.
       </p>
       <p data-index="64">
+        {" "}
         „To już sprawa{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
           Herhora
@@ -477,10 +535,12 @@ export const Chapter60: React.FC = () => {
         !… — pomyślał. — Zresztą tylko kapłani mogliby mieć tak szybkie wiadomości z Tebów…'
       </p>
       <p data-index="65">
+        {" "}
         Na chwilę stracił chęć do zajmowania się wyborem delegatów, lecz znowu odzyskał energię, wciąż powtarzając sobie, że — co lud dziś pozyska, tego nie straci jutro… Chyba
         gdyby zaszły jakieś nadzwyczajne wypadki!
       </p>
       <p data-index="66">
+        {" "}
         Za Memfisem, na północ od piramid i sfinksa, wznosiła się już na granicy piasków niewielka świątynia bogini Nut. Mieszkał tam stary kapłan{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
           Menes
@@ -488,6 +548,7 @@ export const Chapter60: React.FC = () => {
         , największy w Egipcie znawca gwiazd, zarazem inżynier.
       </p>
       <p data-index="67">
+        {" "}
         Gdy trafiła się w państwie budowa dużego gmachu albo nowego kanału,{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
           Menes
@@ -495,6 +556,7 @@ export const Chapter60: React.FC = () => {
         schodził na grunt i wytykał kierunek. Poza obrębem tego żył ubogi i samotny w swej świątyni, nocami badając gwiazdy, w dzień pracując nad osobliwymi przyrządami.
       </p>
       <p data-index="68">
+        {" "}
         Od kilku lat{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
@@ -502,6 +564,7 @@ export const Chapter60: React.FC = () => {
         nie był w tym miejscu, toteż uderzyło go opuszczenie i ubóstwo. Ceglany mur walił się, w ogrodzie poschły drzewa, na dziedzińcu wałęsała się chuda koza i parę kur.
       </p>
       <p data-index="69">
+        {" "}
         Przy świątyni nie było nikogo. Dopiero gdy{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
@@ -510,6 +573,7 @@ export const Chapter60: React.FC = () => {
         szerść wypełzła. Mimo to jego postawa była pełna godności, a oblicze rozumu. Bystro przypatrzył się gościowi i rzekł:
       </p>
       <p data-index="70">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -523,10 +587,12 @@ export const Chapter60: React.FC = () => {
         ?…
       </p>
       <p data-index="71">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Jestem nim —
         odrzekł przybysz i serdecznie uściskał starca.
       </p>
       <p data-index="72">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -541,6 +607,7 @@ export const Chapter60: React.FC = () => {
         oceanu niebieskiego, matka Nut!…
       </p>
       <p data-index="73">
+        {" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
         </span>{" "}
@@ -551,6 +618,7 @@ export const Chapter60: React.FC = () => {
         powstrzymał go z uśmiechem.
       </p>
       <p data-index="74">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -560,16 +628,19 @@ export const Chapter60: React.FC = () => {
         — Daj pokój! — rzekł. — Gdybyś wiedział, jakie klejnoty mamy na niebie, nie kwapiłbyś się z ofiarowaniem złota… Cóż, przychodzisz do nas osiedlić się?…
       </p>
       <p data-index="75">
+        {" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
         </span>{" "}
         potrząsnął głową.
       </p>
       <p data-index="76">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Nie — odparł. —
         Przyszedłem tylko pokłonić się tobie, boski nauczycielu.
       </p>
       <p data-index="77">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -579,10 +650,12 @@ export const Chapter60: React.FC = () => {
         — A potem znowu do dworu?… — śmiał się starzec. — Oj, wy, wy!… gdybyście wiedzieli, co tracicie, porzucając mądrość dla pałaców, bylibyście najsmutniejszymi ludźmi…
       </p>
       <p data-index="78">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Sam jesteś,
         nauczycielu?
       </p>
       <p data-index="79">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -592,10 +665,12 @@ export const Chapter60: React.FC = () => {
         — Jak palma w pustyni, szczególniej dziś, kiedy mój głuchoniemy poszedł z koszem do Memfisu użebrać co dla matki Re i jej kapłana.
       </p>
       <p data-index="80">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— I nie przykro
         ci?…
       </p>
       <p data-index="81">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -609,6 +684,7 @@ export const Chapter60: React.FC = () => {
         . — Przez czas kiedyśmy się nie widzieli, wydarłem bogom kilka tajemnic, których nie odstąpiłbym za obie korony Egiptu!…
       </p>
       <p data-index="82">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Czy to sekret?…
         — zapytał{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -617,6 +693,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="83">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -626,15 +703,18 @@ export const Chapter60: React.FC = () => {
         — Co za sekret!… Przed rokiem dokończyłem pomiarów i rachunków odnoszących się do wielkości ziemi…
       </p>
       <p data-index="84">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Co to znaczy?
       </p>
       <p data-index="85">
+        {" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
           Menes
         </span>{" "}
         obejrzał się i zniżył głos.
       </p>
       <p data-index="86">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -644,6 +724,7 @@ export const Chapter60: React.FC = () => {
         — Przecież wiadomo ci — mówił — że ziemia nie jest płaską jak stół, ale — jest olbrzymią kulą, na powierzchni której znajdują się morza, kraje i miasta…
       </p>
       <p data-index="87">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— To wiadomo —
         rzekł{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -652,6 +733,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="88">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -665,6 +747,7 @@ export const Chapter60: React.FC = () => {
         . — A już wcale nie było wiadomo: jak wielką może być ta kula…
       </p>
       <p data-index="89">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— A ty wiesz? —
         zapytał prawie wylękniony{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -673,6 +756,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="90">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -686,6 +770,7 @@ export const Chapter60: React.FC = () => {
         . Otóż kula ziemska jest tak ogromna, że nasze wojska obeszłyby ją dokoła w ciągu pięciu lat…
       </p>
       <p data-index="91">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Bogowie!… —
         rzekł{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -694,12 +779,14 @@ export const Chapter60: React.FC = () => {
         . — Czy nie lękasz się, ojcze, myśleć o podobnych rzeczach?…
       </p>
       <p data-index="92">
+        {" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
           Menes
         </span>{" "}
         wzruszył ramionami.
       </p>
       <p data-index="93">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -710,6 +797,7 @@ export const Chapter60: React.FC = () => {
         świątyni od pałacu faraona, nie przechodząc przez Nil…
       </p>
       <p data-index="94">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Strach!… —
         szepnął{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -718,6 +806,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="95">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -728,16 +817,19 @@ export const Chapter60: React.FC = () => {
         słońca… w dzień zrobi się noc… I niech umrę śmiercią głodową, jeżeli chybiłem w rachunku bodaj o dwudziestą część godziny…
       </p>
       <p data-index="96">
+        {" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
         </span>{" "}
         dotknął amuletu, który miał na piersiach, i odmówił modlitwę. Potem rzekł:
       </p>
       <p data-index="97">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Czytałem w
         świętych księgach, że już nieraz, ku utrapieniu ludzi, robiła się noc w południe. Ale co to jest? nie rozumiem.
       </p>
       <p data-index="98">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -751,9 +843,11 @@ export const Chapter60: React.FC = () => {
         , wskazując ku pustyni.
       </p>
       <p data-index="99">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Widzę.
       </p>
       <p data-index="100">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -764,6 +858,7 @@ export const Chapter60: React.FC = () => {
         noc…
       </p>
       <p data-index="101">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— I to stanie się
         u nas? — spytał{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -772,6 +867,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="102">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -786,6 +882,7 @@ export const Chapter60: React.FC = () => {
         …
       </p>
       <p data-index="103">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— A{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
           Herhor
@@ -793,6 +890,7 @@ export const Chapter60: React.FC = () => {
         ?
       </p>
       <p data-index="104">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -802,6 +900,7 @@ export const Chapter60: React.FC = () => {
         — Dał nam trzydzieści miar jęczmienia. Ten jeden człowiek w Egipcie szanuje mądrość; ale młody faraon jest lekkomyślny.
       </p>
       <p data-index="105">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Nie bądź
         surowym dla niego, ojcze — wtrącił{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -814,6 +913,7 @@ export const Chapter60: React.FC = () => {
         chce poprawić dolę chłopów i rzemieślników: da im co siódmy dzień odpoczynek, zabroni bić ich bez sądu, a może obdaruje ziemią…
       </p>
       <p data-index="106">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -827,10 +927,12 @@ export const Chapter60: React.FC = () => {
         . — Dwa miesiące temu posłałem mu wielki plan ulżenia pracy chłopom i… także wyśmiał mnie!… To nieuk i pyszałek.
       </p>
       <p data-index="107">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Uprzedzasz się,
         ojcze… Ale powiedz mi twój plan, a może pomogę wykonać go.
       </p>
       <p data-index="108">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -840,6 +942,7 @@ export const Chapter60: React.FC = () => {
         — Plan!… — powtórzył starzec. — To już nie plan, ale rzecz…
       </p>
       <p data-index="109">
+        {" "}
         Powstał z ławy i obaj z{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuerem
@@ -847,6 +950,7 @@ export const Chapter60: React.FC = () => {
         poszli do sadzawki w ogrodzie, nad którą stała altana doskonale zasłonięta pnącymi się roślinami.
       </p>
       <p data-index="110">
+        {" "}
         W tym budynku znajdowało się wielkie koło osadzone na poziomej osi, z mnóstwem wiaderek na obwodzie.{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
           Menes
@@ -854,6 +958,7 @@ export const Chapter60: React.FC = () => {
         wszedł wewnątrz koła i zaczął poruszać nogami. Koło obracało się, a wiaderka czerpały wodę z sadzawki i wlewały ją w koryto stojące wyżej.
       </p>
       <p data-index="111">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Ciekawy
         przyrząd! — rzekł{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -862,6 +967,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="112">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -871,9 +977,11 @@ export const Chapter60: React.FC = () => {
         — A czy zgadniesz: co on może zrobić dla ludu egipskiego?
       </p>
       <p data-index="113">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Nie…
       </p>
       <p data-index="114">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -883,6 +991,7 @@ export const Chapter60: React.FC = () => {
         — Więc pomyśl, że to koło jest pięć albo i dziesięć razy większe i że w jego wnętrzu, zamiast człowieka, chodzi kilka par wołów…
       </p>
       <p data-index="115">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Coś… coś wydaje
         mi się — wtrącił{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -891,6 +1000,7 @@ export const Chapter60: React.FC = () => {
         — ale jeszcze niedobrze rozumiem.
       </p>
       <p data-index="116">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -905,16 +1015,19 @@ export const Chapter60: React.FC = () => {
         przy wiadrach, mogliby odpoczywać… Teraz widzisz, że mądrość więcej robi dla ludzkiego szczęścia aniżeli faraonowie.
       </p>
       <p data-index="117">
+        {" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
         </span>{" "}
         potrząsnął głową.
       </p>
       <p data-index="118">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Ileż by na to
         potrzeba drzewa — rzekł — ile wołów, ile paszy!… Zdaje mi się, ojcze, że twoje koło nie zastąpi siódmego dnia odpoczynku.
       </p>
       <p data-index="119">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -929,6 +1042,7 @@ export const Chapter60: React.FC = () => {
         się do mądrości i gdy ja umrę, zechcesz pracować nad ulepszeniem i upowszechnieniem moich wynalazków.
       </p>
       <p data-index="120">
+        {" "}
         Wrócili do pylonu, a{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
           Menes
@@ -936,6 +1050,7 @@ export const Chapter60: React.FC = () => {
         podłożył nieco paliwa pod miedziany kociołek. Rozdmuchał płomień i wkrótce woda zaczęła się gotować.
       </p>
       <p data-index="121">
+        {" "}
         Z kociołka wychodziła pionowa rura zakryta ciężkim kamieniem. Gdy w kotle zasyczało,{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
           Menes
@@ -943,6 +1058,7 @@ export const Chapter60: React.FC = () => {
         rzekł:
       </p>
       <p data-index="122">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -951,8 +1067,9 @@ export const Chapter60: React.FC = () => {
         />
         — Stań w tej framudze i patrz…
       </p>
-      <p data-index="123">Poruszył korbę przytwierdzoną do rury i — w jednej chwili ciężki kamień wyleciał w powietrze, a komnata napełniła się kłębami pary.</p>
+      <p data-index="123"> Poruszył korbę przytwierdzoną do rury i — w jednej chwili ciężki kamień wyleciał w powietrze, a komnata napełniła się kłębami pary.</p>
       <p data-index="124">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Dziwo!… —
         krzyknął{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -961,10 +1078,12 @@ export const Chapter60: React.FC = () => {
         . Lecz wnet uspokoiwszy się zapytał:
       </p>
       <p data-index="125">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— No, a ten
         kamień w czym poprawi byt ludu?
       </p>
       <p data-index="126">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -975,6 +1094,7 @@ export const Chapter60: React.FC = () => {
         gotująca się woda zastąpi konia i wołu.
       </p>
       <p data-index="127">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Ale co chłopom
         z tego przyjdzie? — nalegał{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -983,6 +1103,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="128">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -995,8 +1116,9 @@ export const Chapter60: React.FC = () => {
         </span>{" "}
         chwytając się za głowę. — Nie wiem, zestarzałeś się czy zgłupiałeś, ale już chłopi zasłonili przed tobą cały świat, zaćmili ci umysł.
       </p>
-      <p data-index="129">Tymczasem gdyby mędrcy mieli tylko chłopów na względzie, powinni by rzucić księgi i rachunki i zostać pastuchami!…</p>
+      <p data-index="129"> Tymczasem gdyby mędrcy mieli tylko chłopów na względzie, powinni by rzucić księgi i rachunki i zostać pastuchami!…</p>
       <p data-index="130">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Każda rzecz
         musi przynosić pożytek — wtrącił onieśmielony{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -1005,6 +1127,7 @@ export const Chapter60: React.FC = () => {
         .
       </p>
       <p data-index="131">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -1020,10 +1143,12 @@ export const Chapter60: React.FC = () => {
         zażądał garści jęczmienia za przedmiot, którego nie pojmuje wasz umysł.
       </p>
       <p data-index="132">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Gniewasz się,
         ojcze?… Czyliż chciałem zrobić tobie przykrość?…
       </p>
       <p data-index="133">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -1034,6 +1159,7 @@ export const Chapter60: React.FC = () => {
         bogi! nie mogę znaleźć nie tylko następcy, ale nawet człowieka, który by mnie rozumiał.
       </p>
       <p data-index="134">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Z pewnością,
         ojcze, zostałbym tu do śmierci, aby poznać boskie twoje pomysły — rzekł{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -1042,6 +1168,7 @@ export const Chapter60: React.FC = () => {
         . — Powiedz jednak, czy mogę zamykać się dziś w świątyni, gdy ważą się losy państwa, szczęście ludu prostego — i gdy mój udział…
       </p>
       <p data-index="135">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -1055,18 +1182,21 @@ export const Chapter60: React.FC = () => {
         . — O wy, dorosłe dzieci w infułach i łańcuchach dostojników!… Dlatego że wolno wam zaczerpnąć wody z Nilu, zaraz wam się zdaje, że możecie powstrzymać przybór albo odpływ
         rzeki.
       </p>
-      <p data-index="136">Zaprawdę, inaczej nie myśli owca, która idąc za stadem wyobraża sobie, że ona je popędza!</p>
+      <p data-index="136"> Zaprawdę, inaczej nie myśli owca, która idąc za stadem wyobraża sobie, że ona je popędza!</p>
       <p data-index="137">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Ależ pomyśl
         tylko, nauczycielu. Młody faraon ma serce pełne szlachetności, chce dać ludowi siódmy dzień wypoczynku, sprawiedliwy sąd, a nawet ziemię…
       </p>
       <p data-index="138">
+        {" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
           Menes
         </span>{" "}
         potrząsnął głową.
       </p>
       <p data-index="139">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Menes-kaplan-gwiazdziarz"
@@ -1077,14 +1207,17 @@ export const Chapter60: React.FC = () => {
         to zmieniało się!… Ileż od trzech tysięcy lat przesunęło się nad Egiptem dynastii i kapłanów, ile miast i świątyń upadło w gruzy, ba! nawet narosły nowe warstwy ziemi…
       </p>
       <p data-index="140">
+        {" "}
         Wszystko zmieniło się z wyjątkiem tego, że: dwa i dwa jest cztery, że trójkąt jest połową prostokąta, że księżyc może zakryć słońce, a gotująca się woda wyrzuca kamień w
         powietrze…
       </p>
       <p data-index="141">
+        {" "}
         W znikomym świecie trwa i zostaje sama tylko mądrość. I biada temu, kto dla rzeczy mijających jak obłoki opuszcza wiekuiste! Jego serce nigdy nie zazna spokoju, a umysł
         będzie kołysał się jak czółno podczas wichru.
       </p>
       <p data-index="142">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Bogowie mówią
         przez twoje usta, nauczycielu — odparł po namyśle{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
@@ -1095,6 +1228,7 @@ export const Chapter60: React.FC = () => {
         koło ani kociołek nie obroniłby kraju przed napadem barbarzyńców ani wymierzyłby sprawiedliwości pokrzywdzonym.
       </p>
       <p data-index="143">
+        {" "}
         Więc — zakończył{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
@@ -1102,6 +1236,7 @@ export const Chapter60: React.FC = () => {
         — chociaż mądrość jest jak słońce, krew i oddech, nie możemy jednak wszyscy być mędrcami.
       </p>
       <p data-index="144">
+        {" "}
         Na te słowa{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
           Menes
@@ -1109,6 +1244,7 @@ export const Chapter60: React.FC = () => {
         już nic nie odpowiedział.
       </p>
       <p data-index="145">
+        {" "}
         Kilka dni przepędził{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
           Pentuer
@@ -1120,6 +1256,7 @@ export const Chapter60: React.FC = () => {
         przypatrywał się gwiazdom, oglądał koło do czerpania wody, czasami chodził w stronę piramid. Podziwiał ubóstwo i geniusz swego nauczyciela, lecz w duchu mówił:
       </p>
       <p data-index="146">
+        {" "}
         „
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
           Menes

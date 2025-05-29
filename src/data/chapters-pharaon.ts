@@ -11473,7 +11473,7 @@ export const PharaonBookXml = `<section><section><section data-chapter="1">
       Wysłuchawszy żalów <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >księcia</span>, <span class="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4" >Tutmozis</span> podniósł się z krzesła, z uwagą przejrzał sąsiednie komnaty, czy kto w nich nie podsłuchuje, potem znowu usiadł przy <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >Ramzesie</span> i zaczął szeptać:
     </p>
     <p data-index="50">
-      <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span> — Bądź dobrej myśli, panie! O ile wiem, cała arystokracja, wszyscy nomarchowie, wszyscy wyżsi oficerowie słyszeli coś o tym traktacie i są oburzeni. Daj więc tylko znak, a rozbijemy traktatowe cegły na łbach <Sargona>Sargona</Sargona>, nawet Assara…
+      <span class="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true"></span> — Bądź dobrej myśli, panie! O ile wiem, cała arystokracja, wszyscy nomarchowie, wszyscy wyżsi oficerowie słyszeli coś o tym traktacie i są oburzeni. Daj więc tylko znak, a rozbijemy traktatowe cegły na łbach <Sargon>Sargona</Sargon>, nawet Assara…
     </p>
     <p data-index="51">
       <span class="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true"></span> — Ależ to byłby bunt przeciw jego świątobliwości… — równie cicho odparł <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >książę</span>.
@@ -11575,7 +11575,7 @@ export const PharaonBookXml = `<section><section><section data-chapter="1">
       Ale postanowiwszy wojnę, chciał działać rozważnie. Chciał powoli przekonać do niej stan kapłański, a dopiero w razie oporu — zgnieść go za pomocą wojska i szlachty.
     </p>
     <p data-index="84">
-      I właśnie wówczas, gdy święty <span class="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4" >Mefres</span> i <span class="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4" >Mentezufis</span> żartowali z przepowiedni <Sargona>Sargona</Sargona>, że <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >następca</span> nie podda się kapłanom, ale ich zmusi do posłuszeństwa, już wówczas <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >książę</span> miał gotowy plan ujarzmienia ich i widział, jakie posiada do tego środki. Zaś chwilę rozpoczęcia walki i sposób przeprowadzenia jej pozostawiał przyszłości.
+      I właśnie wówczas, gdy święty <span class="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4" >Mefres</span> i <span class="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4" >Mentezufis</span> żartowali z przepowiedni <Sargon>Sargona</Sargon>, że <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >następca</span> nie podda się kapłanom, ale ich zmusi do posłuszeństwa, już wówczas <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >książę</span> miał gotowy plan ujarzmienia ich i widział, jakie posiada do tego środki. Zaś chwilę rozpoczęcia walki i sposób przeprowadzenia jej pozostawiał przyszłości.
     </p>
     <p data-index="85">
       <span class="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true"></span> „Czas przynosi najlepsze rady!' — rzekł do siebie. Był spokojny i zadowolony jak człowiek, który po długim wahaniu wie, co ma robić, i posiada wiarę we własne siły. Toteż ażeby pozbyć się nawet śladów niedawnego wzburzenia, poszedł do <span class="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4" >Sary</span>.
@@ -18498,7 +18498,7 @@ export const PharaonBookXml = `<section><section><section data-chapter="1">
       Faraon zamyślił się.
     </p>
     <p data-index="64">
-      <span class="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true"></span> — Musimy — odpowiedział — zaciągnąć nową pożyczkę. Porozumiej się z <span class="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4" >Herhorem</span> i <Mefresem>Mefresem</Mefresem>, aby nam dały świątynie.
+      <span class="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true"></span> — Musimy — odpowiedział — zaciągnąć nową pożyczkę. Porozumiej się z <span class="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4" >Herhorem</span> i <Mefres>Mefresem</Mefres>, aby nam dały świątynie.
     </p>
     <p data-index="65">
       <span class="character-placeholder character-talking" data-character="Wielki-skarbnik-panstwowy" data-src-talking="/Pharaon/wielki-skarbnik-panstwowy.png" data-is-talking="true"></span> — Mówiłem o tym… Świątynie nic nam nie dadzą.
@@ -18822,7 +18822,7 @@ export const PharaonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true"></span>— Zaprawdę, jesteś wielkim <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >władcą</span>, panie nasz — szepnął <span class="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4" >Hiram</span>, schylając się do ziemi.
     </p>
     <p data-index="81">
-      Było już późno w nocy. Fenicjanin pożegnał <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >faraona</span> i wraz z <Tutmozisem>Tutmozisem</Tutmozisem> opuścił pałac. Na drugi zaś dzień przysłał przez <span class="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4" >Dagona</span> skrzynkę z próbkami bogactw nieznanych krajów.
+      Było już późno w nocy. Fenicjanin pożegnał <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >faraona</span> i wraz z <Tutmozis>Tutmozisem</Tutmozis> opuścił pałac. Na drugi zaś dzień przysłał przez <span class="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4" >Dagona</span> skrzynkę z próbkami bogactw nieznanych krajów.
     </p>
     <p data-index="82">
       <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >Pan</span> znalazł w niej posążki bogów, tkaniny i pierścienie indyjskie, małe kawałki opium, a w drugiej przegrodzie — garstkę ryżu, listki herbaty, parę porcelanowych czarek ozdobionych malowidłami i — kilkanaście rysunków wykonanych farbami i tuszem na papierze.
@@ -19071,7 +19071,7 @@ export const PharaonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true"></span>— Owszem, módlcie się i zachęcajcie do tego naród. Ale prócz tego dajcie państwu trzydzieści tysięcy talentów — odpowiedział <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >faraon</span>.
     </p>
     <p data-index="164">
-      Arcykapłani milczeli. <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >Pan</span> chwilę czekał, w końcu zwrócił się do <Herhora>Herhora</Herhora>:
+      Arcykapłani milczeli. <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >Pan</span> chwilę czekał, w końcu zwrócił się do <Herhor>Herhora</Herhor>:
     </p>
     <p data-index="165">
       <span class="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true"></span>— Milczysz, wasza dostojność?
@@ -19122,7 +19122,7 @@ export const PharaonBookXml = `<section><section><section data-chapter="1">
       O nienawiści kapłanów do siebie już nie wątpił. To byli ci sami oszołomieni pychą dostojnicy, którzy w roku zeszłym nie dali mu korpusu Menfi i dopiero zrobili go namiestnikiem, gdy zdawało im się, że spełnił akt pokory, usuwając się z pałacu. Ci sami, którzy kontrolowali każdy jego ruch, składali o nim raporty, ale jemu, następcy tronu, nie powiedzieli nawet o traktacie z Asyrią. Ci sami, co oszukiwali go w świątyni Hator, a nad Sodowymi Jeziorami wymordowali jeńców, którym on przyobiecał łaskę.
     </p>
     <p data-index="181">
-      <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >Faraon</span> przypomniał sobie ukłony <Herhora>Herhora</Herhora>, spojrzenia <Mefresa>Mefresa</Mefresa> i ton głosu obydwu. Spod pozorów uprzejmości co chwilę wynurzała się ich duma i lekceważenie jego. On potrzebuje pieniędzy, a oni obiecują mu modlitwy, ba!… ośmielają się mówić, że nie jest wyłącznym <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >władcą</span> Egiptu.
+      <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >Faraon</span> przypomniał sobie ukłony <Herhor>Herhora</Herhor>, spojrzenia <Mefresa>Mefresa</Mefresa> i ton głosu obydwu. Spod pozorów uprzejmości co chwilę wynurzała się ich duma i lekceważenie jego. On potrzebuje pieniędzy, a oni obiecują mu modlitwy, ba!… ośmielają się mówić, że nie jest wyłącznym <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >władcą</span> Egiptu.
     </p>
     <p data-index="182">
       Młody <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >pan</span> mimo woli uśmiechnął się: przyszły mu bowiem na myśl wynajęte pastuchy, którzy właścicielowi trzody mówią, że on nie ma prawa robić z nią tego, co chce!…
@@ -19389,7 +19389,7 @@ export const PharaonBookXml = `<section><section><section data-chapter="1">
       — Mogłeś ostrzec kogo z dostojnych Egipcjan…
     </p>
     <p data-index="270">
-      <span class="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true"></span>— Kogo?… — zapytał kapłan. — Czy takich, którzy wobec <Herhora>Herhora</Herhora> byli bezsilni, czy takich, którzy by mnie oskarżyli przed nim i narazili na śmierć w męczarniach?… Powiedziałem <span class="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4" >Hiramowi</span>, bo on stykał się z naszymi dostojnikami, których ja nie widuję nigdy.
+      <span class="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true"></span>— Kogo?… — zapytał kapłan. — Czy takich, którzy wobec <Herhor>Herhora</Herhor> byli bezsilni, czy takich, którzy by mnie oskarżyli przed nim i narazili na śmierć w męczarniach?… Powiedziałem <span class="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4" >Hiramowi</span>, bo on stykał się z naszymi dostojnikami, których ja nie widuję nigdy.
     </p>
     <p data-index="271">
       <span class="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true"></span>— A dlaczego <span class="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4" >Herhor</span> i <span class="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4" >Mefres</span> zawarli podobną umowę? — badał <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >faraon</span>.
@@ -19527,7 +19527,7 @@ export const PharaonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true"></span>— Mam nadzieję, że nim wrócisz, panie, z Tebów, uda mi się ta sprawa.
     </p>
     <p data-index="316">
-      <span class="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true"></span>A gdy przeniesiemy skarb do waszego pałacu, gdy sąd potępi <Herhora>Herhora</Herhora> i <Mefresa>Mefresa</Mefresa>, których wasza świątobliwość może potem ułaskawić, wówczas za waszym pozwoleniem wystąpię jawnie… I przestanę być kapłanem Seta, który tylko ludzi odstrasza ode mnie…
+      <span class="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true"></span>A gdy przeniesiemy skarb do waszego pałacu, gdy sąd potępi <Herhor>Herhora</Herhor> i <Mefresa>Mefresa</Mefresa>, których wasza świątobliwość może potem ułaskawić, wówczas za waszym pozwoleniem wystąpię jawnie… I przestanę być kapłanem Seta, który tylko ludzi odstrasza ode mnie…
     </p>
     <p data-index="317">
       — I myślisz, że wszystko dobrze pójdzie?…
@@ -21093,7 +21093,7 @@ export const PharaonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Wielki-skarbnik-panstwowy" data-src-talking="/Pharaon/wielki-skarbnik-panstwowy.png" data-is-talking="true"></span> — Słyszałem — rzekł — iż jacyś ludzie tłumaczą chłopom, że za panowania waszej świątobliwości mogą nie płacić podatków…
     </p>
     <p data-index="15">
-      <span class="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true"></span> — Oho! ho!… — zawołał, śmiejąc się, <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >Ramzes</span> — owi jacyś ludzie wydają mi się bardzo podobnymi do dostojnego <Herhora>Herhora</Herhora>… Cóż to, chce on mnie zamorzyć głodem?… Czymże pokrywacie wydatki bieżące? — spytał.
+      <span class="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true"></span> — Oho! ho!… — zawołał, śmiejąc się, <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >Ramzes</span> — owi jacyś ludzie wydają mi się bardzo podobnymi do dostojnego <Herhor>Herhora</Herhor>… Cóż to, chce on mnie zamorzyć głodem?… Czymże pokrywacie wydatki bieżące? — spytał.
     </p>
     <p data-index="16">
       <span class="character-placeholder character-talking" data-character="Wielki-skarbnik-panstwowy" data-src-talking="/Pharaon/wielki-skarbnik-panstwowy.png" data-is-talking="true"></span> — Z rozkazu <Hirama>Hirama</Hirama> pożyczają nam Fenicjanie — odpowiedział skarbnik. — Wzięliśmy już osiem tysięcy talentów…
@@ -21105,7 +21105,7 @@ export const PharaonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Wielki-skarbnik-panstwowy" data-src-talking="/Pharaon/wielki-skarbnik-panstwowy.png" data-is-talking="true"></span> — I kwity, i zastawy… — westchnął skarbnik. — Oni mówią, że to prosta formalność; niemniej osiedlają się na folwarkach waszej świątobliwości i zabierają chłopom, co się da…
     </p>
     <p data-index="19">
-      Upojony przyjęciem ze strony ludu i pokorą magnatów, faraon już nawet nie gniewał się na <Herhora>Herhora</Herhora> i <Mefresa>Mefresa</Mefresa>. Czas gniewów minął, nadeszła chwila działania, i <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >Ramzes</span> tego samego dnia ułożył plan.
+      Upojony przyjęciem ze strony ludu i pokorą magnatów, faraon już nawet nie gniewał się na <Herhor>Herhora</Herhor> i <Mefresa>Mefresa</Mefresa>. Czas gniewów minął, nadeszła chwila działania, i <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >Ramzes</span> tego samego dnia ułożył plan.
     </p>
     <p data-index="20">
       Nazajutrz wezwał ludzi najbardziej zaufanych: arcykapłana <Sema>Sema</Sema>, proroka <Pentuera>Pentuera</Pentuera>, ulubieńca <Tutmozisa>Tutmozisa</Tutmozisa> i Fenicjanina <Hirama>Hirama</Hirama>. A gdy zebrali się, rzekł:
@@ -24876,7 +24876,7 @@ export const PharaonBookXml = `<section><section><section data-chapter="1">
       <span class="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true"></span>— <span class="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4" >Eunana</span>?… — powtórzył <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >faraon</span>. — A cóż inni?…
     </p>
     <p data-index="129">
-      — Prawie wszyscy ochotnicy, którzy pojechali z <Tutmozisem>Tutmozisem</Tutmozisem>, byli zaprzedani kapłanom.
+      — Prawie wszyscy ochotnicy, którzy pojechali z <Tutmozis>Tutmozisem</Tutmozis>, byli zaprzedani kapłanom.
     </p>
     <p data-index="130">
       <span class="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true"></span>— No, muszę już z tym skończyć! — rzekł <span class="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4" >pan</span>. — Zatrąbcie na azjatyckie pułki…

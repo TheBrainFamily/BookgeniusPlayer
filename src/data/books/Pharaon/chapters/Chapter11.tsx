@@ -3,34 +3,41 @@ import React from "react";
 export const Chapter11: React.FC = () => {
   return (
     <section data-chapter="11">
-      <p data-index="0">Rozdział XI</p>
+      <p data-index="0"> Rozdział XI</p>
       <p data-index="1">
+        {" "}
         Skończył się miesiąc Tot i zaczynał miesiąc Paofi, druga połowa lipca. Woda Nilu z zielonawej zrobiła się białą, a potem czerwoną i wciąż przybierała. Królewski wodowskaz w
         Memfisie był zapełniony prawie na wysokość dwu ludzi, a Nil rósł co dzień na dwie pięści. Najniższe grunta były zalane, z wyższych spiesznie zbierano len, winogrona i
         pewien rodzaj bawełny. Gdzie z rana było jeszcze sucho, tam ku wieczorowi pluskały fale.
       </p>
       <p data-index="2">
+        {" "}
         Zdawało się, że gwałtowny, choć niewidzialny wicher dmie w głębi rzeki. Orze na niej szerokie zagony, wypełnia pianą bruzdy, potem na chwilę wygładza powierzchnię wody, a
         po chwili skręca ją w przepaściste wiry.
       </p>
       <p data-index="3">
+        {" "}
         Znowu orze, znowu wygładza, skręca, napędza nowe góry wody, nowe smugi pian i wciąż podnosi szeleszczącą rzekę, wciąż zdobywa nowe płaty ziemi. Niekiedy woda dosięgnąwszy
         pewnej granicy, przekracza ją, w oka mgnieniu wlewa się w nizinę i tworzy błyszczące jeziorko tam, gdzie przed chwilą rozsypywały się w proch zwiędłe trawy.
       </p>
       <p data-index="4">
+        {" "}
         Choć przybór dosięgnął ledwie trzeciej części swej miary, już całe wybrzeże było zalane. Co godzinę jakiś folwarczek na wzgórzu robił się podobnym do wyspy, z początku
         odgraniczonej od innych tylko wąskim kanałem, który stopniowo rozszerzał się i coraz bardziej odcinał domostwo od sąsiadów. Nieraz, kto wyszedł do pracy piechotą, wracał
         czółnem.
       </p>
       <p data-index="5">
+        {" "}
         Łódek i tratew ukazywało się na Nilu coraz więcej. Z jednych łapano ryby w sieci, na innych przewożono zbiory do stodół albo ryczące bydło do obór, na innych odwiedzano
         znajomych, ażeby wśród śmiechu i krzyku zawiadomić ich (na co patrzyli wszyscy), że Nil przybiera. Niekiedy łodzie, skupione jak stado kaczek, rozbiegały się na wszystkie
         strony przed szeroką tratwą, która z Górnego Egiptu niosła w dół olbrzymie bryły kamienne, wyrąbane w nadbrzeżnych kopalniach.
       </p>
       <p data-index="6">
+        {" "}
         W powietrzu, jak ucho sięgło, rozlegał się szelest przybierającej wody, krzyk spłoszonego ptactwa i wesołe śpiewy ludzkie. Nil przybiera, będzie dużo chleba!
       </p>
       <p data-index="7">
+        {" "}
         Przez cały ten miesiąc toczyło się śledztwo w sprawie napadu na dom{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następcy tronu
@@ -39,10 +46,12 @@ export const Chapter11: React.FC = () => {
         wracały do Memfisu dwie łódki: jedna niosła urzędników, druga więźniów.
       </p>
       <p data-index="8">
+        {" "}
         Tym sposobem wyłowiono kilkuset przestępców, z których połowa nie wiedziała o niczym, połowie zaś groziło więzienie lub kilka lat pracy w kamieniołomach. Niczego jednak nie
         dowiedziano się ani o przewódcach napadu, ani o owym kapłanie, który skłonił lud do rozejścia.
       </p>
       <p data-index="9">
+        {" "}
         W księciu{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzesie
@@ -50,6 +59,7 @@ export const Chapter11: React.FC = () => {
         kojarzyły się niezwykle sprzeczne przymioty. Był on gwałtowny jak lew i uparty jak wół. Obok tego miał wielki rozum i głębokie poczucie sprawiedliwości.
       </p>
       <p data-index="10">
+        {" "}
         Widząc, że śledztwo prowadzone przez urzędników nie wydaje rezultatu,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -57,10 +67,12 @@ export const Chapter11: React.FC = () => {
         pewnego dnia sam popłynął do Memfisu i kazał sobie otworzyć więzienie.
       </p>
       <p data-index="11">
+        {" "}
         Było ono zbudowane na wzgórzu, otoczone wysokim murem i składało się z wielkiej liczby budynków kamiennych, ceglanych i drewnianych. Budowle te po większej części były
         tylko wejściami lub mieszkaniami dozorców. Więźniowie zaś mieścili się w podziemnych jaskiniach wykutych w wapiennej skale.
       </p>
       <p data-index="12">
+        {" "}
         Kiedy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następca
@@ -98,7 +110,7 @@ export const Chapter11: React.FC = () => {
         to są więźniowie?
       </p>
       <p data-index="21">— Nie, najdostojniejszy panie. To jest rodzina oczekująca na zwłoki przestępcy, który ma być uduszony… O, już prowadzą go do izby… — mówił nadzorca.</p>
-      <p data-index="22">Po czym zwróciwszy się do gromadki rzekł:</p>
+      <p data-index="22"> Po czym zwróciwszy się do gromadki rzekł:</p>
       <p data-index="23">— Bądźcie jeszcze chwilkę cierpliwi, kochani ludzie, zaraz dostaniecie ciało.</p>
       <p data-index="24">
         — Bardzo dziękujemy ci, zacny panie — odparł stary człowiek, zapewne ojciec delikwenta. — Wyszliśmy z domu wczoraj wieczór, len został nam w polu, a tu rzeka przybiera!…
@@ -125,8 +137,9 @@ export const Chapter11: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
         ten, którego mają w tej chwili dusić, czy nie ma prawa korzystać z mojej łaski?
       </p>
-      <p data-index="29">Nadzorca rozłożył ręce i pochylił się w milczeniu.</p>
+      <p data-index="29"> Nadzorca rozłożył ręce i pochylił się w milczeniu.</p>
       <p data-index="30">
+        {" "}
         Ruszyli z miejsca i przeszli kilka dziedzińców. W drewnianych klatkach, na gołej ziemi, roili się w ciasnocie przestępcy skazani na więzienie. W jednym budynku rozlegały
         się straszne krzyki: bito dla wydobycia zeznań.
       </p>
@@ -144,6 +157,7 @@ export const Chapter11: React.FC = () => {
         Wybierzcie, zdaniem waszym, najwinniejszych i wypytajcie ich w mojej obecności. Nie chcę jednak, ażeby mnie poznali.
       </p>
       <p data-index="34">
+        {" "}
         Otworzono{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następcy tronu
@@ -154,7 +168,7 @@ export const Chapter11: React.FC = () => {
         </span>{" "}
         kazał mu zająć zwykłe miejsce, a sam usiadł za słupem.
       </p>
-      <p data-index="35">Niebawem zaczęli ukazywać się pojedynczo oskarżeni. Wszyscy byli chudzi; porosły im duże włosy i brody, a oczy miały wyraz spokojnego obłąkania.</p>
+      <p data-index="35"> Niebawem zaczęli ukazywać się pojedynczo oskarżeni. Wszyscy byli chudzi; porosły im duże włosy i brody, a oczy miały wyraz spokojnego obłąkania.</p>
       <p data-index="36">
         —{" "}
         <span className="character-highlighted" data-character="Dutmoze" data-src-listening="/Pharaon/dutmoze-listens.mp4">
@@ -328,7 +342,7 @@ export const Chapter11: React.FC = () => {
         </span>
         . — Powiedz mi jednak, czy i jego świątobliwość nie miałby prawa uwolnić tych ludzi?
       </p>
-      <p data-index="71">Urzędnik złożył ręce na krzyż i schylił głowę.</p>
+      <p data-index="71"> Urzędnik złożył ręce na krzyż i schylił głowę.</p>
       <p data-index="72">
         — On, równy bogom, wszystko, co chce, uczynić może: uwolnić oskarżonych, nawet skazanych, a nawet zniszczyć akta sprawy, co spełnione przez zwykłego człowieka byłoby
         świętokradztwem.
@@ -345,6 +359,7 @@ export const Chapter11: React.FC = () => {
         o umorzenie nieszczęsnej sprawy.
       </p>
       <p data-index="74">
+        {" "}
         Tego jednak dnia jego świątobliwość miał dużo ceremonii religijnych i naradę z ministrami, więc{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następca
@@ -415,6 +430,7 @@ export const Chapter11: React.FC = () => {
         upadł obelisk albo kolumna świątyni.
       </p>
       <p data-index="83">
+        {" "}
         „Za słabe są moje ręce do podniesienia tego gmachu' — myślał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -430,6 +446,7 @@ export const Chapter11: React.FC = () => {
         !
       </p>
       <p data-index="84">
+        {" "}
         Zapadła noc.{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
@@ -437,6 +454,7 @@ export const Chapter11: React.FC = () => {
         nie kazał służbie nikogo przyjmować i samotny chodził po tarasie swojej willi, dumając:
       </p>
       <p data-index="85">
+        {" "}
         „Straszna rzecz!… Tam rozstąpiły się przede mną niezwyciężone pułki{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
           Nitagera
@@ -456,14 +474,17 @@ export const Chapter11: React.FC = () => {
         nie miałby ułaskawić niewinnych?… Państwo tak chce!… I cóż to jest państwo?… Co ono jada, gdzie sypia, gdzie jego ręce i miecz, którego się wszyscy boją?…'
       </p>
       <p data-index="86">
+        {" "}
         Spojrzał w ogród i między drzewami, na szczycie wzgórza, zobaczył dwie olbrzymie sylwetki pylonów, na których płonęły kagańce straży. Przyszło mu na myśl, że ta straż nigdy
         nie śpi i że pylony nigdy nie jedzą, a jednak są. Odwieczne pylony, potężne jak mocarz, który je wznosił, Ramzes Wielki.
       </p>
       <p data-index="87">
+        {" "}
         Poruszyć te gmachy i setki im podobnych; zmylić tą straż i tysiące innych, które czuwają nad bezpieczeństwem Egiptu; okazać nieposłuszeństwo prawom, które pozostawił Ramzes
         Wielki i inni, jeszcze więksi przed nim mocarze, a które dwadzieścia dynastii uświęciło swoim poszanowaniem…
       </p>
       <p data-index="88">
+        {" "}
         W duszy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           księcia
@@ -477,13 +498,14 @@ export const Chapter11: React.FC = () => {
         jak podróżny architekt, który ledwie zdąży osadzić jeden głaz w ścianie i już odchodzi. A ściany rosną od pokolenia do pokolenia i budowa trwa dalej.
       </p>
       <p data-index="89">
+        {" "}
         Jeszcze nigdy on, syn królewski, nie czuł tak swojej małości jak w tej chwili, kiedy jego wzrok wśród nocy błądził ponad Nilem, między pylonami zamku{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraona
         </span>{" "}
         i niewyraźnymi, lecz przepotężnymi sylwetkami memfijskich świątyń.
       </p>
-      <p data-index="90">Wtem, spomiędzy drzew, których konary dotykały tarasu, odezwał się głos:</p>
+      <p data-index="90"> Wtem, spomiędzy drzew, których konary dotykały tarasu, odezwał się głos:</p>
       <p data-index="91">
         — Znam twoją troskę i błogosławię cię. Sąd nie uwolni oskarżonych chłopów. Ale sprawa ich może upaść i wrócą w pokoju do swych domów, jeżeli dozorca twego folwarku nie
         będzie popierał skargi o napad.
@@ -499,7 +521,7 @@ export const Chapter11: React.FC = () => {
       <p data-index="93">
         — Prawdę rzekłeś. On podał ją w twoim imieniu. Ale jeżeli nie przyjdzie na sąd, nie będzie pokrzywdzonego; a gdzie nie ma pokrzywdzonego, nie ma przestępstwa.
       </p>
-      <p data-index="94">Krzaki zaszeleściły.</p>
+      <p data-index="94"> Krzaki zaszeleściły.</p>
       <p data-index="95">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Stójże! — zawołał{" "}
@@ -509,6 +531,7 @@ export const Chapter11: React.FC = () => {
         . — Kto jesteś?…
       </p>
       <p data-index="96">
+        {" "}
         Nikt nie odpowiedział. Tylko zdawało się{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           księciu
@@ -523,7 +546,7 @@ export const Chapter11: React.FC = () => {
         </span>
         . — Dlaczego on kryje się?…
       </p>
-      <p data-index="98">Lecz w tej chwili przyszło mu na myśl, że ów kapłan mógłby ciężko odpowiadać za udzielanie rad tamujących wymiar sprawiedliwości.</p>
+      <p data-index="98"> Lecz w tej chwili przyszło mu na myśl, że ów kapłan mógłby ciężko odpowiadać za udzielanie rad tamujących wymiar sprawiedliwości.</p>
     </section>
   );
 };

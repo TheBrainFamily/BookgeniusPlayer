@@ -3,8 +3,9 @@ import React from "react";
 export const Chapter36: React.FC = () => {
   return (
     <section data-chapter="36">
-      <h4 data-index="0">Rozdział XI</h4>
+      <h4 data-index="0"> Rozdział XI</h4>
       <p data-index="1">
+        {" "}
         Po przyjęciu u namiestnika{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
           Sargon
@@ -16,6 +17,7 @@ export const Chapter36: React.FC = () => {
         z Memfisu, a jednocześnie między oficerami i szlachtą zaczęły na nowo krążyć dziwaczne pogłoski.
       </p>
       <p data-index="2">
+        {" "}
         Fenicjanie opowiadali, pod największym rozumie się sekretem, że kapłani, nie wiadomo z jakiego powodu, nie tylko darowali Asyrii zaległe daniny, nie tylko uwolnili ją raz
         na zawsze od ich płacenia, ale nadto, ażeby ułatwić Asyryjczykom jakąś wojnę północną, zawarli z nimi traktat pokojowy na długie lata.
       </p>
@@ -30,13 +32,14 @@ export const Chapter36: React.FC = () => {
         </span>{" "}
         martwi się i chodzi smutny, lecz obaj muszą ulegać kapłanom, nie będąc pewni uczuć szlachty i wojska.
       </p>
-      <p data-index="4">To najwięcej oburzało egipską arystokrację.</p>
+      <p data-index="4"> To najwięcej oburzało egipską arystokrację.</p>
       <p data-index="5">
         <CharactersMaster></CharactersMaster>— Jak to — szeptali między sobą zadłużeni magnaci — więc dynastia już nam nie ufa?… Więc kapłani uwzięli się, ażeby zhańbić i zrujnować
         Egipt?… Bo przecie jasne jest, że jeżeli Asyria ma wojnę gdzieś na dalekiej północy, to właśnie teraz trzeba ją napaść i zdobytymi łupami podźwignąć zubożały skarb
         królewski i arystokrację…
       </p>
       <p data-index="6">
+        {" "}
         Ten i ów z młodych panów ośmielał się zapytywać{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następcy
@@ -52,6 +55,7 @@ export const Chapter36: React.FC = () => {
         wielkie nieszczęścia…
       </p>
       <p data-index="8">
+        {" "}
         Ciche gniewy prędko zamieniły się w ciche narady mające nawet pozór spisku. Ale choć bardzo wiele osób brało w tym udział, pewny siebie czy zaślepiony stan kapłański nic o
         nich nie wiedział, a{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -60,6 +64,7 @@ export const Chapter36: React.FC = () => {
         , choć przeczuwał nienawiść, nie przywiązywał do niej wagi.
       </p>
       <p data-index="9">
+        {" "}
         Poznał on, że{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę Ramzes
@@ -75,6 +80,7 @@ export const Chapter36: React.FC = () => {
         , która coraz łaskawiej przyjmowała jego zaloty i dary.
       </p>
       <p data-index="10">
+        {" "}
         Taki był nastrój kół najwyższych, gdy pewnej nocy wpadł do mieszkania{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzesa
@@ -90,6 +96,7 @@ export const Chapter36: React.FC = () => {
         .
       </p>
       <p data-index="11">
+        {" "}
         Dworzanie odpowiedzieli, że u{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           księcia
@@ -105,12 +112,14 @@ export const Chapter36: React.FC = () => {
         .
       </p>
       <p data-index="12">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę
         </span>{" "}
         po chwili ukazał się, nawet nierozgniewany.
       </p>
       <p data-index="13">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Cóż
         to — zapytał{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
@@ -119,6 +128,7 @@ export const Chapter36: React.FC = () => {
         — czy mamy wojnę, że wasza cześć trudzisz się do mnie o tak późnej porze?
       </p>
       <p data-index="14">
+        {" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
           Mentezufis
         </span>{" "}
@@ -129,6 +139,7 @@ export const Chapter36: React.FC = () => {
         i głęboko odetchnął.
       </p>
       <p data-index="15">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę
@@ -136,25 +147,30 @@ export const Chapter36: React.FC = () => {
         nie wychodziłeś cały wieczór? — zapytał.
       </p>
       <p data-index="16">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Ani
         na krok.
       </p>
       <p data-index="17">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Więc mogę
         dać na to kapłańskie przyrzeczenie?
       </p>
       <p data-index="18">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Następca
         </span>{" "}
         zdziwił się.
       </p>
       <p data-index="19">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Zdaje mi się — odparł dumnie — że twoje słowo już nie jest potrzebne, gdy ja dałem moje. Cóż to znaczy?…
       </p>
-      <p data-index="20">Wyszli do osobnego pokoju.</p>
+      <p data-index="20"> Wyszli do osobnego pokoju.</p>
       <p data-index="21">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Czy
         wiesz, panie — mówił wzburzony{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
@@ -167,10 +183,12 @@ export const Chapter36: React.FC = () => {
         jacyś młodzieńcy napadli i obili kijami…
       </p>
       <p data-index="22">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Jacy?… gdzie?…
       </p>
       <p data-index="23">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Pod willą
         fenickiej kapłanki, nazwiskiem{" "}
         <span className="character-highlighted" data-character="Pieszczota" data-src-listening="/Pharaon/pieszczota-listens.mp4">
@@ -187,6 +205,7 @@ export const Chapter36: React.FC = () => {
         .
       </p>
       <p data-index="24">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Odważne chłopaki! — odparł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -195,6 +214,7 @@ export const Chapter36: React.FC = () => {
         , wzruszając ramionami. — Napadać takiego siłacza!… Przypuszczam, że musiała tam pęknąć niejedna kość.
       </p>
       <p data-index="25">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Ale
         napadać{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -211,6 +231,7 @@ export const Chapter36: React.FC = () => {
         .
       </p>
       <p data-index="26">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Ho!
         ho!… — roześmiał się{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -219,12 +240,14 @@ export const Chapter36: React.FC = () => {
         . — Więc król Assar wysyła swoich posłów nawet do fenickich tancerek?…
       </p>
       <p data-index="27">
+        {" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
           Mentezufis
         </span>{" "}
         stropił się. Nagle uderzył się w czoło i zawołał również ze śmiechem:
       </p>
       <p data-index="28">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Patrz,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -239,8 +262,9 @@ export const Chapter36: React.FC = () => {
         </span>
         , ale zwyczajnym człowiekiem!…
       </p>
-      <p data-index="29">Lecz po chwili dodał:</p>
+      <p data-index="29"> Lecz po chwili dodał:</p>
       <p data-index="30">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— W każdym
         razie niedobrze się stało…{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -249,6 +273,7 @@ export const Chapter36: React.FC = () => {
         może nabrać do nas niechęci…
       </p>
       <p data-index="31">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Kapłanie!… kapłanie!… — zawołał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -261,6 +286,7 @@ export const Chapter36: React.FC = () => {
         , ale nawet króla Assara…
       </p>
       <p data-index="32">
+        {" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
           Mentezufis
         </span>{" "}
@@ -271,6 +297,7 @@ export const Chapter36: React.FC = () => {
         , że zamiast odpowiedzieć kłaniał się mrucząc:
       </p>
       <p data-index="33">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Bogowie
         obdarzyli cię,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -280,6 +307,7 @@ export const Chapter36: React.FC = () => {
         twojej rady, bo jesteś mędrcem nad mędrce.
       </p>
       <p data-index="34">
+        {" "}
         Powiedz zatem, panie, co mamy począć z{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
           Sargonem
@@ -287,6 +315,7 @@ export const Chapter36: React.FC = () => {
         i tymi zuchwalcami?…
       </p>
       <p data-index="35">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Przede wszystkim zaczekać do jutra — odparł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -295,6 +324,7 @@ export const Chapter36: React.FC = () => {
         . — Jako kapłan, wiesz najlepiej, że boski sen często przynosi dobre rady.
       </p>
       <p data-index="36">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— A jeżeli
         i do jutra nic nie obmyślę? — pytał{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
@@ -303,6 +333,7 @@ export const Chapter36: React.FC = () => {
         .
       </p>
       <p data-index="37">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— W
         każdym razie ja odwiedzę{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -311,6 +342,7 @@ export const Chapter36: React.FC = () => {
         i postaram się zatrzeć w jego pamięci ten drobny wypadek.
       </p>
       <p data-index="38">
+        {" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
           Kapłan
         </span>{" "}
@@ -321,6 +353,7 @@ export const Chapter36: React.FC = () => {
         z oznakami czci. Zaś wracając do siebie, myślał:
       </p>
       <p data-index="39">
+        {" "}
         „Serce dam sobie wydrzeć z piersi, że do tego nie należał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -337,6 +370,7 @@ export const Chapter36: React.FC = () => {
         !…'
       </p>
       <p data-index="40">
+        {" "}
         Nazajutrz wspaniały{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
           Sargon
@@ -348,6 +382,7 @@ export const Chapter36: React.FC = () => {
         , z oczyma utkwionymi w sufit, szepcząc modlitwy.
       </p>
       <p data-index="41">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Istubar" data-src-listening="/Pharaon/istubar-listens.mp4">
           Istubarze
@@ -359,10 +394,12 @@ export const Chapter36: React.FC = () => {
         — czy jesteś pewny, że nikt z naszego dworu nie wie o moim nieszczęściu?
       </p>
       <p data-index="42">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Istubar" data-src-talking="/Pharaon/istubar-speaks.mp4" data-is-talking="true" />— Któż może
         wiedzieć, jeżeli cię nikt nie widział?
       </p>
       <p data-index="43">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— Ale Egipcjanie!…
         — jęknął{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -371,6 +408,7 @@ export const Chapter36: React.FC = () => {
         .
       </p>
       <p data-index="44">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Istubar" data-src-talking="/Pharaon/istubar-speaks.mp4" data-is-talking="true" />— Z Egipcjan wie
         o tym{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
@@ -383,6 +421,7 @@ export const Chapter36: React.FC = () => {
         , no i ci szaleńcy, którzy zapewne długo będą pamiętali twoje pięści.
       </p>
       <p data-index="45">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— Może trochę…
         może!… Ale zdaje mi się, że był między nimi{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -391,6 +430,7 @@ export const Chapter36: React.FC = () => {
         i ma nos rozbity, jeżeli nie złamany…
       </p>
       <p data-index="46">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Istubar" data-src-talking="/Pharaon/istubar-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Następca
@@ -398,6 +438,7 @@ export const Chapter36: React.FC = () => {
         ma cały nos i on tam nie był, zapewniam cię.
       </p>
       <p data-index="47">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— W takim razie —
         wzdychał{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -414,6 +455,7 @@ export const Chapter36: React.FC = () => {
         !… ciało moje jest święte…
       </p>
       <p data-index="48">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Istubar" data-src-talking="/Pharaon/istubar-speaks.mp4" data-is-talking="true" />— A ja mówię ci —
         radził{" "}
         <span className="character-highlighted" data-character="Istubar" data-src-listening="/Pharaon/istubar-listens.mp4">
@@ -431,12 +473,14 @@ export const Chapter36: React.FC = () => {
         , z jakimiż to widywałeś się Fenicjanami i o czym mówiłeś z nimi pod ich świątynią wśród nocy?…'
       </p>
       <p data-index="49">
+        {" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
           Sargon
         </span>{" "}
         wzdychał, jeżeli można wzdychaniem nazwać odgłosy podobne do mruczenia lwa.
       </p>
       <p data-index="50">
+        {" "}
         Wtem wpadł jeden z oficerów asyryjskich. Uklęknął, uderzył czołem o podłogę i rzekł do{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
           Sargona
@@ -451,6 +495,7 @@ export const Chapter36: React.FC = () => {
         … Chce tu wejść, widocznie z zamiarem złożenia ci hołdu…
       </p>
       <p data-index="52">
+        {" "}
         Lecz, nim{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
           Sargon
@@ -470,6 +515,7 @@ export const Chapter36: React.FC = () => {
         , szeroko otworzywszy oczy, nie wiedział, co robić ze sobą: uciec nago do innej izby czy schować się pod pościel?
       </p>
       <p data-index="53">
+        {" "}
         Na progu stało kilku oficerów asyryjskich, zdumionych wtargnięciem{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następcy
@@ -481,12 +527,14 @@ export const Chapter36: React.FC = () => {
         dał im znak i znikli za kotarą.
       </p>
       <p data-index="54">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę
         </span>{" "}
         był sam; zostawił świtę na dziedzińcu.
       </p>
       <p data-index="55">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Bądź pozdrowiony — rzekł —{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -504,6 +552,7 @@ export const Chapter36: React.FC = () => {
         potężnego Assara, który oby żył wiecznie!
       </p>
       <p data-index="56">
+        {" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
           Sargon
         </span>{" "}
@@ -526,6 +575,7 @@ export const Chapter36: React.FC = () => {
         '.
       </p>
       <p data-index="57">
+        {" "}
         Kiedy uspokoił się i przeprosił{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           księcia
@@ -533,6 +583,7 @@ export const Chapter36: React.FC = () => {
         za nędzny stan, w jakim go znalazł gość tak znakomity i dostojny, dodał:
       </p>
       <p data-index="58">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— Nie miej za złe,
         o{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -546,6 +597,7 @@ export const Chapter36: React.FC = () => {
         , byłeś sprawcą mojej wczorajszej niedoli. Zdawało mi się, że między kijami, które spadały na moje plecy, czuję twój kij, zaprawdę tęgo bijący!…
       </p>
       <p data-index="59">
+        {" "}
         Spokojny{" "}
         <span className="character-highlighted" data-character="Istubar" data-src-listening="/Pharaon/istubar-listens.mp4">
           Istubar
@@ -561,6 +613,7 @@ export const Chapter36: React.FC = () => {
         z iście królewską godnością odparł:
       </p>
       <p data-index="60">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Omyliłeś się,{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -570,6 +623,7 @@ export const Chapter36: React.FC = () => {
         po nocy.
       </p>
       <p data-index="61">
+        {" "}
         Zanim światły{" "}
         <span className="character-highlighted" data-character="Istubar" data-src-listening="/Pharaon/istubar-listens.mp4">
           Istubar
@@ -585,10 +639,12 @@ export const Chapter36: React.FC = () => {
         i objął jego nogi, wołając:
       </p>
       <p data-index="62">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— Wielki pan!…
         wielki król!… Chwała Egiptowi, że posiada takiego władcę.
       </p>
       <p data-index="63">
+        {" "}
         A na to znowu{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -596,6 +652,7 @@ export const Chapter36: React.FC = () => {
         :
       </p>
       <p data-index="64">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Więcej powiem ci,{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -605,6 +662,7 @@ export const Chapter36: React.FC = () => {
         czaszkę. Zaś moi bliscy są zdrowi.
       </p>
       <p data-index="65">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— Prawdę rzekł i
         mądrze powiedział! — szepnął{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -617,6 +675,7 @@ export const Chapter36: React.FC = () => {
         .
       </p>
       <p data-index="66">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Lecz jakkolwiek — ciągnął{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -626,6 +685,7 @@ export const Chapter36: React.FC = () => {
         nawiedziłem twoją sypialnię, dlatego otwieram ci mój dom o każdej porze, ile razy zechcesz mnie odwiedzić. Dlatego… proszę cię, abyś przyjął ode mnie ten mały dar…
       </p>
       <p data-index="67">
+        {" "}
         To mówiąc,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -633,6 +693,7 @@ export const Chapter36: React.FC = () => {
         sięgnął za tunikę i wydobył łańcuch wysadzany rubinami i szafirami.
       </p>
       <p data-index="68">
+        {" "}
         Olbrzymi{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
           Sargon
@@ -660,6 +721,7 @@ export const Chapter36: React.FC = () => {
         mądrego króla.
       </p>
       <p data-index="69">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Namiestnik
         </span>{" "}
@@ -670,12 +732,14 @@ export const Chapter36: React.FC = () => {
         . Zaś wychodząc pomyślał, że jednak Asyryjczycy, pomimo barbarzyństwa, nie są złymi ludźmi, skoro umieją odczuć wspaniałomyślność.
       </p>
       <p data-index="70">
+        {" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
           Sargon
         </span>{" "}
         zaś był tak podniecony, że kazał natychmiast przynieść wina i pił, pił od południa aż do wieczora.
       </p>
       <p data-index="71">
+        {" "}
         Dobrze po zachodzie słońca{" "}
         <span className="character-highlighted" data-character="Istubar" data-src-listening="/Pharaon/istubar-listens.mp4">
           kapłan Istubar
@@ -699,6 +763,7 @@ export const Chapter36: React.FC = () => {
         .
       </p>
       <p data-index="72">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Przynosimy ci,
         dostojny{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -711,6 +776,7 @@ export const Chapter36: React.FC = () => {
         .
       </p>
       <p data-index="73">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— Obym mógł wam
         udzielić podobnej! — zawołał{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -724,6 +790,7 @@ export const Chapter36: React.FC = () => {
         ?…
       </p>
       <p data-index="74">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Istubar" data-src-talking="/Pharaon/istubar-speaks.mp4" data-is-talking="true" />— Mówcie — poparł
         go{" "}
         <span className="character-highlighted" data-character="Istubar" data-src-listening="/Pharaon/istubar-listens.mp4">
@@ -732,6 +799,7 @@ export const Chapter36: React.FC = () => {
         .
       </p>
       <p data-index="75">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Dziś —
         zabrał głos{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
@@ -749,12 +817,14 @@ export const Chapter36: React.FC = () => {
         traktatu.
       </p>
       <p data-index="76">
+        {" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
           Sargon
         </span>{" "}
         chwiał się na wojłokowych materacach, ale oczy miał prawie przytomne.
       </p>
       <p data-index="77">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— Pojadę — odparł —
         do jego świątobliwości{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -764,6 +834,7 @@ export const Chapter36: React.FC = () => {
         na brzuchu przed jego świątobliwością (oby żył wiecznie!) i traktat podpiszę… Ale jak wy go tam wykonacie… cha!… cha!… cha!… tego już nie wiem… — zakończył grubym śmiechem.
       </p>
       <p data-index="78">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Jak
         śmiesz,{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -776,12 +847,14 @@ export const Chapter36: React.FC = () => {
         .
       </p>
       <p data-index="79">
+        {" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
           Sargon
         </span>{" "}
         nieco wytrzeźwiał.
       </p>
       <p data-index="80">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— Ja nie mówię o
         jego świątobliwości — odparł — ale o{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -790,6 +863,7 @@ export const Chapter36: React.FC = () => {
         …
       </p>
       <p data-index="81">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Jest to pełen
         mądrości młodzian, który bez wahania wykona wolę ojca i najwyższej rady kapłańskiej — rzekł{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
@@ -798,6 +872,7 @@ export const Chapter36: React.FC = () => {
         .
       </p>
       <p data-index="82">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— Cha!… cha!… cha!…
         — zaśmiał się znowu pijany{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -814,11 +889,13 @@ export const Chapter36: React.FC = () => {
         …
       </p>
       <p data-index="83">
+        {" "}
         Nasz asyryjski następca to mędrzec, to kapłan… On, zanim wybierze się na wojnę, zagląda naprzód w gwiazdy na niebie, później kurom pod ogony… Zaś wasz zobaczyłby: ile ma
         wojska? dowiedziałby się: gdzie obozuje nieprzyjaciel? I spadłby mu na kark jak orzeł na barana. Oto wódz!… oto król!… On nie z tych, którzy słuchają rady kapłanów… On
         radzić się będzie własnego miecza, a wy musicie spełniać jego rozkazy…
       </p>
       <p data-index="84">
+        {" "}
         I dlatego, choć podpiszę z wami traktat, opowiem memu panu, że poza chorym królem i mądrymi kapłanami kryje się tu młody{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następca tronu
@@ -826,6 +903,7 @@ export const Chapter36: React.FC = () => {
         , lew i byk w jednej osobie… który ma miody w ustach, a pioruny w sercu…
       </p>
       <p data-index="85">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— I powiesz
         nieprawdę — wtrącił{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
@@ -838,21 +916,25 @@ export const Chapter36: React.FC = () => {
         , aczkolwiek popędliwy i trochę hulaka, jak zwyczajnie młody, umie jednak uszanować i radę mędrców, i najwyższe urzędy w kraju.
       </p>
       <p data-index="86">
+        {" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
           Sargon
         </span>{" "}
         pokiwał głową.
       </p>
       <p data-index="87">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— Oj, wy mędrcy!…
         uczeni w piśmie!… znawcy gwiazdowych obrotów!… — mówił szydząc. — Ja prostak, zwyczajny sobie jenerał<a href="#fn242" className="link-note"></a>, który bez pieczęci nie
         zawsze umiałbym wyżłobić moje nazwisko… Wy mędrcy, ja prostak, ale na brodę mego króla, nie zamieniłbym się na waszą mądrość…
       </p>
       <p data-index="88">
+        {" "}
         Bo wy jesteście ludźmi, dla których otworzył się świat cegieł i papirusów, ale zamknął się ten prawdziwy, na którym wszyscy żyjemy… Ja prostak! Ale ja mam psi węch. A jak
         pies z dala wyczuje niedźwiedzia, tak ja moim zaczerwienionym nosem poznam bohatera.
       </p>
       <p data-index="89">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />
         Wy będziecie radzić{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -866,6 +948,7 @@ export const Chapter36: React.FC = () => {
         stanie pod Niniwą, byle w drodze rodzili mu się żołnierze, zamiast ginąć…
       </p>
       <p data-index="90">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Choćbyś
         mówił prawdę — przerwał{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
@@ -878,6 +961,7 @@ export const Chapter36: React.FC = () => {
         chciał iść pod Niniwę, nie pójdzie.
       </p>
       <p data-index="91">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— A któż go
         powstrzyma, gdy zostanie{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -886,9 +970,11 @@ export const Chapter36: React.FC = () => {
         ?
       </p>
       <p data-index="92">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— My.
       </p>
       <p data-index="93">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— Wy?… wy!… Cha!
         cha! cha!… — śmiał się{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
@@ -898,6 +984,7 @@ export const Chapter36: React.FC = () => {
         wie.
       </p>
       <p data-index="94">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />
         Czyliż Fenicjanie byliby tak spokojni, gdyby nie mieli pewności, że młody{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -906,6 +993,7 @@ export const Chapter36: React.FC = () => {
         zasłoni ich przed asyryjskim bykiem?
       </p>
       <p data-index="95">
+        {" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
           Mentezufis
         </span>{" "}
@@ -920,6 +1008,7 @@ export const Chapter36: React.FC = () => {
         , który śmiało wypowiadał to, czego oni wcale nie brali pod rachunek.
       </p>
       <p data-index="96">
+        {" "}
         I rzeczywiście: co by też było, gdyby{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następca tronu
@@ -927,6 +1016,7 @@ export const Chapter36: React.FC = () => {
         odgadł ich zamiary, a nawet chciał je powikłać?…
       </p>
       <p data-index="97">
+        {" "}
         Lecz z chwilowego kłopotu wybawił ich milczący dotychczas{" "}
         <span className="character-highlighted" data-character="Istubar" data-src-listening="/Pharaon/istubar-listens.mp4">
           Istubar
@@ -934,6 +1024,7 @@ export const Chapter36: React.FC = () => {
         .
       </p>
       <p data-index="98">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Istubar" data-src-talking="/Pharaon/istubar-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
           Sargonie
@@ -945,6 +1036,7 @@ export const Chapter36: React.FC = () => {
         , to już nie twoja sprawa. Skoro najwyższa, wiecznie żyjąca rada kapłanów zapewnia nas, traktat będzie wykonany. Jakim zaś zrobi się to sposobem? nie naszej głowy rzecz.
       </p>
       <p data-index="99">
+        {" "}
         Oschły ton, z jakim wypowiedział to{" "}
         <span className="character-highlighted" data-character="Istubar" data-src-listening="/Pharaon/istubar-listens.mp4">
           Istubar
@@ -960,6 +1052,7 @@ export const Chapter36: React.FC = () => {
         pokiwał głową i mruknął:
       </p>
       <p data-index="100">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sargon" data-src-talking="/Pharaon/sargon-speaks.mp4" data-is-talking="true" />— W takim razie
         szkoda chłopca!… Wielki to wojownik, wspaniałomyślny pan…
       </p>

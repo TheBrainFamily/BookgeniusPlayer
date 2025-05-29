@@ -3,7 +3,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import { LocationProvider } from "./state/LocationContext";
 import { useCutScene } from "./hooks/useCutScene";
 import { useBackgroundVideo } from "./hooks/useBackgroundVideo";
-import { useBookContent } from "./hooks/useBookContent";
 
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
 import { runLegacyInit } from "./main";
@@ -13,7 +12,7 @@ import { RealtimeProvider } from "./context/RealtimeContext";
 import { getBookData } from "./booksData/getBookData";
 import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
 import { BookData } from "./booksData/types";
-import { ModalProvider, useModal } from "./context/ModalContext";
+import { ModalProvider } from "./context/ModalContext";
 import { BookContentWrapper } from "./components/BookContentWrapper";
 import { BookThemeProvider } from "./context/BookThemeContext";
 import { useAudiobookTracks } from "@/hooks/useAudiobookTracks";
@@ -25,36 +24,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { EditorMode } from "@/components/EditorMode";
 import useLocalStorageState from "use-local-storage-state";
-import { BookContentContainer } from "./components/BookContentContainer";
-import { BookChapterRenderer, BookChapterRendererMemoize } from "./BookChapterRenderer";
-
-// function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
-//   /* Inject book content first */
-//   // useBookContent(bookData.bookXml, "content-container");
-
-//   /* scroll‑related hooks */
-//   usePageObserver("bookData.bookXml", useModal());
-
-//   /* dynamic visual hooks */
-//   useCutScene();
-//   useBackgroundVideo();
-
-//   /* dynamic audio hooks */
-//   useBackgroundSongs();
-//   useAudiobookTracks();
-
-//   return (
-//     <>
-//       <Header />
-//       <NoteLinkBlinker />
-//       <CharacterNotesPanel bookData={bookData} />
-//       <ContentContainerWrapper />
-//       <RightNotesPanel />
-//       <Footer />
-//       {import.meta.env.VITE_EDITOR === "true" && <EditorMode />}
-//     </>
-//   );
-// }
+import { BookChapterRenderer } from "./BookChapterRenderer";
 
 function Shell({ bookData }: { bookData: BookData }) {
   // Remove useBookContent hook - no longer needed!

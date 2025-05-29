@@ -3,8 +3,9 @@ import React from "react";
 export const Chapter13: React.FC = () => {
   return (
     <section data-chapter="13">
-      <p data-index="0">Rozdział XIII</p>
+      <p data-index="0"> Rozdział XIII</p>
       <p data-index="1">
+        {" "}
         Wycieczki{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następcy tronu
@@ -20,6 +21,7 @@ export const Chapter13: React.FC = () => {
         udzielił porady prawnej, miały nieoczekiwany rezultat.
       </p>
       <p data-index="2">
+        {" "}
         Kapłan nie znalazł się, natomiast między egipskim chłopstwem zaczęły o{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzesie
@@ -27,6 +29,7 @@ export const Chapter13: React.FC = () => {
         krążyć legendy.
       </p>
       <p data-index="3">
+        {" "}
         Jakiś człowiek pływał wieczorami ode wsi do wsi w drobnym czółenku i opowiadał chłopom, że{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następca tronu
@@ -39,10 +42,12 @@ export const Chapter13: React.FC = () => {
         znajduje się pod szczególną opieką boga Amona z pustyni zachodniej, który jest jego ojcem.
       </p>
       <p data-index="4">
+        {" "}
         Prosty lud chciwie słuchał wieści, raz dlatego, że zgadzały się z faktami, po wtóre, że opowiadający je człowiek sam wyglądał na ducha: przypływał nie wiadomo skąd i
         znikał.
       </p>
       <p data-index="5">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę Ramzes
         </span>{" "}
@@ -53,6 +58,7 @@ export const Chapter13: React.FC = () => {
         , nawet nie wzywał go do siebie. Czuł wstyd wobec Fenicjanina, od którego wziął pieniądze i jeszcze nieraz mógł ich potrzebować.
       </p>
       <p data-index="6">
+        {" "}
         Ale w kilka dni po awanturze z pisarzem{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
           Dagona
@@ -68,9 +74,11 @@ export const Chapter13: React.FC = () => {
         , ukląkł, rozwiązał białą chustkę i wyjął z niej prześliczny złoty kielich.
       </p>
       <p data-index="7">
+        {" "}
         Kielich był wysadzany różnokolorowymi kamieniami i pokryty płaskorzeźbą, która na podstawie przedstawiała zbieranie i tłoczenie winogron, a na czaszy — ucztę.
       </p>
       <p data-index="8">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Przyjmij ten
         kielich, dostojny{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -79,6 +87,7 @@ export const Chapter13: React.FC = () => {
         , od niewolnika twego — mówił bankier — i używaj go sto… tysiąc lat… do skończenia wieków.
       </p>
       <p data-index="9">
+        {" "}
         Ale{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -86,6 +95,7 @@ export const Chapter13: React.FC = () => {
         zrozumiał, o co chodzi Fenicjaninowi. Nie dotykając przeto złotego daru, rzekł z twarzą surową:
       </p>
       <p data-index="10">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Czy
         widzisz,{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
@@ -94,10 +104,12 @@ export const Chapter13: React.FC = () => {
         , te purpurowe blaski wewnątrz kielicha?…
       </p>
       <p data-index="11">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Zaprawdę — odparł
         bankier — jakżebym nie miał widzieć tej purpury, która dowodzi, że kielich jest z najczystszego złota.
       </p>
       <p data-index="12">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
         ja ci mówię, że to jest krew dzieci zabieranych rodzicom — odpowiedział gniewnie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -105,12 +117,14 @@ export const Chapter13: React.FC = () => {
         </span>
         .
       </p>
-      <p data-index="13">Odwrócił się i wyszedł do dalszych pokojów.</p>
+      <p data-index="13"> Odwrócił się i wyszedł do dalszych pokojów.</p>
       <p data-index="14">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— O Astoreth! —
         jęknął Fenicjanin. Usta mu posiniały, a ręce zaczęły drżeć tak, że ledwie zdążył owinąć swój kielich w białą chustę.
       </p>
       <p data-index="15">
+        {" "}
         W parę dni później{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
           Dagon
@@ -122,6 +136,7 @@ export const Chapter13: React.FC = () => {
         . Ubrał się w szaty przetykane złotem, w gęstej brodzie miał szklaną kulkę, z której ciekły wonności, a do głowy przypiął dwa pióra.
       </p>
       <p data-index="16">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Piękna{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Saro
@@ -138,6 +153,7 @@ export const Chapter13: React.FC = () => {
         (oby zdrów był!) dziesięć talentów i pojąłbym cię za prawą małżonkę. Taki jestem namiętny!…
       </p>
       <p data-index="17">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sara" data-src-talking="/Pharaon/sara-speaks.mp4" data-is-talking="true" />— Niech mnie Bóg
         zachowa — odparła{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
@@ -154,6 +170,7 @@ export const Chapter13: React.FC = () => {
         , przyszła ci ochota nawiedzić dzisiaj służebnicę pańską?
       </p>
       <p data-index="18">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Powiem ci prawdę,
         jakbyś była{" "}
         <span className="character-highlighted" data-character="Tamar" data-src-listening="/Pharaon/tamar-listens.mp4">
@@ -162,6 +179,7 @@ export const Chapter13: React.FC = () => {
         , żoną moją, która, choć rodowita córka Sydonu, choć wniosła mi duży posag, jest już stara i niewarta zdejmować ci sandałów…
       </p>
       <p data-index="19">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sara" data-src-talking="/Pharaon/sara-speaks.mp4" data-is-talking="true" />— W miodzie, płynącym z
         ust waszych, jest dużo piołunu — wtrąciła{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
@@ -170,6 +188,7 @@ export const Chapter13: React.FC = () => {
         .
       </p>
       <p data-index="20">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Miód — prawił{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
           Dagon
@@ -190,6 +209,7 @@ export const Chapter13: React.FC = () => {
         , która pożądliwości już we mnie rozbudzić nie może.
       </p>
       <p data-index="21">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sara" data-src-talking="/Pharaon/sara-speaks.mp4" data-is-talking="true" />— Nie to chcieliście
         mówić — przerwała zarumieniona{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
@@ -198,6 +218,7 @@ export const Chapter13: React.FC = () => {
         .
       </p>
       <p data-index="22">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Ja już nie wiem, co
         chcę mówić od czasu, gdym ujrzał ciebie i gdy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -239,6 +260,7 @@ export const Chapter13: React.FC = () => {
         , ten kielich szczerozłoty, wysadzany kamieniami i okryty rzeźbą, której dziwiliby się sami bogowie…
       </p>
       <p data-index="23">
+        {" "}
         To mówiąc,{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
           Dagon
@@ -250,6 +272,7 @@ export const Chapter13: React.FC = () => {
         .
       </p>
       <p data-index="24">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Ja nawet nie chcę,{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Saro
@@ -311,12 +334,14 @@ export const Chapter13: React.FC = () => {
         …
       </p>
       <p data-index="25">
+        {" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sara
         </span>{" "}
         usunęła się ze spuszczonymi oczyma.
       </p>
       <p data-index="26">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sara" data-src-talking="/Pharaon/sara-speaks.mp4" data-is-talking="true" />— Nie wezmę kielicha —
         odparła — bo{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -325,12 +350,14 @@ export const Chapter13: React.FC = () => {
         zabronił mi od kogokolwiek przyjmować darów.
       </p>
       <p data-index="27">
+        {" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
           Dagon
         </span>{" "}
         osłupiał i patrzył na nią zdziwionymi oczyma.
       </p>
       <p data-index="28">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Ty chyba nie wiesz,{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Saro
@@ -338,6 +365,7 @@ export const Chapter13: React.FC = () => {
         , co jest wart ten kielich?… Wreszcie ja daję go twojemu ojcu, memu bratu…
       </p>
       <p data-index="29">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sara" data-src-talking="/Pharaon/sara-speaks.mp4" data-is-talking="true" />— Nie mogę przyjąć… —
         szepnęła{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
@@ -346,6 +374,7 @@ export const Chapter13: React.FC = () => {
         .
       </p>
       <p data-index="30">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Gwałtu!… — krzyknął{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
           Dagon
@@ -366,6 +395,7 @@ export const Chapter13: React.FC = () => {
         zechce?…
       </p>
       <p data-index="31">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sara" data-src-talking="/Pharaon/sara-speaks.mp4" data-is-talking="true" />— Nie mogę!… — szepnęła{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sara
@@ -376,8 +406,9 @@ export const Chapter13: React.FC = () => {
         </span>
         .
       </p>
-      <p data-index="32">Fenicjanin w okamgnieniu zmienił ton i rzekł, śmiejąc się:</p>
+      <p data-index="32"> Fenicjanin w okamgnieniu zmienił ton i rzekł, śmiejąc się:</p>
       <p data-index="33">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Bardzo dobrze,{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Saro
@@ -389,6 +420,7 @@ export const Chapter13: React.FC = () => {
         . I widzę, że jesteś wierna, chociaż głupi ludzie gadają…
       </p>
       <p data-index="34">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Sara" data-src-talking="/Pharaon/sara-speaks.mp4" data-is-talking="true" />— Co?… — wybuchnęła{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sara
@@ -400,6 +432,7 @@ export const Chapter13: React.FC = () => {
         z zaciśniętymi pięściami.
       </p>
       <p data-index="35">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— A cha! cha!… —
         śmiał się Fenicjanin. — Jaka szkoda, że tego nie słyszał i nie widział{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -413,6 +446,7 @@ export const Chapter13: React.FC = () => {
         , skusiłby niejedną kobietę… I niemałą kobietę…
       </p>
       <p data-index="36">
+        {" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
           Dagon
         </span>{" "}
@@ -432,6 +466,7 @@ export const Chapter13: React.FC = () => {
         powstał i podniósłszy ręce do góry począł wołać:
       </p>
       <p data-index="37">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— O Baal Sydon, o
         Astoreth!… pomścijcie moją zniewagę nad przeklętą córką Judy… Niech przepadnie jej zdradziecka piękność jak kropla deszczu w pustyni… Niechaj choroby stoczą jej ciało, a
         szaleństwo opęta duszę… Niech{" "}
@@ -442,10 +477,12 @@ export const Chapter13: React.FC = () => {
         o kubek mętnej wody…
       </p>
       <p data-index="38">
+        {" "}
         Potem pluł i mruczał niezrozumiałe a straszne wyrazy, aż na chwilę czarny obłok zakrył słońce, a woda w pobliżu łodzi poczęła mącić się i wydymać w duże fale. Gdy skończył,
         słońce znowu zajaśniało, ale rzeka jeszcze niepokoiła się, jakby poruszył ją nowy przybór.
       </p>
       <p data-index="39">
+        {" "}
         Wioślarze{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
           Dagona
@@ -453,6 +490,7 @@ export const Chapter13: React.FC = () => {
         zlękli się i przestali śpiewać; lecz oddzieleni od swego pana ścianą namiotu, nie spostrzegli jego praktyk.
       </p>
       <p data-index="40">
+        {" "}
         Od tej pory Fenicjanin nie pokazywał się{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następcy tronu
@@ -465,6 +503,7 @@ export const Chapter13: React.FC = () => {
         szal na ramionach.
       </p>
       <p data-index="41">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Któż ty jesteś? — zapytał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -473,6 +512,7 @@ export const Chapter13: React.FC = () => {
         .
       </p>
       <p data-index="42">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pieszczota" data-src-talking="/Pharaon/pieszczota-speaks.mp4" data-is-talking="true" />— Jestem
         kapłanką i twoją służebnicą, a przysłał mnie pan{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
@@ -481,10 +521,12 @@ export const Chapter13: React.FC = () => {
         , ażebym wypłoszyła twój gniew na niego.
       </p>
       <p data-index="43">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Jakże potrafisz to zrobić?
       </p>
       <p data-index="44">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pieszczota" data-src-talking="/Pharaon/pieszczota-speaks.mp4" data-is-talking="true" />— O tak…
         Siądź tutaj — mówiła, sadowiąc go na fotelu — ja stanę na palcach, ażeby zrobić się wyższą aniżeli twój gniew, i tym szalem, który jest poświęcony, będę odpędzać od ciebie
         złe duchy… A kysz!… a kysz!… — szeptała, tańcząc wkoło{" "}
@@ -498,6 +540,7 @@ export const Chapter13: React.FC = () => {
         … A kysz!… a kysz!… on nie wasz, ale mój… Miłość potrzebuje takiej ciszy, że wobec niej nawet gniew musi umilknąć…
       </p>
       <p data-index="45">
+        {" "}
         Tańcząc, bawiła się włosami{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzesa
@@ -509,6 +552,7 @@ export const Chapter13: React.FC = () => {
         i oparłszy głowę na jego kolanach, bystro przypatrywała mu się, dysząc rozchylonymi ustami.
       </p>
       <p data-index="46">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pieszczota" data-src-talking="/Pharaon/pieszczota-speaks.mp4" data-is-talking="true" />— Już nie
         gniewasz się na twego sługę{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
@@ -521,40 +565,49 @@ export const Chapter13: React.FC = () => {
         .
       </p>
       <p data-index="47">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
         </span>{" "}
         chciał ją pocałować w usta, lecz zerwała się z jego kolan i uciekła, wołając:
       </p>
       <p data-index="48">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pieszczota" data-src-talking="/Pharaon/pieszczota-speaks.mp4" data-is-talking="true" />— O, nie,
         nie można!…
       </p>
       <p data-index="49">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Dlaczego?
       </p>
       <p data-index="50">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pieszczota" data-src-talking="/Pharaon/pieszczota-speaks.mp4" data-is-talking="true" />— Jestem
         dziewicą i kapłanką wielkiej bogini Astoreth… Musiałbyś bardzo kochać i czcić moją opiekunkę, zanim byłoby ci wolno pocałować mnie.
       </p>
       <p data-index="51">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
         tobie wolno?…
       </p>
       <p data-index="52">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pieszczota" data-src-talking="/Pharaon/pieszczota-speaks.mp4" data-is-talking="true" />— Mnie
         wszystko wolno, bo ja jestem kapłanka i przysięgłam zachować czystość.
       </p>
       <p data-index="53">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Więc po cóżeś tu przyszła?
       </p>
       <p data-index="54">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pieszczota" data-src-talking="/Pharaon/pieszczota-speaks.mp4" data-is-talking="true" />— Rozpędzić
         gniew twój. Zrobiłam to i odchodzę. Bądź zdrów i zawsze dobry!… — dodała z przejmującym wejrzeniem.
       </p>
       <p data-index="55">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Gdzie mieszkasz?… jak się nazywasz?… — pytał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -563,6 +616,7 @@ export const Chapter13: React.FC = () => {
         .
       </p>
       <p data-index="56">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Pieszczota" data-src-talking="/Pharaon/pieszczota-speaks.mp4" data-is-talking="true" />— Nazywam
         się{" "}
         <span className="character-highlighted" data-character="Pieszczota" data-src-listening="/Pharaon/pieszczota-listens.mp4">
@@ -571,6 +625,7 @@ export const Chapter13: React.FC = () => {
         . A mieszkam… Ech, po co mam mówić. Jeszcze nieprędko przyjdziesz do mnie.
       </p>
       <p data-index="57">
+        {" "}
         Skinęła ręką i znikła, a{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -578,12 +633,14 @@ export const Chapter13: React.FC = () => {
         , jak odurzony, nie ruszył się z fotelu. Gdy zaś po chwili wyjrzał oknem, zobaczył bogatą lektykę, którą czterej Nubijczycy szybko nieśli w stronę Nilu.
       </p>
       <p data-index="58">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
         </span>{" "}
         nie żałował odchodzącej: zdziwiła go, ale nie porwała.
       </p>
       <p data-index="59">
+        {" "}
         „
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sara
@@ -591,6 +648,7 @@ export const Chapter13: React.FC = () => {
         jest spokojniejsza od niej — myślał — i ładniejsza. Zresztą… zdaje mi się, że ta Fenicjanka musi być zimna, a jej pieszczoty wyuczone.'
       </p>
       <p data-index="60">
+        {" "}
         Lecz od tej chwili{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -605,7 +663,7 @@ export const Chapter13: React.FC = () => {
         </span>
         , przyszli do niego chłopi i dziękując za opiekę oświadczyli, że Fenicjanin już nie zmusza ich do płacenia nowego podatku.
       </p>
-      <p data-index="61">Tak było pod Memfisem. Za to w dalszych folwarkach książęcy dzierżawca wetował sobie straty.</p>
+      <p data-index="61"> Tak było pod Memfisem. Za to w dalszych folwarkach książęcy dzierżawca wetował sobie straty.</p>
     </section>
   );
 };

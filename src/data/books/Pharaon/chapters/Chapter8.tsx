@@ -3,7 +3,7 @@ import React from "react";
 export const Chapter8: React.FC = () => {
   return (
     <section data-chapter="8">
-      <p data-index="0">Rozdział VIII</p>
+      <p data-index="0"> Rozdział VIII</p>
       <p data-index="1">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę
@@ -51,11 +51,13 @@ export const Chapter8: React.FC = () => {
         uspokaja się tylko przy dzbanie mocnego wina, i to na krótko. Bo ledwie nieborak odzyska zmysły, znowu zaczyna czuć, jakby mu się ziemia rozstępowała pod nogami.
       </p>
       <p data-index="6">
+        {" "}
         Widzę to — ciągnął elegant — po twoim niespokojnym chodzie i bezładnym wyrzucaniu rękoma, że w tej chwili doznajesz rozpaczy z powodu braku pieniędzy. Wkrótce jednak
         doznasz innych uczuć, jak gdyby ci zdjęto z piersi wielkiego sfinksa. Później ulegniesz słodkiemu stanowi zapomnienia o swoich poprzednich kłopotach i teraźniejszych
         wierzycielach, a potem…
       </p>
       <p data-index="7">
+        {" "}
         Ach, szczęśliwy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzesie
@@ -83,8 +85,9 @@ export const Chapter8: React.FC = () => {
         </span>
         , a wieczorem, choćby ci jeszcze nie dał pieniędzy, odzyskasz spokój.
       </p>
-      <p data-index="10">Wybiegł, wsiadł do małej lektyki i, otoczony służbą tudzież takimi jak sam letkiewiczami, zniknął w alejach parku.</p>
+      <p data-index="10"> Wybiegł, wsiadł do małej lektyki i, otoczony służbą tudzież takimi jak sam letkiewiczami, zniknął w alejach parku.</p>
       <p data-index="11">
+        {" "}
         Przed zachodem słońca do domu{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następcy tronu
@@ -98,6 +101,7 @@ export const Chapter8: React.FC = () => {
         elegantów.
       </p>
       <p data-index="12">
+        {" "}
         Mieszkanie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następcy
@@ -111,6 +115,7 @@ export const Chapter8: React.FC = () => {
         na dwu osłach, zeszedł na pierwsze piętro, gdzie był nie zajęty pokój.
       </p>
       <p data-index="13">
+        {" "}
         Po chwili we drzwiach ukazał się{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
           Dagon
@@ -122,6 +127,7 @@ export const Chapter8: React.FC = () => {
         nowe słońce Egiptu!… Obyś żył wiecznie, a twoja sława oby dosięgła tych dalekich brzegów, kędy dobijają fenickie statki…
       </p>
       <p data-index="15">
+        {" "}
         Na rozkaz{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           księcia
@@ -217,6 +223,7 @@ export const Chapter8: React.FC = () => {
         .
       </p>
       <p data-index="22">
+        {" "}
         Usłyszawszy to,{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
           Dagon
@@ -235,6 +242,7 @@ export const Chapter8: React.FC = () => {
         niewolników!… Rabuśniki, złodzieje…
       </p>
       <p data-index="24">
+        {" "}
         W{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           księciu
@@ -284,7 +292,7 @@ export const Chapter8: React.FC = () => {
         </span>
         .
       </p>
-      <p data-index="31">Przestraszony Fenicjanin nagle zsunął się z krzesła na podłogę.</p>
+      <p data-index="31"> Przestraszony Fenicjanin nagle zsunął się z krzesła na podłogę.</p>
       <p data-index="32">
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Kto w tym mieście —
         zawołał — nie ma pieniędzy na twój rozkaz, synu słońca?… Prawda, że ja jestem nędzarz, którego złoto, klejnoty i wszystkie dzierżawy niewarte twojego spojrzenia,{" "}
@@ -497,6 +505,7 @@ export const Chapter8: React.FC = () => {
         . Ale po co służba ma wiedzieć, że ich pan pożycza ode mnie pieniądze?…
       </p>
       <p data-index="57">
+        {" "}
         Znudzony{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następca

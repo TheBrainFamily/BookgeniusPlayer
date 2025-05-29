@@ -3,7 +3,7 @@ import React from "react";
 export const Chapter16: React.FC = () => {
   return (
     <section data-chapter="16">
-      <p data-index="0">Rozdział XVI</p>
+      <p data-index="0"> Rozdział XVI</p>
       <p data-index="1">
         Tak wyglądały, zresztą dość rzadkie, chwile największego zbliżenia między{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">

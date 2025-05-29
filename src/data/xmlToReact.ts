@@ -1,9 +1,12 @@
 // Converter: xmlToReactChapters.ts
-import { DOMParser, Element } from "@xmldom/xmldom";
+import { DOMParser } from "@journeyapps/domparser";
 import fs from "fs";
 import path from "path";
 import { getTalkingMediaFilePathForName, getListeningMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
+
+let filePath;
+let xmlString;
 
 interface CharacterInfo {
   display: string;
@@ -83,16 +86,8 @@ function generateChapterComponent(chapter: Element, chapterId: string, character
       const childElement = node as unknown as Element;
       const tagName = childElement.tagName;
 
-      if (tagName === "p") {
-        const paragraphJSX = processParagraph(childElement, dataIndex++, characterMap, bookSlug, indent);
-        componentCode += paragraphJSX;
-      } else if (tagName === "h3" || tagName === "h4" || tagName === "h5") {
-        const content = escapeJSXText(childElement.textContent || "");
-        componentCode += `${indent}<${tagName} data-index="${dataIndex++}">${content}</${tagName}>\n`;
-      } else if (tagName === "h1" || tagName === "h2" || tagName === "h6") {
-        const content = escapeJSXText(childElement.textContent || "");
-        componentCode += `${indent}<${tagName} data-index="${dataIndex++}">${content}</${tagName}>\n`;
-      }
+      const paragraphJSX = processParagraph(childElement, dataIndex++, characterMap, bookSlug, indent, tagName, chapterId);
+      componentCode += paragraphJSX;
     }
   }
 
@@ -103,9 +98,72 @@ function generateChapterComponent(chapter: Element, chapterId: string, character
 
   return componentCode;
 }
+let errorCount = 0;
 
-function processParagraph(paragraphElement: Element, dataIndex: number, characterMap: Map<string, CharacterInfo>, bookSlug: BOOK_SLUGS, indent: string): string {
-  let jsxContent = `${indent}<p data-index="${dataIndex}">\n`;
+function processParagraph(
+  paragraphElement: Element,
+  dataIndex: number,
+  characterMap: Map<string, CharacterInfo>,
+  bookSlug: BOOK_SLUGS,
+  indent: string,
+  tagName: string,
+  chapterId: string,
+): string {
+  const processInlineElement = (element: Element, characterMap: Map<string, CharacterInfo>, bookSlug: BOOK_SLUGS): string => {
+    const characterInfo = characterMap.get(element.tagName);
+
+    if (characterInfo) {
+      const characterSlug = element.tagName;
+      const isTalking = element.getAttribute("talking") === "true";
+      const talkingSrc = getTalkingMediaFilePathForName(characterSlug, bookSlug);
+      const listeningSrc = getListeningMediaFilePathForName(characterSlug, bookSlug);
+
+      if (isTalking) {
+        return `<span className="character-placeholder character-talking" data-character="${characterSlug}" data-src-talking="${talkingSrc}" data-is-talking="true"/>`;
+      } else {
+        const content = escapeJSXText(element.textContent || "");
+        return `<span className="character-highlighted" data-character="${characterSlug}" data-src-listening="${listeningSrc}">${content}</span>`;
+      }
+    }
+
+    // Handle other inline elements
+    switch (element.tagName) {
+      case "note": {
+        const noteId = element.getAttribute("id");
+        const noteContent = escapeJSXText(element.textContent || "");
+        return `<a href="#fn${noteId}" className="link-note">${noteContent}</a>`;
+      }
+      case "b":
+        return `<span className="bold">${escapeJSXText(element.textContent || "")}</span>`;
+
+      case "i":
+        return `<span className="italic">${escapeJSXText(element.textContent || "")}</span>`;
+
+      case "strong":
+        return `<strong>${escapeJSXText(element.textContent?.trim() || "")}</strong>`;
+
+      default:
+        if (element.tagName[0] === element.tagName[0].toUpperCase()) {
+          const location = paragraphElement.ownerDocument.locator.position(paragraphElement.openStart);
+
+          errorCount++;
+          console.warn(`${filePath}:${location.line + 1} \n Warning: Tag name "${element.tagName}" starts with uppercase letter, this is most probably wrong Character Tag.`);
+        }
+        return `<${element.tagName}>${escapeJSXText(element.textContent || "")}</${element.tagName}>`;
+    }
+  };
+  // Attempt to get line number information from the element.
+  // Note: You may need to install/create type definitions for @journeyapps/domparser.js
+  // for proper type checking instead of using 'as any'.
+
+  if (tagName[0] === tagName[0].toUpperCase()) {
+    const location = paragraphElement.ownerDocument.locator.position(paragraphElement.openStart);
+    errorCount++;
+    console.warn(
+      `${filePath}:${location.line + 1} \n Warning: Tag name "${tagName}" starts with uppercase letter, that should never be the case, most probably the "talking character" is talking outside of an html element. Chapter ${chapterId}, paragraph ${dataIndex}. `,
+    );
+  }
+  let jsxContent = `${indent}<${tagName} data-index="${dataIndex}">`;
   const contentParts: string[] = [];
 
   for (let k = 0; k < paragraphElement.childNodes.length; k++) {
@@ -130,46 +188,8 @@ function processParagraph(paragraphElement: Element, dataIndex: number, characte
     jsxContent += `${indent}  ${contentParts.join("")}\n`;
   }
 
-  jsxContent += `${indent}</p>\n`;
+  jsxContent += `${indent}</${tagName}>\n`;
   return jsxContent;
-}
-
-function processInlineElement(element: Element, characterMap: Map<string, CharacterInfo>, bookSlug: BOOK_SLUGS): string {
-  const characterInfo = characterMap.get(element.tagName);
-
-  if (characterInfo) {
-    const characterSlug = element.tagName;
-    const isTalking = element.getAttribute("talking") === "true";
-    const talkingSrc = getTalkingMediaFilePathForName(characterSlug, bookSlug);
-    const listeningSrc = getListeningMediaFilePathForName(characterSlug, bookSlug);
-
-    if (isTalking) {
-      return `<span className="character-placeholder character-talking" data-character="${characterSlug}" data-src-talking="${talkingSrc}" data-is-talking="true"/>`;
-    } else {
-      const content = escapeJSXText(element.textContent || "");
-      return `<span className="character-highlighted" data-character="${characterSlug}" data-src-listening="${listeningSrc}">${content}</span>`;
-    }
-  }
-
-  // Handle other inline elements
-  switch (element.tagName) {
-    case "note": {
-      const noteId = element.getAttribute("id");
-      const noteContent = escapeJSXText(element.textContent || "");
-      return `<a href="#fn${noteId}" className="link-note">${noteContent}</a>`;
-    }
-    case "b":
-      return `<span className="bold">${escapeJSXText(element.textContent || "")}</span>`;
-
-    case "i":
-      return `<span className="italic">${escapeJSXText(element.textContent || "")}</span>`;
-
-    case "strong":
-      return `<strong>${escapeJSXText(element.textContent?.trim() || "")}</strong>`;
-
-    default:
-      return `<${element.tagName}>${escapeJSXText(element.textContent || "")}</${element.tagName}>`;
-  }
 }
 
 // Old escapeJSX function (lines 160-171) will be replaced by the two functions below.
@@ -265,9 +285,14 @@ export interface BookMetadata {
 // Main execution
 if (require.main === module) {
   const bookSlug: BOOK_SLUGS = CURRENT_BOOK;
-  const xmlString = fs.readFileSync(path.join(__dirname, `${bookSlug}-chapters.xml`), "utf8");
+  filePath = path.join(__dirname, `${bookSlug}-chapters.xml`);
+  xmlString = fs.readFileSync(filePath, "utf8");
 
   console.log(`Converting ${bookSlug} to React components...`);
   xmlToReactChapters(xmlString, bookSlug);
-  console.log(`Conversion complete! Check books/${bookSlug}/chapters/ directory.`);
+  if (errorCount > 0) {
+    console.error(`\n\n!!!!!!! Found ${errorCount} errors. Please fix them before running the project.\n\n`);
+  } else {
+    console.log(`Conversion complete! Check books/${bookSlug}/chapters/ directory.`);
+  }
 }

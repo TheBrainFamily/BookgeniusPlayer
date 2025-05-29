@@ -3,8 +3,9 @@ import React from "react";
 export const Chapter48: React.FC = () => {
   return (
     <section data-chapter="48">
-      <h4 data-index="0">Rozdział XXIII</h4>
+      <h4 data-index="0"> Rozdział XXIII</h4>
       <p data-index="1">
+        {" "}
         W ciągu kilku miesięcy, podczas których książę{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
@@ -25,6 +26,7 @@ export const Chapter48: React.FC = () => {
         miasta Teb.
       </p>
       <p data-index="2">
+        {" "}
         Nie był jeszcze zbyt podeszły wiek równego bogom{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           mocarza
@@ -37,6 +39,7 @@ export const Chapter48: React.FC = () => {
         bez trosk panuje wiecznie nad ludami, tak szczęśliwymi, że nikt i nigdy nie chciał stamtąd powracać.
       </p>
       <p data-index="3">
+        {" "}
         Jeszcze pół roku temu świątobliwy{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           pan
@@ -44,6 +47,7 @@ export const Chapter48: React.FC = () => {
         spełniał wszystkie czynności przywiązane do jego stanowiska, na którym opierało się bezpieczeństwo i pomyślność całego widzialnego świata.
       </p>
       <p data-index="4">
+        {" "}
         Rankiem, ledwo kur zapiał, kapłani budzili{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           władcę
@@ -56,6 +60,7 @@ export const Chapter48: React.FC = () => {
         odpędzania złych duchów.
       </p>
       <p data-index="5">
+        {" "}
         Tak oczyszczony i okadzony przez proroków szedł{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           pan
@@ -68,6 +73,7 @@ export const Chapter48: React.FC = () => {
         wszystkie członki zrastały się na powrót, bez żadnej przyczyny.
       </p>
       <p data-index="6">
+        {" "}
         Gdy{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           jego świątobliwość
@@ -77,6 +83,7 @@ export const Chapter48: React.FC = () => {
         nieszczęście.
       </p>
       <p data-index="7">
+        {" "}
         Po wskrzeszeniu i ubraniu bóstwa{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           jego świątobliwość
@@ -86,6 +93,7 @@ export const Chapter48: React.FC = () => {
         niewidzialne uderzenie, które pozbawiało go przytomności, a nawet życia.
       </p>
       <p data-index="8">
+        {" "}
         Po odprawieniu nabożeństwa szedł{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           pan
@@ -107,6 +115,7 @@ export const Chapter48: React.FC = () => {
         , zaspokoiwszy głód, opuścił salę, potrawy przeznaczone dla przodków mieli prawo zjadać książęta albo kapłani.
       </p>
       <p data-index="9">
+        {" "}
         Z jadalni udawał się{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           pan
@@ -119,6 +128,7 @@ export const Chapter48: React.FC = () => {
         wykonywania których tron zasypywano wieńcami i bukietami.
       </p>
       <p data-index="10">
+        {" "}
         Po audiencji{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           jego świątobliwość
@@ -131,6 +141,7 @@ export const Chapter48: React.FC = () => {
         miał rozstrzygać.
       </p>
       <p data-index="11">
+        {" "}
         Niekiedy jednak, gdy snów nie było albo gdy ich tłumaczenie wydało się{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraonowi
@@ -142,6 +153,7 @@ export const Chapter48: React.FC = () => {
         uśmiechał się dobrotliwie i — rozkazywał w danej sprawie postąpić tak a tak. Rozkaz ten był prawem, którego nikt nie mógł zmieniać, chyba tylko w wykonaniu szczegółów.
       </p>
       <p data-index="12">
+        {" "}
         W godzinach popołudniowych{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           jego świątobliwość
@@ -151,6 +163,7 @@ export const Chapter48: React.FC = () => {
         barbarzyńca, padał na twarz, ażeby i na jego głowę spłynęła cząstka łaski najwyższej.
       </p>
       <p data-index="13">
+        {" "}
         W takiej chwili nie było wolno uderzyć człowieka ani bydlęcia: kij podniesiony nad grzbietem sam opadał. Jeżeli zaś przestępca skazany na śmierć dowiódł, że czytano mu
         wyrok w czasie ukazania się{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -163,6 +176,7 @@ export const Chapter48: React.FC = () => {
         chodzi moc, a za nim miłosierdzie.
       </p>
       <p data-index="14">
+        {" "}
         Uszczęśliwiwszy lud swój,{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           władca
@@ -171,10 +185,12 @@ export const Chapter48: React.FC = () => {
         przypatrując się zabawom dzieci swojego domu. Gdy które z nich pięknością czy zręcznością zwróciło jego uwagę, przywoływał je do siebie i pytał:
       </p>
       <p data-index="15">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Kto ty
         jesteś, mój maleńki?
       </p>
       <p data-index="16">
+        {" "}
         — Jestem książę Binotris, syn{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           jego świątobliwości
@@ -182,10 +198,12 @@ export const Chapter48: React.FC = () => {
         — odpowiadał chłopczyk.
       </p>
       <p data-index="17">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— A jakże
         nazywa się twoja matka?
       </p>
       <p data-index="18">
+        {" "}
         — Moja matka jest pani Ameces, kobieta{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           jego świątobliwości
@@ -193,10 +211,12 @@ export const Chapter48: React.FC = () => {
         .
       </p>
       <p data-index="19">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Cóż ty
         umiesz?
       </p>
       <p data-index="20">
+        {" "}
         — Umiem już liczyć do dziesięciu i napisać: „Niech żyje wiecznie ojciec i bóg nasz, świątobliwy{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraon
@@ -207,6 +227,7 @@ export const Chapter48: React.FC = () => {
         !…'
       </p>
       <p data-index="21">
+        {" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           Pan
         </span>{" "}
@@ -218,6 +239,7 @@ export const Chapter48: React.FC = () => {
         wciąż uśmiechał się w sposób zagadkowy.
       </p>
       <p data-index="22">
+        {" "}
         Ale kogo raz dotknęła{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           boska ręka
@@ -225,6 +247,7 @@ export const Chapter48: React.FC = () => {
         , ten nie mógł zaznać niedoli w życiu i musiał być wywyższonym nad innych.
       </p>
       <p data-index="23">
+        {" "}
         Na obiad szedł{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           władca
@@ -233,6 +256,7 @@ export const Chapter48: React.FC = () => {
         kapłanom i najwyższym osobom dworu.
       </p>
       <p data-index="24">
+        {" "}
         Ku wieczorowi{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           jego świątobliwość
@@ -245,6 +269,7 @@ export const Chapter48: React.FC = () => {
         rozebrać i ułożyć do snu bóstwo cudowne. Dokonawszy tego, zamykał i pieczętował drzwi kaplicy i otoczony procesją kapłanów szedł do sypialni.
       </p>
       <p data-index="25">
+        {" "}
         Kapłani do wschodu słońca w sąsiedniej izbie odprawiali ciche modły do duszy{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraona
@@ -257,8 +282,9 @@ export const Chapter48: React.FC = () => {
         </span>
         .
       </p>
-      <p data-index="26">Był to skutek osiedlenia się w kraju różnych cudzoziemców i pogan, od których lud nauczył się lekceważenia egipskich bogów i miejsc najświętszych.</p>
+      <p data-index="26"> Był to skutek osiedlenia się w kraju różnych cudzoziemców i pogan, od których lud nauczył się lekceważenia egipskich bogów i miejsc najświętszych.</p>
       <p data-index="27">
+        {" "}
         Spoczynek{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           pana
@@ -271,6 +297,7 @@ export const Chapter48: React.FC = () => {
         zdarzyło się nic szczególnego? Niekiedy bowiem ukazywały się chmury, spadały gwiazdy częściej niż zwykle albo przelatywały nad ziemią kule ogniste.
       </p>
       <p data-index="28">
+        {" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           Pan
         </span>{" "}
@@ -279,6 +306,7 @@ export const Chapter48: React.FC = () => {
         nie objawiali nikomu, chyba kolegom swoim, chaldejskim kapłanom w Babilonie.
       </p>
       <p data-index="29">
+        {" "}
         Po północy{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           jego świątobliwość
@@ -286,12 +314,14 @@ export const Chapter48: React.FC = () => {
         mógł już spać do zapiania rannych kogutów, jeżeli uważał za stosowne.
       </p>
       <p data-index="30">
+        {" "}
         Taki pobożny i pracowity żywot jeszcze pół roku temu prowadził dobry bóg, rozdawca opieki, życia i zdrowia, dniem i nocą czuwając nad ziemią i niebem, nad widzialnym i
         niewidzialnym światem. Ale od pół roku wiecznie żyjąca dusza jego coraz częściej zaczęła przykrzyć sobie ziemskie sprawy i cielesną powłokę. Bywały dnie, że nic nie jadł, i
         noce, w czasie których wcale nie sypiał. Niekiedy podczas audiencji na łagodnym jego obliczu ukazywał się wyraz głębokiej boleści, a bardzo często, coraz częściej zdarzało
         się, że wpadał w omdlenia.
       </p>
       <p data-index="31">
+        {" "}
         Przerażona królowa{" "}
         <span className="character-highlighted" data-character="Nikotris" data-src-listening="/Pharaon/nikotris-listens.mp4">
           Nikotris
@@ -311,6 +341,7 @@ export const Chapter48: React.FC = () => {
         wzruszał ramionami i milczał, wciąż pełniąc swoje uciążliwe obowiązki.
       </p>
       <p data-index="32">
+        {" "}
         Wówczas lekarze dworscy nieznacznie zaczęli podsuwać mu najmocniejsze środki dla przywrócenia sił. Mieszano mu w winie i potrawach naprzód popioły konia i byka, później —
         lwa, nosorożca i słonia, ale potężne leki zdawały się nie wywierać żadnego skutku.{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -319,6 +350,7 @@ export const Chapter48: React.FC = () => {
         tak często omdlewał, że już zaprzestano odczytywać mu raportów.
       </p>
       <p data-index="33">
+        {" "}
         Jednego dnia dostojny{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
           Herhor
@@ -338,6 +370,7 @@ export const Chapter48: React.FC = () => {
         zgodził się, lekarze zbadali go i opukali, lecz oprócz wielkiego wychudnięcia nie znaleźli żadnej groźnej wskazówki.
       </p>
       <p data-index="34">
+        {" "}
         — Jakich uczuć doznaje{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           wasza świątobliwość
@@ -345,16 +378,19 @@ export const Chapter48: React.FC = () => {
         ? — zapytał w końcu najmędrszy lekarz.
       </p>
       <p data-index="35">
+        {" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           Faraon
         </span>{" "}
         uśmiechnął się.
       </p>
       <p data-index="36">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Czuję —
         odparł — że pora mi wrócić do słonecznego ojca.
       </p>
       <p data-index="37">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Tego{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           wasza świątobliwość
@@ -366,6 +402,7 @@ export const Chapter48: React.FC = () => {
         .
       </p>
       <p data-index="38">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Zostawię
         wam syna,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -378,6 +415,7 @@ export const Chapter48: React.FC = () => {
         . — I zaprawdę, jeżeli go słuchać będziecie, zgotuje on Egiptowi taki los, o jakim od początku świata nie słyszano.
       </p>
       <p data-index="39">
+        {" "}
         Świętego{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
           Herhora
@@ -393,6 +431,7 @@ export const Chapter48: React.FC = () => {
         , którego serce pełne litości było jak wiatr północny przynoszący deszcz polom i ochłodę ludziom.
       </p>
       <p data-index="40">
+        {" "}
         Dlatego wszyscy, niby jeden mąż, padli na ziemię jęcząc i dopóty leżeli na brzuchach swoich, aż{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraon
@@ -400,6 +439,7 @@ export const Chapter48: React.FC = () => {
         zgodził się poddać kuracji.
       </p>
       <p data-index="41">
+        {" "}
         Wtedy lekarze na cały dzień wynieśli go do ogrodu między pachnące drzewa iglaste, karmili go siekanym mięsem, poili mocnymi rosołami, mlekiem i starym winem. Dzielne te
         środki na jakiś tydzień wzmocniły{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -411,8 +451,9 @@ export const Chapter48: React.FC = () => {
         </span>
         , ażeby pił świeżą krew cieląt pochodzących od Apisa.
       </p>
-      <p data-index="42">Lecz i krew nie na długo pomogła, i trzeba było odwołać się do porady arcykapłana świątyni — złego boga Seta.</p>
+      <p data-index="42"> Lecz i krew nie na długo pomogła, i trzeba było odwołać się do porady arcykapłana świątyni — złego boga Seta.</p>
       <p data-index="43">
+        {" "}
         Wśród powszechnej trwogi ponury kapłan wszedł do sypialni{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           jego świątobliwości
@@ -420,6 +461,7 @@ export const Chapter48: React.FC = () => {
         , spojrzał na chorego i zalecił straszne lekarstwo.
       </p>
       <p data-index="44">
+        {" "}
         — Trzeba — rzekł — dawać{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraonowi
@@ -427,10 +469,12 @@ export const Chapter48: React.FC = () => {
         do picia krew z niewinnych dzieci, co dzień po kubku…
       </p>
       <p data-index="45">
+        {" "}
         Kapłani i magnaci zapełniający pokój oniemieli na taką radę. Potem zaczęli szeptać, że do tego celu najlepsze będą dzieci chłopskie; dzieci bowiem kapłańskie i wielkich
         panów już w niemowlęctwie tracą niewinność.
       </p>
       <p data-index="46">
+        {" "}
         — Wszystko mi jedno, czyje to będą dzieci — odparł okrutny kapłan — byle{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           jego świątobliwość
@@ -438,6 +482,7 @@ export const Chapter48: React.FC = () => {
         miał co dzień świeżą krew.
       </p>
       <p data-index="47">
+        {" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           Pan
         </span>
@@ -452,15 +497,18 @@ export const Chapter48: React.FC = () => {
         ocknął się. Wlepił mądre oczy w obecnych i rzekł:
       </p>
       <p data-index="48">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Krokodyl
         nie pożera swoich małych, szakal i hiena oddaje życie za swe szczenięta, a ja miałbym pić krew egipskich dzieci, które są moimi dziećmi?… Zaprawdę, nigdy bym nie
         przypuszczał, że ośmieli mi się kto zalecić niegodne lekarstwo…
       </p>
       <p data-index="49">
+        {" "}
         Kapłan złego boga upadł na ziemię, tłumacząc się, że krwi dziecięcej nikt nigdy nie pił w Egipcie, lecz że moce piekielne tym sposobem mają przywracać zdrowie. Taki
         przynajmniej środek używa się w Asyrii i Fenicji.
       </p>
       <p data-index="50">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Wstydź
         się — odparł{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -470,6 +518,7 @@ export const Chapter48: React.FC = () => {
         uwierzy, aby krew niewinnie rozlana mogła komu wyjść na pożytek…
       </p>
       <p data-index="51">
+        {" "}
         Tak mówił{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           równy nieśmiertelnym
@@ -477,6 +526,7 @@ export const Chapter48: React.FC = () => {
         . Dworacy zasłonili twarze pokalane wstydem, a arcykapłan Seta po cichu wyniósł się z komnaty.
       </p>
       <p data-index="52">
+        {" "}
         Wówczas{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
           Herhor
@@ -500,6 +550,7 @@ export const Chapter48: React.FC = () => {
         , najmędrszy kapłan z Babilonu i niezrównany cudotwórca.
       </p>
       <p data-index="53">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Dla{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           waszej świątobliwości
@@ -519,6 +570,7 @@ export const Chapter48: React.FC = () => {
         , ażeby spojrzał na ciebie, bo jestem pewny, że znajdzie dla twej choroby lekarstwo, a w żadnym wypadku nie obrazi twojej świętości bezbożnymi słowami.
       </p>
       <p data-index="54">
+        {" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           Faraon
         </span>{" "}
@@ -533,6 +585,7 @@ export const Chapter48: React.FC = () => {
         , wezwany jakimś tajemnym sposobem, przypłynął do Memfisu.
       </p>
       <p data-index="55">
+        {" "}
         Mądry{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
           Chaldejczyk
@@ -544,6 +597,7 @@ export const Chapter48: React.FC = () => {
         , taką dał radę:
       </p>
       <p data-index="56">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />— Trzeba
         znaleźć w Egipcie człowieka, którego modły dosięgają tronu Najwyższego. A gdy on szczerze pomodli się na intencję{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -556,6 +610,7 @@ export const Chapter48: React.FC = () => {
         odzyska zdrowie i będzie żył długie lata.
       </p>
       <p data-index="57">
+        {" "}
         Usłyszawszy te słowa,{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           pan
@@ -563,11 +618,13 @@ export const Chapter48: React.FC = () => {
         spojrzał na gromadę otaczających go kapłanów i rzekł:
       </p>
       <p data-index="58">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Widzę tu
         tylu mężów świętych, że gdy który zechce pomyśleć o mnie, będę zdrów…
       </p>
-      <p data-index="59">I uśmiechnął się nieznacznie.</p>
+      <p data-index="59"> I uśmiechnął się nieznacznie.</p>
       <p data-index="60">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />— Wszyscy
         jesteśmy tylko ludźmi — wtrącił cudotwórczy{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
@@ -580,10 +637,12 @@ export const Chapter48: React.FC = () => {
         nieomylny sposób odkrycia człowieka, który modli się najszczerzej i najskuteczniej.
       </p>
       <p data-index="61">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Owszem,
         odkryj mi go, ażeby został moim przyjacielem w ostatniej godzinie życia.
       </p>
       <p data-index="62">
+        {" "}
         Po przychylnej odpowiedzi{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           pana
@@ -598,6 +657,7 @@ export const Chapter48: React.FC = () => {
         .
       </p>
       <p data-index="63">
+        {" "}
         W oznaczonej porze czterech najwyższych kapłanów ubrali<a href="#fn293" className="link-note"></a>{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraona
@@ -609,6 +669,7 @@ export const Chapter48: React.FC = () => {
         do owej pustej komnaty, gdzie znajdował się tylko mały stolik.
       </p>
       <p data-index="64">
+        {" "}
         Był tam już{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
           Beroes
@@ -616,6 +677,7 @@ export const Chapter48: React.FC = () => {
         i zwrócony do wschodu modlił się.
       </p>
       <p data-index="65">
+        {" "}
         Kiedy kapłani wyszli,{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
           Chaldejczyk
@@ -631,11 +693,13 @@ export const Chapter48: React.FC = () => {
         zakreślił w powietrzu krąg. Potem zwracając się kolejno ku czterem okolicom świata szeptał:
       </p>
       <p data-index="66">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />— Amorul,
         Taneha, Latisten, Rabur, Adonay… Miej litość nade mną i oczyść mnie, Ojcze niebieski, łaskawy i miłosierny… Zlej na niegodnego sługę swoje święte błogosławieństwo i
         wyciągnij wszechmocne ramię na duchy uparte i buntownicze, ażebym mógł rozważać w spokoju twoje święte dzieła…
       </p>
       <p data-index="67">
+        {" "}
         Przerwał i zwrócił się do{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraona
@@ -643,6 +707,7 @@ export const Chapter48: React.FC = () => {
         :
       </p>
       <p data-index="68">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />—
         Mer-amen-
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -651,10 +716,12 @@ export const Chapter48: React.FC = () => {
         , arcykapłanie Amona, czy w tej czarnej kuli dostrzegasz iskrę?…
       </p>
       <p data-index="69">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Widzę
         białą iskierkę, która zdaje się poruszać jak pszczoła nad kwiatem…
       </p>
       <p data-index="70">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />—
         Mer-amen-
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -662,13 +729,15 @@ export const Chapter48: React.FC = () => {
         </span>
         , patrz w tę iskrę i nie odrywaj od niej oczu… Nie spoglądaj ani na prawo, ani na lewo, ani na nic, cokolwiek wychylałoby się z boków…
       </p>
-      <p data-index="71">I znowu szeptał:</p>
+      <p data-index="71"> I znowu szeptał:</p>
       <p data-index="72">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />—
         Baralanensis, Baldachiensis, przez potężnych książąt Genio, Lachiadae, ministrów piekielnego państwa, wywołuję was i wzywam mocą najwyższego Majestatu, którą jestem
         obdarzony, zaklinam was i rozkazuję…
       </p>
       <p data-index="73">
+        {" "}
         W tym miejscu{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraon
@@ -676,6 +745,7 @@ export const Chapter48: React.FC = () => {
         wstrząsnął się ze wstrętem.
       </p>
       <p data-index="74">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />—
         Mer-amen-
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -688,11 +758,13 @@ export const Chapter48: React.FC = () => {
         .
       </p>
       <p data-index="75">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Spoza
         kuli wychyla się jakaś okropna głowa… Rude włosy jeżą się… twarz zielonkowatej barwy… źrenice wywrócone na dół, że tylko białka oczu widać… Usta szeroko otwarte, jakby
         chciały krzyczeć…
       </p>
       <p data-index="76">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />— To
         trwoga — rzekł{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
@@ -701,6 +773,7 @@ export const Chapter48: React.FC = () => {
         i zwrócił ponad kulę ostrze sztyletu.
       </p>
       <p data-index="77">
+        {" "}
         Nagle{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraon
@@ -708,26 +781,31 @@ export const Chapter48: React.FC = () => {
         aż zgiął się ku ziemi.
       </p>
       <p data-index="78">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Dosyć!… —
         zawołał — dlaczego mnie tak męczysz?… Strudzone ciało chce spocząć, dusza ulecić w krainę wiecznego światła… A wy nie tylko nie pozwalacie mi umrzeć, ale jeszcze wymyślacie
         nowe udręczenia… Ach!… nie chcę…
       </p>
       <p data-index="79">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />— Co
         widzisz?…
       </p>
       <p data-index="80">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Od sufitu
         co chwilę spuszczają się niby dwie nogi pajęcze, straszliwe… Grube jak palmy, kosmate, zakończone hakami… Czuję, że nad moją głową unosi się potwornej wielkości pająk i
         osnuwa mnie siecią z lin okrętowych…
       </p>
       <p data-index="81">
+        {" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
           Beroes
         </span>{" "}
         zwrócił sztylet w górę.
       </p>
       <p data-index="82">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />—
         Mer-amen-
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -736,11 +814,13 @@ export const Chapter48: React.FC = () => {
         — rzekł znowu — ciągle patrz w iskrę i nie oglądaj się na boki…
       </p>
       <p data-index="83">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />— Oto
         znak, który podnoszę w waszej obecności… — szeptał. — Otom jest potężnie uzbrojony w pomoc boską, przewidujący i nieustraszony, który wywołuję was przez zaklęcia… Aye,
         Saraye, Aye, Saraye, Aye, Saraye… przez imię wszechmocnego i wiecznie żyjącego Boga…
       </p>
       <p data-index="84">
+        {" "}
         W tej chwili na twarzy{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraona
@@ -748,6 +828,7 @@ export const Chapter48: React.FC = () => {
         ukazał się spokojny uśmiech.
       </p>
       <p data-index="85">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Zdaje mi
         się — rzekł{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -756,6 +837,7 @@ export const Chapter48: React.FC = () => {
         — że widzę Egipt… cały Egipt… Tak, to jest Nil… pustynia… Tu Memfis, tam Teby…
       </p>
       <p data-index="86">
+        {" "}
         Istotnie widział Egipt, cały Egipt, ale nie większy od alei, która ciągnęła się przez ogród jego pałacu. Dziwny obraz miał jednak tę własność, że gdy{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraon
@@ -763,15 +845,18 @@ export const Chapter48: React.FC = () => {
         skierował na jaki punkt baczniejszą uwagę, punkt ten rozrastał się w okolicę prawie naturalnej wielkości.
       </p>
       <p data-index="87">
+        {" "}
         Słońce już zachodziło, oblewając ziemię złotawo-purpurowym światłem. Dzienne ptaki zasiadały do snu, nocne — budziły się w kryjówkach. W pustyni ziewały hieny i szakale, a
         drzemiący lew przeciągał potężne cielsko, gotując się do pościgów za łupem.
       </p>
       <p data-index="88">
+        {" "}
         Nilowy rybak śpiesznie wywłóczył sieci, wielkie statki transportowe przybijały do brzegów. Znużony rolnik odejmował od żurawia kubeł, którym przez cały dzień czerpał wodę,
         inny powoli wracał z pługiem do swej lepianki. W miastach zapalano światła, w świątyniach kapłani zbierali się na nabożeństwo wieczorne. Na gościńcach opadał kurz i
         milknęły skrzypiące koła wozów. Ze szczytu pylonów odezwały się jękliwe głosy wzywające naród do modlitwy.
       </p>
       <p data-index="89">
+        {" "}
         W chwilę później{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraon
@@ -780,31 +865,36 @@ export const Chapter48: React.FC = () => {
         nawet z kopalń. Z początku każdy z nich pędził w górę jak strzała, lecz wnet spotykał pod niebem innego srebrnopiórego ptaka, który zabiegał mu drogę, uderzał go z całej
         siły i — obaj martwi upadali na ziemię.
       </p>
-      <p data-index="90">Były to niezgodne modlitwy ludzkie, które nawzajem przeszkadzały sobie wzbić się do tronu Przedwiecznego…</p>
+      <p data-index="90"> Były to niezgodne modlitwy ludzkie, które nawzajem przeszkadzały sobie wzbić się do tronu Przedwiecznego…</p>
       <p data-index="91">
+        {" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           Faraon
         </span>{" "}
         wytężył słuch… Z początku dolatywał go tylko szelest skrzydeł; niebawem jednak mógł odróżniać wyrazy.
       </p>
       <p data-index="92">
+        {" "}
         I oto słyszał chorego, który modlił się o powrót do zdrowia, a jednocześnie lekarza, który błagał, ażeby jego pacjent chorował jak najdłużej. Gospodarz prosił Amona o
         czuwanie nad jego spichrzem i oborą; złodziej wyciągał ręce do nieba, ażeby bez przeszkody mógł wyprowadzić cudzą krowę i napełnić wory cudzym ziarnem.
       </p>
-      <p data-index="93">Modlitwy ich roztrącały się jak kamienie wyrzucone z procy.</p>
+      <p data-index="93"> Modlitwy ich roztrącały się jak kamienie wyrzucone z procy.</p>
       <p data-index="94">
+        {" "}
         Wędrowiec w pustyni upadał na piasek, żebrząc o wiatr północny, który by mu przyniósł kroplę wody; morski żeglarz bił czołem o pokład, ażeby jeszcze przez tydzień wiały
         wiatry ze wschodu. Rolnik chciał, aby prędzej wysychały bagna po wylewie; ubogi rybak żądał, by bagna nie wysychały nigdy.
       </p>
-      <p data-index="95">I ich modły rozbijały się wzajemnie i nie dosięgły boskich uszu Amona.</p>
+      <p data-index="95"> I ich modły rozbijały się wzajemnie i nie dosięgły boskich uszu Amona.</p>
       <p data-index="96">
+        {" "}
         Największy zgiełk panował nad kamieniołomami, gdzie przestępcy, skuci w łańcuchy, za pomocą klinów moczonych wodą rozsadzali ogromne skały. Tam partia robotników dziennych
         błagała o noc, aby spać się położyć, podczas, gdy budzeni przez dozorców robotnicy partii nocnej bili się w piersi, aby nigdy nie zachodziło słońce. Tam kupcy, którzy
         nabywali odłupane i obrobione kamienie, modlili się, ażeby jak najwięcej było w kopalni przestępców, podczas gdy dostawcy żywności leżeli na brzuchach wzdychając, ażeby
         pomór tępił robotników i umożliwił dostawcom większe zyski.
       </p>
-      <p data-index="97">Więc i modły ludzi z kopalń nie dolatywały do nieba.</p>
+      <p data-index="97"> Więc i modły ludzi z kopalń nie dolatywały do nieba.</p>
       <p data-index="98">
+        {" "}
         Na zachodniej granicy ujrzał{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraon
@@ -812,8 +902,9 @@ export const Chapter48: React.FC = () => {
         dwie armie gotujące się do boju. Obie leżały na piaskach wzywając Amona o wytępienie nieprzyjaciół. Libijczycy życzyli hańby i śmierci Egipcjanom; Egipcjanie miotali
         przekleństwa na Libijczyków.
       </p>
-      <p data-index="99">Modły tych i tamtych, jak dwa stada jastrzębi, starły się nad ziemią i spadły na pustynię. Amon nawet ich nie dojrzał.</p>
+      <p data-index="99"> Modły tych i tamtych, jak dwa stada jastrzębi, starły się nad ziemią i spadły na pustynię. Amon nawet ich nie dojrzał.</p>
       <p data-index="100">
+        {" "}
         I gdziekolwiek zwrócił{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraon
@@ -832,48 +923,56 @@ export const Chapter48: React.FC = () => {
         nie pomarły drapieżniki.
       </p>
       <p data-index="101">
+        {" "}
         I tak na całym świecie panowała rozterka. Każdy chciał tego, co lękiem napełniało innych; każdy prosił o własne dobro, nie pytając, czy nie zrobi szkody bliźniemu.
       </p>
       <p data-index="102">
+        {" "}
         Przeto modlitwy ich, chociaż były jak srebrzyste ptaki wzbijające się ku niebu, nie dosięgły przeznaczenia. I boski Amon, którego nie dochodził żaden głos z ziemi, oparłszy
         ręce na kolanach, coraz więcej zagłębiał się w rozpatrywaniu swojej własnej boskości, a na świecie coraz częściej rządziła ślepa moc i przypadek.
       </p>
       <p data-index="103">
+        {" "}
         Wtem{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraon
         </span>{" "}
         usłyszał głos kobiecy:
       </p>
-      <p data-index="104">— Psujak!… Psujaczek!… wracaj, zbytniku, do chaty, bo już pora na modlitwę…</p>
-      <p data-index="105">— Zaraz… zaraz!… — odpowiedział głos dziecięcy.</p>
+      <p data-index="104"> — Psujak!… Psujaczek!… wracaj, zbytniku, do chaty, bo już pora na modlitwę…</p>
+      <p data-index="105"> — Zaraz… zaraz!… — odpowiedział głos dziecięcy.</p>
       <p data-index="106">
+        {" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           Władca
         </span>{" "}
         spojrzał w tamtym kierunku i zobaczył ubogą lepiankę pisarza od bydła. Właściciel jej przy blaskach zachodzącego słońca kończył pisać swój rejestr, jego żona rozbijała
         kamieniem pszenicę na placki, a przed domem, jak młody koziołek, biegał i skakał sześcioletni chłopczyna, śmiejąc się nie wiadomo z czego.
       </p>
-      <p data-index="107">Widać upajało go pełne woni powietrze wieczorne.</p>
-      <p data-index="108">— Psujak!… Psujaczek… chodź mi tu na modlitwę… — powtarzała kobieta.</p>
-      <p data-index="109">— Zaraz!… zaraz!….</p>
-      <p data-index="110">I znowu biegał, i cieszył się jak szalony.</p>
+      <p data-index="107"> Widać upajało go pełne woni powietrze wieczorne.</p>
+      <p data-index="108"> — Psujak!… Psujaczek… chodź mi tu na modlitwę… — powtarzała kobieta.</p>
+      <p data-index="109"> — Zaraz!… zaraz!….</p>
+      <p data-index="110"> I znowu biegał, i cieszył się jak szalony.</p>
       <p data-index="111">
+        {" "}
         Nareszcie matka, widząc, że słońce zaczyna pogrążać się w piaskach pustyni, odłożyła swój kamień i wyszedłszy na dziedziniec, schwyciła biegającego chłopca jak źrebaka.
         Opierał się, lecz w końcu uległ przemocy. Matka zaś, wciągnąwszy go do lepianki, czym prędzej posadziła go na podłodze i przytrzymała ręką, ażeby jej znowu nie uciekł.
       </p>
-      <p data-index="112">— Nie kręć się — mówiła — podwiń nogi i siedź prosto, a ręce złóż i podnieś do góry… A niedobre dziecko!…</p>
+      <p data-index="112"> — Nie kręć się — mówiła — podwiń nogi i siedź prosto, a ręce złóż i podnieś do góry… A niedobre dziecko!…</p>
       <p data-index="113">
+        {" "}
         Chłopak wiedział, że już nie wykręci się od modlitwy, więc aby jak najprędzej wyrwać się znowu na podwórze, wzniósł pobożnie oczy i ręce do nieba i cieniutkim, a krzykliwym
         głosem prawił zadyszany:
       </p>
       <p data-index="114">
+        {" "}
         — Dziękuję ci, dobry boży Amonie, żeś tatkę chronił dzisiaj od przygód, a mamie dał pszenicy na placki… I jeszcze co?… Żeś stworzył niebo i ziemię i zesłał jej Nil, który
         nam chleb przynosi… I jeszcze co?… Aha, już wiem!… I jeszcze dziękuję ci, że tak pięknie na dworze, że rosną kwiaty, śpiewają ptaki i że palma rodzi słodkie daktyle. A za
         te dobre rzeczy, które nam darowałeś, niechaj wszyscy kochają cię jak ja i chwalą lepiej ode mnie, bom jeszcze mały i nie uczyli mnie mądrości. No, już dosyć…
       </p>
-      <p data-index="115">— Złe dziecko! — mruknął pisarz od bydła schylony nad swoim rejestrem. — Złe dziecko niedbale oddaje cześć Amonowi…</p>
+      <p data-index="115"> — Złe dziecko! — mruknął pisarz od bydła schylony nad swoim rejestrem. — Złe dziecko niedbale oddaje cześć Amonowi…</p>
       <p data-index="116">
+        {" "}
         Ale{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           faraon
@@ -881,15 +980,17 @@ export const Chapter48: React.FC = () => {
         w czarodziejskiej kuli dostrzegł zupełnie co innego. Oto modlitwa rozzbytkowanego chłopczyny jak skowronek wzbiła się ku niebu i trzepocąc skrzydłami wznosiła się coraz
         wyżej i wyżej, aż do tronu, gdzie wiekuisty Amon, z rękoma na kolanach, zagłębiał się w rozpatrywaniu swojej własnej wszechmocy.
       </p>
-      <p data-index="117">Potem wzniosła się jeszcze wyżej aż na wysokość głowy bóstwa i śpiewała mu cienkim dziecięcym głosikiem:</p>
-      <p data-index="118">— A za te dobre rzeczy, które nam darowałeś, niechaj wszyscy kochają cię jak ja…</p>
+      <p data-index="117"> Potem wzniosła się jeszcze wyżej aż na wysokość głowy bóstwa i śpiewała mu cienkim dziecięcym głosikiem:</p>
+      <p data-index="118"> — A za te dobre rzeczy, które nam darowałeś, niechaj wszyscy kochają cię jak ja…</p>
       <p data-index="119">
+        {" "}
         Na te słowa pogrążone w sobie bóstwo otworzyło oczy i padł z nich na świat promień szczęścia. Od nieba do ziemi zaległa niezmierna cisza. Ustał wszelki ból, wszelki strach,
         wszelka krzywda. Świszczący pocisk zawisnął w powietrzu, lew zatrzymał się w skoku na łanię, podniesiony kij nie spadł na plecy niewolnika. Chory zapomniał o cierpieniu,
         zbłąkany w pustyni o głodzie, więzień o łańcuchach. Ucichła burza i stanęła fala morska gotowa zatopić okręt. I na całej ziemi zapanował taki spokój, że słońce, już ukryte
         pod widnokręgiem, znowu podniosło promieniejącą głowę…
       </p>
       <p data-index="120">
+        {" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
           Faraon
         </span>{" "}
@@ -903,6 +1004,7 @@ export const Chapter48: React.FC = () => {
         .
       </p>
       <p data-index="121">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />—
         Mer-amen-
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -915,6 +1017,7 @@ export const Chapter48: React.FC = () => {
         — znalazłżeś człowieka, którego modły trafią do podnóżka Przedwiecznego?
       </p>
       <p data-index="122">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Tak —
         odparł{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
@@ -923,14 +1026,17 @@ export const Chapter48: React.FC = () => {
         .
       </p>
       <p data-index="123">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />— Jestże
         on księciem, rycerzem, prorokiem czy może tylko zwyczajnym pustelnikiem?
       </p>
       <p data-index="124">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Jest to
         mały, sześcioletni chłopczyk, który o nic Amona nie prosił, lecz za wszystko dziękował.
       </p>
       <p data-index="125">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Phut-Beroes" data-src-talking="/Pharaon/phut-beroes-speaks.mp4" data-is-talking="true" />— A
         wiesz, gdzie on mieszka? — pytał{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
@@ -939,6 +1045,7 @@ export const Chapter48: React.FC = () => {
         .
       </p>
       <p data-index="126">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Wiem, ale
         nie chcę wykradać dla siebie potęgi jego modlitw. Świat,{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
@@ -952,6 +1059,7 @@ export const Chapter48: React.FC = () => {
         ?
       </p>
       <p data-index="127">
+        {" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
           Beroes
         </span>{" "}

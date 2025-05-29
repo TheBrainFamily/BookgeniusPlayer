@@ -3,8 +3,9 @@ import React from "react";
 export const Chapter15: React.FC = () => {
   return (
     <section data-chapter="15">
-      <p data-index="0">Rozdział XV</p>
+      <p data-index="0"> Rozdział XV</p>
       <p data-index="1">
+        {" "}
         Na następny dzień{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
@@ -16,6 +17,7 @@ export const Chapter15: React.FC = () => {
         przybiła duża łódź, napełniona greckim żołnierstwem w wysokich hełmach i połyskliwych pancerzach.
       </p>
       <p data-index="2">
+        {" "}
         Na komendę, szesnastu ludzi uzbrojonych w tarcze i krótkie włócznie wysiadło na brzeg i uszykowało się we dwa szeregi. Już mieli maszerować do domu{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sary
@@ -31,6 +33,7 @@ export const Chapter15: React.FC = () => {
         .
       </p>
       <p data-index="3">
+        {" "}
         Stanęli i stali bez ruchu jak dwa rzędy kolumn obitych błyszczącą blachą. Za posłańcem poszedł{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
           Patrokles
@@ -38,6 +41,7 @@ export const Chapter15: React.FC = () => {
         , w hełmie z piórami i purpurowej tunice, na której miał złotą zbroję, ozdobioną na piersiach wizerunkiem głowy kobiecej najeżonej wężami, zamiast włosów.
       </p>
       <p data-index="4">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę
         </span>{" "}
@@ -48,6 +52,7 @@ export const Chapter15: React.FC = () => {
         , lecz z chłodną twarzą rzekł:
       </p>
       <p data-index="5">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Powiedz, wasza dostojność, greckim żołnierzom z moich pułków, że nie będę z nimi odbywał musztry, dopóki jego świątobliwość nasz pan nie mianuje mnie po raz drugi ich
         wodzem. Zaszczyt ten utracili, wydając po szynkowniach godne pijaków okrzyki, które mnie obrażają. Zwracam też uwagę waszej dostojności, że greckie pułki są nie dość karne.
@@ -56,6 +61,7 @@ export const Chapter15: React.FC = () => {
         najmiłościwszego władcy i — zawsze milczeć. Proszę, abyś, wasza dostojność, uwagi te zakomunikował moim pułkom, i życzę waszej dostojności wszelkiego powodzenia.
       </p>
       <p data-index="6">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Patrokles" data-src-talking="/Pharaon/patrokles-speaks.mp4" data-is-talking="true" />— Będzie tak,
         jak powiedziałeś, wasza dostojność — odparł{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
@@ -64,6 +70,7 @@ export const Chapter15: React.FC = () => {
         . Obrócił się na pięcie i wyprostowany poszedł z chrzęstem do swojej łodzi.
       </p>
       <p data-index="7">
+        {" "}
         Wiedział on o rozprawach żołnierzy w szynkowniach, a w tej chwili zrozumiał, że stała się jakaś przykrość{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           następcy tronu
@@ -71,6 +78,7 @@ export const Chapter15: React.FC = () => {
         , którego wojsko ubóstwiało. Gdy więc dosięgnął stojącej nad brzegiem garstki zbrojnych, przybrał minę bardzo zagniewaną i wściekle machając rękoma zawołał:
       </p>
       <p data-index="8">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Patrokles" data-src-talking="/Pharaon/patrokles-speaks.mp4" data-is-talking="true" />— Waleczni
         żołnierze greccy!… — parszywe psy, oby was trąd stoczył… Jeżeli od tej pory którykolwiek Grek wymówi w szynku imię{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -84,16 +92,18 @@ export const Chapter15: React.FC = () => {
         </span>
         . Oby żyli wiecznie!…
       </p>
-      <p data-index="9">— Niech żyją wiecznie!… — powtórzyli żołnierze.</p>
+      <p data-index="9"> — Niech żyją wiecznie!… — powtórzyli żołnierze.</p>
       <p data-index="10">
+        {" "}
         Wszyscy siedli na statek pochmurni. Ale około Memfisu{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
           Patrokles
         </span>{" "}
         rozpogodził zmarszczone czoło i kazał zaśpiewać pieśń o córce kapłana, która tak lubiła wojsko, że do łóżka kładła lalkę, a sama całą noc przepędzała w budce szyldwachów.
       </p>
-      <p data-index="11">W takt tej pieśni najlepiej maszerowało się i najraźniej uderzały wiosła.</p>
+      <p data-index="11"> W takt tej pieśni najlepiej maszerowało się i najraźniej uderzały wiosła.</p>
       <p data-index="12">
+        {" "}
         Nad wieczorem do folwarku{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sary
@@ -105,12 +115,14 @@ export const Chapter15: React.FC = () => {
         .
       </p>
       <p data-index="13">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę
         </span>{" "}
         i tego dostojnika przyjął w bramie ogrodowej. Może przez surowość, a może — aby nie zmuszać go do wchodzenia w dom swojej nałożnicy i Żydówki.
       </p>
       <p data-index="14">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Chciałem — rzekł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -119,8 +131,9 @@ export const Chapter15: React.FC = () => {
         — zobaczyć się z tobą i powiedzieć, że między moim chłopstwem krążą jakieś nieprzystojne gadaniny o zniżeniu podatków czy o czymś takim… Pragnę, ażeby dowiedzieli się
         chłopi, że ja im podatków nie zmniejszę. Jeżeli zaś który, mimo ostrzeżeń, uprze się w swej głupocie i będzie rozprawiał o podatkach, dostanie kije…
       </p>
-      <p data-index="15">— Może lepiej, aby zapłacił karę… Utena czy drachmę, jak rozkaże wasza dostojność — wtrącił naczelny rządca.</p>
+      <p data-index="15"> — Może lepiej, aby zapłacił karę… Utena czy drachmę, jak rozkaże wasza dostojność — wtrącił naczelny rządca.</p>
       <p data-index="16">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Owszem, niech płaci karę… — odparł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -128,16 +141,19 @@ export const Chapter15: React.FC = () => {
         </span>{" "}
         po chwilowym zawahaniu się.
       </p>
-      <p data-index="17">— A teraz może by dać kije pewnej liczbie niesforniejszych, ażeby lepiej pamiętali miłościwy rozkaz?… — szepnął rządca.</p>
+      <p data-index="17"> — A teraz może by dać kije pewnej liczbie niesforniejszych, ażeby lepiej pamiętali miłościwy rozkaz?… — szepnął rządca.</p>
       <p data-index="18">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Owszem, można dać niesforniejszym kije.
       </p>
       <p data-index="19">
+        {" "}
         — Ośmielam się zrobić uwagę waszej dostojności — szeptał wciąż pochylony rządca — że chłopi przez pewien czas istotnie mówili o zniesieniu podatków, buntowani przez
         jakiegoś nieznanego człowieka. Ale od paru dni nagle ucichli…
       </p>
       <p data-index="20">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— No,
         więc w takim razie można im nie dawać kijów — zauważył{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -145,13 +161,15 @@ export const Chapter15: React.FC = () => {
         </span>
         .
       </p>
-      <p data-index="21">— Chyba w formie zapobiegawczej?… — wtrącił rządca.</p>
+      <p data-index="21"> — Chyba w formie zapobiegawczej?… — wtrącił rządca.</p>
       <p data-index="22">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Czy
         nie szkoda kijów?
       </p>
-      <p data-index="23">— Tego towaru nigdy nam nie zabraknie.</p>
+      <p data-index="23"> — Tego towaru nigdy nam nie zabraknie.</p>
       <p data-index="24">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— W
         każdym razie… z umiarkowaniem — upominał go{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -160,8 +178,9 @@ export const Chapter15: React.FC = () => {
         . — Nie chcę… nie chcę, ażeby do jego świątobliwości doszło, że bez potrzeby dręczę chłopów… Za buntownicze gawędy trzeba bić i ściągać kary pieniężne, ale gdy nie ma
         powodu, można okazać się wspaniałomyślnym.
       </p>
-      <p data-index="25">— Rozumiem — odparł rządca, patrząc w oczy księciu. — Niech tyle krzyczą, ile potrzeba, ażeby nie szeptali bluźnierstw…</p>
+      <p data-index="25"> — Rozumiem — odparł rządca, patrząc w oczy księciu. — Niech tyle krzyczą, ile potrzeba, ażeby nie szeptali bluźnierstw…</p>
       <p data-index="26">
+        {" "}
         Obie te mowy: do{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
           Patroklesa
@@ -172,8 +191,9 @@ export const Chapter15: React.FC = () => {
         </span>{" "}
         ziewnął i oglądając się dokoła znudzonym wzrokiem, rzekł do siebie:
       </p>
-      <p data-index="27">„Zrobiłem, com mógł… A teraz nic nie będę robił, o ile potrafię…'</p>
+      <p data-index="27"> „Zrobiłem, com mógł… A teraz nic nie będę robił, o ile potrafię…'</p>
       <p data-index="28">
+        {" "}
         W tej chwili od strony budynków folwarcznych doleciał księcia cichy jęk i gęste uderzenia.{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
@@ -185,6 +205,7 @@ export const Chapter15: React.FC = () => {
         , syn Rubena, wali kijem jednego ze swoich podwładnych, uspakajając go przy tym:
       </p>
       <p data-index="29">
+        {" "}
         <span
           className="character-placeholder character-talking"
           data-character="Ezechiel-syn-Rubena"
@@ -193,14 +214,16 @@ export const Chapter15: React.FC = () => {
         />
         — A cicho! a milcz, ty podłe bydlę!…
       </p>
-      <p data-index="30">Bity zaś parobek, leżąc na ziemi, zatykał ręką usta, aby nie krzyczeć.</p>
+      <p data-index="30"> Bity zaś parobek, leżąc na ziemi, zatykał ręką usta, aby nie krzyczeć.</p>
       <p data-index="31">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę
         </span>{" "}
         w pierwszej chwili rzucił się jak pantera w stronę budynków. Nagle stanął.
       </p>
       <p data-index="32">
+        {" "}
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Cóż
         mu zrobię?… — szepnął. — Przecież to folwark{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
@@ -208,8 +231,9 @@ export const Chapter15: React.FC = () => {
         </span>
         , a ten Żyd jest jej krewnym…
       </p>
-      <p data-index="33">Przygryzł usta i skrył się między drzewami, tym bardziej że egzekucja była już skończona.</p>
+      <p data-index="33"> Przygryzł usta i skrył się między drzewami, tym bardziej że egzekucja była już skończona.</p>
       <p data-index="34">
+        {" "}
         „Więc to tak gospodarują pokorni Żydzi?… — myślał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -217,6 +241,7 @@ export const Chapter15: React.FC = () => {
         . — Więc to tak?… Na mnie patrzy jak wystraszony pies, a bije parobków?… Czy oni wszyscy tacy?…'
       </p>
       <p data-index="35">
+        {" "}
         I pierwszy raz zbudziło się w duszy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzesa
@@ -228,6 +253,7 @@ export const Chapter15: React.FC = () => {
         pod pozorami dobroci może ukrywać obłudę.
       </p>
       <p data-index="36">
+        {" "}
         W{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sarze
@@ -235,6 +261,7 @@ export const Chapter15: React.FC = () => {
         istotnie zachodziły pewne zmiany, przede wszystkim moralne.
       </p>
       <p data-index="37">
+        {" "}
         Od pierwszej chwili, kiedy spotkała księcia w pustynnej dolince,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
@@ -258,6 +285,7 @@ export const Chapter15: React.FC = () => {
         wpadła w stan oszołomienia.
       </p>
       <p data-index="38">
+        {" "}
         Za żadne skarby, za cenę życia nie wyrzekłaby się{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzesa
@@ -267,10 +295,12 @@ export const Chapter15: React.FC = () => {
         przerażona, nie pojmująca, co się z nią dzieje.
       </p>
       <p data-index="39">
+        {" "}
         Nadto, zanim zdążyła oswoić się z nowymi wrażeniami, zatrwożyła ją niechęć okolicznego ludu do niej, do Żydówki, potem wizyta jakichś nieznajomych pań, wreszcie napad na
         folwark.
       </p>
       <p data-index="40">
+        {" "}
         To, że{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
@@ -279,6 +309,7 @@ export const Chapter15: React.FC = () => {
         człowieka, który, gdyby mu się podobało, miał prawo przelewać cudzą krew, zabijać…
       </p>
       <p data-index="41">
+        {" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sara
         </span>{" "}
@@ -290,13 +321,15 @@ export const Chapter15: React.FC = () => {
         i nowy kierunek nadało jej uczuciom.
       </p>
       <p data-index="42">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę
         </span>{" "}
         myśląc, że jest raniona, zerwał jej z głowy opaskę, lecz zobaczywszy stłuczenie, zawołał:
       </p>
-      <p data-index="43">„To tylko siniak?… Jak ten siniak zmienia twarz!…'</p>
+      <p data-index="43"> „To tylko siniak?… Jak ten siniak zmienia twarz!…'</p>
       <p data-index="44">
+        {" "}
         Wobec tego słówka{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sara
@@ -304,6 +337,7 @@ export const Chapter15: React.FC = () => {
         zapomniała o bólu i trwodze. Ogarnął ją nowy niepokój: więc ona zmieniła się tak, aż to zdziwiło księcia?… A on tylko zdziwił się!…
       </p>
       <p data-index="45">
+        {" "}
         Siniak zniknął w parę dni, ale w duszy{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sary
@@ -315,14 +349,17 @@ export const Chapter15: React.FC = () => {
         i bać się, aby jej nie porzucił.
       </p>
       <p data-index="46">
+        {" "}
         I jeszcze jedna dręczyła ją troska: że ona czuje się wobec księcia sługą i niewolnicą. Ona była i chciała być jego najwierniejszą sługą, najbardziej oddaną niewolnicą,
         nieodstępną jak cień. Ale jednocześnie pragnęła, aby on ją, przynajmniej w chwili pieszczot, nie traktował jak pan i władca.
       </p>
       <p data-index="47">
+        {" "}
         Przecież ona była jego, a on jej. Z jakiej więc racji on nie okazuje, że należy do niej choć trochę, lecz każdym słowem i ruchem daje poznać, że dzieli ich jakaś przepaść…
         Jaka?… Alboż nie ona trzymała go w swoich objęciach? Alboż nie on całował jej usta i piersi?…
       </p>
       <p data-index="48">
+        {" "}
         Pewnego dnia przypłynął do niej{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -339,6 +376,7 @@ export const Chapter15: React.FC = () => {
         śmielej niż ona.
       </p>
       <p data-index="49">
+        {" "}
         Nie mogła uspokoić się i znienawidziła mądre zwierzę, które jej zabierało część pieszczot, wcale nie dbając o nie i zachowując się wobec pana z taką poufałością, na jaką
         ona zdobyć się nie śmiała. Nawet nie potrafiłaby mieć tak obojętnej miny albo patrzeć w inną stronę, gdy na jej głowie leżała ręka{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
@@ -347,6 +385,7 @@ export const Chapter15: React.FC = () => {
         .
       </p>
       <p data-index="50">
+        {" "}
         Niedawno znowu{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           książę
@@ -358,6 +397,7 @@ export const Chapter15: React.FC = () => {
         wybuchła. Jak to, więc on pozwoliłby się pieścić tym nagim, bezwstydnym kobietom?… I Jehowa, widząc to z wysokiego nieba, na potworne kobiety nie rzucił gromu?…
       </p>
       <p data-index="51">
+        {" "}
         Wprawdzie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
@@ -369,10 +409,12 @@ export const Chapter15: React.FC = () => {
         ; ten tylko wywarły skutek, że postanowiła nie myśleć już o niczym poza obrębem swojej miłości.
       </p>
       <p data-index="52">
+        {" "}
         Co będzie jutro?… o to mniejsza. A kiedy u nóg księcia śpiewała pieśń o utrapieniach, od kolebki do grobu ścigających ród ludzki, wypowiedziała w niej stan własnej duszy i
         swoją ostatnią nadzieję — w Bogu.
       </p>
       <p data-index="53">
+        {" "}
         Na dziś{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Ramzes
@@ -384,6 +426,7 @@ export const Chapter15: React.FC = () => {
         najcięższa gorycz.
       </p>
       <p data-index="54">
+        {" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Książę
         </span>{" "}
@@ -391,13 +434,14 @@ export const Chapter15: React.FC = () => {
         gdy był po drugiej stronie rzeki, w obrębie królewskiego parku.
       </p>
       <p data-index="55">
+        {" "}
         Był z nią, ale myślał o czym innym, a{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Sara
         </span>{" "}
         nawet odgadnąć nie mogła — o czym. Obejmował ją albo bawił się jej włosami, ale patrzył w stronę Memfisu, na ogromne pylony zamku faraona albo — nie wiadomo gdzie.
       </p>
-      <p data-index="56">Czasem nawet nie odpowiadał na jej pytania albo nagle spojrzał na nią jak zbudzony, jakby dziwił się, że ją widzi obok siebie.</p>
+      <p data-index="56"> Czasem nawet nie odpowiadał na jej pytania albo nagle spojrzał na nią jak zbudzony, jakby dziwił się, że ją widzi obok siebie.</p>
     </section>
   );
 };

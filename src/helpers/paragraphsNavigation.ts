@@ -17,7 +17,7 @@ interface Bridge {
 
 let _bridge: Bridge = {
   get: () => ({ chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 }),
-   
+
   set: () => {},
 };
 export const __setLocationBridge = (b: Bridge) => (_bridge = b);

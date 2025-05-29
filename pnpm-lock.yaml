@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@journeyapps/domparser':
+        specifier: ^0.4.1
+        version: 0.4.1
       '@openai/realtime-api-beta':
         specifier: github:openai/openai-realtime-api-beta
         version: https://codeload.github.com/openai/openai-realtime-api-beta/tar.gz/a5cb94824f625423858ebacb9f769226ca98945f
@@ -1325,6 +1328,9 @@ packages:
   '@jest/types@29.6.3':
     resolution: {integrity: sha512-u3UPsIilWKOM3F9CXtrG8LEJmNxwoCQC/XVj4IKYXvvpx7QIi/Kg1LI5uDmDpKlac62NUtX7eLjRh+jVZcLOzw==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
+
+  '@journeyapps/domparser@0.4.1':
+    resolution: {integrity: sha512-rZ2gxAVVwE6tklS2lm04nkI52BCUjECVO8R9+bG9Uz8L9/ZBqxhuXu23jKX66G0Dc3evx5HWmuEuunOW7/Mahw==}
 
   '@jridgewell/gen-mapping@0.3.8':
     resolution: {integrity: sha512-imAbBGkb+ebQyxKgzv5Hu2nmROxoDOXHh80evxdoXNOrvAnVx7zimzc1Oo5h9RlfV4vPXaE2iM5pOFbvOCClWA==}
@@ -6873,6 +6879,8 @@ snapshots:
       '@types/node': 22.15.18
       '@types/yargs': 17.0.33
       chalk: 4.1.2
+
+  '@journeyapps/domparser@0.4.1': {}
 
   '@jridgewell/gen-mapping@0.3.8':
     dependencies:

@@ -3,7 +3,7 @@ import React from "react";
 export const Chapter4: React.FC = () => {
   return (
     <section data-chapter="4">
-      <p data-index="0">Rozdział IV</p>
+      <p data-index="0"> Rozdział IV</p>
       <p data-index="1">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
           Następca tronu
@@ -130,7 +130,7 @@ export const Chapter4: React.FC = () => {
         </span>
         .
       </p>
-      <p data-index="20">Chwila ciszy.</p>
+      <p data-index="20"> Chwila ciszy.</p>
       <p data-index="21">
         <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />— Rozstąpić się!…
         — powtórzył ten sam wielki głos co pierwej.
@@ -472,12 +472,12 @@ export const Chapter4: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Z woli jego
         świątobliwości, wraz ze skończeniem manewrów, najwyższa władza wojskowa znowu przechodzi w moje ręce.
       </p>
-      <p data-index="62">Obecni pochylili głowy.</p>
+      <p data-index="62"> Obecni pochylili głowy.</p>
       <p data-index="63">
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Władzy tej wypada
         mi użyć przede wszystkim na wymiar sprawiedliwości…
       </p>
-      <p data-index="64">Oficerowie zaczęli spoglądać po sobie.</p>
+      <p data-index="64"> Oficerowie zaczęli spoglądać po sobie.</p>
       <p data-index="65">
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
@@ -780,7 +780,7 @@ export const Chapter4: React.FC = () => {
         . — Niewolnikiem, którego żenią, rozwodzą, biją, sprzedają, niekiedy mordują, a zawsze każą mu pracować, obiecując w dodatku, że i na tamtym świecie również będzie
         niewolnikiem.
       </p>
-      <p data-index="97">Adiutant wzruszył ramionami.</p>
+      <p data-index="97"> Adiutant wzruszył ramionami.</p>
       <p data-index="98">
         — Dziwny ty jesteś, choć tak mądry! — rzekł. — Przecie widzisz, że każdy z nas zajmuje jakieś stanowisko — niskie, mniej niskie lub bardziej niskie, na którym musi
         pracować. A czy martwi cię to, że nie jesteś faraonem i że twoim grobem nie będzie piramida?… Wcale nie myślisz o tym, bo rozumiesz, że taki jest porządek świata. Każdy
