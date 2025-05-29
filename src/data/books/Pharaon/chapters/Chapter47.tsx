@@ -6,26 +6,26 @@ export const Chapter47: React.FC = () => {
       <h4 data-index="0">Rozdział XXII</h4>
       <p data-index="1">
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          Kapłan{" "}
+          Kapłan
         </span>{" "}
         spod oka przypatrzył się{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>{" "}
         i znalazł go bardzo zmienionym.{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         był blady, prawie schudł w kilka godzin, a jego oczy straciły blask i zapadły się pod czoło.
       </p>
       <p data-index="2">
         Usłyszawszy, o co chodzi Grekom,{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          Mentezufis{" "}
+          Mentezufis
         </span>{" "}
         ani chwili nie wahał się z wydaniem zwłok{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
-          Patroklesa{" "}
+          Patroklesa
         </span>
         .
       </p>
@@ -33,29 +33,29 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Grecy
         mają słuszność — rzekł{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          święty mąż{" "}
+          święty mąż
         </span>{" "}
         — że moglibyśmy udręczać po śmierci cień{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
-          Patroklesa{" "}
+          Patroklesa
         </span>
         . Ale są głupcami przypuszczając, że którykolwiek kapłan egipski czy chaldejski dopuściłby się podobnej zbrodni.
       </p>
       <p data-index="4">Niech zabiorą ciało swego ziomka, jeżeli sądzą, że pod opieką ich obyczajów będzie szczęśliwszy po śmierci!…</p>
       <p data-index="5">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         natychmiast wysłał oficera ze stosownym rozkazem, ale{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          Mentezufisa{" "}
+          Mentezufisa
         </span>{" "}
         zatrzymał. Widocznie chciał mu coś powiedzieć, choć wahał się.
       </p>
       <p data-index="6">
         Po dłuższym milczeniu{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         nagle zapytał:
       </p>
@@ -63,11 +63,11 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Zapewne wiesz,{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          święty proroku{" "}
+          święty proroku
         </span>
         , że jedna z moich kobiet,{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
-          Sara{" "}
+          Sara
         </span>
         , umarła, a jej syn został zamordowany?…
       </p>
@@ -75,13 +75,13 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Stało się
         to — odparł{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          Mentezufis{" "}
+          Mentezufis
         </span>{" "}
         — tej samej nocy, kiedy opuściliśmy Pi-Bast…
       </p>
       <p data-index="9">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         zerwał się.
       </p>
@@ -93,7 +93,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Panie —
         rzekł{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          kapłan{" "}
+          kapłan
         </span>{" "}
         — naczelny wódz w przededniu bitwy nie ma ani ojca, ani dziecka, ani nikogo zgoła, tylko — swoją armię i nieprzyjaciół. Mogliżeśmy cię w tych ważnych czasach niepokoić
         podobnymi wiadomościami?
@@ -102,7 +102,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— To
         prawda — odparł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         po namyśle. — Gdyby nas dzisiaj zaskoczono, nie wiem, czy potrafiłbym dobrze pokierować wojskiem… I w ogóle nie wiem, czy już kiedykolwiek zdołam odzyskać spokój…
       </p>
@@ -114,17 +114,17 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Czas
         wszystko leczy… Czas i modlitwa — szepnął{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          kapłan{" "}
+          kapłan
         </span>
         .
       </p>
       <p data-index="15">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         pokiwał głową i znowu w namiocie zaległa taka cisza, że słychać było piasek wysypujący się z klepsydry.{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Następca{" "}
+          Następca
         </span>{" "}
         znowu ocknął się.
       </p>
@@ -132,7 +132,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Powiedz mi — rzekł —{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          ojcze święty{" "}
+          ojcze święty
         </span>
         , jeżeli nie należy to do wielkich tajemnic, jaka jest naprawdę różnica między spaleniem zmarłego i zrobieniem z niego mumii? Bo chociaż słyszałem coś w szkole, nie
         rozumiem jednak tej kwestii, do której Grecy tak wielką przywiązują wagę.
@@ -141,7 +141,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— My
         przywiązujemy daleko większą, największą… — odparł{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          kapłan{" "}
+          kapłan
         </span>
         . — Świadczą o tym nasze miasta zmarłych, które zajęły cały skraj pustyni zachodniej. Świadczą piramidy, które są grobami faraonów starego państwa, i mnemonie, olbrzymie
         groby, kute w skałach, dla królów naszej epoki.
@@ -156,7 +156,7 @@ export const Chapter47: React.FC = () => {
       </p>
       <p data-index="20">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         otrząsnął się.
       </p>
@@ -168,7 +168,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Owszem.
         Teraz właśnie robią ich mumie. A zarówno{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
-          Sara{" "}
+          Sara
         </span>
         , jak i twój syn będą mieli wszystko, cokolwiek przydać im się może w długiej wędrówce.
       </p>
@@ -176,7 +176,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Doprawdy?… — spytał, jakby ucieszony,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         .
       </p>
@@ -184,13 +184,13 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Zaręczam,
         że tak jest — odparł{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          kapłan{" "}
+          kapłan
         </span>{" "}
         — i że zrobione będzie wszystko, co potrzeba, abyś znalazł ich, panie, szczęśliwymi, gdy i tobie kiedyś uprzykrzy się ziemski żywot.
       </p>
       <p data-index="25">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Następca{" "}
+          Następca
         </span>
         , słuchając tego, był bardzo wzruszony.
       </p>
@@ -198,11 +198,11 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Więc myślisz,{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          święty mężu{" "}
+          święty mężu
         </span>{" "}
         — spytał — że odnajdę kiedyś mego syna i będę mógł powiedzieć tej kobiecie:{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
-          Saro{" "}
+          Saro
         </span>
         , ja wiem, że byłem dla ciebie zbyt surowy?…
       </p>
@@ -214,11 +214,11 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Mów… mów o tym!… — zawołał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         . — Człowiek dopóty nie dba o groby, dopóki nie złoży w nich cząstki samego siebie… A mnie spotkała ta niedola, i właśnie wówczas, gdym myślał, że z wyjątkiem{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>
         , nie ma potężniejszego nade mnie!
       </p>
@@ -226,7 +226,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />—
         Zapytywałeś, panie — zaczął{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          Mentezufis{" "}
+          Mentezufis
         </span>{" "}
         — jaka jest różnica między spaleniem zmarłego i zrobieniem z niego mumii? Taka sama jak między zniszczeniem szaty a schowaniem jej do komory. Gdy szata jest przechowana,
         może się niejednokrotnie przydać; a gdy masz tylko jedną, byłoby szaleństwem palić ją…
@@ -235,7 +235,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Tego nie rozumiem — wtrącił{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         . — Tego nie wykładacie nawet w wyższej szkole…
       </p>
@@ -243,14 +243,14 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Ale
         możemy powiedzieć{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy faraona{" "}
+          następcy faraona
         </span>
         .
       </p>
       <p data-index="32">
         Wasza dostojność wiesz — ciągnął{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          kapłan{" "}
+          kapłan
         </span>{" "}
         — że ludzka istota składa się z trzech części: ciała, iskry bożej i cienia, czyli<strong>Ka</strong>, który łączy ciało z iskrą bożą.
       </p>
@@ -274,7 +274,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Dziwne rzeczy!… — szepnął{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>
         .
       </p>
@@ -302,7 +302,7 @@ export const Chapter47: React.FC = () => {
       </p>
       <p data-index="41">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         rozmyślał, wreszcie rzekł:
       </p>
@@ -313,7 +313,7 @@ export const Chapter47: React.FC = () => {
       <p data-index="43">
         O tym, że jest bezwodna pustynia — ciągnął{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         — wiem, bo ją widzę, bom tonął w jej piaskach i doświadczyłem jej żarów. O tym, że są krainy, w których woda kamienieje, a para zamienia się na białe puchy, także wiem, bo
         mówili wiarogodni<a href="#fn290" className="link-note"></a> świadkowie…
@@ -323,7 +323,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Mylisz
         się, wasza dostojność — odparł{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          kapłan{" "}
+          kapłan
         </span>
         . — Cienie ukazywały się ludziom nieraz, a nawet opowiadały im swoje tajemnice.
       </p>
@@ -335,7 +335,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
         któż to żył tysiące lat?… — zapytał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         .
       </p>
@@ -343,7 +343,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Żył, żyje
         i żyć będzie święty stan kapłański — odpowiedział{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          Mentezufis{" "}
+          Mentezufis
         </span>
         . — On to przed trzydziestoma tysiącami lat osiedlił się nad Nilem, on przez ten czas badał niebo i ziemię, on stworzył naszą mądrość i nakreślił plany wszystkich pól, tam,
         kanałów, piramid i świątyń…
@@ -352,7 +352,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— To
         prawda — przerwał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         . — Stan kapłański jest mądry i potężny, ale — gdzie są cienie?… Kto je widział i z nimi rozmawiał?…
       </p>
@@ -360,7 +360,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Wiedz o
         tym, panie — prawił{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          Mentezufis{" "}
+          Mentezufis
         </span>{" "}
         — że cień jest w każdym żyjącym człowieku. A jak są ludzie odznaczający się ogromną siłą lub arcybystrym wzrokiem, tak są i tacy ludzie, którzy posiadają niezwykły dar, że
         — mogą za życia wydzielać swój własny cień…
@@ -380,7 +380,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Znam ja takie cienie!… — szepnął ironicznie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         .
       </p>
@@ -388,7 +388,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Muszę
         dodać — ciągnął{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          Mentezufis{" "}
+          Mentezufis
         </span>{" "}
         — że nie tylko ludzie, ale — zwierzęta, rośliny, kamienie, budowle i sprzęty mają takie same cienie. Tylko (dziwna rzecz!) cień przedmiotu martwego nie jest martwy, ale
         posiada życie: rusza się, przesuwa się z miejsca na miejsce, nawet myśli i objawia to za pomocą rozmaitych znaków, najczęściej — pukania.
@@ -407,34 +407,34 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Opowiadasz ciekawe rzeczy,{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          święty mężu{" "}
+          święty mężu
         </span>{" "}
         — odparł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
-        — pozwól więc, że i ja ci coś powiem. Jednej nocy, w Pi-Bast, pokazano mi „mój cień\'… Był zupełnie podobny do mnie i nawet tak ubrany jak ja. Wnet jednak przekonałem się,
+        — pozwól więc, że i ja ci coś powiem. Jednej nocy, w Pi-Bast, pokazano mi „mój cień'… Był zupełnie podobny do mnie i nawet tak ubrany jak ja. Wnet jednak przekonałem się,
         że to nie jest żaden cień, ale żywy człowiek, niejaki{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykon{" "}
+          Lykon
         </span>
         , nikczemny morderca mego syna…
       </p>
       <p data-index="59">
         Występki swoje zaczął od tego, że straszył Fenicjankę{" "}
         <span className="character-highlighted" data-character="Pieszczota" data-src-listening="/Pharaon/pieszczota-listens.mp4">
-          Kamę{" "}
+          Kamę
         </span>
         . Wyznaczyłem nagrodę za schwytanie go… Ale nasza policja nie tylko nie pojmała go, lecz nawet pozwoliła mu wykraść tą samą{" "}
         <span className="character-highlighted" data-character="Pieszczota" data-src-listening="/Pharaon/pieszczota-listens.mp4">
-          Kamę{" "}
+          Kamę
         </span>{" "}
         i zabić niewinne dziecko.
       </p>
       <p data-index="60">
         Dziś słyszę, że schwytano{" "}
         <span className="character-highlighted" data-character="Pieszczota" data-src-listening="/Pharaon/pieszczota-listens.mp4">
-          Kamę{" "}
+          Kamę
         </span>
         ; ale o tym nędzniku nic nie wiem. Zapewne żyje na swobodzie zdrów, wesół i zasobny w skradzione skarby; może nawet sposobi się do nowej zbrodni!…
       </p>
@@ -442,11 +442,11 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mentezufis" data-src-talking="/Pharaon/mentezufis-speaks.mp4" data-is-talking="true" />— Zbyt
         wiele osób ściga tego nikczemnika, ażeby w końcu nie został pojmany — rzekł{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          Mentezufis{" "}
+          Mentezufis
         </span>
         . — A gdy raz wpadnie w nasze ręce, Egipt zapłaci mu za zgryzoty, jakie uczynił jego{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy tronu{" "}
+          następcy tronu
         </span>
         . Wierzaj mi, panie, możesz mu z góry przebaczyć wszystkie występki, kara bowiem odpowie ich wielkości.
       </p>
@@ -454,22 +454,22 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Wolałbym go sam mieć w rękach — odparł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
-        . — Zawsze to niebezpieczna rzecz taki „cień\' za życia!…<a href="#fn292" className="link-note"></a>
+        . — Zawsze to niebezpieczna rzecz taki „cień' za życia!…<a href="#fn292" className="link-note"></a>
       </p>
       <p data-index="63">
         Nie bardzo zbudowany podobnym zakończeniem swego wykładu,{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          święty Mentezufis{" "}
+          święty Mentezufis
         </span>{" "}
         pożegnał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>
         . Po nim wszedł do namiotu{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         , zawiadamiając, że Grecy już układają stos dla swojego wodza i że kilkanaście libijskich kobiet zgodziło się płakać w czasie pogrzebowego obchodu.
       </p>
@@ -477,12 +477,12 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Będziemy przy tym — odparł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>
         . — Czy wiesz, że zabito mego syna?… Takie małe dziecko!… Gdy nosiłem go, śmiał się i wyciągał do mnie rączki!… Niepojęta rzecz, ile nikczemności może pomieścić ludzkie
         serce! Gdyby ten podły{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykon{" "}
+          Lykon
         </span>{" "}
         targnął się na moje życie, jeszcze rozumiałbym, nawet przebaczył… Ale mordować dziecko…
       </p>
@@ -490,11 +490,11 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— A o
         poświęceniu{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
-          Sary{" "}
+          Sary
         </span>{" "}
         mówiono ci, panie? — spytał{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         .
       </p>
@@ -502,26 +502,26 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Tak. Zdaje mi się, że była to najwierniejsza z moich kobiet i że niesłusznie postąpiłem z nią… Ale jak to może być — zawołał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         , bijąc pięścią w stół — ażeby dotychczas nie schwytano nędznika{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykona{" "}
+          Lykona
         </span>
         ?… Przysięgli mi na to Fenicjanie… obiecałem nagrodę{" "}
         <span className="character-highlighted" data-character="Naczelnik-policji-w-Pi-Bast" data-src-listening="/Pharaon/naczelnik-policji-w-pi-bast-listens.mp4">
-          naczelnikowi policji{" "}
+          naczelnikowi policji
         </span>
         …
       </p>
       <p data-index="67">W tym musi coś być!…</p>
       <p data-index="68">
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>{" "}
         zbliżył się do{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         i szepnął:
       </p>
@@ -529,29 +529,29 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Był u mnie
         posłaniec od{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hirama{" "}
+          Hirama
         </span>
         , który obawiając się gniewu kapłanów kryje się, zanim opuści Egipt… Otóż{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         podobno dowiedział się od{" "}
         <span className="character-highlighted" data-character="Naczelnik-policji-w-Pi-Bast" data-src-listening="/Pharaon/naczelnik-policji-w-pi-bast-listens.mp4">
-          naczelnika policji w Pi-Bast{" "}
+          naczelnika policji w Pi-Bast
         </span>
         , że…{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykon{" "}
+          Lykon
         </span>{" "}
         został schwytany… Ale cicho!… — dodał wylękniony{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         .
       </p>
       <p data-index="70">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         na chwilę wpadł w gniew, lecz wnet się opanował.
       </p>
@@ -562,11 +562,11 @@ export const Chapter47: React.FC = () => {
       <p data-index="72">
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Bo{" "}
         <span className="character-highlighted" data-character="Naczelnik-policji-w-Pi-Bast" data-src-listening="/Pharaon/naczelnik-policji-w-pi-bast-listens.mp4">
-          naczelnik policji{" "}
+          naczelnik policji
         </span>{" "}
         musiał oddać go{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          świętemu Mefresowi{" "}
+          świętemu Mefresowi
         </span>{" "}
         na jego rozkaz w imieniu najwyższej rady…
       </p>
@@ -574,35 +574,35 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Aha… aha!… — powtarzał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>
         . — Zatem czcigodnemu{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresowi{" "}
+          Mefresowi
         </span>{" "}
         i najwyższej radzie potrzebny jest człowiek tak bardzo podobny do mnie?… Aha!… Memu dziecku i{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
-          Sarze{" "}
+          Sarze
         </span>{" "}
         mają sprawić piękny pogrzeb… balsamują ich zwłoki… Ale mordercę ukrywają w bezpiecznym miejscu… Aha!…
       </p>
       <p data-index="74">
         I{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          święty Mentezufis{" "}
+          święty Mentezufis
         </span>{" "}
         jest wielkim mędrcem. Opowiedział mi dziś wszystkie tajemnice zagrobowego życia, wytłumaczył mi cały pogrzebowy rytuał, jakbym ja sam był kapłanem co najmniej trzeciego
         stopnia… Ale o schwytaniu{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykona{" "}
+          Lykona
         </span>{" "}
         i o ukryciu tego zabójcy przez{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresa{" "}
+          Mefresa
         </span>{" "}
         ani wspomniał!… Widocznie święci ojcowie troskliwsi są o drobne sekreta{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy tronu{" "}
+          następcy tronu
         </span>{" "}
         aniżeli o wielkie tajemnice przyszłego życia… Aha!…
       </p>
@@ -610,7 +610,7 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Zdaje się,
         panie, że dziwić cię to nie powinno — wtrącił{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         . — Wiesz, że kapłani już podejrzewają cię o niechęć i mają się na ostrożności… Tym więcej…
       </p>
@@ -621,7 +621,7 @@ export const Chapter47: React.FC = () => {
       <p data-index="77">
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Że{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          jego świątobliwość{" "}
+          jego świątobliwość
         </span>{" "}
         jest bardzo chory. Bardzo…
       </p>
@@ -629,26 +629,26 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Aha!… ojciec mój chory, a ja tymczasem na czele wojska muszę pilnować pustyni, ażeby z niej piaski nie uciekły… Dobrze, żeś mi to przypomniał!… Tak,{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          jego świątobliwość{" "}
+          jego świątobliwość
         </span>{" "}
         musi być ciężko chory, gdyż kapłani są bardzo czuli dla mnie… Wszystko mi pokazują i o wszystkim mówią, wyjąwszy tego, że{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         ukrył{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykona{" "}
+          Lykona
         </span>
         .
       </p>
       <p data-index="79">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>{" "}
         — rzekł nagle{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         — czy i dziś sądzisz, że mogę rachować na wojsko?
       </p>
@@ -668,11 +668,11 @@ export const Chapter47: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Dobrze — odparł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>
         . — Możemy teraz oddać ostatnią usługę{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
-          Patroklesowi{" "}
+          Patroklesowi
         </span>
         .
       </p>

@@ -7,7 +7,7 @@ export const Chapter25: React.FC = () => {
       <p data-index="1">
         Tego samego dnia, w Memfisie, Fenicjanin{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         , dostojny bankier następcy tronu, leżał na kanapie pod werendą swego pałacu. Otaczały go wonne krzaki iglaste, hodowane w wazonach. Dwaj czarni niewolnicy chłodzili
         bogacza wachlarzami, a on, bawiąc się młodą małpką, słuchał rachunków, które czytał mu jego pisarz.
@@ -15,14 +15,14 @@ export const Chapter25: React.FC = () => {
       <p data-index="2">
         W tej chwili niewolnik, uzbrojony w miecz, hełm, włócznię i tarczę (bankier lubił wojskowe ubiory), zameldował dostojnego{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsuna{" "}
+          Rabsuna
         </span>
         , który był kupcem fenickim osiadłym w Memfis.
       </p>
       <p data-index="3">
         Gość wszedł, nisko kłaniając się, i w ten sposób opuścił powieki, że dostojny{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         rozkazał pisarzowi i niewolnikom, ażeby wynieśli się spod werendy. Następnie, jako człowiek przezorny, obejrzał wszystkie kąty i rzekł do gościa:
       </p>
@@ -31,7 +31,7 @@ export const Chapter25: React.FC = () => {
       </p>
       <p data-index="5">
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>{" "}
         zaczął bez wstępu:
       </p>
@@ -39,13 +39,13 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Czy dostojność
         wasza wie, że przyjechał z Tyru książę{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         ?…
       </p>
       <p data-index="7">
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         podskoczył na kanapie.
       </p>
@@ -61,11 +61,11 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Co to jest
         nieporozumienie?… — krzyczał{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Ten rozbójnik okradł mnie, zniszczył, zrujnował… Kiedy ja posłałem moje statki, za innymi tyryjskimi, na zachód po srebro, sternicy łotra{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hirama{" "}
+          Hirama
         </span>{" "}
         rzucali na nie ogień, chcieli je zepchnąć na mieliznę… No, i moje okręty wróciły z niczym, opalone i potrzaskane… Żeby jego spalił ogień niebieski!… — zakończył
         rozwścieczony bankier.
@@ -73,14 +73,14 @@ export const Chapter25: React.FC = () => {
       <p data-index="11">
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— A jeżeli{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         ma dla waszej dostojności dobry interes? — spytał gość flegmatycznie.
       </p>
       <p data-index="12">
         Burza szalejąca w piersiach{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagona{" "}
+          Dagona
         </span>{" "}
         od razu ucichła.
       </p>
@@ -108,7 +108,7 @@ export const Chapter25: React.FC = () => {
       <p data-index="19">
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagonie{" "}
+          Dagonie
         </span>{" "}
         — rzekł — miej ty rozum.
       </p>
@@ -116,25 +116,25 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Dlaczego ja nie mam
         rozumu i dlaczego ty,{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         , nie mówisz do mnie — dostojność?…
       </p>
       <p data-index="21">
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         , nie bądź ty głupi!… — reflektował gość. — Jeżeli ty nie pójdziesz do niego ani on do ciebie, to jakże wy zrobicie interes?
       </p>
       <p data-index="22">
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Ty jesteś głupi,{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         ! — znowu wybuchnął bankier. — Bo gdybym ja poszedł do{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hirama{" "}
+          Hirama
         </span>
         , to, niech mi ręka uschnie, że straciłbym na tej grzeczności połowę zarobku.
       </p>
@@ -143,20 +143,20 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Teraz rzekłeś
         mądre słowo. Więc ja tobie coś powiem. Przyjdź do mnie i{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         przyjdzie do mnie, i wy obaj u mnie obgadacie ten interes.
       </p>
       <p data-index="25">
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         przechylił głowę i przymrużywszy oko filuternie zapytał:
       </p>
       <p data-index="26">
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Ej,{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         !… Powiedz od razu: ile on tobie dał?
       </p>
@@ -171,7 +171,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— To jest interes
         dla całej Fenicji, więc ja na nim zarobku nie potrzebuję — odparł oburzony{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         .
       </p>
@@ -183,7 +183,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Żeby mi się nie
         wypłacili, jeżeli ja co na tym zarobię! Niech tylko Fenicja nie straci! — zakrzyczał z gniewem{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         .
       </p>
@@ -191,26 +191,26 @@ export const Chapter25: React.FC = () => {
       <p data-index="33">
         Nad wieczorem dostojny{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         wsiadł w lektykę niesioną przez sześciu niewolników. Poprzedzali go dwaj laufrowie z kijami i dwaj z pochodniami; zaś za lektyką szło czterech służących uzbrojonych od stóp
         do głów. Nie dla bezpieczeństwa, lecz że{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         od pewnego czasu lubił otaczać się zbrojnymi jak rycerz.
       </p>
       <p data-index="34">
         Wysiadł z lektyki z wielką powagą i podtrzymywany przez dwu ludzi (trzeci niósł nad nim parasol) wszedł do domu{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsuna{" "}
+          Rabsuna
         </span>
         .
       </p>
       <p data-index="35">
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Gdzież jest ten…{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         ? — zapytał dumnie gospodarza.
       </p>
@@ -236,7 +236,7 @@ export const Chapter25: React.FC = () => {
       <p data-index="41">
         Po krótkim oporze{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         ustąpił, a w chwilę później, na znak gospodarza domu, wszedł do drugiej komnaty. Jednocześnie z dalszych pokojów wysunął się niewysoki człowiek z siwą brodą, ubrany w
         złocistą togę i złotą obręcz na głowie.
@@ -245,52 +245,52 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Oto jest — rzekł
         gospodarz stojąc na środku — oto jest jego miłość książę{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         , członek najwyższej rady tyryjskiej… Oto jest dostojny{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         , bankier{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         następcy tronu i namiestnika w Dolnym Egipcie.
       </p>
       <p data-index="43">
         Dwaj dostojnicy ukłonili się sobie z założonymi na piersiach rękoma i usiedli przy oddzielnych stolikach, na środku sali.{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         nieco odsunął togę, aby ukazać wielki złoty medal na swej szyi, w odpowiedzi na co{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         zaczął bawić się grubym złotym łańcuchem, który otrzymał od{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia Ramzesa{" "}
+          księcia Ramzesa
         </span>
         .
       </p>
       <p data-index="44">
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Ja,{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         — odezwał się starzec — pozdrawiam pana, panie{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         , życzę panu dużego majątku i powodzenia w interesach.
       </p>
       <p data-index="45">
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Ja,{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         , pozdrawiam pana, panie{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         , i życzę panu tego samego, co pan mnie życzy…
       </p>
@@ -298,7 +298,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Już się pan chcesz
         kłócić?… — przerwał zirytowany{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -306,7 +306,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Gdzie ja się
         kłócę?…{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         , ty powiedz, czy ja się kłócę?…
       </p>
@@ -317,7 +317,7 @@ export const Chapter25: React.FC = () => {
       <p data-index="49">
         Po chwili namysłu{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         zaczął:
       </p>
@@ -329,7 +329,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Oni tylko to
         przysłali mi? — spytał drwiącym tonem{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         .
       </p>
@@ -337,7 +337,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Co pan chcesz, żeby
         oni panu przysyłali?… — odparł{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         , podnosząc głos.
       </p>
@@ -347,7 +347,7 @@ export const Chapter25: React.FC = () => {
       </p>
       <p data-index="54">
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         kilka razy głębiej odetchnął i rzekł:
       </p>
@@ -359,13 +359,13 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Czy morze zatopiło
         wam Tyr albo Sydon?… — spytał z uśmiechem{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         .
       </p>
       <p data-index="57">
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         splunął i zapytał:
       </p>
@@ -385,7 +385,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Może w Fenicji —
         odparł{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Ale już w Asyrii u lada satrapy czekasz pan w sieniach trzy dni na posłuchanie, a kiedy cię przyjmą, leżysz na brzuchu jak każdy handlarz fenicki.
       </p>
@@ -393,7 +393,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— A pan co byś robił
         wobec dzikiego człowieka, który może pana na pal wbić?… — zakrzyczał{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -401,11 +401,11 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Co ja bym robił,
         nie wiem — rzekł{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Ale w Egipcie ja sobie siedzę na jednej kanapie z{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcą tronu{" "}
+          następcą tronu
         </span>
         , który dziś jest namiestnikiem.
       </p>
@@ -417,7 +417,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Zgoda!… zgoda, że
         ten pan jest zwyczajny fenicki handlarz, a mnie nie chce oddać szacunku… — zawołał{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         .
       </p>
@@ -425,7 +425,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Ja mam sto
         okrętów!… — wrzasnął{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -433,7 +433,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— A jego
         świątobliwość{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         ma dwadzieścia tysięcy miast, miasteczek i osad…
       </p>
@@ -441,13 +441,13 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Wasze dostojności
         utopicie ten interes i całą Fenicję!… — odezwał się już podniesionym głosem{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         .
       </p>
       <p data-index="69">
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         zacisnął pięści, lecz umilkł i odpoczął.
       </p>
@@ -455,7 +455,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Musisz jednak
         przyznać, wasza dostojność — rzekł po chwili do{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagona{" "}
+          Dagona
         </span>{" "}
         — że z tych dwudziestu tysięcy miast jego świątobliwość niewiele ma naprawdę.
       </p>
@@ -463,7 +463,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Chcesz powiedzieć,
         wasza miłość — odparł{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         — że siedm tysięcy miast należy do świątyń i siedm tysięcy do wielkich panów?… Zawsze jednak jego świątobliwości zostaje siedm tysięcy na czysto…
       </p>
@@ -475,7 +475,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Mówi prawdę wasza
         miłość — rzekł{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Zawsze jednak jego świątobliwości zostaje ze dwa tysiące miast bardzo bogatych…
       </p>
@@ -483,18 +483,18 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Czy was Tyfon
         opętał?… — wrzasnął z kolei{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         . — Będziecie teraz wyliczali miasta{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>
         , bodajby go…
       </p>
       <p data-index="75">
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Psyt!… — szepnął{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         , zrywając się z krzesła.
       </p>
@@ -502,7 +502,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Kiedy nad Fenicją
         wisi nieszczęście!… — dokończył{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         .
       </p>
@@ -510,14 +510,14 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Niechże ja się raz
         dowiem, jakie nieszczęście?… — przerwał{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         .
       </p>
       <p data-index="78">
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Więc daj mówić{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiramowi{" "}
+          Hiramowi
         </span>
         , to się dowiesz — odparł gospodarz.
       </p>
@@ -526,13 +526,13 @@ export const Chapter25: React.FC = () => {
       </p>
       <p data-index="80">
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Czy wasza
-        dostojność wiesz, co się stało w zajeździe „Pod Okrętem\', u brata naszego,{" "}
+        dostojność wiesz, co się stało w zajeździe „Pod Okrętem', u brata naszego,{" "}
         <span className="character-highlighted" data-character="Asarhadon" data-src-listening="/Pharaon/asarhadon-listens.mp4">
-          Asarhadona{" "}
+          Asarhadona
         </span>
         ?… — zaczął{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -540,7 +540,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Nie mam braci
         pomiędzy szynkarzami!… — wtrącił szyderczo{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         .
       </p>
@@ -548,7 +548,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Milcz!… —
         wrzasnął rozgniewany{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>{" "}
         i schwycił za rękojeść sztyletu. — Jesteś głupi jak pies, który szczeka przez sen…
       </p>
@@ -556,7 +556,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Czego on się
         gniewa, ten… ten handlujący kośćmi?… — odparł{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         i również sięgnął do noża.
       </p>
@@ -567,7 +567,7 @@ export const Chapter25: React.FC = () => {
       <p data-index="85">
         Przez chwilę wszystkim trzem drżały nozdrza i błyszczały oczy. Wreszcie{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         , który uspokoił się najpierwej, zaczął znowu, jakby nigdy nic nie zaszło.
       </p>
@@ -575,11 +575,11 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Parę miesięcy temu
         stanął w zajeździe{" "}
         <span className="character-highlighted" data-character="Asarhadon" data-src-listening="/Pharaon/asarhadon-listens.mp4">
-          Asarhadona{" "}
+          Asarhadona
         </span>{" "}
         niejaki{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Phut{" "}
+          Phut
         </span>
         , z miasta Harranu…
       </p>
@@ -587,14 +587,14 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Miał odebrać pięć
         talentów od jakiegoś kapłana — wtrącił{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         .
       </p>
       <p data-index="88">
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Cóż dalej? — spytał{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -606,30 +606,30 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Masz rozum dziecka,
         a gadatliwość kobiety — rzekł{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         . — Ten harrańczyk nie jest harrańczykiem, ale Chaldejczykiem, i nie nazywa się{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Phut{" "}
+          Phut
         </span>
         , ale{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Beroes{" "}
+          Beroes
         </span>
         …
       </p>
       <p data-index="91">
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Beroes{" "}
+          Beroes
         </span>
         ?…{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Beroes{" "}
+          Beroes
         </span>
         ?… — powtórzył przypominając sobie{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Gdzieś słyszałem to nazwisko…
       </p>
@@ -637,11 +637,11 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Słyszałeś!… — mówił
         z pogardą{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         . —{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Beroes{" "}
+          Beroes
         </span>{" "}
         to najmędrszy kapłan w Babilonie, doradca książąt asyryjskich i samego króla…
       </p>
@@ -649,17 +649,17 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Niech on będzie
         doradcą, byle nie{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>
         , co mnie to obchodzi?… — rzekł bankier.
       </p>
       <p data-index="94">
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>{" "}
         podniósł się z krzesła i grożąc{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagonowi{" "}
+          Dagonowi
         </span>{" "}
         pięścią pod nosem, zawołał:
       </p>
@@ -669,7 +669,7 @@ export const Chapter25: React.FC = () => {
       </p>
       <p data-index="96">
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         zbladł i odparł spokojnym głosem:
       </p>
@@ -681,7 +681,7 @@ export const Chapter25: React.FC = () => {
       <p data-index="98">
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         , posłuchaj mnie — dodał po chwili. — Ja życzę twojej żonie i dzieciom, i cieniom twoich ojców, ażebyś ty o nich tyle dbał, ile ja o każdy okręt fenicki, o każdy kamień
         Tyru, Sydonu, a nawet Zarpath i Achsibu…
@@ -689,11 +689,11 @@ export const Chapter25: React.FC = () => {
       <p data-index="99">
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         mówi prawdę — wtrącił{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -701,7 +701,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Ja nie dbam o
         Fenicję!… — ciągnął bankier, zapalając się. — A ilu ja sprowadziłem tu Fenicjan, ażeby robili majątki, i — co mam z tego?… Ja nie dbam!…{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         zepsuł mi dwa okręty i pozbawił mnie wielkich zarobków, a przecie, kiedy chodzi o Fenicję, ja usiadłem z nim w jednym pokoju…
       </p>
@@ -709,7 +709,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Bo myślałeś, że
         będziecie gadali o tym, ażeby kogo oszukać — rzekł{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         .
       </p>
@@ -717,22 +717,22 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Żebyś ty tak myślał
         o skonaniu, głupi!… — odparł{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Niby ja jestem dziecko i niby nie rozumiem, że jak{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         przyjeżdża do Memfisu, to przecie on nie dla handlu przyjeżdża. Oj, ty{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         !… Tyś powinien ze dwa lata być u mnie chłopcem do zamiatania stajni…
       </p>
       <p data-index="103">
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Dosyć!… — zawołał{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         , uderzając pięścią w stolik.
       </p>
@@ -740,13 +740,13 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— My nigdy nie
         skończymy z tym kapłanem chaldejskim — mruknął{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>{" "}
         z takim spokojem, jakby przed chwilą nie jego zwymyślano.
       </p>
       <p data-index="105">
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         odchrząknął i zaczął.
       </p>
@@ -754,7 +754,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Ten człowiek ma
         naprawdę dom i grunta w Harranie i tam nazywa się{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Phut{" "}
+          Phut
         </span>
         . Dostał listy od kupców chetyjskich do kupców sydońskich, więc w podróż zabrała go nasza karawana. Sam dobrze mówi po fenicku, płaci rzetelnie, nic osobliwego nie żąda,
         więc nasi ludzie nawet bardzo go polubili.
@@ -763,11 +763,11 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />
         Ale — mówił{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         podrapawszy się w brodę — gdy lew nakryje się skórą wołu, zawsze mu choćby kawałek ogona wylezie. Ten{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Phut{" "}
+          Phut
         </span>{" "}
         był strasznie mądry i pewny siebie; więc naczelnik karawany po cichu zrewidował jego rzeczy. I nic nie znalazł, tylko medal bogini Astoreth. Dowódcę karawany medal ten
         kolnął w serce. Skąd Chetyjczyk ma fenicki medal?…
@@ -776,7 +776,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />
         Więc gdy przyjechali do Sydonu, zaraz zameldował starszym, i od tej pory nasza tajna policja miała tego{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Phuta{" "}
+          Phuta
         </span>{" "}
         na oku.
       </p>
@@ -789,11 +789,11 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />
         Tu znowu nasza starszyzna zaczęła czuwać nad nim, ale nic nie odkryła; domyślała się tylko, że musi to być wielki pan, nie zaś prosty mieszczanin harrański. Dopiero{" "}
         <span className="character-highlighted" data-character="Asarhadon" data-src-listening="/Pharaon/asarhadon-listens.mp4">
-          Asarhadon{" "}
+          Asarhadon
         </span>{" "}
         przypadkiem wyśledził, a nawet nie wyśledził, tylko wpadł na poszlaki, że ten niby{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Phut{" "}
+          Phut
         </span>{" "}
         całą jedną noc przepędził w starej świątyni Seta, która tu wiele znaczy…
       </p>
@@ -801,7 +801,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Wchodzą do niej
         tylko arcykapłani na ważne narady — wtrącił{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         .
       </p>
@@ -809,7 +809,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Jeszcze i to nic by
         nie znaczyło — prawił{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         . — Ale jeden z naszych kupców wrócił miesiąc temu z Babilonu z dziwnymi wiadomościami. Za wielki prezent pewien dworzanin babilońskiego satrapy powiedział mu, że nad
         Fenicją — wisi bieda!…
@@ -819,19 +819,19 @@ export const Chapter25: React.FC = () => {
         „Was zabiorą Asyryjczycy — mówił ten dworzanin do naszego kupca — a Izraelitów wezmą Egipcjanie. W tym interesie nawet pojechał do tebańskich kapłanów wielki chaldejski
         kapłan{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Beroes{" "}
+          Beroes
         </span>{" "}
-        i zawrze z nimi traktat.\'
+        i zawrze z nimi traktat.'
       </p>
       <p data-index="114">
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />
         Musicie wiedzieć — ciągnął{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         — że kapłani chaldejscy uważają egipskich za swoich braci. A że{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Beroes{" "}
+          Beroes
         </span>{" "}
         ma wielkie znaczenie na dworze króla Assara, więc wieść o tym traktacie może być bardzo prawdziwa.
       </p>
@@ -839,7 +839,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Na co Asyryjczykom
         Fenicja?… — zapytał{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         , gryząc paznogcie.
       </p>
@@ -847,7 +847,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— A na co złodziejowi
         cudzy spichlerz?… — odparł{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -855,41 +855,41 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Co może znaczyć
         traktat{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Beroesa{" "}
+          Beroesa
         </span>{" "}
         z egipskimi kapłanami?… — wtrącił zamyślony{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         .
       </p>
       <p data-index="118">
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Głupi ty!… — odparł{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . —{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Faraon{" "}
+          Faraon
         </span>{" "}
         robi tylko to, co kapłani uradzą.
       </p>
       <p data-index="119">
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Będzie i traktat z{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraonem{" "}
+          faraonem
         </span>
         , nie bójcie się! — przerwał{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         . — W Tyrze wiemy na pewno, że jedzie do Egiptu z wielką świtą i darami poseł asyryjski —{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
-          Sargon{" "}
+          Sargon
         </span>
         … On niby to chce zobaczyć Egipt i ułożyć się z ministrami, ażeby w egipskich aktach nie pisano jako — Asyria płaci daninę{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraonom{" "}
+          faraonom
         </span>
         . Ale naprawdę to on jedzie zawrzeć traktat o podział krajów leżących między naszym morzem a rzeką Eufratem.
       </p>
@@ -897,7 +897,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Oby ich ziemia
         pochłonęła! — zaklął{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         .
       </p>
@@ -905,11 +905,11 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Cóż ty o tym
         myślisz,{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagonie{" "}
+          Dagonie
         </span>
         ?… — spytał{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -919,7 +919,7 @@ export const Chapter25: React.FC = () => {
       </p>
       <p data-index="123">
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         zatrząsł się z gniewu.
       </p>
@@ -932,7 +932,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Niech was bogowie
         bronią od takiej ostateczności — rzekł{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         .
       </p>
@@ -940,11 +940,11 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Właśnie o to idzie,
         ażeby ratować dzisiejszą Fenicję od zagłady — mówił{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         . — A ty,{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagonie{" "}
+          Dagonie
         </span>
         , wiele możesz w tym interesie…
       </p>
@@ -955,7 +955,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Możesz dowiedzieć
         się od kapłanów: czy był u nich{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Beroes{" "}
+          Beroes
         </span>{" "}
         i czy zawarł z nimi taką umowę?..
       </p>
@@ -963,22 +963,22 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Strasznie trudna
         rzecz! — szepnął{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Ale może ja znajdę takiego kapłana, który mnie objaśni.
       </p>
       <p data-index="130">
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Możesz — ciągnął{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         — na dworze{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         nie dopuścić traktatu z{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
-          Sargonem{" "}
+          Sargonem
         </span>
         ?…
       </p>
@@ -994,7 +994,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Sam dałem dwa
         talenty! — szepnął{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         .
       </p>
@@ -1002,7 +1002,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Dam dziesięć —
         rzekł{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Ale co dostanę za moją pracę?…
       </p>
@@ -1010,7 +1010,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Co?… No, dziesięć
         okrętów — odparł{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -1018,7 +1018,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— A ty ile zarobisz?
         — spytał{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         .
       </p>
@@ -1030,7 +1030,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Ja się pytam: co ty
         zarobisz? — nalegał{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         .
       </p>
@@ -1056,7 +1056,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— I tam, gdzie rodzi
         się bursztyn — zakończył{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         .
       </p>
@@ -1064,13 +1064,13 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Żebyś ty raz
         zdechł!… — odparł miłościwy książę{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         , wyciągając do niego rękę. — Ale już nie będziesz chował złego serca dla mnie za tamte dwie krypy?…
       </p>
       <p data-index="146">
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         westchnął.
       </p>
@@ -1081,7 +1081,7 @@ export const Chapter25: React.FC = () => {
       <p data-index="148">
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Dosyć! — wtrącił{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         . — Gadajcie o Fenicji.
       </p>
@@ -1089,14 +1089,14 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Przez kogo ty się
         dowiesz o{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Beroesie{" "}
+          Beroesie
         </span>{" "}
         i traktacie? — spytał{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagona{" "}
-        </span>
+          Dagona
+        </span>{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -1112,31 +1112,31 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Ja myślę… Ja myślę,
         że chyba przez{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcę tronu{" "}
+          następcę tronu
         </span>
         . Mam dużo jego kwitów.
       </p>
       <p data-index="153">
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         podniósł do góry rękę i odparł:
       </p>
       <p data-index="154">
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Następca{" "}
+          Następca
         </span>{" "}
         — bardzo dobrze, bo on zostanie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraonem{" "}
+          faraonem
         </span>
         , może nawet niedługo…
       </p>
       <p data-index="155">
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Psyt!… — przerwał{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         , uderzając pięścią w stół. — Żeby tobie mowę odjęło za takie gadanie!…
       </p>
@@ -1144,7 +1144,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Oto wieprz! —
         zawołał{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         , wygrażając bankierowi pod nosem.
       </p>
@@ -1152,11 +1152,11 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— A to głupi kramarz!
         — odpowiedział{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         z szyderczym uśmiechem. — Ty,{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         , powinieneś sprzedawać suszone ryby i wodę na ulicach, ale nie mieszać się do interesów między państwami. Wołowe kopyto umazane w egipskim błocie ma więcej rozumu aniżeli
         ty, który pięć lat mieszkasz w stolicy Egiptu!… Oby cię świnie zjadły…
@@ -1165,7 +1165,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Cicho!… cicho!… —
         wtrącił{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         . — Nie dacie mi dokończyć…
       </p>
@@ -1173,48 +1173,48 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Mów, boś ty mądry
         i ciebie rozumie moje serce — rzekł{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         .
       </p>
       <p data-index="160">
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Jeżeli ty,{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         , masz wpływ na{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcę{" "}
+          następcę
         </span>
         , to bardzo dobrze — ciągnął{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         . — Bo jeżeli{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>{" "}
         zechce mieć traktat z Asyrią, to będzie traktat, i w dodatku napisany naszą krwią, na naszych skórach. Ale jeżeli{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>{" "}
         zechce wojny z Asyrią, to on zrobi wojnę, choćby kapłani przeciw niemu wezwali do pomocy wszystkich bogów.
       </p>
       <p data-index="161">
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Psyt! — wtrącił{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         — jeżeli kapłani bardzo zechcą, to będzie traktat… Ale może oni nie zechcą…
       </p>
       <p data-index="162">
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Dlatego,{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagonie{" "}
+          Dagonie
         </span>{" "}
         — mówił{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         — my musimy mieć za sobą wszystkich wodzów…
       </p>
@@ -1230,15 +1230,15 @@ export const Chapter25: React.FC = () => {
       <p data-index="166">
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— I{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcę{" "}
+          następcę
         </span>{" "}
         — prawił{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         . — Ale, jeżeli tylko ty sam będziesz pchał go do wojny z Asyrią, to na nic. Człowiek, jak arfa, ma dużo strun i grać na nich trzeba dziesięcioma palcami, a ty,{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagonie{" "}
+          Dagonie
         </span>
         , jesteś tylko jednym palcem.
       </p>
@@ -1250,15 +1250,15 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Ale ty możesz być
         jak jedna ręka, przy której jest pięć palców. Ty powinieneś zrobić to, ażeby nikt nie wiedział, że ty chcesz wojny, ale — ażeby każdy kucharz{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>{" "}
         chciał wojny, każdy fryzjer{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>{" "}
         chciał wojny, ażeby wszyscy łaziebnicy, lektykarze, pisarze, oficerowie, woźnice, ażeby oni wszyscy chcieli wojny z Asyrią i ażeby{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>{" "}
         słyszał o tym od rana do nocy, a nawet, kiedy śpi…
       </p>
@@ -1269,13 +1269,13 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— A znasz ty jego
         kochanki? — spytał{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
       <p data-index="171">
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         machnął ręką.
       </p>
@@ -1287,7 +1287,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Trzeba mu podsunąć
         taką kochankę, ażeby o tym wiedziała — rzekł{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -1295,18 +1295,18 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Skąd ją wziąć?… —
         spytał{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — A… mam!… — zawołał, uderzając się w czoło. — Znasz ty{" "}
         <span className="character-highlighted" data-character="Pieszczota" data-src-listening="/Pharaon/pieszczota-listens.mp4">
-          Kamę{" "}
+          Kamę
         </span>
         , kapłankę Astoreth?…
       </p>
       <p data-index="175">
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Co?… — przerwał{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         . — Kapłanka świętej bogini Astoreth będzie kochanką Egipcjanina?…
       </p>
@@ -1314,7 +1314,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Ty byś wolał, ażeby
         ona była twoją?… — szydził{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Ona nawet zostanie arcykapłanką, gdy będzie trzeba zbliżyć ją do dworu…
       </p>
@@ -1322,7 +1322,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Prawdę mówisz —
         rzekł{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -1330,7 +1330,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Ależ to
         świętokradztwo!… — oburzał się{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         .
       </p>
@@ -1338,7 +1338,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Toteż kapłanka,
         która je popełni, może umrzeć — wtrącił sędziwy{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -1346,15 +1346,15 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Żeby nam tylko nie
         przeszkodziła ta{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
-          Sara{" "}
+          Sara
         </span>
         , Żydówka — odezwał się po chwili milczenia{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Ona spodziewa się dziecka, do którego{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         już dziś jest przywiązany. Gdyby zaś urodził jej się syn, poszłyby w kąt wszystkie.
       </p>
@@ -1362,11 +1362,11 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Będziemy mieli
         pieniądze i dla{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
-          Sary{" "}
+          Sary
         </span>{" "}
         — rzekł{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -1374,7 +1374,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Ona nic nie
         weźmie!… — wybuchnął{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Ta nędzna odrzuciła złoty, kosztowny puchar, który jej sam zaniosłem…
       </p>
@@ -1382,13 +1382,13 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Bo myślała, że ją
         chcesz okpić — wtrącił{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         .
       </p>
       <p data-index="184">
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         pokiwał głową.
       </p>
@@ -1399,14 +1399,14 @@ export const Chapter25: React.FC = () => {
       <p data-index="186">
         <span className="character-placeholder character-talking" data-character="Rabsun" data-src-talking="/Pharaon/rabsun-speaks.mp4" data-is-talking="true" />— Nóż… — syknął{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>
         .
       </p>
       <p data-index="187">
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Trucizna… — szepnął{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         .
       </p>
@@ -1414,7 +1414,7 @@ export const Chapter25: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Hiram" data-src-talking="/Pharaon/hiram-speaks.mp4" data-is-talking="true" />— Nóż to rzecz bardzo
         grubiańska… — zakonkludował{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         .
       </p>
@@ -1422,18 +1422,18 @@ export const Chapter25: React.FC = () => {
         Pogładził brodę, zamyślił się, w końcu powstał i wydobył z zanadrza purpurową wstęgę, na którą były nanizane trzy złote amulety z wizerunkiem bogini Astoreth. Wyjął zza
         pasa nóż, przeciął wstęgę na trzy części i dwa kawałki z amuletami wręczył{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagonowi{" "}
+          Dagonowi
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsunowi{" "}
+          Rabsunowi
         </span>
         .
       </p>
       <p data-index="190">
         Potem wszyscy trzej ze środka pokoju poszli w kąt, gdzie stał skrzydlaty posąg bogini; złożyli ręce na piersiach, a{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         zaczął mówić zniżonym głosem, lecz wyraźnie:
       </p>
@@ -1455,11 +1455,11 @@ export const Chapter25: React.FC = () => {
       <p data-index="194">
         Po strasznej przysiędze, którą zaczął{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         , a od połowy wykrzykiwali wszyscy głosami drżącymi wściekłością, trzej Fenicjanie odpoczęli zadyszani. Po czym{" "}
         <span className="character-highlighted" data-character="Rabsun" data-src-listening="/Pharaon/rabsun-listens.mp4">
-          Rabsun{" "}
+          Rabsun
         </span>{" "}
         zaprosił ich na ucztę, gdzie przy winie, muzyce i tancerkach na chwilę zapomnieli o czekającej ich pracy.
       </p>

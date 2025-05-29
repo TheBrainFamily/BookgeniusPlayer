@@ -87,10 +87,10 @@ function generateChapterComponent(chapter: Element, chapterId: string, character
         const paragraphJSX = processParagraph(childElement, dataIndex++, characterMap, bookSlug, indent);
         componentCode += paragraphJSX;
       } else if (tagName === "h3" || tagName === "h4" || tagName === "h5") {
-        const content = escapeJSX(childElement.textContent || "");
+        const content = escapeJSXText(childElement.textContent || "");
         componentCode += `${indent}<${tagName} data-index="${dataIndex++}">${content}</${tagName}>\n`;
       } else if (tagName === "h1" || tagName === "h2" || tagName === "h6") {
-        const content = escapeJSX(childElement.textContent || "");
+        const content = escapeJSXText(childElement.textContent || "");
         componentCode += `${indent}<${tagName} data-index="${dataIndex++}">${content}</${tagName}>\n`;
       }
     }
@@ -113,9 +113,11 @@ function processParagraph(paragraphElement: Element, dataIndex: number, characte
 
     if (pNode.nodeType === 3 /* Node.TEXT_NODE */) {
       const text = pNode.textContent || "";
-      if (text.trim()) {
-        contentParts.push(escapeJSX(text));
-      }
+      // Preserve all text, including spaces. escapeJSXText will handle empty strings.
+      // React's JSX rendering will typically collapse multiple whitespace characters from text nodes
+      // into a single space, and leading/trailing spaces within a line might be trimmed depending on CSS / HTML rules.
+      // But we should pass the raw text through.
+      contentParts.push(escapeJSXText(text));
     } else if (pNode.nodeType === 1 /* Node.ELEMENT_NODE */) {
       const pElement = pNode as unknown as Element;
       const elementJSX = processInlineElement(pElement, characterMap, bookSlug);
@@ -144,8 +146,8 @@ function processInlineElement(element: Element, characterMap: Map<string, Charac
     if (isTalking) {
       return `<span className="character-placeholder character-talking" data-character="${characterSlug}" data-src-talking="${talkingSrc}" data-is-talking="true"/>`;
     } else {
-      const content = escapeJSX(element.textContent || "");
-      return `<span className="character-highlighted" data-character="${characterSlug}" data-src-listening="${listeningSrc}">${content} </span>`;
+      const content = escapeJSXText(element.textContent || "");
+      return `<span className="character-highlighted" data-character="${characterSlug}" data-src-listening="${listeningSrc}">${content}</span>`;
     }
   }
 
@@ -153,36 +155,58 @@ function processInlineElement(element: Element, characterMap: Map<string, Charac
   switch (element.tagName) {
     case "note": {
       const noteId = element.getAttribute("id");
-      const noteContent = escapeJSX(element.textContent || "");
+      const noteContent = escapeJSXText(element.textContent || "");
       return `<a href="#fn${noteId}" className="link-note">${noteContent}</a>`;
     }
     case "b":
-      return `<span className="bold">${escapeJSX(element.textContent || "")}</span>`;
+      return `<span className="bold">${escapeJSXText(element.textContent || "")}</span>`;
 
     case "i":
-      return `<span className="italic">${escapeJSX(element.textContent || "")}</span>`;
+      return `<span className="italic">${escapeJSXText(element.textContent || "")}</span>`;
 
     case "strong":
-      return `<strong>${escapeJSX(element.textContent?.trim() || "")}</strong>`;
+      return `<strong>${escapeJSXText(element.textContent?.trim() || "")}</strong>`;
 
     default:
-      return `<${element.tagName}>${escapeJSX(element.textContent || "")}</${element.tagName}>`;
+      return `<${element.tagName}>${escapeJSXText(element.textContent || "")}</${element.tagName}>`;
   }
 }
 
-function escapeJSX(text: string): string {
-  // Escape characters that could break JSX
+// Old escapeJSX function (lines 160-171) will be replaced by the two functions below.
+
+// Function to escape text for direct inclusion in JSX content
+function escapeJSXText(text: string): string {
+  if (typeof text !== "string") return "";
+  let result = text;
+  // Escape HTML special characters to prevent XSS and ensure they are displayed as text.
+  // Ampersand must be escaped first.
+  result = result.replace(/&/g, "&amp;");
+  result = result.replace(/</g, "&lt;");
+  result = result.replace(/>/g, "&gt;");
+
+  // To display literal curly braces in JSX text content, they must be escaped.
+  // Embedding them as {'{'} and {'}'} is the standard React way.
+  // The output of this function is directly concatenated into a template literal
+  // that forms the JSX code. So, if text is "{", this function returns "{'{'}",
+  // which then becomes part of the JSX code string, e.g., "<span>{'{'}</span>".
+  result = result.replace(/{/g, "{'{'}");
+  result = result.replace(/}/g, "{'}'}");
+
+  // Characters like ', ", \\n, \\r, \\t, \\ do not need special escaping
+  // when they are part of the text content that React will render.
+  // React handles them appropriately. For example, newlines are treated as whitespace.
+  return result;
+}
+
+// Function to escape text for embedding within a JavaScript string literal
+function escapeForJavaScriptStringLiteral(text: string): string {
+  if (typeof text !== "string") return "";
   return text
-    .replace(/\\/g, "\\\\")
-    .replace(/'/g, "\\'")
-    .replace(/"/g, '\\"')
-    .replace(/\n/g, "\\n")
-    .replace(/\r/g, "\\r")
-    .replace(/\t/g, "\\t")
-    .replace(/{/g, "\\{")
-    .replace(/}/g, "\\}")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+    .replace(/\\/g, "\\\\") // Escape backslashes: \ -> \\
+    .replace(/"/g, '\\"') // Escape double quotes: " -> \\" (for use in ""-delimited strings)
+    .replace(/\n/g, "\\n") // Escape newlines: \n -> \\n (becomes a newline char in the JS string)
+    .replace(/\r/g, "\\r") // Escape carriage returns: \r -> \\r
+    .replace(/\t/g, "\\t"); // Escape tabs: \t -> \\t
 }
 
 function generateIndexFile(bookSlug: BOOK_SLUGS, chapters: Array<{ id: string; title: string }>, characterMap: Map<string, CharacterInfo>): void {
@@ -191,14 +215,14 @@ function generateIndexFile(bookSlug: BOOK_SLUGS, chapters: Array<{ id: string; t
   // Export chapter metadata
   indexContent += `export const chapterMetadata = [\n`;
   chapters.forEach((chapter) => {
-    indexContent += `  { id: "${chapter.id}", title: "${escapeJSX(chapter.title)}" },\n`;
+    indexContent += `  { id: "${chapter.id}", title: "${escapeForJavaScriptStringLiteral(chapter.title)}" },\n`;
   });
   indexContent += `];\n\n`;
 
   // Export character metadata
   indexContent += `export const characterMetadata = new Map([\n`;
   characterMap.forEach((info, slug) => {
-    indexContent += `  ["${slug}", { display: "${escapeJSX(info.display)}", summary: "${escapeJSX(info.summary || "")}" }],\n`;
+    indexContent += `  ["${slug}", { display: "${escapeForJavaScriptStringLiteral(info.display)}", summary: "${escapeForJavaScriptStringLiteral(info.summary || "")}" }],\n`;
   });
   indexContent += `]);\n\n`;
 

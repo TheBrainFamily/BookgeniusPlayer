@@ -11,7 +11,7 @@ export const Chapter56: React.FC = () => {
       <p data-index="2">
         Przygotowania do pogrzebu{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ozyrys-Mer-amen-Ramzesa{" "}
+          Ozyrys-Mer-amen-Ramzesa
         </span>{" "}
         były ukończone.
       </p>
@@ -27,7 +27,7 @@ export const Chapter56: React.FC = () => {
         Tak opakowane zwłoki króla spoczywały na kosztownym łożu, w małej cedrowej kaplicy, której ściany były pokryte napisami opiewającymi żywot i czyny zmarłego. Nad zwłokami
         unosił się cudowny jastrząb z ludzką głową, a przy łożu, dniem i nocą, czuwał kapłan przebrany za{" "}
         <span className="character-highlighted" data-character="Anubis-kaplan-w-ceremonii" data-src-listening="/Pharaon/anubis-kaplan-w-ceremonii.png">
-          Anubisa{" "}
+          Anubisa
         </span>
         , bożka pogrzebu, z głową szakala.
       </p>
@@ -41,7 +41,7 @@ export const Chapter56: React.FC = () => {
         było aż na drugiej stronie Nilu.
       </p>
       <p data-index="9">
-        \n — O panie!… o panie nasz!… — wołały — dlaczego nas opuszczasz?… Ty taki piękny, taki dobry?… Który tak chętnie rozmawiałeś z nami, teraz milczysz, i dlaczego?… Przecie
+        — O panie!… o panie nasz!… — wołały — dlaczego nas opuszczasz?… Ty taki piękny, taki dobry?… Który tak chętnie rozmawiałeś z nami, teraz milczysz, i dlaczego?… Przecie
         lubiłeś nasze towarzystwo, a dziś tak daleko jesteś od nas?…
       </p>
       <p data-index="10">A przez ten czas kapłani śpiewali:</p>
@@ -69,7 +69,7 @@ export const Chapter56: React.FC = () => {
         <a href="#fn65" className="link-note">
           [65]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="17">
         Po dwu dniach jęków i nabożeństw zajechał przed pałac wielki wóz w formie łodzi. Jej końce były ozdobione baranimi głowami i wachlarzami z piór strusich, a nad kosztownym
@@ -113,7 +113,7 @@ export const Chapter56: React.FC = () => {
         <a href="#fn66" className="link-note">
           [66]
         </a>
-        !\'
+        !'
       </p>
       <p data-index="30">
         Co paręset kroków stał oddział wojska witający pana głuchym łoskotem bębnów i żegnający go przeraźliwym odgłosem trąb. Nie był to pogrzeb, ale marsz triumfalny do kraju
@@ -122,7 +122,7 @@ export const Chapter56: React.FC = () => {
       <p data-index="31">
         W pewnej odległości za wozem szedł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         otoczony wielką świtą jenerałów
         <a href="#fn67" className="link-note">
@@ -130,7 +130,7 @@ export const Chapter56: React.FC = () => {
         </a>
         , a za nim królowa{" "}
         <span className="character-highlighted" data-character="Nikotris" data-src-listening="/Pharaon/nikotris-listens.mp4">
-          Nikotris{" "}
+          Nikotris
         </span>{" "}
         oparta na dwu damach dworskich. Ani syn, ani matka nie płakali, ponieważ im było wiadomo (o czym nie wiedział lud prosty), że zmarły pan już znajduje się u boku Ozyrysa i z
         pobytu w ojczyźnie szczęśliwości jest tak zadowolony, że nie chciałby wrócić na ziemię.
@@ -141,13 +141,13 @@ export const Chapter56: React.FC = () => {
         Dworskie kobiety jeszcze raz próbowały odebrać mumię kapłanom; jeszcze raz odezwały się wszystkie chóry i wszystkie muzyki wojskowe. Potem na statek wiozący mumię królewską
         weszła pani{" "}
         <span className="character-highlighted" data-character="Nikotris" data-src-listening="/Pharaon/nikotris-listens.mp4">
-          Nikotris{" "}
+          Nikotris
         </span>{" "}
         i kilkunastu kapłanów, lud począł rzucać bukiety i wieńce i — zaszumiały wiosła…
       </p>
       <p data-index="35">
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzes XII{" "}
+          Ramzes XII
         </span>{" "}
         po raz ostatni opuścił swój pałac, dążąc Nilem do grobu w Tebach. Po drodze zaś, jako troskliwy władca, miał wstępować do wszystkich słynnych miejscowości, aby pożegnać się
         z nimi.
@@ -159,11 +159,11 @@ export const Chapter56: React.FC = () => {
       <p data-index="37">
         W kilka dni po wyjeździe{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>{" "}
         na wiekuisty spoczynek wyruszył za nim{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>
         , aby widokiem swoim wskrzesić martwe z żalu serca poddanych, przyjąć ich hołdy i złożyć ofiary bogom.
       </p>
@@ -174,7 +174,7 @@ export const Chapter56: React.FC = () => {
       <p data-index="39">
         Stało się jednak inaczej. Przy boku{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa XIII{" "}
+          Ramzesa XIII
         </span>{" "}
         znaleźli się wszyscy jenerałowie, bardzo wielu urzędników, mnóstwo drobnej szlachty i — całe niższe duchowieństwo, co bardziej nawet zdziwiło, aniżeli ucieszyło faraona.
       </p>
@@ -194,8 +194,8 @@ export const Chapter56: React.FC = () => {
         urzędników złagodniała, że Fenicjanie w mniej bezwzględny sposób wybierali podatki i że pokorny zazwyczaj lud egipski zaczął podnosić głowę wobec kapłanów.
       </p>
       <p data-index="44">
-        \n — Niech tylko faraon pozwoli — mówiono w szynkowniach, na polach i na rynkach — a zaraz ład zrobimy ze świętymi mężami… Oni to są winni, że płacimy wielkie podatki, że
-        rany nigdy nie goją się na naszych plecach!…
+        — Niech tylko faraon pozwoli — mówiono w szynkowniach, na polach i na rynkach — a zaraz ład zrobimy ze świętymi mężami… Oni to są winni, że płacimy wielkie podatki, że rany
+        nigdy nie goją się na naszych plecach!…
       </p>
       <p data-index="45">O siedem mil na południe od Memfisu leżał między rozgałęzieniami gór libijskich kraj Piom albo Fajum, dziwny tym, że stworzyły go ludzkie ręce.</p>
       <p data-index="46">
@@ -264,7 +264,7 @@ export const Chapter56: React.FC = () => {
       <p data-index="58">
         Przybywszy w te strony,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         zwiedził przede wszystkim prowincję Fajum. Wyglądała ona jak wnętrze głębokiej misy, której dnem było jezioro, a brzegami wzgórza. Gdzie zwrócił oczy, wszędzie spotykał
         soczystą zieloność traw upstrzonych kwiatami, kępy palm, gaje fig i tamaryndusów, wśród których od wschodu do zachodu słońca rozlegał się śpiew ptaków i wesołe głosy
@@ -287,10 +287,10 @@ export const Chapter56: React.FC = () => {
         ogolony.
       </p>
       <p data-index="64">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Ci ludzie wyglądają jak kapłani!… — zawołał{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Ci
+        ludzie wyglądają jak kapłani!… — zawołał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         .
       </p>
@@ -301,9 +301,9 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Bo też każdy z nich odebrał niższe święcenia, a setnicy wyższe — odpowiedział{" "}
+        — Bo też każdy z nich odebrał niższe święcenia, a setnicy wyższe — odpowiedział{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          arcykapłan gmachu{" "}
+          arcykapłan gmachu
         </span>
         .
       </p>
@@ -315,27 +315,27 @@ export const Chapter56: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
         „Bardzom ciekawy, w jaki sposób trafi tutaj{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
-        ?…\' — rzekł do siebie pan.
+        ?…' — rzekł do siebie pan.
       </p>
       <p data-index="68">
         Zrozumiał, że tych ludzi nie można ani nastraszyć, ani przekupić. Taka biła od nich pewność siebie, jakby każdy miał do swego rozporządzenia niezwalczone pułki duchów.
       </p>
       <p data-index="69">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        „Zobaczymy — pomyślał — czy ulękną się tych bogobojnych mężów moi Grecy i Azjaci?… Na szczęście są oni tak dzicy, że nawet nie poznają się na uroczystych minach…\'
+        „Zobaczymy — pomyślał — czy ulękną się tych bogobojnych mężów moi Grecy i Azjaci?… Na szczęście są oni tak dzicy, że nawet nie poznają się na uroczystych minach…'
       </p>
       <p data-index="70">
         Na prośbę kapłanów świta{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa XIII{" "}
+          Ramzesa XIII
         </span>{" "}
         została przed bramą, jakby pod dozorem żołnierzy z ogolonymi głowami.
       </p>
       <p data-index="71">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Czy i miecz mam tu zostawić? — zapytał faraon.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Czy
+        i miecz mam tu zostawić? — zapytał faraon.
       </p>
       <p data-index="72">
         <span
@@ -344,9 +344,9 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Nic on nam nie zaszkodzi — odparł{" "}
+        — Nic on nam nie zaszkodzi — odparł{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          najwyższy dozorca{" "}
+          najwyższy dozorca
         </span>
         .
       </p>
@@ -355,7 +355,7 @@ export const Chapter56: React.FC = () => {
         Przez ogromny dziedziniec, między dwoma szeregami sfinksów, faraon i kapłani weszli do głównego korpusu. Tu, w sieni bardzo obszernej, lecz nieco przyćmionej, było ośmioro
         drzwi, a{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          dozorca{" "}
+          dozorca
         </span>{" "}
         zapytał:
       </p>
@@ -366,26 +366,26 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Którymi drzwiami wasza świątobliwość chce dostać się do skarbca?
+        — Którymi drzwiami wasza świątobliwość chce dostać się do skarbca?
       </p>
       <p data-index="76">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Tymi, które doprowadzą nas najprędzej.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Tymi, które doprowadzą nas najprędzej.
       </p>
       <p data-index="77">
         Każdy z pięciu kapłanów wziął po dwa pęki pochodni, ale zapalił światło tylko jeden. Obok niego stanął{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          najwyższy dozorca{" "}
+          najwyższy dozorca
         </span>
         , trzymając w rękach duży sznur paciorków, na których wypisane były jakieś znaki. Za nimi zaś szedł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         otoczony przez trzech pozostałych kapłanów.
       </p>
       <p data-index="78">
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          Arcykapłan{" "}
+          Arcykapłan
         </span>{" "}
         z paciorkami zwrócił się na prawo i wszedł do wielkiej sali, której ściany i kolumny były pokryte napisami i figurami. Stamtąd dostali się do ciasnego korytarza, który
         prowadził pod górę, i znaleźli się w innej sali odznaczającej się wielką ilością drzwi. Tu usunęła się przed nimi tafla w podłodze, odsłaniając otwór, przez który zeszli na
@@ -394,7 +394,7 @@ export const Chapter56: React.FC = () => {
       <p data-index="79">Ale przewodnik dotknął jednego hieroglifu i — usunęła się przed nim ściana.</p>
       <p data-index="80">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         chciał zdać sobie sprawę z kierunku, w jakim idą; lecz wnet splątała mu się uwaga. Widział tylko, że śpiesznie przechodzą duże sale, małe komnaty, ciasne korytarze, że
         wdrapują się pod górę lub zbiegają na dół, że niektóre sale mają mnóstwo drzwi, a inne wcale ich nie posiadają. Zarazem spostrzegł, że przewodnik przy każdym nowym wejściu
@@ -405,19 +405,19 @@ export const Chapter56: React.FC = () => {
         znaki na paciorkach ze znakami na ścianach.
       </p>
       <p data-index="81">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Gdzież teraz jesteśmy — nagle zapytał faraon — w podziemiu czy na górze?…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Gdzież teraz jesteśmy — nagle zapytał faraon — w podziemiu czy na górze?…
       </p>
-      <p data-index="82">\n — Jesteśmy w mocy bogów — odparł jego sąsiad.</p>
+      <p data-index="82">— Jesteśmy w mocy bogów — odparł jego sąsiad.</p>
       <p data-index="83">Po kilku zakrętach i przejściach faraon znowu odezwał się:</p>
       <p data-index="84">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Ależ myśmy tu już byli, bodajże ze dwa razy!…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Ależ myśmy tu już byli, bodajże ze dwa razy!…
       </p>
       <p data-index="85">
         Kapłani milczeli, tylko niosący pochodnią oświetlił kolejno ściany, a{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         przypatrzywszy się wyznał w duchu, że chyba tu jeszcze nie byli.
       </p>
@@ -429,15 +429,15 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — To — rzekł{" "}
+        — To — rzekł{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          dozorca gmachu{" "}
+          dozorca gmachu
         </span>{" "}
         — jest trup pewnego Fenicjanina, które za szesnastej dynastii probował wedrzeć się do Labiryntu i doszedł aż tutaj.
       </p>
       <p data-index="88">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Zabito go? — spytał faraon.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Zabito go? — spytał faraon.
       </p>
       <p data-index="89">
         <span
@@ -446,7 +446,7 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Umarł z głodu.
+        — Umarł z głodu.
       </p>
       <p data-index="90">Szli już z pół godziny, gdy kapłan niosący pochodnią oświetlił framugę korytarza, gdzie równie leżały wysuszone zwłoki.</p>
       <p data-index="91">
@@ -456,9 +456,9 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — To — mówił{" "}
+        — To — mówił{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          dozorca{" "}
+          dozorca
         </span>{" "}
         — jest trup kapłana nubijskiego, który za czasów dziada waszej świątobliwości probował tu wejść…
       </p>
@@ -469,9 +469,9 @@ export const Chapter56: React.FC = () => {
       <p data-index="93">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />„
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
-        nic nie zrobi!… — mówił w duchu. — Albo zginie jak ci dwaj, o których muszę mu nawet powiedzieć.\'
+        nic nie zrobi!… — mówił w duchu. — Albo zginie jak ci dwaj, o których muszę mu nawet powiedzieć.'
       </p>
       <p data-index="94">
         Takiego zgnębienia, takiego uczucia niemocy i nicości nigdy jeszcze nie doznał. Chwilami zdawało mu się, że kapłani zostawią go w jednej z ciasnych komnat pozbawionych
@@ -484,7 +484,7 @@ export const Chapter56: React.FC = () => {
       <p data-index="97">
         Pochód trwał blisko godzinę, gdy nareszcie weszli do niskiej sali wspartej na ośmiokątnych słupach. Trzej kapłani otaczający faraona rozpierzchli się, przy czym{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         spostrzegł, że jeden z nich przytulił się do kolumny i — jakby znikł w jej wnętrzu.
       </p>
@@ -499,16 +499,16 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Oto są komory… — rzekł{" "}
+        — Oto są komory… — rzekł{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          dozorca gmachu{" "}
+          dozorca gmachu
         </span>
         .
       </p>
       <p data-index="100">
         Kapłani szybko zapalili pochodnie przytwierdzone do kolumn i ścian i{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         zobaczył szereg ogromnych izb przepełnionych najrozmaitszymi wyrobami bezcennej wartości. W zbiorze tym każda dynastia, jeżeli nie każdy faraon składał, co miał
         najosobliwszego i najdroższego.
@@ -522,21 +522,21 @@ export const Chapter56: React.FC = () => {
       <p data-index="103">
         Między osobliwościami faraon zauważył srebrny model asyryjskiego pałacu, ofiarowany{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesowi XII{" "}
+          Ramzesowi XII
         </span>{" "}
         przez{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
-          Sargona{" "}
+          Sargona
         </span>
         .{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          Arcykapłan{" "}
+          Arcykapłan
         </span>{" "}
         objaśniając faraonowi, który dar od kogo pochodzi, pilnie przypatrywał się jego fizjognomii. Ale zamiast podziwu dla skarbów dostrzegł niezadowolenie.
       </p>
       <p data-index="104">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Powiedz mi, wasza dostojność — zapytał faraon nagle — jaka jest korzyść z tych skarbów zamkniętych w ciemnicy?…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Powiedz mi, wasza dostojność — zapytał faraon nagle — jaka jest korzyść z tych skarbów zamkniętych w ciemnicy?…
       </p>
       <p data-index="105">
         <span
@@ -545,19 +545,19 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Jest w nich wielka siła na wypadek, gdyby Egipt znalazł się w niebezpieczeństwie — odparł{" "}
+        — Jest w nich wielka siła na wypadek, gdyby Egipt znalazł się w niebezpieczeństwie — odparł{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          arcykapłan{" "}
+          arcykapłan
         </span>
         . — Za kilka tych hełmów, wozów, mieczów możemy kupić sobie życzliwość wszystkich asyryjskich satrapów. A może nie oparłby się i{" "}
         <span className="character-highlighted" data-character="Krol-Assar" data-src-listening="/Pharaon/krol-assar-listens.mp4">
-          król Assar{" "}
+          król Assar
         </span>
         , gdybyśmy mu dostarczyli sprzętów do sali tronowej lub zbrojowni.
       </p>
       <p data-index="106">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Myślę, że oni woleliby zabrać wszystko mieczem od nas aniżeli trochę — życzliwością dla nas — wtrącił pan.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Myślę, że oni woleliby zabrać wszystko mieczem od nas aniżeli trochę — życzliwością dla nas — wtrącił pan.
       </p>
       <p data-index="107">
         <span
@@ -566,11 +566,11 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Niech spróbują!… — rzekł kapłan.
+        — Niech spróbują!… — rzekł kapłan.
       </p>
       <p data-index="108">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Rozumiem… Macie widać sposoby zniszczenia skarbów. Ale w takim razie już nikt z nich nie skorzysta.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Rozumiem… Macie widać sposoby zniszczenia skarbów. Ale w takim razie już nikt z nich nie skorzysta.
       </p>
       <p data-index="109">
         <span
@@ -579,15 +579,15 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Nie mój w tym rozum — odparł{" "}
+        — Nie mój w tym rozum — odparł{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          najwyższy dozorca{" "}
+          najwyższy dozorca
         </span>
         . — Pilnujemy, co nam oddano, i czynimy, jak kazano.
       </p>
       <p data-index="110">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Czy nie lepiej byłoby użyć cząstki tych skarbów na zasilenie kasy państwa i podźwignięcie Egiptu z niedoli, w jakiej jest dziś pogrążony? — spytał faraon.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Czy
+        nie lepiej byłoby użyć cząstki tych skarbów na zasilenie kasy państwa i podźwignięcie Egiptu z niedoli, w jakiej jest dziś pogrążony? — spytał faraon.
       </p>
       <p data-index="111">
         <span
@@ -596,13 +596,13 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — To nie zależy od nas.
+        — To nie zależy od nas.
       </p>
       <p data-index="112">Faraon zmarszczył brwi. Jakiś czas oglądał przedmioty bez wielkiego zresztą zapału, wreszcie znowu zapytał:</p>
       <p data-index="113">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Dobrze. Te kunsztowne wyroby przydać się mogą na zjednanie życzliwości asyryjskich dostojników. Ale gdyby wybuchła wojna z Asyrią, czym wydobylibyśmy: zboże, ludzi i
-        broń od narodów, które nie znają się na osobliwościach?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Dobrze. Te kunsztowne wyroby przydać się mogą na zjednanie życzliwości asyryjskich dostojników. Ale gdyby wybuchła wojna z Asyrią, czym wydobylibyśmy: zboże, ludzi i broń
+        od narodów, które nie znają się na osobliwościach?
       </p>
       <p data-index="114">
         <span
@@ -611,9 +611,9 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Otworzyć skarbiec — rzekł{" "}
+        — Otworzyć skarbiec — rzekł{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          arcykapłan{" "}
+          arcykapłan
         </span>
         .
       </p>
@@ -621,7 +621,7 @@ export const Chapter56: React.FC = () => {
       <p data-index="116">
         Znowu usunęły się ukryte drzwi i{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         wszedł do właściwego skarbca.
       </p>
@@ -640,16 +640,16 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Oto jest nasz majątek na wypadek nieszczęścia — rzekł{" "}
+        — Oto jest nasz majątek na wypadek nieszczęścia — rzekł{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          kapłan-dozorca{" "}
+          kapłan-dozorca
         </span>
         .
       </p>
       <p data-index="120">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Na jakie wy nieszczęścia czekacie? — zapytał faraon. — Lud biedny, szlachta i dwór zadłużeni, armia do połowy zmniejszona, faraon nie ma pieniędzy… Czy kiedykolwiek
-        Egipt znajdował się w gorszym położeniu?…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Na
+        jakie wy nieszczęścia czekacie? — zapytał faraon. — Lud biedny, szlachta i dwór zadłużeni, armia do połowy zmniejszona, faraon nie ma pieniędzy… Czy kiedykolwiek Egipt
+        znajdował się w gorszym położeniu?…
       </p>
       <p data-index="121">
         <span
@@ -658,13 +658,13 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Był w gorszym, kiedy go podbili Hyksosi.
+        — Był w gorszym, kiedy go podbili Hyksosi.
       </p>
       <p data-index="122">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Za kilkanaście lat — odparł{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Za
+        kilkanaście lat — odparł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         — podbiją nas nawet Izraelici, jeżeli nie uprzedzą ich Libijczycy i Etiopowie. A wówczas te piękne kamienie, rozbite na okruchy, pójdą na przyozdobienie żydowskich i
         murzyńskich sandałów…
@@ -676,18 +676,18 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Bądź spokojnym, wasza świątobliwość. W razie potrzeby nie tylko skarbiec, ale nawet Labirynt zniknie bez śladu, razem ze swymi dozorcami.
+        — Bądź spokojnym, wasza świątobliwość. W razie potrzeby nie tylko skarbiec, ale nawet Labirynt zniknie bez śladu, razem ze swymi dozorcami.
       </p>
       <p data-index="124">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         ostatecznie zrozumiał, że ma przed sobą fanatyków, którzy myślą tylko o jednym: ażeby nikogo nie dopuścić do owładnięcia skarbem.
       </p>
       <p data-index="125">Faraon usiadł na stosie złotych cegieł i rzekł:</p>
       <p data-index="126">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Więc majątek ten zachowujecie na złe czasy Egiptu?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Więc majątek ten zachowujecie na złe czasy Egiptu?
       </p>
       <p data-index="127">
         <span
@@ -696,11 +696,11 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Prawdę mówisz, świątobliwy panie.
+        — Prawdę mówisz, świątobliwy panie.
       </p>
       <p data-index="128">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Dobrze. Ale kto was, dozorców, przekona, że takie czasy nadeszły, gdyby nadeszły?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Dobrze. Ale kto was, dozorców, przekona, że takie czasy nadeszły, gdyby nadeszły?
       </p>
       <p data-index="129">
         <span
@@ -709,12 +709,12 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Do tego musi być zwołane nadzwyczajne zgromadzenie rodowitych Egipcjan, w którym zasiądzie: faraon, trzynastu kapłanów wyższego stopnia, trzynastu nomarchów, trzynastu
+        — Do tego musi być zwołane nadzwyczajne zgromadzenie rodowitych Egipcjan, w którym zasiądzie: faraon, trzynastu kapłanów wyższego stopnia, trzynastu nomarchów, trzynastu
         szlachty, trzynastu oficerów i po trzynastu kupców, rzemieślników i chłopów.
       </p>
       <p data-index="130">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Więc takiemu zgromadzeniu oddalibyście skarby? — spytał faraon.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Więc takiemu zgromadzeniu oddalibyście skarby? — spytał faraon.
       </p>
       <p data-index="131">
         <span
@@ -723,11 +723,11 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Dalibyśmy sumę potrzebną, gdyby całe zgromadzenie jak jeden mąż uchwaliło, że — Egipt jest w niebezpieczeństwie i…
+        — Dalibyśmy sumę potrzebną, gdyby całe zgromadzenie jak jeden mąż uchwaliło, że — Egipt jest w niebezpieczeństwie i…
       </p>
       <p data-index="132">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — I co?…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— I
+        co?…
       </p>
       <p data-index="133">
         <span
@@ -736,11 +736,11 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — I gdyby posąg Amona w Tebach potwierdził tę uchwałę.
+        — I gdyby posąg Amona w Tebach potwierdził tę uchwałę.
       </p>
       <p data-index="134">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         spuścił głowę, ażeby ukryć wyraz wielkiego zadowolenia. Już miał plan.
       </p>
@@ -750,11 +750,11 @@ export const Chapter56: React.FC = () => {
         <a href="#fn72" className="link-note">
           [72]
         </a>{" "}
-        do jednomyślności… — mówił sobie. — Również zdaje mi się, że boski posąg Amona potwierdzi uchwałę, gdy jego kapłanów otoczę moimi Azjatami…\'
+        do jednomyślności… — mówił sobie. — Również zdaje mi się, że boski posąg Amona potwierdzi uchwałę, gdy jego kapłanów otoczę moimi Azjatami…'
       </p>
       <p data-index="136">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Dziękuję wam, pobożni mężowie — rzekł głośno — za pokazanie cennych rzeczy, których jednak wielka wartość nie przeszkadza mi być najuboższym z królów świata. A teraz
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Dziękuję wam, pobożni mężowie — rzekł głośno — za pokazanie cennych rzeczy, których jednak wielka wartość nie przeszkadza mi być najuboższym z królów świata. A teraz
         proszę, ażebyście mnie wyprowadzili stąd krótszą i wygodniejszą drogą.
       </p>
       <p data-index="137">
@@ -764,22 +764,22 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Życzymy waszej świątobliwości — odparł{" "}
+        — Życzymy waszej świątobliwości — odparł{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          dozorca{" "}
+          dozorca
         </span>{" "}
         — abyś drugie tyle bogactw dołożył Labiryntowi… Co się zaś tyczy drogi do wyjścia stąd, jest tylko jedna i tą samą musimy wracać.
       </p>
       <p data-index="138">
         Jeden z kapłanów podał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesowi{" "}
+          Ramzesowi
         </span>{" "}
         trochę daktyli, drugi flaszę wina zaprawionego wzmacniającą substancją. Po czym faraon odzyskał siły i szedł wesoło.
       </p>
       <p data-index="139">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Dużo bym dał — mówił, śmiejąc się — ażeby zrozumieć wszystkie zakręty tej dziwacznej drogi!…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Dużo bym dał — mówił, śmiejąc się — ażeby zrozumieć wszystkie zakręty tej dziwacznej drogi!…
       </p>
       <p data-index="140">Kapłan przewodniczący zatrzymał się.</p>
       <p data-index="141">
@@ -789,11 +789,11 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Zapewniam waszą świątobliwość — rzekł — że my sami nie rozumiemy ani pamiętamy tej drogi, choć każdy z nas odbywał ją po kilkanaście razy…
+        — Zapewniam waszą świątobliwość — rzekł — że my sami nie rozumiemy ani pamiętamy tej drogi, choć każdy z nas odbywał ją po kilkanaście razy…
       </p>
       <p data-index="142">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Więc jakim sposobem trafiacie tu?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Więc jakim sposobem trafiacie tu?
       </p>
       <p data-index="143">
         <span
@@ -802,12 +802,12 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Korzystamy z pewnych wskazówek. Lecz gdyby nam bodaj w tej chwili zginęła która, pomarlibyśmy tu z głodu…
+        — Korzystamy z pewnych wskazówek. Lecz gdyby nam bodaj w tej chwili zginęła która, pomarlibyśmy tu z głodu…
       </p>
       <p data-index="144">Nareszcie wyszli do przysionka, a z niego na dziedziniec. Faraon zaczął oglądać się dokoła i kilka razy odetchnął.</p>
       <p data-index="145">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Za wszystkie skarby Labiryntu nie chciałbym ich pilnować! — zawołał. — Strach pada mi na piersi, gdy pomyślę, że można umrzeć w tych kamiennych ciemnicach…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Za
+        wszystkie skarby Labiryntu nie chciałbym ich pilnować! — zawołał. — Strach pada mi na piersi, gdy pomyślę, że można umrzeć w tych kamiennych ciemnicach…
       </p>
       <p data-index="146">
         <span
@@ -816,16 +816,16 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Ale można się i przywiązać do nich — odparł z uśmiechem{" "}
+        — Ale można się i przywiązać do nich — odparł z uśmiechem{" "}
         <span className="character-highlighted" data-character="Arcykaplan-Labiryntu" data-src-listening="/Pharaon/arcykaplan-labiryntu-listens.mp4">
-          arcykapłan{" "}
+          arcykapłan
         </span>
         .
       </p>
       <p data-index="147">Faraon podziękował każdemu ze swych przewodników i zakończył:</p>
       <p data-index="148">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Rad bym udzielić wam jakiejś łaski, żądajcie więc…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Rad
+        bym udzielić wam jakiejś łaski, żądajcie więc…
       </p>
       <p data-index="149">Ale kapłani słuchali obojętnie, a ich naczelnik rzekł:</p>
       <p data-index="150">
@@ -835,12 +835,12 @@ export const Chapter56: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-labiryntu-speaks.mp4"
           data-is-talking="true"
         />
-        \n — Wybacz mi, panie, zuchwalstwo, ale… czegóż moglibyśmy pragnąć?… Nasze figi i daktyle są tak słodkie jak z twego ogrodu; woda tak dobra jak z twojej studni. Gdyby zaś
+        — Wybacz mi, panie, zuchwalstwo, ale… czegóż moglibyśmy pragnąć?… Nasze figi i daktyle są tak słodkie jak z twego ogrodu; woda tak dobra jak z twojej studni. Gdyby zaś
         ciągnęły nas bogactwa, czyliż nie mamy ich więcej aniżeli wszyscy królowie?…
       </p>
       <p data-index="151">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        „Tych niczym nie przejednam — pomyślał faraon — ale… dam im uchwałę zgromadzenia i wyrok Amona.\'
+        „Tych niczym nie przejednam — pomyślał faraon — ale… dam im uchwałę zgromadzenia i wyrok Amona.'
       </p>
     </section>
   );

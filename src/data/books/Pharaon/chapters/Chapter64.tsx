@@ -29,14 +29,14 @@ export const Chapter64: React.FC = () => {
         Położenie to cechował przede wszystkim rozłam między Górnym, czyli Tebańskim, i Dolnym, czyli Memfijskim Egiptem. W Tebach miało przewagę stronnictwo kapłanów, w Memfis —
         faraonowe. W Tebach mówiono, że{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         oszalał i chce sprzedać Egipt Fenicjanom; w Memfisie dowodzono, że kapłani chcą otruć faraona i naprowadzić do kraju Asyryjczyków.
       </p>
       <p data-index="8">
         Lud prosty, zarówno na północy, jak i na południu, czuł instynktowny pociąg do{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>
         . Ale lud była to siła bierna i chwiejna. Gdy przemawiał agitator rządowy, chłopi gotowi byli uderzyć na świątynie i bić kapłanów; lecz gdy wystąpiła procesja, padali na
         twarze i truchleli słuchając zapowiedzi jakichś klęsk, które już w tym miesiącu groziły Egiptowi.
@@ -44,18 +44,18 @@ export const Chapter64: React.FC = () => {
       <p data-index="9">
         Przerażona szlachta i nomarchowie prawie wszyscy zjechali do Memfisu błagać faraona o ratunek przeciw buntującym się chłopom. Lecz ponieważ{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         zalecał im cierpliwość i nie gromił pospólstwa, więc magnaci zaczęli naradzać się ze stronnictwem kapłańskim.
       </p>
       <p data-index="10">
         Prawda, że{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         milczał albo także zalecał cierpliwość; ale inni arcykapłani dowodzili panom, że{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         jest szalony, i napomykali o potrzebie usunięcia go od władzy.
       </p>
@@ -72,12 +72,12 @@ export const Chapter64: React.FC = () => {
         Faraon, nie zgromadziwszy jeszcze wszystkich wojsk i dowodów przeciw kapłanom, nie dawał hasła do stanowczego napadu na świątynie; kapłani zdawali się czekać na coś. Było
         jednak widoczne, że już dziś nie czują się oni tak słabymi jak w pierwszych dniach po głosowaniu delegatów. A i sam{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         zamyślał się, gdy mu ze wszystkich stron donoszono, że chłopi kapłańscy prawie wcale nie mieszają się do zaburzeń, lecz pracują.
       </p>
       <p data-index="14">
-        „Co to znaczy? — sam siebie zapytywał faraon. — Czy gołe łby sądzą, że nie ośmielę się zaczepić świątyń, czyli też mają jakieś nie znane mi środki obrony?\'
+        „Co to znaczy? — sam siebie zapytywał faraon. — Czy gołe łby sądzą, że nie ośmielę się zaczepić świątyń, czyli też mają jakieś nie znane mi środki obrony?'
       </p>
       <p data-index="15">Dziewiętnastego Paofi policja zawiadomiła władcę, że upłynionej nocy lud zaczął psuć mury otaczające świątynią Horusa.</p>
       <p data-index="16">
@@ -91,7 +91,7 @@ export const Chapter64: React.FC = () => {
       </p>
       <p data-index="19">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>
         , jako wódz i zwycięzca znad Sodowych Jezior, wiedział, że gdy raz tłumy wyruszą do ataku, już nic ich nie powstrzyma: muszą rozbić albo zostać rozbite. Gdyby świątynie nie
         broniły się, pospólstwo da im radę, ale — jeżeli zechcą bronić się?…
@@ -100,15 +100,15 @@ export const Chapter64: React.FC = () => {
       <p data-index="21">
         Nadto —{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         jeszcze nie wrócił z Pi-Bast z listami dowodzącymi zdrady{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresa{" "}
+          Mefresa
         </span>
         . A co ważniejsze — przychylni faraonowi kapłani mieli dać pomoc wojsku dopiero dwudziestego trzeciego Paofi. Jakimże więc sposobem uprzedzić ich w tylu świątyniach
         odległych jedna od drugiej? I czy sama ostrożność nie nakazywała unikać z nimi stosunków, które mogły ich zdradzić?
@@ -116,7 +116,7 @@ export const Chapter64: React.FC = () => {
       <p data-index="22">
         Z tych powodów{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         nie życzył sobie wcześniejszego napadania świątyń przez lud.
       </p>
@@ -132,7 +132,7 @@ export const Chapter64: React.FC = () => {
       <p data-index="25">
         Ten wcale nieoczekiwany wypadek napełnił serce{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>{" "}
         wielką radością, a jeszcze większą dumą. Kazał powstać delegatom i łaskawie odpowiedział, że jego pułki zawsze gotowe są bronić świątyń, byle — zostały tam wprowadzone.
       </p>
@@ -152,14 +152,14 @@ export const Chapter64: React.FC = () => {
         Delegaci zasmuceni opuścili faraona, który po ich wyjściu zwołał radę poufną. Był przekonany, że kapłani poddadzą się jego woli, i ani mu przez myśl nie przeszło, że
         delegacja jest sztuką urządzoną przez{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>
         , aby go w błąd wprowadzić.
       </p>
       <p data-index="31">
         Gdy w komnacie królewskiej zebrali się cywilni i wojskowi dostojnicy,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         pełen dumy zabrał głos.
       </p>
@@ -171,7 +171,7 @@ export const Chapter64: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Nasze wojska
         jeszcze nie zebrały się… — wtrącił{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         .
       </p>
@@ -179,11 +179,11 @@ export const Chapter64: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Wielki-pisarz" data-src-talking="/Pharaon/wielki-pisarz-speaks.mp4" data-is-talking="true" />— I
         nie mamy listów{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>{" "}
         do Asyrii — dodał{" "}
         <span className="character-highlighted" data-character="Wielki-pisarz" data-src-listening="/Pharaon/wielki-pisarz-listens.mp4">
-          wielki pisarz{" "}
+          wielki pisarz
         </span>
         .
       </p>
@@ -191,15 +191,15 @@ export const Chapter64: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Mniejsza o to! — odparł faraon. — Niech lud jutro dowie się, że{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         są zdrajcami, a nomarchom i kapłanom okażemy dowody za parę dni, gdy wróci{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         z Pi-Bast.
       </p>
@@ -207,14 +207,14 @@ export const Chapter64: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Nowy rozkaz
         waszej świątobliwości bardzo zmienia plan pierwotny — rzekł{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         . — Jutro nie zajmiemy Labiryntu… A gdyby i w Memfis świątynie ośmieliły się stawić opór, nie mamy nawet taranów do wybicia bram…
       </p>
       <p data-index="37">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisie{" "}
+          Tutmozisie
         </span>{" "}
         — odpowiedział pan — mógłbym nie tłumaczyć się z moich rozkazów… Ale chcę przekonać was, że serce moje głębiej ocenia bieg wypadków…
       </p>
@@ -236,7 +236,7 @@ export const Chapter64: React.FC = () => {
         />
         — I żywność kończy się — wtrącił{" "}
         <span className="character-highlighted" data-character="Wielki-skarbnik-panstwowy" data-src-listening="/Pharaon/wielki-skarbnik-panstwowy-listens.mp4">
-          skarbnik{" "}
+          skarbnik
         </span>
         . — Za trzy dni pospólstwo musi wracać do roboty, bo nie będziemy mieli czym karmić ich darmo…
       </p>
@@ -244,7 +244,7 @@ export const Chapter64: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— O,
         widzisz!… — mówił faraon do{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisa{" "}
+          Tutmozisa
         </span>
         . — Ja sam rozkazałem naczelnikowi policji, ażeby hamował pospólstwo. Lecz gdy powściągnąć go nie można, trzeba skorzystać z ruchu. Doświadczony żeglarz nie walczy z prądem
         ani z wiatrem, ale pozwala im unosić się w obranym przez siebie kierunku…
@@ -268,11 +268,11 @@ export const Chapter64: React.FC = () => {
       <p data-index="47">
         Jutro{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         powinni być uwięzieni i przyprowadzeni do pałacu. A z Labiryntem skończymy za kilka dni.
       </p>
@@ -288,7 +288,7 @@ export const Chapter64: React.FC = () => {
         Od tej chwili kurier przychodził za kurierem. Jedni przynosili wiadomości, że wielkie masy chłopstwa uzbrojonego w topory i pałki ze wszystkich stron podążają do Memfisu.
         Skądinąd donoszono, że lud w okolicach Peme, Sochem i On ucieka w pole krzycząc, że jutro będzie koniec świata. Inny kurier przywiózł list od{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hirama{" "}
+          Hirama
         </span>
         , że wnet przybywa. Inny zawiadamiał o przekradaniu się pułków świątyniowych do Memfisu i co ważniejsza, że z Górnego Egiptu posuwają się mocne oddziały ludu i wojska,
         wrogo usposobione dla Fenicjan, a nawet dla jego świątobliwości.
@@ -296,9 +296,9 @@ export const Chapter64: React.FC = () => {
       <p data-index="51">
         „Nim tamci nadejdą — myślał faraon — ja już będę miał w rękach arcykapłanów i nawet pułki{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitagera{" "}
+          Nitagera
         </span>
-        … Spóźnili się o kilka dni!…\'
+        … Spóźnili się o kilka dni!…'
       </p>
       <p data-index="52">
         Donoszono wreszcie, że tu i owdzie na gościńcach wojsko schwytało przebranych kapłanów, którzy usiłowali dostać się do pałacu jego świątobliwości, zapewne z niedobrymi
@@ -311,7 +311,7 @@ export const Chapter64: React.FC = () => {
       <p data-index="54">
         Około północy czcigodna królowa{" "}
         <span className="character-highlighted" data-character="Nikotris" data-src-listening="/Pharaon/nikotris-listens.mp4">
-          Nikotris{" "}
+          Nikotris
         </span>{" "}
         zażądała posłuchania u jego świątobliwości.
       </p>
@@ -371,14 +371,14 @@ export const Chapter64: React.FC = () => {
       <p data-index="69">
         Królowa objęła nogi władcy i wyszła ukojona zakląwszy jednak{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>
         , aby szanował bogów i miał miłosierdzie nad ich sługami.
       </p>
       <p data-index="70">
         Po odejściu matki faraon wezwał{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisa{" "}
+          Tutmozisa
         </span>
         .
       </p>
@@ -390,15 +390,15 @@ export const Chapter64: React.FC = () => {
       <p data-index="72">
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Nawet na{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresa{" "}
+          Mefresa
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>
         ?… — spytał{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         .
       </p>
@@ -413,7 +413,7 @@ export const Chapter64: React.FC = () => {
       </p>
       <p data-index="75">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         podniósł w górę palec na znak, że nie chce słuchać żadnych przedstawień. A następnie, aby zmienić temat rozmowy, rzekł z uśmiechem:
       </p>
@@ -421,7 +421,7 @@ export const Chapter64: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Pamiętasz,{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisie{" "}
+          Tutmozisie
         </span>
         , manewry pod Pi-Bailos?… Już minęło dwa lata!… Kiedy wówczas gniewałem się na zuchwalstwo i chciwość kapłanów, czy mogłeś pomyśleć, że tak prędko zrobię z nimi rachunek?…
       </p>

@@ -26,7 +26,7 @@ export const Chapter26: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Niewolnik boży,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         — rzekł pokutnik.
       </p>
@@ -49,7 +49,7 @@ export const Chapter26: React.FC = () => {
       <p data-index="16">
         A gdy brama zamknęła się, kapłan wziął{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>{" "}
         za rękę i wśród zmroku, pomiędzy ogromnymi kolumnami przysionka, zaprowadził go do przeznaczonego mieszkania. Była to mała celka oświetlona kagankiem. Na kamiennej posadzce
         leżała wiązka suchej trawy, w kącie stał dzban wody, a obok — jęczmienny placek.
@@ -58,14 +58,14 @@ export const Chapter26: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Widzę, że tutaj naprawdę odpocznę po przyjęciach u nomarchów!… — wesoło zawołał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         .
       </p>
       <p data-index="18">— Myśl o wieczności — odparł kapłan i oddalił się.</p>
       <p data-index="19">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Księcia{" "}
+          Księcia
         </span>{" "}
         niemile dotknęła ta odpowiedź. Pomimo że był głodny, nie chciał jeść placka ani pić wody. Usiadł na trawie i, patrząc na swoje pokaleczone w podróży nogi, pytał się: po co
         on tu przyszedł?… po co dobrowolnie wyzuł się ze swej dostojności?…
@@ -74,10 +74,10 @@ export const Chapter26: React.FC = () => {
         Widząc ściany celi i jej ubóstwo, przypomniał sobie chłopięce lata spędzone w kapłańskiej szkole. Ile on tam dostał kijów!… ile nocy przepędził na kamiennej posadzce za
         karę!…{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         i teraz uczuł tą nienawiść i trwogę, jakiej wówczas doświadczał wobec surowych kapłanów, którzy na wszystkie jego pytania i prośby odpowiadali zawsze jednym: „Myśl o
-        wieczności!…\'
+        wieczności!…'
       </p>
       <p data-index="21">
         Po kilkumiesięcznym zgiełku wpaść w taką ciszę, zamienić dwór książęcy na ciemność i samotność, a zamiast uczt, kobiet, muzyki czuć dokoła siebie i nad sobą ciężar murów…
@@ -85,7 +85,7 @@ export const Chapter26: React.FC = () => {
       <p data-index="22">
         „Oszalałem!… oszalałem!… — mówił do siebie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         .
       </p>
@@ -94,7 +94,7 @@ export const Chapter26: React.FC = () => {
         szorstkość pokutniczej płachty — wszystko to napełniało go obrzydzeniem. Gdyby choć miał swój miecz!… Ale czy w tym odzieniu i tym miejscu ośmieliłby się go użyć?…
       </p>
       <p data-index="24">Uczuł niepokonany strach i to go otrzeźwiło. Przypomniał sobie, że bogowie w świątyniach zsyłają na ludzi trwogę i że ona ma być wstępem do mądrości.</p>
-      <p data-index="25">„Jestem przecie namiestnikiem i następcą faraona — pomyślał — cóż mi tu kto zrobi?…\'</p>
+      <p data-index="25">„Jestem przecie namiestnikiem i następcą faraona — pomyślał — cóż mi tu kto zrobi?…'</p>
       <p data-index="26">
         Podniósł się i wyszedł ze swej celi. Znajdował się w wielkim dziedzińcu otoczonym kolumnami. Gwiazdy jasno świeciły, więc zobaczył — na jednym końcu podwórza olbrzymie
         pylony, na drugim otwarte wejście do świątyni.
@@ -124,7 +124,7 @@ export const Chapter26: React.FC = () => {
         <strong>Chór I</strong>. Wody Nilu płyną, gdy rozkazuję…
       </p>
       <p data-index="34">
-        <strong>Chór II</strong>. Ale bogowie nie znają jego imienia.\'<a href="#fn186" className="link-note"></a>
+        <strong>Chór II</strong>. Ale bogowie nie znają jego imienia.'<a href="#fn186" className="link-note"></a>
       </p>
       <p data-index="35">
         Głosy, z początku niewyraźne, potężniały tak, że słychać było każde słowo; a gdy zniknął orszak, zaczęły rozpraszać się między kolumnami, słabnąć… Wreszcie umilkły.
@@ -132,28 +132,28 @@ export const Chapter26: React.FC = () => {
       <p data-index="36">
         „A jednak ci ludzie — pomyślał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
-        — nie tylko jedzą, piją i zbierają bogactwa… Oni naprawdę spełniają służbę, nawet w nocy… Chociaż — co z tego przyjdzie posągowi!…\'
+        — nie tylko jedzą, piją i zbierają bogactwa… Oni naprawdę spełniają służbę, nawet w nocy… Chociaż — co z tego przyjdzie posągowi!…'
       </p>
       <p data-index="37">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         nieraz widywał posągi bóstw granicznych obrzucone błotem przez mieszkańców innego nomesu albo postrzelane z łuków i proc przez żołnierzy cudzoziemskich pułków. Jeżeli
         bogowie nie obrażają się o zniewagi, niewiele także muszą dbać o modlitwy i procesje.
       </p>
       <p data-index="38">
-        „Kto zresztą widział bogów!…\' — rzekł do siebie{" "}
+        „Kto zresztą widział bogów!…' — rzekł do siebie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         .
       </p>
       <p data-index="39">
         Ogrom świątyni, jej niezliczone kolumny, światła palące się przed posągiem, wszystko to pociągało{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>
         . Chciał rozejrzeć się w tym tajemniczym bezmiarze i poszedł naprzód.
       </p>
@@ -163,14 +163,14 @@ export const Chapter26: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Kto
         tu jest?… — zawołał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         i rzucił się między kolumny.
       </p>
       <p data-index="43">Lecz potknął się i omal nie upadł: coś schwyciło go za nogi.</p>
       <p data-index="44">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>{" "}
         znowu opanował strach, większy niż w celi. Zaczął uciekać bez pamięci, potrącając się o kolumny, które zastępowały mu drogę, a ciemność ogarniała ze wszech stron.
       </p>
@@ -184,7 +184,7 @@ export const Chapter26: React.FC = () => {
       </p>
       <p data-index="47">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         wrócił do swej celi wzburzony i skruszony; serce rzucało się w nim jak ptak schwytany w sidła. Pierwszy raz od wielu lat upadł twarzą na ziemię i gorąco modlił się o łaskę
         i przebaczenie.
@@ -192,7 +192,7 @@ export const Chapter26: React.FC = () => {
       <p data-index="48">— Będziesz wysłuchany!… — odezwał się nad nim słodki głos.</p>
       <p data-index="49">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         nagle podniósł głowę, lecz w celi nie było nikogo: drzwi zamknięte, mury grube. Modlił się więc jeszcze goręcej i tak usnął, z twarzą na kamieniach i rozkrzyżowanymi
         rękoma.
@@ -209,7 +209,7 @@ export const Chapter26: React.FC = () => {
       <p data-index="53">
         Pewnego dnia{" "}
         <span className="character-highlighted" data-character="Wielki-prorok-swiatyni-Hator" data-src-listening="/Pharaon/wielki-prorok-swiatyni-hator-listens.mp4">
-          wielki prorok świątyni{" "}
+          wielki prorok świątyni
         </span>{" "}
         wezwał go do siebie, przypominając, że nie wszedł tu wyłącznie dla modłów, ale dla poznania mądrości. Pochwalił jego pobożne życie, powiedział, że jest już oczyszczony z
         brudów świata, i kazał mu zapoznać się ze szkołami istniejącymi przy świątyni.
@@ -217,7 +217,7 @@ export const Chapter26: React.FC = () => {
       <p data-index="54">
         Raczej przez posłuszeństwo aniżeli ciekawość{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         prosto od niego udał się na zewnętrzny dziedziniec, gdzie mieścił się oddział czytania i pisania.
       </p>
@@ -228,20 +228,20 @@ export const Chapter26: React.FC = () => {
       <p data-index="56">
         Gdy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         wszedł, uczniowie (prawie wszyscy jednego wieku z nim) upadli na twarz. Nauczyciel zaś, skłoniwszy się, przerwał dotychczasowe zajęcie, aby wypowiedzieć chłopcom wykład o
         wielkim znaczeniu nauki.
       </p>
       <p data-index="57">
         — Moi kochani! — mówił. — „Człowiek, który nie ma serca do mądrości, musi zajmować się pracą ręczną i męczyć oczy. Ale ten, kto rozumie wartość nauk i kształci się w nich,
-        może osiągnąć wszystkie władze, wszystkie dworskie urzędy. Pamiętajcie o tym.\'<a href="#fn187" className="link-note"></a>
+        może osiągnąć wszystkie władze, wszystkie dworskie urzędy. Pamiętajcie o tym.'<a href="#fn187" className="link-note"></a>
       </p>
       <p data-index="58">
         Przypatrzcie się nędznemu życiu ludzi, którzy nie znają pisma. „Kowal jest czarny, posmolony, ma palce pełne nagniotków, a pracuje dzień i noc. Kamieniarz zrywa sobie
         ramię, ażeby napełnić żołądek. Mularz<a href="#fn188" className="link-note"></a> budujący kapitele w formie lotosu bywa strącany przez wicher ze szczytu dachu. Tkacz ma
         zgięte kolana, fabrykant broni ciągle podróżuje: ledwo przyjedzie do domu wieczorem, już musi go opuszczać. Malarzowi pokojowemu cuchną palce, a czas upływa mu na krajaniu
-        gałganów. Zaś szybkobiegacz, ten, żegnając się z rodziną, powinien zostawić testament, bo naraża się na niebezpieczeństwo spotkania dzikich zwierząt lub Azjatów.\'
+        gałganów. Zaś szybkobiegacz, ten, żegnając się z rodziną, powinien zostawić testament, bo naraża się na niebezpieczeństwo spotkania dzikich zwierząt lub Azjatów.'
       </p>
       <p data-index="59">
         Pokazałem wam dolę różnych rzemiosł, bo chcę, ażebyście kochali sztukę pisania, która jest waszą matką, a teraz przedstawię wam jej piękności. Ona nie jest pustym słowem na
@@ -261,7 +261,7 @@ export const Chapter26: React.FC = () => {
       <p data-index="62">
         Toteż{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         zmęczył się samym słuchaniem, wśród którego jedyną rozrywkę stanowiło to, gdy nauczyciel kazał któremu z uczniów wyrysować lub nazwać literę i walił go kijem, gdy się
         omylił.
@@ -269,7 +269,7 @@ export const Chapter26: React.FC = () => {
       <p data-index="63">
         Pożegnawszy nauczyciela i wychowańców,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         ze szkoły pisarzy przeszedł do szkoły mierników. Tu uczono młodzież zdejmować plany pól, mających po największej części formę prostokątów, tudzież niwelować grunta za
         pomocą dwu łat i węgielnicy. W tym również oddziale wykładano sztukę pisania liczb, nie mniej zawikłaną jak hieroglify albo znaki demotyczne. Lecz najprostsze działania
@@ -277,7 +277,7 @@ export const Chapter26: React.FC = () => {
       </p>
       <p data-index="64">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         miał tego dosyć i dopiero po kilku dniach zgodził się odwiedzić szkołę lekarską.
       </p>
@@ -288,27 +288,27 @@ export const Chapter26: React.FC = () => {
       <p data-index="66">
         Gdy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         wszedł tutaj, panowała największa czynność. Kilku pacjentów kąpało się w sadzawce wody bieżącej, jednego smarowano wonnymi maściami, jednego okadzano. Było kilku, których
         uśpiono za pomocą wzroku i pociągnięć rękami; jeden jęczał po nastawieniu zwichniętej nogi.
       </p>
       <p data-index="67">Pewnej ciężko chorej kobiecie kapłan podawał w kubku jakąś miksturę, mówiąc:</p>
       <p data-index="68">
-        „Chodź, leku, chodź, wypędź to z mego serca, z tych moich członków, silny w czary przy tym leku.\'<a href="#fn190" className="link-note"></a>
+        „Chodź, leku, chodź, wypędź to z mego serca, z tych moich członków, silny w czary przy tym leku.'<a href="#fn190" className="link-note"></a>
       </p>
       <p data-index="69">
         Następnie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         w towarzystwie{" "}
         <span className="character-highlighted" data-character="Wielki-lekarz-swiatyni-Hator" data-src-listening="/Pharaon/wielki-lekarz-swiatyni-hator.png">
-          wielkiego lekarza{" "}
+          wielkiego lekarza
         </span>{" "}
         poszedł do apteki, gdzie jeden z kapłanów przygotowywał lekarstwa z ziół, miodu, oliwy, skórek wężowych i jaszczurczych, kości i tłuszczów zwierzęcych. Na zapytanie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>{" "}
         laborant nie oderwał oczu od swej pracy. Tylko wciąż ważył i rozcierał materiały, odmawiając przy tym modlitwę:
       </p>
@@ -317,13 +317,13 @@ export const Chapter26: React.FC = () => {
         i gorączki bogini…
       </p>
       <p data-index="71">
-        O Schauagat\', eenagate\' synie! Erukate\'! Kauaruschagate\'!… Paparuka paparaka paparuka…\'<a href="#fn191" className="link-note"></a>
+        O Schauagat', eenagate' synie! Erukate'! Kauaruschagate'!… Paparuka paparaka paparuka…'<a href="#fn191" className="link-note"></a>
       </p>
       <p data-index="72">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Co
         on mówi? — spytał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         .
       </p>
@@ -336,18 +336,18 @@ export const Chapter26: React.FC = () => {
         />
         — Tajemnica… — odparł{" "}
         <span className="character-highlighted" data-character="Wielki-lekarz-swiatyni-Hator" data-src-listening="/Pharaon/wielki-lekarz-swiatyni-hator.png">
-          wielki lekarz{" "}
+          wielki lekarz
         </span>
         , kładąc palec na ustach.
       </p>
       <p data-index="74">
         Gdy wyszli na pusty dziedziniec,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         rzekł do{" "}
         <span className="character-highlighted" data-character="Wielki-lekarz-swiatyni-Hator" data-src-listening="/Pharaon/wielki-lekarz-swiatyni-hator.png">
-          wielkiego lekarza{" "}
+          wielkiego lekarza
         </span>
         :
       </p>
@@ -367,7 +367,7 @@ export const Chapter26: React.FC = () => {
         />
         — Co to jest choroba, jakim sposobem spada na ludzkie ciało, o tym nie mogę powiedzieć ci,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesie{" "}
+          Ramzesie
         </span>
         . Ale objaśnię ci, bo zostałeś oczyszczony, czym kierujemy się przy wydawaniu lekarstw.
       </p>
@@ -404,11 +404,11 @@ export const Chapter26: React.FC = () => {
       </p>
       <p data-index="84">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         słuchał z uwagą, w duchu jednak przyznał, że niewiele rozumie. Zarazem przypomniał sobie cel swojego przybycia do świątyni i nagle zapytał{" "}
         <span className="character-highlighted" data-character="Wielki-lekarz-swiatyni-Hator" data-src-listening="/Pharaon/wielki-lekarz-swiatyni-hator.png">
-          wielkiego lekarza{" "}
+          wielkiego lekarza
         </span>
         :
       </p>
@@ -425,21 +425,21 @@ export const Chapter26: React.FC = () => {
         />
         — Bynajmniej — odpowiedział{" "}
         <span className="character-highlighted" data-character="Wielki-lekarz-swiatyni-Hator" data-src-listening="/Pharaon/wielki-lekarz-swiatyni-hator.png">
-          lekarz{" "}
+          lekarz
         </span>
         . — Ale my nie znamy się na rzeczach państwowych. Dopiero ma tu zjechać święty kapłan{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         , wielki mędrzec, i on zdejmie z oczu twoich zasłonę.
       </p>
       <p data-index="87">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         pożegnał{" "}
         <span className="character-highlighted" data-character="Wielki-lekarz-swiatyni-Hator" data-src-listening="/Pharaon/wielki-lekarz-swiatyni-hator.png">
-          lekarza{" "}
+          lekarza
         </span>{" "}
         jeszcze więcej zaciekawiony tym, co miano mu pokazać.
       </p>

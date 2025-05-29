@@ -5,813 +5,807 @@ export const Chapter6: React.FC = () => {
     <section data-chapter="6">
       <p data-index="0">Rozdział VI</p>
       <p data-index="1">
-        \n Do pałacu{" "}
+        Do pałacu{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         pod Memfisem wchodziło się przez bramę osadzoną między dwoma pięciopiętrowymi wieżami, czyli — pylonami. Zewnętrzne ściany tych budowli, wzniesionych z szarego piaskowca,
-        od dołu do góry były okryte płaskorzeźbami.\n
+        od dołu do góry były okryte płaskorzeźbami.
       </p>
       <p data-index="2">
-        \n Na szczycie bramy wznosił się herb czy symbol państwa: skrzydlata kula, spoza której wychylały się dwa węże. Poniżej siedział rząd bogów, którym faraonowie składali
-        ofiary. Na bocznych słupach wyrzeźbiono również wizerunki bogów, w pięciu kondygnacjach, jedna nad drugą, a u dołu — hieroglificzne napisy.\n
+        Na szczycie bramy wznosił się herb czy symbol państwa: skrzydlata kula, spoza której wychylały się dwa węże. Poniżej siedział rząd bogów, którym faraonowie składali ofiary.
+        Na bocznych słupach wyrzeźbiono również wizerunki bogów, w pięciu kondygnacjach, jedna nad drugą, a u dołu — hieroglificzne napisy.
       </p>
       <p data-index="3">
-        \n Na ścianach każdego pylonu główne miejsce zajmowała płaskorzeźba Ramzesa Wielkiego, który w jednej ręce miał podniesiony topór, a drugą trzymał za włosy gromadę ludzi
+        Na ścianach każdego pylonu główne miejsce zajmowała płaskorzeźba Ramzesa Wielkiego, który w jednej ręce miał podniesiony topór, a drugą trzymał za włosy gromadę ludzi
         związanych w pęk niby pietruszka. Powyżej króla stały lub siedziały znowu dwie kondygnacje bogów; jeszcze wyżej szereg ludzi niosących ofiary, a pod samym szczytem pylonów
-        wizerunki skrzydlatych wężów, przeplatane wizerunkami skarabeuszów.\n
+        wizerunki skrzydlatych wężów, przeplatane wizerunkami skarabeuszów.
       </p>
       <p data-index="4">
-        \n Te pięciopiętrowe pylony o ścianach zwężających się ku górze, trzypiętrowa brama, która je łączyła, płaskorzeźby, w których porządek mieszał się z ponurą fantazją, a
-        pobożność z okrucieństwem, robiły przygnębiające wrażenie. Zdawało się, że trudno tu wejść, niepodobna wyjść, a żyć — ciężko.\n
+        Te pięciopiętrowe pylony o ścianach zwężających się ku górze, trzypiętrowa brama, która je łączyła, płaskorzeźby, w których porządek mieszał się z ponurą fantazją, a
+        pobożność z okrucieństwem, robiły przygnębiające wrażenie. Zdawało się, że trudno tu wejść, niepodobna wyjść, a żyć — ciężko.
       </p>
       <p data-index="5">
-        \n Z bramy, przed którą stało wojsko i tłum drobnych urzędników, wchodziło się na dziedziniec otoczony krużgankami, wspartymi na piętrowych słupach. Był to ozdobny ogródek,
-        w którym hodowano aloesy, małe palmy, drzewa pomarańczowe i cedry w wazonach, wszystko wyciągnięte w szeregi i dobrane według wzrostu. Na środku tryskała fontanna; ścieżki
-        wysypano kolorowym piaskiem.\n
+        Z bramy, przed którą stało wojsko i tłum drobnych urzędników, wchodziło się na dziedziniec otoczony krużgankami, wspartymi na piętrowych słupach. Był to ozdobny ogródek, w
+        którym hodowano aloesy, małe palmy, drzewa pomarańczowe i cedry w wazonach, wszystko wyciągnięte w szeregi i dobrane według wzrostu. Na środku tryskała fontanna; ścieżki
+        wysypano kolorowym piaskiem.
       </p>
-      <p data-index="6">\n Tu, pod krużgankami, siedzieli lub przechadzali się wyżsi urzędnicy państwa, szepcząc po cichu.\n</p>
+      <p data-index="6">Tu, pod krużgankami, siedzieli lub przechadzali się wyżsi urzędnicy państwa, szepcząc po cichu.</p>
       <p data-index="7">
-        \n Z dziedzińca, przez wysokie drzwi, szło się do sali wspartej na dwunastu kolumnach trzypiętrowych. Sala była duża, lecz z powodu grubości kolumn wydawała się ciasną.
+        Z dziedzińca, przez wysokie drzwi, szło się do sali wspartej na dwunastu kolumnach trzypiętrowych. Sala była duża, lecz z powodu grubości kolumn wydawała się ciasną.
         Oświetlały ją drobne okienka w ścianach i duży prostokątny otwór w suficie. Panował tu chłód i cień, prawie zmrok, który jednak nie przeszkadzał widzieć żółtych ścian i
         słupów pokrytych kondygnacjami malowideł. W górze — liście i kwiaty, niżej bogowie, jeszcze niżej ludzie, którzy nieśli ich posągi lub składali ofiary, a między tymi
-        grupami szeregi hieroglifów.\n
+        grupami szeregi hieroglifów.
       </p>
-      <p data-index="8">\n Wszystko to było malowane wyraźnymi, prawie ostrymi kolorami: zielonym, czerwonym i niebieskim.\n</p>
+      <p data-index="8">Wszystko to było malowane wyraźnymi, prawie ostrymi kolorami: zielonym, czerwonym i niebieskim.</p>
       <p data-index="9">
-        \n W tej sali, z wzorzystą posadzką mozaikową, stali w ciszy, białych szatach i boso — kapłani, najwyżsi urzędnicy państwa, minister wojny{" "}
+        W tej sali, z wzorzystą posadzką mozaikową, stali w ciszy, białych szatach i boso — kapłani, najwyżsi urzędnicy państwa, minister wojny{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         tudzież wodzowie:{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
-          Patrokles{" "}
+          Patrokles
         </span>
         , wezwani do{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>
-        .\n
+        .
       </p>
       <p data-index="10">
-        \n Jego świątobliwość{" "}
+        Jego świątobliwość{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzes XII{" "}
+          Ramzes XII
         </span>
         , jak zwykle przed naradą, składał ofiary bogom w swojej kaplicy. Ciągnęło się to dość długo. Co chwilę z dalszych komnat wbiegał jakiś kapłan albo urzędnik, komunikując
-        wiadomości o przebiegu nabożeństwa.\n
+        wiadomości o przebiegu nabożeństwa.
       </p>
-      <p data-index="11">\n — Już pan złamał pieczęć do kaplicy… Już myje święte bóstwo… Już go ubiera… Już zamknął drzwi…\n</p>
+      <p data-index="11">— Już pan złamał pieczęć do kaplicy… Już myje święte bóstwo… Już go ubiera… Już zamknął drzwi…</p>
       <p data-index="12">
-        \n Na twarzach obecnych, pomimo ich dostojeństw, malował się niepokój i zgnębienie. Tylko{" "}
+        Na twarzach obecnych, pomimo ich dostojeństw, malował się niepokój i zgnębienie. Tylko{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         był obojętny,{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
-          Patrokles{" "}
+          Patrokles
         </span>{" "}
         niecierpliwy, a{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>{" "}
         od czasu do czasu mącił uroczystą ciszę swoim potężnym głosem. Za każdym tak nieprzyzwoitym odezwaniem się starego wodza dworacy poruszali się niby spłoszone owce, a potem
-        spoglądali na siebie, jakby mówiąc:\n
+        spoglądali na siebie, jakby mówiąc:
       </p>
-      <p data-index="13">\n „To gbur, całe życie ugania się za barbarzyńcami, więc można mu wybaczyć…\'\n</p>
+      <p data-index="13">„To gbur, całe życie ugania się za barbarzyńcami, więc można mu wybaczyć…'</p>
       <p data-index="14">
-        \n W dalszych komnatach odezwał się dźwięk dzwonków i chrzęst broni. Do sali weszło dwoma rzędami kilkunastu gwardzistów w złotych hełmach i napierśnikach, z obnażonymi
+        W dalszych komnatach odezwał się dźwięk dzwonków i chrzęst broni. Do sali weszło dwoma rzędami kilkunastu gwardzistów w złotych hełmach i napierśnikach, z obnażonymi
         mieczami, potem dwa szeregi kapłanów, a nareszcie ukazał się{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>
-        , niesiony na tronie, otoczony obłokami dymu z kadzielnic.\n
+        , niesiony na tronie, otoczony obłokami dymu z kadzielnic.
       </p>
       <p data-index="15">
-        \n Władca Egiptu,{" "}
+        Władca Egiptu,{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzes XII{" "}
+          Ramzes XII
         </span>
-        , był to człowiek blisko sześćdziesięcioletni, z twarzą zwiędłą. Miał na sobie białą togę, na głowie czerwono-biały kołpak ze złotym wężem, w ręku długą laskę.\n
+        , był to człowiek blisko sześćdziesięcioletni, z twarzą zwiędłą. Miał na sobie białą togę, na głowie czerwono-biały kołpak ze złotym wężem, w ręku długą laskę.
       </p>
       <p data-index="16">
-        \n Kiedy orszak ukazał się, wszyscy upadli na twarz. Tylko{" "}
+        Kiedy orszak ukazał się, wszyscy upadli na twarz. Tylko{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
-          Patrokles{" "}
+          Patrokles
         </span>
         , jako barbarzyńca, poprzestał na niskim ukłonie, a{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>{" "}
-        przyklęknął na jedno kolano, lecz wnet podniósł się.\n
+        przyklęknął na jedno kolano, lecz wnet podniósł się.
       </p>
       <p data-index="17">
-        \n Lektyka zatrzymała się przed baldachimem, pod którym na wzniesieniu stał tron hebanowy.{" "}
+        Lektyka zatrzymała się przed baldachimem, pod którym na wzniesieniu stał tron hebanowy.{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Faraon{" "}
+          Faraon
         </span>{" "}
         z wolna zeszedł z lektyki, chwilę popatrzył na obecnych, a potem, usiadłszy na tronie, utkwił oczy w gzyms sali, na którym była wymalowana różowa kula z niebieskimi
-        skrzydłami i zielonymi wężami.\n
+        skrzydłami i zielonymi wężami.
       </p>
       <p data-index="18">
-        \n Na prawo od{" "}
+        Na prawo od{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         stanął{" "}
         <span className="character-highlighted" data-character="Wielki-pisarz" data-src-listening="/Pharaon/wielki-pisarz-listens.mp4">
-          wielki pisarz{" "}
+          wielki pisarz
         </span>
         , na lewo{" "}
         <span className="character-highlighted" data-character="Sedzia" data-src-listening="/Pharaon/sedzia-listens.mp4">
-          sędzia{" "}
+          sędzia
         </span>{" "}
-        z laską, obaj w ogromnych perukach.\n
+        z laską, obaj w ogromnych perukach.
       </p>
       <p data-index="19">
-        \n Na znak dany przez{" "}
+        Na znak dany przez{" "}
         <span className="character-highlighted" data-character="Sedzia" data-src-listening="/Pharaon/sedzia-listens.mp4">
-          sędziego{" "}
+          sędziego
         </span>{" "}
         wszyscy usiedli albo uklękli na podłodze, zaś{" "}
         <span className="character-highlighted" data-character="Wielki-pisarz" data-src-listening="/Pharaon/wielki-pisarz-listens.mp4">
-          pisarz{" "}
+          pisarz
         </span>{" "}
         odezwał się do{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>
-        :\n
+        :
       </p>
       <p data-index="20">
-        <span className="character-placeholder character-talking" data-character="Wielki-pisarz" data-src-talking="/Pharaon/wielki-pisarz-speaks.mp4" data-is-talking="true" />
-        \n — Panie nasz i władco potężny! Twój sługa{" "}
+        <span className="character-placeholder character-talking" data-character="Wielki-pisarz" data-src-talking="/Pharaon/wielki-pisarz-speaks.mp4" data-is-talking="true" />—
+        Panie nasz i władco potężny! Twój sługa{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>
         , wielki strażnik granicy wschodniej, przyjechał, aby złożyć ci hołdy, i przywiózł haracz od pobitych narodów: wazę z zielonego kamienia pełną złota, trzysta wołów, sto
-        koni i wonne drzewo teszep.\n
+        koni i wonne drzewo teszep.
       </p>
       <p data-index="21">
-        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />
-        \n — Nędzny to haracz, mój panie — odezwał się{" "}
+        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />— Nędzny to
+        haracz, mój panie — odezwał się{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>
-        . — Prawdziwe skarby znaleźlibyśmy dopiero nad Eufratem, gdzie pysznym, choć jeszcze słabym królom bardzo potrzeba przypomnieć czasy Ramzesa Wielkiego.\n
+        . — Prawdziwe skarby znaleźlibyśmy dopiero nad Eufratem, gdzie pysznym, choć jeszcze słabym królom bardzo potrzeba przypomnieć czasy Ramzesa Wielkiego.
       </p>
       <p data-index="22">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Odpowiedz słudze memu{" "}
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Odpowiedz
+        słudze memu{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitagerowi{" "}
+          Nitagerowi
         </span>{" "}
         — rzekł do{" "}
         <span className="character-highlighted" data-character="Wielki-pisarz" data-src-listening="/Pharaon/wielki-pisarz-listens.mp4">
-          pisarza{" "}
-        </span>
+          pisarza
+        </span>{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         — że jego słowa będą wzięte pod pilną uwagę. A teraz zapytaj go: co sądzi o wojskowych zdolnościach syna mego i{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>
-        , z którym wczoraj miał zaszczyt zetrzeć się pod Pi-Bailos?\n
+        , z którym wczoraj miał zaszczyt zetrzeć się pod Pi-Bailos?
       </p>
       <p data-index="23">
-        <span className="character-placeholder character-talking" data-character="Wielki-pisarz" data-src-talking="/Pharaon/wielki-pisarz-speaks.mp4" data-is-talking="true" />
-        \n — Nasz władca, pan dziewięciu narodów, zapytuje cię,{" "}
+        <span className="character-placeholder character-talking" data-character="Wielki-pisarz" data-src-talking="/Pharaon/wielki-pisarz-speaks.mp4" data-is-talking="true" />—
+        Nasz władca, pan dziewięciu narodów, zapytuje cię,{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitagerze{" "}
+          Nitagerze
         </span>
         … — zaczął{" "}
         <span className="character-highlighted" data-character="Wielki-pisarz" data-src-listening="/Pharaon/wielki-pisarz-listens.mp4">
-          pisarz{" "}
+          pisarz
         </span>
-        .\n
+        .
       </p>
-      <p data-index="24">\n Wtem, ku największemu zgorszeniu dworaków, wódz przerwał szorstko:\n</p>
+      <p data-index="24">Wtem, ku największemu zgorszeniu dworaków, wódz przerwał szorstko:</p>
       <p data-index="25">
-        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />
-        \n — Sam słyszę, co mówi pan mój… Ustami zaś jego, kiedy zwraca się do mnie, mógłby być tylko{" "}
+        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />— Sam słyszę, co
+        mówi pan mój… Ustami zaś jego, kiedy zwraca się do mnie, mógłby być tylko{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca tronu{" "}
+          następca tronu
         </span>
         , nie zaś ty,{" "}
         <span className="character-highlighted" data-character="Wielki-pisarz" data-src-listening="/Pharaon/wielki-pisarz-listens.mp4">
-          wielki pisarzu{" "}
+          wielki pisarzu
         </span>
-        .\n
+        .
       </p>
       <p data-index="26">
         <span className="character-highlighted" data-character="Wielki-pisarz" data-src-listening="/Pharaon/wielki-pisarz-listens.mp4">
-          Pisarz{" "}
+          Pisarz
         </span>{" "}
         z przerażeniem spojrzał na śmiałka, ale{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
-        rzekł:\n
+        rzekł:
       </p>
       <p data-index="27">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Mówi prawdę mój wiemy sługa{" "}
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Mówi
+        prawdę mój wiemy sługa{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>
-        .\n
+        .
       </p>
       <p data-index="28">
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Minister wojny{" "}
+          Minister wojny
         </span>{" "}
-        ukłonił się.\n
+        ukłonił się.
       </p>
       <p data-index="29">
-        \n Teraz{" "}
+        Teraz{" "}
         <span className="character-highlighted" data-character="Sedzia" data-src-listening="/Pharaon/sedzia-listens.mp4">
-          sędzia{" "}
+          sędzia
         </span>{" "}
         obwieścił wszystkim obecnym: kapłanom, urzędnikom i gwardii, że mogą wyjść na dziedziniec, i sam wraz z{" "}
         <span className="character-highlighted" data-character="Wielki-pisarz" data-src-listening="/Pharaon/wielki-pisarz-listens.mp4">
-          pisarzem{" "}
+          pisarzem
         </span>
         , skłoniwszy się tronowi, pierwsi opuścili salę. Został w niej tylko{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>
         ,{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
-        i dwaj wodzowie.\n
+        i dwaj wodzowie.
       </p>
       <p data-index="30">
-        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />
-        \n — Nakłoń uszy swoje, władco, i wysłuchaj skargi — zaczął{" "}
+        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />— Nakłoń uszy
+        swoje, władco, i wysłuchaj skargi — zaczął{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>
         . — Dziś z rana kapłan-urzędnik, który z twego rozkazu przyszedł namaścić włosy moje, powiedział mi, ażebym idąc do ciebie zostawił sandały w przysionku. Tymczasem wiadomo
-        jest nie tylko w Górnym i Dolnym Egipcie, ale u Hetytów, w Libii, Fenicji i w kraju Punt, że dwadzieścia lat temu dałeś mi prawo stawania przed tobą w sandałach.\n
+        jest nie tylko w Górnym i Dolnym Egipcie, ale u Hetytów, w Libii, Fenicji i w kraju Punt, że dwadzieścia lat temu dałeś mi prawo stawania przed tobą w sandałach.
       </p>
       <p data-index="31">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Mówisz prawdę — rzekł{" "}
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Mówisz
+        prawdę — rzekł{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>
-        . — Do mego dworu zakradły się różne nieporządki.\n
+        . — Do mego dworu zakradły się różne nieporządki.
       </p>
       <p data-index="32">
-        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />
-        \n — Tylko rozkaż, królu, a moi weterani zaraz zrobią ład — pochwycił{" "}
+        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />— Tylko rozkaż,
+        królu, a moi weterani zaraz zrobią ład — pochwycił{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>
-        .\n
+        .
       </p>
       <p data-index="33">
-        \n Na znak dany przez{" "}
+        Na znak dany przez{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          ministra wojny{" "}
+          ministra wojny
         </span>{" "}
         wbiegło kilku urzędników: jeden przyniósł sandały i obuł{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitagera{" "}
+          Nitagera
         </span>
         , inni naprzeciw tronu ustawili kosztowne taborety dla{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          ministra{" "}
+          ministra
         </span>{" "}
-        i wodzów.\n
+        i wodzów.
       </p>
       <p data-index="34">
-        \n Gdy trzej dostojnicy usiedli,{" "}
+        Gdy trzej dostojnicy usiedli,{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
-        zapytał:\n
+        zapytał:
       </p>
       <p data-index="35">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Powiedz mi,{" "}
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Powiedz
+        mi,{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitagerze{" "}
+          Nitagerze
         </span>
-        , czy sądzisz, że mój syn będzie wodzem?… Ale mów szczerą prawdę.\n
+        , czy sądzisz, że mój syn będzie wodzem?… Ale mów szczerą prawdę.
       </p>
       <p data-index="36">
-        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />
-        \n — Na Amona z Teb, na sławę moich przodków, w których płynęła krew królewska, przysięgam, że{" "}
+        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />— Na Amona z Teb,
+        na sławę moich przodków, w których płynęła krew królewska, przysięgam, że{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         , twój{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>
         , będzie wielkim wodzem, jeżeli mu pozwolą bogowie — odparł{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>
         . — Młody to jest chłopak, jeszcze pacholę, a jednak z wielką umiejętnością zebrał pułki, zaopatrzył i marsz im ułatwił. Najwięcej zaś podoba mi się, że nie stracił głowy,
         kiedy mu przeciąłem drogę, lecz poprowadził swoich do ataku. On będzie wodzem i zwycięży Asyryjczyków, których dziś trzeba pobić, jeżeli nasze wnuki nie mają zobaczyć ich
-        nad Nilem.\n
+        nad Nilem.
       </p>
       <p data-index="37">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Cóż ty na to,{" "}
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Cóż ty na
+        to,{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhorze{" "}
+          Herhorze
         </span>
         ? — zapytał{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>
-        .\n
+        .
       </p>
       <p data-index="38">
-        <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />
-        \n — Co się tyczy Asyryjczyków, myślę, że dostojny{" "}
+        <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Co się tyczy
+        Asyryjczyków, myślę, że dostojny{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>{" "}
         za wcześnie kłopocze się nimi. Jeszcze jesteśmy chorzy po dawnych wojnach i musimy pierwej dobrze się wzmocnić, zanim rozpoczniemy nową — mówił{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          minister{" "}
+          minister
         </span>
         . — Co się zaś tyczy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy tronu{" "}
+          następcy tronu
         </span>
         ,{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>{" "}
-        sprawiedliwie mówi, że młodzian ten posiada zalety wodza: jest przezorny jak lis i gwałtowny jak lew. Mimo to wczoraj popełnił dużo błędów…\n
+        sprawiedliwie mówi, że młodzian ten posiada zalety wodza: jest przezorny jak lis i gwałtowny jak lew. Mimo to wczoraj popełnił dużo błędów…
       </p>
       <p data-index="39">
-        <span className="character-placeholder character-talking" data-character="Patrokles" data-src-talking="/Pharaon/patrokles-speaks.mp4" data-is-talking="true" />
-        \n — Kto z nas ich nie popełnia!… — wtrącił milczący dotąd{" "}
+        <span className="character-placeholder character-talking" data-character="Patrokles" data-src-talking="/Pharaon/patrokles-speaks.mp4" data-is-talking="true" />— Kto z nas
+        ich nie popełnia!… — wtrącił milczący dotąd{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
-          Patrokles{" "}
+          Patrokles
         </span>
-        .\n
+        .
       </p>
       <p data-index="40">
-        <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />
-        \n —{" "}
+        <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Następca{" "}
+          Następca
         </span>{" "}
         — ciągnął{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          minister{" "}
+          minister
         </span>{" "}
         — mądrze prowadził główny korpus, ale zaniedbał swój sztab, przez co maszerowaliśmy tak wolno i nieporządnie, że{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>{" "}
-        mógł zabiec nam drogę…\n
+        mógł zabiec nam drogę…
       </p>
       <p data-index="41">
-        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />
-        \n — Może{" "}
+        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />— Może{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         liczył na waszą dostojność? — spytał{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>
-        .\n
+        .
       </p>
       <p data-index="42">
-        <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />
-        \n — W rządzie i wojnie na nikogo nie liczy się: o jeden niedopatrzony kamyk można się przewrócić — rzekł{" "}
+        <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— W rządzie i
+        wojnie na nikogo nie liczy się: o jeden niedopatrzony kamyk można się przewrócić — rzekł{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          minister{" "}
+          minister
         </span>
-        .\n
+        .
       </p>
       <p data-index="43">
-        <span className="character-placeholder character-talking" data-character="Patrokles" data-src-talking="/Pharaon/patrokles-speaks.mp4" data-is-talking="true" />
-        \n — Gdybyś wasza dostojność — odezwał się{" "}
+        <span className="character-placeholder character-talking" data-character="Patrokles" data-src-talking="/Pharaon/patrokles-speaks.mp4" data-is-talking="true" />— Gdybyś
+        wasza dostojność — odezwał się{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
-          Patrokles{" "}
+          Patrokles
         </span>{" "}
-        — nie zepchnął kolumny z gościńca z powodu tych tam skarabeuszów…\n
+        — nie zepchnął kolumny z gościńca z powodu tych tam skarabeuszów…
       </p>
       <p data-index="44">
-        <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />
-        \n — Jesteś wasza dostojność cudzoziemcem i poganinem — odparł{" "}
+        <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Jesteś wasza
+        dostojność cudzoziemcem i poganinem — odparł{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         — więc tak mówisz. My zaś, Egipcjanie, rozumiemy, że gdy lud i żołnierze przestaną szanować skarabeusza, synowie ich przestaną się bać ureusa. Z lekceważenia bogów urodzi
         się bunt przeciw{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraonowi{" "}
+          faraonowi
         </span>
-        …\n
+        …
       </p>
       <p data-index="45">
-        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />
-        \n — A od czego topory? — przerwał{" "}
+        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />— A od czego
+        topory? — przerwał{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>
-        . — Kto chce zachować głowę na plecach, niech słucha najwyższego wodza.\n
+        . — Kto chce zachować głowę na plecach, niech słucha najwyższego wodza.
       </p>
       <p data-index="46">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Jakaż więc jest twoja ostateczna myśl o{" "}
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Jakaż
+        więc jest twoja ostateczna myśl o{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>
         ? — spytał{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
-        </span>
+          faraon
+        </span>{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>
-        .\n
+        .
       </p>
       <p data-index="47">
-        <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />
-        \n — Żywy obrazie słońca, synu bogów — odparł{" "}
+        <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Żywy obrazie
+        słońca, synu bogów — odparł{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          minister{" "}
+          minister
         </span>
         . — Każ{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>{" "}
         namaścić, daj mu wielki łańcuch i dziesięć talentów, ale wodzem korpusu Menfi jeszcze go nie mianuj. Książę na ten urząd jest za młody, za gorący, niedoświadczony. Czy więc
         możemy uznać go równym{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
-          Patroklesowi{" "}
+          Patroklesowi
         </span>
         , który w dwudziestu bitwach zdeptał Etiopów i Libijczyków? A czy możemy stawiać go obok{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitagera{" "}
+          Nitagera
         </span>
-        , którego samo imię od dwudziestu lat przyprawia o bladość naszych wrogów ze wschodu i północy?\n
+        , którego samo imię od dwudziestu lat przyprawia o bladość naszych wrogów ze wschodu i północy?
       </p>
       <p data-index="48">
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Faraon{" "}
+          Faraon
         </span>{" "}
-        oparł głowę na ręku, pomyślał i rzekł:\n
+        oparł głowę na ręku, pomyślał i rzekł:
       </p>
       <p data-index="49">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Odejdźcie w spokoju i łasce mojej. Uczynię, jak nakazuje mądrość i sprawiedliwość.\n
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Odejdźcie
+        w spokoju i łasce mojej. Uczynię, jak nakazuje mądrość i sprawiedliwość.
       </p>
       <p data-index="50">
-        \n Dostojnicy skłonili się głęboko, a{" "}
+        Dostojnicy skłonili się głęboko, a{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzes XII{" "}
+          Ramzes XII
         </span>
-        , nie czekając na świtę, przeszedł do dalszych komnat.\n
+        , nie czekając na świtę, przeszedł do dalszych komnat.
       </p>
       <p data-index="51">
-        \n Kiedy dwaj wodzowie znaleźli się sami w przysionku,{" "}
+        Kiedy dwaj wodzowie znaleźli się sami w przysionku,{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitager{" "}
+          Nitager
         </span>{" "}
         odezwał się do{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
-          Patroklesa{" "}
+          Patroklesa
         </span>
-        :\n
+        :
       </p>
       <p data-index="52">
-        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />
-        \n — Tu, widzę, rządzą kapłani jak u siebie. Ale jaki to wódz ten{" "}
+        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />— Tu, widzę,
+        rządzą kapłani jak u siebie. Ale jaki to wódz ten{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         !… Pobił nas, nim przyszliśmy do słowa, i nie da korpusu{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>
-        …\n
+        …
       </p>
       <p data-index="53">
-        <span className="character-placeholder character-talking" data-character="Patrokles" data-src-talking="/Pharaon/patrokles-speaks.mp4" data-is-talking="true" />
-        \n — Mnie tak pochwalił, że nie śmiałem się odezwać — odparł{" "}
+        <span className="character-placeholder character-talking" data-character="Patrokles" data-src-talking="/Pharaon/patrokles-speaks.mp4" data-is-talking="true" />— Mnie tak
+        pochwalił, że nie śmiałem się odezwać — odparł{" "}
         <span className="character-highlighted" data-character="Patrokles" data-src-listening="/Pharaon/patrokles-listens.mp4">
-          Patrokles{" "}
+          Patrokles
         </span>
-        .\n
+        .
       </p>
       <p data-index="54">
-        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />
-        \n — Zresztą on daleko widzi, choć nie wszystko mówi. Za następcą wcisnęliby się do korpusu rozmaite paniczyki, co to ze śpiewaczkami jeżdżą na wojnę, i oni zajęliby
-        najwyższe posady. Naturalnie starzy oficerowie zaczęliby próżnować z gniewu, że ich awans ominął; eleganci musieliby próżnować dla zabaw, i — korpus popękałby, nawet nie
-        uderzywszy o nieprzyjaciela. O,{" "}
+        <span className="character-placeholder character-talking" data-character="Nitager" data-src-talking="/Pharaon/nitager-speaks.mp4" data-is-talking="true" />— Zresztą on
+        daleko widzi, choć nie wszystko mówi. Za następcą wcisnęliby się do korpusu rozmaite paniczyki, co to ze śpiewaczkami jeżdżą na wojnę, i oni zajęliby najwyższe posady.
+        Naturalnie starzy oficerowie zaczęliby próżnować z gniewu, że ich awans ominął; eleganci musieliby próżnować dla zabaw, i — korpus popękałby, nawet nie uderzywszy o
+        nieprzyjaciela. O,{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
-        to mędrzec!…\n
+        to mędrzec!…
       </p>
       <p data-index="55">
-        <span className="character-placeholder character-talking" data-character="Patrokles" data-src-talking="/Pharaon/patrokles-speaks.mp4" data-is-talking="true" />
-        \n — Bodajby nas nie kosztowała więcej jego mądrość aniżeli niedoświadczenie{" "}
+        <span className="character-placeholder character-talking" data-character="Patrokles" data-src-talking="/Pharaon/patrokles-speaks.mp4" data-is-talking="true" />— Bodajby nas
+        nie kosztowała więcej jego mądrość aniżeli niedoświadczenie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>{" "}
-        — szepnął Grek.\n
+        — szepnął Grek.
       </p>
       <p data-index="56">
-        \n Przez szereg komnat pełnych kolumn i ozdobionych malowidłami, gdzie w każdych drzwiach kapłani i pałacowi urzędnicy składali mu niskie ukłony,{" "}
+        Przez szereg komnat pełnych kolumn i ozdobionych malowidłami, gdzie w każdych drzwiach kapłani i pałacowi urzędnicy składali mu niskie ukłony,{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         przeszedł do swego gabinetu. Była to dwupiętrowa sala o ścianach z alabastru, na których złotem i jaskrawymi farbami odmalowano najznakomitsze wypadki panowania{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>
-        , a więc: hołdy składane mu przez mieszkańców Mezopotamii, poselstwo od króla Buchtenu i triumfalną podróż bożka Chonsu po kraju Buchten.\n
+        , a więc: hołdy składane mu przez mieszkańców Mezopotamii, poselstwo od króla Buchtenu i triumfalną podróż bożka Chonsu po kraju Buchten.
       </p>
       <p data-index="57">
-        \n W sali tej znajdował się malachitowy posążek Horusa z ptasią głową, ozdobiony złotem i klejnotami, przed nim ołtarz w formie ściętej piramidy, broń królewska, kosztowne
-        fotele i ławki tudzież stoliki zapełnione drobiazgami.\n
+        W sali tej znajdował się malachitowy posążek Horusa z ptasią głową, ozdobiony złotem i klejnotami, przed nim ołtarz w formie ściętej piramidy, broń królewska, kosztowne
+        fotele i ławki tudzież stoliki zapełnione drobiazgami.
       </p>
       <p data-index="58">
-        \n Gdy{" "}
+        Gdy{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         ukazał się, jeden z obecnych kapłanów spalił przed nim kadzidło, a jeden z urzędników zameldował{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcę tronu{" "}
+          następcę tronu
         </span>
         , który niebawem wszedł i nisko ukłonił się ojcu. Na wyrazistej twarzy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
-        było widać gorączkowy niepokój.\n
+        było widać gorączkowy niepokój.
       </p>
       <p data-index="59">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Cieszę się,{" "}
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Cieszę
+        się,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          erpatre{" "}
+          erpatre
         </span>{" "}
         — rzekł{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
-        — że wracasz zdrowym z ciężkiej podróży.\n
+        — że wracasz zdrowym z ciężkiej podróży.
       </p>
       <p data-index="60">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Obyś wasza świątobliwość żył wiecznie i dziełami swoimi napełnił oba światy — odparł{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Obyś wasza świątobliwość żył wiecznie i dziełami swoimi napełnił oba światy — odparł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
-        .\n
+        .
       </p>
       <p data-index="61">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Dopiero co — mówił{" "}
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Dopiero
+        co — mówił{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
-        — moi radcy wojenni opowiadali mi o twojej pracy i roztropności.\n
+        — moi radcy wojenni opowiadali mi o twojej pracy i roztropności.
       </p>
       <p data-index="62">
-        \n Twarz{" "}
+        Twarz{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>{" "}
         drżała i mieniła się. Wpił wielkie oczy w{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
-        i słuchał.\n
+        i słuchał.
       </p>
       <p data-index="63">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Czyny twoje nie zostaną bez nagrody. Otrzymasz dziesięć talentów, wielki łańcuch i dwa greckie pułki, z którymi będziesz robił ćwiczenia.\n
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Czyny
+        twoje nie zostaną bez nagrody. Otrzymasz dziesięć talentów, wielki łańcuch i dwa greckie pułki, z którymi będziesz robił ćwiczenia.
       </p>
       <p data-index="64">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
-        osłupiał, lecz po chwili zapytał stłumionym głosem:\n
+        osłupiał, lecz po chwili zapytał stłumionym głosem:
       </p>
       <p data-index="65">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — A korpus Menfi?…\n
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        korpus Menfi?…
       </p>
       <p data-index="66">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Za rok powtórzymy manewry, a jeżeli nie popełnisz żadnego błędu w prowadzeniu wojska, dostaniesz korpus.\n
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Za rok
+        powtórzymy manewry, a jeżeli nie popełnisz żadnego błędu w prowadzeniu wojska, dostaniesz korpus.
       </p>
       <p data-index="67">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Wiem, to zrobił{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Wiem, to zrobił{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         !… — zawołał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>
-        , ledwie hamując się z gniewu.\n
+        , ledwie hamując się z gniewu.
       </p>
-      <p data-index="68">\n Obejrzał się wkoło i dodał:\n</p>
+      <p data-index="68">Obejrzał się wkoło i dodał:</p>
       <p data-index="69">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Nigdy nie mogę być sam z tobą, mój ojcze… Zawsze między nami znajdują się obcy ludzie…\n
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Nigdy nie mogę być sam z tobą, mój ojcze… Zawsze między nami znajdują się obcy ludzie…
       </p>
       <p data-index="70">
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Faraon{" "}
+          Faraon
         </span>{" "}
-        z lekka poruszył brwiami i jego świta znikła jak gromada cieniów.\n
+        z lekka poruszył brwiami i jego świta znikła jak gromada cieniów.
       </p>
       <p data-index="71">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Co masz mi do powiedzenia?\n
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Co masz
+        mi do powiedzenia?
       </p>
       <p data-index="72">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Tylko jedno, ojcze…{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Tylko jedno, ojcze…{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
-        jest moim wrogiem… On oskarżył mnie przed tobą i naraził na taki wstyd!…\n
+        jest moim wrogiem… On oskarżył mnie przed tobą i naraził na taki wstyd!…
       </p>
       <p data-index="73">
-        \n Mimo pokornej postawy{" "}
+        Mimo pokornej postawy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
-        gryzł wargi i zaciskał pięści.\n
+        gryzł wargi i zaciskał pięści.
       </p>
       <p data-index="74">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n —{" "}
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         jest moim wiernym sługą, a twoim przyjacielem. Jego to wymowa sprawiła, że jesteś następcą tronu. To ja — nie powierzam korpusu młodemu wodzowi, który pozwolił odciąć się
-        od swojej armii.\n
+        od swojej armii.
       </p>
       <p data-index="75">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Połączyłem się z nią!… — odparł zgnębiony{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Połączyłem się z nią!… — odparł zgnębiony{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>
         . — To{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
-        kazał okrążać dwa żuki…\n
+        kazał okrążać dwa żuki…
       </p>
       <p data-index="76">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Chcesz więc, ażeby kapłan wobec wojska lekceważył religię?\n
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Chcesz
+        więc, ażeby kapłan wobec wojska lekceważył religię?
       </p>
       <p data-index="77">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Mój ojcze — szeptał{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Mój
+        ojcze — szeptał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
-        drżącym głosem — ażeby nie zepsuć pochodu żukom, zniszczono budujący się kanał i zabito człowieka.\n
+        drżącym głosem — ażeby nie zepsuć pochodu żukom, zniszczono budujący się kanał i zabito człowieka.
       </p>
       <p data-index="78">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Ten człowiek sam podniósł rękę na siebie.\n
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Ten
+        człowiek sam podniósł rękę na siebie.
       </p>
       <p data-index="79">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Ale z winy{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Ale
+        z winy{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>
-        .\n
+        .
       </p>
       <p data-index="80">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — W pułkach, które tak umiejętnie zgromadziłeś pod Pi-Bailos, trzydziestu ludzi umarło ze zmęczenia, a kilkuset jest chorych.\n
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— W
+        pułkach, które tak umiejętnie zgromadziłeś pod Pi-Bailos, trzydziestu ludzi umarło ze zmęczenia, a kilkuset jest chorych.
       </p>
       <p data-index="81">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
-        spuścił głowę.\n
+        spuścił głowę.
       </p>
       <p data-index="82">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n —{" "}
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesie{" "}
+          Ramzesie
         </span>{" "}
         — ciągnął{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         — przez usta twoje nie przemawia dostojnik państwa, który dba o całość kanałów i życie robotników, ale człowiek rozgniewany. Gniew zaś nie godzi się ze sprawiedliwością jak
-        jastrząb z gołębiem.\n
+        jastrząb z gołębiem.
       </p>
       <p data-index="83">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — O mój ojcze! — wybuchnął{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— O
+        mój ojcze! — wybuchnął{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>{" "}
         — jeżeli gniew mnie unosi, to dlatego że widzę niechęć dla mnie{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>{" "}
-        i kapłanów…\n
+        i kapłanów…
       </p>
       <p data-index="84">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Przecież sam jesteś wnukiem arcykapłana, kapłani uczyli cię… Poznałeś więcej ich tajemnic aniżeli którykolwiek inny książę…\n
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Przecież
+        sam jesteś wnukiem arcykapłana, kapłani uczyli cię… Poznałeś więcej ich tajemnic aniżeli którykolwiek inny książę…
       </p>
       <p data-index="85">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Poznałem ich nienasyconą dumę i chęć władzy. A że ukrócę to… więc już dziś są moimi wrogami…{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Poznałem ich nienasyconą dumę i chęć władzy. A że ukrócę to… więc już dziś są moimi wrogami…{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
-        nie chce mi dać nawet korpusu, gdyż woli rządzić całą armią…\n
+        nie chce mi dać nawet korpusu, gdyż woli rządzić całą armią…
       </p>
       <p data-index="86">
-        \n Wyrzuciwszy te niebaczne słowa{" "}
+        Wyrzuciwszy te niebaczne słowa{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>{" "}
         struchlał. Ale{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          władca{" "}
+          władca
         </span>{" "}
-        podniósł na niego jasne spojrzenie i odparł spokojnie:\n
+        podniósł na niego jasne spojrzenie i odparł spokojnie:
       </p>
       <p data-index="87">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Armią i państwem rządzę ja. Ze mnie płyną wszelkie rozkazy i wyroki. Na tym świecie jestem wagą Ozyrysa i sam ważę sprawy moich sług:{" "}
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Armią i
+        państwem rządzę ja. Ze mnie płyną wszelkie rozkazy i wyroki. Na tym świecie jestem wagą Ozyrysa i sam ważę sprawy moich sług:{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>
         ,{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          ministra{" "}
+          ministra
         </span>{" "}
-        czy ludu. Nieroztropnym byłby ten, kto by sądził, że nie są mi znane wszystkie gwichty.\n
+        czy ludu. Nieroztropnym byłby ten, kto by sądził, że nie są mi znane wszystkie gwichty.
       </p>
       <p data-index="88">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Jednak gdybyś, ojcze, patrzył na bieg manewrów własnymi oczami…\n
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Jednak gdybyś, ojcze, patrzył na bieg manewrów własnymi oczami…
       </p>
       <p data-index="89">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n — Może zobaczyłbym wodza — przerwał{" "}
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />— Może
+        zobaczyłbym wodza — przerwał{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
-        — który w stanowczej chwili rzuca wojsko i ugania się po krzakach za izraelską dziewczyną. Ale ja o takich błahostkach nie chcę wiedzieć.\n
+        — który w stanowczej chwili rzuca wojsko i ugania się po krzakach za izraelską dziewczyną. Ale ja o takich błahostkach nie chcę wiedzieć.
       </p>
       <p data-index="90">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
-        upadł do nóg ojcu, szepcąc:\n
+        upadł do nóg ojcu, szepcąc:
       </p>
       <p data-index="91">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n —{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>{" "}
-        powiedział ci o tym, panie?…\n
+        powiedział ci o tym, panie?…
       </p>
       <p data-index="92">
-        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />
-        \n —{" "}
+        <span className="character-placeholder character-talking" data-character="Ramzes-XII" data-src-talking="/Pharaon/ramzes-xii-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>{" "}
         jest dzieciakiem jak i ty. On już robi długi, jako szef sztabu w korpusie Menfi, i myśli w swym sercu, że oko{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
-        nie dosięgnie jego spraw w pustyni.\n
+        nie dosięgnie jego spraw w pustyni.
       </p>
     </section>
   );

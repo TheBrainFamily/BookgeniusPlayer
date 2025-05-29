@@ -96,7 +96,7 @@ export const Chapter42: React.FC = () => {
         Taki stan rzeczy trwał blisko sto osiemdziesiąt lat; ostatnią bowiem wojnę z Libijczykami prowadził jeszcze Ramzes III, który uciął ogromne stosy rąk poległym
         nieprzyjaciołom i przywiódł do Egiptu trzynaście tysięcy niewolników. Od tej pory nikt nie lękał się napadu ze strony Libii i dopiero przy schyłku panowania{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>{" "}
         dziwna polityka kapłanów na nowo zapaliła w tamtych stronach pożar walki.
       </p>
@@ -104,26 +104,26 @@ export const Chapter42: React.FC = () => {
       <p data-index="24">
         Jego dostojność{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         , minister wojny i arcykapłan, skutkiem oporu jego świątobliwości faraona nie mógł zawrzeć z Asyrią traktatu o podział Azji. Pragnąc jednak, stosownie do przestróg{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Beroesa{" "}
+          Beroesa
         </span>
         , utrzymać z Asyryjczykami dłuższy spokój,{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         zapewnił{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
-          Sargona{" "}
+          Sargona
         </span>
         , że Egipt nie przeszkodzi im w prowadzeniu wojny z Azjatami wschodnimi i północnymi.
       </p>
       <p data-index="25">
         A ponieważ pełnomocnik króla Assara zdawał się nie ufać przysięgom, więc{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         postanowił złożyć mu materialny dowód życzliwości i w tym celu wydał rozkaz natychmiastowego uwolnienia dwudziestu tysięcy wojsk najemnych, przeważnie Libijczyków.
       </p>
@@ -131,7 +131,7 @@ export const Chapter42: React.FC = () => {
         Dla uwolnionych, a nic niewinnych i zawsze wiernych żołnierzy postanowienie to było nieszczęściem nieomal równającym się karze śmierci. Przed Egiptem otwierało się
         niebezpieczeństwo wojny z Libią, która w żaden sposób nie mogła dać przytułku takiej masie ludzi, przywykłych tylko do musztry i wygód, nie zaś do pracy i nędzy. Ale{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         i kapłani nie krępowali się drobiazgami, gdy chodziło o wielkie interesa<a href="#fn264" className="link-note"></a> państwowe.
       </p>
@@ -139,7 +139,7 @@ export const Chapter42: React.FC = () => {
       <p data-index="28">
         Przede wszystkim{" "}
         <span className="character-highlighted" data-character="Sargon" data-src-listening="/Pharaon/sargon-listens.mp4">
-          Sargon{" "}
+          Sargon
         </span>{" "}
         i jego towarzysze podpisali i zaprzysięgli tymczasowy traktat z Egiptem na lat dziesięć, przez który to czas, według proroctw chaldejskich kapłanów, miały ciążyć nad ziemią
         świętą złe losy.
@@ -148,25 +148,25 @@ export const Chapter42: React.FC = () => {
       <p data-index="30">
         Po trzecie — wojna z Libią na zachodniej granicy była upustem dla bohaterskich instynktów{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy tronu{" "}
+          następcy tronu
         </span>{" "}
         i na długi czas mogła odwrócić jego uwagę od spraw azjatyckich i od granicy wschodniej. Jego dostojność{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         i rada najwyższa bardzo mądrze przypuszczali, że upłynie kilka lat, zanim Libijczycy, zużywszy się w partyzanckich walkach, zechcą prosić o pokój.
       </p>
       <p data-index="31">
         Plan był rozsądny, lecz autorowie<a href="#fn265" className="link-note"></a> jego popełnili jeden błąd: nie przeczuli, że w{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księciu Ramzesie{" "}
+          księciu Ramzesie
         </span>{" "}
         tkwi materiał na genialnego wojownika.
       </p>
       <p data-index="32">
         Rozpuszczone pułki libijskie, rabując po drodze, bardzo prędko dotarły do swej ojczyzny; tym łatwiej, że{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         nie kazał stawiać im przeszkód. Najpierwsi zaś spomiędzy wypędzonych stanąwszy na libijskiej ziemi niestworzone rzeczy opowiadali swoim rodakom.
       </p>
@@ -193,25 +193,25 @@ export const Chapter42: React.FC = () => {
       <p data-index="37">
         Nawet chytry i mądry książę libijski,{" "}
         <span className="character-highlighted" data-character="Musawasa" data-src-listening="/Pharaon/musawasa.png">
-          Musawasa{" "}
+          Musawasa
         </span>
         , dał się porwać ogólnemu prądowi. Jego jednak nie przekonali imigranci, ale jacyś ludzie poważni i dostojni, a według wszelkiego prawdopodobieństwa — agenci najwyższej
         rady egipskiej. Ci dygnitarze, niby to niezadowoleni ze stanu rzeczy w Egipcie, niby to obrażeni na faraona i kapłanów, przyjechali do Libii od strony morza, kryli się
         przed gawiedzią, unikali stosunków z wypędzonymi żołnierzami, a{" "}
         <span className="character-highlighted" data-character="Musawasa" data-src-listening="/Pharaon/musawasa.png">
-          Musawasie{" "}
+          Musawasie
         </span>{" "}
         tłumaczyli pod największym sekretem i z dowodami w rękach, że — teraz właśnie powinien napaść na Egipt.
       </p>
-      <p data-index="38">\n — Znajdziesz tam — mówili — bezdenny skarbiec i spiżarnię dla siebie, dla swoich ludzi i dla wnuków waszych wnuków.\n</p>
+      <p data-index="38">— Znajdziesz tam — mówili — bezdenny skarbiec i spiżarnię dla siebie, dla swoich ludzi i dla wnuków waszych wnuków.</p>
       <p data-index="39">
         <span className="character-highlighted" data-character="Musawasa" data-src-listening="/Pharaon/musawasa.png">
-          Musawasa{" "}
+          Musawasa
         </span>{" "}
         — choć przebiegły wódz i dyplomata — dał się złapać. Jako człowiek energiczny, natychmiast ogłosił przeciw Egiptowi świętą wojnę i — mając pod ręką tysiące dzielnych
         wojowników, pchnął pierwszy korpus ku wschodowi, pod dowództwem swego syna, dwudziestoletniego{" "}
         <span className="character-highlighted" data-character="Tehenna" data-src-listening="/Pharaon/tehenna.png">
-          Tehenny{" "}
+          Tehenny
         </span>
         .
       </p>
@@ -225,11 +225,11 @@ export const Chapter42: React.FC = () => {
       <p data-index="42">
         Oddał więc{" "}
         <span className="character-highlighted" data-character="Musawasa" data-src-listening="/Pharaon/musawasa.png">
-          Musawasa{" "}
+          Musawasa
         </span>{" "}
         dwa tysiące eks-żołnierzy i ze cztery tysiące libijskiej hołoty swemu synowi,{" "}
         <span className="character-highlighted" data-character="Tehenna" data-src-listening="/Pharaon/tehenna.png">
-          Tehennie{" "}
+          Tehennie
         </span>
         , zalecając mu, ażeby czym prędzej wpadł do Egiptu, zrabował, co się da, i przygotował zapasy dla właściwej armii. Sam zaś, gromadząc poważniejsze siły, rozesłał gońców po
         oazach i wzywał wszystkich, którzy nie mają nic do stracenia, pod swoje sztandary.
@@ -241,7 +241,7 @@ export const Chapter42: React.FC = () => {
       <p data-index="44">
         Opierając się na zdaniu swoich doradców, którzy jeszcze miesiąc temu byli oficerami jego świątobliwości,{" "}
         <span className="character-highlighted" data-character="Musawasa" data-src-listening="/Pharaon/musawasa.png">
-          Musawasa{" "}
+          Musawasa
         </span>{" "}
         całkiem rozsądnie przypuszczał, że jego syn pierwej zrabuje kilkaset wsi i miasteczek od Terenuthis do Senti-Nofer<a href="#fn267" className="link-note"></a>, zanim spotka
         jakieś poważniejsze siły egipskie. Wreszcie doniesiono mu, że na pierwszą wieść o ruchu Libijczyków nie tylko uciekli wszyscy robotnicy z wielkiej huty szklannej
@@ -252,11 +252,11 @@ export const Chapter42: React.FC = () => {
       <p data-index="46">
         Otóż{" "}
         <span className="character-highlighted" data-character="Musawasa" data-src-listening="/Pharaon/musawasa.png">
-          Musawasa{" "}
+          Musawasa
         </span>{" "}
         popełnił błąd taki sam jak najwyższa rada kapłańska: nie przeczuł wojennego geniuszu w{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesie{" "}
+          Ramzesie
         </span>
         . I stała się rzecz nadzwyczajna: zanim pierwszy korpus libijski dotarł do okolicy Sodowych Jezior, już w tym miejscu znalazła się dwa razy liczniejsza armia następcy
         tronu.
@@ -264,7 +264,7 @@ export const Chapter42: React.FC = () => {
       <p data-index="47">Nie można nawet zarzucać Libijczykom nieprzezorności.</p>
       <p data-index="48">
         <span className="character-highlighted" data-character="Tehenna" data-src-listening="/Pharaon/tehenna.png">
-          Tehenna{" "}
+          Tehenna
         </span>{" "}
         i jego sztab utworzyli bardzo porządną służbę wywiadowczą. Ich szpiegowie<a href="#fn270" className="link-note"></a> niejednokrotnie byli w Melcatis
         <a href="#fn271" className="link-note"></a>, Naucratis<a href="#fn272" className="link-note"></a>, Sai<a href="#fn273" className="link-note"></a>, Menuf, Terenuthis i
@@ -274,14 +274,14 @@ export const Chapter42: React.FC = () => {
       <p data-index="49">
         Przynosili więc swemu dowódcy jak najlepsze wiadomości. A tymczasem armia księcia{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>
         , pomimo wylewu, w osiem dni po uruchomieniu dotarła brzegu pustyni i zaopatrzona w wodę i żywność przepadła między górami Sodowych Jezior.
       </p>
       <p data-index="50">
         Gdyby{" "}
         <span className="character-highlighted" data-character="Tehenna" data-src-listening="/Pharaon/tehenna.png">
-          Tehenna{" "}
+          Tehenna
         </span>{" "}
         mógł jak orzeł wzbić się ponad stanowiska swojej bandy, struchlałby, zobaczywszy, że we wszystkich wąwozach tej okolicy kryją się egipskie pułki i — że lada chwilę korpus
         jego zostanie otoczony.

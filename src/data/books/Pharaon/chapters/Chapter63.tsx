@@ -12,11 +12,11 @@ export const Chapter63: React.FC = () => {
       <p data-index="3">
         Skutkiem tego arcykapłani{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         nakazali procesje dokoła świątyń i składanie ofiar w domach.
       </p>
@@ -36,19 +36,19 @@ export const Chapter63: React.FC = () => {
       <p data-index="7">
         W parę godzin po zachodzie słońca zebrali się arcykapłani i ich najwierniejsi stronnicy w świątyni Ptah. Był dostojny{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         ,{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         ,{" "}
         <span className="character-highlighted" data-character="Mentezufis" data-src-listening="/Pharaon/mentezufis-listens.mp4">
-          Mentezufis{" "}
+          Mentezufis
         </span>
         , trzech nomarchów i{" "}
         <span className="character-highlighted" data-character="Najwyzszy-sedzia-Tebow" data-src-listening="/Pharaon/najwyzszy-sedzia-tebow-listens.mp4">
-          najwyższy sędzia z Tebów{" "}
+          najwyższy sędzia z Tebów
         </span>
         .
       </p>
@@ -61,7 +61,7 @@ export const Chapter63: React.FC = () => {
         />
         — Straszne czasy! — odezwał się{" "}
         <span className="character-highlighted" data-character="Sedzia" data-src-listening="/Pharaon/sedzia-listens.mp4">
-          sędzia{" "}
+          sędzia
         </span>
         . — Wiem z pewnością, że faraon chce podburzyć motłoch do napadu na świątynie…
       </p>
@@ -69,11 +69,11 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Nomarcha-Sebes" data-src-talking="/Pharaon/nomarcha-sebes.png" data-is-talking="true" />—
         Słyszałem — odezwał się{" "}
         <span className="character-highlighted" data-character="Nomarcha-Sebes" data-src-listening="/Pharaon/nomarcha-sebes.png">
-          nomarcha Sebes{" "}
+          nomarcha Sebes
         </span>{" "}
         — że wysłano rozkaz do{" "}
         <span className="character-highlighted" data-character="Nitager" data-src-listening="/Pharaon/nitager-listens.mp4">
-          Nitagera{" "}
+          Nitagera
         </span>
         , ażeby przybiegł czym prędzej z nowymi wojskami, jakby już i tych nie było dosyć!…
       </p>
@@ -81,18 +81,18 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Nomarcha-Aa" data-src-talking="/Pharaon/nomarcha-aa.png" data-is-talking="true" />— Komunikacja
         między Dolnym i Górnym Egiptem przecięta od wczoraj — dodał{" "}
         <span className="character-highlighted" data-character="Nomarcha-Aa" data-src-listening="/Pharaon/nomarcha-aa.png">
-          nomarcha Aa{" "}
+          nomarcha Aa
         </span>
         . — Na gościńcach stoi wojsko, a galery jego świątobliwości rewidują każdy statek płynący Nilem…
       </p>
       <p data-index="11">
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
-        nie jest „świątobliwością\' — wtrącił oschle{" "}
+        nie jest „świątobliwością' — wtrącił oschle{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         — gdyż nie otrzymał koron z rąk bogów.
       </p>
@@ -105,7 +105,7 @@ export const Chapter63: React.FC = () => {
         />
         — Wszystko to byłyby drobiazgi — odezwał się{" "}
         <span className="character-highlighted" data-character="Najwyzszy-sedzia-Tebow" data-src-listening="/Pharaon/najwyzszy-sedzia-tebow-listens.mp4">
-          najwyższy sędzia{" "}
+          najwyższy sędzia
         </span>
         . — Gorszą jest zdrada… Mam poszlaki, że wielu młodszych kapłanów sprzyja faraonowi i o wszystkim donosi mu…
       </p>
@@ -113,7 +113,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Są nawet tacy,
         którzy podjęli się ułatwić wojsku zajęcie świątyń — dodał{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         .
       </p>
@@ -121,7 +121,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Nomarcha-Sebes" data-src-talking="/Pharaon/nomarcha-sebes.png" data-is-talking="true" />— Wojsko
         ma wejść do świątyń?!… — zawołał{" "}
         <span className="character-highlighted" data-character="Nomarcha-Sebes" data-src-listening="/Pharaon/nomarcha-sebes.png">
-          nomarcha Sebes{" "}
+          nomarcha Sebes
         </span>
         .
       </p>
@@ -129,7 +129,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Taki ma
         przynajmniej rozkaz na dwudziestego trzeciego — odparł{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         .
       </p>
@@ -137,13 +137,13 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Nomarcha-Ament" data-src-talking="/Pharaon/nomarcha-ament.png" data-is-talking="true" />— I wasza
         dostojność mówisz o tym spokojnie?… — zapytał{" "}
         <span className="character-highlighted" data-character="Nomarcha-Ament" data-src-listening="/Pharaon/nomarcha-ament.png">
-          nomarcha Ament{" "}
+          nomarcha Ament
         </span>
         .
       </p>
       <p data-index="17">
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         wzruszył ramionami, a nomarchowie zaczęli spoglądać po sobie.
       </p>
@@ -151,11 +151,11 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Nomarcha-Aa" data-src-talking="/Pharaon/nomarcha-aa.png" data-is-talking="true" />— Tego już nie
         rozumiem!… — odezwał się prawie z gniewem{" "}
         <span className="character-highlighted" data-character="Nomarcha-Aa" data-src-listening="/Pharaon/nomarcha-aa.png">
-          nomarcha Aa{" "}
+          nomarcha Aa
         </span>
         . — Świątynie mają zaledwie kilkuset żołnierzy, kapłani zdradzają, faraon odcina nas od Tebów i podburza lud, a dostojny{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         mówi o tym, jakby nas zapraszał na ucztę… Albo brońmy się, jeżeli jeszcze można, albo…
       </p>
@@ -163,7 +163,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Poddajmy się jego
         świątobliwości?… — spytał ironicznie{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         . — Na to zawsze będziecie mieli czas!…
       </p>
@@ -171,7 +171,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Nomarcha-Sebes" data-src-talking="/Pharaon/nomarcha-sebes.png" data-is-talking="true" />— Ale my
         chcielibyśmy dowiedzieć się czegoś o środkach obrony… — rzekł{" "}
         <span className="character-highlighted" data-character="Nomarcha-Sebes" data-src-listening="/Pharaon/nomarcha-sebes.png">
-          nomarcha Sebes{" "}
+          nomarcha Sebes
         </span>
         .
       </p>
@@ -179,13 +179,13 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Bogowie ocalą
         swoich wiernych — odpowiedział{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         .
       </p>
       <p data-index="22">
         <span className="character-highlighted" data-character="Nomarcha-Aa" data-src-listening="/Pharaon/nomarcha-aa.png">
-          Nomarcha Aa{" "}
+          Nomarcha Aa
         </span>{" "}
         załamał ręce.
       </p>
@@ -198,7 +198,7 @@ export const Chapter63: React.FC = () => {
         />
         — Jeżeli mam otworzyć moje serce, to i mnie dziwi wasza obojętność — odezwał się{" "}
         <span className="character-highlighted" data-character="Najwyzszy-sedzia-Tebow" data-src-listening="/Pharaon/najwyzszy-sedzia-tebow-listens.mp4">
-          najwyższy sędzia{" "}
+          najwyższy sędzia
         </span>
         . — Prawie całe pospólstwo jest przeciw nam…
       </p>
@@ -206,7 +206,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Pospólstwo jak
         jęczmień na polu, idzie za wiatrem — rzekł{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         .
       </p>
@@ -219,7 +219,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Nomarcha-Aa" data-src-talking="/Pharaon/nomarcha-aa.png" data-is-talking="true" />— Wiem —
         przerwał niecierpliwie{" "}
         <span className="character-highlighted" data-character="Nomarcha-Aa" data-src-listening="/Pharaon/nomarcha-aa.png">
-          nomarcha Aa{" "}
+          nomarcha Aa
         </span>{" "}
         — ale nie widzę ani Ozyrysa, ani tego wiatru, który do nas zwróci pospólstwo… Tymczasem faraon już dziś przywiązał ich do siebie obietnicami, a jutro wystąpi z darowizną…
       </p>
@@ -227,7 +227,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Od obietnic i
         podarunków mocniejszą jest trwoga — odparł{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         .
       </p>
@@ -243,7 +243,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Nomarcha-Aa" data-src-talking="/Pharaon/nomarcha-aa.png" data-is-talking="true" />— Ale gdzież on
         jest?… — pytał wzburzony{" "}
         <span className="character-highlighted" data-character="Nomarcha-Aa" data-src-listening="/Pharaon/nomarcha-aa.png">
-          nomarcha Aa{" "}
+          nomarcha Aa
         </span>
         .
       </p>
@@ -254,7 +254,7 @@ export const Chapter63: React.FC = () => {
       <p data-index="33">
         Słowa te wypowiedział{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         z takim niezachwianym spokojem, że w zgromadzeniu zaległa cisza.
       </p>
@@ -267,14 +267,14 @@ export const Chapter63: React.FC = () => {
         />
         — Ostatecznie cóż jednak robimy?… — zapytał po chwili{" "}
         <span className="character-highlighted" data-character="Najwyzszy-sedzia-Tebow" data-src-listening="/Pharaon/najwyzszy-sedzia-tebow-listens.mp4">
-          najwyższy sędzia{" "}
+          najwyższy sędzia
         </span>
         .
       </p>
       <p data-index="35">
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Faraon — mówił{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         — chce, ażeby lud napadł na świątynie dwudziestego trzeciego. My zaś musimy sprawić, aby napadnięto nas dwudziestego Paofi.
       </p>
@@ -282,18 +282,18 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Nomarcha-Aa" data-src-talking="/Pharaon/nomarcha-aa.png" data-is-talking="true" />— Wiecznie żywi
         bogowie! — znowu zawołał{" "}
         <span className="character-highlighted" data-character="Nomarcha-Aa" data-src-listening="/Pharaon/nomarcha-aa.png">
-          nomarcha Aa{" "}
+          nomarcha Aa
         </span>{" "}
         wznosząc ręce. — A my po co mamy ściągać nieszczęście na nasze głowy, w dodatku o dwa dni wcześniej?…
       </p>
       <p data-index="37">
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Słuchajcie{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>{" "}
         — odezwał się stanowczym głosem{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         — i na wszelki sposób starajcie się, ażeby napad miał miejsce dwudziestego Paofi, od rana.
       </p>
@@ -301,7 +301,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Sedzia" data-src-talking="/Pharaon/sedzia-speaks.mp4" data-is-talking="true" />— A jak nas
         naprawdę rozbiją?… — spytał zmieszany{" "}
         <span className="character-highlighted" data-character="Sedzia" data-src-listening="/Pharaon/sedzia-listens.mp4">
-          sędzia{" "}
+          sędzia
         </span>
         .
       </p>
@@ -309,11 +309,11 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Jeżeli nie
         poskutkują zaklęcia{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>
         , wówczas ja wezwę bogów na pomoc — odparł{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         , a w oczach błysnął mu złowrogi ogień.
       </p>
@@ -326,7 +326,7 @@ export const Chapter63: React.FC = () => {
         />
         — Ha! wy arcykapłani macie swoje tajemnice, których nam odsłaniać nie wolno — rzekł wielki{" "}
         <span className="character-highlighted" data-character="Sedzia" data-src-listening="/Pharaon/sedzia-listens.mp4">
-          sędzia{" "}
+          sędzia
         </span>
         . — Zrobimy więc, co każecie, wywołamy napad dwudziestego… Ale pamiętajcie, że nasza i dzieci naszych krew spadnie na wasze głowy…
       </p>
@@ -338,7 +338,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Niech się tak
         stanie!… — zawołali jednocześnie obaj arcykapłani. Po czym dodał{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         :
       </p>
@@ -350,29 +350,29 @@ export const Chapter63: React.FC = () => {
       <p data-index="44">
         Niebawem nomarchowie pożegnali arcykapłanów, nie usiłując nawet ukrywać smutku i niepokoju. Zostali tylko{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         .
       </p>
       <p data-index="45">
         Po dłuższym milczeniu{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         odezwał się:
       </p>
       <p data-index="46">
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Tak, ten{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykon{" "}
+          Lykon
         </span>{" "}
         był dobry, dopóki udawał szalonego. Ale ażeby można go podstawić zamiast{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>
         !…
       </p>
@@ -380,7 +380,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Jeżeli matka nie
         poznała się na nim — odparł{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         — więc już musi być bardzo podobny… A siedzieć na tronie, przemówić parę słów do otoczenia to chyba potrafi. Zresztą my będziemy przy nim…
       </p>
@@ -388,7 +388,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Strasznie głupi
         komediant!… — westchnął{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         trąc czoło.
       </p>
@@ -400,36 +400,36 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Ciągle wasza
         dostojność mówisz mi o tym podwójnym wzroku — odparł{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         . — Nareszcie niechże ja sam przekonam się o tym…
       </p>
       <p data-index="51">
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Chcesz?… — spytał{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         . — Więc idźmy… Ale, na bogi,{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhorze{" "}
+          Herhorze
         </span>
         , o tym, co zobaczysz, nie wspominaj nawet przed własnym sercem…
       </p>
       <p data-index="52">
         Zeszli do podziemiów świątyni Ptah i znaleźli się w obszernej piwnicy oświetlonej kagańcem. Przy słabym blasku{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         dojrzał człowieka, który siedząc za stołem jadł. Człowiek miał na sobie kaftan gwardii faraona.
       </p>
       <p data-index="53">
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykonie{" "}
+          Lykonie
         </span>{" "}
         — rzekł{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         — najwyższy dostojnik państwa chce przekonać się o zdolnościach, jakimi obdarzyli cię bogowie…
       </p>
@@ -445,21 +445,21 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Na to zawsze
         będzie czas — wtrącił surowo{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         .
       </p>
       <p data-index="57">
         Grek umilkł i nagle zaczął drżeć zobaczywszy w ręce{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresa{" "}
+          Mefresa
         </span>{" "}
         kulkę z ciemnego kryształu. Pobladł, spojrzenie zmętniało mu, na twarz wystąpił pot kroplisty. Jego oczy były utkwione w jeden punkt, jakby przykute do kryształowej kuli.
       </p>
       <p data-index="58">
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Już śpi — rzekł{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         . — Nie dziwneż to?
       </p>
@@ -470,17 +470,17 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Uszczypnij go…
         ukłuj… nawet sparz… — mówił{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         .
       </p>
       <p data-index="61">
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         wydobył spod białej szaty sztylet i zamierzył się, jakby chcąc uderzyć{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykona{" "}
+          Lykona
         </span>{" "}
         między oczy. Ale Grek nie poruszył się, nawet nie drgnęły mu powieki.
       </p>
@@ -488,11 +488,11 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Spojrzyj tu —
         mówił{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         zbliżając do{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykona{" "}
+          Lykona
         </span>{" "}
         kryształ. — Czy widzisz tego, który porwał Kamę?…
       </p>
@@ -505,7 +505,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Gdzież on jest
         teraz? — pytał{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         .
       </p>
@@ -513,32 +513,32 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Lykon" data-src-talking="/Pharaon/lykon-speaks.mp4" data-is-talking="true" />— W pałacyku, w
         stronie ogrodu najbliższej rzeki… Jest z nim piękna kobieta… — szeptał{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykon{" "}
+          Lykon
         </span>
         .
       </p>
       <p data-index="67">
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Nazywa się{" "}
         <span className="character-highlighted" data-character="Hebron" data-src-listening="/Pharaon/hebron-listens.mp4">
-          Hebron{" "}
+          Hebron
         </span>{" "}
         i jest żoną{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisa{" "}
+          Tutmozisa
         </span>{" "}
         — podpowiedział{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         . — Przyznaj,{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresie{" "}
+          Mefresie
         </span>{" "}
         — dodał — że ażeby o tym wiedzieć, nie trzeba podwójnego wzroku…
       </p>
       <p data-index="68">
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         zaciął wąskie usta.
       </p>
@@ -546,7 +546,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Jeżeli to nie
         przekonywa waszej dostojności, pokażę coś lepszego — odparł. —{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykonie{" "}
+          Lykonie
         </span>
         , znajdź teraz zdrajcę, który szuka drogi do skarbca Labiryntu…
       </p>
@@ -569,17 +569,17 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Lykon" data-src-talking="/Pharaon/lykon-speaks.mp4" data-is-talking="true" />— Ma rudą brodę i
         włosy… — odpowiedział{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykon{" "}
+          Lykon
         </span>
         .
       </p>
       <p data-index="76">
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— A co?… — spytał{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
-        </span>
+          Mefres
+        </span>{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>
         .
       </p>
@@ -587,7 +587,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Wasza dostojność
         masz dobrą policję — rzekł{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         .
       </p>
@@ -598,15 +598,15 @@ export const Chapter63: React.FC = () => {
           data-character="Dozorcy-Labiryntu-trzej-zabojcy-Mefresa"
           data-src-listening="/Pharaon/dozorcy-labiryntu-trzej-zabojcy-mefresa-listens.mp4"
         >
-          dozorcy Labiryntu{" "}
+          dozorcy Labiryntu
         </span>{" "}
         źle go pilnują! — mówił gniewnie{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         . — Jeszcze dziś w nocy pojadę tam z{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykonem{" "}
+          Lykonem
         </span>
         , aby ostrzec miejscowych kapłanów… Lecz gdy uda mi się ocalić skarb bogów, wasza dostojność pozwolisz, że ja zostanę jego dozorcą…
       </p>
@@ -614,14 +614,14 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Herhor" data-src-talking="/Pharaon/herhor-speaks.mp4" data-is-talking="true" />— Jak wasza
         dostojność chcesz — odparł{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         obojętnie. A w sercu swym dodał:
       </p>
       <p data-index="80">
         „Nareszcie pobożny{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         zaczyna pokazywać zęby i pazury… Sam pragnie zostać — tylko —{" "}
         <span
@@ -629,41 +629,41 @@ export const Chapter63: React.FC = () => {
           data-character="Dozorcy-Labiryntu-trzej-zabojcy-Mefresa"
           data-src-listening="/Pharaon/dozorcy-labiryntu-trzej-zabojcy-mefresa-listens.mp4"
         >
-          dozorcą Labiryntu{" "}
+          dozorcą Labiryntu
         </span>
         , a swego wychowańca{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykona{" "}
+          Lykona
         </span>{" "}
         zrobić — tylko — faraonem!…
       </p>
-      <p data-index="81">Zaprawdę, że dla nasycenia chciwości moich pomocników bogowie musieliby stworzyć dziesięć Egiptów…\'</p>
+      <p data-index="81">Zaprawdę, że dla nasycenia chciwości moich pomocników bogowie musieliby stworzyć dziesięć Egiptów…'</p>
       <p data-index="82">
         Gdy obaj dostojnicy opuścili podziemia,{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         , wśród nocy, piechotą wrócił do świątyni Izydy, gdzie miał mieszkanie, a{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         kazał przygotować parę konnych lektyk. Do jednej młodzi kapłani włożyli śpiącego{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykona{" "}
+          Lykona
         </span>{" "}
         w worku na głowie, do drugiej arcykapłan wsiadł sam i otoczony garstką jeźdźców, tęgim kłusem pojechał do Fayum.
       </p>
       <p data-index="83">
         W nocy z czternastego na piętnasty Paofi arcykapłan{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         , stosownie do obietnicy danej faraonowi, wszedł, sobie tylko znanym korytarzem, do Labiryntu. Miał w rękach pęk pochodni, z których jedna paliła się, a na plecach
         niewielki koszyk z przyborami.
       </p>
       <p data-index="84">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         bardzo łatwo przechodził z sali do sali, z korytarza na korytarz, jednym dotknięciem usuwając kamienne tafle w kolumnach i ścianach, gdzie były drzwi ukryte. Niekiedy wahał
         się, lecz wówczas odczytywał tajemnicze znaki na ścianach i porównywał je ze znakami na paciorkach, które miał na szyi.
@@ -674,7 +674,7 @@ export const Chapter63: React.FC = () => {
       </p>
       <p data-index="86">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         położył koszyk i zapaliwszy dwie pochodnie przy ich świetle zaczął odczytywać napisy ścienne.
       </p>
@@ -683,12 +683,12 @@ export const Chapter63: React.FC = () => {
         Na dworze zamieniam się w słup ognia i czynię błyskawicę. Zamknięty, jestem grzmotem i zniszczeniem, i nie ma budowli, która oparłaby się mojej potędze.
       </p>
       <p data-index="89">Ułagodzić mnie może tylko święta woda, która odbiera mi moc. Ale gniew mój tak dobrze rodzi się z płomienia, jak i z najmniejszej iskry.</p>
-      <p data-index="90">Wobec mnie wszystko skręca się i upada. Jestem jak Tyfon, który obala najwyższe drzewo i podnosi kamienie.\'</p>
+      <p data-index="90">Wobec mnie wszystko skręca się i upada. Jestem jak Tyfon, który obala najwyższe drzewo i podnosi kamienie.'</p>
       <p data-index="91">
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        „Słowem, każda świątynia ma swoją tajemnicę, której inne nie znają!…\' — rzekł do siebie{" "}
+        „Słowem, każda świątynia ma swoją tajemnicę, której inne nie znają!…' — rzekł do siebie{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         .
       </p>
@@ -698,7 +698,7 @@ export const Chapter63: React.FC = () => {
       </p>
       <p data-index="93">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         odciął kawałek sznurka, przytknął go do pochodni i spostrzegł, że sznur spala się bardzo prędko, wydając syczenie.
       </p>
@@ -708,7 +708,7 @@ export const Chapter63: React.FC = () => {
       </p>
       <p data-index="95">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         wyjął znowu trochę popielatego piasku, wysypał na posadzkę, umieścił wśród niego kawałek sznura, który znalazł przy garnku, i — wszystko to nakrył ciężkim kamieniem. Potem
         zbliżył pochodnię, sznur zatlił się i po chwili — kamień wśród płomieni podskoczył do góry.
@@ -717,14 +717,14 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Mam już tego
         syna bogów!… — rzekł z uśmiechem{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         . — Skarbiec nie zapadnie się…
       </p>
       <p data-index="97">
         Zaczął chodzić od kolumny do kolumny, otwierać tafle i z wnętrza wydobywać ukryte garnki. Przy każdym był sznur, który{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         przecinał, a garnki odstawiał na bok…
       </p>
@@ -736,14 +736,14 @@ export const Chapter63: React.FC = () => {
       <p data-index="99">
         Zabezpieczywszy w ten sposób salę dolną,{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         wrócił do skarbca, a stamtąd wszedł do sali górnej. Tam również były napisy na ścianach, liczne kolumny, a w nich garnki zaopatrzone w sznury i napełnione kamykami, które
         przy zetknięciu się z ogniem wybuchały.
       </p>
       <p data-index="100">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         poprzecinał sznury, powydobywał garnki z wnętrza kolumn i — szczyptę popielatego piasku zawiązał w gałganek.
       </p>
@@ -751,12 +751,12 @@ export const Chapter63: React.FC = () => {
       <p data-index="102">
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
         „Nigdy bym nie przypuszczał — mówił do siebie — że tutejsi kapłani mają tak dziwny materiał?… Przecie można by rozwalać nim asyryjskie fortece!… No, my także nie wszystko
-        ogłaszamy naszym uczniom…\'
+        ogłaszamy naszym uczniom…'
       </p>
       <p data-index="103">
         Strudzony począł marzyć. Teraz był pewny, że zajmie najwyższe stanowisko w państwie, potężniejsze od tego, jakie zajmował{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         .
       </p>
@@ -779,19 +779,19 @@ export const Chapter63: React.FC = () => {
       <p data-index="108">
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
         „Już w miesiącu Hator — mówił w sobie — będę władcą!… Młody pan zanadto lubi kobiety i wojsko, aby mógł zajmować się rządami… A jeżeli nie będzie miał synów, wówczas mój
-        syn, mój syn…\'
+        syn, mój syn…'
       </p>
       <p data-index="109">Ocknął się. Jeszcze jedna pochodnia spłonęła i był wielki czas do opuszczenia podziemiów.</p>
       <p data-index="110">Podniósł się, zabrał swój koszyk i opuścił salę nad skarbcem.</p>
       <p data-index="111">
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        „Nie potrzebuję pomocników… — myślał uśmiechając się. — Sam wszystko zabezpieczyłem… ja sam… pogardzany kapłan Seta!…\'
+        „Nie potrzebuję pomocników… — myślał uśmiechając się. — Sam wszystko zabezpieczyłem… ja sam… pogardzany kapłan Seta!…'
       </p>
       <p data-index="112">Minął już kilkadziesiąt komnat i korytarzy, gdy nagle stanął… Zdawało się, że na posadzce sali, do której wszedł, widać cienką smugę światła…</p>
       <p data-index="113">W jednej chwili ogarnęła go tak straszna trwoga, że zgasił pochodnię. Lecz i smuga na posadzce znikła.</p>
       <p data-index="114">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         wytężył słuch, ale słyszał tylko bicie tętna we własnej głowie.
       </p>
@@ -800,11 +800,11 @@ export const Chapter63: React.FC = () => {
         się!… — rzekł.
       </p>
       <p data-index="116">Drżącymi rękoma wydobył z kosza małe naczynie, gdzie powoli tliła się hubka, i znowu zapalił pochodnią.</p>
-      <p data-index="117">„Jestem bardzo senny!…\' — pomyślał.</p>
+      <p data-index="117">„Jestem bardzo senny!…' — pomyślał.</p>
       <p data-index="118">Rozejrzał się po sali i poszedł do ściany, w której były ukryte drzwi. Nacisnął gwóźdź, drzwi nie uchyliły się. Drugi… trzeci nacisk — nic…</p>
       <p data-index="119">
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        „Co to znaczy?\' — rzekł do siebie zdumiony.
+        „Co to znaczy?' — rzekł do siebie zdumiony.
       </p>
       <p data-index="120">
         Już zapomniał o świetlnej smudze. Zdawało mu się, że spotkał go nowy, niesłychany wypadek. Tyle setek drzwi ukrytych otwierał w swym życiu, tyle ich otworzył w Labiryncie,
@@ -813,7 +813,7 @@ export const Chapter63: React.FC = () => {
       <p data-index="121">
         Wtem znowu ogarnął go strach. Zaczął biegać od ściany do ściany i wszędzie próbować ukrytych drzwi. Wreszcie jedne ustąpiły.{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         głęboko odetchnął i znalazł się w ogromnej sali, jak zwykle przepełnionej kolumnami. Jego pochodnia rozświetlała zaledwie część przestrzeni, której ogromna reszta ginęła w
         gęstym mroku.
@@ -828,7 +828,7 @@ export const Chapter63: React.FC = () => {
       </p>
       <p data-index="124">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         , jak nikt w Egipcie, był oswojony z podziemiami, ciemnością, zbłąkaniem… Przechodził też różne niepokoje w życiu. Ale to, czego doznawał obecnie, było czymś zupełnie nowym
         i tak strasznym, że kapłan bał się nadać temu właściwego nazwiska.
@@ -838,7 +838,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Gdybym naprawdę
         widział światło… gdyby naprawdę ktoś pozamykał drzwi, byłbym zdradzony… A w takim razie co?…
       </p>
-      <p data-index="127">„Śmierć!…\' — szepnął mu głos ukryty gdzieś na dnie duszy.</p>
+      <p data-index="127">„Śmierć!…' — szepnął mu głos ukryty gdzieś na dnie duszy.</p>
       <p data-index="128">Śmierć?!…</p>
       <p data-index="129">
         Pot wystąpił mu na twarz; zatamował mu się oddech. I nagle opanowało go szaleństwo strachu. Zaczął biegać po sali i uderzać pięścią w mury szukając wyjścia. Już zapomniał,
@@ -873,11 +873,11 @@ export const Chapter63: React.FC = () => {
           data-character="Dozorcy-Labiryntu-trzej-zabojcy-Mefresa"
           data-src-listening="/Pharaon/dozorcy-labiryntu-trzej-zabojcy-mefresa-listens.mp4"
         >
-          dozorców{" "}
+          dozorców
         </span>
         , i tylko dziecko albo głupiec mógłby myśleć o oszukaniu ich…
       </p>
-      <p data-index="136">Majątek… władza!… Gdzież jest taki skarb, za który warto by oddać jeden dzień życia?… I oto ja, człowiek w sile wieku, naraziłem moje…\'</p>
+      <p data-index="136">Majątek… władza!… Gdzież jest taki skarb, za który warto by oddać jeden dzień życia?… I oto ja, człowiek w sile wieku, naraziłem moje…'</p>
       <p data-index="137">Zdawało mu się, że usłyszał ciężkie stuknięcie. Zerwał się i w głębi sali — zobaczył blask.</p>
       <p data-index="138">
         Tak jest: blask rzeczywisty, nie złudzenie… W odległej ścianie, gdzieś na końcu, stały otwarte drzwi, przez które w tej chwili ostrożnie wchodziło kilku zbrojnych ludzi z
@@ -887,7 +887,7 @@ export const Chapter63: React.FC = () => {
       <p data-index="140">
         Kto mógł go zdradzić?… Rozumie się, że tylko jeden człowiek:{" "}
         <span className="character-highlighted" data-character="Mlody-kaplan-poslannik-Samentu" data-src-listening="/Pharaon/mlody-kaplan-poslannik-samentu-listens.mp4">
-          młody kapłan Seta{" "}
+          młody kapłan Seta
         </span>
         , którego wtajemniczył dość szczegółowo w swoje plany. Zdrajca sam z miesiąc musiałby szukać drogi w Labiryncie; ale gdyby porozumiał się z{" "}
         <span
@@ -895,11 +895,11 @@ export const Chapter63: React.FC = () => {
           data-character="Dozorcy-Labiryntu-trzej-zabojcy-Mefresa"
           data-src-listening="/Pharaon/dozorcy-labiryntu-trzej-zabojcy-mefresa-listens.mp4"
         >
-          dozorcami{" "}
+          dozorcami
         </span>
         , mogli{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         wytropić w jeden dzień…
       </p>
@@ -919,7 +919,7 @@ export const Chapter63: React.FC = () => {
       </p>
       <p data-index="145">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         nawet nie czuł do nich niechęci, tylko ciekawość: kto mógł go zdradzić? Ale i ta kwestia nie bardzo go obchodziła; wydawało mu się bowiem nierównie ważniejszym pytanie:
         dlaczego człowiek musi umierać i — po co rodził się?… Gdyż, wobec faktu śmierci, całe życie skraca się w jedną chwilkę bolesną, choćby było najdłuższym i najbogatszym w
@@ -931,7 +931,7 @@ export const Chapter63: React.FC = () => {
       <p data-index="149">
         Zbrojni stanęli.{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         poczuł, że kocha tych ludzi, którzy nie chcą iść dalej, i — serce w nim uderzyło.
       </p>
@@ -943,36 +943,36 @@ export const Chapter63: React.FC = () => {
       <p data-index="152">
         — A jednak patrz, wasza dostojność, na zachowanie się{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykona{" "}
+          Lykona
         </span>{" "}
         — odparł drugi głos. — Śpiący wciąż wygląda tak, jakby nieprzyjaciela czuł blisko…
       </p>
       <p data-index="153">
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />„
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykon{" "}
+          Lykon
         </span>
         ?… — myślał{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         . — Ach, to ten Grek podobny do faraona… Co widzę?…{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
-        go tu przyprowadził!…\'
+        go tu przyprowadził!…'
       </p>
       <p data-index="154">
         W tej chwili śpiący Grek rzucił się naprzód i stanął przed kolumną, za którą ukrywał się{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         . Zbrojni pobiegli za nim, a blask ich pochodni oświetlił ciemną figurę kapłana.
       </p>
       <p data-index="155">— Kto tu?… — krzyknął chrapliwym głosem dowódca.</p>
       <p data-index="156">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         wysunął się. Jego widok zrobił tak silne wrażenie, że ludzie z pochodniami cofnęli się. Mógł był przejść między przerażonymi i nikt by go nie zatrzymał; ale kapłan już nie
         myślał o ucieczce.
@@ -981,13 +981,13 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— A co, czy mylił
         się mój jasnowidzący?… — zawołał{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         wyciągając rękę. — Oto zdrajca!…
       </p>
       <p data-index="158">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         zbliżył się do niego z uśmiechem i rzekł:
       </p>
@@ -995,14 +995,14 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Poznałem cię po
         tym okrzyku,{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresie{" "}
+          Mefresie
         </span>
         . Gdy nie możesz być oszustem, jesteś tylko głupcem…
       </p>
       <p data-index="160">
         Obecni osłupieli;{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         mówił ze spokojną ironią:
       </p>
@@ -1014,7 +1014,7 @@ export const Chapter63: React.FC = () => {
           data-character="Dozorcy-Labiryntu-trzej-zabojcy-Mefresa"
           data-src-listening="/Pharaon/dozorcy-labiryntu-trzej-zabojcy-mefresa-listens.mp4"
         >
-          dozorców Labiryntu{" "}
+          dozorców Labiryntu
         </span>
         , że ten łotr ma dar podwójnego widzenia; a głupcem, bo myślisz, że ci uwierzą. Lepiej od razu powiedz, że i w świątyni Ptah znajdują się dokładne plany Labiryntu…
       </p>
@@ -1022,7 +1022,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— To fałsz!… —
         zawołał{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         .
       </p>
@@ -1030,7 +1030,7 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Zapytaj tych
         ludzi, komu wierzą: tobie czy mnie? Ja jestem tutaj, gdyż znalazłem plany w świątyni Seta; ty przyszedłeś z łaski nieśmiertelnego Ptah… — zakończył{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         śmiejąc się.
       </p>
@@ -1038,20 +1038,20 @@ export const Chapter63: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Zwiążcie tego
         zdrajcę i kłamcę!… — krzyknął{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         .
       </p>
       <p data-index="165">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         cofnął się parę kroków. Szybko wydobył spod odzieży flakonik i podnosząc go do ust rzekł:
       </p>
       <p data-index="166">
         <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresie{" "}
+          Mefresie
         </span>
         , ty do śmierci będziesz głupi… Spryt masz tylko wówczas, gdy chodzi o pieniądze…
       </p>
@@ -1070,7 +1070,7 @@ export const Chapter63: React.FC = () => {
           data-character="Dozorcy-Labiryntu-trzej-zabojcy-Mefresa"
           data-src-listening="/Pharaon/dozorcy-labiryntu-trzej-zabojcy-mefresa-listens.mp4"
         >
-          dozorca Labiryntu{" "}
+          dozorca Labiryntu
         </span>
         .
       </p>
@@ -1078,11 +1078,11 @@ export const Chapter63: React.FC = () => {
       <p data-index="171">
         Gdy dostojny{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         znalazł się na dziedzińcu, kazał swoim kapłanom przygotować konne lektyki i natychmiast razem ze śpiącym{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykonem{" "}
+          Lykonem
         </span>{" "}
         odjechał do Memfisu.
       </p>
@@ -1092,11 +1092,11 @@ export const Chapter63: React.FC = () => {
           data-character="Dozorcy-Labiryntu-trzej-zabojcy-Mefresa"
           data-src-listening="/Pharaon/dozorcy-labiryntu-trzej-zabojcy-mefresa-listens.mp4"
         >
-          Dozorcy Labiryntu{" "}
+          Dozorcy Labiryntu
         </span>
         , oszołomieni niezwykłymi wypadkami, spoglądali to na siebie, to na eskortę{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresa{" "}
+          Mefresa
         </span>
         , która już znikała w żółtym tumanie pyłu.
       </p>
@@ -1122,11 +1122,11 @@ export const Chapter63: React.FC = () => {
       <p data-index="176">
         — I dwaj uciekli — podpowiedział młodszy kapłan — komediant{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykon{" "}
+          Lykon
         </span>{" "}
         i świątobliwy{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         .
       </p>
@@ -1183,18 +1183,18 @@ export const Chapter63: React.FC = () => {
           data-character="Dozorcy-Labiryntu-trzej-zabojcy-Mefresa"
           data-src-listening="/Pharaon/dozorcy-labiryntu-trzej-zabojcy-mefresa-listens.mp4"
         >
-          dozorcy{" "}
+          dozorcy
         </span>
         .
       </p>
       <p data-index="185">
         — Kto wie, czy{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         nie działał w porozumieniu z najdostojniejszym{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhorem{" "}
+          Herhorem
         </span>
         ? — szepnął ktoś.
       </p>
@@ -1207,19 +1207,19 @@ export const Chapter63: React.FC = () => {
         />
         — Dosyć! — zawołał arcykapłan. — Gdy{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>{" "}
         znajdziemy w Labiryncie, postąpimy według prawa. Ale domyślać się ani posądzać kogokolwiek — nie wolno… Niech pisarze przygotują wyroki dla{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresa{" "}
+          Mefresa
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Lykon" data-src-listening="/Pharaon/lykon-listens.mp4">
-          Lykona{" "}
+          Lykona
         </span>
         , wybrani niech najśpieszniej jadą za nimi, a milicja niech pomnoży warty. Trzeba także zbadać wnętrze gmachu i odkryć, którędy wszedł{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         … Choć jestem pewny, że nieprędko znajdzie naśladowców…
       </p>

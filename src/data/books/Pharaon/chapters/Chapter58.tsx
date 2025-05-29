@@ -7,7 +7,7 @@ export const Chapter58: React.FC = () => {
       <p data-index="1">
         Opuściwszy Abydos,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         popłynął, wciąż w górę rzeki, do miasta Tan-ta-ren (Dendera)
         <a href="#fn88" className="link-note">
@@ -25,28 +25,28 @@ export const Chapter58: React.FC = () => {
       </p>
       <p data-index="3">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Faraon{" "}
+          Faraon
         </span>{" "}
         był tu i tam. Zirytował się, gdy mu kazano palić kadzidła przed świętymi krokodylami, które uważał za gady śmierdzące i głupie. A gdy jeden z nich w czasie ofiary, zanadto
         wysunąwszy się, chwycił pana zębami za szatę,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         tak trzasnął go w łeb brązową łyżką, że gad na chwilę zamknął oczy i rozstawił łapy; potem cofnął się i wlazł w wodę, jakby zrozumiawszy, że młody{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          władca{" "}
+          władca
         </span>{" "}
         nawet ze strony bogów nie lubi poufałości.
       </p>
       <p data-index="4">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— A może popełniłem świętokradztwo? — zapytał{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        może popełniłem świętokradztwo? — zapytał{" "}
         <span
           className="character-highlighted"
           data-character="Arcykaplan-swiatyni-Hator-w-Tan-ta-ren"
           data-src-listening="/Pharaon/arcykaplan-swiatyni-hator-w-tan-ta-ren-listens.mp4"
         >
-          arcykapłana{" "}
+          arcykapłana
         </span>
         .
       </p>
@@ -56,7 +56,7 @@ export const Chapter58: React.FC = () => {
           data-character="Arcykaplan-swiatyni-Hator-w-Tan-ta-ren"
           data-src-listening="/Pharaon/arcykaplan-swiatyni-hator-w-tan-ta-ren-listens.mp4"
         >
-          Dostojnik{" "}
+          Dostojnik
         </span>{" "}
         spojrzał spod oka, czy kto nie podsłuchuje, i odparł:
       </p>
@@ -67,12 +67,12 @@ export const Chapter58: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-swiatyni-hator-w-tan-ta-ren-speaks.mp4"
           data-is-talking="true"
         />
-        \n— Gdybym wiedział, że wasza świątobliwość taką zrobisz mu ofiarę, podałbym wam maczugę, a nie kadzielnicę. Ten krokodyl to najnieznośniejsze bydlę w całej świątyni… Raz
+        — Gdybym wiedział, że wasza świątobliwość taką zrobisz mu ofiarę, podałbym wam maczugę, a nie kadzielnicę. Ten krokodyl to najnieznośniejsze bydlę w całej świątyni… Raz
         porwał dziecko…
       </p>
       <p data-index="7">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— I zjadł?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— I
+        zjadł?
       </p>
       <p data-index="8">
         <span
@@ -81,17 +81,17 @@ export const Chapter58: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-swiatyni-hator-w-tan-ta-ren-speaks.mp4"
           data-is-talking="true"
         />
-        \n— Rodzice byli kontenci
+        — Rodzice byli kontenci
         <a href="#fn90" className="link-note">
           [90]
         </a>
         !… — rzekł kapłan.
       </p>
       <p data-index="9">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Powiedz mi — spytał po namyśle{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Powiedz mi — spytał po namyśle{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         — jakim sposobem wy, ludzie mądrzy, możecie składać hołdy zwierzętom, które w dodatku, gdy nie ma widzów, okładacie kijami!…
       </p>
@@ -101,7 +101,7 @@ export const Chapter58: React.FC = () => {
           data-character="Arcykaplan-swiatyni-Hator-w-Tan-ta-ren"
           data-src-listening="/Pharaon/arcykaplan-swiatyni-hator-w-tan-ta-ren-listens.mp4"
         >
-          Arcykapłan{" "}
+          Arcykapłan
         </span>{" "}
         jeszcze raz obejrzał się, a widząc, że w bliskości nie ma nikogo, odpowiedział:
       </p>
@@ -112,9 +112,9 @@ export const Chapter58: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-swiatyni-hator-w-tan-ta-ren-speaks.mp4"
           data-is-talking="true"
         />
-        \n— Przecie chyba ty,{" "}
+        — Przecie chyba ty,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          władco{" "}
+          władco
         </span>
         , nie posądzisz wyznawców Jedynego Boga o wiarę w świętość zwierząt… To, co się robi, robi się dla motłochu… Byk Apis, którego niby czczą kapłani, jest najpiękniejszym
         bykiem w całym Egipcie i utrzymuje naszą rasę bydła. Ibisy i bociany oczyszczają z padliny nasze pola; dzięki kotom — myszy nie niszczą nam zapasów zboża, a dzięki
@@ -127,21 +127,21 @@ export const Chapter58: React.FC = () => {
       <p data-index="14">
         W świątyni Hator{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         prędko przebiegł dziedzińce szkoły medycznej i bez wielkiego zapału wysłuchał wróżb, jakie stawiali mu astrologowie. Gdy zaś{" "}
         <span className="character-highlighted" data-character="Arcykaplan-astronom-w-Tan-ta-ren" data-src-listening="/Pharaon/arcykaplan-astronom-w-tan-ta-ren.png">
-          arcykapłan-astronom{" "}
+          arcykapłan-astronom
         </span>{" "}
         pokazał mu złotą tablicę, na której była wyrytowana mapa nieba,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          pan{" "}
+          pan
         </span>{" "}
         zapytał:
       </p>
       <p data-index="15">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Jak też często sprawdzają się wasze przepowiednie, które odczytujecie w gwiazdach?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Jak
+        też często sprawdzają się wasze przepowiednie, które odczytujecie w gwiazdach?
       </p>
       <p data-index="16">
         <span
@@ -150,15 +150,15 @@ export const Chapter58: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-astronom-w-tan-ta-ren.png"
           data-is-talking="true"
         />
-        \n— Czasem sprawdzają się.
+        — Czasem sprawdzają się.
       </p>
       <p data-index="17">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— A gdybyście wróżyli ludziom z drzew, kamieni albo biegu wody, to także sprawdzałoby się?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        gdybyście wróżyli ludziom z drzew, kamieni albo biegu wody, to także sprawdzałoby się?
       </p>
       <p data-index="18">
         <span className="character-highlighted" data-character="Arcykaplan-astronom-w-Tan-ta-ren" data-src-listening="/Pharaon/arcykaplan-astronom-w-tan-ta-ren.png">
-          Arcykapłan{" "}
+          Arcykapłan
         </span>{" "}
         zakłopotał się.
       </p>
@@ -169,11 +169,11 @@ export const Chapter58: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-astronom-w-tan-ta-ren.png"
           data-is-talking="true"
         />
-        \n— Wasza świątobliwość nie chciej uważać nas za oszustów. Przepowiadamy ludziom przyszłość, bo ona ich obchodzi i, co prawda, tyle rozumieją z astronomii.
+        — Wasza świątobliwość nie chciej uważać nas za oszustów. Przepowiadamy ludziom przyszłość, bo ona ich obchodzi i, co prawda, tyle rozumieją z astronomii.
       </p>
       <p data-index="20">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— A co wy rozumiecie?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        co wy rozumiecie?
       </p>
       <p data-index="21">
         <span
@@ -182,15 +182,15 @@ export const Chapter58: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-astronom-w-tan-ta-ren.png"
           data-is-talking="true"
         />
-        \n— Znamy — mówił{" "}
+        — Znamy — mówił{" "}
         <span className="character-highlighted" data-character="Arcykaplan-astronom-w-Tan-ta-ren" data-src-listening="/Pharaon/arcykaplan-astronom-w-tan-ta-ren.png">
-          kapłan{" "}
+          kapłan
         </span>{" "}
         — budowę sklepienia niebieskiego i ruchy gwiazd…
       </p>
       <p data-index="22">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Cóż z tego przyjdzie komu?…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Cóż
+        z tego przyjdzie komu?…
       </p>
       <p data-index="23">
         <span
@@ -199,27 +199,27 @@ export const Chapter58: React.FC = () => {
           data-src-talking="/Pharaon/arcykaplan-astronom-w-tan-ta-ren.png"
           data-is-talking="true"
         />
-        \n— Niemałe usługi oddaliśmy Egiptowi. My wskazujemy główne kierunki, według których wznoszą się budowle i kopią kanały. Bez pomocy naszej nauki okręty pływające po morzu
-        nie mogłyby oddalać się od brzegów. My wreszcie układamy kalendarz i obrachowujemy przyszłe zjawiska na niebie. Ot, i teraz niedługo będziemy mieli zaćmienie…
+        — Niemałe usługi oddaliśmy Egiptowi. My wskazujemy główne kierunki, według których wznoszą się budowle i kopią kanały. Bez pomocy naszej nauki okręty pływające po morzu nie
+        mogłyby oddalać się od brzegów. My wreszcie układamy kalendarz i obrachowujemy przyszłe zjawiska na niebie. Ot, i teraz niedługo będziemy mieli zaćmienie…
       </p>
       <p data-index="24">
         Ale{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         już go nie słuchał; odwrócił się i wyszedł.
       </p>
       <p data-index="25">
         „Jak można — myślał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
-        — budować świątynie dla tak dziecinnej zabawki i jeszcze rezultaty jej ryć na złotych tablicach?… Święci mężowie już nie wiedzą, czego się chwytać z próżniactwa!…\'
+        — budować świątynie dla tak dziecinnej zabawki i jeszcze rezultaty jej ryć na złotych tablicach?… Święci mężowie już nie wiedzą, czego się chwytać z próżniactwa!…'
       </p>
       <p data-index="26">
         Krótko zabawiwszy w Tan-ta-ren,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          władca{" "}
+          władca
         </span>{" "}
         przeprawił się na drugą stronę Nilu, do miasta Kaneh.
       </p>
@@ -238,18 +238,18 @@ export const Chapter58: React.FC = () => {
       <p data-index="28">
         Kaneh roiło się też Fenicjanami, którzy z ogromnym zapałem przyjęli{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          władcę{" "}
+          władcę
         </span>{" "}
         i ofiarowali mu rozmaitych kosztowności za dziesięć talentów.
       </p>
       <p data-index="29">
         Mimo to{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         ledwie jeden dzień zabawił w Kaneh; dano mu bowiem z Tebów znać, że czcigodna mumia{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>{" "}
         już znajduje się w pałacu Luksor
         <a href="#fn93" className="link-note">
@@ -262,54 +262,54 @@ export const Chapter58: React.FC = () => {
         gmachów publicznych i prywatnych. Główne ulice były szerokie, proste i wyłożone kamiennymi płytami, brzegi Nilu obulwarowane, domy cztero- i pięciopiętrowe.
       </p>
       <p data-index="31">
-        Ponieważ każda świątynia i pałac miała ogromną bramę z pylonami, nazywano więc Teby miastem „stubramowym\'. Właściwie były one miastem — z jednej strony bardzo przemysłowym
+        Ponieważ każda świątynia i pałac miała ogromną bramę z pylonami, nazywano więc Teby miastem „stubramowym'. Właściwie były one miastem — z jednej strony bardzo przemysłowym
         i handlowym, z drugiej — jakby progiem do wieczności. Albowiem na zachodnim brzegu Nilu, w górach i między górami, znajdowała się niezliczona ilość grobów kapłańskich,
         magnackich i królewskich.
       </p>
       <p data-index="32">
-        Wspaniałość swoją Teby zawdzięczały dwom faraonom: Amenofisowi III, czyli Memnonowi, który zastał „miasto gliniane, a zostawił kamienne\', i Ramzesowi II, który wykończył i
+        Wspaniałość swoją Teby zawdzięczały dwom faraonom: Amenofisowi III, czyli Memnonowi, który zastał „miasto gliniane, a zostawił kamienne', i Ramzesowi II, który wykończył i
         uzupełnił gmachy rozpoczęte przez Amenofisa.
       </p>
       <p data-index="33">
         Na wschodnim brzegu Nilu, w stronie południowej miasta, była cała dzielnica ogromnych budowli królewskich: pałaców, willi, świątyń, na których gruzach dziś wznosi się
         miasteczko Luksor. W tej dzielnicy zwłoki{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         oczekiwały na ostateczne ceremonie.
       </p>
       <p data-index="34">
         Gdy przyjechał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>
         , całe Teby wyległy na powitanie go; w domach zostali tylko starcy i kalecy, a w zaułkach złodzieje… Tu po raz pierwszy lud wyprzągł konie z królewskiego wozu i sam go
         ciągnął. Tu również po raz pierwszy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         usłyszał krzyki i złorzeczenia przeciw kapłanom, co go ucieszyło, tudzież wołania, aby każdy siódmy dzień był świętem, co zastanowiło{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          władcę{" "}
+          władcę
         </span>
         . Pragnął on dać taki podarunek pracującemu Egiptowi, ale nie myślał, że jego zamiary stały się już głośnymi i naród oczekuje ich spełnienia.
       </p>
       <p data-index="35">
         Milowa podróż ciągnęła się parę godzin wśród zbitych tłumów. Wóz królewski bardzo często zatrzymywał się między ciżbą i nie prędzej ruszał, aż gwardii{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          jego świątobliwości{" "}
+          jego świątobliwości
         </span>{" "}
         udało się podnieść tych, którzy leżeli plackiem na ziemi.
       </p>
       <p data-index="36">
         Dobiwszy się wreszcie do pałacowych ogrodów, gdzie zajął jedną z mniejszych willi,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         był tak zmęczony, że tego dnia nie zajmował się interesami państwa. Zaś na drugi dzień spalił kadzidła przed mumią ojca, która stała w królewskim gmachu głównym, i
         powiedział{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhorowi{" "}
+          Herhorowi
         </span>
         , że można zwłoki przeprowadzić do grobów.
       </p>
@@ -330,7 +330,7 @@ export const Chapter58: React.FC = () => {
         I tym razem mumia królewska jechała w złotej łodzi, ale nierównie kosztowniejszej niż w Memfisie. Wóz, który ją dźwigał, zaprzężony w osiem par białych wołów, miał ze dwa
         piętra wysokości i prawie znikał pod stosami wieńców, bukietów, strusich piór i drogocennych tkanin. Otaczały go gęste kłęby dymu z kadzideł, co robiło wrażenie, iż{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzes XII{" "}
+          Ramzes XII
         </span>{" "}
         ukazuje się swojemu narodowi już jako bóg w obłokach.
       </p>
@@ -342,33 +342,33 @@ export const Chapter58: React.FC = () => {
       <p data-index="45">
         Dopiero gdy mumię{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>{" "}
         wniesiono do świątyni, z pałacu, na złotym wozie ciągnionym przez parę dzielnych koni, wyjechał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>
         . Lud stojący wzdłuż alei, który w czasie procesji zachowywał się spokojnie, na widok ukochanego{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          władcy{" "}
+          władcy
         </span>{" "}
         wybuchnął tak ogromnym okrzykiem, że w nim rozpłynęły się grzmoty i dźwięki ze szczytu świątyń.
       </p>
       <p data-index="46">
         Była chwila, że uniesione zapałem pospólstwo chciało wybiec na środek alei i otoczyć{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          pana{" "}
+          pana
         </span>
         . Ale{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         jednym znakiem reki powstrzymał żyjącą powódź i zapobiegł świętokradztwu.
       </p>
       <p data-index="47">
         W ciągu kilkunastu minut{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         przejechał gościniec i stanął przed olbrzymimi pylonami najwspanialszej świątyni w Egipcie.
       </p>
@@ -402,23 +402,23 @@ export const Chapter58: React.FC = () => {
       <p data-index="52">
         W olbrzymiej bramie czekał na{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         dostojny{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         , arcykapłan tej świątyni. Otoczony całym sztabem kapłanów,{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         powitał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          władcę{" "}
+          władcę
         </span>{" "}
         prawie dumnie, a paląc przed nim kadzidło, nie patrzył na niego. Potem przez dziedziniec zaprowadził{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         do hipostylu i wydał rozkaz wpuszczenia deputacji w obręb świątyniowego
         <a href="#fn98" className="link-note">
@@ -429,66 +429,66 @@ export const Chapter58: React.FC = () => {
       <p data-index="53">
         Na środku hipostylu stała łódź z mumią zmarłego{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          władcy{" "}
+          władcy
         </span>
         , a po obu jej stronach, naprzeciw siebie — dwa jednakowo wysokie trony. Na jednym zasiadł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         otoczony przez jenerałów i nomarchów, na drugim —{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         otoczony przez kapłanów. Po czym arcykapłan{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         podał{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhorowi{" "}
+          Herhorowi
         </span>{" "}
         infułę Amenhotepa, a młody{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         po raz drugi na głowie{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>{" "}
         zobaczył złotego węża, symbol władzy królewskiej.
       </p>
       <p data-index="54">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         pobladł z gniewu i pomyślał:
       </p>
       <p data-index="55">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n„Obym nie potrzebował zdjąć ci ureusza razem z twoją głową!…\'
+        „Obym nie potrzebował zdjąć ci ureusza razem z twoją głową!…'
       </p>
       <p data-index="56">
         Ale milczał, wiedząc, że w tej największej świątyni egipskiej{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         jest panem równym bogom i mocarzem bodaj czy nie wyższym od samego{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraona{" "}
+          faraona
         </span>
         .
       </p>
       <p data-index="57">
         Przez ten czas, gdy lud napełniał dziedziniec, a za purpurową zasłoną oddzielającą od śmiertelnych resztę świątyni odezwały się arfy i ciche śpiewy,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         przypatrywał się sali. Cały las potężnych kolumn, od góry do dołu okrytych malowidłami, tajemnicze oświetlenie, sufit zawieszony gdzieś pod niebem, przytłaczające wywarło
         na nim wrażenie.
       </p>
       <p data-index="58">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n„Co to znaczy — myślał — wygrać bitwę nad Sodowymi Jeziorami?… Zbudować taki gmach to jest dzieło!… A przecież oni go wznieśli…\'
+        „Co to znaczy — myślał — wygrać bitwę nad Sodowymi Jeziorami?… Zbudować taki gmach to jest dzieło!… A przecież oni go wznieśli…'
       </p>
       <p data-index="59">
         W tej chwili odczuł potęgę kapłańskiego stanu. Czyliż on, jego wojsko, a nawet cały lud potrafiłby obalić tę świątynię?… A jeżeli trudno poradzić sobie z gmachem, czy
@@ -497,30 +497,30 @@ export const Chapter58: React.FC = () => {
       <p data-index="60">
         Z przykrych medytacji wyrwał go głos arcykapłana{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresa{" "}
+          Mefresa
         </span>
         .
       </p>
       <p data-index="61">
-        <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />
-        \n— Wasza świątobliwość — mówił starzec — ty, najdostojniejszy powierniku bogów (tu ukłonił się{" "}
+        <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Wasza
+        świątobliwość — mówił starzec — ty, najdostojniejszy powierniku bogów (tu ukłonił się{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhorowi{" "}
+          Herhorowi
         </span>
         ), wy nomarchowie, pisarze, rycerze i ludu pospolity! Najdostojniejszy arcykapłan tej świątyni,{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         , wezwał nas, abyśmy starym obyczajem osądzili ziemskie postępki zmarłego{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         i odmówili mu lub przyznali — prawo pogrzebu…
       </p>
       <p data-index="62">
         Gniew uderzył do głowy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraonowi{" "}
+          faraonowi
         </span>
         . Nie dość, że jego lekceważą w tym miejscu, ale jeszcze śmią rozprawiać o czynach ojca, decydować o pogrzebie!…
       </p>
@@ -528,44 +528,43 @@ export const Chapter58: React.FC = () => {
       <p data-index="64">
         Na znak dany przez{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>{" "}
         arcykapłani zasiedli na taboretach. Ale nomarchowie ani jenerałowie otaczający tron{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>{" "}
         nie usiedli: dla nich bowiem nie było krzeseł.
       </p>
       <p data-index="65">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Faraon{" "}
+          Faraon
         </span>{" "}
         zapamiętał i tę zniewagę; ale już tak panował nad sobą, że nie można było poznać, czy dostrzegł lekceważenie swoich bliskich.
       </p>
       <p data-index="66">
         Tymczasem święty{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         zastanawiał się nad życiem zmarłego pana.
       </p>
       <p data-index="67">
-        <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />
-        \n—{" "}
+        <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzes XII{" "}
+          Ramzes XII
         </span>{" "}
         — mówił — nie popełnił żadnego z czterdziestu dwóch grzechów, więc sąd bogów wyda dla niego wyrok łaskawy. A że nadto mumia królewska, dzięki wyjątkowej troskliwości
         kapłanów, jest zaopatrzona we wszystkie amulety, modlitwy, przepisy i zaklęcia, zatem nie ulega kwestii, że zmarły{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         jest już w mieszkaniu bogów, zasiada obok Ozyrysa i jest sam Ozyrysem.
       </p>
       <p data-index="68">
         Boska natura{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>{" "}
         objawiała się już w ziemskim życiu. Panował przeszło trzydzieści lat, dał narodowi głęboki spokój i wybudował lub dokończył wielu
         <a href="#fn99" className="link-note">
@@ -574,21 +573,21 @@ export const Chapter58: React.FC = () => {
         świątyń. Prócz tego sam był arcykapłanem i najpobożniejszych kapłanów prześcigał pobożnością. W jego panowaniu pierwsze miejsce zajmowała cześć bogów i podźwignięcie
         świętego stanu kapłańskiego. Za co też kochały go moce niebieskie, a jeden z tebańskich bożków, Chonsu, na prośbę{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         raczył udać się do kraju Buchten i tam wypędził złego ducha z córki królewskiej.
       </p>
       <p data-index="69">
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         odpoczął i znowu mówił dalej:
       </p>
       <p data-index="70">
-        <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />
-        \n— Gdy dowiodłem wam, dostojnicy, że{" "}
+        <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Gdy dowiodłem
+        wam, dostojnicy, że{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzes XII{" "}
+          Ramzes XII
         </span>{" "}
         był bogiem, zapytacie: w jakim celu ta wyższa istota zstąpiła na ziemię egipską i kilkadziesiąt lat spędziła na niej?
       </p>
@@ -617,19 +616,19 @@ export const Chapter58: React.FC = () => {
         Skutkiem tego cała szlachta jest zadłużona, lud bity i przeciążony pracą, tu i ówdzie wybuchają bunty. Co mówię: tu i ówdzie?… Od pewnego czasu, jak długi i szeroki Egipt,
         dzięki tajemniczym burzycielom, słyszymy okrzyk:
       </p>
-      <p data-index="78">„Dajcie nam co sześć dni odpoczynek!… Nie bijcie nas bez sądu!… Darujcie nam po zagonie ziemi na własność!…\'</p>
+      <p data-index="78">„Dajcie nam co sześć dni odpoczynek!… Nie bijcie nas bez sądu!… Darujcie nam po zagonie ziemi na własność!…'</p>
       <p data-index="79">
         Jest to zapowiedź ruiny naszego państwa, przeciw której trzeba znaleźć ratunek. Ratunek zaś jest tylko w religii, która uczy nas, że lud powinien pracować, mężowie święci,
         jako znający wolę bogów, powinni mu wskazywać pracę, a{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         i jego dostojnicy winni czuwać, ażeby praca była rzetelnie spełniana.
       </p>
       <p data-index="80">
         Tego nas uczy religia; według tych zasad rządził państwem równy bogom{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ozyrys-Ramzes XII{" "}
+          Ozyrys-Ramzes XII
         </span>
         . My zaś, arcykapłani, uznając jego pobożność, ten napis wyryjemy mu na grobie i w świątyniach:
       </p>
@@ -640,13 +639,13 @@ export const Chapter58: React.FC = () => {
         <a href="#fn101" className="link-note">
           [101]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="82">
         Gdy wniosek ten zebrani zatwierdzili okrzykiem, wybiegły spoza zasłony tancerki i wykonały przed sarkofagiem święty taniec, a kapłani zapalili kadzidła. Po czym zdjęto
         mumię z łodzi i wniesiono do sanktuarium Amona, dokąd{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         już nie miał prawa wchodzić.
       </p>
@@ -654,35 +653,35 @@ export const Chapter58: React.FC = () => {
       <p data-index="84">
         Wracając do pałacu Luksor, młody{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         był tak pogrążony w myślach, że prawie nie dostrzegał niezmiernego tłumu i nie słyszał jego okrzyków.
       </p>
       <p data-index="85">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n„Nie mogę oszukiwać własnego serca — mówił do siebie{" "}
+        „Nie mogę oszukiwać własnego serca — mówił do siebie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         . — Arcykapłani lekceważą mnie, co nie spotkało dotychczas żadnego{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraona{" "}
+          faraona
         </span>
         ; ba! nawet wskazują mi, w jaki sposób mogę odzyskać ich łaskę. Oni chcą rządzić państwem, a ja mam pilnować, ażeby wykonywano ich rozkazy…
       </p>
-      <p data-index="86">Otóż będzie inaczej: ja rozkazuję, a wy musicie spełniać… I albo zginę, albo na waszych karkach oprę moją królewską nogę…\'</p>
+      <p data-index="86">Otóż będzie inaczej: ja rozkazuję, a wy musicie spełniać… I albo zginę, albo na waszych karkach oprę moją królewską nogę…'</p>
       <p data-index="87">
         Przez dwa dni czcigodna mumia{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>{" "}
         przebywała w świątyni Amona-Ra, w miejscu tak boskim, że z wyjątkiem{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresa{" "}
+          Mefresa
         </span>
         , nawet arcykapłani wchodzić tam nie mogli. Przed zmarłym świeciła się jedna tylko lampa, której płomień podniecany cudownym sposobem nigdy nie gasnął. Nad zmarłym unosił
         się symbol duszy, krogulec z ludzką głową. Czy to była machina, czy naprawdę żywa istota, nikt nie wiedział. To pewne, że kapłani, którzy mieli odwagę spojrzeć ukradkiem za
@@ -757,16 +756,16 @@ export const Chapter58: React.FC = () => {
       <p data-index="101">
         Tu znajdują się drzwi prowadzące do podziemnego grobu, który budował sobie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         przez trzydzieści lat panowania. Grób ten to cały pałac z komnatami dla{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          pana{" "}
+          pana
         </span>
         , rodziny i służby, z jadalnią, sypialnią i łazienką, z kaplicami poświęconymi różnym bogom, a nareszcie — ze studnią, na dnie której znajduje się mały pokoik, gdzie na
         wieki spocznie mumia{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraona{" "}
+          faraona
         </span>
         .
       </p>
@@ -778,55 +777,55 @@ export const Chapter58: React.FC = () => {
         Nie dość na tym: pokoje bowiem nie tylko są zastawione sprzętami, naczyniami, wozami i bronią, kwiatami, mięsem, ciastem i winem, ale jeszcze znajduje się w nich mnóstwo
         posągów. Są to liczne wizerunki{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>
         , jego kapłanów, ministrów, kobiet, żołnierzy i niewolników.{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Pan{" "}
+          Pan
         </span>{" "}
         bowiem i na tamtym świecie nie może obejść się bez kosztownych sprzętów, wykwintnego jadła i wiernej służby.
       </p>
       <p data-index="104">
         Gdy wóz żałobny zatrzymał się u wejścia do grobu, kapłani wyjęli mumię królewską z sarkofagu i postawili ją na ziemi opartą plecami o skałę. Wówczas{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         spalił przed zwłokami ojca kadzidło, a królowa{" "}
         <span className="character-highlighted" data-character="Nikotris" data-src-listening="/Pharaon/nikotris-listens.mp4">
-          Nikotris{" "}
+          Nikotris
         </span>
         , objąwszy mumię za szyję, poczęła mówić z płaczem:
       </p>
       <p data-index="105">
-        <span className="character-placeholder character-talking" data-character="Nikotris" data-src-talking="/Pharaon/nikotris-speaks.mp4" data-is-talking="true" />
-        \n— „Jam jest siostra twoja, żona twoja{" "}
+        <span className="character-placeholder character-talking" data-character="Nikotris" data-src-talking="/Pharaon/nikotris-speaks.mp4" data-is-talking="true" />— „Jam jest
+        siostra twoja, żona twoja{" "}
         <span className="character-highlighted" data-character="Nikotris" data-src-listening="/Pharaon/nikotris-listens.mp4">
-          Nikotris{" "}
+          Nikotris
         </span>
         , nie opuszczaj mnie, o wielki! Czy istotnie pragniesz, mój dobry ojcze, abym się oddaliła? A jeżeli ja odejdę, zostaniesz sam, i czy ktokolwiek będzie z tobą?…
         <a href="#fn107" className="link-note">
           [107]
         </a>
-        \'
+        '
       </p>
       <p data-index="106">
         W tej chwili arcykapłan{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         spalił kadzidło przed mumią, a{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         rozlał wino i rzekł:
       </p>
       <p data-index="107">
-        <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />
-        \n— „Twemu sobowtórowi ofiarujemy to,{" "}
+        <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— „Twemu
+        sobowtórowi ofiarujemy to,{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ozyrysie-Mer-amen-Ramzesie{" "}
+          Ozyrysie-Mer-amen-Ramzesie
         </span>
-        , władco Górnego i Dolnego Egiptu, którego głos jest sprawiedliwy przed wielkim bogiem…\'
+        , władco Górnego i Dolnego Egiptu, którego głos jest sprawiedliwy przed wielkim bogiem…'
       </p>
       <p data-index="108">Po czym odezwały się płaczki i chóry kapłanów:</p>
       <p data-index="109">
@@ -848,58 +847,58 @@ export const Chapter58: React.FC = () => {
         <a href="#fn108" className="link-note">
           [108]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="114">Zaczęły się ostateczne ceremonie.</p>
       <p data-index="115">
         Przyprowadzono wołu i antylopę, które powinien był zabić{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>
         , ale zabił jego zastępca wobec bogów, arcykapłan{" "}
         <span className="character-highlighted" data-character="Sem" data-src-listening="/Pharaon/sem-listens.mp4">
-          Sem{" "}
+          Sem
         </span>
         . Niżsi kapłani szybko oprawili zwierzęta, po czym{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         , wziąwszy udźce ich, kolejno przykładali je do ust mumii. Ale mumia jeść nie chciała, była bowiem jeszcze nie ożywiona, a usta jej zamknięte.
       </p>
       <p data-index="116">
         Aby usunąć tę przeszkodę,{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         obmył ją świętą wodą i okadził wonnościami i ałunem, mówiąc:
       </p>
       <p data-index="117">
-        <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />
-        \n— „Oto stoi mój ojciec, oto stoi{" "}
+        <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— „Oto stoi mój
+        ojciec, oto stoi{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ozyrys-Mer-amen-Ramzes{" "}
+          Ozyrys-Mer-amen-Ramzes
         </span>
         . Ja jestem twoim synem, jestem Horusem, przychodzę do ciebie, aby cię oczyścić i zrobić żywym… Składam na powrót twoje kości, spajam, co było przecięte, gdyż jestem Horus,
         mściciel ojca mojego… Zasiadasz na tronie Re i dajesz rozkazy bogom. Gdyż ty jesteś Re, który z Nut pochodzi, które rodzi Re każdego poranku, który rodzi{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Mer-amen-Ramzesa{" "}
+          Mer-amen-Ramzesa
         </span>{" "}
         codziennie tak jak Re
         <a href="#fn109" className="link-note">
           [109]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="118">Mówiąc tak, arcykapłan dotykał amuletami ust, piersi, rąk i nóg mumii.</p>
       <p data-index="119">Teraz znowu odezwały się chóry.</p>
       <p data-index="120">
         <strong>Chór I</strong>. „
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ozyrys-Mer-amen-Ramzes{" "}
+          Ozyrys-Mer-amen-Ramzes
         </span>{" "}
         będzie odtąd jadał i pijał wszystko, co jedzą i piją bogowie. Zasiada na ich miejscu, jest zdrów i silny jak oni…
       </p>
@@ -909,7 +908,7 @@ export const Chapter58: React.FC = () => {
       <p data-index="122">
         <strong>Chór I</strong>. O bogowie, użyczcie{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ozyrysowi-Mer-amen-Ramzesowi{" "}
+          Ozyrysowi-Mer-amen-Ramzesowi
         </span>{" "}
         tysiące tysięcy kruż wina, tysiące szat, chlebów i wołów…
       </p>
@@ -924,7 +923,7 @@ export const Chapter58: React.FC = () => {
         <a href="#fn110" className="link-note">
           [110]
         </a>
-        \'
+        '
       </p>
       <p data-index="125">
         Po tym zaklęciu kapłani zapalili pochodnie, wzięli mumię królewską i znowu włożyli ją do skrzyni, a ze skrzynią do kamiennego sarkofagu, który w ogólnych zarysach miał
@@ -941,7 +940,7 @@ export const Chapter58: React.FC = () => {
       <p data-index="127">
         Wszystko to wykonali sami kapłani, bez świadków, a wykonali tak dokładnie, że mumia{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>{" "}
         po dziś dzień spoczywa w swym tajemniczym mieszkaniu, zarówno bezpieczna od złodziejów, jak i od nowożytnej ciekawości. W ciągu dwudziestu dziewięciu wieków wiele mogił
         królewskich zgwałcono, ale ta została nie tkniętą.
@@ -949,35 +948,35 @@ export const Chapter58: React.FC = () => {
       <p data-index="128">
         Przez ten czas, gdy jedna grupa kapłanów ukrywała zwłoki pobożnego{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraona{" "}
+          faraona
         </span>
         , inna grupa, oświetliwszy podziemne komnaty, zaprosiła żyjących na ucztę.
       </p>
       <p data-index="129">
         Weszli do sali jadalnej:{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>
         , królowa{" "}
         <span className="character-highlighted" data-character="Nikotris" data-src-listening="/Pharaon/nikotris-listens.mp4">
-          Nikotris{" "}
+          Nikotris
         </span>
         , arcykapłani{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         ,{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Sem" data-src-listening="/Pharaon/sem-listens.mp4">
-          Sem{" "}
+          Sem
         </span>{" "}
         tudzież kilkunastu cywilnych i wojskowych dostojników. Na środku komnaty stały stoły zapełnione potrawami, winem i kwiatami, a pod ścianą siedział wykuty z porfiru posąg
         zmarłego{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          pana{" "}
+          pana
         </span>
         . Zdawał się on patrzeć na obecnych i z melancholijnym uśmiechem zapraszać ich, aby jedli.
       </p>
@@ -987,7 +986,7 @@ export const Chapter58: React.FC = () => {
         <a href="#fn112" className="link-note">
           [112]
         </a>
-        \'
+        '
       </p>
       <p data-index="132">Po kapłance wystąpił prorok i przy akompaniamencie arf mówił śpiewającym głosem:</p>
       <p data-index="133">
@@ -1008,28 +1007,28 @@ export const Chapter58: React.FC = () => {
         <a href="#fn113" className="link-note">
           [113]
         </a>
-        \'
+        '
       </p>
       <p data-index="137">
         Uczta skończyła się i dostojne zebranie, jeszcze raz okadziwszy posąg zmarłego, zabrało się z powrotem do Tebów. W świątyni grobowej zostali tylko kapłani, aby regularnie
         składać{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          panu{" "}
+          panu
         </span>{" "}
         ofiary, tudzież straż pilnująca grobu przeciw świętokradzkim pokuszeniom złodziejów.
       </p>
       <p data-index="138">
         Odtąd{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzes XII{" "}
+          Ramzes XII
         </span>{" "}
         został sam w swej tajemnej komnacie. Przez małe a ukryte w skale okienko ledwie wdzierał się mrok. Zamiast piór strusich nad{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          panem{" "}
+          panem
         </span>{" "}
         szeleściły skrzydła ogromnych nietoperzy; zamiast muzyki rozlegały się w nocnej porze jękliwe wycia hien i kiedy niekiedy potężny głos lwa, który ze swej pustyni pozdrawiał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         w grobie.
       </p>

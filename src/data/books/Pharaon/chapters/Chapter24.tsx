@@ -7,7 +7,7 @@ export const Chapter24: React.FC = () => {
       <p data-index="1">
         Teraz już{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         wiedział, że albo nie spełni rozkazu faraona, albo musi poddać się woli kapłanów, co go przejmowało gniewem i niechęcią do nich.
       </p>
@@ -18,30 +18,30 @@ export const Chapter24: React.FC = () => {
       <p data-index="3">
         Właśnie powrócił{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         , mistrz we wszelkiej zabawie, i przywiózł{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księciu{" "}
+          księciu
         </span>{" "}
         dobre wiadomości od{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
-          Sary{" "}
+          Sary
         </span>
         . Była zdrowa i pięknie wyglądała, co dziś mniej już obchodziło{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>
         . Lecz kapłani postawili jego przyszłemu dziecku tak dobry horoskop, że{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         był zachwycony.
       </p>
       <p data-index="4">Twierdzili na pewno, że dziecko będzie synem bardzo obdarowanym od bogów i jeżeli ojciec będzie go kochał, osięgnie w życiu wielkie zaszczyty.</p>
       <p data-index="5">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         śmiał się z drugiej części tej przepowiedni.
       </p>
@@ -49,7 +49,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Dziwna ich mądrość — mówił do{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisa{" "}
+          Tutmozisa
         </span>
         . — Wiedzą, że będzie syn, o czym ja nie wiem, choć jestem ojcem; a wątpią, czy go będę kochał, choć łatwo zgadnąć, że kochałbym to dziecię, gdyby nawet było córką.
       </p>
@@ -57,19 +57,19 @@ export const Chapter24: React.FC = () => {
       <p data-index="8">
         W miesiącu Pachono (styczeń — luty){" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>{" "}
         przejechał do nomesu Ka, gdzie był podejmowany przez nomarchę{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofra{" "}
+          Sofra
         </span>
         . Miasto Anu leżało o siedem godzin pieszej drogi od Atribis, ale{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         przez trzy dni odbywał tę podróż. Na myśl o modlitwach i postach, jakie czekały go przy wtajemniczaniu się w sekreta świątyń,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         czuł coraz większą ochotę do zabaw; jego orszak odgadł to, więc następowała uciecha po uciesze.
       </p>
@@ -77,25 +77,25 @@ export const Chapter24: React.FC = () => {
         Znowu na gościńcach, którymi przejeżdżał do Atribis, ukazały się tłumy ludu z okrzykami, kwiatami i muzyką. Szczególniej pod miastem zapał dosięgnął szczytu. Zdarzyło się
         nawet, że jakiś olbrzymi robotnik rzucił się pod wóz{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          namiestnika{" "}
+          namiestnika
         </span>
         . A gdy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         zatrzymał konie, z gromady wystąpiło kilkanaście młodych kobiet i cały wóz oplotły mu kwiatami.
       </p>
       <p data-index="10">
-        „Oni jednak kochają mnie!…\' — pomyślał{" "}
+        „Oni jednak kochają mnie!…' — pomyślał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         .
       </p>
       <p data-index="11">
         W prowincji Ka już nie zapytywał{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchy{" "}
+          nomarchy
         </span>{" "}
         o dochody faraona, nie zwiedzał fabryk, nie kazał sobie czytać raportów. Wiedział, że niczego nie zrozumie, więc odłożył te zajęcia do czasu, gdy zostanie wtajemniczonym.
         Tylko raz, gdy zobaczył, że świątynia boga Sebaka stoi na wysokim wzgórzu, oświadczył chęć wejścia na jej pylon i obejrzenia okolicy.
@@ -103,11 +103,11 @@ export const Chapter24: React.FC = () => {
       <p data-index="12">
         Dostojny{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofra{" "}
+          Sofra
         </span>{" "}
         natychmiast spełnił wolę{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>
         , który znalazłszy się na wieży spędził parę godzin z wielką uciechą.
       </p>
@@ -125,68 +125,68 @@ export const Chapter24: React.FC = () => {
       <p data-index="15">
         Z tego miejsca{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         spostrzegł zjawisko, które go zastanowiło. Oto w pobliżu świątyń domy były najpiękniejsze, a w polach kręciło się najwięcej ludności.
       </p>
-      <p data-index="16">„Folwarki kapłanów są najbogatsze!…\' — przypomniał sobie i jeszcze raz przebiegł oczyma świątynie i kaplice, których z wieży było widać kilkanaście.</p>
+      <p data-index="16">„Folwarki kapłanów są najbogatsze!…' — przypomniał sobie i jeszcze raz przebiegł oczyma świątynie i kaplice, których z wieży było widać kilkanaście.</p>
       <p data-index="17">
         Ponieważ jednak pogodził się z{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhorem{" "}
+          Herhorem
         </span>{" "}
         i potrzebował usług od kapłanów, więc nie chciał dłużej zajmować się tą sprawą.
       </p>
       <p data-index="18">
         W ciągu następnych dni dostojny{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofra{" "}
+          Sofra
         </span>{" "}
         urządził dla{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         szereg polowań posuwając się od miasta Atribis ku wschodowi. Nad kanałami strzelano do ptaków z łuku, chwytano je w ogromne potrzaski z sieci, które od razu zagarniały po
         kilkadziesiąt sztuk, albo na latających swobodnie wypuszczano sokoły. Gdy zaś orszak{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         wkroczył do wschodniej pustyni, zaczęły się wielkie łowy z psami i panterą na czworonożne zwierzęta, których w ciągu kilku dni zabito lub schwytano paręset sztuk.
       </p>
       <p data-index="19">
         Gdy dostojny{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofra{" "}
+          Sofra
         </span>{" "}
         spostrzegł, że{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         ma już dość zabaw pod otwartym niebem i noclegów w namiotach, przerwał polowanie i najkrótszymi drogami zawrócił swoich gości do Atribis.
       </p>
       <p data-index="20">
         Stanęli tu o czwartej po południu, a{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarcha{" "}
+          nomarcha
         </span>{" "}
         zaprosił wszystkich do swego pałacu na ucztę.
       </p>
       <p data-index="21">
         Sam zaprowadził{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         do łazienki, asystował przy kąpieli i z własnej skrzyni wydobył wonności dla namaszczenia{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>
         . Potem dozorował fryzjera, który uporządkował włosy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          namiestnikowi{" "}
+          namiestnikowi
         </span>
         , wreszcie uklęknąwszy na podłodze błagał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         o łaskawe przyjęcie od niego nowych szat.
       </p>
@@ -195,25 +195,25 @@ export const Chapter24: React.FC = () => {
       </p>
       <p data-index="23">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Następca{" "}
+          Następca
         </span>{" "}
         łaskawie przyjął to, oświadczając, że jeszcze nigdy nie otrzymał tak pięknego podarunku.
       </p>
       <p data-index="24">
         Słońce już zaszło i{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarcha{" "}
+          nomarcha
         </span>{" "}
         zaprowadził{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         do sali balowej.
       </p>
       <p data-index="25">
         Był to duży dziedziniec otoczony kolumnadą, wyłożony mozaiką. Wszystkie ściany były pokryte malowidłami przedstawiającymi sceny z życia przodków{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofry{" "}
+          Sofry
         </span>
         , a więc — wojny, morskie podróże i polowania. Nad budynkiem tym, zamiast dachu, unosił się olbrzymi motyl z różnobarwnymi skrzydłami, które poruszali ukryci niewolnicy dla
         odświeżenia powietrza.
@@ -223,39 +223,39 @@ export const Chapter24: React.FC = () => {
         Sala dzieliła się na dwie części: jedna była pusta, druga zapełniona stolikami i krzesłami dla biesiadników. W głębi wznosił się pomost, na którym, pod kosztownym namiotem
         z rozsuniętymi ścianami, stał stolik i łóżko dla{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>
         .
       </p>
       <p data-index="28">
         Przy każdym stoliku znajdowały się wielkie wazony z palmami, akacjami i figami. Stół{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>{" "}
         otoczono roślinami iglastymi, które w sali rozlewały woń balsamiczną.
       </p>
       <p data-index="29">
         Zgromadzeni goście powitali{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         radosnym okrzykiem, a gdy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         zajął miejsce pod baldachimem, skąd był otwarty widok na całą salę, orszak jego zasiadł do stołów.
       </p>
       <p data-index="30">
         Odezwały się arfy i zaczęły wchodzić damy w bogatych muślinowych szatach, z odsłoniętymi piersiami, błyszczące od klejnotów. Cztery najpiękniejsze otoczyły{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>
         , inne zasiadły obok dostojników jego orszaku.
       </p>
       <p data-index="31">
         W powietrzu unosiła się woń róż, konwalij i fiołków, a{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         poczuł, że mu tętna biją w skroniach.
       </p>
@@ -267,26 +267,26 @@ export const Chapter24: React.FC = () => {
       <p data-index="33">
         Kilka godzin ciągnęła się uczta, przeplatana okrzykami na cześć{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>
         ,{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchy{" "}
+          nomarchy
         </span>{" "}
         i jego rodziny.
       </p>
       <p data-index="34">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>
         , który w postawie półleżącej siedział na łóżku okrytym lwią skórą ze złotymi szponami, obsługiwały cztery damy. Jedna wachlowała go, druga zmieniała mu wieńce na głowie,
         dwie inne przysuwały potrawy. Pod koniec uczty ta z nich, z którą{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         najchętniej rozmawiał, przyniosła mu kielich wina.{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         wychylił połowę, resztę podał jej, a gdy wypiła, pocałował ją w usta.
       </p>
@@ -298,11 +298,11 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Bakura" data-src-talking="/Pharaon/bakura-speaks.mp4" data-is-talking="true" />— Puśćcie mnie!… —
         wołał ochrypnięty głos męski. — Gdzie jest{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>
         ?… Gdzie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          namiestnik{" "}
+          namiestnik
         </span>
         ?…
       </p>
@@ -310,7 +310,7 @@ export const Chapter24: React.FC = () => {
       <p data-index="39">
         — Co to jest?… Zamach na{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcę{" "}
+          następcę
         </span>
         !… Hej, warta!…
       </p>
@@ -318,14 +318,14 @@ export const Chapter24: React.FC = () => {
       <p data-index="41">
         <span className="character-placeholder character-talking" data-character="Bakura" data-src-talking="/Pharaon/bakura-speaks.mp4" data-is-talking="true" />— Gdzie jest{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>
         ? — ryczał obcy człowiek.
       </p>
       <p data-index="42">
         — Warta!… Brońcie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>
         !… — odpowiedziano z sali.
       </p>
@@ -333,21 +333,21 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Zapalcie światło!… — odezwał się młodzieńczy głos{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>
         . — Kto mnie szuka?… Tu jestem.
       </p>
       <p data-index="44">
         Wniesiono pochodnie. Na sali piętrzyły się wywrócone i połamane sprzęty, między którymi kryli się biesiadnicy. Na estradzie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         wydzierał się kobietom, które krzycząc oplątywały mu ręce i nogi. Obok{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
-        </span>
+          księcia
+        </span>{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>{" "}
         w potarganej peruce, z brązowym dzbanem w ręku, gotów był walić w łeb każdego, kto by się zbliżył. We drzwiach sali ukazało się kilku żołnierzy z obnażonymi mieczami.
       </p>
@@ -355,14 +355,14 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Sofra" data-src-talking="/Pharaon/sofra-speaks.mp4" data-is-talking="true" />— Co to jest?… Kto tu
         jest?… — wołał przerażony{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarcha{" "}
+          nomarcha
         </span>
         .
       </p>
       <p data-index="46">
         Nareszcie spostrzeżono sprawcę zamętu. Jakiś olbrzym, nagi, okryty błotem, z krwawymi pręgami na plecach, klęczał na schodach estrady i wyciągał ręce do{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>
         .
       </p>
@@ -370,13 +370,13 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Sofra" data-src-talking="/Pharaon/sofra-speaks.mp4" data-is-talking="true" />— Oto morderca!… —
         wrzasnął{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarcha{" "}
+          nomarcha
         </span>
         . — Bierzcie go!…
       </p>
       <p data-index="48">
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>{" "}
         podniósł swój dzban, ode drzwi przybiegli żołnierze. Poraniony człowiek upadł twarzą na schody wołając:
       </p>
@@ -387,7 +387,7 @@ export const Chapter24: React.FC = () => {
       <p data-index="50">
         Już mieli go schwycić żołnierze, gdy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         , wydarłszy się kobietom, zbliżył się do nędzarza.
       </p>
@@ -402,11 +402,11 @@ export const Chapter24: React.FC = () => {
       <p data-index="53">
         W tej chwili{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofra{" "}
+          Sofra
         </span>{" "}
         zbliżywszy się do{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         szepnął:
       </p>
@@ -418,18 +418,18 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Kto
         jesteś? — spytał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         .
       </p>
       <p data-index="56">
         <span className="character-placeholder character-talking" data-character="Bakura" data-src-talking="/Pharaon/bakura-speaks.mp4" data-is-talking="true" />— Jestem{" "}
         <span className="character-highlighted" data-character="Bakura" data-src-listening="/Pharaon/bakura-listens.mp4">
-          Bakura{" "}
+          Bakura
         </span>
         , robotnik z pułku kopaczy w Sochem. Nie mamy teraz zajęcia, więc nomarcha{" "}
         <span className="character-highlighted" data-character="Otoes" data-src-listening="/Pharaon/otoes-listens.mp4">
-          Otoes{" "}
+          Otoes
         </span>{" "}
         kazał nam…
       </p>
@@ -437,17 +437,17 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Sofra" data-src-talking="/Pharaon/sofra-speaks.mp4" data-is-talking="true" />— To pijak i wariat!…
         — szeptał wzburzony{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofra{" "}
+          Sofra
         </span>
         . — Jak on przemawia do ciebie, panie…
       </p>
       <p data-index="58">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         tak spojrzał na{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchę{" "}
+          nomarchę
         </span>
         , że dygnitarz zgięty wpół cofnął się.
       </p>
@@ -455,14 +455,14 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Co
         wam kazał dostojny{" "}
         <span className="character-highlighted" data-character="Otoes" data-src-listening="/Pharaon/otoes-listens.mp4">
-          Otoes{" "}
+          Otoes
         </span>
         ? — pytał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          namiestnik{" "}
-        </span>
+          namiestnik
+        </span>{" "}
         <span className="character-highlighted" data-character="Bakura" data-src-listening="/Pharaon/bakura-listens.mp4">
-          Bakury{" "}
+          Bakury
         </span>
         .
       </p>
@@ -475,10 +475,10 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Cóż
         wy na to, dostojny panie? — zapytał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
-        </span>
+          książę
+        </span>{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchy{" "}
+          nomarchy
         </span>
         .
       </p>
@@ -486,7 +486,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Sofra" data-src-talking="/Pharaon/sofra-speaks.mp4" data-is-talking="true" />— Niebezpieczny
         pijak… brzydki kłamca… — odparł{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofra{" "}
+          Sofra
         </span>
         .
       </p>
@@ -496,12 +496,12 @@ export const Chapter24: React.FC = () => {
       </p>
       <p data-index="64">
         <span className="character-placeholder character-talking" data-character="Bakura" data-src-talking="/Pharaon/bakura-speaks.mp4" data-is-talking="true" />— Jak rozkazano —
-        mówił olbrzym. — Moja żona i córka krzyczały wraz z innymi: „oby żył wiecznie!\', a ja skakałem do wody i ciskałem wieńce do statku waszej dostojności, za co miano mi
-        płacić po utenie. Zaś kiedy wasza cześć raczyłeś wjeżdżać łaskawie do miasta Atribis, mnie naznaczono, abym rzucił się pod konie i zatrzymał wóz…
+        mówił olbrzym. — Moja żona i córka krzyczały wraz z innymi: „oby żył wiecznie!', a ja skakałem do wody i ciskałem wieńce do statku waszej dostojności, za co miano mi płacić
+        po utenie. Zaś kiedy wasza cześć raczyłeś wjeżdżać łaskawie do miasta Atribis, mnie naznaczono, abym rzucił się pod konie i zatrzymał wóz…
       </p>
       <p data-index="65">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         zaczął się śmiać.
       </p>
@@ -526,7 +526,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Za
         ten zgiełk dla mnie? — wtrącił śmiejąc się{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         .
       </p>
@@ -534,7 +534,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Bakura" data-src-talking="/Pharaon/bakura-speaks.mp4" data-is-talking="true" />— Prawdę mówi wasza
         cześć… Otóż wczoraj był bunt największy, za co jego dostojność nomarcha{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofra{" "}
+          Sofra
         </span>{" "}
         kazał nas dziesiątkować… Co dziesiąty brał kije, a ja dostałem najwięcej, bom duży i mam do wykarmienia trzy gęby: moją, żony i córki… Zbity, wydarłem się im, ażeby upaść
         na mój brzuch przed tobą, panie, i opowiedzieć nasze żale. Ty nas bij, jeżeliśmy winni, ale niech pisarze wydadzą nam, co się należy, bo z głodu pomrzemy — my, żony i
@@ -544,7 +544,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Sofra" data-src-talking="/Pharaon/sofra-speaks.mp4" data-is-talking="true" />— To człowiek
         opętany!… — zawołał{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofra{" "}
+          Sofra
         </span>
         . — Racz spojrzeć, wasza dostojność, ile on mi szkody narobił… Dziesięciu talentów nie wziąłbym za te stoły, misy i dzbany…
       </p>
@@ -557,7 +557,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Jeden bunt niezapłaconych robotników więcej sprawia szkody państwu, aniżeli warte są te bogactwa — surowo odezwał się{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         .
       </p>
@@ -568,11 +568,11 @@ export const Chapter24: React.FC = () => {
       <p data-index="77">
         Z nieukrywaną pogardą spojrzał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         na zmiennych jak obłoki dworaków i zwrócił się do{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchy{" "}
+          nomarchy
         </span>
         .
       </p>
@@ -584,22 +584,22 @@ export const Chapter24: React.FC = () => {
       <p data-index="79">
         Po tych słowach{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          namiestnik{" "}
+          namiestnik
         </span>{" "}
         wyszedł, zostawiając{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchę{" "}
+          nomarchę
         </span>{" "}
         i gości w wielkim strapieniu.
       </p>
       <p data-index="80">
         Na drugi dzień{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         , ubierając się przy pomocy{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisa{" "}
+          Tutmozisa
         </span>
         , zapytał go:
       </p>
@@ -615,13 +615,13 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
         ten… ten{" "}
         <span className="character-highlighted" data-character="Bakura" data-src-listening="/Pharaon/bakura-listens.mp4">
-          Bakura{" "}
+          Bakura
         </span>{" "}
         jest między nimi?
       </p>
       <p data-index="84">
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>{" "}
         skrzywił się i odparł:
       </p>
@@ -629,7 +629,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Zdarzył się
         dziwny wypadek. Dostojny{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofra{" "}
+          Sofra
         </span>{" "}
         kazał go zamknąć w pustej piwnicy swego pałacu. Otóż ten hultaj, bardzo silny człowiek, wyłamał drzwi do drugiego lochu, gdzie stało wino, przewrócił kilka dzbanów bardzo
         kosztownych, a sam tak się spił, że…
@@ -638,7 +638,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Że
         co?… — spytał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         .
       </p>
@@ -647,7 +647,7 @@ export const Chapter24: React.FC = () => {
       </p>
       <p data-index="88">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Następca{" "}
+          Następca
         </span>{" "}
         zerwał się z krzesła.
       </p>
@@ -659,7 +659,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Muszę
         wierzyć, bo nie mam dowodów, że go zabito — odpowiedział{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         .
       </p>
@@ -667,7 +667,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Ale
         ja ich poszukam!… — wybuchnął{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         .
       </p>
@@ -675,7 +675,7 @@ export const Chapter24: React.FC = () => {
       <p data-index="93">
         Gdy nieco uspokoił się, rzekł{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         :
       </p>
@@ -683,11 +683,11 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Nie szukaj,
         panie, winy tam, gdzie jej nie widać, bo nawet świadków nie znajdziesz. Gdyby ktoś w rzeczy samej z rozkazu{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchy{" "}
+          nomarchy
         </span>{" "}
         zadławił tego robotnika, nie przyzna się. Sam umarły także nic nie powie, a zresztą, cóż by znaczyła jego skarga na{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchę{" "}
+          nomarchę
         </span>
         !… W tych warunkach żaden sąd nie zechce rozpocząć śledztwa…
       </p>
@@ -695,7 +695,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
         jeżeli ja każę?… — spytał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          namiestnik{" "}
+          namiestnik
         </span>
         .
       </p>
@@ -703,13 +703,13 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— W takim razie
         przeprowadzą śledztwo i dowiodą niewinności{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofry{" "}
+          Sofry
         </span>
         . Po czym ty, panie, będziesz zawstydzony, a wszyscy nomarchowie, ich krewni i służba zostaną twoimi wrogami.
       </p>
       <p data-index="97">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         stał na środku pokoju i myślał.
       </p>
@@ -717,22 +717,22 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Wreszcie —
         mówił{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>{" "}
         — wszystko zdaje się przemawiać za tym, że nieszczęsny{" "}
         <span className="character-highlighted" data-character="Bakura" data-src-listening="/Pharaon/bakura-listens.mp4">
-          Bakura{" "}
+          Bakura
         </span>{" "}
         był pijak albo wariat, a nade wszystko — człowiek obcego pochodzenia. Bo czyliż rodowity i przytomny Egipcjanin, choćby przez rok nie pobierał żołdu i dwa razy tyle dostał
         kijów, czy ośmieliłby się — wpadać do pałacu{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchy{" "}
+          nomarchy
         </span>{" "}
         i z takim wrzaskiem wzywać ciebie?…
       </p>
       <p data-index="99">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         pochylił głowę, a widząc, że w drugim pokoju są dworzanie, rzekł zniżonym głosem:
       </p>
@@ -740,7 +740,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Czy
         ty wiesz,{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisie{" "}
+          Tutmozisie
         </span>
         , że od czasu jak wyruszyłem w tę podróż, Egipt zaczyna mi się wydawać jakiś inny. Niekiedy pytam samego siebie: czy ja jestem w obcym kraju? To znowu serce moje niepokoi
         się, jakbym miał na oczach zasłonę, poza którą dzieją się łotrostwa, których ja — nie mogę dojrzeć…
@@ -749,14 +749,14 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Toteż i nie
         wypatruj ich, bo w końcu wyda ci się, żeśmy wszyscy powinni iść do kopalń — odparł ze śmiechem{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         . — Pamiętaj, że nomarchowie i urzędnicy są pasterzami twego stada. Gdy który wydoi miarę mleka dla siebie albo zarznie owcę, przecie go nie zabijesz ani wypędzisz. Owiec
         masz za dużo, a o pastuchów trudno.
       </p>
       <p data-index="102">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Namiestnik{" "}
+          Namiestnik
         </span>
         , już ubrany, przeszedł do sali poczekalnej, gdzie zebrała się jego świta: kapłani, oficerowie i urzędnicy. Następnie wraz z nimi opuścił pałac i udał się na dziedziniec
         zewnętrzny.
@@ -764,13 +764,13 @@ export const Chapter24: React.FC = () => {
       <p data-index="103">
         Był to obszerny plac zasadzony akacjami, pod cieniem których oczekiwali na{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         robotnicy. Na odgłos trąbki cały tłum zerwał się z ziemi i uszykował w pięć szeregów.
       </p>
       <p data-index="104">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         , otoczony błyszczącym orszakiem dostojników, nagle zatrzymał się, chcąc najpierwej z daleka obejrzeć pułk kopaczy. Byli to ludzie nadzy, w białych czepcach na głowie i
         takichże przepaskach około bioder. W szeregach doskonale można było odróżnić brunatnych Egipcjan, ciemnych Murzynów, żółtych Azjatów i białych mieszkańców Libii tudzież
@@ -784,11 +784,11 @@ export const Chapter24: React.FC = () => {
       <p data-index="107">
         Kiedy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
-        zbliżył się do nich, zawołali chórem: „obyś żył wiecznie!\', i uklęknąwszy uderzyli czołem o ziemię.{" "}
+        zbliżył się do nich, zawołali chórem: „obyś żył wiecznie!', i uklęknąwszy uderzyli czołem o ziemię.{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Następca{" "}
+          Następca
         </span>{" "}
         kazał im powstać i znowu przypatrzył się z uwagą.
       </p>
@@ -796,15 +796,15 @@ export const Chapter24: React.FC = () => {
       <p data-index="109">
         Do{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          namiestnika{" "}
+          namiestnika
         </span>{" "}
         przystąpił nomarcha{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofra{" "}
+          Sofra
         </span>{" "}
         ze swoim orszakiem. Ale{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         udając, że go nie spostrzegł, zwrócił się do jednego z majstrów:
       </p>
@@ -815,7 +815,7 @@ export const Chapter24: React.FC = () => {
       <p data-index="111">Majster jak długi upadł twarzą na ziemię i milczał.</p>
       <p data-index="112">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         wzruszył ramionami i zawołał do robotników:
       </p>
@@ -833,19 +833,19 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— W
         tył zwrot!… — zakomenderował{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         .
       </p>
       <p data-index="118">Odwrócili się. Prawie każdy miał na plecach głębokie i gęste blizny od kijów; ale świeżych pręg nie było.</p>
       <p data-index="119">
-        „Oszukują mnie!…\' — pomyślał{" "}
+        „Oszukują mnie!…' — pomyślał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>
         . Kazał robotnikom iść do koszar i nie witając się ani żegnając z{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchą{" "}
+          nomarchą
         </span>
         , wrócił do pałacu.
       </p>
@@ -853,7 +853,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Czy
         i ty mi powiesz — rzekł w drodze do{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisa{" "}
+          Tutmozisa
         </span>{" "}
         — że ci ludzie są robotnikami z Sochem?…
       </p>
@@ -863,40 +863,40 @@ export const Chapter24: React.FC = () => {
       </p>
       <p data-index="122">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         zawołał, aby mu podano konia, i odjechał do wojsk obozujących za miastem.
       </p>
       <p data-index="123">
         Cały dzień musztrował pułki. Około południa na placu ćwiczeń, pod dowództwem{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchy{" "}
+          nomarchy
         </span>
         , ukazało się kilkudziesięciu tragarzy z namiotami, sprzętami, jadłem i winem. Ale{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         odprawił ich do Atribis, a gdy nadszedł czas posiłku dla wojska, kazał sobie podać i jadł owsiane placki z suszonym mięsem.
       </p>
       <p data-index="124">
         Były to najemne pułki libijskie. Kiedy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
-        wieczorem kazał im odłożyć broń i pożegnał się z nimi, zdawało się, że żołnierze i oficerowie ulegli szaleństwu. Krzycząc: „żyj wiecznie!\', całowali jego ręce i nogi,
+        wieczorem kazał im odłożyć broń i pożegnał się z nimi, zdawało się, że żołnierze i oficerowie ulegli szaleństwu. Krzycząc: „żyj wiecznie!', całowali jego ręce i nogi,
         zrobili lektykę z włóczni i płaszczów, ze śpiewami odnieśli{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         do miasta, a w drodze kłócili się o zaszczyt dźwigania go na ramionach.
       </p>
       <p data-index="125">
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Nomarcha{" "}
+          Nomarcha
         </span>{" "}
         i urzędnicy prowincji, widząc zapał barbarzyńskich Libijczyków i łaskę dla nich{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następcy{" "}
+          następcy
         </span>
         , zatrwożyli się.
       </p>
@@ -904,24 +904,24 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Wielki-pisarz" data-src-talking="/Pharaon/wielki-pisarz-speaks.mp4" data-is-talking="true" />— Oto
         jest władca!… — szepnął do{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofry{" "}
-        </span>
+          Sofry
+        </span>{" "}
         <span className="character-highlighted" data-character="Wielki-pisarz" data-src-listening="/Pharaon/wielki-pisarz-listens.mp4">
-          wielki pisarz{" "}
+          wielki pisarz
         </span>
         . — Gdyby zechciał, ci ludzie pobiliby mieczem nas i dzieci nasze…
       </p>
       <p data-index="127">
         Strapiony{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarcha{" "}
+          nomarcha
         </span>{" "}
         westchnął do bogów i polecił się ich łaskawej opiece.
       </p>
       <p data-index="128">
         Późno w nocy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         znalazł się w swym pałacu i tu powiedziała mu służba, że zmieniono mu pokój sypialny.
       </p>
@@ -933,7 +933,7 @@ export const Chapter24: React.FC = () => {
       <p data-index="131">
         W skrzydle sąsiadującym z domem{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchy{" "}
+          nomarchy
         </span>{" "}
         znajdowała się nowa sypialnia. Był to czworoboczny pokój otoczony kolumnami. Miał alabastrowe ściany pokryte malowaną płaskorzeźbą przedstawiającą u dołu — rośliny w
         wazonach, wyżej — girlandy z liści oliwkowych i laurowych.
@@ -945,21 +945,21 @@ export const Chapter24: React.FC = () => {
       <p data-index="133">W suficie był wielki otwór czworoboczny zasłonięty płótnem.</p>
       <p data-index="134">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         wykąpał się i legł na miękkim posłaniu, jego służba odeszła do dalszych komnat. Pochodnie zaczęły przygasać, po sypialni wionął chłodny wiatr nasycony wonią kwiatów.
         Jednocześnie w górze odezwała się cicha muzyka arf.
       </p>
       <p data-index="135">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         podniósł głowę. Płócienny dach pokoju usunął się i przez otwór w suficie widać było konstelację Lwa, a w niej jasną gwiazdę Regulusa. Muzyka arf wzmogła się.
       </p>
       <p data-index="136">
-        „Czy bogowie wybierają się do mnie w odwiedziny?…\' — pomyślał z uśmiechem{" "}
+        „Czy bogowie wybierają się do mnie w odwiedziny?…' — pomyślał z uśmiechem{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         .
       </p>
@@ -974,7 +974,7 @@ export const Chapter24: React.FC = () => {
       <p data-index="139">
         Kobieta, wysiadłszy ze swej napowietrznej lektyki, uklękła przed{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księciem{" "}
+          księciem
         </span>
         .
       </p>
@@ -982,11 +982,11 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
         Jesteś córką{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofry{" "}
+          Sofry
         </span>
         ?… — spytał jej{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          następca{" "}
+          następca
         </span>
         .
       </p>
@@ -1011,7 +1011,7 @@ export const Chapter24: React.FC = () => {
       </p>
       <p data-index="146">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         przyciągnął ją do siebie i namiętnie pocałował. Oczy płonęły mu.
       </p>
@@ -1023,7 +1023,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Abeb" data-src-talking="/Pharaon/abeb-speaks.mp4" data-is-talking="true" />— O, jakiś ty dobry!… —
         zawołała, tuląc się do{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>
         . A potem dodała z przymileniem:
       </p>
@@ -1041,7 +1041,7 @@ export const Chapter24: React.FC = () => {
       </p>
       <p data-index="152">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         popatrzył na nią.
       </p>
@@ -1065,7 +1065,7 @@ export const Chapter24: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Nic
         o tym nie wiem — wtrącił{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         .
       </p>
@@ -1096,14 +1096,14 @@ export const Chapter24: React.FC = () => {
       <p data-index="164">
         Na drugi dzień{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          namiestnik{" "}
+          namiestnik
         </span>{" "}
         raczył przyjąć hołdy i ucztę od{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchy{" "}
-        </span>
+          nomarchy
+        </span>{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          Sofra{" "}
+          Sofra
         </span>
         . Publicznie pochwalił jego zarząd prowincją i aby wynagrodzić szkody wyrządzone przez pijanego robotnika, darował mu połowę naczyń i sprzętów, które otrzymał w mieście
         Anu.
@@ -1111,30 +1111,30 @@ export const Chapter24: React.FC = () => {
       <p data-index="165">
         Drugą połowę tych darów zabrała córka{" "}
         <span className="character-highlighted" data-character="Sofra" data-src-listening="/Pharaon/sofra-listens.mp4">
-          nomarchy{" "}
+          nomarchy
         </span>
         , piękna{" "}
         <span className="character-highlighted" data-character="Abeb" data-src-listening="/Pharaon/abeb-listens.mp4">
-          Abeb{" "}
+          Abeb
         </span>
         , jako dama dworu{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>
         . Nadto kazała sobie wypłacić z kasy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>{" "}
         pięć talentów na stroje, konie i niewolnice.
       </p>
       <p data-index="166">
         Wieczorem{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         ziewając rzekł do{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisa{" "}
+          Tutmozisa
         </span>
         :
       </p>
@@ -1153,7 +1153,7 @@ export const Chapter24: React.FC = () => {
       <p data-index="170">
         <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Czy i{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
-          Sarę{" "}
+          Sarę
         </span>
         ?
       </p>
@@ -1167,7 +1167,7 @@ export const Chapter24: React.FC = () => {
       </p>
       <p data-index="173">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         znowu ziewnął.
       </p>

@@ -8,24 +8,24 @@ export const Chapter28: React.FC = () => {
       <p data-index="2">
         Na znak{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresa{" "}
+          Mefresa
         </span>{" "}
         znowu wystąpiła procesja muzykantów, tancerek i młodszych kapłanów z posągiem bogini Hator z krowią głową. A gdy odpędzono złe duchy,{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         znowu zaczął kazanie.
       </p>
       <p data-index="3">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Widzieliście, dostojnicy, że od czasów dziewiętnastej dynastii ubyło nam sto tysięcy miar ziemi i dwa miliony ludności. To wyjaśnia, dlaczego dochód państwa zmniejszył
-        się o trzydzieści dwa tysiące talentów, i o tym wiemy wszyscy. Jest to przecie dopiero początek klęsk Egiptu i skarbu. Na pozór bowiem zostało jego świątobliwości jeszcze
-        dziewięćdziesiąt osiem tysięcy talentów dochodu. Czy jednak sądzicie, że faraon otrzymuje cały ten dochód?
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Widzieliście,
+        dostojnicy, że od czasów dziewiętnastej dynastii ubyło nam sto tysięcy miar ziemi i dwa miliony ludności. To wyjaśnia, dlaczego dochód państwa zmniejszył się o trzydzieści
+        dwa tysiące talentów, i o tym wiemy wszyscy. Jest to przecie dopiero początek klęsk Egiptu i skarbu. Na pozór bowiem zostało jego świątobliwości jeszcze dziewięćdziesiąt
+        osiem tysięcy talentów dochodu. Czy jednak sądzicie, że faraon otrzymuje cały ten dochód?
       </p>
       <p data-index="4">
         Za przykład opowiem wam, co jego dostojność{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         odkrył w powiecie Zajęczym<a href="#fn201" className="link-note"></a>.
       </p>
@@ -36,7 +36,7 @@ export const Chapter28: React.FC = () => {
       <p data-index="6">
         — Dlaczego?… — spytał dostojny{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         — a oto, co pokazało śledztwo.
       </p>
@@ -47,23 +47,23 @@ export const Chapter28: React.FC = () => {
       <p data-index="8">
         Jego dostojności{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhorowi{" "}
+          Herhorowi
         </span>{" "}
         nie wiadomo, czy tak jest w każdym powiecie. To przecież pewne, że skarb faraona, zamiast dziewięćdziesięciu ośmiu, ma tylko siedemdziesiąt cztery tysiące talentów rocznie…
       </p>
       <p data-index="9">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Powiedz, ojcze święty: pięćdziesiąt tysięcy… — wtrącił{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Powiedz, ojcze święty: pięćdziesiąt tysięcy… — wtrącił{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         .
       </p>
       <p data-index="10">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— I to objaśnię — odparł kapłan. — W każdym razie zapamiętaj,{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— I to objaśnię —
+        odparł kapłan. — W każdym razie zapamiętaj,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         , iż skarb faraona oddaje dziś dwadzieścia cztery tysiące talentów urzędnikom, gdy za dynastii dziewiętnastej wydawał tylko dziesięć tysięcy.
       </p>
@@ -71,38 +71,38 @@ export const Chapter28: React.FC = () => {
       <p data-index="12">
         Ale{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         był nieustraszony.
       </p>
       <p data-index="13">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Teraz — mówił — pokażę ci, następco, byt urzędników i dolę ludu za dawnych lat i dzisiaj.
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Teraz — mówił —
+        pokażę ci, następco, byt urzędników i dolę ludu za dawnych lat i dzisiaj.
       </p>
       <p data-index="14">— Czy nie szkoda czasu?… To przecie każdy sam może zobaczyć… — zaszemrali kapłani.</p>
       <p data-index="15">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Ja chcę to wiedzieć — rzekł stanowczo następca.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Ja
+        chcę to wiedzieć — rzekł stanowczo następca.
       </p>
       <p data-index="16">
         Szmer ucichł.{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         po stopniach amfiteatru zeszedł na dziedziniec, a za nim{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         , arcykapłan{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         i reszta kapłanów.
       </p>
       <p data-index="17">
         Zatrzymali się przed długą zasłoną z mat, która tworzyła jakby parkan. Na znak{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuera{" "}
+          Pentuera
         </span>{" "}
         przybiegło kilkunastu młodych kapłanów z jarzącymi pochodniami. Drugi znak — i część zasłony spadła.
       </p>
@@ -112,10 +112,10 @@ export const Chapter28: React.FC = () => {
         głowy były poręczami.
       </p>
       <p data-index="20">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Tak było — mówił{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Tak było —
+        mówił{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         — za dynastii dziewiętnastej. Spojrzyjcie na rolników. Przy ich pługach widzicie woły lub osły, ich motyki i łopaty są brązowe, a więc mocne. Patrzcie, jacy to tędzy
         ludzie! Dziś podobnych można spotkać tylko w gwardii jego świątobliwości. Potężne ręce i nogi, piersi wypukłe, twarze uśmiechnięte. Wszyscy są namaszczeni oliwą, wykąpani.
@@ -133,7 +133,7 @@ export const Chapter28: React.FC = () => {
       </p>
       <p data-index="23">
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         klasnął i w żywym obrazie zapanował ruch. Chłopi zaczęli podawać urzędnikom kosze winogron, wory jęczmienia, grochu i pszenicy, dzbany wina, piwa, mleka i miodu, mnóstwo
         zwierzyny i liczne sztuki białych lub kolorowych tkanin. Urzędnicy odebrali te produkta<a href="#fn202" className="link-note"></a>, część ich zostawiali sobie, ale
@@ -141,19 +141,19 @@ export const Chapter28: React.FC = () => {
         pagórek.
       </p>
       <p data-index="24">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Widzicie, dostojni — rzekł{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Widzicie,
+        dostojni — rzekł{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         — że w owych czasach, kiedy chłopi byli syci i zamożni, skarb jego świątobliwości ledwo mógł pomieścić dary poddanych. A teraz zobaczcie: co jest dzisiaj…
       </p>
       <p data-index="25">Nowe hasło, spadła druga część zasłony i ukazał się drugi obraz, w ogólnych zarysach podobny do poprzedniego.</p>
       <p data-index="26">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Oto są teraźniejsi chłopi — mówił{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Oto są
+        teraźniejsi chłopi — mówił{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         , a w głosie jego czuć było wzburzenie. — Ciało ich składa się ze skóry i kości, wyglądają jak chorzy, są brudni i już zapomnieli namaszczać się oliwą. Za to grzbiety ich
         są poranione kijami.
@@ -172,9 +172,9 @@ export const Chapter28: React.FC = () => {
       </p>
       <p data-index="30">Wzruszenie zatamowało mu głos. Lecz chwilę odpoczął i ciągnął dalej, wśród gniewnego milczenia kapłanów:</p>
       <p data-index="31">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— A teraz spojrzyjcie na urzędników: jacy oni czerstwi, uróżowani, jak pięknie ubrani!… Żony ich noszą złote bransolety i zausznice, i tak cienkie szaty, że książęta
-        mogliby im pozazdrościć. Wśród chłopów nie widać wołu ani osła; za to urzędnicy podróżują na koniach albo w lektykach… Piją zaś tylko wino, i to — dobre wino!…
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— A teraz
+        spojrzyjcie na urzędników: jacy oni czerstwi, uróżowani, jak pięknie ubrani!… Żony ich noszą złote bransolety i zausznice, i tak cienkie szaty, że książęta mogliby im
+        pozazdrościć. Wśród chłopów nie widać wołu ani osła; za to urzędnicy podróżują na koniach albo w lektykach… Piją zaś tylko wino, i to — dobre wino!…
       </p>
       <p data-index="32">
         Klasnął w ręce i znowu zrobił się ruch. Chłopi zaczęli podawać urzędnikom: wory zboża, kosze owoców, wino, zwierzęta… Przedmioty te urzędnicy jak pierwej
@@ -182,10 +182,10 @@ export const Chapter28: React.FC = () => {
         kondygnacja urzędników była zasypana.
       </p>
       <p data-index="33">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Oto jest Egipt dzisiejszy — mówił{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Oto jest Egipt
+        dzisiejszy — mówił{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         . — Nędzni chłopi, bogaci pisarze, skarb nie tak pełny jak dawniej. A teraz…
       </p>
@@ -196,10 +196,10 @@ export const Chapter28: React.FC = () => {
       <p data-index="35">Widzowie ze zdumieniem patrzyli na szczególne zabiegi tajemniczych osób. Nagle ktoś zawołał:</p>
       <p data-index="36">— To Fenicjanie!… Oni nas tak obdzierają!…</p>
       <p data-index="37">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Tak jest, święci ojcowie — rzekł{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Tak jest,
+        święci ojcowie — rzekł{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         . — To są ręce ukrytych między nami Fenicjan. Obdzierają oni króla i pisarzy, a chłopów zabierają w niewolę, gdyż im już nic wydrzeć nie można…
       </p>
@@ -208,14 +208,14 @@ export const Chapter28: React.FC = () => {
       <p data-index="40">
         Gdy ucichło,{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         kazał zanieść pochodnie w inną stronę dziedzińca i tam zaprowadził swoich słuchaczy. Nie było tu żywych obrazów, ale jakby wystawa przemysłowa.
       </p>
       <p data-index="41">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Raczcie spojrzeć, dostojni — mówił. — Za dziewiętnastej dynastii te rzeczy przysyłali nam cudzoziemcy: z kraju Punt mieliśmy wonności, z Syrii złoto, żelazną broń i
-        wozy wojenne. Oto wszystko.
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Raczcie
+        spojrzeć, dostojni — mówił. — Za dziewiętnastej dynastii te rzeczy przysyłali nam cudzoziemcy: z kraju Punt mieliśmy wonności, z Syrii złoto, żelazną broń i wozy wojenne.
+        Oto wszystko.
       </p>
       <p data-index="42">Lecz wówczas Egipt wyrabiał… Spojrzyjcie na te olbrzymie dzbany: ile tu kształtów, a jakie rozmaite kolory!…</p>
       <p data-index="43">
@@ -224,15 +224,15 @@ export const Chapter28: React.FC = () => {
       </p>
       <p data-index="44">Przeszedł do następnej grupy przedmiotów.</p>
       <p data-index="45">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— A dziś — patrzcie. Dzbany są małe i prawie bez ozdób, sprzęty proste, tkaniny grube i jednostajne. Ani jeden z tegoczesnych wyrobów nie może równać się pod względem
-        rozmiarów, trwałości czy piękności z dawnymi. Dlaczego?…
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— A dziś —
+        patrzcie. Dzbany są małe i prawie bez ozdób, sprzęty proste, tkaniny grube i jednostajne. Ani jeden z tegoczesnych wyrobów nie może równać się pod względem rozmiarów,
+        trwałości czy piękności z dawnymi. Dlaczego?…
       </p>
       <p data-index="46">Posunął się znowu kilka kroków i otoczony pochodniami mówił:</p>
       <p data-index="47">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Oto jest wielka liczba towarów, które nam przywożą Fenicjanie z rozmaitych okolic świata. Kilkadziesiąt pachnideł, kolorowe szkła, sprzęty, naczynia, tkaniny, wozy,
-        ozdoby, wszystko to przychodzi do nas z Azji i jest przez nas kupowane.
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Oto jest wielka
+        liczba towarów, które nam przywożą Fenicjanie z rozmaitych okolic świata. Kilkadziesiąt pachnideł, kolorowe szkła, sprzęty, naczynia, tkaniny, wozy, ozdoby, wszystko to
+        przychodzi do nas z Azji i jest przez nas kupowane.
       </p>
       <p data-index="48">
         Czy rozumiecie teraz, dostojnicy: za co Fenicjanie wydzierali zboże, owoce i bydło pisarzom i faraonowi?… Za te właśnie obce wyroby, które zniszczyły naszych rzemieślników
@@ -240,9 +240,9 @@ export const Chapter28: React.FC = () => {
       </p>
       <p data-index="49">Kapłan odpoczął i ciągnął dalej:</p>
       <p data-index="50">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Pomiędzy towarami dostarczanymi przez Fenicjan jego świątobliwości, nomarchom i pisarzom pierwsze miejsce zajmuje złoto. Ten rodzaj handlu jest najdokładniejszym
-        obrazem klęsk, jakie ci Azjaci wyrządzają Egiptowi.
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Pomiędzy
+        towarami dostarczanymi przez Fenicjan jego świątobliwości, nomarchom i pisarzom pierwsze miejsce zajmuje złoto. Ten rodzaj handlu jest najdokładniejszym obrazem klęsk,
+        jakie ci Azjaci wyrządzają Egiptowi.
       </p>
       <p data-index="51">
         Gdy kto bierze od nich złota za talent, obowiązany jest po trzech latach zwrócić dwa talenty. Najczęściej jednak Fenicjanie, pod pozorem umniejszenia kłopotów dłużnikowi,
@@ -250,16 +250,16 @@ export const Chapter28: React.FC = () => {
       </p>
       <p data-index="52">
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \nSpojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną część dziedzińca. — Ten kwadrat ziemi, mający sto osiemdziesiąt kroków długości i tyleż szerokości,
-        znaczy dwie miary; ta zaś gromada mężczyzn, kobiet i dzieci tworzy osiem rodzin. Wszystko to zaś razem: ludzie i grunt, idą na trzy lata w okropną niewolę. Przez ten czas
-        ich właściciel — faraon czy nomarcha, nie ma z nich żadnego pożytku; po upływie zaś terminu odbiera ziemię wyjałowioną, a ludzi… najwyżej dwudziestu… Reszta bowiem zmarła w
+        Spojrzyjcie tam, dostojni — mówił, wskazując na lepiej oświetloną część dziedzińca. — Ten kwadrat ziemi, mający sto osiemdziesiąt kroków długości i tyleż szerokości, znaczy
+        dwie miary; ta zaś gromada mężczyzn, kobiet i dzieci tworzy osiem rodzin. Wszystko to zaś razem: ludzie i grunt, idą na trzy lata w okropną niewolę. Przez ten czas ich
+        właściciel — faraon czy nomarcha, nie ma z nich żadnego pożytku; po upływie zaś terminu odbiera ziemię wyjałowioną, a ludzi… najwyżej dwudziestu… Reszta bowiem zmarła w
         męczarniach!…
       </p>
       <p data-index="53">Obecni szemrali ze zgrozy.</p>
       <p data-index="54">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Powiedziałem, że dwie miary gruntu i trzydziestu dwu ludzi bierze Fenicjanin na trzy lat<a href="#fn204" className="link-note"></a> dzierżawy, za pożyczenie jednego
-        talentu złotem. Przypatrzcie się, jaki to kawał ziemi i jaka gromada ludzi, a teraz — spojrzyjcie na moją rękę…
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Powiedziałem,
+        że dwie miary gruntu i trzydziestu dwu ludzi bierze Fenicjanin na trzy lat<a href="#fn204" className="link-note"></a> dzierżawy, za pożyczenie jednego talentu złotem.
+        Przypatrzcie się, jaki to kawał ziemi i jaka gromada ludzi, a teraz — spojrzyjcie na moją rękę…
       </p>
       <p data-index="55">Ten kawałek złota, który trzymam, ta bryłka mniejsza od kurzego jaja to talent!…</p>
       <p data-index="56">
@@ -283,19 +283,19 @@ export const Chapter28: React.FC = () => {
       <p data-index="60">Na twarzach kapłanów malowało się zadowolenie: chętniej słuchali o przewrotności Fenicjan aniżeli o zbytkach pisarzy.</p>
       <p data-index="61">
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         chwilę odpoczął, potem zwrócił się do{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>
         .
       </p>
       <p data-index="62">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Od kilku miesięcy — mówił — z niepokojem zapytujesz, sługo boży,{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Od kilku
+        miesięcy — mówił — z niepokojem zapytujesz, sługo boży,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesie{" "}
+          Ramzesie
         </span>
         : dlaczego zmniejszyły się dochody jego świątobliwości? Mądrość bogów pokazała ci, że zmniejszył się nie tylko skarb, ale i wojsko, i że oba te źródła królewskiej potęgi
         zmniejszać się będą ciągle. I albo skończy się to na zupełnej ruinie państwa, albo — niebiosa ześlą Egiptowi władcę, który zatrzyma powódź klęsk od kilkuset lat
@@ -308,15 +308,14 @@ export const Chapter28: React.FC = () => {
       <p data-index="64">
         Kapłani znowu zaczęli się niepokoić z obawy, aby{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         po raz drugi nie wspomniał o klasie pisarzy.
       </p>
       <p data-index="65">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Widziałeś,{" "}
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Widziałeś,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         , na własne oczy i przy świadkach, że w tej epoce, gdy lud był syty, dorodny i zadowolony, skarb królewski był pełen. Gdy zaś lud zaczął wyglądać nędznie, gdy jego żony i
         dzieci musiały zaprzęgnąć się do pługa, gdy ziarna lotosu zastąpiły pszenicę i mięso, skarb — zubożał. Jeżeli więc chcesz doprowadzić państwo do tej potęgi, jaką posiadało
@@ -326,25 +325,25 @@ export const Chapter28: React.FC = () => {
       <p data-index="66">Pamiętaj wreszcie, że Egipt na piersiach swoich nosi jadowitego węża…</p>
       <p data-index="67">Obecni słuchali z ciekawością i obawą.</p>
       <p data-index="68">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n— Tym wężem, który wysysa krew ludu, majątki nomarchów, potęgę faraona, są Fenicjanie!…
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Tym wężem,
+        który wysysa krew ludu, majątki nomarchów, potęgę faraona, są Fenicjanie!…
       </p>
       <p data-index="69">— Precz z nimi!… — zawołali obecni. — Przekreślić wszystkie długi… Nie dopuszczać ich kupców i okrętów…</p>
       <p data-index="70">
         Uciszył ich arcykapłan{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         , który ze łzami w oczach zwrócił się do{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuera{" "}
+          Pentuera
         </span>
         .
       </p>
       <p data-index="71">
-        <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />
-        \n— Nie mam wątpliwości — mówił — że przez usta twoje odzywała się do nas święta Hator. Nie tylko dlatego, że człowiek nie potrafiłby być tak mądrym i wszystkowiedzącym jak
-        ty, ale jeszcze, że spostrzegłem nad głową twoją płomyki w formie rogów.
+        <span className="character-placeholder character-talking" data-character="Mefres" data-src-talking="/Pharaon/mefres-speaks.mp4" data-is-talking="true" />— Nie mam
+        wątpliwości — mówił — że przez usta twoje odzywała się do nas święta Hator. Nie tylko dlatego, że człowiek nie potrafiłby być tak mądrym i wszystkowiedzącym jak ty, ale
+        jeszcze, że spostrzegłem nad głową twoją płomyki w formie rogów.
       </p>
       <p data-index="72">
         Dziękuję ci za wielkie słowa, którymi rozproszyłeś naszą niewiadomość… Błogosławię cię i proszę bogów, aby — gdy mnie powołają na swój sąd, ciebie mianowali moim następcą…
@@ -353,20 +352,20 @@ export const Chapter28: React.FC = () => {
         Przeciągły okrzyk reszty słuchaczów<a href="#fn205" className="link-note"></a> poparł błogosławieństwo najwyższego dostojnika. Kapłani tym więcej byli zadowoleni, że
         nieustannie wisiała nad nimi trwoga, aby{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         po raz drugi nie zaczepił o kwestię pisarzy. Ale mędrzec umiał być powściągliwym: wskazał wewnętrzną ranę państwa, lecz nie zaognił jej i dlatego odniósł zupełny triumf.
       </p>
       <p data-index="74">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
-        </span>
+          Książę
+        </span>{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         nie dziękował{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuerowi{" "}
+          Pentuerowi
         </span>
         , tylko przytulił jego głowę do swej piersi. Nikt jednak nie wątpił, że kazanie wielkiego proroka wstrząsnęło duszę następcy i jest ziarnem, z którego może wyrosnąć chwała
         i pomyślność Egiptu.
@@ -374,20 +373,20 @@ export const Chapter28: React.FC = () => {
       <p data-index="75">
         Nazajutrz{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         , nie żegnając się, o wschodzie słońca opuścił świątynię i odjechał do Memfis.
       </p>
       <p data-index="76">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         przez kilka dni z nikim nie rozmawiał: siedział w celi albo przechadzał się po cienistych korytarzach i rozmyślał. W jego duszy odbywała się praca.
       </p>
       <p data-index="77">
         W gruncie rzeczy{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         nie powiedział nic nowego: wszyscy narzekali na ubytek ziemi i ludności w Egipcie, na nędzę chłopów, nadużycia pisarzów<a href="#fn206" className="link-note"></a> i wyzysk
         Fenicjan. Ale kazanie proroka uporządkowało w nim dotychczasowe bezładne wiadomości, nadało dotykalne formy i lepiej oświetliło pewne fakta
@@ -396,41 +395,41 @@ export const Chapter28: React.FC = () => {
       <p data-index="78">
         Fenicjanie przerazili go:{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         nie oceniał dotychczas ogromu nieszczęść wyrządzonych przez ten naród jego państwu. Zgroza była tym silniejszą, że przecie on sam własnych poddanych wypuścił w dzierżawę{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagonowi{" "}
+          Dagonowi
         </span>{" "}
         i — był świadkiem, w jaki sposób bankier wybierał od nich należności!…
       </p>
       <p data-index="79">
         Lecz to splątanie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         z wyzyskiem Fenicjan wywołało dziwny skutek:{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         — nie chciał myśleć o Fenicjanach, a ile razy zapalił się w nim gniew na tych ludzi, tyle razy gasiło go uczucie wstydu. W pewnej części był on ich wspólnikiem.
       </p>
       <p data-index="80">
         Natomiast{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         doskonale zrozumiał ważność ubytku ziemi i ludności i na te punkta<a href="#fn208" className="link-note"></a> położył główny nacisk w swych samotnych medytacjach.
       </p>
       <p data-index="81">
         „Gdybyśmy posiadali — mówił w sobie — te dwa miliony ludzi, których Egipt utracił, można by za ich pomocą odzyskać od pustyni urodzajne grunta, nawet powiększyć obszary… A
-        wówczas, pomimo Fenicjan, nasi chłopi mieliby się lepiej, a dochody państwa wzrosłyby…\'
+        wówczas, pomimo Fenicjan, nasi chłopi mieliby się lepiej, a dochody państwa wzrosłyby…'
       </p>
       <p data-index="82">Ale skąd wziąć ludzi?</p>
       <p data-index="83">
         Wypadek nasunął mu odpowiedź. Pewnego wieczora{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         przechadzając się po ogrodach świątyni spotkał gromadę niewolników, których jenerał<a href="#fn209" className="link-note"></a> Nitager pochwycił na granicy wschodniej i
         przysłał bogini Hator. Ludzie ci byli doskonale zbudowani, pracowali więcej niż Egipcjanie, a ponieważ ich karmiono dobrze, więc byli nawet zadowoleni ze swego losu.
@@ -445,17 +444,17 @@ export const Chapter28: React.FC = () => {
       </p>
       <p data-index="86">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         był zachwycony, choć następnego dnia zbudziła się w nim nowa wątpliwość.
       </p>
       <p data-index="87">
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         z wielkim naciskiem głosił, a jeszcze dawniej{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         twierdził to samo, że źródłem nieszczęść Egiptu były — zwycięskie wojny.
       </p>
@@ -463,26 +462,26 @@ export const Chapter28: React.FC = () => {
       <p data-index="89">
         „
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         jest wielki mędrzec i{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         wielki mędrzec — myślał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         . — Jeżeli oni uważają wojnę za szkodliwą, jeżeli tak samo sądzi arcykapłan{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         i inni kapłani, to może naprawdę wojna jest rzeczą niebezpieczną?…
       </p>
-      <p data-index="90">I musi nią być, skoro tak utrzymuje tylu ludzi mądrych i świętych?\'</p>
+      <p data-index="90">I musi nią być, skoro tak utrzymuje tylu ludzi mądrych i świętych?'</p>
       <p data-index="91">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Książę{" "}
+          Książę
         </span>{" "}
         był głęboko strapiony. Wymyślił prosty sposób podźwignięcia Egiptu, a tymczasem kapłani utrzymywali, że właśnie to mogłoby do reszty zrujnować Egipt.
       </p>
@@ -490,35 +489,35 @@ export const Chapter28: React.FC = () => {
       <p data-index="93">
         Lecz trafił się wypadek, który nieco ochłodził wiarę{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         w prawdomówność kapłanów, a raczej — rozbudził w nim dawniejszą do nich nieufność.
       </p>
       <p data-index="94">Raz szedł z jednym lekarzem do biblioteki. Droga wypadała przez ciasny i ciemny korytarz, z którego następca cofnął się ze wstrętem.</p>
       <p data-index="95">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Nie pójdę tędy!… — rzekł.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Nie
+        pójdę tędy!… — rzekł.
       </p>
       <p data-index="96">— Dlaczego?… — spytał zdziwiony lekarz.</p>
       <p data-index="97">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Czyliż nie pamiętacie, ojcze święty, że na końcu tego korytarza jest loch, w którym okrutnie zamęczyliście jakiegoś zdrajcę?…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Czyliż nie pamiętacie, ojcze święty, że na końcu tego korytarza jest loch, w którym okrutnie zamęczyliście jakiegoś zdrajcę?…
       </p>
       <p data-index="98">
         — Aha!… — odparł lekarz. — Jest tu loch, do którego przed kazaniem{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuera{" "}
+          Pentuera
         </span>{" "}
         wlewaliśmy roztopioną smołę…
       </p>
       <p data-index="99">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— I zabiliście człowieka…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— I
+        zabiliście człowieka…
       </p>
       <p data-index="100">
         Lekarz uśmiechnął się. Był to człowiek dobry i wesoły. Toteż widząc oburzenie{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>
         , rzekł po pewnym namyśle:
       </p>
@@ -526,14 +525,14 @@ export const Chapter28: React.FC = () => {
       <p data-index="102">
         Ton jego był tak szczególny, że{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         zażądał objaśnień.
       </p>
       <p data-index="103">— Nie mogę zdradzać tajemnic — odparł lekarz — ale… Ale jeżeli wasza dostojność przyrzekniesz zachować to przy sobie, opowiem ci historię…</p>
       <p data-index="104">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         przyrzekł, lekarz opowiedział:
       </p>
@@ -542,24 +541,24 @@ export const Chapter28: React.FC = () => {
         bardzo tłustym i zadowolonym, choć nosił nędzne szaty.
       </p>
       <p data-index="106">
-        „Wytłumacz mi — spytał kapłan wesołego biedaka — czym się to dzieje, że choć jesteś ubogi, jednak ciało twoje wygląda, jakbyś był przełożonym świątyni?\'
+        „Wytłumacz mi — spytał kapłan wesołego biedaka — czym się to dzieje, że choć jesteś ubogi, jednak ciało twoje wygląda, jakbyś był przełożonym świątyni?'
       </p>
       <p data-index="107">Zaś ów człowiek obejrzawszy się, czy go kto nie podsłuchuje, odparł:</p>
       <p data-index="108">
         „Bo ja mam wielce żałosny głos, więc jestem przy tej świątyni męczennikiem. Gdy lud zejdzie się na nabożeństwo, ja włażę do lochu i jęczę, o ile mi sił starczy; za co dają
-        mi wcale obfite jedzenie przez cały rok, a dzban piwa za każdy dzień męczeństwa.\'
+        mi wcale obfite jedzenie przez cały rok, a dzban piwa za każdy dzień męczeństwa.'
       </p>
       <p data-index="109">
         Tak bywa w pogańskim kraju Aram — zakończył lekarz, kładąc palec na usta. — Pamiętaj,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>
         , coś mi obiecał i myśl o naszej smole roztopionej, co ci się podoba…
       </p>
       <p data-index="110">
         Opowiadanie to znowu poruszyło{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>
         . Czuł pewną ulgę, że w świątyni nie zamordowano człowieka, lecz i ocknęły się w nim wszystkie dawne podejrzenia do kapłanów.
       </p>
@@ -570,45 +569,45 @@ export const Chapter28: React.FC = () => {
       <p data-index="112">
         Któż wie zatem, czy kazanie{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuera{" "}
+          Pentuera
         </span>{" "}
         nie było ową procesją Apisa, przeznaczoną dla niego? Tak przecie łatwo nasypać na ziemię fasoli czerwonej i różnokolorowej i również nietrudno ustawić żywe obrazy. O ileż
         wspanialsze widywał on przedstawienia, choćby walkę Seta z Ozyrysem, do której wchodziło kilkaset osób… A czyliż i w tym wypadku nie oszukiwali kapłani? Miała to być walka
         bogów, tymczasem prowadzili ją poprzebierani ludzie. Ginął w niej Ozyrys, a tymczasem kapłan udający Ozyrysa był zdrów jak nosorożec. Jakich tam nie pokazywano cudów!… Woda
         wznosiła się, biły pioruny, ziemia drżała i wyrzucała ogień. I to wszystko było oszukaństwem. Dlaczegóż by więc przedstawienie{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuera{" "}
+          Pentuera
         </span>{" "}
         miało być prawdą?
       </p>
       <p data-index="113">
         Zresztą{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         miał silne poszlaki, że chciano go oszukać. Już był oszustwem człowiek jęczący w podziemiach, niby to oblewany smołą przez kapłanów. Ale mniejsza o niego. Ważnym było to, o
         czym{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          książę{" "}
+          książę
         </span>{" "}
         przekonał się niejednokrotnie, że{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         nie chciał wojny.{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         także nie chciał wojny, a{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         był jednego pomocnikiem, drugiego ulubieńcem.
       </p>
       <p data-index="114">
         Taka walka toczyła się w{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księciu{" "}
+          księciu
         </span>
         : to zdawało mu się, że wszystko rozumie, to znowu ogarniała go ciemność; raz był pełen nadziei, drugi raz wątpił o wszystkim. Z godziny na godzinę, z dnia na dzień dusza
         jego przybierała i opadała jak wody Nilu przez ciąg całego roku.
@@ -616,7 +615,7 @@ export const Chapter28: React.FC = () => {
       <p data-index="115">
         Powoli jednak{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         odzyskał równowagę, a gdy nadszedł czas opuszczenia świątyni, miał już sformułowane pewne poglądy.
       </p>
@@ -624,22 +623,22 @@ export const Chapter28: React.FC = () => {
       <p data-index="117">
         Po wtóre wierzył, że najprostszym sposobem zdobycia ludzi jest — wojna z Azją.{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         jednak dowodził mu, że wojna może tylko powiększyć klęski państwa. Rodzi się tedy nowa kwestia: czy{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         mówił prawdę, czy kłamał?
       </p>
       <p data-index="118">
         Jeżeli mówił prawdę, pogrążał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          księcia{" "}
+          księcia
         </span>{" "}
         w rozpaczy:{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         bowiem nie widział innego sposobu podźwignięcia państwa, tylko wojnę. Bez wojny Egipt z roku na rok będzie tracił ludność, a skarb faraona będzie powiększał swoje długi. Aż
         cały ten proces skończy się jakąś okropną katastrofą, może nawet za przyszłego panowania.
@@ -647,15 +646,15 @@ export const Chapter28: React.FC = () => {
       <p data-index="119">
         A jeżeli{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         kłamał? Dlaczego by to robił? Oczywiście namówiony przez{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>
         ,{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefresa{" "}
+          Mefresa
         </span>{" "}
         i całe ciało kapłańskie. Z jakiej jednak racji kapłani nie chcieli wojny, co mieli w tym za interes? Przecie każda wojna im i faraonowi największe przynosiła zyski.
       </p>
@@ -663,7 +662,7 @@ export const Chapter28: React.FC = () => {
         Czy zresztą kapłani mogli go oszukiwać w sprawie tyle doniosłej? Prawda, że robili tak bardzo często, lecz w wypadkach drobnych, nie zaś kiedy chodziło o przyszłość i byt
         państwa. Nie można też twierdzić, że oszukiwali zawsze. Są oni przecie sługami bogów i stróżami wielkich tajemnic. W ich świątyniach mieszkają duchy, o czym{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         sam się przekonał pierwszej nocy po osiedleniu się w tym miejscu.
       </p>
@@ -674,7 +673,7 @@ export const Chapter28: React.FC = () => {
       <p data-index="122">
         Gdy w kilka dni później{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         po uroczystym nabożeństwie, wśród błogosławieństwa kapłanów, opuszczał świątynię Hator, nurtowały w nim dwa pytania:
       </p>

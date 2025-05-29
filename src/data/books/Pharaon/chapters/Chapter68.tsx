@@ -7,18 +7,18 @@ export const Chapter68: React.FC = () => {
       <p data-index="1">
         W miesiącu Mechir (listopad — grudzień){" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         przybył do świątyni za Memfisem, gdzie{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         prowadził wielkie prace nad niebiosami i ziemią.
       </p>
       <p data-index="2">
         Stary, w myślach pogrążony mędrzec znowu nie poznał{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuera{" "}
+          Pentuera
         </span>
         . Opamiętawszy się jednak uściskał go i zapytał:
       </p>
@@ -35,7 +35,7 @@ export const Chapter68: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Przyszedłem, by
         zostać z tobą i służyć ci — odpowiedział{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         .
       </p>
@@ -48,7 +48,7 @@ export const Chapter68: React.FC = () => {
         />
         — Ho! ho!… — zawołał{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         przypatrując mu się z uwagą. — Ho! ho!… czy naprawdę masz już dosyć dworskiego życia i dostojeństw?… Błogosławiony to dzień!… Kiedy z wierzchołka mego pylonu zaczniesz
         oglądać świat, przekonasz się, jakie to małe i brzydkie.
@@ -56,35 +56,35 @@ export const Chapter68: React.FC = () => {
       <p data-index="6">
         Ponieważ{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         nic nie odpowiedział, więc{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         udał się do swych zajęć. Wróciwszy zaś po kilku godzinach zastał ucznia siedzącego na tym samym miejscu, z okiem utkwionym w punkt, gdzie w oddali majaczył pałac faraonów.
       </p>
       <p data-index="7">
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         dał mu jęczmienny placek, garnuszek mleka i zostawił go w spokoju.
       </p>
       <p data-index="8">
         Trwało tak kilka dni.{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         jadał niewiele, mówił jeszcze mniej, niekiedy zrywał się w nocy, a dni przepędzał bez ruchu, patrząc nie wiadomo gdzie.
       </p>
       <p data-index="9">
         Ten tryb życia nie podobał się{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menesowi{" "}
+          Menesowi
         </span>
         . Więc pewnego razu zająwszy na kamieniu miejsce obok{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuera{" "}
+          Pentuera
         </span>{" "}
         rzekł:
       </p>
@@ -99,7 +99,7 @@ export const Chapter68: React.FC = () => {
       </p>
       <p data-index="11">
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         zwrócił na niego zamglone oczy.
       </p>
@@ -121,7 +121,7 @@ export const Chapter68: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Mam duszę chorą
         — odparł{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         .
       </p>
@@ -138,7 +138,7 @@ export const Chapter68: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Im dłużej
         rozmyślam, tym większą czuję pewność, że gdybym nie opuścił{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa XIII{" "}
+          Ramzesa XIII
         </span>
         , gdybym mu oddał moje usługi, żyłby dotychczas ten najszlachetniejszy z faraonów.
       </p>
@@ -152,14 +152,14 @@ export const Chapter68: React.FC = () => {
         />
         — I tobie naprawdę zdaje się, że mogłeś go uratować? — zapytał{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>
         . — O pycho niedouczonego mędrca!… Wszystkie rozumy nie ocaliłyby sokoła zaplątanego między wrony, a ty, niby jaki bożek, chciałeś odmienić los człowieka?…
       </p>
       <p data-index="19">
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Alboż{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         musiał zginąć?…
       </p>
@@ -177,15 +177,15 @@ export const Chapter68: React.FC = () => {
         Gdyby w miesiącu Mechir dojrzała oliwka albo fiołek zakwitnął w miesiącu Tot, jedno i drugie musiałoby zginąć, jako płody spóźnione lub przedwczesne. Ty zaś chcesz, ażeby w
         epoce{" "}
         <span className="character-highlighted" data-character="Amenhotep" data-src-listening="/Pharaon/amenhotep-listens.mp4">
-          Amenhotepów{" "}
+          Amenhotepów
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhorów{" "}
+          Herhorów
         </span>{" "}
         utrzymał się faraon należący do epoki Hyksosów. Każda rzecz ma swój czas, w którym dojrzewa, i taki — w którym marnieje.{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         zdarzył się w epoce niewłaściwej, więc musiał ustąpić.
       </p>
@@ -193,7 +193,7 @@ export const Chapter68: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— I myślisz, że
         nic by go nie uratowało? — spytał{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         .
       </p>
@@ -211,7 +211,7 @@ export const Chapter68: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Tak spokojnie
         mówisz o upadku państwa? — zdziwił się{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         .
       </p>
@@ -237,7 +237,7 @@ export const Chapter68: React.FC = () => {
         />
         — Wcale nie — mówił{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         — ale mamy miarę. Z ruchów chorągiewki poznasz: jaki wiatr wieje, studnia nilowa mówi: czy rzeka wzbiera, czy opada… A nas od wieków o niemocy państwa uczy ten oto sfinks…
       </p>
@@ -246,7 +246,7 @@ export const Chapter68: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Nic nie wiem o
         tym… — szepnął{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         .
       </p>
@@ -275,7 +275,7 @@ export const Chapter68: React.FC = () => {
         />
         — Bynajmniej — odparł{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>
         . — Jak po nocy następuje dzień, a po niskich wodach przybór Nilu, tak po okresach upadków przychodzą czasy rozkwitu życia. Odwieczna historia!… Z niektórych drzew opadają
         liście w miesiącu Mechir, lecz po to tylko, aby na nowo wyrosnąć w miesiącu Pachono…
@@ -286,18 +286,18 @@ export const Chapter68: React.FC = () => {
       </p>
       <p data-index="35">
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         zamyślił się; ale jego oczy spoglądały przytomniej.
       </p>
       <p data-index="36">
         Jeszcze po paru dniach rzekł{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         do{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuera{" "}
+          Pentuera
         </span>
         :
       </p>
@@ -313,7 +313,7 @@ export const Chapter68: React.FC = () => {
       <p data-index="38">
         Wzięli obaj wielkie kosze na plecy i od wczesnego ranka zaczęli obchodzić wsie nadbrzeżne. Zwykle stawali pod chatami chłopów śpiewając nabożne pieśni, po czym{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         pukał do drzwi i mówił:
       </p>
@@ -348,11 +348,11 @@ export const Chapter68: React.FC = () => {
       <p data-index="44">
         Leżąc w szopie na pękach świeżej trzciny,{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         przysłuchiwali się weselnej muzyce, pijackim okrzykom, niekiedy kłótniom radujących się gości.
       </p>
@@ -360,7 +360,7 @@ export const Chapter68: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Okropna rzecz —
         odezwał się{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         . — Zaledwie kilka miesięcy upłynęło od śmierci pana, który był dobroczyńcą chłopów, a ci już zapomnieli o nim… Zaprawdę, niedługo trwa ludzka wdzięczność…
       </p>
@@ -373,7 +373,7 @@ export const Chapter68: React.FC = () => {
         />
         — Cóżeś chciał, ażeby ludzie do końca wieków obsypywali sobie głowy popiołem? — spytał{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>
         . — Gdy krokodyl schwyta kobietę lub dziecko, czy myślisz, że zaraz przestają płynąć wody Nilu?… One toczą się bez względu na trupy, a nawet bez względu na spadek lub
         przybór rzeki.
@@ -387,7 +387,7 @@ export const Chapter68: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Przyznaj
         jednak, że ich radość dziwnie wygląda obok tego, co sam mówiłeś o upadku państwa — wtrącił{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         .
       </p>
@@ -408,18 +408,18 @@ export const Chapter68: React.FC = () => {
       <p data-index="51">
         Gdy mędrcy powrócili z żebraniny do świątyni,{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         wprowadził{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuera{" "}
+          Pentuera
         </span>{" "}
         na szczyt pylonu. Pokazał mu wielką marmurową kulę, na której za pomocą złotych punktów sam oznaczył położenie kilkuset gwiazd, i — kazał mu przez połowę nocy śledzić
         księżyc na niebie.
       </p>
       <p data-index="52">
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         chętnie podjął się pracy i dziś pierwszy raz w życiu, sprawdzał na własne oczy, że w ciągu kilku godzin sklepienie niebieskie jakby obróciło się ku zachodowi, ale księżyc
         przesunął się między gwiazdami ku wschodowi.
@@ -427,7 +427,7 @@ export const Chapter68: React.FC = () => {
       <p data-index="53">
         Te tak proste zjawiska{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         doskonale znał, lecz tylko ze słyszenia. Więc gdy pierwszy raz własnymi oczyma zobaczył ruch nieba i cichą wędrówkę księżyca, doznał takiego wzruszenia, że upadł na twarz i
         zapłakał.
@@ -436,61 +436,61 @@ export const Chapter68: React.FC = () => {
       <p data-index="55">
         Znowu upłynęło kilka dni, gdy zgłosił się do nich{" "}
         <span className="character-highlighted" data-character="Bogaty-dzierzawca" data-src-listening="/Pharaon/bogaty-dzierzawca.png">
-          bogaty dzierżawca{" "}
+          bogaty dzierżawca
         </span>{" "}
         proponując, aby jako mędrcy wyznaczyli mu na gruncie i wykopali kanał. W zamian ofiarowywał im żywność na czas roboty tudzież kozę z koźlątkiem jako zapłatę.
       </p>
       <p data-index="56">
         Ponieważ mleka brakowało w świątyni,{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         zgodził się i poszli obaj z{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuerem{" "}
+          Pentuerem
         </span>{" "}
         do roboty. Zniwelowali grunt, wykreślili kierunek i kopali.
       </p>
       <p data-index="57">
         Przy ciężkim zajęciu{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         ożywił się, a nawet gdy był sam z{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menesem{" "}
+          Menesem
         </span>
         , rozmawiał. Tylko przy zetknięciu z ludźmi tracił humor; ich śmiechy i śpiewy zdawały się powiększać jego cierpienie.
       </p>
       <p data-index="58">
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         nie chodził na noc do wsi, ale razem z{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuerem{" "}
+          Pentuerem
         </span>{" "}
         sypiał w polu, skąd mogli widzieć kwitnące łany i przysłuchiwać się echom ludzkiej radości, nie przyjmując w niej udziału.
       </p>
       <p data-index="59">
         Pewnego wieczora polne roboty przerwano wcześniej; do wsi bowiem przyszedł po prośbie{" "}
         <span className="character-highlighted" data-character="Ubogi-kaplan-z-chlopcem" data-src-listening="/Pharaon/ubogi-kaplan-z-chlopcem.png">
-          ubogi kapłan{" "}
+          ubogi kapłan
         </span>{" "}
         z{" "}
         <span className="character-highlighted" data-character="Maly-chlopiec-z-kaplanem" data-src-listening="/Pharaon/maly-chlopiec-z-kaplanem.png">
-          małym chłopcem{" "}
+          małym chłopcem
         </span>
         . Chodzili od domu do domu błagając o jałmużnę. Chłopak wygrywał na flecie smutną melodię, a w przerwach jej kapłan śpiewał silnym głosem pieśń na poły świecką, na poły
         pobożną.
       </p>
       <p data-index="60">
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         leżąc na pagórku przypatrywali się rozpłomienionemu niebu, na którego złotym tle mocno uwydatniały się czarne trójkąty piramid tudzież brunatne pnie i ciemnozielone bukiety
         drzew palmowych. Tymczasem kapłan wlókł się od chaty do chaty i wyśpiewywał swoją pieśń odpoczywając dłuższy czas po każdej zwrotce:
@@ -508,13 +508,13 @@ export const Chapter68: React.FC = () => {
         <a href="#fn136" className="link-note">
           [136]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="62">
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— I po co to?… —
         nagle odezwał się{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         . — Gdyby choć było prawdą, że życie w tym celu stworzono, aby wzrastała cześć bogów i cnota. Ale tak nie jest. Podstępny okrutnik, matka, która zostaje małżonką mordercy
         swego syna, kochanka, która w chwili pieszczot myśli o zdradzie, ci rosną w pomyślność i potęgę. A mądrzy usychają w bezczynności, a dzielni i szlachetni giną sami i pamięć
@@ -529,13 +529,13 @@ export const Chapter68: React.FC = () => {
         />
         — „Spraw sobie wesoły dzień, o książę — śpiewał kapłan — gdyż niewiele ci ich darowano! Postaw maści i kadzideł dla nosa twego, a lotosowe wieńce dla członków, dla ciała
         siostry, która mieszkając w twym sercu siedzi przy tobie. Niech wam śpiewają i grają. Porzućcie troski i weselcie się, bo wnet zaświta dzień, w którym jedzie się do kraju,
-        kędy panuje milczenie.\'
+        kędy panuje milczenie.'
       </p>
       <p data-index="64">
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Maści dla nosa,
         wieńce lotosowe dla członków, a potem… milczenie!… — wtrącił{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         . — Zaprawdę, błazen udający rycerza ma więcej sensu aniżeli ten świat, w którym wszyscy coś udajemy, bez żadnego pożytku dla siebie. I żeby choć ten ziemski sen był jednym
         ciągiem wesołości?… Ale gdzie tam!… Komu głód nie skręca kiszek, tego serce zatruwa pożądanie lub niepokój. A jeżeli kiedy trafi się chwila ciszy, wówczas z jej głębin
@@ -550,7 +550,7 @@ export const Chapter68: React.FC = () => {
         />
         — „Święć wesoły dzień, o Nefarhotep, mężu z czystymi rękoma! Ja wiem wszystko, co się stało przodkom twoim: ich mury rozpadły się, miast już nie ma, a oni sami są, jakby
         ich nie było nigdy. Nikt nie przychodzi stamtąd, kto by nam powiedział, jak się miewają, i serca nasze ucieszył. I tak będzie, dopóki sami nie zbliżycie się do miejsca,
-        gdzie oni poszli.\'
+        gdzie oni poszli.'
       </p>
       <p data-index="66">
         <span
@@ -561,11 +561,11 @@ export const Chapter68: React.FC = () => {
         />
         — Widziałeś ty kiedy spokojne morze?… — odezwał się{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         do{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuera{" "}
+          Pentuera
         </span>
         . — Prawda, jakie ono nudne, niby obraz snu, w którym się nic nie śni? Dopiero gdy wicher zaorze gładką powierzchnię, gdy jedna fala spada w otchłań, a druga podnosi się,
         gdy na powierzchni zagrają światła, a z głębi odezwą się groźne lub jękliwe głosy, wówczas morze robi się pięknym.
@@ -582,7 +582,7 @@ export const Chapter68: React.FC = () => {
           data-is-talking="true"
         />
         — „Połóż mirrę na głowę twoją, ustrój się w cienkie płótna i namaść się boskimi darami — śpiewał kapłan. — Ubierz się pięknie, jak możesz, i nie pozwalaj upadać sercu
-        twemu. Żyj dla rozkoszy, dopóki jesteś na ziemi, i nie zasmucaj serca, zanim przyjdzie dla ciebie dzień żalów.\'
+        twemu. Żyj dla rozkoszy, dopóki jesteś na ziemi, i nie zasmucaj serca, zanim przyjdzie dla ciebie dzień żalów.'
       </p>
       <p data-index="69">
         <span
@@ -593,7 +593,7 @@ export const Chapter68: React.FC = () => {
         />
         — Tak samo z życiem ludzkim — ciągnął{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>
         . — Rozkosze są niby fale i szczyty gór, cierpienia — niby głębie i wąwozy, i dopiero wszystkie one razem sprawiają, że życie jest piękne, gdyż rzeźbi się jak poszarpany
         łańcuch gór wschodnich, na które patrzymy z podziwem.
@@ -606,13 +606,13 @@ export const Chapter68: React.FC = () => {
           data-is-talking="true"
         />
         — „Ale ten, którego serce już nie bije — śpiewał kapłan — nie słyszy żalów i nie smuci się cudzą żałobą. Więc z rozjaśnionym obliczem święć dni wesołe i pomnażaj ich
-        liczbę…\'
+        liczbę…'
       </p>
       <p data-index="71">
         <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Słyszysz? —
         zapytał{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         wskazując w kierunku wsi. — Ten, którego serce już nie bije, nie tylko nie smuci się cudzą żałobą, ale nawet nie cieszy się własnym życiem, choćby było najpiękniej
         wyrzeźbione… Na cóż więc te rzeźbienia, za które płaci się bólem i krwawymi łzami?…
@@ -620,7 +620,7 @@ export const Chapter68: React.FC = () => {
       <p data-index="72">
         Noc zapadała.{" "}
         <span className="character-highlighted" data-character="Menes-kaplan-gwiazdziarz" data-src-listening="/Pharaon/menes-kaplan-gwiazdziarz-listens.mp4">
-          Menes{" "}
+          Menes
         </span>{" "}
         owinął się w opończę i odparł:
       </p>

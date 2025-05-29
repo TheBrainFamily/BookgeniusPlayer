@@ -34,7 +34,7 @@ export const Chapter57: React.FC = () => {
         </a>
         , w którym{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         parę dni odpoczął. Wypadało nawet zatrzymać się, gdyż mumia zmarłego króla jeszcze przebywała w Abydos, gdzie przy grobie Ozyrysa odprawiano uroczyste modły.
       </p>
@@ -45,21 +45,21 @@ export const Chapter57: React.FC = () => {
       <p data-index="8">
         Drugiego dnia pobytu w tym miejscu zgłosił się do jego świątobliwości kapłan{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>
         , naczelnik komisji badającej położenie ludu.
       </p>
       <p data-index="9">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Masz jakie nowiny? — zapytał pan.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Masz jakie nowiny? — zapytał pan.
       </p>
       <p data-index="10">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n — Mam te, że cały Egipt błogosławi waszą świątobliwość. Wszyscy, z kimkolwiek rozmawiałem, są pełni otuchy i mówią, że wasze panowanie odrodzi państwo…
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Mam te, że cały
+        Egipt błogosławi waszą świątobliwość. Wszyscy, z kimkolwiek rozmawiałem, są pełni otuchy i mówią, że wasze panowanie odrodzi państwo…
       </p>
       <p data-index="11">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Chcę — odparł faraon — ażeby moi poddani byli szczęśliwi, a lud odetchnął. Chcę, ażeby Egipt miał, jak niegdyś, osiem milionów ludności i odzyskał grunta
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Chcę — odparł faraon — ażeby moi poddani byli szczęśliwi, a lud odetchnął. Chcę, ażeby Egipt miał, jak niegdyś, osiem milionów ludności i odzyskał grunta
         <a href="#fn75" className="link-note">
           [75]
         </a>
@@ -67,15 +67,15 @@ export const Chapter57: React.FC = () => {
       </p>
       <p data-index="12">
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         upadł na twarz przed dobrotliwym panem.
       </p>
       <p data-index="13">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Podnieś się — mówił{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Podnieś się — mówił{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         . — Powiem ci jednak, że miałem godziny ciężkiego smutku. Widzę bowiem niedolę mego ludu, pragnę go podźwignąć, a jednocześnie donoszą mi, że skarb jest pusty. Sam zaś
         wiesz najlepiej, że nie posiadając kilkudziesięciu tysięcy talentów gotowizną, nie mógłbym ważyć się na podobne ulepszenia.
@@ -83,49 +83,49 @@ export const Chapter57: React.FC = () => {
       <p data-index="14">Ale dziś jestem spokojny: mam środek na wydobycie potrzebnych funduszów z Labiryntu…</p>
       <p data-index="15">
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         spojrzał na władcę zdziwiony.
       </p>
       <p data-index="16">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Dozorca skarbu objaśnił mnie: co mam robić — ciągnął faraon. — Muszę zwołać ogólne zgromadzenie wszystkich stanów, po trzynastu ludzi z każdego stanu. A gdy oni
-        oświadczą, że Egipt jest w potrzebie, Labirynt dostarczy mi skarbów…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Dozorca skarbu objaśnił mnie: co mam robić — ciągnął faraon. — Muszę zwołać ogólne zgromadzenie wszystkich stanów, po trzynastu ludzi z każdego stanu. A gdy oni oświadczą,
+        że Egipt jest w potrzebie, Labirynt dostarczy mi skarbów…
       </p>
       <p data-index="17">
         Bogowie! — dodał — za parę… za jeden z tych klejnotów, jakie tam leżą, można dać ludowi pięćdziesiąt odpoczynków na rok… Nigdy chyba nie zostaną one lepiej użytymi…
       </p>
       <p data-index="18">
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuer{" "}
+          Pentuer
         </span>{" "}
         potrząsnął głową.
       </p>
       <p data-index="19">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n — Panie — rzekł — sześć milionów Egipcjan, a ja i moi przyjaciele przed innymi zgodzimy się, ażebyś czerpał z tamtego skarbca. Ale… nie łudź się, wasza świątobliwość!…
-        Bo stu najwyższych dostojników państwa oprą
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Panie — rzekł —
+        sześć milionów Egipcjan, a ja i moi przyjaciele przed innymi zgodzimy się, ażebyś czerpał z tamtego skarbca. Ale… nie łudź się, wasza świątobliwość!… Bo stu najwyższych
+        dostojników państwa oprą
         <a href="#fn76" className="link-note">
           [76]
         </a>{" "}
         się temu, a wówczas Labirynt nic nie wyda…
       </p>
       <p data-index="20">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Więc oni chcą, ażebym chyba został żebrakiem przy której ze świątyń?… — wybuchnął faraon.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Więc oni chcą, ażebym chyba został żebrakiem przy której ze świątyń?… — wybuchnął faraon.
       </p>
       <p data-index="21">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n — Nie — odparł kapłan. — Oni lękać się będą, ażeby nie opróżnił się skarbiec raz napoczęty. Oni będą posądzali najwierniejsze sługi waszej świątobliwości o udział w
-        zyskach płynących z tego źródła… A wówczas zazdrość podszepnie im: dlaczego i wy nie mielibyście coś zyskać?… Nie niechęć do ciebie, panie, ale wzajemna nieufność, ale
-        chciwość popchną ich do oporu…
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Nie — odparł
+        kapłan. — Oni lękać się będą, ażeby nie opróżnił się skarbiec raz napoczęty. Oni będą posądzali najwierniejsze sługi waszej świątobliwości o udział w zyskach płynących z
+        tego źródła… A wówczas zazdrość podszepnie im: dlaczego i wy nie mielibyście coś zyskać?… Nie niechęć do ciebie, panie, ale wzajemna nieufność, ale chciwość popchną ich do
+        oporu…
       </p>
       <p data-index="22">Pan, wysłuchawszy tego, uspokoił się, a nawet uśmiechnął.</p>
       <p data-index="23">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Jeżeli tak jest, kochany{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Jeżeli tak jest, kochany{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuerze{" "}
+          Pentuerze
         </span>
         , jak mówisz, więc bądź spokojny — rzekł. — W tej chwili dokładnie zrozumiałem: w jakim celu Amon ustanowił władzę faraona i dał mu nadludzką potęgę… Dlatego, widzisz,
         ażeby stu choćby najdostojniejszych łotrów nie mogli zgubić
@@ -136,18 +136,18 @@ export const Chapter57: React.FC = () => {
       </p>
       <p data-index="24">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         podniósł się z krzesła i dodał:
       </p>
       <p data-index="25">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Powiedz memu ludowi, niech pracuje i będzie cierpliwy… Powiedz wiernym mi kapłanom, ażeby służyli bogom i uprawiali mądrość, która jest słońcem świata. A owych
-        opornych i podejrzliwych dostojników mnie zostaw… Biada im, jeżeli rozgniewają moje serce.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Powiedz memu ludowi, niech pracuje i będzie cierpliwy… Powiedz wiernym mi kapłanom, ażeby służyli bogom i uprawiali mądrość, która jest słońcem świata. A owych opornych i
+        podejrzliwych dostojników mnie zostaw… Biada im, jeżeli rozgniewają moje serce.
       </p>
       <p data-index="26">
-        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />
-        \n — Panie — rzekł kapłan — jestem twoim wiernym sługą…
+        <span className="character-placeholder character-talking" data-character="Pentuer" data-src-talking="/Pharaon/pentuer-speaks.mp4" data-is-talking="true" />— Panie — rzekł
+        kapłan — jestem twoim wiernym sługą…
       </p>
       <p data-index="27">Ale gdy pożegnawszy się wychodził, na jego obliczu widać było troskę.</p>
       <p data-index="28">
@@ -173,22 +173,22 @@ export const Chapter57: React.FC = () => {
       <p data-index="31">
         Mumia{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>{" "}
         przemieszkała tam parę dni; był to bowiem władca odznaczający się pobożnością. Nic też dziwnego, że i{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         rozpoczynał rządy od złożenia hołdu grobowi Ozyrysa.
       </p>
       <p data-index="32">
         Świątynia Setiego nie należała do najstarszych ani najwspanialszych w Egipcie, lecz odznaczała się czystością egipskiego stylu. Jego świątobliwość{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         zwiedzał ją i złożył w niej ofiary w towarzystwie arcykapłana{" "}
         <span className="character-highlighted" data-character="Sem" data-src-listening="/Pharaon/sem-listens.mp4">
-          Sema{" "}
+          Sema
         </span>
         .
       </p>
@@ -233,11 +233,11 @@ export const Chapter57: React.FC = () => {
       <p data-index="42">
         Z dziedzińca osoby stanu szlacheckiego mogły jeszcze wchodzić do pierwszej sali, <strong>hipostylu</strong>; miała ona sufit oparty na dwu szeregach wysokich kolumn i mogła
         pomieścić ze dwa tysiące uczestników nabożeństwa. Sala ta była ostatnim kresem dla ludzi świeckich. Najwięksi dostojnicy, lecz którzy nie otrzymali święceń, mieli prawo
-        modlić się tylko tutaj i z tego miejsca patrzeć na zasłonięty posąg boga, który wznosił się w sali „boskiego objawienia\'.
+        modlić się tylko tutaj i z tego miejsca patrzeć na zasłonięty posąg boga, który wznosił się w sali „boskiego objawienia'.
       </p>
       <p data-index="43">
-        Za salą „objawienia\' leżała komnata „stołów ofiarnych\', gdzie kapłani składali bogom dary przyniesione przez wiernych. Następną była komnata „odpoczynku\', gdzie
-        wypoczywał bożek wracający lub idący na procesję, ostatnią — kaplica, czyli sanktuarium, gdzie bożek mieszkał.
+        Za salą „objawienia' leżała komnata „stołów ofiarnych', gdzie kapłani składali bogom dary przyniesione przez wiernych. Następną była komnata „odpoczynku', gdzie wypoczywał
+        bożek wracający lub idący na procesję, ostatnią — kaplica, czyli sanktuarium, gdzie bożek mieszkał.
       </p>
       <p data-index="44">
         Kaplica była zwykle bardzo małą i ciemną, niekiedy wyciosaną z jednej sztuki kamienia. Ze wszystkich stron otaczały ją kapliczki równie małe, zapełnione szatami, sprzętami,
@@ -249,30 +249,30 @@ export const Chapter57: React.FC = () => {
         Ściany i kolumny każdej sali były pokryte napisami i malowidłami objaśniającymi. W korytarzu otaczającym dziedziniec (perystyl) były nazwiska i portrety wszystkich faraonów
         od Menesa, pierwszego władcy Egiptu, do{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>
         . W hipostylu, czyli sali szlacheckiej, przedstawiono w sposób poglądowy jeografię
         <a href="#fn80" className="link-note">
           [80]
         </a>{" "}
-        i statystykę Egiptu tudzież podbitych ludów. W sali „objawienia\' znajdował się kalendarz i rezultaty obserwacji astronomicznych; w komnacie „stołów ofiarnych\' i
-        „odpoczynku\' figurowały obrazy dotyczące religijnych obrządków, a w sanktuarium — przepisy wywoływania istot zaziemskich i opanowania zjawisk natury.
+        i statystykę Egiptu tudzież podbitych ludów. W sali „objawienia' znajdował się kalendarz i rezultaty obserwacji astronomicznych; w komnacie „stołów ofiarnych' i
+        „odpoczynku' figurowały obrazy dotyczące religijnych obrządków, a w sanktuarium — przepisy wywoływania istot zaziemskich i opanowania zjawisk natury.
       </p>
       <p data-index="47">
         Ten ostatni rodzaj wiedzy nadludzkiej zawierał się w tak powikłanych zdaniach, że nawet kapłani z czasów{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>{" "}
         nie rozumieli ich. Dopiero Chaldejczyk{" "}
         <span className="character-highlighted" data-character="Phut-Beroes" data-src-listening="/Pharaon/phut-beroes-listens.mp4">
-          Beroes{" "}
+          Beroes
         </span>{" "}
         miał wskrzesić obumierającą mądrość.
       </p>
       <p data-index="48">
         Odpocząwszy dwa dni w rządowym pałacu w Abydos,{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         wybrał się do świątyni. Miał na sobie białą koszulę, złoty pancerz, fartuszek w pomarańczowe i niebieskie pasy, stalowy miecz przy boku i złoty hełm na głowie. Wsiadł na
         wóz, którego konie, przybrane w pióra strusie, prowadzili nomarchowie, i z wolna pojechał do domu Ozyrysa otoczony świtą.
@@ -287,35 +287,35 @@ export const Chapter57: React.FC = () => {
       </p>
       <p data-index="51">
         W perystylu arcykapłan zwrócił uwagę jego świątobliwości na misterne portrety faraonów i wskazał miejsce przeznaczone na jego wizerunek. W hipostylu objaśnił mu znaczenie
-        map jeograficznych i statystycznych tablic. W komnacie „boskiego objawienia\'{" "}
+        map jeograficznych i statystycznych tablic. W komnacie „boskiego objawienia'{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         ofiarował kadzidło olbrzymiemu posągowi Ozyrysa, a arcykapłan wskazał mu słupy poświęcone oddzielnym planetom: Merkuremu, Wenerze, Księżycowi, Marsowi, Jowiszowi i
         Saturnowi. Stały one dokoła posągu słonecznego bóstwa w liczbie siedmiu.
       </p>
       <p data-index="52">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Mówisz mi — spytał{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Mówisz mi — spytał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         — że jest sześć planet, a tymczasem widzę siedem słupów…
       </p>
       <p data-index="53">
-        <span className="character-placeholder character-talking" data-character="Sem" data-src-talking="/Pharaon/sem-speaks.mp4" data-is-talking="true" />
-        \n — Ten siódmy przedstawia Ziemię, która także jest planetą — szepnął arcykapłan.
+        <span className="character-placeholder character-talking" data-character="Sem" data-src-talking="/Pharaon/sem-speaks.mp4" data-is-talking="true" />— Ten siódmy przedstawia
+        Ziemię, która także jest planetą — szepnął arcykapłan.
       </p>
       <p data-index="54">Zdziwiony faraon zażądał objaśnień; ale mędrzec milczał wskazując na migi, że dla dalszych objaśnień ma zapieczętowane usta.</p>
       <p data-index="55">
-        W komnacie „stołów ofiarnych\' odezwała się cicha, lecz piękna muzyka, podczas której chór kapłanek wykonał uroczysty taniec. Faraon zdjął swój złoty hełm i pancerz
-        wielkiej wartości i oboje oddał Ozyrysowi żądając, aby dary te zostały w boskim skarbcu i nie były odnoszone do Labiryntu.
+        W komnacie „stołów ofiarnych' odezwała się cicha, lecz piękna muzyka, podczas której chór kapłanek wykonał uroczysty taniec. Faraon zdjął swój złoty hełm i pancerz wielkiej
+        wartości i oboje oddał Ozyrysowi żądając, aby dary te zostały w boskim skarbcu i nie były odnoszone do Labiryntu.
       </p>
       <p data-index="56">W zamian za hojność arcykapłan ofiarował władcy najpiękniejszą piętnastoletnią tancerkę, która wydawała się bardzo zadowoloną ze swego losu.</p>
       <p data-index="57">
-        Gdy faraon znalazł się w sali „odpoczynku\', usiadł na tronie, a jego zastępca religijny,{" "}
+        Gdy faraon znalazł się w sali „odpoczynku', usiadł na tronie, a jego zastępca religijny,{" "}
         <span className="character-highlighted" data-character="Sem" data-src-listening="/Pharaon/sem-listens.mp4">
-          Sem{" "}
+          Sem
         </span>
         , przy dźwiękach muzyki i wśród dymu kadzideł, wszedł do sanktuarium, ażeby wynieść stamtąd bożka.
       </p>
@@ -326,19 +326,19 @@ export const Chapter57: React.FC = () => {
       <p data-index="59">
         Kapłani upadli na twarz, a{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         pilniej wpatrzył się w przezroczyste zasłony. Jedna uchyliła się i faraon ujrzał nadzwyczajnej piękności dziecko, które spojrzało na niego tak mądrymi oczyma, że władca
         Egiptu uczuł nieomal trwogę.
       </p>
       <p data-index="60">
-        \n — Oto jest{" "}
+        — Oto jest{" "}
         <span className="character-highlighted" data-character="Horus-dziecko-w-swiatyni-Setiego" data-src-listening="/Pharaon/horus-dziecko-w-swiatyni-setiego.png">
-          Horus{" "}
+          Horus
         </span>{" "}
         — szeptali kapłani —{" "}
         <span className="character-highlighted" data-character="Horus-dziecko-w-swiatyni-Setiego" data-src-listening="/Pharaon/horus-dziecko-w-swiatyni-setiego.png">
-          Horus{" "}
+          Horus
         </span>
         , wschodzące słońce… Jest on synem i ojcem Ozyrysa, i mężem swej matki, która jest jego siostrą.
       </p>
@@ -349,18 +349,18 @@ export const Chapter57: React.FC = () => {
       <p data-index="62">
         Gdy procesja obeszła wszystkie sale i korytarze świątyni, bożek i{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
-        obaj wrócili do komnaty „odpoczynku\'. Wówczas zasłony okrywające łódź świętą odchyliły się po raz drugi i piękne dziecko — uśmiechnęło się do faraona.
+        obaj wrócili do komnaty „odpoczynku'. Wówczas zasłony okrywające łódź świętą odchyliły się po raz drugi i piękne dziecko — uśmiechnęło się do faraona.
       </p>
       <p data-index="63">
         Po czym łódź i bożka{" "}
         <span className="character-highlighted" data-character="Sem" data-src-listening="/Pharaon/sem-listens.mp4">
-          Sem{" "}
+          Sem
         </span>{" "}
         odniósł do kaplicy.
       </p>
-      <p data-index="64">„Może by zostać arcykapłanem?\' — pomyślał władca, któremu dziecko tak się podobało, że rad był widywać je jak najczęściej.</p>
+      <p data-index="64">„Może by zostać arcykapłanem?' — pomyślał władca, któremu dziecko tak się podobało, że rad był widywać je jak najczęściej.</p>
       <p data-index="65">
         Lecz gdy wyszedł ze świątyni, zobaczył słońce i niezmierny tłum radującego się ludu, przyznał w duchu, że — nic nie rozumie. Ani skąd wzięło się owe
         <a href="#fn81" className="link-note">
@@ -377,179 +377,177 @@ export const Chapter57: React.FC = () => {
       <p data-index="69">
         Dobrze po południu{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         wrócił do swego pałacu, aby wysłuchać raportów. Gdy zaś wszyscy dostojnicy opuścili gabinet pana, przyszedł{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>{" "}
         mówiąc:
       </p>
       <p data-index="70">
         — Kapłan{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         pragnie złożyć hołd waszej świątobliwości.
       </p>
       <p data-index="71">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Dobrze, wprowadź go.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Dobrze, wprowadź go.
       </p>
       <p data-index="72">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — On błaga cię, panie, ażebyś przyjął go w namiocie, wśród wojskowego obozu, i twierdzi, że mury pałaców lubią podsłuchiwać…
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— On błaga cię,
+        panie, ażebyś przyjął go w namiocie, wśród wojskowego obozu, i twierdzi, że mury pałaców lubią podsłuchiwać…
       </p>
       <p data-index="73">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Ciekawym, czego chce?… — rzekł faraon i zapowiedział dworzanom, że noc przepędzi w obozie.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Ciekawym, czego chce?… — rzekł faraon i zapowiedział dworzanom, że noc przepędzi w obozie.
       </p>
       <p data-index="74">
         Przed zachodem słońca pan odjechał z{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisem{" "}
+          Tutmozisem
         </span>{" "}
         do swoich wiernych wojsk i znalazł tam królewski namiot, przy którym z polecenia{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisa{" "}
+          Tutmozisa
         </span>{" "}
         wartę trzymali Azjaci.
       </p>
       <p data-index="75">
         Wieczorem przyszedł{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         odziany w płaszcz pielgrzyma i ze czcią powitawszy jego świątobliwość, szepnął:
       </p>
       <p data-index="76">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Zdaje mi się, że przez całą drogę szedł za mną jakiś człowiek, który zatrzymał się nie opodal boskiego namiotu. Może to wysłannik arcykapłanów?…
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Zdaje mi się,
+        że przez całą drogę szedł za mną jakiś człowiek, który zatrzymał się nie opodal boskiego namiotu. Może to wysłannik arcykapłanów?…
       </p>
       <p data-index="77">
         Na rozkaz faraona wybiegł{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>{" "}
         i rzeczywiście znalazł obcego oficera.
       </p>
       <p data-index="78">
-        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />
-        \n — Kto jesteś? — zapytał.
+        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Kto jesteś? —
+        zapytał.
       </p>
       <p data-index="79">
-        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />
-        \n — Jestem{" "}
+        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />— Jestem{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunana{" "}
+          Eunana
         </span>
         , setnik pułku Izydy… Nieszczęśliwy{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunana{" "}
+          Eunana
         </span>
         , wasza dostojność nie pamięta mnie?… Więcej niż rok temu na manewrach pod Pi-Bailos odkryłem święte skarabeusze…
       </p>
       <p data-index="80">
-        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />
-        \n — Ach, to ty!… — przerwał{" "}
+        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Ach, to ty!…
+        — przerwał{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         . — Twój pułk przecież nie stoi w Abydos?
       </p>
       <p data-index="81">
-        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />
-        \n — Woda prawdy płynie z ust waszych. Stoimy w nędznej okolicy pod Mena, gdzie kapłani rozkazali nam poprawiać kanał, jak chłopom albo Żydom…
+        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />— Woda prawdy
+        płynie z ust waszych. Stoimy w nędznej okolicy pod Mena, gdzie kapłani rozkazali nam poprawiać kanał, jak chłopom albo Żydom…
       </p>
       <p data-index="82">
-        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />
-        \n — Skądżeś się tu wziął?
+        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Skądżeś się
+        tu wziął?
       </p>
       <p data-index="83">
-        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />
-        \n — Ubłagałem starszych o kilkudniowy odpoczynek — odparł{" "}
+        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />— Ubłagałem
+        starszych o kilkudniowy odpoczynek — odparł{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunana{" "}
+          Eunana
         </span>{" "}
         — i jak spragniony jeleń do źródła przybiegłem tutaj dzięki chyżości moich nóg.
       </p>
       <p data-index="84">
-        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />
-        \n — Więc czego chcesz?
+        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Więc czego
+        chcesz?
       </p>
       <p data-index="85">
-        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />
-        \n — Chcę żebrać miłosierdzia u jego świątobliwości przeciw ogolonym łbom, którzy nie dają mi awansu dlatego, że jestem tkliwy na cierpienia żołnierzy.
+        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />— Chcę żebrać
+        miłosierdzia u jego świątobliwości przeciw ogolonym łbom, którzy nie dają mi awansu dlatego, że jestem tkliwy na cierpienia żołnierzy.
       </p>
       <p data-index="86">
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>{" "}
         markotny wrócił do namiotu i powtórzył faraonowi rozmowę z{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunaną{" "}
+          Eunaną
         </span>
         .
       </p>
       <p data-index="87">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n —{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunana{" "}
+          Eunana
         </span>
         ?… — powtórzył pan. — Prawda, pamiętam go… Narobił nam kłopotu skarabeuszami, ale też i dostał pięćdziesiąt kijów z łaski{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>
         . I mówisz, że skarży się na kapłanów?… Daj go tu!…
       </p>
       <p data-index="88">
         Faraon kazał odejść{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentowi{" "}
+          Samentowi
         </span>{" "}
         do drugiego przedziału w namiocie, a swego ulubieńca wysłał po{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunanę{" "}
+          Eunanę
         </span>
         .
       </p>
       <p data-index="89">Niebawem ukazał się nieszczęśliwy oficer. Upadł twarzą na ziemię, a potem klęcząc i wzdychając, mówił:</p>
       <p data-index="90">
-        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />
-        \n — „Co dzień modlę się do Re Harmachis przy jego wschodzie i zachodzie i do Amona, i Re, i Ptaha, i do innych bogów i bogiń: Obyś ty zdrów był, władco Egiptu! Obyś został
-        przy życiu! Oby ci się dobrze wiodło, a ja ażebym mógł choć blaski twoich pięt oglądać…
+        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />— „Co dzień modlę
+        się do Re Harmachis przy jego wschodzie i zachodzie i do Amona, i Re, i Ptaha, i do innych bogów i bogiń: Obyś ty zdrów był, władco Egiptu! Obyś został przy życiu! Oby ci
+        się dobrze wiodło, a ja ażebym mógł choć blaski twoich pięt oglądać…
         <a href="#fn82" className="link-note">
           [82]
         </a>
-        \'
+        '
       </p>
       <p data-index="91">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Czego on chce? — spytał faraon{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Czego on chce? — spytał faraon{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisa{" "}
+          Tutmozisa
         </span>
         , pierwszy raz przestrzegając etykiety.
       </p>
       <p data-index="92">
-        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />
-        \n — Jego świątobliwość raczy zapytywać: czego chcesz? — powtórzył{" "}
+        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Jego
+        świątobliwość raczy zapytywać: czego chcesz? — powtórzył{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         .
       </p>
       <p data-index="93">
         Obłudny{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunana{" "}
+          Eunana
         </span>
         , wciąż klęcząc, zwrócił się do ulubieńca i prawił:
       </p>
       <p data-index="94">
-        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />
-        \n — Jesteś, wasza dostojność, uchem i okiem pana, który daje nam radość i życie, a więc odpowiem ci jak na sądzie Ozyrysa:
+        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />— Jesteś, wasza
+        dostojność, uchem i okiem pana, który daje nam radość i życie, a więc odpowiem ci jak na sądzie Ozyrysa:
       </p>
       <p data-index="95">
         Służę w kapłańskim pułku boskiej Izydy dziesięć lat, walczyłem sześć lat na wschodnich kresach. Rówieśnicy moi zostali już pułkownikami, ale ja wciąż jestem tylko setnikiem
@@ -562,16 +560,16 @@ export const Chapter57: React.FC = () => {
           [83]
         </a>
         , który bierze cięgi, równy głuchemu, który nie słyszy i do którego trzeba mówić ręką. Mimo tę moją chęć do nauk, nie jestem zarozumiałym z własnej wiedzy, lecz radzę się
-        wszystkich, bo od każdego coś nauczyć się można, a czcigodnych mędrców otaczam szacunkiem…\'
+        wszystkich, bo od każdego coś nauczyć się można, a czcigodnych mędrców otaczam szacunkiem…'
       </p>
       <p data-index="98">
         Faraon poruszył się niecierpliwie, lecz słuchał dalej, wiedząc, że prawy Egipcjanin uważa gadulstwo za swój obowiązek i najwyższą cześć dla przełożonych.
       </p>
       <p data-index="99">
-        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />
-        \n — Oto jaki jestem — prawił{" "}
+        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />— Oto jaki jestem —
+        prawił{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunana{" "}
+          Eunana
         </span>
         . — „W obcym domu nie oglądam się za kobietami, czeladzi jeść daję, co należy, ale gdy o mnie chodzi, nie sprzeczam się przy podziale. Mam zawsze zadowoloną twarz, a wobec
         zwierzchników zachowuję się z szacunkiem i nie siądę, gdy starszy człowiek stoi. Nie jestem natrętnym, a nieproszony, nie wchodzę do obcych domów. Co moje oko ujrzy, o tym
@@ -583,37 +581,36 @@ export const Chapter57: React.FC = () => {
         <a href="#fn84" className="link-note">
           [84]
         </a>
-        \'
+        '
       </p>
       <p data-index="101">
         I co mam za to?… — kończył{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunana{" "}
+          Eunana
         </span>{" "}
         podniesionym głosem. — Cierpię głód, chodzę w łachmanach, a na grzbiecie leżeć nie mogę, tak jest zbity. Czytam w księgach, że stan kapłański wynagradzał męstwo i
         roztropność. Zaprawdę! musiało tak być kiedyś i już bardzo dawno. Bo dzisiejsi kapłani tyłem odwracają się od roztropnych, a męstwo i siłę wypędzają z oficerskich kości…
       </p>
       <p data-index="102">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Ja zasnę przy tym człowieku! — rzekł faraon.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Ja
+        zasnę przy tym człowieku! — rzekł faraon.
       </p>
       <p data-index="103">
-        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />
-        \n —{" "}
+        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunano{" "}
+          Eunano
         </span>{" "}
         — dodał{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>{" "}
         — przekonałeś jego świątobliwość, że jesteś biegły w księgach, a teraz — powiedz jak najkrócej: czego pragniesz?
       </p>
       <p data-index="104">
-        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />
-        \n — Strzała tak prędko nie dobiega celu, jak moja prośba doleci do boskich pięt jego świątobliwości — odparł{" "}
+        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />— Strzała tak
+        prędko nie dobiega celu, jak moja prośba doleci do boskich pięt jego świątobliwości — odparł{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunana{" "}
+          Eunana
         </span>
         . — Tak obmierzła mi służba u ogolonych łbów, taką goryczą kapłani napełnili moje serce, że — jeżeli nie będę przeniesiony do wojsk faraona, przebiję się własnym mieczem,
         przed którym nie raz i nie sto razy drżeli wrogowie Egiptu.
@@ -625,294 +622,292 @@ export const Chapter57: React.FC = () => {
       <p data-index="106">
         Ostatnie frazesy{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunana{" "}
+          Eunana
         </span>{" "}
         wypowiedział z takim wściekłym gniewem, że faraon rzekł po grecku do{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisa{" "}
+          Tutmozisa
         </span>
         :
       </p>
       <p data-index="107">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Weź go do gwardii. Oficer, który nie lubi kapłanów, może nam się przydać.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Weź
+        go do gwardii. Oficer, który nie lubi kapłanów, może nam się przydać.
       </p>
       <p data-index="108">
-        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />
-        \n — Jego świątobliwość, pan obu światów, kazał przyjąć cię do swej gwardii — powtórzył{" "}
+        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Jego
+        świątobliwość, pan obu światów, kazał przyjąć cię do swej gwardii — powtórzył{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         .
       </p>
       <p data-index="109">
-        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />
-        \n — Zdrowie i życie moje należy do pana naszego{" "}
+        <span className="character-placeholder character-talking" data-character="Eunana" data-src-talking="/Pharaon/eunana-speaks.mp4" data-is-talking="true" />— Zdrowie i życie
+        moje należy do pana naszego{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa{" "}
+          Ramzesa
         </span>
         … Oby żył wiecznie! — zawołał{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunana{" "}
+          Eunana
         </span>{" "}
         i ucałował dywan leżący pod królewskimi stopami.
       </p>
       <p data-index="110">
         Gdy uszczęśliwiony{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunana{" "}
+          Eunana
         </span>{" "}
         cofał się tyłem z namiotu, co parę kroków padając na twarz i błogosławiąc władcę, faraon rzekł:
       </p>
       <p data-index="111">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — W gardle łaskotało mnie jego gadulstwo… Muszę ja nauczyć żołnierzy i oficerów egipskich, aby wyrażali się krótko, nie zaś jak uczeni pisarze.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— W
+        gardle łaskotało mnie jego gadulstwo… Muszę ja nauczyć żołnierzy i oficerów egipskich, aby wyrażali się krótko, nie zaś jak uczeni pisarze.
       </p>
       <p data-index="112">
-        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />
-        \n — Bodajby on miał tylko tę jedną wadę!… — szepnął{" "}
+        <span className="character-placeholder character-talking" data-character="Tutmozis" data-src-talking="/Pharaon/tutmozis-speaks.mp4" data-is-talking="true" />— Bodajby on
+        miał tylko tę jedną wadę!… — szepnął{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozis{" "}
+          Tutmozis
         </span>
         , na którym{" "}
         <span className="character-highlighted" data-character="Eunana" data-src-listening="/Pharaon/eunana-listens.mp4">
-          Eunana{" "}
+          Eunana
         </span>{" "}
         niemiłe zrobił wrażenie.
       </p>
       <p data-index="113">
         Pan wezwał do siebie{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         .
       </p>
       <p data-index="114">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Bądź spokojny — powiedział do kapłana. — Ten oficer, który szedł za tobą, nie śledził cię. Jest on za głupi do spełniania tego rodzaju zleceń… Ale może mieć ciężką
-        rękę na wypadek potrzeby!…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Bądź spokojny — powiedział do kapłana. — Ten oficer, który szedł za tobą, nie śledził cię. Jest on za głupi do spełniania tego rodzaju zleceń… Ale może mieć ciężką rękę na
+        wypadek potrzeby!…
       </p>
       <p data-index="115">
         <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n No — dodał faraon — a teraz powiedz: co cię skłania do podobnej ostrożności?
+        No — dodał faraon — a teraz powiedz: co cię skłania do podobnej ostrożności?
       </p>
       <p data-index="116">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Prawie już znam drogę do skarbca w Labiryncie — odparł{" "}
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Prawie już znam
+        drogę do skarbca w Labiryncie — odparł{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         .
       </p>
       <p data-index="117">Pan potrząsnął głową.</p>
       <p data-index="118">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Ciężka to rzecz — szepnął. — Godzinę biegałem po rozmaitych korytarzach i salach, jak mysz, którą kot goni. I przyznam ci się, że nie tylko nie rozumiem tej drogi, ale
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Ciężka to rzecz — szepnął. — Godzinę biegałem po rozmaitych korytarzach i salach, jak mysz, którą kot goni. I przyznam ci się, że nie tylko nie rozumiem tej drogi, ale
         nawet nie wybrałbym się na nią sam. Śmierć na słońcu może być wesołą; ale śmierć w tych norach, gdzie kret zabłąkałby się… brr!…
       </p>
       <p data-index="119">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — A jednak musimy znaleźć i opanować tę drogę — rzekł{" "}
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— A jednak musimy
+        znaleźć i opanować tę drogę — rzekł{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         .
       </p>
       <p data-index="120">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — A jeżeli dozorcy sami oddadzą nam potrzebną część skarbów?… — spytał faraon.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        jeżeli dozorcy sami oddadzą nam potrzebną część skarbów?… — spytał faraon.
       </p>
       <p data-index="121">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Nie zrobią tego, dopóki żyje{" "}
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Nie zrobią
+        tego, dopóki żyje{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>
         ,{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         i ich poplecznicy. Wierzaj mi, panie, że tym dostojnikom chodzi o to, ażeby owinęli cię w powijaki jak niemowlę…
       </p>
       <p data-index="122">Faraon pobladł z gniewu.</p>
       <p data-index="123">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Obym ja nie zawinął ich w łańcuchy!… Jakim sposobem chcesz odkryć drogę?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Obym ja nie zawinął ich w łańcuchy!… Jakim sposobem chcesz odkryć drogę?
       </p>
       <p data-index="124">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Tu, w Abydos, w grobie Ozyrysa znalazłem cały plan drogi do skarbca — rzekł kapłan.
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Tu, w Abydos, w
+        grobie Ozyrysa znalazłem cały plan drogi do skarbca — rzekł kapłan.
       </p>
       <p data-index="125">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — A skąd wiedziałeś, że on tu jest?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        skąd wiedziałeś, że on tu jest?
       </p>
       <p data-index="126">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Objaśniły mnie o tym napisy w mojej świątyni Seta.
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Objaśniły mnie
+        o tym napisy w mojej świątyni Seta.
       </p>
       <p data-index="127">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Kiedyżeś znalazł plan?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Kiedyżeś znalazł plan?
       </p>
       <p data-index="128">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Gdy mumia wiecznie żyjącego ojca waszej świątobliwości była w świątyni Ozyrysa — odparł{" "}
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Gdy mumia
+        wiecznie żyjącego ojca waszej świątobliwości była w świątyni Ozyrysa — odparł{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
-        . — Towarzyszyłem czcigodnym zwłokom i będąc na nocnej służbie w sali „odpoczynku\', wszedłem do sanktuarium.
+        . — Towarzyszyłem czcigodnym zwłokom i będąc na nocnej służbie w sali „odpoczynku', wszedłem do sanktuarium.
       </p>
       <p data-index="129">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Tobie być jenerałem, nie arcykapłanem!… — zawołał śmiejąc się{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Tobie być jenerałem, nie arcykapłanem!… — zawołał śmiejąc się{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         . — I już rozumiesz drogę Labiryntu?…
       </p>
       <p data-index="130">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Rozumiałem ją od dawna, a teraz zebrałem wskazówki do kierowania się.
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Rozumiałem ją
+        od dawna, a teraz zebrałem wskazówki do kierowania się.
       </p>
       <p data-index="131">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Czy możesz mi to objaśnić?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Czy
+        możesz mi to objaśnić?
       </p>
       <p data-index="132">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Owszem, nawet przy okazji pokażę waszej świątobliwości plan.
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Owszem, nawet
+        przy okazji pokażę waszej świątobliwości plan.
       </p>
       <p data-index="133">
         Droga ta — ciągnął{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         — przechodzi w zygzak cztery razy przez cały Labirynt; zaczyna się na najwyższym piętrze, kończy w najniższym podziemiu i posiada jeszcze mnóstwo zakrętów. Dlatego jest tak
         długa.
       </p>
       <p data-index="134">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — A jakże trafisz z jednej sali do drugiej, gdzie jest mnóstwo drzwi?…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        jakże trafisz z jednej sali do drugiej, gdzie jest mnóstwo drzwi?…
       </p>
       <p data-index="135">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Na każdych drzwiach prowadzących do celu znajduje się cząstka zdania:
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Na każdych
+        drzwiach prowadzących do celu znajduje się cząstka zdania:
       </p>
       <p data-index="136">
         „Biada zdrajcy, który usiłuje przeniknąć najwyższą tajemnicę państwa i wyciągnąć świętokradzką rękę na majątek bogów. Zwłoki jego będą jak padlina, a duch nie zazna
-        spokoju, lecz będzie się tułał po miejscach ciemnych, szarpany przez własne grzechy…\'
+        spokoju, lecz będzie się tułał po miejscach ciemnych, szarpany przez własne grzechy…'
       </p>
       <p data-index="137">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — I ciebie nie odstrasza ten napis?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— I
+        ciebie nie odstrasza ten napis?
       </p>
       <p data-index="138">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — A waszą świątobliwość odstrasza widok libijskiej włóczni?… Groźby dobre są dla pospólstwa, nie dla mnie, który sam potrafiłbym napisać jeszcze groźniejsze
-        przekleństwa…
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— A waszą
+        świątobliwość odstrasza widok libijskiej włóczni?… Groźby dobre są dla pospólstwa, nie dla mnie, który sam potrafiłbym napisać jeszcze groźniejsze przekleństwa…
       </p>
       <p data-index="139">Faraon zamyślił się.</p>
       <p data-index="140">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Masz słuszność — rzekł. — Włócznia nie zaszkodzi temu, kto potrafi ją odbić, a mylna droga nie obłąka mędrca, który zna słowo prawdy…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Masz słuszność — rzekł. — Włócznia nie zaszkodzi temu, kto potrafi ją odbić, a mylna droga nie obłąka mędrca, który zna słowo prawdy…
       </p>
       <p data-index="141">Jakże jednak sprawisz, ażeby ustępowały przed tobą kamienie w ścianach i ażeby kolumny zamieniały się na drzwi wchodowe?…</p>
       <p data-index="142">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         pogardliwie wzruszył ramionami.
       </p>
       <p data-index="143">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — W mojej świątyni — odparł — są także niedostrzegalne wejścia, nawet trudniej otwierające się aniżeli w Labiryncie. Kto zna słowo tajemnicy, wszędzie trafi, jak
-        słusznie powiedziałeś, wasza świątobliwość.
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— W mojej
+        świątyni — odparł — są także niedostrzegalne wejścia, nawet trudniej otwierające się aniżeli w Labiryncie. Kto zna słowo tajemnicy, wszędzie trafi, jak słusznie
+        powiedziałeś, wasza świątobliwość.
       </p>
       <p data-index="144">Faraon oparł głowę na ręku i wciąż dumał.</p>
       <p data-index="145">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Żal by mi cię było — rzekł — gdybyś na tej drodze spotkał nieszczęście…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Żal
+        by mi cię było — rzekł — gdybyś na tej drodze spotkał nieszczęście…
       </p>
       <p data-index="146">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — W najgorszym wypadku spotkam śmierć, a czyliż ona nie grozi nawet faraonom?… Czy wreszcie wasza świątobliwość nie szedłeś śmiało nad Jeziora Sodowe, choć nie byłeś
-        pewny, że stamtąd powrócisz?…
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— W najgorszym
+        wypadku spotkam śmierć, a czyliż ona nie grozi nawet faraonom?… Czy wreszcie wasza świątobliwość nie szedłeś śmiało nad Jeziora Sodowe, choć nie byłeś pewny, że stamtąd
+        powrócisz?…
       </p>
       <p data-index="147">
         Nie myśl też, panie — ciągnął kapłan — że ja będę musiał przejść całą drogę, po której chodzą zwiedzający Labirynt. Znajdę bliższe punkta i w ciągu jednej modlitwy do
         Ozyrysa dostanę się tam, gdzie ty idąc mogłeś odmówić ze trzydzieści modlitw…
       </p>
       <p data-index="148">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Alboż tam są inne wejścia?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Alboż tam są inne wejścia?
       </p>
       <p data-index="149">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Niezawodnie są, a ja muszę je znaleźć — odparł{" "}
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Niezawodnie są,
+        a ja muszę je znaleźć — odparł{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         . — Nie wejdę przecież, jak wasza świątobliwość, w dzień ani główną bramą…
       </p>
       <p data-index="150">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Więc jak?…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Więc jak?…
       </p>
       <p data-index="151">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Są w murze zewnętrznym niewidoczne furtki, które znam, a których mądrzy dozorcy Labiryntu nigdy nie pilnują… Na dziedzińcu warty w nocy są nieliczne i tak ufają opiece
-        bogów czy trwodze pospólstwa, że najczęściej śpią… Prócz tego trzy razy między zachodem i wschodem słońca kapłani idą na modlitwę do świątyni, a ich żołnierze odbywają
-        praktyki nabożne pod niebem… Zanim skończą jedno nabożeństwo, ja będę w gmachu…
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Są w murze
+        zewnętrznym niewidoczne furtki, które znam, a których mądrzy dozorcy Labiryntu nigdy nie pilnują… Na dziedzińcu warty w nocy są nieliczne i tak ufają opiece bogów czy
+        trwodze pospólstwa, że najczęściej śpią… Prócz tego trzy razy między zachodem i wschodem słońca kapłani idą na modlitwę do świątyni, a ich żołnierze odbywają praktyki
+        nabożne pod niebem… Zanim skończą jedno nabożeństwo, ja będę w gmachu…
       </p>
       <p data-index="152">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — A jeżeli zabłądzisz?…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        jeżeli zabłądzisz?…
       </p>
       <p data-index="153">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Mam plan.
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Mam plan.
       </p>
       <p data-index="154">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — A jeżeli plan jest fałszywy? — mówił faraon, nie mogąc ukryć troski.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        jeżeli plan jest fałszywy? — mówił faraon, nie mogąc ukryć troski.
       </p>
       <p data-index="155">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — A jeżeli wasza świątobliwość nie pozyska skarbów Labiryntu?… Jeżeli Fenicjanie, rozmyśliwszy się, nie dadzą przyobiecanej pożyczki?… Jeżeli wojsko będzie głodne, a
-        nadzieje pospólstwa zostaną zawiedzione?…
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— A jeżeli wasza
+        świątobliwość nie pozyska skarbów Labiryntu?… Jeżeli Fenicjanie, rozmyśliwszy się, nie dadzą przyobiecanej pożyczki?… Jeżeli wojsko będzie głodne, a nadzieje pospólstwa
+        zostaną zawiedzione?…
       </p>
       <p data-index="156">Racz mi wierzyć, panie mój — ciągnął kapłan — że ja wśród korytarzy Labiryntu będę bezpieczniejszy aniżeli ty w twoim państwie…</p>
       <p data-index="157">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Ale ciemność… ciemność… I mury, których nie można przebić, i głębia, i te setki dróg, gdzie człowiek musi się zabłąkać… Wierz mi,{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Ale
+        ciemność… ciemność… I mury, których nie można przebić, i głębia, i te setki dróg, gdzie człowiek musi się zabłąkać… Wierz mi,{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         , że walka z ludźmi to zabawka; ale szamotanie się z cieniem i nieświadomością to straszna rzecz!…
       </p>
       <p data-index="158">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         uśmiechnął się.
       </p>
       <p data-index="159">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Wasza świątobliwość — odparł — nie zna mego życia… Kiedym miał lat dwadzieścia pięć, byłem kapłanem Ozyrysa…
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Wasza
+        świątobliwość — odparł — nie zna mego życia… Kiedym miał lat dwadzieścia pięć, byłem kapłanem Ozyrysa…
       </p>
       <p data-index="160">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Ty?… — zdziwił się{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Ty?… — zdziwił się{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         .
       </p>
       <p data-index="161">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Ja, i zaraz powiem, dlaczego przeszedłem do służby Seta. Wyprawiono mnie na półwysep Synaj, aby tam wybudować małą kaplicę dla górników. Budowa ciągnęła się sześć lat,
-        ja zaś, mając dużo wolnego czasu, włóczyłem się między górami i zwiedzałem tamtejsze pieczary.
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Ja, i zaraz
+        powiem, dlaczego przeszedłem do służby Seta. Wyprawiono mnie na półwysep Synaj, aby tam wybudować małą kaplicę dla górników. Budowa ciągnęła się sześć lat, ja zaś, mając
+        dużo wolnego czasu, włóczyłem się między górami i zwiedzałem tamtejsze pieczary.
       </p>
       <p data-index="162">
         Czego ja tam nie widziałem!… Korytarze długie na kilka godzin; ciasne wejścia, przez które trzeba było pełzać na brzuchu; izby tak ogromne, że w każdej zmieściłaby się
@@ -944,44 +939,43 @@ export const Chapter57: React.FC = () => {
       </p>
       <p data-index="169">Teraz pomyśl, że figura ta stoi na nogach, rękoma i piersiami oparta o skałę…</p>
       <p data-index="170">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Coś bardzo brzydkiego — wtrącił faraon. — Zaraz bym to zabił…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Coś
+        bardzo brzydkiego — wtrącił faraon. — Zaraz bym to zabił…
       </p>
       <p data-index="171">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — To nie było brzydkie — mówił kapłan wstrząsając się. — Bo pomyśl, panie, że ten potwór był wysoki jak obelisk…
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— To nie było
+        brzydkie — mówił kapłan wstrząsając się. — Bo pomyśl, panie, że ten potwór był wysoki jak obelisk…
       </p>
       <p data-index="172">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         zrobił gest niezadowolenia.
       </p>
       <p data-index="173">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n —{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         — rzekł — zdaje mi się, żeś twoje pieczary zwiedzał we śnie…
       </p>
       <p data-index="174">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Przysięgam ci, panie, na życie moich dzieci — zawołał kapłan — że mówię prawdę!… Tak jest, ten potwór w skórze gada, okryty kolczastą zbroją, gdyby leżał na ziemi,
-        miałby wraz z ogonem z pięćdziesiąt kroków długości… Pomimo trwogi i odrazy kilkakrotnie wracałem do jego jaskini i obejrzałem go jak najuważniej…
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Przysięgam ci,
+        panie, na życie moich dzieci — zawołał kapłan — że mówię prawdę!… Tak jest, ten potwór w skórze gada, okryty kolczastą zbroją, gdyby leżał na ziemi, miałby wraz z ogonem z
+        pięćdziesiąt kroków długości… Pomimo trwogi i odrazy kilkakrotnie wracałem do jego jaskini i obejrzałem go jak najuważniej…
       </p>
       <p data-index="175">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Więc on żył?
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Więc on żył?
       </p>
       <p data-index="176">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Nie. To już był trup, bardzo dawny, ale tak zachowany jak nasze mumie. Utrzymała go wielka suchość powietrza, a może nie znane mi sole ziemi.
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Nie. To już był
+        trup, bardzo dawny, ale tak zachowany jak nasze mumie. Utrzymała go wielka suchość powietrza, a może nie znane mi sole ziemi.
       </p>
       <p data-index="177">
         Było to moje ostatnie odkrycie — ciągnął{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         . Nie wchodziłem już do jaskiń, alem dużo rozmyślał. Ozyrys — mówiłem — tworzy wielkie istoty: lwy, słonie, konie… zaś Set rodzi węża, nietoperza, krokodyla… Potwór,
         którego spotkałem, jest na pewno tworem Seta, a ponieważ przerasta wszystko, co znamy pod słońcem, więc Set jest mocniejszym bogiem aniżeli Ozyrys.
@@ -992,28 +986,28 @@ export const Chapter57: React.FC = () => {
       </p>
       <p data-index="179">
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         odpoczął i mówił dalej:
       </p>
       <p data-index="180">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Jeżeli kiedy wasza świątobliwość zechce odwiedzić naszą świątynię, pokażę wam w grobach dziwne i straszne istoty: gęsi z jaszczurczymi głowami a skrzydłami nietoperza,
-        jaszczurki podobne do łabędzi, lecz większe od strusiów, krokodyla trzy razy dłuższego aniżeli te, które mieszkają w Nilu, żabę wielkości psa…
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Jeżeli kiedy
+        wasza świątobliwość zechce odwiedzić naszą świątynię, pokażę wam w grobach dziwne i straszne istoty: gęsi z jaszczurczymi głowami a skrzydłami nietoperza, jaszczurki
+        podobne do łabędzi, lecz większe od strusiów, krokodyla trzy razy dłuższego aniżeli te, które mieszkają w Nilu, żabę wielkości psa…
       </p>
       <p data-index="181">
         Są to albo mumie, albo szkielety znalezione w jaskiniach i przechowujące się w naszych grobach. Lud myśli, że my im cześć składamy, a tymczasem my tylko badamy ich budowę i
         chronimy od zepsucia.
       </p>
       <p data-index="182">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Uwierzę ci, gdy sam zobaczę — odparł faraon. — Ale powiedz mi, skąd mogłyby się wziąć podobne istoty w jaskiniach?…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Uwierzę ci, gdy sam zobaczę — odparł faraon. — Ale powiedz mi, skąd mogłyby się wziąć podobne istoty w jaskiniach?…
       </p>
       <p data-index="183">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Panie mój — mówił kapłan — świat, na którym żyjemy, ulega wielkim zmianom. Już w samym Egipcie znajdujemy gruzy miast i świątyń głęboko ukryte w ziemi. Był czas, że
-        miejsce Dolnego Egiptu zajmowała odnoga morska, a Nil płynął całą szerokością naszej doliny. Jeszcze dawniej tu, gdzie jest nasze państwo, było morze… Nasi zaś przodkowie
-        zamieszkiwali krainę, którą dziś zajęła pustynia zachodnia…
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Panie mój —
+        mówił kapłan — świat, na którym żyjemy, ulega wielkim zmianom. Już w samym Egipcie znajdujemy gruzy miast i świątyń głęboko ukryte w ziemi. Był czas, że miejsce Dolnego
+        Egiptu zajmowała odnoga morska, a Nil płynął całą szerokością naszej doliny. Jeszcze dawniej tu, gdzie jest nasze państwo, było morze… Nasi zaś przodkowie zamieszkiwali
+        krainę, którą dziś zajęła pustynia zachodnia…
       </p>
       <p data-index="184">
         Jeszcze dawniej, przed dziesiątkami tysięcy lat, nie było ludzi takich jak my, ale stworzenia podobne do małp, które jednak umiały budować szałasy, podtrzymywać ogień,
@@ -1029,39 +1023,38 @@ export const Chapter57: React.FC = () => {
         …
       </p>
       <p data-index="186">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — A jeszcze dawniej?… — spytał{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        jeszcze dawniej?… — spytał{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         .
       </p>
       <p data-index="187">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Jeszcze dawniej ziemia była pusta i próżna, a Duch Boży unosił się nad wodami…
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Jeszcze dawniej
+        ziemia była pusta i próżna, a Duch Boży unosił się nad wodami…
         <a href="#fn86" className="link-note">
           [86]
         </a>
       </p>
       <p data-index="188">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Coś słyszałem o tym — rzekł faraon — ale nie prędzej uwierzę, aż mi pokażesz mumie potworów, jakie mają spoczywać w waszej świątyni.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Coś
+        słyszałem o tym — rzekł faraon — ale nie prędzej uwierzę, aż mi pokażesz mumie potworów, jakie mają spoczywać w waszej świątyni.
       </p>
       <p data-index="189">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Za pozwoleniem waszej świątobliwości, dokończę, com zaczął — mówił{" "}
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Za pozwoleniem
+        waszej świątobliwości, dokończę, com zaczął — mówił{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         . — Otóż kiedy w pieczarze Synaj zobaczyłem owego ogromnego trupa, zdjął mnie strach i przez parę lat nie byłbym poszedł do żadnej jaskini. Ale gdy kapłani Seta
         wytłumaczyli mi, skąd się wzięły tak dziwne istoty, trwoga moja znikła, a ciekawość wzmogła się. I dziś nie ma dla mnie milszej zabawy jak błąkać się po podziemiach i
         szukać dróg wśród ciemności. Z tego powodu Labirynt nie sprawi mi więcej trudów jak przechadzka po królewskim ogrodzie.
       </p>
       <p data-index="190">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n —{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         — rzekł pan — bardzo cenię twoją nadludzką odwagę i mądrość. Opowiedziałeś mi tyle ciekawych rzeczy, że zaprawdę sam nabrałem ochoty do oglądania jaskiń i kiedyś może
         popłynę razem z tobą do Synaj.
@@ -1070,26 +1063,26 @@ export const Chapter57: React.FC = () => {
         Niemniej jednak obawiam się, czy poradzisz sobie z Labiryntem, i na wszelki wypadek zwołam zgromadzenie Egipcjan, aby upoważniło mnie do korzystania ze skarbca.
       </p>
       <p data-index="192">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — To nigdy nie zawadzi — odparł kapłan. — Ale moja praca niemniej będzie potrzebną, bo{" "}
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— To nigdy nie
+        zawadzi — odparł kapłan. — Ale moja praca niemniej będzie potrzebną, bo{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         nie zgodzą się na wydanie skarbu.
       </p>
       <p data-index="193">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — I masz pewność, że ci się uda?… — uporczywie zapytywał faraon.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— I
+        masz pewność, że ci się uda?… — uporczywie zapytywał faraon.
       </p>
       <p data-index="194">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Jak Egipt Egiptem — przekonywał go{" "}
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Jak Egipt
+        Egiptem — przekonywał go{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>{" "}
         — nie było człowieka, który by posiadał tyle środków, co ja, do zwyciężenia w tej walce, która dla mnie nie jest nawet walką, ale zabawą.
       </p>
@@ -1105,53 +1098,53 @@ export const Chapter57: React.FC = () => {
         wyrazy, które przeprowadzą mnie z sali do sali. Co mi więc może przeszkodzić?…
       </p>
       <p data-index="197">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — A jednak na dnie serca twego leży wątpliwość: zląkłeś się bowiem oficera, który zdawał się iść za tobą…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        jednak na dnie serca twego leży wątpliwość: zląkłeś się bowiem oficera, który zdawał się iść za tobą…
       </p>
       <p data-index="198">Kapłan wzruszył ramionami.</p>
       <p data-index="199">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Ja niczego i nikogo nie lękam się — odparł spokojnie — tylko jestem ostrożny. Przewiduję wszystko i jestem nawet na to przygotowany, że mnie złapią…
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Ja niczego i
+        nikogo nie lękam się — odparł spokojnie — tylko jestem ostrożny. Przewiduję wszystko i jestem nawet na to przygotowany, że mnie złapią…
       </p>
       <p data-index="200">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Straszne czekałyby cię męki!… — szepnął{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Straszne czekałyby cię męki!… — szepnął{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>
         .
       </p>
       <p data-index="201">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Żadne. Prosto z podziemiów Labiryntu otworzę sobie drzwi do krainy, gdzie panuje wieczne światło.
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Żadne. Prosto z
+        podziemiów Labiryntu otworzę sobie drzwi do krainy, gdzie panuje wieczne światło.
       </p>
       <p data-index="202">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — I nie będziesz miał do mnie żalu?…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— I
+        nie będziesz miał do mnie żalu?…
       </p>
       <p data-index="203">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — Za co?… — spytał kapłan. — Dojdę do wielkiego celu: chcę w państwie zająć miejsce{" "}
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— Za co?… —
+        spytał kapłan. — Dojdę do wielkiego celu: chcę w państwie zająć miejsce{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>
         …
       </p>
       <p data-index="204">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — Przysięgam, że je zajmiesz!…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Przysięgam, że je zajmiesz!…
       </p>
       <p data-index="205">
-        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />
-        \n — O ile nie zginę — odparł{" "}
+        <span className="character-placeholder character-talking" data-character="Samentu" data-src-talking="/Pharaon/samentu-speaks.mp4" data-is-talking="true" />— O ile nie zginę
+        — odparł{" "}
         <span className="character-highlighted" data-character="Samentu" data-src-listening="/Pharaon/samentu-listens.mp4">
-          Samentu{" "}
+          Samentu
         </span>
         . — A że na szczyty gór wchodzi się nad przepaściami, że w tej wędrówce może się poślizgnąć noga i spadnę, cóż to znaczy? Ty, panie, zajmiesz się losem moich dzieci.
       </p>
       <p data-index="206">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n — A więc idź — rzekł faraon. — Jesteś godzien być najprzedniejszym moim pomocnikiem.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        więc idź — rzekł faraon. — Jesteś godzien być najprzedniejszym moim pomocnikiem.
       </p>
     </section>
   );

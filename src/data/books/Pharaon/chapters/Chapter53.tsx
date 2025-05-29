@@ -7,7 +7,7 @@ export const Chapter53: React.FC = () => {
       <p data-index="1">
         Tak tedy w miesiącu Hator, po trzydziestu czterech latach panowania, umarł{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon Mer-amen-Ramzes XII{" "}
+          faraon Mer-amen-Ramzes XII
         </span>
         , władca dwu światów, pan wieczności, rozdawca życia i wszelakiej uciechy.
       </p>
@@ -20,7 +20,7 @@ export const Chapter53: React.FC = () => {
       <p data-index="4">
         Pan zbudził się o wschodzie słońca i wsparty na dwu{" "}
         <span className="character-highlighted" data-character="Prorocy-dwaj-asystujacy-Ramzesowi-XII" data-src-listening="/Pharaon/prorocy-dwaj-asystujacy-ramzesowi-xii.png">
-          prorokach{" "}
+          prorokach
         </span>
         , otoczony chórem kapłanów, udał się do kaplicy Ozyrysa. Tam, jak zwykle, wskrzesił bóstwo, umył je i ubrał, złożył ofiarę i podniósł ręce do modlitwy.
       </p>
@@ -47,12 +47,12 @@ export const Chapter53: React.FC = () => {
         <strong>Chór I</strong>. O gwiazdo, wynurzająca się, wielka przez swoją światłość, ty sama kształtujesz swoje członki…
       </p>
       <p data-index="13">
-        <strong>Chór II</strong>. I nie urodzony przez nikogo rodzisz sam siebie na horyzoncie.\'
+        <strong>Chór II</strong>. I nie urodzony przez nikogo rodzisz sam siebie na horyzoncie.'
       </p>
       <p data-index="14">
         A w tym miejscu odezwał się{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>
         :
       </p>
@@ -67,14 +67,14 @@ export const Chapter53: React.FC = () => {
         <a href="#fn27" className="link-note">
           [27]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="16">Tak z podniesionymi rękoma mówił pan otoczony chmurą kadzideł. Nagle umilkł i rzucił się w tył, w ramiona asystujących kapłanów.</p>
       <p data-index="17">Już nie żył.</p>
       <p data-index="18">
         Wieść o śmierci{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         jak błyskawica obiegła pałac. Słudzy opuścili swoje zajęcia, dozorcy przestali czuwać nad niewolnikami, zaalarmowano gwardię i obsadzono wszystkie wejścia.
       </p>
@@ -91,7 +91,7 @@ export const Chapter53: React.FC = () => {
         <a href="#fn29" className="link-note">
           [29]
         </a>
-        \'
+        '
       </p>
       <p data-index="21">
         Straszny wrzask rozlegał się po wszystkich dziedzińcach, po całym parku. Odbijał się od gór wschodnich, na skrzydłach wiatru przeleciał Nil i zatrwożył miasto Memfis.
@@ -103,24 +103,24 @@ export const Chapter53: React.FC = () => {
       <p data-index="23">
         Na tę chwilę przybiegła{" "}
         <span className="character-highlighted" data-character="Nikotris" data-src-listening="/Pharaon/nikotris-listens.mp4">
-          królowa Nikotris{" "}
+          królowa Nikotris
         </span>
         , a zobaczywszy zwłoki już w lektyce, rzuciła się do nóg zmarłego.
       </p>
       <p data-index="24">
         <span className="character-placeholder character-talking" data-character="Nikotris" data-src-talking="/Pharaon/nikotris-speaks.mp4" data-is-talking="true" />— „O mężu mój!
         o bracie mój! o ukochany mój! — wołała, zanosząc się od płaczu. — O ukochany, zostań z nami, zostań w twoim domu, nie oddalaj się od tego miejsca na ziemi, w którym
-        przebywasz…\'
+        przebywasz…'
       </p>
-      <p data-index="25">— „W pokoju, w pokoju, na Zachód — śpiewali kapłani — o wielki władco, idź w pokoju na Zachód…\'</p>
+      <p data-index="25">— „W pokoju, w pokoju, na Zachód — śpiewali kapłani — o wielki władco, idź w pokoju na Zachód…'</p>
       <p data-index="26">
         <span className="character-placeholder character-talking" data-character="Nikotris" data-src-talking="/Pharaon/nikotris-speaks.mp4" data-is-talking="true" />— „Niestety! —
         mówiła{" "}
         <span className="character-highlighted" data-character="Nikotris" data-src-listening="/Pharaon/nikotris-listens.mp4">
-          królowa{" "}
+          królowa
         </span>{" "}
         — śpieszysz do przewozu, aby przeprawić się na drugi brzeg! O kapłani, o prorocy, nie śpieszcie się, zostawcie go; bo przecież wy wrócicie do domów, ale on pójdzie do kraju
-        wieczności…\'
+        wieczności…'
       </p>
       <p data-index="27">
         — „W pokoju, w pokoju, na Zachód!… — śpiewał chór kapłański. — Jeżeli podoba się Bogu, kiedy dzień wieczności nadejdzie, ujrzymy cię znowu, o władco, bo oto idziesz do
@@ -128,27 +128,27 @@ export const Chapter53: React.FC = () => {
         <a href="#fn30" className="link-note">
           [30]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="28">
         Na znak dany przez dostojnego{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>{" "}
         służebnice oderwały panią od nóg{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         i gwałtem odprowadziły do jej komnat.
       </p>
       <p data-index="29">
         Lektyka niesiona przez kapłanów ruszyła, a w niej władca ubrany i otoczony jak za życia. Na prawo i na lewo, przed nim i za nim szli: jenerałowie, skarbnicy,{" "}
         <span className="character-highlighted" data-character="Sedzia" data-src-listening="/Pharaon/sedzia-listens.mp4">
-          sędziowie{" "}
+          sędziowie
         </span>
         ,{" "}
         <span className="character-highlighted" data-character="Wielki-pisarz" data-src-listening="/Pharaon/wielki-pisarz-listens.mp4">
-          wielcy pisarze{" "}
+          wielcy pisarze
         </span>
         , nosiciel topora i łuku, a nade wszystko — tłum kapłanów różnego stopnia.
       </p>
@@ -159,7 +159,7 @@ export const Chapter53: React.FC = () => {
       <p data-index="32">
         Tu lektykę zasypano kwiatami, naprzeciw niej ustawiono posąg{" "}
         <span className="character-highlighted" data-character="Anubis-kaplan-w-ceremonii" data-src-listening="/Pharaon/anubis-kaplan-w-ceremonii.png">
-          Anubisa{" "}
+          Anubisa
         </span>
         <a href="#fn31" className="link-note">
           [31]
@@ -167,7 +167,7 @@ export const Chapter53: React.FC = () => {
         i — statek królewski ruszył ku drugiemu brzegowi Nilu, żegnany płaczem służby i dworskich kobiet.
       </p>
       <p data-index="33">
-        O dwie godziny od pałacu, za Nilem, za kanałem, za urodzajnymi polami i gajami palm między Memfisem a „Płaskowzgórzem Mumii\' leżała oryginalna dzielnica. Wszystkie jej
+        O dwie godziny od pałacu, za Nilem, za kanałem, za urodzajnymi polami i gajami palm między Memfisem a „Płaskowzgórzem Mumii' leżała oryginalna dzielnica. Wszystkie jej
         budowle były poświęcone zmarłym, a zamieszkane tylko przez kolchitów
         <a href="#fn32" className="link-note">
           [32]
@@ -181,7 +181,7 @@ export const Chapter53: React.FC = () => {
       <p data-index="35">
         Dzielnicę tą, oddaloną od Memfisu na parę tysięcy kroków, otaczał długi mur, tu i ówdzie opatrzony bramami. Orszak niosący zwłoki{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         zatrzymał się przed bramą najwspanialszą, a jeden z kapłanów zapukał.
       </p>
@@ -227,7 +227,7 @@ export const Chapter53: React.FC = () => {
         Teraz kapłani zostawili lektykę pod bramą i śpiesznie odeszli, ażeby nie padło na nich nieczyste tchnienie zwłok nagromadzonych w tym miejscu. Zostali tylko urzędnicy
         cywilni pod przewodnictwem najwyższego{" "}
         <span className="character-highlighted" data-character="Sedzia" data-src-listening="/Pharaon/sedzia-listens.mp4">
-          sędziego{" "}
+          sędziego
         </span>{" "}
         i skarbnika.
       </p>
@@ -235,7 +235,7 @@ export const Chapter53: React.FC = () => {
       <p data-index="43">
         Na ich widok{" "}
         <span className="character-highlighted" data-character="Sedzia" data-src-listening="/Pharaon/sedzia-listens.mp4">
-          sędzia{" "}
+          sędzia
         </span>{" "}
         odezwał się:
       </p>
@@ -269,11 +269,11 @@ export const Chapter53: React.FC = () => {
         — Stanie się, jak żądacie — odpowiedział jeden z zasłoniętych kapłanów.
       </p>
       <p data-index="48">Po czym inni podnieśli lektykę i weszli z nią w głąb dzielnicy zmarłych śpiewając:</p>
-      <p data-index="49">— „Idziesz w pokoju do Abydos!… Obyś doszedł w pokoju do Zachodu tebańskiego!… Na Zachód, na Zachód, do ziemi sprawiedliwych!\'</p>
+      <p data-index="49">— „Idziesz w pokoju do Abydos!… Obyś doszedł w pokoju do Zachodu tebańskiego!… Na Zachód, na Zachód, do ziemi sprawiedliwych!'</p>
       <p data-index="50">
         Brama zamknęła się, a najwyższy{" "}
         <span className="character-highlighted" data-character="Sedzia" data-src-listening="/Pharaon/sedzia-listens.mp4">
-          sędzia{" "}
+          sędzia
         </span>
         , skarbnik i towarzyszący im urzędnicy zawrócili się do przewozu i pałacu.
       </p>
@@ -281,7 +281,7 @@ export const Chapter53: React.FC = () => {
         Przez ten czas zakapturzeni kapłani odnieśli lektykę do ogromnego budynku, gdzie balsamowano tylko królewskie zwłoki oraz tych najwyższych dostojników, którzy pozyskali
         wyjątkową łaskę{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>
         . Zatrzymali się w przysionku, gdzie stała złota łódź na kółkach, i zaczęli wydobywać nieboszczyka z lektyki.
       </p>
@@ -294,7 +294,7 @@ export const Chapter53: React.FC = () => {
         />
         — Patrzcie! — zawołał jeden z zakapturzonych — nie sąż to złodzieje?…{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Faraon{" "}
+          Faraon
         </span>{" "}
         przecie umarł pod kaplicą Ozyrysa, więc musiał być w paradnym stroju… A tu — o!… Zamiast złotych bransolet — mosiężne, łańcuch także mosiężny, a w pierścieniach fałszywe
         klejnoty…
@@ -338,11 +338,11 @@ export const Chapter53: React.FC = () => {
         />
         — Uuu!… mówią, że to będzie ostry władca — wtrącił inny. — Przyjaźni się z Fenicjanami, chętnie przestaje z{" "}
         <span className="character-highlighted" data-character="Pentuer" data-src-listening="/Pharaon/pentuer-listens.mp4">
-          Pentuerem{" "}
+          Pentuerem
         </span>
         , który przecie nie jest rodowity kapłan, tylko z takich biedaków jak my… A wojsko, powiadają, że dałoby się spalić i wytopić za nowego{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraona{" "}
+          faraona
         </span>
         …
       </p>
@@ -364,7 +364,7 @@ export const Chapter53: React.FC = () => {
         />
         — Gdzież on jest, ten nowy{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>
         ?… — odezwał się inny. — W pustyni!… Otóż lękam się, ażeby zanim wróci do Memfis, nie spotkało go nieszczęście…
       </p>
@@ -386,7 +386,7 @@ export const Chapter53: React.FC = () => {
         />
         — Oj ty głupi! — wtrącił milczący dotychczas balsamista. —{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Faraon{" "}
+          Faraon
         </span>{" "}
         podoła kapłanom!…
       </p>
@@ -430,11 +430,11 @@ export const Chapter53: React.FC = () => {
         />
         — No, więc ja ci mówię, że prędziej lew, bawół czy wicher przewróci piramidę, aniżeli{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         pokona stan kapłański… Choćby ten{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         był lwem, bawołem i wichrem w jednej osobie…
       </p>
@@ -443,7 +443,7 @@ export const Chapter53: React.FC = () => {
       <p data-index="74">
         — Wszystko jedno… Dawać go tu prędzej, bo{" "}
         <span className="character-highlighted" data-character="Izyda-kaplanka-w-ceremonii" data-src-listening="/Pharaon/izyda-kaplanka-w-ceremonii.png">
-          Izyda{" "}
+          Izyda
         </span>{" "}
         za godzinę musi iść do miasta…
       </p>
@@ -455,7 +455,7 @@ export const Chapter53: React.FC = () => {
       <p data-index="77">
         Sala wyobrażała sklepienie niebieskie, ganek drogę słońca na niebie, zmarły zaś{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraon{" "}
+          faraon
         </span>{" "}
         miał być Ozyrysem, czyli słońcem, które posuwa się od wschodu ku zachodowi.
       </p>
@@ -464,16 +464,16 @@ export const Chapter53: React.FC = () => {
       <p data-index="80">Rozmowy umilkły. W górze rozległ się trzykrotny dźwięk spiżowej blachy i — na balkonie ukazała się złocista łódź słońca, w której jechał nieboszczyk.</p>
       <p data-index="81">Na dole zabrzmiał hymn na cześć słońca:</p>
       <p data-index="82">„Oto ukazuje się w obłoku, aby oddzielić niebo od ziemi, a później je połączyć…</p>
-      <p data-index="83">Nieustannie ukryty w każdej rzeczy, on jeden żyjący, w którym wiekuiście istnieją wszystkie rzeczy…\'</p>
+      <p data-index="83">Nieustannie ukryty w każdej rzeczy, on jeden żyjący, w którym wiekuiście istnieją wszystkie rzeczy…'</p>
       <p data-index="84">Łódź stopniowo posuwała się w górę łuku, wreszcie stanęła na najwyższym szczycie.</p>
       <p data-index="85">
         Wówczas na dolnym krańcu łuku ukazała się kapłanka przebrana za boginią{" "}
         <span className="character-highlighted" data-character="Izyda-kaplanka-w-ceremonii" data-src-listening="/Pharaon/izyda-kaplanka-w-ceremonii.png">
-          Izydę{" "}
+          Izydę
         </span>
         , z synem{" "}
         <span className="character-highlighted" data-character="Horus-osoba-w-ceremonii-pogrzebowej" data-src-listening="/Pharaon/horus-osoba-w-ceremonii-pogrzebowej.png">
-          Horusem{" "}
+          Horusem
         </span>
         <a href="#fn34" className="link-note">
           [34]
@@ -490,27 +490,27 @@ export const Chapter53: React.FC = () => {
         <a href="#fn36" className="link-note">
           [36]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="88">
         Łódź znikła na zachodnim końcu balkonu,{" "}
         <span className="character-highlighted" data-character="Izyda-kaplanka-w-ceremonii" data-src-listening="/Pharaon/izyda-kaplanka-w-ceremonii.png">
-          Izyda{" "}
+          Izyda
         </span>{" "}
         z{" "}
         <span className="character-highlighted" data-character="Horus-osoba-w-ceremonii-pogrzebowej" data-src-listening="/Pharaon/horus-osoba-w-ceremonii-pogrzebowej.png">
-          Horusem{" "}
+          Horusem
         </span>{" "}
         stanęli na szczycie łuku. Wówczas do łodzi przybiegła gromada kapłanów, wydobyli zwłoki{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         i położyli je na marmurowym stole, niby Ozyrysa na spoczynek po dziennym trudzie.
       </p>
       <p data-index="89">
         Teraz do nieboszczyka zbliżył się{" "}
         <span className="character-highlighted" data-character="Paraszyta-przebrany-za-Tyfona" data-src-listening="/Pharaon/paraszyta-przebrany-za-tyfona-listens.mp4">
-          paraszyta przebrany za bożka Tyfona{" "}
+          paraszyta przebrany za bożka Tyfona
         </span>
         . Na głowie miał okropną maskę, rudą kudłatą perukę, na plecach skórę dzika, a w ręku — kamienny nóż etiopski.
       </p>
@@ -524,7 +524,7 @@ export const Chapter53: React.FC = () => {
         />
         — Co robisz śpiącemu, bracie Tyfonie? — zapytała go z balkonu{" "}
         <span className="character-highlighted" data-character="Izyda-kaplanka-w-ceremonii" data-src-listening="/Pharaon/izyda-kaplanka-w-ceremonii.png">
-          Izyda{" "}
+          Izyda
         </span>
         .
       </p>
@@ -537,21 +537,21 @@ export const Chapter53: React.FC = () => {
         />
         — Oskrobuję nogi memu bratu Ozyrysowi, aby ziemskim pyłem nie zanieczyścił nieba — odpowiedział{" "}
         <span className="character-highlighted" data-character="Paraszyta-przebrany-za-Tyfona" data-src-listening="/Pharaon/paraszyta-przebrany-za-tyfona-listens.mp4">
-          paraszyta przebrany za Tyfona{" "}
+          paraszyta przebrany za Tyfona
         </span>
         .
       </p>
       <p data-index="93">
         Oderznąwszy podeszwy{" "}
         <span className="character-highlighted" data-character="Paraszyta-przebrany-za-Tyfona" data-src-listening="/Pharaon/paraszyta-przebrany-za-tyfona-listens.mp4">
-          paraszyta{" "}
+          paraszyta
         </span>{" "}
         porwał zgięty drut, zanurzył go w nosie zmarłego i zaczął wydobywać mózg. Następnie rozciął mu brzuch i tym otworem szybko wyciągnął wnętrzności, serce i płuca.
       </p>
       <p data-index="94">
         Przez ten czas pomocnicy{" "}
         <span className="character-highlighted" data-character="Paraszyta-przebrany-za-Tyfona" data-src-listening="/Pharaon/paraszyta-przebrany-za-tyfona-listens.mp4">
-          Tyfona{" "}
+          Tyfona
         </span>{" "}
         przynieśli cztery wielkie urny ozdobione głowami bogów: Hape, Emset, Duamutf i Quebhsneuf
         <a href="#fn37" className="link-note">
@@ -568,11 +568,11 @@ export const Chapter53: React.FC = () => {
         />
         — A co tam robisz, bracie{" "}
         <span className="character-highlighted" data-character="Paraszyta-przebrany-za-Tyfona" data-src-listening="/Pharaon/paraszyta-przebrany-za-tyfona-listens.mp4">
-          Tyfonie{" "}
+          Tyfonie
         </span>
         ? — zapytała po raz drugi{" "}
         <span className="character-highlighted" data-character="Izyda-kaplanka-w-ceremonii" data-src-listening="/Pharaon/izyda-kaplanka-w-ceremonii.png">
-          Izyda{" "}
+          Izyda
         </span>
         .
       </p>
@@ -585,7 +585,7 @@ export const Chapter53: React.FC = () => {
         />
         — Oczyszczam brata mego, Ozyrysa, z rzeczy ziemskich, ażeby stał się piękniejszym — odpowiedział{" "}
         <span className="character-highlighted" data-character="Paraszyta-przebrany-za-Tyfona" data-src-listening="/Pharaon/paraszyta-przebrany-za-tyfona-listens.mp4">
-          paraszyta{" "}
+          paraszyta
         </span>
         .
       </p>
@@ -596,11 +596,11 @@ export const Chapter53: React.FC = () => {
       <p data-index="98">
         Tymczasem{" "}
         <span className="character-highlighted" data-character="Izyda-kaplanka-w-ceremonii" data-src-listening="/Pharaon/izyda-kaplanka-w-ceremonii.png">
-          Izyda{" "}
+          Izyda
         </span>
         , przeszedłszy cały balkon, zbliżyła się do komnaty, w której{" "}
         <span className="character-highlighted" data-character="Paraszyta-przebrany-za-Tyfona" data-src-listening="/Pharaon/paraszyta-przebrany-za-tyfona-listens.mp4">
-          paraszyta{" "}
+          paraszyta
         </span>{" "}
         otworzył i oczyścił królewskie zwłoki. Spojrzała na marmurowy stół, a widząc, że był pusty, zapytała przestraszona:
       </p>
@@ -616,7 +616,7 @@ export const Chapter53: React.FC = () => {
       <p data-index="100">
         Wtem ryknął grzmot, odezwały się trąby i spiżowe blachy, a{" "}
         <span className="character-highlighted" data-character="Paraszyta-przebrany-za-Tyfona" data-src-listening="/Pharaon/paraszyta-przebrany-za-tyfona-listens.mp4">
-          paraszyta przebrany za Tyfona{" "}
+          paraszyta przebrany za Tyfona
         </span>{" "}
         wybuchnął śmiechem i zawołał:
       </p>
@@ -629,7 +629,7 @@ export const Chapter53: React.FC = () => {
         />
         — Piękna{" "}
         <span className="character-highlighted" data-character="Izyda-kaplanka-w-ceremonii" data-src-listening="/Pharaon/izyda-kaplanka-w-ceremonii.png">
-          Izydo{" "}
+          Izydo
         </span>
         , która pospołu z gwiazdami rozweselasz noce, nie ma już twego małżonka!… Już nigdy promieniejący Ozyrys nie usiądzie na złocistej łodzi, już nigdy słońce nie ukaże się na
         firmamencie… Ja to uczyniłem, ja, Set, i ukryłem go tak głęboko, że go żaden z bogów ani wszyscy razem nie odnajdą!…
@@ -638,7 +638,7 @@ export const Chapter53: React.FC = () => {
         Na te słowa bogini rozdarła szaty, zaczęła jęczeć i rwać sobie włosy. Znowu odezwały się trąby, grzmoty i dzwony, wśród kapłanów i kapłanek wszczął się szmer, potem krzyk,
         klątwy i — nagle wszyscy rzucili się na{" "}
         <span className="character-highlighted" data-character="Paraszyta-przebrany-za-Tyfona" data-src-listening="/Pharaon/paraszyta-przebrany-za-tyfona-listens.mp4">
-          Tyfona{" "}
+          Tyfona
         </span>
         , wołając:
       </p>
@@ -649,7 +649,7 @@ export const Chapter53: React.FC = () => {
       <p data-index="104">
         Tak przeklinając, wszyscy rzucili się na{" "}
         <span className="character-highlighted" data-character="Paraszyta-przebrany-za-Tyfona" data-src-listening="/Pharaon/paraszyta-przebrany-za-tyfona-listens.mp4">
-          Tyfona{" "}
+          Tyfona
         </span>{" "}
         z pięściami i kijami, a rudowłosy bożek począł uciekać i w końcu wybiegł z sali.
       </p>
@@ -663,11 +663,11 @@ export const Chapter53: React.FC = () => {
         />
         — No dosyć! — zawołał{" "}
         <span className="character-highlighted" data-character="Najstarszy-kaplan-dzielnicy-zmarlych" data-src-listening="/Pharaon/najstarszy-kaplan-dzielnicy-zmarlych.png">
-          najstarszy kapłan{" "}
+          najstarszy kapłan
         </span>{" "}
         do gromady, która już naprawdę zaczęła się bić między sobą. — Ty,{" "}
         <span className="character-highlighted" data-character="Izyda-kaplanka-w-ceremonii" data-src-listening="/Pharaon/izyda-kaplanka-w-ceremonii.png">
-          Izydo{" "}
+          Izydo
         </span>
         , możesz iść do miasta, a reszta do innych nieboszczyków, którzy czekają na nas… Nie zaniedbujcie zwyczajnych zmarłych, bo nie wiadomo, jak nam za tego zapłacą…
       </p>
@@ -680,7 +680,7 @@ export const Chapter53: React.FC = () => {
         />
         — Z pewnością niewiele! — wtrącił balsamista. — Mówią, że w skarbie nie ma nic, a{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Fenicjanie{" "}
+          Fenicjanie
         </span>{" "}
         grożą, że przestaną pożyczać, jeżeli nie otrzymają nowych praw.
       </p>
@@ -693,7 +693,7 @@ export const Chapter53: React.FC = () => {
         />
         — Bodaj śmierć wytępiła tych waszych{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Fenicjan{" "}
+          Fenicjan
         </span>
         !… Niedługo człowiek będzie musiał żebrać u nich o placek jęczmienny, tak już wszystko zagarnęli…
       </p>
@@ -706,43 +706,43 @@ export const Chapter53: React.FC = () => {
         />
         — Ale jeżeli oni nie dadzą{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          faraonowi{" "}
+          faraonowi
         </span>{" "}
         pieniędzy, za pogrzeb nic nie dostaniemy…
       </p>
       <p data-index="110">
         Stopniowo rozmowy ucichły i obecni opuścili niebieską salę. Tylko przy jeziorku, gdzie mokły zwłoki{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>
         , została warta.
       </p>
       <p data-index="111">
         Cała ta uroczystość odtwarzająca legendę o zabiciu Ozyrysa (słońce) przez{" "}
         <span className="character-highlighted" data-character="Paraszyta-przebrany-za-Tyfona" data-src-listening="/Pharaon/paraszyta-przebrany-za-tyfona-listens.mp4">
-          Tyfona{" "}
+          Tyfona
         </span>{" "}
         (bożek nocy i występku) służyła do tego, ażeby rozciąć i oczyścić zwłoki{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>
         , i tym sposobem przygotować je do właściwego balsamowania.
       </p>
       <p data-index="112">
         Przez siedemdziesiąt dni leżał nieboszczyk w wodzie nasyconej sodą, zdaje się, na pamiątkę, że zły{" "}
         <span className="character-highlighted" data-character="Paraszyta-przebrany-za-Tyfona" data-src-listening="/Pharaon/paraszyta-przebrany-za-tyfona-listens.mp4">
-          Tyfon{" "}
+          Tyfon
         </span>{" "}
         utopił ciało brata w Sodowych Jeziorach. Przez wszystkie te dni, rano i wieczór, kapłanka przebrana za{" "}
         <span className="character-highlighted" data-character="Izyda-kaplanka-w-ceremonii" data-src-listening="/Pharaon/izyda-kaplanka-w-ceremonii.png">
-          Izydę{" "}
+          Izydę
         </span>{" "}
         przychodziła do niebieskiej sali. Tam jęcząc i rwąc sobie włosy, wypytywała obecnych: czy kto nie widział boskiego jej małżonka i brata?
       </p>
       <p data-index="113">
         Po upływie tego czasu żałoby zjawił się w sali{" "}
         <span className="character-highlighted" data-character="Horus-osoba-w-ceremonii-pogrzebowej" data-src-listening="/Pharaon/horus-osoba-w-ceremonii-pogrzebowej.png">
-          Horus{" "}
+          Horus
         </span>
         , syn i następca Ozyrysa, ze swoją świtą i — oni dopiero spostrzegli wannę z wodą.
       </p>
@@ -755,14 +755,14 @@ export const Chapter53: React.FC = () => {
         />
         — Może by tu poszukać zwłok mego ojca i brata? — spytał{" "}
         <span className="character-highlighted" data-character="Horus-osoba-w-ceremonii-pogrzebowej" data-src-listening="/Pharaon/horus-osoba-w-ceremonii-pogrzebowej.png">
-          Horus{" "}
+          Horus
         </span>
         .
       </p>
       <p data-index="115">
         Jakoż poszukali, znaleźli i wśród ogromnej radości kapłanów, przy dźwiękach muzyki wydobyli ciało{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         z umacniającej kąpieli.
       </p>
@@ -772,19 +772,19 @@ export const Chapter53: React.FC = () => {
         Ciało nieboszczyka zwrócone głową do południa obmywano poświęconą wodą, a jego wnętrze winem palmowym. Na posadzce osypanej popiołem zasiadały płaczki i szarpiąc sobie
         włosy, drapiąc twarze opłakiwały zmarłego. Dokoła śmiertelnego łoża zgromadzili się kapłani przebrani za bożków. Więc naga{" "}
         <span className="character-highlighted" data-character="Izyda-kaplanka-w-ceremonii" data-src-listening="/Pharaon/izyda-kaplanka-w-ceremonii.png">
-          Izis{" "}
+          Izis
         </span>{" "}
         w koronie faraonów, młodzieńczy{" "}
         <span className="character-highlighted" data-character="Horus-osoba-w-ceremonii-pogrzebowej" data-src-listening="/Pharaon/horus-osoba-w-ceremonii-pogrzebowej.png">
-          Horus{" "}
+          Horus
         </span>
         ,{" "}
         <span className="character-highlighted" data-character="Anubis-kaplan-w-ceremonii" data-src-listening="/Pharaon/anubis-kaplan-w-ceremonii.png">
-          Anubis{" "}
+          Anubis
         </span>{" "}
         z głową szakala,{" "}
         <span className="character-highlighted" data-character="Tot-kaplan-w-ceremonii" data-src-listening="/Pharaon/tot-kaplan-w-ceremonii.png">
-          Tot{" "}
+          Tot
         </span>
         <a href="#fn38" className="link-note">
           [38]
@@ -808,11 +808,11 @@ export const Chapter53: React.FC = () => {
         </a>
         , a jego prawe oko jest okiem boga Tumu, którego promienie przebijają ciemność. Jego lewe oko jest okiem{" "}
         <span className="character-highlighted" data-character="Horus-osoba-w-ceremonii-pogrzebowej" data-src-listening="/Pharaon/horus-osoba-w-ceremonii-pogrzebowej.png">
-          Horusa{" "}
+          Horusa
         </span>
         , które tępi wszystkie stworzenia żyjące, warga górna to{" "}
         <span className="character-highlighted" data-character="Izyda-kaplanka-w-ceremonii" data-src-listening="/Pharaon/izyda-kaplanka-w-ceremonii.png">
-          Izis{" "}
+          Izis
         </span>
         <a href="#fn41" className="link-note">
           [41]
@@ -833,7 +833,7 @@ export const Chapter53: React.FC = () => {
         <a href="#fn45" className="link-note">
           [45]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="122">Inny kapłan mówi:</p>
       <p data-index="123">
@@ -841,7 +841,7 @@ export const Chapter53: React.FC = () => {
         <a href="#fn46" className="link-note">
           [46]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="124">A tymczasem na szyi zmarłego wieszają wizerunek chrząszcza skarabeusza zrobiony z drogiego kamienia, na którym jest napis:</p>
       <p data-index="125">
@@ -849,7 +849,7 @@ export const Chapter53: React.FC = () => {
         <a href="#fn47" className="link-note">
           [47]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="126">
         Teraz każdą rękę i nogę, każdy palec zmarłego owijają kapłani taśmami, na których wypisane są modlitwy i zaklęcia. Taśmy te podkleja się gumą i balsamami. Na piersiach zaś
@@ -863,7 +863,7 @@ export const Chapter53: React.FC = () => {
       <p data-index="132">
         Wczoraj — jest to Ozyrys, Jutro — jest to Ra, w tym dniu, kiedy zniweczy nieprzyjaciół Pana, który jest nad wszystkim, i kiedy poświęci syna swego{" "}
         <span className="character-highlighted" data-character="Horus-osoba-w-ceremonii-pogrzebowej" data-src-listening="/Pharaon/horus-osoba-w-ceremonii-pogrzebowej.png">
-          Horusa{" "}
+          Horusa
         </span>
         . Innymi słowy: w dniu, kiedy trumnę Ozyrysa spotka jego ojciec Ra. On zwalczy bogów na rozkaz Ozyrysa, pana góry Amenti.
       </p>
@@ -881,7 +881,7 @@ export const Chapter53: React.FC = () => {
         <a href="#fn48" className="link-note">
           [48]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="137">
         Gdy każdy członek zmarłego został już owinięty modlitewnymi taśmami i zaopatrzony w amulety, gdy posiada już dostateczny zasób medytacji, które pozwolą mu orientować się w
@@ -891,7 +891,7 @@ export const Chapter53: React.FC = () => {
         Albowiem między mogiłą i niebem czeka na zmarłego czterdziestu dwu straszliwych sędziów, którzy, pod prezydencją Ozyrysa, badają jego ziemskie życie. Dopiero gdy serce
         nieboszczyka, zważone na wadze sprawiedliwości okaże się równym bogini prawdy, gdy bóg Dutes zapisujący na tabliczkach czyny zmarłego uważa je za dobre, dopiero wtedy{" "}
         <span className="character-highlighted" data-character="Horus-osoba-w-ceremonii-pogrzebowej" data-src-listening="/Pharaon/horus-osoba-w-ceremonii-pogrzebowej.png">
-          Horus{" "}
+          Horus
         </span>{" "}
         bierze duszę za rękę i prowadzi ją przed tron Ozyrysa.
       </p>
@@ -911,7 +911,7 @@ export const Chapter53: React.FC = () => {
         <a href="#fn49" className="link-note">
           [49]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="142">
         Gdy nieboszczyk już umiał, dzięki Księdze Zmarłych, radzić sobie w krainie wiekuistej, a przede wszystkim — gdy wiedział, jak usprawiedliwić się przed sądem czterdziestu
@@ -920,11 +920,11 @@ export const Chapter53: React.FC = () => {
       <p data-index="143">
         W tym celu balsamiści otaczający świeżą mumię{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         odsuwali się, a przychodził{" "}
         <span className="character-highlighted" data-character="Najstarszy-kaplan-dzielnicy-zmarlych" data-src-listening="/Pharaon/najstarszy-kaplan-dzielnicy-zmarlych.png">
-          arcykapłan tej dzielnicy{" "}
+          arcykapłan tej dzielnicy
         </span>{" "}
         i szeptał zmarłemu do ucha:
       </p>
@@ -949,7 +949,7 @@ export const Chapter53: React.FC = () => {
         <a href="#fn50" className="link-note">
           [50]
         </a>
-        .\'
+        .'
       </p>
       <p data-index="147">
         Zwłoki królewskie ubrano w kosztowne szaty, w złotą maskę na twarz, w pierścienie i bransolety na rękach, które złożono na krzyż. Pod głowę dano mu z kości słoniowej
@@ -959,7 +959,7 @@ export const Chapter53: React.FC = () => {
       <p data-index="148">
         Po trzech miesiącach pobytu w dzielnicy zmarłych mumia{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          faraona{" "}
+          faraona
         </span>{" "}
         była gotowa do uroczystego pogrzebu. Więc — odniesiono ją na powrót do królewskiego pałacu.
       </p>

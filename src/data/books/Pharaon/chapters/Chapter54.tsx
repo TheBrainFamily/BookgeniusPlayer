@@ -68,7 +68,7 @@ export const Chapter54: React.FC = () => {
         Nomarchowie i szlachta cierpli na myśl, że ich chłop może próżnować przez pięćdziesiąt dni w roku, a co gorsza — posiadać na własność ziemię, choćby tylko w rozmiarach
         wystarczających na zbudowanie grobu. Kapłani bledli i zaciskali zęby, patrząc na gospodarstwo{" "}
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzesa XIII{" "}
+          Ramzesa XIII
         </span>{" "}
         i sposób, w jaki ich traktował.
       </p>
@@ -78,7 +78,7 @@ export const Chapter54: React.FC = () => {
         piętrze gwardię, w pokojach znajdujących się wzdłuż muru — Etiopów. Wartę dokoła pałacyku trzymali Azjaci, a przy komnatach jego świątobliwości kwaterował ten szwadron,
         którego żołnierze towarzyszyli panu w czasie pościgu za{" "}
         <span className="character-highlighted" data-character="Tehenna" data-src-listening="/Pharaon/tehenna.png">
-          Tehenną{" "}
+          Tehenną
         </span>{" "}
         przez pustynię.
       </p>
@@ -88,7 +88,7 @@ export const Chapter54: React.FC = () => {
       <p data-index="27">
         Prawda, że korpus kapłański, który był w głównym pałacu, został w nim i odprawiał obrządki religijne pod przewodnictwem dostojnego{" "}
         <span className="character-highlighted" data-character="Sem" data-src-listening="/Pharaon/sem-listens.mp4">
-          Sema{" "}
+          Sema
         </span>
         . Ale ponieważ kapłani nie towarzyszyli faraonowi przy śniadaniu, obiedzie i kolacji, więc ich żywność stała się bardzo niewykwintną.
       </p>
@@ -97,7 +97,7 @@ export const Chapter54: React.FC = () => {
         że dla bogów i przodków wystarczą kwiaty i wonności, a że sami prorocy, jak nakazuje moralność, powinni jadać jęczmienne placki i popijać wodą lub piwem. Dla poparcia
         swoich grubiańskich teorii skarbnik powoływał się na przykład arcykapłana{" "}
         <span className="character-highlighted" data-character="Sem" data-src-listening="/Pharaon/sem-listens.mp4">
-          Sema{" "}
+          Sema
         </span>
         , który żył jak pokutnik, a co gorsze, mówił im, że jego świątobliwość, wraz z jenerałami, prowadzi żołnierską kuchnię.
       </p>
@@ -108,18 +108,18 @@ export const Chapter54: React.FC = () => {
       <p data-index="30">
         I może uczyniliby tak natychmiast, gdyby najdostojniejsi{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>{" "}
         i{" "}
         <span className="character-highlighted" data-character="Mefres" data-src-listening="/Pharaon/mefres-listens.mp4">
-          Mefres{" "}
+          Mefres
         </span>{" "}
         nie rozkazali im wytrwać na miejscu.
       </p>
       <p data-index="31">
         Ale i położenie{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhora{" "}
+          Herhora
         </span>{" "}
         przy nowym panu nie mogło nazywać się pomyślnym. Do niedawna wszechwładny minister, który prawie nie opuszczał pokojów królewskich, siedział dziś samotny w swoim pałacyku i
         nieraz nie widywał nowego faraona przez całe dekady. Był on jeszcze ministrem wojny, ale już prawie nie wydawał rozkazów. Wszystkie bowiem interesa
@@ -135,42 +135,42 @@ export const Chapter54: React.FC = () => {
       <p data-index="32">
         Jego dostojność{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhor{" "}
+          Herhor
         </span>
         , jeżeli kiedy był wezwany przez władcę, to chyba po to, ażeby usłyszeć wymówkę.
       </p>
       <p data-index="33">Niemniej wszyscy dostojnicy przyznawali, że nowy faraon bardzo pracuje.</p>
       <p data-index="34">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         wstawał przed wschodem słońca, kąpał się i spalał kadzidło przed posągiem Ozyrysa. Natychmiast potem słuchał raportów:{" "}
         <span className="character-highlighted" data-character="Sedzia" data-src-listening="/Pharaon/sedzia-listens.mp4">
-          najwyższego sędziego{" "}
+          najwyższego sędziego
         </span>
         ,{" "}
         <span className="character-highlighted" data-character="Wielki-pisarz" data-src-listening="/Pharaon/wielki-pisarz-listens.mp4">
-          najwyższego pisarza{" "}
+          najwyższego pisarza
         </span>{" "}
         stodół i obór w całym kraju,{" "}
         <span className="character-highlighted" data-character="Wielki-skarbnik-panstwowy" data-src-listening="/Pharaon/wielki-skarbnik-panstwowy-listens.mp4">
-          najwyższego skarbnika{" "}
+          najwyższego skarbnika
         </span>
         , wreszcie —{" "}
         <span className="character-highlighted" data-character="Naczelnik-palacow-Ramzesa-XIII" data-src-listening="/Pharaon/naczelnik-palacow-ramzesa-xiii.png">
-          naczelnika swoich pałaców{" "}
+          naczelnika swoich pałaców
         </span>
         . Ten ostatni cierpiał najwięcej: nie było bowiem dnia, ażeby pan nie mówił mu, że utrzymanie dworu za dużo kosztuje i że jest w nim za wiele osób.
       </p>
       <p data-index="35">
         Istotnie, mieszkało w pałacu królewskim kilkaset kobiet zmarłego faraona z odpowiednią ilością dzieci i służby. Ciągle upominany{" "}
         <span className="character-highlighted" data-character="Naczelnik-palacow-Ramzesa-XIII" data-src-listening="/Pharaon/naczelnik-palacow-ramzesa-xiii.png">
-          naczelnik dworu{" "}
+          naczelnik dworu
         </span>{" "}
         z dnia na dzień wypędzał po kilkanaście osób, a innym ograniczał wydatki. Skutkiem czego po upływie miesiąca wszystkie damy dworu z krzykiem i płaczem pobiegły do
         mieszkania królowej{" "}
         <span className="character-highlighted" data-character="Nikotris" data-src-listening="/Pharaon/nikotris-listens.mp4">
-          Nikotris{" "}
+          Nikotris
         </span>
         , błagając o ratunek.
       </p>
@@ -180,18 +180,18 @@ export const Chapter54: React.FC = () => {
       <p data-index="37">
         Faraon wysłuchał jej ze zmarszczonym czołem i rozkazał{" "}
         <span className="character-highlighted" data-character="Naczelnik-palacow-Ramzesa-XIII" data-src-listening="/Pharaon/naczelnik-palacow-ramzesa-xiii.png">
-          naczelnikowi dworu{" "}
+          naczelnikowi dworu
         </span>{" "}
         już nie posuwać dalej oszczędności. Zarazem jednak powiedział najczcigodniejszej pani, że po pogrzebie ojca kobiety będą usunięte z pałacu i rozesłane po folwarkach.
       </p>
       <p data-index="38">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Nasz dwór — mówił — kosztuje około trzydziestu tysięcy talentów rocznie, czyli o połowę więcej aniżeli całe wojsko. Takiej sumy nie mogę wydawać bez zrujnowania siebie
-        i państwa.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Nasz dwór — mówił — kosztuje około trzydziestu tysięcy talentów rocznie, czyli o połowę więcej aniżeli całe wojsko. Takiej sumy nie mogę wydawać bez zrujnowania siebie i
+        państwa.
       </p>
       <p data-index="39">
-        <span className="character-placeholder character-talking" data-character="Nikotris" data-src-talking="/Pharaon/nikotris-speaks.mp4" data-is-talking="true" />
-        \n— Czyń, jak chcesz — odparła królowa. — Egipt jest twój. Lękam się jednak, że rozpędzeni ludzie dworscy staną się twymi wrogami.
+        <span className="character-placeholder character-talking" data-character="Nikotris" data-src-talking="/Pharaon/nikotris-speaks.mp4" data-is-talking="true" />— Czyń, jak
+        chcesz — odparła królowa. — Egipt jest twój. Lękam się jednak, że rozpędzeni ludzie dworscy staną się twymi wrogami.
       </p>
       <p data-index="40">Na to pan milcząc wziął matkę za rękę, poprowadził ją do okna i wskazał las włóczni musztrującej się na dziedzińcu piechoty.</p>
       <p data-index="41">
@@ -199,13 +199,13 @@ export const Chapter54: React.FC = () => {
         głosem:
       </p>
       <p data-index="42">
-        <span className="character-placeholder character-talking" data-character="Nikotris" data-src-talking="/Pharaon/nikotris-speaks.mp4" data-is-talking="true" />
-        \n— Zaprawdę, jesteś synem Izydy i Ozyrysa i dobrze uczyniłam, odstępując cię bogini… Nareszcie Egipt ma władcę!…
+        <span className="character-placeholder character-talking" data-character="Nikotris" data-src-talking="/Pharaon/nikotris-speaks.mp4" data-is-talking="true" />— Zaprawdę,
+        jesteś synem Izydy i Ozyrysa i dobrze uczyniłam, odstępując cię bogini… Nareszcie Egipt ma władcę!…
       </p>
       <p data-index="43">Od tej pory czcigodna pani nigdy w żadnej sprawie nie wstawiała się do syna. A gdy ją proszono o protekcję, odpowiadała:</p>
       <p data-index="44">
-        <span className="character-placeholder character-talking" data-character="Nikotris" data-src-talking="/Pharaon/nikotris-speaks.mp4" data-is-talking="true" />
-        \n— Jestem sługą jego świątobliwości i radzę wam spełniać rozkazy pana bez oporu. Wszystko bowiem, co on robi, pochodzi z natchnienia bogów; a któż oprze się bogom?…
+        <span className="character-placeholder character-talking" data-character="Nikotris" data-src-talking="/Pharaon/nikotris-speaks.mp4" data-is-talking="true" />— Jestem sługą
+        jego świątobliwości i radzę wam spełniać rozkazy pana bez oporu. Wszystko bowiem, co on robi, pochodzi z natchnienia bogów; a któż oprze się bogom?…
       </p>
       <p data-index="45">
         Po śniadaniu faraon zajmował się sprawami ministerium wojny i skarbowością, a około trzeciej po południu, otoczony wielką świtą, wyjeżdżał do wojsk obozujących pod Memfisem
@@ -234,7 +234,7 @@ export const Chapter54: React.FC = () => {
         Wyszło też polecenie do rodzin stanu wojskowego, aby mężczyźni ich wprawiali się w rzucaniu pocisków, pod kierunkiem oficerów i dziesiętników armii regularnej. Rozkaz
         wykonano natychmiast, skutkiem czego Egipt, już we dwa miesiące po śmierci{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>
         , wyglądał jak obóz.
       </p>
@@ -248,11 +248,11 @@ export const Chapter54: React.FC = () => {
       <p data-index="55">
         W tym samym dniu, kiedy balsamiści wydobyli ciało{" "}
         <span className="character-highlighted" data-character="Ramzes-XII" data-src-listening="/Pharaon/ramzes-xii-listens.mp4">
-          Ramzesa XII{" "}
+          Ramzesa XII
         </span>{" "}
         z sodowej kąpieli,{" "}
         <span className="character-highlighted" data-character="Wielki-skarbnik-panstwowy" data-src-listening="/Pharaon/wielki-skarbnik-panstwowy-listens.mp4">
-          wielki skarbnik{" "}
+          wielki skarbnik
         </span>{" "}
         składając zwykły raport rzekł do faraona:
       </p>
@@ -263,11 +263,11 @@ export const Chapter54: React.FC = () => {
           data-src-talking="/Pharaon/wielki-skarbnik-panstwowy-speaks.mp4"
           data-is-talking="true"
         />
-        \n— Nie wiem, co począć… Mamy bowiem w skarbie dwa tysiące talentów, a na pogrzeb zmarłego pana trzeba co najmniej tysiąc…
+        — Nie wiem, co począć… Mamy bowiem w skarbie dwa tysiące talentów, a na pogrzeb zmarłego pana trzeba co najmniej tysiąc…
       </p>
       <p data-index="57">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Jak to dwa tysiące?… — zdziwił się władca. — Kiedym obejmował rządy, mówiłeś, że mamy dwadzieścia tysięcy…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Jak
+        to dwa tysiące?… — zdziwił się władca. — Kiedym obejmował rządy, mówiłeś, że mamy dwadzieścia tysięcy…
       </p>
       <p data-index="58">
         <span
@@ -276,11 +276,11 @@ export const Chapter54: React.FC = () => {
           data-src-talking="/Pharaon/wielki-skarbnik-panstwowy-speaks.mp4"
           data-is-talking="true"
         />
-        \n— Wydaliśmy osiemnaście…
+        — Wydaliśmy osiemnaście…
       </p>
       <p data-index="59">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— We dwa miesiące?…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— We
+        dwa miesiące?…
       </p>
       <p data-index="60">
         <span
@@ -289,11 +289,11 @@ export const Chapter54: React.FC = () => {
           data-src-talking="/Pharaon/wielki-skarbnik-panstwowy-speaks.mp4"
           data-is-talking="true"
         />
-        \n— Mieliśmy ogromne rozchody…
+        — Mieliśmy ogromne rozchody…
       </p>
       <p data-index="61">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Prawda — odparł faraon — ależ co dzień wpływają podatki…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Prawda — odparł faraon — ależ co dzień wpływają podatki…
       </p>
       <p data-index="62">
         <span
@@ -302,19 +302,19 @@ export const Chapter54: React.FC = () => {
           data-src-talking="/Pharaon/wielki-skarbnik-panstwowy-speaks.mp4"
           data-is-talking="true"
         />
-        \n— Podatki — rzekł{" "}
+        — Podatki — rzekł{" "}
         <span className="character-highlighted" data-character="Wielki-skarbnik-panstwowy" data-src-listening="/Pharaon/wielki-skarbnik-panstwowy-listens.mp4">
-          skarbnik{" "}
+          skarbnik
         </span>{" "}
         — nie wiem dlaczego, znowu zmniejszyły się i nie napływają w takiej ilości, jak rachowałem. Ale i one rozeszły się… Racz, wasza świątobliwość, pamiętać, że mamy pięć nowych
         pułków. Więc około ośmiu tysięcy ludzi porzuciło swoje zajęcia i żyją na koszt państwa…
       </p>
       <p data-index="63">Faraon zamyślił się.</p>
       <p data-index="64">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Musimy — odpowiedział — zaciągnąć nową pożyczkę. Porozumiej się z{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Musimy — odpowiedział — zaciągnąć nową pożyczkę. Porozumiej się z{" "}
         <span className="character-highlighted" data-character="Herhor" data-src-listening="/Pharaon/herhor-listens.mp4">
-          Herhorem{" "}
+          Herhorem
         </span>{" "}
         i <Mefresem>Mefresem</Mefresem>, aby nam dały świątynie.
       </p>
@@ -325,49 +325,49 @@ export const Chapter54: React.FC = () => {
           data-src-talking="/Pharaon/wielki-skarbnik-panstwowy-speaks.mp4"
           data-is-talking="true"
         />
-        \n— Mówiłem o tym… Świątynie nic nam nie dadzą.
+        — Mówiłem o tym… Świątynie nic nam nie dadzą.
       </p>
       <p data-index="66">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Obrazili się prorocy!… — uśmiechnął się faraon. — W takim razie musimy wezwać pogan… Przyślij do mnie{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Obrazili się prorocy!… — uśmiechnął się faraon. — W takim razie musimy wezwać pogan… Przyślij do mnie{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagona{" "}
+          Dagona
         </span>
         .
       </p>
       <p data-index="67">Nad wieczorem przyszedł bankier fenicki. Upadł na ziemię przed panem i ofiarował mu złoty puchar wysadzany klejnotami.</p>
       <p data-index="68">
-        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />
-        \n— Teraz już mogę umrzeć!… — zawołał{" "}
+        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Teraz już mogę
+        umrzeć!… — zawołał{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>{" "}
         — kiedy mój najłaskawszy władca zasiadł na tronie…
       </p>
       <p data-index="69">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Zanim jednak umrzesz — rzekł do klęczącego faraon — Wystaraj mi się o kilka tysięcy talentów.
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Zanim jednak umrzesz — rzekł do klęczącego faraon — Wystaraj mi się o kilka tysięcy talentów.
       </p>
       <p data-index="70">Fenicjanin struchlał, czy może tylko udawał wielkie zakłopotanie.</p>
       <p data-index="71">
-        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />
-        \n— Niech wasza świątobliwość każe mi lepiej szukać pereł w Nilu — odparł — gdyż zginę od razu i pan mój nie posądzi mnie o złe chęci… Ale taką sumę znaleźć dzisiaj!…
+        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Niech wasza
+        świątobliwość każe mi lepiej szukać pereł w Nilu — odparł — gdyż zginę od razu i pan mój nie posądzi mnie o złe chęci… Ale taką sumę znaleźć dzisiaj!…
       </p>
       <p data-index="72">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes XIII{" "}
+          Ramzes XIII
         </span>{" "}
         zdziwił się.
       </p>
       <p data-index="73">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Jak to?… — spytał — więc Fenicjanie nie mają dla mnie pieniędzy?…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— Jak
+        to?… — spytał — więc Fenicjanie nie mają dla mnie pieniędzy?…
       </p>
       <p data-index="74">
-        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />
-        \n— Krew i życie nasze i dzieci naszych oddamy waszej świątobliwości — rzekł{" "}
+        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Krew i życie nasze
+        i dzieci naszych oddamy waszej świątobliwości — rzekł{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Ale pieniądze… Skąd my weźmiemy pieniędzy?…
       </p>
@@ -390,85 +390,84 @@ export const Chapter54: React.FC = () => {
         <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />
         Godziny nasze na tej ziemi są policzone!… — mówił z płaczem{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         .
       </p>
       <p data-index="78">Faraon sposępniał.</p>
       <p data-index="79">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Zajmę ja się tymi sprawami — odparł — i sądy będą wymierzały wam sprawiedliwość. Tymczasem jednak potrzebuję około pięciu tysięcy talentów…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Zajmę ja się tymi sprawami — odparł — i sądy będą wymierzały wam sprawiedliwość. Tymczasem jednak potrzebuję około pięciu tysięcy talentów…
       </p>
       <p data-index="80">
-        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />
-        \n— Skąd weźmiemy panie?… — jęczał{" "}
+        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Skąd weźmiemy
+        panie?… — jęczał{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Wskaż nam, wasza świątobliwość, kupców, a sprzedamy im wszystkie nasze ruchomości i nieruchomości, byle spełnić twoje rozkazy…
       </p>
       <p data-index="81">Lecz gdzie są ci kupcy?… Chyba kapłani, którzy otaksują nasze majątki za bezcen i — jeszcze nie zapłacą gotowizną.</p>
       <p data-index="82">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— Poślijcie do Tyru, Sydonu… — wtrącił pan. — Przecież każde z tych miast mogłoby pożyczyć nie pięć, ale sto tysięcy talentów…
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—
+        Poślijcie do Tyru, Sydonu… — wtrącił pan. — Przecież każde z tych miast mogłoby pożyczyć nie pięć, ale sto tysięcy talentów…
       </p>
       <p data-index="83">
-        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />
-        \n— Tyr i Sydon!… — powtórzył{" "}
+        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Tyr i Sydon!… —
+        powtórzył{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagon{" "}
+          Dagon
         </span>
         . — Dziś cała Fenicja gromadzi złoto i klejnoty, ażeby opłacić się Asyryjczykom… Kręcą się już po naszym kraju wysłańcy{" "}
         <span className="character-highlighted" data-character="Krol-Assar" data-src-listening="/Pharaon/krol-assar-listens.mp4">
-          króla Assara{" "}
+          króla Assara
         </span>{" "}
         i mówią, że byleśmy składali co roku hojny okup, to król i satrapowie nie tylko nie będą nas ciemiężyli, ale jeszcze nastręczą nam większe zarobki niż te, jakie mamy dziś z
         łaski waszej świątobliwości i Egiptu…
       </p>
       <p data-index="84">Władca pobladł i zacisnął zęby. Fenicjanin spostrzegł się i dodał prędko:</p>
       <p data-index="85">
-        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />
-        \n— Wreszcie, co ja mam zabierać waszej świątobliwości czas moim głupim gadaniem?… Jest tu, w Memfisie, książę{" "}
+        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Wreszcie, co ja mam
+        zabierać waszej świątobliwości czas moim głupim gadaniem?… Jest tu, w Memfisie, książę{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>
         … On może lepiej objaśni wszystko memu panu, bo to mędrzec i członek najwyższej rady naszych miast…
       </p>
       <p data-index="86">
         <span className="character-highlighted" data-character="Ksiaze-Ramzes" data-src-listening="/Pharaon/ksiaze-ramzes-listens.mp4">
-          Ramzes{" "}
+          Ramzes
         </span>{" "}
         ożywił się.
       </p>
       <p data-index="87">
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />
-        \n— A dawajże mi tu prędzej{" "}
+        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />— A
+        dawajże mi tu prędzej{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hirama{" "}
+          Hirama
         </span>{" "}
         — odparł. — Bo ty,{" "}
         <span className="character-highlighted" data-character="Dagon" data-src-listening="/Pharaon/dagon-listens.mp4">
-          Dagonie{" "}
+          Dagonie
         </span>
         , rozmawiasz ze mną nie jak bankier, ale jak pogrzebowa płaczka.
       </p>
       <p data-index="88">Fenicjanin jeszcze raz uderzył czołem w posadzkę i spytał:</p>
       <p data-index="89">
-        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />
-        \n— Czy dostojny{" "}
+        <span className="character-placeholder character-talking" data-character="Dagon" data-src-talking="/Pharaon/dagon-speaks.mp4" data-is-talking="true" />— Czy dostojny{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hiram{" "}
+          Hiram
         </span>{" "}
         nie mógłby zaraz tu przyjść?… Prawda, że już późno… Ale on tak boi się kapłanów, że wolałby o nocnej porze złożyć hołd waszej świątobliwości…
       </p>
       <p data-index="90">
         Faraon przygryzł usta, ale zgodził się na ten projekt. Wysłał nawet z bankierem{" "}
         <span className="character-highlighted" data-character="Tutmozis" data-src-listening="/Pharaon/tutmozis-listens.mp4">
-          Tutmozisa{" "}
+          Tutmozisa
         </span>
         , aby ten przyprowadził{" "}
         <span className="character-highlighted" data-character="Hiram" data-src-listening="/Pharaon/hiram-listens.mp4">
-          Hirama{" "}
+          Hirama
         </span>{" "}
         do pałacu tajemnymi wejściami.
       </p>
