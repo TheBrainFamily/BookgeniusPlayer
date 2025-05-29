@@ -10,7 +10,6 @@ export class TextEditor {
   private readonly fileManager: FileManager;
   private readonly editorManager: EditorManager;
   private readonly promptsManager: PromptsManager;
-  m;
   private readonly xmlManager: XmlManager;
 
   constructor(private readonly bookSlug: BOOK_SLUGS) {
