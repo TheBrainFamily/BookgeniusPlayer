@@ -85,6 +85,12 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
                   case "strong":
                     pContent += ` <strong>${pElement.textContent.trim() || ""}</strong>`;
                     break;
+                  case "musicShift":
+                    pContent += `<span class="absolute top-0 right-5 group" data-editor-mode="true">
+                      <span class="cursor-pointer" data-editor-tag="musicShift">♪</span>
+                      <span class="hidden group-hover:block absolute right-0 top-6 bg-gray-800 text-white p-2 rounded text-sm whitespace-nowrap">${pElement.getAttribute("style") || "Music shift"}</span>
+                    </span>`;
+                    break;
                   default:
                     pContent += `<${pElement.tagName}>${pElement.textContent || ""}</${pElement.tagName}>`;
                     break;
@@ -99,7 +105,7 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
           if (pContent.trim()) {
             let cleanedContent = pContent.replace(/\s+/g, " ").trim();
             cleanedContent = cleanedContent.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
-            htmlResult += `\n    <p data-index="${dataIndex++}">\n      ${cleanedContent}\n    </p>`;
+            htmlResult += `\n    <p data-index="${dataIndex++}" class="relative">\n      ${cleanedContent}\n    </p>`;
           }
         } else if (tagName === "h4") {
           // Handle h4 element (e.g., chapter title)
