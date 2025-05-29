@@ -9,10 +9,12 @@ interface ChapterLoaderDirectProps {
   errorFallback?: (error: string) => ReactNode;
   /** Fired once the Chapter component has appeared in the DOM */
   onChapterRendered?: () => void;
+  /** Target paragraph to scroll to when this chapter is the current chapter */
+  targetParagraph?: number;
 }
 
-const DefaultLoadingFallback: React.FC<{ chapterId: number }> = ({ chapterId }) => (
-  <section data-chapter={chapterId} className="chapter-loading-placeholder">
+const DefaultLoadingFallback: React.FC<{ chapterId: number; bookSlug?: string }> = ({ chapterId, bookSlug }) => (
+  <section data-chapter={chapterId} data-book-slug={bookSlug} className="chapter-loading-placeholder">
     <div>Loading Chapter {chapterId}...</div>
     {/* You can reuse your ChapterSkeleton structure here if desired */}
     <div style={{ height: "50px", background: "#eee", margin: "10px 0" }} />
@@ -20,15 +22,15 @@ const DefaultLoadingFallback: React.FC<{ chapterId: number }> = ({ chapterId }) 
   </section>
 );
 
-const DefaultErrorFallback: React.FC<{ chapterId: number; error: string }> = ({ chapterId, error }) => (
-  <section data-chapter={chapterId} className="chapter-error-placeholder">
+const DefaultErrorFallback: React.FC<{ chapterId: number; error: string; bookSlug?: string }> = ({ chapterId, error, bookSlug }) => (
+  <section data-chapter={chapterId} data-book-slug={bookSlug} className="chapter-error-placeholder">
     <div>
       Error loading Chapter {chapterId}: {error}
     </div>
   </section>
 );
 
-const ChapterLoaderDirect: React.FC<ChapterLoaderDirectProps> = ({ bookSlug, chapterId, loadingFallback, errorFallback, onChapterRendered }) => {
+const ChapterLoaderDirect: React.FC<ChapterLoaderDirectProps> = ({ bookSlug, chapterId, loadingFallback, errorFallback, onChapterRendered, targetParagraph }) => {
   const [ChapterComponent, setChapterComponent] = useState<React.ComponentType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -46,8 +48,7 @@ const ChapterLoaderDirect: React.FC<ChapterLoaderDirectProps> = ({ bookSlug, cha
         console.log(`ChapterLoaderDirect: Importing for slug '${bookSlug}', chapter '${chapterId}'`);
         // IMPORTANT: Adjust the path according to your project structure and how Vite handles dynamic imports.
         // Using an alias like '@/' for src might be more robust if your bundler is configured for it.
-        // Assuming chapter files are like: src/data/books/book-slug/chapters/Chapter1.tsx
-        const module = await import(`../data/books/${bookSlug}/chapters/Chapter${chapterId}.tsx`); // Adjust this path!
+        const module = await import(`../data/books/${bookSlug}/chapters/Chapter${chapterId}.tsx`);
 
         if (!isMounted) return;
 
@@ -93,21 +94,83 @@ const ChapterLoaderDirect: React.FC<ChapterLoaderDirectProps> = ({ bookSlug, cha
     }
   }, [isLoading, ChapterComponent, onChapterRendered]);
 
+  // Scroll to target paragraph after chapter renders
+  useEffect(() => {
+    if (!isLoading && ChapterComponent && targetParagraph !== undefined) {
+      console.log(`ChapterLoaderDirect: Attempting to scroll to chapter ${chapterId}, paragraph ${targetParagraph}`);
+
+      let intervalId: NodeJS.Timeout | null = null;
+
+      // Function to wait for element and scroll
+      const waitAndScroll = () => {
+        // For paragraph 0, scroll to the chapter itself
+        const selector = targetParagraph === 0 ? `section[data-chapter="${chapterId}"]` : `section[data-chapter="${chapterId}"] [data-index="${targetParagraph}"]`;
+
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds total
+
+        const checkAndScroll = () => {
+          const element = document.querySelector(selector);
+          if (element) {
+            console.log(`ChapterLoaderDirect: Found ${targetParagraph === 0 ? "chapter" : "paragraph"} element, scrolling to it`);
+            // Use requestAnimationFrame to ensure layout is complete
+            requestAnimationFrame(() => {
+              console.log("GOZDECKI MAY 29 scrollIntoView", element);
+              element.scrollIntoView({ behavior: "instant", block: "start" });
+            });
+            return true;
+          }
+          return false;
+        };
+
+        // Try immediately first
+        if (checkAndScroll()) return;
+
+        // Then set up interval to keep checking
+        intervalId = setInterval(() => {
+          attempts++;
+          if (checkAndScroll() || attempts >= maxAttempts) {
+            if (intervalId) clearInterval(intervalId);
+            if (attempts >= maxAttempts) {
+              console.error(
+                `ChapterLoaderDirect: Failed to find ${targetParagraph === 0 ? "chapter" : `paragraph ${targetParagraph}`} in chapter ${chapterId} after ${maxAttempts} attempts`,
+              );
+            }
+          }
+        }, 100);
+      };
+
+      // Start the wait and scroll process
+      waitAndScroll();
+
+      return () => {
+        if (intervalId) {
+          clearInterval(intervalId);
+        }
+      };
+    }
+  }, [isLoading, ChapterComponent, targetParagraph, chapterId]);
+
   if (isLoading) {
-    return loadingFallback ? <>{loadingFallback}</> : <DefaultLoadingFallback chapterId={chapterId} />;
+    return loadingFallback ? <>{loadingFallback}</> : <DefaultLoadingFallback chapterId={chapterId} bookSlug={bookSlug} />;
   }
 
   if (error) {
-    return errorFallback ? <>{errorFallback(error)}</> : <DefaultErrorFallback chapterId={chapterId} error={error} />;
+    return errorFallback ? <>{errorFallback(error)}</> : <DefaultErrorFallback chapterId={chapterId} error={error} bookSlug={bookSlug} />;
   }
 
   if (ChapterComponent) {
-    return <ChapterComponent />;
+    // Wrap the component to ensure it has the necessary data attributes
+    return (
+      <div data-chapter-wrapper={chapterId} data-book-slug={bookSlug}>
+        <ChapterComponent />
+      </div>
+    );
   }
 
   // Should ideally not be reached if loading/error/component states are handled
   return (
-    <section data-chapter={chapterId} className="chapter-unavailable-placeholder">
+    <section data-chapter={chapterId} data-book-slug={bookSlug} className="chapter-unavailable-placeholder">
       <div>Chapter {chapterId} is unavailable.</div>
     </section>
   );

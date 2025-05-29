@@ -13,7 +13,7 @@ interface BookChapterRendererProps {
 
 const BookChapterRendererComponent: React.FC<BookChapterRendererProps> = ({ bookData }) => {
   const [containerElement, setContainerElement] = useState<HTMLElement | null>(null);
-  const { location } = useLocation();
+  const { location, lastSystemLocation } = useLocation();
   const { openCharacterDetailsModal } = useModal(); // Destructure the stable function
 
   const { observeNewParagraphs, cleanupRemovedParagraphs } = usePageObserver({ enabled: !!containerElement && !!bookData?.slug, openCharacterDetailsModal });
@@ -31,6 +31,25 @@ const BookChapterRendererComponent: React.FC<BookChapterRendererProps> = ({ book
     if (isNaN(currentChapterNum) || currentChapterNum <= 0) currentChapterNum = 1;
     return [currentChapterNum - 1, currentChapterNum, currentChapterNum + 1].filter((id) => id > 0 && id <= chapters);
   }, [bookData?.chapters, location.currentChapter]);
+
+  // Determine if we should scroll to a specific paragraph
+  const shouldScrollToChapter = useMemo(() => {
+    if (!lastSystemLocation) return null;
+
+    // Only scroll if this is a recent system navigation (within last 2 seconds)
+    const isRecent = Date.now() - lastSystemLocation.timestamp < 2000;
+    if (!isRecent) return null;
+
+    // Only scroll if the system location matches current location
+    if (lastSystemLocation.location.currentChapter === location.currentChapter && lastSystemLocation.location.currentParagraph === location.currentParagraph) {
+      console.log(
+        `BookChapterRenderer: System navigation detected to chapter ${lastSystemLocation.location.currentChapter}, paragraph ${lastSystemLocation.location.currentParagraph}`,
+      );
+      return { chapter: lastSystemLocation.location.currentChapter, paragraph: lastSystemLocation.location.currentParagraph };
+    }
+
+    return null;
+  }, [lastSystemLocation, location.currentChapter, location.currentParagraph]);
 
   // Whenever we change which chapters are rendered, update the observer lists
   useEffect(() => {
@@ -53,6 +72,9 @@ const BookChapterRendererComponent: React.FC<BookChapterRendererProps> = ({ book
   }
 
   console.log(`BookChapterRenderer: Rendering chapters ${chaptersToRender.join(", ")} (for location.currentChapter: ${location.currentChapter})`);
+  if (shouldScrollToChapter) {
+    console.log(`BookChapterRenderer: Will scroll to chapter ${shouldScrollToChapter.chapter}, paragraph ${shouldScrollToChapter.paragraph}`);
+  }
 
   return createPortal(
     <section>
@@ -61,6 +83,7 @@ const BookChapterRendererComponent: React.FC<BookChapterRendererProps> = ({ book
           key={`chapter-${bookData.slug}-${chapterId}`}
           bookSlug={bookData.slug}
           chapterId={chapterId}
+          targetParagraph={shouldScrollToChapter && chapterId === shouldScrollToChapter.chapter ? shouldScrollToChapter.paragraph : undefined}
           onChapterRendered={() => {
             observeNewParagraphs();
             cleanupRemovedParagraphs();
