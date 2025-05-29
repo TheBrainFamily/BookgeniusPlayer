@@ -316,7 +316,9 @@ const getParagraphInfo = (element: Element): { chapter: number | null; paragraph
   return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
 };
 
-export function setupPageObserver(openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void): IntersectionObserver | null {
+export function setupPageObserver(
+  openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void,
+): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number } | null {
   const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
 
   // --- State for tracking all currently intersecting pages ---
@@ -324,6 +326,10 @@ export function setupPageObserver(openCharacterDetailsModal: (characterSlug: str
   let currentlyActivePageElement: Element | null = null;
   let currentlyLastActivePageElement: Element | null = null;
   let currentlyActiveParagraph: { chapter: number; paragraph: number } | null = null;
+
+  // Keep track of observed paragraphs to avoid re-observing
+  const observedParagraphs = new Set<Element>();
+
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
     const scrollMarginTopPx = getScrollMarginTopPx();
@@ -579,6 +585,62 @@ export function setupPageObserver(openCharacterDetailsModal: (characterSlug: str
     }
   }, observerOptions);
 
+  // Function to observe new paragraphs
+  const observeNewParagraphs = (): number => {
+    const allParagraphs = document.querySelectorAll("section[data-chapter] [data-index]");
+    let newParagraphsCount = 0;
+
+    allParagraphs.forEach((paragraph) => {
+      if (!observedParagraphs.has(paragraph)) {
+        observer.observe(paragraph);
+        observedParagraphs.add(paragraph);
+        newParagraphsCount++;
+      }
+    });
+
+    if (newParagraphsCount > 0) {
+      console.log(`[PageObserver] Observed ${newParagraphsCount} new paragraphs. Total observed: ${observedParagraphs.size}`);
+    }
+
+    return newParagraphsCount;
+  };
+
+  // Function to clean up paragraphs that are no longer in the DOM
+  const cleanupRemovedParagraphs = (): number => {
+    let removedCount = 0;
+    const elementsToRemove: Element[] = [];
+
+    observedParagraphs.forEach((paragraph) => {
+      // Check if the element is still connected to the DOM
+      if (!paragraph.isConnected) {
+        observer.unobserve(paragraph);
+        intersectingPages.delete(paragraph); // Also remove from intersecting set
+        elementsToRemove.push(paragraph);
+        removedCount++;
+      }
+    });
+
+    // Remove from the Set after iteration to avoid modification during iteration
+    elementsToRemove.forEach((element) => {
+      observedParagraphs.delete(element);
+    });
+
+    // Clear active element references if they're no longer connected
+    if (currentlyActivePageElement && !currentlyActivePageElement.isConnected) {
+      currentlyActivePageElement = null;
+    }
+    if (currentlyLastActivePageElement && !currentlyLastActivePageElement.isConnected) {
+      currentlyLastActivePageElement = null;
+    }
+
+    if (removedCount > 0) {
+      console.log(`[PageObserver] Cleaned up ${removedCount} removed paragraphs. Total observed: ${observedParagraphs.size}`);
+    }
+
+    return removedCount;
+  };
+
+  // Initial observation
   const paragraphsToObserve = document.querySelectorAll("section[data-chapter] [data-index]");
   if (paragraphsToObserve.length === 0) {
     console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
@@ -587,7 +649,9 @@ export function setupPageObserver(openCharacterDetailsModal: (characterSlug: str
     console.log(`GOZDECKI MAY 28 paragraphsToObserve.length`, paragraphsToObserve.length);
     paragraphsToObserve.forEach((paragraph) => {
       observer.observe(paragraph);
+      observedParagraphs.add(paragraph);
     });
-    return observer;
+
+    return { observer, observeNewParagraphs, cleanupRemovedParagraphs };
   }
 }

@@ -16,8 +16,8 @@ const BookChapterRendererComponent: React.FC<BookChapterRendererProps> = ({ book
   const { location } = useLocation();
   const { openCharacterDetailsModal } = useModal(); // Destructure the stable function
 
-  const pageIntersectionObserverRef = useRef<IntersectionObserver | null>(null);
-  const domMutationObserverRef = useRef<MutationObserver | null>(null);
+  const pageObserverRef = useRef<{ observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number } | null>(null);
+  const chapterMutationObserverRef = useRef<MutationObserver | null>(null);
 
   // --- Diagnostic for bookData prop (keep if useful) ---
   const prevBookDataRef = useRef<BookData | null>(null);
@@ -50,15 +50,15 @@ const BookChapterRendererComponent: React.FC<BookChapterRendererProps> = ({ book
   // Effect to setup/cleanup page observer
   useEffect(() => {
     const cleanupObservers = () => {
-      if (pageIntersectionObserverRef.current) {
+      if (pageObserverRef.current) {
         console.log("BookChapterRenderer: Disconnecting Page IntersectionObserver");
-        pageIntersectionObserverRef.current.disconnect();
-        pageIntersectionObserverRef.current = null;
+        pageObserverRef.current.observer.disconnect();
+        pageObserverRef.current = null;
       }
-      if (domMutationObserverRef.current) {
-        console.log("BookChapterRenderer: Disconnecting DOM MutationObserver");
-        domMutationObserverRef.current.disconnect();
-        domMutationObserverRef.current = null;
+      if (chapterMutationObserverRef.current) {
+        console.log("BookChapterRenderer: Disconnecting Chapter MutationObserver");
+        chapterMutationObserverRef.current.disconnect();
+        chapterMutationObserverRef.current = null;
       }
     };
 
@@ -69,76 +69,148 @@ const BookChapterRendererComponent: React.FC<BookChapterRendererProps> = ({ book
       return;
     }
 
-    const attemptSetupPageObserver = (): boolean => {
-      if (!containerElement) return false;
-
-      // Always disconnect previous IntersectionObserver before setting up a new one
-      if (pageIntersectionObserverRef.current) {
-        pageIntersectionObserverRef.current.disconnect();
-        pageIntersectionObserverRef.current = null;
+    const setupPageObserverWithMutation = () => {
+      // Clean up any stale paragraph references when chapters change
+      if (pageObserverRef.current) {
+        console.log("BookChapterRenderer: Cleaning up stale paragraph references before new setup.");
+        pageObserverRef.current.cleanupRemovedParagraphs();
       }
 
-      // Paragraphs are queried by setupPageObserver itself using the container a
-      // ensure it's up-to-date.
-      console.log("BookChapterRenderer: Attempting to set up Page IntersectionObserver.");
-      const observer = setupPageObserver(openCharacterDetailsModal); // Pass the modal context
-      if (observer) {
-        pageIntersectionObserverRef.current = observer;
+      // Always disconnect previous observers before setting up new ones
+      cleanupObservers();
+
+      console.log("BookChapterRenderer: Setting up Page IntersectionObserver.");
+      const observerResult = setupPageObserver(openCharacterDetailsModal);
+
+      if (observerResult) {
+        pageObserverRef.current = observerResult;
         console.log("BookChapterRenderer: Page IntersectionObserver setup successful.");
-        // If IntersectionObserver setup worked, we might not need the MutationObserver anymore
-        if (domMutationObserverRef.current) {
-          domMutationObserverRef.current.disconnect();
-          domMutationObserverRef.current = null;
-        }
-        return true;
+
+        // Set up MutationObserver to watch for new chapters
+        chapterMutationObserverRef.current = new MutationObserver((mutations) => {
+          let hasChanges = false;
+
+          // Check if any new chapter sections were added
+          const newChaptersAdded = mutations.some((mutation) => Array.from(mutation.addedNodes).some((node) => node instanceof Element && node.matches("section[data-chapter]")));
+
+          // Check if any chapter sections were removed
+          const chaptersRemoved = mutations.some((mutation) => Array.from(mutation.removedNodes).some((node) => node instanceof Element && node.matches("section[data-chapter]")));
+
+          if (chaptersRemoved && pageObserverRef.current) {
+            console.log("BookChapterRenderer: Chapter sections removed. Cleaning up removed paragraphs.");
+            const removedCount = pageObserverRef.current.cleanupRemovedParagraphs();
+            if (removedCount > 0) {
+              console.log(`BookChapterRenderer: Cleaned up ${removedCount} removed paragraph observers.`);
+            }
+            hasChanges = true;
+          }
+
+          if (newChaptersAdded && pageObserverRef.current) {
+            console.log("BookChapterRenderer: New chapter sections detected. Observing new paragraphs.");
+            // Small delay to ensure DOM is fully updated
+            setTimeout(() => {
+              const newCount = pageObserverRef.current?.observeNewParagraphs();
+              if (newCount && newCount > 0) {
+                console.log(`BookChapterRenderer: Added ${newCount} new paragraphs to observer.`);
+              }
+            }, 100);
+            hasChanges = true;
+          }
+
+          // If we have any changes, also do a general cleanup
+          if (hasChanges) {
+            setTimeout(() => {
+              pageObserverRef.current?.cleanupRemovedParagraphs();
+            }, 200);
+          }
+        });
+
+        chapterMutationObserverRef.current.observe(containerElement, { childList: true, subtree: true, attributes: false, characterData: false });
+
+        console.log("BookChapterRenderer: Chapter MutationObserver setup successful.");
       } else {
-        console.warn("BookChapterRenderer: setupPageObserver returned null (e.g., no paragraphs found initially).");
-        return false;
+        console.log("BookChapterRenderer: setupPageObserver returned null. Setting up retry MutationObserver.");
+
+        // Set up MutationObserver to wait for initial paragraphs to appear
+        chapterMutationObserverRef.current = new MutationObserver((mutations) => {
+          // Check if any paragraphs with data-index were added
+          const newParagraphsAdded = mutations.some((mutation) =>
+            Array.from(mutation.addedNodes).some((node) => node instanceof Element && (node.matches("[data-index]") || node.querySelector("[data-index]"))),
+          );
+
+          if (newParagraphsAdded) {
+            console.log("BookChapterRenderer: Initial paragraphs detected. Retrying Page IntersectionObserver setup.");
+            // Small delay to ensure all paragraphs are rendered
+            setTimeout(() => {
+              const retryResult = setupPageObserver(openCharacterDetailsModal);
+              if (retryResult) {
+                // Disconnect the retry observer
+                chapterMutationObserverRef.current?.disconnect();
+
+                // Set up the new observer
+                pageObserverRef.current = retryResult;
+                console.log("BookChapterRenderer: Page IntersectionObserver setup successful on retry.");
+
+                // Now set up the chapter-level MutationObserver for future chapters
+                chapterMutationObserverRef.current = new MutationObserver((mutations) => {
+                  let hasChanges = false;
+
+                  const newChaptersAdded = mutations.some((mutation) =>
+                    Array.from(mutation.addedNodes).some((node) => node instanceof Element && node.matches("section[data-chapter]")),
+                  );
+
+                  const chaptersRemoved = mutations.some((mutation) =>
+                    Array.from(mutation.removedNodes).some((node) => node instanceof Element && node.matches("section[data-chapter]")),
+                  );
+
+                  if (chaptersRemoved && pageObserverRef.current) {
+                    console.log("BookChapterRenderer: Chapter sections removed. Cleaning up removed paragraphs.");
+                    const removedCount = pageObserverRef.current.cleanupRemovedParagraphs();
+                    if (removedCount > 0) {
+                      console.log(`BookChapterRenderer: Cleaned up ${removedCount} removed paragraph observers.`);
+                    }
+                    hasChanges = true;
+                  }
+
+                  if (newChaptersAdded && pageObserverRef.current) {
+                    console.log("BookChapterRenderer: New chapter sections detected. Observing new paragraphs.");
+                    setTimeout(() => {
+                      const newCount = pageObserverRef.current?.observeNewParagraphs();
+                      if (newCount && newCount > 0) {
+                        console.log(`BookChapterRenderer: Added ${newCount} new paragraphs to observer.`);
+                      }
+                    }, 100);
+                    hasChanges = true;
+                  }
+
+                  if (hasChanges) {
+                    setTimeout(() => {
+                      pageObserverRef.current?.cleanupRemovedParagraphs();
+                    }, 200);
+                  }
+                });
+
+                chapterMutationObserverRef.current.observe(containerElement, { childList: true, subtree: true, attributes: false, characterData: false });
+
+                console.log("BookChapterRenderer: Chapter MutationObserver setup successful after retry.");
+              }
+            }, 100);
+          }
+        });
+
+        chapterMutationObserverRef.current.observe(containerElement, { childList: true, subtree: true, attributes: false, characterData: false });
+
+        console.log("BookChapterRenderer: Retry MutationObserver setup successful.");
       }
     };
 
-    // Try to set up the observer. If it fails (e.g. paragraphs not rendered yet by ChapterLoaderDirect),
-    // then set up a MutationObserver.
-    if (!attemptSetupPageObserver()) {
-      console.log("BookChapterRenderer: Initial Page IntersectionObserver setup failed, setting up DOM MutationObserver.");
-
-      // Ensure no lingering mutation observer
-      if (domMutationObserverRef.current) {
-        domMutationObserverRef.current.disconnect();
-      }
-
-      domMutationObserverRef.current = new MutationObserver((mutations, obs) => {
-        // A simple check: has any node with data-index been added?
-        const newParagraphsAdded = mutations.some((mutation) =>
-          Array.from(mutation.addedNodes).some((node) => node instanceof Element && (node.matches("[data-index]") || node.querySelector("[data-index]"))),
-        );
-
-        if (newParagraphsAdded) {
-          console.log("BookChapterRenderer: DOM MutationObserver detected new paragraphs. Re-attempting Page IntersectionObserver setup.");
-          if (attemptSetupPageObserver()) {
-            console.log("BookChapterRenderer: Page IntersectionObserver setup successful via MutationObserver. Disconnecting MutationObserver.");
-            obs.disconnect(); // Self-disconnect
-            domMutationObserverRef.current = null;
-          }
-        }
-      });
-
-      domMutationObserverRef.current.observe(containerElement, { childList: true, subtree: true });
-    }
+    setupPageObserverWithMutation();
 
     return () => {
       console.log("BookChapterRenderer: Observer useEffect cleanup.");
       cleanupObservers();
     };
-    // Dependencies:
-    // - containerElement: The root for observation.
-    // - bookData.slug: If the book changes, the context of observation changes.
-    // - location.currentChapter: When this changes, chaptersToRender changes, so the DOM content changes.
-    //   This is a good signal to re-initialize the observer for the new set of paragraphs.
-    // - modal: The modal context object. If it's stable (properly memoized in ModalProvider), this is fine.
   }, [containerElement, bookData?.slug, location.currentChapter, openCharacterDetailsModal]);
-  // chaptersToRender was removed from deps because its reference changes too often.
-  // location.currentChapter is a better proxy for when the *set* of rendered chapters changes.
 
   if (!containerElement) {
     return null;
