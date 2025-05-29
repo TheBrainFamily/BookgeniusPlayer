@@ -19,13 +19,13 @@ import { BookContentWrapper } from "./components/BookContentWrapper";
 import { BookThemeProvider } from "./context/BookThemeContext";
 import { useAudiobookTracks } from "@/hooks/useAudiobookTracks";
 
-import SplashScreen from "./components/SplashScreen";
 import CharacterNotesPanel from "./components/CharacterNotesPanel";
 import ContentContainerWrapper from "./components/ContentContainerWrapper";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { EditorMode } from "@/components/EditorMode";
 import useLocalStorageState from "use-local-storage-state";
+import { useAppReady } from "./hooks/useAppReady";
 
 function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
   /* Inject book content first */
@@ -37,6 +37,9 @@ function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
   /* dynamic visual hooks */
   useCutScene();
   useBackgroundVideo();
+
+  /* app ready hook */
+  useAppReady();
 
   /* dynamic audio hooks */
   useBackgroundSongs();
@@ -106,7 +109,6 @@ export default function App() {
             <BookContentWrapper>
               <ModalProvider bookData={currentBookData}>
                 <Shell bookData={currentBookData} />
-                <SplashScreen />
               </ModalProvider>
             </BookContentWrapper>
           </BookThemeProvider>

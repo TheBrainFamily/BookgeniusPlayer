@@ -1,12 +1,298 @@
+/* Pre-React Splash Screen Styles */
 #splash-screen {
   position: fixed;
   inset: 0;
   background-color: oklch(0.205 0 0);
-  z-index: 9999;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  z-index: 99999;
+  overflow: hidden;
+  padding: 1rem;
+  opacity: 1;
+  transition:
+    opacity 1s ease-in-out,
+    transform 1s ease-in-out,
+    filter 1s ease-in-out;
 }
 
 #splash-screen.splash-screen--hide {
   opacity: 0;
+  transform: scale(1.1);
+  filter: brightness(1.5);
   pointer-events: none;
-  transition: opacity 1s ease-in-out;
+}
+
+.splash-container {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 32rem;
+  gap: 2rem;
+}
+
+.splash-title-container {
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInUp 0.6s ease-out forwards;
+  animation-delay: 0.2s;
+  line-height: 40px;
+}
+
+.splash-title {
+  color: white;
+  font-size: 3rem;
+  font-weight: bold;
+  padding-bottom: 0.5rem;
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+}
+
+.splash-subtitle {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.splash-image-container {
+  position: relative;
+  width: 10rem;
+  height: 10rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: visible;
+  opacity: 0;
+  transform: scale(0.8);
+  animation: fadeInScale 0.8s ease-out forwards;
+  animation-delay: 0.4s;
+}
+
+.splash-glow-ring {
+  position: absolute;
+  top: 0.5rem;
+  bottom: -0.5rem;
+  left: 0;
+  right: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+  animation:
+    pulse-glow 3s ease-in-out infinite,
+    rotate 20s linear infinite;
+}
+
+.splash-loading-image {
+  width: 7rem;
+  height: 7rem;
+  position: relative;
+  z-index: 10;
+  animation: pulse-image 3s ease-in-out infinite;
+}
+
+.splash-text-container {
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  width: 100%;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-out forwards;
+  animation-delay: 0.8s;
+}
+
+.splash-loading-text {
+  text-align: center;
+  font-style: italic;
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.9);
+  opacity: 0;
+  transform: translateY(20px);
+  filter: blur(3px);
+  animation: textFadeIn 0.5s ease-out forwards;
+}
+
+.splash-start-button {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  color: white;
+  font-weight: 600;
+  font-size: 1.125rem;
+  padding: 1rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.95) translateY(15px);
+  transition: all 0.3s ease-out;
+  will-change: transform, opacity, box-shadow;
+}
+
+.splash-start-button.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  animation: buttonPulse 4s ease-in-out infinite;
+}
+
+.splash-start-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 25px rgba(255, 255, 255, 0.25);
+}
+
+.splash-start-button:active {
+  transform: scale(1);
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.15);
+}
+
+.splash-start-button.disabled {
+  pointer-events: none;
+  opacity: 0;
+}
+
+.play-icon {
+  width: 2rem;
+  height: 2rem;
+  position: relative;
+}
+
+.play-icon::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-40%, -50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid currentColor;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes textFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 40px 15px rgba(255, 255, 255, 0.25);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-image {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1) drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.3));
+    transform: scale(1) rotate(0.1deg);
+  }
+  50% {
+    opacity: 0.95;
+    filter: brightness(1.1) drop-shadow(0px 0px 20px rgba(255, 255, 255, 0.5));
+    transform: scale(1.1) rotate(0.1deg);
+  }
+}
+
+@keyframes buttonPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0px rgba(255, 255, 255, 0);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .splash-title {
+    font-size: 2.5rem;
+  }
+
+  .splash-container {
+    gap: 1.5rem;
+  }
+
+  .splash-image-container {
+    width: 8rem;
+    height: 8rem;
+  }
+
+  .splash-loading-image {
+    width: 6rem;
+    height: 6rem;
+  }
 }

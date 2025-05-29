@@ -89,13 +89,6 @@ export async function runLegacyInit() {
   } else {
     onDOMLoaded();
   }
-
-  /* ----------------------------------------------------------------
-   *  3. Anything that other scripts expect to exist on window
-   * ---------------------------------------------------------------- */
-  // (window as any).showCharacterDetailsModal = showCharacterDetailsModal;
-
-  /* Characters panel initial state (night mode, mobile characters, …) */
 }
 
 export async function runLegacyInitJustSW() {
