@@ -1,5 +1,5 @@
 // Converter: xmlToReactChapters.ts
-import { DOMParser, XMLSerializer, Node, Element } from "@xmldom/xmldom";
+import { DOMParser, Element } from "@xmldom/xmldom";
 import fs from "fs";
 import path from "path";
 import { getTalkingMediaFilePathForName, getListeningMediaFilePathForName } from "@/utils/getFilePathsForName";
@@ -142,20 +142,20 @@ function processInlineElement(element: Element, characterMap: Map<string, Charac
     const listeningSrc = getListeningMediaFilePathForName(characterSlug, bookSlug);
 
     if (isTalking) {
-      return `<span \n          className="character-placeholder character-talking" \n          data-character="${characterSlug}" \n          data-src-talking="${talkingSrc}" \n          data-is-talking="true"\n        />`;
+      return `<span className="character-placeholder character-talking" data-character="${characterSlug}" data-src-talking="${talkingSrc}" data-is-talking="true"/>`;
     } else {
       const content = escapeJSX(element.textContent || "");
-      return `<span \n          className="character-highlighted" \n          data-character="${characterSlug}" \n          data-src-listening="${listeningSrc}"\n        >\n          ${content}\n        </span>`;
+      return `<span className="character-highlighted" data-character="${characterSlug}" data-src-listening="${listeningSrc}">${content} </span>`;
     }
   }
 
   // Handle other inline elements
   switch (element.tagName) {
-    case "note":
+    case "note": {
       const noteId = element.getAttribute("id");
       const noteContent = escapeJSX(element.textContent || "");
       return `<a href="#fn${noteId}" className="link-note">${noteContent}</a>`;
-
+    }
     case "b":
       return `<span className="bold">${escapeJSX(element.textContent || "")}</span>`;
 
