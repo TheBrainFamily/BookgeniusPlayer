@@ -36,21 +36,16 @@ export class TextEditor {
 
   public async editParagraph(chapterNumber: number, paragraphNumber: number): Promise<void> {
     try {
-      const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
-      if (!originalParagraph) {
-        throw new ParagraphNotFoundError(chapterNumber, paragraphNumber);
-      }
-
-      this.promptsManager.generateWrapCharactersRule();
-      const updatedParagraphText = await this.editorManager.openInCursor(originalParagraph);
-
       const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
       const { paragraph } = this.xmlManager.getParagraphElement(xmlDoc, chapterNumber, paragraphNumber);
-      if (!paragraph) {
-        throw new ParagraphNotFoundError(chapterNumber, paragraphNumber);
-      }
+      const originalParagraph = this.xmlManager.getParagraphHtml(paragraph);
 
-      const updatedXml = this.xmlManager.updateAndSaveXml(xmlDoc, paragraph, updatedParagraphText);
+      this.promptsManager.generateWrapCharactersRule();
+      const updatedParagraph = await this.editorManager.openInCursor(originalParagraph);
+
+      const updatedParagraphElement = this.xmlManager.stringToElement(updatedParagraph);
+
+      const updatedXml = this.xmlManager.updateAndSaveXml(xmlDoc, paragraph, this.xmlManager.getParagraphText(updatedParagraphElement));
       this.fileManager.regenerateXml(updatedXml);
       this.promptsManager.removeWrapCharactersRule();
     } catch (error) {
