@@ -1058,7 +1058,7 @@ export const Chapter11: React.FC = () => {
         </span>{" "}
         zażywał bezpieczeństwa, uczciwie przez nią opłaconego. Z czasem poczucie bezpieczeństwa zmieniło się w ufność, w przywiązanie do własnego domu, senne i głębokie jak
         spokojny staw; jego powierzchnia wzdrygała się nieznacznie tylko wówczas, gdy w pobliżu znalazł się{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Aleksander-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-aleksander-ossipon-listens.mp4">
+        <span className="character-highlighted" data-character="Towarzysz-Aleksander-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-aleksander-ossipon.png">
           Ossipon
         </span>
         , krzepki anarchista o bezwstydnie wyzywających oczach, których niedwuznaczne spojrzenie było zrozumiałe dla każdej kobiety z wyjątkiem skończonych idiotek.

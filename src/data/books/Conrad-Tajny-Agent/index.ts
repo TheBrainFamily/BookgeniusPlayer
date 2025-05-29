@@ -51,6 +51,7 @@ export const characterMetadata = new Map([
   ["Pani-Neale", { display: "Pani Neale", summary: "Posługaczka w domu Verloców." }],
   ["Starszy-lokaj", { display: "Starszy lokaj", summary: "Lokaj w domu opiekunki Michaelisa." }],
   ["Towarzysz-Ossipon", { display: "Towarzysz Ossipon", summary: "" }],
+  ["Mlody-rzeznik", { display: "Młody rzeźnik", summary: "" }],
 ]);
 
 export const chapterComponents = {

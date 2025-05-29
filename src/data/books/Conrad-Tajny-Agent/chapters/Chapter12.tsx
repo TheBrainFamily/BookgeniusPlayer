@@ -218,15 +218,15 @@ export const Chapter12: React.FC = () => {
         </span>{" "}
         zachwiała się, pochyliła naprzód i szła dalej przed siebie na oślep, bojąc się okropnie, aby nie upaść; nagle, uszedłszy kilka kroków, doznała uczucia ulgi i
         bezpieczeństwa. Podniósłszy głowę, zobaczyła męskie oblicze wpatrzone z bliska w jej twarz zasłoniętą woalką.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>{" "}
         nie lękał się nieznajomych kobiet i żadne poczucie fałszywej delikatności nie przeszkadzało mu zaznajomić się z tą kobietą najwidoczniej pijaniusieńką.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>{" "}
         interesował się kobietami. Podtrzymał ową kobietę dwiema szerokimi dłońmi, patrząc na nią ciągle w sposób rzeczowy, a gdy usłyszał cichy okrzyk: „Pan{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>
         !', ledwie jej z rąk nie wypuścił.
@@ -236,7 +236,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         —{" "}
@@ -253,7 +253,7 @@ export const Chapter12: React.FC = () => {
           Verlocu
         </span>
         , usiłował przyciągnąć ją do piersi. Ku jego zdumieniu pozwoliła na to z łatwością i nawet wsparła się chwilę o jego ramię, zanim spróbowała się wyswobodzić.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>{" "}
         nie chciał łaskawego losu przynaglać. Cofnął ramię naturalnym ruchem.
@@ -273,11 +273,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Naturalnie, że panią poznałem — rzekł{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         bez zająknienia. — Bałem się, że pani upadnie. Zbyt często myślałem o pani w ostatnich czasach, aby pani nie poznać wszędzie, o każdej porze dnia. Myślałem o pani zawsze —
@@ -305,11 +305,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Tak — odrzekł{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>
         . — Wyszedłem z domu natychmiast po przeczytaniu dziennika.
@@ -317,7 +317,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="24">
         {" "}
         W rzeczywistości zaś{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysz Ossipon
         </span>{" "}
         ukrywał się przeszło dwie godziny w pobliżu Brett Street, nie mogąc się zdecydować na żaden odważny krok. Krzepki anarchista nie był właściwie mężnym zdobywcą. Pamiętał, że{" "}
@@ -328,7 +328,7 @@ export const Chapter12: React.FC = () => {
         policja powzięła przesadne wyobrażenie o jego rewolucyjnych sympatiach. Nawet i teraz nie wiedział dokładnie, co robić. W stosunku do jego zwykłych miłosnych poczynań było
         to przedsięwzięcie wielkie i poważne. Nie wiedział, jak dużo mógłby osiągnąć, ani jak daleko będzie się musiał posunąć, aby zdobyć to, co jest do zdobycia — jeśli w ogóle w
         tym wypadku coś zdobyć można. Te wątpliwości przyćmiły radość{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>{" "}
         i nadały jego głosowi wstrzemięźliwość odpowiadającą sytuacji.
@@ -338,7 +338,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Czy zechce mi pani powiedzieć, dokąd pani szła? — rzekł ściszonym głosem.
@@ -359,12 +359,12 @@ export const Chapter12: React.FC = () => {
       </p>
       <p data-index="27">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         doszedł do wniosku, że jest bardzo podniecona, ale najzupełniej trzeźwa. Milczała chwilę u jego boku, a potem nagle zrobiła coś, czego zupełnie nie oczekiwał. Wsunęła mu
         rękę pod ramię. Ten gest zaskoczył go, zwłaszcza stanowczość, którą wyczuł w dotknięciu. Ale sprawa była delikatna i{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysz Ossipon
         </span>{" "}
         zachował się z delikatnością. Poprzestał na lekkim przytuleniu tej ręki do swych krzepkich żeber. Jednocześnie zaś uczuł, że{" "}
@@ -402,11 +402,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Powiem, że nikt chętniej ode mnie nie dopomoże pani w jej troskach — odrzekł{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>
         , czując, iż zbliża się do celu z szybkością wręcz niesłychaną. Zawrotne tempo, jakie przybrała owa delikatna sprawa, tamowało mu oddech.
@@ -430,7 +430,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Otóż to właśnie.
@@ -450,11 +450,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — W dziesięć minut po przeczytaniu wieczornej gazety — odrzekł{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         z zapałem — natknąłem się na człowieka, którego pani może widziała parę razy w sklepie; pomówiłem z nim i ta rozmowa wyjaśniła mi wszystko. Zaraz potem wyruszyłem tutaj,
@@ -462,7 +462,7 @@ export const Chapter12: React.FC = () => {
       </p>
       <p data-index="35">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>{" "}
         słusznie przypuszczał, że nie ma kobiety, która by choć trochę nie uwierzyła takiemu oświadczeniu. Ale nie wiedział, że{" "}
@@ -495,11 +495,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Wyczytała to pani z mych oczu — poddał{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         z wielką pewnością siebie.
@@ -519,7 +519,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Tego rodzaju uczucie nie mogło się ukryć przed taką kobietą jak pani — ciągnął dalej, usiłując oderwać myśli od względów materialnych, jak na przykład rentowność sklepu
@@ -528,7 +528,7 @@ export const Chapter12: React.FC = () => {
           pan Verloc
         </span>{" "}
         mógł zostawić w banku.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         usiłował patrzeć na tę sprawę tylko od strony uczuciowej. A w głębi ducha poniekąd gorszył się swym powodzeniem.{" "}
@@ -536,7 +536,7 @@ export const Chapter12: React.FC = () => {
           Verloc
         </span>{" "}
         był człowiekiem porządnym i, o ile można było sądzić, mężem bardzo przyzwoitym. Lecz{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysz Ossipon
         </span>{" "}
         nie miał zamiaru przeciwstawiać się swemu szczęściu ze względu na człowieka, który już nie żył. Poskromił więc współczucie dla ducha towarzysza{" "}
@@ -550,7 +550,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Nie potrafiłem ukryć swojej miłości. Pani przepełniała mi duszę. Ośmielę się twierdzić, że musiała pani wyczytać to z moich oczu. Ale nie byłem tego pewien. Pani wydawała
@@ -583,7 +583,7 @@ export const Chapter12: React.FC = () => {
       </p>
       <p data-index="45">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         pominął to milczeniem i podjął znowu:
@@ -593,7 +593,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Ja zawsze uważałem, że on nie był pani godzien — rzekł, przestając się troszczyć o lojalność względem zmarłego. — Należał się pani lepszy los.
@@ -617,11 +617,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Wydawało się, że pani jest z nim bardzo szczęśliwa — starał się{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         usprawiedliwić obojętność swego dawnego postępowania. — To mnie właśnie onieśmielało. Miałem wrażenie, że pani go kocha. Dziwiłem się… i byłem zazdrosny — dodał.
@@ -643,7 +643,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="50">
         {" "}
         Dźwięk tego imienia przejął dumą{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysza Ossipona
         </span>
         . Albowiem na imię było mu Aleksander, a Tomem zwali go tylko najbliżsi, używając tego spieszczenia w chwilach poufnych zwierzeń. Nie wiedział, że{" "}
@@ -674,8 +674,11 @@ export const Chapter12: React.FC = () => {
       </p>
       <p data-index="52">
         {" "}
-        Wspomnienie wczesnej, romantycznej miłości do <Mlody-rzeznik>młodego rzeźnika</Mlody-rzeznik> — niby wizerunek objawionego ideału — przetrwało uporczywie w jej sercu,
-        drżącym teraz ze strachu przed szubienicą i pełnym buntu przeciw śmierci.
+        Wspomnienie wczesnej, romantycznej miłości do{" "}
+        <span className="character-highlighted" data-character="Mlody-rzeznik" data-src-listening="/Conrad-Tajny-Agent/mlody-rzeznik.png">
+          młodego rzeźnika
+        </span>{" "}
+        — niby wizerunek objawionego ideału — przetrwało uporczywie w jej sercu, drżącym teraz ze strachu przed szubienicą i pełnym buntu przeciw śmierci.
       </p>
       <p data-index="53">
         {" "}
@@ -707,7 +710,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="54">
         {" "}
         W szepcie jej taka była siła i taka zawziętość, że{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysz Ossipon
         </span>{" "}
         oniemiał.{" "}
@@ -722,7 +725,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Nie, nie wiedziałem o tym — oświadczył z pewnego rodzaju bezsilną głupotą, której śmieszność była stracona dla tej kobiety drżącej przed szubienicą — ale teraz już wiem.
@@ -732,7 +735,7 @@ export const Chapter12: React.FC = () => {
         </span>{" "}
         oddawać pod pokrywką sennych, spokojnych pozorów małżeńskiego pożycia. To było naprawdę okropne. — Ja rozumiem — powtórzył i pod wpływem natchnienia wyrzekł ze wzniosłym
         współczuciem; — Nieszczęsna kobieto! — zamiast użyć bardziej poufałego: „kochane biedactwo', którym to zwrotem zwykle się posługiwał. Ale ten wypadek nie był przeciętny.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         czuł, że dzieje się coś niezwykłego, a jednocześnie nie tracił z oczu wielkości stawki. — Dzielna, nieszczęsna kobieto!
@@ -743,7 +746,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — No ale on już przecież nie żyje — to było wszystko, na co jeszcze potrafił się zdobyć. Zawarł należytą dozę wrogości w tym ostrożnym okrzyku.{" "}
@@ -765,11 +768,11 @@ export const Chapter12: React.FC = () => {
       <p data-index="59">
         {" "}
         Odcień tryumfu, ulgi, wdzięczności zabrzmiał w nieokreślonym tonie jej słów. Ton tych słów pochłonął całkowicie uwagę{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>{" "}
         z uszczerbkiem dla ich treści.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>{" "}
         nie mógł zrozumieć, co się dzieje z tą kobietą i dlaczego doprowadziła się do stanu tak szalonego podniecenia. Zadał sobie nawet pytanie, czy ukrytą przyczyną zamachu w
@@ -791,7 +794,7 @@ export const Chapter12: React.FC = () => {
           Profesorem
         </span>{" "}
         w dodatku. Naprawdę — myślał{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         w zdumieniu — on chyba na pewno to zrobił! Biedaczysko! Przyszło mu do głowy, że z tych dwojga małżonków niekoniecznie mąż był diabłem.
@@ -799,7 +802,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="60">
         {" "}
         Aleksander{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>
         , zwany Doktorem, miał wrodzoną skłonność do pobłażliwej oceny swoich przyjaciół. O przyjaciółkach zaś myślał pod specjalnym, a mianowicie praktycznym kątem widzenia.
@@ -808,7 +811,7 @@ export const Chapter12: React.FC = () => {
           panią Verloc
         </span>{" "}
         wspartą o jego ramię. Nie przejął się nadmiernie jej okrzykiem zdumienia na wieść, że on,{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>
         , wie o śmierci{" "}
@@ -821,7 +824,7 @@ export const Chapter12: React.FC = () => {
           Verloc
         </span>{" "}
         zdradził się przed żoną ze swym zamiarem — jakikolwiek był ten zamiar. Zagadnienie to interesowało niezmiernie{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysza Ossipona
         </span>
         . Zatrzymał się. Obeszli już wszystkie trzy strony Brett Place i znaleźli się znów blisko końca Brett Street.
@@ -831,11 +834,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — A skąd ty się o tym dowiedziałaś? — zapytał{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>
         , usiłując dostosować ton głosu do rewelacyjnych zwierzeń uczynionych mu przez kobietę stojącą u jego boku.
@@ -875,7 +878,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="66">
         {" "}
         Piersi jej falowały od suchych łkań.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         w jednej chwili odzyskał głos.
@@ -885,7 +888,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Policja! Czy chcesz przez to powiedzieć, że policja już była? Że{" "}
@@ -910,7 +913,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         —{" "}
@@ -946,11 +949,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Drugi… drugi komisarz, co? — zapytał{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         w wielkim podnieceniu, głosem bardzo podobnym do głosu przestraszonego dziecka.
@@ -967,7 +970,7 @@ export const Chapter12: React.FC = () => {
       </p>
       <p data-index="74">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>{" "}
         ledwie nie zemdlał od tego nowego wstrząsu.
@@ -977,7 +980,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Z ambasady! Czy ty wiesz, co mówisz? Z jakiej ambasady? Co przez to rozumiesz?
@@ -997,7 +1000,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — A ten drugi, co on zrobił albo powiedział?
@@ -1017,11 +1020,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Dobrze, dobrze. Już nie będę pytał — rzekł czule{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>
         . Uległ nie dlatego, aby był wzruszony jej tragicznym, błagalnym głosem, tylko czuł, że się gubi w labiryncie tej mrocznej sprawy. Policja! Ambasada! Fiu! Odsunął od siebie
@@ -1055,7 +1058,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Niestety, moja droga, nie mogę cię zabrać do swojego pokoju. Mieszkam razem z przyjacielem.
@@ -1085,11 +1088,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Może dałoby się gdzieś wyszukać jakieś bezpieczne mieszkanie — odezwał się wreszcie{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>
         . — Ale mówiąc szczerze, moja droga, za mało mam na to pieniędzy — ledwie kilka pensów. My, rewolucjoniści, nie jesteśmy bogaci.
@@ -1100,7 +1103,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — A tu jeszcze podróż przed nami — i to wczesnym rankiem — dodał.
@@ -1108,7 +1111,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="89">
         {" "}
         Nie odrzekła nic, nie poruszyła się wcale i{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysza Ossipona
         </span>{" "}
         zaczęło ogarniać rozczarowanie. Widać{" "}
@@ -1132,7 +1135,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — A ile? — zapytał, nie ruszając się z miejsca, choć go ciągnęła; był to człowiek ostrożny.
@@ -1152,7 +1155,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Jak to? Wszystkie pieniądze, które były w banku, czy co? — spytał niedowierzająco, gotów jednak nie dziwić się szczęśliwemu zrządzeniu losu.
@@ -1172,7 +1175,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Jakim sposobem potrafiłaś już do nich się dobrać? — zdumiał się.
@@ -1186,7 +1189,7 @@ export const Chapter12: React.FC = () => {
           data-is-talking="true"
         />
         — Sam mi je dał — szepnęła, nagle zgaszona i drżąca.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>{" "}
         poskromił z siłą wzrastające w nim zdumienie.
@@ -1196,7 +1199,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — No więc… jesteśmy ocaleni — wyrzekł powoli.
@@ -1205,7 +1208,7 @@ export const Chapter12: React.FC = () => {
         {" "}
         Pochyliła się naprzód i opadła znów na jego piersi. Objął ją serdecznie. Miała przy sobie wszystkie pieniądze! Jej kapelusz, a także i woalka przeszkadzały gwałtownemu
         upustowi uczuć.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         ujawnił je w odpowiedniej mierze, ale nic ponadto. Poddała mu się bez oporu i bez uniesienia, biernie, jakby na wpół przytomna. Uwolniła się łatwo z jego luźnego uścisku.
@@ -1227,7 +1230,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Czegóż ty u diabła się boisz?
@@ -1242,15 +1245,15 @@ export const Chapter12: React.FC = () => {
         />
         — Przecież odgadłeś, co ja musiałam zrobić! — krzyknęła kobieta. Szał ją ogarniał od straszliwie wyrazistych przeczuć, w głowie jej dźwięczały gwałtowne słowa
         uprzytamniające grozę położenia, a jednocześnie była przekonana, że jej bezładne wyznania są jasne i przejrzyste. Nie miała pojęcia, jak niewiele mógł{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         zrozumieć z tych urywanych zdań, które uzupełniała tylko w myśli. Odczuła ulgę niby po wyczerpującej spowiedzi i każde słowo{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>{" "}
         wydawało jej się pełne szczególnego znaczenia, a tymczasem{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         ani w części tego, co ona, nie wiedział. — Przecież odgadłeś, co ja musiałam zrobić! — powtórzyła załamującym się głosem. — Więc łatwo ci się domyślić, przed czym drżę —
@@ -1263,13 +1266,13 @@ export const Chapter12: React.FC = () => {
         kobietami i zawsze skłonny był raczej kierować się nabytym już doświadczeniem, niż traktować indywidualnie każdy konkretny wypadek. Zresztą w tym wypadku jego roztropny
         umysł pracował w innych kierunkach. Słowa kobiece lecą z wiatrem jak plewy, lecz braki w komunikacji statkami są nie do usunięcia. Wyspiarski charakter Wielkiej Brytanii
         narzucił się uwadze{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>{" "}
         w przykry sposób. „Człowiek ma wrażenie, że każdej nocy biorą go pod klucz' — pomyślał ze złością, taki skłopotany, jakby musiał drapać się na mur, dźwigając tę kobietę na
         grzbiecie. Nagle uderzył się w czoło: wysiliwszy pamięć, przypomniał sobie o linii Southampton - St. Malo. Statek wyruszał około północy. Dziesiąta trzydzieści odchodził
         pociąg.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         poweselał i nabrał ochoty do czynu.
@@ -1279,7 +1282,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Odjedziemy ze stacji Waterloo. Jeszcze mnóstwo czasu. Właściwie to wszystko w porządku… O co ci znów chodzi? Ależ nie tędy — protestował.
@@ -1303,7 +1306,7 @@ export const Chapter12: React.FC = () => {
       </p>
       <p data-index="107">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>{" "}
         przestał już interesować się sklepem oraz całą jego zawartością. Umiał ograniczać się w swych pragnieniach. Już, już chciał powiedzieć: „Więc co? Dajmy temu spokój', lecz
@@ -1334,7 +1337,7 @@ export const Chapter12: React.FC = () => {
       </p>
       <p data-index="110">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         wysunął głowę i dostrzegł nikłe światło wśród ciemności sklepu.
@@ -1344,7 +1347,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Tak, rzeczywiście — odrzekł.
@@ -1362,7 +1365,7 @@ export const Chapter12: React.FC = () => {
           pani Verloc
         </span>{" "}
         dochodził słabo zza woalki. Gdy{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         stał, chcąc ją puścić przodem, rzekła głośniej: — Wejdź i zgaś, bo inaczej zwariuję.
@@ -1373,7 +1376,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Gdzie są te wszystkie pieniądze? — zapytał.
@@ -1391,7 +1394,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="116">
         {" "}
         Nieprzygotowany do stawienia oporu{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysz Ossipon
         </span>
         , pchnięty przez{" "}
@@ -1403,11 +1406,11 @@ export const Chapter12: React.FC = () => {
       </p>
       <p data-index="117">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>{" "}
         wyminął z łatwością koniec lady i zbliżył się spokojnie do oszklonych drzwi saloniku. Firanka zasłaniająca szyby była trochę ściągnięta na bok i{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         pod wpływem naturalnego odruchu zajrzał do saloniku przed naciśnięciem klamki. Zajrzał machinalnie, bez żadnego celu, bez ciekawości. Zajrzał, bo zajrzeć musiał. Zajrzał —
@@ -1420,11 +1423,11 @@ export const Chapter12: React.FC = () => {
       <p data-index="118">
         {" "}
         W piersi{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>{" "}
         zrodził się wrzask i zamarł bez dźwięku, przeistoczony w tłusty, mdlący posmak na wargach. Jednocześnie zaś duchowa istota{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysza Ossipona
         </span>{" "}
         wykonała oszalały skok w tył. Lecz jego ciało, pozbawione kierownictwa rozumu, trzymało się klamki z bezmyślną siłą instynktu. Krzepki anarchista nawet się nie zachwiał.
@@ -1435,7 +1438,7 @@ export const Chapter12: React.FC = () => {
           Verloców
         </span>{" "}
         — przeszyła nie tyle jego mózg, co żołądek, i znikła, pozostawiając chorobliwą omdlałość i nudności. Przez chwilę, przez długą chwilę{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysz Ossipon
         </span>{" "}
         nie czuł się bynajmniej dobrze — i to w sposób bardzo specjalny. Lecz wciąż patrzył. A tymczasem{" "}
@@ -1444,7 +1447,7 @@ export const Chapter12: React.FC = () => {
         </span>{" "}
         leżał bez ruchu, z wiadomych sobie powodów udając sen, jego żona zaś, ta dzika kobieta, strzegła drzwi — niewidoczna i niema wśród mroku opustoszałej ulicy. Czyżby to
         wszystko było jakąś straszliwą machinacją uknutą przez policję na intencję jego,{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>
         ? W swej skromności odrzucił takie rozwiązanie zagadki.
@@ -1459,7 +1462,7 @@ export const Chapter12: React.FC = () => {
         , spoczywającego na kanapie i rozkoszującego się pełnią spokoju i wygody domowego ogniska. Od kapelusza oczy krzepkiego anarchisty powędrowały ku odsuniętemu stołowi,
         patrzyły chwilę na stłuczony półmisek i doznały jakby optycznego wstrząsu, dostrzegłszy połyskliwą białość pod niedomkniętymi powiekami człowieka leżącego na kanapie.
         Wydało się teraz{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossiponowi
         </span>
         , że{" "}
@@ -1467,7 +1470,7 @@ export const Chapter12: React.FC = () => {
           pan Verloc
         </span>{" "}
         niekoniecznie śpi, że raczej leży z przechyloną głową i patrzy uporczywie na swą lewą pierś. A gdy{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysz Ossipon
         </span>{" "}
         dostrzegł wreszcie rękojeść noża, odwrócił się od szklanych drzwi, wstrząśnięty gwałtownym kurczem zwiastującym wymioty.
@@ -1475,7 +1478,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="120">
         {" "}
         Nagle usłyszał, że drzwi od ulicy się zatrzaskują i dusza uciekła mu w pięty. Ten dom ze swym nieszkodliwym mieszkańcem mógł jednak służyć za pułapkę — i to straszliwą.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>{" "}
         nie miał już teraz pojęcia, co się z nim dzieje. Zaczepiwszy udem o koniec lady, obrócił się w kółko i zachwiał z okrzykiem bólu; wśród przerażającego grzechotu dzwonka
@@ -1493,11 +1496,11 @@ export const Chapter12: React.FC = () => {
       </p>
       <p data-index="122">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         przestał się wydzierać: ona go nie puści. Ręce jej splotły się nierozerwalnym węzłem na krzepkich plecach{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>
         . Kroki na ulicy zbliżały się; dyszeli oboje pierś w pierś ciężko, mozolnie, co wyglądało na śmiertelną walkę, choć postawa ich wyrażała śmiertelny strach. Czas dłużył się
@@ -1525,7 +1528,7 @@ export const Chapter12: React.FC = () => {
           Verloca
         </span>
         , trzymał równie dobrze jak zazwyczaj. W chwili gdy sumienny agent policji potrząsał klamką,{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         poczuł znów zimne wargi kobiece muskające mu ucho:
@@ -1548,7 +1551,7 @@ export const Chapter12: React.FC = () => {
           Winnie
         </span>{" "}
         rozplotły się i ramiona jej z wolna opadły.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         wsparł się o ladę. Krzepki anarchista potrzebował na gwałt podpory. To, co przeżył, było straszliwe. Ogarnął go wielki niesmak i nie chciało mu się mówić. Zdobył się jednak
@@ -1559,7 +1562,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Jeszcze parę chwil i z twojej winy byłbym się nadział na tego draba obmacującego sklep swoją, psiakrew, latarką.
@@ -1585,7 +1588,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="129">
         {" "}
         Ujrzała niewyraźnie jego porywczy gest odmowy. Za żadne skarby świata{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         nie wróciłby do saloniku. Nie był przesądny, ale widział tam za wiele krwi na podłodze; kapelusz był otoczony wielką kałużą. Już i tak oglądał zbyt blisko tego trupa;
@@ -1604,11 +1607,11 @@ export const Chapter12: React.FC = () => {
       <p data-index="131">
         {" "}
         Krzepka postać{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysza Ossipona
         </span>{" "}
         przeszła przez sklep jak cień wielkimi, porywczymi krokami i przykucnęła posłusznie w kącie; ale w tym posłuszeństwie było dużo niechęci.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         szukał teraz nerwowo kurka, mrucząc przekleństwa; za oszklonymi drzwiami zapadła nagle ciemność i prawie natychmiast rozległo się chrapliwe, histeryczne westchnienie
@@ -1625,7 +1628,7 @@ export const Chapter12: React.FC = () => {
       </p>
       <p data-index="132">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         szedł po omacku z powrotem ku ladzie przez duszny mrok, czarny teraz jak sadza. Głos{" "}
@@ -1647,7 +1650,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="134">
         {" "}
         Umilkła.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         rzucił od lady przestrogę:
@@ -1657,7 +1660,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Nie krzycz tak. — Zdawał się głęboko namyślać. — Zrobiłaś to zupełnie sama? — zapytał głucho, ale z wszelkimi pozorami władczego spokoju, co przepełniło serce{" "}
@@ -1681,7 +1684,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Nigdy bym w to nie uwierzył — mruknął. — Nikt by nie uwierzył.
@@ -1689,7 +1692,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="138">
         {" "}
         Posłyszała jego ruchy w ciemności i odgłos zatrzasku w drzwiach saloniku.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>
         , przekręciwszy klucz, zapewnił{" "}
@@ -1699,7 +1702,7 @@ export const Chapter12: React.FC = () => {
         spokój; nie uczynił tego przez szacunek dla wiecznotrwałości jego spoczynku, ani też wiedziony jakimś innym uczuciowym względem, lecz wyłącznie dlatego, że wcale nie był
         pewien, czy ktoś nie ukrywa się jeszcze gdzieś w domu. Nie wierzył słowom tej kobiety, a raczej nie umiał na razie osądzić, co jest rzeczywiste, prawdopodobne lub nawet
         możliwe na tym zdumiewającym świecie. Strach wyzuł{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>{" "}
         z wszelkich uczuć wiary lub zwątpienia odnośnie do tej niesłychanej sprawy, która zaczęła się przy współudziale komisarzy policji i ambasad, a skończy się Bóg raczy
@@ -1755,7 +1758,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="143">
         {" "}
         Posunęła się naprzód w ciemności. Przerażenie zdjęło{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>
         . Nie zdziwiłby się, gdyby nagle wydobyła drugi nóż, aby go zatopić w jego piersi. Aniby myślał się bronić. W owej chwili nie miał po prostu sił krzyknąć, żeby ją osadzić
@@ -1766,7 +1769,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Czy on spał?
@@ -1798,11 +1801,11 @@ export const Chapter12: React.FC = () => {
       <p data-index="148">
         {" "}
         Błysk światła przeszył mózg{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysza Ossipona
         </span>
         : to ten półgłówek zginął w parku! Cóż za niesłychana mistyfikacja, wszyscy bez wyjątku zostali nabrani.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         wykrzyknął w najwyższym zdumieniu:
@@ -1812,7 +1815,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Słowo daję, to ten degenerat!
@@ -1834,12 +1837,12 @@ export const Chapter12: React.FC = () => {
       </p>
       <p data-index="151">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         bał się jej straszliwie — tej siostry degenerata, która sama była degeneratką typu zbrodniczego… a może kłamliwego. Poza wszystkimi innymi rodzajami strachu, budziła w nim
         także lęk, rzekłbyś, naukowy. Przerażenie{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>
         , bezgraniczne i skomplikowane, właśnie wskutek swego nadmiaru robiło w ciemnościach wrażenie spokojnej, głębokiej rozwagi, gdyż poruszał się i mówił z trudem, jakby wola i
@@ -1870,7 +1873,7 @@ export const Chapter12: React.FC = () => {
           Winnie
         </span>{" "}
         w rozpędzie. Nagle poczuł, że opasała mu nogi; strach jego przekroczył wszelką miarę, zaczął działać jak trucizna, zrodził halucynacje, nabrał cech białej gorączki.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         naprawdę widział teraz węże. Widział, że ta kobieta owija się wokół niego jak wąż, który nie pozwoli się strząsnąć. Nie była morderczynią. Była wcieloną śmiercią —
@@ -1898,11 +1901,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Wstań — rzekł{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>
         .
@@ -1922,12 +1925,12 @@ export const Chapter12: React.FC = () => {
           Pani Verloc
         </span>{" "}
         dźwignęła się z ziemi, a{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         pożałował, że nie wybiegł natychmiast na dwór. Ale zrozumiał w mig, że to by nie przydało się na nic. Rzuciłaby się za nim. Goniłaby go, krzycząc, ażby wszyscy okoliczni
         policjanci zaczęli go ścigać. A wtedy Bóg raczy wiedzieć, co by o nim powiedziała.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         bał się do tego stopnia, że mignęła mu przez głowę obłędna myśl, aby ją udusić w ciemności. Przerażenie jego wzrosło do punktu kulminacyjnego. Jest w mocy tej kobiety!
@@ -1948,7 +1951,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Chodźmy, bo się spóźnimy na pociąg.
@@ -1972,7 +1975,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Najpierw do Paryża; tak będzie najlepiej… Wyjdź pierwsza i zobacz, czy tam kogoś nie ma.
@@ -1990,7 +1993,7 @@ export const Chapter12: React.FC = () => {
       </p>
       <p data-index="166">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         wysunął się na ulicę. Mimo jego wysiłków, aby uczynić to jak najciszej, pęknięty dzwonek zagrzechotał za drzwiami w pustym sklepie, jakby starając się na próżno ostrzec{" "}
@@ -2013,7 +2016,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Gdy zajedziemy — mówił dziwnym, jednostajnym głosem — musisz wejść na stację osobno, jak gdybyśmy się nie znali. Kupię bilety i wsunę ci twój do ręki, kiedy cię będę
@@ -2038,14 +2041,14 @@ export const Chapter12: React.FC = () => {
           pani Verloc
         </span>
         , siedząc tuż przy{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossiponie
         </span>
         , zmartwiała ze strachu przed szubienicą. — Dobrze, Tomie. — I powtórzyła po cichu jakby straszliwą zwrotkę: — „Spuszczono delikwenta z wysokości czternastu stóp'.
       </p>
       <p data-index="170">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         nie patrzył na nią; twarz jego wyglądała jak gipsowa maska zdjęta z niego po ciężkiej chorobie.
@@ -2055,7 +2058,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Ach, prawda — rzekł — potrzeba mi teraz pieniędzy na kupienie biletów.
@@ -2072,7 +2075,7 @@ export const Chapter12: React.FC = () => {
         {" "}
         Wszystko to odbyło się bez zamiany jednego spojrzenia; robili wrażenie dwojga ludzi, którzy wypatrują upragnionego celu. Dopiero gdy dorożka skręciła na rogu ulicy i
         zbliżała się do mostu,{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         znów otworzył usta.
@@ -2082,7 +2085,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Czy wiesz, ile tam jest pieniędzy? — zadał pytanie, jakby się zwracał do chochlika siedzącego na głowie konia między jego uszami.
@@ -2104,7 +2107,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="176">
         {" "}
         Poruszyła z lekka prawą ręką. W nieznacznym ruchu tej prawej ręki, która przed niespełna godziną zadała śmiertelny cios, przebijając ludzkie serce, było tyle wyrazu, że{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         nie umiał powstrzymać dreszczu. Przedłużył go umyślnie i mruknął:
@@ -2114,7 +2117,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Zimno mi. Przemarzłem do szpiku kości.
@@ -2130,7 +2133,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="179">
         {" "}
         Sztywność{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>{" "}
         miała w sobie coś rzeczowego, jakiś dziwaczny urzędowy wyraz. Nagle zaczął znów mówić, jakby mu się język rozwiązał:
@@ -2140,7 +2143,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Słuchaj no, może wiesz, czy twój… czy konto w banku było na jego własne nazwisko, czy też na czyjeś inne?
@@ -2167,11 +2170,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Odpowiedz mi na to dokładnie — pouczał{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         w sunącej szybko dorożce. — To niezmiernie ważne. Wytłumaczę ci. W banku zachowano numery tych banknotów. Jeśli wypłacili mu je na jego własne nazwisko, to kiedy się
@@ -2183,7 +2186,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Ani trochę? — nalegał.
@@ -2203,7 +2206,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Więc to by było niebezpieczne. Trzeba by operować tymi pieniędzmi w specjalny sposób. Bardzo specjalny. Musielibyśmy pewno stracić więcej niż połowę całej sumy, aby
@@ -2230,7 +2233,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Jesteś tego pewna?
@@ -2250,7 +2253,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — I nie przypuszczasz, aby ktoś w banku znał jego prawdziwe nazwisko? Może który z urzędników, albo…
@@ -2271,7 +2274,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Nie. To chyba nie jest prawdopodobne. Choć lepiej byłoby wiedzieć… No, przyjechaliśmy. Wysiadaj pierwsza i idź prosto na dworzec. Ruszaj się żwawo.
@@ -2283,7 +2286,7 @@ export const Chapter12: React.FC = () => {
           pani Verloc
         </span>{" "}
         z biletem do St. Malo w ręku weszła do damskiej poczekalni,{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysz Ossipon
         </span>{" "}
         udał się do baru i w siedem minut wchłonął trzy szklanki wody sodowej z mocną wódką.
@@ -2293,7 +2296,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Chcę pozbyć się zaziębienia — wyjaśnił kelnerce z przyjaznym skinieniem głowy, uśmiechając się kurczowo. Po tym wesołym intermedium
@@ -2306,7 +2309,7 @@ export const Chapter12: React.FC = () => {
         </span>{" "}
         ukazała się punktualnie, cała w czerni — czarna jak śmierć we własnej osobie — z opuszczoną woalką, z pęczkiem tanich, bladych kwiatów u kapelusza. Przeszła tuż koło grupy
         śmiejących się mężczyzn, których śmiech można było zgasić jednym słowem. Szła krokiem opieszałym, ale trzymała się prosto;{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysz Ossipon
         </span>{" "}
         popatrzył na nią ze zgrozą, nim ruszył z miejsca.
@@ -2318,7 +2321,7 @@ export const Chapter12: React.FC = () => {
           Pani Verloc
         </span>{" "}
         szła powoli wzdłuż pustych przedziałów, póki{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         nie dotknął z tyłu jej łokcia.
@@ -2328,7 +2331,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Wejdź tutaj.
@@ -2349,18 +2352,18 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Poczekaj. Tam idzie konduktor.
       </p>
       <p data-index="204">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         zaczepił człowieka w mundurze. Rozmawiali przez chwilę. Słyszała, jak konduktor powiedział: „Dobrze, proszę pana', dotykając czapki.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         wrócił i rzekł:
@@ -2370,7 +2373,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Powiedziałem mu, żeby nie wpuszczał nikogo do naszego przedziału.
@@ -2395,7 +2398,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Nic nam nie grozi — rzekł, spoglądając w nie z natężeniem prawie drapieżnym;{" "}
@@ -2403,11 +2406,11 @@ export const Chapter12: React.FC = () => {
           pani Verloc
         </span>
         , uciekającej przed szubienicą, to spojrzenie wydało się pełne tkliwości i siły. Wzruszyło ją głęboko — i ponura, surowa zgroza ustąpiła z kamiennej twarzy.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>{" "}
         wpatrywał się w nią, jak nigdy kochanek nie wpatrywał się w ukochaną. Aleksander{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>
         , anarchista przezwany Doktorem, autor medycznej (i nieprzyzwoitej) broszury, były prelegent (zajmował się społeczną stroną higieny i wygłaszał odczyty w klubach
@@ -2418,7 +2421,7 @@ export const Chapter12: React.FC = () => {
           pani Verloc
         </span>{" "}
         rozchyliły się, zmiękłszy pod jego zaciekle badawczym wzrokiem, spojrzał także na jej zęby… Nie ulega żadnej wątpliwości… typ zbrodniczy… Jeśli{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysz Ossipon
         </span>{" "}
         nie polecił Lombrosowi swej przerażonej duszy, to wyłącznie dlatego, że zgodnie z zasadami nauki nie wierzył, aby coś na kształt duszy mogło w nim przebywać. Natomiast
@@ -2429,7 +2432,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — To był niezwykły chłopak, ten twój brat. Nadzwyczaj interesujący do studiowania. Doskonały typ w swoim rodzaju. Doskonały!
@@ -2458,11 +2461,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — To wprost niewiarygodne, do jakiego stopnia wyście byli do siebie podobni — ciągnął{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>
         , dając wyraz swej nieustannej obawie, a zarazem usiłując nie zdradzić chorobliwie nerwowej niecierpliwości, z jaką wyczekiwał odejścia pociągu. — Tak, on był do ciebie
@@ -2471,7 +2474,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="214">
         {" "}
         Z tych słów nie przebijało żadne szczególne wzruszenie ani też współczucie. Ale już sam fakt, że{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         podkreślał podobieństwo{" "}
@@ -2479,7 +2482,7 @@ export const Chapter12: React.FC = () => {
           Winnie
         </span>{" "}
         do brata, wstrząsnął silnie jej uczuciami. Z lekkim okrzykiem wyprężyła ramiona i wybuchnęła nareszcie płaczem.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         wsiadł do wagonu, zamknął pośpiesznie drzwi i spojrzał przez okno na zegar stacyjny. Jeszcze osiem minut. Przez pierwsze trzy minuty{" "}
@@ -2535,11 +2538,11 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Przesiądź się w tamten kąt, dalej od peronu — rzekł pieczołowicie{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>
         .
@@ -2548,7 +2551,7 @@ export const Chapter12: React.FC = () => {
         {" "}
         Usłuchała swego zbawcy, który usadowił ją troskliwie i śledził na jej twarzy nadejście drugiego ataku płaczu, jeszcze gwałtowniejszego niż pierwszy. Przypatrywał jej się z
         miną, rzekłbyś, lekarza liczącego sekundy. Nareszcie usłyszał gwizd. W chwili gdy pociąg ruszał, mimowolny skurcz górnej wargi odsłonił zęby{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>{" "}
         i nadał jego twarzy wyraz dzikiej stanowczości.{" "}
@@ -2556,7 +2559,7 @@ export const Chapter12: React.FC = () => {
           Pani Verloc
         </span>{" "}
         była nieczuła na wszystko, a{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>
         , jej zbawca, stał jak wryty. Czuł, że wagony suną coraz szybciej, towarzysząc głuchym stukotem głośnym łkaniom kobiety. Nagle dwoma susami minął przedział, otworzył
@@ -2576,7 +2579,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Ale drugi raz tego nie zrobię — rzekł w końcu; uśmiechnął się do wszystkich wokoło, rozdał trochę drobnych i opuścił stację, nawet nie kulejąc.
@@ -2584,7 +2587,7 @@ export const Chapter12: React.FC = () => {
       <p data-index="224">
         {" "}
         Znalazłszy się przed dworcem,{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysz Ossipon
         </span>
         , zaopatrzony w banknoty jak jeszcze nigdy w życiu, odrzucił propozycję dorożkarza.
@@ -2594,7 +2597,7 @@ export const Chapter12: React.FC = () => {
         <span
           className="character-placeholder character-talking"
           data-character="Towarzysz-Ossipon"
-          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon.png"
+          data-src-talking="/Conrad-Tajny-Agent/towarzysz-ossipon-speaks.mp4"
           data-is-talking="true"
         />
         — Mogę iść pieszo — rzucił z przyjaznym uśmiechem uprzejmemu dorożkarzowi.
@@ -2603,7 +2606,7 @@ export const Chapter12: React.FC = () => {
         {" "}
         Mógł iść. I poszedł. Przebył most. Potem wieże Opactwa<a href="#fn91" className="link-note"></a>, stojące w masywnym bezruchu, widziały żółty wiecheć jego czupryny sunący
         pod latarniami. Światła dzielnicy Victoria widziały go także, i Sloane Square, i sztachety Hyde Parku. Po jakimś czasie{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           towarzysz Ossipon
         </span>{" "}
         znalazł się znów na moście. Przyciągnęła jego uwagę rzeka, przepych mrocznych cieni i rozmigotanych blasków kłębiących się w dole wśród ponurej ciszy. Stał długi czas,
@@ -2611,7 +2614,7 @@ export const Chapter12: React.FC = () => {
       </p>
       <p data-index="227">
         {" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>{" "}
         znowu zaczął iść. Jego krzepką postać widziano tej nocy w odległych dzielnicach miasta, które jak olbrzymi potwór drzemało na dywanie z błota pod welonem zimnej mgły.
@@ -2624,11 +2627,11 @@ export const Chapter12: React.FC = () => {
         Tak jak stał, rzucił się ubrany na łóżko i leżał nieruchomo przez cały kwadrans. Nagle siadł, podciągnął kolana i objął je rękami. Brzask zastał go siedzącego w tej samej
         pozie z otwartymi oczyma. Ten człowiek, który mógł chodzić tak długo, tak daleko, tak zupełnie bez celu, nie zdradzając najlżejszego zmęczenia, mógł także siedzieć
         godzinami jak posąg, nie drgnąwszy ani ręką, ani nogą. Ale gdy późne słońce przeniknęło do pokoju,{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipon
         </span>{" "}
         opuścił ręce i padł w tył na poduszkę. Oczy jego patrzyły w sufit. Raptem zamknęły się.{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Towarzysz Ossipon
         </span>{" "}
         spał w blasku słońca.

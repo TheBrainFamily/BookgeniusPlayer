@@ -94,7 +94,7 @@ export const Chapter9: React.FC = () => {
           Yundt
         </span>{" "}
         jest „obrzydliwym starym dziadem'. O wizycie{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>
         , którego przyjęła chłodno zza szańca lady, z kamienną twarzą i wzrokiem jakby nieobecnym, nie powiedziała nic, a jej wspomnienie o krzepkim anarchiście zaznaczyło się
@@ -576,7 +576,7 @@ export const Chapter9: React.FC = () => {
           Karla Yundta
         </span>
         , tego „wstrętnego starca',{" "}
-        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon.png">
+        <span className="character-highlighted" data-character="Towarzysz-Ossipon" data-src-listening="/Conrad-Tajny-Agent/towarzysz-ossipon-listens.mp4">
           Ossipona
         </span>{" "}
         zaś pominęła milczeniem. Naturalnie, że to by zrobiło{" "}
