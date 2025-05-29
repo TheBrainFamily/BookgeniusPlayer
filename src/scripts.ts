@@ -1,10 +1,14 @@
+/**
+ * Polish typography rules
+ * Non-breaking spaces before certain words
+ */
 document.querySelectorAll("#legacy p, #legacy span, #legacy li").forEach((el) => {
   el.innerHTML = el.innerHTML.replace(/(\s|^)([aiouwz]|na|do|od|za|po|we|ku|ze|co|że|bo|iż|ni|nad|pod|bez|dla|oraz|ale|lub|czy|ani)\s/gi, "$1$2\u00A0");
 });
 
 /**
- * Pre-React Splash Screen
- * This script runs before React loads to show an immediate loading screen
+ * Splash Screen
+ * Manages the splash screen with loading phrases and a start button
  */
 const loadingPhrases = [
   "Kreowanie wirtualnej biblioteki...",
@@ -51,7 +55,7 @@ class SplashScreenManager {
       this.previousPhrases.clear();
     }
 
-    let phrase;
+    let phrase: string;
     let attempts = 0;
     const maxAttempts = 10; // Prevent infinite loop
 
@@ -69,30 +73,22 @@ class SplashScreenManager {
   updatePhrase() {
     const phraseElement = document.getElementById("loading-phrase");
     if (phraseElement) {
-      // Fade out current phrase
-      phraseElement.style.animation = "none";
-      phraseElement.style.opacity = "0";
-      phraseElement.style.transform = "translateY(-20px)";
-      phraseElement.style.filter = "blur(3px)";
+      phraseElement.style.animation = "textFadeOut 0.3s ease-out forwards";
 
       setTimeout(() => {
-        // Update text and fade in new phrase
         this.currentPhrase = this.getRandomPhrase();
         phraseElement.textContent = this.currentPhrase;
         phraseElement.style.animation = "textFadeIn 0.5s ease-out forwards";
-      }, 200);
+      }, 300);
     }
   }
 
   setupPhraseCycle() {
-    // Initial phrase
     this.updatePhrase();
 
-    // Set up interval for phrase changes
-    const PHRASE_DURATION_MS = 3000;
     this.phraseInterval = setInterval(() => {
       this.updatePhrase();
-    }, PHRASE_DURATION_MS);
+    }, 3000);
   }
 
   displayStartButton() {
@@ -127,7 +123,7 @@ class SplashScreenManager {
         if (window.playAudiobook) {
           window.playAudiobook(true);
         }
-      }, 1000); // Match animation duration
+      }, 1000);
     } catch (error) {
       console.error("Error during splash screen exit:", error);
       // Fallback: force exit even if there was an error

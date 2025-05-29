@@ -1,4 +1,4 @@
-/* Pre-React Splash Screen Styles */
+/* Splash Screen Styles */
 #splash-screen {
   position: fixed;
   inset: 0;
@@ -228,6 +228,19 @@
     opacity: 1;
     transform: translateY(0);
     filter: blur(0);
+  }
+}
+
+@keyframes textFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+    filter: blur(3px);
   }
 }
 
