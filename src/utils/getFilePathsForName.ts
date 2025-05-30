@@ -102,6 +102,8 @@ export const knownPharaon = [
   "nikotris-speaks.mp4",
   "nitager-listens.mp4",
   "nitager-speaks.mp4",
+  "nomarcha-memfijski-listens.mp4",
+  "nomarcha-memfijski-speaks.mp4",
   "otoes-listens.mp4",
   "otoes-speaks.mp4",
   "paraszyta-przebrany-za-tyfona-listens.mp4",
