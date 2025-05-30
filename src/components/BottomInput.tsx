@@ -8,7 +8,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { CURRENT_BOOK } from "@/consts";
 import { useLocation } from "@/state/LocationContext";
 import { deepResearchCall } from "@/deepResearchCall";
-import { useModal } from "@/context/ModalProvider";
+import { useSearchModal } from "@/stores/modals/searchModal.store";
+import { useDeepResearchModal } from "@/stores/modals/deepResearchModal.store";
 
 interface SubmitMessageData {
   query: string;
@@ -26,7 +27,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
 
-  const { openSearchModal, closeModal, currentModal, performSearchInModal, openDeepResearchModal } = useModal();
+  const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
+  const { openModal: openDeepResearchModal } = useDeepResearchModal();
 
   const { startRecording, stopRecording, response } = useRealtime();
   const { location } = useLocation();
@@ -72,18 +74,18 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     if (response && !isRecording) {
       setValue(response);
       updateLastActivity();
-      if (currentModal?.type === "search") {
-        performSearchInModal(response);
+      if (isSearchModalOpen) {
+        setSearchQuery(response);
       }
     }
-  }, [response, isRecording, currentModal?.type, performSearchInModal, updateLastActivity]);
+  }, [response, isRecording, isSearchModalOpen, setSearchQuery, updateLastActivity]);
 
   const toggleDeepResearch = () => {
     updateLastActivity();
     const newDeepResearchState = !isDeepResearchActive;
     setIsDeepResearchActive(newDeepResearchState);
-    if (newDeepResearchState && currentModal?.type === "search") {
-      closeModal(); // Close search modal if deep research is activated
+    if (newDeepResearchState && isSearchModalOpen) {
+      closeSearchModal(); // Close search modal if deep research is activated
     }
     if (newDeepResearchState) {
       setValue(""); // Clear input when activating deep research
@@ -98,15 +100,15 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     if (isDeepResearchActive) return;
 
     const trimmedValue = newVal.trim();
-    if (!trimmedValue.length && currentModal?.type === "search") {
-      performSearchInModal("");
+    if (!trimmedValue.length && isSearchModalOpen) {
+      setSearchQuery("");
       return;
     }
 
-    if (currentModal?.type !== "search") {
+    if (!isSearchModalOpen) {
       openSearchModal(true, true, trimmedValue);
     } else {
-      performSearchInModal(trimmedValue);
+      setSearchQuery(trimmedValue);
     }
   };
 
@@ -117,8 +119,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     const trimmedValue = value.trim();
     if (!trimmedValue) return;
 
-    if (currentModal?.type === "search") {
-      performSearchInModal(trimmedValue);
+    if (isSearchModalOpen) {
+      setSearchQuery(trimmedValue);
       return;
     }
 
@@ -147,13 +149,13 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     setValue("");
 
     // Clear search if starting voice input while search modal is open
-    if (currentModal?.type === "search") performSearchInModal("");
+    if (isSearchModalOpen) setSearchQuery("");
 
     startRecording().catch((error) => {
       console.error("Error starting recording:", error);
       setIsRecording(false);
     });
-  }, [isRecording, startRecording, currentModal?.type, performSearchInModal, updateLastActivity]);
+  }, [isRecording, startRecording, isSearchModalOpen, setSearchQuery, updateLastActivity]);
 
   const handleRecordingEnd = useCallback(() => {
     if (!isRecording) return;

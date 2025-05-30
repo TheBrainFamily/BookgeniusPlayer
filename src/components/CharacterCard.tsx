@@ -4,7 +4,7 @@ import CharacterMedia from "./CharacterMedia";
 import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
 import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { CURRENT_BOOK } from "@/consts";
-import { useModal } from "@/context/ModalProvider";
+import { useCharacterModal } from "@/stores/modals/characterModal.store";
 import { useHighlight } from "@/context/HighlightContext";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +15,7 @@ interface CharacterCardProps {
 }
 
 const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
-  const { openCharacterDetailsModal } = useModal();
+  const { openModal } = useCharacterModal();
   const { highlightParagraphs, isScrollingLocked } = useHighlight();
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -81,7 +81,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
             ? "z-10 shadow-lg border-2 border-(--book-primary-color) animate-pulse-glow"
             : "transition-transform duration-300 ease-in-out hover:scale-110 hover:z-10",
         )}
-        onClick={() => openCharacterDetailsModal(entity.slug, isTalkingInCurrentRange, mediaSrc)}
+        onClick={() => openModal(entity.slug, isTalkingInCurrentRange, mediaSrc)}
       >
         <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />
       </div>

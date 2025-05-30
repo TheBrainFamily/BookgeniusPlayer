@@ -23,7 +23,7 @@ import { useAppReady } from "./hooks/useAppReady";
 import useSplashHidden from "./hooks/useSplashHidden";
 import { initAudioContext } from "./audio-crossfader";
 import CharacterNotesPanel from "./components/CharacterNotesPanel";
-import { ModalProvider } from "./context/ModalProvider";
+import { ModalRenderers } from "./features/ModalRenderers";
 
 function Shell() {
   /* dynamic visual hooks */
@@ -83,11 +83,10 @@ export default function App() {
       <RealtimeProvider>
         <WebSocketProvider>
           <BookThemeProvider>
-            <ModalProvider>
-              <BookContentWrapper>
-                <Shell />
-              </BookContentWrapper>
-            </ModalProvider>
+            <BookContentWrapper>
+              <Shell />
+              <ModalRenderers />
+            </BookContentWrapper>
           </BookThemeProvider>
         </WebSocketProvider>
       </RealtimeProvider>
