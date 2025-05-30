@@ -40,23 +40,23 @@ export class PromptsManager {
     }
   }
 
-  public generateMusicShiftRule(): void {
+  public generateMusicSuggestionRule(): void {
     try {
-      const musicShiftInitialPrompt = fs.readFileSync(`${this.promptsPath}/musicShiftInitialPrompt.mdc`, "utf-8");
+      const musicSuggestionInitialPrompt = fs.readFileSync(`${this.promptsPath}/musicSuggestionInitialPrompt.mdc`, "utf-8");
 
       this.makeRulesDirectory();
 
-      fs.writeFileSync(`${this.cursorRulesPath}/rules/musicShiftRulePrompt.mdc`, musicShiftInitialPrompt);
+      fs.writeFileSync(`${this.cursorRulesPath}/rules/musicSuggestionRulePrompt.mdc`, musicSuggestionInitialPrompt);
     } catch (err) {
       console.error(err);
     }
   }
 
-  public removeMusicShiftRule(): void {
+  public removeMusicSuggestionRule(): void {
     try {
-      fs.rmSync(`${this.cursorRulesPath}/rules/musicShiftRulePrompt.mdc`);
+      fs.rmSync(`${this.cursorRulesPath}/rules/musicSuggestionRulePrompt.mdc`);
     } catch (err) {
-      console.error(`Fail during musicShiftRulePrompt: ${err}`);
+      console.error(`Fail during musicSuggestionRulePrompt: ${err}`);
     }
   }
 
@@ -65,6 +65,26 @@ export class PromptsManager {
       fs.rmSync(`${this.cursorRulesPath}/rules/wrap${this.bookSlug}CharactersRulePrompt.mdc`);
     } catch (err) {
       console.error(`Fail during removeWrapCharactersRulePrompt: ${err}`);
+    }
+  }
+
+  public generateBackgroundSuggestionRule(): void {
+    try {
+      const backgroundSuggestionInitialPrompt = fs.readFileSync(`${this.promptsPath}/backgroundSuggestionInitialPrompt.mdc`, "utf-8");
+
+      this.makeRulesDirectory();
+
+      fs.writeFileSync(`${this.cursorRulesPath}/rules/backgroundSuggestionRulePrompt.mdc`, backgroundSuggestionInitialPrompt);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  public removeBackgroundSuggestionRule(): void {
+    try {
+      fs.rmSync(`${this.cursorRulesPath}/rules/backgroundSuggestionRulePrompt.mdc`);
+    } catch (err) {
+      console.error(`Fail during backgroundSuggestionRulePrompt: ${err}`);
     }
   }
 }

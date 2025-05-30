@@ -67,7 +67,7 @@ export class TextEditorController {
     }
   };
 
-  public addMusicSuggestionToParagraph: RequestHandler = async (req, res) => {
+  public addMusicSuggestion: RequestHandler = async (req, res) => {
     try {
       const { chapterNumber, paragraphNumber } = req.body;
 
@@ -76,7 +76,7 @@ export class TextEditorController {
         return;
       }
 
-      const result = await this.textEditorService.addMusicShiftSuggestionToParagraph(Number(chapterNumber), Number(paragraphNumber));
+      const result = await this.textEditorService.addMusicSuggestion(Number(chapterNumber), Number(paragraphNumber));
 
       res.json({ success: true, data: result });
     } catch (error) {
@@ -84,7 +84,7 @@ export class TextEditorController {
     }
   };
 
-  public removeMusicShift: RequestHandler = async (req, res) => {
+  public removeMusicSuggestion: RequestHandler = async (req, res) => {
     try {
       const { chapterNumber, paragraphNumber } = req.body;
 
@@ -93,7 +93,41 @@ export class TextEditorController {
         return;
       }
 
-      const result = this.textEditorService.removeMusicShift(Number(chapterNumber), Number(paragraphNumber));
+      const result = this.textEditorService.removeMusicSuggestion(Number(chapterNumber), Number(paragraphNumber));
+
+      res.json({ success: true, data: result });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  };
+
+  public addBackgroundSuggestion: RequestHandler = async (req, res) => {
+    try {
+      const { chapterNumber, paragraphNumber } = req.body;
+
+      if (!chapterNumber || paragraphNumber === null) {
+        res.status(400).json({ error: "Missing required parameters" });
+        return;
+      }
+
+      const result = await this.textEditorService.addBackgroundSuggestion(Number(chapterNumber), Number(paragraphNumber));
+
+      res.json({ success: true, data: result });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  };
+
+  public removeBackgroundSuggestion: RequestHandler = async (req, res) => {
+    try {
+      const { chapterNumber, paragraphNumber } = req.body;
+
+      if (!chapterNumber || !paragraphNumber) {
+        res.status(400).json({ error: "Missing required parameters" });
+        return;
+      }
+
+      const result = this.textEditorService.removeBackgroundSuggestion(Number(chapterNumber), Number(paragraphNumber));
 
       res.json({ success: true, data: result });
     } catch (error) {

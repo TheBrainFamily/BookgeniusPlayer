@@ -2,13 +2,16 @@ import { useEffect, useRef } from "react";
 import { useModal } from "@/context/ModalContext";
 import { handleAddCharacter } from "@/text-editor-service/listeners/handleAddCharacter";
 import { handleEditParagraph } from "@/text-editor-service/listeners/handleEditParagraph";
-import { handleAddMusicShiftParagraph } from "@/text-editor-service/listeners/handleAddMusicShiftParagraph";
+import { handleAddMusicSuggestion } from "@/text-editor-service/listeners/handleAddMusicSuggestion";
 import { handleRemoveCharacter } from "@/text-editor-service/listeners/handleRemoveCharacter";
-import { handleRemoveMusicShift } from "@/text-editor-service/listeners/handleRemoveMusicShift";
+import { handleRemoveMusicSuggestion } from "@/text-editor-service/listeners/handleRemoveMusicSuggestion";
+import { handleRemoveBackgroundSuggestion } from "@/text-editor-service/listeners/handleRemoveBackgroundSuggestion";
+import { handleAddBackgroundSuggestion } from "@/text-editor-service/listeners/handleAddBackgroundSuggestion";
 
 export function useEditorMode(container: HTMLElement | null) {
   const { openEditorModeModal } = useModal();
   const mKeyPressed = useRef(false);
+  const bKeyPressed = useRef(false);
 
   useEffect(() => {
     if (!container) return;
@@ -22,8 +25,9 @@ export function useEditorMode(container: HTMLElement | null) {
       const paragraphNumber = parseInt(paragraphTag.attributes["data-index"].value);
       const characterTag = target.getAttribute("data-character");
       const musicShiftTag = target.getAttribute("data-editor-tag") === "musicShift";
+      const backgroundShiftTag = target.getAttribute("data-editor-tag") === "backgroundShift";
 
-      if (paragraphTag && !characterTag && !musicShiftTag) {
+      if (paragraphTag && !characterTag && !musicShiftTag && !backgroundShiftTag) {
         if (!event.metaKey && event.altKey) {
           return openEditorModeModal("add-character", (characterSlug: string) => handleAddCharacter(target, chapterNumber, paragraphNumber, characterSlug));
         }
@@ -33,7 +37,11 @@ export function useEditorMode(container: HTMLElement | null) {
         }
 
         if (mKeyPressed.current) {
-          return handleAddMusicShiftParagraph(chapterNumber, paragraphNumber);
+          return handleAddMusicSuggestion(chapterNumber, paragraphNumber);
+        }
+
+        if (bKeyPressed.current) {
+          return handleAddBackgroundSuggestion(chapterNumber, paragraphNumber);
         }
       }
 
@@ -42,19 +50,25 @@ export function useEditorMode(container: HTMLElement | null) {
       }
 
       if (mKeyPressed.current && musicShiftTag) {
-        return handleRemoveMusicShift(chapterNumber, paragraphNumber);
+        return handleRemoveMusicSuggestion(chapterNumber, paragraphNumber);
+      } else if (bKeyPressed.current && backgroundShiftTag) {
+        return handleRemoveBackgroundSuggestion(chapterNumber, paragraphNumber);
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "m" || event.key === "M") {
         mKeyPressed.current = true;
+      } else if (event.key === "b" || event.key === "b") {
+        bKeyPressed.current = true;
       }
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
       if (event.key === "m" || event.key === "M") {
         mKeyPressed.current = false;
+      } else if (event.key === "b" || event.key === "b") {
+        bKeyPressed.current = false;
       }
     };
 

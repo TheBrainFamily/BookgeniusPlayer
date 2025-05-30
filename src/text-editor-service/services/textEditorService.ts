@@ -20,11 +20,19 @@ export class TextEditorService {
     return this.textEditor.addCharacter(chapterNumber, paragraphNumber, characterName, selectedText, startSelectedWordIndex, endSelectedWordIndex);
   }
 
-  public addMusicShiftSuggestionToParagraph(chapterNumber: number, paragraphNumber: number) {
-    return this.textEditor.addMusicShiftSuggestionToParagraph(chapterNumber, paragraphNumber);
+  public addMusicSuggestion(chapterNumber: number, paragraphNumber: number) {
+    return this.textEditor.addMusicSuggestion(chapterNumber, paragraphNumber);
   }
 
-  public removeMusicShift(chapterNumber: number, paragraphNumber: number) {
-    return this.textEditor.removeMusicShift(chapterNumber, paragraphNumber);
+  public removeMusicSuggestion(chapterNumber: number, paragraphNumber: number) {
+    return this.textEditor.removeMusicSuggestion(chapterNumber, paragraphNumber);
+  }
+
+  public addBackgroundSuggestion(chapterNumber: number, paragraphNumber: number) {
+    return this.textEditor.addBackgroundSuggestion(chapterNumber, paragraphNumber);
+  }
+
+  public removeBackgroundSuggestion(chapterNumber: number, paragraphNumber: number) {
+    return this.textEditor.removeBackgroundSuggestion(chapterNumber, paragraphNumber);
   }
 }

@@ -10,9 +10,13 @@ router.post("/remove-character", textEditorController.removeCharacter);
 
 router.post("/add-character", textEditorController.addCharacter);
 
-router.post("/add-music-shift", textEditorController.addMusicSuggestionToParagraph);
+router.post("/add-music-suggestion", textEditorController.addMusicSuggestion);
 
-router.post("/remove-music-shift", textEditorController.removeMusicShift);
+router.post("/remove-music-suggestion", textEditorController.removeMusicSuggestion);
+
+router.post("/add-background-suggestion", textEditorController.addBackgroundSuggestion);
+
+router.post("/remove-background-suggestion", textEditorController.removeBackgroundSuggestion);
 
 // // Add a character to a paragraph
 // router.post("/character", textEditorController.addCharacter);

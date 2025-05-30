@@ -56,13 +56,13 @@ export class TextEditor {
     }
   }
 
-  public async addMusicShiftSuggestionToParagraph(chapterNumber: number, paragraphNumber: number): Promise<void> {
+  public async addMusicSuggestion(chapterNumber: number, paragraphNumber: number): Promise<void> {
     try {
       const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
       const { paragraph } = this.xmlManager.getParagraphElement(xmlDoc, chapterNumber, paragraphNumber);
       const originalParagraph = this.xmlManager.getParagraphHtml(paragraph);
 
-      this.promptsManager.generateMusicShiftRule();
+      this.promptsManager.generateMusicSuggestionRule();
       const updatedParagraph = await this.editorManager.openInCursor(originalParagraph);
       const updatedParagraphElement = this.xmlManager.stringToElement(updatedParagraph);
       const updatedParagraphText = this.xmlManager.getParagraphText(updatedParagraphElement);
@@ -72,9 +72,31 @@ export class TextEditor {
         this.fileManager.regenerateXml(updatedXml);
       }
 
-      this.promptsManager.removeMusicShiftRule();
+      this.promptsManager.removeMusicSuggestionRule();
     } catch (error) {
       this.handleError("add music shift suggestion to paragraph", error);
+    }
+  }
+
+  public async addBackgroundSuggestion(chapterNumber: number, paragraphNumber: number): Promise<void> {
+    try {
+      const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+      const { paragraph } = this.xmlManager.getParagraphElement(xmlDoc, chapterNumber, paragraphNumber);
+      const originalParagraph = this.xmlManager.getParagraphHtml(paragraph);
+
+      this.promptsManager.generateBackgroundSuggestionRule();
+      const updatedParagraph = await this.editorManager.openInCursor(originalParagraph);
+      const updatedParagraphElement = this.xmlManager.stringToElement(updatedParagraph);
+      const updatedParagraphText = this.xmlManager.getParagraphText(updatedParagraphElement);
+
+      if (updatedParagraph !== originalParagraph) {
+        const updatedXml = this.xmlManager.updateAndSaveXml(xmlDoc, paragraph, updatedParagraphText);
+        this.fileManager.regenerateXml(updatedXml);
+      }
+
+      this.promptsManager.removeBackgroundSuggestionRule();
+    } catch (error) {
+      this.handleError("add background shift suggestion to paragraph", error);
     }
   }
 
@@ -107,7 +129,7 @@ export class TextEditor {
     }
   }
 
-  public removeMusicShift(chapterNumber: number, paragraphNumber: number): string {
+  public removeMusicSuggestion(chapterNumber: number, paragraphNumber: number): string {
     const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
     const { paragraph } = this.xmlManager.getParagraphElement(xmlDoc, chapterNumber, paragraphNumber);
     if (!paragraph) {
@@ -116,6 +138,21 @@ export class TextEditor {
 
     const paragraphText = this.xmlManager.getParagraphText(paragraph);
     const updatedParagraph = paragraphText.replace(/<musicShift[^>]*>.*?<\/musicShift>|<musicShift[^>]*\/>/g, "");
+
+    const updatedXml = this.xmlManager.updateAndSaveXml(xmlDoc, paragraph, updatedParagraph);
+    this.fileManager.regenerateXml(updatedXml);
+    return updatedXml;
+  }
+
+  public removeBackgroundSuggestion(chapterNumber: number, paragraphNumber: number): string {
+    const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+    const { paragraph } = this.xmlManager.getParagraphElement(xmlDoc, chapterNumber, paragraphNumber);
+    if (!paragraph) {
+      throw new ParagraphNotFoundError(chapterNumber, paragraphNumber);
+    }
+
+    const paragraphText = this.xmlManager.getParagraphText(paragraph);
+    const updatedParagraph = paragraphText.replace(/<backgroundShift[^>]*>.*?<\/backgroundShift>|<backgroundShift[^>]*\/>/g, "");
 
     const updatedXml = this.xmlManager.updateAndSaveXml(xmlDoc, paragraph, updatedParagraph);
     this.fileManager.regenerateXml(updatedXml);

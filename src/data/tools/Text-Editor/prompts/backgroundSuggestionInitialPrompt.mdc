@@ -1,0 +1,86 @@
+---
+description: "Guides the AI to insert <backgroundShift /> tags with highly descriptive style attributes into paragraphs, based on user's natural language prompts about desired visual scenes, settings, and artistic styles."
+globs: *.xml
+alwaysApply: false
+---
+
+# Guidelines for Inserting <backgroundShift /> Tags
+
+When I provide a paragraph of text (often the current text I'm editing or discussing) and subsequently describe in chat (e.g., using `Cmd+L`) a desired visual background, setting, or artistic style, your primary task is to accurately insert a `<backgroundShift />` tag into that paragraph. Please adhere to the following detailed instructions:
+
+1.  **Recognize User Intent:**
+    Your first step is to recognize that my prompt is requesting a visual background description. This intent might be conveyed by:
+    * Descriptions of a scene's location, time of day, or atmosphere.
+    * Requests for a specific artistic style, mood, or visual aesthetic.
+    * Details about lighting, color palettes, and environmental elements.
+
+2.  **The Specific Tag to Insert:**
+    The exact XML/HTML tag to be inserted is: `<backgroundShift />`.
+
+3.  **Generating the `style` Attribute – Crafting a Detailed Visual Brief:**
+    * The `<backgroundShift />` tag **must always** include a `style` attribute.
+    * The value of this `style` attribute should be a **comprehensive, descriptive text**, much like a creative brief you'd give to a concept artist or a detailed prompt for an AI image generator. It should synthesize the key visual elements from my prompt into a coherent description.
+    * **Analysis:** Carefully analyze my description of the desired background. Extract and structure information related to:
+        * **Subject & Setting:** What is the scene? (e.g., "Victorian London street," "enchanted forest," "futuristic cityscape").
+        * **Artistic Style:** (e.g., "digital painting," "photorealistic," "impressionistic," "cyberpunk aesthetic," "noir film style").
+        * **Mood & Atmosphere:** (e.g., "mysterious," "serene," "dystopian," "eerie," "romantic").
+        * **Lighting:** (e.g., "cinematic lighting," "soft dappled sunlight," "dramatic chiaroscuro," "neon glow," "gaslight ambience").
+        * **Color Palette:** (e.g., "muted greys and deep browns," "vibrant electric blues and pinks," "earthy tones with pops of color").
+        * **Key Elements & Details:** Specific objects, textures, weather conditions, or focal points.
+        * **Influences:** Any artistic influences or references I mention.
+    * **Summarization into a Brief:** Combine these extracted elements into a well-organized descriptive paragraph or a few detailed sentences for the `style` attribute. The goal is to provide enough detail to clearly define the visual characteristics of the desired background. Refer to the examples below.
+
+4.  **Determining Tag Placement:**
+    * Unless my prompt explicitly specifies a different location, the `<backgroundShift />` tag should generally be placed at the **beginning of the paragraph or sentence** where the described visual scene is intended to be established.
+    * If I provide a paragraph enclosed in tags (e.g., `<p>...</p>`), insert the `<backgroundShift />` tag immediately *after* the opening paragraph tag and *before* its text content (as demonstrated in the examples).
+
+5.  **Preserving Original Text:**
+    It is crucial that the original text content of the paragraph is fully preserved. The `<backgroundShift />` tag should be inserted without altering or deleting the existing text.
+
+**Examples of Application:**
+
+**Example 1 (Victorian Noir Psychological Thriller):**
+
+* **Initial Paragraph Snippet:**
+    ```xml
+    <p>He adjusted his coat collar against the biting wind, the flickering gaslight casting long, dancing shadows down the narrow cobblestone alley.</p>
+    ```
+* **My Prompt (e.g., in the chat / `Cmd+L`):**
+    ```
+    For this scene, I need a background that embodies a dark psychological noir aesthetic, specifically set in late Victorian London. I'm thinking of a digital painting style, but with a soft cinematic feel. The lighting is key: it should be cinematic, really accentuating intrigue and paranoia through stark but softened contrasts and very heavy shadows. The color palette should be mostly muted greys, deep browns, and shadowy blues, but with subtle punctuations from lantern yellows and a hazy gaslight ambience. It should feel influenced by vintage espionage illustrations and moody realism.
+    ```
+* **Expected Output:**
+    ```xml
+    <p><backgroundShift style="Digital painting for an ebook background. Soft cinematic-style. Dark psychological noir aesthetic set in late Victorian London. Cinematic lighting accentuates intrigue, paranoia, and moral ambiguity through stark but soften contrasts and heavy shadows. Color palette dominated by muted greys, deep browns, and shadowy blues punctuated subtly by lantern yellows and hazy gaslight ambience. Influenced by vintage espionage illustrations, Victorian noir atmospherics, and trending moody realism."/>He adjusted his coat collar against the biting wind, the flickering gaslight casting long, dancing shadows down the narrow cobblestone alley.</p>
+    ```
+
+**Example 2 (Enchanted Fantasy Forest):**
+
+* **Initial Paragraph Snippet:**
+    ```xml
+    <p>She stepped through the shimmering portal and found herself in an ancient, whispering wood, unlike anything she had ever imagined.</p>
+    ```
+* **My Prompt (e.g., in the chat / `Cmd+L`):**
+    ```
+    The background for this part should be an ancient, deeply enchanted forest. I want a rich digital painting style. Imagine towering, ancient trees covered in glowing moss, with dappled sunlight or mystical light beams filtering through a very dense canopy, creating an ethereal and magical atmosphere. The color palette should focus on deep, verdant greens, earthy browns, and perhaps some otherworldly blues or purples in the shadowed areas. The overall feeling should be of serene mystery, old magic, and a touch of melancholy beauty.
+    ```
+* **Expected Output:**
+    ```xml
+    <p><backgroundShift style="Rich digital painting of an ancient, enchanted forest. Towering, moss-covered trees with dappled or mystical sunlight filtering through a dense canopy, creating an ethereal, magical, and serene atmosphere with a touch of melancholy beauty. Color palette: deep verdant greens, earthy browns, with otherworldly blues or purples in shadows. Evokes old magic and serene mystery."/>She stepped through the shimmering portal and found herself in an ancient, whispering wood, unlike anything she had ever imagined.</p>
+    ```
+
+**Example 3 (Cyberpunk Cityscape at Night):**
+
+* **Initial Paragraph Snippet:**
+    ```xml
+    <p>The grav-shuttle descended through layers of neon-lit skyscrapers, towards the bustling, multi-levelled sky-port far below.</p>
+    ```
+* **My Prompt (e.g., in the chat / `Cmd+L`):**
+    ```
+    This scene needs a dynamic cyberpunk cityscape at night. The viewpoint is high, looking down or through massive skyscrapers drenched in vibrant neon signs and massive holographic advertisements. Flying vehicles should be zipping between buildings. The overall aesthetic is sleek and high-tech, but with underlying grit and urban decay. Lighting must be dramatic, coming from the city's own glow, casting long shadows. Key colors: electric blues, deep purples, hot pinks, and fiery oranges contrasted against dark, rain-slicked metallic surfaces.
+    ```
+* **Expected Output:**
+    ```xml
+    <p><backgroundShift style="Dynamic cyberpunk cityscape at night from a high viewpoint. Towering skyscrapers covered in vibrant neon signs and holographic advertisements, with flying vehicles. Sleek, high-tech, yet gritty aesthetic. Dramatic lighting from city glow casting long shadows. Color palette: electric blues, deep purples, hot pinks, fiery oranges against dark, rain-slicked metallic surfaces."/>The grav-shuttle descended through layers of neon-lit skyscrapers, towards the bustling, multi-levelled sky-port far below.</p>
+    ```
+---
