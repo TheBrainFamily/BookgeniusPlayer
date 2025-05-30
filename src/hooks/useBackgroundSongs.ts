@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 
-import { useLocation } from "@/state/LocationContext";
 import { dealWithBackgroundSongs as impl } from "@/deal-with-background-songs";
-import { useDebounce } from "./useDebounce";
+import { useLocationRange } from "./useLocationRange";
 
 /* We keep a mutable ref so we can swap the implementation on HMR */
 const implRef = { current: impl };
@@ -15,9 +14,9 @@ if (import.meta.hot) {
 }
 
 export function useBackgroundSongs() {
-  const { location } = useLocation();
-
-  const { currentChapter, currentParagraph } = useDebounce(location, 300);
+  const {
+    debouncedLocation: { currentChapter, currentParagraph },
+  } = useLocationRange(300);
 
   useEffect(() => {
     implRef.current({ currentChapter, currentParagraph });

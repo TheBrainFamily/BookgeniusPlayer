@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 
-import { useLocation } from "@/state/LocationContext";
 import { dealWithAudiobookTracks as impl } from "@/deal-with-audiobook-playback";
-import { useDebounce } from "./useDebounce";
 import { stopAllTracks } from "@/audiobook-player";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
+import { useLocationRange } from "./useLocationRange";
 
 /* We keep a mutable ref so we can swap the implementation on HMR */
 const implRef = { current: impl };
@@ -21,8 +20,9 @@ const IS_PLAYING_AUDIO_BOOK_KEY = "isPlayingAudioBook";
 export function useAudiobookTracks() {
   // Read the localStorage setting ONCE when the hook initializes.
   const initialIsPlayingAudioBookSetting = localStorage.getItem(IS_PLAYING_AUDIO_BOOK_KEY);
-  const { location } = useLocation();
-  const { currentChapter, currentParagraph } = useDebounce(location, 300);
+  const {
+    debouncedLocation: { currentChapter, currentParagraph },
+  } = useLocationRange(300);
 
   useEffect(() => {
     // This effect runs on chapter/paragraph change. Only start audiobook playback
