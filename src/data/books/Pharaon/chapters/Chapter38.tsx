@@ -675,7 +675,12 @@ export const Chapter38: React.FC = () => {
       </p>
       <p data-index="69">
         {" "}
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—{" "}
+        <span
+          className="character-placeholder character-talking"
+          data-character="Ksiaze-Ramzes"
+          data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4"
+          data-is-talking="true"
+        />—{" "}
         <span className="character-highlighted" data-character="Sara" data-src-listening="/Pharaon/sara-listens.mp4">
           Saro
         </span>

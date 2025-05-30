@@ -85,7 +85,12 @@ export const Chapter39: React.FC = () => {
       </p>
       <p data-index="10">
         {" "}
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—{" "}
+        <span
+          className="character-placeholder character-talking"
+          data-character="Ksiaze-Ramzes"
+          data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4"
+          data-is-talking="true"
+        />—{" "}
         <span className="character-highlighted" data-character="Pieszczota" data-src-listening="/Pharaon/pieszczota-listens.mp4">
           Kamo
         </span>{" "}
@@ -478,7 +483,12 @@ export const Chapter39: React.FC = () => {
       </p>
       <p data-index="44">
         {" "}
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—{" "}
+        <span
+          className="character-placeholder character-talking"
+          data-character="Ksiaze-Ramzes"
+          data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4"
+          data-is-talking="true"
+        />—{" "}
         <span className="character-highlighted" data-character="Pieszczota" data-src-listening="/Pharaon/pieszczota-listens.mp4">
           Kamo
         </span>

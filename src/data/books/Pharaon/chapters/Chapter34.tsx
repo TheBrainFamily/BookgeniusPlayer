@@ -242,7 +242,12 @@ export const Chapter34: React.FC = () => {
       <p data-index="28"> Chciał powiedzieć: „nic nie wiem', lecz wstrzymał się. Zaczął się śmiać i odparł:</p>
       <p data-index="29">
         {" "}
-        <span className="character-placeholder character-talking" data-character="Ksiaze-Ramzes" data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4" data-is-talking="true" />—{" "}
+        <span
+          className="character-placeholder character-talking"
+          data-character="Ksiaze-Ramzes"
+          data-src-talking="/Pharaon/ksiaze-ramzes-speaks.mp4"
+          data-is-talking="true"
+        />—{" "}
         <span className="character-highlighted" data-character="Pieszczota" data-src-listening="/Pharaon/pieszczota-listens.mp4">
           Kamo
         </span>

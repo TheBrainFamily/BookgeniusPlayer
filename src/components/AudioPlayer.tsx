@@ -28,8 +28,11 @@ import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { CURRENT_BOOK } from "@/consts";
+import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
 
 const AudioPlayer = () => {
+  const isMobileOrTablet = useIsMobileOrTablet();
+
   const [isPlayingAudioBook, setIsPlayingAudiobook] = useLocalStorageState("isPlayingAudioBook", { defaultValue: true });
   const [volume, setVolume] = useLocalStorageState("volume", { defaultValue: getMasterVolume() ?? 0.5 });
   const [balance, setBalance] = useLocalStorageState("balance", { defaultValue: 0.5 });
@@ -505,7 +508,8 @@ const AudioPlayer = () => {
         {showSongNotification && currentTrackData && windowWidth && (
           <motion.div
             className={cn(
-              windowWidth >= 1280 && "absolute w-100 top-5 right-5",
+              windowWidth >= 1280 && !isMobileOrTablet && "absolute w-100 top-5 right-5",
+              windowWidth >= 1280 && isMobileOrTablet && "fixed w-80 bottom-5 left-5",
               windowWidth < 1280 && windowWidth >= 965 && "fixed w-80 bottom-5 left-5",
               windowWidth < 965 && "fixed w-80 bottom-20 left-5",
             )}
