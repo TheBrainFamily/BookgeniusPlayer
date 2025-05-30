@@ -1,14 +1,14 @@
 import { useEffect, useRef } from "react";
-import { useModal } from "@/context/ModalProvider";
 import { handleAddCharacter } from "@/text-editor-service/listeners/handleAddCharacter";
 import { handleEditParagraph } from "@/text-editor-service/listeners/handleEditParagraph";
 import { handleAddMusicShiftParagraph } from "@/text-editor-service/listeners/handleAddMusicShiftParagraph";
 import { handleRemoveCharacter } from "@/text-editor-service/listeners/handleRemoveCharacter";
 import { handleRemoveMusicShift } from "@/text-editor-service/listeners/handleRemoveMusicShift";
+import { useEditorModeModal } from "@/stores/modals/editorModeModal.store";
 
 export function useEditorMode(container: HTMLElement | null) {
-  const { openEditorModeModal } = useModal();
   const mKeyPressed = useRef(false);
+  const { openModal } = useEditorModeModal();
 
   useEffect(() => {
     if (!container) return;
@@ -25,7 +25,7 @@ export function useEditorMode(container: HTMLElement | null) {
 
       if (paragraphTag && !characterTag && !musicShiftTag) {
         if (!event.metaKey && event.altKey) {
-          return openEditorModeModal("add-character", (characterSlug: string) => handleAddCharacter(target, chapterNumber, paragraphNumber, characterSlug));
+          return openModal("add-character", (characterSlug: string) => handleAddCharacter(target, chapterNumber, paragraphNumber, characterSlug));
         }
 
         if (event.metaKey && !event.altKey) {
@@ -67,5 +67,5 @@ export function useEditorMode(container: HTMLElement | null) {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keyup", handleKeyUp);
     };
-  }, [container, openEditorModeModal]);
+  }, [container, openModal]);
 }
