@@ -12,8 +12,6 @@ export class PromptsManager {
   ) {
     this.bookSlug = bookSlug;
     this.xmlManager = xmlManager;
-
-    console.log("16: this.xmlManager BANG!", this.xmlManager);
   }
 
   private makeRulesDirectory(): void {
