@@ -1,12 +1,11 @@
 import { RequestHandler } from "express";
 import { TextEditorService } from "../services/textEditorService";
-import { CURRENT_BOOK } from "@/consts";
 
 export class TextEditorController {
   private textEditorService: TextEditorService;
 
   constructor() {
-    this.textEditorService = new TextEditorService(CURRENT_BOOK);
+    this.textEditorService = new TextEditorService();
   }
 
   public editParagraph: RequestHandler = async (req, res) => {

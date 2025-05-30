@@ -43,7 +43,7 @@ const questions = {
 
   const chosenParagraph = paragraphs[paragraph];
 
-  const textEditor = new TextEditor(BOOK_SLUG);
+  const textEditor = new TextEditor(CURRENT_BOOK);
 
   await textEditor.editParagraph(chapter, chosenParagraph.id);
 })();

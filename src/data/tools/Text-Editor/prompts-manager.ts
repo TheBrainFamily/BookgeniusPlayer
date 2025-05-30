@@ -3,13 +3,17 @@ import fs from "fs";
 import { XmlManager } from "@/data/tools/Text-Editor/xml-manager";
 
 export class PromptsManager {
-  private readonly xmlManager: XmlManager;
   private readonly cursorRulesPath: string = "./src/data/tools/Text-Editor/.cursor";
   private readonly promptsPath: string = "./src/data/tools/Text-Editor/prompts";
 
-  constructor(private readonly bookSlug: BOOK_SLUGS) {
+  constructor(
+    private readonly bookSlug: BOOK_SLUGS,
+    private readonly xmlManager: XmlManager,
+  ) {
     this.bookSlug = bookSlug;
-    this.xmlManager = new XmlManager();
+    this.xmlManager = xmlManager;
+
+    console.log("16: this.xmlManager BANG!", this.xmlManager);
   }
 
   private makeRulesDirectory(): void {

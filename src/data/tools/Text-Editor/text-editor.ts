@@ -1,22 +1,27 @@
-import { BOOK_SLUGS } from "@/consts";
 import { XmlManager } from "./xml-manager";
-import { FileManager } from "./file-manager";
+import { FileManager, IFileManager, MockFileManager } from "./file-manager";
 import { EditorManager } from "./editor-manager";
 import { PromptsManager } from "@/data/tools/Text-Editor/prompts-manager";
 import { joinParsedText, parseHtmlText } from "@/utils/parseHtmlText";
 import { TextEditorError, ParagraphNotFoundError, CharacterNotFoundError } from "./error-handlers";
+import { BOOK_SLUGS } from "@/consts";
 
 export class TextEditor {
-  private readonly fileManager: FileManager;
+  private readonly fileManager: IFileManager;
+  private readonly xmlManager: XmlManager;
   private readonly editorManager: EditorManager;
   private readonly promptsManager: PromptsManager;
-  private readonly xmlManager: XmlManager;
 
-  constructor(private readonly bookSlug: BOOK_SLUGS) {
-    this.editorManager = new EditorManager();
-    this.fileManager = new FileManager(bookSlug);
-    this.promptsManager = new PromptsManager(bookSlug);
+  constructor(
+    private readonly bookSlug: BOOK_SLUGS,
+    private readonly environment: string = "development",
+  ) {
+    this.environment = environment;
+    this.bookSlug = bookSlug;
+    this.fileManager = this.environment === "development" ? new FileManager(this.bookSlug) : new MockFileManager();
     this.xmlManager = new XmlManager();
+    this.editorManager = new EditorManager();
+    this.promptsManager = new PromptsManager(this.bookSlug, this.xmlManager);
   }
 
   private handleError(operation: string, error: Error): never {
@@ -197,13 +202,4 @@ export class TextEditor {
       this.handleError("remove character", error);
     }
   }
-}
-
-if (require.main === module) {
-  (async () => {
-    // const BOOK_SLUG = BOOK_SLUGS.Krolowa_Sniegu;
-    // const textEditor = new TextEditor(BOOK_SLUG);
-    // textEditor.addCharacter(3, 5, `<p><Gerda talking="true"/>— <Kaj>Kaj</Kaj> nie żyje! — rzekła do niego Gerda.</p>`);
-    // textEditor.handleRemoveCharacter(1, 1, "Kaj", 1);
-  })();
 }

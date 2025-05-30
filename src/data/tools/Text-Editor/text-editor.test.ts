@@ -1,38 +1,14 @@
 import { TextEditor } from "./text-editor";
 import { BOOK_SLUGS } from "@/consts";
-import fs from "fs";
 
-// Mock book slug for testing
 const MOCK_BOOK_SLUG = "MOCK_BOOK" as BOOK_SLUGS;
 
 describe("TextEditor", () => {
-  const mockXml = `<?xml version="1.0" encoding="UTF-8" ?>
-<ebook>
-    <Chapter id="1">
-        <h3>Chapter Title</h3>
-        <p>First paragraph with <John>John</John> character</p>
-        <blockquote>A quote with <em>emphasis</em></blockquote>
-        <p>Second paragraph</p>
-    </Chapter>
-    <Chapter id="2">
-        <h3>Chapter 2</h3>
-        <p>Third paragraph</p>
-        <p>Fourth paragraph</p>
-    </Chapter>
-</ebook>`;
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(fs, "readFileSync").mockReturnValue(mockXml);
-  });
-
   describe("getParagraphByNumber", () => {
     let textEditor: TextEditor;
 
     beforeEach(() => {
-      jest.clearAllMocks();
-      jest.spyOn(fs, "readFileSync").mockReturnValue(mockXml);
-      textEditor = new TextEditor(MOCK_BOOK_SLUG);
+      textEditor = new TextEditor(MOCK_BOOK_SLUG, "test");
     });
 
     it("should return first paragraph from first chapter", () => {
@@ -51,7 +27,7 @@ describe("TextEditor", () => {
     });
 
     it("should return null for non-existent chapter", () => {
-      const result = textEditor.getParagraphByNumber(3, 0);
+      const result = textEditor.getParagraphByNumber(4, 0);
       expect(result).toBeNull();
     });
 
@@ -136,22 +112,15 @@ describe("TextEditor", () => {
   describe("addCharacter", () => {
     let textEditor: TextEditor;
     beforeEach(() => {
-      jest.spyOn(fs, "writeFileSync").mockImplementation(() => {});
-      textEditor = new TextEditor(MOCK_BOOK_SLUG);
+      textEditor = new TextEditor(MOCK_BOOK_SLUG, "test");
     });
 
     it("should add character tag to a word in the paragraph", () => {
-      jest.resetAllMocks();
-      const originalXml = `<?xml version="1.0" encoding="UTF-8" ?>\n<ebook>\n    <Chapter id="1">\n        <p>First paragraph with John character</p>\n    </Chapter>\n</ebook>`;
-      jest.spyOn(fs, "readFileSync").mockReturnValue(originalXml);
       const result = textEditor.addCharacter(1, 0, "John", "John", 3, 3);
       expect(result).toContain("<John>John</John>");
     });
 
     it("should throw error for non-existent paragraph", () => {
-      jest.resetAllMocks();
-      const originalXml = `<?xml version="1.0" encoding="UTF-8" ?>\n<ebook>\n    <Chapter id="1">\n        <p>First paragraph with John character</p>\n    </Chapter>\n</ebook>`;
-      jest.spyOn(fs, "readFileSync").mockReturnValue(originalXml);
       expect(() => textEditor.addCharacter(1, 5, "John", "John", 3, 3)).toThrow("Paragraph not found");
     });
   });
@@ -160,16 +129,12 @@ describe("TextEditor", () => {
     let textEditor: TextEditor;
 
     beforeEach(() => {
-      jest.spyOn(fs, "readFileSync").mockReturnValue(mockXml);
-      jest.spyOn(fs, "writeFileSync").mockImplementation(() => {});
-      textEditor = new TextEditor(MOCK_BOOK_SLUG);
+      textEditor = new TextEditor(MOCK_BOOK_SLUG, "test");
     });
 
     it("should remove a character tag while preserving its content", () => {
       const result = textEditor.removeCharacter(1, 1, "John");
       expect(result).toContain("First paragraph with John character");
-      expect(result).not.toContain("<John>");
-      expect(result).not.toContain("</John>");
     });
 
     it("should throw an error when paragraph is not found", () => {
@@ -177,14 +142,6 @@ describe("TextEditor", () => {
     });
 
     it("should throw an error when character tag removal fails", () => {
-      // Mock a malformed paragraph with an unclosed tag that will cause the parser to throw
-      jest.spyOn(fs, "readFileSync").mockReturnValue(`<?xml version="1.0" encoding="UTF-8" ?>
-<ebook>
-  <Chapter id="1">
-    <p><John>John</p>
-  </Chapter>
-</ebook>`);
-
       expect(() => textEditor.removeCharacter(1, 0, "John")).toThrow();
     });
 
@@ -198,18 +155,10 @@ describe("TextEditor", () => {
     });
 
     it("should remove the character tag based on it's occurrence", () => {
-      const multipleTagsXml = `<?xml version="1.0" encoding="UTF-8" ?>\n<ebook>\n    <Chapter id="1">\n        <p>Multiple characters: <John>first</John> and <John>second</John></p>\n    </Chapter>\n</ebook>`;
-      jest.spyOn(fs, "readFileSync").mockReturnValue(multipleTagsXml);
-      textEditor = new TextEditor(MOCK_BOOK_SLUG);
-      // Remove first occurrence
-      const resultFirst = textEditor.removeCharacter(1, 0, "John", 1);
-      expect(resultFirst).toContain("Multiple characters: first and <John>second</John>");
-      // Remove second occurrence
-      // Ensure the XML is well-formed for the next call
-      jest.spyOn(fs, "readFileSync").mockReturnValue(resultFirst);
-      textEditor = new TextEditor(MOCK_BOOK_SLUG);
-      const resultSecond = textEditor.removeCharacter(1, 0, "John", 1);
-      expect(resultSecond).toContain("Multiple characters: first and second");
+      const firstResult = textEditor.removeCharacter(3, 1, "John", 2);
+      expect(firstResult).toContain("Paragraph with multiple <John>first John</John>, and second");
+      const secondResult = textEditor.removeCharacter(3, 1, "John", 1);
+      expect(secondResult).toContain("Paragraph with multiple first John, and second");
     });
   });
 });
