@@ -27,11 +27,8 @@ export function useEditorMode(container: HTMLElement | null) {
       const musicShiftTag = target.getAttribute("data-editor-tag") === "musicShift";
       const backgroundShiftTag = target.getAttribute("data-editor-tag") === "backgroundShift";
 
-      console.log("30:  BANG!");
       if (paragraphTag && !characterTag && !musicShiftTag && !backgroundShiftTag) {
-        console.log("31:  BANG!");
         if (!event.metaKey && event.altKey) {
-          console.log("32:  BANG!");
           return openModal("add-character", (characterSlug: string) => handleAddCharacter(target, chapterNumber, paragraphNumber, characterSlug));
         }
 
