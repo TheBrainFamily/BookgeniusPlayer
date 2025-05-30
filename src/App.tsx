@@ -25,6 +25,7 @@ import useLocalStorageState from "use-local-storage-state";
 import { BookChapterRenderer } from "./BookChapterRenderer";
 import { useAppReady } from "./hooks/useAppReady";
 import useSplashHidden from "./hooks/useSplashHidden";
+import { useBookContent } from "./hooks/useBookContent";
 import { initAudioContext } from "./audio-crossfader";
 
 function Shell({ bookData }: { bookData: BookData }) {
@@ -38,6 +39,7 @@ function Shell({ bookData }: { bookData: BookData }) {
   /* dynamic audio hooks */
   useBackgroundSongs();
   useAudiobookTracks();
+  useBookContent("content-container");
 
   return (
     <>

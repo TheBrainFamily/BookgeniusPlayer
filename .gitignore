@@ -4,3 +4,5 @@ dist/
 .DS_Store
 .eslintcache
 tsconfig.tsbuildinfo
+src/data/tools/Text-Editor/.cursor/
+.claude

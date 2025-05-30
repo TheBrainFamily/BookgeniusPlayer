@@ -4,6 +4,8 @@ import fs from "fs";
 import path from "path";
 import { getTalkingMediaFilePathForName, getListeningMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
+import prettier from "prettier";
+import { openSync, writeSync, closeSync } from "fs";
 
 let filePath;
 let xmlString;
@@ -44,7 +46,7 @@ export const xmlToReactChapters = (xmlString: string, bookSlug: BOOK_SLUGS): voi
   const chapters = xmlDoc.getElementsByTagName("Chapter");
   const chapterMetadata: Array<{ id: string; title: string }> = [];
 
-  for (let i = 0; i < chapters.length; i++) {
+  for (let i = 0; i < 1; i++) {
     const chapter = chapters[i];
     const chapterId = chapter.getAttribute("id") || String(i + 1);
 
@@ -58,16 +60,20 @@ export const xmlToReactChapters = (xmlString: string, bookSlug: BOOK_SLUGS): voi
 
     chapterMetadata.push({ id: chapterId, title: chapterTitle });
 
-    const componentCode = generateChapterComponent(chapter, chapterId, characterMap, bookSlug);
-
-    fs.writeFileSync(path.join(outputDir, `Chapter${chapterId}.tsx`), componentCode);
+    prettier.format(generateChapterComponent(chapter, chapterId, characterMap, bookSlug), { parser: "typescript" }).then((formattedCode) => {
+      const outPath = path.join(outputDir, `Chapter${chapterId}.tsx`);
+      const fd = openSync(outPath, "r+"); // open for read/write, no truncate
+      console.log(outPath);
+      writeSync(fd, formattedCode, 0, "utf8"); // overwrite in place
+      closeSync(fd);
+    });
   }
 
   // Generate index file
-  generateIndexFile(bookSlug, chapterMetadata, characterMap);
+  // generateIndexFile(bookSlug, chapterMetadata, characterMap);
 
   // Generate types file
-  generateTypesFile(bookSlug);
+  // generateTypesFile(bookSlug);
 };
 
 function generateChapterComponent(chapter: XMLElement, chapterId: string, characterMap: Map<string, CharacterInfo>, bookSlug: BOOK_SLUGS): string {
@@ -222,68 +228,68 @@ function escapeJSXText(text: string): string {
 }
 
 // Function to escape text for embedding within a JavaScript string literal
-function escapeForJavaScriptStringLiteral(text: string): string {
-  if (typeof text !== "string") return "";
-  return text
-    .replace(/\\/g, "\\\\") // Escape backslashes: \ -> \\
-    .replace(/"/g, '\\"') // Escape double quotes: " -> \\" (for use in ""-delimited strings)
-    .replace(/\n/g, "\\n") // Escape newlines: \n -> \\n (becomes a newline char in the JS string)
-    .replace(/\r/g, "\\r") // Escape carriage returns: \r -> \\r
-    .replace(/\t/g, "\\t"); // Escape tabs: \t -> \\t
-}
+// function escapeForJavaScriptStringLiteral(text: string): string {
+//   if (typeof text !== "string") return "";
+//   return text
+//     .replace(/\\/g, "\\\\") // Escape backslashes: \ -> \\
+//     .replace(/"/g, '\\"') // Escape double quotes: " -> \\" (for use in ""-delimited strings)
+//     .replace(/\n/g, "\\n") // Escape newlines: \n -> \\n (becomes a newline char in the JS string)
+//     .replace(/\r/g, "\\r") // Escape carriage returns: \r -> \\r
+//     .replace(/\t/g, "\\t"); // Escape tabs: \t -> \\t
+// }
 
-function generateIndexFile(bookSlug: BOOK_SLUGS, chapters: Array<{ id: string; title: string }>, characterMap: Map<string, CharacterInfo>): void {
-  let indexContent = `// Auto-generated index file for ${bookSlug}\n\n`;
+// function generateIndexFile(bookSlug: BOOK_SLUGS, chapters: Array<{ id: string; title: string }>, characterMap: Map<string, CharacterInfo>): void {
+//   let indexContent = `// Auto-generated index file for ${bookSlug}\n\n`;
 
-  // Export chapter metadata
-  indexContent += `export const chapterMetadata = [\n`;
-  chapters.forEach((chapter) => {
-    indexContent += `  { id: "${chapter.id}", title: "${escapeForJavaScriptStringLiteral(chapter.title)}" },\n`;
-  });
-  indexContent += `];\n\n`;
+//   // Export chapter metadata
+//   indexContent += `export const chapterMetadata = [\n`;
+//   chapters.forEach((chapter) => {
+//     indexContent += `  { id: "${chapter.id}", title: "${escapeForJavaScriptStringLiteral(chapter.title)}" },\n`;
+//   });
+//   indexContent += `];\n\n`;
 
-  // Export character metadata
-  indexContent += `export const characterMetadata = new Map([\n`;
-  characterMap.forEach((info, slug) => {
-    indexContent += `  ["${slug}", { display: "${escapeForJavaScriptStringLiteral(info.display)}", summary: "${escapeForJavaScriptStringLiteral(info.summary || "")}" }],\n`;
-  });
-  indexContent += `]);\n\n`;
+//   // Export character metadata
+//   indexContent += `export const characterMetadata = new Map([\n`;
+//   characterMap.forEach((info, slug) => {
+//     indexContent += `  ["${slug}", { display: "${escapeForJavaScriptStringLiteral(info.display)}", summary: "${escapeForJavaScriptStringLiteral(info.summary || "")}" }],\n`;
+//   });
+//   indexContent += `]);\n\n`;
 
-  // Export dynamic chapter imports
-  indexContent += `export const chapterComponents = {\n`;
-  chapters.forEach((chapter) => {
-    indexContent += `  ${chapter.id}: () => import('./chapters/Chapter${chapter.id}'),\n`;
-  });
-  indexContent += `};\n\n`;
+//   // Export dynamic chapter imports
+//   indexContent += `export const chapterComponents = {\n`;
+//   chapters.forEach((chapter) => {
+//     indexContent += `  ${chapter.id}: () => import('./chapters/Chapter${chapter.id}'),\n`;
+//   });
+//   indexContent += `};\n\n`;
 
-  indexContent += `export const totalChapters = ${chapters.length};\n`;
+//   indexContent += `export const totalChapters = ${chapters.length};\n`;
 
-  const outputPath = path.join(__dirname, `books/${bookSlug}/index.ts`);
-  fs.writeFileSync(outputPath, indexContent);
-}
+//   const outputPath = path.join(__dirname, `books/${bookSlug}/index.ts`);
+//   fs.writeFileSync(outputPath, indexContent);
+// }
 
-function generateTypesFile(bookSlug: BOOK_SLUGS): void {
-  const typesContent = `// Type definitions for ${bookSlug} book\n
-export interface ChapterMetadata {
-  id: string;
-  title: string;
-}
+// function generateTypesFile(bookSlug: BOOK_SLUGS): void {
+//   const typesContent = `// Type definitions for ${bookSlug} book\n
+// export interface ChapterMetadata {
+//   id: string;
+//   title: string;
+// }
 
-export interface CharacterInfo {
-  display: string;
-  summary?: string;
-}
+// export interface CharacterInfo {
+//   display: string;
+//   summary?: string;
+// }
 
-export interface BookMetadata {
-  chapters: ChapterMetadata[];
-  characters: Map<string, CharacterInfo>;
-  totalChapters: number;
-}
-`;
+// export interface BookMetadata {
+//   chapters: ChapterMetadata[];
+//   characters: Map<string, CharacterInfo>;
+//   totalChapters: number;
+// }
+// `;
 
-  const outputPath = path.join(__dirname, `books/${bookSlug}/types.ts`);
-  fs.writeFileSync(outputPath, typesContent);
-}
+//   const outputPath = path.join(__dirname, `books/${bookSlug}/types.ts`);
+//   fs.writeFileSync(outputPath, typesContent);
+// }
 
 // Main execution
 if (require.main === module) {
