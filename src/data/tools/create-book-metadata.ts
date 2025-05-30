@@ -1,7 +1,8 @@
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import { Element, XMLDocument } from "@xmldom/xmldom/lib/dom"; // Import types if needed for strict typing
-import fs from "fs";
+import fs, { closeSync, openSync, writeSync } from "fs";
 import path from "path";
+import prettier from "prettier";
 
 import { CURRENT_BOOK } from "@/consts";
 import { BOOK_SLUGS } from "@/consts";
@@ -231,6 +232,7 @@ const getDisplayForCharacter = (slug: string, doc: XMLDocument) => {
 
 const doIt = () => {
   const bookSlug: BOOK_SLUGS = CURRENT_BOOK;
+  console.log(`Generating metadata for ${bookSlug}...`);
   const chaptersXml = fs.readFileSync(path.join(__dirname, `../${bookSlug}-chapters.xml`), "utf8");
 
   const parser = new DOMParser();
@@ -244,11 +246,17 @@ const doIt = () => {
 
   // 3. Output the result
   console.log("Extracted Metadata:", JSON.stringify(metadata, null, 2));
-  if (bookSlug === "1984") {
-    fs.writeFileSync(path.join(__dirname, `../metadata-${bookSlug}.ts`), `export const _${bookSlug}CharactersData = ${JSON.stringify(metadata, null, 2)}`);
-  } else {
-    fs.writeFileSync(path.join(__dirname, `../metadata-${bookSlug}.ts`), `export const ${bookSlug.replaceAll("-", "")}CharactersData = ${JSON.stringify(metadata, null, 2)}`);
-  }
+  const metadataFilePath = path.join(__dirname, `../metadata-${bookSlug}.ts`);
+  const variableName = bookSlug === "1984" ? `_${bookSlug}` : bookSlug.replaceAll("-", "");
+
+  prettier
+    .format(`export const ${variableName}CharactersData = ${JSON.stringify(metadata, null, 2)}`, { parser: "typescript", printWidth: 180, objectWrap: "collapse" })
+    .then((formattedCode) => {
+      const fd = openSync(metadataFilePath, "r+"); // open for read/write, no truncate
+      console.log(metadataFilePath);
+      writeSync(fd, formattedCode, 0, "utf8"); // overwrite in place
+      closeSync(fd);
+    });
 };
 
 if (require.main === module) {

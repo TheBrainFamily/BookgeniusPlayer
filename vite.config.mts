@@ -85,6 +85,54 @@ const staticCopyTargets: Target[] = [];
 if (activeBookConfig.staticAssetSourceDir && activeBookConfig.staticAssetDestDir) {
   staticCopyTargets.push({ src: path.join(activeBookConfig.staticAssetSourceDir, "*"), dest: activeBookConfig.staticAssetDestDir });
 }
+const bookDataPlugin = () => {
+  return {
+    name: "book-data-replacer",
+    enforce: "pre" as const,
+    transform(code: string, id: string) {
+      // Only transform the getBookData file
+      if (id.includes("getBookData") && !id.includes("node_modules")) {
+        // Map book slugs to their import paths
+        const bookImportMap: Record<string, string> = {
+          [BOOK_SLUGS._1984]: "1984BookData",
+          [BOOK_SLUGS.PHARAON]: "pharaonBookData",
+          [BOOK_SLUGS.Conrad_Tajny_Agent]: "conrad-tajny-agentBookData",
+          [BOOK_SLUGS.Krolowa_Sniegu]: "krolowa-snieguBookData",
+        };
+
+        const selectedBook = bookImportMap[currentBookSlug];
+
+        // Keep the original imports but comment out unused ones
+        const newCode = code.replace(/^import\s+{\s*bookData\s+as\s+(\w+)\s*}\s+from\s+["']\.\/books\/([^"']+)["'];?$/gm, (match, alias, bookFile) => {
+          // Only keep the import for the selected book
+          if (bookFile.includes(selectedBook)) {
+            return match;
+          }
+          return `// ${match} // Removed by build`;
+        });
+
+        // Replace the function body to return only the selected book
+        const bookAliasMap: Record<string, string> = {
+          [BOOK_SLUGS._1984]: "_1984BookData",
+          [BOOK_SLUGS.PHARAON]: "PharaonBookData",
+          [BOOK_SLUGS.Conrad_Tajny_Agent]: "ConradTajnyAgentBookData",
+          [BOOK_SLUGS.Krolowa_Sniegu]: "KrolowaSnieguBookData",
+        };
+
+        const selectedAlias = bookAliasMap[currentBookSlug];
+
+        const finalCode = newCode.replace(
+          /export\s+async\s+function\s+getBookData\(\)[\s\S]*?^}/m,
+          `export async function getBookData(): Promise<BookData> {
+  return ${selectedAlias};
+}`,
+        );
+
+        return { code: finalCode, map: null };
+      }
+    },
+  };
+};
 
 export default defineConfig({
   // This define will replace all instances of __SELECTED_BOOK_SLUG__ in your client code
@@ -94,6 +142,7 @@ export default defineConfig({
   },
   optimizeDeps: { include: ["workbox-core", "workbox-precaching", "workbox-routing", "workbox-strategies", "workbox-range-requests"] },
   plugins: [
+    bookDataPlugin(), // Add this before other plugins
     react(),
     viteStaticCopy({ targets: staticCopyTargets }),
     VitePWA({

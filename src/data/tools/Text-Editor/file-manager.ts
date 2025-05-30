@@ -1,7 +1,7 @@
-import fs from "fs";
-import { xmlToReactChapters } from "@/data/xmlToReact";
+import fs, { closeSync, openSync, writeSync } from "fs";
 import { BOOK_SLUGS } from "@/consts";
 import { DOMParser } from "@xmldom/xmldom";
+import prettier from "prettier";
 import { extractCharacterMetadata, getCharacterTags } from "@/data/tools/create-book-metadata";
 import { FileError } from "./error-handlers";
 
@@ -35,9 +35,6 @@ export class FileManager {
   public regenerateXml(xmlString: string): void {
     try {
       this.writeXmlFile(xmlString);
-      xmlToReactChapters(xmlString, this.bookSlug);
-
-      this.regenerateMetadata();
     } catch (error) {
       throw new FileError(`Failed to regenerate XML: ${error.message}`);
     }
@@ -53,7 +50,12 @@ export class FileManager {
       const metadata = extractCharacterMetadata(doc, characterTags);
       const variableName = this.bookSlugAsVariable(this.bookSlug).replaceAll("-", "");
 
-      fs.writeFileSync(this.metadataFilePath, `export const ${variableName}CharactersData = ${JSON.stringify(metadata, null, 2)}`);
+      prettier.format(`export const ${variableName}CharactersData = ${JSON.stringify(metadata, null, 2)}`, { parser: "typescript" }).then((formattedCode) => {
+        const fd = openSync(this.metadataFilePath, "r+"); // open for read/write, no truncate
+        console.log(this.metadataFilePath);
+        writeSync(fd, formattedCode, 0, "utf8"); // overwrite in place
+        closeSync(fd);
+      });
     } catch (error) {
       throw new FileError(`Failed to regenerate metadata: ${error.message}`);
     }
