@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange, SelfSufficientCharacterMetadata } from "@/fetchers/getParagraphRange";
+import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange } from "@/fetchers/getParagraphRange";
 import { CURRENT_BOOK } from "@/consts";
 import { Location } from "@/state/LocationContext";
+import { getBookData } from "@/booksData/getBookData";
 
 /** Very light equality check: same length and same canonicalName order */
 function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {
@@ -16,9 +17,9 @@ function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {
  *                            if false, just replaces list on any change
  * @param sortAlphabetically  when appending, whether to sort the new items (and initial load) alphabetically
  */
-export function useCharacterNotes(loc: Location, charactersData: SelfSufficientCharacterMetadata[], addNewAtEnd = false, sortAlphabetically = true): ParsedParagraphRange[] {
+export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphabetically = true): ParsedParagraphRange[] {
   const [notes, setNotes] = useState<ParsedParagraphRange[]>([]);
-
+  const bookData = getBookData();
   useEffect(() => {
     let cancelled = false;
 
@@ -26,7 +27,7 @@ export function useCharacterNotes(loc: Location, charactersData: SelfSufficientC
       const { chapter, paragraph, endChapter, endParagraph } = loc;
       const raw = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange(
         { bookSlug: CURRENT_BOOK, startChapter: chapter, startParagraph: paragraph, endChapter, endParagraph },
-        charactersData,
+        bookData.charactersData,
       );
       if (cancelled) return;
 
@@ -62,7 +63,7 @@ export function useCharacterNotes(loc: Location, charactersData: SelfSufficientC
     return () => {
       cancelled = true;
     };
-  }, [loc.chapter, loc.paragraph, loc.endChapter, loc.endParagraph, charactersData, addNewAtEnd, sortAlphabetically]);
+  }, [loc.chapter, loc.paragraph, loc.endChapter, loc.endParagraph, addNewAtEnd, sortAlphabetically, bookData.charactersData]);
 
   return notes;
 }

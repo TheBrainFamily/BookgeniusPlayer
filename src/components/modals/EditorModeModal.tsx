@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ModalUI from "@/components/modals/ModalUI";
 import { BookData } from "@/booksData/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { useModal } from "@/context/ModalContext";
+import { useModal } from "@/context/ModalProvider";
 
 interface EditorModeModalProps {
   onClose: () => void;

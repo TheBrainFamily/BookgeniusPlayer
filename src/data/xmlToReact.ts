@@ -1,6 +1,6 @@
 // Converter: xmlToReactChapters.ts
 import { DOMParser, XMLElement } from "@journeyapps/domparser";
-import fs from "fs";
+import fs, { ftruncateSync } from "fs";
 import path from "path";
 import { getTalkingMediaFilePathForName, getListeningMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
@@ -15,7 +15,7 @@ interface CharacterInfo {
   summary?: string;
 }
 
-export const xmlToReactChapters = (xmlString: string, bookSlug: BOOK_SLUGS): void => {
+export const xmlToReactChapters = async (xmlString: string, bookSlug: BOOK_SLUGS): Promise<void> => {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xmlString, "text/xml");
 
@@ -60,13 +60,13 @@ export const xmlToReactChapters = (xmlString: string, bookSlug: BOOK_SLUGS): voi
 
     chapterMetadata.push({ id: chapterId, title: chapterTitle });
 
-    prettier.format(generateChapterComponent(chapter, chapterId, characterMap, bookSlug), { parser: "typescript" }).then((formattedCode) => {
-      const outPath = path.join(outputDir, `Chapter${chapterId}.tsx`);
-      const fd = openSync(outPath, "r+"); // open for read/write, no truncate
-      console.log(outPath);
-      writeSync(fd, formattedCode, 0, "utf8"); // overwrite in place
-      closeSync(fd);
-    });
+    const formattedCode = await prettier.format(generateChapterComponent(chapter, chapterId, characterMap, bookSlug), { parser: "typescript" });
+    console.log(formattedCode);
+    const outPath = path.join(outputDir, `Chapter${chapterId}.tsx`);
+    const fd = openSync(outPath, "r+");
+    writeSync(fd, formattedCode, 0, "utf8");
+    ftruncateSync(fd, Buffer.byteLength(formattedCode, "utf8"));
+    closeSync(fd);
   }
 
   // Generate index file
@@ -307,7 +307,7 @@ if (require.main === module) {
   xmlString = fs.readFileSync(filePath, "utf8");
 
   console.log(`Converting ${bookSlug} to React components...`);
-  xmlToReactChapters(xmlString, bookSlug);
+  await xmlToReactChapters(xmlString, bookSlug);
   if (errorCount > 0) {
     console.error(`\n\n!!!!!!! Found ${errorCount} errors. Please fix them before running the project.\n\n`);
   } else {

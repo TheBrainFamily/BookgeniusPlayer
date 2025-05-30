@@ -46,50 +46,6 @@ export interface GetParagraphRangeParams {
   endParagraph: number;
 }
 
-/**
- * Fetches paragraph metadata for a given range within a specific book using
- * query parameters.
- */
-export async function getParagraphRange(params: GetParagraphRangeParams): Promise<SelfSufficientCharacterMetadata[]> {
-  const { bookSlug, startChapter, startParagraph, endChapter, endParagraph } = params;
-
-  const queryParams = new URLSearchParams({
-    startChapter: startChapter.toString(),
-    startParagraph: startParagraph.toString(),
-    endChapter: endChapter.toString(),
-    endParagraph: endParagraph.toString(),
-  });
-
-  const apiUrl = `/api/paragraphs/${bookSlug}?${queryParams.toString()}`;
-
-  console.log("API URL", apiUrl);
-
-  try {
-    const response = await fetch(apiUrl, { method: "GET", headers: { "Content-Type": "application/json" } });
-
-    if (!response.ok) {
-      let errorBody: { message?: string; error?: string } | string | null = null;
-      try {
-        errorBody = await response.json();
-      } catch {
-        try {
-          errorBody = await response.text();
-        } catch {
-          errorBody = null;
-        }
-      }
-      const msg = typeof errorBody === "object" && errorBody !== null ? errorBody.message || errorBody.error : typeof errorBody === "string" ? errorBody : response.statusText;
-      throw new Error(`Network response was not ok: ${msg} (status: ${response.status})`);
-    }
-
-    return (await response.json()) as SelfSufficientCharacterMetadata[];
-  } catch (error: unknown) {
-    console.error("Error fetching paragraph range:", error);
-    const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`Failed to fetch paragraph range: ${message}`);
-  }
-}
-
 /* -------------------------------------------------------------------------- */
 /*  2. Pure in‑memory implementation (works straight on a JSON dump)          */
 /* -------------------------------------------------------------------------- */
@@ -210,9 +166,6 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
         return null;
       }
 
-      if (!character.slug) {
-        console.log(`KURWA: character`, character);
-      }
       return {
         slug: character.slug,
         characterName: character.characterName,
@@ -237,24 +190,3 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
 /* -------------------------------------------------------------------------- */
 /*  4. Ad‑hoc "does it match?" sanity check                                   */
 /* -------------------------------------------------------------------------- */
-
-import { getBookData } from "@/booksData/getBookData";
-
-async function runTest() {
-  try {
-    const currentBookData = await getBookData();
-    if (currentBookData && currentBookData.charactersData) {
-      const res = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange(
-        { startChapter: 3, endChapter: 3, bookSlug: BOOK_SLUGS.PHARAON, startParagraph: 50, endParagraph: 60 },
-        currentBookData.charactersData,
-      );
-      console.dir(res, { depth: null });
-    } else {
-      console.log("Book data or charactersData not available for test.");
-    }
-  } catch (error) {
-    console.error("Error running ad-hoc test:", error);
-  }
-}
-
-runTest();

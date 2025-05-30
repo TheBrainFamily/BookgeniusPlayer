@@ -1,22 +1,19 @@
 // BookChapterRenderer.tsx
 import React, { useEffect, useState, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { BookData } from "./booksData/types"; // Adjust path
 import { useLocation } from "./state/LocationContext"; // Adjust path
-import { useModal } from "./context/ModalContext"; // Import useModal
 import { usePageObserver } from "@/hooks/usePageObserver";
 import ChapterLoaderDirect from "@/components/ChapterLoaderDirect";
+import { CURRENT_BOOK } from "./consts";
+import { useModal } from "./context/ModalProvider";
+import { getBookData } from "./booksData/getBookData";
 
-interface BookChapterRendererProps {
-  bookData: BookData;
-}
-
-const BookChapterRendererComponent: React.FC<BookChapterRendererProps> = ({ bookData }) => {
+const BookChapterRendererComponent = () => {
   const [containerElement, setContainerElement] = useState<HTMLElement | null>(null);
   const { location, lastSystemLocation } = useLocation();
-  const { openCharacterDetailsModal } = useModal(); // Destructure the stable function
-
-  const { observeNewParagraphs, cleanupRemovedParagraphs } = usePageObserver({ enabled: !!containerElement && !!bookData?.slug, openCharacterDetailsModal });
+  const { openCharacterDetailsModal } = useModal();
+  const bookData = getBookData();
+  const { observeNewParagraphs, cleanupRemovedParagraphs } = usePageObserver({ enabled: !!containerElement, openCharacterDetailsModal });
 
   useEffect(() => {
     const container = document.getElementById("content-container");
@@ -25,11 +22,9 @@ const BookChapterRendererComponent: React.FC<BookChapterRendererProps> = ({ book
   }, []);
 
   const chaptersToRender = useMemo(() => {
-    if (!bookData || typeof bookData.chapters !== "number") return [];
-    const { chapters } = bookData;
     let currentChapterNum = Number(location.currentChapter);
     if (isNaN(currentChapterNum) || currentChapterNum <= 0) currentChapterNum = 1;
-    return [currentChapterNum - 1, currentChapterNum, currentChapterNum + 1].filter((id) => id > 0 && id <= chapters);
+    return [currentChapterNum - 1, currentChapterNum, currentChapterNum + 1].filter((id) => id > 0 && id <= bookData.chapters);
   }, [bookData?.chapters, location.currentChapter]);
 
   // Determine if we should scroll to a specific paragraph
@@ -53,22 +48,12 @@ const BookChapterRendererComponent: React.FC<BookChapterRendererProps> = ({ book
 
   // Whenever we change which chapters are rendered, update the observer lists
   useEffect(() => {
-    if (!bookData) return;
     observeNewParagraphs();
     cleanupRemovedParagraphs();
-  }, [chaptersToRender, observeNewParagraphs, cleanupRemovedParagraphs, bookData]);
+  }, [chaptersToRender, observeNewParagraphs, cleanupRemovedParagraphs]);
 
   if (!containerElement) {
     return null;
-  }
-
-  if (!bookData || !bookData.slug || typeof bookData.chapters !== "number") {
-    return createPortal(
-      <section>
-        <div className="book-loading">BookChapterRenderer: Waiting for complete book data...</div>
-      </section>,
-      containerElement,
-    );
   }
 
   console.log(`BookChapterRenderer: Rendering chapters ${chaptersToRender.join(", ")} (for location.currentChapter: ${location.currentChapter})`);
@@ -80,8 +65,8 @@ const BookChapterRendererComponent: React.FC<BookChapterRendererProps> = ({ book
     <section>
       {chaptersToRender.map((chapterId) => (
         <ChapterLoaderDirect
-          key={`chapter-${bookData.slug}-${chapterId}`}
-          bookSlug={bookData.slug}
+          key={`chapter-${chapterId}`}
+          bookSlug={CURRENT_BOOK}
           chapterId={chapterId}
           targetParagraph={shouldScrollToChapter && chapterId === shouldScrollToChapter.chapter ? shouldScrollToChapter.paragraph : undefined}
           onChapterRendered={() => {

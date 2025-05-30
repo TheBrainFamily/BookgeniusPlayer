@@ -1,5 +1,5 @@
 import { SearchResultsData } from "@/searchModal";
-import { ModalType } from "./ModalContext";
+import type { ModalType } from "./ModalContext";
 
 export type ModalState = { currentModal: ModalType | null; searchResults: SearchResultsData | null; searchQuery: string };
 

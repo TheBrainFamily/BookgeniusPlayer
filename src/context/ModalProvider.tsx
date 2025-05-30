@@ -1,9 +1,8 @@
-import React, { createContext, useContext, useReducer, useCallback, ReactNode, useMemo, useEffect } from "react";
+import React, { useContext, useReducer, useCallback, ReactNode, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
 
 import debounce from "lodash.debounce";
-import { BookData } from "@/booksData/types";
-import { performLocalDOMSearch, SearchResultsData } from "@/searchModal";
+import { performLocalDOMSearch } from "@/searchModal";
 import { resetFurthestPageLocation } from "@/helpers/reset-furthest-page-location";
 import { preloadBackgroundTracks } from "@/deal-with-background-songs";
 
@@ -16,33 +15,13 @@ import BookMenuModal from "@/components/modals/BookMenuModal";
 import { modalReducer, initialModalState } from "./modalReducer";
 import { useLocationRange } from "@/hooks/useLocationRange";
 import EditorModeModal from "@/components/modals/EditorModeModal";
+import { getBookData } from "@/booksData/getBookData";
 
-// Different types of modals the application can display
-export type ModalType =
-  | { type: "character"; slug: string; isVideo: boolean; mediaSrc: string }
-  | { type: "search"; layoutView?: boolean; hideOverlay?: boolean; query?: string; isLoading?: boolean }
-  | { type: "deepResearch"; content?: string; layoutView?: boolean; hideOverlay?: boolean; isLoading?: boolean }
-  | { type: "bookChapter"; chapter: number }
-  | { type: "bookMenu" }
-  | { type: "editorMode"; modalType: "edit-paragraph" | "add-character" | "remove-character"; onSubmit: (characterSlug?: string) => Promise<void> };
+// Import context and types from separate file
+import { ModalContext, ModalContextType, ModalType } from "./ModalContext";
 
-export interface ModalContextType {
-  openCharacterDetailsModal: (slug: string, isVideo: boolean, mediaSrc: string) => void;
-  openSearchModal: (layoutView?: boolean, hideOverlay?: boolean, query?: string) => void;
-  openDeepResearchModal: (content?: string, layoutView?: boolean, hideOverlay?: boolean) => void;
-  openBookChapterModal: (chapter?: number) => void;
-  openBookMenuModal: () => void;
-  openEditorModeModal: (modalType: "edit-paragraph" | "add-character" | "remove-character", onSubmit: (characterSlug?: string) => Promise<void>) => void;
-  closeModal: () => void;
-  currentModal: ModalType | null;
-  performSearchInModal: (query: string) => void;
-  searchQuery: string;
-  searchResults: SearchResultsData | null;
-}
-
-const ModalContext = createContext<ModalContextType | undefined>(undefined);
-
-export const ModalProvider: React.FC<{ children: ReactNode; bookData: BookData }> = ({ children, bookData }) => {
+export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const bookData = getBookData();
   const { locationRange, debouncedLocation } = useLocationRange();
   const [state, dispatch] = useReducer(modalReducer, initialModalState);
   const { currentModal, searchResults, searchQuery } = state;

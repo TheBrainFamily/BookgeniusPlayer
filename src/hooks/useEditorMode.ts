@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useModal } from "@/context/ModalContext";
+import { useModal } from "@/context/ModalProvider";
 import { handleAddCharacter } from "@/text-editor-service/listeners/handleAddCharacter";
 import { handleEditParagraph } from "@/text-editor-service/listeners/handleEditParagraph";
 import { handleAddMusicSuggestion } from "@/text-editor-service/listeners/handleAddMusicSuggestion";
