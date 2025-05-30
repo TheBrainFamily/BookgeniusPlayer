@@ -1,1 +1,0 @@
-export { BookChapterModalRenderer } from "./BookChapterModalRenderer";

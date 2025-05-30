@@ -1,1 +1,0 @@
-export { CharacterModalRenderer } from "./CharacterModalRenderer";

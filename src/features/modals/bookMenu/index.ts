@@ -1,1 +1,0 @@
-export { BookMenuModalRenderer } from "./BookMenuModalRenderer";
