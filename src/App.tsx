@@ -6,7 +6,6 @@ import { useBackgroundVideo } from "./hooks/useBackgroundVideo";
 
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
 import { runLegacyInit } from "./main";
-import { RightNotesPanel } from "./components/RightNotesPanel";
 import { WebSocketProvider } from "./context/WebSocketContext";
 import { RealtimeProvider } from "./context/RealtimeContext";
 import { getBookData } from "./booksData/getBookData";
@@ -49,7 +48,8 @@ function Shell({ bookData }: { bookData: BookData }) {
       <NoteLinkBlinker />
       <CharacterNotesPanel bookData={bookData} />
       <ContentContainerWrapper /> {/* Keep for animations */}
-      <RightNotesPanel />
+      {/* Not used for now, but can be re-enabled if needed later */}
+      {/* <RightNotesPanel /> */}
       <Footer />
       {import.meta.env.VITE_EDITOR === "true" && <EditorMode />}
     </>
