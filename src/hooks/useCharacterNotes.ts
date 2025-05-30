@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange, SelfSufficientCharacterMetadata } from "@/fetchers/getParagraphRange";
+import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange } from "@/fetchers/getParagraphRange";
 import { CURRENT_BOOK } from "@/consts";
 import { Location } from "@/state/LocationContext";
 import { getBookData } from "@/booksData/getBookData";

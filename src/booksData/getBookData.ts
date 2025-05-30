@@ -8,7 +8,6 @@ import { bookData as ConradTajnyAgentBookData } from "./books/conrad-tajny-agent
 declare const __SELECTED_BOOK_SLUG__: string;
 
 export function getBookData(): BookData {
-  console.log("tewtesssw");
   if (__SELECTED_BOOK_SLUG__ === BOOK_SLUGS._1984) {
     return _1984BookData;
   } else if (__SELECTED_BOOK_SLUG__ === BOOK_SLUGS.PHARAON) {

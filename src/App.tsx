@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect } from "react";
 
 import { LocationProvider } from "./state/LocationContext";
 import { useCutScene } from "./hooks/useCutScene";
