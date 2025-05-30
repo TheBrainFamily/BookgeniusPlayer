@@ -1,22 +1,27 @@
-import { BOOK_SLUGS } from "@/consts";
 import { XmlManager } from "./xml-manager";
-import { FileManager } from "./file-manager";
+import { FileManager, IFileManager, MockFileManager } from "./file-manager";
 import { EditorManager } from "./editor-manager";
 import { PromptsManager } from "@/data/tools/Text-Editor/prompts-manager";
 import { joinParsedText, parseHtmlText } from "@/utils/parseHtmlText";
 import { TextEditorError, ParagraphNotFoundError, CharacterNotFoundError } from "./error-handlers";
+import { BOOK_SLUGS } from "@/consts";
 
 export class TextEditor {
-  private readonly fileManager: FileManager;
+  private readonly fileManager: IFileManager;
+  private readonly xmlManager: XmlManager;
   private readonly editorManager: EditorManager;
   private readonly promptsManager: PromptsManager;
-  private readonly xmlManager: XmlManager;
 
-  constructor(private readonly bookSlug: BOOK_SLUGS) {
-    this.editorManager = new EditorManager();
-    this.fileManager = new FileManager(bookSlug);
-    this.promptsManager = new PromptsManager(bookSlug);
+  constructor(
+    private readonly bookSlug: BOOK_SLUGS,
+    private readonly environment: string = "development",
+  ) {
+    this.environment = environment;
+    this.bookSlug = bookSlug;
+    this.fileManager = this.environment === "development" ? new FileManager(this.bookSlug) : new MockFileManager();
     this.xmlManager = new XmlManager();
+    this.editorManager = new EditorManager();
+    this.promptsManager = new PromptsManager(this.bookSlug, this.xmlManager);
   }
 
   private handleError(operation: string, error: Error): never {
@@ -56,13 +61,13 @@ export class TextEditor {
     }
   }
 
-  public async addMusicShiftSuggestionToParagraph(chapterNumber: number, paragraphNumber: number): Promise<void> {
+  public async addMusicSuggestion(chapterNumber: number, paragraphNumber: number): Promise<void> {
     try {
       const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
       const { paragraph } = this.xmlManager.getParagraphElement(xmlDoc, chapterNumber, paragraphNumber);
       const originalParagraph = this.xmlManager.getParagraphHtml(paragraph);
 
-      this.promptsManager.generateMusicShiftRule();
+      this.promptsManager.generateMusicSuggestionRule();
       const updatedParagraph = await this.editorManager.openInCursor(originalParagraph);
       const updatedParagraphElement = this.xmlManager.stringToElement(updatedParagraph);
       const updatedParagraphText = this.xmlManager.getParagraphText(updatedParagraphElement);
@@ -72,9 +77,31 @@ export class TextEditor {
         this.fileManager.regenerateXml(updatedXml);
       }
 
-      this.promptsManager.removeMusicShiftRule();
+      this.promptsManager.removeMusicSuggestionRule();
     } catch (error) {
       this.handleError("add music shift suggestion to paragraph", error);
+    }
+  }
+
+  public async addBackgroundSuggestion(chapterNumber: number, paragraphNumber: number): Promise<void> {
+    try {
+      const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+      const { paragraph } = this.xmlManager.getParagraphElement(xmlDoc, chapterNumber, paragraphNumber);
+      const originalParagraph = this.xmlManager.getParagraphHtml(paragraph);
+
+      this.promptsManager.generateBackgroundSuggestionRule();
+      const updatedParagraph = await this.editorManager.openInCursor(originalParagraph);
+      const updatedParagraphElement = this.xmlManager.stringToElement(updatedParagraph);
+      const updatedParagraphText = this.xmlManager.getParagraphText(updatedParagraphElement);
+
+      if (updatedParagraph !== originalParagraph) {
+        const updatedXml = this.xmlManager.updateAndSaveXml(xmlDoc, paragraph, updatedParagraphText);
+        this.fileManager.regenerateXml(updatedXml);
+      }
+
+      this.promptsManager.removeBackgroundSuggestionRule();
+    } catch (error) {
+      this.handleError("add background shift suggestion to paragraph", error);
     }
   }
 
@@ -107,7 +134,7 @@ export class TextEditor {
     }
   }
 
-  public removeMusicShift(chapterNumber: number, paragraphNumber: number): string {
+  public removeMusicSuggestion(chapterNumber: number, paragraphNumber: number): string {
     const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
     const { paragraph } = this.xmlManager.getParagraphElement(xmlDoc, chapterNumber, paragraphNumber);
     if (!paragraph) {
@@ -116,6 +143,21 @@ export class TextEditor {
 
     const paragraphText = this.xmlManager.getParagraphText(paragraph);
     const updatedParagraph = paragraphText.replace(/<musicShift[^>]*>.*?<\/musicShift>|<musicShift[^>]*\/>/g, "");
+
+    const updatedXml = this.xmlManager.updateAndSaveXml(xmlDoc, paragraph, updatedParagraph);
+    this.fileManager.regenerateXml(updatedXml);
+    return updatedXml;
+  }
+
+  public removeBackgroundSuggestion(chapterNumber: number, paragraphNumber: number): string {
+    const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+    const { paragraph } = this.xmlManager.getParagraphElement(xmlDoc, chapterNumber, paragraphNumber);
+    if (!paragraph) {
+      throw new ParagraphNotFoundError(chapterNumber, paragraphNumber);
+    }
+
+    const paragraphText = this.xmlManager.getParagraphText(paragraph);
+    const updatedParagraph = paragraphText.replace(/<backgroundShift[^>]*>.*?<\/backgroundShift>|<backgroundShift[^>]*\/>/g, "");
 
     const updatedXml = this.xmlManager.updateAndSaveXml(xmlDoc, paragraph, updatedParagraph);
     this.fileManager.regenerateXml(updatedXml);
@@ -160,13 +202,4 @@ export class TextEditor {
       this.handleError("remove character", error);
     }
   }
-}
-
-if (require.main === module) {
-  (async () => {
-    // const BOOK_SLUG = BOOK_SLUGS.Krolowa_Sniegu;
-    // const textEditor = new TextEditor(BOOK_SLUG);
-    // textEditor.addCharacter(3, 5, `<p><Gerda talking="true"/>— <Kaj>Kaj</Kaj> nie żyje! — rzekła do niego Gerda.</p>`);
-    // textEditor.handleRemoveCharacter(1, 1, "Kaj", 1);
-  })();
 }

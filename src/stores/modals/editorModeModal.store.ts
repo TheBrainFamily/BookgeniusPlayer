@@ -21,6 +21,7 @@ export const useEditorModeModal = create<EditorModeModalState>()(
       onSubmit: null,
 
       openModal: (modalType, onSubmit) => {
+        console.log("24:  BANG!");
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
           set({ isOpen: true, modalType, onSubmit });

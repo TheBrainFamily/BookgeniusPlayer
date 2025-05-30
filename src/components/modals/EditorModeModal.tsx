@@ -18,6 +18,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
     e.preventDefault();
     if (onSubmit) {
       await onSubmit(selectedCharacter);
+      onClose();
     }
   };
 

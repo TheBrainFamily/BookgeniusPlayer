@@ -24,8 +24,11 @@ import useSplashHidden from "./hooks/useSplashHidden";
 import { initAudioContext } from "./audio-crossfader";
 import CharacterNotesPanel from "./components/CharacterNotesPanel";
 import { ModalRenderers } from "./features/ModalRenderers";
+import { useBookContent } from "@/hooks/useBookContent";
 
 function Shell() {
+  useBookContent("content-container");
+
   /* dynamic visual hooks */
   useCutScene();
   useBackgroundVideo();
