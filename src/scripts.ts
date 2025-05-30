@@ -117,24 +117,53 @@ class SplashScreenManager {
     try {
       this.hideSplash();
 
-      // Wait for animation to complete before dispatching events and playing audio
-      setTimeout(() => {
+      setTimeout(async () => {
         window.dispatchEvent(new CustomEvent("splashHidden"));
-        if (window.playAudiobook) {
-          window.playAudiobook(true);
-        }
       }, 1000);
+      await this.startAudioSequence();
     } catch (error) {
       console.error("Error during splash screen exit:", error);
       // Fallback: force exit even if there was an error
       this.hideSplash();
 
-      setTimeout(() => {
+      setTimeout(async () => {
         window.dispatchEvent(new CustomEvent("splashHidden"));
+      }, 100);
+      await this.startAudioSequence();
+    }
+  }
+
+  async startAudioSequence() {
+    try {
+      // ToDo: Analyze if we can and we need to dynamically import modules
+      const { initAudioContext } = await import("./audio-crossfader");
+      const contextReady = await initAudioContext();
+
+      if (!contextReady) {
+        console.warn("Audio context initialization failed, audio may not work properly");
+        return;
+      }
+
+      const { dealWithBackgroundSongs } = await import("./deal-with-background-songs");
+      const { getCurrentLocation } = await import("./helpers/paragraphsNavigation");
+
+      const location = getCurrentLocation();
+      if (location) {
+        console.log("Starting background music...");
+        await dealWithBackgroundSongs({ currentChapter: location.currentChapter, currentParagraph: location.currentParagraph });
+      }
+
+      setTimeout(() => {
         if (window.playAudiobook) {
+          console.log("Starting audiobook playback...");
           window.playAudiobook(true);
         }
-      }, 100);
+      }, 1500);
+    } catch (error) {
+      console.error("Error in audio sequence:", error);
+      if (window.playAudiobook) {
+        window.playAudiobook(true);
+      }
     }
   }
 

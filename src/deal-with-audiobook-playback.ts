@@ -85,12 +85,11 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
     // TODO: PINGWING: Why we filter the whole book if need only first index
 
     if (sectionToApply && sectionToApply.file) {
-      console.log("Applicable Audiobook section found:", sectionToApply);
+      console.log("Audiobook song check: Applicable Audiobook section found:", sectionToApply);
       const currentPlayingTrackId = `${sectionToApply.file}#${sectionToApply.smile_id}`;
 
-      console.log(`Audiobook song check: Section is [${sectionToApply}]. Currently playing: ${currentPlayingTrackId}.`);
+      console.log(`Audiobook song check: Currently playing:`, currentPlayingTrackId);
 
-      // console.log("WILCZYNSKA: 112 sectionToApply.file, 0, sectionToApply[clip-begin]", sectionToApply.file, 0, sectionToApply["clip-begin"]);
       loadTrack(sectionToApply.file).then(() => {
         console.log("audio loaded", sectionToApply.file);
         stopAllTracks();
