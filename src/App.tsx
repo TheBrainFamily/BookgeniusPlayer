@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 
 import { LocationProvider } from "./state/LocationContext";
-import { usePageObserver } from "./hooks/usePageObserver";
 import { useCutScene } from "./hooks/useCutScene";
 import { useBackgroundVideo } from "./hooks/useBackgroundVideo";
-import { useBookContent } from "./hooks/useBookContent";
 
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
 import { runLegacyInit } from "./main";
@@ -14,7 +12,7 @@ import { RealtimeProvider } from "./context/RealtimeContext";
 import { getBookData } from "./booksData/getBookData";
 import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
 import { BookData } from "./booksData/types";
-import { ModalProvider, useModal } from "./context/ModalContext";
+import { ModalProvider } from "./context/ModalContext";
 import { BookContentWrapper } from "./components/BookContentWrapper";
 import { BookThemeProvider } from "./context/BookThemeContext";
 import { useAudiobookTracks } from "@/hooks/useAudiobookTracks";
@@ -25,14 +23,13 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { EditorMode } from "@/components/EditorMode";
 import useLocalStorageState from "use-local-storage-state";
+import { BookChapterRenderer } from "./BookChapterRenderer";
 import { useAppReady } from "./hooks/useAppReady";
 
-function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
-  /* Inject book content first */
-  useBookContent(bookData.bookXml, "content-container");
+function Shell({ bookData }: { bookData: BookData }) {
+  // Remove useBookContent hook - no longer needed!
 
-  /* scroll‑related hooks */
-  usePageObserver(bookData.bookXml, useModal());
+  /* scroll‑related hooks - update to work with React components */
 
   /* dynamic visual hooks */
   useCutScene();
@@ -48,9 +45,10 @@ function Shell({ bookData }: { bookData: BookData; passedText?: string }) {
   return (
     <>
       <Header />
+      <BookChapterRenderer bookData={bookData} /> {/* New component for content */}
       <NoteLinkBlinker />
       <CharacterNotesPanel bookData={bookData} />
-      <ContentContainerWrapper />
+      <ContentContainerWrapper /> {/* Keep for animations */}
       <RightNotesPanel />
       <Footer />
       {import.meta.env.VITE_EDITOR === "true" && <EditorMode />}

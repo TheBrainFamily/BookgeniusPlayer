@@ -13,12 +13,4 @@ export interface BookThemeColors {
   quaternaryColor: string;
 }
 
-export type BookData = {
-  slug: BOOK_SLUGS;
-  metadata: BookMetadata;
-  charactersData: CharacterData[];
-  bookXml: string;
-  chapters: number;
-  themeColors: BookThemeColors;
-  hasAudiobook: boolean;
-};
+export type BookData = { slug: BOOK_SLUGS; metadata: BookMetadata; charactersData: CharacterData[]; chapters: number; themeColors: BookThemeColors; hasAudiobook: boolean };

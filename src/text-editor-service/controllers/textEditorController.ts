@@ -66,4 +66,38 @@ export class TextEditorController {
       res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   };
+
+  public addMusicSuggestionToParagraph: RequestHandler = async (req, res) => {
+    try {
+      const { chapterNumber, paragraphNumber } = req.body;
+
+      if (!chapterNumber || paragraphNumber === null) {
+        res.status(400).json({ error: "Missing required parameters" });
+        return;
+      }
+
+      const result = await this.textEditorService.addMusicShiftSuggestionToParagraph(Number(chapterNumber), Number(paragraphNumber));
+
+      res.json({ success: true, data: result });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  };
+
+  public removeMusicShift: RequestHandler = async (req, res) => {
+    try {
+      const { chapterNumber, paragraphNumber } = req.body;
+
+      if (!chapterNumber || !paragraphNumber) {
+        res.status(400).json({ error: "Missing required parameters" });
+        return;
+      }
+
+      const result = this.textEditorService.removeMusicShift(Number(chapterNumber), Number(paragraphNumber));
+
+      res.json({ success: true, data: result });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  };
 }

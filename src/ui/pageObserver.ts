@@ -1,5 +1,4 @@
 import { initAudioContext } from "@/audio-crossfader";
-import { ModalContextType } from "@/context/ModalContext";
 import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
 
 const SHOULD_SHOW_EVERYONE = false;
@@ -32,7 +31,10 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 /**
  * Creates and configures a video or image element based on the placeholder span's data.
  */
-function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextType): HTMLVideoElement | HTMLImageElement | null {
+function createMediaElement(
+  placeholder: HTMLSpanElement,
+  openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void,
+): HTMLVideoElement | HTMLImageElement | null {
   const characterSlug = placeholder.dataset.character;
   const isTalking = placeholder.dataset.isTalking === "true";
   const talkingSrc = placeholder.dataset.srcTalking; // Can be video or image
@@ -64,7 +66,7 @@ function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextTyp
   // Configure and return the element
   if (element && finalSrc) {
     element.addEventListener("click", () => {
-      modal.openCharacterDetailsModal(characterSlug, isTalking, finalSrc);
+      openCharacterDetailsModal(characterSlug, isTalking, finalSrc);
     });
     element.src = finalSrc;
     element.classList.add("inline-avatar");
@@ -79,7 +81,7 @@ function createMediaElement(placeholder: HTMLSpanElement, modal: ModalContextTyp
   return null;
 }
 
-function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType) {
+function highlightCharacter(character: HTMLSpanElement, openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void) {
   const characterSlug = character.dataset.character;
   const listeningSrc = character.dataset.srcListening;
   const isTalking = character.dataset.isTalking === "true";
@@ -91,7 +93,7 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
 
   character.classList.add("character-highlighted-activated");
   character.addEventListener("click", () => {
-    modal.openCharacterDetailsModal(characterSlug, isTalking, listeningSrc);
+    openCharacterDetailsModal(characterSlug, isTalking, listeningSrc);
   });
 
   // Add hover functionality to show floating avatar
@@ -109,7 +111,7 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
 
     // Create media element based on source type
     if (listeningSrc) {
-      let mediaElement;
+      let mediaElement: HTMLVideoElement | HTMLImageElement;
       if (listeningSrc.toLowerCase().endsWith(".png")) {
         // Create image element
         mediaElement = document.createElement("img");
@@ -162,7 +164,13 @@ function highlightCharacter(character: HTMLSpanElement, modal: ModalContextType)
 /**
  * Manages media loading and playback for paragraphs within the visible range.
  */
-function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, modal: ModalContextType) {
+function activateMediaInRange(
+  startChapter: number,
+  startParagraph: number,
+  endChapter: number,
+  endParagraph: number,
+  openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void,
+) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
 
   allParagraphs.forEach((p) => {
@@ -185,7 +193,7 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
         if (inView) {
           if (dummyPlaceholder) {
             // Found a dummy, replace it with actual media
-            const newMediaElement = createMediaElement(placeholder, modal);
+            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal);
             if (newMediaElement) {
               placeholder.replaceChild(newMediaElement, dummyPlaceholder);
               placeholder.dataset.mediaInjected = "true"; // Mark as injected
@@ -202,7 +210,7 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
             }
           } else if (!mediaInjected) {
             // No dummy and no media injected yet, inject for the first time
-            const newMediaElement = createMediaElement(placeholder, modal);
+            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal);
             if (newMediaElement) {
               mediaElement = newMediaElement; // Update mediaElement reference
               // Hide original text content if it's a mention
@@ -278,7 +286,7 @@ function activateMediaInRange(startChapter: number, startParagraph: number, endC
         const charText = character.dataset.character;
         if (charText && !seenCharactersInParentP.has(charText) && !charactersDisplayed.includes(charText)) {
           seenCharactersInParentP.add(charText);
-          highlightCharacter(character, modal);
+          highlightCharacter(character, openCharacterDetailsModal);
         }
       });
     }
@@ -308,7 +316,9 @@ const getParagraphInfo = (element: Element): { chapter: number | null; paragraph
   return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
 };
 
-export function setupPageObserver(modal: ModalContextType): IntersectionObserver | null {
+export function setupPageObserver(
+  openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void,
+): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number } | null {
   const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
 
   // --- State for tracking all currently intersecting pages ---
@@ -316,6 +326,10 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
   let currentlyActivePageElement: Element | null = null;
   let currentlyLastActivePageElement: Element | null = null;
   let currentlyActiveParagraph: { chapter: number; paragraph: number } | null = null;
+
+  // Keep track of observed paragraphs to avoid re-observing
+  const observedParagraphs = new Set<Element>();
+
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
     const scrollMarginTopPx = getScrollMarginTopPx();
@@ -463,25 +477,74 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
         const topFocusedPageElement = focusedPages[0];
         const bottomFocusedPageElement = focusedPages[focusedPages.length - 1];
 
-        // 3. Update active state only if the topmost or bottommost focused page has changed
-        if (topFocusedPageElement !== currentlyActivePageElement || bottomFocusedPageElement !== currentlyLastActivePageElement || activeParagraph !== currentlyActiveParagraph) {
-          console.log("[Observer] Top focused page:", topFocusedPageElement);
-          console.log("[Observer] Bottom focused page:", bottomFocusedPageElement);
-          console.log("[Observer] Active paragraph:", activeParagraph);
+        let activeParagraphChanged = false;
+        if (!currentlyActiveParagraph && activeParagraph) {
+          activeParagraphChanged = true;
+        } else if (currentlyActiveParagraph && !activeParagraph) {
+          activeParagraphChanged = true;
+        } else if (currentlyActiveParagraph && activeParagraph) {
+          if (currentlyActiveParagraph.chapter !== activeParagraph.chapter || currentlyActiveParagraph.paragraph !== activeParagraph.paragraph) {
+            activeParagraphChanged = true;
+          }
+        }
 
+        // --- Determine if topFocusedPageElement has changed (value-based) ---
+        let topElementChanged = false;
+        const newTopInfo = topFocusedPageElement ? getParagraphInfo(topFocusedPageElement) : null;
+        // Get info for currentlyActivePageElement (which was the top element from the PREVIOUS run)
+        const currentTopInfoFromState = currentlyActivePageElement ? getParagraphInfo(currentlyActivePageElement) : null;
+
+        if ((!newTopInfo && currentTopInfoFromState) || (newTopInfo && !currentTopInfoFromState)) {
+          topElementChanged = true;
+        } else if (newTopInfo && currentTopInfoFromState) {
+          if (newTopInfo.chapter !== currentTopInfoFromState.chapter || newTopInfo.paragraph !== currentTopInfoFromState.paragraph) {
+            topElementChanged = true;
+          }
+        }
+
+        // --- Determine if bottomFocusedPageElement has changed (value-based) ---
+        let bottomElementChanged = false;
+        const newBottomInfo = bottomFocusedPageElement ? getParagraphInfo(bottomFocusedPageElement) : null;
+        // Get info for currentlyLastActivePageElement (which was the bottom element from the PREVIOUS run)
+        const currentBottomInfoFromState = currentlyLastActivePageElement ? getParagraphInfo(currentlyLastActivePageElement) : null;
+
+        if ((!newBottomInfo && currentBottomInfoFromState) || (newBottomInfo && !currentBottomInfoFromState)) {
+          bottomElementChanged = true;
+        } else if (newBottomInfo && currentBottomInfoFromState) {
+          if (newBottomInfo.chapter !== currentBottomInfoFromState.chapter || newBottomInfo.paragraph !== currentBottomInfoFromState.paragraph) {
+            bottomElementChanged = true;
+          }
+        }
+
+        if (topElementChanged || bottomElementChanged || activeParagraphChanged) {
+          console.log(`[Observer] Change detected. TopEl C: ${topElementChanged}, BotEl C: ${bottomElementChanged}, Pgh C: ${activeParagraphChanged}`);
+          console.log(`[Observer] Prev Top Pgh: ${JSON.stringify(currentTopInfoFromState)}, New Top Pgh: ${JSON.stringify(newTopInfo)}`);
+          console.log(`[Observer] Prev Bottom Pgh: ${JSON.stringify(currentBottomInfoFromState)}, New Bottom Pgh: ${JSON.stringify(newBottomInfo)}`);
+          console.log(`[Observer] Prev Active Pgh: ${JSON.stringify(currentlyActiveParagraph)}, New Active Pgh: ${JSON.stringify(activeParagraph)}`);
+
+          // Update persisted state with the NEW DOM element references for the next comparison cycle
           currentlyActivePageElement = topFocusedPageElement;
           currentlyLastActivePageElement = bottomFocusedPageElement;
-          currentlyActiveParagraph = activeParagraph;
+          currentlyActiveParagraph = activeParagraph ? { chapter: activeParagraph.chapter, paragraph: activeParagraph.paragraph } : null;
 
-          const startInfo = getParagraphInfo(topFocusedPageElement);
-          const endInfo = getParagraphInfo(bottomFocusedPageElement);
-          // -----------------------------------------
+          // Use startInfo and endInfo derived from the NEW topFocusedPageElement and bottomFocusedPageElement
+          const startInfo = newTopInfo; // Already derived
+          const endInfo = newBottomInfo; // Already derived
 
-          // 4. Call update logic if we have valid info
-          if (startInfo.chapter !== null && startInfo.paragraph !== null && endInfo.chapter !== null && endInfo.paragraph !== null && activeParagraph !== null) {
+          if (
+            activeParagraph &&
+            activeParagraph.chapter !== null &&
+            activeParagraph.paragraph !== null &&
+            startInfo &&
+            startInfo.chapter !== null &&
+            startInfo.paragraph !== null &&
+            endInfo &&
+            endInfo.chapter !== null &&
+            endInfo.paragraph !== null
+          ) {
             console.log(`[Observer] Updating notes for Ch ${startInfo.chapter}:${startInfo.paragraph} to Ch ${endInfo.chapter}:${endInfo.paragraph} (Focus Zone)`);
             console.log("setting current location from intersection (focus zone)", { chapter: startInfo.chapter, paragraph: startInfo.paragraph });
-            // Set current location based on the top element in the focus zone
+
             setCurrentLocation({
               chapter: startInfo.chapter,
               paragraph: startInfo.paragraph,
@@ -491,12 +554,16 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
               currentParagraph: activeParagraph.paragraph,
             });
 
-            // --- Activate/Deactivate Media ---
-            activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, modal);
-            // ----------------------------------
+            activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal);
           } else {
-            console.warn("[Observer] Could not extract chapter/paragraph info for focused elements:", topFocusedPageElement, bottomFocusedPageElement);
+            console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {
+              activePgh: activeParagraph,
+              startInfo: startInfo,
+              endInfo: endInfo,
+            });
           }
+        } else {
+          console.log(`[Observer] No relevant change detected in active/boundary elements or paragraph. Skipping update.`);
         }
       } else {
         // Handle case where intersecting pages exist, but none are in the focus zone
@@ -512,20 +579,79 @@ export function setupPageObserver(modal: ModalContextType): IntersectionObserver
       // Handle case where no pages are intersecting the viewport at all
       if (currentlyActivePageElement !== null) {
         console.log("[Observer] No pages intersecting viewport.");
-        currentlyActivePageElement = null;
-        currentlyLastActivePageElement = null;
+        // currentlyActivePageElement = null;
+        // currentlyLastActivePageElement = null;
       }
     }
   }, observerOptions);
 
+  // Function to observe new paragraphs
+  const observeNewParagraphs = (): number => {
+    const allParagraphs = document.querySelectorAll("section[data-chapter] [data-index]");
+    let newParagraphsCount = 0;
+
+    allParagraphs.forEach((paragraph) => {
+      if (!observedParagraphs.has(paragraph)) {
+        observer.observe(paragraph);
+        observedParagraphs.add(paragraph);
+        newParagraphsCount++;
+      }
+    });
+
+    if (newParagraphsCount > 0) {
+      console.log(`[PageObserver] Observed ${newParagraphsCount} new paragraphs. Total observed: ${observedParagraphs.size}`);
+    }
+
+    return newParagraphsCount;
+  };
+
+  // Function to clean up paragraphs that are no longer in the DOM
+  const cleanupRemovedParagraphs = (): number => {
+    let removedCount = 0;
+    const elementsToRemove: Element[] = [];
+
+    observedParagraphs.forEach((paragraph) => {
+      // Check if the element is still connected to the DOM
+      if (!paragraph.isConnected) {
+        observer.unobserve(paragraph);
+        intersectingPages.delete(paragraph); // Also remove from intersecting set
+        elementsToRemove.push(paragraph);
+        removedCount++;
+      }
+    });
+
+    // Remove from the Set after iteration to avoid modification during iteration
+    elementsToRemove.forEach((element) => {
+      observedParagraphs.delete(element);
+    });
+
+    // Clear active element references if they're no longer connected
+    if (currentlyActivePageElement && !currentlyActivePageElement.isConnected) {
+      currentlyActivePageElement = null;
+    }
+    if (currentlyLastActivePageElement && !currentlyLastActivePageElement.isConnected) {
+      currentlyLastActivePageElement = null;
+    }
+
+    if (removedCount > 0) {
+      console.log(`[PageObserver] Cleaned up ${removedCount} removed paragraphs. Total observed: ${observedParagraphs.size}`);
+    }
+
+    return removedCount;
+  };
+
+  // Initial observation
   const paragraphsToObserve = document.querySelectorAll("section[data-chapter] [data-index]");
   if (paragraphsToObserve.length === 0) {
     console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
+    return null;
   } else {
+    console.log(`GOZDECKI MAY 28 paragraphsToObserve.length`, paragraphsToObserve.length);
     paragraphsToObserve.forEach((paragraph) => {
       observer.observe(paragraph);
+      observedParagraphs.add(paragraph);
     });
-  }
 
-  return observer;
+    return { observer, observeNewParagraphs, cleanupRemovedParagraphs };
+  }
 }

@@ -40,6 +40,7 @@
     <xs:complexType name="chapterType">
         <xs:sequence>
             <xs:element name="BookTitle" type="xs:string" minOccurs="0"/>
+            <xs:element name="h4" type="paragraphType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="p" type="paragraphType" minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="id" type="xs:string" use="required"/>

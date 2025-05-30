@@ -108,6 +108,9 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
     <Bogaty-dzierzawca display="Bogaty dzierżawca" summary="" />
     <Ubogi-kaplan-z-chlopcem display="Ubogi kapłan (z chłopcem)" summary="" />
     <Maly-chlopiec-z-kaplanem display="Mały chłopiec (z kapłanem)" summary="" />
+    <Sezofris display="Sezofris" summary="" />
+    <Chaires display="Chaires" summary="" />
+    <Nomarcha-Memfis display="Nomarcha Memfis" summary="" />
 </CharactersMaster>
 
       
@@ -2240,7 +2243,7 @@ Chodź ze mną, <Tutmozis>kuzynie</Tutmozis> — rzekł do <Tutmozis>Tutmozisa</
   <p>— Kwiecie pachnący, którego głos jest jak dźwięk fletu, wysłuchaj mnie!… — błagała kobieta <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes>. — Więc mój mąż powiedział temu urzędnikowi: „Wolałbym stracić dwa byczki, gdybym je miał, aniżeli oddać moich chłopców, choćbyście mi za każdego płacili po cztery drachmy na rok. Bo jak dziecko wyjdzie z domu na służbę, nikt go już nie zobaczy…'</p>
   <p>— Bodajbym się udusił!… bodaj ryby jadły ciało moje na dnie Nilu!… — jęczał chłop. — Przecie ty cały folwark zmarnujesz swoimi skargami… kobieto…</p>
   <p>Urzędnik widząc, że ma poparcie strony głównie zainteresowanej, wystąpił naprzód i zaczął znowu przez nos:</p>
-  <p>— Od czasu jak słońce wschodzi za pałacem królewskim, a zachodzi nad piramidami, działy się w tym kraju różne dziwowiska… Za faraona Semempsesaukazywały się około piramidy Kochom zjawiska cudowne i dżuma spadła na Egipt. Za Boetosa rozwarła się ziemia pod Bubastis i pochłonęła wielu ludzi… Za panowania Neferchesa wody Nilu przez jedenaście dni były słodkie jak miód. To widziano i wiele innych rzeczy, o których wiem, bo jestem pełen mądrości. Ale nigdy nie widziano, ażeby z wody wyszedł jakiś nieznany człowiek i w majątkach najdostojniejszego <Ksiaze-Ramzes>następcy tronu</Ksiaze-Ramzes> bronił zbierania podatków…</p>
+  <p>— Od czasu jak słońce wschodzi za pałacem królewskim, a zachodzi nad piramidami, działy się w tym kraju różne dziwowiska… Za faraona Semempsesa ukazywały się około piramidy Kochom zjawiska cudowne i dżuma spadła na Egipt. Za Boetosa rozwarła się ziemia pod Bubastis i pochłonęła wielu ludzi… Za panowania Neferchesa wody Nilu przez jedenaście dni były słodkie jak miód. To widziano i wiele innych rzeczy, o których wiem, bo jestem pełen mądrości. Ale nigdy nie widziano, ażeby z wody wyszedł jakiś nieznany człowiek i w majątkach najdostojniejszego <Ksiaze-Ramzes>następcy tronu</Ksiaze-Ramzes> bronił zbierania podatków…</p>
   <p>
     <Ksiaze-Ramzes talking="true"/>— Milcz! — krzyknął <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> — i wynoś się stąd. Nikt wam nie zabierze dzieci — dodał do kobiety.</p>
   <p>— Łatwo mi wynieść się — odparł poborca — bo mam lotne czółno i pięciu wioślarzy. Ale dajże mi, wasza dostojność, jakiś znak do pana mego, <Dagon>Dagona</Dagon>…</p>
@@ -5841,15 +5844,12 @@ A kto wie — kończył — może spodobasz się królowi Assarowi i on zechce c
 <p>Po przyjęciu u namiestnika <Sargon>Sargon</Sargon> zatrzymał się jeszcze w Pi-Bast, czekając na listy <Ramzes-XII>faraona</Ramzes-XII> z Memfisu, a jednocześnie między oficerami i szlachtą zaczęły na nowo krążyć dziwaczne pogłoski.</p>
 <p>Fenicjanie opowiadali, pod największym rozumie się sekretem, że kapłani, nie wiadomo z jakiego powodu, nie tylko darowali Asyrii zaległe daniny, nie tylko uwolnili ją raz na zawsze od ich płacenia, ale nadto, ażeby ułatwić Asyryjczykom jakąś wojnę północną, zawarli z nimi traktat pokojowy na długie lata.</p>
 <p>
-<CharactersMaster talking="true"/>
 — <Ramzes-XII>Faraon</Ramzes-XII> — mówili Fenicjanie — aż mocniej zachorował dowiedziawszy się o ustępstwach robionych barbarzyńcom. <Ksiaze-Ramzes>Książę Ramzes</Ksiaze-Ramzes> martwi się i chodzi smutny, lecz obaj muszą ulegać kapłanom, nie będąc pewni uczuć szlachty i wojska.</p>
 <p>To najwięcej oburzało egipską arystokrację.</p>
 <p>
-<CharactersMaster talking="true"/>
 — Jak to — szeptali między sobą zadłużeni magnaci — więc dynastia już nam nie ufa?… Więc kapłani uwzięli się, ażeby zhańbić i zrujnować Egipt?… Bo przecie jasne jest, że jeżeli Asyria ma wojnę gdzieś na dalekiej północy, to właśnie teraz trzeba ją napaść i zdobytymi łupami podźwignąć zubożały skarb królewski i arystokrację…</p>
 <p>Ten i ów z młodych panów ośmielał się zapytywać <Ksiaze-Ramzes>następcy</Ksiaze-Ramzes>: co myśli o asyryjskich barbarzyńcach? <Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> milczał, ale błysk jego oczu i zacięte usta dostatecznie wyrażały uczucia.</p>
 <p>
-<CharactersMaster talking="true"/>
 — Oczywiście — szeptali panowie w dalszym ciągu — że dynastia jest opętana przez kapłanów, nie ufa szlachcie, Egiptowi zaś grożą wielkie nieszczęścia…</p>
 <p>Ciche gniewy prędko zamieniły się w ciche narady mające nawet pozór spisku. Ale choć bardzo wiele osób brało w tym udział, pewny siebie czy zaślepiony stan kapłański nic o nich nie wiedział, a <Sargon>Sargon</Sargon>, choć przeczuwał nienawiść, nie przywiązywał do niej wagi.</p>
 <p>Poznał on, że <Ksiaze-Ramzes>książę Ramzes</Ksiaze-Ramzes> jest mu niechętny, ale przypisywał to wypadkowi w cyrku, a więcej — zazdrości o <Pieszczota>Kamę</Pieszczota>. Ufny jednak w swoją poselską nietykalność, pił, ucztował i prawie co wieczór wymykał się do fenickiej <Pieszczota>kapłanki</Pieszczota>, która coraz łaskawiej przyjmowała jego zaloty i dary.</p>
@@ -6078,7 +6078,7 @@ Sto tysięcy talentów… — powtórzył <Ksiaze-Ramzes>książę</Ksiaze-Ramze
 <p>I to wszystko zniweczą kapłani za pomocą kilku zapisanych blach srebrnych i kilku cegieł pociętych znakami w formie strzał, których nikt z nas nie rozumie!…</p>
 <p>Wysłuchawszy żalów <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>, <Tutmozis>Tutmozis</Tutmozis> podniósł się z krzesła, z uwagą przejrzał sąsiednie komnaty, czy kto w nich nie podsłuchuje, potem znowu usiadł przy <Ksiaze-Ramzes>Ramzesie</Ksiaze-Ramzes> i zaczął szeptać:</p>
 <p><Tutmozis talking="true"/>
-— Bądź dobrej myśli, panie! O ile wiem, cała arystokracja, wszyscy nomarchowie, wszyscy wyżsi oficerowie słyszeli coś o tym traktacie i są oburzeni. Daj więc tylko znak, a rozbijemy traktatowe cegły na łbach <Sargona>Sargona</Sargona>, nawet Assara…</p>
+— Bądź dobrej myśli, panie! O ile wiem, cała arystokracja, wszyscy nomarchowie, wszyscy wyżsi oficerowie słyszeli coś o tym traktacie i są oburzeni. Daj więc tylko znak, a rozbijemy traktatowe cegły na łbach <Sargon>Sargona</Sargon>, nawet Assara…</p>
 <p><Ksiaze-Ramzes talking="true"/>
 — Ależ to byłby bunt przeciw jego świątobliwości… — równie cicho odparł <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
 <p><Tutmozis>Tutmozis</Tutmozis> zrobił smutną miną.</p>
@@ -6131,7 +6131,7 @@ Oho! minęły te czasy — ciągnął <Tutmozis>Tutmozis</Tutmozis> — kiedy ca
 <p>Z drugiej strony <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> nie przypuszczał, że kapłani, nawet zawierając tak szpetny traktat z Asyrią, dopuszczali się zdrady. Nie, to nie byli zdrajcy, ale — rozleniwieni dygnitarze. Dogadza im pokój, gdyż wśród spokoju mnożą swoje skarby i rozszerzają władzę. Nie chcą wojny, gdyż wojna spotęgowałaby władzę faraona, a ich samych naraziłaby na ciężkie wydatki.</p>
 <p>I stało się, że młody <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>, pomimo braku doświadczenia, rozumiał, że musi być ostrożnym, nie śpieszyć się, nikogo nie potępiać, ale też i nikomu nie ufać zbytecznie. On już postanowił wojnę z Asyrią, nie dlatego że pragnęła jej szlachta i Fenicjanie, lecz że Egipt potrzebował skarbów i niewolników.</p>
 <p>Ale postanowiwszy wojnę, chciał działać rozważnie. Chciał powoli przekonać do niej stan kapłański, a dopiero w razie oporu — zgnieść go za pomocą wojska i szlachty.</p>
-<p>I właśnie wówczas, gdy święty <Mefres>Mefres</Mefres> i <Mentezufis>Mentezufis</Mentezufis> żartowali z przepowiedni <Sargona>Sargona</Sargona>, że <Ksiaze-Ramzes>następca</Ksiaze-Ramzes> nie podda się kapłanom, ale ich zmusi do posłuszeństwa, już wówczas <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> miał gotowy plan ujarzmienia ich i widział, jakie posiada do tego środki. Zaś chwilę rozpoczęcia walki i sposób przeprowadzenia jej pozostawiał przyszłości.</p>
+<p>I właśnie wówczas, gdy święty <Mefres>Mefres</Mefres> i <Mentezufis>Mentezufis</Mentezufis> żartowali z przepowiedni <Sargon>Sargona</Sargon>, że <Ksiaze-Ramzes>następca</Ksiaze-Ramzes> nie podda się kapłanom, ale ich zmusi do posłuszeństwa, już wówczas <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> miał gotowy plan ujarzmienia ich i widział, jakie posiada do tego środki. Zaś chwilę rozpoczęcia walki i sposób przeprowadzenia jej pozostawiał przyszłości.</p>
 <p><Ksiaze-Ramzes talking="true"/>
 „Czas przynosi najlepsze rady!' — rzekł do siebie. Był spokojny i zadowolony jak człowiek, który po długim wahaniu wie, co ma robić, i posiada wiarę we własne siły. Toteż ażeby pozbyć się nawet śladów niedawnego wzburzenia, poszedł do <Sara>Sary</Sara>.</p>
 <p>Zabawa z synkiem zawsze koiła jego troski i pogodą napełniała mu serce.</p>
@@ -8054,104 +8054,91 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>Nie wiem, jaki będzie skutek waszych próśb; lecz ponieważ bogowie nigdy nie odwracają się od skruszonych i błagających, więc przeczuwam, że nie będziecie źle przyjęci.</p>
 <p>A teraz pokażcie mi dary przeznaczone dla jego świątobliwości, abym osądził, czy poruszą serce wszechmocnego faraona.</p>
 <p>W tej chwili <Mentezufis>Mentezufis</Mentezufis> dał znak stojącemu na wozie <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> <Pentuer>Pentuerowi</Pentuer>. A gdy ten zeszedł i zbliżył się ze czcią do świętego męża, <Mentezufis>Mentezufis</Mentezufis> szepnął:</p>
-<Mentezufis talking="true"/>
-<p>— Boję się, ażeby młodemu panu naszemu triumf nie za mocno uderzył do głowy. Czy nie sądzisz, że byłoby roztropnym przerwać w jaki sposób uroczystość?…</p>
-<Pentuer talking="true"/>
-<p>— Przeciwnie — odparł <Pentuer>Pentuer</Pentuer> — nie przerywajcie uroczystości, a ja wam ręczę, że podczas triumfu nie będzie miał wesołej twarzy.</p>
-<Mentezufis talking="true"/>
-<p>— Zrobisz cud?</p>
-<Pentuer talking="true"/>
-<p>— Czyliżbym potrafił? Pokażę mu tylko, że na tym świecie wielkiej radości towarzyszą wielkie strapienia.</p>
-<Mentezufis talking="true"/>
-<p>— Czyń, jak chcesz — rzekł <Mentezufis>Mentezufis</Mentezufis> — gdyż bogowie dali ci mądrość godną członka najwyższej rady.</p>
+<p><Mentezufis talking="true"/>— Boję się, ażeby młodemu panu naszemu triumf nie za mocno uderzył do głowy. Czy nie sądzisz, że byłoby roztropnym przerwać w jaki sposób uroczystość?…</p>
+<p><Pentuer talking="true"/>— Przeciwnie — odparł <Pentuer>Pentuer</Pentuer> — nie przerywajcie uroczystości, a ja wam ręczę, że podczas triumfu nie będzie miał wesołej twarzy.</p>
+<p><Mentezufis talking="true"/>— Zrobisz cud?</p>
+<p><Pentuer talking="true"/>— Czyliżbym potrafił? Pokażę mu tylko, że na tym świecie wielkiej radości towarzyszą wielkie strapienia.</p>
+<p><Mentezufis talking="true"/>— Czyń, jak chcesz — rzekł <Mentezufis>Mentezufis</Mentezufis> — gdyż bogowie dali ci mądrość godną członka najwyższej rady.</p>
 <p>Odezwały się trąby i bębny i rozpoczęto pochód triumfalny.</p>
 <p>Na czele szli nadzy niewolnicy z darami, pilnowani przez możnych Libijczyków. Więc niesiono złote i srebrne bogi, szkatułki napełnione wonnościami, emaliowane naczynia, tkaniny, sprzęty, wreszcie złote misy zasypane rubinami, szafirami i szmaragdami. Niewolnicy niosący je mieli ogolone głowy i opaski na ustach, ażeby który nie ukradł cennego klejnotu.</p>
 <p><Ksiaze-Ramzes>Książę Ramzes</Ksiaze-Ramzes> wsparł obie ręce o krawędź wozu i z wysokości pagórka patrzył na Libijczyków i swoje wojsko jak żółtogłowy orzeł na pstre kuropatwy. Duma wypełniała go od stóp do głów i wszyscy czuli, że nie można być potężniejszym nad tego zwycięskiego wodza.</p>
 <p>W jednej chwili oczy <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> utraciły swój blask, a na twarzy odmalowało się przykre zdziwienie. To stojący za nim <Pentuer>Pentuer</Pentuer> szepnął:</p>
-<Pentuer talking="true"/>
-<p>— Nakłoń, panie, ucha twego… Od czasu kiedy opuściłeś miasto Pi-Bast, zaszły tam dziwne wydarzenia… Twoja kobieta, <Pieszczota>Kama</Pieszczota> Fenicjanka, uciekła z Grekiem <Lykon>Lykonem</Lykon>…</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— Z <Lykon>Lykonem</Lykon>?… — powtórzył <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<Pentuer talking="true"/>
-<p>— Nie poruszaj się, panie, i nie okazuj tysiącom twoich niewolników, że masz smutek w dniu triumfu…</p>
+<p><Pentuer talking="true"/>— Nakłoń, panie, ucha twego… Od czasu kiedy opuściłeś miasto Pi-Bast, zaszły tam dziwne wydarzenia… Twoja kobieta, <Pieszczota>Kama</Pieszczota> Fenicjanka, uciekła z Grekiem <Lykon>Lykonem</Lykon>…</p>
+<p><Ksiaze-Ramzes talking="true"/>— Z <Lykon>Lykonem</Lykon>?… — powtórzył <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
+<p><Pentuer talking="true"/>— Nie poruszaj się, panie, i nie okazuj tysiącom twoich niewolników, że masz smutek w dniu triumfu…</p>
 <p>W tej chwili przechodził u stóp <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> bardzo długi sznur Libijczyków niosących w koszach owoce i chleby, a w ogromnych dzbanach wino i oliwę dla wojska. Na ten widok wśród karnego żołnierstwa rozległ się szmer radości, ale <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> nie spostrzegł tego, zajęty opowiadaniem <Pentuer>Pentuera</Pentuer>.</p>
-<Pentuer talking="true"/>
-<p>— Bogowie — szeptał prorok — ukarali zdradziecką Fenicjankę…</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— Złapana?… — spytał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<Pentuer talking="true"/>
-<p>— Złapana, ale musiano ją wysłać do wschodnich kolonii… Spadł bowiem na nią trąd…</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— O bogowie!… — szepnął <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>. — Czy aby mnie on nie grozi?…</p>
-<Pentuer talking="true"/>
-<p>— Bądź spokojny, panie: gdybyś się zaraził, już byś go miał…</p>
+<p><Pentuer talking="true"/>— Bogowie — szeptał prorok — ukarali zdradziecką Fenicjankę…</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— Złapana?… — spytał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
+
+<p><Pentuer talking="true"/>— Złapana, ale musiano ją wysłać do wschodnich kolonii… Spadł bowiem na nią trąd…</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— O bogowie!… — szepnął <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>. — Czy aby mnie on nie grozi?…</p>
+
+<p><Pentuer talking="true"/>— Bądź spokojny, panie: gdybyś się zaraził, już byś go miał…</p>
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> poczuł zimno we wszystkich członkach. Jakże łatwo bogom z najwyższych szczytów zepchnąć człowieka w przepaść najgłębszej nędzy!…</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— A tenże nikczemny <Lykon>Lykon</Lykon>?…</p>
-<Pentuer talking="true"/>
-<p>— Jest to wielki zbrodniarz — mówi <Pentuer>Pentuer</Pentuer> — zbrodniarz, jakich niewielu wydała ziemia…</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— Znam go. Jest podobny do mnie jak obraz odbity w lustrze… — odparł <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>.</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— A tenże nikczemny <Lykon>Lykon</Lykon>?…</p>
+
+<p><Pentuer talking="true"/>— Jest to wielki zbrodniarz — mówi <Pentuer>Pentuer</Pentuer> — zbrodniarz, jakich niewielu wydała ziemia…</p>
+<p><Ksiaze-Ramzes talking="true"/>— Znam go. Jest podobny do mnie jak obraz odbity w lustrze… — odparł <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>.</p>
 <p>Teraz nadciągnęła gromada Libijczyków prowadzących osobliwe zwierzęta. Na czele szedł jednogarbny wielbłąd z białawym włosem, jeden z pierwszych, jakiego złapano w pustyni. Za nim dwa nosorożce, stado koni i oswojony lew w klatce. A dalej mnóstwo klatek z różnobarwnymi ptakami, małpkami i małymi pieskami, przeznaczonymi dla dam dworskich. W końcu pędzono wielkie stada wołów i baranów na mięso dla wojska.</p>
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> ledwo rzucił okiem na wędrujący zwierzyniec i pytał kapłana:</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— A <Lykon>Lykon</Lykon> schwytany?…</p>
-<Pentuer talking="true"/>
-<p>— Teraz powiem ci najgorszą rzecz, nieszczęśliwy panie — szeptał <Pentuer>Pentuer</Pentuer>. — Pamiętaj jednak, aby nieprzyjaciele Egiptu nie dostrzegli smutku w tobie…</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— A <Lykon>Lykon</Lykon> schwytany?…</p>
+
+<p><Pentuer talking="true"/>— Teraz powiem ci najgorszą rzecz, nieszczęśliwy panie — szeptał <Pentuer>Pentuer</Pentuer>. — Pamiętaj jednak, aby nieprzyjaciele Egiptu nie dostrzegli smutku w tobie…</p>
 <p>Następca poruszył się.</p>
-<Pentuer talking="true"/>
-<p>— Twoja druga kobieta, <Sara>Sara</Sara> Żydówka…</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— Czy także uciekła?…</p>
-<Pentuer talking="true"/>
-<p>— Zmarła w więzieniu…</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— O bogowie!… Któż śmiał ją wtrącić?…</p>
-<Pentuer talking="true"/>
-<p>— Sama oskarżyła się o zabójstwo syna twego…</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— Co?…</p>
+
+<p><Pentuer talking="true"/>— Twoja druga kobieta, <Sara>Sara</Sara> Żydówka…</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— Czy także uciekła?…</p>
+
+<p><Pentuer talking="true"/>— Zmarła w więzieniu…</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— O bogowie!… Któż śmiał ją wtrącić?…</p>
+
+<p><Pentuer talking="true"/>— Sama oskarżyła się o zabójstwo syna twego…</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— Co?…</p>
 <p>Wielki krzyk rozległ się u stóp <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes>: maszerowali jeńcy libijscy wzięci podczas bitwy, a na ich czele smutny <Tehenna>Tehenna</Tehenna>.</p>
 <p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> miał w tej chwili serce tak przepełnione bólem, że skinął na <Tehenna>Tehennę</Tehenna> i rzekł:</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— Stań przy ojcu twoim, <Musawasa>Musawasie</Musawasa>, ażeby widział i dotknął cię, że żyjesz…</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— Stań przy ojcu twoim, <Musawasa>Musawasie</Musawasa>, ażeby widział i dotknął cię, że żyjesz…</p>
 <p>Na te słowa wszyscy Libijczycy i całe wojsko wydało potężny okrzyk; ale <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> nie słuchał go.</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— Syn mój nie żyje?… — pytał kapłana. — <Sara>Sara</Sara> oskarżyła się o dzieciobójstwo?… Czy szaleństwo padło na jej duszę?…</p>
-<Pentuer talking="true"/>
-<p>— Dziecko zabił nikczemny <Lykon>Lykon</Lykon>…</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— O bogowie, dajcie mi siły!… — jęknął <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
-<Pentuer talking="true"/>
-<p>— Hamuj się, panie, jak przystało na zwycięskiego wodza…</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— Czyliż podobna zwyciężyć taką boleść!… O niemiłosierni bogowie!…</p>
-<Pentuer talking="true"/>
-<p>— Dziecko zabił <Lykon>Lykon</Lykon>, <Sara>Sara</Sara> zaś oskarżyła się, ażeby ciebie ocalić… Widząc bowiem mordercę w nocy, myślała, że to ty sam byłeś…</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— A ja ją wygnałem z mego domu!… A ja zrobiłem ją służebnicą Fenicjanki!… — szeptał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— Syn mój nie żyje?… — pytał kapłana. — <Sara>Sara</Sara> oskarżyła się o dzieciobójstwo?… Czy szaleństwo padło na jej duszę?…</p>
+
+<p><Pentuer talking="true"/>— Dziecko zabił nikczemny <Lykon>Lykon</Lykon>…</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— O bogowie, dajcie mi siły!… — jęknął <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
+
+<p><Pentuer talking="true"/>— Hamuj się, panie, jak przystało na zwycięskiego wodza…</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— Czyliż podobna zwyciężyć taką boleść!… O niemiłosierni bogowie!…</p>
+
+<p><Pentuer talking="true"/>— Dziecko zabił <Lykon>Lykon</Lykon>, <Sara>Sara</Sara> zaś oskarżyła się, ażeby ciebie ocalić… Widząc bowiem mordercę w nocy, myślała, że to ty sam byłeś…</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— A ja ją wygnałem z mego domu!… A ja zrobiłem ją służebnicą Fenicjanki!… — szeptał <Ksiaze-Ramzes>książę</Ksiaze-Ramzes>.</p>
 <p>Teraz ukazali się egipscy żołnierze, niosący pełne kosze rąk uciętych poległym Libijczykom.</p>
 <p>Na ten widok <Ksiaze-Ramzes>książę Ramzes</Ksiaze-Ramzes> zasłonił twarz swoją i gorzko zapłakał.</p>
 <p>Natychmiast jenerałowie otoczyli wóz, pocieszając pana. Zaś święty prorok <Mentezufis>Mentezufis</Mentezufis> podał wniosek, który przyjęto bez namysłu, ażeby od tej pory wojsko egipskie już nigdy nie ucinało rąk poległym w boju nieprzyjaciołom.</p>
 <p>Tym nieprzewidzianym wypadkiem zakończył się pierwszy triumf następcy egipskiego tronu. Ale łzy, jakie wylał nad uciętymi rękoma, mocniej aniżeli zwycięska bitwa przywiązały do niego Libijczyków. Nikt też nie dziwił się, że dokoła ognisk zasiedli w zgodzie żołnierze egipscy i Libijczycy, dzieląc się chlebem i pijąc wino z tych samych kubków. Miejsce wojny i nienawiści, które miały trwać całe lata, zajęło głębokie uczucie spokoju i zaufania.</p>
 <p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> polecił, ażeby <Musawasa>Musawasa</Musawasa>, <Tehenna>Tehenna</Tehenna> i najprzedniejsi Libijczycy natychmiast jechali z darami do Memfisu, i dał im eskortę, nie tyle do pilnowania ich, ile dla bezpieczeństwa ich osób i wiezionych skarbów. Sam zaś ukrył się w namiocie i nie pokazał się przez kilka godzin. Nie przyjął nawet <Tutmozis>Tutmozisa</Tutmozis>, jak człowiek, któremu boleść starczy za najmilsze towarzystwo.</p>
 <p>Ku wieczorowi przyszła do <Ksiaze-Ramzes>księcia</Ksiaze-Ramzes> deputacja greckich oficerów pod dowództwem <Kalipos>Kaliposa</Kalipos>. Kiedy następca zapytał: czego chcą?… <Kalipos>Kalipos</Kalipos> odparł:</p>
-<Kalipos talking="true"/>
-<p>— Przychodzimy błagać cię, panie, ażeby ciało naszego wodza, a twego sługi, <Patrokles>Patroklesa</Patrokles>, nie było wydane egipskim kapłanom, lecz spalone według greckiego obyczaju.</p>
+<p><Kalipos talking="true"/>— Przychodzimy błagać cię, panie, ażeby ciało naszego wodza, a twego sługi, <Patrokles>Patroklesa</Patrokles>, nie było wydane egipskim kapłanom, lecz spalone według greckiego obyczaju.</p>
 <p><Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> zdziwił się.</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— Chyba wiadomo wam — rzekł — że ze zwłok <Patrokles>Patroklesa</Patrokles> kapłani chcą zrobić mumię pierwszej klasy i umieścić ją przy grobach faraonów. Czy może większy zaszczyt spotkać człowieka na tym świecie?</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— Chyba wiadomo wam — rzekł — że ze zwłok <Patrokles>Patroklesa</Patrokles> kapłani chcą zrobić mumię pierwszej klasy i umieścić ją przy grobach faraonów. Czy może większy zaszczyt spotkać człowieka na tym świecie?</p>
 <p>Grecy wahali się, wreszcie <Kalipos>Kalipos</Kalipos>, zebrawszy odwagę, odpowiedział:</p>
-<Kalipos talking="true"/>
-<p>— Panie nasz, pozwól otworzyć serce przed tobą. Dobrze wiemy, że zrobienie mumii jest dla człowieka korzystniejszym niż spalenie go. Gdy bowiem dusza spalonego natychmiast przenosi się do krajów wiekuistych, dusza zabalsamowanego może tysiące lat żyć na tej ziemi i cieszyć się jej pięknością.</p>
+<p><Kalipos talking="true"/>— Panie nasz, pozwól otworzyć serce przed tobą. Dobrze wiemy, że zrobienie mumii jest dla człowieka korzystniejszym niż spalenie go. Gdy bowiem dusza spalonego natychmiast przenosi się do krajów wiekuistych, dusza zabalsamowanego może tysiące lat żyć na tej ziemi i cieszyć się jej pięknością.</p>
 <p>Ale egipscy kapłani, wodzu (niech to nie obraża twoich uszu!), nienawidzili <Patrokles>Patroklesa</Patrokles>. Któż więc nas zapewni, że kapłani, zrobiwszy jego mumię, nie w tym celu zatrzymają duszę na ziemi, aby ją poddać udręczeniom?… I co my bylibyśmy warci, gdybyśmy, podejrzewając zemstę, nie uchronili od niej duszy naszego ziomka i dowódcy?…</p>
 <p>Zdziwienie <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes> jeszcze bardziej wzrosło.</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— Czyńcie — rzekł — jak uważacie za potrzebne.</p>
-<Kalipos talking="true"/>
-<p>— A jeżeli nie wydadzą nam ciała?…</p>
-<Ksiaze-Ramzes talking="true"/>
-<p>— Tylko przygotujcie stos, a resztą sam się zajmę.</p>
+<p><Ksiaze-Ramzes talking="true"/>— Czyńcie — rzekł — jak uważacie za potrzebne.</p>
+
+<p><Kalipos talking="true"/>— A jeżeli nie wydadzą nam ciała?…</p>
+
+<p><Ksiaze-Ramzes talking="true"/>— Tylko przygotujcie stos, a resztą sam się zajmę.</p>
 <p>Grecy wyszli, <Ksiaze-Ramzes>książę</Ksiaze-Ramzes> posłał po <Mentezufis>Mentezufisa</Mentezufis>.</p></Chapter><Chapter id="47"><h4>Rozdział XXII</h4>
 <p><Mentezufis>Kapłan</Mentezufis> spod oka przypatrzył się <Ksiaze-Ramzes>następcy</Ksiaze-Ramzes> i znalazł go bardzo zmienionym. <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> był blady, prawie schudł w kilka godzin, a jego oczy straciły blask i zapadły się pod czoło.</p>
 <p>Usłyszawszy, o co chodzi Grekom, <Mentezufis>Mentezufis</Mentezufis> ani chwili nie wahał się z wydaniem zwłok <Patrokles>Patroklesa</Patrokles>.</p>
@@ -9203,7 +9190,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 — Podatki — rzekł <Wielki-skarbnik-panstwowy>skarbnik</Wielki-skarbnik-panstwowy> — nie wiem dlaczego, znowu zmniejszyły się i nie napływają w takiej ilości, jak rachowałem. Ale i one rozeszły się… Racz, wasza świątobliwość, pamiętać, że mamy pięć nowych pułków. Więc około ośmiu tysięcy ludzi porzuciło swoje zajęcia i żyją na koszt państwa…</p>
 <p>Faraon zamyślił się.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-— Musimy — odpowiedział — zaciągnąć nową pożyczkę. Porozumiej się z <Herhor>Herhorem</Herhor> i <Mefresem>Mefresem</Mefresem>, aby nam dały świątynie.</p>
+— Musimy — odpowiedział — zaciągnąć nową pożyczkę. Porozumiej się z <Herhor>Herhorem</Herhor> i <Mefres>Mefresem</Mefres>, aby nam dały świątynie.</p>
 <p><Wielki-skarbnik-panstwowy talking="true"/>
 — Mówiłem o tym… Świątynie nic nam nie dadzą.</p>
 <p><Ksiaze-Ramzes talking="true"/>
@@ -9324,7 +9311,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> spojrzał na niego z chłodną pogardą.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Starcze — rzekł — mnie zostaw troskę o posłuszeństwo kapłanów, a sam złóż dowody, że to, co mówiłeś, jest prawdą. Byłbym bardzo lichym królem, gdybym nie potrafił usunąć przeszkód wyrastających pomiędzy moją wolą a interesami państwa.</p>
 <p><Hiram talking="true"/>— Zaprawdę, jesteś wielkim <Ksiaze-Ramzes>władcą</Ksiaze-Ramzes>, panie nasz — szepnął <Hiram>Hiram</Hiram>, schylając się do ziemi.</p>
-<p>Było już późno w nocy. Fenicjanin pożegnał <Ksiaze-Ramzes>faraona</Ksiaze-Ramzes> i wraz z <Tutmozisem>Tutmozisem</Tutmozisem> opuścił pałac. Na drugi zaś dzień przysłał przez <Dagon>Dagona</Dagon> skrzynkę z próbkami bogactw nieznanych krajów.</p>
+<p>Było już późno w nocy. Fenicjanin pożegnał <Ksiaze-Ramzes>faraona</Ksiaze-Ramzes> i wraz z <Tutmozis>Tutmozisem</Tutmozis> opuścił pałac. Na drugi zaś dzień przysłał przez <Dagon>Dagona</Dagon> skrzynkę z próbkami bogactw nieznanych krajów.</p>
 <p><Ksiaze-Ramzes>Pan</Ksiaze-Ramzes> znalazł w niej posążki bogów, tkaniny i pierścienie indyjskie, małe kawałki opium, a w drugiej przegrodzie — garstkę ryżu, listki herbaty, parę porcelanowych czarek ozdobionych malowidłami i — kilkanaście rysunków wykonanych farbami i tuszem na papierze.</p>
 <p>Obejrzał to z największą uwagą i przyznał, że podobne okazy były mu nieznane. Ani ryż, ani papier, ani wizerunki ludzi, którzy mieli spiczaste kapelusze i skośne oczy.</p>
 <p>Już nie wątpił o istnieniu jakiegoś nowego kraju, w którym wszystko było inne niż w Egipcie: góry, drzewa, domy, mosty, okręty…</p>
@@ -9348,7 +9335,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Tutmozis talking="true"/>— A komu wasza świątobliwość przeznaczysz ten zaszczyt?</p>
 <p><Ksiaze-Ramzes talking="true"/>— W tej chwili nie wiem… Trzeba będzie znaleźć kogo między egipskimi albo greckimi kupcami… W ostateczności — odwołamy się do kapłanów.</p>
 <p>Wiadomość ta obiegła wszystkie pałace królewskie i przed upływem godziny doleciała do Memfisu. Po całym mieście opowiadano, że Fenicjanie wpadli w niełaskę u <Ksiaze-Ramzes>faraona</Ksiaze-Ramzes>, a ku wieczorowi lud już zaczął rozbijać sklepy znienawidzonym cudzoziemcom.</p>
-<p>Kapłani odetchnęli. <Herhor>Herhor</Herhor> złożył nawet wizytę świętemu <Mefresowi>Mefresowi</Mefresowi> i rzekł mu:</p>
+<p>Kapłani odetchnęli. <Herhor>Herhor</Herhor> złożył nawet wizytę świętemu <Mefres>Mefresowi</Mefres> i rzekł mu:</p>
 <p><Herhor talking="true"/>— Serce moje czuło, że <Ksiaze-Ramzes>pan</Ksiaze-Ramzes> nasz odwróci się od tych pogan pijących krew ludu. Myślę, że należy okazać mu wdzięczność z naszej strony…</p>
 <p><Mefres talking="true"/>— I może otworzyć drzwi do naszych skarbców?… — spytał szorstko święty <Mefres>Mefres</Mefres>. — Nie śpiesz się, wasza dostojność… Odgadłem już tego młodzika i — biada nam — jeżeli raz pozwolimy mu wziąć górę nad sobą…</p>
 <p>— A gdyby zerwał z Fenicjanami?…</p>
@@ -9407,7 +9394,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Ksiaze-Ramzes talking="true"/>Dlatego — dodał szybko — od was, święci mężowie, będę potrzebował pomocy…</p>
 <p><Mefres talking="true"/>— Każdy zamiar waszej świątobliwości gotowi jesteśmy popierać modłami i procesjami — rzekł <Mefres>Mefres</Mefres>.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Owszem, módlcie się i zachęcajcie do tego naród. Ale prócz tego dajcie państwu trzydzieści tysięcy talentów — odpowiedział <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes>.</p>
-<p>Arcykapłani milczeli. <Ksiaze-Ramzes>Pan</Ksiaze-Ramzes> chwilę czekał, w końcu zwrócił się do <Herhora>Herhora</Herhora>:</p>
+<p>Arcykapłani milczeli. <Ksiaze-Ramzes>Pan</Ksiaze-Ramzes> chwilę czekał, w końcu zwrócił się do <Herhor>Herhora</Herhor>:</p>
 <p><Ksiaze-Ramzes talking="true"/>— Milczysz, wasza dostojność?</p>
 <p><Herhor talking="true"/>— Sam powiedziałeś, <Ksiaze-Ramzes>władco</Ksiaze-Ramzes> nasz, że skarb nie ma funduszu nawet na pogrzeb <Ramzes-XII>Ozyrysa-Mer-amen-Ramzesa</Ramzes-XII>. Nie mogę więc nawet odgadnąć: skąd wzięlibyśmy trzydzieści tysięcy talentów?…</p>
 <p>— A skarbiec Labiryntu?…</p>
@@ -9424,7 +9411,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Mefres talking="true"/>— O tyle do nas — odparł zuchwały arcykapłan — o ile państwo należy do ciebie, <Ksiaze-Ramzes>władco</Ksiaze-Ramzes>. Pilnujemy tych skarbów i pomnażamy je, ale trwonić ich — nie mamy prawa…</p>
 <p>Dyszący gniewem <Ksiaze-Ramzes>pan</Ksiaze-Ramzes> opuścił zebranie i poszedł do swego gabinetu. Jego położenie przedstawiło mu się okrutnie jasno.</p>
 <p>O nienawiści kapłanów do siebie już nie wątpił. To byli ci sami oszołomieni pychą dostojnicy, którzy w roku zeszłym nie dali mu korpusu Menfi i dopiero zrobili go namiestnikiem, gdy zdawało im się, że spełnił akt pokory, usuwając się z pałacu. Ci sami, którzy kontrolowali każdy jego ruch, składali o nim raporty, ale jemu, następcy tronu, nie powiedzieli nawet o traktacie z Asyrią. Ci sami, co oszukiwali go w świątyni Hator, a nad Sodowymi Jeziorami wymordowali jeńców, którym on przyobiecał łaskę.</p>
-<p><Ksiaze-Ramzes>Faraon</Ksiaze-Ramzes> przypomniał sobie ukłony <Herhora>Herhora</Herhora>, spojrzenia <Mefresa>Mefresa</Mefresa> i ton głosu obydwu. Spod pozorów uprzejmości co chwilę wynurzała się ich duma i lekceważenie jego. On potrzebuje pieniędzy, a oni obiecują mu modlitwy, ba!… ośmielają się mówić, że nie jest wyłącznym <Ksiaze-Ramzes>władcą</Ksiaze-Ramzes> Egiptu.</p>
+<p><Ksiaze-Ramzes>Faraon</Ksiaze-Ramzes> przypomniał sobie ukłony <Herhor>Herhora</Herhor>, spojrzenia <Mefres>Mefresa</Mefres> i ton głosu obydwu. Spod pozorów uprzejmości co chwilę wynurzała się ich duma i lekceważenie jego. On potrzebuje pieniędzy, a oni obiecują mu modlitwy, ba!… ośmielają się mówić, że nie jest wyłącznym <Ksiaze-Ramzes>władcą</Ksiaze-Ramzes> Egiptu.</p>
 <p>Młody <Ksiaze-Ramzes>pan</Ksiaze-Ramzes> mimo woli uśmiechnął się: przyszły mu bowiem na myśl wynajęte pastuchy, którzy właścicielowi trzody mówią, że on nie ma prawa robić z nią tego, co chce!…</p>
 <p>Lecz obok strony śmiesznej była tu strona groźna. W skarbie znajdowało się może tysiąc talentów, które według dotychczasowej normy wydatków mogły starczyć na siedem do dziesięciu dni. A co potem?… Jak zachowają się urzędnicy, służba, a przede wszystkim — wojsko nie tylko nie pobierające żołdu, ale wprost głodne?…</p>
 <p>Arcykapłani znali to położenie <Ksiaze-Ramzes>faraona</Ksiaze-Ramzes>, a jeżeli nie śpieszą mu z pomocą, więc chcą go zgubić… I to zgubić w ciągu kilku dni, nawet przed pogrzebem ojca.</p>
@@ -9440,7 +9427,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>„Co mnie może spotkać?… Tylko śmierć… Odejdę do moich sławnych przodków, do <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes> Wielkiego… A im przecież nie mogę powiedzieć, żem zginął, nie broniąc się… Po nieszczęściach życia ziemskiego spotkałaby mnie hańba wiekuista…'</p>
 <p>Jak to, on, zwycięzca znad Sodowych Jezior, miałby ustąpić przed garścią obłudników, z którymi jeden azjatycki pułk nie miałby wielkiego zajęcia?… Więc dlatego, że <Mefres>Mefres</Mefres> i <Herhor>Herhor</Herhor> chcą rządzić Egiptem i <Ksiaze-Ramzes>faraonem</Ksiaze-Ramzes>, jego wojska mają cierpieć głód, a milion chłopów nie otrzymać łaski odpoczynku?…</p>
 <p>Alboż nie jego przodkowie powznosili te świątynie?… Alboż nie oni wypełnili je łupami?… A kto wygrywał bitwy: kapłani czy żołnierze?… Więc kto ma prawo do skarbów: kapłani czy <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes> i jego armia?</p>
-<p>Młody <Ksiaze-Ramzes>pan</Ksiaze-Ramzes> wzruszył ramionami i wezwał do siebie <Tutmozisa>Tutmozisa</Tutmozisa>. Mimo późnej nocy królewski ulubieniec zjawił się natychmiast.</p>
+<p>Młody <Ksiaze-Ramzes>pan</Ksiaze-Ramzes> wzruszył ramionami i wezwał do siebie <Tutmozis>Tutmozisa</Tutmozis>. Mimo późnej nocy królewski ulubieniec zjawił się natychmiast.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Czy wiesz? — rzekł <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes> — kapłani odmówili mi pożyczki, pomimo że skarb jest pusty.</p>
 <p><Tutmozis>Tutmozis</Tutmozis> wyprostował się.</p>
 <p><Tutmozis talking="true"/>— Każesz, wasza świątobliwość, zaprowadzić ich do więzienia?… — odparł.</p>
@@ -9451,7 +9438,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Ksiaze-Ramzes talking="true"/>— Jeszcze za wcześnie — odparł <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>. — Muszę być łaskawym dla tych ludzi przynajmniej do pogrzebu ojca mego. Gdyż inaczej gotowi jego czcigodnej mumii zrobić jakie łotrostwo i zakłócić spokój duszy… A teraz, pójdź jutro do <Hiram>Hirama</Hiram> i powiedz, ażeby przysłał mi tego kapłana, o którym mówiliśmy.</p>
 <p><Tutmozis talking="true"/>— Tak się stanie. Muszę jednak wspomnieć waszej świątobliwości, że dzisiaj lud napadał domy memfijskich Fenicjan…</p>
 <p>— Oho?… To było niepotrzebne.</p>
-<p><Tutmozis talking="true"/>— Zdaje mi się też — ciągnął <Tutmozis>Tutmozis</Tutmozis> — że od czasu kiedy wasza świątobliwość kazałeś <Pentuerowi>Pentuerowi</Pentuerowi> zbadać położenie chłopów i robotników, kapłani podburzają nomarchów i szlachtę… Mówią, panie, że chcesz zrujnować szlachtę dla chłopów…</p>
+<p><Tutmozis talking="true"/>— Zdaje mi się też — ciągnął <Tutmozis>Tutmozis</Tutmozis> — że od czasu kiedy wasza świątobliwość kazałeś <Pentuer>Pentuerowi</Pentuer> zbadać położenie chłopów i robotników, kapłani podburzają nomarchów i szlachtę… Mówią, panie, że chcesz zrujnować szlachtę dla chłopów…</p>
 <p>— I szlachta wierzy temu?…</p>
 <p><Tutmozis talking="true"/>— Są tacy, którzy wierzą. Ale są i tacy, którzy wręcz odpowiadają, że to jest intryga kapłańska przeciw waszej świątobliwości.</p>
 <p><Ksiaze-Ramzes talking="true"/>— A gdybym naprawdę chciał poprawić dolę chłopów?… — spytał <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes>.</p>
@@ -9466,7 +9453,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>Był to dar zacny: wszystko bowiem, co ofiarowali Fenicjanie, przedstawiało sumę trzech tysięcy talentów.</p>
 <p><Ksiaze-Ramzes>Pan</Ksiaze-Ramzes> odpowiedział wiernym kupcom bardzo łaskawie, obiecując im swoją opiekę. Pożegnali go uszczęśliwieni.</p>
 <p><Ksiaze-Ramzes>Ramzes XIII</Ksiaze-Ramzes> odetchnął: bankructwo skarbu, a więc i konieczność użycia gwałtownych środków przeciw kapłanom odsunęła się na dalsze dziesięć dni.</p>
-<p>Wieczorem, znowu pod opieką <Tutmozisa>Tutmozisa</Tutmozisa>, stanął w gabinecie jego świątobliwości dostojny <Hiram>Hiram</Hiram>. Tym razem nie skarżył się na zmęczenie, ale upadł na twarz i jękliwym głosem przeklinał głupiego <Dagon>Dagona</Dagon>.</p>
+<p>Wieczorem, znowu pod opieką <Tutmozis>Tutmozisa</Tutmozis>, stanął w gabinecie jego świątobliwości dostojny <Hiram>Hiram</Hiram>. Tym razem nie skarżył się na zmęczenie, ale upadł na twarz i jękliwym głosem przeklinał głupiego <Dagon>Dagona</Dagon>.</p>
 <p><Hiram talking="true"/>— Dowiedziałem się — mówił — że ten parch śmiał przypominać waszej świątobliwości naszą umowę o kanał do Morza Czerwonego… Niech on zmarnieje!… niech jego trąd stoczy!… niech jego dzieci zostaną świnopasami, a wnuki Żydami…</p>
 <p><Hiram talking="true"/>Ty zaś, <Ksiaze-Ramzes>władco</Ksiaze-Ramzes>, tylko rozkazuj, a ile ma bogactw Fenicja, wszystkie złoży u stóp twoich bez żadnego kwitu i traktatu… Czy to my Asyryjczycy albo… kapłani — dodał szeptem — ażeby nie wystarczało nam jedno słowo tak potężnego mocarza?…</p>
 <p><Ksiaze-Ramzes talking="true"/>— A gdybym ja, <Hiram>Hiramie</Hiram>, naprawdę zażądał wielkiej sumy? — spytał <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes>.</p>
@@ -9513,7 +9500,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Ksiaze-Ramzes talking="true"/>— Dlaczego powierzyłeś Fenicjanom wielką tajemnicę państwa? — zapytał <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>.</p>
 <p><Samentu talking="true"/>— Bo chciałem zapobiec haniebnemu traktatowi, który szkodził zarówno nam, jak i Fenicji.</p>
 <p>— Mogłeś ostrzec kogo z dostojnych Egipcjan…</p>
-<p><Samentu talking="true"/>— Kogo?… — zapytał kapłan. — Czy takich, którzy wobec <Herhora>Herhora</Herhora> byli bezsilni, czy takich, którzy by mnie oskarżyli przed nim i narazili na śmierć w męczarniach?… Powiedziałem <Hiram>Hiramowi</Hiram>, bo on stykał się z naszymi dostojnikami, których ja nie widuję nigdy.</p>
+<p><Samentu talking="true"/>— Kogo?… — zapytał kapłan. — Czy takich, którzy wobec <Herhor>Herhora</Herhor> byli bezsilni, czy takich, którzy by mnie oskarżyli przed nim i narazili na śmierć w męczarniach?… Powiedziałem <Hiram>Hiramowi</Hiram>, bo on stykał się z naszymi dostojnikami, których ja nie widuję nigdy.</p>
 <p><Ksiaze-Ramzes talking="true"/>— A dlaczego <Herhor>Herhor</Herhor> i <Mefres>Mefres</Mefres> zawarli podobną umowę? — badał <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes>.</p>
 <p><Samentu talking="true"/>— Są to, moim zdaniem, ludzie słabej głowy, których nastraszył <Phut-Beroes>Beroes</Phut-Beroes>, wielki kapłan chaldejski. Powiedział im, że nad Egiptem przez dziesięć lat będą srożyły się złe losy i że gdybyśmy w ciągu tego czasu rozpoczęli wojnę z Asyrią, zostalibyśmy pobici.</p>
 <p>— I oni uwierzyli temu?</p>
@@ -9542,7 +9529,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>— Trafiłbyś do niego?</p>
 <p><Samentu talking="true"/>— Mam już wiele wskazówek, resztę — znajdę, bo wiem, gdzie szukać.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Cóż dalej? — pytał <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes>.</p>
-<p><Samentu talking="true"/>— Należałoby wytoczyć <Herhorowi>Herhorowi</Herhorowi> i <Mefresowi>Mefresowi</Mefresowi> proces o zdradę państwa za tajemne stosunki z Asyrią…</p>
+<p><Samentu talking="true"/>— Należałoby wytoczyć <Herhor>Herhorowi</Herhor> i <Mefres>Mefresowi</Mefres> proces o zdradę państwa za tajemne stosunki z Asyrią…</p>
 <p>— A dowody?…</p>
 <p><Samentu talking="true"/>— Znajdziemy je przy pomocy Fenicjan — odparł kapłan.</p>
 <p>— Czy nie wynikłyby stąd jakie niebezpieczeństwa dla Egiptu?</p>
@@ -9559,7 +9546,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Samentu talking="true"/>Będę więc służył i radził waszej świątobliwości, ale — potajemnie…</p>
 <p>— I znajdziesz drogę do skarbca w Labiryncie?</p>
 <p><Samentu talking="true"/>— Mam nadzieję, że nim wrócisz, panie, z Tebów, uda mi się ta sprawa.</p>
-<p><Samentu talking="true"/>A gdy przeniesiemy skarb do waszego pałacu, gdy sąd potępi <Herhora>Herhora</Herhora> i <Mefresa>Mefresa</Mefresa>, których wasza świątobliwość może potem ułaskawić, wówczas za waszym pozwoleniem wystąpię jawnie… I przestanę być kapłanem Seta, który tylko ludzi odstrasza ode mnie…</p>
+<p><Samentu talking="true"/>A gdy przeniesiemy skarb do waszego pałacu, gdy sąd potępi <Herhor>Herhora</Herhor> i <Mefres>Mefresa</Mefres>, których wasza świątobliwość może potem ułaskawić, wówczas za waszym pozwoleniem wystąpię jawnie… I przestanę być kapłanem Seta, który tylko ludzi odstrasza ode mnie…</p>
 <p>— I myślisz, że wszystko dobrze pójdzie?…</p>
 <p><Samentu talking="true"/>— Życie stawiam!… — zawołał kapłan. — Lud kocha waszą świątobliwość, więc łatwo go podburzyć przeciw zdradzieckim dostojnikom… Wojsko jest wam posłuszne jak żadnemu z faraonów od czasu <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes> Wielkiego… Więc któż się oprze?… A w dodatku wasza świątobliwość ma za sobą Fenicjan i pieniądze, największą siłę na świecie!…</p>
 <p>Gdy <Samentu>Samentu</Samentu> żegnał <Ksiaze-Ramzes>faraona</Ksiaze-Ramzes>, <Ksiaze-Ramzes>pan</Ksiaze-Ramzes> zezwolił mu ucałować swoje nogi i darował ciężki złoty łańcuch tudzież bransoletę, ozdobioną szafirami.</p>
@@ -10251,7 +10238,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Wielki-skarbnik-panstwowy talking="true"/>
       — Wszystkie świątynie — rzekł — odmówiły skarbowi kredytu i najpokorniej błagają waszą świątobliwość, aby w ciągu dwu lat rozkazał wypłacić pożyczone od nich sumy…</p>
 <p><Ksiaze-Ramzes talking="true"/>
-      — Rozumiem — odparł władca — to robota świętego <Mefresa>Mefresa</Mefresa>!… Ileż jesteśmy im winni?</p>
+      — Rozumiem — odparł władca — to robota świętego <Mefres>Mefresa</Mefres>!… Ileż jesteśmy im winni?</p>
 <p><Wielki-skarbnik-panstwowy talking="true"/>
       — Z pięćdziesiąt tysięcy talentów.</p>
 <p><Ksiaze-Ramzes talking="true"/>
@@ -10264,15 +10251,15 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Wielki-skarbnik-panstwowy talking="true"/>
       — Słyszałem — rzekł — iż jacyś ludzie tłumaczą chłopom, że za panowania waszej świątobliwości mogą nie płacić podatków…</p>
 <p><Ksiaze-Ramzes talking="true"/>
-      — Oho! ho!… — zawołał, śmiejąc się, <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> — owi jacyś ludzie wydają mi się bardzo podobnymi do dostojnego <Herhora>Herhora</Herhora>… Cóż to, chce on mnie zamorzyć głodem?… Czymże pokrywacie wydatki bieżące? — spytał.</p>
+      — Oho! ho!… — zawołał, śmiejąc się, <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> — owi jacyś ludzie wydają mi się bardzo podobnymi do dostojnego <Herhor>Herhora</Herhor>… Cóż to, chce on mnie zamorzyć głodem?… Czymże pokrywacie wydatki bieżące? — spytał.</p>
 <p><Wielki-skarbnik-panstwowy talking="true"/>
-      — Z rozkazu <Hirama>Hirama</Hirama> pożyczają nam Fenicjanie — odpowiedział skarbnik. — Wzięliśmy już osiem tysięcy talentów…</p>
+      — Z rozkazu <Hiram>Hirama</Hiram> pożyczają nam Fenicjanie — odpowiedział skarbnik. — Wzięliśmy już osiem tysięcy talentów…</p>
 <p><Ksiaze-Ramzes talking="true"/>
       — Ale kwity dajecie im?</p>
 <p><Wielki-skarbnik-panstwowy talking="true"/>
       — I kwity, i zastawy… — westchnął skarbnik. — Oni mówią, że to prosta formalność; niemniej osiedlają się na folwarkach waszej świątobliwości i zabierają chłopom, co się da…</p>
-<p>Upojony przyjęciem ze strony ludu i pokorą magnatów, faraon już nawet nie gniewał się na <Herhora>Herhora</Herhora> i <Mefresa>Mefresa</Mefresa>. Czas gniewów minął, nadeszła chwila działania, i <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> tego samego dnia ułożył plan.</p>
-<p>Nazajutrz wezwał ludzi najbardziej zaufanych: arcykapłana <Sema>Sema</Sema>, proroka <Pentuera>Pentuera</Pentuera>, ulubieńca <Tutmozisa>Tutmozisa</Tutmozisa> i Fenicjanina <Hirama>Hirama</Hirama>. A gdy zebrali się, rzekł:</p>
+<p>Upojony przyjęciem ze strony ludu i pokorą magnatów, faraon już nawet nie gniewał się na <Herhor>Herhora</Herhor> i <Mefres>Mefresa</Mefres>. Czas gniewów minął, nadeszła chwila działania, i <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> tego samego dnia ułożył plan.</p>
+<p>Nazajutrz wezwał ludzi najbardziej zaufanych: arcykapłana <Sem>Sema</Sem>, proroka <Pentuer>Pentuera</Pentuer>, ulubieńca <Tutmozis>Tutmozisa</Tutmozis> i Fenicjanina <Hiram>Hirama</Hiram>. A gdy zebrali się, rzekł:</p>
 <p><Ksiaze-Ramzes talking="true"/>
       — Zapewne wiecie, że świątynie zażądały, abym zwrócił im fundusze, które pożyczył od nich mój wiecznie żyjący ojciec. Każdy dług jest świętym, ten zaś, który należy się bogom, rad bym spłacić najpierwej. Ale skarb mój jest pusty, bo nawet podatki nieregularnie wpływają…</p>
 <p>Z tego powodu uważam, że państwo jest w niebezpieczeństwie, i — jestem zmuszony zwrócić się po fundusze do skarbów przechowywanych w Labiryncie…</p>
@@ -10282,7 +10269,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>Faraon w tym miejscu uśmiechnął się i zakończył:</p>
 <p><Ksiaze-Ramzes talking="true"/>
       — Dziś wezwałem was, abyście mi pomogli zwołać to zgromadzenie stanów, i oto, co wam rozkazuję:</p>
-<p>Ty, dostojny <Semie>Semie</Semie>, wybierzesz mi trzynastu kapłanów i trzynastu nomarchów… Ty, pobożny <Pentuerze>Pentuerze</Pentuerze>, sprowadzisz z różnych nomesów trzynastu rolników i trzynastu rzemieślników… <Tutmozis>Tutmozis</Tutmozis> dostarczy trzynastu oficerów i trzynastu szlachty, a książę <Hiram>Hiram</Hiram> zajmie się tym, ażebym miał trzynastu kupców.</p>
+<p>Ty, dostojny <Sem>Semie</Sem>, wybierzesz mi trzynastu kapłanów i trzynastu nomarchów… Ty, pobożny <Pentuer>Pentuerze</Pentuer>, sprowadzisz z różnych nomesów trzynastu rolników i trzynastu rzemieślników… <Tutmozis>Tutmozis</Tutmozis> dostarczy trzynastu oficerów i trzynastu szlachty, a książę <Hiram>Hiram</Hiram> zajmie się tym, ażebym miał trzynastu kupców.</p>
 <p>Życzę sobie, ażeby zgromadzenie to jak najprędzej zebrało się w moim pałacu w Memfis i nie tracąc czasu na próżnym gadaniu uznało, że Labirynt powinien dostarczyć funduszów memu skarbowi…</p>
 <p><Sem talking="true"/>
       — Ośmielę się przypomnieć waszej świątobliwości — wtrącił arcykapłan <Sem>Sem</Sem> — że na tym zgromadzeniu muszą być: dostojny <Herhor>Herhor</Herhor> i dostojny <Mefres>Mefres</Mefres>, i że służy im prawo, a nawet mają obowiązek sprzeciwiać się naruszeniu skarbca w Labiryncie.</p>
@@ -10301,7 +10288,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
       — Jeżeli wasza świątobliwość pozwoli, ja zaraz wyjadę, ażeby zająć się zgromadzeniem rolników i rzemieślników. Wszyscy oni będą głosowali za naszym panem, ale spośród mnóstwa trzeba wybrać najmędrszych.</p>
 <p>Pożegnał faraona i wyszedł.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-      — A ty, <Tutmozisie>Tutmozisie</Tutmozisie>?… — spytał <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>.</p>
+      — A ty, <Tutmozis>Tutmozisie</Tutmozis>?… — spytał <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>.</p>
 <p><Tutmozis talking="true"/>
       — Panie mój — rzekł ulubieniec — jestem tak pewny twojej szlachty i wojska, że zamiast mówić o nich, ośmielę się zanieść do ciebie moją własną prośbę…</p>
 <p><Ksiaze-Ramzes talking="true"/>
@@ -10311,11 +10298,11 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Ksiaze-Ramzes talking="true"/>
       — Ty?… — zawołał faraon. — Któraż kobieta zasłużyła u bogów na podobne szczęście?</p>
 <p><Tutmozis talking="true"/>
-      — Jest to piękna <Hebron>Hebron</Hebron>, córka najdostojniejszego nomarchy tebańskiego — <Antefa>Antefa</Antefa>… — odparł, śmiejąc się, <Tutmozis>Tutmozis</Tutmozis>. — Jeżeli wasza świątobliwość raczysz oświadczyć mnie tej czcigodnej rodzinie… Chciałem powiedzieć, że moja miłość dla was zwiększy się… ale dam spokój, bo skłamałbym…</p>
+      — Jest to piękna <Hebron>Hebron</Hebron>, córka najdostojniejszego nomarchy tebańskiego — <Antef>Antefa</Antef>… — odparł, śmiejąc się, <Tutmozis>Tutmozis</Tutmozis>. — Jeżeli wasza świątobliwość raczysz oświadczyć mnie tej czcigodnej rodzinie… Chciałem powiedzieć, że moja miłość dla was zwiększy się… ale dam spokój, bo skłamałbym…</p>
 <p>Faraon poklepał go po ramieniu.</p>
 <p><Ksiaze-Ramzes talking="true"/>
-      — No… no!… tylko mnie nie zapewniaj o tym, czego jestem pewny — rzekł. — Pojadę jutro do <Antefa>Antefa</Antefa> i przez bogi, zdaje mi się, że w ciągu kilku dni urządzę ci wesele. A teraz możesz iść do swojej <Hebron>Hebron</Hebron>…</p>
-<p>Zostawszy z jednym tylko <Semem>Semem</Semem>, jego świątobliwość zapytał:</p>
+      — No… no!… tylko mnie nie zapewniaj o tym, czego jestem pewny — rzekł. — Pojadę jutro do <Antef>Antefa</Antef> i przez bogi, zdaje mi się, że w ciągu kilku dni urządzę ci wesele. A teraz możesz iść do swojej <Hebron>Hebron</Hebron>…</p>
+<p>Zostawszy z jednym tylko <Sem>Semem</Sem>, jego świątobliwość zapytał:</p>
 <p><Ksiaze-Ramzes talking="true"/>
       — Oblicze twoje jest ponure… Czy wątpisz, aby znalazło się trzynastu kapłanów gotowych spełnić moje rozkazy?…</p>
 <p><Sem talking="true"/>
@@ -10376,7 +10363,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>„Wspinaj się nad ludzi, Asyryjczyku, zadzieraj głowę wyżej niż inni!… Nie zdziałasz nic wielkiego na świecie, ale przynajmniej zostawisz wiele gruzów…'</p>
 <p><Sem talking="true"/>
       Miałżebyś, panie, odwagę — zakończył arcykapłan — wznosić u nas budowle asyryjskie, naśladować naród, którym Egipt brzydzi się i pogardza?…</p>
-<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> zamyślił się. Pomimo wykładu <Sema>Sema</Sema> i teraz sądził, że jednak pałace asyryjskie są piękniejsze od egipskich. Ale tak nienawidził Asyryjczyków, że jego serce poczęło się chwiać.</p>
+<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> zamyślił się. Pomimo wykładu <Sem>Sema</Sem> i teraz sądził, że jednak pałace asyryjskie są piękniejsze od egipskich. Ale tak nienawidził Asyryjczyków, że jego serce poczęło się chwiać.</p>
 <p><Ksiaze-Ramzes talking="true"/>
       — W takim razie — odparł — zaczekam z budową świątyni i mego grobu. Wy zaś, mędrcy, którzy jesteście mi życzliwi, obmyślcie plany takich gmachów, które by imię moje przekazały najdalszym pokoleniom.</p>
 <p>„Nieludzka duma wypełnia duszę tego młodzieńca!…' — rzekł do siebie arcykapłan i smutny pożegnał faraona.</p></Chapter><Chapter id="60"><h4>Rozdział XI</h4>
@@ -10760,7 +10747,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>Wyciągnął do mnie rękę, i ja, nieprzytomna z żalu, dotykałam przez okno jego rąk, jego twarzy oblanej zimnym potem… Wreszcie zsunął się z drzewa i uciekł…</p>
 <p><Tutmozis>Tutmozis</Tutmozis> słuchał przerażony. Nagle uderzył się w czoło.</p>
 <p><Tutmozis talking="true"/>
-— To nie był <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>! — odparł stanowczo. — To był człowiek bardzo podobny do niego, podły Grek, <Lykon>Lykon</Lykon>, który zabił mu syna, a dziś znajduje się w mocy arcykapłanów… To nie <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>!… To występek tych nikczemników, <Herhor>Herhora</Herhor> i <Mefresa>Mefresa</Mefresa>…</p>
+— To nie był <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>! — odparł stanowczo. — To był człowiek bardzo podobny do niego, podły Grek, <Lykon>Lykon</Lykon>, który zabił mu syna, a dziś znajduje się w mocy arcykapłanów… To nie <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>!… To występek tych nikczemników, <Herhor>Herhora</Herhor> i <Mefres>Mefresa</Mefres>…</p>
 <p>Na twarzy królowej błysnęła nadzieja, lecz tylko na chwilę.</p>
 <p><Nikotris talking="true"/>
 — Czyliżbym nie poznała mego syna?…</p>
@@ -11014,7 +11001,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Ksiaze-Ramzes talking="true"/>
     — Świątynie i Labirynt muszą być zajęte przez wojska dwudziestego trzeciego Paofi — ciągnął <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes>, zwracając się do <Wielki-pisarz>wielkiego pisarza</Wielki-pisarz>. — Lud zatem zarówno w Memfis, jak i w Fayum może zbierać się już osiemnastego, z początku małymi garściami, potem coraz liczniej. Gdyby więc około dwudziestego zaczęły się drobne rozruchy, już nie należy im przeszkadzać. Szturmować jednak do świątyń mogą dopiero w dniach dwudziestym drugim i dwudziestym trzecim. A gdy wojsko zajmie te punkta, wszystko musi uspokoić się.</p>
 <p><Tutmozis talking="true"/>
-    — Czy nie lepiej byłoby natychmiast uwięzić <Herhor>Herhora</Herhor> i <Mefresa>Mefresa</Mefresa>? — zapytał <Tutmozis>Tutmozis</Tutmozis>.</p>
+    — Czy nie lepiej byłoby natychmiast uwięzić <Herhor>Herhora</Herhor> i <Mefres>Mefresa</Mefres>? — zapytał <Tutmozis>Tutmozis</Tutmozis>.</p>
 <p><Ksiaze-Ramzes talking="true"/>
     — Po co?… Mnie nie chodzi o nich, tylko o świątynie i Labirynt, do zajęcia których wojsko nie jest jeszcze gotowe. Zresztą <Hiram>Hiram</Hiram>, który przejął listy <Herhor>Herhora</Herhor> do Asyryjczyków, wróci dopiero około dwudziestego… Więc dopiero w dniu dwudziestym pierwszym Paofi będziemy mieli w rękach dowody, że arcykapłani są zdrajcami, i ogłosimy to ludowi.</p>
 <p><Kalipos talking="true"/>
@@ -11822,14 +11809,14 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Tutmozis talking="true"/>— Idziesz? — spytał <Tutmozis>Tutmozis</Tutmozis>.</p>
 <p><Herhor talking="true"/>— Czekam tu na <Ksiaze-Ramzes>Ramzesa</Ksiaze-Ramzes> — odparł <Herhor>Herhor</Herhor>.</p>
 <p><Tutmozis talking="true"/>— A więc zostań tu, oszuście!… — krzyknął <Tutmozis>Tutmozis</Tutmozis>.</p>
-<p>Wydobył miecz i rzucił się na <Herhor>Herhora</Herhor>. W tej chwili stojący za wodzem <Eunana>Eunana</Eunana> podniósł topór i z całej siły uderzył <Tutmozisa>Tutmozisa</Tutmozisa> między szyję i prawy obojczyk, aż krew trysnęła na wszystkie strony. Ulubieniec <Ksiaze-Ramzes>faraona</Ksiaze-Ramzes> padł na ziemię, prawie na pół rozcięty.</p>
+<p>Wydobył miecz i rzucił się na <Herhor>Herhora</Herhor>. W tej chwili stojący za wodzem <Eunana>Eunana</Eunana> podniósł topór i z całej siły uderzył <Tutmozis>Tutmozisa</Tutmozis> między szyję i prawy obojczyk, aż krew trysnęła na wszystkie strony. Ulubieniec <Ksiaze-Ramzes>faraona</Ksiaze-Ramzes> padł na ziemię, prawie na pół rozcięty.</p>
 <p>Kilku żołnierzy z pochylonymi włóczniami podskoczyli do <Eunana>Eunany</Eunana>, lecz po krótkiej walce z towarzyszami polegli. Spomiędzy ochotników trzy czwarte było na żołdzie kapłańskim.</p>
 <p><Eunana talking="true"/>— Niech żyje świątobliwy <Herhor>Herhor</Herhor>, pan nasz! — zawołał <Eunana>Eunana</Eunana> wywijając zakrwawionym toporem.</p>
 <p>— Niech żyje wiecznie! — powtórzyli żołnierze i kapłani i — wszyscy padli twarzą na ziemię. Najdostojniejszy <Herhor>Herhor</Herhor> wzniósł ręce i błogosławił ich.</p>
 <p>Opuściwszy dziedziniec świątyni <Mefres>Mefres</Mefres> zstąpił do podziemiów, gdzie zamieszkiwał <Lykon>Lykon</Lykon>. Arcykapłan zaraz na progu wydobył z zanadrza kryształową kulę, na widok której Grek wpadł w gniew.</p>
 <p><Lykon talking="true"/>— Bodaj was ziemia pochłonęła!… Bodaj trupy wasze nie zaznały spokoju!… — złorzeczył <Lykon>Lykon</Lykon> coraz cichszym głosem.</p>
 <p>W końcu umilkł i zasnął.</p>
-<p><Mefres talking="true"/>— Weź ten sztylet — mówił <Mefres>Mefres</Mefres> podając Grekowi wąziutką stal. — Weź ten sztylet i idź do pałacowego ogrodu… Tam stań w figowym klombie i czekaj na tego, który zabrał ci i uwiódł <Pieszczota-Kama>Kamę</Pieszczota-Kama>…</p>
+<p><Mefres talking="true"/>— Weź ten sztylet — mówił <Mefres>Mefres</Mefres> podając Grekowi wąziutką stal. — Weź ten sztylet i idź do pałacowego ogrodu… Tam stań w figowym klombie i czekaj na tego, który zabrał ci i uwiódł <Pieszczota>Kamę</Pieszczota>…</p>
 <p><Lykon>Lykon</Lykon> począł zgrzytać zębami w bezsilnej złości.</p>
 <p><Mefres talking="true"/>— A gdy go ujrzysz, obudź się… — zakończył <Mefres>Mefres</Mefres>.</p>
 <p>Potem narzucił na Greka oficerski płaszcz z kapturem, do ucha szepnął mu hasło i z podziemiów, przez ukrytą furtkę świątyni, wyprowadził go na pustą ulicę Memfisu.</p>
@@ -11843,14 +11830,14 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— Nie potrzebujemy ci przypominać, święty mężu — mówił jeden z <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorców</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa> wciąż klęcząc — że kilka dni temu byłeś w Labiryncie, do którego wiesz drogę tak dobrze jak my, choć nie jesteś wtajemniczonym… Jesteś zaś zbyt wielkim mędrcem, ażebyś nie miał znać i naszych praw w podobnych wypadkach…</p>
 <p><Mefres talking="true"/>— Co to znaczy?… — zawołał podniesionym głosem <Mefres>Mefres</Mefres>. — Jesteście zbójcy, nasłani przez Her…</p>
 <p>Nie dokończył. Jeden z napastników schwytał go za ręce, drugi zarzucił mu chustkę na głowę, a trzeci skropił mu twarz przezroczystym płynem. <Mefres>Mefres</Mefres> rzucił się kilka razy i upadł. Jeszcze raz pokropiono go, a gdy skonał, <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorcy</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa> położyli go we framudze, w martwą rękę wsunęli jakiś papirus i — znikli w korytarzach pylonu.</p>
-<p>Trzej tak samo ubrani ludzie uganiali się za <Lykonem>Lykonem</Lykonem> prawie od chwili, gdy wypuszczony ze świątyni przez <Mefresa>Mefresa</Mefresa>, znalazł się na pustej ulicy.</p>
+<p>Trzej tak samo ubrani ludzie uganiali się za <Lykon>Lykonem</Lykon> prawie od chwili, gdy wypuszczony ze świątyni przez <Mefres>Mefresa</Mefres>, znalazł się na pustej ulicy.</p>
 <p>Ludzie ci kryli się niedaleko furtki, przez którą przeszedł Grek, i z początku przepuścili go wolno. Lecz wnet jeden z nich dostrzegł w jego ruchach coś podejrzanego, więc wszyscy poczęli iść za nim.</p>
 <p>Dziwna rzecz! uśpiony <Lykon>Lykon</Lykon>, jakby przeczuwając gonitwę, nagle skręcił w ulicę ruchliwą, potem na plac, gdzie krążyło mnóstwo ludzi, a potem ulicą Rybacką pobiegł do Nilu. Tu, w jakimś zaułku, znalazł małe czółenko, skoczył w nie i z niesłychaną szybkością zaczął przeprawiać się na drugą stronę rzeki.</p>
 <p>Był już o paręset kroków oddalony od brzegu, gdy wysunęła się za nim łódź z jednym przewoźnikiem i trzema podróżnymi. Ledwie zaś ci odbili, ukazała się druga łódź, mająca dwu przewoźników i znowu trzech podróżnych.</p>
-<p>Obie łodzie zawzięcie ścigały <Lykona>Lykona</Lykona>.</p>
+<p>Obie łodzie zawzięcie ścigały <Lykon>Lykona</Lykon>.</p>
 <p>W tej, która miała tylko jednego wioślarza, siedzieli <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorcy Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa> i pilnie przypatrywali się swoim współzawodnikom, o ile pozwalał na to zmierzch prędko zapadający po zachodzie słońca.</p>
 <p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— Co to za jedni tamci trzej?… — szeptali między sobą <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorcy z Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>. — Od onegdaj krążyli dokoła świątyni, a dziś gonią za nim… Czyby go chcieli zasłonić przed nami?…</p>
-<p>Drobna łódka <Lykona>Lykona</Lykona> przybiła do drugiego brzegu. Uśpiony Grek wyskoczył z niej i szybkim krokiem począł iść ku pałacowym ogrodom. Niekiedy zataczał się, stawał i chwytał się za głowę; lecz po chwili znowu szedł jakby ciągniony przez niepojętą siłę.</p>
+<p>Drobna łódka <Lykon>Lykona</Lykon> przybiła do drugiego brzegu. Uśpiony Grek wyskoczył z niej i szybkim krokiem począł iść ku pałacowym ogrodom. Niekiedy zataczał się, stawał i chwytał się za głowę; lecz po chwili znowu szedł jakby ciągniony przez niepojętą siłę.</p>
 <p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>Dozorcy Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa> również wylądowali na drugim brzegu, ale już zostali uprzedzeni przez swoich współzawodników.</p>
 <p>I zaczął się jedyny w swoim rodzaju wyścig. <Lykon>Lykon</Lykon> pędził ku pałacowi królewskiemu jak szybkobiegacz, za nim trzej ludzie nieznani, a na końcu trzej <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorcy Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>.</p>
 <p>O kilkaset kroków od ogrodu obie goniące grupy zetknęły się ze sobą. Była już noc, ale jasna.</p>
@@ -11875,7 +11862,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>Postanowili tedy czekać i działać wspólnie.</p>
 <p>— Trzecią noc marnujemy! — rzekł jeden z policjantów ziewając.</p>
 <p>Owinęli się w burnusy i legli na trawie.</p>
-<p>Natychmiast po wyjeździe <Tutmozisa>Tutmozisa</Tutmozisa> czcigodna pani <Nikotris>Nikotris</Nikotris> milcząc, z zaciśniętymi z gniewu ustami opuściła komnaty syna. A gdy <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> chciał ją uspokoić, ostro przerwała mu:</p>
+<p>Natychmiast po wyjeździe <Tutmozis>Tutmozisa</Tutmozis> czcigodna pani <Nikotris>Nikotris</Nikotris> milcząc, z zaciśniętymi z gniewu ustami opuściła komnaty syna. A gdy <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> chciał ją uspokoić, ostro przerwała mu:</p>
 <p><Nikotris talking="true"/>— Żegnam <Ksiaze-Ramzes>faraona</Ksiaze-Ramzes> i proszę bogów, ażeby pozwoliły mi jutro powitać cię jeszcze jako <Ksiaze-Ramzes>faraona</Ksiaze-Ramzes>…</p>
 <p><Ksiaze-Ramzes talking="true"/>— Wątpisz o tym, matko?</p>
 <p><Nikotris talking="true"/>— O wszystkim można zwątpić wobec człowieka, który słucha rad szaleńców i zdrajców!…</p>
@@ -11890,18 +11877,18 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>O zachodzie słońca wszedł do komnaty pokojowiec <Ksiaze-Ramzes>faraona</Ksiaze-Ramzes> i szepnął, że pani <Hebron>Hebron</Hebron> ciężko zachorowała i błaga, ażeby <Ksiaze-Ramzes>jego świątobliwość</Ksiaze-Ramzes> raczył ją odwiedzić.</p>
 <p>Dostojnicy znając stosunek, jaki łączył <Ksiaze-Ramzes>pana</Ksiaze-Ramzes> z piękną <Hebron>Hebron</Hebron>, spojrzeli po sobie. Ale gdy <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes> oświadczył zamiar wyjścia na ogród, nie protestowali. Ogród, dzięki gęstym strażom, był równie bezpieczny jak pałac. Nikt też nie uważał za stosowne choćby z daleka czuwać nad <Ksiaze-Ramzes>faraonem</Ksiaze-Ramzes> wiedząc, że <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> nie lubi, ażeby zajmowano się nim w pewnych chwilach.</p>
 <p>Gdy <Ksiaze-Ramzes>pan</Ksiaze-Ramzes> zniknął w korytarzu, <Wielki-pisarz>wielki pisarz</Wielki-pisarz> rzekł do <Wielki-skarbnik-panstwowy>skarbnika</Wielki-skarbnik-panstwowy>:</p>
-<p><Wielki-pisarz talking="true"/>— Czas wlecze się jak wozy w pustyni. Może <Hebron>Hebron</Hebron> ma wiadomość od <Tutmozisa>Tutmozisa</Tutmozisa>?…</p>
+<p><Wielki-pisarz talking="true"/>— Czas wlecze się jak wozy w pustyni. Może <Hebron>Hebron</Hebron> ma wiadomość od <Tutmozis>Tutmozisa</Tutmozis>?…</p>
 <p><Wielki-skarbnik-panstwowy talking="true"/>— W tej chwili — odparł <Wielki-skarbnik-panstwowy>skarbnik</Wielki-skarbnik-panstwowy> — jego wyprawa w kilkudziesięciu ludzi na świątynię Ptah wydaje mi się niepojętym szaleństwem…</p>
 <p><Hiram talking="true"/>— A czy rozsądniej zrobił <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes> nad Sodowymi Jeziorami, kiedy całą noc uganiał się za <Tehenna>Tehenną</Tehenna>?… — wtrącił <Hiram>Hiram</Hiram>. — Odwaga więcej znaczy aniżeli liczba.</p>
 <p><Wielki-skarbnik-panstwowy talking="true"/>— A ten <Mlody-kaplan-poslannik-Samentu>młody kapłan</Mlody-kaplan-poslannik-Samentu>?… — zapytał <Wielki-skarbnik-panstwowy>skarbnik</Wielki-skarbnik-panstwowy>.</p>
 <p><Hiram talking="true"/>— Przyszedł bez naszej wiedzy i odszedł nie pytając — rzekł <Hiram>Hiram</Hiram>. — Każdy z nas postępuje jak spiskowiec.</p>
 <p><Wielki-skarbnik-panstwowy>Skarbnik</Wielki-skarbnik-panstwowy> pokręcił głową.</p>
-<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> szybko przebiegł odległość dzielącą jego willę od pałacyku <Tutmozisa>Tutmozisa</Tutmozisa>. Gdy wszedł do pokoju, <Hebron>Hebron</Hebron> z płaczem rzuciła mu się na szyję.</p>
+<p><Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> szybko przebiegł odległość dzielącą jego willę od pałacyku <Tutmozis>Tutmozisa</Tutmozis>. Gdy wszedł do pokoju, <Hebron>Hebron</Hebron> z płaczem rzuciła mu się na szyję.</p>
 <p><Hebron talking="true"/>— Umieram z trwogi!… — zawołała.</p>
-<p><Ksiaze-Ramzes talking="true"/>— Lękasz się o <Tutmozisa>Tutmozisa</Tutmozisa>?</p>
+<p><Ksiaze-Ramzes talking="true"/>— Lękasz się o <Tutmozis>Tutmozisa</Tutmozis>?</p>
 <p><Hebron talking="true"/>— A cóż on mnie obchodzi? — odparła <Hebron>Hebron</Hebron> robiąc pogardliwy grymas ustami. — Ty jeden obchodzisz mnie… o tobie jednym myślę… o ciebie się lękam…</p>
 <p><Ksiaze-Ramzes talking="true"/>— Błogosławioną niech będzie twoja trwoga, która choć na chwilę uwolniła mnie od nudów… — rzekł śmiejąc się <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes>. — Bogowie! jakiż to ciężki dzień… Gdybyś słyszała nasze narady, gdybyś widziała miny moich doradców!… I jeszcze, na domiar wszystkiego, podobało się czcigodnej królowej uczcić nasze zebranie swoją obecnością… Nigdy nie przypuszczałem, że dostojeństwo <Ksiaze-Ramzes>faraona</Ksiaze-Ramzes> może mi tak dokuczyć…</p>
-<p><Hebron talking="true"/>— Nie wymawiaj tego zbyt głośno — ostrzegła <Hebron>Hebron</Hebron>. — Co poczniesz, jeżeli <Tutmozisowi>Tutmozisowi</Tutmozisowi> nie uda się opanować świątyni?</p>
+<p><Hebron talking="true"/>— Nie wymawiaj tego zbyt głośno — ostrzegła <Hebron>Hebron</Hebron>. — Co poczniesz, jeżeli <Tutmozis>Tutmozisowi</Tutmozis> nie uda się opanować świątyni?</p>
 <p><Ksiaze-Ramzes talking="true"/>— Odbiorę mu naczelne dowództwo i schowam do skrzyni moją koronę, a włożę hełm oficerski — odpowiedział <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>. — Jestem pewny, że gdy sam wystąpię na czele wojska, bunt upadnie…</p>
 <p><Hebron talking="true"/>— Który?… — spytała <Hebron>Hebron</Hebron>.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Ach, prawda, że mamy aż dwa bunty! — zaśmiał się <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>. — Pospólstwo przeciw kapłanom, kapłani przeciw mnie…</p>
@@ -11929,7 +11916,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>Tuż pod pałacykiem zabiegł mu drogę jeden z oficerów wołając:</p>
 <p>— <Tutmozis>Tutmozis</Tutmozis> nie żyje… Zabił go zdrajca <Eunana>Eunana</Eunana>!…</p>
 <p><Ksiaze-Ramzes talking="true"/>— <Eunana>Eunana</Eunana>?… — powtórzył <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes>. — A cóż inni?…</p>
-<p>— Prawie wszyscy ochotnicy, którzy pojechali z <Tutmozisem>Tutmozisem</Tutmozisem>, byli zaprzedani kapłanom.</p>
+<p>— Prawie wszyscy ochotnicy, którzy pojechali z <Tutmozis>Tutmozisem</Tutmozis>, byli zaprzedani kapłanom.</p>
 <p><Ksiaze-Ramzes talking="true"/>— No, muszę już z tym skończyć! — rzekł <Ksiaze-Ramzes>pan</Ksiaze-Ramzes>. — Zatrąbcie na azjatyckie pułki…</p>
 <p>Odezwała się trąbka i Azjaci zaczęli wysypywać się z koszar, ciągnąc za sobą konie.</p>
 <p><Ksiaze-Ramzes talking="true"/>— Podajcie i mnie konia — rzekł <Ksiaze-Ramzes>faraon</Ksiaze-Ramzes>. Ale uczuł silny zawrót głowy i dodał:</p>
