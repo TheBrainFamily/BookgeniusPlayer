@@ -148,7 +148,16 @@ function processParagraph(
 
       case "strong":
         return `<strong>${escapeJSXText(element.textContent?.trim() || "")}</strong>`;
-
+      case "musicShift":
+        return `<span className="absolute top-0 right-5 group" data-editor-mode="true">
+                      <span className="cursor-pointer" data-editor-tag="musicShift">♪</span>
+                      <span className="hidden group-hover:block absolute right-0 top-6 bg-gray-800 text-white p-2 rounded text-sm whitespace-nowrap">${element.getAttribute("style") || "Music shift"}</span>
+                    </span>`;
+      case "backgroundShift":
+        return `<span className="absolute top-0 right-5 group" data-editor-mode="true">
+                      <span className="cursor-pointer" data-editor-tag="backgroundShift">🖼️</span>
+                      <span className="hidden group-hover:block absolute right-0 top-6 bg-gray-800 text-white p-2 rounded text-sm whitespace-nowrap">${element.getAttribute("style") || "Background shift"}</span>
+                    </span>`;
       default:
         if (element.tagName[0] === element.tagName[0].toUpperCase()) {
           // @ts-expect-error(wrong package types)
@@ -172,7 +181,7 @@ function processParagraph(
       `${filePath}:${location.line + 1} \n Warning: Tag name "${tagName}" starts with uppercase letter, that should never be the case, most probably the "talking character" is talking outside of an html element. Chapter ${chapterId}, paragraph ${dataIndex}. `,
     );
   }
-  let jsxContent = `${indent}<${tagName} data-index="${dataIndex}">`;
+  let jsxContent = `${indent}<${tagName} data-index="${dataIndex}" className="relative">`;
   const contentParts: string[] = [];
 
   for (let k = 0; k < paragraphElement.childNodes.length; k++) {
