@@ -4,14 +4,14 @@ import CharacterMedia from "@/components/CharacterMedia";
 import { CharacterData } from "@/booksData/types";
 import { performLocalDOMSearch, SearchResultItemData } from "@/searchModal";
 import { useLocation } from "@/state/LocationContext";
+import { getBookData } from "@/booksData/getBookData";
 
 interface CharacterModalProps {
   onClose: () => void;
   isVideo: boolean;
   mediaSrc: string;
-  matchingCharacter: CharacterData;
+  characterSlug: string;
   endChapter: number;
-  bookSlug: string;
 }
 
 export const findLatestSummaryInRange = (character: CharacterData, endChapter: number) => {
@@ -19,8 +19,15 @@ export const findLatestSummaryInRange = (character: CharacterData, endChapter: n
   return latestSummary;
 };
 
-const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, matchingCharacter, endChapter, bookSlug }) => {
+const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, characterSlug, endChapter }) => {
   const { location } = useLocation();
+  const bookData = getBookData();
+  const matchingCharacter = bookData.charactersData.find((character) => character.slug === characterSlug);
+
+  // If character not found, don't render anything
+  if (!matchingCharacter) {
+    return null;
+  }
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,7 +36,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     const searchAppearances = async () => {
       setIsLoading(true);
       try {
-        const searchResults = await performLocalDOMSearch(matchingCharacter.characterName, location, bookSlug);
+        const searchResults = await performLocalDOMSearch(matchingCharacter.characterName, location, bookData.slug);
         // Return first 3 appearances
         setCharacterAppearances(searchResults.items.slice(0, 3));
       } catch (error) {
@@ -41,7 +48,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     };
 
     searchAppearances();
-  }, [matchingCharacter.characterName, location, bookSlug]);
+  }, [matchingCharacter.characterName, location, bookData.slug]);
 
   return (
     <ModalUI onClose={onClose} className="bg-transparent pointer-events-none">

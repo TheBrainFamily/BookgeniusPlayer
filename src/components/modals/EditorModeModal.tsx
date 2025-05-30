@@ -1,30 +1,31 @@
 import React, { useState } from "react";
 import ModalUI from "@/components/modals/ModalUI";
-import { BookData } from "@/booksData/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { useModal } from "@/context/ModalProvider";
+import { useEditorModeModal } from "@/stores/modals/editorModeModal.store";
+import { getBookData } from "@/booksData/getBookData";
 
 interface EditorModeModalProps {
   onClose: () => void;
-  bookData: BookData;
 }
 
-const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose, bookData }) => {
-  const { currentModal } = useModal();
+const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
+  const bookData = getBookData();
+  const { modalType, onSubmit } = useEditorModeModal();
   const [selectedCharacter, setSelectedCharacter] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (currentModal?.type === "editorMode") {
-      await currentModal.onSubmit(selectedCharacter);
+    if (onSubmit) {
+      await onSubmit(selectedCharacter);
+      onClose();
     }
   };
 
   const renderContent = () => {
-    if (currentModal?.type !== "editorMode") return null;
+    if (!modalType) return null;
 
-    switch (currentModal.modalType) {
+    switch (modalType) {
       case "edit-paragraph":
         return (
           <div className="space-y-4">

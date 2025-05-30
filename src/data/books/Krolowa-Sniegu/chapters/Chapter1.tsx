@@ -17,6 +17,16 @@ export const Chapter1: React.FC = () => {
       </p>
       <p data-index="2" className="relative">
         {" "}
+        <span className="absolute top-0 right-5 group" data-editor-mode="true">
+          <span className="cursor-pointer" data-editor-tag="backgroundShift">
+            🖼️
+          </span>
+          <span className="hidden group-hover:block absolute right-0 top-6 bg-gray-800 text-white p-2 rounded text-sm whitespace-nowrap">
+            Digital painting of a dark, ominous mirror with a twisted, warped frame. The mirror's surface distorts and corrupts everything it reflects, making beautiful objects
+            appear grotesque and deformed. The reflections are blurred, stretched, and discolored, creating an unsettling atmosphere. The mirror itself has an eerie, supernatural
+            glow, while the surrounding area is dimly lit to emphasize the contrast between reality and the mirror's distorted reflections.
+          </span>
+        </span>
         Wymyślił wreszcie i zrobił takie sztuczne zwierciadło
         <a href="#fn1" className="link-note"></a>, iż wszystkie rzeczy piękne i dobre wyglądały w nim szkaradnie, a nawet śmiesznie, ponieważ były wykrzywione, zamazane, niewyraźne
         — za to złe rzeczy widać w nim było doskonale.

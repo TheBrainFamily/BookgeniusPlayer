@@ -5,13 +5,13 @@ import { useLocation } from "./state/LocationContext"; // Adjust path
 import { usePageObserver } from "@/hooks/usePageObserver";
 import ChapterLoaderDirect from "@/components/ChapterLoaderDirect";
 import { CURRENT_BOOK } from "./consts";
-import { useModal } from "./context/ModalProvider";
+import { useCharacterModal } from "./stores/modals/characterModal.store";
 import { getBookData } from "./booksData/getBookData";
 
 const BookChapterRendererComponent = () => {
   const [containerElement, setContainerElement] = useState<HTMLElement | null>(null);
   const { location, lastSystemLocation } = useLocation();
-  const { openCharacterDetailsModal } = useModal();
+  const { openModal: openCharacterDetailsModal } = useCharacterModal();
   const bookData = getBookData();
   const { observeNewParagraphs, cleanupRemovedParagraphs } = usePageObserver({ enabled: !!containerElement, openCharacterDetailsModal });
 

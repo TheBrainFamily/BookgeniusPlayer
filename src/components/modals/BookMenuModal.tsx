@@ -4,7 +4,6 @@ import { List, Type, RotateCcw, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { BookData } from "@/booksData/types";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import useLocalStorageState from "use-local-storage-state";
 import { cn } from "@/lib/utils";
@@ -12,7 +11,6 @@ import ModalUI from "./ModalUI";
 
 interface BookMenuModalProps {
   onClose: () => void;
-  bookData: BookData;
   openBookChapterModal: () => void;
   preloadBackgroundTracks: () => void;
   resetFurthestPageLocation: () => void;

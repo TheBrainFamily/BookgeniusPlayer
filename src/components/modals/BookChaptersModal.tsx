@@ -1,17 +1,17 @@
 import React, { useMemo } from "react";
 import ModalUI from "@/components/modals/ModalUI";
-import { BookData } from "@/booksData/types";
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
 import { getTitle } from "@/utils/getChapterTitle";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
+import { getBookData } from "@/booksData/getBookData";
 
 interface BookChaptersModalProps {
   onClose: () => void;
-  bookData: BookData;
 }
 
-const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose, bookData }) => {
+const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
+  const bookData = getBookData();
   const chapters = useMemo(() => {
     if (!bookData || typeof bookData.chapters !== "number") {
       return [];
