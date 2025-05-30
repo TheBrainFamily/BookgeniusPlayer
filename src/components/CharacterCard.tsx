@@ -4,7 +4,7 @@ import CharacterMedia from "./CharacterMedia";
 import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
 import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { CURRENT_BOOK } from "@/consts";
-import { useModal } from "@/context/ModalContext";
+import { useModal } from "@/context/ModalProvider";
 import { useHighlight } from "@/context/HighlightContext";
 import { cn } from "@/lib/utils";
 

@@ -2,7 +2,7 @@ import React from "react";
 import { Book } from "lucide-react";
 import { motion, Variants } from "motion/react";
 
-import { useModal } from "@/context/ModalContext";
+import { useModal } from "@/context/ModalProvider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const MenuButton = () => {
