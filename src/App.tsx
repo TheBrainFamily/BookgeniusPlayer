@@ -24,12 +24,10 @@ import { EditorMode } from "@/components/EditorMode";
 import useLocalStorageState from "use-local-storage-state";
 import { BookChapterRenderer } from "./BookChapterRenderer";
 import { useAppReady } from "./hooks/useAppReady";
+import useSplashHidden from "./hooks/useSplashHidden";
+import { initAudioContext } from "./audio-crossfader";
 
 function Shell({ bookData }: { bookData: BookData }) {
-  // Remove useBookContent hook - no longer needed!
-
-  /* scroll‑related hooks - update to work with React components */
-
   /* dynamic visual hooks */
   useCutScene();
   useBackgroundVideo();
@@ -57,8 +55,11 @@ function Shell({ bookData }: { bookData: BookData }) {
 }
 
 export default function App() {
-  const [currentBookData, setCurrentBookData] = useState<BookData | null>(null);
+  const splashHidden = useSplashHidden();
+
   const [fontSize] = useLocalStorageState("fontSize", { defaultValue: 1 });
+
+  const [currentBookData, setCurrentBookData] = useState<BookData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -84,6 +85,15 @@ export default function App() {
   useEffect(() => {
     runLegacyInit();
   }, []);
+
+  useEffect(() => {
+    if (!splashHidden) return;
+
+    const audioReady = initAudioContext();
+    if (!audioReady) {
+      console.warn("AudioContext could not be started automatically. User interaction (e.g., clicking 'Enable Audio') might be required.");
+    }
+  }, [splashHidden]);
 
   useEffect(() => {
     const newFontSize = 16 * fontSize;

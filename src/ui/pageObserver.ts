@@ -1,4 +1,3 @@
-import { initAudioContext } from "@/audio-crossfader";
 import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
 
 const SHOULD_SHOW_EVERYONE = false;
@@ -333,11 +332,6 @@ export function setupPageObserver(
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
     const scrollMarginTopPx = getScrollMarginTopPx();
-
-    const audioReady = initAudioContext();
-    if (!audioReady) {
-      console.warn("AudioContext could not be started automatically. User interaction (e.g., clicking 'Enable Audio') might be required.");
-    }
 
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
