@@ -14,7 +14,7 @@ interface ChapterLoaderDirectProps {
 }
 
 const DefaultLoadingFallback: React.FC<{ chapterId: number; bookSlug?: string }> = ({ chapterId, bookSlug }) => (
-  <section data-chapter={chapterId} data-book-slug={bookSlug} className="chapter-loading-placeholder">
+  <section data-chapter={chapterId} data-book-slug={bookSlug} className="chapter-loading-placeholder px-3">
     <div>Loading Chapter {chapterId}...</div>
     {/* You can reuse your ChapterSkeleton structure here if desired */}
     <div style={{ height: "50px", background: "#eee", margin: "10px 0" }} />

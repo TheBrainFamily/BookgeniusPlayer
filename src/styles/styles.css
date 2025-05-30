@@ -200,6 +200,7 @@
 
       & > section {
         padding: 10vh 0 50vh;
+        width: 100%;
       }
 
       /* Chapter sections */
