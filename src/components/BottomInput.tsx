@@ -8,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { CURRENT_BOOK } from "@/consts";
 import { useLocation } from "@/state/LocationContext";
 import { deepResearchCall } from "@/deepResearchCall";
-import { useModal } from "@/context/ModalContext";
+import { useModal } from "@/context/ModalProvider";
 
 interface SubmitMessageData {
   query: string;

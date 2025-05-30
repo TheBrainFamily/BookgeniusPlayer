@@ -2,7 +2,6 @@ import React from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, Variants } from "motion/react";
 
-import { BookData } from "@/booksData/types";
 import { useCharacterNotes } from "@/hooks/useCharacterNotes";
 import useSplashHidden from "@/hooks/useSplashHidden";
 import { useLocationRange } from "@/hooks/useLocationRange";
@@ -10,14 +9,10 @@ import CharacterCard from "./CharacterCard";
 
 const target = document.getElementById("left-notes");
 
-interface CharacterNotesPanelProps {
-  bookData: BookData;
-}
-
-const CharacterNotesPanel = ({ bookData }: CharacterNotesPanelProps) => {
+const CharacterNotesPanel = () => {
   const { locationRange } = useLocationRange();
   const isSplashHidden = useSplashHidden();
-  const characterNotes = useCharacterNotes(locationRange, bookData.charactersData, true, true);
+  const characterNotes = useCharacterNotes(locationRange, true, true);
 
   if (!target || !isSplashHidden) return null;
 

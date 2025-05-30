@@ -1,6 +1,6 @@
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import { Element, XMLDocument } from "@xmldom/xmldom/lib/dom"; // Import types if needed for strict typing
-import fs, { closeSync, openSync, writeSync } from "fs";
+import fs, { closeSync, ftruncateSync, openSync, writeSync } from "fs";
 import path from "path";
 import prettier from "prettier";
 
@@ -253,8 +253,8 @@ const doIt = () => {
     .format(`export const ${variableName}CharactersData = ${JSON.stringify(metadata, null, 2)}`, { parser: "typescript", printWidth: 180, objectWrap: "collapse" })
     .then((formattedCode) => {
       const fd = openSync(metadataFilePath, "r+"); // open for read/write, no truncate
-      console.log(metadataFilePath);
-      writeSync(fd, formattedCode, 0, "utf8"); // overwrite in place
+      writeSync(fd, formattedCode, 0, "utf8");
+      ftruncateSync(fd, Buffer.byteLength(formattedCode, "utf8"));
       closeSync(fd);
     });
 };
