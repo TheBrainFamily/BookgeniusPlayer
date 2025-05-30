@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import ModalUI from "@/components/modals/ModalUI";
-import { BookData } from "@/booksData/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { useEditorModeModal } from "@/stores/modals/editorModeModal.store";
+import { getBookData } from "@/booksData/getBookData";
 
 interface EditorModeModalProps {
   onClose: () => void;
-  bookData: BookData;
 }
 
-const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose, bookData }) => {
+const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
+  const bookData = getBookData();
   const { modalType, onSubmit } = useEditorModeModal();
   const [selectedCharacter, setSelectedCharacter] = useState("");
   const [error, setError] = useState("");

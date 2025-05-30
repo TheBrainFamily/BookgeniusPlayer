@@ -1,21 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { createPortal } from "react-dom";
 import { useDeepResearchModal } from "@/stores/modals/deepResearchModal.store";
 import DeepResearchModal from "@/components/modals/DeepResearchModal";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
 
 export const DeepResearchModalRenderer: React.FC = () => {
   const { isOpen, content, layoutView, hideOverlay, isLoading, closeModal } = useDeepResearchModal();
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeModal();
-    };
-
-    document.addEventListener("keydown", handleEsc);
-    return () => document.removeEventListener("keydown", handleEsc);
-  }, [isOpen, closeModal]);
+  useEscapeKey(isOpen, closeModal);
 
   if (!isOpen) return null;
 

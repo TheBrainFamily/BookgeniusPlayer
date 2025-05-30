@@ -3,13 +3,12 @@ import debounce from "lodash.debounce";
 import { useSearchModal } from "@/stores/modals/searchModal.store";
 import { performLocalDOMSearch } from "@/searchModal";
 import { useLocationRange } from "@/hooks/useLocationRange";
-import { getBookData } from "@/booksData/getBookData";
 import { Location } from "@/state/LocationContext";
+import { CURRENT_BOOK } from "@/consts";
 
 export const useSearchLogic = () => {
   const { query, isOpen, setResults } = useSearchModal();
   const { debouncedLocation } = useLocationRange();
-  const bookData = getBookData();
 
   const debouncedPerformSearch = useMemo(() => {
     let latestSearchId = 0;
@@ -38,9 +37,9 @@ export const useSearchLogic = () => {
 
   useEffect(() => {
     if (isOpen && query.trim()) {
-      debouncedPerformSearch(query, debouncedLocation, bookData.slug);
+      debouncedPerformSearch(query, debouncedLocation, CURRENT_BOOK);
     } else if (isOpen && !query.trim()) {
       setResults({ header: "Please enter a search term.", items: [], isLoading: false });
     }
-  }, [query, isOpen, debouncedPerformSearch, debouncedLocation, bookData.slug, setResults]);
+  }, [query, isOpen, debouncedPerformSearch, debouncedLocation, CURRENT_BOOK, setResults]);
 };
