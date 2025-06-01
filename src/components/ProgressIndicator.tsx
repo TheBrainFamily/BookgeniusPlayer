@@ -96,6 +96,7 @@ const ProgressIndicator: React.FC<BookProgressIndicatorProps> = ({ bookData }) =
     return markers;
   };
 
+  return <></>;
   return (
     <motion.div
       className="bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl p-5 py-3 flex flex-col gap-1 md:gap-2 lg:gap-3"
