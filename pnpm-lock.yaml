@@ -8,6 +8,15 @@ importers:
 
   .:
     dependencies:
+      '@capacitor/core':
+        specifier: ^7.2.0
+        version: 7.2.0
+      '@capacitor/filesystem':
+        specifier: ^7.1.1
+        version: 7.1.1(@capacitor/core@7.2.0)
+      '@capawesome/capacitor-asset-manager':
+        specifier: ^7.0.0
+        version: 7.0.0(@capacitor/core@7.2.0)
       '@journeyapps/domparser':
         specifier: ^0.4.1
         version: 0.4.1
@@ -138,6 +147,9 @@ importers:
       '@types/lodash':
         specifier: ^4.17.16
         version: 4.17.16
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@types/lodash.debounce':
         specifier: ^4.0.9
         version: 4.0.9
@@ -865,6 +877,22 @@ packages:
 
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
+
+  '@capacitor/core@7.2.0':
+    resolution: {integrity: sha512-2zCnA6RJeZ9ec4470o8QMZEQTWpekw9FNoqm5TLc10jeCrhvHVI8MPgxdZVc3mOdFlyieYu4AS1fNxSqbS57Pw==}
+
+  '@capacitor/filesystem@7.1.1':
+    resolution: {integrity: sha512-xAQvurZlfKOO7I8d98GFRymS/Dd25sw0L1weF4dKR59nXloWEeagoFv+xtaNlDfolJHo4/uKVvxsLzM0xSmiUQ==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
+
+  '@capacitor/synapse@1.0.2':
+    resolution: {integrity: sha512-ynq39s4D2rhk+aVLWKfKfMCz9SHPKijL9tq8aFL5dG7ik7/+PvBHmg9cPHbqdvFEUSMmaGzL6cIjzkOruW7vGA==}
+
+  '@capawesome/capacitor-asset-manager@7.0.0':
+    resolution: {integrity: sha512-BhogsCX91FAEyXQtmjA28rmt4vnAMBLapoyI4hLL5yUt+DjwiK2zM/ftGBi6uCQeXSEr/XLyFROxJU2ScUUc2g==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -2273,6 +2301,9 @@ packages:
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
+
+  '@types/lodash-es@4.17.12':
+    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
 
   '@types/lodash.debounce@4.0.9':
     resolution: {integrity: sha512-Ma5JcgTREwpLRwMM+XwBR7DaWe96nC38uCBDFKZWbNKD+osjVzdpnUSwBcqCptrp16sSOLBAUb50Car5I0TCsQ==}
@@ -6428,6 +6459,21 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
+  '@capacitor/core@7.2.0':
+    dependencies:
+      tslib: 2.8.1
+
+  '@capacitor/filesystem@7.1.1(@capacitor/core@7.2.0)':
+    dependencies:
+      '@capacitor/core': 7.2.0
+      '@capacitor/synapse': 1.0.2
+
+  '@capacitor/synapse@1.0.2': {}
+
+  '@capawesome/capacitor-asset-manager@7.0.0(@capacitor/core@7.2.0)':
+    dependencies:
+      '@capacitor/core': 7.2.0
+
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
@@ -7780,6 +7826,10 @@ snapshots:
       parse5: 7.3.0
 
   '@types/json-schema@7.0.15': {}
+
+  '@types/lodash-es@4.17.12':
+    dependencies:
+      '@types/lodash': 4.17.16
 
   '@types/lodash.debounce@4.0.9':
     dependencies:

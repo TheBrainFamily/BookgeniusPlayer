@@ -73,11 +73,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setApiKey(storedApiKey);
 
     if (!storedApiKey) {
-      const newApiKey = prompt("OpenAI API Key") || "";
-      if (newApiKey) {
-        localStorage.setItem("tmp::voice_api_key", newApiKey);
-        setApiKey(newApiKey);
-      }
+      console.warn("No OpenAI API Key, things will not work");
     }
   }, []);
 

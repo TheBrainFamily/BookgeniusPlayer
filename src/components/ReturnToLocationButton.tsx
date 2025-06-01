@@ -5,20 +5,23 @@ import { UndoDot } from "lucide-react";
 import { shouldShowReturnButton, systemNavigateTo, getSavedLocation } from "@/helpers/paragraphsNavigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLocation } from "@/state/LocationContext";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const ReturnToLocationButton = () => {
   const [isVisible, setIsVisible] = useState(false);
   const { location } = useLocation();
+  const { currentChapter, currentParagraph } = useDebounce(location, 300);
 
   useEffect(() => {
     setIsVisible(shouldShowReturnButton());
-  }, [location.currentParagraph, location.currentChapter]);
+  }, [currentParagraph, currentChapter]);
 
   const onGoBackClick = () => {
     const savedLocation = getSavedLocation();
     systemNavigateTo({ currentChapter: savedLocation.currentChapter, currentParagraph: savedLocation.currentParagraph });
     setIsVisible(false);
   };
+  console.log("go back button visible", isVisible);
 
   return (
     <AnimatePresence mode="wait" initial={false}>

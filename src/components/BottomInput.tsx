@@ -239,18 +239,41 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                         <motion.button
                           type="button"
                           className={cn("p-2 rounded-full flex items-center justify-center cursor-pointer", isRecording ? "text-red-400" : "text-white/70")}
+                          style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
                           whileHover={!isRecording ? "hover" : undefined}
-                          whileTap={!isRecording ? "tap" : undefined}
+                          whileTap={{ scale: 1.2 }}
                           variants={buttonVariants}
                           animate={isRecording ? "recording" : "idle"}
-                          onClick={() => {
-                            if (isRecording) {
-                              setIsRecording(false);
-                              handleRecordingEnd();
-                            }
-                            setIsRecording(true);
+                          // onClick={() => {
+                          //   if (isRecording) {
+                          //     setIsRecording(false);
+                          //     handleRecordingEnd();
+                          //   }
+                          //   setIsRecording(true);
+                          //   handleRecordingStart();
+                          // }}
+                          onTouchStart={(e) => {
+                            e.preventDefault();
                             handleRecordingStart();
                           }}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handleRecordingEnd();
+                          }}
+                          onTouchCancel={(e) => {
+                            e.preventDefault();
+                            handleRecordingEnd();
+                          }}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            handleRecordingStart();
+                          }}
+                          onMouseUp={(e) => {
+                            e.preventDefault();
+                            handleRecordingEnd();
+                          }}
+                          onMouseLeave={() => isRecording && handleRecordingEnd()}
+                          onContextMenu={(e) => e.preventDefault()}
                           disabled={isThinking}
                         >
                           <Mic size={18} />

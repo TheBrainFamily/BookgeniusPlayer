@@ -144,67 +144,80 @@ export async function initAudioContext(): Promise<boolean> {
   // Return true only if the context is running
   return audioContext?.state === "running";
 }
+function buildUrl(trackId: string): string {
+  return `/${CURRENT_BOOK}/${trackId}.mp3`; // → /1984/background-forest.mp3
+}
+function isFetchOk(res: Response, url: string): boolean {
+  const local = url.startsWith("/");
+  return res.ok || (local && res.status === 0);
+}
 
+/* MAIN ------------------------------------------------------------------ */
 export async function loadTrack(trackId: string, transitionPoints?: number[]): Promise<boolean> {
-  if (!audioContext) {
-    if (!(await initAudioContext())) {
-      console.error("loadTrack: AudioContext could not be initialized/resumed. Cannot load track.");
-      return false;
-    }
+  /* 1 ▸ make sure AudioContext is alive ---------------------------- */
+  if (!audioContext && !(await initAudioContext())) {
+    console.error("loadTrack: AudioContext could not be initialised.");
+    return false;
   }
 
-  const existing = tracks.get(trackId);
-  if (existing?.audioBuffer) {
-    if (transitionPoints && existing.transitionPoints !== transitionPoints) {
-      existing.transitionPoints = transitionPoints;
+  /* 2 ▸ cache hit? ------------------------------------------------- */
+  const cached = tracks.get(trackId);
+  if (cached?.audioBuffer) {
+    if (transitionPoints && cached.transitionPoints !== transitionPoints) {
+      cached.transitionPoints = transitionPoints;
     }
     return true;
   }
 
-  const audioPath = `/${CURRENT_BOOK}/${trackId}.mp3`;
-  console.log(`Loading '${trackId}' from ${audioPath}...`);
+  /* 3 ▸ fetch ------------------------------------------------------ */
+  const url = buildUrl(trackId);
+  console.log(`🎼 Loading background '${trackId}' from ${url}`);
+
+  let arrayBuffer: ArrayBuffer;
   try {
-    const response = await fetch(audioPath);
-    if (!response.ok) throw new Error(`HTTP ${response.status} – ${response.statusText}`);
-
-    // Get audio as ArrayBuffer (read the response only once)
-    const arrayBuffer = await response.arrayBuffer();
-
-    // Create a Blob from the ArrayBuffer for metadata parsing
-    const blob = new Blob([arrayBuffer], { type: "audio/mpeg" });
-
-    // Parse metadata
-    const { common: metadata } = await parseBlob(blob);
-    console.log(`metadata`, metadata);
-
-    // Decode audio from the same ArrayBuffer
-    const audioBuffer = await audioContext!.decodeAudioData(arrayBuffer);
-    let coverArtUrl: string | undefined;
-
-    if (metadata.picture?.[0]) {
-      const picture = metadata.picture[0];
-      const blob = new Blob([new Uint8Array(picture.data)], { type: picture.format });
-      coverArtUrl = URL.createObjectURL(blob);
+    const res = await fetch(url);
+    if (!isFetchOk(res, url)) {
+      throw new Error(`Fetch failed: HTTP ${res.status}`);
     }
-
-    // Continue with audio processing
-    tracks.set(trackId, {
-      audioBuffer,
-      duration: audioBuffer.duration,
-      transitionPoints,
-      sourceNode: null,
-      gainNode: null,
-      coverArtUrl,
-      title: metadata.title || trackId,
-      trackLength: audioBuffer.duration,
-    });
-    console.log(`Decoded '${trackId}'. Duration: ${audioBuffer.duration.toFixed(2)}s.` + (transitionPoints ? ` Transition points: ${transitionPoints.join(", ")}` : ""));
-    return true;
+    arrayBuffer = await res.arrayBuffer();
+    if (!arrayBuffer.byteLength) throw new Error("Empty file");
   } catch (e) {
-    console.error(`Error loading '${trackId}':`, e);
+    console.error(`❌ Fetch error for '${trackId}':`, e);
     tracks.delete(trackId);
     return false;
   }
+
+  /* 4 ▸ parse metadata & decode ----------------------------------- */
+  let audioBuffer: AudioBuffer;
+  let coverArtUrl: string | undefined;
+  let title = trackId;
+
+  try {
+    /* ── 4a metadata (ID3) ───────────────────────────────────────── */
+    const { common } = await parseBlob(new Blob([arrayBuffer], { type: "audio/mpeg" }));
+    console.log("🛈 metadata", common);
+    title = common.title || title;
+
+    if (common.picture?.[0]) {
+      const pic = common.picture[0];
+      const blob = new Blob([new Uint8Array(pic.data)], { type: pic.format });
+      coverArtUrl = URL.createObjectURL(blob);
+    }
+
+    /* ── 4b decode audio ─────────────────────────────────────────── */
+    audioBuffer = await audioContext!.decodeAudioData(arrayBuffer);
+  } catch (e) {
+    console.error(`❌ metadata/decode error for '${trackId}':`, e);
+    if (coverArtUrl) URL.revokeObjectURL(coverArtUrl);
+    tracks.delete(trackId);
+    return false;
+  }
+
+  /* 5 ▸ cache & done ---------------------------------------------- */
+  tracks.set(trackId, { audioBuffer, duration: audioBuffer.duration, transitionPoints, sourceNode: null, gainNode: null, coverArtUrl, title, trackLength: audioBuffer.duration });
+
+  console.log(`✅ Decoded '${trackId}' – ${audioBuffer.duration.toFixed(2)} s` + (transitionPoints ? ` | transitions: ${transitionPoints.join(", ")}` : ""));
+  return true;
 }
 
 function playTrack(trackId: string, startTime: number = 0, offset: number = 0): boolean {

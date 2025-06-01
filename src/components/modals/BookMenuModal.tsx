@@ -133,6 +133,19 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           <RotateCcw className="mr-2 h-4 w-4" />
           Resetuj Pozycję Czytania
         </Button>
+        <Button
+          variant="ghost"
+          onClick={() => {
+            const newApiKey = prompt("OpenAI API Key") || "";
+            if (newApiKey) {
+              localStorage.setItem("tmp::voice_api_key", newApiKey);
+              console.warn("need to pass it to the voice agent now");
+            }
+            onClose();
+          }}
+        >
+          Ustaw klucz OpenAI
+        </Button>
       </div>
       <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300")}>
         <div className="space-y-4">
@@ -159,6 +172,9 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             <span>Duży</span>
           </div>
         </div>
+      </div>
+      <div className="text-xs text-gray-500 mt-4 text-right">
+        <span>Wersja: {import.meta.env.VITE_BUILD_TIME || "0.0.1"}</span>
       </div>
     </ModalUI>
   );
