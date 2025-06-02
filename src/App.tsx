@@ -18,7 +18,6 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { EditorMode } from "@/components/EditorMode";
 import useLocalStorageState from "use-local-storage-state";
-import { BookChapterRenderer } from "./BookChapterRenderer";
 import { useAppReady } from "./hooks/useAppReady";
 import useSplashHidden from "./hooks/useSplashHidden";
 import { initAudioContext } from "./audio-crossfader";
@@ -43,7 +42,6 @@ function Shell() {
   return (
     <>
       <Header />
-      <BookChapterRenderer /> {/* New component for content */}
       <NoteLinkBlinker />
       <ContentContainerWrapper /> {/* Keep for animations */}
       <CharacterNotesPanel />
