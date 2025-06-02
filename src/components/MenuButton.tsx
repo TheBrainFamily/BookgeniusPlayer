@@ -4,12 +4,13 @@ import { motion, Variants } from "motion/react";
 
 import { useBookMenuModal } from "@/stores/modals/bookMenuModal.store";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 const MenuButton = () => {
   const { openModal } = useBookMenuModal();
 
   return (
-    <div className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center">
+    <div className={cn("bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center", "optional-element")}>
       <Tooltip>
         <TooltipTrigger asChild>
           <motion.button onClick={openModal} className="p-2 my-1 hover:text-white rounded-full cursor-pointer flex" whileHover="hover" whileTap="tap" variants={buttonVariants}>

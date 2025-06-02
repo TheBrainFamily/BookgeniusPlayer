@@ -271,7 +271,7 @@ const AudioPlayer = () => {
 
   return (
     <>
-      <div className="relative origin-top-left">
+      <div className={cn("relative origin-top-left", "optional-element")}>
         <div className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1 relative">
           {/* Volume Control Button with Dropdown */}
           <div

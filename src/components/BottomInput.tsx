@@ -168,7 +168,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   }, [isRecording, stopRecording, updateLastActivity]);
 
   return (
-    <div className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
+    <div className={cn("transition-all duration-300 ease-out w-full flex justify-center", "optional-element", className)}>
       <motion.div className={cn("bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-3 py-2")}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key="expanded" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>

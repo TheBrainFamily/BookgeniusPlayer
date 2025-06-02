@@ -50,19 +50,37 @@ export async function runLegacyInit() {
     const INACTIVITY_TIMEOUT = 5000; // 10 seconds
 
     const hideOptionalElements = () => {
-      const optionalElements = document.querySelectorAll(".optional-element");
+      const optionalElements = document.querySelectorAll(".optional-element") as NodeListOf<HTMLElement>;
       optionalElements.forEach((element) => {
-        (element as HTMLElement).style.transition = "opacity 8s ease-in";
-        (element as HTMLElement).style.opacity = "0";
+        element.style.transition = "opacity 8s ease-in";
+        element.style.opacity = "0";
+        element.style.pointerEvents = "none";
       });
+
+      // Also hide the progress indicator
+      const progressIndicator = document.querySelector(".progress-indicator") as HTMLElement;
+      if (progressIndicator) {
+        progressIndicator.style.transition = "opacity 8s ease-in";
+        progressIndicator.style.opacity = "0";
+        progressIndicator.style.pointerEvents = "none";
+      }
     };
 
     const showOptionalElements = () => {
-      const optionalElements = document.querySelectorAll(".optional-element[style*='opacity: 0']");
+      const optionalElements = document.querySelectorAll(".optional-element[style*='opacity: 0']") as NodeListOf<HTMLElement>;
       optionalElements.forEach((element) => {
-        (element as HTMLElement).style.transition = "opacity 1s ease-out";
-        (element as HTMLElement).style.opacity = "1";
+        element.style.transition = "opacity 1s ease-out";
+        element.style.opacity = "1";
+        element.style.pointerEvents = "auto";
       });
+
+      // Also show the progress indicator
+      const progressIndicator = document.querySelector(".progress-indicator") as HTMLElement;
+      if (progressIndicator && progressIndicator.style.opacity === "0") {
+        progressIndicator.style.transition = "opacity 1s ease-out";
+        progressIndicator.style.opacity = "1";
+        progressIndicator.style.pointerEvents = "auto";
+      }
     };
 
     const resetInactivityTimer = () => {
@@ -76,11 +94,8 @@ export async function runLegacyInit() {
     // Start the timer initially
     inactivityTimer = window.setTimeout(hideOptionalElements, INACTIVITY_TIMEOUT);
 
-    // Reset timer on mouse movement
-    document.addEventListener("mousemove", resetInactivityTimer);
-    // Also reset on scroll, click and keypress for better user experience
-    document.addEventListener("scroll", resetInactivityTimer);
-    document.addEventListener("click", resetInactivityTimer);
+    // Reset timer on pointer down and keypress
+    document.addEventListener("pointerdown", resetInactivityTimer);
     document.addEventListener("keypress", resetInactivityTimer);
   }
 
