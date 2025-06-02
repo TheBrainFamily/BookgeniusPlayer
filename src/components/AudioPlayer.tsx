@@ -33,6 +33,7 @@ import { useTranslation } from "react-i18next";
 
 const AudioPlayer = () => {
   const isMobileOrTablet = useIsMobileOrTablet();
+  const { t } = useTranslation();
 
   const [isPlayingAudioBook, setIsPlayingAudiobook] = useLocalStorageState("isPlayingAudioBook", { defaultValue: true });
   const [volume, setVolume] = useLocalStorageState("volume", { defaultValue: getMasterVolume() ?? 0.5 });
@@ -49,7 +50,6 @@ const AudioPlayer = () => {
   const [playlistTracks, setPlaylistTracks] = useState<{ id: string; title: string; duration: number }[]>([]);
   const [currentTrackIdFromState, setCurrentTrackIdFromState] = useState<string | null>(null);
   const isAudiobookAvailable = true;
-  const { t } = useTranslation();
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -273,8 +273,8 @@ const AudioPlayer = () => {
 
   return (
     <>
-      <div className={cn("relative origin-top-left", "optional-element")}>
-        <div className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1 relative">
+      <div className={cn("relative origin-top-left", "optional-element")} data-interactive="true" data-audio-player="true">
+        <div className="audio-player bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1 relative">
           {/* Volume Control Button with Dropdown */}
           <div
             onMouseEnter={() => {
@@ -301,7 +301,9 @@ const AudioPlayer = () => {
             <AnimatePresence>
               {isVolumeOpen && (
                 <motion.div
-                  className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 absolute top-full left-0 mt-2 z-10 px-4 pt-2 pb-3 w-48 flex gap-3 flex-col"
+                  className="volume-control bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 absolute top-full left-0 mt-2 z-10 px-4 pt-2 pb-3 w-48 flex gap-3 flex-col"
+                  data-interactive="true"
+                  data-audio-player="true"
                   variants={variants.dropdownContainer}
                   initial="initial"
                   animate="animate"
@@ -372,7 +374,9 @@ const AudioPlayer = () => {
             <AnimatePresence>
               {isBigPlayerOpen && (
                 <motion.div
-                  className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs"
+                  className="player-controls bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs"
+                  data-interactive="true"
+                  data-audio-player="true"
                   variants={variants.dropdownContainer}
                   initial="initial"
                   animate="animate"
@@ -525,7 +529,10 @@ const AudioPlayer = () => {
                 "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-4",
                 "flex items-center gap-4 z-20 max-w-full overflow-hidden",
                 "cursor-pointer",
+                "audio-player",
               )}
+              data-interactive="true"
+              data-audio-player="true"
               onClick={() => setShowSongNotification(false)}
             >
               <div

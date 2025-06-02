@@ -31,19 +31,20 @@ const ProgressIndicator: React.FC<BookProgressIndicatorProps> = ({ bookData }) =
     if (chapterNum === currentChapter) return "current";
     if (chapterNum === furthestChapter && chapterNum !== currentChapter) return "furthest";
     if (chapterNum < furthestChapter) return "completed";
+
     return "locked";
   };
 
   const getChapterColor = (status: string) => {
     switch (status) {
       case "current":
-        return "bg-blue-400 shadow-lg border border-blue-300";
+        return "bg-white shadow-md border-2 border-white";
       case "furthest":
-        return "bg-green-400 shadow-md border border-green-300";
+        return "bg-blue-400 shadow-md border-2 border-white";
       case "completed":
-        return "bg-amber-400/80 hover:bg-amber-300 border border-amber-300/50";
+        return "bg-green-400 shadow-md border-2 border-white";
       default:
-        return "bg-gray-500 hover:bg-gray-400 border border-gray-400/50";
+        return "bg-gray-400 shadow-md border-2 border-gray-400";
     }
   };
 
@@ -74,7 +75,7 @@ const ProgressIndicator: React.FC<BookProgressIndicatorProps> = ({ bookData }) =
             <TooltipTrigger asChild>
               <motion.button
                 onClick={() => handleChapterClick(i)}
-                className={cn(`absolute top-0 h-full w-[7px] z-10 ${colorClass} transition-all cursor-pointer`, i === 1 && "translate-x-[1px]")}
+                className={cn(`absolute top-0 rounded-4xl h-[10px] w-[10px] z-10 ${colorClass} transition-all cursor-pointer`, i === 1 && "translate-x-[1px]")}
                 style={{ left: `${position}%` }}
                 custom={i}
               />
@@ -89,19 +90,20 @@ const ProgressIndicator: React.FC<BookProgressIndicatorProps> = ({ bookData }) =
         </TooltipProvider>,
       );
     }
+
     return markers;
   };
 
   // return <></>;
   return (
     <motion.div
-      className={cn("relative h-2 bg-black/70 textured-bg border shadow-xl text-white border-white/30 rounded-3xl overflow-hidden mx-3", "progress-indicator")}
+      className={cn("relative h-3 bg-black/70 textured-bg border shadow-xl text-white border-white/30 rounded-3xl overflow-hidden mx-3", "progress-indicator")}
       variants={variants.container}
       initial="hidden"
       animate="visible"
     >
       <motion.div
-        className="h-full bg-gradient-to-r from-amber-500/80 via-orange-500/80 to-red-500/80 rounded-full"
+        className="h-full bg-gradient-to-r from-yellow-400/80 via-lime-500/80 to-green-500/80 rounded-full"
         variants={variants.progressBar}
         style={{ width: `${Math.max(0, totalProgress)}%` }}
         initial={{ scaleX: 0 }}
