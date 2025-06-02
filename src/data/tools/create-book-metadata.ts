@@ -247,7 +247,7 @@ const doIt = () => {
   // 3. Output the result
   console.log("Extracted Metadata:", JSON.stringify(metadata, null, 2));
   const metadataFilePath = path.join(__dirname, `../metadata-${bookSlug}.ts`);
-  const variableName = bookSlug === "1984" ? `_${bookSlug}` : bookSlug.replaceAll("-", "");
+  const variableName = bookSlug === "1984" || bookSlug === "1984-English" ? `_${bookSlug.replaceAll("-", "")}` : bookSlug.replaceAll("-", "");
 
   prettier
     .format(`export const ${variableName}CharactersData = ${JSON.stringify(metadata, null, 2)}`, { parser: "typescript", printWidth: 180, objectWrap: "collapse" })
