@@ -26,7 +26,7 @@ pnpm install
 pnpm dev
 
 # Run with specific book
-VITE_BOOK=1984 VITE_LANG=EN pnpm dev        # English version
+VITE_BOOK=1984-English VITE_LANG=EN pnpm dev        # English version
 VITE_BOOK=1984 pnpm dev                     # Polish version
 VITE_BOOK=Pharaon pnpm dev                  # Polish version
 VITE_BOOK=Conrad-Tajny-Agent pnpm dev       # Polish version
