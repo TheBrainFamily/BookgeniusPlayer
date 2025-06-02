@@ -104,7 +104,7 @@ export const getBackgrounds = (): Background[] => {
   ];
   let backgrounds = processBackgroundInputs(backgroundsInput);
 
-  if (CURRENT_BOOK === BOOK_SLUGS._1984) {
+  if (CURRENT_BOOK === BOOK_SLUGS._1984 || CURRENT_BOOK === BOOK_SLUGS._1984_English) {
     const backgroundsInput = [
       { chapter: 1, file: "1984-chapter-1.mp4" },
       { chapter: 2, file: "1984-chapter-2.mp4" },

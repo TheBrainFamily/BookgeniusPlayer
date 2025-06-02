@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 import { UndoDot } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { shouldShowReturnButton, systemNavigateTo, getSavedLocation } from "@/helpers/paragraphsNavigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -11,6 +12,7 @@ const ReturnToLocationButton = () => {
   const {
     locationRange: { currentChapter, currentParagraph },
   } = useLocationRange(300);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setIsVisible(shouldShowReturnButton());
@@ -54,10 +56,10 @@ const ReturnToLocationButton = () => {
                   variants={variants.button}
                 >
                   <UndoDot className="w-4 h-4" />
-                  Wróć
+                  {t("go_back")}
                 </motion.button>
               </TooltipTrigger>
-              <TooltipContent>Powrót do ostatniego miejsca czytania</TooltipContent>
+              <TooltipContent>{t("return_to_last_reading_location")}</TooltipContent>
             </Tooltip>
           </motion.div>
         )}

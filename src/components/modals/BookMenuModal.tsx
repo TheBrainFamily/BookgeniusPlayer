@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { List, Type, RotateCcw, Music, Brain } from "lucide-react";
+import { List, Type, RotateCcw, Music, BrainCircuit } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import useLocalStorageState from "use-local-storage-state";
 
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const [hideOverlay, setHideOverlay] = useState(false);
   const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hiddenParagraphsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { t } = useTranslation();
 
   const handleFontSizeChange = (value: number[]) => {
     const fontSize = value[0];
@@ -99,7 +101,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   }, []);
 
   return (
-    <ModalUI title="Ustawienia Książki" onClose={onClose} hideOverlay={hideOverlay}>
+    <ModalUI title={t("book_settings")} onClose={onClose} hideOverlay={hideOverlay}>
       <div className="space-y-2 mb-6">
         <Button
           variant="ghost"
@@ -109,7 +111,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           }}
         >
           <List className="mr-2 h-4 w-4" />
-          Otwórz Rodział
+          {t("open_chapter")}
         </Button>
         <Button
           variant="ghost"
@@ -120,7 +122,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           }}
         >
           <Music className="mr-2 h-4 w-4" />
-          Przeładuj Muzykę
+          {t("reload_music")}
         </Button>
         <Button
           variant="ghost"
@@ -131,7 +133,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           }}
         >
           <RotateCcw className="mr-2 h-4 w-4" />
-          Resetuj Pozycję Czytania
+          {t("reset_reading_position")}
         </Button>
         <Button
           variant="ghost"
@@ -145,8 +147,8 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             onClose();
           }}
         >
-          <Brain className="mr-2 h-4 w-4" />
-          Ustaw klucz OpenAI
+          <BrainCircuit className="mr-2 h-4 w-4" />
+          {t("set_openai_api_key")}
         </Button>
       </div>
       <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300")}>
@@ -154,7 +156,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           <div className="flex items-center gap-2">
             <Type className="h-4 w-4 text-white" />
             <Label htmlFor="font-size" className="text-sm font-medium text-white">
-              Rozmiar tekstu: <span id="font-size-value" className="text-blue-300">{`${currentFontSize.toFixed(1)}x`}</span>
+              {t("text_size")}: <span id="font-size-value" className="text-blue-300">{`${currentFontSize.toFixed(1)}x`}</span>
             </Label>
           </div>
           <Slider
@@ -169,14 +171,16 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
           />
           <div className="flex justify-between text-xs text-gray-300">
-            <span>Mały</span>
-            <span>Domyślny</span>
-            <span>Duży</span>
+            <span>{t("small")}</span>
+            <span>{t("default")}</span>
+            <span>{t("large")}</span>
           </div>
         </div>
       </div>
       <div className="text-xs text-gray-500 mt-4 text-right">
-        <span>Wersja: {import.meta.env.VITE_BUILD_TIME || "0.0.1"}</span>
+        <span>
+          {t("version")}: {import.meta.env.VITE_BUILD_TIME || "0.0.1"}
+        </span>
       </div>
     </ModalUI>
   );

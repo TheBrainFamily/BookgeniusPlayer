@@ -5,9 +5,11 @@ import { motion, Variants } from "motion/react";
 import { useBookMenuModal } from "@/stores/modals/bookMenuModal.store";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 const MenuButton = () => {
   const { openModal } = useBookMenuModal();
+  const { t } = useTranslation();
 
   return (
     <div className={cn("bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center", "optional-element")}>
@@ -17,7 +19,7 @@ const MenuButton = () => {
             <Book className="w-4 h-4 lg:w-5 lg:h-5" />
           </motion.button>
         </TooltipTrigger>
-        <TooltipContent>Otwórz Menu Książki</TooltipContent>
+        <TooltipContent>{t("book_menu_button_tooltip")}</TooltipContent>
       </Tooltip>
     </div>
   );

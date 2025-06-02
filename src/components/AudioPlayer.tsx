@@ -29,6 +29,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { cn } from "@/lib/utils";
 import { CURRENT_BOOK } from "@/consts";
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
+import { useTranslation } from "react-i18next";
 
 const AudioPlayer = () => {
   const isMobileOrTablet = useIsMobileOrTablet();
@@ -48,6 +49,7 @@ const AudioPlayer = () => {
   const [playlistTracks, setPlaylistTracks] = useState<{ id: string; title: string; duration: number }[]>([]);
   const [currentTrackIdFromState, setCurrentTrackIdFromState] = useState<string | null>(null);
   const isAudiobookAvailable = true;
+  const { t } = useTranslation();
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -306,7 +308,7 @@ const AudioPlayer = () => {
                   exit="exit"
                 >
                   <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.05 }}>
-                    <div className="flex justify-between text-xs my-2">Głośność</div>
+                    <div className="flex justify-between text-xs my-2">{t("volume")}</div>
                     <Slider value={[isMuted ? 0 : volume]} min={0} max={1} step={0.01} onValueChange={handleVolumeChange} variant="secondary" />
                     <div className="flex justify-between text-xs mt-2">
                       <span>0%</span>
@@ -316,11 +318,11 @@ const AudioPlayer = () => {
 
                   {isAudiobookAvailable && (
                     <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.1 }}>
-                      <div className="flex justify-between text-xs my-2">Balans</div>
+                      <div className="flex justify-between text-xs my-2">{t("balance")}</div>
                       <Slider value={[balance]} min={0} max={1} step={0.01} onValueChange={handleBalanceChange} variant="secondary" />
                       <div className="flex justify-between text-xs mt-2">
-                        <span>Audiobook</span>
-                        <span>Muzyka</span>
+                        <span>{t("audiobook")}</span>
+                        <span>{t("music")}</span>
                       </div>
                     </motion.div>
                   )}
@@ -344,7 +346,7 @@ const AudioPlayer = () => {
                   <motion.div className="absolute bottom-0 right-0">{isPlayingAudioBook ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}</motion.div>
                 </motion.button>
               </TooltipTrigger>
-              <TooltipContent>{isPlayingAudioBook ? "Zatrzymaj audiobook" : "Odtwórz audiobook"}</TooltipContent>
+              <TooltipContent>{isPlayingAudioBook ? t("stop_audiobook") : t("play_audiobook")}</TooltipContent>
             </Tooltip>
           )}
 
@@ -532,8 +534,8 @@ const AudioPlayer = () => {
                 {currentTrackData.coverArtUrl && <img src={currentTrackData.coverArtUrl} alt="Teraz gra" className="w-full h-full object-cover" />}
               </div>
               <div className="flex flex-col flex-1 min-w-0">
-                <div className="text-sm font-medium">Teraz gra</div>
-                <div className="text-base font-medium truncate">{currentTrackData.title || "Unknown Track"}</div>
+                <div className="text-sm font-medium">{t("now_playing")}</div>
+                <div className="text-base font-medium truncate">{currentTrackData.title || t("unknown_track")}</div>
               </div>
             </div>
           </motion.div>

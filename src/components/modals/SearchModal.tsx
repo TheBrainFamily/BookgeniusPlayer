@@ -3,6 +3,7 @@ import { SearchResultsData, SearchResultItemData, cleanupSearchChapters } from "
 import { useLocation } from "@/state/LocationContext";
 import ModalUIOld from "./ModalUIOld";
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
+import { useTranslation } from "react-i18next";
 
 interface SearchModalProps {
   onClose: () => void;
@@ -13,6 +14,7 @@ interface SearchModalProps {
 
 const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults }) => {
   const { setLocation } = useLocation();
+  const { t } = useTranslation();
 
   // Cleanup search chapters when modal unmounts
   useEffect(() => {
@@ -44,7 +46,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            <span className="text-gray-700 dark:text-gray-300">Searching...</span>
+            <span className="text-gray-700 dark:text-gray-300">{t("searching")}</span>
           </div>
         )}
         {searchResults && !searchResults.isLoading && (
@@ -59,7 +61,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                     onClick={() => handleSearchResultClick(item)}
                   >
                     <div className="search-result-page font-semibold text-blue-600 dark:text-blue-400">
-                      Rozdział {item.chapter}, Paragraf {item.paragraphNumber}
+                      {t("chapter")} {item.chapter}, {t("paragraph")} {item.paragraphNumber}
                     </div>
                     {item.summary && <div className="search-result-summary text-xs italic text-gray-500 dark:text-gray-400 mt-1">{item.summary}</div>}
                     <div className="search-result-content text-sm text-gray-800 dark:text-gray-200 mt-1">{item.text}</div>
@@ -67,7 +69,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                 ))}
               </ul>
             ) : (
-              <p className="text-center text-gray-500 dark:text-gray-400 py-4">No results to display.</p>
+              <p className="text-center text-gray-500 dark:text-gray-400 py-4">{t("no_results_to_display")}</p>
             )}
           </div>
         )}
