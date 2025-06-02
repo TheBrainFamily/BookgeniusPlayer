@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { List, Type, RotateCcw, Music } from "lucide-react";
+import { List, Type, RotateCcw, Music, Brain } from "lucide-react";
+import useLocalStorageState from "use-local-storage-state";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
-import useLocalStorageState from "use-local-storage-state";
 import { cn } from "@/lib/utils";
 import ModalUI from "./ModalUI";
 
@@ -135,6 +135,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
         </Button>
         <Button
           variant="ghost"
+          className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
           onClick={() => {
             const newApiKey = prompt("OpenAI API Key") || "";
             if (newApiKey) {
@@ -144,6 +145,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             onClose();
           }}
         >
+          <Brain className="mr-2 h-4 w-4" />
           Ustaw klucz OpenAI
         </Button>
       </div>
