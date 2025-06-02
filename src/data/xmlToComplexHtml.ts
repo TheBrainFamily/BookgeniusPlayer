@@ -146,8 +146,8 @@ if (require.main === module) {
   // Example usage: Provide the book slug when calling
   console.log("bookSlug", bookSlug);
   const htmlString = xmlToComplexHtml(xmlString, bookSlug);
-  if (bookSlug === "1984") {
-    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const _${bookSlug}BookXml = \`<section>${htmlString}</section>\`;`);
+  if (bookSlug === "1984" || bookSlug === "1984-English") {
+    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const _${bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlString}</section>\`;`);
   } else {
     fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const ${bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlString}</section>\`;`);
   }

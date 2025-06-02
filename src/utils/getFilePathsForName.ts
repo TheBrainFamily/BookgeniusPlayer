@@ -194,7 +194,7 @@ const known1984 = [
   "tillotson-speaks.mp4",
   "tom-parsons-listens.mp4",
   "tom-parsons-speaks.mp4",
-  "wielki-brat-listens.mp4",
+  "big-brother-listens.mp4",
   "winston-smith-listens.mp4",
   "winston-smith-speaks.mp4",
 ];

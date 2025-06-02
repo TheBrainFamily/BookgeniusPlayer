@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { EditorError, CursorInstallationError, SettingsError } from "./error-handlers";
 
-const SETTINGS = { VSCODE_SETTINGS_FILE: ".vscode/settings.json", TEMP_FILE_DIR: "/tmp/Text-Editor", DEFAULT_SETTINGS: { "editor.wordWrap": "on" } } as const;
+const SETTINGS = { VSCODE_SETTINGS_FILE: ".vscode/settings.json", TEMP_FILE_DIR: "./src/data/tools/Text-Editor", DEFAULT_SETTINGS: { "editor.wordWrap": "on" } } as const;
 
 export class EditorManager {
   private userCursorSettings: string | null = null;
@@ -13,8 +13,8 @@ export class EditorManager {
       this.verifyCursorInstallation();
       this.adjustSettings();
 
-      if (!fs.existsSync("/tmp/Text-Editor")) {
-        fs.mkdirSync("/tmp/Text-Editor");
+      if (!fs.existsSync(SETTINGS.TEMP_FILE_DIR)) {
+        fs.mkdirSync(SETTINGS.TEMP_FILE_DIR);
       }
 
       const tempFile = path.join(SETTINGS.TEMP_FILE_DIR, `temp-${Date.now()}.xml`);
