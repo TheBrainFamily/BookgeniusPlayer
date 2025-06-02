@@ -10,6 +10,7 @@ import { useLocation } from "@/state/LocationContext";
 import { deepResearchCall } from "@/deepResearchCall";
 import { useSearchModal } from "@/stores/modals/searchModal.store";
 import { useDeepResearchModal } from "@/stores/modals/deepResearchModal.store";
+import { useTranslation } from "react-i18next";
 
 interface SubmitMessageData {
   query: string;
@@ -26,6 +27,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
+  const { t } = useTranslation();
 
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
   const { openModal: openDeepResearchModal } = useDeepResearchModal();
@@ -179,7 +181,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                 type="text"
                 value={value}
                 onChange={handleInputChange}
-                placeholder={isRecording ? "Nasłuchiwanie.." : isDeepResearchActive ? "Wprowadź wyszukanie Deep Research..." : "Poszukaj albo zapytaj"}
+                placeholder={isRecording ? t("listening") : isDeepResearchActive ? t("enter_deep_research") : t("search_or_ask")}
                 className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-50" : "")}
                 disabled={isRecording || isThinking}
                 autoComplete="off"
@@ -208,7 +210,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                         <Telescope size={18} />
                       </motion.button>
                     </TooltipTrigger>
-                    <TooltipContent>Deep Research - analizuje szczegółowo cały tekst</TooltipContent>
+                    <TooltipContent>{t("deep_research")}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
 
@@ -229,7 +231,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                           <Send size={18} />
                         </motion.button>
                       </TooltipTrigger>
-                      <TooltipContent>Wyślij wiadomość</TooltipContent>
+                      <TooltipContent>{t("send_message")}</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 ) : (
@@ -279,7 +281,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                           <Mic size={18} />
                         </motion.button>
                       </TooltipTrigger>
-                      <TooltipContent>{isRecording ? "Zatrzymaj nagrywanie" : "Rozpocznij nagrywanie"}</TooltipContent>
+                      <TooltipContent>{isRecording ? t("stop_recording") : t("start_recording")}</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 )}
