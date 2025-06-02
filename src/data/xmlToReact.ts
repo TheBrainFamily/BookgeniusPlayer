@@ -44,9 +44,10 @@ export const xmlToReactChapters = async (xmlString: string, bookSlug: BOOK_SLUGS
 
   // Process each chapter
   const chapters = xmlDoc.getElementsByTagName("Chapter");
+
   const chapterMetadata: Array<{ id: string; title: string }> = [];
 
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < chapters.length; i++) {
     const chapter = chapters[i];
     const chapterId = chapter.getAttribute("id") || String(i + 1);
 
@@ -58,11 +59,17 @@ export const xmlToReactChapters = async (xmlString: string, bookSlug: BOOK_SLUGS
       chapterTitle = titleElements[0].textContent || "";
     }
 
+    console.log("62: chapterTitle BANG!", chapterTitle);
+
     chapterMetadata.push({ id: chapterId, title: chapterTitle });
 
     const formattedCode = await prettier.format(generateChapterComponent(chapter, chapterId, characterMap, bookSlug), { parser: "typescript" });
-    console.log(formattedCode);
+
+    // console.log(formattedCode);
     const outPath = path.join(outputDir, `Chapter${chapterId}.tsx`);
+    if (!fs.existsSync(outPath)) {
+      fs.writeFileSync(outPath, "", "utf-8");
+    }
     const fd = openSync(outPath, "r+");
     writeSync(fd, formattedCode, 0, "utf8");
     ftruncateSync(fd, Buffer.byteLength(formattedCode, "utf8"));

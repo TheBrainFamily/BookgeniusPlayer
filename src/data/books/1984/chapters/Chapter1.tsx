@@ -3,8 +3,11 @@ import React from "react";
 export const Chapter1: React.FC = () => {
   return (
     <section data-chapter="1">
-      <h4 data-index="0"> 1</h4>
-      <p data-index="1">
+      <h4 data-index="0" className="relative">
+        {" "}
+        1
+      </h4>
+      <p data-index="1" className="relative">
         {" "}
         Był jasny, zimny kwietniowy dzień, zegary wybijały trzynastą.{" "}
         <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984/winston-smith-listens.mp4">
@@ -13,7 +16,7 @@ export const Chapter1: React.FC = () => {
         , przyciskając brodę do piersi dla osłony przed zacinającym wiatrem, wślizgnął się najszybciej, jak potrafił, przez szklane drzwi Rezydencji Zwycięstwa; wirujący w
         podmuchach wiatru ziarnisty pył mimo wszystko dostał się do środka.
       </p>
-      <p data-index="2">
+      <p data-index="2" className="relative">
         {" "}
         W holu cuchnęło gotowaną kapustą i starymi, szmacianymi wycieraczkami. Na jego końcu wisiał kolorowy plakat, zbyt duży do eksponowania w pomieszczeniu. Przedstawiał tylko
         ogromną twarz, szeroką na więcej niż metr: twarz mężczyzny w wieku około czterdziestu pięciu lat, z bujnymi, czarnymi wąsami, o ostrych, interesujących rysach.{" "}
@@ -33,7 +36,7 @@ export const Chapter1: React.FC = () => {
         </span>{" "}
         WIDZI'.
       </p>
-      <p data-index="3">
+      <p data-index="3" className="relative">
         {" "}
         W mieszkaniu dźwięczny głos odczytywał ciągi liczb, które miały jakiś związek z produkcją surówki. Głos ów wydobywał się z podłużnego, metalowego panelu, przypominającego
         mętne lustro, wmontowanego w ścianę po prawej.{" "}
@@ -47,7 +50,7 @@ export const Chapter1: React.FC = () => {
         podszedł do okna. Był niewysoki i szczupły; niebieski kombinezon, uniform członków Partii, dodatkowo podkreślał mizerność jego ciała. Mężczyzna miał bardzo jasne włosy, a
         twarz naturalnie rumianą — o skórze zgrubiałej od szarego mydła, tępych żyletek i zimy, która właśnie dobiegła końca.
       </p>
-      <p data-index="4">
+      <p data-index="4" className="relative">
         {" "}
         Świat na zewnątrz sprawiał wrażenie zimnego nawet przez szybę zamkniętego okna. W dole, na ulicy, wiatr porywał do spiralnego tańca kurz i strzępy gazet. I chociaż świeciło
         słońce, a niebo było intensywnie niebieskie, rzeczywistość wydawała się bezbarwna — poza porozlepianymi wszędzie plakatami. Twarz o czarnych wąsach spoglądała z każdego
@@ -63,7 +66,7 @@ export const Chapter1: React.FC = () => {
         oddali helikopter zapikował między dachy budynków, zawisnął na moment jak trzmiel, po czym uniósł się zakrzywionym lotem. Był to zaglądający ludziom do okien patrol
         policyjny. Ale te patrole nie miały wielkiego znaczenia. Liczyła się tylko myślopolicja.
       </p>
-      <p data-index="5">
+      <p data-index="5" className="relative">
         {" "}
         Za plecami{" "}
         <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984/winston-smith-listens.mp4">
@@ -83,7 +86,7 @@ export const Chapter1: React.FC = () => {
         podłączyć się do dowolnego kanału, kiedy tylko chcieli. Trzeba było żyć — i ludzie tak żyli, z przyzwyczajenia, które przeradzało się w instynkt — zakładając, że każdy
         dźwięk jest podsłuchiwany, a każdy ruch podglądany, z wyjątkiem chwil, gdy w pomieszczeniu jest ciemno.
       </p>
-      <p data-index="6">
+      <p data-index="6" className="relative">
         {" "}
         <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984/winston-smith-listens.mp4">
           Winston
@@ -103,7 +106,7 @@ export const Chapter1: React.FC = () => {
         </span>{" "}
         nie pamiętał; z dzieciństwa pozostała mu tylko seria prześwietlonych obrazów, bez żadnego tła i przeważnie niezrozumiałych.
       </p>
-      <p data-index="7">
+      <p data-index="7" className="relative">
         {" "}
         Ministerstwo Prawdy — w nowomowie
         <a href="#fn2" className="link-note">
@@ -116,11 +119,11 @@ export const Chapter1: React.FC = () => {
         </span>{" "}
         widział wyraźnie, wypisane eleganckimi literami na białej fasadzie, trzy slogany Partii:
       </p>
-      <blockquote data-index="8">
+      <blockquote data-index="8" className="relative">
         {" "}
         <div> WOJNA TO POKÓJ WOLNOŚĆ TO NIEWOLA IGNORANCJA TO SIŁA </div>
       </blockquote>
-      <p data-index="9">
+      <p data-index="9" className="relative">
         {" "}
         Mówiono, że nadziemna część Ministerstwa Prawdy składa się z trzech tysięcy pomieszczeń; ponoć tyle samo ma ich część podziemna. W różnych miejscach Londynu znajdowały się
         jeszcze trzy inne budynki o podobnym wyglądzie i rozmiarach. Do tego stopnia górowały nad otaczającą je architekturą, że z dachu Rezydencji Zwycięstwa widziało się
@@ -128,7 +131,7 @@ export const Chapter1: React.FC = () => {
         sztukę; Ministerstwo Pokoju, zajmujące się wojną; Ministerstwo Miłości, pilnujące prawa i porządku; oraz Ministerstwo Dobrobytu, skoncentrowane na ekonomii. Ich nazwy w
         nowomowie brzmiały: „Minipra', „Minipo', „Minimiło', „Minidobro'.
       </p>
-      <p data-index="10">
+      <p data-index="10" className="relative">
         {" "}
         Najbardziej przerażało Ministerstwo Miłości. Gmach ten w ogóle nie miał okien.{" "}
         <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984/winston-smith-listens.mp4">
@@ -138,7 +141,7 @@ export const Chapter1: React.FC = () => {
         wtedy trzeba było przedzierać się przez labirynt zasieków z drutu kolczastego, stalowych drzwi i ukrytych stanowisk karabinów maszynowych. Dodatkowo okoliczne ulice
         patrolowali strażnicy o twarzach goryli, ubrani w czarne uniformy i uzbrojeni w pałki teleskopowe.
       </p>
-      <p data-index="11">
+      <p data-index="11" className="relative">
         {" "}
         <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984/winston-smith-listens.mp4">
           Winston
@@ -152,7 +155,7 @@ export const Chapter1: React.FC = () => {
         </span>{" "}
         nalał sobie prawie pełną filiżankę, przygotował się na szok i przełknął płyn na raz, jak dawkę lekarstwa.
       </p>
-      <p data-index="12">
+      <p data-index="12" className="relative">
         {" "}
         Twarz mu spurpurowiała, z oczu popłynęły łzy. To coś smakowało jak kwas azotowy
         <a href="#fn3" className="link-note">
@@ -166,7 +169,7 @@ export const Chapter1: React.FC = () => {
         na podłogę. Z następnym poszło mu lepiej. Wrócił do pokoju i usiadł przy małym stole, znajdującym się po lewej stronie teleekranu. Z szuflady biurka wydobył obsadkę,
         buteleczkę atramentu i gruby, czysty zeszyt formatu A4, z czerwonym grzbietem i marmurkową okładką.
       </p>
-      <p data-index="13">
+      <p data-index="13" className="relative">
         {" "}
         Z jakiegoś powodu umiejscowienie teleekranu w pokoju było nietypowe. Gdyby zamontowano go, jak to zwykle robiono, w ścianie w głębi pomieszczenia, miałby widok na całe
         wnętrze. Tymczasem teleekran tkwił na dłuższej ścianie, naprzeciwko okna. Z jednej strony znajdowała się płytka wnęka i właśnie tam{" "}
@@ -180,7 +183,7 @@ export const Chapter1: React.FC = () => {
         był w stanie usunąć się z pola widzenia teleekranu. Mogli go oczywiście podsłuchać; o ile jednak tkwił w obecnej pozycji, nie było go widać. Częściowo właśnie przez ten
         nietypowy rozkład pokoju wpadł na pomysł, który miał teraz zrealizować.
       </p>
-      <p data-index="14">
+      <p data-index="14" className="relative">
         {" "}
         Częściowo zaś stało się to przez wyjątkowo piękny zeszyt. Przed chwilą wyjął go z szuflady. Takiego gładkiego, kremowego papieru nie produkowano od co najmniej czterdziestu
         lat.{" "}
@@ -194,7 +197,7 @@ export const Chapter1: React.FC = () => {
         bez żadnego konkretnego zamiaru. Niosąc go do domu w teczce z dokumentami, odczuwał wyrzuty sumienia. Samo posiadanie takiego notesu, nawet zupełnie czystego, mogło być
         kompromitujące.
       </p>
-      <p data-index="15">
+      <p data-index="15" className="relative">
         {" "}
         Teraz zdecydował, że zacznie prowadzić dziennik. Nie było to zakazane (nic nie było zakazane, wszelkie prawa dawno już zniesiono), nie miał jednak wątpliwości, że w razie
         przyłapania dostanie karę śmierci (albo co najmniej dwadzieścia pięć lat kolonii karnej).{" "}
@@ -209,16 +212,16 @@ export const Chapter1: React.FC = () => {
         nie miał wprawy w ręcznym pisaniu. Wszelkie teksty, poza najkrótszymi notatkami, dyktował do głosopisu; oczywiście teraz to nie wchodziło w grę. Zanurzył stalówkę w
         atramencie i zawahał się przez chwilę. Zadrżał. Zostawiając ślad na papierze, podejmował nieodwracalną decyzję. Małymi, niezgrabnymi literami napisał:
       </p>
-      <blockquote data-index="16">
+      <blockquote data-index="16" className="relative">
         {" "}
         <p>4 kwietnia, 1984.</p>
       </blockquote>
-      <p data-index="17">
+      <p data-index="17" className="relative">
         {" "}
         Opadł na oparcie krzesła. Ogarnęło go poczucie całkowitej niemocy. Po pierwsze, nie był pewien, czy rzeczywiście jest rok 1984. Musiał być mniej więcej ten rok, bo był
         raczej pewien, że ma 39 lat, a wiedział, iż urodził się w 1944 lub 1945; jednak w tych czasach datę dawało się ustalić tylko w przybliżeniu do roku czy dwóch.
       </p>
-      <p data-index="18">
+      <p data-index="18" className="relative">
         {" "}
         Nagle ogarnęła go wątpliwość: dla kogo pisze ten dziennik? Dla przyszłości, dla tych, którzy się jeszcze nie urodzili. Jego umysł krążył przez chwilę wokół niepewnej daty,
         aż wyłoniło się używane często w nowomowie słowo: <strong>dwójmyślenie</strong>. Dopiero teraz do{" "}
@@ -228,7 +231,7 @@ export const Chapter1: React.FC = () => {
         dotarła waga tego, co przedsięwziął. Jak można porozumieć się z przyszłością? Było to z natury rzeczy niemożliwe. Jeśli przyszłość będzie przypominała teraźniejszość, nikt
         go nie usłyszy, jeśli zaś będzie inna, jego położenie nie będzie miało dla niej żadnego znaczenia.
       </p>
-      <p data-index="19">
+      <p data-index="19" className="relative">
         {" "}
         Siedział przez jakiś czas, tępo wpatrując się w papier. Teleekran przełączył się na ostrą, militarną muzykę. O dziwo,{" "}
         <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984/winston-smith-listens.mp4">
@@ -243,12 +246,12 @@ export const Chapter1: React.FC = () => {
         bał się go podrapać, ponieważ za każdym razem kończyło się to infekcją. Mijały sekundy. Nie był świadom niczego poza bielą kartki przed oczami, swędzeniem skóry nad kostką,
         hałaśliwą muzyką i lekkim rauszem po ginie.
       </p>
-      <p data-index="20">
+      <p data-index="20" className="relative">
         {" "}
         Nagle, owładnięty panicznym strachem, zaczął pisać, tylko niezupełnie zdając sobie sprawę z tego, co wychodzi spod jego pióra. Drobne, dziecinne pismo zapełniało kartkę
         nierównymi, falującymi liniami, pomijając najpierw wielkie litery, a potem także kropki:
       </p>
-      <blockquote data-index="21">
+      <blockquote data-index="21" className="relative">
         {" "}
         <p>4 kwietnia, 1984.</p>{" "}
         <p>
@@ -264,7 +267,7 @@ export const Chapter1: React.FC = () => {
           prolska reakcja oni nigdy…
         </p>
       </blockquote>
-      <p data-index="22">
+      <p data-index="22" className="relative">
         {" "}
         <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984/winston-smith-listens.mp4">
           Winston
@@ -273,8 +276,11 @@ export const Chapter1: React.FC = () => {
         wspomnienie wyklarowało się w jego świadomości, tak wyraźnie, jakby zostało już gdzieś zanotowane. Zdał sobie teraz sprawę, że to właśnie owo zdarzenie wpłynęło na jego
         decyzję, żeby szybciej wrócić do domu i zabrać się do pisania.
       </p>
-      <p data-index="23"> Miało ono miejsce tego ranka w ministerstwie — jeśli o zdarzeniu tak mglistym można powiedzieć, iż miało miejsce.</p>
-      <p data-index="24">
+      <p data-index="23" className="relative">
+        {" "}
+        Miało ono miejsce tego ranka w ministerstwie — jeśli o zdarzeniu tak mglistym można powiedzieć, iż miało miejsce.
+      </p>
+      <p data-index="24" className="relative">
         {" "}
         Dochodziła jedenasta i w Departamencie Archiwów, gdzie{" "}
         <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984/winston-smith-listens.mp4">
@@ -305,7 +311,7 @@ export const Chapter1: React.FC = () => {
         napełniło go mroczną trwogą. Przeszło mu nawet przez myśl, że ona może być agentką myślopolicji. Było to, co prawda, wysoce nieprawdopodobne. Niemniej jednak odczuwał w jej
         obecności dziwny dyskomfort, będący mieszaniną lęku i wrogości.
       </p>
-      <p data-index="25">
+      <p data-index="25" className="relative">
         {" "}
         Drugą z tych osób był mężczyzna o nazwisku{" "}
         <span className="character-highlighted" data-character="OBrien" data-src-listening="/1984/obrien-listens.mp4">
@@ -377,12 +383,12 @@ export const Chapter1: React.FC = () => {
         </span>
         .
       </p>
-      <p data-index="26">
+      <p data-index="26" className="relative">
         {" "}
         W następnej chwili z teleekranu w końcu pomieszczenia wydobyło się okropne skrzypienie, jakby uruchomiła się jakaś monstrualna, nienaoliwiona maszyna. Zęby bolały od tego
         dźwięku i ciarki przebiegały po plecach. Zaczęła się Nienawiść.
       </p>
-      <p data-index="27">
+      <p data-index="27" className="relative">
         {" "}
         Jak zwykle, na ekranie wyświetliła się twarz{" "}
         <span className="character-highlighted" data-character="Emmanuel-Goldstein" data-src-listening="/1984/emmanuel-goldstein-listens.mp4">
@@ -413,7 +419,7 @@ export const Chapter1: React.FC = () => {
         herezje, zbłądzenia z partyjnej drogi, wynikały bezpośrednio z jego wpływów. Nadal gdzieś tam żył i inspirował rozmaitych spiskowców, może za oceanem, pod ochroną swoich
         obcych mocodawców; a może nawet — jak czasem plotkowano — w jakiejś kryjówce na obszarze Oceanii.
       </p>
-      <p data-index="28">
+      <p data-index="28" className="relative">
         {" "}
         <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984/winston-smith-listens.mp4">
           Winston
@@ -446,7 +452,7 @@ export const Chapter1: React.FC = () => {
         </span>{" "}
         rozlegało się głuche dudnienie żołnierskich butów.
       </p>
-      <p data-index="29">
+      <p data-index="29" className="relative">
         {" "}
         Nie upłynęło nawet trzydzieści sekund Nienawiści, a połowa zebranych zaczęła wydawać z siebie niekontrolowane odgłosy gniewu. Zadowolona z siebie owcza twarz na ekranie, w
         połączeniu z przerażającą siłą eurazjatyckiej armii, to było za wiele, ale faktem jest, że sam już widok{" "}
@@ -469,7 +475,7 @@ export const Chapter1: React.FC = () => {
         informacje wędrowały jedynie w formie niejasnych pogłosek. Ani o Bractwie, ani o <strong>książce</strong> żaden zwykły członek Partii nigdy by się z własnej woli nie
         zająknął.
       </p>
-      <p data-index="30">
+      <p data-index="30" className="relative">
         {" "}
         W drugiej minucie zebranych ogarnął szał. Miotali się na swoich miejscach i krzyczeli co sił w płucach, starając się zagłuszyć dobiegające z teleekranu beczenie.{" "}
         <span
@@ -535,7 +541,7 @@ export const Chapter1: React.FC = () => {
         , przy całej swojej samotności i bezbronności, pomimo wątpliwości, czy w ogóle istnieje, nabierał cech mrocznego uwodziciela, samą siłą swojego głosu zdolnego do zburzenia
         porządku, na którym zasadzała się cywilizacja.
       </p>
-      <p data-index="31">
+      <p data-index="31" className="relative">
         {" "}
         Czasem dawało się zmienić kierunek nienawiści aktem woli. Niczym człowiek, któremu śni się koszmar, nagłym, gwałtownym wysiłkiem odrywa głowę od poduszki,{" "}
         <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984/winston-smith-listens.mp4">
@@ -554,7 +560,7 @@ export const Chapter1: React.FC = () => {
         młoda, piękna i aseksualna, bo chciał iść z nią do łóżka, ale wiedział, że to się nigdy nie zdarzy, bo jej słodką, subtelną talię, która zdawała się zapraszać, aby ją
         otoczyć ramieniem, opasywała znienawidzona szkarłatna szarfa, agresywny symbol czystości.
       </p>
-      <p data-index="32">
+      <p data-index="32" className="relative">
         {" "}
         Nienawiść osiągnęła swój szczyt. Głos{" "}
         <span className="character-highlighted" data-character="Emmanuel-Goldstein" data-src-listening="/1984/emmanuel-goldstein-listens.mp4">
@@ -577,11 +583,11 @@ export const Chapter1: React.FC = () => {
         </span>{" "}
         znikła, a zamiast niej pojawiły się, wypisane pogrubionymi wielkimi literami, trzy slogany Partii:
       </p>
-      <blockquote data-index="33">
+      <blockquote data-index="33" className="relative">
         {" "}
         <div> WOJNA TO POKÓJ WOLNOŚĆ TO NIEWOLA IGNORANCJA TO SIŁA </div>
       </blockquote>
-      <p data-index="34">
+      <p data-index="34" className="relative">
         {" "}
         Jeszcze przez kilka sekund twarz{" "}
         <span className="character-highlighted" data-character="Wielki-Brat" data-src-listening="/1984/wielki-brat-listens.mp4">
@@ -598,7 +604,7 @@ export const Chapter1: React.FC = () => {
         opadła na siedzenie stojącego przed nią krzesła. Z drżącym szeptem, w którym dawało się rozpoznać słowa: „Mój zbawca!', wyciągnęła ramiona w stronę ekranu. Następnie ukryła
         twarz w dłoniach. Było jasne, że się modli.
       </p>
-      <p data-index="35">
+      <p data-index="35" className="relative">
         {" "}
         W tym samym momencie wszyscy zebrani zaczęli skandować, niespiesznie, rytmicznie i głośno: „W-B!.. W-B!.. W-B!'. Powtarzali te sylaby wiele razy, powoli, robiąc długą pauzę
         między „Wu' i „Be' — było to głębokie zawodzenie, tak osobliwie dzikie, że w tle niemal słyszało się tupanie gołych stóp i bębnienie tam-tamów. Trwało to może ze
@@ -622,7 +628,7 @@ export const Chapter1: React.FC = () => {
         w pełni utożsamił się z tłumem, przez parę sekund wyraz oczu mógł chyba zdradzać jego prawdziwe uczucia. Właśnie w tym momencie miało miejsce owo niezwykłe zdarzenie — o
         ile rzeczywiście cokolwiek się wydarzyło.
       </p>
-      <p data-index="36">
+      <p data-index="36" className="relative">
         {" "}
         Na mgnienie oka jego wzrok spotkał się ze wzrokiem{" "}
         <span className="character-highlighted" data-character="OBrien" data-src-listening="/1984/obrien-listens.mp4">
@@ -652,7 +658,7 @@ export const Chapter1: React.FC = () => {
         </span>{" "}
         stała się nieprzenikniona jak wszystkie inne twarze.
       </p>
-      <p data-index="37">
+      <p data-index="37" className="relative">
         {" "}
         To wszystko; w dodatku{" "}
         <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984/winston-smith-listens.mp4">
@@ -674,29 +680,32 @@ export const Chapter1: React.FC = () => {
         może dwie, między ich oczami przepływał dwuznaczny komunikat — to wszystko. Jednak nawet to stanowiło doświadczenie godne zapamiętania w ciasnej samotności, w której
         wszystkim przyszło żyć.
       </p>
-      <p data-index="38">
+      <p data-index="38" className="relative">
         {" "}
         <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984/winston-smith-listens.mp4">
           Winston
         </span>{" "}
         wyprostował się na krześle. Beknął. To gin podchodził mu do gardła.
       </p>
-      <p data-index="39">
+      <p data-index="39" className="relative">
         {" "}
         Ponownie skupił wzrok na kartce. Naraz odkrył, że oddając się bezładnym rozmyślaniom, jednocześnie pisał, zupełnie jak automat. I to nie tym samym, przykurczonym pismem co
         wcześniej. Pióro toczyło się zmysłowo po gładkim papierze, rysując duże, staranne, drukowane litery:
       </p>
-      <blockquote data-index="40">
+      <blockquote data-index="40" className="relative">
         {" "}
         <div> PRECZ Z WIELKIM BRATEM PRECZ Z WIELKIM BRATEM PRECZ Z WIELKIM BRATEM PRECZ Z WIELKIM BRATEM PRECZ Z WIELKIM BRATEM </div>
       </blockquote>
-      <p data-index="41"> — i tak dalej, aż zapełnił pół strony.</p>
-      <p data-index="42">
+      <p data-index="41" className="relative">
+        {" "}
+        — i tak dalej, aż zapełnił pół strony.
+      </p>
+      <p data-index="42" className="relative">
         {" "}
         Nie mógł opanować ataku paniki. Absurd, bo napisanie tych konkretnych słów nie stanowiło aktu bardziej niebezpiecznego niż samo otwarcie zeszytu, jednak przez chwilę kusiło
         go, żeby wyrwać zapisane strony i porzucić całe przedsięwzięcie.
       </p>
-      <p data-index="43">
+      <p data-index="43" className="relative">
         {" "}
         Nie zrobił tego jednak, wiedział, że to na nic. Czy będzie dalej pisał: „PRECZ Z{" "}
         <span className="character-highlighted" data-character="Wielki-Brat" data-src-listening="/1984/wielki-brat-listens.mp4">
@@ -706,20 +715,26 @@ export const Chapter1: React.FC = () => {
         dorwie. Popełnił — i popełniłby, nawet gdyby nie dotknął piórem powierzchni papieru — podstawową zbrodnię, zawierającą w sobie wszystkie inne przewinienia. Myślozbrodnię,
         jak to nazywali. Myślozbrodni nie da się ukrywać w nieskończoność. Można skutecznie robić uniki przez pewien czas, całymi latami, w końcu jednak dorwą człowieka.
       </p>
-      <p data-index="44">
+      <p data-index="44" className="relative">
         {" "}
         Odbywało się to w nocy — aresztowania przeprowadzano zawsze w nocy. Nagłe przebudzenie, brutalne szarpnięcie za ramię, oślepiające światło latarki, krąg zaciętych twarzy
         wokół łóżka. W większości przypadków nie było sądu, nie spisywano raportu z aresztowania. Ludzie po prostu znikali, zawsze w nocy. Nazwisko danej osoby usuwano z rejestrów
         i przepadał po niej wszelki ślad; niepowtarzalna egzystencja podlegała zanegowaniu, a następnie zapomnieniu. To było unicestwienie, wymazanie. Albo{" "}
         <strong>ewaporowanie[8]</strong> — jak zwykło się mówić o takich przypadkach.
       </p>
-      <p data-index="45"> Na moment opanowała go trwoga. Zaczął pokrywać kartkę pospiesznym, niestarannym pismem:</p>
-      <blockquote data-index="46">
+      <p data-index="45" className="relative">
+        {" "}
+        Na moment opanowała go trwoga. Zaczął pokrywać kartkę pospiesznym, niestarannym pismem:
+      </p>
+      <blockquote data-index="46" className="relative">
         {" "}
         <p>zastrzelą mnie wszystko mi jedno strzelą w tył głowy wszystko mi jedno precz z wielkim bratem zawsze strzelają w tył głowy wszystko mi jedno precz z wielkim bratem…</p>
       </blockquote>
-      <p data-index="47"> Opadł na oparcie krzesła, trochę zawstydzony, i odłożył pióro. Nagle poderwał się gwałtownie — ktoś pukał do drzwi.</p>
-      <p data-index="48">
+      <p data-index="47" className="relative">
+        {" "}
+        Opadł na oparcie krzesła, trochę zawstydzony, i odłożył pióro. Nagle poderwał się gwałtownie — ktoś pukał do drzwi.
+      </p>
+      <p data-index="48" className="relative">
         {" "}
         Już! Siedział cicho jak mysz, w płonnej nadziei, że ktokolwiek puka, odejdzie po tej jednej próbie. Niestety, pukanie powtórzyło się. Najgorszą strategią byłoby
         przedłużanie tego momentu. Serce waliło mu jak młot, ale na twarzy, w wyniku głębokiego przyzwyczajenia, nie malowały się żadne emocje. Podniósł się i powoli podszedł do

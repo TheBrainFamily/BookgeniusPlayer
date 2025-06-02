@@ -4,6 +4,7 @@ import { bookData as _1984BookData } from "./books/1984BookData";
 import { bookData as PharaonBookData } from "./books/pharaonBookData";
 import { bookData as KrolowaSnieguBookData } from "./books/krolowa-snieguBookData";
 import { bookData as ConradTajnyAgentBookData } from "./books/conrad-tajny-agentBookData";
+import { bookData as _1984EnglishBookData } from "./books/1984-EnglishBookData";
 
 declare const __SELECTED_BOOK_SLUG__: string;
 
@@ -16,6 +17,8 @@ export function getBookData(): BookData {
     return ConradTajnyAgentBookData;
   } else if (__SELECTED_BOOK_SLUG__ === BOOK_SLUGS.Krolowa_Sniegu) {
     return KrolowaSnieguBookData;
+  } else if (__SELECTED_BOOK_SLUG__ === BOOK_SLUGS._1984_English) {
+    return _1984EnglishBookData;
   }
 
   throw new Error(`Unknown book: ${__SELECTED_BOOK_SLUG__}`);
