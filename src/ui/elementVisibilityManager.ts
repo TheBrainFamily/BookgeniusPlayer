@@ -6,16 +6,21 @@
  * - Scroll events (show progress indicator only)
  * - Inactivity timer (hide elements automatically)
  */
-
 export class ElementVisibilityManager {
   private areElementsVisible: boolean = true;
   private inactivityTimer: number | null = null;
   private isInitialized: boolean = false;
   private scrollTimer: number | null = null;
   private isScrollMode: boolean = false;
+  private touchStartY: number = 0;
+  private touchStartX: number = 0;
+  private touchStartTime: number = 0;
+  private isTouchScrolling: boolean = false;
 
   private readonly INACTIVITY_TIMEOUT = 8000;
   private readonly SCROLL_HIDE_DELAY = 3000;
+  private readonly TOUCH_MOVE_THRESHOLD = 15;
+  private readonly TAP_TIME_THRESHOLD = 500;
 
   private applyTransition(elements: NodeListOf<HTMLElement>, duration: string = "0.3s"): void {
     elements.forEach((element) => {
@@ -103,6 +108,41 @@ export class ElementVisibilityManager {
     }, this.INACTIVITY_TIMEOUT);
   }
 
+  private handleTouchStart = (event: TouchEvent): void => {
+    const touch = event.touches[0];
+    this.touchStartY = touch.clientY;
+    this.touchStartX = touch.clientX;
+    this.touchStartTime = Date.now();
+    this.isTouchScrolling = false;
+  };
+
+  private handleTouchMove = (event: TouchEvent): void => {
+    if (this.isTouchScrolling) return;
+
+    const touch = event.touches[0];
+    const deltaY = Math.abs(touch.clientY - this.touchStartY);
+    const deltaX = Math.abs(touch.clientX - this.touchStartX);
+
+    // If the touch has moved beyond the threshold, it's likely a scroll gesture
+    if (deltaY > this.TOUCH_MOVE_THRESHOLD || deltaX > this.TOUCH_MOVE_THRESHOLD) {
+      this.isTouchScrolling = true;
+    }
+  };
+
+  private handleTouchEnd = (event: TouchEvent): void => {
+    const touchDuration = Date.now() - this.touchStartTime;
+
+    // Only treat as a tap if:
+    // 1. It wasn't a scrolling gesture
+    // 2. It was a reasonable duration (not too long, but not instantaneous)
+    // 3. It's not on an interactive element
+    if (!this.isTouchScrolling && touchDuration < this.TAP_TIME_THRESHOLD && touchDuration > 50) {
+      this.handleScreenTap(event);
+    }
+
+    this.isTouchScrolling = false;
+  };
+
   private handleScreenTap = (event: MouseEvent | TouchEvent): void => {
     // Ignore taps on interactive elements
     const target = event.target as HTMLElement;
@@ -110,8 +150,8 @@ export class ElementVisibilityManager {
       target.closest("button") ||
       target.closest("input") ||
       target.closest("a") ||
-      target.closest(".optional-element") ||
-      target.closest(".progress-indicator") ||
+      // target.closest(".optional-element") ||
+      // target.closest(".progress-indicator") ||
       target.closest("[data-interactive]") ||
       target.closest(".modal-overlay") ||
       target.closest(".tooltip")
@@ -169,8 +209,13 @@ export class ElementVisibilityManager {
     this.showAllElements();
     this.resetInactivityTimer();
 
+    // Handle mouse clicks (desktop)
     document.addEventListener("click", this.handleScreenTap, true);
-    document.addEventListener("touchstart", this.handleScreenTap, true);
+
+    // Handle touch events (mobile) with proper gesture detection
+    document.addEventListener("touchstart", this.handleTouchStart, { passive: true });
+    document.addEventListener("touchmove", this.handleTouchMove, { passive: true });
+    document.addEventListener("touchend", this.handleTouchEnd, true);
 
     const contentContainer = document.getElementById("content-container");
     if (contentContainer) {
