@@ -5,6 +5,7 @@ import { CharacterData } from "@/booksData/types";
 import { performLocalDOMSearch, SearchResultItemData } from "@/searchModal";
 import { useLocation } from "@/state/LocationContext";
 import { getBookData } from "@/booksData/getBookData";
+import { useTranslation } from "react-i18next";
 
 interface CharacterModalProps {
   onClose: () => void;
@@ -30,6 +31,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   }
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
 
   // Search for character appearances in the text up to the current location
   useEffect(() => {
@@ -75,10 +77,10 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
           {characterAppearances.length > 0 && (
             <div className="mt-4">
-              <h5 className="text-md font-semibold text-white mb-3 text-center">Wystąpienia postaci w tekście</h5>
+              <h5 className="text-md font-semibold text-white mb-3 text-center">{t("appearances")}</h5>
               {isLoading ? (
                 <div className="flex items-center justify-center py-4">
-                  <div className="text-gray-300">Szukanie wystąpień...</div>
+                  <div className="text-gray-300">{t("searching_appearances")}</div>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -86,7 +88,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                     <div key={appearance.id} className="p-3 rounded-lg bg-black/20 border border-white/20 hover:bg-black/40 transition-colors cursor-pointer">
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-xs font-medium text-blue-300">
-                          Rozdział {appearance.chapter}, Paragraf {appearance.paragraphNumber}
+                          {t("chapter")} {appearance.chapter}, {t("paragraph")} {appearance.paragraphNumber}
                         </span>
                       </div>
                       <p className="text-sm text-gray-300 leading-relaxed">{appearance.text}</p>

@@ -73,47 +73,50 @@
     </div>
 
     <script>
-      const loadingPhrases = [
-        "Kreowanie wirtualnej biblioteki...",
-        "Przywoływanie fikcyjnych postaci...",
-        "Warzenie literackich eliksirów...",
-        "Odkurzanie starożytnych ksiąg...",
-        "Stawianie ostatnich kropek...",
-        "Przewracanie cyfrowych stron...",
-        "Łączenie wyobraźni z rzeczywistością...",
-        "Odszyfrowywanie intencji autora...",
-        "Układanie słów w idealnym porządku...",
-        "Uwalnianie narracyjnej magii...",
-        "Otwieranie bram do świata książek...",
-        "Rozpalanie ognia wyobraźni...",
-        "Szlifowanie literackich klejnotów...",
-        "Nanoszenie ostatnich poprawek...",
-        "Splatanie wątków opowieści...",
-        "Przebudzanie uśpionych bohaterów...",
-      ];
-
       class SplashScreenManager {
         constructor() {
           this.currentPhrase = "";
           this.phraseInterval = null;
           this.previousPhrases = new Set();
           this.isExiting = false;
-          this.setupPhraseCycle();
+          this.loadingPhrases = [];
+          this.setupDynamicContent();
           this.setupEventListeners();
         }
 
+        async setupDynamicContent() {
+          await new Promise(resolve => {
+            const checkReady = () => {
+              if (window.i18n && window.i18n.isInitialized) {
+                resolve();
+              } else {
+                setTimeout(checkReady, 100);
+              }
+            }
+            checkReady();
+          });
+
+          const t = window.i18n.t;
+          document.querySelector('.splash-title').textContent = t('splash_title');
+          document.querySelector('.splash-subtitle').textContent = t('splash_subtitle');
+          document.querySelector('.splash-start-button span').textContent = t('start_button');
+          this.loadingPhrases = t('loading_phrases', { returnObjects: true }) || [];
+          this.setupPhraseCycle();
+        }
+
         getRandomPhrase() {
-          if (this.previousPhrases.size > loadingPhrases.length - 5) {
+          if (this.loadingPhrases.length === 0) return "";
+          if (this.previousPhrases.size > this.loadingPhrases.length - 5 && this.loadingPhrases.length >= 5) {
             this.previousPhrases.clear();
           }
           let phrase;
           let attempts = 0;
           const maxAttempts = 10;
           do {
-            const randomIndex = Math.floor(Math.random() * loadingPhrases.length);
-            phrase = loadingPhrases[randomIndex];
+            const randomIndex = Math.floor(Math.random() * this.loadingPhrases.length);
+            phrase = this.loadingPhrases[randomIndex];
             attempts++;
-          } while (this.previousPhrases.has(phrase) && attempts < maxAttempts && loadingPhrases.length > 1);
+          } while (this.previousPhrases.has(phrase) && attempts < maxAttempts && this.loadingPhrases.length > 1);
           this.previousPhrases.add(phrase);
           return phrase;
         }

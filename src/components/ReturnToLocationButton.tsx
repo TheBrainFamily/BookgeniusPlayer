@@ -6,11 +6,13 @@ import { shouldShowReturnButton, systemNavigateTo, getSavedLocation } from "@/he
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLocation } from "@/state/LocationContext";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useTranslation } from "react-i18next";
 
 const ReturnToLocationButton = () => {
   const [isVisible, setIsVisible] = useState(false);
   const { location } = useLocation();
   const { currentChapter, currentParagraph } = useDebounce(location, 300);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setIsVisible(shouldShowReturnButton());
@@ -40,10 +42,10 @@ const ReturnToLocationButton = () => {
                 variants={buttonVariants}
               >
                 <UndoDot className="w-4 h-4" />
-                Wróć
+                {t("go_back")}
               </motion.button>
             </TooltipTrigger>
-            <TooltipContent>Powrót do ostatniego miejsca czytania</TooltipContent>
+            <TooltipContent>{t("return_to_last_reading_location")}</TooltipContent>
           </Tooltip>
         </div>
       )}
