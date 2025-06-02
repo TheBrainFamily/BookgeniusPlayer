@@ -75,7 +75,7 @@ const BookChapterRendererComponent = () => {
           }}
         />
       ))}
-      <div style={{ height: "50vh" }} /> {/* Spacer */}
+      <div style={{ height: "70vh" }} /> {/* Spacer */}
     </section>,
     containerElement,
   );
