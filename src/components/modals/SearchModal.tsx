@@ -27,9 +27,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
 
       // Update location with 'system' source to trigger scrolling
       systemNavigateTo({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber });
-
-      // Close the modal
-      onClose();
     },
     [onClose, setLocation],
   );
@@ -62,7 +59,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                     onClick={() => handleSearchResultClick(item)}
                   >
                     <div className="search-result-page font-semibold text-blue-600 dark:text-blue-400">
-                      Chapter {item.chapter}, Paragraph {item.paragraphNumber}
+                      Rozdział {item.chapter}, Paragraf {item.paragraphNumber}
                     </div>
                     {item.summary && <div className="search-result-summary text-xs italic text-gray-500 dark:text-gray-400 mt-1">{item.summary}</div>}
                     <div className="search-result-content text-sm text-gray-800 dark:text-gray-200 mt-1">{item.text}</div>
