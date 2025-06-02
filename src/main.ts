@@ -11,6 +11,7 @@ import { initializeNoteLinkBlinking } from "./annotationsHandling";
 import { dealWithSW } from "./serviceWorker";
 import { setupParagraphHighlighting } from "./ui/paragraphHighlighting";
 import { initPage } from "./ui/pageInit";
+import { initializeElementVisibilityManager } from "./ui/elementVisibilityManager";
 
 /* ------------------------------------------------------------------ */
 /*  The only exported symbol                                           */
@@ -37,66 +38,14 @@ export async function runLegacyInit() {
    * ---------------------------------------------------------------- */
   function onDOMLoaded() {
     initializeNoteLinkBlinking(); // <-- kept here for safety;
-    //     also wrapped in a React hook upstream
-
-    document.querySelectorAll(".modal-close").forEach((button) => {
-      const modal = button.closest(".modal-overlay");
-      if (modal) button.addEventListener("click", () => modal.classList.remove("active"));
-    });
     setupParagraphHighlighting();
 
-    // Setup optional elements hiding on user inactivity
-    let inactivityTimer: number | null = null;
-    const INACTIVITY_TIMEOUT = 5000; // 10 seconds
+    // Initialize element visibility manager only after splash is hidden
+    function initElementVisibilityAfterSplash() {
+      initializeElementVisibilityManager();
+    }
 
-    const hideOptionalElements = () => {
-      const optionalElements = document.querySelectorAll(".optional-element") as NodeListOf<HTMLElement>;
-      optionalElements.forEach((element) => {
-        element.style.transition = "opacity 8s ease-in";
-        element.style.opacity = "0";
-        element.style.pointerEvents = "none";
-      });
-
-      // Also hide the progress indicator
-      const progressIndicator = document.querySelector(".progress-indicator") as HTMLElement;
-      if (progressIndicator) {
-        progressIndicator.style.transition = "opacity 8s ease-in";
-        progressIndicator.style.opacity = "0";
-        progressIndicator.style.pointerEvents = "none";
-      }
-    };
-
-    const showOptionalElements = () => {
-      const optionalElements = document.querySelectorAll(".optional-element[style*='opacity: 0']") as NodeListOf<HTMLElement>;
-      optionalElements.forEach((element) => {
-        element.style.transition = "opacity 1s ease-out";
-        element.style.opacity = "1";
-        element.style.pointerEvents = "auto";
-      });
-
-      // Also show the progress indicator
-      const progressIndicator = document.querySelector(".progress-indicator") as HTMLElement;
-      if (progressIndicator && progressIndicator.style.opacity === "0") {
-        progressIndicator.style.transition = "opacity 1s ease-out";
-        progressIndicator.style.opacity = "1";
-        progressIndicator.style.pointerEvents = "auto";
-      }
-    };
-
-    const resetInactivityTimer = () => {
-      if (inactivityTimer) {
-        clearTimeout(inactivityTimer);
-      }
-      showOptionalElements();
-      inactivityTimer = window.setTimeout(hideOptionalElements, INACTIVITY_TIMEOUT);
-    };
-
-    // Start the timer initially
-    inactivityTimer = window.setTimeout(hideOptionalElements, INACTIVITY_TIMEOUT);
-
-    // Reset timer on pointer down and keypress
-    document.addEventListener("pointerdown", resetInactivityTimer);
-    document.addEventListener("keypress", resetInactivityTimer);
+    window.addEventListener("splashHidden", initElementVisibilityAfterSplash);
   }
 
   if (document.readyState === "loading") {
