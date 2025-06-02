@@ -14,7 +14,7 @@ export const _1984EnglishCharactersData = [
         chapter: 2,
         summary: "The main protagonist, a 39-year-old man working at the Ministry of Truth. He suffers from a varicose ulcer above his right ankle. He lives in Victory Mansions.",
         paragraphsWhereSpotted: [4, 6, 8, 10, 11, 13, 15, 17, 18, 22, 23],
-        paragraphsWhereTalking: [],
+        paragraphsWhereTalking: [11],
       },
       {
         chapter: 3,
@@ -120,7 +120,7 @@ export const _1984EnglishCharactersData = [
         chapter: 2,
         summary: "Winston's neighbor from Victory Mansions. She is about thirty but looks older. She is Tom Parsons' wife and the mother of two children.",
         paragraphsWhereSpotted: [4, 5, 7, 8, 12, 13, 18, 22],
-        paragraphsWhereTalking: [],
+        paragraphsWhereTalking: [3, 5, 7, 9, 12, 19],
       },
     ],
     imageUrl: "UNKNOWN",
@@ -140,7 +140,21 @@ export const _1984EnglishCharactersData = [
     ],
     imageUrl: "UNKNOWN",
   },
-  { slug: "The-Parsons-children", characterName: "The Parsons children", bookSlug: "1984-English", infoPerChapter: [], imageUrl: "UNKNOWN" },
+  {
+    slug: "The-Parsons-children",
+    characterName: "The Parsons children",
+    bookSlug: "1984-English",
+    infoPerChapter: [
+      {
+        chapter: 2,
+        summary:
+          "Mr. and Mrs. Parsons' son (9 years old) and daughter (around 7 years old). Members of the Spies organization, dressed in uniforms. They are noisy and aggressive in their play, showing fanatical devotion to the Party.",
+        paragraphsWhereSpotted: [7],
+        paragraphsWhereTalking: [14, 16, 20, 21, 23],
+      },
+    ],
+    imageUrl: "UNKNOWN",
+  },
   { slug: "Winstons-mother", characterName: "Winston's mother", bookSlug: "1984-English", infoPerChapter: [], imageUrl: "UNKNOWN" },
   { slug: "Winstons-sister", characterName: "Winston's sister", bookSlug: "1984-English", infoPerChapter: [], imageUrl: "UNKNOWN" },
   { slug: "Winstons-father", characterName: "Winston's father", bookSlug: "1984-English", infoPerChapter: [], imageUrl: "UNKNOWN" },

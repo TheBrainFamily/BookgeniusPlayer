@@ -63,7 +63,7 @@ export const xmlToReactChapters = async (xmlString: string, bookSlug: BOOK_SLUGS
 
     const formattedCode = await prettier.format(generateChapterComponent(chapter, chapterId, characterMap, bookSlug), { parser: "typescript" });
 
-    // console.log(formattedCode);
+    console.log(formattedCode);
     const outPath = path.join(outputDir, `Chapter${chapterId}.tsx`);
     if (!fs.existsSync(outPath)) {
       fs.writeFileSync(outPath, "", "utf-8");

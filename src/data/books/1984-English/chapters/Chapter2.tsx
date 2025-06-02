@@ -23,6 +23,7 @@ export const Chapter2: React.FC = () => {
       </p>
       <p data-index="3" className="relative">
         {" "}
+        <span className="character-placeholder character-talking" data-character="Mrs-Parsons" data-src-talking="/1984-English/mrs-parsons-speaks.mp4" data-is-talking="true" />
         'Oh, comrade,' she began in a dreary, whining sort of voice, 'I thought I heard you come in. Do you think you could come across and have a look at our kitchen sink? It's
         got blocked up and——'
       </p>
@@ -44,6 +45,7 @@ export const Chapter2: React.FC = () => {
       </p>
       <p data-index="5" className="relative">
         {" "}
+        <span className="character-placeholder character-talking" data-character="Mrs-Parsons" data-src-talking="/1984-English/mrs-parsons-speaks.mp4" data-is-talking="true" />
         'Of course it's only because{" "}
         <span className="character-highlighted" data-character="Tom-Parsons" data-src-listening="/1984-English/tom-parsons-listens.mp4">
           Tom
@@ -72,7 +74,12 @@ export const Chapter2: React.FC = () => {
       </p>
       <p data-index="7" className="relative">
         {" "}
-        'It's the children,' said{" "}
+        <span className="character-placeholder character-talking" data-character="Mrs-Parsons" data-src-talking="/1984-English/mrs-parsons-speaks.mp4" data-is-talking="true" />
+        'It's{" "}
+        <span className="character-highlighted" data-character="The-Parsons-children" data-src-listening="/1984-English/the-parsons-children.png">
+          the children
+        </span>
+        ,' said{" "}
         <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons-listens.mp4">
           Mrs Parsons
         </span>
@@ -92,6 +99,7 @@ export const Chapter2: React.FC = () => {
       </p>
       <p data-index="9" className="relative">
         {" "}
+        <span className="character-placeholder character-talking" data-character="Mrs-Parsons" data-src-talking="/1984-English/mrs-parsons-speaks.mp4" data-is-talking="true" />
         'Of course if{" "}
         <span className="character-highlighted" data-character="Tom-Parsons" data-src-listening="/1984-English/tom-parsons-listens.mp4">
           Tom
@@ -121,6 +129,7 @@ export const Chapter2: React.FC = () => {
       </p>
       <p data-index="11" className="relative">
         {" "}
+        <span className="character-placeholder character-talking" data-character="Winston-Smith" data-src-talking="/1984-English/winston-smith-speaks.mp4" data-is-talking="true" />
         'Have you got a spanner?' said{" "}
         <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984-English/winston-smith-listens.mp4">
           Winston
@@ -129,6 +138,7 @@ export const Chapter2: React.FC = () => {
       </p>
       <p data-index="12" className="relative">
         {" "}
+        <span className="character-placeholder character-talking" data-character="Mrs-Parsons" data-src-talking="/1984-English/mrs-parsons-speaks.mp4" data-is-talking="true" />
         'A spanner,' said{" "}
         <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons-listens.mp4">
           Mrs Parsons
@@ -150,6 +160,12 @@ export const Chapter2: React.FC = () => {
       </p>
       <p data-index="14" className="relative">
         {" "}
+        <span
+          className="character-placeholder character-talking"
+          data-character="The-Parsons-children"
+          data-src-talking="/1984-English/the-parsons-children.png"
+          data-is-talking="true"
+        />
         'Up with your hands!' yelled a savage voice.
       </p>
       <p data-index="15" className="relative">
@@ -163,6 +179,12 @@ export const Chapter2: React.FC = () => {
       </p>
       <p data-index="16" className="relative">
         {" "}
+        <span
+          className="character-placeholder character-talking"
+          data-character="The-Parsons-children"
+          data-src-talking="/1984-English/the-parsons-children.png"
+          data-is-talking="true"
+        />
         'You're a traitor!' yelled the boy. 'You're a thought-criminal! You're a Eurasian spy! I'll shoot you, I'll vaporize you, I'll send you to the salt mines!'
       </p>
       <p data-index="17" className="relative">
@@ -192,6 +214,7 @@ export const Chapter2: React.FC = () => {
       </p>
       <p data-index="19" className="relative">
         {" "}
+        <span className="character-placeholder character-talking" data-character="Mrs-Parsons" data-src-talking="/1984-English/mrs-parsons-speaks.mp4" data-is-talking="true" />
         'They do get so noisy,' she said. 'They're disappointed because they couldn't go to see the hanging, that's what it is. I'm too busy to take them. and{" "}
         <span className="character-highlighted" data-character="Tom-Parsons" data-src-listening="/1984-English/tom-parsons-listens.mp4">
           Tom
@@ -200,10 +223,22 @@ export const Chapter2: React.FC = () => {
       </p>
       <p data-index="20" className="relative">
         {" "}
+        <span
+          className="character-placeholder character-talking"
+          data-character="The-Parsons-children"
+          data-src-talking="/1984-English/the-parsons-children.png"
+          data-is-talking="true"
+        />
         'Why can't we go and see the hanging?' roared the boy in his huge voice.
       </p>
       <p data-index="21" className="relative">
         {" "}
+        <span
+          className="character-placeholder character-talking"
+          data-character="The-Parsons-children"
+          data-src-talking="/1984-English/the-parsons-children.png"
+          data-is-talking="true"
+        />
         'Want to see the hanging! Want to see the hanging!' chanted the little girl, still capering round.
       </p>
       <p data-index="22" className="relative">
@@ -225,6 +260,12 @@ export const Chapter2: React.FC = () => {
       </p>
       <p data-index="23" className="relative">
         {" "}
+        <span
+          className="character-placeholder character-talking"
+          data-character="The-Parsons-children"
+          data-src-talking="/1984-English/the-parsons-children.png"
+          data-is-talking="true"
+        />
         '
         <span className="character-highlighted" data-character="Emmanuel-Goldstein" data-src-listening="/1984-English/emmanuel-goldstein-listens.mp4">
           Goldstein
