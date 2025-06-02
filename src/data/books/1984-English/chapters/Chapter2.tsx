@@ -29,7 +29,7 @@ export const Chapter2: React.FC = () => {
       <p data-index="4" className="relative">
         {" "}
         It was{" "}
-        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons.png">
+        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons-listens.mp4">
           Mrs Parsons
         </span>
         , the wife of a neighbour on the same floor. ('Mrs' was a word somewhat discountenanced by the Party—you were supposed to call everyone 'comrade'—but with some women one
@@ -49,7 +49,7 @@ export const Chapter2: React.FC = () => {
           Tom
         </span>{" "}
         isn't home,' said{" "}
-        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons.png">
+        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons-listens.mp4">
           Mrs Parsons
         </span>{" "}
         vaguely.
@@ -73,7 +73,7 @@ export const Chapter2: React.FC = () => {
       <p data-index="7" className="relative">
         {" "}
         'It's the children,' said{" "}
-        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons.png">
+        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons-listens.mp4">
           Mrs Parsons
         </span>
         , casting a half-apprehensive glance at the door. 'They haven't been out today. And of course——'
@@ -85,7 +85,7 @@ export const Chapter2: React.FC = () => {
           Winston
         </span>{" "}
         knelt down and examined the angle-joint of the pipe. He hated using his hands, and he hated bending down, which was always liable to start him coughing.{" "}
-        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons.png">
+        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons-listens.mp4">
           Mrs Parsons
         </span>{" "}
         looked on helplessly.
@@ -130,7 +130,7 @@ export const Chapter2: React.FC = () => {
       <p data-index="12" className="relative">
         {" "}
         'A spanner,' said{" "}
-        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons.png">
+        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons-listens.mp4">
           Mrs Parsons
         </span>
         , immediately becoming invertebrate. 'I don't know, I'm sure. Perhaps the children——'
@@ -138,7 +138,7 @@ export const Chapter2: React.FC = () => {
       <p data-index="13" className="relative">
         {" "}
         There was a trampling of boots and another blast on the comb as the children charged into the living-room.{" "}
-        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons.png">
+        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons-listens.mp4">
           Mrs Parsons
         </span>{" "}
         brought the spanner.{" "}
@@ -181,7 +181,7 @@ export const Chapter2: React.FC = () => {
       </p>
       <p data-index="18" className="relative">
         {" "}
-        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons.png">
+        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons-listens.mp4">
           Mrs Parsons'
         </span>{" "}
         eyes flitted nervously from{" "}
@@ -213,12 +213,12 @@ export const Chapter2: React.FC = () => {
           Winston
         </span>{" "}
         remembered. This happened about once a month, and was a popular spectacle. Children always clamoured to be taken to see it. He took his leave of{" "}
-        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons.png">
+        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons-listens.mp4">
           Mrs Parsons
         </span>{" "}
         and made for the door. But he had not gone six steps down the passage when something hit the back of his neck an agonizingly painful blow. It was as though a red-hot wire
         had been jabbed into him. He spun round just in time to see{" "}
-        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons.png">
+        <span className="character-highlighted" data-character="Mrs-Parsons" data-src-listening="/1984-English/mrs-parsons-listens.mp4">
           Mrs Parsons
         </span>{" "}
         dragging her son back into the doorway while the boy pocketed a catapult.

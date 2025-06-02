@@ -59,8 +59,6 @@ export const xmlToReactChapters = async (xmlString: string, bookSlug: BOOK_SLUGS
       chapterTitle = titleElements[0].textContent || "";
     }
 
-    console.log("62: chapterTitle BANG!", chapterTitle);
-
     chapterMetadata.push({ id: chapterId, title: chapterTitle });
 
     const formattedCode = await prettier.format(generateChapterComponent(chapter, chapterId, characterMap, bookSlug), { parser: "typescript" });

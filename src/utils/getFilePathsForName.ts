@@ -169,7 +169,7 @@ export const knownPharaon = [
   "mlody-kaplan-poslannik-samentu-speaks.mp4",
 ];
 
-const known1984 = [
+const known1984English = [
   "aaronson-listens.mp4",
   "ampleforth-listens.mp4",
   "ampleforth-speaks.mp4",
@@ -195,6 +195,36 @@ const known1984 = [
   "tom-parsons-listens.mp4",
   "tom-parsons-speaks.mp4",
   "big-brother-listens.mp4",
+  "winston-smith-listens.mp4",
+  "winston-smith-speaks.mp4",
+];
+
+const known1984 = [
+  "aaronson-listens.mp4",
+  "ampleforth-listens.mp4",
+  "ampleforth-speaks.mp4",
+  "dziewczyna-z-ciemnymi-wlosami-julia-listens.mp4",
+  "dziewczyna-z-ciemnymi-wlosami-julia-speaks.mp4",
+  "emmanuel-goldstein-listens.mp4",
+  "jones-listens.mp4",
+  "katharine-listens.mp4",
+  "matka-winstona-listens.mp4",
+  "obrien-listens.mp4",
+  "obrien-speaks.mp4",
+  "ojciec-winstona-listens.mp4",
+  "pan-charrington-listens.mp4",
+  "pan-charrington-speaks.mp4",
+  "pani-parsons-listens.mp4",
+  "pani-parsons-speaks.mp4",
+  "rutheford_listens.mp4",
+  "sasiadka-winstona-z-pracy-drobna-kobieta-o-wlosach-w-kolorze-piasku-listens.mp4",
+  "sasiadka-winstona-z-pracy-drobna-kobieta-o-wlosach-w-kolorze-piasku-speaks.mp4",
+  "siostra-winstona-listens.mp4",
+  "tillotson-listens.mp4",
+  "tillotson-speaks.mp4",
+  "tom-parsons-listens.mp4",
+  "tom-parsons-speaks.mp4",
+  "wielki-brat-listens.mp4",
   "winston-smith-listens.mp4",
   "winston-smith-speaks.mp4",
 ];
@@ -312,7 +342,7 @@ const knownConradTajnyAgent = [
   "winnie-verloc-speaks.mp4",
 ];
 
-const known = [...knownPharaon, ...known1984, ...knownKrolowaSniegu, ...knownConradTajnyAgent];
+const known = [...knownPharaon, ...known1984, ...knownKrolowaSniegu, ...knownConradTajnyAgent, ...known1984English];
 export const getPictureFileNameForName = (name: string) => {
   return `${name.replace(/[\s()\\']+/g, "-").toLowerCase()}.png`;
 };
