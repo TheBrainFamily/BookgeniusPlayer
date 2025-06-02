@@ -10,7 +10,7 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    lng: viteLang,
+    lng: viteLang.toLowerCase(),
     fallbackLng: "en",
     debug: true,
     interpolation: {
