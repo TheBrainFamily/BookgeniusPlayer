@@ -7,7 +7,7 @@ export const _1984EnglishCharactersData = [
       {
         chapter: 1,
         summary: "The main protagonist, a 39-year-old man working at the Ministry of Truth. He suffers from a varicose ulcer above his right ankle. He lives in Victory Mansions.",
-        paragraphsWhereSpotted: [1, 2, 3, 4, 5, 6, 7, 12, 13, 15, 17, 19, 21, 22, 24, 26, 27, 30, 32, 33, 39, 40, 42],
+        paragraphsWhereSpotted: [1, 2, 3, 4, 5, 6, 7, 12, 13, 15, 17, 24, 26, 27, 30, 32, 33, 39, 40, 42],
         paragraphsWhereTalking: [],
       },
       {

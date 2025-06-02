@@ -198,12 +198,9 @@ export const Chapter1: React.FC = () => {
       </p>
       <p data-index="19" className="relative">
         {" "}
-        <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984-English/winston-smith-listens.mp4">
-          Winston
-        </span>{" "}
-        sat back. A sense of complete helplessness had descended upon him. To begin with, he did not know with any certainty that this was 1984. It must be round about that date,
-        since he was fairly sure that his age was thirty-nine, and he believed that he had been born in 1944 or 1945; but it was never possible nowadays to pin down any date within
-        a year or two.
+        He sat back. A sense of complete helplessness had descended upon him. To begin with, he did not know with any certainty that this was 1984. It must be round about that
+        date, since he was fairly sure that his age was thirty-nine, and he believed that he had been born in 1944 or 1945; but it was never possible nowadays to pin down any date
+        within a year or two.
       </p>
       <p data-index="20" className="relative">
         {" "}
@@ -214,25 +211,17 @@ export const Chapter1: React.FC = () => {
       </p>
       <p data-index="21" className="relative">
         {" "}
-        For some time{" "}
-        <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984-English/winston-smith-listens.mp4">
-          Winston
-        </span>{" "}
-        sat gazing stupidly at the paper. The telescreen had changed over to strident military music. It was curious that he seemed not merely to have lost the power of expressing
-        himself, but even to have forgotten what it was that he had originally intended to say. For weeks past he had been making ready for this moment, and it had never crossed
-        his mind that anything would be needed except courage. The actual writing would be easy. All he had to do was to transfer to paper the interminable restless monologue that
-        had been running inside his head, literally for years. At this moment, however, even the monologue had dried up. Moreover his varicose ulcer had begun itching unbearably.
-        He dared not scratch it, because if he did so it always became inflamed. The seconds were ticking by. He was conscious of nothing except the blankness of the page in front
-        of him, the itching of the skin above his ankle, the blaring of the music, and a slight booziness caused by the gin.
+        For some time he sat gazing stupidly at the paper. The telescreen had changed over to strident military music. It was curious that he seemed not merely to have lost the
+        power of expressing himself, but even to have forgotten what it was that he had originally intended to say. For weeks past he had been making ready for this moment, and it
+        had never crossed his mind that anything would be needed except courage. The actual writing would be easy. All he had to do was to transfer to paper the interminable
+        restless monologue that had been running inside his head, literally for years. At this moment, however, even the monologue had dried up. Moreover his varicose ulcer had
+        begun itching unbearably. He dared not scratch it, because if he did so it always became inflamed. The seconds were ticking by. He was conscious of nothing except the
+        blankness of the page in front of him, the itching of the skin above his ankle, the blaring of the music, and a slight booziness caused by the gin.
       </p>
       <p data-index="22" className="relative">
         {" "}
-        Suddenly{" "}
-        <span className="character-highlighted" data-character="Winston-Smith" data-src-listening="/1984-English/winston-smith-listens.mp4">
-          Winston
-        </span>{" "}
-        began writing in sheer panic, only imperfectly aware of what he was setting down. His small but childish handwriting straggled up and down the page, shedding first its
-        capital letters and finally even its full stops:
+        Suddenly he began writing in sheer panic, only imperfectly aware of what he was setting down. His small but childish handwriting straggled up and down the page, shedding
+        first its capital letters and finally even its full stops:
       </p>
       <p data-index="23" className="relative">
         {" "}
