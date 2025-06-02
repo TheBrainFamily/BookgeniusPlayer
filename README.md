@@ -26,10 +26,11 @@ pnpm install
 pnpm dev
 
 # Run with specific book
-VITE_BOOK=1984 pnpm dev
-VITE_BOOK=Pharaon pnpm dev
-VITE_BOOK=Conrad-Tajny-Agent pnpm dev
-VITE_BOOK=Krolowa-Sniegu pnpm dev
+VITE_BOOK=1984 VITE_LANG=EN pnpm dev        # English version
+VITE_BOOK=1984 pnpm dev                     # Polish version
+VITE_BOOK=Pharaon pnpm dev                  # Polish version
+VITE_BOOK=Conrad-Tajny-Agent pnpm dev       # Polish version
+VITE_BOOK=Krolowa-Sniegu pnpm dev           # Polish version
 ```
 
 ### Editor Mode (Development)
