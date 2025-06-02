@@ -18,7 +18,7 @@ BookGenius is an innovative multi-book interactive reading platform that transfo
 
 ### Running the Application
 
-````bash
+```bash
 # Install dependencies
 pnpm install
 
@@ -27,10 +27,11 @@ pnpm dev
 
 # Run with specific book
 VITE_BOOK=1984 VITE_LANG=EN pnpm dev        # English version
-VITE_BOOK=1984 pnpm dev        # Polish version
-VITE_BOOK=Pharaon pnpm dev     # Polish version
-VITE_BOOK=Conrad-Tajny-Agent pnpm dev  # Polish version
-VITE_BOOK=Krolowa-Sniegu pnpm dev      # Polish version
+VITE_BOOK=1984 pnpm dev                     # Polish version
+VITE_BOOK=Pharaon pnpm dev                  # Polish version
+VITE_BOOK=Conrad-Tajny-Agent pnpm dev       # Polish version
+VITE_BOOK=Krolowa-Sniegu pnpm dev           # Polish version
+```
 
 ### Editor Mode (Development)
 
@@ -42,7 +43,7 @@ VITE_BOOK=Krolowa-Sniegu VITE_EDITOR=true pnpm dev
 
 # Run text editor service (separate terminal)
 tsx src/text-editor-service/server.ts
-````
+```
 
 **Requirements for Editor Mode:**
 
