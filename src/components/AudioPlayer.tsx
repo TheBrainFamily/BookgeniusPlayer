@@ -330,11 +330,15 @@ const AudioPlayer = () => {
             }}
           >
             <motion.button
-              onTouchEnd={() => {
+              onTouchEnd={(e) => {
+                e.preventDefault(); // Prevent mouse events from firing
                 setIsVolumeOpen(!isVolumeOpen);
               }}
-              onMouseUp={() => {
-                toggleMute();
+              onMouseUp={(e) => {
+                // Only handle mouse events if no touch capability or if it's actually a mouse click
+                if (!("ontouchstart" in window) || e.detail > 0) {
+                  toggleMute();
+                }
               }}
               className="p-2 my-1 hover:text-white rounded-full cursor-pointer"
               whileHover="hover"
