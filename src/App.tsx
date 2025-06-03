@@ -24,9 +24,11 @@ import { initAudioContext } from "./audio-crossfader";
 import CharacterNotesPanel from "./components/CharacterNotesPanel";
 import { ModalRenderers } from "./features/ModalRenderers";
 import { useBookContent } from "@/hooks/useBookContent";
+import { useElementVisibility } from "./hooks/useElementVisibility";
 
 function Shell() {
   useBookContent("content-container");
+  useElementVisibility();
 
   /* dynamic visual hooks */
   useCutScene();

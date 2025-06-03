@@ -68,7 +68,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
   return (
     <div
       ref={cardRef}
-      className={cn("w-[85%] max-w-[250px] mx-auto relative pb-4")}
+      className={cn("w-[85%] max-w-[225px] mx-auto relative pb-4")}
       data-canonical-name={entity.slug}
       data-appearances={JSON.stringify(apps)}
       onMouseEnter={() => requestToggle(true)}

@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import { List, Type, RotateCcw, Music, BrainCircuit } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import useLocalStorageState from "use-local-storage-state";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
-import useLocalStorageState from "use-local-storage-state";
 import { cn } from "@/lib/utils";
 import ModalUI from "./ModalUI";
-import { useTranslation } from "react-i18next";
 
 interface BookMenuModalProps {
   onClose: () => void;

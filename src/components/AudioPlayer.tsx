@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Play, Pause, SkipForward, SkipBack, ListMusic, BookHeadphones, Volume2, VolumeX, Download } from "lucide-react";
 import { motion, AnimatePresence, Variants, Transition } from "motion/react";
 import useLocalStorageState from "use-local-storage-state";
+import { useTranslation } from "react-i18next";
 
 import {
   getMasterVolume,
@@ -29,10 +30,14 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { cn } from "@/lib/utils";
 import { CURRENT_BOOK } from "@/consts";
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
-import { useTranslation } from "react-i18next";
+import { OptionalElement } from "./OptionalElement";
 
 const AudioPlayer = () => {
   const isMobileOrTablet = useIsMobileOrTablet();
+  const { t } = useTranslation();
+
+  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const INACTIVITY_TIMEOUT = 5000;
 
   const [isPlayingAudioBook, setIsPlayingAudiobook] = useLocalStorageState("isPlayingAudioBook", { defaultValue: true });
   const [volume, setVolume] = useLocalStorageState("volume", { defaultValue: getMasterVolume() ?? 0.5 });
@@ -45,11 +50,10 @@ const AudioPlayer = () => {
   const [isBigPlayerOpen, setIsBigPlayerOpen] = useState(false);
   const [currentTrackData, setCurrentTrackData] = useState<TrackState | null>(null);
   const [showSongNotification, setShowSongNotification] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(undefined);
+  const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
   const [playlistTracks, setPlaylistTracks] = useState<{ id: string; title: string; duration: number }[]>([]);
   const [currentTrackIdFromState, setCurrentTrackIdFromState] = useState<string | null>(null);
   const isAudiobookAvailable = true;
-  const { t } = useTranslation();
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -78,22 +82,33 @@ const AudioPlayer = () => {
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
-  useEffect(() => {
-    // Update the current time periodically based on the actual playback position
-    if (!isPlaying) return;
+  const startInactivityTimer = useCallback(() => {
+    return;
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+      inactivityTimerRef.current = null;
+    }
 
-    // Create a timer that updates the current time every 250ms
+    inactivityTimerRef.current = setTimeout(() => {
+      if (isVolumeOpen) setIsVolumeOpen(false);
+      if (isBigPlayerOpen) setIsBigPlayerOpen(false);
+    }, INACTIVITY_TIMEOUT);
+  }, [isVolumeOpen, isBigPlayerOpen, INACTIVITY_TIMEOUT]);
+
+  useEffect(() => {
+    if (!isPlaying || !isBigPlayerOpen) return;
+
     const timer = setInterval(() => {
       const position = getCurrentTrackPosition();
       if (position !== null) {
         setCurrentTime(position);
       }
-    }, 250);
+    }, 1000);
 
     return () => {
       clearInterval(timer);
     };
-  }, [isPlaying]);
+  }, [isPlaying, isBigPlayerOpen]);
 
   useEffect(() => {
     const updatePlaylist = async () => {
@@ -132,6 +147,30 @@ const AudioPlayer = () => {
   }, [currentTrackData]);
 
   useEffect(() => {
+    const setInitialWindowWidth = () => {
+      setWindowWidth(window?.innerWidth || 1920);
+    };
+    setInitialWindowWidth();
+
+    const initializeTrackState = () => {
+      setCurrentTrackIdFromState(getCurrentTrackId());
+
+      const initialTrack = getCurrentTrackData();
+      if (initialTrack) {
+        setCurrentTrackData(initialTrack);
+        setShowSongNotification(true);
+
+        // Hide initial notification after 10 seconds
+        const initialNotificationTimer = setTimeout(() => {
+          setShowSongNotification(false);
+        }, 10000);
+
+        return initialNotificationTimer;
+      }
+      return null;
+    };
+    const initialNotificationTimer = initializeTrackState();
+
     let notificationTimer: ReturnType<typeof setTimeout> | null = null;
 
     const handleSongTransition = () => {
@@ -142,6 +181,8 @@ const AudioPlayer = () => {
       setCurrentTrackData(newCurrentTrack);
       setIsPlaying(true);
       setCurrentTrackIdFromState(getCurrentTrackId());
+
+      setCurrentTime(0);
 
       if (notificationTimer) {
         clearTimeout(notificationTimer);
@@ -154,40 +195,26 @@ const AudioPlayer = () => {
       }, 6000);
     };
 
-    setCurrentTrackIdFromState(getCurrentTrackId());
-
-    // Show notification for initial track
-    const initialTrack = getCurrentTrackData();
-    if (initialTrack) {
-      setCurrentTrackData(initialTrack);
-      setShowSongNotification(true);
-
-      notificationTimer = setTimeout(() => {
-        setShowSongNotification(false);
-      }, 10000);
-    }
-
-    window.addEventListener("songTransition", handleSongTransition);
-
-    return () => {
-      window.removeEventListener("songTransition", handleSongTransition);
-
-      if (notificationTimer) {
-        clearTimeout(notificationTimer);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window?.innerWidth || 1920);
     };
 
-    handleResize();
-
+    window.addEventListener("songTransition", handleSongTransition);
     window.addEventListener("resize", handleResize);
+
     return () => {
+      window.removeEventListener("songTransition", handleSongTransition);
       window.removeEventListener("resize", handleResize);
+
+      if (notificationTimer) {
+        clearTimeout(notificationTimer);
+      }
+      if (initialNotificationTimer) {
+        clearTimeout(initialNotificationTimer);
+      }
+      if (inactivityTimerRef.current) {
+        clearTimeout(inactivityTimerRef.current);
+      }
     };
   }, []);
 
@@ -273,15 +300,19 @@ const AudioPlayer = () => {
 
   return (
     <>
-      <div className="relative origin-top-left">
-        <div className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1 relative">
+      <OptionalElement className="relative origin-top-left" data-interactive="true" data-audio-player="true">
+        <div className="audio-player bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1 relative">
           {/* Volume Control Button with Dropdown */}
           <div
             onMouseEnter={() => {
               setIsVolumeOpen(true);
               setIsBigPlayerOpen(false);
+              if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
             }}
-            onMouseLeave={() => setIsVolumeOpen(false)}
+            onMouseLeave={() => {
+              startInactivityTimer();
+              setIsVolumeOpen(false);
+            }}
           >
             <motion.button onClick={toggleMute} className="p-2 my-1 hover:text-white rounded-full cursor-pointer" whileHover="hover" whileTap="tap" variants={variants.buttonHover}>
               <AnimatePresence mode="wait" initial={false}>
@@ -301,7 +332,9 @@ const AudioPlayer = () => {
             <AnimatePresence>
               {isVolumeOpen && (
                 <motion.div
-                  className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 absolute top-full left-0 mt-2 z-10 px-4 pt-2 pb-3 w-48 flex gap-3 flex-col"
+                  className="volume-control bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 absolute top-full left-0 mt-2 z-10 px-4 pt-2 pb-3 w-48 flex gap-3 flex-col"
+                  data-interactive="true"
+                  data-audio-player="true"
                   variants={variants.dropdownContainer}
                   initial="initial"
                   animate="animate"
@@ -353,10 +386,16 @@ const AudioPlayer = () => {
           {/* Big Player Button with Dropdown */}
           <div
             onMouseEnter={() => {
+              setCurrentTime(getCurrentTrackPosition());
               setIsBigPlayerOpen(true);
               setIsVolumeOpen(false);
+
+              if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
             }}
-            onMouseLeave={() => setIsBigPlayerOpen(false)}
+            onMouseLeave={() => {
+              startInactivityTimer();
+              setIsBigPlayerOpen(false);
+            }}
           >
             <motion.button
               onClick={() => setIsBigPlayerOpen((prev) => !prev)}
@@ -372,7 +411,9 @@ const AudioPlayer = () => {
             <AnimatePresence>
               {isBigPlayerOpen && (
                 <motion.div
-                  className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs"
+                  className="player-controls bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs"
+                  data-interactive="true"
+                  data-audio-player="true"
                   variants={variants.dropdownContainer}
                   initial="initial"
                   animate="animate"
@@ -503,7 +544,7 @@ const AudioPlayer = () => {
             </AnimatePresence>
           </div>
         </div>
-      </div>
+      </OptionalElement>
 
       {/* Song Notification */}
       <AnimatePresence>
@@ -525,7 +566,10 @@ const AudioPlayer = () => {
                 "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-4",
                 "flex items-center gap-4 z-20 max-w-full overflow-hidden",
                 "cursor-pointer",
+                "audio-player",
               )}
+              data-interactive="true"
+              data-audio-player="true"
               onClick={() => setShowSongNotification(false)}
             >
               <div

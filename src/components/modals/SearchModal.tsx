@@ -29,9 +29,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
 
       // Update location with 'system' source to trigger scrolling
       systemNavigateTo({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber });
-
-      // Close the modal
-      onClose();
     },
     [onClose, setLocation],
   );
