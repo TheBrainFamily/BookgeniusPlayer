@@ -92,9 +92,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     if (newDeepResearchState && isSearchModalOpen) {
       closeSearchModal(); // Close search modal if deep research is activated
     }
-    if (newDeepResearchState) {
-      setValue(""); // Clear input when activating deep research
-    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -230,7 +227,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                         )}
                         whileHover={!isThinking ? "hover" : undefined}
                         whileTap={!isThinking ? "tap" : undefined}
-                        variants={variants.button}
+                        variants={variants.deepResearchButton}
                         onClick={toggleDeepResearch}
                         disabled={isThinking || isRecording}
                       >
@@ -335,6 +332,11 @@ const variants: Record<string, Variants> = {
       boxShadow: ["0px 0px 0px rgba(239, 68, 68, 0.4)", "0px 0px 15px rgba(239, 68, 68, 0.6)", "0px 0px 0px rgba(239, 68, 68, 0.4)"],
       transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
     },
+  },
+  deepResearchButton: {
+    hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
+    tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
+    idle: { scale: 1, backgroundColor: "transparent", boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", transition: { duration: 0.3 } },
   },
   container: {
     idle: { boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", borderColor: "rgba(255, 255, 255, 0.3)", transition: { duration: 0.3 } },
