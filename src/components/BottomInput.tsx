@@ -37,15 +37,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   const { chapter: currentChapter, paragraph: currentParagraph } = location;
 
   const inputRef = useRef<HTMLInputElement>(null);
-  // Ref to track last activity time
   const lastActivityRef = useRef<number>(Date.now());
-  // Ref for inactivity timer
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Update last activity time
   const updateLastActivity = useCallback(() => {
     lastActivityRef.current = Date.now();
-    // Reset any existing inactivity timer
     if (inactivityTimerRef.current) {
       clearTimeout(inactivityTimerRef.current);
       inactivityTimerRef.current = null;
@@ -170,23 +166,42 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   }, [isRecording, stopRecording, updateLastActivity]);
 
   return (
-    <div className={cn("transition-all duration-300 ease-out w-full flex justify-center", "optional-element", className)}>
-      <motion.div className={cn("bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-3 py-2")}>
+    <div className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
+      <motion.div
+        className={cn("bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-3 py-2", isRecording && "recording-active")}
+        animate={isRecording ? "recordingContainer" : "idle"}
+        initial="idle"
+        variants={variants.container}
+      >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key="expanded" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
             <form onSubmit={handleSubmit} className="flex items-center space-x-2 min-w-[280px] sm:min-w-[350px]">
-              <input
-                id="bottom-input"
-                ref={inputRef}
-                type="text"
-                value={value}
-                onChange={handleInputChange}
-                placeholder={isRecording ? t("listening") : isDeepResearchActive ? t("enter_deep_research") : t("search_or_ask")}
-                className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-50" : "")}
-                disabled={isRecording || isThinking}
-                autoComplete="off"
-                onFocus={updateLastActivity}
-              />
+              <div className="relative flex-grow flex items-center">
+                <AnimatePresence>
+                  {isRecording && (
+                    <motion.div
+                      key="recording-indicator"
+                      className="absolute left-2 w-3 h-3 rounded-full bg-red-500"
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.05, 1] }}
+                      exit={{ opacity: 0, scale: 0, transition: { duration: 0.2 } }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                  )}
+                </AnimatePresence>
+                <input
+                  id="bottom-input"
+                  ref={inputRef}
+                  type="text"
+                  value={value}
+                  onChange={handleInputChange}
+                  placeholder={isRecording ? t("listening") : isDeepResearchActive ? t("enter_deep_research") : t("search_or_ask")}
+                  className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-80 pl-7 font-medium" : "")}
+                  disabled={isRecording || isThinking}
+                  autoComplete="off"
+                  onFocus={updateLastActivity}
+                />
+              </div>
 
               <div className="flex items-center space-x-2">
                 {/* Deep Research Button */}
@@ -203,7 +218,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                         )}
                         whileHover={!isThinking ? "hover" : undefined}
                         whileTap={!isThinking ? "tap" : undefined}
-                        variants={buttonVariants}
+                        variants={variants.button}
                         onClick={toggleDeepResearch}
                         disabled={isThinking || isRecording}
                       >
@@ -225,7 +240,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                           className="p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400"
                           whileHover="hover"
                           whileTap="tap"
-                          variants={buttonVariants}
+                          variants={variants.button}
                           disabled={isThinking}
                         >
                           <Send size={18} />
@@ -244,7 +259,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                           style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
                           whileHover={!isRecording ? "hover" : undefined}
                           whileTap={{ scale: 1.2 }}
-                          variants={buttonVariants}
+                          variants={variants.button}
+                          initial="idle"
                           animate={isRecording ? "recording" : "idle"}
                           // onClick={() => {
                           //   if (isRecording) {
@@ -296,14 +312,24 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
 
 export default BottomInput;
 
-const buttonVariants: Variants = {
-  hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
-  tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
-  idle: { scale: 1 },
-  recording: {
-    scale: [1, 1.1, 1],
-    backgroundColor: ["rgba(239, 68, 68, 0.2)", "rgba(239, 68, 68, 0.4)", "rgba(239, 68, 68, 0.2)"],
-    boxShadow: ["0px 0px 0px rgba(239, 68, 68, 0.4)", "0px 0px 15px rgba(239, 68, 68, 0.6)", "0px 0px 0px rgba(239, 68, 68, 0.4)"],
-    transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+const variants: Record<string, Variants> = {
+  button: {
+    hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
+    tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
+    idle: { scale: 1, backgroundColor: "transparent", boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", color: "rgba(255, 255, 255, 0.7)", transition: { duration: 0.3 } },
+    recording: {
+      scale: [1, 1.1, 1],
+      backgroundColor: ["rgba(239, 68, 68, 0.2)", "rgba(239, 68, 68, 0.4)", "rgba(239, 68, 68, 0.2)"],
+      boxShadow: ["0px 0px 0px rgba(239, 68, 68, 0.4)", "0px 0px 15px rgba(239, 68, 68, 0.6)", "0px 0px 0px rgba(239, 68, 68, 0.4)"],
+      transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+    },
+  },
+  container: {
+    idle: { boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", borderColor: "rgba(255, 255, 255, 0.3)", transition: { duration: 0.3 } },
+    recordingContainer: {
+      boxShadow: ["0px 0px 0px rgba(239, 68, 68, 0.2)", "0px 0px 12px rgba(239, 68, 68, 0.6)", "0px 0px 0px rgba(239, 68, 68, 0.2)"],
+      borderColor: ["rgba(255, 255, 255, 0.3)", "rgba(239, 68, 68, 0.6)", "rgba(255, 255, 255, 0.3)"],
+      transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+    },
   },
 };
