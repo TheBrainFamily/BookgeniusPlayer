@@ -120,11 +120,12 @@ const AudioPlayer = () => {
   }, [isPlaying, isBigPlayerOpen]);
 
   useEffect(() => {
-    const updatePlaylist = async () => {
-      const sectionTrackIds = getCurrentSectionTracks();
+    const updatePlaylist = async (sectionTrackIds?: string[] | null) => {
+      // Use provided sectionTrackIds or get current ones
+      const trackIds = sectionTrackIds !== undefined ? sectionTrackIds : getCurrentSectionTracks();
 
-      if (sectionTrackIds && sectionTrackIds.length > 0) {
-        const loadPromises = sectionTrackIds.map((id) => {
+      if (trackIds && trackIds.length > 0) {
+        const loadPromises = trackIds.map((id) => {
           if (!getTrackDetailsById(id)) {
             console.log(`Details for track ${id} missing in playlist, attempting to load...`);
             return loadTrack(id);
@@ -134,7 +135,7 @@ const AudioPlayer = () => {
 
         await Promise.all(loadPromises);
 
-        const detailedTracks = sectionTrackIds
+        const detailedTracks = trackIds
           .map((id) => {
             const details = getTrackDetailsById(id);
             if (details) {
@@ -151,9 +152,18 @@ const AudioPlayer = () => {
         setPlaylistTracks([]);
       }
     };
-
     updatePlaylist();
-  }, [currentTrackData]);
+
+    const handlePlaylistChange = (event: WindowEventMap["playlistChange"]) => {
+      const { tracks } = event.detail;
+      updatePlaylist(tracks);
+    };
+
+    window.addEventListener("playlistChange", handlePlaylistChange);
+    return () => {
+      window.removeEventListener("playlistChange", handlePlaylistChange);
+    };
+  }, []);
 
   useEffect(() => {
     const setInitialWindowWidth = () => {

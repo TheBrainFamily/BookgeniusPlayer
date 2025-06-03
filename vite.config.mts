@@ -39,10 +39,12 @@ const removeChunksPlugin = () => {
         .filter((slug) => slug !== currentBookSlug) // Use the resolved currentBookSlug
         .map((slug) => `${slug.toLowerCase()}`);
 
+      console.log(`Removing chunks for books: ${toRemove.join(", ")}`);
+
       toRemove.forEach((base) =>
         fs
           .readdirSync(distDir)
-          .filter((f) => f.toLowerCase().includes(base)) // Make comparison case-insensitive if needed
+          .filter((f) => f.toLowerCase().includes(`${base}audiobookdata`) || f.toLowerCase().includes(`${base}bookdata`))
           .forEach((f) => fs.unlinkSync(path.join(distDir, f))),
       );
     },
