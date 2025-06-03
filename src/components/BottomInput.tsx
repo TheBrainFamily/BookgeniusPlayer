@@ -12,6 +12,7 @@ import { deepResearchCall } from "@/deepResearchCall";
 import { useSearchModal } from "@/stores/modals/searchModal.store";
 import { useDeepResearchModal } from "@/stores/modals/deepResearchModal.store";
 import { OptionalElement } from "./OptionalElement";
+import { useElementVisibilityStore } from "@/stores/elementVisibility.store";
 
 interface SubmitMessageData {
   query: string;
@@ -24,11 +25,15 @@ interface BottomInputProps {
 }
 
 const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
+  const { t } = useTranslation();
+
   const [value, setValue] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
-  const { t } = useTranslation();
+
+  const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
+  const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
 
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
   const { openModal: openDeepResearchModal } = useDeepResearchModal();
@@ -42,6 +47,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const updateLastActivity = useCallback(() => {
+    pauseAllTimers();
     lastActivityRef.current = Date.now();
     if (inactivityTimerRef.current) {
       clearTimeout(inactivityTimerRef.current);
@@ -167,7 +173,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   }, [isRecording, stopRecording, updateLastActivity]);
 
   return (
-    <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
+    <OptionalElement
+      className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}
+      onMouseEnter={() => pauseAllTimers()}
+      onMouseLeave={() => startAllTimers()}
+    >
       <motion.div
         className={cn("bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-3 py-2", isRecording && "recording-active")}
         animate={isRecording ? "recordingContainer" : "idle"}
@@ -201,6 +211,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                   disabled={isRecording || isThinking}
                   autoComplete="off"
                   onFocus={updateLastActivity}
+                  onBlur={() => startAllTimers()}
                 />
               </div>
 

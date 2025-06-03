@@ -31,10 +31,14 @@ import { cn } from "@/lib/utils";
 import { CURRENT_BOOK } from "@/consts";
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
 import { OptionalElement } from "./OptionalElement";
+import { useElementVisibilityStore } from "@/stores/elementVisibility.store";
 
 const AudioPlayer = () => {
   const isMobileOrTablet = useIsMobileOrTablet();
   const { t } = useTranslation();
+
+  const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
+  const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
 
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const INACTIVITY_TIMEOUT = 5000;
@@ -84,6 +88,11 @@ const AudioPlayer = () => {
 
   const startInactivityTimer = useCallback(() => {
     return;
+    // Don't start inactivity timer if dropdowns are open - keep elements visible
+    if (isVolumeOpen || isBigPlayerOpen) {
+      return;
+    }
+
     if (inactivityTimerRef.current) {
       clearTimeout(inactivityTimerRef.current);
       inactivityTimerRef.current = null;
@@ -300,7 +309,7 @@ const AudioPlayer = () => {
 
   return (
     <>
-      <OptionalElement className="relative origin-top-left" data-interactive="true" data-audio-player="true">
+      <OptionalElement className="relative origin-top-left" onMouseEnter={() => pauseAllTimers()} onMouseLeave={() => startAllTimers()}>
         <div className="audio-player bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1 relative">
           {/* Volume Control Button with Dropdown */}
           <div
@@ -333,8 +342,6 @@ const AudioPlayer = () => {
               {isVolumeOpen && (
                 <motion.div
                   className="volume-control bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 absolute top-full left-0 mt-2 z-10 px-4 pt-2 pb-3 w-48 flex gap-3 flex-col"
-                  data-interactive="true"
-                  data-audio-player="true"
                   variants={variants.dropdownContainer}
                   initial="initial"
                   animate="animate"
@@ -412,13 +419,10 @@ const AudioPlayer = () => {
               {isBigPlayerOpen && (
                 <motion.div
                   className="player-controls bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs"
-                  data-interactive="true"
-                  data-audio-player="true"
                   variants={variants.dropdownContainer}
                   initial="initial"
                   animate="animate"
                   exit="exit"
-                  onClick={(e) => e.stopPropagation()}
                 >
                   <motion.div className="flex justify-center pt-4 mb-4" variants={variants.popUpItem} initial="closed" animate="open">
                     <div className="w-32 h-32 bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg">
@@ -568,8 +572,6 @@ const AudioPlayer = () => {
                 "cursor-pointer",
                 "audio-player",
               )}
-              data-interactive="true"
-              data-audio-player="true"
               onClick={() => setShowSongNotification(false)}
             >
               <div

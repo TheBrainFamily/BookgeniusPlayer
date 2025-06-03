@@ -3,12 +3,12 @@ import React, { useEffect, useRef } from "react";
 import { useOptionalElementVisibility } from "@/stores/elementVisibility.store";
 import { cn } from "@/lib/utils";
 
-interface OptionalElementProps {
+interface OptionalElementProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   className?: string;
 }
 
-export const OptionalElement: React.FC<OptionalElementProps> = ({ children, className }) => {
+export const OptionalElement: React.FC<OptionalElementProps> = ({ children, className, ...props }) => {
   const shouldBeVisible = useOptionalElementVisibility();
   const elementRef = useRef<HTMLDivElement>(null);
   const previousVisibilityRef = useRef<boolean>(shouldBeVisible);
@@ -24,9 +24,9 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
     const isBecomingHidden = !shouldBeVisible && previousVisibilityRef.current;
 
     if (isBecomingVisible) {
-      element.style.transition = `opacity 0.3 ease-in-out`;
+      element.style.transition = `opacity 0.2 ease-in-out`;
     } else if (isBecomingHidden) {
-      element.style.transition = `opacity 4s ease-in-out`;
+      element.style.transition = `opacity 3s ease-in-out`;
     }
 
     element.style.opacity = shouldBeVisible ? "1" : "0";
@@ -36,7 +36,7 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
   }, [shouldBeVisible]);
 
   return (
-    <div ref={elementRef} className={cn("transition-opacity", className)} style={{ opacity: shouldBeVisible ? 1 : 0, pointerEvents: shouldBeVisible ? "auto" : "none" }}>
+    <div ref={elementRef} className={cn("transition-opacity", className)} style={{ opacity: shouldBeVisible ? 1 : 0, pointerEvents: shouldBeVisible ? "auto" : "none" }} {...props}>
       {children}
     </div>
   );

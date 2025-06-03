@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
+const INACTIVITY_TIMEOUT = 8000;
+
 interface TouchState {
   startY: number;
   startX: number;
@@ -31,6 +33,8 @@ interface ElementVisibilityState {
   handleScreenTap: () => void;
   handleScrollStart: () => void;
   handleScrollEnd: () => void;
+  pauseAllTimers: () => void;
+  startAllTimers: () => void;
   // Selectors for better performance
   getVisibilityState: () => { areElementsVisible: boolean; isScrollMode: boolean };
   getTouchState: () => TouchState;
@@ -54,6 +58,40 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
       setInactivityTimer: (timerId) => set((state) => ({ timers: { ...state.timers, inactivityTimerId: timerId } })),
       setScrollTimer: (timerId) => set((state) => ({ timers: { ...state.timers, scrollTimerId: timerId } })),
 
+      pauseAllTimers: () => {
+        const { timers } = get();
+
+        if (timers.inactivityTimerId !== null) {
+          clearTimeout(timers.inactivityTimerId);
+        }
+        if (timers.scrollTimerId !== null) {
+          clearTimeout(timers.scrollTimerId);
+        }
+
+        set({ timers: { inactivityTimerId: null, scrollTimerId: null } });
+      },
+
+      startAllTimers: () => {
+        const { timers } = get();
+
+        if (timers.inactivityTimerId !== null) {
+          clearTimeout(timers.inactivityTimerId);
+        }
+        if (timers.scrollTimerId !== null) {
+          clearTimeout(timers.scrollTimerId);
+        }
+
+        // Start the inactivity timer to automatically hide elements after timeout
+        const inactivityTimerId = window.setTimeout(() => {
+          const { hideAllElements, setInactivityTimer } = useElementVisibilityStore.getState();
+          hideAllElements();
+          setInactivityTimer(null);
+        }, INACTIVITY_TIMEOUT);
+
+        // Update the store with the new timer ID
+        set({ timers: { inactivityTimerId, scrollTimerId: null } });
+      },
+
       // Complex actions
       showAllElements: () => set({ areElementsVisible: true, isScrollMode: false }),
 
@@ -61,26 +99,21 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
 
       handleScreenTap: () => {
         const { areElementsVisible, isScrollMode } = get();
-        console.log("handleScreenTap - before:", { areElementsVisible, isScrollMode });
 
         // If we're in scroll mode or elements are hidden, show all elements and exit scroll mode
         if (isScrollMode || !areElementsVisible) {
-          console.log("handleScreenTap - showing elements");
           set({ areElementsVisible: true, isScrollMode: false });
         } else {
           // If elements are visible and we're not in scroll mode, hide them
-          console.log("handleScreenTap - hiding elements");
           set({ areElementsVisible: false, isScrollMode: false });
         }
       },
 
       handleScrollStart: () => {
-        console.log("handleScrollStart - hiding elements");
         set({ isScrollMode: true });
       },
 
       handleScrollEnd: () => {
-        console.log("handleScrollEnd - keeping visibility state, exiting scroll mode");
         // After scroll ends, exit scroll mode but keep elements in their previous visibility state
         // This allows elements to show up on tap if they were visible before scrolling
         set({ isScrollMode: false });
