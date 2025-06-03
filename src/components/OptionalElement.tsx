@@ -24,9 +24,9 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
     const isBecomingHidden = !shouldBeVisible && previousVisibilityRef.current;
 
     if (isBecomingVisible) {
-      element.style.transition = `opacity 0.2s ease-in-out`;
+      element.style.transition = `opacity 0.3s ease-in-out`;
     } else if (isBecomingHidden) {
-      element.style.transition = `opacity 3s ease-in-out`;
+      element.style.transition = `opacity 0.3s ease-in-out`;
     }
 
     element.style.opacity = shouldBeVisible ? "1" : "0";
