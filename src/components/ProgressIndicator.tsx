@@ -73,7 +73,7 @@ const ProgressIndicator: React.FC = () => {
             <TooltipTrigger asChild>
               <motion.button
                 onClick={() => handleChapterClick(i)}
-                className={cn(`absolute top-0 rounded-4xl h-[10px] w-[10px] z-10 ${colorClass} transition-all cursor-pointer`, i === 1 && "translate-x-[1px]")}
+                className={cn(`absolute -top-1 rounded-4xl h-[14px] w-[14px] z-10 ${colorClass} transition-all cursor-pointer`, i === 1 && "translate-x-[1px]")}
                 style={{ left: `${position}%` }}
                 custom={i}
               />
@@ -94,22 +94,19 @@ const ProgressIndicator: React.FC = () => {
 
   // return <></>;
   return (
-    <ProgressElement className="mx-3">
-      <motion.div
-        className={cn("relative h-3 bg-black/70 textured-bg border shadow-xl text-white border-white/30 rounded-3xl overflow-hidden")}
-        variants={variants.container}
-        initial="hidden"
-        animate="visible"
-      >
-        <motion.div
-          className="h-full bg-gradient-to-r from-yellow-400/80 via-lime-500/80 to-green-500/80 rounded-full"
-          variants={variants.progressBar}
-          style={{ width: `${Math.max(0, totalProgress)}%` }}
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
-        />
-        {renderChapterMarkers()}
+    <ProgressElement>
+      <motion.div className="my-1 h-4 overflow-hidden progress-indicator content-center" variants={variants.container} initial="hidden" animate="visible">
+        <motion.div className={cn("relative h-2 bg-black/70 textured-bg border shadow-xl text-white border-white/30 rounded-3xl")}>
+          <motion.div
+            className="h-full bg-gradient-to-r from-yellow-400/80 via-lime-500/80 to-green-500/80 rounded-full"
+            variants={variants.progressBar}
+            style={{ width: `${Math.max(0, totalProgress)}%` }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
+          />
+          {renderChapterMarkers()}
+        </motion.div>
       </motion.div>
     </ProgressElement>
   );

@@ -34,7 +34,11 @@ export const ProgressElement: React.FC<ProgressElementProps> = ({ children, clas
   }, [shouldBeVisible]);
 
   return (
-    <div ref={elementRef} className={cn("transition-opacity", className)} style={{ opacity: shouldBeVisible ? 1 : 0, pointerEvents: shouldBeVisible ? "auto" : "none" }}>
+    <div
+      ref={elementRef}
+      className={cn("transition-opacity progress-indicator", className)}
+      style={{ opacity: shouldBeVisible ? 1 : 0, pointerEvents: shouldBeVisible ? "auto" : "none" }}
+    >
       {children}
     </div>
   );

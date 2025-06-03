@@ -19,6 +19,7 @@ const INTERACTIVE_SELECTORS = [
   ".player-controls",
   "[data-interactive]",
   "[data-canonical-name]",
+  "progress-indicator",
   ".modal-overlay",
   ".tooltip",
   ".character-highlighted-activated",

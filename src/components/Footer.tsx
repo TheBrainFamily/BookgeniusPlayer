@@ -29,7 +29,7 @@ const Footer = () => {
           className={cn("fixed bottom-0 inset-x-0 z-50 flex flex-row gap-2 justify-center mx-auto max-w-[120rem] w-full", "p-3 md:p-3 lg:p-5")}
         >
           <div id="left-notes-blank" className="hidden md:block md:flex-1 max-w-[700px]" />
-          <div className="flex-2 md:min-w-[600px] max-w-[900px] px-0 md:px-0 flex flex-col gap-1 md:gap-2 lg:gap-2 ml-0 md:pl-10 xl:pl-0">
+          <div className="flex-2 md:min-w-[600px] max-w-[900px] px-0 md:px-0 flex flex-col ml-0 md:pl-10 xl:pl-0">
             <BottomInput onSubmit={sendMessage} />
             <ProgressIndicator />
           </div>
