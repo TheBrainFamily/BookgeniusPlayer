@@ -43,6 +43,8 @@ let currentSectionTracks: string[] | null = null;
 let currentTrackIndexInSection: number = -1;
 // undefined: no pending change; null: pending clear; string[]: pending set
 let pendingSectionTracks: string[] | null | undefined = undefined;
+// ToDo: Remove later, check why at the beginning, even though we should have info about tracks, we don't have them
+let temporaryTracks: string[] = [];
 
 export function getTrackDetailsById(id: string): TrackState | null {
   return tracks.get(id) || null;
@@ -519,7 +521,9 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
   if (currentSectionTracks) {
     currentTrackIndexInSection = currentSectionTracks.indexOf(fadeInId);
   }
+
   announceSongTransition();
+
   // ---------- unified clean-up helper ----------
   const finishCrossfade = () => {
     if (!isTransitioning) return; // already cleaned once
@@ -529,6 +533,7 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
       console.log(`Crossfade complete: Applying pending section: ${pendingSectionTracks ? "[" + pendingSectionTracks.join(", ") + "]" : "None"}`);
       currentSectionTracks = pendingSectionTracks ? [...pendingSectionTracks] : null;
       pendingSectionTracks = undefined;
+      dispatchPlaylistChangeEvent();
     }
 
     if (currentSectionTracks) {
@@ -557,6 +562,8 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
 }
 
 export function setActiveSection(newSectionTrackIds: string[] | null): void {
+  temporaryTracks = newSectionTrackIds || [];
+
   if (!audioContext) {
     console.warn("setActiveSection: AudioContext not ready.");
     return;
@@ -575,6 +582,7 @@ export function setActiveSection(newSectionTrackIds: string[] | null): void {
     } else {
       // console.log("setActiveSection: Deferring, but requested section is same as pending. No change to pendingSectionTracks.");
     }
+
     return;
   }
 
@@ -592,6 +600,7 @@ export function setActiveSection(newSectionTrackIds: string[] | null): void {
 
   console.log(`Setting active section directly: ${newSectionTrackIds ? `[${newSectionTrackIds.join(", ")}]` : "None"}`);
   currentSectionTracks = newSectionTrackIds ? [...newSectionTrackIds] : null;
+  dispatchPlaylistChangeEvent();
 
   if (currentTrackId && currentSectionTracks && currentSectionTracks.includes(currentTrackId)) {
     currentTrackIndexInSection = currentSectionTracks.indexOf(currentTrackId);
@@ -767,6 +776,7 @@ export function stopAllPlayback() {
   currentSectionTracks = null;
   currentTrackIndexInSection = -1;
   pendingSectionTracks = undefined;
+  dispatchPlaylistChangeEvent();
 
   console.log("All playback stopped and state reset.");
 }
@@ -920,6 +930,27 @@ export function resumeCurrentTrack(): void {
   playTrack(currentTrackId, audioContext.currentTime, s.pausedAt);
 }
 
+function dispatchPlaylistChangeEvent(tracks: string[] | null = null) {
+  const detail: { tracks: string[] } = { tracks: [] };
+
+  if (tracks) {
+    detail.tracks = tracks;
+  } else {
+    detail.tracks = currentSectionTracks ? currentSectionTracks : [];
+  }
+
+  const event = new CustomEvent("playlistChange", { detail });
+  window.dispatchEvent(event);
+}
+
+// Listen for splash screen hiding event to trigger initial playlist change
+// There is a problem with deal-with-background-song, we do not have informations about tracks at the very first moment
+window.addEventListener("splashHidden", () => {
+  setTimeout(() => {
+    dispatchPlaylistChangeEvent(temporaryTracks);
+  }, 500);
+});
+
 // Add TypeScript declarations for window properties
 declare global {
   interface Window {
@@ -931,6 +962,10 @@ declare global {
     setCurrentTrackPosition: typeof setCurrentTrackPosition;
     pauseCurrentTrack: typeof pauseCurrentTrack;
     resumeCurrentTrack: typeof resumeCurrentTrack;
+  }
+
+  interface WindowEventMap {
+    playlistChange: CustomEvent<{ tracks: string[] | null }>;
   }
 }
 
