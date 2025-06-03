@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Mic, Send, Telescope } from "lucide-react";
+import { Mic, Send, Telescope, Loader2 } from "lucide-react";
 import { motion, Variants, AnimatePresence } from "motion/react";
 import { useTranslation } from "react-i18next";
 
@@ -36,7 +36,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
 
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
-  const { openModal: openDeepResearchModal } = useDeepResearchModal();
+  const { openModal: openDeepResearchModal, setContent: setDeepResearchContent } = useDeepResearchModal();
 
   const { startRecording, stopRecording, response } = useRealtime();
   const { location } = useLocation();
@@ -128,17 +128,21 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
 
     if (isDeepResearchActive) {
       setIsThinking(true);
+      openDeepResearchModal(undefined, true, true);
+
       deepResearchCall(trimmedValue, location)
         .then((deepResearchResponse) => {
-          openDeepResearchModal(deepResearchResponse, true, true);
+          setDeepResearchContent(deepResearchResponse);
         })
-        .catch((error) => console.error("Deep research failed:", error))
+        .catch((error) => {
+          console.error("Deep research failed:", error);
+          setDeepResearchContent(t("deep_research_error"));
+        })
         .finally(() => {
           setIsThinking(false);
         });
     } else if (onSubmit) {
       onSubmit({ query: trimmedValue, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: CURRENT_BOOK } });
-      setValue(""); // Clear after submission
     }
   };
 
@@ -203,7 +207,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                   type="text"
                   value={value}
                   onChange={handleInputChange}
-                  placeholder={isRecording ? t("listening") : isDeepResearchActive ? t("enter_deep_research") : t("search_or_ask")}
+                  placeholder={isRecording ? t("listening") : isThinking ? t("thinking") : isDeepResearchActive ? t("enter_deep_research") : t("search_or_ask")}
                   className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-80 pl-7 font-medium" : "")}
                   disabled={isRecording || isThinking}
                   autoComplete="off"
@@ -231,10 +235,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                         onClick={toggleDeepResearch}
                         disabled={isThinking || isRecording}
                       >
-                        <Telescope size={18} />
+                        {isThinking ? <Loader2 size={18} className="animate-spin" /> : <Telescope size={18} />}
                       </motion.button>
                     </TooltipTrigger>
-                    <TooltipContent>{t("deep_research")}</TooltipContent>
+                    <TooltipContent>{isThinking ? t("thinking") : t("deep_research")}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
 

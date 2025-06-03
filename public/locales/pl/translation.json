@@ -74,6 +74,8 @@
   "start_recording": "Rozpocznij nagrywanie",
   "stop_recording": "Zatrzymaj nagrywanie",
   "listening": "Nasłuchiwanie...",
+  "thinking": "Myślę...",
+  "deep_research_error": "Przepraszam, deep research nie udało się. Spróbuj ponownie.",
   "enter_deep_research": "Wprowadź wyszukanie Deep Research...",
   "search_or_ask": "Poszukaj albo zapytaj",
   "no_results_to_display": "Brak wyników do wyświetlenia.",

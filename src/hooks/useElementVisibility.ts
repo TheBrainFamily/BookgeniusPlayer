@@ -4,7 +4,7 @@ import useSplashHidden from "./useSplashHidden";
 
 const INACTIVITY_TIMEOUT = 8000;
 const SCROLL_HIDE_DELAY = 3000;
-const TOUCH_MOVE_THRESHOLD = 15;
+const TOUCH_MOVE_THRESHOLD = 30;
 const TAP_TIME_THRESHOLD = 500;
 
 // Interactive element selectors that should be ignored for taps
@@ -197,12 +197,13 @@ export const useElementVisibility = () => {
       const currentTouch = stateRef.current.touch;
       const touchDuration = Date.now() - currentTouch.startTime;
 
+      const { setTouchScrolling } = useElementVisibilityStore.getState();
+      setTouchScrolling(false);
+
+      // Check if this was a tap (not a scroll) and within time limits
       if (!currentTouch.isScrolling && touchDuration < TAP_TIME_THRESHOLD && touchDuration > 50) {
         stableHandleTap(event);
       }
-
-      const { setTouchScrolling } = useElementVisibilityStore.getState();
-      setTouchScrolling(false);
     },
     [stableHandleTap],
   );
