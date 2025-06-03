@@ -1,5 +1,6 @@
 import { searchParagraphsFromServer } from "./utils/searchParagraphsFromServer";
-import type { Location } from "@/state/LocationContext"; // Import Location type
+import type { Location } from "@/state/LocationContext";
+import { BookData } from "@/booksData/types"; // Import Location type
 
 export interface SearchResultItemData {
   chapter: number;
@@ -209,4 +210,116 @@ export function cleanupSearchChapters(): void {
   if (searchContainer) {
     searchContainer.remove();
   }
+}
+
+const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) => {
+  const sentences = paragraph
+    .split(/(?<=[.!?])\s+(?=[A-Z<])/) // Split on sentence endings while preserving HTML tags
+    .map((s) => s.trim()) // Trim whitespace
+    .filter((s) => s.length > 0); // Remove empty sentence
+
+  return sentences.reduce((acc, sentence) => {
+    if (sentence.includes(`data-character="${characterSlug}"`)) {
+      // Find the character's position in the original sentence
+      const characterIndex = sentence.indexOf(`data-character="${characterSlug}"`);
+      if (characterIndex !== -1) {
+        // Get the text before the character tag
+        const beforeCharacter = sentence.substring(0, characterIndex);
+        // Get the text after the character tag
+        const afterCharacter = sentence.substring(characterIndex);
+
+        // Split into words and get context
+        const words = beforeCharacter.split(/\s+/);
+        const startIndex = Math.max(0, words.length - 5); // Get 5 words before character
+        const contextBefore = words.slice(startIndex).join(" ");
+
+        // Combine with the character and what follows
+        const contextualSentence = startIndex > 0 ? `...${contextBefore}${afterCharacter}` : `${contextBefore}${afterCharacter}`;
+
+        if (acc.length === 0) {
+          return contextualSentence;
+        }
+        return `${acc} ${contextualSentence}`;
+      }
+
+      // Fallback to original behavior if we can't find the character position
+      if (acc.length === 0) {
+        return sentence;
+      }
+      return `${acc} ${sentence}`;
+    }
+    // If we haven't found the character yet, keep looking
+    if (acc.length === 0) {
+      return acc;
+    }
+    // If we already have text with the character, add more context until we reach the limit
+    const cleanAcc = acc.replace(/<[^>]*>/g, "");
+    if (cleanAcc.length < 150) {
+      return `${acc} ${sentence}`;
+    }
+    return acc;
+  }, "");
+};
+
+export function findCharacterSentences(characterSlug: string, currentLocation: Location, bookData: BookData) {
+  const characterData = bookData.charactersData.find((character) => character.slug === characterSlug);
+
+  // Changed return type
+  const items: SearchResultItemData[] = [];
+  let resultIndex: 0;
+
+  try {
+    if (characterData) {
+      const knownCharacterHistory: { chapter: number; paragraphs: number[] }[] = [];
+      const hasHistoryTillCurrentChapter = characterData.infoPerChapter.filter((characterInfo) => characterInfo.chapter <= currentLocation.chapter);
+
+      if (hasHistoryTillCurrentChapter) {
+        hasHistoryTillCurrentChapter.forEach((infoPerChapter) => {
+          if (infoPerChapter.chapter < currentLocation.chapter) {
+            knownCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: infoPerChapter.paragraphsWhereSpotted });
+          } else {
+            const historyTillCurrentParagraph = infoPerChapter.paragraphsWhereSpotted.filter((paragraph) => paragraph <= currentLocation.paragraph);
+            knownCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: historyTillCurrentParagraph });
+          }
+        });
+      }
+
+      knownCharacterHistory.forEach(({ chapter, paragraphs }) => {
+        paragraphs.forEach((paragraph) => {
+          const paragraphInnerHTML = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`).innerHTML;
+
+          const sentence = getSentenceWithCharacterSpan(paragraphInnerHTML, characterSlug);
+
+          if (sentence) {
+            const cleanText = sentence.replace(/<[^>]*>/g, "");
+            const summaryText = cleanText.length > 150 ? `${cleanText.substring(0, 150).trim()}...` : cleanText;
+            const displayText = summaryText.length > 75 ? `${summaryText.substring(0, 75)}...` : summaryText;
+
+            items.push({
+              chapter,
+              paragraphNumber: paragraph,
+              summary: summaryText,
+              text: displayText,
+              id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}-${Date.now()}`,
+            });
+          }
+        });
+      });
+    }
+  } catch (error) {
+    console.error("Error in performLocalDOMSearch:", error);
+    // Return SearchResultsData structure on error
+    return { header: `Error performing local search for "${characterSlug}".`, items: [], isLoading: false };
+  }
+
+  // Construct SearchResultsData object for successful search
+  const totalMatches = items.length;
+  let header = "";
+  if (totalMatches > 0) {
+    header = `Found ${totalMatches} local match(es) for "${characterSlug}" (context: Ch. ${currentLocation.chapter}, P. ${currentLocation.paragraph})`;
+  } else {
+    header = `No local matches found for "${characterSlug}" (context: Ch. ${currentLocation.chapter}, P. ${currentLocation.paragraph})`;
+  }
+
+  return { header, items, isLoading: false };
 }
