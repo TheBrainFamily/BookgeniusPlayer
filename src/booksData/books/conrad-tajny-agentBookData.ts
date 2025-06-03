@@ -10,4 +10,5 @@ export const bookData: BookData = {
   chapters: 13,
   themeColors: getBookThemeColors(BOOK_SLUGS.Conrad_Tajny_Agent),
   hasAudiobook: true,
+  bookStringified: "",
 };
