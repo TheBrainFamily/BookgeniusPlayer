@@ -82,6 +82,8 @@ export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph
 
   // Update hash immediately for system navigation
   window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
+
+  goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph });
 };
 
 /* ------------------------------------------------------------------ */
