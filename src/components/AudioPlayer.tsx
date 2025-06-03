@@ -31,14 +31,10 @@ import { cn } from "@/lib/utils";
 import { CURRENT_BOOK } from "@/consts";
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
 import { OptionalElement } from "./OptionalElement";
-import { useElementVisibilityStore } from "@/stores/elementVisibility.store";
 
 const AudioPlayer = () => {
   const isMobileOrTablet = useIsMobileOrTablet();
   const { t } = useTranslation();
-
-  const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
-  const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
 
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const INACTIVITY_TIMEOUT = 5000;
@@ -319,7 +315,7 @@ const AudioPlayer = () => {
 
   return (
     <>
-      <OptionalElement className="relative origin-top-left" onMouseEnter={() => pauseAllTimers()} onMouseLeave={() => startAllTimers()}>
+      <OptionalElement className="relative origin-top-left">
         <div className="audio-player bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1 relative">
           {/* Volume Control Button with Dropdown */}
           <div
