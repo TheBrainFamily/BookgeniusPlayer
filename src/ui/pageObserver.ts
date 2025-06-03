@@ -1,5 +1,4 @@
 import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
-import debounce from "lodash.debounce";
 
 const SHOULD_SHOW_EVERYONE = false;
 
@@ -319,61 +318,19 @@ const getParagraphInfo = (element: Element): { chapter: number | null; paragraph
 export function setupPageObserver(
   openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void,
 ): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number } | null {
-  const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.85] };
+  const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
 
+  // --- State for tracking all currently intersecting pages ---
   const intersectingPages = new Set<Element>();
   let currentlyActivePageElement: Element | null = null;
   let currentlyLastActivePageElement: Element | null = null;
-  let currentlyActiveParagraph: { chapter: number | null; paragraph: number | null } | null = null;
+  let currentlyActiveParagraph: { chapter: number; paragraph: number } | null = null;
 
+  // Keep track of observed paragraphs to avoid re-observing
   const observedParagraphs = new Set<Element>();
 
-  const debouncedUpdater = debounce(
-    (
-      activeParagraphForUpdate: { chapter: number; paragraph: number } | null,
-      startInfoForUpdate: { chapter: number | null; paragraph: number | null } | null,
-      endInfoForUpdate: { chapter: number | null; paragraph: number | null } | null,
-      openModalFn: (characterSlug: string, isTalking: boolean, src: string) => void,
-    ) => {
-      if (
-        activeParagraphForUpdate &&
-        activeParagraphForUpdate.chapter !== null &&
-        activeParagraphForUpdate.paragraph !== null &&
-        startInfoForUpdate &&
-        startInfoForUpdate.chapter !== null &&
-        startInfoForUpdate.paragraph !== null &&
-        endInfoForUpdate &&
-        endInfoForUpdate.chapter !== null &&
-        endInfoForUpdate.paragraph !== null
-      ) {
-        console.log(
-          `[Observer DEBOUNCED] Updating notes for Ch ${startInfoForUpdate.chapter}:${startInfoForUpdate.paragraph} to Ch ${endInfoForUpdate.chapter}:${endInfoForUpdate.paragraph} (Focus Zone)`,
-        );
-        console.log("setting current location from DEBOUNCED intersection (focus zone)", { chapter: startInfoForUpdate.chapter, paragraph: startInfoForUpdate.paragraph });
-
-        setCurrentLocation({
-          chapter: startInfoForUpdate.chapter,
-          paragraph: startInfoForUpdate.paragraph,
-          endChapter: endInfoForUpdate.chapter,
-          endParagraph: endInfoForUpdate.paragraph,
-          currentChapter: activeParagraphForUpdate.chapter,
-          currentParagraph: activeParagraphForUpdate.paragraph,
-        });
-
-        activateMediaInRange(startInfoForUpdate.chapter, startInfoForUpdate.paragraph, endInfoForUpdate.chapter, endInfoForUpdate.paragraph, openModalFn);
-      } else {
-        console.warn("[Observer DEBOUNCED] Could not update location: activeParagraph or start/end info is invalid.", {
-          activePgh: activeParagraphForUpdate,
-          startInfo: startInfoForUpdate,
-          endInfo: endInfoForUpdate,
-        });
-      }
-    },
-    200,
-    { maxWait: 500, leading: true },
-  );
-
-  const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+  // ----------------------------------------------------------
+  const observer = new IntersectionObserver((entries) => {
     const scrollMarginTopPx = getScrollMarginTopPx();
 
     entries.forEach((entry) => {
@@ -384,40 +341,51 @@ export function setupPageObserver(
       }
     });
 
-    const rootElement = observerOptions.root;
-    if (!rootElement) {
-      console.warn("[Observer IMMEDIATE] Root element not found for observer calculations.");
-      return;
-    }
-    const rootRect = rootElement.getBoundingClientRect();
+    const rootRect = observerOptions.root.getBoundingClientRect();
     const zoneTop = rootRect.top + scrollMarginTopPx;
-    const zoneBottom = zoneTop + 0.1 * rootRect.height;
+    const zoneBottom = zoneTop + 0.1 * rootRect.height; // 10% height below this point
 
-    let newActiveParagraphInfo: { chapter: number | null; paragraph: number | null } | null = null;
+    // --- Development Zone Visualizer ---
+
+    console.log("WILCZYNSKA: 276 zoneTop", zoneTop);
+    console.log("WILCZYNSKA: 277 zoneBottom", zoneBottom);
+    console.log("WILCZYNSKA: 278 rootRect", rootRect);
+    console.log("WILCZYNSKA: 279 scrollMarginTopPx", scrollMarginTopPx);
+
+    let activeParagraph: { chapter: number | null; paragraph: number | null } | null = null;
     let maxPercentageOverlapRatio = -1;
-    let newChosenElement: Element | null = null;
-    let newFoundFullyVisible = false;
+    let chosenElement: Element | null = null;
+    let foundFullyVisible = false;
+    // Minimum overlap threshold in pixels to consider an element
     const MIN_OVERLAP_THRESHOLD = 20;
 
+    // First pass: look for fully visible elements
     intersectingPages.forEach((element) => {
       const rect = element.getBoundingClientRect();
+      // Check if element is fully contained within the zone
       if (rect.top >= zoneTop && rect.bottom <= zoneBottom) {
-        if (!newFoundFullyVisible) {
-          newFoundFullyVisible = true;
-          newActiveParagraphInfo = getParagraphInfo(element);
-          newChosenElement = element;
-          maxPercentageOverlapRatio = 1.0;
+        // Element is fully visible in the zone
+        if (!foundFullyVisible) {
+          // This is the first fully visible element found
+          foundFullyVisible = true;
+          activeParagraph = getParagraphInfo(element);
+          chosenElement = element;
+          maxPercentageOverlapRatio = 1.0; // 100% visible
         }
       }
     });
 
-    if (!newFoundFullyVisible) {
+    // Only proceed to second pass if no fully visible elements were found
+    if (!foundFullyVisible) {
+      let maxAbsoluteOverlap = 0; // Track the maximum absolute pixel overlap
+
       intersectingPages.forEach((element) => {
         const rect = element.getBoundingClientRect();
         const overlapTop = Math.max(rect.top, zoneTop);
         const overlapBottom = Math.min(rect.bottom, zoneBottom);
         const overlap = Math.max(0, overlapBottom - overlapTop);
 
+        // Skip elements with minimal overlap
         if (overlap < MIN_OVERLAP_THRESHOLD) return;
 
         const elementHeight = rect.height;
@@ -427,102 +395,189 @@ export function setupPageObserver(
           currentOverlapRatio = overlap / elementHeight;
         }
 
+        // Use a weighted combination of absolute overlap and percentage overlap
+        // This gives preference to elements that occupy more space in the zone
+        // while still considering how much of the element is visible
         const ABSOLUTE_WEIGHT = 0.7;
         const PERCENTAGE_WEIGHT = 0.3;
+
         const zoneHeight = zoneBottom - zoneTop;
-        const normalizedAbsoluteOverlap = zoneHeight > 0 ? overlap / zoneHeight : 0; // Avoid division by zero
+        const normalizedAbsoluteOverlap = overlap / zoneHeight; // Normalize to 0-1 range
         const weightedScore = normalizedAbsoluteOverlap * ABSOLUTE_WEIGHT + currentOverlapRatio * PERCENTAGE_WEIGHT;
 
         if (weightedScore > maxPercentageOverlapRatio) {
           maxPercentageOverlapRatio = weightedScore;
-          newActiveParagraphInfo = getParagraphInfo(element);
-          newChosenElement = element;
+          maxAbsoluteOverlap = overlap;
+          activeParagraph = getParagraphInfo(element);
+          chosenElement = element;
         }
       });
+
+      console.log("WILCZYNSKA: Absolute overlap of selected element:", maxAbsoluteOverlap);
     }
+
+    console.log(
+      "WILCZYNSKA: 298 activeParagraph",
+      currentlyActiveParagraph,
+      activeParagraph,
+      maxPercentageOverlapRatio,
+      chosenElement,
+      foundFullyVisible ? "fully-visible" : "partial",
+    );
 
     document.querySelectorAll(".active-paragraph").forEach((element) => {
       element.classList.remove("active-paragraph");
     });
-    newChosenElement?.classList.add("active-paragraph");
+    chosenElement?.classList.add("active-paragraph");
 
     const topMultiplier = 0.05;
     let bottomMultiplier = 0.5;
 
+    // Check media query for landscape mode on smaller wide screens
     const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
     if (landscapeMediaQuery.matches) {
-      bottomMultiplier = 0.95;
+      bottomMultiplier = 0.95; // Use larger bottom zone in this mode
     }
 
     const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
     const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
-
-    let newTopFocusedPageElement: Element | null = null;
-    let newBottomFocusedPageElement: Element | null = null;
+    // let zoneVisualizer = document.getElementById("dev-zone-visualizer");
+    // if (!zoneVisualizer) {
+    //   zoneVisualizer = document.createElement("div");
+    //   zoneVisualizer.id = "dev-zone-visualizer";
+    //   document.body.appendChild(zoneVisualizer);
+    // }
+    // zoneVisualizer.style.left = `${rootRect.left}px`;
+    // zoneVisualizer.style.top = `${focusZoneTop}px`;
+    // zoneVisualizer.style.width = `${rootRect.width}px`;
+    // zoneVisualizer.style.height = `${focusZoneBottom - focusZoneTop}px`;
 
     if (intersectingPages.size > 0) {
-      const newFocusedPages = Array.from(intersectingPages).filter((element) => {
+      // Default multipliers
+
+      // Filter intersecting pages to find those overlapping the focus zone
+      const focusedPages = Array.from(intersectingPages).filter((element) => {
         const elementRect = element.getBoundingClientRect();
+        // Check if element's vertical range overlaps with the focus zone
         return elementRect.top < focusZoneBottom && elementRect.bottom > focusZoneTop;
       });
 
-      if (newFocusedPages.length > 0) {
-        newFocusedPages.sort((a, b) => {
+      if (focusedPages.length > 0) {
+        // Sort the focused pages by their viewport top position
+        focusedPages.sort((a, b) => {
           return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
         });
-        newTopFocusedPageElement = newFocusedPages[0];
-        newBottomFocusedPageElement = newFocusedPages[newFocusedPages.length - 1];
+
+        const topFocusedPageElement = focusedPages[0];
+        const bottomFocusedPageElement = focusedPages[focusedPages.length - 1];
+
+        let activeParagraphChanged = false;
+        if (!currentlyActiveParagraph && activeParagraph) {
+          activeParagraphChanged = true;
+        } else if (currentlyActiveParagraph && !activeParagraph) {
+          activeParagraphChanged = true;
+        } else if (currentlyActiveParagraph && activeParagraph) {
+          if (currentlyActiveParagraph.chapter !== activeParagraph.chapter || currentlyActiveParagraph.paragraph !== activeParagraph.paragraph) {
+            activeParagraphChanged = true;
+          }
+        }
+
+        // --- Determine if topFocusedPageElement has changed (value-based) ---
+        let topElementChanged = false;
+        const newTopInfo = topFocusedPageElement ? getParagraphInfo(topFocusedPageElement) : null;
+        // Get info for currentlyActivePageElement (which was the top element from the PREVIOUS run)
+        const currentTopInfoFromState = currentlyActivePageElement ? getParagraphInfo(currentlyActivePageElement) : null;
+
+        if ((!newTopInfo && currentTopInfoFromState) || (newTopInfo && !currentTopInfoFromState)) {
+          topElementChanged = true;
+        } else if (newTopInfo && currentTopInfoFromState) {
+          if (newTopInfo.chapter !== currentTopInfoFromState.chapter || newTopInfo.paragraph !== currentTopInfoFromState.paragraph) {
+            topElementChanged = true;
+          }
+        }
+
+        // --- Determine if bottomFocusedPageElement has changed (value-based) ---
+        let bottomElementChanged = false;
+        const newBottomInfo = bottomFocusedPageElement ? getParagraphInfo(bottomFocusedPageElement) : null;
+        // Get info for currentlyLastActivePageElement (which was the bottom element from the PREVIOUS run)
+        const currentBottomInfoFromState = currentlyLastActivePageElement ? getParagraphInfo(currentlyLastActivePageElement) : null;
+
+        if ((!newBottomInfo && currentBottomInfoFromState) || (newBottomInfo && !currentBottomInfoFromState)) {
+          bottomElementChanged = true;
+        } else if (newBottomInfo && currentBottomInfoFromState) {
+          if (newBottomInfo.chapter !== currentBottomInfoFromState.chapter || newBottomInfo.paragraph !== currentBottomInfoFromState.paragraph) {
+            bottomElementChanged = true;
+          }
+        }
+
+        if (topElementChanged || bottomElementChanged || activeParagraphChanged) {
+          console.log(`[Observer] Change detected. TopEl C: ${topElementChanged}, BotEl C: ${bottomElementChanged}, Pgh C: ${activeParagraphChanged}`);
+          console.log(`[Observer] Prev Top Pgh: ${JSON.stringify(currentTopInfoFromState)}, New Top Pgh: ${JSON.stringify(newTopInfo)}`);
+          console.log(`[Observer] Prev Bottom Pgh: ${JSON.stringify(currentBottomInfoFromState)}, New Bottom Pgh: ${JSON.stringify(newBottomInfo)}`);
+          console.log(`[Observer] Prev Active Pgh: ${JSON.stringify(currentlyActiveParagraph)}, New Active Pgh: ${JSON.stringify(activeParagraph)}`);
+
+          // Update persisted state with the NEW DOM element references for the next comparison cycle
+          currentlyActivePageElement = topFocusedPageElement;
+          currentlyLastActivePageElement = bottomFocusedPageElement;
+          currentlyActiveParagraph = activeParagraph ? { chapter: activeParagraph.chapter, paragraph: activeParagraph.paragraph } : null;
+
+          // Use startInfo and endInfo derived from the NEW topFocusedPageElement and bottomFocusedPageElement
+          const startInfo = newTopInfo; // Already derived
+          const endInfo = newBottomInfo; // Already derived
+
+          if (
+            activeParagraph &&
+            activeParagraph.chapter !== null &&
+            activeParagraph.paragraph !== null &&
+            startInfo &&
+            startInfo.chapter !== null &&
+            startInfo.paragraph !== null &&
+            endInfo &&
+            endInfo.chapter !== null &&
+            endInfo.paragraph !== null
+          ) {
+            console.log(`[Observer] Updating notes for Ch ${startInfo.chapter}:${startInfo.paragraph} to Ch ${endInfo.chapter}:${endInfo.paragraph} (Focus Zone)`);
+            console.log("setting current location from intersection (focus zone)", { chapter: startInfo.chapter, paragraph: startInfo.paragraph });
+
+            setCurrentLocation({
+              chapter: startInfo.chapter,
+              paragraph: startInfo.paragraph,
+              endChapter: endInfo.chapter,
+              endParagraph: endInfo.paragraph,
+              currentChapter: activeParagraph.chapter,
+              currentParagraph: activeParagraph.paragraph,
+            });
+
+            activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal);
+          } else {
+            console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {
+              activePgh: activeParagraph,
+              startInfo: startInfo,
+              endInfo: endInfo,
+            });
+          }
+        } else {
+          console.log(`[Observer] No relevant change detected in active/boundary elements or paragraph. Skipping update.`);
+        }
+      } else {
+        // Handle case where intersecting pages exist, but none are in the focus zone
+        if (currentlyActivePageElement !== null) {
+          console.log("[Observer] No pages intersecting the focus zone.");
+          // Decide if you want to clear the active elements or keep the last known ones
+          // currentlyActivePageElement = null;
+          // currentlyLastActivePageElement = null;
+          // updateParagraphNotes({ startChapter: null, startParagraph: null, endChapter: null, endParagraph: null }); // Example: Clear notes
+        }
+      }
+    } else {
+      // Handle case where no pages are intersecting the viewport at all
+      if (currentlyActivePageElement !== null) {
+        console.log("[Observer] No pages intersecting viewport.");
+        // currentlyActivePageElement = null;
+        // currentlyLastActivePageElement = null;
       }
     }
-
-    const newTopInfo = newTopFocusedPageElement ? getParagraphInfo(newTopFocusedPageElement) : null;
-    const newBottomInfo = newBottomFocusedPageElement ? getParagraphInfo(newBottomFocusedPageElement) : null;
-
-    let activeParagraphChanged = false;
-    if ((!currentlyActiveParagraph && newActiveParagraphInfo) || (currentlyActiveParagraph && !newActiveParagraphInfo)) {
-      activeParagraphChanged = true;
-    } else if (currentlyActiveParagraph && newActiveParagraphInfo) {
-      if (currentlyActiveParagraph.chapter !== newActiveParagraphInfo.chapter || currentlyActiveParagraph.paragraph !== newActiveParagraphInfo.paragraph) {
-        activeParagraphChanged = true;
-      }
-    }
-
-    let topElementChanged = false;
-    const currentTopInfoFromState = currentlyActivePageElement ? getParagraphInfo(currentlyActivePageElement) : null;
-    if ((!newTopInfo && currentTopInfoFromState) || (newTopInfo && !currentTopInfoFromState)) {
-      topElementChanged = true;
-    } else if (newTopInfo && currentTopInfoFromState) {
-      if (newTopInfo.chapter !== currentTopInfoFromState.chapter || newTopInfo.paragraph !== currentTopInfoFromState.paragraph) {
-        topElementChanged = true;
-      }
-    }
-
-    let bottomElementChanged = false;
-    const currentBottomInfoFromState = currentlyLastActivePageElement ? getParagraphInfo(currentlyLastActivePageElement) : null;
-    if ((!newBottomInfo && currentBottomInfoFromState) || (newBottomInfo && !currentBottomInfoFromState)) {
-      bottomElementChanged = true;
-    } else if (newBottomInfo && currentBottomInfoFromState) {
-      if (newBottomInfo.chapter !== currentBottomInfoFromState.chapter || newBottomInfo.paragraph !== currentBottomInfoFromState.paragraph) {
-        bottomElementChanged = true;
-      }
-    }
-
-    if (topElementChanged || bottomElementChanged || activeParagraphChanged) {
-      // Update persisted state with the NEW DOM element references and paragraph info for the next comparison cycle
-      currentlyActivePageElement = newTopFocusedPageElement;
-      currentlyLastActivePageElement = newBottomFocusedPageElement;
-      currentlyActiveParagraph = newActiveParagraphInfo ? { chapter: newActiveParagraphInfo.chapter, paragraph: newActiveParagraphInfo.paragraph } : null;
-
-      const activePghForDebounce =
-        newActiveParagraphInfo && newActiveParagraphInfo.chapter !== null && newActiveParagraphInfo.paragraph !== null
-          ? { chapter: newActiveParagraphInfo.chapter, paragraph: newActiveParagraphInfo.paragraph }
-          : null;
-
-      debouncedUpdater(activePghForDebounce, newTopInfo, newBottomInfo, openCharacterDetailsModal);
-    }
-  };
-
-  const observer = new IntersectionObserver(handleIntersection, observerOptions);
+  }, observerOptions);
 
   // Function to observe new paragraphs
   const observeNewParagraphs = (): number => {

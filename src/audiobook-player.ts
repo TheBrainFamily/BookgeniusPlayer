@@ -1,6 +1,5 @@
 import { getAudioContext, initAudioContext, getAudiobookGainNode } from "@/audio-crossfader";
 import { CURRENT_BOOK } from "./consts";
-import { AssetManager } from "@capawesome/capacitor-asset-manager";
 
 export type AudiobookTrackEvent = {
   timestamp: number; // Time in seconds within the track
@@ -60,20 +59,9 @@ initAudiobookPlayer();
 /* ——————————————————————————————————————————————————————————— */
 /* main                                                        */
 /* ——————————————————————————————————————————————————————————— */
-async function listFolder(path: string) {
-  try {
-    const { files } = await AssetManager.list({ path });
-    console.log(`📂 ${path || "[root]"} → ${JSON.stringify(files)}`);
-  } catch (e) {
-    console.warn(`⚠️  Cannot list "${path}":`, e);
-  }
-}
 
 export async function loadTrack(trackId: string): Promise<boolean> {
   /* 1 ▸ sanity-check what’s in the bundle --------------------------- */
-  await listFolder("public");
-  await listFolder(`public/${CURRENT_BOOK}`);
-  await listFolder(`public/${CURRENT_BOOK}/audiobook_data`);
 
   /* 2 ▸ audio context ---------------------------------------------- */
   audioContext = getAudioContext() ?? (initAudioContext(), getAudioContext());

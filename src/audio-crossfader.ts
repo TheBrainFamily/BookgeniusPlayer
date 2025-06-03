@@ -195,7 +195,6 @@ export async function loadTrack(trackId: string, transitionPoints?: number[]): P
   try {
     /* ── 4a metadata (ID3) ───────────────────────────────────────── */
     const { common } = await parseBlob(new Blob([arrayBuffer], { type: "audio/mpeg" }));
-    console.log("🛈 metadata", common);
     title = common.title || title;
 
     if (common.picture?.[0]) {

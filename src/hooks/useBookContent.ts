@@ -1,8 +1,19 @@
-import { useEditorMode } from "@/hooks/useEditorMode";
+import { useEffect } from "react";
+import { getBookData } from "@/booksData/getBookData";
+import { useCharacterModal } from "@/stores/modals/characterModal.store";
+import { setupPageObserver } from "@/ui/pageObserver";
 
 export function useBookContent(containerId: string) {
-  const container = document.getElementById(containerId);
-  const isEditorMode = import.meta.env.VITE_EDITOR === "true";
+  const { bookStringified } = getBookData();
+  const { openModal: openCharacterDetailsModal } = useCharacterModal();
 
-  useEditorMode(isEditorMode ? container : null);
+  useEffect(() => {
+    const container = document.getElementById(containerId);
+    if (container) {
+      container.innerHTML = bookStringified.replace(/<\/section>(?!.*<\/section>)/s, '<div style="height: 50vh;"></div></section>');
+      setupPageObserver(openCharacterDetailsModal);
+    } else {
+      console.warn(`Container with id '${containerId}' not found for content injection.`);
+    }
+  }, [bookStringified, containerId]); // Rerun if content or ID changes
 }
