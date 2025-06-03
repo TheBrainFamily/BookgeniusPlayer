@@ -190,7 +190,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         content: [
           {
             type: "input_text",
-            // text: `
+            text: `Answer question about this book. Use only knowledge from get_book_information tool. Absolutely no spoilers besides those chunks. Characters in the book: Winston, Big Brother, Julia, Parsons, O'Brien, . If I mispronounce a character's name, use this list to guide you. `,
             // text: `Pomóz mi z książką. Odpowiadaj tylko na podstawie tekstu z get_book_information tool. Postacie z ksiazki to: Ksiąze Ramzes, Sara, Herhor, Dagon, Tutmozis i inni.`,
             // text: `Help me with the book. The characters are: "Chilli", "Harry", "Karen", "Catlett", "Michael", "Leo", "Tommy", "Nicki", "Fay". If I mispronounce a character's name, use this list to guide you. When I ask a question, use the get_book_information tool to answer the question.`,
           },
