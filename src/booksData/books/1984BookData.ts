@@ -12,4 +12,5 @@ export const bookData: BookData = {
   themeColors: getBookThemeColors(BOOK_SLUGS._1984),
   hasAudiobook: true,
   bookStringified: _1984BookXml,
+  audioPrompt: `Answer question about this book. Use only knowledge from get_book_information tool. Absolutely no spoilers besides those chunks. Characters in the book: Willson, Big Brother, Julia, Parson. If I mispronounce a character's name, use this list to guide you. `,
 };

@@ -21,4 +21,5 @@ export type BookData = {
   themeColors: BookThemeColors;
   hasAudiobook: boolean;
   bookStringified: string;
+  audioPrompt?: string;
 };
