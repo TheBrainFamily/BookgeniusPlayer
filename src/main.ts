@@ -11,7 +11,6 @@ import { initializeNoteLinkBlinking } from "./annotationsHandling";
 import { dealWithSW } from "./serviceWorker";
 import { setupParagraphHighlighting } from "./ui/paragraphHighlighting";
 import { initPage } from "./ui/pageInit";
-import { initializeElementVisibilityManager } from "./ui/elementVisibilityManager";
 
 /* ------------------------------------------------------------------ */
 /*  The only exported symbol                                           */
@@ -39,13 +38,6 @@ export async function runLegacyInit() {
   function onDOMLoaded() {
     initializeNoteLinkBlinking(); // <-- kept here for safety;
     setupParagraphHighlighting();
-
-    // Initialize element visibility manager only after splash is hidden
-    function initElementVisibilityAfterSplash() {
-      initializeElementVisibilityManager();
-    }
-
-    window.addEventListener("splashHidden", initElementVisibilityAfterSplash);
   }
 
   if (document.readyState === "loading") {

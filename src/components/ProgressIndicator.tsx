@@ -1,21 +1,19 @@
 import React from "react";
 import { motion, Variants } from "motion/react";
 
-import { BookData } from "../booksData/types";
 import { useLocationRange } from "@/hooks/useLocationRange";
 import { systemNavigateTo, getSavedLocation } from "@/helpers/paragraphsNavigation";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { ProgressElement } from "./ProgressElement";
+import { getBookData } from "@/booksData/getBookData";
 
-interface BookProgressIndicatorProps {
-  bookData: BookData;
-}
-
-const ProgressIndicator: React.FC<BookProgressIndicatorProps> = ({ bookData }) => {
+const ProgressIndicator: React.FC = () => {
   const {
     debouncedLocation: { currentChapter },
   } = useLocationRange();
   const { currentChapter: furthestChapter } = getSavedLocation();
+  const bookData = getBookData();
 
   const totalChapters = bookData.chapters;
 
@@ -96,22 +94,24 @@ const ProgressIndicator: React.FC<BookProgressIndicatorProps> = ({ bookData }) =
 
   // return <></>;
   return (
-    <motion.div
-      className={cn("relative h-3 bg-black/70 textured-bg border shadow-xl text-white border-white/30 rounded-3xl overflow-hidden mx-3", "progress-indicator")}
-      variants={variants.container}
-      initial="hidden"
-      animate="visible"
-    >
+    <ProgressElement className="mx-3">
       <motion.div
-        className="h-full bg-gradient-to-r from-yellow-400/80 via-lime-500/80 to-green-500/80 rounded-full"
-        variants={variants.progressBar}
-        style={{ width: `${Math.max(0, totalProgress)}%` }}
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
-      />
-      {renderChapterMarkers()}
-    </motion.div>
+        className={cn("relative h-3 bg-black/70 textured-bg border shadow-xl text-white border-white/30 rounded-3xl overflow-hidden")}
+        variants={variants.container}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div
+          className="h-full bg-gradient-to-r from-yellow-400/80 via-lime-500/80 to-green-500/80 rounded-full"
+          variants={variants.progressBar}
+          style={{ width: `${Math.max(0, totalProgress)}%` }}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
+        />
+        {renderChapterMarkers()}
+      </motion.div>
+    </ProgressElement>
   );
 };
 

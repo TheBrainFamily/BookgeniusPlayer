@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Play, Pause, SkipForward, SkipBack, ListMusic, BookHeadphones, Volume2, VolumeX, Download } from "lucide-react";
 import { motion, AnimatePresence, Variants, Transition } from "motion/react";
 import useLocalStorageState from "use-local-storage-state";
+import { useTranslation } from "react-i18next";
 
 import {
   getMasterVolume,
@@ -29,7 +30,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { cn } from "@/lib/utils";
 import { CURRENT_BOOK } from "@/consts";
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
-import { useTranslation } from "react-i18next";
+import { OptionalElement } from "./OptionalElement";
 
 const AudioPlayer = () => {
   const isMobileOrTablet = useIsMobileOrTablet();
@@ -299,7 +300,7 @@ const AudioPlayer = () => {
 
   return (
     <>
-      <div className="relative origin-top-left" data-interactive="true" data-audio-player="true">
+      <OptionalElement className="relative origin-top-left" data-interactive="true" data-audio-player="true">
         <div className="audio-player bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1 relative">
           {/* Volume Control Button with Dropdown */}
           <div
@@ -543,7 +544,7 @@ const AudioPlayer = () => {
             </AnimatePresence>
           </div>
         </div>
-      </div>
+      </OptionalElement>
 
       {/* Song Notification */}
       <AnimatePresence>

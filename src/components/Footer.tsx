@@ -7,13 +7,11 @@ import useSplashHidden from "@/hooks/useSplashHidden";
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
 import { cn } from "@/lib/utils";
 import ProgressIndicator from "./ProgressIndicator";
-import { getBookData } from "@/booksData/getBookData";
 
 const Footer = () => {
   const { sendMessage } = useWebSocket();
   const isSplashHidden = useSplashHidden();
   const isMobileOrTablet = useIsMobileOrTablet();
-  const bookData = getBookData();
 
   const [isRightNotesBlankHidden, setIsRightNotesBlankHidden] = useState(false);
 
@@ -33,7 +31,7 @@ const Footer = () => {
           <div id="left-notes-blank" className="hidden md:block md:flex-1 max-w-[700px]" />
           <div className="flex-2 md:min-w-[600px] max-w-[900px] px-0 md:px-0 flex flex-col gap-1 md:gap-2 lg:gap-2 ml-0 md:pl-10 xl:pl-0">
             <BottomInput onSubmit={sendMessage} />
-            <ProgressIndicator bookData={bookData} />
+            <ProgressIndicator />
           </div>
           {!isRightNotesBlankHidden && <div id="right-notes-blank" className="hidden xl:block xl:flex-1 max-w-[700px]" />}
         </motion.footer>

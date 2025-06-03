@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Mic, Send, Telescope } from "lucide-react";
 import { motion, Variants, AnimatePresence } from "motion/react";
+import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 import { useRealtime } from "@/context/RealtimeContext";
@@ -10,7 +11,7 @@ import { useLocation } from "@/state/LocationContext";
 import { deepResearchCall } from "@/deepResearchCall";
 import { useSearchModal } from "@/stores/modals/searchModal.store";
 import { useDeepResearchModal } from "@/stores/modals/deepResearchModal.store";
-import { useTranslation } from "react-i18next";
+import { OptionalElement } from "./OptionalElement";
 
 interface SubmitMessageData {
   query: string;
@@ -166,7 +167,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   }, [isRecording, stopRecording, updateLastActivity]);
 
   return (
-    <div className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
+    <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
       <motion.div
         className={cn("bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-3 py-2", isRecording && "recording-active")}
         animate={isRecording ? "recordingContainer" : "idle"}
@@ -306,7 +307,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
           </motion.div>
         </AnimatePresence>
       </motion.div>
-    </div>
+    </OptionalElement>
   );
 };
 

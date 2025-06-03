@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { shouldShowReturnButton, systemNavigateTo, getSavedLocation } from "@/helpers/paragraphsNavigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLocationRange } from "@/hooks/useLocationRange";
+import { OptionalElement } from "./OptionalElement";
 
 const ReturnToLocationButton = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -37,7 +38,7 @@ const ReturnToLocationButton = () => {
 
   return (
     <AnimatePresence>
-      <div className="optional-element">
+      <OptionalElement>
         {isVisible && (
           <motion.div
             className="bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center"
@@ -63,7 +64,7 @@ const ReturnToLocationButton = () => {
             </Tooltip>
           </motion.div>
         )}
-      </div>
+      </OptionalElement>
     </AnimatePresence>
   );
 };
