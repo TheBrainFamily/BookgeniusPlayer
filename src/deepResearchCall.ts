@@ -10,7 +10,7 @@ export async function deepResearchCall(searchQuery: string, location: Location):
 
   const params = new URLSearchParams({ question: searchQuery, filter: JSON.stringify(filter) });
 
-  const url = `${baseUrl}?${params.toString()}`;
+  const url = `https://bookgenius.net/${baseUrl}?${params.toString()}`;
   console.log(`Fetching deep research from: ${url}`); // Optional: for debugging
 
   try {

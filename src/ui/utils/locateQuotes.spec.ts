@@ -1,6 +1,6 @@
 import { expect, describe, it } from "@jest/globals";
 import { normalise } from "./normalise";
-import { locateQuotes, similarity } from "./locateQuotes";
+import { locateQuotes, similarity, similarityPingwing } from "./locateQuotes";
 
 describe("similarity()", () => {
   it("is 1 for identical strings", () => {
@@ -12,6 +12,25 @@ describe("similarity()", () => {
     const a = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
     const b = "Masz moja wdziecznosc i przekonasz sie, ze jest cos warta";
     expect(similarity(normalise(a), normalise(b))).toBeGreaterThan(0.99);
+  });
+});
+
+describe("similarityPingwing()", () => {
+  it("is 1 for identical strings", () => {
+    const s = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
+    expect(similarityPingwing(normalise(s), normalise(s))).toBe(1);
+  });
+
+  it("is high for minor edits", () => {
+    const a = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
+    const b = "Masz moja wdziecznosc i przekonasz sie, ze jest cos warta";
+    expect(similarityPingwing(normalise(a), normalise(b))).toBeGreaterThan(0.99);
+  });
+
+  it("is high for substrings", () => {
+    const a = "Masz moja wdziecznosc";
+    const b = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
+    expect(similarityPingwing(normalise(a), normalise(b))).toBeGreaterThan(0.99);
   });
 });
 

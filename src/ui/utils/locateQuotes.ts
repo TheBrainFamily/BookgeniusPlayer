@@ -2,6 +2,7 @@ import DiffMatchPatch from "diff-match-patch";
 
 import { normalise } from "./normalise";
 import type { ParagraphInfo, QuoteHit } from "../MarkdownComponent";
+import { alignTwoStringsAndGivePercentScoreFromZeroToOne } from "@/ui/utils/Needleman-Wunsch";
 
 const dmp = new DiffMatchPatch();
 
@@ -29,6 +30,11 @@ export const similarity = (a: string, b: string): number => {
   return 1 - edit / maxLen;
 };
 
+export const similarityPingwing = (a: string, b: string): number => {
+  const result = alignTwoStringsAndGivePercentScoreFromZeroToOne(a, b);
+  return result;
+};
+
 export const locateQuotes = (quotes: string[], paragraphs: ParagraphInfo[], upTo: { chapter: number; paragraph: number }): QuoteHit[] => {
   const limited = paragraphs.filter((p) => p.chapter < upTo.chapter || (p.chapter === upTo.chapter && p.index <= upTo.paragraph));
 
@@ -41,6 +47,7 @@ export const locateQuotes = (quotes: string[], paragraphs: ParagraphInfo[], upTo
         .replace(/\s+/g, " ")
         .trim(),
     );
+
     let best: QuoteHit | undefined;
 
     limited.forEach((p) => {
@@ -48,7 +55,7 @@ export const locateQuotes = (quotes: string[], paragraphs: ParagraphInfo[], upTo
       const overlap = qNorm.split(/\s+/).filter((w) => w.length > 3 && p.norm.includes(w)).length;
       if (overlap < 3) return;
 
-      const score = similarity(qNorm, p.norm);
+      const score = similarityPingwing(qNorm, p.norm);
       if (score > 0.55 && (!best || score > best.score)) {
         best = { quote, chapter: p.chapter, index: p.index, score };
       }

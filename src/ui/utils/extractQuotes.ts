@@ -24,7 +24,7 @@ export function extractQuotes(raw: string): string[] {
   quotes.forEach((q) => {
     const clean = q
       /* remove Markdown bold, stray quotes */
-      .replace(/\*\*/g, "")
+      .replace(/\*\*/g, "") // PINGWING TODO check if it can stay like this
       /* crush internal line-breaks introduced by bullet wraps */
       .replace(/\n\s*\*\s+/g, " ")
       /* leading list markers (*, -, +) */

@@ -63,11 +63,22 @@ const buildParagraphCache = (): ParagraphInfo[] => {
  * ------------------------------------------------------------------ */
 const inlineFootnotes = (md: string, hits: QuoteHit[]) => {
   let footnoted = md;
+
+  const foundBold = footnoted.matchAll(/\*\*/g);
+
+  console.log("PINGWING: 68 foundBold", foundBold);
+
+  console.log("PINGWING: 66 md", md);
+  console.log("PINGWING: 72 footnoted", footnoted);
   hits.forEach((h, idx) => {
     // Escape RegExp specials in the quote text
+    console.log("PINGWING: 68 h.quote", h.quote);
+
     const safe = h.quote.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
     const tag = `<sup class="quote-ref" data-ch="${h.chapter}" data-para="${h.index}">[${idx}]</sup>`;
     const re = new RegExp(safe);
+    const found = footnoted.search(re);
+    console.log("PINGWING: 72 found", found);
     footnoted = footnoted.replace(re, `${h.quote}${tag}`);
   });
   return footnoted;
