@@ -31,7 +31,12 @@ const ModalUI: React.FC<ModalUIProps> = ({ title, onClose, children, className =
           )}
         </AnimatePresence>
         <DialogTitle className="hidden">{title}</DialogTitle>
-        <DialogContent className={cn("bg-transparent border-none shadow-none p-0", layoutView ? "w-full max-w-none" : "max-w-lg")}>
+        <DialogContent
+          className={cn("bg-transparent border-none shadow-none p-0", layoutView ? "w-full max-w-none" : "max-w-lg")}
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+          }}
+        >
           <div
             className={cn("flex flex-row gap-2 justify-center items-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 h-full", layoutView ? "w-full max-w-none" : "max-w-[100rem]")}
           >
