@@ -48,6 +48,7 @@
   animation: fadeInUp 0.6s ease-out forwards;
   animation-delay: 0.2s;
   line-height: 40px;
+  height: 88px; /* hardcoded height of the title container so there is no flicker when subtitle is loaded */
 }
 
 .splash-title {
