@@ -329,7 +329,18 @@ const AudioPlayer = () => {
               setIsVolumeOpen(false);
             }}
           >
-            <motion.button onClick={toggleMute} className="p-2 my-1 hover:text-white rounded-full cursor-pointer" whileHover="hover" whileTap="tap" variants={variants.buttonHover}>
+            <motion.button
+              onTouchEnd={() => {
+                setIsVolumeOpen(!isVolumeOpen);
+              }}
+              onMouseUp={() => {
+                toggleMute();
+              }}
+              className="p-2 my-1 hover:text-white rounded-full cursor-pointer"
+              whileHover="hover"
+              whileTap="tap"
+              variants={variants.buttonHover}
+            >
               <AnimatePresence mode="wait" initial={false}>
                 {isMuted ? (
                   <motion.div key="muted" variants={variants.iconFadeScale}>
