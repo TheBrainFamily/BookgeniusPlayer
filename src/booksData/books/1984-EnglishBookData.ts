@@ -8,7 +8,7 @@ export const bookData: BookData = {
   slug: BOOK_SLUGS._1984_English,
   metadata: { title: "1984-English" },
   charactersData: _1984EnglishCharactersData,
-  chapters: 3,
+  chapters: 5,
   themeColors: getBookThemeColors(BOOK_SLUGS._1984_English),
   bookStringified: _1984EnglishBookXml,
   hasAudiobook: true,
