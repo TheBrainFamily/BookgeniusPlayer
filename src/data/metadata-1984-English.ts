@@ -7,7 +7,7 @@ export const _1984EnglishCharactersData = [
       {
         chapter: 1,
         summary: "The main protagonist, a 39-year-old man working at the Ministry of Truth. He suffers from a varicose ulcer above his right ankle. He lives in Victory Mansions.",
-        paragraphsWhereSpotted: [1, 2, 3, 4, 5, 6, 7, 12, 13, 15, 17, 24, 26, 27, 30, 32, 33, 39, 40, 42],
+        paragraphsWhereSpotted: [1, 2, 3, 4, 5, 6, 7, 10, 11, 13, 15, 22, 24, 25, 28, 30, 31, 35, 36, 38],
         paragraphsWhereTalking: [],
       },
       {
@@ -33,7 +33,7 @@ export const _1984EnglishCharactersData = [
       {
         chapter: 1,
         summary: "The leader of the Party in Oceania. His face is on omnipresent posters with the caption 'BIG BROTHER IS WATCHING YOU'.",
-        paragraphsWhereSpotted: [2, 4, 29, 30, 32, 34, 38, 39, 43, 46],
+        paragraphsWhereSpotted: [2, 4, 27, 28, 30, 32, 34, 35, 39, 42],
         paragraphsWhereTalking: [],
       },
       {
@@ -60,7 +60,7 @@ export const _1984EnglishCharactersData = [
         chapter: 1,
         summary:
           "The main enemy of the people and the Party. A former high-ranking Party official who became a traitor and counter-revolutionary. He is the central figure during the Two Minutes Hate.",
-        paragraphsWhereSpotted: [29, 30, 31, 32, 34],
+        paragraphsWhereSpotted: [27, 28, 29, 30, 32],
         paragraphsWhereTalking: [],
       },
       {
@@ -82,7 +82,7 @@ export const _1984EnglishCharactersData = [
         chapter: 1,
         summary:
           "A young woman (around 27 years old) working in the Fiction Department. She has dark hair, a bold look, and wears the scarlet sash of the Junior Anti-Sex League. Winston feels antipathy and suspicion towards her.",
-        paragraphsWhereSpotted: [26, 27, 32, 33],
+        paragraphsWhereSpotted: [24, 25, 30, 31],
         paragraphsWhereTalking: [],
       },
       {
@@ -104,7 +104,7 @@ export const _1984EnglishCharactersData = [
         chapter: 1,
         summary:
           "A member of the Inner Party, holding an important position. A large, robust man with a harsh face but engaging manners. Winston feels a strange attraction to him and hopes that O'Brien might not be fully orthodox.",
-        paragraphsWhereSpotted: [27, 32, 40, 41],
+        paragraphsWhereSpotted: [25, 30, 36, 37],
         paragraphsWhereTalking: [],
       },
     ],
