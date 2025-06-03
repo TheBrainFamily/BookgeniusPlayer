@@ -53,7 +53,7 @@
       <div class="splash-container">
         <div class="splash-title-container">
           <div class="splash-title">BookGenius</div>
-          <div class="splash-subtitle">Twoja wirtualna biblioteka</div>
+          <div class="splash-subtitle"> </div>
         </div>
 
         <div class="splash-image-container">
@@ -97,7 +97,6 @@
           });
 
           const t = window.i18n.t;
-          document.querySelector('.splash-title').textContent = t('splash_title');
           document.querySelector('.splash-subtitle').textContent = t('splash_subtitle');
           document.querySelector('.splash-start-button span').textContent = t('start_button');
           this.loadingPhrases = t('loading_phrases', { returnObjects: true }) || [];
