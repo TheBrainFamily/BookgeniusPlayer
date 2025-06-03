@@ -15,8 +15,14 @@ interface ModalUIProps {
 }
 
 const ModalUI: React.FC<ModalUIProps> = ({ title, onClose, children, className = "", preventClickOutside = false, layoutView = false, hideOverlay = false }) => {
+  const handleOpenChange = (open: boolean) => {
+    if (!open && !preventClickOutside && !layoutView) {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={true} onOpenChange={onClose}>
+    <Dialog open={true} onOpenChange={handleOpenChange}>
       <DialogPortal>
         <AnimatePresence>
           {!hideOverlay && (
@@ -26,21 +32,26 @@ const ModalUI: React.FC<ModalUIProps> = ({ title, onClose, children, className =
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15, ease: "easeInOut" }}
               className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-              onClick={preventClickOutside ? undefined : onClose}
+              onClick={preventClickOutside || layoutView ? undefined : onClose}
             />
           )}
         </AnimatePresence>
         <DialogTitle className="hidden">{title}</DialogTitle>
         <DialogContent
-          className={cn("bg-transparent border-none shadow-none p-0", layoutView ? "w-full max-w-none" : "max-w-lg")}
+          className={cn("bg-transparent border-none shadow-none p-0", layoutView ? "w-full max-w-none pointer-events-none!" : "max-w-lg sm:max-w-lg")}
           onOpenAutoFocus={(e) => {
             e.preventDefault();
           }}
         >
           <div
-            className={cn("flex flex-row gap-2 justify-center items-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 h-full", layoutView ? "w-full max-w-none" : "max-w-[100rem]")}
+            className={cn(
+              "flex flex-row gap-2 justify-center items-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 h-full",
+              layoutView ? "w-full max-w-none pointer-events-none" : "max-w-[100rem]",
+            )}
           >
-            {layoutView && <div id="left-notes-blank" className={cn("hidden max-w-[700px] ", "lg:flex lg:order-2 lg:flex-2 lg:max-w-[900px]", "xl:flex-1 xl:order-1")} />}
+            {layoutView && (
+              <div id="left-notes-blank" className={cn("hidden max-w-[700px] pointer-events-none", "lg:flex lg:order-2 lg:flex-2 lg:max-w-[900px]", "xl:flex-1 xl:order-1")} />
+            )}
             <div
               className={cn(
                 // Apply default styling only if className doesn't contain 'bg-transparent'

@@ -110,15 +110,15 @@ const DeepResearchMarkdown: React.FC<DMProps> = ({ text, className = "" }) => {
   };
 
   const components = {
-    h1: (props: ComponentPropsWithoutRef<"h1">) => <h1 {...props} className="mt-12 mb-6 text-3xl font-extrabold border-b border-gray-300 pb-3 tracking-tight first:mt-0" />,
+    h1: (props: ComponentPropsWithoutRef<"h1">) => <h1 {...props} className="mt-12 mb-6 text-3xl font-extrabold border-b border-white pb-3 tracking-tight first:mt-0" />,
     h2: (props: ComponentPropsWithoutRef<"h2">) => <h2 {...props} className="mt-10 mb-4 text-2xl font-semibold border-l-4 border-primary pl-4 first:mt-0" />,
-    h3: (props: ComponentPropsWithoutRef<"h3">) => <h3 {...props} className="mt-8 mb-3 text-xl font-medium text-gray-900 first:mt-0" />,
-    p: (props: ComponentPropsWithoutRef<"p">) => <p {...props} className="my-4 leading-relaxed text-gray-800 max-w-none prose-p:leading-normal" />,
+    h3: (props: ComponentPropsWithoutRef<"h3">) => <h3 {...props} className="mt-8 mb-3 text-xl font-medium text-white first:mt-0" />,
+    p: (props: ComponentPropsWithoutRef<"p">) => <p {...props} className="my-4 leading-relaxed text-white/90 max-w-none prose-p:leading-normal" />,
     ul: (props: ComponentPropsWithoutRef<"ul">) => <ul {...props} className="list-disc ml-6 space-y-1" />,
     ol: (props: ComponentPropsWithoutRef<"ol">) => <ol {...props} className="list-decimal ml-6 space-y-1" />,
     strong: (props: ComponentPropsWithoutRef<"strong">) => <strong {...props} className="font-semibold text-gray-900" />,
-    em: (props: ComponentPropsWithoutRef<"em">) => <em {...props} className="italic text-gray-700" />,
-    blockquote: (props: ComponentPropsWithoutRef<"blockquote">) => <blockquote {...props} className="border-l-4 border-primary/80 italic pl-5 my-4 text-gray-700" />,
+    em: (props: ComponentPropsWithoutRef<"em">) => <em {...props} className="italic text-white/80" />,
+    blockquote: (props: ComponentPropsWithoutRef<"blockquote">) => <blockquote {...props} className="border-l-4 border-primary/80 italic pl-5 my-4 text-white/70" />,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     li: ({ ordered, ...props }: ListItemProps) => <li {...props} className="pl-1 marker:font-semibold" />,
     code: ({ inline, children, ...props }: CodeProps) => {
