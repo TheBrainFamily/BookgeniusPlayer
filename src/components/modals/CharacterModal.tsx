@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ModalUI from "./ModalUI";
 import CharacterMedia from "@/components/CharacterMedia";
 import { CharacterData } from "@/booksData/types";
-import { performLocalDOMSearch, SearchResultItemData } from "@/searchModal";
+import { findCharacterSentences, SearchResultItemData } from "@/searchModal";
 import { useLocation } from "@/state/LocationContext";
 import { getBookData } from "@/booksData/getBookData";
 import { useTranslation } from "react-i18next";
@@ -35,10 +35,10 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
   // Search for character appearances in the text up to the current location
   useEffect(() => {
-    const searchAppearances = async () => {
+    const searchAppearances = () => {
       setIsLoading(true);
       try {
-        const searchResults = await performLocalDOMSearch(matchingCharacter.characterName, location, bookData.slug);
+        const searchResults = findCharacterSentences(characterSlug, location, bookData);
         // Return first 3 appearances
         setCharacterAppearances(searchResults.items.slice(0, 3));
       } catch (error) {
