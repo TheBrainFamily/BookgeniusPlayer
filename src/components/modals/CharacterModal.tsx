@@ -91,7 +91,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                           {t("chapter")} {appearance.chapter}, {t("paragraph")} {appearance.paragraphNumber}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-300 leading-relaxed">{appearance.text}</p>
+                      <p className="text-sm text-gray-300 leading-relaxed line-clamp-3">{appearance.text}</p>
                     </div>
                   ))}
                 </div>

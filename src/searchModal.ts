@@ -254,7 +254,7 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
     }
     // If we already have text with the character, add more context until we reach the limit
     const cleanAcc = acc.replace(/<[^>]*>/g, "");
-    if (cleanAcc.length < 150) {
+    if (cleanAcc.length < 200) {
       return `${acc} ${sentence}`;
     }
     return acc;
@@ -292,8 +292,8 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
 
           if (sentence) {
             const cleanText = sentence.replace(/<[^>]*>/g, "");
-            const summaryText = cleanText.length > 150 ? `${cleanText.substring(0, 150).trim()}...` : cleanText;
-            const displayText = summaryText.length > 75 ? `${summaryText.substring(0, 75)}...` : summaryText;
+            const summaryText = cleanText.length > 200 ? cleanText.substring(0, 200) : cleanText;
+            const displayText = summaryText.length > 200 ? summaryText.substring(0, 200) : summaryText;
 
             items.push({
               chapter,
