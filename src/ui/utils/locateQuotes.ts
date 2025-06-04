@@ -30,6 +30,41 @@ export const similarity = (a: string, b: string): number => {
   return 1 - edit / maxLen;
 };
 
+export const similarityPingwingBasedOnAbove = (a: string, b: string): number => {
+  const maxLen = Math.max(a.length, b.length);
+  if (maxLen < 10) return 0; // allow shorter quotes
+
+  const diffs = dmp.diff_main(a, b);
+  dmp.diff_cleanupSemantic(diffs);
+
+  console.log("PINGWING: 40 diffs", diffs);
+
+  let equalBlockLenght = 0;
+
+  const edit = diffs.reduce((acc, [op, txt]) => {
+    if (op === 0) {
+      equalBlockLenght += txt.length;
+      return acc;
+    } // equal block – free
+
+    // strip non-alphanumerics so commas, dashes, spaces cost 0
+    const pure = txt.replace(/[^\p{L}\p{N}]/gu, "");
+    if (!pure) return acc;
+
+    // digits are weighted ×4 so “200”→“300” matters
+    const digitPenalty = (pure.match(/\d/g) || []).length * 4;
+    const letterPenalty = pure.length - (pure.match(/\d/g) || []).length;
+
+    return acc + digitPenalty + letterPenalty;
+  }, 0);
+
+  console.log("PINGWING: 54 edit", edit);
+  console.log("PINGWING: 61 equalBlockLenght", equalBlockLenght);
+  console.log("PINGWING: 62 a.length", a.length);
+
+  return equalBlockLenght / a.length;
+};
+
 export const similarityPingwing = (a: string, b: string): number => {
   const result = alignTwoStringsAndGivePercentScoreFromZeroToOne(a, b);
   return result;

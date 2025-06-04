@@ -1,6 +1,6 @@
 import { expect, describe, it } from "@jest/globals";
 import { normalise } from "./normalise";
-import { locateQuotes, similarity, similarityPingwing } from "./locateQuotes";
+import { locateQuotes, similarity, similarityPingwing, similarityPingwingBasedOnAbove } from "./locateQuotes";
 
 describe("similarity()", () => {
   it("is 1 for identical strings", () => {
@@ -12,6 +12,49 @@ describe("similarity()", () => {
     const a = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
     const b = "Masz moja wdziecznosc i przekonasz sie, ze jest cos warta";
     expect(similarity(normalise(a), normalise(b))).toBeGreaterThan(0.99);
+  });
+
+  it("is high for substrings", () => {
+    const a = "Masz moja wdziecznosc";
+    const b = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
+    expect(similarity(normalise(a), normalise(b))).toBeGreaterThan(0.99);
+  });
+
+  it("is high for substrings in any part of string", () => {
+    const a = "oja wdziecznosc i przekonasz";
+    const b = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
+    expect(similarity(normalise(a), normalise(b))).toBeGreaterThan(0.99);
+  });
+});
+
+describe("similarityPingwingBasedOnAbove()", () => {
+  it("is 1 for identical strings", () => {
+    const s = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
+    expect(similarityPingwingBasedOnAbove(normalise(s), normalise(s))).toBe(1);
+  });
+
+  it("is high for minor edits", () => {
+    const a = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
+    const b = "Masz moja wdziecznosc i przekonasz sie, ze jest cos warta";
+    expect(similarityPingwingBasedOnAbove(normalise(a), normalise(b))).toBeGreaterThan(0.99);
+  });
+
+  it("is high for substrings", () => {
+    const a = "moja wdziecznosc i przekonasz";
+    const b = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
+    expect(similarityPingwingBasedOnAbove(normalise(a), normalise(b))).toBeGreaterThan(0.99);
+  });
+
+  it("is high for substrings in any part of string", () => {
+    const a = "oja wdziecznosc i przek";
+    const b = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
+    expect(similarityPingwingBasedOnAbove(normalise(a), normalise(b))).toBeGreaterThan(0.99);
+  });
+
+  it("is high for substrings in any part of string even with editions", () => {
+    const a = "oja wdzie cznosc i przek";
+    const b = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
+    expect(similarityPingwingBasedOnAbove(normalise(a), normalise(b))).toBeGreaterThan(0.95);
   });
 });
 
@@ -31,6 +74,18 @@ describe("similarityPingwing()", () => {
     const a = "Masz moja wdziecznosc";
     const b = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
     expect(similarityPingwing(normalise(a), normalise(b))).toBeGreaterThan(0.99);
+  });
+
+  it("is high for substrings in any part of string", () => {
+    const a = "oja wdziecznosc i przek";
+    const b = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
+    expect(similarityPingwing(normalise(a), normalise(b))).toBeGreaterThan(0.99);
+  });
+
+  it("is high for substrings in any part of string with editions", () => {
+    const a = "oja wdzie cznosc i przek";
+    const b = "Masz moją wdzięczność i przekonasz się, że jest coś warta";
+    expect(similarityPingwing(normalise(a), normalise(b))).toBeGreaterThan(0.95);
   });
 });
 
