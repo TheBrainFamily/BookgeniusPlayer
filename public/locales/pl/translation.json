@@ -98,5 +98,9 @@
   "version": "Wersja",
   "set_openai_api_key": "Ustaw klucz OpenAI",
   "appearances": "Wystąpienia postaci w tekście",
-  "searching_appearances": "Szukanie wystąpień..."
+  "searching_appearances": "Szukanie wystąpień...",
+  "cancel": "Anuluj",
+  "save": "Zapisz",
+  "enter_openai_api_key": "Wprowadź klucz OpenAI",
+  "openai_api_key_description": "Wprowadź swój klucz API OpenAI, aby włączyć funkcje głosowe"
 }

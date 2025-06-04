@@ -98,5 +98,9 @@
   "version": "Version",
   "set_openai_api_key": "Set OpenAI API Key",
   "appearances": "Appearances in the text",
-  "searching_appearances": "Searching for appearances..."
+  "searching_appearances": "Searching for appearances...",
+  "cancel": "Cancel",
+  "save": "Save",
+  "enter_openai_api_key": "Enter OpenAI API Key",
+  "openai_api_key_description": "Enter your OpenAI API key to enable voice features"
 }

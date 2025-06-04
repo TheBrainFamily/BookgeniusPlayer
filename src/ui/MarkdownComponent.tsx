@@ -116,7 +116,7 @@ const DeepResearchMarkdown: React.FC<DMProps> = ({ text, className = "" }) => {
     p: (props: ComponentPropsWithoutRef<"p">) => <p {...props} className="my-4 leading-relaxed text-white/90 max-w-none prose-p:leading-normal" />,
     ul: (props: ComponentPropsWithoutRef<"ul">) => <ul {...props} className="list-disc ml-6 space-y-1" />,
     ol: (props: ComponentPropsWithoutRef<"ol">) => <ol {...props} className="list-decimal ml-6 space-y-1" />,
-    strong: (props: ComponentPropsWithoutRef<"strong">) => <strong {...props} className="font-semibold text-gray-900" />,
+    strong: (props: ComponentPropsWithoutRef<"strong">) => <strong {...props} className="font-semibold text-white" />,
     em: (props: ComponentPropsWithoutRef<"em">) => <em {...props} className="italic text-white/80" />,
     blockquote: (props: ComponentPropsWithoutRef<"blockquote">) => <blockquote {...props} className="border-l-4 border-primary/80 italic pl-5 my-4 text-white/70" />,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

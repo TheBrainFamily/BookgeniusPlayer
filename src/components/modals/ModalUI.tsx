@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogTitle, DialogOverlay } from "@/components/ui/dialog";
 
 export interface ModalUIProps {
-  title?: string;
+  title?: ReactNode;
   onClose: () => void;
   children: ReactNode;
   className?: string;
@@ -92,7 +92,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
       <DialogOverlay className={cn("dialog-overlay", hideOverlay && "bg-transparent backdrop-blur-none")} />
 
       {/* Accessibility */}
-      {title && <DialogTitle className="sr-only">{title}</DialogTitle>}
+      {title && <DialogTitle className="sr-only">{typeof title === "string" ? title : "Modal"}</DialogTitle>}
 
       {/* Modal Content */}
       <DialogContent className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)} onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -102,7 +102,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
           <div className={modalContentClasses} onClick={(e) => e.stopPropagation()}>
             {title && (
               <header className="flex justify-between items-center p-4">
-                <h2 className={titleTextClasses}>{title}</h2>
+                <div className={titleTextClasses}>{title}</div>
                 {showCloseButton && (
                   <button type="button" onClick={onClose} className={closeButtonClasses} aria-label="Close modal">
                     <X size={20} />
