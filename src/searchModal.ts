@@ -252,12 +252,8 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
     if (acc.length === 0) {
       return acc;
     }
-    // If we already have text with the character, add more context until we reach the limit
-    const cleanAcc = acc.replace(/<[^>]*>/g, "");
-    if (cleanAcc.length < 200) {
-      return `${acc} ${sentence}`;
-    }
-    return acc;
+    // If we already have text with the character, add the rest of the text
+    return `${acc} ${sentence}`;
   }, "");
 };
 
