@@ -14,6 +14,6 @@ import "./i18n";
 const container = document.getElementById("root")!;
 createRoot(container).render(
   <React.StrictMode>
-    <App />,
+    <App />
   </React.StrictMode>,
 );
