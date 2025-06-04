@@ -16,7 +16,7 @@ interface Bridge {
 }
 
 let _bridge: Bridge = {
-  get: () => ({ chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 }),
+  get: () => ({ chapter: 1, paragraph: 0, endChapter: 1, endParagraph: 0, currentChapter: 1, currentParagraph: 0 }),
 
   set: () => {},
 };
@@ -24,12 +24,12 @@ export const __setLocationBridge = (b: Bridge) => (_bridge = b);
 
 /* ------------------------------------------------------------------ */
 /*  Furthest‑location helpers                                         */
-export const getSavedLocation = (): Location => {
+export const getSavedLocation = (): Location | null => {
   try {
     const raw = localStorage.getItem("furthestLocation");
-    return raw ? JSON.parse(raw) : { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 };
+    return raw ? JSON.parse(raw) : null;
   } catch {
-    return { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 };
+    return null;
   }
 };
 
@@ -50,9 +50,13 @@ export const setCurrentLocation = (loc: Location) => {
   }, 2000);
 
   const saved = getSavedLocation();
-  const ahead = loc.currentChapter > saved.currentChapter || (loc.currentChapter === saved.currentChapter && loc.currentParagraph > saved.currentParagraph);
+  if (!saved) {
+    setSavedLocation(loc);
+  } else {
+    const isAhead = loc.currentChapter > saved.currentChapter || (loc.currentChapter === saved.currentChapter && loc.currentParagraph > saved.currentParagraph);
 
-  if (ahead) setSavedLocation(loc);
+    if (isAhead) setSavedLocation(loc);
+  }
 };
 
 /* ------------------------------------------------------------------ */
@@ -140,6 +144,7 @@ window.addEventListener("orientationchange", handleResizeOrOrientationChange);
 
 export const parseLocationFromHash = (): Location | null => {
   const hash = window.location.hash.substring(1); // Remove leading #
+  console.log("hash", hash);
   if (!hash) return null;
 
   const parts = hash.split("-");
@@ -169,6 +174,10 @@ export const goToInitialLocationFromHash = () => {
     // Fallback if hash is invalid or missing: go to furthest saved location
     console.warn("no location in hash, using saved location");
     const saved = getSavedLocation();
-    systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph });
+    if (saved) {
+      systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph });
+    } else {
+      console.warn("no saved location, using default location");
+    }
   }
 };
