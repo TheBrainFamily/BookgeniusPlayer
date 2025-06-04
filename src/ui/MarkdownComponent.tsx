@@ -63,7 +63,6 @@ const buildParagraphCache = (): ParagraphInfo[] => {
  * ------------------------------------------------------------------ */
 const inlineFootnotes = (md: string, hits: QuoteHit[]) => {
   let footnoted = md;
-
   hits.forEach((h, idx) => {
     // Escape RegExp specials in the quote text
     const safe = h.quote.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
