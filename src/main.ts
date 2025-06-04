@@ -37,51 +37,7 @@ export async function runLegacyInit() {
    * ---------------------------------------------------------------- */
   function onDOMLoaded() {
     initializeNoteLinkBlinking(); // <-- kept here for safety;
-    //     also wrapped in a React hook upstream
-
-    document.querySelectorAll(".modal-close").forEach((button) => {
-      const modal = button.closest(".modal-overlay");
-      if (modal) button.addEventListener("click", () => modal.classList.remove("active"));
-    });
     setupParagraphHighlighting();
-
-    // Setup optional elements hiding on user inactivity
-    let inactivityTimer: number | null = null;
-    const INACTIVITY_TIMEOUT = 5000; // 10 seconds
-
-    const hideOptionalElements = () => {
-      const optionalElements = document.querySelectorAll(".optional-element");
-      optionalElements.forEach((element) => {
-        (element as HTMLElement).style.transition = "opacity 8s ease-in";
-        (element as HTMLElement).style.opacity = "0";
-      });
-    };
-
-    const showOptionalElements = () => {
-      const optionalElements = document.querySelectorAll(".optional-element[style*='opacity: 0']");
-      optionalElements.forEach((element) => {
-        (element as HTMLElement).style.transition = "opacity 1s ease-out";
-        (element as HTMLElement).style.opacity = "1";
-      });
-    };
-
-    const resetInactivityTimer = () => {
-      if (inactivityTimer) {
-        clearTimeout(inactivityTimer);
-      }
-      showOptionalElements();
-      inactivityTimer = window.setTimeout(hideOptionalElements, INACTIVITY_TIMEOUT);
-    };
-
-    // Start the timer initially
-    inactivityTimer = window.setTimeout(hideOptionalElements, INACTIVITY_TIMEOUT);
-
-    // Reset timer on mouse movement
-    document.addEventListener("mousemove", resetInactivityTimer);
-    // Also reset on scroll, click and keypress for better user experience
-    document.addEventListener("scroll", resetInactivityTimer);
-    document.addEventListener("click", resetInactivityTimer);
-    document.addEventListener("keypress", resetInactivityTimer);
   }
 
   if (document.readyState === "loading") {

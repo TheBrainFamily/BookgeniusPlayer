@@ -1,25 +1,19 @@
 import React from "react";
-import { BookOpen } from "lucide-react";
 import { motion, Variants } from "motion/react";
 
-import { BookData } from "../booksData/types";
 import { useLocationRange } from "@/hooks/useLocationRange";
 import { systemNavigateTo, getSavedLocation } from "@/helpers/paragraphsNavigation";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { ProgressElement } from "./ProgressElement";
+import { getBookData } from "@/booksData/getBookData";
 
-interface BookProgressIndicatorProps {
-  bookData: BookData;
-}
-
-const containerVariants: Variants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut", staggerChildren: 0.1 } } };
-const progressBarVariants: Variants = { hidden: { scaleX: 0 }, visible: { scaleX: 1, transition: { duration: 1, ease: "easeOut", delay: 0.2 } } };
-
-const ProgressIndicator: React.FC<BookProgressIndicatorProps> = ({ bookData }) => {
+const ProgressIndicator: React.FC = () => {
   const {
-    debouncedLocation: { currentChapter, currentParagraph },
+    debouncedLocation: { currentChapter },
   } = useLocationRange();
   const { currentChapter: furthestChapter } = getSavedLocation();
+  const bookData = getBookData();
 
   const totalChapters = bookData.chapters;
 
@@ -35,19 +29,20 @@ const ProgressIndicator: React.FC<BookProgressIndicatorProps> = ({ bookData }) =
     if (chapterNum === currentChapter) return "current";
     if (chapterNum === furthestChapter && chapterNum !== currentChapter) return "furthest";
     if (chapterNum < furthestChapter) return "completed";
+
     return "locked";
   };
 
   const getChapterColor = (status: string) => {
     switch (status) {
       case "current":
-        return "bg-blue-400 shadow-lg border border-blue-300";
+        return "bg-white shadow-md border-2 border-white";
       case "furthest":
-        return "bg-green-400 shadow-md border border-green-300";
+        return "bg-blue-400 shadow-md border-2 border-white";
       case "completed":
-        return "bg-amber-400/80 hover:bg-amber-300 border border-amber-300/50";
+        return "bg-green-400 shadow-md border-2 border-white";
       default:
-        return "bg-gray-500 hover:bg-gray-400 border border-gray-400/50";
+        return "bg-gray-400 shadow-md border-2 border-gray-400";
     }
   };
 
@@ -78,7 +73,7 @@ const ProgressIndicator: React.FC<BookProgressIndicatorProps> = ({ bookData }) =
             <TooltipTrigger asChild>
               <motion.button
                 onClick={() => handleChapterClick(i)}
-                className={cn(`absolute top-0 h-full w-[7px] z-10 ${colorClass} transition-all cursor-pointer`, i === 1 && "translate-x-[1px]")}
+                className={cn(`absolute -top-1 rounded-4xl h-[14px] w-[14px] z-10 ${colorClass} transition-all cursor-pointer`, i === 1 && "translate-x-[1px]")}
                 style={{ left: `${position}%` }}
                 custom={i}
               />
@@ -93,52 +88,33 @@ const ProgressIndicator: React.FC<BookProgressIndicatorProps> = ({ bookData }) =
         </TooltipProvider>,
       );
     }
+
     return markers;
   };
 
+  // return <></>;
   return (
-    <motion.div
-      className="bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl p-5 py-3 flex flex-col gap-1 md:gap-2 lg:gap-3"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <motion.div className="flex items-center justify-between" variants={containerVariants}>
-        <motion.div className="flex items-center gap-2" variants={containerVariants}>
-          <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}>
-            <BookOpen className="h-4 w-4 text-amber-600" />
-          </motion.div>
-          <span className="text-xs font-medium">Progres czytania</span>
-        </motion.div>
-        <motion.div className="text-xs text-gray-300" variants={containerVariants}>
-          Rozdział {currentChapter} z {totalChapters}
+    <ProgressElement>
+      <motion.div className="my-1 h-4 overflow-hidden progress-indicator content-center" variants={variants.container} initial="hidden" animate="visible">
+        <motion.div className={cn("relative h-2 bg-black/70 textured-bg border shadow-xl text-white border-white/30 rounded-3xl")}>
+          <motion.div
+            className="h-full bg-gradient-to-r from-yellow-400/80 via-lime-500/80 to-green-500/80 rounded-full"
+            variants={variants.progressBar}
+            style={{ width: `${Math.max(0, totalProgress)}%` }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
+          />
+          {renderChapterMarkers()}
         </motion.div>
       </motion.div>
-
-      <motion.div className="relative h-3 bg-gray-200/20 rounded-full overflow-hidden backdrop-blur-sm" variants={containerVariants}>
-        <motion.div
-          className="h-full bg-gradient-to-r from-amber-500/80 via-orange-500/80 to-red-500/80 rounded-full"
-          variants={progressBarVariants}
-          style={{ width: `${Math.max(0, totalProgress)}%` }}
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
-        />
-        {renderChapterMarkers()}
-      </motion.div>
-
-      <motion.div className="text-xs text-gray-400 text-center flex justify-between items-center" variants={containerVariants}>
-        <motion.span key={Math.round(totalProgress)} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.3 }}>
-          {Math.round(totalProgress)}% ukończone
-        </motion.span>
-        {currentParagraph > 0 && (
-          <motion.span initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.4, delay: 0.5 }} className="text-blue-300">
-            Paragraf {currentParagraph}
-          </motion.span>
-        )}
-      </motion.div>
-    </motion.div>
+    </ProgressElement>
   );
+};
+
+const variants: Record<string, Variants> = {
+  container: { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut", staggerChildren: 0.1 } } },
+  progressBar: { hidden: { scaleX: 0 }, visible: { scaleX: 1, transition: { duration: 1, ease: "easeOut", delay: 0.2 } } },
 };
 
 export default ProgressIndicator;

@@ -27,6 +27,8 @@ export const getAudiobookTracksForBook = async (): Promise<AudiobookTracksSectio
       return audiobookTracks;
     case BOOK_SLUGS.Conrad_Tajny_Agent:
       return audiobookTracks;
+    case BOOK_SLUGS._1984_English:
+      return audiobookTracks;
     default:
       return [];
   }

@@ -231,6 +231,14 @@ const _1984BackgroundSongsDefined = [
   { chapter: 24, paragraph: 36, files: ["1984-chapter-24-paragraph-36.mp3", "1984-chapter-24-paragraph-36b.mp3"] },
 ];
 
+const _1984EnglishBackgroundSongsDefined = [
+  { chapter: 1, paragraph: 0, files: ["1984-chapter-1-paragraph-1.mp3", "1984-chapter-1-paragraph-1b.mp3"] },
+  { chapter: 1, paragraph: 22, files: ["1984-chapter-1-paragraph-22.mp3", "1984-chapter-1-paragraph-22b.mp3"] },
+  { chapter: 2, paragraph: 1, files: ["1984-chapter-2-paragraph-1.mp3", "1984-chapter-2-paragraph-1b.mp3"] },
+  { chapter: 2, paragraph: 26, files: ["1984-chapter-2-paragraph-26.mp3", "1984-chapter-2-paragraph-26b.mp3"] },
+  { chapter: 3, paragraph: 1, files: ["1984-chapter-3-paragraph-1.mp3", "1984-chapter-3-paragraph-1b.mp3"] },
+];
+
 const conradTajnyAgentBackgroundSongsDefined = [
   { chapter: 1, paragraph: 0, files: ["tajny-agent-chapter-1-paragraph-1.mp3", "tajny-agent-chapter-1-paragraph-1b.mp3"] },
   { chapter: 2, paragraph: 1, files: ["tajny-agent-chapter-2-paragraph-1.mp3", "tajny-agent-chapter-2-paragraph-1b.mp3"] },
@@ -288,6 +296,8 @@ export const getBackgroundSongsForBook = (bookSlug: string) => {
       return conradTajnyAgentBackgroundSongsDefined;
     case BOOK_SLUGS.Krolowa_Sniegu:
       return krolowaSnieguBackgroundSongsDefined;
+    case BOOK_SLUGS._1984_English:
+      return _1984EnglishBackgroundSongsDefined;
     default:
       return [];
   }

@@ -39,10 +39,12 @@ const removeChunksPlugin = () => {
         .filter((slug) => slug !== currentBookSlug) // Use the resolved currentBookSlug
         .map((slug) => `${slug.toLowerCase()}`);
 
+      console.log(`Removing chunks for books: ${toRemove.join(", ")}`);
+
       toRemove.forEach((base) =>
         fs
           .readdirSync(distDir)
-          .filter((f) => f.toLowerCase().includes(base)) // Make comparison case-insensitive if needed
+          .filter((f) => f.toLowerCase().includes(`${base}audiobookdata`) || f.toLowerCase().includes(`${base}bookdata`))
           .forEach((f) => fs.unlinkSync(path.join(distDir, f))),
       );
     },
@@ -72,6 +74,12 @@ const bookBuildConfigs: Partial<Record<BOOK_SLUGS, BookBuildData>> = {
     staticAssetSourceDir: `public_books/${BOOK_SLUGS.Krolowa_Sniegu}`,
     staticAssetDestDir: BOOK_SLUGS.Krolowa_Sniegu,
   },
+  [BOOK_SLUGS._1984_English]: {
+    name: "1984 English",
+    short_name: "1984-English",
+    staticAssetSourceDir: `public_books/${BOOK_SLUGS._1984_English}`,
+    staticAssetDestDir: BOOK_SLUGS._1984_English,
+  },
 };
 
 const activeBookConfig = bookBuildConfigs[currentBookSlug]; // Use the resolved currentBookSlug
@@ -98,6 +106,7 @@ const bookDataPlugin = () => {
           [BOOK_SLUGS.PHARAON]: "pharaonBookData",
           [BOOK_SLUGS.Conrad_Tajny_Agent]: "conrad-tajny-agentBookData",
           [BOOK_SLUGS.Krolowa_Sniegu]: "krolowa-snieguBookData",
+          [BOOK_SLUGS._1984_English]: "1984-EnglishBookData",
         };
 
         const selectedBook = bookImportMap[currentBookSlug];
@@ -117,6 +126,7 @@ const bookDataPlugin = () => {
           [BOOK_SLUGS.PHARAON]: "PharaonBookData",
           [BOOK_SLUGS.Conrad_Tajny_Agent]: "ConradTajnyAgentBookData",
           [BOOK_SLUGS.Krolowa_Sniegu]: "KrolowaSnieguBookData",
+          [BOOK_SLUGS._1984_English]: "1984-EnglishBookData",
         };
 
         const selectedAlias = bookAliasMap[currentBookSlug];

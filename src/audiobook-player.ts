@@ -56,38 +56,44 @@ initAudiobookPlayer();
 //   preemptiveTransitionTimeout?: ReturnType<typeof setTimeout> | null; // Added for managing pre-emptive transition
 // }
 
+/* ——————————————————————————————————————————————————————————— */
+/* main                                                        */
+/* ——————————————————————————————————————————————————————————— */
+
 export async function loadTrack(trackId: string): Promise<boolean> {
-  audioContext = getAudioContext();
-  if (!audioContext) {
-    initAudioContext();
-    audioContext = getAudioContext();
-  }
-  if (audioContext!.state !== "running") {
-    // audioContext is guaranteed to be non-null here
-    console.warn("loadTrack: AudioContext is not running. Loading may succeed but playback won't start yet.");
-    // await audioContext!.resume().catch((e) => console.error("Error resuming AudioContext before load:", e));
-    // Resuming here might be too late if the user gesture is already "spent". initAudioContext should handle it.
-  }
+  /* 1 ▸ sanity-check what’s in the bundle --------------------------- */
 
-  const existing = tracks.find((track) => track.id === trackId && track.audioBuffer);
-  if (existing) {
-    // console.log(`Track '${trackId}' already loaded.`);
-    return true;
-  }
+  /* 2 ▸ audio context ---------------------------------------------- */
+  audioContext = getAudioContext() ?? (initAudioContext(), getAudioContext());
 
-  const audioPath = `/${CURRENT_BOOK}/${trackId}`;
-  console.log(`Loading '${trackId}' from ${audioPath}...`);
+  if (tracks.find((t) => t.id === trackId && t.audioBuffer)) return true;
+
+  /* 3 ▸ fetch ------------------------------------------------------- */
+  const rel = `${CURRENT_BOOK}/${trackId}`; // 1984/audiobook_data/book0.mp3
+  const url = `/${rel.replace(/^\/+/, "")}`; // /1984/…
+  console.log(`🎧 loadTrack → ${url}`);
+
+  let buf: ArrayBuffer;
   try {
-    const response = await fetch(audioPath);
-    if (!response.ok) throw new Error(`HTTP ${response.status} – ${response.statusText}`);
-    const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await audioContext!.decodeAudioData(arrayBuffer);
+    const res = await fetch(url);
+    const isLocal = url.startsWith("/");
+    if (!(res.ok || (isLocal && res.status === 0))) throw new Error(`Fetch failed: HTTP ${res.status}`);
+
+    buf = await res.arrayBuffer();
+    if (!buf.byteLength) throw new Error("Empty file");
+  } catch (e) {
+    console.error("❌ Fetch error:", e);
+    return false;
+  }
+
+  /* 4 ▸ decode ------------------------------------------------------ */
+  try {
+    const audioBuffer = await audioContext!.decodeAudioData(buf);
+    console.log(`✅ decoded – ${audioBuffer.duration.toFixed(2)} s`);
     tracks.push({ id: trackId, audioBuffer, duration: audioBuffer.duration, sourceNode: null, gainNode: null, playbackIntervalId: null, events: null, startTimeInContext: 0 });
-    console.log(`Decoded '${trackId}'. Duration: ${audioBuffer.duration.toFixed(2)}s.`);
     return true;
   } catch (e) {
-    console.error(`Error loading '${trackId}':`, e);
-    // tracks = tracks.filter((track) => track.id !== trackId);
+    console.error("❌ decodeAudioData error:", e);
     return false;
   }
 }

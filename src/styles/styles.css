@@ -199,7 +199,7 @@
       }
 
       & > section {
-        padding: 10vh 0 50vh;
+        padding: 15vh 0 70vh;
         width: 100%;
       }
 
@@ -1051,9 +1051,9 @@ section[data-chapter] [data-index] {
 
 @keyframes fadeLastWordHighlightEffect {
   to {
-    background-color: transparent; /* Fades the background highlight */
-    /* If you also change text color, you might want to revert it or fade opacity */
-    /* opacity: 0; */ /* This would make the text itself invisible */
+    background-color: transparent;
+    border: none;
+    border-color: none;
   }
 }
 

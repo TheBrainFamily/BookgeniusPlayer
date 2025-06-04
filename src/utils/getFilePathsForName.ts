@@ -169,6 +169,36 @@ export const knownPharaon = [
   "mlody-kaplan-poslannik-samentu-speaks.mp4",
 ];
 
+const known1984English = [
+  "aaronson-listens.mp4",
+  "ampleforth-listens.mp4",
+  "ampleforth-speaks.mp4",
+  "dark-haired-girl-julia-listens.mp4",
+  "dark-haired-girl-julia-speaks.mp4",
+  "emmanuel-goldstein-listens.mp4",
+  "jones-listens.mp4",
+  "katharine-listens.mp4",
+  "winstons-mother-listens.mp4",
+  "obrien-listens.mp4",
+  "obrien-speaks.mp4",
+  "winstons-father-listens.mp4",
+  "mr-charrington-listens.mp4",
+  "mr-charrington-speaks.mp4",
+  "mrs-parsons-listens.mp4",
+  "mrs-parsons-speaks.mp4",
+  "rutheford_listens.mp4",
+  "winstons-sandy-haired-female-colleague-listens.mp4",
+  "winstons-sandy-haired-female-colleague-speaks.mp4",
+  "winstons-sister-listens.mp4",
+  "tillotson-listens.mp4",
+  "tillotson-speaks.mp4",
+  "tom-parsons-listens.mp4",
+  "tom-parsons-speaks.mp4",
+  "big-brother-listens.mp4",
+  "winston-smith-listens.mp4",
+  "winston-smith-speaks.mp4",
+];
+
 const known1984 = [
   "aaronson-listens.mp4",
   "ampleforth-listens.mp4",
@@ -312,7 +342,7 @@ const knownConradTajnyAgent = [
   "winnie-verloc-speaks.mp4",
 ];
 
-const known = [...knownPharaon, ...known1984, ...knownKrolowaSniegu, ...knownConradTajnyAgent];
+const known = [...knownPharaon, ...known1984, ...knownKrolowaSniegu, ...knownConradTajnyAgent, ...known1984English];
 export const getPictureFileNameForName = (name: string) => {
   return `${name.replace(/[\s()\\']+/g, "-").toLowerCase()}.png`;
 };

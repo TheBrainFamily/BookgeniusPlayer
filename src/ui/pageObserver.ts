@@ -28,6 +28,24 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 }
 
 /**
+ * Normalizes the src to always be PNG and removes "speaks" or "listens" suffixes
+ */
+function normalizeSrcForInlineAvatar(src: string): string {
+  if (!src) return src;
+
+  // Remove "-speaks" or "-listens" (including the dash) that appears before the file extension
+  let normalizedSrc = src.replace(/-(speaks|listens)(?=\.|$)/, "");
+
+  // Ensure it ends with .png
+  if (!normalizedSrc.endsWith(".png")) {
+    // Remove any existing extension and add .png
+    normalizedSrc = normalizedSrc.replace(/\.[^.]*$/, "") + ".png";
+  }
+
+  return normalizedSrc;
+}
+
+/**
  * Creates and configures a video or image element based on the placeholder span's data.
  */
 function createMediaElement(
@@ -43,29 +61,18 @@ function createMediaElement(
   let element: HTMLVideoElement | HTMLImageElement | null = null;
   let finalSrc: string | undefined = undefined;
 
-  // Determine the source and element type
-  if (isTalking) {
-    // Talking, use moving source
-    finalSrc = talkingSrc;
-    if (talkingSrc.toLowerCase().endsWith(".png")) {
-      // Moving source is an image
-      element = document.createElement("img");
-      // Add specific attributes for talking image if needed, otherwise uses common ones below
-    } else {
-      // Moving source is a video
-      const video = document.createElement("video");
-      video.autoplay = true;
-      video.loop = true;
-      video.muted = true;
-      video.playsInline = true;
-      element = video;
-    }
+  // For inline avatars, always use PNG format
+  if (isTalking && talkingSrc) {
+    finalSrc = normalizeSrcForInlineAvatar(talkingSrc);
+    // Always create image element for inline avatars
+    element = document.createElement("img");
   }
 
   // Configure and return the element
   if (element && finalSrc) {
     element.addEventListener("click", () => {
-      openCharacterDetailsModal(characterSlug, isTalking, finalSrc);
+      // Pass the original talkingSrc to the modal, not the normalized finalSrc
+      openCharacterDetailsModal(characterSlug, isTalking, talkingSrc);
     });
     element.src = finalSrc;
     element.classList.add("inline-avatar");
@@ -110,8 +117,11 @@ function highlightCharacter(character: HTMLSpanElement, openCharacterDetailsModa
 
     // Create media element based on source type
     if (listeningSrc) {
+      // Normalize the src for consistent PNG format
+      const normalizedSrc = normalizeSrcForInlineAvatar(listeningSrc);
+
       let mediaElement: HTMLVideoElement | HTMLImageElement;
-      if (listeningSrc.toLowerCase().endsWith(".png")) {
+      if (normalizedSrc.toLowerCase().endsWith(".png")) {
         // Create image element
         mediaElement = document.createElement("img");
       } else {
@@ -123,7 +133,7 @@ function highlightCharacter(character: HTMLSpanElement, openCharacterDetailsModa
         mediaElement.playsInline = true;
       }
 
-      mediaElement.src = listeningSrc;
+      mediaElement.src = normalizedSrc;
       mediaElement.classList.add("avatar-preview");
 
       floatingAvatar.appendChild(mediaElement);

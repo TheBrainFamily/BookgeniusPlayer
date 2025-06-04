@@ -48,6 +48,7 @@
   animation: fadeInUp 0.6s ease-out forwards;
   animation-delay: 0.2s;
   line-height: 40px;
+  height: 88px; /* hardcoded height of the title container so there is no flicker when subtitle is loaded */
 }
 
 .splash-title {
@@ -133,7 +134,7 @@
   color: white;
   font-weight: 600;
   font-size: 1.125rem;
-  padding: 1rem 2.5rem;
+  padding: 1rem 3rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,7 +169,7 @@
 }
 
 .play-icon {
-  width: 2rem;
+  width: 0.8rem;
   height: 2rem;
   position: relative;
 }

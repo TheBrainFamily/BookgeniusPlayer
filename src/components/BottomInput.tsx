@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Mic, Send, Telescope } from "lucide-react";
+import { Mic, Send, Telescope, Loader2 } from "lucide-react";
 import { motion, Variants, AnimatePresence } from "motion/react";
+import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 import { useRealtime } from "@/context/RealtimeContext";
@@ -10,6 +11,10 @@ import { useLocation } from "@/state/LocationContext";
 import { deepResearchCall } from "@/deepResearchCall";
 import { useSearchModal } from "@/stores/modals/searchModal.store";
 import { useDeepResearchModal } from "@/stores/modals/deepResearchModal.store";
+import { OptionalElement } from "./OptionalElement";
+import { useElementVisibilityStore } from "@/stores/elementVisibility.store";
+import { hasApiKey } from "@/utils/apiKeyManager";
+import { useApiKeyModal } from "@/stores/modals/apiKeyModal.store";
 
 interface SubmitMessageData {
   query: string;
@@ -22,28 +27,31 @@ interface BottomInputProps {
 }
 
 const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
+  const { t } = useTranslation();
+
   const [value, setValue] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
 
+  const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
+  const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
+
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
-  const { openModal: openDeepResearchModal } = useDeepResearchModal();
+  const { openModal: openDeepResearchModal, setContent: setDeepResearchContent } = useDeepResearchModal();
+  const { openModal: openApiKeyModal } = useApiKeyModal();
 
   const { startRecording, stopRecording, response } = useRealtime();
   const { location } = useLocation();
   const { chapter: currentChapter, paragraph: currentParagraph } = location;
 
   const inputRef = useRef<HTMLInputElement>(null);
-  // Ref to track last activity time
   const lastActivityRef = useRef<number>(Date.now());
-  // Ref for inactivity timer
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Update last activity time
   const updateLastActivity = useCallback(() => {
+    pauseAllTimers();
     lastActivityRef.current = Date.now();
-    // Reset any existing inactivity timer
     if (inactivityTimerRef.current) {
       clearTimeout(inactivityTimerRef.current);
       inactivityTimerRef.current = null;
@@ -87,9 +95,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     if (newDeepResearchState && isSearchModalOpen) {
       closeSearchModal(); // Close search modal if deep research is activated
     }
-    if (newDeepResearchState) {
-      setValue(""); // Clear input when activating deep research
-    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,22 +131,32 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
 
     if (isDeepResearchActive) {
       setIsThinking(true);
+      openDeepResearchModal(undefined, true, true);
+
       deepResearchCall(trimmedValue, location)
         .then((deepResearchResponse) => {
-          openDeepResearchModal(deepResearchResponse, true, true);
+          setDeepResearchContent(deepResearchResponse);
         })
-        .catch((error) => console.error("Deep research failed:", error))
+        .catch((error) => {
+          console.error("Deep research failed:", error);
+          setDeepResearchContent(t("deep_research_error"));
+        })
         .finally(() => {
           setIsThinking(false);
         });
     } else if (onSubmit) {
       onSubmit({ query: trimmedValue, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: CURRENT_BOOK } });
-      setValue(""); // Clear after submission
     }
   };
 
   const handleRecordingStart = useCallback(() => {
     if (isRecording) return;
+
+    // Check if API key is set before starting recording
+    if (!hasApiKey()) {
+      openApiKeyModal();
+      return;
+    }
 
     updateLastActivity();
     setIsRecording(true);
@@ -155,7 +170,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       console.error("Error starting recording:", error);
       setIsRecording(false);
     });
-  }, [isRecording, startRecording, isSearchModalOpen, setSearchQuery, updateLastActivity]);
+  }, [isRecording, startRecording, isSearchModalOpen, setSearchQuery, updateLastActivity, openApiKeyModal]);
 
   const handleRecordingEnd = useCallback(() => {
     if (!isRecording) return;
@@ -168,23 +183,43 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   }, [isRecording, stopRecording, updateLastActivity]);
 
   return (
-    <div className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
-      <motion.div className={cn("bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-3 py-2")}>
+    <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
+      <motion.div
+        className={cn("bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-3 py-2", isRecording && "recording-active")}
+        animate={isRecording ? "recordingContainer" : "idle"}
+        initial="idle"
+        variants={variants.container}
+      >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key="expanded" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
             <form onSubmit={handleSubmit} className="flex items-center space-x-2 min-w-[280px] sm:min-w-[350px]">
-              <input
-                id="bottom-input"
-                ref={inputRef}
-                type="text"
-                value={value}
-                onChange={handleInputChange}
-                placeholder={isRecording ? "Nasłuchiwanie.." : isDeepResearchActive ? "Wprowadź wyszukanie Deep Research..." : "Poszukaj albo zapytaj"}
-                className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-50" : "")}
-                disabled={isRecording || isThinking}
-                autoComplete="off"
-                onFocus={updateLastActivity}
-              />
+              <div className="relative flex-grow flex items-center">
+                <AnimatePresence>
+                  {isRecording && (
+                    <motion.div
+                      key="recording-indicator"
+                      className="absolute left-2 w-3 h-3 rounded-full bg-red-500"
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.05, 1] }}
+                      exit={{ opacity: 0, scale: 0, transition: { duration: 0.2 } }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                  )}
+                </AnimatePresence>
+                <input
+                  id="bottom-input"
+                  ref={inputRef}
+                  type="text"
+                  value={value}
+                  onChange={handleInputChange}
+                  placeholder={isRecording ? t("listening") : isThinking ? t("thinking") : isDeepResearchActive ? t("enter_deep_research") : t("search_or_ask")}
+                  className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-80 pl-7 font-medium" : "")}
+                  disabled={isRecording || isThinking}
+                  autoComplete="off"
+                  onFocus={updateLastActivity}
+                  onBlur={() => startAllTimers()}
+                />
+              </div>
 
               <div className="flex items-center space-x-2">
                 {/* Deep Research Button */}
@@ -201,14 +236,14 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                         )}
                         whileHover={!isThinking ? "hover" : undefined}
                         whileTap={!isThinking ? "tap" : undefined}
-                        variants={buttonVariants}
+                        variants={variants.deepResearchButton}
                         onClick={toggleDeepResearch}
                         disabled={isThinking || isRecording}
                       >
-                        <Telescope size={18} />
+                        {isThinking ? <Loader2 size={18} className="animate-spin" /> : <Telescope size={18} />}
                       </motion.button>
                     </TooltipTrigger>
-                    <TooltipContent>Deep Research - analizuje szczegółowo cały tekst</TooltipContent>
+                    <TooltipContent>{isThinking ? t("thinking") : t("deep_research")}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
 
@@ -223,13 +258,13 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                           className="p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400"
                           whileHover="hover"
                           whileTap="tap"
-                          variants={buttonVariants}
+                          variants={variants.button}
                           disabled={isThinking}
                         >
                           <Send size={18} />
                         </motion.button>
                       </TooltipTrigger>
-                      <TooltipContent>Wyślij wiadomość</TooltipContent>
+                      <TooltipContent>{t("send_message")}</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 ) : (
@@ -239,24 +274,48 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                         <motion.button
                           type="button"
                           className={cn("p-2 rounded-full flex items-center justify-center cursor-pointer", isRecording ? "text-red-400" : "text-white/70")}
+                          style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
                           whileHover={!isRecording ? "hover" : undefined}
-                          whileTap={!isRecording ? "tap" : undefined}
-                          variants={buttonVariants}
+                          whileTap={{ scale: 1.2 }}
+                          variants={variants.button}
+                          initial="idle"
                           animate={isRecording ? "recording" : "idle"}
-                          onClick={() => {
-                            if (isRecording) {
-                              setIsRecording(false);
-                              handleRecordingEnd();
-                            }
-                            setIsRecording(true);
+                          // onClick={() => {
+                          //   if (isRecording) {
+                          //     setIsRecording(false);
+                          //     handleRecordingEnd();
+                          //   }
+                          //   setIsRecording(true);
+                          //   handleRecordingStart();
+                          // }}
+                          onTouchStart={(e) => {
+                            e.preventDefault();
                             handleRecordingStart();
                           }}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handleRecordingEnd();
+                          }}
+                          onTouchCancel={(e) => {
+                            e.preventDefault();
+                            handleRecordingEnd();
+                          }}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            handleRecordingStart();
+                          }}
+                          onMouseUp={(e) => {
+                            e.preventDefault();
+                            handleRecordingEnd();
+                          }}
+                          onMouseLeave={() => isRecording && handleRecordingEnd()}
+                          onContextMenu={(e) => e.preventDefault()}
                           disabled={isThinking}
                         >
                           <Mic size={18} />
                         </motion.button>
                       </TooltipTrigger>
-                      <TooltipContent>{isRecording ? "Zatrzymaj nagrywanie" : "Rozpocznij nagrywanie"}</TooltipContent>
+                      <TooltipContent>{isRecording ? t("stop_recording") : t("start_recording")}</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 )}
@@ -265,20 +324,35 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
           </motion.div>
         </AnimatePresence>
       </motion.div>
-    </div>
+    </OptionalElement>
   );
 };
 
 export default BottomInput;
 
-const buttonVariants: Variants = {
-  hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
-  tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
-  idle: { scale: 1 },
-  recording: {
-    scale: [1, 1.1, 1],
-    backgroundColor: ["rgba(239, 68, 68, 0.2)", "rgba(239, 68, 68, 0.4)", "rgba(239, 68, 68, 0.2)"],
-    boxShadow: ["0px 0px 0px rgba(239, 68, 68, 0.4)", "0px 0px 15px rgba(239, 68, 68, 0.6)", "0px 0px 0px rgba(239, 68, 68, 0.4)"],
-    transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+const variants: Record<string, Variants> = {
+  button: {
+    hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
+    tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
+    idle: { scale: 1, backgroundColor: "transparent", boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", color: "rgba(255, 255, 255, 0.7)", transition: { duration: 0.3 } },
+    recording: {
+      scale: [1, 1.1, 1],
+      backgroundColor: ["rgba(239, 68, 68, 0.2)", "rgba(239, 68, 68, 0.4)", "rgba(239, 68, 68, 0.2)"],
+      boxShadow: ["0px 0px 0px rgba(239, 68, 68, 0.4)", "0px 0px 15px rgba(239, 68, 68, 0.6)", "0px 0px 0px rgba(239, 68, 68, 0.4)"],
+      transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+    },
+  },
+  deepResearchButton: {
+    hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
+    tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
+    idle: { scale: 1, backgroundColor: "transparent", boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", transition: { duration: 0.3 } },
+  },
+  container: {
+    idle: { boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", borderColor: "rgba(255, 255, 255, 0.3)", transition: { duration: 0.3 } },
+    recordingContainer: {
+      boxShadow: ["0px 0px 0px rgba(239, 68, 68, 0.2)", "0px 0px 12px rgba(239, 68, 68, 0.6)", "0px 0px 0px rgba(239, 68, 68, 0.2)"],
+      borderColor: ["rgba(255, 255, 255, 0.3)", "rgba(239, 68, 68, 0.6)", "rgba(255, 255, 255, 0.3)"],
+      transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+    },
   },
 };

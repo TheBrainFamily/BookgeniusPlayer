@@ -5,12 +5,14 @@ import { getTitle } from "@/utils/getChapterTitle";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
 import { getBookData } from "@/booksData/getBookData";
+import { useTranslation } from "react-i18next";
 
 interface BookChaptersModalProps {
   onClose: () => void;
 }
 
 const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
+  const { t } = useTranslation();
   const bookData = getBookData();
   const chapters = useMemo(() => {
     if (!bookData || typeof bookData.chapters !== "number") {
@@ -26,7 +28,7 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
   };
 
   return (
-    <ModalUI title="Rozdziały" onClose={onClose}>
+    <ModalUI title={t("chapters")} onClose={onClose}>
       <ScrollArea className="max-h-[60vh]">
         <div className="space-y-2">
           {chapters.map((chapter) => (

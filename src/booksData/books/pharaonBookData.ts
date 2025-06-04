@@ -9,5 +9,6 @@ export const bookData: BookData = {
   charactersData: PharaonCharactersData,
   chapters: 68,
   themeColors: getBookThemeColors(BOOK_SLUGS.PHARAON),
+  bookStringified: "",
   hasAudiobook: false,
 };

@@ -104,15 +104,20 @@ export const getBackgrounds = (): Background[] => {
   ];
   let backgrounds = processBackgroundInputs(backgroundsInput);
 
-  if (CURRENT_BOOK === BOOK_SLUGS._1984) {
+  if (CURRENT_BOOK === BOOK_SLUGS._1984 || CURRENT_BOOK === BOOK_SLUGS._1984_English) {
     const backgroundsInput = [
-      { chapter: 1, file: "1984-chapter-1.mp4" },
-      { chapter: 2, file: "1984-chapter-2.mp4" },
-      { chapter: 3, file: "1984-chapter-3.mp4" },
-      { chapter: 4, file: "chapter_4.mp4" },
-      { chapter: 5, file: "chapter_5.mp4" },
-      { chapter: 6, file: "chapter_6.mp4" },
-      { chapter: 7, file: "chapter_7.mp4" },
+      { chapter: 1, startParagraph: 0, file: "chapter_1.mp4" },
+      { chapter: 1, startParagraph: 22, file: "chapter_23.mp4" },
+      { chapter: 2, startParagraph: 0, file: "chapter_2.mp4" },
+      { chapter: 2, startParagraph: 26, file: "chapter_24.mp4" },
+      { chapter: 3, startParagraph: 0, file: "chapter_3.mp4" },
+      { chapter: 4, startParagraph: 0, file: "chapter_4.mp4" },
+      { chapter: 4, startParagraph: 13, file: "chapter_8.mp4" },
+      { chapter: 5, startParagraph: 0, file: "chapter_5.mp4" },
+      { chapter: 5, startParagraph: 36, file: "chapter_4.mp4" },
+      { chapter: 6, startParagraph: 0, file: "chapter_6.mp4.mp4" },
+      { chapter: 6, startParagraph: 10, file: "1984-chapter-6-2.mp4" },
+      { chapter: 7, startParagraph: 0, file: "chapter_7.mp4" },
       { chapter: 8, file: "chapter_8.mp4" },
       { chapter: 9, file: "chapter_9.mp4" },
       { chapter: 10, file: "chapter_10.mp4" },
