@@ -6,7 +6,7 @@ export interface SearchResultItemData {
   chapter: number;
   paragraphNumber: number;
   summary: string;
-  text: string;
+  text?: string;
   id: string; // For React keys
 }
 
@@ -172,16 +172,12 @@ export async function performLocalDOMSearch(query: string, currentLocation: Loca
 
         if (paragraphText.toLowerCase().includes(queryLower)) {
           const fullText = paragraphText;
-          const displayText = fullText.length > 75 ? `${fullText.substring(0, 75)}...` : fullText;
-
-          // Use a longer snippet of the text for summary, as local DOM search doesn't have explicit summaries
-          const summaryText = fullText.length > 150 ? `${fullText.substring(0, 150)}...` : fullText;
+          const summaryText = fullText.length > 75 ? `${fullText.substring(0, 75)}...` : fullText;
 
           items.push({
             chapter: chapterIndex,
             paragraphNumber: paragraphNumber,
             summary: summaryText,
-            text: displayText,
             id: `local-dom-search-${chapterIndex}-${paragraphNumber}-${resultIndex++}-${Date.now()}`,
           });
         }
