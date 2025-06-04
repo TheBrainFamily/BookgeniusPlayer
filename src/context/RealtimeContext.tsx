@@ -2,12 +2,9 @@ import React, { createContext, useContext, useState, useRef, useEffect, useCallb
 import { RealtimeClient } from "@openai/realtime-api-beta";
 
 import { WavRecorder, WavStreamPlayer } from "@/lib/wavtools/index.js";
-import { CURRENT_BOOK } from "@/consts.js";
-import { QUESTIONS_SERVER_URL } from "@/lib/consts.js";
-// import { usePage } from "./PageContext.js";
 import { instructions } from "@/utils/conversation_config.js";
-import { useLocation } from "@/state/LocationContext.js";
 import { getApiKey, createApiKeyListener } from "@/utils/apiKeyManager";
+import { useBookContext } from "@/hooks/useBookContext";
 
 // Define the conversation item type
 interface ConversationItem {
@@ -58,14 +55,14 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const wavRecorderRef = useRef<WavRecorder>(new WavRecorder({ sampleRate: 24000 }));
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(new WavStreamPlayer({ sampleRate: 24000 }));
 
-  const { location } = useLocation();
-  const { chapter: currentChapter, paragraph: currentParagraph } = location;
-
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [response, setResponse] = useState("");
   const [, setItems] = useState<ConversationItem[]>([]);
+
+  // Use the book context hook to manage sending book content to the RealtimeClient
+  useBookContext({ client: clientRef.current, isConnected });
 
   // Initialize API key from localStorage and listen for changes
   useEffect(() => {
@@ -106,32 +103,32 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     // Set initial instructions
     client.updateSession({ instructions: instructions });
-    client.addTool(
-      {
-        name: "get_book_information",
-        description: "Answers the questions about the book.",
-        parameters: { type: "object", properties: { question: { type: "string", description: "The question to answer." } }, required: ["question"] },
-      },
-      async ({ question }: { question: string }) => {
-        try {
-          console.log("question", question);
+    // client.addTool(
+    //   {
+    //     name: "get_book_information",
+    //     description: "Answers the questions about the book.",
+    //     parameters: { type: "object", properties: { question: { type: "string", description: "The question to answer." } }, required: ["question"] },
+    //   },
+    //   async ({ question }: { question: string }) => {
+    //     try {
+    //       console.log("question", question);
 
-          // Calculate the pageFrom and pageTo based on current page
-          // We're using dynamic page range based on current reading position
-          // we set the pageTo to the current page so we avoid spoilers
+    //       // Calculate the pageFrom and pageTo based on current page
+    //       // We're using dynamic page range based on current reading position
+    //       // we set the pageTo to the current page so we avoid spoilers
 
-          const filter = { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: CURRENT_BOOK };
-          console.log("filter", filter);
-          const response = await fetch(`${QUESTIONS_SERVER_URL}/ask?question=${encodeURIComponent(question)}&filter=${encodeURIComponent(JSON.stringify(filter))}`);
-          const data = await response.text();
-          console.log("Response from book information service:", data);
-          return data;
-        } catch (error) {
-          console.log("error");
-          return { error: (error as Error).message };
-        }
-      },
-    );
+    //       const filter = { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: CURRENT_BOOK };
+    //       console.log("filter", filter);
+    //       const response = await fetch(`${QUESTIONS_SERVER_URL}/ask?question=${encodeURIComponent(question)}&filter=${encodeURIComponent(JSON.stringify(filter))}`);
+    //       const data = await response.text();
+    //       console.log("Response from book information service:", data);
+    //       return data;
+    //     } catch (error) {
+    //       console.log("error");
+    //       return { error: (error as Error).message };
+    //     }
+    //   },
+    // );
 
     client.on("error", (event: unknown) => console.error(event));
 
@@ -167,7 +164,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // Cleanup
       client.reset();
     };
-  }, [clientRef.current, isMuted, currentChapter, currentParagraph]);
+  }, [clientRef.current, isMuted]);
 
   // Connect to conversation
   const connectConversation = useCallback(async () => {
@@ -203,8 +200,8 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         content: [
           {
             type: "input_text",
-            text: `Answer question about this book. Use only knowledge from get_book_information tool. Absolutely no spoilers besides those chunks. Characters in the book: Winston, Big Brother, Julia, Parsons, O'Brien, . If I mispronounce a character's name, use this list to guide you. `,
-            // text: `Pomóz mi z książką. Odpowiadaj tylko na podstawie tekstu z get_book_information tool. Postacie z ksiazki to: Ksiąze Ramzes, Sara, Herhor, Dagon, Tutmozis i inni.`,
+            text: `Answer questions about this book. I will provide you with the book content as context as I read through it. Use the provided book context and the get_book_information tool when needed. Absolutely no spoilers beyond what I've already read. Characters in the book: Winston, Big Brother, Julia, Parsons, O'Brien. If I mispronounce a character's name, use this list to guide you.`,
+            // text: `Pomóż mi z książką. Odpowiadaj tylko na podstawie tekstu z get_book_information tool. Postacie z ksiazki to: Ksiąze Ramzes, Sara, Herhor, Dagon, Tutmozis i inni.`,
             // text: `Help me with the book. The characters are: "Chilli", "Harry", "Karen", "Catlett", "Michael", "Leo", "Tommy", "Nicki", "Fay". If I mispronounce a character's name, use this list to guide you. When I ask a question, use the get_book_information tool to answer the question.`,
           },
         ],
