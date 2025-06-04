@@ -15,9 +15,12 @@ interface TimerState {
   scrollTimerId: number | null;
 }
 
+type HideReason = "tap" | "inactivity" | null;
+
 interface ElementVisibilityState {
   areElementsVisible: boolean;
   isScrollMode: boolean;
+  lastHideReason: HideReason;
   touch: TouchState;
   timers: TimerState;
   // Actions
@@ -29,7 +32,7 @@ interface ElementVisibilityState {
   setScrollTimer: (timerId: number | null) => void;
   // Complex actions
   showAllElements: () => void;
-  hideAllElements: () => void;
+  hideAllElements: (reason?: HideReason) => void;
   handleScreenTap: () => void;
   handleScrollStart: () => void;
   handleScrollEnd: () => void;
@@ -47,6 +50,7 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
       // Initial state
       areElementsVisible: true,
       isScrollMode: false,
+      lastHideReason: null,
       touch: { startY: 0, startX: 0, startTime: 0, isScrolling: false },
       timers: { inactivityTimerId: null, scrollTimerId: null },
 
@@ -84,7 +88,7 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
         // Start the inactivity timer to automatically hide elements after timeout
         const inactivityTimerId = window.setTimeout(() => {
           const { hideAllElements, setInactivityTimer } = useElementVisibilityStore.getState();
-          hideAllElements();
+          hideAllElements("inactivity");
           setInactivityTimer(null);
         }, INACTIVITY_TIMEOUT);
 
@@ -93,19 +97,19 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
       },
 
       // Complex actions
-      showAllElements: () => set({ areElementsVisible: true, isScrollMode: false }),
+      showAllElements: () => set({ areElementsVisible: true, isScrollMode: false, lastHideReason: null }),
 
-      hideAllElements: () => set({ areElementsVisible: false, isScrollMode: false }),
+      hideAllElements: (reason = null) => set({ areElementsVisible: false, isScrollMode: false, lastHideReason: reason }),
 
       handleScreenTap: () => {
         const { areElementsVisible, isScrollMode } = get();
 
         // If we're in scroll mode or elements are hidden, show all elements and exit scroll mode
         if (isScrollMode || !areElementsVisible) {
-          set({ areElementsVisible: true, isScrollMode: false });
+          set({ areElementsVisible: true, isScrollMode: false, lastHideReason: null });
         } else {
           // If elements are visible and we're not in scroll mode, hide them
-          set({ areElementsVisible: false, isScrollMode: false });
+          set({ areElementsVisible: false, isScrollMode: false, lastHideReason: "tap" });
         }
       },
 
@@ -132,6 +136,14 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
 );
 
 export const useOptionalElementVisibility = () => useElementVisibilityStore((state) => state.areElementsVisible);
+
+export const useLastHideReason = () => useElementVisibilityStore((state) => state.lastHideReason);
+
+export const useOptionalElementVisibilityWithReason = () => {
+  const isVisible = useOptionalElementVisibility();
+  const lastHideReason = useLastHideReason();
+  return { isVisible, lastHideReason };
+};
 
 export const useProgressElementVisibility = () =>
   useElementVisibilityStore((state) => {

@@ -31,14 +31,10 @@ import { cn } from "@/lib/utils";
 import { CURRENT_BOOK } from "@/consts";
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
 import { OptionalElement } from "./OptionalElement";
-import { useElementVisibilityStore } from "@/stores/elementVisibility.store";
 
 const AudioPlayer = () => {
   const isMobileOrTablet = useIsMobileOrTablet();
   const { t } = useTranslation();
-
-  const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
-  const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
 
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const INACTIVITY_TIMEOUT = 5000;
@@ -319,7 +315,7 @@ const AudioPlayer = () => {
 
   return (
     <>
-      <OptionalElement className="relative origin-top-left" onMouseEnter={() => pauseAllTimers()} onMouseLeave={() => startAllTimers()}>
+      <OptionalElement className="relative origin-top-left">
         <div className="audio-player bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-2 flex items-center gap-1 relative">
           {/* Volume Control Button with Dropdown */}
           <div
@@ -333,7 +329,22 @@ const AudioPlayer = () => {
               setIsVolumeOpen(false);
             }}
           >
-            <motion.button onClick={toggleMute} className="p-2 my-1 hover:text-white rounded-full cursor-pointer" whileHover="hover" whileTap="tap" variants={variants.buttonHover}>
+            <motion.button
+              onTouchEnd={(e) => {
+                e.preventDefault(); // Prevent mouse events from firing
+                setIsVolumeOpen(!isVolumeOpen);
+              }}
+              onMouseUp={(e) => {
+                // Only handle mouse events if no touch capability or if it's actually a mouse click
+                if (!("ontouchstart" in window) || e.detail > 0) {
+                  toggleMute();
+                }
+              }}
+              className="p-2 my-1 hover:text-white rounded-full cursor-pointer"
+              whileHover="hover"
+              whileTap="tap"
+              variants={variants.buttonHover}
+            >
               <AnimatePresence mode="wait" initial={false}>
                 {isMuted ? (
                   <motion.div key="muted" variants={variants.iconFadeScale}>

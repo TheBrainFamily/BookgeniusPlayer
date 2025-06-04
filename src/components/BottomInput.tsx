@@ -174,11 +174,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   }, [isRecording, stopRecording, updateLastActivity]);
 
   return (
-    <OptionalElement
-      className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}
-      onMouseEnter={() => pauseAllTimers()}
-      onMouseLeave={() => startAllTimers()}
-    >
+    <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
       <motion.div
         className={cn("bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-3 py-2", isRecording && "recording-active")}
         animate={isRecording ? "recordingContainer" : "idle"}

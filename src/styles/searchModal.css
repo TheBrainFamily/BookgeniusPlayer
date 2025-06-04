@@ -92,10 +92,6 @@
   transition: background-color 0.2s;
 }
 
-.search-result-item:hover {
-  background-color: #f5f9ff;
-}
-
 .search-result-page {
   font-weight: bold;
   margin-bottom: 8px;
@@ -104,12 +100,6 @@
 
 .search-result-content {
   line-height: 1.5;
-}
-
-.search-result-summary {
-  font-style: italic;
-  color: #666;
-  margin-bottom: 8px;
 }
 
 .search-highlight {
@@ -126,7 +116,7 @@
 .search-results-header {
   padding: 12px 15px;
   margin-bottom: 20px;
-  background-color: #f0f7ff;
+  background-color: #272424;
   border-radius: 4px;
   font-weight: bold;
   border-left: 4px solid #4a90e2;
