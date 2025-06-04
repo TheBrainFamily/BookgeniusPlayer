@@ -13,6 +13,7 @@ import ModalUI from "./ModalUI";
 interface BookMenuModalProps {
   onClose: () => void;
   openBookChapterModal: () => void;
+  openApiKeyModal: () => void;
   preloadBackgroundTracks: () => void;
   resetFurthestPageLocation: () => void;
 }
@@ -47,7 +48,7 @@ const displayAllChapters = () => {
   });
 };
 
-const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, preloadBackgroundTracks, resetFurthestPageLocation }) => {
+const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, openApiKeyModal, preloadBackgroundTracks, resetFurthestPageLocation }) => {
   const [currentFontSize, setCurrentFontSize] = useLocalStorageState("fontSize", { defaultValue: 1 });
   const [hideOverlay, setHideOverlay] = useState(false);
   const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -139,12 +140,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           variant="ghost"
           className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
           onClick={() => {
-            const newApiKey = prompt("OpenAI API Key") || "";
-            if (newApiKey) {
-              localStorage.setItem("tmp::voice_api_key", newApiKey);
-              console.warn("need to pass it to the voice agent now");
-            }
-            onClose();
+            openApiKeyModal();
           }}
         >
           <BrainCircuit className="mr-2 h-4 w-4" />

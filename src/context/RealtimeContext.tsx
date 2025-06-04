@@ -7,6 +7,7 @@ import { QUESTIONS_SERVER_URL } from "@/lib/consts.js";
 // import { usePage } from "./PageContext.js";
 import { instructions } from "@/utils/conversation_config.js";
 import { useLocation } from "@/state/LocationContext.js";
+import { getApiKey, createApiKeyListener } from "@/utils/apiKeyManager";
 
 // Define the conversation item type
 interface ConversationItem {
@@ -66,15 +67,27 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [response, setResponse] = useState("");
   const [, setItems] = useState<ConversationItem[]>([]);
 
-  // Initialize API key from localStorage
+  // Initialize API key from localStorage and listen for changes
   useEffect(() => {
-    // Only run on client side
-    const storedApiKey = localStorage.getItem("tmp::voice_api_key") || "";
-    setApiKey(storedApiKey);
+    const loadApiKey = () => {
+      const storedApiKey = getApiKey();
+      setApiKey(storedApiKey);
 
-    if (!storedApiKey) {
-      console.warn("No OpenAI API Key, things will not work");
-    }
+      if (!storedApiKey) {
+        console.warn("No OpenAI API Key, things will not work");
+      } else {
+        console.log("OpenAI API Key loaded successfully");
+      }
+    };
+
+    // Load initial API key
+    loadApiKey();
+
+    // Set up listeners for API key changes
+    const { addListeners, removeListeners } = createApiKeyListener(loadApiKey);
+    addListeners();
+
+    return removeListeners;
   }, []);
 
   // Initialize RealtimeClient when apiKey is available
