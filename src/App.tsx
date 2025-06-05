@@ -25,8 +25,11 @@ import CharacterNotesPanel from "./components/CharacterNotesPanel";
 import { ModalRenderers } from "./features/ModalRenderers";
 import { useBookContent } from "@/hooks/useBookContent";
 import { useElementVisibility } from "./hooks/useElementVisibility";
+import { setKnownVideos } from "@/utils/getFilePathsForName";
+import { getKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles";
 
 function Shell() {
+  setKnownVideos(getKnownVideoFiles());
   useBookContent("content-container");
   useElementVisibility();
 

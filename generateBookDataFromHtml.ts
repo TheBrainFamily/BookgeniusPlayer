@@ -5,7 +5,7 @@ import { xmlToComplexHtml } from "./scripts/data/xmlToComplexHtml";
 import { BOOK_SLUGS } from "@/consts";
 import { extractCharacterMetadata, getCharacterTags } from "./scripts/data/tools/create-book-metadata";
 
-function mainFunction() {
+export function generateBookDataFromHtml() {
   const args = process.argv.slice(2); // Skip node executable and script path
 
   if (args.length === 0) {
@@ -26,7 +26,6 @@ function mainFunction() {
   const bookOutputPath = path.resolve("src", "books", bookSlug);
 
   const getBookStringified = xmlToComplexHtml(book, bookSlug as BOOK_SLUGS);
-  console.log("65: getBookStringified BANG!", getBookStringified);
   fs.writeFileSync(
     path.join(bookOutputPath, "getBookStringified.ts"),
     `const bookStringified = \`<section>${getBookStringified}</section>\`\n\n export const getBookStringified = (): string => {
@@ -63,5 +62,3 @@ function mainFunction() {
 
   fs.writeFileSync(path.join(bookOutputPath, "bookData.ts"), bookData, "utf8");
 }
-
-mainFunction();

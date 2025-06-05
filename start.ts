@@ -2,7 +2,8 @@ import path from "path";
 import { execSync } from "child_process";
 import fs from "fs";
 import { DOMParser } from "@xmldom/xmldom";
-import * as child_process from "node:child_process";
+import { setKnownVideos } from "@/utils/getFilePathsForName";
+import { generateBookDataFromHtml } from "./generateBookDataFromHtml";
 
 interface BookMetadata {
   title: string;
@@ -54,13 +55,17 @@ async function start() {
     .filter((file) => file.endsWith(".mp4"))
     .map((file) => file);
 
+  setKnownVideos(videoFiles);
+
   const getKnownVideoFiles = `export const getKnownVideoFiles = () => {\n return ${JSON.stringify(videoFiles, null, 2)} \n};`;
   fs.writeFileSync(path.join(bookOutputPath, "getKnownVideoFiles.ts"), getKnownVideoFiles, "utf-8");
 
   // getBookStringified.ts
 
-  const command = `tsx ./generateBookDataFromHtml.ts ${bookDirectoryPath}`;
-  child_process.execSync(command);
+  generateBookDataFromHtml();
+
+  // const command = `tsx ./generateBookDataFromHtml.ts ${bookDirectoryPath}`;
+  // child_process.execSync(command);
 
   try {
     console.log(`Attempting to load book data from: ${bookDataPath}`);
@@ -85,7 +90,7 @@ async function start() {
     const viteBookName = bookData.metadata.title;
 
     // Ensure book names with spaces are handled correctly by quoting.
-    const command = `VITE_BOOK='${viteBook}' VITE_BOOK_NAME='${viteBookName.replace(/'/g, "'\\''")}' vite dev`;
+    const command = `VITE_BOOK='${viteBook}' VITE_BOOK_NAME='${viteBookName.replace(/'/g, "'\\''")}' VITE_BOOK_PATH='${bookDirectoryPath}' vite dev`;
 
     console.log(`Executing: ${command}`);
 

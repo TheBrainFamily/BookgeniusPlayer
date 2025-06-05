@@ -1,13 +1,14 @@
-import { BOOK_SLUGS } from "@/consts";
-import { getKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles";
-
 export const getPictureFileNameForName = (name: string) => {
   return `${name.replace(/[\s()\\']+/g, "-").toLowerCase()}.png`;
 };
 
-const knownVideos = getKnownVideoFiles();
+let knownVideos;
 
-export const getListeningMediaFilePathForName = (name: string, bookSlug: BOOK_SLUGS, forceKnown = false) => {
+export const setKnownVideos = (passedKnownVideos: string[]) => {
+  knownVideos = passedKnownVideos;
+};
+
+export const getListeningMediaFilePathForName = (name: string, bookSlug: string, forceKnown = false) => {
   const listensPath = `${name
     .toLowerCase()
     .replace(/ /g, "-")
@@ -20,7 +21,7 @@ export const getListeningMediaFilePathForName = (name: string, bookSlug: BOOK_SL
   return `/${bookSlug}/${getPictureFileNameForName(name)}`;
 };
 
-export const getTalkingMediaFilePathForName = (name: string, bookSlug: BOOK_SLUGS, forceKnown = false) => {
+export const getTalkingMediaFilePathForName = (name: string, bookSlug: string, forceKnown = false) => {
   const speaksPath = `${name
     .toLowerCase()
     .replace(/ /g, "-")

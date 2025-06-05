@@ -41,7 +41,7 @@ interface BookBuildData {
 const activeBookConfig: BookBuildData = {
   name: process.env.VITE_BOOK_NAME,
   short_name: process.env.VITE_BOOK,
-  staticAssetSourceDir: `public_books/${process.env.VITE_BOOK}/assets`,
+  staticAssetSourceDir: `${process.env.VITE_BOOK_PATH}/assets`,
   staticAssetDestDir: process.env.VITE_BOOK,
 };
 // Prepare targets for vite-plugin-static-copy
