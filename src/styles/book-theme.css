@@ -1,0 +1,80 @@
+/* Custom Tailwind utilities for Book Theme colors */
+@layer utilities {
+  /* Background gradients */
+  .bg-book-gradient-primary-tertiary {
+    background: linear-gradient(135deg, var(--book-primary-color), var(--book-tertiary-color));
+  }
+
+  .bg-book-gradient-secondary-quaternary {
+    background: linear-gradient(45deg, var(--book-secondary-color), var(--book-quaternary-color));
+  }
+
+  .bg-book-gradient-shimmer {
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--book-primary-color) 20%, transparent), transparent);
+  }
+
+  /* Background colors with opacity */
+  .bg-book-primary {
+    background-color: var(--book-primary-color);
+  }
+
+  .bg-book-primary-20 {
+    background-color: color-mix(in srgb, var(--book-primary-color) 20%, transparent);
+  }
+
+  .bg-book-primary-30 {
+    background-color: color-mix(in srgb, var(--book-primary-color) 30%, transparent);
+  }
+
+  .bg-book-secondary-20 {
+    background-color: color-mix(in srgb, var(--book-secondary-color) 20%, transparent);
+  }
+
+  .bg-book-tertiary-30 {
+    background-color: color-mix(in srgb, var(--book-tertiary-color) 30%, transparent);
+  }
+
+  .bg-book-quaternary-40 {
+    background-color: color-mix(in srgb, var(--book-quaternary-color) 40%, transparent);
+  }
+
+  /* Border colors with opacity */
+  .border-book-primary-20 {
+    border-color: color-mix(in srgb, var(--book-primary-color) 20%, transparent);
+  }
+
+  .border-book-primary-40 {
+    border-color: color-mix(in srgb, var(--book-primary-color) 40%, transparent);
+  }
+
+  .border-book-secondary-30 {
+    border-color: color-mix(in srgb, var(--book-secondary-color) 30%, transparent);
+  }
+
+  /* Text colors */
+  .text-book-primary {
+    color: var(--book-primary-color);
+  }
+
+  .text-book-tertiary {
+    color: var(--book-tertiary-color);
+  }
+
+  /* Border colors for spinners */
+  .border-book-primary-30 {
+    border-color: color-mix(in srgb, var(--book-primary-color) 30%, transparent);
+  }
+
+  .border-t-book-primary {
+    border-top-color: var(--book-primary-color);
+  }
+
+  .border-t-book-tertiary-50 {
+    border-top-color: color-mix(in srgb, var(--book-tertiary-color) 50%, transparent);
+  }
+
+  /* Fill colors */
+  .fill-book-primary {
+    fill: var(--book-primary-color);
+  }
+}

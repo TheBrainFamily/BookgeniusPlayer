@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ebook id="demo-single-source" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ebook.xsd">
+  <CharactersMaster>
+    <Faraon display="Faraon" summary="Obecny władca Egiptu" />
+    <Ksiaze-Ramzes display="Książe Ramzes" summary="Młodszy syn faraona" />
+    <Nikotris display="Nikotris" summary="Królowa Egiptu, matka Ramzesa" />
+    <Sara display="Sara" summary="Piękna Hebrajka, ukochana Ramzesa" />
+  </CharactersMaster>
+
+  <Chapter id="1">
+    <BookTitle>Bolesław Prus, Faraon</BookTitle>
+    <h4>Chapter one</h4>
+    <p>
+      Dopiero czwarty syn, <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>, urodzony z królowej <Nikotris>Nikotris</Nikotris>, córki arcykapłana Amenhotepa był silny jak wół Api, odważny jak lew i mądry jak kapłani. Od dzieciństwa otaczał się wojskowymi i jeszcze będąc zwyczajnym księciem, mawiał:
+    </p>
+
+    <p>
+      <Ksiaze-Ramzes talking="true"/>
+      — Gdyby bogowie, zamiast młodszym synem królewskim, uczynili mnie faraonem, podbiłbym dziewięć narodów…
+    </p>
+
+    <p>
+      Książe <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes> spojrzał na <Sara>Sarę</Sara>, a jego wzrok złagodniał.
+    </p>
+
+    <p>
+      — Panie mój, twe słowa są jak światło w ciemności — wyszeptała.
+    </p>
+  </Chapter>
+</ebook>

@@ -1,0 +1,84 @@
+---
+description: "Guides the AI to insert <musicShift /> tags with descriptive style attributes into paragraphs, based on user's natural language prompts about desired musical mood and atmosphere."
+globs: *.xml
+alwaysApply: false
+---
+
+# Guidelines for Inserting <musicShift /> Tags
+
+When I provide a paragraph of text (often the current text I'm editing or discussing) and subsequently describe in chat (e.g., using `Cmd+L`) a desired musical change or an emotional atmosphere that implies such a shift, your primary task is to accurately insert a `<musicShift />` tag into that paragraph. Please adhere to the following detailed instructions:
+
+1.  **Recognize User Intent:**
+    Your first step is to recognize that my prompt is requesting a musical shift. This intent might be conveyed by:
+    * Descriptions of an emotional moment or specific feelings.
+    * A change in scene atmosphere or pacing.
+    * Direct requests for a particular style of music or musical underscoring.
+
+2.  **The Specific Tag to Insert:**
+    The exact XML/HTML tag to be inserted is: `<musicShift />`.
+
+3.  **Generating the `style` Attribute – Capturing Musical Essence:**
+    * The `<musicShift />` tag **must always** include a `style` attribute.
+    * The value of this `style` attribute should be a concise yet descriptive summary that accurately captures the essence of the musical qualities described in my prompt.
+    * **Analysis:** Carefully analyze my description of the desired music. Extract key elements such as:
+        * Emotional tones (e.g., "sad," "joyful," "tense," "romantic").
+        * Suggested instruments or orchestral color (e.g., "piano," "strings," "brass fanfare," "ethereal synths," "chimes").
+        * Tempo or pacing (e.g., "slow," "fast-paced," "gradual build-up").
+        * Overall feeling or genre implied (e.g., "heroic," "mysterious," "ominous," "uplifting," "full of hope," "sense of wonder").
+    * **Summarization:** Distill these extracted elements into a comma-separated list of keywords or a short, evocative phrase. Prioritize using keywords or close synonyms from my own descriptive prompt where appropriate, ensuring the `style` attribute is rich but not overly verbose.
+    * Refer to the examples below to see how natural language prompts are transformed into `style` attribute values.
+
+4.  **Determining Tag Placement:**
+    * Unless my prompt explicitly specifies a different location, the `<musicShift />` tag should generally be placed at the **beginning of the paragraph or sentence** where the described emotional shift or musical change is intended to start.
+    * If I provide a paragraph enclosed in tags (e.g., `<p>...</p>`), insert the `<musicShift />` tag immediately *after* the opening paragraph tag and *before* its text content (as demonstrated in the examples).
+
+5.  **Preserving Original Text:**
+    It is crucial that the original text content of the paragraph is fully preserved. The `<musicShift />` tag should be inserted without altering or deleting the existing text.
+
+**Examples of Application:**
+
+**Example 1 (Suspense/Danger):**
+
+* **Initial Paragraph Snippet:**
+    ```xml
+    <p>He tiptoed past the sleeping guard, venturing deeper into the shadowy, restricted archives.</p>
+    ```
+* **My Prompt (e.g., in the chat / `Cmd+L`):**
+    ```
+    This part needs a musical shift. The character is sneaking into a forbidden, dark area. Build a sense of growing tension and unease. The music should be very quiet, almost subliminal, but with an ominous undercurrent. Think sparse, unsettling high-pitched string effects or very low, resonant woodwinds.
+    ```
+* **Expected Output:**
+    ```xml
+    <p><musicShift style="suspenseful, tense, quiet, ominous, unsettling strings, low woodwinds"/>He tiptoed past the sleeping guard, venturing deeper into the shadowy, restricted archives.</p>
+    ```
+
+**Example 2 (Triumph/Heroism):**
+
+* **Initial Paragraph Snippet:**
+    ```xml
+    <p>Against all expectations, she delivered the final presentation flawlessly, securing the vital contract for her team.</p>
+    ```
+* **My Prompt (e.g., in the chat / `Cmd+L`):**
+    ```
+    This is a major turning point, a moment of pure triumph! She's overcome huge obstacles. The music here should swell to be loud, incredibly heroic, and celebratory. I'm imagining bold brass fanfares, soaring orchestral themes, and a powerful, energetic rhythm.
+    ```
+* **Expected Output:**
+    ```xml
+    <p><musicShift style="triumphant, heroic, celebratory, loud, fanfare, soaring orchestra, energetic"/>Against all expectations, she delivered the final presentation flawlessly, securing the vital contract for her team.</p>
+    ```
+
+**Example 3 (Mystery/Enchantment):**
+
+* **Initial Paragraph Snippet:**
+    ```xml
+    <p>They pushed open the ancient door, revealing a hidden chamber filled with softly glowing crystals and intricate, unknown devices.</p>
+    ```
+* **My Prompt (e.g., in the chat / `Cmd+L`):**
+    ```
+    As they enter this newly discovered, magical space, the music should reflect a profound sense of mystery, awe, and enchantment. It should be quite ethereal and shimmering, perhaps using gentle bells, a solo celeste, or a delicate harp arpeggio to suggest a magical atmosphere.
+    ```
+* **Expected Output:**
+    ```xml
+    <p><musicShift style="mysterious, awe-inspiring, enchanting, magical, ethereal, shimmering, bells, celeste, harp"/>They pushed open the ancient door, revealing a hidden chamber filled with softly glowing crystals and intricate, unknown devices.</p>
+    ```
+---

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ebook 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="ebook.xsd">
+
+    <metadata>
+        <characterList>
+            <character charId="k_ramzes">
+                <name>Książe Ramzes</name>
+                <description>The ambitious younger son of the Pharaoh.</description>
+            </character>
+            <character charId="faraon_ramzes_xii">
+                <name>Faraon Ramzes XII</name>
+                <description>The ruling Pharaoh, father of Ramzes.</description>
+            </character>
+            <character charId="cheops">
+                <name>Cheops</name>
+                <description>Ancient Pharaoh known for his pyramid.</description>
+            </character>
+            <character charId="ramzes_wielki">
+                <name>Ramzes Wielki</name>
+                <description>Ramesses II, renowned historical Pharaoh, used as a comparison.</description>
+            </character>
+            <character charId="pentuer">
+                 <name>Pentuer</name>
+                 <description>Scribe and advisor to Ramzes.</description>
+            </character>
+            </characterList>
+        </metadata>
+
+    <content>
+        <p data-index="5">
+            Słońce wznosiło się coraz wyżej nad złotymi piaskami pustyni, rzucając długie cienie. Karawana posuwała się wolno. 
+        </p>
+
+        <p data-index="6">
+            <CharactersMentioned>
+                <characterRef ref="faraon_ramzes_xii"/> <characterRef ref="ramzes_wielki"/>     <characterRef ref="cheops"/>            </CharactersMentioned>
+            <CharactersTalking>
+                <characterRef ref="k_ramzes"/>          </CharactersTalking>
+            — Gdyby bogowie, zamiast młodszym synem królewskim, uczynili mnie faraonem, podbiłbym, jak Ramzes Wielki, dziewięć
+            narodów, o których nigdy w Egipcie nie słyszano, zbudowałbym świątynię większą aniżeli całe Teby, a dla siebie wzniósłbym piramidę, przy której grób Cheopsa wyglądałby jak krzak róży obok dojrzałej palmy.
+        </p>
+
+        <p data-index="7">
+             <CharactersMentioned>
+                 </CharactersMentioned>
+             <CharactersTalking>
+                 <characterRef ref="pentuer"/> </CharactersTalking>
+             — Panie — rzekł Pentuer — wielkie są twoje myśli, godne syna słońca. Lecz czy bogowie pozwolą ci je spełnić?
+        </p>
+         <p data-index="8">
+             <CharactersMentioned>
+                 <characterRef ref="pentuer"/> </CharactersMentioned>
+             <CharactersTalking>
+                 <characterRef ref="k_ramzes"/> </CharactersTalking>
+             — Milcz, Pentuerze! Nie wątp w moją gwiazdę! Przeznaczenie jest po mojej stronie!
+        </p>
+    </content>
+</ebook>

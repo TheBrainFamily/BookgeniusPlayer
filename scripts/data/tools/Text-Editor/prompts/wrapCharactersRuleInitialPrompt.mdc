@@ -1,0 +1,65 @@
+---
+description: {{description}}
+globs: *.xml
+alwaysApply: false
+---
+
+# There are all characters we have:
+
+{{characters}}
+
+# Character Tagging Guidelines
+
+When I ask you to "wrap by tags," "apply tags," "add character tags," or perform a similar character tagging action on selected text, please adhere to the following guidelines using **THE CHARACTER LIST YOU PROVIDE ABOVE** (where `{{characters}}` is):
+
+1.  **Identify Characters**: Scan the selected text to identify mentions of characters whose tags are defined in YOUR CHARACTER LIST.
+    * Be mindful of different grammatical forms or cases. For example, if a character "Exemplar" (associated with `<Exemplar />` in your list) is mentioned, then textual occurrences like "Exemplar's," "Exemplars," "exemplar" (lowercase), or other inflections should all be recognized as relating to that character.
+    * When matching character names from the text to your list, try to be case-insensitive for the initial identification, but preserve the original casing of the found text when wrapping (see point 3).
+
+2.  **Derive Tag Names**: For each identified character, derive the correct tag name from YOUR CHARACTER LIST. The tag name is typically the string that appears after the initial `<` and before the first space, `/`, or `>` in your list entry.
+    * For example, from a list entry like `<SampleTag />`, the tag name is `SampleTag`.
+    * From a list entry like `<Another-Example-Tag />`, the tag name is `Another-Example-Tag`.
+    * If your list has an entry like `<IrregularEntryFormat "/>`, the tag name to be used is `IrregularEntryFormat`.
+    * **These derived tag names are the ONLY valid tag names to be used for wrapping characters according to this rule.**
+
+3.  **Wrapping Format**: Enclose the *exact text* of the identified character mention (including its specific grammatical form and original casing as found in the input text) within the opening and closing tags derived in step 2.
+    * For example, if "[ActualTextFoundInInput]" is identified, and its corresponding tag name derived from your list is `[TagNameFromYourList]`, it should be wrapped as `<[TagNameFromYourList]>[ActualTextFoundInInput]</[TagNameFromYourList]>`.
+    * If the text contains "[original cased text]" (e.g., "characterName" or "CHARACTERNAME") and it's identified as a character whose tag name is `[TagNameFromYourList]`, wrap it as `<[TagNameFromYourList]>[original cased text]</[TagNameFromYourList]>`, thereby preserving the original case from the input.
+
+4.  **Multi-Word Names and Variations**:
+    * Some tags in YOUR CHARACTER LIST might represent characters whose names appear in the text as multiple words (e.g., "[A Multi Word Character Name From Text]") or as a key part of that name (e.g., "[KeyPartOfNameFromText]").
+    * These textual mentions should map to their corresponding tag name defined in your list (e.g., `[TagForMultiWordConceptFromYourList]`).
+    * When you encounter such multi-word names or their recognizable key parts that correspond to a character in your list, wrap the *entire identified phrase found in the text* or the *key part found in the text* using the appropriate tag name.
+    * For instance, if the text has "[A Multi Word Character Name From Text]", it should become `<[TagForMultiWordConceptFromYourList]>[A Multi Word Character Name From Text]</[TagForMultiWordConceptFromYourList]>`.
+    * If the text has "[KeyPartOfNameFromText]" (and context implies it refers to the character associated with `[TagForMultiWordConceptFromYourList]`), it should become `<[TagForMultiWordConceptFromYourList]>[KeyPartOfNameFromText]</[TagForMultiWordConceptFromYourList]>`.
+
+5.  **Strict Adherence to Provided List & Tag Exclusivity**:
+    * **Crucially, you MUST ONLY use tag names derived directly from YOUR CHARACTER LIST as instructed in Point 2.**
+    * **DO NOT invent, create, or infer any new tag names that are not explicitly derivable from your provided list.** For instance, if your character list does not define tags that would result in `<Szwagier>` or `<Zona-Verloca>`, you must not generate these tags.
+    * If a word, name, or phrase in the selected text *appears* to be a character but it (or its base/recognizable form) cannot be confidently mapped to an entry in YOUR CHARACTER LIST, that word, name, or phrase **MUST be left untagged**. Do not attempt to create a new tag for it.
+    * Only wrap words or phrases that are clear and unambiguous mentions of the characters defined in YOUR CHARACTER LIST.
+    * If there is any doubt as to whether a piece of text corresponds to a character in your list, **err on the side of not tagging it.**
+
+**Examples of Application:**
+
+**(In these examples, imagine YOUR CHARACTER LIST (represented by `{{characters}}`) includes entries like `<Hero />` for a character often referred to as "Alex" or "alex", and `<AncientGuide />` for a character known as "The Old Sage" or sometimes just "Sage".)**
+
+* **Instruction:** `Wrap Alex by its tag.`
+    * **Input Text:** `In the story, Alex met the Sage.`
+    * *(Assuming "Alex" maps to `<Hero />` as per your list):*
+    * **Expected Output:** `In the story, <Hero>Alex</Hero> met the Sage.`
+
+* **Instruction:** `Wrap all characters by their tags.`
+    * **Input Text:** `The Sage saw that Alex's quest was vital.`
+    * *(Assuming "Sage" maps to `<AncientGuide />` and "Alex's" (inflected) maps to `<Hero />` as per your list):*
+    * **Expected Output:** `<AncientGuide>The Sage</AncientGuide> saw that <Hero>Alex's</Hero> quest was vital.` (Note: "The Sage" is wrapped if your list implies "Sage" maps to `<AncientGuide />` and the AI identifies "The Sage" as the full mention).
+
+* **Instruction:** `Apply character tags.`
+    * **Input Text:** `The journey featured The Old Sage guiding young alex.`
+    * *(Assuming "The Old Sage" (multi-word) maps to `<AncientGuide />`, and "alex" (different case) maps to `<Hero />` as per your list):*
+    * **Expected Output:** `The journey featured <AncientGuide>The Old Sage</AncientGuide> guiding young <Hero>alex</Hero>.`
+
+* **Instruction:** `Tag the characters in this line.`
+    * **Input Text:** `alex and the Old Sage faced the challenge.`
+    * *(Assuming "alex" maps to `<Hero />` and "Old Sage" (as part of "The Old Sage") maps to `<AncientGuide />` as per your list):*
+    * **Expected Output:** `<Hero>alex</Hero> and <AncientGuide>the Old Sage</AncientGuide> faced the challenge.`

@@ -1,0 +1,84 @@
+/* --- Modal Styles --- */
+.modal-overlay {
+  font-family: var(--font-serif);
+  position: fixed;
+  inset: 0;
+  background-color: var(--modal-overlay-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Same level as loading */
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--transition-medium) var(--transition-timing),
+    visibility var(--transition-medium) step-end; /* Hide instantly when fading out */
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity var(--transition-medium) var(--transition-timing),
+      visibility 0s; /* Show instantly */
+
+    .modal-container {
+      transform: translateY(0);
+    }
+  }
+}
+.modal-overlay.search-modal.active {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.modal-container {
+  background-color: rgba(var(--modal-bg-light-rgb), 0.9); /* Slightly transparent */
+  color: var(--modal-text-light);
+  border-radius: 8px;
+  padding: 25px;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid var(--modal-header-border-light);
+  padding-bottom: 10px;
+}
+
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--modal-close-light);
+  padding: 0; /* Remove default padding */
+  margin: 0; /* Remove default margin */
+}
+
+.modal-content {
+  margin-bottom: 20px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Modal Button Variants */
+.modal-button {
+  /* Inherits base button styles */
+  margin: 0; /* Reset margin for gap usage */
+  font-weight: bold;
+}

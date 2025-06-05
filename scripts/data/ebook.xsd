@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+           vc:minVersion="1.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+    <xs:complexType name="characterMasterEntryType">
+        <xs:attribute name="display" type="xs:string" use="required"/>
+        <xs:attribute name="summary" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:element name="ebook">
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element name="CharactersMaster">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:any minOccurs="1" maxOccurs="unbounded" processContents="lax"/>
+                        </xs:sequence>
+                        <xs:assert test="count(*) = count(distinct-values(local-name(*)))"/>
+                        <xs:assert test="every $char in * satisfies exists($char/@display) and exists($char/@summary)"/>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:element name="BookSlug" type="xs:string" minOccurs="1" maxOccurs="1"/>
+
+                <xs:element name="Chapter" type="chapterType" minOccurs="1" maxOccurs="unbounded"/>
+
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+        </xs:complexType>
+
+        <xs:key name="characterNameKey">
+          <xs:selector xpath="CharactersMaster/*"/>
+          <xs:field xpath="local-name()"/>
+        </xs:key>
+
+        </xs:element>
+
+    <xs:complexType name="chapterType">
+        <xs:sequence>
+            <xs:element name="BookTitle" type="xs:string" minOccurs="0"/>
+            <xs:element name="h4" type="paragraphType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="p" type="paragraphType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="paragraphType" mixed="true">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+             <xs:any processContents="lax"/>
+        </xs:choice>
+
+        <xs:assert test="
+            every $el in * satisfies (
+                (: 1. Check if the element's name is defined in CharactersMaster :)
+                local-name($el) = ancestor::ebook/CharactersMaster/*/local-name() and
+
+                (: 2. Ensure master attributes 'display' and 'summary' are NOT used here :)
+                empty($el/@display) and empty($el/@summary) and
+
+                (: 3. Ensure only the 'talking' attribute is allowed, if any attributes are present :)
+                empty($el/@*[local-name() != 'talking']) and
+
+                (: 4. If 'talking' attribute exists, ensure it's a valid boolean value :)
+                (not(exists($el/@talking)) or $el/@talking = ('true', 'false', '1', '0'))
+            )
+        "/>
+        </xs:complexType>
+
+    </xs:schema>

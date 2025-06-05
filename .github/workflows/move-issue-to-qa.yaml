@@ -1,0 +1,82 @@
+name: Move issue to QA on PR approval
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+env:
+  PROJECT_NUMBER: 2
+  PROJECT_OWNER: thebrainfamily
+
+jobs:
+  move-to-qa:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Extract Issue Number
+        id: extract
+        run: |
+          ISSUE_NUMBER=$(grep -oE '#[0-9]+' <<< "${{ github.event.pull_request.body }}" | tr -d '#')
+          echo "ISSUE=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Issue Number Exists
+        run: |
+          if [ -z "${{ steps.extract.outputs.ISSUE }}" ]; then
+            echo "No issue found in PR description."
+            exit 0
+          fi
+
+      - name: Move Issue to QA Column
+        run: |
+          # Get project ID
+          PROJECT_ID=$(gh project view $PROJECT_NUMBER --owner $PROJECT_OWNER --format json | jq -r '.id')
+          echo "Project ID: $PROJECT_ID"
+          
+          # Get all fields
+          FIELDS=$(gh project field-list $PROJECT_NUMBER --owner $PROJECT_OWNER --format json)
+          echo "All fields:"
+          echo "$FIELDS" | jq '.'
+          
+          STATUS_FIELD=$(echo "$FIELDS" | jq -r '.fields[] | select(.name == "Status")')
+          STATUS_FIELD_ID=$(echo "$STATUS_FIELD" | jq -r '.id')
+          QA_OPTION_ID=$(echo "$STATUS_FIELD" | jq -r '.options[] | select(.name == "QA") | .id')
+           
+          echo "STATUS_FIELD_ID: $STATUS_FIELD_ID"
+          echo "QA_OPTION_ID: $QA_OPTION_ID"
+
+          # Find the item ID for the closed issue
+          ITEM_ID=""
+          echo "Fetching items..."
+          ITEMS_RESPONSE=$(gh project item-list $PROJECT_NUMBER --owner $PROJECT_OWNER --format json --limit 10000)
+ 
+          # Extract the item ID if the issue is found
+          ITEM_ID=$(echo "$ITEMS_RESPONSE" | jq -r --arg ISSUE_NUMBER "${{ steps.extract.outputs.ISSUE }}" '.items[] | select(.content.number == (${{ steps.extract.outputs.ISSUE }} | tonumber)) | .id')
+ 
+          if [ -n "$ITEM_ID" ]; then
+            echo "Item found with ID: $ITEM_ID"
+          else
+            echo "Error: Could not find the issue in the project. Skipping status update."
+            exit 0
+          fi
+ 
+          echo "ITEM_ID: $ITEM_ID"
+
+          # Set the Status to QA
+          echo "Updating item status to QA..."
+          RESULT=$(gh project item-edit $PROJECT_NUMBER \
+            --id "$ITEM_ID" \
+            --project-id "$PROJECT_ID" \
+            --field-id "$STATUS_FIELD_ID" \
+            --single-select-option-id "$QA_OPTION_ID" \
+            --format json)
+ 
+          if echo "$RESULT" | jq -e '.id' > /dev/null; then
+            echo "Issue successfully moved to QA status."
+          else
+            echo "Error: Updating issue status: $RESULT"
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          

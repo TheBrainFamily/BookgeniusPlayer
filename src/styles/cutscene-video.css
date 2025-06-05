@@ -1,0 +1,36 @@
+#cutscene-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  z-index: 999999; /* Ensure it's on top */
+  /* Add any other styles you might need, e.g., object-fit */
+  object-fit: cover;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 4s ease-in-out; /* Only transition opacity */
+}
+
+#cutscene-text {
+  position: fixed;
+  bottom: 10%; /* Adjust as needed */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%; /* Limit width */
+  max-width: 800px; /* Max width */
+  color: white;
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 1.2em; /* Adjust as needed */
+  font-family: sans-serif;
+  z-index: 100000; /* Higher than the video */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out; /* Match video fade */
+  pointer-events: none; /* Don't block interaction with potential video controls */
+  white-space: pre-line; /* Respect newline characters */
+}
