@@ -1,13 +1,21 @@
 # BookGenius Frontend
 
+
+
 ## Overview
 
 BookGenius is an innovative multi-book interactive reading platform that transforms classic literature into immersive multimedia experiences. The application features synchronized audiobooks, character avatars, background music, animations, and real-time AI-powered research capabilities.
 
+## Live demo:
+
+https://bookgenius.net/
+
+![CleanShot 2025-06-05 at 14 50 17@2x](https://github.com/user-attachments/assets/bf4392d6-2faa-4902-a2f2-b678c30fbac0)
+![CleanShot 2025-06-05 at 14 47 07@2x](https://github.com/user-attachments/assets/61fea04b-e64c-4530-91a7-d2ac18fde3c1)
+
 **Key Features:**
 
-- Multi-book support (1984, Pharaon, Conrad-Tajny-Agent, Krolowa-Sniegu)
-- Synchronized audiobook narration with text highlighting
+- Multi-book support
 - Character avatars with speaking animations
 - Dynamic background videos and music
 - Real-time AI research and character analysis
