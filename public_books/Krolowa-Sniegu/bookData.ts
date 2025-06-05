@@ -7,5 +7,4 @@ export const bookData: BookData = {
   themeColors: { primaryColor: "#E3F2FD", secondaryColor: "#1976D2", tertiaryColor: "#90CAF9", quaternaryColor: "#0D47A1" },
   hasAudiobook: false,
   bookStringified: "",
-  audioPrompt: "",
 };
