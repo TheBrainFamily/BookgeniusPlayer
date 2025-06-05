@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import useLocalStorageState from "use-local-storage-state";
 
 import { LocationProvider } from "./state/LocationContext";
 import { useCutScene } from "./hooks/useCutScene";
@@ -17,7 +18,6 @@ import ContentContainerWrapper from "./components/ContentContainerWrapper";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { EditorMode } from "@/components/EditorMode";
-import useLocalStorageState from "use-local-storage-state";
 import { useAppReady } from "./hooks/useAppReady";
 import useSplashHidden from "./hooks/useSplashHidden";
 import { initAudioContext } from "./audio-crossfader";
