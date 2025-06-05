@@ -27,13 +27,19 @@ export function useAudiobookTracks() {
   } = useLocationRange(300);
 
   useEffect(() => {
+    let audiobookTimeout: NodeJS.Timeout | null = null;
     // This effect runs on chapter/paragraph change. Only start audiobook playback
     // if the INITIAL setting from localStorage (when the component/hook was first set up)
     // was explicitly "true" AND the splash screen is hidden.
     if (initialIsPlayingAudioBookSetting === "true" && isSplashHidden) {
-      implRef.current({ currentChapter, currentParagraph });
-      playAudiobook(true);
+      audiobookTimeout = setTimeout(() => {
+        playAudiobook(true);
+      }, 1500);
     }
+
+    return () => {
+      clearTimeout(audiobookTimeout);
+    };
   }, [currentChapter, currentParagraph, initialIsPlayingAudioBookSetting, isSplashHidden]);
 }
 
