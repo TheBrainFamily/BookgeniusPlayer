@@ -1,5 +1,6 @@
 import path from "path";
 import { execSync } from "child_process";
+import fs from "fs";
 
 interface BookMetadata {
   title: string;
@@ -25,6 +26,10 @@ async function start() {
   // Construct an absolute path for the import, as dynamic imports are relative to the current file or use absolute paths.
   // process.cwd() gives the directory where the pnpm command was run.
   const bookDataPath = path.resolve(process.cwd(), bookDirectoryPath, "bookData.ts");
+
+  const bookDataFileExists = fs.existsSync(bookDirectoryPath);
+
+  console.log("PINGWING: 32 bookDataFileExists", bookDataFileExists);
 
   try {
     console.log(`Attempting to load book data from: ${bookDataPath}`);
