@@ -140,6 +140,20 @@ const bookDataPlugin = () => {
             map: null,
           };
         }
+        if (id.includes("getKnownVideoFiles")) {
+          return {
+            code: `           
+            import { getKnownVideoFiles as getKnownVideoFilesInput } from "@/books/Krolowa-Sniegu-v2/getKnownVideoFiles.ts";
+            export const getKnownVideoFiles = (): string[] => {
+              if (getKnownVideoFilesInput) {
+                return getKnownVideoFilesInput();
+              }        
+              throw new Error("getKnownVideoFiles should never be called at runtime");
+            };
+            `,
+            map: null,
+          };
+        }
       }
     },
   };

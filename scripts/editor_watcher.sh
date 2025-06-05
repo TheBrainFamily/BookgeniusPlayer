@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# odpalic to za pierwszym razem
+# a potem watch'owac na xml (zmiana edytora itd)
+# odpalic z juz czyms w stylu VITE_BOOK przekazanym sluga wezmiemy z .xml
 fswatch -0 src/data | while IFS= read -r -d '' file; do
   case "$file" in
     *.xml)
