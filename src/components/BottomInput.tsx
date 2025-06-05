@@ -36,6 +36,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
 
   const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
   const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
+  const showAllElements = useElementVisibilityStore((state) => state.showAllElements);
 
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
   const { openModal: openDeepResearchModal, setContent: setDeepResearchContent } = useDeepResearchModal();
@@ -51,6 +52,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
 
   const updateLastActivity = useCallback(() => {
     pauseAllTimers();
+    showAllElements();
+
     lastActivityRef.current = Date.now();
     if (inactivityTimerRef.current) {
       clearTimeout(inactivityTimerRef.current);
