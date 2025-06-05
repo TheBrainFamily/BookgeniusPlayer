@@ -16,8 +16,6 @@ function mainFunction() {
 
   const bookDirectoryPath = args[0];
 
-  const bookDataPath = path.resolve(process.cwd(), bookDirectoryPath, "bookData.ts");
-
   const parser = new DOMParser();
   const book = fs.readFileSync(`${bookDirectoryPath}/book.xml`, "utf8");
   const xmlDoc = parser.parseFromString(book, "text/xml");
