@@ -5,6 +5,11 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    env:
+      VITE_BOOK: Snow-Queen
+      VITE_BOOK_NAME: Snow Queen
+      VITE_BOOK_PATH: ./public_books/Snow-Queen
 
     steps:
       - uses: actions/checkout@v4
@@ -21,6 +26,7 @@ jobs:
             vite.config.mts
             src/
             tests/
+            public_books/
           sparse-checkout-cone-mode: false
       - uses: pnpm/action-setup@v4
         with:
@@ -31,7 +37,11 @@ jobs:
           node-version: "20"
           cache: "pnpm"
       - run: pnpm install
+      - name: Generate book data
+        run: pnpm start ./public_books/Snow-Queen
       - run: pnpm test
       - run: pnpm typecheck:ci
       - run: pnpm lint:ci
       - run: pnpm prettier:check
+      - name: Build project
+        run: pnpm build
