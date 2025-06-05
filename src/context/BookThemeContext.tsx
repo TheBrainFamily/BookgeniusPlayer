@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
 import { BookThemeColors } from "@/books/types";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
@@ -9,8 +9,6 @@ interface BookThemeContextType {
   setThemeColors: (colors: BookThemeColors) => void;
 }
 const BookThemeContext = createContext<BookThemeContextType>({ bookSlug: CURRENT_BOOK, themeColors: getBookData().themeColors, setThemeColors: () => {} });
-
-export const useBookTheme = () => useContext(BookThemeContext);
 
 const applyThemeToDocument = (themeColors: BookThemeColors) => {
   const root = document.documentElement;

@@ -198,6 +198,6 @@ export default defineConfig({
     port: 5173,
     open: false,
     proxy: { "/api": "http://localhost:3000" },
-    watch: { ignored: ["**/src/data/*.xml", "**/src/data/tools/Text-Editor/*.xml", "**/.vscode/**", "**/.cursor/**"] },
+    watch: { ignored: ["**/src/data/*.xml", "**/public_books/**", "**/src/data/tools/Text-Editor/*.xml", "**/.vscode/**", "**/.cursor/**"] },
   },
 });
