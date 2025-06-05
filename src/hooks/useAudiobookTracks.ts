@@ -4,6 +4,7 @@ import { dealWithAudiobookTracks as impl } from "@/deal-with-audiobook-playback"
 import { stopAllTracks } from "@/audiobook-player";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { useLocationRange } from "./useLocationRange";
+import useSplashHidden from "./useSplashHidden";
 
 /* We keep a mutable ref so we can swap the implementation on HMR */
 const implRef = { current: impl };
@@ -20,6 +21,7 @@ const IS_PLAYING_AUDIO_BOOK_KEY = "isPlayingAudioBook";
 export function useAudiobookTracks() {
   // Read the localStorage setting ONCE when the hook initializes.
   const initialIsPlayingAudioBookSetting = localStorage.getItem(IS_PLAYING_AUDIO_BOOK_KEY);
+  const isSplashHidden = useSplashHidden();
   const {
     debouncedLocation: { currentChapter, currentParagraph },
   } = useLocationRange(300);
@@ -27,11 +29,12 @@ export function useAudiobookTracks() {
   useEffect(() => {
     // This effect runs on chapter/paragraph change. Only start audiobook playback
     // if the INITIAL setting from localStorage (when the component/hook was first set up)
-    // was explicitly "true". This prevents it from starting if the user had it off.
-    if (initialIsPlayingAudioBookSetting === "true") {
+    // was explicitly "true" AND the splash screen is hidden.
+    if (initialIsPlayingAudioBookSetting === "true" && isSplashHidden) {
       implRef.current({ currentChapter, currentParagraph });
+      playAudiobook(true);
     }
-  }, [currentChapter, currentParagraph, initialIsPlayingAudioBookSetting]); // Added initialIsPlayingAudioBookSetting to dependencies
+  }, [currentChapter, currentParagraph, initialIsPlayingAudioBookSetting, isSplashHidden]);
 }
 
 export const playAudiobook = (getSavedState: boolean = false) => {
@@ -43,6 +46,7 @@ export const playAudiobook = (getSavedState: boolean = false) => {
       console.log(`PONTON playAudiobook (getSavedState=true): Not playing because localStorage is not "true". Value: "${currentPlayStateFromStorage}"`);
       return;
     }
+
     // If currentPlayStateFromStorage is "true", fall through to play.
     console.log('PONTON playAudiobook (getSavedState=true): Proceeding to play because localStorage is "true".');
   } else {
@@ -68,5 +72,6 @@ declare global {
     stopAudiobook: typeof stopAudiobook;
   }
 }
+
 window.playAudiobook = playAudiobook;
 window.stopAudiobook = stopAudiobook;
