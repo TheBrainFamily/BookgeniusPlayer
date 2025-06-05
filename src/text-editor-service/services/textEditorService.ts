@@ -1,4 +1,4 @@
-import { TextEditor } from "@/data/tools/Text-Editor/text-editor";
+import { TextEditor } from "../../../scripts/data/tools/Text-Editor/text-editor";
 import { CURRENT_BOOK } from "@/consts";
 
 export class TextEditorService {

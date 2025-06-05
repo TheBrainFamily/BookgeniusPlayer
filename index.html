@@ -10,9 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Book Viewer" />
     <meta name="theme-color" content="#333333" />
-    <meta name="description" content="Interactive book reader with character profiles" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="description" content="Interactive book reader" />
 
     <!-- PWA Icons -->
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
@@ -49,11 +47,12 @@
     </div>
 
     <div id="root"></div>
+
     <div id="splash-screen">
       <div class="splash-container">
         <div class="splash-title-container">
           <div class="splash-title">BookGenius</div>
-          <div class="splash-subtitle"> </div>
+          <div class="splash-subtitle"></div>
         </div>
 
         <div class="splash-image-container">
@@ -85,21 +84,21 @@
         }
 
         async setupDynamicContent() {
-          await new Promise(resolve => {
+          await new Promise((resolve) => {
             const checkReady = () => {
               if (window.i18n && window.i18n.isInitialized) {
                 resolve();
               } else {
                 setTimeout(checkReady, 100);
               }
-            }
+            };
             checkReady();
           });
 
           const t = window.i18n.t;
-          document.querySelector('.splash-subtitle').textContent = t('splash_subtitle');
-          document.querySelector('.splash-start-button span').textContent = t('start_button');
-          this.loadingPhrases = t('loading_phrases', { returnObjects: true }) || [];
+          document.querySelector(".splash-subtitle").textContent = t("splash_subtitle");
+          document.querySelector(".splash-start-button span").textContent = t("start_button");
+          this.loadingPhrases = t("loading_phrases", { returnObjects: true }) || [];
           this.setupPhraseCycle();
         }
 
