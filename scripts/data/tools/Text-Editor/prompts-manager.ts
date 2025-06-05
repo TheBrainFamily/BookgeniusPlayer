@@ -1,6 +1,6 @@
 import { BOOK_SLUGS } from "@/consts";
 import fs from "fs";
-import { XmlManager } from "@/data/tools/Text-Editor/xml-manager";
+import { XmlManager } from "./xml-manager";
 
 export class PromptsManager {
   private readonly cursorRulesPath: string = "./src/data/tools/Text-Editor/.cursor";
