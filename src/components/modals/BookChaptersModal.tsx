@@ -4,7 +4,7 @@ import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
 import { getTitle } from "@/utils/getChapterTitle";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
-import { getBookData } from "@/booksData/getBookData";
+import { getBookData } from "@/books/getBookData";
 import { useTranslation } from "react-i18next";
 
 interface BookChaptersModalProps {

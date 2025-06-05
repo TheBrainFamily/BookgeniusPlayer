@@ -1,6 +1,6 @@
 import { searchParagraphsFromServer } from "./utils/searchParagraphsFromServer";
 import type { Location } from "@/state/LocationContext";
-import { BookData } from "@/booksData/types"; // Import Location type
+import { BookData } from "@/books/types"; // Import Location type
 
 export interface SearchResultItemData {
   chapter: number;

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange } from "@/fetchers/getParagraphRange";
 import { CURRENT_BOOK } from "@/consts";
 import { Location } from "@/state/LocationContext";
-import { getBookData } from "@/booksData/getBookData";
+import { getBookData } from "@/books/getBookData";
 
 /** Very light equality check: same length and same canonicalName order */
 function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {

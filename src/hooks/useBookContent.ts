@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { getBookData } from "@/booksData/getBookData";
+import { getBookData } from "@/books/getBookData";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
 import { setupPageObserver } from "@/ui/pageObserver";
 

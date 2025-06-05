@@ -1,5 +1,3 @@
-import { BOOK_SLUGS } from "@/consts";
-
 type InfoPerChapter = { chapter: number; summary: string; label?: string; paragraphsWhereSpotted: number[]; paragraphsWhereTalking: number[] };
 
 export type CharacterData = { slug: string; characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; imageUrl: string };
@@ -14,7 +12,7 @@ export interface BookThemeColors {
 }
 
 export type BookData = {
-  slug: BOOK_SLUGS;
+  slug: string;
   metadata: BookMetadata;
   charactersData: CharacterData[];
   chapters: number;

@@ -1,6 +1,6 @@
 import { BOOK_SLUGS } from "@/consts";
-import { getAudiobookData } from "./booksData/getAudiobookData";
-import { getBookData } from "./booksData/getBookData";
+import { getAudiobookData } from "./books/getAudiobookData";
+import { getBookData } from "./books/getBookData";
 
 // word, start
 export type WordPosition = [string, number];

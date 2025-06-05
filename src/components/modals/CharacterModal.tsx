@@ -5,10 +5,10 @@ import { useTranslation } from "react-i18next";
 
 import ModalUI from "./ModalUI";
 import CharacterMedia from "@/components/CharacterMedia";
-import { CharacterData } from "@/booksData/types";
+import { CharacterData } from "@/books/types";
 import { findCharacterSentences, SearchResultItemData } from "@/searchModal";
 import { useLocation } from "@/state/LocationContext";
-import { getBookData } from "@/booksData/getBookData";
+import { getBookData } from "@/books/getBookData";
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
 
 interface CharacterModalProps {
