@@ -130,19 +130,12 @@ const bookDataPlugin = () => {
           };
         }
         if (id.includes("getBookStringified")) {
-          // return {
-          //   code: `
-          //   import { getBookStringified as getBookStringifiedInput } from "@/books/${selectedAlias}/getBookStringified";
-          //   export const getBookStringified = (): string => {
-          //     return getBookStringifiedInput();
-          //   };
-          //   `,
-          //   map: null,
-          // };
           return {
             code: `
-            import { bookStringified as bookStringifiedInput } from "@/books/${selectedAlias}/getBookStringified";
-            export const bookStringified = bookStringifiedInput;
+            import { getBookStringified as getBookStringifiedInput } from "@/books/${selectedAlias}/getBookStringified";
+            export const getBookStringified = (): string => {
+              return getBookStringifiedInput();
+            }; 
             `,
             map: null,
           };

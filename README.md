@@ -22,15 +22,10 @@ BookGenius is an innovative multi-book interactive reading platform that transfo
 # Install dependencies
 pnpm install
 
-# Run with default book (Pharaon)
-pnpm dev
+# Be sure that in public_books/$BOOK_SLUG you have a book.xml file
 
-# Run with specific book
-VITE_BOOK=1984-English VITE_LANG=EN pnpm dev        # English version
-VITE_BOOK=1984 pnpm dev                     # Polish version
-VITE_BOOK=Pharaon pnpm dev                  # Polish version
-VITE_BOOK=Conrad-Tajny-Agent pnpm dev       # Polish version
-VITE_BOOK=Krolowa-Sniegu pnpm dev           # Polish version
+pnpm start public_books/$BOOK_SLUG (eg. pnpm start public_books/Snow_Queen)
+
 ```
 
 ### Editor Mode (Development)
@@ -47,17 +42,8 @@ tsx src/text-editor-service/server.ts
 
 **Requirements for Editor Mode:**
 
-- VSCode installed
+- Cursor installed (free-plan is enough)
 - Node.js with TypeScript support
-
-### Build and Deploy
-
-```bash
-# Production builds per book
-pnpm run deploy        # Pharaon to /var/www/faraon/
-pnpm run deploy:1984   # 1984 to /var/www/1984/
-pnpm run deploy:conrad # Conrad to /var/www/tajny-agent/
-```
 
 ## Architecture Overview
 
