@@ -31,7 +31,7 @@ function mainFunction() {
   console.log("65: getBookStringified BANG!", getBookStringified);
   fs.writeFileSync(
     path.join(bookOutputPath, "getBookStringified.ts"),
-    `const bookStringified = \`${getBookStringified}\`\n\n export const getBookStringified = (): string => {
+    `const bookStringified = \`<section>${getBookStringified}</section>\`\n\n export const getBookStringified = (): string => {
   return bookStringified;
 };`,
     "utf-8",
