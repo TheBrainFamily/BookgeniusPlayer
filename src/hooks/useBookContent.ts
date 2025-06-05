@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { getBookData } from "@/books/getBookData";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
 import { setupPageObserver } from "@/ui/pageObserver";
+import { getBookStringified } from "@/genericBookDataGetters/getBookStringified";
 
 export function useBookContent(containerId: string) {
-  const { bookStringified } = getBookData();
+  const bookStringified = getBookStringified();
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
 
   useEffect(() => {

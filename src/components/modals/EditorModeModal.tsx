@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import ModalUI from "@/components/modals/ModalUI";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { useEditorModeModal } from "@/stores/modals/editorModeModal.store";
-import { getBookData } from "@/books/getBookData";
+import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
 
 interface EditorModeModalProps {
   onClose: () => void;
 }
 
 const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
-  const bookData = getBookData();
   const { modalType, onSubmit } = useEditorModeModal();
   const [selectedCharacter, setSelectedCharacter] = useState("");
   const [error, setError] = useState("");
@@ -74,7 +73,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
                   <SelectValue placeholder="Wybierz postać" />
                 </SelectTrigger>
                 <SelectContent className="max-h-45">
-                  {bookData.charactersData.map((character) => (
+                  {getCharactersData().map((character) => (
                     <SelectItem key={character.slug} value={character.slug}>
                       {character.characterName}
                     </SelectItem>

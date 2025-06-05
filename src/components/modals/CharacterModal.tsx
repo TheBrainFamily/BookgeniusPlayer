@@ -8,8 +8,8 @@ import CharacterMedia from "@/components/CharacterMedia";
 import { CharacterData } from "@/books/types";
 import { findCharacterSentences, SearchResultItemData } from "@/searchModal";
 import { useLocation } from "@/state/LocationContext";
-import { getBookData } from "@/books/getBookData";
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
+import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
 
 interface CharacterModalProps {
   onClose: () => void;
@@ -26,8 +26,7 @@ export const findLatestSummaryInRange = (character: CharacterData, endChapter: n
 
 const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, characterSlug, endChapter }) => {
   const { location } = useLocation();
-  const bookData = getBookData();
-  const matchingCharacter = bookData.charactersData.find((character) => character.slug === characterSlug);
+  const matchingCharacter = getCharactersData().find((character) => character.slug === characterSlug);
 
   // If character not found, don't render anything
   if (!matchingCharacter) {
@@ -42,7 +41,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     const searchAppearances = () => {
       setIsLoading(true);
       try {
-        const searchResults = findCharacterSentences(characterSlug, location, bookData);
+        const searchResults = findCharacterSentences(characterSlug, location);
         // Return first 3 appearances
         setCharacterAppearances(searchResults.items.slice(0, 3));
       } catch (error) {
@@ -54,7 +53,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     };
 
     searchAppearances();
-  }, [matchingCharacter.characterName, location, bookData.slug]);
+  }, [matchingCharacter.characterName, location]);
 
   const handleAppearanceClick = (appearance: SearchResultItemData) => {
     console.log(`CharacterModal: Navigating to chapter ${appearance.chapter}, paragraph ${appearance.paragraphNumber}`);

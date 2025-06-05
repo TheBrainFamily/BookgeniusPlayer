@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
 import { BookThemeColors } from "@/books/types";
-import { getBookData } from "@/books/getBookData";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
 
 interface BookThemeContextType {
   bookSlug: BOOK_SLUGS;

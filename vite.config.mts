@@ -57,20 +57,17 @@ const bookDataPlugin = () => {
       // Only transform the getBookData file
       const selectedAlias = activeBookConfig.short_name;
       if (!id.includes("node_modules") && !id.includes("src/books/")) {
-        //         if (id.includes("getBookData")) {
-        //           const finalCode = `
-        //         import type { BookData } from "@/books/types";
-        //         import { bookData as bookDataInput } from "@/books/${selectedAlias}/bookData";
-        //         export function getBookData(): BookData {
-        //           return bookDataInput;
-        // }`;
+        if (id.includes("getBookData")) {
+          const finalCode = `
+                import type { BookData } from "@/books/types";
+                import { bookData as bookDataInput } from "@/books/${selectedAlias}/bookData";
+                export function getBookData(): BookData {
+                  return bookDataInput;
+        }`;
 
-        //           return { code: finalCode, map: null };
-        //         }
+          return { code: finalCode, map: null };
+        }
 
-        // if (id.includes("backgroundsForBook")) {
-        //   return { code: fs.readFileSync(`public_books/${selectedAlias}/backgroundsForBook.ts`, "utf8"), map: null };
-        // }
         if (id.includes("backgroundsForBook")) {
           return {
             code: `
@@ -107,6 +104,39 @@ const bookDataPlugin = () => {
   return getCutScenesForBookInput();
 };
 `,
+            map: null,
+          };
+        }
+        if (id.includes("getKnownVideoFiles")) {
+          return {
+            code: `
+            import { getKnownVideoFiles as getKnownVideoFilesInput } from "@/books/${selectedAlias}/getKnownVideoFiles";
+            export const getKnownVideoFiles = (): string[] => {
+              return getKnownVideoFilesInput();
+            }; 
+            `,
+            map: null,
+          };
+        }
+        if (id.includes("getCharactersData")) {
+          return {
+            code: `
+            import { getCharactersData as getCharactersDataInput } from "@/books/${selectedAlias}/getCharactersData";
+            export const getCharactersData = (): CharacterData[] => {
+              return getCharactersDataInput();
+            }; 
+            `,
+            map: null,
+          };
+        }
+        if (id.includes("getBookStringified")) {
+          return {
+            code: `
+            import { getBookStringified as getBookStringifiedInput } from "@/books/${selectedAlias}/getBookStringified";
+            export const getBookStringified = (): string => {
+              return getBookStringifiedInput();
+            }; 
+            `,
             map: null,
           };
         }

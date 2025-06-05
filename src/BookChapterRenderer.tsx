@@ -6,7 +6,7 @@ import { usePageObserver } from "@/hooks/usePageObserver";
 import ChapterLoaderDirect from "@/components/ChapterLoaderDirect";
 import { CURRENT_BOOK } from "./consts";
 import { useCharacterModal } from "./stores/modals/characterModal.store";
-import { getBookData } from "./books/getBookData";
+import { getBookData } from "./genericBookDataGetters/getBookData";
 
 const BookChapterRendererComponent = () => {
   const [containerElement, setContainerElement] = useState<HTMLElement | null>(null);

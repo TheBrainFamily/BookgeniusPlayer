@@ -14,7 +14,6 @@ export interface BookThemeColors {
 export type BookData = {
   slug: string;
   metadata: BookMetadata;
-  charactersData: CharacterData[];
   chapters: number;
   themeColors: BookThemeColors;
   hasAudiobook: boolean;
