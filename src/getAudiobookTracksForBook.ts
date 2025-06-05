@@ -1,4 +1,3 @@
-import { BOOK_SLUGS } from "@/consts";
 import { getBookData } from "./genericBookDataGetters/getBookData";
 
 // word, start
