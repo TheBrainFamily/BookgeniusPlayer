@@ -23,8 +23,6 @@ import {
   loadTrack,
 } from "@/audio-crossfader";
 import { stopAudiobook, playAudiobook } from "@/hooks/useAudiobookTracks";
-import { dealWithBackgroundSongs } from "@/deal-with-background-songs";
-import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -264,8 +262,6 @@ const AudioPlayer = () => {
       stopAudiobook();
     } else {
       initAudioContext();
-      const { currentChapter, currentParagraph } = getCurrentLocation();
-      dealWithBackgroundSongs({ currentChapter, currentParagraph });
       setIsPlayingAudiobook(true);
       playAudiobook();
     }
