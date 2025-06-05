@@ -29,47 +29,49 @@ async function start() {
   // process.cwd() gives the directory where the pnpm command was run.
   const bookDataPath = path.resolve(process.cwd(), bookDirectoryPath, "bookData.ts");
 
-  const bookDataFileExists = fs.existsSync(bookDataPath);
+  const parser = new DOMParser();
+  const book = fs.readFileSync(`${bookDirectoryPath}/book.xml`, "utf8");
+  const xmlDoc = parser.parseFromString(book, "text/xml");
+  const bookSlug = xmlDoc.getElementsByTagName("BookSlug")[0].textContent;
+  // const chapters = xmlDoc.getElementsByTagName("Chapter");
+  // const chapterNumber = chapters.length;
 
-  if (!bookDataFileExists) {
-    const parser = new DOMParser();
-    const book = fs.readFileSync(`${bookDirectoryPath}/book.xml`, "utf8");
-    const xmlDoc = parser.parseFromString(book, "text/xml");
-    const bookSlug = xmlDoc.getElementsByTagName("BookSlug")[0].textContent;
-    // const chapters = xmlDoc.getElementsByTagName("Chapter");
-    // const chapterNumber = chapters.length;
+  const bookOutputPath = path.resolve("src", "books", bookSlug);
 
-    const bookOutputPath = path.resolve("src", "books", bookSlug);
-
-    if (!fs.existsSync(bookOutputPath)) {
-      fs.mkdirSync(bookOutputPath);
-    }
-
-    // getKnownVideoFiles.ts
-
-    const assetsPath = path.join(bookDirectoryPath, "assets");
-    const videoFiles = fs
-      .readdirSync(assetsPath)
-      .filter((file) => file.endsWith(".mp4"))
-      .map((file) => file);
-
-    const getKnownVideoFiles = `export const getKnownVideoFiles = () => {\n return ${JSON.stringify(videoFiles, null, 2)} \n};`;
-    fs.writeFileSync(path.join(bookOutputPath, "getKnownVideoFiles.ts"), getKnownVideoFiles, "utf-8");
-
-    // getBookStringified.ts
-
-    const command = `tsx ./generateBookDataFromHtml.ts ${bookDirectoryPath}`;
-    child_process.execSync(command);
-
-    // odpalic drugi skrypt ts
+  if (!fs.existsSync(bookOutputPath)) {
+    fs.mkdirSync(bookOutputPath);
   }
+
+  ["backgroundsForBook.ts", "getBackgroundSongsForBook.ts", "getCutScenesForBook.ts"].forEach((mediaBookFile) => {
+    fs.copyFileSync(path.join(bookDirectoryPath, mediaBookFile), path.join(bookOutputPath, mediaBookFile), fs.constants.COPYFILE_FICLONE);
+  });
+
+  // getKnownVideoFiles.ts
+
+  const assetsPath = path.join(bookDirectoryPath, "assets");
+  const videoFiles = fs
+    .readdirSync(assetsPath)
+    .filter((file) => file.endsWith(".mp4"))
+    .map((file) => file);
+
+  const getKnownVideoFiles = `export const getKnownVideoFiles = () => {\n return ${JSON.stringify(videoFiles, null, 2)} \n};`;
+  fs.writeFileSync(path.join(bookOutputPath, "getKnownVideoFiles.ts"), getKnownVideoFiles, "utf-8");
+
+  // getBookStringified.ts
+
+  const command = `tsx ./generateBookDataFromHtml.ts ${bookDirectoryPath}`;
+  child_process.execSync(command);
 
   try {
     console.log(`Attempting to load book data from: ${bookDataPath}`);
     // For dynamic imports with tsx/ESM, the path needs to be valid URL or absolute path.
     // On Windows, path.resolve will produce paths like C:\... which needs to be file:///C:/...
     // On Unix, /path/to/file is fine.
-    const bookDataModulePath = path.sep === "\\" ? `file:///${bookDataPath.replace(/\\/g, "/")}` : bookDataPath;
+
+    const bookDataFilePath = path.join(bookOutputPath, "bookData.ts");
+    const bookDataModulePath = path.sep === "\\" ? `file:///${bookDataFilePath.replace(/\\/g, "/")}` : bookDataFilePath;
+    console.log("80: bookOutputPath BANG!", bookOutputPath);
+    console.log("77: bookDataPath BANG!", bookDataFilePath);
     const bookModule = (await import(bookDataModulePath)) as { bookData: BookData };
     const { bookData } = bookModule;
 

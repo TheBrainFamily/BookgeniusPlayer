@@ -1,4 +1,4 @@
-const bookStringified = `<section><section><section data-chapter="1">
+const bookStringified = `<section><section data-chapter="1">
     <h3 data-index="0">I. Czarodziejskie zwierciadło</h3>
     <p data-index="1">
       Żył sobie niegdyś bardzo <span class="character-highlighted" data-character="Zlosliwy-czarodziej" data-src-listening="/Krolowa-Sniegu/zlosliwy-czarodziej-listens.mp4" >złośliwy czarodziej</span>. Całą jego przyjemnością było dokuczać ludziom, czynić źle, ze wszystkiego się wyśmiewać i każdą rzecz przedstawiać z najgorszej strony.
@@ -850,8 +850,8 @@ const bookStringified = `<section><section><section data-chapter="1">
       A dzieci zaśpiewały razem:
     </p>
     <blockquote data-index="47"><div class="poem"> <div class="stanza"> <p class="verse">Co ja kocham na tym świecie?</p> <p class="verse">Złote słonko, cudne kwiecie!</p> <p class="verse">Boże ptaszki śpiewające,</p> <p class="verse">Jasne rosy, w kwiatach drżące,</p> <p class="verse">Błękit nieba i obłoki,</p> <p class="verse">Cały piękny świat szeroki,</p> <p class="verse">I chatynkę pobielaną,</p> <p class="verse">I mateńkę ukochaną!</p> <p class="verse">Wszystko kocham serca biciem,</p> <p class="verse">A przestanę chyba z życiem! </p> </div> </div></blockquote>
-  </section></section></section>`;
+  </section></section>`
 
-export const getBookStringified = (): string => {
+ export const getBookStringified = (): string => {
   return bookStringified;
 };

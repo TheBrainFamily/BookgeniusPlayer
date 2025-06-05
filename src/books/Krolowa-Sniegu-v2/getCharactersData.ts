@@ -1,7 +1,10 @@
-const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
+import type { CharacterData } from "@/books/types";
+
+const KrolowaSnieguv2CharactersData: CharacterData[] = [
   {
     "slug": "Zlosliwy-czarodziej",
     "characterName": "Złośliwy czarodziej",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 1,
@@ -27,6 +30,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Uczniowie-czarodzieja",
     "characterName": "Uczniowie czarodzieja",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 1,
@@ -43,6 +47,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Kaj",
     "characterName": "Kaj",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 2,
@@ -167,6 +172,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Gerda",
     "characterName": "Gerda",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 2,
@@ -345,6 +351,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Rodzice-Kaja",
     "characterName": "Rodzice Kaja",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 2,
@@ -376,6 +383,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Rodzice-Gerdy",
     "characterName": "Rodzice Gerdy",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 2,
@@ -391,6 +399,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Babka-Gerdy",
     "characterName": "Babka Gerdy",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 2,
@@ -443,6 +452,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Krolowa-Sniegu",
     "characterName": "Królowa Śniegu",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 2,
@@ -509,6 +519,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Chlopcy-z-rynku",
     "characterName": "Chłopcy z rynku",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 2,
@@ -532,6 +543,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Wroble",
     "characterName": "Wróble",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 3,
@@ -549,6 +561,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Wrozka",
     "characterName": "Wróżka",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 3,
@@ -578,6 +591,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Roze-z-ogrodu-wrozki",
     "characterName": "Róże z ogrodu wróżki",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 3,
@@ -597,6 +611,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Wrona",
     "characterName": "Wrona",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 4,
@@ -651,6 +666,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Ksiezniczka",
     "characterName": "Księżniczka",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 4,
@@ -687,6 +703,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Damy-dworu-ksiezniczki",
     "characterName": "Damy dworu księżniczki",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 4,
@@ -702,6 +719,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Kruk-czarnopiory",
     "characterName": "Kruk czarnopióry",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 4,
@@ -733,6 +751,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Ksiaze",
     "characterName": "Książę",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 4,
@@ -749,6 +768,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Woznica",
     "characterName": "Woźnica",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 4,
@@ -764,6 +784,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Lokaj",
     "characterName": "Lokaj",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 4,
@@ -780,6 +801,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Stara-rozbojnica",
     "characterName": "Stara rozbójnica",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 5,
@@ -802,6 +824,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Mala-zbojniczka",
     "characterName": "Mała zbójniczka",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 5,
@@ -859,6 +882,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Golebie-lesne",
     "characterName": "Gołębie leśne",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 5,
@@ -880,6 +904,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Ren",
     "characterName": "Ren",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 5,
@@ -941,6 +966,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Laponka",
     "characterName": "Laponka",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 6,
@@ -969,6 +995,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Eskimoska",
     "characterName": "Eskimoska",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 6,
@@ -1004,6 +1031,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Platki-sniezne-Straze-Krolowej-Sniegu",
     "characterName": "Płatki śnieżne (Straże Królowej Śniegu)",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 2,
@@ -1029,6 +1057,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Male-aniolki",
     "characterName": "Małe aniołki",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 6,
@@ -1045,6 +1074,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Towarzysz-rena",
     "characterName": "Towarzysz rena",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 7,
@@ -1060,6 +1090,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Slonce",
     "characterName": "Słońce",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 3,
@@ -1075,6 +1106,7 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
   {
     "slug": "Jaskolka",
     "characterName": "Jaskółka",
+    "bookSlug": "Krolowa-Sniegu-v2",
     "infoPerChapter": [
       {
         "chapter": 3,
@@ -1090,5 +1122,5 @@ const Krolowa-Sniegu-v2CharactersData: CharacterData[] = [
 ]
 
  export const getCharactersData = (): CharacterData[] => {
-  return Krolowa-Sniegu-v2CharactersData;
+  return KrolowaSnieguv2CharactersData;
 };

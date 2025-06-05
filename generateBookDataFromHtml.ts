@@ -41,27 +41,29 @@ function mainFunction() {
 
   const characterTags = getCharacterTags(xmlDoc);
 
-  const metadata = extractCharacterMetadata(xmlDoc, characterTags);
+  const metadata = extractCharacterMetadata(xmlDoc, characterTags).map((characterMetadata) => ({ ...characterMetadata, bookSlug }));
+
+  const bookSlugWithoutDashes = bookSlug.replaceAll("-", "");
 
   fs.writeFileSync(
     path.join(bookOutputPath, "getCharactersData.ts"),
-    `const ${bookSlug}CharactersData: CharacterData[] = ${JSON.stringify(metadata, null, 2)}\n\n export const getCharactersData = (): CharacterData[] => {
-  return ${bookSlug}CharactersData;
+    `import type { CharacterData } from "@/books/types";\n\nconst ${bookSlugWithoutDashes}CharactersData: CharacterData[] = ${JSON.stringify(metadata, null, 2)}\n\n export const getCharactersData = (): CharacterData[] => {
+  return ${bookSlugWithoutDashes}CharactersData;
 };`,
   );
 
-  const bookData = `import type { BookData } from "@/books/types"; \n\n
-    export const bookData: BookData = {
-      slug: "${bookSlug}",
-      metadata: { title: "${bookSlug.replace("-", "")}" },
-      chapters: ${chapterNumber},
-      themeColors: { primaryColor: "#E3F2FD", secondaryColor: "#1976D2", tertiaryColor: "#90CAF9", quaternaryColor: "#0D47A1" },
-      hasAudiobook: false,
-      bookStringified: "",
-      audioPrompt: "",
-    };`;
+  const bookData = `import type { BookData } from "@/books/types";\nimport { getBookStringified } from "@/books/${bookSlug}/getBookStringified";
+  export const bookData: BookData = {
+    slug: "${bookSlug}",
+    metadata: { title: "${bookSlugWithoutDashes}" },
+    chapters: ${chapterNumber},
+    themeColors: { primaryColor: "#E3F2FD", secondaryColor: "#1976D2", tertiaryColor: "#90CAF9", quaternaryColor: "#0D47A1" },
+    hasAudiobook: false,
+    bookStringified: getBookStringified(),
+    audioPrompt: "",
+  };`;
 
-  // fs.writeFileSync(bookDataPath, bookData, "utf8");
+  fs.writeFileSync(path.join(bookOutputPath, "bookData.ts"), bookData, "utf8");
 }
 
 mainFunction();
