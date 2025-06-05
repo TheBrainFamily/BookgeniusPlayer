@@ -1,6 +1,6 @@
 #!/bin/bash
 
-fswatch -0 src/data | while IFS= read -r -d '' file; do
+fswatch -0 scripts/data | while IFS= read -r -d '' file; do
   case "$file" in
     *.xml)
       filename=$(basename "$file")
@@ -8,8 +8,8 @@ fswatch -0 src/data | while IFS= read -r -d '' file; do
       book="${book#chapters-}"
       book="${book%-chapters}"
       echo "File $filename changed, running scripts for $book..."
-      VITE_BOOK="$book" bun src/data/xmlToReact.ts
-      VITE_BOOK="$book" bun src/data/tools/create-book-metadata.ts
+      VITE_BOOK="$book" bun scripts/data/xmlToComplexHtml.ts
+      VITE_BOOK="$book" bun scripts/data/create-book-metadata.ts
       echo "Scripts executed successfully for $book.";;
   esac
 done

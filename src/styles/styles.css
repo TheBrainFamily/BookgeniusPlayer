@@ -956,7 +956,7 @@ section[data-chapter] [data-index] {
 /* Scroll margin for landscape orientation on wider screens */
 @media screen and (min-width: 1024px) {
   section[data-chapter] [data-index] {
-    scroll-margin-top: 150px;
+    scroll-margin-top: 90px;
   }
 }
 

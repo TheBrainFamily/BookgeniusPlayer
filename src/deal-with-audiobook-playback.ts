@@ -91,7 +91,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
       console.log(`Audiobook song check: Currently playing:`, currentPlayingTrackId);
 
       loadTrack(sectionToApply.file).then(() => {
-        console.log("audio loaded", sectionToApply.file);
+        console.log("audio loaded", sectionToApply.file, new Date().toISOString());
         stopAllTracks();
 
         const createEventsForAudiobook = () => {

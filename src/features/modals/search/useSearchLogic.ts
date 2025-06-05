@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import debounce from "lodash.debounce";
 import { useSearchModal } from "@/stores/modals/searchModal.store";
-import { performLocalDOMSearch } from "@/searchModal";
+import { performLocalDOMSearch, performUnifiedSearch } from "@/searchModal";
 import { useLocationRange } from "@/hooks/useLocationRange";
 import { Location } from "@/state/LocationContext";
 import { CURRENT_BOOK } from "@/consts";
@@ -22,7 +22,13 @@ export const useSearchLogic = () => {
       const searchId = ++latestSearchId;
 
       try {
-        const results = await performLocalDOMSearch(searchQuery, location, bookSlug);
+        let results = await performLocalDOMSearch(searchQuery, location, bookSlug);
+        if (results.items.length === 0) {
+          console.log("JUN 5 no results from local DOM search", results);
+          results = await performUnifiedSearch(searchQuery, location);
+        } else {
+          console.log("JUN 5 results", results);
+        }
 
         if (searchId === latestSearchId) {
           setResults(results);
@@ -32,7 +38,7 @@ export const useSearchLogic = () => {
           setResults({ header: "Search failed. Please try again.", items: [], isLoading: false });
         }
       }
-    }, 350);
+    }, 100);
   }, [setResults]);
 
   useEffect(() => {
