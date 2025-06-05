@@ -8,6 +8,7 @@
   "main": "index.js",
   "scripts": {
     "start": "tsx ./start.ts",
+    "generate-book-data": "tsx ./generate-book-data.ts",
     "prepare": "husky",
     "build": "vite build",
     "deploy": "VITE_BOOK=Pharaon npx vite build && rsync -av ./dist root@64.23.230.45:/var/www/faraon/",

@@ -38,11 +38,26 @@ interface BookBuildData {
   staticAssetDestDir: string;
 }
 
+// Validate environment variables
+const VITE_BOOK = process.env.VITE_BOOK;
+const VITE_BOOK_NAME = process.env.VITE_BOOK_NAME;
+const VITE_BOOK_PATH = process.env.VITE_BOOK_PATH;
+
+if (!VITE_BOOK || !VITE_BOOK_NAME || !VITE_BOOK_PATH) {
+  console.error("❌ Missing required environment variables:");
+  if (!VITE_BOOK) console.error("  - VITE_BOOK is not set");
+  if (!VITE_BOOK_NAME) console.error("  - VITE_BOOK_NAME is not set");
+  if (!VITE_BOOK_PATH) console.error("  - VITE_BOOK_PATH is not set");
+  console.error("\nPlease set these environment variables before building:");
+  console.error("Example: VITE_BOOK='Snow-Queen' VITE_BOOK_NAME='Snow Queen' VITE_BOOK_PATH='./public_books/Snow-Queen' pnpm build");
+  process.exit(1);
+}
+
 const activeBookConfig: BookBuildData = {
-  name: process.env.VITE_BOOK_NAME,
-  short_name: process.env.VITE_BOOK,
-  staticAssetSourceDir: `${process.env.VITE_BOOK_PATH}/assets`,
-  staticAssetDestDir: process.env.VITE_BOOK,
+  name: VITE_BOOK_NAME,
+  short_name: VITE_BOOK,
+  staticAssetSourceDir: `${VITE_BOOK_PATH}/assets`,
+  staticAssetDestDir: VITE_BOOK,
 };
 // Prepare targets for vite-plugin-static-copy
 const staticCopyTargets: Target[] = [];

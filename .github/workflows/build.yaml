@@ -38,7 +38,7 @@ jobs:
           cache: "pnpm"
       - run: pnpm install
       - name: Generate book data
-        run: pnpm start ./public_books/Snow-Queen
+        run: pnpm generate-book-data ./public_books/Snow-Queen
       - run: pnpm test
       - run: pnpm typecheck:ci
       - run: pnpm lint:ci
