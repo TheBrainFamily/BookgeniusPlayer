@@ -1,5 +1,3 @@
-import { BOOK_SLUGS } from "@/consts";
-import { getAudiobookData } from "./books/getAudiobookData";
 import { getBookData } from "./genericBookDataGetters/getBookData";
 
 // word, start
@@ -12,24 +10,24 @@ export const getAudiobookTracksForBook = async (): Promise<AudiobookTracksSectio
   if (!bookData.hasAudiobook) {
     return [];
   }
-  const audiobookTracks = await getAudiobookData();
-  const bookSlug = bookData.slug;
-  switch (bookSlug) {
-    case BOOK_SLUGS._1984:
-      return audiobookTracks.map((track) => {
-        if (track.chapter === 1) {
-          return { ...track, paragraph: track.paragraph - 6 };
-        } else {
-          return track;
-        }
-      });
-    case BOOK_SLUGS.Krolowa_Sniegu:
-      return audiobookTracks;
-    case BOOK_SLUGS.Conrad_Tajny_Agent:
-      return audiobookTracks;
-    case BOOK_SLUGS._1984_English:
-      return audiobookTracks;
-    default:
-      return [];
-  }
+  // const audiobookTracks = await getAudiobookData();
+  // const bookSlug = bookData.slug;
+  // switch (bookSlug) {
+  //   case BOOK_SLUGS._1984:
+  //     return audiobookTracks.map((track) => {
+  //       if (track.chapter === 1) {
+  //         return { ...track, paragraph: track.paragraph - 6 };
+  //       } else {
+  //         return track;
+  //       }
+  //     });
+  //   case BOOK_SLUGS.Krolowa_Sniegu:
+  //     return audiobookTracks;
+  //   case BOOK_SLUGS.Conrad_Tajny_Agent:
+  //     return audiobookTracks;
+  //   case BOOK_SLUGS._1984_English:
+  //     return audiobookTracks;
+  //   default:
+  //     return [];
+  // }
 };
