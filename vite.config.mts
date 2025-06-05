@@ -143,7 +143,7 @@ const bookDataPlugin = () => {
         if (id.includes("getKnownVideoFiles")) {
           return {
             code: `           
-            import { getKnownVideoFiles as getKnownVideoFilesInput } from "@/books/Krolowa-Sniegu-v2/getKnownVideoFiles.ts";
+            import { getKnownVideoFiles as getKnownVideoFilesInput } from "@/books/${selectedAlias}/getKnownVideoFiles.ts";
             export const getKnownVideoFiles = (): string[] => {
               if (getKnownVideoFilesInput) {
                 return getKnownVideoFilesInput();
