@@ -2,7 +2,9 @@
 #splash-screen {
   position: fixed;
   inset: 0;
-  background-color: oklch(0.205 0 0);
+  touch-action: none;
+  overscroll-behavior: none;
+  background-color: #2d2d2d;
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   display: flex;
   flex-direction: column;
@@ -15,7 +17,7 @@
     sans-serif;
   z-index: 99999;
   overflow: hidden;
-  padding: 1rem;
+  padding: clamp(0.5rem, 4vw, 2rem);
   opacity: 1;
   transition:
     opacity 1s ease-in-out,
@@ -37,8 +39,9 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 32rem;
-  gap: 2rem;
+  max-width: min(32rem, 90vw);
+  gap: clamp(1rem, 4vh, 2.5rem);
+  padding: 0 1rem;
 }
 
 .splash-title-container {
@@ -47,30 +50,46 @@
   transform: translateY(10px);
   animation: fadeInUp 0.6s ease-out forwards;
   animation-delay: 0.2s;
-  line-height: 40px;
-  height: 88px; /* hardcoded height of the title container so there is no flicker when subtitle is loaded */
+  line-height: 1.2;
+  min-height: clamp(60px, 12vh, 88px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .splash-title {
   color: white;
-  font-size: 3rem;
+  font-size: clamp(2rem, 8vw, 3rem);
   font-weight: bold;
   padding-bottom: 0.5rem;
   letter-spacing: 0.1em;
   opacity: 0.8;
+  line-height: 1.1;
 }
 
 .splash-subtitle {
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 3vw, 0.875rem);
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease-out;
+  opacity: 0;
+  min-height: 1.4em;
+}
+
+.splash-subtitle:not(:empty) {
+  opacity: 0.8;
 }
 
 .splash-image-container {
   position: relative;
-  width: 10rem;
-  height: 10rem;
+  width: clamp(6rem, 20vw, 10rem);
+  height: clamp(6rem, 20vw, 10rem);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -96,15 +115,15 @@
 }
 
 .splash-loading-image {
-  width: 7rem;
-  height: 7rem;
+  width: clamp(4.5rem, 15vw, 7rem);
+  height: clamp(4.5rem, 15vw, 7rem);
   position: relative;
   z-index: 10;
   animation: pulse-image 3s ease-in-out infinite;
 }
 
 .splash-text-container {
-  height: 4rem;
+  min-height: clamp(2rem, 8vh, 4rem);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,17 +132,23 @@
   opacity: 0;
   animation: fadeIn 0.5s ease-out forwards;
   animation-delay: 0.8s;
+  padding: 0 1rem;
 }
 
 .splash-loading-text {
   text-align: center;
   font-style: italic;
-  font-size: 1.125rem;
+  font-size: clamp(1rem, 4vw, 1.125rem);
   color: rgba(255, 255, 255, 0.9);
   opacity: 0;
   transform: translateY(20px);
   filter: blur(3px);
   animation: textFadeIn 0.5s ease-out forwards;
+  line-height: 1.4;
+  max-width: 100%;
+  word-wrap: break-word;
+  hyphens: auto;
+  min-height: 1.4em;
 }
 
 .splash-start-button {
@@ -133,18 +158,27 @@
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   color: white;
   font-weight: 600;
-  font-size: 1.125rem;
-  padding: 1rem 3rem;
+  font-size: clamp(1rem, 4vw, 1.125rem);
+  padding: clamp(0.75rem, 3vw, 1rem) clamp(2rem, 8vw, 3rem);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.25rem;
+  gap: clamp(0.75rem, 3vw, 1.25rem);
   backdrop-filter: blur(8px);
   cursor: pointer;
   opacity: 0;
   transform: scale(0.95) translateY(15px);
   transition: all 0.3s ease-out;
   will-change: transform, opacity, box-shadow;
+  min-height: 44px;
+  min-width: clamp(120px, 30vw, 160px);
+  position: relative;
+}
+
+.splash-start-button span {
+  min-width: clamp(3em, 15vw, 4em);
+  text-align: center;
+  transition: opacity 0.3s ease-out;
 }
 
 .splash-start-button.visible {
@@ -187,7 +221,153 @@
   border-bottom: 8px solid transparent;
 }
 
-/* Animations */
+@media (max-width: 480px) {
+  .play-icon {
+    width: 0.6rem;
+    height: 1.5rem;
+  }
+
+  .play-icon::before {
+    border-left: 10px solid currentColor;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+  }
+}
+
+@media (max-width: 320px) {
+  .play-icon {
+    width: 0.5rem;
+    height: 1.25rem;
+  }
+
+  .play-icon::before {
+    border-left: 8px solid currentColor;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+  }
+}
+
+@media (max-width: 480px) {
+  #splash-screen {
+    padding: clamp(0.5rem, 3vw, 1rem);
+  }
+
+  .splash-container {
+    gap: clamp(0.75rem, 3vh, 1.5rem);
+    max-width: 95vw;
+  }
+
+  .splash-title {
+    font-size: clamp(1.75rem, 7vw, 2.25rem);
+    letter-spacing: 0.05em;
+  }
+
+  .splash-subtitle {
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    letter-spacing: 0.15em;
+  }
+
+  .splash-image-container {
+    width: clamp(5rem, 18vw, 7rem);
+    height: clamp(5rem, 18vw, 7rem);
+  }
+
+  .splash-loading-image {
+    width: clamp(4rem, 14vw, 5.5rem);
+    height: clamp(4rem, 14vw, 5.5rem);
+  }
+
+  .splash-loading-text {
+    font-size: clamp(0.9rem, 3.5vw, 1rem);
+    padding: 0 0.5rem;
+  }
+
+  .splash-start-button {
+    font-size: clamp(0.85rem, 3vw, 0.95rem);
+    padding: clamp(0.5rem, 2vw, 0.7rem) clamp(1rem, 4vw, 1.5rem);
+    gap: clamp(0.4rem, 2vw, 0.75rem);
+    min-height: 40px;
+    min-width: 100px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .splash-container {
+    gap: clamp(1.25rem, 3.5vh, 2rem);
+  }
+
+  .splash-title {
+    font-size: clamp(2.25rem, 6vw, 2.75rem);
+  }
+
+  .splash-subtitle {
+    font-size: clamp(0.8rem, 2.8vw, 0.9rem);
+  }
+
+  .splash-image-container {
+    width: clamp(7rem, 16vw, 9rem);
+    height: clamp(7rem, 16vw, 9rem);
+  }
+
+  .splash-loading-image {
+    width: clamp(5.5rem, 12vw, 7rem);
+    height: clamp(5.5rem, 12vw, 7rem);
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .splash-container {
+    max-width: 28rem;
+    gap: clamp(1.75rem, 3vh, 2.25rem);
+  }
+
+  .splash-title {
+    font-size: clamp(2.75rem, 5vw, 3rem);
+  }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+  .splash-container {
+    gap: clamp(0.75rem, 2vh, 1.25rem);
+  }
+
+  .splash-title-container {
+    min-height: clamp(40px, 8vh, 60px);
+  }
+
+  .splash-title {
+    font-size: clamp(1.5rem, 6vw, 2.25rem);
+    padding-bottom: 0.25rem;
+  }
+
+  .splash-subtitle {
+    font-size: clamp(0.65rem, 2.5vw, 0.8rem);
+  }
+
+  .splash-image-container {
+    width: clamp(4rem, 12vw, 6rem);
+    height: clamp(4rem, 12vw, 6rem);
+  }
+
+  .splash-loading-image {
+    width: clamp(3rem, 9vw, 4.5rem);
+    height: clamp(3rem, 9vw, 4.5rem);
+  }
+
+  .splash-text-container {
+    min-height: clamp(1.5rem, 5vh, 2.5rem);
+  }
+
+  .splash-loading-text {
+    font-size: clamp(0.85rem, 3vw, 1rem);
+  }
+
+  .splash-start-button {
+    padding: clamp(0.5rem, 1.5vw, 0.7rem) clamp(1.25rem, 4vw, 2rem);
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+  }
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -287,26 +467,5 @@
   50% {
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
     border-color: rgba(255, 255, 255, 0.4);
-  }
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .splash-title {
-    font-size: 2.5rem;
-  }
-
-  .splash-container {
-    gap: 1.5rem;
-  }
-
-  .splash-image-container {
-    width: 8rem;
-    height: 8rem;
-  }
-
-  .splash-loading-image {
-    width: 6rem;
-    height: 6rem;
   }
 }
