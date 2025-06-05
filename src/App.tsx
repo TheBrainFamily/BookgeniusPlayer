@@ -30,7 +30,7 @@ import { getKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles"
 
 function Shell() {
   setKnownVideos(getKnownVideoFiles());
-  useBookContent("content-container");
+  useBookContent();
   useElementVisibility();
 
   /* dynamic visual hooks */
