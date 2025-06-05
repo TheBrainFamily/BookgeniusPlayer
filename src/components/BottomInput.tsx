@@ -13,6 +13,8 @@ import { useSearchModal } from "@/stores/modals/searchModal.store";
 import { useDeepResearchModal } from "@/stores/modals/deepResearchModal.store";
 import { OptionalElement } from "./OptionalElement";
 import { useElementVisibilityStore } from "@/stores/elementVisibility.store";
+import { hasApiKey } from "@/utils/apiKeyManager";
+import { useApiKeyModal } from "@/stores/modals/apiKeyModal.store";
 
 interface SubmitMessageData {
   query: string;
@@ -34,9 +36,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
 
   const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
   const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
+  const showAllElements = useElementVisibilityStore((state) => state.showAllElements);
 
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
   const { openModal: openDeepResearchModal, setContent: setDeepResearchContent } = useDeepResearchModal();
+  const { openModal: openApiKeyModal } = useApiKeyModal();
 
   const { startRecording, stopRecording, response } = useRealtime();
   const { location } = useLocation();
@@ -48,6 +52,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
 
   const updateLastActivity = useCallback(() => {
     pauseAllTimers();
+    showAllElements();
+
     lastActivityRef.current = Date.now();
     if (inactivityTimerRef.current) {
       clearTimeout(inactivityTimerRef.current);
@@ -149,6 +155,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   const handleRecordingStart = useCallback(() => {
     if (isRecording) return;
 
+    // Check if API key is set before starting recording
+    if (!hasApiKey()) {
+      openApiKeyModal();
+      return;
+    }
+
     updateLastActivity();
     setIsRecording(true);
 
@@ -161,7 +173,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       console.error("Error starting recording:", error);
       setIsRecording(false);
     });
-  }, [isRecording, startRecording, isSearchModalOpen, setSearchQuery, updateLastActivity]);
+  }, [isRecording, startRecording, isSearchModalOpen, setSearchQuery, updateLastActivity, openApiKeyModal]);
 
   const handleRecordingEnd = useCallback(() => {
     if (!isRecording) return;

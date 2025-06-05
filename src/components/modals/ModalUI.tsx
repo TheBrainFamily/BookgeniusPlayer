@@ -26,7 +26,7 @@ const MODAL_SIZES: Record<NonNullable<ModalUIProps["size"]>, ModalSize> = {
   full: { content: "w-full max-w-none", container: "w-full max-w-none" },
 };
 
-const LAYOUT_VIEW_SIZE: ModalSize = { content: "w-full max-w-none pointer-events-none", container: "w-full max-w-none pointer-events-none" };
+const LAYOUT_VIEW_SIZE: ModalSize = { content: "w-full max-w-none pointer-events-none z-49", container: "w-full max-w-none pointer-events-none" };
 
 const isTransparentModal = (transparent: boolean, className: string): boolean => {
   return transparent || className.includes("bg-transparent");

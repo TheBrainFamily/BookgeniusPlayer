@@ -3,16 +3,15 @@
 <html lang="pl">
   <head>
     <meta charset="UTF-8" />
+    <title>BookGenius</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#333333" />
+    <meta name="description" content="Interactive book reader" />
 
     <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Book Viewer" />
-    <meta name="theme-color" content="#333333" />
-    <meta name="description" content="Interactive book reader with character profiles" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <!-- PWA Icons -->
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
@@ -20,11 +19,15 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
     <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
 
-    <!-- Preload assets -->
+    <!-- Preloaded -->
+    <style>
+      body,
+      html {
+        background-color: #2d2d2d;
+      }
+    </style>
     <link rel="preload" href="/loading.gif" as="image" />
     <link rel="stylesheet" href="/src/styles/preload.css" />
-
-    <title>BookGenius</title>
   </head>
 
   <body>
@@ -49,11 +52,12 @@
     </div>
 
     <div id="root"></div>
+
     <div id="splash-screen">
       <div class="splash-container">
         <div class="splash-title-container">
           <div class="splash-title">BookGenius</div>
-          <div class="splash-subtitle"> </div>
+          <div class="splash-subtitle"></div>
         </div>
 
         <div class="splash-image-container">
@@ -85,21 +89,21 @@
         }
 
         async setupDynamicContent() {
-          await new Promise(resolve => {
+          await new Promise((resolve) => {
             const checkReady = () => {
               if (window.i18n && window.i18n.isInitialized) {
                 resolve();
               } else {
                 setTimeout(checkReady, 100);
               }
-            }
+            };
             checkReady();
           });
 
           const t = window.i18n.t;
-          document.querySelector('.splash-subtitle').textContent = t('splash_subtitle');
-          document.querySelector('.splash-start-button span').textContent = t('start_button');
-          this.loadingPhrases = t('loading_phrases', { returnObjects: true }) || [];
+          document.querySelector(".splash-subtitle").textContent = t("splash_subtitle");
+          document.querySelector(".splash-start-button span").textContent = t("start_button");
+          this.loadingPhrases = t("loading_phrases", { returnObjects: true }) || [];
           this.setupPhraseCycle();
         }
 
