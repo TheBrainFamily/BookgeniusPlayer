@@ -43,12 +43,12 @@ async function start() {
     fs.mkdirSync(bookOutputPath);
   }
 
+  // Copy media book files
   ["backgroundsForBook.ts", "getBackgroundSongsForBook.ts", "getCutScenesForBook.ts"].forEach((mediaBookFile) => {
     fs.copyFileSync(path.join(bookDirectoryPath, mediaBookFile), path.join(bookOutputPath, mediaBookFile), fs.constants.COPYFILE_FICLONE);
   });
 
-  // getKnownVideoFiles.ts
-
+  // Generate getKnownVideoFiles.ts
   const assetsPath = path.join(bookDirectoryPath, "assets");
   const videoFiles = fs
     .readdirSync(assetsPath)
@@ -60,24 +60,29 @@ async function start() {
   const getKnownVideoFiles = `export const getKnownVideoFiles = () => {\n return ${JSON.stringify(videoFiles, null, 2)} \n};`;
   fs.writeFileSync(path.join(bookOutputPath, "getKnownVideoFiles.ts"), getKnownVideoFiles, "utf-8");
 
-  // getBookStringified.ts
-
+  // Generate book data from HTML
   generateBookDataFromHtml();
 
-  // const command = `tsx ./generateBookDataFromHtml.ts ${bookDirectoryPath}`;
-  // child_process.execSync(command);
+  console.log(`✅ Book data generated successfully for ${bookSlug}`);
+  console.log(`📁 Output directory: ${bookOutputPath}`);
 
   try {
-    console.log(`Attempting to load book data from: ${bookDataPath}`);
-    // For dynamic imports with tsx/ESM, the path needs to be valid URL or absolute path.
-    // On Windows, path.resolve will produce paths like C:\... which needs to be file:///C:/...
-    // On Unix, /path/to/file is fine.
+    // Wait a moment for file generation to complete
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const bookDataFilePath = path.join(bookOutputPath, "bookData.ts");
-    const bookDataModulePath = path.sep === "\\" ? `file:///${bookDataFilePath.replace(/\\/g, "/")}` : bookDataFilePath;
-    console.log("80: bookOutputPath BANG!", bookOutputPath);
-    console.log("77: bookDataPath BANG!", bookDataFilePath);
-    const bookModule = (await import(bookDataModulePath)) as { bookData: BookData };
+
+    if (!fs.existsSync(bookDataFilePath)) {
+      console.error(`Error: bookData.ts not found at ${bookDataFilePath}`);
+      console.error("Make sure generateBookDataFromHtml() creates the bookData.ts file");
+      process.exit(1);
+    }
+
+    console.log(`Loading book data from: ${bookDataFilePath}`);
+
+    // Convert to file URL for proper dynamic import
+    const fileUrl = `file://${path.resolve(bookDataFilePath)}`;
+    const bookModule = (await import(fileUrl)) as { bookData: BookData };
     const { bookData } = bookModule;
 
     if (!bookData || !bookData.slug || !bookData.metadata || !bookData.metadata.title) {
