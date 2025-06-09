@@ -159,7 +159,7 @@ export const xmlToComplexHtml = (
                     pContent += `<span class="italic">${pElement.textContent || ""}</span>`;
                     break;
                   case "strong":
-                    pContent += ` <strong>${pElement.textContent.trim() || ""}</strong>`;
+                    pContent += `<strong>${pElement.textContent.trim() || ""}</strong>`;
                     break;
                   default:
                     pContent += `<${pElement.tagName}>${pElement.textContent || ""}</${pElement.tagName}>`;
@@ -236,13 +236,13 @@ ${backgroundsData.map((item) => `  { chapter: ${item.chapter}, paragraph: ${item
   const audioContent = `import type { BackgroundSongForBook } from "@/types/book";
 
 export const backgroundSongsForBook: BackgroundSongForBook[] = [
-${audioData.map((item) => `    { chapter: ${item.chapter}, paragraph: ${item.paragraph}, file: "${item.files[0]}" }`).join(",\n")}
+${audioData.map((item) => `  { chapter: ${item.chapter}, paragraph: ${item.paragraph}, files: [${item.files.map((f) => `"${f}"`).join(", ")}] }`).join(",\n")}
 ];`;
 
   // Generate cutScenesForBook.ts
-  const cutSceneContent = `import type { CutSceneSectionForBook } from "@/types/book";
+  const cutSceneContent = `import type { CutSceneForBook } from "@/types/book";
 
-export const cutScenesForBook: CutSceneSectionForBook[] = [
+export const cutScenesForBook: CutSceneForBook[] = [
 ${cutSceneData
   .map((item) =>
     item.files

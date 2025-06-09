@@ -61,6 +61,17 @@
         <p>A niegodziwych pyłków ciągle jeszcze pełno i zobaczymy, co z tego wynikło.</p>
     </Chapter>
     <Chapter id="2">
+        <BackgroundFiles>
+            <File title="krolowa-chapter-2-paragraph-0-loop.mp4" paragraph="0"/>
+            <File title="krolowa-chapter-2-paragraph-35.mp4" paragraph="35"/>
+            <File title="snow-covered-forest.mp4" paragraph="42"/>
+        </BackgroundFiles>
+        <AudioFiles>
+            <File title="chapter_2_paragraph_1.mp3" paragraph="0"/>
+            <File title="chapter_2_paragraph_1b.mp3" paragraph="0"/>
+            <File title="chapter_2_paragraph_24.mp3" paragraph="24"/>
+            <File title="chapter_2_paragraph_24b.mp3" paragraph="24"/>
+        </AudioFiles>
         <h3>II. Sąsiedzi</h3>
         <p>W pewnym bardzo starym mieście, w bardzo wysokim domu na poddaszu mieszkało dwoje dzieci, każde u swoich rodziców — był to <Kaj>Kaj</Kaj> i <Gerda>Gerda</Gerda>.</p>
         <p>W tym mieście było tyle ludzi, że nie mógł każdy dla siebie mieć osobnego domku, a cóż dopiero myśleć o własnym ogródku. Ale że dobrzy ludzie bardzo lubią kwiaty, więc wszyscy hodowali je w doniczkach. I tym sposobem w każdym prawie oknie był ogródek; ale najładniej było u <Kaj>Kaja</Kaj> i <Gerda>Gerdy</Gerda>.</p>
@@ -119,6 +130,19 @@
         <p>I tak płynęła długa noc zimowa, a gdy nastąpił ranek, <Kaj>Kaj</Kaj> spał u nóg <Krolowa-Sniegu>królowej śniegu</Krolowa-Sniegu>.</p>
     </Chapter>
     <Chapter id="3">
+        <BackgroundFiles>
+            <File title="riverbank.mp4" paragraph="0"/>
+            <File title="cottage-with-flower-covered-walls.mp4" paragraph="20"/>
+            <File title="krolowa-chapter-3-paragraph-43.mp4" paragraph="43"/>
+        </BackgroundFiles>
+        <AudioFiles>
+            <File title="chapter_3_paragraph_1.mp3" paragraph="1"/>
+            <File title="chapter_3_paragraph_1b.mp3" paragraph="1"/>
+            <File title="chapter_3_paragraph_20b.mp3" paragraph="20"/>
+            <File title="chapter_3_paragraph_20.mp3" paragraph="20"/>
+            <File title="chapter_3_paragraph_37.mp3" paragraph="37"/>
+            <File title="chapter_3_paragraph_37b.mp3" paragraph="37"/>
+        </AudioFiles>
         <h3>III. W ogródku wróżki</h3>
         <p>Jakże smutno i strasznie było biednej <Gerda>Gerdzie</Gerda>, kiedy wieczorem <Kaj>Kaj</Kaj> nie wrócił do domu!</p>
         <p>Nikt nie wiedział, gdzie się podział i co się z nim stało. <Chlopcy-z-rynku>Chłopcy</Chlopcy-z-rynku> opowiadali, że jeździł po rynku, a potem swoje saneczki uczepił do wielkich sań, które pomknęły za miasto. Tyle go widziano.</p>
@@ -171,6 +195,17 @@
         <p>Szaro i smutno było na szerokim świecie, otulonym w szare, ciężkie, ołowiane chmury.</p>
     </Chapter>
     <Chapter id="4">
+        <BackgroundFiles>
+            <File title="forest-first-snow.mp4" paragraph="0"/>
+            <File title="palace-interior.mp4" paragraph="22"/>
+            <File title="gerda-w-palacu-fixed.mp4" paragraph="39"/>
+        </BackgroundFiles>
+        <AudioFiles>
+            <File title="chapter_4_paragraph_1.mp3" paragraph="1"/>
+            <File title="chapter_4_paragraph_1b.mp3" paragraph="1"/>
+            <File title="chapter_4_paragraph_35.mp3" paragraph="35"/>
+            <File title="chapter_4_paragraph_35b.mp3" paragraph="35"/>
+        </AudioFiles>
         <h3>IV. U księżniczki</h3>
         <p>Długo szła tak <Gerda>Gerda</Gerda>, w końcu zmęczyła się bardzo i usiadła znowu pod drzewem. Właśnie pierwszy śnieg pokrył ziemię i bose nożyny dziewczynki poczerwieniały z zimna. Wtem tuż przed nią stanęła duża, szara <Wrona>wrona</Wrona>: popatrzyła na nią, pokręciła łebkiem, podleciała w prawo i w lewo i zawołała: „Kra! Kra!'</p>
         <p><Wrona talking="true"/>Znaczyło to: „Dzień dobry, kochana dziewczynko, musisz być bardzo biedna, kiedy w takie zimno sama idziesz w świat szeroki. Gdzież ty idziesz, dziewczynko? Czego szukasz?'</p>
@@ -217,6 +252,18 @@
         <p><Gerda>Gerda</Gerda> jechała dalej sama jedna, lecz się nie obawiała głodu ani zimna, gdyż kareta zaopatrzona była w żywność; stały w niej kosze ciastek, pierników, owoców — dzielny konik biegł szybko, więc myślała sobie, że chyba teraz musi znaleźć <Kaj>Kaja</Kaj>.</p>
     </Chapter>
     <Chapter id="5">
+        <BackgroundFiles>
+            <File title="forest-at-night.mp4" paragraph="0"/>
+            <File title="chapter-5-zamek-zbojow.mp4" paragraph="11"/>
+            <File title="forest-at-night.mp4" paragraph="36"/>
+            <File title="frozen-plain.mp4" paragraph="40"/>
+        </BackgroundFiles>
+        <AudioFiles>
+            <File title="chapter_5_paragraph_1.mp3" paragraph="1"/>
+            <File title="chapter_5_paragraph_1b.mp3" paragraph="1"/>
+            <File title="chapter_5_paragraph_23.mp3" paragraph="23"/>
+            <File title="chapter_5_paragraph_23b.mp3" paragraph="23"/>
+        </AudioFiles>
         <h3>V. Mała zbójniczka</h3>
         <p>Złocista kareta wjechała do ciemnego lasu i między drzewami świeciła jak słońce. Zobaczyli to rozbójnicy i wybiegli z gęstwiny.</p>
         <p>— Złoto! Złoto! — krzyczeli i rzucili się na karetę, uchwycili konia za cugle<note id="10"/>, pozabijali służbę i wyciągnęli na drogę przerażoną <Gerda>Gerdę</Gerda>.</p>
@@ -262,6 +309,20 @@
         <p>Na koniec, kiedy chleby zostały zjedzone, a z szynki nie pozostało ani śladu, ukazał się przed nimi biały kraj wiecznego lodu.</p>
     </Chapter>
     <Chapter id="6">
+        <BackgroundFiles>
+            <File title="dom-laponki.mp4" paragraph="0"/>
+            <File title="finland-cottage.mp4" paragraph="6"/>
+            <File title="krolowa-chapter-6-23.mp4" paragraph="23"/>
+            <File title="ice-castle-exterior.mp4" paragraph="28"/>
+        </BackgroundFiles>
+        <AudioFiles>
+            <File title="chapter_6_paragraph_1.mp3" paragraph="1"/>
+            <File title="chapter_6_paragraph_1b.mp3" paragraph="1"/>
+            <File title="chapter_6_paragraph_28.mp3" paragraph="28"/>
+            <File title="chapter_6_paragraph_28b.mp3" paragraph="28"/>
+            <File title="chapter_6_paragraph_31.mp3" paragraph="31"/>
+            <File title="chapter_6_paragraph_31b.mp3" paragraph="31"/>
+        </AudioFiles>
         <h3>VI. Laponka i Eskimoska</h3>
         <p>Zatrzymali się nagle przed niepozornym domkiem. Była to chatka tak niska, że dach opierał się na ziemi, a drzwi stanowił otwór, przez który mieszkańcy musieli wpełzać do środka na brzuchu. W chatce nie było nikogo oprócz <Laponka>starej Laponki</Laponka><note id="15"/>, która gotowała rybę nad lampą napełnioną tranem.</p>
         <p><Ren>Ren</Ren> opowiedział jej swoją historię, która wydawała mu się najważniejszą, a potem zaczął mówić o <Gerda>Gerdzie</Gerda>, ponieważ dziewczynka była tak zziębnięta, że sama opowiadać nie mogła.</p>
@@ -298,6 +359,23 @@
         <p>A tymczasem zobaczmy, co tam robił <Kaj>Kaj</Kaj>. O <Gerda>Gerdzie</Gerda> nie myślał wcale i nie przypuszczał, że stoi w śniegu przed pałacem.</p>
     </Chapter>
     <Chapter id="7">
+        <BackgroundFiles>
+            <File title="ice-castle-interior.mp4" paragraph="0"/>
+            <File title="krolowa-chapter-7-4.mp4" paragraph="4"/>
+            <File title="summer-garden.mp4" paragraph="27"/>
+            <File title="krolowa-town-loop2.mp4" paragraph="40"/>
+            <File title="grandmother-house.mp4" paragraph="43"/>
+        </BackgroundFiles>
+        <AudioFiles>
+            <File title="chapter_7_paragraph_1.mp3" paragraph="1"/>
+            <File title="chapter_7_paragraph_1b.mp3" paragraph="1"/>
+            <File title="chapter_7_paragraph_25.mp3" paragraph="25"/>
+            <File title="chapter_7_paragraph_25b.mp3" paragraph="25"/>
+        </AudioFiles>
+        <CutSceneFiles>
+            <File title="kocham-slow.mp4" paragraph="21" delayInMs="5000" />
+            <File title="dzieci-spotkanie.mp4" paragraph="19" delayInMs="10000" />
+        </CutSceneFiles>
         <h3>VII. W pałacu królowej śniegu</h3>
         <p>Ściany pałacu były z olbrzymich zasp śnieżnych, w których wichry wywierciły drzwi i okna. Przeszło sto sal znajdowało się w tym gmachu, a największa miała kilka mil długości. Oświetlała je piękna zorza, kładąc na białym śniegu czerwone i żółte blaski, toteż w wielkich komnatach było pusto, cicho, jasno i mroźno.</p>
         <p>Nigdy w tej białej olbrzymiej przestrzeni nie słyszano śmiechu ani wesołego głosu, nie było tu nigdy rozgłośnej zabawy, choć północne niedźwiadki i inne stworzenia mogły wyprawiać najświetniejsze bale w takich wspaniałych salach przy muzyce wichru. Nie wchodziły tu jednak nigdy — nigdy! W pałacu <Krolowa-Sniegu>królowej śniegu</Krolowa-Sniegu> było pusto i zawsze cicho. Cicho codziennie o jednej godzinie zapalała się zorza, a następnie gasła, cicho błyszczały białe, śnieżne ściany, cicho w środku leżało wielkie lodowe jezioro. Przejrzysty lód spękany był w tysiące kawałków, ale wszystkie były podobne do siebie, zupełnie jednakowe. A na środku jeziora, na wysokim lodowym tronie siedziała <Krolowa-Sniegu>królowa śniegu</Krolowa-Sniegu>, gdy gościła w swoim królestwie.</p>
