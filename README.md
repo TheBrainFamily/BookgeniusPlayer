@@ -1,14 +1,12 @@
 # BookGenius Frontend
 
-
-
 ## Overview
 
 BookGenius is an innovative multi-book interactive reading platform that transforms classic literature into immersive multimedia experiences. The application features synchronized audiobooks, character avatars, background music, animations, and real-time AI-powered research capabilities.
 
-## Live demo:
+## Live demo
 
-https://bookgenius.net/
+<https://bookgenius.net/>
 
 ![CleanShot 2025-06-05 at 14 50 17@2x](https://github.com/user-attachments/assets/bf4392d6-2faa-4902-a2f2-b678c30fbac0)
 ![CleanShot 2025-06-05 at 14 47 07@2x](https://github.com/user-attachments/assets/61fea04b-e64c-4530-91a7-d2ac18fde3c1)
@@ -32,7 +30,7 @@ pnpm install
 
 # Be sure that in public_books/$BOOK_SLUG you have a book.xml file
 
-pnpm start public_books/$BOOK_SLUG (eg. pnpm start public_books/Snow_Queen)
+pnpm start public_books/$BOOK_SLUG (eg. pnpm start public_books/Krolowa-Sniegu)
 
 ```
 
@@ -66,7 +64,7 @@ tsx src/text-editor-service/server.ts
 
 ### Project Structure
 
-```
+```plaintext
 src/
 ├── App.tsx                    # Main application component
 ├── main.ts                    # Legacy initialization (vanilla JS)
@@ -239,7 +237,7 @@ The application supports multiple books through a sophisticated build-time confi
 - Background sync for user-generated content
 - Update notifications and cache management
 
-#### PWA Features:
+#### PWA Features
 
 - Installable app with custom icons
 - Offline reading capability
@@ -272,9 +270,11 @@ The application supports multiple books through a sophisticated build-time confi
 
 1. **Download DAISY files** - Standard audiobook format with synchronized text
 2. **Convert SMIL to audiobook items**:
+
    ```bash
    bun src/convertSmilToAudiobookItems.ts
    ```
+
 3. **Verify chapter/paragraph alignment** - Ensure audio segments match book XML structure
 4. **Create AudiobookTracksDefined file** in `public_books/{BOOK_SLUG}/audiobook_data/`
 5. **Import and configure** in `getAudiobookTracksForBook.ts` with unique identifier
@@ -282,7 +282,7 @@ The application supports multiple books through a sophisticated build-time confi
 
 ### Audio File Structure
 
-```
+```plaintext
 public_books/{BOOK_NAME}/
 ├── audiobook_data/
 │   └── AudiobookTracksDefined.ts
@@ -356,7 +356,7 @@ pnpm test             # Jest unit tests
 
 ## Asset Structure
 
-```
+```plaintext
 public_books/
 ├── Pharaon/           # Ancient Egyptian book assets
 ├── 1984/              # Orwell's 1984 assets
