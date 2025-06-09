@@ -1,15 +1,69 @@
-import { DOMParser, XMLSerializer, Node } from "@xmldom/xmldom";
+import { DOMParser, XMLSerializer, Node, Element as XMLElement } from "@xmldom/xmldom";
 import fs from "fs";
 import path from "path";
 
 import { getTalkingMediaFilePathForName, getListeningMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
 
-export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): string => {
+// Helper function to extract file data from XML elements
+const extractFileData = (
+  chapter: XMLElement,
+  tagName: string,
+  chapterNumber: number,
+): Array<{ chapter: number; paragraph: number; files: Array<{ title: string; delayInMs?: number; text?: string }> }> => {
+  const elementsArray = chapter.getElementsByTagName(tagName);
+  const filesByParagraph: Record<number, Array<{ title: string; delayInMs?: number; text?: string }>> = {};
+
+  for (let i = 0; i < elementsArray.length; i++) {
+    const files = elementsArray[i].getElementsByTagName("File");
+
+    for (let j = 0; j < files.length; j++) {
+      const fileElement = files[j];
+      const title = fileElement.getAttribute("title");
+      const paragraph = fileElement.getAttribute("paragraph");
+      const delayInMs = fileElement.getAttribute("delayInMs");
+      const text = fileElement.getAttribute("text");
+
+      if (title && paragraph !== null) {
+        const paragraphNum = parseInt(paragraph, 10);
+        if (!filesByParagraph[paragraphNum]) {
+          filesByParagraph[paragraphNum] = [];
+        }
+
+        const fileData: { title: string; delayInMs?: number; text?: string } = { title };
+        if (delayInMs !== null) {
+          fileData.delayInMs = parseInt(delayInMs, 10);
+        }
+        if (text !== null) {
+          fileData.text = text;
+        }
+
+        filesByParagraph[paragraphNum].push(fileData);
+      }
+    }
+  }
+
+  return Object.entries(filesByParagraph).map(([paragraph, files]) => ({ chapter: chapterNumber, paragraph: parseInt(paragraph, 10), files: files }));
+};
+
+export const xmlToComplexHtml = (
+  xmlString: string,
+  bookSlug: BOOK_SLUGS,
+): {
+  htmlResult: string;
+  backgroundsData: Array<{ chapter: number; file: string; startParagraph: number }>;
+  audioData: Array<{ chapter: number; paragraph: number; files: string[] }>;
+  cutSceneData: Array<{ chapter: number; paragraph: number; files: Array<{ title: string; delayInMs?: number; text?: string }> }>;
+} => {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xmlString, "text/xml");
   const serializer = new XMLSerializer();
   let htmlResult = "";
+
+  // Arrays to collect background, audio, and cutscene data
+  const backgroundsData: Array<{ chapter: number; file: string; startParagraph: number }> = [];
+  const audioData: Array<{ chapter: number; paragraph: number; files: string[] }> = [];
+  const cutSceneData: Array<{ chapter: number; paragraph: number; files: Array<{ title: string; delayInMs?: number; text?: string }> }> = [];
 
   // Parse CharactersMaster
   const charactersMaster = xmlDoc.getElementsByTagName("CharactersMaster")[0];
@@ -30,6 +84,23 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
 
   for (const chapter of chapters) {
     const chapterId = chapter.getAttribute("id");
+    const chapterNumber = parseInt(chapterId || "0", 10);
+
+    const backgroundFileData = extractFileData(chapter, "BackgroundFiles", chapterNumber);
+    backgroundFileData.forEach((item) => {
+      item.files.forEach((file) => {
+        backgroundsData.push({ chapter: chapterNumber, file: file.title, startParagraph: item.paragraph });
+      });
+    });
+
+    const audioFileData = extractFileData(chapter, "AudioFiles", chapterNumber);
+    audioFileData.forEach((item) => {
+      audioData.push({ chapter: chapterNumber, paragraph: item.paragraph, files: item.files.map((f) => f.title) });
+    });
+
+    const cutSceneFileData = extractFileData(chapter, "CutSceneFiles", chapterNumber);
+    cutSceneData.push(...cutSceneFileData);
+
     htmlResult += `\n      <section><section data-chapter="${chapterId}">`;
     let dataIndex = 0;
 
@@ -85,6 +156,11 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
                   case "strong":
                     pContent += ` <strong>${pElement.textContent.trim() || ""}</strong>`;
                     break;
+                  // Skip these tags as they are handled separately
+                  case "AudioFiles":
+                  case "BackgroundFiles":
+                  case "CutSceneFiles":
+                    break;
                   default:
                     pContent += `<${pElement.tagName}>${pElement.textContent || ""}</${pElement.tagName}>`;
                     break;
@@ -120,10 +196,10 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
               node.nodeName.charAt(0) === node.nodeName.charAt(0).toUpperCase() &&
               node.nodeName.charAt(0) !== node.nodeName.charAt(0).toLowerCase()
             ) {
-              console.log("skipping tag", node.nodeName);
+              console.log("⏭️ skipping tag", node.nodeName);
               continue;
             }
-            console.log("adding tag", node.nodeName);
+            // console.log("adding tag", node.nodeName);
             innerHtml += serializer.serializeToString(node);
           }
           htmlResult += `\n    <${tagName} data-index="${dataIndex++}">${innerHtml}</${tagName}>`;
@@ -137,18 +213,102 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: BOOK_SLUGS): strin
 
   // Add a wrapping div or return directly depending on final requirements
   // For now, returning the content of the sections directly, trimmed.
-  return htmlResult.trim();
+
+  // Return both the HTML result and the extracted data
+  return { htmlResult: htmlResult.trim(), backgroundsData, audioData, cutSceneData };
+};
+
+// Helper function to generate background, audio, and cutscene files
+export const generateDataFiles = (
+  backgroundsData: Array<{ chapter: number; file: string; startParagraph: number }>,
+  audioData: Array<{ chapter: number; paragraph: number; files: string[] }>,
+  cutSceneData: Array<{ chapter: number; paragraph: number; files: Array<{ title: string; delayInMs?: number; text?: string }> }>,
+  bookSlug: BOOK_SLUGS,
+) => {
+  // Generate backgroundsForBook.ts
+  const backgroundsContent = `import type { BackgroundForBook } from "@/types/book";
+
+export const backgroundsForBook: BackgroundForBook[] = [
+${backgroundsData.map((item) => `  { chapter: ${item.chapter}, paragraph: ${item.startParagraph}, file: "${item.file}" }`).join(",\n")}
+];`;
+
+  // Generate backgroundSongsForBook.ts
+  const audioContent = `import type { BackgroundSongForBook } from "@/types/book";
+
+export const backgroundSongsForBook: BackgroundSongForBook[] = [
+${audioData.map((item) => `    { chapter: ${item.chapter}, paragraph: ${item.paragraph}, file: "${item.files[0]}" }`).join(",\n")}
+];`;
+
+  // Generate cutScenesForBook.ts
+  const cutSceneContent = `import type { CutSceneSectionForBook } from "@/types/book";
+
+export const cutScenesForBook: CutSceneSectionForBook[] = [
+${cutSceneData
+  .map((item) =>
+    item.files
+      .map(
+        (f) =>
+          `  { chapter: ${item.chapter}, paragraph: ${item.paragraph}, file: "${f.title}"${f.delayInMs !== undefined ? `, delayInMs: ${f.delayInMs}` : ""}${f.text !== undefined ? `, text: "${f.text}"` : ""} }`,
+      )
+      .join(",\n"),
+  )
+  .filter(Boolean)
+  .join(",\n")}
+];`;
+
+  // Write the files
+  const backgroundsPath = path.join(__dirname, "..", "..", "src/books", bookSlug, "new", "backgroundsForBook.ts");
+  const audioPath = path.join(__dirname, "..", "..", "src/books", bookSlug, "new", "backgroundSongsForBook.ts");
+  const cutScenePath = path.join(__dirname, "..", "..", "src/books", bookSlug, "new", "cutScenesForBook.ts");
+
+  // Create directories if they don't exist
+  const newDir = path.join(__dirname, "..", "..", "src/books", bookSlug, "new");
+  fs.mkdirSync(newDir, { recursive: true });
+
+  fs.writeFileSync(backgroundsPath, backgroundsContent);
+  fs.writeFileSync(audioPath, audioContent);
+  fs.writeFileSync(cutScenePath, cutSceneContent);
+
+  console.log(`Generated ${backgroundsPath}`);
+  console.log(`Generated ${audioPath}`);
+  console.log(`Generated ${cutScenePath}`);
 };
 
 if (require.main === module) {
   const bookSlug: BOOK_SLUGS = CURRENT_BOOK;
-  const xmlString = fs.readFileSync(path.join(__dirname, `${bookSlug}-chapters.xml`), "utf8");
+
+  // Try to read from the public_books directory first (with Background/Audio data)
+  let xmlString: string;
+  const publicBookPath = path.join(__dirname, "..", "..", "public_books", bookSlug, "book.xml");
+  const fallbackPath = path.join(__dirname, `${bookSlug}-chapters.xml`);
+
+  if (fs.existsSync(publicBookPath)) {
+    console.log(`Reading from ${publicBookPath}`);
+    xmlString = fs.readFileSync(publicBookPath, "utf8");
+  } else {
+    console.log(`Reading from ${fallbackPath}`);
+    xmlString = fs.readFileSync(fallbackPath, "utf8");
+  }
+
   // Example usage: Provide the book slug when calling
   console.log("bookSlug", bookSlug);
-  const htmlString = xmlToComplexHtml(xmlString, bookSlug);
-  if (bookSlug === "1984" || bookSlug === "1984-English") {
-    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const _${bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlString}</section>\`;`);
+  const { backgroundsData, audioData, cutSceneData, htmlResult } = xmlToComplexHtml(xmlString, bookSlug);
+
+  console.log("backgroundsData", backgroundsData);
+  console.log("audioData", audioData);
+  console.log("cutSceneData", cutSceneData);
+
+  // Generate the data files if we have any data
+  if (backgroundsData.length > 0 || audioData.length > 0 || cutSceneData.length > 0) {
+    generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug);
   } else {
-    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const ${bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlString}</section>\`;`);
+    console.log("No background, audio, or cutscene data found in XML");
+  }
+
+  // Generate the HTML file as before
+  if (bookSlug === "1984" || bookSlug === "1984-English") {
+    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const _${bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlResult}</section>\`;`);
+  } else {
+    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const ${bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlResult}</section>\`;`);
   }
 }

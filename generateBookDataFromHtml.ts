@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { DOMParser } from "@xmldom/xmldom";
-import { xmlToComplexHtml } from "./scripts/data/xmlToComplexHtml";
+import { xmlToComplexHtml, generateDataFiles } from "./scripts/data/xmlToComplexHtml";
 import { BOOK_SLUGS } from "@/consts";
 import { extractCharacterMetadata, getCharacterTags } from "./scripts/data/tools/create-book-metadata";
 
@@ -24,14 +24,20 @@ export function generateBookDataFromHtml() {
   const chapterCount = chapters.length;
   const bookOutputPath = path.resolve("src", "books", bookSlug);
 
-  const getBookStringified = xmlToComplexHtml(bookXml, bookSlug as BOOK_SLUGS);
-  fs.writeFileSync(
-    path.join(bookOutputPath, "getBookStringified.ts"),
-    `const bookStringified = \`<section>${getBookStringified}</section>\`\n\n export const getBookStringified = (): string => {
+  // --- Generate getBookStringified.ts ---
+  const { audioData, backgroundsData, cutSceneData, htmlResult } = xmlToComplexHtml(bookXml, bookSlug as BOOK_SLUGS);
+
+  if (backgroundsData.length > 0 || audioData.length > 0 || cutSceneData.length > 0) {
+    generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug as BOOK_SLUGS);
+  }
+
+  const getBookStringifiedContent = `const bookStringified = \`<section>${htmlResult}</section>\`;
+
+export const getBookStringified = (): string => {
   return bookStringified;
-};`,
-    "utf-8",
-  );
+};
+`;
+  fs.writeFileSync(path.join(bookOutputPath, "getBookStringified.ts"), getBookStringifiedContent, "utf-8");
 
   // --- Generate getCharactersData.ts ---
   const characterTags = getCharacterTags(xmlDoc);
