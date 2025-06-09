@@ -113,6 +113,11 @@ export const xmlToComplexHtml = (
         const childElement = node as unknown as Element;
         const tagName = childElement.tagName;
 
+        // Skip these tags as they are handled separately in extractFileData
+        if (tagName === "BackgroundFiles" || tagName === "AudioFiles" || tagName === "CutSceneFiles") {
+          continue;
+        }
+
         if (tagName === "p") {
           // Process paragraph element
           let pContent = "";
@@ -155,11 +160,6 @@ export const xmlToComplexHtml = (
                     break;
                   case "strong":
                     pContent += ` <strong>${pElement.textContent.trim() || ""}</strong>`;
-                    break;
-                  // Skip these tags as they are handled separately
-                  case "AudioFiles":
-                  case "BackgroundFiles":
-                  case "CutSceneFiles":
                     break;
                   default:
                     pContent += `<${pElement.tagName}>${pElement.textContent || ""}</${pElement.tagName}>`;
