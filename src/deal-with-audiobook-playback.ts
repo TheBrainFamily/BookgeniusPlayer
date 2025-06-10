@@ -1,5 +1,5 @@
-import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
-import { getAudiobookTracksForBook, AudiobookTracksSection } from "@/getAudiobookTracksForBook"; // Adjust path as needed
+import { CURRENT_BOOK } from "./consts";
+import { getAudiobookTracksForBook, AudiobookTracksSection } from "@/genericBookDataGetters/getAudiobookTracksForBook";
 import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audiobook-player";
 import { highlightNthOccurrence } from "./highlightWord";
 

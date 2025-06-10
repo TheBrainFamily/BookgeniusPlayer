@@ -1,5 +1,3 @@
-// Type definitions for 1984 book
-
 export interface ChapterMetadata {
   id: string;
   title: string;
@@ -24,4 +22,5 @@ export interface BookThemeColors {
   tertiaryColor: string;
   quaternaryColor: string;
 }
+
 export type BookData = { slug: string; metadata: BookMetadata; chapters: number; hasAudiobook: boolean; bookStringified: string; themeColors: BookThemeColors };

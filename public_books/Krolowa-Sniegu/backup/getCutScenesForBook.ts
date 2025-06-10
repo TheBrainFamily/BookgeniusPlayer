@@ -1,4 +1,4 @@
-import type { CutScene } from "@/getCutScenesForBook";
+import type { CutScene } from "@/genericBookDataGetters/getCutScenesForBook";
 
 export const getCutScenesForBook = (): CutScene[] => {
   return [

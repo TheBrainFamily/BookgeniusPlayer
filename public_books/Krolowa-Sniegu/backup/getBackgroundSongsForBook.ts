@@ -1,4 +1,4 @@
-import type { BackgroundSongSection } from "@/getBackgroundSongsForBook";
+import type { BackgroundSongSection } from "@/genericBookDataGetters/getBackgroundSongsForBook";
 
 export const getBackgroundSongsForBook = (): BackgroundSongSection[] => {
   return [

@@ -1,5 +1,5 @@
 import { CURRENT_BOOK } from "./consts";
-import { getCutScenesForBook } from "./getCutScenesForBook";
+import { getCutScenesForBook } from "./genericBookDataGetters/getCutScenesForBook";
 import "./styles/cutscene-video.css";
 
 export const dealWithCutScenes = ({ currentChapter, currentParagraph }) => {
