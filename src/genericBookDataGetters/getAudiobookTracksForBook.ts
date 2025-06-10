@@ -1,15 +1,7 @@
-import { getBookData } from "./getBookData";
+export type WordPosition = [string, number]; // word, start
 
-// word, start
-export type WordPosition = [string, number];
+export type AudiobookTracksSection = { chapter: number; paragraph: number; file: string; smile_id?: string; "clip-begin": number; "clip-end": number; words?: WordPosition[] };
 
-export type AudiobookTracksSection = { chapter: number; paragraph: number; file: string; smile_id: string; "clip-begin": number; "clip-end": number; words?: WordPosition[] };
-
-export const getAudiobookTracksForBook = async (): Promise<AudiobookTracksSection[]> => {
-  const bookData = getBookData();
-  if (!bookData.hasAudiobook) {
-    return [];
-  }
-
+export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
   return [];
 };

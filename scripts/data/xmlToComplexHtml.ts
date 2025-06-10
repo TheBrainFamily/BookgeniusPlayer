@@ -231,6 +231,8 @@ export const generateDataFiles = (
 export const getBackgroundsForBook = (): BackgroundForBook[] => [
 ${backgroundsData.map((item) => `  { chapter: ${item.chapter}, paragraph: ${item.startParagraph}, file: "${item.file}" }`).join(",\n")}
 ];`;
+  const backgroundsPath = path.join(__dirname, "..", "..", "src/books", bookSlug, "getBackgroundsForBook.ts");
+  fs.writeFileSync(backgroundsPath, backgroundsContent);
 
   // Generate getBackgroundSongsForBook.ts
   const audioContent = `import type { BackgroundSongForBook } from "@/types/book";
@@ -238,6 +240,8 @@ ${backgroundsData.map((item) => `  { chapter: ${item.chapter}, paragraph: ${item
 export const getBackgroundSongsForBook = (): BackgroundSongForBook[] => [
 ${audioData.map((item) => `  { chapter: ${item.chapter}, paragraph: ${item.paragraph}, files: [${item.files.map((f) => `"${f}"`).join(", ")}] }`).join(",\n")}
 ];`;
+  const audioPath = path.join(__dirname, "..", "..", "src/books", bookSlug, "getBackgroundSongsForBook.ts");
+  fs.writeFileSync(audioPath, audioContent);
 
   // Generate getCutScenesForBook.ts
   const cutSceneContent = `import type { CutSceneForBook } from "@/types/book";
@@ -255,23 +259,8 @@ ${cutSceneData
   .filter(Boolean)
   .join(",\n")}
 ];`;
-
-  // Write the files
-  const backgroundsPath = path.join(__dirname, "..", "..", "src/books", bookSlug, "getBackgroundsForBook.ts");
-  const audioPath = path.join(__dirname, "..", "..", "src/books", bookSlug, "getBackgroundSongsForBook.ts");
   const cutScenePath = path.join(__dirname, "..", "..", "src/books", bookSlug, "getCutScenesForBook.ts");
-
-  // Create directories if they don't exist
-  const newDir = path.join(__dirname, "..", "..", "src/books", bookSlug, "new");
-  fs.mkdirSync(newDir, { recursive: true });
-
-  fs.writeFileSync(backgroundsPath, backgroundsContent);
-  fs.writeFileSync(audioPath, audioContent);
   fs.writeFileSync(cutScenePath, cutSceneContent);
-
-  console.log(`Generated ${backgroundsPath}`);
-  console.log(`Generated ${audioPath}`);
-  console.log(`Generated ${cutScenePath}`);
 };
 
 if (require.main === module) {

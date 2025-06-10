@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { viteStaticCopy, type Target } from "vite-plugin-static-copy";
-
 import path from "path";
 
 // Workaround to remove unnecessary books chunks from the build
@@ -114,10 +113,10 @@ const bookDataPlugin = () => {
 };`,
     },
     getAudiobookTracksForBook: {
-      types: `export type WordPosition = [string, number];
-export type AudiobookTracksSection = { chapter: number; paragraph: number; file: string; smile_id: string; "clip-begin": number; "clip-end": number; words?: WordPosition[] };`,
+      types: `export type WordPosition = [string | number];
+export type AudiobookTracksSection = { chapter: number; paragraph: number; file: string; smile_id?: string; "clip-begin": number; "clip-end": number; words?: WordPosition[] };`,
       import: `import { getAudiobookTracksForBook as getAudiobookTracksForBookInput } from "@/books/${selectedAlias}/getAudiobookTracksForBook";`,
-      export: `export const getAudiobookTracksForBook = async (): Promise<AudiobookTracksSection[]> => {
+      export: `export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
   return getAudiobookTracksForBookInput();
 };`,
     },

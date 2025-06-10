@@ -8,8 +8,10 @@
   "main": "index.js",
   "scripts": {
     "start": "tsx ./start.ts",
+    "generate-book": "tsx ./generate-book.ts",
     "prepare": "husky",
-    "build": "vite build",
+    "build": "tsx ./build-with-book.ts",
+    "build-only": "vite build",
     "deploy": "VITE_BOOK=Pharaon npx vite build && rsync -av ./dist root@64.23.230.45:/var/www/faraon/",
     "deploy:1984": "VITE_BOOK=1984 npx vite build && rsync -av ./dist root@64.23.230.45:/var/www/1984/",
     "deploy:1984-english": "VITE_LANG=EN VITE_BOOK=1984-English npx vite build && rsync -av ./dist root@64.23.230.45:/var/www/1984-english/",

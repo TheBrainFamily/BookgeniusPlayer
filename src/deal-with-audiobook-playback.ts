@@ -65,7 +65,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
   try {
     console.log(`Calculated consideration point: Chapter ${currentChapter}, Paragraph ${currentParagraph}`);
 
-    const bookTracks = await getAudiobookTracksForBook();
+    const bookTracks = getAudiobookTracksForBook();
     if (!bookTracks) {
       console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot determine Audiobook song.`);
       isProcessingAudiobookTracks = false;

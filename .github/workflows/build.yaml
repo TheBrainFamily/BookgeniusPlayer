@@ -6,6 +6,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      VITE_BOOK: Krolowa-Sniegu
+      VITE_BOOK_NAME: Krolowa Sniegu
+      VITE_BOOK_PATH: ./public_books/Krolowa-Sniegu
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,6 +26,7 @@ jobs:
             vite.config.mts
             src/
             tests/
+            public_books/
           sparse-checkout-cone-mode: false
       - uses: pnpm/action-setup@v4
         with:
@@ -35,3 +41,5 @@ jobs:
       - run: pnpm typecheck:ci
       - run: pnpm lint:ci
       - run: pnpm prettier:check
+      - name: Build project
+        run: pnpm build public_books/Krolowa-Sniegu

@@ -1,8 +1,9 @@
 import fs from "fs";
 import path from "path";
 import { DOMParser } from "@xmldom/xmldom";
-import { xmlToComplexHtml, generateDataFiles } from "./scripts/data/xmlToComplexHtml";
+
 import { BOOK_SLUGS } from "@/consts";
+import { xmlToComplexHtml, generateDataFiles } from "./scripts/data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterTags } from "./scripts/data/tools/create-book-metadata";
 
 export function generateBookDataFromHtml() {
