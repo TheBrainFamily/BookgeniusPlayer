@@ -28,6 +28,8 @@ jobs:
             generate-book.ts
             start.ts
             generateBookDataFromHtml.ts
+            scripts/data/xmlToComplexHtml.ts
+            scripts/data/tools/create-book-metadata.ts
             src/
             tests/
             public_books/
