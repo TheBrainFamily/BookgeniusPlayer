@@ -62,7 +62,7 @@ export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphab
     return () => {
       cancelled = true;
     };
-  }, [loc.chapter, loc.paragraph, loc.endChapter, loc.endParagraph, addNewAtEnd, sortAlphabetically, getCharactersData()]);
+  }, [loc.chapter, loc.paragraph, loc.endChapter, loc.endParagraph, addNewAtEnd, sortAlphabetically]);
 
   return notes;
 }
