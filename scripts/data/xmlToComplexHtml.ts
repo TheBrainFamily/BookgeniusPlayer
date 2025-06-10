@@ -225,24 +225,24 @@ export const generateDataFiles = (
   cutSceneData: Array<{ chapter: number; paragraph: number; files: Array<{ title: string; delayInMs?: number; text?: string }> }>,
   bookSlug: BOOK_SLUGS,
 ) => {
-  // Generate backgroundsForBook.ts
+  // Generate getBackgroundsForBook.ts
   const backgroundsContent = `import type { BackgroundForBook } from "@/types/book";
 
-export const backgroundsForBook: BackgroundForBook[] = [
+export const getBackgroundsForBook = (): BackgroundForBook[] => [
 ${backgroundsData.map((item) => `  { chapter: ${item.chapter}, paragraph: ${item.startParagraph}, file: "${item.file}" }`).join(",\n")}
 ];`;
 
-  // Generate backgroundSongsForBook.ts
+  // Generate getBackgroundSongsForBook.ts
   const audioContent = `import type { BackgroundSongForBook } from "@/types/book";
 
-export const backgroundSongsForBook: BackgroundSongForBook[] = [
+export const getBackgroundSongsForBook = (): BackgroundSongForBook[] => [
 ${audioData.map((item) => `  { chapter: ${item.chapter}, paragraph: ${item.paragraph}, files: [${item.files.map((f) => `"${f}"`).join(", ")}] }`).join(",\n")}
 ];`;
 
-  // Generate cutScenesForBook.ts
+  // Generate getCutScenesForBook.ts
   const cutSceneContent = `import type { CutSceneForBook } from "@/types/book";
 
-export const cutScenesForBook: CutSceneForBook[] = [
+export const getCutScenesForBook = (): CutSceneForBook[] => [
 ${cutSceneData
   .map((item) =>
     item.files
@@ -257,9 +257,9 @@ ${cutSceneData
 ];`;
 
   // Write the files
-  const backgroundsPath = path.join(__dirname, "..", "..", "src/books", bookSlug, "new", "backgroundsForBook.ts");
-  const audioPath = path.join(__dirname, "..", "..", "src/books", bookSlug, "new", "backgroundSongsForBook.ts");
-  const cutScenePath = path.join(__dirname, "..", "..", "src/books", bookSlug, "new", "cutScenesForBook.ts");
+  const backgroundsPath = path.join(__dirname, "..", "..", "src/books", bookSlug, "getBackgroundsForBook.ts");
+  const audioPath = path.join(__dirname, "..", "..", "src/books", bookSlug, "getBackgroundSongsForBook.ts");
+  const cutScenePath = path.join(__dirname, "..", "..", "src/books", bookSlug, "getCutScenesForBook.ts");
 
   // Create directories if they don't exist
   const newDir = path.join(__dirname, "..", "..", "src/books", bookSlug, "new");

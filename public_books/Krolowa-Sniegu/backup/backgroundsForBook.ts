@@ -1,4 +1,4 @@
-import type { BackgroundsForBook } from "@/ui/backgroundsForBook";
+import type { BackgroundsForBook } from "@/ui/getBackgroundsForBook";
 
 export const backgroundsForBook: BackgroundsForBook = [
   { chapter: 1, startParagraph: 0, file: "chapter-1-background.mp4" },

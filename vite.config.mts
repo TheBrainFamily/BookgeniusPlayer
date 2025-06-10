@@ -62,110 +62,75 @@ if (activeBookConfig.staticAssetSourceDir && activeBookConfig.staticAssetDestDir
 }
 
 const bookDataPlugin = () => {
+  const selectedAlias = activeBookConfig.short_name;
+
+  // Configuration for file transformations
+  const transformConfigs = {
+    getBookData: {
+      types: `import type { BookData } from "@/books/types";`,
+      import: `import { bookData as bookDataInput } from "@/books/${selectedAlias}/bookData";`,
+      export: `export function getBookData(): BookData {
+  return bookDataInput;
+}`,
+    },
+    getBackgroundsForBook: {
+      types: `export type BackgroundsForBook = { chapter: number; file: string; startParagraph?: number }[];`,
+      import: `import { getBackgroundsForBook as getBackgroundsForBookInput } from "@/books/${selectedAlias}/getBackgroundsForBook";`,
+      export: `export const getBackgroundsForBook: BackgroundsForBook = getBackgroundsForBookInput;`,
+    },
+    getBackgroundSongsForBook: {
+      types: `export type BackgroundSongSection = { chapter: number; paragraph: number; files: string[] };`,
+      import: `import { getBackgroundSongsForBook as getBackgroundSongsForBookInput } from "@/books/${selectedAlias}/getBackgroundSongsForBook";`,
+      export: `export const getBackgroundSongsForBook = (): BackgroundSongSection[] => {
+  return getBackgroundSongsForBookInput();
+};`,
+    },
+    getCutScenesForBook: {
+      types: `export type CutScene = { chapter: number; paragraph: number; file: string };`,
+      import: `import { getCutScenesForBook as getCutScenesForBookInput } from "@/books/${selectedAlias}/getCutScenesForBook";`,
+      export: `export const getCutScenesForBook = (): CutScene[] => {
+  return getCutScenesForBookInput();
+};`,
+    },
+    getKnownVideoFiles: {
+      types: ``,
+      import: `import { getKnownVideoFiles as getKnownVideoFilesInput } from "@/books/${selectedAlias}/getKnownVideoFiles";`,
+      export: `export const getKnownVideoFiles = (): string[] => {
+  return getKnownVideoFilesInput();
+};`,
+    },
+    getCharactersData: {
+      types: ``,
+      import: `import { getCharactersData as getCharactersDataInput } from "@/books/${selectedAlias}/getCharactersData";`,
+      export: `export const getCharactersData = (): CharacterData[] => {
+  return getCharactersDataInput();
+};`,
+    },
+    getBookStringified: {
+      types: ``,
+      import: `import { getBookStringified as getBookStringifiedInput } from "@/books/${selectedAlias}/getBookStringified";`,
+      export: `export const getBookStringified = (): string => {
+  return getBookStringifiedInput();
+};`,
+    },
+  };
+
   return {
     name: "book-data-replacer",
     enforce: "pre" as const,
-    async transform(code: string, id: string) {
-      // Only transform the getBookData file
-      const selectedAlias = activeBookConfig.short_name;
-      if (!id.includes("node_modules") && !id.includes("src/books/")) {
-        if (id.includes("getBookData")) {
-          const finalCode = `
-                import type { BookData } from "@/books/types";
-                import { bookData as bookDataInput } from "@/books/${selectedAlias}/bookData";
-                export function getBookData(): BookData {
-                  return bookDataInput;
-        }`;
+    async transform(_code: string, id: string) {
+      // Skip node_modules and book-specific directories
+      if (id.includes("node_modules") || id.includes("src/books/")) {
+        return;
+      }
 
-          return { code: finalCode, map: null };
-        }
+      const matchingKey = Object.keys(transformConfigs).find((key) => id.includes(key));
 
-        if (id.includes("backgroundsForBook")) {
-          return {
-            code: `
-                    export type BackgroundsForBook = { chapter: number; file: string; startParagraph?: number }[];
+      if (matchingKey) {
+        const config = transformConfigs[matchingKey as keyof typeof transformConfigs];
+        const code = [config.types, config.import, config.export].filter(Boolean).join("\n\n");
 
-        import { backgroundsForBook as backgroundsForBookInput } from "@/books/${selectedAlias}/backgroundsForBook";
-
-        export const backgroundsForBook: BackgroundsForBook = backgroundsForBookInput;
-        `,
-            map: null,
-          };
-        }
-        if (id.includes("getBackgroundSongsForBook")) {
-          return {
-            code: `
-        export type BackgroundSongSection = { chapter: number; paragraph: number; files: string[] };
-
-        import { getBackgroundSongsForBook as getBackgroundSongsForBookInput } from "@/books/${selectedAlias}/getBackgroundSongsForBook";
-
-        export const getBackgroundSongsForBook = (): BackgroundSongSection[] => {
-  return getBackgroundSongsForBookInput();
-};
-        `,
-            map: null,
-          };
-        }
-        if (id.includes("getCutScenesForBook")) {
-          return {
-            code: `
-            export type CutScene = { chapter: number; paragraph: number; file: string };
-            import { getCutScenesForBook as getCutScenesForBookInput } from "@/books/${selectedAlias}/getCutScenesForBook";
-
-        export const getCutScenesForBook = (): CutScene[] => {
-  return getCutScenesForBookInput();
-};
-`,
-            map: null,
-          };
-        }
-        if (id.includes("getKnownVideoFiles")) {
-          return {
-            code: `
-            import { getKnownVideoFiles as getKnownVideoFilesInput } from "@/books/${selectedAlias}/getKnownVideoFiles";
-            export const getKnownVideoFiles = (): string[] => {
-              return getKnownVideoFilesInput();
-            }; 
-            `,
-            map: null,
-          };
-        }
-        if (id.includes("getCharactersData")) {
-          return {
-            code: `
-            import { getCharactersData as getCharactersDataInput } from "@/books/${selectedAlias}/getCharactersData";
-            export const getCharactersData = (): CharacterData[] => {
-              return getCharactersDataInput();
-            }; 
-            `,
-            map: null,
-          };
-        }
-        if (id.includes("getBookStringified")) {
-          return {
-            code: `
-            import { getBookStringified as getBookStringifiedInput } from "@/books/${selectedAlias}/getBookStringified";
-            export const getBookStringified = (): string => {
-              return getBookStringifiedInput();
-            };
-            `,
-            map: null,
-          };
-        }
-        if (id.includes("getKnownVideoFiles")) {
-          return {
-            code: `           
-            import { getKnownVideoFiles as getKnownVideoFilesInput } from "@/books/${selectedAlias}/getKnownVideoFiles.ts";
-            export const getKnownVideoFiles = (): string[] => {
-              if (getKnownVideoFilesInput) {
-                return getKnownVideoFilesInput();
-              }        
-              throw new Error("getKnownVideoFiles should never be called at runtime");
-            };
-            `,
-            map: null,
-          };
-        }
+        return { code, map: null };
       }
     },
   };

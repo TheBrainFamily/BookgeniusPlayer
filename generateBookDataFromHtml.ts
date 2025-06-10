@@ -13,6 +13,7 @@ export function generateBookDataFromHtml() {
     console.log("Usage: pnpm start <path_to_book_directory>");
     process.exit(1);
   }
+
   const bookDirectoryPath = args[0];
 
   // --- Parse book.xml ---
@@ -45,11 +46,7 @@ export const getBookStringified = (): string => {
   const bookSlugNoDashes = bookSlug.replaceAll("-", "");
   const getCharactersDataContent = `import type { CharacterData } from "@/books/types";
 
-const ${bookSlugNoDashes}CharactersData: CharacterData[] = ${JSON.stringify(characterMetadata, null, 2)};
-
-export const getCharactersData = (): CharacterData[] => {
-  return ${bookSlugNoDashes}CharactersData;
-};
+export const getCharactersData = (): CharacterData[] => ${JSON.stringify(characterMetadata, null, 2)};\n
 `;
   fs.writeFileSync(path.join(bookOutputPath, "getCharactersData.ts"), getCharactersDataContent);
 
@@ -71,5 +68,6 @@ export const bookData: BookData = {
   bookStringified: getBookStringified(),
 };
 `;
+
   fs.writeFileSync(path.join(bookOutputPath, "bookData.ts"), bookDataContent, "utf8");
 }

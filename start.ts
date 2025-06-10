@@ -26,30 +26,23 @@ async function start() {
   }
 
   const bookDirectoryPath = args[0];
-  // Construct an absolute path for the import, as dynamic imports are relative to the current file or use absolute paths.
-  // process.cwd() gives the directory where the pnpm command was run.
-  const bookDataPath = path.resolve(process.cwd(), bookDirectoryPath, "bookData.ts");
-
-  const parser = new DOMParser();
-
-  // Check if book.xml exists
   const bookXmlPath = `${bookDirectoryPath}/book.xml`;
   if (!fs.existsSync(bookXmlPath)) {
     console.error(`Error: book.xml not found at ${bookXmlPath}`);
     process.exit(1);
   }
 
+  const parser = new DOMParser();
   const book = fs.readFileSync(bookXmlPath, "utf8");
-  console.log("📖 Read book.xml successfully");
-
   const xmlDoc = parser.parseFromString(book, "text/xml");
 
-  // Check for XML parsing errors
   const parserError = xmlDoc.getElementsByTagName("parsererror");
   if (parserError.length > 0) {
     console.error("Error: Failed to parse book.xml");
     console.error("Parser error:", parserError[0].textContent);
     process.exit(1);
+  } else {
+    console.log("📖 Read book.xml successfully");
   }
 
   const bookSlugElements = xmlDoc.getElementsByTagName("BookSlug");
@@ -76,11 +69,6 @@ async function start() {
     fs.mkdirSync(bookOutputPath);
   }
 
-  // Copy media book files
-  ["backgroundsForBook.ts", "getBackgroundSongsForBook.ts", "getCutScenesForBook.ts"].forEach((mediaBookFile) => {
-    fs.copyFileSync(path.join(bookDirectoryPath, mediaBookFile), path.join(bookOutputPath, mediaBookFile), fs.constants.COPYFILE_FICLONE);
-  });
-
   // Generate getKnownVideoFiles.ts
   const assetsPath = path.join(bookDirectoryPath, "assets");
   const videoFiles = fs
@@ -89,8 +77,7 @@ async function start() {
     .map((file) => file);
 
   setKnownVideos(videoFiles);
-
-  const getKnownVideoFiles = `export const getKnownVideoFiles = () => {\n return ${JSON.stringify(videoFiles, null, 2)} \n};`;
+  const getKnownVideoFiles = `export const getKnownVideoFiles = () => ${JSON.stringify(videoFiles, null, 2)};\n`;
   fs.writeFileSync(path.join(bookOutputPath, "getKnownVideoFiles.ts"), getKnownVideoFiles, "utf-8");
 
   // Generate book data from HTML
@@ -144,6 +131,9 @@ async function start() {
       console.error("An unknown error occurred:", error);
     }
     if (error && typeof error === "object" && "code" in error && error.code === "ERR_MODULE_NOT_FOUND") {
+      // Construct an absolute path for the import, as dynamic imports are relative to the current file or use absolute paths.
+      // process.cwd() gives the directory where the pnpm command was run.
+      const bookDataPath = path.resolve(process.cwd(), bookDirectoryPath, "bookData.ts");
       console.error(`Could not find module. Please ensure the file exists and is correctly referenced: ${bookDataPath}`);
     }
     process.exit(1);

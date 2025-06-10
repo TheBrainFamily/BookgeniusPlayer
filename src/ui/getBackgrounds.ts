@@ -1,5 +1,5 @@
 import type { Background } from "./background";
-import { backgroundsForBook } from "./backgroundsForBook";
+import { getBackgroundsForBook } from "./getBackgroundsForBook";
 
 export const getBackgrounds = (): Background[] => {
   // Helper function to process background inputs and set proper end paragraphs
@@ -33,5 +33,5 @@ export const getBackgrounds = (): Background[] => {
     return result;
   };
 
-  return processBackgroundInputs(backgroundsForBook);
+  return processBackgroundInputs(getBackgroundsForBook());
 };
