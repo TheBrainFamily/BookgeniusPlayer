@@ -24,6 +24,10 @@ jobs:
             tailwind.config.js
             tsconfig.json
             vite.config.mts
+            build-with-book.ts
+            generate-book.ts
+            start.ts
+            generateBookDataFromHtml.ts
             src/
             tests/
             public_books/
