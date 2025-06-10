@@ -1029,7 +1029,7 @@ section[data-chapter] [data-index] {
     box-shadow:
         /* The outer white "border" above line */       0 -3px 0 0.125rem white,
         /* The outer white "border" below line */       0 3px 0 0.125rem white,
-        /* The outer subtle shadow */                   0 2px 4px rgba(0, 0, 0, 0.1),
+        /* The outer subtle shadow */                   0 4px 4px rgba(0, 0, 0, 0.1),
         /* The "fake" background color */               0 0 0 999px white inset;
 
     /* Still use border-radius for the corners */
@@ -1040,10 +1040,6 @@ section[data-chapter] [data-index] {
        technique is the primary fix. */
     -webkit-box-decoration-break: clone;
     box-decoration-break: clone;
-}
-
-.current-word:has(.character-highlighted-activated) {
-  box-shadow: none;
 }
 
 /* Class to make the highlight on the last word fade out */
