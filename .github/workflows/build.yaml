@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
+            index.html
             package.json
             .prettierrc
             eslint.config.mjs
