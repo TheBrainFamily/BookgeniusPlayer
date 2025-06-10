@@ -20,6 +20,22 @@ export interface SearchResultsData {
 // For this file, it's assumed the caller (ModalContext) provides the location.
 
 /**
+ * Highlights search string found in text by wrapping it with <mark> tags
+ */
+const highlightMatchedWords = (text: string, query: string): string => {
+  if (!query.trim()) return text;
+
+  // Escape special regex characters in the query
+  const escapedQuery = query.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  // Create regex pattern to match the search string (case insensitive)
+  const pattern = new RegExp(escapedQuery, "gi");
+
+  // Replace matched text with highlighted version using theme-appropriate colors
+  return text.replace(pattern, '<mark class="bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm">$&</mark>');
+};
+
+/**
  * Perform a unified search (primarily server-based in this refactor).
  * Returns structured search result data.
  */
@@ -47,7 +63,7 @@ export async function performUnifiedSearch(
       chapter: match.chapter,
       paragraphNumber: match.paragraphNumber,
       summary: match.summary,
-      text: match.text.length > 75 ? `${match.text.substring(0, 75)}...` : match.text,
+      text: createContextualSummary(match.text, query, 75),
       id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}-${Date.now()}`,
     }));
 
@@ -57,6 +73,43 @@ export async function performUnifiedSearch(
     return { header: "Search failed. Please try again.", items: [], isLoading: false };
   }
 }
+
+/**
+ * Creates a summary that starts 20 characters before the found text with highlighting
+ */
+const createContextualSummary = (fullText: string, query: string, maxLength: number = 75): string => {
+  const queryLower = query.toLowerCase();
+  const fullTextLower = fullText.toLowerCase();
+
+  const matchIndex = fullTextLower.indexOf(queryLower);
+  if (matchIndex === -1) {
+    // Fallback to original behavior if query not found, but still apply highlighting
+    const truncated = fullText.length > maxLength ? `${fullText.substring(0, maxLength)}...` : fullText;
+    return highlightMatchedWords(truncated, query);
+  }
+
+  // Start 20 characters before the match, but not before the beginning
+  const contextStart = Math.max(0, matchIndex - 20);
+
+  // Calculate end position to maintain roughly the same summary length
+  const remainingLength = maxLength - (matchIndex - contextStart) - query.length;
+  const contextEnd = Math.min(fullText.length, matchIndex + query.length + remainingLength);
+
+  let summary = fullText.substring(contextStart, contextEnd);
+
+  // Add ellipsis if we're not starting from the beginning
+  if (contextStart > 0) {
+    summary = `...${summary}`;
+  }
+
+  // Add ellipsis if we're not ending at the end
+  if (contextEnd < fullText.length) {
+    summary = `${summary}...`;
+  }
+
+  // Apply highlighting to the matched words
+  return highlightMatchedWords(summary, query);
+};
 
 export async function performLocalDOMSearch(query: string, currentLocation: Location, bookSlug?: string): Promise<SearchResultsData> {
   // Changed return type
@@ -172,7 +225,7 @@ export async function performLocalDOMSearch(query: string, currentLocation: Loca
 
         if (paragraphText.toLowerCase().includes(queryLower)) {
           const fullText = paragraphText;
-          const summaryText = fullText.length > 75 ? `${fullText.substring(0, 75)}...` : fullText;
+          const summaryText = createContextualSummary(fullText, query);
 
           items.push({
             chapter: chapterIndex,
@@ -290,8 +343,8 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
             items.push({
               chapter,
               paragraphNumber: paragraph,
-              summary: summaryText,
-              text: displayText,
+              summary: highlightMatchedWords(summaryText, characterSlug),
+              text: highlightMatchedWords(displayText, characterSlug),
               id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}-${Date.now()}`,
             });
           }

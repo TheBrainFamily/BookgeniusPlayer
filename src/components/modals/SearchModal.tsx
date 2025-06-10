@@ -107,18 +107,21 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                       {item.text && (
                         <motion.div
                           className="mb-2 text-sm italic text-white/70 p-2 rounded-md bg-book-secondary-20"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.1 }}
+                          // initial={{ opacity: 0 }}
+                          // animate={{ opacity: 1 }}
+                          // transition={{ delay: 0.1 }}
                         >
                           <div className="flex items-start gap-2">
-                            <span>{item.text}</span>
+                            <span dangerouslySetInnerHTML={{ __html: item.text }} />
                           </div>
                         </motion.div>
                       )}
 
-                      <motion.div className="text-sm text-white/90 leading-relaxed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-                        {item.summary}
+                      <motion.div
+                        className="text-sm text-white/90 leading-relaxed"
+                        //  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+                      >
+                        <span dangerouslySetInnerHTML={{ __html: item.summary }} />
                       </motion.div>
                     </div>
                   </motion.div>

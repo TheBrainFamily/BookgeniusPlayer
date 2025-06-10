@@ -10,6 +10,7 @@ import { findCharacterSentences, SearchResultItemData } from "@/searchModal";
 import { useLocation } from "@/state/LocationContext";
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
 import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
+import { highlightSearchInParagraph, cleanupAllSearchHighlights } from "@/utils/textHighlighting";
 
 interface CharacterModalProps {
   onClose: () => void;
@@ -56,8 +57,17 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   }, [matchingCharacter.characterName, location]);
 
   const handleAppearanceClick = (appearance: SearchResultItemData) => {
-    console.log(`CharacterModal: Navigating to chapter ${appearance.chapter}, paragraph ${appearance.paragraphNumber}`);
+    // Clean up any existing highlights before navigating
+    cleanupAllSearchHighlights();
+
+    // Update location with 'system' source to trigger scrolling
     systemNavigateTo({ currentChapter: appearance.chapter, currentParagraph: appearance.paragraphNumber });
+
+    // Highlight the character name in the target paragraph after navigation
+    if (matchingCharacter?.characterName) {
+      highlightSearchInParagraph(appearance.chapter, appearance.paragraphNumber, matchingCharacter.characterName);
+    }
+
     onClose();
   };
 
@@ -145,9 +155,13 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                           </div>
                         </div>
 
-                        <motion.div className="text-sm text-white/90 leading-relaxed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-                          {appearance.text}
-                        </motion.div>
+                        <motion.div
+                          className="text-sm text-white/90 leading-relaxed"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.2 }}
+                          dangerouslySetInnerHTML={{ __html: appearance.text }}
+                        />
 
                         <motion.div
                           className="absolute top-2 right-2 opacity-0 group-hover:opacity-100"
