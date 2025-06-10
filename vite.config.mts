@@ -113,6 +113,14 @@ const bookDataPlugin = () => {
   return getBookStringifiedInput();
 };`,
     },
+    getAudiobookTracksForBook: {
+      types: `export type WordPosition = [string, number];
+export type AudiobookTracksSection = { chapter: number; paragraph: number; file: string; smile_id: string; "clip-begin": number; "clip-end": number; words?: WordPosition[] };`,
+      import: `import { getAudiobookTracksForBook as getAudiobookTracksForBookInput } from "@/books/${selectedAlias}/getAudiobookTracksForBook";`,
+      export: `export const getAudiobookTracksForBook = async (): Promise<AudiobookTracksSection[]> => {
+  return getAudiobookTracksForBookInput();
+};`,
+    },
   };
 
   return {

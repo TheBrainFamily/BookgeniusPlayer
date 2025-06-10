@@ -50,6 +50,10 @@ export const getCharactersData = (): CharacterData[] => ${JSON.stringify(charact
 `;
   fs.writeFileSync(path.join(bookOutputPath, "getCharactersData.ts"), getCharactersDataContent);
 
+  // --- Check for AudiobookTracksDefined.ts existence ---
+  const audiobookDataPath = path.join(bookDirectoryPath, "assets", "audiobook_data", "AudiobookTracksDefined.ts");
+  const hasAudiobook = fs.existsSync(audiobookDataPath);
+
   // --- Generate bookData.ts ---
   const bookDataContent = `import type { BookData } from "@/books/types";
 import { getBookStringified } from "@/books/${bookSlug}/getBookStringified";
@@ -64,7 +68,7 @@ export const bookData: BookData = {
     tertiaryColor: "#90CAF9",
     quaternaryColor: "#0D47A1"
   },
-  hasAudiobook: false,
+  hasAudiobook: ${hasAudiobook},
   bookStringified: getBookStringified(),
 };
 `;
