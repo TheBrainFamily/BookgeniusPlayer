@@ -28,10 +28,16 @@ BookGenius is an innovative multi-book interactive reading platform that transfo
 # Install dependencies
 pnpm install
 
-# Be sure that in public_books/$BOOK_SLUG you have a book.xml file
+# Start development server with a specific book
+# The book directory should contain a book.xml file
+pnpm start public_books/Krolowa-Sniegu
+```
 
-pnpm start public_books/$BOOK_SLUG (eg. pnpm start public_books/Krolowa-Sniegu)
+### Building for Production
 
+```bash
+# Build the application for a specific book
+pnpm build public_books/Krolowa-Sniegu
 ```
 
 ### Editor Mode (Development)

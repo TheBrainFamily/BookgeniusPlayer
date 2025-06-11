@@ -7,9 +7,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      VITE_BOOK: Krolowa-Sniegu
-      VITE_BOOK_NAME: Krolowa Sniegu
-      VITE_BOOK_PATH: ./public_books/Krolowa-Sniegu
+      VITE_BOOK_DIR: ./public_books/Krolowa-Sniegu
 
     steps:
       - uses: actions/checkout@v4

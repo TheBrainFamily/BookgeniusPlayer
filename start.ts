@@ -14,10 +14,9 @@ async function start() {
 
   try {
     // Generate book data
-    const { bookSlug, bookTitle } = await generateBook(bookDirectoryPath);
+    await generateBook(bookDirectoryPath);
 
-    // Ensure book names with spaces are handled correctly by quoting.
-    const command = `VITE_BOOK='${bookSlug}' VITE_BOOK_NAME='${bookTitle.replace(/'/g, "'\\''")}' VITE_BOOK_PATH='${bookDirectoryPath}' vite dev`;
+    const command = `VITE_BOOK_DIR='${bookDirectoryPath}' vite dev`;
 
     console.log(`🚀 Executing: ${command}`);
 

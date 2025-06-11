@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { viteStaticCopy, type Target } from "vite-plugin-static-copy";
 import path from "path";
+import fs from "fs";
 
 // Workaround to remove unnecessary books chunks from the build
 // ToDo: Do not create them in the first place
@@ -36,24 +37,40 @@ interface BookBuildData {
   staticAssetDestDir: string;
 }
 
-// Validate environment variables
-const VITE_BOOK = process.env.VITE_BOOK;
-const VITE_BOOK_NAME = process.env.VITE_BOOK_NAME;
-const VITE_BOOK_PATH = process.env.VITE_BOOK_PATH;
-
-if (!VITE_BOOK || !VITE_BOOK_NAME || !VITE_BOOK_PATH) {
-  console.error("❌ Missing required environment variables:");
-
-  if (!VITE_BOOK) console.error("  - VITE_BOOK is not set");
-  if (!VITE_BOOK_NAME) console.error("  - VITE_BOOK_NAME is not set");
-  if (!VITE_BOOK_PATH) console.error("  - VITE_BOOK_PATH is not set");
-
-  console.error("\nPlease set these environment variables before building:");
-  console.error("Example: VITE_BOOK='Snow-Queen' VITE_BOOK_NAME='Snow Queen' VITE_BOOK_PATH='./public_books/Snow-Queen' pnpm build");
+const VITE_BOOK_DIR = process.env.VITE_BOOK_DIR;
+if (!VITE_BOOK_DIR) {
+  console.error("❌ Missing required environment variable:");
+  console.error("  - VITE_BOOK_DIR is not set");
+  console.error("\nPlease set this environment variable before building:");
+  console.error("Example: VITE_BOOK_DIR='./public_books/Krolowa-Sniegu' pnpm build");
   process.exit(1);
 }
 
-const activeBookConfig: BookBuildData = { name: VITE_BOOK_NAME, short_name: VITE_BOOK, staticAssetSourceDir: `${VITE_BOOK_PATH}/assets`, staticAssetDestDir: VITE_BOOK };
+function getBookConfig() {
+  const bookDirName = path.basename(VITE_BOOK_DIR);
+  const bookDataPath = path.join("src", "books", bookDirName, "bookData.ts");
+
+  try {
+    // Read the generated bookData.ts file to get the book information
+    const bookDataContent = fs.readFileSync(bookDataPath, "utf-8");
+    const slugMatch = bookDataContent.match(/slug:\s*["']([^"']+)["']/);
+    const titleMatch = bookDataContent.match(/title:\s*["']([^"']+)["']/);
+
+    if (!slugMatch || !titleMatch) {
+      throw new Error(`Could not extract slug or title from ${bookDataPath}`);
+    }
+
+    return { slug: slugMatch[1], title: titleMatch[1], assetsPath: path.join(VITE_BOOK_DIR, "assets") };
+  } catch (error) {
+    console.error(`❌ Error reading book data from ${bookDataPath}:`, error);
+    console.error("Make sure the book has been generated with 'pnpm start <book_directory>' first");
+    process.exit(1);
+  }
+}
+
+const bookConfig = getBookConfig();
+
+const activeBookConfig: BookBuildData = { name: bookConfig.title, short_name: bookConfig.slug, staticAssetSourceDir: bookConfig.assetsPath, staticAssetDestDir: bookConfig.slug };
 // Prepare targets for vite-plugin-static-copy
 const staticCopyTargets: Target[] = [];
 if (activeBookConfig.staticAssetSourceDir && activeBookConfig.staticAssetDestDir) {

@@ -287,12 +287,7 @@ if (require.main === module) {
   console.log("audioData", audioData);
   console.log("cutSceneData", cutSceneData);
 
-  // Generate the data files if we have any data
-  if (backgroundsData.length > 0 || audioData.length > 0 || cutSceneData.length > 0) {
-    generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug);
-  } else {
-    console.log("No background, audio, or cutscene data found in XML");
-  }
+  generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug);
 
   // Generate the HTML file as before
   if (bookSlug === "1984" || bookSlug === "1984-English") {

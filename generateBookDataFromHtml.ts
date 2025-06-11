@@ -29,9 +29,7 @@ export function generateBookDataFromHtml() {
   // --- Generate getBookStringified.ts ---
   const { audioData, backgroundsData, cutSceneData, htmlResult } = xmlToComplexHtml(bookXml, bookSlug as BOOK_SLUGS);
 
-  if (backgroundsData.length > 0 || audioData.length > 0 || cutSceneData.length > 0) {
-    generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug as BOOK_SLUGS);
-  }
+  generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug as BOOK_SLUGS);
 
   const getBookStringifiedContent = `const bookStringified = \`<section>${htmlResult}</section>\`;
 

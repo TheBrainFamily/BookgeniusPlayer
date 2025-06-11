@@ -6,4 +6,4 @@ dist/
 tsconfig.tsbuildinfo
 src/data/tools/Text-Editor/.cursor/
 .claude
-src/books
+src/books/**/*

@@ -2,33 +2,29 @@ import { execSync } from "child_process";
 import { generateBook } from "./generate-book";
 
 async function buildWithBook() {
-  // Get environment variables
-  const VITE_BOOK = process.env.VITE_BOOK;
-  const VITE_BOOK_NAME = process.env.VITE_BOOK_NAME;
-  const VITE_BOOK_PATH = process.env.VITE_BOOK_PATH;
+  const args = process.argv.slice(2); // Skip node executable and script path
 
-  if (!VITE_BOOK || !VITE_BOOK_NAME || !VITE_BOOK_PATH) {
-    console.error("❌ Missing required environment variables:");
-    if (!VITE_BOOK) console.error("  - VITE_BOOK is not set");
-    if (!VITE_BOOK_NAME) console.error("  - VITE_BOOK_NAME is not set");
-    if (!VITE_BOOK_PATH) console.error("  - VITE_BOOK_PATH is not set");
-    console.error("\nPlease set these environment variables before building:");
-    console.error("Example: VITE_BOOK='Snow-Queen' VITE_BOOK_NAME='Snow Queen' VITE_BOOK_PATH='./public_books/Snow-Queen' pnpm build");
+  if (args.length === 0) {
+    console.error("Error: Please provide the path to the book directory.");
+    console.log("Usage: pnpm build <path_to_book_directory>");
     process.exit(1);
   }
 
+  const bookDirectoryPath = args[0];
+
   try {
-    console.log(`🔨 Generating book data for ${VITE_BOOK}...`);
+    console.log(`🔨 Generating book data for ${bookDirectoryPath}...`);
 
     // Generate book data first
-    await generateBook(VITE_BOOK_PATH);
+    await generateBook(bookDirectoryPath);
 
     console.log(`🏗️  Building application...`);
 
-    // Now run the actual build
-    execSync("vite build", { stdio: "inherit" });
+    // Set the book directory and run the build
+    const command = `VITE_BOOK_DIR='${bookDirectoryPath}' vite build`;
+    execSync(command, { stdio: "inherit" });
 
-    console.log(`✅ Build completed successfully for ${VITE_BOOK}`);
+    console.log(`✅ Build completed successfully for ${bookDirectoryPath}`);
   } catch (error) {
     console.error(`❌ Build failed:`);
     if (error instanceof Error) {
