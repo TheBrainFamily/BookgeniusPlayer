@@ -51,6 +51,11 @@ function getBookConfig() {
   const bookDataPath = path.join("src", "books", bookDirName, "bookData.ts");
 
   try {
+    // Check if the generated bookData.ts file exists
+    if (!fs.existsSync(bookDataPath)) {
+      throw new Error(`Generated book data file not found at ${bookDataPath}. Make sure to run the book generation first.`);
+    }
+
     // Read the generated bookData.ts file to get the book information
     const bookDataContent = fs.readFileSync(bookDataPath, "utf-8");
     const slugMatch = bookDataContent.match(/slug:\s*["']([^"']+)["']/);
@@ -60,10 +65,19 @@ function getBookConfig() {
       throw new Error(`Could not extract slug or title from ${bookDataPath}`);
     }
 
-    return { slug: slugMatch[1], title: titleMatch[1], assetsPath: path.join(VITE_BOOK_DIR, "assets") };
+    // Use the absolute path passed via environment variable for assets
+    const assetsPath = path.join(VITE_BOOK_DIR, "assets");
+
+    return {
+      slug: slugMatch[1],
+      title: titleMatch[1],
+      assetsPath: assetsPath,
+      bookDir: VITE_BOOK_DIR, // Include the full book directory path
+    };
   } catch (error) {
     console.error(`❌ Error reading book data from ${bookDataPath}:`, error);
     console.error("Make sure the book has been generated with 'pnpm start <book_directory>' first");
+    console.error(`Book directory provided: ${VITE_BOOK_DIR}`);
     process.exit(1);
   }
 }

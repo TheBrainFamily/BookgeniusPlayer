@@ -6,17 +6,7 @@ import { BOOK_SLUGS } from "@/consts";
 import { xmlToComplexHtml, generateDataFiles } from "./scripts/data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterTags } from "./scripts/data/tools/create-book-metadata";
 
-export function generateBookDataFromHtml() {
-  // --- Parse CLI arguments ---
-  const args = process.argv.slice(2); // Skip node executable and script path
-  if (args.length === 0) {
-    console.error("Error: Please provide the path to the book directory.");
-    console.log("Usage: pnpm start <path_to_book_directory>");
-    process.exit(1);
-  }
-
-  const bookDirectoryPath = args[0];
-
+export function generateBookDataFromHtml(bookDirectoryPath: string) {
   // --- Parse book.xml ---
   const parser = new DOMParser();
   const bookXml = fs.readFileSync(`${bookDirectoryPath}/book.xml`, "utf8");

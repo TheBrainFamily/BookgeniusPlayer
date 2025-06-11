@@ -30,15 +30,56 @@ pnpm install
 
 # Start development server with a specific book
 # The book directory should contain a book.xml file
+
+# Using relative paths:
 pnpm start public_books/Krolowa-Sniegu
+
+# Using absolute paths (any directory on your system):
+# Windows:
+pnpm start "C:\Users\username\Desktop\BookGenius\1984"
+pnpm start "D:\MyBooks\Snow-Queen"
+
+# WSL2 (Windows Subsystem for Linux):
+# You can use Windows paths directly - they'll be automatically translated
+pnpm start "C:\Users\username\Desktop\BookGenius\1984"
+pnpm start "D:\MyBooks\Snow-Queen"
+# Or use the WSL2 mount paths directly:
+pnpm start "/mnt/c/Users/username/Desktop/BookGenius/1984"
+
+# macOS/Linux:
+pnpm start "/Users/username/Documents/BookGenius/1984"
+pnpm start "/home/username/books/Snow-Queen"
+pnpm start ~/Desktop/my-book-project
+
+# Current working directory:
+pnpm start "../my-books/Krolowa-Sniegu"
 ```
 
 ### Building for Production
 
 ```bash
-# Build the application for a specific book
+# Build the application for a specific book (supports same path formats as start)
+pnpm build public_books/Krolowa-Sniegu
+
+# Examples with absolute paths:
+pnpm build "C:\Users\username\Desktop\BookGenius\1984"
+pnpm build "/Users/username/Documents/BookGenius/1984"
+
+# WSL2 examples:
+pnpm build "C:\Users\username\Desktop\BookGenius\1984"  # Auto-translated
+pnpm build "/mnt/c/Users/username/Desktop/BookGenius/1984"  # Direct mount path
+
+# Alternative: use the existing build script (same functionality)
 pnpm build public_books/Krolowa-Sniegu
 ```
+
+### Path Requirements
+
+- The book directory can be located **anywhere** on your system
+- The directory must contain a `book.xml` file
+- Paths with spaces should be quoted (e.g., `"C:\My Books\Book Name"`)
+- Both relative and absolute paths are supported
+- Cross-platform compatible (Windows, macOS, Linux)
 
 ### Editor Mode (Development)
 

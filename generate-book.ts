@@ -93,7 +93,7 @@ export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
   fs.writeFileSync(path.join(bookOutputPath, "getAudiobookTracksForBook.ts"), getAudiobookTracksForBookContent, "utf-8");
 
   // Generate book data from HTML
-  generateBookDataFromHtml();
+  generateBookDataFromHtml(bookDirectoryPath);
 
   console.log(`✅ Book data generated successfully for ${bookSlug}`);
   console.log(`📁 Output directory: ${bookOutputPath}`);
