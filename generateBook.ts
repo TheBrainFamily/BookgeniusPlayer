@@ -1,13 +1,41 @@
 import fs from "fs";
 import path from "path";
-import { DOMParser } from "@xmldom/xmldom";
+import { DOMParser, Document } from "@xmldom/xmldom";
 
-import { setKnownVideos } from "@/utils/getFilePathsForName";
-import { generateBookDataFromHtml } from "./generateBookDataFromHtml";
 import { BookData } from "@/books/types";
+import { setKnownVideos } from "@/utils/getFilePathsForName";
+import { xmlToComplexHtml, generateDataFiles } from "./scripts/data/xmlToComplexHtml";
+import { extractCharacterMetadata, getCharacterTags } from "./scripts/data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
 
 async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: string; bookTitle: string }> {
+  // Parse book.xml and extract book slug and other data
+  const { bookSlug, xmlDoc } = parseBookXmlData(bookDirectoryPath);
+
+  // Ensure output directory exists
+  const bookOutputPath = path.resolve("src", "books", bookSlug);
+  if (!fs.existsSync(bookOutputPath)) {
+    fs.mkdirSync(bookOutputPath, { recursive: true });
+  }
+
+  // Generate files
+  generateKnownVideoFiles(bookDirectoryPath, bookOutputPath);
+  generateAudiobookTracksFile(bookDirectoryPath, bookOutputPath);
+  generateBookDataFiles(bookDirectoryPath, bookSlug, xmlDoc);
+
+  // Wait a moment for file generation to complete
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  // Load and validate generated book data
+  const bookData = await loadAndValidateBookData(bookOutputPath);
+
+  console.log(`✅ Book data generated successfully for ${bookSlug}`);
+  console.log(`📁 Output directory: ${bookOutputPath}`);
+
+  return { bookSlug: bookData.slug, bookTitle: bookData.metadata.title };
+}
+
+function parseBookXmlData(bookDirectoryPath: string): { bookSlug: string; xmlDoc: Document } {
   const bookXmlPath = `${bookDirectoryPath}/book.xml`;
   if (!fs.existsSync(bookXmlPath)) {
     throw new Error(`book.xml not found at ${bookXmlPath}`);
@@ -22,8 +50,6 @@ async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: stri
     throw new Error(`Failed to parse book.xml: ${parserError[0].textContent}`);
   }
 
-  console.log("📖 Read book.xml successfully");
-
   const bookSlugElements = xmlDoc.getElementsByTagName("BookSlug");
   if (bookSlugElements.length === 0) {
     throw new Error("No BookSlug element found in book.xml");
@@ -34,12 +60,10 @@ async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: stri
     throw new Error("BookSlug element is empty or null");
   }
 
-  const bookOutputPath = path.resolve("src", "books", bookSlug);
-  if (!fs.existsSync(bookOutputPath)) {
-    fs.mkdirSync(bookOutputPath, { recursive: true });
-  }
+  return { bookSlug, xmlDoc };
+}
 
-  // Generate getKnownVideoFiles.ts
+function generateKnownVideoFiles(bookDirectoryPath: string, bookOutputPath: string): void {
   const assetsPath = path.join(bookDirectoryPath, "assets");
   let videoFiles: string[] = [];
 
@@ -50,16 +74,15 @@ async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: stri
   setKnownVideos(videoFiles);
   const getKnownVideoFiles = `export const getKnownVideoFiles = () => ${JSON.stringify(videoFiles, null, 2)};\n`;
   fs.writeFileSync(path.join(bookOutputPath, "getKnownVideoFiles.ts"), getKnownVideoFiles, "utf-8");
+}
 
-  // Generate getAudiobookTracksForBook.ts
+async function generateAudiobookTracksFile(bookDirectoryPath: string, bookOutputPath: string) {
   const audiobookDataPath = path.join(bookDirectoryPath, "assets", "audiobook_data", "AudiobookTracksDefined.ts");
   let getAudiobookTracksForBookContent: string;
 
   if (fs.existsSync(audiobookDataPath)) {
-    // Read the AudiobookTracksDefined content and inline it
     const audiobookContent = fs.readFileSync(audiobookDataPath, "utf-8");
 
-    // Extract the exported data from the file (assumes export const AudiobookTracksDefined = [...])
     const match = audiobookContent.match(/export\s+const\s+AudiobookTracksDefined\s*=\s*(\[[\s\S]*?\]);/);
     const audiobookData = match ? match[1] : "[]";
 
@@ -83,21 +106,68 @@ export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
   }
 
   fs.writeFileSync(path.join(bookOutputPath, "getAudiobookTracksForBook.ts"), getAudiobookTracksForBookContent, "utf-8");
+}
 
-  // Generate book data from HTML
-  generateBookDataFromHtml(bookDirectoryPath);
+function generateBookDataFiles(bookDirectoryPath: string, bookSlug: string, xmlDoc: Document): void {
+  const chapters = xmlDoc.getElementsByTagName("Chapter");
+  const chapterCount = chapters.length;
+  const bookOutputPath = path.resolve("src", "books", bookSlug);
 
-  console.log(`✅ Book data generated successfully for ${bookSlug}`);
-  console.log(`📁 Output directory: ${bookOutputPath}`);
+  // --- Generate getBookStringified.ts ---
+  const bookXml = fs.readFileSync(`${bookDirectoryPath}/book.xml`, "utf8");
+  const { audioData, backgroundsData, cutSceneData, htmlResult } = xmlToComplexHtml(bookXml, bookSlug);
 
-  // Wait a moment for file generation to complete
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug);
 
+  const getBookStringifiedContent = `const bookStringified = \`<section>${htmlResult}</section>\`;
+
+export const getBookStringified = (): string => {
+  return bookStringified;
+};
+`;
+  fs.writeFileSync(path.join(bookOutputPath, "getBookStringified.ts"), getBookStringifiedContent, "utf-8");
+
+  // --- Generate getCharactersData.ts ---
+  const characterTags = getCharacterTags(xmlDoc);
+  const characterMetadata = extractCharacterMetadata(xmlDoc, characterTags).map((character) => ({ ...character, bookSlug }));
+  const bookSlugNoDashes = bookSlug.replaceAll("-", "");
+  const getCharactersDataContent = `import type { CharacterData } from "@/books/types";
+
+export const getCharactersData = (): CharacterData[] => ${JSON.stringify(characterMetadata, null, 2)};\n
+`;
+  fs.writeFileSync(path.join(bookOutputPath, "getCharactersData.ts"), getCharactersDataContent);
+
+  // --- Check for AudiobookTracksDefined.ts existence ---
+  const audiobookDataPath = path.join(bookDirectoryPath, "assets", "audiobook_data", "AudiobookTracksDefined.ts");
+  const hasAudiobook = fs.existsSync(audiobookDataPath);
+
+  // --- Generate bookData.ts ---
+  const bookDataContent = `import type { BookData } from "@/books/types";
+import { getBookStringified } from "@/books/${bookSlug}/getBookStringified";
+
+export const bookData: BookData = {
+  slug: "${bookSlug}",
+  metadata: { title: "${bookSlugNoDashes}" },
+  chapters: ${chapterCount},
+  themeColors: {
+    primaryColor: "#E3F2FD",
+    secondaryColor: "#1976D2",
+    tertiaryColor: "#90CAF9",
+    quaternaryColor: "#0D47A1"
+  },
+  hasAudiobook: ${hasAudiobook},
+  bookStringified: getBookStringified(),
+};
+`;
+
+  fs.writeFileSync(path.join(bookOutputPath, "bookData.ts"), bookDataContent, "utf8");
+}
+
+async function loadAndValidateBookData(bookOutputPath: string): Promise<BookData> {
   const bookDataFilePath = path.join(bookOutputPath, "bookData.ts");
 
-  console.log(`📦 Loading book data from: ${bookDataFilePath}`);
   if (!fs.existsSync(bookDataFilePath)) {
-    throw new Error(`bookData.ts not found at ${bookDataFilePath}. Make sure generateBookDataFromHtml() creates the bookData.ts file`);
+    throw new Error(`bookData.ts not found at ${bookDataFilePath}.`);
   }
 
   // Convert to file URL for proper dynamic import
@@ -109,7 +179,7 @@ export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
     throw new Error('Invalid bookData.ts structure. It must export a default object with "slug" and "metadata.title" properties.');
   }
 
-  return { bookSlug: bookData.slug, bookTitle: bookData.metadata.title };
+  return bookData;
 }
 
 async function main() {
@@ -121,7 +191,7 @@ async function main() {
     const { bookSlug, bookTitle } = await generateBook(bookDirectoryPath);
     console.log(`🎉 Book generation completed for ${bookSlug} (${bookTitle})`);
   } catch (error) {
-    console.error(`❌ Generating book failed:`);
+    console.error(`❌ Book generation failed:`);
 
     if (error instanceof Error) {
       console.error("Message:", error.message);
@@ -134,7 +204,10 @@ async function main() {
 }
 
 if (require.main === module) {
-  main();
+  main().catch((error) => {
+    console.error("Unhandled error in main:", error);
+    process.exit(1);
+  });
 }
 
 export { generateBook };

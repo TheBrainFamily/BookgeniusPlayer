@@ -27,7 +27,6 @@ jobs:
             build.ts
             validateAndNormalizeBookPath.ts
             generateBook.ts
-            generateBookDataFromHtml.ts
             scripts/data/xmlToComplexHtml.ts
             scripts/data/tools/create-book-metadata.ts
             src/

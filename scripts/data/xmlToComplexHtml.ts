@@ -48,7 +48,7 @@ const extractFileData = (
 
 export const xmlToComplexHtml = (
   xmlString: string,
-  bookSlug: BOOK_SLUGS,
+  bookSlug: string,
 ): {
   htmlResult: string;
   backgroundsData: Array<{ chapter: number; file: string; startParagraph: number }>;
@@ -223,7 +223,7 @@ export const generateDataFiles = (
   backgroundsData: Array<{ chapter: number; file: string; startParagraph: number }>,
   audioData: Array<{ chapter: number; paragraph: number; files: string[] }>,
   cutSceneData: Array<{ chapter: number; paragraph: number; files: Array<{ title: string; delayInMs?: number; text?: string }> }>,
-  bookSlug: BOOK_SLUGS,
+  bookSlug: string,
 ) => {
   // Generate getBackgroundsForBook.ts
   const backgroundsContent = `import type { BackgroundForBook } from "@/types/book";
@@ -263,6 +263,7 @@ ${cutSceneData
   fs.writeFileSync(cutScenePath, cutSceneContent);
 };
 
+// ToDo: Verify if this script is needed?
 if (require.main === module) {
   const bookSlug: BOOK_SLUGS = CURRENT_BOOK;
 
@@ -282,10 +283,6 @@ if (require.main === module) {
   // Example usage: Provide the book slug when calling
   console.log("bookSlug", bookSlug);
   const { backgroundsData, audioData, cutSceneData, htmlResult } = xmlToComplexHtml(xmlString, bookSlug);
-
-  console.log("backgroundsData", backgroundsData);
-  console.log("audioData", audioData);
-  console.log("cutSceneData", cutSceneData);
 
   generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug);
 
