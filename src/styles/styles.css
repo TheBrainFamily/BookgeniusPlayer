@@ -1027,9 +1027,9 @@ section[data-chapter] [data-index] {
 .current-word {
     /* The magic happens here */
     box-shadow:
-        /* The outer white "border" above line */       0 -3px 0 0.125rem white,
-        /* The outer white "border" below line */       0 3px 0 0.125rem white,
-        /* The outer subtle shadow */                   0 4px 4px rgba(0, 0, 0, 0.1),
+        /* The outer white "border" above line */       0 -0.188rem 0 0.125rem white,
+        /* The outer white "border" below line */       0 0.188rem 0 0.125rem white,
+        /* The outer subtle shadow */                   0 0.25rem 0.25rem rgba(0, 0, 0, 0.1),
         /* The "fake" background color */               0 0 0 999px white inset;
 
     /* Still use border-radius for the corners */
