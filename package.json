@@ -1,5 +1,5 @@
 {
-  "name": "bookgenius-frontend",
+  "name": "bookgenius-player",
   "version": "1.0.0",
   "description": "",
   "keywords": [],
@@ -8,9 +8,9 @@
   "main": "index.js",
   "scripts": {
     "start": "tsx ./start.ts",
-    "generate-book": "tsx ./generate-book.ts",
+    "build": "tsx ./build.ts",
+    "generate-book": "tsx ./generateBook.ts",
     "prepare": "husky",
-    "build": "tsx ./build-with-book.ts",
     "build-only": "vite build",
     "deploy": "VITE_BOOK=Pharaon npx vite build && rsync -av ./dist root@64.23.230.45:/var/www/faraon/",
     "deploy:1984": "VITE_BOOK=1984 npx vite build && rsync -av ./dist root@64.23.230.45:/var/www/1984/",

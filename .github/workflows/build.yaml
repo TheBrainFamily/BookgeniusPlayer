@@ -23,9 +23,10 @@ jobs:
             tailwind.config.js
             tsconfig.json
             vite.config.mts
-            build-with-book.ts
-            generate-book.ts
             start.ts
+            build.ts
+            validateAndNormalizeBookPath.ts
+            generateBook.ts
             generateBookDataFromHtml.ts
             scripts/data/xmlToComplexHtml.ts
             scripts/data/tools/create-book-metadata.ts

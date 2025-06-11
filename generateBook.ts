@@ -1,19 +1,11 @@
-import path from "path";
 import fs from "fs";
+import path from "path";
 import { DOMParser } from "@xmldom/xmldom";
+
 import { setKnownVideos } from "@/utils/getFilePathsForName";
 import { generateBookDataFromHtml } from "./generateBookDataFromHtml";
-
-interface BookMetadata {
-  title: string;
-  // Add other metadata properties if they exist
-}
-
-interface BookData {
-  slug: string;
-  metadata: BookMetadata;
-  // Add other bookData properties if they exist
-}
+import { BookData } from "@/books/types";
+import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
 
 async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: string; bookTitle: string }> {
   const bookXmlPath = `${bookDirectoryPath}/book.xml`;
@@ -121,26 +113,22 @@ export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
 }
 
 async function main() {
-  const args = process.argv.slice(2); // Skip node executable and script path
-
-  if (args.length === 0) {
-    console.error("Error: Please provide the path to the book directory.");
-    console.log("Usage: tsx generate-book.ts <path_to_book_directory>");
-    process.exit(1);
-  }
-
-  const bookDirectoryPath = args[0];
+  const args = process.argv.slice(2);
+  const { bookDirectoryPath } = validateAndNormalizeBookPath(args);
 
   try {
+    console.log(`🔨 Generating book data for ${bookDirectoryPath}...`);
     const { bookSlug, bookTitle } = await generateBook(bookDirectoryPath);
     console.log(`🎉 Book generation completed for ${bookSlug} (${bookTitle})`);
   } catch (error) {
-    console.error(`❌ Error generating book for ${bookDirectoryPath}:`);
+    console.error(`❌ Generating book failed:`);
+
     if (error instanceof Error) {
       console.error("Message:", error.message);
     } else {
       console.error("An unknown error occurred:", error);
     }
+
     process.exit(1);
   }
 }
