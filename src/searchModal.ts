@@ -16,6 +16,38 @@ export interface SearchResultsData {
   isLoading?: boolean;
 }
 
+const createContextualSummary = (fullText: string, query: string, maxLength: number = 75): string => {
+  const queryLower = query.toLowerCase();
+  const fullTextLower = fullText.toLowerCase();
+
+  const matchIndex = fullTextLower.indexOf(queryLower);
+  if (matchIndex === -1) {
+    // Fallback to original behavior if query not found
+    return fullText.length > maxLength ? `${fullText.substring(0, maxLength)}...` : fullText;
+  }
+
+  // Start 20 characters before the match, but not before the beginning
+  const contextStart = Math.max(0, matchIndex - 20);
+
+  // Calculate end position to maintain roughly the same summary length
+  const remainingLength = maxLength - (matchIndex - contextStart) - query.length;
+  const contextEnd = Math.min(fullText.length, matchIndex + query.length + remainingLength);
+
+  let summary = fullText.substring(contextStart, contextEnd);
+
+  // Add ellipsis if we're not starting from the beginning
+  if (contextStart > 0) {
+    summary = `...${summary}`;
+  }
+
+  // Add ellipsis if we're not ending at the end
+  if (contextEnd < fullText.length) {
+    summary = `${summary}...`;
+  }
+
+  return summary;
+};
+
 // getCurrentLocation would be sourced from your state management, e.g., useLocation hook
 // For this file, it's assumed the caller (ModalContext) provides the location.
 
@@ -172,7 +204,7 @@ export async function performLocalDOMSearch(query: string, currentLocation: Loca
 
         if (paragraphText.toLowerCase().includes(queryLower)) {
           const fullText = paragraphText;
-          const summaryText = fullText.length > 75 ? `${fullText.substring(0, 75)}...` : fullText;
+          const summaryText = createContextualSummary(fullText, query);
 
           items.push({
             chapter: chapterIndex,

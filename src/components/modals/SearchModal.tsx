@@ -117,9 +117,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                         </motion.div>
                       )}
 
-                      <motion.div className="text-sm text-white/90 leading-relaxed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-                        {item.summary}
-                      </motion.div>
+                      <motion.div className="text-sm text-white/90">{item.summary}</motion.div>
                     </div>
                   </motion.div>
                 ))}
