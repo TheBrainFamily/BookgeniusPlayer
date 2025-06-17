@@ -20,13 +20,13 @@
     <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
 
     <!-- Preloaded -->
+    <link rel="preload" href="/clear-loader.png" as="image" />
     <style>
       body,
       html {
         background-color: #2d2d2d;
       }
     </style>
-    <link rel="preload" href="/loading.gif" as="image" />
     <link rel="stylesheet" href="/src/styles/preload.css" />
   </head>
 
@@ -61,8 +61,16 @@
         </div>
 
         <div class="splash-image-container">
-          <div class="splash-glow-ring"></div>
-          <img src="/loading.gif" alt="Loading..." class="splash-loading-image" />
+          <video 
+            id="splash-video" 
+            poster="/clear-loader.png" 
+            alt="Loading..." 
+            class="splash-loading-image" 
+            muted 
+            autoplay
+            playsinline
+            preload="auto">
+          </video>
         </div>
 
         <div class="splash-text-container">
@@ -84,8 +92,33 @@
           this.previousPhrases = new Set();
           this.isExiting = false;
           this.loadingPhrases = [];
+          this.videoPlayed = false;
+          this.setupVideoSource();
           this.setupDynamicContent();
           this.setupEventListeners();
+          this.setupVideo();
+        }
+
+        setupVideoSource() {
+          // Mapping of book slugs to their respective loader videos
+          const videoMapping = {
+            'Pharaon': '/pharaon-loader.mp4',
+            '1984': '/1984-loader.mp4',
+            'Conrad-Tajny-Agent': '/secret-agent-loader.mp4',
+            'Krolowa-Sniegu': '/snow-queen-loader.mp4',
+            '1984-English': '/1984-loader.mp4'
+          };
+
+          // Get the current book slug from the global variable
+          const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : 'Pharaon';
+          
+          // Set the video source based on the current book, fallback to 1984-small.mp4
+          const videoSrc = videoMapping[currentBookSlug] || '/1984-small.mp4';
+          
+          const video = document.getElementById("splash-video");
+          if (video) {
+            video.src = videoSrc;
+          }
         }
 
         async setupDynamicContent() {
@@ -148,6 +181,30 @@
           if (startButton) {
             startButton.classList.remove("disabled");
             startButton.classList.add("visible");
+          }
+        }
+
+        setupVideo() {
+          const video = document.getElementById("splash-video");
+          if (video) {
+            video.addEventListener("loadeddata", () => {
+              if (!this.videoPlayed) {
+                this.videoPlayed = true;
+                video.play().catch(e => console.log("Video autoplay prevented:", e));
+              }
+            });
+            
+            video.addEventListener("canplay", () => {
+              if (!this.videoPlayed) {
+                this.videoPlayed = true;
+                video.play().catch(e => console.log("Video autoplay prevented:", e));
+              }
+            });
+            
+            video.addEventListener("ended", () => {
+              // Ensure video stays on last frame
+              video.currentTime = video.duration;
+            });
           }
         }
 

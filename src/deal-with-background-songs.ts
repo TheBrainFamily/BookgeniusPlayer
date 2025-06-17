@@ -9,7 +9,7 @@ import {
   getCurrentSectionTracks,
 } from "./audio-crossfader"; // Adjust path as needed
 import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
-import { getBackgroundSongsForBook, BackgroundSongSection } from "./songs-defined"; // Adjust path and ensure type export
+import { getBackgroundSongsForBook, BackgroundSongSection } from "./getBackgroundSongsForBook"; // Adjust path and ensure type export
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation"; // Adjust path as needed
 
 let isProcessingBackgroundSongs = false; // Module-level flag to prevent re-entrancy
@@ -33,7 +33,7 @@ export const preloadBackgroundTracks = async () => {
   const chaptersToConsider = Array.from({ length: chaptersToPreloadAhead + 1 }, (_, i) => currentChapter + i);
   console.log("Preloading tracks for chapters:", chaptersToConsider);
 
-  const bookSongs = getBackgroundSongsForBook(CURRENT_BOOK);
+  const bookSongs = getBackgroundSongsForBook();
   if (!bookSongs) {
     console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot preload.`);
     return;
@@ -74,7 +74,7 @@ export const dealWithBackgroundSongs = async ({ currentChapter, currentParagraph
   try {
     console.log(`Calculated consideration point: Chapter ${currentChapter}, Paragraph ${currentParagraph}`);
 
-    const bookSongs = getBackgroundSongsForBook(CURRENT_BOOK);
+    const bookSongs = getBackgroundSongsForBook();
     if (!bookSongs) {
       console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot determine background song.`);
       isProcessingBackgroundSongs = false; // Reset flag before early exit

@@ -101,24 +101,13 @@
   animation-delay: 0.4s;
 }
 
-.splash-glow-ring {
-  position: absolute;
-  top: 0.5rem;
-  bottom: -0.5rem;
-  left: 0;
-  right: 0;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
-  animation:
-    pulse-glow 3s ease-in-out infinite,
-    rotate 20s linear infinite;
-}
-
 .splash-loading-image {
   width: clamp(4.5rem, 15vw, 7rem);
   height: clamp(4.5rem, 15vw, 7rem);
   position: relative;
   z-index: 10;
+  object-fit: cover;
+  border-radius: 100%;
   animation: pulse-image 3s ease-in-out infinite;
 }
 

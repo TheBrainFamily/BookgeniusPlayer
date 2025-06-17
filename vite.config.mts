@@ -6,88 +6,44 @@ import { viteStaticCopy, type Target } from "vite-plugin-static-copy";
 import path from "path";
 import fs from "fs";
 
-// Import BOOK_SLUGS directly, but CURRENT_BOOK will now be effectively determined here
-import { BOOK_SLUGS } from "./src/consts"; // We only need the enum here
-
-// --- START: Dynamic Book Configuration ---
-const desiredBookSlug = process.env.VITE_BOOK;
-let currentBookSlug: BOOK_SLUGS;
-
-if (desiredBookSlug && Object.values(BOOK_SLUGS).includes(desiredBookSlug as BOOK_SLUGS)) {
-  currentBookSlug = desiredBookSlug as BOOK_SLUGS;
-  console.log(`Using book from VITE_BOOK environment variable: ${currentBookSlug}`);
-} else {
-  currentBookSlug = BOOK_SLUGS.PHARAON; // Default book
-  if (desiredBookSlug) {
-    console.warn(`VITE_BOOK="${desiredBookSlug}" is not a valid book slug. Defaulting to ${currentBookSlug}. Valid slugs are: ${Object.values(BOOK_SLUGS).join(", ")}`);
-  } else {
-    console.log(`VITE_BOOK environment variable not set or invalid. Defaulting to book: ${currentBookSlug}`);
-  }
-}
-// --- END: Dynamic Book Configuration ---
-
 // Workaround to remove unnecessary books chunks from the build
 // ToDo: Do not create them in the first place
-const removeChunksPlugin = () => {
-  return {
-    name: "remove-specified-chunks",
-    apply: "build" as const,
-    closeBundle() {
-      console.log(`Removing chunks for books other than: ${currentBookSlug}`); // Use the resolved currentBookSlug
-      const distDir = path.resolve(__dirname, "dist/assets");
-      const toRemove = Object.values(BOOK_SLUGS)
-        .filter((slug) => slug !== currentBookSlug) // Use the resolved currentBookSlug
-        .map((slug) => `${slug.toLowerCase()}`);
+// const removeChunksPlugin = () => {
+//   return {
+//     name: "remove-specified-chunks",
+//     apply: "build" as const,
+//     closeBundle() {
+//       console.log(`Removing chunks for books other than: ${currentBookSlug}`); // Use the resolved currentBookSlug
+//       const distDir = path.resolve(__dirname, "dist/assets");
+//       const toRemove = Object.values(BOOK_SLUGS)
+//         .filter((slug) => slug !== currentBookSlug) // Use the resolved currentBookSlug
+//         .map((slug) => `${slug.toLowerCase()}`);
 
-      console.log(`Removing chunks for books: ${toRemove.join(", ")}`);
+//       console.log(`Removing chunks for books: ${toRemove.join(", ")}`);
 
-      toRemove.forEach((base) =>
-        fs
-          .readdirSync(distDir)
-          .filter((f) => f.toLowerCase().includes(`${base}audiobookdata`) || f.toLowerCase().includes(`${base}bookdata`))
-          .forEach((f) => fs.unlinkSync(path.join(distDir, f))),
-      );
-    },
-  };
-};
+//       toRemove.forEach((base) =>
+//         fs
+//           .readdirSync(distDir)
+//           .filter((f) => f.toLowerCase().includes(`${base}audiobookdata`) || f.toLowerCase().includes(`${base}bookdata`))
+//           .forEach((f) => fs.unlinkSync(path.join(distDir, f))),
+//       );
+//     },
+//   };
+// };
 
 interface BookBuildData {
   name: string;
   short_name: string;
-  description?: string;
-  staticAssetSourceDir?: string;
-  staticAssetDestDir?: string;
+  staticAssetSourceDir: string;
+  staticAssetDestDir: string;
 }
 
-const bookBuildConfigs: Partial<Record<BOOK_SLUGS, BookBuildData>> = {
-  [BOOK_SLUGS.PHARAON]: { name: "Faraon", short_name: "Faraon", staticAssetSourceDir: `public_books/${BOOK_SLUGS.PHARAON}`, staticAssetDestDir: BOOK_SLUGS.PHARAON },
-  [BOOK_SLUGS._1984]: { name: "1984", short_name: "1984", staticAssetSourceDir: `public_books/${BOOK_SLUGS._1984}`, staticAssetDestDir: BOOK_SLUGS._1984 },
-  [BOOK_SLUGS.Conrad_Tajny_Agent]: {
-    name: "Conrad Tajny Agent",
-    short_name: "Conrad-Tajny-Agent",
-    staticAssetSourceDir: `public_books/${BOOK_SLUGS.Conrad_Tajny_Agent}`,
-    staticAssetDestDir: BOOK_SLUGS.Conrad_Tajny_Agent,
-  },
-  [BOOK_SLUGS.Krolowa_Sniegu]: {
-    name: "Krolowa Sniegu",
-    short_name: "Krolowa-Sniegu",
-    staticAssetSourceDir: `public_books/${BOOK_SLUGS.Krolowa_Sniegu}`,
-    staticAssetDestDir: BOOK_SLUGS.Krolowa_Sniegu,
-  },
-  [BOOK_SLUGS._1984_English]: {
-    name: "1984 English",
-    short_name: "1984-English",
-    staticAssetSourceDir: `public_books/${BOOK_SLUGS._1984_English}`,
-    staticAssetDestDir: BOOK_SLUGS._1984_English,
-  },
+const activeBookConfig: BookBuildData = {
+  name: process.env.VITE_BOOK_NAME,
+  short_name: process.env.VITE_BOOK,
+  staticAssetSourceDir: `${process.env.VITE_BOOK_PATH}/assets`,
+  staticAssetDestDir: process.env.VITE_BOOK,
 };
-
-const activeBookConfig = bookBuildConfigs[currentBookSlug]; // Use the resolved currentBookSlug
-
-if (!activeBookConfig) {
-  throw new Error(`Build configuration for book "${currentBookSlug}" is not defined in vite.config.ts.`);
-}
-
 // Prepare targets for vite-plugin-static-copy
 const staticCopyTargets: Target[] = [];
 if (activeBookConfig.staticAssetSourceDir && activeBookConfig.staticAssetDestDir) {
@@ -97,48 +53,107 @@ const bookDataPlugin = () => {
   return {
     name: "book-data-replacer",
     enforce: "pre" as const,
-    transform(code: string, id: string) {
+    async transform(code: string, id: string) {
       // Only transform the getBookData file
-      if (id.includes("getBookData") && !id.includes("node_modules")) {
-        // Map book slugs to their import paths
-        const bookImportMap: Record<string, string> = {
-          [BOOK_SLUGS._1984]: "1984BookData",
-          [BOOK_SLUGS.PHARAON]: "pharaonBookData",
-          [BOOK_SLUGS.Conrad_Tajny_Agent]: "conrad-tajny-agentBookData",
-          [BOOK_SLUGS.Krolowa_Sniegu]: "krolowa-snieguBookData",
-          [BOOK_SLUGS._1984_English]: "1984-EnglishBookData",
-        };
+      const selectedAlias = activeBookConfig.short_name;
+      if (!id.includes("node_modules") && !id.includes("src/books/")) {
+        if (id.includes("getBookData")) {
+          const finalCode = `
+                import type { BookData } from "@/books/types";
+                import { bookData as bookDataInput } from "@/books/${selectedAlias}/bookData";
+                export function getBookData(): BookData {
+                  return bookDataInput;
+        }`;
 
-        const selectedBook = bookImportMap[currentBookSlug];
+          return { code: finalCode, map: null };
+        }
 
-        // Keep the original imports but comment out unused ones
-        const newCode = code.replace(/^import\s+{\s*bookData\s+as\s+(\w+)\s*}\s+from\s+["']\.\/books\/([^"']+)["'];?$/gm, (match, alias, bookFile) => {
-          // Only keep the import for the selected book
-          if (bookFile.includes(selectedBook)) {
-            return match;
-          }
-          return `// ${match} // Removed by build`;
-        });
+        if (id.includes("backgroundsForBook")) {
+          return {
+            code: `
+                    export type BackgroundsForBook = { chapter: number; file: string; startParagraph?: number }[];
 
-        // Replace the function body to return only the selected book
-        const bookAliasMap: Record<string, string> = {
-          [BOOK_SLUGS._1984]: "_1984BookData",
-          [BOOK_SLUGS.PHARAON]: "PharaonBookData",
-          [BOOK_SLUGS.Conrad_Tajny_Agent]: "ConradTajnyAgentBookData",
-          [BOOK_SLUGS.Krolowa_Sniegu]: "KrolowaSnieguBookData",
-          [BOOK_SLUGS._1984_English]: "1984-EnglishBookData",
-        };
+        import { backgroundsForBook as backgroundsForBookInput } from "@/books/${selectedAlias}/backgroundsForBook";
 
-        const selectedAlias = bookAliasMap[currentBookSlug];
+        export const backgroundsForBook: BackgroundsForBook = backgroundsForBookInput;
+        `,
+            map: null,
+          };
+        }
+        if (id.includes("getBackgroundSongsForBook")) {
+          return {
+            code: `
+        export type BackgroundSongSection = { chapter: number; paragraph: number; files: string[] };
 
-        const finalCode = newCode.replace(
-          /export\s+async\s+function\s+getBookData\(\)[\s\S]*?^}/m,
-          `export async function getBookData(): Promise<BookData> {
-  return ${selectedAlias};
-}`,
-        );
+        import { getBackgroundSongsForBook as getBackgroundSongsForBookInput } from "@/books/${selectedAlias}/getBackgroundSongsForBook";
 
-        return { code: finalCode, map: null };
+        export const getBackgroundSongsForBook = (): BackgroundSongSection[] => {
+  return getBackgroundSongsForBookInput();
+};
+        `,
+            map: null,
+          };
+        }
+        if (id.includes("getCutScenesForBook")) {
+          return {
+            code: `
+            export type CutScene = { chapter: number; paragraph: number; file: string };
+            import { getCutScenesForBook as getCutScenesForBookInput } from "@/books/${selectedAlias}/getCutScenesForBook";
+
+        export const getCutScenesForBook = (): CutScene[] => {
+  return getCutScenesForBookInput();
+};
+`,
+            map: null,
+          };
+        }
+        if (id.includes("getKnownVideoFiles")) {
+          return {
+            code: `
+            import { getKnownVideoFiles as getKnownVideoFilesInput } from "@/books/${selectedAlias}/getKnownVideoFiles";
+            export const getKnownVideoFiles = (): string[] => {
+              return getKnownVideoFilesInput();
+            }; 
+            `,
+            map: null,
+          };
+        }
+        if (id.includes("getCharactersData")) {
+          return {
+            code: `
+            import { getCharactersData as getCharactersDataInput } from "@/books/${selectedAlias}/getCharactersData";
+            export const getCharactersData = (): CharacterData[] => {
+              return getCharactersDataInput();
+            }; 
+            `,
+            map: null,
+          };
+        }
+        if (id.includes("getBookStringified")) {
+          return {
+            code: `
+            import { getBookStringified as getBookStringifiedInput } from "@/books/${selectedAlias}/getBookStringified";
+            export const getBookStringified = (): string => {
+              return getBookStringifiedInput();
+            }; 
+            `,
+            map: null,
+          };
+        }
+        if (id.includes("getKnownVideoFiles")) {
+          return {
+            code: `           
+            import { getKnownVideoFiles as getKnownVideoFilesInput } from "@/books/${selectedAlias}/getKnownVideoFiles.ts";
+            export const getKnownVideoFiles = (): string[] => {
+              if (getKnownVideoFilesInput) {
+                return getKnownVideoFilesInput();
+              }        
+              throw new Error("getKnownVideoFiles should never be called at runtime");
+            };
+            `,
+            map: null,
+          };
+        }
       }
     },
   };
@@ -148,7 +163,7 @@ export default defineConfig({
   // This define will replace all instances of __SELECTED_BOOK_SLUG__ in your client code
   // with the actual string value of currentBookSlug.
   define: {
-    __SELECTED_BOOK_SLUG__: JSON.stringify(currentBookSlug), // Important: JSON.stringify to make it a string literal
+    __SELECTED_BOOK_SLUG__: JSON.stringify(activeBookConfig.short_name), // Important: JSON.stringify to make it a string literal
   },
   optimizeDeps: { include: ["workbox-core", "workbox-precaching", "workbox-routing", "workbox-strategies", "workbox-range-requests"] },
   plugins: [
@@ -175,7 +190,6 @@ export default defineConfig({
       },
       devOptions: { enabled: true },
     }),
-    removeChunksPlugin(),
   ],
   root: "./",
   resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
@@ -184,6 +198,6 @@ export default defineConfig({
     port: 5173,
     open: false,
     proxy: { "/api": "http://localhost:3000" },
-    watch: { ignored: ["**/src/data/*.xml", "**/src/data/tools/Text-Editor/*.xml", "**/.vscode/**", "**/.cursor/**"] },
+    watch: { ignored: ["**/src/data/*.xml", "**/public_books/**", "**/src/data/tools/Text-Editor/*.xml", "**/.vscode/**", "**/.cursor/**"] },
   },
 });

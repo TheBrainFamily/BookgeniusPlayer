@@ -1,6 +1,6 @@
 import { searchParagraphsFromServer } from "./utils/searchParagraphsFromServer";
 import type { Location } from "@/state/LocationContext";
-import { BookData } from "@/booksData/types"; // Import Location type
+import { getCharactersData } from "./genericBookDataGetters/getCharactersData";
 
 export interface SearchResultItemData {
   chapter: number;
@@ -285,8 +285,8 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
   }, "");
 };
 
-export function findCharacterSentences(characterSlug: string, currentLocation: Location, bookData: BookData) {
-  const characterData = bookData.charactersData.find((character) => character.slug === characterSlug);
+export function findCharacterSentences(characterSlug: string, currentLocation: Location) {
+  const characterData = getCharactersData().find((character) => character.slug === characterSlug);
 
   // Changed return type
   const items: SearchResultItemData[] = [];

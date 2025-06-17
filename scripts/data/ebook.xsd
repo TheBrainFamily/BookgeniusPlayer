@@ -24,6 +24,8 @@
                     </xs:complexType>
                 </xs:element>
 
+                <xs:element name="BookSlug" type="xs:string" minOccurs="1" maxOccurs="1"/>
+
                 <xs:element name="Chapter" type="chapterType" minOccurs="1" maxOccurs="unbounded"/>
 
             </xs:sequence>

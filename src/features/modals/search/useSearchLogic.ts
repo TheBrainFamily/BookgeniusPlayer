@@ -68,6 +68,7 @@ export const useSearchLogic = () => {
         if (results.items.length === 0) {
           setResults({ header: "Searching…", items: [], isLoading: true });
 
+          // @ts-expect-error(this is wrong typing) TODO fix this if you want?
           results = await debouncedPerformUnifiedSearch(searchQuery, location);
         }
 

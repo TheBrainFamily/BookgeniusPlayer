@@ -23,7 +23,7 @@ export function useAudiobookTracks() {
 
   useEffect(() => {
     if (isSplashHidden) {
-      playAudiobook(true);
+      playAudiobook();
     }
   }, [isSplashHidden]);
 }

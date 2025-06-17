@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ebook id="demo-single-source" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xi="http://www.w3.org/2001/XInclude" xsi:noNamespaceSchemaLocation="ebook.xsd">
+
+<CharactersMaster>
+  <Wicked-Sprite display="Wicked Sprite" summary="A very wicked sprite whose sole pleasure was to torment people and do evil. He invented and created an artificial mirror that made all good and beautiful things appear hideous, while evil things became clearly visible."/>
+  <Wicked-Sprite-Students display="Sprite's Students" summary="The wicked sprite's students, who stole his magical mirror and ran around with it, suddenly holding it up to people's eyes."/>
+  <Kay display="Kay" summary="A boy living in an attic in the old town, neighbor and friend of Gerda, with whom he loved like a brother loves a sister. He played with her in a small rooftop garden."/>
+  <Gerda display="Gerda" summary="A girl living in an attic in the old town, neighbor and friend of Kay, with whom she loved like a sister loves a brother. She played with him in a small rooftop garden."/>
+  <Kay-Parents display="Kay’s Parents" summary="Kay’s parents, who lived in the attic and, together with Gerda’s parents, placed boxes with flowers and vegetables on the roof, creating a small garden for the children."/>
+  <Gerda-Parents display="Gerda’s Parents" summary="Gerda’s parents, who lived in the attic and, together with Kay’s parents, placed boxes with flowers and vegetables on the roof, creating a small garden for the children."/>
+  <Gerda-Grandmother display="Gerda’s Grandmother" summary="Gerda’s old grandmother who told stories to the children, including Gerda and Kay, about white bees (snowflakes) and the Snow Queen."/>
+  <Snow-Queen display="Snow Queen" summary="A figure described by Gerda’s grandmother as the largest snowflake. She appeared to Kay as a beautiful lady in a long white gown, calling him to her."/>
+  <Market-Place-Boys display="Market Boys" summary="Boys who played in the marketplace and claimed they saw Kay attach his sled to a large sleigh that sped out of town."/>
+  <Sparrows display="Sparrows" summary="A flock of sparrows flying along the riverbank, trying to comfort Gerda as her boat drifted with the current, calling to her that they were with her."/>
+  <Witch display="Witch" summary="A hunchbacked old woman living in a cottage with a beautiful flower garden and colorful windows. She helped Gerda out of the boat and invited her into her home, later using an enchanted comb."/>
+  <Roses-From-Witch-Garden display="Roses from the Witch’s Garden" summary="Roses growing in the witch’s garden. When Gerda cried over the spot where they had grown, those the witch had hidden underground reappeared and told her that Kay was not buried underground."/>
+  <Raven display="Raven" summary="A large gray raven who met Gerda in the forest. She expressed sympathy for the girl and told her about a wise princess, suggesting that Kay might have become her husband."/>
+  <Princess display="Princess" summary="A very wise princess who, according to the raven, announced she would marry the young man who could answer her questions wisely."/>
+  <Court-Ladies display="Ladies-in-Waiting" summary="The princess’s ladies-in-waiting, who, according to the raven, praised her idea for finding a wise husband."/>
+  <Prince display="Prince" summary="A young man with a sunburnt neck who became the princess’s husband. At first, Gerda thought he was Kay, but he woke up when she called."/>
+  <Driver display="Coachman" summary="Coachman of the gilded carriage given to Gerda by the princess, wearing a golden crown on his livery."/>
+  <Lackey display="Footman" summary="Footman of the gilded carriage given to Gerda by the princess, wearing a golden crown on his livery."/>
+  <Old-Robber-Woman display="Old Robber Woman" summary="An old woman with a wild head of hair and terrifying eyes, a member of the robber band who attacked Gerda's carriage."/>
+  <Robber-Mainden display="Little Robber Girl" summary="Daughter of the old robber woman, a wild and energetic child who bit her mother’s ear to save Gerda from death."/>
+  <Wood-Pigeons display="Wood Pigeons" summary="A flock of pigeons nesting in the robbers’ castle. They told Gerda they saw Kay with the Snow Queen traveling through the forest to the north."/>
+  <Reindeer display="Reindeer" summary="A tame reindeer belonging to the little robber girl; later helps Gerda on her journey north."/>
+  <Lapland-Woman display="Lapp Woman" summary="An old Lapp woman living in a low hut in the far north; wrote a message on dried stockfish to help Gerda."/>
+  <Finland-Woman display="Finn Woman" summary="A short, stout woman living in a very hot hut near the Snow Queen’s palace; known for her wisdom and for reading letters on fish skins."/>
+  <Snow-Flakes-Queen-Outposts display="Snowflakes (Snow Queen’s Guards)" summary="Living snowflakes that grew in size and took on terrifying shapes, serving as the Snow Queen’s vanguard."/>
+  <Little-Angels display="Little Angels" summary="Beings formed from Gerda’s visible breath during prayer, who protected her from the snowflake-guards."/>
+  <Another-Reindeer display="Reindeer Companion" summary="A second reindeer, brought by the tame reindeer to help Gerda and Kay on their journey home."/>
+  <Sun display="Sun" summary="The springtime Sun."/>
+  <Swallow display="Swallow" summary="A helpful Swallow who returned in autumn to its nest."/>
+</CharactersMaster>
+
+
+<!-- book content here -->
+</ebook>

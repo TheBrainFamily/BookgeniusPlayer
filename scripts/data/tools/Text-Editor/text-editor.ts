@@ -1,7 +1,7 @@
 import { XmlManager } from "./xml-manager";
 import { FileManager, IFileManager, MockFileManager } from "./file-manager";
 import { EditorManager } from "./editor-manager";
-import { PromptsManager } from "@/data/tools/Text-Editor/prompts-manager";
+import { PromptsManager } from "./prompts-manager";
 import { joinParsedText, parseHtmlText } from "@/utils/parseHtmlText";
 import { TextEditorError, ParagraphNotFoundError, CharacterNotFoundError } from "./error-handlers";
 import { BOOK_SLUGS } from "@/consts";
