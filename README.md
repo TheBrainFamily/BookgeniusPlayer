@@ -16,7 +16,7 @@ BookGenius is an innovative multi-book interactive reading platform that transfo
 
 **Available books:**
 
-- \_1984
+- 1984
 - 1984-English
 - Conrad-Tajny-Agent
 - Krolowa-Sniegu
