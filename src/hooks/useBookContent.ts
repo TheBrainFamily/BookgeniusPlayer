@@ -29,7 +29,6 @@ export function useBookContent(containerId: string) {
       });
 
       // --- PART C: The Update Function ---
-      const pendingUpdates = {};
 
       function updateText(currentLevel) {
         for (const sentenceData of allVariants) {
@@ -49,21 +48,10 @@ export function useBookContent(containerId: string) {
 
           // 3. **THE NEW COMPARISON:** Compare scores, not HTML strings!
           if (currentScore !== bestFit.score) {
-            if (pendingUpdates[sentenceData.id]) {
-              clearTimeout(pendingUpdates[sentenceData.id]);
-            }
+            element.innerHTML = textToDisplay;
 
-            element.style.opacity = "0";
-
-            pendingUpdates[sentenceData.id] = setTimeout(() => {
-              element.innerHTML = textToDisplay;
-
-              // 4. **CRITICAL:** Update the state on the element!
-              element.dataset.currentScore = bestFit.score.toString();
-
-              element.style.opacity = "1";
-              delete pendingUpdates[sentenceData.id];
-            }, 200);
+            // 4. **CRITICAL:** Update the state on the element!
+            element.dataset.currentScore = bestFit.score.toString();
           }
         }
       }
