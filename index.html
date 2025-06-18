@@ -49,6 +49,10 @@
           <div id="right-notes-scrollable-container"></div>
         </div>
       </div>
+      <div class="slider-container">
+        <label for="complexity-slider">Reading Complexity</label>
+        <input type="range" id="complexity-slider" min="20" max="100" value="100" />
+      </div>
     </div>
 
     <div id="root"></div>
@@ -61,16 +65,7 @@
         </div>
 
         <div class="splash-image-container">
-          <video 
-            id="splash-video" 
-            poster="/clear-loader.png" 
-            alt="Loading..." 
-            class="splash-loading-image" 
-            muted 
-            autoplay
-            playsinline
-            preload="auto">
-          </video>
+          <video id="splash-video" poster="/clear-loader.png" alt="Loading..." class="splash-loading-image" muted autoplay playsinline preload="auto"></video>
         </div>
 
         <div class="splash-text-container">
@@ -102,19 +97,19 @@
         setupVideoSource() {
           // Mapping of book slugs to their respective loader videos
           const videoMapping = {
-            'Pharaon': '/pharaon-loader.mp4',
-            '1984': '/1984-loader.mp4',
-            'Conrad-Tajny-Agent': '/secret-agent-loader.mp4',
-            'Krolowa-Sniegu': '/snow-queen-loader.mp4',
-            '1984-English': '/1984-loader.mp4'
+            Pharaon: "/pharaon-loader.mp4",
+            1984: "/1984-loader.mp4",
+            "Conrad-Tajny-Agent": "/secret-agent-loader.mp4",
+            "Krolowa-Sniegu": "/snow-queen-loader.mp4",
+            "1984-English": "/1984-loader.mp4",
           };
 
           // Get the current book slug from the global variable
-          const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : 'Pharaon';
-          
+          const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : "Pharaon";
+
           // Set the video source based on the current book, fallback to 1984-small.mp4
-          const videoSrc = videoMapping[currentBookSlug] || '/1984-small.mp4';
-          
+          const videoSrc = videoMapping[currentBookSlug] || "/1984-small.mp4";
+
           const video = document.getElementById("splash-video");
           if (video) {
             video.src = videoSrc;
@@ -190,17 +185,17 @@
             video.addEventListener("loadeddata", () => {
               if (!this.videoPlayed) {
                 this.videoPlayed = true;
-                video.play().catch(e => console.log("Video autoplay prevented:", e));
+                video.play().catch((e) => console.log("Video autoplay prevented:", e));
               }
             });
-            
+
             video.addEventListener("canplay", () => {
               if (!this.videoPlayed) {
                 this.videoPlayed = true;
-                video.play().catch(e => console.log("Video autoplay prevented:", e));
+                video.play().catch((e) => console.log("Video autoplay prevented:", e));
               }
             });
-            
+
             video.addEventListener("ended", () => {
               // Ensure video stays on last frame
               video.currentTime = video.duration;

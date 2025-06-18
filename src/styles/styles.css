@@ -239,7 +239,6 @@
       h1 + p,
       h2 + p,
       h3 + p,
-      h4 + p,
       h5 + p,
       h6 + p,
       blockquote + p,
@@ -1025,30 +1024,25 @@ section[data-chapter] [data-index] {
 }
 
 .current-word {
-    /* The magic happens here */
-    box-shadow:
-        /* The outer white "border" above line */       0 -0.188rem 0 0.125rem white,
-        /* The outer white "border" below line */       0 0.188rem 0 0.125rem white,
-        /* The outer subtle shadow */                   0 0.25rem 0.25rem rgba(0, 0, 0, 0.1),
-        /* The "fake" background color */               0 0 0 999px white inset;
+  box-shadow:
+        /* The outer white "border" above line */
+    0 -0.188rem 0 0.125rem white,
+    /* The outer white "border" below line */ 0 0.188rem 0 0.125rem white,
+    /* The outer subtle shadow */ 0 0.25rem 0.25rem rgba(0, 0, 0, 0.1),
+    /* The "fake" background color */ 0 0 0 999px white inset;
 
-    /* Still use border-radius for the corners */
-    border-radius: 0.375rem;
+  border-radius: 0.375rem;
 
-    /* To get the padding effect on each line, we use box-decoration-break.
-       This should work, but if it's the source of the issue, the shadow
-       technique is the primary fix. */
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 /* Class to make the highlight on the last word fade out */
 .last-word-auto-fade.current-word {
-  /* Be specific to the highlighted state */
   animation-name: fadeLastWordHighlightEffect;
-  animation-duration: 0.8s; /* Duration of the fade effect */
-  animation-delay: 1.5s; /* Delay before the fade starts (e.g., word duration + pause) */
-  animation-fill-mode: forwards; /* Keep the state of the last keyframe (faded) */
+  animation-duration: 0.8s;
+  animation-delay: 1.5s;
+  animation-fill-mode: forwards;
   animation-timing-function: ease-out;
 }
 
@@ -1105,4 +1099,22 @@ section[data-chapter] [data-index] {
   50% {
     opacity: 0.5;
   }
+}
+
+#book-container span {
+  transition: opacity 0.2s ease-in-out;
+}
+.sentence-fading {
+  opacity: 0;
+}
+
+.slider-container {
+  position: fixed;
+  bottom: 100px;
+  right: 2%;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
 }
