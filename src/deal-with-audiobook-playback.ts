@@ -1,7 +1,9 @@
 import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
-import { getAudiobookTracksForBook, AudiobookTracksSection } from "@/getAudiobookTracksForBook"; // Adjust path as needed
+
 import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audiobook-player";
 import { highlightNthOccurrence } from "./highlightWord";
+import { getAudiobookTracksForBook } from "./genericBookDataGetters/getAudiobookTracksForBook";
+import { AudiobookTracksSection } from "./types/book";
 
 const AUDIO_SYNC_SHIFT = -0.1;
 

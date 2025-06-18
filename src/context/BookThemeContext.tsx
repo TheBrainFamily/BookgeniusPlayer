@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
-import { BookThemeColors } from "@/books/types";
+import { BookThemeColors } from "@/types/book";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
 
 interface BookThemeContextType {

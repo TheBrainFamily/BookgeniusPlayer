@@ -9,8 +9,9 @@ import {
   getCurrentSectionTracks,
 } from "./audio-crossfader"; // Adjust path as needed
 import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
-import { getBackgroundSongsForBook, BackgroundSongSection } from "./getBackgroundSongsForBook"; // Adjust path and ensure type export
+import { getBackgroundSongsForBook } from "./genericBookDataGetters/getBackgroundSongsForBook"; // Adjust path and ensure type export
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation"; // Adjust path as needed
+import { BackgroundSongSection } from "./types/book";
 
 let isProcessingBackgroundSongs = false; // Module-level flag to prevent re-entrancy
 

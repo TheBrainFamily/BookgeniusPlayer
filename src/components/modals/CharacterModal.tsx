@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import ModalUI from "./ModalUI";
 import CharacterMedia from "@/components/CharacterMedia";
-import { CharacterData } from "@/books/types";
+import { CharacterData } from "@/types/book";
 import { findCharacterSentences, SearchResultItemData } from "@/searchModal";
 import { useLocation } from "@/state/LocationContext";
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
