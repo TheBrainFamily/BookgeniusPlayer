@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange } from "@/fetchers/getParagraphRange";
 import { CURRENT_BOOK } from "@/consts";
 import { Location } from "@/state/LocationContext";
-import { getBookData } from "@/booksData/getBookData";
+import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
 
 /** Very light equality check: same length and same canonicalName order */
 function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {
@@ -19,7 +19,6 @@ function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {
  */
 export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphabetically = true): ParsedParagraphRange[] {
   const [notes, setNotes] = useState<ParsedParagraphRange[]>([]);
-  const bookData = getBookData();
   useEffect(() => {
     let cancelled = false;
 
@@ -27,7 +26,7 @@ export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphab
       const { chapter, paragraph, endChapter, endParagraph } = loc;
       const raw = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange(
         { bookSlug: CURRENT_BOOK, startChapter: chapter, startParagraph: paragraph, endChapter, endParagraph },
-        bookData.charactersData,
+        getCharactersData(),
       );
       if (cancelled) return;
 
@@ -63,7 +62,7 @@ export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphab
     return () => {
       cancelled = true;
     };
-  }, [loc.chapter, loc.paragraph, loc.endChapter, loc.endParagraph, addNewAtEnd, sortAlphabetically, bookData.charactersData]);
+  }, [loc.chapter, loc.paragraph, loc.endChapter, loc.endParagraph, addNewAtEnd, sortAlphabetically]);
 
   return notes;
 }

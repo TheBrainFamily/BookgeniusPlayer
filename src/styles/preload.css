@@ -102,8 +102,8 @@
 }
 
 .splash-loading-image {
-  width: 100%;
-  height: 100%;
+  width: clamp(4.5rem, 15vw, 7rem);
+  height: clamp(4.5rem, 15vw, 7rem);
   position: relative;
   z-index: 10;
   object-fit: cover;

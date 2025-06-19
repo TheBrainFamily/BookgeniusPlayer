@@ -10,6 +10,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
+            index.html
             package.json
             .prettierrc
             eslint.config.mjs
@@ -19,8 +20,16 @@ jobs:
             tailwind.config.js
             tsconfig.json
             vite.config.mts
+            scripts/start.ts
+            scripts/build.ts
+            scripts/validateAndNormalizeBookPath.ts
+            scripts/generateBook.ts
+            scripts/data/xmlToComplexHtml.ts
+            scripts/data/tools/create-book-metadata.ts
+            scripts/data/tools/Text-Editor/
             src/
             tests/
+            public_books/Krolowa-Sniegu
           sparse-checkout-cone-mode: false
       - uses: pnpm/action-setup@v4
         with:
@@ -35,3 +44,5 @@ jobs:
       - run: pnpm typecheck:ci
       - run: pnpm lint:ci
       - run: pnpm prettier:check
+      - name: Build project
+        run: pnpm build public_books/Krolowa-Sniegu

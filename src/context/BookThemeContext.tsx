@@ -1,16 +1,14 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
-import { BookThemeColors } from "@/booksData/types";
-import { getBookThemeColors } from "@/booksData/bookThemes";
+import { BookThemeColors } from "@/types/book";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
 
 interface BookThemeContextType {
   bookSlug: BOOK_SLUGS;
   themeColors: BookThemeColors;
   setThemeColors: (colors: BookThemeColors) => void;
 }
-const BookThemeContext = createContext<BookThemeContextType>({ bookSlug: CURRENT_BOOK, themeColors: getBookThemeColors(CURRENT_BOOK), setThemeColors: () => {} });
-
-export const useBookTheme = () => useContext(BookThemeContext);
+const BookThemeContext = createContext<BookThemeContextType>({ bookSlug: CURRENT_BOOK, themeColors: getBookData().themeColors, setThemeColors: () => {} });
 
 const applyThemeToDocument = (themeColors: BookThemeColors) => {
   const root = document.documentElement;
@@ -23,7 +21,7 @@ const applyThemeToDocument = (themeColors: BookThemeColors) => {
 
 export const BookThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [bookSlug] = useState<BOOK_SLUGS>(CURRENT_BOOK);
-  const [themeColors, setThemeColors] = useState<BookThemeColors>(getBookThemeColors(bookSlug));
+  const [themeColors, setThemeColors] = useState<BookThemeColors>(getBookData().themeColors);
 
   useEffect(() => {
     applyThemeToDocument(themeColors);

@@ -1,4 +1,12 @@
-import { BOOK_SLUGS } from "@/consts";
+export type BackgroundForBook = { chapter: number; file: string; paragraph: number };
+
+export type BackgroundSongForBook = { chapter: number; files: string[]; paragraph: number };
+
+export type CutSceneForBook = { chapter: number; file: string; paragraph: number; delayInMs?: number; text?: string };
+
+export type WordPosition = [string, number];
+
+export type AudiobookTracksSection = { chapter: number; paragraph: number; file: string; smile_id?: string; "clip-begin": number; "clip-end": number; words?: WordPosition[] };
 
 type InfoPerChapter = { chapter: number; summary: string; label?: string; paragraphsWhereSpotted: number[]; paragraphsWhereTalking: number[] };
 
@@ -14,12 +22,13 @@ export interface BookThemeColors {
 }
 
 export type BookData = {
-  slug: BOOK_SLUGS;
+  slug: string;
   metadata: BookMetadata;
-  charactersData: CharacterData[];
   chapters: number;
   themeColors: BookThemeColors;
   hasAudiobook: boolean;
   bookStringified: string;
   audioPrompt?: string;
 };
+
+export type BackgroundSongSection = { chapter: number; paragraph: number; files: string[] };

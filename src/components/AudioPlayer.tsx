@@ -37,7 +37,7 @@ const AudioPlayer = () => {
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const INACTIVITY_TIMEOUT = 5000;
 
-  const [isPlayingAudioBook, setIsPlayingAudiobook] = useLocalStorageState("isPlayingAudioBook", { defaultValue: true });
+  const [isPlayingAudioBook, setIsPlayingAudiobook] = useState(true);
   const [volume, setVolume] = useLocalStorageState("volume", { defaultValue: getMasterVolume() ?? 0.5 });
   const [balance, setBalance] = useLocalStorageState("balance", { defaultValue: 0.5 });
   const [isMuted, setIsMuted] = useLocalStorageState("isMuted", { defaultValue: false });

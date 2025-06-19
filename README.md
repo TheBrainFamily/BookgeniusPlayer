@@ -6,13 +6,23 @@ BookGenius is an innovative multi-book interactive reading platform that transfo
 
 **Key Features:**
 
-- Multi-book support (1984, Pharaon, Conrad-Tajny-Agent, Krolowa-Sniegu)
+- Multi-book support
 - Synchronized audiobook narration with text highlighting
 - Character avatars with speaking animations
 - Dynamic background videos and music
 - Real-time AI research and character analysis
 - Progressive Web App (PWA) capabilities
 - Cross-platform responsive design
+
+**Available books:**
+
+- 1984
+- 1984-English
+- Conrad-Tajny-Agent
+- Krolowa-Sniegu
+- Lalka
+- Pharaon
+- Snow-Queen - add book content and validate backgrounds, songs, cut scenes
 
 ## Quick Start
 
@@ -22,16 +32,58 @@ BookGenius is an innovative multi-book interactive reading platform that transfo
 # Install dependencies
 pnpm install
 
-# Run with default book (Pharaon)
-pnpm dev
+# Start development server with a specific book
+# The book directory should contain a book.xml file
 
-# Run with specific book
-VITE_BOOK=1984-English VITE_LANG=EN pnpm dev        # English version
-VITE_BOOK=1984 pnpm dev                     # Polish version
-VITE_BOOK=Pharaon pnpm dev                  # Polish version
-VITE_BOOK=Conrad-Tajny-Agent pnpm dev       # Polish version
-VITE_BOOK=Krolowa-Sniegu pnpm dev           # Polish version
+# Using relative paths:
+pnpm start public_books/Krolowa-Sniegu
+
+# Using absolute paths (any directory on your system):
+# Windows:
+pnpm start "C:\Users\username\Desktop\BookGenius\1984"
+pnpm start "D:\MyBooks\Snow-Queen"
+
+# WSL2 (Windows Subsystem for Linux):
+# You can use Windows paths directly - they'll be automatically translated
+pnpm start "C:\Users\username\Desktop\BookGenius\1984"
+pnpm start "D:\MyBooks\Snow-Queen"
+# Or use the WSL2 mount paths directly:
+pnpm start "/mnt/c/Users/username/Desktop/BookGenius/1984"
+
+# macOS/Linux:
+pnpm start "/Users/username/Documents/BookGenius/1984"
+pnpm start "/home/username/books/Snow-Queen"
+pnpm start ~/Desktop/my-book-project
+
+# Current working directory:
+pnpm start "../my-books/Krolowa-Sniegu"
 ```
+
+### Building for Production
+
+```bash
+# Build the application for a specific book (supports same path formats as start)
+pnpm build public_books/Krolowa-Sniegu
+
+# Examples with absolute paths:
+pnpm build "C:\Users\username\Desktop\BookGenius\1984"
+pnpm build "/Users/username/Documents/BookGenius/1984"
+
+# WSL2 examples:
+pnpm build "C:\Users\username\Desktop\BookGenius\1984"  # Auto-translated
+pnpm build "/mnt/c/Users/username/Desktop/BookGenius/1984"  # Direct mount path
+
+# Alternative: use the existing build script (same functionality)
+pnpm build public_books/Krolowa-Sniegu
+```
+
+### Path Requirements
+
+- The book directory can be located **anywhere** on your system
+- The directory must contain a `book.xml` file
+- Paths with spaces should be quoted (e.g., `"C:\My Books\Book Name"`)
+- Both relative and absolute paths are supported
+- Cross-platform compatible (Windows, macOS, Linux)
 
 ### Editor Mode (Development)
 
@@ -47,32 +99,12 @@ tsx src/text-editor-service/server.ts
 
 **Requirements for Editor Mode:**
 
-- VSCode installed
+- Cursor installed (free-plan is enough)
 - Node.js with TypeScript support
-
-### Build and Deploy
-
-```bash
-# Production builds per book
-pnpm run deploy        # Pharaon to /var/www/faraon/
-pnpm run deploy:1984   # 1984 to /var/www/1984/
-pnpm run deploy:conrad # Conrad to /var/www/tajny-agent/
-```
-
-## Architecture Overview
-
-### Core Technologies
-
-- **Frontend**: React 19 + TypeScript + Vite
-- **Styling**: TailwindCSS + Radix UI components
-- **Audio**: Web Audio API with custom crossfading
-- **PWA**: Workbox service worker with offline caching
-- **State**: Zustand stores + React Context
-- **Build**: Multi-book dynamic build system
 
 ### Project Structure
 
-```
+```plaintext
 src/
 ├── App.tsx                    # Main application component
 ├── main.ts                    # Legacy initialization (vanilla JS)
@@ -245,7 +277,7 @@ The application supports multiple books through a sophisticated build-time confi
 - Background sync for user-generated content
 - Update notifications and cache management
 
-#### PWA Features:
+#### PWA Features
 
 - Installable app with custom icons
 - Offline reading capability
@@ -278,9 +310,11 @@ The application supports multiple books through a sophisticated build-time confi
 
 1. **Download DAISY files** - Standard audiobook format with synchronized text
 2. **Convert SMIL to audiobook items**:
+
    ```bash
    bun src/convertSmilToAudiobookItems.ts
    ```
+
 3. **Verify chapter/paragraph alignment** - Ensure audio segments match book XML structure
 4. **Create AudiobookTracksDefined file** in `public_books/{BOOK_SLUG}/audiobook_data/`
 5. **Import and configure** in `getAudiobookTracksForBook.ts` with unique identifier
@@ -288,7 +322,7 @@ The application supports multiple books through a sophisticated build-time confi
 
 ### Audio File Structure
 
-```
+```plaintext
 public_books/{BOOK_NAME}/
 ├── audiobook_data/
 │   └── AudiobookTracksDefined.ts
@@ -362,7 +396,7 @@ pnpm test             # Jest unit tests
 
 ## Asset Structure
 
-```
+```plaintext
 public_books/
 ├── Pharaon/           # Ancient Egyptian book assets
 ├── 1984/              # Orwell's 1984 assets

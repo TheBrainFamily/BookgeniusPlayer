@@ -1,9 +1,9 @@
 import { CURRENT_BOOK } from "./consts";
-import { getCutScenes } from "./cut-scenes-per-book";
+import { getCutScenesForBook } from "./genericBookDataGetters/getCutScenesForBook";
 import "./styles/cutscene-video.css";
 
 export const dealWithCutScenes = ({ currentChapter, currentParagraph }) => {
-  const cutscenesDefined = getCutScenes();
+  const cutscenesDefined = getCutScenesForBook();
   console.log("cut scenes got", cutscenesDefined);
   // const cutScenes = document.querySelectorAll<HTMLElement>(".cut-scene");
   // cutScenes.forEach((cutScene) => {

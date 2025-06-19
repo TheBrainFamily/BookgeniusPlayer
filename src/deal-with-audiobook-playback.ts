@@ -1,7 +1,9 @@
 import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
-import { getAudiobookTracksForBook, AudiobookTracksSection } from "@/getAudiobookTracksForBook"; // Adjust path as needed
+
 import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audiobook-player";
 import { highlightNthOccurrence } from "./highlightWord";
+import { getAudiobookTracksForBook } from "./genericBookDataGetters/getAudiobookTracksForBook";
+import { AudiobookTracksSection } from "./types/book";
 
 const AUDIO_SYNC_SHIFT = -0.1;
 
@@ -91,7 +93,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
       console.log(`Audiobook song check: Currently playing:`, currentPlayingTrackId);
 
       loadTrack(sectionToApply.file).then(() => {
-        console.log("audio loaded", sectionToApply.file);
+        console.log("audio loaded", sectionToApply.file, new Date().toISOString());
         stopAllTracks();
 
         const createEventsForAudiobook = () => {

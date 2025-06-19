@@ -6,7 +6,7 @@ import { systemNavigateTo, getSavedLocation } from "@/helpers/paragraphsNavigati
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { ProgressElement } from "./ProgressElement";
-import { getBookData } from "@/booksData/getBookData";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
 
 const ProgressIndicator: React.FC = () => {
   const {

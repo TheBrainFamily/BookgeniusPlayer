@@ -5,11 +5,12 @@ import { useTranslation } from "react-i18next";
 
 import ModalUI from "./ModalUI";
 import CharacterMedia from "@/components/CharacterMedia";
-import { CharacterData } from "@/booksData/types";
+import { CharacterData } from "@/types/book";
 import { findCharacterSentences, SearchResultItemData } from "@/searchModal";
 import { useLocation } from "@/state/LocationContext";
-import { getBookData } from "@/booksData/getBookData";
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
+import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
+import { highlightSearchInParagraph, cleanupAllSearchHighlights } from "@/utils/textHighlighting";
 
 interface CharacterModalProps {
   onClose: () => void;
@@ -26,8 +27,7 @@ export const findLatestSummaryInRange = (character: CharacterData, endChapter: n
 
 const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, characterSlug, endChapter }) => {
   const { location } = useLocation();
-  const bookData = getBookData();
-  const matchingCharacter = bookData.charactersData.find((character) => character.slug === characterSlug);
+  const matchingCharacter = getCharactersData().find((character) => character.slug === characterSlug);
 
   // If character not found, don't render anything
   if (!matchingCharacter) {
@@ -42,7 +42,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     const searchAppearances = () => {
       setIsLoading(true);
       try {
-        const searchResults = findCharacterSentences(characterSlug, location, bookData);
+        const searchResults = findCharacterSentences(characterSlug, location);
         // Return first 3 appearances
         setCharacterAppearances(searchResults.items.slice(0, 3));
       } catch (error) {
@@ -54,11 +54,20 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     };
 
     searchAppearances();
-  }, [matchingCharacter.characterName, location, bookData.slug]);
+  }, [matchingCharacter.characterName, location]);
 
   const handleAppearanceClick = (appearance: SearchResultItemData) => {
-    console.log(`CharacterModal: Navigating to chapter ${appearance.chapter}, paragraph ${appearance.paragraphNumber}`);
+    // Clean up any existing highlights before navigating
+    cleanupAllSearchHighlights();
+
+    // Update location with 'system' source to trigger scrolling
     systemNavigateTo({ currentChapter: appearance.chapter, currentParagraph: appearance.paragraphNumber });
+
+    // Highlight the character name in the target paragraph after navigation
+    if (matchingCharacter?.characterName) {
+      highlightSearchInParagraph(appearance.chapter, appearance.paragraphNumber, matchingCharacter.characterName);
+    }
+
     onClose();
   };
 
@@ -146,9 +155,13 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                           </div>
                         </div>
 
-                        <motion.div className="text-sm text-white/90 leading-relaxed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-                          {appearance.text}
-                        </motion.div>
+                        <motion.div
+                          className="text-sm text-white/90 leading-relaxed"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.2 }}
+                          dangerouslySetInnerHTML={{ __html: appearance.text }}
+                        />
 
                         <motion.div
                           className="absolute top-2 right-2 opacity-0 group-hover:opacity-100"

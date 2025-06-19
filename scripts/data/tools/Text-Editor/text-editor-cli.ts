@@ -2,7 +2,7 @@ import inquirer from "inquirer";
 import { CURRENT_BOOK } from "@/consts";
 import fs from "fs";
 import { DOMParser } from "@xmldom/xmldom";
-import { TextEditor } from "@/data/tools/Text-Editor/text-editor";
+import { TextEditor } from "./text-editor";
 
 const BOOK_SLUG = CURRENT_BOOK;
 
