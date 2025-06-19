@@ -20,9 +20,9 @@ export function findSimplifiedSentence(id: string, currentScore: number) {
 
   if (lowerVersions.length === 0) {
     // No lower version available, do nothing or handle as needed
-    return { text: null, score: null };
+    return { text: null, score: null, hasLower: false };
   }
 
   lowerVersions.sort((a, b) => b.score - a.score);
-  return { text: lowerVersions[0].text.replace(/<[^>]*>/g, ""), score: lowerVersions[0].score };
+  return { text: lowerVersions[0].text.replace(/<[^>]*>/g, ""), score: lowerVersions[0].score, hasLower: lowerVersions.length > 1 };
 }
