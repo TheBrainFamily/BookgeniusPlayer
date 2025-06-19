@@ -87,7 +87,7 @@ function createMediaElement(
   return null;
 }
 
-function highlightCharacter(character: HTMLSpanElement, openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void) {
+export function highlightCharacter(character: HTMLSpanElement, openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void) {
   const characterSlug = character.dataset.character;
   const listeningSrc = character.dataset.srcListening;
   const isTalking = character.dataset.isTalking === "true";

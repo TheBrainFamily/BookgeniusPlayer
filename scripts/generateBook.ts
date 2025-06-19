@@ -148,7 +148,11 @@ export const getBookStringified = (): string => {
 
   // --- Generate getCharactersData.ts ---
   const characterTags = getCharacterTags(xmlDoc);
-  const characterMetadata = extractCharacterMetadata(xmlDoc, characterTags).map((character) => ({ ...character, bookSlug }));
+  const characterMetadata = extractCharacterMetadata(xmlDoc, characterTags).map((character) => ({
+    ...character,
+    bookSlug,
+    imageUrl: `/${bookSlug}/${character.slug.toLowerCase()}.png`,
+  }));
   const bookSlugNoDashes = bookSlug.replaceAll("-", "");
   const getCharactersDataContent = `import type { CharacterData } from "@/types/book";
 

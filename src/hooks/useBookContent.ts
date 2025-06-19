@@ -3,6 +3,8 @@ import { useCharacterModal } from "@/stores/modals/characterModal.store";
 import { setupPageObserver } from "@/ui/pageObserver";
 import { getBookStringified } from "@/genericBookDataGetters/getBookStringified";
 import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
+import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
+import { activateCharacterInteractions } from "@/helpers/activateCharacterIneractions";
 
 type SentenceData = {
   id: string;
@@ -56,10 +58,13 @@ export function useBookContent(containerId: string) {
 
           // 3. **THE NEW COMPARISON:** Compare scores, not HTML strings!
           if (currentScore !== bestFit.score) {
-            element.innerHTML = textToDisplay;
+            element.innerHTML = replaceXmlTagsIntoHtmlTags(textToDisplay);
 
             // 4. **CRITICAL:** Update the state on the element!
             element.dataset.currentScore = bestFit.score.toString();
+
+            // 5. Activate character interactions for newly transformed content
+            activateCharacterInteractions(element, openCharacterDetailsModal);
           }
         }
       }
