@@ -130,6 +130,14 @@ function generateBookDataFiles(bookDirectoryPath: string, bookSlug: string, xmlD
     generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug);
   }
 
+  const getAllVariantsPath = path.join(bookDirectoryPath, "getAllVariants.ts");
+  if (fs.existsSync(getAllVariantsPath)) {
+    fs.copyFileSync(getAllVariantsPath, path.join(bookOutputPath, "getAllVariants.ts"), fs.constants.COPYFILE_FICLONE);
+  } else {
+    const getAllVariantsContent = `export const getAllVariants = () => [];`;
+    fs.writeFileSync(path.join(bookOutputPath, "getAllVariants.ts"), getAllVariantsContent, "utf-8");
+  }
+
   const getBookStringifiedContent = `const bookStringified = \`<section>${htmlResult}</section>\`;
 
 export const getBookStringified = (): string => {

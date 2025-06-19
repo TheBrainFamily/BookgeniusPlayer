@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
 import { setupPageObserver } from "@/ui/pageObserver";
 import { getBookStringified } from "@/genericBookDataGetters/getBookStringified";
-import { allVariants } from "@/allVariants";
+import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
 
 type SentenceData = {
   id: string;
@@ -11,6 +11,8 @@ type SentenceData = {
 };
 export function useBookContent(containerId: string) {
   const bookStringified = getBookStringified();
+  const allVariants = getAllVariants();
+
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
 
   useEffect(() => {
@@ -21,6 +23,12 @@ export function useBookContent(containerId: string) {
 
       // --- PART B: Slider Interaction ---
       const slider = document.getElementById("complexity-slider");
+
+      if (allVariants.length === 0) {
+        console.warn("No variants found. Complexity Slider will be hidden.");
+        slider.parentElement.style.display = "none";
+        return;
+      }
 
       slider.addEventListener("input", (event: Event) => {
         const currentLevel = parseInt((event.target as HTMLInputElement).value, 10); // A value from 20-100
