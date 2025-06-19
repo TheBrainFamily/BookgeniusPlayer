@@ -1,6 +1,6 @@
 import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
 
-export function findLowerSentenceScore(id: string, currentScore: number) {
+export function findSimplifiedSentence(id: string, currentScore: number) {
   const allVariants = getAllVariants();
   const foundSentence = allVariants.find((s) => s.id === id);
   if (!foundSentence) {

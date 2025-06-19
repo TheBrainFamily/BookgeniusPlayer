@@ -6,7 +6,7 @@ import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
 import { useSentenceModal } from "@/stores/modals/sentenceModal.store";
-import { findLowerSentenceScore } from "@/helpers/findLowerSentenceScore";
+import { findSimplifiedSentence } from "@/helpers/findSimplifiedSentence";
 
 type SentenceData = {
   id: string;
@@ -33,10 +33,11 @@ export function useBookContent(containerId: string) {
       matchingSpans.forEach((span) => {
         span.addEventListener("click", (event) => {
           const target = event.target as HTMLInputElement;
+          const currentSentenceId = target.id;
           const currentSentence = target.textContent;
-          const currentScore = target.getAttribute("data-current-score");
-          const { text: lowerSentence, score: lowerSentenceScore } = findLowerSentenceScore(target.id, parseInt(currentScore));
-          openSentenceModal(currentSentence, lowerSentence, target.id, lowerSentenceScore);
+          const currentSentenceScore = target.getAttribute("data-current-score");
+          const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentence(target.id, parseInt(currentSentenceScore));
+          openSentenceModal(currentSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
         });
       });
 
