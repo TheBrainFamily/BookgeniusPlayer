@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
 import { setupPageObserver } from "@/ui/pageObserver";
 import { getBookStringified } from "@/genericBookDataGetters/getBookStringified";
-import { allVariants } from "@/books/allVariants";
+import { allVariants } from "@/allVariants";
 
 type SentenceData = {
   id: string;
