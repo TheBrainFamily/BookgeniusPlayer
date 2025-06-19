@@ -4,7 +4,7 @@ import { setupPageObserver } from "@/ui/pageObserver";
 import { getBookStringified } from "@/genericBookDataGetters/getBookStringified";
 import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
-import { activateCharacterInteractions } from "@/helpers/activateCharacterIneractions";
+import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
 
 type SentenceData = {
   id: string;
