@@ -5,6 +5,8 @@ import { getBookStringified } from "@/genericBookDataGetters/getBookStringified"
 import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
+import { useSentenceModal } from "@/stores/modals/sentenceModal.store";
+import { findLowerSentenceScore } from "@/helpers/findLowerSentenceScore";
 
 type SentenceData = {
   id: string;
@@ -16,12 +18,27 @@ export function useBookContent(containerId: string) {
   const allVariants = getAllVariants();
 
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
+  const { openModal: openSentenceModal } = useSentenceModal();
 
   useEffect(() => {
     const container = document.getElementById(containerId);
     if (container) {
       container.innerHTML = bookStringified.replace(/<\/section>(?!.*<\/section>)/s, '<div style="height: 50vh;"></div></section>');
       setupPageObserver(openCharacterDetailsModal);
+
+      const allSpans = container.querySelectorAll("span");
+      const regex = /^ch\d+-p\d+-s\d+$/;
+      const matchingSpans = Array.from(allSpans).filter((span) => regex.test(span.id));
+
+      matchingSpans.forEach((span) => {
+        span.addEventListener("click", (event) => {
+          const target = event.target as HTMLInputElement;
+          const currentSentence = target.textContent;
+          const currentScore = target.getAttribute("data-current-score");
+          const { text: lowerSentence, score: lowerSentenceScore } = findLowerSentenceScore(target.id, parseInt(currentScore));
+          openSentenceModal(currentSentence, lowerSentence, target.id, lowerSentenceScore);
+        });
+      });
 
       // --- PART B: Slider Interaction ---
       const slider = document.getElementById("complexity-slider");
