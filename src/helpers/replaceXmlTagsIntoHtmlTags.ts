@@ -42,5 +42,34 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
     });
   }
 
+  // Handle self-closing tags like <alice talking="true" />
+  const selfClosingRegex = new RegExp(`<(${characterTagPattern})\\s+(talking|listening)="true"\\s*\\/>`, "gi");
+  outputText = outputText.replace(selfClosingRegex, (match, tagName, attribute) => {
+    const foundCharacter = characters.find((char) => char.slug.toLowerCase() === tagName.toLowerCase());
+
+    if (!foundCharacter) {
+      console.warn(`Internal error: Character data not found for tag: ${tagName}. This should not happen with the dynamic regex.`);
+      return match;
+    }
+
+    const attributeName = attribute.toLowerCase();
+
+    const newAttributes = {
+      class: `character-placeholder character-${attributeName}`,
+      "data-character": foundCharacter.slug,
+      [`data-src-${attributeName}`]: foundCharacter.imageUrl,
+      [`data-is-${attributeName}`]: "true",
+      "data-media-injected": "true",
+    };
+
+    const attributeString = Object.entries(newAttributes)
+      .map(([key, value]) => `${key}="${value}"`)
+      .join(" ");
+
+    const imgTag = `<img src="${foundCharacter.imageUrl}" class="inline-avatar" data-character="${foundCharacter.slug}">`;
+
+    return `<span ${attributeString}>${imgTag}</span>`;
+  });
+
   return outputText;
 };

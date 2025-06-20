@@ -148,7 +148,10 @@ export const getBookStringified = (): string => {
 
   // --- Generate getCharactersData.ts ---
   const characterTags = getCharacterTags(xmlDoc);
-  const characterMetadata = extractCharacterMetadata(xmlDoc, characterTags).map((character) => ({
+  const parser = new DOMParser();
+  const updatedString = bookXml.replaceAll(/<\/?span[^>]*>/g, "");
+  const xmlDocWithoutSpans = parser.parseFromString(updatedString, "text/xml");
+  const characterMetadata = extractCharacterMetadata(xmlDocWithoutSpans, characterTags).map((character) => ({
     ...character,
     bookSlug,
     imageUrl: `/${bookSlug}/${character.slug.toLowerCase()}.png`,
