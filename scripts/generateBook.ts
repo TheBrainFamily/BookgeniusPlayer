@@ -8,9 +8,9 @@ import { generateDataFiles, xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterTags } from "./data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
 
-async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: string; bookTitle: string }> {
+async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
-  const { bookSlug, xmlDoc } = parseBookXmlData(bookDirectoryPath);
+  const { bookSlug, bookLanguage, xmlDoc } = parseBookXmlData(bookDirectoryPath);
 
   // Ensure output directory exists
   const bookOutputPath = path.resolve("src", "books", bookSlug);
@@ -21,7 +21,7 @@ async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: stri
   // Generate files
   generateKnownVideoFiles(bookDirectoryPath, bookOutputPath);
   generateAudiobookTracksFile(bookDirectoryPath, bookOutputPath);
-  generateBookDataFiles(bookDirectoryPath, bookSlug, xmlDoc);
+  generateBookDataFiles(bookDirectoryPath, bookSlug, bookLanguage, xmlDoc);
 
   // Wait a moment for file generation to complete
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -29,13 +29,13 @@ async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: stri
   // Load and validate generated book data
   const bookData = await loadAndValidateBookData(bookOutputPath);
 
-  console.log(`✅ Book data generated successfully for ${bookSlug}`);
+  console.log(`✅ Book data generated successfully for ${bookSlug} (Language: ${bookLanguage})`);
   console.log(`📁 Output directory: ${bookOutputPath}`);
 
-  return { bookSlug: bookData.slug, bookTitle: bookData.metadata.title };
+  return { bookSlug: bookData.slug, bookTitle: bookData.metadata.title, bookLanguage };
 }
 
-function parseBookXmlData(bookDirectoryPath: string): { bookSlug: string; xmlDoc: Document } {
+function parseBookXmlData(bookDirectoryPath: string): { bookSlug: string; bookLanguage: string; xmlDoc: Document } {
   const bookXmlPath = `${bookDirectoryPath}/book.xml`;
   if (!fs.existsSync(bookXmlPath)) {
     throw new Error(`book.xml not found at ${bookXmlPath}`);
@@ -60,7 +60,13 @@ function parseBookXmlData(bookDirectoryPath: string): { bookSlug: string; xmlDoc
     throw new Error("BookSlug element is empty or null");
   }
 
-  return { bookSlug, xmlDoc };
+  const bookLangElements = xmlDoc.getElementsByTagName("BookLanguage");
+  let bookLanguage = "polish";
+  if (bookLangElements.length > 0 && bookLangElements[0].textContent) {
+    bookLanguage = bookLangElements[0].textContent.trim().toLowerCase();
+  }
+
+  return { bookSlug, bookLanguage, xmlDoc };
 }
 
 function generateKnownVideoFiles(bookDirectoryPath: string, bookOutputPath: string): void {
@@ -106,7 +112,7 @@ export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
   fs.writeFileSync(path.join(bookOutputPath, "getAudiobookTracksForBook.ts"), getAudiobookTracksForBookContent, "utf-8");
 }
 
-function generateBookDataFiles(bookDirectoryPath: string, bookSlug: string, xmlDoc: Document): void {
+function generateBookDataFiles(bookDirectoryPath: string, bookSlug: string, bookLang: string, xmlDoc: Document): void {
   const chapters = xmlDoc.getElementsByTagName("Chapter");
   const chapterCount = chapters.length;
   const bookOutputPath = path.resolve("src", "books", bookSlug);
@@ -170,7 +176,7 @@ import { getBookStringified } from "@/books/${bookSlug}/getBookStringified";
 
 export const bookData: BookData = {
   slug: "${bookSlug}",
-  metadata: { title: "${bookSlugNoDashes}" },
+  metadata: { title: "${bookSlugNoDashes}", language: "${bookLang}" },
   chapters: ${chapterCount},
   themeColors: {
     primaryColor: "#E3F2FD",
@@ -211,8 +217,8 @@ async function main() {
 
   try {
     console.log(`🔨 Generating book data for ${bookDirectoryPath}...`);
-    const { bookSlug, bookTitle } = await generateBook(bookDirectoryPath);
-    console.log(`🎉 Book generation completed for ${bookSlug} (${bookTitle})`);
+    const { bookSlug, bookTitle, bookLanguage } = await generateBook(bookDirectoryPath);
+    console.log(`🎉 Book generation completed for ${bookSlug} (${bookTitle}) - Language: ${bookLanguage}`);
   } catch (error) {
     console.error(`❌ Book generation failed:`);
 
