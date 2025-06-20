@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import ModalUI from "./ModalUI";
 import { findSimplifiedSentence } from "@/helpers/findSimplifiedSentence";
+import { Button } from "@/components/ui/button";
 
 interface SentenceModalProps {
   onClose: () => void;
@@ -49,9 +50,9 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
           <p className="text-red-500 font-bold">There is no more simplified version of a current sentence.</p>
         </div>
       )}
-      <button className="border px-4 py-1 rounded-lg cursor-pointer" onClick={handleClick} disabled={!isMoreSimplifiedSentence}>
+      <Button className="border px-4 py-1 rounded-lg cursor-pointer" onClick={handleClick} disabled={!isMoreSimplifiedSentence}>
         Get Simplified Sentence
-      </button>
+      </Button>
     </ModalUI>
   );
 };
