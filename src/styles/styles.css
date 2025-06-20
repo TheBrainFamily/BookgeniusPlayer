@@ -140,17 +140,6 @@
           rgba(0 0 0 / 0.2) 70%,
           transparent 100%
         ),
-        linear-gradient(
-          to right,
-          transparent 0,
-          rgba(0 0 0 / 0.4) 1%,
-          rgba(0 0 0 / 0.7) 2%,
-          rgba(0 0 0 / 1) 4%,
-          rgba(0 0 0 / 1) 96%,
-          rgba(0 0 0 / 0.7) 98%,
-          rgba(0 0 0 / 0.4) 99%,
-          transparent 100%
-        ),
         radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
 
       mask-composite: intersect;
@@ -169,7 +158,6 @@
             rgba(0 0 0 / 0.2) 70%,
             transparent 100%
           ),
-          linear-gradient(to right, transparent 0, rgba(0 0 0 / 0.4) 1%, rgba(0 0 0 / 0.7) 2%, rgba(0 0 0 / 1) 4%, rgba(0 0 0 / 1) 100%),
           radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
       }
 
