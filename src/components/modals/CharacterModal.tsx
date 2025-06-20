@@ -156,7 +156,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                         </div>
 
                         <motion.div
-                          className="text-sm text-white/90 leading-relaxed"
+                          className="text-sm text-white/90 leading-relaxed line-clamp-3"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.2 }}
