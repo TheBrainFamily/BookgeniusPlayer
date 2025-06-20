@@ -4,9 +4,8 @@ import { motion, Variants } from "motion/react";
 import { Search, FileText } from "lucide-react";
 
 import { SearchResultsData, SearchResultItemData, cleanupSearchChapters } from "@/searchModal";
-import { useLocation } from "@/state/LocationContext";
-import ModalUI from "./ModalUI";
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
+import ModalUI from "./ModalUI";
 
 interface SearchModalProps {
   onClose: () => void;
@@ -16,7 +15,6 @@ interface SearchModalProps {
 }
 
 const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults }) => {
-  const { setLocation } = useLocation();
   const { t } = useTranslation();
 
   // Cleanup search chapters when modal unmounts
@@ -26,15 +24,12 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
     };
   }, []);
 
-  const handleSearchResultClick = useCallback(
-    (item: SearchResultItemData) => {
-      console.log(`SearchModal: Navigating to chapter ${item.chapter}, paragraph ${item.paragraphNumber}`);
+  const handleSearchResultClick = useCallback((item: SearchResultItemData) => {
+    console.log(`SearchModal: Navigating to chapter ${item.chapter}, paragraph ${item.paragraphNumber}`);
 
-      // Update location with 'system' source to trigger scrolling
-      systemNavigateTo({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber });
-    },
-    [onClose, setLocation],
-  );
+    // Update location with 'system' source to trigger scrolling
+    systemNavigateTo({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber });
+  }, []);
 
   const modalTitle = (
     <div className="flex items-center gap-2">
