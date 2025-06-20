@@ -14,13 +14,15 @@ interface BookChaptersModalProps {
 const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
   const { t } = useTranslation();
   const bookData = getBookData();
+
   const chapters = useMemo(() => {
     if (!bookData || typeof bookData.chapters !== "number") {
       return [];
     }
+
     const pageChapters = Array.from({ length: bookData.chapters }, (_, i) => ({ chapter: i + 1, page: (i + 1).toString() }));
-    return pageChapters.map((page) => ({ id: page.chapter, title: getTitle(page.chapter), page: page.page }));
-  }, [bookData]);
+    return pageChapters.map((page) => ({ id: page.chapter, title: getTitle(page.chapter, t), page: page.page }));
+  }, [bookData, t]);
 
   const navigateToChapter = (chapterId: number) => {
     systemNavigateTo({ currentChapter: chapterId, currentParagraph: 0 });
