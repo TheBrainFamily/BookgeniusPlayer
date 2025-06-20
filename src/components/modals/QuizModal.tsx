@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion, Variants, AnimatePresence } from "motion/react";
+import { motion, Variants } from "motion/react";
 import { HelpCircle, Check, X } from "lucide-react";
 
 import ModalUI from "./ModalUI";
@@ -19,28 +19,22 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question }) => {
     setSelectedAnswerId(answerId);
     setShowResult(true);
 
-    // Close modal after 2 seconds
     setTimeout(() => {
       onClose();
-    }, 2000);
+    }, 3000);
   };
 
   const getAnswerButtonClasses = (answer: QuizAnswer) => {
-    const baseClasses = "w-full p-6 text-left border-2 rounded-xl transition-all duration-300 cursor-pointer relative overflow-hidden shadow-lg";
+    const baseClasses = "w-full p-6 text-left border-2 rounded-xl cursor-pointer relative overflow-hidden shadow-lg";
 
     if (!showResult) {
-      return `${baseClasses} ${
-        selectedAnswerId === answer.id
-          ? "border-blue-400 bg-gradient-to-r from-blue-400/20 to-blue-500/20 shadow-lg shadow-blue-400/30 transform scale-105"
-          : "border-white/30 bg-white/5 hover:bg-white/10 hover:border-white/50 hover:shadow-xl hover:shadow-white/10"
-      }`;
+      return `${baseClasses} border-white/30 bg-white/5`;
     }
 
-    // Show results
     if (answer.isCorrect) {
-      return `${baseClasses} border-green-400 bg-gradient-to-r from-green-400/20 to-green-500/20 shadow-lg shadow-green-400/30`;
+      return `${baseClasses} border-green-400 bg-gradient-to-r from-green-400/20 to-green-500/20`;
     } else if (selectedAnswerId === answer.id) {
-      return `${baseClasses} border-red-400 bg-gradient-to-r from-red-400/20 to-red-500/20 shadow-lg shadow-red-400/30`;
+      return `${baseClasses} border-red-400 bg-gradient-to-r from-red-400/20 to-red-500/20`;
     } else {
       return `${baseClasses} border-white/20 bg-white/5 opacity-60`;
     }
@@ -114,11 +108,20 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question }) => {
             className={getAnswerButtonClasses(answer)}
             disabled={showResult}
             variants={variants.answerItem}
-            initial="hidden"
+            initial={showResult ? false : "hidden"}
             animate="visible"
-            transition={{ delay: index * 0.15 }}
-            whileHover={{ scale: showResult ? 1 : 1.03 }}
+            transition={{ delay: showResult ? 0 : index * 0.15 }}
+            whileHover={{
+              scale: showResult ? 1 : 1.03,
+              borderColor: showResult ? undefined : "rgba(255, 255, 255, 0.5)",
+              backgroundColor: showResult ? undefined : "rgba(255, 255, 255, 0.1)",
+            }}
             whileTap={{ scale: showResult ? 1 : 0.97 }}
+            style={{
+              borderColor: !showResult && selectedAnswerId === answer.id ? "rgb(96, 165, 250)" : undefined,
+              backgroundColor: !showResult && selectedAnswerId === answer.id ? "rgba(59, 130, 246, 0.2)" : undefined,
+              transform: !showResult && selectedAnswerId === answer.id ? "scale(1.02)" : undefined,
+            }}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -156,32 +159,18 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question }) => {
 
   return (
     <ModalUI title={modalTitle} onClose={onClose} size="lg">
-      <motion.div className="flex flex-col h-full relative overflow-hidden px-2" variants={variants.container} initial="hidden" animate="visible" exit="exit">
+      <motion.div className="flex flex-col h-full relative overflow-hidden p-4" variants={variants.container} initial="hidden" animate="visible" exit="exit">
         <div className="relative z-10 flex-1 flex items-center justify-center">
           <div className="w-full">
-            <AnimatePresence mode="wait">
-              {showResult ? (
-                <motion.div
-                  key="result"
-                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                >
-                  {renderQuizComplete()}
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="question"
-                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                >
-                  {renderQuestion()}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {showResult ? (
+              <motion.div key="result" initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.4, ease: "easeOut" }}>
+                {renderQuizComplete()}
+              </motion.div>
+            ) : (
+              <motion.div key="question" initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.4, ease: "easeOut" }}>
+                {renderQuestion()}
+              </motion.div>
+            )}
           </div>
         </div>
       </motion.div>
@@ -195,14 +184,8 @@ const variants: Record<string, Variants> = {
     visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut", staggerChildren: 0.15, delayChildren: 0.1 } },
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.3 } },
   },
-  item: {
-    hidden: { opacity: 0, y: 30, scale: 0.95 },
-    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: "easeOut", type: "spring", stiffness: 100, damping: 15 } },
-  },
-  answerItem: {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut", type: "spring", stiffness: 120, damping: 20 } },
-  },
+  item: { hidden: { opacity: 0, y: 30, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5 } } },
+  answerItem: { hidden: { opacity: 0, scale: 0.9 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } } },
 };
 
 export default QuizModal;
