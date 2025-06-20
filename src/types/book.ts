@@ -12,7 +12,7 @@ type InfoPerChapter = { chapter: number; summary: string; label?: string; paragr
 
 export type CharacterData = { slug: string; characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; imageUrl: string };
 
-type BookMetadata = { title: string };
+type BookMetadata = { title: string; language?: string };
 
 export interface BookThemeColors {
   primaryColor: string;

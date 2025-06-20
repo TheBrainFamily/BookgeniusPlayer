@@ -11,10 +11,13 @@ async function start() {
 
   try {
     console.log(`🔨 Generating book data for ${bookDirectoryPath}...`);
-    const { bookSlug, bookTitle } = await generateBook(bookDirectoryPath);
-    console.log(`🎉 Book generation completed for ${bookSlug} (${bookTitle})`);
+    const { bookSlug, bookTitle, bookLanguage } = await generateBook(bookDirectoryPath);
+    console.log(`🎉 Book generation completed for ${bookSlug} (${bookTitle}) - Language: ${bookLanguage}`);
 
-    const command = `VITE_BOOK_DIR=${JSON.stringify(bookDirectoryPath)} pnpm exec vite dev`;
+    const langMapping: Record<string, string> = { polish: "pl", english: "en" };
+    const viteLanguage = langMapping[bookLanguage] || "pl";
+
+    const command = `VITE_BOOK_DIR=${JSON.stringify(bookDirectoryPath)} VITE_LANG=${viteLanguage} pnpm exec vite dev`;
     console.log(`🚀 Executing: ${command}`);
     execSync(command, { stdio: "inherit" });
   } catch (error) {

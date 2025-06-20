@@ -7,6 +7,7 @@ import { BookMenuModalRenderer } from "./modals/bookMenu/BookMenuModalRenderer";
 import { EditorModeModalRenderer } from "./modals/editorMode/EditorModeModalRenderer";
 import { ApiKeyModalRenderer } from "./modals/apiKey/ApiKeyModalRenderer";
 import { SentenceModalRenderer } from "./modals/sentence/SentenceModalRenderer";
+import { QuizModalRenderer } from "./modals/quiz/QuizModalRenderer";
 
 export const ModalRenderers: React.FC = () => {
   return (
@@ -19,6 +20,7 @@ export const ModalRenderers: React.FC = () => {
       <EditorModeModalRenderer />
       <ApiKeyModalRenderer />
       <SentenceModalRenderer />
+      <QuizModalRenderer />
     </>
   );
 };

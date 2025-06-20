@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { List, Type, RotateCcw, Music, BrainCircuit } from "lucide-react";
+import { List, Type, RotateCcw, Music, BrainCircuit, HelpCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useLocalStorageState from "use-local-storage-state";
 
@@ -9,6 +9,7 @@ import { Slider } from "@/components/ui/slider";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { cn } from "@/lib/utils";
 import ModalUI from "./ModalUI";
+import { useQuizModal } from "@/stores/modals/quizModal.store";
 
 interface BookMenuModalProps {
   onClose: () => void;
@@ -54,6 +55,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hiddenParagraphsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { t } = useTranslation();
+  const { openModal: openQuizModal } = useQuizModal();
 
   const handleFontSizeChange = (value: number[]) => {
     const fontSize = value[0];
@@ -145,6 +147,27 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
         >
           <BrainCircuit className="mr-2 h-4 w-4" />
           {t("set_openai_api_key")}
+        </Button>
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
+          onClick={() => {
+            const question = {
+              id: "q3",
+              question: "What is 2 + 2?",
+              answers: [
+                { id: "a1", text: "3", isCorrect: false },
+                { id: "a2", text: "4", isCorrect: true },
+                { id: "a3", text: "5", isCorrect: false },
+                { id: "a4", text: "6", isCorrect: false },
+              ],
+            };
+            openQuizModal(question);
+            onClose();
+          }}
+        >
+          <HelpCircle className="mr-2 h-4 w-4" />
+          Quiz (Test)
         </Button>
       </div>
       <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300")}>
