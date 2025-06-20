@@ -22,7 +22,7 @@ BookGenius is an innovative multi-book interactive reading platform that transfo
 - Krolowa-Sniegu
 - Lalka
 - Pharaon
-- Snow-Queen
+- Snow-Queen - add book content and validate backgrounds, songs, cut scenes
 
 ## Quick Start
 
