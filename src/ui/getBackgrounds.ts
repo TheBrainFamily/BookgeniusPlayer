@@ -1,18 +1,19 @@
+import type { BackgroundForBook } from "@/types/book";
 import type { Background } from "./background";
 import { getBackgroundsForBook } from "@/genericBookDataGetters/getBackgroundsForBook";
 
 export const getBackgrounds = (): Background[] => {
   // Helper function to process background inputs and set proper end paragraphs
-  const processBackgroundInputs = (inputs: { chapter: number; file: string; startParagraph?: number }[]): Background[] => {
+  const processBackgroundInputs = (inputs: BackgroundForBook[]): Background[] => {
     // Group by chapter
     const chapterGroups: Record<number, { chapter: number; file: string; startParagraph: number }[]> = {};
 
     // First, normalize and group by chapter
-    inputs.forEach(({ chapter, file, startParagraph = 0 }) => {
+    inputs.forEach(({ chapter, file, paragraph = 0 }) => {
       if (!chapterGroups[chapter]) {
         chapterGroups[chapter] = [];
       }
-      chapterGroups[chapter].push({ chapter, file, startParagraph });
+      chapterGroups[chapter].push({ chapter, file, startParagraph: paragraph });
     });
 
     // Process each chapter group

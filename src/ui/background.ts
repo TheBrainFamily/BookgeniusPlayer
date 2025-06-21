@@ -98,6 +98,10 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
           currentLocation.currentParagraph <= bg.endParagraph,
       );
 
+      console.log("DAMIANO currentLocation", currentLocation);
+      console.log("DAMIANO backgrounds", backgrounds);
+      console.log("DAMIANO found", found);
+
       /* ---- cancel zooms *before* any early-return --------------------- */
 
       if (!found) {
