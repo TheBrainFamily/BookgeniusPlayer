@@ -10,7 +10,7 @@ import { getSavedLocation } from "@/helpers/paragraphsNavigation";
 
 export const useSearchLogic = () => {
   const { query, isOpen, setResults } = useSearchModal();
-  const savedLocation = getSavedLocation();
+  const savedLocation = useMemo(() => getSavedLocation(), []);
 
   /* ------------------------------------------------------------------ *
    * 1 ️⃣  Unified-search debounce (1 s, returns a real Promise)
