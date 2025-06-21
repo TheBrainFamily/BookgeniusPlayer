@@ -110,13 +110,20 @@ export const xmlToComplexHtml = (
 
       if (tagName === "p") {
         let pContent = "";
+        let hasSignificantTextContent = false;
 
         for (let k = 0; k < childElement.childNodes.length; k++) {
           const pNode = childElement.childNodes[k];
 
           // ── 1) TEXT ──
           if (pNode.nodeType === 3) {
-            pContent += pNode.textContent;
+            const textContent = pNode.textContent || "";
+
+            if (textContent.trim().length > 0) {
+              hasSignificantTextContent = true;
+            }
+
+            pContent += textContent;
             continue;
           }
 
@@ -133,7 +140,13 @@ export const xmlToComplexHtml = (
               for (let m = 0; m < pElement.childNodes.length; m++) {
                 const sub = pElement.childNodes[m];
                 if (sub.nodeType === 3) {
-                  inner += sub.textContent;
+                  const subTextContent = sub.textContent || "";
+
+                  if (subTextContent.trim().length > 0) {
+                    hasSignificantTextContent = true;
+                  }
+
+                  inner += subTextContent;
                 } else if (sub.nodeType === 1) {
                   const e = sub as Element;
                   const char = characterMap.get(e.tagName);
@@ -143,7 +156,8 @@ export const xmlToComplexHtml = (
                     const talkingSrc = getTalkingMediaFilePathForName(slug, bookSlug);
                     const listeningSrc = getListeningMediaFilePathForName(slug, bookSlug);
                     if (isTalking) {
-                      inner += `<span class="character-placeholder character-talking" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
+                      const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
+                      inner += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
                     } else {
                       inner += `<span class="character-highlighted" data-character="${slug}" data-src-listening="${listeningSrc}">${e.textContent}</span>`;
                     }
@@ -184,13 +198,15 @@ export const xmlToComplexHtml = (
               const talkingSrc = getTalkingMediaFilePathForName(slug, bookSlug);
               const listeningSrc = getListeningMediaFilePathForName(slug, bookSlug);
               if (isTalking) {
-                pContent += `<span class="character-placeholder character-talking" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
+                const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
+                pContent += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
               } else {
                 pContent += `<span class="character-highlighted" data-character="${slug}" data-src-listening="${listeningSrc}">${pElement.textContent}</span>`;
               }
             }
             // 2c) notes / formatting / default
             else {
+              hasSignificantTextContent = true;
               switch (pElement.tagName) {
                 case "note":
                   pContent += `<a href="#fn${pElement.getAttribute("id")}" class="link-note">${pElement.textContent}</a>`;
