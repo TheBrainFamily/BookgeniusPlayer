@@ -17,19 +17,15 @@ export function useBookContent(containerId: string) {
       container.innerHTML = bookStringified.replace(/<\/section>(?!.*<\/section>)/s, '<div style="height: 50vh;"></div></section>');
       setupPageObserver(openCharacterDetailsModal);
 
-      const allSpans = container.querySelectorAll("span");
-      const regex = /^ch\d+-p\d+-s\d+$/;
-      const matchingSpans = Array.from(allSpans).filter((span) => regex.test(span.id));
-
-      matchingSpans.forEach((span) => {
-        span.addEventListener("click", (event) => {
-          const target = event.target as HTMLInputElement;
+      container.addEventListener("click", (event) => {
+        const target = event.target as HTMLInputElement;
+        if (target.tagName === "SPAN" && /^ch\d+-p\d+-s\d+$/.test(target.id)) {
           const currentSentenceId = target.id;
           const currentSentence = target.textContent;
           const currentSentenceScore = target.getAttribute("data-current-score");
           const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentence(target.id, parseInt(currentSentenceScore));
           openSentenceModal(currentSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
-        });
+        }
       });
     } else {
       console.warn(`Container with id '${containerId}' not found for content injection.`);
