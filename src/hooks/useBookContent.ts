@@ -19,13 +19,14 @@ export function useBookContent(containerId: string) {
       container.innerHTML = bookStringified.replace(/<\/section>(?!.*<\/section>)/s, '<div style="height: 50vh;"></div></section>');
       setupPageObserver(openCharacterDetailsModal);
 
-      container.addEventListener("click", (event) => {
+      const handleClick = (event) => {
         const target = event.target as HTMLInputElement;
         if (target.tagName === "SPAN" && /^ch\d+-p\d+-s\d+$/.test(target.id)) {
           const currentSentenceId = target.id;
           // const currentSentence = target.textContent;
           const currentSentenceScore = target.getAttribute("data-current-score");
           const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentence(target.id, parseInt(currentSentenceScore));
+
           if (!simplifiedSentence) {
             console.warn(`Simplified sentence not found for ${currentSentenceId}`);
             return;
@@ -39,7 +40,13 @@ export function useBookContent(containerId: string) {
           activateCharacterInteractions(target, openCharacterDetailsModal);
           // openSentenceModal(currentSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
         }
-      });
+      };
+
+      container.addEventListener("click", handleClick);
+
+      return () => {
+        container.removeEventListener("click", handleClick);
+      };
     } else {
       console.warn(`Container with id '${containerId}' not found for content injection.`);
     }
