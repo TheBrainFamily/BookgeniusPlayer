@@ -6,7 +6,7 @@
  */
 
 /* ------------------------------------------------------------------ */
-import type { Location } from "@/state/LocationContext";
+import { DEFAULT_LOCATION, type Location } from "@/state/LocationContext";
 
 /* ------------------------------------------------------------------ */
 /*  Bridge interface for legacy helpers                               */
@@ -16,7 +16,7 @@ interface Bridge {
 }
 
 let _bridge: Bridge = {
-  get: () => ({ chapter: 1, paragraph: 0, endChapter: 1, endParagraph: 0, currentChapter: 1, currentParagraph: 0 }),
+  get: () => DEFAULT_LOCATION,
 
   set: () => {},
 };
@@ -43,10 +43,18 @@ export const getCurrentLocation = (): Location => _bridge.get();
  * Never moves the bookmark backwards.
  */
 export const setCurrentLocation = (loc: Location) => {
+  if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
+    console.error("Invalid location provided to setCurrentLocation:", loc);
+    return;
+  }
+
   _bridge.set(loc);
 
   setTimeout(() => {
-    window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
+    const chapter = Number(loc.currentChapter) || 1;
+    const paragraph = Number(loc.currentParagraph) || 1;
+
+    window.location.hash = `${chapter}-${paragraph}`;
   }, 2000);
 
   const saved = getSavedLocation();
@@ -65,6 +73,11 @@ export const setCurrentLocation = (loc: Location) => {
  * Navigate to a specific location with system source (triggers scrolling)
  */
 export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph: number }) => {
+  if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
+    console.error("Invalid location provided to systemNavigateTo:", loc);
+    return;
+  }
+
   const fullLocation: Location = {
     chapter: loc.currentChapter,
     paragraph: loc.currentParagraph,
@@ -79,9 +92,13 @@ export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph
 
   // Update the saved location to prevent conflicts
   const saved = getSavedLocation();
-  const ahead = loc.currentChapter > saved.currentChapter || (loc.currentChapter === saved.currentChapter && loc.currentParagraph > saved.currentParagraph);
-  if (ahead) {
+  if (!saved) {
     setSavedLocation(fullLocation);
+  } else {
+    const ahead = loc.currentChapter > saved.currentChapter || (loc.currentChapter === saved.currentChapter && loc.currentParagraph > saved.currentParagraph);
+    if (ahead) {
+      setSavedLocation(fullLocation);
+    }
   }
 
   // Update hash immediately for system navigation
@@ -104,6 +121,7 @@ export const goToParagraph = (loc: { currentChapter: number; currentParagraph: n
 export const shouldShowReturnButton = (): boolean => {
   const current = getCurrentLocation();
   const saved = getSavedLocation();
+
   return saved.currentChapter > current.currentChapter || (saved.currentChapter === current.currentChapter && saved.currentParagraph - 5 > current.currentParagraph);
 };
 
@@ -145,6 +163,7 @@ window.addEventListener("orientationchange", handleResizeOrOrientationChange);
 export const parseLocationFromHash = (): Location | null => {
   const hash = window.location.hash.substring(1); // Remove leading #
   console.log("hash", hash);
+
   if (!hash) return null;
 
   const parts = hash.split("-");
@@ -174,10 +193,12 @@ export const goToInitialLocationFromHash = () => {
     // Fallback if hash is invalid or missing: go to furthest saved location
     console.warn("no location in hash, using saved location");
     const saved = getSavedLocation();
+
     if (saved) {
       systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph });
     } else {
       console.warn("no saved location, using default location");
+      systemNavigateTo({ currentChapter: 1, currentParagraph: 1 });
     }
   }
 };

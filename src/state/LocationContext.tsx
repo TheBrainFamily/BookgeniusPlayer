@@ -17,14 +17,16 @@ export interface LocationWithMetadata {
   source: "user" | "system";
 }
 
+export const DEFAULT_LOCATION: Location = { chapter: 1, paragraph: 1, endChapter: 1, endParagraph: 1, currentChapter: 1, currentParagraph: 1 };
+
 /* ------------------------------------------------------------------ */
 /*  Load the *initial* reader position from LS — nothing more         */
 const loadFromLS = (): Location => {
   try {
     const raw = localStorage.getItem("furthestLocation");
-    return raw ? JSON.parse(raw) : { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 };
+    return raw ? JSON.parse(raw) : DEFAULT_LOCATION;
   } catch {
-    return { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 };
+    return DEFAULT_LOCATION;
   }
 };
 
@@ -35,18 +37,14 @@ interface LocationCtx {
   setLocation: (loc: Location, source?: "user" | "system") => void;
 }
 
-export const LocationContext = createContext<LocationCtx>({
-  location: { chapter: 0, paragraph: 0, endChapter: 0, endParagraph: 0, currentChapter: 0, currentParagraph: 0 },
-  lastSystemLocation: null,
-  setLocation: () => {},
-});
+export const LocationContext = createContext<LocationCtx>({ location: DEFAULT_LOCATION, lastSystemLocation: null, setLocation: () => {} });
 
 /* ------------------------------------------------------------------ */
 export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Load initial location from URL hash or localStorage
   const initialLocation = useMemo(() => {
     const hashLocation = parseLocationFromHash();
-    return hashLocation || loadFromLS();
+    return hashLocation || loadFromLS() || DEFAULT_LOCATION;
   }, []);
 
   const [location, setLocationState] = useState<Location>(initialLocation);
