@@ -1,7 +1,7 @@
 import { Location } from "./state/LocationContext";
 
 export async function deepResearchCall(searchQuery: string, location: Location): Promise<string> {
-  const baseUrl = "/api/deepResearch"; // Assuming localhost for now
+  const baseUrl = "/deepResearch"; // Assuming localhost for now
   const filter = {
     chapterFrom: 1, // Based on the curl example
     chapterTo: location.chapter,
@@ -10,7 +10,7 @@ export async function deepResearchCall(searchQuery: string, location: Location):
 
   const params = new URLSearchParams({ question: searchQuery, filter: JSON.stringify(filter) });
 
-  const url = `https://bookgenius.net/${baseUrl}?${params.toString()}`;
+  const url = `https://alice.bookgenius.net/api/${baseUrl}?${params.toString()}`;
   console.log(`Fetching deep research from: ${url}`); // Optional: for debugging
 
   try {

@@ -33,7 +33,7 @@ export type SearchParagraphsFunctionResponse = { chapter: number; paragraphNumbe
  * @returns A promise that resolves with the search results from the server.
  */
 export async function searchParagraphsFromServer(searchQuery: string, location: Location): Promise<SearchParagraphsFunctionResponse[]> {
-  const baseUrl = `${QUESTIONS_SERVER_URL}/api/getParagraphsForSearch`;
+  const baseUrl = `${QUESTIONS_SERVER_URL}/getParagraphsForSearch`;
   const filter = {
     chapterFrom: 0, // Assuming 0-based chapter indexing
     chapterTo: location.endChapter,
