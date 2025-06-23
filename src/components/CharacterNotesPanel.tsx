@@ -19,7 +19,7 @@ const CharacterNotesPanel = () => {
   return createPortal(
     <AnimatePresence mode="sync">
       {isSplashHidden && (
-        <motion.div className="content-center h-full space-y-3 py-10 overflow-x-hidden" initial="hidden" animate="visible" variants={variants.container}>
+        <motion.div className="content-center h-full space-y-3 py-10 overflow-x-hidden no-scrollbar" initial="hidden" animate="visible" variants={variants.container}>
           <AnimatePresence>
             {characterNotes.map((characterNote, index) => (
               <motion.div

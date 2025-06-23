@@ -85,6 +85,7 @@
   "exploring_chapters": "Eksplorowanie rozdziałów i fragmentów...",
   "try_different_search_terms": "Spróbuj innych terminów wyszukiwania",
   "chapter": "Rozdział",
+  "chapter_zero": "Rozdział Zero",
   "chapters": "Rozdziały",
   "paragraph": "Paragraf",
   "book_settings": "Ustawienia Książki",
@@ -102,5 +103,10 @@
   "cancel": "Anuluj",
   "save": "Zapisz",
   "enter_openai_api_key": "Wprowadź klucz OpenAI",
-  "openai_api_key_description": "Wprowadź swój klucz API OpenAI, aby włączyć funkcje głosowe"
+  "openai_api_key_description": "Wprowadź swój klucz API OpenAI, aby włączyć funkcje głosowe",
+  "sentence_simplification": "Uproszczenie Zdania",
+  "original_sentence": "Oryginalne Zdanie",
+  "simplified_version": "Uproszczona Wersja",
+  "no_further_simplification": "Brak dalszych uproszczeń",
+  "get_simplified_sentence": "Pobierz Następne Uproszczone Zdanie"
 }

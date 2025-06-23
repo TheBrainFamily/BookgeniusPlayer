@@ -22,7 +22,7 @@ if (!VITE_BOOK_DIR) {
 }
 
 function getBookConfig() {
-  const bookDirName = path.basename(VITE_BOOK_DIR);
+  const bookDirName = path.basename(VITE_BOOK_DIR!);
   const bookDataPath = path.join("src", "books", bookDirName, "bookData.ts");
 
   try {
@@ -41,7 +41,7 @@ function getBookConfig() {
     }
 
     // Use the absolute path passed via environment variable for assets
-    const assetsPath = path.join(VITE_BOOK_DIR, "assets");
+    const assetsPath = path.join(VITE_BOOK_DIR!, "assets");
 
     return {
       slug: slugMatch[1],
@@ -123,6 +123,13 @@ const bookDataPlugin = () => {
       import: `import { getAudiobookTracksForBook as getAudiobookTracksForBookInput } from "@/books/${selectedAlias}/getAudiobookTracksForBook";`,
       export: `export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
   return getAudiobookTracksForBookInput();
+};`,
+    },
+    getAllVariants: {
+      types: ``,
+      import: `import { getAllVariants as getAllVariantsInput } from "@/books/${selectedAlias}/getAllVariants";`,
+      export: `export const getAllVariants = () => {
+  return getAllVariantsInput();
 };`,
     },
   };

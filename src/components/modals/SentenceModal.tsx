@@ -1,0 +1,146 @@
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { motion, Variants } from "motion/react";
+import { FileText, Zap, CheckCircle } from "lucide-react";
+
+import ModalUI from "./ModalUI";
+import { Button } from "@/components/ui/button";
+import { findSimplifiedSentence } from "@/helpers/findSimplifiedSentence";
+
+interface SentenceModalProps {
+  onClose: () => void;
+  currentSentenceId?: string;
+  currentSentence?: string;
+  simplifiedSentence?: string;
+  simplifiedSentenceScore?: number;
+}
+
+const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceId, currentSentence, simplifiedSentence, simplifiedSentenceScore }) => {
+  const { t } = useTranslation();
+  const [_currentSentence] = useState(currentSentence);
+  const [_simplifiedSentence, setSimplifiedSentence] = useState(simplifiedSentence);
+  const [_simplifiedSentenceScore, setSimplifiedSentenceScore] = useState(simplifiedSentenceScore);
+  const [isMoreSimplifiedSentence, setIsMoreSimplifiedSentence] = useState(Boolean(simplifiedSentence));
+
+  const handleClick = () => {
+    if (!_simplifiedSentence) return;
+    const { text, score: _score, hasLower } = findSimplifiedSentence(currentSentenceId, _simplifiedSentenceScore);
+
+    if (text) {
+      setSimplifiedSentence(text);
+      setSimplifiedSentenceScore(_score);
+    }
+    setIsMoreSimplifiedSentence(hasLower);
+  };
+
+  const modalTitle = (
+    <div className="flex items-center gap-2">
+      <Zap size={20} className="mb-1" />
+      <span>{t("sentence_simplification")}</span>
+    </div>
+  );
+
+  return (
+    <ModalUI title={modalTitle} onClose={onClose} size="lg">
+      <motion.div
+        className="flex flex-col h-full relative overflow-hidden"
+        variants={variants.container}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
+      >
+        <div className="flex-1 flex flex-col min-h-0 relative z-10">
+          <div className="flex-1 space-y-6 pb-4">
+            <motion.div
+              className="group relative overflow-hidden rounded-xl border border-book-primary-20 bg-gradient-to-r from-book-primary-10 to-book-primary-20"
+              variants={variants.item}
+            >
+              <div className="relative p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="px-3 py-1 rounded-full text-xs font-medium bg-book-primary-30 text-book-primary">
+                    <span className="flex items-center gap-1">
+                      <FileText size={12} />
+                      {t("original_sentence")}
+                    </span>
+                  </div>
+                </div>
+                <motion.div
+                  className="text-white/90 leading-relaxed font-medium"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
+                >
+                  {_currentSentence}
+                </motion.div>
+              </div>
+            </motion.div>
+
+            {_simplifiedSentence && (
+              <motion.div
+                className="group relative overflow-hidden rounded-xl border border-book-tertiary-20 bg-gradient-to-r from-book-tertiary-10 to-book-tertiary-20"
+                variants={variants.item}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="relative p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="px-3 py-1 rounded-full text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
+                      <span className="flex items-center gap-1">
+                        <CheckCircle size={12} />
+                        {t("simplified_version")}
+                      </span>
+                    </div>
+                  </div>
+                  <motion.div
+                    className="text-white/90 leading-relaxed font-medium"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
+                  >
+                    {_simplifiedSentence}
+                  </motion.div>
+                </div>
+              </motion.div>
+            )}
+          </div>
+
+          <div className="flex-shrink-0 pt-4 pb-2">
+            <motion.div className="flex justify-center" variants={variants.item} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+              <Button
+                className={`
+                  min-w-[200px] cursor-pointer
+                  ${
+                    isMoreSimplifiedSentence
+                      ? "bg-gradient-to-r from-book-primary to-book-tertiary text-white shadow-lg hover:shadow-xl border border-book-primary-30 hover:from-book-primary/90 hover:to-book-tertiary/90"
+                      : "bg-book-secondary-20 text-white/50 border border-book-secondary-30 cursor-not-allowed hover:bg-book-secondary-20"
+                  }
+                `}
+                onClick={handleClick}
+                disabled={!isMoreSimplifiedSentence}
+                size="lg"
+              >
+                <Zap size={16} className={isMoreSimplifiedSentence ? "text-white" : "text-white/50"} />
+                {isMoreSimplifiedSentence ? t("get_simplified_sentence") : t("no_further_simplification")}
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </motion.div>
+    </ModalUI>
+  );
+};
+
+const variants: Record<string, Variants> = {
+  container: {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: "easeOut", staggerChildren: 0.1 } },
+    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
+  },
+  item: { hidden: { opacity: 0, y: 20, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" } } },
+};
+
+export default SentenceModal;

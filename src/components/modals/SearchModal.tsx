@@ -4,9 +4,9 @@ import { motion, Variants } from "motion/react";
 import { Search, FileText } from "lucide-react";
 
 import { SearchResultsData, SearchResultItemData, cleanupSearchChapters } from "@/searchModal";
-import { useLocation } from "@/state/LocationContext";
-import ModalUI from "./ModalUI";
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
+import ModalUI from "./ModalUI";
+import { highlightSearchInParagraph } from "@/utils/textHighlighting";
 
 interface SearchModalProps {
   onClose: () => void;
@@ -16,7 +16,6 @@ interface SearchModalProps {
 }
 
 const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults }) => {
-  const { setLocation } = useLocation();
   const { t } = useTranslation();
 
   // Cleanup search chapters when modal unmounts
@@ -26,15 +25,15 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
     };
   }, []);
 
-  const handleSearchResultClick = useCallback(
-    (item: SearchResultItemData) => {
-      console.log(`SearchModal: Navigating to chapter ${item.chapter}, paragraph ${item.paragraphNumber}`);
+  const handleSearchResultClick = useCallback((item: SearchResultItemData) => {
+    console.log(`SearchModal: Navigating to chapter ${item.chapter}, paragraph ${item.paragraphNumber}`);
 
-      // Update location with 'system' source to trigger scrolling
-      systemNavigateTo({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber });
-    },
-    [onClose, setLocation],
-  );
+    //TODO: fix this to get the value directly from bottom input hook or so
+    const query = document.querySelector("#bottom-input").getAttribute("value");
+    // Update location with 'system' source to trigger scrolling
+    systemNavigateTo({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber });
+    highlightSearchInParagraph(item.chapter, item.paragraphNumber, query);
+  }, []);
 
   const modalTitle = (
     <div className="flex items-center gap-2">
@@ -84,9 +83,9 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                 {searchResults.items.map((item: SearchResultItemData, index: number) => (
                   <motion.div
                     key={item.id}
-                    className="group relative overflow-hidden cursor-pointer rounded-xl border  border-book-primary-20"
+                    className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20"
                     variants={variants.item}
-                    whileHover="hover"
+                    // whileHover="hover"
                     whileTap="tap"
                     onClick={() => handleSearchResultClick(item)}
                     transition={{ delay: index * 0.05 }}

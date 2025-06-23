@@ -29,10 +29,12 @@ import { cn } from "@/lib/utils";
 import { CURRENT_BOOK } from "@/consts";
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
 import { OptionalElement } from "./OptionalElement";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
 
 const AudioPlayer = () => {
   const isMobileOrTablet = useIsMobileOrTablet();
   const { t } = useTranslation();
+  const { hasAudiobook } = getBookData();
 
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const INACTIVITY_TIMEOUT = 5000;
@@ -51,7 +53,6 @@ const AudioPlayer = () => {
   const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
   const [playlistTracks, setPlaylistTracks] = useState<{ id: string; title: string; duration: number }[]>([]);
   const [currentTrackIdFromState, setCurrentTrackIdFromState] = useState<string | null>(null);
-  const isAudiobookAvailable = true;
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -373,7 +374,7 @@ const AudioPlayer = () => {
                     </div>
                   </motion.div>
 
-                  {isAudiobookAvailable && (
+                  {hasAudiobook && (
                     <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.1 }}>
                       <div className="flex justify-between text-xs my-2">{t("balance")}</div>
                       <Slider value={[balance]} min={0} max={1} step={0.01} onValueChange={handleBalanceChange} variant="secondary" />
@@ -389,7 +390,7 @@ const AudioPlayer = () => {
           </div>
 
           {/* Audiobook Toggle Button */}
-          {isAudiobookAvailable && (
+          {hasAudiobook && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <motion.button

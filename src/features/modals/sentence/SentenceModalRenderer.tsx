@@ -1,0 +1,24 @@
+import React from "react";
+import { createPortal } from "react-dom";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useSentenceModal } from "@/stores/modals/sentenceModal.store";
+import SentenceModal from "@/components/modals/SentenceModal";
+
+export const SentenceModalRenderer: React.FC = () => {
+  const { isOpen, closeModal, currentSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore } = useSentenceModal();
+
+  useEscapeKey(isOpen, closeModal);
+
+  if (!isOpen) return null;
+
+  return createPortal(
+    <SentenceModal
+      onClose={closeModal}
+      currentSentence={currentSentence}
+      simplifiedSentence={simplifiedSentence}
+      currentSentenceId={currentSentenceId}
+      simplifiedSentenceScore={simplifiedSentenceScore}
+    />,
+    document.body,
+  );
+};

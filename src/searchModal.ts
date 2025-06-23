@@ -337,8 +337,8 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
 
           if (sentence) {
             const cleanText = sentence.replace(/<[^>]*>/g, "");
-            const summaryText = cleanText.length > 200 ? cleanText.substring(0, 200) : cleanText;
-            const displayText = summaryText.length > 200 ? summaryText.substring(0, 200) : summaryText;
+            const summaryText = cleanText.length > 300 ? cleanText.substring(0, 300) : cleanText;
+            const displayText = summaryText.length > 300 ? summaryText.substring(0, 300) : summaryText;
 
             items.push({
               chapter,

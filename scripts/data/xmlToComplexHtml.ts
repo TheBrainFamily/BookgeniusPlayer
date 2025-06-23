@@ -1,4 +1,4 @@
-import { DOMParser, XMLSerializer, Node, Element as XMLElement } from "@xmldom/xmldom";
+import { DOMParser, XMLSerializer, Node, Element as XMLElement, Element } from "@xmldom/xmldom";
 import fs from "fs";
 import path from "path";
 
@@ -60,21 +60,20 @@ export const xmlToComplexHtml = (
   const serializer = new XMLSerializer();
   let htmlResult = "";
 
-  // Arrays to collect background, audio, and cutscene data
   const backgroundsData: Array<{ chapter: number; file: string; startParagraph: number }> = [];
   const audioData: Array<{ chapter: number; paragraph: number; files: string[] }> = [];
   const cutSceneData: Array<{ chapter: number; paragraph: number; files: Array<{ title: string; delayInMs?: number; text?: string }> }> = [];
 
-  // Parse CharactersMaster
+  // Build characterMap (unchanged)
   const charactersMaster = xmlDoc.getElementsByTagName("CharactersMaster")[0];
   const characterMap = new Map<string, { display: string }>();
   if (charactersMaster) {
     for (let i = 0; i < charactersMaster.childNodes.length; i++) {
       const node = charactersMaster.childNodes[i];
-      if (node.nodeType === 1 /* Node.ELEMENT_NODE */) {
-        const element = node as unknown as Element;
+      if (node.nodeType === 1) {
+        const element = node as Element;
         const tagName = element.tagName;
-        const display = element.getAttribute("display") || tagName; // Use tagName as fallback
+        const display = element.getAttribute("display") || tagName;
         characterMap.set(tagName, { display });
       }
     }
@@ -86,135 +85,178 @@ export const xmlToComplexHtml = (
     const chapterId = chapter.getAttribute("id");
     const chapterNumber = parseInt(chapterId || "0", 10);
 
-    const backgroundFileData = extractFileData(chapter, "BackgroundFiles", chapterNumber);
-    backgroundFileData.forEach((item) => {
-      item.files.forEach((file) => {
-        backgroundsData.push({ chapter: chapterNumber, file: file.title, startParagraph: item.paragraph });
-      });
-    });
-
-    const audioFileData = extractFileData(chapter, "AudioFiles", chapterNumber);
-    audioFileData.forEach((item) => {
-      audioData.push({ chapter: chapterNumber, paragraph: item.paragraph, files: item.files.map((f) => f.title) });
-    });
-
-    const cutSceneFileData = extractFileData(chapter, "CutSceneFiles", chapterNumber);
-    cutSceneData.push(...cutSceneFileData);
+    // collect file data (unchanged)
+    extractFileData(chapter, "BackgroundFiles", chapterNumber).forEach((item) =>
+      item.files.forEach((f) => backgroundsData.push({ chapter: chapterNumber, file: f.title, startParagraph: item.paragraph })),
+    );
+    extractFileData(chapter, "AudioFiles", chapterNumber).forEach((item) =>
+      audioData.push({ chapter: chapterNumber, paragraph: item.paragraph, files: item.files.map((f) => f.title) }),
+    );
+    cutSceneData.push(...extractFileData(chapter, "CutSceneFiles", chapterNumber));
 
     htmlResult += `\n      <section><section data-chapter="${chapterId}">`;
     let dataIndex = 0;
 
-    // Iterate over direct child nodes of the chapter
+    // ─── iterate over chapter children ───
     for (let j = 0; j < chapter.childNodes.length; j++) {
       const node = chapter.childNodes[j];
+      if (node.nodeType !== 1) continue;
+      const childElement = node as Element;
+      const tagName = childElement.tagName;
 
-      // Check if it's an element node
-      if (node.nodeType === 1 /* Node.ELEMENT_NODE */) {
-        const childElement = node as unknown as Element;
-        const tagName = childElement.tagName;
+      if (["BackgroundFiles", "AudioFiles", "CutSceneFiles"].includes(tagName)) {
+        continue;
+      }
 
-        // Skip these tags as they are handled separately in extractFileData
-        if (tagName === "BackgroundFiles" || tagName === "AudioFiles" || tagName === "CutSceneFiles") {
-          continue;
-        }
+      if (tagName === "p") {
+        let pContent = "";
+        let hasSignificantTextContent = false;
 
-        if (tagName === "p") {
-          // Process paragraph element
-          let pContent = "";
-          for (let k = 0; k < childElement.childNodes.length; k++) {
-            const pNode = childElement.childNodes[k];
-            // Check if the node is a text node (nodeType 3) and append its content
-            if (pNode.nodeType === 3 /* Node.TEXT_NODE */) {
-              pContent += pNode.textContent;
+        for (let k = 0; k < childElement.childNodes.length; k++) {
+          const pNode = childElement.childNodes[k];
+
+          // ── 1) TEXT ──
+          if (pNode.nodeType === 3) {
+            const textContent = pNode.textContent || "";
+
+            if (textContent.trim().length > 0) {
+              hasSignificantTextContent = true;
             }
-            // If it's an element node (nodeType 1)
-            else if (pNode.nodeType === 1 /* Node.ELEMENT_NODE */) {
-              const pElement = pNode as unknown as Element;
-              const characterInfo = characterMap.get(pElement.tagName);
 
-              if (characterInfo) {
-                const characterSlug = pElement.tagName;
-                const isTalking = pElement.getAttribute("talking") === "true";
-                const talkingSrc = getTalkingMediaFilePathForName(characterSlug, bookSlug);
-                const listeningSrc = getListeningMediaFilePathForName(characterSlug, bookSlug);
+            pContent += textContent;
+            continue;
+          }
 
-                if (isTalking) {
-                  // Generate placeholder span for talking character
-                  pContent += `<span class="character-placeholder character-talking" data-character="${characterSlug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
-                } else {
-                  // Generate placeholder span for mentioned character, preserving text content
-                  pContent += `<span class="character-highlighted" data-character="${characterSlug}" data-src-listening="${listeningSrc}" >${pElement.textContent || ""}</span>`;
-                }
-              } else {
-                switch (pElement.tagName) {
-                  case "note":
-                    // previously it looked like this: <a href="#fn14" class="link-note">[14]</a>
-                    pContent += `<a href="#fn${pElement.getAttribute("id")}" class="link-note">${pElement.textContent || ""}</a>`;
+          // ── 2) ELEMENT ──
+          if (pNode.nodeType === 1) {
+            const pElement = pNode as Element;
 
-                    break;
-                  case "b":
-                    pContent += `<span class="bold">${pElement.textContent || ""}</span>`;
-                    break;
-                  case "i":
-                    pContent += `<span class="italic">${pElement.textContent || ""}</span>`;
-                    break;
-                  case "strong":
-                    pContent += `<strong>${pElement.textContent.trim() || ""}</strong>`;
-                    break;
-                  default:
-                    pContent += `<${pElement.tagName}>${pElement.textContent || ""}</${pElement.tagName}>`;
-                    break;
+            // 2a) sentence-wrapper span
+            if (pElement.tagName === "span" && pElement.hasAttribute("id")) {
+              const spanId = pElement.getAttribute("id")!;
+              let inner = "";
+
+              // recurse into its children
+              for (let m = 0; m < pElement.childNodes.length; m++) {
+                const sub = pElement.childNodes[m];
+                if (sub.nodeType === 3) {
+                  const subTextContent = sub.textContent || "";
+
+                  if (subTextContent.trim().length > 0) {
+                    hasSignificantTextContent = true;
+                  }
+
+                  inner += subTextContent;
+                } else if (sub.nodeType === 1) {
+                  const e = sub as Element;
+                  const char = characterMap.get(e.tagName);
+                  if (char) {
+                    const slug = e.tagName;
+                    const isTalking = e.getAttribute("talking") === "true";
+                    const talkingSrc = getTalkingMediaFilePathForName(slug, bookSlug);
+                    const listeningSrc = getListeningMediaFilePathForName(slug, bookSlug);
+                    if (isTalking) {
+                      const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
+                      inner += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
+                    } else {
+                      inner += `<span class="character-highlighted" data-character="${slug}" data-src-listening="${listeningSrc}">${e.textContent}</span>`;
+                    }
+                  } else {
+                    // your existing note / b / i / strong / default logic:
+                    switch (e.tagName) {
+                      case "note":
+                        inner += `<a href="#fn${e.getAttribute("id")}" class="link-note">${e.textContent}</a>`;
+                        break;
+                      case "b":
+                        inner += `<span class="bold">${e.textContent}</span>`;
+                        break;
+                      case "i":
+                        inner += `<span class="italic">${e.textContent}</span>`;
+                        break;
+                      case "strong":
+                        inner += `<strong>${e.textContent.trim()}</strong>`;
+                        break;
+                      default: {
+                        const eid = e.getAttribute("id");
+                        const idStr = eid ? ` id="${eid}"` : "";
+                        inner += `<${e.tagName}${idStr}>${e.textContent}</${e.tagName}>`;
+                      }
+                    }
+                  }
                 }
               }
-            } else {
-              console.log("unknown tag again", tagName);
-            }
-          }
 
-          // Only add paragraph if it contains non-whitespace content after processing
-          if (pContent.trim()) {
-            let cleanedContent = pContent.replace(/\s+/g, " ").trim();
-            cleanedContent = cleanedContent.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
-            htmlResult += `\n    <p data-index="${dataIndex++}">\n      ${cleanedContent}\n    </p>`;
-          }
-        } else if (tagName === "h4") {
-          // Handle h4 element (e.g., chapter title)
-          htmlResult += `\n    <h4 data-index="${dataIndex++}">${childElement.textContent || ""}</h4>`;
-        } else if (tagName === "h5") {
-          // Handle h5 element (e.g., book title)
-          htmlResult += `\n    <h5 data-index="${dataIndex++}">${childElement.textContent || ""}</h5>`;
-        } else {
-          // Serialize child nodes to preserve inner HTML
-          let innerHtml = "";
-          for (let k = 0; k < childElement.childNodes.length; k++) {
-            // Cast ChildNode to unknown, then to the imported Node type
-            const node = childElement.childNodes[k] as unknown as Node;
-            // Skip nodes that start with capital letter (XML tags for Characters)
-            if (
-              node.nodeType === 1 /* Element node */ &&
-              node.nodeName &&
-              node.nodeName.charAt(0) === node.nodeName.charAt(0).toUpperCase() &&
-              node.nodeName.charAt(0) !== node.nodeName.charAt(0).toLowerCase()
-            ) {
-              console.log("⏭️ skipping tag", node.nodeName);
+              pContent += `<span id="${spanId}">${inner}</span>`;
               continue;
             }
-            // console.log("adding tag", node.nodeName);
-            innerHtml += serializer.serializeToString(node);
+
+            // 2b) character‐tag (e.g. <Alice>)
+            const ci = characterMap.get(pElement.tagName);
+            if (ci) {
+              const slug = pElement.tagName;
+              const isTalking = pElement.getAttribute("talking") === "true";
+              const talkingSrc = getTalkingMediaFilePathForName(slug, bookSlug);
+              const listeningSrc = getListeningMediaFilePathForName(slug, bookSlug);
+              if (isTalking) {
+                const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
+                pContent += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
+              } else {
+                pContent += `<span class="character-highlighted" data-character="${slug}" data-src-listening="${listeningSrc}">${pElement.textContent}</span>`;
+              }
+            }
+            // 2c) notes / formatting / default
+            else {
+              hasSignificantTextContent = true;
+              switch (pElement.tagName) {
+                case "note":
+                  pContent += `<a href="#fn${pElement.getAttribute("id")}" class="link-note">${pElement.textContent}</a>`;
+                  break;
+                case "b":
+                  pContent += `<span class="bold">${pElement.textContent}</span>`;
+                  break;
+                case "i":
+                  pContent += `<span class="italic">${pElement.textContent}</span>`;
+                  break;
+                case "strong":
+                  pContent += `<strong>${pElement.textContent.trim()}</strong>`;
+                  break;
+                default: {
+                  const eid2 = pElement.getAttribute("id");
+                  const idStr2 = eid2 ? ` id="${eid2}"` : "";
+                  pContent += `<${pElement.tagName}${idStr2}>${pElement.textContent || ""}</${pElement.tagName}>`;
+                }
+              }
+            }
           }
-          htmlResult += `\n    <${tagName} data-index="${dataIndex++}">${innerHtml}</${tagName}>`;
         }
-        // Add handlers for other potential top-level tags (h1, h2, h3, h6, etc.) if needed
+
+        // collapse whitespace & emit
+        if (pContent.trim()) {
+          let clean = pContent.replace(/\s+/g, " ").trim();
+          clean = clean.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
+          htmlResult += `\n    <p data-index="${dataIndex++}">\n      ${clean}\n    </p>`;
+        }
+      } else if (tagName === "h4") {
+        htmlResult += `\n    <h4 data-index="${dataIndex++}">${childElement.textContent}</h4>`;
+      } else if (tagName === "h5") {
+        htmlResult += `\n    <h5 data-index="${dataIndex++}">${childElement.textContent}</h5>`;
+      } else {
+        // serialize any other tags
+        let inner = "";
+        for (let k = 0; k < childElement.childNodes.length; k++) {
+          const n2 = childElement.childNodes[k] as unknown as Node;
+          if (n2.nodeType === 1 && n2.nodeName.charAt(0).toUpperCase() === n2.nodeName.charAt(0)) {
+            continue;
+          }
+          inner += serializer.serializeToString(n2);
+        }
+        htmlResult += `\n    <${tagName} data-index="${dataIndex++}">${inner}</${tagName}>`;
       }
     }
 
     htmlResult += "\n  </section></section>";
   }
 
-  // Add a wrapping div or return directly depending on final requirements
-  // For now, returning the content of the sections directly, trimmed.
-
-  // Return both the HTML result and the extracted data
   return { htmlResult: htmlResult.trim(), backgroundsData, audioData, cutSceneData };
 };
 

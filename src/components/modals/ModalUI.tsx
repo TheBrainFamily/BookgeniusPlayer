@@ -20,9 +20,9 @@ export interface ModalUIProps {
 type ModalSize = { content: string; container: string };
 
 const MODAL_SIZES: Record<NonNullable<ModalUIProps["size"]>, ModalSize> = {
-  sm: { content: "max-w-md", container: "max-w-[100rem]" },
-  md: { content: "max-w-lg", container: "max-w-[100rem]" },
-  lg: { content: "max-w-2xl", container: "max-w-[100rem]" },
+  sm: { content: "max-w-md", container: "w-full max-w-[100rem]" },
+  md: { content: "max-w-lg", container: "w-full max-w-[100rem]" },
+  lg: { content: "max-w-2xl", container: "w-full max-w-[100rem]" },
   full: { content: "w-full max-w-none", container: "w-full max-w-none" },
 };
 

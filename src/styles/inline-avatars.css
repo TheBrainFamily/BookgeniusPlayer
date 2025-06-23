@@ -6,16 +6,15 @@
   white-space: nowrap;
 }
 
-.character-talking {
-  position: relative;
+.character-talking.start-of-paragraph {
   margin-left: -3em;
 }
 
-.character-talking + .character-talking {
+.character-talking.start-of-paragraph + .character-talking {
   margin-left: -1.5em;
 }
 
-.character-talking + .character-talking + .character-talking {
+.character-talking.start-of-paragraph + .character-talking + .character-talking {
   margin-left: 0em;
 }
 
@@ -30,6 +29,7 @@
   object-fit: cover;
   position: relative;
   transition: transform 0.2s ease;
+  cursor: pointer;
 }
 
 .character-talking .inline-avatar {

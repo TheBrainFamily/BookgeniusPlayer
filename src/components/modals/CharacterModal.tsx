@@ -10,7 +10,7 @@ import { findCharacterSentences, SearchResultItemData } from "@/searchModal";
 import { useLocation } from "@/state/LocationContext";
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
 import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
-import { highlightSearchInParagraph, cleanupAllSearchHighlights } from "@/utils/textHighlighting";
+import { highlightSearchInParagraph } from "@/utils/textHighlighting";
 
 interface CharacterModalProps {
   onClose: () => void;
@@ -57,9 +57,6 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   }, [matchingCharacter.characterName, location]);
 
   const handleAppearanceClick = (appearance: SearchResultItemData) => {
-    // Clean up any existing highlights before navigating
-    cleanupAllSearchHighlights();
-
     // Update location with 'system' source to trigger scrolling
     systemNavigateTo({ currentChapter: appearance.chapter, currentParagraph: appearance.paragraphNumber });
 
@@ -74,7 +71,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   return (
     <ModalUI onClose={onClose} className="bg-transparent pointer-events-none">
       <motion.div
-        className="flex flex-col items-center pointer-events-none gap-6 max-w-4xl mx-auto relative"
+        className="flex flex-col sm:flex-row items-center pointer-events-none gap-6 max-w-4xl mx-auto relative max-h-screen py-5"
         variants={variants.container}
         initial="hidden"
         animate="visible"
@@ -100,8 +97,8 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
         </motion.div>
 
         <motion.div
-          className="p-4 rounded-xl flex flex-col gap-4 w-full max-w-2xl pointer-events-auto relative overflow-hidden
-          bg-black/70 textured-bg border border-white/30 shadow-xl text-white"
+          className="p-4 rounded-xl flex flex-col gap-4 w-full max-w-2xl pointer-events-auto relative overflow-auto
+          bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[95vh]"
           variants={variants.content}
           initial="hidden"
           animate="visible"
@@ -156,7 +153,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                         </div>
 
                         <motion.div
-                          className="text-sm text-white/90 leading-relaxed"
+                          className="text-sm text-white/90 leading-relaxed line-clamp-3"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.2 }}

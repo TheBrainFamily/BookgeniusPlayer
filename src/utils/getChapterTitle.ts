@@ -1,9 +1,6 @@
-import { useTranslation } from "react-i18next";
-
-export const getTitle = (chapter: number) => {
-  const { t } = useTranslation();
+export const getTitle = (chapter: number, t: (key: string) => string) => {
   // Special case for 0
-  if (chapter === 0) return "Rozdział Zero";
+  if (chapter === 0) return t("chapter_zero");
 
   // Units (1-9)
   const units = ["", t("ordinal.1"), t("ordinal.2"), t("ordinal.3"), t("ordinal.4"), t("ordinal.5"), t("ordinal.6"), t("ordinal.7"), t("ordinal.8"), t("ordinal.9")];
