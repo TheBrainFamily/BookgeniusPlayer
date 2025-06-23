@@ -3,6 +3,9 @@ import { useEffect } from "react";
 import { useLocationRange } from "./useLocationRange";
 import { useQuizModal } from "@/stores/modals/quizModal.store";
 import { getQuizQuestions } from "../../public_books/Alice-Wonderland/getQuizQuestions";
+import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
+
+type QuizOutput = { id: string; score: number; questions: { id: string; question: string; answers: { id: string; text: string; isCorrect: boolean }[] }[] };
 
 export function useQuizz() {
   const {
@@ -13,27 +16,26 @@ export function useQuizz() {
   const getQuestions = () => {
     const clickedSentences = JSON.parse(localStorage.getItem("clickedSentences") || "[]");
 
-    const quizQuestions = getQuizQuestions();
-    return quizQuestions.filter((question) => !clickedSentences.includes(question.id));
+    const quizQuestions = getQuizQuestions() as QuizOutput[];
+    return quizQuestions.filter((question) => {
+      const chapterMatch = question.id.match(/ch(\d+)/);
+      const questionChapter = chapterMatch ? parseInt(chapterMatch[1]) : 0;
+
+      return !clickedSentences.includes(question.id) && questionChapter === currentChapter - 1;
+    });
   };
 
   useEffect(() => {
     const questions = getQuestions().sort((a, b) => (b.score || 0) - (a.score || 0));
 
-    console.log("23: questions[0] BANG!", questions[0]);
+    if (!questions.length) return;
+
+    const sentence = getAllVariants()
+      .find((question) => question.id === questions[0].id)
+      .analysis.originalSentence.replace(/<[^>]*>/g, "");
 
     if (currentChapter >= 1) {
-      // const question = {
-      // id: "q3",
-      // question: `What is currentChapter ${currentChapter}?`,
-      // answers: [
-      //   { id: "a1", text: "3", isCorrect: false },
-      //   { id: "a2", text: "4", isCorrect: true },
-      //   { id: "a3", text: "5", isCorrect: false },
-      //   { id: "a4", text: "6", isCorrect: false },
-      // ],
-      // };
-      openQuizModal(questions[0]);
+      openQuizModal(questions[0].questions, sentence);
     }
   }, [currentChapter]);
 }
