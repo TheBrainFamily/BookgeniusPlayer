@@ -40,7 +40,7 @@ const getModalSizeConfig = (layoutView: boolean, size: NonNullable<ModalUIProps[
 const getModalContentClasses = (isTransparent: boolean, layoutView: boolean, className: string): string => {
   return cn(
     // Base classes
-    "rounded-lg overflow-hidden w-full flex flex-col align-center justify-center h-fit",
+    "rounded-lg overflow-hidden w-full flex flex-col align-center justify-center h-fit pointer-events-auto",
 
     // Default styling (unless transparent)
     !isTransparent && "bg-black/70 textured-bg border border-white/30 shadow-xl text-white",
