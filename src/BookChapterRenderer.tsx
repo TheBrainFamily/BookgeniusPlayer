@@ -24,7 +24,7 @@ const BookChapterRendererComponent = () => {
   const chaptersToRender = useMemo(() => {
     let currentChapterNum = Number(location.currentChapter);
     if (isNaN(currentChapterNum) || currentChapterNum <= 0) currentChapterNum = 1;
-    return [currentChapterNum - 2, currentChapterNum - 1, currentChapterNum, currentChapterNum + 1, currentChapterNum + 2].filter((id) => id > 0 && id <= bookData.chapters);
+    return [currentChapterNum - 2, currentChapterNum - 1, currentChapterNum, currentChapterNum + 1, currentChapterNum + 2].filter((id) => id > 0 && id <= bookData.chapters.length);
   }, [bookData?.chapters, location.currentChapter]);
 
   // Determine if we should scroll to a specific paragraph

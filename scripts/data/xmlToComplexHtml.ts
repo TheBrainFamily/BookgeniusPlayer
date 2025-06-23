@@ -54,6 +54,7 @@ export const xmlToComplexHtml = (
   backgroundsData: Array<{ chapter: number; file: string; startParagraph: number }>;
   audioData: Array<{ chapter: number; paragraph: number; files: string[] }>;
   cutSceneData: Array<{ chapter: number; paragraph: number; files: Array<{ title: string; delayInMs?: number; text?: string }> }>;
+  chapterTitles: Array<{ id: string; title: string }>;
 } => {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xmlString, "text/xml");
@@ -63,6 +64,7 @@ export const xmlToComplexHtml = (
   const backgroundsData: Array<{ chapter: number; file: string; startParagraph: number }> = [];
   const audioData: Array<{ chapter: number; paragraph: number; files: string[] }> = [];
   const cutSceneData: Array<{ chapter: number; paragraph: number; files: Array<{ title: string; delayInMs?: number; text?: string }> }> = [];
+  const chapterTitles: Array<{ id: string; title: string }> = [];
 
   // Build characterMap (unchanged)
   const charactersMaster = xmlDoc.getElementsByTagName("CharactersMaster")[0];
@@ -84,6 +86,18 @@ export const xmlToComplexHtml = (
   for (const chapter of chapters) {
     const chapterId = chapter.getAttribute("id");
     const chapterNumber = parseInt(chapterId || "0", 10);
+
+    let chapterTitle = "";
+    const h3Elements = chapter.getElementsByTagName("h3");
+    const h4Elements = chapter.getElementsByTagName("h4");
+
+    if (h3Elements.length > 0) {
+      chapterTitle = h3Elements[0].textContent || "";
+    } else if (h4Elements.length > 0) {
+      chapterTitle = h4Elements[0].textContent || "";
+    }
+
+    chapterTitles.push({ id: chapterId || String(chapterNumber), title: chapterTitle });
 
     // collect file data (unchanged)
     extractFileData(chapter, "BackgroundFiles", chapterNumber).forEach((item) =>
@@ -257,7 +271,7 @@ export const xmlToComplexHtml = (
     htmlResult += "\n  </section></section>";
   }
 
-  return { htmlResult: htmlResult.trim(), backgroundsData, audioData, cutSceneData };
+  return { htmlResult: htmlResult.trim(), backgroundsData, audioData, cutSceneData, chapterTitles };
 };
 
 // Helper function to generate background, audio, and cutscene files
