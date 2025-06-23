@@ -44,7 +44,7 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
 
   // Handle self-closing tags like <alice talking="true" />
   const selfClosingRegex = new RegExp(`<(${characterTagPattern})\\s+(talking|listening)="true"\\s*\\/>`, "gi");
-  outputText = outputText.replace(selfClosingRegex, (match, tagName, attribute) => {
+  outputText = outputText.replace(selfClosingRegex, (match, tagName, attribute, offset) => {
     const foundCharacter = characters.find((char) => char.slug.toLowerCase() === tagName.toLowerCase());
 
     if (!foundCharacter) {
@@ -55,7 +55,7 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
     const attributeName = attribute.toLowerCase();
 
     const newAttributes = {
-      class: `character-placeholder character-${attributeName}`,
+      class: `character-placeholder character-${attributeName} ${offset === 0 ? "start-of-paragraph" : ""}`,
       "data-character": foundCharacter.slug,
       [`data-src-${attributeName}`]: foundCharacter.imageUrl,
       [`data-is-${attributeName}`]: "true",
