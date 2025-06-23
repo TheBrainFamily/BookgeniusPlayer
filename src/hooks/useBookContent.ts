@@ -43,10 +43,33 @@ export function useBookContent(containerId: string) {
         }
       };
 
+      const handleMouseOver = (event: MouseEvent) => {
+        const span = (event.target as HTMLElement).closest("span");
+
+        if (span && /^ch\d+-p\d+-s\d+$/.test(span.id)) {
+          span.style.backgroundColor = "rgba(66, 68, 90, 0.1)";
+          span.style.padding = "0.2rem 0";
+          span.style.cursor = "pointer";
+        }
+      };
+
+      const handleMouseOut = (event: MouseEvent) => {
+        const span = (event.target as HTMLElement).closest("span");
+        if (span && /^ch\d+-p\d+-s\d+$/.test(span.id)) {
+          span.style.backgroundColor = "transparent";
+          span.style.padding = "0";
+          span.style.cursor = "default";
+        }
+      };
+
       container.addEventListener("click", handleClick);
+      container.addEventListener("mouseover", handleMouseOver);
+      container.addEventListener("mouseout", handleMouseOut);
 
       return () => {
         container.removeEventListener("click", handleClick);
+        container.removeEventListener("mouseover", handleMouseOver);
+        container.removeEventListener("mouseout", handleMouseOut);
       };
     } else {
       console.warn(`Container with id '${containerId}' not found for content injection.`);
