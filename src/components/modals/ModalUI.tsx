@@ -12,7 +12,7 @@ export interface ModalUIProps {
   layoutView?: boolean;
   hideOverlay?: boolean;
   transparent?: boolean;
-  size?: "sm" | "md" | "lg" | "full";
+  size?: "md" | "lg" | "xl" | "xxl" | "full";
   showCloseButton?: boolean;
   closeOnOverlayClick?: boolean;
 }
@@ -20,9 +20,10 @@ export interface ModalUIProps {
 type ModalSize = { content: string; container: string };
 
 const MODAL_SIZES: Record<NonNullable<ModalUIProps["size"]>, ModalSize> = {
-  sm: { content: "max-w-md", container: "w-full max-w-[100rem]" },
-  md: { content: "max-w-lg", container: "w-full max-w-[100rem]" },
-  lg: { content: "max-w-2xl", container: "w-full max-w-[100rem]" },
+  md: { content: "max-w-md", container: "w-full max-w-[100rem]" },
+  lg: { content: "max-w-lg", container: "w-full max-w-[100rem]" },
+  xl: { content: "max-w-2xl", container: "w-full max-w-[100rem]" },
+  xxl: { content: "max-w-4xl", container: "w-full max-w-[100rem]" },
   full: { content: "w-full max-w-none", container: "w-full max-w-none" },
 };
 
@@ -68,7 +69,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
   layoutView = false,
   hideOverlay = false,
   transparent = false,
-  size = "md",
+  size = "lg",
   showCloseButton = true,
 }) => {
   const handleOpenChange = useCallback(

@@ -69,16 +69,16 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   };
 
   return (
-    <ModalUI onClose={onClose} className="bg-transparent pointer-events-none">
+    <ModalUI onClose={onClose} className="bg-transparent pointer-events-none" size="xxl">
       <motion.div
-        className="flex flex-col sm:flex-row items-center pointer-events-none gap-6 max-w-4xl mx-auto relative max-h-screen py-5"
+        className="flex flex-col sm:flex-row items-center pointer-events-none gap-6 mx-auto relative max-h-screen"
         variants={variants.container}
         initial="hidden"
         animate="visible"
         exit="exit"
       >
         <motion.div
-          className="rounded-full overflow-hidden h-full w-full max-h-[60vh] max-w-[60vh] lg:max-h-96 lg:max-w-96 border shadow-xl border-book-primary-20 aspect-square"
+          className="rounded-full overflow-hidden h-full w-full max-h-[30vh] max-w-[30vh] md:max-h-80 md:max-w-80 border shadow-xl border-book-primary-20 aspect-square"
           variants={variants.media}
           initial="hidden"
           animate="visible"

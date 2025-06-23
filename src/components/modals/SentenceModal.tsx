@@ -41,7 +41,7 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
   );
 
   return (
-    <ModalUI title={modalTitle} onClose={onClose} size="lg">
+    <ModalUI title={modalTitle} onClose={onClose} size="xl">
       <motion.div
         className="flex flex-col h-full relative overflow-hidden"
         variants={variants.container}

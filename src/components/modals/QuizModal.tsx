@@ -158,7 +158,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question }) => {
   );
 
   return (
-    <ModalUI title={modalTitle} onClose={onClose} size="lg">
+    <ModalUI title={modalTitle} onClose={onClose} size="xl">
       <motion.div className="flex flex-col h-full relative overflow-hidden p-4" variants={variants.container} initial="hidden" animate="visible" exit="exit">
         <div className="relative z-10 flex-1 flex items-center justify-center">
           <div className="w-full">
