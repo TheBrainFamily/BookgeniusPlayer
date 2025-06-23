@@ -124,8 +124,8 @@
       background: linear-gradient(
         to bottom,
         rgba(var(--bg-content-light-rgb), 0) 0%,
-        rgba(var(--bg-content-light-rgb), 0.9) 5%,
-        rgba(var(--bg-content-light-rgb), 0.9) 60%,
+        rgba(var(--bg-content-light-rgb), 1) 5%,
+        rgba(var(--bg-content-light-rgb), 1) 60%,
         rgba(var(--bg-content-light-rgb), 0) 100%
       );
 
@@ -1107,4 +1107,11 @@ section[data-chapter] [data-index] {
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   z-index: 10000;
+}
+
+.scrollbar-search {
+  scrollbar-color: #aaa transparent;
+  scrollbar-width: thin;
+  padding-right: 8px;
+  scrollbar-gutter: stable;
 }

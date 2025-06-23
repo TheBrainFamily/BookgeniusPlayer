@@ -59,7 +59,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       clearTimeout(inactivityTimerRef.current);
       inactivityTimerRef.current = null;
     }
-  }, []);
+  }, [pauseAllTimers, showAllElements]);
 
   useEffect(() => {
     // Add keyboard listener for Cmd+F / Ctrl+F
@@ -91,66 +91,85 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     }
   }, [response, isRecording, isSearchModalOpen, setSearchQuery, updateLastActivity]);
 
-  const toggleDeepResearch = () => {
+  const toggleDeepResearch = useCallback(() => {
     updateLastActivity();
     const newDeepResearchState = !isDeepResearchActive;
     setIsDeepResearchActive(newDeepResearchState);
     if (newDeepResearchState && isSearchModalOpen) {
       closeSearchModal(); // Close search modal if deep research is activated
     }
-  };
+  }, [closeSearchModal, isDeepResearchActive, isSearchModalOpen, updateLastActivity]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateLastActivity();
-    const newVal = e.target.value;
-    setValue(newVal);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      updateLastActivity();
+      const newVal = e.target.value;
+      setValue(newVal);
 
-    if (isDeepResearchActive) return;
+      if (isDeepResearchActive) return;
 
-    const trimmedValue = newVal.trim();
-    if (!trimmedValue.length && isSearchModalOpen) {
-      setSearchQuery("");
-      return;
-    }
+      const trimmedValue = newVal.trim();
+      if (!trimmedValue.length && isSearchModalOpen) {
+        setSearchQuery("");
+        return;
+      }
 
-    if (!isSearchModalOpen) {
-      openSearchModal(true, true, trimmedValue);
-    } else {
-      setSearchQuery(trimmedValue);
-    }
-  };
+      if (!isSearchModalOpen) {
+        openSearchModal(true, true, trimmedValue);
+      } else {
+        setSearchQuery(trimmedValue);
+      }
+    },
+    [isDeepResearchActive, isSearchModalOpen, openSearchModal, setSearchQuery, updateLastActivity],
+  );
 
-  const handleSubmit = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    updateLastActivity();
+  const handleSubmit = useCallback(
+    (e?: React.FormEvent) => {
+      e?.preventDefault();
+      updateLastActivity();
 
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return;
+      const trimmedValue = value.trim();
+      if (!trimmedValue) return;
 
-    if (isSearchModalOpen) {
-      setSearchQuery(trimmedValue);
-      return;
-    }
+      if (isSearchModalOpen) {
+        setSearchQuery(trimmedValue);
+        return;
+      }
 
-    if (isDeepResearchActive) {
-      setIsThinking(true);
-      openDeepResearchModal(undefined, true, true);
+      if (isDeepResearchActive) {
+        setIsThinking(true);
+        openDeepResearchModal(undefined, true, true);
 
-      deepResearchCall(trimmedValue, location)
-        .then((deepResearchResponse) => {
-          setDeepResearchContent(deepResearchResponse);
-        })
-        .catch((error) => {
-          console.error("Deep research failed:", error);
-          setDeepResearchContent(t("deep_research_error"));
-        })
-        .finally(() => {
-          setIsThinking(false);
-        });
-    } else if (onSubmit) {
-      onSubmit({ query: trimmedValue, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: CURRENT_BOOK } });
-    }
-  };
+        deepResearchCall(trimmedValue, location)
+          .then((deepResearchResponse) => {
+            setDeepResearchContent(deepResearchResponse);
+          })
+          .catch((error) => {
+            console.error("Deep research failed:", error);
+            setDeepResearchContent(t("deep_research_error"));
+          })
+          .finally(() => {
+            setIsThinking(false);
+          });
+      } else if (onSubmit) {
+        onSubmit({ query: trimmedValue, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: CURRENT_BOOK } });
+      }
+    },
+    [
+      updateLastActivity,
+      value,
+      isSearchModalOpen,
+      setSearchQuery,
+      isDeepResearchActive,
+      openDeepResearchModal,
+      location,
+      setDeepResearchContent,
+      t,
+      onSubmit,
+      currentChapter,
+      currentParagraph,
+    ],
+  );
 
   const handleRecordingStart = useCallback(() => {
     if (isRecording) return;
@@ -184,6 +203,17 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
         .finally(() => setIsRecording(false));
     }, 150);
   }, [isRecording, stopRecording, updateLastActivity]);
+
+  const handleInputFocus = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      updateLastActivity();
+      e.target.select();
+      if (!isSearchModalOpen && !isDeepResearchActive) {
+        openSearchModal(true, true, value.trim());
+      }
+    },
+    [updateLastActivity, isSearchModalOpen, isDeepResearchActive, openSearchModal, value],
+  );
 
   return (
     <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
@@ -219,7 +249,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                   className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-80 pl-7 font-medium" : "")}
                   disabled={isRecording || isThinking}
                   autoComplete="off"
-                  onFocus={updateLastActivity}
+                  onFocus={handleInputFocus}
                   onBlur={() => startAllTimers()}
                 />
               </div>

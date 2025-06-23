@@ -11,6 +11,8 @@ export function useQuizz() {
   const { openModal: openQuizModal } = useQuizModal();
 
   useEffect(() => {
+    // do not show quizz if you move back
+    // only show quizz if currentLocation is equal or greater than furthest location
     if (currentChapter >= 1) {
       const question = {
         id: "q3",
