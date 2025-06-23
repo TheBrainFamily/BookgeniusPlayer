@@ -262,7 +262,9 @@ export function cleanupSearchChapters(): void {
 }
 
 const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) => {
-  const sentences = paragraph
+  // Remove span tags with dynamic IDs like ch1-p1-s1
+  const paragraphWithoutSpans = paragraph.replace(/<span id="ch\d+-p\d+-s\d+">(.*?)<\/span>/g, "$1");
+  const sentences = paragraphWithoutSpans
     .split(/(?<=[.!?])\s+(?=[A-Z<])/) // Split on sentence endings while preserving HTML tags
     .map((s) => s.trim()) // Trim whitespace
     .filter((s) => s.length > 0); // Remove empty sentence
