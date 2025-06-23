@@ -29,6 +29,7 @@ const INTERACTIVE_SELECTORS = [
   ".character-mention",
   ".character-highlighted",
   ".dialog-overlay",
+  ".opened-modal",
 ];
 
 export const useElementVisibility = () => {

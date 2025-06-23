@@ -40,7 +40,7 @@ const getModalSizeConfig = (layoutView: boolean, size: NonNullable<ModalUIProps[
 const getModalContentClasses = (isTransparent: boolean, layoutView: boolean, className: string): string => {
   return cn(
     // Base classes
-    "rounded-lg overflow-hidden w-full flex flex-col align-center justify-center h-fit pointer-events-auto",
+    "rounded-lg overflow-hidden w-full flex flex-col align-center justify-center h-fit",
 
     // Default styling (unless transparent)
     !isTransparent && "bg-black/70 textured-bg border border-white/30 shadow-xl text-white",
@@ -112,7 +112,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
               </header>
             )}
 
-            <main className="p-4 overflow-y-auto">{children}</main>
+            <main className="p-4 overflow-y-auto opened-modal">{children}</main>
           </div>
 
           {layoutView && <div id="right-notes-blank" className="hidden max-w-[900px] xl:block xl:flex-2 xl:order-2" />}

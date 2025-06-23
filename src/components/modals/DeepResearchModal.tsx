@@ -24,10 +24,6 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content,
   return (
     <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
       <motion.div className="flex flex-col h-full relative overflow-hidden" variants={variants.container} initial="hidden" animate="visible" exit="exit">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10 blur-2xl bg-book-gradient-primary-tertiary" />
-          <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full opacity-8 blur-xl bg-book-gradient-secondary-quaternary" />
-        </div>
         {isLoading && (
           <motion.div className="flex flex-col items-center justify-center py-12 px-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <div className="relative">
