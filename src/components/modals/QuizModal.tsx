@@ -75,34 +75,9 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
   };
 
   const modalTitle = (
-    <div className="flex flex-col w-full gap-3">
-      <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <HelpCircle size={20} className="mb-1" />
-            <span>Quiz Question</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-white/70 font-mono">
-            <button onClick={handlePreviousQuestion} disabled={currentQuestionIndex === 0 || showResult} className="disabled:opacity-50 transition-opacity">
-              <ChevronLeft size={20} />
-            </button>
-            <span>
-              {currentQuestionIndex + 1} / {totalQuestions}
-            </span>
-            <button onClick={handleNextQuestion} disabled={currentQuestionIndex === totalQuestions - 1 || showResult} className="disabled:opacity-50 transition-opacity">
-              <ChevronRight size={20} />
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className="w-full bg-white/10 rounded-full h-1.5">
-        <motion.div
-          className="bg-blue-400 h-1.5 rounded-full"
-          initial={{ width: `${(currentQuestionIndex / totalQuestions) * 100}%` }}
-          animate={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-        />
-      </div>
+    <div className="flex items-center gap-2">
+      <HelpCircle size={20} />
+      <span>Quiz Question</span>
     </div>
   );
 
@@ -230,7 +205,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
   );
 
   return (
-    <ModalUI title={modalTitle} onClose={onClose} size="xl">
+    <ModalUI title={modalTitle} onClose={onClose} size="xxl">
       <motion.div className="flex flex-col h-full relative overflow-hidden p-4" variants={variants.container} initial="hidden" animate="visible" exit="exit">
         <div className="relative z-10 flex-1 flex items-center justify-center">
           <div className="w-full">
@@ -243,6 +218,28 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
                 {renderQuestion()}
               </motion.div>
             )}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-4 mt-10">
+          <div className="flex items-center justify-center gap-2 text-sm text-white/70 font-mono">
+            <button onClick={handlePreviousQuestion} disabled={currentQuestionIndex === 0 || showResult} className="disabled:opacity-50 transition-opacity">
+              <ChevronLeft size={20} />
+            </button>
+            <span>
+              {currentQuestionIndex + 1} / {totalQuestions}
+            </span>
+            <button onClick={handleNextQuestion} disabled={currentQuestionIndex === totalQuestions - 1 || showResult} className="disabled:opacity-50 transition-opacity">
+              <ChevronRight size={20} />
+            </button>
+          </div>
+          <div className="w-full bg-white/10 rounded-full h-1.5">
+            <motion.div
+              className="bg-blue-400 h-1.5 rounded-full"
+              initial={{ width: `${(currentQuestionIndex / totalQuestions) * 100}%` }}
+              animate={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+            />
           </div>
         </div>
       </motion.div>
