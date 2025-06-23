@@ -7,10 +7,10 @@ import ModalUI from "./ModalUI";
 import CharacterMedia from "@/components/CharacterMedia";
 import { CharacterData } from "@/types/book";
 import { findCharacterSentences, SearchResultItemData } from "@/searchModal";
-import { useLocation } from "@/state/LocationContext";
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
 import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
 import { highlightSearchInParagraph } from "@/utils/textHighlighting";
+import { useLocationRange } from "@/hooks/useLocationRange";
 
 interface CharacterModalProps {
   onClose: () => void;
@@ -26,13 +26,14 @@ export const findLatestSummaryInRange = (character: CharacterData, endChapter: n
 };
 
 const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, characterSlug, endChapter }) => {
-  const { location } = useLocation();
+  const { debouncedLocation } = useLocationRange();
   const matchingCharacter = getCharactersData().find((character) => character.slug === characterSlug);
 
   // If character not found, don't render anything
   if (!matchingCharacter) {
     return null;
   }
+
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useTranslation();
@@ -42,9 +43,21 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     const searchAppearances = () => {
       setIsLoading(true);
       try {
-        const searchResults = findCharacterSentences(characterSlug, location);
-        // Return first 3 appearances
-        setCharacterAppearances(searchResults.items.slice(0, 3));
+        const searchResults = findCharacterSentences(characterSlug, debouncedLocation);
+
+        const appearancesByChapter = new Map<number, SearchResultItemData>();
+
+        searchResults.items.forEach((appearance) => {
+          if (!appearancesByChapter.has(appearance.chapter)) {
+            appearancesByChapter.set(appearance.chapter, appearance);
+          }
+        });
+
+        const onePerChapter = Array.from(appearancesByChapter.values())
+          .sort((a, b) => a.chapter - b.chapter)
+          .slice(0, 3);
+
+        setCharacterAppearances(onePerChapter);
       } catch (error) {
         console.error("Error searching for character appearances:", error);
         setCharacterAppearances([]);
