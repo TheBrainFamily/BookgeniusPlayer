@@ -14,6 +14,11 @@ export type CharacterData = { slug: string; characterName: string; bookSlug: str
 
 type BookMetadata = { title: string; language?: string };
 
+export interface Chapter {
+  id: string;
+  title: string;
+}
+
 export interface BookThemeColors {
   primaryColor: string;
   secondaryColor: string;
@@ -24,7 +29,7 @@ export interface BookThemeColors {
 export type BookData = {
   slug: string;
   metadata: BookMetadata;
-  chapters: number;
+  chapters?: Chapter[];
   themeColors: BookThemeColors;
   hasAudiobook: boolean;
   bookStringified: string;

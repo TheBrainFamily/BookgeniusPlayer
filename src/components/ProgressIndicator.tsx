@@ -15,7 +15,7 @@ const ProgressIndicator: React.FC = () => {
   const { currentChapter: furthestChapter } = getSavedLocation();
   const bookData = getBookData();
 
-  const totalChapters = bookData.chapters;
+  const totalChapters = bookData.chapters.length;
 
   const completedChapters = Math.max(0, furthestChapter - 1);
   const chapterProgress = (completedChapters / totalChapters) * 100;
