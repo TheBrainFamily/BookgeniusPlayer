@@ -10,7 +10,7 @@ import { findCharacterSentences, SearchResultItemData } from "@/searchModal";
 import { useLocation } from "@/state/LocationContext";
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
 import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
-import { highlightSearchInParagraph, cleanupAllSearchHighlights } from "@/utils/textHighlighting";
+import { highlightSearchInParagraph } from "@/utils/textHighlighting";
 
 interface CharacterModalProps {
   onClose: () => void;
@@ -57,9 +57,6 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   }, [matchingCharacter.characterName, location]);
 
   const handleAppearanceClick = (appearance: SearchResultItemData) => {
-    // Clean up any existing highlights before navigating
-    cleanupAllSearchHighlights();
-
     // Update location with 'system' source to trigger scrolling
     systemNavigateTo({ currentChapter: appearance.chapter, currentParagraph: appearance.paragraphNumber });
 
