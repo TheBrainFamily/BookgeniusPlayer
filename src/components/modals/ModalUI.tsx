@@ -1,4 +1,5 @@
 import React, { ReactNode, useCallback } from "react";
+import { motion } from "motion/react";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -15,6 +16,7 @@ export interface ModalUIProps {
   size?: "md" | "lg" | "xl" | "xxl" | "full";
   showCloseButton?: boolean;
   closeOnOverlayClick?: boolean;
+  animateHeight?: boolean;
 }
 
 type ModalSize = { content: string; container: string };
@@ -71,6 +73,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
   transparent = false,
   size = "lg",
   showCloseButton = true,
+  animateHeight = false,
 }) => {
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -100,7 +103,12 @@ const ModalUI: React.FC<ModalUIProps> = ({
         <div className={cn("flex flex-row gap-2 justify-center items-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 h-full", sizeConfig.container)}>
           {layoutView && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none lg:flex lg:order-2 lg:flex-2 lg:max-w-[900px] xl:flex-1 xl:order-1" />}
 
-          <div className={modalContentClasses} onClick={(e) => e.stopPropagation()}>
+          <motion.div
+            className={modalContentClasses}
+            onClick={(e) => e.stopPropagation()}
+            layout={animateHeight}
+            transition={animateHeight ? { duration: 0.3, ease: "easeInOut", layout: { duration: 0.3 } } : undefined}
+          >
             {title && (
               <header className="flex justify-between items-center p-4">
                 <div className={titleTextClasses}>{title}</div>
@@ -112,8 +120,14 @@ const ModalUI: React.FC<ModalUIProps> = ({
               </header>
             )}
 
-            <main className="p-4 overflow-y-auto opened-modal scrollbar-search">{children}</main>
-          </div>
+            <motion.main
+              className="p-4 overflow-y-auto opened-modal scrollbar-search"
+              layout={animateHeight}
+              transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}
+            >
+              {children}
+            </motion.main>
+          </motion.div>
 
           {layoutView && <div id="right-notes-blank" className="hidden max-w-[900px] xl:block xl:flex-2 xl:order-2" />}
         </div>

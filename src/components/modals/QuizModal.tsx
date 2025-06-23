@@ -172,7 +172,9 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-white font-bold text-lg">{String.fromCharCode(65 + index)}</div>
+                <div className="min-w-10 min-h-10 w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                  {String.fromCharCode(65 + index)}
+                </div>
                 <span className="text-white font-medium text-lg">{answer.text}</span>
               </div>
               <div className="flex items-center">
@@ -205,7 +207,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
   );
 
   return (
-    <ModalUI title={modalTitle} onClose={onClose} size="xxl">
+    <ModalUI title={modalTitle} onClose={onClose} size="xxl" animateHeight={true}>
       <motion.div className="flex flex-col h-full relative overflow-hidden p-4" variants={variants.container} initial="hidden" animate="visible" exit="exit">
         <div className="relative z-10 flex-1 flex items-center justify-center">
           <div className="w-full">
