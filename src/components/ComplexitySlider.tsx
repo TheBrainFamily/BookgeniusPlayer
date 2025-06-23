@@ -7,11 +7,11 @@ import { motion } from "motion/react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
-// import { OptionalElement } from "./OptionalElement";
 import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
+import { OptionalElement } from "./OptionalElement";
 
 type SentenceData = {
   id: string;
@@ -91,7 +91,7 @@ const ComplexitySlider: React.FC<ComplexitySliderProps> = ({ className }) => {
   if (!isVisible) return null;
 
   return (
-    <div className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
+    <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
       <motion.div
         className="bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full max-w-[400px] rounded-3xl px-4 py-3"
         initial={{ opacity: 0, y: 20 }}
@@ -125,7 +125,7 @@ const ComplexitySlider: React.FC<ComplexitySliderProps> = ({ className }) => {
           </div>
         </div>
       </motion.div>
-    </div>
+    </OptionalElement>
   );
 };
 
