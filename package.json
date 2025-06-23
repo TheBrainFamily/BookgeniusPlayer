@@ -32,6 +32,7 @@
     "@capawesome/capacitor-asset-manager": "^7.0.0",
     "@journeyapps/domparser": "^0.4.1",
     "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
+    "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-scroll-area": "^1.2.3",

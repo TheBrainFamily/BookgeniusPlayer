@@ -4,7 +4,6 @@ import { useBookMenuModal } from "@/stores/modals/bookMenuModal.store";
 import { useBookChapterModal } from "@/stores/modals/bookChapterModal.store";
 import { useApiKeyModal } from "@/stores/modals/apiKeyModal.store";
 import BookMenuModal from "@/components/modals/BookMenuModal";
-import { preloadBackgroundTracks } from "@/deal-with-background-songs";
 import { resetFurthestPageLocation } from "@/helpers/reset-furthest-page-location";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 
@@ -32,7 +31,6 @@ export const BookMenuModalRenderer: React.FC = () => {
       onClose={closeModal}
       openBookChapterModal={handleOpenBookChapterModal}
       openApiKeyModal={handleOpenApiKeyModal}
-      preloadBackgroundTracks={preloadBackgroundTracks}
       resetFurthestPageLocation={resetFurthestPageLocation}
     />,
     document.body,
