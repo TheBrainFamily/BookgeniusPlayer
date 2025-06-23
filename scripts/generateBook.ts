@@ -113,14 +113,12 @@ export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
 }
 
 function generateBookDataFiles(bookDirectoryPath: string, bookSlug: string, bookLang: string, xmlDoc: Document): void {
-  const chapters = xmlDoc.getElementsByTagName("Chapter");
-  const chapterCount = chapters.length;
   const bookOutputPath = path.resolve("src", "books", bookSlug);
 
   // --- Generate getBookStringified.ts ---
   const bookXml = fs.readFileSync(`${bookDirectoryPath}/book.xml`, "utf8");
 
-  const { backgroundsData, audioData, cutSceneData, htmlResult } = xmlToComplexHtml(bookXml, bookSlug);
+  const { backgroundsData, audioData, cutSceneData, htmlResult, chapterTitles } = xmlToComplexHtml(bookXml, bookSlug);
 
   // Check if the required media files exist in the book directory
   const requiredMediaFiles = ["getBackgroundsForBook.ts", "getBackgroundSongsForBook.ts", "getCutScenesForBook.ts"];
@@ -180,7 +178,7 @@ import { getBookStringified } from "@/books/${bookSlug}/getBookStringified";
 export const bookData: BookData = {
   slug: "${bookSlug}",
   metadata: { title: "${bookSlugNoDashes}", language: "${bookLang}" },
-  chapters: ${chapterCount},
+  chapters: ${JSON.stringify(chapterTitles, null, 2)},
   themeColors: {
     primaryColor: "#E3F2FD",
     secondaryColor: "#1976D2",
