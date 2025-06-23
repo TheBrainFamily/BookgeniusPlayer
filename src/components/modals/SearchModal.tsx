@@ -146,8 +146,8 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
             ) : (
               <motion.div
                 className="flex flex-col items-center justify-center py-12 text-center"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
                 <div className="p-4 rounded-full mb-4 backdrop-blur-sm border bg-book-secondary-20 border-book-secondary-30">
