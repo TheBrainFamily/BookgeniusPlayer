@@ -24,5 +24,5 @@ export function findSimplifiedSentence(id: string, currentScore: number) {
   }
 
   lowerVersions.sort((a, b) => b.score - a.score);
-  return { text: lowerVersions[0].text.replace(/<[^>]*>/g, ""), score: lowerVersions[0].score, hasLower: lowerVersions.length > 1 };
+  return { text: lowerVersions[0].text, score: lowerVersions[0].score, hasLower: lowerVersions.length > 1 };
 }
