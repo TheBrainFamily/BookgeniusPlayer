@@ -77,7 +77,7 @@ export async function performUnifiedSearch(
 /**
  * Creates a summary that starts 20 characters before the found text with highlighting
  */
-const createContextualSummary = (fullText: string, query: string, maxLength: number = 75): string => {
+const createContextualSummary = (fullText: string, query: string, maxLength: number = 150): string => {
   const queryLower = query.toLowerCase();
   const fullTextLower = fullText.toLowerCase();
 
@@ -225,7 +225,7 @@ export async function performLocalDOMSearch(query: string, currentLocation: Loca
 
         if (paragraphText.toLowerCase().includes(queryLower)) {
           const fullText = paragraphText;
-          const summaryText = createContextualSummary(fullText, query);
+          const summaryText = createContextualSummary(fullText, query, 150);
 
           items.push({
             chapter: chapterIndex,

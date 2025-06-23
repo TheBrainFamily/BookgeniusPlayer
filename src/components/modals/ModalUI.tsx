@@ -112,7 +112,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
               </header>
             )}
 
-            <main className="p-4 overflow-y-auto opened-modal">{children}</main>
+            <main className="p-4 overflow-y-auto opened-modal scrollbar-search">{children}</main>
           </div>
 
           {layoutView && <div id="right-notes-blank" className="hidden max-w-[900px] xl:block xl:flex-2 xl:order-2" />}

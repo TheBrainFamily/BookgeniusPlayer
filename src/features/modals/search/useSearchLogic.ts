@@ -3,14 +3,12 @@ import debounce from "lodash.debounce";
 
 import { useSearchModal } from "@/stores/modals/searchModal.store";
 import { performLocalDOMSearch, performUnifiedSearch } from "@/searchModal";
-// import { useLocationRange } from "@/hooks/useLocationRange";
 import { Location } from "@/state/LocationContext";
 import { CURRENT_BOOK } from "@/consts";
 import { getSavedLocation } from "@/helpers/paragraphsNavigation";
 
 export const useSearchLogic = () => {
   const { query, isOpen, setResults } = useSearchModal();
-  const savedLocation = useMemo(() => getSavedLocation(), []);
 
   /* ------------------------------------------------------------------ *
    * 1 ️⃣  Unified-search debounce (1 s, returns a real Promise)
@@ -95,9 +93,10 @@ export const useSearchLogic = () => {
    * ------------------------------------------------------------------ */
   useEffect(() => {
     if (isOpen && query.trim()) {
-      debouncedTriggerSearch(query, savedLocation, CURRENT_BOOK);
+      const latestLocation = getSavedLocation();
+      debouncedTriggerSearch(query, latestLocation, CURRENT_BOOK);
     } else if (isOpen && !query.trim()) {
       setResults({ header: "Please enter a search term.", items: [], isLoading: false });
     }
-  }, [query, isOpen, debouncedTriggerSearch, setResults, savedLocation]);
+  }, [query, isOpen, debouncedTriggerSearch, setResults]);
 };

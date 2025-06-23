@@ -7,6 +7,10 @@ import { SearchResultsData, SearchResultItemData, cleanupSearchChapters } from "
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
 import ModalUI from "./ModalUI";
 import { highlightSearchInParagraph } from "@/utils/textHighlighting";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { getTitle } from "@/utils/getChapterTitle";
+import { isNumberTitle } from "@/utils/isNumberTitle";
 
 interface SearchModalProps {
   onClose: () => void;
@@ -17,6 +21,20 @@ interface SearchModalProps {
 
 const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults }) => {
   const { t } = useTranslation();
+  const bookData = getBookData();
+
+  const getChapterTitle = (chapterNumber: number): string => {
+    if (!bookData?.chapters) {
+      return `${t("chapter")} ${chapterNumber}`;
+    }
+
+    const chapter = bookData.chapters.find((ch) => parseInt(ch.id) === chapterNumber);
+    if (chapter && chapter.title.trim() && !isNumberTitle(chapter.title)) {
+      return chapter.title;
+    }
+
+    return getTitle(chapterNumber, t);
+  };
 
   // Cleanup search chapters when modal unmounts
   useEffect(() => {
@@ -34,6 +52,22 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
     systemNavigateTo({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber });
     highlightSearchInParagraph(item.chapter, item.paragraphNumber, query);
   }, []);
+
+  // Group search results by chapter
+  const groupedResults = React.useMemo(() => {
+    if (!searchResults?.items) return {};
+
+    return searchResults.items.reduce(
+      (acc, item) => {
+        if (!acc[item.chapter]) {
+          acc[item.chapter] = [];
+        }
+        acc[item.chapter].push(item);
+        return acc;
+      },
+      {} as Record<number, SearchResultItemData[]>,
+    );
+  }, [searchResults?.items]);
 
   const modalTitle = (
     <div className="flex items-center gap-2">
@@ -75,51 +109,56 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
           <div className="flex-grow overflow-y-auto pb-4">
             {searchResults.items.length > 0 ? (
               <motion.div className="space-y-3" variants={variants.container} initial="hidden" animate="visible">
-                {searchResults.items.map((item: SearchResultItemData, index: number) => (
-                  <motion.div
-                    key={item.id}
-                    className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20"
-                    variants={variants.item}
-                    // whileHover="hover"
-                    whileTap="tap"
-                    onClick={() => handleSearchResultClick(item)}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <div className="relative p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-primary-30 text-book-primary">
-                          <span className="flex items-center gap-1">
-                            <FileText size={12} />
-                            {t("chapter")} {item.chapter}
-                          </span>
-                        </div>
-                        <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
-                          {t("paragraph")} {item.paragraphNumber}
-                        </div>
-                      </div>
-
-                      {item.text && (
-                        <motion.div
-                          className="mb-2 text-sm italic text-white/70 p-2 rounded-md bg-book-secondary-20"
-                          // initial={{ opacity: 0 }}
-                          // animate={{ opacity: 1 }}
-                          // transition={{ delay: 0.1 }}
-                        >
-                          <div className="flex items-start gap-2">
-                            <span dangerouslySetInnerHTML={{ __html: item.text }} />
+                <Accordion type="multiple" defaultValue={Object.keys(groupedResults).map(String)} className="w-full">
+                  {Object.entries(groupedResults)
+                    .sort(([a], [b]) => Number(a) - Number(b))
+                    .map(([chapter, items], chapterIndex) => (
+                      <AccordionItem key={chapter} value={chapter} className="border-book-primary-20 rounded-lg mb-3 overflow-hidden">
+                        <AccordionTrigger className="px-4 py-3 bg-book-primary-10 hover:bg-book-primary-20 text-book-primary hover:no-underline">
+                          <div className="flex items-center gap-2">
+                            <FileText size={16} />
+                            <span className="font-medium">
+                              {getChapterTitle(Number(chapter))} ({items.length} {items.length === 1 ? "result" : "results"})
+                            </span>
                           </div>
-                        </motion.div>
-                      )}
+                        </AccordionTrigger>
+                        <AccordionContent className="px-0 pb-0">
+                          <div className="space-y-2 p-3">
+                            {items.map((item: SearchResultItemData, index: number) => (
+                              <motion.div
+                                key={item.id}
+                                className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20 bg-gradient-to-br from-book-primary-5 to-book-secondary-5 hover:from-book-primary-10 hover:to-book-secondary-10 transition-all duration-200"
+                                variants={variants.item}
+                                whileTap="tap"
+                                onClick={() => handleSearchResultClick(item)}
+                                transition={{ delay: (chapterIndex * items.length + index) * 0.03 }}
+                              >
+                                <div className="relative p-4">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
+                                      {t("paragraph")} {item.paragraphNumber}
+                                    </div>
+                                  </div>
 
-                      <motion.div
-                        className="text-sm text-white/90 leading-relaxed"
-                        //  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-                      >
-                        <span dangerouslySetInnerHTML={{ __html: item.summary }} />
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                ))}
+                                  {item.text && (
+                                    <motion.div className="mb-2 text-sm italic text-white/70 p-2 rounded-md bg-book-secondary-20">
+                                      <div className="flex items-start gap-2">
+                                        <span dangerouslySetInnerHTML={{ __html: item.text }} />
+                                      </div>
+                                    </motion.div>
+                                  )}
+
+                                  <motion.div className="text-sm text-white/90 leading-relaxed">
+                                    <span dangerouslySetInnerHTML={{ __html: item.summary }} />
+                                  </motion.div>
+                                </div>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                </Accordion>
               </motion.div>
             ) : (
               <motion.div
