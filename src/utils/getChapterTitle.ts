@@ -1,3 +1,6 @@
+import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { isNumberTitle } from "./isNumberTitle";
+
 export const getTitle = (chapter: number, t: (key: string) => string) => {
   // Special case for 0
   if (chapter === 0) return t("chapter_zero");
@@ -58,4 +61,25 @@ export const getTitle = (chapter: number, t: (key: string) => string) => {
   }
 
   return `${t("chapter")} ${chapterName.trim()}`;
+};
+
+/**
+ * Get the display title for a chapter, preferring custom titles over ordinal numbers
+ * @param chapterNumber - The chapter number (1-based)
+ * @param t - Translation function
+ * @returns The chapter title to display
+ */
+export const getChapterTitle = (chapterNumber: number, t: (key: string) => string): string => {
+  const bookData = getBookData();
+
+  if (!bookData?.chapters) {
+    return `${t("chapter")} ${chapterNumber}`;
+  }
+
+  const chapter = bookData.chapters.find((ch) => parseInt(ch.id) === chapterNumber);
+  if (chapter && chapter.title.trim() && !isNumberTitle(chapter.title)) {
+    return chapter.title;
+  }
+
+  return getTitle(chapterNumber, t);
 };

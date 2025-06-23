@@ -11,6 +11,7 @@ import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
 import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
 import { highlightSearchInParagraph } from "@/utils/textHighlighting";
 import { useLocationRange } from "@/hooks/useLocationRange";
+import { getChapterTitle } from "@/utils/getChapterTitle";
 
 interface CharacterModalProps {
   onClose: () => void;
@@ -26,6 +27,7 @@ export const findLatestSummaryInRange = (character: CharacterData, endChapter: n
 };
 
 const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, characterSlug, endChapter }) => {
+  const { t } = useTranslation();
   const { debouncedLocation } = useLocationRange();
   const matchingCharacter = getCharactersData().find((character) => character.slug === characterSlug);
 
@@ -36,7 +38,6 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { t } = useTranslation();
 
   // Search for character appearances in the text up to the current location
   useEffect(() => {
@@ -168,7 +169,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                           <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-primary-30 text-book-primary">
                             <span className="flex items-center gap-1">
                               <FileText size={12} />
-                              {t("chapter")} {appearance.chapter}
+                              {getChapterTitle(appearance.chapter, t)}
                             </span>
                           </div>
                           <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
