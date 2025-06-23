@@ -308,13 +308,13 @@ function getScrollMarginTopPx(): number {
 
   const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1024px)");
   if (landscapeMediaQuery.matches) {
-    return 30;
+    return 50;
   }
 
   // Assuming 'line-height: 1.6;' for 'p' elements (as per file_context_2),
   // 1em (font-size of p) = lineHeight / 1.6.
   // So, 6em = 6 * (lineHeight / 1.6) = (6 / 1.6) * lineHeight = 3.75 * lineHeight.
-  return 130;
+  return 250;
 }
 
 // --- Extract Chapter and Paragraph Info ---
@@ -440,7 +440,7 @@ export function setupPageObserver(
     });
     chosenElement?.classList.add("active-paragraph");
 
-    const topMultiplier = 0.05;
+    const topMultiplier = 0.3;
     let bottomMultiplier = 0.5;
 
     // Check media query for landscape mode on smaller wide screens
