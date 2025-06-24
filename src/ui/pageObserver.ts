@@ -99,6 +99,12 @@ export function highlightCharacter(character: HTMLSpanElement, openCharacterDeta
 
   character.classList.add("character-highlighted-activated");
   character.addEventListener("click", () => {
+    // Find and remove any floating avatars to prevent them from sticking
+    const floatingAvatars = document.querySelectorAll(".floating-avatar");
+    floatingAvatars.forEach((avatar) => {
+      document.body.removeChild(avatar);
+    });
+
     openCharacterDetailsModal(characterSlug, isTalking, listeningSrc);
   });
 

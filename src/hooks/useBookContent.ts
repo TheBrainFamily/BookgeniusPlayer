@@ -22,6 +22,10 @@ export function useBookContent(containerId: string) {
       const handleClick = (event) => {
         const target = event.target as HTMLElement;
 
+        if (target.closest(".character-highlighted-activated")) {
+          return;
+        }
+
         // If the icon was clicked, let its own handler deal with it and don't simplify further.
         if (target.closest(".simplified-icon")) {
           return;
