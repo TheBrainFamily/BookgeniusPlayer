@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
 import { setupPageObserver } from "@/ui/pageObserver";
 import { getBookStringified } from "@/genericBookDataGetters/getBookStringified";
-// import { useSentenceModal } from "@/stores/modals/sentenceModal.store";
+import { useSentenceModal } from "@/stores/modals/sentenceModal.store";
 import { findSimplifiedSentence } from "@/helpers/findSimplifiedSentence";
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
@@ -11,7 +11,7 @@ export function useBookContent(containerId: string) {
   const bookStringified = getBookStringified();
 
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
-  // const { openModal: openSentenceModal } = useSentenceModal();
+  const { openModal: openSentenceModal } = useSentenceModal();
 
   useEffect(() => {
     const container = document.getElementById(containerId);
@@ -20,25 +20,60 @@ export function useBookContent(containerId: string) {
       setupPageObserver(openCharacterDetailsModal);
 
       const handleClick = (event) => {
-        const target = event.target as HTMLInputElement;
-        if (target.tagName === "SPAN" && /^ch\d+-p\d+-s\d+$/.test(target.id)) {
-          const currentSentenceId = target.id;
-          // const currentSentence = target.textContent;
-          const currentSentenceScore = target.getAttribute("data-current-score");
-          const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentence(target.id, parseInt(currentSentenceScore));
+        const target = event.target as HTMLElement;
+
+        // If the icon was clicked, let its own handler deal with it and don't simplify further.
+        if (target.closest(".simplified-icon")) {
+          return;
+        }
+
+        const span = target.closest("span[id^='ch']");
+
+        if (span) {
+          const isFirstSimplification = !span.hasAttribute("data-simplified");
+
+          // Store the original sentence only on the first click.
+          if (isFirstSimplification) {
+            span.setAttribute("data-original-sentence", span.innerHTML);
+          }
+
+          const currentSentenceId = span.id;
+          const currentSentenceScore = span.getAttribute("data-current-score") || "0";
+          const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentence(span.id, parseInt(currentSentenceScore));
 
           if (!simplifiedSentence) {
-            console.warn(`Simplified sentence not found for ${currentSentenceId}`);
+            console.warn(`No further simplification available for ${currentSentenceId}`);
+            // We can add a visual cue here later if needed.
             return;
           }
-          target.innerHTML = replaceXmlTagsIntoHtmlTags(simplifiedSentence);
 
-          // 4. Update the state on the element!
-          target.dataset.currentScore = simplifiedSentenceScore.toString();
+          // Remove old icon if it exists before updating innerHTML
+          const existingIcon = span.querySelector(".simplified-icon");
+          if (existingIcon) {
+            span.removeChild(existingIcon);
+          }
 
-          // 5. Activate character interactions for newly transformed content
-          activateCharacterInteractions(target, openCharacterDetailsModal);
-          // openSentenceModal(currentSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
+          span.innerHTML = replaceXmlTagsIntoHtmlTags(simplifiedSentence);
+          span.setAttribute("data-current-score", simplifiedSentenceScore.toString());
+          span.setAttribute("data-simplified", "true");
+
+          activateCharacterInteractions(span as HTMLElement, openCharacterDetailsModal);
+
+          const iconContainer = document.createElement("span");
+          iconContainer.className = "simplified-icon";
+          iconContainer.style.marginLeft = "5px";
+          iconContainer.style.cursor = "pointer";
+          iconContainer.style.display = "inline-block";
+          iconContainer.style.verticalAlign = "middle";
+          iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="CornflowerBlue" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>`;
+          span.appendChild(iconContainer);
+
+          iconContainer.onclick = (e) => {
+            e.stopPropagation();
+            const originalSentence = span.getAttribute("data-original-sentence");
+            // The `simplifiedSentence` variable holds the text for the *current* simplified version.
+            openSentenceModal(originalSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
+          };
         }
       };
 

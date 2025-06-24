@@ -1,11 +1,17 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, Variants } from "motion/react";
-import { FileText, Zap, CheckCircle } from "lucide-react";
+import { FileText, CheckCircle, ArrowDownUp } from "lucide-react";
 
 import ModalUI from "./ModalUI";
 import { Button } from "@/components/ui/button";
 import { findSimplifiedSentence } from "@/helpers/findSimplifiedSentence";
+
+const stripHtml = (html: string | undefined): string => {
+  if (!html) return "";
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent || "";
+};
 
 interface SentenceModalProps {
   onClose: () => void;
@@ -33,9 +39,20 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
     setIsMoreSimplifiedSentence(hasLower);
   };
 
+  const handleUndo = () => {
+    const sentenceElement = document.getElementById(currentSentenceId);
+    if (sentenceElement) {
+      sentenceElement.innerHTML = _currentSentence;
+      sentenceElement.removeAttribute("data-simplified");
+      sentenceElement.removeAttribute("data-original-sentence");
+      sentenceElement.setAttribute("data-current-score", "0");
+    }
+    onClose();
+  };
+
   const modalTitle = (
     <div className="flex items-center gap-2">
-      <Zap size={20} className="mb-1" />
+      <ArrowDownUp size={20} className="mb-1" />
       <span>{t("sentence_simplification")}</span>
     </div>
   );
@@ -72,7 +89,7 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
                   transition={{ delay: 0.1 }}
                   style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
                 >
-                  {_currentSentence}
+                  {stripHtml(_currentSentence)}
                 </motion.div>
               </div>
             </motion.div>
@@ -101,7 +118,7 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
                     transition={{ delay: 0.3 }}
                     style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
                   >
-                    {_simplifiedSentence}
+                    {stripHtml(_simplifiedSentence)}
                   </motion.div>
                 </div>
               </motion.div>
@@ -109,7 +126,14 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
           </div>
 
           <div className="flex-shrink-0 pt-4 pb-2">
-            <motion.div className="flex justify-center" variants={variants.item} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+            <motion.div className="flex justify-center gap-4" variants={variants.item} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+              <Button
+                onClick={handleUndo}
+                size="lg"
+                className="cursor-pointer bg-gradient-to-r from-book-primary to-book-tertiary text-white shadow-lg hover:shadow-xl border border-book-primary-30 hover:from-book-primary/90 hover:to-book-tertiary/90"
+              >
+                {t("undo_simplification")}
+              </Button>
               <Button
                 className={`
                   min-w-[200px] cursor-pointer
@@ -123,7 +147,7 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
                 disabled={!isMoreSimplifiedSentence}
                 size="lg"
               >
-                <Zap size={16} className={isMoreSimplifiedSentence ? "text-white" : "text-white/50"} />
+                <ArrowDownUp size={16} className={isMoreSimplifiedSentence ? "text-white" : "text-white/50"} />
                 {isMoreSimplifiedSentence ? t("get_simplified_sentence") : t("no_further_simplification")}
               </Button>
             </motion.div>
