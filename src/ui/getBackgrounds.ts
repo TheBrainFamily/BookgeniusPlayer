@@ -23,11 +23,10 @@ export const getBackgrounds = (): Background[] => {
       backgrounds.sort((a, b) => a.paragraph - b.paragraph);
 
       // Set endParagraph for each background
-      backgrounds.forEach((bg, index) => {
-        const nextBg = backgrounds[index + 1];
-        const endParagraph = nextBg ? nextBg.paragraph - 1 : 10_000; // 10,000 for the last bg in chapter
+      backgrounds.forEach((bg) => {
+        const endParagraph = 10_000; // 10,000 for the last bg in chapter
 
-        result.push({ startChapter: bg.chapter, startParagraph: bg.paragraph, file: bg.file, endChapter: bg.chapter, endParagraph });
+        result.push({ startChapter: bg.chapter, startParagraph: bg.paragraph, file: bg.file, endChapter: 10_000, endParagraph });
       });
     });
 

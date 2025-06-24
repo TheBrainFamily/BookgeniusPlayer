@@ -90,16 +90,15 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
     /* ---------- main debounced handler ----------------------------------- */
     debouncedHandler = debounce(async (currentLocation: { currentChapter: number; currentParagraph: number }) => {
       const backgrounds = getBackgrounds() as Background[];
-      const found = backgrounds.find(
-        (bg) =>
-          currentLocation.currentChapter >= bg.startChapter &&
-          currentLocation.currentChapter <= bg.endChapter &&
-          currentLocation.currentParagraph >= bg.startParagraph &&
-          currentLocation.currentParagraph <= bg.endParagraph,
-      );
 
-      console.log("DAMIANO currentLocation", currentLocation);
+      const foundAll = backgrounds.filter((bg) => {
+        return (currentLocation.currentChapter == bg.startChapter && currentLocation.currentParagraph >= bg.startParagraph) || currentLocation.currentChapter > bg.startChapter;
+      });
+
       console.log("DAMIANO backgrounds", backgrounds);
+      console.log("DAMIANO currentLocation", currentLocation);
+      console.log("DAMIANO foundAll", foundAll);
+      const found = foundAll[foundAll.length - 1];
       console.log("DAMIANO found", found);
 
       /* ---- cancel zooms *before* any early-return --------------------- */
