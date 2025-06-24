@@ -335,6 +335,9 @@ const getParagraphInfo = (element: Element): { chapter: number | null; paragraph
   return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
 };
 
+let rootRectChangedTimes = 0;
+let previousRootRectWidth = 0;
+
 export function setupPageObserver(
   openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void,
 ): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number } | null {
@@ -365,6 +368,14 @@ export function setupPageObserver(
     const zoneTop = rootRect.top + scrollMarginTopPx;
     const zoneBottom = zoneTop + 0.1 * rootRect.height; // 10% height below this point
 
+    if (rootRect.width !== previousRootRectWidth) {
+      console.log("ROOTRECTE: 372 rootRectChangedTimes", rootRectChangedTimes);
+      console.log("ROOTRECTE: 373 rootRect.width", rootRect.width);
+      console.log("ROOTRECTE: 374 previousRootRectWidth", previousRootRectWidth);
+      rootRectChangedTimes++;
+      previousRootRectWidth = rootRect.width;
+    }
+
     // --- Development Zone Visualizer ---
 
     console.log("WILCZYNSKA: 276 zoneTop", zoneTop);
@@ -372,17 +383,26 @@ export function setupPageObserver(
     console.log("WILCZYNSKA: 278 rootRect", rootRect);
     console.log("WILCZYNSKA: 279 scrollMarginTopPx", scrollMarginTopPx);
 
-    let currentSentenceVisualizer = document.getElementById("dev-zone-visualizer-2");
-    if (!currentSentenceVisualizer) {
-      currentSentenceVisualizer = document.createElement("div");
-      currentSentenceVisualizer.id = "dev-zone-visualizer-2";
-      document.body.appendChild(currentSentenceVisualizer);
-    }
-    currentSentenceVisualizer.style.left = `${rootRect.left}px`;
-    currentSentenceVisualizer.style.top = `${zoneTop - 50}px`;
-    currentSentenceVisualizer.style.width = `${rootRect.width}px`;
-    currentSentenceVisualizer.style.height = `${zoneBottom - zoneTop + 100}px`;
+    console.log(`intersectingPages.size: ${intersectingPages.size}`);
+    if (intersectingPages.size > 0 && rootRectChangedTimes === 2) {
+      let currentSentenceVisualizer = document.getElementById("dev-zone-visualizer-2");
+      if (!currentSentenceVisualizer) {
+        currentSentenceVisualizer = document.createElement("div");
+        currentSentenceVisualizer.id = "dev-zone-visualizer-2";
+        currentSentenceVisualizer.style.opacity = "0";
+        currentSentenceVisualizer.style.transition = "opacity 0.5s ease-in-out";
+        document.body.appendChild(currentSentenceVisualizer);
+      }
+      currentSentenceVisualizer.style.left = `${rootRect.left}px`;
+      currentSentenceVisualizer.style.top = `${zoneTop - 50}px`;
+      currentSentenceVisualizer.style.width = `${rootRect.width}px`;
+      currentSentenceVisualizer.style.height = `${zoneBottom - zoneTop + 100}px`;
 
+      // Trigger fade-in
+      requestAnimationFrame(() => {
+        currentSentenceVisualizer.style.opacity = "1";
+      });
+    }
     const topMultiplier = 0.2;
     let bottomMultiplier = 0.55;
 
@@ -395,16 +415,16 @@ export function setupPageObserver(
     const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
     const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
 
-    let zoneVisualizer = document.getElementById("dev-zone-visualizer");
-    if (!zoneVisualizer) {
-      zoneVisualizer = document.createElement("div");
-      zoneVisualizer.id = "dev-zone-visualizer";
-      document.body.appendChild(zoneVisualizer);
-    }
-    zoneVisualizer.style.left = `${rootRect.left}px`;
-    zoneVisualizer.style.top = `${focusZoneTop}px`;
-    zoneVisualizer.style.width = `${rootRect.width}px`;
-    zoneVisualizer.style.height = `${focusZoneBottom - focusZoneTop}px`;
+    // let zoneVisualizer = document.getElementById("dev-zone-visualizer");
+    // if (!zoneVisualizer) {
+    //   zoneVisualizer = document.createElement("div");
+    //   zoneVisualizer.id = "dev-zone-visualizer";
+    //   document.body.appendChild(zoneVisualizer);
+    // }
+    // zoneVisualizer.style.left = `${rootRect.left}px`;
+    // zoneVisualizer.style.top = `${focusZoneTop}px`;
+    // zoneVisualizer.style.width = `${rootRect.width}px`;
+    // zoneVisualizer.style.height = `${focusZoneBottom - focusZoneTop}px`;
 
     let activeParagraph: { chapter: number | null; paragraph: number | null } | null = null;
     let maxPercentageOverlapRatio = -1;

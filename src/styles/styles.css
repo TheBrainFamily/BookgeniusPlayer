@@ -190,6 +190,11 @@
         padding: 15vh 0 70vh;
         width: 100%;
       }
+      @media (min-width: 1280px) {
+        & > section {
+          padding-top: 30vh;
+        }
+      }
 
       /* Chapter sections */
       section[data-chapter] {
