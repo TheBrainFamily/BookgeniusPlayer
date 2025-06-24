@@ -4,8 +4,10 @@ import { useLocationRange } from "./useLocationRange";
 import { useQuizModal } from "@/stores/modals/quizModal.store";
 import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
 import { getQuizQuestions } from "@/genericBookDataGetters/getQuizQuestions";
+import useSplashHidden from "./useSplashHidden";
 
 export function useQuizz() {
+  const isSplashHidden = useSplashHidden();
   const {
     debouncedLocation: { currentChapter },
   } = useLocationRange(300);
@@ -15,6 +17,7 @@ export function useQuizz() {
     const clickedSentences = JSON.parse(localStorage.getItem("clickedSentences") || "[]");
 
     const quizQuestions = getQuizQuestions();
+
     return quizQuestions.filter((question) => {
       const chapterMatch = question.id.match(/ch(\d+)/);
       const questionChapter = chapterMatch ? parseInt(chapterMatch[1]) : 0;
@@ -26,7 +29,7 @@ export function useQuizz() {
   useEffect(() => {
     const questions = getQuestions().sort((a, b) => (b.score || 0) - (a.score || 0));
 
-    if (!questions.length) return;
+    if (!questions.length || !isSplashHidden) return;
 
     const sentence = getAllVariants()
       .find((question) => question.id === questions[0].id)
@@ -35,5 +38,5 @@ export function useQuizz() {
     if (currentChapter >= 1) {
       openQuizModal(questions[0].questions, sentence);
     }
-  }, [currentChapter]);
+  }, [currentChapter, isSplashHidden]);
 }

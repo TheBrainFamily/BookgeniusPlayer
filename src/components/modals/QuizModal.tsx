@@ -4,6 +4,7 @@ import { HelpCircle, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 import ModalUI from "./ModalUI";
 import { QuizAnswer, QuizQuestion } from "@/stores/modals/quizModal.store";
+import ComplexitySlider from "../ComplexitySlider";
 
 interface QuizModalProps {
   onClose: () => void;
@@ -40,15 +41,17 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
   const handleAnswerCorrectness = (answerId: string) => {
     const answerIsCorrect = Boolean(question.answers.find((answer) => answer.id === answerId && answer.isCorrect));
 
-    const readingComplexity = parseInt(localStorage.getItem("readingComplexity") || "0");
+    let readingComplexity = parseInt(localStorage.getItem("readingComplexity") || "0");
 
     if (answerIsCorrect) {
-      const newComplexity = Math.min(100, readingComplexity + 10);
-      localStorage.setItem("readingComplexity", newComplexity.toString());
+      readingComplexity = Math.min(100, readingComplexity + 10);
+      // localStorage.setItem("readingComplexity", newComplexity.toString());
     } else {
-      const newComplexity = Math.max(0, readingComplexity - 10);
-      localStorage.setItem("readingComplexity", newComplexity.toString());
+      readingComplexity = Math.max(0, readingComplexity - 10);
+      // localStorage.setItem("readingComplexity", newComplexity.toString());
     }
+
+    window.dispatchEvent(new CustomEvent("changeReadingComplexity", { detail: { complexity: readingComplexity } }));
   };
 
   const handleAnswerSelect = (answerId: string) => {
@@ -262,6 +265,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
             />
           </div>
         </div>
+        <ComplexitySlider className="mt-8 pointer-events-none" />
       </motion.div>
     </ModalUI>
   );

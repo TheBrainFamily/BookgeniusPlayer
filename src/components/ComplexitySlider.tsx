@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { BarChart3 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useLocalStorageState from "use-local-storage-state";
@@ -23,18 +23,29 @@ interface ComplexitySliderProps {
   className?: string;
 }
 
+interface ChangeComplexityReadingEvent extends CustomEvent {
+  detail: { complexity: number };
+}
+
 const ComplexitySlider: React.FC<ComplexitySliderProps> = ({ className }) => {
   const { t } = useTranslation();
+  const allVariants = getAllVariants();
   const [currentComplexity, setCurrentComplexity] = useLocalStorageState("readingComplexity", { defaultValue: 100 });
-  const [isVisible, setIsVisible] = useState(false);
+  const isVisible = useRef(allVariants.length > 0);
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
 
-  const allVariants = getAllVariants();
-
-  // Show slider only if variants are available
   useEffect(() => {
-    setIsVisible(allVariants.length > 0);
-  }, [allVariants.length]);
+    const handleComplexityReadingChange = (event: ChangeComplexityReadingEvent) => {
+      setCurrentComplexity(event.detail.complexity);
+      localStorage.setItem("readingComplexity", event.detail.complexity.toString());
+    };
+
+    window.addEventListener("changeReadingComplexity", handleComplexityReadingChange);
+
+    return () => {
+      window.removeEventListener("changeReadingComplexity", handleComplexityReadingChange);
+    };
+  }, []);
 
   const handleComplexityChange = (value: number[]) => {
     const complexity = value[0];
@@ -88,7 +99,7 @@ const ComplexitySlider: React.FC<ComplexitySliderProps> = ({ className }) => {
     return bestFit;
   };
 
-  if (!isVisible) return null;
+  if (!isVisible.current) return null;
 
   return (
     <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
