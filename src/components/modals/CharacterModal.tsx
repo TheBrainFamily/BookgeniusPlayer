@@ -28,7 +28,6 @@ export const findLatestSummaryInRange = (character: CharacterData, endChapter: n
 };
 
 const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, characterSlug, endChapter }) => {
-  const { t } = useTranslation();
   const { debouncedLocation } = useLocationRange();
   const matchingCharacter = getCharactersData().find((character) => character.slug === characterSlug);
 
