@@ -384,7 +384,7 @@ export function setupPageObserver(
     console.log("WILCZYNSKA: 279 scrollMarginTopPx", scrollMarginTopPx);
 
     console.log(`intersectingPages.size: ${intersectingPages.size}`);
-    if (intersectingPages.size > 0 && rootRectChangedTimes === 2) {
+    if (intersectingPages.size > 0 && rootRectChangedTimes >= 2) {
       let currentSentenceVisualizer = document.getElementById("dev-zone-visualizer-2");
       if (!currentSentenceVisualizer) {
         currentSentenceVisualizer = document.createElement("div");
