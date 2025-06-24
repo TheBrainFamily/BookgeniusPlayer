@@ -21,10 +21,12 @@ interface QuizModalState {
   questions: QuizQuestion[];
   currentQuestionIndex: number;
   sentence: string | null;
+  userResponses: Record<string, string>;
   openModal: (questions: QuizQuestion[], sentence: string) => void;
   closeModal: () => void;
   nextQuestion: () => void;
   previousQuestion: () => void;
+  setUserResponse: (questionId: string, answerId: string) => void;
 }
 
 export const useQuizModal = create<QuizModalState>()(
@@ -34,12 +36,13 @@ export const useQuizModal = create<QuizModalState>()(
       questions: [],
       currentQuestionIndex: 0,
       sentence: null,
+      userResponses: {},
       openModal: (questions, sentence) => {
         if (!questions || questions.length === 0) return;
 
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
-          set({ isOpen: true, questions, currentQuestionIndex: 0, sentence });
+          set({ isOpen: true, questions, currentQuestionIndex: 0, sentence, userResponses: {} });
         }
       },
       nextQuestion: () => {
@@ -60,6 +63,9 @@ export const useQuizModal = create<QuizModalState>()(
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
         set({ isOpen: false, questions: [], currentQuestionIndex: 0, sentence: null });
+      },
+      setUserResponse: (questionId: string, answerId: string) => {
+        set((state) => ({ userResponses: { ...state.userResponses, [questionId]: answerId } }));
       },
     }),
     { name: "quiz-modal" },

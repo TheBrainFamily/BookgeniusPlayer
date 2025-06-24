@@ -5,7 +5,7 @@ import QuizModal from "@/components/modals/QuizModal";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 
 export const QuizModalRenderer: React.FC = () => {
-  const { isOpen, questions, currentQuestionIndex, closeModal, nextQuestion, previousQuestion, sentence } = useQuizModal();
+  const { isOpen, questions, currentQuestionIndex, closeModal, nextQuestion, previousQuestion, sentence, setUserResponse } = useQuizModal();
 
   useEscapeKey(isOpen, closeModal);
 
@@ -23,6 +23,7 @@ export const QuizModalRenderer: React.FC = () => {
       currentQuestionIndex={currentQuestionIndex}
       totalQuestions={questions.length}
       sentence={sentence}
+      setUserResponse={setUserResponse}
     />,
     document.body,
   );

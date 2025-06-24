@@ -13,9 +13,10 @@ interface QuizModalProps {
   currentQuestionIndex: number;
   totalQuestions: number;
   sentence: string | null;
+  setUserResponse: (questionId: string, answerId: string) => void;
 }
 
-const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, previousQuestion, currentQuestionIndex, totalQuestions, sentence }) => {
+const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, previousQuestion, currentQuestionIndex, totalQuestions, sentence, setUserResponse }) => {
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -36,10 +37,27 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
     };
   }, []);
 
+  const handleAnswerCorrectness = (answerId: string) => {
+    const answerIsCorrect = Boolean(question.answers.find((answer) => answer.id === answerId && answer.isCorrect));
+
+    const readingComplexity = parseInt(localStorage.getItem("readingComplexity") || "0");
+
+    if (answerIsCorrect) {
+      const newComplexity = Math.min(100, readingComplexity + 10);
+      localStorage.setItem("readingComplexity", newComplexity.toString());
+    } else {
+      const newComplexity = Math.max(0, readingComplexity - 10);
+      localStorage.setItem("readingComplexity", newComplexity.toString());
+    }
+  };
+
   const handleAnswerSelect = (answerId: string) => {
     if (showResult) return;
     setSelectedAnswerId(answerId);
     setShowResult(true);
+
+    handleAnswerCorrectness(answerId);
+    setUserResponse(question.id, answerId);
 
     timeoutRef.current = setTimeout(() => {
       nextQuestion();
