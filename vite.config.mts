@@ -132,6 +132,13 @@ const bookDataPlugin = () => {
   return getAllVariantsInput();
 };`,
     },
+    getQuizQuestions: {
+      types: `import type { QuizOutput } from "@/types/book";`,
+      import: `import { getQuizQuestions as getQuizQuestionsInput } from "@/books/${selectedAlias}/getQuizQuestions";`,
+      export: `export const getQuizQuestions = (): QuizOutput[] => {
+  return getQuizQuestionsInput();
+};`,
+    },
   };
 
   return {

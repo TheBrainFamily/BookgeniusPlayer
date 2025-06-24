@@ -2,10 +2,8 @@ import { useEffect } from "react";
 
 import { useLocationRange } from "./useLocationRange";
 import { useQuizModal } from "@/stores/modals/quizModal.store";
-import { getQuizQuestions } from "../../public_books/Alice-Wonderland/getQuizQuestions";
 import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
-
-type QuizOutput = { id: string; score: number; questions: { id: string; question: string; answers: { id: string; text: string; isCorrect: boolean }[] }[] };
+import { getQuizQuestions } from "@/genericBookDataGetters/getQuizQuestions";
 
 export function useQuizz() {
   const {
@@ -16,7 +14,7 @@ export function useQuizz() {
   const getQuestions = () => {
     const clickedSentences = JSON.parse(localStorage.getItem("clickedSentences") || "[]");
 
-    const quizQuestions = getQuizQuestions() as QuizOutput[];
+    const quizQuestions = getQuizQuestions();
     return quizQuestions.filter((question) => {
       const chapterMatch = question.id.match(/ch(\d+)/);
       const questionChapter = chapterMatch ? parseInt(chapterMatch[1]) : 0;
