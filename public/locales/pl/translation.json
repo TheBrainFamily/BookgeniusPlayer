@@ -107,5 +107,6 @@
   "original_sentence": "Oryginalne Zdanie",
   "simplified_version": "Uproszczona Wersja",
   "no_further_simplification": "Brak dalszych uproszczeń",
-  "get_simplified_sentence": "Pobierz Następne Uproszczone Zdanie"
+  "get_simplified_sentence": "Pobierz Następne Uproszczone Zdanie",
+  "undo_simplification": "Cofnij Uproszczenie"
 }
