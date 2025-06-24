@@ -383,8 +383,8 @@ export function setupPageObserver(
     currentSentenceVisualizer.style.width = `${rootRect.width}px`;
     currentSentenceVisualizer.style.height = `${zoneBottom - zoneTop + 100}px`;
 
-    const topMultiplier = 0.3;
-    let bottomMultiplier = 0.6;
+    const topMultiplier = 0.2;
+    let bottomMultiplier = 0.55;
 
     // Check media query for landscape mode on smaller wide screens
     const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");

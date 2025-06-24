@@ -967,7 +967,7 @@ section[data-chapter] [data-index] {
   background-color: rgba(57, 112, 59, 0.3);
   /* border: 1px dashed gray; */
   z-index: 30;
-  pointer-events: none;
+  pointer-events: none !important;
   mix-blend-mode: multiply;
   /* Blur at top and bottom using a mask gradient */
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
