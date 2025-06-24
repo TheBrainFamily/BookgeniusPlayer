@@ -379,9 +379,9 @@ export function setupPageObserver(
       document.body.appendChild(currentSentenceVisualizer);
     }
     currentSentenceVisualizer.style.left = `${rootRect.left}px`;
-    currentSentenceVisualizer.style.top = `${zoneTop}px`;
+    currentSentenceVisualizer.style.top = `${zoneTop - 50}px`;
     currentSentenceVisualizer.style.width = `${rootRect.width}px`;
-    currentSentenceVisualizer.style.height = `${zoneBottom - zoneTop}px`;
+    currentSentenceVisualizer.style.height = `${zoneBottom - zoneTop + 100}px`;
 
     const topMultiplier = 0.3;
     let bottomMultiplier = 0.6;

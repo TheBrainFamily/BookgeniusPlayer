@@ -964,10 +964,16 @@ section[data-chapter] [data-index] {
 
 #dev-zone-visualizer-2 {
   position: fixed;
-  background-color: rgba(255, 215, 140, 0.1);
-  border: 1px dashed gray;
+  background-color: rgba(57, 112, 59, 0.3);
+  /* border: 1px dashed gray; */
   z-index: 30;
   pointer-events: none;
+  mix-blend-mode: multiply;
+  /* Blur at top and bottom using a mask gradient */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+  /* Optional: add a blur filter for extra effect */
+  /* filter: blur(2px); */
 }
 
 @keyframes pulse {
