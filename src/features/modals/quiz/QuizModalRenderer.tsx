@@ -5,11 +5,26 @@ import QuizModal from "@/components/modals/QuizModal";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 
 export const QuizModalRenderer: React.FC = () => {
-  const { isOpen, question, closeModal } = useQuizModal();
+  const { isOpen, questions, currentQuestionIndex, closeModal, nextQuestion, previousQuestion, sentence, setUserResponse } = useQuizModal();
 
   useEscapeKey(isOpen, closeModal);
 
-  if (!isOpen) return null;
+  if (!isOpen || !questions.length) return null;
 
-  return createPortal(<QuizModal onClose={closeModal} question={question} />, document.body);
+  const currentQuestion = questions[currentQuestionIndex];
+  if (!currentQuestion) return null;
+
+  return createPortal(
+    <QuizModal
+      onClose={closeModal}
+      question={currentQuestion}
+      nextQuestion={nextQuestion}
+      previousQuestion={previousQuestion}
+      currentQuestionIndex={currentQuestionIndex}
+      totalQuestions={questions.length}
+      sentence={sentence}
+      setUserResponse={setUserResponse}
+    />,
+    document.body,
+  );
 };

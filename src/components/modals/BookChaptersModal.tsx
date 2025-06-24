@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import ModalUI from "@/components/modals/ModalUI";
 import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
-import { getTitle } from "@/utils/getChapterTitle";
-import { isNumberTitle } from "@/utils/isNumberTitle";
+import { getChapterTitle } from "@/utils/getChapterTitle";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
@@ -15,19 +14,15 @@ interface BookChaptersModalProps {
 
 const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
   const { t } = useTranslation();
-  const bookData = getBookData();
 
   const chapters = useMemo(() => {
+    const bookData = getBookData();
     if (!bookData) {
       return [];
     }
 
-    return bookData.chapters.map((chapter, index) => ({
-      id: parseInt(chapter.id),
-      title: chapter.title.trim() && !isNumberTitle(chapter.title) ? chapter.title : getTitle(index + 1, t),
-      page: (index + 1).toString(),
-    }));
-  }, [bookData, t]);
+    return bookData.chapters.map((chapter, index) => ({ id: parseInt(chapter.id), title: getChapterTitle(parseInt(chapter.id), t), page: (index + 1).toString() }));
+  }, [t]);
 
   const navigateToChapter = (chapterId: number) => {
     systemNavigateTo({ currentChapter: chapterId, currentParagraph: 0 });

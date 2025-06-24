@@ -12,6 +12,7 @@ import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
 import { highlightSearchInParagraph } from "@/utils/textHighlighting";
 import { useLocationRange } from "@/hooks/useLocationRange";
 import { DialogEnhanceClose } from "../ui/dialog";
+import { getChapterTitle } from "@/utils/getChapterTitle";
 
 interface CharacterModalProps {
   onClose: () => void;
@@ -54,11 +55,22 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
           }
         });
 
-        const onePerChapter = Array.from(appearancesByChapter.values())
-          .sort((a, b) => a.chapter - b.chapter)
-          .slice(0, 3);
+        let results = Array.from(appearancesByChapter.values()).sort((a, b) => a.chapter - b.chapter);
 
-        setCharacterAppearances(onePerChapter);
+        // If we have fewer than 3 unique chapters but more items available, fill from the first chapter to reach 3 results total
+        if (results.length < 3 && searchResults.items.length > results.length) {
+          const firstChapter = results[0]?.chapter;
+          if (firstChapter !== undefined) {
+            const firstChapterItems = searchResults.items.filter((item) => item.chapter === firstChapter).sort((a, b) => a.paragraphNumber - b.paragraphNumber);
+
+            const neededCount = Math.min(3 - results.length, firstChapterItems.length - 1);
+            const additionalItems = firstChapterItems.slice(1, 1 + neededCount);
+
+            results = [results[0], ...additionalItems, ...results.slice(1)];
+          }
+        }
+
+        setCharacterAppearances(results.slice(0, 3));
       } catch (error) {
         console.error("Error searching for character appearances:", error);
         setCharacterAppearances([]);
@@ -158,7 +170,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                           <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-primary-30 text-book-primary">
                             <span className="flex items-center gap-1">
                               <FileText size={12} />
-                              {t("chapter")} {appearance.chapter}
+                              {getChapterTitle(appearance.chapter, t)}
                             </span>
                           </div>
                           <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">

@@ -18,28 +18,54 @@ export interface QuizQuestion {
 
 interface QuizModalState {
   isOpen: boolean;
-  question: QuizQuestion | null;
-  openModal: (question?: QuizQuestion) => void;
+  questions: QuizQuestion[];
+  currentQuestionIndex: number;
+  sentence: string | null;
+  userResponses: Record<string, string>;
+  openModal: (questions: QuizQuestion[], sentence: string) => void;
   closeModal: () => void;
+  nextQuestion: () => void;
+  previousQuestion: () => void;
+  setUserResponse: (questionId: string, answerId: string) => void;
 }
 
 export const useQuizModal = create<QuizModalState>()(
   devtools(
-    (set) => ({
+    (set, get) => ({
       isOpen: false,
-      question: null,
+      questions: [],
+      currentQuestionIndex: 0,
+      sentence: null,
+      userResponses: {},
+      openModal: (questions, sentence) => {
+        if (!questions || questions.length === 0) return;
 
-      openModal: (question) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
-          set({ isOpen: true, question });
+          set({ isOpen: true, questions, currentQuestionIndex: 0, sentence, userResponses: {} });
         }
       },
-
+      nextQuestion: () => {
+        const { questions, currentQuestionIndex, closeModal } = get();
+        if (currentQuestionIndex < questions.length - 1) {
+          set({ currentQuestionIndex: currentQuestionIndex + 1 });
+        } else {
+          closeModal();
+        }
+      },
+      previousQuestion: () => {
+        const { currentQuestionIndex } = get();
+        if (currentQuestionIndex > 0) {
+          set({ currentQuestionIndex: currentQuestionIndex - 1 });
+        }
+      },
       closeModal: () => {
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
-        set({ isOpen: false, question: null });
+        set({ isOpen: false, questions: [], currentQuestionIndex: 0, sentence: null });
+      },
+      setUserResponse: (questionId: string, answerId: string) => {
+        set((state) => ({ userResponses: { ...state.userResponses, [questionId]: answerId } }));
       },
     }),
     { name: "quiz-modal" },

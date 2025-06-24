@@ -78,6 +78,10 @@ export function useBookContent(containerId: string) {
             // The `simplifiedSentence` variable holds the text for the *current* simplified version.
             openSentenceModal(originalSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
           };
+          // 5. Activate character interactions for newly transformed content
+          activateCharacterInteractions(target, openCharacterDetailsModal);
+          // openSentenceModal(currentSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
+          setSentenceAsClicked(currentSentenceId);
         }
       };
 
@@ -113,4 +117,26 @@ export function useBookContent(containerId: string) {
       console.warn(`Container with id '${containerId}' not found for content injection.`);
     }
   }, [bookStringified, containerId]); // Rerun if content or ID changes
+}
+
+function setSentenceAsClicked(sentenceId: string) {
+  const clickedSentencesRaw = localStorage.getItem("clickedSentences");
+  let clickedSentences: string[] = [];
+
+  if (clickedSentencesRaw) {
+    try {
+      const parsed = JSON.parse(clickedSentencesRaw);
+      if (Array.isArray(parsed)) {
+        clickedSentences = parsed;
+      }
+    } catch (e) {
+      console.error("Failed to parse clickedSentences from localStorage. Starting fresh.", e);
+      clickedSentences = [];
+    }
+  }
+
+  if (!clickedSentences.includes(sentenceId)) {
+    clickedSentences.push(sentenceId);
+    localStorage.setItem("clickedSentences", JSON.stringify(clickedSentences));
+  }
 }

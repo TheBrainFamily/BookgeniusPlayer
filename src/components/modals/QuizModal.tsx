@@ -1,26 +1,69 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, Variants } from "motion/react";
-import { HelpCircle, Check, X } from "lucide-react";
+import { HelpCircle, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 import ModalUI from "./ModalUI";
 import { QuizAnswer, QuizQuestion } from "@/stores/modals/quizModal.store";
+import ComplexitySlider from "../ComplexitySlider";
 
 interface QuizModalProps {
   onClose: () => void;
+  nextQuestion: () => void;
+  previousQuestion: () => void;
   question: QuizQuestion;
+  currentQuestionIndex: number;
+  totalQuestions: number;
+  sentence: string | null;
+  setUserResponse: (questionId: string, answerId: string) => void;
 }
 
-const QuizModal: React.FC<QuizModalProps> = ({ onClose, question }) => {
+const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, previousQuestion, currentQuestionIndex, totalQuestions, sentence, setUserResponse }) => {
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    setSelectedAnswerId(null);
+    setShowResult(false);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+  }, [question]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleAnswerCorrectness = (answerId: string) => {
+    const answerIsCorrect = Boolean(question.answers.find((answer) => answer.id === answerId && answer.isCorrect));
+
+    let readingComplexity = parseInt(localStorage.getItem("readingComplexity") || "0");
+
+    if (answerIsCorrect) {
+      readingComplexity = Math.min(100, readingComplexity + 10);
+      // localStorage.setItem("readingComplexity", newComplexity.toString());
+    } else {
+      readingComplexity = Math.max(0, readingComplexity - 10);
+      // localStorage.setItem("readingComplexity", newComplexity.toString());
+    }
+
+    window.dispatchEvent(new CustomEvent("changeReadingComplexity", { detail: { complexity: readingComplexity } }));
+  };
 
   const handleAnswerSelect = (answerId: string) => {
     if (showResult) return;
     setSelectedAnswerId(answerId);
     setShowResult(true);
 
-    setTimeout(() => {
-      onClose();
+    handleAnswerCorrectness(answerId);
+    setUserResponse(question.id, answerId);
+
+    timeoutRef.current = setTimeout(() => {
+      nextQuestion();
     }, 3000);
   };
 
@@ -40,9 +83,21 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question }) => {
     }
   };
 
+  const handleNextQuestion = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    nextQuestion();
+  };
+
+  const handlePreviousQuestion = () => {
+    if (showResult) return;
+    previousQuestion();
+  };
+
   const modalTitle = (
     <div className="flex items-center gap-2">
-      <HelpCircle size={20} className="mb-1" />
+      <HelpCircle size={20} />
       <span>Quiz Question</span>
     </div>
   );
@@ -87,6 +142,12 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question }) => {
               </motion.div>
             )}
           </motion.div>
+
+          <motion.div variants={variants.item}>
+            <button onClick={handleNextQuestion} className="mt-4 px-10 py-4 bg-blue-500 hover:bg-blue-600 transition-colors text-white rounded-xl font-semibold text-lg shadow-lg">
+              {currentQuestionIndex < totalQuestions - 1 ? "Next Question" : "Finish Quiz"}
+            </button>
+          </motion.div>
         </motion.div>
       </div>
     );
@@ -94,6 +155,13 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question }) => {
 
   const renderQuestion = () => (
     <motion.div className="space-y-8 max-w-4xl mx-auto" variants={variants.container} initial="hidden" animate="visible">
+      {/* Sentence */}
+      {sentence && (
+        <motion.div variants={variants.item} className="relative overflow-hidden rounded-xl border border-white/10 bg-black/20">
+          <p className="text-lg p-6 text-white/80 leading-relaxed italic text-center">"{sentence}"</p>
+        </motion.div>
+      )}
+
       {/* Question */}
       <motion.div variants={variants.item} className="relative overflow-hidden rounded-xl border border-book-primary-20 bg-gradient-to-r from-book-primary-10 to-book-primary-20">
         <h2 className="text-2xl p-8 font-semibold text-white leading-relaxed">{question.question}</h2>
@@ -125,7 +193,9 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question }) => {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-white font-bold text-lg">{String.fromCharCode(65 + index)}</div>
+                <div className="min-w-10 min-h-10 w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                  {String.fromCharCode(65 + index)}
+                </div>
                 <span className="text-white font-medium text-lg">{answer.text}</span>
               </div>
               <div className="flex items-center">
@@ -158,7 +228,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question }) => {
   );
 
   return (
-    <ModalUI title={modalTitle} onClose={onClose} size="xl">
+    <ModalUI title={modalTitle} onClose={onClose} size="xxl" animateHeight={true}>
       <motion.div className="flex flex-col h-full relative overflow-hidden p-4" variants={variants.container} initial="hidden" animate="visible" exit="exit">
         <div className="relative z-10 flex-1 flex items-center justify-center">
           <div className="w-full">
@@ -173,6 +243,29 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question }) => {
             )}
           </div>
         </div>
+
+        <div className="flex flex-col gap-4 mt-10">
+          <div className="flex items-center justify-center gap-2 text-sm text-white/70 font-mono">
+            <button onClick={handlePreviousQuestion} disabled={currentQuestionIndex === 0 || showResult} className="disabled:opacity-50 transition-opacity">
+              <ChevronLeft size={20} />
+            </button>
+            <span>
+              {currentQuestionIndex + 1} / {totalQuestions}
+            </span>
+            <button onClick={handleNextQuestion} disabled={currentQuestionIndex === totalQuestions - 1 || showResult} className="disabled:opacity-50 transition-opacity">
+              <ChevronRight size={20} />
+            </button>
+          </div>
+          <div className="w-full bg-white/10 rounded-full h-1.5">
+            <motion.div
+              className="bg-blue-400 h-1.5 rounded-full"
+              initial={{ width: `${(currentQuestionIndex / totalQuestions) * 100}%` }}
+              animate={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+            />
+          </div>
+        </div>
+        <ComplexitySlider className="mt-8 pointer-events-none" />
       </motion.div>
     </ModalUI>
   );

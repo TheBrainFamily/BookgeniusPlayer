@@ -8,9 +8,7 @@ import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
 import ModalUI from "./ModalUI";
 import { highlightSearchInParagraph } from "@/utils/textHighlighting";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
-import { getTitle } from "@/utils/getChapterTitle";
-import { isNumberTitle } from "@/utils/isNumberTitle";
+import { getChapterTitle } from "@/utils/getChapterTitle";
 
 interface SearchModalProps {
   onClose: () => void;
@@ -21,20 +19,6 @@ interface SearchModalProps {
 
 const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults }) => {
   const { t } = useTranslation();
-  const bookData = getBookData();
-
-  const getChapterTitle = (chapterNumber: number): string => {
-    if (!bookData?.chapters) {
-      return `${t("chapter")} ${chapterNumber}`;
-    }
-
-    const chapter = bookData.chapters.find((ch) => parseInt(ch.id) === chapterNumber);
-    if (chapter && chapter.title.trim() && !isNumberTitle(chapter.title)) {
-      return chapter.title;
-    }
-
-    return getTitle(chapterNumber, t);
-  };
 
   // Cleanup search chapters when modal unmounts
   useEffect(() => {
@@ -118,7 +102,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                           <div className="flex items-center gap-2">
                             <FileText size={16} />
                             <span className="font-medium">
-                              {getChapterTitle(Number(chapter))} ({items.length} {items.length === 1 ? "result" : "results"})
+                              {getChapterTitle(Number(chapter), t)} ({items.length} {items.length === 1 ? "result" : "results"})
                             </span>
                           </div>
                         </AccordionTrigger>
