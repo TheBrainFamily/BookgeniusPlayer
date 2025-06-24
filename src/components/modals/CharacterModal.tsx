@@ -11,6 +11,7 @@ import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
 import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
 import { highlightSearchInParagraph } from "@/utils/textHighlighting";
 import { useLocationRange } from "@/hooks/useLocationRange";
+import { DialogEnhanceClose } from "../ui/dialog";
 import { getChapterTitle } from "@/utils/getChapterTitle";
 
 interface CharacterModalProps {
@@ -38,6 +39,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
 
   // Search for character appearances in the text up to the current location
   useEffect(() => {
@@ -200,6 +202,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
               )}
             </motion.div>
           )}
+          <DialogEnhanceClose className="absolute top-4 right-4 cursor-pointer" onClick={onClose} />
         </motion.div>
       </motion.div>
     </ModalUI>

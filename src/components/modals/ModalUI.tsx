@@ -96,7 +96,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
       <DialogOverlay className={cn("dialog-overlay", hideOverlay && "bg-transparent backdrop-blur-none")} />
 
       {/* Accessibility */}
-      {title && <DialogTitle className="sr-only">{typeof title === "string" ? title : "Modal"}</DialogTitle>}
+      {title ? <DialogTitle className="sr-only">{typeof title === "string" ? title : "Modal"}</DialogTitle> : <DialogTitle className="sr-only">Modal</DialogTitle>}
 
       {/* Modal Content */}
       <DialogContent className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)} onOpenAutoFocus={(e) => e.preventDefault()}>
