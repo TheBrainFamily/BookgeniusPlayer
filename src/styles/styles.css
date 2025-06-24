@@ -259,11 +259,10 @@
       /* Blockquote / Citation */
       blockquote {
         margin: 1.5em 0;
-        padding-left: 2em;
         color: #333;
 
-        .poem {
-          border-left: 3px solid #bbb;
+        .verse {
+          padding: 0 2rem;
         }
 
         p {
