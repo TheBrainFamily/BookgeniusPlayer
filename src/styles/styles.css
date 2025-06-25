@@ -124,22 +124,13 @@
       background: linear-gradient(
         to bottom,
         rgba(var(--bg-content-light-rgb), 0) 0%,
-        rgba(var(--bg-content-light-rgb), 1) 30%,
-        rgba(var(--bg-content-light-rgb), 1) 70%,
+        rgba(var(--bg-content-light-rgb), 0.95) 35%,
+        rgba(var(--bg-content-light-rgb), 0.95) 65%,
         rgba(var(--bg-content-light-rgb), 0) 100%
       );
 
       mask-image:
-        linear-gradient(
-          to bottom,
-          transparent 0%,
-          rgba(0 0 0 / 0.25) 5%,
-          rgba(0 0 0 / 0.65) 10%,
-          rgba(0 0 0 / 0.9) var(--top-solid),
-          rgba(0 0 0 / 0.9) var(--mid-solid),
-          rgba(0 0 0 / 0.05) 70%,
-          transparent 100%
-        ),
+        linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 10%, rgba(0 0 0 / 1) 45%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 70%, transparent 100%),
         radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
 
       mask-composite: intersect;
@@ -152,9 +143,9 @@
             to bottom,
             transparent 0%,
             rgba(0 0 0 / 0.25) 5%,
-            rgba(0 0 0 / 0.65) 10%,
-            rgba(0 0 0 / 0.9) var(--top-solid),
-            rgba(0 0 0 / 0.9) var(--mid-solid),
+            rgba(0 0 0 / 0.65) 20%,
+            rgba(0 0 0 / 0.9) 30%,
+            rgba(0 0 0 / 0.9) 40%,
             rgba(0 0 0 / 0.2) 70%,
             transparent 100%
           ),
@@ -968,6 +959,7 @@ section[data-chapter] [data-index] {
 }
 
 #dev-zone-visualizer-2 {
+  visibility: hidden;
   position: fixed;
   background-color: rgba(57, 112, 59, 0.3);
   /* border: 1px dashed gray; */
