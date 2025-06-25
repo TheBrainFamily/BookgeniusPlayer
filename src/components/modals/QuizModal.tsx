@@ -42,8 +42,8 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
   const modalTitle = useMemo(
     () => (
       <div className="flex items-center gap-2">
-        <HelpCircle size={20} />
-        <span>Quiz Question</span>
+        <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+        <span className="text-sm sm:text-base">Quiz Question</span>
       </div>
     ),
     [],
@@ -67,7 +67,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
 
   const getAnswerButtonClasses = useCallback(
     (answer: QuizAnswer) => {
-      const baseClasses = "w-full p-6 text-left border-2 rounded-xl cursor-pointer relative overflow-hidden shadow-lg";
+      const baseClasses = "w-full p-2 sm:p-3 md:p-4 lg:p-6 text-left border-2 rounded-lg sm:rounded-xl cursor-pointer relative overflow-hidden shadow-lg";
 
       if (!showResult) {
         return `${baseClasses} border-white/30 bg-white/5`;
@@ -147,22 +147,22 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
     const { isCorrect, correctAnswer } = selectedAnswerData;
 
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <motion.div className="text-center space-y-8 max-w-lg w-full" variants={variants.container} initial="hidden" animate="visible">
+      <div className="flex items-center justify-center min-h-[200px] sm:min-h-[300px] md:min-h-[350px] lg:min-h-[400px] px-3 sm:px-4">
+        <motion.div className="text-center space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8 max-w-lg w-full" variants={variants.container} initial="hidden" animate="visible">
           <motion.div variants={variants.item} className="relative">
             <motion.div
-              className={`inline-flex items-center justify-center w-24 h-24 rounded-full mb-6 ${
+              className={`inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full mb-3 sm:mb-4 lg:mb-6 ${
                 isCorrect ? "bg-gradient-to-r from-green-500 to-green-600" : "bg-gradient-to-r from-red-500 to-red-600"
               }`}
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
             >
-              {isCorrect ? <Check size={48} className="text-white" /> : <X size={48} className="text-white" />}
+              {isCorrect ? <Check className="text-white w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" /> : <X className="text-white w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" />}
             </motion.div>
 
             <motion.h2
-              className={`text-4xl font-bold mb-6 ${isCorrect ? "text-green-300" : "text-red-300"}`}
+              className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4 lg:mb-6 ${isCorrect ? "text-green-300" : "text-red-300"}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
@@ -172,19 +172,22 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
 
             {!isCorrect && correctAnswer && (
               <motion.div
-                className="inline-block px-8 py-4 bg-gradient-to-r from-book-primary-10 to-book-primary-20 rounded-xl border border-book-primary-30"
+                className="inline-block px-3 sm:px-4 lg:px-6 py-2 sm:py-3 bg-gradient-to-r from-book-primary-10 to-book-primary-20 rounded-lg sm:rounded-xl border border-book-primary-30"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4, delay: 0.6 }}
               >
-                <p className="text-xl text-white/90">The correct answer was:</p>
-                <p className="text-xl text-blue-300 font-semibold mt-2">{correctAnswer.text}</p>
+                <p className="text-xs sm:text-sm lg:text-base text-white/90">The correct answer was:</p>
+                <p className="text-xs sm:text-sm lg:text-base text-blue-300 font-semibold mt-1">{correctAnswer.text}</p>
               </motion.div>
             )}
           </motion.div>
 
           <motion.div variants={variants.item}>
-            <button onClick={handleNextQuestion} className="mt-4 px-10 py-4 bg-blue-500 hover:bg-blue-600 transition-colors text-white rounded-xl font-semibold text-lg shadow-lg">
+            <button
+              onClick={handleNextQuestion}
+              className="mt-3 sm:mt-4 px-4 sm:px-6 lg:px-8 py-2 sm:py-3 bg-blue-500 hover:bg-blue-600 transition-colors text-white rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm lg:text-base shadow-lg"
+            >
               {currentQuestionIndex < totalQuestions - 1 ? "Next Question" : "Finish Quiz"}
             </button>
           </motion.div>
@@ -195,21 +198,24 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
 
   const renderQuestion = useCallback(
     () => (
-      <motion.div className="space-y-8 max-w-4xl mx-auto" variants={variants.container} initial="hidden" animate="visible">
+      <motion.div className="space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8 max-w-4xl mx-auto" variants={variants.container} initial="hidden" animate="visible">
         {/* Question */}
-        <motion.div variants={variants.item} className="relative overflow-hidden rounded-xl border border-book-primary-20 bg-gradient-to-r from-book-primary-10 to-book-primary-20">
-          <h2 className="text-2xl p-8 font-semibold text-white leading-relaxed">{question.question}</h2>
+        <motion.div
+          variants={variants.item}
+          className="relative overflow-hidden rounded-lg sm:rounded-xl border border-book-primary-20 bg-gradient-to-r from-book-primary-10 to-book-primary-20"
+        >
+          <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl p-3 sm:p-4 md:p-6 lg:p-8 font-semibold text-white leading-relaxed">{question.question}</h2>
         </motion.div>
 
-        {/* Sentence */}
+        {/* Sentence - Hidden on mobile, visible on sm+ */}
         {sentence && (
-          <motion.div variants={variants.item} className="relative overflow-hidden rounded-xl border border-white/10 bg-black/20">
-            <p className="text-lg p-6 text-white/80 leading-relaxed italic text-center">"{sentence}"</p>
+          <motion.div variants={variants.item} className="hidden sm:block relative overflow-hidden rounded-lg sm:rounded-xl border border-white/10 bg-black/20">
+            <p className="text-sm sm:text-base lg:text-lg p-3 sm:p-4 lg:p-6 text-white/80 leading-relaxed italic text-center">"{sentence}"</p>
           </motion.div>
         )}
 
         {/* Answers Grid */}
-        <motion.div variants={variants.item} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <motion.div variants={variants.item} className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
           {question.answers.map((answer, index) => (
             <motion.button
               key={answer.id}
@@ -233,31 +239,31 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
               }}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="min-w-10 min-h-10 w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+                  <div className="min-w-6 min-h-6 w-6 h-6 sm:min-w-8 sm:min-h-8 sm:w-8 sm:h-8 md:min-w-10 md:min-h-10 md:w-10 md:h-10 bg-white/20 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm md:text-base">
                     {String.fromCharCode(65 + index)}
                   </div>
-                  <span className="text-white font-medium text-lg">{answer.text}</span>
+                  <span className="text-white font-medium text-xs sm:text-sm md:text-base lg:text-lg">{answer.text}</span>
                 </div>
                 <div className="flex items-center">
                   {showResult && answer.isCorrect && (
                     <motion.div
-                      className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"
+                      className="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full flex items-center justify-center"
                       initial={{ scale: 0, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ duration: 0.4, delay: 0.2 }}
                     >
-                      <Check size={20} className="text-white" />
+                      <Check size={16} className="text-white sm:w-5 sm:h-5" />
                     </motion.div>
                   )}
                   {showResult && selectedAnswerId === answer.id && !answer.isCorrect && (
                     <motion.div
-                      className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center"
+                      className="w-6 h-6 sm:w-8 sm:h-8 bg-red-500 rounded-full flex items-center justify-center"
                       initial={{ scale: 0, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ duration: 0.4, delay: 0.2 }}
                     >
-                      <X size={20} className="text-white" />
+                      <X size={16} className="text-white sm:w-5 sm:h-5" />
                     </motion.div>
                   )}
                 </div>
@@ -272,7 +278,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
 
   return (
     <ModalUI title={modalTitle} onClose={onClose} size="xxl" animateHeight={true}>
-      <motion.div className="flex flex-col h-full relative overflow-hidden p-4" variants={variants.container} initial="hidden" animate="visible" exit="exit">
+      <motion.div className="flex flex-col h-full relative overflow-hidden p-2 sm:p-4" variants={variants.container} initial="hidden" animate="visible" exit="exit">
         <div className="relative z-10 flex-1 flex items-center justify-center">
           <div className="w-full">
             {showResult ? (
@@ -287,16 +293,16 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 mt-10">
-          <div className="flex items-center justify-center gap-2 text-sm text-white/70 font-mono">
-            <button onClick={handlePreviousQuestion} disabled={currentQuestionIndex === 0 || showResult} className="disabled:opacity-50 transition-opacity">
-              <ChevronLeft size={20} />
+        <div className="flex flex-col gap-3 sm:gap-4 mt-6 sm:mt-8 md:mt-10">
+          <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-white/70 font-mono">
+            <button onClick={handlePreviousQuestion} disabled={currentQuestionIndex === 0 || showResult} className="disabled:opacity-50 transition-opacity p-1">
+              <ChevronLeft size={16} className="sm:w-5 sm:h-5" />
             </button>
-            <span>
+            <span className="px-2">
               {currentQuestionIndex + 1} / {totalQuestions}
             </span>
-            <button onClick={handleNextQuestion} disabled={currentQuestionIndex === totalQuestions - 1 || showResult} className="disabled:opacity-50 transition-opacity">
-              <ChevronRight size={20} />
+            <button onClick={handleNextQuestion} disabled={currentQuestionIndex === totalQuestions - 1 || showResult} className="disabled:opacity-50 transition-opacity p-1">
+              <ChevronRight size={16} className="sm:w-5 sm:h-5" />
             </button>
           </div>
           <div className="w-full bg-white/10 rounded-full h-1.5">
@@ -309,7 +315,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
           </div>
 
           <motion.div
-            className={`flex items-center justify-center gap-3 text-sm rounded-lg px-4 py-3 transition-all duration-300 ${
+            className={`hidden sm:flex items-center justify-center gap-3 text-sm rounded-lg px-4 py-3 transition-all duration-300 ${
               isComplexityChanging ? "bg-blue-500/10 border border-blue-400/30 shadow-lg shadow-blue-500/20" : "bg-black/20 border border-white/10"
             }`}
             initial={{ opacity: 0, y: 10 }}
