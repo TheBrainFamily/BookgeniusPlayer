@@ -7,6 +7,7 @@ import { getChapterTitle } from "@/utils/getChapterTitle";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { useLocationRange } from "@/hooks/useLocationRange";
 
 interface BookChaptersModalProps {
   onClose: () => void;
@@ -14,6 +15,8 @@ interface BookChaptersModalProps {
 
 const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
   const { t } = useTranslation();
+  const { locationRange } = useLocationRange();
+  const currentChapter = locationRange.currentChapter;
 
   const chapters = useMemo(() => {
     const bookData = getBookData();
@@ -32,17 +35,25 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
   return (
     <ModalUI title={t("chapters")} onClose={onClose}>
       <ScrollArea className="max-h-[60vh] space-y-2">
-        {chapters.map((chapter) => (
-          <Button
-            variant="ghost"
-            key={chapter.id}
-            onClick={() => navigateToChapter(chapter.id)}
-            className="w-full justify-between text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
-          >
-            <div className="flex items-center gap-3 font-medium">{chapter.title}</div>
-            <span className="text-sm text-muted-foreground">{chapter.page}</span>
-          </Button>
-        ))}
+        {chapters.map((chapter) => {
+          const isCurrentChapter = chapter.id === currentChapter;
+          return (
+            <Button
+              variant="ghost"
+              key={chapter.id}
+              onClick={() => navigateToChapter(chapter.id)}
+              className={`w-full justify-between text-left hover:bg-white/10 hover:text-white border-white/20 cursor-pointer ${
+                isCurrentChapter ? "bg-white/20 text-white border-white/40 font-semibold" : "text-white"
+              }`}
+            >
+              <div className="flex items-center gap-3 font-medium">
+                {chapter.title}
+                {isCurrentChapter && <span className="text-green-400">●</span>}
+              </div>
+              <span className="text-sm text-muted-foreground">{chapter.page}</span>
+            </Button>
+          );
+        })}
       </ScrollArea>
     </ModalUI>
   );
