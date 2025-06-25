@@ -4,7 +4,6 @@ import { HelpCircle, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 import ModalUI from "./ModalUI";
 import { QuizAnswer, QuizQuestion } from "@/stores/modals/quizModal.store";
-import ComplexitySlider from "../ComplexitySlider";
 
 interface QuizModalProps {
   onClose: () => void;
@@ -265,7 +264,6 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
             />
           </div>
         </div>
-        <ComplexitySlider className="mt-8 pointer-events-none !opacity-100" />
       </motion.div>
     </ModalUI>
   );
