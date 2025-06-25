@@ -1,5 +1,7 @@
 import { Location } from "@/state/LocationContext";
 import { QUESTIONS_SERVER_URL } from "@/lib/consts";
+import { CURRENT_BOOK } from "@/consts";
+import { Filter } from "@/types/book";
 
 const extractSummary = (text: string): string => {
   const summaryMatch = text.match(/<Summary>(.*?)<\/Summary>/);
@@ -34,10 +36,11 @@ export type SearchParagraphsFunctionResponse = { chapter: number; paragraphNumbe
  */
 export async function searchParagraphsFromServer(searchQuery: string, location: Location): Promise<SearchParagraphsFunctionResponse[]> {
   const baseUrl = `${QUESTIONS_SERVER_URL}/getParagraphsForSearch`;
-  const filter = {
+  const filter: Filter = {
     chapterFrom: 0, // Assuming 0-based chapter indexing
     chapterTo: location.endChapter,
     paragraphTo: location.endParagraph,
+    bookSlug: CURRENT_BOOK,
   };
 
   const params = new URLSearchParams({ searchQuery: searchQuery, filter: JSON.stringify(filter) });
