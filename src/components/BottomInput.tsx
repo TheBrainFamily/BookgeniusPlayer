@@ -15,10 +15,11 @@ import { OptionalElement } from "./OptionalElement";
 import { useElementVisibilityStore } from "@/stores/elementVisibility.store";
 import { hasApiKey } from "@/utils/apiKeyManager";
 import { useApiKeyModal } from "@/stores/modals/apiKeyModal.store";
+import { Filter } from "@/types/book";
 
 interface SubmitMessageData {
   query: string;
-  filter: { chapterFrom: number; chapterTo: number | undefined; paragraphFrom: number; paragraphTo: number | undefined; bookSlug: string };
+  filter: Filter;
 }
 
 interface BottomInputProps {

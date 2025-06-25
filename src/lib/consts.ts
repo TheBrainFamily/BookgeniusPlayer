@@ -1,3 +1,5 @@
+import { CURRENT_BOOK } from "@/consts";
+
 // Function to determine if we're running locally or in production
 function isDevelopment(): boolean {
   if (typeof window === "undefined") return true; // SSR case defaults to dev
@@ -6,7 +8,7 @@ function isDevelopment(): boolean {
 }
 
 // Base URLs that adapt to the environment
-const DEV_SERVER_URL = "https://alice.bookgenius.net/";
+const DEV_SERVER_URL = `https://${CURRENT_BOOK}.bookgenius.net/`;
 const DEV_WS_URL = "ws://192.168.1.26:3000";
 
 // In production, use relative URLs that will point to the same domain
