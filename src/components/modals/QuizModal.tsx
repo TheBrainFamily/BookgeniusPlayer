@@ -1,36 +1,23 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, Variants, useMotionValue, useSpring, useTransform } from "motion/react";
-import { HelpCircle, Check, X, ChevronLeft, ChevronRight, BarChart3 } from "lucide-react";
+import { HelpCircle, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 import ModalUI from "./ModalUI";
 import { QuizAnswer, QuizQuestion } from "@/stores/modals/quizModal.store";
 
-const AnimatedComplexityNumber: React.FC<{ value: number; isChanging: boolean; showResult: boolean }> = React.memo(({ value, isChanging, showResult }) => {
+const AnimatedComplexityNumber: React.FC<{ value: number; isChanging: boolean }> = React.memo(({ value, isChanging }) => {
   const [currentDisplayValue, setCurrentDisplayValue] = useState(value);
   const motionValue = useMotionValue(currentDisplayValue);
   const spring = useSpring(motionValue, { stiffness: 50, damping: 15, mass: 1, restDelta: 0.001 });
   const rounded = useTransform(spring, (latest) => Math.round(latest));
 
   useEffect(() => {
-    if (!showResult) {
-      setCurrentDisplayValue(value);
-      motionValue.set(value);
-    }
-  }, [value, showResult, motionValue]);
+    setCurrentDisplayValue(value);
+    motionValue.set(value);
+  }, [value, motionValue]);
 
-  useEffect(() => {
-    if (showResult) {
-      const timer = setTimeout(() => {
-        setCurrentDisplayValue(value);
-        motionValue.set(value);
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [showResult, value, motionValue]);
-
-  return <motion.span className={`font-mono font-bold transition-colors duration-300 ${isChanging ? "text-blue-300" : "text-white"}`}>{rounded}</motion.span>;
+  return <motion.span className={`font-bold transition-colors duration-300 ${isChanging ? "text-blue-300" : "text-white"}`}>{rounded}</motion.span>;
 });
 
 interface QuizModalProps {
@@ -329,16 +316,8 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
-            <motion.div animate={{ rotate: isComplexityChanging ? [0, 5, -5, 0] : 0 }} transition={{ duration: isComplexityChanging ? 0.6 : 0.3, ease: "easeOut" }}>
-              <BarChart3 size={16} className={`transition-colors duration-300 ${isComplexityChanging ? "text-blue-300" : "text-blue-400"}`} />
-            </motion.div>
             <span className="text-white/80 font-medium">{t("reading_complexity")}:</span>
-            <AnimatedComplexityNumber value={currentComplexity} isChanging={isComplexityChanging} showResult={showResult} />
-            <motion.div
-              className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${isComplexityChanging ? "bg-blue-300" : "bg-white/30"}`}
-              animate={{ opacity: isComplexityChanging ? [0.3, 1, 0.3] : 0.6 }}
-              transition={{ duration: isComplexityChanging ? 1.5 : 0.3, repeat: isComplexityChanging ? Infinity : 0, ease: "easeInOut" }}
-            />
+            <AnimatedComplexityNumber value={currentComplexity} isChanging={isComplexityChanging} />
           </motion.div>
         </div>
       </motion.div>
