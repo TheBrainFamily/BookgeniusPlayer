@@ -6,7 +6,6 @@ import useLocalStorageState from "use-local-storage-state";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { cn } from "@/lib/utils";
 import ModalUI from "./ModalUI";
 import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
@@ -30,36 +29,6 @@ interface BookMenuModalProps {
 const SLIDER_DELAY = 200;
 const OVERLAY_TIMEOUT = 1500;
 
-const hideNonVisibleParagraphs = (currentChapter: number, currentParagraph: number) => {
-  document.querySelectorAll("[data-chapter]").forEach((chapter: HTMLElement) => {
-    const id = parseInt(chapter.dataset.chapter || "0");
-    if (Math.abs(id - currentChapter) > 0) {
-      chapter.style.display = "none";
-    } else {
-      chapter.style.display = "block";
-    }
-  });
-  console.log(`currentChapter: ${currentChapter}, currentParagraph: ${currentParagraph}`);
-  console.log(``);
-  document.querySelectorAll(`[data-chapter="${currentChapter}"] [data-index]`).forEach((paragraph: HTMLElement) => {
-    const id = parseInt(paragraph.dataset.index || "0");
-    if (id < currentParagraph) {
-      paragraph.style.display = "none";
-    } else {
-      paragraph.style.display = "block";
-    }
-  });
-};
-
-const displayAllChapters = () => {
-  document.querySelectorAll("[data-chapter]").forEach((chapter: HTMLElement) => {
-    chapter.style.display = "block";
-  });
-  document.querySelectorAll("[data-index]").forEach((paragraph: HTMLElement) => {
-    paragraph.style.display = "block";
-  });
-};
-
 const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, openApiKeyModal, resetFurthestPageLocation }) => {
   const { t } = useTranslation();
   const allVariants = getAllVariants();
@@ -70,20 +39,12 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
   const [hideOverlay, setHideOverlay] = useState(false);
   const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const hiddenParagraphsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isVisible = useRef(allVariants.length > 0);
 
   const handleSliderChangeWithOverlay = (callback: () => void) => {
     if (overlayTimeoutRef.current) {
       clearTimeout(overlayTimeoutRef.current);
     }
-    if (hiddenParagraphsTimeoutRef.current) {
-      clearTimeout(hiddenParagraphsTimeoutRef.current);
-    }
-
-    // Get current location and hide non-visible paragraphs for performance
-    const currentLocation = getCurrentLocation();
-    hideNonVisibleParagraphs(currentLocation.currentChapter, currentLocation.currentParagraph);
 
     if (!hideOverlay) {
       setHideOverlay(true);
@@ -95,9 +56,6 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
     overlayTimeoutRef.current = setTimeout(() => {
       setHideOverlay(false);
-    }, OVERLAY_TIMEOUT);
-    hiddenParagraphsTimeoutRef.current = setTimeout(() => {
-      displayAllChapters();
     }, OVERLAY_TIMEOUT);
   };
 
@@ -166,9 +124,6 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
     return () => {
       if (overlayTimeoutRef.current) {
         clearTimeout(overlayTimeoutRef.current);
-      }
-      if (hiddenParagraphsTimeoutRef.current) {
-        clearTimeout(hiddenParagraphsTimeoutRef.current);
       }
     };
   }, []);

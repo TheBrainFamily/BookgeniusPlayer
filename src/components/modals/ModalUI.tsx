@@ -1,9 +1,9 @@
 import React, { ReactNode, useCallback } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogTitle, DialogOverlay } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 export interface ModalUIProps {
   title?: ReactNode;
@@ -92,8 +92,18 @@ const ModalUI: React.FC<ModalUIProps> = ({
 
   return (
     <Dialog open={true} onOpenChange={handleOpenChange} modal={!layoutView}>
-      {/* Overlay */}
-      <DialogOverlay className={cn("dialog-overlay", hideOverlay && "bg-transparent backdrop-blur-none")} />
+      {/* Overlay with AnimatePresence */}
+      <AnimatePresence>
+        {!hideOverlay && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+          />
+        )}
+      </AnimatePresence>
 
       {/* Accessibility */}
       {title ? <DialogTitle className="sr-only">{typeof title === "string" ? title : "Modal"}</DialogTitle> : <DialogTitle className="sr-only">Modal</DialogTitle>}
