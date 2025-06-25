@@ -1,9 +1,37 @@
-import React, { useState, useEffect, useRef } from "react";
-import { motion, Variants } from "motion/react";
-import { HelpCircle, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { motion, Variants, useMotionValue, useSpring, useTransform } from "motion/react";
+import { HelpCircle, Check, X, ChevronLeft, ChevronRight, BarChart3 } from "lucide-react";
 
 import ModalUI from "./ModalUI";
 import { QuizAnswer, QuizQuestion } from "@/stores/modals/quizModal.store";
+
+const AnimatedComplexityNumber: React.FC<{ value: number; isChanging: boolean; showResult: boolean }> = React.memo(({ value, isChanging, showResult }) => {
+  const [currentDisplayValue, setCurrentDisplayValue] = useState(value);
+  const motionValue = useMotionValue(currentDisplayValue);
+  const spring = useSpring(motionValue, { stiffness: 50, damping: 15, mass: 1, restDelta: 0.001 });
+  const rounded = useTransform(spring, (latest) => Math.round(latest));
+
+  useEffect(() => {
+    if (!showResult) {
+      setCurrentDisplayValue(value);
+      motionValue.set(value);
+    }
+  }, [value, showResult, motionValue]);
+
+  useEffect(() => {
+    if (showResult) {
+      const timer = setTimeout(() => {
+        setCurrentDisplayValue(value);
+        motionValue.set(value);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showResult, value, motionValue]);
+
+  return <motion.span className={`font-mono font-bold transition-colors duration-300 ${isChanging ? "text-blue-300" : "text-white"}`}>{rounded}</motion.span>;
+});
 
 interface QuizModalProps {
   onClose: () => void;
@@ -17,9 +45,22 @@ interface QuizModalProps {
 }
 
 const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, previousQuestion, currentQuestionIndex, totalQuestions, sentence, setUserResponse }) => {
+  const { t } = useTranslation();
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [currentComplexity, setCurrentComplexity] = useState<number>(() => parseInt(localStorage.getItem("readingComplexity") || "50"));
+  const [isComplexityChanging, setIsComplexityChanging] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const modalTitle = useMemo(
+    () => (
+      <div className="flex items-center gap-2">
+        <HelpCircle size={20} />
+        <span>Quiz Question</span>
+      </div>
+    ),
+    [],
+  );
 
   useEffect(() => {
     setSelectedAnswerId(null);
@@ -37,73 +78,86 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
     };
   }, []);
 
-  const handleAnswerCorrectness = (answerId: string) => {
-    const answerIsCorrect = Boolean(question.answers.find((answer) => answer.id === answerId && answer.isCorrect));
+  const getAnswerButtonClasses = useCallback(
+    (answer: QuizAnswer) => {
+      const baseClasses = "w-full p-6 text-left border-2 rounded-xl cursor-pointer relative overflow-hidden shadow-lg";
 
-    let readingComplexity = parseInt(localStorage.getItem("readingComplexity") || "0");
+      if (!showResult) {
+        return `${baseClasses} border-white/30 bg-white/5`;
+      }
 
-    if (answerIsCorrect) {
-      readingComplexity = Math.min(100, readingComplexity + 10);
-      // localStorage.setItem("readingComplexity", newComplexity.toString());
-    } else {
-      readingComplexity = Math.max(0, readingComplexity - 10);
-      // localStorage.setItem("readingComplexity", newComplexity.toString());
-    }
+      if (answer.isCorrect) {
+        return `${baseClasses} border-green-400 bg-gradient-to-r from-green-400/20 to-green-500/20`;
+      } else if (selectedAnswerId === answer.id) {
+        return `${baseClasses} border-red-400 bg-gradient-to-r from-red-400/20 to-red-500/20`;
+      } else {
+        return `${baseClasses} border-white/20 bg-white/5 opacity-60`;
+      }
+    },
+    [showResult, selectedAnswerId],
+  );
 
-    window.dispatchEvent(new CustomEvent("changeReadingComplexity", { detail: { complexity: readingComplexity } }));
-  };
+  const handleAnswerCorrectness = useCallback(
+    (answerId: string) => {
+      const answerIsCorrect = Boolean(question.answers.find((answer) => answer.id === answerId && answer.isCorrect));
 
-  const handleAnswerSelect = (answerId: string) => {
-    if (showResult) return;
-    setSelectedAnswerId(answerId);
-    setShowResult(true);
+      let readingComplexity = parseInt(localStorage.getItem("readingComplexity") || "50");
 
-    handleAnswerCorrectness(answerId);
-    setUserResponse(question.id, answerId);
+      if (answerIsCorrect) {
+        readingComplexity = Math.min(100, readingComplexity + 10);
+      } else {
+        readingComplexity = Math.max(0, readingComplexity - 10);
+      }
 
-    timeoutRef.current = setTimeout(() => {
-      nextQuestion();
-    }, 3000);
-  };
+      localStorage.setItem("readingComplexity", readingComplexity.toString());
 
-  const getAnswerButtonClasses = (answer: QuizAnswer) => {
-    const baseClasses = "w-full p-6 text-left border-2 rounded-xl cursor-pointer relative overflow-hidden shadow-lg";
+      setIsComplexityChanging(true);
+      setCurrentComplexity(readingComplexity);
 
-    if (!showResult) {
-      return `${baseClasses} border-white/30 bg-white/5`;
-    }
+      setTimeout(() => {
+        setIsComplexityChanging(false);
+      }, 1500);
 
-    if (answer.isCorrect) {
-      return `${baseClasses} border-green-400 bg-gradient-to-r from-green-400/20 to-green-500/20`;
-    } else if (selectedAnswerId === answer.id) {
-      return `${baseClasses} border-red-400 bg-gradient-to-r from-red-400/20 to-red-500/20`;
-    } else {
-      return `${baseClasses} border-white/20 bg-white/5 opacity-60`;
-    }
-  };
+      window.dispatchEvent(new CustomEvent("changeReadingComplexity", { detail: { complexity: readingComplexity } }));
+    },
+    [question.answers],
+  );
 
-  const handleNextQuestion = () => {
+  const handleAnswerSelect = useCallback(
+    (answerId: string) => {
+      if (showResult) return;
+      setSelectedAnswerId(answerId);
+      setShowResult(true);
+
+      handleAnswerCorrectness(answerId);
+      setUserResponse(question.id, answerId);
+
+      timeoutRef.current = setTimeout(() => {
+        nextQuestion();
+      }, 3000);
+    },
+    [showResult, handleAnswerCorrectness, setUserResponse, question.id, nextQuestion],
+  );
+
+  const handleNextQuestion = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
     nextQuestion();
-  };
+  }, [nextQuestion]);
 
-  const handlePreviousQuestion = () => {
+  const handlePreviousQuestion = useCallback(() => {
     if (showResult) return;
     previousQuestion();
-  };
+  }, [showResult, previousQuestion]);
 
-  const modalTitle = (
-    <div className="flex items-center gap-2">
-      <HelpCircle size={20} />
-      <span>Quiz Question</span>
-    </div>
-  );
-
-  const renderQuizComplete = () => {
+  const selectedAnswerData = useMemo(() => {
     const selectedAnswer = question.answers.find((answer) => answer.id === selectedAnswerId);
-    const isCorrect = selectedAnswer?.isCorrect || false;
+    return { selectedAnswer, isCorrect: selectedAnswer?.isCorrect || false, correctAnswer: question.answers.find((a) => a.isCorrect) };
+  }, [question.answers, selectedAnswerId]);
+
+  const renderQuizComplete = useCallback(() => {
+    const { isCorrect, correctAnswer } = selectedAnswerData;
 
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -129,7 +183,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
               {isCorrect ? "Correct!" : "Incorrect!"}
             </motion.h2>
 
-            {!isCorrect && (
+            {!isCorrect && correctAnswer && (
               <motion.div
                 className="inline-block px-8 py-4 bg-gradient-to-r from-book-primary-10 to-book-primary-20 rounded-xl border border-book-primary-30"
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -137,7 +191,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
                 transition={{ duration: 0.4, delay: 0.6 }}
               >
                 <p className="text-xl text-white/90">The correct answer was:</p>
-                <p className="text-xl text-blue-300 font-semibold mt-2">{question.answers.find((a) => a.isCorrect)?.text}</p>
+                <p className="text-xl text-blue-300 font-semibold mt-2">{correctAnswer.text}</p>
               </motion.div>
             )}
           </motion.div>
@@ -150,80 +204,83 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
         </motion.div>
       </div>
     );
-  };
+  }, [selectedAnswerData, handleNextQuestion, currentQuestionIndex, totalQuestions]);
 
-  const renderQuestion = () => (
-    <motion.div className="space-y-8 max-w-4xl mx-auto" variants={variants.container} initial="hidden" animate="visible">
-      {/* Question */}
-      <motion.div variants={variants.item} className="relative overflow-hidden rounded-xl border border-book-primary-20 bg-gradient-to-r from-book-primary-10 to-book-primary-20">
-        <h2 className="text-2xl p-8 font-semibold text-white leading-relaxed">{question.question}</h2>
-      </motion.div>
-
-      {/* Sentence */}
-      {sentence && (
-        <motion.div variants={variants.item} className="relative overflow-hidden rounded-xl border border-white/10 bg-black/20">
-          <p className="text-lg p-6 text-white/80 leading-relaxed italic text-center">"{sentence}"</p>
+  const renderQuestion = useCallback(
+    () => (
+      <motion.div className="space-y-8 max-w-4xl mx-auto" variants={variants.container} initial="hidden" animate="visible">
+        {/* Question */}
+        <motion.div variants={variants.item} className="relative overflow-hidden rounded-xl border border-book-primary-20 bg-gradient-to-r from-book-primary-10 to-book-primary-20">
+          <h2 className="text-2xl p-8 font-semibold text-white leading-relaxed">{question.question}</h2>
         </motion.div>
-      )}
 
-      {/* Answers Grid */}
-      <motion.div variants={variants.item} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {question.answers.map((answer, index) => (
-          <motion.button
-            key={answer.id}
-            onClick={() => handleAnswerSelect(answer.id)}
-            className={getAnswerButtonClasses(answer)}
-            disabled={showResult}
-            variants={variants.answerItem}
-            initial={showResult ? false : "hidden"}
-            animate="visible"
-            transition={{ delay: showResult ? 0 : index * 0.15 }}
-            whileHover={{
-              scale: showResult ? 1 : 1.03,
-              borderColor: showResult ? undefined : "rgba(255, 255, 255, 0.5)",
-              backgroundColor: showResult ? undefined : "rgba(255, 255, 255, 0.1)",
-            }}
-            whileTap={{ scale: showResult ? 1 : 0.97 }}
-            style={{
-              borderColor: !showResult && selectedAnswerId === answer.id ? "rgb(96, 165, 250)" : undefined,
-              backgroundColor: !showResult && selectedAnswerId === answer.id ? "rgba(59, 130, 246, 0.2)" : undefined,
-              transform: !showResult && selectedAnswerId === answer.id ? "scale(1.02)" : undefined,
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="min-w-10 min-h-10 w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                  {String.fromCharCode(65 + index)}
+        {/* Sentence */}
+        {sentence && (
+          <motion.div variants={variants.item} className="relative overflow-hidden rounded-xl border border-white/10 bg-black/20">
+            <p className="text-lg p-6 text-white/80 leading-relaxed italic text-center">"{sentence}"</p>
+          </motion.div>
+        )}
+
+        {/* Answers Grid */}
+        <motion.div variants={variants.item} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {question.answers.map((answer, index) => (
+            <motion.button
+              key={answer.id}
+              onClick={() => handleAnswerSelect(answer.id)}
+              className={getAnswerButtonClasses(answer)}
+              disabled={showResult}
+              variants={variants.answerItem}
+              initial={showResult ? false : "hidden"}
+              animate="visible"
+              transition={{ delay: showResult ? 0 : index * 0.15 }}
+              whileHover={{
+                scale: showResult ? 1 : 1.03,
+                borderColor: showResult ? undefined : "rgba(255, 255, 255, 0.5)",
+                backgroundColor: showResult ? undefined : "rgba(255, 255, 255, 0.1)",
+              }}
+              whileTap={{ scale: showResult ? 1 : 0.97 }}
+              style={{
+                borderColor: !showResult && selectedAnswerId === answer.id ? "rgb(96, 165, 250)" : undefined,
+                backgroundColor: !showResult && selectedAnswerId === answer.id ? "rgba(59, 130, 246, 0.2)" : undefined,
+                transform: !showResult && selectedAnswerId === answer.id ? "scale(1.02)" : undefined,
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="min-w-10 min-h-10 w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                    {String.fromCharCode(65 + index)}
+                  </div>
+                  <span className="text-white font-medium text-lg">{answer.text}</span>
                 </div>
-                <span className="text-white font-medium text-lg">{answer.text}</span>
+                <div className="flex items-center">
+                  {showResult && answer.isCorrect && (
+                    <motion.div
+                      className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ duration: 0.4, delay: 0.2 }}
+                    >
+                      <Check size={20} className="text-white" />
+                    </motion.div>
+                  )}
+                  {showResult && selectedAnswerId === answer.id && !answer.isCorrect && (
+                    <motion.div
+                      className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center"
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ duration: 0.4, delay: 0.2 }}
+                    >
+                      <X size={20} className="text-white" />
+                    </motion.div>
+                  )}
+                </div>
               </div>
-              <div className="flex items-center">
-                {showResult && answer.isCorrect && (
-                  <motion.div
-                    className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ duration: 0.4, delay: 0.2 }}
-                  >
-                    <Check size={20} className="text-white" />
-                  </motion.div>
-                )}
-                {showResult && selectedAnswerId === answer.id && !answer.isCorrect && (
-                  <motion.div
-                    className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center"
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ duration: 0.4, delay: 0.2 }}
-                  >
-                    <X size={20} className="text-white" />
-                  </motion.div>
-                )}
-              </div>
-            </div>
-          </motion.button>
-        ))}
+            </motion.button>
+          ))}
+        </motion.div>
       </motion.div>
-    </motion.div>
+    ),
+    [question.question, question.answers, sentence, showResult, selectedAnswerId, handleAnswerSelect, getAnswerButtonClasses],
   );
 
   return (
@@ -263,6 +320,26 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
               transition={{ duration: 0.5, ease: "easeInOut" }}
             />
           </div>
+
+          <motion.div
+            className={`flex items-center justify-center gap-3 text-sm rounded-lg px-4 py-3 transition-all duration-300 ${
+              isComplexityChanging ? "bg-blue-500/10 border border-blue-400/30 shadow-lg shadow-blue-500/20" : "bg-black/20 border border-white/10"
+            }`}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
+            <motion.div animate={{ rotate: isComplexityChanging ? [0, 5, -5, 0] : 0 }} transition={{ duration: isComplexityChanging ? 0.6 : 0.3, ease: "easeOut" }}>
+              <BarChart3 size={16} className={`transition-colors duration-300 ${isComplexityChanging ? "text-blue-300" : "text-blue-400"}`} />
+            </motion.div>
+            <span className="text-white/80 font-medium">{t("reading_complexity")}:</span>
+            <AnimatedComplexityNumber value={currentComplexity} isChanging={isComplexityChanging} showResult={showResult} />
+            <motion.div
+              className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${isComplexityChanging ? "bg-blue-300" : "bg-white/30"}`}
+              animate={{ opacity: isComplexityChanging ? [0.3, 1, 0.3] : 0.6 }}
+              transition={{ duration: isComplexityChanging ? 1.5 : 0.3, repeat: isComplexityChanging ? Infinity : 0, ease: "easeInOut" }}
+            />
+          </motion.div>
         </div>
       </motion.div>
     </ModalUI>
