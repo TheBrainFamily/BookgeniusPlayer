@@ -316,11 +316,15 @@ function getScrollMarginTopPx(): number {
   if (landscapeMediaQuery.matches) {
     return 50;
   }
+  // measure viewport and element height
+  const viewportHeight = window.innerHeight;
+  const elementHeight = element.getBoundingClientRect().height;
 
-  // Assuming 'line-height: 1.6;' for 'p' elements (as per file_context_2),
-  // 1em (font-size of p) = lineHeight / 1.6.
-  // So, 6em = 6 * (lineHeight / 1.6) = (6 / 1.6) * lineHeight = 3.75 * lineHeight.
-  return 250;
+  // center the element vertically
+  const marginTop = ((viewportHeight - elementHeight) / 2) * 0.9;
+
+  // guard against negative values
+  return Math.max(0, Math.round(marginTop));
 }
 
 // --- Extract Chapter and Paragraph Info ---
@@ -330,6 +334,9 @@ const getParagraphInfo = (element: Element): { chapter: number | null; paragraph
   const chapterStr = chapterElement ? (chapterElement as HTMLElement).dataset.chapter : null;
   return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
 };
+
+let rootRectChangedTimes = 0;
+let previousRootRectWidth = 0;
 
 export function setupPageObserver(
   openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void,
@@ -361,12 +368,63 @@ export function setupPageObserver(
     const zoneTop = rootRect.top + scrollMarginTopPx;
     const zoneBottom = zoneTop + 0.1 * rootRect.height; // 10% height below this point
 
+    if (rootRect.width !== previousRootRectWidth) {
+      console.log("ROOTRECTE: 372 rootRectChangedTimes", rootRectChangedTimes);
+      console.log("ROOTRECTE: 373 rootRect.width", rootRect.width);
+      console.log("ROOTRECTE: 374 previousRootRectWidth", previousRootRectWidth);
+      rootRectChangedTimes++;
+      previousRootRectWidth = rootRect.width;
+    }
+
     // --- Development Zone Visualizer ---
 
     console.log("WILCZYNSKA: 276 zoneTop", zoneTop);
     console.log("WILCZYNSKA: 277 zoneBottom", zoneBottom);
     console.log("WILCZYNSKA: 278 rootRect", rootRect);
     console.log("WILCZYNSKA: 279 scrollMarginTopPx", scrollMarginTopPx);
+
+    console.log(`intersectingPages.size: ${intersectingPages.size}`);
+    if (intersectingPages.size > 0 && rootRectChangedTimes >= 2) {
+      let currentSentenceVisualizer = document.getElementById("dev-zone-visualizer-2");
+      if (!currentSentenceVisualizer) {
+        currentSentenceVisualizer = document.createElement("div");
+        currentSentenceVisualizer.id = "dev-zone-visualizer-2";
+        currentSentenceVisualizer.style.opacity = "0";
+        currentSentenceVisualizer.style.transition = "opacity 0.5s ease-in-out";
+        document.body.appendChild(currentSentenceVisualizer);
+      }
+      currentSentenceVisualizer.style.left = `${rootRect.left}px`;
+      currentSentenceVisualizer.style.top = `${zoneTop - 50}px`;
+      currentSentenceVisualizer.style.width = `${rootRect.width}px`;
+      currentSentenceVisualizer.style.height = `${zoneBottom - zoneTop + 100}px`;
+
+      // Trigger fade-in
+      requestAnimationFrame(() => {
+        currentSentenceVisualizer.style.opacity = "1";
+      });
+    }
+    const topMultiplier = 0.2;
+    let bottomMultiplier = 0.55;
+
+    // Check media query for landscape mode on smaller wide screens
+    const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
+    if (landscapeMediaQuery.matches) {
+      bottomMultiplier = 0.95; // Use larger bottom zone in this mode
+    }
+
+    const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
+    const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
+
+    // let zoneVisualizer = document.getElementById("dev-zone-visualizer");
+    // if (!zoneVisualizer) {
+    //   zoneVisualizer = document.createElement("div");
+    //   zoneVisualizer.id = "dev-zone-visualizer";
+    //   document.body.appendChild(zoneVisualizer);
+    // }
+    // zoneVisualizer.style.left = `${rootRect.left}px`;
+    // zoneVisualizer.style.top = `${focusZoneTop}px`;
+    // zoneVisualizer.style.width = `${rootRect.width}px`;
+    // zoneVisualizer.style.height = `${focusZoneBottom - focusZoneTop}px`;
 
     let activeParagraph: { chapter: number | null; paragraph: number | null } | null = null;
     let maxPercentageOverlapRatio = -1;
@@ -445,28 +503,6 @@ export function setupPageObserver(
       element.classList.remove("active-paragraph");
     });
     chosenElement?.classList.add("active-paragraph");
-
-    const topMultiplier = 0.3;
-    let bottomMultiplier = 0.5;
-
-    // Check media query for landscape mode on smaller wide screens
-    const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
-    if (landscapeMediaQuery.matches) {
-      bottomMultiplier = 0.95; // Use larger bottom zone in this mode
-    }
-
-    const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
-    const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
-    // let zoneVisualizer = document.getElementById("dev-zone-visualizer");
-    // if (!zoneVisualizer) {
-    //   zoneVisualizer = document.createElement("div");
-    //   zoneVisualizer.id = "dev-zone-visualizer";
-    //   document.body.appendChild(zoneVisualizer);
-    // }
-    // zoneVisualizer.style.left = `${rootRect.left}px`;
-    // zoneVisualizer.style.top = `${focusZoneTop}px`;
-    // zoneVisualizer.style.width = `${rootRect.width}px`;
-    // zoneVisualizer.style.height = `${focusZoneBottom - focusZoneTop}px`;
 
     if (intersectingPages.size > 0) {
       // Default multipliers

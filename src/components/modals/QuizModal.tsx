@@ -155,17 +155,17 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
 
   const renderQuestion = () => (
     <motion.div className="space-y-8 max-w-4xl mx-auto" variants={variants.container} initial="hidden" animate="visible">
+      {/* Question */}
+      <motion.div variants={variants.item} className="relative overflow-hidden rounded-xl border border-book-primary-20 bg-gradient-to-r from-book-primary-10 to-book-primary-20">
+        <h2 className="text-2xl p-8 font-semibold text-white leading-relaxed">{question.question}</h2>
+      </motion.div>
+
       {/* Sentence */}
       {sentence && (
         <motion.div variants={variants.item} className="relative overflow-hidden rounded-xl border border-white/10 bg-black/20">
           <p className="text-lg p-6 text-white/80 leading-relaxed italic text-center">"{sentence}"</p>
         </motion.div>
       )}
-
-      {/* Question */}
-      <motion.div variants={variants.item} className="relative overflow-hidden rounded-xl border border-book-primary-20 bg-gradient-to-r from-book-primary-10 to-book-primary-20">
-        <h2 className="text-2xl p-8 font-semibold text-white leading-relaxed">{question.question}</h2>
-      </motion.div>
 
       {/* Answers Grid */}
       <motion.div variants={variants.item} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -265,7 +265,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
             />
           </div>
         </div>
-        <ComplexitySlider className="mt-8 pointer-events-none" />
+        <ComplexitySlider className="mt-8 pointer-events-none !opacity-100" />
       </motion.div>
     </ModalUI>
   );
