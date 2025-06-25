@@ -13,6 +13,11 @@ export function useQuizz() {
   } = useLocationRange(300);
   const { openModal: openQuizModal } = useQuizModal();
 
+  const isChapterQuizCompleted = (chapter: number) => {
+    const completedQuizzes = JSON.parse(localStorage.getItem("completedChapterQuizzes") || "[]");
+    return completedQuizzes.includes(chapter);
+  };
+
   const getQuestions = () => {
     const clickedSentences = JSON.parse(localStorage.getItem("clickedSentences") || "[]");
 
@@ -27,6 +32,8 @@ export function useQuizz() {
   };
 
   useEffect(() => {
+    if (isChapterQuizCompleted(currentChapter)) return;
+
     const questions = getQuestions().sort((a, b) => (b.score || 0) - (a.score || 0));
 
     if (!questions.length || !isSplashHidden) return;
@@ -36,7 +43,7 @@ export function useQuizz() {
       .analysis.originalSentence.replace(/<[^>]*>/g, "");
 
     if (currentChapter >= 1) {
-      openQuizModal(questions[0].questions, sentence);
+      openQuizModal(questions[0].questions, sentence, currentChapter);
     }
   }, [currentChapter, isSplashHidden]);
 }
