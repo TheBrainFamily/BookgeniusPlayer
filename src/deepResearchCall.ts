@@ -1,16 +1,19 @@
+import { CURRENT_BOOK } from "./consts";
 import { Location } from "./state/LocationContext";
+import { Filter } from "./types/book";
 
 export async function deepResearchCall(searchQuery: string, location: Location): Promise<string> {
   const baseUrl = "/deepResearch"; // Assuming localhost for now
-  const filter = {
+  const filter: Filter = {
     chapterFrom: 1, // Based on the curl example
     chapterTo: location.chapter,
     paragraphTo: location.paragraph + 1,
+    bookSlug: CURRENT_BOOK,
   };
 
   const params = new URLSearchParams({ question: searchQuery, filter: JSON.stringify(filter) });
 
-  const url = `https://alice.bookgenius.net/api/${baseUrl}?${params.toString()}`;
+  const url = `/api/${baseUrl}?${params.toString()}`;
   console.log(`Fetching deep research from: ${url}`); // Optional: for debugging
 
   try {

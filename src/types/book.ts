@@ -39,3 +39,5 @@ export type BookData = {
 export type BackgroundSongSection = { chapter: number; paragraph: number; files: string[] };
 
 export type QuizOutput = { id: string; score: number; questions: { id: string; question: string; answers: { id: string; text: string; isCorrect: boolean }[] }[] };
+
+export type Filter = { chapterFrom: number; chapterTo: number; paragraphTo: number; bookSlug: string; paragraphFrom?: number };
