@@ -91,21 +91,10 @@
         }
 
         setupVideoSource() {
-          // Mapping of book slugs to their respective loader videos
-          const videoMapping = {
-            Pharaon: "/pharaon-loader.mp4",
-            1984: "/1984-loader.mp4",
-            "Conrad-Tajny-Agent": "/secret-agent-loader.mp4",
-            "Krolowa-Sniegu": "/snow-queen-loader.mp4",
-            "1984-English": "/1984-loader.mp4",
-          };
-
           // Get the current book slug from the global variable
           const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : "Pharaon";
-
-          // Set the video source based on the current book, fallback to 1984-small.mp4
-          const videoSrc = videoMapping[currentBookSlug] || "/1984-small.mp4";
-
+          // Set the video source to the loader.mp4 in the book's assets folder
+          const videoSrc = `/public_books/${currentBookSlug}/assets/loader.mp4`;
           const video = document.getElementById("splash-video");
           if (video) {
             video.src = videoSrc;
