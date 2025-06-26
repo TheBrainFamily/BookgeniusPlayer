@@ -181,6 +181,13 @@
         padding: 15vh 0 70vh;
         width: 100%;
       }
+
+      .play-container > section {
+        width: 78%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
       @media (min-width: 1280px) {
         & > section {
           padding-top: 30vh;
@@ -193,8 +200,16 @@
         /* page-break-before: always; */
       }
 
+      section > span {
+        display: block;
+        font-size: small;
+        margin-top: 2em;
+        margin-bottom: 2em;
+      }
+
       /* Paragraphs */
       p {
+        text-indent: 1.5em;
         margin-top: 0;
         margin-bottom: 1em;
         text-align: justify;
