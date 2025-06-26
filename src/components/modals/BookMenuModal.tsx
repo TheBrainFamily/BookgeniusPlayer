@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, memo } from "react";
 import { List, Type, RotateCcw, BrainCircuit, BarChart3 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useLocalStorageState from "use-local-storage-state";
+import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,38 @@ import { activateCharacterInteractions } from "@/helpers/activateCharacterIntera
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
+
+const AnimatedFontSize: React.FC<{ value: number; isChanging: boolean }> = memo(({ value, isChanging }) => {
+  const [currentDisplayValue, setCurrentDisplayValue] = useState(value);
+  const motionValue = useMotionValue(currentDisplayValue);
+  const spring = useSpring(motionValue, { stiffness: 50, damping: 15, mass: 1, restDelta: 0.001 });
+  const rounded = useTransform(spring, (latest) => Math.round(latest * 10) / 10);
+
+  useEffect(() => {
+    setCurrentDisplayValue(value);
+    motionValue.set(value);
+  }, [value, motionValue]);
+
+  return (
+    <span className={`transition-colors duration-300 ${isChanging ? "text-blue-300" : "text-blue-300"}`}>
+      <motion.span>{rounded}</motion.span>x
+    </span>
+  );
+});
+
+const AnimatedComplexity: React.FC<{ value: number; isChanging: boolean }> = memo(({ value, isChanging }) => {
+  const [currentDisplayValue, setCurrentDisplayValue] = useState(value);
+  const motionValue = useMotionValue(currentDisplayValue);
+  const spring = useSpring(motionValue, { stiffness: 50, damping: 15, mass: 1, restDelta: 0.001 });
+  const rounded = useTransform(spring, (latest) => Math.round(latest));
+
+  useEffect(() => {
+    setCurrentDisplayValue(value);
+    motionValue.set(value);
+  }, [value, motionValue]);
+
+  return <motion.span className={`transition-colors duration-300 ${isChanging ? "text-blue-300" : "text-blue-300"}`}>{rounded}</motion.span>;
+});
 
 type SentenceData = {
   id: string;
@@ -38,6 +71,9 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const [currentComplexity, setCurrentComplexity] = useLocalStorageState("readingComplexity", { defaultValue: 100 });
 
   const [hideOverlay, setHideOverlay] = useState(false);
+  const [isFontSizeChanging, setIsFontSizeChanging] = useState(false);
+  const [isComplexityChanging, setIsComplexityChanging] = useState(false);
+
   const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isVisible = useRef(allVariants.length > 0);
 
@@ -168,7 +204,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           <div className="flex items-center gap-2">
             <Type className="h-4 w-4 text-white" />
             <Label htmlFor="font-size" className="text-sm font-medium text-white">
-              {t("text_size")}: <span id="font-size-value" className="text-blue-300">{`${currentFontSize.toFixed(1)}x`}</span>
+              {t("text_size")}: <AnimatedFontSize value={currentFontSize} isChanging={isFontSizeChanging} />
             </Label>
           </div>
           <Slider
@@ -183,9 +219,60 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
           />
           <div className="flex justify-between text-xs text-gray-300">
-            <span>{t("small")}</span>
-            <span>{t("default")}</span>
-            <span>{t("large")}</span>
+            <span
+              className="cursor-pointer hover:text-white transition-colors"
+              onClick={() => {
+                setHideOverlay(true);
+                setIsFontSizeChanging(true);
+
+                setTimeout(() => {
+                  setCurrentFontSize(0.5);
+                }, 100);
+
+                setTimeout(() => {
+                  setHideOverlay(false);
+                  setIsFontSizeChanging(false);
+                }, 1500);
+              }}
+            >
+              {t("small")}
+            </span>
+            <span
+              className="cursor-pointer hover:text-white transition-colors"
+              onClick={() => {
+                setHideOverlay(true);
+                setIsFontSizeChanging(true);
+
+                setTimeout(() => {
+                  setCurrentFontSize(1.0);
+                }, 100);
+
+                setTimeout(() => {
+                  setHideOverlay(false);
+                  setIsFontSizeChanging(false);
+                }, 1500);
+              }}
+            >
+              {t("default")}
+            </span>
+            <span
+              className="cursor-pointer hover:text-white transition-colors"
+              onClick={() => {
+                setHideOverlay(true);
+                setIsFontSizeChanging(true);
+
+                setTimeout(() => {
+                  setCurrentFontSize(1.5);
+                }, 100);
+
+                setTimeout(() => {
+                  setHideOverlay(false);
+                  setIsFontSizeChanging(false);
+                }, 1500);
+              }}
+            >
+              {t("large")}
+            </span>
           </div>
         </div>
       </div>
@@ -195,7 +282,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             <div className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-white" />
               <Label htmlFor="complexity-slider" className="text-sm font-medium text-white">
-                {t("reading_complexity")}: <span className="text-blue-300">{currentComplexity}</span>
+                {t("reading_complexity")}: <AnimatedComplexity value={currentComplexity} isChanging={isComplexityChanging} />
               </Label>
             </div>
             <Slider
@@ -210,9 +297,63 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
               className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
             />
             <div className="flex justify-between text-xs text-gray-300">
-              <span>{t("simple")}</span>
-              <span>{t("medium")}</span>
-              <span>{t("complex")}</span>
+              <span
+                className="cursor-pointer hover:text-white transition-colors"
+                onClick={() => {
+                  setHideOverlay(true);
+                  setIsComplexityChanging(true);
+
+                  setTimeout(() => {
+                    setCurrentComplexity(20);
+                    updateText(20);
+                  }, 100);
+
+                  setTimeout(() => {
+                    setHideOverlay(false);
+                    setIsComplexityChanging(false);
+                  }, 1500);
+                }}
+              >
+                {t("simple")}
+              </span>
+              <span
+                className="cursor-pointer hover:text-white transition-colors"
+                onClick={() => {
+                  setHideOverlay(true);
+                  setIsComplexityChanging(true);
+
+                  setTimeout(() => {
+                    setCurrentComplexity(60);
+                    updateText(60);
+                  }, 100);
+
+                  setTimeout(() => {
+                    setHideOverlay(false);
+                    setIsComplexityChanging(false);
+                  }, 1500);
+                }}
+              >
+                {t("medium")}
+              </span>
+              <span
+                className="cursor-pointer hover:text-white transition-colors"
+                onClick={() => {
+                  setHideOverlay(true);
+                  setIsComplexityChanging(true);
+
+                  setTimeout(() => {
+                    setCurrentComplexity(100);
+                    updateText(100);
+                  }, 100);
+
+                  setTimeout(() => {
+                    setHideOverlay(false);
+                    setIsComplexityChanging(false);
+                  }, 1500);
+                }}
+              >
+                {t("complex")}
+              </span>
             </div>
           </div>
         </div>
