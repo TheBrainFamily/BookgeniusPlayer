@@ -48,6 +48,4 @@ for dir in "$BOOKS_DIR"/*/; do
 
   echo "Cleaning up ./dist"
   rm -rf ./dist
-  # usunac po testach
-  break;
 done
