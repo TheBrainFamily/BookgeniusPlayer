@@ -8,7 +8,15 @@ export type WordPosition = [string, number];
 
 export type AudiobookTracksSection = { chapter: number; paragraph: number; file: string; smile_id?: string; "clip-begin": number; "clip-end": number; words?: WordPosition[] };
 
-type InfoPerChapter = { chapter: number; summary: string; label?: string; paragraphsWhereSpotted: number[]; paragraphsWhereTalking: number[] };
+type InfoPerChapter = {
+  chapter: number;
+  summary: string;
+  label?: string;
+  paragraphsWhereSpotted: number[];
+  paragraphsWhereTalking: number[];
+  paragraphsWhereEnters?: number[];
+  paragraphsWhereExits?: number[];
+};
 
 export type CharacterData = { slug: string; characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; imageUrl: string };
 
