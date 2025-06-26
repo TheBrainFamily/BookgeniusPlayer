@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 # Different locales for specific books
 get_book_lang() {
   case "$1" in
