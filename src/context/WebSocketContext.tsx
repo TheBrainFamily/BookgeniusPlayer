@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
 import { QUESTIONS_SERVER_WS_URL } from "@/lib/consts";
+import { Filter } from "@/types/book";
 
 // Types for the streamed messages
 type StreamMessage = { type: "stream"; content: string };
@@ -8,7 +9,7 @@ type CompleteMessage = { type: "complete"; message: string };
 
 type WebSocketMessage = StreamMessage | CompleteMessage;
 
-export type Message = { query: string; filter: { bookSlug: string; chapterFrom?: number; chapterTo?: number; paragraphFrom?: number; paragraphTo?: number } };
+export type Message = { query: string; filter: Filter };
 
 interface WebSocketContextType {
   isConnected: boolean;

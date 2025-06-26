@@ -81,6 +81,12 @@ export const xmlToComplexHtml = (
     }
   }
 
+  const bookForm = xmlDoc.getElementsByTagName("BookForm")[0];
+  const bookFormValue = bookForm ? bookForm.textContent : "";
+  if (bookFormValue === "Play") {
+    htmlResult += `\n    <div class="play-container">`;
+  }
+
   const chapters = xmlDoc.getElementsByTagName("Chapter");
 
   for (const chapter of chapters) {
@@ -269,6 +275,10 @@ export const xmlToComplexHtml = (
     }
 
     htmlResult += "\n  </section></section>";
+  }
+
+  if (bookFormValue === "Play") {
+    htmlResult += `\n    </div>`;
   }
 
   return { htmlResult: htmlResult.trim(), backgroundsData, audioData, cutSceneData, chapterTitles };
