@@ -16,6 +16,7 @@
   height: 100vh; /* Fallback */
   height: calc(100vh + var(--safe-area-inset-bottom)); /* Extend to include the bottom safe area */
   min-height: -webkit-fill-available; /* Fill entire height on iOS */
+  max-height: 100svh;
   overflow: hidden; /* Hide main overflow, content scrolls */
   display: flex;
   flex-direction: row; /* Arrange items horizontally (book + notes) */
