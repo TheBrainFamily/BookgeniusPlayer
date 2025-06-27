@@ -415,16 +415,16 @@ export function setupPageObserver(
     const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
     const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
 
-    let zoneVisualizer = document.getElementById("dev-zone-visualizer");
-    if (!zoneVisualizer) {
-      zoneVisualizer = document.createElement("div");
-      zoneVisualizer.id = "dev-zone-visualizer";
-      document.body.appendChild(zoneVisualizer);
-    }
-    zoneVisualizer.style.left = `${rootRect.left}px`;
-    zoneVisualizer.style.top = `${focusZoneTop}px`;
-    zoneVisualizer.style.width = `${rootRect.width}px`;
-    zoneVisualizer.style.height = `${focusZoneBottom - focusZoneTop}px`;
+    // let zoneVisualizer = document.getElementById("dev-zone-visualizer");
+    // if (!zoneVisualizer) {
+    //   zoneVisualizer = document.createElement("div");
+    //   zoneVisualizer.id = "dev-zone-visualizer";
+    //   document.body.appendChild(zoneVisualizer);
+    // }
+    // zoneVisualizer.style.left = `${rootRect.left}px`;
+    // zoneVisualizer.style.top = `${focusZoneTop}px`;
+    // zoneVisualizer.style.width = `${rootRect.width}px`;
+    // zoneVisualizer.style.height = `${focusZoneBottom - focusZoneTop}px`;
 
     let activeParagraph: { chapter: number | null; paragraph: number | null } | null = null;
     let maxPercentageOverlapRatio = -1;
