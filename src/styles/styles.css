@@ -140,29 +140,14 @@
       /* Media query for tablets - no right side fade */
       @media (min-width: 768px) and (max-width: 1279px) {
         mask-image:
-          linear-gradient(
-            to bottom,
-            transparent 0%,
-            rgba(0 0 0 / 1) 35%,
-            rgba(0 0 0 / 1) 50%,
-            rgba(0 0 0 / 0.4) 65%,
-            transparent 100%
-          ),
+          linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 1) 35%, rgba(0 0 0 / 1) 50%, rgba(0 0 0 / 0.4) 65%, transparent 100%),
           radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
       }
 
       @media (min-width: 768px) and (max-height: 700px) {
         mask-image:
-        linear-gradient(
-          to bottom,
-          transparent 0%,
-          rgba(0 0 0 / 0.9) 10%,
-          rgba(0 0 0 / 1) 35%,
-          rgba(0 0 0 / 1) 55%,
-          rgba(0 0 0 / 0.7) 75%,
-          transparent 100%
-        ),
-        radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
+          linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.9) 10%, rgba(0 0 0 / 1) 35%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.7) 75%, transparent 100%),
+          radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
       }
 
       /* Headings */
@@ -172,22 +157,26 @@
         text-align: center;
         margin-bottom: 1.5em;
         margin-top: 0;
-        padding: 0 3rem;
+        padding: 2rem 3rem;
+        font-weight: bold;
       }
 
       h2 {
         font-size: 2em;
-        padding: 0 3rem;
+        padding: 2rem 3rem;
+        font-weight: bold;
       }
 
       h3 {
         font-size: 2em;
-        padding: 0 3rem;
+        padding: 2rem 3rem;
+        font-weight: bold;
       }
 
       h4 {
         font-size: 1.4em;
-        padding: 0 3rem;
+        padding: 2rem 3rem;
+        font-weight: bold;
       }
 
       & > section {
