@@ -75,10 +75,10 @@ export const useQuizModal = create<QuizModalState>()(
         set((state) => ({ userResponses: { ...state.userResponses, [questionId]: answerId } }));
       },
       markChapterQuizCompleted: (chapter: number) => {
-        const completedQuizzes = JSON.parse(localStorage.getItem("completedChapterQuizzes") || "[]");
-        if (!completedQuizzes.includes(chapter)) {
-          completedQuizzes.push(chapter);
-          localStorage.setItem("completedChapterQuizzes", JSON.stringify(completedQuizzes));
+        const completedQuizes = JSON.parse(localStorage.getItem("completedChapterQuizes") || "[]");
+        if (!completedQuizes.includes(chapter)) {
+          completedQuizes.push(chapter);
+          localStorage.setItem("completedChapterQuizes", JSON.stringify(completedQuizes));
         }
       },
     }),

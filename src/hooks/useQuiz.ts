@@ -6,7 +6,7 @@ import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
 import { getQuizQuestions } from "@/genericBookDataGetters/getQuizQuestions";
 import useSplashHidden from "./useSplashHidden";
 
-export function useQuizz() {
+export function useQuiz() {
   const isSplashHidden = useSplashHidden();
   const {
     debouncedLocation: { currentChapter },
@@ -14,8 +14,8 @@ export function useQuizz() {
   const { openModal: openQuizModal } = useQuizModal();
 
   const isChapterQuizCompleted = (chapter: number) => {
-    const completedQuizzes = JSON.parse(localStorage.getItem("completedChapterQuizzes") || "[]");
-    return completedQuizzes.includes(chapter);
+    const completedQuizes = JSON.parse(localStorage.getItem("completedChapterQuizes") || "[]");
+    return completedQuizes.includes(chapter);
   };
 
   const getQuestions = () => {
@@ -32,18 +32,18 @@ export function useQuizz() {
   };
 
   useEffect(() => {
-    if (isChapterQuizCompleted(currentChapter)) return;
+    if (currentChapter < 1 || !isSplashHidden) return;
+
+    if (isChapterQuizCompleted(currentChapter - 1)) return;
 
     const questions = getQuestions().sort((a, b) => (b.score || 0) - (a.score || 0));
 
-    if (!questions.length || !isSplashHidden) return;
+    if (!questions.length) return;
 
     const sentence = getAllVariants()
       .find((question) => question.id === questions[0].id)
       .analysis.originalSentence.replace(/<[^>]*>/g, "");
 
-    if (currentChapter >= 1) {
-      openQuizModal(questions[0].questions, sentence, currentChapter);
-    }
+    openQuizModal(questions[0].questions, sentence, currentChapter - 1);
   }, [currentChapter, isSplashHidden]);
 }
