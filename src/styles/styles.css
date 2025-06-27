@@ -22,7 +22,7 @@
   flex-direction: row; /* Arrange items horizontally (book + notes) */
   justify-content: space-between; /* Push first/last to edges, space between */
   align-items: stretch; /* Make items fill height by default */
-  padding: 0;
+  padding: 0 !important;
   padding-bottom: var(--safe-area-inset-bottom); /* Add padding only for the safe area */
   transition: background-color var(--transition-medium) var(--transition-timing);
   position: relative; /* Needed for z-index stacking context */
