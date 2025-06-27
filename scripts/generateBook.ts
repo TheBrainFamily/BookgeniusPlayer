@@ -88,7 +88,7 @@ function generateKnownVideoFiles(bookDirectoryPath: string, bookOutputPath: stri
   fs.writeFileSync(path.join(bookOutputPath, "getKnownVideoFiles.ts"), getKnownVideoFiles, "utf-8");
 }
 
-async function generateAudiobookTracksFile(bookDirectoryPath: string, bookOutputPath: string) {
+function generateAudiobookTracksFile(bookDirectoryPath: string, bookOutputPath: string) {
   const audiobookDataPath = path.join(bookDirectoryPath, "assets", "audiobook_data", "AudiobookTracksDefined.ts");
   let getAudiobookTracksForBookContent: string;
 
@@ -194,7 +194,7 @@ import { getBookStringified } from "@/books/${bookSlug}/getBookStringified";
 
 export const bookData: BookData = {
   slug: "${bookSlug}",
-  metadata: { title: "${bookSlugNoDashes}", language: "${bookLang}" },
+  metadata: { title: "${bookSlugNoDashes}", language: "${bookLang}", bookForm: "${bookForm}" },
   chapters: ${JSON.stringify(chapterTitles, null, 2)},
   themeColors: {
     primaryColor: "#E3F2FD",
