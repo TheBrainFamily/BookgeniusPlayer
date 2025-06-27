@@ -20,7 +20,7 @@ type InfoPerChapter = {
 
 export type CharacterData = { slug: string; characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; imageUrl: string };
 
-type BookMetadata = { title: string; language?: string };
+type BookMetadata = { title: string; language?: string; bookForm?: string };
 
 export interface Chapter {
   id: string;
