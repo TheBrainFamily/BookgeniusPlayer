@@ -110,7 +110,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
 
       {/* Modal Content */}
       <DialogContent className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)} onOpenAutoFocus={(e) => e.preventDefault()}>
-        <div className={cn("flex flex-row gap-2 justify-center items-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 h-full", sizeConfig.container)}>
+        <div className={cn("flex flex-row gap-2 justify-center items-center mx-auto p-2 xl:px-4 h-full", sizeConfig.container)}>
           {layoutView && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none lg:flex lg:order-2 lg:flex-2 lg:max-w-[900px] xl:flex-1 xl:order-1" />}
 
           <motion.div
@@ -131,7 +131,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             )}
 
             <motion.main
-              className="p-4 overflow-y-auto opened-modal scrollbar-search"
+              className="p-4 pt-0 overflow-y-auto opened-modal scrollbar-search"
               layout={animateHeight}
               transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}
             >

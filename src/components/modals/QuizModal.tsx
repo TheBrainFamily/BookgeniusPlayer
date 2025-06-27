@@ -67,7 +67,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
 
   const getAnswerButtonClasses = useCallback(
     (answer: QuizAnswer) => {
-      const baseClasses = "w-full p-2 sm:p-3 md:p-4 lg:p-6 text-left border-2 rounded-lg sm:rounded-xl cursor-pointer relative overflow-hidden shadow-lg";
+      const baseClasses = "w-full p-2 sm:p-2 md:p-2 lg:p-3 text-left border-2 rounded-lg sm:rounded-xl cursor-pointer relative overflow-hidden shadow-lg";
 
       if (!showResult) {
         return `${baseClasses} border-white/30 bg-white/5`;
@@ -198,24 +198,21 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
 
   const renderQuestion = useCallback(
     () => (
-      <motion.div className="space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8 max-w-4xl mx-auto" variants={variants.container} initial="hidden" animate="visible">
+      <motion.div className="space-y-3 sm:space-y-2 md:space-y-2 lg:space-y-3 max-w-4xl mx-auto" variants={variants.container} initial="hidden" animate="visible">
         {/* Question */}
-        <motion.div
-          variants={variants.item}
-          className="relative overflow-hidden rounded-lg sm:rounded-xl border border-book-primary-20 bg-gradient-to-r from-book-primary-10 to-book-primary-20"
-        >
-          <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl p-3 sm:p-4 md:p-6 lg:p-8 font-semibold text-white leading-relaxed">{question.question}</h2>
+        <motion.div variants={variants.item} className="relative overflow-hidden rounded-lg pl-3 sm:rounded-xl bg-gradient-to-r from-book-primary-10 to-book-primary-20">
+          <h2 className="text-base text-center sm:text-md md:text-lg lg:text-xl font-semibold text-white leading-relaxed">{question.question}</h2>
         </motion.div>
 
         {/* Sentence - Hidden on mobile, visible on sm+ */}
         {sentence && (
-          <motion.div variants={variants.item} className="hidden sm:block relative overflow-hidden rounded-lg sm:rounded-xl border border-white/10 bg-black/20">
-            <p className="text-sm sm:text-base lg:text-lg p-3 sm:p-4 lg:p-6 text-white/80 leading-relaxed italic text-center">"{sentence}"</p>
+          <motion.div variants={variants.item} className="hidden sm:block p-3 relative overflow-hidden rounded-lg sm:rounded-xl border border-white/10 bg-black/20">
+            <p className="text-xs md:text-sm lg:text-base text-white/80 leading-relaxed italic text-center">"{sentence}"</p>
           </motion.div>
         )}
 
         {/* Answers Grid */}
-        <motion.div variants={variants.item} className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
+        <motion.div variants={variants.item} className="grid p-2 grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
           {question.answers.map((answer, index) => (
             <motion.button
               key={answer.id}
@@ -240,10 +237,10 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-                  <div className="min-w-6 min-h-6 w-6 h-6 sm:min-w-8 sm:min-h-8 sm:w-8 sm:h-8 md:min-w-10 md:min-h-10 md:w-10 md:h-10 bg-white/20 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm md:text-base">
+                  <div className="min-w-6 min-h-6 w-6 h-6 sm:min-w-8 sm:min-h-8 sm:w-8 sm:h-8 md:min-w-8 md:min-h-8 md:w-8 md:h-8 bg-white/20 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm md:text-base">
                     {String.fromCharCode(65 + index)}
                   </div>
-                  <span className="text-white font-medium text-xs sm:text-sm md:text-base lg:text-lg">{answer.text}</span>
+                  <span className="text-white font-medium text-xs sm:text-xs md:text-sm lg:text-base pr-4">{answer.text}</span>
                 </div>
                 <div className="flex items-center">
                   {showResult && answer.isCorrect && (
@@ -278,7 +275,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
 
   return (
     <ModalUI title={modalTitle} onClose={onClose} size="xxl" animateHeight={true}>
-      <motion.div className="flex flex-col h-full relative overflow-hidden p-2 sm:p-4" variants={variants.container} initial="hidden" animate="visible" exit="exit">
+      <motion.div className="flex flex-col h-full relative overflow-hidden" variants={variants.container} initial="hidden" animate="visible" exit="exit">
         <div className="relative z-10 flex-1 flex items-center justify-center">
           <div className="w-full">
             {showResult ? (
@@ -293,8 +290,8 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 sm:gap-4 mt-6 sm:mt-8 md:mt-10">
-          <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-white/70 font-mono">
+        <div className="flex flex-row items-center gap-3 sm:gap-4">
+          <div className="w-full max-w-fit flex items-center justify-center gap-2 text-xs sm:text-sm text-white/70 font-mono">
             <button onClick={handlePreviousQuestion} disabled={currentQuestionIndex === 0 || showResult} className="disabled:opacity-50 transition-opacity p-1">
               <ChevronLeft size={16} className="sm:w-5 sm:h-5" />
             </button>
@@ -315,8 +312,8 @@ const QuizModal: React.FC<QuizModalProps> = ({ onClose, question, nextQuestion, 
           </div>
 
           <motion.div
-            className={`hidden sm:flex items-center justify-center gap-3 text-sm rounded-lg px-4 py-3 transition-all duration-300 ${
-              isComplexityChanging ? "bg-blue-500/10 border border-blue-400/30 shadow-lg shadow-blue-500/20" : "bg-black/20 border border-white/10"
+            className={`w-full max-w-fit hidden sm:flex items-center justify-center gap-3 text-sm rounded-lg px-4 py-3 transition-all duration-300 ${
+              isComplexityChanging && "color-500/20"
             }`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
