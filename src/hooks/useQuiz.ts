@@ -14,8 +14,8 @@ export function useQuiz() {
   const { openModal: openQuizModal } = useQuizModal();
 
   const isChapterQuizCompleted = (chapter: number) => {
-    const completedQuizes = JSON.parse(localStorage.getItem("completedChapterQuizes") || "[]");
-    return completedQuizes.includes(chapter);
+    const completedQuizzes = JSON.parse(localStorage.getItem("completedChapterQuizzes") || "[]");
+    return completedQuizzes.includes(chapter);
   };
 
   const getQuestions = () => {

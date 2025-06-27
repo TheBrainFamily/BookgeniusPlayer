@@ -342,10 +342,8 @@
 }
 
 #left-notes {
-  overflow: none;
   scrollbar-color: transparent transparent;
   scrollbar-width: none !important;
-  padding-bottom: env(safe-area-inset-bottom, 20px);
 }
 
 .character-notes-custom {
