@@ -24,13 +24,19 @@ export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphab
 
     async function load() {
       const { chapter, paragraph, endChapter, endParagraph } = loc;
+
       const raw = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange(
         { bookSlug: CURRENT_BOOK, startChapter: chapter, startParagraph: paragraph, endChapter, endParagraph },
         getCharactersData(),
       );
+
       if (cancelled) return;
 
+      console.log("34: raw BANG!", raw);
+
       const parsed = parseParagraphRange(raw);
+
+      console.log("39: parser BANG!", parsed);
 
       setNotes((prev) => {
         if (sameList(prev, parsed)) {

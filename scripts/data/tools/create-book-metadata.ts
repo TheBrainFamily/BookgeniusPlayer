@@ -58,8 +58,8 @@ export function getCharacterTags(doc: XMLDocument): Set<string> {
  * @returns An array of SimpleCharacterMetadata objects.
  */
 export function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<string>, bookForm: string): SimpleCharacterMetadata[] {
-  // Initialize results map keyed by character tag name
   console.log("62: bookForm BANG!", bookForm);
+  // Initialize results map keyed by character tag name
   const resultsMap = new Map<string, SimpleCharacterMetadata>();
   characterTags.forEach((tag) => {
     resultsMap.set(tag, { slug: tag, characterName: getDisplayForCharacter(tag, doc), bookSlug: CURRENT_BOOK, infoPerChapter: [], imageUrl: "UNKNOWN" });
@@ -76,8 +76,6 @@ export function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<st
 
     // Find all <Chapter> elements
     const chapterElements = doc.getElementsByTagName("Chapter");
-    const x = new XMLSerializer().serializeToString(chapterElements[1]);
-    console.log("80: x BANG!", x);
     if (chapterElements.length === 0) {
       console.warn("No <Chapter> elements found in the generated XML.");
       return []; // Return empty if no chapters found
@@ -121,6 +119,9 @@ export function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<st
               // Check if this tag is one of our characters
               if (characterTags.has(tagName)) {
                 // Check for the specific talking="true" attribute
+
+                if (element.getAttribute("dynasty") === "true") continue;
+
                 if (element.getAttribute("enters") === "true") {
                   entersInPara.add(tagName);
                 } else if (element.getAttribute("exits") === "true") {
@@ -168,10 +169,6 @@ export function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<st
             // const targetArray = listType === "talking" ? chapterEntry.paragraphsWhereTalking : chapterEntry.paragraphsWhereSpotted;
             // const targetArray = listType === "enters" ? chapterEntry.paragraphsWhereEnters : [];
 
-            if (listType === "enters") {
-              console.log("170: dataIndex BANG!", dataIndex);
-              console.log("170: chapterEntry.paragraphsWhereEnters BANG!", chapterEntry.paragraphsWhereEnters);
-            }
             const targetArray = chapterEntry[`paragraphsWhere${listType.charAt(0).toUpperCase()}${listType.slice(1)}`];
 
             // let targetArray;
@@ -197,10 +194,6 @@ export function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<st
 
             if (!targetArray.includes(dataIndex)) {
               targetArray.push(dataIndex);
-
-              if (listType === "enters") {
-                console.log("199: targetArray BANG!", targetArray);
-              }
 
               // Keep paragraph indices sorted
               // targetArray.sort((a, b) => a - b); // Sorting done later globally

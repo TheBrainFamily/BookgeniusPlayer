@@ -8,6 +8,7 @@
  */
 
 import { BOOK_SLUGS } from "@/consts";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
 
 /* -------------------------------------------------------------------------- */
 /*  Shared types                                                              */
@@ -16,9 +17,12 @@ import { BOOK_SLUGS } from "@/consts";
 export interface InfoPerChapter {
   chapter: number;
   summary: string;
-  label?: string;
+  slug?: string;
+  characterName?: string;
   paragraphsWhereSpotted: number[];
   paragraphsWhereTalking: number[];
+  paragraphsWhereEnters?: number[];
+  paragraphsWhereExits?: number[];
 }
 
 export interface SelfSufficientCharacterMetadata {
@@ -59,6 +63,9 @@ export const paragraphMetadataServicePure = {
    */
   getCharactersMetadataForParagraphRange(range: PureRange, data: SelfSufficientCharacterMetadata[]): SelfSufficientCharacterMetadata[] {
     const { startChapter, endChapter, bookSlug, startParagraph, endParagraph } = range;
+    const {
+      metadata: { bookForm },
+    } = getBookData();
 
     return (
       data
@@ -83,8 +90,11 @@ export const paragraphMetadataServicePure = {
                 return true;
               };
 
-              const paragraphsWhereSpotted = c.paragraphsWhereSpotted.filter(keep);
               const paragraphsWhereTalking = c.paragraphsWhereTalking.filter(keep);
+              const paragraphsWhereSpotted =
+                bookForm === "play"
+                  ? createParagraphsWhereSpottedForPlay(startParagraph, endParagraph, c.paragraphsWhereEnters, c.paragraphsWhereExits)
+                  : c.paragraphsWhereSpotted.filter(keep);
 
               return { ...c, paragraphsWhereSpotted, paragraphsWhereTalking };
             })
@@ -149,7 +159,7 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
           paragraphNumber: firstPara,
           isTalking: info.paragraphsWhereTalking.includes(firstPara),
           summary: info.summary,
-          label: info.label,
+          label: info.slug,
           others: [
             ...rest.map((p) => ({ chapterNumber: info.chapter, paragraphNumber: p, isTalkingInParagraph: info.paragraphsWhereTalking.includes(p) })),
             ...sortedChapters
@@ -190,3 +200,41 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
 /* -------------------------------------------------------------------------- */
 /*  4. Ad‑hoc "does it match?" sanity check                                   */
 /* -------------------------------------------------------------------------- */
+
+function createParagraphsWhereSpottedForPlay(startParagraph: number, endParagraph: number, paragraphsWhereEnters: number[], paragraphsWhereExits: number[]): number[] {
+  const activeIntervals: Array<[number, number]> = [];
+
+  let exitIndex = 0;
+
+  for (let i = 0; i < paragraphsWhereEnters.length; i++) {
+    const entry = paragraphsWhereEnters[i];
+
+    let correspondingExit = endParagraph + 1;
+
+    while (exitIndex < paragraphsWhereExits.length && paragraphsWhereExits[exitIndex] <= entry) {
+      exitIndex++;
+    }
+
+    if (exitIndex < paragraphsWhereExits.length) {
+      correspondingExit = paragraphsWhereExits[exitIndex];
+      exitIndex++;
+    }
+
+    activeIntervals.push([entry, correspondingExit - 1]);
+  }
+
+  const uniqueSpottedParagraphs = new Set<number>();
+
+  for (const [intervalStart, intervalEnd] of activeIntervals) {
+    const overlapStart = Math.max(intervalStart, startParagraph);
+    const overlapEnd = Math.min(intervalEnd, endParagraph);
+
+    if (overlapStart <= overlapEnd) {
+      for (let p = overlapStart; p <= overlapEnd; p++) {
+        uniqueSpottedParagraphs.add(p);
+      }
+    }
+  }
+
+  return Array.from(uniqueSpottedParagraphs).sort((a, b) => a - b);
+}

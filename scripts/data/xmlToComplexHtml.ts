@@ -179,7 +179,11 @@ export const xmlToComplexHtml = (
                       const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
                       inner += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
                     } else {
-                      inner += `<span class="character-highlighted" data-character="${slug}" data-src-listening="${listeningSrc}">${e.textContent}</span>`;
+                      if (pElement.getAttribute("dynasty") === "true") {
+                        pContent += pElement.textContent;
+                      } else {
+                        pContent += `<span class="character-highlighted" data-character="${slug}" data-src-listening="${listeningSrc}">${pElement.textContent}</span>`;
+                      }
                     }
                   } else {
                     // your existing note / b / i / strong / default logic:
@@ -221,7 +225,11 @@ export const xmlToComplexHtml = (
                 const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
                 pContent += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
               } else {
-                pContent += `<span class="character-highlighted" data-character="${slug}" data-src-listening="${listeningSrc}">${pElement.textContent}</span>`;
+                if (pElement.getAttribute("dynasty") === "true") {
+                  pContent += pElement.textContent;
+                } else {
+                  pContent += `<span class="character-highlighted" data-character="${slug}" data-src-listening="${listeningSrc}">${pElement.textContent}</span>`;
+                }
               }
             }
             // 2c) notes / formatting / default
