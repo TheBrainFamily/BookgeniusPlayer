@@ -7,10 +7,10 @@ import {
   setActiveSection,
   isCurrentTrackInSection,
   getCurrentSectionTracks,
-} from "./audio-crossfader"; // Adjust path as needed
-import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
-import { getBackgroundSongsForBook } from "./genericBookDataGetters/getBackgroundSongsForBook"; // Adjust path and ensure type export
-import { getCurrentLocation } from "@/helpers/paragraphsNavigation"; // Adjust path as needed
+} from "./audio-crossfader";
+import { CURRENT_BOOK } from "./consts";
+import { getBackgroundSongsForBook } from "./genericBookDataGetters/getBackgroundSongsForBook";
+import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { BackgroundSongSection } from "./types/book";
 
 let isProcessingBackgroundSongs = false; // Module-level flag to prevent re-entrancy
@@ -19,17 +19,15 @@ let isProcessingBackgroundSongs = false; // Module-level flag to prevent re-entr
 export const preloadBackgroundTracks = async () => {
   console.log("Attempting to preload background tracks dynamically...");
 
-  // initAudioContext in audio-crossfader will be called by loadTrack if needed
-  // but calling it here can ensure context is ready early if desired.
-  // For now, rely on loadTrack's internal init.
-  if (!initAudioContext()) {
+  const audioContextReady = await initAudioContext();
+  if (!audioContextReady) {
     console.warn("Cannot preload tracks, AudioContext not ready.");
-    return;
+    return false;
   }
 
   const location = getCurrentLocation();
   const currentChapter = location.currentChapter;
-  const chaptersToPreloadAhead = 1;
+  const chaptersToPreloadAhead = 2;
 
   const chaptersToConsider = Array.from({ length: chaptersToPreloadAhead + 1 }, (_, i) => currentChapter + i);
   console.log("Preloading tracks for chapters:", chaptersToConsider);
@@ -37,24 +35,37 @@ export const preloadBackgroundTracks = async () => {
   const bookSongs = getBackgroundSongsForBook();
   if (!bookSongs) {
     console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot preload.`);
-    return;
+    return false;
   }
 
   const sectionsToPreload = bookSongs.filter((section) => chaptersToConsider.includes(section.chapter));
 
   if (sectionsToPreload.length === 0) {
     console.log("No background tracks found for the current chapter range to preload.");
-    return;
+    return false;
   }
 
   console.log(`Preloading ${sectionsToPreload.length} sections...`);
-  for (const section of sectionsToPreload) {
-    for (const file of section.files) {
-      const trackId = file.replace(".mp3", "");
-      loadTrack(trackId);
+  const preloadPromises = sectionsToPreload.flatMap((section) => section.files.map((file) => loadTrack(file.replace(".mp3", ""))));
+
+  // Wait for all tracks to load in parallel
+  try {
+    const results = await Promise.allSettled(preloadPromises);
+    const successful = results.filter((result) => result.status === "fulfilled" && result.value === true).length;
+    const failed = results.length - successful;
+
+    console.log(`Dynamic background tracks preloading complete. Successfully loaded: ${successful}, Failed: ${failed}`);
+
+    if (failed > 0) {
+      const failedResults = results.filter((result) => result.status === "rejected" || (result.status === "fulfilled" && result.value === false));
+      console.warn("Some tracks failed to preload:", failedResults);
     }
+
+    return successful > 0;
+  } catch (error) {
+    console.error("Error during track preloading:", error);
+    return false;
   }
-  console.log("Dynamic background tracks preloading complete.");
 };
 
 interface DealWithBackgroundSongsParams {

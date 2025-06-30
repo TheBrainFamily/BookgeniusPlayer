@@ -557,7 +557,10 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
   // ---------- unified clean-up helper ----------
   const finishCrossfade = () => {
     if (!isTransitioning) return; // already cleaned once
-    stopTrackInternal(fadeOutId);
+    // Prevent stopping the new track when looping the same track
+    if (fadeOutId !== fadeInId) {
+      stopTrackInternal(fadeOutId);
+    }
 
     if (pendingSectionTracks !== undefined) {
       console.log(`Crossfade complete: Applying pending section: ${pendingSectionTracks ? "[" + pendingSectionTracks.join(", ") + "]" : "None"}`);
@@ -731,7 +734,9 @@ export async function transitionToTrack(targetId: string): Promise<boolean> {
     }
   }
 
-  if (currentTrackId === targetId && tracks.get(targetId)?.sourceNode) {
+  // --- Allow looping/restarting the same track if it's the only one in the playlist ---
+  const isSingleTrackSection = currentSectionTracks && currentSectionTracks.length === 1 && currentSectionTracks[0] === targetId;
+  if (currentTrackId === targetId && tracks.get(targetId)?.sourceNode && !isSingleTrackSection) {
     console.log(`transitionToTrack: Target track '${targetId}' is already current and playing. Ensuring index is correct.`);
     if (currentSectionTracks && currentTrackIndexInSection === -1) {
       currentTrackIndexInSection = currentSectionTracks.indexOf(targetId);
