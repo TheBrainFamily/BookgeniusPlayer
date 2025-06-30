@@ -762,30 +762,6 @@ export async function transitionToTrack(targetId: string): Promise<boolean> {
     return await startFirstTrack(targetId);
   }
 
-  // If looping a single track, treat as a restart (crossfade or cut)
-  if (isSingleTrackSection && currentTrackId === targetId) {
-    console.log(`transitionToTrack: Looping/restarting single track section for '${targetId}'.`);
-    // Optionally, you can crossfade or just cut. We'll use crossfade logic if possible.
-    const transitionPointTime = findNextTransitionPoint(currentTrackId);
-    if (transitionPointTime === null) {
-      console.warn(`transitionToTrack: Could not find a transition point for '${currentTrackId}'. Falling back to immediate cut to '${targetId}'.`);
-      const oldTrackId = currentTrackId;
-      stopTrackInternal(currentTrackId);
-      currentTrackId = null;
-      currentTrackIndexInSection = -1;
-      const started = await startFirstTrack(targetId);
-      if (started) {
-        console.log(`transitionToTrack: Immediate cut from '${oldTrackId}' to '${targetId}' succeeded.`);
-      } else {
-        console.warn(`transitionToTrack: Immediate cut from '${oldTrackId}', but failed to start '${targetId}'.`);
-      }
-      return started;
-    }
-    console.log(`transitionToTrack: Initiating crossfade for looping single track '${targetId}' at ${transitionPointTime.toFixed(2)}s`);
-    await performCrossfade(currentTrackId, targetId, transitionPointTime);
-    return true;
-  }
-
   const transitionPointTime = findNextTransitionPoint(currentTrackId);
   if (transitionPointTime === null) {
     console.warn(`transitionToTrack: Could not find a transition point for '${currentTrackId}'. Falling back to immediate cut to '${targetId}'.`);

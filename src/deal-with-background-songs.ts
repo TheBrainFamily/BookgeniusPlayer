@@ -46,14 +46,7 @@ export const preloadBackgroundTracks = async () => {
   }
 
   console.log(`Preloading ${sectionsToPreload.length} sections...`);
-  const preloadPromises: Promise<boolean>[] = [];
-
-  for (const section of sectionsToPreload) {
-    for (const file of section.files) {
-      const trackId = file.replace(".mp3", "");
-      preloadPromises.push(loadTrack(trackId));
-    }
-  }
+  const preloadPromises = sectionsToPreload.flatMap((section) => section.files.map((file) => loadTrack(file.replace(".mp3", ""))));
 
   // Wait for all tracks to load in parallel
   try {
