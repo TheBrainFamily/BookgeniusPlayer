@@ -93,7 +93,7 @@ export const paragraphMetadataServicePure = {
               const paragraphsWhereTalking = c.paragraphsWhereTalking.filter(keep);
               const paragraphsWhereSpotted =
                 bookForm === "play"
-                  ? createParagraphsWhereSpottedForPlay(startParagraph, endParagraph, c.paragraphsWhereEnters, c.paragraphsWhereExits)
+                  ? createParagraphsWhereSpottedForPlay(startParagraph, endParagraph, c.paragraphsWhereEnters, c.paragraphsWhereExits).filter(keep)
                   : c.paragraphsWhereSpotted.filter(keep);
 
               return { ...c, paragraphsWhereSpotted, paragraphsWhereTalking };

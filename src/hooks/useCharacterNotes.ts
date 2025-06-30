@@ -32,11 +32,7 @@ export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphab
 
       if (cancelled) return;
 
-      console.log("34: raw BANG!", raw);
-
       const parsed = parseParagraphRange(raw);
-
-      console.log("39: parser BANG!", parsed);
 
       setNotes((prev) => {
         if (sameList(prev, parsed)) {

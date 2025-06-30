@@ -16,8 +16,6 @@ const CharacterNotesPanel = () => {
 
   if (!target || !isSplashHidden) return null;
 
-  // console.log("19: characterNotes BANG!", characterNotes);
-
   return createPortal(
     <AnimatePresence mode="sync">
       {isSplashHidden && (

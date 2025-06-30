@@ -167,10 +167,9 @@ export const getBookStringified = (): string => {
   // --- Generate getCharactersData.ts ---
   const characterTags = getCharacterTags(xmlDoc);
   const parser = new DOMParser();
-  const updatedString = bookXml.replaceAll(/<\/?span[^>]*id="ch\d+-p\d+-s\d+"[^>]*>/g, "").replaceAll(/<\/?em[^>]*>/g, "");
+  // Removes all spans with their id as "chX-pY-sZ" and <em> which is inside the stage direction
+  const updatedString = bookXml.replaceAll(/<span id="ch\d+-p\d+-s\d+">(.*?)<\/span>/g, "$1").replaceAll(/<\/?em[^>]*>/g, "");
   const xmlDocWithoutSpans = parser.parseFromString(updatedString, "text/xml");
-
-  // const xmlDocWithoutSpansString = new XMLSerializer().serializeToString(xmlDocWithoutSpans);
 
   const characterMetadata = extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm).map((character) => ({
     ...character,

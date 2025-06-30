@@ -24,6 +24,13 @@ interface SimpleCharacterMetadata {
   imageUrl: string;
 }
 
+export enum ListType {
+  SPOTTED = "spotted",
+  TALKING = "talking",
+  ENTERS = "enters",
+  EXITS = "exits",
+}
+
 /**
  * Parses the CharactersMaster XML to extract character tag names.
  * @param charactersXml The XML string containing <CharactersMaster>.
@@ -58,7 +65,6 @@ export function getCharacterTags(doc: XMLDocument): Set<string> {
  * @returns An array of SimpleCharacterMetadata objects.
  */
 export function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<string>, bookForm: string): SimpleCharacterMetadata[] {
-  console.log("62: bookForm BANG!", bookForm);
   // Initialize results map keyed by character tag name
   const resultsMap = new Map<string, SimpleCharacterMetadata>();
   characterTags.forEach((tag) => {
@@ -144,7 +150,7 @@ export function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<st
           } // End loop through paragraph children
 
           // --- Update Results Based on Findings in this Paragraph ---
-          const updateCharacterInfo = (charTag: string, listType: "spotted" | "talking" | "enters" | "exits") => {
+          const updateCharacterInfo = (charTag: string, listType: ListType) => {
             const data = resultsMap.get(charTag);
 
             if (!data) return; // Should not happen if initialized correctly
@@ -152,61 +158,32 @@ export function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<st
             // Find or create the entry for the current chapter
             let chapterEntry = data.infoPerChapter.find((info) => info.chapter === chapterId);
             if (!chapterEntry) {
-              chapterEntry = {
-                chapter: chapterId,
-                summary: getSummaryForCharacter(charTag, doc),
-                paragraphsWhereSpotted: [],
-                paragraphsWhereTalking: [],
-                paragraphsWhereEnters: [],
-                paragraphsWhereExits: [],
-              };
+              chapterEntry = { chapter: chapterId, summary: getSummaryForCharacter(charTag, doc), paragraphsWhereSpotted: [], paragraphsWhereTalking: [] };
+              if (bookForm === "play") {
+                chapterEntry.paragraphsWhereEnters = [];
+                chapterEntry.paragraphsWhereExits = [];
+              }
               data.infoPerChapter.push(chapterEntry);
               // Keep chapter entries sorted by chapter number
               data.infoPerChapter.sort((a, b) => a.chapter - b.chapter);
             }
 
             // Add the current paragraph index if not already present
-            // const targetArray = listType === "talking" ? chapterEntry.paragraphsWhereTalking : chapterEntry.paragraphsWhereSpotted;
-            // const targetArray = listType === "enters" ? chapterEntry.paragraphsWhereEnters : [];
-
             const targetArray = chapterEntry[`paragraphsWhere${listType.charAt(0).toUpperCase()}${listType.slice(1)}`];
-
-            // let targetArray;
-            //
-            // switch (listType) {
-            //   case "talking":
-            //     targetArray = chapterEntry.paragraphsWhereTalking;
-            //     console.log('172:  "talking" BANG!', targetArray);
-            //     break;
-            //   case "spotted":
-            //     targetArray = chapterEntry.paragraphsWhereSpotted;
-            //     console.log('176:  "spotted" BANG!', targetArray);
-            //     break;
-            //   case "enters":
-            //     targetArray = chapterEntry.paragraphsWhereEnters;
-            //     console.log('180:  "enters" BANG!', targetArray);
-            //     break;
-            //   case "exits":
-            //     targetArray = chapterEntry.paragraphsWhereExits;
-            //     console.log('184:  "exits" BANG!', targetArray);
-            //     break;
-            // }
 
             if (!targetArray.includes(dataIndex)) {
               targetArray.push(dataIndex);
-
               // Keep paragraph indices sorted
               // targetArray.sort((a, b) => a - b); // Sorting done later globally
             }
           };
 
-          // console.log("196: entersInPara BANG!", entersInPara);
-          // console.log("197: talksInPara BANG!", talksInPara);
-
-          talksInPara.forEach((charTag) => updateCharacterInfo(charTag, "talking"));
-          spottedInPara.forEach((charTag) => updateCharacterInfo(charTag, "spotted"));
-          entersInPara.forEach((charTag) => updateCharacterInfo(charTag, "enters"));
-          exitsInPara.forEach((charTag) => updateCharacterInfo(charTag, "exits"));
+          talksInPara.forEach((charTag) => updateCharacterInfo(charTag, ListType.TALKING));
+          spottedInPara.forEach((charTag) => updateCharacterInfo(charTag, ListType.SPOTTED));
+          if (bookForm === "play") {
+            entersInPara.forEach((charTag) => updateCharacterInfo(charTag, ListType.ENTERS));
+            exitsInPara.forEach((charTag) => updateCharacterInfo(charTag, ListType.EXITS));
+          }
           dataIndex++;
         }
       } // End loop through paragraphs
@@ -217,8 +194,10 @@ export function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<st
       data.infoPerChapter.forEach((chapterInfo) => {
         chapterInfo.paragraphsWhereSpotted.sort((a, b) => a - b);
         chapterInfo.paragraphsWhereTalking.sort((a, b) => a - b);
-        chapterInfo.paragraphsWhereEnters.sort((a, b) => a - b);
-        chapterInfo.paragraphsWhereExits.sort((a, b) => a - b);
+        if (bookForm === "play") {
+          chapterInfo.paragraphsWhereEnters.sort((a, b) => a - b);
+          chapterInfo.paragraphsWhereExits.sort((a, b) => a - b);
+        }
       });
     });
 
