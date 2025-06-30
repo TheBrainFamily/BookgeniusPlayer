@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 
 import BottomInput from "./BottomInput";
-import ComplexitySlider from "./ComplexitySlider";
 import { useWebSocket } from "@/context/WebSocketContext";
 import useSplashHidden from "@/hooks/useSplashHidden";
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
@@ -30,7 +29,6 @@ const Footer = () => {
         >
           <div id="left-notes-blank" className="hidden md:block md:flex-1 max-w-[700px]" />
           <div className="flex-2 md:min-w-[600px] max-w-[900px] px-0 md:px-0 flex flex-col ml-0 md:pl-10 xl:pl-0 space-y-3 pointer-events-auto">
-            <ComplexitySlider />
             <BottomInput onSubmit={sendMessage} />
             {/* <ProgressIndicator /> */}
           </div>

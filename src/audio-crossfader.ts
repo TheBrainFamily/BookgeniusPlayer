@@ -1,6 +1,5 @@
 import { parseBlob } from "music-metadata";
-
-import { CURRENT_BOOK } from "./consts";
+import { getBookData } from "./genericBookDataGetters/getBookData";
 
 // --- Interfaces and Types ---
 export interface TrackState {
@@ -43,8 +42,8 @@ let currentSectionTracks: string[] | null = null;
 let currentTrackIndexInSection: number = -1;
 // undefined: no pending change; null: pending clear; string[]: pending set
 let pendingSectionTracks: string[] | null | undefined = undefined;
-// ToDo: Remove later, check why at the beginning, even though we should have info about tracks, we don't have them
-let temporaryTracks: string[] = [];
+
+const bookData = getBookData();
 
 export function getTrackDetailsById(id: string): TrackState | null {
   return tracks.get(id) || null;
@@ -147,7 +146,7 @@ export async function initAudioContext(): Promise<boolean> {
   return audioContext?.state === "running";
 }
 function buildUrl(trackId: string): string {
-  return `/${CURRENT_BOOK}/${trackId}.mp3`; // → /1984/background-forest.mp3
+  return `/${bookData.slug}/${trackId}.mp3`; // → /1984/background-forest.mp3
 }
 function isFetchOk(res: Response, url: string): boolean {
   const local = url.startsWith("/");
@@ -168,8 +167,30 @@ export async function loadTrack(trackId: string, transitionPoints?: number[]): P
     if (transitionPoints && cached.transitionPoints !== transitionPoints) {
       cached.transitionPoints = transitionPoints;
     }
+    console.log(`✅ Track '${trackId}' already loaded from cache`);
     return true;
   }
+
+  // Check if track is currently being loaded to prevent duplicates
+  if (cached && !cached.audioBuffer) {
+    console.log(`⏳ Track '${trackId}' is already being loaded, waiting...`);
+    // Wait for the existing load to complete
+    let attempts = 0;
+    while (attempts < 50) {
+      // Max 5 seconds
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      const updated = tracks.get(trackId);
+      if (updated?.audioBuffer) {
+        console.log(`✅ Track '${trackId}' loaded by another process`);
+        return true;
+      }
+      attempts++;
+    }
+    console.warn(`⚠️ Timeout waiting for '${trackId}' to load`);
+  }
+
+  // Mark as being loaded to prevent duplicates
+  tracks.set(trackId, { coverArtUrl: "", title: trackId, trackLength: 0, sourceNode: null, gainNode: null });
 
   /* 3 ▸ fetch ------------------------------------------------------ */
   const url = buildUrl(trackId);
@@ -215,7 +236,16 @@ export async function loadTrack(trackId: string, transitionPoints?: number[]): P
   }
 
   /* 5 ▸ cache & done ---------------------------------------------- */
-  tracks.set(trackId, { audioBuffer, duration: audioBuffer.duration, transitionPoints, sourceNode: null, gainNode: null, coverArtUrl, title, trackLength: audioBuffer.duration });
+  tracks.set(trackId, {
+    audioBuffer,
+    duration: audioBuffer.duration,
+    transitionPoints,
+    sourceNode: null,
+    gainNode: null,
+    coverArtUrl: coverArtUrl || "",
+    title,
+    trackLength: audioBuffer.duration,
+  });
 
   console.log(`✅ Decoded '${trackId}' – ${audioBuffer.duration.toFixed(2)} s` + (transitionPoints ? ` | transitions: ${transitionPoints.join(", ")}` : ""));
   return true;
@@ -294,7 +324,7 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0): 
     state.startedAtCtxTime = startTime;
     state.offsetAtStart = offset;
     state.pausedAt = null;
-    console.log(`Scheduled '${trackId}' @ ${startTime.toFixed(2)}s (offset ${offset.toFixed(2)}s). Duration: ${state.audioBuffer.duration.toFixed(2)}s`);
+    console.log(`🎵 Started '${trackId}' @ ${startTime.toFixed(2)}s (offset ${offset.toFixed(2)}s). Duration: ${state.audioBuffer.duration.toFixed(2)}s`);
 
     // Schedule pre-emptive transition
     if (currentSectionTracks && currentSectionTracks.length > 0 && state.duration && audioContext) {
@@ -562,10 +592,9 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
 }
 
 export function setActiveSection(newSectionTrackIds: string[] | null): void {
-  temporaryTracks = newSectionTrackIds || [];
-
   if (!audioContext) {
-    console.warn("setActiveSection: AudioContext not ready.");
+    console.log("setActiveSection: No audio context, saving as pending change");
+    pendingSectionTracks = newSectionTrackIds;
     return;
   }
 
@@ -587,24 +616,25 @@ export function setActiveSection(newSectionTrackIds: string[] | null): void {
   }
 
   // Not transitioning, apply immediately and clear any pending definition.
-  // console.log("setActiveSection: Applying change immediately, clearing any pending definition.");
+  console.log("setActiveSection: Applying change immediately, clearing any pending definition.");
   pendingSectionTracks = undefined;
 
   const newSectionKey = newSectionTrackIds ? newSectionTrackIds.join(",") : "null";
   const oldSectionKey = currentSectionTracks ? currentSectionTracks.join(",") : "null";
 
   if (newSectionKey === oldSectionKey) {
-    // console.log("setActiveSection: Section is the same as current, no change needed.");
-    return; // No change needed
+    console.log("setActiveSection: New section is the same as current, no change needed");
+    return;
   }
 
   console.log(`Setting active section directly: ${newSectionTrackIds ? `[${newSectionTrackIds.join(", ")}]` : "None"}`);
   currentSectionTracks = newSectionTrackIds ? [...newSectionTrackIds] : null;
+
   dispatchPlaylistChangeEvent();
 
   if (currentTrackId && currentSectionTracks && currentSectionTracks.includes(currentTrackId)) {
     currentTrackIndexInSection = currentSectionTracks.indexOf(currentTrackId);
-    console.log(`Active section updated. Current track '${currentTrackId}' (index ${currentTrackIndexInSection}) is part of new section.`);
+    console.log(`setActiveSection: Current track '${currentTrackId}' is in new section at index ${currentTrackIndexInSection}`);
   } else {
     if (currentTrackId && currentSectionTracks && !currentSectionTracks.includes(currentTrackId)) {
       console.log(`Active section updated. Current track '${currentTrackId}' is NOT part of new section [${currentSectionTracks.join(", ")}]. Index reset.`);
@@ -616,6 +646,7 @@ export function setActiveSection(newSectionTrackIds: string[] | null): void {
       // console.log("Active section updated/cleared. No current track or section unchanged regarding current track. Index reset.");
     }
     currentTrackIndexInSection = -1;
+    console.log("setActiveSection: Current track is not in new section or no current track");
   }
 }
 
@@ -931,24 +962,21 @@ export function resumeCurrentTrack(): void {
 }
 
 function dispatchPlaylistChangeEvent(tracks: string[] | null = null) {
-  const detail: { tracks: string[] } = { tracks: [] };
-
-  if (tracks) {
-    detail.tracks = tracks;
-  } else {
-    detail.tracks = currentSectionTracks ? currentSectionTracks : [];
-  }
-
-  const event = new CustomEvent("playlistChange", { detail });
-  window.dispatchEvent(event);
+  const tracksToDispatch = tracks || currentSectionTracks;
+  console.log("Dispatching playlist change event with tracks:", tracksToDispatch);
+  window.dispatchEvent(new CustomEvent("playlistChange", { detail: tracksToDispatch }));
 }
 
 // Listen for splash screen hiding event to trigger initial playlist change
-// There is a problem with deal-with-background-song, we do not have informations about tracks at the very first moment
 window.addEventListener("splashHidden", () => {
   setTimeout(() => {
-    dispatchPlaylistChangeEvent(temporaryTracks);
-  }, 500);
+    const currentTracks = getCurrentSectionTracks();
+    if (currentTracks && currentTracks.length > 0) {
+      dispatchPlaylistChangeEvent(currentTracks);
+    } else {
+      dispatchPlaylistChangeEvent(null);
+    }
+  }, 2000);
 });
 
 // Add TypeScript declarations for window properties

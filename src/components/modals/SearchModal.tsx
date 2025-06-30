@@ -98,7 +98,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                     .sort(([a], [b]) => Number(a) - Number(b))
                     .map(([chapter, items], chapterIndex) => (
                       <AccordionItem key={chapter} value={chapter} className="border-book-primary-20 rounded-lg mb-3 overflow-hidden">
-                        <AccordionTrigger className="px-4 py-3 bg-book-primary-10 hover:bg-book-primary-20 text-book-primary hover:no-underline">
+                        <AccordionTrigger className="px-4 py-3 bg-book-primary-10 hover:bg-book-primary-20 text-book-primary hover:no-underline cursor-pointer">
                           <div className="flex items-center gap-2">
                             <FileText size={16} />
                             <span className="font-medium">

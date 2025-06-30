@@ -137,54 +137,60 @@ export async function performLocalDOMSearch(query: string, currentLocation: Loca
       document.body.appendChild(searchContainer);
     }
 
+    // --------- React Dynamic Chapter Loading --------- //
+    // This is a part of code used for React dynamic chapter loading
+    // It was commented out in the original code, but we can keep it here for future
+
     // Load chapters that aren't already in the DOM
-    const chaptersToLoad: number[] = [];
-    const existingChapters = new Set<number>();
+    // const chaptersToLoad: number[] = [];
+    // const existingChapters = new Set<number>();
 
     // Check which chapters are already loaded
-    document.querySelectorAll("section[data-chapter]").forEach((section) => {
-      const chapterNum = parseInt(section.getAttribute("data-chapter") || "0");
-      if (chapterNum > 0) {
-        existingChapters.add(chapterNum);
-      }
-    });
+    // document.querySelectorAll("section[data-chapter]").forEach((section) => {
+    //   const chapterNum = parseInt(section.getAttribute("data-chapter") || "0");
+    //   if (chapterNum > 0) {
+    //     existingChapters.add(chapterNum);
+    //   }
+    // });
 
     // Determine which chapters need to be loaded for search
-    for (let i = 1; i <= currentLocation.chapter; i++) {
-      if (!existingChapters.has(i)) {
-        chaptersToLoad.push(i);
-      }
-    }
+    // for (let i = 1; i <= currentLocation.chapter; i++) {
+    //   if (!existingChapters.has(i)) {
+    //     chaptersToLoad.push(i);
+    //   }
+    // }
 
     // Load missing chapters into the search container
-    const loadPromises = chaptersToLoad.map(async (chapterId) => {
-      try {
-        // Import the chapter module
-        const module = await import(`./data/books/${actualBookSlug}/chapters/Chapter${chapterId}.tsx`);
-        const ChapterComponent = module.default || module[`Chapter${chapterId}`];
+    // const loadPromises = chaptersToLoad.map(async (chapterId) => {
+    //   try {
+    //     // Import the chapter module
+    //     const module = await import(`./data/books/${actualBookSlug}/chapters/Chapter${chapterId}.tsx`);
+    //     const ChapterComponent = module.default || module[`Chapter${chapterId}`];
 
-        if (ChapterComponent && typeof ChapterComponent === "function") {
-          // Create a temporary div to render the chapter
-          const tempDiv = document.createElement("div");
-          tempDiv.setAttribute("data-search-chapter", chapterId.toString());
-          searchContainer!.appendChild(tempDiv);
+    //     if (ChapterComponent && typeof ChapterComponent === "function") {
+    //       // Create a temporary div to render the chapter
+    //       const tempDiv = document.createElement("div");
+    //       tempDiv.setAttribute("data-search-chapter", chapterId.toString());
+    //       searchContainer!.appendChild(tempDiv);
 
-          // Use React to render the component
-          const { createRoot } = await import("react-dom/client");
-          const root = createRoot(tempDiv);
-          const React = await import("react");
-          root.render(React.createElement(ChapterComponent));
+    //       // Use React to render the component
+    //       const { createRoot } = await import("react-dom/client");
+    //       const root = createRoot(tempDiv);
+    //       const React = await import("react");
+    //       root.render(React.createElement(ChapterComponent));
 
-          // Wait a bit for React to render
-          await new Promise((resolve) => setTimeout(resolve, 50));
-        }
-      } catch (error) {
-        console.error(`Failed to load chapter ${chapterId} for search:`, error);
-      }
-    });
+    //       // Wait a bit for React to render
+    //       await new Promise((resolve) => setTimeout(resolve, 50));
+    //     }
+    //   } catch (error) {
+    //     console.error(`Failed to load chapter ${chapterId} for search:`, error);
+    //   }
+    // });
 
     // Wait for all chapters to load
-    await Promise.all(loadPromises);
+    // await Promise.all(loadPromises);
+
+    // --------- React Dynamic Chapter Loading --------- //
 
     // Now perform the search across all chapters (both existing and newly loaded)
     for (let chapterIndex = 1; chapterIndex <= currentLocation.chapter; chapterIndex++) {
@@ -263,7 +269,12 @@ export function cleanupSearchChapters(): void {
 
 const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) => {
   // Remove span tags with dynamic IDs like ch1-p1-s1
-  const paragraphWithoutSpans = paragraph.replace(/<span id="ch\d+-p\d+-s\d+">(.*?)<\/span>/g, "$1");
+  // We are getting here paragraph like: "/n       <span id='ch1-p1-s1' ..."
+  const paragraphWithoutSpans = paragraph
+    .replace("\n", "")
+    .trim()
+    .replace(/<span id="ch\d+-p\d+-s\d+"[^>]*>(.*)<\/span>/g, "$1");
+
   const sentences = paragraphWithoutSpans
     .split(/(?<=[.!?])\s+(?=[A-Z<])/) // Split on sentence endings while preserving HTML tags
     .map((s) => s.trim()) // Trim whitespace

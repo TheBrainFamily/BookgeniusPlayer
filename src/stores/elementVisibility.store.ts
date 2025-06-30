@@ -23,6 +23,8 @@ interface ElementVisibilityState {
   lastHideReason: HideReason;
   touch: TouchState;
   timers: TimerState;
+  // Internal timer refs (not exposed to components)
+  _internalTimers: { inactivityTimerRef: number | null; scrollTimerRef: number | null };
   // Actions
   setElementsVisible: (visible: boolean) => void;
   setScrollMode: (scrollMode: boolean) => void;
@@ -38,6 +40,8 @@ interface ElementVisibilityState {
   handleScrollEnd: () => void;
   pauseAllTimers: () => void;
   startAllTimers: () => void;
+  clearInactivityTimer: () => void;
+  resetInactivityTimer: () => void;
   // Selectors for better performance
   getVisibilityState: () => { areElementsVisible: boolean; isScrollMode: boolean };
   getTouchState: () => TouchState;
@@ -53,6 +57,7 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
       lastHideReason: null,
       touch: { startY: 0, startX: 0, startTime: 0, isScrolling: false },
       timers: { inactivityTimerId: null, scrollTimerId: null },
+      _internalTimers: { inactivityTimerRef: null, scrollTimerRef: null },
 
       // Simple actions
       setElementsVisible: (visible) => set({ areElementsVisible: visible }),
@@ -62,38 +67,51 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
       setInactivityTimer: (timerId) => set((state) => ({ timers: { ...state.timers, inactivityTimerId: timerId } })),
       setScrollTimer: (timerId) => set((state) => ({ timers: { ...state.timers, scrollTimerId: timerId } })),
 
+      // Timer management
+      clearInactivityTimer: () => {
+        const { _internalTimers } = get();
+        if (_internalTimers.inactivityTimerRef) {
+          clearTimeout(_internalTimers.inactivityTimerRef);
+          set((state) => ({ _internalTimers: { ...state._internalTimers, inactivityTimerRef: null }, timers: { ...state.timers, inactivityTimerId: null } }));
+        }
+      },
+
+      resetInactivityTimer: () => {
+        const store = get();
+
+        if (store._internalTimers.inactivityTimerRef) {
+          clearTimeout(store._internalTimers.inactivityTimerRef);
+        }
+
+        const timerId = window.setTimeout(() => {
+          const { hideAllElements } = useElementVisibilityStore.getState();
+          hideAllElements("inactivity");
+          set((state) => ({ _internalTimers: { ...state._internalTimers, inactivityTimerRef: null }, timers: { ...state.timers, inactivityTimerId: null } }));
+        }, INACTIVITY_TIMEOUT);
+
+        set((state) => ({ _internalTimers: { ...state._internalTimers, inactivityTimerRef: timerId }, timers: { ...state.timers, inactivityTimerId: timerId } }));
+      },
+
       pauseAllTimers: () => {
-        const { timers } = get();
+        const { _internalTimers } = get();
 
-        if (timers.inactivityTimerId !== null) {
-          clearTimeout(timers.inactivityTimerId);
+        if (_internalTimers.inactivityTimerRef) {
+          clearTimeout(_internalTimers.inactivityTimerRef);
         }
-        if (timers.scrollTimerId !== null) {
-          clearTimeout(timers.scrollTimerId);
+        if (_internalTimers.scrollTimerRef) {
+          clearTimeout(_internalTimers.scrollTimerRef);
         }
 
-        set({ timers: { inactivityTimerId: null, scrollTimerId: null } });
+        set({ _internalTimers: { inactivityTimerRef: null, scrollTimerRef: null }, timers: { inactivityTimerId: null, scrollTimerId: null } });
       },
 
       startAllTimers: () => {
-        const { timers } = get();
+        const { areElementsVisible, isScrollMode, resetInactivityTimer } = get();
 
-        if (timers.inactivityTimerId !== null) {
-          clearTimeout(timers.inactivityTimerId);
+        // Only start timer if elements are visible and not in scroll mode
+        if (areElementsVisible && !isScrollMode) {
+          resetInactivityTimer();
         }
-        if (timers.scrollTimerId !== null) {
-          clearTimeout(timers.scrollTimerId);
-        }
-
-        // Start the inactivity timer to automatically hide elements after timeout
-        const inactivityTimerId = window.setTimeout(() => {
-          const { hideAllElements, setInactivityTimer } = useElementVisibilityStore.getState();
-          hideAllElements("inactivity");
-          setInactivityTimer(null);
-        }, INACTIVITY_TIMEOUT);
-
-        // Update the store with the new timer ID
-        set({ timers: { inactivityTimerId, scrollTimerId: null } });
       },
 
       // Complex actions
@@ -102,7 +120,9 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
       hideAllElements: (reason = null) => set({ areElementsVisible: false, isScrollMode: false, lastHideReason: reason }),
 
       handleScreenTap: () => {
-        const { areElementsVisible, isScrollMode } = get();
+        const { areElementsVisible, isScrollMode, clearInactivityTimer } = get();
+
+        clearInactivityTimer();
 
         // If we're in scroll mode or elements are hidden, show all elements and exit scroll mode
         if (isScrollMode || !areElementsVisible) {

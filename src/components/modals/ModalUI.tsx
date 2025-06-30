@@ -1,9 +1,9 @@
 import React, { ReactNode, useCallback } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogTitle, DialogOverlay } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 export interface ModalUIProps {
   title?: ReactNode;
@@ -92,15 +92,25 @@ const ModalUI: React.FC<ModalUIProps> = ({
 
   return (
     <Dialog open={true} onOpenChange={handleOpenChange} modal={!layoutView}>
-      {/* Overlay */}
-      <DialogOverlay className={cn("dialog-overlay", hideOverlay && "bg-transparent backdrop-blur-none")} />
+      {/* Overlay with AnimatePresence */}
+      <AnimatePresence>
+        {!hideOverlay && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+          />
+        )}
+      </AnimatePresence>
 
       {/* Accessibility */}
       {title ? <DialogTitle className="sr-only">{typeof title === "string" ? title : "Modal"}</DialogTitle> : <DialogTitle className="sr-only">Modal</DialogTitle>}
 
       {/* Modal Content */}
       <DialogContent className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)} onOpenAutoFocus={(e) => e.preventDefault()}>
-        <div className={cn("flex flex-row gap-2 justify-center items-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 h-full", sizeConfig.container)}>
+        <div className={cn("flex flex-row gap-2 justify-center items-center mx-auto p-2 xl:px-4 h-full", sizeConfig.container)}>
           {layoutView && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none lg:flex lg:order-2 lg:flex-2 lg:max-w-[900px] xl:flex-1 xl:order-1" />}
 
           <motion.div
@@ -121,7 +131,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             )}
 
             <motion.main
-              className="p-4 overflow-y-auto opened-modal scrollbar-search"
+              className="p-4 pt-0 overflow-y-auto opened-modal scrollbar-search"
               layout={animateHeight}
               transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}
             >

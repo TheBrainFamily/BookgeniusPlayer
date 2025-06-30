@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Play, Pause, SkipForward, SkipBack, ListMusic, BookHeadphones, Volume2, VolumeX, Download } from "lucide-react";
 import { motion, AnimatePresence, Variants, Transition } from "motion/react";
 import useLocalStorageState from "use-local-storage-state";
@@ -20,30 +20,23 @@ import {
   getCurrentTrackIndexInSection,
   transitionToTrack,
   getTrackDetailsById,
-  loadTrack,
 } from "@/audio-crossfader";
 import { stopAudiobook, playAudiobook } from "@/hooks/useAudiobookTracks";
 import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { CURRENT_BOOK } from "@/consts";
-import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
 import { OptionalElement } from "./OptionalElement";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
 
 const AudioPlayer = () => {
-  const isMobileOrTablet = useIsMobileOrTablet();
   const { t } = useTranslation();
-  const { hasAudiobook } = getBookData();
+  const { hasAudiobook, slug } = getBookData();
 
-  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const INACTIVITY_TIMEOUT = 5000;
-
-  const [isPlayingAudioBook, setIsPlayingAudiobook] = useState(true);
   const [volume, setVolume] = useLocalStorageState("volume", { defaultValue: getMasterVolume() ?? 0.5 });
   const [balance, setBalance] = useLocalStorageState("balance", { defaultValue: 0.5 });
   const [isMuted, setIsMuted] = useLocalStorageState("isMuted", { defaultValue: false });
 
+  const [isPlayingAudioBook, setIsPlayingAudiobook] = useState(hasAudiobook);
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [isVolumeOpen, setIsVolumeOpen] = useState(false);
@@ -71,8 +64,8 @@ const AudioPlayer = () => {
   };
 
   const formatTime = (time: number) => {
-    if (isNaN(time) || time === null || typeof time === "undefined") {
-      return "0:00";
+    if (isNaN(time) || time === null || typeof time === "undefined" || time < 0) {
+      time = 0;
     }
 
     const minutes = Math.floor(time / 60);
@@ -80,24 +73,6 @@ const AudioPlayer = () => {
 
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
-
-  const startInactivityTimer = useCallback(() => {
-    return;
-    // Don't start inactivity timer if dropdowns are open - keep elements visible
-    if (isVolumeOpen || isBigPlayerOpen) {
-      return;
-    }
-
-    if (inactivityTimerRef.current) {
-      clearTimeout(inactivityTimerRef.current);
-      inactivityTimerRef.current = null;
-    }
-
-    inactivityTimerRef.current = setTimeout(() => {
-      if (isVolumeOpen) setIsVolumeOpen(false);
-      if (isBigPlayerOpen) setIsBigPlayerOpen(false);
-    }, INACTIVITY_TIMEOUT);
-  }, [isVolumeOpen, isBigPlayerOpen, INACTIVITY_TIMEOUT]);
 
   useEffect(() => {
     if (!isPlaying || !isBigPlayerOpen) return;
@@ -120,16 +95,6 @@ const AudioPlayer = () => {
       const trackIds = sectionTrackIds !== undefined ? sectionTrackIds : getCurrentSectionTracks();
 
       if (trackIds && trackIds.length > 0) {
-        const loadPromises = trackIds.map((id) => {
-          if (!getTrackDetailsById(id)) {
-            console.log(`Details for track ${id} missing in playlist, attempting to load...`);
-            return loadTrack(id);
-          }
-          return Promise.resolve(true);
-        });
-
-        await Promise.all(loadPromises);
-
         const detailedTracks = trackIds
           .map((id) => {
             const details = getTrackDetailsById(id);
@@ -138,7 +103,8 @@ const AudioPlayer = () => {
               const duration = typeof details.trackLength === "number" && !isNaN(details.trackLength) ? details.trackLength : 0;
               return { id, title, duration };
             }
-            return null;
+
+            return { id, title: id, duration: 0 };
           })
           .filter((track): track is { id: string; title: string; duration: number } => track !== null);
 
@@ -147,20 +113,16 @@ const AudioPlayer = () => {
         setPlaylistTracks([]);
       }
     };
+
     updatePlaylist();
 
-    const handlePlaylistChange = (event: WindowEventMap["playlistChange"]) => {
-      const { tracks } = event.detail;
-      updatePlaylist(tracks);
+    const handlePlaylistChange = (event: CustomEvent<string[] | null>) => {
+      console.log("AudioPlayer: Received playlist change event", event.detail);
+      updatePlaylist(event.detail);
     };
 
-    window.addEventListener("playlistChange", handlePlaylistChange);
-    return () => {
-      window.removeEventListener("playlistChange", handlePlaylistChange);
-    };
-  }, []);
+    window.addEventListener("playlistChange", handlePlaylistChange as EventListener);
 
-  useEffect(() => {
     const setInitialWindowWidth = () => {
       setWindowWidth(window?.innerWidth || 1920);
     };
@@ -219,6 +181,7 @@ const AudioPlayer = () => {
     return () => {
       window.removeEventListener("songTransition", handleSongTransition);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("playlistChange", handlePlaylistChange as EventListener);
 
       if (notificationTimer) {
         clearTimeout(notificationTimer);
@@ -226,23 +189,27 @@ const AudioPlayer = () => {
       if (initialNotificationTimer) {
         clearTimeout(initialNotificationTimer);
       }
-      if (inactivityTimerRef.current) {
-        clearTimeout(inactivityTimerRef.current);
-      }
     };
   }, []);
 
   const handleVolumeChange = (value: number[]) => {
     const newVolume = value[0];
+
     setVolume(newVolume);
     setMasterVolume(newVolume);
+
     if (newVolume > 0 && isMuted) {
       setIsMuted(false);
+    } else if (newVolume === 0 && !isMuted) {
+      setIsMuted(true);
+      pauseCurrentTrack();
+      setIsPlaying(false);
     }
   };
 
   const handleBalanceChange = (value: number[]) => {
     const newVolume = value[0];
+
     setBalance(newVolume);
     setBackgroundVolume(newVolume);
   };
@@ -301,7 +268,7 @@ const AudioPlayer = () => {
   const handleDownloadTrack = (id: string, title: string) => {
     if (!id) return;
 
-    const trackUrl = `/${CURRENT_BOOK}/${id}.mp3`;
+    const trackUrl = `/${slug}/${id}.mp3`;
     const link = document.createElement("a");
     link.href = trackUrl;
     link.download = `${title}.mp3`;
@@ -319,17 +286,14 @@ const AudioPlayer = () => {
             onMouseEnter={() => {
               setIsVolumeOpen(true);
               setIsBigPlayerOpen(false);
-              if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
             }}
-            onMouseLeave={() => {
-              startInactivityTimer();
-              setIsVolumeOpen(false);
-            }}
+            onMouseLeave={() => setIsVolumeOpen(false)}
           >
             <motion.button
               onTouchEnd={(e) => {
                 e.preventDefault(); // Prevent mouse events from firing
-                setIsVolumeOpen(!isVolumeOpen);
+                setIsVolumeOpen((prev) => !prev);
+                setIsBigPlayerOpen(false);
               }}
               onMouseUp={(e) => {
                 // Only handle mouse events if no touch capability or if it's actually a mouse click
@@ -411,19 +375,34 @@ const AudioPlayer = () => {
           {/* Big Player Button with Dropdown */}
           <div
             onMouseEnter={() => {
-              setCurrentTime(getCurrentTrackPosition());
-              setIsBigPlayerOpen(true);
-              setIsVolumeOpen(false);
-
-              if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+              // Only on desktop
+              if (window.matchMedia("(hover: hover)").matches) {
+                setCurrentTime(getCurrentTrackPosition());
+                setIsVolumeOpen(false);
+                setIsBigPlayerOpen(true);
+              }
             }}
             onMouseLeave={() => {
-              startInactivityTimer();
-              setIsBigPlayerOpen(false);
+              if (window.matchMedia("(hover: hover)").matches) {
+                setIsBigPlayerOpen(false);
+              }
             }}
           >
             <motion.button
-              onClick={() => setIsBigPlayerOpen((prev) => !prev)}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                setCurrentTime(getCurrentTrackPosition());
+                setIsVolumeOpen(false);
+                setIsBigPlayerOpen((prev) => !prev);
+              }}
+              onMouseDown={(e) => {
+                // Only handle if not a touch device
+                if (e.detail > 0) {
+                  setCurrentTime(getCurrentTrackPosition());
+                  setIsVolumeOpen(false);
+                  setIsBigPlayerOpen((prev) => !prev);
+                }
+              }}
               className="p-2 my-1 hover:text-white rounded-full cursor-pointer"
               whileHover="hover"
               whileTap="tap"
@@ -443,18 +422,25 @@ const AudioPlayer = () => {
                   exit="exit"
                 >
                   <motion.div className="flex justify-center pt-4 mb-4" variants={variants.popUpItem} initial="closed" animate="open">
-                    <div className="w-32 h-32 bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg">
-                      {currentTrackData?.coverArtUrl && (
-                        <motion.img
-                          key={currentTrackData?.coverArtUrl}
-                          src={currentTrackData?.coverArtUrl}
-                          alt="Music album art"
-                          className="w-full h-full object-cover"
-                          variants={variants.iconFadeScale}
-                          initial="initial"
-                          animate="animate"
-                        />
-                      )}
+                    <div className="relative group w-32 h-32">
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/25 to-white/10 rounded-2xl blur-sm opacity-70 group-hover:opacity-90 transition-opacity duration-300" />
+                      <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-white/40 shadow-2xl backdrop-blur-sm bg-white/15">
+                        {currentTrackData?.coverArtUrl ? (
+                          <motion.img
+                            key={currentTrackData?.coverArtUrl}
+                            src={currentTrackData?.coverArtUrl}
+                            alt="Album artwork"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            variants={variants.iconFadeScale}
+                            initial="initial"
+                            animate="animate"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/25 to-white/10">
+                            <ListMusic className="w-12 h-12 text-white/70" />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </motion.div>
 
@@ -529,38 +515,40 @@ const AudioPlayer = () => {
                     </motion.button>
                   </motion.div>
 
-                  <motion.div className="space-y-2 pb-3" variants={variants.popUpItem} initial="closed" animate="open">
-                    <div className="text-sm font-medium mb-2">Playlist:</div>
-                    {playlistTracks.map((track) => (
-                      <motion.div
-                        key={track.id}
-                        className={cn("flex items-center justify-between px-2 py-1 rounded-md cursor-pointer gap-2", currentTrackIdFromState === track.id && "bg-white/10")}
-                        variants={variants.trackItemHover}
-                        whileHover="hover"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          transitionToTrack(track.id);
-                        }}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className={"text-white/70"}>{track.title}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-white/70">{formatTime(track.duration)}</span>
-                          <button
-                            className="text-white/70 hover:text-white p-2 rounded-full transition hover:bg-black/40 cursor-pointer"
-                            title="Download track"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDownloadTrack(track.id, track.title);
-                            }}
-                          >
-                            <Download className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </motion.div>
+                  {playlistTracks.length > 0 && (
+                    <motion.div className="space-y-2 pb-3" variants={variants.popUpItem} initial="closed" animate="open">
+                      <div className="text-sm font-medium mb-2">Playlist:</div>
+                      {playlistTracks.map((track) => (
+                        <motion.div
+                          key={track.id}
+                          className={cn("flex items-center justify-between px-2 py-1 rounded-md cursor-pointer gap-2", currentTrackIdFromState === track.id && "bg-white/10")}
+                          variants={variants.trackItemHover}
+                          whileHover="hover"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            transitionToTrack(track.id);
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className={"text-white/70"}>{track.title}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-white/70">{formatTime(track.duration)}</span>
+                            <button
+                              className="text-white/70 hover:text-white p-2 rounded-full transition hover:bg-black/40 cursor-pointer"
+                              title="Download track"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownloadTrack(track.id, track.title);
+                              }}
+                            >
+                              <Download className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -572,12 +560,7 @@ const AudioPlayer = () => {
       <AnimatePresence>
         {showSongNotification && currentTrackData && windowWidth && (
           <motion.div
-            className={cn(
-              windowWidth >= 1280 && !isMobileOrTablet && "absolute w-100 top-5 right-5",
-              windowWidth >= 1280 && isMobileOrTablet && "fixed w-80 bottom-5 left-5",
-              windowWidth < 1280 && windowWidth >= 965 && "fixed w-80 bottom-5 left-5",
-              windowWidth < 965 && "fixed w-80 bottom-20 left-5",
-            )}
+            className={cn(windowWidth >= 965 && "absolute w-100 top-5 right-5", windowWidth < 965 && "fixed w-80 bottom-20 left-5")}
             variants={variants.songNotification}
             initial="initial"
             animate="animate"
@@ -592,10 +575,17 @@ const AudioPlayer = () => {
               )}
               onClick={() => setShowSongNotification(false)}
             >
-              <div
-                className={`bg-white/15 rounded-lg overflow-hidden flex items-center justify-center border border-white/40 shadow-lg flex-shrink-0 ${windowWidth < 1280 ? "w-24 h-24" : "w-32 h-32"}`}
-              >
-                {currentTrackData.coverArtUrl && <img src={currentTrackData.coverArtUrl} alt="Teraz gra" className="w-full h-full object-cover" />}
+              <div className={cn("relative group", windowWidth < 965 ? "w-20 h-20" : "w-26 h-26")}>
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-white/5 rounded-xl blur-sm opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+                <div className="relative w-full h-full rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl backdrop-blur-sm bg-white/10">
+                  {currentTrackData.coverArtUrl ? (
+                    <img src={currentTrackData.coverArtUrl} alt="Now playing" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/20 to-white/5">
+                      <ListMusic className="w-8 h-8 text-white/70" />
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="flex flex-col flex-1 min-w-0">
                 <div className="text-sm font-medium">{t("now_playing")}</div>

@@ -27,7 +27,7 @@ import { useBookContent } from "@/hooks/useBookContent";
 import { useElementVisibility } from "./hooks/useElementVisibility";
 import { setKnownVideos } from "@/utils/getFilePathsForName";
 import { getKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles";
-import { useQuizz } from "./hooks/useQuizz";
+import { useQuiz } from "./hooks/useQuiz";
 
 function Shell() {
   setKnownVideos(getKnownVideoFiles());
@@ -37,7 +37,7 @@ function Shell() {
   /* dynamic visual hooks */
   useCutScene();
   useBackgroundVideo();
-  useQuizz();
+  useQuiz();
   /* app ready hook */
   useAppReady();
 
