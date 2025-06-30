@@ -13,6 +13,7 @@ import { activateCharacterInteractions } from "@/helpers/activateCharacterIntera
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
+import { getCurrentLocation, goToParagraph } from "@/helpers/paragraphsNavigation";
 
 const AnimatedFontSize: React.FC<{ value: number; isChanging: boolean }> = memo(({ value, isChanging }) => {
   const [currentDisplayValue, setCurrentDisplayValue] = useState(value);
@@ -97,9 +98,41 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
   const handleFontSizeChange = (value: number[]) => {
     const fontSize = value[0];
+
+    // Store current position before changing font size
+    const currentLocation = getCurrentLocation();
+
     handleSliderChangeWithOverlay(() => {
       setCurrentFontSize(fontSize);
+
+      // After font size change, scroll back to the same position
+      // Use a longer timeout to ensure the font size has been applied to the DOM
+      setTimeout(() => {
+        goToParagraph({ currentChapter: currentLocation.currentChapter, currentParagraph: currentLocation.currentParagraph }, true);
+      }, 300);
     });
+  };
+
+  const handleQuickFontSizeChange = (fontSize: number) => {
+    // Store current position before changing font size
+    const currentLocation = getCurrentLocation();
+
+    setHideOverlay(true);
+    setIsFontSizeChanging(true);
+
+    setTimeout(() => {
+      setCurrentFontSize(fontSize);
+
+      // After font size change, scroll back to the same position
+      setTimeout(() => {
+        goToParagraph({ currentChapter: currentLocation.currentChapter, currentParagraph: currentLocation.currentParagraph }, true);
+      }, 200);
+    }, 100);
+
+    setTimeout(() => {
+      setHideOverlay(false);
+      setIsFontSizeChanging(false);
+    }, 1500);
   };
 
   const handleComplexityChange = (value: number[]) => {
@@ -219,58 +252,13 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
           />
           <div className="flex justify-between text-xs text-gray-300">
-            <span
-              className="cursor-pointer hover:text-white transition-colors"
-              onClick={() => {
-                setHideOverlay(true);
-                setIsFontSizeChanging(true);
-
-                setTimeout(() => {
-                  setCurrentFontSize(0.5);
-                }, 100);
-
-                setTimeout(() => {
-                  setHideOverlay(false);
-                  setIsFontSizeChanging(false);
-                }, 1500);
-              }}
-            >
+            <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleQuickFontSizeChange(0.5)}>
               {t("small")}
             </span>
-            <span
-              className="cursor-pointer hover:text-white transition-colors"
-              onClick={() => {
-                setHideOverlay(true);
-                setIsFontSizeChanging(true);
-
-                setTimeout(() => {
-                  setCurrentFontSize(1.0);
-                }, 100);
-
-                setTimeout(() => {
-                  setHideOverlay(false);
-                  setIsFontSizeChanging(false);
-                }, 1500);
-              }}
-            >
+            <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleQuickFontSizeChange(1.0)}>
               {t("default")}
             </span>
-            <span
-              className="cursor-pointer hover:text-white transition-colors"
-              onClick={() => {
-                setHideOverlay(true);
-                setIsFontSizeChanging(true);
-
-                setTimeout(() => {
-                  setCurrentFontSize(1.5);
-                }, 100);
-
-                setTimeout(() => {
-                  setHideOverlay(false);
-                  setIsFontSizeChanging(false);
-                }, 1500);
-              }}
-            >
+            <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleQuickFontSizeChange(1.5)}>
               {t("large")}
             </span>
           </div>

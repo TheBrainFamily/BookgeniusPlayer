@@ -25,7 +25,7 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
   }, [t]);
 
   const navigateToChapter = (chapterId: number) => {
-    systemNavigateTo({ currentChapter: chapterId, currentParagraph: 0 });
+    systemNavigateTo({ currentChapter: chapterId, currentParagraph: 0 }, false);
     onClose();
   };
 
