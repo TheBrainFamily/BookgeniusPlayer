@@ -26,7 +26,8 @@
     "lint": "eslint --cache --fix src/",
     "lint:ci": "eslint --cache src/",
     "prettier:check": "prettier --check src/ --quiet 2>&1 | grep -v 'Ignored unknown option'",
-    "analyze-characters": "tsx ./scripts/analyze-character-mentions.ts"
+    "analyze-characters": "tsx ./scripts/analyze-character-mentions.ts",
+    "check-assets": "tsx ./scripts/check-character-assets.ts"
   },
   "dependencies": {
     "@capacitor/core": "^7.2.0",
