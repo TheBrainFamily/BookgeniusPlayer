@@ -180,8 +180,9 @@
       }
 
       & > section {
-        padding: 15vh 0 70vh;
+        padding: 35vh 0 70vh;
         width: 100%;
+        margin-top: 2em;
       }
 
       .play-container > section {
@@ -190,16 +191,10 @@
         margin-right: auto;
       }
 
-      @media (min-width: 1280px) {
+      @media screen and (max-height: 600px) and (orientation: landscape) {
         & > section {
-          padding-top: 30vh;
+          padding-top: 30vh; /* Slightly reduce for very short landscape screens */
         }
-      }
-
-      /* Chapter sections */
-      section[data-chapter] {
-        margin-top: 3em;
-        /* page-break-before: always; */
       }
 
       section > span {
@@ -964,31 +959,6 @@ section[data-chapter] [data-index] {
 .active-paragraph {
   background: hsla(219, 60%, 36%, 0);
   transition: all 0.3s ease-in-out;
-}
-
-/* visualizer lapiacy first and last visible paragraph */
-#dev-zone-visualizer {
-  visibility: hidden;
-  position: fixed;
-  background-color: rgba(255, 215, 140, 0);
-  border: 1px dashed gray;
-  z-index: 999;
-  pointer-events: none;
-}
-/* visualizer lapiacy active paragraph */
-#dev-zone-visualizer-2 {
-  visibility: hidden;
-  position: fixed;
-  background-color: rgba(57, 112, 59, 0.3);
-  /* border: 1px dashed gray; */
-  z-index: 30;
-  pointer-events: none !important;
-  mix-blend-mode: multiply;
-  /* Blur at top and bottom using a mask gradient */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
-  /* Optional: add a blur filter for extra effect */
-  /* filter: blur(2px); */
 }
 
 @keyframes pulse {

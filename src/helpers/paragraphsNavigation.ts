@@ -52,7 +52,7 @@ export const setCurrentLocation = (loc: Location) => {
 
   setTimeout(() => {
     const chapter = Number(loc.currentChapter) || 1;
-    const paragraph = Number(loc.currentParagraph) || 1;
+    const paragraph = Number(loc.currentParagraph) || 0;
 
     window.location.hash = `${chapter}-${paragraph}`;
   }, 2000);
@@ -104,14 +104,42 @@ export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph
   // Update hash immediately for system navigation
   window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
 
-  goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph });
+  goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, true);
 };
 
 /* ------------------------------------------------------------------ */
 /*  Scroll helper                                                     */
 export const goToParagraph = (loc: { currentChapter: number; currentParagraph: number }, fast = false) => {
-  const selector = `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
-  document.querySelector(selector)?.scrollIntoView({ behavior: fast ? "instant" : "smooth", block: "start" });
+  // For paragraph 0, scroll to the chapter itself; otherwise, look for the specific paragraph
+  const selector =
+    loc.currentParagraph === 0 ? `section[data-chapter="${loc.currentChapter}"]` : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
+  const element = document.querySelector(selector) as HTMLElement;
+
+  if (!element) {
+    console.warn(`Element not found for selector: ${selector}`);
+    return;
+  }
+
+  const contentContainer = document.getElementById("content-container");
+  if (!contentContainer) {
+    element.scrollIntoView({ behavior: fast ? "instant" : "smooth", block: "start" });
+    return;
+  }
+
+  const containerRect = contentContainer.getBoundingClientRect();
+  const elementRect = element.getBoundingClientRect();
+
+  // Focus zone starts at about 35vh from the top of the container
+  const focusZoneOffset = containerRect.height * 0.35;
+
+  // Calculate the scroll position to place the element at the focus zone
+  const targetScrollTop = contentContainer.scrollTop + elementRect.top - containerRect.top - focusZoneOffset;
+
+  if (fast) {
+    contentContainer.scrollTop = targetScrollTop;
+  } else {
+    contentContainer.scrollTo({ top: targetScrollTop, behavior: "smooth" });
+  }
 };
 
 /**
@@ -195,10 +223,11 @@ export const goToInitialLocationFromHash = () => {
     const saved = getSavedLocation();
 
     if (saved) {
+      console.log("navigating to saved location", saved);
       systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph });
     } else {
-      console.warn("no saved location, using default location");
-      systemNavigateTo({ currentChapter: 1, currentParagraph: 1 });
+      console.log("no saved location, starting fresh at chapter 1, paragraph 0 (chapter title)");
+      systemNavigateTo({ currentChapter: 1, currentParagraph: 0 });
     }
   }
 };
