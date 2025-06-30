@@ -179,10 +179,10 @@ export const xmlToComplexHtml = (
                       const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
                       inner += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
                     } else {
-                      if (pElement.getAttribute("dynasty") === "true") {
-                        pContent += pElement.textContent;
+                      if (e.getAttribute("dynasty") === "true") {
+                        inner += e.textContent;
                       } else {
-                        pContent += `<span class="character-highlighted" data-character="${slug}" data-src-listening="${listeningSrc}">${pElement.textContent}</span>`;
+                        inner += `<span class="character-highlighted" data-character="${slug}" data-src-listening="${listeningSrc}">${e.textContent}</span>`;
                       }
                     }
                   } else {

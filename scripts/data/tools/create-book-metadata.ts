@@ -169,7 +169,21 @@ export function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<st
             }
 
             // Add the current paragraph index if not already present
-            const targetArray = chapterEntry[`paragraphsWhere${listType.charAt(0).toUpperCase()}${listType.slice(1)}`];
+            let targetArray: number[];
+            switch (listType) {
+              case ListType.SPOTTED:
+                targetArray = chapterEntry.paragraphsWhereSpotted;
+                break;
+              case ListType.TALKING:
+                targetArray = chapterEntry.paragraphsWhereTalking;
+                break;
+              case ListType.ENTERS:
+                targetArray = chapterEntry.paragraphsWhereEnters!;
+                break;
+              case ListType.EXITS:
+                targetArray = chapterEntry.paragraphsWhereExits!;
+                break;
+            }
 
             if (!targetArray.includes(dataIndex)) {
               targetArray.push(dataIndex);

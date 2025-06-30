@@ -201,7 +201,7 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
 /*  4. Ad‑hoc "does it match?" sanity check                                   */
 /* -------------------------------------------------------------------------- */
 
-function createParagraphsWhereSpottedForPlay(startParagraph: number, endParagraph: number, paragraphsWhereEnters: number[], paragraphsWhereExits: number[]): number[] {
+function createParagraphsWhereSpottedForPlay(startParagraph: number, endParagraph: number, paragraphsWhereEnters: number[] = [], paragraphsWhereExits: number[] = []): number[] {
   const activeIntervals: Array<[number, number]> = [];
 
   let exitIndex = 0;
