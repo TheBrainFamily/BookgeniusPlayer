@@ -10,7 +10,7 @@ import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
 
 async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
-  const { bookSlug, bookLanguage, xmlDoc } = parseBookXmlData(bookDirectoryPath);
+  const { bookSlug, bookLanguage, bookForm, xmlDoc } = parseBookXmlData(bookDirectoryPath);
 
   // Ensure output directory exists
   const bookOutputPath = path.resolve("src", "books", bookSlug);
@@ -21,7 +21,7 @@ async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: stri
   // Generate files
   generateKnownVideoFiles(bookDirectoryPath, bookOutputPath);
   generateAudiobookTracksFile(bookDirectoryPath, bookOutputPath);
-  generateBookDataFiles(bookDirectoryPath, bookSlug, bookLanguage, xmlDoc);
+  generateBookDataFiles(bookDirectoryPath, bookSlug, bookLanguage, bookForm, xmlDoc);
 
   // Wait a moment for file generation to complete
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -35,7 +35,7 @@ async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: stri
   return { bookSlug: bookData.slug, bookTitle: bookData.metadata.title, bookLanguage };
 }
 
-function parseBookXmlData(bookDirectoryPath: string): { bookSlug: string; bookLanguage: string; xmlDoc: Document } {
+function parseBookXmlData(bookDirectoryPath: string): { bookSlug: string; bookLanguage: string; bookForm: string; xmlDoc: Document } {
   const bookXmlPath = `${bookDirectoryPath}/book.xml`;
   if (!fs.existsSync(bookXmlPath)) {
     throw new Error(`book.xml not found at ${bookXmlPath}`);
@@ -66,7 +66,13 @@ function parseBookXmlData(bookDirectoryPath: string): { bookSlug: string; bookLa
     bookLanguage = bookLangElements[0].textContent.trim().toLowerCase();
   }
 
-  return { bookSlug, bookLanguage, xmlDoc };
+  const bookFormElements = xmlDoc.getElementsByTagName("BookForm");
+  let bookForm = "book";
+  if (bookFormElements.length > 0 && bookFormElements[0].textContent) {
+    bookForm = bookFormElements[0].textContent.trim().toLowerCase();
+  }
+
+  return { bookSlug, bookLanguage, bookForm, xmlDoc };
 }
 
 function generateKnownVideoFiles(bookDirectoryPath: string, bookOutputPath: string): void {
@@ -82,7 +88,7 @@ function generateKnownVideoFiles(bookDirectoryPath: string, bookOutputPath: stri
   fs.writeFileSync(path.join(bookOutputPath, "getKnownVideoFiles.ts"), getKnownVideoFiles, "utf-8");
 }
 
-async function generateAudiobookTracksFile(bookDirectoryPath: string, bookOutputPath: string) {
+function generateAudiobookTracksFile(bookDirectoryPath: string, bookOutputPath: string) {
   const audiobookDataPath = path.join(bookDirectoryPath, "assets", "audiobook_data", "AudiobookTracksDefined.ts");
   let getAudiobookTracksForBookContent: string;
 
@@ -112,7 +118,7 @@ export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
   fs.writeFileSync(path.join(bookOutputPath, "getAudiobookTracksForBook.ts"), getAudiobookTracksForBookContent, "utf-8");
 }
 
-function generateBookDataFiles(bookDirectoryPath: string, bookSlug: string, bookLang: string, xmlDoc: Document): void {
+function generateBookDataFiles(bookDirectoryPath: string, bookSlug: string, bookLang: string, bookForm: string, xmlDoc: Document): void {
   const bookOutputPath = path.resolve("src", "books", bookSlug);
 
   // --- Generate getBookStringified.ts ---
@@ -161,9 +167,11 @@ export const getBookStringified = (): string => {
   // --- Generate getCharactersData.ts ---
   const characterTags = getCharacterTags(xmlDoc);
   const parser = new DOMParser();
-  const updatedString = bookXml.replaceAll(/<\/?span[^>]*>/g, "");
+  // Removes all spans with their id as "chX-pY-sZ" and <em> which is inside the stage direction
+  const updatedString = bookXml.replaceAll(/<span id="ch\d+-p\d+-s\d+">(.*?)<\/span>/g, "$1").replaceAll(/<\/?em[^>]*>/g, "");
   const xmlDocWithoutSpans = parser.parseFromString(updatedString, "text/xml");
-  const characterMetadata = extractCharacterMetadata(xmlDocWithoutSpans, characterTags).map((character) => ({
+
+  const characterMetadata = extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm).map((character) => ({
     ...character,
     bookSlug,
     imageUrl: `/${bookSlug}/${character.slug.toLowerCase()}.png`,
@@ -185,7 +193,7 @@ import { getBookStringified } from "@/books/${bookSlug}/getBookStringified";
 
 export const bookData: BookData = {
   slug: "${bookSlug}",
-  metadata: { title: "${bookSlugNoDashes}", language: "${bookLang}" },
+  metadata: { title: "${bookSlugNoDashes}", language: "${bookLang}", bookForm: "${bookForm}" },
   chapters: ${JSON.stringify(chapterTitles, null, 2)},
   themeColors: {
     primaryColor: "#E3F2FD",

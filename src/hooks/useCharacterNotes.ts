@@ -24,10 +24,12 @@ export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphab
 
     async function load() {
       const { chapter, paragraph, endChapter, endParagraph } = loc;
+
       const raw = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange(
         { bookSlug: CURRENT_BOOK, startChapter: chapter, startParagraph: paragraph, endChapter, endParagraph },
         getCharactersData(),
       );
+
       if (cancelled) return;
 
       const parsed = parseParagraphRange(raw);
