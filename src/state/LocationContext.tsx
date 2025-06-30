@@ -17,7 +17,7 @@ export interface LocationWithMetadata {
   source: "user" | "system";
 }
 
-export const DEFAULT_LOCATION: Location = { chapter: 1, paragraph: 1, endChapter: 1, endParagraph: 1, currentChapter: 1, currentParagraph: 1 };
+export const DEFAULT_LOCATION: Location = { chapter: 1, paragraph: 0, endChapter: 1, endParagraph: 0, currentChapter: 1, currentParagraph: 0 };
 
 /* ------------------------------------------------------------------ */
 /*  Load the *initial* reader position from LS — nothing more         */

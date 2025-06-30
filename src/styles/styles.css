@@ -16,12 +16,13 @@
   height: 100vh; /* Fallback */
   height: calc(100vh + var(--safe-area-inset-bottom)); /* Extend to include the bottom safe area */
   min-height: -webkit-fill-available; /* Fill entire height on iOS */
+  max-height: 100svh;
   overflow: hidden; /* Hide main overflow, content scrolls */
   display: flex;
   flex-direction: row; /* Arrange items horizontally (book + notes) */
   justify-content: space-between; /* Push first/last to edges, space between */
   align-items: stretch; /* Make items fill height by default */
-  padding: 0;
+  padding: 0 !important;
   padding-bottom: var(--safe-area-inset-bottom); /* Add padding only for the safe area */
   transition: background-color var(--transition-medium) var(--transition-timing);
   position: relative; /* Needed for z-index stacking context */
@@ -139,16 +140,13 @@
       /* Media query for tablets - no right side fade */
       @media (min-width: 768px) and (max-width: 1279px) {
         mask-image:
-          linear-gradient(
-            to bottom,
-            transparent 0%,
-            rgba(0 0 0 / 0.25) 5%,
-            rgba(0 0 0 / 0.65) 20%,
-            rgba(0 0 0 / 0.9) 30%,
-            rgba(0 0 0 / 0.9) 40%,
-            rgba(0 0 0 / 0.2) 70%,
-            transparent 100%
-          ),
+          linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 1) 35%, rgba(0 0 0 / 1) 50%, rgba(0 0 0 / 0.4) 65%, transparent 100%),
+          radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
+      }
+
+      @media (min-width: 768px) and (max-height: 700px) {
+        mask-image:
+          linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.9) 10%, rgba(0 0 0 / 1) 35%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.7) 75%, transparent 100%),
           radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
       }
 
@@ -159,27 +157,32 @@
         text-align: center;
         margin-bottom: 1.5em;
         margin-top: 0;
-        padding: 0 3rem;
+        padding: 2rem 3rem;
+        font-weight: bold;
       }
 
       h2 {
         font-size: 2em;
-        padding: 0 3rem;
+        padding: 2rem 3rem;
+        font-weight: bold;
       }
 
       h3 {
         font-size: 2em;
-        padding: 0 3rem;
+        padding: 2rem 3rem;
+        font-weight: bold;
       }
 
       h4 {
         font-size: 1.4em;
-        padding: 0 3rem;
+        padding: 2rem 3rem;
+        font-weight: bold;
       }
 
       & > section {
-        padding: 15vh 0 70vh;
+        padding: 35vh 0 70vh;
         width: 100%;
+        margin-top: 2em;
       }
 
       .play-container > section {
@@ -188,16 +191,10 @@
         margin-right: auto;
       }
 
-      @media (min-width: 1280px) {
+      @media screen and (max-height: 600px) and (orientation: landscape) {
         & > section {
-          padding-top: 30vh;
+          padding-top: 30vh; /* Slightly reduce for very short landscape screens */
         }
-      }
-
-      /* Chapter sections */
-      section[data-chapter] {
-        margin-top: 3em;
-        /* page-break-before: always; */
       }
 
       section > span {
@@ -962,30 +959,6 @@ section[data-chapter] [data-index] {
 .active-paragraph {
   background: hsla(219, 60%, 36%, 0);
   transition: all 0.3s ease-in-out;
-}
-
-#dev-zone-visualizer {
-  visibility: hidden;
-  position: fixed;
-  background-color: rgba(255, 215, 140, 0);
-  border: 1px dashed gray;
-  z-index: 999;
-  pointer-events: none;
-}
-
-#dev-zone-visualizer-2 {
-  visibility: hidden;
-  position: fixed;
-  background-color: rgba(57, 112, 59, 0.3);
-  /* border: 1px dashed gray; */
-  z-index: 30;
-  pointer-events: none !important;
-  mix-blend-mode: multiply;
-  /* Blur at top and bottom using a mask gradient */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
-  /* Optional: add a blur filter for extra effect */
-  /* filter: blur(2px); */
 }
 
 @keyframes pulse {

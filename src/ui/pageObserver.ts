@@ -1,6 +1,71 @@
 import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
 
 const SHOULD_SHOW_EVERYONE = false;
+const DEV_ZONE_VISUALIZERS_ENABLED = false;
+
+// --- Development Zone Visualizers ---
+
+/**
+ * Creates the main active element visualizer (dev-zone-visualizer)
+ * Shows only the single active paragraph/heading
+ */
+function createActiveElementVisualizer(): HTMLDivElement {
+  const visualizer = document.createElement("div");
+  visualizer.id = "dev-zone-visualizer";
+  visualizer.style.position = "fixed";
+  visualizer.style.pointerEvents = "none";
+  visualizer.style.zIndex = "45";
+  visualizer.style.border = "2px solid #ff6b6b";
+  visualizer.style.backgroundColor = "rgba(255, 107, 107, 0.1)";
+  visualizer.style.opacity = "0";
+  visualizer.style.transition = "opacity 0.3s ease-in-out";
+  document.body.appendChild(visualizer);
+  return visualizer;
+}
+
+/**
+ * Creates the range visualizer (dev-zone-visualizer-2)
+ * Shows all paragraphs that overlap with the focus zone
+ */
+function createRangeVisualizer(): HTMLDivElement {
+  const visualizer = document.createElement("div");
+  visualizer.id = "dev-zone-visualizer-2";
+  visualizer.style.position = "fixed";
+  visualizer.style.pointerEvents = "none";
+  visualizer.style.zIndex = "44";
+  visualizer.style.border = "2px solid #4ecdc4";
+  visualizer.style.backgroundColor = "rgba(78, 205, 196, 0.1)";
+  visualizer.style.opacity = "0";
+  visualizer.style.transition = "opacity 0.5s ease-in-out";
+  document.body.appendChild(visualizer);
+  return visualizer;
+}
+
+/**
+ * Initializes both development zone visualizers
+ * Returns references to both visualizers or null if disabled
+ */
+function initializeDevZoneVisualizers(): { activeElementVisualizer: HTMLDivElement | null; rangeVisualizer: HTMLDivElement | null } {
+  if (!DEV_ZONE_VISUALIZERS_ENABLED) {
+    return { activeElementVisualizer: null, rangeVisualizer: null };
+  }
+
+  // Check if visualizers already exist to prevent duplicates
+  let activeElementVisualizer = document.getElementById("dev-zone-visualizer") as HTMLDivElement;
+  let rangeVisualizer = document.getElementById("dev-zone-visualizer-2") as HTMLDivElement;
+
+  if (!activeElementVisualizer) {
+    activeElementVisualizer = createActiveElementVisualizer();
+  }
+
+  if (!rangeVisualizer) {
+    rangeVisualizer = createRangeVisualizer();
+  }
+
+  console.log("[DevZoneVisualizers] Initialized development zone visualizers");
+
+  return { activeElementVisualizer, rangeVisualizer };
+}
 
 // --- Helper Functions ---
 
@@ -308,25 +373,6 @@ function activateMediaInRange(
   });
 }
 
-function getScrollMarginTopPx(): number {
-  const element = document.querySelector("#content-container p");
-  if (!element) return 0;
-
-  const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1024px)");
-  if (landscapeMediaQuery.matches) {
-    return 50;
-  }
-  // measure viewport and element height
-  const viewportHeight = window.innerHeight;
-  const elementHeight = element.getBoundingClientRect().height;
-
-  // center the element vertically
-  const marginTop = ((viewportHeight - elementHeight) / 2) * 0.9;
-
-  // guard against negative values
-  return Math.max(0, Math.round(marginTop));
-}
-
 // --- Extract Chapter and Paragraph Info ---
 const getParagraphInfo = (element: Element): { chapter: number | null; paragraph: number | null } => {
   const paragraphStr = (element as HTMLElement).dataset.index;
@@ -343,6 +389,9 @@ export function setupPageObserver(
 ): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number } | null {
   const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
 
+  // Initialize development zone visualizers early
+  const { activeElementVisualizer, rangeVisualizer } = initializeDevZoneVisualizers();
+
   // --- State for tracking all currently intersecting pages ---
   const intersectingPages = new Set<Element>();
   let currentlyActivePageElement: Element | null = null;
@@ -354,8 +403,6 @@ export function setupPageObserver(
 
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
-    const scrollMarginTopPx = getScrollMarginTopPx();
-
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         intersectingPages.add(entry.target);
@@ -365,8 +412,36 @@ export function setupPageObserver(
     });
 
     const rootRect = observerOptions.root.getBoundingClientRect();
-    const zoneTop = rootRect.top + scrollMarginTopPx;
-    const zoneBottom = zoneTop + 0.1 * rootRect.height; // 10% height below this point
+    const topMultiplier = 0.35; // 35vh focus zone start
+    let bottomMultiplier = 0.45; // 10vh focus zone height (default)
+
+    // Responsive focus zone adjustments
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    // Check media query for landscape mode on smaller wide screens
+    const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
+    if (landscapeMediaQuery.matches) {
+      bottomMultiplier = 0.75; // Use larger focus zone in landscape mode
+    }
+
+    // Adjust for smaller screens (mobile)
+    if (viewportHeight < 700) {
+      bottomMultiplier = 0.55; // Larger zone for smaller screens
+    }
+
+    // Adjust for mobile portrait - ensure sufficient zone for chapter detection
+    if (viewportWidth < 768 && viewportHeight > viewportWidth) {
+      bottomMultiplier = 0.6; // Even larger zone for mobile portrait
+    }
+
+    // Adjust for very wide screens
+    if (viewportWidth > 1600) {
+      bottomMultiplier = 0.42; // Smaller, more precise zone for large screens
+    }
+
+    const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
+    const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
 
     if (rootRect.width !== previousRootRectWidth) {
       console.log("ROOTRECTE: 372 rootRectChangedTimes", rootRectChangedTimes);
@@ -375,56 +450,6 @@ export function setupPageObserver(
       rootRectChangedTimes++;
       previousRootRectWidth = rootRect.width;
     }
-
-    // --- Development Zone Visualizer ---
-
-    console.log("WILCZYNSKA: 276 zoneTop", zoneTop);
-    console.log("WILCZYNSKA: 277 zoneBottom", zoneBottom);
-    console.log("WILCZYNSKA: 278 rootRect", rootRect);
-    console.log("WILCZYNSKA: 279 scrollMarginTopPx", scrollMarginTopPx);
-
-    console.log(`intersectingPages.size: ${intersectingPages.size}`);
-    if (intersectingPages.size > 0 && rootRectChangedTimes >= 2) {
-      let currentSentenceVisualizer = document.getElementById("dev-zone-visualizer-2");
-      if (!currentSentenceVisualizer) {
-        currentSentenceVisualizer = document.createElement("div");
-        currentSentenceVisualizer.id = "dev-zone-visualizer-2";
-        currentSentenceVisualizer.style.opacity = "0";
-        currentSentenceVisualizer.style.transition = "opacity 0.5s ease-in-out";
-        document.body.appendChild(currentSentenceVisualizer);
-      }
-      currentSentenceVisualizer.style.left = `${rootRect.left}px`;
-      currentSentenceVisualizer.style.top = `${zoneTop - 50}px`;
-      currentSentenceVisualizer.style.width = `${rootRect.width}px`;
-      currentSentenceVisualizer.style.height = `${zoneBottom - zoneTop + 100}px`;
-
-      // Trigger fade-in
-      requestAnimationFrame(() => {
-        currentSentenceVisualizer.style.opacity = "1";
-      });
-    }
-    const topMultiplier = 0.2;
-    let bottomMultiplier = 0.55;
-
-    // Check media query for landscape mode on smaller wide screens
-    const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
-    if (landscapeMediaQuery.matches) {
-      bottomMultiplier = 0.95; // Use larger bottom zone in this mode
-    }
-
-    const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
-    const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
-
-    // let zoneVisualizer = document.getElementById("dev-zone-visualizer");
-    // if (!zoneVisualizer) {
-    //   zoneVisualizer = document.createElement("div");
-    //   zoneVisualizer.id = "dev-zone-visualizer";
-    //   document.body.appendChild(zoneVisualizer);
-    // }
-    // zoneVisualizer.style.left = `${rootRect.left}px`;
-    // zoneVisualizer.style.top = `${focusZoneTop}px`;
-    // zoneVisualizer.style.width = `${rootRect.width}px`;
-    // zoneVisualizer.style.height = `${focusZoneBottom - focusZoneTop}px`;
 
     let activeParagraph: { chapter: number | null; paragraph: number | null } | null = null;
     let maxPercentageOverlapRatio = -1;
@@ -436,8 +461,18 @@ export function setupPageObserver(
     // First pass: look for fully visible elements
     intersectingPages.forEach((element) => {
       const rect = element.getBoundingClientRect();
+
+      // Get computed styles to account for margins for accurate positioning
+      const computedStyle = window.getComputedStyle(element);
+      const marginTop = parseFloat(computedStyle.marginTop);
+      const marginBottom = parseFloat(computedStyle.marginBottom);
+
+      // Calculate true visual bounds including margins
+      const visualTop = rect.top - marginTop;
+      const visualBottom = rect.bottom + marginBottom;
+
       // Check if element is fully contained within the zone
-      if (rect.top >= zoneTop && rect.bottom <= zoneBottom) {
+      if (visualTop >= focusZoneTop && visualBottom <= focusZoneBottom) {
         // Element is fully visible in the zone
         if (!foundFullyVisible) {
           // This is the first fully visible element found
@@ -455,18 +490,29 @@ export function setupPageObserver(
 
       intersectingPages.forEach((element) => {
         const rect = element.getBoundingClientRect();
-        const overlapTop = Math.max(rect.top, zoneTop);
-        const overlapBottom = Math.min(rect.bottom, zoneBottom);
+
+        // Get computed styles to account for margins for accurate overlap calculation
+        const computedStyle = window.getComputedStyle(element);
+        const marginTop = parseFloat(computedStyle.marginTop);
+        const marginBottom = parseFloat(computedStyle.marginBottom);
+
+        // Calculate true visual bounds including margins
+        const visualTop = rect.top - marginTop;
+        const visualBottom = rect.bottom + marginBottom;
+        const visualHeight = visualBottom - visualTop;
+
+        // Calculate overlap using visual bounds
+        const overlapTop = Math.max(visualTop, focusZoneTop);
+        const overlapBottom = Math.min(visualBottom, focusZoneBottom);
         const overlap = Math.max(0, overlapBottom - overlapTop);
 
         // Skip elements with minimal overlap
         if (overlap < MIN_OVERLAP_THRESHOLD) return;
 
-        const elementHeight = rect.height;
         let currentOverlapRatio = 0;
 
-        if (elementHeight > 0) {
-          currentOverlapRatio = overlap / elementHeight;
+        if (visualHeight > 0) {
+          currentOverlapRatio = overlap / visualHeight;
         }
 
         // Use a weighted combination of absolute overlap and percentage overlap
@@ -475,7 +521,7 @@ export function setupPageObserver(
         const ABSOLUTE_WEIGHT = 0.7;
         const PERCENTAGE_WEIGHT = 0.3;
 
-        const zoneHeight = zoneBottom - zoneTop;
+        const zoneHeight = focusZoneBottom - focusZoneTop;
         const normalizedAbsoluteOverlap = overlap / zoneHeight; // Normalize to 0-1 range
         const weightedScore = normalizedAbsoluteOverlap * ABSOLUTE_WEIGHT + currentOverlapRatio * PERCENTAGE_WEIGHT;
 
@@ -504,9 +550,39 @@ export function setupPageObserver(
     });
     chosenElement?.classList.add("active-paragraph");
 
-    if (intersectingPages.size > 0) {
-      // Default multipliers
+    // Update dev-zone-visualizer (single active element)
+    if (chosenElement && activeElementVisualizer && DEV_ZONE_VISUALIZERS_ENABLED) {
+      const updateVisualizerPosition = () => {
+        requestAnimationFrame(() => {
+          // Wait one more frame to ensure layout is completely stable
+          requestAnimationFrame(() => {
+            const elementRect = chosenElement.getBoundingClientRect();
 
+            const computedStyle = window.getComputedStyle(chosenElement);
+            const marginTop = parseFloat(computedStyle.marginTop);
+            const marginBottom = parseFloat(computedStyle.marginBottom);
+            const marginLeft = parseFloat(computedStyle.marginLeft);
+            const marginRight = parseFloat(computedStyle.marginRight);
+
+            const visualTop = elementRect.top - marginTop;
+            const visualBottom = elementRect.bottom + marginBottom;
+            const visualLeft = elementRect.left - marginLeft;
+            const visualWidth = elementRect.width + marginLeft + marginRight;
+            const visualHeight = visualBottom - visualTop;
+
+            activeElementVisualizer.style.left = `${visualLeft}px`;
+            activeElementVisualizer.style.top = `${visualTop}px`;
+            activeElementVisualizer.style.width = `${visualWidth}px`;
+            activeElementVisualizer.style.height = `${visualHeight}px`;
+            activeElementVisualizer.style.opacity = "1";
+          });
+        });
+      };
+
+      updateVisualizerPosition();
+    }
+
+    if (intersectingPages.size > 0) {
       // Filter intersecting pages to find those overlapping the focus zone
       const focusedPages = Array.from(intersectingPages).filter((element) => {
         const elementRect = element.getBoundingClientRect();
@@ -515,6 +591,47 @@ export function setupPageObserver(
       });
 
       if (focusedPages.length > 0) {
+        // Update dev-zone-visualizer-2 with focused paragraphs
+        if (rangeVisualizer && DEV_ZONE_VISUALIZERS_ENABLED) {
+          const updateRangeVisualizerPosition = () => {
+            requestAnimationFrame(() => {
+              // Calculate the bounding box that encompasses all focused paragraphs
+              let minTop = Infinity;
+              let maxBottom = -Infinity;
+              let minLeft = Infinity;
+              let maxRight = -Infinity;
+
+              focusedPages.forEach((element) => {
+                const rect = element.getBoundingClientRect();
+                const computedStyle = window.getComputedStyle(element);
+                const marginTop = parseFloat(computedStyle.marginTop);
+                const marginBottom = parseFloat(computedStyle.marginBottom);
+                const marginLeft = parseFloat(computedStyle.marginLeft);
+                const marginRight = parseFloat(computedStyle.marginRight);
+
+                const visualTop = rect.top - marginTop;
+                const visualBottom = rect.bottom + marginBottom;
+                const visualLeft = rect.left - marginLeft;
+                const visualRight = rect.right + marginRight;
+
+                minTop = Math.min(minTop, visualTop);
+                maxBottom = Math.max(maxBottom, visualBottom);
+                minLeft = Math.min(minLeft, visualLeft);
+                maxRight = Math.max(maxRight, visualRight);
+              });
+
+              // Position the range visualizer to encompass all focused paragraphs
+              rangeVisualizer.style.left = `${minLeft}px`;
+              rangeVisualizer.style.top = `${minTop}px`;
+              rangeVisualizer.style.width = `${maxRight - minLeft}px`;
+              rangeVisualizer.style.height = `${maxBottom - minTop}px`;
+              rangeVisualizer.style.opacity = "1";
+            });
+          };
+
+          updateRangeVisualizerPosition();
+        }
+
         // Sort the focused pages by their viewport top position
         focusedPages.sort((a, b) => {
           return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
@@ -613,6 +730,10 @@ export function setupPageObserver(
         }
       } else {
         // Handle case where intersecting pages exist, but none are in the focus zone
+        if (rangeVisualizer && DEV_ZONE_VISUALIZERS_ENABLED) {
+          rangeVisualizer.style.opacity = "0";
+        }
+
         if (currentlyActivePageElement !== null) {
           console.log("[Observer] No pages intersecting the focus zone.");
           // Decide if you want to clear the active elements or keep the last known ones
@@ -623,6 +744,10 @@ export function setupPageObserver(
       }
     } else {
       // Handle case where no pages are intersecting the viewport at all
+      if (rangeVisualizer && DEV_ZONE_VISUALIZERS_ENABLED) {
+        rangeVisualizer.style.opacity = "0";
+      }
+
       if (currentlyActivePageElement !== null) {
         console.log("[Observer] No pages intersecting viewport.");
         // currentlyActivePageElement = null;

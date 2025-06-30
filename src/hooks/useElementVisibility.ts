@@ -2,7 +2,6 @@ import { useEffect, useCallback, useRef } from "react";
 import { useElementVisibilityStore } from "@/stores/elementVisibility.store";
 import useSplashHidden from "./useSplashHidden";
 
-const INACTIVITY_TIMEOUT = 8000;
 const SCROLL_HIDE_DELAY = 3000;
 const TOUCH_MOVE_THRESHOLD = 30;
 const TAP_TIME_THRESHOLD = 500;
@@ -40,14 +39,14 @@ export const useElementVisibility = () => {
   const isSplashHidden = useSplashHidden();
 
   // Store actions (these don't change, so they won't cause re-renders)
-  const { setInactivityTimer, setScrollTimer, showAllElements, hideAllElements, handleScrollStart, handleScrollEnd } = useElementVisibilityStore();
+  const { showAllElements, handleScrollStart, handleScrollEnd, clearInactivityTimer, resetInactivityTimer } = useElementVisibilityStore();
 
   const isInitializedRef = useRef(false);
-  const inactivityTimerRef = useRef<number | null>(null);
-  const scrollTimerRef = useRef<number | null>(null);
   const scrollEndDebounceRef = useRef<number | null>(null);
   const isCurrentlyScrollingRef = useRef(false);
   const rafIdRef = useRef<number | null>(null);
+  const lastTapTimeRef = useRef(0);
+  const preventClickRef = useRef(false);
 
   const stateRef = useRef({ areElementsVisible, isScrollMode, touch });
 
@@ -55,41 +54,12 @@ export const useElementVisibility = () => {
     stateRef.current = { areElementsVisible, isScrollMode, touch };
   }, [areElementsVisible, isScrollMode, touch]);
 
-  const clearInactivityTimer = useCallback(() => {
-    if (inactivityTimerRef.current) {
-      clearTimeout(inactivityTimerRef.current);
-      inactivityTimerRef.current = null;
-      setInactivityTimer(null);
-    }
-  }, [setInactivityTimer]);
-
-  const clearScrollTimer = useCallback(() => {
-    if (scrollTimerRef.current) {
-      clearTimeout(scrollTimerRef.current);
-      scrollTimerRef.current = null;
-      setScrollTimer(null);
-    }
-  }, [setScrollTimer]);
-
   const cancelPendingRaf = useCallback(() => {
     if (rafIdRef.current !== null) {
       cancelAnimationFrame(rafIdRef.current);
       rafIdRef.current = null;
     }
   }, []);
-
-  const resetInactivityTimer = useCallback(() => {
-    clearInactivityTimer();
-
-    const timerId = window.setTimeout(() => {
-      hideAllElements();
-      inactivityTimerRef.current = null;
-      setInactivityTimer(null);
-    }, INACTIVITY_TIMEOUT);
-
-    inactivityTimerRef.current = timerId;
-    setInactivityTimer(timerId);
-  }, [clearInactivityTimer, hideAllElements, setInactivityTimer]);
 
   const handleScroll = useCallback(() => {
     if (scrollEndDebounceRef.current) {
@@ -120,24 +90,32 @@ export const useElementVisibility = () => {
 
       rafIdRef.current = requestAnimationFrame(() => {
         handleScrollEnd();
+        // After scroll ends, restart the inactivity timer if elements are visible
+        const currentState = useElementVisibilityStore.getState();
+        if (currentState.areElementsVisible && !currentState.isScrollMode) {
+          resetInactivityTimer();
+        }
         rafIdRef.current = null;
       });
     }, SCROLL_HIDE_DELAY);
-  }, [clearInactivityTimer, cancelPendingRaf, handleScrollStart, handleScrollEnd]);
+  }, [clearInactivityTimer, cancelPendingRaf, handleScrollStart, handleScrollEnd, resetInactivityTimer]);
 
   useEffect(() => {
     if (isInitializedRef.current || !isSplashHidden) return;
+
+    clearInactivityTimer();
 
     showAllElements();
     resetInactivityTimer();
 
     isInitializedRef.current = true;
-  }, [showAllElements, resetInactivityTimer, isSplashHidden]);
+  }, [showAllElements, resetInactivityTimer, isSplashHidden, clearInactivityTimer]);
 
   // Initialize after a delay even if splash screen detection fails
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!isInitializedRef.current) {
+        clearInactivityTimer();
         showAllElements();
         resetInactivityTimer();
         isInitializedRef.current = true;
@@ -145,31 +123,55 @@ export const useElementVisibility = () => {
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [showAllElements, resetInactivityTimer]);
+  }, [showAllElements, resetInactivityTimer, clearInactivityTimer]);
 
   const stableHandleTap = useCallback(
     (event: MouseEvent | TouchEvent) => {
+      const now = Date.now();
+
+      // Prevent duplicate taps within 200ms
+      if (now - lastTapTimeRef.current < 200) {
+        return;
+      }
+      lastTapTimeRef.current = now;
+
       const target = event.target as HTMLElement;
 
       // Check if tap is on an interactive element
       for (const selector of INTERACTIVE_SELECTORS) {
         if (target.closest(selector)) {
-          console.log("Tap ignored - interactive element", selector);
           return;
         }
       }
 
+      // For touch events, prevent the subsequent click event
+      if (event.type === "touchend") {
+        preventClickRef.current = true;
+        setTimeout(() => {
+          preventClickRef.current = false;
+        }, 300);
+      }
+
+      // For click events, check if we should prevent it due to recent touch
+      if (event.type === "click" && preventClickRef.current) {
+        return;
+      }
+
+      // Clear any existing timers to prevent conflicts
+      clearInactivityTimer();
+
       const { handleScreenTap } = useElementVisibilityStore.getState();
       handleScreenTap();
 
-      const storeState = useElementVisibilityStore.getState();
-      const areNowVisible = storeState.areElementsVisible && !storeState.isScrollMode;
+      // Use a small delay to ensure state has updated before checking
+      setTimeout(() => {
+        const storeState = useElementVisibilityStore.getState();
+        const areNowVisible = storeState.areElementsVisible && !storeState.isScrollMode;
 
-      if (areNowVisible) {
-        resetInactivityTimer();
-      } else {
-        clearInactivityTimer();
-      }
+        if (areNowVisible) {
+          resetInactivityTimer();
+        }
+      }, 10);
     },
     [resetInactivityTimer, clearInactivityTimer],
   );
@@ -203,7 +205,8 @@ export const useElementVisibility = () => {
       setTouchScrolling(false);
 
       // Check if this was a tap (not a scroll) and within time limits
-      if (!currentTouch.isScrolling && touchDuration < TAP_TIME_THRESHOLD && touchDuration > 50) {
+      if (!currentTouch.isScrolling && touchDuration < TAP_TIME_THRESHOLD && touchDuration > 100) {
+        event.preventDefault();
         stableHandleTap(event);
       }
     },
@@ -248,29 +251,19 @@ export const useElementVisibility = () => {
       }
 
       clearInactivityTimer();
-      clearScrollTimer();
     };
-  }, [isInitializedRef.current, stableHandleTap, stableHandleTouchStart, stableHandleTouchMove, stableHandleTouchEnd, stableHandleScroll, clearInactivityTimer, clearScrollTimer]);
+  }, [isInitializedRef.current, stableHandleTap, stableHandleTouchStart, stableHandleTouchMove, stableHandleTouchEnd, stableHandleScroll, clearInactivityTimer]);
 
   useEffect(() => {
     return () => {
-      if (inactivityTimerRef.current) {
-        clearTimeout(inactivityTimerRef.current);
-        inactivityTimerRef.current = null;
-      }
-      if (scrollTimerRef.current) {
-        clearTimeout(scrollTimerRef.current);
-        scrollTimerRef.current = null;
-      }
       if (scrollEndDebounceRef.current) {
         clearTimeout(scrollEndDebounceRef.current);
         scrollEndDebounceRef.current = null;
       }
 
       clearInactivityTimer();
-      clearScrollTimer();
     };
-  }, [clearInactivityTimer, clearScrollTimer]);
+  }, [clearInactivityTimer]);
 
   return { areElementsVisible, isScrollMode };
 };

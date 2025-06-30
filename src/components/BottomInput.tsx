@@ -48,18 +48,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   const { chapter: currentChapter, paragraph: currentParagraph } = location;
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const lastActivityRef = useRef<number>(Date.now());
-  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const updateLastActivity = useCallback(() => {
     pauseAllTimers();
     showAllElements();
-
-    lastActivityRef.current = Date.now();
-    if (inactivityTimerRef.current) {
-      clearTimeout(inactivityTimerRef.current);
-      inactivityTimerRef.current = null;
-    }
   }, [pauseAllTimers, showAllElements]);
 
   useEffect(() => {
