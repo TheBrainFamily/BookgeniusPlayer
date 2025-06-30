@@ -186,14 +186,63 @@
       }
 
       .play-container > section {
-        width: 78%;
+        width: 85%;
         margin-left: auto;
         margin-right: auto;
+        margin-top: 5em;
+
+        span {
+          margin-top: 0;
+          text-align: center;
+        }
+
+        h4 {
+          text-align: center;
+          padding-bottom: 0.5em;
+          font-family: var(--font-eb-garamond);
+          font-weight: 700;
+        }
+
+        p {
+          margin-bottom: 0.1em;
+          font-family: var(--font-libre-caslon-text);
+        }
+
+        p > strong {
+          font-family: var(--font-eb-garamond);
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+
+        p:has(em) {
+          text-align: center;
+          line-height: 1em;
+          font-size: 14px;
+        }
+
+        p:not(:has(em)) + p:has(em) {
+          margin-top: 1.5em;
+        }
+
+        p:has(em) + p:not(:has(em)) {
+          margin-top: 1.5em;
+        }
       }
 
       @media screen and (max-height: 600px) and (orientation: landscape) {
         & > section {
           padding-top: 30vh; /* Slightly reduce for very short landscape screens */
+        }
+      }
+
+      @media screen and (max-width: 430px) and (orientation: portrait) {
+        section {
+          width: 100% !important;
+        }
+
+        p:not(:has(span),:has(em)), p:has(span.character-highlighted) {
+          text-indent: 0 !important;
+          margin-left: 1.5em;
         }
       }
 

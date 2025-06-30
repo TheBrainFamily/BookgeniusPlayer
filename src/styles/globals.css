@@ -179,6 +179,8 @@
   --font-serif: "Georgia", serif;
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono: "Courier New", Courier, monospace;
+  --font-eb-garamond: "EB Garamond", serif;
+  --font-libre-caslon-text: "Libre Caslon Text", serif;
 
   /* Transitions */
   --transition-fast: 0.2s;
