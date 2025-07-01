@@ -19,7 +19,6 @@ import {
   getCurrentTrackId,
   getCurrentTrackIndexInSection,
   transitionToTrack,
-  getTrackDetailsById,
 } from "@/audio-crossfader";
 import { stopAudiobook, playAudiobook } from "@/hooks/useAudiobookTracks";
 import { Slider } from "@/components/ui/slider";
@@ -90,38 +89,10 @@ const AudioPlayer = () => {
   }, [isPlaying, isBigPlayerOpen]);
 
   useEffect(() => {
-    const updatePlaylist = async (sectionTrackIds?: string[] | null) => {
-      // Use provided sectionTrackIds or get current ones
-      const trackIds = sectionTrackIds !== undefined ? sectionTrackIds : getCurrentSectionTracks();
-
-      if (trackIds && trackIds.length > 0) {
-        const detailedTracks = trackIds
-          .map((id) => {
-            const details = getTrackDetailsById(id);
-            if (details) {
-              const title = details.title || id;
-              const duration = typeof details.trackLength === "number" && !isNaN(details.trackLength) ? details.trackLength : 0;
-              return { id, title, duration };
-            }
-
-            return { id, title: id, duration: 0 };
-          })
-          .filter((track): track is { id: string; title: string; duration: number } => track !== null);
-
-        setPlaylistTracks(detailedTracks);
-      } else {
-        setPlaylistTracks([]);
-      }
-    };
-
-    updatePlaylist();
-
-    const handlePlaylistChange = (event: CustomEvent<string[] | null>) => {
+    const handlePlaylistChange = (event: CustomEvent<{ id: string; title: string; duration: number }[] | null>) => {
       console.log("AudioPlayer: Received playlist change event", event.detail);
-      updatePlaylist(event.detail);
+      setPlaylistTracks(event.detail || []);
     };
-
-    window.addEventListener("playlistChange", handlePlaylistChange as EventListener);
 
     const setInitialWindowWidth = () => {
       setWindowWidth(window?.innerWidth || 1920);
@@ -150,9 +121,8 @@ const AudioPlayer = () => {
     let notificationTimer: ReturnType<typeof setTimeout> | null = null;
 
     const handleSongTransition = () => {
-      console.log("Song transition event received");
       const newCurrentTrack = getCurrentTrackData();
-      console.log("Current track data:", newCurrentTrack);
+      console.log("AudioPlayer: Song transition event received", newCurrentTrack);
 
       setCurrentTrackData(newCurrentTrack);
       setIsPlaying(true);
@@ -177,15 +147,17 @@ const AudioPlayer = () => {
 
     window.addEventListener("songTransition", handleSongTransition);
     window.addEventListener("resize", handleResize);
+    window.addEventListener("playlistChange", handlePlaylistChange);
 
     return () => {
       window.removeEventListener("songTransition", handleSongTransition);
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("playlistChange", handlePlaylistChange as EventListener);
+      window.removeEventListener("playlistChange", handlePlaylistChange);
 
       if (notificationTimer) {
         clearTimeout(notificationTimer);
       }
+
       if (initialNotificationTimer) {
         clearTimeout(initialNotificationTimer);
       }

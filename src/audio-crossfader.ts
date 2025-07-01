@@ -966,10 +966,29 @@ export function resumeCurrentTrack(): void {
   playTrack(currentTrackId, audioContext.currentTime, s.pausedAt);
 }
 
-function dispatchPlaylistChangeEvent(tracks: string[] | null = null) {
-  const tracksToDispatch = tracks || currentSectionTracks;
-  console.log("Dispatching playlist change event with tracks:", tracksToDispatch);
-  window.dispatchEvent(new CustomEvent("playlistChange", { detail: tracksToDispatch }));
+function dispatchPlaylistChangeEvent(trackIds: string[] | null = null) {
+  const tracksToDispatch = trackIds || currentSectionTracks;
+
+  let playlistData: { id: string; title: string; duration: number }[] | null = null;
+
+  if (tracksToDispatch && tracksToDispatch.length > 0) {
+    playlistData = tracksToDispatch
+      .map((id) => {
+        const trackState = tracks.get(id);
+        if (trackState) {
+          const title = trackState.title || id;
+          const duration = typeof trackState.trackLength === "number" && !isNaN(trackState.trackLength) ? trackState.trackLength : 0;
+
+          return { id, title, duration };
+        }
+
+        return { id, title: id, duration: 0 };
+      })
+      .filter((track): track is { id: string; title: string; duration: number } => track !== null);
+  }
+
+  console.log("Dispatching playlist change event with track data:", playlistData);
+  window.dispatchEvent(new CustomEvent("playlistChange", { detail: playlistData }));
 }
 
 // Listen for splash screen hiding event to trigger initial playlist change
