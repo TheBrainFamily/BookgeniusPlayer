@@ -199,7 +199,8 @@ export const bookData: BookData = {
     primaryColor: "#E3F2FD",
     secondaryColor: "#1976D2",
     tertiaryColor: "#90CAF9",
-    quaternaryColor: "#0D47A1"
+    quaternaryColor: "#0D47A1",
+    simplifiedIconColor: "#4CAF50"
   },
   hasAudiobook: ${hasAudiobook},
   bookStringified: getBookStringified(),
