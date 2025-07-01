@@ -506,6 +506,7 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
   // ---------- fade-OUT ramp ----------
   const gOut = fadeOutState.gainNode.gain;
   const oldSourceNode = fadeOutState.sourceNode;
+  const oldGainNode = fadeOutState.gainNode;
   gOut.cancelScheduledValues(audioContext.currentTime);
   gOut.setValueAtTime(gOut.value, audioContext.currentTime);
   gOut.linearRampToValueAtTime(0, fadeEnd);
@@ -579,6 +580,13 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
         }
         try {
           oldSourceNode.disconnect();
+        } catch {
+          /* empty */
+        }
+      }
+      if (oldGainNode) {
+        try {
+          oldGainNode.disconnect();
         } catch {
           /* empty */
         }
