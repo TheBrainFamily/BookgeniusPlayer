@@ -160,7 +160,14 @@
           const t = window.i18n.t;
           document.querySelector(".splash-subtitle").textContent = t("splash_subtitle");
           document.querySelector(".splash-start-button span").textContent = t("start_button");
-          this.loadingPhrases = t("loading_phrases", { returnObjects: true }) || [];
+          
+          // Get the current book slug from the global variable
+          const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : "Pharaon";
+          
+          // Try to get book-specific loading phrases first, fallback to generic ones
+          const bookSpecificPhrases = t(`books.${currentBookSlug}.loading_phrases`, { returnObjects: true });
+          this.loadingPhrases = bookSpecificPhrases || t("loading_phrases", { returnObjects: true }) || [];
+          
           this.setupPhraseCycle();
         }
 

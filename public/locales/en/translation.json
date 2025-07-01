@@ -38,15 +38,162 @@
     "900": "Nine Hundred"
   },
   "loading_phrases": [
-    "Stretching reality...",
-    "Shrinking logic...",
-    "Resizing hallways...",
-    "Ignoring all known physics...",
-    "Painting the roses red...",
-    "Calibrating curiosity...",
-    "Painting the roses red...",
-    "Consulting the Caterpillar..."
+    "Creating a virtual library...",
+    "Invoking fictional characters...",
+    "Crafting literary elixirs...",
+    "Cleaning up ancient books...",
+    "Setting the final dots...",
+    "Turning pages...",
+    "Connecting imagination to reality...",
+    "Deciphering author's intentions...",
+    "Arranging words in perfect order...",
+    "Releasing narrative magic...",
+    "Opening doors to the world of books...",
+    "Igniting the fire of imagination...",
+    "Polishing literary gems...",
+    "Adding the final touches...",
+    "Weaving the threads of stories...",
+    "Awakening dormant heroes..."
   ],
+  "books": {
+    "Alice-Wonderland": {
+      "loading_phrases": [
+        "Stretching reality...",
+        "Shrinking logic...",
+        "Resizing hallways...",
+        "Ignoring all known physics...",
+        "Painting the roses red...",
+        "Calibrating curiosity...",
+        "Consulting the Caterpillar..."
+      ]
+    },
+    "1984": {
+      "loading_phrases": [
+        "Watching you through the telescreen...",
+        "Rewriting history...",
+        "Eliminating unpersons...",
+        "Doublethinking...",
+        "Speaking in Newspeak...",
+        "Reporting to Big Brother...",
+        "Erasing memories...",
+        "Controlling thoughtcrime...",
+        "Maintaining the Ministry of Truth...",
+        "Enforcing the Party line..."
+      ]
+    },
+    "1984-English": {
+      "loading_phrases": [
+        "Watching you through the telescreen...",
+        "Rewriting history...",
+        "Eliminating unpersons...",
+        "Doublethinking...",
+        "Speaking in Newspeak...",
+        "Reporting to Big Brother...",
+        "Erasing memories...",
+        "Controlling thoughtcrime...",
+        "Maintaining the Ministry of Truth...",
+        "Enforcing the Party line..."
+      ]
+    },
+    "Pharaon": {
+      "loading_phrases": [
+        "Building the pyramids...",
+        "Consulting the oracles...",
+        "Reading the stars...",
+        "Preparing the royal procession...",
+        "Summoning the ancient gods...",
+        "Deciphering hieroglyphs...",
+        "Navigating the Nile...",
+        "Entering the temple of Amun...",
+        "Preparing the pharaoh's crown...",
+        "Awakening the mummies..."
+      ]
+    },
+    "Conrad-Tajny-Agent": {
+      "loading_phrases": [
+        "Decoding secret messages...",
+        "Following the spy's trail...",
+        "Uncovering the conspiracy...",
+        "Reading between the lines...",
+        "Tracking the secret agent...",
+        "Deciphering coded documents...",
+        "Unmasking the double agent...",
+        "Following the shadow...",
+        "Reading encrypted letters...",
+        "Uncovering the truth..."
+      ]
+    },
+    "Krolowa-Sniegu": {
+      "loading_phrases": [
+        "Freezing the heart...",
+        "Creating ice palaces...",
+        "Summoning snowflakes...",
+        "Preparing the sleigh...",
+        "Casting winter spells...",
+        "Forming ice mirrors...",
+        "Calling the reindeer...",
+        "Creating snowstorms...",
+        "Building ice bridges...",
+        "Awakening the Snow Queen..."
+      ]
+    },
+    "Snow-Queen": {
+      "loading_phrases": [
+        "Freezing the heart...",
+        "Creating ice palaces...",
+        "Summoning snowflakes...",
+        "Preparing the sleigh...",
+        "Casting winter spells...",
+        "Forming ice mirrors...",
+        "Calling the reindeer...",
+        "Creating snowstorms...",
+        "Building ice bridges...",
+        "Awakening the Snow Queen..."
+      ]
+    },
+    "Lalka": {
+      "loading_phrases": [
+        "Opening the shop window...",
+        "Counting the profits...",
+        "Reading the newspaper...",
+        "Walking through Warsaw...",
+        "Visiting the theater...",
+        "Meeting at the café...",
+        "Walking in the park...",
+        "Reading love letters...",
+        "Counting the money...",
+        "Dreaming of Izabela..."
+      ]
+    },
+    "Romeo-And-Juliet": {
+      "loading_phrases": [
+        "Crossing the balcony...",
+        "Reading love sonnets...",
+        "Preparing the masquerade...",
+        "Meeting at the ball...",
+        "Swearing by the moon...",
+        "Preparing the wedding...",
+        "Sending the messenger...",
+        "Reading the stars...",
+        "Crossing family lines...",
+        "Awakening love..."
+      ]
+    },
+    "Fatherland": {
+      "loading_phrases": [
+        "Reading the Führer's speeches...",
+        "Checking the papers...",
+        "Walking through Berlin...",
+        "Following the investigation...",
+        "Reading the reports...",
+        "Crossing the border...",
+        "Decoding the messages...",
+        "Following the trail...",
+        "Reading the newspapers...",
+        "Uncovering the truth..."
+      ]
+    }
+  },
   "splash_title": "BookGenius",
   "splash_subtitle": "Books reimagined",
   "start_button": "Start",
