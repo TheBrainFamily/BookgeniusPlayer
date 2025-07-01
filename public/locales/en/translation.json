@@ -69,128 +69,142 @@
     },
     "1984": {
       "loading_phrases": [
-        "Watching you through the telescreen...",
-        "Rewriting history...",
-        "Eliminating unpersons...",
-        "Doublethinking...",
-        "Speaking in Newspeak...",
-        "Reporting to Big Brother...",
-        "Erasing memories...",
-        "Controlling thoughtcrime...",
-        "Maintaining the Ministry of Truth...",
-        "Enforcing the Party line..."
+        "Building the Ministry of Truth...",
+        "Installing telescreens...",
+        "Creating Newspeak...",
+        "Setting up Big Brother...",
+        "Configuring thoughtcrime...",
+        "Erasing the past...",
+        "Building the Ministry of Love...",
+        "Setting up the Ministry of Peace...",
+        "Configuring the Ministry of Plenty...",
+        "Activating thought police..."
       ]
     },
     "1984-English": {
       "loading_phrases": [
-        "Watching you through the telescreen...",
-        "Rewriting history...",
-        "Eliminating unpersons...",
-        "Doublethinking...",
-        "Speaking in Newspeak...",
-        "Reporting to Big Brother...",
-        "Erasing memories...",
-        "Controlling thoughtcrime...",
-        "Maintaining the Ministry of Truth...",
-        "Enforcing the Party line..."
+        "Building the Ministry of Truth...",
+        "Installing telescreens...",
+        "Creating Newspeak...",
+        "Setting up Big Brother...",
+        "Configuring thoughtcrime...",
+        "Erasing the past...",
+        "Building the Ministry of Love...",
+        "Setting up the Ministry of Peace...",
+        "Configuring the Ministry of Plenty...",
+        "Activating thought police..."
       ]
     },
     "Pharaon": {
       "loading_phrases": [
         "Building the pyramids...",
-        "Consulting the oracles...",
-        "Reading the stars...",
-        "Preparing the royal procession...",
-        "Summoning the ancient gods...",
-        "Deciphering hieroglyphs...",
-        "Navigating the Nile...",
-        "Entering the temple of Amun...",
-        "Preparing the pharaoh's crown...",
-        "Awakening the mummies..."
+        "Raising the temple of Amun...",
+        "Carving the sphinxes...",
+        "Painting hieroglyphs...",
+        "Setting up the Nile...",
+        "Creating mummies...",
+        "Crowning the pharaoh...",
+        "Building tombs...",
+        "Carving obelisks...",
+        "Painting papyrus...",
+        "Setting up pyramids...",
+        "Creating scarabs..."
       ]
     },
     "Conrad-Tajny-Agent": {
       "loading_phrases": [
-        "Decoding secret messages...",
-        "Following the spy's trail...",
-        "Uncovering the conspiracy...",
-        "Reading between the lines...",
-        "Tracking the secret agent...",
-        "Deciphering coded documents...",
-        "Unmasking the double agent...",
-        "Following the shadow...",
-        "Reading encrypted letters...",
-        "Uncovering the truth..."
+        "Building London...",
+        "Creating the fog...",
+        "Setting up street lamps...",
+        "Painting shop signs...",
+        "Building the docks...",
+        "Creating alleyways...",
+        "Setting up agents...",
+        "Painting ciphers...",
+        "Building conspiracies...",
+        "Creating mysteries...",
+        "Setting up spies...",
+        "Painting intrigues..."
       ]
     },
     "Krolowa-Sniegu": {
       "loading_phrases": [
-        "Freezing the heart...",
-        "Creating ice palaces...",
-        "Summoning snowflakes...",
-        "Preparing the sleigh...",
-        "Casting winter spells...",
-        "Forming ice mirrors...",
-        "Calling the reindeer...",
+        "Building the ice palace...",
+        "Carving snowflakes...",
         "Creating snowstorms...",
+        "Painting mirrors...",
+        "Setting up reindeer...",
         "Building ice bridges...",
-        "Awakening the Snow Queen..."
+        "Creating snow flowers...",
+        "Painting stars...",
+        "Setting up the north wind...",
+        "Carving hearts of ice...",
+        "Creating snow angels...",
+        "Painting the aurora..."
       ]
     },
     "Snow-Queen": {
       "loading_phrases": [
-        "Freezing the heart...",
-        "Creating ice palaces...",
-        "Summoning snowflakes...",
-        "Preparing the sleigh...",
-        "Casting winter spells...",
-        "Forming ice mirrors...",
-        "Calling the reindeer...",
+        "Building the ice palace...",
+        "Carving snowflakes...",
         "Creating snowstorms...",
+        "Painting mirrors...",
+        "Setting up reindeer...",
         "Building ice bridges...",
-        "Awakening the Snow Queen..."
+        "Creating snow flowers...",
+        "Painting stars...",
+        "Setting up the north wind...",
+        "Carving hearts of ice...",
+        "Creating snow angels...",
+        "Painting the aurora..."
       ]
     },
     "Lalka": {
       "loading_phrases": [
-        "Opening the shop window...",
-        "Counting the profits...",
-        "Reading the newspaper...",
-        "Walking through Warsaw...",
-        "Visiting the theater...",
-        "Meeting at the café...",
-        "Walking in the park...",
-        "Reading love letters...",
-        "Counting the money...",
-        "Dreaming of Izabela..."
+        "Building Warsaw...",
+        "Creating shops...",
+        "Painting tenements...",
+        "Setting up theaters...",
+        "Building cafés...",
+        "Creating parks...",
+        "Painting streets...",
+        "Setting up salons...",
+        "Building churches...",
+        "Creating gardens...",
+        "Painting shop windows...",
+        "Setting up carriages..."
       ]
     },
     "Romeo-And-Juliet": {
       "loading_phrases": [
-        "Crossing the balcony...",
-        "Reading love sonnets...",
-        "Preparing the masquerade...",
-        "Meeting at the ball...",
-        "Swearing by the moon...",
-        "Preparing the wedding...",
-        "Sending the messenger...",
-        "Reading the stars...",
-        "Crossing family lines...",
-        "Awakening love..."
+        "Building Verona...",
+        "Creating balconies...",
+        "Painting palaces...",
+        "Setting up gardens...",
+        "Building churches...",
+        "Creating piazzas...",
+        "Painting streets...",
+        "Setting up fountains...",
+        "Building theaters...",
+        "Creating terraces...",
+        "Painting stars...",
+        "Setting up the moon..."
       ]
     },
     "Fatherland": {
       "loading_phrases": [
-        "Reading the Führer's speeches...",
-        "Checking the papers...",
-        "Walking through Berlin...",
-        "Following the investigation...",
-        "Reading the reports...",
-        "Crossing the border...",
-        "Decoding the messages...",
-        "Following the trail...",
-        "Reading the newspapers...",
-        "Uncovering the truth..."
+        "Building Berlin...",
+        "Creating government buildings...",
+        "Painting flags...",
+        "Setting up checkpoints...",
+        "Building bridges...",
+        "Creating streets...",
+        "Painting signs...",
+        "Setting up borders...",
+        "Building offices...",
+        "Creating documents...",
+        "Painting maps...",
+        "Setting up surveillance..."
       ]
     }
   },

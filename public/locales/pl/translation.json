@@ -58,140 +58,156 @@
   "books": {
     "Alice-Wonderland": {
       "loading_phrases": [
-        "Podążanie za Białym Królikiem...",
-        "Zmniejszanie się, by przejść przez drzwi...",
-        "Rośnięcie, by sięgnąć klucza...",
+        "Rozciąganie rzeczywistości...",
+        "Kurczenie logiki...",
+        "Zmienianie rozmiaru korytarzy...",
+        "Ignorowanie wszystkich znanych praw fizyki...",
         "Malowanie róż na czerwono...",
-        "Picie herbaty z Szalonym Kapelusznikiem...",
-        "Gra w krokieta z flamingami...",
+        "Kalibrowanie ciekawości...",
         "Konsultacja z Gąsienicą...",
-        "Spotkanie z Kotem z Cheshire...",
-        "Uczestnictwo w przyjęciu w ogrodzie Królowej...",
-        "Znajdowanie drogi do Krainy Czarów..."
+        "Przygotowywanie herbaty o szóstej...",
+        "Ustawianie gry w krykieta...",
+        "Otwieranie drzwi do Krainy Czarów..."
       ]
     },
     "1984": {
       "loading_phrases": [
-        "Obserwowanie przez teleekran...",
-        "Przepisywanie historii...",
-        "Eliminowanie nieosób...",
-        "Mówienie nowomową...",
-        "Raportowanie do Wielkiego Brata...",
-        "Wymazywanie wspomnień...",
-        "Kontrolowanie myślozbrodni...",
-        "Utrzymywanie Ministerstwa Prawdy...",
-        "Egzekwowanie linii Partii..."
+        "Budowanie Ministerstwa Prawdy...",
+        "Instalowanie teleekranów...",
+        "Tworzenie nowomowy...",
+        "Ustawianie Wielkiego Brata...",
+        "Konfigurowanie myślozbrodni...",
+        "Wymazywanie przeszłości...",
+        "Budowanie Ministerstwa Miłości...",
+        "Ustawianie Ministerstwa Pokoju...",
+        "Konfigurowanie Ministerstwa Obfitości...",
+        "Aktywowanie patroli myśli..."
       ]
     },
     "1984-English": {
       "loading_phrases": [
-        "Obserwowanie przez teleekran...",
-        "Przepisywanie historii...",
-        "Eliminowanie nieosób...",
-        "Mówienie nowomową...",
-        "Raportowanie do Wielkiego Brata...",
-        "Wymazywanie wspomnień...",
-        "Kontrolowanie myślozbrodni...",
-        "Utrzymywanie Ministerstwa Prawdy...",
-        "Egzekwowanie linii Partii..."
+        "Budowanie Ministerstwa Prawdy...",
+        "Instalowanie teleekranów...",
+        "Tworzenie nowomowy...",
+        "Ustawianie Wielkiego Brata...",
+        "Konfigurowanie myślozbrodni...",
+        "Wymazywanie przeszłości...",
+        "Budowanie Ministerstwa Miłości...",
+        "Ustawianie Ministerstwa Pokoju...",
+        "Konfigurowanie Ministerstwa Obfitości...",
+        "Aktywowanie patroli myśli..."
       ]
     },
     "Pharaon": {
       "loading_phrases": [
         "Budowanie piramid...",
-        "Konsultacja z wyroczniami...",
-        "Czytanie gwiazd...",
-        "Przygotowywanie królewskiej procesji...",
-        "Przywoływanie starożytnych bogów...",
-        "Odszyfrowywanie hieroglifów...",
-        "Nawigacja po Nilu...",
-        "Wchodzenie do świątyni Amona...",
-        "Przygotowywanie korony faraona...",
-        "Budzenie mumii..."
+        "Wznoszenie świątyni Amona...",
+        "Rzeźbienie sfinksów...",
+        "Malowanie hieroglifów...",
+        "Ustawianie Nilu...",
+        "Tworzenie mumii...",
+        "Koronowanie faraona...",
+        "Budowanie grobowców...",
+        "Rzeźbienie obelisków...",
+        "Malowanie papirusów...",
+        "Ustawianie piramid...",
+        "Tworzenie skarabeuszy..."
       ]
     },
     "Conrad-Tajny-Agent": {
       "loading_phrases": [
-        "Dekodowanie tajnych wiadomości...",
-        "Podążanie śladem szpiega...",
-        "Ujawnianie spisku...",
-        "Czytanie między wierszami...",
-        "Śledzenie tajnego agenta...",
-        "Odszyfrowywanie zakodowanych dokumentów...",
-        "Demaskowanie podwójnego agenta...",
-        "Podążanie za cieniem...",
-        "Czytanie zaszyfrowanych listów...",
-        "Ujawnianie prawdy..."
+        "Budowanie Londynu...",
+        "Tworzenie mgły...",
+        "Ustawianie latarni...",
+        "Malowanie szyldów...",
+        "Budowanie doków...",
+        "Tworzenie zaułków...",
+        "Ustawianie agentów...",
+        "Malowanie szyfrów...",
+        "Budowanie konspiracji...",
+        "Tworzenie tajemnic...",
+        "Ustawianie szpiegów...",
+        "Malowanie intryg..."
       ]
     },
     "Krolowa-Sniegu": {
       "loading_phrases": [
-        "Zamrażanie serca...",
-        "Tworzenie lodowych pałaców...",
-        "Przywoływanie płatków śniegu...",
-        "Przygotowywanie sań...",
-        "Rzucanie zimowych zaklęć...",
-        "Formowanie lodowych luster...",
-        "Wzywanie reniferów...",
+        "Budowanie lodowego pałacu...",
+        "Rzeźbienie płatków śniegu...",
         "Tworzenie zamieci...",
+        "Malowanie luster...",
+        "Ustawianie reniferów...",
         "Budowanie lodowych mostów...",
-        "Budzenie Królowej Śniegu..."
+        "Tworzenie śnieżnych kwiatów...",
+        "Malowanie gwiazd...",
+        "Ustawianie wiatru północnego...",
+        "Rzeźbienie serca z lodu...",
+        "Tworzenie śnieżnych aniołów...",
+        "Malowanie zorzy polarnej..."
       ]
     },
     "Snow-Queen": {
       "loading_phrases": [
-        "Zamrażanie serca...",
-        "Tworzenie lodowych pałaców...",
-        "Przywoływanie płatków śniegu...",
-        "Przygotowywanie sań...",
-        "Rzucanie zimowych zaklęć...",
-        "Formowanie lodowych luster...",
-        "Wzywanie reniferów...",
+        "Budowanie lodowego pałacu...",
+        "Rzeźbienie płatków śniegu...",
         "Tworzenie zamieci...",
+        "Malowanie luster...",
+        "Ustawianie reniferów...",
         "Budowanie lodowych mostów...",
-        "Budzenie Królowej Śniegu..."
+        "Tworzenie śnieżnych kwiatów...",
+        "Malowanie gwiazd...",
+        "Ustawianie wiatru północnego...",
+        "Rzeźbienie serca z lodu...",
+        "Tworzenie śnieżnych aniołów...",
+        "Malowanie zorzy polarnej..."
       ]
     },
     "Lalka": {
       "loading_phrases": [
-        "Otwieranie wystawy sklepowej...",
-        "Liczenie zysków...",
-        "Czytanie gazety...",
-        "Spacer po Warszawie...",
-        "Wizyta w teatrze...",
-        "Spotkanie w kawiarni...",
-        "Spacer w parku...",
-        "Czytanie listów miłosnych...",
-        "Liczenie pieniędzy...",
-        "Marzenie o Izabeli..."
+        "Budowanie Warszawy...",
+        "Tworzenie sklepów...",
+        "Malowanie kamienic...",
+        "Ustawianie teatrów...",
+        "Budowanie kawiarni...",
+        "Tworzenie parków...",
+        "Malowanie ulic...",
+        "Ustawianie salonów...",
+        "Budowanie kościołów...",
+        "Tworzenie ogrodów...",
+        "Malowanie witryn...",
+        "Ustawianie dorożek..."
       ]
     },
     "Romeo-And-Juliet": {
       "loading_phrases": [
-        "Przechodzenie przez balkon...",
-        "Czytanie sonetów miłosnych...",
-        "Przygotowywanie maskarady...",
-        "Spotkanie na balu...",
-        "Przysięganie na księżyc...",
-        "Przygotowywanie ślubu...",
-        "Wysyłanie posłańca...",
-        "Czytanie gwiazd...",
-        "Łamanie zasad rodzinnych...",
-        "Budzenie miłości..."
+        "Budowanie Werony...",
+        "Tworzenie balkonów...",
+        "Malowanie pałaców...",
+        "Ustawianie ogrodów...",
+        "Budowanie kościołów...",
+        "Tworzenie placów...",
+        "Malowanie ulic...",
+        "Ustawianie fontann...",
+        "Budowanie teatrów...",
+        "Tworzenie tarasów...",
+        "Malowanie gwiazd...",
+        "Ustawianie księżyca..."
       ]
     },
     "Fatherland": {
       "loading_phrases": [
-        "Czytanie przemówień Führera...",
-        "Sprawdzanie dokumentów...",
-        "Spacer po Berlinie...",
-        "Śledzenie śledztwa...",
-        "Czytanie raportów...",
-        "Przekraczanie granicy...",
-        "Dekodowanie wiadomości...",
-        "Podążanie śladem...",
-        "Czytanie gazet...",
-        "Ujawnianie prawdy..."
+        "Budowanie Berlina...",
+        "Tworzenie gmachów...",
+        "Malowanie flag...",
+        "Ustawianie posterunków...",
+        "Budowanie mostów...",
+        "Tworzenie ulic...",
+        "Malowanie szyldów...",
+        "Ustawianie granic...",
+        "Budowanie biur...",
+        "Tworzenie dokumentów...",
+        "Malowanie map...",
+        "Ustawianie kontroli..."
       ]
     }
   },

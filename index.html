@@ -136,12 +136,14 @@
 
         setupVideoSource() {
           // Get the current book slug from the global variable
-          const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : "Pharaon";
-          // Set the video source to the loader.mp4 in the book's assets folder
-          const videoSrc = `/public_books/${currentBookSlug}/assets/loader.mp4`;
-          const video = document.getElementById("splash-video");
-          if (video) {
-            video.src = videoSrc;
+          const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : null;
+          if (currentBookSlug) {
+            // Set the video source to the loader.mp4 in the book's assets folder
+            const videoSrc = `/public_books/${currentBookSlug}/assets/loader.mp4`;
+            const video = document.getElementById("splash-video");
+            if (video) {
+              video.src = videoSrc;
+            }
           }
         }
 
@@ -162,10 +164,19 @@
           document.querySelector(".splash-start-button span").textContent = t("start_button");
           
           // Get the current book slug from the global variable
-          const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : "Pharaon";
+          const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : null;
           
           // Try to get book-specific loading phrases first, fallback to generic ones
-          const bookSpecificPhrases = t(`books.${currentBookSlug}.loading_phrases`, { returnObjects: true });
+          let bookSpecificPhrases = null;
+          if (currentBookSlug) {
+            const bookPhrases = t(`books.${currentBookSlug}.loading_phrases`, { returnObjects: true });
+            // Check if the result is actually an array (not the key string returned when translation is missing)
+            if (Array.isArray(bookPhrases)) {
+              bookSpecificPhrases = bookPhrases;
+            }
+          }
+          
+          // Fallback to generic phrases if book-specific ones are not available
           this.loadingPhrases = bookSpecificPhrases || t("loading_phrases", { returnObjects: true }) || [];
           
           this.setupPhraseCycle();
