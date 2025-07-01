@@ -408,19 +408,21 @@ const AudioPlayer = () => {
                   </motion.div>
 
                   <motion.div className="flex justify-center items-center gap-8 mb-4 relative" variants={variants.popUpItem} initial="closed" animate="open">
-                    <motion.button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        skipToPrevious();
-                      }}
-                      className="hover:text-white/80 p-2 rounded-full cursor-pointer"
-                      whileHover="hover"
-                      whileTap="tap"
-                      variants={variants.navButtonHover}
-                      title="Previous track"
-                    >
-                      <SkipBack className="w-4 h-4 lg:w-5 lg:h-5" />
-                    </motion.button>
+                    {playlistTracks.length > 1 && (
+                      <motion.button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          skipToPrevious();
+                        }}
+                        className="hover:text-white/80 p-2 rounded-full cursor-pointer"
+                        whileHover="hover"
+                        whileTap="tap"
+                        variants={variants.navButtonHover}
+                        title="Previous track"
+                      >
+                        <SkipBack className="w-4 h-4 lg:w-5 lg:h-5" />
+                      </motion.button>
+                    )}
 
                     <motion.div variants={variants.playButtonHover} whileTap="tap">
                       <motion.button
@@ -448,19 +450,21 @@ const AudioPlayer = () => {
                       </motion.button>
                     </motion.div>
 
-                    <motion.button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        skipToNext();
-                      }}
-                      className="hover:text-white/80 p-2 rounded-full cursor-pointer"
-                      whileHover="hover"
-                      whileTap="tap"
-                      variants={variants.navButtonHover}
-                      title="Next track"
-                    >
-                      <SkipForward className="w-4 h-4 lg:w-5 lg:h-5" />
-                    </motion.button>
+                    {playlistTracks.length > 1 && (
+                      <motion.button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          skipToNext();
+                        }}
+                        className="hover:text-white/80 p-2 rounded-full cursor-pointer"
+                        whileHover="hover"
+                        whileTap="tap"
+                        variants={variants.navButtonHover}
+                        title="Next track"
+                      >
+                        <SkipForward className="w-4 h-4 lg:w-5 lg:h-5" />
+                      </motion.button>
+                    )}
                   </motion.div>
 
                   {playlistTracks.length > 0 && (
