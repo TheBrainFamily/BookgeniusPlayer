@@ -37,6 +37,24 @@
     "800": "Osiemset",
     "900": "Dziewięćset"
   },
+  "loading_phrases": [
+    "Kreowanie wirtualnej biblioteki...",
+    "Przywoływanie fikcyjnych postaci...",
+    "Warzenie literackich eliksirów...",
+    "Odkurzanie starożytnych ksiąg...",
+    "Stawianie ostatnich kropek...",
+    "Przewracanie cyfrowych stron...",
+    "Łączenie wyobraźni z rzeczywistością...",
+    "Odszyfrowywanie intencji autora...",
+    "Układanie słów w idealnym porządku...",
+    "Uwalnianie narracyjnej magii...",
+    "Otwieranie bram do świata książek...",
+    "Rozpalanie ognia wyobraźni...",
+    "Szlifowanie literackich klejnotów...",
+    "Nanoszenie ostatnich poprawek...",
+    "Splatanie wątków opowieści...",
+    "Przebudzanie uśpionych bohaterów..."
+  ],
   "books": {
     "Alice-Wonderland": {
       "loading_phrases": [
@@ -80,22 +98,16 @@
     },
     "Pharaon": {
       "loading_phrases": [
-        "Kreowanie wirtualnej biblioteki...",
-        "Przywoływanie fikcyjnych postaci...",
-        "Warzenie literackich eliksirów...",
-        "Odkurzanie starożytnych ksiąg...",
-        "Stawianie ostatnich kropek...",
-        "Przewracanie cyfrowych stron...",
-        "Łączenie wyobraźni z rzeczywistością...",
-        "Odszyfrowywanie intencji autora...",
-        "Układanie słów w idealnym porządku...",
-        "Uwalnianie narracyjnej magii...",
-        "Otwieranie bram do świata książek...",
-        "Rozpalanie ognia wyobraźni...",
-        "Szlifowanie literackich klejnotów...",
-        "Nanoszenie ostatnich poprawek...",
-        "Splatanie wątków opowieści...",
-        "Przebudzanie uśpionych bohaterów..."
+        "Budowanie piramid...",
+        "Konsultacja z wyroczniami...",
+        "Czytanie gwiazd...",
+        "Przygotowywanie królewskiej procesji...",
+        "Przywoływanie starożytnych bogów...",
+        "Odszyfrowywanie hieroglifów...",
+        "Nawigacja po Nilu...",
+        "Wchodzenie do świątyni Amona...",
+        "Przygotowywanie korony faraona...",
+        "Budzenie mumii..."
       ]
     },
     "Conrad-Tajny-Agent": {
