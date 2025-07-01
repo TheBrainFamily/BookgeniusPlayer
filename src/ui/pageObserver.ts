@@ -722,7 +722,7 @@ export function setupPageObserver(
             // This ensures avatars remain visible not only for a current chapter, but previous or next chapter as well
             const allIntersectingParagraphs = Array.from(intersectingPages)
               .map((element) => getParagraphInfo(element))
-              .filter((info) => info.chapter !== null && info.paragraph !== null)
+              .filter((info) => info.chapter !== null && !isNaN(info.chapter) && info.paragraph !== null && !isNaN(info.paragraph))
               .sort((a, b) => {
                 if (a.chapter !== b.chapter) return a.chapter - b.chapter;
                 return a.paragraph - b.paragraph;
