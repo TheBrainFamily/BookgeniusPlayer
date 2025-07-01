@@ -152,17 +152,16 @@ const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, 
     isVideo,
     isTalking,
   );
-  const _isVideo = mediaSrc.includes(".mp4");
 
-  if (!_isVideo) {
+  if (!isVideo) {
     return <img {...commonAttrs} src={mediaSrc || videoListensSrc || ""} alt={canonicalName} className="rounded-full" />;
   }
 
-  const placeholderSrc = (videoListensSrc || mediaSrc).replace(/-(listens|speaks)\.mp4$/, ".png");
+  const placeholderSrc = (videoListensSrc || mediaSrc).replace(/-(listens|speaks)\.(mp4|webm)$/, ".png");
 
   const showListensVideo = isListeningMode && videoListensLoaded;
   const showSpeaksVideo = !isListeningMode && videoSpeaksLoaded;
-  const showPlaceholder = (isListeningMode && !videoListensLoaded) || (!isListeningMode && !videoSpeaksLoaded);
+  const showPlaceholder = isListeningMode ? !videoListensLoaded : !videoSpeaksLoaded;
 
   return (
     <div className="relative w-full h-full">
