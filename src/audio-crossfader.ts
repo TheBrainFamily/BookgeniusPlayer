@@ -61,8 +61,8 @@ export function getAudioContext(): AudioContext | null {
   return audioContext;
 }
 
-function announceSongTransition() {
-  window.dispatchEvent(new CustomEvent("songTransition"));
+function announceSongTransition(trackData: TrackState) {
+  window.dispatchEvent(new CustomEvent("songTransition", { detail: trackData }));
 }
 
 export async function initAudioContext(): Promise<boolean> {
@@ -74,7 +74,7 @@ export async function initAudioContext(): Promise<boolean> {
         return false;
       }
       audioContext = new AudioContextClass();
-      console.log(`AudioContext initialised. State: ${audioContext.state}`);
+      console.log(`AudioContext initialized. State: ${audioContext.state}`);
       audioContext.onstatechange = () => {
         console.log(`AudioContext state changed to: ${audioContext?.state}`);
       };
@@ -157,7 +157,7 @@ function isFetchOk(res: Response, url: string): boolean {
 export async function loadTrack(trackId: string, transitionPoints?: number[]): Promise<boolean> {
   /* 1 ▸ make sure AudioContext is alive ---------------------------- */
   if (!audioContext && !(await initAudioContext())) {
-    console.error("loadTrack: AudioContext could not be initialised.");
+    console.error("loadTrack: AudioContext could not be initialized.");
     return false;
   }
 
@@ -456,7 +456,9 @@ async function playNextTrackInSection(): Promise<void> {
       currentTrackId = previousTrackId;
       currentTrackIndexInSection = previousIndex;
     } else {
-      announceSongTransition();
+      const trackData = tracks.get(nextTrackIdToPlay);
+      announceSongTransition(trackData);
+
       console.log(`playNextTrackInSection: Successfully started next track '${nextTrackIdToPlay}'.`);
     }
   } else {
@@ -552,7 +554,8 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
     currentTrackIndexInSection = currentSectionTracks.indexOf(fadeInId);
   }
 
-  announceSongTransition();
+  const trackData = tracks.get(fadeInId);
+  announceSongTransition(trackData);
 
   // ---------- unified clean-up helper ----------
   const finishCrossfade = () => {
@@ -709,7 +712,9 @@ export async function startFirstTrack(trackId: string): Promise<boolean> {
       currentTrackIndexInSection = -1;
       console.log(`Started track ${trackId} (no active section).`);
     }
-    announceSongTransition();
+
+    const trackData = tracks.get(trackId);
+    announceSongTransition(trackData);
     return true;
   } else {
     console.warn(`startFirstTrack: playTrack call failed for ${trackId}.`);
@@ -1018,6 +1023,7 @@ declare global {
 
   interface WindowEventMap {
     playlistChange: CustomEvent<{ tracks: string[] | null }>;
+    songTransition: CustomEvent<TrackState | null>;
   }
 }
 

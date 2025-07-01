@@ -9,7 +9,6 @@ import {
   setMasterVolume,
   setBackgroundVolume,
   initAudioContext,
-  getCurrentTrackData,
   TrackState,
   getCurrentTrackPosition,
   pauseCurrentTrack,
@@ -99,29 +98,10 @@ const AudioPlayer = () => {
     };
     setInitialWindowWidth();
 
-    const initializeTrackState = () => {
-      setCurrentTrackIdFromState(getCurrentTrackId());
-
-      const initialTrack = getCurrentTrackData();
-      if (initialTrack) {
-        setCurrentTrackData(initialTrack);
-        setShowSongNotification(true);
-
-        // Hide initial notification after 10 seconds
-        const initialNotificationTimer = setTimeout(() => {
-          setShowSongNotification(false);
-        }, 10000);
-
-        return initialNotificationTimer;
-      }
-      return null;
-    };
-    const initialNotificationTimer = initializeTrackState();
-
     let notificationTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const handleSongTransition = () => {
-      const newCurrentTrack = getCurrentTrackData();
+    const handleSongTransition = (event: CustomEvent<TrackState | null>) => {
+      const newCurrentTrack = event.detail;
       console.log("AudioPlayer: Song transition event received", newCurrentTrack);
 
       setCurrentTrackData(newCurrentTrack);
@@ -156,10 +136,6 @@ const AudioPlayer = () => {
 
       if (notificationTimer) {
         clearTimeout(notificationTimer);
-      }
-
-      if (initialNotificationTimer) {
-        clearTimeout(initialNotificationTimer);
       }
     };
   }, []);
