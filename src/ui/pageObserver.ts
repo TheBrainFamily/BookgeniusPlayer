@@ -261,7 +261,9 @@ function activateMediaInRange(
     if (chapterStr && paragraphStr) {
       const currentChapter = parseInt(chapterStr, 10);
       const currentParagraph = parseInt(paragraphStr, 10);
-      const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - 3, endChapter, endParagraph + 12);
+
+      const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - 10, endChapter, endParagraph + 10);
+
       const placeholders = p.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
       const charactersDisplayed = [];
@@ -717,7 +719,23 @@ export function setupPageObserver(
               currentParagraph: activeParagraph.paragraph,
             });
 
-            activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal);
+            // This ensures avatars remain visible not only for a current chapter, but previous or next chapter as well
+            const allIntersectingParagraphs = Array.from(intersectingPages)
+              .map((element) => getParagraphInfo(element))
+              .filter((info) => info.chapter !== null && info.paragraph !== null)
+              .sort((a, b) => {
+                if (a.chapter !== b.chapter) return a.chapter - b.chapter;
+                return a.paragraph - b.paragraph;
+              });
+
+            if (allIntersectingParagraphs.length > 0) {
+              const mediaStartInfo = allIntersectingParagraphs[0];
+              const mediaEndInfo = allIntersectingParagraphs[allIntersectingParagraphs.length - 1];
+
+              activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, openCharacterDetailsModal);
+            } else {
+              activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal);
+            }
           } else {
             console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {
               activePgh: activeParagraph,
