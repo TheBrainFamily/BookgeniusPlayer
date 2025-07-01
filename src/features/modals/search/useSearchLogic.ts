@@ -4,7 +4,6 @@ import debounce from "lodash.debounce";
 import { useSearchModal } from "@/stores/modals/searchModal.store";
 import { performCachedSearch, performUnifiedSearch } from "@/searchModal";
 import { Location } from "@/state/LocationContext";
-import { CURRENT_BOOK } from "@/consts";
 import { getSavedLocation } from "@/helpers/paragraphsNavigation";
 
 export const useSearchLogic = () => {
@@ -99,7 +98,7 @@ export const useSearchLogic = () => {
   useEffect(() => {
     if (isOpen && query.trim()) {
       const latestLocation = getSavedLocation();
-      debouncedTriggerSearch(query, latestLocation, CURRENT_BOOK);
+      debouncedTriggerSearch(query, latestLocation);
     } else if (isOpen && !query.trim()) {
       setResults({ header: "Please enter a search term.", items: [], isLoading: false });
     }
