@@ -37,29 +37,16 @@
     "800": "Eight Hundred",
     "900": "Nine Hundred"
   },
-  "loading_phrases": [
-    "Stretching reality...",
-    "Shrinking logic...",
-    "Resizing hallways...",
-    "Ignoring all known physics...",
-    "Painting the roses red...",
-    "Calibrating curiosity...",
-    "Painting the roses red...",
-    "Consulting the Caterpillar..."
-  ],
   "books": {
     "Alice-Wonderland": {
       "loading_phrases": [
-        "Following the White Rabbit...",
-        "Shrinking to fit through doors...",
-        "Growing to reach the key...",
+        "Stretching reality...",
+        "Shrinking logic...",
+        "Resizing hallways...",
+        "Ignoring all known physics...",
         "Painting the roses red...",
-        "Having tea with the Mad Hatter...",
-        "Playing croquet with flamingos...",
-        "Consulting the Caterpillar...",
-        "Meeting the Cheshire Cat...",
-        "Attending the Queen's garden party...",
-        "Finding the way to Wonderland..."
+        "Calibrating curiosity...",
+        "Consulting the Caterpillar..."
       ]
     },
     "1984": {
