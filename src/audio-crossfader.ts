@@ -61,8 +61,9 @@ export function getAudioContext(): AudioContext | null {
   return audioContext;
 }
 
-function announceSongTransition(trackData: TrackState) {
-  window.dispatchEvent(new CustomEvent("songTransition", { detail: trackData }));
+function announceSongTransition(trackData?: TrackState | null) {
+  const dataToSend = trackData !== undefined ? trackData : getCurrentTrackData();
+  window.dispatchEvent(new CustomEvent("songTransition", { detail: dataToSend }));
 }
 
 export async function initAudioContext(): Promise<boolean> {
@@ -977,19 +978,17 @@ function dispatchPlaylistChangeEvent(trackIds: string[] | null = null) {
   let playlistData: { id: string; title: string; duration: number }[] | null = null;
 
   if (tracksToDispatch && tracksToDispatch.length > 0) {
-    playlistData = tracksToDispatch
-      .map((id) => {
-        const trackState = tracks.get(id);
-        if (trackState) {
-          const title = trackState.title || id;
-          const duration = typeof trackState.trackLength === "number" && !isNaN(trackState.trackLength) ? trackState.trackLength : 0;
+    playlistData = tracksToDispatch.map((id) => {
+      const trackState = tracks.get(id);
+      if (trackState) {
+        const title = trackState.title || id;
+        const duration = typeof trackState.trackLength === "number" && !isNaN(trackState.trackLength) ? trackState.trackLength : 0;
 
-          return { id, title, duration };
-        }
+        return { id, title, duration };
+      }
 
-        return { id, title: id, duration: 0 };
-      })
-      .filter((track): track is { id: string; title: string; duration: number } => track !== null);
+      return { id, title: id, duration: 0 };
+    });
   }
 
   console.log("Dispatching playlist change event with track data:", playlistData);
@@ -1022,7 +1021,7 @@ declare global {
   }
 
   interface WindowEventMap {
-    playlistChange: CustomEvent<{ tracks: string[] | null }>;
+    playlistChange: CustomEvent<{ id: string; title: string; duration: number }[] | null>;
     songTransition: CustomEvent<TrackState | null>;
   }
 }
