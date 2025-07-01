@@ -110,7 +110,7 @@ export const xmlToComplexHtml = (
       currentAct = actElements[0].textContent || "";
     }
     if (currentAct) {
-      chapterTitle = `${currentAct}, ${chapterTitle}`;
+      chapterTitle = chapterTitle ? `${currentAct}, ${chapterTitle}` : currentAct;
     }
 
     chapterTitles.push({ id: chapterId || String(chapterNumber), title: chapterTitle });
@@ -275,7 +275,7 @@ export const xmlToComplexHtml = (
           htmlResult += `\n    <p data-index="${dataIndex++}">\n      ${clean}\n    </p>`;
         }
       } else if (tagName === "Act") {
-        htmlResult += `\n    <h3 data-index="${dataIndex++}" data-act="true">${childElement.textContent}</h3>`;
+        htmlResult += `\n    <h3 data-act="true">${childElement.textContent || ""}</h3>`;
       } else if (tagName === "h4") {
         htmlResult += `\n    <h4 data-index="${dataIndex++}">${childElement.textContent}</h4>`;
       } else if (tagName === "h5") {
