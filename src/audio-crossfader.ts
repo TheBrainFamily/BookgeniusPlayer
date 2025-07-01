@@ -252,7 +252,7 @@ export async function loadTrack(trackId: string, transitionPoints?: number[]): P
   return true;
 }
 
-function playTrack(trackId: string, startTime: number = 0, offset: number = 0): boolean {
+function playTrack(trackId: string, startTime: number = 0, offset: number = 0, skipStopInternal: boolean = false): boolean {
   if (!audioContext || audioContext.state !== "running") {
     console.error(`Cannot play track '${trackId}', AudioContext not ready/running. State: ${audioContext?.state}`);
     initAudioContext(); // Attempt to re-init/resume
@@ -270,7 +270,9 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0): 
     setBackgroundVolume(backgroundGainNode.gain.value, false);
   }
 
-  stopTrackInternal(trackId); // Stop any previous instance of this specific track
+  if (!skipStopInternal) {
+    stopTrackInternal(trackId); // Stop any previous instance of this specific track
+  }
 
   const source = audioContext.createBufferSource();
   const gainNode = audioContext.createGain();
@@ -503,6 +505,8 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
 
   // ---------- fade-OUT ramp ----------
   const gOut = fadeOutState.gainNode.gain;
+  const oldSourceNode = fadeOutState.sourceNode;
+  const oldGainNode = fadeOutState.gainNode;
   gOut.cancelScheduledValues(audioContext.currentTime);
   gOut.setValueAtTime(gOut.value, audioContext.currentTime);
   gOut.linearRampToValueAtTime(0, fadeEnd);
@@ -518,7 +522,7 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
     return;
   }
 
-  if (!playTrack(fadeInId, transitionStartTime, 0)) {
+  if (!playTrack(fadeInId, transitionStartTime, 0, fadeOutId === fadeInId)) {
     console.error(`performCrossfade: Failed to schedule playTrack for fadeInId: ${fadeInId}. Aborting crossfade.`);
     gOut.cancelScheduledValues(audioContext.currentTime);
     gOut.linearRampToValueAtTime(1, audioContext.currentTime + 0.2);
@@ -561,9 +565,32 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
   // ---------- unified clean-up helper ----------
   const finishCrossfade = () => {
     if (!isTransitioning) return; // already cleaned once
-    // Prevent stopping the new track when looping the same track
+    // Handle cleanup for same-track vs different-track crossfades
     if (fadeOutId !== fadeInId) {
       stopTrackInternal(fadeOutId);
+    } else {
+      // For same-track crossfades, manually clean up the old source node
+      if (oldSourceNode) {
+        liveSources.delete(oldSourceNode);
+        oldSourceNode.onended = null;
+        try {
+          oldSourceNode.stop();
+        } catch {
+          /* empty */
+        }
+        try {
+          oldSourceNode.disconnect();
+        } catch {
+          /* empty */
+        }
+      }
+      if (oldGainNode) {
+        try {
+          oldGainNode.disconnect();
+        } catch {
+          /* empty */
+        }
+      }
     }
 
     if (pendingSectionTracks !== undefined) {
@@ -595,7 +622,10 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
   setTimeout(finishCrossfade, msUntilFadeEnd);
 
   // 2) …and also if the old source ends earlier for any reason
-  fadeOutState.sourceNode!.onended = finishCrossfade;
+  const sourceNodeToWatch = fadeOutId === fadeInId ? oldSourceNode : fadeOutState.sourceNode;
+  if (sourceNodeToWatch) {
+    sourceNodeToWatch.onended = finishCrossfade;
+  }
 }
 
 export function setActiveSection(newSectionTrackIds: string[] | null): void {
