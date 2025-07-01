@@ -72,7 +72,7 @@ export const setCurrentLocation = (loc: Location) => {
 /**
  * Navigate to a specific location with system source (triggers scrolling)
  */
-export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph: number }, fast = true) => {
+export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph: number }) => {
   if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
     console.error("Invalid location provided to systemNavigateTo:", loc);
     return;
@@ -104,7 +104,7 @@ export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph
   // Update hash immediately for system navigation
   window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
 
-  goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, fast);
+  goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, true);
 };
 
 /* ------------------------------------------------------------------ */
@@ -138,7 +138,7 @@ export const goToParagraph = (loc: { currentChapter: number; currentParagraph: n
   if (fast) {
     contentContainer.scrollTop = targetScrollTop;
   } else {
-    contentContainer.scrollTo({ top: targetScrollTop, behavior: fast ? "instant" : "smooth" });
+    contentContainer.scrollTo({ top: targetScrollTop, behavior: "smooth" });
   }
 };
 

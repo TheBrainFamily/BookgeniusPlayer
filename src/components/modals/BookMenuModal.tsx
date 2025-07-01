@@ -13,7 +13,7 @@ import { activateCharacterInteractions } from "@/helpers/activateCharacterIntera
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
-import { getCurrentLocation, goToParagraph } from "@/helpers/paragraphsNavigation";
+import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 
 const AnimatedFontSize: React.FC<{ value: number; isChanging: boolean }> = memo(({ value, isChanging }) => {
   const [currentDisplayValue, setCurrentDisplayValue] = useState(value);
@@ -63,6 +63,34 @@ interface BookMenuModalProps {
 const SLIDER_DELAY = 200;
 const OVERLAY_TIMEOUT = 1500;
 
+const hideNonVisibleParagraphs = (currentChapter: number, currentParagraph: number) => {
+  document.querySelectorAll("[data-chapter]").forEach((chapter: HTMLElement) => {
+    const id = parseInt(chapter.dataset.chapter || "0");
+    if (Math.abs(id - currentChapter) > 0) {
+      chapter.style.display = "none";
+    } else {
+      chapter.style.display = "block";
+    }
+  });
+  console.log(`currentChapter: ${currentChapter}, currentParagraph: ${currentParagraph}`);
+  document.querySelectorAll(`[data-chapter="${currentChapter}"] [data-index]`).forEach((paragraph: HTMLElement) => {
+    const id = parseInt(paragraph.dataset.index || "0");
+    if (id < currentParagraph) {
+      paragraph.style.display = "none";
+    } else {
+      paragraph.style.display = "block";
+    }
+  });
+};
+const displayAllChapters = () => {
+  document.querySelectorAll("[data-chapter]").forEach((chapter: HTMLElement) => {
+    chapter.style.display = "block";
+  });
+  document.querySelectorAll("[data-index]").forEach((paragraph: HTMLElement) => {
+    paragraph.style.display = "block";
+  });
+};
+
 const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, openApiKeyModal, resetFurthestPageLocation }) => {
   const { t } = useTranslation();
   const allVariants = getAllVariants();
@@ -77,6 +105,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
   const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isVisible = useRef(allVariants.length > 0);
+  const hiddenParagraphsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSliderChangeWithOverlay = (callback: () => void) => {
     if (overlayTimeoutRef.current) {
@@ -99,39 +128,34 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const handleFontSizeChange = (value: number[]) => {
     const fontSize = value[0];
 
-    // Store current position before changing font size
+    if (overlayTimeoutRef.current) {
+      clearTimeout(overlayTimeoutRef.current);
+    }
+
     const currentLocation = getCurrentLocation();
-
-    handleSliderChangeWithOverlay(() => {
-      setCurrentFontSize(fontSize);
-
-      // After font size change, scroll back to the same position
-      // Use a longer timeout to ensure the font size has been applied to the DOM
-      setTimeout(() => {
-        goToParagraph({ currentChapter: currentLocation.currentChapter, currentParagraph: currentLocation.currentParagraph }, true);
-      }, 300);
-    });
-  };
-
-  const handleQuickFontSizeChange = (fontSize: number) => {
-    // Store current position before changing font size
-    const currentLocation = getCurrentLocation();
-
-    setHideOverlay(true);
-    setIsFontSizeChanging(true);
-
+    console.log("location currentChapter", currentLocation.currentChapter);
+    hideNonVisibleParagraphs(currentLocation.currentChapter, currentLocation.currentParagraph);
     setTimeout(() => {
       setCurrentFontSize(fontSize);
+    }, 200);
 
-      // After font size change, scroll back to the same position
-      setTimeout(() => {
-        goToParagraph({ currentChapter: currentLocation.currentChapter, currentParagraph: currentLocation.currentParagraph }, true);
-      }, 200);
-    }, 100);
+    if (!hideOverlay) {
+      setHideOverlay(true);
+    }
 
-    setTimeout(() => {
+    if (hiddenParagraphsTimeoutRef.current) {
+      clearTimeout(hiddenParagraphsTimeoutRef.current);
+    }
+
+    if (overlayTimeoutRef.current) {
+      clearTimeout(overlayTimeoutRef.current);
+    }
+
+    overlayTimeoutRef.current = setTimeout(() => {
       setHideOverlay(false);
-      setIsFontSizeChanging(false);
+    }, 1500);
+    hiddenParagraphsTimeoutRef.current = setTimeout(() => {
+      displayAllChapters();
     }, 1500);
   };
 
@@ -252,13 +276,58 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
           />
           <div className="flex justify-between text-xs text-gray-300">
-            <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleQuickFontSizeChange(0.5)}>
+            <span
+              className="cursor-pointer hover:text-white transition-colors"
+              onClick={() => {
+                setHideOverlay(true);
+                setIsFontSizeChanging(true);
+
+                setTimeout(() => {
+                  setCurrentFontSize(0.5);
+                }, 100);
+
+                setTimeout(() => {
+                  setHideOverlay(false);
+                  setIsFontSizeChanging(false);
+                }, 1500);
+              }}
+            >
               {t("small")}
             </span>
-            <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleQuickFontSizeChange(1.0)}>
+            <span
+              className="cursor-pointer hover:text-white transition-colors"
+              onClick={() => {
+                setHideOverlay(true);
+                setIsFontSizeChanging(true);
+
+                setTimeout(() => {
+                  setCurrentFontSize(1.0);
+                }, 100);
+
+                setTimeout(() => {
+                  setHideOverlay(false);
+                  setIsFontSizeChanging(false);
+                }, 1500);
+              }}
+            >
               {t("default")}
             </span>
-            <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleQuickFontSizeChange(1.5)}>
+            <span
+              className="cursor-pointer hover:text-white transition-colors"
+              onClick={() => {
+                setHideOverlay(true);
+                setIsFontSizeChanging(true);
+
+                setTimeout(() => {
+                  setCurrentFontSize(1.5);
+                }, 100);
+
+                setTimeout(() => {
+                  setHideOverlay(false);
+                  setIsFontSizeChanging(false);
+                }, 1500);
+              }}
+            >
               {t("large")}
             </span>
           </div>

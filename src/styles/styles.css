@@ -106,6 +106,7 @@
     cursor: default;
     overflow-y: auto;
     height: 100%;
+    scroll-behavior: smooth;
     text-align: justify; /* Default text alignment for content */
     will-change: padding, transform; /* Optimize for animations */
     -webkit-backface-visibility: hidden;
