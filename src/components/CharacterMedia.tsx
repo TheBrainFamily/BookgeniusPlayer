@@ -147,19 +147,34 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ state, src, isActive, commonA
 };
 
 const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, isVideo, canonicalName, isTalking }) => {
-  const { videoListensSrc, videoSpeaksSrc, isListeningMode, handleLoadedData, handleVideoError } = useVideoState(mediaSrc, isVideo, isTalking);
+  const { videoListensSrc, videoSpeaksSrc, isListeningMode, handleLoadedData, handleVideoError, videoListensLoaded, videoSpeaksLoaded } = useVideoState(
+    mediaSrc,
+    isVideo,
+    isTalking,
+  );
   const _isVideo = mediaSrc.includes(".mp4");
 
   if (!_isVideo) {
     return <img {...commonAttrs} src={mediaSrc || videoListensSrc || ""} alt={canonicalName} className="rounded-full" />;
   }
 
+  const placeholderSrc = (videoListensSrc || mediaSrc).replace(/-(listens|speaks)\.mp4$/, ".png");
+
+  const showListensVideo = isListeningMode && videoListensLoaded;
+  const showSpeaksVideo = !isListeningMode && videoSpeaksLoaded;
+  const showPlaceholder = (isListeningMode && !videoListensLoaded) || (!isListeningMode && !videoSpeaksLoaded);
+
   return (
     <div className="relative w-full h-full">
+      <img
+        src={placeholderSrc}
+        alt={canonicalName}
+        className={cn("absolute top-0 left-0 w-full h-full object-cover rounded-full transition-opacity duration-300 ease-in-out", showPlaceholder ? "opacity-100" : "opacity-0")}
+      />
       <VideoPlayer
         state="listens"
         src={videoListensSrc}
-        isActive={isListeningMode}
+        isActive={showListensVideo}
         commonAttrs={commonAttrs}
         onLoaded={handleLoadedData}
         onError={handleVideoError}
@@ -168,7 +183,7 @@ const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, 
       <VideoPlayer
         state="speaks"
         src={videoSpeaksSrc}
-        isActive={!isListeningMode}
+        isActive={showSpeaksVideo}
         commonAttrs={commonAttrs}
         onLoaded={handleLoadedData}
         onError={handleVideoError}
