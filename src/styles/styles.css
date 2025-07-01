@@ -196,7 +196,7 @@
           text-align: center;
         }
 
-        h4 {
+        h3, h4 {
           text-align: center;
           padding-bottom: 0.5em;
           font-family: var(--font-eb-garamond);
