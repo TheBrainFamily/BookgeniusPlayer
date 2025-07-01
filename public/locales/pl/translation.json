@@ -55,6 +55,162 @@
     "Splatanie wątków opowieści...",
     "Przebudzanie uśpionych bohaterów..."
   ],
+  "books": {
+    "Alice-Wonderland": {
+      "loading_phrases": [
+        "Rozciąganie rzeczywistości...",
+        "Kurczenie logiki...",
+        "Zmienianie rozmiaru korytarzy...",
+        "Ignorowanie wszystkich znanych praw fizyki...",
+        "Malowanie róż na czerwono...",
+        "Kalibrowanie ciekawości...",
+        "Konsultacja z Gąsienicą...",
+        "Przygotowywanie herbaty o szóstej...",
+        "Ustawianie gry w krykieta...",
+        "Otwieranie drzwi do Krainy Czarów..."
+      ]
+    },
+    "1984": {
+      "loading_phrases": [
+        "Budowanie Ministerstwa Prawdy...",
+        "Instalowanie teleekranów...",
+        "Tworzenie nowomowy...",
+        "Ustawianie Wielkiego Brata...",
+        "Konfigurowanie myślozbrodni...",
+        "Wymazywanie przeszłości...",
+        "Budowanie Ministerstwa Miłości...",
+        "Ustawianie Ministerstwa Pokoju...",
+        "Konfigurowanie Ministerstwa Obfitości...",
+        "Aktywowanie patroli myśli..."
+      ]
+    },
+    "1984-English": {
+      "loading_phrases": [
+        "Budowanie Ministerstwa Prawdy...",
+        "Instalowanie teleekranów...",
+        "Tworzenie nowomowy...",
+        "Ustawianie Wielkiego Brata...",
+        "Konfigurowanie myślozbrodni...",
+        "Wymazywanie przeszłości...",
+        "Budowanie Ministerstwa Miłości...",
+        "Ustawianie Ministerstwa Pokoju...",
+        "Konfigurowanie Ministerstwa Obfitości...",
+        "Aktywowanie patroli myśli..."
+      ]
+    },
+    "Pharaon": {
+      "loading_phrases": [
+        "Budowanie piramid...",
+        "Wznoszenie świątyni Amona...",
+        "Rzeźbienie sfinksów...",
+        "Malowanie hieroglifów...",
+        "Ustawianie Nilu...",
+        "Tworzenie mumii...",
+        "Koronowanie faraona...",
+        "Budowanie grobowców...",
+        "Rzeźbienie obelisków...",
+        "Malowanie papirusów...",
+        "Ustawianie piramid...",
+        "Tworzenie skarabeuszy..."
+      ]
+    },
+    "Conrad-Tajny-Agent": {
+      "loading_phrases": [
+        "Budowanie Londynu...",
+        "Tworzenie mgły...",
+        "Ustawianie latarni...",
+        "Malowanie szyldów...",
+        "Budowanie doków...",
+        "Tworzenie zaułków...",
+        "Ustawianie agentów...",
+        "Malowanie szyfrów...",
+        "Budowanie konspiracji...",
+        "Tworzenie tajemnic...",
+        "Ustawianie szpiegów...",
+        "Malowanie intryg..."
+      ]
+    },
+    "Krolowa-Sniegu": {
+      "loading_phrases": [
+        "Budowanie lodowego pałacu...",
+        "Rzeźbienie płatków śniegu...",
+        "Tworzenie zamieci...",
+        "Malowanie luster...",
+        "Ustawianie reniferów...",
+        "Budowanie lodowych mostów...",
+        "Tworzenie śnieżnych kwiatów...",
+        "Malowanie gwiazd...",
+        "Ustawianie wiatru północnego...",
+        "Rzeźbienie serca z lodu...",
+        "Tworzenie śnieżnych aniołów...",
+        "Malowanie zorzy polarnej..."
+      ]
+    },
+    "Snow-Queen": {
+      "loading_phrases": [
+        "Budowanie lodowego pałacu...",
+        "Rzeźbienie płatków śniegu...",
+        "Tworzenie zamieci...",
+        "Malowanie luster...",
+        "Ustawianie reniferów...",
+        "Budowanie lodowych mostów...",
+        "Tworzenie śnieżnych kwiatów...",
+        "Malowanie gwiazd...",
+        "Ustawianie wiatru północnego...",
+        "Rzeźbienie serca z lodu...",
+        "Tworzenie śnieżnych aniołów...",
+        "Malowanie zorzy polarnej..."
+      ]
+    },
+    "Lalka": {
+      "loading_phrases": [
+        "Budowanie Warszawy...",
+        "Tworzenie sklepów...",
+        "Malowanie kamienic...",
+        "Ustawianie teatrów...",
+        "Budowanie kawiarni...",
+        "Tworzenie parków...",
+        "Malowanie ulic...",
+        "Ustawianie salonów...",
+        "Budowanie kościołów...",
+        "Tworzenie ogrodów...",
+        "Malowanie witryn...",
+        "Ustawianie dorożek..."
+      ]
+    },
+    "Romeo-And-Juliet": {
+      "loading_phrases": [
+        "Budowanie Werony...",
+        "Tworzenie balkonów...",
+        "Malowanie pałaców...",
+        "Ustawianie ogrodów...",
+        "Budowanie kościołów...",
+        "Tworzenie placów...",
+        "Malowanie ulic...",
+        "Ustawianie fontann...",
+        "Budowanie teatrów...",
+        "Tworzenie tarasów...",
+        "Malowanie gwiazd...",
+        "Ustawianie księżyca..."
+      ]
+    },
+    "Fatherland": {
+      "loading_phrases": [
+        "Budowanie Berlina...",
+        "Tworzenie gmachów...",
+        "Malowanie flag...",
+        "Ustawianie posterunków...",
+        "Budowanie mostów...",
+        "Tworzenie ulic...",
+        "Malowanie szyldów...",
+        "Ustawianie granic...",
+        "Budowanie biur...",
+        "Tworzenie dokumentów...",
+        "Malowanie map...",
+        "Ustawianie kontroli..."
+      ]
+    }
+  },
   "splash_title": "BookGenius",
   "splash_subtitle": "Twoja wirtualna biblioteka",
   "start_button": "Start",

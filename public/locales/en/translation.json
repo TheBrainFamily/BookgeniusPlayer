@@ -38,15 +38,176 @@
     "900": "Nine Hundred"
   },
   "loading_phrases": [
-    "Stretching reality...",
-    "Shrinking logic...",
-    "Resizing hallways...",
-    "Ignoring all known physics...",
-    "Painting the roses red...",
-    "Calibrating curiosity...",
-    "Painting the roses red...",
-    "Consulting the Caterpillar..."
+    "Creating a virtual library...",
+    "Invoking fictional characters...",
+    "Crafting literary elixirs...",
+    "Cleaning up ancient books...",
+    "Setting the final dots...",
+    "Turning pages...",
+    "Connecting imagination to reality...",
+    "Deciphering author's intentions...",
+    "Arranging words in perfect order...",
+    "Releasing narrative magic...",
+    "Opening doors to the world of books...",
+    "Igniting the fire of imagination...",
+    "Polishing literary gems...",
+    "Adding the final touches...",
+    "Weaving the threads of stories...",
+    "Awakening dormant heroes..."
   ],
+  "books": {
+    "Alice-Wonderland": {
+      "loading_phrases": [
+        "Stretching reality...",
+        "Shrinking logic...",
+        "Resizing hallways...",
+        "Ignoring all known physics...",
+        "Painting the roses red...",
+        "Calibrating curiosity...",
+        "Consulting the Caterpillar..."
+      ]
+    },
+    "1984": {
+      "loading_phrases": [
+        "Building the Ministry of Truth...",
+        "Installing telescreens...",
+        "Creating Newspeak...",
+        "Setting up Big Brother...",
+        "Configuring thoughtcrime...",
+        "Erasing the past...",
+        "Building the Ministry of Love...",
+        "Setting up the Ministry of Peace...",
+        "Configuring the Ministry of Plenty...",
+        "Activating thought police..."
+      ]
+    },
+    "1984-English": {
+      "loading_phrases": [
+        "Building the Ministry of Truth...",
+        "Installing telescreens...",
+        "Creating Newspeak...",
+        "Setting up Big Brother...",
+        "Configuring thoughtcrime...",
+        "Erasing the past...",
+        "Building the Ministry of Love...",
+        "Setting up the Ministry of Peace...",
+        "Configuring the Ministry of Plenty...",
+        "Activating thought police..."
+      ]
+    },
+    "Pharaon": {
+      "loading_phrases": [
+        "Building the pyramids...",
+        "Raising the temple of Amun...",
+        "Carving the sphinxes...",
+        "Painting hieroglyphs...",
+        "Setting up the Nile...",
+        "Creating mummies...",
+        "Crowning the pharaoh...",
+        "Building tombs...",
+        "Carving obelisks...",
+        "Painting papyrus...",
+        "Setting up pyramids...",
+        "Creating scarabs..."
+      ]
+    },
+    "Conrad-Tajny-Agent": {
+      "loading_phrases": [
+        "Building London...",
+        "Creating the fog...",
+        "Setting up street lamps...",
+        "Painting shop signs...",
+        "Building the docks...",
+        "Creating alleyways...",
+        "Setting up agents...",
+        "Painting ciphers...",
+        "Building conspiracies...",
+        "Creating mysteries...",
+        "Setting up spies...",
+        "Painting intrigues..."
+      ]
+    },
+    "Krolowa-Sniegu": {
+      "loading_phrases": [
+        "Building the ice palace...",
+        "Carving snowflakes...",
+        "Creating snowstorms...",
+        "Painting mirrors...",
+        "Setting up reindeer...",
+        "Building ice bridges...",
+        "Creating snow flowers...",
+        "Painting stars...",
+        "Setting up the north wind...",
+        "Carving hearts of ice...",
+        "Creating snow angels...",
+        "Painting the aurora..."
+      ]
+    },
+    "Snow-Queen": {
+      "loading_phrases": [
+        "Building the ice palace...",
+        "Carving snowflakes...",
+        "Creating snowstorms...",
+        "Painting mirrors...",
+        "Setting up reindeer...",
+        "Building ice bridges...",
+        "Creating snow flowers...",
+        "Painting stars...",
+        "Setting up the north wind...",
+        "Carving hearts of ice...",
+        "Creating snow angels...",
+        "Painting the aurora..."
+      ]
+    },
+    "Lalka": {
+      "loading_phrases": [
+        "Building Warsaw...",
+        "Creating shops...",
+        "Painting tenements...",
+        "Setting up theaters...",
+        "Building cafés...",
+        "Creating parks...",
+        "Painting streets...",
+        "Setting up salons...",
+        "Building churches...",
+        "Creating gardens...",
+        "Painting shop windows...",
+        "Setting up carriages..."
+      ]
+    },
+    "Romeo-And-Juliet": {
+      "loading_phrases": [
+        "Building Verona...",
+        "Creating balconies...",
+        "Painting palaces...",
+        "Setting up gardens...",
+        "Building churches...",
+        "Creating piazzas...",
+        "Painting streets...",
+        "Setting up fountains...",
+        "Building theaters...",
+        "Creating terraces...",
+        "Painting stars...",
+        "Setting up the moon..."
+      ]
+    },
+    "Fatherland": {
+      "loading_phrases": [
+        "Building Berlin...",
+        "Creating government buildings...",
+        "Painting flags...",
+        "Setting up checkpoints...",
+        "Building bridges...",
+        "Creating streets...",
+        "Painting signs...",
+        "Setting up borders...",
+        "Building offices...",
+        "Creating documents...",
+        "Painting maps...",
+        "Setting up surveillance..."
+      ]
+    }
+  },
   "splash_title": "BookGenius",
   "splash_subtitle": "Books reimagined",
   "start_button": "Start",

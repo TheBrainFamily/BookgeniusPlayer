@@ -89,11 +89,14 @@ export const xmlToComplexHtml = (
 
   const chapters = xmlDoc.getElementsByTagName("Chapter");
 
+  let currentAct = "";
+
   for (const chapter of chapters) {
     const chapterId = chapter.getAttribute("id");
     const chapterNumber = parseInt(chapterId || "0", 10);
 
     let chapterTitle = "";
+    const actElements = chapter.getElementsByTagName("Act");
     const h3Elements = chapter.getElementsByTagName("h3");
     const h4Elements = chapter.getElementsByTagName("h4");
 
@@ -101,6 +104,13 @@ export const xmlToComplexHtml = (
       chapterTitle = h3Elements[0].textContent || "";
     } else if (h4Elements.length > 0) {
       chapterTitle = h4Elements[0].textContent || "";
+    }
+
+    if (actElements.length > 0) {
+      currentAct = actElements[0].textContent || "";
+    }
+    if (currentAct) {
+      chapterTitle = chapterTitle ? `${currentAct}, ${chapterTitle}` : currentAct;
     }
 
     chapterTitles.push({ id: chapterId || String(chapterNumber), title: chapterTitle });
@@ -264,6 +274,8 @@ export const xmlToComplexHtml = (
           clean = clean.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
           htmlResult += `\n    <p data-index="${dataIndex++}">\n      ${clean}\n    </p>`;
         }
+      } else if (tagName === "Act") {
+        htmlResult += `\n    <h3 data-act="true">${childElement.textContent || ""}</h3>`;
       } else if (tagName === "h4") {
         htmlResult += `\n    <h4 data-index="${dataIndex++}">${childElement.textContent}</h4>`;
       } else if (tagName === "h5") {

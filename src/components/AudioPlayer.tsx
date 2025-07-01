@@ -9,7 +9,6 @@ import {
   setMasterVolume,
   setBackgroundVolume,
   initAudioContext,
-  getCurrentTrackData,
   TrackState,
   getCurrentTrackPosition,
   pauseCurrentTrack,
@@ -19,7 +18,6 @@ import {
   getCurrentTrackId,
   getCurrentTrackIndexInSection,
   transitionToTrack,
-  getTrackDetailsById,
 } from "@/audio-crossfader";
 import { stopAudiobook, playAudiobook } from "@/hooks/useAudiobookTracks";
 import { Slider } from "@/components/ui/slider";
@@ -90,69 +88,21 @@ const AudioPlayer = () => {
   }, [isPlaying, isBigPlayerOpen]);
 
   useEffect(() => {
-    const updatePlaylist = async (sectionTrackIds?: string[] | null) => {
-      // Use provided sectionTrackIds or get current ones
-      const trackIds = sectionTrackIds !== undefined ? sectionTrackIds : getCurrentSectionTracks();
-
-      if (trackIds && trackIds.length > 0) {
-        const detailedTracks = trackIds
-          .map((id) => {
-            const details = getTrackDetailsById(id);
-            if (details) {
-              const title = details.title || id;
-              const duration = typeof details.trackLength === "number" && !isNaN(details.trackLength) ? details.trackLength : 0;
-              return { id, title, duration };
-            }
-
-            return { id, title: id, duration: 0 };
-          })
-          .filter((track): track is { id: string; title: string; duration: number } => track !== null);
-
-        setPlaylistTracks(detailedTracks);
-      } else {
-        setPlaylistTracks([]);
-      }
-    };
-
-    updatePlaylist();
-
-    const handlePlaylistChange = (event: CustomEvent<string[] | null>) => {
+    const handlePlaylistChange = (event: CustomEvent<{ id: string; title: string; duration: number }[] | null>) => {
       console.log("AudioPlayer: Received playlist change event", event.detail);
-      updatePlaylist(event.detail);
+      setPlaylistTracks(event.detail || []);
     };
-
-    window.addEventListener("playlistChange", handlePlaylistChange as EventListener);
 
     const setInitialWindowWidth = () => {
       setWindowWidth(window?.innerWidth || 1920);
     };
     setInitialWindowWidth();
 
-    const initializeTrackState = () => {
-      setCurrentTrackIdFromState(getCurrentTrackId());
-
-      const initialTrack = getCurrentTrackData();
-      if (initialTrack) {
-        setCurrentTrackData(initialTrack);
-        setShowSongNotification(true);
-
-        // Hide initial notification after 10 seconds
-        const initialNotificationTimer = setTimeout(() => {
-          setShowSongNotification(false);
-        }, 10000);
-
-        return initialNotificationTimer;
-      }
-      return null;
-    };
-    const initialNotificationTimer = initializeTrackState();
-
     let notificationTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const handleSongTransition = () => {
-      console.log("Song transition event received");
-      const newCurrentTrack = getCurrentTrackData();
-      console.log("Current track data:", newCurrentTrack);
+    const handleSongTransition = (event: CustomEvent<TrackState | null>) => {
+      const newCurrentTrack = event.detail;
+      console.log("AudioPlayer: Song transition event received", newCurrentTrack);
 
       setCurrentTrackData(newCurrentTrack);
       setIsPlaying(true);
@@ -177,17 +127,15 @@ const AudioPlayer = () => {
 
     window.addEventListener("songTransition", handleSongTransition);
     window.addEventListener("resize", handleResize);
+    window.addEventListener("playlistChange", handlePlaylistChange);
 
     return () => {
       window.removeEventListener("songTransition", handleSongTransition);
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("playlistChange", handlePlaylistChange as EventListener);
+      window.removeEventListener("playlistChange", handlePlaylistChange);
 
       if (notificationTimer) {
         clearTimeout(notificationTimer);
-      }
-      if (initialNotificationTimer) {
-        clearTimeout(initialNotificationTimer);
       }
     };
   }, []);
@@ -460,19 +408,21 @@ const AudioPlayer = () => {
                   </motion.div>
 
                   <motion.div className="flex justify-center items-center gap-8 mb-4 relative" variants={variants.popUpItem} initial="closed" animate="open">
-                    <motion.button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        skipToPrevious();
-                      }}
-                      className="hover:text-white/80 p-2 rounded-full cursor-pointer"
-                      whileHover="hover"
-                      whileTap="tap"
-                      variants={variants.navButtonHover}
-                      title="Previous track"
-                    >
-                      <SkipBack className="w-4 h-4 lg:w-5 lg:h-5" />
-                    </motion.button>
+                    {playlistTracks.length > 1 && (
+                      <motion.button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          skipToPrevious();
+                        }}
+                        className="hover:text-white/80 p-2 rounded-full cursor-pointer"
+                        whileHover="hover"
+                        whileTap="tap"
+                        variants={variants.navButtonHover}
+                        title="Previous track"
+                      >
+                        <SkipBack className="w-4 h-4 lg:w-5 lg:h-5" />
+                      </motion.button>
+                    )}
 
                     <motion.div variants={variants.playButtonHover} whileTap="tap">
                       <motion.button
@@ -500,19 +450,21 @@ const AudioPlayer = () => {
                       </motion.button>
                     </motion.div>
 
-                    <motion.button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        skipToNext();
-                      }}
-                      className="hover:text-white/80 p-2 rounded-full cursor-pointer"
-                      whileHover="hover"
-                      whileTap="tap"
-                      variants={variants.navButtonHover}
-                      title="Next track"
-                    >
-                      <SkipForward className="w-4 h-4 lg:w-5 lg:h-5" />
-                    </motion.button>
+                    {playlistTracks.length > 1 && (
+                      <motion.button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          skipToNext();
+                        }}
+                        className="hover:text-white/80 p-2 rounded-full cursor-pointer"
+                        whileHover="hover"
+                        whileTap="tap"
+                        variants={variants.navButtonHover}
+                        title="Next track"
+                      >
+                        <SkipForward className="w-4 h-4 lg:w-5 lg:h-5" />
+                      </motion.button>
+                    )}
                   </motion.div>
 
                   {playlistTracks.length > 0 && (

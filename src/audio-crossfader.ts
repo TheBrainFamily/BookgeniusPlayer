@@ -61,8 +61,9 @@ export function getAudioContext(): AudioContext | null {
   return audioContext;
 }
 
-function announceSongTransition() {
-  window.dispatchEvent(new CustomEvent("songTransition"));
+function announceSongTransition(trackData?: TrackState | null) {
+  const dataToSend = trackData !== undefined ? trackData : getCurrentTrackData();
+  window.dispatchEvent(new CustomEvent("songTransition", { detail: dataToSend }));
 }
 
 export async function initAudioContext(): Promise<boolean> {
@@ -74,7 +75,7 @@ export async function initAudioContext(): Promise<boolean> {
         return false;
       }
       audioContext = new AudioContextClass();
-      console.log(`AudioContext initialised. State: ${audioContext.state}`);
+      console.log(`AudioContext initialized. State: ${audioContext.state}`);
       audioContext.onstatechange = () => {
         console.log(`AudioContext state changed to: ${audioContext?.state}`);
       };
@@ -157,7 +158,7 @@ function isFetchOk(res: Response, url: string): boolean {
 export async function loadTrack(trackId: string, transitionPoints?: number[]): Promise<boolean> {
   /* 1 ▸ make sure AudioContext is alive ---------------------------- */
   if (!audioContext && !(await initAudioContext())) {
-    console.error("loadTrack: AudioContext could not be initialised.");
+    console.error("loadTrack: AudioContext could not be initialized.");
     return false;
   }
 
@@ -251,7 +252,7 @@ export async function loadTrack(trackId: string, transitionPoints?: number[]): P
   return true;
 }
 
-function playTrack(trackId: string, startTime: number = 0, offset: number = 0): boolean {
+function playTrack(trackId: string, startTime: number = 0, offset: number = 0, skipStopInternal: boolean = false): boolean {
   if (!audioContext || audioContext.state !== "running") {
     console.error(`Cannot play track '${trackId}', AudioContext not ready/running. State: ${audioContext?.state}`);
     initAudioContext(); // Attempt to re-init/resume
@@ -269,7 +270,9 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0): 
     setBackgroundVolume(backgroundGainNode.gain.value, false);
   }
 
-  stopTrackInternal(trackId); // Stop any previous instance of this specific track
+  if (!skipStopInternal) {
+    stopTrackInternal(trackId); // Stop any previous instance of this specific track
+  }
 
   const source = audioContext.createBufferSource();
   const gainNode = audioContext.createGain();
@@ -456,7 +459,9 @@ async function playNextTrackInSection(): Promise<void> {
       currentTrackId = previousTrackId;
       currentTrackIndexInSection = previousIndex;
     } else {
-      announceSongTransition();
+      const trackData = tracks.get(nextTrackIdToPlay);
+      announceSongTransition(trackData);
+
       console.log(`playNextTrackInSection: Successfully started next track '${nextTrackIdToPlay}'.`);
     }
   } else {
@@ -500,6 +505,8 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
 
   // ---------- fade-OUT ramp ----------
   const gOut = fadeOutState.gainNode.gain;
+  const oldSourceNode = fadeOutState.sourceNode;
+  const oldGainNode = fadeOutState.gainNode;
   gOut.cancelScheduledValues(audioContext.currentTime);
   gOut.setValueAtTime(gOut.value, audioContext.currentTime);
   gOut.linearRampToValueAtTime(0, fadeEnd);
@@ -515,7 +522,7 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
     return;
   }
 
-  if (!playTrack(fadeInId, transitionStartTime, 0)) {
+  if (!playTrack(fadeInId, transitionStartTime, 0, fadeOutId === fadeInId)) {
     console.error(`performCrossfade: Failed to schedule playTrack for fadeInId: ${fadeInId}. Aborting crossfade.`);
     gOut.cancelScheduledValues(audioContext.currentTime);
     gOut.linearRampToValueAtTime(1, audioContext.currentTime + 0.2);
@@ -552,14 +559,38 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
     currentTrackIndexInSection = currentSectionTracks.indexOf(fadeInId);
   }
 
-  announceSongTransition();
+  const trackData = tracks.get(fadeInId);
+  announceSongTransition(trackData);
 
   // ---------- unified clean-up helper ----------
   const finishCrossfade = () => {
     if (!isTransitioning) return; // already cleaned once
-    // Prevent stopping the new track when looping the same track
+    // Handle cleanup for same-track vs different-track crossfades
     if (fadeOutId !== fadeInId) {
       stopTrackInternal(fadeOutId);
+    } else {
+      // For same-track crossfades, manually clean up the old source node
+      if (oldSourceNode) {
+        liveSources.delete(oldSourceNode);
+        oldSourceNode.onended = null;
+        try {
+          oldSourceNode.stop();
+        } catch {
+          /* empty */
+        }
+        try {
+          oldSourceNode.disconnect();
+        } catch {
+          /* empty */
+        }
+      }
+      if (oldGainNode) {
+        try {
+          oldGainNode.disconnect();
+        } catch {
+          /* empty */
+        }
+      }
     }
 
     if (pendingSectionTracks !== undefined) {
@@ -591,7 +622,10 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
   setTimeout(finishCrossfade, msUntilFadeEnd);
 
   // 2) …and also if the old source ends earlier for any reason
-  fadeOutState.sourceNode!.onended = finishCrossfade;
+  const sourceNodeToWatch = fadeOutId === fadeInId ? oldSourceNode : fadeOutState.sourceNode;
+  if (sourceNodeToWatch) {
+    sourceNodeToWatch.onended = finishCrossfade;
+  }
 }
 
 export function setActiveSection(newSectionTrackIds: string[] | null): void {
@@ -709,7 +743,9 @@ export async function startFirstTrack(trackId: string): Promise<boolean> {
       currentTrackIndexInSection = -1;
       console.log(`Started track ${trackId} (no active section).`);
     }
-    announceSongTransition();
+
+    const trackData = tracks.get(trackId);
+    announceSongTransition(trackData);
     return true;
   } else {
     console.warn(`startFirstTrack: playTrack call failed for ${trackId}.`);
@@ -966,10 +1002,27 @@ export function resumeCurrentTrack(): void {
   playTrack(currentTrackId, audioContext.currentTime, s.pausedAt);
 }
 
-function dispatchPlaylistChangeEvent(tracks: string[] | null = null) {
-  const tracksToDispatch = tracks || currentSectionTracks;
-  console.log("Dispatching playlist change event with tracks:", tracksToDispatch);
-  window.dispatchEvent(new CustomEvent("playlistChange", { detail: tracksToDispatch }));
+function dispatchPlaylistChangeEvent(trackIds: string[] | null = null) {
+  const tracksToDispatch = trackIds || currentSectionTracks;
+
+  let playlistData: { id: string; title: string; duration: number }[] | null = null;
+
+  if (tracksToDispatch && tracksToDispatch.length > 0) {
+    playlistData = tracksToDispatch.map((id) => {
+      const trackState = tracks.get(id);
+      if (trackState) {
+        const title = trackState.title || id;
+        const duration = typeof trackState.trackLength === "number" && !isNaN(trackState.trackLength) ? trackState.trackLength : 0;
+
+        return { id, title, duration };
+      }
+
+      return { id, title: id, duration: 0 };
+    });
+  }
+
+  console.log("Dispatching playlist change event with track data:", playlistData);
+  window.dispatchEvent(new CustomEvent("playlistChange", { detail: playlistData }));
 }
 
 // Listen for splash screen hiding event to trigger initial playlist change
@@ -998,7 +1051,8 @@ declare global {
   }
 
   interface WindowEventMap {
-    playlistChange: CustomEvent<{ tracks: string[] | null }>;
+    playlistChange: CustomEvent<{ id: string; title: string; duration: number }[] | null>;
+    songTransition: CustomEvent<TrackState | null>;
   }
 }
 
