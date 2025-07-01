@@ -176,8 +176,9 @@
             }
           }
           
-          // Fallback to generic phrases if book-specific ones are not available
-          this.loadingPhrases = bookSpecificPhrases || t("loading_phrases", { returnObjects: true }) || [];
+// Fallback to generic phrases if book-specific ones are not available
+const genericPhrases = t("loading_phrases", { returnObjects: true });
+this.loadingPhrases = bookSpecificPhrases || (Array.isArray(genericPhrases) ? genericPhrases : []);
           
           this.setupPhraseCycle();
         }
