@@ -58,6 +58,6 @@ rsync -av ./dist/ root@"$DEPLOY_HOST":/var/www/"$TARGET_DIRECTORY"
 rm -rf ./dist
 echo "Done."
 
-echo "- [$BOOK_NAME] → https://$TARGET_DIRECTORY.bg.aws.lucetius.pl" > "$TARGET_DIRECTORY.txt"
+echo "| $BOOK_NAME | https://$TARGET_DIRECTORY.bg.aws.lucetius.pl |" > "$TARGET_DIRECTORY.txt"
 ssh root@"$DEPLOY_HOST" "mkdir -p /root/github-builds/$GITHUB_RUN_ID"
 scp "$TARGET_DIRECTORY.txt" root@"$DEPLOY_HOST":/root/github-builds/$GITHUB_RUN_ID/

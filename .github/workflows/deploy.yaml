@@ -60,7 +60,7 @@ jobs:
       - name: Run deployment script
         run: bash scripts/github-actions/build-and-deploy.sh ${{ matrix.title }} ${{ github.run_id }}
 
-  summary:
+  book-links:
     needs: deploy
     runs-on: ubuntu-latest
     environment: lucetius
