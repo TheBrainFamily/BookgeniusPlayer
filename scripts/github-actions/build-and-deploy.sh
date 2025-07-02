@@ -15,7 +15,7 @@ if [ -z "$2" ]; then
 fi
 
 BOOK_NAME="$1"
-$GITHUB_RUN_ID="$2"
+GITHUB_RUN_ID="$2"
 BOOK_PATH="$BOOKS_DIR/$BOOK_NAME"
 
 if [ ! -d "$BOOK_PATH" ]; then
