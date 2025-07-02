@@ -9,7 +9,13 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
+if [ -z "$2" ]; then
+  echo "You need to pass github run id"
+  exit 1
+fi
+
 BOOK_NAME="$1"
+$GITHUB_RUN_ID="$2"
 BOOK_PATH="$BOOKS_DIR/$BOOK_NAME"
 
 if [ ! -d "$BOOK_PATH" ]; then
@@ -21,14 +27,6 @@ if [ -z "$DEPLOY_HOST" ]; then
   echo "Environment variable DEPLOY_HOST is not set."
   exit 1
 fi
-
-# Different locales for specific books
-get_book_lang() {
-  case "$1" in
-    "Conrad-Tajny-Agent") echo "PL" ;;
-    *) echo "EN" ;;
-  esac
-}
 
 # Different subdomain/directory for specific books
 get_deploy_dir() {
@@ -53,13 +51,6 @@ echo "Target server directory: $TARGET_DIRECTORY"
 
 rm -rf ./dist
 
-#VITE_LANG="$VITE_LANG" \
-#VITE_BOOK="$BOOK_NAME" \
-#VITE_BOOK_NAME="$BOOK_NAME" \
-#VITE_BOOK_PATH="$BOOK_PATH/" \
-#VITE_BOOK_DIR="$BOOK_PATH" \
-#npx vite build
-
 pnpm build "$BOOK_PATH"
 
 echo "Sending: $DEPLOY_HOST:/var/www/$TARGET_DIRECTORY"
@@ -68,4 +59,6 @@ rsync -av ./dist/ root@"$DEPLOY_HOST":/var/www/"$TARGET_DIRECTORY"
 rm -rf ./dist
 echo "Done."
 
-echo "- [$BOOK_NAME}] → https://$TARGET_DIRECTORY.bg.aws.lucetius.pl" >> $GITHUB_STEP_SUMMARY
+echo "- [$BOOK_NAME] → https://$TARGET_DIRECTORY.bg.aws.lucetius.pl" > "$TARGET_DIRECTORY.txt"
+ssh root@"$DEPLOY_HOST" "mkdir -p /root/github-builds/$GITHUB_RUN_ID"
+scp "$TARGET_DIRECTORY.txt" root@"$DEPLOY_HOST":/root/github-builds/$GITHUB_RUN_ID/
