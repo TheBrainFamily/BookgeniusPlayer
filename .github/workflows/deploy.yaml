@@ -59,6 +59,3 @@ jobs:
 
       - name: Run deployment script
         run: bash scripts/github-actions/build-and-deploy.sh ${{ matrix.title }}
-
-      - name: Display book url
-        run: echo "- [${{ matrix.title }}] → https://${{ matrix.title }}.bg.aws.lucetius.pl" >> $GITHUB_STEP_SUMMARY

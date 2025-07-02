@@ -43,12 +43,13 @@ VITE_LANG=$(get_book_lang "$BOOK_NAME")
 DEPLOY_DIR=$(get_deploy_dir "$BOOK_NAME")
 
 if [ -n "$DEPLOY_DIR" ]; then
-  LOWERCASE_BOOK_NAME="$DEPLOY_DIR"
+  TARGET_DIRECTORY="$DEPLOY_DIR"
 else
-  LOWERCASE_BOOK_NAME=$(echo "$BOOK_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[-_]//g')
+  TARGET_DIRECTORY=$(echo "$BOOK_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[-_]//g')
 fi
 
-echo "Target server directory: $LOWERCASE_BOOK_NAME"
+TARGET_DIRECTORY="daniel-$TARGET_DIRECTORY"
+echo "Target server directory: $TARGET_DIRECTORY"
 
 rm -rf ./dist
 
@@ -61,8 +62,10 @@ rm -rf ./dist
 
 pnpm build "$BOOK_PATH"
 
-echo "Sending: $DEPLOY_HOST:/var/www/$LOWERCASE_BOOK_NAME"
-rsync -av ./dist/ root@"$DEPLOY_HOST":/var/www/daniel-"$LOWERCASE_BOOK_NAME"
+echo "Sending: $DEPLOY_HOST:/var/www/$TARGET_DIRECTORY"
+rsync -av ./dist/ root@"$DEPLOY_HOST":/var/www/"$TARGET_DIRECTORY"
 
 rm -rf ./dist
 echo "Done."
+
+echo "- [$BOOK_NAME}] → https://${TARGET_DIRECTORY.bg.aws.lucetius.pl" >> $GITHUB_STEP_SUMMARY
