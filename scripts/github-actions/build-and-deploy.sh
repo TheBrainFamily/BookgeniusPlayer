@@ -68,4 +68,4 @@ rsync -av ./dist/ root@"$DEPLOY_HOST":/var/www/"$TARGET_DIRECTORY"
 rm -rf ./dist
 echo "Done."
 
-echo "- [$BOOK_NAME}] → https://${TARGET_DIRECTORY.bg.aws.lucetius.pl" >> $GITHUB_STEP_SUMMARY
+echo "- [$BOOK_NAME}] → https://$TARGET_DIRECTORY.bg.aws.lucetius.pl" >> $GITHUB_STEP_SUMMARY
