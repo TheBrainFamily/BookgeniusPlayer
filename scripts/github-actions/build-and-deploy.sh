@@ -37,7 +37,6 @@ get_deploy_dir() {
   esac
 }
 
-VITE_LANG=$(get_book_lang "$BOOK_NAME")
 DEPLOY_DIR=$(get_deploy_dir "$BOOK_NAME")
 
 if [ -n "$DEPLOY_DIR" ]; then
