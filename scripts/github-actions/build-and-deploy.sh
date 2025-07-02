@@ -45,7 +45,6 @@ else
   TARGET_DIRECTORY=$(echo "$BOOK_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[-_]//g')
 fi
 
-TARGET_DIRECTORY="daniel-$TARGET_DIRECTORY"
 echo "Target server directory: $TARGET_DIRECTORY"
 
 rm -rf ./dist
