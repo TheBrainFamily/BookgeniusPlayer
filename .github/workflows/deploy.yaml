@@ -58,7 +58,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Run deployment script
-        run: bash scripts/github-actions/build-and-deploy.sh ${{ matrix.title }}
+        run: bash scripts/github-actions/build-and-deploy.sh ${{ matrix.title }} "${{ github.run_id }}"
 
       - name: Display matrix summary
         run: bash scripts/github-actions/display-summary.sh "${{ github.run_id }}"
