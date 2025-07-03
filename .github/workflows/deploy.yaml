@@ -38,6 +38,7 @@ jobs:
 
       - id: set-matrix
         run: |
+          set -euo pipefail
           titles=$(find public_books -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | \
                     jq -R -s -c 'split("\n") | map(select(length > 0))')
           echo "Detected titles: $titles"
