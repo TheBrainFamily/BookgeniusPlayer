@@ -29,4 +29,4 @@ fi
 
 echo "Deleting folders matching ${DEPLOY_ROOT_DIR}/${BRANCH_NAME}-* on $DEPLOY_HOST"
 ssh "${DEPLOY_USER}@${DEPLOY_HOST}" \
-  "find ${DEPLOY_ROOT_DIR} -maxdepth 1 -type d -name '${BRANCH_NAME}-*' -exec rm -rf {} +"
+  "find \"${DEPLOY_ROOT_DIR}\" -maxdepth 1 -type d -name '${BRANCH_NAME}-*' -exec rm -rf {} +"
