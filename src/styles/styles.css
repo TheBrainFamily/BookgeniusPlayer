@@ -203,6 +203,22 @@
           font-weight: 700;
         }
 
+        p[data-text-alignment="left"]:not(:has(em)) {
+          text-align: left;
+        }
+
+        p[data-text-alignment="right"][data-is-character="false"]:not(:has(em)) {
+          text-align: left;
+          padding-left: 10em;
+          text-indent: 0;
+        }
+
+        p[data-text-alignment="right"][data-is-character="true"] {
+          text-align: right;
+          text-indent: 0;
+        }
+
+
         p {
           margin-bottom: 0.1em;
           font-family: var(--font-libre-caslon-text);

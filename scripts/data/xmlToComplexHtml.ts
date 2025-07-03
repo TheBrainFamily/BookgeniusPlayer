@@ -90,6 +90,9 @@ export const xmlToComplexHtml = (
   const chapters = xmlDoc.getElementsByTagName("Chapter");
 
   let currentAct = "";
+  let currentCharacterAlignment = "";
+  let isCharacter = false;
+  const charactersPositionData = [];
 
   for (const chapter of chapters) {
     const chapterId = chapter.getAttribute("id");
@@ -133,6 +136,7 @@ export const xmlToComplexHtml = (
       if (node.nodeType !== 1) continue;
       const childElement = node as Element;
       const tagName = childElement.tagName;
+      // console.log("daniel tagName", tagName, node.textContent, childElement.textContent);
 
       if (["BackgroundFiles", "AudioFiles", "CutSceneFiles"].includes(tagName)) {
         continue;
@@ -186,8 +190,15 @@ export const xmlToComplexHtml = (
                     const talkingSrc = getTalkingMediaFilePathForName(slug, bookSlug);
                     const listeningSrc = getListeningMediaFilePathForName(slug, bookSlug);
                     if (isTalking) {
+                      isCharacter = true;
+                      console.log(char, isCharacter);
                       const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
                       inner += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
+                      if (!currentCharacterAlignment || currentCharacterAlignment === "right") {
+                        currentCharacterAlignment = "left";
+                      } else {
+                        currentCharacterAlignment = "right";
+                      }
                     } else {
                       if (e.getAttribute("dynasty") === "true") {
                         inner += e.textContent;
@@ -272,7 +283,16 @@ export const xmlToComplexHtml = (
         if (pContent.trim()) {
           let clean = pContent.replace(/\s+/g, " ").trim();
           clean = clean.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
-          htmlResult += `\n    <p data-index="${dataIndex++}">\n      ${clean}\n    </p>`;
+          htmlResult += `\n    <p data-index="${dataIndex++}" data-text-alignment="${currentCharacterAlignment}" data-is-character="${isCharacter}">\n      ${clean}\n    </p>`;
+          if (isCharacter) {
+            if (chapterId) {
+              if (!charactersPositionData[chapterId]) {
+                charactersPositionData[chapterId] = [];
+              }
+              charactersPositionData[chapterId].push(dataIndex - 1);
+            }
+            isCharacter = false;
+          }
         }
       } else if (tagName === "Act") {
         htmlResult += `\n    <h3 data-act="true">${childElement.textContent || ""}</h3>`;
@@ -300,6 +320,33 @@ export const xmlToComplexHtml = (
   if (bookFormValue === "Play") {
     htmlResult += `\n    </div>`;
   }
+
+  console.log(JSON.stringify(charactersPositionData));
+  charactersPositionData.forEach((positionsData, index) => {
+    console.log("chapterId", index);
+    positionsData.forEach((position, index) => {
+      const nextData = positionsData[index+1];
+      if (nextData) {
+        const numberOfLines = nextData - position - 1;
+        console.log("position", position, nextData, numberOfLines);
+      } else {
+        console.log("brak next dla", position);
+      }
+    });
+  })
+  // const sortedCharactersPositionData = charactersPositionData.sort((a, b) => a - b);
+  // const sortedCharactersPositionData = [...new Set(charactersPositionData)].sort((a, b) => a - b);
+  // console.log(JSON.stringify(sortedCharactersPositionData));
+
+  // sortedCharactersPositionData.forEach((position, index) => {
+  //   const nextData = sortedCharactersPositionData[index+1];
+  //   if (nextData) {
+  //     const numberOfLines = nextData - position;
+  //     console.log("position", position, nextData, numberOfLines);
+  //   } else {
+  //     console.log("brak next dla", position);
+  //   }
+  // });
 
   return { htmlResult: htmlResult.trim(), backgroundsData, audioData, cutSceneData, chapterTitles };
 };
