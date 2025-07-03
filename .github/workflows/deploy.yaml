@@ -9,25 +9,24 @@ on:
       types: [ opened, synchronize, reopened ]
 
 jobs:
-  jobs:
-    resolve-branch-name:
-      runs-on: ubuntu-latest
-      outputs:
-        branch_name: ${{ steps.set.outputs.branch_name }}
-      steps:
-        - name: Get and sanitize branch name
-          id: set
-          run: |
-            if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
-              RAW_BRANCH="${{ github.head_ref }}"
-            else
-              RAW_BRANCH="${{ github.ref_name }}"
-            fi
+  resolve-branch-name:
+    runs-on: ubuntu-latest
+    outputs:
+      branch_name: ${{ steps.set.outputs.branch_name }}
+    steps:
+      - name: Get and sanitize branch name
+        id: set
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            RAW_BRANCH="${{ github.head_ref }}"
+          else
+            RAW_BRANCH="${{ github.ref_name }}"
+          fi
 
-            SAFE_BRANCH=$(echo "$RAW_BRANCH" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+          SAFE_BRANCH=$(echo "$RAW_BRANCH" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
 
-            echo "Resolved BRANCH_NAME: $SAFE_BRANCH"
-            echo "branch_name=$SAFE_BRANCH" >> "$GITHUB_OUTPUT"
+          echo "Resolved BRANCH_NAME: $SAFE_BRANCH"
+          echo "branch_name=$SAFE_BRANCH" >> "$GITHUB_OUTPUT"
 
   generate-matrix:
     needs: resolve-branch-name
