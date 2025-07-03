@@ -7,6 +7,7 @@ jobs:
   cleanup:
     if: github.event.ref_type == 'branch'
     runs-on: ubuntu-latest
+    environment: lucetius
 
     env:
       DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
