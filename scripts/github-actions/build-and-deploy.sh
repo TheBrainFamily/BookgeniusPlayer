@@ -1,65 +1,74 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
-# Different locales for specific books
-get_book_lang() {
-  case "$1" in
-    "Conrad-Tajny-Agent") echo "PL" ;;
-    *) echo "EN" ;;
-  esac
-}
-
-# Different subdomain/directory for specific books
-get_deploy_dir() {
-  case "$1" in
-    "Alice-Wonderland") echo "alice" ;;
-    "Conrad-Tajny-Agent") echo "tajny-agent" ;;
-    *) echo "" ;;
-  esac
-}
+BOOK_NAME="$1"
+RUN_ID="$2"
 BOOKS_DIR="public_books"
+BOOK_PATH="$BOOKS_DIR/$BOOK_NAME"
 
-if [ -z "$DEPLOY_HOST" ]; then
-  echo "Environment variable DEPLOY_HOST is not set."
+if [[ -n "$BRANCH_NAME" && "$BRANCH_NAME" != "main" ]]; then
+  BRANCH_PREFIX="${BRANCH_NAME}-"
+else
+  BRANCH_PREFIX=""
+fi
+
+if [ -z "$BOOK_NAME" ]; then
+  echo "Error: Missing required argument: BOOK_NAME"
+  echo "Usage: $0 <book-name> <run-id>"
   exit 1
 fi
 
-echo "Cleaning up ./dist"
-rm -rf ./dist
-
-for dir in "$BOOKS_DIR"/*/; do
-  BOOK_NAME=$(basename "$dir")
-  VITE_LANG=$(get_book_lang "$BOOK_NAME")
-
-  if [[ -n "${BOOK_LANG_MAP[$BOOK_NAME]}" ]]; then
-    VITE_LANG="${BOOK_LANG_MAP[$BOOK_NAME]}"
-  fi
-
-  VITE_BOOK="$BOOK_NAME"
-  VITE_BOOK_PATH="$BOOKS_DIR/$BOOK_NAME/"
-  VITE_BOOK_DIR="$BOOKS_DIR/$BOOK_NAME"
-
-  echo "Building and syncing book: $BOOK_NAME (lang=$VITE_LANG)"
-
-  pnpm build "$VITE_BOOK_DIR"
-
-  VITE_LANG="$VITE_LANG" \
-  VITE_BOOK="$VITE_BOOK" \
-  VITE_BOOK_NAME="$VITE_BOOK" \
-  VITE_BOOK_PATH="$VITE_BOOK_PATH" \
-  VITE_BOOK_DIR="$VITE_BOOK_DIR" \
-  npx vite build
-
-  DEPLOY_DIR=$(get_deploy_dir "$BOOK_NAME")
-  if [ -n "$DEPLOY_DIR" ]; then
-  LOWERCASE_BOOK_NAME="$DEPLOY_DIR"
-else
-  LOWERCASE_BOOK_NAME=$(echo "$BOOK_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[-_]//g')
+if [ -z "$RUN_ID" ]; then
+  echo "Error: Missing required argument: RUN_ID"
+  echo "Usage: $0 <book-name> <run-id>"
+  exit 1
 fi
 
-  rsync -av ./dist/ root@"$DEPLOY_HOST":/var/www/"$LOWERCASE_BOOK_NAME"
+if [ ! -d "$BOOK_PATH" ]; then
+  echo "Error: Book directory not found $BOOK_PATH"
+  exit 1
+fi
 
-  echo "Cleaning up ./dist"
-  rm -rf ./dist
-done
+if [ -z "$DEPLOY_HOST" ]; then
+  echo "Error: Environment variable DEPLOY_HOST is not set."
+  exit 1
+fi
+
+if [ -z "$DEPLOY_USER" ]; then
+  echo "Error: Environment variable DEPLOY_USER is not set."
+  exit 1
+fi
+
+if [ -z "$DEPLOY_DOMAIN" ]; then
+  echo "Error: Environment variable $DEPLOY_DOMAIN is not set."
+  exit 1
+fi
+
+if [ -z "$DEPLOY_STATUS_DIR" ]; then
+  echo "Error: Environment variable DEPLOY_STATUS_DIR is not set."
+  exit 1
+fi
+
+TARGET_DIRECTORY=$(echo "$BOOK_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[-_]//g')
+
+if [[ -n "$BRANCH_PREFIX" ]]; then
+  TARGET_DIRECTORY="${BRANCH_PREFIX}${TARGET_DIRECTORY}"
+fi
+
+echo "Target server directory: $TARGET_DIRECTORY"
+
+rm -rf ./dist
+
+pnpm build "$BOOK_PATH"
+
+echo "Sending: $DEPLOY_HOST:/var/www/$TARGET_DIRECTORY"
+rsync -av ./dist/ "$DEPLOY_USER@$DEPLOY_HOST:/var/www/$TARGET_DIRECTORY"
+
+rm -rf ./dist
+echo "Done."
+
+echo "| $BOOK_NAME | https://$TARGET_DIRECTORY.$DEPLOY_DOMAIN |" > "$TARGET_DIRECTORY.txt"
+ssh "$DEPLOY_USER@$DEPLOY_HOST" "mkdir -p $DEPLOY_STATUS_DIR/$RUN_ID"
+scp "$TARGET_DIRECTORY.txt" "$DEPLOY_USER@$DEPLOY_HOST":"$DEPLOY_STATUS_DIR/$RUN_ID/"
+rm "$TARGET_DIRECTORY.txt"
