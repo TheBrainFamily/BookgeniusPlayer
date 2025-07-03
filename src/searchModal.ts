@@ -147,7 +147,7 @@ export function performCachedSearch(query: string, currentLocation: Location): S
           chapter: chapterIdNum,
           paragraphNumber: paragraphNumber,
           summary: createContextualSummary(paragraphText, query),
-          id: `cached-search-${chapterIdNum}-${paragraphNumber}-${Date.now()}`,
+          id: `cached-search-${chapterIdNum}-${paragraphNumber}}`,
         });
       }
     }
