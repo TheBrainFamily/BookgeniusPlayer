@@ -206,9 +206,10 @@
         p {
           margin-bottom: 0.1em;
           font-family: var(--font-libre-caslon-text);
+          text-indent: 0;
         }
 
-        p > strong {
+        p > span > strong {
           font-family: var(--font-eb-garamond);
           font-weight: 700;
           text-transform: uppercase;
