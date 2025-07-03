@@ -65,7 +65,7 @@ export async function performUnifiedSearch(
       paragraphNumber: match.paragraphNumber,
       summary: match.summary,
       text: createContextualSummary(match.text, query, 75),
-      id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}-${Date.now()}`,
+      id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}}`,
     }));
 
     return { header, items, isLoading: false };
@@ -147,7 +147,7 @@ export function performCachedSearch(query: string, currentLocation: Location): S
           chapter: chapterIdNum,
           paragraphNumber: paragraphNumber,
           summary: createContextualSummary(paragraphText, query),
-          id: `cached-search-${chapterIdNum}-${paragraphNumber}}`,
+          id: `cached-search-${chapterIdNum}-${paragraphNumber}}-`,
         });
       }
     }
@@ -257,7 +257,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
               paragraphNumber: paragraph,
               summary: highlightMatchedWords(summaryText, characterSlug),
               text: highlightMatchedWords(displayText, characterSlug),
-              id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}-${Date.now()}`,
+              id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}}`,
             });
           }
         });
