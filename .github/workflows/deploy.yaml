@@ -51,8 +51,10 @@ jobs:
 
       - name: Selective LFS pull
         run: |
+          set -e
           git lfs install
-          git lfs pull --include="public_books/${{ matrix.title }},public"
+          git lfs pull --include="public_books/${{ matrix.title }}"
+          git lfs pull --include="public"
 
           echo "Pointers:"
           grep -r "oid sha256" public_books/${{ matrix.title }} || echo "No pointers"

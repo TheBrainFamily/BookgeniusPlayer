@@ -53,7 +53,7 @@ rm -rf ./dist
 pnpm build "$BOOK_PATH"
 
 echo "Sending: $DEPLOY_HOST:/var/www/$TARGET_DIRECTORY"
-rsync -av ./dist/ "$DEPLOY_USER@$DEPLOY_HOST":/var/www/"$TARGET_DIRECTORY"
+rsync -av ./dist/ "$DEPLOY_USER@$DEPLOY_HOST:/var/www/$TARGET_DIRECTORY"
 
 rm -rf ./dist
 echo "Done."
