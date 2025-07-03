@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - deployment-improvments
 
 jobs:
   generate-matrix:
@@ -16,9 +16,10 @@ jobs:
 
       - id: set-matrix
         run: |
-          titles=$(ls -1 public_books | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          titles=$(find public_books -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | \
+                    jq -R -s -c 'split("\n") | map(select(length > 0))')
           echo "Detected titles: $titles"
-          echo "matrix=$titles" >> $GITHUB_OUTPUT
+          printf 'matrix=%s\n' "$titles" >> "$GITHUB_OUTPUT"
 
   deploy:
     needs: generate-matrix
@@ -31,6 +32,8 @@ jobs:
 
     env:
       DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+      DEPLOY_STATUS_DIR: ${{ vars.DEPLOY_STATUS_DIR }}
 
     steps:
       - name: Checkout repo

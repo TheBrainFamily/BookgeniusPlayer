@@ -3,21 +3,39 @@
 set -e
 
 RUN_ID="$1"
-REMOTE_BASE_DIR="/root/github-builds"
 LOCAL_SUMMARY_DIR="summary"
 
+if [ -z "$RUN_ID" ]; then
+  echo "Error: Missing required argument: RUN_ID"
+  echo "Usage: $0 <run-id>"
+  exit 1
+fi
+
 if [ -z "$DEPLOY_HOST" ]; then
-  echo "Environment variable DEPLOY_HOST is not set."
+  echo "Error: Environment variable DEPLOY_HOST is not set."
+  exit 1
+fi
+
+if [ -z "$DEPLOY_USER" ]; then
+  echo "Error: Environment variable DEPLOY_USER is not set."
+  exit 1
+fi
+
+if [ -z "$DEPLOY_STATUS_DIR" ]; then
+  echo "Error: Environment variable DEPLOY_STATUS_DIR is not set."
   exit 1
 fi
 
 mkdir -p "$LOCAL_SUMMARY_DIR"
 rsync -avz -e "ssh" \
-  "root@$DEPLOY_HOST:$REMOTE_BASE_DIR/$RUN_ID/" "$LOCAL_SUMMARY_DIR/"
+  "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_STATUS_DIR/$RUN_ID/" "$LOCAL_SUMMARY_DIR/"
 
 echo "## Deployment Summary" >> "$GITHUB_STEP_SUMMARY"
 echo "| Book Name | Deployment URL |" >> "$GITHUB_STEP_SUMMARY"
 echo "|-----------|----------------|" >> "$GITHUB_STEP_SUMMARY"
+shopt -s nullglob
 cat "$LOCAL_SUMMARY_DIR"/*.txt >> "$GITHUB_STEP_SUMMARY"
+shopt -u nullglob
 
-ssh "root@$DEPLOY_HOST" "rm -rf $REMOTE_BASE_DIR/$RUN_ID"
+ssh "$DEPLOY_USER@$DEPLOY_HOST" "rm -rf \"$DEPLOY_STATUS_DIR/$RUN_ID\""
+rm -rf "$LOCAL_SUMMARY_DIR"
