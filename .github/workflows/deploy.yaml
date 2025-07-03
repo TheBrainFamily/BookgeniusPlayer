@@ -38,8 +38,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          lfs: true
 
       - uses: pnpm/action-setup@v4
         with:
@@ -49,6 +47,12 @@ jobs:
         with:
           node-version: "20"
           cache: "pnpm"
+
+      - name: Selective LFS pull
+        run: |
+          git lfs install
+          git lfs pull --include="public_books/${{ matrix.title }},public"
+
       - run: pnpm install
 
       - name: Setup SSH
