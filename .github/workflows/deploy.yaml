@@ -4,10 +4,33 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - deployment-improvments
+      - main
+    pull_request:
+      types: [ opened, synchronize, reopened ]
 
 jobs:
+  jobs:
+    resolve-branch-name:
+      runs-on: ubuntu-latest
+      outputs:
+        branch_name: ${{ steps.set.outputs.branch_name }}
+      steps:
+        - name: Get and sanitize branch name
+          id: set
+          run: |
+            if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+              RAW_BRANCH="${{ github.head_ref }}"
+            else
+              RAW_BRANCH="${{ github.ref_name }}"
+            fi
+
+            SAFE_BRANCH=$(echo "$RAW_BRANCH" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+
+            echo "Resolved BRANCH_NAME: $SAFE_BRANCH"
+            echo "branch_name=$SAFE_BRANCH" >> "$GITHUB_OUTPUT"
+
   generate-matrix:
+    needs: resolve-branch-name
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -22,7 +45,7 @@ jobs:
           printf 'matrix=%s\n' "$titles" >> "$GITHUB_OUTPUT"
 
   deploy:
-    needs: generate-matrix
+    needs: [resolve-branch-name,generate-matrix]
     runs-on: ubuntu-latest
     environment: lucetius
     strategy:
@@ -35,6 +58,7 @@ jobs:
       DEPLOY_USER: ${{ vars.DEPLOY_USER }}
       DEPLOY_DOMAIN: ${{ vars.DEPLOY_DOMAIN }}
       DEPLOY_STATUS_DIR: ${{ vars.DEPLOY_STATUS_DIR }}
+      BRANCH_NAME: ${{ needs.resolve-branch-name.outputs.branch_name }}
 
     steps:
       - name: Checkout repo

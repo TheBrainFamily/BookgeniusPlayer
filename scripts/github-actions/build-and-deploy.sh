@@ -7,6 +7,12 @@ RUN_ID="$2"
 BOOKS_DIR="public_books"
 BOOK_PATH="$BOOKS_DIR/$BOOK_NAME"
 
+if [[ -n "$BRANCH_NAME" && "$BRANCH_NAME" != "main" ]]; then
+  BRANCH_PREFIX="${BRANCH_NAME}-"
+else
+  BRANCH_PREFIX=""
+fi
+
 if [ -z "$BOOK_NAME" ]; then
   echo "Error: Missing required argument: BOOK_NAME"
   echo "Usage: $0 <book-name> <run-id>"
@@ -46,6 +52,10 @@ fi
 
 TARGET_DIRECTORY=$(echo "$BOOK_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[-_]//g')
 
+if [[ -n "$BRANCH_PREFIX" ]]; then
+  TARGET_DIRECTORY="${BRANCH_PREFIX}${TARGET_DIRECTORY}"
+fi
+
 echo "Target server directory: $TARGET_DIRECTORY"
 
 rm -rf ./dist
@@ -60,5 +70,5 @@ echo "Done."
 
 echo "| $BOOK_NAME | https://$TARGET_DIRECTORY.$DEPLOY_DOMAIN |" > "$TARGET_DIRECTORY.txt"
 ssh "$DEPLOY_USER@$DEPLOY_HOST" "mkdir -p $DEPLOY_STATUS_DIR/$RUN_ID"
-scp "$TARGET_DIRECTORY.txt" "$DEPLOY_USER"@"$DEPLOY_HOST":/root/github-builds/$RUN_ID/
+scp "$TARGET_DIRECTORY.txt" "$DEPLOY_USER@$DEPLOY_HOST":"$DEPLOY_STATUS_DIR/$RUN_ID/"
 rm "$TARGET_DIRECTORY.txt"
