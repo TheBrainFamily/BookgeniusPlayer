@@ -35,7 +35,7 @@ if [ -z "$DEPLOY_USER" ]; then
 fi
 
 if [ -z "$DEPLOY_DOMAIN" ]; then
-  echo "Error: Environment variable DEPLOY_USER is not set."
+  echo "Error: Environment variable $DEPLOY_DOMAIN is not set."
   exit 1
 fi
 

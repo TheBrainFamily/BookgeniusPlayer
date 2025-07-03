@@ -33,6 +33,7 @@ jobs:
     env:
       DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
       DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+      DEPLOY_DOMAIN: ${{ vars.DEPLOY_DOMAIN }}
       DEPLOY_STATUS_DIR: ${{ vars.DEPLOY_STATUS_DIR }}
 
     steps:
