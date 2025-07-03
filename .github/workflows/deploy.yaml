@@ -60,6 +60,9 @@ jobs:
           echo "LFS files:"
           git lfs ls-files | grep public_books/${{ matrix.title }} || echo "No LFS files"
 
+          echo "Book dir size:"
+          du -sh public_books/${{ matrix.title }}
+
       - run: pnpm install
 
       - name: Setup SSH
