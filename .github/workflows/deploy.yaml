@@ -54,6 +54,12 @@ jobs:
           git lfs install
           git lfs pull --include="public_books/${{ matrix.title }},public"
 
+          echo "Pointers:"
+          grep -r "oid sha256" public_books/${{ matrix.title }} || echo "No pointers"
+
+          echo "LFS files:"
+          git lfs ls-files | grep public_books/${{ matrix.title }} || echo "No LFS files"
+
       - run: pnpm install
 
       - name: Setup SSH
@@ -75,6 +81,8 @@ jobs:
 
     env:
       DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+      DEPLOY_STATUS_DIR: ${{ vars.DEPLOY_STATUS_DIR }}
 
     steps:
       - name: Checkout repo
