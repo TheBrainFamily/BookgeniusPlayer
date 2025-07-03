@@ -57,6 +57,7 @@ jobs:
       DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
       DEPLOY_USER: ${{ vars.DEPLOY_USER }}
       DEPLOY_DOMAIN: ${{ vars.DEPLOY_DOMAIN }}
+      DEPLOY_ROOT_DIR: ${{ vars.DEPLOY_ROOT_DIR }}
       DEPLOY_STATUS_DIR: ${{ vars.DEPLOY_STATUS_DIR }}
       BRANCH_NAME: ${{ needs.resolve-branch-name.outputs.branch_name }}
 

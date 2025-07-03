@@ -45,6 +45,11 @@ if [ -z "$DEPLOY_DOMAIN" ]; then
   exit 1
 fi
 
+if [ -z "$DEPLOY_ROOT_DIR" ]; then
+  echo "Error: Environment variable DEPLOY_ROOT_DIR is not set."
+  exit 1
+fi
+
 if [ -z "$DEPLOY_STATUS_DIR" ]; then
   echo "Error: Environment variable DEPLOY_STATUS_DIR is not set."
   exit 1
@@ -62,8 +67,8 @@ rm -rf ./dist
 
 pnpm build "$BOOK_PATH"
 
-echo "Sending: $DEPLOY_HOST:/var/www/$TARGET_DIRECTORY"
-rsync -av ./dist/ "$DEPLOY_USER@$DEPLOY_HOST:/var/www/$TARGET_DIRECTORY"
+echo "Sending: $DEPLOY_HOST:$DEPLOY_ROOT_DIR/$TARGET_DIRECTORY"
+rsync -av ./dist/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_ROOT_DIR/$TARGET_DIRECTORY"
 
 rm -rf ./dist
 echo "Done."

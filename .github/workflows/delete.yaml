@@ -12,8 +12,12 @@ jobs:
     env:
       DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
       DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+      DEPLOY_ROOT_DIR: ${{ vars.DEPLOY_ROOT_DIR }}
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
       - name: Set branch slug
         id: branch
         run: |
