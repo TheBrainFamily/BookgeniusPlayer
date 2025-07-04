@@ -76,9 +76,9 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
   CHANGED_FILES=$(git diff --name-only ${BASE_SHA} HEAD -- public public_books || true)
 
   mkdir -p "${TMP_UNPACK_DIR}/${BOOKS_DIR}"
-  aws s3 cp "${S3_REMOTE_PATH}" "${TMP_UNPACK_DIR}/${ARCHIVE_NAME}"
-  tar -xzf "${TMP_UNPACK_DIR}/${ARCHIVE_NAME}" -C "${TMP_UNPACK_DIR}/${BOOKS_DIR}"
-  find "${TMP_UNPACK_DIR}" -print
+  aws s3 cp "${S3_REMOTE_PATH}" "${ARCHIVE_NAME}"
+  tar -xzf "${ARCHIVE_NAME}" -C "${TMP_UNPACK_DIR}/${BOOKS_DIR}"
+  rm "${ARCHIVE_NAME}"
 
   MATCHED=$(echo "$CHANGED_FILES" | grep "^$BOOK_PATH" || true)
 
@@ -88,20 +88,20 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
       cat changed.txt
       while IFS= read -r file; do
         path_to_remove="${TMP_UNPACK_DIR}/$file"
-        echo "daniel: $path_to_remove"
         if [ -f "$path_to_remove" ]; then
           echo "Deleting: $path_to_remove"
           rm -f "$path_to_remove"
         else
-          echo "File not found"
-          ls -al "$path_to_remove"
+          echo "File not found $path_to_remove"
         fi
       done < changed.txt
-      find "${TMP_UNPACK_DIR}" -print
     else
       echo "No files to delete"
     fi
     rm changed.txt
+    ls -al public_books/Lalka/assets
+    rsync -a "$TMP_UNPACK_DIR/${BOOKS_DIR}/" "${BOOKS_DIR}/"
+    ls -al public_books/Lalka/assets
   fi
 else
   echo "Making an archive..."
