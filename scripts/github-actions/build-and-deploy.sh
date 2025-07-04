@@ -89,10 +89,6 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
       while IFS= read -r file; do
         path_to_remove="${TMP_UNPACK_DIR}/$file"
         echo "daniel: $path_to_remove"
-        ls -al "$TMP_UNPACK_DIR"
-        ls -al "$TMP_UNPACK_DIR/$BOOK_PATH"
-        ls -al "$TMP_UNPACK_DIR/$BOOK_PATH/Lalka"
-        ls -al "$TMP_UNPACK_DIR/$BOOK_PATH/Lalka/assets"
         if [ -f "$path_to_remove" ]; then
           echo "Deleting: $path_to_remove"
           rm -f "$path_to_remove"
@@ -100,8 +96,8 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
           echo "File not found"
           ls -al "$path_to_remove"
         fi
-        ls -al "$TMP_UNPACK_DIR/$BOOK_PATH/Lalka/assets"
       done < changed.txt
+      find "${TMP_UNPACK_DIR}" -print
     else
       echo "No files to delete"
     fi
