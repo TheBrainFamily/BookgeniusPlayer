@@ -83,7 +83,6 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
     if [[ -s changed.txt ]]; then
       echo "Pulling changed LFS files for ${BOOK_NAME}:"
       cat changed.txt
-      git lfs install
       git lfs pull --include="$(paste -sd, changed.txt)"
     else
       echo "No LFS files to pull"
