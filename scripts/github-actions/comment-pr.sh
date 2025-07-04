@@ -28,7 +28,7 @@ BODY="${COMMENT_TAG}
 ${SUMMARY}"
 
 COMMENT_ID=$(gh api repos/$REPO/issues/$PR_NUMBER/comments \
-  --jq ".[] | select(.body | contains(\"$COMMENT_TAG\")) | .id")
+  --jq "$(printf '[.[] | select(.body | contains("%s"))][0].id' "$COMMENT_TAG")")
 
 if [[ -n "$COMMENT_ID" ]]; then
   echo "Updating existing comment $COMMENT_ID"

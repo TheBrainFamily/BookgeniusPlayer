@@ -32,7 +32,9 @@ jobs:
           echo "DEPLOY_ROOT_DIR=${{ vars.DEPLOY_ROOT_DIR }}" >> $GITHUB_OUTPUT
           echo "DEPLOY_STATUS_DIR=${{ vars.DEPLOY_STATUS_DIR }}" >> $GITHUB_OUTPUT
           B64=$(echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64)
-          echo "ssh_key_b64=$B64" >> $GITHUB_OUTPUT
+          echo "ssh_key_b64<<EOF" >> $GITHUB_OUTPUT
+          echo "$B64" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
   resolve-branch-name:
     runs-on: ubuntu-latest
