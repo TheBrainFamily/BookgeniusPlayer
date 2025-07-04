@@ -77,7 +77,7 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
 
   mkdir -p "${TMP_UNPACK_DIR}/${BOOK_PATH}"
   aws s3 cp "${S3_REMOTE_PATH}" "${TMP_UNPACK_DIR}/${ARCHIVE_NAME}"
-  tar -xzf "$ARCHIVE_NAME" -C "${TMP_UNPACK_DIR}/${BOOK_PATH}"
+  tar -xzf "${TMP_UNPACK_DIR}/${ARCHIVE_NAME}" -C "${TMP_UNPACK_DIR}/${BOOK_PATH}"
 
   MATCHED=$(echo "$CHANGED_FILES" | grep "^$BOOK_PATH" || true)
 
