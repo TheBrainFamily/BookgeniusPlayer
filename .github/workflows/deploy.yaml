@@ -8,7 +8,40 @@ on:
   pull_request:
     types: [ opened, synchronize, reopened ]
 
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
 jobs:
+  env-vars:
+    runs-on: ubuntu-latest
+    environment: lucetius
+    outputs:
+      DEPLOY_HOST: ${{ steps.export.outputs.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ steps.export.outputs.DEPLOY_USER }}
+      DEPLOY_DOMAIN: ${{ steps.export.outputs.DEPLOY_DOMAIN }}
+      DEPLOY_ROOT_DIR: ${{ steps.export.outputs.DEPLOY_ROOT_DIR }}
+      DEPLOY_STATUS_DIR: ${{ steps.export.outputs.DEPLOY_STATUS_DIR }}
+      DEPLOY_AWS_ARN: ${{ steps.export.outputs.DEPLOY_AWS_ARN }}
+      DEPLOY_AWS_REGION: ${{ steps.export.outputs.DEPLOY_AWS_REGION }}
+      DEPLOY_AWS_BUCKET: ${{ steps.export.outputs.DEPLOY_AWS_BUCKET }}
+      ssh_key_b64: ${{ steps.export.outputs.ssh_key_b64 }}
+    steps:
+      - id: export
+        run: |
+          echo "DEPLOY_HOST=${{ vars.DEPLOY_HOST }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_USER=${{ vars.DEPLOY_USER }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_DOMAIN=${{ vars.DEPLOY_DOMAIN }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_ROOT_DIR=${{ vars.DEPLOY_ROOT_DIR }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_STATUS_DIR=${{ vars.DEPLOY_STATUS_DIR }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_AWS_ARN=${{ vars.DEPLOY_AWS_ARN }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_AWS_REGION=${{ vars.DEPLOY_AWS_REGION }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_AWS_BUCKET=${{ vars.DEPLOY_AWS_BUCKET }}" >> $GITHUB_OUTPUT
+          echo "ssh_key_b64<<EOF" >> "$GITHUB_OUTPUT"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
   resolve-branch-name:
     runs-on: ubuntu-latest
     outputs:
@@ -45,20 +78,21 @@ jobs:
           printf 'matrix=%s\n' "$titles" >> "$GITHUB_OUTPUT"
 
   deploy:
-    needs: [resolve-branch-name,generate-matrix]
+    needs: [env-vars, resolve-branch-name,generate-matrix]
     runs-on: ubuntu-latest
-    environment: lucetius
     strategy:
       matrix:
         title: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
       fail-fast: false
 
     env:
-      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
-      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
-      DEPLOY_DOMAIN: ${{ vars.DEPLOY_DOMAIN }}
-      DEPLOY_ROOT_DIR: ${{ vars.DEPLOY_ROOT_DIR }}
-      DEPLOY_STATUS_DIR: ${{ vars.DEPLOY_STATUS_DIR }}
+      DEPLOY_HOST: ${{ needs.env-vars.outputs.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ needs.env-vars.outputs.DEPLOY_USER }}
+      DEPLOY_DOMAIN: ${{ needs.env-vars.outputs.DEPLOY_DOMAIN }}
+      DEPLOY_ROOT_DIR: ${{ needs.env-vars.outputs.DEPLOY_ROOT_DIR }}
+      DEPLOY_STATUS_DIR: ${{ needs.env-vars.outputs.DEPLOY_STATUS_DIR }}
+      DEPLOY_AWS_BUCKET: ${{ needs.env-vars.outputs.DEPLOY_AWS_BUCKET }}
+      AWS_REGION: ${{ needs.env-vars.outputs.DEPLOY_AWS_REGION }}
       BRANCH_NAME: ${{ needs.resolve-branch-name.outputs.branch_name }}
 
     steps:
@@ -75,6 +109,7 @@ jobs:
           cache: "pnpm"
 
       - name: Selective LFS pull
+        if: needs.resolve-branch-name.outputs.branch_name == 'main'
         run: |
           set -e
           git lfs install
@@ -95,24 +130,29 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          echo "$SSH_PRIVATE_KEY" | base64 --decode > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ needs.env-vars.outputs.ssh_key_b64 }}
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ needs.env-vars.outputs.DEPLOY_AWS_ARN }}
+          aws-region: ${{ needs.env-vars.outputs.DEPLOY_AWS_REGION }}
 
       - name: Run deployment script
         run: bash scripts/github-actions/build-and-deploy.sh ${{ matrix.title }} ${{ github.run_id }}
 
   book-links:
-    needs: deploy
+    needs: [env-vars, deploy]
     runs-on: ubuntu-latest
-    environment: lucetius
 
     env:
-      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
-      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
-      DEPLOY_STATUS_DIR: ${{ vars.DEPLOY_STATUS_DIR }}
+      DEPLOY_HOST: ${{ needs.env-vars.outputs.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ needs.env-vars.outputs.DEPLOY_USER }}
+      DEPLOY_STATUS_DIR: ${{ needs.env-vars.outputs.DEPLOY_STATUS_DIR }}
 
     steps:
       - name: Checkout repo
@@ -121,11 +161,17 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          echo "$SSH_PRIVATE_KEY" | base64 --decode > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ needs.env-vars.outputs.ssh_key_b64 }}
 
       - name: Display matrix summary
         run: bash scripts/github-actions/display-summary.sh ${{ github.run_id }}
+
+      - name: Create or update PR comment with deployment summary
+        if: github.event_name == 'pull_request'
+        run: bash scripts/github-actions/comment-pr.sh ${{ github.event.pull_request.number }} ${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
