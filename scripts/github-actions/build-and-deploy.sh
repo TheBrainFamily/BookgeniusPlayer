@@ -67,44 +67,33 @@ fi
 
 # preparing assets files // for now only for branches
 ARCHIVE_NAME="${BOOK_NAME}.tar.gz"
+TMP_UNPACK_DIR="tmp_unpack"
 S3_REMOTE_PATH="s3://${DEPLOY_AWS_BUCKET}/main/${ARCHIVE_NAME}"
 if [[ "$BRANCH_NAME" != "main" ]]; then
-  echo "dir size"
-  du -kh -d 1 public_books
-  export GIT_LFS_SKIP_SMUDGE=1
   GIT_LFS_SKIP_SMUDGE=1 GIT_TRACE=1 git lfs install --skip-repo
   GIT_LFS_SKIP_SMUDGE=1 GIT_TRACE=1 git fetch origin main --depth=1
   BASE_SHA=$(git rev-parse origin/main)
   CHANGED_FILES=$(git diff --name-only ${BASE_SHA} HEAD -- public public_books || true)
-  du -kh -d 1 public_books
 
-  aws s3 cp "${S3_REMOTE_PATH}" "${ARCHIVE_NAME}"
-  tar -xzf "$ARCHIVE_NAME" -C "$(dirname "$BOOK_PATH")"
+  mkdir -p "${TMP_UNPACK_DIR}/${BOOK_PATH}"
+  aws s3 cp "${S3_REMOTE_PATH}" "${TMP_UNPACK_DIR}/${ARCHIVE_NAME}"
+  tar -xzf "$ARCHIVE_NAME" -C "${TMP_UNPACK_DIR}/${BOOK_PATH}"
 
   MATCHED=$(echo "$CHANGED_FILES" | grep "^$BOOK_PATH" || true)
+
   if [[ -n "$MATCHED" ]]; then
     echo "$MATCHED" > changed.txt
     if [[ -s changed.txt ]]; then
-      echo "Pulling changed LFS files for ${BOOK_NAME}:"
       cat changed.txt
-
-      # restore LFS pointers
       while IFS= read -r file; do
-        echo "---------------> file: ${file}"
-        GIT_TRACE=1 git checkout -f -- "$file"
-        du -kh -d 1 public_books
-        oid=$(grep "oid sha256" "$file" | awk '{print $2}')
-        echo "SHA: $oid"
-        if [[ -n "$oid" ]]; then
-#          git lfs fetch --object-id "$oid"
-#          git lfs checkout --include="$file"
-          echo "oid is here ${oid}"
-        else
-          echo "File  $file is not a LFS pointer"
+        path_to_remove="${TMP_UNPACK_DIR}/$file"
+        if [ -f "$path_to_remove" ]; then
+          echo "Deleting: $path_to_remove"
+          rm -f "$path_to_remove"
         fi
       done < changed.txt
     else
-      echo "No LFS files to pull"
+      echo "No files to delete"
     fi
     rm changed.txt
   fi
