@@ -70,8 +70,8 @@ ARCHIVE_NAME="${BOOK_NAME}.tar.gz"
 TMP_UNPACK_DIR="tmp_unpack"
 S3_REMOTE_PATH="s3://${DEPLOY_AWS_BUCKET}/main/${ARCHIVE_NAME}"
 if [[ "$BRANCH_NAME" != "main" ]]; then
-  GIT_LFS_SKIP_SMUDGE=1 GIT_TRACE=1 git lfs install --skip-repo
-  GIT_LFS_SKIP_SMUDGE=1 GIT_TRACE=1 git fetch origin main --depth=1
+  GIT_LFS_SKIP_SMUDGE=1 git lfs install --skip-repo
+  GIT_LFS_SKIP_SMUDGE=1 git fetch origin main --depth=1
   BASE_SHA=$(git rev-parse origin/main)
   CHANGED_FILES=$(git diff --name-only ${BASE_SHA} HEAD -- public public_books || true)
 
@@ -101,10 +101,12 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
     ls -al public_books/Lalka/assets
     rsync -a "$TMP_UNPACK_DIR/${BOOKS_DIR}/" "${BOOKS_DIR}/"
     ls -al public_books/Lalka/assets
-    GIT_LFS_SKIP_SMUDGE=1 GIT_TRACE=1 git lfs pull --include="$(paste -sd, changed.txt)"
+    GIT_LFS_SKIP_SMUDGE=1 git lfs pull --include="$(paste -sd, changed.txt)"
     ls -al public_books/Lalka/assets
     rm changed.txt
     rm -rf "${TMP_UNPACK_DIR}"
+    echo "daniel"
+    ls -al public_books/Lalka/assets
   fi
 else
   echo "Making an archive..."
