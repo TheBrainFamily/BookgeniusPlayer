@@ -91,6 +91,7 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
         if [[ -n "$oid" ]]; then
 #          git lfs fetch --object-id "$oid"
 #          git lfs checkout --include="$file"
+          echo "oid is here ${oid}"
         else
           echo "File  $file is not a LFS pointer"
         fi
