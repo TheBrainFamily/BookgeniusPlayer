@@ -70,6 +70,7 @@ ARCHIVE_NAME="${BOOK_NAME}.tar.gz"
 S3_REMOTE_PATH="s3://${DEPLOY_AWS_BUCKET}/main/${ARCHIVE_NAME}"
 if [[ "$BRANCH_NAME" != "main" ]]; then
   export GIT_LFS_SKIP_SMUDGE=1
+  git lfs install --skip-repo
   git fetch origin main --depth=1
   BASE_SHA=$(git rev-parse origin/main)
   CHANGED_FILES=$(git diff --name-only ${BASE_SHA} HEAD -- public public_books || true)
