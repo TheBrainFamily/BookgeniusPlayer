@@ -82,6 +82,12 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
     if [[ -s changed.txt ]]; then
       echo "Pulling changed LFS files for ${BOOK_NAME}:"
       cat changed.txt
+
+      # restore LFS pointers
+      while IFS= read -r file; do
+        git checkout -- "$file"
+      done < changed.txt
+
       git lfs pull --include="$(paste -sd, changed.txt)"
     else
       echo "No LFS files to pull"
