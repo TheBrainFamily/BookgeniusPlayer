@@ -79,9 +79,11 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
   MATCHED=$(echo "$CHANGED_FILES" | grep "^$BOOK_PATH" || true)
   if [[ -n "$MATCHED" ]]; then
     echo "$CHANGED" > changed.txt
+    cat changed.txt
     if [[ -s changed.txt ]]; then
       echo "Pulling changed LFS files for ${BOOK_NAME}:"
       cat changed.txt
+      git lfs install
       git lfs pull --include="$(paste -sd, changed.txt)"
     else
       echo "No LFS files to pull"
