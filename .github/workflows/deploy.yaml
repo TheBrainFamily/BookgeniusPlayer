@@ -22,7 +22,7 @@ jobs:
       DEPLOY_DOMAIN: ${{ steps.export.outputs.DEPLOY_DOMAIN }}
       DEPLOY_ROOT_DIR: ${{ steps.export.outputs.DEPLOY_ROOT_DIR }}
       DEPLOY_STATUS_DIR: ${{ steps.export.outputs.DEPLOY_STATUS_DIR }}
-      ssh_key_b64: ${{ steps.encode.outputs.ssh_key_b64 }}
+      ssh_key_b64: ${{ steps.export.outputs.ssh_key_b64 }}
     steps:
       - id: export
         run: |
@@ -31,10 +31,9 @@ jobs:
           echo "DEPLOY_DOMAIN=${{ vars.DEPLOY_DOMAIN }}" >> $GITHUB_OUTPUT
           echo "DEPLOY_ROOT_DIR=${{ vars.DEPLOY_ROOT_DIR }}" >> $GITHUB_OUTPUT
           echo "DEPLOY_STATUS_DIR=${{ vars.DEPLOY_STATUS_DIR }}" >> $GITHUB_OUTPUT
-          B64=$(echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64)
-          echo "ssh_key_b64<<EOF" >> $GITHUB_OUTPUT
-          echo "$B64" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo "ssh_key_b64<<EOF" >> "$GITHUB_OUTPUT"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
   resolve-branch-name:
     runs-on: ubuntu-latest
