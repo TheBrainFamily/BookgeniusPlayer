@@ -96,8 +96,9 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
 
       # restore LFS pointers
       while IFS= read -r file; do
-        echo "file: ${file}"
+        echo "---------------> file: ${file}"
         git checkout -f -- "$file"
+        du -kh -d 1 public_books
         oid=$(grep "oid sha256" "$file" | awk '{print $2}')
         echo "SHA: $oid"
         if [[ -n "$oid" ]]; then
