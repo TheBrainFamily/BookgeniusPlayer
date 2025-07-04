@@ -90,6 +90,8 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
         echo "daniel: $path_to_remove"
         ls -al "$TMP_UNPACK_DIR"
         ls -al "$TMP_UNPACK_DIR/$BOOK_PATH"
+        ls -al "$TMP_UNPACK_DIR/$BOOK_PATH/Lalka"
+        ls -al "$TMP_UNPACK_DIR/$BOOK_PATH/Lalka/assets"
         if [ -f "$path_to_remove" ]; then
           echo "Deleting: $path_to_remove"
           rm -f "$path_to_remove"
