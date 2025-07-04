@@ -78,8 +78,7 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
 
   MATCHED=$(echo "$CHANGED_FILES" | grep "^$BOOK_PATH" || true)
   if [[ -n "$MATCHED" ]]; then
-    echo "$CHANGED" > changed.txt
-    cat changed.txt
+    echo "$MATCHED" > changed.txt
     if [[ -s changed.txt ]]; then
       echo "Pulling changed LFS files for ${BOOK_NAME}:"
       cat changed.txt
