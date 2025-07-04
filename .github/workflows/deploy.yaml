@@ -9,6 +9,7 @@ on:
     types: [ opened, synchronize, reopened ]
 
 permissions:
+  id-token: write
   contents: read
   pull-requests: write
 

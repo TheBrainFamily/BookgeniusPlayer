@@ -34,7 +34,7 @@ shopt -s nullglob
 HEADER="## Deployment Summary
 | Book Name | Deployment URL |
 |-----------|----------------|"
-BODY=$(cat "$LOCAL_SUMMARY_DIR"/*.txt || true)
+BODY=$(find "$LOCAL_SUMMARY_DIR" -maxdepth 1 -type f -name '*.txt' -exec cat {} +)
 shopt -u nullglob
 
 SUMMARY="$HEADER"$'\n'"$BODY"
