@@ -22,7 +22,7 @@ jobs:
       DEPLOY_DOMAIN: ${{ steps.export.outputs.DEPLOY_DOMAIN }}
       DEPLOY_ROOT_DIR: ${{ steps.export.outputs.DEPLOY_ROOT_DIR }}
       DEPLOY_STATUS_DIR: ${{ steps.export.outputs.DEPLOY_STATUS_DIR }}
-      SSH_PRIVATE_KEY: ${{ steps.export.outputs.SSH_PRIVATE_KEY }}
+      ssh_key_b64: ${{ steps.encode.outputs.ssh_key_b64 }}
     steps:
       - id: export
         run: |
@@ -31,7 +31,8 @@ jobs:
           echo "DEPLOY_DOMAIN=${{ vars.DEPLOY_DOMAIN }}" >> $GITHUB_OUTPUT
           echo "DEPLOY_ROOT_DIR=${{ vars.DEPLOY_ROOT_DIR }}" >> $GITHUB_OUTPUT
           echo "DEPLOY_STATUS_DIR=${{ vars.DEPLOY_STATUS_DIR }}" >> $GITHUB_OUTPUT
-          echo "SSH_PRIVATE_KEY=${{ secrets.SSH_PRIVATE_KEY }}" >> $GITHUB_OUTPUT
+          B64=$(echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -w 0)
+          echo "ssh_key_b64=$B64" >> $GITHUB_OUTPUT
 
   resolve-branch-name:
     runs-on: ubuntu-latest
@@ -118,11 +119,11 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
         env:
-          SSH_PRIVATE_KEY: ${{ needs.env-vars.outputs.SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ needs.env-vars.outputs.ssh_key_b64 }}
 
       - name: Run deployment script
         run: bash scripts/github-actions/build-and-deploy.sh ${{ matrix.title }} ${{ github.run_id }}
@@ -143,11 +144,11 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
         env:
-          SSH_PRIVATE_KEY: ${{ needs.env-vars.outputs.SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ needs.env-vars.outputs.ssh_key_b64 }}
 
       - name: Display matrix summary
         run: bash scripts/github-actions/display-summary.sh ${{ github.run_id }}
