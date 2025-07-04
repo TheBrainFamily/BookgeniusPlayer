@@ -87,10 +87,10 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
       while IFS= read -r file; do
         git checkout -f -- "$file"
         oid=$(grep "oid sha256" "$file" | awk '{print $2}')
+        echo "SHA: $oid"
         if [[ -n "$oid" ]]; then
-          echo "SHA: $oid"
-          git lfs fetch --object-id "$oid"
-          git lfs checkout --include="$file"
+#          git lfs fetch --object-id "$oid"
+#          git lfs checkout --include="$file"
         else
           echo "File  $file is not a LFS pointer"
         fi
