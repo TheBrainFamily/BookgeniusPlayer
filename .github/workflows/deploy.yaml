@@ -31,7 +31,7 @@ jobs:
           echo "DEPLOY_DOMAIN=${{ vars.DEPLOY_DOMAIN }}" >> $GITHUB_OUTPUT
           echo "DEPLOY_ROOT_DIR=${{ vars.DEPLOY_ROOT_DIR }}" >> $GITHUB_OUTPUT
           echo "DEPLOY_STATUS_DIR=${{ vars.DEPLOY_STATUS_DIR }}" >> $GITHUB_OUTPUT
-          B64=$(echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -w 0)
+          B64=$(echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64)
           echo "ssh_key_b64=$B64" >> $GITHUB_OUTPUT
 
   resolve-branch-name:
@@ -98,28 +98,28 @@ jobs:
           node-version: "20"
           cache: "pnpm"
 
-      - name: Selective LFS pull
-        run: |
-          set -e
-          git lfs install
-          git lfs pull --include="public_books/${{ matrix.title }}"
-          git lfs pull --include="public"
-
-          echo "Pointers:"
-          grep -r "oid sha256" public_books/${{ matrix.title }} || echo "No pointers"
-
-          echo "LFS files:"
-          git lfs ls-files | grep public_books/${{ matrix.title }} || echo "No LFS files"
-
-          echo "Book dir size:"
-          du -sh public_books/${{ matrix.title }}
+#      - name: Selective LFS pull
+#        run: |
+#          set -e
+#          git lfs install
+#          git lfs pull --include="public_books/${{ matrix.title }}"
+#          git lfs pull --include="public"
+#
+#          echo "Pointers:"
+#          grep -r "oid sha256" public_books/${{ matrix.title }} || echo "No pointers"
+#
+#          echo "LFS files:"
+#          git lfs ls-files | grep public_books/${{ matrix.title }} || echo "No LFS files"
+#
+#          echo "Book dir size:"
+#          du -sh public_books/${{ matrix.title }}
 
       - run: pnpm install
 
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
+          echo "$SSH_PRIVATE_KEY" | base64 --decode > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
         env:
@@ -144,7 +144,7 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
+          echo "$SSH_PRIVATE_KEY" | base64 --decode > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
         env:
