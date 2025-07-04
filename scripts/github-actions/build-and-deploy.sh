@@ -95,7 +95,11 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
         if [ -f "$path_to_remove" ]; then
           echo "Deleting: $path_to_remove"
           rm -f "$path_to_remove"
+        else
+          echo "File not found"
+          ls -al "$path_to_remove"
         fi
+        ls -al "$TMP_UNPACK_DIR/$BOOK_PATH/Lalka/assets"
       done < changed.txt
     else
       echo "No files to delete"
