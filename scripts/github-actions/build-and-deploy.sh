@@ -73,6 +73,8 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
   BASE_SHA=$(git rev-parse origin/main)
   CHANGED_FILES=$(git diff --name-only ${BASE_SHA} HEAD -- public public_books || true)
 
+  cat public_books/Lalka/assets/adwokat.png | head -n 1
+
   aws s3 cp "${S3_REMOTE_PATH}" "${ARCHIVE_NAME}"
   tar -xzf "$ARCHIVE_NAME" -C "$(dirname "$BOOK_PATH")"
 
