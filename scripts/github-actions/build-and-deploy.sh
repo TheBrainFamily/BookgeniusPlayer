@@ -98,15 +98,10 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
     else
       echo "No files to delete"
     fi
-    ls -al public_books/Lalka/assets
     rsync -a "$TMP_UNPACK_DIR/${BOOKS_DIR}/" "${BOOKS_DIR}/"
-    ls -al public_books/Lalka/assets
     GIT_LFS_SKIP_SMUDGE=1 git lfs pull --include="$(paste -sd, changed.txt)"
-    ls -al public_books/Lalka/assets
     rm changed.txt
     rm -rf "${TMP_UNPACK_DIR}"
-    echo "daniel"
-    ls -al public_books/Lalka/assets
   fi
 else
   echo "Making an archive..."
@@ -115,7 +110,6 @@ else
   aws s3 cp "${ARCHIVE_NAME}" "${S3_REMOTE_PATH}"
   rm "${ARCHIVE_NAME}"
 fi
-exit 0
 
 # build and deploy
 TARGET_DIRECTORY=$(echo "$BOOK_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[-_]//g')
