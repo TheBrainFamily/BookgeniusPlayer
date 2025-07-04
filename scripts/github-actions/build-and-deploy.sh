@@ -71,18 +71,12 @@ S3_REMOTE_PATH="s3://${DEPLOY_AWS_BUCKET}/main/${ARCHIVE_NAME}"
 if [[ "$BRANCH_NAME" != "main" ]]; then
   echo "dir size"
   du -kh -d 1 public_books
-  echo "file content before fetching"
-  cat public_books/Lalka/assets/adwokat.png | head -n 1
-  echo "*****"
   export GIT_LFS_SKIP_SMUDGE=1
   GIT_LFS_SKIP_SMUDGE=1 GIT_TRACE=1 git lfs install --skip-repo
   GIT_LFS_SKIP_SMUDGE=1 GIT_TRACE=1 git fetch origin main --depth=1
   BASE_SHA=$(git rev-parse origin/main)
   CHANGED_FILES=$(git diff --name-only ${BASE_SHA} HEAD -- public public_books || true)
-
-  echo "file content after fetching"
-  cat public_books/Lalka/assets/adwokat.png | head -n 1
-  echo "*****"
+  du -kh -d 1 public_books
 
   aws s3 cp "${S3_REMOTE_PATH}" "${ARCHIVE_NAME}"
   tar -xzf "$ARCHIVE_NAME" -C "$(dirname "$BOOK_PATH")"
@@ -97,7 +91,7 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
       # restore LFS pointers
       while IFS= read -r file; do
         echo "---------------> file: ${file}"
-        git checkout -f -- "$file"
+        GIT_TRACE=1 git checkout -f -- "$file"
         du -kh -d 1 public_books
         oid=$(grep "oid sha256" "$file" | awk '{print $2}')
         echo "SHA: $oid"
