@@ -9,6 +9,26 @@ on:
     types: [ opened, synchronize, reopened ]
 
 jobs:
+  env-vars:
+    runs-on: ubuntu-latest
+    environment: lucetius
+    outputs:
+      DEPLOY_HOST: ${{ steps.export.outputs.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ steps.export.outputs.DEPLOY_USER }}
+      DEPLOY_DOMAIN: ${{ steps.export.outputs.DEPLOY_DOMAIN }}
+      DEPLOY_ROOT_DIR: ${{ steps.export.outputs.DEPLOY_ROOT_DIR }}
+      DEPLOY_STATUS_DIR: ${{ steps.export.outputs.DEPLOY_STATUS_DIR }}
+      SSH_PRIVATE_KEY: ${{ steps.export.outputs.SSH_PRIVATE_KEY }}
+    steps:
+      - id: export
+        run: |
+          echo "DEPLOY_HOST=${{ vars.DEPLOY_HOST }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_USER=${{ vars.DEPLOY_USER }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_DOMAIN=${{ vars.DEPLOY_DOMAIN }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_ROOT_DIR=${{ vars.DEPLOY_ROOT_DIR }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_STATUS_DIR=${{ vars.DEPLOY_STATUS_DIR }}" >> $GITHUB_OUTPUT
+          echo "SSH_PRIVATE_KEY=${{ secrets.SSH_PRIVATE_KEY }}" >> $GITHUB_OUTPUT
+
   resolve-branch-name:
     runs-on: ubuntu-latest
     outputs:
@@ -45,20 +65,19 @@ jobs:
           printf 'matrix=%s\n' "$titles" >> "$GITHUB_OUTPUT"
 
   deploy:
-    needs: [resolve-branch-name,generate-matrix]
+    needs: [env-vars, resolve-branch-name,generate-matrix]
     runs-on: ubuntu-latest
-    environment: lucetius
     strategy:
       matrix:
         title: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
       fail-fast: false
 
     env:
-      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
-      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
-      DEPLOY_DOMAIN: ${{ vars.DEPLOY_DOMAIN }}
-      DEPLOY_ROOT_DIR: ${{ vars.DEPLOY_ROOT_DIR }}
-      DEPLOY_STATUS_DIR: ${{ vars.DEPLOY_STATUS_DIR }}
+      DEPLOY_HOST: ${{ needs.env-vars.outputs.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ needs.env-vars.outputs.DEPLOY_USER }}
+      DEPLOY_DOMAIN: ${{ needs.env-vars.outputs.DEPLOY_DOMAIN }}
+      DEPLOY_ROOT_DIR: ${{ needs.env-vars.outputs.DEPLOY_ROOT_DIR }}
+      DEPLOY_STATUS_DIR: ${{ needs.env-vars.outputs.DEPLOY_STATUS_DIR }}
       BRANCH_NAME: ${{ needs.resolve-branch-name.outputs.branch_name }}
 
     steps:
@@ -99,20 +118,19 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ needs.env-vars.outputs.SSH_PRIVATE_KEY }}
 
       - name: Run deployment script
         run: bash scripts/github-actions/build-and-deploy.sh ${{ matrix.title }} ${{ github.run_id }}
 
   book-links:
-    needs: deploy
+    needs: [env-vars, deploy]
     runs-on: ubuntu-latest
-    environment: lucetius
 
     env:
-      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
-      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
-      DEPLOY_STATUS_DIR: ${{ vars.DEPLOY_STATUS_DIR }}
+      DEPLOY_HOST: ${{ needs.env-vars.outputs.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ needs.env-vars.outputs.DEPLOY_USER }}
+      DEPLOY_STATUS_DIR: ${{ needs.env-vars.outputs.DEPLOY_STATUS_DIR }}
 
     steps:
       - name: Checkout repo
@@ -125,7 +143,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ needs.env-vars.outputs.SSH_PRIVATE_KEY }}
 
       - name: Display matrix summary
         run: bash scripts/github-actions/display-summary.sh ${{ github.run_id }}
