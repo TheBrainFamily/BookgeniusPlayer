@@ -98,10 +98,13 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
     else
       echo "No files to delete"
     fi
-    rm changed.txt
     ls -al public_books/Lalka/assets
     rsync -a "$TMP_UNPACK_DIR/${BOOKS_DIR}/" "${BOOKS_DIR}/"
     ls -al public_books/Lalka/assets
+    GIT_LFS_SKIP_SMUDGE=1 GIT_TRACE=1 git lfs pull --include="$(paste -sd, changed.txt)"
+    ls -al public_books/Lalka/assets
+    rm changed.txt
+    rm -rf "${TMP_UNPACK_DIR}"
   fi
 else
   echo "Making an archive..."
