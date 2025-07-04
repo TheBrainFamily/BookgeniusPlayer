@@ -22,6 +22,9 @@ jobs:
       DEPLOY_DOMAIN: ${{ steps.export.outputs.DEPLOY_DOMAIN }}
       DEPLOY_ROOT_DIR: ${{ steps.export.outputs.DEPLOY_ROOT_DIR }}
       DEPLOY_STATUS_DIR: ${{ steps.export.outputs.DEPLOY_STATUS_DIR }}
+      DEPLOY_AWS_ARN: ${{ steps.export.outputs.DEPLOY_AWS_ARN }}
+      DEPLOY_AWS_REGION: ${{ steps.export.outputs.DEPLOY_AWS_REGION }}
+      DEPLOY_AWS_BUCKET: ${{ steps.export.outputs.DEPLOY_AWS_BUCKET }}
       ssh_key_b64: ${{ steps.export.outputs.ssh_key_b64 }}
     steps:
       - id: export
@@ -31,6 +34,9 @@ jobs:
           echo "DEPLOY_DOMAIN=${{ vars.DEPLOY_DOMAIN }}" >> $GITHUB_OUTPUT
           echo "DEPLOY_ROOT_DIR=${{ vars.DEPLOY_ROOT_DIR }}" >> $GITHUB_OUTPUT
           echo "DEPLOY_STATUS_DIR=${{ vars.DEPLOY_STATUS_DIR }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_AWS_ARN=${{ vars.DEPLOY_AWS_ARN }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_AWS_REGION=${{ vars.DEPLOY_AWS_REGION }}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_AWS_BUCKET=${{ vars.DEPLOY_AWS_BUCKET }}" >> $GITHUB_OUTPUT
           echo "ssh_key_b64<<EOF" >> "$GITHUB_OUTPUT"
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
@@ -84,6 +90,8 @@ jobs:
       DEPLOY_DOMAIN: ${{ needs.env-vars.outputs.DEPLOY_DOMAIN }}
       DEPLOY_ROOT_DIR: ${{ needs.env-vars.outputs.DEPLOY_ROOT_DIR }}
       DEPLOY_STATUS_DIR: ${{ needs.env-vars.outputs.DEPLOY_STATUS_DIR }}
+      DEPLOY_AWS_BUCKET: ${{ needs.env-vars.outputs.DEPLOY_AWS_BUCKET }}
+      AWS_REGION: ${{ needs.env-vars.outputs.DEPLOY_AWS_REGION }}
       BRANCH_NAME: ${{ needs.resolve-branch-name.outputs.branch_name }}
 
     steps:
@@ -99,21 +107,22 @@ jobs:
           node-version: "20"
           cache: "pnpm"
 
-#      - name: Selective LFS pull
-#        run: |
-#          set -e
-#          git lfs install
-#          git lfs pull --include="public_books/${{ matrix.title }}"
-#          git lfs pull --include="public"
-#
-#          echo "Pointers:"
-#          grep -r "oid sha256" public_books/${{ matrix.title }} || echo "No pointers"
-#
-#          echo "LFS files:"
-#          git lfs ls-files | grep public_books/${{ matrix.title }} || echo "No LFS files"
-#
-#          echo "Book dir size:"
-#          du -sh public_books/${{ matrix.title }}
+      - name: Selective LFS pull
+        if: needs.resolve-branch-name.outputs.branch_name == 'main'
+        run: |
+          set -e
+          git lfs install
+          git lfs pull --include="public_books/${{ matrix.title }}"
+          git lfs pull --include="public"
+
+          echo "Pointers:"
+          grep -r "oid sha256" public_books/${{ matrix.title }} || echo "No pointers"
+
+          echo "LFS files:"
+          git lfs ls-files | grep public_books/${{ matrix.title }} || echo "No LFS files"
+
+          echo "Book dir size:"
+          du -sh public_books/${{ matrix.title }}
 
       - run: pnpm install
 
@@ -125,6 +134,12 @@ jobs:
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
         env:
           SSH_PRIVATE_KEY: ${{ needs.env-vars.outputs.ssh_key_b64 }}
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ needs.env-vars.outputs.DEPLOY_AWS_ARN }}
+          aws-region: ${{ needs.env-vars.outputs.DEPLOY_AWS_REGION }}
 
       - name: Run deployment script
         run: bash scripts/github-actions/build-and-deploy.sh ${{ matrix.title }} ${{ github.run_id }}
