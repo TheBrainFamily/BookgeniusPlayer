@@ -75,9 +75,10 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
   BASE_SHA=$(git rev-parse origin/main)
   CHANGED_FILES=$(git diff --name-only ${BASE_SHA} HEAD -- public public_books || true)
 
-  mkdir -p "${TMP_UNPACK_DIR}/${BOOK_PATH}"
+  mkdir -p "${TMP_UNPACK_DIR}/${BOOKS_DIR}"
   aws s3 cp "${S3_REMOTE_PATH}" "${TMP_UNPACK_DIR}/${ARCHIVE_NAME}"
-  tar -xzf "${TMP_UNPACK_DIR}/${ARCHIVE_NAME}" -C "${TMP_UNPACK_DIR}/${BOOK_PATH}"
+  tar -xzf "${TMP_UNPACK_DIR}/${ARCHIVE_NAME}" -C "${TMP_UNPACK_DIR}/${BOOKS_DIR}"
+  find "${TMP_UNPACK_DIR}" -print
 
   MATCHED=$(echo "$CHANGED_FILES" | grep "^$BOOK_PATH" || true)
 
