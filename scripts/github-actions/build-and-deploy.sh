@@ -87,8 +87,9 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
       while IFS= read -r file; do
         git checkout -- "$file"
       done < changed.txt
-
-      git lfs pull --include="$(paste -sd, changed.txt)"
+      oid=$(grep "oid sha256" public_books/Lalka/assets/adwokat.png | awk '{print $2}')
+      echo "oid ${oid}"
+      GIT_TRACE=1 git lfs pull --include="$(paste -sd, changed.txt)"
     else
       echo "No LFS files to pull"
     fi
