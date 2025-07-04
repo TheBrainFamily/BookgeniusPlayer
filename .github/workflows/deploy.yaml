@@ -8,6 +8,10 @@ on:
   pull_request:
     types: [ opened, synchronize, reopened ]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   env-vars:
     runs-on: ubuntu-latest
@@ -147,3 +151,9 @@ jobs:
 
       - name: Display matrix summary
         run: bash scripts/github-actions/display-summary.sh ${{ github.run_id }}
+
+      - name: Create or update PR comment with deployment summary
+        if: github.event_name == 'pull_request'
+        run: bash scripts/github-actions/comment-pr.sh ${{ github.event.pull_request.number }} ${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
