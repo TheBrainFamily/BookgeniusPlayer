@@ -87,6 +87,9 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
       cat changed.txt
       while IFS= read -r file; do
         path_to_remove="${TMP_UNPACK_DIR}/$file"
+        echo "daniel: $path_to_remove"
+        ls -al "$TMP_UNPACK_DIR"
+        ls -al "$TMP_UNPACK_DIR/$BOOK_PATH"
         if [ -f "$path_to_remove" ]; then
           echo "Deleting: $path_to_remove"
           rm -f "$path_to_remove"
