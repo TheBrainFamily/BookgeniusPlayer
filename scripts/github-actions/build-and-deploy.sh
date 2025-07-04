@@ -85,7 +85,7 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
 
       # restore LFS pointers
       while IFS= read -r file; do
-        git checkout -- "$file"
+        git restore "$file"
       done < changed.txt
       oid=$(grep "oid sha256" public_books/Lalka/assets/adwokat.png | awk '{print $2}')
       echo "oid ${oid}"
