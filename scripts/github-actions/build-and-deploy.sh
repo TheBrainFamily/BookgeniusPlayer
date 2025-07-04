@@ -85,11 +85,16 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
 
       # restore LFS pointers
       while IFS= read -r file; do
-        git restore "$file"
+        git checkout -f -- "$file"
+        oid=$(grep "oid sha256" "$file" | awk '{print $2}')
+        if [[ -n "$oid" ]]; then
+          echo "SHA: $oid"
+          git lfs fetch --object-id "$oid"
+          git lfs checkout --include="$file"
+        else
+          echo "File  $file is not a LFS pointer"
+        fi
       done < changed.txt
-      oid=$(grep "oid sha256" public_books/Lalka/assets/adwokat.png | awk '{print $2}')
-      echo "oid ${oid}"
-      GIT_TRACE=1 git lfs pull --include="$(paste -sd, changed.txt)"
     else
       echo "No LFS files to pull"
     fi
@@ -102,6 +107,7 @@ else
   aws s3 cp "${ARCHIVE_NAME}" "${S3_REMOTE_PATH}"
   rm "${ARCHIVE_NAME}"
 fi
+exit 0
 
 # build and deploy
 TARGET_DIRECTORY=$(echo "$BOOK_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[-_]//g')
