@@ -328,12 +328,7 @@
 }
 
 .search-highlight {
-  background-color: #ffff66;
-  border-radius: 3px;
-  padding: 1px 2px;
-  box-shadow: 0 0 4px rgba(255, 255, 0, 0.5);
-  transition: all 0.3s ease;
-  animation: searchHighlightFade 4s ease-in-out forwards;
+  @apply bg-yellow-300 text-black rounded-sm;
 }
 
 .dark .search-highlight {

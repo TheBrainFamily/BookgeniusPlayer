@@ -2,9 +2,8 @@ import { useEffect, useMemo } from "react";
 import debounce from "lodash.debounce";
 
 import { useSearchModal } from "@/stores/modals/searchModal.store";
-import { performLocalDOMSearch, performUnifiedSearch } from "@/searchModal";
+import { performCachedSearch, performUnifiedSearch } from "@/searchModal";
 import { Location } from "@/state/LocationContext";
-import { CURRENT_BOOK } from "@/consts";
 import { getSavedLocation } from "@/helpers/paragraphsNavigation";
 
 export const useSearchLogic = () => {
@@ -15,7 +14,7 @@ export const useSearchLogic = () => {
    * ------------------------------------------------------------------ */
   const debouncedPerformUnifiedSearch = useMemo(() => {
     /**
-     * lodash.debounce doesn’t natively return a promise you can await,
+     * lodash.debounce doesn't natively return a promise you can await,
      * so we wrap it: we pass resolve/reject into the debounced callback
      * and build a new Promise around it.
      */
@@ -23,15 +22,15 @@ export const useSearchLogic = () => {
       (resolve: (v: unknown) => void, reject: (e: unknown) => void, q: string, loc: Location) => {
         performUnifiedSearch(q, loc).then(resolve).catch(reject);
       },
-      1000, // ← one-second “pause after typing” window
+      1000, // ← one-second "pause after typing" window
       { leading: false, trailing: true },
     );
 
     // The wrapper we will actually call from our code
     const wrapped = (q: string, loc: Location) => new Promise((res, rej) => debouncedFn(res, rej, q, loc));
 
-    // Re-expose lodash’s .cancel for cleanup
-    // (Type-ignore because lodash types don’t know about it here)
+    // Re-expose lodash's .cancel for cleanup
+    // (Type-ignore because lodash types don't know about it here)
     wrapped.cancel = debouncedFn.cancel;
 
     return wrapped;
@@ -51,7 +50,7 @@ export const useSearchLogic = () => {
   const performSearch = useMemo(() => {
     let latestSearchId = 0;
 
-    return async (searchQuery: string, location: Location, bookSlug: string) => {
+    return async (searchQuery: string, location: Location) => {
       if (!searchQuery.trim()) {
         setResults({ header: "Please enter a search term.", items: [], isLoading: false });
         return;
@@ -61,10 +60,15 @@ export const useSearchLogic = () => {
 
       try {
         /* ---------- 2a. local DOM search: runs immediately ---------- */
-        let results = await performLocalDOMSearch(searchQuery, location, bookSlug);
+        let results = performCachedSearch(searchQuery, location);
+
+        // If the cache is still indexing, it will return isLoading: true
+        if (results.isLoading) {
+          setResults(results);
+        }
 
         /* ---------- 2b. remote search (only if local came up empty) -- */
-        if (results.items.length === 0) {
+        if (results.items.length === 0 && !results.isLoading) {
           setResults({ header: "Searching…", items: [], isLoading: true });
 
           // @ts-expect-error(this is wrong typing) TODO fix this if you want?
@@ -94,7 +98,7 @@ export const useSearchLogic = () => {
   useEffect(() => {
     if (isOpen && query.trim()) {
       const latestLocation = getSavedLocation();
-      debouncedTriggerSearch(query, latestLocation, CURRENT_BOOK);
+      debouncedTriggerSearch(query, latestLocation);
     } else if (isOpen && !query.trim()) {
       setResults({ header: "Please enter a search term.", items: [], isLoading: false });
     }

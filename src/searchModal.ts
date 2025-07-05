@@ -1,6 +1,7 @@
 import { searchParagraphsFromServer } from "./utils/searchParagraphsFromServer";
 import type { Location } from "@/state/LocationContext";
 import { getCharactersData } from "./genericBookDataGetters/getCharactersData";
+import { useBookContentStore } from "./stores/bookContent.store";
 
 export interface SearchResultItemData {
   chapter: number;
@@ -64,7 +65,7 @@ export async function performUnifiedSearch(
       paragraphNumber: match.paragraphNumber,
       summary: match.summary,
       text: createContextualSummary(match.text, query, 75),
-      id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}-${Date.now()}`,
+      id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}}`,
     }));
 
     return { header, items, isLoading: false };
@@ -111,153 +112,51 @@ const createContextualSummary = (fullText: string, query: string, maxLength: num
   return highlightMatchedWords(summary, query);
 };
 
-export async function performLocalDOMSearch(query: string, currentLocation: Location, bookSlug?: string): Promise<SearchResultsData> {
-  // Changed return type
+export function performCachedSearch(query: string, currentLocation: Location): SearchResultsData {
+  const { textCache, isInitialized } = useBookContentStore.getState();
+
   const items: SearchResultItemData[] = [];
   const queryLower = query.toLowerCase();
-  let resultIndex = 0; // For unique ID generation
 
-  try {
-    // Get the bookSlug from parameter or from the current page
-    let actualBookSlug = bookSlug;
-    if (!actualBookSlug) {
-      const existingChapterElement = document.querySelector("[data-book-slug]");
-      if (!existingChapterElement) {
-        return { header: `Error: No chapters found in DOM for search.`, items: [], isLoading: false };
-      }
-      actualBookSlug = existingChapterElement.getAttribute("data-book-slug") || "book";
-    }
-
-    // Create a temporary container for search chapters
-    let searchContainer = document.getElementById("search-chapters-container");
-    if (!searchContainer) {
-      searchContainer = document.createElement("div");
-      searchContainer.id = "search-chapters-container";
-      searchContainer.style.display = "none"; // Hide from view
-      document.body.appendChild(searchContainer);
-    }
-
-    // --------- React Dynamic Chapter Loading --------- //
-    // This is a part of code used for React dynamic chapter loading
-    // It was commented out in the original code, but we can keep it here for future
-
-    // Load chapters that aren't already in the DOM
-    // const chaptersToLoad: number[] = [];
-    // const existingChapters = new Set<number>();
-
-    // Check which chapters are already loaded
-    // document.querySelectorAll("section[data-chapter]").forEach((section) => {
-    //   const chapterNum = parseInt(section.getAttribute("data-chapter") || "0");
-    //   if (chapterNum > 0) {
-    //     existingChapters.add(chapterNum);
-    //   }
-    // });
-
-    // Determine which chapters need to be loaded for search
-    // for (let i = 1; i <= currentLocation.chapter; i++) {
-    //   if (!existingChapters.has(i)) {
-    //     chaptersToLoad.push(i);
-    //   }
-    // }
-
-    // Load missing chapters into the search container
-    // const loadPromises = chaptersToLoad.map(async (chapterId) => {
-    //   try {
-    //     // Import the chapter module
-    //     const module = await import(`./data/books/${actualBookSlug}/chapters/Chapter${chapterId}.tsx`);
-    //     const ChapterComponent = module.default || module[`Chapter${chapterId}`];
-
-    //     if (ChapterComponent && typeof ChapterComponent === "function") {
-    //       // Create a temporary div to render the chapter
-    //       const tempDiv = document.createElement("div");
-    //       tempDiv.setAttribute("data-search-chapter", chapterId.toString());
-    //       searchContainer!.appendChild(tempDiv);
-
-    //       // Use React to render the component
-    //       const { createRoot } = await import("react-dom/client");
-    //       const root = createRoot(tempDiv);
-    //       const React = await import("react");
-    //       root.render(React.createElement(ChapterComponent));
-
-    //       // Wait a bit for React to render
-    //       await new Promise((resolve) => setTimeout(resolve, 50));
-    //     }
-    //   } catch (error) {
-    //     console.error(`Failed to load chapter ${chapterId} for search:`, error);
-    //   }
-    // });
-
-    // Wait for all chapters to load
-    // await Promise.all(loadPromises);
-
-    // --------- React Dynamic Chapter Loading --------- //
-
-    // Now perform the search across all chapters (both existing and newly loaded)
-    for (let chapterIndex = 1; chapterIndex <= currentLocation.chapter; chapterIndex++) {
-      // Look in both the normal content and the search container
-      const selectors = [`section[data-chapter="${chapterIndex}"]`, `[data-search-chapter="${chapterIndex}"] section[data-chapter="${chapterIndex}"]`];
-
-      let pageElement: Element | null = null;
-      for (const selector of selectors) {
-        pageElement = document.querySelector(selector);
-        if (pageElement) break;
-      }
-
-      if (!pageElement) continue;
-
-      const paragraphs = pageElement.querySelectorAll<HTMLElement>(`[data-index]`);
-
-      paragraphs.forEach((paragraphElement) => {
-        const paragraphNumberAttr = paragraphElement.getAttribute("data-index");
-        if (!paragraphNumberAttr) return;
-
-        const paragraphNumber = parseInt(paragraphNumberAttr, 10);
-
-        // Skip paragraphs beyond the current one in the current chapter
-        if (chapterIndex === currentLocation.chapter && paragraphNumber > currentLocation.paragraph) {
-          return;
-        }
-
-        const paragraphClone = paragraphElement.cloneNode(true) as HTMLElement;
-
-        // Remove anchor tags to get clean text
-        const anchors = paragraphClone.querySelectorAll("a.anchor");
-        anchors.forEach((anchor) => anchor.remove());
-
-        const paragraphText = (paragraphClone.textContent || "")
-          .replace(/[\n\r]/g, " ")
-          .replace(/\s+/g, " ")
-          .trim();
-
-        if (paragraphText.toLowerCase().includes(queryLower)) {
-          const fullText = paragraphText;
-          const summaryText = createContextualSummary(fullText, query, 150);
-
-          items.push({
-            chapter: chapterIndex,
-            paragraphNumber: paragraphNumber,
-            summary: summaryText,
-            id: `local-dom-search-${chapterIndex}-${paragraphNumber}-${resultIndex++}-${Date.now()}`,
-          });
-        }
-      });
-    }
-  } catch (error) {
-    console.error("Error in performLocalDOMSearch:", error);
-    // Return SearchResultsData structure on error
-    return { header: `Error performing local search for "${query}".`, items: [], isLoading: false };
+  if (!query.trim()) {
+    return { header: "Please enter a search term.", items: [], isLoading: false };
   }
 
-  // Construct SearchResultsData object for successful search
+  if (!isInitialized) {
+    return { header: "Book content is being indexed, please try again shortly.", items: [], isLoading: true };
+  }
+
+  // Iterate over cached chapters
+  for (const chapterId in textCache) {
+    const chapterIdNum = parseInt(chapterId, 10);
+    // Only search up to the current location
+    if (chapterIdNum > currentLocation.chapter) continue;
+
+    const chapterCache = textCache[chapterIdNum];
+    // Iterate over cached paragraphs
+    for (const pIndex in chapterCache) {
+      const paragraphNumber = parseInt(pIndex, 10);
+
+      if (chapterIdNum === currentLocation.chapter && paragraphNumber > currentLocation.paragraph) {
+        continue;
+      }
+
+      const paragraphText = chapterCache[pIndex];
+      if (paragraphText.toLowerCase().includes(queryLower)) {
+        items.push({
+          chapter: chapterIdNum,
+          paragraphNumber: paragraphNumber,
+          summary: createContextualSummary(paragraphText, query),
+          id: `cached-search-${chapterIdNum}-${paragraphNumber}}-`,
+        });
+      }
+    }
+  }
+
   const totalMatches = items.length;
-  let header = "";
-  if (totalMatches > 0) {
-    header = `Found ${totalMatches} local match(es) for "${query}" (context: Ch. ${currentLocation.chapter}, P. ${currentLocation.paragraph})`;
-  } else {
-    header = `No local matches found for "${query}" (context: Ch. ${currentLocation.chapter}, P. ${currentLocation.paragraph})`;
-  }
+  const header = totalMatches > 0 ? `Found ${totalMatches} match(es) in read text for "${query}"` : `No matches found in read text for "${query}"`;
 
-  return { header, items, isLoading: false };
+  return { header, items: items.sort((a, b) => a.chapter - b.chapter || a.paragraphNumber - b.paragraphNumber), isLoading: false };
 }
 
 export function cleanupSearchChapters(): void {
@@ -358,7 +257,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
               paragraphNumber: paragraph,
               summary: highlightMatchedWords(summaryText, characterSlug),
               text: highlightMatchedWords(displayText, characterSlug),
-              id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}-${Date.now()}`,
+              id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}}`,
             });
           }
         });
