@@ -28,11 +28,15 @@ import { useElementVisibility } from "./hooks/useElementVisibility";
 import { setKnownVideos } from "@/utils/getFilePathsForName";
 import { getKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles";
 import { useQuiz } from "./hooks/useQuiz";
+import { useTextCacheManager } from "./hooks/useTextCacheManager";
 
 function Shell() {
   setKnownVideos(getKnownVideoFiles());
   useBookContent("content-container");
   useElementVisibility();
+
+  /* text cache manager */
+  useTextCacheManager();
 
   /* dynamic visual hooks */
   useCutScene();
