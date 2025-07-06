@@ -77,25 +77,12 @@ const ProgressBars: React.FC = () => {
 
   return (
     <>
-      <div
-        style={{ position: "fixed", top: 0, left: 0, right: 0, height: "3px", backgroundColor: "rgba(139, 69, 19, 0.2)", zIndex: 9999, boxShadow: "0 2px 5px rgba(0, 0, 0, 0.4)" }}
-      >
-        <div style={{ height: "100%", width: `${chapterProgress}%`, background: "linear-gradient(to right, #8B4513, #CD853F)", transition: "width 0.8s ease-out" }} />
+      <div style={{ position: "fixed", top: 0, left: 0, right: 0, height: "10px", backgroundColor: "rgba(139, 69, 19, 0.2)", zIndex: 9999 }}>
+        <div style={{ height: "100%", width: `${chapterProgress}%`, background: "linear-gradient(to right, #8B4513, #CD853F)", transition: "width 0.8s ease-out", opacity: 0.7 }} />
       </div>
 
-      <div
-        style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: "3px",
-          backgroundColor: "rgba(139, 69, 19, 0.2)",
-          zIndex: 9999,
-          boxShadow: "0 -2px 5px rgba(0, 0, 0, 0.4)",
-        }}
-      >
-        <div style={{ height: "100%", width: `${bookProgress}%`, background: "linear-gradient(to right, #A0522D, #F4A460)", transition: "width 0.8s ease-out" }} />
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, height: "10px", backgroundColor: "rgba(139, 69, 19, 0.2)", zIndex: 9999 }}>
+        <div style={{ height: "100%", width: `${bookProgress}%`, background: "linear-gradient(to right, #A0522D, #F4A460)", transition: "width 0.8s ease-out", opacity: 0.7 }} />
       </div>
     </>
   );
