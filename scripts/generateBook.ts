@@ -10,7 +10,7 @@ import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
 
 async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
-  const { bookSlug, bookLanguage, bookForm, xmlDoc } = parseBookXmlData(bookDirectoryPath);
+  const { bookSlug, bookLanguage, bookForm, bookSimplifiedIconColor, xmlDoc } = parseBookXmlData(bookDirectoryPath);
 
   // Ensure output directory exists
   const bookOutputPath = path.resolve("src", "books", bookSlug);
@@ -21,7 +21,7 @@ async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: stri
   // Generate files
   generateKnownVideoFiles(bookDirectoryPath, bookOutputPath);
   generateAudiobookTracksFile(bookDirectoryPath, bookOutputPath);
-  generateBookDataFiles(bookDirectoryPath, bookSlug, bookLanguage, bookForm, xmlDoc);
+  generateBookDataFiles(bookDirectoryPath, bookSlug, bookLanguage, bookForm, bookSimplifiedIconColor, xmlDoc);
 
   // Wait a moment for file generation to complete
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -35,7 +35,7 @@ async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: stri
   return { bookSlug: bookData.slug, bookTitle: bookData.metadata.title, bookLanguage };
 }
 
-function parseBookXmlData(bookDirectoryPath: string): { bookSlug: string; bookLanguage: string; bookForm: string; xmlDoc: Document } {
+function parseBookXmlData(bookDirectoryPath: string): { bookSlug: string; bookLanguage: string; bookForm: string; bookSimplifiedIconColor: string; xmlDoc: Document } {
   const bookXmlPath = `${bookDirectoryPath}/book.xml`;
   if (!fs.existsSync(bookXmlPath)) {
     throw new Error(`book.xml not found at ${bookXmlPath}`);
@@ -72,7 +72,13 @@ function parseBookXmlData(bookDirectoryPath: string): { bookSlug: string; bookLa
     bookForm = bookFormElements[0].textContent.trim().toLowerCase();
   }
 
-  return { bookSlug, bookLanguage, bookForm, xmlDoc };
+  const bookSimplifiedIconColorElements = xmlDoc.getElementsByTagName("BookSimplifiedIconColor");
+  let bookSimplifiedIconColor = "#4CAF50";
+  if (bookSimplifiedIconColorElements.length > 0 && bookSimplifiedIconColorElements[0].textContent) {
+    bookSimplifiedIconColor = bookSimplifiedIconColorElements[0].textContent.trim();
+  }
+
+  return { bookSlug, bookLanguage, bookForm, bookSimplifiedIconColor, xmlDoc };
 }
 
 function generateKnownVideoFiles(bookDirectoryPath: string, bookOutputPath: string): void {
@@ -118,7 +124,7 @@ export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
   fs.writeFileSync(path.join(bookOutputPath, "getAudiobookTracksForBook.ts"), getAudiobookTracksForBookContent, "utf-8");
 }
 
-function generateBookDataFiles(bookDirectoryPath: string, bookSlug: string, bookLang: string, bookForm: string, xmlDoc: Document): void {
+function generateBookDataFiles(bookDirectoryPath: string, bookSlug: string, bookLang: string, bookForm: string, bookSimplifiedIconColor: string, xmlDoc: Document): void {
   const bookOutputPath = path.resolve("src", "books", bookSlug);
 
   // --- Generate getBookStringified.ts ---
@@ -200,7 +206,7 @@ export const bookData: BookData = {
     secondaryColor: "#1976D2",
     tertiaryColor: "#90CAF9",
     quaternaryColor: "#0D47A1",
-    simplifiedIconColor: "#4CAF50"
+    simplifiedIconColor: "${bookSimplifiedIconColor}"
   },
   hasAudiobook: ${hasAudiobook},
   bookStringified: getBookStringified(),
