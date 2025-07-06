@@ -29,6 +29,7 @@ import { setKnownVideos } from "@/utils/getFilePathsForName";
 import { getKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles";
 import { useQuiz } from "./hooks/useQuiz";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
+import ProgressBars from "@/components/ProgressBars";
 
 function Shell() {
   setKnownVideos(getKnownVideoFiles());
@@ -51,6 +52,7 @@ function Shell() {
 
   return (
     <>
+      <ProgressBars />
       <Header />
       <NoteLinkBlinker />
       <ContentContainerWrapper /> {/* Keep for animations */}
