@@ -20,6 +20,7 @@ export interface TrackState {
 // --- Configuration ---
 const FADE_DURATION_SECONDS = 8.0;
 const PRE_END_TRANSITION_TRIGGER_SECONDS = 4.0; // Time before track end to trigger transition
+const VOLUME_SCALE = 1.737;
 
 // --- Module-level State ---
 let audioContext: AudioContext | null = null;
@@ -108,8 +109,11 @@ export async function initAudioContext(): Promise<boolean> {
 
       const isInitiallyMuted = (storedMutedStr !== null ? storedMutedStr : defaultIsMutedSerialized) === "true";
 
+      // Apply non-linear scaling for the initial volume
+      const scaledInitialVolume = Math.pow(initialVolume, VOLUME_SCALE);
+
       // Set initial gains based on localStorage values
-      masterGainNode.gain.value = isInitiallyMuted ? 0 : initialVolume;
+      masterGainNode.gain.value = isInitiallyMuted ? 0 : scaledInitialVolume;
       backgroundGainNode.gain.value = initialBalance;
       audiobookGainNode.gain.value = 1.0 - initialBalance;
       // --- End of localStorage initialization ---
@@ -932,8 +936,13 @@ export function setMasterVolume(volume: number): boolean {
   // Clamp volume between 0 and 1
   const safeVolume = Math.max(0, Math.min(1, volume));
 
+  // Apply a non-linear scale to make the volume control more perceptual.
+  // This makes the lower end of the slider have a finer control.
+  // The value 1.737 is chosen so that a slider value of 0.5 corresponds to a gain of ~0.3.
+  const scaledVolume = Math.pow(safeVolume, VOLUME_SCALE);
+
   try {
-    masterGainNode.gain.value = safeVolume;
+    masterGainNode.gain.value = scaledVolume;
     return true;
   } catch (e) {
     console.error("Error setting master volume:", e);
