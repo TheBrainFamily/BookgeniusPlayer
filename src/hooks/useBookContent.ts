@@ -52,6 +52,10 @@ export function useBookContent(containerId: string) {
             span.innerHTML = replaceXmlTagsIntoHtmlTags(span.getAttribute("data-original-sentence") || "");
             span.setAttribute("data-current-score", "100");
             span.setAttribute("data-simplified", "false");
+            span.querySelectorAll('[data-click-listener-attached="true"]').forEach((el) => {
+              el.removeAttribute("data-click-listener-attached");
+            });
+
             activateCharacterInteractions(span as HTMLElement, openCharacterDetailsModal);
 
             return;
