@@ -88,8 +88,8 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
 
   if [[ -n "$MATCHED" ]]; then
     echo "$MATCHED" > changed.txt
+    cat changed.txt
     if [[ -s changed.txt  && "$S3_NOT_FOUND" -eq 0 ]]; then
-      cat changed.txt
       while IFS= read -r file; do
         path_to_remove="${TMP_UNPACK_DIR}/$file"
         if [ -f "$path_to_remove" ]; then
@@ -99,6 +99,8 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
           echo "File not found $path_to_remove"
         fi
       done < changed.txt
+    fi
+    if [[ "$S3_NOT_FOUND" -eq 0 ]]; then
       rsync -a "$TMP_UNPACK_DIR/${BOOKS_DIR}/" "${BOOKS_DIR}/"
       rm -rf "${TMP_UNPACK_DIR}"
     fi
