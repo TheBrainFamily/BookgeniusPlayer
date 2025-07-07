@@ -77,9 +77,9 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
   CHANGED_FILES=$(git diff --name-only ${BASE_SHA} HEAD -- public public_books || true)
   MATCHED=$(echo "$CHANGED_FILES" | grep "^$BOOK_PATH" || true)
 
-  S3_NOT_FOUND=$(aws s3api head-object --bucket "$DEPLOY_AWS_BUCKET" --key "$S3_KEY" >/dev/null 2>&1 && echo 0 || echo 1)
+  S3_OBJECT_FOUND=$(aws s3api head-object --bucket "$DEPLOY_AWS_BUCKET" --key "$S3_KEY" >/dev/null 2>&1 && echo 1 || echo 0)
 
-  if [ "$S3_NOT_FOUND" -eq 0 ]; then
+  if [ "$S3_OBJECT_FOUND" -eq 1 ]; then
     mkdir -p "${TMP_UNPACK_DIR}/${BOOKS_DIR}"
     aws s3 cp "${S3_REMOTE_PATH}" "${ARCHIVE_NAME}"
     tar -xzf "${ARCHIVE_NAME}" -C "${TMP_UNPACK_DIR}/${BOOKS_DIR}"
@@ -89,7 +89,7 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
   if [[ -n "$MATCHED" ]]; then
     echo "$MATCHED" > changed.txt
     cat changed.txt
-    if [[ -s changed.txt  && "$S3_NOT_FOUND" -eq 0 ]]; then
+    if [[ -s changed.txt  && "$S3_OBJECT_FOUND" -eq 1 ]]; then
       while IFS= read -r file; do
         path_to_remove="${TMP_UNPACK_DIR}/$file"
         if [ -f "$path_to_remove" ]; then
