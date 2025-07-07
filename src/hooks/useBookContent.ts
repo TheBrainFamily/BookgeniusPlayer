@@ -48,6 +48,12 @@ export function useBookContent(containerId: string) {
           if (!simplifiedSentence) {
             console.warn(`No further simplification available for ${currentSentenceId}`);
             // We can add a visual cue here later if needed.
+
+            span.innerHTML = replaceXmlTagsIntoHtmlTags(span.getAttribute("data-original-sentence") || "");
+            span.setAttribute("data-current-score", "100");
+            span.setAttribute("data-simplified", "false");
+            activateCharacterInteractions(span as HTMLElement, openCharacterDetailsModal);
+
             return;
           }
 
