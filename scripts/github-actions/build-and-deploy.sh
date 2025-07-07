@@ -68,24 +68,28 @@ fi
 # preparing assets files // for now only for branches
 ARCHIVE_NAME="${BOOK_NAME}.tar.gz"
 TMP_UNPACK_DIR="tmp_unpack"
-S3_REMOTE_PATH="s3://${DEPLOY_AWS_BUCKET}/main/${ARCHIVE_NAME}"
+S3_KEY="main/${ARCHIVE_NAME}"
+S3_REMOTE_PATH="s3://${DEPLOY_AWS_BUCKET}/${S3_KEY}"
 if [[ "$BRANCH_NAME" != "main" ]]; then
   GIT_LFS_SKIP_SMUDGE=1 git lfs install --skip-repo
   GIT_LFS_SKIP_SMUDGE=1 git fetch origin main --depth=1
   BASE_SHA=$(git rev-parse origin/main)
   CHANGED_FILES=$(git diff --name-only ${BASE_SHA} HEAD -- public public_books || true)
-
-  mkdir -p "${TMP_UNPACK_DIR}/${BOOKS_DIR}"
-  aws s3 cp "${S3_REMOTE_PATH}" "${ARCHIVE_NAME}"
-  tar -xzf "${ARCHIVE_NAME}" -C "${TMP_UNPACK_DIR}/${BOOKS_DIR}"
-  rm "${ARCHIVE_NAME}"
-
   MATCHED=$(echo "$CHANGED_FILES" | grep "^$BOOK_PATH" || true)
+
+  S3_OBJECT_FOUND=$(aws s3api head-object --bucket "$DEPLOY_AWS_BUCKET" --key "$S3_KEY" >/dev/null 2>&1 && echo 1 || echo 0)
+
+  if [ "$S3_OBJECT_FOUND" -eq 1 ]; then
+    mkdir -p "${TMP_UNPACK_DIR}/${BOOKS_DIR}"
+    aws s3 cp "${S3_REMOTE_PATH}" "${ARCHIVE_NAME}"
+    tar -xzf "${ARCHIVE_NAME}" -C "${TMP_UNPACK_DIR}/${BOOKS_DIR}"
+    rm "${ARCHIVE_NAME}"
+  fi
 
   if [[ -n "$MATCHED" ]]; then
     echo "$MATCHED" > changed.txt
-    if [[ -s changed.txt ]]; then
-      cat changed.txt
+    cat changed.txt
+    if [[ -s changed.txt  && "$S3_OBJECT_FOUND" -eq 1 ]]; then
       while IFS= read -r file; do
         path_to_remove="${TMP_UNPACK_DIR}/$file"
         if [ -f "$path_to_remove" ]; then
@@ -95,13 +99,11 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
           echo "File not found $path_to_remove"
         fi
       done < changed.txt
-    else
-      echo "No files to delete"
+      rsync -a "$TMP_UNPACK_DIR/${BOOKS_DIR}/" "${BOOKS_DIR}/"
+      rm -rf "${TMP_UNPACK_DIR}"
     fi
-    rsync -a "$TMP_UNPACK_DIR/${BOOKS_DIR}/" "${BOOKS_DIR}/"
     GIT_LFS_SKIP_SMUDGE=1 git lfs pull --include="$(paste -sd, changed.txt)"
     rm changed.txt
-    rm -rf "${TMP_UNPACK_DIR}"
   fi
 else
   echo "Making an archive..."
