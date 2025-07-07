@@ -115,7 +115,7 @@ function normalizeSrcForInlineAvatar(src: string): string {
  */
 function createMediaElement(
   placeholder: HTMLSpanElement,
-  openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void,
+  openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
 ): HTMLVideoElement | HTMLImageElement | null {
   const characterSlug = placeholder.dataset.character;
   const isTalking = placeholder.dataset.isTalking === "true";
@@ -135,9 +135,10 @@ function createMediaElement(
 
   // Configure and return the element
   if (element && finalSrc) {
-    element.addEventListener("click", () => {
+    element.addEventListener("click", (e) => {
+      e.stopPropagation();
       // Pass the original talkingSrc to the modal, not the normalized finalSrc
-      openCharacterDetailsModal(characterSlug, isTalking, talkingSrc);
+      openCharacterDetailsModal(characterSlug, isTalking && !!talkingSrc, talkingSrc);
     });
     element.src = finalSrc;
     element.classList.add("inline-avatar");
@@ -152,10 +153,9 @@ function createMediaElement(
   return null;
 }
 
-export function highlightCharacter(character: HTMLSpanElement, openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void) {
+export function highlightCharacter(character: HTMLSpanElement, openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void) {
   const characterSlug = character.dataset.character;
   const listeningSrc = character.dataset.srcListening;
-  const isTalking = character.dataset.isTalking === "true";
 
   // Check if a listener has already been attached
   if (character.dataset.clickListenerAttached === "true") {
@@ -170,7 +170,7 @@ export function highlightCharacter(character: HTMLSpanElement, openCharacterDeta
       document.body.removeChild(avatar);
     });
 
-    openCharacterDetailsModal(characterSlug, isTalking, listeningSrc);
+    openCharacterDetailsModal(characterSlug, true, listeningSrc);
   });
 
   // Add hover functionality to show floating avatar
@@ -249,7 +249,7 @@ function activateMediaInRange(
   startParagraph: number,
   endChapter: number,
   endParagraph: number,
-  openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void,
+  openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
 ) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
 
@@ -387,7 +387,7 @@ let rootRectChangedTimes = 0;
 let previousRootRectWidth = 0;
 
 export function setupPageObserver(
-  openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void,
+  openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
 ): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number } | null {
   const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
 
