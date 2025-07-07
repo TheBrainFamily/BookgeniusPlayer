@@ -99,8 +99,6 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
           echo "File not found $path_to_remove"
         fi
       done < changed.txt
-    fi
-    if [[ "$S3_NOT_FOUND" -eq 0 ]]; then
       rsync -a "$TMP_UNPACK_DIR/${BOOKS_DIR}/" "${BOOKS_DIR}/"
       rm -rf "${TMP_UNPACK_DIR}"
     fi
