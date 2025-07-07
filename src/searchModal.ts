@@ -200,13 +200,7 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
       const wordsBefore = [];
       let beforeElement = current.previousSibling;
       while (beforeElement && wordsBefore.length < 10) {
-        if (beforeElement.nodeType === Node.TEXT_NODE) {
-          const words = beforeElement.textContent
-            .trim()
-            .split(/\s+/)
-            .filter((w) => w);
-          wordsBefore.unshift(...words.slice(-10));
-        } else if (beforeElement.nodeType === Node.ELEMENT_NODE) {
+        if (beforeElement.nodeType === Node.TEXT_NODE || beforeElement.nodeType === Node.ELEMENT_NODE) {
           const words = beforeElement.textContent
             .trim()
             .split(/\s+/)
@@ -222,13 +216,7 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
       const wordsAfter = [];
       let afterElement = current.nextSibling;
       while (afterElement && wordsAfter.length < 10) {
-        if (afterElement.nodeType === Node.TEXT_NODE) {
-          const words = afterElement.textContent
-            .trim()
-            .split(/\s+/)
-            .filter((w) => w);
-          wordsAfter.push(...words.slice(0, 10));
-        } else if (afterElement.nodeType === Node.ELEMENT_NODE) {
+        if (afterElement.nodeType === Node.TEXT_NODE || afterElement.nodeType === Node.ELEMENT_NODE) {
           const words = afterElement.textContent
             .trim()
             .split(/\s+/)
@@ -283,8 +271,6 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
           const paragraphInnerHTML = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`).innerHTML;
 
           const sentence = getSentenceWithCharacterSpan(paragraphInnerHTML, characterSlug);
-          console.log("STOJANISKO", sentence);
-
           if (sentence) {
             const cleanText = sentence.replace(/<[^>]*>/g, "");
             const summaryText = cleanText.length > 300 ? cleanText.substring(0, 300) : cleanText;

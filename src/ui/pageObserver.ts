@@ -138,7 +138,7 @@ function createMediaElement(
     element.addEventListener("click", (e) => {
       e.stopPropagation();
       // Pass the original talkingSrc to the modal, not the normalized finalSrc
-      openCharacterDetailsModal(characterSlug, isTalking && !!talkingSrc, talkingSrc);
+      openCharacterDetailsModal(characterSlug, !!talkingSrc && talkingSrc.endsWith(".mp4"), talkingSrc);
     });
     element.src = finalSrc;
     element.classList.add("inline-avatar");
@@ -170,7 +170,7 @@ export function highlightCharacter(character: HTMLSpanElement, openCharacterDeta
       document.body.removeChild(avatar);
     });
 
-    openCharacterDetailsModal(characterSlug, true, listeningSrc);
+    openCharacterDetailsModal(characterSlug, !!listeningSrc && listeningSrc.endsWith(".mp4"), listeningSrc);
   });
 
   // Add hover functionality to show floating avatar

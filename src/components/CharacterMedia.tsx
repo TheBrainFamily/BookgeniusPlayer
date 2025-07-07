@@ -158,18 +158,12 @@ const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, 
   }
 
   const placeholderSrc = (videoListensSrc || mediaSrc).replace(/-(listens|speaks)\.(mp4|webm)$/, ".png");
-
   const showListensVideo = isListeningMode && videoListensLoaded;
   const showSpeaksVideo = !isListeningMode && videoSpeaksLoaded;
-  const showPlaceholder = isListeningMode ? !videoListensLoaded : !videoSpeaksLoaded;
 
   return (
     <div className="relative w-full h-full">
-      <img
-        src={placeholderSrc}
-        alt={canonicalName}
-        className={cn("absolute top-0 left-0 w-full h-full object-cover rounded-full transition-opacity duration-300 ease-in-out", showPlaceholder ? "opacity-100" : "opacity-0")}
-      />
+      {placeholderSrc && <img src={placeholderSrc} alt={canonicalName} className="absolute top-0 left-0 w-full h-full object-cover rounded-full" />}
       <VideoPlayer
         state="listens"
         src={videoListensSrc}
