@@ -107,7 +107,7 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
   else
     if [ "$S3_OBJECT_FOUND" -eq 1 ]; then
       rsync -a "$TMP_UNPACK_DIR/${BOOKS_DIR}/" "${BOOKS_DIR}/"
-      rsync -a "$TMP_UNPACK_DIR/public/" "public/"
+#      rsync -a "$TMP_UNPACK_DIR/public/" "public/"
       rm -rf "${TMP_UNPACK_DIR}"
     fi
   fi
