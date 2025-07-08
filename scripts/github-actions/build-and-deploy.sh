@@ -104,6 +104,12 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
     fi
     GIT_LFS_SKIP_SMUDGE=1 git lfs pull --include="$(paste -sd, changed.txt)"
     rm changed.txt
+  else
+    if [ "$S3_OBJECT_FOUND" -eq 1 ]; then
+      rsync -a "$TMP_UNPACK_DIR/${BOOKS_DIR}/" "${BOOKS_DIR}/"
+#      rsync -a "$TMP_UNPACK_DIR/public/" "public/"
+      rm -rf "${TMP_UNPACK_DIR}"
+    fi
   fi
 else
   echo "Making an archive..."
