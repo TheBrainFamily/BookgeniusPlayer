@@ -50,7 +50,7 @@ export function useBookContent(containerId: string) {
             // We can add a visual cue here later if needed.
 
             span.innerHTML = replaceXmlTagsIntoHtmlTags(span.getAttribute("data-original-sentence") || "");
-            span.setAttribute("data-current-score", "0");
+            span.removeAttribute("data-current-score");
             span.setAttribute("data-simplified", "false");
             span.querySelectorAll('[data-click-listener-attached="true"]').forEach((el) => {
               el.removeAttribute("data-click-listener-attached");
