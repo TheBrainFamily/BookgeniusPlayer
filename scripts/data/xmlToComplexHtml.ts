@@ -283,7 +283,18 @@ export const xmlToComplexHtml = (
         if (pContent.trim()) {
           let clean = pContent.replace(/\s+/g, " ").trim();
           clean = clean.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
+
+          console.log("daniel content", pContent.includes("<em>"));
+
+          if ((isCharacter && currentCharacterAlignment === "left") || pContent.includes("<em>")) {
+            htmlResult += `\n </span>\n`;
+          }
+
           htmlResult += `\n    <p data-index="${dataIndex++}" data-text-alignment="${currentCharacterAlignment}" data-is-character="${isCharacter}">\n      ${clean}\n    </p>`;
+
+          if (isCharacter && currentCharacterAlignment === "right") {
+            htmlResult += `\n <span class="daniel-container">\n`;
+          }
           if (isCharacter) {
             if (chapterId) {
               if (!charactersPositionData[chapterId]) {
