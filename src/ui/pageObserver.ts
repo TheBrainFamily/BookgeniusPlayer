@@ -211,8 +211,10 @@ export function highlightCharacter(character: HTMLSpanElement, openCharacterDeta
       document.body.appendChild(floatingAvatar);
 
       // Position the floating avatar relative to the trigger element
-      floatingAvatar.style.left = `${triggerRect.right + 10}px`; // 10px to the right of the trigger
-      floatingAvatar.style.top = `${triggerRect.top + triggerRect.height / 2 - floatingAvatar.offsetHeight / 2}px`; // Vertically centered with the trigger, adjust as needed
+      const avatarHeight = floatingAvatar.offsetHeight;
+      const avatarWidth = floatingAvatar.offsetWidth;
+      floatingAvatar.style.top = `${triggerRect.top - avatarHeight - 10}px`; // 10px above the trigger
+      floatingAvatar.style.left = `${triggerRect.left + triggerRect.width / 2 - avatarWidth / 2}px`; // Horizontally centered with the trigger
 
       // Fade in
       setTimeout(() => {
