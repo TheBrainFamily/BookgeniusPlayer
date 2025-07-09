@@ -281,17 +281,21 @@ export const xmlToComplexHtml = (
           let clean = pContent.replace(/\s+/g, " ").trim();
           clean = clean.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
 
-          if ((isCharacter && currentCharacterAlignment === "left") || pContent.includes("<em>")) {
-            htmlResult += `\n </span>\n`;
-          }
+          if (bookFormValue === "Play") {
+            if ((isCharacter && currentCharacterAlignment === "left") || pContent.includes("<em>")) {
+              htmlResult += `\n </span>\n`;
+            }
 
-          htmlResult += `\n    <p data-index="${dataIndex++}" data-text-alignment="${currentCharacterAlignment}" data-is-character="${isCharacter}">\n      ${clean}\n    </p>`;
+            htmlResult += `\n    <p data-index="${dataIndex++}" data-text-alignment="${currentCharacterAlignment}" data-is-character="${isCharacter}">\n      ${clean}\n    </p>`;
 
-          if (isCharacter && currentCharacterAlignment === "right") {
-            htmlResult += `\n <span class="right-character-container">\n`;
-          }
-          if (isCharacter) {
-            isCharacter = false;
+            if (isCharacter && currentCharacterAlignment === "right") {
+              htmlResult += `\n <span class="right-character-container">\n`;
+            }
+            if (isCharacter) {
+              isCharacter = false;
+            }
+          } else {
+            htmlResult += `\n <p data-index="${dataIndex++}">\n ${clean}\n </p>`;
           }
         }
       } else if (tagName === "Act") {
