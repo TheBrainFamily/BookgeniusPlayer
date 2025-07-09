@@ -5,6 +5,7 @@ set -e
 BOOK_NAME="$1"
 RUN_ID="$2"
 BOOKS_DIR="public_books"
+PUBLIC_DIR="public"
 BOOK_PATH="$BOOKS_DIR/$BOOK_NAME"
 
 if [[ -n "$BRANCH_NAME" && "$BRANCH_NAME" != "main" ]]; then
@@ -41,7 +42,7 @@ if [ -z "$DEPLOY_USER" ]; then
 fi
 
 if [ -z "$DEPLOY_DOMAIN" ]; then
-  echo "Error: Environment variable $DEPLOY_DOMAIN is not set."
+  echo "Error: Environment variable DEPLOY_DOMAIN is not set."
   exit 1
 fi
 
@@ -55,6 +56,72 @@ if [ -z "$DEPLOY_STATUS_DIR" ]; then
   exit 1
 fi
 
+if [ -z "$DEPLOY_AWS_BUCKET" ]; then
+  echo "Error: Environment variable DEPLOY_AWS_BUCKET is not set."
+  exit 1
+fi
+
+if [ -z "$AWS_REGION" ]; then
+  echo "Error: Environment variable AWS_REGION is not set."
+  exit 1
+fi
+
+# preparing assets files // for now only for branches
+ARCHIVE_NAME="${BOOK_NAME}.tar.gz"
+TMP_UNPACK_DIR="tmp_unpack"
+S3_KEY="main/${ARCHIVE_NAME}"
+S3_REMOTE_PATH="s3://${DEPLOY_AWS_BUCKET}/${S3_KEY}"
+if [[ "$BRANCH_NAME" != "main" ]]; then
+  GIT_LFS_SKIP_SMUDGE=1 git lfs install --skip-repo
+  GIT_LFS_SKIP_SMUDGE=1 git fetch origin main --depth=1
+  BASE_SHA=$(git rev-parse origin/main)
+  CHANGED_FILES=$(git diff --name-only ${BASE_SHA} HEAD -- public public_books || true)
+  MATCHED=$(echo "$CHANGED_FILES" | grep "^$BOOK_PATH" || true)
+
+  S3_OBJECT_FOUND=$(aws s3api head-object --bucket "$DEPLOY_AWS_BUCKET" --key "$S3_KEY" >/dev/null 2>&1 && echo 1 || echo 0)
+
+  if [ "$S3_OBJECT_FOUND" -eq 1 ]; then
+    mkdir -p "${TMP_UNPACK_DIR}"
+    aws s3 cp "${S3_REMOTE_PATH}" "${ARCHIVE_NAME}"
+    tar -xzf "${ARCHIVE_NAME}" -C "${TMP_UNPACK_DIR}"
+    rm "${ARCHIVE_NAME}"
+  fi
+
+  if [[ -n "$MATCHED" ]]; then
+    echo "$MATCHED" > changed.txt
+    cat changed.txt
+    if [[ -s changed.txt  && "$S3_OBJECT_FOUND" -eq 1 ]]; then
+      while IFS= read -r file; do
+        path_to_remove="${TMP_UNPACK_DIR}/$file"
+        if [ -f "$path_to_remove" ]; then
+          echo "Deleting: $path_to_remove"
+          rm -f "$path_to_remove"
+        else
+          echo "File not found $path_to_remove"
+        fi
+      done < changed.txt
+      rsync -a "$TMP_UNPACK_DIR/${BOOKS_DIR}/" "${BOOKS_DIR}/"
+      rsync -a "$TMP_UNPACK_DIR/${PUBLIC_DIR}/" "${PUBLIC_DIR}/"
+      rm -rf "${TMP_UNPACK_DIR}"
+    fi
+    GIT_LFS_SKIP_SMUDGE=1 git lfs pull --include="$(paste -sd, changed.txt)"
+    rm changed.txt
+  else
+    if [ "$S3_OBJECT_FOUND" -eq 1 ]; then
+      rsync -a "$TMP_UNPACK_DIR/${BOOKS_DIR}/" "${BOOKS_DIR}/"
+      rsync -a "$TMP_UNPACK_DIR/${PUBLIC_DIR}/" "${PUBLIC_DIR}/"
+      rm -rf "${TMP_UNPACK_DIR}"
+    fi
+  fi
+else
+  echo "Making an archive..."
+  tar -zcf "${ARCHIVE_NAME}" "${PUBLIC_DIR}" "${BOOK_PATH}"
+  echo "Uploading to S3"
+  aws s3 cp "${ARCHIVE_NAME}" "${S3_REMOTE_PATH}"
+  rm "${ARCHIVE_NAME}"
+fi
+
+# build and deploy
 TARGET_DIRECTORY=$(echo "$BOOK_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[-_]//g')
 
 if [[ -n "$BRANCH_PREFIX" ]]; then

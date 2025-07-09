@@ -30,12 +30,15 @@ mkdir -p "$LOCAL_SUMMARY_DIR"
 rsync -avz -e "ssh" \
   "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_STATUS_DIR/$RUN_ID/" "$LOCAL_SUMMARY_DIR/"
 
-echo "## Deployment Summary" >> "$GITHUB_STEP_SUMMARY"
-echo "| Book Name | Deployment URL |" >> "$GITHUB_STEP_SUMMARY"
-echo "|-----------|----------------|" >> "$GITHUB_STEP_SUMMARY"
 shopt -s nullglob
-cat "$LOCAL_SUMMARY_DIR"/*.txt >> "$GITHUB_STEP_SUMMARY"
+HEADER="## Deployment Summary
+| Book Name | Deployment URL |
+|-----------|----------------|"
+BODY=$(find "$LOCAL_SUMMARY_DIR" -maxdepth 1 -type f -name '*.txt' -exec cat {} +)
 shopt -u nullglob
+
+SUMMARY="$HEADER"$'\n'"$BODY"
+echo "$SUMMARY" | tee summary.txt >> "$GITHUB_STEP_SUMMARY"
 
 ssh "$DEPLOY_USER@$DEPLOY_HOST" "rm -rf \"$DEPLOY_STATUS_DIR/$RUN_ID\""
 rm -rf "$LOCAL_SUMMARY_DIR"

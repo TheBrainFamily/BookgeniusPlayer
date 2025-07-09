@@ -17,6 +17,9 @@ const applyThemeToDocument = (themeColors: BookThemeColors) => {
   root.style.setProperty("--book-secondary-color", themeColors.secondaryColor);
   root.style.setProperty("--book-tertiary-color", themeColors.tertiaryColor);
   root.style.setProperty("--book-quaternary-color", themeColors.quaternaryColor);
+  if (themeColors.simplifiedIconColor) {
+    root.style.setProperty("--book-simplified-icon-color", themeColors.simplifiedIconColor);
+  }
 };
 
 export const BookThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
