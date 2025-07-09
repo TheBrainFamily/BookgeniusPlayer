@@ -92,7 +92,6 @@ export const xmlToComplexHtml = (
   let currentAct = "";
   let currentCharacterAlignment = "";
   let isCharacter = false;
-  const charactersPositionData = [];
 
   for (const chapter of chapters) {
     const chapterId = chapter.getAttribute("id");
@@ -136,7 +135,6 @@ export const xmlToComplexHtml = (
       if (node.nodeType !== 1) continue;
       const childElement = node as Element;
       const tagName = childElement.tagName;
-      // console.log("daniel tagName", tagName, node.textContent, childElement.textContent);
 
       if (["BackgroundFiles", "AudioFiles", "CutSceneFiles"].includes(tagName)) {
         continue;
@@ -191,7 +189,6 @@ export const xmlToComplexHtml = (
                     const listeningSrc = getListeningMediaFilePathForName(slug, bookSlug);
                     if (isTalking) {
                       isCharacter = true;
-                      console.log(char, isCharacter);
                       const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
                       inner += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
                       if (!currentCharacterAlignment || currentCharacterAlignment === "right") {

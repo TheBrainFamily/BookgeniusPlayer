@@ -200,38 +200,42 @@
 
         p[data-text-alignment="right"][data-is-character="true"] {
           text-align: right;
-        }
+          text-indent: 0;
 
-        p[data-text-alignment="right"][data-is-character="true"] > span {
-          display: flex;
-          flex-direction: row-reverse;
-          align-items: center;
-          gap: 0.5em;
-          background: transparent !important;
-          padding: 0 !important;
-          cursor: default !important;
-        }
+          > span {
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: center;
+            gap: 0.5em;
+            background: transparent !important;
+            padding: 0 !important;
+            pointer-events: none;
 
-        p[data-text-alignment="right"][data-is-character="true"] > span > span {
-          margin-left: 0;
-        }
+            > span {
+              margin-left: 0;
+            }
+          }
 
-        p[data-text-alignment="right"][data-is-character="true"] img.inline-avatar {
-          transform: rotateY(180deg);
-          margin: 0;
-        }
+          strong {
+            cursor: pointer;
+            display: inline-block;
+            line-height: 1.5;
+            pointer-events: auto;
 
-        p[data-text-alignment="right"][data-is-character="true"] strong {
-          cursor: pointer;
-          display: inline-block;
-          line-height: 1.5;
-        }
+            &:hover {
+               background-color: rgba(0, 0, 0, 0.05);
+            }
+          }
 
-        p[data-text-alignment="right"][data-is-character="true"] strong:hover {
-          background-color: rgba(0, 0, 0, 0.05);
-          /*padding: 0.2em 0.4em;*/
-          /*margin: -0.2em -0.4em;*/
-          /*border-radius: 0.3em;*/
+          img.inline-avatar {
+            transform: rotateY(180deg);
+            margin: 0;
+            pointer-events: auto;
+
+            &:hover {
+               transform: rotateY(180deg) scale(2);
+            }
+          }
         }
 
         span {
@@ -253,11 +257,6 @@
         p[data-text-alignment="right"][data-is-character="false"]:not(:has(em)) {
           text-align: left;
           padding-left: 0;
-          text-indent: 0;
-        }
-
-        p[data-text-alignment="right"][data-is-character="true"] {
-          text-align: right;
           text-indent: 0;
         }
 
