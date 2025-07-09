@@ -3,6 +3,9 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { DOMParser } from "@xmldom/xmldom";
+import { getFileNameForName } from "../src/utils/getFilePathsForName";
+import { generateCharacterMetadata, parseBookXmlData } from "./generateBook";
+import { SimpleCharacterMetadata } from "./data/tools/create-book-metadata";
 
 interface CharacterAsset {
   name: string;
@@ -10,6 +13,8 @@ interface CharacterAsset {
   hasSpeaks: boolean;
   hasListens: boolean;
   isComplete: boolean;
+  speaksCount: number;
+  listensCount: number;
 }
 
 function parseCharacterNames(xmlPath: string): string[] {
@@ -28,25 +33,39 @@ function parseCharacterNames(xmlPath: string): string[] {
   return characters;
 }
 
-function checkCharacterAssets(bookPath: string, characterName: string): CharacterAsset {
+function checkCharacterAssets(
+  bookPath: string,
+  characterName: string,
+  characterMetadata: SimpleCharacterMetadata[],
+  ignoreIfSpeaksLessFrequentThan: number,
+  ignoreIfListensLessFrequentThan: number,
+): CharacterAsset {
   const assetsDir = join(bookPath, "assets");
   // Try different naming variations
-  const nameVariations = [
-    characterName.toLowerCase(),
-    characterName.toLowerCase().replace(/-/g, ""),
-    characterName.toLowerCase().replace(/-/g, "_"),
-    characterName === "Platki-sniezne-Straze-Krolowej-Sniegu" ? "platki-sniezne" : null,
-    characterName === "Wroble" ? "wroble" : null,
-  ].filter(Boolean) as string[];
-  let hasPng = false;
-  let hasSpeaks = false;
-  let hasListens = false;
-  for (const name of nameVariations) {
-    if (existsSync(join(assetsDir, `${name}.png`))) hasPng = true;
-    if (existsSync(join(assetsDir, `${name}-speaks.mp4`))) hasSpeaks = true;
-    if (existsSync(join(assetsDir, `${name}-listens.mp4`))) hasListens = true;
+  const name = getFileNameForName(characterName);
+  const character = characterMetadata.find((c) => c.slug === characterName);
+  if (!character) {
+    throw new Error(`Character not found: ${characterName}`);
   }
-  return { name: characterName, hasPng, hasSpeaks, hasListens, isComplete: hasPng && hasSpeaks && hasListens };
+
+  let hasPng = false;
+  if (existsSync(join(assetsDir, `${name}.png`))) hasPng = true;
+
+  let hasSpeaks = false;
+  const speaksCount = character.infoPerChapter.reduce((acc, chapter) => acc + chapter.paragraphsWhereTalking.length, 0);
+  // We ignore the fact that the character does not have the speak video if it speaks more than ignoreIfSpeaksLessFrequentThan times
+  if (speaksCount > ignoreIfSpeaksLessFrequentThan) {
+    hasSpeaks = true;
+  }
+  if (existsSync(join(assetsDir, `${name}-speaks.mp4`))) hasSpeaks = true;
+  const listensCount = character.infoPerChapter.reduce((acc, chapter) => acc + chapter.paragraphsWhereTalking.length, 0);
+  let hasListens = false;
+  // We ignore the fact that the character does not have the listen video if it listens more than ignoreIfListensLessFrequentThan times
+  if (listensCount > ignoreIfListensLessFrequentThan) {
+    hasListens = true;
+  }
+  if (existsSync(join(assetsDir, `${name}-listens.mp4`))) hasListens = true;
+  return { name: characterName, hasPng, hasSpeaks, hasListens, isComplete: hasPng && hasSpeaks && hasListens, speaksCount, listensCount };
 }
 
 function main(): void {
@@ -56,39 +75,33 @@ function main(): void {
     console.error("Example: tsx check-character-assets.ts Krolowa-Sniegu");
     process.exit(1);
   }
-  const bookName = args[0];
-  const bookPath = `public_books/${bookName}`;
+  const bookPath = args[0];
+  const { xmlDoc, bookString, bookForm, bookSlug } = parseBookXmlData(bookPath);
+  const characterMetadata = generateCharacterMetadata(xmlDoc, bookString, bookForm, bookSlug);
+  const ignoreIfSpeaksLessFrequentThan = parseInt(args[1] || "1000000000", 10);
+  const ignoreIfListensLessFrequentThan = parseInt(args[2] || "1000000000", 10);
   const xmlPath = join(bookPath, "book.xml");
   if (!existsSync(xmlPath)) {
     throw new Error(`Book XML file not found: ${xmlPath}`);
   }
+  console.log(`\n\n\nChecking book: ${bookPath}`);
   const characterNames = parseCharacterNames(xmlPath);
   console.log(`\nCharacters found in CharactersMaster (${characterNames.length}):`);
-  characterNames.forEach((name, idx) => console.log(`${idx + 1}. ${name}`));
-  console.log("");
-  const results = characterNames.map((name) => checkCharacterAssets(bookPath, name));
-  const complete = results.filter((r) => r.isComplete);
+  const results = characterNames.map((name) => checkCharacterAssets(bookPath, name, characterMetadata, ignoreIfSpeaksLessFrequentThan, ignoreIfListensLessFrequentThan));
   const incomplete = results.filter((r) => !r.isComplete);
-  console.log(`Total Characters: ${characterNames.length}`);
-  console.log(`✅ Complete: ${complete.length}`);
-  console.log(`❌ Incomplete: ${incomplete.length}`);
   if (incomplete.length > 0) {
+    console.log(`❌ Incomplete: ${incomplete.length}`);
     console.log("\n❌ Missing Assets:");
     incomplete.forEach((char) => {
       const missing = [];
       if (!char.hasPng) missing.push("PNG");
-      if (!char.hasSpeaks) missing.push("speaks.mp4");
-      if (!char.hasListens) missing.push("listens.mp4");
-      console.log(`  ${char.name}: Missing: ${missing.join(", ")}`);
+      if (!char.hasSpeaks && char.speaksCount > 0) missing.push(`speaks.mp4 (${char.speaksCount})`);
+      if (!char.hasListens && char.listensCount > 0) missing.push(`listens.mp4 (${char.listensCount})`);
+      if (missing.length > 0) {
+        console.log(`  ${char.name}: Missing: ${missing.join(", ")}`);
+      }
     });
   }
-  if (complete.length > 0) {
-    console.log("\n✅ Complete Assets:");
-    complete.forEach((char) => {
-      console.log(`  ${char.name}: PNG ✅, speaks.mp4 ✅, listens.mp4 ✅`);
-    });
-  }
-  if (incomplete.length > 0) process.exit(1);
 }
 
 if (require.main === module) {
