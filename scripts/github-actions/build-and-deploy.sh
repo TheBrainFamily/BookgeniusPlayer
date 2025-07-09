@@ -81,11 +81,9 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
   S3_OBJECT_FOUND=$(aws s3api head-object --bucket "$DEPLOY_AWS_BUCKET" --key "$S3_KEY" >/dev/null 2>&1 && echo 1 || echo 0)
 
   if [ "$S3_OBJECT_FOUND" -eq 1 ]; then
-    mkdir -p "${TMP_UNPACK_DIR}/${BOOKS_DIR}"
-    mkdir -p "${TMP_UNPACK_DIR}/${PUBLIC_DIR}"
+    mkdir -p "${TMP_UNPACK_DIR}"
     aws s3 cp "${S3_REMOTE_PATH}" "${ARCHIVE_NAME}"
-    tar -xzf "${ARCHIVE_NAME}" -C "${TMP_UNPACK_DIR}/${BOOKS_DIR}" "${BOOK_NAME}"
-    tar -xzf "${ARCHIVE_NAME}" -C "${TMP_UNPACK_DIR}/${PUBLIC_DIR}" "${PUBLIC_DIR}"
+    tar -xzf "${ARCHIVE_NAME}" -C "${TMP_UNPACK_DIR}"
     rm "${ARCHIVE_NAME}"
   fi
 
@@ -117,7 +115,7 @@ if [[ "$BRANCH_NAME" != "main" ]]; then
   fi
 else
   echo "Making an archive..."
-  tar -zcf "${ARCHIVE_NAME}" "${PUBLIC_DIR}" -C "$(dirname "$BOOK_PATH")" "$(basename "$BOOK_PATH")"
+  tar -zcf "${ARCHIVE_NAME}" "${PUBLIC_DIR}" "${BOOK_PATH}"
   echo "Uploading to S3"
   aws s3 cp "${ARCHIVE_NAME}" "${S3_REMOTE_PATH}"
   rm "${ARCHIVE_NAME}"
