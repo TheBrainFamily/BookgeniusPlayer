@@ -1,5 +1,7 @@
 #!/usr/bin/env tsx
 
+// Check check-character-assets.md to see how to use this script
+
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { DOMParser } from "@xmldom/xmldom";
@@ -54,14 +56,14 @@ function checkCharacterAssets(
   let hasSpeaks = false;
   const speaksCount = character.infoPerChapter.reduce((acc, chapter) => acc + chapter.paragraphsWhereTalking.length, 0);
   // We ignore the fact that the character does not have the speak video if it speaks more than ignoreIfSpeaksLessFrequentThan times
-  if (speaksCount > ignoreIfSpeaksLessFrequentThan) {
+  if (speaksCount <= ignoreIfSpeaksLessFrequentThan) {
     hasSpeaks = true;
   }
   if (existsSync(join(assetsDir, `${name}-speaks.mp4`))) hasSpeaks = true;
   const listensCount = character.infoPerChapter.reduce((acc, chapter) => acc + chapter.paragraphsWhereTalking.length, 0);
   let hasListens = false;
   // We ignore the fact that the character does not have the listen video if it listens more than ignoreIfListensLessFrequentThan times
-  if (listensCount > ignoreIfListensLessFrequentThan) {
+  if (listensCount <= ignoreIfListensLessFrequentThan) {
     hasListens = true;
   }
   if (existsSync(join(assetsDir, `${name}-listens.mp4`))) hasListens = true;
@@ -78,8 +80,8 @@ function main(): void {
   const bookPath = args[0];
   const { xmlDoc, bookString, bookForm, bookSlug } = parseBookXmlData(bookPath);
   const characterMetadata = generateCharacterMetadata(xmlDoc, bookString, bookForm, bookSlug);
-  const ignoreIfSpeaksLessFrequentThan = parseInt(args[1] || "1000000000", 10);
-  const ignoreIfListensLessFrequentThan = parseInt(args[2] || "1000000000", 10);
+  const ignoreIfSpeaksLessFrequentThan = parseInt(args[1] || "0", 10);
+  const ignoreIfListensLessFrequentThan = parseInt(args[2] || "0", 10);
   const xmlPath = join(bookPath, "book.xml");
   if (!existsSync(xmlPath)) {
     throw new Error(`Book XML file not found: ${xmlPath}`);
