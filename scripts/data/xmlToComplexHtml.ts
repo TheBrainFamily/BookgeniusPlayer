@@ -284,8 +284,6 @@ export const xmlToComplexHtml = (
           let clean = pContent.replace(/\s+/g, " ").trim();
           clean = clean.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
 
-          console.log("daniel content", pContent.includes("<em>"));
-
           if ((isCharacter && currentCharacterAlignment === "left") || pContent.includes("<em>")) {
             htmlResult += `\n </span>\n`;
           }
@@ -293,15 +291,9 @@ export const xmlToComplexHtml = (
           htmlResult += `\n    <p data-index="${dataIndex++}" data-text-alignment="${currentCharacterAlignment}" data-is-character="${isCharacter}">\n      ${clean}\n    </p>`;
 
           if (isCharacter && currentCharacterAlignment === "right") {
-            htmlResult += `\n <span class="daniel-container">\n`;
+            htmlResult += `\n <span class="right-character-container">\n`;
           }
           if (isCharacter) {
-            if (chapterId) {
-              if (!charactersPositionData[chapterId]) {
-                charactersPositionData[chapterId] = [];
-              }
-              charactersPositionData[chapterId].push(dataIndex - 1);
-            }
             isCharacter = false;
           }
         }
@@ -331,33 +323,6 @@ export const xmlToComplexHtml = (
   if (bookFormValue === "Play") {
     htmlResult += `\n    </div>`;
   }
-
-  console.log(JSON.stringify(charactersPositionData));
-  charactersPositionData.forEach((positionsData, index) => {
-    console.log("chapterId", index);
-    positionsData.forEach((position, index) => {
-      const nextData = positionsData[index+1];
-      if (nextData) {
-        const numberOfLines = nextData - position - 1;
-        console.log("position", position, nextData, numberOfLines);
-      } else {
-        console.log("brak next dla", position);
-      }
-    });
-  })
-  // const sortedCharactersPositionData = charactersPositionData.sort((a, b) => a - b);
-  // const sortedCharactersPositionData = [...new Set(charactersPositionData)].sort((a, b) => a - b);
-  // console.log(JSON.stringify(sortedCharactersPositionData));
-
-  // sortedCharactersPositionData.forEach((position, index) => {
-  //   const nextData = sortedCharactersPositionData[index+1];
-  //   if (nextData) {
-  //     const numberOfLines = nextData - position;
-  //     console.log("position", position, nextData, numberOfLines);
-  //   } else {
-  //     console.log("brak next dla", position);
-  //   }
-  // });
 
   return { htmlResult: htmlResult.trim(), backgroundsData, audioData, cutSceneData, chapterTitles };
 };

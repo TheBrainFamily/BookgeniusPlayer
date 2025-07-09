@@ -191,8 +191,7 @@
         margin-right: auto;
         margin-top: 5em;
 
-        .daniel-container {
-          /*border: 2px solid blue;*/
+        .right-character-container {
           display: block;
           width: max-content;
           margin-left: auto;
@@ -204,24 +203,35 @@
         }
 
         p[data-text-alignment="right"][data-is-character="true"] > span {
-          /*display: inline-flex;*/
-          /*flex-direction: row-reverse;*/
-          /*align-items: center;*/
-          /*justify-content: flex-end;*/
-          /*gap: 0.5em;*/
+          display: flex;
+          flex-direction: row-reverse;
+          align-items: center;
+          gap: 0.5em;
+          background: transparent !important;
+          padding: 0 !important;
+          cursor: default !important;
         }
 
         p[data-text-alignment="right"][data-is-character="true"] > span > span {
-          /*order: 2;*/
+          margin-left: 0;
         }
 
         p[data-text-alignment="right"][data-is-character="true"] img.inline-avatar {
-          transform: scaleX(-1);
+          transform: rotateY(180deg);
+          margin: 0;
         }
 
         p[data-text-alignment="right"][data-is-character="true"] strong {
-          /*border: 2px solid blue;*/
-          /*order: 1;*/
+          cursor: pointer;
+          display: inline-block;
+          line-height: 1.5;
+        }
+
+        p[data-text-alignment="right"][data-is-character="true"] strong:hover {
+          background-color: rgba(0, 0, 0, 0.05);
+          /*padding: 0.2em 0.4em;*/
+          /*margin: -0.2em -0.4em;*/
+          /*border-radius: 0.3em;*/
         }
 
         span {
@@ -252,7 +262,7 @@
         }
 
 
-        p, .daniel-container > p {
+        p, .right-character-container > p {
           margin-bottom: 0.1em;
           font-family: var(--font-libre-caslon-text);
           font-size: 16px;
