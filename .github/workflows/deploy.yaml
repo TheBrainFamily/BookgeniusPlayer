@@ -150,6 +150,7 @@ jobs:
   book-links:
     needs: [env-vars, deploy]
     runs-on: ubuntu-latest
+    if: always()
 
     env:
       DEPLOY_HOST: ${{ needs.env-vars.outputs.DEPLOY_HOST }}
