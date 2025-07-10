@@ -138,6 +138,10 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ needs.env-vars.outputs.ssh_key_b64 }}
 
+      - name: Test fail one title
+        if matrix.title == "Lalka"
+        run: exit 1
+
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -150,6 +154,7 @@ jobs:
   book-links:
     needs: [env-vars, deploy]
     runs-on: ubuntu-latest
+    if: always()
 
     env:
       DEPLOY_HOST: ${{ needs.env-vars.outputs.DEPLOY_HOST }}
