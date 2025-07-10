@@ -139,7 +139,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ needs.env-vars.outputs.ssh_key_b64 }}
 
       - name: Test fail one title
-        if matrix.title == "Lalka"
+        if: matrix.title == "Lalka"
         run: exit 1
 
       - name: Configure AWS credentials (OIDC)
