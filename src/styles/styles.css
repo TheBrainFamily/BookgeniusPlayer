@@ -195,6 +195,7 @@
           display: grid;
           grid-template-columns: 1fr max-content;
           width: 100%;
+          margin-bottom: 2em;
 
           p[data-text-alignment="right"] {
             grid-column: 2;
@@ -212,6 +213,7 @@
         p[data-text-alignment="right"][data-is-character="true"] {
           text-align: right;
           text-indent: 0;
+          margin-top: 1.5em;
 
           > span {
             display: flex;
