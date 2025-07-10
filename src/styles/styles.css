@@ -192,10 +192,21 @@
         margin-top: 5em;
 
         .right-character-container {
-          display: block;
-          width: max-content;
-          margin-left: auto;
-          text-align: left;
+          display: grid;
+          grid-template-columns: 1fr max-content;
+          width: 100%;
+
+          p[data-text-alignment="right"] {
+            grid-column: 2;
+            text-align: left;
+          }
+
+          p[data-is-didaskalia="true"] {
+            grid-column: 1 / -1;
+            text-align: center;
+            width: 100%;
+          }
+
         }
 
         p[data-text-alignment="right"][data-is-character="true"] {
@@ -274,7 +285,7 @@
           text-transform: uppercase;
         }
 
-        p:has(em) {
+        p:has(em), .right-character-container > p:has(em) {
           text-align: center;
           line-height: 1em;
           font-size: 14px;
