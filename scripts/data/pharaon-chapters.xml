@@ -100,7 +100,7 @@ xsi:noNamespaceSchemaLocation="ebook.xsd">
     <Robotnik-olbrzymiego-wzrostu display="Robotnik olbrzymiego wzrostu" summary="" />
     <Adiutant-pulku-z-Memfisu display="Adiutant pułku (z Memfisu)" summary="" />
     <Mlody-kaplan-poslannik-Samentu display="Młody kapłan (posłannik Samentu)" summary="" />
-    <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa display="Dozorcy Labiryntu (trzej zabójcy Mefresa)" summary="" />
+    <Dozorcy-Labiryntu display="Dozorcy Labiryntu" summary="" />
     <Setnicy-dwaj-z-policji-Pi-Bast display="Setnicy (dwaj, z policji Pi-Bast)" summary="" />
     <Nomarcha-memfijski display="Nomarcha memfijski" summary="" />
     <Arcykaplan-Ozyrysa-koronacja-Herhora display="Arcykapłan Ozyrysa (koronacja Herhora)" summary="" />
@@ -11169,9 +11169,9 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Lykon talking="true"/>— Ma rudą brodę i włosy… — odpowiedział <Lykon>Lykon</Lykon>.</p>
 <p><Mefres talking="true"/>— A co?… — spytał <Mefres>Mefres</Mefres> <Herhor>Herhora</Herhor>.</p>
 <p><Herhor talking="true"/>— Wasza dostojność masz dobrą policję — rzekł <Herhor>Herhor</Herhor>.</p>
-<p><Mefres talking="true"/>— Ale za to <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorcy Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa> źle go pilnują! — mówił gniewnie <Mefres>Mefres</Mefres>. — Jeszcze dziś w nocy pojadę tam z <Lykon>Lykonem</Lykon>, aby ostrzec miejscowych kapłanów… Lecz gdy uda mi się ocalić skarb bogów, wasza dostojność pozwolisz, że ja zostanę jego dozorcą…</p>
+<p><Mefres talking="true"/>— Ale za to <Dozorcy-Labiryntu>dozorcy Labiryntu</Dozorcy-Labiryntu> źle go pilnują! — mówił gniewnie <Mefres>Mefres</Mefres>. — Jeszcze dziś w nocy pojadę tam z <Lykon>Lykonem</Lykon>, aby ostrzec miejscowych kapłanów… Lecz gdy uda mi się ocalić skarb bogów, wasza dostojność pozwolisz, że ja zostanę jego dozorcą…</p>
 <p><Herhor talking="true"/>— Jak wasza dostojność chcesz — odparł <Herhor>Herhor</Herhor> obojętnie. A w sercu swym dodał:</p>
-<p>„Nareszcie pobożny <Mefres>Mefres</Mefres> zaczyna pokazywać zęby i pazury… Sam pragnie zostać — tylko — <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorcą Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>, a swego wychowańca <Lykon>Lykona</Lykon> zrobić — tylko — faraonem!…</p>
+<p>„Nareszcie pobożny <Mefres>Mefres</Mefres> zaczyna pokazywać zęby i pazury… Sam pragnie zostać — tylko — <Dozorcy-Labiryntu>dozorcą Labiryntu</Dozorcy-Labiryntu>, a swego wychowańca <Lykon>Lykona</Lykon> zrobić — tylko — faraonem!…</p>
 <p>Zaprawdę, że dla nasycenia chciwości moich pomocników bogowie musieliby stworzyć dziesięć Egiptów…'</p>
 <p>Gdy obaj dostojnicy opuścili podziemia, <Herhor>Herhor</Herhor>, wśród nocy, piechotą wrócił do świątyni Izydy, gdzie miał mieszkanie, a <Mefres>Mefres</Mefres> kazał przygotować parę konnych lektyk. Do jednej młodzi kapłani włożyli śpiącego <Lykon>Lykona</Lykon> w worku na głowie, do drugiej arcykapłan wsiadł sam i otoczony garstką jeźdźców, tęgim kłusem pojechał do Fayum.</p>
 <p>W nocy z czternastego na piętnasty Paofi arcykapłan <Samentu>Samentu</Samentu>, stosownie do obietnicy danej faraonowi, wszedł, sobie tylko znanym korytarzem, do Labiryntu. Miał w rękach pęk pochodni, z których jedna paliła się, a na plecach niewielki koszyk z przyborami.</p>
@@ -11226,12 +11226,12 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Samentu talking="true"/>— Cóż mnie tu może spotkać? — mówił wzruszając ramionami. — Bylem uspokoił się, mogą mnie gonić po całym Labiryncie… Wszak do przecięcia mi wszystkich dróg trzeba by kilku tysięcy ludzi, a do wskazania: w której sali jestem — chyba cudu!…</p>
 <p>No, ale przypuśćmy, że łapią mnie… Więc i cóż!… Biorę ten oto flakonik, przykładam do ust i w jednej chwili uciekam tak, że mnie już nikt nie złapie… Nawet bogowie…</p>
 <p>Lecz pomimo rozumowań znowu schwyciła go tak straszna trwoga, że po raz drugi zgasił pochodnią i drżąc, szczękając zębami wcisnął się pod jedną z kolumn.</p>
-<p><Samentu talking="true"/>„Jak można… jak można było wchodzić tutaj!… — mówił do siebie. — Alboż nie miałem czego jeść… na czym wesprzeć głowy?… Prosta rzecz, że jestem odkryty… Przecież Labirynt posiada mnóstwo czujnych jak psy <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorców</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>, i tylko dziecko albo głupiec mógłby myśleć o oszukaniu ich…</p>
+<p><Samentu talking="true"/>„Jak można… jak można było wchodzić tutaj!… — mówił do siebie. — Alboż nie miałem czego jeść… na czym wesprzeć głowy?… Prosta rzecz, że jestem odkryty… Przecież Labirynt posiada mnóstwo czujnych jak psy <Dozorcy-Labiryntu>dozorców</Dozorcy-Labiryntu>, i tylko dziecko albo głupiec mógłby myśleć o oszukaniu ich…</p>
 <p>Majątek… władza!… Gdzież jest taki skarb, za który warto by oddać jeden dzień życia?… I oto ja, człowiek w sile wieku, naraziłem moje…'</p>
 <p>Zdawało mu się, że usłyszał ciężkie stuknięcie. Zerwał się i w głębi sali — zobaczył blask.</p>
 <p>Tak jest: blask rzeczywisty, nie złudzenie… W odległej ścianie, gdzieś na końcu, stały otwarte drzwi, przez które w tej chwili ostrożnie wchodziło kilku zbrojnych ludzi z pochodniami.</p>
 <p>Na ten widok kapłan uczuł zimno — w nogach, w sercu, w głowie… Już nie wątpił, że nie tylko został odkryty, ale że jest ścigany i otoczony.</p>
-<p>Kto mógł go zdradzić?… Rozumie się, że tylko jeden człowiek: <Mlody-kaplan-poslannik-Samentu>młody kapłan Seta</Mlody-kaplan-poslannik-Samentu>, którego wtajemniczył dość szczegółowo w swoje plany. Zdrajca sam z miesiąc musiałby szukać drogi w Labiryncie; ale gdyby porozumiał się z <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorcami</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>, mogli <Samentu>Samentu</Samentu> wytropić w jeden dzień…</p>
+<p>Kto mógł go zdradzić?… Rozumie się, że tylko jeden człowiek: <Mlody-kaplan-poslannik-Samentu>młody kapłan Seta</Mlody-kaplan-poslannik-Samentu>, którego wtajemniczył dość szczegółowo w swoje plany. Zdrajca sam z miesiąc musiałby szukać drogi w Labiryncie; ale gdyby porozumiał się z <Dozorcy-Labiryntu>dozorcami</Dozorcy-Labiryntu>, mogli <Samentu>Samentu</Samentu> wytropić w jeden dzień…</p>
 <p>W tej chwili arcykapłan doznał wrażeń znanych tylko ludziom, którzy stają w obliczu śmierci. Przestał się bać, gdyż jego urojone trwogi pierzchły wobec rzeczywistych pochodni… I nie tylko odzyskał panowanie nad sobą, ale nawet poczuł się nieskończenie wyższym od wszystkiego, co żyje… Za chwilę już nie będzie mu groziło żadne… żadne niebezpieczeństwo!…</p>
 <p>Myśli przebiegały mu przez głowę z szybkością i jasnością błyskawic. Ogarnął całe swoje istnienie: prace, niebezpieczeństwa, nadzieje i ambicje, i — wszystko to wydawało mu się drobiazgiem. Bo i co by mu przyszło, gdyby w tej chwili był nawet faraonem albo posiadał klejnoty wszystkich skarbców królewskich?…</p>
 <p>Wszystko to marność, pył a nawet gorzej, bo złudzenie. Jedna tylko rzecz jest wielka i prawdziwa — śmierć…</p>
@@ -11252,7 +11252,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Samentu>Samentu</Samentu> zbliżył się do niego z uśmiechem i rzekł:</p>
 <p><Samentu talking="true"/>— Poznałem cię po tym okrzyku, <Mefres>Mefresie</Mefres>. Gdy nie możesz być oszustem, jesteś tylko głupcem…</p>
 <p>Obecni osłupieli; <Samentu>Samentu</Samentu> mówił ze spokojną ironią:</p>
-<p><Samentu talking="true"/>— Choć prawda, że w tej chwili jesteś i oszustem, i głupcem. Oszustem, bo wmawiasz w <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorców Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>, że ten łotr ma dar podwójnego widzenia; a głupcem, bo myślisz, że ci uwierzą. Lepiej od razu powiedz, że i w świątyni Ptah znajdują się dokładne plany Labiryntu…</p>
+<p><Samentu talking="true"/>— Choć prawda, że w tej chwili jesteś i oszustem, i głupcem. Oszustem, bo wmawiasz w <Dozorcy-Labiryntu>dozorców Labiryntu</Dozorcy-Labiryntu>, że ten łotr ma dar podwójnego widzenia; a głupcem, bo myślisz, że ci uwierzą. Lepiej od razu powiedz, że i w świątyni Ptah znajdują się dokładne plany Labiryntu…</p>
 <p><Mefres talking="true"/>— To fałsz!… — zawołał <Mefres>Mefres</Mefres>.</p>
 <p><Samentu talking="true"/>— Zapytaj tych ludzi, komu wierzą: tobie czy mnie? Ja jestem tutaj, gdyż znalazłem plany w świątyni Seta; ty przyszedłeś z łaski nieśmiertelnego Ptah… — zakończył <Samentu>Samentu</Samentu> śmiejąc się.</p>
 <p><Mefres talking="true"/>— Zwiążcie tego zdrajcę i kłamcę!… — krzyknął <Mefres>Mefres</Mefres>.</p>
@@ -11260,10 +11260,10 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Samentu talking="true"/>— <Mefres>Mefresie</Mefres>, ty do śmierci będziesz głupi… Spryt masz tylko wówczas, gdy chodzi o pieniądze…</p>
 <p>Przytknął do ust flakonik i upadł na posadzkę.</p>
 <p>Zbrojni rzucili się na niego, podnieśli, ale już leciał im przez ręce.</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— Niechże tu zostanie jak inni… — rzekł <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorca Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>.</p>
+<p><Dozorcy-Labiryntu talking="true"/>— Niechże tu zostanie jak inni… — rzekł <Dozorcy-Labiryntu>dozorca Labiryntu</Dozorcy-Labiryntu>.</p>
 <p>Cały orszak opuścił salę i starannie zamknął ukryte drzwi. Niebawem wyszli z podziemiów Labiryntu.</p>
 <p>Gdy dostojny <Mefres>Mefres</Mefres> znalazł się na dziedzińcu, kazał swoim kapłanom przygotować konne lektyki i natychmiast razem ze śpiącym <Lykon>Lykonem</Lykon> odjechał do Memfisu.</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>Dozorcy Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>, oszołomieni niezwykłymi wypadkami, spoglądali to na siebie, to na eskortę <Mefres>Mefresa</Mefres>, która już znikała w żółtym tumanie pyłu.</p>
+<p><Dozorcy-Labiryntu>Dozorcy Labiryntu</Dozorcy-Labiryntu>, oszołomieni niezwykłymi wypadkami, spoglądali to na siebie, to na eskortę <Mefres>Mefresa</Mefres>, która już znikała w żółtym tumanie pyłu.</p>
 <p><Arcykaplan-Labiryntu talking="true"/>— Nie mogę uwierzyć — rzekł arcykapłan dozorca — że był za naszych dni człowiek, który wdarł się do podziemiów…</p>
 <p>— Wasza dostojność zapomina, że dzisiaj było trzech takich — wtrącił jeden z młodszych kapłanów obrzucając go ukośnym spojrzeniem.</p>
 <p><Arcykaplan-Labiryntu talking="true"/>— A… a… prawda!… — odparł arcykapłan. — Czyliż bogowie pomieszali mi rozsądek?… — dodał, trąc czoło i ściskając zawieszony na piersiach amulet.</p>
@@ -11275,7 +11275,7 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p><Arcykaplan-Labiryntu talking="true"/>— Ależ ja straciłem rozum! — narzekał arcykapłan.</p>
 <p>— Co się stało, to się stało — przerwał nie bez ironii młodszy kapłan. — Jedno jest pewne, że: ludzie, którzy nie tylko trafili do podziemiów, ale nawet chodzili po nich jak po własnym domu, że ludzie ci żyć nie mogą…</p>
 <p><Arcykaplan-Labiryntu talking="true"/>— Więc wyznaczcie sześciu z naszej milicji…</p>
-<p>— Rozumie się!… Trzeba z tym skończyć… — potwierdzili kapłani-<Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorcy</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>.</p>
+<p>— Rozumie się!… Trzeba z tym skończyć… — potwierdzili kapłani-<Dozorcy-Labiryntu>dozorcy</Dozorcy-Labiryntu>.</p>
 <p>— Kto wie, czy <Mefres>Mefres</Mefres> nie działał w porozumieniu z najdostojniejszym <Herhor>Herhorem</Herhor>? — szepnął ktoś.</p>
 <p><Arcykaplan-Labiryntu talking="true"/>— Dosyć! — zawołał arcykapłan. — Gdy <Herhor>Herhora</Herhor> znajdziemy w Labiryncie, postąpimy według prawa. Ale domyślać się ani posądzać kogokolwiek — nie wolno… Niech pisarze przygotują wyroki dla <Mefres>Mefresa</Mefres> i <Lykon>Lykona</Lykon>, wybrani niech najśpieszniej jadą za nimi, a milicja niech pomnoży warty. Trzeba także zbadać wnętrze gmachu i odkryć, którędy wszedł <Samentu>Samentu</Samentu>… Choć jestem pewny, że nieprędko znajdzie naśladowców…</p>
 <p>W parę godzin później sześciu ludzi wyjechało do Memfisu.</p></Chapter><Chapter id="64"><h4>Rozdział XV</h4>
@@ -11822,43 +11822,43 @@ Zresztą — czy ja wiem, co zrobię?… Ale bez pamiątki nie odejdę…</p>
 <p>Potem narzucił na Greka oficerski płaszcz z kapturem, do ucha szepnął mu hasło i z podziemiów, przez ukrytą furtkę świątyni, wyprowadził go na pustą ulicę Memfisu.</p>
 <p>Następnie <Mefres>Mefres</Mefres> z żywością młodzieńca pobiegł na szczyt pylonu i wziąwszy do rąk kilka różnobarwnych chorągiewek począł dawać znaki w kierunku pałacu <Ksiaze-Ramzes>faraona</Ksiaze-Ramzes>. Dostrzeżono go widać i zrozumiano, gdyż na pargaminowej twarzy arcykapłana błysnął przykry uśmiech.</p>
 <p><Mefres>Mefres</Mefres> złożył chorągiewki, opuścił taras pylonu i z wolna począł schodzić na dół. Wtem, gdy już był na pierwszym piętrze, otoczyło go kilku ludzi w brunatnych opończach, którymi zasłaniali kaftany w czarne i białe pasy.</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— Oto jest najdostojniejszy <Mefres>Mefres</Mefres> — rzekł jeden z nich.</p>
+<p><Dozorcy-Labiryntu talking="true"/>— Oto jest najdostojniejszy <Mefres>Mefres</Mefres> — rzekł jeden z nich.</p>
 <p>I wszyscy trzej uklękli przed arcykapłanem, który machinalnie podniósł rękę jakby do błogosławieństwa. Lecz nagle opuścił ją pytając:</p>
 <p><Mefres talking="true"/>— Kto wy jesteście?…</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>Dozorcy Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>.</p>
+<p><Dozorcy-Labiryntu talking="true"/>— <Dozorcy-Labiryntu>Dozorcy Labiryntu</Dozorcy-Labiryntu>.</p>
 <p><Mefres talking="true"/>— Czegóż zastąpiliście mi drogą? — rzekł, a jednocześnie zaczęły mu drżeć ręce i wąskie usta.</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— Nie potrzebujemy ci przypominać, święty mężu — mówił jeden z <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorców</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa> wciąż klęcząc — że kilka dni temu byłeś w Labiryncie, do którego wiesz drogę tak dobrze jak my, choć nie jesteś wtajemniczonym… Jesteś zaś zbyt wielkim mędrcem, ażebyś nie miał znać i naszych praw w podobnych wypadkach…</p>
+<p><Dozorcy-Labiryntu talking="true"/>— Nie potrzebujemy ci przypominać, święty mężu — mówił jeden z <Dozorcy-Labiryntu>dozorców</Dozorcy-Labiryntu> wciąż klęcząc — że kilka dni temu byłeś w Labiryncie, do którego wiesz drogę tak dobrze jak my, choć nie jesteś wtajemniczonym… Jesteś zaś zbyt wielkim mędrcem, ażebyś nie miał znać i naszych praw w podobnych wypadkach…</p>
 <p><Mefres talking="true"/>— Co to znaczy?… — zawołał podniesionym głosem <Mefres>Mefres</Mefres>. — Jesteście zbójcy, nasłani przez Her…</p>
-<p>Nie dokończył. Jeden z napastników schwytał go za ręce, drugi zarzucił mu chustkę na głowę, a trzeci skropił mu twarz przezroczystym płynem. <Mefres>Mefres</Mefres> rzucił się kilka razy i upadł. Jeszcze raz pokropiono go, a gdy skonał, <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorcy</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa> położyli go we framudze, w martwą rękę wsunęli jakiś papirus i — znikli w korytarzach pylonu.</p>
+<p>Nie dokończył. Jeden z napastników schwytał go za ręce, drugi zarzucił mu chustkę na głowę, a trzeci skropił mu twarz przezroczystym płynem. <Mefres>Mefres</Mefres> rzucił się kilka razy i upadł. Jeszcze raz pokropiono go, a gdy skonał, <Dozorcy-Labiryntu>dozorcy</Dozorcy-Labiryntu> położyli go we framudze, w martwą rękę wsunęli jakiś papirus i — znikli w korytarzach pylonu.</p>
 <p>Trzej tak samo ubrani ludzie uganiali się za <Lykon>Lykonem</Lykon> prawie od chwili, gdy wypuszczony ze świątyni przez <Mefres>Mefresa</Mefres>, znalazł się na pustej ulicy.</p>
 <p>Ludzie ci kryli się niedaleko furtki, przez którą przeszedł Grek, i z początku przepuścili go wolno. Lecz wnet jeden z nich dostrzegł w jego ruchach coś podejrzanego, więc wszyscy poczęli iść za nim.</p>
 <p>Dziwna rzecz! uśpiony <Lykon>Lykon</Lykon>, jakby przeczuwając gonitwę, nagle skręcił w ulicę ruchliwą, potem na plac, gdzie krążyło mnóstwo ludzi, a potem ulicą Rybacką pobiegł do Nilu. Tu, w jakimś zaułku, znalazł małe czółenko, skoczył w nie i z niesłychaną szybkością zaczął przeprawiać się na drugą stronę rzeki.</p>
 <p>Był już o paręset kroków oddalony od brzegu, gdy wysunęła się za nim łódź z jednym przewoźnikiem i trzema podróżnymi. Ledwie zaś ci odbili, ukazała się druga łódź, mająca dwu przewoźników i znowu trzech podróżnych.</p>
 <p>Obie łodzie zawzięcie ścigały <Lykon>Lykona</Lykon>.</p>
-<p>W tej, która miała tylko jednego wioślarza, siedzieli <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorcy Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa> i pilnie przypatrywali się swoim współzawodnikom, o ile pozwalał na to zmierzch prędko zapadający po zachodzie słońca.</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— Co to za jedni tamci trzej?… — szeptali między sobą <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorcy z Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>. — Od onegdaj krążyli dokoła świątyni, a dziś gonią za nim… Czyby go chcieli zasłonić przed nami?…</p>
+<p>W tej, która miała tylko jednego wioślarza, siedzieli <Dozorcy-Labiryntu>dozorcy Labiryntu</Dozorcy-Labiryntu> i pilnie przypatrywali się swoim współzawodnikom, o ile pozwalał na to zmierzch prędko zapadający po zachodzie słońca.</p>
+<p><Dozorcy-Labiryntu talking="true"/>— Co to za jedni tamci trzej?… — szeptali między sobą <Dozorcy-Labiryntu>dozorcy z Labiryntu</Dozorcy-Labiryntu>. — Od onegdaj krążyli dokoła świątyni, a dziś gonią za nim… Czyby go chcieli zasłonić przed nami?…</p>
 <p>Drobna łódka <Lykon>Lykona</Lykon> przybiła do drugiego brzegu. Uśpiony Grek wyskoczył z niej i szybkim krokiem począł iść ku pałacowym ogrodom. Niekiedy zataczał się, stawał i chwytał się za głowę; lecz po chwili znowu szedł jakby ciągniony przez niepojętą siłę.</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>Dozorcy Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa> również wylądowali na drugim brzegu, ale już zostali uprzedzeni przez swoich współzawodników.</p>
-<p>I zaczął się jedyny w swoim rodzaju wyścig. <Lykon>Lykon</Lykon> pędził ku pałacowi królewskiemu jak szybkobiegacz, za nim trzej ludzie nieznani, a na końcu trzej <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorcy Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>.</p>
+<p><Dozorcy-Labiryntu>Dozorcy Labiryntu</Dozorcy-Labiryntu> również wylądowali na drugim brzegu, ale już zostali uprzedzeni przez swoich współzawodników.</p>
+<p>I zaczął się jedyny w swoim rodzaju wyścig. <Lykon>Lykon</Lykon> pędził ku pałacowi królewskiemu jak szybkobiegacz, za nim trzej ludzie nieznani, a na końcu trzej <Dozorcy-Labiryntu>dozorcy Labiryntu</Dozorcy-Labiryntu>.</p>
 <p>O kilkaset kroków od ogrodu obie goniące grupy zetknęły się ze sobą. Była już noc, ale jasna.</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— Kto wy jesteście, ludzie? — zapytał nieznajomych <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorca Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>.</p>
+<p><Dozorcy-Labiryntu talking="true"/>— Kto wy jesteście, ludzie? — zapytał nieznajomych <Dozorcy-Labiryntu>dozorca Labiryntu</Dozorcy-Labiryntu>.</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>— Jestem <Naczelnik-policji-w-Pi-Bast>naczelnikiem policji z Pi-Bast</Naczelnik-policji-w-Pi-Bast> i z dwoma moimi <Setnicy-dwaj-z-policji-Pi-Bast>setnikami</Setnicy-dwaj-z-policji-Pi-Bast> ścigam wielkiego zbrodniarza…</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— A my jesteśmy <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorcy Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa> i również ścigamy tego człowieka…</p>
+<p><Dozorcy-Labiryntu talking="true"/>— A my jesteśmy <Dozorcy-Labiryntu>dozorcy Labiryntu</Dozorcy-Labiryntu> i również ścigamy tego człowieka…</p>
 <p>Obie grupy przypatrywały się sobie z rękoma na mieczach lub nożach.</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>— Co chcecie z nim zrobić? — spytał wreszcie <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast>.</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— Mamy przeciw niemu wyrok…</p>
+<p><Dozorcy-Labiryntu talking="true"/>— Mamy przeciw niemu wyrok…</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>— A trupa zostawicie?</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— Ze wszystkim, co ma na sobie — odparł starszy <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorca</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>.</p>
+<p><Dozorcy-Labiryntu talking="true"/>— Ze wszystkim, co ma na sobie — odparł starszy <Dozorcy-Labiryntu>dozorca</Dozorcy-Labiryntu>.</p>
 <p>Policjanci szeptali między sobą.</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>— Jeżeli mówicie prawdę — rzekł wreszcie <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast> — nie będziemy wam przeszkadzali. Owszem, pożyczymy go wam na chwilę, gdy wpadnie w nasze ręce…</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— Przysięgacie?</p>
+<p><Dozorcy-Labiryntu talking="true"/>— Przysięgacie?</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>— Przysięgamy…</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— No to możemy iść razem…</p>
+<p><Dozorcy-Labiryntu talking="true"/>— No to możemy iść razem…</p>
 <p>Połączyli się, ale Grek zniknął im z oczu.</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>— Przekleństwo!… — zawołał <Naczelnik-policji-w-Pi-Bast>naczelnik policji</Naczelnik-policji-w-Pi-Bast>. — Znowu umknął…</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— Znajdzie się — odparł <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorca z Labiryntu</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa> — a może nawet tędy będzie wracał.</p>
+<p><Dozorcy-Labiryntu talking="true"/>— Znajdzie się — odparł <Dozorcy-Labiryntu>dozorca z Labiryntu</Dozorcy-Labiryntu> — a może nawet tędy będzie wracał.</p>
 <p><Naczelnik-policji-w-Pi-Bast talking="true"/>— Po cóż by szedł do królewskiego ogrodu? — spytał <Naczelnik-policji-w-Pi-Bast>naczelnik</Naczelnik-policji-w-Pi-Bast>.</p>
-<p><Dozorcy-Labiryntu-trzej-zabojcy-Mefresa talking="true"/>— Arcykapłani używają go do jakichś swoich interesów, ale on wróci do świątyni, wróci!… — mówił <Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>dozorca</Dozorcy-Labiryntu-trzej-zabojcy-Mefresa>.</p>
+<p><Dozorcy-Labiryntu talking="true"/>— Arcykapłani używają go do jakichś swoich interesów, ale on wróci do świątyni, wróci!… — mówił <Dozorcy-Labiryntu>dozorca</Dozorcy-Labiryntu>.</p>
 <p>Postanowili tedy czekać i działać wspólnie.</p>
 <p>— Trzecią noc marnujemy! — rzekł jeden z policjantów ziewając.</p>
 <p>Owinęli się w burnusy i legli na trawie.</p>
