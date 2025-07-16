@@ -4,12 +4,10 @@ import "./styles/cutscene-video.css";
 
 export const dealWithCutScenes = ({ currentChapter, currentParagraph }) => {
   const cutScenesDefined = getCutScenesForBook();
-  console.log("cut scenes got", cutScenesDefined);
 
   const cutSceneToApply = cutScenesDefined.find((cutscene) => {
     return cutscene.chapter === currentChapter && cutscene.paragraph === currentParagraph;
   });
-  console.log("cut scene to apply", cutSceneToApply);
 
   if (cutSceneToApply) {
     const cutsceneVideo = document.getElementById("cutscene-video") as HTMLVideoElement;

@@ -190,7 +190,6 @@ window.addEventListener("orientationchange", handleResizeOrOrientationChange);
 
 export const parseLocationFromHash = (): Location | null => {
   const hash = window.location.hash.substring(1); // Remove leading #
-  console.log("hash", hash);
 
   if (!hash) return null;
 
@@ -215,18 +214,14 @@ export const goToInitialLocationFromHash = () => {
 
   if (locationFromHash) {
     // Use system navigation for initial load from hash
-    console.log("going to location from hash", locationFromHash);
     systemNavigateTo({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph });
   } else {
     // Fallback if hash is invalid or missing: go to furthest saved location
-    console.warn("no location in hash, using saved location");
     const saved = getSavedLocation();
 
     if (saved) {
-      console.log("navigating to saved location", saved);
       systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph });
     } else {
-      console.log("no saved location, starting fresh at chapter 1, paragraph 0 (chapter title)");
       systemNavigateTo({ currentChapter: 1, currentParagraph: 0 });
     }
   }
