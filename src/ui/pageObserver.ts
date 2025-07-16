@@ -338,7 +338,6 @@ function activateMediaInRange(
             delete placeholder.dataset.mediaInjected; // Mark as not injected (dummy is present)
 
             // NOTE: Text remains hidden in its wrapper span. No need to restore/re-hide.
-
           } else {
             // We are out of view, and it's NOT (mediaInjected && mediaElement is valid)
             // `dummyPlaceholder` was queried at the start of the loop for this placeholder.
@@ -382,7 +381,6 @@ const getParagraphInfo = (element: Element): { chapter: number | null; paragraph
   return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
 };
 
-let rootRectChangedTimes = 0;
 let previousRootRectWidth = 0;
 
 export function setupPageObserver(
@@ -445,7 +443,6 @@ export function setupPageObserver(
     const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
 
     if (rootRect.width !== previousRootRectWidth) {
-      rootRectChangedTimes++;
       previousRootRectWidth = rootRect.width;
     }
 
@@ -484,8 +481,6 @@ export function setupPageObserver(
 
     // Only proceed to second pass if no fully visible elements were found
     if (!foundFullyVisible) {
-      let maxAbsoluteOverlap = 0; // Track the maximum absolute pixel overlap
-
       intersectingPages.forEach((element) => {
         const rect = element.getBoundingClientRect();
 
@@ -667,7 +662,6 @@ export function setupPageObserver(
         }
 
         if (topElementChanged || bottomElementChanged || activeParagraphChanged) {
-
           // Update persisted state with the NEW DOM element references for the next comparison cycle
           currentlyActivePageElement = topFocusedPageElement;
           currentlyLastActivePageElement = bottomFocusedPageElement;
@@ -688,7 +682,6 @@ export function setupPageObserver(
             endInfo.chapter !== null &&
             endInfo.paragraph !== null
           ) {
-
             setCurrentLocation({
               chapter: startInfo.chapter,
               paragraph: startInfo.paragraph,
@@ -722,7 +715,6 @@ export function setupPageObserver(
               endInfo: endInfo,
             });
           }
-        } else {
         }
       } else {
         // Handle case where intersecting pages exist, but none are in the focus zone
