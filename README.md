@@ -102,6 +102,38 @@ tsx src/text-editor-service/server.ts
 - Cursor installed (free-plan is enough)
 - Node.js with TypeScript support
 
+### Video Processing
+
+For resizing character video files to a consistent size:
+
+```bash
+# Resize videos for a specific book (default: 480x480)
+npx tsx scripts/resize-character-videos.ts 1984
+
+# Custom size
+npx tsx scripts/resize-character-videos.ts 1984 480 480
+
+# Without backup (overwrites originals)
+npx tsx scripts/resize-character-videos.ts 1984 480 480 --no-backup
+
+# Using the shell wrapper
+./scripts/resize-videos.sh 1984
+```
+
+**Features:**
+
+- Automatically finds all `-listens.mp4` and `-speaks.mp4` files
+- Resizes to specified dimensions (default: 480x480)
+- Maintains aspect ratio with padding
+- Backs up original files to `original-videos-backup/` folder
+- Requires ffmpeg to be installed
+
+**Available books for video processing:**
+
+- 1984, 1984-English, Alice-Wonderland, Conrad-Tajny-Agent
+- Fatherland, Krolowa-Sniegu, Lalka, Macbeth
+- Othello, Pharaon, Romeo-And-Juliet, Snow-Queen
+
 ### Project Structure
 
 ```plaintext
