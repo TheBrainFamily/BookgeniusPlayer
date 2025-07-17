@@ -193,11 +193,7 @@ export const xmlToComplexHtml = (
                       const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
                       inner += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
                       if (spanId !== lastSpanId) {
-                        if (!currentCharacterAlignment || currentCharacterAlignment === "right") {
-                          currentCharacterAlignment = "left";
-                        } else {
-                          currentCharacterAlignment = "right";
-                        }
+                        currentCharacterAlignment = currentCharacterAlignment === "left" ? "right" : "left";
                       }
                       lastSpanId = spanId;
                     } else {
