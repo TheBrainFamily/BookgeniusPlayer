@@ -1,18 +1,17 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { useLocation } from "@/state/LocationContext";
-import { getSavedLocation } from "@/helpers/paragraphsNavigation";
+import React, { useState, useEffect } from "react";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { useReadingProgress } from "@/hooks/useReadingProgress";
 
-interface ChapterStructure {
+export interface ChapterStructure {
   chapterNumber: number;
   paragraphCount: number;
 }
 
 const ProgressBars: React.FC = () => {
-  const { location } = useLocation();
-
   const [chaptersStructure, setChaptersStructure] = useState<ChapterStructure[]>([]);
   const [totalParagraphs, setTotalParagraphs] = useState(0);
+
+  const { chapterProgress, bookProgress, furthestProgress } = useReadingProgress(chaptersStructure, totalParagraphs);
 
   useEffect(() => {
     try {
@@ -38,49 +37,6 @@ const ProgressBars: React.FC = () => {
       console.error("❌ Error parsing book data:", error);
     }
   }, []);
-
-  const { chapterProgress, bookProgress, furthestProgress } = useMemo(() => {
-    if (chaptersStructure.length === 0 || !location) {
-      return { chapterProgress: 0, bookProgress: 0, furthestProgress: 0 };
-    }
-
-    const currentChapter = location.currentChapter || 1;
-    const currentParagraph = location.currentParagraph || 0;
-
-    const currentChapterData = chaptersStructure.find((ch) => ch.chapterNumber === currentChapter);
-
-    const chapterProg = currentChapterData ? Math.min(((currentParagraph + 1) / currentChapterData.paragraphCount) * 100, 100) : 0;
-
-    // Current position in book
-    let currentReadParagraphs = 0;
-    for (const chapter of chaptersStructure) {
-      if (chapter.chapterNumber < currentChapter) {
-        currentReadParagraphs += chapter.paragraphCount;
-      } else if (chapter.chapterNumber === currentChapter) {
-        currentReadParagraphs += Math.min(currentParagraph + 1, chapter.paragraphCount);
-        break;
-      }
-    }
-    const bookProg = totalParagraphs > 0 ? (currentReadParagraphs / totalParagraphs) * 100 : 0;
-
-    // Furthest position in book (saved location)
-    const savedLocation = getSavedLocation();
-    const savedChapter = savedLocation?.currentChapter || 1;
-    const savedParagraph = savedLocation?.currentParagraph || 0;
-
-    let furthestReadParagraphs = 0;
-    for (const chapter of chaptersStructure) {
-      if (chapter.chapterNumber < savedChapter) {
-        furthestReadParagraphs += chapter.paragraphCount;
-      } else if (chapter.chapterNumber === savedChapter) {
-        furthestReadParagraphs += Math.min(savedParagraph + 1, chapter.paragraphCount);
-        break;
-      }
-    }
-    const furthestProg = totalParagraphs > 0 ? (furthestReadParagraphs / totalParagraphs) * 100 : 0;
-
-    return { chapterProgress: chapterProg, bookProgress: bookProg, furthestProgress: furthestProg };
-  }, [chaptersStructure, totalParagraphs, location]);
 
   if (chaptersStructure.length === 0) {
     return null;
