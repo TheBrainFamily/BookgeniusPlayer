@@ -186,10 +186,70 @@
       }
 
       .play-container > section {
-        width: 85%;
+        width: 80%;
         margin-left: auto;
         margin-right: auto;
         margin-top: 5em;
+
+        .right-character-container {
+          display: grid;
+          grid-template-columns: 1fr max-content;
+          width: 100%;
+          margin-bottom: 2em;
+
+          p[data-text-alignment="right"] {
+            grid-column: 2;
+            text-align: left;
+          }
+
+          p[data-is-didaskalia="true"] {
+            grid-column: 1 / -1;
+            text-align: center;
+            width: 100%;
+          }
+
+        }
+
+        p[data-text-alignment="right"][data-is-character="true"] {
+          text-align: right;
+          text-indent: 0;
+          margin-top: 1.5em;
+
+          > span {
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: center;
+            gap: 0.5em;
+            background: transparent !important;
+            padding: 0 !important;
+            pointer-events: none;
+
+            > span {
+              margin-left: 0;
+            }
+          }
+
+          strong {
+            cursor: pointer;
+            display: inline-block;
+            line-height: 1.5;
+            pointer-events: auto;
+
+            &:hover {
+               background-color: rgba(0, 0, 0, 0.05);
+            }
+          }
+
+          img.inline-avatar {
+            transform: rotateY(180deg);
+            margin: 0;
+            pointer-events: auto;
+
+            &:hover {
+               transform: rotateY(180deg) scale(2);
+            }
+          }
+        }
 
         span {
           margin-top: 0;
@@ -203,9 +263,21 @@
           font-weight: 700;
         }
 
-        p {
+        p[data-text-alignment="left"]:not(:has(em)) {
+          text-align: left;
+        }
+
+        p[data-text-alignment="right"][data-is-character="false"]:not(:has(em)) {
+          text-align: left;
+          padding-left: 0;
+          text-indent: 0;
+        }
+
+
+        p, .right-character-container > p {
           margin-bottom: 0.1em;
           font-family: var(--font-libre-caslon-text);
+          font-size: 16px;
           text-indent: 0;
         }
 
@@ -215,7 +287,7 @@
           text-transform: uppercase;
         }
 
-        p:has(em) {
+        p:has(em), .right-character-container > p:has(em) {
           text-align: center;
           line-height: 1em;
           font-size: 14px;

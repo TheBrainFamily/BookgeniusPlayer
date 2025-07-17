@@ -7,7 +7,7 @@ import prettier from "prettier";
 import { CURRENT_BOOK } from "@/consts";
 import { BOOK_SLUGS } from "@/consts";
 
-interface ChapterInfo {
+export interface ChapterInfo {
   chapter: number;
   summary: string;
   paragraphsWhereSpotted: number[]; // 0-based index of <p> tag
@@ -16,7 +16,7 @@ interface ChapterInfo {
   paragraphsWhereExits?: number[]; // 0-based index of <p> tag
 }
 
-interface SimpleCharacterMetadata {
+export interface SimpleCharacterMetadata {
   slug: string; // The XML tag name, e.g., "Ksiaze-Ramzes"
   characterName: string; // The display name, e.g., "Książe Ramzes"
   bookSlug: string;

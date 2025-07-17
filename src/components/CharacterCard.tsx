@@ -81,7 +81,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
             ? "z-10 shadow-lg border-2 border-(--book-primary-color) animate-pulse-glow"
             : "transition-transform duration-300 ease-in-out hover:scale-110 hover:z-10",
         )}
-        onClick={() => openModal(entity.slug, isTalkingInCurrentRange, mediaSrc)}
+        onClick={() => openModal(entity.slug, isVideo, mediaSrc)}
       >
         <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />
       </div>

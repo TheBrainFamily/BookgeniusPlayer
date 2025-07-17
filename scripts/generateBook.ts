@@ -3,14 +3,14 @@ import path from "path";
 import { DOMParser, Document } from "@xmldom/xmldom";
 
 import { BookData } from "@/types/book";
-import { setKnownVideos } from "@/utils/getFilePathsForName";
+import { getPictureFileNameForName, setKnownVideos } from "@/utils/getFilePathsForName";
 import { generateDataFiles, xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterTags } from "./data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
 
 async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
-  const { bookSlug, bookLanguage, bookForm, xmlDoc } = parseBookXmlData(bookDirectoryPath);
+  const { bookSlug, bookLanguage, bookForm, bookSimplifiedIconColor, xmlDoc } = parseBookXmlData(bookDirectoryPath);
 
   // Ensure output directory exists
   const bookOutputPath = path.resolve("src", "books", bookSlug);
@@ -21,7 +21,7 @@ async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: stri
   // Generate files
   generateKnownVideoFiles(bookDirectoryPath, bookOutputPath);
   generateAudiobookTracksFile(bookDirectoryPath, bookOutputPath);
-  generateBookDataFiles(bookDirectoryPath, bookSlug, bookLanguage, bookForm, xmlDoc);
+  generateBookDataFiles(bookDirectoryPath, bookSlug, bookLanguage, bookForm, bookSimplifiedIconColor, xmlDoc);
 
   // Wait a moment for file generation to complete
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -35,7 +35,14 @@ async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: stri
   return { bookSlug: bookData.slug, bookTitle: bookData.metadata.title, bookLanguage };
 }
 
-function parseBookXmlData(bookDirectoryPath: string): { bookSlug: string; bookLanguage: string; bookForm: string; xmlDoc: Document } {
+export function parseBookXmlData(bookDirectoryPath: string): {
+  bookSlug: string;
+  bookLanguage: string;
+  bookForm: string;
+  bookSimplifiedIconColor: string;
+  xmlDoc: Document;
+  bookString: string;
+} {
   const bookXmlPath = `${bookDirectoryPath}/book.xml`;
   if (!fs.existsSync(bookXmlPath)) {
     throw new Error(`book.xml not found at ${bookXmlPath}`);
@@ -72,7 +79,13 @@ function parseBookXmlData(bookDirectoryPath: string): { bookSlug: string; bookLa
     bookForm = bookFormElements[0].textContent.trim().toLowerCase();
   }
 
-  return { bookSlug, bookLanguage, bookForm, xmlDoc };
+  const bookSimplifiedIconColorElements = xmlDoc.getElementsByTagName("BookSimplifiedIconColor");
+  let bookSimplifiedIconColor = "#4CAF50";
+  if (bookSimplifiedIconColorElements.length > 0 && bookSimplifiedIconColorElements[0].textContent) {
+    bookSimplifiedIconColor = bookSimplifiedIconColorElements[0].textContent.trim();
+  }
+
+  return { bookSlug, bookLanguage, bookForm, bookSimplifiedIconColor, xmlDoc, bookString: book };
 }
 
 function generateKnownVideoFiles(bookDirectoryPath: string, bookOutputPath: string): void {
@@ -118,7 +131,21 @@ export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
   fs.writeFileSync(path.join(bookOutputPath, "getAudiobookTracksForBook.ts"), getAudiobookTracksForBookContent, "utf-8");
 }
 
-function generateBookDataFiles(bookDirectoryPath: string, bookSlug: string, bookLang: string, bookForm: string, xmlDoc: Document): void {
+export function generateCharacterMetadata(xmlDoc: Document, bookString: string, bookForm: string, bookSlug: string) {
+  const characterTags = getCharacterTags(xmlDoc);
+  const parser = new DOMParser();
+  // Removes all spans with their id as "chX-pY-sZ" and <em> which is inside the stage direction
+  const updatedString = bookString.replaceAll(/<span id="ch\d+-p\d+-s\d+">(.*?)<\/span>/g, "$1").replaceAll(/<\/?em[^>]*>/g, "");
+  const xmlDocWithoutSpans = parser.parseFromString(updatedString, "text/xml");
+
+  return extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm).map((character) => ({
+    ...character,
+    bookSlug,
+    imageUrl: `/${bookSlug}/${getPictureFileNameForName(character.slug)}.png`,
+  }));
+}
+
+function generateBookDataFiles(bookDirectoryPath: string, bookSlug: string, bookLang: string, bookForm: string, bookSimplifiedIconColor: string, xmlDoc: Document): void {
   const bookOutputPath = path.resolve("src", "books", bookSlug);
 
   // --- Generate getBookStringified.ts ---
@@ -165,24 +192,14 @@ export const getBookStringified = (): string => {
   fs.writeFileSync(path.join(bookOutputPath, "getBookStringified.ts"), getBookStringifiedContent, "utf-8");
 
   // --- Generate getCharactersData.ts ---
-  const characterTags = getCharacterTags(xmlDoc);
-  const parser = new DOMParser();
-  // Removes all spans with their id as "chX-pY-sZ" and <em> which is inside the stage direction
-  const updatedString = bookXml.replaceAll(/<span id="ch\d+-p\d+-s\d+">(.*?)<\/span>/g, "$1").replaceAll(/<\/?em[^>]*>/g, "");
-  const xmlDocWithoutSpans = parser.parseFromString(updatedString, "text/xml");
-
-  const characterMetadata = extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm).map((character) => ({
-    ...character,
-    bookSlug,
-    imageUrl: `/${bookSlug}/${character.slug.toLowerCase()}.png`,
-  }));
-  const bookSlugNoDashes = bookSlug.replaceAll("-", "");
+  const characterMetadata = generateCharacterMetadata(xmlDoc, bookXml, bookForm, bookSlug);
   const getCharactersDataContent = `import type { CharacterData } from "@/types/book";
-
-export const getCharactersData = (): CharacterData[] => ${JSON.stringify(characterMetadata, null, 2)};\n
-`;
+  
+  export const getCharactersData = (): CharacterData[] => ${JSON.stringify(characterMetadata, null, 2)};\n
+  `;
   fs.writeFileSync(path.join(bookOutputPath, "getCharactersData.ts"), getCharactersDataContent);
 
+  const bookSlugNoDashes = bookSlug.replaceAll("-", "");
   // --- Check for AudiobookTracksDefined.ts existence ---
   const audiobookDataPath = path.join(bookDirectoryPath, "assets", "audiobook_data", "AudiobookTracksDefined.ts");
   const hasAudiobook = fs.existsSync(audiobookDataPath);
@@ -199,7 +216,8 @@ export const bookData: BookData = {
     primaryColor: "#E3F2FD",
     secondaryColor: "#1976D2",
     tertiaryColor: "#90CAF9",
-    quaternaryColor: "#0D47A1"
+    quaternaryColor: "#0D47A1",
+    simplifiedIconColor: "${bookSimplifiedIconColor}"
   },
   hasAudiobook: ${hasAudiobook},
   bookStringified: getBookStringified(),

@@ -167,55 +167,80 @@ export function cleanupSearchChapters(): void {
 }
 
 const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) => {
-  // Remove span tags with dynamic IDs like ch1-p1-s1
-  // We are getting here paragraph like: "/n       <span id='ch1-p1-s1' ..."
-  const paragraphWithoutSpans = paragraph
-    .replace("\n", "")
-    .trim()
-    .replace(/<span id="ch\d+-p\d+-s\d+"[^>]*>(.*)<\/span>/g, "$1");
+  // Create a temporary DOM element to properly parse the HTML
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = paragraph;
 
-  const sentences = paragraphWithoutSpans
-    .split(/(?<=[.!?])\s+(?=[A-Z<])/) // Split on sentence endings while preserving HTML tags
-    .map((s) => s.trim()) // Trim whitespace
-    .filter((s) => s.length > 0); // Remove empty sentence
+  const characterElements = tempDiv.querySelectorAll(`[data-character="${characterSlug}"]`);
+  if (characterElements.length === 0) {
+    return "";
+  }
 
-  return sentences.reduce((acc, sentence) => {
-    if (sentence.includes(`data-character="${characterSlug}"`)) {
-      // Find the character's position in the original sentence
-      const characterIndex = sentence.indexOf(`data-character="${characterSlug}"`);
-      if (characterIndex !== -1) {
-        // Get the text before the character tag
-        const beforeCharacter = sentence.substring(0, characterIndex);
-        // Get the text after the character tag
-        const afterCharacter = sentence.substring(characterIndex);
+  const results = [];
 
-        // Split into words and get context
-        const words = beforeCharacter.split(/\s+/);
-        const startIndex = Math.max(0, words.length - 5); // Get 5 words before character
-        const contextBefore = words.slice(startIndex).join(" ");
+  characterElements.forEach((characterElement) => {
+    // Find the sentence span that contains this character element
+    const sentenceSpan = characterElement.closest('span[id^="ch"][id*="-s"]');
 
-        // Combine with the character and what follows
-        const contextualSentence = startIndex > 0 ? `...${contextBefore}${afterCharacter}` : `${contextBefore}${afterCharacter}`;
+    if (sentenceSpan) {
+      // Get the sentence text with HTML intact
+      let sentenceHTML = sentenceSpan.outerHTML;
 
-        if (acc.length === 0) {
-          return contextualSentence;
+      // Clean up the sentence HTML - remove the id and style attributes
+      sentenceHTML = sentenceHTML.replace(/\s*id="[^"]*"/g, "");
+      sentenceHTML = sentenceHTML.replace(/\s*style="[^"]*"/g, "");
+
+      results.push(sentenceHTML);
+    } else {
+      // Fallback: if no sentence span found, try to get surrounding context
+      let context = "";
+      const current = characterElement;
+
+      // Get up to 10 words before
+      const wordsBefore = [];
+      let beforeElement = current.previousSibling;
+      while (beforeElement && wordsBefore.length < 10) {
+        if (beforeElement.nodeType === Node.TEXT_NODE || beforeElement.nodeType === Node.ELEMENT_NODE) {
+          const words = beforeElement.textContent
+            .trim()
+            .split(/\s+/)
+            .filter((w) => w);
+          wordsBefore.unshift(...words.slice(-10));
         }
-        return `${acc} ${contextualSentence}`;
+        beforeElement = beforeElement.previousSibling;
       }
 
-      // Fallback to original behavior if we can't find the character position
-      if (acc.length === 0) {
-        return sentence;
+      const characterHTML = characterElement.outerHTML;
+
+      // Get up to 10 words after
+      const wordsAfter = [];
+      let afterElement = current.nextSibling;
+      while (afterElement && wordsAfter.length < 10) {
+        if (afterElement.nodeType === Node.TEXT_NODE || afterElement.nodeType === Node.ELEMENT_NODE) {
+          const words = afterElement.textContent
+            .trim()
+            .split(/\s+/)
+            .filter((w) => w);
+          wordsAfter.push(...words.slice(0, 10));
+        }
+        afterElement = afterElement.nextSibling;
       }
-      return `${acc} ${sentence}`;
+
+      // Combine context
+      const before = wordsBefore.slice(-5).join(" ");
+      const after = wordsAfter.slice(0, 5).join(" ");
+      context = `${before ? before + " " : ""}${characterHTML}${after ? " " + after : ""}`;
+
+      if (context.trim()) {
+        results.push(context.trim());
+      }
     }
-    // If we haven't found the character yet, keep looking
-    if (acc.length === 0) {
-      return acc;
-    }
-    // If we already have text with the character, add the rest of the text
-    return `${acc} ${sentence}`;
-  }, "");
+  });
+
+  const uniqueResults = [...new Set(results)];
+  const finalResult = uniqueResults.join(" ");
+
+  return finalResult;
 };
 
 export function findCharacterSentences(characterSlug: string, currentLocation: Location) {
@@ -246,7 +271,6 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
           const paragraphInnerHTML = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`).innerHTML;
 
           const sentence = getSentenceWithCharacterSpan(paragraphInnerHTML, characterSlug);
-
           if (sentence) {
             const cleanText = sentence.replace(/<[^>]*>/g, "");
             const summaryText = cleanText.length > 300 ? cleanText.substring(0, 300) : cleanText;

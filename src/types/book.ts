@@ -32,6 +32,7 @@ export interface BookThemeColors {
   secondaryColor: string;
   tertiaryColor: string;
   quaternaryColor: string;
+  simplifiedIconColor?: string;
 }
 
 export type BookData = {

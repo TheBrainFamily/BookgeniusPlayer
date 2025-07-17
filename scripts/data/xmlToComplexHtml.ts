@@ -90,6 +90,9 @@ export const xmlToComplexHtml = (
   const chapters = xmlDoc.getElementsByTagName("Chapter");
 
   let currentAct = "";
+  let currentCharacterAlignment = "";
+  let isCharacter = false;
+  let lastSpanId = "";
 
   for (const chapter of chapters) {
     const chapterId = chapter.getAttribute("id");
@@ -186,8 +189,13 @@ export const xmlToComplexHtml = (
                     const talkingSrc = getTalkingMediaFilePathForName(slug, bookSlug);
                     const listeningSrc = getListeningMediaFilePathForName(slug, bookSlug);
                     if (isTalking) {
+                      isCharacter = true;
                       const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
                       inner += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
+                      if (spanId !== lastSpanId) {
+                        currentCharacterAlignment = currentCharacterAlignment === "left" ? "right" : "left";
+                      }
+                      lastSpanId = spanId;
                     } else {
                       if (e.getAttribute("dynasty") === "true") {
                         inner += e.textContent;
@@ -223,7 +231,6 @@ export const xmlToComplexHtml = (
               pContent += `<span id="${spanId}">${inner}</span>`;
               continue;
             }
-
             // 2b) character‐tag (e.g. <Alice>)
             const ci = characterMap.get(pElement.tagName);
             if (ci) {
@@ -272,7 +279,28 @@ export const xmlToComplexHtml = (
         if (pContent.trim()) {
           let clean = pContent.replace(/\s+/g, " ").trim();
           clean = clean.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
-          htmlResult += `\n    <p data-index="${dataIndex++}">\n      ${clean}\n    </p>`;
+
+          if (bookFormValue === "Play") {
+            if (isCharacter && currentCharacterAlignment === "left") {
+              htmlResult += `\n </span>\n`;
+            }
+
+            htmlResult += `\n    <p 
+                data-index="${dataIndex++}" 
+                data-text-alignment="${currentCharacterAlignment}" 
+                data-is-character="${isCharacter}"
+                data-is-didaskalia="${pContent.includes("<em>")}"
+                >\n      ${clean}\n    </p>`;
+
+            if (isCharacter && currentCharacterAlignment === "right") {
+              htmlResult += `\n <span class="right-character-container">\n`;
+            }
+            if (isCharacter) {
+              isCharacter = false;
+            }
+          } else {
+            htmlResult += `\n <p data-index="${dataIndex++}">\n ${clean}\n </p>`;
+          }
         }
       } else if (tagName === "Act") {
         htmlResult += `\n    <h3 data-act="true">${childElement.textContent || ""}</h3>`;
