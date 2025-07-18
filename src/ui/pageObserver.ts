@@ -520,7 +520,6 @@ export function setupPageObserver(
 
         if (weightedScore > maxPercentageOverlapRatio) {
           maxPercentageOverlapRatio = weightedScore;
-          maxAbsoluteOverlap = overlap;
           activeParagraph = getParagraphInfo(element);
           chosenElement = element;
         }
