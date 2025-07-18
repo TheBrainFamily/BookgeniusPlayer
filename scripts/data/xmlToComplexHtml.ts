@@ -92,6 +92,7 @@ export const xmlToComplexHtml = (
   let currentAct = "";
   let currentCharacterAlignment = "";
   let isCharacter = false;
+  let lastSpanId = "";
 
   for (const chapter of chapters) {
     const chapterId = chapter.getAttribute("id");
@@ -191,11 +192,10 @@ export const xmlToComplexHtml = (
                       isCharacter = true;
                       const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
                       inner += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
-                      if (!currentCharacterAlignment || currentCharacterAlignment === "right") {
-                        currentCharacterAlignment = "left";
-                      } else {
-                        currentCharacterAlignment = "right";
+                      if (spanId !== lastSpanId) {
+                        currentCharacterAlignment = currentCharacterAlignment === "left" ? "right" : "left";
                       }
+                      lastSpanId = spanId;
                     } else {
                       if (e.getAttribute("dynasty") === "true") {
                         inner += e.textContent;
@@ -231,7 +231,6 @@ export const xmlToComplexHtml = (
               pContent += `<span id="${spanId}">${inner}</span>`;
               continue;
             }
-
             // 2b) character‐tag (e.g. <Alice>)
             const ci = characterMap.get(pElement.tagName);
             if (ci) {
@@ -282,7 +281,7 @@ export const xmlToComplexHtml = (
           clean = clean.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
 
           if (bookFormValue === "Play") {
-            if ((isCharacter && currentCharacterAlignment === "left")) {
+            if (isCharacter && currentCharacterAlignment === "left") {
               htmlResult += `\n </span>\n`;
             }
 
