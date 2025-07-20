@@ -67,12 +67,13 @@ export const paragraphMetadataServicePure = {
       metadata: { bookForm },
     } = getBookData();
 
+    const bookCharacters = data.filter((d) => d.bookSlug === bookSlug);
+
     // For "play" books, we need to know the closest entry paragraph in the current chapter
     // to correctly display characters at the very beginning (paragraph 0).
     const chapterEntryParagraphs =
       bookForm === "play"
-        ? data
-            .filter((d) => d.bookSlug === bookSlug)
+        ? bookCharacters
             .flatMap((character) => character.infoPerChapter)
             .filter((c) => c.chapter === startChapter)
             .flatMap((c) => c.paragraphsWhereEnters || [])
@@ -80,9 +81,8 @@ export const paragraphMetadataServicePure = {
         : [];
 
     return (
-      data
-        // 1. book filter ───────────────────────────────────────────────────────
-        .filter((d) => d.bookSlug === bookSlug)
+      bookCharacters
+        // 1. book filter is already done
         // 2. chapter & paragraph filtering ────────────────────────────────────
         .map((character) => {
           const infoPerChapter: InfoPerChapter[] = character.infoPerChapter
@@ -246,7 +246,7 @@ function createParagraphsWhereSpottedForPlay(
   // Special case: At the start of a chapter, if this character is among the first to enter,
   // we treat them as "spotted" at paragraph 0 so they appear immediately.
   if (startParagraph === 0 && allChapterEntryParagraphs.length > 0) {
-const closestEntry = allChapterEntryParagraphs.reduce((a, b) => Math.min(a, b));
+    const closestEntry = allChapterEntryParagraphs.reduce((a, b) => Math.min(a, b));
     if (paragraphsWhereEnters.includes(closestEntry)) {
       uniqueSpottedParagraphs.add(0);
     }
