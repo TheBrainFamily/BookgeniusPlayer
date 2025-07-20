@@ -67,6 +67,18 @@ export const paragraphMetadataServicePure = {
       metadata: { bookForm },
     } = getBookData();
 
+    // For "play" books, we need to know the closest entry paragraph in the current chapter
+    // to correctly display characters at the very beginning (paragraph 0).
+    const chapterEntryParagraphs =
+      bookForm === "play"
+        ? data
+            .filter((d) => d.bookSlug === bookSlug)
+            .flatMap((character) => character.infoPerChapter)
+            .filter((c) => c.chapter === startChapter)
+            .flatMap((c) => c.paragraphsWhereEnters || [])
+            .filter((p) => p > 0)
+        : [];
+
     return (
       data
         // 1. book filter ───────────────────────────────────────────────────────
@@ -93,7 +105,7 @@ export const paragraphMetadataServicePure = {
               const paragraphsWhereTalking = c.paragraphsWhereTalking.filter(keep);
               const paragraphsWhereSpotted =
                 bookForm === "play"
-                  ? createParagraphsWhereSpottedForPlay(startParagraph, endParagraph, c.paragraphsWhereEnters, c.paragraphsWhereExits).filter(keep)
+                  ? createParagraphsWhereSpottedForPlay(startParagraph, endParagraph, c.paragraphsWhereEnters, c.paragraphsWhereExits, chapterEntryParagraphs).filter(keep)
                   : c.paragraphsWhereSpotted.filter(keep);
 
               return { ...c, paragraphsWhereSpotted, paragraphsWhereTalking };
@@ -201,7 +213,13 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
 /*  4. Ad‑hoc "does it match?" sanity check                                   */
 /* -------------------------------------------------------------------------- */
 
-function createParagraphsWhereSpottedForPlay(startParagraph: number, endParagraph: number, paragraphsWhereEnters: number[] = [], paragraphsWhereExits: number[] = []): number[] {
+function createParagraphsWhereSpottedForPlay(
+  startParagraph: number,
+  endParagraph: number,
+  paragraphsWhereEnters: number[] = [],
+  paragraphsWhereExits: number[] = [],
+  allChapterEntryParagraphs: number[] = [],
+): number[] {
   const activeIntervals: Array<[number, number]> = [];
 
   let exitIndex = 0;
@@ -224,6 +242,15 @@ function createParagraphsWhereSpottedForPlay(startParagraph: number, endParagrap
   }
 
   const uniqueSpottedParagraphs = new Set<number>();
+
+  // Special case: At the start of a chapter, if this character is among the first to enter,
+  // we treat them as "spotted" at paragraph 0 so they appear immediately.
+  if (startParagraph === 0 && allChapterEntryParagraphs.length > 0) {
+    const closestEntry = Math.min(...allChapterEntryParagraphs);
+    if (paragraphsWhereEnters.includes(closestEntry)) {
+      uniqueSpottedParagraphs.add(0);
+    }
+  }
 
   for (const [intervalStart, intervalEnd] of activeIntervals) {
     const overlapStart = Math.max(intervalStart, startParagraph);
