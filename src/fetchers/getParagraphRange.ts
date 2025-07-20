@@ -258,26 +258,9 @@ function createParagraphsWhereSpottedForPlay(
   // Special case: At the start of a chapter, if this character is among the first to enter,
   // we treat them as "spotted" at paragraph 0 so they appear immediately.
   if (startParagraph === 0 && closestEntryInChapter > 0) {
-    // Binary search implementation for O(log N) instead of O(N)
-    let left = 0;
-    let right = paragraphsWhereEnters.length - 1;
-    let found = false;
-
-    while (left <= right) {
-      const mid = Math.floor((left + right) / 2);
-      if (paragraphsWhereEnters[mid] === closestEntryInChapter) {
-        found = true;
-        break;
-      } else if (paragraphsWhereEnters[mid] < closestEntryInChapter) {
-        left = mid + 1;
-      } else {
-        right = mid - 1;
-      }
-    }
-
-    if (found) {
-      uniqueSpottedParagraphs.add(0);
-    }
+if (paragraphsWhereEnters.includes(closestEntryInChapter)) {
+  uniqueSpottedParagraphs.add(0);
+}
   }
 
   for (const [intervalStart, intervalEnd] of activeIntervals) {
