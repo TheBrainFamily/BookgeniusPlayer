@@ -231,14 +231,24 @@ function createParagraphsWhereSpottedForPlay(
 ): number[] {
   const activeIntervals: Array<[number, number]> = [];
 
-  // Create intervals for each entry-exit pair
-  // Assumes paragraphsWhereEnters and paragraphsWhereExits are sorted
+  // Two-pointer approach for O(N+M) complexity instead of O(N*M)
+  let exitIndex = 0;
+  let correspondingExit = endParagraph + 1;
+
   for (let i = 0; i < paragraphsWhereEnters.length; i++) {
     const entry = paragraphsWhereEnters[i];
 
-    // Find the first exit that occurs after this entry
-    const exitIndex = paragraphsWhereExits.findIndex((exit) => exit > entry);
-    const correspondingExit = exitIndex !== -1 ? paragraphsWhereExits[exitIndex] : endParagraph + 1;
+    // Advance exitIndex to find the first exit greater than the current entry
+    while (exitIndex < paragraphsWhereExits.length && paragraphsWhereExits[exitIndex] <= entry) {
+      exitIndex++;
+    }
+
+    // If a suitable exit is found, use it; otherwise, default to endParagraph + 1
+    if (exitIndex < paragraphsWhereExits.length) {
+      correspondingExit = paragraphsWhereExits[exitIndex];
+    } else {
+      correspondingExit = endParagraph + 1;
+    }
 
     activeIntervals.push([entry, correspondingExit - 1]);
   }
@@ -248,7 +258,24 @@ function createParagraphsWhereSpottedForPlay(
   // Special case: At the start of a chapter, if this character is among the first to enter,
   // we treat them as "spotted" at paragraph 0 so they appear immediately.
   if (startParagraph === 0 && closestEntryInChapter > 0) {
-    if (paragraphsWhereEnters.includes(closestEntryInChapter)) {
+    // Binary search implementation for O(log N) instead of O(N)
+    let left = 0;
+    let right = paragraphsWhereEnters.length - 1;
+    let found = false;
+
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      if (paragraphsWhereEnters[mid] === closestEntryInChapter) {
+        found = true;
+        break;
+      } else if (paragraphsWhereEnters[mid] < closestEntryInChapter) {
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
+    }
+
+    if (found) {
       uniqueSpottedParagraphs.add(0);
     }
   }
