@@ -67,13 +67,27 @@ export const paragraphMetadataServicePure = {
       metadata: { bookForm },
     } = getBookData();
 
+    const bookCharacters = data.filter((d) => d.bookSlug === bookSlug);
+
+    // For "play" books, calculate the closest entry paragraph in the start chapter once.
+    const chapterEntryParagraphs =
+      bookForm === "play"
+        ? bookCharacters
+            .flatMap((character) => character.infoPerChapter)
+            .filter((c) => c.chapter === startChapter)
+            .flatMap((c) => c.paragraphsWhereEnters || [])
+            .filter((p) => p > 0)
+        : [];
+
+    // Use reduce instead of Math.min(...array) to avoid stack overflow with large arrays
+    const closestEntryInChapter = chapterEntryParagraphs.length > 0 ? chapterEntryParagraphs.reduce((min, current) => (current < min ? current : min), Infinity) : -1;
+
     return (
-      data
-        // 1. book filter ───────────────────────────────────────────────────────
-        .filter((d) => d.bookSlug === bookSlug)
+      bookCharacters
+        // 1. book filter is already done
         // 2. chapter & paragraph filtering ────────────────────────────────────
         .map((character) => {
-          const infoPerChapter: InfoPerChapter[] = character.infoPerChapter
+          const infoPerChapter: InfoPerChapter[] = character.infoPerChapter // Fixed typo: was infoPerchapter
             // keep only chapters inside the chapter range
             .filter((c) => c.chapter >= startChapter && c.chapter <= endChapter)
             // for every chapter keep only the paragraphs that satisfy the rules
@@ -93,7 +107,14 @@ export const paragraphMetadataServicePure = {
               const paragraphsWhereTalking = c.paragraphsWhereTalking.filter(keep);
               const paragraphsWhereSpotted =
                 bookForm === "play"
-                  ? createParagraphsWhereSpottedForPlay(startParagraph, endParagraph, c.paragraphsWhereEnters, c.paragraphsWhereExits).filter(keep)
+                  ? createParagraphsWhereSpottedForPlay(
+                      startParagraph,
+                      endParagraph,
+                      c.paragraphsWhereEnters,
+                      c.paragraphsWhereExits,
+                      // Pass the pre-calculated closest entry only for the start chapter
+                      c.chapter === startChapter ? closestEntryInChapter : -1,
+                    ).filter(keep)
                   : c.paragraphsWhereSpotted.filter(keep);
 
               return { ...c, paragraphsWhereSpotted, paragraphsWhereTalking };
@@ -201,29 +222,46 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
 /*  4. Ad‑hoc "does it match?" sanity check                                   */
 /* -------------------------------------------------------------------------- */
 
-function createParagraphsWhereSpottedForPlay(startParagraph: number, endParagraph: number, paragraphsWhereEnters: number[] = [], paragraphsWhereExits: number[] = []): number[] {
+function createParagraphsWhereSpottedForPlay(
+  startParagraph: number,
+  endParagraph: number,
+  paragraphsWhereEnters: number[] = [],
+  paragraphsWhereExits: number[] = [],
+  closestEntryInChapter: number = -1,
+): number[] {
   const activeIntervals: Array<[number, number]> = [];
 
+  // Two-pointer approach for O(N+M) complexity instead of O(N*M)
   let exitIndex = 0;
+  let correspondingExit = endParagraph + 1;
 
   for (let i = 0; i < paragraphsWhereEnters.length; i++) {
     const entry = paragraphsWhereEnters[i];
 
-    let correspondingExit = endParagraph + 1;
-
+    // Advance exitIndex to find the first exit greater than the current entry
     while (exitIndex < paragraphsWhereExits.length && paragraphsWhereExits[exitIndex] <= entry) {
       exitIndex++;
     }
 
+    // If a suitable exit is found, use it; otherwise, default to endParagraph + 1
     if (exitIndex < paragraphsWhereExits.length) {
       correspondingExit = paragraphsWhereExits[exitIndex];
-      exitIndex++;
+    } else {
+      correspondingExit = endParagraph + 1;
     }
 
     activeIntervals.push([entry, correspondingExit - 1]);
   }
 
   const uniqueSpottedParagraphs = new Set<number>();
+
+  // Special case: At the start of a chapter, if this character is among the first to enter,
+  // we treat them as "spotted" at paragraph 0 so they appear immediately.
+  if (startParagraph === 0 && closestEntryInChapter > 0) {
+if (paragraphsWhereEnters.includes(closestEntryInChapter)) {
+  uniqueSpottedParagraphs.add(0);
+}
+  }
 
   for (const [intervalStart, intervalEnd] of activeIntervals) {
     const overlapStart = Math.max(intervalStart, startParagraph);

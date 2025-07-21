@@ -12,7 +12,6 @@ function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {
 
 /**
  * @param loc                 current paragraph-range location
- * @param charactersData      raw metadata array
  * @param addNewAtEnd         if true, keeps existing order and appends new chars;
  *                            if false, just replaces list on any change
  * @param sortAlphabetically  when appending, whether to sort the new items (and initial load) alphabetically

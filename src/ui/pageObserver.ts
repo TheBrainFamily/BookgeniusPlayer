@@ -290,7 +290,6 @@ function activateMediaInRange(
               if (mediaElement instanceof HTMLVideoElement) {
                 mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
               }
-              console.log(`[Media Inject] Replaced dummy with media for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
             }
           } else if (!mediaInjected) {
             // No dummy and no media injected yet, inject for the first time
@@ -313,7 +312,6 @@ function activateMediaInRange(
               if (mediaElement instanceof HTMLVideoElement) {
                 mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
               }
-              console.log(`[Media Inject] Injected media for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
             }
           } else if (mediaElement instanceof HTMLVideoElement && mediaElement.paused) {
             // Media already injected, just play existing video if paused
@@ -340,8 +338,6 @@ function activateMediaInRange(
             delete placeholder.dataset.mediaInjected; // Mark as not injected (dummy is present)
 
             // NOTE: Text remains hidden in its wrapper span. No need to restore/re-hide.
-
-            console.log(`[Media Unload] Replaced media with dummy for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
           } else {
             // We are out of view, and it's NOT (mediaInjected && mediaElement is valid)
             // `dummyPlaceholder` was queried at the start of the loop for this placeholder.
@@ -385,7 +381,6 @@ const getParagraphInfo = (element: Element): { chapter: number | null; paragraph
   return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
 };
 
-let rootRectChangedTimes = 0;
 let previousRootRectWidth = 0;
 
 export function setupPageObserver(
@@ -448,10 +443,6 @@ export function setupPageObserver(
     const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
 
     if (rootRect.width !== previousRootRectWidth) {
-      console.log("ROOTRECTE: 372 rootRectChangedTimes", rootRectChangedTimes);
-      console.log("ROOTRECTE: 373 rootRect.width", rootRect.width);
-      console.log("ROOTRECTE: 374 previousRootRectWidth", previousRootRectWidth);
-      rootRectChangedTimes++;
       previousRootRectWidth = rootRect.width;
     }
 
@@ -490,8 +481,6 @@ export function setupPageObserver(
 
     // Only proceed to second pass if no fully visible elements were found
     if (!foundFullyVisible) {
-      let maxAbsoluteOverlap = 0; // Track the maximum absolute pixel overlap
-
       intersectingPages.forEach((element) => {
         const rect = element.getBoundingClientRect();
 
@@ -531,23 +520,11 @@ export function setupPageObserver(
 
         if (weightedScore > maxPercentageOverlapRatio) {
           maxPercentageOverlapRatio = weightedScore;
-          maxAbsoluteOverlap = overlap;
           activeParagraph = getParagraphInfo(element);
           chosenElement = element;
         }
       });
-
-      console.log("WILCZYNSKA: Absolute overlap of selected element:", maxAbsoluteOverlap);
     }
-
-    console.log(
-      "WILCZYNSKA: 298 activeParagraph",
-      currentlyActiveParagraph,
-      activeParagraph,
-      maxPercentageOverlapRatio,
-      chosenElement,
-      foundFullyVisible ? "fully-visible" : "partial",
-    );
 
     document.querySelectorAll(".active-paragraph").forEach((element) => {
       element.classList.remove("active-paragraph");
@@ -684,11 +661,6 @@ export function setupPageObserver(
         }
 
         if (topElementChanged || bottomElementChanged || activeParagraphChanged) {
-          console.log(`[Observer] Change detected. TopEl C: ${topElementChanged}, BotEl C: ${bottomElementChanged}, Pgh C: ${activeParagraphChanged}`);
-          console.log(`[Observer] Prev Top Pgh: ${JSON.stringify(currentTopInfoFromState)}, New Top Pgh: ${JSON.stringify(newTopInfo)}`);
-          console.log(`[Observer] Prev Bottom Pgh: ${JSON.stringify(currentBottomInfoFromState)}, New Bottom Pgh: ${JSON.stringify(newBottomInfo)}`);
-          console.log(`[Observer] Prev Active Pgh: ${JSON.stringify(currentlyActiveParagraph)}, New Active Pgh: ${JSON.stringify(activeParagraph)}`);
-
           // Update persisted state with the NEW DOM element references for the next comparison cycle
           currentlyActivePageElement = topFocusedPageElement;
           currentlyLastActivePageElement = bottomFocusedPageElement;
@@ -709,9 +681,6 @@ export function setupPageObserver(
             endInfo.chapter !== null &&
             endInfo.paragraph !== null
           ) {
-            console.log(`[Observer] Updating notes for Ch ${startInfo.chapter}:${startInfo.paragraph} to Ch ${endInfo.chapter}:${endInfo.paragraph} (Focus Zone)`);
-            console.log("setting current location from intersection (focus zone)", { chapter: startInfo.chapter, paragraph: startInfo.paragraph });
-
             setCurrentLocation({
               chapter: startInfo.chapter,
               paragraph: startInfo.paragraph,
@@ -745,8 +714,6 @@ export function setupPageObserver(
               endInfo: endInfo,
             });
           }
-        } else {
-          console.log(`[Observer] No relevant change detected in active/boundary elements or paragraph. Skipping update.`);
         }
       } else {
         // Handle case where intersecting pages exist, but none are in the focus zone
@@ -837,7 +804,6 @@ export function setupPageObserver(
     console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
     return null;
   } else {
-    console.log(`GOZDECKI MAY 28 paragraphsToObserve.length`, paragraphsToObserve.length);
     paragraphsToObserve.forEach((paragraph) => {
       observer.observe(paragraph);
       observedParagraphs.add(paragraph);
