@@ -466,8 +466,8 @@ export function setupPageObserver(
       const visualTop = rect.top - marginTop;
       const visualBottom = rect.bottom + marginBottom;
 
-      // Check if element is fully contained within the zone
-      if (visualTop >= focusZoneTop && visualBottom <= focusZoneBottom) {
+      // Check if element is fully contained within the zone and has content
+      if (visualTop >= focusZoneTop && visualBottom <= focusZoneBottom && element.textContent?.trim() !== "") {
         // Element is fully visible in the zone
         if (!foundFullyVisible) {
           // This is the first fully visible element found
@@ -483,6 +483,7 @@ export function setupPageObserver(
     if (!foundFullyVisible) {
       intersectingPages.forEach((element) => {
         const rect = element.getBoundingClientRect();
+        if (rect.height === 0) return; // Skip zero-height elements
 
         // Get computed styles to account for margins for accurate overlap calculation
         const computedStyle = window.getComputedStyle(element);
@@ -501,6 +502,9 @@ export function setupPageObserver(
 
         // Skip elements with minimal overlap
         if (overlap < MIN_OVERLAP_THRESHOLD) return;
+
+        // Skip elements with no text content
+        if (element.textContent?.trim() === "") return;
 
         let currentOverlapRatio = 0;
 
