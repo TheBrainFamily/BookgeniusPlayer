@@ -55,9 +55,7 @@ export function activateCharacters(chapterNum: number, paragraphNum: number, boo
           if (app.isTalkingInParagraph) {
             isTalkingInRange = true;
             break; // Found talking in range, no need to check further appearances for this entity
-          } else {
-            // Empty block removed
-          }
+          } 
         }
       }
 

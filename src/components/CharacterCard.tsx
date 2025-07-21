@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useRef, useState, useEffect, useMemo, useCallback } from "react";
 
 import CharacterMedia from "./CharacterMedia";
 import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
@@ -6,6 +6,7 @@ import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from
 import { CURRENT_BOOK } from "@/consts";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
 import { useHighlight } from "@/context/HighlightContext";
+import { usePlaySpeaker } from "@/context/PlaySpeakerContext";
 import { cn } from "@/lib/utils";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
@@ -26,7 +27,17 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
     ...entity.otherAppearances,
   ];
 
-  const isTalkingInCurrentRange = useMemo(() => apps.some((app) => app.isTalkingInParagraph), [apps]);
+  const { currentSpeakers, isPlayFormat } = usePlaySpeaker();
+
+  const isTalkingInCurrentRange = useMemo(() => {
+    if (isPlayFormat) {
+      // For play format, check if this character is one of the current speakers
+      return currentSpeakers.includes(entity.slug);
+    } else {
+      // For non-play format, use original logic
+      return apps.some((app) => app.isTalkingInParagraph);
+    }
+  }, [apps, isPlayFormat, currentSpeakers, entity.slug]);
   const [currentMediaSrc, setCurrentMediaSrc] = useState("");
 
   useEffect(() => {
@@ -81,7 +92,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
             ? "z-10 shadow-lg border-2 border-(--book-primary-color) animate-pulse-glow"
             : "transition-transform duration-300 ease-in-out hover:scale-110 hover:z-10",
         )}
-        onClick={() => openModal(entity.slug, isTalkingInCurrentRange, mediaSrc)}
+        onClick={() => openModal(entity.slug, isVideo, mediaSrc)}
       >
         <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />
       </div>
