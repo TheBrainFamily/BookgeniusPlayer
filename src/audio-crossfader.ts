@@ -20,6 +20,11 @@ export interface TrackState {
 // --- Configuration ---
 const FADE_DURATION_SECONDS = 8.0;
 const PRE_END_TRANSITION_TRIGGER_SECONDS = 4.0; // Time before track end to trigger transition
+/**
+ * Exponent for non-linear volume scaling.
+ * This makes the lower end of the slider have a finer control.
+ * The value 1.737 is chosen so that a slider value of 0.5 corresponds to a gain of ~0.3.
+ */
 const VOLUME_SCALE = 1.737;
 
 // --- Module-level State ---
