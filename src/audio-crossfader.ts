@@ -925,7 +925,10 @@ export function getMasterVolume(): number | null {
   if (!audioContext || !masterGainNode) {
     return null;
   }
-  return masterGainNode.gain.value;
+  const scaledVolume = masterGainNode.gain.value;
+  // Reverse the non-linear scaling to get the linear value for the UI slider
+  const linearVolume = Math.pow(scaledVolume, 1 / VOLUME_SCALE);
+  return linearVolume;
 }
 
 /**
