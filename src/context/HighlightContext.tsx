@@ -1,4 +1,5 @@
 import React, { useEffect, createContext, useContext, useState, ReactNode } from "react";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
 
 declare global {
   interface Window {
@@ -31,7 +32,13 @@ interface HighlightProviderProps {
 export const HighlightProvider: React.FC<HighlightProviderProps> = ({ children }) => {
   const [isScrollingLocked, setScrollingLocked] = useState(false);
 
+  // Check once if this is a play format book
+  const isPlayFormat = getBookData().metadata.bookForm === "play";
+
   const highlightParagraphs = (appearances: Appearance[], enable: boolean): void => {
+    // Don't highlight paragraphs for play format books
+    if (isPlayFormat) return;
+
     appearances.forEach(({ chapterNumber, paragraphNumber, isTalkingInParagraph }) => {
       const p = document.querySelector<HTMLElement>(`section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`);
       if (!p) return;

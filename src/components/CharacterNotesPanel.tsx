@@ -54,7 +54,7 @@ const CharacterNotesPanel = () => {
     let mostRecentParagraph = -1;
 
     characterChapterData.forEach((char) => {
-      const mostRecentForThisChar = char.paragraphsWhereTalking.filter((p) => p <= currentParagraph).reduce((max, p) => Math.max(max, p), -1);
+      const mostRecentForThisChar = char.paragraphsWhereTalking.reduce((max, p) => (p <= currentParagraph ? Math.max(max, p) : max), -1);
 
       if (mostRecentForThisChar !== -1) {
         if (mostRecentForThisChar > mostRecentParagraph) {
