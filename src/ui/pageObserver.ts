@@ -1,7 +1,7 @@
 import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
 
 const SHOULD_SHOW_EVERYONE = false;
-const DEV_ZONE_VISUALIZERS_ENABLED = false;
+const DEV_ZONE_VISUALIZERS_ENABLED = true;
 
 // --- Development Zone Visualizers ---
 
