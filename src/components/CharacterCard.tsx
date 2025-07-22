@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import ReactDOM from "react-dom/client";
 
 import CharacterMedia from "./CharacterMedia";
 import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
@@ -45,8 +46,40 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
 
     if (isTalkingInCurrentRange) {
       setCurrentMediaSrc(getTalkingMediaFilePathForName(entity.slug, CURRENT_BOOK));
+      // console.log("daniel", entity);
     } else {
       setCurrentMediaSrc(getListeningMediaFilePathForName(entity.slug, CURRENT_BOOK));
+      // console.log("daniel2", entity);
+    }
+
+    const targetP = document.querySelector<HTMLParagraphElement>(`p[data-index="${entity.paragraphNumber}"]`);
+    if (targetP) {
+      // console.log("daniel targetP", targetP);
+      const avatarImg = targetP.querySelector<HTMLImageElement>('img.inline-avatar');
+      console.log("daniel avatarImg", avatarImg);
+      if (avatarImg) {
+        const container = document.createElement("span");
+        container.className = "inline-avatar-wrapper";
+        avatarImg.parentNode?.replaceChild(container, avatarImg);
+        const root = ReactDOM.createRoot(container);
+        root.render(
+          <CharacterMedia
+            mediaSrc={mediaSrc}
+            commonAttrs={{
+              "data-original-src": mediaSrc,
+              "data-character-name": entity.slug,
+              "data-summary": entity.summary ?? "",
+              className: "inline-avatar w-[3em] aspect-square object-cover",
+            }}
+            isVideo={mediaSrc.endsWith(".mp4") || mediaSrc.endsWith(".webm")}
+            canonicalName={entity.slug}
+            isTalking={isTalkingInCurrentRange}
+          />
+        );
+        return () => {
+          // root.unmount();
+        };
+      }
     }
   }, [isTalkingInCurrentRange, entity.slug, entity.imageUrl]);
 
@@ -85,6 +118,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
       onMouseEnter={() => requestToggle(true)}
       onMouseLeave={() => requestToggle(false)}
     >
+      <div>daniel</div>
       <div
         className={cn(
           "rounded-full overflow-hidden aspect-square cursor-pointer",

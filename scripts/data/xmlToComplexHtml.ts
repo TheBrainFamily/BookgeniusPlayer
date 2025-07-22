@@ -93,6 +93,7 @@ export const xmlToComplexHtml = (
   let currentCharacterAlignment = "";
   let isCharacter = false;
   let lastSpanId = "";
+  let firstCharacter = true;
 
   for (const chapter of chapters) {
     const chapterId = chapter.getAttribute("id");
@@ -282,8 +283,19 @@ export const xmlToComplexHtml = (
 
           if (bookFormValue === "Play") {
             if (isCharacter && currentCharacterAlignment === "left") {
-              htmlResult += `\n </span>\n`;
+              htmlResult += `\n </span>\n`; // right-character-container
             }
+
+            // if (isCharacter) {
+            //   if (firstCharacter) {
+            //     console.log(clean);
+            //   }
+            //   if (!firstCharacter) {
+            //     htmlResult += `\n </div>\n`; // daniel
+            //   }
+            //   htmlResult += `\n <div class="daniel">\n`;
+            //   firstCharacter = false;
+            // }
 
             htmlResult += `\n    <p 
                 data-index="${dataIndex++}" 
@@ -321,6 +333,11 @@ export const xmlToComplexHtml = (
         htmlResult += `\n    <${tagName} data-index="${dataIndex++}">${inner}</${tagName}>`;
       }
     }
+
+    // if (bookFormValue === "Play") {
+    //   htmlResult += `\n </div>\n`; // daniel
+    //   firstCharacter = true;
+    // }
 
     htmlResult += "\n  </section></section>";
   }
