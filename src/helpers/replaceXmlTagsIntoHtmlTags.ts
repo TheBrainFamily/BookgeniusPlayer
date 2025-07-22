@@ -71,5 +71,8 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
     return `<span ${attributeString}>${imgTag}</span>`;
   });
 
+  // Handle LineBreak tags
+  outputText = outputText.replace(/<LineBreak\s*\/>/g, '<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>');
+
   return outputText;
 };
