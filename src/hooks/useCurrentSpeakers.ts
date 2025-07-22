@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useDebounce } from "./useDebounce";
 import type { Location } from "@/state/LocationContext";
 import type { CharacterData } from "@/types/book";
 
@@ -10,13 +11,16 @@ import type { CharacterData } from "@/types/book";
  * @returns Array of character slugs who are currently speaking
  */
 export function useCurrentSpeakers(location: Location, allCharacters: CharacterData[], isPlayFormat: boolean): string[] {
+  // Add debouncing to prevent rapid changes during scrolling
+  const debouncedLocation = useDebounce(location, 50);
+
   return useMemo(() => {
-    if (!location.currentChapter || !location.currentParagraph) {
+    if (!debouncedLocation.currentChapter || !debouncedLocation.currentParagraph) {
       return [];
     }
 
-    const currentChapter = location.currentChapter;
-    const currentParagraph = location.currentParagraph;
+    const currentChapter = debouncedLocation.currentChapter;
+    const currentParagraph = debouncedLocation.currentParagraph;
 
     // Use cached character data and filter only once
     const characterChapterData = allCharacters.map((char) => {
@@ -53,5 +57,5 @@ export function useCurrentSpeakers(location: Location, allCharacters: CharacterD
       }
     });
     return mostRecentSpeakers;
-  }, [location.currentChapter, location.currentParagraph, allCharacters, isPlayFormat]);
+  }, [debouncedLocation.currentChapter, debouncedLocation.currentParagraph, allCharacters, isPlayFormat]);
 }

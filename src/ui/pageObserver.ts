@@ -1,7 +1,19 @@
 import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
 
 const SHOULD_SHOW_EVERYONE = false;
-const DEV_ZONE_VISUALIZERS_ENABLED = true;
+const DEV_ZONE_VISUALIZERS_ENABLED = false;
+
+// Cache isPlayFormat at module level to avoid repeated getBookData() calls
+let cachedIsPlayFormat: boolean | null = null;
+
+function getIsPlayFormat(): boolean {
+  if (cachedIsPlayFormat === null) {
+    const bookData = getBookData();
+    cachedIsPlayFormat = bookData.metadata.bookForm === "play";
+  }
+  return cachedIsPlayFormat;
+}
 
 // --- Development Zone Visualizers ---
 
@@ -685,15 +697,6 @@ export function setupPageObserver(
             endInfo.chapter !== null &&
             endInfo.paragraph !== null
           ) {
-            setCurrentLocation({
-              chapter: startInfo.chapter,
-              paragraph: startInfo.paragraph,
-              endChapter: endInfo.chapter,
-              endParagraph: endInfo.paragraph,
-              currentChapter: activeParagraph.chapter,
-              currentParagraph: activeParagraph.paragraph,
-            });
-
             // This ensures avatars remain visible not only for a current chapter, but previous or next chapter as well
             const allIntersectingParagraphs = Array.from(intersectingPages)
               .map((element) => getParagraphInfo(element))
@@ -703,10 +706,32 @@ export function setupPageObserver(
                 return a.paragraph - b.paragraph;
               });
 
+            const RANGE_PADDING = 1;
+            const isPlayFormat = getIsPlayFormat();
+
+            const rangeStartInfo = startInfo;
+            const rangeEndInfo = endInfo;
+
+            let expandedStartParagraph = Math.max(1, rangeStartInfo.paragraph - RANGE_PADDING);
+            const expandedEndParagraph = rangeEndInfo.paragraph + RANGE_PADDING;
+
+            if (isPlayFormat && rangeStartInfo.paragraph <= 3) {
+              expandedStartParagraph = 0;
+            }
+
+            setCurrentLocation({
+              chapter: rangeStartInfo.chapter,
+              paragraph: expandedStartParagraph,
+              endChapter: rangeEndInfo.chapter,
+              endParagraph: expandedEndParagraph,
+              currentChapter: activeParagraph.chapter,
+              currentParagraph: activeParagraph.paragraph,
+            });
+
+            // Media uses viewport range (separate from character notes)
             if (allIntersectingParagraphs.length > 0) {
               const mediaStartInfo = allIntersectingParagraphs[0];
               const mediaEndInfo = allIntersectingParagraphs[allIntersectingParagraphs.length - 1];
-
               activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, openCharacterDetailsModal);
             } else {
               activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal);
