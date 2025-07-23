@@ -141,7 +141,7 @@ export function generateCharacterMetadata(xmlDoc: Document, bookString: string, 
   return extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm).map((character) => ({
     ...character,
     bookSlug,
-    imageUrl: `/${bookSlug}/${getPictureFileNameForName(character.slug)}.png`,
+    imageUrl: `/${bookSlug}/${getPictureFileNameForName(character.slug)}`,
   }));
 }
 
