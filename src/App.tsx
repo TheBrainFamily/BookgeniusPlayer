@@ -56,7 +56,7 @@ function Shell() {
       <Header />
       <NoteLinkBlinker />
       <ContentContainerWrapper /> {/* Keep for animations */}
-      <CharacterNotesPanel />
+      {/*<CharacterNotesPanel />*/}
       {/* Not used for now, but can be re-enabled if needed later */}
       {/* <RightNotesPanel /> */}
       <Footer />
