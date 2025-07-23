@@ -193,13 +193,38 @@
 
         .right-character-container {
           display: grid;
-          grid-template-columns: 1fr max-content;
+          grid-template-columns: 1fr 9fr;
           width: 100%;
           margin-bottom: 2em;
 
           p[data-text-alignment="right"] {
             grid-column: 2;
-            text-align: left;
+            text-align: right !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            max-width: 100%;
+            justify-self: end;
+          }
+
+          p[data-text-alignment="right"] span {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
+            max-width: 100%;
+            text-align: right !important;
+          }
+
+          p[data-text-alignment="right"] span span {
+            max-width: 100%;
+            text-align: right !important;
+          }
+
+          p[data-text-alignment="right"] em {
+            text-align: center !important;
+            display: block;
+            width: 100%;
           }
 
           p[data-is-didaskalia="true"] {
@@ -265,6 +290,8 @@
 
         p[data-text-alignment="left"]:not(:has(em)) {
           text-align: left;
+          max-width: 90%;
+          margin: 0 auto 0 0;
         }
 
         p[data-text-alignment="right"][data-is-character="false"]:not(:has(em)) {
