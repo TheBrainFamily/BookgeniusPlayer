@@ -6,16 +6,13 @@ import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from
 import { CURRENT_BOOK } from "@/consts";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
 import { useHighlight } from "@/context/HighlightContext";
-import { usePlaySpeaker } from "@/context/PlaySpeakerContext";
 import { cn } from "@/lib/utils";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
-interface CharacterCardProps {
-  entity: ParsedParagraphRange;
-}
+type CharacterCardProps = { entity: ParsedParagraphRange; currentSpeakers: string[] };
 
-const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
+const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers }) => {
   const { openModal } = useCharacterModal();
   const { highlightParagraphs, isScrollingLocked } = useHighlight();
 
@@ -27,17 +24,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
     ...entity.otherAppearances,
   ];
 
-  const { currentSpeakers, isPlayFormat } = usePlaySpeaker();
-
   const isTalkingInCurrentRange = useMemo(() => {
-    if (isPlayFormat) {
-      // For play format, check if this character is one of the current speakers
-      return currentSpeakers.includes(entity.slug);
-    } else {
-      // For non-play format, use original logic
-      return apps.some((app) => app.isTalkingInParagraph);
-    }
-  }, [apps, isPlayFormat, currentSpeakers, entity.slug]);
+    return currentSpeakers.includes(entity.slug);
+  }, [currentSpeakers, entity.slug]);
   const [currentMediaSrc, setCurrentMediaSrc] = useState("");
 
   useEffect(() => {
