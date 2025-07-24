@@ -5,8 +5,11 @@
  * as in the original vanilla code.
  */
 
+let systemNavigationInProgress = false;
+let systemNavigationTimer: number | null = null;
+
 /* ------------------------------------------------------------------ */
-import { DEFAULT_LOCATION, type Location } from "@/state/LocationContext";
+import { DEFAULT_LOCATION, Location } from "@/state/LocationContext";
 
 /* ------------------------------------------------------------------ */
 /*  Bridge interface for legacy helpers                               */
@@ -51,6 +54,7 @@ export const setCurrentLocation = (loc: Location) => {
   _bridge.set(loc);
 
   setTimeout(() => {
+    if (systemNavigationInProgress) return;
     const chapter = Number(loc.currentChapter) || 1;
     const paragraph = Number(loc.currentParagraph) || 0;
 
@@ -77,6 +81,12 @@ export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph
     console.error("Invalid location provided to systemNavigateTo:", loc);
     return;
   }
+
+  systemNavigationInProgress = true;
+  if (systemNavigationTimer) clearTimeout(systemNavigationTimer);
+  systemNavigationTimer = window.setTimeout(() => {
+    systemNavigationInProgress = false;
+  }, 2500);
 
   const fullLocation: Location = {
     chapter: loc.currentChapter,
@@ -120,9 +130,17 @@ export const goToParagraph = (loc: { currentChapter: number; currentParagraph: n
     return;
   }
 
+  if (fast) {
+    // For fast, programmatic scrolling (like on initial load), a simple, centered
+    // scrollIntoView is more reliable than complex calculations. This ensures
+    // the target element is squarely in the observer's focus zone.
+    element.scrollIntoView({ behavior: "instant", block: "start" });
+    return;
+  }
+
   const contentContainer = document.getElementById("content-container");
   if (!contentContainer) {
-    element.scrollIntoView({ behavior: fast ? "instant" : "smooth", block: "start" });
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
 
@@ -135,11 +153,7 @@ export const goToParagraph = (loc: { currentChapter: number; currentParagraph: n
   // Calculate the scroll position to place the element at the focus zone
   const targetScrollTop = contentContainer.scrollTop + elementRect.top - containerRect.top - focusZoneOffset;
 
-  if (fast) {
-    contentContainer.scrollTop = targetScrollTop;
-  } else {
-    contentContainer.scrollTo({ top: targetScrollTop, behavior: "smooth" });
-  }
+  contentContainer.scrollTo({ top: targetScrollTop, behavior: "smooth" });
 };
 
 /**
