@@ -11,12 +11,37 @@ import { initializeNoteLinkBlinking } from "./annotationsHandling";
 import { dealWithSW } from "./serviceWorker";
 import { setupParagraphHighlighting } from "./ui/paragraphHighlighting";
 import { initPage } from "./ui/pageInit";
+let listenerSet = false;
+function toggleBookContainerVisibilityWithShortcut() {
+  if (listenerSet) return;
+  function onKeyDown(e: KeyboardEvent) {
+    console.log("onKeyDown", e);
+    // Check for Shift + H (case-insensitive)
+    if ((e.key === "h" || e.key === "H") && e.shiftKey) {
+      const bookContainer = document.getElementById("book-container");
+      if (bookContainer) {
+        if (bookContainer.style.opacity === "0") {
+          bookContainer.style.opacity = "100";
+        } else {
+          bookContainer.style.opacity = "0";
+        }
+      }
+      // Prevent default to avoid accidental browser shortcuts
+      e.preventDefault();
+    }
+  }
+  listenerSet = true;
+  window.addEventListener("keydown", onKeyDown);
+}
+
+// Call the function immediately so the shortcut is active
 
 /* ------------------------------------------------------------------ */
 /*  The only exported symbol                                           */
 /* ------------------------------------------------------------------ */
 export async function runLegacyInit() {
   dealWithSW();
+  toggleBookContainerVisibilityWithShortcut();
 
   /* ----------------------------------------------------------------
    *  1. Initialise the FB2 pages, scrolling position, SW, etc.
