@@ -34,6 +34,7 @@ export function useBookContent(containerId: string) {
         const span = target.closest("span[id^='ch']");
 
         if (span) {
+          console.log("daniel span", span);
           const isFirstSimplification = !span.hasAttribute("data-simplified");
 
           // Store the original sentence only on the first click.

@@ -286,16 +286,28 @@ export const xmlToComplexHtml = (
               htmlResult += `\n </span>\n`; // right-character-container
             }
 
-            // if (isCharacter) {
-            //   if (firstCharacter) {
-            //     console.log(clean);
-            //   }
-            //   if (!firstCharacter) {
-            //     htmlResult += `\n </div>\n`; // daniel
-            //   }
-            //   htmlResult += `\n <div class="daniel">\n`;
-            //   firstCharacter = false;
-            // }
+            if (isCharacter) {
+              if (firstCharacter) {
+                console.log(clean);
+              }
+
+              const characterPlaceholderSpans = [];
+              clean = clean.replace(/<span class="character-placeholder[^>]*>.*?<\/span>/g, match => {
+                characterPlaceholderSpans.push(match)
+                return "";
+              });
+
+              if (!firstCharacter) {
+                htmlResult += `\n </div>\n`; // daniel-character-text
+                htmlResult += `\n </div>\n`; // daniel-character-container
+              }
+              htmlResult += `\n <div class="daniel-character-container" data-text-alignment="${currentCharacterAlignment}">\n`;
+              htmlResult += `\n <div class="daniel-character-avatar" data-index="1">${characterPlaceholderSpans}</div>\n`;
+              htmlResult += `\n <div class="daniel-character-text">\n`;
+
+              firstCharacter = false;
+            }
+
 
             htmlResult += `\n    <p 
                 data-index="${dataIndex++}" 
@@ -334,10 +346,11 @@ export const xmlToComplexHtml = (
       }
     }
 
-    // if (bookFormValue === "Play") {
-    //   htmlResult += `\n </div>\n`; // daniel
-    //   firstCharacter = true;
-    // }
+    if (bookFormValue === "Play") {
+      htmlResult += `\n </div>\n`; // daniel-character-text
+      htmlResult += `\n </div>\n`; // daniel-character-container
+      firstCharacter = true;
+    }
 
     htmlResult += "\n  </section></section>";
   }

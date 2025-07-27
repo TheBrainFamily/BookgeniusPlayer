@@ -210,12 +210,14 @@
 
         }
 
-      /*  .daniel {*/
-      /*    border: 3px solid green;*/
-      /*    position: relative;*/
-      /*    padding-left: 4.5em; */
-      /*    overflow: hidden;*/
-      /*  }*/
+        /*.daniel {*/
+        /*  border: 3px solid green;*/
+        /*  position: relative;*/
+        /*  padding-left: 4.5em;*/
+        /*  overflow: hidden;*/
+        /*}*/
+
+
 
       /*.daniel .inline-avatar {*/
       /*  position: sticky;*/
@@ -225,6 +227,40 @@
       /*  border-radius: 50%;*/
       /*  z-index: 1;*/
       /*}*/
+
+
+.daniel-character-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 1em;
+  position: relative;
+}
+
+.daniel-character-container[data-text-alignment="left"] {
+  flex-direction: row;
+}
+
+.daniel-character-container[data-text-alignment="right"] {
+  flex-direction: row-reverse;
+}
+
+.daniel-character-avatar {
+  position: sticky;
+  top: 35vh;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.daniel-character-avatar img {
+  width: 80px;
+  height: auto;
+  display: block;
+}
+
+.daniel-character-text {
+  flex: 1;
+}
+
 
         span.inline-avatar-wrapper > div {
           width: 5em;
