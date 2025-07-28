@@ -16,8 +16,10 @@ function toggleBookContainerVisibilityWithShortcut() {
   if (listenerSet) return;
   function onKeyDown(e: KeyboardEvent) {
     console.log("onKeyDown", e);
-    // Check for Shift + H (case-insensitive)
-    if ((e.key === "h" || e.key === "H") && e.shiftKey) {
+    // Check for Shift + H (case-insensitive) and Command (Meta) key on macOS
+    const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+    const isCommand = isMac ? e.metaKey : e.ctrlKey; // Use Command on Mac, Ctrl elsewhere
+    if ((e.key === "h" || e.key === "H") && e.shiftKey && isCommand) {
       const bookContainer = document.getElementById("book-container");
       if (bookContainer) {
         if (bookContainer.style.opacity === "0") {
