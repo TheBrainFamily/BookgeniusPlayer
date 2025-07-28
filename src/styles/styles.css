@@ -193,19 +193,49 @@
 
         .right-character-container {
           display: grid;
-          grid-template-columns: 1fr max-content;
+          grid-template-columns: 1fr minmax(0, max-content);
           width: 100%;
           margin-bottom: 2em;
+          padding-left: 7em;
 
           p[data-text-alignment="right"] {
             grid-column: 2;
-            text-align: left;
+            text-align: left !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            max-width: 100%;
+            justify-self: start;
+          }
+
+          p[data-text-alignment="right"] span {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
+            max-width: 100%;
+            text-align: right !important;
+          }
+
+          p[data-text-alignment="right"] span span {
+            max-width: 100%;
+            text-align: right !important;
+          }
+
+          p[data-text-alignment="right"] em {
+            text-align: center !important;
+            display: block;
+            width: 100%;
           }
 
           p[data-is-didaskalia="true"] {
             grid-column: 1 / -1;
             text-align: center;
             width: 100%;
+          }
+
+          p[data-text-alignment="right"][data-is-didaskalia="true"] {
+            margin-left: -4em;
           }
 
         }
@@ -265,6 +295,8 @@
 
         p[data-text-alignment="left"]:not(:has(em)) {
           text-align: left;
+          max-width: 90%;
+          margin: 0 auto 0 0;
         }
 
         p[data-text-alignment="right"][data-is-character="false"]:not(:has(em)) {

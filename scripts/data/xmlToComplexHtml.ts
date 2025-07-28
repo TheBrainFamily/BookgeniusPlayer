@@ -219,9 +219,13 @@ export const xmlToComplexHtml = (
                         inner += `<strong>${e.textContent.trim()}</strong>`;
                         break;
                       default: {
-                        const eid = e.getAttribute("id");
-                        const idStr = eid ? ` id="${eid}"` : "";
-                        inner += `<${e.tagName}${idStr}>${e.textContent}</${e.tagName}>`;
+                        if (e.tagName === "LineBreak") {
+                          inner += `<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>`;
+                        } else {
+                          const eid = e.getAttribute("id");
+                          const idStr = eid ? ` id="${eid}"` : "";
+                          inner += `<${e.tagName}${idStr}>${e.textContent}</${e.tagName}>`;
+                        }
                       }
                     }
                   }
@@ -266,9 +270,13 @@ export const xmlToComplexHtml = (
                   pContent += `<strong>${pElement.textContent.trim()}</strong>`;
                   break;
                 default: {
-                  const eid2 = pElement.getAttribute("id");
-                  const idStr2 = eid2 ? ` id="${eid2}"` : "";
-                  pContent += `<${pElement.tagName}${idStr2}>${pElement.textContent || ""}</${pElement.tagName}>`;
+                  if (pElement.tagName === "LineBreak") {
+                    pContent += `<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>`;
+                  } else {
+                    const eid2 = pElement.getAttribute("id");
+                    const idStr2 = eid2 ? ` id="${eid2}"` : "";
+                    pContent += `<${pElement.tagName}${idStr2}>${pElement.textContent || ""}</${pElement.tagName}>`;
+                  }
                 }
               }
             }
@@ -281,7 +289,7 @@ export const xmlToComplexHtml = (
           clean = clean.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
 
           if (bookFormValue === "Play") {
-            if ((isCharacter && currentCharacterAlignment === "left")) {
+            if (isCharacter && currentCharacterAlignment === "left") {
               htmlResult += `\n </span>\n`;
             }
 

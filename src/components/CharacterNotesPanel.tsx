@@ -1,11 +1,15 @@
-import React from "react";
+import { useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, Variants } from "motion/react";
 
 import { useCharacterNotes } from "@/hooks/useCharacterNotes";
+import { useCurrentSpeakers } from "@/hooks/useCurrentSpeakers";
 import useSplashHidden from "@/hooks/useSplashHidden";
 import { useLocationRange } from "@/hooks/useLocationRange";
 import CharacterCard from "./CharacterCard";
+import { useLocation } from "@/state/LocationContext";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
 
 const target = document.getElementById("left-notes");
 
@@ -13,6 +17,13 @@ const CharacterNotesPanel = () => {
   const { locationRange } = useLocationRange();
   const isSplashHidden = useSplashHidden();
   const characterNotes = useCharacterNotes(locationRange, true, true);
+  const { location } = useLocation();
+
+  const bookData = useMemo(() => getBookData(), []);
+  const isPlayFormat = useMemo(() => bookData.metadata.bookForm === "play", [bookData]);
+  const allCharacters = useMemo(() => getCharactersData(), []);
+
+  const currentSpeakers = useCurrentSpeakers(location, allCharacters, isPlayFormat);
 
   if (!target || !isSplashHidden) return null;
 
@@ -37,7 +48,7 @@ const CharacterNotesPanel = () => {
                 exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
                 transition={{ layout: { delay: 0.2 } }}
               >
-                <CharacterCard entity={characterNote} />
+                <CharacterCard entity={characterNote} currentSpeakers={currentSpeakers} />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -48,12 +59,9 @@ const CharacterNotesPanel = () => {
   );
 };
 
-const variants: Record<string, Variants> = {
-  container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 4, delay: 2, when: "afterChildren" } } },
-  character: {
-    hidden: { opacity: 0, x: -100, y: 10 },
-    visible: (i: number) => ({ opacity: 1, x: 0, y: 0, transition: { duration: 0.6, delay: 0.5 + 0.15 * i, type: "spring", stiffness: 100 } }),
-  },
+const variants: { container: Variants; character: Variants } = {
+  container: { visible: { transition: { staggerChildren: 0.05 } } },
+  character: { hidden: { opacity: 0, x: -100 }, visible: (i: number) => ({ opacity: 1, x: 0, transition: { delay: i * 0.05 } }) },
 };
 
 export default CharacterNotesPanel;

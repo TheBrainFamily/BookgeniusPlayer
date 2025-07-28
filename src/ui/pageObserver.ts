@@ -1,7 +1,19 @@
 import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
 
 const SHOULD_SHOW_EVERYONE = false;
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
+
+// Cache isPlayFormat at module level to avoid repeated getBookData() calls
+let cachedIsPlayFormat: boolean | null = null;
+
+function getIsPlayFormat(): boolean {
+  if (cachedIsPlayFormat === null) {
+    const bookData = getBookData();
+    cachedIsPlayFormat = bookData.metadata.bookForm === "play";
+  }
+  return cachedIsPlayFormat;
+}
 
 // --- Development Zone Visualizers ---
 
@@ -290,7 +302,6 @@ function activateMediaInRange(
               if (mediaElement instanceof HTMLVideoElement) {
                 mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
               }
-              console.log(`[Media Inject] Replaced dummy with media for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
             }
           } else if (!mediaInjected) {
             // No dummy and no media injected yet, inject for the first time
@@ -313,7 +324,6 @@ function activateMediaInRange(
               if (mediaElement instanceof HTMLVideoElement) {
                 mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
               }
-              console.log(`[Media Inject] Injected media for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
             }
           } else if (mediaElement instanceof HTMLVideoElement && mediaElement.paused) {
             // Media already injected, just play existing video if paused
@@ -340,8 +350,6 @@ function activateMediaInRange(
             delete placeholder.dataset.mediaInjected; // Mark as not injected (dummy is present)
 
             // NOTE: Text remains hidden in its wrapper span. No need to restore/re-hide.
-
-            console.log(`[Media Unload] Replaced media with dummy for ${placeholder.dataset.character} in ${currentChapter}:${currentParagraph}`);
           } else {
             // We are out of view, and it's NOT (mediaInjected && mediaElement is valid)
             // `dummyPlaceholder` was queried at the start of the loop for this placeholder.
@@ -385,7 +393,6 @@ const getParagraphInfo = (element: Element): { chapter: number | null; paragraph
   return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
 };
 
-let rootRectChangedTimes = 0;
 let previousRootRectWidth = 0;
 
 export function setupPageObserver(
@@ -448,10 +455,6 @@ export function setupPageObserver(
     const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
 
     if (rootRect.width !== previousRootRectWidth) {
-      console.log("ROOTRECTE: 372 rootRectChangedTimes", rootRectChangedTimes);
-      console.log("ROOTRECTE: 373 rootRect.width", rootRect.width);
-      console.log("ROOTRECTE: 374 previousRootRectWidth", previousRootRectWidth);
-      rootRectChangedTimes++;
       previousRootRectWidth = rootRect.width;
     }
 
@@ -475,8 +478,8 @@ export function setupPageObserver(
       const visualTop = rect.top - marginTop;
       const visualBottom = rect.bottom + marginBottom;
 
-      // Check if element is fully contained within the zone
-      if (visualTop >= focusZoneTop && visualBottom <= focusZoneBottom) {
+      // Check if element is fully contained within the zone and has content
+      if (visualTop >= focusZoneTop && visualBottom <= focusZoneBottom && element.textContent?.trim() !== "") {
         // Element is fully visible in the zone
         if (!foundFullyVisible) {
           // This is the first fully visible element found
@@ -490,10 +493,9 @@ export function setupPageObserver(
 
     // Only proceed to second pass if no fully visible elements were found
     if (!foundFullyVisible) {
-      let maxAbsoluteOverlap = 0; // Track the maximum absolute pixel overlap
-
       intersectingPages.forEach((element) => {
         const rect = element.getBoundingClientRect();
+        if (rect.height === 0) return; // Skip zero-height elements
 
         // Get computed styles to account for margins for accurate overlap calculation
         const computedStyle = window.getComputedStyle(element);
@@ -513,6 +515,9 @@ export function setupPageObserver(
         // Skip elements with minimal overlap
         if (overlap < MIN_OVERLAP_THRESHOLD) return;
 
+        // Skip elements with no text content
+        if (element.textContent?.trim() === "") return;
+
         let currentOverlapRatio = 0;
 
         if (visualHeight > 0) {
@@ -531,23 +536,11 @@ export function setupPageObserver(
 
         if (weightedScore > maxPercentageOverlapRatio) {
           maxPercentageOverlapRatio = weightedScore;
-          maxAbsoluteOverlap = overlap;
           activeParagraph = getParagraphInfo(element);
           chosenElement = element;
         }
       });
-
-      console.log("WILCZYNSKA: Absolute overlap of selected element:", maxAbsoluteOverlap);
     }
-
-    console.log(
-      "WILCZYNSKA: 298 activeParagraph",
-      currentlyActiveParagraph,
-      activeParagraph,
-      maxPercentageOverlapRatio,
-      chosenElement,
-      foundFullyVisible ? "fully-visible" : "partial",
-    );
 
     document.querySelectorAll(".active-paragraph").forEach((element) => {
       element.classList.remove("active-paragraph");
@@ -684,11 +677,6 @@ export function setupPageObserver(
         }
 
         if (topElementChanged || bottomElementChanged || activeParagraphChanged) {
-          console.log(`[Observer] Change detected. TopEl C: ${topElementChanged}, BotEl C: ${bottomElementChanged}, Pgh C: ${activeParagraphChanged}`);
-          console.log(`[Observer] Prev Top Pgh: ${JSON.stringify(currentTopInfoFromState)}, New Top Pgh: ${JSON.stringify(newTopInfo)}`);
-          console.log(`[Observer] Prev Bottom Pgh: ${JSON.stringify(currentBottomInfoFromState)}, New Bottom Pgh: ${JSON.stringify(newBottomInfo)}`);
-          console.log(`[Observer] Prev Active Pgh: ${JSON.stringify(currentlyActiveParagraph)}, New Active Pgh: ${JSON.stringify(activeParagraph)}`);
-
           // Update persisted state with the NEW DOM element references for the next comparison cycle
           currentlyActivePageElement = topFocusedPageElement;
           currentlyLastActivePageElement = bottomFocusedPageElement;
@@ -709,18 +697,6 @@ export function setupPageObserver(
             endInfo.chapter !== null &&
             endInfo.paragraph !== null
           ) {
-            console.log(`[Observer] Updating notes for Ch ${startInfo.chapter}:${startInfo.paragraph} to Ch ${endInfo.chapter}:${endInfo.paragraph} (Focus Zone)`);
-            console.log("setting current location from intersection (focus zone)", { chapter: startInfo.chapter, paragraph: startInfo.paragraph });
-
-            setCurrentLocation({
-              chapter: startInfo.chapter,
-              paragraph: startInfo.paragraph,
-              endChapter: endInfo.chapter,
-              endParagraph: endInfo.paragraph,
-              currentChapter: activeParagraph.chapter,
-              currentParagraph: activeParagraph.paragraph,
-            });
-
             // This ensures avatars remain visible not only for a current chapter, but previous or next chapter as well
             const allIntersectingParagraphs = Array.from(intersectingPages)
               .map((element) => getParagraphInfo(element))
@@ -730,10 +706,32 @@ export function setupPageObserver(
                 return a.paragraph - b.paragraph;
               });
 
+            const RANGE_PADDING = 1;
+            const isPlayFormat = getIsPlayFormat();
+
+            const rangeStartInfo = startInfo;
+            const rangeEndInfo = endInfo;
+
+            let expandedStartParagraph = Math.max(1, rangeStartInfo.paragraph - RANGE_PADDING);
+            const expandedEndParagraph = rangeEndInfo.paragraph + RANGE_PADDING;
+
+            if (isPlayFormat && rangeStartInfo.paragraph <= 3) {
+              expandedStartParagraph = 0;
+            }
+
+            setCurrentLocation({
+              chapter: rangeStartInfo.chapter,
+              paragraph: expandedStartParagraph,
+              endChapter: rangeEndInfo.chapter,
+              endParagraph: expandedEndParagraph,
+              currentChapter: activeParagraph.chapter,
+              currentParagraph: activeParagraph.paragraph,
+            });
+
+            // Media uses viewport range (separate from character notes)
             if (allIntersectingParagraphs.length > 0) {
               const mediaStartInfo = allIntersectingParagraphs[0];
               const mediaEndInfo = allIntersectingParagraphs[allIntersectingParagraphs.length - 1];
-
               activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, openCharacterDetailsModal);
             } else {
               activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal);
@@ -745,8 +743,6 @@ export function setupPageObserver(
               endInfo: endInfo,
             });
           }
-        } else {
-          console.log(`[Observer] No relevant change detected in active/boundary elements or paragraph. Skipping update.`);
         }
       } else {
         // Handle case where intersecting pages exist, but none are in the focus zone
@@ -837,7 +833,6 @@ export function setupPageObserver(
     console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
     return null;
   } else {
-    console.log(`GOZDECKI MAY 28 paragraphsToObserve.length`, paragraphsToObserve.length);
     paragraphsToObserve.forEach((paragraph) => {
       observer.observe(paragraph);
       observedParagraphs.add(paragraph);

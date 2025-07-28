@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useRef, useState, useEffect, useMemo, useCallback } from "react";
 
 import CharacterMedia from "./CharacterMedia";
 import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
@@ -10,11 +10,9 @@ import { cn } from "@/lib/utils";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
-interface CharacterCardProps {
-  entity: ParsedParagraphRange;
-}
+type CharacterCardProps = { entity: ParsedParagraphRange; currentSpeakers: string[] };
 
-const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
+const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers }) => {
   const { openModal } = useCharacterModal();
   const { highlightParagraphs, isScrollingLocked } = useHighlight();
 
@@ -26,7 +24,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
     ...entity.otherAppearances,
   ];
 
-  const isTalkingInCurrentRange = useMemo(() => apps.some((app) => app.isTalkingInParagraph), [apps]);
+  const isTalkingInCurrentRange = useMemo(() => {
+    return currentSpeakers.includes(entity.slug);
+  }, [currentSpeakers, entity.slug]);
   const [currentMediaSrc, setCurrentMediaSrc] = useState("");
 
   useEffect(() => {

@@ -95,26 +95,19 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
         return (currentLocation.currentChapter == bg.startChapter && currentLocation.currentParagraph >= bg.startParagraph) || currentLocation.currentChapter > bg.startChapter;
       });
 
-      console.log("DAMIANO backgrounds", backgrounds);
-      console.log("DAMIANO currentLocation", currentLocation);
-      console.log("DAMIANO foundAll", foundAll);
       const found = foundAll[foundAll.length - 1];
-      console.log("DAMIANO found", found);
 
       /* ---- cancel zooms *before* any early-return --------------------- */
 
       if (!found) {
         cancelAllImageZoom(imageA, imageB);
-        console.log(`No background definition found for chapter ${currentLocation.currentChapter}`);
         return;
       }
       if (found.file === legacy.dataset.currentFile) {
-        console.log("Background file hasn't changed.");
         return;
       }
       if (transitionState !== TransitionState.Idle) {
         cancelAllImageZoom(imageA, imageB);
-        console.log("Transition already in progress.");
         return;
       }
 
@@ -196,7 +189,6 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
           if (curType === "image") curFront.classList.remove("zooming");
 
           transitionState = TransitionState.Idle;
-          console.log("Transition complete:", legacy.dataset.type, legacy.dataset.front, legacy.dataset.currentFile);
         }, fadeMs + safetyMargin);
       } catch (err) {
         /* ---------- prep failed → roll back --------------------------- */
