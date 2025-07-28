@@ -199,7 +199,7 @@
 
           p[data-text-alignment="right"] {
             grid-column: 2;
-            text-align: right !important;
+            text-align: left !important;
             word-wrap: break-word;
             overflow-wrap: break-word;
             hyphens: auto;
