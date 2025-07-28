@@ -196,7 +196,7 @@
           grid-template-columns: 1fr minmax(0, max-content);
           width: 100%;
           margin-bottom: 2em;
-          padding-left: 3.5em;
+          padding-left: 7em;
 
           p[data-text-alignment="right"] {
             grid-column: 2;
@@ -235,7 +235,7 @@
           }
 
           p[data-text-alignment="right"][data-is-didaskalia="true"] {
-            margin-left: -3.5em;
+            margin-left: -4em;
           }
 
         }
