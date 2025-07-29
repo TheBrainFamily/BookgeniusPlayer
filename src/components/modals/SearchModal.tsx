@@ -4,7 +4,7 @@ import { motion, Variants } from "motion/react";
 import { Search, FileText } from "lucide-react";
 
 import { SearchResultsData, SearchResultItemData, cleanupSearchChapters } from "@/searchModal";
-import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
+import { goToParagraph } from "@/helpers/paragraphsNavigation";
 import ModalUI from "./ModalUI";
 import { highlightSearchInParagraph } from "@/utils/textHighlighting";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -33,7 +33,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
     //TODO: fix this to get the value directly from bottom input hook or so
     const query = document.querySelector("#bottom-input").getAttribute("value");
     // Update location with 'system' source to trigger scrolling
-    systemNavigateTo({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber });
+    goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "smooth" });
     highlightSearchInParagraph(item.chapter, item.paragraphNumber, query);
   }, []);
 

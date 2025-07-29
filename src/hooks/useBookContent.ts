@@ -22,16 +22,14 @@ export function useBookContent(containerId: string) {
       setupPageObserver(openCharacterDetailsModal);
 
       // Give the browser a moment to render the injected HTML
-      setTimeout(async () => {
-        try {
-          await initPage();
-        } catch (error) {
-          console.error("Error initializing page:", error);
-          if (loadingIndicator) {
-            loadingIndicator.innerHTML = "<div>Error loading book. Please refresh the page.</div>";
-          }
+      try {
+        initPage();
+      } catch (error) {
+        console.error("Error initializing page:", error);
+        if (loadingIndicator) {
+          loadingIndicator.innerHTML = "<div>Error loading book. Please refresh the page.</div>";
         }
-      }, 0);
+      }
 
       const handleClick = (event) => {
         const target = event.target as HTMLElement;
