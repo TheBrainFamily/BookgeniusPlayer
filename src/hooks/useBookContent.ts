@@ -31,7 +31,7 @@ export function useBookContent(containerId: string) {
             loadingIndicator.innerHTML = "<div>Error loading book. Please refresh the page.</div>";
           }
         }
-      }, 100);
+      }, 0);
 
       const handleClick = (event) => {
         const target = event.target as HTMLElement;
