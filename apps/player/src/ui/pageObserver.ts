@@ -1,4 +1,4 @@
-import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
+import { setCurrentLocation, isSystemNavigationInProgress } from "@/helpers/paragraphsNavigation";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
 import { getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { bookDataLoader } from "@/services/bookDataLoader";
@@ -75,8 +75,6 @@ function initializeDevZoneVisualizers(): { activeElementVisualizer: HTMLDivEleme
   if (!rangeVisualizer) {
     rangeVisualizer = createRangeVisualizer();
   }
-
-  console.log("[DevZoneVisualizers] Initialized development zone visualizers");
 
   return { activeElementVisualizer, rangeVisualizer };
 }
@@ -737,14 +735,17 @@ export function setupPageObserver(
               expandedStartParagraph = 0;
             }
 
-            setCurrentLocation({
-              chapter: rangeStartInfo.chapter,
-              paragraph: expandedStartParagraph,
-              endChapter: rangeEndInfo.chapter,
-              endParagraph: expandedEndParagraph,
-              currentChapter: activeParagraph.chapter,
-              currentParagraph: activeParagraph.paragraph,
-            });
+            // Don't update location during system navigation to avoid conflicts with programmatic scrolling
+            if (!isSystemNavigationInProgress()) {
+              setCurrentLocation({
+                chapter: rangeStartInfo.chapter,
+                paragraph: expandedStartParagraph,
+                endChapter: rangeEndInfo.chapter,
+                endParagraph: expandedEndParagraph,
+                currentChapter: activeParagraph.chapter,
+                currentParagraph: activeParagraph.paragraph,
+              });
+            }
 
             // Media uses viewport range (separate from character notes)
             if (allIntersectingParagraphs.length > 0) {
@@ -769,7 +770,6 @@ export function setupPageObserver(
         }
 
         if (currentlyActivePageElement !== null) {
-          console.log("[Observer] No pages intersecting the focus zone.");
           // Decide if you want to clear the active elements or keep the last known ones
           // currentlyActivePageElement = null;
           // currentlyLastActivePageElement = null;
@@ -783,7 +783,6 @@ export function setupPageObserver(
       }
 
       if (currentlyActivePageElement !== null) {
-        console.log("[Observer] No pages intersecting viewport.");
         // currentlyActivePageElement = null;
         // currentlyLastActivePageElement = null;
       }

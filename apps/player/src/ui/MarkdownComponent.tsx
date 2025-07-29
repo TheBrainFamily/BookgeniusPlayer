@@ -91,7 +91,9 @@ const DeepResearchMarkdown: React.FC<DMProps> = ({ text, className = "" }) => {
       const paragraph = Number(sup.dataset.para);
 
       // global helper you already have
-      goToParagraph({ currentChapter: chapter, currentParagraph: paragraph });
+      goToParagraph({ currentChapter: chapter, currentParagraph: paragraph }, { behavior: "smooth" }).catch((error) =>
+        console.warn("Failed to navigate to paragraph from markdown:", error),
+      );
     };
 
     const el = ref.current;
