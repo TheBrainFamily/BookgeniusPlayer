@@ -21,7 +21,6 @@ export function useCurrentSpeakers(location: Location, allCharacters: CharacterD
 
     const currentChapter = debouncedLocation.currentChapter;
     const currentParagraph = debouncedLocation.currentParagraph;
-    // const paragraphRange = 2; // Look 2 paragraphs ahead and behind
 
     // Use cached character data and filter only once
     const characterChapterData = allCharacters.map((char) => {
@@ -37,6 +36,7 @@ export function useCurrentSpeakers(location: Location, allCharacters: CharacterD
 
     // For play format, apply sticky logic.
     const whoStartsTalkingNow = characterChapterData.filter((char) => char.paragraphsWhereTalking.includes(currentParagraph));
+
     if (whoStartsTalkingNow.length > 0) {
       return whoStartsTalkingNow.map((char) => char.slug);
     }
