@@ -519,7 +519,7 @@ const AudioPlayer = () => {
       <AnimatePresence>
         {showSongNotification && currentTrackData && windowWidth && (
           <motion.div
-            className={cn(windowWidth >= 965 && "absolute w-100 top-5 right-5", windowWidth < 965 && "fixed w-80 bottom-20 left-5")}
+            className={cn(windowWidth >= 1024 && "absolute w-100 top-5 right-5", windowWidth < 1024 && "fixed w-80 bottom-16 right-3", windowWidth < 640 && "w-60 left-2")}
             variants={variants.songNotification}
             initial="initial"
             animate="animate"
@@ -534,7 +534,7 @@ const AudioPlayer = () => {
               )}
               onClick={() => setShowSongNotification(false)}
             >
-              <div className={cn("relative group", windowWidth < 965 ? "w-20 h-20" : "w-26 h-26")}>
+              <div className={cn("relative group", "w-26 h-26", windowWidth < 1024 && "w-20 h-20", windowWidth < 640 && "w-18 h-18")}>
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-white/5 rounded-xl blur-sm opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
                 <div className="relative w-full h-full rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl backdrop-blur-sm bg-white/10">
                   {currentTrackData.coverArtUrl ? (
