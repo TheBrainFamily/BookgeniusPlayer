@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Play, Pause, SkipForward, SkipBack, ListMusic, BookHeadphones, Volume2, VolumeX, Download } from "lucide-react";
 import { motion, AnimatePresence, Variants, Transition } from "motion/react";
 import useLocalStorageState from "use-local-storage-state";
@@ -29,6 +29,8 @@ import { getBookData } from "@/genericBookDataGetters/getBookData";
 const AudioPlayer = () => {
   const { t } = useTranslation();
   const { hasAudiobook, slug } = getBookData();
+
+  const isInitialLoad = useRef(true);
 
   const [volume, setVolume] = useLocalStorageState("volume", { defaultValue: getMasterVolume() ?? 0.5 });
   const [balance, setBalance] = useLocalStorageState("balance", { defaultValue: 0.5 });
@@ -109,6 +111,11 @@ const AudioPlayer = () => {
       setCurrentTrackIdFromState(getCurrentTrackId());
 
       setCurrentTime(0);
+
+      if (isInitialLoad.current) {
+        isInitialLoad.current = false;
+        return;
+      }
 
       if (notificationTimer) {
         clearTimeout(notificationTimer);
