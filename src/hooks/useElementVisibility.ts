@@ -101,29 +101,16 @@ export const useElementVisibility = () => {
   }, [clearInactivityTimer, cancelPendingRaf, handleScrollStart, handleScrollEnd, resetInactivityTimer]);
 
   useEffect(() => {
-    if (isInitializedRef.current || !isSplashHidden) return;
+    if (isInitializedRef.current || !isSplashHidden) {
+      return;
+    }
 
     clearInactivityTimer();
-
     showAllElements();
     resetInactivityTimer();
 
     isInitializedRef.current = true;
-  }, [showAllElements, resetInactivityTimer, isSplashHidden, clearInactivityTimer]);
-
-  // Initialize after a delay even if splash screen detection fails
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isInitializedRef.current) {
-        clearInactivityTimer();
-        showAllElements();
-        resetInactivityTimer();
-        isInitializedRef.current = true;
-      }
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [showAllElements, resetInactivityTimer, clearInactivityTimer]);
+  }, [isSplashHidden, showAllElements, resetInactivityTimer, clearInactivityTimer]);
 
   const stableHandleTap = useCallback(
     (event: MouseEvent | TouchEvent) => {
