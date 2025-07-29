@@ -25,12 +25,11 @@ const Footer = () => {
           variants={footerVariants}
           initial="hidden"
           animate="visible"
-          className={cn("fixed bottom-0 inset-x-0 z-50 flex flex-row gap-2 justify-center mx-auto max-w-[120rem] w-full pointer-events-none", "p-3 md:p-3 lg:p-5")}
+          className={cn("fixed bottom-0 inset-x-0 z-50 flex flex-row gap-2 justify-center mx-auto max-w-[120rem] w-full pointer-events-none", "px-2 py-3 sm:pr-0 xl:px-4 sm:pl-4")}
         >
-          <div id="left-notes-blank" className="hidden md:block md:flex-1 max-w-[700px]" />
-          <div className="flex-2 md:min-w-[600px] max-w-[900px] px-0 md:px-0 flex flex-col ml-0 md:pl-10 xl:pl-0 space-y-3 pointer-events-auto">
+          <div id="left-notes-blank" className="hidden sm:block sm:flex-1 max-w-[700px]" />
+          <div className="w-full sm:flex-3 max-w-[900px] px-0 flex flex-col sm:ml-2 sm:px-3 xl:ml-0 xl:px-2 space-y-3 pointer-events-auto">
             <BottomInput onSubmit={sendMessage} />
-            {/* <ProgressIndicator /> */}
           </div>
           {!isRightNotesBlankHidden && <div id="right-notes-blank" className="hidden xl:block xl:flex-1 max-w-[700px]" />}
         </motion.footer>
