@@ -22,11 +22,7 @@ export async function runLegacyInit() {
   toggleBookContainerVisibilityWithShortcut();
 
   /* ----------------------------------------------------------------
-   *  1. Initialise the FB2 pages, scrolling position, SW, etc.
-   * ---------------------------------------------------------------- */
-
-  /* ----------------------------------------------------------------
-   *  2.  "DOMContentLoaded" kind of stuff
+   *  1.  "DOMContentLoaded" kind of stuff
    * ---------------------------------------------------------------- */
   function onDOMLoaded() {
     initializeNoteLinkBlinking(); // <-- kept here for safety;
