@@ -1,4 +1,4 @@
-import { setCurrentLocation, isSystemNavigationInProgress } from "@/helpers/paragraphsNavigation";
+import { navigationEvents, setCurrentLocation, isSystemNavigationInProgress } from "@/helpers/paragraphsNavigation";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
 import { getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { bookDataLoader } from "@/services/bookDataLoader";
@@ -428,16 +428,7 @@ export function setupPageObserver(
   // Keep track of observed paragraphs to avoid re-observing
   const observedParagraphs = new Set<Element>();
 
-  // ----------------------------------------------------------
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        intersectingPages.add(entry.target);
-      } else {
-        intersectingPages.delete(entry.target);
-      }
-    });
-
+  const processIntersections = () => {
     const rootRect = observerOptions.root.getBoundingClientRect();
     const topMultiplier = 0.35; // 35vh focus zone start
     let bottomMultiplier = 0.45; // 10vh focus zone height (default)
@@ -735,17 +726,29 @@ export function setupPageObserver(
               expandedStartParagraph = 0;
             }
 
+            // By default, update the hash.
+            let shouldUpdateHash = true;
+
+            // However, if system navigation was in progress, it means this is the
+            // re-evaluation call after the initial scroll. In this case, we've
+            // just landed where we want to be, so we should NOT update the hash
+            // to avoid an unwanted jump (e.g., from 1-0 to 1-1).
+            if (isSystemNavigationInProgress()) {
+              shouldUpdateHash = false;
+            }
+
             // Don't update location during system navigation to avoid conflicts with programmatic scrolling
-            if (!isSystemNavigationInProgress()) {
-              setCurrentLocation({
+            setCurrentLocation(
+              {
                 chapter: rangeStartInfo.chapter,
                 paragraph: expandedStartParagraph,
                 endChapter: rangeEndInfo.chapter,
                 endParagraph: expandedEndParagraph,
                 currentChapter: activeParagraph.chapter,
                 currentParagraph: activeParagraph.paragraph,
-              });
-            }
+              },
+              { updateHash: shouldUpdateHash },
+            );
 
             // Media uses viewport range (separate from character notes)
             if (allIntersectingParagraphs.length > 0) {
@@ -787,7 +790,33 @@ export function setupPageObserver(
         // currentlyLastActivePageElement = null;
       }
     }
+  };
+
+  // ----------------------------------------------------------
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        intersectingPages.add(entry.target);
+      } else {
+        intersectingPages.delete(entry.target);
+      }
+    });
+
+    processIntersections();
   }, observerOptions);
+
+  // After a system-driven scroll completes, we need to manually trigger
+  // the intersection processing again. This ensures the UI state
+  // (like visible characters) is correctly synchronized after the scroll.
+  const scrollEndHandler = () => {
+    setTimeout(() => {
+      processIntersections();
+      // Clean up the listener after it has run once.
+      navigationEvents.off("scroll-end", scrollEndHandler);
+    }, 100); // A small delay to ensure the DOM is stable.
+  };
+
+  navigationEvents.on("scroll-end", scrollEndHandler);
 
   // Function to observe new paragraphs
   const observeNewParagraphs = (): number => {
