@@ -45,7 +45,7 @@ class NavigationEventEmitter {
   }
 }
 
-const navigationEvents = new NavigationEventEmitter();
+export const navigationEvents = new NavigationEventEmitter();
 
 /* ------------------------------------------------------------------ */
 /*  Scroll completion detection helpers                              */
@@ -119,7 +119,9 @@ export const getCurrentLocation = (): Location => _bridge.get();
  * Update current location + potentially the "furthest" bookmark.
  * Never moves the bookmark backwards.
  */
-export const setCurrentLocation = (loc: Location) => {
+export const setCurrentLocation = (loc: Location, options: { updateHash?: boolean } = {}) => {
+  const { updateHash = true } = options;
+
   if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
     console.error("Invalid location provided to setCurrentLocation:", loc);
     return;
@@ -127,15 +129,17 @@ export const setCurrentLocation = (loc: Location) => {
 
   _bridge.set(loc);
 
-  setTimeout(() => {
-    if (systemNavigationInProgress) {
-      return;
-    }
-    const chapter = Number(loc.currentChapter) || 1;
-    const paragraph = Number(loc.currentParagraph) || 0;
+  if (updateHash) {
+    setTimeout(() => {
+      if (systemNavigationInProgress) {
+        return;
+      }
+      const chapter = Number(loc.currentChapter) || 1;
+      const paragraph = Number(loc.currentParagraph) || 0;
 
-    window.location.hash = `${chapter}-${paragraph}`;
-  }, 2000);
+      window.location.hash = `${chapter}-${paragraph}`;
+    }, 2000);
+  }
 
   const saved = getSavedLocation();
   if (!saved) {
@@ -211,7 +215,6 @@ export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph
 /* ------------------------------------------------------------------ */
 /*  Scroll helper                                                     */
 export const goToParagraph = (loc: { currentChapter: number; currentParagraph: number }, options: ScrollToOptions = { behavior: "smooth" }): Promise<void> => {
-  console.log("[GoToParagraph] Called with options:", options);
   return new Promise((resolve, reject) => {
     const selector = `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
     const element = document.querySelector(selector) as HTMLElement;
