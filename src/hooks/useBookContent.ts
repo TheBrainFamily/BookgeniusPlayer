@@ -6,30 +6,18 @@ import { useSentenceModal } from "@/stores/modals/sentenceModal.store";
 import { findSimplifiedSentence } from "@/helpers/findSimplifiedSentence";
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
-import { initPage } from "@/ui/pageInit";
 
 export function useBookContent(containerId: string) {
   const bookStringified = getBookStringified();
 
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
   const { openModal: openSentenceModal } = useSentenceModal();
-  const loadingIndicator = document.getElementById("loading");
 
   useEffect(() => {
     const container = document.getElementById(containerId);
     if (container) {
       container.innerHTML = bookStringified.replace(/<\/section>(?!.*<\/section>)/s, '<div style="height: 50vh;"></div></section>');
       setupPageObserver(openCharacterDetailsModal);
-
-      // Give the browser a moment to render the injected HTML
-      try {
-        initPage();
-      } catch (error) {
-        console.error("Error initializing page:", error);
-        if (loadingIndicator) {
-          loadingIndicator.innerHTML = "<div>Error loading book. Please refresh the page.</div>";
-        }
-      }
 
       const handleClick = (event) => {
         const target = event.target as HTMLElement;

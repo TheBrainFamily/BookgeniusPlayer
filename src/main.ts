@@ -10,6 +10,7 @@
 import { initializeNoteLinkBlinking } from "./annotationsHandling";
 import { dealWithSW } from "./serviceWorker";
 import { setupParagraphHighlighting } from "./ui/paragraphHighlighting";
+import { initPage } from "./ui/pageInit";
 import { toggleBookContainerVisibilityWithShortcut } from "./helpers/hide-interface-shortcut";
 
 // Call the function immediately so the shortcut is active
@@ -22,7 +23,21 @@ export async function runLegacyInit() {
   toggleBookContainerVisibilityWithShortcut();
 
   /* ----------------------------------------------------------------
-   *  1.  "DOMContentLoaded" kind of stuff
+   *  1. Initialise the FB2 pages, scrolling position, SW, etc.
+   * ---------------------------------------------------------------- */
+  const loadingIndicator = document.getElementById("loading");
+
+  try {
+    await initPage();
+  } catch (error) {
+    console.error("Error initializing page:", error);
+    if (loadingIndicator) {
+      loadingIndicator.innerHTML = "<div>Error loading book. Please refresh the page.</div>";
+    }
+  }
+
+  /* ----------------------------------------------------------------
+   *  2.  "DOMContentLoaded" kind of stuff
    * ---------------------------------------------------------------- */
   function onDOMLoaded() {
     initializeNoteLinkBlinking(); // <-- kept here for safety;
