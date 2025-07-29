@@ -6,8 +6,13 @@ import { useSentenceModal } from "@/stores/modals/sentenceModal.store";
 import { findSimplifiedSentence } from "@/helpers/findSimplifiedSentence";
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
+<<<<<<< HEAD:apps/player/src/hooks/useBookContent.ts
 import { useEditorMode } from "@/hooks/useEditorMode";
 import { useBookData } from "@/context/BookDataContext";
+||||||| parent of 538c8da0 (refactor: revert changes):src/hooks/useBookContent.ts
+import { initPage } from "@/ui/pageInit";
+=======
+>>>>>>> 538c8da0 (refactor: revert changes):src/hooks/useBookContent.ts
 
 const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
@@ -26,7 +31,12 @@ export function useBookContent(containerId: string) {
 
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
   const { openModal: openSentenceModal } = useSentenceModal();
+<<<<<<< HEAD:apps/player/src/hooks/useBookContent.ts
   useEditorMode(isEditorMode ? container : null);
+||||||| parent of 538c8da0 (refactor: revert changes):src/hooks/useBookContent.ts
+  const loadingIndicator = document.getElementById("loading");
+=======
+>>>>>>> 538c8da0 (refactor: revert changes):src/hooks/useBookContent.ts
 
   useEffect(() => {
     if (container) {
