@@ -19,9 +19,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
     <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
 
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Libre+Caslon+Text&display=swap" rel="stylesheet">
-
-
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Libre+Caslon+Text&display=swap" rel="stylesheet" />
 
     <!-- Preloaded -->
     <link rel="preload" href="/clear-loader.png" as="image" />
@@ -86,9 +84,9 @@
 
       <p id="cutscene-text"></p>
 
-      <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 max-w-[120rem] w-full">
-        <div id="left-notes" class="hidden md:block md:flex-1 max-w-[700px] content-center overflow-y-auto"></div>
-        <div id="content-container" class="flex-2 md:min-w-[600px] max-w-[900px]"></div>
+      <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 sm:pr-0 xl:px-4 sm:pl-4 max-w-[120rem] w-full">
+        <div id="left-notes" class="hidden sm:block sm:flex-1 max-w-[700px] content-center overflow-y-auto"></div>
+        <div id="content-container" class="flex-2 sm:min-w-[500px] md:min-w-[600px] max-w-[900px]"></div>
         <div id="right-notes" class="hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none">
           <div id="right-notes-scrollable-container"></div>
         </div>
@@ -162,10 +160,10 @@
           const t = window.i18n.t;
           document.querySelector(".splash-subtitle").textContent = t("splash_subtitle");
           document.querySelector(".splash-start-button span").textContent = t("start_button");
-          
+
           // Get the current book slug from the global variable
           const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : null;
-          
+
           // Try to get book-specific loading phrases first, fallback to generic ones
           let bookSpecificPhrases = null;
           if (currentBookSlug) {
@@ -175,11 +173,11 @@
               bookSpecificPhrases = bookPhrases;
             }
           }
-          
-// Fallback to generic phrases if book-specific ones are not available
-const genericPhrases = t("loading_phrases", { returnObjects: true });
-this.loadingPhrases = bookSpecificPhrases || (Array.isArray(genericPhrases) ? genericPhrases : []);
-          
+
+          // Fallback to generic phrases if book-specific ones are not available
+          const genericPhrases = t("loading_phrases", { returnObjects: true });
+          this.loadingPhrases = bookSpecificPhrases || (Array.isArray(genericPhrases) ? genericPhrases : []);
+
           this.setupPhraseCycle();
         }
 
