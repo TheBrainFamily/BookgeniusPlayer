@@ -216,7 +216,8 @@ export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph
 /*  Scroll helper                                                     */
 export const goToParagraph = (loc: { currentChapter: number; currentParagraph: number }, options: ScrollToOptions = { behavior: "smooth" }): Promise<void> => {
   return new Promise((resolve, reject) => {
-    const selector = `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
+    const selector =
+      loc.currentParagraph === 0 ? `section[data-chapter="${loc.currentChapter}"]` : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
     const element = document.querySelector(selector) as HTMLElement;
 
     if (!element) {

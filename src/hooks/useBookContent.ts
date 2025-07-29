@@ -17,8 +17,9 @@ export function useBookContent(containerId: string) {
     const container = document.getElementById(containerId);
     if (container) {
       container.innerHTML = bookStringified.replace(/<\/section>(?!.*<\/section>)/s, '<div style="height: 50vh;"></div></section>');
-      setupPageObserver(openCharacterDetailsModal);
+      const observerSetup = setupPageObserver(openCharacterDetailsModal);
 
+      // Give the browser a moment to render the injected HTML
       const handleClick = (event) => {
         const target = event.target as HTMLElement;
 
@@ -122,6 +123,10 @@ export function useBookContent(containerId: string) {
         container.removeEventListener("click", handleClick);
         container.removeEventListener("mouseover", handleMouseOver);
         container.removeEventListener("mouseout", handleMouseOut);
+        // Clean up the observer and its event listeners
+        if (observerSetup) {
+          observerSetup.cleanup();
+        }
       };
     } else {
       console.warn(`Container with id '${containerId}' not found for content injection.`);

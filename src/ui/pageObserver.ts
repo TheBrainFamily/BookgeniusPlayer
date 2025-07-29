@@ -395,7 +395,7 @@ let previousRootRectWidth = 0;
 
 export function setupPageObserver(
   openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
-): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number } | null {
+): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number; cleanup: () => void } | null {
   const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
 
   // Initialize development zone visualizers early
@@ -787,15 +787,12 @@ export function setupPageObserver(
     processIntersections();
   }, observerOptions);
 
-  // After a system-driven scroll completes, we need to manually trigger
-  // the intersection processing again. This ensures the UI state
-  // (like visible characters) is correctly synchronized after the scroll.
+  // Add a persistent scroll-end handler that will trigger re-evaluation
+  // after system navigation completes, ensuring UI state synchronization
   const scrollEndHandler = () => {
     setTimeout(() => {
       processIntersections();
-      // Clean up the listener after it has run once.
-      navigationEvents.off("scroll-end", scrollEndHandler);
-    }, 100); // A small delay to ensure the DOM is stable.
+    }, 100); // Small delay to ensure DOM stability
   };
 
   navigationEvents.on("scroll-end", scrollEndHandler);
@@ -866,6 +863,13 @@ export function setupPageObserver(
       observedParagraphs.add(paragraph);
     });
 
-    return { observer, observeNewParagraphs, cleanupRemovedParagraphs };
+    return {
+      observer,
+      observeNewParagraphs,
+      cleanupRemovedParagraphs,
+      cleanup: () => {
+        navigationEvents.off("scroll-end", scrollEndHandler);
+      },
+    };
   }
 }
