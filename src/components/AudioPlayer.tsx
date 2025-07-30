@@ -515,8 +515,8 @@ const AudioPlayer = () => {
           >
             <div
               className={cn(
-                "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-3 sm:p-4 ",
-                "flex items-center gap-3 sm:gap-4 z-20 max-w-full overflow-hidden",
+                "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-3 lg:p-4 ",
+                "flex items-center gap-3 lg:gap-4 z-20 max-w-full overflow-hidden",
                 "cursor-pointer",
                 "audio-player",
               )}
