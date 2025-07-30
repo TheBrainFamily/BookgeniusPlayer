@@ -3,7 +3,7 @@ import path from "path";
 import { DOMParser, Document } from "@xmldom/xmldom";
 
 import { BookData } from "@/types/book";
-import { getPictureFileNameForName, setKnownVideos } from "@/utils/getFilePathsForName";
+import { getListeningMediaFilePathForName, getPictureFileNameForName, getTalkingMediaFilePathForName, setKnownVideos } from "@/utils/getFilePathsForName";
 import { generateDataFiles, xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterTags } from "./data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
@@ -142,6 +142,8 @@ export function generateCharacterMetadata(xmlDoc: Document, bookString: string, 
     ...character,
     bookSlug,
     imageUrl: `/${bookSlug}/${getPictureFileNameForName(character.slug)}`,
+    listeningUrl: getListeningMediaFilePathForName(character.slug, bookSlug),
+    talkingUrl: getTalkingMediaFilePathForName(character.slug, bookSlug),
   }));
 }
 
