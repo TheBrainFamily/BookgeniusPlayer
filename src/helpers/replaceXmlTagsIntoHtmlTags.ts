@@ -32,7 +32,7 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
         return match;
       }
 
-      const newAttributes = { class: "character-highlighted", "data-character": foundCharacter.slug, "data-src-listening": foundCharacter.imageUrl };
+      const newAttributes = { class: "character-highlighted", "data-character": foundCharacter.slug, "data-src-listening": foundCharacter.listeningUrl };
 
       const attributeString = Object.entries(newAttributes)
         .map(([key, value]) => `${key}="${value}"`)

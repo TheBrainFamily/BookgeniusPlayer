@@ -18,7 +18,7 @@ type InfoPerChapter = {
   paragraphsWhereExits?: number[];
 };
 
-export type CharacterData = { slug: string; characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; imageUrl: string };
+export type CharacterData = { slug: string; characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; imageUrl: string; listeningUrl: string; talkingUrl: string };
 
 type BookMetadata = { title: string; language?: string; bookForm?: string };
 
