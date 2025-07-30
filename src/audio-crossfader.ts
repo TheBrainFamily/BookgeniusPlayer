@@ -27,6 +27,9 @@ const PRE_END_TRANSITION_TRIGGER_SECONDS = 4.0; // Time before track end to trig
  */
 const VOLUME_SCALE = 1.737;
 
+const PLAYLIST_LOAD_STAGGER_MS = 100;
+const PLAYLIST_UPDATE_DEBOUNCE_MS = 300;
+
 // --- Module-level State ---
 let audioContext: AudioContext | null = null;
 const tracks: Map<string, TrackState> = new Map();
@@ -49,6 +52,9 @@ let currentTrackIndexInSection: number = -1;
 // undefined: no pending change; null: pending clear; string[]: pending set
 let pendingSectionTracks: string[] | null | undefined = undefined;
 
+// Debouncing for playlist updates to avoid UI spam
+let playlistUpdateTimeout: ReturnType<typeof setTimeout> | null = null;
+
 const bookData = getBookData();
 
 export function getTrackDetailsById(id: string): TrackState | null {
@@ -56,8 +62,7 @@ export function getTrackDetailsById(id: string): TrackState | null {
 }
 
 export function getCurrentTrackData(): TrackState | null {
-  console.log(`currentTrackId: ${currentTrackId}`);
-  console.log(`tracks`, tracks);
+  if (!currentTrackId) return null;
   return tracks.get(currentTrackId) || null;
 }
 
@@ -606,7 +611,7 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
       console.log(`Crossfade complete: Applying pending section: ${pendingSectionTracks ? "[" + pendingSectionTracks.join(", ") + "]" : "None"}`);
       currentSectionTracks = pendingSectionTracks ? [...pendingSectionTracks] : null;
       pendingSectionTracks = undefined;
-      dispatchPlaylistChangeEvent();
+      dispatchPlaylistChangeEvent().catch(console.error);
     }
 
     if (currentSectionTracks) {
@@ -676,7 +681,7 @@ export function setActiveSection(newSectionTrackIds: string[] | null): void {
   console.log(`Setting active section directly: ${newSectionTrackIds ? `[${newSectionTrackIds.join(", ")}]` : "None"}`);
   currentSectionTracks = newSectionTrackIds ? [...newSectionTrackIds] : null;
 
-  dispatchPlaylistChangeEvent();
+  dispatchPlaylistChangeEvent().catch(console.error);
 
   if (currentTrackId && currentSectionTracks && currentSectionTracks.includes(currentTrackId)) {
     currentTrackIndexInSection = currentSectionTracks.indexOf(currentTrackId);
@@ -857,7 +862,7 @@ export function stopAllPlayback() {
   currentSectionTracks = null;
   currentTrackIndexInSection = -1;
   pendingSectionTracks = undefined;
-  dispatchPlaylistChangeEvent();
+  dispatchPlaylistChangeEvent().catch(console.error);
 
   console.log("All playback stopped and state reset.");
 }
@@ -881,11 +886,24 @@ export function getCurrentTrackIndexInSection(): number {
 
 /** Pure getter for current playback position (in seconds) */
 export function getCurrentTrackPosition(): number | null {
+  // Early returns for performance
   if (!audioContext || !currentTrackId) return null;
+
+  // Check if AudioContext is in a valid state
+  if (audioContext.state !== "running") {
+    return null;
+  }
+
   const state = tracks.get(currentTrackId);
   if (!state) return null;
+
+  // If paused, return the paused position immediately
   if (state.pausedAt != null) return state.pausedAt;
+
+  // If no start time recorded, return 0
   if (state.startedAtCtxTime == null) return 0;
+
+  // Calculate current position
   const pos = audioContext.currentTime - state.startedAtCtxTime + (state.offsetAtStart ?? 0);
   return Math.min(pos, state.audioBuffer?.duration ?? Infinity);
 }
@@ -1019,27 +1037,78 @@ export function resumeCurrentTrack(): void {
   playTrack(currentTrackId, audioContext.currentTime, s.pausedAt);
 }
 
-function dispatchPlaylistChangeEvent(trackIds: string[] | null = null) {
+async function dispatchPlaylistChangeEvent(trackIds: string[] | null = null) {
   const tracksToDispatch = trackIds || currentSectionTracks;
 
-  let playlistData: { id: string; title: string; duration: number }[] | null = null;
-
-  if (tracksToDispatch && tracksToDispatch.length > 0) {
-    playlistData = tracksToDispatch.map((id) => {
+  // Helper to create playlist data from a list of track IDs
+  const createPlaylistData = (ids: string[]) => {
+    return ids.map((id) => {
       const trackState = tracks.get(id);
-      if (trackState) {
+      if (trackState && trackState.audioBuffer) {
         const title = trackState.title || id;
-        const duration = typeof trackState.trackLength === "number" && !isNaN(trackState.trackLength) ? trackState.trackLength : 0;
-
+        const duration = !isNaN(trackState.trackLength) ? trackState.trackLength : 0;
         return { id, title, duration };
       }
-
-      return { id, title: id, duration: 0 };
+      return { id, title: id, duration: 0 }; // Default for unloaded tracks
     });
+  };
+
+  if (tracksToDispatch && tracksToDispatch.length > 0) {
+    // First pass: Dispatch immediately with what we have
+    const initialPlaylistData = createPlaylistData(tracksToDispatch);
+    window.dispatchEvent(new CustomEvent("playlistChange", { detail: initialPlaylistData }));
+
+    // Second pass: Load missing tracks progressively
+    const tracksToLoad = tracksToDispatch.filter((id) => {
+      const trackState = tracks.get(id);
+      return !trackState || !trackState.audioBuffer;
+    });
+
+    if (tracksToLoad.length > 0) {
+      const loadTrackWithDelay = async (id: string, index: number) => {
+        // Stagger the requests slightly to avoid overwhelming the system
+        await new Promise((resolve) => setTimeout(resolve, index * PLAYLIST_LOAD_STAGGER_MS));
+
+        try {
+          if (await loadTrack(id)) {
+            if (playlistUpdateTimeout) {
+              clearTimeout(playlistUpdateTimeout);
+            }
+
+            playlistUpdateTimeout = setTimeout(() => {
+              try {
+                // Check if the section has changed since loading started.
+                // This prevents a race condition where a new section is selected, but an update for the old one
+                // arrives later and incorrectly overwrites the UI.
+                const currentTracksKey = currentSectionTracks?.join(",") ?? null;
+                const dispatchTracksKey = tracksToDispatch.join(",");
+
+                if (currentTracksKey !== dispatchTracksKey) {
+                  return; // Abort update for stale playlist
+                }
+
+                const updatedPlaylistData = createPlaylistData(tracksToDispatch);
+                window.dispatchEvent(new CustomEvent("playlistChange", { detail: updatedPlaylistData }));
+              } catch (error) {
+                console.error("Error during debounced playlist update:", error);
+              }
+            }, PLAYLIST_UPDATE_DEBOUNCE_MS);
+          }
+        } catch (error) {
+          console.warn(`Failed to load track ${id} for playlist:`, error);
+        }
+      };
+
+      // Start loading tracks progressively
+      tracksToLoad.forEach(loadTrackWithDelay);
+    }
+
+    return; // Early return since we already dispatched
   }
 
-  console.log("Dispatching playlist change event with track data:", playlistData);
-  window.dispatchEvent(new CustomEvent("playlistChange", { detail: playlistData }));
+  // No tracks case
+  console.log("Dispatching playlist change event with track data:", null);
+  window.dispatchEvent(new CustomEvent("playlistChange", { detail: null }));
 }
 
 // Listen for splash screen hiding event to trigger initial playlist change
@@ -1047,9 +1116,9 @@ window.addEventListener("splashHidden", () => {
   setTimeout(() => {
     const currentTracks = getCurrentSectionTracks();
     if (currentTracks && currentTracks.length > 0) {
-      dispatchPlaylistChangeEvent(currentTracks);
+      dispatchPlaylistChangeEvent(currentTracks).catch(console.error);
     } else {
-      dispatchPlaylistChangeEvent(null);
+      dispatchPlaylistChangeEvent(null).catch(console.error);
     }
   }, 2000);
 });
