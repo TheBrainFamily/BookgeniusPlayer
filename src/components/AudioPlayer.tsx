@@ -505,7 +505,7 @@ const AudioPlayer = () => {
       <AnimatePresence>
         {showSongNotification && currentTrackData && windowWidth && (
           <motion.div
-            className={cn(windowWidth >= 1024 && "absolute w-100 top-5 right-5", windowWidth < 1024 && "fixed w-70 bottom-16 right-3", windowWidth < 640 && "w-60 right-2")}
+            className={cn(windowWidth >= 1024 && "absolute w-80 top-5 right-5", windowWidth < 1024 && "fixed w-70 bottom-16 right-3", windowWidth < 640 && "w-60 right-2")}
             variants={windowWidth < 1024 ? variants.songNotificationRight : variants.songNotificationTop}
             initial="initial"
             animate="animate"
@@ -515,23 +515,23 @@ const AudioPlayer = () => {
           >
             <div
               className={cn(
-                "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-4",
-                "flex items-center gap-4 z-20 max-w-full overflow-hidden",
+                "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-3 sm:p-4 ",
+                "flex items-center gap-3 sm:gap-4 z-20 max-w-full overflow-hidden",
                 "cursor-pointer",
                 "audio-player",
               )}
               onClick={() => setShowSongNotification(false)}
             >
               <motion.div variants={variants.notificationContent}>
-                <div className={cn("relative group", "w-26 h-26", windowWidth < 1024 && "w-18 h-18", windowWidth < 640 && "w-14 h-14")}>
+                <div className={cn("relative group", "w-20 h-20", windowWidth < 1024 && "w-16 h-16", windowWidth < 640 && "w-14 h-14")}>
                   <div className="relative w-full h-full rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl backdrop-blur-sm bg-white/10">
                     <CoverArt src={currentTrackData.coverArtUrl} />
                   </div>
                 </div>
               </motion.div>
               <motion.div variants={variants.notificationContent} className="flex flex-col flex-1 min-w-0">
-                <div className="text-xs lg:text-sm font-medium">{t("now_playing")}</div>
-                <div className="text-xs lg:text-base font-medium truncate ">{currentTrackData.title || t("unknown_track")}</div>
+                <div className="text-xs font-medium">{t("now_playing")}</div>
+                <div className="text-xs lg:text-sm font-medium truncate ">{currentTrackData.title || t("unknown_track")}</div>
               </motion.div>
             </div>
           </motion.div>
