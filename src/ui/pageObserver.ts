@@ -154,7 +154,13 @@ function createMediaElement(
     });
     element.src = finalSrc;
     element.classList.add("inline-avatar");
-    if (characterSlug) element.dataset.character = characterSlug; // Assign character data if available
+
+    if (characterSlug) {
+      // Assign character data if slug available
+      element.dataset.character = characterSlug;
+      element.title = characterSlug;
+    }
+
     // Add basic error handling for loading
     element.onerror = () => console.error(`Failed to load media: ${element?.src}`);
     return element;
@@ -344,6 +350,7 @@ function activateMediaInRange(
             // Ensure necessary styles for sizing and alignment are present, either via CSS or inline
             dummyElement.style.display = "inline-block"; // Needed to respect width/height
             dummyElement.style.verticalAlign = mediaElement.style.verticalAlign || "bottom"; // Match original or default
+            dummyElement.title = mediaElement.title || ""; // Preserve title if any
 
             // Replace media with dummy
             placeholder.replaceChild(dummyElement, mediaElement);

@@ -6,23 +6,11 @@
   white-space: nowrap;
 }
 
-.character-talking.start-of-paragraph {
-  margin-left: -3em;
-}
-
-.character-talking.start-of-paragraph + .character-talking {
-  margin-left: -1.5em;
-}
-
-.character-talking.start-of-paragraph + .character-talking + .character-talking {
-  margin-left: 0em;
-}
-
 .inline-avatar {
   width: 2.5em;
   height: 2.5em;
   border-radius: 50%;
-  margin: 0 0.5em 0 0;
+  margin: 0;
   vertical-align: middle;
   border: 1px solid #ddd;
   display: inline-block;
@@ -30,6 +18,35 @@
   position: relative;
   transition: transform 0.2s ease;
   cursor: pointer;
+}
+
+.character-talking.start-of-paragraph:first-of-type {
+  margin-left: -3em;
+}
+
+.character-talking + .character-talking {
+  margin-left: -0.5em;
+}
+
+.character-talking {
+  margin-right: 0;
+}
+
+.character-talking:not(:has(~ .character-talking)) {
+  margin-right: 0.5em;
+}
+
+p[data-text-alignment="right"] .character-talking {
+  margin-right: -3em;
+  margin-left: 0;
+}
+
+p[data-text-alignment="right"] .character-talking + .character-talking {
+  margin-right: -1em;
+}
+
+p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)) {
+  margin-left: 0.5em;
 }
 
 .character-talking .inline-avatar {
@@ -67,6 +84,7 @@
 /* Hover effects */
 .inline-avatar:hover {
   transform: scale(2);
+  z-index: 1;
   transition: transform 0.2s ease;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }

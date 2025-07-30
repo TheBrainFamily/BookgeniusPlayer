@@ -66,7 +66,7 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
       .map(([key, value]) => `${key}="${value}"`)
       .join(" ");
 
-    const imgTag = `<img src="${foundCharacter.imageUrl}" class="inline-avatar" data-character="${foundCharacter.slug}">`;
+    const imgTag = `<img src="${foundCharacter.imageUrl}" class="inline-avatar" data-character="${foundCharacter.slug}" title="${foundCharacter.slug}" />`;
 
     return `<span ${attributeString}>${imgTag}</span>`;
   });
