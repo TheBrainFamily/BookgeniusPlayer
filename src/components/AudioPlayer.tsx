@@ -77,6 +77,13 @@ const AudioPlayer = () => {
 
   useEffect(() => {
     if (!isPlaying || !isBigPlayerOpen) return;
+    // Immediate update when player opens, using requestAnimationFrame to avoid blocking
+    requestAnimationFrame(() => {
+      const position = getCurrentTrackPosition();
+      if (position !== null) {
+        setCurrentTime(position);
+      }
+    });
 
     const timer = setInterval(() => {
       const position = getCurrentTrackPosition();
@@ -333,9 +340,9 @@ const AudioPlayer = () => {
             onMouseEnter={() => {
               // Only on desktop
               if (window.matchMedia("(hover: hover)").matches) {
-                setCurrentTime(getCurrentTrackPosition());
                 setIsVolumeOpen(false);
                 setIsBigPlayerOpen(true);
+                // currentTime is already being updated by useEffect interval when player opens
               }
             }}
             onMouseLeave={() => {
@@ -347,16 +354,16 @@ const AudioPlayer = () => {
             <motion.button
               onTouchEnd={(e) => {
                 e.preventDefault();
-                setCurrentTime(getCurrentTrackPosition());
                 setIsVolumeOpen(false);
                 setIsBigPlayerOpen((prev) => !prev);
+                // currentTime will be updated by useEffect interval when player opens
               }}
               onMouseDown={(e) => {
                 // Only handle if not a touch device
                 if (e.detail > 0) {
-                  setCurrentTime(getCurrentTrackPosition());
                   setIsVolumeOpen(false);
                   setIsBigPlayerOpen((prev) => !prev);
+                  // currentTime will be updated by useEffect interval when player opens
                 }
               }}
               className="p-2 my-1 hover:text-white rounded-full cursor-pointer"

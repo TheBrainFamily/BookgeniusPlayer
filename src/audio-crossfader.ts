@@ -62,8 +62,7 @@ export function getTrackDetailsById(id: string): TrackState | null {
 }
 
 export function getCurrentTrackData(): TrackState | null {
-  console.log(`currentTrackId: ${currentTrackId}`);
-  console.log(`tracks`, tracks);
+  if (!currentTrackId) return null;
   return tracks.get(currentTrackId) || null;
 }
 
@@ -887,11 +886,24 @@ export function getCurrentTrackIndexInSection(): number {
 
 /** Pure getter for current playback position (in seconds) */
 export function getCurrentTrackPosition(): number | null {
+  // Early returns for performance
   if (!audioContext || !currentTrackId) return null;
+
+  // Check if AudioContext is in a valid state
+  if (audioContext.state !== "running") {
+    return null;
+  }
+
   const state = tracks.get(currentTrackId);
   if (!state) return null;
+
+  // If paused, return the paused position immediately
   if (state.pausedAt != null) return state.pausedAt;
+
+  // If no start time recorded, return 0
   if (state.startedAtCtxTime == null) return 0;
+
+  // Calculate current position
   const pos = audioContext.currentTime - state.startedAtCtxTime + (state.offsetAtStart ?? 0);
   return Math.min(pos, state.audioBuffer?.duration ?? Infinity);
 }
@@ -1034,7 +1046,7 @@ async function dispatchPlaylistChangeEvent(trackIds: string[] | null = null) {
       const trackState = tracks.get(id);
       if (trackState && trackState.audioBuffer) {
         const title = trackState.title || id;
-const duration = !isNaN(trackState.trackLength) ? trackState.trackLength : 0;
+        const duration = !isNaN(trackState.trackLength) ? trackState.trackLength : 0;
         return { id, title, duration };
       }
       return { id, title: id, duration: 0 }; // Default for unloaded tracks
