@@ -1034,7 +1034,7 @@ async function dispatchPlaylistChangeEvent(trackIds: string[] | null = null) {
       const trackState = tracks.get(id);
       if (trackState && trackState.audioBuffer) {
         const title = trackState.title || id;
-        const duration = typeof trackState.trackLength === "number" && !isNaN(trackState.trackLength) ? trackState.trackLength : 0;
+const duration = !isNaN(trackState.trackLength) ? trackState.trackLength : 0;
         return { id, title, duration };
       }
       return { id, title: id, duration: 0 }; // Default for unloaded tracks
