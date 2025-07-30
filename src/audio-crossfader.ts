@@ -1091,8 +1091,6 @@ async function dispatchPlaylistChangeEvent(trackIds: string[] | null = null) {
                 window.dispatchEvent(new CustomEvent("playlistChange", { detail: updatedPlaylistData }));
               } catch (error) {
                 console.error("Error during debounced playlist update:", error);
-              } finally {
-                playlistUpdateTimeout = null;
               }
             }, PLAYLIST_UPDATE_DEBOUNCE_MS);
           }
