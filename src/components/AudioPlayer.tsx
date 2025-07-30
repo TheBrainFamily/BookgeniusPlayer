@@ -25,6 +25,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { cn } from "@/lib/utils";
 import { OptionalElement } from "./OptionalElement";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { CoverArt } from "./CoverArt";
 
 const AudioPlayer = () => {
   const { t } = useTranslation();
@@ -378,23 +379,8 @@ const AudioPlayer = () => {
                 >
                   <motion.div className="flex justify-center pt-4 mb-4" variants={variants.popUpItem} initial="closed" animate="open">
                     <div className="relative group w-32 h-32">
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/25 to-white/10 rounded-2xl blur-sm opacity-70 group-hover:opacity-90 transition-opacity duration-300" />
                       <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-white/40 shadow-2xl backdrop-blur-sm bg-white/15">
-                        {currentTrackData?.coverArtUrl ? (
-                          <motion.img
-                            key={currentTrackData?.coverArtUrl}
-                            src={currentTrackData?.coverArtUrl}
-                            alt="Album artwork"
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            variants={variants.iconFadeScale}
-                            initial="initial"
-                            animate="animate"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/25 to-white/10">
-                            <ListMusic className="w-12 h-12 text-white/70" />
-                          </div>
-                        )}
+                        <CoverArt src={currentTrackData?.coverArtUrl} />
                       </div>
                     </div>
                   </motion.div>
@@ -519,11 +505,13 @@ const AudioPlayer = () => {
       <AnimatePresence>
         {showSongNotification && currentTrackData && windowWidth && (
           <motion.div
-            className={cn(windowWidth >= 1024 && "absolute w-100 top-5 right-5", windowWidth < 1024 && "fixed w-80 bottom-16 right-3", windowWidth < 640 && "w-60 left-2")}
-            variants={variants.songNotification}
+            className={cn(windowWidth >= 1024 && "absolute w-100 top-5 right-5", windowWidth < 1024 && "fixed w-70 bottom-16 right-3", windowWidth < 640 && "w-60 right-2")}
+            variants={windowWidth < 1024 ? variants.songNotificationRight : variants.songNotificationTop}
             initial="initial"
             animate="animate"
             exit="exit"
+            title={currentTrackData.title || t("unknown_track")}
+            aria-label={currentTrackData.title || t("unknown_track")}
           >
             <div
               className={cn(
@@ -534,22 +522,17 @@ const AudioPlayer = () => {
               )}
               onClick={() => setShowSongNotification(false)}
             >
-              <div className={cn("relative group", "w-26 h-26", windowWidth < 1024 && "w-20 h-20", windowWidth < 640 && "w-18 h-18")}>
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-white/5 rounded-xl blur-sm opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
-                <div className="relative w-full h-full rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl backdrop-blur-sm bg-white/10">
-                  {currentTrackData.coverArtUrl ? (
-                    <img src={currentTrackData.coverArtUrl} alt="Now playing" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/20 to-white/5">
-                      <ListMusic className="w-8 h-8 text-white/70" />
-                    </div>
-                  )}
+              <motion.div variants={variants.notificationContent}>
+                <div className={cn("relative group", "w-26 h-26", windowWidth < 1024 && "w-18 h-18", windowWidth < 640 && "w-14 h-14")}>
+                  <div className="relative w-full h-full rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl backdrop-blur-sm bg-white/10">
+                    <CoverArt src={currentTrackData.coverArtUrl} />
+                  </div>
                 </div>
-              </div>
-              <div className="flex flex-col flex-1 min-w-0">
-                <div className="text-sm font-medium">{t("now_playing")}</div>
-                <div className="text-base font-medium truncate">{currentTrackData.title || t("unknown_track")}</div>
-              </div>
+              </motion.div>
+              <motion.div variants={variants.notificationContent} className="flex flex-col flex-1 min-w-0">
+                <div className="text-xs lg:text-sm font-medium">{t("now_playing")}</div>
+                <div className="text-xs lg:text-base font-medium truncate ">{currentTrackData.title || t("unknown_track")}</div>
+              </motion.div>
             </div>
           </motion.div>
         )}
@@ -604,10 +587,16 @@ const variants: Record<string, Variants> = {
   // Track item hover effect
   trackItemHover: { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.1)", borderRadius: "6px", boxShadow: "0 0 5px rgba(255, 255, 255, 0.2)" } },
   // Song notification animation
-  songNotification: {
-    initial: { opacity: 0, y: -5, scale: 0.98, filter: "blur(1px)" },
-    animate: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", transition: transitions.spring({ stiffness: 100, damping: 30, duration: 3.5 }) },
-    exit: { opacity: 0, y: 5, scale: 0.98, filter: "blur(1px)" },
+  notificationContent: { initial: { opacity: 0, y: -5, scale: 0.98 }, animate: { opacity: 1, y: -0, scale: 1 }, exit: { opacity: 0, y: -5, scale: 0.98 } },
+  songNotificationTop: {
+    initial: { opacity: 0, scale: 0.98, y: -5, filter: "blur(1px)" },
+    animate: { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", transition: { when: "beforeChildren", duration: 0.25 } },
+    exit: { opacity: 0, scale: 0.98, y: -5, filter: "blur(1px)" },
+  },
+  songNotificationRight: {
+    initial: { opacity: 0, scale: 0.98, x: 5, filter: "blur(1px)" },
+    animate: { opacity: 1, scale: 1, x: 0, filter: "blur(0px)", transition: { when: "beforeChildren", duration: 0.25 } },
+    exit: { opacity: 0, scale: 0.98, x: 5, filter: "blur(1px)" },
   },
 };
 
