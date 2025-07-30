@@ -276,6 +276,7 @@
 
             &:hover {
               transform: rotateY(180deg) scale(2);
+              z-index: 1;
             }
           }
         }

@@ -36,18 +36,17 @@
   margin-right: 0.5em;
 }
 
-p[data-text-alignment="right"] .character-talking + .character-talking {
+p[data-text-alignment="right"] .character-talking {
+  margin-right: -3em;
   margin-left: 0;
+}
+
+p[data-text-alignment="right"] .character-talking + .character-talking {
   margin-right: -1em;
 }
 
-p[data-text-alignment="right"] .character-talking:last-of-type {
-  margin-right: 0;
-}
-
-p[data-text-alignment="right"] .character-talking.start-of-paragraph {
-  margin-left: 0;
-  margin-right: -3em;
+p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)) {
+  margin-left: 0.5em;
 }
 
 .character-talking .inline-avatar {
@@ -85,6 +84,7 @@ p[data-text-alignment="right"] .character-talking.start-of-paragraph {
 /* Hover effects */
 .inline-avatar:hover {
   transform: scale(2);
+  z-index: 1;
   transition: transform 0.2s ease;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
