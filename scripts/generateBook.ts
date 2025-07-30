@@ -153,7 +153,7 @@ function generateBookDataFiles(bookDirectoryPath: string, bookSlug: string, book
   // --- Generate getBookStringified.ts ---
   const bookXml = fs.readFileSync(`${bookDirectoryPath}/book.xml`, "utf8");
 
-  const { backgroundsData, audioData, cutSceneData, htmlResult, chapterTitles } = xmlToComplexHtml(bookXml, bookSlug);
+  const { backgroundsData, audioData, cutSceneData, htmlResult, chapterTitles } = xmlToComplexHtml(bookXml, bookSlug, bookLang);
 
   // Check if the required media files exist in the book directory
   const requiredMediaFiles = ["getBackgroundsForBook.ts", "getBackgroundSongsForBook.ts", "getCutScenesForBook.ts"];

@@ -49,6 +49,7 @@ const extractFileData = (
 export const xmlToComplexHtml = (
   xmlString: string,
   bookSlug: string,
+  bookLang: string,
 ): {
   htmlResult: string;
   backgroundsData: Array<{ chapter: number; file: string; startParagraph: number }>;
@@ -337,6 +338,10 @@ export const xmlToComplexHtml = (
     htmlResult += `\n    </div>`;
   }
 
+  if (bookLang === "polish" && bookFormValue !== "Play") {
+    htmlResult = htmlResult.replace(/(?<=\s|&nbsp;)(a|i|o|u|w|z|na|do|od|za|po|we|ku|ze|co|że|bo|iż|ni|nad|pod|bez|dla|oraz|ale|lub|czy|ani)\s/gi, "$1&nbsp;");
+  }
+
   return { htmlResult: htmlResult.trim(), backgroundsData, audioData, cutSceneData, chapterTitles };
 };
 
@@ -404,7 +409,7 @@ if (require.main === module) {
 
   // Example usage: Provide the book slug when calling
   console.log("bookSlug", bookSlug);
-  const { backgroundsData, audioData, cutSceneData, htmlResult } = xmlToComplexHtml(xmlString, bookSlug);
+  const { backgroundsData, audioData, cutSceneData, htmlResult } = xmlToComplexHtml(xmlString, bookSlug, "polish");
 
   generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug);
 
