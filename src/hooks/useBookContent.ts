@@ -33,7 +33,9 @@ export function useBookContent(containerId: string) {
 
         const span = target.closest("span[id^='ch']");
 
-        if (span) {
+        const isCharacterPlaceholder = span.children.length === 2 && span.children[0].classList.contains("character-placeholder") && span.children[1].tagName === "STRONG";
+
+        if (span && !isCharacterPlaceholder) {
           const isFirstSimplification = !span.hasAttribute("data-simplified");
 
           // Store the original sentence only on the first click.
