@@ -8,6 +8,15 @@ import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags
 import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
 import { useEditorMode } from "@/hooks/useEditorMode";
 
+const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
+
+if (import.meta.hot) {
+  import.meta.hot.accept("@/helpers/findSimplifiedSentence", (mod) => {
+    findSimplifiedSentenceRef.current = mod.findSimplifiedSentence;
+    console.info("[HMR] findSimplifiedSentence updated");
+  });
+}
+
 const isEditorMode = import.meta.env.VITE_EDITOR === "true";
 export function useBookContent(containerId: string) {
   const container = document.getElementById(containerId);
@@ -53,7 +62,7 @@ export function useBookContent(containerId: string) {
 
           const currentSentenceId = span.id;
           const currentSentenceScore = span.getAttribute("data-current-score") || "0";
-          const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentence(span.id, parseInt(currentSentenceScore));
+          const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentenceRef.current(span.id, parseInt(currentSentenceScore));
 
           if (!simplifiedSentence) {
             console.warn(`No further simplification available for ${currentSentenceId}`);
