@@ -413,9 +413,11 @@ if (require.main === module) {
     xmlString = fs.readFileSync(fallbackPath, "utf8");
   }
 
+  const bookLanguage = xmlString.match(/<BookLanguage>([^<]+)<\/BookLanguage>/)?.[1] || "polish";
+
   // Example usage: Provide the book slug when calling
   console.log("bookSlug", bookSlug);
-  const { backgroundsData, audioData, cutSceneData, htmlResult } = xmlToComplexHtml(xmlString, bookSlug, "polish");
+  const { backgroundsData, audioData, cutSceneData, htmlResult } = xmlToComplexHtml(xmlString, bookSlug, bookLanguage);
 
   generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug);
 
