@@ -43,18 +43,12 @@ export const calculateChapterProgress = (currentChapter: number): number => {
   }
 
   const viewportHeight = window.innerHeight;
-  // Focus zone middle (middle reading line) is at 60vh from the top of the container (35vh+(75vh-35vh/2))
-  // const readingLine = viewportHeight * 0.6;
-
-  // Focus zone top (first reading line) is at 35vh from the top of the container
-  // const readingLine = viewportHeight * 0.35;
-
-  // Focus zone bottom (lasr reading line) is at 75vh from the top of the container
-  const readingLine = viewportHeight * 0.75;
+  const readingLinePercentage = 0.4;
+  const readingLinePixelPosition = viewportHeight * readingLinePercentage;
 
   const rect = activeChapter.getBoundingClientRect();
 
-  const scrollDistance = readingLine - rect.top;
+  const scrollDistance = readingLinePixelPosition - rect.top;
 
   // Avoid division by zero if the element has no height, which can result in NaN.
   if (rect.height <= 0) {

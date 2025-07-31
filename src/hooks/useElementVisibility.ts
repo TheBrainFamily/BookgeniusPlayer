@@ -2,7 +2,11 @@ import { useEffect, useCallback, useRef } from "react";
 import { useElementVisibilityStore } from "@/stores/elementVisibility.store";
 import useSplashHidden from "./useSplashHidden";
 
+import { useLocation } from "@/state/LocationContext";
+import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
+
 const SCROLL_HIDE_DELAY = 3000;
+const SCROLL_DEBOUNCE_DELAY = 50;
 const TOUCH_MOVE_THRESHOLD = 30;
 const TAP_TIME_THRESHOLD = 500;
 
@@ -47,6 +51,7 @@ export const useElementVisibility = () => {
   const rafIdRef = useRef<number | null>(null);
   const lastTapTimeRef = useRef(0);
   const preventClickRef = useRef(false);
+  const { setLocation } = useLocation();
 
   const stateRef = useRef({ areElementsVisible, isScrollMode, touch });
 
@@ -60,6 +65,17 @@ export const useElementVisibility = () => {
       rafIdRef.current = null;
     }
   }, []);
+
+  const handleScrollEndForUpdatingPosition = useCallback(() => {
+    try {
+      const currentLocation = getCurrentLocation();
+      if (currentLocation) {
+        setLocation({ ...currentLocation, lastScrollTimestamp: Date.now() });
+      }
+    } catch (error) {
+      console.warn("Failed to update paragraph progress:", error);
+    }
+  }, [setLocation]);
 
   const handleScroll = useCallback(() => {
     if (scrollEndDebounceRef.current) {
@@ -200,9 +216,17 @@ export const useElementVisibility = () => {
     [stableHandleTap],
   );
 
+  const scrollDebounceRef = useRef<number | null>(null);
   const stableHandleScroll = useCallback(() => {
     handleScroll();
-  }, [handleScroll]);
+
+    if (scrollDebounceRef.current) {
+      clearTimeout(scrollDebounceRef.current);
+    }
+    scrollDebounceRef.current = window.setTimeout(() => {
+      handleScrollEndForUpdatingPosition();
+    }, SCROLL_DEBOUNCE_DELAY);
+  }, [handleScroll, handleScrollEndForUpdatingPosition]);
 
   useEffect(() => {
     if (!isInitializedRef.current) return;

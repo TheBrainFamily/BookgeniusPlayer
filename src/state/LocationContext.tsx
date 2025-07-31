@@ -9,6 +9,7 @@ export interface Location {
   endParagraph: number;
   currentChapter: number;
   currentParagraph: number;
+  lastScrollTimestamp?: number;
 }
 
 export interface LocationWithMetadata {
