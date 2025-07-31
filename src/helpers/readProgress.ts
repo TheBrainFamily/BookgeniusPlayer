@@ -22,12 +22,47 @@ export const calculateReadProgress = (chaptersStructure: ChapterStructure[], tar
   return (readParagraphs / totalParagraphs) * 100;
 };
 
-/**
- * Calculate chapter progress as a percentage
- */
-export const calculateChapterProgress = (chaptersStructure: ChapterStructure[], currentChapter: number, currentParagraph: number): number => {
-  const chapterData = chaptersStructure.find((ch) => ch.chapterNumber === currentChapter);
-  if (!chapterData) return 0;
+// /**
+//  * Calculate chapter progress as a percentage
+//  */
+// export const calculateChapterProgress = (chaptersStructure: ChapterStructure[], currentChapter: number, currentParagraph: number): number => {
+//   const chapterData = chaptersStructure.find((ch) => ch.chapterNumber === currentChapter);
+//   if (!chapterData) return 0;
+//
+//   return Math.min(((currentParagraph + 1) / chapterData.paragraphCount) * 100, 100);
+// };
 
-  return Math.min(((currentParagraph + 1) / chapterData.paragraphCount) * 100, 100);
+/**
+ * Calculate chapter progress as a percentage based on user scroll position
+ */
+export const calculateChapterProgress = (currentChapter: number): number => {
+  const activeChapter = document.querySelector(`section[data-chapter="${currentChapter}"]`) as HTMLElement | null;
+
+  if (!activeChapter) {
+    return 0;
+  }
+
+  const viewportHeight = window.innerHeight;
+  // Focus zone middle (middle reading line) is at 60vh from the top of the container (35vh+(75vh-35vh/2))
+  // const readingLine = viewportHeight * 0.6;
+
+  // Focus zone top (first reading line) is at 35vh from the top of the container
+  // const readingLine = viewportHeight * 0.35;
+
+  // Focus zone bottom (lasr reading line) is at 75vh from the top of the container
+  const readingLine = viewportHeight * 0.75;
+
+  const rect = activeChapter.getBoundingClientRect();
+
+  const scrollDistance = readingLine - rect.top;
+
+  // Avoid division by zero if the element has no height, which can result in NaN.
+  if (rect.height <= 0) {
+    return scrollDistance > 0 ? 100 : 0;
+  }
+
+  const progress = (scrollDistance / rect.height) * 100;
+  console.log("PINGWING: 60 in calculateChapterProgressprogress", progress);
+
+  return Math.max(0, Math.min(100, progress));
 };
