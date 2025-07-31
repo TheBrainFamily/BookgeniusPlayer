@@ -1,6 +1,7 @@
 import { CURRENT_BOOK } from "./consts";
 import { Location } from "./state/LocationContext";
 import { Filter } from "./types/book";
+import { DEV_SERVER_URL } from "@/lib/consts";
 
 export async function deepResearchCall(searchQuery: string, location: Location): Promise<string> {
   const baseUrl = "/deepResearch"; // Assuming localhost for now
@@ -13,11 +14,14 @@ export async function deepResearchCall(searchQuery: string, location: Location):
 
   const params = new URLSearchParams({ question: searchQuery, filter: JSON.stringify(filter) });
 
-  const url = `/api/${baseUrl}?${params.toString()}`;
+  let url = `/api/${baseUrl}?${params.toString()}`;
+  const isDev = import.meta.env.MODE === "development";
+  if (isDev) {
+    url = `${DEV_SERVER_URL}${url}`;
+  }
   console.log(`Fetching deep research from: ${url}`); // Optional: for debugging
-
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { method: "GET", headers: { ...(isDev && { "X-Dev-Token": import.meta.env.VITE_DEV_TOKEN }) } });
     if (!response.ok) {
       // Throw an error with status text for better debugging
       throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
