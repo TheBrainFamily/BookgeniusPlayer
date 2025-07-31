@@ -22,16 +22,6 @@ export const calculateReadProgress = (chaptersStructure: ChapterStructure[], tar
   return (readParagraphs / totalParagraphs) * 100;
 };
 
-// /**
-//  * Calculate chapter progress as a percentage
-//  */
-// export const calculateChapterProgress = (chaptersStructure: ChapterStructure[], currentChapter: number, currentParagraph: number): number => {
-//   const chapterData = chaptersStructure.find((ch) => ch.chapterNumber === currentChapter);
-//   if (!chapterData) return 0;
-//
-//   return Math.min(((currentParagraph + 1) / chapterData.paragraphCount) * 100, 100);
-// };
-
 /**
  * Calculate chapter progress as a percentage based on user scroll position
  */
