@@ -1,9 +1,9 @@
 <!doctype html>
 
-<html lang="pl">
+<html lang="<%- lang %>">
   <head>
     <meta charset="UTF-8" />
-    <title>BookGenius</title>
+    <title>BookGenius - <%= title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#333333" />
     <meta name="description" content="Interactive book reader" />
@@ -101,12 +101,22 @@
     <div id="splash-screen">
       <div class="splash-container">
         <div class="splash-title-container">
-          <div class="splash-title">BookGenius</div>
-          <div class="splash-subtitle"></div>
+          <div class="splash-title"><%= title %></div>
+          <div class="splash-subtitle"><%= subtitle %></div>
         </div>
 
         <div class="splash-image-container">
-          <video id="splash-video" poster="/clear-loader.png" alt="Loading..." class="splash-loading-image" muted autoplay playsinline preload="auto"></video>
+          <video
+            id="splash-video"
+            src="<%= loaderVideoSrc %>"
+            poster="/clear-loader.png"
+            alt="Loading..."
+            class="splash-loading-image"
+            muted
+            autoplay
+            playsinline
+            preload="auto"
+          ></video>
         </div>
 
         <div class="splash-text-container">
@@ -115,7 +125,7 @@
 
         <button class="splash-start-button disabled" id="start-button">
           <div class="play-icon"></div>
-          <span>Start</span>
+          <span><%= startButtonText %></span>
         </button>
       </div>
     </div>
@@ -127,61 +137,16 @@
           this.phraseInterval = null;
           this.previousPhrases = new Set();
           this.isExiting = false;
-          this.loadingPhrases = [];
+          try {
+            this.loadingPhrases = JSON.parse(`<%- loadingPhrases %>`);
+          } catch (e) {
+            console.error("Failed to parse loading phrases:", e);
+            this.loadingPhrases = ["Loading..."];
+          }
           this.videoPlayed = false;
-          this.setupVideoSource();
-          this.setupDynamicContent();
+          this.setupPhraseCycle();
           this.setupEventListeners();
           this.setupVideo();
-        }
-
-        setupVideoSource() {
-          // Get the current book slug from the global variable
-          const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : null;
-          if (currentBookSlug) {
-            // Set the video source to the loader.mp4 in the book's assets folder
-            const videoSrc = `/public_books/${currentBookSlug}/assets/loader.mp4`;
-            const video = document.getElementById("splash-video");
-            if (video) {
-              video.src = videoSrc;
-            }
-          }
-        }
-
-        async setupDynamicContent() {
-          await new Promise((resolve) => {
-            const checkReady = () => {
-              if (window.i18n && window.i18n.isInitialized) {
-                resolve();
-              } else {
-                setTimeout(checkReady, 100);
-              }
-            };
-            checkReady();
-          });
-
-          const t = window.i18n.t;
-          document.querySelector(".splash-subtitle").textContent = t("splash_subtitle");
-          document.querySelector(".splash-start-button span").textContent = t("start_button");
-
-          // Get the current book slug from the global variable
-          const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : null;
-
-          // Try to get book-specific loading phrases first, fallback to generic ones
-          let bookSpecificPhrases = null;
-          if (currentBookSlug) {
-            const bookPhrases = t(`books.${currentBookSlug}.loading_phrases`, { returnObjects: true });
-            // Check if the result is actually an array (not the key string returned when translation is missing)
-            if (Array.isArray(bookPhrases)) {
-              bookSpecificPhrases = bookPhrases;
-            }
-          }
-
-          // Fallback to generic phrases if book-specific ones are not available
-          const genericPhrases = t("loading_phrases", { returnObjects: true });
-          this.loadingPhrases = bookSpecificPhrases || (Array.isArray(genericPhrases) ? genericPhrases : []);
-
-          this.setupPhraseCycle();
         }
 
         getRandomPhrase() {
