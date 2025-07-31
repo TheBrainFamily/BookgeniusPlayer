@@ -5,8 +5,8 @@ import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
 import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { CURRENT_BOOK } from "@/consts";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
-import { useHighlight } from "@/context/HighlightContext";
 import { cn } from "@/lib/utils";
+import { useHighlight } from "@/hooks/useHighlight";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
