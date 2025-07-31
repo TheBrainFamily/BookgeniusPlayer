@@ -11,7 +11,6 @@ import { WebSocketProvider } from "./context/WebSocketContext";
 import { RealtimeProvider } from "./context/RealtimeContext";
 import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
 import { BookContentWrapper } from "./components/BookContentWrapper";
-import { BookThemeProvider } from "./context/BookThemeContext";
 import { useAudiobookTracks } from "@/hooks/useAudiobookTracks";
 
 import ContentContainerWrapper from "./components/ContentContainerWrapper";
@@ -95,12 +94,10 @@ export default function App() {
     <LocationProvider>
       <RealtimeProvider>
         <WebSocketProvider>
-          <BookThemeProvider>
-            <BookContentWrapper>
-              <Shell />
-              <ModalRenderers />
-            </BookContentWrapper>
-          </BookThemeProvider>
+          <BookContentWrapper>
+            <Shell />
+            <ModalRenderers />
+          </BookContentWrapper>
         </WebSocketProvider>
       </RealtimeProvider>
     </LocationProvider>
