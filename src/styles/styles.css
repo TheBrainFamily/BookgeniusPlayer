@@ -137,6 +137,12 @@
       mask-composite: intersect;
       hyphens: auto;
 
+      @media only screen and (min-width: 667px) and (orientation: landscape) {
+        mask-image:
+          linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 10%, rgba(0 0 0 / 1) 15%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 100%, transparent 100%),
+          radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
+      }
+
       /* Media query for tablets - no right side fade */
       @media (min-width: 768px) and (max-width: 1279px) {
         mask-image:
