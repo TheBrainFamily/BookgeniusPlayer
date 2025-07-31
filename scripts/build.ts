@@ -17,10 +17,9 @@ async function build() {
     const langMapping: Record<string, string> = { polish: "pl", english: "en" };
     const viteLanguage = langMapping[bookLanguage] || "pl";
 
-    const command = `VITE_BOOK_DIR=${JSON.stringify(bookDirectoryPath)} VITE_LANG=${viteLanguage} pnpm exec vite build`;
+    const command = `NODE_OPTIONS='--import tsx' VITE_BOOK_DIR=${JSON.stringify(bookDirectoryPath)} VITE_LANG=${viteLanguage} pnpm exec vite build`;
     console.log(`🚀 Executing: ${command}`);
     execSync(command, { stdio: "inherit" });
-
     console.log(`✅ Build completed successfully for ${bookSlug}`);
   } catch (error) {
     console.error(`❌ Build failed:`);
