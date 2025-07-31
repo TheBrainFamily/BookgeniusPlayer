@@ -3,6 +3,7 @@ import { CURRENT_BOOK } from "@/consts";
 import fs from "fs";
 import { DOMParser } from "@xmldom/xmldom";
 import { TextEditor } from "./text-editor";
+import { PUBLIC_BOOKS_PATH } from "./consts";
 
 const BOOK_SLUG = CURRENT_BOOK;
 
@@ -25,7 +26,7 @@ const questions = {
 
 (async () => {
   const parser = new DOMParser();
-  const book = fs.readFileSync(`./src/data/${BOOK_SLUG}-chapters.xml`, "utf8");
+  const book = fs.readFileSync(`${PUBLIC_BOOKS_PATH}/${BOOK_SLUG}/book.xml`, "utf8");
   const xmlDoc = parser.parseFromString(book, "text/xml");
   const chaptersXml = xmlDoc.getElementsByTagName("Chapter");
 

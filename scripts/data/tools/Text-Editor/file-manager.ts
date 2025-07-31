@@ -11,7 +11,7 @@ export class FileManager implements IFileManager {
   private readonly xmlFilePath: string;
 
   constructor(private readonly bookSlug: BOOK_SLUGS) {
-    this.xmlFilePath = `./src/data/${this.bookSlug}-chapters.xml`;
+    this.xmlFilePath = `./public_books/${this.bookSlug}/book.xml`;
   }
 
   public readXmlFile(): string {

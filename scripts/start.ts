@@ -17,7 +17,7 @@ async function start() {
     const langMapping: Record<string, string> = { polish: "pl", english: "en" };
     const viteLanguage = langMapping[bookLanguage] || "pl";
 
-    const command = `NODE_OPTIONS='--import tsx' VITE_BOOK_DIR=${JSON.stringify(bookDirectoryPath)} VITE_LANG=${viteLanguage} pnpm exec vite dev`;
+    const command = `NODE_OPTIONS='--import tsx' VITE_BOOK_DIR=${JSON.stringify(bookDirectoryPath)} VITE_LANG=${viteLanguage} VITE_EDITOR=true pnpm exec vite dev`;
     console.log(`🚀 Executing: ${command}`);
     execSync(command, { stdio: "inherit" });
   } catch (error) {

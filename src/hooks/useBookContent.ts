@@ -6,20 +6,26 @@ import { useSentenceModal } from "@/stores/modals/sentenceModal.store";
 import { findSimplifiedSentence } from "@/helpers/findSimplifiedSentence";
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
+import { useEditorMode } from "@/hooks/useEditorMode";
 
+const isEditorMode = import.meta.env.VITE_EDITOR === "true";
 export function useBookContent(containerId: string) {
+  const container = document.getElementById(containerId);
   const bookStringified = getBookStringified();
 
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
   const { openModal: openSentenceModal } = useSentenceModal();
+  useEditorMode(isEditorMode ? container : null);
 
   useEffect(() => {
-    const container = document.getElementById(containerId);
     if (container) {
       container.innerHTML = bookStringified.replace(/<\/section>(?!.*<\/section>)/s, '<div style="height: 50vh;"></div></section>');
       setupPageObserver(openCharacterDetailsModal);
 
       const handleClick = (event) => {
+        if (event.metaKey || event.ctrlKey) {
+          return;
+        }
         const target = event.target as HTMLElement;
 
         if (target.closest(".character-highlighted-activated")) {
