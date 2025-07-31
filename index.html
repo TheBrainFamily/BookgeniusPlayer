@@ -3,7 +3,7 @@
 <html lang="<%- lang %>">
   <head>
     <meta charset="UTF-8" />
-    <title>BookGenius - <%- title %></title>
+    <title>BookGenius - <%= title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#333333" />
     <meta name="description" content="Interactive book reader" />
@@ -101,14 +101,14 @@
     <div id="splash-screen">
       <div class="splash-container">
         <div class="splash-title-container">
-          <div class="splash-title"><%- title %></div>
-          <div class="splash-subtitle"><%- subtitle %></div>
+          <div class="splash-title"><%= title %></div>
+          <div class="splash-subtitle"><%= subtitle %></div>
         </div>
 
         <div class="splash-image-container">
           <video
             id="splash-video"
-            src="<%- loaderVideoSrc %>"
+            src="<%= loaderVideoSrc %>"
             poster="/clear-loader.png"
             alt="Loading..."
             class="splash-loading-image"
@@ -125,7 +125,7 @@
 
         <button class="splash-start-button disabled" id="start-button">
           <div class="play-icon"></div>
-          <span><%- startButtonText %></span>
+          <span><%= startButtonText %></span>
         </button>
       </div>
     </div>
@@ -137,7 +137,12 @@
           this.phraseInterval = null;
           this.previousPhrases = new Set();
           this.isExiting = false;
-          this.loadingPhrases = JSON.parse(`<%- loadingPhrases %>`);
+          try {
+            this.loadingPhrases = JSON.parse(`<%- loadingPhrases %>`);
+          } catch (e) {
+            console.error("Failed to parse loading phrases:", e);
+            this.loadingPhrases = ["Loading..."];
+          }
           this.videoPlayed = false;
           this.setupPhraseCycle();
           this.setupEventListeners();
