@@ -70,6 +70,7 @@ export const useElementVisibility = () => {
     try {
       const currentLocation = getCurrentLocation();
       if (currentLocation) {
+        // we need to update the lastScrollTimestamp to the current time to avoid the progress bar from jumping
         setLocation({ ...currentLocation, lastScrollTimestamp: Date.now() });
       }
     } catch (error) {
