@@ -8,12 +8,12 @@ function isDevelopment(): boolean {
 }
 
 // Base URLs that adapt to the environment
-const DEV_SERVER_URL = `https://${CURRENT_BOOK}.bookgenius.net/`;
+export const DEV_SERVER_URL = `https://${CURRENT_BOOK.replace(/[^a-zA-Z0-9]/g, "").toLowerCase()}.bookgenius.net/`;
 const DEV_WS_URL = "ws://192.168.1.26:3000";
 
 // In production, use relative URLs that will point to the same domain
 export const SERVER_URL = isDevelopment() ? DEV_SERVER_URL : `${window.location.origin}/api`;
 
-export const QUESTIONS_SERVER_URL = isDevelopment() ? DEV_SERVER_URL : `${window.location.origin}/api`;
+export const QUESTIONS_SERVER_URL = isDevelopment() ? `${DEV_SERVER_URL}/api` : `${window.location.origin}/api`;
 
 export const QUESTIONS_SERVER_WS_URL = isDevelopment() ? DEV_WS_URL : `ws${window.location.protocol === "https:" ? "s" : ""}://${window.location.host}/ws`;
