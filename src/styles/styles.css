@@ -1271,3 +1271,7 @@ section[data-chapter] [data-index] {
   padding-right: 8px;
   scrollbar-gutter: stable;
 }
+
+.text-nowrap {
+  text-wrap: nowrap;
+}
