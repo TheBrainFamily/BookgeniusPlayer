@@ -26,10 +26,6 @@ export const calculateReadProgress = (chaptersStructure: ChapterStructure[], tar
  * Calculate chapter progress as a percentage based on user scroll position
  */
 export const calculateChapterProgress = (currentChapter: number): number => {
-  if (typeof document === "undefined") {
-    return 0;
-  }
-
   const activeChapter = document.querySelector(`section[data-chapter="${currentChapter}"]`) as HTMLElement | null;
   if (!activeChapter) {
     return 0;
