@@ -82,7 +82,7 @@ export const xmlToComplexHtml = (
     }
   }
 
-  const bookForm = xmlDoc.getElementsByTagName("BookForm")[0];
+  const bookForm = xmlDoc.getElementsByTagName("Form")[0];
   const bookFormValue = bookForm ? bookForm.textContent : "";
   if (bookFormValue === "Play") {
     htmlResult += `\n    <div class="play-container">`;
