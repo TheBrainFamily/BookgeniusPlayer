@@ -52,7 +52,7 @@ const ProgressBars: React.FC = () => {
             height: "100%",
             width: `${chapterProgress}%`,
             background: "linear-gradient(to right, #8B4513, #CD853F)",
-            transition: `width ${PROGRESS_BAR_TRANSITION_TIME} ease-in`,
+            transition: `width ${PROGRESS_BAR_TRANSITION_TIME} ease`,
             opacity: 0.7,
           }}
         />
@@ -63,7 +63,7 @@ const ProgressBars: React.FC = () => {
             height: "100%",
             width: `${furthestProgress}%`,
             background: "linear-gradient(to right, #88888830, #bbbbbb30)",
-            transition: `width ${PROGRESS_BAR_TRANSITION_TIME} ease-in`,
+            transition: `width ${PROGRESS_BAR_TRANSITION_TIME} ease`,
           }}
         />
       </div>
@@ -73,7 +73,7 @@ const ProgressBars: React.FC = () => {
             height: "100%",
             width: `${bookProgress}%`,
             background: "linear-gradient(to right, #A0522D, #F4A460)",
-            transition: `width ${PROGRESS_BAR_TRANSITION_TIME} ease-in`,
+            transition: `width ${PROGRESS_BAR_TRANSITION_TIME} ease`,
             opacity: 0.7,
           }}
         />
