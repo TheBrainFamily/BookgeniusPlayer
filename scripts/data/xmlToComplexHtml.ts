@@ -49,6 +49,7 @@ const extractFileData = (
 export const xmlToComplexHtml = (
   xmlString: string,
   bookSlug: string,
+  bookLang: string,
 ): {
   htmlResult: string;
   backgroundsData: Array<{ chapter: number; file: string; startParagraph: number }>;
@@ -220,9 +221,13 @@ export const xmlToComplexHtml = (
                         inner += `<strong>${e.textContent.trim()}</strong>`;
                         break;
                       default: {
-                        const eid = e.getAttribute("id");
-                        const idStr = eid ? ` id="${eid}"` : "";
-                        inner += `<${e.tagName}${idStr}>${e.textContent}</${e.tagName}>`;
+                        if (e.tagName === "LineBreak") {
+                          inner += `<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>`;
+                        } else {
+                          const eid = e.getAttribute("id");
+                          const idStr = eid ? ` id="${eid}"` : "";
+                          inner += `<${e.tagName}${idStr}>${e.textContent}</${e.tagName}>`;
+                        }
                       }
                     }
                   }
@@ -267,9 +272,13 @@ export const xmlToComplexHtml = (
                   pContent += `<strong>${pElement.textContent.trim()}</strong>`;
                   break;
                 default: {
-                  const eid2 = pElement.getAttribute("id");
-                  const idStr2 = eid2 ? ` id="${eid2}"` : "";
-                  pContent += `<${pElement.tagName}${idStr2}>${pElement.textContent || ""}</${pElement.tagName}>`;
+                  if (pElement.tagName === "LineBreak") {
+                    pContent += `<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>`;
+                  } else {
+                    const eid2 = pElement.getAttribute("id");
+                    const idStr2 = eid2 ? ` id="${eid2}"` : "";
+                    pContent += `<${pElement.tagName}${idStr2}>${pElement.textContent || ""}</${pElement.tagName}>`;
+                  }
                 }
               }
             }
@@ -292,8 +301,8 @@ export const xmlToComplexHtml = (
               }
 
               const characterPlaceholderSpans = [];
-              clean = clean.replace(/<span class="character-placeholder[^>]*>.*?<\/span>/g, match => {
-                characterPlaceholderSpans.push(match)
+              clean = clean.replace(/<span class="character-placeholder[^>]*>.*?<\/span>/g, (match) => {
+                characterPlaceholderSpans.push(match);
                 return "";
               });
 
@@ -307,7 +316,6 @@ export const xmlToComplexHtml = (
 
               firstCharacter = false;
             }
-
 
             htmlResult += `\n    <p 
                 data-index="${dataIndex++}" 
@@ -357,6 +365,16 @@ export const xmlToComplexHtml = (
 
   if (bookFormValue === "Play") {
     htmlResult += `\n    </div>`;
+  }
+
+  if (bookLang === "polish" && bookFormValue !== "Play") {
+    const conjunctions = "a|i|o|u|w|z|na|do|od|za|po|we|ku|ze|co|że|bo|iż|ni|nad|pod|bez|dla|oraz|ale|lub|czy|ani";
+    const conjunctionsRegex = new RegExp(`(?<=\\s|&nbsp;)(${conjunctions})\\s`, "gi");
+
+    htmlResult = htmlResult.replace(/>([^<]+)</g, (match, textContent) => {
+      const formattedText = textContent.replace(conjunctionsRegex, "$1&nbsp;");
+      return `>${formattedText}<`;
+    });
   }
 
   return { htmlResult: htmlResult.trim(), backgroundsData, audioData, cutSceneData, chapterTitles };
@@ -424,9 +442,11 @@ if (require.main === module) {
     xmlString = fs.readFileSync(fallbackPath, "utf8");
   }
 
+  const bookLanguage = xmlString.match(/<BookLanguage>([^<]+)<\/BookLanguage>/)?.[1] || "polish";
+
   // Example usage: Provide the book slug when calling
   console.log("bookSlug", bookSlug);
-  const { backgroundsData, audioData, cutSceneData, htmlResult } = xmlToComplexHtml(xmlString, bookSlug);
+  const { backgroundsData, audioData, cutSceneData, htmlResult } = xmlToComplexHtml(xmlString, bookSlug, bookLanguage);
 
   generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug);
 

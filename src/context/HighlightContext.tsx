@@ -1,4 +1,6 @@
-import React, { useEffect, createContext, useContext, useState, ReactNode } from "react";
+import React, { useEffect, useState, ReactNode, useMemo } from "react";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { HighlightContext } from "@/hooks/useHighlight";
 
 declare global {
   interface Window {
@@ -8,21 +10,11 @@ declare global {
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
-interface HighlightContextType {
+export interface HighlightContextType {
   highlightParagraphs: (appearances: Appearance[], enable: boolean) => void;
   isScrollingLocked: boolean;
   setScrollingLocked: (locked: boolean) => void;
 }
-
-const HighlightContext = createContext<HighlightContextType | undefined>(undefined);
-
-export const useHighlight = (): HighlightContextType => {
-  const context = useContext(HighlightContext);
-  if (context === undefined) {
-    throw new Error("useHighlight must be used within a HighlightProvider");
-  }
-  return context;
-};
 
 interface HighlightProviderProps {
   children: ReactNode;
@@ -31,7 +23,12 @@ interface HighlightProviderProps {
 export const HighlightProvider: React.FC<HighlightProviderProps> = ({ children }) => {
   const [isScrollingLocked, setScrollingLocked] = useState(false);
 
+  const isPlayFormat = useMemo(() => getBookData().metadata.bookForm === "play", []);
+
   const highlightParagraphs = (appearances: Appearance[], enable: boolean): void => {
+    // Don't highlight paragraphs for play format books
+    if (isPlayFormat) return;
+
     appearances.forEach(({ chapterNumber, paragraphNumber, isTalkingInParagraph }) => {
       const p = document.querySelector<HTMLElement>(`section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`);
       if (!p) return;

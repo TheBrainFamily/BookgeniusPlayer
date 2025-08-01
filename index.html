@@ -1,9 +1,9 @@
 <!doctype html>
 
-<html lang="pl">
+<html lang="<%- lang %>">
   <head>
     <meta charset="UTF-8" />
-    <title>BookGenius</title>
+    <title>BookGenius - <%= title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#333333" />
     <meta name="description" content="Interactive book reader" />
@@ -19,20 +19,21 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
     <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
 
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Libre+Caslon+Text&display=swap" rel="stylesheet">
-
-
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Libre+Caslon+Text&display=swap" rel="stylesheet" />
 
     <!-- Preloaded -->
     <link rel="preload" href="/clear-loader.png" as="image" />
     <style>
       body,
       html {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
         height: 100svh;
         margin: 0;
         padding: 0;
         overflow: hidden;
+      }
+
+      body {
+        background-color: #2d2d2d;
       }
 
       #splash-screen {
@@ -86,9 +87,9 @@
 
       <p id="cutscene-text"></p>
 
-      <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 md:pr-0 xl:px-4 md:pl-4 max-w-[120rem] w-full">
-        <div id="left-notes" class="hidden md:block md:flex-1 max-w-[700px] content-center overflow-y-auto"></div>
-        <div id="content-container" class="flex-2 md:min-w-[600px] max-w-[900px]"></div>
+      <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 sm:pr-0 xl:px-4 sm:pl-4 max-w-[120rem] w-full">
+        <div id="left-notes" class="hidden sm:block sm:flex-1 max-w-[700px] content-center overflow-y-auto"></div>
+        <div id="content-container" class="sm:flex-3 max-w-[900px]"></div>
         <div id="right-notes" class="hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none">
           <div id="right-notes-scrollable-container"></div>
         </div>
@@ -100,12 +101,22 @@
     <div id="splash-screen">
       <div class="splash-container">
         <div class="splash-title-container">
-          <div class="splash-title">BookGenius</div>
-          <div class="splash-subtitle"></div>
+          <div class="splash-title"><%= title %></div>
+          <div class="splash-subtitle"><%= subtitle %></div>
         </div>
 
         <div class="splash-image-container">
-          <video id="splash-video" poster="/clear-loader.png" alt="Loading..." class="splash-loading-image" muted autoplay playsinline preload="auto"></video>
+          <video
+            id="splash-video"
+            src="<%= loaderVideoSrc %>"
+            poster="/clear-loader.png"
+            alt="Loading..."
+            class="splash-loading-image"
+            muted
+            autoplay
+            playsinline
+            preload="auto"
+          ></video>
         </div>
 
         <div class="splash-text-container">
@@ -114,7 +125,7 @@
 
         <button class="splash-start-button disabled" id="start-button">
           <div class="play-icon"></div>
-          <span>Start</span>
+          <span><%= startButtonText %></span>
         </button>
       </div>
     </div>
@@ -126,61 +137,16 @@
           this.phraseInterval = null;
           this.previousPhrases = new Set();
           this.isExiting = false;
-          this.loadingPhrases = [];
+          try {
+            this.loadingPhrases = JSON.parse(`<%- loadingPhrases %>`);
+          } catch (e) {
+            console.error("Failed to parse loading phrases:", e);
+            this.loadingPhrases = ["Loading..."];
+          }
           this.videoPlayed = false;
-          this.setupVideoSource();
-          this.setupDynamicContent();
+          this.setupPhraseCycle();
           this.setupEventListeners();
           this.setupVideo();
-        }
-
-        setupVideoSource() {
-          // Get the current book slug from the global variable
-          const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : null;
-          if (currentBookSlug) {
-            // Set the video source to the loader.mp4 in the book's assets folder
-            const videoSrc = `/public_books/${currentBookSlug}/assets/loader.mp4`;
-            const video = document.getElementById("splash-video");
-            if (video) {
-              video.src = videoSrc;
-            }
-          }
-        }
-
-        async setupDynamicContent() {
-          await new Promise((resolve) => {
-            const checkReady = () => {
-              if (window.i18n && window.i18n.isInitialized) {
-                resolve();
-              } else {
-                setTimeout(checkReady, 100);
-              }
-            };
-            checkReady();
-          });
-
-          const t = window.i18n.t;
-          document.querySelector(".splash-subtitle").textContent = t("splash_subtitle");
-          document.querySelector(".splash-start-button span").textContent = t("start_button");
-          
-          // Get the current book slug from the global variable
-          const currentBookSlug = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : null;
-          
-          // Try to get book-specific loading phrases first, fallback to generic ones
-          let bookSpecificPhrases = null;
-          if (currentBookSlug) {
-            const bookPhrases = t(`books.${currentBookSlug}.loading_phrases`, { returnObjects: true });
-            // Check if the result is actually an array (not the key string returned when translation is missing)
-            if (Array.isArray(bookPhrases)) {
-              bookSpecificPhrases = bookPhrases;
-            }
-          }
-          
-// Fallback to generic phrases if book-specific ones are not available
-const genericPhrases = t("loading_phrases", { returnObjects: true });
-this.loadingPhrases = bookSpecificPhrases || (Array.isArray(genericPhrases) ? genericPhrases : []);
-          
-          this.setupPhraseCycle();
         }
 
         getRandomPhrase() {

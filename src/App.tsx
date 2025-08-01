@@ -11,7 +11,6 @@ import { WebSocketProvider } from "./context/WebSocketContext";
 import { RealtimeProvider } from "./context/RealtimeContext";
 import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
 import { BookContentWrapper } from "./components/BookContentWrapper";
-import { BookThemeProvider } from "./context/BookThemeContext";
 import { useAudiobookTracks } from "@/hooks/useAudiobookTracks";
 
 import ContentContainerWrapper from "./components/ContentContainerWrapper";
@@ -21,7 +20,7 @@ import { EditorMode } from "@/components/EditorMode";
 import { useAppReady } from "./hooks/useAppReady";
 import useSplashHidden from "./hooks/useSplashHidden";
 import { initAudioContext } from "./audio-crossfader";
-import CharacterNotesPanel from "./components/CharacterNotesPanel";
+// import CharacterNotesPanel from "./components/CharacterNotesPanel";
 import { ModalRenderers } from "./features/ModalRenderers";
 import { useBookContent } from "@/hooks/useBookContent";
 import { useElementVisibility } from "./hooks/useElementVisibility";
@@ -95,12 +94,10 @@ export default function App() {
     <LocationProvider>
       <RealtimeProvider>
         <WebSocketProvider>
-          <BookThemeProvider>
-            <BookContentWrapper>
-              <Shell />
-              <ModalRenderers />
-            </BookContentWrapper>
-          </BookThemeProvider>
+          <BookContentWrapper>
+            <Shell />
+            <ModalRenderers />
+          </BookContentWrapper>
         </WebSocketProvider>
       </RealtimeProvider>
     </LocationProvider>

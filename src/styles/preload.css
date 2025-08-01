@@ -6,8 +6,8 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: min(32rem, 90vw);
-  gap: clamp(1rem, 4vh, 2.5rem);
+  max-width: min(40rem, 90vw);
+  gap: clamp(1rem, 4vh, 2rem);
   padding: 0 1rem;
 }
 
@@ -29,13 +29,13 @@
   font-size: clamp(2rem, 8vw, 3rem);
   font-weight: bold;
   padding-bottom: 0.5rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.025em;
   opacity: 0.8;
   line-height: 1.1;
 }
 
 .splash-subtitle {
-  font-size: clamp(0.75rem, 3vw, 0.875rem);
+  font-size: clamp(1rem, 3vw, 1.25rem);
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: rgba(255, 255, 255, 0.8);
@@ -338,11 +338,11 @@
 @keyframes fadeInScale {
   from {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(0.8) rotate(0.1deg);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) rotate(0.1deg);
   }
 }
 

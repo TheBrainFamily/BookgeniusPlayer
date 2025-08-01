@@ -32,7 +32,7 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
         return match;
       }
 
-      const newAttributes = { class: "character-highlighted", "data-character": foundCharacter.slug, "data-src-listening": foundCharacter.imageUrl };
+      const newAttributes = { class: "character-highlighted", "data-character": foundCharacter.slug, "data-src-listening": foundCharacter.listeningUrl };
 
       const attributeString = Object.entries(newAttributes)
         .map(([key, value]) => `${key}="${value}"`)
@@ -66,12 +66,15 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
       .map(([key, value]) => `${key}="${value}"`)
       .join(" ");
 
-    const imgTag = `<img src="${foundCharacter.imageUrl}" class="inline-avatar" data-character="${foundCharacter.slug}">`;
+    const imgTag = `<img src="${foundCharacter.imageUrl}" class="inline-avatar" data-character="${foundCharacter.slug}" title="${foundCharacter.slug}" />`;
 
     console.log("daniel outputtext");
     return `<span ${attributeString}>${imgTag}</span>`;
     // return `<span ${attributeString}></span>`;
   });
+
+  // Handle LineBreak tags
+  outputText = outputText.replace(/<LineBreak\s*\/>/g, '<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>');
 
   return outputText;
 };

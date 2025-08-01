@@ -6,17 +6,14 @@ import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
 import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { CURRENT_BOOK } from "@/consts";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
-import { useHighlight } from "@/context/HighlightContext";
-import { usePlaySpeaker } from "@/context/PlaySpeakerContext";
 import { cn } from "@/lib/utils";
+import { useHighlight } from "@/hooks/useHighlight";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
-interface CharacterCardProps {
-  entity: ParsedParagraphRange;
-}
+type CharacterCardProps = { entity: ParsedParagraphRange; currentSpeakers: string[] };
 
-const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
+const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers }) => {
   const { openModal } = useCharacterModal();
   const { highlightParagraphs, isScrollingLocked } = useHighlight();
 
@@ -28,17 +25,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
     ...entity.otherAppearances,
   ];
 
-  const { currentSpeakers, isPlayFormat } = usePlaySpeaker();
-
   const isTalkingInCurrentRange = useMemo(() => {
-    if (isPlayFormat) {
-      // For play format, check if this character is one of the current speakers
-      return currentSpeakers.includes(entity.slug);
-    } else {
-      // For non-play format, use original logic
-      return apps.some((app) => app.isTalkingInParagraph);
-    }
-  }, [apps, isPlayFormat, currentSpeakers, entity.slug]);
+    return currentSpeakers.includes(entity.slug);
+  }, [currentSpeakers, entity.slug]);
   const [currentMediaSrc, setCurrentMediaSrc] = useState("");
 
   useEffect(() => {
@@ -55,7 +44,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
     const targetP = document.querySelector<HTMLParagraphElement>(`p[data-index="${entity.paragraphNumber}"]`);
     if (targetP) {
       // console.log("daniel targetP", targetP);
-      const avatarImg = targetP.querySelector<HTMLImageElement>('img.inline-avatar');
+      const avatarImg = targetP.querySelector<HTMLImageElement>("img.inline-avatar");
       console.log("daniel avatarImg", avatarImg);
       if (avatarImg) {
         const container = document.createElement("span");
@@ -74,7 +63,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity }) => {
             isVideo={mediaSrc.endsWith(".mp4") || mediaSrc.endsWith(".webm")}
             canonicalName={entity.slug}
             isTalking={isTalkingInCurrentRange}
-          />
+          />,
         );
         return () => {
           // root.unmount();

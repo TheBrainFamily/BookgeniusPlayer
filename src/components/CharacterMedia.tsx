@@ -154,7 +154,7 @@ const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, 
   );
 
   if (!isVideo) {
-    return <img {...commonAttrs} src={mediaSrc || videoListensSrc || ""} alt={canonicalName} className="rounded-full" />;
+    return <img {...commonAttrs} src={mediaSrc || ""} alt={canonicalName} className="rounded-full w-full" />;
   }
 
   const placeholderSrc = (videoListensSrc || mediaSrc).replace(/-(listens|speaks)\.(mp4|webm)$/, ".png");

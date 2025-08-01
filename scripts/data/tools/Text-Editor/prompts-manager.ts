@@ -1,10 +1,11 @@
 import { BOOK_SLUGS } from "@/consts";
 import fs from "fs";
 import { XmlManager } from "./xml-manager";
+import { PUBLIC_BOOKS_PATH } from "./consts";
 
 export class PromptsManager {
-  private readonly cursorRulesPath: string = "./src/data/tools/Text-Editor/.cursor";
-  private readonly promptsPath: string = "./src/data/tools/Text-Editor/prompts";
+  private readonly cursorRulesPath: string = "./scripts/data/tools/Text-Editor/.cursor";
+  private readonly promptsPath: string = "./scripts/data/tools/Text-Editor/prompts";
 
   constructor(
     private readonly bookSlug: BOOK_SLUGS,
@@ -25,7 +26,7 @@ export class PromptsManager {
 
   public generateWrapCharactersRule(): void {
     try {
-      const bookXml = fs.readFileSync(`./src/data/${this.bookSlug}-chapters.xml`, "utf8");
+      const bookXml = fs.readFileSync(`${PUBLIC_BOOKS_PATH}/${this.bookSlug}/book.xml`, "utf8");
       const charactersTags = this.xmlManager.getCharactersTags(bookXml);
 
       const wrapCharactersRuleInitialPrompt = fs.readFileSync(`${this.promptsPath}/wrapCharactersRuleInitialPrompt.mdc`, "utf-8");

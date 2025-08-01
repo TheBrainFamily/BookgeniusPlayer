@@ -1,7 +1,19 @@
 import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
 
 const SHOULD_SHOW_EVERYONE = false;
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
+
+// Cache isPlayFormat at module level to avoid repeated getBookData() calls
+let cachedIsPlayFormat: boolean | null = null;
+
+function getIsPlayFormat(): boolean {
+  if (cachedIsPlayFormat === null) {
+    const bookData = getBookData();
+    cachedIsPlayFormat = bookData.metadata.bookForm === "play";
+  }
+  return cachedIsPlayFormat;
+}
 
 // --- Development Zone Visualizers ---
 
@@ -136,13 +148,23 @@ function createMediaElement(
   // Configure and return the element
   if (element && finalSrc) {
     element.addEventListener("click", (e) => {
+      // If this is a command-click (metaKey on Mac, ctrlKey on Windows), ignore
+      if (e.metaKey || e.ctrlKey) {
+        return;
+      }
       e.stopPropagation();
       // Pass the original talkingSrc to the modal, not the normalized finalSrc
       openCharacterDetailsModal(characterSlug, !!talkingSrc && talkingSrc.endsWith(".mp4"), talkingSrc);
     });
     element.src = finalSrc;
     element.classList.add("inline-avatar");
-    if (characterSlug) element.dataset.character = characterSlug; // Assign character data if available
+
+    if (characterSlug) {
+      // Assign character data if slug available
+      element.dataset.character = characterSlug;
+      element.title = characterSlug;
+    }
+
     // Add basic error handling for loading
     element.onerror = () => console.error(`Failed to load media: ${element?.src}`);
     return element;
@@ -162,8 +184,13 @@ export function highlightCharacter(character: HTMLSpanElement, openCharacterDeta
     return;
   }
 
+  let floatingAvatar: HTMLDivElement | null = null;
   character.classList.add("character-highlighted-activated");
-  character.addEventListener("click", () => {
+  character.addEventListener("click", (e) => {
+    if (e.metaKey || e.ctrlKey) {
+      floatingAvatar?.remove();
+      return;
+    }
     // Find and remove any floating avatars to prevent them from sticking
     const floatingAvatars = document.querySelectorAll(".floating-avatar");
     floatingAvatars.forEach((avatar) => {
@@ -176,7 +203,7 @@ export function highlightCharacter(character: HTMLSpanElement, openCharacterDeta
   // Add hover functionality to show floating avatar
   character.addEventListener("mouseover", () => {
     // Create floating avatar container
-    const floatingAvatar = document.createElement("div");
+    floatingAvatar = document.createElement("div");
     floatingAvatar.classList.add("floating-avatar");
     floatingAvatar.style.position = "fixed";
     floatingAvatar.style.zIndex = "1000";
@@ -338,6 +365,7 @@ function activateMediaInRange(
             // Ensure necessary styles for sizing and alignment are present, either via CSS or inline
             dummyElement.style.display = "inline-block"; // Needed to respect width/height
             dummyElement.style.verticalAlign = mediaElement.style.verticalAlign || "bottom"; // Match original or default
+            dummyElement.title = mediaElement.title || ""; // Preserve title if any
 
             // Replace media with dummy
             placeholder.replaceChild(dummyElement, mediaElement);
@@ -472,8 +500,8 @@ export function setupPageObserver(
       const visualTop = rect.top - marginTop;
       const visualBottom = rect.bottom + marginBottom;
 
-      // Check if element is fully contained within the zone
-      if (visualTop >= focusZoneTop && visualBottom <= focusZoneBottom) {
+      // Check if element is fully contained within the zone and has content
+      if (visualTop >= focusZoneTop && visualBottom <= focusZoneBottom && element.textContent?.trim() !== "") {
         // Element is fully visible in the zone
         if (!foundFullyVisible) {
           // This is the first fully visible element found
@@ -489,6 +517,7 @@ export function setupPageObserver(
     if (!foundFullyVisible) {
       intersectingPages.forEach((element) => {
         const rect = element.getBoundingClientRect();
+        if (rect.height === 0) return; // Skip zero-height elements
 
         // Get computed styles to account for margins for accurate overlap calculation
         const computedStyle = window.getComputedStyle(element);
@@ -507,6 +536,9 @@ export function setupPageObserver(
 
         // Skip elements with minimal overlap
         if (overlap < MIN_OVERLAP_THRESHOLD) return;
+
+        // Skip elements with no text content
+        if (element.textContent?.trim() === "") return;
 
         let currentOverlapRatio = 0;
 
@@ -687,15 +719,6 @@ export function setupPageObserver(
             endInfo.chapter !== null &&
             endInfo.paragraph !== null
           ) {
-            setCurrentLocation({
-              chapter: startInfo.chapter,
-              paragraph: startInfo.paragraph,
-              endChapter: endInfo.chapter,
-              endParagraph: endInfo.paragraph,
-              currentChapter: activeParagraph.chapter,
-              currentParagraph: activeParagraph.paragraph,
-            });
-
             // This ensures avatars remain visible not only for a current chapter, but previous or next chapter as well
             const allIntersectingParagraphs = Array.from(intersectingPages)
               .map((element) => getParagraphInfo(element))
@@ -705,10 +728,32 @@ export function setupPageObserver(
                 return a.paragraph - b.paragraph;
               });
 
+            const RANGE_PADDING = 1;
+            const isPlayFormat = getIsPlayFormat();
+
+            const rangeStartInfo = startInfo;
+            const rangeEndInfo = endInfo;
+
+            let expandedStartParagraph = Math.max(1, rangeStartInfo.paragraph - RANGE_PADDING);
+            const expandedEndParagraph = rangeEndInfo.paragraph + RANGE_PADDING;
+
+            if (isPlayFormat && rangeStartInfo.paragraph <= 3) {
+              expandedStartParagraph = 0;
+            }
+
+            setCurrentLocation({
+              chapter: rangeStartInfo.chapter,
+              paragraph: expandedStartParagraph,
+              endChapter: rangeEndInfo.chapter,
+              endParagraph: expandedEndParagraph,
+              currentChapter: activeParagraph.chapter,
+              currentParagraph: activeParagraph.paragraph,
+            });
+
+            // Media uses viewport range (separate from character notes)
             if (allIntersectingParagraphs.length > 0) {
               const mediaStartInfo = allIntersectingParagraphs[0];
               const mediaEndInfo = allIntersectingParagraphs[allIntersectingParagraphs.length - 1];
-
               activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, openCharacterDetailsModal);
             } else {
               activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal);

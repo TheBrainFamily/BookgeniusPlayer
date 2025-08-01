@@ -6,20 +6,35 @@ import { useSentenceModal } from "@/stores/modals/sentenceModal.store";
 import { findSimplifiedSentence } from "@/helpers/findSimplifiedSentence";
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
+import { useEditorMode } from "@/hooks/useEditorMode";
 
+const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
+
+if (import.meta.hot) {
+  import.meta.hot.accept("@/helpers/findSimplifiedSentence", (mod) => {
+    findSimplifiedSentenceRef.current = mod.findSimplifiedSentence;
+    console.info("[HMR] findSimplifiedSentence updated");
+  });
+}
+
+const isEditorMode = import.meta.env.VITE_EDITOR === "true";
 export function useBookContent(containerId: string) {
+  const container = document.getElementById(containerId);
   const bookStringified = getBookStringified();
 
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
   const { openModal: openSentenceModal } = useSentenceModal();
+  useEditorMode(isEditorMode ? container : null);
 
   useEffect(() => {
-    const container = document.getElementById(containerId);
     if (container) {
       container.innerHTML = bookStringified.replace(/<\/section>(?!.*<\/section>)/s, '<div style="height: 50vh;"></div></section>');
       setupPageObserver(openCharacterDetailsModal);
 
       const handleClick = (event) => {
+        if (event.metaKey || event.ctrlKey) {
+          return;
+        }
         const target = event.target as HTMLElement;
 
         if (target.closest(".character-highlighted-activated")) {
@@ -35,6 +50,11 @@ export function useBookContent(containerId: string) {
 
         if (span) {
           console.log("daniel span", span);
+
+          const isCharacterPlaceholder = span.children.length === 2 && span.children[0].classList.contains("character-placeholder") && span.children[1].tagName === "STRONG";
+
+          if (isCharacterPlaceholder) return;
+
           const isFirstSimplification = !span.hasAttribute("data-simplified");
 
           // Store the original sentence only on the first click.
@@ -44,7 +64,7 @@ export function useBookContent(containerId: string) {
 
           const currentSentenceId = span.id;
           const currentSentenceScore = span.getAttribute("data-current-score") || "0";
-          const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentence(span.id, parseInt(currentSentenceScore));
+          const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentenceRef.current(span.id, parseInt(currentSentenceScore));
 
           if (!simplifiedSentence) {
             console.warn(`No further simplification available for ${currentSentenceId}`);

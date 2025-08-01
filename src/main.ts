@@ -11,12 +11,16 @@ import { initializeNoteLinkBlinking } from "./annotationsHandling";
 import { dealWithSW } from "./serviceWorker";
 import { setupParagraphHighlighting } from "./ui/paragraphHighlighting";
 import { initPage } from "./ui/pageInit";
+import { toggleBookContainerVisibilityWithShortcut } from "./helpers/hide-interface-shortcut";
+
+// Call the function immediately so the shortcut is active
 
 /* ------------------------------------------------------------------ */
 /*  The only exported symbol                                           */
 /* ------------------------------------------------------------------ */
 export async function runLegacyInit() {
   dealWithSW();
+  toggleBookContainerVisibilityWithShortcut();
 
   /* ----------------------------------------------------------------
    *  1. Initialise the FB2 pages, scrolling position, SW, etc.
