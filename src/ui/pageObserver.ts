@@ -281,15 +281,11 @@ function activateMediaInRange(
   openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
 ) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
-  // console.log("daniel allParagaphs", allParagraphs);
 
   allParagraphs.forEach((p) => {
     const chapterElement = p.closest("section[data-chapter]") as HTMLElement;
     const chapterStr = chapterElement?.dataset.chapter;
     const paragraphStr = p.dataset.index;
-
-    // console.log("daniel chapterStr", chapterStr);
-    // console.log("daniel paragraphStr", paragraphStr);
 
     if (chapterStr && paragraphStr) {
       const currentChapter = parseInt(chapterStr, 10);
@@ -298,7 +294,6 @@ function activateMediaInRange(
       const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - 10, endChapter, endParagraph + 10);
 
       const placeholders = p.querySelectorAll<HTMLSpanElement>(".character-placeholder");
-      // console.log("daniel placeholders", placeholders);
 
       const charactersDisplayed = [];
       placeholders.forEach((placeholder) => {
@@ -353,7 +348,6 @@ function activateMediaInRange(
           // Out of view
           // Check if actual media is injected (not a dummy)
           if (mediaInjected && mediaElement) {
-            console.log("daniel here media");
             // Create dummy placeholder
             const dummyElement = document.createElement("span");
             // Add classes for styling (assuming CSS defines size, display, etc.)

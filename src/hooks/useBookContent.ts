@@ -49,8 +49,6 @@ export function useBookContent(containerId: string) {
         const span = target.closest("span[id^='ch']");
 
         if (span) {
-          console.log("daniel span", span);
-
           const isCharacterPlaceholder = span.children.length === 2 && span.children[0].classList.contains("character-placeholder") && span.children[1].tagName === "STRONG";
 
           if (isCharacterPlaceholder) return;

@@ -29,6 +29,7 @@ import { getKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles"
 import { useQuiz } from "./hooks/useQuiz";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
 import ProgressBars from "@/components/ProgressBars";
+// import CharacterNotesPanel from "./components/CharacterNotesPanel";
 
 function Shell() {
   setKnownVideos(getKnownVideoFiles());
@@ -55,7 +56,7 @@ function Shell() {
       <Header />
       <NoteLinkBlinker />
       <ContentContainerWrapper /> {/* Keep for animations */}
-      {/*<CharacterNotesPanel />*/}
+      {/* <CharacterNotesPanel /> */}
       {/* Not used for now, but can be re-enabled if needed later */}
       {/* <RightNotesPanel /> */}
       <Footer />

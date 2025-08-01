@@ -84,6 +84,7 @@ export const xmlToComplexHtml = (
 
   const bookForm = xmlDoc.getElementsByTagName("Form")[0];
   const bookFormValue = bookForm ? bookForm.textContent : "";
+
   if (bookFormValue === "Play") {
     htmlResult += `\n    <div class="play-container">`;
   }
@@ -291,13 +292,9 @@ export const xmlToComplexHtml = (
           clean = clean.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
 
           if (bookFormValue === "Play") {
-            if (isCharacter && currentCharacterAlignment === "left") {
-              htmlResult += `\n </span>\n`; // right-character-container
-            }
-
             if (isCharacter) {
               if (firstCharacter) {
-                console.log(clean);
+                console.log("daniel", clean);
               }
 
               const characterPlaceholderSpans = [];
@@ -306,15 +303,23 @@ export const xmlToComplexHtml = (
                 return "";
               });
 
+              // Close previous containers if not first character
               if (!firstCharacter) {
                 htmlResult += `\n </div>\n`; // daniel-character-text
                 htmlResult += `\n </div>\n`; // daniel-character-container
               }
+
+              // Open new character container
               htmlResult += `\n <div class="daniel-character-container" data-text-alignment="${currentCharacterAlignment}">\n`;
               htmlResult += `\n <div class="daniel-character-avatar" data-index="1">${characterPlaceholderSpans}</div>\n`;
               htmlResult += `\n <div class="daniel-character-text">\n`;
 
               firstCharacter = false;
+            }
+
+            // Open right-character-container BEFORE paragraph if needed
+            if (isCharacter && currentCharacterAlignment === "right") {
+              htmlResult += `\n <span class="right-character-container">\n`;
             }
 
             htmlResult += `\n    <p 
@@ -324,9 +329,11 @@ export const xmlToComplexHtml = (
                 data-is-didaskalia="${pContent.includes("<em>")}"
                 >\n      ${clean}\n    </p>`;
 
+            // Close right-character-container AFTER paragraph if needed
             if (isCharacter && currentCharacterAlignment === "right") {
-              htmlResult += `\n <span class="right-character-container">\n`;
+              htmlResult += `\n </span>\n`; // right-character-container
             }
+
             if (isCharacter) {
               isCharacter = false;
             }
@@ -355,8 +362,11 @@ export const xmlToComplexHtml = (
     }
 
     if (bookFormValue === "Play") {
-      htmlResult += `\n </div>\n`; // daniel-character-text
-      htmlResult += `\n </div>\n`; // daniel-character-container
+      // Only close containers if they were opened (not firstCharacter means containers are open)
+      if (!firstCharacter) {
+        htmlResult += `\n </div>\n`; // daniel-character-text
+        htmlResult += `\n </div>\n`; // daniel-character-container
+      }
       firstCharacter = true;
     }
 

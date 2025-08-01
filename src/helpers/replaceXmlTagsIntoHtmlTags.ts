@@ -68,7 +68,6 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
 
     const imgTag = `<img src="${foundCharacter.imageUrl}" class="inline-avatar" data-character="${foundCharacter.slug}" title="${foundCharacter.slug}" />`;
 
-    console.log("daniel outputtext");
     return `<span ${attributeString}>${imgTag}</span>`;
     // return `<span ${attributeString}></span>`;
   });
