@@ -194,89 +194,28 @@
 
       .play-container > section {
         width: 80%;
-        /*border: 2px solid green;*/
         margin-left: auto;
         margin-right: auto;
         margin-top: 5em;
 
-        .right-character-container {
-          display: grid;
-          grid-template-columns: 1fr minmax(0, max-content);
-          width: 100%;
-          margin-bottom: 2em;
-          padding-left: 7em;
-
-          p[data-text-alignment="right"] {
-            grid-column: 2;
-            text-align: left !important;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            hyphens: auto;
-            max-width: 100%;
-            justify-self: start;
-          }
-
-          p[data-text-alignment="right"] span {
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            word-break: break-word;
-            hyphens: auto;
-            max-width: 100%;
-            text-align: right !important;
-          }
-
-          p[data-text-alignment="right"] span span {
-            max-width: 100%;
-            text-align: right !important;
-          }
-
-          p[data-text-alignment="right"] em {
-            text-align: center !important;
-            display: block;
-            width: 100%;
-          }
-
-          p[data-is-didaskalia="true"] {
-            grid-column: 1 / -1;
-            text-align: center;
-            width: 100%;
-          }
-
-          p[data-text-alignment="right"][data-is-didaskalia="true"] {
-            margin-left: -4em;
-          }
-        }
-
-        /*.daniel {*/
-        /*  border: 3px solid green;*/
-        /*  position: relative;*/
-        /*  padding-left: 4.5em;*/
-        /*  overflow: hidden;*/
-        /*}*/
-
-        /*.daniel .inline-avatar {*/
-        /*  position: sticky;*/
-        /*  top: 1em;               */
-        /*  left: -4em;             */
-        /*  width: 3em;*/
-        /*  border-radius: 50%;*/
-        /*  z-index: 1;*/
-        /*}*/
-
         .daniel-character-container {
           display: flex;
           align-items: flex-start;
-          /*gap: 1em;*/
           position: relative;
-          /*border: 2px solid red;*/
+          margin-bottom: 2.5em;
+          width: 100%;
         }
 
         .daniel-character-container[data-text-alignment="left"] {
           flex-direction: row;
+          justify-content: flex-start;
+          align-items: flex-start;
         }
 
         .daniel-character-container[data-text-alignment="right"] {
           flex-direction: row-reverse;
+          justify-content: flex-start;
+          align-items: flex-start;
         }
 
         .daniel-character-avatar {
@@ -284,11 +223,11 @@
           top: 36vh;
           z-index: 10;
           flex-shrink: 0;
-          width: 120px;
+          width: 110px;
           display: flex;
           flex-direction: column;
-          justify-content: center;
-          /*border: 2px solid green;*/
+          justify-content: flex-start;
+          align-items: center;
 
           span {
             margin: 0;
@@ -299,7 +238,8 @@
 
         .daniel-character-avatar img.inline-avatar {
           width: 100px;
-          height: auto;
+          height: 100px;
+          border-radius: 50%;
           display: block;
           padding: 0;
           margin: 0;
@@ -307,7 +247,18 @@
 
         .daniel-character-text {
           flex: 1;
-          /*border: 2px solid black;*/
+          max-width: 75%;
+        }
+
+        .daniel-character-container[data-text-alignment="left"] .daniel-character-text {
+          text-align: left;
+          margin-left: 0.3em;
+        }
+
+        .daniel-character-container[data-text-alignment="right"] .daniel-character-text {
+          text-align: right;
+          margin-right: 0.3em;
+          margin-left: auto;
         }
 
         span.inline-avatar-wrapper > div {
@@ -318,60 +269,13 @@
         }
 
         img.inline-avatar {
-          /*border: 5px solid red;*/
-          /*width: 5em;*/
-          /*height: 5em;*/
           width: 80px;
           height: 80px;
         }
 
         p[data-text-alignment="left"][data-is-character="true"] {
           img.inline-avatar {
-            /*border: 3px solid orange;*/
             margin-left: -2.5em;
-          }
-        }
-
-        p[data-text-alignment="right"][data-is-character="true"] {
-          text-align: right;
-          text-indent: 0;
-          margin-top: 1.5em;
-          padding-right: 0px;
-
-          > span {
-            display: flex;
-            flex-direction: row-reverse;
-            align-items: center;
-            gap: 0.5em;
-            background: transparent !important;
-            padding: 0 !important;
-            pointer-events: none;
-
-            > span {
-              margin-left: 0;
-            }
-          }
-
-          strong {
-            cursor: pointer;
-            display: inline-block;
-            line-height: 1.5;
-            pointer-events: auto;
-
-            &:hover {
-              background-color: rgba(0, 0, 0, 0.05);
-            }
-          }
-
-          img.inline-avatar {
-            transform: rotateY(180deg);
-            margin: 0;
-            pointer-events: auto;
-
-            &:hover {
-              transform: rotateY(180deg) scale(2);
-              z-index: 1;
-            }
           }
         }
 
@@ -389,23 +293,33 @@
         }
 
         p[data-text-alignment="left"]:not(:has(em)) {
+          padding: 0 1.5rem;
           text-align: left;
-          max-width: 90%;
-          margin: 0 auto 0 0;
+          max-width: 100%;
+          margin: 0;
+          text-indent: 0;
+        }
+
+        p[data-text-alignment="right"]:not(:has(em)) {
+          padding: 0 1.5rem;
+          text-align: right;
+          max-width: 100%;
+          margin: 0;
+          text-indent: 0;
         }
 
         p[data-text-alignment="right"][data-is-character="false"]:not(:has(em)) {
-          text-align: left;
+          text-align: right;
           padding-left: 0;
           text-indent: 0;
         }
 
-        p,
-        .right-character-container > p {
-          margin-bottom: 0.1em;
+        p {
+          margin-bottom: 0.2em;
           font-family: var(--font-libre-caslon-text);
           font-size: 16px;
           text-indent: 0;
+          margin: 0.1em 0;
         }
 
         p > span > strong {
@@ -414,11 +328,18 @@
           text-transform: uppercase;
         }
 
-        p:has(em),
-        .right-character-container > p:has(em) {
-          text-align: center;
+        p:has(em) {
+          text-align: center !important;
           line-height: 1em;
           font-size: 14px;
+          width: 100%;
+        }
+
+        .daniel-character-container p:has(em) {
+          text-align: center !important;
+          width: 100%;
+          margin-left: auto;
+          margin-right: auto;
         }
 
         p:not(:has(em)) + p:has(em) {

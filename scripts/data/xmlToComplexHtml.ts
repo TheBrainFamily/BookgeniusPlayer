@@ -317,22 +317,12 @@ export const xmlToComplexHtml = (
               firstCharacter = false;
             }
 
-            // Open right-character-container BEFORE paragraph if needed
-            if (isCharacter && currentCharacterAlignment === "right") {
-              htmlResult += `\n <span class="right-character-container">\n`;
-            }
-
             htmlResult += `\n    <p 
-                data-index="${dataIndex++}" 
-                data-text-alignment="${currentCharacterAlignment}" 
-                data-is-character="${isCharacter}"
-                data-is-didaskalia="${pContent.includes("<em>")}"
-                >\n      ${clean}\n    </p>`;
-
-            // Close right-character-container AFTER paragraph if needed
-            if (isCharacter && currentCharacterAlignment === "right") {
-              htmlResult += `\n </span>\n`; // right-character-container
-            }
+              data-index="${dataIndex++}" 
+              data-text-alignment="${currentCharacterAlignment}" 
+              data-is-character="${isCharacter}"
+              data-is-didaskalia="${pContent.includes("<em>")}"
+              >\n      ${clean}\n    </p>`;
 
             if (isCharacter) {
               isCharacter = false;
