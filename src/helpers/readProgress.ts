@@ -46,6 +46,7 @@ export const calculateChapterProgress = (currentChapter: number): number => {
   }
 
   const progress = (scrollDistance / rect.height) * 100;
+  console.log("PINGWING: 49 progress", progress);
 
   return Math.max(0, Math.min(100, progress));
 };
