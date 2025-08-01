@@ -102,6 +102,7 @@
   /* --- Layout Structure --- */
 
   #content-container {
+      /*border: 2px solid blue;*/
     display: flex;
     cursor: default;
     overflow-y: auto;
@@ -122,13 +123,14 @@
       line-height: 1.6;
       color: var(--text-light);
 
+
       background: linear-gradient(
         to bottom,
         rgba(var(--bg-content-light-rgb), 0) 0%,
         rgba(var(--bg-content-light-rgb), 0.95) 35%,
         rgba(var(--bg-content-light-rgb), 0.95) 65%,
         rgba(var(--bg-content-light-rgb), 0) 100%
-      );
+      ) center/73% 100% no-repeat;
 
       mask-image:
         linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 10%, rgba(0 0 0 / 1) 45%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 70%, transparent 100%),
@@ -186,7 +188,8 @@
       }
 
       .play-container > section {
-        width: 80%;
+        width: 100%;
+          /*border: 2px solid green;*/
         margin-left: auto;
         margin-right: auto;
         margin-top: 5em;
@@ -232,8 +235,9 @@
 .daniel-character-container {
   display: flex;
   align-items: flex-start;
-  gap: 1em;
+  /*gap: 1em;*/
   position: relative;
+    /*border: 2px solid red;*/
 }
 
 .daniel-character-container[data-text-alignment="left"] {
@@ -246,19 +250,34 @@
 
 .daniel-character-avatar {
   position: sticky;
-  top: 35vh;
+  top: 36vh;
   z-index: 10;
   flex-shrink: 0;
+    width: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /*border: 2px solid green;*/
+
+    span {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+    }
 }
 
-.daniel-character-avatar img {
-  width: 80px;
+
+.daniel-character-avatar img.inline-avatar {
+  width: 100px;
   height: auto;
   display: block;
+    padding: 0;
+    margin: 0;
 }
 
 .daniel-character-text {
   flex: 1;
+    /*border: 2px solid black;*/
 }
 
 

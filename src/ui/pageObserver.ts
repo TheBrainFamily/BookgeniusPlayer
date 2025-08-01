@@ -254,12 +254,15 @@ function activateMediaInRange(
   openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
 ) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
-  console.log("daniel allParagaphs", allParagraphs);
+  // console.log("daniel allParagaphs", allParagraphs);
 
   allParagraphs.forEach((p) => {
     const chapterElement = p.closest("section[data-chapter]") as HTMLElement;
     const chapterStr = chapterElement?.dataset.chapter;
     const paragraphStr = p.dataset.index;
+
+    // console.log("daniel chapterStr", chapterStr);
+    // console.log("daniel paragraphStr", paragraphStr);
 
     if (chapterStr && paragraphStr) {
       const currentChapter = parseInt(chapterStr, 10);
