@@ -7,8 +7,6 @@ export interface ChapterStructure {
   paragraphCount: number;
 }
 
-const PROGRESS_BAR_TRANSITION_TIME = "0.2s";
-
 const ProgressBars: React.FC = () => {
   const [chaptersStructure, setChaptersStructure] = useState<ChapterStructure[]>([]);
   const [totalParagraphs, setTotalParagraphs] = useState(0);
@@ -47,36 +45,13 @@ const ProgressBars: React.FC = () => {
   return (
     <>
       <div style={{ position: "fixed", top: 0, left: 0, right: 0, height: "10px", backgroundColor: "rgba(139, 69, 19, 0.2)", zIndex: 9999 }}>
-        <div
-          style={{
-            height: "100%",
-            width: `${chapterProgress}%`,
-            background: "linear-gradient(to right, #8B4513, #CD853F)",
-            transition: `width ${PROGRESS_BAR_TRANSITION_TIME} ease-out`,
-            opacity: 0.7,
-          }}
-        />
+        <div style={{ height: "100%", width: `${chapterProgress}%`, background: "linear-gradient(to right, #8B4513, #CD853F)", opacity: 0.7 }} />
       </div>
       <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, height: "10px", backgroundColor: "rgba(139, 69, 19, 0.2)", zIndex: 9998 }}>
-        <div
-          style={{
-            height: "100%",
-            width: `${furthestProgress}%`,
-            background: "linear-gradient(to right, #88888830, #bbbbbb30)",
-            transition: `width ${PROGRESS_BAR_TRANSITION_TIME} ease-out`,
-          }}
-        />
+        <div style={{ height: "100%", width: `${furthestProgress}%`, background: "linear-gradient(to right, #88888830, #bbbbbb30)" }} />
       </div>
       <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, height: "10px", backgroundColor: "rgba(139, 69, 19, 0.2)", zIndex: 9999 }}>
-        <div
-          style={{
-            height: "100%",
-            width: `${bookProgress}%`,
-            background: "linear-gradient(to right, #A0522D, #F4A460)",
-            transition: `width ${PROGRESS_BAR_TRANSITION_TIME} ease-out`,
-            opacity: 0.7,
-          }}
-        />
+        <div style={{ height: "100%", width: `${bookProgress}%`, background: "linear-gradient(to right, #A0522D, #F4A460)", opacity: 0.7 }} />
       </div>
     </>
   );
