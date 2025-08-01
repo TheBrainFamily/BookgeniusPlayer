@@ -6,7 +6,7 @@ import { useLocation } from "@/state/LocationContext";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 
 const SCROLL_HIDE_DELAY = 3000;
-const SCROLL_DEBOUNCE_DELAY = 50;
+const SCROLL_DEBOUNCE_DELAY = 25;
 const TOUCH_MOVE_THRESHOLD = 30;
 const TAP_TIME_THRESHOLD = 500;
 
