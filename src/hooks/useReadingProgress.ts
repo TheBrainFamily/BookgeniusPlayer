@@ -17,10 +17,10 @@ export const useReadingProgress = (chaptersStructure: ChapterStructure[], totalP
     const currentParagraph = location.currentParagraph || 0;
 
     // Calculate current progress
-    const chapterProgress = calculateChapterProgress(chaptersStructure, currentChapter, currentParagraph);
+    const chapterProgress = calculateChapterProgress(currentChapter);
     const bookProgress = calculateReadProgress(chaptersStructure, currentChapter, currentParagraph, totalParagraphs);
 
-    // Calculate furthest progress (from saved location or current if no saved location)
+    // Calculate the furthest progress (from saved location or current if no saved location)
     const furthestChapter = savedLocation?.currentChapter ?? currentChapter;
     const furthestParagraph = savedLocation?.currentParagraph ?? currentParagraph;
     const furthestProgress = calculateReadProgress(chaptersStructure, furthestChapter, furthestParagraph, totalParagraphs);
