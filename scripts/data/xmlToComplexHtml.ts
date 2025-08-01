@@ -49,6 +49,7 @@ const extractFileData = (
 export const xmlToComplexHtml = (
   xmlString: string,
   bookSlug: string,
+  bookLang: string,
 ): {
   htmlResult: string;
   backgroundsData: Array<{ chapter: number; file: string; startParagraph: number }>;
@@ -337,6 +338,16 @@ export const xmlToComplexHtml = (
     htmlResult += `\n    </div>`;
   }
 
+  if (bookLang === "polish" && bookFormValue !== "Play") {
+    const conjunctions = "a|i|o|u|w|z|na|do|od|za|po|we|ku|ze|co|że|bo|iż|ni|nad|pod|bez|dla|oraz|ale|lub|czy|ani";
+    const conjunctionsRegex = new RegExp(`(?<=\\s|&nbsp;)(${conjunctions})\\s`, "gi");
+
+    htmlResult = htmlResult.replace(/>([^<]+)</g, (match, textContent) => {
+      const formattedText = textContent.replace(conjunctionsRegex, "$1&nbsp;");
+      return `>${formattedText}<`;
+    });
+  }
+
   return { htmlResult: htmlResult.trim(), backgroundsData, audioData, cutSceneData, chapterTitles };
 };
 
@@ -402,9 +413,11 @@ if (require.main === module) {
     xmlString = fs.readFileSync(fallbackPath, "utf8");
   }
 
+  const bookLanguage = xmlString.match(/<BookLanguage>([^<]+)<\/BookLanguage>/)?.[1] || "polish";
+
   // Example usage: Provide the book slug when calling
   console.log("bookSlug", bookSlug);
-  const { backgroundsData, audioData, cutSceneData, htmlResult } = xmlToComplexHtml(xmlString, bookSlug);
+  const { backgroundsData, audioData, cutSceneData, htmlResult } = xmlToComplexHtml(xmlString, bookSlug, bookLanguage);
 
   generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug);
 

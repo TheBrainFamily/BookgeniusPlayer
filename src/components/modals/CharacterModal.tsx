@@ -22,7 +22,7 @@ interface CharacterModalProps {
   endChapter: number;
 }
 
-export const findLatestSummaryInRange = (character: CharacterData, endChapter: number) => {
+const findLatestSummaryInRange = (character: CharacterData, endChapter: number) => {
   const latestSummary = character.infoPerChapter.filter((info) => info.chapter <= endChapter).sort((a, b) => b.chapter - a.chapter)[0]?.summary;
   return latestSummary;
 };

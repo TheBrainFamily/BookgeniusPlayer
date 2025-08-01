@@ -146,13 +146,23 @@ function createMediaElement(
   // Configure and return the element
   if (element && finalSrc) {
     element.addEventListener("click", (e) => {
+      // If this is a command-click (metaKey on Mac, ctrlKey on Windows), ignore
+      if (e.metaKey || e.ctrlKey) {
+        return;
+      }
       e.stopPropagation();
       // Pass the original talkingSrc to the modal, not the normalized finalSrc
       openCharacterDetailsModal(characterSlug, !!talkingSrc && talkingSrc.endsWith(".mp4"), talkingSrc);
     });
     element.src = finalSrc;
     element.classList.add("inline-avatar");
-    if (characterSlug) element.dataset.character = characterSlug; // Assign character data if available
+
+    if (characterSlug) {
+      // Assign character data if slug available
+      element.dataset.character = characterSlug;
+      element.title = characterSlug;
+    }
+
     // Add basic error handling for loading
     element.onerror = () => console.error(`Failed to load media: ${element?.src}`);
     return element;
@@ -172,8 +182,13 @@ export function highlightCharacter(character: HTMLSpanElement, openCharacterDeta
     return;
   }
 
+  let floatingAvatar: HTMLDivElement | null = null;
   character.classList.add("character-highlighted-activated");
-  character.addEventListener("click", () => {
+  character.addEventListener("click", (e) => {
+    if (e.metaKey || e.ctrlKey) {
+      floatingAvatar?.remove();
+      return;
+    }
     // Find and remove any floating avatars to prevent them from sticking
     const floatingAvatars = document.querySelectorAll(".floating-avatar");
     floatingAvatars.forEach((avatar) => {
@@ -186,7 +201,7 @@ export function highlightCharacter(character: HTMLSpanElement, openCharacterDeta
   // Add hover functionality to show floating avatar
   character.addEventListener("mouseover", () => {
     // Create floating avatar container
-    const floatingAvatar = document.createElement("div");
+    floatingAvatar = document.createElement("div");
     floatingAvatar.classList.add("floating-avatar");
     floatingAvatar.style.position = "fixed";
     floatingAvatar.style.zIndex = "1000";
@@ -342,6 +357,7 @@ function activateMediaInRange(
             // Ensure necessary styles for sizing and alignment are present, either via CSS or inline
             dummyElement.style.display = "inline-block"; // Needed to respect width/height
             dummyElement.style.verticalAlign = mediaElement.style.verticalAlign || "bottom"; // Match original or default
+            dummyElement.title = mediaElement.title || ""; // Preserve title if any
 
             // Replace media with dummy
             placeholder.replaceChild(dummyElement, mediaElement);

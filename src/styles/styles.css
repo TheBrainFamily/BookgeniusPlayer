@@ -137,6 +137,12 @@
       mask-composite: intersect;
       hyphens: auto;
 
+      @media only screen and (min-width: 667px) and (orientation: landscape) {
+        mask-image:
+          linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 10%, rgba(0 0 0 / 1) 15%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 100%, transparent 100%),
+          radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
+      }
+
       /* Media query for tablets - no right side fade */
       @media (min-width: 768px) and (max-width: 1279px) {
         mask-image:
@@ -237,7 +243,6 @@
           p[data-text-alignment="right"][data-is-didaskalia="true"] {
             margin-left: -4em;
           }
-
         }
 
         p[data-text-alignment="right"][data-is-character="true"] {
@@ -266,7 +271,7 @@
             pointer-events: auto;
 
             &:hover {
-               background-color: rgba(0, 0, 0, 0.05);
+              background-color: rgba(0, 0, 0, 0.05);
             }
           }
 
@@ -276,7 +281,8 @@
             pointer-events: auto;
 
             &:hover {
-               transform: rotateY(180deg) scale(2);
+              transform: rotateY(180deg) scale(2);
+              z-index: 1;
             }
           }
         }
@@ -286,7 +292,8 @@
           text-align: center;
         }
 
-        h3, h4 {
+        h3,
+        h4 {
           text-align: center;
           padding-bottom: 0.5em;
           font-family: var(--font-eb-garamond);
@@ -305,8 +312,8 @@
           text-indent: 0;
         }
 
-
-        p, .right-character-container > p {
+        p,
+        .right-character-container > p {
           margin-bottom: 0.1em;
           font-family: var(--font-libre-caslon-text);
           font-size: 16px;
@@ -319,7 +326,8 @@
           text-transform: uppercase;
         }
 
-        p:has(em), .right-character-container > p:has(em) {
+        p:has(em),
+        .right-character-container > p:has(em) {
           text-align: center;
           line-height: 1em;
           font-size: 14px;
@@ -345,7 +353,8 @@
           width: 100% !important;
         }
 
-        p:not(:has(span),:has(em)), p:has(span.character-highlighted) {
+        p:not(:has(span), :has(em)),
+        p:has(span.character-highlighted) {
           text-indent: 0 !important;
           margin-left: 1.5em;
         }

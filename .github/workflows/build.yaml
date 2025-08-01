@@ -30,6 +30,7 @@ jobs:
             src/
             tests/
             public_books/Krolowa-Sniegu
+            public/locales/pl/
           sparse-checkout-cone-mode: false
       - uses: pnpm/action-setup@v4
         with:
