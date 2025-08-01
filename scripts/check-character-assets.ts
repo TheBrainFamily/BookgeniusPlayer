@@ -78,8 +78,12 @@ function main(): void {
     process.exit(1);
   }
   const bookPath = args[0];
-  const { xmlDoc, bookString, bookForm, bookSlug } = parseBookXmlData(bookPath);
-  const characterMetadata = generateCharacterMetadata(xmlDoc, bookString, bookForm, bookSlug);
+  const {
+    xmlDoc,
+    bookString,
+    metadata: { form, slug },
+  } = parseBookXmlData(bookPath);
+  const characterMetadata = generateCharacterMetadata(xmlDoc, bookString, form, slug);
   const ignoreIfSpeaksLessFrequentThan = parseInt(args[1] || "0", 10);
   const ignoreIfListensLessFrequentThan = parseInt(args[2] || "0", 10);
   const xmlPath = join(bookPath, "book.xml");
