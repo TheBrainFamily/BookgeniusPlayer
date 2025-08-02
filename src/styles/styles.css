@@ -114,6 +114,10 @@
     -webkit-perspective: 1000;
     perspective: 1000;
     font-size: 16px; /* Base content font size */
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none; /* hide scrollbar */
+    }
 
     /* --- FB2 Generated Content Styling (Nested) --- */
     /* Using high specificity here based on original CSS */
@@ -130,14 +134,12 @@
         rgba(var(--bg-content-light-rgb), 0) 100%
       );
 
-      mask-image:
-        linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 10%, rgba(0 0 0 / 1) 45%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 70%, transparent 100%),
-        radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 20%, rgba(0 0 0 / 1) 25%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 70%, transparent 100%);
 
       mask-composite: intersect;
       hyphens: auto;
 
-      @media only screen and (min-width: 667px) and (orientation: landscape) {
+      @media only screen and (min-width: 667px) and (orientation: landscape) and (max-width: 768px) {
         mask-image:
           linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 10%, rgba(0 0 0 / 1) 15%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 100%, transparent 100%),
           radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
@@ -235,9 +237,9 @@
           }
         }
 
-        .daniel-character-avatar img.inline-avatar {
-          min-width: 125px;
-          min-height: 125px;
+        .daniel-character-avatar .inline-avatar {
+          min-width: 150px;
+          min-height: 150px;
           border-radius: 50%;
           display: block;
           padding: 0;
@@ -392,7 +394,7 @@
           right: -110px;
         }
 
-        .daniel-character-avatar img.inline-avatar {
+        .daniel-character-avatar .inline-avatar {
           width: 100px;
           height: 100px;
         }

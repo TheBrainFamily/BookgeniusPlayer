@@ -140,9 +140,18 @@ function createMediaElement(
 
   // For inline avatars, always use PNG format
   if (isTalking && talkingSrc) {
-    finalSrc = normalizeSrcForInlineAvatar(talkingSrc);
-    // Always create image element for inline avatars
-    element = document.createElement("img");
+    if (talkingSrc.endsWith(".mp4")) {
+      finalSrc = talkingSrc;
+      element = document.createElement("video");
+      element.autoplay = true;
+      element.loop = true;
+      element.muted = true;
+      element.playsInline = true;
+    } else {
+      finalSrc = normalizeSrcForInlineAvatar(talkingSrc);
+      // Always create image element for inline avatars
+      element = document.createElement("img");
+    }
   }
 
   // Configure and return the element
