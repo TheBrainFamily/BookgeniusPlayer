@@ -45,12 +45,16 @@ async function getBookConfig() {
     // Use the absolute path passed via environment variable for assets
     const assetsPath = path.join(VITE_BOOK_DIR!, "assets");
 
+    const langCodeMap: { [key: string]: string } = { polish: "pl", english: "en" };
+    const langCode = langCodeMap[bookData.metadata.language.toLowerCase()] || "pl";
+
     return {
       slug: bookData.slug,
       title: bookData.metadata.title,
       author: bookData.metadata.author,
-      language: bookData.metadata.language,
+      language: langCode,
       assetsPath: assetsPath,
+      bookForm: bookData.metadata.bookForm || null,
       bookDir: VITE_BOOK_DIR, // Include the full book directory path
     };
   } catch (error) {
@@ -156,10 +160,7 @@ const bookDataPlugin = (slug: string) => {
 };
 
 const getSplashScreenTexts = (bookLang: string, bookSlug: string) => {
-  const langCodeMap: { [key: string]: string } = { polish: "pl", english: "en" };
-  const langCode = langCodeMap[bookLang.toLowerCase()] || bookLang;
-
-  const langFilePath = path.resolve(__dirname, `public/locales/${langCode}/translation.json`);
+  const langFilePath = path.resolve(__dirname, `public/locales/${bookLang}/translation.json`);
   const langFileContent = JSON.parse(fs.readFileSync(langFilePath, "utf-8"));
 
   const bookSpecificPhrases = langFileContent.books?.[bookSlug]?.loading_phrases;
@@ -170,6 +171,8 @@ const getSplashScreenTexts = (bookLang: string, bookSlug: string) => {
 
 export default defineConfig(async () => {
   const bookConfig = await getBookConfig();
+
+  console.log("BOOK CONFIG:", bookConfig);
 
   const activeBookConfig: BookBuildData = { name: bookConfig.title, slug: bookConfig.slug, staticAssetSourceDir: bookConfig.assetsPath, staticAssetDestDir: bookConfig.slug };
 
@@ -194,6 +197,7 @@ export default defineConfig(async () => {
             title: bookConfig.title || "BookGenius",
             subtitle: bookConfig.author || "Books reimagined",
             loaderVideoSrc: `/public_books/${activeBookConfig.slug}/assets/loader.mp4`,
+            bookForm: bookConfig.bookForm,
             ...getSplashScreenTexts(bookConfig.language, bookConfig.slug),
           },
         },

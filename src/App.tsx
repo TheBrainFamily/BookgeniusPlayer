@@ -20,7 +20,7 @@ import { EditorMode } from "@/components/EditorMode";
 import { useAppReady } from "./hooks/useAppReady";
 import useSplashHidden from "./hooks/useSplashHidden";
 import { initAudioContext } from "./audio-crossfader";
-// import CharacterNotesPanel from "./components/CharacterNotesPanel";
+import CharacterNotesPanel from "./components/CharacterNotesPanel";
 import { ModalRenderers } from "./features/ModalRenderers";
 import { useBookContent } from "@/hooks/useBookContent";
 import { useElementVisibility } from "./hooks/useElementVisibility";
@@ -29,7 +29,6 @@ import { getKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles"
 import { useQuiz } from "./hooks/useQuiz";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
 import ProgressBars from "@/components/ProgressBars";
-// import CharacterNotesPanel from "./components/CharacterNotesPanel";
 
 function Shell() {
   setKnownVideos(getKnownVideoFiles());
@@ -56,7 +55,7 @@ function Shell() {
       <Header />
       <NoteLinkBlinker />
       <ContentContainerWrapper /> {/* Keep for animations */}
-      {/* <CharacterNotesPanel /> */}
+      <CharacterNotesPanel />
       {/* Not used for now, but can be re-enabled if needed later */}
       {/* <RightNotesPanel /> */}
       <Footer />

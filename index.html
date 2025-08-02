@@ -3,7 +3,7 @@
 <html lang="<%- lang %>">
   <head>
     <meta charset="UTF-8" />
-    <title>BookGenius - <%= title %></title>
+    <title>BookGenius - <%- title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#333333" />
     <meta name="description" content="Interactive book reader" />
@@ -88,11 +88,15 @@
       <p id="cutscene-text"></p>
 
       <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 sm:pr-0 xl:px-4 sm:pl-4 max-w-[120rem] w-full">
+        <% if (bookForm !== 'play') { %>
         <div id="left-notes" class="hidden sm:block sm:flex-1 max-w-[700px] content-center overflow-y-auto"></div>
         <div id="content-container" class="sm:flex-3 max-w-[900px]"></div>
         <div id="right-notes" class="hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none">
           <div id="right-notes-scrollable-container"></div>
         </div>
+        <% } %> <% if (bookForm === 'play') { %>
+        <div id="content-container" class="max-w-[100rem]"></div>
+        <% } %>
       </div>
     </div>
 
@@ -101,14 +105,14 @@
     <div id="splash-screen">
       <div class="splash-container">
         <div class="splash-title-container">
-          <div class="splash-title"><%= title %></div>
-          <div class="splash-subtitle"><%= subtitle %></div>
+          <div class="splash-title"><%- title %></div>
+          <div class="splash-subtitle"><%- subtitle %></div>
         </div>
 
         <div class="splash-image-container">
           <video
             id="splash-video"
-            src="<%= loaderVideoSrc %>"
+            src="<%- loaderVideoSrc %>"
             poster="/clear-loader.png"
             alt="Loading..."
             class="splash-loading-image"
@@ -125,7 +129,7 @@
 
         <button class="splash-start-button disabled" id="start-button">
           <div class="play-icon"></div>
-          <span><%= startButtonText %></span>
+          <span><%- startButtonText %></span>
         </button>
       </div>
     </div>

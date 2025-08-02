@@ -201,8 +201,8 @@
           display: flex;
           align-items: flex-start;
           position: relative;
-          margin-bottom: 2.5em;
-          width: 100%;
+          width: 80%;
+          margin: 0 auto 2.5em;
         }
 
         .daniel-character-container[data-text-alignment="left"] {
@@ -236,8 +236,8 @@
         }
 
         .daniel-character-avatar img.inline-avatar {
-          min-width: 120px;
-          min-height: 120px;
+          min-width: 125px;
+          min-height: 125px;
           border-radius: 50%;
           display: block;
           padding: 0;
@@ -261,6 +261,14 @@
           text-align: right;
           margin-right: 0;
           margin-left: 0;
+        }
+
+        .daniel-character-container[data-text-alignment="left"] .daniel-character-avatar {
+          transform: translateX(-25%);
+        }
+
+        .daniel-character-container[data-text-alignment="right"] .daniel-character-avatar {
+          transform: translateX(25%) rotateY(180deg);
         }
 
         span.inline-avatar-wrapper > div {
@@ -602,6 +610,13 @@
         display: none;
       }
     }
+  }
+
+  #content-container:has(.play-container) {
+    width: 60%;
+    background-size: 60% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 
   /* Add padding bottom when horizontal character strip is visible */
@@ -1158,6 +1173,10 @@ section[data-chapter] [data-index] {
 
 #book-container span {
   transition: opacity 0.2s ease-in-out;
+}
+
+#book-container {
+  overflow-x: visible;
 }
 
 .scrollbar-search {
