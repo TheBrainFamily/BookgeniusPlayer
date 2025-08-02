@@ -615,12 +615,17 @@
   }
 
   #content-container:has(.play-container) {
-    width: 60%;
+    width: 100%;
     background-size: 60% 100%;
     background-position: center;
     background-repeat: no-repeat;
   }
 
+  @media screen and (min-width: 1280px) {
+    #content-container:has(.play-container) {
+      width: 60%;
+    }
+  }
   /* Add padding bottom when horizontal character strip is visible */
   &.characters-visible #content-container {
     padding-bottom: calc(85px + var(--safe-area-inset-bottom));
