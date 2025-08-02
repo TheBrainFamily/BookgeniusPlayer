@@ -93,6 +93,7 @@
   /* --- Typography Basics --- */
   h2 {
     font-size: 150%;
+
     &.h3 {
       /* Specific case for h2 styled as h3? Reconsider class name */
       margin-top: 1.5em;
@@ -102,7 +103,6 @@
   /* --- Layout Structure --- */
 
   #content-container {
-    /*border: 2px solid blue;*/
     display: flex;
     cursor: default;
     overflow-y: auto;
@@ -237,28 +237,31 @@
         }
 
         .daniel-character-avatar img.inline-avatar {
-          width: 100px;
-          height: 100px;
+          min-width: 120px;
+          min-height: 120px;
           border-radius: 50%;
           display: block;
           padding: 0;
           margin: 0;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          border: 3px solid rgba(255, 255, 255, 0.8);
+          object-fit: cover;
         }
 
         .daniel-character-text {
           flex: 1;
-          max-width: 75%;
+          max-width: 100%;
         }
 
         .daniel-character-container[data-text-alignment="left"] .daniel-character-text {
           text-align: left;
-          margin-left: 0.3em;
+          margin-left: 0;
         }
 
         .daniel-character-container[data-text-alignment="right"] .daniel-character-text {
           text-align: right;
-          margin-right: 0.3em;
-          margin-left: auto;
+          margin-right: 0;
+          margin-left: 0;
         }
 
         span.inline-avatar-wrapper > div {
@@ -366,6 +369,25 @@
         p:has(span.character-highlighted) {
           text-indent: 0 !important;
           margin-left: 1.5em;
+        }
+      }
+
+      @media screen and (max-width: 768px) and (orientation: portrait) {
+        .play-container > section {
+          width: 75%;
+        }
+
+        .daniel-character-container[data-text-alignment="left"] .daniel-character-avatar {
+          left: -110px;
+        }
+
+        .daniel-character-container[data-text-alignment="right"] .daniel-character-avatar {
+          right: -110px;
+        }
+
+        .daniel-character-avatar img.inline-avatar {
+          width: 100px;
+          height: 100px;
         }
       }
 
