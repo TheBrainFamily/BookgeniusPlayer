@@ -19,16 +19,16 @@ export const getListeningMediaFilePathForName = (name: string, bookSlug: string,
   const listensPath = `${getFileNameForName(name)}-listens.mp4`;
 
   if (forceKnown || knownVideos.includes(listensPath)) {
-    return `/${bookSlug}/assets/${listensPath}`;
+    return `/books/${bookSlug}/assets/${listensPath}`;
   }
-  return `/${bookSlug}/assets/${getPictureFileNameForName(name)}`;
+  return `/books/${bookSlug}/assets/${getPictureFileNameForName(name)}`;
 };
 
 export const getTalkingMediaFilePathForName = (name: string, bookSlug: string, forceKnown = false) => {
   const speaksPath = `${getFileNameForName(name)}-speaks.mp4`;
 
   if (forceKnown || knownVideos.includes(speaksPath)) {
-    return `/${bookSlug}/assets/${speaksPath}`;
+    return `/books/${bookSlug}/assets/${speaksPath}`;
   }
   return getListeningMediaFilePathForName(name, bookSlug);
 };

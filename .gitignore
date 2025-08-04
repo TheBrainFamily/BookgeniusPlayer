@@ -7,6 +7,7 @@ tsconfig.tsbuildinfo
 src/data/tools/Text-Editor/.cursor/
 .claude
 src/books/*
+public/books/
 public/1984
 public/1984-English
 public/Alice-Wonderland

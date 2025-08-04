@@ -57,7 +57,7 @@ export const dealWithCutScenes = ({ currentChapter, currentParagraph }) => {
     // --- Setup and Play ---
     cutsceneText.textContent = cutSceneToApply.text || ""; // Set the text content
     const currentBook = bookDataLoader.getCurrentBook();
-    cutsceneVideo.src = `/${currentBook}/assets/${cutSceneToApply.file}`;
+    cutsceneVideo.src = `/books/${currentBook}/assets/${cutSceneToApply.file}`;
     cutsceneVideo.load();
 
     // Add a listener to schedule the fade out 4 seconds before the end

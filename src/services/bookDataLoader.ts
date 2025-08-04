@@ -1,6 +1,22 @@
 // Service to dynamically load book data at runtime
 import type { BookData, BackgroundForBook, BackgroundSongSection, CutSceneForBook, CharacterData, AudiobookTracksSection, QuizOutput } from "@/types/book";
 import type { Variant } from "@/genericBookDataGetters/getAllVariants";
+import { getBookDataUrl } from "@/utils/assetUrls";
+
+async function importPublicModule(moduleUrl) {
+  try {
+    const response = await fetch(moduleUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${moduleUrl}: ${response.statusText}`);
+    }
+    const text = await response.text();
+    const dataUrl = `data:application/javascript;charset=utf-8,${encodeURIComponent(text)}`;
+    return await import(dataUrl);
+  } catch (error) {
+    console.error("Error importing public module:", error);
+    throw error;
+  }
+}
 
 class BookDataLoader {
   private static instance: BookDataLoader;
@@ -34,10 +50,15 @@ class BookDataLoader {
     try {
       // Always load fresh with cache busting
       const timestamp = Date.now();
-      const moduleUrl = `/${book}/compiled/${fileName}.js?t=${timestamp}`;
-      console.log("Loading module:", moduleUrl);
-
-      const module = await import(moduleUrl);
+      // Use importPublicModule in vite dev, otherwise use dynamic import
+      // const moduleUrl = `${getBookDataUrl(fileName)}.js?t=${timestamp}`;
+      // console.log("Loading module:", moduleUrl);
+      let module;
+      if (import.meta.env && import.meta.env.DEV) {
+        module = await importPublicModule(`${getBookDataUrl(fileName)}.js?t=${timestamp}`);
+      } else {
+        module = await import(/* @vite-ignore */ `${getBookDataUrl(fileName)}.js?t=${timestamp}`);
+      }
 
       // Extract the default export or the named export matching the file name
       const functionName = fileName.replace(".js", "");
