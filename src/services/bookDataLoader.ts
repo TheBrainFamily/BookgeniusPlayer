@@ -36,9 +36,15 @@ class BookDataLoader {
     if (this.currentBook) {
       return this.currentBook;
     }
+    let book;
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const book = urlParams.get("book") || "Romeo-And-Juliet-Small";
+    if (typeof window !== "undefined" && window.location) {
+      const urlParams = new URLSearchParams(window.location.search);
+      book = urlParams.get("book") || "Romeo-And-Juliet-Small";
+    } else {
+      book = process.env.VITE_BOOK;
+    }
+
     this.currentBook = book;
     return book;
   }

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { reloadBookStringified } from "@/genericBookDataGetters/getBookStringified";
+import { useBookUpdateSSE } from "@/hooks/useBookUpdateSSE";
 
 interface BookDataContextType {
   textVersion: number;
@@ -13,6 +14,7 @@ export function BookDataProvider({ children }: { children: React.ReactNode }) {
   const [textVersion, setTextVersion] = useState(0);
   const [isEditorMode, setIsEditorMode] = useState(false);
   const [isReloading, setIsReloading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -40,6 +42,24 @@ export function BookDataProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Connect to SSE for automatic reloading in editor mode
+  useBookUpdateSSE({
+    enabled: isEditorMode,
+    onProcessingStarted: () => {
+      setIsProcessing(true);
+      console.log("[BookDataContext] Book processing started");
+    },
+    onBookUpdated: async () => {
+      setIsProcessing(false);
+      console.log("[BookDataContext] Book updated, auto-reloading...");
+      await reloadText();
+    },
+    onProcessingError: (error) => {
+      setIsProcessing(false);
+      console.error("[BookDataContext] Book processing error:", error);
+    },
+  });
+
   return (
     <BookDataContext.Provider value={{ textVersion, reloadText, isEditorMode }}>
       {children}
@@ -59,20 +79,24 @@ export function BookDataProvider({ children }: { children: React.ReactNode }) {
         >
           <button
             onClick={reloadText}
-            disabled={isReloading}
+            disabled={isReloading || isProcessing}
             style={{
               padding: "8px 16px",
-              backgroundColor: isReloading ? "#ccc" : "#007bff",
+              backgroundColor: isReloading || isProcessing ? "#ccc" : "#007bff",
               color: "white",
               border: "none",
               borderRadius: "4px",
-              cursor: isReloading ? "not-allowed" : "pointer",
+              cursor: isReloading || isProcessing ? "not-allowed" : "pointer",
               fontSize: "14px",
             }}
           >
-            {isReloading ? "Reloading..." : "Reload Book Data"}
+            {isProcessing ? "Processing..." : isReloading ? "Reloading..." : "Reload Book Data"}
           </button>
-          <div style={{ marginTop: "5px", fontSize: "12px", color: "#666" }}>Version: {textVersion}</div>
+          <div style={{ marginTop: "5px", fontSize: "12px", color: "#666" }}>
+            Version: {textVersion}
+            {isProcessing && <span> (Processing book changes...)</span>}
+          </div>
+          <div style={{ marginTop: "3px", fontSize: "11px", color: "#999" }}>Auto-reload enabled via SSE</div>
         </div>
       )}
     </BookDataContext.Provider>

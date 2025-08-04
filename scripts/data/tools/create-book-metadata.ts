@@ -1,11 +1,5 @@
-import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
+import { XMLSerializer } from "@xmldom/xmldom";
 import { Element, XMLDocument } from "@xmldom/xmldom/lib/dom"; // Import types if needed for strict typing
-import fs, { closeSync, ftruncateSync, openSync, writeSync } from "fs";
-import path from "path";
-import prettier from "prettier";
-
-import { CURRENT_BOOK } from "@/consts";
-import { BOOK_SLUGS } from "@/consts";
 
 export interface ChapterInfo {
   chapter: number;
@@ -64,11 +58,11 @@ export function getCharacterTags(doc: XMLDocument): Set<string> {
  * @param characterTags A Set containing the valid character tag names.
  * @returns An array of SimpleCharacterMetadata objects.
  */
-export function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<string>, bookForm: string): SimpleCharacterMetadata[] {
+export function extractCharacterMetadata(doc: XMLDocument, characterTags: Set<string>, bookForm: string, bookSlug: string): SimpleCharacterMetadata[] {
   // Initialize results map keyed by character tag name
   const resultsMap = new Map<string, SimpleCharacterMetadata>();
   characterTags.forEach((tag) => {
-    resultsMap.set(tag, { slug: tag, characterName: getDisplayForCharacter(tag, doc), bookSlug: CURRENT_BOOK, infoPerChapter: [], imageUrl: "UNKNOWN" });
+    resultsMap.set(tag, { slug: tag, characterName: getDisplayForCharacter(tag, doc), bookSlug, infoPerChapter: [], imageUrl: "UNKNOWN" });
   });
 
   try {
@@ -274,38 +268,3 @@ const getDisplayForCharacter = (slug: string, doc: XMLDocument) => {
     return "FIX ME";
   }
 };
-
-// --- Example Usage ---
-
-const doIt = () => {
-  const bookSlug: BOOK_SLUGS = CURRENT_BOOK;
-  console.log(`Generating metadata for ${bookSlug}...`);
-  const chaptersXml = fs.readFileSync(path.join(__dirname, `../${bookSlug}-chapters.xml`), "utf8");
-
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(chaptersXml.replace(`<?xml version="1.0" encoding="UTF-8" ?>`, ""), "text/xml");
-  // 1. Get the list of character tags
-  const characterTags = getCharacterTags(doc);
-  console.log("Character Tags:", characterTags);
-
-  // 2. Analyze the generated chapter
-  const metadata = extractCharacterMetadata(doc, characterTags, "book");
-
-  // 3. Output the result
-  console.log("Extracted Metadata:", JSON.stringify(metadata, null, 2));
-  const metadataFilePath = path.join(__dirname, `../metadata-${bookSlug}.ts`);
-  const variableName = bookSlug === "1984" || bookSlug === "1984-English" ? `_${bookSlug.replaceAll("-", "")}` : bookSlug.replaceAll("-", "");
-
-  prettier
-    .format(`export const ${variableName}CharactersData = ${JSON.stringify(metadata, null, 2)}`, { parser: "typescript", printWidth: 180, objectWrap: "collapse" })
-    .then((formattedCode) => {
-      const fd = openSync(metadataFilePath, "r+"); // open for read/write, no truncate
-      writeSync(fd, formattedCode, 0, "utf8");
-      ftruncateSync(fd, Buffer.byteLength(formattedCode, "utf8"));
-      closeSync(fd);
-    });
-};
-
-if (require.main === module) {
-  doIt();
-}

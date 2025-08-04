@@ -13,7 +13,8 @@ async function generateBook(bookDirectoryPath: string, bookOutputPath?: string):
   const { metadata, xmlDoc, bookString } = parseBookXmlData(bookDirectoryPath);
 
   // Ensure output directory exists
-  bookOutputPath = bookOutputPath || path.resolve("src", "books", metadata.slug);
+  bookOutputPath = bookDirectoryPath;
+  console.log("bookOutputPath", bookOutputPath);
   if (!fs.existsSync(bookOutputPath)) {
     fs.mkdirSync(bookOutputPath, { recursive: true });
   }
@@ -23,11 +24,10 @@ async function generateBook(bookDirectoryPath: string, bookOutputPath?: string):
   generateAudiobookTracksFile(bookDirectoryPath, bookOutputPath);
   generateBookDataFiles(bookDirectoryPath, metadata, xmlDoc, bookString, bookOutputPath);
 
-  // Wait a moment for file generation to complete
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
   // Load and validate generated book data
+  console.time("loadAndValidateBookData");
   const bookData = await loadAndValidateBookData(bookOutputPath);
+  console.timeEnd("loadAndValidateBookData");
 
   console.log(`✅ Book data generated successfully for ${metadata.slug} (Language: ${metadata.language})`);
   console.log(`📁 Output directory: ${bookOutputPath}`);
@@ -129,7 +129,7 @@ export function generateCharacterMetadata(xmlDoc: Document, bookString: string, 
   const updatedString = bookString.replaceAll(/<span id="ch\d+-p\d+-s\d+">(.*?)<\/span>/g, "$1").replaceAll(/<\/?em[^>]*>/g, "");
   const xmlDocWithoutSpans = parser.parseFromString(updatedString, "text/xml");
 
-  return extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm).map((character) => ({
+  return extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm, bookSlug).map((character) => ({
     ...character,
     bookSlug,
     imageUrl: `/${bookSlug}/${getPictureFileNameForName(character.slug)}`,
@@ -178,7 +178,10 @@ export const getBookStringified = (): string => {
   return bookStringified;
 };
 `;
-  fs.writeFileSync(path.join(bookOutputPath, "getBookStringified.ts"), getBookStringifiedContent, "utf-8");
+
+  const pathToOverwrite = path.join(bookOutputPath, "getBookStringified.ts");
+  console.log("pathToOverwrite", pathToOverwrite);
+  fs.writeFileSync(pathToOverwrite, getBookStringifiedContent, "utf-8");
 
   // --- Generate getCharactersData.ts ---
   const characterMetadata = generateCharacterMetadata(xmlDoc, bookString, metadata.form, metadata.slug);
