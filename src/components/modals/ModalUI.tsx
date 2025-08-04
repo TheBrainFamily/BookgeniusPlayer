@@ -109,7 +109,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
       {title ? <DialogTitle className="sr-only">{typeof title === "string" ? title : "Modal"}</DialogTitle> : <DialogTitle className="sr-only">Modal</DialogTitle>}
 
       {/* Modal Content */}
-      <DialogContent className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)} onOpenAutoFocus={(e) => e.preventDefault()}>
+      <DialogContent className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}>
         <div className={cn("flex flex-row gap-2 justify-center items-center mx-auto p-2 xl:px-4 h-full", sizeConfig.container)}>
           {layoutView && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none lg:flex lg:order-2 lg:flex-2 lg:max-w-[900px] xl:flex-1 xl:order-1" />}
 
@@ -123,7 +123,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
               <header className="flex justify-between items-center p-4">
                 <div className={titleTextClasses}>{title}</div>
                 {showCloseButton && (
-                  <button type="button" onClick={onClose} className={closeButtonClasses} aria-label="Close modal">
+                  <button type="button" onClick={onClose} onTouchEnd={onClose} className={closeButtonClasses} aria-label="Close modal">
                     <X size={20} />
                   </button>
                 )}

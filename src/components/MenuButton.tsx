@@ -17,7 +17,14 @@ const MenuButton = () => {
       <div className={cn("bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center")}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <motion.button onClick={openModal} className="p-2 my-1 hover:text-white rounded-full cursor-pointer flex" whileHover="hover" whileTap="tap" variants={buttonVariants}>
+            <motion.button
+              onClick={openModal}
+              onTouchEnd={openModal}
+              className="p-2 my-1 hover:text-white rounded-full cursor-pointer flex"
+              whileHover="hover"
+              whileTap="tap"
+              variants={buttonVariants}
+            >
               <Book className="w-4 h-4 lg:w-5 lg:h-5" />
             </motion.button>
           </TooltipTrigger>
