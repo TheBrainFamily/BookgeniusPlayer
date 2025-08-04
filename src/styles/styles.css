@@ -229,11 +229,138 @@
           flex-direction: column;
           justify-content: flex-start;
           align-items: center;
+          gap: 0.25rem;
 
           span {
             margin: 0;
             display: flex;
             justify-content: center;
+            position: relative;
+            transition: all 0.3s ease-in-out;
+          }
+
+          &:has(.character-placeholder:nth-child(2)) {
+            width: 140px;
+
+            &:not(:has(.character-placeholder:nth-child(3))) {
+              flex-direction: row;
+              gap: 0.75rem;
+
+              .character-placeholder .inline-avatar {
+                width: 60px;
+                height: 60px;
+              }
+            }
+
+            &:has(.character-placeholder:nth-child(3)) {
+              gap: -15px;
+
+              .character-placeholder {
+                &:not(:first-child) {
+                  margin-top: -50px;
+                }
+
+                .inline-avatar {
+                  width: 80px;
+                  height: 80px;
+                  border: 2px solid rgba(255, 255, 255, 0.9);
+                  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+                }
+
+                &:nth-child(even) {
+                  transform: translateX(10px);
+                }
+
+                &:nth-child(odd):not(:first-child) {
+                  transform: translateX(-10px);
+                }
+
+                &:nth-child(1) {
+                  z-index: 1;
+                }
+
+                &:nth-child(2) {
+                  z-index: 2;
+                }
+
+                &:nth-child(3) {
+                  z-index: 3;
+                }
+
+                &:nth-child(4) {
+                  z-index: 4;
+                }
+
+                &:nth-child(5) {
+                  z-index: 5;
+                }
+
+                &:nth-child(6) {
+                  z-index: 6;
+                }
+
+                &:nth-child(7) {
+                  z-index: 7;
+                }
+
+                &:nth-child(8) {
+                  z-index: 8;
+                }
+
+                &:nth-child(9) {
+                  z-index: 9;
+                }
+
+                &:nth-child(10) {
+                  z-index: 10;
+                }
+              }
+            }
+
+            &:has(.character-placeholder:nth-child(5)) {
+              .character-placeholder {
+                &:not(:first-child) {
+                  margin-top: -55px;
+                }
+
+                .inline-avatar {
+                  width: 65px;
+                  height: 65px;
+                }
+              }
+            }
+
+            /* For 7+ characters - very compact */
+            &:has(.character-placeholder:nth-child(7)) {
+              .character-placeholder {
+                &:not(:first-child) {
+                  margin-top: -60px;
+                }
+
+                .inline-avatar {
+                  width: 50px;
+                  height: 50px;
+                }
+              }
+            }
+          }
+
+          &:has(.character-placeholder:nth-child(2)) .character-placeholder:hover {
+            transform: scale(1.05) !important;
+            z-index: 20 !important;
+
+            .inline-avatar {
+              box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+              border-color: rgba(255, 255, 255, 1);
+            }
+          }
+
+          &:has(.character-placeholder:nth-child(2)) .character-placeholder:nth-child(even):hover {
+            transform: scale(1.05) translateX(10px) !important;
+          }
+
+          &:has(.character-placeholder:nth-child(2)) .character-placeholder:nth-child(odd):not(:first-child):hover {
+            transform: scale(1.05) translateX(-10px) !important;
           }
         }
 
@@ -354,6 +481,16 @@
           width: 100%;
           margin-left: auto;
           margin-right: auto;
+          margin-top: 3em;
+          margin-bottom: 3em;
+        }
+
+        .play-row p[data-text-alignment="right"][data-is-character="false"]:has(em) {
+          margin-right: -3.5rem;
+        }
+
+        .play-row p[data-text-alignment="left"][data-is-character="false"]:has(em) {
+          margin-left: -3.5rem;
         }
 
         p:not(:has(em)) + p:has(em) {
