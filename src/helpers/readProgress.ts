@@ -23,11 +23,28 @@ export const calculateReadProgress = (chaptersStructure: ChapterStructure[], tar
 };
 
 /**
- * Calculate chapter progress as a percentage
+ * Calculate chapter progress as a percentage based on user scroll position
  */
-export const calculateChapterProgress = (chaptersStructure: ChapterStructure[], currentChapter: number, currentParagraph: number): number => {
-  const chapterData = chaptersStructure.find((ch) => ch.chapterNumber === currentChapter);
-  if (!chapterData) return 0;
+export const calculateChapterProgress = (currentChapter: number): number => {
+  const activeChapter = document.querySelector(`section[data-chapter="${currentChapter}"]`) as HTMLElement | null;
+  if (!activeChapter) {
+    return 0;
+  }
 
-  return Math.min(((currentParagraph + 1) / chapterData.paragraphCount) * 100, 100);
+  const viewportHeight = window.innerHeight;
+  const readingLinePercentage = 0.4;
+  const readingLinePixelPosition = viewportHeight * readingLinePercentage;
+
+  const rect = activeChapter.getBoundingClientRect();
+
+  const scrollDistance = readingLinePixelPosition - rect.top;
+
+  // Avoid division by zero if the element has no height, which can result in NaN.
+  if (rect.height <= 0) {
+    return scrollDistance > 0 ? 100 : 0;
+  }
+
+  const progress = (scrollDistance / rect.height) * 100;
+
+  return Math.max(0, Math.min(100, progress));
 };
