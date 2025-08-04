@@ -28,30 +28,30 @@ export const EditorMode = () => {
                   <span className="w-5 h-5 bg-gray-500 p-1 shadow-[2px_2px_white] mr-1 rounded-xs">⌥</span> + select text
                 </span>
               </div>
-              <div className="flex justify-between space-x-2">
-                <span>Add Music Suggestion</span>
-                <span className="text-white/70">
-                  <span className="w-5 h-5 bg-gray-500 p-1 shadow-[2px_2px_white] mr-1 rounded-xs">M</span> + click (on text)
-                </span>
-              </div>
-              <div className="flex justify-between space-x-2">
-                <span>Remove Music Suggestion</span>
-                <span className="text-white/70">
-                  <span className="w-5 h-5 bg-gray-500 p-1 shadow-[2px_2px_white] mr-1 rounded-xs">M</span> + click (on ♪)
-                </span>
-              </div>
-              <div className="flex justify-between space-x-2">
-                <span>Add Background Suggestion</span>
-                <span className="text-white/70">
-                  <span className="w-5 h-5 bg-gray-500 p-1 shadow-[2px_2px_white] mr-1 rounded-xs">B</span> + click (on text)
-                </span>
-              </div>
-              <div className="flex justify-between space-x-2">
-                <span>Remove Background Suggestion</span>
-                <span className="text-white/70">
-                  <span className="w-5 h-5 bg-gray-500 p-1 shadow-[2px_2px_white] mr-1 rounded-xs">B</span> + click (on 🖼️)
-                </span>
-              </div>
+              {/*<div className="flex justify-between space-x-2">*/}
+              {/*  <span>Add Music Suggestion</span>*/}
+              {/*  <span className="text-white/70">*/}
+              {/*    <span className="w-5 h-5 bg-gray-500 p-1 shadow-[2px_2px_white] mr-1 rounded-xs">M</span> + click (on text)*/}
+              {/*  </span>*/}
+              {/*</div>*/}
+              {/*<div className="flex justify-between space-x-2">*/}
+              {/*  <span>Remove Music Suggestion</span>*/}
+              {/*  <span className="text-white/70">*/}
+              {/*    <span className="w-5 h-5 bg-gray-500 p-1 shadow-[2px_2px_white] mr-1 rounded-xs">M</span> + click (on ♪)*/}
+              {/*  </span>*/}
+              {/*</div>*/}
+              {/*<div className="flex justify-between space-x-2">*/}
+              {/*  <span>Add Background Suggestion</span>*/}
+              {/*  <span className="text-white/70">*/}
+              {/*    <span className="w-5 h-5 bg-gray-500 p-1 shadow-[2px_2px_white] mr-1 rounded-xs">B</span> + click (on text)*/}
+              {/*  </span>*/}
+              {/*</div>*/}
+              {/*<div className="flex justify-between space-x-2">*/}
+              {/*  <span>Remove Background Suggestion</span>*/}
+              {/*  <span className="text-white/70">*/}
+              {/*    <span className="w-5 h-5 bg-gray-500 p-1 shadow-[2px_2px_white] mr-1 rounded-xs">B</span> + click (on 🖼️)*/}
+              {/*  </span>*/}
+              {/*</div>*/}
             </div>
           </div>
         </div>
