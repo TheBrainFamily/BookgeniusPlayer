@@ -199,18 +199,31 @@ export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph
 
   navigationEvents.on("scroll-end", handleScrollComplete);
 
+  const runGoToParagraph = () => {
+    goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior: "instant" })
+      .then(() => {
+        // Emit scroll-end event when Promise resolves
+        navigationEvents.emit("scroll-end");
+      })
+      .catch((error) => {
+        console.error("Error during system navigation scroll:", error);
+        // Still end navigation state on error
+        systemNavigationInProgress = false;
+        navigationEvents.off("scroll-end", handleScrollComplete);
+      });
+  };
+
+  const howLongToUseOffsetAfterReload = 2000;
+  const millisecondsSinceLoad = performance.now();
+  const pageWasJustReloaded = millisecondsSinceLoad < howLongToUseOffsetAfterReload;
+
+  // During the initial page render the layout is unstable, we need to navigate after the page is fully rendered
   // Start the scroll with Promise-based completion
-  goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior: "instant" })
-    .then(() => {
-      // Emit scroll-end event when Promise resolves
-      navigationEvents.emit("scroll-end");
-    })
-    .catch((error) => {
-      console.error("Error during system navigation scroll:", error);
-      // Still end navigation state on error
-      systemNavigationInProgress = false;
-      navigationEvents.off("scroll-end", handleScrollComplete);
-    });
+  if (pageWasJustReloaded) {
+    setTimeout(runGoToParagraph, 500);
+  } else {
+    runGoToParagraph();
+  }
 };
 
 /* ------------------------------------------------------------------ */
@@ -252,26 +265,13 @@ export const goToParagraph = (loc: { currentChapter: number; currentParagraph: n
     const containerScrollPosition = contentContainer.scrollTop;
     const goToParagraphPositionTop = elementRect.top;
 
-    // PINGWING: I understand how ugly this solution is, but after fiddling for the whole day with many possible
-    // not working solutions, this one at least works.
-    // values 19 and -500 are based on manual experimentation, I'd love to understand what they represent
-    let elementOffset = 0;
-    const howLongToUseOffsetAfterReload = 2000;
-    const millisecondsSinceLoad = performance.now();
-    const pageWasJustReloaded = millisecondsSinceLoad < howLongToUseOffsetAfterReload;
-
-    if (pageWasJustReloaded) {
-      if (containerScrollPosition === 0) {
-        // this happens when we show the page for the first time and we need to jump from the book start to our position
-        elementOffset = goToParagraphPositionTop / 19;
-      } else {
-        // this happens when we refresh
-        elementOffset = containerScrollPosition / -500;
-      }
+    let additionalOffset = 0;
+    if (containerScrollPosition === 0) {
+      additionalOffset = goToParagraphPositionTop / 19; // based on experiments
     }
 
     // Calculate the scroll position needed to align the element's top with the focus zone's top.
-    const targetScrollTop = containerScrollPosition + elementRect.top - containerRect.top - focusZoneOffset + elementOffset;
+    const targetScrollTop = containerScrollPosition + goToParagraphPositionTop - containerRect.top - focusZoneOffset + additionalOffset;
 
     contentContainer.scrollTo({ top: targetScrollTop, behavior: options.behavior });
 
