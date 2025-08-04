@@ -14,6 +14,16 @@ const wrapPunctuationInLine = (line: string): string => {
     return line;
   }
 
+  // First, handle the new case: HTML tag immediately followed by punctuation
+  // Pattern: <span...>content</span> followed by punctuation
+  const htmlWithPunctuationRegex = /(<span[^>]*>[^<]*<\/span>)([^\w\s<>]+)/g;
+  const result = line.replace(htmlWithPunctuationRegex, '<span class="text-nowrap">$1$2</span>');
+
+  // If we made changes in the first step, return the result
+  if (result !== line) {
+    return result;
+  }
+
   // Look for lines ending with </span>
   if (!line.endsWith("</span>")) {
     return line;
