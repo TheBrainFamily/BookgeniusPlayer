@@ -294,10 +294,6 @@ export const xmlToComplexHtml = (
 
           if (bookFormValue === "Play") {
             if (isCharacter) {
-              if (firstCharacter) {
-                console.log("daniel", clean);
-              }
-
               const characterPlaceholderSpans = [];
               clean = clean.replace(/<span class="character-placeholder[^>]*>.*?<\/span>/g, (match) => {
                 characterPlaceholderSpans.push(match);
@@ -306,14 +302,14 @@ export const xmlToComplexHtml = (
 
               // Close previous containers if not first character
               if (!firstCharacter) {
-                htmlResult += `\n </div>\n`; // daniel-character-text
-                htmlResult += `\n </div>\n`; // daniel-character-container
+                htmlResult += `\n </div>\n`; // character-text
+                htmlResult += `\n </div>\n`; // character-container
               }
 
               // Open new character container
-              htmlResult += `\n <div class="daniel-character-container" data-text-alignment="${currentCharacterAlignment}">\n`;
-              htmlResult += `\n <div class="daniel-character-avatar" data-index="1">${characterPlaceholderSpans}</div>\n`;
-              htmlResult += `\n <div class="daniel-character-text">\n`;
+              htmlResult += `\n <div class="character-container" data-text-alignment="${currentCharacterAlignment}">\n`;
+              htmlResult += `\n <div class="character-avatar" data-index="1">${characterPlaceholderSpans}</div>\n`;
+              htmlResult += `\n <div class="character-text">\n`;
 
               firstCharacter = false;
             }
@@ -355,8 +351,8 @@ export const xmlToComplexHtml = (
     if (bookFormValue === "Play") {
       // Only close containers if they were opened (not firstCharacter means containers are open)
       if (!firstCharacter) {
-        htmlResult += `\n </div>\n`; // daniel-character-text
-        htmlResult += `\n </div>\n`; // daniel-character-container
+        htmlResult += `\n </div>\n`; // character-text
+        htmlResult += `\n </div>\n`; // character-container
       }
       firstCharacter = true;
     }
