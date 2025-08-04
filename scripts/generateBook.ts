@@ -8,12 +8,12 @@ import { generateDataFiles, xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterTags } from "./data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
 
-async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
+async function generateBook(bookDirectoryPath: string, bookOutputPath?: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
   const { metadata, xmlDoc, bookString } = parseBookXmlData(bookDirectoryPath);
 
   // Ensure output directory exists
-  const bookOutputPath = path.resolve("src", "books", metadata.slug);
+  bookOutputPath = bookOutputPath || path.resolve("src", "books", metadata.slug);
   if (!fs.existsSync(bookOutputPath)) {
     fs.mkdirSync(bookOutputPath, { recursive: true });
   }
@@ -21,7 +21,7 @@ async function generateBook(bookDirectoryPath: string): Promise<{ bookSlug: stri
   // Generate files
   generateKnownVideoFiles(bookDirectoryPath, bookOutputPath);
   generateAudiobookTracksFile(bookDirectoryPath, bookOutputPath);
-  generateBookDataFiles(bookDirectoryPath, metadata, xmlDoc, bookString);
+  generateBookDataFiles(bookDirectoryPath, metadata, xmlDoc, bookString, bookOutputPath);
 
   // Wait a moment for file generation to complete
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -138,9 +138,7 @@ export function generateCharacterMetadata(xmlDoc: Document, bookString: string, 
   }));
 }
 
-function generateBookDataFiles(bookDirectoryPath: string, metadata: ReturnType<typeof parseBookXmlData>["metadata"], xmlDoc: Document, bookString: string) {
-  const bookOutputPath = path.resolve("src", "books", metadata.slug);
-
+function generateBookDataFiles(bookDirectoryPath: string, metadata: ReturnType<typeof parseBookXmlData>["metadata"], xmlDoc: Document, bookString: string, bookOutputPath: string) {
   // --- Generate getBookStringified.ts ---
   const { backgroundsData, audioData, cutSceneData, htmlResult, chapterTitles } = xmlToComplexHtml(bookString, metadata.slug, metadata.language);
 
@@ -196,7 +194,6 @@ export const getBookStringified = (): string => {
 
   // --- Generate bookData.ts ---
   const bookDataContent = `import type { BookData } from "@/types/book";
-import { getBookStringified } from "@/books/${metadata.slug}/getBookStringified";
 
 export const bookData: BookData = {
   slug: "${metadata.slug}",
@@ -214,8 +211,7 @@ export const bookData: BookData = {
     quaternaryColor: "#0D47A1",
     simplifiedIconColor: "${metadata.simplifiedIconColor}"
   },
-  hasAudiobook: ${hasAudiobook},
-  bookStringified: getBookStringified(),
+  hasAudiobook: ${hasAudiobook}
 };
 `;
 
@@ -247,7 +243,8 @@ async function main() {
 
   try {
     console.log(`🔨 Generating book data for ${bookDirectoryPath}...`);
-    const { bookSlug, bookTitle, bookLanguage } = await generateBook(bookDirectoryPath);
+    const bookOutputPath = path.resolve(bookDirectoryPath);
+    const { bookSlug, bookTitle, bookLanguage } = await generateBook(bookDirectoryPath, bookOutputPath);
     console.log(`🎉 Book generation completed for ${bookSlug} (${bookTitle}) - Language: ${bookLanguage}`);
   } catch (error) {
     console.error(`❌ Book generation failed:`);

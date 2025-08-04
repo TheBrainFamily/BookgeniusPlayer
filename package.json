@@ -10,6 +10,7 @@
     "start": "tsx ./scripts/start.ts",
     "build": "tsx ./scripts/build.ts",
     "generate-book": "tsx ./scripts/generateBook.ts",
+    "process-all-books": "tsx ./scripts/processAllBooks.ts",
     "build-only": "vite build",
     "dev": "vite dev",
     "prepare": "husky",

@@ -5,7 +5,7 @@ import { bookDataLoader } from "@/services/bookDataLoader";
  */
 export function getBookAssetBaseUrl(): string {
   const currentBook = bookDataLoader.getCurrentBook();
-  return `/${currentBook}/assets`;
+  return `/books/${currentBook}/assets`;
 }
 
 /**
@@ -13,7 +13,7 @@ export function getBookAssetBaseUrl(): string {
  */
 export function getBookAssetUrl(assetPath: string): string {
   const baseUrl = getBookAssetBaseUrl();
-  return `${baseUrl}/${assetPath}`;
+  return `${baseUrl}/books/${assetPath}`;
 }
 
 /**
@@ -21,7 +21,7 @@ export function getBookAssetUrl(assetPath: string): string {
  */
 export function getBookDataUrl(fileName: string): string {
   const currentBook = bookDataLoader.getCurrentBook();
-  return `/${currentBook}/compiled/${fileName}`;
+  return `/books/${currentBook}/compiled/${fileName}`;
 }
 
 /**
@@ -29,5 +29,5 @@ export function getBookDataUrl(fileName: string): string {
  */
 export function buildAudioUrl(trackId: string): string {
   const currentBook = bookDataLoader.getCurrentBook();
-  return `/${currentBook}/assets/${trackId}.mp3`;
+  return `/books/${currentBook}/assets/${trackId}.mp3`;
 }
