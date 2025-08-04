@@ -16,6 +16,10 @@ export class TextEditorService {
     return this.textEditor.addCharacter(chapterNumber, paragraphNumber, characterName, selectedText, startSelectedWordIndex, endSelectedWordIndex);
   }
 
+  public editSentence(sentenceId: string) {
+    return this.textEditor.editSentence(sentenceId);
+  }
+
   public addMusicSuggestion(chapterNumber: number, paragraphNumber: number) {
     return this.textEditor.addMusicSuggestion(chapterNumber, paragraphNumber);
   }

@@ -7,6 +7,7 @@ import { handleRemoveCharacter } from "@/text-editor-service/listeners/handleRem
 // import { handleRemoveBackgroundSuggestion } from "@/text-editor-service/listeners/handleRemoveBackgroundSuggestion";
 // import { handleAddBackgroundSuggestion } from "@/text-editor-service/listeners/handleAddBackgroundSuggestion";
 import { useEditorModeModal } from "@/stores/modals/editorModeModal.store";
+import { handleEditSentence } from "@/text-editor-service/listeners/handleEditSentence";
 
 export function useEditorMode(container: HTMLElement | null) {
   const { openModal } = useEditorModeModal();
@@ -21,6 +22,7 @@ export function useEditorMode(container: HTMLElement | null) {
 
       const paragraphTag = target.closest("[data-index]");
       const chapterTag = target.closest("[data-chapter]");
+      const closestSentence = target.closest('[id^="ch"][id*="-p"][id*="-s"]');
       const chapterNumber = parseInt((chapterTag as HTMLElement).attributes["data-chapter"].value);
       const paragraphNumber = parseInt(paragraphTag.attributes["data-index"].value);
       const characterTag = target.getAttribute("data-character");
@@ -33,6 +35,9 @@ export function useEditorMode(container: HTMLElement | null) {
         }
 
         if (event.metaKey && !event.altKey) {
+          if (closestSentence) {
+            return handleEditSentence(closestSentence.id);
+          }
           return handleEditParagraph(chapterNumber, paragraphNumber);
         }
 

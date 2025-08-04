@@ -66,6 +66,23 @@ export class TextEditorController {
     }
   };
 
+  public editSentence: RequestHandler = async (req, res) => {
+    try {
+      const { sentenceId } = req.body;
+
+      if (!sentenceId || typeof sentenceId !== "string") {
+        res.status(400).json({ error: "Missing or invalid sentenceId parameter" });
+        return;
+      }
+
+      const result = await this.textEditorService.editSentence(sentenceId);
+
+      res.json({ success: true, data: result });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  };
+
   public addMusicSuggestion: RequestHandler = async (req, res) => {
     try {
       const { chapterNumber, paragraphNumber } = req.body;
