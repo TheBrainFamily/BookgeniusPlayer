@@ -21,7 +21,7 @@ async function processAllBooks() {
   const errors: { book: string; error: Error }[] = [];
 
   for (const bookName of bookDirs) {
-    const result = processBook(bookName);
+    const result = await processBook(path.join(PUBLIC_BOOKS_DIR, bookName));
     if (result.success) {
       successCount++;
     } else {

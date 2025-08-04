@@ -1,5 +1,5 @@
-import { bookDataLoader } from "@/services/bookDataLoader";
 import { getBackgrounds } from "./getBackgrounds";
+import { getBookAssetBaseUrl } from "@/utils/assetUrls";
 export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number };
 
 // ---- generic debounce -------------------------------------------------------
@@ -121,8 +121,7 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
         transitionState = TransitionState.Idle;
         return;
       }
-      const currentBook = bookDataLoader.getCurrentBook();
-      const newSrc = `/books/${currentBook}/assets/${newFile}`;
+      const newSrc = `${getBookAssetBaseUrl()}/${newFile}`;
 
       const curType = legacy.dataset.type as "video" | "image";
       const curFrontId = legacy.dataset.front as "a" | "b";
