@@ -29,5 +29,5 @@ export function getBookDataUrl(fileName: string): string {
  */
 export function buildAudioUrl(trackId: string): string {
   const currentBook = bookDataLoader.getCurrentBook();
-  return `/public/${currentBook}/assets/${trackId}.mp3`;
+  return `/${currentBook}/assets/${trackId}.mp3`;
 }

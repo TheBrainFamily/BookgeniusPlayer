@@ -1,7 +1,7 @@
 import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
 import { getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
-import { CURRENT_BOOK } from "@/consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 
 const SHOULD_SHOW_EVERYONE = false;
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
@@ -133,7 +133,7 @@ function createMediaElement(
 ): HTMLVideoElement | HTMLImageElement | null {
   const characterSlug = placeholder.dataset.character;
   const isTalking = placeholder.dataset.isTalking === "true";
-  const talkingSrc = getTalkingMediaFilePathForName(characterSlug, CURRENT_BOOK); // Can be video or image
+  const talkingSrc = getTalkingMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook()); // Can be video or image
 
   if (!characterSlug) return null;
 

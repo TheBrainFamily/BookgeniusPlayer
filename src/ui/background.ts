@@ -122,7 +122,7 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
         return;
       }
       const currentBook = bookDataLoader.getCurrentBook();
-      const newSrc = `/public/${currentBook}/assets/${newFile}`;
+      const newSrc = `/${currentBook}/assets/${newFile}`;
 
       const curType = legacy.dataset.type as "video" | "image";
       const curFrontId = legacy.dataset.front as "a" | "b";

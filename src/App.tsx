@@ -30,6 +30,7 @@ import { useQuiz } from "./hooks/useQuiz";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
 import ProgressBars from "@/components/ProgressBars";
 import { AppInitializer } from "./components/AppInitializer";
+import { BookDataProvider } from "./context/BookDataContext";
 
 function Shell() {
   setKnownVideos(getKnownVideoFiles());
@@ -93,16 +94,18 @@ export default function App() {
 
   return (
     <AppInitializer>
-      <LocationProvider>
-        <RealtimeProvider>
-          <WebSocketProvider>
-            <BookContentWrapper>
-              <Shell />
-              <ModalRenderers />
-            </BookContentWrapper>
-          </WebSocketProvider>
-        </RealtimeProvider>
-      </LocationProvider>
+      <BookDataProvider>
+        <LocationProvider>
+          <RealtimeProvider>
+            <WebSocketProvider>
+              <BookContentWrapper>
+                <Shell />
+                <ModalRenderers />
+              </BookContentWrapper>
+            </WebSocketProvider>
+          </RealtimeProvider>
+        </LocationProvider>
+      </BookDataProvider>
     </AppInitializer>
   );
 }

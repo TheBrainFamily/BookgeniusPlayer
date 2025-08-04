@@ -4,7 +4,6 @@ import { EditorManager } from "./editor-manager";
 import { PromptsManager } from "./prompts-manager";
 import { joinParsedText, parseHtmlText } from "@/utils/parseHtmlText";
 import { TextEditorError, ParagraphNotFoundError, CharacterNotFoundError } from "./error-handlers";
-import { BOOK_SLUGS } from "@/consts";
 
 export class TextEditor {
   private readonly fileManager: IFileManager;
@@ -13,7 +12,7 @@ export class TextEditor {
   private readonly promptsManager: PromptsManager;
 
   constructor(
-    private readonly bookSlug: BOOK_SLUGS,
+    private readonly bookSlug: string,
     private readonly environment: string = "development",
   ) {
     this.environment = environment;

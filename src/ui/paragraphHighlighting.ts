@@ -1,4 +1,4 @@
-import { CURRENT_BOOK } from "@/consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 import { activateCharacters } from "./characterHelpers";
 
 // Variables to track scrolling state
@@ -23,7 +23,7 @@ export function setupParagraphHighlighting() {
       if (chapterNumber && paragraphNumber) {
         const chapterNum = parseInt(chapterNumber);
         const paragraphNum = parseInt(paragraphNumber);
-        activateCharacters(chapterNum, paragraphNum, CURRENT_BOOK);
+        activateCharacters(chapterNum, paragraphNum, bookDataLoader.getCurrentBook());
       }
     }
   });

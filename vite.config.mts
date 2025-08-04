@@ -8,12 +8,7 @@ import { createHtmlPlugin } from "vite-plugin-html";
 export default defineConfig(async () => {
   // For now, hardcode default values for the HTML template
   // Later this can be made dynamic when generating book-specific HTML files
-  const defaultBookConfig = {
-    title: "BookGenius",
-    author: "Books reimagined",
-    language: "english",
-    slug: "Romeo-And-Juliet-Small"
-  };
+  const defaultBookConfig = { title: "BookGenius", author: "Books reimagined", language: "english", slug: "Romeo-And-Juliet-Small" };
 
   const getSplashScreenTexts = (bookLang: string, bookSlug: string) => {
     const langCodeMap: { [key: string]: string } = { polish: "pl", english: "en" };
@@ -25,17 +20,11 @@ export default defineConfig(async () => {
     const bookSpecificPhrases = langFileContent.books?.[bookSlug]?.loading_phrases;
     const loadingPhrases = bookSpecificPhrases || langFileContent.loading_phrases;
 
-    return { 
-      splashSubtitle: langFileContent.splash_subtitle, 
-      startButtonText: langFileContent.start_button, 
-      loadingPhrases: JSON.stringify(loadingPhrases) 
-    };
+    return { splashSubtitle: langFileContent.splash_subtitle, startButtonText: langFileContent.start_button, loadingPhrases: JSON.stringify(loadingPhrases) };
   };
 
   return {
-    optimizeDeps: { 
-      include: ["workbox-core", "workbox-precaching", "workbox-routing", "workbox-strategies", "workbox-range-requests"] 
-    },
+    optimizeDeps: { include: ["workbox-core", "workbox-precaching", "workbox-routing", "workbox-strategies", "workbox-range-requests"] },
     plugins: [
       createHtmlPlugin({
         inject: {
@@ -44,7 +33,7 @@ export default defineConfig(async () => {
             title: defaultBookConfig.title,
             subtitle: defaultBookConfig.author,
             // This will need to be dynamic based on the book being loaded
-            loaderVideoSrc: `/public/Romeo-And-Juliet-Small/assets/loader.mp4`,
+            loaderVideoSrc: `/Romeo-And-Juliet-Small/assets/loader.mp4`,
             ...getSplashScreenTexts(defaultBookConfig.language, defaultBookConfig.slug),
           },
         },
@@ -54,10 +43,7 @@ export default defineConfig(async () => {
         srcDir: "src",
         filename: "sw.ts",
         strategies: "injectManifest",
-        injectManifest: { 
-          globPatterns: ["**/*.{js,css,html,svg,png,webp}"], 
-          maximumFileSizeToCacheInBytes: 30000000 
-        },
+        injectManifest: { globPatterns: ["**/*.{js,css,html,svg,png,webp}"], maximumFileSizeToCacheInBytes: 30000000 },
         manifest: {
           name: defaultBookConfig.title,
           short_name: defaultBookConfig.slug,
@@ -81,9 +67,7 @@ export default defineConfig(async () => {
       port: 5173,
       open: false,
       proxy: { "/api": "http://localhost:3000" },
-      watch: { 
-        ignored: ["**/src/data/*.xml", "**/public_books/**", "**/src/data/tools/Text-Editor/*.xml", "**/.vscode/**", "**/.cursor/**"] 
-      },
+      watch: { ignored: ["**/src/data/*.xml", "**/public_books/**", "**/src/data/tools/Text-Editor/*.xml", "**/.vscode/**", "**/.cursor/**", "**/public/**"] },
     },
   };
 });

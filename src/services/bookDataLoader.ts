@@ -4,7 +4,6 @@ import type { Variant } from "@/genericBookDataGetters/getAllVariants";
 
 class BookDataLoader {
   private static instance: BookDataLoader;
-  private cache: Map<string, unknown> = new Map();
   private currentBook: string | null = null;
 
   private constructor() {}
@@ -31,23 +30,18 @@ class BookDataLoader {
   // Generic loader for any book data file
   async loadBookDataFile<T>(fileName: string): Promise<T> {
     const book = this.getCurrentBook();
-    const cacheKey = `${book}/${fileName}`;
-
-    // Check cache first
-    if (this.cache.has(cacheKey)) {
-      return this.cache.get(cacheKey) as T;
-    }
 
     try {
-      // Load the compiled JS module
-      const module = await import(`/public/${book}/compiled/${fileName}.js`);
+      // Always load fresh with cache busting
+      const timestamp = Date.now();
+      const moduleUrl = `/${book}/compiled/${fileName}.js?t=${timestamp}`;
+      console.log("Loading module:", moduleUrl);
+
+      const module = await import(moduleUrl);
 
       // Extract the default export or the named export matching the file name
       const functionName = fileName.replace(".js", "");
       const data = module[functionName] || module.default;
-
-      // Cache the result
-      this.cache.set(cacheKey, data);
 
       return data as T;
     } catch (error) {
@@ -107,15 +101,9 @@ class BookDataLoader {
     return typeof getter === "function" ? getter() : getter;
   }
 
-  // Clear cache if needed
-  clearCache(): void {
-    this.cache.clear();
-  }
-
   // Reset current book (useful for switching books)
   resetCurrentBook(): void {
     this.currentBook = null;
-    this.clearCache();
   }
 }
 

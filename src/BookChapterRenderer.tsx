@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { useLocation } from "./state/LocationContext"; // Adjust path
 import { usePageObserver } from "@/hooks/usePageObserver";
 import ChapterLoaderDirect from "@/components/ChapterLoaderDirect";
-import { CURRENT_BOOK } from "./consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 import { useCharacterModal } from "./stores/modals/characterModal.store";
 import { getBookData } from "./genericBookDataGetters/getBookData";
 
@@ -66,7 +66,7 @@ const BookChapterRendererComponent = () => {
       {chaptersToRender.map((chapterId) => (
         <ChapterLoaderDirect
           key={`chapter-${chapterId}`}
-          bookSlug={CURRENT_BOOK}
+          bookSlug={bookDataLoader.getCurrentBook()}
           chapterId={chapterId}
           targetParagraph={shouldScrollToChapter && chapterId === shouldScrollToChapter.chapter ? shouldScrollToChapter.paragraph : undefined}
           onChapterRendered={() => {

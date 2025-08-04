@@ -70,8 +70,8 @@ export async function loadTrack(trackId: string): Promise<boolean> {
 
   /* 3 ▸ fetch ------------------------------------------------------- */
   const currentBook = bookDataLoader.getCurrentBook();
-  const rel = `public/${currentBook}/assets/${trackId}`; // public/Romeo-And-Juliet-Small/assets/audiobook_data/book0.mp3
-  const url = `/${rel.replace(/^\/+/, "")}`; // /public/Romeo-And-Juliet-Small/assets/…
+  const rel = `${currentBook}/assets/${trackId}`; // Romeo-And-Juliet-Small/assets/audiobook_data/book0.mp3
+  const url = `/${rel.replace(/^\/+/, "")}`; // /Romeo-And-Juliet-Small/assets/…
   console.log(`🎧 loadTrack → ${url}`);
 
   let buf: ArrayBuffer;

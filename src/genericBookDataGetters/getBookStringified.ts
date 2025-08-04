@@ -15,3 +15,11 @@ export const loadBookStringified = async (): Promise<string> => {
   }
   return cachedBookStringified;
 };
+
+// Force reload the book stringified data
+export const reloadBookStringified = async (): Promise<void> => {
+  // Reload the data (loader always fetches fresh now)
+  cachedBookStringified = await bookDataLoader.getBookStringified();
+
+  console.log("Book stringified data reloaded");
+};

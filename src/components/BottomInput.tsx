@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useRealtime } from "@/context/RealtimeContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { CURRENT_BOOK } from "@/consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 import { useLocation } from "@/state/LocationContext";
 import { deepResearchCall } from "@/deepResearchCall";
 import { useSearchModal } from "@/stores/modals/searchModal.store";
@@ -145,7 +145,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
             setIsThinking(false);
           });
       } else if (onSubmit) {
-        onSubmit({ query: trimmedValue, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: CURRENT_BOOK } });
+        onSubmit({
+          query: trimmedValue,
+          filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: bookDataLoader.getCurrentBook() },
+        });
       }
     },
     [

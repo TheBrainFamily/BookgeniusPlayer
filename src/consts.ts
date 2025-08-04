@@ -1,12 +1,4 @@
-import { bookDataLoader } from "./services/bookDataLoader";
-
-export enum BOOK_SLUGS {
-  PHARAON = "Pharaon",
-  _1984 = "1984",
-  Conrad_Tajny_Agent = "Conrad-Tajny-Agent",
-  Krolowa_Sniegu = "Krolowa-Sniegu",
-  _1984_English = "1984-English",
-}
+export type BOOK_SLUGS = string;
 
 // This will be replaced by Vite's `define` feature in vite.config.mts
 // We need to declare it globally for TypeScript to know about it during type checking
@@ -18,4 +10,3 @@ declare global {
 
 // For backward compatibility, we'll keep CURRENT_BOOK but make it dynamic
 // This will be replaced with dynamic loading
-export const CURRENT_BOOK: string = bookDataLoader.getCurrentBook(); // Temporary default
