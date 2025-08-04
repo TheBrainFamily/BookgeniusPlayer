@@ -7,6 +7,7 @@ import { findSimplifiedSentence } from "@/helpers/findSimplifiedSentence";
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
 import { useEditorMode } from "@/hooks/useEditorMode";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
 
 const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
@@ -18,12 +19,18 @@ if (import.meta.hot) {
 }
 
 const isEditorMode = import.meta.env.VITE_EDITOR === "true";
+
 export function useBookContent(containerId: string) {
   const container = document.getElementById(containerId);
+
   const bookStringified = getBookStringified();
+  const {
+    metadata: { bookForm },
+  } = getBookData();
 
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
   const { openModal: openSentenceModal } = useSentenceModal();
+
   useEditorMode(isEditorMode ? container : null);
 
   useEffect(() => {
@@ -49,7 +56,12 @@ export function useBookContent(containerId: string) {
         const span = target.closest("span[id^='ch']");
 
         if (span) {
-          const isCharacterPlaceholder = span.children.length === 2 && span.children[0].classList.contains("character-placeholder") && span.children[1].tagName === "STRONG";
+          let isCharacterPlaceholder = false;
+          if (bookForm === "play") {
+            isCharacterPlaceholder = span.children.length === 1 && span.children[0].tagName === "STRONG";
+          } else {
+            isCharacterPlaceholder = span.children.length === 2 && span.children[0].classList.contains("character-placeholder") && span.children[1].tagName === "STRONG";
+          }
 
           if (isCharacterPlaceholder) return;
 

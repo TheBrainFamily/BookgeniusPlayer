@@ -50,9 +50,11 @@
     opacity: 1;
     z-index: -2; /* sit below ::after / ::before */
   }
+
   .bg-video.faded {
     opacity: 0;
   }
+
   .bg-element {
     position: absolute; /* As per your current CSS */
     top: 0;
@@ -69,6 +71,7 @@
     background-position: center center;
     background-repeat: no-repeat;
   }
+
   .bg-element.faded {
     opacity: 0;
   }
@@ -134,27 +137,16 @@
         rgba(var(--bg-content-light-rgb), 0) 100%
       );
 
-      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 20%, rgba(0 0 0 / 1) 25%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 70%, transparent 100%);
+      mask-image:
+        linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 10%, rgba(0 0 0 / 1) 45%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 70%, transparent 100%),
+        radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
 
       mask-composite: intersect;
       hyphens: auto;
 
-      @media only screen and (min-width: 667px) and (orientation: landscape) and (max-width: 768px) {
+      @media (max-height: 640px) {
         mask-image:
-          linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 10%, rgba(0 0 0 / 1) 15%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 100%, transparent 100%),
-          radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
-      }
-
-      /* Media query for tablets - no right side fade */
-      @media (min-width: 768px) and (max-width: 1279px) {
-        mask-image:
-          linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 1) 35%, rgba(0 0 0 / 1) 50%, rgba(0 0 0 / 0.4) 65%, transparent 100%),
-          radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
-      }
-
-      @media (min-width: 768px) and (max-height: 700px) {
-        mask-image:
-          linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.9) 10%, rgba(0 0 0 / 1) 35%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.7) 75%, transparent 100%),
+          linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 5%, rgba(0 0 0 / 1) 30%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 80%, transparent 100%),
           radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
       }
 
@@ -253,6 +245,11 @@
           flex: 1;
           max-width: 100%;
         }
+
+        /* .daniel-character-text: hover strong {
+          flex: 1;
+          max-width: 100%;
+        } */
 
         .daniel-character-container[data-text-alignment="left"] .daniel-character-text {
           text-align: left;
@@ -465,6 +462,7 @@
 
       /* Blockquote / Citation */
       blockquote {
+        padding: 0 3rem;
         margin: 1.5em 0;
         color: #333;
 
@@ -619,6 +617,8 @@
     background-size: 60% 100%;
     background-position: center;
     background-repeat: no-repeat;
+
+    mask-image: linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 20%, rgba(0 0 0 / 1) 30%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 70%, transparent 100%);
   }
 
   @media screen and (min-width: 1280px) {
