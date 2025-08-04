@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
 import { useReadingProgress } from "@/hooks/useReadingProgress";
+import { getBookStringified } from "@/genericBookDataGetters/getBookStringified";
 
 export interface ChapterStructure {
   chapterNumber: number;
@@ -17,7 +17,7 @@ const ProgressBars: React.FC = () => {
 
   useEffect(() => {
     try {
-      const bookDataString = getBookData().bookStringified;
+      const bookDataString = getBookStringified();
       const parser = new window.DOMParser();
       const htmlDoc = parser.parseFromString(bookDataString, "text/html");
 

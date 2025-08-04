@@ -29,6 +29,7 @@ import { getKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles"
 import { useQuiz } from "./hooks/useQuiz";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
 import ProgressBars from "@/components/ProgressBars";
+import { AppInitializer } from "./components/AppInitializer";
 
 function Shell() {
   setKnownVideos(getKnownVideoFiles());
@@ -91,15 +92,17 @@ export default function App() {
   }, [fontSize]);
 
   return (
-    <LocationProvider>
-      <RealtimeProvider>
-        <WebSocketProvider>
-          <BookContentWrapper>
-            <Shell />
-            <ModalRenderers />
-          </BookContentWrapper>
-        </WebSocketProvider>
-      </RealtimeProvider>
-    </LocationProvider>
+    <AppInitializer>
+      <LocationProvider>
+        <RealtimeProvider>
+          <WebSocketProvider>
+            <BookContentWrapper>
+              <Shell />
+              <ModalRenderers />
+            </BookContentWrapper>
+          </WebSocketProvider>
+        </RealtimeProvider>
+      </LocationProvider>
+    </AppInitializer>
   );
 }

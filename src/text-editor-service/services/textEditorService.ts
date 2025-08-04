@@ -1,8 +1,8 @@
 import { TextEditor } from "../../../scripts/data/tools/Text-Editor/text-editor";
-import { CURRENT_BOOK } from "@/consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 
 export class TextEditorService {
-  private textEditor: TextEditor = new TextEditor(CURRENT_BOOK);
+  private textEditor: TextEditor = new TextEditor(bookDataLoader.getCurrentBook());
 
   public editParagraph(chapterNumber: number, paragraphNumber: number) {
     return this.textEditor.editParagraph(chapterNumber, paragraphNumber);

@@ -1,0 +1,56 @@
+export const getCharactersData = () => [
+  {
+    slug: "Sampson",
+    characterName: "Sampson",
+    bookSlug: "Romeo-And-Juliet-Small",
+    infoPerChapter: [
+      {
+        chapter: 2,
+        summary: "A servant from the house of Capulet, who is eager to start a fight with the Montagues.",
+        paragraphsWhereSpotted: [1],
+        paragraphsWhereTalking: [2, 6, 10, 14, 19],
+        paragraphsWhereEnters: [1],
+        paragraphsWhereExits: [],
+      },
+    ],
+    imageUrl: "/Romeo-And-Juliet-Small/sampson.png",
+    listeningUrl: "/Romeo-And-Juliet-Small/sampson-listens.mp4",
+    talkingUrl: "/Romeo-And-Juliet-Small/sampson-speaks.mp4",
+  },
+  {
+    slug: "Gregory",
+    characterName: "Gregory",
+    bookSlug: "Romeo-And-Juliet-Small",
+    infoPerChapter: [
+      {
+        chapter: 2,
+        summary: "A servant from the house of Capulet who engages in witty banter with his companion, Sampson.",
+        paragraphsWhereSpotted: [1, 3],
+        paragraphsWhereTalking: [4, 8, 12, 16],
+        paragraphsWhereEnters: [1],
+        paragraphsWhereExits: [],
+      },
+    ],
+    imageUrl: "/Romeo-And-Juliet-Small/gregory.png",
+    listeningUrl: "/Romeo-And-Juliet-Small/gregory-listens.mp4",
+    talkingUrl: "/Romeo-And-Juliet-Small/gregory-speaks.mp4",
+  },
+  {
+    slug: "Capulet",
+    characterName: "Capulet",
+    bookSlug: "Romeo-And-Juliet-Small",
+    infoPerChapter: [],
+    imageUrl: "/Romeo-And-Juliet-Small/capulet.png",
+    listeningUrl: "/Romeo-And-Juliet-Small/capulet-listens.mp4",
+    talkingUrl: "/Romeo-And-Juliet-Small/capulet-speaks.mp4",
+  },
+  {
+    slug: "Montague",
+    characterName: "Montague",
+    bookSlug: "Romeo-And-Juliet-Small",
+    infoPerChapter: [],
+    imageUrl: "/Romeo-And-Juliet-Small/montague.png",
+    listeningUrl: "/Romeo-And-Juliet-Small/montague-listens.mp4",
+    talkingUrl: "/Romeo-And-Juliet-Small/montague-speaks.mp4",
+  },
+];

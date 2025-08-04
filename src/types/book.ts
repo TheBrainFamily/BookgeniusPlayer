@@ -35,15 +35,7 @@ export interface BookThemeColors {
   simplifiedIconColor?: string;
 }
 
-export type BookData = {
-  slug: string;
-  metadata: BookMetadata;
-  chapters?: Chapter[];
-  themeColors: BookThemeColors;
-  hasAudiobook: boolean;
-  bookStringified: string;
-  audioPrompt?: string;
-};
+export type BookData = { slug: string; metadata: BookMetadata; chapters?: Chapter[]; themeColors: BookThemeColors; hasAudiobook: boolean; audioPrompt?: string };
 
 export type BackgroundSongSection = { chapter: number; paragraph: number; files: string[] };
 

@@ -27,7 +27,8 @@
     "lint:ci": "eslint --cache src/",
     "prettier:check": "prettier --check src/ --quiet 2>&1 | grep -v 'Ignored unknown option'",
     "analyze-characters": "tsx ./scripts/analyze-character-mentions.ts",
-    "check-assets": "tsx ./scripts/check-character-assets.ts"
+    "check-assets": "tsx ./scripts/check-character-assets.ts",
+    "compile-book-data": "node ./scripts/compileBookData.js"
   },
   "dependencies": {
     "@capacitor/core": "^7.2.0",

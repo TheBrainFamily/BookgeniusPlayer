@@ -1,5 +1,5 @@
 import { getAudioContext, initAudioContext, getAudiobookGainNode } from "@/audio-crossfader";
-import { CURRENT_BOOK } from "./consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 
 export type AudiobookTrackEvent = {
   timestamp: number; // Time in seconds within the track
@@ -69,8 +69,9 @@ export async function loadTrack(trackId: string): Promise<boolean> {
   if (tracks.find((t) => t.id === trackId && t.audioBuffer)) return true;
 
   /* 3 ▸ fetch ------------------------------------------------------- */
-  const rel = `${CURRENT_BOOK}/${trackId}`; // 1984/audiobook_data/book0.mp3
-  const url = `/${rel.replace(/^\/+/, "")}`; // /1984/…
+  const currentBook = bookDataLoader.getCurrentBook();
+  const rel = `public/${currentBook}/assets/${trackId}`; // public/Romeo-And-Juliet-Small/assets/audiobook_data/book0.mp3
+  const url = `/${rel.replace(/^\/+/, "")}`; // /public/Romeo-And-Juliet-Small/assets/…
   console.log(`🎧 loadTrack → ${url}`);
 
   let buf: ArrayBuffer;

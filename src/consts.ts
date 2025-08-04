@@ -1,3 +1,5 @@
+import { bookDataLoader } from "./services/bookDataLoader";
+
 export enum BOOK_SLUGS {
   PHARAON = "Pharaon",
   _1984 = "1984",
@@ -14,4 +16,6 @@ declare global {
   const __SELECTED_BOOK_SLUG__: BOOK_SLUGS;
 }
 
-export const CURRENT_BOOK: BOOK_SLUGS = typeof __SELECTED_BOOK_SLUG__ !== "undefined" ? __SELECTED_BOOK_SLUG__ : (process.env.VITE_BOOK as BOOK_SLUGS); // Default fallback
+// For backward compatibility, we'll keep CURRENT_BOOK but make it dynamic
+// This will be replaced with dynamic loading
+export const CURRENT_BOOK: string = bookDataLoader.getCurrentBook(); // Temporary default

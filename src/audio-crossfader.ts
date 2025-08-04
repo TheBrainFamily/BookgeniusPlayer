@@ -1,5 +1,5 @@
 import { parseBlob } from "music-metadata";
-import { getBookData } from "./genericBookDataGetters/getBookData";
+import { buildAudioUrl } from "./utils/assetUrls";
 
 // --- Interfaces and Types ---
 export interface TrackState {
@@ -55,8 +55,7 @@ let pendingSectionTracks: string[] | null | undefined = undefined;
 // Debouncing for playlist updates to avoid UI spam
 let playlistUpdateTimeout: ReturnType<typeof setTimeout> | null = null;
 
-const bookData = getBookData();
-
+// This is now loaded dynamically, so we'll get it when needed
 export function getTrackDetailsById(id: string): TrackState | null {
   return tracks.get(id) || null;
 }
@@ -161,7 +160,7 @@ export async function initAudioContext(): Promise<boolean> {
   return audioContext?.state === "running";
 }
 function buildUrl(trackId: string): string {
-  return `/${bookData.slug}/${trackId}.mp3`; // → /1984/background-forest.mp3
+  return buildAudioUrl(trackId);
 }
 function isFetchOk(res: Response, url: string): boolean {
   const local = url.startsWith("/");

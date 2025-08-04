@@ -1,4 +1,4 @@
-import { CURRENT_BOOK } from "@/consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 import { getBackgrounds } from "./getBackgrounds";
 export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number };
 
@@ -121,7 +121,8 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
         transitionState = TransitionState.Idle;
         return;
       }
-      const newSrc = `/${CURRENT_BOOK}/${newFile}`;
+      const currentBook = bookDataLoader.getCurrentBook();
+      const newSrc = `/public/${currentBook}/assets/${newFile}`;
 
       const curType = legacy.dataset.type as "video" | "image";
       const curFrontId = legacy.dataset.front as "a" | "b";

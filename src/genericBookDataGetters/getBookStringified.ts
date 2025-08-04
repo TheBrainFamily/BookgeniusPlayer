@@ -1,3 +1,17 @@
+import { bookDataLoader } from "@/services/bookDataLoader";
+
+let cachedBookStringified: string | null = null;
+
 export const getBookStringified = (): string => {
-  throw new Error("getBookStringified should never be called at runtime");
+  if (!cachedBookStringified) {
+    throw new Error("Book stringified not loaded. Call loadBookStringified() first.");
+  }
+  return cachedBookStringified;
+};
+
+export const loadBookStringified = async (): Promise<string> => {
+  if (!cachedBookStringified) {
+    cachedBookStringified = await bookDataLoader.getBookStringified();
+  }
+  return cachedBookStringified;
 };
