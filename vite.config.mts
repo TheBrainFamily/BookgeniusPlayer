@@ -204,7 +204,7 @@ export default defineConfig(async () => {
         srcDir: "src",
         filename: "sw.ts",
         strategies: "injectManifest",
-        injectManifest: { globPatterns: ["**/*.{js,css,html,svg,png,webp}"], maximumFileSizeToCacheInBytes: 30000000 },
+        injectManifest: { globPatterns: ["**/*.{js,css,svg,png,webp}"], maximumFileSizeToCacheInBytes: 30000000 },
         manifest: {
           name: activeBookConfig.name,
           short_name: activeBookConfig.slug,
