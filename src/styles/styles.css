@@ -1273,5 +1273,5 @@ section[data-chapter] [data-index] {
 }
 
 .text-nowrap {
-  text-wrap: nowrap;
+  white-space: nowrap;
 }
