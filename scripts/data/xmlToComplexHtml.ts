@@ -293,33 +293,53 @@ export const xmlToComplexHtml = (
           clean = clean.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
 
           if (bookFormValue === "Play") {
-            if (isCharacter) {
-              const characterPlaceholderSpans = [];
-              clean = clean.replace(/<span class="character-placeholder[^>]*>.*?<\/span>/g, (match) => {
-                characterPlaceholderSpans.push(match);
-                return "";
-              });
+            const isDidaskaliaParagraph = pContent.includes("<em>");
 
-              // Close previous containers if not first character
+            if (isDidaskaliaParagraph) {
+              // close previous character containers if open
               if (!firstCharacter) {
                 htmlResult += `\n </div>\n`; // character-text
-                htmlResult += `\n </div>\n`; // character-container
+                htmlResult += `\n </div>\n`; // play-row
+                firstCharacter = true;
               }
 
-              // Open new character container
-              htmlResult += `\n <div class="character-container" data-text-alignment="${currentCharacterAlignment}">\n`;
-              htmlResult += `\n <div class="character-avatar" data-index="1">${characterPlaceholderSpans}</div>\n`;
-              htmlResult += `\n <div class="character-text">\n`;
+              // open a separate row just for didaskalia
+              htmlResult += `\n <div class="play-row didaskalia-row">\n`;
+              htmlResult += `\n  <div class="character-text didaskalia-text">\n`;
+              htmlResult += `\n    <p data-index="${dataIndex++}" data-is-didaskalia="true">\n      ${clean}\n    </p>`;
+              htmlResult += `\n  </div>\n`;
+              htmlResult += `\n </div>\n`;
 
+              continue; // skip the normal character/dialogue logic
+            }
+
+            // ── now handle dialogue paragraphs ──
+            const characterPlaceholderSpans: string[] = [];
+            clean = clean.replace(/<span class="character-placeholder[^>]*>.*?<\/span>/g, (match) => {
+              characterPlaceholderSpans.push(match);
+              return "";
+            });
+            const hasAvatar = characterPlaceholderSpans.length > 0;
+
+            if (firstCharacter || isCharacter) {
+              if (!firstCharacter) {
+                htmlResult += `\n </div>\n`; // close previous character-text
+                htmlResult += `\n </div>\n`; // close previous play-row
+              }
+              htmlResult += `\n <div class="play-row${hasAvatar ? "" : " no-avatar-row"}" data-text-alignment="${currentCharacterAlignment}">\n`;
+              if (hasAvatar) {
+                htmlResult += `\n  <div class="character-avatar" data-index="${dataIndex}">${characterPlaceholderSpans.join("")}</div>\n`;
+              }
+              htmlResult += `\n  <div class="character-text">\n`;
               firstCharacter = false;
             }
 
-            htmlResult += `\n    <p 
-              data-index="${dataIndex++}" 
-              data-text-alignment="${currentCharacterAlignment}" 
-              data-is-character="${isCharacter}"
-              data-is-didaskalia="${pContent.includes("<em>")}"
-              >\n      ${clean}\n    </p>`;
+            htmlResult += `\n    <p
+  data-index="${dataIndex++}"
+  data-text-alignment="${currentCharacterAlignment}"
+  data-is-character="${isCharacter}"
+  data-is-didaskalia="false"
+>\n      ${clean}\n    </p>`;
 
             if (isCharacter) {
               isCharacter = false;
@@ -352,7 +372,7 @@ export const xmlToComplexHtml = (
       // Only close containers if they were opened (not firstCharacter means containers are open)
       if (!firstCharacter) {
         htmlResult += `\n </div>\n`; // character-text
-        htmlResult += `\n </div>\n`; // character-container
+        htmlResult += `\n </div>\n`; // play-row
       }
       firstCharacter = true;
     }
