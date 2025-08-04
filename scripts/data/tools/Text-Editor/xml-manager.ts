@@ -134,15 +134,14 @@ export class XmlManager {
 
   public getSentenceElement(xmlDoc: Document, sentenceId: string): { sentence: Element | null; paragraph: Element | null; xmlDoc: Document } {
     try {
-      const spans = xmlDoc.getElementsByTagName("span");
-      for (let i = 0; i < spans.length; i++) {
-        const span = spans[i];
-        if (span.getAttribute("id") === sentenceId) {
-          const paragraph = span.parentNode as Element;
-          return { sentence: span, paragraph, xmlDoc };
-        }
+      const sentence = xmlDoc.getElementById(sentenceId);
+
+      if (!sentence || sentence.tagName.toLowerCase() !== "span") {
+        return { sentence: null, paragraph: null, xmlDoc };
       }
-      return { sentence: null, paragraph: null, xmlDoc };
+
+      const paragraph = sentence.parentNode as Element;
+      return { sentence, paragraph, xmlDoc };
     } catch (error) {
       throw new XmlError(`Failed to get sentence element: ${error.message}`);
     }
