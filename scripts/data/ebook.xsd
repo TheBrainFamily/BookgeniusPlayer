@@ -10,6 +10,17 @@
         <xs:attribute name="summary" type="xs:string" use="required"/>
     </xs:complexType>
 
+    <xs:complexType name="bookMetadataType">
+        <xs:sequence>
+            <xs:element name="Slug" type="xs:string"/>
+            <xs:element name="Title" type="xs:string"/>
+            <xs:element name="Author" type="xs:string"/>
+            <xs:element name="Language" type="xs:string"/>
+            <xs:element name="Form" type="xs:string" minOccurs="0"/>
+            <xs:element name="SimplifiedIconColor" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
     <xs:element name="ebook">
         <xs:complexType>
             <xs:sequence>
@@ -24,7 +35,7 @@
                     </xs:complexType>
                 </xs:element>
 
-                <xs:element name="BookSlug" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                <xs:element name="BookMetadata" type="bookMetadataType" minOccurs="1" maxOccurs="1"/>
 
                 <xs:element name="Chapter" type="chapterType" minOccurs="1" maxOccurs="unbounded"/>
 
@@ -42,6 +53,7 @@
     <xs:complexType name="chapterType">
         <xs:sequence>
             <xs:element name="BookTitle" type="xs:string" minOccurs="0"/>
+            <xs:element name="h3" type="paragraphType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="h4" type="paragraphType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="p" type="paragraphType" minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
