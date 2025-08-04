@@ -34,10 +34,10 @@ tsFiles.forEach((file) => {
     let content = fs.readFileSync(inputFile, "utf-8");
 
     // Remove type imports
-    content = content.replace(/import type .* from .*;\n/g, "");
+    content = content.replace(/^import\s+type\s+.*from\s*['"].*['"];?\s*$/gm, "");
 
     // Remove @/ imports
-    content = content.replace(/import .* from ["']@\/.*["'];\n/g, "");
+    content = content.replace(/^import\s+.*from\s*['"]@\/.*['"];?\s*$/gm, "");
 
     // Transpile TypeScript to JavaScript
     const result = ts.transpileModule(content, { compilerOptions: { module: ts.ModuleKind.ES2020, target: ts.ScriptTarget.ES2020, removeComments: true } });
