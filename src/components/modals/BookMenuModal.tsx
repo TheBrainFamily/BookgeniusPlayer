@@ -107,6 +107,35 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const isVisible = useRef(allVariants.length > 0);
   const hiddenParagraphsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const handleFontSizePreset = (size: number) => {
+    setHideOverlay(true);
+    setIsFontSizeChanging(true);
+
+    setTimeout(() => {
+      setCurrentFontSize(size);
+    }, 100);
+
+    setTimeout(() => {
+      setHideOverlay(false);
+      setIsFontSizeChanging(false);
+    }, 1500);
+  };
+
+  const handleComplexityPreset = (level: number) => {
+    setHideOverlay(true);
+    setIsComplexityChanging(true);
+
+    setTimeout(() => {
+      setCurrentComplexity(level);
+      updateText(level);
+    }, 100);
+
+    setTimeout(() => {
+      setHideOverlay(false);
+      setIsComplexityChanging(false);
+    }, 1500);
+  };
+
   const handleSliderChangeWithOverlay = (callback: () => void) => {
     if (overlayTimeoutRef.current) {
       clearTimeout(overlayTimeoutRef.current);
@@ -277,58 +306,13 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
               className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
             />
             <div className="flex justify-between text-xs text-gray-300">
-              <span
-                className="cursor-pointer hover:text-white transition-colors"
-                onClick={() => {
-                  setHideOverlay(true);
-                  setIsFontSizeChanging(true);
-
-                  setTimeout(() => {
-                    setCurrentFontSize(0.5);
-                  }, 100);
-
-                  setTimeout(() => {
-                    setHideOverlay(false);
-                    setIsFontSizeChanging(false);
-                  }, 1500);
-                }}
-              >
+              <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(0.5)}>
                 {t("small")}
               </span>
-              <span
-                className="cursor-pointer hover:text-white transition-colors"
-                onClick={() => {
-                  setHideOverlay(true);
-                  setIsFontSizeChanging(true);
-
-                  setTimeout(() => {
-                    setCurrentFontSize(1.0);
-                  }, 100);
-
-                  setTimeout(() => {
-                    setHideOverlay(false);
-                    setIsFontSizeChanging(false);
-                  }, 1500);
-                }}
-              >
+              <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(1.0)}>
                 {t("default")}
               </span>
-              <span
-                className="cursor-pointer hover:text-white transition-colors"
-                onClick={() => {
-                  setHideOverlay(true);
-                  setIsFontSizeChanging(true);
-
-                  setTimeout(() => {
-                    setCurrentFontSize(1.5);
-                  }, 100);
-
-                  setTimeout(() => {
-                    setHideOverlay(false);
-                    setIsFontSizeChanging(false);
-                  }, 1500);
-                }}
-              >
+              <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(1.5)}>
                 {t("large")}
               </span>
             </div>
@@ -355,61 +339,13 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
                 className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
               />
               <div className="flex justify-between text-xs text-gray-300">
-                <span
-                  className="cursor-pointer hover:text-white transition-colors"
-                  onClick={() => {
-                    setHideOverlay(true);
-                    setIsComplexityChanging(true);
-
-                    setTimeout(() => {
-                      setCurrentComplexity(20);
-                      updateText(20);
-                    }, 100);
-
-                    setTimeout(() => {
-                      setHideOverlay(false);
-                      setIsComplexityChanging(false);
-                    }, 1500);
-                  }}
-                >
+                <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleComplexityPreset(20)}>
                   {t("simple")}
                 </span>
-                <span
-                  className="cursor-pointer hover:text-white transition-colors"
-                  onClick={() => {
-                    setHideOverlay(true);
-                    setIsComplexityChanging(true);
-
-                    setTimeout(() => {
-                      setCurrentComplexity(60);
-                      updateText(60);
-                    }, 100);
-
-                    setTimeout(() => {
-                      setHideOverlay(false);
-                      setIsComplexityChanging(false);
-                    }, 1500);
-                  }}
-                >
+                <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleComplexityPreset(60)}>
                   {t("medium")}
                 </span>
-                <span
-                  className="cursor-pointer hover:text-white transition-colors"
-                  onClick={() => {
-                    setHideOverlay(true);
-                    setIsComplexityChanging(true);
-
-                    setTimeout(() => {
-                      setCurrentComplexity(100);
-                      updateText(100);
-                    }, 100);
-
-                    setTimeout(() => {
-                      setHideOverlay(false);
-                      setIsComplexityChanging(false);
-                    }, 1500);
-                  }}
-                >
+                <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleComplexityPreset(100)}>
                   {t("complex")}
                 </span>
               </div>

@@ -18,8 +18,7 @@ const MenuButton = () => {
         <Tooltip>
           <TooltipTrigger asChild>
             <motion.button
-              onClick={openModal}
-              onTouchEnd={openModal}
+              onPointerUp={openModal}
               className="p-2 my-1 hover:text-white rounded-full cursor-pointer flex"
               whileHover="hover"
               whileTap="tap"
