@@ -88,14 +88,14 @@
       <p id="cutscene-text"></p>
 
       <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 sm:pr-0 xl:px-4 sm:pl-4 max-w-[120rem] w-full">
-        <% if (bookForm !== 'play') { %>
+        <% if (bookForm === 'play') { %>
+        <div id="content-container" class="max-w-[100rem]"></div>
+        <% } else { %>
         <div id="left-notes" class="hidden sm:block sm:flex-1 max-w-[700px] content-center overflow-y-auto"></div>
         <div id="content-container" class="sm:flex-3 max-w-[900px]"></div>
         <div id="right-notes" class="hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none">
           <div id="right-notes-scrollable-container"></div>
         </div>
-        <% } %> <% if (bookForm === 'play') { %>
-        <div id="content-container" class="max-w-[100rem]"></div>
         <% } %>
       </div>
     </div>

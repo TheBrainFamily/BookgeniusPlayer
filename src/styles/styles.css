@@ -321,7 +321,7 @@
         p {
           margin-bottom: 0.2em;
           font-family: var(--font-libre-caslon-text);
-          font-size: 16px;
+          /* font-size: 16px; */
           text-indent: 0;
           margin: 0.1em 0;
         }
@@ -335,7 +335,7 @@
         p:has(em) {
           text-align: center !important;
           line-height: 1em;
-          font-size: 14px;
+          font-size: 0.9em;
           width: 100%;
         }
 
