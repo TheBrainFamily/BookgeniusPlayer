@@ -4,6 +4,7 @@ import path from "path";
 
 import { getTalkingMediaFilePathForName, getListeningMediaFilePathForName } from "@/utils/getFilePathsForName";
 import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
+import { wrapPunctuationAdvanced } from "@/utils/wrapPunctuation";
 
 // Helper function to extract file data from XML elements
 const extractFileData = (
@@ -376,6 +377,8 @@ export const xmlToComplexHtml = (
       return `>${formattedText}<`;
     });
   }
+
+  htmlResult = wrapPunctuationAdvanced(htmlResult);
 
   return { htmlResult: htmlResult.trim(), backgroundsData, audioData, cutSceneData, chapterTitles };
 };
