@@ -86,6 +86,7 @@ const detectScrollEnd = (element: HTMLElement, callback: () => void, timeout: nu
 };
 
 /* ------------------------------------------------------------------ */
+
 /*  Bridge interface for legacy helpers                               */
 interface Bridge {
   get: () => Location;
@@ -154,7 +155,7 @@ export const setCurrentLocation = (loc: Location, options: { updateHash?: boolea
 /* ------------------------------------------------------------------ */
 /*  System Navigation Helper                                          */
 /**
- * Navigate to a specific location with system source (triggers scrolling)
+ * Navigate to a specific location with a system source (triggers scrolling)
  */
 export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph: number }) => {
   if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
@@ -248,8 +249,29 @@ export const goToParagraph = (loc: { currentChapter: number; currentParagraph: n
     // to this precise position, for both fast and smooth scrolling.
     const focusZoneOffset = containerRect.height * 0.35;
 
+    const containerScrollPosition = contentContainer.scrollTop;
+    const goToParagraphPositionTop = elementRect.top;
+
+    // PINGWING: I understand how ugly this solution is, but after fiddling for the whole day with many possible
+    // not working solutions, this one at least works.
+    // values 19 and -500 are based on manual experimentation, I'd love to understand what they represent
+    let elementOffset = 0;
+    const howLongToUseOffsetAfterReload = 2000;
+    const millisecondsSinceLoad = performance.now();
+    const pageWasJustReloaded = millisecondsSinceLoad < howLongToUseOffsetAfterReload;
+
+    if (pageWasJustReloaded) {
+      if (containerScrollPosition === 0) {
+        // this happens when we show the page for the first time and we need to jump from the book start to our position
+        elementOffset = goToParagraphPositionTop / 19;
+      } else {
+        // this happens when we refresh
+        elementOffset = containerScrollPosition / -500;
+      }
+    }
+
     // Calculate the scroll position needed to align the element's top with the focus zone's top.
-    const targetScrollTop = contentContainer.scrollTop + elementRect.top - containerRect.top - focusZoneOffset;
+    const targetScrollTop = containerScrollPosition + elementRect.top - containerRect.top - focusZoneOffset + elementOffset;
 
     contentContainer.scrollTo({ top: targetScrollTop, behavior: options.behavior });
 
@@ -350,7 +372,7 @@ export const goToInitialLocationFromHash = () => {
   const locationFromHash = parseLocationFromHash();
 
   if (locationFromHash) {
-    // Use system navigation for initial load from hash
+    // Use system navigation for the initial load from hash
     systemNavigateTo({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph });
   } else {
     // Fallback if hash is invalid or missing: go to furthest saved location
