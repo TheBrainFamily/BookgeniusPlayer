@@ -4,6 +4,7 @@
  * the *furthest* location logic and the Return button state exactly
  * as in the original vanilla code.
  */
+import { pageWasJustReloaded } from "@/utils/pageWasJustReloaded";
 
 let systemNavigationInProgress = false;
 
@@ -154,6 +155,68 @@ export const setCurrentLocation = (loc: Location, options: { updateHash?: boolea
 
 /* ------------------------------------------------------------------ */
 /*  System Navigation Helper                                          */
+
+/**
+ * Waits for an element's position and dimensions to be stable for a certain period.
+ * This is useful to avoid layout shifts when scrolling to an element shortly after render.
+ * @param element The HTML element to monitor.
+ * @param options Configuration for timeout, polling interval, and stability threshold.
+ * @returns A promise that resolves when the element is stable or when the timeout is reached.
+ */
+const waitForElementStablePosition = (element: HTMLElement, options: { timeout?: number; interval?: number; stableThreshold?: number } = {}): Promise<void> => {
+  const { timeout = 2000, interval = 50, stableThreshold = 200 } = options;
+
+  return new Promise((resolve) => {
+    let lastRect: DOMRect | null = null;
+    let stableTime = 0;
+    let checkTimeout: number | null = null;
+
+    const cleanup = () => {
+      if (checkTimeout) clearTimeout(checkTimeout);
+    };
+
+    const check = () => {
+      if (!element || !document.body.contains(element)) {
+        cleanup();
+        resolve(); // Element removed from DOM, stop waiting
+        return;
+      }
+      const currentRect = element.getBoundingClientRect();
+
+      if (lastRect && currentRect.top === lastRect.top && currentRect.left === lastRect.left && currentRect.width === lastRect.width && currentRect.height === lastRect.height) {
+        stableTime += interval;
+      } else {
+        stableTime = 0;
+      }
+
+      lastRect = currentRect;
+
+      if (stableTime >= stableThreshold) {
+        cleanup();
+        resolve();
+      } else {
+        checkTimeout = window.setTimeout(check, interval);
+      }
+    };
+
+    // Overall timeout for the whole operation
+    const overallTimeout = window.setTimeout(() => {
+      console.warn("waitForElementStablePosition timed out waiting for element to stabilize.");
+      cleanup();
+      resolve();
+    }, timeout);
+
+    check();
+
+    // Make sure to clear the overall timeout if we resolve early
+    const originalResolve = resolve;
+    resolve = () => {
+      clearTimeout(overallTimeout);
+      originalResolve();
+    };
+  });
+};
+
 /**
  * Navigate to a specific location with a system source (triggers scrolling)
  */
@@ -213,14 +276,14 @@ export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph
       });
   };
 
-  const howLongToUseOffsetAfterReload = 2000;
-  const millisecondsSinceLoad = performance.now();
-  const pageWasJustReloaded = millisecondsSinceLoad < howLongToUseOffsetAfterReload;
+  const selector =
+    loc.currentParagraph === 0 ? `section[data-chapter="${loc.currentChapter}"]` : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
+  const element = document.querySelector(selector) as HTMLElement;
 
-  // During the initial page render the layout is unstable, we need to navigate after the page is fully rendered
-  // Start the scroll with Promise-based completion
-  if (pageWasJustReloaded) {
-    setTimeout(runGoToParagraph, 500);
+  if (pageWasJustReloaded() && element) {
+    waitForElementStablePosition(element).then(() => {
+      runGoToParagraph();
+    });
   } else {
     runGoToParagraph();
   }
