@@ -293,51 +293,29 @@ export const xmlToComplexHtml = (
           clean = clean.replace(/\s*(<span class="character-talking"[^>]*><\/span>)\s*/g, "$1");
 
           if (bookFormValue === "Play") {
-            // Check if this paragraph contains didaskalia (em tags)
-            const hasDidaskalia = /<em>.*?<\/em>/.test(clean);
-            const isDidaskaliaParagraph = clean.startsWith("<em>") && clean.endsWith("</em>");
+            // Check if this is primarily didaskalia by removing character tags and checking if most content is in <em>
+            let cleanForDidaskaliaCheck = clean;
+            // Remove character highlights but keep the text
+            cleanForDidaskaliaCheck = cleanForDidaskaliaCheck.replace(/<span class="character-highlighted"[^>]*>([^<]*)<\/span>/g, "$1");
+            // Remove other non-em tags but keep content
+            cleanForDidaskaliaCheck = cleanForDidaskaliaCheck.replace(/<(?!em|\/em)[^>]*>/g, "");
 
-            // If paragraph contains any didaskalia, extract it and create separate play-row
-            if (hasDidaskalia) {
-              // Find current speaking character (look backwards)
-              let currentSpeakingCharacter = "";
-              for (let prevJ = j - 1; prevJ >= 0; prevJ--) {
-                const prevNode = chapter.childNodes[prevJ];
-                if (prevNode.nodeType === 1) {
-                  const prevElement = prevNode as Element;
-                  if (prevElement.tagName === "p") {
-                    // Check for talking characters in original XML structure
-                    const spans = prevElement.getElementsByTagName("span");
-                    for (let s = 0; s < spans.length; s++) {
-                      const span = spans[s];
-                      for (let c = 0; c < span.childNodes.length; c++) {
-                        const child = span.childNodes[c];
-                        if (child.nodeType === 1) {
-                          const childEl = child as Element;
-                          if (characterMap.has(childEl.tagName) && childEl.getAttribute("talking") === "true") {
-                            currentSpeakingCharacter = childEl.tagName;
-                            break;
-                          }
-                        }
-                      }
-                      if (currentSpeakingCharacter) break;
-                    }
-                    if (currentSpeakingCharacter) break;
-                  }
-                }
-              }
+            const textInEm = cleanForDidaskaliaCheck.match(/<em>.*?<\/em>/g)?.join("") || "";
+            const textOutsideEm = cleanForDidaskaliaCheck.replace(/<em>.*?<\/em>/g, "").trim();
+            const isPureDidaskalia = textInEm.length > 0 && (textOutsideEm.length === 0 || textInEm.length > textOutsideEm.length * 2);
 
-              // Check if current speaker continues speaking in any subsequent paragraphs
-              let currentSpeakerContinues = false;
+            // Check if current character continues speaking after this paragraph
+            let currentCharacterContinues = false;
+            if (isPureDidaskalia && !firstCharacter) {
+              // Look ahead to see if there are more paragraphs for the current character
               for (let nextJ = j + 1; nextJ < chapter.childNodes.length; nextJ++) {
                 const nextNode = chapter.childNodes[nextJ];
                 if (nextNode.nodeType === 1) {
                   const nextElement = nextNode as Element;
                   if (nextElement.tagName === "p") {
-                    // Check if this paragraph has the current speaker or is regular dialogue
+                    // Check if this paragraph has a new talking character
                     const spans = nextElement.getElementsByTagName("span");
                     let hasNewTalkingCharacter = false;
-                    let hasCurrentSpeakerTalking = false;
 
                     for (let s = 0; s < spans.length; s++) {
                       const span = spans[s];
@@ -346,95 +324,115 @@ export const xmlToComplexHtml = (
                         if (child.nodeType === 1) {
                           const childEl = child as Element;
                           if (characterMap.has(childEl.tagName) && childEl.getAttribute("talking") === "true") {
-                            if (childEl.tagName === currentSpeakingCharacter) {
-                              hasCurrentSpeakerTalking = true;
-                            } else {
-                              hasNewTalkingCharacter = true;
-                            }
+                            hasNewTalkingCharacter = true;
                             break;
                           }
                         }
                       }
-                      if (hasNewTalkingCharacter || hasCurrentSpeakerTalking) break;
+                      if (hasNewTalkingCharacter) break;
                     }
 
-                    // If we found a new talking character, stop looking
+                    // If we found a new talking character, current character doesn't continue
                     if (hasNewTalkingCharacter) {
                       break;
                     }
 
-                    // If we found current speaker talking again, they continue
-                    if (hasCurrentSpeakerTalking) {
-                      currentSpeakerContinues = true;
-                      break;
-                    }
-
-                    // If this paragraph has no talking characters but has content, current speaker likely continues
+                    // If this paragraph has content and no new talking character, current character continues
                     const textContent = nextElement.textContent?.trim() || "";
-                    const hasDidaskaliaOnly = /<em>.*?<\/em>/.test(textContent) && textContent.replace(/<em>.*?<\/em>/g, "").trim() === "";
+                    if (textContent) {
+                      // Check if this is also didaskalia
+                      let nextCleanForCheck = textContent;
+                      nextCleanForCheck = nextCleanForCheck.replace(/<span class="character-highlighted"[^>]*>([^<]*)<\/span>/g, "$1");
+                      nextCleanForCheck = nextCleanForCheck.replace(/<(?!em|\/em)[^>]*>/g, "");
 
-                    if (textContent && !hasDidaskaliaOnly) {
-                      currentSpeakerContinues = true;
-                      break;
+                      const nextTextInEm = nextCleanForCheck.match(/<em>.*?<\/em>/g)?.join("") || "";
+                      const nextTextOutsideEm = nextCleanForCheck.replace(/<em>.*?<\/em>/g, "").trim();
+                      const nextIsPureDidaskalia = nextTextInEm.length > 0 && (nextTextOutsideEm.length === 0 || nextTextInEm.length > nextTextOutsideEm.length * 2);
+
+                      if (!nextIsPureDidaskalia) {
+                        currentCharacterContinues = true;
+                        break;
+                      }
                     }
                   }
                 }
               }
+            }
 
-              // Determine if didaskalia should stay in current play-row or be separate
-              const shouldStayInCurrentPlayRow =
-                !firstCharacter && // We're already in a play-row
-                !isCharacter && // This isn't the character introduction paragraph
-                currentSpeakingCharacter && // There is a current speaker
-                currentSpeakerContinues; // Current speaker continues speaking
+            const isDidaskaliaParagraph = isPureDidaskalia && !currentCharacterContinues;
 
-              if (shouldStayInCurrentPlayRow) {
-                // Keep didaskalia in current play-row - don't extract it
-                htmlResult += `\n    <p data-index="${dataIndex++}" data-text-alignment="${currentCharacterAlignment}" data-is-character="false" data-is-didaskalia="true">\n      ${clean}\n    </p>`;
-                continue;
-              } else if (isDidaskaliaParagraph) {
-                // This is a standalone didaskalia paragraph that should be separate
+            // If paragraph is pure didaskalia and character doesn't continue, create separate play-row
+            if (isDidaskaliaParagraph) {
+              // Check if we need to open a new didaskalia row or continue existing one
+              const isInDidaskaliaRow =
+                htmlResult.includes('class="play-row didaskalia-row no-avatar-row"') &&
+                !htmlResult.match(/\n <\/div>\n\n <div class="play-row(?! didaskalia-row)/m) &&
+                htmlResult.match(/didaskalia-row[^>]*>\s*\n\s*<div class="character-text didaskalia-text">\s*$/m);
+
+              if (!isInDidaskaliaRow) {
+                // Close any open play-row first
                 if (!firstCharacter) {
                   htmlResult += `\n </div>\n`; // close character-text
                   htmlResult += `\n </div>\n`; // close play-row
                   firstCharacter = true;
                 }
+                // Start new didaskalia row
                 htmlResult += `\n <div class="play-row didaskalia-row no-avatar-row">\n`;
                 htmlResult += `\n  <div class="character-text didaskalia-text">\n`;
-                htmlResult += `\n    <p data-index="${dataIndex++}" data-is-didaskalia="true">\n      ${clean}\n    </p>`;
-                htmlResult += `\n  </div>\n`;
-                htmlResult += `\n </div>\n`;
-                continue;
-              } else if (hasDidaskalia && !shouldStayInCurrentPlayRow) {
-                // Mixed content with didaskalia that should be extracted
-                const didaskaliaMatches = clean.match(/<em>.*?<\/em>/g);
-                if (didaskaliaMatches) {
-                  // For each didaskalia found, create separate play-row
-                  for (const didaskalia of didaskaliaMatches) {
-                    if (!firstCharacter) {
-                      htmlResult += `\n </div>\n`; // close character-text
-                      htmlResult += `\n </div>\n`; // close play-row
-                      firstCharacter = true;
+              }
+
+              // Add the didaskalia paragraph
+              htmlResult += `\n    <p data-index="${dataIndex++}" data-is-didaskalia="true">\n      ${clean}\n    </p>`;
+
+              // Check if next paragraph is also didaskalia - if not, close the row
+              let shouldCloseRow = true;
+              if (j + 1 < chapter.childNodes.length) {
+                const nextNode = chapter.childNodes[j + 1];
+                if (nextNode.nodeType === 1) {
+                  const nextElement = nextNode as Element;
+                  if (nextElement.tagName === "p") {
+                    // Get the next paragraph content to check if it's didaskalia
+                    let nextPContent = "";
+                    for (let k = 0; k < nextElement.childNodes.length; k++) {
+                      const pNode = nextElement.childNodes[k];
+                      if (pNode.nodeType === 3) {
+                        nextPContent += pNode.textContent || "";
+                      } else if (pNode.nodeType === 1) {
+                        const pElement = pNode as Element;
+                        if (pElement.tagName === "span" && pElement.hasAttribute("id")) {
+                          nextPContent += pElement.textContent || "";
+                        } else {
+                          nextPContent += pElement.textContent || "";
+                        }
+                      }
                     }
-                    htmlResult += `\n <div class="play-row didaskalia-row no-avatar-row">\n`;
-                    htmlResult += `\n  <div class="character-text didaskalia-text">\n`;
-                    htmlResult += `\n    <p data-index="${dataIndex++}" data-is-didaskalia="true">\n      ${didaskalia}\n    </p>`;
-                    htmlResult += `\n  </div>\n`;
-                    htmlResult += `\n </div>\n`;
-                  }
 
-                  // Remove didaskalia from original content
-                  clean = clean.replace(/<em>.*?<\/em>/g, "").trim();
+                    // Clean and check if next is didaskalia
+                    const nextClean = nextPContent.replace(/\s+/g, " ").trim();
+                    let nextCleanForCheck = nextClean;
+                    nextCleanForCheck = nextCleanForCheck.replace(/<span class="character-highlighted"[^>]*>([^<]*)<\/span>/g, "$1");
+                    nextCleanForCheck = nextCleanForCheck.replace(/<(?!em|\/em)[^>]*>/g, "");
 
-                  // If there's remaining content after removing didaskalia, process it
-                  if (clean) {
-                    // Continue processing the non-didaskalia content...
-                  } else {
-                    continue; // Skip if only didaskalia was in this paragraph
+                    const nextTextInEm = nextCleanForCheck.match(/<em>.*?<\/em>/g)?.join("") || "";
+                    const nextTextOutsideEm = nextCleanForCheck.replace(/<em>.*?<\/em>/g, "").trim();
+                    const nextIsDidaskaliaParagraph = nextTextInEm.length > 0 && (nextTextOutsideEm.length === 0 || nextTextInEm.length > nextTextOutsideEm.length * 2);
+
+                    if (nextIsDidaskaliaParagraph || /<em>.*?<\/em>/.test(nextClean)) {
+                      shouldCloseRow = false;
+                    }
                   }
                 }
               }
+
+              if (shouldCloseRow) {
+                htmlResult += `\n  </div>\n`;
+                htmlResult += `\n </div>\n`;
+              }
+              continue;
             }
+
+            // Check if this paragraph contains didaskalia that should stay within character dialogue
+            const hasDidaskaliaInDialogue = (/<em>.*?<\/em>/.test(clean) && !isDidaskaliaParagraph) || (isPureDidaskalia && currentCharacterContinues);
 
             // ── now handle dialogue paragraphs ──
             const characterPlaceholderSpans: string[] = [];
@@ -461,7 +459,7 @@ export const xmlToComplexHtml = (
   data-index="${dataIndex++}"
   data-text-alignment="${currentCharacterAlignment}"
   data-is-character="${isCharacter}"
-  data-is-didaskalia="false"
+  data-is-didaskalia="${hasDidaskaliaInDialogue ? "true" : "false"}"
 >\n      ${clean}\n    </p>`;
 
             if (isCharacter) {
