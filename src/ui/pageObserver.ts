@@ -1,5 +1,6 @@
 import { navigationEvents, getCurrentLocation, setCurrentLocation, isSystemNavigationInProgress } from "@/helpers/paragraphsNavigation";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { pageWasJustReloaded } from "@/utils/pageWasJustReloaded";
 
 const SHOULD_SHOW_EVERYONE = false;
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
@@ -731,7 +732,7 @@ export function setupPageObserver(
             // re-evaluation call after the initial scroll. In this case, we've
             // just landed where we want to be, so we should NOT update the hash
             // to avoid an unwanted jump (e.g., from 1-0 to 1-1).
-            if (isSystemNavigationInProgress()) {
+            if (pageWasJustReloaded() || isSystemNavigationInProgress()) {
               shouldUpdateHash = false;
             }
 
