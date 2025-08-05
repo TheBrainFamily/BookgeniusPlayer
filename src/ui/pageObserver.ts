@@ -1,4 +1,4 @@
-import { navigationEvents, getCurrentLocation, setCurrentLocation, isSystemNavigationInProgress } from "@/helpers/paragraphsNavigation";
+import { setCurrentLocation, isSystemNavigationInProgress } from "@/helpers/paragraphsNavigation";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
 import { pageWasJustReloaded } from "@/utils/pageWasJustReloaded";
 
@@ -804,35 +804,6 @@ export function setupPageObserver(
     processIntersections();
   }, observerOptions);
 
-  // Add a persistent scroll-end handler that will trigger re-evaluation
-  // after system navigation completes, ensuring UI state synchronization
-  const scrollEndHandler = () => {
-    setTimeout(() => {
-      // During system navigation, we want to preserve the target location
-      // and only update the character display, not recalculate the active paragraph
-      if (isSystemNavigationInProgress()) {
-        // System navigation just completed, but we shouldn't let the observer
-        // override the intended target location. Just trigger media activation
-        // for the current range without changing the location.
-        const currentLocation = getCurrentLocation();
-        if (currentLocation && currentLocation.currentChapter && currentLocation.currentParagraph != null) {
-          // Use a small range around the target to activate characters
-          const startChapter = currentLocation.chapter || currentLocation.currentChapter;
-          const startParagraph = Math.max(0, (currentLocation.paragraph != null ? currentLocation.paragraph : currentLocation.currentParagraph) - 1);
-          const endChapter = currentLocation.endChapter || currentLocation.currentChapter;
-          const endParagraph = (currentLocation.endParagraph != null ? currentLocation.endParagraph : currentLocation.currentParagraph) + 1;
-
-          activateMediaInRange(startChapter, startParagraph, endChapter, endParagraph, openCharacterDetailsModal);
-        }
-      } else {
-        // Normal scroll, full intersection processing
-        processIntersections();
-      }
-    }, 100); // Small delay to ensure DOM stability
-  };
-
-  navigationEvents.on("scroll-end", scrollEndHandler);
-
   // Function to observe new paragraphs
   const observeNewParagraphs = (): number => {
     const allParagraphs = document.querySelectorAll("section[data-chapter] [data-index]");
@@ -899,13 +870,6 @@ export function setupPageObserver(
       observedParagraphs.add(paragraph);
     });
 
-    return {
-      observer,
-      observeNewParagraphs,
-      cleanupRemovedParagraphs,
-      cleanup: () => {
-        navigationEvents.off("scroll-end", scrollEndHandler);
-      },
-    };
+    return { observer, observeNewParagraphs, cleanupRemovedParagraphs, cleanup: () => {} };
   }
 }

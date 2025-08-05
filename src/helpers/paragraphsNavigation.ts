@@ -16,37 +16,6 @@ export const isSystemNavigationInProgress = (): boolean => systemNavigationInPro
 import { DEFAULT_LOCATION, Location } from "@/state/LocationContext";
 
 /* ------------------------------------------------------------------ */
-/*  Event-driven navigation system                                   */
-type NavigationEventMap = { "scroll-end": () => void };
-
-type EventName = keyof NavigationEventMap;
-type Listener<K extends EventName> = NavigationEventMap[K];
-
-class NavigationEventEmitter {
-  private listeners: { [K in EventName]?: Listener<K>[] } = {};
-
-  on<K extends EventName>(event: K, callback: Listener<K>) {
-    if (!this.listeners[event]) {
-      this.listeners[event] = [];
-    }
-    this.listeners[event]!.push(callback);
-  }
-
-  off<K extends EventName>(event: K, callback: Listener<K>) {
-    if (!this.listeners[event]) return;
-    const index = this.listeners[event]!.indexOf(callback);
-    if (index > -1) {
-      this.listeners[event]!.splice(index, 1);
-    }
-  }
-
-  emit<K extends EventName>(event: K, ...args: Parameters<Listener<K>>) {
-    if (!this.listeners[event]) return;
-    this.listeners[event]!.forEach((callback) => (callback as (...args: unknown[]) => void)(...args));
-  }
-}
-
-export const navigationEvents = new NavigationEventEmitter();
 
 /* ------------------------------------------------------------------ */
 /*  Scroll completion detection helpers                              */
@@ -254,25 +223,13 @@ export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph
   // Update hash immediately for system navigation
   window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
 
-  // Listen for scroll completion
-  const handleScrollComplete = () => {
-    systemNavigationInProgress = false;
-    navigationEvents.off("scroll-end", handleScrollComplete);
-  };
-
-  navigationEvents.on("scroll-end", handleScrollComplete);
-
   const runGoToParagraph = () => {
     goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior: "instant" })
-      .then(() => {
-        // Emit scroll-end event when Promise resolves
-        navigationEvents.emit("scroll-end");
-      })
       .catch((error) => {
         console.error("Error during system navigation scroll:", error);
-        // Still end navigation state on error
+      })
+      .finally(() => {
         systemNavigationInProgress = false;
-        navigationEvents.off("scroll-end", handleScrollComplete);
       });
   };
 
