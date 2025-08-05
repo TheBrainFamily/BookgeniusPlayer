@@ -1,18 +1,8 @@
 import { getBackgrounds } from "./getBackgrounds";
+import debounce from "lodash.debounce";
+
 import { getBookAssetBaseUrl } from "@/utils/assetUrls";
 export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number };
-
-// ---- generic debounce -------------------------------------------------------
-function debounce<T extends (...args: unknown[]) => void>(fn: T, wait: number): (...args: Parameters<T>) => void {
-  let t: number | null = null;
-  return (...args: Parameters<T>) => {
-    if (t !== null) clearTimeout(t);
-    t = window.setTimeout(() => {
-      t = null;
-      fn(...args);
-    }, wait);
-  };
-}
 
 // ---- globals ----------------------------------------------------------------
 let debouncedHandler: ((currentLocation: { currentChapter: number; currentParagraph: number }) => void) | null = null;
@@ -22,6 +12,7 @@ enum TransitionState {
   Preparing = "prep", // loading / first-frame wait
   Fading = "fade", // CSS cross-fade running
 }
+
 let transitionState: TransitionState = TransitionState.Idle;
 
 // ---- helper -----------------------------------------------------------------
