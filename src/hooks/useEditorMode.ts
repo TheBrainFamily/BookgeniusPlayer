@@ -13,6 +13,10 @@ export function useEditorMode(container: HTMLElement | null) {
   const mKeyPressed = useRef(false);
   const bKeyPressed = useRef(false);
 
+  // Get the current book name from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const bookName = urlParams.get("book");
+
   useEffect(() => {
     if (!container) return;
 
@@ -33,7 +37,7 @@ export function useEditorMode(container: HTMLElement | null) {
         }
 
         if (event.metaKey && !event.altKey) {
-          return handleEditParagraph(chapterNumber, paragraphNumber);
+          return handleEditParagraph(chapterNumber, paragraphNumber, bookName);
         }
 
         if (mKeyPressed.current) {

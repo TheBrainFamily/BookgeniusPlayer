@@ -38,7 +38,9 @@ export class SSEController {
     const pingInterval = setInterval(() => {
       try {
         res.write(":ping\n\n");
-      } catch {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        console.log(`[SSE] Ping failed for client ${clientId}, cleaning up`);
         clearInterval(pingInterval);
         bookWatcherService.removeClient(clientId);
       }
@@ -46,7 +48,15 @@ export class SSEController {
 
     // Clean up ping interval on disconnect
     req.on("close", () => {
+      console.log(`[SSE] Client ${clientId} connection closed`);
       clearInterval(pingInterval);
+    });
+
+    // Handle connection errors
+    req.on("error", (error) => {
+      console.error(`[SSE] Connection error for client ${clientId}:`, error);
+      clearInterval(pingInterval);
+      bookWatcherService.removeClient(clientId);
     });
   };
 }
