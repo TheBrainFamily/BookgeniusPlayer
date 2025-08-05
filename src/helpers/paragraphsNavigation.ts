@@ -14,6 +14,7 @@ export const isSystemNavigationInProgress = (): boolean => systemNavigationInPro
 
 /* ------------------------------------------------------------------ */
 import { DEFAULT_LOCATION, Location } from "@/state/LocationContext";
+import debounce from "lodash.debounce";
 
 /* ------------------------------------------------------------------ */
 
@@ -336,19 +337,6 @@ export const shouldShowReturnButton = (): boolean => {
 
 /* ------------------------------------------------------------------ */
 /*  Handle Resize/Orientation Changes                                 */
-
-// Debounce function
-function debounce<T extends (...args: Parameters<T>) => void>(func: T, wait: number): (...args: Parameters<T>) => void {
-  let timeout: ReturnType<typeof setTimeout> | null;
-  return (...args: Parameters<T>) => {
-    const later = () => {
-      timeout = null;
-      func(...args);
-    };
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
 
 // Event handler
 const handleResizeOrOrientationChange = debounce(() => {
