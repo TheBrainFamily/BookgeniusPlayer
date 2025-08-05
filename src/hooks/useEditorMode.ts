@@ -1,15 +1,17 @@
 import { useEffect, useRef } from "react";
 import { handleAddCharacter } from "@/text-editor-service/listeners/handleAddCharacter";
-import { handleEditParagraph } from "@/text-editor-service/listeners/handleEditParagraph";
+// import { handleEditParagraph } from "@/text-editor-service/listeners/handleEditParagraph";
 import { handleAddMusicSuggestion } from "@/text-editor-service/listeners/handleAddMusicSuggestion";
 import { handleRemoveCharacter } from "@/text-editor-service/listeners/handleRemoveCharacter";
 import { handleRemoveMusicSuggestion } from "@/text-editor-service/listeners/handleRemoveMusicSuggestion";
 import { handleRemoveBackgroundSuggestion } from "@/text-editor-service/listeners/handleRemoveBackgroundSuggestion";
 import { handleAddBackgroundSuggestion } from "@/text-editor-service/listeners/handleAddBackgroundSuggestion";
 import { useEditorModeModal } from "@/stores/modals/editorModeModal.store";
+import { WindowManager } from "@/utils/WindowManager";
 
 export function useEditorMode(container: HTMLElement | null) {
   const { openModal } = useEditorModeModal();
+  const windowManager = new WindowManager();
   const mKeyPressed = useRef(false);
   const bKeyPressed = useRef(false);
 
@@ -37,7 +39,14 @@ export function useEditorMode(container: HTMLElement | null) {
         }
 
         if (event.metaKey && !event.altKey) {
-          return handleEditParagraph(chapterNumber, paragraphNumber, bookName);
+          windowManager.openOrUpdateApp(bookName, chapterNumber);
+          // const popup = window.open(`http://localhost:5174/?book=${bookName}&chapter=chapter${chapterNumber}.xml`);
+          //
+          // if (popup) {
+          //   popup.focus();
+          // }
+          // return handleEditParagraph(chapterNumber, paragraphNumber, bookName);
+          // return popup;
         }
 
         if (mKeyPressed.current) {
