@@ -186,19 +186,21 @@
       }
 
       .play-container > section {
-        width: clamp(85%, 90vw, 95%);
+        width: 100%;
+        max-width: 800px;
         margin-left: auto;
         margin-right: auto;
         margin-top: clamp(2em, 8vh, 5em);
-        padding: 0 clamp(0.5rem, 2vw, 1rem);
+        padding: 0;
 
         .play-row {
           display: flex;
           align-items: flex-start;
           position: relative;
           width: 100%;
-          max-width: min(100%, 80rem);
+          max-width: 100%;
           margin: 0 auto clamp(1.5em, 4vh, 2.5em);
+          padding: 0 clamp(1rem, 3vw, 2rem);
           gap: clamp(0.5rem, 2vw, 1.5rem);
         }
 
@@ -400,11 +402,11 @@
         }
 
         .play-row[data-text-alignment="left"] .character-avatar {
-          transform: translateX(-25%);
+          transform: translateX(-20%);
         }
 
         .play-row[data-text-alignment="right"] .character-avatar {
-          transform: translateX(25%) rotateY(180deg);
+          transform: translateX(20%) rotateY(180deg);
         }
 
         span.inline-avatar-wrapper > div {
@@ -443,7 +445,7 @@
           /* padding: 0 clamp(0.75rem, 3vw, 1.5rem); */
           padding: 0;
           text-align: left;
-          max-width: clamp(85%, 90vw, 75%);
+          max-width: 100%;
           margin: 0;
           text-indent: 0;
         }
@@ -452,7 +454,7 @@
           /* padding: 0 clamp(0.75rem, 3vw, 1.5rem); */
           padding: 0;
           text-align: right;
-          max-width: clamp(85%, 90vw, 75%);
+          max-width: 100%;
           margin: 0;
           text-indent: 0;
           margin-left: auto;
@@ -530,12 +532,14 @@
       /* Small mobile phones - portrait */
       @media screen and (max-width: 430px) and (orientation: portrait) {
         .play-container > section {
-          width: 95%;
-          padding: 0 0.5rem;
+          width: 100%;
+          max-width: 800px;
+          padding: 0;
 
           .play-row {
             gap: clamp(0.25rem, 1vw, 0.75rem);
             margin-bottom: clamp(1em, 3vh, 2em);
+            padding: 0 clamp(0.5rem, 2vw, 1rem);
           }
 
           .character-avatar {
@@ -562,8 +566,8 @@
 
           p[data-text-alignment="left"]:not(:has(em)),
           p[data-text-alignment="right"]:not(:has(em)) {
-            max-width: 90%;
-            padding: 0 clamp(0.5rem, 2vw, 1rem);
+            max-width: 100%;
+            padding: 0;
           }
         }
 
@@ -582,10 +586,13 @@
       @media screen and (max-width: 768px) and (orientation: portrait) {
         .play-container > section {
           /* width: 90%; */
+          width: 100%;
+          max-width: 800px;
 
           .play-row {
             gap: clamp(0.5rem, 2vw, 1rem);
             margin-bottom: clamp(1.5em, 3vh, 2em);
+            padding: 0 clamp(0.75rem, 2.5vw, 1.5rem);
           }
 
           .character-avatar {
@@ -607,11 +614,11 @@
           }
 
           .play-row[data-text-alignment="left"] .character-avatar {
-            transform: translateX(-25%);
+            transform: translateX(-20%);
           }
 
           .play-row[data-text-alignment="right"] .character-avatar {
-            transform: translateX(25%) rotateY(180deg);
+            transform: translateX(20%) rotateY(180deg);
           }
 
           .character-text {
@@ -621,8 +628,8 @@
 
           p[data-text-alignment="left"]:not(:has(em)),
           p[data-text-alignment="right"]:not(:has(em)) {
-            max-width: 85%;
-            padding: 0 clamp(0.75rem, 2vw, 1rem);
+            max-width: 100%;
+            padding: 0;
           }
         }
       }
@@ -630,7 +637,8 @@
       /* Large mobile and small tablets - portrait */
       @media screen and (max-width: 1024px) and (orientation: portrait) {
         .play-container > section {
-          /* width: 85%; */
+          width: 100%;
+          max-width: 800px;
 
           .character-avatar {
             width: clamp(80px, 15vw, 100px);
@@ -641,12 +649,14 @@
       /* Small mobile devices - landscape */
       @media screen and (max-width: 768px) and (orientation: landscape) {
         .play-container > section {
-          /* width: 95%; */
+          width: 100%;
+          max-width: 800px;
           margin-top: clamp(1em, 3vh, 2em);
 
           .play-row {
             margin-bottom: clamp(1em, 2vh, 1.5em);
             gap: clamp(0.5rem, 1.5vw, 1rem);
+            padding: 0 clamp(0.5rem, 2vw, 1rem);
           }
 
           .character-avatar {
@@ -669,11 +679,11 @@
           }
 
           .play-row[data-text-alignment="left"] .character-avatar {
-            transform: translateX(-25%);
+            transform: translateX(-20%);
           }
 
           .play-row[data-text-alignment="right"] .character-avatar {
-            transform: translateX(25%) rotateY(180deg);
+            transform: translateX(20%) rotateY(180deg);
           }
 
           p {
@@ -686,7 +696,8 @@
       /* Medium devices - landscape (769px-1024px) */
       @media screen and (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
         .play-container > section {
-          width: 85%;
+          width: 100%;
+          max-width: 800px;
           margin-top: clamp(1.5em, 4vh, 3em);
 
           .play-row {
@@ -708,11 +719,11 @@
       /* Ultra-wide screens */
       @media screen and (min-width: 1400px) {
         .play-container > section {
-          width: 70%;
-          max-width: 100rem;
+          width: 100%;
+          max-width: 800px;
 
           .play-row {
-            max-width: 80rem;
+            max-width: 100%;
           }
         }
       }
@@ -720,11 +731,11 @@
       /* Desktop and large tablets - proper alignment for 1024px-1400px */
       @media screen and (min-width: 1024px) and (max-width: 1399px) {
         .play-container > section {
-          width: 75%;
-          max-width: 85rem;
+          width: 100%;
+          max-width: 800px;
 
           .play-row {
-            max-width: 70rem;
+            max-width: 100%;
             gap: clamp(1rem, 2.5vw, 2rem);
           }
 
@@ -756,16 +767,11 @@
           }
 
           .play-row[data-text-alignment="left"] .character-avatar {
-            transform: translateX(-25%);
+            transform: translateX(-20%);
           }
 
           .play-row[data-text-alignment="right"] .character-avatar {
-            transform: translateX(25%) rotateY(180deg);
-          }
-
-          .character-text {
-            padding-left: clamp(0.75rem, 2vw, 1.25rem);
-            padding-right: clamp(0.75rem, 2vw, 1.25rem);
+            transform: translateX(20%) rotateY(180deg);
           }
 
           p {
@@ -778,7 +784,7 @@
       /* Medium tablets - balanced layout for 768px-1024px */
       @media screen and (min-width: 768px) and (max-width: 1023px) {
         .play-container > section {
-          width: 80%;
+          width: 100%;
 
           .play-row {
             gap: clamp(0.75rem, 2vw, 1.5rem);
@@ -803,11 +809,11 @@
           }
 
           .play-row[data-text-alignment="left"] .character-avatar {
-            transform: translateX(-25%);
+            transform: translateX(-20%);
           }
 
           .play-row[data-text-alignment="right"] .character-avatar {
-            transform: translateX(25%) rotateY(180deg);
+            transform: translateX(20%) rotateY(180deg);
           }
         }
       }
@@ -1028,31 +1034,45 @@
   }
 
   #content-container:has(.play-container) {
-    min-width: 750px;
-    background-size: clamp(50%, 60%, 70%) 100%;
+    min-width: 800px;
+    width: 100%;
+    background-size: clamp(28%, 42%, 52%) 100%;
     background-position: center;
     background-repeat: no-repeat;
 
     mask-image: linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 20%, rgba(0 0 0 / 1) 30%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 70%, transparent 100%);
   }
 
-  /* @media screen and (min-width: 768px) {
+  /* Responsive mask adjustments for optimal avatar integration */
+  @media screen and (max-width: 430px) {
     #content-container:has(.play-container) {
-      width: 85%;
+      background-size: 32% 100%;
     }
   }
 
-  @media screen and (min-width: 1024px) {
+  @media screen and (min-width: 431px) and (max-width: 767px) {
     #content-container:has(.play-container) {
-      width: 75%;
+      background-size: 38% 100%;
     }
   }
 
-  @media screen and (min-width: 1280px) {
+  @media screen and (min-width: 768px) and (max-width: 1023px) {
     #content-container:has(.play-container) {
-      width: 70%;
+      background-size: 60% 100%;
     }
-  } */
+  }
+
+  @media screen and (min-width: 1024px) and (max-width: 1399px) {
+    #content-container:has(.play-container) {
+      background-size: 48% 100%;
+    }
+  }
+
+  @media screen and (min-width: 1400px) {
+    #content-container:has(.play-container) {
+      background-size: 35% 100%;
+    }
+  }
 
   /* Add padding bottom when horizontal character strip is visible */
   &.characters-visible #content-container {
@@ -1628,6 +1648,8 @@ section[data-chapter] [data-index] {
 /* Touch-friendly improvements */
 @media (hover: none) and (pointer: coarse) {
   .play-container > section {
+    max-width: 800px;
+
     .character-avatar {
       /* Increase touch target size */
       .inline-avatar {
@@ -1651,7 +1673,8 @@ section[data-chapter] [data-index] {
 /* Ultra-small devices (320px and below) */
 @media screen and (max-width: 320px) {
   .play-container > section {
-    width: 98%;
+    width: 100%;
+    max-width: 800px;
     padding: 0 0.25rem;
 
     .play-row {
@@ -1698,6 +1721,8 @@ section[data-chapter] [data-index] {
 /* Accessibility - Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   .play-container > section {
+    max-width: 800px;
+
     .character-avatar {
       .inline-avatar {
         transition: none;
@@ -1717,6 +1742,8 @@ section[data-chapter] [data-index] {
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .play-container > section {
+    max-width: 800px;
+
     .character-avatar .inline-avatar {
       border-width: clamp(3px, 0.5vw, 5px) !important;
       border-color: rgba(0, 0, 0, 1) !important;
@@ -1727,7 +1754,8 @@ section[data-chapter] [data-index] {
 /* Medium-sized mobile phones - portrait (430px-768px) */
 @media screen and (min-width: 431px) and (max-width: 767px) and (orientation: portrait) {
   .play-container > section {
-    width: 87%;
+    width: 100%;
+    max-width: 800px;
 
     .play-row {
       gap: clamp(0.75rem, 2.5vw, 1.25rem);
