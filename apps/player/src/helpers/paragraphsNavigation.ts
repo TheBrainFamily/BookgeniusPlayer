@@ -141,14 +141,22 @@ const waitForElementStablePosition = (element: HTMLElement, options: { timeout?:
     let stableTime = 0;
     let checkTimeout: number | null = null;
 
-    const cleanup = () => {
+    const resolveAndCleanup = () => {
+      clearTimeout(overallTimeout);
       if (checkTimeout) clearTimeout(checkTimeout);
+      resolve();
     };
+
+    // Overall timeout for the whole operation
+    const overallTimeout = window.setTimeout(() => {
+      console.warn("waitForElementStablePosition timed out waiting for element to stabilize.");
+      if (checkTimeout) clearTimeout(checkTimeout);
+      resolve();
+    }, timeout);
 
     const check = () => {
       if (!element || !document.body.contains(element)) {
-        cleanup();
-        resolve(); // Element removed from DOM, stop waiting
+        resolveAndCleanup(); // Element removed from DOM, stop waiting
         return;
       }
       const currentRect = element.getBoundingClientRect();
@@ -162,28 +170,13 @@ const waitForElementStablePosition = (element: HTMLElement, options: { timeout?:
       lastRect = currentRect;
 
       if (stableTime >= stableThreshold) {
-        cleanup();
-        resolve();
+        resolveAndCleanup();
       } else {
         checkTimeout = window.setTimeout(check, interval);
       }
     };
 
-    // Overall timeout for the whole operation
-    const overallTimeout = window.setTimeout(() => {
-      console.warn("waitForElementStablePosition timed out waiting for element to stabilize.");
-      cleanup();
-      resolve();
-    }, timeout);
-
     check();
-
-    // Make sure to clear the overall timeout if we resolve early
-    const originalResolve = resolve;
-    resolve = () => {
-      clearTimeout(overallTimeout);
-      originalResolve();
-    };
   });
 };
 
