@@ -873,6 +873,6 @@ export function setupPageObserver(
       observedParagraphs.add(paragraph);
     });
 
-    return { observer, observeNewParagraphs, cleanupRemovedParagraphs, cleanup: () => {} };
+    return { observer, observeNewParagraphs, cleanupRemovedParagraphs, cleanup: () => observer.disconnect() };
   }
 }
