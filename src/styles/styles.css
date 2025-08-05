@@ -1040,7 +1040,17 @@
     background-position: center;
     background-repeat: no-repeat;
 
-    mask-image: linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 20%, rgba(0 0 0 / 1) 30%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 70%, transparent 100%);
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 15%,
+      rgba(0 0 0 / 0.05) 20%,
+      rgba(0 0 0 / 1) 30%,
+      rgba(0 0 0 / 1) 55%,
+      rgba(0 0 0 / 0.05) 75%,
+      transparent 80%,
+      transparent 100%
+    );
   }
 
   /* Responsive mask adjustments for optimal avatar integration */
