@@ -33,7 +33,9 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
     //TODO: fix this to get the value directly from bottom input hook or so
     const query = document.querySelector("#bottom-input").getAttribute("value");
     // Update location with 'system' source to trigger scrolling
-    goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "smooth" });
+    goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "smooth" }).catch((error) =>
+      console.warn("Failed to scroll during resize/orientation change:", error),
+    );
     highlightSearchInParagraph(item.chapter, item.paragraphNumber, query);
   }, []);
 
