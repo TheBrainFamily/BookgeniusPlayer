@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import useLocalStorageState from "use-local-storage-state";
 
 import { LocationProvider } from "./state/LocationContext";
@@ -29,10 +29,8 @@ import { getKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles"
 import { useQuiz } from "./hooks/useQuiz";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
 import ProgressBars from "@/components/ProgressBars";
-import { AppInitializer } from "./components/AppInitializer";
-import { BookDataProvider } from "./context/BookDataContext";
 
-function Shell() {
+function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   setKnownVideos(getKnownVideoFiles());
   useBookContent("content-container");
   useElementVisibility();
@@ -50,6 +48,10 @@ function Shell() {
   /* dynamic audio hooks */
   useBackgroundSongs();
   useAudiobookTracks();
+
+  useEffect(() => {
+    onShellMounted();
+  }, []);
 
   return (
     <>
@@ -71,9 +73,12 @@ export default function App() {
 
   const [fontSize] = useLocalStorageState("fontSize", { defaultValue: 1 });
 
+  const [reactDomReady, setReactDomReady] = useState(false);
+
   useEffect(() => {
+    if (!reactDomReady) return;
     runLegacyInit();
-  }, []);
+  }, [reactDomReady]);
 
   useEffect(() => {
     if (!splashHidden) return;
@@ -93,19 +98,15 @@ export default function App() {
   }, [fontSize]);
 
   return (
-    <AppInitializer>
-      <BookDataProvider>
-        <LocationProvider>
-          <RealtimeProvider>
-            <WebSocketProvider>
-              <BookContentWrapper>
-                <Shell />
-                <ModalRenderers />
-              </BookContentWrapper>
-            </WebSocketProvider>
-          </RealtimeProvider>
-        </LocationProvider>
-      </BookDataProvider>
-    </AppInitializer>
+    <LocationProvider>
+      <RealtimeProvider>
+        <WebSocketProvider>
+          <BookContentWrapper>
+            <Shell onShellMounted={() => setReactDomReady(true)} />
+            <ModalRenderers />
+          </BookContentWrapper>
+        </WebSocketProvider>
+      </RealtimeProvider>
+    </LocationProvider>
   );
 }
