@@ -93,7 +93,6 @@ function stringalign(ainstr, binstr, mispen, gappen, skwpen) {
   //   }
   //   table += "</tr>";
   // }
-  // console.log("PINGWING: 97 table", table);
   // $("#mat").html(table);
   // $("#newA").html(aout.join("").replace(/ /g, "&nbsp;"));
   // $("#newB").html(bout.join("").replace(/ /g, "&nbsp;"));
