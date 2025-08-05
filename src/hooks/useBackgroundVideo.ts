@@ -2,7 +2,6 @@ import { useEffect } from "react";
 
 import { useLocation } from "@/state/LocationContext";
 import { dealWithBackground as impl } from "@/ui/background";
-import { useDebounce } from "@/hooks/useDebounce";
 
 const implRef = { current: impl };
 
@@ -15,9 +14,9 @@ if (import.meta.hot) {
 
 export function useBackgroundVideo() {
   const { location } = useLocation();
-  const { currentChapter, currentParagraph } = useDebounce(location, 300);
 
+  const { currentChapter, currentParagraph } = location;
   useEffect(() => {
-    implRef.current({ currentChapter, currentParagraph });
+    implRef.current(location);
   }, [currentChapter, currentParagraph]);
 }

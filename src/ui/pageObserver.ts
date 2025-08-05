@@ -440,6 +440,9 @@ export function setupPageObserver(
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
+      if (entry.target.classList.contains("transition-spacer")) {
+        return;
+      }
       if (entry.isIntersecting) {
         intersectingPages.add(entry.target);
       } else {
@@ -854,6 +857,72 @@ export function setupPageObserver(
 
   // Initial observation
   const paragraphsToObserve = document.querySelectorAll("section[data-chapter] [data-index]");
+
+  console.log("spacerObserver", paragraphsToObserve);
+  const spacerObserver = new IntersectionObserver(
+    (entries) => {
+      console.log("spacerObserver entries", entries);
+      entries.forEach((entry) => {
+        const contentContainer = document.getElementById("content-container");
+        if (!contentContainer) return;
+
+        const rect = entry.boundingClientRect;
+
+        // Calculate how much of the spacer is visible
+        const visibleTop = Math.max(0, rect.top);
+        const visibleBottom = Math.min(window.innerHeight, rect.bottom);
+        const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+        const visibilityPercent = visibleHeight / rect.height;
+
+        // Determine if spacer is entering from bottom or leaving from top
+
+        if (entry.isIntersecting) {
+          // Spacer is at least partially visible
+          if (rect.top >= 0) {
+            // Spacer is entering from bottom or fully in view
+            if (visibilityPercent <= 0.5) {
+              // 0-50% visible: keep full opacity
+              contentContainer.style.opacity = "1";
+            } else if (visibilityPercent < 1) {
+              // 50-99% visible: fade from 1 to 0
+              const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
+              console.log(`[PageObserver] Spacer is entering from bottom or fully in view. Next chapter start: ${nextChapterStart}`);
+              setCurrentLocation({
+                chapter: parseInt(nextChapterStart, 10),
+                paragraph: 0,
+                endChapter: parseInt(nextChapterStart, 10),
+                endParagraph: 0,
+                currentChapter: parseInt(nextChapterStart, 10),
+                currentParagraph: 0,
+              });
+              const fadePercent = (visibilityPercent - 0.5) * 2;
+              contentContainer.style.opacity = (1 - fadePercent).toString();
+            } else {
+              // 100% visible: full transparency
+              contentContainer.style.opacity = "0";
+            }
+          } else {
+            // Spacer is leaving from top (rect.top < 0)
+            if (visibilityPercent >= 0.6) {
+              // Still 50% or more visible: keep at 0
+              contentContainer.style.opacity = "0";
+            } else {
+              contentContainer.style.opacity = "1";
+            }
+          }
+        } else {
+          // Spacer is completely out of view
+          contentContainer.style.opacity = "1";
+        }
+      });
+    },
+    { threshold: Array.from(Array(101).keys()).map((i) => i / 100) },
+  );
+
+  document.querySelectorAll(".transition-spacer").forEach((spacer) => {
+    spacerObserver.observe(spacer);
+  });
+
   if (paragraphsToObserve.length === 0) {
     console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
     return null;

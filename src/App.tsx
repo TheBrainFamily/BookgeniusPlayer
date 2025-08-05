@@ -29,6 +29,7 @@ import { getKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles"
 import { useQuiz } from "./hooks/useQuiz";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
 import ProgressBars from "@/components/ProgressBars";
+import { usePlayCharacterSelect } from "./hooks/usePlayCharacterSelect";
 
 function Shell() {
   setKnownVideos(getKnownVideoFiles());
@@ -48,6 +49,7 @@ function Shell() {
   /* dynamic audio hooks */
   useBackgroundSongs();
   useAudiobookTracks();
+  usePlayCharacterSelect();
 
   return (
     <>
