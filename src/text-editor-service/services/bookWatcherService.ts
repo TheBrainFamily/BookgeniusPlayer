@@ -202,16 +202,25 @@ class BookWatcherService {
         });
       }, 2000); // Wait 2 seconds
 
-      // Trigger the external application on port 5174
-      await this.openExternalApp();
+      // Trigger the external application on port 5174 with book and chapter params
+      await this.openExternalApp(chapterNumber, bookName);
     } catch (error) {
       console.error("[External App] Failed to trigger external app:", error);
     }
   }
 
-  private async openExternalApp(): Promise<void> {
+  private async openExternalApp(chapterNumber?: number, bookName?: string): Promise<void> {
     try {
-      const editorUrl = "http://localhost:5174";
+      // Build URL with book and chapter parameters
+      const params = new URLSearchParams();
+      if (bookName) {
+        params.set("book", bookName);
+      }
+      if (chapterNumber) {
+        params.set("chapter", `chapter${chapterNumber}.xml`);
+      }
+
+      const editorUrl = `http://localhost:5174${params.toString() ? "?" + params.toString() : ""}`;
 
       console.log(`[External App] Attempting to focus existing tab or open new one: ${editorUrl}`);
 
@@ -313,7 +322,7 @@ end tell`;
       }
     } catch (error) {
       console.error("[External App] Error opening external application:", error);
-      console.log("[External App] Please manually open: http://localhost:5174");
+      console.log(`[External App] Please manually open: ${editorUrl}`);
     }
   }
 
@@ -352,7 +361,7 @@ end tell`;
 
     child.on("error", (error) => {
       console.error("[External App] Failed to spawn command:", error);
-      console.log("[External App] Please manually open: http://localhost:5174");
+      console.log(`[External App] Please manually open: ${url}`);
     });
 
     child.on("exit", (code) => {
