@@ -330,7 +330,11 @@ export const goToParagraph = (loc: { currentChapter: number; currentParagraph: n
 
     let additionalOffset = 0;
     if (containerScrollPosition === 0) {
-      additionalOffset = goToParagraphPositionTop / 19; // based on experiments
+      // This offset is an empirical value to correct initial scroll position when the scroll container is at the top.
+      // It helps to account for layout factors that are not yet stable on initial load, ensuring the target paragraph
+      // lands correctly in the focus zone.
+      const INITIAL_SCROLL_CORRECTION_FACTOR = 19;
+      additionalOffset = goToParagraphPositionTop / INITIAL_SCROLL_CORRECTION_FACTOR;
     }
 
     // Calculate the scroll position needed to align the element's top with the focus zone's top.
