@@ -15,7 +15,7 @@ export function useCurrentSpeakers(location: Location, allCharacters: CharacterD
   const debouncedLocation = useDebounce(location, 50);
 
   return useMemo(() => {
-    if (!debouncedLocation.currentChapter || !debouncedLocation.currentParagraph) {
+    if (debouncedLocation.currentChapter == null || debouncedLocation.currentParagraph == null) {
       return [];
     }
 

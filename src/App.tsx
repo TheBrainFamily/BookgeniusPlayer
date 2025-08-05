@@ -48,6 +48,7 @@ function Shell() {
   /* dynamic audio hooks */
   useBackgroundSongs();
   useAudiobookTracks();
+  // usePlayCharacterSelect();
 
   return (
     <>
