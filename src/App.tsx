@@ -29,6 +29,8 @@ import { getKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles"
 import { useQuiz } from "./hooks/useQuiz";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
 import ProgressBars from "@/components/ProgressBars";
+import { AppInitializer } from "@/components/AppInitializer";
+import { BookDataProvider } from "@/context/BookDataContext";
 
 function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   setKnownVideos(getKnownVideoFiles());
@@ -98,15 +100,19 @@ export default function App() {
   }, [fontSize]);
 
   return (
-    <LocationProvider>
-      <RealtimeProvider>
-        <WebSocketProvider>
-          <BookContentWrapper>
-            <Shell onShellMounted={() => setReactDomReady(true)} />
-            <ModalRenderers />
-          </BookContentWrapper>
-        </WebSocketProvider>
-      </RealtimeProvider>
-    </LocationProvider>
+    <AppInitializer>
+      <BookDataProvider>
+        <LocationProvider>
+          <RealtimeProvider>
+            <WebSocketProvider>
+              <BookContentWrapper>
+                <Shell onShellMounted={() => setReactDomReady(true)} />
+                <ModalRenderers />
+              </BookContentWrapper>
+            </WebSocketProvider>
+          </RealtimeProvider>
+        </LocationProvider>
+      </BookDataProvider>
+    </AppInitializer>
   );
 }
