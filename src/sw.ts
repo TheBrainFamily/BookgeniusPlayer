@@ -1,6 +1,8 @@
 /// <reference lib="webworker" />
 import { precacheAndRoute } from "workbox-precaching";
 import { clientsClaim } from "workbox-core";
+import { registerRoute } from "workbox-routing";
+import { NetworkOnly } from "workbox-strategies";
 
 declare const self: ServiceWorkerGlobalScope & { __WB_MANIFEST: Array<{ url: string; revision: string | null }> };
 
@@ -36,3 +38,5 @@ self.addEventListener("activate", (event) => {
     })(),
   );
 });
+
+registerRoute(({ request }) => request.mode === "navigate", new NetworkOnly());
