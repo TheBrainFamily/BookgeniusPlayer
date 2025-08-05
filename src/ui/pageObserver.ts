@@ -1,6 +1,7 @@
 import { setCurrentLocation, isSystemNavigationInProgress } from "@/helpers/paragraphsNavigation";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
 import { pageWasJustReloaded } from "@/utils/pageWasJustReloaded";
+import debounce from "lodash.debounce";
 
 const SHOULD_SHOW_EVERYONE = false;
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
@@ -791,6 +792,8 @@ export function setupPageObserver(
     }
   };
 
+  const debouncedProcessIntersections = debounce(processIntersections, 50);
+
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -801,7 +804,7 @@ export function setupPageObserver(
       }
     });
 
-    processIntersections();
+    debouncedProcessIntersections();
   }, observerOptions);
 
   // Function to observe new paragraphs
