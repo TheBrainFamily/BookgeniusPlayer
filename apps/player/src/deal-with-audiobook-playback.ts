@@ -111,14 +111,12 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
               return {
                 timestamp: section["clip-end"],
                 callback: () => {
-                  // console.log("PINGWING: 112 sectionToApply.file, 0, sectionToApply[clip-begin]", section.file, 0, section["clip-begin"]);
                   const currentChapter = sectionsToApply[index].chapter;
                   const nextSection = sectionsToApply[index + 1];
                   const nextSectionChapter = nextSection.chapter;
                   const nextElementSelector = `section[data-chapter='${nextSectionChapter}'] [data-index='${nextSection.paragraph}']`;
                   const nextElement = document.querySelector(nextElementSelector);
 
-                  // console.log("PINGWING: 112 nextElementSelector", nextElementSelector);
                   if (currentChapter === nextSectionChapter) {
                     isProcessingAudiobookTracks = true;
                     setTimeout(() => {
