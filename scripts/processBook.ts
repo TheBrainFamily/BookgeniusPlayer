@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { generateBook } from "./generateBook";
 import { compileToJsForBook } from "./compileBookData";
+import { buildBookFromContent } from "./buildBookFromContent";
 
 const PUBLIC_DIR = path.join(__dirname, "..", "public", "books");
 
@@ -19,6 +20,12 @@ export async function processBook(bookPath: string) {
   console.log("bookPublicPath", bookPublicPath);
 
   try {
+    // Step 0: Build book.xml from booksContent if it exists
+    console.log(`0️⃣  Building book.xml from booksContent for ${bookName}...`);
+    console.time("build-book-from-content");
+    buildBookFromContent(bookSourcePath);
+    console.timeEnd("build-book-from-content");
+
     // Step 1: Run generate-book script
     console.log(`1️⃣  Running generate-book for ${bookName}...`);
     console.time("removeDirectory");

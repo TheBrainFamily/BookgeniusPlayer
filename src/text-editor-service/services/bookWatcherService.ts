@@ -54,23 +54,23 @@ class BookWatcherService {
   }
 
   private startWatching(book: string): void {
-    const bookPath = path.join(process.cwd(), "public_books", book, "book.xml");
-    console.log(`[File Watcher] Starting to watch: ${bookPath}`);
+    const booksContentPath = path.join(process.cwd(), "public_books", book, "booksContent");
+    console.log(`[File Watcher] Starting to watch: ${booksContentPath}`);
 
-    // Check if file exists before watching
+    // Check if directory exists before watching
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const fs = require("fs");
-      if (!fs.existsSync(bookPath)) {
-        console.error(`[File Watcher] Book file does not exist: ${bookPath}`);
+      if (!fs.existsSync(booksContentPath)) {
+        console.error(`[File Watcher] booksContent directory does not exist: ${booksContentPath}`);
         return;
       }
     } catch (error) {
-      console.error(`[File Watcher] Error checking file existence: ${bookPath}`, error);
+      console.error(`[File Watcher] Error checking directory existence: ${booksContentPath}`, error);
       return;
     }
 
-    const watcher = chokidar.watch(bookPath, {
+    const watcher = chokidar.watch(booksContentPath, {
       persistent: true,
       ignoreInitial: true,
       awaitWriteFinish: { stabilityThreshold: 1000, pollInterval: 100 },
@@ -79,9 +79,19 @@ class BookWatcherService {
       atomic: true,
     });
 
-    watcher.on("change", () => {
-      console.log(`[File Watcher] Detected change in ${book}/book.xml`);
-      this.handleBookChange(book);
+    watcher.on("change", async (changedPath) => {
+      console.log(`[File Watcher] Detected change in ${changedPath}`);
+      await this.handleBookChange(book);
+    });
+
+    watcher.on("add", async (addedPath) => {
+      console.log(`[File Watcher] Detected new file: ${addedPath}`);
+      await this.handleBookChange(book);
+    });
+
+    watcher.on("unlink", async (removedPath) => {
+      console.log(`[File Watcher] Detected file removal: ${removedPath}`);
+      await this.handleBookChange(book);
     });
 
     watcher.on("error", (error) => {
@@ -90,7 +100,7 @@ class BookWatcherService {
     });
 
     watcher.on("ready", () => {
-      console.log(`[File Watcher] Ready to watch: ${bookPath}`);
+      console.log(`[File Watcher] Ready to watch: ${booksContentPath}`);
     });
 
     this.watchers.set(book, watcher);

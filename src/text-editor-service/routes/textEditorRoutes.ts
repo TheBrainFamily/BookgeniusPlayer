@@ -6,6 +6,8 @@ const router = Router();
 const textEditorController = new TextEditorController();
 const sseController = new SSEController();
 
+router.post("/save-file", textEditorController.saveFile);
+
 router.post("/edit-paragraph", textEditorController.editParagraph);
 
 router.post("/remove-character", textEditorController.removeCharacter);
