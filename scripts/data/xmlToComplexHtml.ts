@@ -337,7 +337,7 @@ export const xmlToComplexHtml = (
                       break;
                     }
 
-                    // If this paragraph has content and no new talking character, current character continues
+                    // If this paragraph has content, check if it's didaskalia
                     const textContent = nextElement.textContent?.trim() || "";
                     if (textContent) {
                       // Check if this is also didaskalia
@@ -350,9 +350,11 @@ export const xmlToComplexHtml = (
                       const nextIsPureDidaskalia = nextTextInEm.length > 0 && (nextTextOutsideEm.length === 0 || nextTextInEm.length > nextTextOutsideEm.length * 2);
 
                       if (!nextIsPureDidaskalia) {
+                        // Found regular content (not didaskalia), current character continues
                         currentCharacterContinues = true;
                         break;
                       }
+                      // If it's didaskalia, continue looking further
                     }
                   }
                 }
