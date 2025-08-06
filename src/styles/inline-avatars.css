@@ -162,10 +162,6 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
     font-size: clamp(0.7em, 2.5vw, 0.8em);
     padding: clamp(1px, 0.5vw, 3px) clamp(3px, 1vw, 6px);
   }
-
-  #content-container p {
-    padding: 0 clamp(0.75rem, 3vw, 2rem);
-  }
 }
 
 @media screen and (max-width: 430px) {
@@ -177,11 +173,6 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
   .character-talking .inline-avatar {
     width: clamp(1.8em, 6vw, 2.2em) !important;
     height: clamp(1.8em, 6vw, 2.2em) !important;
-  }
-
-  #content-container p {
-    line-height: clamp(1.8em, 6vw, 2.2em);
-    padding: 0 clamp(0.5rem, 2vw, 1rem);
   }
 
   .character-caption {
