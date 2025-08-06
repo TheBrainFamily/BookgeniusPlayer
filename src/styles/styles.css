@@ -1712,7 +1712,6 @@ section[data-chapter] [data-index] {
 .scrollbar-search {
   scrollbar-color: #aaa transparent;
   scrollbar-width: thin;
-  padding-right: 8px;
   scrollbar-gutter: stable;
 }
 
