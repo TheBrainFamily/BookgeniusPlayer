@@ -1,23 +1,16 @@
-import React, { useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useCharactersOnStage } from "@/hooks/useCharactersOnStage";
 import { AnimatePresence, motion } from "motion/react";
 import { useCurrentSpeakers } from "@/hooks/useCurrentSpeakers";
 import { useLocation } from "@/state/LocationContext";
-import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
 import { cn } from "@/lib/utils";
+import { CharacterData } from "@/types/book";
 
-const target = document.getElementById("bottom-panel");
-
-const CharactersOnStagePanel = () => {
-  const charactersOnStage = useCharactersOnStage();
+const CharactersOnStagePanel = ({ allCharacters }: { allCharacters: CharacterData[] }) => {
+  const target = document.getElementById("bottom-panel");
+  const charactersOnStage = useCharactersOnStage(allCharacters);
   const { location } = useLocation();
-  const allCharacters = useMemo(() => getCharactersData(), []);
-  const bookData = useMemo(() => getBookData(), []);
-  const isPlayFormat = useMemo(() => bookData.metadata.bookForm === "play", [bookData]);
-
-  const currentSpeakers = useCurrentSpeakers(location!, allCharacters, isPlayFormat);
+  const currentSpeakers = useCurrentSpeakers(location!, allCharacters, true);
 
   if (!target || !location) return null;
 

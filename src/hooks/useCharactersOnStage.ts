@@ -1,11 +1,9 @@
 import { useMemo } from "react";
-import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
 import { useLocation } from "@/state/LocationContext";
 import { CharacterData } from "@/types/book";
 
-export function useCharactersOnStage(): CharacterData[] {
+export function useCharactersOnStage(allCharacters: CharacterData[]): CharacterData[] {
   const { location } = useLocation();
-  const allCharacters = useMemo(() => getCharactersData(), []);
 
   const charactersOnStage = useMemo(() => {
     if (!location) return [];
