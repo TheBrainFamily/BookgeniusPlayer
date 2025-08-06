@@ -1,3 +1,14 @@
+html {
+  font-size: calc(16px * var(--font-size-multiplier, 1));
+  transition: font-size 0.2s ease-in-out;
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: calc(14px * var(--font-size-multiplier, 1));
+  }
+}
+
 /* ============================================ */
 /* Scoped Legacy CSS            */
 /* ============================================ */

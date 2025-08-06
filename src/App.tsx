@@ -91,11 +91,9 @@ export default function App() {
   }, [splashHidden]);
 
   useEffect(() => {
-    const newFontSize = 16 * fontSize;
-    const contentContainer = document.getElementById("content-container");
-    if (contentContainer) {
-      contentContainer.style.fontSize = `${newFontSize}px`;
-    }
+    if (!fontSize) return;
+
+    document.documentElement.style.setProperty("--font-size-multiplier", String(fontSize));
   }, [fontSize]);
 
   return (
