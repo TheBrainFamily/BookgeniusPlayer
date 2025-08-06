@@ -653,11 +653,13 @@
       }
 
       p {
-        margin-bottom: clamp(0.1em, 0.5vh, 0.2em);
         font-family: var(--font-libre-caslon-text);
         line-height: clamp(1.4, 4vw, 1.6);
         text-indent: 0;
-        margin: clamp(0.05em, 0.25vh, 0.1em) 0;
+        /* margin-bottom: clamp(0.1em, 0.5vh, 0.2em); */
+        /* margin: clamp(0.05em, 0.25vh, 0.1em) 0; */
+
+        margin: clamp(0.05em, 0.25vh, 0.1em) 0 clamp(0.1em, 0.5vh, 0.2em) 0;
       }
 
       p > span > strong {

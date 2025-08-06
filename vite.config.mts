@@ -172,8 +172,6 @@ const getSplashScreenTexts = (bookLang: string, bookSlug: string) => {
 export default defineConfig(async () => {
   const bookConfig = await getBookConfig();
 
-  console.log("BOOK CONFIG:", bookConfig);
-
   const activeBookConfig: BookBuildData = { name: bookConfig.title, slug: bookConfig.slug, staticAssetSourceDir: bookConfig.assetsPath, staticAssetDestDir: bookConfig.slug };
 
   const staticCopyTargets: Target[] = [];

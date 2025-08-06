@@ -96,7 +96,7 @@ export const xmlToComplexHtml = (
   let currentCharacterAlignment = "";
   let isCharacter = false;
   let lastSpanId = "";
-  let firstCharacter = true;
+  let shouldOpenNewPlayRow = true;
 
   for (const chapter of chapters) {
     const chapterId = chapter.getAttribute("id");
@@ -306,7 +306,7 @@ export const xmlToComplexHtml = (
 
             // Check if current character continues speaking after this paragraph
             let currentCharacterContinues = false;
-            if (isPureDidaskalia && !firstCharacter) {
+            if (isPureDidaskalia && !shouldOpenNewPlayRow) {
               // Look ahead to see if there are more paragraphs for the current character
               for (let nextJ = j + 1; nextJ < chapter.childNodes.length; nextJ++) {
                 const nextNode = chapter.childNodes[nextJ];
@@ -373,10 +373,10 @@ export const xmlToComplexHtml = (
 
               if (!isInDidaskaliaRow) {
                 // Close any open play-row first
-                if (!firstCharacter) {
+                if (!shouldOpenNewPlayRow) {
                   htmlResult += `\n </div>\n`; // close character-text
                   htmlResult += `\n </div>\n`; // close play-row
-                  firstCharacter = true;
+                  shouldOpenNewPlayRow = true;
                 }
                 // Start new didaskalia row
                 htmlResult += `\n <div class="play-row didaskalia-row no-avatar-row">\n`;
@@ -444,8 +444,8 @@ export const xmlToComplexHtml = (
             });
             const hasAvatar = characterPlaceholderSpans.length > 0;
 
-            if (firstCharacter || isCharacter) {
-              if (!firstCharacter) {
+            if (shouldOpenNewPlayRow || isCharacter) {
+              if (!shouldOpenNewPlayRow) {
                 htmlResult += `\n </div>\n`; // close previous character-text
                 htmlResult += `\n </div>\n`; // close previous play-row
               }
@@ -454,7 +454,7 @@ export const xmlToComplexHtml = (
                 htmlResult += `\n  <div class="character-avatar" data-index="${dataIndex}">${characterPlaceholderSpans.join("")}</div>\n`;
               }
               htmlResult += `\n  <div class="character-text">\n`;
-              firstCharacter = false;
+              shouldOpenNewPlayRow = false;
             }
 
             htmlResult += `\n    <p
@@ -492,12 +492,12 @@ export const xmlToComplexHtml = (
     }
 
     if (bookFormValue === "Play") {
-      // Only close containers if they were opened (not firstCharacter means containers are open)
-      if (!firstCharacter) {
+      // Only close containers if they were opened (not shouldOpenNewPlayRow means containers are open)
+      if (!shouldOpenNewPlayRow) {
         htmlResult += `\n </div>\n`; // character-text
         htmlResult += `\n </div>\n`; // play-row
       }
-      firstCharacter = true;
+      shouldOpenNewPlayRow = true;
     }
 
     htmlResult += "\n  </section></section>";

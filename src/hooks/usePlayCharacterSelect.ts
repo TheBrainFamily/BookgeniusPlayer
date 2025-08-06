@@ -10,6 +10,10 @@ function swapVideo(container: HTMLElement, newSrc: string) {
   const current = container.querySelector<HTMLVideoElement>("video.visible");
   if (!current || current.src.endsWith(newSrc)) return;
 
+  if (container.dataset.swapping === "true") return;
+
+  container.dataset.swapping = "true";
+
   // prepare the incoming clone
   const clone = current.cloneNode(true) as HTMLVideoElement;
   clone.src = newSrc;
@@ -28,7 +32,14 @@ function swapVideo(container: HTMLElement, newSrc: string) {
 
       // remove old after transition
       setTimeout(() => {
-        container.removeChild(current);
+        try {
+          container.removeChild(current);
+          if (container.contains(current)) {
+            container.removeChild(current);
+          }
+        } catch (error) {
+          console.error("Failed to remove old video element:", error);
+        }
       }, 400);
     },
     { once: true },
@@ -37,15 +48,15 @@ function swapVideo(container: HTMLElement, newSrc: string) {
 
 export function usePlayCharacterSelect() {
   const { location } = useLocation();
+
   const bookData = useMemo(() => getBookData(), []);
   const allCharacters = useMemo(() => getCharactersData(), []);
   const isPlayFormat = useMemo(() => bookData.metadata.bookForm === "play", [bookData]);
   const bookSlug = useMemo(() => bookData.slug, [bookData]);
 
   const currentSpeakers = useCurrentSpeakers(location, allCharacters, isPlayFormat);
-  console.log("currentSpeakers", currentSpeakers);
+
   useEffect(() => {
-    console.log("usePlayCharacterSelect", currentSpeakers);
     // Get all elements with inline-avatar class
     const avatars = document.querySelectorAll<HTMLElement>(".avatar-container");
     avatars.forEach((container) => {

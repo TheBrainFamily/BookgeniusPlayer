@@ -39,7 +39,6 @@ export function useBookContent(containerId: string) {
       const doc = parser.parseFromString(bookStringified, "text/html");
       const chapterSections = Array.from(doc.querySelectorAll(".play-container section[data-chapter]"));
 
-      console.log(`chapterSections: ${chapterSections}`);
       // Add spacers between chapters
       chapterSections.slice(0, -1).forEach((section) => {
         const chapterNumber = section.getAttribute("data-chapter");

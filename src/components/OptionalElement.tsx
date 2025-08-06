@@ -50,13 +50,11 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
   }, [shouldBeVisible, lastHideReason]);
 
   const handleMouseEnter = () => {
-    console.log("handleMouseEnter");
     setIsHovered(true);
     pauseAllTimers();
   };
 
   const handleMouseLeave = () => {
-    console.log("handleMouseLeave");
     setIsHovered(false);
     startAllTimers();
   };
