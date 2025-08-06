@@ -194,11 +194,17 @@ export class TextEditor {
     return updatedXml;
   }
 
-  public async removeCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1): string {
+  public async removeCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1): Promise<string> {
     const { chapters } = await this.booksService.getBookData("Romeo-And-Juliet-Small");
+
+    //TODO: should use bookName instead of hardcoded and add try/catch
 
     const chapterContent = chapters[`chapter${chapterNumber}`];
     const paragraph = getParagraphById(paragraphNumber, chapterContent);
+
+    if (!paragraph) {
+      throw new ParagraphNotFoundError(chapterNumber, paragraphNumber);
+    }
 
     const characterPattern = new RegExp(`<${characterName}[^>]*>.*?</${characterName}>`, "g");
 
