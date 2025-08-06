@@ -9,23 +9,6 @@ export class TextEditorController {
     this.textEditorService = new TextEditorService();
   }
 
-  public saveFile: RequestHandler = async (req, res) => {
-    try {
-      const { bookName, fileName, content } = req.body;
-
-      if (!bookName || !fileName || content === undefined) {
-        res.status(400).json({ error: "Missing required parameters: bookName, fileName, content" });
-        return;
-      }
-
-      const result = await this.textEditorService.saveFile(bookName, fileName, content);
-
-      res.json({ success: true, data: result });
-    } catch (error) {
-      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
-    }
-  };
-
   public editParagraph: RequestHandler = async (req, res) => {
     try {
       const { chapterNumber, paragraphNumber, bookName } = req.body;
