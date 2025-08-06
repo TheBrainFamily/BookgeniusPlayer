@@ -39,14 +39,13 @@ export function useEditorMode(container: HTMLElement | null) {
         }
 
         if (event.metaKey && !event.altKey) {
+          await fetch("http://localhost:3000/api/text-editor/select-paragraph", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bookId: bookName, chapterId: chapterNumber, paragraphId: paragraphNumber }),
+          });
+
           windowManager.openOrUpdateApp(bookName, chapterNumber);
-          // const popup = window.open(`http://localhost:5174/?book=${bookName}&chapter=chapter${chapterNumber}.xml`);
-          //
-          // if (popup) {
-          //   popup.focus();
-          // }
-          // return handleEditParagraph(chapterNumber, paragraphNumber, bookName);
-          // return popup;
         }
 
         if (mKeyPressed.current) {

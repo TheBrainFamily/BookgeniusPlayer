@@ -2,6 +2,19 @@ import { Request, Response } from "express";
 import { bookWatcherService } from "../services/bookWatcherService";
 
 export class SSEController {
+  selectParagraph = (req: Request, res: Response): void => {
+    const { bookId, chapterId, paragraphId } = req.body;
+
+    if (!bookId || !chapterId || paragraphId === null || paragraphId === undefined) {
+      res.status(400).json({ error: "bookId, chapterId, and paragraphId are required" });
+      return;
+    }
+
+    bookWatcherService.broadcastParagraphSelection({ bookId, chapterId, paragraphId, timestamp: Date.now() });
+
+    res.json({ success: true });
+  };
+
   bookUpdates = (req: Request, res: Response): void => {
     // Get book from query parameter
     const book = req.query.book as string;
