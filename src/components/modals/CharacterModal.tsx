@@ -201,7 +201,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
               )}
             </motion.div>
           )}
-          <DialogEnhanceClose className="absolute top-4 right-4 cursor-pointer" onClick={onClose} />
+          <DialogEnhanceClose className="absolute top-4 right-4 cursor-pointer" onPointerUp={onClose} />
         </motion.div>
       </motion.div>
     </ModalUI>
