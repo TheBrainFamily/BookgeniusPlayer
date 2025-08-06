@@ -24,6 +24,9 @@ jobs:
             scripts/build.ts
             scripts/validateAndNormalizeBookPath.ts
             scripts/generateBook.ts
+            scripts/processBook.ts
+            scripts/compileBookData.js
+            scripts/buildBookFromContent.ts
             scripts/data/xmlToComplexHtml.ts
             scripts/data/tools/create-book-metadata.ts
             scripts/data/tools/Text-Editor/

@@ -9,10 +9,18 @@ interface SSEClient {
   response: Response;
 }
 
+interface ParagraphSelection {
+  bookId: string;
+  chapterId: number;
+  paragraphId: number;
+  timestamp: number;
+}
+
 class BookWatcherService {
   private clients: Map<string, SSEClient> = new Map();
   private watchers: Map<string, chokidar.FSWatcher> = new Map();
   private processingBooks: Set<string> = new Set();
+  private lastParagraphSelection: ParagraphSelection | null = null;
 
   constructor() {
     // Cleanup on exit
@@ -36,6 +44,18 @@ class BookWatcherService {
     }
 
     console.log(`[SSE] Client ${clientId} connected for book: ${book}`);
+
+    // Send last paragraph selection if available and matching book
+    if (this.lastParagraphSelection && this.lastParagraphSelection.bookId === book) {
+      try {
+        const message = `data: ${JSON.stringify({ type: "paragraph-selected", ...this.lastParagraphSelection })}\n\n`;
+        response.write(message);
+        console.log(`[SSE] Sent last paragraph selection to client ${clientId}`);
+      } catch (error) {
+        console.error(`[SSE] Failed to send last paragraph selection to client ${clientId}:`, error);
+        this.removeClient(clientId);
+      }
+    }
   }
 
   removeClient(clientId: string): void {
@@ -168,6 +188,26 @@ class BookWatcherService {
     });
 
     console.log(`[SSE] Sent event to ${clients.length} clients for book ${book}:`, data.type);
+  }
+
+  broadcastParagraphSelection(selection: ParagraphSelection): void {
+    // Store the last selection
+    this.lastParagraphSelection = selection;
+
+    // Send to all clients connected to this book
+    const clients = Array.from(this.clients.values()).filter((c) => c.book === selection.bookId);
+    const message = `data: ${JSON.stringify({ type: "paragraph-selected", ...selection })}\n\n`;
+
+    clients.forEach((client) => {
+      try {
+        client.response.write(message);
+      } catch (error) {
+        console.error(`[SSE] Failed to send paragraph selection to client ${client.id}:`, error);
+        this.removeClient(client.id);
+      }
+    });
+
+    console.log(`[SSE] Broadcast paragraph selection to ${clients.length} clients for book ${selection.bookId}`);
   }
 
   private cleanup(): void {
