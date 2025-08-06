@@ -107,6 +107,35 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const isVisible = useRef(allVariants.length > 0);
   const hiddenParagraphsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const handleFontSizePreset = (size: number) => {
+    setHideOverlay(true);
+    setIsFontSizeChanging(true);
+
+    setTimeout(() => {
+      setCurrentFontSize(size);
+    }, 100);
+
+    setTimeout(() => {
+      setHideOverlay(false);
+      setIsFontSizeChanging(false);
+    }, 1500);
+  };
+
+  const handleComplexityPreset = (level: number) => {
+    setHideOverlay(true);
+    setIsComplexityChanging(true);
+
+    setTimeout(() => {
+      setCurrentComplexity(level);
+      updateText(level);
+    }, 100);
+
+    setTimeout(() => {
+      setHideOverlay(false);
+      setIsComplexityChanging(false);
+    }, 1500);
+  };
+
   const handleSliderChangeWithOverlay = (callback: () => void) => {
     if (overlayTimeoutRef.current) {
       clearTimeout(overlayTimeoutRef.current);
@@ -223,7 +252,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
   return (
     <ModalUI title={t("book_settings")} onClose={onClose} hideOverlay={hideOverlay}>
-      <div className="space-y-2 mb-6">
+      <div className="space-y-2 mb-6 book-settings-actions">
         <Button
           variant="ghost"
           className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
@@ -256,166 +285,75 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           {t("set_openai_api_key")}
         </Button>
       </div>
-      <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300")}>
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Type className="h-4 w-4 text-white" />
-            <Label htmlFor="font-size" className="text-sm font-medium text-white">
-              {t("text_size")}: <AnimatedFontSize value={currentFontSize} isChanging={isFontSizeChanging} />
-            </Label>
-          </div>
-          <Slider
-            id="font-size"
-            variant="secondary"
-            min={0.5}
-            max={1.5}
-            step={0.1}
-            value={[currentFontSize]}
-            onValueChange={handleFontSizeChange}
-            aria-label="Rozmiar tekstu"
-            className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
-          />
-          <div className="flex justify-between text-xs text-gray-300">
-            <span
-              className="cursor-pointer hover:text-white transition-colors"
-              onClick={() => {
-                setHideOverlay(true);
-                setIsFontSizeChanging(true);
-
-                setTimeout(() => {
-                  setCurrentFontSize(0.5);
-                }, 100);
-
-                setTimeout(() => {
-                  setHideOverlay(false);
-                  setIsFontSizeChanging(false);
-                }, 1500);
-              }}
-            >
-              {t("small")}
-            </span>
-            <span
-              className="cursor-pointer hover:text-white transition-colors"
-              onClick={() => {
-                setHideOverlay(true);
-                setIsFontSizeChanging(true);
-
-                setTimeout(() => {
-                  setCurrentFontSize(1.0);
-                }, 100);
-
-                setTimeout(() => {
-                  setHideOverlay(false);
-                  setIsFontSizeChanging(false);
-                }, 1500);
-              }}
-            >
-              {t("default")}
-            </span>
-            <span
-              className="cursor-pointer hover:text-white transition-colors"
-              onClick={() => {
-                setHideOverlay(true);
-                setIsFontSizeChanging(true);
-
-                setTimeout(() => {
-                  setCurrentFontSize(1.5);
-                }, 100);
-
-                setTimeout(() => {
-                  setHideOverlay(false);
-                  setIsFontSizeChanging(false);
-                }, 1500);
-              }}
-            >
-              {t("large")}
-            </span>
-          </div>
-        </div>
-      </div>
-      {isVisible && (
-        <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 mt-2")}>
-          <div className="space-y-4">
+      <div className="flex flex-col gap-2 book-settings-container">
+        <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full book-settings-control-box")}>
+          <div className="space-y-4 book-settings-control-box-inner">
             <div className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-white" />
-              <Label htmlFor="complexity-slider" className="text-sm font-medium text-white">
-                {t("reading_complexity")}: <AnimatedComplexity value={currentComplexity} isChanging={isComplexityChanging} />
+              <Type className="h-4 w-4 text-white" />
+              <Label htmlFor="font-size" className="text-sm font-medium text-white">
+                {t("text_size")}: <AnimatedFontSize value={currentFontSize} isChanging={isFontSizeChanging} />
               </Label>
             </div>
             <Slider
-              id="complexity-slider"
+              id="font-size"
               variant="secondary"
-              min={20}
-              max={100}
-              step={1}
-              value={[currentComplexity]}
-              onValueChange={handleComplexityChange}
-              aria-label={t("reading_complexity")}
+              min={0.5}
+              max={1.5}
+              step={0.1}
+              value={[currentFontSize]}
+              onValueChange={handleFontSizeChange}
+              aria-label="Rozmiar tekstu"
               className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
             />
             <div className="flex justify-between text-xs text-gray-300">
-              <span
-                className="cursor-pointer hover:text-white transition-colors"
-                onClick={() => {
-                  setHideOverlay(true);
-                  setIsComplexityChanging(true);
-
-                  setTimeout(() => {
-                    setCurrentComplexity(20);
-                    updateText(20);
-                  }, 100);
-
-                  setTimeout(() => {
-                    setHideOverlay(false);
-                    setIsComplexityChanging(false);
-                  }, 1500);
-                }}
-              >
-                {t("simple")}
+              <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(0.5)}>
+                {t("small")}
               </span>
-              <span
-                className="cursor-pointer hover:text-white transition-colors"
-                onClick={() => {
-                  setHideOverlay(true);
-                  setIsComplexityChanging(true);
-
-                  setTimeout(() => {
-                    setCurrentComplexity(60);
-                    updateText(60);
-                  }, 100);
-
-                  setTimeout(() => {
-                    setHideOverlay(false);
-                    setIsComplexityChanging(false);
-                  }, 1500);
-                }}
-              >
-                {t("medium")}
+              <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(1.0)}>
+                {t("default")}
               </span>
-              <span
-                className="cursor-pointer hover:text-white transition-colors"
-                onClick={() => {
-                  setHideOverlay(true);
-                  setIsComplexityChanging(true);
-
-                  setTimeout(() => {
-                    setCurrentComplexity(100);
-                    updateText(100);
-                  }, 100);
-
-                  setTimeout(() => {
-                    setHideOverlay(false);
-                    setIsComplexityChanging(false);
-                  }, 1500);
-                }}
-              >
-                {t("complex")}
+              <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(1.5)}>
+                {t("large")}
               </span>
             </div>
           </div>
         </div>
-      )}
-      <div className="text-xs text-gray-500 mt-4 text-right">
+        {isVisible && (
+          <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full book-settings-control-box")}>
+            <div className="space-y-4 book-settings-control-box-inner">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-white" />
+                <Label htmlFor="complexity-slider" className="text-sm font-medium text-white">
+                  {t("reading_complexity")}: <AnimatedComplexity value={currentComplexity} isChanging={isComplexityChanging} />
+                </Label>
+              </div>
+              <Slider
+                id="complexity-slider"
+                variant="secondary"
+                min={20}
+                max={100}
+                step={1}
+                value={[currentComplexity]}
+                onValueChange={handleComplexityChange}
+                aria-label={t("reading_complexity")}
+                className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
+              />
+              <div className="flex justify-between text-xs text-gray-300">
+                <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleComplexityPreset(20)}>
+                  {t("simple")}
+                </span>
+                <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleComplexityPreset(60)}>
+                  {t("medium")}
+                </span>
+                <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleComplexityPreset(100)}>
+                  {t("complex")}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="text-xs text-gray-500 mt-4 text-right book-settings-version">
         <span>
           {t("version")}: {import.meta.env.VITE_BUILD_TIME || "0.0.1"}
         </span>

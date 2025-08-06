@@ -131,7 +131,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             )}
 
             <motion.main
-              className="p-4 pt-0 overflow-y-auto opened-modal scrollbar-search"
+              className="p-4 overflow-y-auto opened-modal scrollbar-search"
               layout={animateHeight}
               transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}
             >

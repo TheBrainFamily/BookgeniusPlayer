@@ -104,7 +104,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
         exit="exit"
       >
         <motion.div
-          className="rounded-full overflow-hidden h-full w-full max-h-[30vh] max-w-[30vh] md:max-h-80 md:max-w-80 border shadow-xl border-book-primary-20 aspect-square"
+          className="w-48 md:w-80 rounded-full overflow-hidden max-h-[30vh] max-w-[30vh] md:max-h-80 md:max-w-80 border shadow-xl border-book-primary-20 aspect-square"
           variants={variants.media}
           initial="hidden"
           animate="visible"
@@ -123,84 +123,86 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
         </motion.div>
 
         <motion.div
-          className="p-4 rounded-xl flex flex-col gap-4 w-full max-w-2xl pointer-events-auto relative overflow-auto
-          bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[95vh]"
+          className="p-4 rounded-xl flex flex-col gap-4 w-full max-w-2xl pointer-events-auto relative
+          bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[55vh] sm:max-h-[80vh]"
           variants={variants.content}
           initial="hidden"
           animate="visible"
         >
-          <div className="relative">
+          <div className="relative text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <h4 className="text-lg font-bold text-center text-white">{matchingCharacter.characterName}</h4>
+              <h4 className="text-lg font-bold text-white">{matchingCharacter.characterName}</h4>
             </div>
-            <p className="text-center text-white/90" dangerouslySetInnerHTML={{ __html: findLatestSummaryInRange(matchingCharacter, endChapter) || "" }} />
+            <p className="text-center text-white/90 text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: findLatestSummaryInRange(matchingCharacter, endChapter) || "" }} />
           </div>
 
-          {characterAppearances.length > 0 && (
-            <motion.div className="mt-4 relative" variants={variants.appearances} initial="hidden" animate="visible">
-              <h5 className="text-md font-semibold text-white mb-3 text-center">{t("appearances")}</h5>
-              {isLoading ? (
-                <motion.div className="flex flex-col items-center justify-center py-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <div className="relative">
-                    <motion.div
-                      className="w-8 h-8 border-3 rounded-full border-book-primary-30 border-t-book-primary"
-                      variants={variants.loading}
-                      initial="initial"
-                      animate="animate"
-                    />
-                  </div>
-                  <motion.div className="mt-2 text-white/90 text-sm" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-                    {t("searching_appearances")}
-                  </motion.div>
-                </motion.div>
-              ) : (
-                <motion.div className="space-y-3" variants={variants.container} initial="hidden" animate="visible">
-                  {characterAppearances.map((appearance, index) => (
-                    <motion.div
-                      key={appearance.id}
-                      className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20"
-                      variants={variants.item}
-                      whileHover="hover"
-                      whileTap="tap"
-                      onClick={() => handleAppearanceClick(appearance)}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <div className="relative p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-primary-30 text-book-primary">
-                            <span className="flex items-center gap-1">
-                              <FileText size={12} />
-                              {getChapterTitle(appearance.chapter, t)}
-                            </span>
-                          </div>
-                          <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
-                            {t("paragraph")} {appearance.paragraphNumber}
-                          </div>
-                        </div>
-
-                        <motion.div
-                          className="text-sm text-white/90 leading-relaxed line-clamp-3"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.2 }}
-                          dangerouslySetInnerHTML={{ __html: appearance.text }}
-                        />
-
-                        <motion.div
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100"
-                          initial={{ scale: 0, rotate: -90 }}
-                          whileHover={{ scale: 1, rotate: 0 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <div className="w-2 h-2 rounded-full bg-book-primary" />
-                        </motion.div>
-                      </div>
+          <div className="overflow-y-auto flex-grow">
+            {characterAppearances.length > 0 && (
+              <motion.div className="mt-4 relative" variants={variants.appearances} initial="hidden" animate="visible">
+                <h5 className="text-md font-semibold text-white mb-3 text-center">{t("appearances")}</h5>
+                {isLoading ? (
+                  <motion.div className="flex flex-col items-center justify-center py-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                    <div className="relative">
+                      <motion.div
+                        className="w-8 h-8 border-3 rounded-full border-book-primary-30 border-t-book-primary"
+                        variants={variants.loading}
+                        initial="initial"
+                        animate="animate"
+                      />
+                    </div>
+                    <motion.div className="mt-2 text-white/90 text-sm" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                      {t("searching_appearances")}
                     </motion.div>
-                  ))}
-                </motion.div>
-              )}
-            </motion.div>
-          )}
+                  </motion.div>
+                ) : (
+                  <motion.div className="space-y-3" variants={variants.container} initial="hidden" animate="visible">
+                    {characterAppearances.map((appearance, index) => (
+                      <motion.div
+                        key={appearance.id}
+                        className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20"
+                        variants={variants.item}
+                        whileHover="hover"
+                        whileTap="tap"
+                        onClick={() => handleAppearanceClick(appearance)}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <div className="relative p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-primary-30 text-book-primary">
+                              <span className="flex items-center gap-1">
+                                <FileText size={12} />
+                                {getChapterTitle(appearance.chapter, t)}
+                              </span>
+                            </div>
+                            <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
+                              {t("paragraph")} {appearance.paragraphNumber}
+                            </div>
+                          </div>
+
+                          <motion.div
+                            className="text-sm text-white/90 leading-relaxed line-clamp-3"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            dangerouslySetInnerHTML={{ __html: appearance.text }}
+                          />
+
+                          <motion.div
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100"
+                            initial={{ scale: 0, rotate: -90 }}
+                            whileHover={{ scale: 1, rotate: 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <div className="w-2 h-2 rounded-full bg-book-primary" />
+                          </motion.div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+          </div>
           <DialogEnhanceClose className="absolute top-4 right-4 cursor-pointer" onPointerUp={onClose} />
         </motion.div>
       </motion.div>
