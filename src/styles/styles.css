@@ -1292,6 +1292,25 @@ section[data-chapter] [data-index] {
 }
 
 @media screen and (max-height: 480px) and (orientation: landscape) {
+  .book-settings-actions {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .book-settings-control-box {
+    padding: 0.75rem;
+  }
+
+  .book-settings-control-box-inner {
+    gap: 0.5rem;
+  }
+
+  .book-settings-version {
+    margin-top: 0.5rem;
+  }
+
   .book-settings-container {
     flex-direction: row;
     gap: 0.5rem;
@@ -1372,27 +1391,6 @@ section[data-chapter] [data-index] {
   }
   .player-left .mb-4 {
     margin-bottom: 0.5rem;
-  }
-}
-
-@media screen and (max-height: 480px) and (orientation: landscape) {
-  .book-settings-actions {
-    margin-bottom: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .book-settings-control-box {
-    padding: 0.75rem;
-  }
-
-  .book-settings-control-box-inner {
-    gap: 0.5rem;
-  }
-
-  .book-settings-version {
-    margin-top: 0.5rem;
   }
 }
 
