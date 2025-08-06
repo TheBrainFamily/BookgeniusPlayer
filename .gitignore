@@ -16,3 +16,4 @@ public_books/*/getKnownVideoFiles.ts
 public_books/*/getQuizQuestions.ts
 public_books/*/getAllVariants.ts
 .env
+build/

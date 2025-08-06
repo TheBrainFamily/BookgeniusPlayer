@@ -5,13 +5,13 @@ const fs = require("fs");
 const path = require("path");
 const ts = require("typescript");
 
-export const compileToJsForBook = (bookDir) => {
+export const compileToJsForBook = (bookDir, destinationDir) => {
   if (!bookDir) {
     console.error("Please provide a book directory name");
     process.exit(1);
   }
 
-  const sourcePath = path.join(__dirname, "..", "public", "books", bookDir);
+  const sourcePath = path.join(destinationDir, bookDir);
   console.log("sourcePath", sourcePath);
   const targetPath = path.join(sourcePath, "compiled");
   console.log("targetPath", targetPath);

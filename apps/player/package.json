@@ -1,5 +1,5 @@
 {
-  "name": "bookgenius-frontend",
+  "name": "player",
   "version": "1.0.0",
   "description": "",
   "keywords": [],
@@ -13,6 +13,8 @@
     "process-all-books": "tsx ./scripts/processAllBooks.ts",
     "process-book": "tsx ./scripts/processBook.ts",
     "build-only": "vite build",
+    "build-for-docker": "vite build && pnpm process-all-books",
+    "post-build": "bun run ../../tools/scripts/prepare-docker-build.ts",
     "dev": "vite dev",
     "prepare": "husky",
     "deploy": "VITE_BOOK=Pharaon npx vite build && rsync -av ./dist root@64.23.230.45:/var/www/faraon/",

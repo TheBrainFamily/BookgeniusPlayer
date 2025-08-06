@@ -4,6 +4,7 @@ import path from "path";
 import { processBook } from "./processBook";
 
 const PUBLIC_BOOKS_DIR = path.join(__dirname, "..", "public_books");
+const DIST_DIR = path.join(__dirname, "..", "dist", "books");
 
 async function processAllBooks() {
   console.log("🚀 Starting to process all books...\n");
@@ -20,8 +21,14 @@ async function processAllBooks() {
   let failCount = 0;
   const errors: { book: string; error: Error }[] = [];
 
-  for (const bookName of bookDirs) {
-    const result = await processBook(path.join(PUBLIC_BOOKS_DIR, bookName));
+  // Process all books in parallel
+  const results = await Promise.all(
+    bookDirs.map((bookName) =>
+      processBook(path.join(PUBLIC_BOOKS_DIR, bookName), DIST_DIR)
+    )
+  );
+
+  for (const result of results) {
     if (result.success) {
       successCount++;
     } else {

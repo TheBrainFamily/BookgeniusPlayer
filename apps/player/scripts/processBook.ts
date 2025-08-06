@@ -6,7 +6,7 @@ import { compileToJsForBook } from "./compileBookData";
 
 const PUBLIC_DIR = path.join(__dirname, "..", "public", "books");
 
-export async function processBook(bookPath: string) {
+export async function processBook(bookPath: string, destinationDir = PUBLIC_DIR) {
   console.log(`\n${"=".repeat(60)}`);
   console.log(`📖 Processing: ${bookPath}`);
   console.log(`${"=".repeat(60)}\n`);
@@ -15,7 +15,7 @@ export async function processBook(bookPath: string) {
   console.log("bookSourcePath", bookSourcePath);
   const bookName = path.basename(bookPath);
   console.log("bookName", bookName);
-  const bookPublicPath = path.join(PUBLIC_DIR, bookName);
+  const bookPublicPath = path.join(destinationDir, bookName);
   console.log("bookPublicPath", bookPublicPath);
 
   try {
@@ -45,7 +45,7 @@ export async function processBook(bookPath: string) {
     // Step 3: Compile TypeScript files to JavaScript
     console.log(`\n3️⃣  Compiling TypeScript files for ${bookName}...`);
     console.time("compileBookData");
-    compileToJsForBook(bookName);
+    compileToJsForBook(bookName, destinationDir);
     console.timeEnd("compileBookData");
 
     console.log(`\n✅ Successfully processed ${bookName}`);
