@@ -4,12 +4,16 @@ import { EditorManager } from "./editor-manager";
 import { PromptsManager } from "./prompts-manager";
 import { joinParsedText, parseHtmlText } from "@/utils/parseHtmlText";
 import { TextEditorError, ParagraphNotFoundError, CharacterNotFoundError } from "./error-handlers";
+import { BooksService } from "@/text-editor-service/services/booksService";
+import { getParagraphById } from "@/text-editor-service/utils/getParagraphById";
 
 export class TextEditor {
   private readonly fileManager: IFileManager;
   private readonly xmlManager: XmlManager;
   private readonly editorManager: EditorManager;
   private readonly promptsManager: PromptsManager;
+
+  private readonly booksService: BooksService;
 
   constructor(
     private readonly bookSlug: string,
@@ -21,6 +25,8 @@ export class TextEditor {
     this.xmlManager = new XmlManager();
     this.editorManager = new EditorManager();
     this.promptsManager = new PromptsManager(this.bookSlug, this.xmlManager);
+
+    this.booksService = new BooksService();
   }
 
   private handleError(operation: string, error: Error): never {
@@ -188,42 +194,39 @@ export class TextEditor {
     return updatedXml;
   }
 
-  public removeCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1): string {
-    try {
-      const originalParagraph = this.getParagraphByNumber(chapterNumber, paragraphNumber);
-      if (!originalParagraph) {
-        throw new ParagraphNotFoundError(chapterNumber, paragraphNumber);
-      }
+  public async removeCharacter(chapterNumber: number, paragraphNumber: number, characterName: string, occurrence: number = 1): Promise<string> {
+    const { chapters } = await this.booksService.getBookData("Romeo-And-Juliet-Small");
 
-      const characterPattern = new RegExp(`<${characterName}[^>]*>.*?</${characterName}>`, "g");
-      const matches = originalParagraph.match(characterPattern) || [];
+    //TODO: should use bookName instead of hardcoded and add try/catch
 
-      if (occurrence < 1 || occurrence > matches.length) {
-        throw new CharacterNotFoundError(characterName, occurrence, matches.length);
-      }
+    const chapterContent = chapters[`chapter${chapterNumber}`];
+    const paragraph = getParagraphById(paragraphNumber, chapterContent);
 
-      let currentOccurrence = 0;
-      const updatedParagraph = originalParagraph.replace(characterPattern, (match) => {
-        currentOccurrence++;
-        return currentOccurrence === occurrence ? match.replace(new RegExp(`<${characterName}[^>]*>|</${characterName}>`, "g"), "") : match;
-      });
-
-      const remainingMatches = updatedParagraph.match(characterPattern) || [];
-      if (remainingMatches.length !== matches.length - 1) {
-        throw new TextEditorError("Failed to remove character tag properly");
-      }
-
-      const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
-      const { paragraph } = this.xmlManager.getParagraphElement(xmlDoc, chapterNumber, paragraphNumber);
-      if (!paragraph) {
-        throw new ParagraphNotFoundError(chapterNumber, paragraphNumber);
-      }
-
-      const updatedXml = this.xmlManager.updateAndSaveXml(xmlDoc, paragraph, updatedParagraph);
-      this.fileManager.regenerateXml(updatedXml);
-      return updatedXml;
-    } catch (error) {
-      this.handleError("remove character", error);
+    if (!paragraph) {
+      throw new ParagraphNotFoundError(chapterNumber, paragraphNumber);
     }
+
+    const characterPattern = new RegExp(`<${characterName}[^>]*>.*?</${characterName}>`, "g");
+
+    const matches = paragraph.match(characterPattern) || [];
+
+    if (occurrence < 1 || occurrence > matches.length) {
+      throw new CharacterNotFoundError(characterName, occurrence, matches.length);
+    }
+
+    let currentOccurrence = 0;
+    const updatedParagraph = paragraph.replace(characterPattern, (match) => {
+      currentOccurrence++;
+      return currentOccurrence === occurrence ? match.replace(new RegExp(`<${characterName}[^>]*>|</${characterName}>`, "g"), "") : match;
+    });
+
+    const remainingMatches = updatedParagraph.match(characterPattern) || [];
+    if (remainingMatches.length !== matches.length - 1) {
+      throw new TextEditorError("Failed to remove character tag properly");
+    }
+
+    const updatedChapterContent = chapterContent.replace(paragraph, updatedParagraph);
+
+    await this.booksService.updateChapter("Romeo-And-Juliet-Small", `chapter${chapterNumber}`, updatedChapterContent);
   }
 }
