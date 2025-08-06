@@ -1393,13 +1393,3 @@ section[data-chapter] [data-index] {
     margin-bottom: 0.5rem;
   }
 }
-
-/* Fix for desktop layout */
-@media screen and (min-width: 1024px) {
-  .book-settings-container {
-    align-items: center; /* Center the items horizontally */
-  }
-  .book-settings-control-box {
-    max-width: 300px; /* Give a max width to prevent them from being too wide */
-  }
-}
