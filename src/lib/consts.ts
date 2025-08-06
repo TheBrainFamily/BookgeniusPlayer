@@ -1,4 +1,4 @@
-import { CURRENT_BOOK } from "@/consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 
 // Function to determine if we're running locally or in production
 function isDevelopment(): boolean {
@@ -8,7 +8,10 @@ function isDevelopment(): boolean {
 }
 
 // Base URLs that adapt to the environment
-export const DEV_SERVER_URL = `https://${CURRENT_BOOK?.replace(/[^a-zA-Z0-9]/g, "").toLowerCase()}.bookgenius.net/`;
+export const DEV_SERVER_URL = `https://${bookDataLoader
+  .getCurrentBook()
+  ?.replace(/[^a-zA-Z0-9]/g, "")
+  .toLowerCase()}.bookgenius.net/`;
 const DEV_WS_URL = "ws://192.168.1.26:3000";
 
 // In production, use relative URLs that will point to the same domain

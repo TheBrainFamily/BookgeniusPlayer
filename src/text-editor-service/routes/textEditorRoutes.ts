@@ -1,8 +1,12 @@
 import { Router } from "express";
 import { TextEditorController } from "../controllers/textEditorController";
+import { SSEController } from "../controllers/sseController";
 
 const router = Router();
 const textEditorController = new TextEditorController();
+const sseController = new SSEController();
+
+router.post("/save-file", textEditorController.saveFile);
 
 router.post("/edit-paragraph", textEditorController.editParagraph);
 
@@ -19,5 +23,8 @@ router.post("/remove-music-suggestion", textEditorController.removeMusicSuggesti
 router.post("/add-background-suggestion", textEditorController.addBackgroundSuggestion);
 
 router.post("/remove-background-suggestion", textEditorController.removeBackgroundSuggestion);
+
+// SSE endpoint for book updates
+router.get("/sse/book-updates", sseController.bookUpdates);
 
 export default router;

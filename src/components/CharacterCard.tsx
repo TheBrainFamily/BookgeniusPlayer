@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect, useMemo, useCallback } from "react"
 import CharacterMedia from "./CharacterMedia";
 import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
 import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
-import { CURRENT_BOOK } from "@/consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
 import { cn } from "@/lib/utils";
 import { useHighlight } from "@/hooks/useHighlight";
@@ -33,9 +33,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers }
     if (!cardRef.current) return;
 
     if (isTalkingInCurrentRange) {
-      setCurrentMediaSrc(getTalkingMediaFilePathForName(entity.slug, CURRENT_BOOK));
+      setCurrentMediaSrc(getTalkingMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook()));
     } else {
-      setCurrentMediaSrc(getListeningMediaFilePathForName(entity.slug, CURRENT_BOOK));
+      setCurrentMediaSrc(getListeningMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook()));
     }
   }, [isTalkingInCurrentRange, entity.slug, entity.imageUrl]);
 
@@ -60,7 +60,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers }
     };
   }, []);
 
-  const mediaSrc = currentMediaSrc || getListeningMediaFilePathForName(entity.slug, CURRENT_BOOK);
+  const mediaSrc = currentMediaSrc || getListeningMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook());
   const isVideo = mediaSrc.endsWith(".mp4") || mediaSrc.endsWith(".webm");
 
   const commonAttrs = { "data-original-src": mediaSrc, "data-character-name": entity.slug, "data-summary": entity.summary ?? "", className: "w-full h-full object-cover" } as const;

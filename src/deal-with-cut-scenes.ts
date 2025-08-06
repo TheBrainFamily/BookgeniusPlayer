@@ -1,4 +1,4 @@
-import { CURRENT_BOOK } from "./consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 import { getCutScenesForBook } from "./genericBookDataGetters/getCutScenesForBook";
 import "./styles/cutscene-video.css";
 
@@ -56,7 +56,8 @@ export const dealWithCutScenes = ({ currentChapter, currentParagraph }) => {
 
     // --- Setup and Play ---
     cutsceneText.textContent = cutSceneToApply.text || ""; // Set the text content
-    cutsceneVideo.src = `/${CURRENT_BOOK}/${cutSceneToApply.file}`;
+    const currentBook = bookDataLoader.getCurrentBook();
+    cutsceneVideo.src = `/books/${currentBook}/assets/${cutSceneToApply.file}`;
     cutsceneVideo.load();
 
     // Add a listener to schedule the fade out 4 seconds before the end

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange } from "@/fetchers/getParagraphRange";
-import { CURRENT_BOOK } from "@/consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 import { Location } from "@/state/LocationContext";
 import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
 
@@ -25,7 +25,7 @@ export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphab
       const { chapter, paragraph, endChapter, endParagraph } = loc;
 
       const raw = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange(
-        { bookSlug: CURRENT_BOOK, startChapter: chapter, startParagraph: paragraph, endChapter, endParagraph },
+        { bookSlug: bookDataLoader.getCurrentBook(), startChapter: chapter, startParagraph: paragraph, endChapter, endParagraph },
         getCharactersData(),
       );
 

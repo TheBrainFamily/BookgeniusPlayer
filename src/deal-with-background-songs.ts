@@ -8,7 +8,7 @@ import {
   isCurrentTrackInSection,
   getCurrentSectionTracks,
 } from "./audio-crossfader";
-import { CURRENT_BOOK } from "./consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 import { getBackgroundSongsForBook } from "./genericBookDataGetters/getBackgroundSongsForBook";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { BackgroundSongSection } from "./types/book";
@@ -34,7 +34,7 @@ export const preloadBackgroundTracks = async () => {
 
   const bookSongs = getBackgroundSongsForBook();
   if (!bookSongs) {
-    console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot preload.`);
+    console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot preload.`);
     return false;
   }
 
@@ -88,7 +88,7 @@ export const dealWithBackgroundSongs = async ({ currentChapter, currentParagraph
 
     const bookSongs = getBackgroundSongsForBook();
     if (!bookSongs) {
-      console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot determine background song.`);
+      console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot determine background song.`);
       isProcessingBackgroundSongs = false; // Reset flag before early exit
       return;
     }

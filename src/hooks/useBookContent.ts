@@ -7,6 +7,7 @@ import { findSimplifiedSentence } from "@/helpers/findSimplifiedSentence";
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
 import { useEditorMode } from "@/hooks/useEditorMode";
+import { useBookData } from "@/context/BookDataContext";
 
 const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
@@ -20,6 +21,7 @@ if (import.meta.hot) {
 const isEditorMode = import.meta.env.VITE_EDITOR === "true";
 export function useBookContent(containerId: string) {
   const container = document.getElementById(containerId);
+  const { textVersion } = useBookData();
   const bookStringified = getBookStringified();
 
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
@@ -145,7 +147,7 @@ export function useBookContent(containerId: string) {
     } else {
       console.warn(`Container with id '${containerId}' not found for content injection.`);
     }
-  }, [bookStringified, containerId]); // Rerun if content or ID changes
+  }, [bookStringified, containerId, textVersion]); // Rerun if content, ID, or text version changes
 }
 
 function setSentenceAsClicked(sentenceId: string) {

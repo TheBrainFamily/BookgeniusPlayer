@@ -3,7 +3,6 @@ import fs from "fs";
 import path from "path";
 
 import { getTalkingMediaFilePathForName, getListeningMediaFilePathForName } from "@/utils/getFilePathsForName";
-import { BOOK_SLUGS, CURRENT_BOOK } from "@/consts";
 import { wrapPunctuationAdvanced } from "@/utils/wrapPunctuation";
 
 // Helper function to extract file data from XML elements
@@ -400,34 +399,34 @@ ${cutSceneData
 };
 
 // ToDo: Verify if this script is needed?
-if (require.main === module) {
-  const bookSlug: BOOK_SLUGS = CURRENT_BOOK;
+// if (require.main === module) {
+//   const bookSlug: BOOK_SLUGS = CURRENT_BOOK;
 
-  // Try to read from the public_books directory first (with Background/Audio data)
-  let xmlString: string;
-  const publicBookPath = path.join(__dirname, "..", "..", "public_books", bookSlug, "book.xml");
-  const fallbackPath = path.join(__dirname, `${bookSlug}-chapters.xml`);
+//   // Try to read from the public_books directory first (with Background/Audio data)
+//   let xmlString: string;
+//   const publicBookPath = path.join(__dirname, "..", "..", "public_books", bookSlug, "book.xml");
+//   const fallbackPath = path.join(__dirname, `${bookSlug}-chapters.xml`);
 
-  if (fs.existsSync(publicBookPath)) {
-    console.log(`Reading from ${publicBookPath}`);
-    xmlString = fs.readFileSync(publicBookPath, "utf8");
-  } else {
-    console.log(`Reading from ${fallbackPath}`);
-    xmlString = fs.readFileSync(fallbackPath, "utf8");
-  }
+//   if (fs.existsSync(publicBookPath)) {
+//     console.log(`Reading from ${publicBookPath}`);
+//     xmlString = fs.readFileSync(publicBookPath, "utf8");
+//   } else {
+//     console.log(`Reading from ${fallbackPath}`);
+//     xmlString = fs.readFileSync(fallbackPath, "utf8");
+//   }
 
-  const bookLanguage = xmlString.match(/<BookLanguage>([^<]+)<\/BookLanguage>/)?.[1] || "polish";
+//   const bookLanguage = xmlString.match(/<BookLanguage>([^<]+)<\/BookLanguage>/)?.[1] || "polish";
 
-  // Example usage: Provide the book slug when calling
-  console.log("bookSlug", bookSlug);
-  const { backgroundsData, audioData, cutSceneData, htmlResult } = xmlToComplexHtml(xmlString, bookSlug, bookLanguage);
+//   // Example usage: Provide the book slug when calling
+//   console.log("bookSlug", bookSlug);
+//   const { backgroundsData, audioData, cutSceneData, htmlResult } = xmlToComplexHtml(xmlString, bookSlug, bookLanguage);
 
-  generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug);
+//   generateDataFiles(backgroundsData, audioData, cutSceneData, bookSlug);
 
-  // Generate the HTML file as before
-  if (bookSlug === "1984" || bookSlug === "1984-English") {
-    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const _${bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlResult}</section>\`;`);
-  } else {
-    fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const ${bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlResult}</section>\`;`);
-  }
-}
+//   // Generate the HTML file as before
+//   if (bookSlug === "1984" || bookSlug === "1984-English") {
+//     fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const _${bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlResult}</section>\`;`);
+//   } else {
+//     fs.writeFileSync(path.join(__dirname, `chapters-${bookSlug}.ts`), `export const ${bookSlug.replace(/-/g, "")}BookXml = \`<section>${htmlResult}</section>\`;`);
+//   }
+// }

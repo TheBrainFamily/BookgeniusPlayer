@@ -1,3 +1,25 @@
+import { bookDataLoader } from "@/services/bookDataLoader";
+
+let cachedBookStringified: string | null = null;
+
 export const getBookStringified = (): string => {
-  throw new Error("getBookStringified should never be called at runtime");
+  if (!cachedBookStringified) {
+    throw new Error("Book stringified not loaded. Call loadBookStringified() first.");
+  }
+  return cachedBookStringified;
+};
+
+export const loadBookStringified = async (): Promise<string> => {
+  if (!cachedBookStringified) {
+    cachedBookStringified = await bookDataLoader.getBookStringified();
+  }
+  return cachedBookStringified;
+};
+
+// Force reload the book stringified data
+export const reloadBookStringified = async (): Promise<void> => {
+  // Reload the data (loader always fetches fresh now)
+  cachedBookStringified = await bookDataLoader.getBookStringified();
+
+  console.log("Book stringified data reloaded");
 };

@@ -1,9 +1,8 @@
-import { CURRENT_BOOK } from "./consts"; // Adjust path as needed
-
 import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audiobook-player";
 import { highlightNthOccurrence } from "./highlightWord";
 import { getAudiobookTracksForBook } from "./genericBookDataGetters/getAudiobookTracksForBook";
 import { AudiobookTracksSection } from "./types/book";
+import { bookDataLoader } from "@/services/bookDataLoader";
 
 const AUDIO_SYNC_SHIFT = -0.1;
 
@@ -26,9 +25,9 @@ let isProcessingAudiobookTracks = false; // Module-level flag to prevent re-entr
 //   }
 //   console.log("Preloading tracks for chapters:", chaptersToConsider);
 //
-//   const bookTracks = getAudiobookTracksForBook(CURRENT_BOOK);
+//   const bookTracks = getAudiobookTracksForBook(bookDataLoader.getCurrentBook());
 //   if (!bookTracks) {
-//     console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot preload.`);
+//     console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot preload.`);
 //     return;
 //   }
 //
@@ -69,7 +68,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
 
     const bookTracks = await getAudiobookTracksForBook();
     if (!bookTracks) {
-      console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot determine Audiobook song.`);
+      console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot determine Audiobook song.`);
       isProcessingAudiobookTracks = false;
       return;
     }
@@ -101,7 +100,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
             (section: AudiobookTracksSection) => section.chapter === currentChapter || (section.chapter === currentChapter + 1 && section.paragraph <= 1),
           );
           if (!sectionsToApply) {
-            console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot determine Audiobook song.`);
+            console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot determine Audiobook song.`);
             isProcessingAudiobookTracks = false; // Reset flag before early exit
             return;
           }
@@ -154,7 +153,7 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
             (section: AudiobookTracksSection) => section.chapter === currentChapter || (section.chapter === currentChapter + 1 && section.paragraph <= 1),
           );
           if (!sectionsToApply) {
-            console.log(`No song definitions found for book ${CURRENT_BOOK}. Cannot determine Audiobook song.`);
+            console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot determine Audiobook song.`);
             isProcessingAudiobookTracks = false; // Reset flag before early exit
             return;
           }

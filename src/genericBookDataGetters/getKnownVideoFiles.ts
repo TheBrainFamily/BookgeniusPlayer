@@ -1,3 +1,17 @@
+import { bookDataLoader } from "@/services/bookDataLoader";
+
+let cachedKnownVideoFiles: string[] | null = null;
+
 export const getKnownVideoFiles = (): string[] => {
-  throw new Error("getKnownVideoFiles should never be called at runtime");
+  if (!cachedKnownVideoFiles) {
+    throw new Error("Known video files not loaded. Call loadKnownVideoFiles() first.");
+  }
+  return cachedKnownVideoFiles;
+};
+
+export const loadKnownVideoFiles = async (): Promise<string[]> => {
+  if (!cachedKnownVideoFiles) {
+    cachedKnownVideoFiles = await bookDataLoader.getKnownVideoFiles();
+  }
+  return cachedKnownVideoFiles;
 };

@@ -1,6 +1,6 @@
 import { Location } from "@/state/LocationContext";
 import { QUESTIONS_SERVER_URL } from "@/lib/consts";
-import { CURRENT_BOOK } from "@/consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 import { Filter } from "@/types/book";
 
 const extractSummary = (text: string): string => {
@@ -40,7 +40,7 @@ export async function searchParagraphsFromServer(searchQuery: string, location: 
     chapterFrom: 0, // Assuming 0-based chapter indexing
     chapterTo: location.endChapter,
     paragraphTo: location.endParagraph,
-    bookSlug: CURRENT_BOOK,
+    bookSlug: bookDataLoader.getCurrentBook(),
   };
 
   const params = new URLSearchParams({ searchQuery: searchQuery, filter: JSON.stringify(filter) });

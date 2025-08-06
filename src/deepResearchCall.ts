@@ -1,7 +1,7 @@
-import { CURRENT_BOOK } from "./consts";
 import { Location } from "./state/LocationContext";
 import { Filter } from "./types/book";
 import { DEV_SERVER_URL } from "@/lib/consts";
+import { bookDataLoader } from "@/services/bookDataLoader";
 
 export async function deepResearchCall(searchQuery: string, location: Location): Promise<string> {
   const baseUrl = "/deepResearch"; // Assuming localhost for now
@@ -9,7 +9,7 @@ export async function deepResearchCall(searchQuery: string, location: Location):
     chapterFrom: 1, // Based on the curl example
     chapterTo: location.chapter,
     paragraphTo: location.paragraph + 1,
-    bookSlug: CURRENT_BOOK,
+    bookSlug: bookDataLoader.getCurrentBook(),
   };
 
   const params = new URLSearchParams({ question: searchQuery, filter: JSON.stringify(filter) });
