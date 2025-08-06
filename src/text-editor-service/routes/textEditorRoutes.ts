@@ -26,6 +26,6 @@ router.post("/remove-background-suggestion", textEditorController.removeBackgrou
 router.get("/sse/book-updates", sseController.bookUpdates);
 
 // Endpoint for paragraph selection from Reader
-router.post("/select-paragraph", sseController.selectParagraph);
+router.post("/sse/select-paragraph", sseController.selectParagraph);
 
 export default router;

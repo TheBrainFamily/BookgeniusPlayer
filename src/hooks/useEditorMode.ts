@@ -40,7 +40,7 @@ export function useEditorMode(container: HTMLElement | null) {
 
         if (event.metaKey && !event.altKey) {
           try {
-            const response = await fetch("http://localhost:3000/api/text-editor/select-paragraph", {
+            const response = await fetch("http://localhost:3000/api/text-editor/sse/select-paragraph", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ bookId: bookName, chapterId: chapterNumber, paragraphId: paragraphNumber }),
