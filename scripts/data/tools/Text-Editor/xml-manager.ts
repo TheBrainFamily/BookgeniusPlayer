@@ -132,8 +132,57 @@ export class XmlManager {
     return { paragraph: paragraphs[paragraphNumber], xmlDoc };
   }
 
+  public getSentenceElement(xmlDoc: Document, sentenceId: string): { sentence: Element | null; paragraph: Element | null; xmlDoc: Document } {
+    try {
+      const sentence = xmlDoc.getElementById(sentenceId);
+
+      if (!sentence || sentence.tagName.toLowerCase() !== "span") {
+        return { sentence: null, paragraph: null, xmlDoc };
+      }
+
+      const paragraph = sentence.parentNode as Element;
+      return { sentence, paragraph, xmlDoc };
+    } catch (error) {
+      throw new XmlError(`Failed to get sentence element: ${error.message}`);
+    }
+  }
+
+  public getSentenceHtml(sentence: Element): string {
+    try {
+      return sentence.toString();
+    } catch (error) {
+      throw new XmlError(`Failed to get sentence html: ${error.message}`);
+    }
+  }
+
+  public updateSentenceContent(sentence: Element, newContent: string): void {
+    try {
+      const parentElement = sentence.parentNode;
+      if (!parentElement) {
+        throw new XmlError("Sentence element has no parent");
+      }
+
+      const tempDoc = this.domParser.parseFromString(`<temp>${newContent}</temp>`, "text/xml");
+      const tempElement = tempDoc.documentElement;
+      const newSentenceElement = tempElement.firstChild as Element;
+
+      if (!newSentenceElement) {
+        throw new XmlError("Failed to parse new sentence content");
+      }
+
+      parentElement.replaceChild(newSentenceElement, sentence);
+    } catch (error) {
+      throw new XmlError(`Failed to update sentence content: ${error.message}`);
+    }
+  }
+
   public updateAndSaveXml(xmlDoc: Document, paragraph: Element, newContent: string): string {
     this.updateParagraphContent(xmlDoc, paragraph, newContent);
+    return this.serializeXml(xmlDoc);
+  }
+
+  public updateSentenceAndSaveXml(xmlDoc: Document, sentence: Element, newContent: string): string {
+    this.updateSentenceContent(sentence, newContent);
     return this.serializeXml(xmlDoc);
   }
 }

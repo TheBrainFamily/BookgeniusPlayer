@@ -14,6 +14,8 @@ router.post("/remove-character", textEditorController.removeCharacter);
 
 router.post("/add-character", textEditorController.addCharacter);
 
+router.post("/edit-sentence", textEditorController.editSentence);
+
 router.post("/add-music-suggestion", textEditorController.addMusicSuggestion);
 
 router.post("/remove-music-suggestion", textEditorController.removeMusicSuggestion);

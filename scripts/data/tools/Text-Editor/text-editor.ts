@@ -60,6 +60,31 @@ export class TextEditor {
     }
   }
 
+  public async editSentence(sentenceId: string): Promise<void> {
+    try {
+      const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
+      const { sentence, paragraph } = this.xmlManager.getSentenceElement(xmlDoc, sentenceId);
+
+      if (!sentence || !paragraph) {
+        throw new TextEditorError(`Sentence with ID "${sentenceId}" not found`);
+      }
+
+      const originalSentenceHtml = this.xmlManager.getSentenceHtml(sentence);
+
+      this.promptsManager.generateWrapCharactersRule();
+      const updatedSentenceHtml = await this.editorManager.openInCursor(originalSentenceHtml);
+
+      if (updatedSentenceHtml !== originalSentenceHtml) {
+        const updatedXml = this.xmlManager.updateSentenceAndSaveXml(xmlDoc, sentence, updatedSentenceHtml);
+        this.fileManager.regenerateXml(updatedXml);
+      }
+
+      this.promptsManager.removeWrapCharactersRule();
+    } catch (error) {
+      this.handleError("edit sentence", error);
+    }
+  }
+
   public async addMusicSuggestion(chapterNumber: number, paragraphNumber: number): Promise<void> {
     try {
       const xmlDoc = this.xmlManager.parseXml(this.fileManager.readXmlFile());
