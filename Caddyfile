@@ -1,0 +1,24 @@
+# This Caddyfile now handles two separate frontend applications
+
+# 1. The Platform App (your main entry point)
+platform.localhost {
+    log
+    # All requests to platform.localhost are handled by the platform service
+    reverse_proxy platform:80
+}
+
+# 2. The Player App (loaded inside the iframe)
+localhost {
+    log
+
+    # Route API requests to the core-api service
+    handle_path /api/core/* {
+        uri strip_prefix /api/core
+        reverse_proxy core-api:3000
+    }
+
+    # Handle all other requests by proxying them to the player service
+    handle {
+        reverse_proxy player:80
+    }
+}

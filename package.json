@@ -1,0 +1,20 @@
+{
+  "name": "monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:player": "pnpm --filter player dev",
+    "dev:core-api": "pnpm --filter core-api dev",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:docker": "pnpm --filter player build-for-docker && pnpm --filter platform build && bun run ./tools/scripts/prepare-docker-build.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  }
+}

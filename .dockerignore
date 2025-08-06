@@ -1,0 +1,10 @@
+# Ignore all node_modules directories in the entire project
+**/node_modules
+
+# Ignore all build output directories
+**/dist
+
+# Ignore other common files
+.git
+.env
+*.log
