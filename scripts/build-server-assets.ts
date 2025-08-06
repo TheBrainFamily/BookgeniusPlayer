@@ -13,8 +13,8 @@ async function buildServerAssets() {
   try {
     // 1. Parse book data using existing functions
     const { metadata, bookString } = parseBookXmlData(bookDirectoryPath);
-    // Call the function which returns htmlResult and other data
-    const { htmlResult, chapterTitles } = xmlToComplexHtml(bookString, metadata.slug, metadata.language);
+    // Call the function which now returns chapterHtmls
+    const { chapterHtmls, chapterTitles } = xmlToComplexHtml(bookString, metadata.slug, metadata.language);
 
     // 2. Create the output directory
     const outputDir = path.resolve("dist-server", metadata.slug);
@@ -22,10 +22,9 @@ async function buildServerAssets() {
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    // 3. Generate and save the HTML files
-    const fullBookHtml = htmlResult;
-    // For now, use the full HTML for chapter 1 as well
-    const chapter1Html = htmlResult;
+    // 3. Generate and save the HTML files (the CORRECT way)
+    const fullBookHtml = chapterHtmls.join("");
+    const chapter1Html = chapterHtmls.length > 0 ? chapterHtmls[0] : "";
 
     fs.writeFileSync(path.join(outputDir, "full-book.html"), fullBookHtml, "utf-8");
     fs.writeFileSync(path.join(outputDir, "chapter-1.html"), chapter1Html, "utf-8");
