@@ -1,6 +1,5 @@
 import { RequestHandler } from "express";
 import { TextEditorService } from "../services/textEditorService";
-import { bookWatcherService } from "../services/bookWatcherService";
 
 export class TextEditorController {
   private textEditorService: TextEditorService;
@@ -11,7 +10,7 @@ export class TextEditorController {
 
   public editParagraph: RequestHandler = async (req, res) => {
     try {
-      const { chapterNumber, paragraphNumber, bookName } = req.body;
+      const { chapterNumber, paragraphNumber } = req.body;
 
       if (!chapterNumber || paragraphNumber === null) {
         res.status(400).json({ error: "Missing required parameters" });
@@ -19,9 +18,6 @@ export class TextEditorController {
       }
 
       // const result = await this.textEditorService.editParagraph(Number(chapterNumber), Number(paragraphNumber));
-
-      // Trigger external app via SSE
-      await bookWatcherService.triggerExternalApp(Number(chapterNumber), Number(paragraphNumber), bookName);
 
       res.json({ success: true, data: "" });
     } catch (error) {
