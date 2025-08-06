@@ -15,6 +15,16 @@ function getIsPlayFormat(): boolean {
   return cachedIsPlayFormat;
 }
 
+let isSplashAnimationComplete = false;
+
+window.addEventListener(
+  "splashHidden",
+  () => {
+    isSplashAnimationComplete = true;
+  },
+  { once: true },
+);
+
 // --- Development Zone Visualizers ---
 
 /**
@@ -858,12 +868,14 @@ export function setupPageObserver(
   // Initial observation
   const paragraphsToObserve = document.querySelectorAll("section[data-chapter] [data-index]");
 
-  console.log("spacerObserver", paragraphsToObserve);
+  const spacersToObserve = document.querySelectorAll(".transition-spacer");
+  const contentContainer = document.getElementById("content-container");
+  console.log("Observing these spacers:", spacersToObserve);
+
   const spacerObserver = new IntersectionObserver(
     (entries) => {
-      console.log("spacerObserver entries", entries);
       entries.forEach((entry) => {
-        const contentContainer = document.getElementById("content-container");
+        if (!isSplashAnimationComplete) return;
         if (!contentContainer) return;
 
         const rect = entry.boundingClientRect;
@@ -875,7 +887,6 @@ export function setupPageObserver(
         const visibilityPercent = visibleHeight / rect.height;
 
         // Determine if spacer is entering from bottom or leaving from top
-
         if (entry.isIntersecting) {
           // Spacer is at least partially visible
           if (rect.top >= 0) {
@@ -886,7 +897,7 @@ export function setupPageObserver(
             } else if (visibilityPercent < 1) {
               // 50-99% visible: fade from 1 to 0
               const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
-              console.log(`[PageObserver] Spacer is entering from bottom or fully in view. Next chapter start: ${nextChapterStart}`);
+
               setCurrentLocation({
                 chapter: parseInt(nextChapterStart, 10),
                 paragraph: 0,
@@ -895,6 +906,7 @@ export function setupPageObserver(
                 currentChapter: parseInt(nextChapterStart, 10),
                 currentParagraph: 0,
               });
+
               const fadePercent = (visibilityPercent - 0.5) * 2;
               contentContainer.style.opacity = (1 - fadePercent).toString();
             } else {
@@ -919,7 +931,7 @@ export function setupPageObserver(
     { threshold: Array.from(Array(101).keys()).map((i) => i / 100) },
   );
 
-  document.querySelectorAll(".transition-spacer").forEach((spacer) => {
+  spacersToObserve.forEach((spacer) => {
     spacerObserver.observe(spacer);
   });
 
