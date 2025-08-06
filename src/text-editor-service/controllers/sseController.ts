@@ -5,7 +5,7 @@ export class SSEController {
   selectParagraph = (req: Request, res: Response): void => {
     const { bookId, chapterId, paragraphId } = req.body;
 
-    if (!bookId || !chapterId || paragraphId === null || paragraphId === undefined) {
+    if (!bookId || !chapterId || paragraphId == null) {
       res.status(400).json({ error: "bookId, chapterId, and paragraphId are required" });
       return;
     }

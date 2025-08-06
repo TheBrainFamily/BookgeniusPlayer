@@ -11,8 +11,8 @@ interface SSEClient {
 
 interface ParagraphSelection {
   bookId: string;
-  chapterId: string;
-  paragraphId: string;
+  chapterId: number;
+  paragraphId: number;
   timestamp: number;
 }
 
@@ -53,6 +53,7 @@ class BookWatcherService {
         console.log(`[SSE] Sent last paragraph selection to client ${clientId}`);
       } catch (error) {
         console.error(`[SSE] Failed to send last paragraph selection to client ${clientId}:`, error);
+        this.removeClient(clientId);
       }
     }
   }
