@@ -8,6 +8,7 @@ src/data/tools/Text-Editor/.cursor/
 .claude
 src/books/*
 public/books/
+public_books/
 public_books/*/bookData.ts
 public_books/*/getAudiobookTracksForBook.ts
 public_books/*/getBookStringified.ts
