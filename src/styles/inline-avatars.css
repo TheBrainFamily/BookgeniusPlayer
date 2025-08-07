@@ -243,12 +243,18 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
 /* Characters on Stage */
 .characters-on-stage-panel .not-speaking .cursor-pointer {
   filter: grayscale(60%);
+  transition:
+    filter 0.3s ease,
+    transform 0.3s ease;
 }
 .characters-on-stage-panel .not-speaking .cursor-pointer:hover {
   filter: none;
 }
 .characters-on-stage-panel .speaking .cursor-pointer {
   filter: none;
+  transition:
+    filter 0.3s ease,
+    transform 0.3s ease;
 }
 
 .characters-on-stage-panel .speaking,
