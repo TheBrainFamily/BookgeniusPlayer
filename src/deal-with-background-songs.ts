@@ -12,12 +12,15 @@ import { CURRENT_BOOK } from "./consts";
 import { getBackgroundSongsForBook } from "./genericBookDataGetters/getBackgroundSongsForBook";
 import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
 import { BackgroundSongSection } from "./types/book";
+import { pageWasJustReloaded } from "./utils/pageWasJustReloaded";
 
 let isProcessingBackgroundSongs = false; // Module-level flag to prevent re-entrancy
 
 // Preload function - can be async if loadTrack is async (it is now)
 export const preloadBackgroundTracks = async () => {
   console.log("Attempting to preload background tracks dynamically...");
+
+  const appWasJustLaunched = pageWasJustReloaded();
 
   const audioContextReady = await initAudioContext();
   if (!audioContextReady) {
@@ -27,7 +30,8 @@ export const preloadBackgroundTracks = async () => {
 
   const location = getCurrentLocation();
   const currentChapter = location.currentChapter;
-  const chaptersToPreloadAhead = 2;
+  const currentParagraph = location.currentParagraph;
+  const chaptersToPreloadAhead = appWasJustLaunched ? 0 : 2;
 
   const chaptersToConsider = Array.from({ length: chaptersToPreloadAhead + 1 }, (_, i) => currentChapter + i);
   console.log("Preloading tracks for chapters:", chaptersToConsider);
@@ -40,13 +44,25 @@ export const preloadBackgroundTracks = async () => {
 
   const sectionsToPreload = bookSongs.filter((section) => chaptersToConsider.includes(section.chapter));
 
+  let sectionsToPreloadFiltered: BackgroundSongSection[] = [];
+
   if (sectionsToPreload.length === 0) {
     console.log("No background tracks found for the current chapter range to preload.");
     return false;
   }
 
-  console.log(`Preloading ${sectionsToPreload.length} sections...`);
-  const preloadPromises = sectionsToPreload.flatMap((section) => section.files.map((file) => loadTrack(file.replace(".mp3", ""))));
+  if (appWasJustLaunched) {
+    sectionsToPreloadFiltered = sectionsToPreload.filter((section) => section.paragraph <= currentParagraph).slice(-1);
+  } else {
+    sectionsToPreloadFiltered = sectionsToPreload;
+  }
+
+  if (sectionsToPreloadFiltered.length === 0) {
+    sectionsToPreloadFiltered = sectionsToPreload;
+  }
+
+  console.log(`Preloading ${sectionsToPreloadFiltered.length} sections...`);
+  const preloadPromises = sectionsToPreloadFiltered.flatMap((section) => section.files.map((file) => loadTrack(file.replace(".mp3", ""))));
 
   // Wait for all tracks to load in parallel
   try {
