@@ -4,12 +4,30 @@ import { Badge } from "@/components/ui/badge";
 import { Star, BookOpen, Clock, Play, Volume2 } from "lucide-react";
 import { books } from "@/books";
 import { useNavigate } from "react-router-dom";
+import { useRouteTransition } from "@/providers/RouteTransitionProvider";
 
 const BookCollection = () => {
   const navigate = useNavigate();
+  const { startTransition } = useRouteTransition();
 
   const handleBookClick = (slug: string) => {
-    navigate(`/reader/${slug}`);
+    const book = books.find((b) => b.slug === slug);
+    const title = book?.title ?? "BookGenius";
+    const phrases =
+      book?.phrases ?? [
+        "Loading...",
+        "Creating the story...",
+        "Waking up the director...",
+        "Warming up the speakers...",
+      ];
+
+    // Start the unified overlay with BookLoader
+    startTransition({ title, phrases, subtitle: "Loading..." });
+
+    // Let the overlay paint before route switch for a smooth fade
+    requestAnimationFrame(() => {
+      navigate(`/reader/${slug}`);
+    });
   };
 
   return (

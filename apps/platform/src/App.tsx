@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ReaderPage from "./pages/ReaderPage";
 import { ClerkProvider } from "@clerk/react-router";
+import { RouteTransitionProvider } from "./providers/RouteTransitionProvider";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -23,11 +24,13 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/reader/:slug" element={<ReaderPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <RouteTransitionProvider defaultMinDurationMs={50}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/reader/:slug" element={<ReaderPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </RouteTransitionProvider>
         </ClerkProvider>
       </BrowserRouter>
     </TooltipProvider>
