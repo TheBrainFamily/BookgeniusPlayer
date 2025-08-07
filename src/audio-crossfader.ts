@@ -310,7 +310,7 @@ async function streamingDecodeAudioData(
         } catch (e) {
           console.error(`Failed to decode full audio for '${trackId}':`, e);
         }
-      })().catch(e => console.error(`[audio-crossfader] Unhandled error in full audio decode background task for '${trackId}':`, e));
+      })().catch((e) => console.error(`[audio-crossfader] Unhandled error in full audio decode background task for '${trackId}':`, e));
 
       return decodedFirstChunk;
     } catch (e) {
@@ -321,6 +321,197 @@ async function streamingDecodeAudioData(
     console.error(`Streaming decode failed for '${trackId}':`, e);
     tracks.delete(trackId);
     return null;
+  }
+}
+
+/**
+ * Handles streaming download of audio files, starting playback as soon as enough data is available.
+ */
+async function handleStreamingDownload(response: Response, trackId: string, transitionPoints?: number[]): Promise<boolean> {
+  if (!audioContext || !response.body) {
+    console.error("handleStreamingDownload: AudioContext or response body not available");
+    tracks.delete(trackId);
+    return false;
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytesReceived = 0;
+  let hasStartedPlayback = false;
+  let coverArtUrl: string | undefined;
+  let title = trackId;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) {
+        break;
+      }
+
+      if (value) {
+        chunks.push(value);
+        totalBytesReceived += value.length;
+
+        // Try to start early playback once we have enough data
+        if (!hasStartedPlayback && totalBytesReceived >= 256 * 1024) {
+          // 256KB threshold
+          try {
+            // Combine chunks into a single array buffer
+            const combinedArray = new Uint8Array(totalBytesReceived);
+            let offset = 0;
+            for (const chunk of chunks) {
+              combinedArray.set(chunk, offset);
+              offset += chunk.length;
+            }
+
+            // Parse metadata from the available data
+            try {
+              const partialBlob = new Blob([combinedArray], { type: "audio/mpeg" });
+              const { common } = await parseBlob(partialBlob);
+              title = common.title || title;
+
+              if (common.picture?.[0]) {
+                const pic = common.picture[0];
+                const blob = new Blob([new Uint8Array(pic.data)], { type: pic.format });
+                coverArtUrl = URL.createObjectURL(blob);
+              }
+            } catch (metadataError) {
+              console.warn(`Metadata parsing failed for partial data of '${trackId}':`, metadataError);
+              // Continue with playback even if metadata parsing fails
+            }
+
+            // Attempt early streaming decode
+            const audioBuffer = await streamingDecodeAudioData(audioContext, combinedArray.buffer, trackId, title, coverArtUrl || "", transitionPoints);
+
+            if (audioBuffer) {
+              hasStartedPlayback = true;
+              console.log(`🎵 Early streaming playback started for '${trackId}' with ${totalBytesReceived} bytes received`);
+
+              // Continue downloading in the background for the full file
+              downloadRemainingDataInBackground(reader, chunks, trackId, title, coverArtUrl || "", transitionPoints);
+              return true;
+            }
+          } catch (earlyPlaybackError) {
+            console.warn(`Early playback failed for '${trackId}':`, earlyPlaybackError);
+            // Continue downloading to try full decode later
+          }
+        }
+      }
+    }
+
+    // If we reach here, download is complete but early playback didn't start
+    // Combine all chunks and process normally
+    const finalArray = new Uint8Array(totalBytesReceived);
+    let offset = 0;
+    for (const chunk of chunks) {
+      finalArray.set(chunk, offset);
+      offset += chunk.length;
+    }
+
+    // Parse metadata if not already done
+    if (!hasStartedPlayback) {
+      try {
+        const fullBlob = new Blob([finalArray], { type: "audio/mpeg" });
+        const { common } = await parseBlob(fullBlob);
+        title = common.title || title;
+
+        if (common.picture?.[0]) {
+          const pic = common.picture[0];
+          const blob = new Blob([new Uint8Array(pic.data)], { type: pic.format });
+          coverArtUrl = URL.createObjectURL(blob);
+        }
+      } catch (metadataError) {
+        console.warn(`Final metadata parsing failed for '${trackId}':`, metadataError);
+      }
+    }
+
+    // Process the complete file
+    const audioBuffer = await streamingDecodeAudioData(audioContext, finalArray.buffer, trackId, title, coverArtUrl || "", transitionPoints);
+
+    if (audioBuffer) {
+      if (!hasStartedPlayback) {
+        console.log(`✅ Full file streaming decode completed for '${trackId}' - ${totalBytesReceived} bytes`);
+      }
+      return true;
+    }
+
+    // Fall back to regular decode if streaming decode fails
+    const regularBuffer = await audioContext.decodeAudioData(finalArray.buffer);
+    const trackState = createTrackState(regularBuffer, { title, coverArtUrl: coverArtUrl || "", transitionPoints });
+    tracks.set(trackId, trackState);
+
+    console.log(`✅ Fallback decode completed for '${trackId}' - ${regularBuffer.duration.toFixed(2)}s`);
+    return true;
+  } catch (error) {
+    console.error(`Streaming download failed for '${trackId}':`, error);
+    tracks.delete(trackId);
+    if (coverArtUrl) URL.revokeObjectURL(coverArtUrl);
+    return false;
+  }
+}
+
+/**
+ * Continues downloading remaining data in the background after early playback has started
+ */
+async function downloadRemainingDataInBackground(
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+  existingChunks: Uint8Array[],
+  trackId: string,
+  title: string,
+  coverArtUrl: string,
+  transitionPoints?: number[],
+): Promise<void> {
+  if (!audioContext) return;
+
+  try {
+    let totalBytesReceived = existingChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+    const allChunks = [...existingChunks];
+
+    // Continue reading the remaining data
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) {
+        break;
+      }
+
+      if (value) {
+        allChunks.push(value);
+        totalBytesReceived += value.length;
+      }
+    }
+
+    // Combine all chunks to create the complete file
+    const completeArray = new Uint8Array(totalBytesReceived);
+    let offset = 0;
+    for (const chunk of allChunks) {
+      completeArray.set(chunk, offset);
+      offset += chunk.length;
+    }
+
+    // Decode the complete audio buffer
+    const fullAudioBuffer = await audioContext.decodeAudioData(completeArray.buffer);
+    const existingState = tracks.get(trackId);
+
+    if (existingState) {
+      // Update the existing partial state with the full buffer
+      existingState.audioBuffer = fullAudioBuffer;
+      existingState.duration = fullAudioBuffer.duration;
+      existingState.trackLength = fullAudioBuffer.duration;
+
+      console.log(`✅ Background download complete for '${trackId}' - ${fullAudioBuffer.duration.toFixed(2)}s (${totalBytesReceived} bytes)`);
+      window.dispatchEvent(new CustomEvent("trackFullyLoaded", { detail: { trackId, fullDuration: fullAudioBuffer.duration, totalBytes: totalBytesReceived } }));
+    } else {
+      // Create new complete track state
+      const newTrackState = createTrackState(fullAudioBuffer, { title, coverArtUrl, transitionPoints });
+      tracks.set(trackId, newTrackState);
+
+      console.log(`✅ Background download and decode complete for '${trackId}' - ${fullAudioBuffer.duration.toFixed(2)}s`);
+      window.dispatchEvent(new CustomEvent("trackFullyLoaded", { detail: { trackId, fullDuration: fullAudioBuffer.duration, totalBytes: totalBytesReceived } }));
+    }
+  } catch (error) {
+    console.error(`Background download failed for '${trackId}':`, error);
   }
 }
 
@@ -373,8 +564,20 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
     if (!isFetchOk(res, url)) {
       throw new Error(`Fetch failed: HTTP ${res.status}`);
     }
-    arrayBuffer = await res.arrayBuffer();
-    if (!arrayBuffer.byteLength) throw new Error("Empty file");
+
+    // Check if we can use streaming for this file
+    const contentLength = res.headers.get("content-length");
+    const fileSize = contentLength ? parseInt(contentLength, 10) : 0;
+    const canStream = enableStreaming && fileSize > STREAMING_FILE_SIZE_THRESHOLD && res.body;
+
+    if (canStream) {
+      // Start streaming download and early playback
+      return await handleStreamingDownload(res, trackId, transitionPoints);
+    } else {
+      // Fall back to traditional download for small files or when streaming is disabled
+      arrayBuffer = await res.arrayBuffer();
+      if (!arrayBuffer.byteLength) throw new Error("Empty file");
+    }
   } catch (e) {
     console.error(`❌ Fetch error for '${trackId}':`, e);
     tracks.delete(trackId);
