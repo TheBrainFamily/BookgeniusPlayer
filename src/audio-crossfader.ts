@@ -180,9 +180,6 @@ async function streamingDecodeAudioData(
     // Create chunks for progressive decoding (roughly 3-second chunks)
     const PLAYBACK_START_THRESHOLD = 512 * 1024; // Start playing after 512KB decoded
 
-    let fullAudioBuffer: AudioBuffer | null = null;
-    const estimatedDuration = 0;
-
     // Try to decode first chunk to get audio format info and start playback early
     const firstChunk = arrayBuffer.slice(0, Math.min(PLAYBACK_START_THRESHOLD, arrayBuffer.byteLength));
 
@@ -215,7 +212,7 @@ async function streamingDecodeAudioData(
     // Continue decoding the full file in the background
     setTimeout(async () => {
       try {
-        fullAudioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+        const fullAudioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
 
         // Update the track with the complete buffer
         const updatedTrackState: TrackState = {
@@ -413,13 +410,19 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
       console.log(`Partial buffer ended for '${trackId}' at ${currentPosition?.toFixed(2)}s. Checking for full buffer...`);
 
       // Wait a moment and check if full buffer is now available
-      setTimeout(async () => {
+      let checkAttempts = 0;
+      const maxCheckAttempts = 50; // Poll for 5 seconds (50 * 100ms)
+      const checkInterval = setInterval(() => {
         const updatedState = tracks.get(trackId);
         if (updatedState?.audioBuffer && updatedState.audioBuffer.duration > bufferDuration + 1) {
+          clearInterval(checkInterval);
           console.log(`Full buffer now available for '${trackId}'. Continuing playback from ${currentPosition?.toFixed(2)}s`);
           if (currentPosition !== null) {
             playTrack(trackId, audioContext?.currentTime || 0, currentPosition);
           }
+        } else if (++checkAttempts >= maxCheckAttempts) {
+          clearInterval(checkInterval);
+          console.warn(`Timed out waiting for full buffer for '${trackId}'.`);
         }
       }, 100);
       return;
