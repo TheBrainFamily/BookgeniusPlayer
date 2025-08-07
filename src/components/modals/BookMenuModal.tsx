@@ -252,7 +252,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
   return (
     <ModalUI title={t("book_settings")} onClose={onClose} hideOverlay={hideOverlay}>
-      <div className="space-y-2 mb-6">
+      <div className="space-y-2 mb-6 book-settings-actions">
         <Button
           variant="ghost"
           className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
@@ -285,9 +285,9 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           {t("set_openai_api_key")}
         </Button>
       </div>
-      <div className="flex lg:flex-col space-x-2 lg:space-y-2 lg:space-x-0">
-        <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-1/2 lg:w-full")}>
-          <div className="space-y-4">
+      <div className="flex flex-col gap-2 book-settings-container">
+        <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full book-settings-control-box")}>
+          <div className="space-y-4 book-settings-control-box-inner">
             <div className="flex items-center gap-2">
               <Type className="h-4 w-4 text-white" />
               <Label htmlFor="font-size" className="text-sm font-medium text-white">
@@ -319,8 +319,8 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           </div>
         </div>
         {isVisible && (
-          <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-1/2 lg:w-full")}>
-            <div className="space-y-4">
+          <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full book-settings-control-box")}>
+            <div className="space-y-4 book-settings-control-box-inner">
               <div className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4 text-white" />
                 <Label htmlFor="complexity-slider" className="text-sm font-medium text-white">
@@ -353,7 +353,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           </div>
         )}
       </div>
-      <div className="text-xs text-gray-500 mt-4 text-right">
+      <div className="text-xs text-gray-500 mt-4 text-right book-settings-version">
         <span>
           {t("version")}: {import.meta.env.VITE_BUILD_TIME || "0.0.1"}
         </span>

@@ -358,6 +358,16 @@
           text-indent: 0 !important;
           margin-left: 1.5em;
         }
+
+        .play-container > section {
+          p[data-text-alignment="left"]:not(:has(em)) {
+            margin-left: 10px;
+          }
+
+          p[data-text-alignment="right"][data-is-character="true"] {
+            margin-right: 10px;
+          }
+        }
       }
 
       section > span {
@@ -1279,4 +1289,107 @@ section[data-chapter] [data-index] {
 
 .text-nowrap {
   white-space: nowrap;
+}
+
+@media screen and (max-height: 480px) and (orientation: landscape) {
+  .book-settings-actions {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .book-settings-control-box {
+    padding: 0.75rem;
+  }
+
+  .book-settings-control-box-inner {
+    gap: 0.5rem;
+  }
+
+  .book-settings-version {
+    margin-top: 0.5rem;
+  }
+
+  .book-settings-container {
+    flex-direction: row;
+    gap: 0.5rem;
+    margin-top: -1rem; /* reduce space to actions */
+  }
+
+  .player-controls-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 90vw;
+    max-width: 600px;
+  }
+
+  .scrollbar-search {
+    padding-top: 0 !important;
+  }
+
+  .player-left {
+    flex: 0 0 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .player-right {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    max-height: 80vh; /* Or a specific max height */
+    overflow-y: auto;
+  }
+
+  /* Make playlist scrollable */
+  .player-right .space-y-2 {
+    max-height: 200px; /* Adjust as needed */
+    overflow-y: auto;
+    padding-right: 8px; /* For scrollbar */
+  }
+
+  .current-track-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .playlist-header {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .playlist-item-title,
+  .playlist-item-duration {
+    font-size: 0.85rem;
+  }
+
+  .music-progress-bar {
+    margin-top: 1.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .music-progress-bar-labels {
+    padding-right: 0.5rem;
+  }
+
+  /* Reduce padding on the main controls container */
+  .player-controls-layout {
+    padding: 0.5rem;
+  }
+
+  /* Reduce margins on player controls */
+  .player-right .mb-2 {
+    margin-bottom: 0.25rem;
+  }
+  .player-right .mb-4 {
+    margin-bottom: 0.5rem;
+  }
+  .player-left .mb-4 {
+    margin-bottom: 0.5rem;
+  }
 }
