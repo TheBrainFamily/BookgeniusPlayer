@@ -170,6 +170,26 @@ function isFetchOk(res: Response, url: string): boolean {
   return res.ok || (local && res.status === 0);
 }
 
+/**
+ * Creates a complete TrackState object from a decoded audio buffer and its metadata.
+ * This helper centralizes the creation logic to avoid duplication.
+ * @param audioBuffer - The fully decoded audio buffer.
+ * @param metadata - An object containing title, coverArtUrl, and optional transitionPoints.
+ * @returns A complete TrackState object, ready to be cached.
+ */
+function createTrackState(audioBuffer: AudioBuffer, metadata: { title: string; coverArtUrl: string; transitionPoints?: number[] }): TrackState {
+  return {
+    audioBuffer,
+    duration: audioBuffer.duration,
+    trackLength: audioBuffer.duration,
+    title: metadata.title,
+    coverArtUrl: metadata.coverArtUrl,
+    transitionPoints: metadata.transitionPoints,
+    sourceNode: null,
+    gainNode: null,
+  };
+}
+
 async function streamingDecodeAudioData(
   audioContext: AudioContext,
   arrayBuffer: ArrayBuffer,
@@ -218,17 +238,7 @@ async function streamingDecodeAudioData(
         const fullAudioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
         // Update the track with the complete buffer
-        const updatedTrackState: TrackState = {
-          audioBuffer: fullAudioBuffer,
-          duration: fullAudioBuffer.duration,
-          transitionPoints,
-          sourceNode: null,
-          gainNode: null,
-          coverArtUrl,
-          title,
-          trackLength: fullAudioBuffer.duration,
-        };
-
+        const updatedTrackState = createTrackState(fullAudioBuffer, { title, coverArtUrl, transitionPoints });
         tracks.set(trackId, updatedTrackState);
 
         console.log(`✅ Full decode complete for '${trackId}' - ${fullAudioBuffer.duration.toFixed(2)}s`);
@@ -342,16 +352,8 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
     const audioBuffer = await audioContext!.decodeAudioData(arrayBuffer);
 
     /* 5 ▸ cache & done ---------------------------------------------- */
-    tracks.set(trackId, {
-      audioBuffer,
-      duration: audioBuffer.duration,
-      transitionPoints,
-      sourceNode: null,
-      gainNode: null,
-      coverArtUrl: coverArtUrl || "",
-      title,
-      trackLength: audioBuffer.duration,
-    });
+    const trackState = createTrackState(audioBuffer, { title, coverArtUrl: coverArtUrl || "", transitionPoints });
+    tracks.set(trackId, trackState);
 
     console.log(`✅ Decoded '${trackId}' – ${audioBuffer.duration.toFixed(2)} s` + (transitionPoints ? ` | transitions: ${transitionPoints.join(", ")}` : ""));
     return true;
