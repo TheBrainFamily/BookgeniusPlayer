@@ -716,12 +716,12 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
     const originalPartialDuration = state.audioBuffer.duration; // Store the original partial duration
     let continuationScheduled = false;
 
-    const scheduleContination = () => {
+    const scheduleContinuation = () => {
       if (continuationScheduled) return;
 
       const currentState = tracks.get(trackId);
       console.log(
-        `scheduleContination check: trackId=${trackId}, currentTrackId=${currentTrackId}, hasBuffer=${!!currentState?.audioBuffer}, bufferDuration=${currentState?.audioBuffer?.duration}, originalPartialDuration=${originalPartialDuration}`,
+        `scheduleContinuation check: trackId=${trackId}, currentTrackId=${currentTrackId}, hasBuffer=${!!currentState?.audioBuffer}, bufferDuration=${currentState?.audioBuffer?.duration}, originalPartialDuration=${originalPartialDuration}`,
       );
 
       // Check if we have a full buffer (duration is significantly larger than the original partial)
@@ -802,7 +802,7 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
     // Listen for the full buffer to be ready
     const handleTrackFullyLoaded = (event: CustomEvent) => {
       if (event.detail.trackId === trackId) {
-        scheduleContination();
+        scheduleContinuation();
         window.removeEventListener("trackFullyLoaded", handleTrackFullyLoaded);
         const state = tracks.get(trackId);
         if (state) {
@@ -814,7 +814,7 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
     window.addEventListener("trackFullyLoaded", handleTrackFullyLoaded);
 
     // Also try immediately in case it's already ready
-    scheduleContination();
+    scheduleContinuation();
   }
 
   source.onended = async () => {
