@@ -6,6 +6,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ReaderPage from "./pages/ReaderPage";
+import { ClerkProvider } from "@clerk/react-router";
+
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Add your Clerk Publishable Key to the .env file");
+}
 
 const queryClient = new QueryClient();
 
@@ -15,11 +22,13 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/reader/:slug" element={<ReaderPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/reader/:slug" element={<ReaderPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ClerkProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

@@ -74,6 +74,16 @@ export const books = [
     readTime: "3 hrs",
     features: ["Shakespearean Audio", "Gothic Animation", "Dramatic Score"],
     language: "en",
+    phrases: [
+      "Sharpening quills...",
+      "Tuning the lute...",
+      "Consulting the soothsayer...",
+      "Polishing the crown jewels...",
+      "Mulling a tragic flaw...",
+      "Brewing toil and trouble...",
+      "Assembling the groundlings...",
+      "Checking for daggers...",
+    ],
   },
   {
     id: 8,

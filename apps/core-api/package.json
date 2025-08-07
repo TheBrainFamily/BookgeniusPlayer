@@ -12,5 +12,9 @@
   "packageManager": "pnpm@10.13.1",
   "devDependencies": {
     "@types/bun": "^1.2.19"
+  },
+  "dependencies": {
+    "@clerk/backend": "^2.6.3",
+    "jose": "^6.0.12"
   }
 }

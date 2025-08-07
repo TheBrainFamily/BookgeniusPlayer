@@ -24,6 +24,7 @@ export default defineConfig(async () => {
   };
 
   return {
+    base: "/player/",
     optimizeDeps: { include: ["workbox-core", "workbox-precaching", "workbox-routing", "workbox-strategies", "workbox-range-requests"] },
     plugins: [
       createHtmlPlugin({

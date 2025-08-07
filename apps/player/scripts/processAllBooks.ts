@@ -4,9 +4,9 @@ import path from "path";
 import { processBook } from "./processBook";
 
 const PUBLIC_BOOKS_DIR = path.join(__dirname, "..", "public_books");
-const DIST_DIR = path.join(__dirname, "..", "dist", "books");
 
-async function processAllBooks() {
+async function processAllBooks(docker: boolean = false) {
+  const DIST_DIR = docker ? path.join(__dirname, "..", "docker-build", "books") : path.join(__dirname, "..", "dist", "books");
   console.log("🚀 Starting to process all books...\n");
 
   // Get all directories in public_books
@@ -22,11 +22,7 @@ async function processAllBooks() {
   const errors: { book: string; error: Error }[] = [];
 
   // Process all books in parallel
-  const results = await Promise.all(
-    bookDirs.map((bookName) =>
-      processBook(path.join(PUBLIC_BOOKS_DIR, bookName), DIST_DIR)
-    )
-  );
+  const results = await Promise.all(bookDirs.map((bookName) => processBook(path.join(PUBLIC_BOOKS_DIR, bookName), DIST_DIR)));
 
   for (const result of results) {
     if (result.success) {
@@ -55,7 +51,7 @@ async function processAllBooks() {
 }
 
 // Run the script
-processAllBooks().catch((error) => {
+processAllBooks(process.argv.includes("--docker")).catch((error) => {
   console.error("Unhandled error:", error);
   process.exit(1);
 });

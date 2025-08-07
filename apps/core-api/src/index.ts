@@ -1,7 +1,8 @@
 import { s3 } from "bun";
 import path from "path";
+import { authenticateRequest } from './auth/authenticator';
 
-console.log("🚀 Starting Core API with native S3 client...");
+console.log("🚀 Starting Core API with authentication and native S3 client...");
 
 // Helper function to determine the correct MIME type based on file extension
 const getMimeType = (filePath: string): string => {
@@ -43,6 +44,15 @@ Bun.serve({
     console.log(`[Core API] Received request for path: ${reqPath}`);
 
     if (reqPath.startsWith("/content/")) {
+      // Authenticate the request first
+      try {
+        const user = await authenticateRequest(req);
+        console.log(`✅ Authorized as user ${user.id} via ${user.authProvider}`);
+      } catch (error) {
+        console.error("⛔️ Authorization failed:", error.message);
+        return new Response("Unauthorized", { status: 401 });
+      }
+
       const s3Key = reqPath.substring("/content/".length);
       console.log(`[Core API] Request matches /content/. Requesting S3 Key: ${s3Key}`);
       
@@ -82,4 +92,4 @@ Bun.serve({
   },
 });
 
-console.log(`✅ Core API (Bun Native S3) is listening on port 3000`);
+console.log(`✅ Core API with Auth (Bun Native S3) is listening on port 3000`);

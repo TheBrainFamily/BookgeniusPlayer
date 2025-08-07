@@ -1,24 +1,35 @@
-# This Caddyfile now handles two separate frontend applications
+# This Caddyfile configures a single domain (localhost) to serve multiple applications
+# based on the URL path. This is the new, unified setup.
 
-# 1. The Platform App (your main entry point)
-platform.localhost {
-    log
-    # All requests to platform.localhost are handled by the platform service
-    reverse_proxy platform:80
-}
-
-# 2. The Player App (loaded inside the iframe)
 localhost {
+    # Enable logging for easy debugging
     log
 
-    # Route API requests to the core-api service
+    # IMPORTANT: Caddy matches these rules from top to bottom.
+    # More specific paths must come before the general catch-all rule.
+
+    # Rule #1: Handle the Player App
+    # All requests starting with /player/ go to the player service.
+    handle_path /player/* {
+        # Strip /player from the beginning of the URL before proxying.
+        # e.g., a request for /player/?book=1984 becomes /?book=1984 for the player container.
+        # This is critical for the player's internal routing to work.
+        uri strip_prefix /player
+        reverse_proxy player:80
+    }
+
+    # Rule #2: Handle the Core API
+    # All requests starting with /api/core/ go to the core-api service. This rule remains unchanged.
     handle_path /api/core/* {
+        # Strip /api/core before proxying.
         uri strip_prefix /api/core
         reverse_proxy core-api:3000
     }
 
-    # Handle all other requests by proxying them to the player service
+    # Rule #3: Handle the Platform App (Catch-all)
+    # This rule is last and handles all remaining traffic, including the homepage '/'.
+    # All requests that didn't match /player/* or /api/core/* will be sent to the platform service.
     handle {
-        reverse_proxy player:80
+        reverse_proxy platform:80
     }
 }

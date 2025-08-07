@@ -8,6 +8,7 @@ src/data/tools/Text-Editor/.cursor/
 .claude
 src/books/*
 apps/player/public/books/
+apps/player/docker-build/
 apps/player/public_books/*/bookData.ts
 apps/player/public_books/*/getAudiobookTracksForBook.ts
 apps/player/public_books/*/getBookStringified.ts
