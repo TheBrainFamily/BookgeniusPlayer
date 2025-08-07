@@ -417,22 +417,31 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
     if (wasPartialEnding && trackId === currentTrackId) {
       console.log(`Partial buffer ended for '${trackId}' at ${currentPosition?.toFixed(2)}s. Checking for full buffer...`);
 
-      // Wait a moment and check if full buffer is now available
-      let checkAttempts = 0;
-      const maxCheckAttempts = 50; // Poll for 5 seconds (50 * 100ms)
-      const checkInterval = setInterval(() => {
-        const updatedState = tracks.get(trackId);
-        if (updatedState?.audioBuffer && updatedState.audioBuffer.duration > bufferDuration + 1) {
-          clearInterval(checkInterval);
-          console.log(`Full buffer now available for '${trackId}'. Continuing playback from ${currentPosition?.toFixed(2)}s`);
-          if (currentPosition !== null) {
-            playTrack(trackId, audioContext?.currentTime || 0, currentPosition);
-          }
-        } else if (++checkAttempts >= maxCheckAttempts) {
-          clearInterval(checkInterval);
+      // Wait for the full buffer using an event-driven approach with a timeout.
+      const bufferPromise = new Promise<boolean>((resolve) => {
+        const timeout = setTimeout(() => {
+          window.removeEventListener("trackFullyLoaded", listener);
           console.warn(`Timed out waiting for full buffer for '${trackId}'.`);
+          resolve(false);
+        }, 5000);
+
+        const listener = (e: Event) => {
+          if ((e as CustomEvent).detail.trackId === trackId) {
+            clearTimeout(timeout);
+            window.removeEventListener("trackFullyLoaded", listener);
+            resolve(true);
+          }
+        };
+
+        window.addEventListener("trackFullyLoaded", listener);
+      });
+
+      if (await bufferPromise) {
+        console.log(`Full buffer now available for '${trackId}'. Continuing playback from ${currentPosition?.toFixed(2)}s`);
+        if (currentPosition !== null) {
+          playTrack(trackId, audioContext?.currentTime || 0, currentPosition);
         }
-      }, 100);
+      }
       return;
     }
 
