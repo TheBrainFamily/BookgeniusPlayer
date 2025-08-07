@@ -3,7 +3,6 @@ import { getBookData } from "@/genericBookDataGetters/getBookData";
 import { pageWasJustReloaded } from "@/utils/pageWasJustReloaded";
 import debounce from "lodash.debounce";
 
-const SHOULD_SHOW_EVERYONE = false;
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
 // Cache isPlayFormat at module level to avoid repeated getBookData() calls
@@ -133,65 +132,96 @@ function normalizeSrcForInlineAvatar(src: string): string {
 }
 
 /**
- * Creates and configures a video or image element based on the placeholder span's data.
+ * Creates a media container element with CharacterMedia-like structure for inline avatars.
  */
 function createMediaElement(
   placeholder: HTMLSpanElement,
   openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
-): HTMLVideoElement | HTMLImageElement | null {
+  isPlayFormat: boolean,
+): HTMLDivElement | null {
   const characterSlug = placeholder.dataset.character;
   const isTalking = placeholder.dataset.isTalking === "true";
-  const talkingSrc = placeholder.dataset.srcTalking; // Can be video or image
+  const talkingSrc = placeholder.dataset.srcTalking;
+  const listeningSrc = placeholder.dataset.srcListening;
 
   if (!characterSlug) return null;
 
-  let element: HTMLVideoElement | HTMLImageElement | null = null;
-  let finalSrc: string | undefined = undefined;
+  // Create container element similar to CharacterMedia structure
+  const container = document.createElement("div");
+  container.classList.add("inline-avatar", "relative", "w-full", "h-full");
+  container.dataset.character = characterSlug;
+  container.title = characterSlug;
 
-  // For inline avatars, always use PNG format
-  if (isTalking && talkingSrc) {
-    if (talkingSrc.endsWith(".mp4")) {
-      finalSrc = talkingSrc;
-      element = document.createElement("video");
-      element.autoplay = true;
-      element.loop = true;
-      element.muted = true;
-      element.playsInline = true;
-    } else {
-      finalSrc = normalizeSrcForInlineAvatar(talkingSrc);
-      // Always create image element for inline avatars
-      element = document.createElement("img");
+  // Create placeholder image (always shown as fallback)
+  const placeholderImg = document.createElement("img");
+  const placeholderSrc = (listeningSrc || talkingSrc || "").replace(/-(listens|speaks)\.(mp4|webm)$/, ".png");
+  placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
+  placeholderImg.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
+  placeholderImg.alt = characterSlug;
+  container.appendChild(placeholderImg);
+
+  if (isPlayFormat && listeningSrc && listeningSrc.endsWith(".mp4")) {
+    // Create listening video
+    const listeningVideo = document.createElement("video");
+    listeningVideo.src = listeningSrc;
+    listeningVideo.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
+    listeningVideo.autoplay = true;
+    listeningVideo.loop = true;
+    listeningVideo.muted = true;
+    listeningVideo.playsInline = true;
+    listeningVideo.dataset.state = "listens";
+
+    // Initially show listening video
+    listeningVideo.style.opacity = isTalking ? "0" : "1";
+    container.appendChild(listeningVideo);
+
+    // Create speaking video if available
+    if (talkingSrc && talkingSrc.endsWith(".mp4")) {
+      const speakingVideo = document.createElement("video");
+      speakingVideo.src = talkingSrc;
+      speakingVideo.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
+      speakingVideo.autoplay = true;
+      speakingVideo.loop = true;
+      speakingVideo.muted = true;
+      speakingVideo.playsInline = true;
+      speakingVideo.dataset.state = "speaks";
+
+      // Show speaking video only when talking
+      speakingVideo.style.opacity = isTalking ? "1" : "0";
+      container.appendChild(speakingVideo);
+
+      // Store references for easy swapping
+      container.dataset.hasVideos = "true";
     }
-  }
 
-  // Configure and return the element
-  if (element && finalSrc) {
-    element.addEventListener("click", (e) => {
-      // If this is a command-click (metaKey on Mac, ctrlKey on Windows), ignore
-      if (e.metaKey || e.ctrlKey) {
-        return;
+    // Handle video loading errors
+    listeningVideo.onerror = () => {
+      console.warn(`Failed to load listening video: ${listeningSrc}`);
+      listeningVideo.style.display = "none";
+    };
+
+    if (talkingSrc && talkingSrc.endsWith(".mp4")) {
+      const speakingVideo = container.querySelector('video[data-state="speaks"]') as HTMLVideoElement;
+      if (speakingVideo) {
+        speakingVideo.onerror = () => {
+          console.warn(`Failed to load speaking video: ${talkingSrc}`);
+          speakingVideo.style.display = "none";
+        };
       }
-      e.stopPropagation();
-      // Pass the original talkingSrc to the modal, not the normalized finalSrc
-      openCharacterDetailsModal(characterSlug, !!talkingSrc && talkingSrc.endsWith(".mp4"), talkingSrc);
-    });
-    element.src = finalSrc;
-    element.classList.add("inline-avatar");
-
-    if (characterSlug) {
-      // Assign character data if slug available
-      element.dataset.character = characterSlug;
-      element.title = characterSlug;
     }
+  }
 
-    // Add basic error handling for loading
-    element.onerror = () => console.error(`Failed to load media: ${element?.src}`);
-    return element;
-  }
-  if (SHOULD_SHOW_EVERYONE) {
-    console.warn("Failed to create media element for placeholder:", placeholder); // Should not happen ideally
-  }
-  return null;
+  // Add click handler to container
+  container.addEventListener("click", (e) => {
+    if (e.metaKey || e.ctrlKey) {
+      return;
+    }
+    e.stopPropagation();
+    const videoSrc = isTalking ? talkingSrc : listeningSrc;
+    openCharacterDetailsModal(characterSlug, !!videoSrc && videoSrc.endsWith(".mp4"), videoSrc || "");
+  });
+
+  return container;
 }
 
 export function highlightCharacter(character: HTMLSpanElement, openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void) {
@@ -298,6 +328,7 @@ function activateMediaInRange(
   endChapter: number,
   endParagraph: number,
   openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
+  isPlayFormat: boolean,
 ) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
 
@@ -318,12 +349,12 @@ function activateMediaInRange(
       placeholders.forEach((placeholder) => {
         const mediaInjected = placeholder.dataset.mediaInjected === "true";
         // Query for either video or image with the class OR the dummy placeholder
-        let mediaElement = placeholder.querySelector<HTMLVideoElement | HTMLImageElement>("video.inline-avatar, img.inline-avatar");
+        let mediaElement = placeholder.querySelector<HTMLDivElement>("div.inline-avatar");
         const dummyPlaceholder = placeholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
         if (inView) {
           if (dummyPlaceholder) {
             // Found a dummy, replace it with actual media
-            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal);
+            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal, isPlayFormat);
             if (newMediaElement) {
               placeholder.replaceChild(newMediaElement, dummyPlaceholder);
               placeholder.dataset.mediaInjected = "true"; // Mark as injected
@@ -339,7 +370,7 @@ function activateMediaInRange(
             }
           } else if (!mediaInjected) {
             // No dummy and no media injected yet, inject for the first time
-            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal);
+            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal, isPlayFormat);
             if (newMediaElement) {
               mediaElement = newMediaElement; // Update mediaElement reference
               // Hide original text content if it's a mention
@@ -773,9 +804,9 @@ export function setupPageObserver(
             if (allIntersectingParagraphs.length > 0) {
               const mediaStartInfo = allIntersectingParagraphs[0];
               const mediaEndInfo = allIntersectingParagraphs[allIntersectingParagraphs.length - 1];
-              activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, openCharacterDetailsModal);
+              activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, openCharacterDetailsModal, isPlayFormat);
             } else {
-              activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal);
+              activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal, isPlayFormat);
             }
           } else {
             console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {

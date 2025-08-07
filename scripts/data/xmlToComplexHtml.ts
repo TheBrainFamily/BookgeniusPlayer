@@ -195,7 +195,7 @@ export const xmlToComplexHtml = (
                     if (isTalking) {
                       isCharacter = true;
                       const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
-                      inner += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
+                      inner += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-listening="${listeningSrc}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
                       if (spanId !== lastSpanId) {
                         currentCharacterAlignment = currentCharacterAlignment === "left" ? "right" : "left";
                       }
@@ -248,7 +248,7 @@ export const xmlToComplexHtml = (
               const listeningSrc = getListeningMediaFilePathForName(slug, bookSlug);
               if (isTalking) {
                 const startOfParagraphClass = !hasSignificantTextContent ? " start-of-paragraph" : "";
-                pContent += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
+                pContent += `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-src-listening="${listeningSrc}" data-src-talking="${talkingSrc}" data-is-talking="true"></span>`;
               } else {
                 if (pElement.getAttribute("dynasty") === "true") {
                   pContent += pElement.textContent;
