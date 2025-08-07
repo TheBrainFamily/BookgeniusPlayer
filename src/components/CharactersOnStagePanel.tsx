@@ -51,8 +51,8 @@ const CharactersOnStagePanel = () => {
                   <motion.div
                     className={cn("w-20 h-20 rounded-full border-2", isSpeaking ? "speaking" : "not-speaking")}
                     animate={{
-                      borderColor: isSpeaking ? "rgba(251, 191, 36, 0.5)" : "rgba(255, 255, 255, 0.3)",
-                      boxShadow: isSpeaking ? "0 10px 15px -3px rgba(251, 191, 36, 0.3), 0 4px 6px -2px rgba(251, 191, 36, 0.05)" : "0 0 0 0 transparent",
+                      borderColor: isSpeaking ? "rgba(255, 255, 255, 0.6)" : "rgba(255, 255, 255, 0.3)",
+                      boxShadow: isSpeaking ? "0 5px 15px -5px rgba(255, 255, 255, 0.6)" : "0 0 0 0 transparent",
                     }}
                     transition={{ duration: 0.5, ease: "easeInOut", borderColor: { duration: 0.5 }, boxShadow: { duration: 0.5 } }}
                   >

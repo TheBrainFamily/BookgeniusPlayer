@@ -378,129 +378,132 @@ const AudioPlayer = () => {
             <AnimatePresence>
               {isBigPlayerOpen && (
                 <motion.div
-                  className="player-controls bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs"
+                  className="player-controls bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs player-controls-layout"
                   variants={variants.dropdownContainer}
                   initial="initial"
                   animate="animate"
                   exit="exit"
                 >
-                  <motion.div className="flex justify-center pt-4 mb-4" variants={variants.popUpItem} initial="closed" animate="open">
-                    <div className="relative group w-32 h-32">
-                      <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-white/40 shadow-2xl backdrop-blur-sm bg-white/15">
-                        <CoverArt src={currentTrackData?.coverArtUrl} />
+                  <div className="player-left">
+                    <motion.div className="flex justify-center pt-4 mb-4" variants={variants.popUpItem} initial="closed" animate="open">
+                      <div className="relative group w-32 h-32">
+                        <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-white/40 shadow-2xl backdrop-blur-sm bg-white/15">
+                          <CoverArt src={currentTrackData?.coverArtUrl} />
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-
-                  <motion.div className="text-lg mb-4 text-center" variants={variants.popUpItem} initial="closed" animate="open">
-                    {currentTrackData?.title}
-                  </motion.div>
-
-                  <motion.div className="mb-2" variants={variants.popUpItem} initial="closed" animate="open">
-                    <div className="w-full group hover:opacity-100">
-                      <Slider value={[currentTime]} min={0} max={currentTrackData?.duration || 100} step={0.1} onValueChange={handleProgressChange} variant="secondary" />
-                    </div>
-                  </motion.div>
-
-                  <motion.div className="flex justify-between text-xs mb-4" variants={variants.popUpItem} initial="closed" animate="open">
-                    <span>{formatTime(currentTime)}</span>
-                    <span>{formatTime(currentTrackData?.duration)}</span>
-                  </motion.div>
-
-                  <motion.div className="flex justify-center items-center gap-8 mb-4 relative" variants={variants.popUpItem} initial="closed" animate="open">
-                    {playlistTracks.length > 1 && (
-                      <motion.button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          skipToPrevious();
-                        }}
-                        className="hover:text-white/80 p-2 rounded-full cursor-pointer"
-                        whileHover="hover"
-                        whileTap="tap"
-                        variants={variants.navButtonHover}
-                        title="Previous track"
-                      >
-                        <SkipBack className="w-4 h-4 lg:w-5 lg:h-5" />
-                      </motion.button>
-                    )}
-
-                    <motion.div variants={variants.playButtonHover} whileTap="tap">
-                      <motion.button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          togglePlay();
-                        }}
-                        className="hover:text-white bg-white/40 rounded-full p-3 relative z-10 cursor-pointer"
-                        whileHover="hover"
-                        whileTap="tap"
-                        variants={variants.playButtonHover}
-                        initial="initial"
-                      >
-                        <AnimatePresence mode="wait" initial={false}>
-                          {isPlaying ? (
-                            <motion.div key="pause" variants={variants.iconRotatePause} initial="initial" animate="animate" exit="exit">
-                              <Pause className="w-6 h-6" />
-                            </motion.div>
-                          ) : (
-                            <motion.div key="play" variants={variants.iconRotatePlay} initial="initial" animate="animate" exit="exit">
-                              <Play className="w-6 h-6" />
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </motion.button>
                     </motion.div>
 
-                    {playlistTracks.length > 1 && (
-                      <motion.button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          skipToNext();
-                        }}
-                        className="hover:text-white/80 p-2 rounded-full cursor-pointer"
-                        whileHover="hover"
-                        whileTap="tap"
-                        variants={variants.navButtonHover}
-                        title="Next track"
-                      >
-                        <SkipForward className="w-4 h-4 lg:w-5 lg:h-5" />
-                      </motion.button>
-                    )}
-                  </motion.div>
+                    <motion.div className="text-lg mb-4 text-center current-track-title" variants={variants.popUpItem} initial="closed" animate="open">
+                      {currentTrackData?.title}
+                    </motion.div>
+                  </div>
+                  <div className="player-right">
+                    <motion.div className="mb-2 music-progress-bar" variants={variants.popUpItem} initial="closed" animate="open">
+                      <div className="w-full group hover:opacity-100">
+                        <Slider value={[currentTime]} min={0} max={currentTrackData?.duration || 100} step={0.1} onValueChange={handleProgressChange} variant="secondary" />
+                      </div>
+                    </motion.div>
 
-                  {playlistTracks.length > 0 && (
-                    <motion.div className="space-y-2 pb-3" variants={variants.popUpItem} initial="closed" animate="open">
-                      <div className="text-sm font-medium mb-2">Playlist:</div>
-                      {playlistTracks.map((track) => (
-                        <motion.div
-                          key={track.id}
-                          className={cn("flex items-center justify-between px-2 py-1 rounded-md cursor-pointer gap-2", currentTrackIdFromState === track.id && "bg-white/10")}
-                          variants={variants.trackItemHover}
-                          whileHover="hover"
+                    <motion.div className="flex justify-between text-xs mb-4 music-progress-bar-labels" variants={variants.popUpItem} initial="closed" animate="open">
+                      <span>{formatTime(currentTime)}</span>
+                      <span>{formatTime(currentTrackData?.duration)}</span>
+                    </motion.div>
+
+                    <motion.div className="flex justify-center items-center gap-8 mb-4 relative" variants={variants.popUpItem} initial="closed" animate="open">
+                      {playlistTracks.length > 1 && (
+                        <motion.button
                           onClick={(e) => {
                             e.stopPropagation();
-                            transitionToTrack(track.id);
+                            skipToPrevious();
                           }}
+                          className="hover:text-white/80 p-2 rounded-full cursor-pointer"
+                          whileHover="hover"
+                          whileTap="tap"
+                          variants={variants.navButtonHover}
+                          title="Previous track"
                         >
-                          <div className="flex items-center gap-2">
-                            <span className={"text-white/70"}>{track.title}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-white/70">{formatTime(track.duration)}</span>
-                            <button
-                              className="text-white/70 hover:text-white p-2 rounded-full transition hover:bg-black/40 cursor-pointer"
-                              title="Download track"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDownloadTrack(track.id, track.title);
-                              }}
-                            >
-                              <Download className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </motion.div>
-                      ))}
+                          <SkipBack className="w-4 h-4 lg:w-5 lg:h-5" />
+                        </motion.button>
+                      )}
+
+                      <motion.div variants={variants.playButtonHover} whileTap="tap">
+                        <motion.button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            togglePlay();
+                          }}
+                          className="hover:text-white bg-white/40 rounded-full p-3 relative z-10 cursor-pointer"
+                          whileHover="hover"
+                          whileTap="tap"
+                          variants={variants.playButtonHover}
+                          initial="initial"
+                        >
+                          <AnimatePresence mode="wait" initial={false}>
+                            {isPlaying ? (
+                              <motion.div key="pause" variants={variants.iconRotatePause} initial="initial" animate="animate" exit="exit">
+                                <Pause className="w-6 h-6" />
+                              </motion.div>
+                            ) : (
+                              <motion.div key="play" variants={variants.iconRotatePlay} initial="initial" animate="animate" exit="exit">
+                                <Play className="w-6 h-6" />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </motion.button>
+                      </motion.div>
+
+                      {playlistTracks.length > 1 && (
+                        <motion.button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            skipToNext();
+                          }}
+                          className="hover:text-white/80 p-2 rounded-full cursor-pointer"
+                          whileHover="hover"
+                          whileTap="tap"
+                          variants={variants.navButtonHover}
+                          title="Next track"
+                        >
+                          <SkipForward className="w-4 h-4 lg:w-5 lg:h-5" />
+                        </motion.button>
+                      )}
                     </motion.div>
-                  )}
+
+                    {playlistTracks.length > 0 && (
+                      <motion.div className="space-y-2 pb-3" variants={variants.popUpItem} initial="closed" animate="open">
+                        <div className="text-sm font-medium mb-2 playlist-header">Playlist:</div>
+                        {playlistTracks.map((track) => (
+                          <motion.div
+                            key={track.id}
+                            className={cn("flex items-center justify-between px-2 py-1 rounded-md cursor-pointer gap-2", currentTrackIdFromState === track.id && "bg-white/10")}
+                            variants={variants.trackItemHover}
+                            whileHover="hover"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              transitionToTrack(track.id);
+                            }}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className={"text-white/70 playlist-item-title"}>{track.title}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-white/70 playlist-item-duration">{formatTime(track.duration)}</span>
+                              <button
+                                className="text-white/70 hover:text-white p-2 rounded-full transition hover:bg-black/40 cursor-pointer"
+                                title="Download track"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDownloadTrack(track.id, track.title);
+                                }}
+                              >
+                                <Download className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
