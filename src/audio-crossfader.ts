@@ -260,10 +260,12 @@ async function streamingDecodeAudioData(
     let accumulatedDuration = 0;
     let framesToTake = 0;
     for (const frame of frames) {
-      accumulatedDuration += frame.duration / 1000;
-      framesToTake++;
-      if (accumulatedDuration >= TARGET_DURATION_S) {
-        break;
+      if (typeof frame.duration === "number" && !isNaN(frame.duration)) {
+        accumulatedDuration += frame.duration / 1000;
+        framesToTake++;
+        if (accumulatedDuration >= TARGET_DURATION_S) {
+          break;
+        }
       }
     }
 
