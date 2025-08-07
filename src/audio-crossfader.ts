@@ -30,6 +30,8 @@ const VOLUME_SCALE = 1.737;
 const PLAYLIST_LOAD_STAGGER_MS = 100;
 const PLAYLIST_UPDATE_DEBOUNCE_MS = 300;
 
+const STREAMING_FILE_SIZE_THRESHOLD = 1024 * 1024;
+
 // --- Module-level State ---
 let audioContext: AudioContext | null = null;
 const tracks: Map<string, TrackState> = new Map();
@@ -184,12 +186,13 @@ async function streamingDecodeAudioData(
     const firstChunk = arrayBuffer.slice(0, Math.min(PLAYBACK_START_THRESHOLD, arrayBuffer.byteLength));
 
     try {
-      const firstBuffer = await audioContext.decodeAudioData(firstChunk.slice(0));
+      const firstChunkByteLength = firstChunk.byteLength;
+      const firstBuffer = await audioContext.decodeAudioData(firstChunk);
 
       // Store partial track info to enable early playback
       const partialTrackState: TrackState = {
         audioBuffer: firstBuffer,
-        duration: (arrayBuffer.byteLength / firstChunk.byteLength) * firstBuffer.duration, // More accurate estimate
+        duration: (arrayBuffer.byteLength / firstChunkByteLength) * firstBuffer.duration, // More accurate estimate
         transitionPoints,
         sourceNode: null,
         gainNode: null,
@@ -212,7 +215,7 @@ async function streamingDecodeAudioData(
     // Continue decoding the full file in the background
     setTimeout(async () => {
       try {
-        const fullAudioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+        const fullAudioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
         // Update the track with the complete buffer
         const updatedTrackState: TrackState = {
@@ -319,7 +322,7 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
     }
 
     /* ── 4b streaming decode ─────────────────────────────────────── */
-    if (enableStreaming && arrayBuffer.byteLength > 1024 * 1024) {
+    if (enableStreaming && arrayBuffer.byteLength > STREAMING_FILE_SIZE_THRESHOLD) {
       // Only use streaming for files > 1MB
       const audioBuffer = await streamingDecodeAudioData(audioContext!, arrayBuffer, trackId, title, coverArtUrl || "", transitionPoints);
       if (audioBuffer) {
