@@ -324,7 +324,12 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
     /* ── 4b streaming decode ─────────────────────────────────────── */
     if (enableStreaming && arrayBuffer.byteLength > STREAMING_FILE_SIZE_THRESHOLD) {
       // Only use streaming for files > 1MB
-      const audioBuffer = await streamingDecodeAudioData(audioContext!, arrayBuffer, trackId, title, coverArtUrl || "", transitionPoints);
+      if (!audioContext) {
+        console.error("AudioContext became null during streaming setup");
+        tracks.delete(trackId);
+        return false;
+      }
+      const audioBuffer = await streamingDecodeAudioData(audioContext, arrayBuffer, trackId, title, coverArtUrl || "", transitionPoints);
       if (audioBuffer) {
         console.log(`✅ Streaming decoded '${trackId}' – ${audioBuffer.duration.toFixed(2)} s` + (transitionPoints ? ` | transitions: ${transitionPoints.join(", ")}` : ""));
         return true;
