@@ -332,6 +332,8 @@ function activateMediaInRange(
 ) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
 
+  const bufferSize = isPlayFormat ? 5 : 10;
+
   allParagraphs.forEach((p) => {
     const chapterElement = p.closest("section[data-chapter]") as HTMLElement;
     const chapterStr = chapterElement?.dataset.chapter;
@@ -341,7 +343,7 @@ function activateMediaInRange(
       const currentChapter = parseInt(chapterStr, 10);
       const currentParagraph = parseInt(paragraphStr, 10);
 
-      const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - 10, endChapter, endParagraph + 10);
+      const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - bufferSize, endChapter, endParagraph + bufferSize);
 
       const placeholders = p.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
