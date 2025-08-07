@@ -192,13 +192,13 @@ async function streamingDecodeAudioData(
       // Store partial track info to enable early playback
       const partialTrackState: TrackState = {
         audioBuffer: firstBuffer,
-        duration: estimatedDuration || firstBuffer.duration * 10, // Rough estimate
+        duration: (arrayBuffer.byteLength / firstChunk.byteLength) * firstBuffer.duration, // More accurate estimate
         transitionPoints,
         sourceNode: null,
         gainNode: null,
         coverArtUrl,
         title,
-        trackLength: estimatedDuration || firstBuffer.duration * 10,
+        trackLength: (arrayBuffer.byteLength / firstChunk.byteLength) * firstBuffer.duration,
       };
 
       tracks.set(trackId, partialTrackState);
