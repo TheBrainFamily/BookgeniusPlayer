@@ -6,7 +6,44 @@ import { processBook } from "./processBook";
 const PUBLIC_BOOKS_DIR = path.join(__dirname, "..", "public_books");
 
 async function processAllBooks(docker: boolean = false) {
-  const DIST_DIR = docker ? path.join(__dirname, "..", "docker-build", "books") : path.join(__dirname, "..", "dist", "books");
+  const DIST_DIR = docker ? path.join(__dirname, "..", "docker-build", "books") : path.join(__dirname, "..", "public", "books");
+  const PUBLIC_DIR = docker ? path.join(__dirname, "..", "docker-build", "books") : path.join(__dirname, "..", "public", "books");
+
+  // Check if we need to recompile by comparing timestamps
+  if (!docker && fs.existsSync(PUBLIC_DIR)) {
+    try {
+      const publicBooksStats = fs.statSync(PUBLIC_BOOKS_DIR);
+      const publicDirStats = fs.statSync(PUBLIC_DIR);
+
+      // Get the most recent modification time in public_books
+      let mostRecentPublicBooks = publicBooksStats.mtime.getTime();
+      const bookDirs = fs.readdirSync(PUBLIC_BOOKS_DIR, { withFileTypes: true }).filter((dirent) => dirent.isDirectory());
+
+      for (const dir of bookDirs) {
+        const dirPath = path.join(PUBLIC_BOOKS_DIR, dir.name);
+        const dirStats = fs.statSync(dirPath);
+        mostRecentPublicBooks = Math.max(mostRecentPublicBooks, dirStats.mtime.getTime());
+
+        // Check files within each book directory
+        const files = fs.readdirSync(dirPath);
+        for (const file of files) {
+          const filePath = path.join(dirPath, file);
+          const fileStats = fs.statSync(filePath);
+          mostRecentPublicBooks = Math.max(mostRecentPublicBooks, fileStats.mtime.getTime());
+        }
+      }
+
+      // If public/books is newer than public_books, skip compilation
+      if (publicDirStats.mtime.getTime() > mostRecentPublicBooks) {
+        console.log("✅ public/books is up to date. Skipping compilation.");
+        return;
+      }
+    } catch (error) {
+      // If there's any error checking timestamps, just proceed with compilation
+      console.log("⚠️ Could not check timestamps, proceeding with compilation...");
+    }
+  }
+
   console.log("🚀 Starting to process all books...\n");
 
   // Get all directories in public_books

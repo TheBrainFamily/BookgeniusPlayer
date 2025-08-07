@@ -12,7 +12,7 @@ const apps = [
   {
     name: "player",
     sourceDir: path.join(projectRoot, "apps", "player", "dist"),
-    booksSourceDir: path.join(projectRoot, "apps", "player", "docker-build"),
+    booksSourceDir: path.join(projectRoot, "apps", "player", "docker-build", "books"),
     targetDir: path.join(buildDir, "player-app"),
   },
   { name: "platform", sourceDir: path.join(projectRoot, "apps", "platform", "dist"), targetDir: path.join(buildDir, "platform-app") },

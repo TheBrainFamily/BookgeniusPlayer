@@ -10,6 +10,10 @@ localhost {
 
     # Rule #1: Handle the Player App
     # All requests starting with /player/ go to the player service.
+    handle_path /player/api/core/* {
+        uri strip_prefix /player/api/core
+        reverse_proxy core-api:3000
+    }
     handle_path /player/* {
         # Strip /player from the beginning of the URL before proxying.
         # e.g., a request for /player/?book=1984 becomes /?book=1984 for the player container.

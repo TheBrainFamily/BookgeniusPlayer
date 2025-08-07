@@ -6,6 +6,15 @@ import { VitePWA } from "vite-plugin-pwa";
 import { createHtmlPlugin } from "vite-plugin-html";
 
 export default defineConfig(async () => {
+  // Determine environment from command line args or env var
+  const isDocker = process.argv.includes("--docker") || process.env.BUILD_ENV === "docker";
+
+  // Load environment configuration
+  const envConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, "env.config.json"), "utf-8"));
+  const currentEnv = isDocker ? "docker" : "development";
+  console.log("currentEnv", currentEnv);
+  const config = envConfig[currentEnv];
+  console.log("config", config);
   // For now, hardcode default values for the HTML template
   // Later this can be made dynamic when generating book-specific HTML files
   const defaultBookConfig = { title: "BookGenius", author: "Books reimagined", language: "english", slug: "Romeo-And-Juliet-Small" };
@@ -24,7 +33,7 @@ export default defineConfig(async () => {
   };
 
   return {
-    base: "/player/",
+    base: config.base || undefined,
     optimizeDeps: { include: ["workbox-core", "workbox-precaching", "workbox-routing", "workbox-strategies", "workbox-range-requests"] },
     plugins: [
       createHtmlPlugin({
