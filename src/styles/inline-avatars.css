@@ -239,3 +239,30 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
     transition: none;
   }
 }
+
+/* Characters on Stage */
+.characters-on-stage-panel .not-speaking .cursor-pointer {
+  filter: grayscale(60%);
+}
+.characters-on-stage-panel .not-speaking .cursor-pointer:hover {
+  filter: none;
+}
+.characters-on-stage-panel .speaking .cursor-pointer {
+  filter: none;
+}
+
+.characters-on-stage-panel .speaking,
+.characters-on-stage-panel .not-speaking {
+  transition: transform 0.3s ease;
+  transform-origin: center center;
+
+  div {
+    width: 100%;
+    height: 100%;
+    padding-bottom: 0;
+  }
+}
+.characters-on-stage-panel .speaking:hover,
+.characters-on-stage-panel .not-speaking:hover {
+  transform: scale(1.1);
+}

@@ -1,49 +1,79 @@
-import { AnimatePresence, motion } from "motion/react";
+import { useMemo } from "react";
+import { AnimatePresence, motion, Variants } from "motion/react";
 
 import { useCharactersOnStage } from "@/hooks/useCharactersOnStage";
 import { useCurrentSpeakers } from "@/hooks/useCurrentSpeakers";
 import { useLocation } from "@/state/LocationContext";
-import { cn } from "@/lib/utils";
 import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
+import CharacterCard from "./CharacterCard";
+import { cn } from "@/lib/utils";
 
 const CharactersOnStagePanel = () => {
-  const allCharacters = getCharactersData();
+  const allCharacters = useMemo(() => getCharactersData(), []);
 
   const charactersOnStage = useCharactersOnStage(allCharacters);
   const { location } = useLocation();
-  const currentSpeakers = useCurrentSpeakers(location!, allCharacters, true);
+  const currentSpeakers = useCurrentSpeakers(location, allCharacters, true);
 
   if (!location) return null;
 
   return (
-    <div className="flex justify-center items-center h-full">
-      <AnimatePresence>
-        {charactersOnStage.map((character) => {
-          const isSpeaking = currentSpeakers.includes(character.slug);
+    <div className="characters-on-stage-panel flex justify-center items-center h-full">
+      <AnimatePresence mode="sync">
+        <motion.div className="flex justify-center items-center gap-2" initial="hidden" animate="visible" variants={variants.container}>
+          <AnimatePresence>
+            {charactersOnStage.map((character, index) => {
+              const isSpeaking = currentSpeakers.includes(character.slug);
+              const characterEntity = {
+                slug: character.slug,
+                characterName: character.characterName,
+                label: character.characterName,
+                summary: "",
+                imageUrl: character.imageUrl,
+                chapterNumber: location.currentChapter,
+                paragraphNumber: location.currentParagraph,
+                isTalkingInFirstParagraph: isSpeaking,
+                otherAppearances: [],
+              };
 
-          return (
-            <motion.div
-              key={character.slug}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.3 }}
-              className="p-1"
-            >
-              <div className="relative w-16 h-16">
-                <img
-                  src={character.imageUrl}
-                  alt={character.characterName}
-                  className={cn("w-full h-full rounded-full object-cover border-2 border-white transition-all duration-300", isSpeaking && "grayscale-[90%]")}
-                  title={character.characterName}
-                />
-              </div>
-            </motion.div>
-          );
-        })}
+              return (
+                <motion.div
+                  key={character.slug}
+                  layout="preserve-aspect"
+                  variants={variants.character}
+                  initial="hidden"
+                  animate="visible"
+                  custom={index}
+                  exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+                  transition={{ layout: { delay: 0.1 } }}
+                  className="flex-shrink-0"
+                >
+                  <motion.div
+                    className={cn("w-20 h-20 rounded-full border-2", isSpeaking ? "speaking" : "not-speaking")}
+                    animate={{
+                      borderColor: isSpeaking ? "rgba(251, 191, 36, 0.5)" : "rgba(255, 255, 255, 0.3)",
+                      boxShadow: isSpeaking ? "0 10px 15px -3px rgba(251, 191, 36, 0.3), 0 4px 6px -2px rgba(251, 191, 36, 0.05)" : "0 0 0 0 transparent",
+                    }}
+                    transition={{ duration: 0.5, ease: "easeInOut", borderColor: { duration: 0.5 }, boxShadow: { duration: 0.5 } }}
+                  >
+                    <CharacterCard entity={characterEntity} currentSpeakers={currentSpeakers} showTitle={false} showHighlight={false} />
+                  </motion.div>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </motion.div>
       </AnimatePresence>
     </div>
   );
+};
+
+const variants: { container: Variants; character: Variants } = {
+  container: { visible: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } } },
+  character: {
+    hidden: { opacity: 0, scale: 0.8, y: 20 },
+    visible: (i: number) => ({ opacity: 1, scale: 1, y: 0, transition: { delay: i * 0.1, duration: 0.4, ease: "easeOut" } }),
+  },
 };
 
 export default CharactersOnStagePanel;

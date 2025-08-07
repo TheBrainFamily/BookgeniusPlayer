@@ -531,8 +531,12 @@
           padding: 0;
           margin: 0;
           box-shadow: 0 clamp(2px, 0.5vw, 4px) clamp(8px, 1.5vw, 12px) rgba(0, 0, 0, 0.3);
-          border: clamp(2px, 0.3vw, 3px) solid rgba(255, 255, 255, 0.7);
+          border: clamp(2px, 0.3vw, 3px) solid rgba(255, 255, 255, 0.6);
           object-fit: cover;
+        }
+
+        .inline-avatar:hover {
+          transform: scale(1.25);
         }
       }
 
