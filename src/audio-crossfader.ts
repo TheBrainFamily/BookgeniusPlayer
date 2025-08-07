@@ -398,7 +398,9 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
               console.log(`🎵 Early streaming playback started for '${trackId}' with ${totalBytesReceived} bytes received`);
 
               // Continue downloading in the background for the full file
-              downloadRemainingDataInBackground(reader, chunks, trackId, title, coverArtUrl || "", transitionPoints);
+              downloadRemainingDataInBackground(reader, chunks, trackId, title, coverArtUrl || "", transitionPoints).catch((error) => {
+                console.error(`Error downloading remaining data for '${trackId}':`, error);
+              });
               return true;
             }
           } catch (earlyPlaybackError) {
