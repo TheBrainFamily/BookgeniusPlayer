@@ -187,6 +187,7 @@
 
         displayStartButton() {
           const startButton = document.getElementById("start-button");
+          console.log("PINGWING: start-button ready at: performance.now()", performance.now());
           if (startButton) {
             startButton.classList.remove("disabled");
             startButton.classList.add("visible");
@@ -228,6 +229,7 @@
         }
 
         async handleStartClick() {
+          console.log("PINGWING: start-button clicked at: performance.now()", performance.now());
           if (this.isExiting) return;
           this.isExiting = true;
           try {
