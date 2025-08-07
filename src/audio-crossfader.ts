@@ -190,6 +190,17 @@ function getAudioOffset(arrayBuffer: ArrayBuffer): number {
   return 0; // No valid ID3v2 tag found
 }
 
+function combineChunks(chunks: Uint8Array[]): Uint8Array {
+  const totalBytes = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+  const combined = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    combined.set(chunk, offset);
+    offset += chunk.length;
+  }
+  return combined;
+}
+
 /**
  * Creates a complete TrackState object from a decoded audio buffer and its metadata.
  * This helper centralizes the creation logic to avoid duplication.
@@ -361,12 +372,7 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
           // 256KB threshold
           try {
             // Combine chunks into a single array buffer
-            const combinedArray = new Uint8Array(totalBytesReceived);
-            let offset = 0;
-            for (const chunk of chunks) {
-              combinedArray.set(chunk, offset);
-              offset += chunk.length;
-            }
+            const combinedArray = combineChunks(chunks);
 
             // Parse metadata from the available data
             try {
@@ -405,12 +411,7 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
 
     // If we reach here, download is complete but early playback didn't start
     // Combine all chunks and process normally
-    const finalArray = new Uint8Array(totalBytesReceived);
-    let offset = 0;
-    for (const chunk of chunks) {
-      finalArray.set(chunk, offset);
-      offset += chunk.length;
-    }
+    const finalArray = combineChunks(chunks);
 
     // Parse metadata if not already done
     if (!hasStartedPlayback) {
@@ -486,12 +487,7 @@ async function downloadRemainingDataInBackground(
     }
 
     // Combine all chunks to create the complete file
-    const completeArray = new Uint8Array(totalBytesReceived);
-    let offset = 0;
-    for (const chunk of allChunks) {
-      completeArray.set(chunk, offset);
-      offset += chunk.length;
-    }
+    const completeArray = combineChunks(allChunks);
 
     // Decode the complete audio buffer
     const fullAudioBuffer = await audioContext.decodeAudioData(completeArray.buffer);
