@@ -310,7 +310,7 @@ async function streamingDecodeAudioData(
         } catch (e) {
           console.error(`Failed to decode full audio for '${trackId}':`, e);
         }
-      })();
+      })().catch(e => console.error(`[audio-crossfader] Unhandled error in full audio decode background task for '${trackId}':`, e));
 
       return decodedFirstChunk;
     } catch (e) {
