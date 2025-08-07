@@ -452,21 +452,22 @@
         position: relative;
         width: 600px;
         max-width: 100%;
-        margin: 0 auto clamp(1.5em, 2vh, 2.5em); /* Damo! */
-        padding: 0 clamp(1rem, 3vw, 2rem); /* Damo! */
-        gap: clamp(0.5rem, 2vw, 1.5rem); /* Damo! */
+        margin: 0 auto clamp(1.5em, 2vh, 2.5em);
+        gap: clamp(1rem, 2vw, 2rem);
       }
 
       .play-row[data-text-alignment="left"] {
         flex-direction: row;
         justify-content: flex-start;
         align-items: flex-start;
+        padding: 0 0 0 clamp(1rem, 3vw, 2rem);
       }
 
       .play-row[data-text-alignment="right"] {
         flex-direction: row-reverse;
         justify-content: flex-start;
         align-items: flex-start;
+        padding: 0 clamp(1rem, 3vw, 2rem) 0 0;
       }
 
       .play-row.no-avatar-row {
@@ -482,8 +483,6 @@
         top: clamp(25vh, 36vh, 40vh);
         z-index: 10;
         flex-shrink: 0;
-        width: clamp(80px, 15vw, 110px);
-        min-width: 60px;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
@@ -542,63 +541,32 @@
       .character-text {
         flex: 1;
         max-width: 100%;
-        min-width: 0; /* Allow shrinking */
+        min-width: 0;
       }
 
-      .play-row .character-text p[data-is-didaskalia="true"] {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
+      .play-row[data-text-alignment="left"] {
+        transform: translateX(-22.5%);
+      }
+
+      .play-row[data-text-alignment="right"] {
+        transform: translateX(22.5%);
       }
 
       .play-row[data-text-alignment="left"] .character-text {
         text-align: left;
         margin-left: 0;
-        transform: translateX(-20%);
       }
 
       .play-row[data-text-alignment="right"] .character-text {
-        text-align: right;
+        flex: inherit;
+        text-align: left;
         margin-right: 0;
-        margin-left: 0;
-        transform: translateX(20%);
-      }
-
-      .play-row[data-text-alignment="left"] .character-avatar {
-        transform: translateX(-100%);
-      }
-
-      .play-row[data-text-alignment="right"] .character-avatar {
-        transform: translateX(100%) rotateY(180deg);
-      }
-
-      /* .play-row[data-text-alignment="left"] .character-avatar {
-        flex-direction: row;
-      }
-      .play-row[data-text-alignment="left"] .character-avatar span.character-placeholder {
-        margin-top: 0;
-        margin-left: clamp(-4rem, -8vw, -2rem);
-        margin-right: 0;
-      }
-      .play-row[data-text-alignment="left"] .character-avatar span.character-placeholder:first-child {
         margin-left: 0;
       }
 
       .play-row[data-text-alignment="right"] .character-avatar {
-        flex-direction: row-reverse;
+        transform: rotateY(180deg);
       }
-      .play-row[data-text-alignment="right"] .character-avatar span.character-placeholder {
-        margin-top: 0;
-        margin-right: clamp(-4rem, -8vw, -2rem);
-        margin-left: 0;
-      }
-      .play-row[data-text-alignment="right"] .character-avatar span.character-placeholder:first-child {
-        margin-right: clamp(-2rem, -5vw, -1rem);
-      }
-
-      span.character-placeholder:hover {
-        z-index: 10;
-        transform: scale(1.025);
-      } */
 
       span.inline-avatar-wrapper > div {
         width: clamp(4em, 8vw, 5em);
@@ -650,18 +618,16 @@
       }
 
       p[data-text-alignment="right"][data-is-character="false"]:not(:has(em)) {
-        text-align: right;
+        text-align: left;
         padding-left: 0;
         text-indent: 0;
+        margin-left: 0;
       }
 
       p {
         font-family: var(--font-libre-caslon-text);
         line-height: clamp(1.4, 4vw, 1.6);
         text-indent: 0;
-        /* margin-bottom: clamp(0.1em, 0.5vh, 0.2em); */
-        /* margin: clamp(0.05em, 0.25vh, 0.1em) 0; */
-
         margin: clamp(0.05em, 0.25vh, 0.1em) 0 clamp(0.1em, 0.5vh, 0.2em) 0;
       }
 
@@ -685,14 +651,6 @@
         margin-right: auto;
         margin-top: clamp(2em, 5vh, 3em);
         margin-bottom: clamp(2em, 5vh, 3em);
-      }
-
-      .play-row p[data-text-alignment="right"][data-is-character="false"]:has(em) {
-        margin-right: clamp(-5rem, -5vw, -3.5rem);
-      }
-
-      .play-row p[data-text-alignment="left"][data-is-character="false"]:has(em) {
-        margin-left: clamp(-5rem, -5vw, -3.5rem);
       }
 
       p:not(:has(em)) + p:has(em) {
@@ -722,11 +680,11 @@
           width: 500px;
         }
 
-        .play-row[data-text-alignment="left"] .character-text {
+        .play-row[data-text-alignment="left"] {
           transform: translateX(-25%);
         }
 
-        .play-row[data-text-alignment="right"] .character-text {
+        .play-row[data-text-alignment="right"] {
           transform: translateX(25%);
         }
       }
@@ -750,46 +708,46 @@
           width: 400px;
         }
 
-        .play-row[data-text-alignment="left"] .character-text {
+        .play-row[data-text-alignment="left"] {
           transform: translateX(-30%);
         }
 
-        .play-row[data-text-alignment="right"] .character-text {
+        .play-row[data-text-alignment="right"] {
           transform: translateX(30%);
         }
       }
     }
   }
 
-  @media (max-width: 580px) {
+  @media (max-width: 600px) {
     #content-container:has(.play-container) {
-      background-size: 350px 100%;
+      background-size: 375px 100%;
 
       .play-container > section > section {
-        max-width: 550px;
+        max-width: 575px;
 
         & > span,
         & > h3,
         & > h4 {
-          width: 350px;
+          width: 375px;
         }
 
         .play-row {
-          width: 350px;
+          width: 375px;
         }
 
-        .play-row[data-text-alignment="left"] .character-text {
+        .play-row[data-text-alignment="left"] {
           transform: translateX(-25%);
         }
 
-        .play-row[data-text-alignment="right"] .character-text {
+        .play-row[data-text-alignment="right"] {
           transform: translateX(25%);
         }
       }
     }
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 525px) {
     #content-container:has(.play-container) {
       background-size: 325px 100%;
 
@@ -806,42 +764,12 @@
           width: 325px;
         }
 
-        .play-row[data-text-alignment="left"] .character-text {
-          transform: translateX(-25%);
+        .play-row[data-text-alignment="left"] {
+          transform: translateX(-17.5%);
         }
 
-        .play-row[data-text-alignment="right"] .character-text {
-          transform: translateX(25%);
-        }
-
-        .play-row[data-text-alignment="left"] .character-avatar {
-          transform: translateX(-85%);
-        }
-
-        .play-row[data-text-alignment="right"] .character-avatar {
-          transform: translateX(85%) rotateY(180deg);
-        }
-      }
-    }
-  }
-
-  @media (max-width: 435px) {
-    #content-container:has(.play-container) {
-      .play-container > section > section {
-        .play-row[data-text-alignment="left"] .character-text {
-          transform: translateX(-27.5%);
-        }
-
-        .play-row[data-text-alignment="right"] .character-text {
-          transform: translateX(27.5%);
-        }
-
-        .play-row[data-text-alignment="left"] .character-avatar {
-          transform: translateX(-70%);
-        }
-
-        .play-row[data-text-alignment="right"] .character-avatar {
-          transform: translateX(70%) rotateY(180deg);
+        .play-row[data-text-alignment="right"] {
+          transform: translateX(17.5%);
         }
       }
     }
@@ -864,20 +792,12 @@
           width: 300px;
         }
 
-        .play-row[data-text-alignment="left"] .character-text {
-          transform: translateX(-27.5%);
+        .play-row[data-text-alignment="left"] {
+          transform: translateX(-12.5%);
         }
 
-        .play-row[data-text-alignment="right"] .character-text {
-          transform: translateX(27.5%);
-        }
-
-        .play-row[data-text-alignment="left"] .character-avatar {
-          transform: translateX(-60%);
-        }
-
-        .play-row[data-text-alignment="right"] .character-avatar {
-          transform: translateX(60%) rotateY(180deg);
+        .play-row[data-text-alignment="right"] {
+          transform: translateX(12.5%);
         }
       }
     }
