@@ -216,7 +216,8 @@ async function streamingDecodeAudioData(
   trackId: string,
   title: string,
   coverArtUrl: string,
-  transitionPoints?: number[],
+  transitionPoints: number[] | undefined,
+  isFullBuffer: boolean,
 ): Promise<AudioBuffer | null> {
   try {
     const fileSize = arrayBuffer.byteLength;
@@ -289,28 +290,30 @@ async function streamingDecodeAudioData(
         }),
       );
 
-      (async () => {
-        try {
-          const fullAudioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-          const existingState = tracks.get(trackId);
+      if (isFullBuffer) {
+        (async () => {
+          try {
+            const fullAudioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            const existingState = tracks.get(trackId);
 
-          if (existingState) {
-            existingState.audioBuffer = fullAudioBuffer;
-            existingState.duration = fullAudioBuffer.duration;
-            existingState.trackLength = fullAudioBuffer.duration;
+            if (existingState) {
+              existingState.audioBuffer = fullAudioBuffer;
+              existingState.duration = fullAudioBuffer.duration;
+              existingState.trackLength = fullAudioBuffer.duration;
 
-            // Note: Buffer is updated in background, will be used for next playback
-          } else {
-            const newTrackState = createTrackState(fullAudioBuffer, { title, coverArtUrl, transitionPoints });
-            tracks.set(trackId, newTrackState);
+              // Note: Buffer is updated in background, will be used for next playback
+            } else {
+              const newTrackState = createTrackState(fullAudioBuffer, { title, coverArtUrl, transitionPoints });
+              tracks.set(trackId, newTrackState);
+            }
+
+            console.log(`✅ Full decode complete for '${trackId}' - ${fullAudioBuffer.duration.toFixed(2)}s (actual duration)`);
+            window.dispatchEvent(new CustomEvent("trackFullyLoaded", { detail: { trackId, fullDuration: fullAudioBuffer.duration, totalBytes: fileSize } }));
+          } catch (e) {
+            console.error(`Failed to decode full audio for '${trackId}':`, e);
           }
-
-          console.log(`✅ Full decode complete for '${trackId}' - ${fullAudioBuffer.duration.toFixed(2)}s (actual duration)`);
-          window.dispatchEvent(new CustomEvent("trackFullyLoaded", { detail: { trackId, fullDuration: fullAudioBuffer.duration, totalBytes: fileSize } }));
-        } catch (e) {
-          console.error(`Failed to decode full audio for '${trackId}':`, e);
-        }
-      })().catch((e) => console.error(`[audio-crossfader] Unhandled error in full audio decode background task for '${trackId}':`, e));
+        })().catch((e) => console.error(`[audio-crossfader] Unhandled error in full audio decode background task for '${trackId}':`, e));
+      }
 
       return decodedFirstChunk;
     } catch (e) {
@@ -382,7 +385,7 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
             }
 
             // Attempt early streaming decode
-            const audioBuffer = await streamingDecodeAudioData(audioContext, combinedArray.buffer, trackId, title, coverArtUrl || "", transitionPoints);
+            const audioBuffer = await streamingDecodeAudioData(audioContext, combinedArray.buffer, trackId, title, coverArtUrl || "", transitionPoints, false);
 
             if (audioBuffer) {
               hasStartedPlayback = true;
@@ -427,7 +430,7 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
     }
 
     // Process the complete file
-    const audioBuffer = await streamingDecodeAudioData(audioContext, finalArray.buffer, trackId, title, coverArtUrl || "", transitionPoints);
+    const audioBuffer = await streamingDecodeAudioData(audioContext, finalArray.buffer, trackId, title, coverArtUrl || "", transitionPoints, true);
 
     if (audioBuffer) {
       if (!hasStartedPlayback) {
@@ -607,7 +610,7 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
         tracks.delete(trackId);
         return false;
       }
-      const audioBuffer = await streamingDecodeAudioData(audioContext, arrayBuffer, trackId, title, coverArtUrl || "", transitionPoints);
+      const audioBuffer = await streamingDecodeAudioData(audioContext, arrayBuffer, trackId, title, coverArtUrl || "", transitionPoints, true);
       if (audioBuffer) {
         console.log(`✅ Streaming decoded '${trackId}' – ${audioBuffer.duration.toFixed(2)} s` + (transitionPoints ? ` | transitions: ${transitionPoints.join(", ")}` : ""));
         return true;
