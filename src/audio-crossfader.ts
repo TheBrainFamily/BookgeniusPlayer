@@ -368,8 +368,7 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
         totalBytesReceived += value.length;
 
         // Try to start early playback once we have enough data
-        if (!hasStartedPlayback && totalBytesReceived >= 256 * 1024) {
-          // 256KB threshold
+        if (!hasStartedPlayback && totalBytesReceived >= STREAMING_FILE_SIZE_THRESHOLD) {
           try {
             // Combine chunks into a single array buffer
             const combinedArray = combineChunks(chunks);
