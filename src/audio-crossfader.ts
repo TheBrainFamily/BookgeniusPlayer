@@ -168,8 +168,89 @@ function isFetchOk(res: Response, url: string): boolean {
   return res.ok || (local && res.status === 0);
 }
 
+async function streamingDecodeAudioData(
+  audioContext: AudioContext,
+  arrayBuffer: ArrayBuffer,
+  trackId: string,
+  title: string,
+  coverArtUrl: string,
+  transitionPoints?: number[],
+): Promise<AudioBuffer | null> {
+  try {
+    // Create chunks for progressive decoding (roughly 3-second chunks)
+    const PLAYBACK_START_THRESHOLD = 512 * 1024; // Start playing after 512KB decoded
+
+    let fullAudioBuffer: AudioBuffer | null = null;
+    const estimatedDuration = 0;
+
+    // Try to decode first chunk to get audio format info and start playback early
+    const firstChunk = arrayBuffer.slice(0, Math.min(PLAYBACK_START_THRESHOLD, arrayBuffer.byteLength));
+
+    try {
+      const firstBuffer = await audioContext.decodeAudioData(firstChunk.slice(0));
+
+      // Store partial track info to enable early playback
+      const partialTrackState: TrackState = {
+        audioBuffer: firstBuffer,
+        duration: estimatedDuration || firstBuffer.duration * 10, // Rough estimate
+        transitionPoints,
+        sourceNode: null,
+        gainNode: null,
+        coverArtUrl,
+        title,
+        trackLength: estimatedDuration || firstBuffer.duration * 10,
+      };
+
+      tracks.set(trackId, partialTrackState);
+
+      console.log(`🎵 Early playback ready for '${trackId}' - ${firstBuffer.duration.toFixed(2)}s decoded`);
+
+      // Dispatch early availability event
+      window.dispatchEvent(new CustomEvent("trackPartiallyLoaded", { detail: { trackId, partialDuration: firstBuffer.duration, estimatedTotal: partialTrackState.duration } }));
+    } catch (e) {
+      console.warn(`Failed to decode first chunk of '${trackId}', falling back to full decode:`, e);
+      return null;
+    }
+
+    // Continue decoding the full file in the background
+    setTimeout(async () => {
+      try {
+        fullAudioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+
+        // Update the track with the complete buffer
+        const updatedTrackState: TrackState = {
+          audioBuffer: fullAudioBuffer,
+          duration: fullAudioBuffer.duration,
+          transitionPoints,
+          sourceNode: null,
+          gainNode: null,
+          coverArtUrl,
+          title,
+          trackLength: fullAudioBuffer.duration,
+        };
+
+        tracks.set(trackId, updatedTrackState);
+
+        console.log(`✅ Full decode complete for '${trackId}' - ${fullAudioBuffer.duration.toFixed(2)}s`);
+
+        // Dispatch full loading complete event
+        window.dispatchEvent(new CustomEvent("trackFullyLoaded", { detail: { trackId, fullDuration: fullAudioBuffer.duration } }));
+      } catch (e) {
+        console.error(`Failed to decode full audio for '${trackId}':`, e);
+        // Keep the partial buffer if full decode fails
+      }
+    }, 0);
+
+    // Return the first chunk buffer to indicate streaming success
+    return tracks.get(trackId)?.audioBuffer || null;
+  } catch (e) {
+    console.error(`Streaming decode failed for '${trackId}':`, e);
+    return null;
+  }
+}
+
 /* MAIN ------------------------------------------------------------------ */
-export async function loadTrack(trackId: string, transitionPoints?: number[]): Promise<boolean> {
+export async function loadTrack(trackId: string, transitionPoints?: number[], enableStreaming: boolean = true): Promise<boolean> {
   /* 1 ▸ make sure AudioContext is alive ---------------------------- */
   if (!audioContext && !(await initAudioContext())) {
     console.error("loadTrack: AudioContext could not be initialized.");
@@ -225,8 +306,7 @@ export async function loadTrack(trackId: string, transitionPoints?: number[]): P
     return false;
   }
 
-  /* 4 ▸ parse metadata & decode ----------------------------------- */
-  let audioBuffer: AudioBuffer;
+  /* 4 ▸ parse metadata & streaming decode -------------------------- */
   let coverArtUrl: string | undefined;
   let title = trackId;
 
@@ -241,29 +321,41 @@ export async function loadTrack(trackId: string, transitionPoints?: number[]): P
       coverArtUrl = URL.createObjectURL(blob);
     }
 
-    /* ── 4b decode audio ─────────────────────────────────────────── */
-    audioBuffer = await audioContext!.decodeAudioData(arrayBuffer);
+    /* ── 4b streaming decode ─────────────────────────────────────── */
+    if (enableStreaming && arrayBuffer.byteLength > 1024 * 1024) {
+      // Only use streaming for files > 1MB
+      const audioBuffer = await streamingDecodeAudioData(audioContext!, arrayBuffer, trackId, title, coverArtUrl || "", transitionPoints);
+      if (audioBuffer) {
+        console.log(`✅ Streaming decoded '${trackId}' – ${audioBuffer.duration.toFixed(2)} s` + (transitionPoints ? ` | transitions: ${transitionPoints.join(", ")}` : ""));
+        return true;
+      }
+      // Fall back to regular decode if streaming failed
+      console.warn(`⚠️ Streaming decode failed for '${trackId}', falling back to regular decode`);
+    }
+
+    /* ── 4c regular decode (fallback or small files) ──────────────── */
+    const audioBuffer = await audioContext!.decodeAudioData(arrayBuffer);
+
+    /* 5 ▸ cache & done ---------------------------------------------- */
+    tracks.set(trackId, {
+      audioBuffer,
+      duration: audioBuffer.duration,
+      transitionPoints,
+      sourceNode: null,
+      gainNode: null,
+      coverArtUrl: coverArtUrl || "",
+      title,
+      trackLength: audioBuffer.duration,
+    });
+
+    console.log(`✅ Decoded '${trackId}' – ${audioBuffer.duration.toFixed(2)} s` + (transitionPoints ? ` | transitions: ${transitionPoints.join(", ")}` : ""));
+    return true;
   } catch (e) {
     console.error(`❌ metadata/decode error for '${trackId}':`, e);
     if (coverArtUrl) URL.revokeObjectURL(coverArtUrl);
     tracks.delete(trackId);
     return false;
   }
-
-  /* 5 ▸ cache & done ---------------------------------------------- */
-  tracks.set(trackId, {
-    audioBuffer,
-    duration: audioBuffer.duration,
-    transitionPoints,
-    sourceNode: null,
-    gainNode: null,
-    coverArtUrl: coverArtUrl || "",
-    title,
-    trackLength: audioBuffer.duration,
-  });
-
-  console.log(`✅ Decoded '${trackId}' – ${audioBuffer.duration.toFixed(2)} s` + (transitionPoints ? ` | transitions: ${transitionPoints.join(", ")}` : ""));
-  return true;
 }
 
 function playTrack(trackId: string, startTime: number = 0, offset: number = 0, skipStopInternal: boolean = false): boolean {
@@ -311,6 +403,27 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
     liveSources.delete(source);
     const stateAtEnd = tracks.get(trackId);
     const thisSourceInstanceEnded = stateAtEnd?.sourceNode === source;
+
+    // Check if this was a partial buffer that ended early due to streaming
+    const currentPosition = getCurrentTrackPosition();
+    const bufferDuration = state.audioBuffer?.duration || 0;
+    const wasPartialEnding = currentPosition !== null && currentPosition < state.trackLength - 1 && Math.abs(currentPosition - bufferDuration) < 0.5;
+
+    if (wasPartialEnding && trackId === currentTrackId) {
+      console.log(`Partial buffer ended for '${trackId}' at ${currentPosition?.toFixed(2)}s. Checking for full buffer...`);
+
+      // Wait a moment and check if full buffer is now available
+      setTimeout(async () => {
+        const updatedState = tracks.get(trackId);
+        if (updatedState?.audioBuffer && updatedState.audioBuffer.duration > bufferDuration + 1) {
+          console.log(`Full buffer now available for '${trackId}'. Continuing playback from ${currentPosition?.toFixed(2)}s`);
+          if (currentPosition !== null) {
+            playTrack(trackId, audioContext?.currentTime || 0, currentPosition);
+          }
+        }
+      }, 100);
+      return;
+    }
 
     // Conditions for this onended handler to take action:
     // 1. This track (trackId) must be the currentTrackId.
@@ -1139,6 +1252,8 @@ declare global {
   interface WindowEventMap {
     playlistChange: CustomEvent<{ id: string; title: string; duration: number }[] | null>;
     songTransition: CustomEvent<TrackState | null>;
+    trackPartiallyLoaded: CustomEvent<{ trackId: string; partialDuration: number; estimatedTotal: number }>;
+    trackFullyLoaded: CustomEvent<{ trackId: string; fullDuration: number }>;
   }
 }
 
