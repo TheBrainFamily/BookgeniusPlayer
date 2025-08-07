@@ -202,6 +202,38 @@ function combineChunks(chunks: Uint8Array[]): Uint8Array {
 }
 
 /**
+ * Parses metadata from an audio buffer, updates title, and manages the cover art object URL to prevent memory leaks.
+ * @param audioData The audio data as a Uint8Array or ArrayBuffer.
+ * @param currentTitle The current title, to be used as a fallback.
+ * @param currentCoverArtUrl The existing cover art URL, which will be revoked if a new one is created.
+ * @returns A promise that resolves to an object with the updated title and coverArtUrl.
+ */
+async function parseMetadataAndUpdate(audioData: Uint8Array | ArrayBuffer, currentTitle: string, currentCoverArtUrl?: string): Promise<{ title: string; coverArtUrl: string }> {
+  let title = currentTitle;
+  let coverArtUrl = currentCoverArtUrl || "";
+
+  try {
+    const blob = new Blob([audioData], { type: "audio/mpeg" });
+    const { common } = await parseBlob(blob);
+    title = common.title || title;
+
+    if (common.picture?.[0]) {
+      // Revoke the old URL before creating a new one to prevent memory leaks
+      if (coverArtUrl) {
+        URL.revokeObjectURL(coverArtUrl);
+      }
+      const pic = common.picture[0];
+      const newBlob = new Blob([new Uint8Array(pic.data)], { type: pic.format });
+      coverArtUrl = URL.createObjectURL(newBlob);
+    }
+  } catch (metadataError) {
+    console.warn(`Metadata parsing failed:`, metadataError);
+  }
+
+  return { title, coverArtUrl };
+}
+
+/**
  * Creates a complete TrackState object from a decoded audio buffer and its metadata.
  * This helper centralizes the creation logic to avoid duplication.
  * @param audioBuffer - The fully decoded audio buffer.
@@ -387,20 +419,9 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
             const combinedArray = combineChunks(chunks);
 
             // Parse metadata from the available data
-            try {
-              const partialBlob = new Blob([combinedArray], { type: "audio/mpeg" });
-              const { common } = await parseBlob(partialBlob);
-              title = common.title || title;
-
-              if (common.picture?.[0]) {
-                const pic = common.picture[0];
-                const blob = new Blob([new Uint8Array(pic.data)], { type: pic.format });
-                coverArtUrl = URL.createObjectURL(blob);
-              }
-            } catch (metadataError) {
-              console.warn(`Metadata parsing failed for partial data of '${trackId}':`, metadataError);
-              // Continue with playback even if metadata parsing fails
-            }
+            const metadata = await parseMetadataAndUpdate(combinedArray, title, coverArtUrl);
+            title = metadata.title;
+            coverArtUrl = metadata.coverArtUrl;
 
             // Attempt early streaming decode
             const audioBuffer = await streamingDecodeAudioData(audioContext, combinedArray.buffer, trackId, title, coverArtUrl || "", transitionPoints, false);
@@ -429,19 +450,9 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
 
     // Parse metadata if not already done
     if (!hasStartedPlayback) {
-      try {
-        const fullBlob = new Blob([finalArray], { type: "audio/mpeg" });
-        const { common } = await parseBlob(fullBlob);
-        title = common.title || title;
-
-        if (common.picture?.[0]) {
-          const pic = common.picture[0];
-          const blob = new Blob([new Uint8Array(pic.data)], { type: pic.format });
-          coverArtUrl = URL.createObjectURL(blob);
-        }
-      } catch (metadataError) {
-        console.warn(`Final metadata parsing failed for '${trackId}':`, metadataError);
-      }
+      const metadata = await parseMetadataAndUpdate(finalArray, title, coverArtUrl);
+      title = metadata.title;
+      coverArtUrl = metadata.coverArtUrl;
     }
 
     // Process the complete file
@@ -599,18 +610,10 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
 
   /* 4 ▸ parse metadata & streaming decode -------------------------- */
   let coverArtUrl: string | undefined;
-  let title = trackId;
-
   try {
     /* ── 4a metadata (ID3) ───────────────────────────────────────── */
-    const { common } = await parseBlob(new Blob([arrayBuffer], { type: "audio/mpeg" }));
-    title = common.title || title;
-
-    if (common.picture?.[0]) {
-      const pic = common.picture[0];
-      const blob = new Blob([new Uint8Array(pic.data)], { type: pic.format });
-      coverArtUrl = URL.createObjectURL(blob);
-    }
+    const { title, coverArtUrl: newCoverArtUrl } = await parseMetadataAndUpdate(arrayBuffer, trackId);
+    coverArtUrl = newCoverArtUrl;
 
     /* ── 4b streaming decode ─────────────────────────────────────── */
     if (enableStreaming && arrayBuffer.byteLength > STREAMING_FILE_SIZE_THRESHOLD) {
