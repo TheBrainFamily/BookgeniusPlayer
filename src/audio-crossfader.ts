@@ -16,6 +16,7 @@ export interface TrackState {
   startedAtCtxTime?: number | null; // AudioContext.currentTime when playback (this instance) started
   offsetAtStart?: number; // Offset (in seconds) passed to source.start()
   pausedAt?: number | null; // Position (in seconds) frozen when paused
+  fullyLoadedListener?: ((event: CustomEvent) => void) | null; // Reference to the 'trackFullyLoaded' event listener
 }
 
 // --- Configuration ---
@@ -601,9 +602,13 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
       if (event.detail.trackId === trackId) {
         scheduleContination();
         window.removeEventListener("trackFullyLoaded", handleTrackFullyLoaded);
+        const state = tracks.get(trackId);
+        if (state) {
+          state.fullyLoadedListener = null;
+        }
       }
     };
-
+    state.fullyLoadedListener = handleTrackFullyLoaded;
     window.addEventListener("trackFullyLoaded", handleTrackFullyLoaded);
 
     // Also try immediately in case it's already ready
@@ -709,6 +714,13 @@ function stopTrackInternal(trackId: string) {
     clearTimeout(state.preemptiveTransitionTimeout);
     state.preemptiveTransitionTimeout = null;
     // console.log(`Cleared pre-emptive transition timeout for '${trackId}' during stop.`);
+  }
+
+  // Ensure the 'trackFullyLoaded' listener is removed if the track is stopped prematurely
+  if (state.fullyLoadedListener) {
+    window.removeEventListener("trackFullyLoaded", state.fullyLoadedListener);
+    state.fullyLoadedListener = null;
+    console.log(`Cleaned up 'trackFullyLoaded' listener for '${trackId}'.`);
   }
 
   if (state.sourceNode) {
