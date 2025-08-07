@@ -221,6 +221,11 @@ function createTrackState(audioBuffer: AudioBuffer, metadata: { title: string; c
   };
 }
 
+interface CodecFrame {
+  duration?: number;
+  totalBytesOut: number;
+}
+
 async function streamingDecodeAudioData(
   audioContext: AudioContext,
   arrayBuffer: ArrayBuffer,
@@ -242,13 +247,19 @@ async function streamingDecodeAudioData(
     const chunkSize = Math.min(256 * 1024, fileSize - audioOffset);
     const chunk = arrayBuffer.slice(audioOffset, audioOffset + chunkSize);
 
-    const parser = new CodecParser("audio/mpeg");
-    const iterator = parser.parseChunk(new Uint8Array(chunk));
-    const frames = [];
-    let result = iterator.next();
-    while (!result.done) {
-      frames.push(result.value);
-      result = iterator.next();
+    let frames: CodecFrame[];
+    try {
+      const parser = new CodecParser("audio/mpeg");
+      const iterator = parser.parseChunk(new Uint8Array(chunk));
+      frames = [];
+      let result = iterator.next();
+      while (!result.done) {
+        frames.push(result.value);
+        result = iterator.next();
+      }
+    } catch (e) {
+      console.warn(`CodecParser or frame iteration failed for '${trackId}', falling back to full decode:`, e);
+      return await audioContext.decodeAudioData(arrayBuffer);
     }
 
     if (frames.length < 2) {
