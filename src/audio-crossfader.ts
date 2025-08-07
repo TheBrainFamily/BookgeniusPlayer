@@ -30,7 +30,7 @@ const VOLUME_SCALE = 1.737;
 const PLAYLIST_LOAD_STAGGER_MS = 100;
 const PLAYLIST_UPDATE_DEBOUNCE_MS = 300;
 
-const STREAMING_FILE_SIZE_THRESHOLD = 1024 * 1024;
+const STREAMING_FILE_SIZE_THRESHOLD = 256 * 1024; // Reduced to 256KB to enable streaming for smaller files
 
 // --- Module-level State ---
 let audioContext: AudioContext | null = null;
@@ -199,8 +199,12 @@ async function streamingDecodeAudioData(
   transitionPoints?: number[],
 ): Promise<AudioBuffer | null> {
   try {
-    // Create chunks for progressive decoding (roughly 3-second chunks)
-    const PLAYBACK_START_THRESHOLD = 512 * 1024; // Start playing after 512KB decoded
+    // Adaptive chunk size based on file size - smaller files get smaller initial chunks for faster start
+    const fileSize = arrayBuffer.byteLength;
+    const PLAYBACK_START_THRESHOLD = Math.min(
+      Math.max(128 * 1024, fileSize * 0.15), // At least 128KB, at most 15% of file
+      512 * 1024, // Never exceed 512KB for initial chunk
+    );
 
     // Try to decode first chunk to get audio format info and start playback early
     const firstChunk = arrayBuffer.slice(0, Math.min(PLAYBACK_START_THRESHOLD, arrayBuffer.byteLength));
@@ -209,47 +213,59 @@ async function streamingDecodeAudioData(
       const firstChunkByteLength = firstChunk.byteLength;
       const firstBuffer = await audioContext.decodeAudioData(firstChunk);
 
+      // Better duration estimation using bitrate calculation
+      const estimatedBitrate = (firstChunkByteLength * 8) / firstBuffer.duration; // bits per second
+      const estimatedTotalDuration = (arrayBuffer.byteLength * 8) / estimatedBitrate;
+
       // Store partial track info to enable early playback
       const partialTrackState: TrackState = {
         audioBuffer: firstBuffer,
-        duration: (arrayBuffer.byteLength / firstChunkByteLength) * firstBuffer.duration, // More accurate estimate
+        duration: estimatedTotalDuration,
         transitionPoints,
         sourceNode: null,
         gainNode: null,
         coverArtUrl,
         title,
-        trackLength: (arrayBuffer.byteLength / firstChunk.byteLength) * firstBuffer.duration,
+        trackLength: estimatedTotalDuration,
       };
 
       tracks.set(trackId, partialTrackState);
 
-      console.log(`🎵 Early playback ready for '${trackId}' - ${firstBuffer.duration.toFixed(2)}s decoded`);
+      console.log(`🎵 Early playback ready for '${trackId}' - ${firstBuffer.duration.toFixed(2)}s decoded (estimated total: ${estimatedTotalDuration.toFixed(2)}s)`);
 
       // Dispatch early availability event
-      window.dispatchEvent(new CustomEvent("trackPartiallyLoaded", { detail: { trackId, partialDuration: firstBuffer.duration, estimatedTotal: partialTrackState.duration } }));
+      window.dispatchEvent(
+        new CustomEvent("trackPartiallyLoaded", {
+          detail: { trackId, partialDuration: firstBuffer.duration, estimatedTotal: estimatedTotalDuration, loadedBytes: firstChunkByteLength, totalBytes: arrayBuffer.byteLength },
+        }),
+      );
     } catch (e) {
       console.warn(`Failed to decode first chunk of '${trackId}', falling back to full decode:`, e);
       return null;
     }
 
-    // Continue decoding the full file in the background
-    setTimeout(async () => {
+    // Continue decoding the full file in the background with progress tracking
+    const decodeFullFile = async () => {
       try {
+        // For very large files, we could implement incremental decoding here
         const fullAudioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
         // Update the track with the complete buffer
         const updatedTrackState = createTrackState(fullAudioBuffer, { title, coverArtUrl, transitionPoints });
         tracks.set(trackId, updatedTrackState);
 
-        console.log(`✅ Full decode complete for '${trackId}' - ${fullAudioBuffer.duration.toFixed(2)}s`);
+        console.log(`✅ Full decode complete for '${trackId}' - ${fullAudioBuffer.duration.toFixed(2)}s (actual duration)`);
 
         // Dispatch full loading complete event
-        window.dispatchEvent(new CustomEvent("trackFullyLoaded", { detail: { trackId, fullDuration: fullAudioBuffer.duration } }));
+        window.dispatchEvent(new CustomEvent("trackFullyLoaded", { detail: { trackId, fullDuration: fullAudioBuffer.duration, totalBytes: arrayBuffer.byteLength } }));
       } catch (e) {
         console.error(`Failed to decode full audio for '${trackId}':`, e);
         // Keep the partial buffer if full decode fails
       }
-    }, 0);
+    };
+
+    // Start full decoding immediately but don't block
+    decodeFullFile();
 
     // Return the first chunk buffer to indicate streaming success
     return tracks.get(trackId)?.audioBuffer || null;
@@ -333,7 +349,7 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
 
     /* ── 4b streaming decode ─────────────────────────────────────── */
     if (enableStreaming && arrayBuffer.byteLength > STREAMING_FILE_SIZE_THRESHOLD) {
-      // Only use streaming for files > 1MB
+      // Use streaming for files larger than threshold
       if (!audioContext) {
         console.error("AudioContext became null during streaming setup");
         tracks.delete(trackId);
@@ -346,6 +362,42 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
       }
       // Fall back to regular decode if streaming failed
       console.warn(`⚠️ Streaming decode failed for '${trackId}', falling back to regular decode`);
+    } else if (enableStreaming && arrayBuffer.byteLength <= STREAMING_FILE_SIZE_THRESHOLD) {
+      // For smaller files, still use streaming but with immediate full decode
+      if (!audioContext) {
+        console.error("AudioContext became null during streaming setup");
+        tracks.delete(trackId);
+        return false;
+      }
+
+      // For small files, decode immediately but still use streaming infrastructure for consistency
+      try {
+        const fullAudioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        const trackState = createTrackState(fullAudioBuffer, { title, coverArtUrl: coverArtUrl || "", transitionPoints });
+        tracks.set(trackId, trackState);
+
+        // Dispatch both events for small files to maintain compatibility
+        window.dispatchEvent(
+          new CustomEvent("trackPartiallyLoaded", {
+            detail: {
+              trackId,
+              partialDuration: fullAudioBuffer.duration,
+              estimatedTotal: fullAudioBuffer.duration,
+              loadedBytes: arrayBuffer.byteLength,
+              totalBytes: arrayBuffer.byteLength,
+            },
+          }),
+        );
+
+        window.dispatchEvent(new CustomEvent("trackFullyLoaded", { detail: { trackId, fullDuration: fullAudioBuffer.duration, totalBytes: arrayBuffer.byteLength } }));
+
+        console.log(
+          `✅ Small file decoded immediately '${trackId}' – ${fullAudioBuffer.duration.toFixed(2)} s` + (transitionPoints ? ` | transitions: ${transitionPoints.join(", ")}` : ""),
+        );
+        return true;
+      } catch (e) {
+        console.warn(`⚠️ Small file decode failed for '${trackId}', falling back to regular decode:`, e);
+      }
     }
 
     /* ── 4c regular decode (fallback or small files) ──────────────── */
@@ -414,18 +466,28 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
     // Check if this was a partial buffer that ended early due to streaming
     const currentPosition = getCurrentTrackPosition();
     const bufferDuration = state.audioBuffer?.duration || 0;
-    const wasPartialEnding = currentPosition !== null && currentPosition < state.trackLength - 1 && Math.abs(currentPosition - bufferDuration) < 0.5;
+    const wasPartialEnding = currentPosition !== null && currentPosition < state.trackLength - 0.5 && Math.abs(currentPosition - bufferDuration) < 0.2;
 
     if (wasPartialEnding && trackId === currentTrackId) {
       console.log(`Partial buffer ended for '${trackId}' at ${currentPosition?.toFixed(2)}s. Checking for full buffer...`);
 
-      // Wait for the full buffer using an event-driven approach with a timeout.
+      // First check if full buffer is already available
+      const updatedState = tracks.get(trackId);
+      if (updatedState?.audioBuffer && updatedState.audioBuffer.duration > bufferDuration + 0.5) {
+        console.log(`Full buffer already available for '${trackId}'. Continuing playback immediately.`);
+        if (currentPosition !== null) {
+          playTrack(trackId, audioContext?.currentTime || 0, currentPosition);
+        }
+        return;
+      }
+
+      // Wait for the full buffer using an event-driven approach with shorter timeout for responsiveness
       const bufferPromise = new Promise<boolean>((resolve) => {
         const timeout = setTimeout(() => {
           window.removeEventListener("trackFullyLoaded", listener);
-          console.warn(`Timed out waiting for full buffer for '${trackId}'.`);
+          console.warn(`Timed out waiting for full buffer for '${trackId}'. Attempting to continue with current buffer.`);
           resolve(false);
-        }, 5000);
+        }, 3000); // Reduced timeout for better UX
 
         const listener = (e: Event) => {
           if ((e as CustomEvent).detail.trackId === trackId) {
@@ -436,13 +498,27 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
         };
 
         window.addEventListener("trackFullyLoaded", listener);
+
+        // Also check periodically in case event was missed
+        const checkInterval = setInterval(() => {
+          const currentState = tracks.get(trackId);
+          if (currentState?.audioBuffer && currentState.audioBuffer.duration > bufferDuration + 0.5) {
+            clearInterval(checkInterval);
+            clearTimeout(timeout);
+            window.removeEventListener("trackFullyLoaded", listener);
+            resolve(true);
+          }
+        }, 100);
       });
 
-      if (await bufferPromise) {
-        console.log(`Full buffer now available for '${trackId}'. Continuing playback from ${currentPosition?.toFixed(2)}s`);
+      const bufferReady = await bufferPromise;
+      if (bufferReady || tracks.get(trackId)?.audioBuffer) {
+        console.log(`Buffer available for '${trackId}'. Continuing playback from ${currentPosition?.toFixed(2)}s`);
         if (currentPosition !== null) {
           playTrack(trackId, audioContext?.currentTime || 0, currentPosition);
         }
+      } else {
+        console.warn(`Unable to continue playback for '${trackId}'. No buffer available.`);
       }
       return;
     }
@@ -486,8 +562,8 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
       if (timeUntilPreemptiveTrigger > FADE_DURATION_SECONDS / 2 && timeUntilPreemptiveTrigger > 0.2) {
         // Ensure there's enough time for a meaningful fade trigger
         const preemptiveTimeoutId = setTimeout(() => {
-          const currentAudioContext = audioContext; // Capture current audioContext
-          if (!currentAudioContext) return;
+          // Capture current audioContext
+          if (!audioContext) return;
 
           // Check conditions again inside timeout, as state might have changed
           if (trackId === currentTrackId && !isTransitioning && currentSectionTracks && currentSectionTracks.length > 0) {
@@ -1006,12 +1082,6 @@ export function stopAllPlayback() {
 export function getCurrentTrackId(): string | null {
   return currentTrackId;
 }
-export function getNextTrackId(): string | null {
-  return nextTrackId;
-}
-export function isCurrentlyTransitioning(): boolean {
-  return isTransitioning;
-}
 export function getCurrentSectionTracks(): string[] | null {
   return currentSectionTracks ? [...currentSectionTracks] : null;
 }
@@ -1080,8 +1150,7 @@ export function getMasterVolume(): number | null {
   }
   const scaledVolume = masterGainNode.gain.value;
   // Reverse the non-linear scaling to get the linear value for the UI slider
-  const linearVolume = Math.pow(scaledVolume, 1 / VOLUME_SCALE);
-  return linearVolume;
+  return Math.pow(scaledVolume, 1 / VOLUME_SCALE);
 }
 
 /**
@@ -1274,8 +1343,8 @@ declare global {
   interface WindowEventMap {
     playlistChange: CustomEvent<{ id: string; title: string; duration: number }[] | null>;
     songTransition: CustomEvent<TrackState | null>;
-    trackPartiallyLoaded: CustomEvent<{ trackId: string; partialDuration: number; estimatedTotal: number }>;
-    trackFullyLoaded: CustomEvent<{ trackId: string; fullDuration: number }>;
+    trackPartiallyLoaded: CustomEvent<{ trackId: string; partialDuration: number; estimatedTotal: number; loadedBytes: number; totalBytes: number }>;
+    trackFullyLoaded: CustomEvent<{ trackId: string; fullDuration: number; totalBytes: number }>;
   }
 }
 
