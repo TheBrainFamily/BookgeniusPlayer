@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import { motion } from "motion/react";
 
 import CharacterMedia from "./CharacterMedia";
 import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
@@ -74,7 +75,8 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers }
       onMouseEnter={() => requestToggle(true)}
       onMouseLeave={() => requestToggle(false)}
     >
-      <div
+      <motion.div
+        layout
         className={cn(
           "rounded-full overflow-hidden aspect-square cursor-pointer",
           isTalkingInCurrentRange
@@ -84,7 +86,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers }
         onClick={() => openModal(entity.slug, isVideo, mediaSrc)}
       >
         <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />
-      </div>
+      </motion.div>
       <div
         className={cn(
           "max-w-full w-full absolute right-0 bottom-0 rounded-xl text-center bg-black/70 textured-bg border shadow-xl",

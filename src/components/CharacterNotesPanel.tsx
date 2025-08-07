@@ -28,7 +28,7 @@ const CharacterNotesPanel = () => {
   if (!target || !isSplashHidden) return null;
 
   return createPortal(
-    <AnimatePresence mode="sync">
+    <AnimatePresence>
       {isSplashHidden && (
         <motion.div
           className="character-notes-custom content-center h-full space-y-3 py-10 overflow-x-hidden no-scrollbar"
@@ -40,13 +40,13 @@ const CharacterNotesPanel = () => {
             {characterNotes.map((characterNote, index) => (
               <motion.div
                 key={characterNote.slug}
-                layout="preserve-aspect"
+                layout="position"
                 variants={variants.character}
                 initial="hidden"
                 animate="visible"
                 custom={index}
                 exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
-                transition={{ layout: { delay: 0.2 } }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
               >
                 <CharacterCard entity={characterNote} currentSpeakers={currentSpeakers} />
               </motion.div>
