@@ -29,6 +29,9 @@ import { getKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles"
 import { useQuiz } from "./hooks/useQuiz";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
 import ProgressBars from "@/components/ProgressBars";
+import CharactersOnStagePanel from "./components/CharactersOnStagePanel";
+import { getBookData } from "./genericBookDataGetters/getBookData";
+import { getCharactersData } from "./genericBookDataGetters/getCharactersData";
 
 function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   setKnownVideos(getKnownVideoFiles());
@@ -96,6 +99,10 @@ export default function App() {
     document.documentElement.style.setProperty("--font-size-multiplier", String(fontSize));
   }, [fontSize]);
 
+  const bookData = getBookData();
+  const allCharacters = getCharactersData();
+  const isPlayForm = bookData.metadata.bookForm === "play";
+
   return (
     <LocationProvider>
       <RealtimeProvider>
@@ -103,6 +110,8 @@ export default function App() {
           <BookContentWrapper>
             <Shell onShellMounted={() => setReactDomReady(true)} />
             <ModalRenderers />
+            <div id="bottom-panel" className="absolute bottom-0 left-0 w-full h-24 z-20 pointer-events-none" />
+            {isPlayForm && <CharactersOnStagePanel allCharacters={allCharacters} />}
           </BookContentWrapper>
         </WebSocketProvider>
       </RealtimeProvider>
