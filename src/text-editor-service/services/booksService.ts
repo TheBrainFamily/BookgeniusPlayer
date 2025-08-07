@@ -1,5 +1,6 @@
 import { readdir, readFile, writeFile } from "fs/promises";
 import path from "path";
+import { parseStringPromise } from "xml2js";
 
 export class BooksService {
   public async getBooks(): Promise<string[]> {
@@ -13,7 +14,14 @@ export class BooksService {
     }
   }
 
-  public async getBookData(bookName: string): Promise<{ chapters: Record<string, string>; metadata: Record<string, string> } | null> {
+  public async getBookData(
+    bookName: string,
+  ): Promise<{
+    chapters: Record<string, string>;
+    metadata: Record<string, string>;
+    characters: Array<{ name: string; display: string; summary: string }>;
+    bookMetadata: { slug?: string; title?: string; author?: string; language?: string; form?: string; simplifiedIconColor?: string };
+  } | null> {
     try {
       const booksContentPath = path.join(process.cwd(), "public_books", bookName, "booksContent");
       const files = await readdir(booksContentPath, { withFileTypes: true });
@@ -52,7 +60,41 @@ export class BooksService {
         metadata[fileName] = content;
       }
 
-      return { chapters, metadata };
+      // Parse metadata.xml if it exists to extract characters and book metadata
+      const characters: Array<{ name: string; display: string; summary: string }> = [];
+      const bookMetadata: { slug?: string; title?: string; author?: string; language?: string; form?: string; simplifiedIconColor?: string } = {};
+
+      if (metadata.metadata) {
+        try {
+          const parsedXml = await parseStringPromise(metadata.metadata, { explicitArray: false, mergeAttrs: true });
+
+          // Extract characters from CharactersMaster
+          if (parsedXml?.ebook?.CharactersMaster) {
+            const charactersMaster = parsedXml.ebook.CharactersMaster;
+            Object.keys(charactersMaster).forEach((key) => {
+              const char = charactersMaster[key];
+              if (char && typeof char === "object" && char.display && char.summary) {
+                characters.push({ name: key, display: char.display, summary: char.summary });
+              }
+            });
+          }
+
+          // Extract book metadata from BookMetadata
+          if (parsedXml?.ebook?.BookMetadata) {
+            const bookMeta = parsedXml.ebook.BookMetadata;
+            bookMetadata.slug = bookMeta.Slug;
+            bookMetadata.title = bookMeta.Title;
+            bookMetadata.author = bookMeta.Author;
+            bookMetadata.language = bookMeta.Language;
+            bookMetadata.form = bookMeta.Form;
+            bookMetadata.simplifiedIconColor = bookMeta.SimplifiedIconColor;
+          }
+        } catch (xmlError) {
+          console.error("Error parsing metadata XML:", xmlError);
+        }
+      }
+
+      return { chapters, metadata, characters, bookMetadata };
     } catch (error) {
       console.error(`Error reading book data for ${bookName}:`, error);
       return null;

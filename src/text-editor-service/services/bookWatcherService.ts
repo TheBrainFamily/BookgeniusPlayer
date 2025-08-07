@@ -10,7 +10,7 @@ interface SSEClient {
 }
 
 interface ParagraphSelection {
-  bookId: string;
+  bookName: string;
   chapterId: number;
   paragraphId: number;
   timestamp: number;
@@ -46,7 +46,7 @@ class BookWatcherService {
     console.log(`[SSE] Client ${clientId} connected for book: ${book}`);
 
     // Send last paragraph selection if available and matching book
-    if (this.lastParagraphSelection && this.lastParagraphSelection.bookId === book) {
+    if (this.lastParagraphSelection && this.lastParagraphSelection.bookName === book) {
       try {
         const message = `data: ${JSON.stringify({ type: "paragraph-selected", ...this.lastParagraphSelection })}\n\n`;
         response.write(message);
@@ -195,7 +195,7 @@ class BookWatcherService {
     this.lastParagraphSelection = selection;
 
     // Send to all clients connected to this book
-    const clients = Array.from(this.clients.values()).filter((c) => c.book === selection.bookId);
+    const clients = Array.from(this.clients.values()).filter((c) => c.book === selection.bookName);
     const message = `data: ${JSON.stringify({ type: "paragraph-selected", ...selection })}\n\n`;
 
     clients.forEach((client) => {
@@ -207,7 +207,7 @@ class BookWatcherService {
       }
     });
 
-    console.log(`[SSE] Broadcast paragraph selection to ${clients.length} clients for book ${selection.bookId}`);
+    console.log(`[SSE] Broadcast paragraph selection to ${clients.length} clients for book ${selection.bookName}`);
   }
 
   private cleanup(): void {

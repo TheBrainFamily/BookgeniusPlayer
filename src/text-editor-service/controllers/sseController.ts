@@ -3,14 +3,14 @@ import { bookWatcherService } from "../services/bookWatcherService";
 
 export class SSEController {
   selectParagraph = (req: Request, res: Response): void => {
-    const { bookId, chapterId, paragraphId } = req.body;
+    const { bookName, chapterId, paragraphId } = req.body;
 
-    if (!bookId || !chapterId || paragraphId == null) {
-      res.status(400).json({ error: "bookId, chapterId, and paragraphId are required" });
+    if (!bookName || !chapterId || paragraphId == null) {
+      res.status(400).json({ error: "bookName, chapterId, and paragraphId are required" });
       return;
     }
 
-    bookWatcherService.broadcastParagraphSelection({ bookId, chapterId, paragraphId, timestamp: Date.now() });
+    bookWatcherService.broadcastParagraphSelection({ bookName, chapterId, paragraphId, timestamp: Date.now() });
 
     res.json({ success: true });
   };
