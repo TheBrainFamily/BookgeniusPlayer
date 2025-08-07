@@ -1,100 +1,139 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const useVideoReadiness = (videoTimeoutMs = 30000) => {
+type TimeoutId = number | null;
+
+const READY_STATE_CAN_PLAY = 3;
+
+interface UseVideoReadinessOpts {
+  videoTimeoutMs?: number; // fallback to force ready if desired (can disable)
+  minSplashMs?: number; // minimum splash display
+  postReadyDelayMs?: number; // delay after a video is ready before starting splash
+}
+
+/**
+ * A video is considered "truly ready" when it begins playing
+ * (playing event). We also accept canplay as a fallback signal
+ * if playing doesn't fire promptly (e.g., autoplay restrictions),
+ * but we prefer playing.
+ *
+ * We don't treat "no element found" as ready.
+ * Overall videosReady = videoAReady || videoBReady.
+ *
+ * We only start the splash timer after a configurable post-ready delay.
+ */
+const useVideoReadiness = ({ videoTimeoutMs = 30000, minSplashMs = 1500, postReadyDelayMs = 100 }: UseVideoReadinessOpts = {}) => {
   const [videoAReady, setVideoAReady] = useState(false);
   const [videoBReady, setVideoBReady] = useState(false);
+  const [postReadyDelayElapsed, setPostReadyDelayElapsed] = useState(false);
+  const [minSplashElapsed, setMinSplashElapsed] = useState(false);
   const [ready, setReady] = useState(false);
 
-  const videoTimeoutIdRef = useRef<number | undefined>(undefined);
-  const buttonTimeoutIdRef = useRef<number | undefined>(undefined);
+  const videoTimeoutIdRef = useRef<TimeoutId>(null);
+  const postReadyDelayTimeoutIdRef = useRef<TimeoutId>(null);
+  const splashTimeoutIdRef = useRef<TimeoutId>(null);
 
   useEffect(() => {
     const bgVideoA = document.getElementById("bg-video-a") as HTMLVideoElement | null;
     const bgVideoB = document.getElementById("bg-video-b") as HTMLVideoElement | null;
 
-    const handleVideoAReadyEvent = () => {
-      if (!videoAReady) {
-        console.log("[READY] bg-video-a is ready");
-        setVideoAReady(true);
-      }
-    };
-    const handleVideoBReadyEvent = () => {
-      if (!videoBReady) {
-        console.log("[READY] bg-video-b is ready");
-        setVideoBReady(true);
-      }
+    const onAPlaying = () => setVideoAReady(true);
+    const onACanPlay = () => {
+      // Only set if not already ready; prefer playing but accept canplay
+      setVideoAReady((prev) => prev || true);
     };
 
-    // If the video element exists AND has a source, wait for it to be ready.
-    if (bgVideoA && (bgVideoA.currentSrc || bgVideoA.src)) {
-      if (bgVideoA.readyState >= 3) {
-        console.log("[READY] bg-video-a already ready (readyState >= 3)");
+    const onBPlaying = () => setVideoBReady(true);
+    const onBCanPlay = () => {
+      setVideoBReady((prev) => prev || true);
+    };
+
+    // Attach listeners only if element exists
+    if (bgVideoA) {
+      // If already in a state that implies playable soon, attach events and
+      // also check current readyState/paused to possibly mark ready early.
+      if (bgVideoA.readyState >= READY_STATE_CAN_PLAY && !bgVideoA.paused) {
         setVideoAReady(true);
       } else {
-        console.log("[READY] bg-video-a waiting for canplay/canplaythrough/playing");
-        bgVideoA.addEventListener("canplay", handleVideoAReadyEvent);
-        bgVideoA.addEventListener("canplaythrough", handleVideoAReadyEvent);
-        bgVideoA.addEventListener("playing", handleVideoAReadyEvent);
+        bgVideoA.addEventListener("playing", onAPlaying);
+        bgVideoA.addEventListener("canplay", onACanPlay);
       }
     }
 
-    // If the video element exists AND has a source, wait for it to be ready.
-    if (bgVideoB && (bgVideoB.currentSrc || bgVideoB.src)) {
-      if (bgVideoB.readyState >= 3) {
-        console.log("[READY] bg-video-b already ready (readyState >= 3)");
+    if (bgVideoB) {
+      if (bgVideoB.readyState >= READY_STATE_CAN_PLAY && !bgVideoB.paused) {
         setVideoBReady(true);
       } else {
-        console.log("[READY] bg-video-b waiting for canplay/canplaythrough/playing");
-        bgVideoB.addEventListener("canplay", handleVideoBReadyEvent);
-        bgVideoB.addEventListener("canplaythrough", handleVideoBReadyEvent);
-        bgVideoB.addEventListener("playing", handleVideoBReadyEvent);
+        bgVideoB.addEventListener("playing", onBPlaying);
+        bgVideoB.addEventListener("canplay", onBCanPlay);
       }
     }
 
-    // Fallback timeout to consider videos ready after a delay.
-    videoTimeoutIdRef.current = window.setTimeout(() => {
-      console.log("[READY] Video readiness timeout reached, forcing ready state for all.");
-      setVideoAReady(true);
-      setVideoBReady(true);
-    }, videoTimeoutMs);
+    // Optional fallback: after videoTimeoutMs, accept whichever can play
+    // If you want to disable force-readiness, set videoTimeoutMs to 0 or undefined.
+    if (videoTimeoutMs && videoTimeoutMs > 0) {
+      videoTimeoutIdRef.current = window.setTimeout(() => {
+        // If neither is ready by timeout, we can treat canplay as enough or force readiness.
+        // Here we force readiness to avoid blocking forever.
+        setVideoAReady((prev) => prev || !!bgVideoA);
+        setVideoBReady((prev) => prev || !!bgVideoB);
+      }, videoTimeoutMs);
+    }
 
     return () => {
       if (videoTimeoutIdRef.current) clearTimeout(videoTimeoutIdRef.current);
-      if (buttonTimeoutIdRef.current) clearTimeout(buttonTimeoutIdRef.current);
+      if (postReadyDelayTimeoutIdRef.current) clearTimeout(postReadyDelayTimeoutIdRef.current);
+      if (splashTimeoutIdRef.current) clearTimeout(splashTimeoutIdRef.current);
 
       if (bgVideoA) {
-        bgVideoA.removeEventListener("canplay", handleVideoAReadyEvent);
-        bgVideoA.removeEventListener("canplaythrough", handleVideoAReadyEvent);
-        bgVideoA.removeEventListener("playing", handleVideoAReadyEvent);
+        bgVideoA.removeEventListener("playing", onAPlaying);
+        bgVideoA.removeEventListener("canplay", onACanPlay);
       }
       if (bgVideoB) {
-        bgVideoB.removeEventListener("canplay", handleVideoBReadyEvent);
-        bgVideoB.removeEventListener("canplaythrough", handleVideoBReadyEvent);
-        bgVideoB.removeEventListener("playing", handleVideoBReadyEvent);
+        bgVideoB.removeEventListener("playing", onBPlaying);
+        bgVideoB.removeEventListener("canplay", onBCanPlay);
       }
     };
   }, [videoTimeoutMs]);
 
+  // When any one video becomes ready, start the post-ready delay once.
   useEffect(() => {
-    if ((videoAReady || videoBReady) && !ready) {
-      console.log("[READY] Either bg-video-a or bg-video-b is ready. Setting ready=true.");
+    const videosReady = videoAReady || videoBReady;
+    if (!videosReady || postReadyDelayElapsed) return;
+
+    if (!postReadyDelayTimeoutIdRef.current) {
+      postReadyDelayTimeoutIdRef.current = window.setTimeout(() => {
+        setPostReadyDelayElapsed(true);
+      }, postReadyDelayMs);
+    }
+  }, [videoAReady, videoBReady, postReadyDelayElapsed, postReadyDelayMs]);
+
+  // After post-ready delay, start the splash timer (once)
+  useEffect(() => {
+    if (!postReadyDelayElapsed || minSplashElapsed) return;
+
+    if (!splashTimeoutIdRef.current) {
+      splashTimeoutIdRef.current = window.setTimeout(() => {
+        setMinSplashElapsed(true);
+      }, minSplashMs);
+    }
+  }, [postReadyDelayElapsed, minSplashElapsed, minSplashMs]);
+
+  // Final readiness gate
+  useEffect(() => {
+    const videosReady = videoAReady || videoBReady;
+    if (videosReady && postReadyDelayElapsed && minSplashElapsed) {
       setReady(true);
     }
-  }, [videoAReady, videoBReady, ready]);
+  }, [videoAReady, videoBReady, postReadyDelayElapsed, minSplashElapsed]);
 
   return { ready };
 };
 
 export const useAppReady = () => {
-  const { ready } = useVideoReadiness();
+  const { ready } = useVideoReadiness({ videoTimeoutMs: 30000, minSplashMs: 1500, postReadyDelayMs: 100 });
 
   useEffect(() => {
-    if (!ready) {
-      console.log("[READY] useAppReady: not ready yet");
-      return;
-    }
-
-    console.log("[READY] useAppReady: dispatching appReady event");
+    if (!ready) return;
     window.dispatchEvent(new CustomEvent("appReady"));
   }, [ready]);
 };
