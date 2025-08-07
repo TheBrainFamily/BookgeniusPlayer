@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 
 import BottomInput from "./BottomInput";
@@ -6,6 +6,7 @@ import { useWebSocket } from "@/context/WebSocketContext";
 import useSplashHidden from "@/hooks/useSplashHidden";
 import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
+import CharactersOnStagePanel from "./CharactersOnStagePanel";
 import { cn } from "@/lib/utils";
 
 const Footer = () => {
@@ -38,6 +39,7 @@ const Footer = () => {
           {bookForm === "play" ? (
             <>
               <div className="w-full sm:flex-3 max-w-[800px] px-0 flex flex-col sm:px-3 xl:px-2 space-y-3 pointer-events-auto">
+                <CharactersOnStagePanel />
                 <BottomInput onSubmit={sendMessage} />
               </div>
             </>

@@ -1,24 +1,26 @@
-import { createPortal } from "react-dom";
-import { useCharactersOnStage } from "@/hooks/useCharactersOnStage";
 import { AnimatePresence, motion } from "motion/react";
+
+import { useCharactersOnStage } from "@/hooks/useCharactersOnStage";
 import { useCurrentSpeakers } from "@/hooks/useCurrentSpeakers";
 import { useLocation } from "@/state/LocationContext";
 import { cn } from "@/lib/utils";
-import { CharacterData } from "@/types/book";
+import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
 
-const CharactersOnStagePanel = ({ allCharacters }: { allCharacters: CharacterData[] }) => {
-  const target = document.getElementById("bottom-panel");
+const CharactersOnStagePanel = () => {
+  const allCharacters = getCharactersData();
+
   const charactersOnStage = useCharactersOnStage(allCharacters);
   const { location } = useLocation();
   const currentSpeakers = useCurrentSpeakers(location!, allCharacters, true);
 
-  if (!target || !location) return null;
+  if (!location) return null;
 
-  return createPortal(
+  return (
     <div className="flex justify-center items-center h-full">
       <AnimatePresence>
         {charactersOnStage.map((character) => {
           const isSpeaking = currentSpeakers.includes(character.slug);
+
           return (
             <motion.div
               key={character.slug}
@@ -40,8 +42,7 @@ const CharactersOnStagePanel = ({ allCharacters }: { allCharacters: CharacterDat
           );
         })}
       </AnimatePresence>
-    </div>,
-    target,
+    </div>
   );
 };
 
