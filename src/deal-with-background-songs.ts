@@ -53,11 +53,11 @@ export const preloadBackgroundTracks = async () => {
 
   if (appWasJustLaunched) {
     sectionsToPreloadFiltered = sectionsToPreload.filter((section) => section.paragraph <= currentParagraph).slice(-1);
-  } else {
-    sectionsToPreloadFiltered = sectionsToPreload;
-  }
 
-  if (sectionsToPreloadFiltered.length === 0) {
+    if (sectionsToPreloadFiltered.length === 0 && sectionsToPreload.length > 0) {
+      sectionsToPreloadFiltered = sectionsToPreload.slice(0, 1);
+    }
+  } else {
     sectionsToPreloadFiltered = sectionsToPreload;
   }
 
