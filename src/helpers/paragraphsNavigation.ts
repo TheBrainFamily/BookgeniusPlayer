@@ -4,11 +4,60 @@
  * the *furthest* location logic and the Return button state exactly
  * as in the original vanilla code.
  */
+import { pageWasJustReloaded } from "@/utils/pageWasJustReloaded";
+
+let systemNavigationInProgress = false;
 
 /* ------------------------------------------------------------------ */
-import { DEFAULT_LOCATION, type Location } from "@/state/LocationContext";
+/*  Export system navigation state checker                           */
+export const isSystemNavigationInProgress = (): boolean => systemNavigationInProgress;
 
 /* ------------------------------------------------------------------ */
+import { DEFAULT_LOCATION, Location } from "@/state/LocationContext";
+import debounce from "lodash.debounce";
+
+/* ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ */
+/*  Scroll completion detection helpers                              */
+const detectScrollEnd = (element: HTMLElement, callback: () => void, timeout: number = 1000): (() => void) => {
+  let scrollTimer: number | null = null;
+  let timeoutTimer: number | null = null;
+  let isScrolling = false;
+
+  const handleScroll = () => {
+    if (!isScrolling) {
+      isScrolling = true;
+    }
+
+    if (scrollTimer) clearTimeout(scrollTimer);
+
+    scrollTimer = window.setTimeout(() => {
+      isScrolling = false;
+      if (timeoutTimer) clearTimeout(timeoutTimer);
+      callback();
+    }, 150); // Detect scroll end after 150ms of no scroll events
+  };
+
+  // Fallback timeout in case scroll events don't fire properly (e.g., instant scroll)
+  timeoutTimer = window.setTimeout(() => {
+    if (scrollTimer) clearTimeout(scrollTimer);
+    callback();
+  }, timeout);
+
+  // Listen for scroll events on the element
+  element.addEventListener("scroll", handleScroll, { passive: true });
+
+  // Cleanup function
+  return () => {
+    if (scrollTimer) clearTimeout(scrollTimer);
+    if (timeoutTimer) clearTimeout(timeoutTimer);
+    element.removeEventListener("scroll", handleScroll);
+  };
+};
+
+/* ------------------------------------------------------------------ */
+
 /*  Bridge interface for legacy helpers                               */
 interface Bridge {
   get: () => Location;
@@ -42,7 +91,9 @@ export const getCurrentLocation = (): Location => _bridge.get();
  * Update current location + potentially the "furthest" bookmark.
  * Never moves the bookmark backwards.
  */
-export const setCurrentLocation = (loc: Location) => {
+export const setCurrentLocation = (loc: Location, options: { updateHash?: boolean } = {}) => {
+  const { updateHash = true } = options;
+
   if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
     console.error("Invalid location provided to setCurrentLocation:", loc);
     return;
@@ -50,12 +101,17 @@ export const setCurrentLocation = (loc: Location) => {
 
   _bridge.set(loc);
 
-  setTimeout(() => {
-    const chapter = Number(loc.currentChapter) || 1;
-    const paragraph = Number(loc.currentParagraph) || 0;
+  if (updateHash) {
+    setTimeout(() => {
+      if (systemNavigationInProgress) {
+        return;
+      }
+      const chapter = Number(loc.currentChapter) || 1;
+      const paragraph = Number(loc.currentParagraph) || 0;
 
-    window.location.hash = `${chapter}-${paragraph}`;
-  }, 2000);
+      window.location.hash = `${chapter}-${paragraph}`;
+    }, 2000);
+  }
 
   const saved = getSavedLocation();
   if (!saved) {
@@ -69,14 +125,71 @@ export const setCurrentLocation = (loc: Location) => {
 
 /* ------------------------------------------------------------------ */
 /*  System Navigation Helper                                          */
+
 /**
- * Navigate to a specific location with system source (triggers scrolling)
+ * Waits for an element's position and dimensions to be stable for a certain period.
+ * This is useful to avoid layout shifts when scrolling to an element shortly after render.
+ * @param element The HTML element to monitor.
+ * @param options Configuration for timeout, polling interval, and stability threshold.
+ * @returns A promise that resolves when the element is stable or when the timeout is reached.
+ */
+const waitForElementStablePosition = (element: HTMLElement, options: { timeout?: number; interval?: number; stableThreshold?: number } = {}): Promise<void> => {
+  const { timeout = 2000, interval = 50, stableThreshold = 200 } = options;
+
+  return new Promise((resolve) => {
+    let lastRect: DOMRect | null = null;
+    let stableTime = 0;
+    let checkTimeout: number | null = null;
+
+    const resolveAndCleanup = () => {
+      clearTimeout(overallTimeout);
+      if (checkTimeout) clearTimeout(checkTimeout);
+      resolve();
+    };
+
+    // Overall timeout for the whole operation
+    const overallTimeout = window.setTimeout(() => {
+      console.warn("waitForElementStablePosition timed out waiting for element to stabilize.");
+      if (checkTimeout) clearTimeout(checkTimeout);
+      resolve();
+    }, timeout);
+
+    const check = () => {
+      if (!element || !document.body.contains(element)) {
+        resolveAndCleanup(); // Element removed from DOM, stop waiting
+        return;
+      }
+      const currentRect = element.getBoundingClientRect();
+
+      if (lastRect && currentRect.top === lastRect.top && currentRect.left === lastRect.left && currentRect.width === lastRect.width && currentRect.height === lastRect.height) {
+        stableTime += interval;
+      } else {
+        stableTime = 0;
+      }
+
+      lastRect = currentRect;
+
+      if (stableTime >= stableThreshold) {
+        resolveAndCleanup();
+      } else {
+        checkTimeout = window.setTimeout(check, interval);
+      }
+    };
+
+    check();
+  });
+};
+
+/**
+ * Navigate to a specific location with a system source (triggers scrolling)
  */
 export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph: number }) => {
   if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
     console.error("Invalid location provided to systemNavigateTo:", loc);
     return;
   }
+
+  systemNavigationInProgress = true;
 
   const fullLocation: Location = {
     chapter: loc.currentChapter,
@@ -104,42 +217,104 @@ export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph
   // Update hash immediately for system navigation
   window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
 
-  goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, true);
-};
+  const runGoToParagraph = () => {
+    goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior: "instant" })
+      .catch((error) => {
+        console.error("Error during system navigation scroll:", error);
+      })
+      .finally(() => {
+        systemNavigationInProgress = false;
+      });
+  };
 
-/* ------------------------------------------------------------------ */
-/*  Scroll helper                                                     */
-export const goToParagraph = (loc: { currentChapter: number; currentParagraph: number }, fast = false) => {
-  // For paragraph 0, scroll to the chapter itself; otherwise, look for the specific paragraph
   const selector =
     loc.currentParagraph === 0 ? `section[data-chapter="${loc.currentChapter}"]` : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
   const element = document.querySelector(selector) as HTMLElement;
 
-  if (!element) {
-    console.warn(`Element not found for selector: ${selector}`);
-    return;
-  }
-
-  const contentContainer = document.getElementById("content-container");
-  if (!contentContainer) {
-    element.scrollIntoView({ behavior: fast ? "instant" : "smooth", block: "start" });
-    return;
-  }
-
-  const containerRect = contentContainer.getBoundingClientRect();
-  const elementRect = element.getBoundingClientRect();
-
-  // Focus zone starts at about 35vh from the top of the container
-  const focusZoneOffset = containerRect.height * 0.35;
-
-  // Calculate the scroll position to place the element at the focus zone
-  const targetScrollTop = contentContainer.scrollTop + elementRect.top - containerRect.top - focusZoneOffset;
-
-  if (fast) {
-    contentContainer.scrollTop = targetScrollTop;
+  if (pageWasJustReloaded() && element) {
+    waitForElementStablePosition(element).then(() => {
+      runGoToParagraph();
+    });
   } else {
-    contentContainer.scrollTo({ top: targetScrollTop, behavior: "smooth" });
+    runGoToParagraph();
   }
+};
+
+/* ------------------------------------------------------------------ */
+/*  Scroll helper                                                     */
+export const goToParagraph = (loc: { currentChapter: number; currentParagraph: number }, options: ScrollToOptions = { behavior: "smooth" }): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const selector =
+      loc.currentParagraph === 0 ? `section[data-chapter="${loc.currentChapter}"]` : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
+    const element = document.querySelector(selector) as HTMLElement;
+
+    if (!element) {
+      console.warn(`Element not found for selector: ${selector}`);
+      reject(new Error(`Element not found for selector: ${selector}`));
+      return;
+    }
+
+    const contentContainer = document.getElementById("content-container");
+    if (!contentContainer) {
+      // Fallback for safety, though the container should always exist.
+      element.scrollIntoView({ behavior: options.behavior, block: "start" });
+
+      if (options.behavior === "instant") {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      } else {
+        // For smooth scroll without a container, we can't detect the end, so we use a timeout.
+        setTimeout(resolve, 1000);
+      }
+      return;
+    }
+
+    const containerRect = contentContainer.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+
+    // The IntersectionObserver's "focus zone" starts at 35% from the top of the container.
+    // To ensure the correct paragraph is detected as "active", we must scroll the element
+    // to this precise position, for both fast and smooth scrolling.
+    const focusZoneOffset = containerRect.height * 0.35;
+
+    const containerScrollPosition = contentContainer.scrollTop;
+    const goToParagraphPositionTop = elementRect.top;
+
+    let additionalOffset = 0;
+    if (containerScrollPosition === 0) {
+      // This offset is an empirical value to correct initial scroll position when the scroll container is at the top.
+      // It helps to account for layout factors that are not yet stable on initial load, ensuring the target paragraph
+      // lands correctly in the focus zone.
+      const INITIAL_SCROLL_CORRECTION_FACTOR = 19;
+      additionalOffset = goToParagraphPositionTop / INITIAL_SCROLL_CORRECTION_FACTOR;
+    }
+
+    // Calculate the scroll position needed to align the element's top with the focus zone's top.
+    const targetScrollTop = containerScrollPosition + goToParagraphPositionTop - containerRect.top - focusZoneOffset + additionalOffset;
+
+    contentContainer.scrollTo({ top: targetScrollTop, behavior: options.behavior });
+
+    if (options.behavior === "instant") {
+      // We use a double requestAnimationFrame to wait for the browser to repaint
+      // and for the IntersectionObserver to process the changes. This is critical
+      // to prevent a race condition where the observer selects the wrong paragraph
+      // immediately after a system navigation.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          resolve();
+        });
+      });
+    } else {
+      // For smooth scroll, we use an event-based detector to know when it's finished.
+      const cleanup = detectScrollEnd(
+        contentContainer,
+        () => {
+          cleanup(); // Stop the listeners.
+          resolve(); // Signal that the scroll is complete.
+        },
+        2000,
+      ); // A 2-second fallback timeout for safety.
+    }
+  });
 };
 
 /**
@@ -156,26 +331,15 @@ export const shouldShowReturnButton = (): boolean => {
 /* ------------------------------------------------------------------ */
 /*  Handle Resize/Orientation Changes                                 */
 
-// Debounce function
-function debounce<T extends (...args: Parameters<T>) => void>(func: T, wait: number): (...args: Parameters<T>) => void {
-  let timeout: ReturnType<typeof setTimeout> | null;
-  return (...args: Parameters<T>) => {
-    const later = () => {
-      timeout = null;
-      func(...args);
-    };
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
-
 // Event handler
 const handleResizeOrOrientationChange = debounce(() => {
   // Re-apply scroll position based on the location stored in the URL hash
   const locationFromHash = parseLocationFromHash();
 
   if (locationFromHash) {
-    goToParagraph({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph }, true);
+    goToParagraph({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph }, { behavior: "instant" }).catch((error) =>
+      console.warn("Failed to scroll during resize/orientation change:", error),
+    );
   }
   // If hash is invalid or missing, we probably don't want to scroll unexpectedly.
   // The browser's default reflow behavior will apply.
@@ -213,7 +377,7 @@ export const goToInitialLocationFromHash = () => {
   const locationFromHash = parseLocationFromHash();
 
   if (locationFromHash) {
-    // Use system navigation for initial load from hash
+    // Use system navigation for the initial load from hash
     systemNavigateTo({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph });
   } else {
     // Fallback if hash is invalid or missing: go to furthest saved location

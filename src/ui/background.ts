@@ -1,5 +1,6 @@
 import { CURRENT_BOOK } from "@/consts";
 import { getBackgrounds } from "./getBackgrounds";
+
 import debounce from "lodash/debounce";
 
 export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number };
@@ -11,6 +12,7 @@ enum TransitionState {
   Preparing = "prep", // loading / first-frame wait
   Fading = "fade", // CSS cross-fade running
 }
+
 let transitionState: TransitionState = TransitionState.Idle;
 
 // ---- helper -----------------------------------------------------------------

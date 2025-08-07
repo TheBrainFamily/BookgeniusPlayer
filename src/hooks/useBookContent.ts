@@ -35,6 +35,7 @@ export function useBookContent(containerId: string) {
 
   useEffect(() => {
     if (container) {
+      // <<<<<<< HEAD
       const parser = new DOMParser();
       const doc = parser.parseFromString(bookStringified, "text/html");
       const chapterSections = Array.from(doc.querySelectorAll(".play-container section[data-chapter]"));
@@ -62,9 +63,10 @@ export function useBookContent(containerId: string) {
       }
 
       container.innerHTML = doc.body.innerHTML;
-      setupPageObserver(openCharacterDetailsModal);
+      const observerSetup = setupPageObserver(openCharacterDetailsModal);
 
-      const handleClick = (event) => {
+      // Give the browser a moment to render the injected HTML
+      const handleClick = (event: MouseEvent) => {
         if (event.metaKey || event.ctrlKey) {
           return;
         }
@@ -179,6 +181,10 @@ export function useBookContent(containerId: string) {
         container.removeEventListener("click", handleClick);
         container.removeEventListener("mouseover", handleMouseOver);
         container.removeEventListener("mouseout", handleMouseOut);
+        // Clean up the observer and its event listeners
+        if (observerSetup) {
+          observerSetup.cleanup();
+        }
       };
     } else {
       console.warn(`Container with id '${containerId}' not found for content injection.`);

@@ -1,5 +1,7 @@
-import { setCurrentLocation } from "@/helpers/paragraphsNavigation";
+import { setCurrentLocation, isSystemNavigationInProgress } from "@/helpers/paragraphsNavigation";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { pageWasJustReloaded } from "@/utils/pageWasJustReloaded";
+import debounce from "lodash.debounce";
 
 const SHOULD_SHOW_EVERYONE = false;
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
@@ -83,8 +85,6 @@ function initializeDevZoneVisualizers(): { activeElementVisualizer: HTMLDivEleme
   if (!rangeVisualizer) {
     rangeVisualizer = createRangeVisualizer();
   }
-
-  console.log("[DevZoneVisualizers] Initialized development zone visualizers");
 
   return { activeElementVisualizer, rangeVisualizer };
 }
@@ -432,7 +432,7 @@ let previousRootRectWidth = 0;
 
 export function setupPageObserver(
   openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
-): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number } | null {
+): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number; cleanup: () => void } | null {
   const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
 
   // Initialize development zone visualizers early
@@ -447,19 +447,7 @@ export function setupPageObserver(
   // Keep track of observed paragraphs to avoid re-observing
   const observedParagraphs = new Set<Element>();
 
-  // ----------------------------------------------------------
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.target.classList.contains("transition-spacer")) {
-        return;
-      }
-      if (entry.isIntersecting) {
-        intersectingPages.add(entry.target);
-      } else {
-        intersectingPages.delete(entry.target);
-      }
-    });
-
+  const processIntersections = () => {
     const rootRect = observerOptions.root.getBoundingClientRect();
     const topMultiplier = 0.35; // 35vh focus zone start
     let bottomMultiplier = 0.45; // 10vh focus zone height (default)
@@ -757,14 +745,29 @@ export function setupPageObserver(
               expandedStartParagraph = 0;
             }
 
-            setCurrentLocation({
-              chapter: rangeStartInfo.chapter,
-              paragraph: expandedStartParagraph,
-              endChapter: rangeEndInfo.chapter,
-              endParagraph: expandedEndParagraph,
-              currentChapter: activeParagraph.chapter,
-              currentParagraph: activeParagraph.paragraph,
-            });
+            // By default, update the hash.
+            let shouldUpdateHash = true;
+
+            // However, if system navigation was in progress, it means this is the
+            // re-evaluation call after the initial scroll. In this case, we've
+            // just landed where we want to be, so we should NOT update the hash
+            // to avoid an unwanted jump (e.g., from 1-0 to 1-1).
+            if (pageWasJustReloaded() || isSystemNavigationInProgress()) {
+              shouldUpdateHash = false;
+            }
+
+            // Don't update location during system navigation to avoid conflicts with programmatic scrolling
+            setCurrentLocation(
+              {
+                chapter: rangeStartInfo.chapter,
+                paragraph: expandedStartParagraph,
+                endChapter: rangeEndInfo.chapter,
+                endParagraph: expandedEndParagraph,
+                currentChapter: activeParagraph.chapter,
+                currentParagraph: activeParagraph.paragraph,
+              },
+              { updateHash: shouldUpdateHash },
+            );
 
             // Media uses viewport range (separate from character notes)
             if (allIntersectingParagraphs.length > 0) {
@@ -789,7 +792,6 @@ export function setupPageObserver(
         }
 
         if (currentlyActivePageElement !== null) {
-          console.log("[Observer] No pages intersecting the focus zone.");
           // Decide if you want to clear the active elements or keep the last known ones
           // currentlyActivePageElement = null;
           // currentlyLastActivePageElement = null;
@@ -803,11 +805,25 @@ export function setupPageObserver(
       }
 
       if (currentlyActivePageElement !== null) {
-        console.log("[Observer] No pages intersecting viewport.");
         // currentlyActivePageElement = null;
         // currentlyLastActivePageElement = null;
       }
     }
+  };
+
+  const debouncedProcessIntersections = debounce(processIntersections, 50);
+
+  // ----------------------------------------------------------
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        intersectingPages.add(entry.target);
+      } else {
+        intersectingPages.delete(entry.target);
+      }
+    });
+
+    debouncedProcessIntersections();
   }, observerOptions);
 
   // Function to observe new paragraphs
@@ -944,6 +960,6 @@ export function setupPageObserver(
       observedParagraphs.add(paragraph);
     });
 
-    return { observer, observeNewParagraphs, cleanupRemovedParagraphs };
+    return { observer, observeNewParagraphs, cleanupRemovedParagraphs, cleanup: () => observer.disconnect() };
   }
 }
