@@ -44,6 +44,11 @@ export const CoverArt = ({ src }: CoverArtProps) => {
     img.onerror = () => {
       setHasError(true);
     };
+
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
   }, [src, displayedSrc]);
 
   if (!displayedSrc || hasError) {
