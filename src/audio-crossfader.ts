@@ -528,18 +528,27 @@ async function downloadRemainingDataInBackground(
     const fullAudioBuffer = await audioContext.decodeAudioData(completeArray.buffer);
     const existingState = tracks.get(trackId);
 
+    // Re-parse metadata from the full file to ensure title/cover art are up-to-date.
+    const { title: refreshedTitle, coverArtUrl: refreshedCoverArtUrl } = await parseMetadataAndUpdate(
+      completeArray,
+      existingState?.title || title,
+      existingState?.coverArtUrl || coverArtUrl,
+    );
+
     if (existingState) {
-      // Update the existing partial state with the full buffer
+      // Update the existing partial state with the full buffer and refreshed metadata
       existingState.audioBuffer = fullAudioBuffer;
       existingState.duration = fullAudioBuffer.duration;
       existingState.trackLength = fullAudioBuffer.duration;
       existingState.isFullyLoaded = true; // Mark as fully loaded
+      existingState.title = refreshedTitle;
+      existingState.coverArtUrl = refreshedCoverArtUrl;
 
       console.log(`✅ Background download complete for '${trackId}' - ${fullAudioBuffer.duration.toFixed(2)}s (${totalBytesReceived} bytes)`);
       window.dispatchEvent(new CustomEvent("trackFullyLoaded", { detail: { trackId, fullDuration: fullAudioBuffer.duration, totalBytes: totalBytesReceived } }));
     } else {
-      // Create new complete track state
-      const newTrackState = createTrackState(fullAudioBuffer, { title, coverArtUrl, transitionPoints });
+      // Create new complete track state with refreshed metadata
+      const newTrackState = createTrackState(fullAudioBuffer, { title: refreshedTitle, coverArtUrl: refreshedCoverArtUrl, transitionPoints });
       newTrackState.isFullyLoaded = true; // Also mark as fully loaded
       tracks.set(trackId, newTrackState);
 
