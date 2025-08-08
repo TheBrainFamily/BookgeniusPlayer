@@ -247,8 +247,10 @@ function validateImageData(imageData: Uint8Array, format: string): boolean {
 function validateImageUrl(url: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const img = new Image();
+    let timeoutId: number | null = null;
 
     const cleanup = () => {
+      if (timeoutId !== null) clearTimeout(timeoutId);
       img.onload = null;
       img.onerror = null;
     };
@@ -257,29 +259,16 @@ function validateImageUrl(url: string): Promise<void> {
       cleanup();
       resolve();
     };
-
     img.onerror = () => {
       cleanup();
       reject(new Error("Image failed to load"));
     };
 
     // Set a timeout to prevent hanging
-    const timeout = setTimeout(() => {
+    timeoutId = window.setTimeout(() => {
       cleanup();
       reject(new Error("Image load timeout"));
-    }, 5000); // 5 second timeout
-
-    img.onload = () => {
-      clearTimeout(timeout);
-      cleanup();
-      resolve();
-    };
-
-    img.onerror = () => {
-      clearTimeout(timeout);
-      cleanup();
-      reject(new Error("Image failed to load"));
-    };
+    }, 5000);
 
     img.src = url;
   });
