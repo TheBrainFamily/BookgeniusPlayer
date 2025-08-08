@@ -205,6 +205,87 @@ function combineChunks(chunks: Uint8Array[]): Uint8Array {
 }
 
 /**
+ * Validates image data by checking file signatures and format compatibility.
+ */
+function validateImageData(imageData: Uint8Array, format: string): boolean {
+  if (!imageData || imageData.length < 8) {
+    return false;
+  }
+
+  // Check common image file signatures
+  const signatures = {
+    "image/jpeg": [0xff, 0xd8, 0xff],
+    "image/png": [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
+    "image/gif": [0x47, 0x49, 0x46],
+    "image/webp": [0x52, 0x49, 0x46, 0x46], // RIFF header for WebP
+    "image/bmp": [0x42, 0x4d],
+  };
+
+  const normalizedFormat = format.toLowerCase();
+  const signature = signatures[normalizedFormat as keyof typeof signatures];
+
+  if (!signature) {
+    // If we don't know the format signature, allow it through
+    // but log for debugging
+    console.debug(`Unknown image format: ${format}, allowing through`);
+    return true;
+  }
+
+  // Check if the data starts with the expected signature
+  for (let i = 0; i < signature.length; i++) {
+    if (i >= imageData.length || imageData[i] !== signature[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Validates that an image URL can be loaded by attempting to create an Image element.
+ */
+function validateImageUrl(url: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+
+    const cleanup = () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+
+    img.onload = () => {
+      cleanup();
+      resolve();
+    };
+
+    img.onerror = () => {
+      cleanup();
+      reject(new Error("Image failed to load"));
+    };
+
+    // Set a timeout to prevent hanging
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error("Image load timeout"));
+    }, 5000); // 5 second timeout
+
+    img.onload = () => {
+      clearTimeout(timeout);
+      cleanup();
+      resolve();
+    };
+
+    img.onerror = () => {
+      clearTimeout(timeout);
+      cleanup();
+      reject(new Error("Image failed to load"));
+    };
+
+    img.src = url;
+  });
+}
+
+/**
  * Parses metadata from an audio buffer, updates title, and manages the cover art object URL to prevent memory leaks.
  * @param audioData The audio data as a Uint8Array or ArrayBuffer.
  * @param currentTitle The current title, to be used as a fallback.
@@ -221,13 +302,36 @@ async function parseMetadataAndUpdate(audioData: Uint8Array | ArrayBuffer, curre
     title = common.title || title;
 
     if (common.picture?.[0]) {
-      // Revoke the old URL before creating a new one to prevent memory leaks
-      if (coverArtUrl) {
-        URL.revokeObjectURL(coverArtUrl);
+      try {
+        // Revoke the old URL before creating a new one to prevent memory leaks
+        if (coverArtUrl) {
+          URL.revokeObjectURL(coverArtUrl);
+        }
+
+        const pic = common.picture[0];
+
+        // Validate picture data before creating blob
+        if (pic.data && pic.data.length > 0 && pic.format) {
+          const imageData = new Uint8Array(pic.data);
+
+          // Validate that we have actual image data (check for common image file headers)
+          const isValidImage = validateImageData(imageData, pic.format);
+
+          if (isValidImage) {
+            const newBlob = new Blob([imageData], { type: pic.format });
+            const newUrl = URL.createObjectURL(newBlob);
+
+            // Test if the URL is actually usable by creating an Image element
+            await validateImageUrl(newUrl);
+            coverArtUrl = newUrl;
+          } else {
+            console.warn(`Invalid image data detected for format: ${pic.format}`);
+          }
+        }
+      } catch (imageError) {
+        console.warn(`Image processing failed:`, imageError);
+        // Keep the current coverArtUrl if image processing fails
       }
-      const pic = common.picture[0];
-      const newBlob = new Blob([new Uint8Array(pic.data)], { type: pic.format });
-      coverArtUrl = URL.createObjectURL(newBlob);
     }
   } catch (metadataError) {
     console.warn(`Metadata parsing failed:`, metadataError);
