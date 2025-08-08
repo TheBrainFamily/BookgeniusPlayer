@@ -13,20 +13,40 @@ interface CoverArtProps {
 }
 
 export const CoverArt = ({ src }: CoverArtProps) => {
-  const [isLoaded, setIsLoaded] = useState(false);
+  // Keep track of the image that is currently being displayed
+  const [displayedSrc, setDisplayedSrc] = useState<string | null | undefined>(src);
   const [hasError, setHasError] = useState(false);
 
+  // Whenever the requested src changes, start pre-loading it.
+  // Only switch the "displayedSrc" once the new image has finished loading
+  // so that the previously shown cover remains visible during the transition.
   useEffect(() => {
-    if (src) {
-      setIsLoaded(false);
-      setHasError(false);
-    } else {
-      setIsLoaded(false);
+    // If no new src is provided, show the fallback icon.
+    if (!src) {
+      setDisplayedSrc(null);
       setHasError(true);
+      return;
     }
-  }, [src]);
 
-  if (!src || hasError) {
+    // If we are already showing the correct image, nothing to do.
+    if (src === displayedSrc) return;
+
+    setHasError(false);
+
+    const img = new Image();
+    img.src = src;
+
+    img.onload = () => {
+      setDisplayedSrc(src);
+      setHasError(false);
+    };
+
+    img.onerror = () => {
+      setHasError(true);
+    };
+  }, [src, displayedSrc]);
+
+  if (!displayedSrc || hasError) {
     return (
       <div className="relative w-full h-full group">
         <Fallback />
@@ -36,28 +56,24 @@ export const CoverArt = ({ src }: CoverArtProps) => {
 
   return (
     <div className="relative w-full h-full group">
-      <Fallback />
-
-      <AnimatePresence mode="wait">
-        {isLoaded && (
-          <motion.img
-            key={src}
-            src={src}
-            alt="Cover Art"
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 z-2"
-            onLoad={() => setIsLoaded(true)}
-            onError={() => setHasError(true)}
-            variants={artVariants}
-            initial="initial"
-            animate="animate"
-            exit="initial"
-          />
-        )}
+      <AnimatePresence /* default mode="sync" gives us overlapping enter/exit for a smooth cross-fade */>
+        <motion.img
+          key={displayedSrc}
+          src={displayedSrc}
+          alt="Cover Art"
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 z-2"
+          variants={artVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+        />
       </AnimatePresence>
-
-      <img key={src + "_loader"} src={src} className="hidden" onLoad={() => setIsLoaded(true)} onError={() => setHasError(true)} alt="" />
     </div>
   );
 };
 
-const artVariants: Variants = { initial: { opacity: 0 }, animate: { opacity: 1, transition: { duration: 0.25, ease: "easeIn" } } };
+const artVariants: Variants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 0.25, ease: "easeIn" } },
+  exit: { opacity: 0, transition: { duration: 0.25, ease: "easeOut" } },
+};
