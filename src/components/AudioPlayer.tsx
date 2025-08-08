@@ -218,8 +218,35 @@ const AudioPlayer = () => {
     const nextIndex = (currentIndex + 1) % currentTracks.length;
     const nextTrackId = currentTracks[nextIndex];
 
-    setCurrentTrackIdFromState(nextTrackId);
+// … inside skipToNext (around line 221) …
+  // Optimistic UI update
+  const oldId = getCurrentTrackId();
+  setCurrentTrackIdFromState(nextTrackId);
+  const success = await transitionToTrack(nextTrackId);
+  if (!success) {
+    // Revert UI on failure
+    setCurrentTrackIdFromState(oldId);
+    console.error(`AudioPlayer: Failed to transition to next track '${nextTrackId}'.`);
+  }
 
+// … inside skipToPrevious (around line 238) …
+  const oldId = getCurrentTrackId();
+  setCurrentTrackIdFromState(prevTrackId);
+  const success = await transitionToTrack(prevTrackId);
+  if (!success) {
+    // Revert UI on failure
+    setCurrentTrackIdFromState(oldId);
+    console.error(`AudioPlayer: Failed to transition to previous track '${prevTrackId}'.`);
+  }
+
+// … inside the JSX for handleDownloadTrack (around line 495) …
+  onClick={async (e) => {
+    e.stopPropagation();
+    const success = await transitionToTrack(track.id);
+    if (!success) {
+      console.error(`AudioPlayer: Failed to start track '${track.id}' from download click.`);
+    }
+  }}
     await transitionToTrack(nextTrackId);
   };
 
