@@ -26,14 +26,20 @@ export function useBackgroundSongs() {
   const isPreloadingInProgress = useRef(false);
 
   useEffect(() => {
-    if (!isAppReady) return;
+useEffect(() => {
+  if (!isAppReady) return;
 
-    const handleTrackFullyLoaded = () => {
-      console.log("First track fully loaded - enabling preloading on chapter change.");
-      setIsInitialTrackLoaded(true);
-      window.removeEventListener("trackFullyLoaded", handleTrackFullyLoaded);
-    };
+  const handleTrackFullyLoaded = () => {
+    console.log("First track fully loaded - enabling preloading on chapter change.");
+    setIsInitialTrackLoaded(true);
+  };
 
+  window.addEventListener("trackFullyLoaded", handleTrackFullyLoaded, { once: true });
+
+  return () => {
+    window.removeEventListener("trackFullyLoaded", handleTrackFullyLoaded);
+  };
+}, [isAppReady]);
     window.addEventListener("trackFullyLoaded", handleTrackFullyLoaded);
 
     return () => {
