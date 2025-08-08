@@ -470,6 +470,11 @@
         padding: 0 clamp(1rem, 3vw, 2rem) 0 0;
       }
 
+      .play-row[data-text-alignment="right"]::after {
+        content: "";
+        flex-grow: 1;
+      }
+
       .play-row.no-avatar-row {
         justify-content: center;
       }
@@ -558,10 +563,11 @@
       }
 
       .play-row[data-text-alignment="right"] .character-text {
-        flex: inherit;
+        flex: 0 0 auto;
         text-align: left;
         margin-right: 0;
         margin-left: 0;
+        width: fit-content;
       }
 
       .play-row[data-text-alignment="right"] .character-avatar {
@@ -800,6 +806,22 @@
           transform: translateX(12.5%);
         }
       }
+    }
+  }
+
+  @media screen and (max-height: 480px) and (orientation: landscape) {
+    #content-container:has(.play-container) {
+      mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 10%,
+        rgba(0 0 0 / 0.05) 15%,
+        rgba(0 0 0 / 1) 25%,
+        rgba(0 0 0 / 1) 60%,
+        rgba(0 0 0 / 0.05) 80%,
+        transparent 85%,
+        transparent 100%
+      );
     }
   }
 
@@ -1401,7 +1423,7 @@ section[data-chapter] [data-index] {
   .song-notification {
     display: none !important;
   }
-  
+
   .book-settings-actions {
     margin-bottom: 1.5rem;
     display: flex;
