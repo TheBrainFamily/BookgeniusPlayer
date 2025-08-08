@@ -20,6 +20,9 @@ export const CoverArt = ({ src }: CoverArtProps) => {
     if (src) {
       setIsLoaded(false);
       setHasError(false);
+    } else {
+      setIsLoaded(false);
+      setHasError(true);
     }
   }, [src]);
 
@@ -35,7 +38,7 @@ export const CoverArt = ({ src }: CoverArtProps) => {
     <div className="relative w-full h-full group">
       <Fallback />
 
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {isLoaded && (
           <motion.img
             key={src}

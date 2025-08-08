@@ -308,8 +308,8 @@ async function parseMetadataAndUpdate(audioData: Uint8Array | ArrayBuffer, curre
             // Test if the URL is actually usable by creating an Image element
             await validateImageUrl(newUrl);
 
-            // Only revoke the old URL after the new one has been successfully validated
-            if (coverArtUrl) {
+            // Only revoke the old URL if it's different from the new one and not empty
+            if (coverArtUrl && coverArtUrl !== newUrl && coverArtUrl.startsWith("blob:")) {
               URL.revokeObjectURL(coverArtUrl);
             }
 
@@ -326,6 +326,8 @@ async function parseMetadataAndUpdate(audioData: Uint8Array | ArrayBuffer, curre
   } catch (metadataError) {
     console.warn(`Metadata parsing failed:`, metadataError);
   }
+
+  console.log("PINGWING image coverArtUrl", { title, coverArtUrl });
 
   return { title, coverArtUrl };
 }
@@ -616,7 +618,9 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
   } catch (error) {
     console.error(`Streaming download failed for '${trackId}':`, error);
     tracks.delete(trackId);
-    if (coverArtUrl) URL.revokeObjectURL(coverArtUrl);
+    if (coverArtUrl && coverArtUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(coverArtUrl);
+    }
     return false;
   }
 }
@@ -843,7 +847,9 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
     return true;
   } catch (e) {
     console.error(`❌ metadata/decode error for '${trackId}':`, e);
-    if (coverArtUrl) URL.revokeObjectURL(coverArtUrl);
+    if (coverArtUrl && coverArtUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(coverArtUrl);
+    }
     tracks.delete(trackId);
     return false;
   }
@@ -1105,8 +1111,9 @@ function stopTrackInternal(trackId: string) {
     state.fullyLoadedListener = null;
     console.log(`Cleaned up 'trackFullyLoaded' listener for '${trackId}'.`);
   }
-  // Revoke any created cover-art URL to avoid leaking Blob URLs
-  if (state.coverArtUrl) {
+  // Only revoke cover-art URL if it's a blob URL and we're not in a transition
+  // This prevents cover art from disappearing during track transitions
+  if (state.coverArtUrl && state.coverArtUrl.startsWith("blob:") && !isTransitioning) {
     URL.revokeObjectURL(state.coverArtUrl);
     state.coverArtUrl = "";
   }
@@ -1559,7 +1566,12 @@ export function stopAllPlayback() {
   });
   liveSources.clear();
 
-  tracks.forEach((_, id) => {
+  // Clean up all cover art URLs when stopping all playback
+  tracks.forEach((state, id) => {
+    if (state.coverArtUrl && state.coverArtUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(state.coverArtUrl);
+      state.coverArtUrl = "";
+    }
     stopTrackInternal(id);
   });
 
