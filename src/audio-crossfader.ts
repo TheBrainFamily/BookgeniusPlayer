@@ -974,6 +974,11 @@ function stopTrackInternal(trackId: string) {
     state.fullyLoadedListener = null;
     console.log(`Cleaned up 'trackFullyLoaded' listener for '${trackId}'.`);
   }
+  // Revoke any created cover-art URL to avoid leaking Blob URLs
+  if (state.coverArtUrl) {
+    URL.revokeObjectURL(state.coverArtUrl);
+    state.coverArtUrl = "";
+  }
 
   if (state.sourceNode) {
     liveSources.delete(state.sourceNode);
