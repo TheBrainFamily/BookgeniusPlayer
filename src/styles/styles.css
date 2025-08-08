@@ -567,7 +567,9 @@
         text-align: left;
         margin-right: 0;
         margin-left: 0;
-        width: fit-content;
+        width: auto;
+        max-width: 60%;
+        min-width: 0;
       }
 
       .play-row[data-text-alignment="right"] .character-avatar {
@@ -725,7 +727,7 @@
     }
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 625px) {
     #content-container:has(.play-container) {
       background-size: 375px 100%;
 
@@ -753,7 +755,7 @@
     }
   }
 
-  @media (max-width: 525px) {
+  @media (max-width: 535px) {
     #content-container:has(.play-container) {
       background-size: 325px 100%;
 
@@ -781,7 +783,7 @@
     }
   }
 
-  @media (max-width: 400px) {
+  @media (max-width: 420px) {
     #content-container:has(.play-container) {
       background-size: 300px 100%;
 
