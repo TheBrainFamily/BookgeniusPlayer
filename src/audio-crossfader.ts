@@ -1543,6 +1543,23 @@ export async function transitionToTrack(targetId: string): Promise<boolean> {
     return await startFirstTrack(targetId);
   }
 
+  // If the target track is fully loaded, skip crossfade and start directly
+  if (isFullyLoaded) {
+    console.log(`transitionToTrack: Target track '${targetId}' is fully loaded. Starting directly without crossfade.`);
+    const oldTrackId = currentTrackId;
+    stopTrackInternal(currentTrackId);
+    currentTrackId = null;
+    currentTrackIndexInSection = -1;
+
+    const started = await startFirstTrack(targetId);
+    if (started) {
+      console.log(`transitionToTrack: Direct start from '${oldTrackId}' to '${targetId}' succeeded.`);
+    } else {
+      console.warn(`transitionToTrack: Direct start from '${oldTrackId}', but failed to start '${targetId}'.`);
+    }
+    return started;
+  }
+
   const transitionPointTime = findNextTransitionPoint(currentTrackId);
   if (transitionPointTime === null) {
     console.warn(`transitionToTrack: Could not find a transition point for '${currentTrackId}'. Falling back to immediate cut to '${targetId}'.`);
