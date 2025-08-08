@@ -24,6 +24,7 @@ export function useBackgroundSongs() {
 
   const [isInitialTrackLoaded, setIsInitialTrackLoaded] = useState(false);
   const isPreloadingInProgress = useRef(false);
+  const lastPreloadedChapter = useRef<number | null>(null);
 
   const handleTrackFullyLoaded = () => {
     console.log("First track fully loaded - enabling preloading on chapter change.");
@@ -46,10 +47,13 @@ export function useBackgroundSongs() {
     const handleBackgroundMusic = async () => {
       await implRef.current({ currentChapter, currentParagraph });
 
-      if (isInitialTrackLoaded && !isPreloadingInProgress.current) {
+      if (isInitialTrackLoaded && !isPreloadingInProgress.current && currentChapter !== lastPreloadedChapter.current) {
         isPreloadingInProgress.current = true;
-        console.log("Preloading background tracks for the new chapter...");
+        console.log(`Preloading background tracks for chapter: ${currentChapter}`);
         preloadBackgroundTracks()
+          .then(() => {
+            lastPreloadedChapter.current = currentChapter;
+          })
           .catch((error) => {
             console.error("Error preloading background tracks:", error);
           })
@@ -59,6 +63,8 @@ export function useBackgroundSongs() {
       }
     };
 
-    handleBackgroundMusic();
+    handleBackgroundMusic().catch((error) => {
+      console.error("Error handling background music:", error);
+    });
   }, [currentChapter, currentParagraph, isSplashHidden, isAppReady, isInitialTrackLoaded]);
 }
