@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 
-import { dealWithBackgroundSongs as impl } from "@/deal-with-background-songs";
+import { dealWithBackgroundSongs as impl, preloadBackgroundTracks } from "@/deal-with-background-songs";
 import { useLocationRange } from "./useLocationRange";
 import useSplashHidden from "./useSplashHidden";
+import { useIsAppReady } from "./useIsAppReady";
 
 /* We keep a mutable ref so we can swap the implementation on HMR */
 const implRef = { current: impl };
@@ -16,6 +17,7 @@ if (import.meta.hot) {
 
 export function useBackgroundSongs() {
   const isSplashHidden = useSplashHidden();
+  const isAppReady = useIsAppReady();
 
   const {
     debouncedLocation: { currentChapter, currentParagraph },
@@ -23,6 +25,26 @@ export function useBackgroundSongs() {
 
   const preloadingRef = useRef<Promise<boolean> | null>(null);
   const isFirstMusicStartRef = useRef(true);
+
+  // Start preloading tracks after the first track is fully loaded
+  useEffect(() => {
+    if (!isAppReady || preloadingRef.current) return;
+
+    const handleTrackFullyLoaded = () => {
+      console.log("First track fully loaded - starting background tracks preloading...");
+      preloadingRef.current = preloadBackgroundTracks().catch((error) => {
+        console.error("Error preloading background tracks:", error);
+        return false;
+      });
+      window.removeEventListener("trackFullyLoaded", handleTrackFullyLoaded);
+    };
+
+    window.addEventListener("trackFullyLoaded", handleTrackFullyLoaded);
+
+    return () => {
+      window.removeEventListener("trackFullyLoaded", handleTrackFullyLoaded);
+    };
+  }, [isAppReady]);
 
   // Start playing music when splash is hidden OR location changes
   useEffect(() => {
