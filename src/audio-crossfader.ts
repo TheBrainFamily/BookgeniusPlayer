@@ -335,10 +335,22 @@ async function streamingDecodeAudioData(
     try {
       const decodedFirstChunk = await audioContext.decodeAudioData(framesBuffer);
       const chunkDuration = decodedFirstChunk.duration;
-
+      if (!isFinite(chunkDuration) || chunkDuration <= 0) {
+        console.warn(`Invalid decoded chunk duration for '${trackId}' (${chunkDuration}).`);
+        if (isFullBuffer) {
+          return await audioContext.decodeAudioData(arrayBuffer);
+        }
+        return null;
+      }
       const estimatedBitrate = (bytesForFrames * 8) / chunkDuration;
+      if (!isFinite(estimatedBitrate) || estimatedBitrate <= 0) {
+        console.warn(`Invalid estimated bitrate for '${trackId}' (${estimatedBitrate}).`);
+        if (isFullBuffer) {
+          return await audioContext.decodeAudioData(arrayBuffer);
+        }
+        return null;
+      }
       const estimatedTotalDuration = ((fileSize - audioOffset) * 8) / estimatedBitrate;
-
       const partialTrackState: TrackState = {
         audioBuffer: decodedFirstChunk,
         duration: estimatedTotalDuration,
