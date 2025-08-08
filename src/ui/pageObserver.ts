@@ -351,7 +351,7 @@ function activateMediaInRange(
 ) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
 
-  const bufferSize = isPlayFormat ? 5 : 10;
+  const bufferSize = isPlayFormat ? 6 : 10;
 
   allParagraphs.forEach((p) => {
     const chapterElement = p.closest("section[data-chapter]") as HTMLElement;
