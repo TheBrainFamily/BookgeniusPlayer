@@ -233,7 +233,10 @@ function createMediaElement(
       return;
     }
     e.stopPropagation();
-    const videoSrc = isTalking ? talkingSrc : listeningSrc;
+
+    const currentIsTalking = placeholder.dataset.isTalking === "true";
+    const videoSrc = currentIsTalking ? talkingSrc : listeningSrc;
+
     openCharacterDetailsModal(characterSlug, !!videoSrc && videoSrc.endsWith(".mp4"), videoSrc || "");
   });
 
