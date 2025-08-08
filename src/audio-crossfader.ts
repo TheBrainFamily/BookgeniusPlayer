@@ -17,6 +17,7 @@ export interface TrackState {
   offsetAtStart?: number; // Offset (in seconds) passed to source.start()
   pausedAt?: number | null; // Position (in seconds) frozen when paused
   fullyLoadedListener?: ((event: CustomEvent) => void) | null; // Reference to the 'trackFullyLoaded' event listener
+  isFullyLoaded?: boolean; // Added to indicate if the track is fully decoded
 }
 
 // --- Configuration ---
@@ -165,9 +166,11 @@ export async function initAudioContext(): Promise<boolean> {
   // Return true only if the context is running
   return audioContext?.state === "running";
 }
+
 function buildUrl(trackId: string): string {
   return `/${bookData.slug}/${trackId}.mp3`; // → /1984/background-forest.mp3
 }
+
 function isFetchOk(res: Response, url: string): boolean {
   const local = url.startsWith("/");
   return res.ok || (local && res.status === 0);
@@ -245,6 +248,7 @@ function createTrackState(audioBuffer: AudioBuffer, metadata: { title: string; c
     audioBuffer,
     duration: audioBuffer.duration,
     trackLength: audioBuffer.duration,
+    isFullyLoaded: true,
     title: metadata.title,
     coverArtUrl: metadata.coverArtUrl,
     transitionPoints: metadata.transitionPoints,
@@ -360,10 +364,12 @@ async function streamingDecodeAudioData(
               existingState.audioBuffer = fullAudioBuffer;
               existingState.duration = fullAudioBuffer.duration;
               existingState.trackLength = fullAudioBuffer.duration;
+              existingState.isFullyLoaded = true; // Mark as fully loaded
 
               // Note: Buffer is updated in background, will be used for next playback
             } else {
               const newTrackState = createTrackState(fullAudioBuffer, { title, coverArtUrl, transitionPoints });
+              newTrackState.isFullyLoaded = true; // Mark as fully loaded
               tracks.set(trackId, newTrackState);
             }
 
@@ -527,12 +533,14 @@ async function downloadRemainingDataInBackground(
       existingState.audioBuffer = fullAudioBuffer;
       existingState.duration = fullAudioBuffer.duration;
       existingState.trackLength = fullAudioBuffer.duration;
+      existingState.isFullyLoaded = true; // Mark as fully loaded
 
       console.log(`✅ Background download complete for '${trackId}' - ${fullAudioBuffer.duration.toFixed(2)}s (${totalBytesReceived} bytes)`);
       window.dispatchEvent(new CustomEvent("trackFullyLoaded", { detail: { trackId, fullDuration: fullAudioBuffer.duration, totalBytes: totalBytesReceived } }));
     } else {
       // Create new complete track state
       const newTrackState = createTrackState(fullAudioBuffer, { title, coverArtUrl, transitionPoints });
+      newTrackState.isFullyLoaded = true; // Also mark as fully loaded
       tracks.set(trackId, newTrackState);
 
       console.log(`✅ Background download and decode complete for '${trackId}' - ${fullAudioBuffer.duration.toFixed(2)}s`);
@@ -553,11 +561,22 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
 
   /* 2 ▸ cache hit? ------------------------------------------------- */
   const cached = tracks.get(trackId);
+  if (cached?.isFullyLoaded) {
+    // If the track is fully loaded, just update transition points if needed and return.
+    if (transitionPoints && cached.transitionPoints !== transitionPoints) {
+      cached.transitionPoints = transitionPoints;
+    }
+    return true; // No console.log needed here, it's a silent success.
+  }
+
+  // If we have a buffer but it's not marked as fully loaded, it's a partial buffer.
+  // We can still use it for playback, so we log it and return true.
+  // The full buffer will be loaded in the background.
   if (cached?.audioBuffer) {
     if (transitionPoints && cached.transitionPoints !== transitionPoints) {
       cached.transitionPoints = transitionPoints;
     }
-    console.log(`✅ Track '${trackId}' already loaded from cache`);
+    console.log(`✅ Track '${trackId}' already loaded from cache (partially)`);
     return true;
   }
 
@@ -1411,9 +1430,11 @@ export function stopAllPlayback() {
 export function getCurrentTrackId(): string | null {
   return currentTrackId;
 }
+
 export function getCurrentSectionTracks(): string[] | null {
   return currentSectionTracks ? [...currentSectionTracks] : null;
 }
+
 export function getCurrentTrackIndexInSection(): number {
   return currentTrackIndexInSection;
 }
