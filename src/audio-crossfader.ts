@@ -304,11 +304,14 @@ async function streamingDecodeAudioData(
 
     if (frames.length < 2) {
       console.warn(`Not enough MP3 frames found in the first chunk of '${trackId}' to stream. Falling back to full decode.`);
-      const { title: refreshedTitle, coverArtUrl: refreshedCoverArtUrl } = await parseMetadataAndUpdate(arrayBuffer, title, coverArtUrl);
-      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-      const trackState = createTrackState(audioBuffer, { title: refreshedTitle, coverArtUrl: refreshedCoverArtUrl, transitionPoints });
-      tracks.set(trackId, trackState);
-      return audioBuffer;
+      if (isFullBuffer) {
+        const { title: refreshedTitle, coverArtUrl: refreshedCoverArtUrl } = await parseMetadataAndUpdate(arrayBuffer, title, coverArtUrl);
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        const trackState = createTrackState(audioBuffer, { title: refreshedTitle, coverArtUrl: refreshedCoverArtUrl, transitionPoints });
+        tracks.set(trackId, trackState);
+        return audioBuffer;
+      }
+      return null;
     }
 
     const TARGET_DURATION_S = 5;
@@ -326,7 +329,10 @@ async function streamingDecodeAudioData(
 
     if (framesToTake >= frames.length) {
       console.warn(`Full initial chunk for '${trackId}' has only ${accumulatedDuration.toFixed(2)}s of audio. Falling back to full decode for better UX.`);
-      return await audioContext.decodeAudioData(arrayBuffer);
+      if (isFullBuffer) {
+        return await audioContext.decodeAudioData(arrayBuffer);
+      }
+      return null;
     }
 
     const bytesForFrames = frames[framesToTake].totalBytesOut;
@@ -392,7 +398,10 @@ async function streamingDecodeAudioData(
       return decodedFirstChunk;
     } catch (e) {
       console.warn(`Failed to decode the first frame chunk of '${trackId}', falling back to full decode:`, e);
-      return await audioContext.decodeAudioData(arrayBuffer);
+      if (isFullBuffer) {
+        return await audioContext.decodeAudioData(arrayBuffer);
+      }
+      return null;
     }
   } catch (e) {
     console.error(`Streaming decode failed for '${trackId}':`, e);
