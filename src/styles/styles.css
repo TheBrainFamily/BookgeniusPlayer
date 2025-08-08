@@ -1409,6 +1409,33 @@ section[data-chapter] [data-index] {
 
 #book-container {
   overflow-x: visible;
+  opacity: 0;
+}
+
+/* Default visible state for iOS (no transform to avoid crashes) */
+#book-container {
+  overflow-x: visible;
+  opacity: 0;
+}
+
+/* Default visible state for iOS (no transform to avoid crashes) */
+#book-container.visible {
+  opacity: 1;
+  transition: opacity 1000ms ease-in-out;
+}
+
+/* Add scaling animation for non-iOS devices */
+@supports not (-webkit-touch-callout: none) {
+  #book-container {
+    transform: scale(0.95);
+  }
+  #book-container.visible {
+    opacity: 1;
+    transform: scale(1);
+    transition:
+      opacity 1000ms ease-in-out,
+      transform 1000ms ease-in-out;
+  }
 }
 
 .scrollbar-search {

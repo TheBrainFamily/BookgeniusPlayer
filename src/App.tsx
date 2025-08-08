@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useLocalStorageState from "use-local-storage-state";
 
 import { LocationProvider } from "./state/LocationContext";
@@ -13,7 +13,6 @@ import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
 import { BookContentWrapper } from "./components/BookContentWrapper";
 import { useAudiobookTracks } from "@/hooks/useAudiobookTracks";
 
-import ContentContainerWrapper from "./components/ContentContainerWrapper";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { EditorMode } from "@/components/EditorMode";
@@ -43,6 +42,7 @@ function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   useCutScene();
   useBackgroundVideo();
   useQuiz();
+
   /* app ready hook */
   useAppReady();
 
@@ -60,7 +60,6 @@ function Shell({ onShellMounted }: { onShellMounted: () => void }) {
       <ProgressBars />
       <Header />
       <NoteLinkBlinker />
-      <ContentContainerWrapper /> {/* Keep for animations */}
       <CharacterNotesPanel />
       {/* Not used for now, but can be re-enabled if needed later */}
       {/* <RightNotesPanel /> */}
@@ -85,9 +84,14 @@ export default function App() {
   useEffect(() => {
     if (!splashHidden) return;
 
+    const bookContainer = document.getElementById("book-container");
+    if (bookContainer) {
+      bookContainer.classList.add("visible");
+    }
+
     const audioReady = initAudioContext();
     if (!audioReady) {
-      console.warn("AudioContext could not be started automatically. User interaction (e.g., clicking 'Enable Audio') might be required.");
+      console.warn("AudioContext could not be started automatically.");
     }
   }, [splashHidden]);
 
