@@ -8,6 +8,12 @@ console.log("🚀 Starting Core API with Versioning...");
 // --- In-memory cache for the versions manifest ---
 let versionsCache: Record<string, string> = {};
 
+let isLoadingVersions = false;
+
+const assetContext = process.env.ASSET_CONTEXT || "staging";
+// For production, path is 'versions.json'. For a branch, it could be 'staging/feature-A/versions.json'
+const versionsPath = assetContext === "production" ? "versions.json" : `${assetContext}/versions.json`;
+
 /**
  * Fetches the versions.json file from S3 and populates the cache.
  */
@@ -17,7 +23,7 @@ async function loadVersions(): Promise<boolean> {
 
   try {
     console.log("[Versioning] Attempting to load versions.json from S3...");
-    const versionsFile = s3.file('versions.json');
+    const versionsFile = s3.file(versionsPath);
     if (await versionsFile.exists()) {
       versionsCache = await versionsFile.json();
       console.log("[Versioning] ✅ Versions cache loaded successfully:", versionsCache);
@@ -49,8 +55,8 @@ async function initialLoadWithRetry(retries = 10, delay = 5000) {
     if (i < retries) {
       console.log(`[Versioning] Retrying in ${delay / 1000} seconds...`);
       await Bun.sleep(delay);
+    }
   }
-}
   console.error("[Versioning] CRITICAL: Failed to load versions.json after all retries.");
 }
 
@@ -58,7 +64,6 @@ async function initialLoadWithRetry(retries = 10, delay = 5000) {
 loadVersions();
 // Optional: Refresh versions every 5 minutes
 setInterval(loadVersions, 5 * 60 * 1000);
-
 
 // Helper function to determine the correct MIME type based on file extension
 const getMimeType = (filePath: string): string => {
@@ -111,9 +116,9 @@ Bun.serve({
         }
       }
 
-      const pathParts = reqPath.substring("/content/".length).split('/');
+      const pathParts = reqPath.substring("/content/".length).split("/");
       const bookSlug = pathParts[2];
-      const assetPath = pathParts.slice(3).join('/');
+      const assetPath = pathParts.slice(3).join("/");
 
       if (!bookSlug || !assetPath) {
         return new Response("Invalid asset path", { status: 400 });
@@ -140,9 +145,7 @@ Bun.serve({
         const mimeType = getMimeType(s3Key);
         console.log(`[Core API] Serving file ${s3Key} with MIME type ${mimeType}`);
 
-        return new Response(s3File.stream(), {
-          headers: { "Content-Type": mimeType, "Content-Length": s3File.size.toString() },
-        });
+        return new Response(s3File.stream(), { headers: { "Content-Type": mimeType, "Content-Length": s3File.size.toString() } });
       } catch (error) {
         console.error("[Core API] Error during S3 operation:", error);
         return new Response("Internal Server Error", { status: 500 });
@@ -151,9 +154,7 @@ Bun.serve({
 
     // Health check for verification
     if (reqPath === "/health") {
-      return new Response(JSON.stringify({ status: "ok", time: new Date() }), {
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(JSON.stringify({ status: "ok", time: new Date() }), { headers: { "Content-Type": "application/json" } });
     }
 
     console.log(`[Core API] Path "${reqPath}" did not match any routes. Returning 404.`);
