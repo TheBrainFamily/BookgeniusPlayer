@@ -132,6 +132,22 @@ function normalizeSrcForInlineAvatar(src: string): string {
 }
 
 /**
+ * Updates video opacity based on talking state for inline avatars
+ */
+function updateVideoState(container: HTMLDivElement, isTalking: boolean) {
+  const listeningVideo = container.querySelector('video[data-state="listens"]') as HTMLVideoElement;
+  const speakingVideo = container.querySelector('video[data-state="speaks"]') as HTMLVideoElement;
+
+  if (listeningVideo) {
+    listeningVideo.style.opacity = isTalking ? "0" : "1";
+  }
+
+  if (speakingVideo) {
+    speakingVideo.style.opacity = isTalking ? "1" : "0";
+  }
+}
+
+/**
  * Creates a media container element with CharacterMedia-like structure for inline avatars.
  */
 function createMediaElement(
@@ -366,8 +382,11 @@ function activateMediaInRange(
               // and remains hidden while the dummy is shown. No action needed here.
 
               // Play video if applicable
-              if (mediaElement instanceof HTMLVideoElement) {
-                mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+              if (newMediaElement) {
+                const videos = newMediaElement.querySelectorAll("video");
+                videos.forEach((video) => {
+                  video.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+                });
               }
             }
           } else if (!mediaInjected) {
@@ -388,13 +407,29 @@ function activateMediaInRange(
               placeholder.dataset.mediaInjected = "true"; // Mark as injected
 
               // Play video if applicable
-              if (mediaElement instanceof HTMLVideoElement) {
-                mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+              if (newMediaElement) {
+                const videos = newMediaElement.querySelectorAll("video");
+                videos.forEach((video) => {
+                  video.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+                });
               }
             }
-          } else if (mediaElement instanceof HTMLVideoElement && mediaElement.paused) {
-            // Media already injected, just play existing video if paused
-            mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+          } else if (mediaElement) {
+            // Media already injected, update talking state and play videos if paused
+            const currentIsTalking = placeholder.dataset.isTalking === "true";
+
+            // Update video state based on current talking status
+            if (mediaElement.dataset.hasVideos === "true") {
+              updateVideoState(mediaElement, currentIsTalking);
+            }
+
+            // Check for videos and play if paused
+            const videos = mediaElement.querySelectorAll("video");
+            videos.forEach((video) => {
+              if (video.paused) {
+                video.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+              }
+            });
           }
         } else {
           // Out of view
