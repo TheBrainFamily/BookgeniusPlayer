@@ -74,6 +74,33 @@ export function getCurrentTrackData(): TrackState | null {
 
 // --- Core Functions ---
 
+/**
+ * Helper function to properly clean up track state and revoke cover art URLs
+ * This should only be called when a track is being completely removed from the cache
+ */
+function cleanupTrackState(trackId: string): void {
+  const state = tracks.get(trackId);
+  if (!state) return;
+
+  // Revoke cover art URL if it's a blob URL
+  if (state.coverArtUrl && state.coverArtUrl.startsWith("blob:")) {
+    URL.revokeObjectURL(state.coverArtUrl);
+  }
+
+  // Clean up any remaining listeners
+  if (state.fullyLoadedListener) {
+    window.removeEventListener("trackFullyLoaded", state.fullyLoadedListener);
+  }
+
+  // Clear any timeouts
+  if (state.preemptiveTransitionTimeout) {
+    clearTimeout(state.preemptiveTransitionTimeout);
+  }
+
+  // Remove from tracks map
+  tracks.delete(trackId);
+}
+
 export function getAudioContext(): AudioContext | null {
   return audioContext;
 }
@@ -516,7 +543,7 @@ async function streamingDecodeAudioData(
     }
   } catch (e) {
     console.error(`Streaming decode failed for '${trackId}':`, e);
-    tracks.delete(trackId);
+    cleanupTrackState(trackId);
     return null;
   }
 }
@@ -527,7 +554,7 @@ async function streamingDecodeAudioData(
 async function handleStreamingDownload(response: Response, trackId: string, transitionPoints?: number[]): Promise<boolean> {
   if (!audioContext || !response.body) {
     console.error("handleStreamingDownload: AudioContext or response body not available");
-    tracks.delete(trackId);
+    cleanupTrackState(trackId);
     return false;
   }
 
@@ -617,10 +644,7 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
     return true;
   } catch (error) {
     console.error(`Streaming download failed for '${trackId}':`, error);
-    tracks.delete(trackId);
-    if (coverArtUrl && coverArtUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(coverArtUrl);
-    }
+    cleanupTrackState(trackId);
     return false;
   }
 }
@@ -772,7 +796,7 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
     }
   } catch (e) {
     console.error(`❌ Fetch error for '${trackId}':`, e);
-    tracks.delete(trackId);
+    cleanupTrackState(trackId);
     return false;
   }
 
@@ -788,7 +812,7 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
       // Use streaming for files larger than threshold
       if (!audioContext) {
         console.error("AudioContext became null during streaming setup");
-        tracks.delete(trackId);
+        cleanupTrackState(trackId);
         return false;
       }
       const audioBuffer = await streamingDecodeAudioData(audioContext, arrayBuffer, trackId, title, coverArtUrl || "", transitionPoints, true, arrayBuffer.byteLength);
@@ -802,7 +826,7 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
       // For smaller files, still use streaming but with immediate full decode
       if (!audioContext) {
         console.error("AudioContext became null during streaming setup");
-        tracks.delete(trackId);
+        cleanupTrackState(trackId);
         return false;
       }
 
@@ -847,10 +871,7 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
     return true;
   } catch (e) {
     console.error(`❌ metadata/decode error for '${trackId}':`, e);
-    if (coverArtUrl && coverArtUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(coverArtUrl);
-    }
-    tracks.delete(trackId);
+    cleanupTrackState(trackId);
     return false;
   }
 }
@@ -1111,12 +1132,8 @@ function stopTrackInternal(trackId: string) {
     state.fullyLoadedListener = null;
     console.log(`Cleaned up 'trackFullyLoaded' listener for '${trackId}'.`);
   }
-  // Only revoke cover-art URL if it's a blob URL and we're not in a transition
-  // This prevents cover art from disappearing during track transitions
-  if (state.coverArtUrl && state.coverArtUrl.startsWith("blob:") && !isTransitioning) {
-    URL.revokeObjectURL(state.coverArtUrl);
-    state.coverArtUrl = "";
-  }
+  // Note: Cover art URLs are NOT revoked here to preserve them for potential resume
+  // They will be revoked when the track is completely removed from the cache
 
   if (state.sourceNode) {
     liveSources.delete(state.sourceNode);
@@ -1566,12 +1583,8 @@ export function stopAllPlayback() {
   });
   liveSources.clear();
 
-  // Clean up all cover art URLs when stopping all playback
+  // Stop all tracks but preserve their state for potential resume
   tracks.forEach((state, id) => {
-    if (state.coverArtUrl && state.coverArtUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(state.coverArtUrl);
-      state.coverArtUrl = "";
-    }
     stopTrackInternal(id);
   });
 
