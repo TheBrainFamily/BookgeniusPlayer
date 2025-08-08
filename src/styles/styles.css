@@ -1398,6 +1398,10 @@ section[data-chapter] [data-index] {
 }
 
 @media screen and (max-height: 480px) and (orientation: landscape) {
+  .song-notification {
+    display: none !important;
+  }
+  
   .book-settings-actions {
     margin-bottom: 1.5rem;
     display: flex;

@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import { motion } from "motion/react";
 
 import CharacterMedia from "./CharacterMedia";
 import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
@@ -85,7 +86,8 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       title={entity.characterName}
       aria-label={entity.characterName}
     >
-      <div
+      <motion.div
+        layout
         className={cn(
           "rounded-full overflow-hidden aspect-square cursor-pointer",
           showHighlight
@@ -97,24 +99,26 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
         onClick={() => openModal(entity.slug, modalIsVideo, modalMediaSrc)}
       >
         <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />
-      </div>
-      {showTitle && (
-        <div
-          className={cn(
-            "max-w-full w-full absolute right-0 bottom-0 rounded-xl text-center bg-black/70 textured-bg border shadow-xl",
-            isTalkingInCurrentRange ? "border-2 border-(--book-primary-color) transition-all duration-300 ease-in-out" : "border-white/30 transition-all duration-200 ease-in-out",
-          )}
-        >
-          <div className="py-1.5 px-3 flex flex-col items-center justify-center">
-            <h4 className="w-full whitespace-nowrap overflow-hidden overflow-ellipsis text-xs font-bold text-white tracking-wide uppercase">
-              {entity.label || entity.characterName}
-            </h4>
-            <p className={cn("w-full whitespace-nowrap overflow-hidden overflow-ellipsis text-xs text-gray-200 italic", isTalkingInCurrentRange ? "" : "text-gray-200")}>
-              {entity.summary}
-            </p>
+        {showTitle && (
+          <div
+            className={cn(
+              "max-w-full w-full absolute right-0 bottom-0 rounded-xl text-center bg-black/70 textured-bg border shadow-xl",
+              isTalkingInCurrentRange
+                ? "border-2 border-(--book-primary-color) transition-all duration-300 ease-in-out"
+                : "border-white/30 transition-all duration-200 ease-in-out",
+            )}
+          >
+            <div className="py-1.5 px-3 flex flex-col items-center justify-center">
+              <h4 className="w-full whitespace-nowrap overflow-hidden overflow-ellipsis text-xs font-bold text-white tracking-wide uppercase">
+                {entity.label || entity.characterName}
+              </h4>
+              <p className={cn("w-full whitespace-nowrap overflow-hidden overflow-ellipsis text-xs text-gray-200 italic", isTalkingInCurrentRange ? "" : "text-gray-200")}>
+                {entity.summary}
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </motion.div>
     </div>
   );
 };
