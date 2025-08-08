@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { dealWithBackgroundSongs as impl, preloadBackgroundTracks } from "@/deal-with-background-songs";
 import { useLocationRange } from "./useLocationRange";
@@ -18,40 +18,53 @@ if (import.meta.hot) {
 export function useBackgroundSongs() {
   const isSplashHidden = useSplashHidden();
   const isAppReady = useIsAppReady();
-
   const {
     debouncedLocation: { currentChapter, currentParagraph },
   } = useLocationRange(300);
 
-  const preloadingRef = useRef<Promise<boolean> | null>(null);
-  const isFirstMusicStartRef = useRef(true);
+  const [isInitialTrackLoaded, setIsInitialTrackLoaded] = useState(false);
+  const isPreloadingInProgress = useRef(false);
+  const lastPreloadedChapter = useRef<number | null>(null);
 
-  // Start preloading tracks when app is ready
+  const handleTrackFullyLoaded = () => {
+    console.log("First track fully loaded - enabling preloading on chapter change.");
+    setIsInitialTrackLoaded(true);
+  };
+
   useEffect(() => {
-    if (!isAppReady || preloadingRef.current) return;
+    if (!isAppReady) return;
 
-    console.log("App ready - starting background tracks preloading...");
-    preloadingRef.current = preloadBackgroundTracks().catch((error) => {
-      console.error("Error preloading background tracks:", error);
-      return false;
-    });
+    window.addEventListener("trackFullyLoaded", handleTrackFullyLoaded, { once: true });
+
+    return () => {
+      window.removeEventListener("trackFullyLoaded", handleTrackFullyLoaded);
+    };
   }, [isAppReady]);
 
-  // Start playing music when splash is hidden OR location changes
   useEffect(() => {
-    if (!isSplashHidden) return;
+    if (!isSplashHidden || !isAppReady) return;
 
     const handleBackgroundMusic = async () => {
-      if (isFirstMusicStartRef.current && preloadingRef.current) {
-        console.log("First music start - waiting for preloading to complete...");
-        const preloadSuccess = await preloadingRef.current;
-        console.log(`Preloading completed with success: ${preloadSuccess}`);
-        isFirstMusicStartRef.current = false;
-      }
-
       await implRef.current({ currentChapter, currentParagraph });
+
+      if (isInitialTrackLoaded && !isPreloadingInProgress.current && currentChapter !== lastPreloadedChapter.current) {
+        isPreloadingInProgress.current = true;
+        console.log(`Preloading background tracks for chapter: ${currentChapter}`);
+        preloadBackgroundTracks()
+          .then(() => {
+            lastPreloadedChapter.current = currentChapter;
+          })
+          .catch((error) => {
+            console.error("Error preloading background tracks:", error);
+          })
+          .finally(() => {
+            isPreloadingInProgress.current = false;
+          });
+      }
     };
 
-    handleBackgroundMusic();
-  }, [currentChapter, currentParagraph, isSplashHidden]);
+    handleBackgroundMusic().catch((error) => {
+      console.error("Error handling background music:", error);
+    });
+  }, [currentChapter, currentParagraph, isSplashHidden, isAppReady, isInitialTrackLoaded]);
 }
