@@ -912,7 +912,7 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
       );
 
       // Check if we have a full buffer (duration is significantly larger than the original partial)
-      if (currentState?.audioBuffer && currentState.audioBuffer.duration > originalPartialDuration + 1) {
+      if (currentState?.isFullyLoaded && currentState.audioBuffer) {
         const timeUntilEnd = partialEndTime - audioContext.currentTime;
         const isCurrentTrack = trackId === currentTrackId;
         const hasCorrectSource = tracks.get(trackId)?.sourceNode === source;
