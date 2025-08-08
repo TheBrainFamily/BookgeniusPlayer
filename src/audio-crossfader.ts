@@ -304,7 +304,11 @@ async function streamingDecodeAudioData(
 
     if (frames.length < 2) {
       console.warn(`Not enough MP3 frames found in the first chunk of '${trackId}' to stream. Falling back to full decode.`);
-      return await audioContext.decodeAudioData(arrayBuffer);
+      const { title: refreshedTitle, coverArtUrl: refreshedCoverArtUrl } = await parseMetadataAndUpdate(arrayBuffer, title, coverArtUrl);
+      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+      const trackState = createTrackState(audioBuffer, { title: refreshedTitle, coverArtUrl: refreshedCoverArtUrl, transitionPoints });
+      tracks.set(trackId, trackState);
+      return audioBuffer;
     }
 
     const TARGET_DURATION_S = 5;
@@ -358,6 +362,8 @@ async function streamingDecodeAudioData(
         (async () => {
           try {
             const fullAudioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            const { title: refreshedTitle, coverArtUrl: refreshedCoverArtUrl } = await parseMetadataAndUpdate(arrayBuffer, title, coverArtUrl);
+
             const existingState = tracks.get(trackId);
 
             if (existingState) {
@@ -365,10 +371,12 @@ async function streamingDecodeAudioData(
               existingState.duration = fullAudioBuffer.duration;
               existingState.trackLength = fullAudioBuffer.duration;
               existingState.isFullyLoaded = true; // Mark as fully loaded
+              existingState.title = refreshedTitle;
+              existingState.coverArtUrl = refreshedCoverArtUrl;
 
               // Note: Buffer is updated in background, will be used for next playback
             } else {
-              const newTrackState = createTrackState(fullAudioBuffer, { title, coverArtUrl, transitionPoints });
+              const newTrackState = createTrackState(fullAudioBuffer, { title: refreshedTitle, coverArtUrl: refreshedCoverArtUrl, transitionPoints });
               newTrackState.isFullyLoaded = true; // Mark as fully loaded
               tracks.set(trackId, newTrackState);
             }
@@ -476,8 +484,9 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
     }
 
     // Fall back to regular decode if streaming decode fails
+    const { title: refreshedTitle, coverArtUrl: refreshedCoverArtUrl } = await parseMetadataAndUpdate(finalArray, title, coverArtUrl);
     const regularBuffer = await audioContext.decodeAudioData(finalArray.buffer);
-    const trackState = createTrackState(regularBuffer, { title, coverArtUrl: coverArtUrl || "", transitionPoints });
+    const trackState = createTrackState(regularBuffer, { title: refreshedTitle, coverArtUrl: refreshedCoverArtUrl, transitionPoints });
     tracks.set(trackId, trackState);
 
     console.log(`✅ Fallback decode completed for '${trackId}' - ${regularBuffer.duration.toFixed(2)}s`);
@@ -975,7 +984,7 @@ function stopTrackInternal(trackId: string) {
     console.log(`Cleaned up 'trackFullyLoaded' listener for '${trackId}'.`);
   }
   // Revoke any created cover-art URL to avoid leaking Blob URLs
-  if (state.coverArtUrl) {
+  if (state.coverArtUrl && state.isFullyLoaded) {
     URL.revokeObjectURL(state.coverArtUrl);
     state.coverArtUrl = "";
   }
@@ -1051,7 +1060,6 @@ async function playNextTrackInSection(): Promise<void> {
     } else {
       const trackData = tracks.get(nextTrackIdToPlay);
       announceSongTransition(trackData);
-
       console.log(`playNextTrackInSection: Successfully started next track '${nextTrackIdToPlay}'.`);
     }
   } else {
