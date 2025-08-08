@@ -70,7 +70,8 @@ services:
       minio:
         condition: service_healthy
     entrypoint: /bin/sh
-    command: -c "mc alias set local http://minio:9000 minioadmin minioadmin && mc mb local/bookgenius-assets --ignore-existing && mc cp --recursive /data/assets/ local/bookgenius-assets/assets/ && echo '✅ MinIO seeding complete.' && exit 0"
+    # NEW: The command now copies the entire content of /data, which includes versions.json
+    command: -c "mc alias set local http://minio:9000 minioadmin minioadmin && mc mb local/bookgenius-assets --ignore-existing && mc cp --recursive /data/ local/bookgenius-assets/ && echo '✅ MinIO seeding complete.' && exit 0"
     volumes:
       - ./build/s3-data:/data
 

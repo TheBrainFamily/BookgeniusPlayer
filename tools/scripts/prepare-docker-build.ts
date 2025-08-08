@@ -5,9 +5,9 @@ import path from "node:path";
 
 const projectRoot = path.join(import.meta.dir, "..", "..");
 const buildDir = path.join(projectRoot, "build");
-const s3DataDir = path.join(buildDir, "s3-data", "assets");
+const s3DataDir = path.join(buildDir, "s3-data"); // We'll put versions.json here
+const s3AssetsDir = path.join(s3DataDir, "assets");
 
-// Define all applications that need to be processed
 const apps = [
   {
     name: "player",
@@ -53,26 +53,39 @@ async function prepareBuild() {
       await rm(buildDir, { recursive: true, force: true });
     }
     await mkdir(buildDir, { recursive: true });
+    await mkdir(s3AssetsDir, { recursive: true });
 
-    console.log("\n--- Handling special assets (books, embeddings, etc.) ---");
-    await mkdir(s3DataDir, { recursive: true });
+    // --- NEW: Versioning Logic ---
+    // Generate a unique, timestamp-based version string for this build run.
+    const buildVersion = 'v' + new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15);
+    console.log(`\n--- Generated build version: ${buildVersion} ---`);
+    const versionsManifest: Record<string, string> = {};
 
-    // Move book assets from the player's dist directory to the S3 data directory
+    console.log("\n--- Handling and versioning book assets ---");
     const playerBooksDir = apps.find((app) => app.name === "player")!.booksSourceDir;
     if (await pathExists(playerBooksDir)) {
-      const booksTarget = path.join(s3DataDir, "books");
-      console.log(`[MOVE] Moving book assets: "${playerBooksDir}" -> "${booksTarget}"`);
-      await copyDirectory(playerBooksDir, booksTarget);
+      const bookSlugs = await readdir(playerBooksDir);
+      for (const bookSlug of bookSlugs) {
+        const sourceBookPath = path.join(playerBooksDir, bookSlug);
+
+        // NEW: Create a versioned path for each book.
+        const versionedBookTarget = path.join(s3AssetsDir, "books", bookSlug, buildVersion);
+
+        console.log(`[VERSIONING] Moving '${bookSlug}' assets to: "${versionedBookTarget}"`);
+        await copyDirectory(sourceBookPath, versionedBookTarget);
+
+        // NEW: Record the new version for this book in our manifest.
+        versionsManifest[bookSlug] = buildVersion;
+      }
     } else {
-      console.log(`[SKIP] No 'books' directory found in player build output.`);
+      console.log(`[SKIP] No 'books' directory found to version.`);
     }
 
-    // TODO: Add logic here to copy/move embeddings if they are generated elsewhere
-    // const embeddingsSourceDir = path.join(projectRoot, 'apps', 'embeddings-api', 'generated-data');
-    // if (await pathExists(embeddingsSourceDir)) {
-    //   console.log('Moving embeddings to s3-data...');
-    //   await copyDirectory(embeddingsSourceDir, path.join(s3DataDir, 'embeddings'));
-    // }
+    // NEW: Write the versions.json file to the root of our S3 data.
+    const versionsFilePath = path.join(s3DataDir, 'versions.json');
+    await Bun.write(versionsFilePath, JSON.stringify(versionsManifest, null, 2));
+    console.log(`[MANIFEST] Created versions manifest at: "${versionsFilePath}"`);
+
 
     console.log("\n--- Processing and copying application artifacts ---");
     for (const app of apps) {
@@ -91,5 +104,4 @@ async function prepareBuild() {
   }
 }
 
-// Run the function
 prepareBuild();
