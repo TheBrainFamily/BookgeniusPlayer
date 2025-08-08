@@ -148,6 +148,12 @@ export const useElementVisibility = () => {
         }
       }
 
+      // Check if tap is on a sentence element (ch#-p#-s# pattern)
+      const sentenceElement = target.closest("span[id^='ch']");
+      if (sentenceElement && /^ch\d+-p\d+-s\d+$/.test(sentenceElement.id)) {
+        return;
+      }
+
       // For touch events, prevent the subsequent click event
       if (event.type === "touchend") {
         preventClickRef.current = true;

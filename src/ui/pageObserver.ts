@@ -3,7 +3,6 @@ import { getBookData } from "@/genericBookDataGetters/getBookData";
 import { pageWasJustReloaded } from "@/utils/pageWasJustReloaded";
 import debounce from "lodash.debounce";
 
-const SHOULD_SHOW_EVERYONE = false;
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
 // Cache isPlayFormat at module level to avoid repeated getBookData() calls
@@ -16,6 +15,16 @@ function getIsPlayFormat(): boolean {
   }
   return cachedIsPlayFormat;
 }
+
+let isSplashAnimationComplete = false;
+
+window.addEventListener(
+  "splashHidden",
+  () => {
+    isSplashAnimationComplete = true;
+  },
+  { once: true },
+);
 
 // --- Development Zone Visualizers ---
 
@@ -123,56 +132,115 @@ function normalizeSrcForInlineAvatar(src: string): string {
 }
 
 /**
- * Creates and configures a video or image element based on the placeholder span's data.
+ * Updates video opacity based on talking state for inline avatars
+ */
+function updateVideoState(container: HTMLDivElement, isTalking: boolean) {
+  const listeningVideo = container.querySelector('video[data-state="listens"]') as HTMLVideoElement;
+  const speakingVideo = container.querySelector('video[data-state="speaks"]') as HTMLVideoElement;
+
+  if (listeningVideo) {
+    listeningVideo.style.opacity = isTalking ? "0" : "1";
+  }
+
+  if (speakingVideo) {
+    speakingVideo.style.opacity = isTalking ? "1" : "0";
+  }
+}
+
+/**
+ * Creates a media container element with CharacterMedia-like structure for inline avatars.
  */
 function createMediaElement(
   placeholder: HTMLSpanElement,
   openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
-): HTMLVideoElement | HTMLImageElement | null {
+  isPlayFormat: boolean,
+): HTMLDivElement | null {
   const characterSlug = placeholder.dataset.character;
   const isTalking = placeholder.dataset.isTalking === "true";
-  const talkingSrc = placeholder.dataset.srcTalking; // Can be video or image
+  const talkingSrc = placeholder.dataset.srcTalking;
+  const listeningSrc = placeholder.dataset.srcListening;
 
   if (!characterSlug) return null;
 
-  let element: HTMLVideoElement | HTMLImageElement | null = null;
-  let finalSrc: string | undefined = undefined;
+  // Create container element similar to CharacterMedia structure
+  const container = document.createElement("div");
+  container.classList.add("inline-avatar", "relative", "w-full", "h-full");
+  container.dataset.character = characterSlug;
+  container.title = characterSlug;
 
-  // For inline avatars, always use PNG format
-  if (isTalking && talkingSrc) {
-    finalSrc = normalizeSrcForInlineAvatar(talkingSrc);
-    // Always create image element for inline avatars
-    element = document.createElement("img");
-  }
+  // Create placeholder image (always shown as fallback)
+  const placeholderImg = document.createElement("img");
+  const placeholderSrc = (listeningSrc || talkingSrc || "").replace(/-(listens|speaks)\.(mp4|webm)$/, ".png");
+  placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
+  placeholderImg.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
+  placeholderImg.alt = characterSlug;
+  container.appendChild(placeholderImg);
 
-  // Configure and return the element
-  if (element && finalSrc) {
-    element.addEventListener("click", (e) => {
-      // If this is a command-click (metaKey on Mac, ctrlKey on Windows), ignore
-      if (e.metaKey || e.ctrlKey) {
-        return;
-      }
-      e.stopPropagation();
-      // Pass the original talkingSrc to the modal, not the normalized finalSrc
-      openCharacterDetailsModal(characterSlug, !!talkingSrc && talkingSrc.endsWith(".mp4"), talkingSrc);
-    });
-    element.src = finalSrc;
-    element.classList.add("inline-avatar");
+  if (isPlayFormat && listeningSrc && listeningSrc.endsWith(".mp4")) {
+    // Create listening video
+    const listeningVideo = document.createElement("video");
+    listeningVideo.src = listeningSrc;
+    listeningVideo.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
+    listeningVideo.autoplay = true;
+    listeningVideo.loop = true;
+    listeningVideo.muted = true;
+    listeningVideo.playsInline = true;
+    listeningVideo.dataset.state = "listens";
 
-    if (characterSlug) {
-      // Assign character data if slug available
-      element.dataset.character = characterSlug;
-      element.title = characterSlug;
+    // Initially show listening video
+    listeningVideo.style.opacity = isTalking ? "0" : "1";
+    container.appendChild(listeningVideo);
+
+    // Create speaking video if available
+    if (talkingSrc && talkingSrc.endsWith(".mp4")) {
+      const speakingVideo = document.createElement("video");
+      speakingVideo.src = talkingSrc;
+      speakingVideo.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
+      speakingVideo.autoplay = true;
+      speakingVideo.loop = true;
+      speakingVideo.muted = true;
+      speakingVideo.playsInline = true;
+      speakingVideo.dataset.state = "speaks";
+
+      // Show speaking video only when talking
+      speakingVideo.style.opacity = isTalking ? "1" : "0";
+      container.appendChild(speakingVideo);
+
+      // Store references for easy swapping
+      container.dataset.hasVideos = "true";
     }
 
-    // Add basic error handling for loading
-    element.onerror = () => console.error(`Failed to load media: ${element?.src}`);
-    return element;
+    // Handle video loading errors
+    listeningVideo.onerror = () => {
+      console.warn(`Failed to load listening video: ${listeningSrc}`);
+      listeningVideo.style.display = "none";
+    };
+
+    if (talkingSrc && talkingSrc.endsWith(".mp4")) {
+      const speakingVideo = container.querySelector('video[data-state="speaks"]') as HTMLVideoElement;
+      if (speakingVideo) {
+        speakingVideo.onerror = () => {
+          console.warn(`Failed to load speaking video: ${talkingSrc}`);
+          speakingVideo.style.display = "none";
+        };
+      }
+    }
   }
-  if (SHOULD_SHOW_EVERYONE) {
-    console.warn("Failed to create media element for placeholder:", placeholder); // Should not happen ideally
-  }
-  return null;
+
+  // Add click handler to container
+  container.addEventListener("click", (e) => {
+    if (e.metaKey || e.ctrlKey) {
+      return;
+    }
+    e.stopPropagation();
+
+    const currentIsTalking = placeholder.dataset.isTalking === "true";
+    const videoSrc = currentIsTalking ? talkingSrc : listeningSrc;
+
+    openCharacterDetailsModal(characterSlug, !!videoSrc && videoSrc.endsWith(".mp4"), videoSrc || "");
+  });
+
+  return container;
 }
 
 export function highlightCharacter(character: HTMLSpanElement, openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void) {
@@ -279,8 +347,11 @@ function activateMediaInRange(
   endChapter: number,
   endParagraph: number,
   openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
+  isPlayFormat: boolean,
 ) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
+
+  const bufferSize = isPlayFormat ? 6 : 10;
 
   allParagraphs.forEach((p) => {
     const chapterElement = p.closest("section[data-chapter]") as HTMLElement;
@@ -291,7 +362,7 @@ function activateMediaInRange(
       const currentChapter = parseInt(chapterStr, 10);
       const currentParagraph = parseInt(paragraphStr, 10);
 
-      const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - 10, endChapter, endParagraph + 10);
+      const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - bufferSize, endChapter, endParagraph + bufferSize);
 
       const placeholders = p.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
@@ -299,12 +370,12 @@ function activateMediaInRange(
       placeholders.forEach((placeholder) => {
         const mediaInjected = placeholder.dataset.mediaInjected === "true";
         // Query for either video or image with the class OR the dummy placeholder
-        let mediaElement = placeholder.querySelector<HTMLVideoElement | HTMLImageElement>("video.inline-avatar, img.inline-avatar");
+        let mediaElement = placeholder.querySelector<HTMLDivElement>("div.inline-avatar");
         const dummyPlaceholder = placeholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
         if (inView) {
           if (dummyPlaceholder) {
             // Found a dummy, replace it with actual media
-            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal);
+            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal, isPlayFormat);
             if (newMediaElement) {
               placeholder.replaceChild(newMediaElement, dummyPlaceholder);
               placeholder.dataset.mediaInjected = "true"; // Mark as injected
@@ -314,13 +385,16 @@ function activateMediaInRange(
               // and remains hidden while the dummy is shown. No action needed here.
 
               // Play video if applicable
-              if (mediaElement instanceof HTMLVideoElement) {
-                mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+              if (newMediaElement) {
+                const videos = newMediaElement.querySelectorAll("video");
+                videos.forEach((video) => {
+                  video.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+                });
               }
             }
           } else if (!mediaInjected) {
             // No dummy and no media injected yet, inject for the first time
-            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal);
+            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal, isPlayFormat);
             if (newMediaElement) {
               mediaElement = newMediaElement; // Update mediaElement reference
               // Hide original text content if it's a mention
@@ -336,13 +410,29 @@ function activateMediaInRange(
               placeholder.dataset.mediaInjected = "true"; // Mark as injected
 
               // Play video if applicable
-              if (mediaElement instanceof HTMLVideoElement) {
-                mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+              if (newMediaElement) {
+                const videos = newMediaElement.querySelectorAll("video");
+                videos.forEach((video) => {
+                  video.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+                });
               }
             }
-          } else if (mediaElement instanceof HTMLVideoElement && mediaElement.paused) {
-            // Media already injected, just play existing video if paused
-            mediaElement.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+          } else if (mediaElement) {
+            // Media already injected, update talking state and play videos if paused
+            const currentIsTalking = placeholder.dataset.isTalking === "true";
+
+            // Update video state based on current talking status
+            if (mediaElement.dataset.hasVideos === "true") {
+              updateVideoState(mediaElement, currentIsTalking);
+            }
+
+            // Check for videos and play if paused
+            const videos = mediaElement.querySelectorAll("video");
+            videos.forEach((video) => {
+              if (video.paused) {
+                video.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+              }
+            });
           }
         } else {
           // Out of view
@@ -754,9 +844,9 @@ export function setupPageObserver(
             if (allIntersectingParagraphs.length > 0) {
               const mediaStartInfo = allIntersectingParagraphs[0];
               const mediaEndInfo = allIntersectingParagraphs[allIntersectingParagraphs.length - 1];
-              activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, openCharacterDetailsModal);
+              activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, openCharacterDetailsModal, isPlayFormat);
             } else {
-              activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal);
+              activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal, isPlayFormat);
             }
           } else {
             console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {
@@ -864,6 +954,74 @@ export function setupPageObserver(
 
   // Initial observation
   const paragraphsToObserve = document.querySelectorAll("section[data-chapter] [data-index]");
+
+  const spacersToObserve = document.querySelectorAll(".transition-spacer");
+  const contentContainer = document.getElementById("content-container");
+  console.log("Observing these spacers:", spacersToObserve);
+
+  const spacerObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!isSplashAnimationComplete) return;
+        if (!contentContainer) return;
+
+        const rect = entry.boundingClientRect;
+
+        // Calculate how much of the spacer is visible
+        const visibleTop = Math.max(0, rect.top);
+        const visibleBottom = Math.min(window.innerHeight, rect.bottom);
+        const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+        const visibilityPercent = visibleHeight / rect.height;
+
+        // Determine if spacer is entering from bottom or leaving from top
+        if (entry.isIntersecting) {
+          // Spacer is at least partially visible
+          if (rect.top >= 0) {
+            // Spacer is entering from bottom or fully in view
+            if (visibilityPercent <= 0.5) {
+              // 0-50% visible: keep full opacity
+              contentContainer.style.opacity = "1";
+            } else if (visibilityPercent < 1) {
+              // 50-99% visible: fade from 1 to 0
+              const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
+
+              setCurrentLocation({
+                chapter: parseInt(nextChapterStart, 10),
+                paragraph: 0,
+                endChapter: parseInt(nextChapterStart, 10),
+                endParagraph: 0,
+                currentChapter: parseInt(nextChapterStart, 10),
+                currentParagraph: 0,
+              });
+
+              const fadePercent = (visibilityPercent - 0.5) * 2;
+              contentContainer.style.opacity = (1 - fadePercent).toString();
+            } else {
+              // 100% visible: full transparency
+              contentContainer.style.opacity = "0";
+            }
+          } else {
+            // Spacer is leaving from top (rect.top < 0)
+            if (visibilityPercent >= 0.6) {
+              // Still 50% or more visible: keep at 0
+              contentContainer.style.opacity = "0";
+            } else {
+              contentContainer.style.opacity = "1";
+            }
+          }
+        } else {
+          // Spacer is completely out of view
+          contentContainer.style.opacity = "1";
+        }
+      });
+    },
+    { threshold: Array.from(Array(101).keys()).map((i) => i / 100) },
+  );
+
+  spacersToObserve.forEach((spacer) => {
+    spacerObserver.observe(spacer);
+  });
+
   if (paragraphsToObserve.length === 0) {
     console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
     return null;
