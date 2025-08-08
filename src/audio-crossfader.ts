@@ -566,7 +566,8 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
     if (transitionPoints && cached.transitionPoints !== transitionPoints) {
       cached.transitionPoints = transitionPoints;
     }
-    return true; // No console.log needed here, it's a silent success.
+    console.log(`✅ Track '${trackId}' already loaded from cache (fully)`);
+    return true;
   }
 
   // If we have a buffer but it's not marked as fully loaded, it's a partial buffer.
@@ -1286,7 +1287,9 @@ export async function startFirstTrack(trackId: string): Promise<boolean> {
     return false;
   }
 
-  if (!tracks.has(trackId) || !tracks.get(trackId)!.audioBuffer) {
+  const isFullyLoaded = tracks.get(trackId)?.isFullyLoaded;
+
+  if (!isFullyLoaded && (!tracks.has(trackId) || !tracks.get(trackId)!.audioBuffer)) {
     console.log(`startFirstTrack: '${trackId}' not loaded. Attempting to load...`);
     const loaded = await loadTrack(trackId);
     if (!loaded) {
@@ -1353,7 +1356,8 @@ export async function transitionToTrack(targetId: string): Promise<boolean> {
     return true;
   }
 
-  if (!tracks.has(targetId) || !tracks.get(targetId)!.audioBuffer) {
+  const isFullyLoaded = tracks.get(targetId)?.isFullyLoaded;
+  if (!isFullyLoaded && (!tracks.has(targetId) || !tracks.get(targetId)!.audioBuffer)) {
     console.log(`transitionToTrack: Target track '${targetId}' not loaded. Attempting to load...`);
     const loaded = await loadTrack(targetId);
     if (!loaded) {
