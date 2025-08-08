@@ -47,8 +47,6 @@ export function usePlayCharacterSelect() {
     // Get ALL inline avatars in the entire chapter (not just current play row)
     const chapterInlineAvatars = document.querySelectorAll<HTMLDivElement>(`${currentChapterSelector} .play-row .inline-avatar`);
 
-    if (!chapterInlineAvatars) return;
-
     chapterInlineAvatars.forEach((container) => {
       const slug = container.dataset.character;
       if (!slug) return;
