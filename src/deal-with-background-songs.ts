@@ -29,7 +29,19 @@ export const preloadBackgroundTracks = async () => {
   const currentChapter = location.currentChapter;
   const chaptersToPreloadAhead = 2;
 
-  const chaptersToConsider = Array.from({ length: chaptersToPreloadAhead + 1 }, (_, i) => currentChapter + i);
+  // Create array of chapters to consider: 1 behind (if not first chapter), current, and 2 ahead
+  const chaptersToConsider = [];
+
+  // Add 1 chapter behind if not the first chapter
+  if (currentChapter > 1) {
+    chaptersToConsider.push(currentChapter - 1);
+  }
+
+  // Add current chapter and 2 ahead
+  for (let i = 0; i <= chaptersToPreloadAhead; i++) {
+    chaptersToConsider.push(currentChapter + i);
+  }
+
   console.log("Preloading tracks for chapters:", chaptersToConsider);
 
   const bookSongs = getBackgroundSongsForBook();
