@@ -218,6 +218,8 @@ const AudioPlayer = () => {
     const nextIndex = (currentIndex + 1) % currentTracks.length;
     const nextTrackId = currentTracks[nextIndex];
 
+    setCurrentTrackIdFromState(nextTrackId);
+
     await transitionToTrack(nextTrackId);
   };
 
@@ -232,6 +234,8 @@ const AudioPlayer = () => {
 
     const prevIndex = (currentIndex - 1 + currentTracks.length) % currentTracks.length;
     const prevTrackId = currentTracks[prevIndex];
+
+    setCurrentTrackIdFromState(prevTrackId);
 
     await transitionToTrack(prevTrackId);
   };
