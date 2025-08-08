@@ -1407,11 +1407,6 @@ section[data-chapter] [data-index] {
   transition: opacity 0.2s ease-in-out;
 }
 
-#book-container {
-  overflow-x: visible;
-  opacity: 0;
-}
-
 /* Default visible state for iOS (no transform to avoid crashes) */
 #book-container {
   overflow-x: visible;
