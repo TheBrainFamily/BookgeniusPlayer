@@ -1005,7 +1005,7 @@ function stopTrackInternal(trackId: string) {
     console.log(`Cleaned up 'trackFullyLoaded' listener for '${trackId}'.`);
   }
   // Revoke any created cover-art URL to avoid leaking Blob URLs
-  if (state.coverArtUrl && state.isFullyLoaded) {
+  if (state.coverArtUrl) {
     URL.revokeObjectURL(state.coverArtUrl);
     state.coverArtUrl = "";
   }
