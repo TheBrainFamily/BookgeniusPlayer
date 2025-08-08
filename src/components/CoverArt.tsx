@@ -29,7 +29,11 @@ export const CoverArt = ({ src }: CoverArtProps) => {
     }
 
     // If we are already showing the correct image, nothing to do.
-    if (src === displayedSrc) return;
+    if (src === displayedSrc) {
+      // clear possible stale error from a previous failed attempt
+      if (hasError) setHasError(false);
+      return;
+    }
 
     setHasError(false);
 
