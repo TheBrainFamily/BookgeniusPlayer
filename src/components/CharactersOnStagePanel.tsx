@@ -50,13 +50,10 @@ const CharactersOnStagePanel = () => {
                 >
                   <motion.div
                     className={cn("w-20 h-20 rounded-full border-2", isSpeaking ? "speaking" : "not-speaking")}
-                    animate={{
-                      borderColor: isSpeaking ? "rgba(255, 255, 255, 0.6)" : "rgba(255, 255, 255, 0.3)",
-                      boxShadow: isSpeaking ? "0 5px 15px -5px rgba(255, 255, 255, 0.6)" : "0 0 0 0 transparent",
-                    }}
+                    animate={{ borderColor: "rgba(255, 255, 255, 0.2)", boxShadow: "0 5px 10px -5px rgba(255, 255, 255, 0.2)" }}
                     transition={{ duration: 0.5, ease: "easeInOut", borderColor: { duration: 0.5 }, boxShadow: { duration: 0.5 } }}
                   >
-                    <CharacterCard entity={characterEntity} currentSpeakers={currentSpeakers} showTitle={false} showHighlight={false} />
+                    <CharacterCard entity={characterEntity} currentSpeakers={currentSpeakers} showTitle={false} showHighlight={false} imageOnly />
                   </motion.div>
                 </motion.div>
               );

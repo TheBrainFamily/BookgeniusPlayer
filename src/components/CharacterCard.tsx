@@ -10,9 +10,9 @@ import { useHighlight } from "@/hooks/useHighlight";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
-type CharacterCardProps = { entity: ParsedParagraphRange; currentSpeakers: string[]; showTitle?: boolean; showHighlight?: boolean };
+type CharacterCardProps = { entity: ParsedParagraphRange; currentSpeakers: string[]; showTitle?: boolean; showHighlight?: boolean; imageOnly?: boolean };
 
-const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, showTitle = true, showHighlight = true }) => {
+const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, showTitle = true, showHighlight = false, imageOnly = false }) => {
   const { openModal } = useCharacterModal();
   const { highlightParagraphs, isScrollingLocked } = useHighlight();
 
@@ -32,12 +32,15 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
   useEffect(() => {
     if (!cardRef.current) return;
 
-    if (isTalkingInCurrentRange) {
+    if (imageOnly) {
+      const imageSrc = entity.imageUrl || getListeningMediaFilePathForName(entity.slug, CURRENT_BOOK).replace(/-(listens|speaks)\.(mp4|webm)$/, ".png");
+      setCurrentMediaSrc(imageSrc);
+    } else if (isTalkingInCurrentRange) {
       setCurrentMediaSrc(getTalkingMediaFilePathForName(entity.slug, CURRENT_BOOK));
     } else {
       setCurrentMediaSrc(getListeningMediaFilePathForName(entity.slug, CURRENT_BOOK));
     }
-  }, [isTalkingInCurrentRange, entity.slug, entity.imageUrl]);
+  }, [isTalkingInCurrentRange, entity.slug, entity.imageUrl, imageOnly]);
 
   const requestToggle = useCallback(
     (enable: boolean) => {
@@ -61,7 +64,13 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
   }, []);
 
   const mediaSrc = currentMediaSrc || getListeningMediaFilePathForName(entity.slug, CURRENT_BOOK);
-  const isVideo = mediaSrc.endsWith(".mp4") || mediaSrc.endsWith(".webm");
+  const isVideo = imageOnly ? false : mediaSrc.endsWith(".mp4") || mediaSrc.endsWith(".webm");
+  const modalMediaSrc = imageOnly
+    ? isTalkingInCurrentRange
+      ? getTalkingMediaFilePathForName(entity.slug, CURRENT_BOOK)
+      : getListeningMediaFilePathForName(entity.slug, CURRENT_BOOK)
+    : mediaSrc;
+  const modalIsVideo = modalMediaSrc.endsWith(".mp4") || modalMediaSrc.endsWith(".webm");
 
   const commonAttrs = { "data-original-src": mediaSrc, "data-character-name": entity.slug, "data-summary": entity.summary ?? "", className: "w-full h-full object-cover" } as const;
 
@@ -85,7 +94,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
               : "transition-transform duration-300 ease-in-out hover:scale-110 hover:z-10"
             : "",
         )}
-        onClick={() => openModal(entity.slug, isVideo, mediaSrc)}
+        onClick={() => openModal(entity.slug, modalIsVideo, modalMediaSrc)}
       >
         <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />
       </div>
