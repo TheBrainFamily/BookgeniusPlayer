@@ -291,7 +291,11 @@ async function streamingDecodeAudioData(
       }
     } catch (e) {
       console.warn(`CodecParser or frame iteration failed for '${trackId}', falling back to full decode:`, e);
-      return await audioContext.decodeAudioData(arrayBuffer);
+      if (isFullBuffer) {
+        return await audioContext.decodeAudioData(arrayBuffer);
+      }
+      // Partial buffer – cannot decode, propagate null so caller keeps downloading
+      return null;
     }
 
     if (frames.length < 2) {
