@@ -314,19 +314,30 @@ export const xmlToComplexHtml = (
                   const nextElement = nextNode as Element;
                   if (nextElement.tagName === "p") {
                     // Check if this paragraph has a new talking character
-                    const spans = nextElement.getElementsByTagName("span");
                     let hasNewTalkingCharacter = false;
 
-                    for (let s = 0; s < spans.length; s++) {
-                      const span = spans[s];
-                      for (let c = 0; c < span.childNodes.length; c++) {
-                        const child = span.childNodes[c];
-                        if (child.nodeType === 1) {
-                          const childEl = child as Element;
-                          if (characterMap.has(childEl.tagName) && childEl.getAttribute("talking") === "true") {
-                            hasNewTalkingCharacter = true;
-                            break;
+                    const candidates = [
+                      ...Array.from(nextElement.getElementsByTagName("span")),
+                      ...(Array.from(nextElement.childNodes).filter((n) => n.nodeType === 1) as Element[]),
+                    ];
+
+                    for (const el of candidates) {
+                      if (el.tagName === "span") {
+                        // Check children of span elements
+                        for (let c = 0; c < el.childNodes.length; c++) {
+                          const child = el.childNodes[c];
+                          if (child.nodeType === 1) {
+                            const childEl = child as Element;
+                            if (characterMap.has(childEl.tagName) && childEl.getAttribute("talking") === "true") {
+                              hasNewTalkingCharacter = true;
+                              break;
+                            }
                           }
+                        }
+                      } else {
+                        // Check direct child elements
+                        if (characterMap.has(el.tagName) && el.getAttribute("talking") === "true") {
+                          hasNewTalkingCharacter = true;
                         }
                       }
                       if (hasNewTalkingCharacter) break;
