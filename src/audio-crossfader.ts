@@ -303,11 +303,6 @@ async function parseMetadataAndUpdate(audioData: Uint8Array | ArrayBuffer, curre
 
     if (common.picture?.[0]) {
       try {
-        // Revoke the old URL before creating a new one to prevent memory leaks
-        if (coverArtUrl) {
-          URL.revokeObjectURL(coverArtUrl);
-        }
-
         const pic = common.picture[0];
 
         // Validate picture data before creating blob
@@ -323,6 +318,12 @@ async function parseMetadataAndUpdate(audioData: Uint8Array | ArrayBuffer, curre
 
             // Test if the URL is actually usable by creating an Image element
             await validateImageUrl(newUrl);
+
+            // Only revoke the old URL after the new one has been successfully validated
+            if (coverArtUrl) {
+              URL.revokeObjectURL(coverArtUrl);
+            }
+
             coverArtUrl = newUrl;
           } else {
             console.warn(`Invalid image data detected for format: ${pic.format}`);
