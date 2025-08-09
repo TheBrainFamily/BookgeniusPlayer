@@ -2,7 +2,6 @@ import { getBookAssetBaseUrl } from "@/utils/assetUrls";
 import { getBackgrounds } from "./getBackgrounds";
 import debounce from "lodash.debounce";
 
-import { getBookAssetBaseUrl } from "@/utils/assetUrls";
 export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number };
 
 // ---- globals ----------------------------------------------------------------
@@ -80,124 +79,128 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
     const safetyMargin = 100; // ms
 
     /* ---------- main debounced handler ----------------------------------- */
-    debouncedHandler = debounce(async (currentLocation: { currentChapter: number; currentParagraph: number }) => {
-      const backgrounds = getBackgrounds() as Background[];
+    debouncedHandler = debounce(
+      async (currentLocation: { currentChapter: number; currentParagraph: number }) => {
+        const backgrounds = getBackgrounds() as Background[];
 
-      const foundAll = backgrounds.filter((bg) => {
-        return (currentLocation.currentChapter == bg.startChapter && currentLocation.currentParagraph >= bg.startParagraph) || currentLocation.currentChapter > bg.startChapter;
-      });
-
-      const found = foundAll[foundAll.length - 1];
-
-      /* ---- cancel zooms *before* any early-return --------------------- */
-
-      if (!found) {
-        cancelAllImageZoom(imageA, imageB);
-        return;
-      }
-      if (found.file === legacy.dataset.currentFile) {
-        return;
-      }
-      if (transitionState !== TransitionState.Idle) {
-        cancelAllImageZoom(imageA, imageB);
-        return;
-      }
-
-      /* ---------- PREPARING phase -------------------------------------- */
-      transitionState = TransitionState.Preparing;
-
-      const newFile = found.file;
-      const newType = getFileType(newFile); // "video" | "image"
-      if (newType === "unknown") {
-        console.error("Unknown file type:", newFile);
-        transitionState = TransitionState.Idle;
-        return;
-      }
-      const newSrc = `${getBookAssetBaseUrl()}/${newFile}`;
-
-      const curType = legacy.dataset.type as "video" | "image";
-      const curFrontId = legacy.dataset.front as "a" | "b";
-      const nextFrontId = curFrontId === "a" ? "b" : "a";
-
-      const el = { video: { a: videoA, b: videoB }, image: { a: imageA, b: imageB } };
-      const curFront = el[curType][curFrontId];
-      const curBack = el[curType][nextFrontId];
-      const nextBack = el[newType][nextFrontId];
-
-      /* ---------- load / prime incoming layer -------------------------- */
-      nextBack.style.transition = "none";
-      nextBack.classList.remove("faded", "zooming");
-      nextBack.style.zIndex = Z_INDEX_BACK;
-
-      let prep: Promise<void> = Promise.resolve();
-      if (newType === "video") {
-        const vid = nextBack as HTMLVideoElement;
-        vid.src = newSrc;
-        vid.load();
-        prep = vid
-          .play()
-          .then(() => new Promise<void>((ok) => vid.requestVideoFrameCallback(() => ok())))
-          .catch((e) => {
-            console.error("Video play/load error:", e);
-            throw e;
-          });
-      } else {
-        const img = nextBack as HTMLDivElement;
-        img.style.backgroundImage = `url('${newSrc}')`;
-        img.classList.add("zooming");
-      }
-
-      /* eslint-disable @typescript-eslint/no-unused-expressions */
-      nextBack.offsetHeight; // reflow
-      nextBack.style.transition = ""; // restore CSS
-      /* eslint-enable  @typescript-eslint/no-unused-expressions */
-
-      try {
-        await prep; // <-- asset ready
-        transitionState = TransitionState.Fading;
-
-        /* ---------- kick off the cross-fade --------------------------- */
-        nextBack.classList.remove("faded"); // now visible (back layer)
-
-        requestAnimationFrame(() => {
-          curFront.classList.add("faded");
+        const foundAll = backgrounds.filter((bg) => {
+          return (currentLocation.currentChapter == bg.startChapter && currentLocation.currentParagraph >= bg.startParagraph) || currentLocation.currentChapter > bg.startChapter;
         });
 
-        window.setTimeout(() => {
-          /* ------ fade complete -------------------------------------- */
-          if (curType === "video") (curFront as HTMLVideoElement).pause();
+        const found = foundAll[foundAll.length - 1];
 
-          nextBack.style.zIndex = Z_INDEX_FRONT;
-          curFront.style.zIndex = Z_INDEX_BACK;
-          if (curType !== newType) {
-            curBack.classList.add("faded");
-            curBack.style.zIndex = Z_INDEX_BACK;
-            if (curType === "video") (curBack as HTMLVideoElement).pause();
-          }
+        /* ---- cancel zooms *before* any early-return --------------------- */
 
-          legacy.dataset.front = nextFrontId;
-          legacy.dataset.type = newType;
-          legacy.dataset.currentFile = newFile;
-          if (curType === "image") curFront.classList.remove("zooming");
+        if (!found) {
+          cancelAllImageZoom(imageA, imageB);
+          return;
+        }
+        if (found.file === legacy.dataset.currentFile) {
+          return;
+        }
+        if (transitionState !== TransitionState.Idle) {
+          cancelAllImageZoom(imageA, imageB);
+          return;
+        }
+
+        /* ---------- PREPARING phase -------------------------------------- */
+        transitionState = TransitionState.Preparing;
+
+        const newFile = found.file;
+        const newType = getFileType(newFile); // "video" | "image"
+        if (newType === "unknown") {
+          console.error("Unknown file type:", newFile);
+          transitionState = TransitionState.Idle;
+          return;
+        }
+        const newSrc = `${getBookAssetBaseUrl()}/${newFile}`;
+
+        const curType = legacy.dataset.type as "video" | "image";
+        const curFrontId = legacy.dataset.front as "a" | "b";
+        const nextFrontId = curFrontId === "a" ? "b" : "a";
+
+        const el = { video: { a: videoA, b: videoB }, image: { a: imageA, b: imageB } };
+        const curFront = el[curType][curFrontId];
+        const curBack = el[curType][nextFrontId];
+        const nextBack = el[newType][nextFrontId];
+
+        /* ---------- load / prime incoming layer -------------------------- */
+        nextBack.style.transition = "none";
+        nextBack.classList.remove("faded", "zooming");
+        nextBack.style.zIndex = Z_INDEX_BACK;
+
+        let prep: Promise<void> = Promise.resolve();
+        if (newType === "video") {
+          const vid = nextBack as HTMLVideoElement;
+          vid.src = newSrc;
+          vid.load();
+          prep = vid
+            .play()
+            .then(() => new Promise<void>((ok) => vid.requestVideoFrameCallback(() => ok())))
+            .catch((e) => {
+              console.error("Video play/load error:", e);
+              throw e;
+            });
+        } else {
+          const img = nextBack as HTMLDivElement;
+          img.style.backgroundImage = `url('${newSrc}')`;
+          img.classList.add("zooming");
+        }
+
+        /* eslint-disable @typescript-eslint/no-unused-expressions */
+        nextBack.offsetHeight; // reflow
+        nextBack.style.transition = ""; // restore CSS
+        /* eslint-enable  @typescript-eslint/no-unused-expressions */
+
+        try {
+          await prep; // <-- asset ready
+          transitionState = TransitionState.Fading;
+
+          /* ---------- kick off the cross-fade --------------------------- */
+          nextBack.classList.remove("faded"); // now visible (back layer)
+
+          requestAnimationFrame(() => {
+            curFront.classList.add("faded");
+          });
+
+          window.setTimeout(() => {
+            /* ------ fade complete -------------------------------------- */
+            if (curType === "video") (curFront as HTMLVideoElement).pause();
+
+            nextBack.style.zIndex = Z_INDEX_FRONT;
+            curFront.style.zIndex = Z_INDEX_BACK;
+            if (curType !== newType) {
+              curBack.classList.add("faded");
+              curBack.style.zIndex = Z_INDEX_BACK;
+              if (curType === "video") (curBack as HTMLVideoElement).pause();
+            }
+
+            legacy.dataset.front = nextFrontId;
+            legacy.dataset.type = newType;
+            legacy.dataset.currentFile = newFile;
+            if (curType === "image") curFront.classList.remove("zooming");
+
+            transitionState = TransitionState.Idle;
+          }, fadeMs + safetyMargin);
+        } catch (err) {
+          /* ---------- prep failed → roll back --------------------------- */
+          console.error("Background preparation failed:", err);
+
+          curFront.classList.remove("faded");
+          curFront.style.zIndex = Z_INDEX_FRONT;
+          if (curType === "image") curFront.classList.add("zooming");
+
+          nextBack.classList.add("faded");
+          nextBack.style.zIndex = Z_INDEX_BACK;
+          if (newType === "video") (nextBack as HTMLVideoElement).pause();
+          if (newType === "image") (nextBack as HTMLDivElement).style.backgroundImage = "none";
 
           transitionState = TransitionState.Idle;
-        }, fadeMs + safetyMargin);
-      } catch (err) {
-        /* ---------- prep failed → roll back --------------------------- */
-        console.error("Background preparation failed:", err);
-
-        curFront.classList.remove("faded");
-        curFront.style.zIndex = Z_INDEX_FRONT;
-        if (curType === "image") curFront.classList.add("zooming");
-
-        nextBack.classList.add("faded");
-        nextBack.style.zIndex = Z_INDEX_BACK;
-        if (newType === "video") (nextBack as HTMLVideoElement).pause();
-        if (newType === "image") (nextBack as HTMLDivElement).style.backgroundImage = "none";
-
-        transitionState = TransitionState.Idle;
-      }
-    }, 150); // debounce
+        }
+      },
+      150,
+      { leading: true, trailing: true, maxWait: 150 },
+    ); // debounce
   }
 
   /* ---------- invoke the handler ----------------------------------------- */

@@ -17,6 +17,9 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
   const elementRef = useRef<HTMLDivElement>(null);
   const previousVisibilityRef = useRef<boolean>(shouldBeVisible);
 
+  // Local state for hover visibility
+  const [isHovered, setIsHovered] = React.useState(false);
+
   // Determine if element should be visible
   // Optional elements should only be visible when explicitly shown, NOT during scroll mode
 
@@ -40,18 +43,32 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
     }
 
     element.style.opacity = shouldBeVisible ? "1" : "0";
-    element.style.pointerEvents = shouldBeVisible ? "auto" : "none";
+    // Always allow pointer events so hover functionality works even when element is invisible
+    element.style.pointerEvents = "auto";
 
     previousVisibilityRef.current = shouldBeVisible;
   }, [shouldBeVisible, lastHideReason]);
 
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    pauseAllTimers();
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    startAllTimers();
+  };
+
+  // Element is visible if it should be visible globally OR if it's being hovered over
+  const isElementVisible = shouldBeVisible || isHovered;
+
   return (
     <div
-      onMouseEnter={() => pauseAllTimers()}
-      onMouseLeave={() => startAllTimers()}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       ref={elementRef}
       className={cn("transition-opacity", className)}
-      style={{ opacity: shouldBeVisible ? 1 : 0, pointerEvents: shouldBeVisible ? "auto" : "none" }}
+      style={{ opacity: isElementVisible ? 1 : 0, pointerEvents: "auto" }}
       {...props}
     >
       {children}

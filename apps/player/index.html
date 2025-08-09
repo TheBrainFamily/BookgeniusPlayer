@@ -1,6 +1,6 @@
 <!doctype html>
 
-<html lang="<%- lang %>">
+<html lang="<%= lang %>">
   <head>
     <meta charset="UTF-8" />
     <title>BookGenius - <%= title %></title>
@@ -34,6 +34,17 @@
 
       body {
         background-color: #2d2d2d;
+      }
+
+      html {
+        font-size: calc(16px * var(--font-size-multiplier, 1));
+        transition: font-size 0.2s ease-in-out;
+      }
+
+      @media (max-width: 768px) {
+        html {
+          font-size: calc(14px * var(--font-size-multiplier, 1));
+        }
       }
 
       #splash-screen {
@@ -87,12 +98,19 @@
 
       <p id="cutscene-text"></p>
 
-      <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 sm:pr-0 xl:px-4 sm:pl-4 max-w-[120rem] w-full">
-        <div id="left-notes" class="hidden sm:block sm:flex-1 max-w-[700px] content-center overflow-y-auto"></div>
-        <div id="content-container" class="sm:flex-3 max-w-[900px]"></div>
-        <div id="right-notes" class="hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none">
-          <div id="right-notes-scrollable-container"></div>
-        </div>
+        <% if (bookForm === 'play') { %>
+          <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto max-w-[120rem] w-full">
+            <div id="content-container"></div>
+          </div>
+        <% } else { %>
+          <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 sm:pr-0 xl:px-4 sm:pl-4 max-w-[120rem] w-full">
+            <div id="left-notes" class="hidden sm:block sm:flex-1 max-w-[700px] content-center overflow-y-auto"></div>
+            <div id="content-container" class="sm:flex-3 max-w-[900px]"></div>
+            <div id="right-notes" class="hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none">
+              <div id="right-notes-scrollable-container"></div>
+            </div>
+          </div>
+        <% } %>
       </div>
     </div>
 
@@ -206,6 +224,7 @@
 
         displayStartButton() {
           const startButton = document.getElementById("start-button");
+          console.log("PINGWING: start-button ready at: performance.now()", performance.now());
           if (startButton) {
             startButton.classList.remove("disabled");
             startButton.classList.add("visible");
@@ -247,6 +266,7 @@
         }
 
         async handleStartClick() {
+          console.log("PINGWING: start-button clicked at: performance.now()", performance.now());
           if (this.isExiting) return;
           this.isExiting = true;
           try {

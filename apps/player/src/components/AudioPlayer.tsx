@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { OptionalElement } from "./OptionalElement";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
 import { CoverArt } from "./CoverArt";
+import { useOptionalElementVisibility } from "@/stores/elementVisibility.store";
 
 const AudioPlayer = () => {
   const { t } = useTranslation();
@@ -47,6 +48,13 @@ const AudioPlayer = () => {
   const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
   const [playlistTracks, setPlaylistTracks] = useState<{ id: string; title: string; duration: number }[]>([]);
   const [currentTrackIdFromState, setCurrentTrackIdFromState] = useState<string | null>(null);
+  const areElementsVisible = useOptionalElementVisibility();
+
+  useEffect(() => {
+    if (!areElementsVisible) {
+      setIsBigPlayerOpen(false);
+    }
+  }, [areElementsVisible]);
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -210,6 +218,8 @@ const AudioPlayer = () => {
     const nextIndex = (currentIndex + 1) % currentTracks.length;
     const nextTrackId = currentTracks[nextIndex];
 
+    setCurrentTrackIdFromState(nextTrackId);
+
     await transitionToTrack(nextTrackId);
   };
 
@@ -224,6 +234,8 @@ const AudioPlayer = () => {
 
     const prevIndex = (currentIndex - 1 + currentTracks.length) % currentTracks.length;
     const prevTrackId = currentTracks[prevIndex];
+
+    setCurrentTrackIdFromState(prevTrackId);
 
     await transitionToTrack(prevTrackId);
   };
@@ -515,8 +527,8 @@ const AudioPlayer = () => {
       <AnimatePresence>
         {showSongNotification && currentTrackData && windowWidth && (
           <motion.div
-            className={cn(windowWidth >= 1024 && "absolute w-80 top-5 right-5", windowWidth < 1024 && "fixed w-70 bottom-16 right-3", windowWidth < 640 && "w-60 right-2")}
-            variants={windowWidth < 1024 ? variants.songNotificationRight : variants.songNotificationTop}
+            className={cn("song-notification fixed z-50 top-5", windowWidth >= 768 ? "right-5 w-80" : "right-3 w-70", windowWidth < 640 && "right-2 w-60")}
+            variants={variants.songNotificationTop}
             initial="initial"
             animate="animate"
             exit="exit"

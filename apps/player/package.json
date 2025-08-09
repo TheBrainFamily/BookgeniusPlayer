@@ -8,6 +8,7 @@
   "main": "index.js",
   "scripts": {
     "start": "pnpm process-all-books && node scripts/setEnv.js --env development vite dev",
+    "dev": "pnpm start",
     "build": "tsx ./scripts/build.ts",
     "generate-book": "tsx ./scripts/generateBook.ts",
     "process-all-books": "tsx ./scripts/processAllBooks.ts",
@@ -47,6 +48,7 @@
     "chokidar": "^4.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "codec-parser": "^2.5.0",
     "cors": "^2.8.5",
     "diff-match-patch": "^1.0.5",
     "dotenv": "^16.5.0",
@@ -56,6 +58,7 @@
     "i18next-http-backend": "^3.0.2",
     "inquirer": "^12.6.1",
     "jsdom": "^26.1.0",
+    "lodash": "^4.17.21",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.479.0",
     "motion": "^12.10.5",
@@ -68,7 +71,6 @@
     "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.3.0",
     "use-local-storage-state": "^19.5.0",
-    "xml2js": "^0.6.2",
     "xmldom": "^0.6.0",
     "zustand": "^5.0.5"
   },

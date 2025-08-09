@@ -8,6 +8,7 @@ import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags
 import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
 import { useEditorMode } from "@/hooks/useEditorMode";
 import { useBookData } from "@/context/BookDataContext";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
 
 const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
@@ -19,22 +20,54 @@ if (import.meta.hot) {
 }
 
 const isEditorMode = import.meta.env.VITE_EDITOR === "true";
+
 export function useBookContent(containerId: string) {
   const container = document.getElementById(containerId);
   const { textVersion } = useBookData();
   const bookStringified = getBookStringified();
+  const {
+    metadata: { bookForm },
+  } = getBookData();
 
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
   const { openModal: openSentenceModal } = useSentenceModal();
+
   useEditorMode(isEditorMode ? container : null);
 
   useEffect(() => {
     if (container) {
-      container.innerHTML = bookStringified.replace(/<\/section>(?!.*<\/section>)/s, '<div style="height: 50vh;"></div></section>');
+      // <<<<<<< HEAD
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(bookStringified, "text/html");
+      const chapterSections = Array.from(doc.querySelectorAll(".play-container section[data-chapter]"));
+
+      // Add spacers between chapters
+      chapterSections.slice(0, -1).forEach((section) => {
+        const chapterNumber = section.getAttribute("data-chapter");
+        if (chapterNumber) {
+          console.log(`chapterNumber: ${chapterNumber}`);
+          const spacer = doc.createElement("div");
+          spacer.className = "transition-spacer";
+          spacer.setAttribute("data-chapter-end", chapterNumber);
+          spacer.setAttribute("data-next-chapter-start", (parseInt(chapterNumber, 10) + 1).toString());
+          spacer.style.height = "100vh";
+          section.after(spacer);
+        }
+      });
+
+      // Add padding to the end of the last chapter to ensure it can be scrolled fully into view
+      if (chapterSections.length > 0) {
+        const lastChapter = chapterSections[chapterSections.length - 1];
+        const finalPadding = doc.createElement("div");
+        finalPadding.style.height = "50vh";
+        lastChapter.appendChild(finalPadding);
+      }
+
+      container.innerHTML = doc.body.innerHTML;
       const observerSetup = setupPageObserver(openCharacterDetailsModal);
 
       // Give the browser a moment to render the injected HTML
-      const handleClick = (event) => {
+      const handleClick = (event: MouseEvent) => {
         if (event.metaKey || event.ctrlKey) {
           return;
         }
@@ -52,7 +85,12 @@ export function useBookContent(containerId: string) {
         const span = target.closest("span[id^='ch']");
 
         if (span) {
-          const isCharacterPlaceholder = span.children.length === 2 && span.children[0].classList.contains("character-placeholder") && span.children[1].tagName === "STRONG";
+          let isCharacterPlaceholder = false;
+          if (bookForm === "play") {
+            isCharacterPlaceholder = span.children.length === 1 && span.children[0].tagName === "STRONG";
+          } else {
+            isCharacterPlaceholder = span.children.length === 2 && span.children[0].classList.contains("character-placeholder") && span.children[1].tagName === "STRONG";
+          }
 
           if (isCharacterPlaceholder) return;
 
