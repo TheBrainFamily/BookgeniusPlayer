@@ -279,6 +279,28 @@
   cursor: pointer;
 }
 
+/* Checkbox styles */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 16px;
+  user-select: none;
+}
+
+.checkbox-container input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #007acc;
+}
+
+.checkbox-container label {
+  cursor: pointer;
+  font-size: 14px;
+  color: #e0e0e0;
+}
+
 .highlight-decoration {
   background-color: rgba(255, 255, 0, 0.3);
   padding: 2px 6px;

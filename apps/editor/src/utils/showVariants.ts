@@ -1,4 +1,5 @@
 import * as monaco from "monaco-editor";
+import { useAppStore } from "../stores/appStore";
 
 export const setupSpanClickDetection = (
   editor: monaco.editor.IStandaloneCodeEditor
@@ -66,6 +67,9 @@ export const setupSpanClickDetection = (
 
   // Handle cursor position changes (clicks, keyboard navigation, etc.)
   const cursorPositionDisposable = editor.onDidChangeCursorPosition((e) => {
+    // Check if showVariants is enabled
+    if (!useAppStore.getState().showVariants) return;
+    
     const position = e.position;
     const spanId = findSpanAtPosition(position);
     
@@ -77,6 +81,9 @@ export const setupSpanClickDetection = (
 
   // Handle mouse clicks specifically
   const mouseDownDisposable = editor.onMouseDown((e) => {
+    // Check if showVariants is enabled
+    if (!useAppStore.getState().showVariants) return;
+    
     if (e.target.position) {
       const spanId = findSpanAtPosition(e.target.position);
       if (spanId) {

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useBooksStore } from "../stores/booksStore.ts";
+import { useAppStore } from "../stores/appStore.ts";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
 import { setupCharacterContextMenu, setupVariants } from "../utils/editorActions.ts";
@@ -10,6 +11,7 @@ import { useBookSave } from "../hooks/useBookSave.ts";
 export const BookEditor = () => {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const { currentFile, currentChapterContent, setCurrentChapterContent, variants } = useBooksStore();
+  const { showVariants, setShowVariants } = useAppStore();
   const variantsCleanupRef = useRef<(() => void) | null>(null);
 
   // Custom hooks
@@ -55,7 +57,7 @@ export const BookEditor = () => {
         variantsCleanupRef.current = null;
       }
     };
-  }, [currentChapterContent]);
+  }, [currentChapterContent, showVariants]); // Re-run when showVariants changes
 
   const handleEditorDidMount: OnMount = (editor) => {
     editorRef.current = editor;
@@ -73,6 +75,10 @@ export const BookEditor = () => {
     <div className="editor-container">
       <div className="editor-header">
         <h2>{currentFile}</h2>
+        <div className="checkbox-container">
+          <input type="checkbox" id="show-variants" checked={showVariants} onChange={(e) => setShowVariants(e.target.checked)} />
+          <label htmlFor="show-variants">Show Variants On Click</label>
+        </div>
         <button className="editor-save-button" onClick={handleSave}>
           Save
         </button>
