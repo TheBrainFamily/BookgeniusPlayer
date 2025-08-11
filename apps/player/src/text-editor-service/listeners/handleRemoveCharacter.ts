@@ -1,4 +1,4 @@
-export const handleRemoveCharacter = async (target: HTMLElement, chapterNumber: number, paragraphNumber: number, characterName: string) => {
+export const handleRemoveCharacter = async (target: HTMLElement, chapterNumber: number, paragraphNumber: number, characterName: string, bookName: string) => {
   const paragraph = target.closest("p");
 
   if (paragraph && characterName) {
@@ -10,7 +10,7 @@ export const handleRemoveCharacter = async (target: HTMLElement, chapterNumber: 
     await fetch(`http://localhost:3000/api/text-editor/remove-character`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chapterNumber, paragraphNumber, characterName, occurrenceNumber: currentIndex + 1 }),
+      body: JSON.stringify({ chapterNumber, paragraphNumber, characterName, occurrenceNumber: currentIndex + 1, bookName }),
     });
   }
 };

@@ -9,10 +9,18 @@ interface SSEClient {
   response: Response;
 }
 
+interface ParagraphSelection {
+  bookName: string;
+  chapterId: number;
+  paragraphId: number;
+  timestamp: number;
+}
+
 class BookWatcherService {
   private clients: Map<string, SSEClient> = new Map();
   private watchers: Map<string, chokidar.FSWatcher> = new Map();
   private processingBooks: Set<string> = new Set();
+  private lastParagraphSelection: ParagraphSelection | null = null;
 
   constructor() {
     // Cleanup on exit
@@ -36,6 +44,18 @@ class BookWatcherService {
     }
 
     console.log(`[SSE] Client ${clientId} connected for book: ${book}`);
+
+    // Send last paragraph selection if available and matching book
+    if (this.lastParagraphSelection && this.lastParagraphSelection.bookName === book) {
+      try {
+        const message = `data: ${JSON.stringify({ type: "paragraph-selected", ...this.lastParagraphSelection })}\n\n`;
+        response.write(message);
+        console.log(`[SSE] Sent last paragraph selection to client ${clientId}`);
+      } catch (error) {
+        console.error(`[SSE] Failed to send last paragraph selection to client ${clientId}:`, error);
+        this.removeClient(clientId);
+      }
+    }
   }
 
   removeClient(clientId: string): void {
@@ -53,18 +73,56 @@ class BookWatcherService {
   }
 
   private startWatching(book: string): void {
-    const bookPath = path.join(process.cwd(), "public_books", book, "book.xml");
-    console.log(`[File Watcher] Starting to watch: ${bookPath}`);
+    const booksContentPath = path.join(process.cwd(), "public_books", book, "booksContent");
+    const getAllVariantsPath = path.join(process.cwd(), "public_books", book, "getAllVariants.ts");
 
-    const watcher = chokidar.watch(bookPath, { persistent: true, ignoreInitial: true, awaitWriteFinish: { stabilityThreshold: 1000, pollInterval: 100 } });
+    console.log(`[File Watcher] Starting to watch: ${booksContentPath} and ${getAllVariantsPath}`);
 
-    watcher.on("change", () => {
-      console.log(`[File Watcher] Detected change in ${book}/book.xml`);
-      this.handleBookChange(book);
+    // Check if directory exists before watching
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const fs = require("fs");
+      if (!fs.existsSync(booksContentPath)) {
+        console.error(`[File Watcher] booksContent directory does not exist: ${booksContentPath}`);
+        return;
+      }
+    } catch (error) {
+      console.error(`[File Watcher] Error checking directory existence: ${booksContentPath}`, error);
+      return;
+    }
+
+    // Watch both booksContent directory and getAllVariants.ts file
+    const watcher = chokidar.watch([booksContentPath, getAllVariantsPath], {
+      persistent: true,
+      ignoreInitial: true,
+      awaitWriteFinish: { stabilityThreshold: 1000, pollInterval: 100 },
+      // Add more robust options
+      usePolling: false,
+      atomic: true,
+    });
+
+    watcher.on("change", async (changedPath) => {
+      console.log(`[File Watcher] Detected change in ${changedPath}`);
+      await this.handleBookChange(book);
+    });
+
+    watcher.on("add", async (addedPath) => {
+      console.log(`[File Watcher] Detected new file: ${addedPath}`);
+      await this.handleBookChange(book);
+    });
+
+    watcher.on("unlink", async (removedPath) => {
+      console.log(`[File Watcher] Detected file removal: ${removedPath}`);
+      await this.handleBookChange(book);
     });
 
     watcher.on("error", (error) => {
       console.error(`[File Watcher] Error watching ${book}:`, error);
+      // Don't crash the watcher on error, just log it
+    });
+
+    watcher.on("ready", () => {
+      console.log(`[File Watcher] Ready to watch: ${booksContentPath} and getAllVariants.ts`);
     });
 
     this.watchers.set(book, watcher);
@@ -133,6 +191,26 @@ class BookWatcherService {
     });
 
     console.log(`[SSE] Sent event to ${clients.length} clients for book ${book}:`, data.type);
+  }
+
+  broadcastParagraphSelection(selection: ParagraphSelection): void {
+    // Store the last selection
+    this.lastParagraphSelection = selection;
+
+    // Send to all clients connected to this book
+    const clients = Array.from(this.clients.values()).filter((c) => c.book === selection.bookName);
+    const message = `data: ${JSON.stringify({ type: "paragraph-selected", ...selection })}\n\n`;
+
+    clients.forEach((client) => {
+      try {
+        client.response.write(message);
+      } catch (error) {
+        console.error(`[SSE] Failed to send paragraph selection to client ${client.id}:`, error);
+        this.removeClient(client.id);
+      }
+    });
+
+    console.log(`[SSE] Broadcast paragraph selection to ${clients.length} clients for book ${selection.bookName}`);
   }
 
   private cleanup(): void {

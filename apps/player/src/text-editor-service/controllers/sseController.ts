@@ -2,6 +2,19 @@ import { Request, Response } from "express";
 import { bookWatcherService } from "../services/bookWatcherService";
 
 export class SSEController {
+  selectParagraph = (req: Request, res: Response): void => {
+    const { bookName, chapterId, paragraphId } = req.body;
+
+    if (!bookName || !chapterId || paragraphId == null) {
+      res.status(400).json({ error: "bookName, chapterId, and paragraphId are required" });
+      return;
+    }
+
+    bookWatcherService.broadcastParagraphSelection({ bookName, chapterId, paragraphId, timestamp: Date.now() });
+
+    res.json({ success: true });
+  };
+
   bookUpdates = (req: Request, res: Response): void => {
     // Get book from query parameter
     const book = req.query.book as string;
@@ -38,7 +51,9 @@ export class SSEController {
     const pingInterval = setInterval(() => {
       try {
         res.write(":ping\n\n");
-      } catch {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        console.log(`[SSE] Ping failed for client ${clientId}, cleaning up`);
         clearInterval(pingInterval);
         bookWatcherService.removeClient(clientId);
       }
@@ -46,7 +61,15 @@ export class SSEController {
 
     // Clean up ping interval on disconnect
     req.on("close", () => {
+      console.log(`[SSE] Client ${clientId} connection closed`);
       clearInterval(pingInterval);
+    });
+
+    // Handle connection errors
+    req.on("error", (error) => {
+      console.error(`[SSE] Connection error for client ${clientId}:`, error);
+      clearInterval(pingInterval);
+      bookWatcherService.removeClient(clientId);
     });
   };
 }

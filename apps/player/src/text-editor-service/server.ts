@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { errorHandler } from "./middleware/errorHandler";
 import { notFoundHandler } from "./middleware/notFoundHandler";
 import textEditorRoutes from "./routes/textEditorRoutes";
+import booksRoutes from "@/text-editor-service/routes/booksRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -18,6 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/text-editor", textEditorRoutes);
+
+app.use("/api/books", booksRoutes);
 
 // Basic health check route
 app.get("/health", (req: Request, res: Response) => {

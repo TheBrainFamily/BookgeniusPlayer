@@ -71,6 +71,7 @@
     "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.3.0",
     "use-local-storage-state": "^19.5.0",
+    "xml2js": "^0.6.2",
     "xmldom": "^0.6.0",
     "zustand": "^5.0.5"
   },
