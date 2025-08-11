@@ -88,6 +88,8 @@ export const setupSpanClickDetection = (
       const spanId = findSpanAtPosition(e.target.position);
       if (spanId) {
         console.log(`Clicked on span with ID: ${spanId}`);
+        // Set the selected span ID in the app store
+        useAppStore.getState().setSelectedSpanId(spanId);
       }
     }
   });

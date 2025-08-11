@@ -301,6 +301,93 @@
   color: #e0e0e0;
 }
 
+/* Variant Sidebar styles */
+.variant-sidebar {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 400px;
+  height: 100vh;
+  background-color: #2d2d2d;
+  border-left: 1px solid #1e1e1e;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.variant-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #3e3e3e;
+  background-color: #252525;
+}
+
+.variant-sidebar-header h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.variant-sidebar-close {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.variant-sidebar-close:hover {
+  background-color: #3e3e3e;
+  color: #ffffff;
+}
+
+.variant-sidebar-content {
+  padding: 20px;
+  color: #e0e0e0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.variant-sidebar-content p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.variant-sidebar-content code {
+  display: block;
+  padding: 12px;
+  background-color: #1e1e1e;
+  border: 1px solid #3e3e3e;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  color: #007acc;
+  word-break: break-all;
+}
+
 .highlight-decoration {
   background-color: rgba(255, 255, 0, 0.3);
   padding: 2px 6px;

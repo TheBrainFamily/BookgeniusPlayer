@@ -3,6 +3,7 @@ import { Sidebar } from "./components/Sidebar.tsx";
 import { useEffect } from "react";
 import { useBooksStore } from "./stores/booksStore.ts";
 import { BookEditor } from "./components/BookEditor.tsx";
+import { VariantSidebar } from "./components/VariantSidebar.tsx";
 import { getCurrentChapterFromUrl } from "./utils/getCurrentChapterFromUrl.ts";
 import { SSEProvider, useSSE } from "./contexts/SSEContext.tsx";
 import { fetchBooks, fetchBookData } from "./api/bookApi.ts";
@@ -87,6 +88,7 @@ const AppContent = () => {
     <div className="app-container">
       <Sidebar />
       <BookEditor />
+      <VariantSidebar />
     </div>
   );
 };
