@@ -25,7 +25,7 @@ const CharacterNotesPanel = () => {
 
   const currentSpeakers = useCurrentSpeakers(location, allCharacters, isPlayFormat);
 
-  if (!target || !isSplashHidden) return null;
+  if (isPlayFormat || !target || !isSplashHidden) return null;
 
   return createPortal(
     <AnimatePresence>

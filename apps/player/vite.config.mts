@@ -17,7 +17,7 @@ export default defineConfig(async () => {
   console.log("config", config);
   // For now, hardcode default values for the HTML template
   // Later this can be made dynamic when generating book-specific HTML files
-  const defaultBookConfig = { title: "BookGenius", author: "Books reimagined", language: "english", slug: "Romeo-And-Juliet-Small", bookForm: "play" };
+  const defaultBookConfig = { title: "BookGenius", author: "Books reimagined", language: "en", slug: "Romeo-And-Juliet-Small", bookForm: "play" };
 
   const getSplashScreenTexts = (bookLang: string, bookSlug: string) => {
     const langCodeMap: { [key: string]: string } = { polish: "pl", english: "en" };

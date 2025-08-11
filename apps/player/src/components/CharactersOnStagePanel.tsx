@@ -29,7 +29,7 @@ const CharactersOnStagePanel = () => {
                 characterName: character.characterName,
                 label: character.characterName,
                 summary: "",
-                imageUrl: character.imageUrl,
+                imageUrl: "",
                 chapterNumber: location.currentChapter,
                 paragraphNumber: location.currentParagraph,
                 isTalkingInFirstParagraph: isSpeaking,
