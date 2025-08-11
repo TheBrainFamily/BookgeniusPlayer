@@ -6,8 +6,8 @@ export const setupSpanClickDetection = (
 ): (() => void) => {
   const disposables: monaco.IDisposable[] = [];
 
-  // Helper function to find span element at position
-  const findSpanAtPosition = (position: monaco.Position): string | null => {
+  // Helper function to find span element at position and extract its content
+  const findSpanAtPosition = (position: monaco.Position): { id: string; text: string } | null => {
     const model = editor.getModel();
     if (!model) return null;
 
@@ -25,7 +25,7 @@ export const setupSpanClickDetection = (
       
       // Check if click position is within the span content
       if (offset >= spanContentStart && offset < spanContentEnd) {
-        return match[1]; // Return the ID
+        return { id: match[1], text: match[2] }; // Return both ID and text content
       }
     }
 
@@ -33,6 +33,7 @@ export const setupSpanClickDetection = (
     // This handles cases where there might be nested tags or more complex content
     let inSpan = false;
     let currentSpanId: string | null = null;
+    let spanStartPos = -1;
     let depth = 0;
     
     // Parse from beginning of line to cursor position
@@ -46,6 +47,7 @@ export const setupSpanClickDetection = (
           if (idMatch) {
             currentSpanId = idMatch[1];
             inSpan = true;
+            spanStartPos = closeTagIndex + 1;
             depth++;
           }
           i = closeTagIndex;
@@ -53,6 +55,11 @@ export const setupSpanClickDetection = (
       }
       // Check for span closing tag
       else if (line.substring(i).startsWith('</span>')) {
+        if (inSpan && currentSpanId && depth === 1) {
+          // Extract the text content between span tags
+          const spanText = line.substring(spanStartPos, i);
+          return { id: currentSpanId, text: spanText.replace(/<[^>]*>/g, '') }; // Strip any nested tags
+        }
         depth--;
         if (depth === 0) {
           inSpan = false;
@@ -62,7 +69,7 @@ export const setupSpanClickDetection = (
       }
     }
 
-    return inSpan ? currentSpanId : null;
+    return null;
   };
 
   // Handle cursor position changes (clicks, keyboard navigation, etc.)
@@ -71,10 +78,10 @@ export const setupSpanClickDetection = (
     if (!useAppStore.getState().showVariants) return;
     
     const position = e.position;
-    const spanId = findSpanAtPosition(position);
+    const spanData = findSpanAtPosition(position);
     
-    if (spanId) {
-      console.log(`Cursor in span with ID: ${spanId}`);
+    if (spanData) {
+      console.log(`Cursor in span with ID: ${spanData.id}, text: "${spanData.text}"`);
     }
   });
   disposables.push(cursorPositionDisposable);
@@ -85,11 +92,11 @@ export const setupSpanClickDetection = (
     if (!useAppStore.getState().showVariants) return;
     
     if (e.target.position) {
-      const spanId = findSpanAtPosition(e.target.position);
-      if (spanId) {
-        console.log(`Clicked on span with ID: ${spanId}`);
-        // Set the selected span ID in the app store
-        useAppStore.getState().setSelectedSpanId(spanId);
+      const spanData = findSpanAtPosition(e.target.position);
+      if (spanData) {
+        console.log(`Clicked on span with ID: ${spanData.id}, text: "${spanData.text}"`);
+        // Set the selected span ID and text in the app store
+        useAppStore.getState().setSelectedSpan(spanData.id, spanData.text);
       }
     }
   });

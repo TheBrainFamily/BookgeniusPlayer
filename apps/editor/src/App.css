@@ -306,13 +306,14 @@
   position: fixed;
   right: 0;
   top: 0;
-  width: 400px;
+  width: 700px;
+  max-width: 50%;
   height: 100vh;
   background-color: #2d2d2d;
   border-left: 1px solid #1e1e1e;
   z-index: 1000;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr;
   box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
   animation: slideIn 0.2s ease-out;
 }
@@ -364,14 +365,15 @@
 }
 
 .variant-sidebar-content {
+  display: flex;
+  flex-direction: column;
   padding: 20px;
   color: #e0e0e0;
-  overflow-y: auto;
-  flex: 1;
+  gap: 10px;
 }
 
 .variant-sidebar-content p {
-  margin: 0 0 8px 0;
+  margin: 0;
   font-size: 14px;
   color: #9ca3af;
 }
