@@ -7,5 +7,6 @@ const booksController = new BooksController();
 router.get("/get-books", booksController.getBooks);
 router.get("/get-book-data/:bookName", booksController.getBookData);
 router.post("/update-chapter", booksController.updateChapter);
+router.post("/update-variants", booksController.updateVariants);
 
 export default router;

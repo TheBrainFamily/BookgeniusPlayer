@@ -63,4 +63,29 @@ export class BooksController {
       res.status(500).json({ error: "Failed to update chapter" });
     }
   };
+
+  public updateVariants: RequestHandler = async (req, res) => {
+    try {
+      const { bookName, variant } = req.body;
+
+      console.log("71: bookName, variant BANG!", bookName, variant);
+
+      if (!bookName || !variant) {
+        res.status(400).json({ error: "bookName and variant are required" });
+        return;
+      }
+
+      const success = await this.booksService.updateVariants(bookName, variant);
+
+      if (!success) {
+        res.status(500).json({ error: "Failed to update variant" });
+        return;
+      }
+
+      res.json({ message: "Variants updated successfully" });
+    } catch (error) {
+      console.error("Error in updateVariants controller:", error);
+      res.status(500).json({ error: "Failed to updateVariants" });
+    }
+  };
 }

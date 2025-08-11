@@ -1,6 +1,7 @@
 import { readdir, readFile, writeFile } from "fs/promises";
 import path from "path";
 import { parseStringPromise } from "xml2js";
+import { Variant } from "@/types/book";
 
 export class BooksService {
   public async getBooks(): Promise<string[]> {
@@ -21,6 +22,11 @@ export class BooksService {
     metadata: Record<string, string>;
     characters: Array<{ name: string; display: string; summary: string }>;
     bookMetadata: { slug?: string; title?: string; author?: string; language?: string; form?: string; simplifiedIconColor?: string };
+    allVariants: {
+      id: string;
+      analysis: { originalSentence: string; reasoning: string; score: number };
+      simplifications: { reasoning: string; score: number; sentences: string[] }[];
+    }[];
   } | null> {
     try {
       const booksContentPath = path.join(process.cwd(), "public_books", bookName, "booksContent");
@@ -94,7 +100,9 @@ export class BooksService {
         }
       }
 
-      return { chapters, metadata, characters, bookMetadata };
+      const allVariants: Variant[] = await this.getAllVariants(bookName);
+
+      return { chapters, metadata, characters, bookMetadata, allVariants };
     } catch (error) {
       console.error(`Error reading book data for ${bookName}:`, error);
       return null;
@@ -111,6 +119,47 @@ export class BooksService {
     } catch (error) {
       console.error(`Error updating chapter ${chapterFile} for book ${bookName}:`, error);
       return false;
+    }
+  }
+
+  public async updateVariants(bookName: string, variant: Variant) {
+    try {
+      const getAllVariantsPath = path.join("public_books", bookName, "getAllVariants.ts");
+
+      const allVariants: Variant[] = await this.getAllVariants(bookName);
+
+      const updatedVariant = allVariants.find(({ id }) => id === variant.id);
+      updatedVariant.analysis = variant.analysis;
+      updatedVariant.simplifications = variant.simplifications;
+
+      const result = `export const getAllVariants = () => ${JSON.stringify([...allVariants, updatedVariant], null, 2)};`;
+
+      await writeFile(getAllVariantsPath, result, "utf-8");
+      return true;
+    } catch (error) {
+      console.error(`Error updating variants for book ${bookName}:`, error);
+      return false;
+    }
+  }
+
+  private async getAllVariants(bookName: string): Promise<Variant[]> {
+    try {
+      const getAllVariantsPath = path.join(process.cwd(), "public_books", bookName, "getAllVariants.ts");
+      const getAllVariantsContent = await readFile(getAllVariantsPath, "utf-8");
+
+      // Extract the array from the getAllVariants function
+      // This is a simple regex that looks for the array inside the function
+      const match = getAllVariantsContent.match(/export\s+const\s+getAllVariants\s*=\s*\(\)\s*=>\s*(\[[\s\S]*?\]);/);
+      if (match && match[1]) {
+        // Use eval to parse the array (in production, consider using a safer parser)
+        try {
+          return eval(match[1]);
+        } catch (evalError) {
+          console.error("Error parsing getAllVariants array:", evalError);
+        }
+      }
+    } catch (fileError) {
+      console.error(`Error reading getAllVariants.ts for ${bookName}:`, fileError);
     }
   }
 }

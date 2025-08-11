@@ -74,7 +74,9 @@ class BookWatcherService {
 
   private startWatching(book: string): void {
     const booksContentPath = path.join(process.cwd(), "public_books", book, "booksContent");
-    console.log(`[File Watcher] Starting to watch: ${booksContentPath}`);
+    const getAllVariantsPath = path.join(process.cwd(), "public_books", book, "getAllVariants.ts");
+
+    console.log(`[File Watcher] Starting to watch: ${booksContentPath} and ${getAllVariantsPath}`);
 
     // Check if directory exists before watching
     try {
@@ -89,7 +91,8 @@ class BookWatcherService {
       return;
     }
 
-    const watcher = chokidar.watch(booksContentPath, {
+    // Watch both booksContent directory and getAllVariants.ts file
+    const watcher = chokidar.watch([booksContentPath, getAllVariantsPath], {
       persistent: true,
       ignoreInitial: true,
       awaitWriteFinish: { stabilityThreshold: 1000, pollInterval: 100 },
@@ -119,7 +122,7 @@ class BookWatcherService {
     });
 
     watcher.on("ready", () => {
-      console.log(`[File Watcher] Ready to watch: ${booksContentPath}`);
+      console.log(`[File Watcher] Ready to watch: ${booksContentPath} and getAllVariants.ts`);
     });
 
     this.watchers.set(book, watcher);

@@ -42,3 +42,9 @@ export type BackgroundSongSection = { chapter: number; paragraph: number; files:
 export type QuizOutput = { id: string; score: number; questions: { id: string; question: string; answers: { id: string; text: string; isCorrect: boolean }[] }[] };
 
 export type Filter = { chapterFrom: number; chapterTo: number; paragraphTo: number; bookSlug: string; paragraphFrom?: number };
+
+export type Variant = {
+  id: string;
+  analysis: { originalSentence: string; reasoning: string; score: number };
+  simplifications: { reasoning: string; score: number; sentences: string[] }[];
+};
