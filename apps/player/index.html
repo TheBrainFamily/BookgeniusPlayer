@@ -1,0 +1,303 @@
+<!doctype html>
+
+<html lang="<%= lang %>">
+  <head>
+    <meta charset="UTF-8" />
+    <title>BookGenius - <%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#333333" />
+    <meta name="description" content="Interactive book reader" />
+
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Book Viewer" />
+
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
+
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Libre+Caslon+Text&display=swap" rel="stylesheet" />
+
+    <!-- Preloaded -->
+    <link rel="preload" href="/clear-loader.png" as="image" />
+    <style>
+      body,
+      html {
+        height: 100svh;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      body {
+        background-color: #2d2d2d;
+      }
+
+      html {
+        font-size: calc(16px * var(--font-size-multiplier, 1));
+        transition: font-size 0.2s ease-in-out;
+      }
+
+      @media (max-width: 768px) {
+        html {
+          font-size: calc(14px * var(--font-size-multiplier, 1));
+        }
+      }
+
+      #splash-screen {
+        position: fixed;
+        inset: 0;
+        touch-action: none;
+        overscroll-behavior: none;
+        background-color: #2d2d2d;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        z-index: 999999;
+        overflow: hidden;
+        padding: clamp(0.5rem, 4vw, 2rem);
+        opacity: 1;
+        visibility: visible;
+        transition:
+          opacity 1s ease-in-out,
+          transform 1s ease-in-out,
+          filter 1s ease-in-out,
+          visibility 0s 1s;
+      }
+
+      #splash-screen.splash-screen--hide {
+        opacity: 0;
+        transform: scale(1.1);
+        filter: brightness(1.5);
+        pointer-events: none;
+        visibility: hidden;
+      }
+    </style>
+    <link rel="stylesheet" href="/src/styles/preload.css" />
+  </head>
+
+  <body>
+    <video id="cutscene-video" class="cutscene-video" playsinline></video>
+
+    <div id="legacy">
+      <video id="bg-video-a" class="bg-element" autoplay muted loop playsinline></video>
+      <video id="bg-video-b" class="bg-element faded" autoplay muted loop playsinline></video>
+
+      <div id="bg-image-a" class="bg-element faded"></div>
+      <div id="bg-image-b" class="bg-element faded"></div>
+
+      <p id="cutscene-text"></p>
+
+        <% if (bookForm === 'play') { %>
+          <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto max-w-[120rem] w-full">
+            <div id="content-container"></div>
+          </div>
+        <% } else { %>
+          <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 sm:pr-0 xl:px-4 sm:pl-4 max-w-[120rem] w-full">
+            <div id="left-notes" class="hidden sm:block sm:flex-1 max-w-[700px] content-center overflow-y-auto"></div>
+            <div id="content-container" class="sm:flex-3 max-w-[900px]"></div>
+            <div id="right-notes" class="hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none">
+              <div id="right-notes-scrollable-container"></div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <div id="root"></div>
+
+    <div id="splash-screen">
+      <div class="splash-container">
+        <div class="splash-title-container">
+          <div class="splash-title"><%= title %></div>
+          <div class="splash-subtitle"><%= subtitle %></div>
+        </div>
+
+        <div class="splash-image-container">
+          <video
+            id="splash-video"
+            src="<%= loaderVideoSrc %>"
+            poster="/clear-loader.png"
+            alt="Loading..."
+            class="splash-loading-image"
+            muted
+            autoplay
+            playsinline
+            preload="auto"
+          ></video>
+        </div>
+
+        <div class="splash-text-container">
+          <p class="splash-loading-text" id="loading-phrase"></p>
+        </div>
+
+        <button class="splash-start-button disabled" id="start-button">
+          <div class="play-icon"></div>
+          <span><%= startButtonText %></span>
+        </button>
+      </div>
+    </div>
+
+    <script>
+      class SplashScreenManager {
+        constructor() {
+          const isEmbedded = window.self !== window.top;
+
+          if (isEmbedded) {
+            this.setupEmbedded();
+            return;
+          }
+
+          this.currentPhrase = "";
+          this.phraseInterval = null;
+          this.previousPhrases = new Set();
+          this.isExiting = false;
+          try {
+            this.loadingPhrases = JSON.parse(`<%- loadingPhrases %>`);
+          } catch (e) {
+            console.error("Failed to parse loading phrases:", e);
+            this.loadingPhrases = ["Loading..."];
+          }
+          this.videoPlayed = false;
+          this.setupPhraseCycle();
+          this.setupEventListeners();
+          this.setupVideo();
+        }
+
+        setupEmbedded() {
+          this.hideSplash();
+          window.addEventListener("appReady", () => {
+            console.log("[Player] Sending 'player-is-ready-for-showtime' message to parent window.");
+            window.parent.postMessage("player-is-ready-for-showtime", window.location.origin);
+            setTimeout(async () => {
+              console.log("[Player] Dispatching 'splashHidden' event.");
+              window.dispatchEvent(new CustomEvent("splashHidden"));
+            }, 1000);
+          });
+        }
+
+        getRandomPhrase() {
+          if (this.loadingPhrases.length === 0) return "";
+          if (this.previousPhrases.size > this.loadingPhrases.length - 5 && this.loadingPhrases.length >= 5) {
+            this.previousPhrases.clear();
+          }
+          let phrase;
+          let attempts = 0;
+          const maxAttempts = 10;
+          do {
+            const randomIndex = Math.floor(Math.random() * this.loadingPhrases.length);
+            phrase = this.loadingPhrases[randomIndex];
+            attempts++;
+          } while (this.previousPhrases.has(phrase) && attempts < maxAttempts && this.loadingPhrases.length > 1);
+          this.previousPhrases.add(phrase);
+          return phrase;
+        }
+
+        updatePhrase() {
+          const phraseElement = document.getElementById("loading-phrase");
+          if (phraseElement) {
+            phraseElement.style.animation = "textFadeOut 0.3s ease-out forwards";
+            setTimeout(() => {
+              this.currentPhrase = this.getRandomPhrase();
+              phraseElement.textContent = this.currentPhrase;
+              phraseElement.style.animation = "textFadeIn 0.5s ease-out forwards";
+            }, 300);
+          }
+        }
+
+        setupPhraseCycle() {
+          this.updatePhrase();
+          this.phraseInterval = setInterval(() => {
+            this.updatePhrase();
+          }, 3000);
+        }
+
+        displayStartButton() {
+          const startButton = document.getElementById("start-button");
+          console.log("PINGWING: start-button ready at: performance.now()", performance.now());
+          if (startButton) {
+            startButton.classList.remove("disabled");
+            startButton.classList.add("visible");
+          }
+        }
+
+        setupVideo() {
+          const video = document.getElementById("splash-video");
+          if (video) {
+            video.addEventListener("loadeddata", () => {
+              if (!this.videoPlayed) {
+                this.videoPlayed = true;
+                video.play().catch((e) => console.log("Video autoplay prevented:", e));
+              }
+            });
+
+            video.addEventListener("canplay", () => {
+              if (!this.videoPlayed) {
+                this.videoPlayed = true;
+                video.play().catch((e) => console.log("Video autoplay prevented:", e));
+              }
+            });
+
+            video.addEventListener("ended", () => {
+              // Ensure video stays on last frame
+              video.currentTime = video.duration;
+            });
+          }
+        }
+
+        setupEventListeners() {
+          const startButton = document.getElementById("start-button");
+          if (startButton) {
+            startButton.addEventListener("click", () => this.handleStartClick());
+          }
+          window.addEventListener("appReady", () => {
+            this.displayStartButton();
+          });
+        }
+
+        async handleStartClick() {
+          console.log("PINGWING: start-button clicked at: performance.now()", performance.now());
+          if (this.isExiting) return;
+          this.isExiting = true;
+          try {
+            this.hideSplash();
+            setTimeout(async () => {
+              window.dispatchEvent(new CustomEvent("splashHidden"));
+            }, 1000);
+          } catch (error) {
+            this.hideSplash();
+            setTimeout(async () => {
+              window.dispatchEvent(new CustomEvent("splashHidden"));
+            }, 100);
+          }
+        }
+
+        hideSplash() {
+          const splashElement = document.getElementById("splash-screen");
+          if (splashElement) {
+            splashElement.classList.add("splash-screen--hide");
+          }
+          if (this.phraseInterval) {
+            clearInterval(this.phraseInterval);
+            this.phraseInterval = null;
+          }
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        new SplashScreenManager();
+      });
+    </script>
+    <script type="module" src="./src/index.tsx" async></script>
+  </body>
+</html>
