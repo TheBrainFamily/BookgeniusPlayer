@@ -1,10 +1,12 @@
 import "./App.css";
 import { Sidebar } from "./components/Sidebar.tsx";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useBooksStore } from "./stores/booksStore.ts";
 import { BookEditor } from "./components/BookEditor.tsx";
 import { VariantSidebar } from "./components/VariantSidebar.tsx";
+import { ChangesView } from "./components/ChangesView.tsx";
 import { getCurrentChapterFromUrl } from "./utils/getCurrentChapterFromUrl.ts";
+import { getCurrentViewFromUrl } from "./utils/updateUrlView.ts";
 import { SSEProvider, useSSE } from "./contexts/SSEContext.tsx";
 import { fetchBooks, fetchBookData } from "./api/bookApi.ts";
 import { transformApiCharacters } from "./utils/characterTransform.ts";
@@ -12,6 +14,26 @@ import { transformApiCharacters } from "./utils/characterTransform.ts";
 const AppContent = () => {
   const { books, setBooks, currentBook, setChapters, setMetadata, setCurrentChapterContent, currentFile, chapters, setCharacters, setVariants } = useBooksStore();
   const eventSource = useSSE();
+  const [currentView, setCurrentView] = useState(getCurrentViewFromUrl());
+
+  // Listen for URL changes to update the current view
+  useEffect(() => {
+    const handleUrlChange = () => {
+      setCurrentView(getCurrentViewFromUrl());
+    };
+
+    const handleViewChange = () => {
+      setCurrentView(getCurrentViewFromUrl());
+    };
+
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('viewchange', handleViewChange);
+    
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('viewchange', handleViewChange);
+    };
+  }, []);
 
   const loadBooks = async () => {
     try {
@@ -83,6 +105,11 @@ const AppContent = () => {
       setCurrentChapterContent(chapters[currentFile] || "");
     }
   }, [currentFile]);
+
+  // Render different views based on current route
+  if (currentView === 'changes') {
+    return <ChangesView />;
+  }
 
   return (
     <div className="app-container">

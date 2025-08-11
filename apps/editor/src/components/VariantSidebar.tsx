@@ -1,21 +1,33 @@
 import { useAppStore } from "../stores/appStore";
 import { useBooksStore } from "../stores/booksStore.ts";
+import { useChangesStore } from "../stores/changesStore.ts";
 import type { Variant } from "../types.ts";
 import { useEffect, useState, useRef } from "react";
 import Editor from "@monaco-editor/react";
 
 export const VariantSidebar = () => {
   const { selectedSpanId, selectedSpanText, setSelectedSpan, showVariants } = useAppStore();
-  const { variants } = useBooksStore();
+  const { variants, currentBook } = useBooksStore();
+  const { trackChange } = useChangesStore();
 
   const [selectedVariant, setSelectedVariant] = useState<Variant | undefined>();
   const [width, setWidth] = useState(700);
+  const [originalXml, setOriginalXml] = useState<string>("");
   const sidebarRef = useRef<HTMLDivElement>(null);
   const isResizing = useRef(false);
 
   useEffect(() => {
-    setSelectedVariant(variants.find((variant) => variant.id === selectedSpanId));
+    const variant = variants.find((variant) => variant.id === selectedSpanId);
+    setSelectedVariant(variant);
   }, [selectedSpanId, variants]);
+
+  // Store original XML when variant or selectedSpanText changes
+  useEffect(() => {
+    if (selectedSpanId) {
+      const xml = convertVariantToXml();
+      setOriginalXml(xml);
+    }
+  }, [selectedVariant, selectedSpanText, selectedSpanId]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -69,7 +81,18 @@ ${spans}
   };
 
   const handleChange = (content: string | undefined) => {
-    if (!content) return;
+    if (!content || !currentBook || !selectedSpanId) return;
+    
+    // Track changes to variants
+    if (originalXml && content !== originalXml) {
+      trackChange(
+        currentBook,
+        `variants/${selectedSpanId}`,
+        originalXml,
+        content,
+        'variant'
+      );
+    }
   };
 
   const handleResizeStart = (e: React.MouseEvent) => {

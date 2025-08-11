@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useBooksStore } from "../stores/booksStore.ts";
+import { useChangesStore } from "../stores/changesStore.ts";
 import { updateUrlChapter } from "../utils/updateUrlChapter.ts";
 import { updateUrlBook } from "../utils/updateUrlBook.ts";
 import bookgeniusLogoEditor from "../assets/bookgenius-editor.svg";
@@ -8,8 +9,27 @@ import { useAppStore } from "../stores/appStore.ts";
 export const Sidebar = () => {
   const { books, setCurrentBook, currentBook, chapters, setCurrentFile, currentFile, characters } = useBooksStore();
   const { setSelectedSpan } = useAppStore();
+  const { hasUnsavedChanges } = useChangesStore();
   const [isChaptersExpanded, setIsChaptersExpanded] = useState(true);
   const [isCharactersExpanded, setIsCharactersExpanded] = useState(true);
+
+  const handleBookChange = (newBook: string) => {
+    // Check for unsaved changes before switching
+    if (currentBook && hasUnsavedChanges(currentBook)) {
+      const confirmed = window.confirm(
+        `You have unsaved changes in "${currentBook}". Are you sure you want to switch books? Your changes will be lost.`
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+    
+    setCurrentBook(newBook);
+    updateUrlBook(newBook);
+    setCurrentFile("chapter1");
+    updateUrlChapter("chapter1");
+    setSelectedSpan(null, null);
+  };
 
   return (
     <div className="sidebar">
@@ -23,14 +43,7 @@ export const Sidebar = () => {
         <select
           id="book-selector"
           value={currentBook}
-          onChange={(e) => {
-            const newBook = e.target.value;
-            setCurrentBook(newBook);
-            updateUrlBook(newBook);
-            setCurrentFile("chapter1");
-            updateUrlChapter("chapter1");
-            setSelectedSpan(null, null);
-          }}
+          onChange={(e) => handleBookChange(e.target.value)}
           style={{ width: "100%", padding: "5px", fontSize: "14px", backgroundColor: "#1e1e1e", color: "#cccccc", border: "1px solid #3c3c3c", borderRadius: "3px" }}
         >
           {books.map((book) => (
