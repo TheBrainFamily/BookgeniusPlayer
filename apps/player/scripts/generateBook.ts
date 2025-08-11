@@ -7,6 +7,7 @@ import { getListeningMediaFilePathForName, getPictureFileNameForName, getTalking
 import { generateDataFiles, xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterTags } from "./data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
+import { getBookAssetUrl } from "@/utils/assetUrls";
 
 async function generateBook(bookDirectoryPath: string, bookOutputPath?: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
@@ -132,7 +133,7 @@ export function generateCharacterMetadata(xmlDoc: Document, bookString: string, 
   return extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm, bookSlug).map((character) => ({
     ...character,
     bookSlug,
-    imageUrl: `/${bookSlug}/${getPictureFileNameForName(character.slug)}`,
+    imageUrl: getBookAssetUrl(getPictureFileNameForName(character.slug)),
     listeningUrl: getListeningMediaFilePathForName(character.slug, bookSlug),
     talkingUrl: getTalkingMediaFilePathForName(character.slug, bookSlug),
   }));
