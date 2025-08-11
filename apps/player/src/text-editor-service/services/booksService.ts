@@ -124,7 +124,7 @@ export class BooksService {
 
   public async updateVariants(bookName: string, variant: Variant) {
     try {
-      const getAllVariantsPath = path.join("public_books", bookName, "getAllVariants.ts");
+      const getAllVariantsPath = path.join(process.cwd(), "public_books", bookName, "getAllVariants.ts");
 
       const allVariants: Variant[] = await this.getAllVariants(bookName);
 
@@ -132,7 +132,7 @@ export class BooksService {
       updatedVariant.analysis = variant.analysis;
       updatedVariant.simplifications = variant.simplifications;
 
-      const result = `export const getAllVariants = () => ${JSON.stringify([...allVariants, updatedVariant], null, 2)};`;
+      const result = `export const getAllVariants = () => ${JSON.stringify(allVariants, null, 2)};`;
 
       await writeFile(getAllVariantsPath, result, "utf-8");
       return true;
@@ -160,6 +160,7 @@ export class BooksService {
       }
     } catch (fileError) {
       console.error(`Error reading getAllVariants.ts for ${bookName}:`, fileError);
+      return [];
     }
   }
 }
