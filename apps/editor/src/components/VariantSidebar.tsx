@@ -20,10 +20,10 @@ export const VariantSidebar = () => {
 
   const convertVariantToXml = () => {
     if (!selectedVariant) {
-      const originalText = selectedSpanText || "Original sentence";
-      return `<Variant id="${selectedSpanId}">
+      const originalText = selectedSpanText || "This is an example of the <em>original</em> sentence...";
+      return `<Variants id="${selectedSpanId}">
 <span score="70">${originalText}</span>
-</Variant>`;
+</Variants>`;
     }
 
     const { id, simplifications } = selectedVariant;
@@ -34,9 +34,9 @@ export const VariantSidebar = () => {
       })
       .join("\n");
 
-    return `<Variant id="${id}">
+    return `<Variants id="${id}">
 ${spans}
-</Variant>`;
+</Variants>`;
   };
 
   const handleChange = (content: string | undefined) => {
