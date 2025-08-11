@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile, access } from "fs/promises";
+import { readdir, readFile, writeFile } from "fs/promises";
 import path from "path";
 import { parseStringPromise } from "xml2js";
 import { Variant } from "@/types/book";
@@ -146,9 +146,8 @@ export class BooksService {
     try {
       const getAllVariantsPath = path.join(process.cwd(), "public_books", bookName, "getAllVariants.ts");
 
-      await access(getAllVariantsPath);
-
       const module = await import(getAllVariantsPath);
+
       return module.getAllVariants();
     } catch (fileError) {
       console.error(`Error reading getAllVariants.ts for ${bookName}:`, fileError);
