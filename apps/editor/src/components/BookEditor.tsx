@@ -42,7 +42,7 @@ export const BookEditor = () => {
         clearInterval(checkEditor);
 
         console.log("[BookEditor] Setting up variants...");
-        const cleanup = setupVariants(editorRef.current, handleVariantClick);
+        const cleanup = setupVariants(editorRef.current);
         variantsCleanupRef.current = cleanup;
       }
     }, 100);

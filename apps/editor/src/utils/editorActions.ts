@@ -7,8 +7,7 @@ import {
   removeCharacterTags, 
   type Character 
 } from './characterTagging';
-import {setupVariantsGutter} from "./showVariants.ts";
-import type {Variant} from "../types.ts";
+import { setupSpanClickDetection } from "./showVariants.ts";
 
 export const setupCharacterContextMenu = (editor: monaco.editor.IStandaloneCodeEditor) => {
   // Create context keys for conditional menu items
@@ -43,28 +42,8 @@ export const setupCharacterContextMenu = (editor: monaco.editor.IStandaloneCodeE
   });
 };
 
-export const setupVariants = (editor: monaco.editor.IStandaloneCodeEditor, onVariantClick?: (variant: Variant, allLineVariants?: Variant[]) => void): (() => void) => {
-  console.log('setupVariants called with callback:', !!onVariantClick);
+export const setupVariants = (editor: monaco.editor.IStandaloneCodeEditor): (() => void) => {
+  console.log('setupVariants called - setting up span click detection');
   
-  return setupVariantsGutter(
-    editor,
-    () => {
-      const state = useBooksStore.getState();
-      console.log('Full store state:', state);
-      console.log('Characters:', state.characters);
-      console.log('Variants:', state.variants);
-      return state.variants;
-    }, // Function to get fresh variants
-    (variant, allLineVariants) => {
-      console.log('Variant clicked callback triggered:', variant);
-      console.log('All line variants:', allLineVariants);
-      console.log('onVariantClick available:', !!onVariantClick);
-      if (onVariantClick) {
-        console.log('Calling onVariantClick...');
-        onVariantClick(variant, allLineVariants);
-      } else {
-        console.log('No onVariantClick callback provided!');
-      }
-    }
-  );
+  return setupSpanClickDetection(editor);
 }
