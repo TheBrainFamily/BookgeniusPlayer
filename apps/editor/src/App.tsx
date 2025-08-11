@@ -1,12 +1,12 @@
-import './App.css'
-import {Sidebar} from "./components/Sidebar.tsx";
-import {useEffect} from "react";
-import {useBooksStore} from "./stores/booksStore.ts";
-import {BookEditor} from "./components/BookEditor.tsx";
-import {getCurrentChapterFromUrl} from "./utils/getCurrentChapterFromUrl.ts";
-import {SSEProvider, useSSE} from "./contexts/SSEContext.tsx";
-import {fetchBooks, fetchBookData} from "./api/bookApi.ts";
-import {transformApiCharacters} from "./utils/characterTransform.ts";
+import "./App.css";
+import { Sidebar } from "./components/Sidebar.tsx";
+import { useEffect } from "react";
+import { useBooksStore } from "./stores/booksStore.ts";
+import { BookEditor } from "./components/BookEditor.tsx";
+import { getCurrentChapterFromUrl } from "./utils/getCurrentChapterFromUrl.ts";
+import { SSEProvider, useSSE } from "./contexts/SSEContext.tsx";
+import { fetchBooks, fetchBookData } from "./api/bookApi.ts";
+import { transformApiCharacters } from "./utils/characterTransform.ts";
 
 const AppContent = () => {
   const { books, setBooks, currentBook, setChapters, setMetadata, setCurrentChapterContent, currentFile, chapters, setCharacters, setVariants } = useBooksStore();
@@ -17,7 +17,7 @@ const AppContent = () => {
       const booksData = await fetchBooks();
       setBooks(booksData);
     } catch (error) {
-      console.error('[Error - Get-Books]', error);
+      console.error("[Error - Get-Books]", error);
     }
   };
 
@@ -31,36 +31,32 @@ const AppContent = () => {
 
     const handleBooksUpdated = async (event: MessageEvent) => {
       const data = JSON.parse(event.data);
-      
-      if (data.type === 'book-updated') {
-        console.log('[SSE] Book updated, refetching...');
-        
-        // Add a small delay to avoid race condition with the save operation
-        setTimeout(async () => {
-          try {
-            const bookData = await fetchBookData(currentBook);
-            setMetadata(bookData.metadata);
-            setChapters(bookData.chapters);
-            setCharacters(transformApiCharacters(bookData.characters));
-            console.log('45: bookData.variants:', bookData.variants);
-            setVariants(bookData.allVariants);
-            // Use currentFile instead of getCurrentChapterFromUrl()
-            if (currentFile && bookData.chapters[currentFile]) {
-              setCurrentChapterContent(bookData.chapters[currentFile]);
-            }
-          } catch (error) {
-            console.error('[Error - Get-Book-Data]', error);
+
+      if (data.type === "book-updated") {
+        console.log("[SSE] Book updated, refetching...");
+        try {
+          const bookData = await fetchBookData(currentBook);
+          setMetadata(bookData.metadata);
+          setChapters(bookData.chapters);
+          setCharacters(transformApiCharacters(bookData.characters));
+          console.log("45: bookData.variants:", bookData.variants);
+          setVariants(bookData.allVariants);
+          // Use currentFile instead of getCurrentChapterFromUrl()
+          if (currentFile && bookData.chapters[currentFile]) {
+            setCurrentChapterContent(bookData.chapters[currentFile]);
           }
-        }, 500); // 500ms delay to let the save operation complete
+        } catch (error) {
+          console.error("[Error - Get-Book-Data]", error);
+        }
       }
     };
 
-    eventSource.addEventListener('message', handleBooksUpdated);
+    eventSource.addEventListener("message", handleBooksUpdated);
 
     return () => {
-      eventSource.removeEventListener('message', handleBooksUpdated);
+      eventSource.removeEventListener("message", handleBooksUpdated);
     };
-  }, [eventSource, currentBook, currentFile, setMetadata, setChapters, setCharacters, setCurrentChapterContent]);
+  }, [eventSource, currentBook, currentFile, setVariants, setMetadata, setChapters, setCharacters, setCurrentChapterContent]);
 
   useEffect(() => {
     const loadBookData = async () => {
@@ -74,16 +70,16 @@ const AppContent = () => {
         setVariants(data.allVariants);
         setCurrentChapterContent(data.chapters[getCurrentChapterFromUrl()]);
       } catch (error) {
-        console.error('[Error - Get-Book-Data]', error);
+        console.error("[Error - Get-Book-Data]", error);
       }
     };
-    
+
     loadBookData();
   }, [books, currentBook, setMetadata, setChapters, setCharacters, setCurrentChapterContent]);
 
   useEffect(() => {
     if (chapters && currentFile) {
-      setCurrentChapterContent(chapters[currentFile] || '');
+      setCurrentChapterContent(chapters[currentFile] || "");
     }
   }, [currentFile]);
 
@@ -92,13 +88,13 @@ const AppContent = () => {
       <Sidebar />
       <BookEditor />
     </div>
-  )
-}
+  );
+};
 
 export const App = () => {
   return (
     <SSEProvider>
       <AppContent />
     </SSEProvider>
-  )
-}
+  );
+};
