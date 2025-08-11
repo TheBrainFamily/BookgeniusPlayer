@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile } from "fs/promises";
+import { readdir, readFile, writeFile, access } from "fs/promises";
 import path from "path";
 import { parseStringPromise } from "xml2js";
 import { Variant } from "@/types/book";
@@ -145,19 +145,11 @@ export class BooksService {
   private async getAllVariants(bookName: string): Promise<Variant[]> {
     try {
       const getAllVariantsPath = path.join(process.cwd(), "public_books", bookName, "getAllVariants.ts");
-      const getAllVariantsContent = await readFile(getAllVariantsPath, "utf-8");
 
-      // Extract the array from the getAllVariants function
-      // This is a simple regex that looks for the array inside the function
-      const match = getAllVariantsContent.match(/export\s+const\s+getAllVariants\s*=\s*\(\)\s*=>\s*(\[[\s\S]*?\]);/);
-      if (match && match[1]) {
-        // Use eval to parse the array (in production, consider using a safer parser)
-        try {
-          return eval(match[1]);
-        } catch (evalError) {
-          console.error("Error parsing getAllVariants array:", evalError);
-        }
-      }
+      await access(getAllVariantsPath);
+
+      const module = await import(getAllVariantsPath);
+      return module.getAllVariants();
     } catch (fileError) {
       console.error(`Error reading getAllVariants.ts for ${bookName}:`, fileError);
       return [];
