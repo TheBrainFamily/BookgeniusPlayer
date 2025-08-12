@@ -66,6 +66,8 @@ function createRangeVisualizer(): HTMLDivElement {
   return visualizer;
 }
 
+let isTransitioning = false;
+
 /**
  * Initializes both development zone visualizers
  * Returns references to both visualizers or null if disabled
@@ -521,6 +523,9 @@ export function setupPageObserver(
   const observedParagraphs = new Set<Element>();
 
   const processIntersections = () => {
+    if (isTransitioning) {
+      return;
+    }
     const rootRect = observerOptions.root.getBoundingClientRect();
     const topMultiplier = 0.35; // 35vh focus zone start
     let bottomMultiplier = 0.45; // 10vh focus zone height (default)
@@ -966,6 +971,12 @@ export function setupPageObserver(
       entries.forEach((entry) => {
         if (!isSplashAnimationComplete) return;
         if (!contentContainer) return;
+
+        if (entry.isIntersecting) {
+          isTransitioning = true;
+        } else {
+          isTransitioning = false;
+        }
 
         const rect = entry.boundingClientRect;
 
