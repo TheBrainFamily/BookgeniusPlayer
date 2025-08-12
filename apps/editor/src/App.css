@@ -662,6 +662,7 @@
   border-bottom: 1px solid #30363d;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 24px;
 }
 
@@ -698,6 +699,83 @@
   display: flex;
   flex: 1;
   overflow: hidden;
+}
+
+/* Save All Button */
+.save-all-btn {
+  background-color: #238636;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.save-all-btn:hover:not(:disabled) {
+  background-color: #2ea043;
+  transform: translateY(-1px);
+}
+
+.save-all-btn:disabled {
+  background-color: #373e47;
+  color: #8b949e;
+  cursor: not-allowed;
+}
+
+/* Save Status Messages */
+.save-status {
+  padding: 16px 24px;
+  background-color: #0d1117;
+  border-bottom: 1px solid #30363d;
+}
+
+.save-status-success {
+  margin-bottom: 16px;
+}
+
+.save-status-success h3 {
+  color: #3fb950;
+  font-size: 14px;
+  margin: 0 0 8px 0;
+}
+
+.save-status-success ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.save-status-success li {
+  color: #7ee787;
+  font-size: 13px;
+  margin-bottom: 4px;
+  padding-left: 20px;
+}
+
+.save-status-error {
+  margin-bottom: 16px;
+}
+
+.save-status-error h3 {
+  color: #f85149;
+  font-size: 14px;
+  margin: 0 0 8px 0;
+}
+
+.save-status-error ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.save-status-error li {
+  color: #ff7b72;
+  font-size: 13px;
+  margin-bottom: 4px;
+  padding-left: 20px;
 }
 
 /* Left Sidebar - File List */
@@ -800,6 +878,58 @@
   background-color: #b91c1c;
   opacity: 1;
   transform: scale(1.1);
+}
+
+/* Book sections in changes view */
+.book-section {
+  border-bottom: 1px solid #21262d;
+}
+
+.book-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  cursor: pointer;
+  background-color: #161b22;
+  border-bottom: 1px solid #30363d;
+  transition: background-color 0.2s;
+  font-weight: 600;
+}
+
+.book-section-header:hover {
+  background-color: #21262d;
+}
+
+.book-section-header .dropdown-icon {
+  font-size: 10px;
+  transition: transform 0.2s ease;
+  color: #8b949e;
+}
+
+.book-section-header .dropdown-icon.expanded {
+  transform: rotate(90deg);
+}
+
+.book-title {
+  flex: 1;
+  color: #f0f6fc;
+  font-size: 14px;
+}
+
+.book-change-count {
+  color: #8b949e;
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.book-files {
+  background-color: #0d1117;
+}
+
+.book-files .file-list-item {
+  padding-left: 40px;
+  border-left: 2px solid #21262d;
 }
 
 /* Main Panel - Diff View */

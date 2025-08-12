@@ -12,9 +12,9 @@ import { UnsavedChangesIndicator } from "./UnsavedChangesIndicator.tsx";
 
 export const BookEditor = () => {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-  const { currentFile, currentChapterContent, setCurrentChapterContent, variants, currentBook, chapters } = useBooksStore();
+  const { currentFile, currentChapterContent, setCurrentChapterContent, variants, currentBook, metadata } = useBooksStore();
   const { showVariants, setShowVariants } = useAppStore();
-  const { trackChange, removeChange } = useChangesStore();
+  const { trackChange } = useChangesStore();
   const variantsCleanupRef = useRef<(() => void) | null>(null);
   const originalContentRef = useRef<string>("");
   const isUpdatingFromExternalSource = useRef<boolean>(false);
@@ -96,40 +96,30 @@ export const BookEditor = () => {
       isUpdatingFromExternalSource: isUpdatingFromExternalSource.current,
       currentBook,
       currentFile,
-      hasOriginalContent: !!originalContentRef.current
+      hasOriginalContent: !!originalContentRef.current,
     });
-    
+
     if (content && !isUpdatingFromExternalSource.current) {
       setCurrentChapterContent(content);
-      
+
       // Track changes if we have original content and current book/file
       console.log("[BookEditor] Checking prerequisites:", {
         currentBook: !!currentBook,
         currentFile: !!currentFile,
         originalContent: !!originalContentRef.current,
-        originalContentValue: originalContentRef.current ? originalContentRef.current.substring(0, 50) + "..." : "EMPTY"
+        originalContentValue: originalContentRef.current ? originalContentRef.current.substring(0, 50) + "..." : "EMPTY",
       });
-      
+
       if (currentBook && currentFile && originalContentRef.current) {
         console.log("[BookEditor] Tracking change:", {
           original: originalContentRef.current.substring(0, 100) + "...",
           current: content.substring(0, 100) + "...",
-          same: originalContentRef.current === content
+          same: originalContentRef.current === content,
         });
-        
-        trackChange(
-          currentBook,
-          currentFile,
-          originalContentRef.current,
-          content,
-          'chapter'
-        );
+
+        trackChange(currentBook, metadata?.title || currentBook, currentFile, originalContentRef.current, content, "chapter");
       } else {
-        console.log("[BookEditor] NOT tracking change - missing prerequisites:", {
-          currentBook,
-          currentFile,
-          hasOriginalContent: !!originalContentRef.current
-        });
+        console.log("[BookEditor] NOT tracking change - missing prerequisites:", { currentBook, currentFile, hasOriginalContent: !!originalContentRef.current });
       }
     } else {
       console.log("[BookEditor] NOT processing content change");
@@ -141,12 +131,14 @@ export const BookEditor = () => {
       <div className="editor-header">
         <h2>{currentFile}</h2>
         <UnsavedChangesIndicator />
-        <div className="checkbox-container">
-          <input type="checkbox" id="show-variants" checked={showVariants} onChange={(e) => setShowVariants(e.target.checked)} />
-          <label htmlFor="show-variants">Show Variants On Click</label>
-        </div>
+        {variants.length > 0 && (
+          <div className="checkbox-container">
+            <input type="checkbox" id="show-variants" checked={showVariants} onChange={(e) => setShowVariants(e.target.checked)} />
+            <label htmlFor="show-variants">Show Variants On Click</label>
+          </div>
+        )}
         <button className="editor-save-button" onClick={handleSave}>
-          Save
+          Save Only This File
         </button>
       </div>
       <Editor

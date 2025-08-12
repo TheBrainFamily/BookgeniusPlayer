@@ -2,24 +2,72 @@ import { useState } from "react";
 import { useChangesStore, type FileChange } from "../stores/changesStore";
 import { useBooksStore } from "../stores/booksStore";
 import { navigateToEditorView } from "../utils/updateUrlView";
+import { useSaveAllChanges } from "../hooks/useSaveAllChanges";
 import * as diff from "diff";
 
 export const ChangesView = () => {
-  const { getCurrentBookChanges, removeChange } = useChangesStore();
+  const { getAllChangesGroupedByBook, removeChange } = useChangesStore();
   const { setCurrentChapterContent, currentBook } = useBooksStore();
+  const { saveAllChanges } = useSaveAllChanges();
   const [selectedChange, setSelectedChange] = useState<FileChange | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<{ successes: string[]; errors: string[] } | null>(null);
+  const allChangesGrouped = getAllChangesGroupedByBook();
+  const allChanges = Object.values(allChangesGrouped).flat();
+  const [expandedBooks, setExpandedBooks] = useState<Set<string>>(new Set(Object.keys(allChangesGrouped)));
 
-  if (!currentBook) return null;
-
-  const changes = getCurrentBookChanges(currentBook);
+  console.log("16: allChanges BANG!", allChanges);
 
   // Set initial selected change if none selected
-  if (changes.length > 0 && !selectedChange) {
-    setSelectedChange(changes[0]);
+  if (allChanges.length > 0 && !selectedChange) {
+    setSelectedChange(allChanges[0]);
   }
 
+  const toggleBookExpanded = (bookName: string) => {
+    const newExpanded = new Set(expandedBooks);
+    if (newExpanded.has(bookName)) {
+      newExpanded.delete(bookName);
+    } else {
+      newExpanded.add(bookName);
+    }
+    setExpandedBooks(newExpanded);
+  };
+
+  const handleSaveAll = async () => {
+    setIsSaving(true);
+    setSaveStatus(null);
+    
+    try {
+      const result = await saveAllChanges();
+      setSaveStatus(result);
+      
+      // If all saved successfully, navigate back to editor
+      if (result.errors.length === 0) {
+        setTimeout(() => {
+          navigateToEditorView();
+        }, 1500); // Give user time to see success message
+      }
+    } catch (error) {
+      console.error('Error saving all changes:', error);
+      setSaveStatus({ 
+        successes: [], 
+        errors: ['An unexpected error occurred while saving'] 
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const generateDiffLines = (change: FileChange) => {
-    const differences = diff.diffLines(change.originalContent, change.currentContent);
+    // Convert objects to formatted JSON strings for diffing if needed
+    const originalStr = typeof change.originalContent === 'string' 
+      ? change.originalContent 
+      : JSON.stringify(change.originalContent, null, 2);
+    const currentStr = typeof change.currentContent === 'string' 
+      ? change.currentContent 
+      : JSON.stringify(change.currentContent, null, 2);
+      
+    const differences = diff.diffLines(originalStr, currentStr);
 
     // Process the differences to add word-level highlighting
     const processedDifferences = [];
@@ -94,17 +142,24 @@ export const ChangesView = () => {
 
   const handleDiscardChange = (change: FileChange) => {
     // Remove from change tracking first
-    removeChange(currentBook, change.filePath);
+    removeChange(change.bookName, change.filePath);
 
-    // Revert the content in the editor
-    if (change.type === "chapter") {
-      // For chapters, revert the editor content
-      setCurrentChapterContent(change.originalContent);
+    // Revert the content in the editor if it's for the current book
+    if (change.bookName === currentBook) {
+      if (change.type === "chapter") {
+        // For chapters, revert the editor content
+        setCurrentChapterContent(change.originalContent as string);
+      } else if (change.type === "variant") {
+        // For variants, we'd need to convert the object back to XML and update the variant
+        // This would require access to variant update functionality
+        console.log("Reverting variant:", change.filePath, change.originalContent);
+        // TODO: Implement variant reversion by converting object back to XML
+      }
     }
-    // For variants, we would need to revert variant changes (TODO: implement variant reversion)
 
-    // If no more changes, go back to editor
-    if (getCurrentBookChanges(currentBook).length <= 1) {
+    // If no more changes across all books, go back to editor
+    const remainingChanges = Object.values(getAllChangesGroupedByBook()).flat();
+    if (remainingChanges.length <= 1) {
       navigateToEditorView();
     }
   };
@@ -117,43 +172,101 @@ export const ChangesView = () => {
           <button className="back-to-editor-btn" onClick={() => navigateToEditorView()}>
             ← Back to Editor
           </button>
-          <h1>Changes Review - {currentBook}</h1>
+          <h1>Changes Review - All Books</h1>
+        </div>
+        <div className="changes-view-actions">
+          <button 
+            className="save-all-btn"
+            onClick={handleSaveAll}
+            disabled={isSaving || allChanges.length === 0}
+          >
+            {isSaving ? 'Saving...' : `Save All Changes (${allChanges.length})`}
+          </button>
         </div>
       </div>
+
+      {/* Save Status Messages */}
+      {saveStatus && (
+        <div className="save-status">
+          {saveStatus.successes.length > 0 && (
+            <div className="save-status-success">
+              <h3>✅ Successfully saved:</h3>
+              <ul>
+                {saveStatus.successes.map((msg, idx) => (
+                  <li key={idx}>{msg}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {saveStatus.errors.length > 0 && (
+            <div className="save-status-error">
+              <h3>❌ Errors occurred:</h3>
+              <ul>
+                {saveStatus.errors.map((msg, idx) => (
+                  <li key={idx}>{msg}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Main content */}
       <div className="changes-view-body">
         {/* Left Panel - File List */}
         <div className="changes-file-sidebar">
           <div className="file-list-header">
-            <h3>Changed Files ({changes.length})</h3>
+            <h3>Changed Files ({allChanges.length} across {Object.keys(allChangesGrouped).length} books)</h3>
           </div>
           <div className="file-list-content">
-            {changes.length === 0 ? (
+            {allChanges.length === 0 ? (
               <div className="no-changes">No unsaved changes</div>
             ) : (
-              changes.map((change) => (
-                <div key={change.filePath} className={`file-list-item ${selectedChange?.filePath === change.filePath ? "selected" : ""}`} onClick={() => setSelectedChange(change)}>
-                  <div className="file-item-info">
-                    <span className={`change-type ${change.type}`}>{change.type === "chapter" ? "📄" : "🔄"}</span>
-                    <div className="file-item-details">
-                      <span className="file-path">{change.filePath}</span>
-                    </div>
-                  </div>
-                  <button
-                    className="file-discard-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDiscardChange(change);
-                      // If this was the selected change, select another one
-                      if (selectedChange?.filePath === change.filePath) {
-                        const remainingChanges = changes.filter((c) => c.filePath !== change.filePath);
-                        setSelectedChange(remainingChanges.length > 0 ? remainingChanges[0] : null);
-                      }
-                    }}
+              Object.entries(allChangesGrouped).map(([bookName, bookChanges]) => (
+                <div key={bookName} className="book-section">
+                  <div 
+                    className="book-section-header" 
+                    onClick={() => toggleBookExpanded(bookName)}
                   >
-                    ×
-                  </button>
+                    <span className={`dropdown-icon ${expandedBooks.has(bookName) ? "expanded" : ""}`}>▶</span>
+                    <span className="book-title">{bookChanges[0]?.bookTitle || bookName}</span>
+                    <span className="book-change-count">({bookChanges.length})</span>
+                  </div>
+                  {expandedBooks.has(bookName) && (
+                    <div className="book-files">
+                      {bookChanges.map((change) => (
+                        <div 
+                          key={`${change.bookName}-${change.filePath}`} 
+                          className={`file-list-item ${selectedChange?.filePath === change.filePath && selectedChange?.bookName === change.bookName ? "selected" : ""}`} 
+                          onClick={() => setSelectedChange(change)}
+                        >
+                          <div className="file-item-info">
+                            <span className={`change-type ${change.type}`}>{change.type === "chapter" ? "📄" : "🔄"}</span>
+                            <div className="file-item-details">
+                              <span className="file-path">{change.filePath}</span>
+                              <span className="file-timestamp">
+                                {new Date(change.timestamp).toLocaleTimeString()}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            className="file-discard-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDiscardChange(change);
+                              // If this was the selected change, select another one
+                              if (selectedChange?.filePath === change.filePath && selectedChange?.bookName === change.bookName) {
+                                const remainingChanges = allChanges.filter((c) => !(c.filePath === change.filePath && c.bookName === change.bookName));
+                                setSelectedChange(remainingChanges.length > 0 ? remainingChanges[0] : null);
+                              }
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))
             )}
@@ -173,7 +286,7 @@ export const ChangesView = () => {
                   className="discard-change-btn"
                   onClick={() => {
                     handleDiscardChange(selectedChange);
-                    const remainingChanges = changes.filter((c) => c.filePath !== selectedChange.filePath);
+                    const remainingChanges = allChanges.filter((c) => !(c.filePath === selectedChange.filePath && c.bookName === selectedChange.bookName));
                     setSelectedChange(remainingChanges.length > 0 ? remainingChanges[0] : null);
                   }}
                 >

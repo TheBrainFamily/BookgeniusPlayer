@@ -14,16 +14,6 @@ export const Sidebar = () => {
   const [isCharactersExpanded, setIsCharactersExpanded] = useState(true);
 
   const handleBookChange = (newBook: string) => {
-    // Check for unsaved changes before switching
-    if (currentBook && hasUnsavedChanges(currentBook)) {
-      const confirmed = window.confirm(
-        `You have unsaved changes in "${currentBook}". Are you sure you want to switch books? Your changes will be lost.`
-      );
-      if (!confirmed) {
-        return;
-      }
-    }
-    
     setCurrentBook(newBook);
     updateUrlBook(newBook);
     setCurrentFile("chapter1");

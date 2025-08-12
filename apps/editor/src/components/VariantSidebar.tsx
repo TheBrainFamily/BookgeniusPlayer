@@ -1,13 +1,14 @@
 import { useAppStore } from "../stores/appStore";
 import { useBooksStore } from "../stores/booksStore.ts";
 import { useChangesStore } from "../stores/changesStore.ts";
+import { convertXmlToVariant } from "../utils/variantConversion";
 import type { Variant } from "../types.ts";
 import { useEffect, useState, useRef } from "react";
 import Editor from "@monaco-editor/react";
 
 export const VariantSidebar = () => {
   const { selectedSpanId, selectedSpanText, setSelectedSpan, showVariants } = useAppStore();
-  const { variants, currentBook } = useBooksStore();
+  const { variants, currentBook, metadata } = useBooksStore();
   const { trackChange } = useChangesStore();
 
   const [selectedVariant, setSelectedVariant] = useState<Variant | undefined>();
@@ -82,18 +83,30 @@ ${spans}
 
   const handleChange = (content: string | undefined) => {
     if (!content || !currentBook || !selectedSpanId) return;
-    
+
     // Track changes to variants
     if (originalXml && content !== originalXml) {
-      trackChange(
-        currentBook,
-        `variants/${selectedSpanId}`,
-        originalXml,
-        content,
-        'variant'
-      );
+      try {
+        // For variants: store the parsed objects directly
+        const variantObject = convertXmlToVariant(content);
+        const originalVariantObject = convertXmlToVariant(originalXml);
+        
+        trackChange(
+          currentBook, 
+          metadata?.title || currentBook, 
+          `variants/${selectedSpanId}`, 
+          originalVariantObject, 
+          variantObject, 
+          "variant"
+        );
+      } catch (error) {
+        console.error("Error converting XML to variant:", error);
+        // Fallback to raw XML comparison
+        trackChange(currentBook, metadata?.title || currentBook, `variants/${selectedSpanId}`, originalXml, content, "variant");
+      }
     }
   };
+
 
   const handleResizeStart = (e: React.MouseEvent) => {
     e.preventDefault();
