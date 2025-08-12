@@ -1,0 +1,61 @@
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server","/usr/local/etc/redis/redis.conf", "--requirepass", "${REDIS_PASSWORD}"]
+    volumes:
+      - redis:/data
+      - ./deployment/templates/redis.conf:/usr/local/etc/redis/redis.conf:ro
+
+  gateway:
+    image: ghcr.io/thebrainfamily/bookgenius-frontend/gateway:latest
+    pull_policy: always
+#    build: ./apps/gateway
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - "80:80"
+      - "443:443"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./apps/gateway/certs:/etc/ssl/private:ro
+      - ./apps/gateway/configs/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+      - ./apps/gateway/configs/sites-enabled:/usr/local/openresty/nginx/conf/sites-enabled:ro
+      - ./apps/gateway/configs/snippets:/usr/local/openresty/nginx/conf/snippets:ro
+      - ./apps/gateway/configs/lua:/usr/local/openresty/nginx/conf/lua:ro
+
+    depends_on: [redis]
+
+  webhook:
+    image: ghcr.io/thebrainfamily/bookgenius-frontend/webhook:latest
+    pull_policy: always
+#    build: ./apps/webhook
+    environment:
+      - API_TOKEN=${WEBHOOK_TOKEN}
+      - BASE_DOMAIN=${BASE_DOMAIN}
+      - IMAGE_PREFIX=${IMAGE_PREFIX}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - PORT_RANGE_START=${PORT_RANGE_START}
+      - PORT_RANGE_END=${PORT_RANGE_END}
+      - TEMPLATE_DIR=/templates
+      - DATA_DIR=/data
+      - GHCR_USER=${GHCR_USER}
+      - GHCR_TOKEN=${GHCR_READ_TOKEN}
+      - CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY}
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
+      - S3_BUCKET=${S3_BUCKET}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./deployment/templates:/templates:ro
+      - ./deployment/data:/data
+    depends_on: [redis]
+
+volumes:
+  redis:

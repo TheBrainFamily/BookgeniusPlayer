@@ -14,7 +14,8 @@
     "prepare:docker": "bun run ./tools/scripts/prepare-docker-build.ts",
     "build:front-parallel": "run-p build:player:front build:platform",
     "build:docker:with-books": "run-s build:player:docker build:platform prepare:docker",
-    "build:docker:front-only": "run-s build:front-parallel prepare:docker"
+    "build:docker:front-only": "run-s build:front-parallel prepare:docker",
+    "prepare:gateway": "zip -r gateway.zip ./docker-compose.gateway.yml ./apps/gateway/configs ./deployment/templates"
   },
   "keywords": [],
   "author": "",
