@@ -66,8 +66,6 @@ function createRangeVisualizer(): HTMLDivElement {
   return visualizer;
 }
 
-let isTransitioning = false;
-
 /**
  * Initializes both development zone visualizers
  * Returns references to both visualizers or null if disabled
@@ -518,6 +516,9 @@ export function setupPageObserver(
   let currentlyActivePageElement: Element | null = null;
   let currentlyLastActivePageElement: Element | null = null;
   let currentlyActiveParagraph: { chapter: number; paragraph: number } | null = null;
+
+  // We want to skip updating location when we scroll through the transition-spacer between chapters
+  let isTransitioning = false;
 
   // Keep track of observed paragraphs to avoid re-observing
   const observedParagraphs = new Set<Element>();
