@@ -452,6 +452,14 @@ function activateMediaInRange(
             dummyElement.style.display = "inline-block"; // Needed to respect width/height
             dummyElement.style.verticalAlign = mediaElement.style.verticalAlign || "bottom"; // Match original or default
             dummyElement.title = mediaElement.title || ""; // Preserve title if any
+            dummyElement.classList.add("relative");
+
+            // Try to keep the same placeholder image visible in the dummy
+            const existingImg = mediaElement.querySelector("img");
+            if (existingImg) {
+              const imgClone = existingImg.cloneNode(true) as HTMLImageElement;
+              dummyElement.appendChild(imgClone);
+            }
 
             // Replace media with dummy
             placeholder.replaceChild(dummyElement, mediaElement);
@@ -467,6 +475,20 @@ function activateMediaInRange(
               newDummyElement.classList.add("inline-avatar");
               newDummyElement.style.display = "inline-block";
               newDummyElement.style.verticalAlign = "bottom";
+              newDummyElement.classList.add("relative");
+
+              // Compute and add placeholder image so the avatar never appears empty
+              const characterSlugForDummy = placeholder.dataset.character;
+              const talkingSrcForDummy = getTalkingMediaFilePathForName(characterSlugForDummy, bookDataLoader.getCurrentBook());
+              const listeningSrcForDummy = getListeningMediaFilePathForName(characterSlugForDummy, bookDataLoader.getCurrentBook());
+              const placeholderSrcForDummy = normalizeSrcForInlineAvatar((listeningSrcForDummy || talkingSrcForDummy || ""));
+              if (placeholderSrcForDummy) {
+                const img = document.createElement("img");
+                img.src = placeholderSrcForDummy;
+                img.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
+                img.alt = characterSlugForDummy || "";
+                newDummyElement.appendChild(img);
+              }
 
               placeholder.appendChild(newDummyElement);
 
