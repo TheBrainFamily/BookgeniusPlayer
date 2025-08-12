@@ -82,3 +82,16 @@
   margin: 0; /* Reset margin for gap usage */
   font-weight: bold;
 }
+
+/* Modal states */
+.modal-overlay.active,
+#note-modal.visible,
+#note-modal-overlay.visible {
+  /* Visible state for modals */
+  display: block;
+}
+
+/* Modal open body state */
+body.modal-open {
+  overflow: hidden;
+}

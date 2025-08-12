@@ -5,7 +5,6 @@ import App from "./App";
 
 import "./styles/globals.css";
 import "./styles/styles.css";
-import "./styles/main.css";
 import "./styles/modals.css";
 import "./styles/inline-avatars.css";
 import "./styles/book-theme.css";
