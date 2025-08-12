@@ -8,9 +8,15 @@ importers:
 
   .:
     devDependencies:
+      husky:
+        specifier: ^9.1.7
+        version: 9.1.7
       ink:
         specifier: ^6.1.0
         version: 6.1.0(@types/react@19.1.9)(react@19.1.1)
+      lint-staged:
+        specifier: ^16.0.0
+        version: 16.1.4
       npm-run-all:
         specifier: ^4.1.5
         version: 4.1.5
@@ -540,18 +546,12 @@ importers:
       globals:
         specifier: ^16.0.0
         version: 16.3.0
-      husky:
-        specifier: ^9.1.7
-        version: 9.1.7
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@22.17.0)(ts-node@10.9.2(@swc/core@1.13.3)(@types/node@22.17.0)(typescript@5.9.2))
       jest-environment-jsdom:
         specifier: ^29.7.0
         version: 29.7.0
-      lint-staged:
-        specifier: ^16.0.0
-        version: 16.1.4
       postcss:
         specifier: ^8.5.3
         version: 8.5.6
