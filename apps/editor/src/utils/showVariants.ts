@@ -6,7 +6,7 @@ export const setupSpanClickDetection = (
 ): (() => void) => {
   const disposables: monaco.IDisposable[] = [];
 
-  // Helper function to find span element at position and extract its content
+  // Helper function to find span element at position using robust DOM parsing
   const findSpanAtPosition = (position: monaco.Position): { id: string; text: string } | null => {
     const model = editor.getModel();
     if (!model) return null;
@@ -14,65 +14,69 @@ export const setupSpanClickDetection = (
     const line = model.getLineContent(position.lineNumber);
     const offset = position.column - 1; // Convert to 0-based index
 
-    // Find all span tags with IDs in the line
-    const spanRegex = /<span\s+[^>]*id=["']([^"']+)["'][^>]*>([^<]*)<\/span>/g;
-    let match;
+    try {
+      // Create a temporary DOM element to parse the HTML properly
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = line;
+      
+      // Find all span elements with id attributes
+      const spans = tempDiv.querySelectorAll('span[id]');
+      
+      // Calculate position offsets for each span in the original line
+      for (const span of spans) {
+        const spanId = span.getAttribute('id');
+        if (!spanId) continue;
+        
+        // Get the outer HTML to find the start position in the original line
+        const spanOuterHTML = span.outerHTML;
+        const spanIndex = line.indexOf(spanOuterHTML);
+        
+        if (spanIndex !== -1) {
+          const spanEnd = spanIndex + spanOuterHTML.length;
+          
+          // Check if cursor is within this span's range
+          if (offset >= spanIndex && offset < spanEnd) {
+            // Extract text content, removing any nested HTML tags
+            const textContent = span.textContent || '';
+            return { id: spanId, text: textContent.trim() };
+          }
+        }
+      }
+      
+      // Fallback: if DOM parsing fails or spans weren't found, try to find spans manually
+      // This handles malformed HTML or edge cases where innerHTML parsing might not work
+      return findSpanWithManualParsing(line, offset);
+      
+    } catch (error) {
+      console.warn('DOM parsing failed, falling back to manual parsing:', error);
+      return findSpanWithManualParsing(line, offset);
+    }
+  };
 
+  // Fallback manual parsing method for edge cases
+  const findSpanWithManualParsing = (line: string, offset: number): { id: string; text: string } | null => {
+    // Use a more comprehensive regex that handles various attribute formats
+    const spanRegex = /<span\s+(?:[^>]*\s+)?id\s*=\s*(['"])((?:(?!\1)[^\\]|\\.)*)?\1[^>]*>(.*?)<\/span>/gi;
+    let match;
+    
+    spanRegex.lastIndex = 0; // Reset regex state
+    
     while ((match = spanRegex.exec(line)) !== null) {
       const spanStart = match.index;
       const spanEnd = spanStart + match[0].length;
       
-      // Check if click position is anywhere within the entire span (including tags)
+      // Check if cursor is within this span
       if (offset >= spanStart && offset < spanEnd) {
-        return { id: match[1], text: match[2] }; // Return both ID and text content
+        const spanId = match[2]; // ID is captured in group 2
+        const spanContent = match[3]; // Content is captured in group 3
+        
+        // Remove any nested HTML tags from content
+        const cleanText = spanContent.replace(/<[^>]*>/g, '').trim();
+        
+        return { id: spanId, text: cleanText };
       }
     }
-
-    // Alternative approach for more complex nested spans
-    let currentSpanId: string | null = null;
-    let spanOpenTagStart = -1;
-    let spanContentStart = -1;
-    let depth = 0;
-    let i = 0;
     
-    // Parse through the entire line to find all span boundaries
-    while (i < line.length) {
-      // Check for span opening tag
-      if (line.substring(i).startsWith('<span')) {
-        const closeTagIndex = line.indexOf('>', i);
-        if (closeTagIndex !== -1) {
-          const tagContent = line.substring(i, closeTagIndex + 1);
-          const idMatch = tagContent.match(/id=["']([^"']+)["']/);
-          if (idMatch && depth === 0) {
-            currentSpanId = idMatch[1];
-            spanOpenTagStart = i;
-            spanContentStart = closeTagIndex + 1;
-          }
-          depth++;
-          i = closeTagIndex;
-        }
-      }
-      // Check for span closing tag
-      else if (line.substring(i).startsWith('</span>')) {
-        depth--;
-        if (depth === 0 && currentSpanId && spanOpenTagStart !== -1) {
-          const spanCloseEnd = i + 7; // Length of </span>
-          
-          // Check if cursor is anywhere within this span's range
-          if (offset >= spanOpenTagStart && offset < spanCloseEnd) {
-            const spanText = line.substring(spanContentStart, i).replace(/<[^>]*>/g, '');
-            return { id: currentSpanId, text: spanText };
-          }
-          
-          // Reset for next span
-          currentSpanId = null;
-          spanOpenTagStart = -1;
-        }
-        i += 6; // Skip past </span>
-      }
-      i++;
-    }
-
     return null;
   };
 

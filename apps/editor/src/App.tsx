@@ -26,12 +26,12 @@ const AppContent = () => {
       setCurrentView(getCurrentViewFromUrl());
     };
 
-    window.addEventListener('popstate', handleUrlChange);
-    window.addEventListener('viewchange', handleViewChange);
-    
+    window.addEventListener("popstate", handleUrlChange);
+    window.addEventListener("viewchange", handleViewChange);
+
     return () => {
-      window.removeEventListener('popstate', handleUrlChange);
-      window.removeEventListener('viewchange', handleViewChange);
+      window.removeEventListener("popstate", handleUrlChange);
+      window.removeEventListener("viewchange", handleViewChange);
     };
   }, []);
 
@@ -57,21 +57,21 @@ const AppContent = () => {
 
       if (data.type === "book-updated") {
         console.log("[SSE] Book updated, data:", data);
-        
+
         // Determine which book was updated
         // The event might contain bookName or we use currentBook as fallback
-        const updatedBookName = data.bookName || currentBook;
-        
+        const updatedBookName = data.bookName;
+
         if (!updatedBookName) {
-          console.warn("[SSE] Book updated but no book name available");
+          console.warn("[SSE] Book updated event received without a book name. Skipping content refresh.");
           return;
         }
-        
+
         console.log(`[SSE] Refetching data for book: ${updatedBookName}`);
-        
+
         try {
           const bookData = await fetchBookData(updatedBookName);
-          
+
           // Only update the stores if this is the current book
           if (updatedBookName === currentBook) {
             setMetadata(bookData.metadata);
@@ -79,16 +79,15 @@ const AppContent = () => {
             setCharacters(transformApiCharacters(bookData.characters));
             console.log("45: bookData.variants:", bookData.variants);
             setVariants(bookData.allVariants);
-            
+
             // Use currentFile instead of getCurrentChapterFromUrl()
             if (currentFile && bookData.chapters[currentFile]) {
               setCurrentChapterContent(bookData.chapters[currentFile]);
             }
           }
-          
+
           // Always refresh the books list in case book metadata changed
           await loadBooks();
-          
         } catch (error) {
           console.error(`[Error - Get-Book-Data for ${updatedBookName}]`, error);
         }
@@ -128,7 +127,7 @@ const AppContent = () => {
   }, [currentFile]);
 
   // Render different views based on current route
-  if (currentView === 'changes') {
+  if (currentView === "changes") {
     return <ChangesView />;
   }
 
