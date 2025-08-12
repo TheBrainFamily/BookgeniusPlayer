@@ -479,15 +479,17 @@ function activateMediaInRange(
 
               // Compute and add placeholder image so the avatar never appears empty
               const characterSlugForDummy = placeholder.dataset.character;
-              const talkingSrcForDummy = getTalkingMediaFilePathForName(characterSlugForDummy, bookDataLoader.getCurrentBook());
-              const listeningSrcForDummy = getListeningMediaFilePathForName(characterSlugForDummy, bookDataLoader.getCurrentBook());
-              const placeholderSrcForDummy = normalizeSrcForInlineAvatar((listeningSrcForDummy || talkingSrcForDummy || ""));
-              if (placeholderSrcForDummy) {
-                const img = document.createElement("img");
-                img.src = placeholderSrcForDummy;
-                img.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
-                img.alt = characterSlugForDummy || "";
-                newDummyElement.appendChild(img);
+              if (characterSlugForDummy) {
+                const talkingSrcForDummy = getTalkingMediaFilePathForName(characterSlugForDummy, bookDataLoader.getCurrentBook());
+                const listeningSrcForDummy = getListeningMediaFilePathForName(characterSlugForDummy, bookDataLoader.getCurrentBook());
+                const placeholderSrcForDummy = normalizeSrcForInlineAvatar((listeningSrcForDummy || talkingSrcForDummy || ""));
+                if (placeholderSrcForDummy) {
+                  const img = document.createElement("img");
+                  img.src = placeholderSrcForDummy;
+                  img.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
+                  img.alt = characterSlugForDummy;
+                  newDummyElement.appendChild(img);
+                }
               }
 
               placeholder.appendChild(newDummyElement);
