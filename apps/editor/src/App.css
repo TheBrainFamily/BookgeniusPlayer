@@ -1086,6 +1086,12 @@
   background-color: #252525;
 }
 
+.variant-sidebar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .variant-sidebar-header h3 {
   margin: 0;
   color: #ffffff;
@@ -1112,6 +1118,61 @@
 .variant-sidebar-close:hover {
   background-color: #3e3e3e;
   color: #ffffff;
+}
+
+/* Variant Save Button */
+.variant-save-button {
+  background-color: #007acc;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.variant-save-button:hover:not(:disabled) {
+  background-color: #0098ff;
+}
+
+.variant-save-button:disabled {
+  background-color: #3e3e3e;
+  color: #666;
+  cursor: not-allowed;
+}
+
+/* Variant Save Status */
+.variant-save-status {
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.variant-save-status.success {
+  background-color: rgba(0, 150, 0, 0.2);
+  border: 1px solid rgba(0, 150, 0, 0.4);
+  color: #00ff00;
+}
+
+.variant-save-status.error {
+  background-color: rgba(255, 0, 0, 0.2);
+  border: 1px solid rgba(255, 0, 0, 0.4);
+  color: #ff6666;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .variant-sidebar-content {

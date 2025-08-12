@@ -1,6 +1,6 @@
 import "./App.css";
 import { Sidebar } from "./components/Sidebar.tsx";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useBooksStore } from "./stores/booksStore.ts";
 import { BookEditor } from "./components/BookEditor.tsx";
 import { VariantSidebar } from "./components/VariantSidebar.tsx";
@@ -35,41 +35,62 @@ const AppContent = () => {
     };
   }, []);
 
-  const loadBooks = async () => {
+  const loadBooks = useCallback(async () => {
     try {
       const booksData = await fetchBooks();
       setBooks(booksData);
     } catch (error) {
       console.error("[Error - Get-Books]", error);
     }
-  };
+  }, [setBooks]);
 
   useEffect(() => {
     loadBooks();
-  }, [setBooks]);
+  }, [loadBooks]);
 
   // Listen for books-updated event
   useEffect(() => {
-    if (!eventSource || !currentBook) return;
+    if (!eventSource) return;
 
     const handleBooksUpdated = async (event: MessageEvent) => {
       const data = JSON.parse(event.data);
 
       if (data.type === "book-updated") {
-        console.log("[SSE] Book updated, refetching...");
+        console.log("[SSE] Book updated, data:", data);
+        
+        // Determine which book was updated
+        // The event might contain bookName or we use currentBook as fallback
+        const updatedBookName = data.bookName || currentBook;
+        
+        if (!updatedBookName) {
+          console.warn("[SSE] Book updated but no book name available");
+          return;
+        }
+        
+        console.log(`[SSE] Refetching data for book: ${updatedBookName}`);
+        
         try {
-          const bookData = await fetchBookData(currentBook);
-          setMetadata(bookData.metadata);
-          setChapters(bookData.chapters);
-          setCharacters(transformApiCharacters(bookData.characters));
-          console.log("45: bookData.variants:", bookData.variants);
-          setVariants(bookData.allVariants);
-          // Use currentFile instead of getCurrentChapterFromUrl()
-          if (currentFile && bookData.chapters[currentFile]) {
-            setCurrentChapterContent(bookData.chapters[currentFile]);
+          const bookData = await fetchBookData(updatedBookName);
+          
+          // Only update the stores if this is the current book
+          if (updatedBookName === currentBook) {
+            setMetadata(bookData.metadata);
+            setChapters(bookData.chapters);
+            setCharacters(transformApiCharacters(bookData.characters));
+            console.log("45: bookData.variants:", bookData.variants);
+            setVariants(bookData.allVariants);
+            
+            // Use currentFile instead of getCurrentChapterFromUrl()
+            if (currentFile && bookData.chapters[currentFile]) {
+              setCurrentChapterContent(bookData.chapters[currentFile]);
+            }
           }
+          
+          // Always refresh the books list in case book metadata changed
+          await loadBooks();
+          
         } catch (error) {
-          console.error("[Error - Get-Book-Data]", error);
+          console.error(`[Error - Get-Book-Data for ${updatedBookName}]`, error);
         }
       }
     };
@@ -79,7 +100,7 @@ const AppContent = () => {
     return () => {
       eventSource.removeEventListener("message", handleBooksUpdated);
     };
-  }, [eventSource, currentBook, currentFile, setVariants, setMetadata, setChapters, setCharacters, setCurrentChapterContent]);
+  }, [eventSource, currentBook, currentFile, setVariants, setMetadata, setChapters, setCharacters, setCurrentChapterContent, loadBooks]);
 
   useEffect(() => {
     const loadBookData = async () => {
