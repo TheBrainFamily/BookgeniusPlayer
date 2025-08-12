@@ -972,11 +972,7 @@ export function setupPageObserver(
         if (!isSplashAnimationComplete) return;
         if (!contentContainer) return;
 
-        if (entry.isIntersecting) {
-          isTransitioning = true;
-        } else {
-          isTransitioning = false;
-        }
+        isTransitioning = !!entry.isIntersecting;
 
         const rect = entry.boundingClientRect;
 
