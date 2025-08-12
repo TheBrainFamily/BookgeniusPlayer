@@ -789,6 +789,10 @@
     #content-container:has(.play-container) {
       background-size: 300px 100%;
 
+      .character-text {
+        max-width: 75% !important;
+      }
+
       .play-container > section > section {
         max-width: 500px;
 
