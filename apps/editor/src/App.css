@@ -1035,17 +1035,15 @@
 
 /* Variant Sidebar styles */
 .variant-sidebar {
-  position: fixed;
-  right: 0;
-  top: 0;
   height: 100vh;
   background-color: #2d2d2d;
   border-left: 1px solid #1e1e1e;
-  z-index: 1000;
   display: grid;
   grid-template-rows: auto 1fr;
   box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
   animation: slideIn 0.2s ease-out;
+  flex-shrink: 0;
+  position: relative;
 }
 
 .variant-sidebar-resize-handle {
