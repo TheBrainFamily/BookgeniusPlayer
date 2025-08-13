@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useBooksStore } from '../stores/booksStore';
+import { useChangesStore } from '../stores/changesStore';
 import { getCurrentChapterFromUrl } from '../utils/getCurrentChapterFromUrl';
 
 export const useBookSave = () => {
@@ -11,6 +12,7 @@ export const useBookSave = () => {
     setChapters, 
     setCurrentChapterContent 
   } = useBooksStore();
+  const { removeChange } = useChangesStore();
 
   const handleSave = useCallback(async () => {
     try {
@@ -41,10 +43,15 @@ export const useBookSave = () => {
       setChapters(data.chapters);
       setCurrentChapterContent(data.chapters[getCurrentChapterFromUrl()]);
 
+      // Clear the change from tracking since it's now saved
+      if (currentBook && currentFile) {
+        removeChange(currentBook, currentFile);
+      }
+
     } catch (error) {
       console.error('Error saving chapter:', error);
     }
-  }, [currentBook, currentFile, currentChapterContent, setMetadata, setChapters, setCurrentChapterContent]);
+  }, [currentBook, currentFile, currentChapterContent, setMetadata, setChapters, setCurrentChapterContent, removeChange]);
 
   return { handleSave };
 };

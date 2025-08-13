@@ -353,8 +353,6 @@ async function parseMetadataAndUpdate(audioData: Uint8Array | ArrayBuffer, curre
     console.warn(`Metadata parsing failed:`, metadataError);
   }
 
-  console.log("PINGWING image coverArtUrl", { title, coverArtUrl });
-
   return { title, coverArtUrl };
 }
 

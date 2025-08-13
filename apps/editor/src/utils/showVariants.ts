@@ -1,153 +1,110 @@
 import * as monaco from "monaco-editor";
-import type { Variant } from "../types.ts";
+import { useAppStore } from "../stores/appStore";
 
-export const setupVariantsGutter = (
-  editor: monaco.editor.IStandaloneCodeEditor,
-  getVariants: () => Variant[],
-  onVariantClick: (variant: Variant, allLineVariants?: Variant[]) => void,
+export const setupSpanClickDetection = (
+  editor: monaco.editor.IStandaloneCodeEditor
 ): (() => void) => {
-  editor.updateOptions({ glyphMargin: true });
-
-  let decorationsCollection: monaco.editor.IEditorDecorationsCollection | null = null;
-  let variantToLineMap: Map<string, number> = new Map();
-  let lineToVariantsMap: Map<number, Variant[]> = new Map();
-
-  // Store disposables for cleanup
   const disposables: monaco.IDisposable[] = [];
 
-  // Debounce timer
-  let debounceTimer: NodeJS.Timeout | null = null;
-  const DEBOUNCE_DELAY = 300; // milliseconds
-
-  const buildVariantMaps = (): void => {
+  // Helper function to find span element at position using robust DOM parsing
+  const findSpanAtPosition = (position: monaco.Position): { id: string; text: string } | null => {
     const model = editor.getModel();
-    if (!model) return;
+    if (!model) return null;
 
-    const currentVariants = getVariants();
+    const line = model.getLineContent(position.lineNumber);
+    const offset = position.column - 1; // Convert to 0-based index
 
-    // Clear existing maps
-    variantToLineMap.clear();
-    lineToVariantsMap.clear();
-
-    if (!currentVariants || currentVariants.length === 0) return;
-
-    // Create a set for faster lookup
-    const variantIdSet = new Set(currentVariants.map((v) => v.id));
-
-    // Use Monaco's findMatches for safer searching
-    // This regex finds all span tags with id attributes
-    const matches = model.findMatches(
-      '<span[^>]*\\bid=["\'"][^"\']+["\'"][^>]*>',
-      false, // searchOnlyEditableRange
-      true, // isRegex
-      false, // matchCase
-      null, // wordSeparators
-      false, // captureMatches
-    );
-
-    matches.forEach((match) => {
-      const lineNumber = match.range.startLineNumber;
-      const matchText = model.getValueInRange(match.range);
-
-      // Extract ID using string manipulation instead of regex
-      const idMatch = matchText.match(/\bid=["']([^"']+)["']/);
-      if (idMatch) {
-        const spanId = idMatch[1];
-
-        // Only process spans that correspond to our variants
-        if (variantIdSet.has(spanId)) {
-          const variant = currentVariants.find((v) => v.id === spanId);
-          if (variant) {
-            // Update variant-to-line map
-            variantToLineMap.set(spanId, lineNumber);
-
-            // Update line-to-variants map
-            const existingVariants = lineToVariantsMap.get(lineNumber) || [];
-            existingVariants.push(variant);
-            lineToVariantsMap.set(lineNumber, existingVariants);
+    try {
+      // Create a temporary DOM element to parse the HTML properly
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = line;
+      
+      // Find all span elements with id attributes
+      const spans = tempDiv.querySelectorAll('span[id]');
+      
+      // Calculate position offsets for each span in the original line
+      for (const span of spans) {
+        const spanId = span.getAttribute('id');
+        if (!spanId) continue;
+        
+        // Get the outer HTML to find the start position in the original line
+        const spanOuterHTML = span.outerHTML;
+        const spanIndex = line.indexOf(spanOuterHTML);
+        
+        if (spanIndex !== -1) {
+          const spanEnd = spanIndex + spanOuterHTML.length;
+          
+          // Check if cursor is within this span's range
+          if (offset >= spanIndex && offset < spanEnd) {
+            // Extract text content, removing any nested HTML tags
+            const textContent = span.textContent || '';
+            return { id: spanId, text: textContent.trim() };
           }
         }
       }
-    });
-
-    console.log("Built variant maps:", { variantToLineMap, lineToVariantsMap });
+      
+      // Fallback: if DOM parsing fails or spans weren't found, try to find spans manually
+      // This handles malformed HTML or edge cases where innerHTML parsing might not work
+      return findSpanWithManualParsing(line, offset);
+      
+    } catch (error) {
+      console.warn('DOM parsing failed, falling back to manual parsing:', error);
+      return findSpanWithManualParsing(line, offset);
+    }
   };
 
-  const updateVariantDecorations = () => {
-    console.log("Updating variant decorations...");
-
-    // Rebuild maps when content changes
-    buildVariantMaps();
-
-    const decorations: monaco.editor.IModelDeltaDecoration[] = [];
-
-    // Use the line-to-variants map to create decorations
-    lineToVariantsMap.forEach((variants, lineNumber) => {
-      if (variants.length > 0) {
-        decorations.push({
-          range: new monaco.Range(lineNumber, 1, lineNumber, 1),
-          options: {
-            isWholeLine: false,
-            glyphMarginClassName: "variant-edit-icon",
-            glyphMarginHoverMessage: { value: variants.length === 1 ? `Click to edit variant: ${variants[0].id}` : `Click to edit ${variants.length} variants on this line` },
-          },
-        });
+  // Fallback manual parsing method for edge cases
+  const findSpanWithManualParsing = (line: string, offset: number): { id: string; text: string } | null => {
+    // Use a more comprehensive regex that handles various attribute formats
+    const spanRegex = /<span\s+(?:[^>]*\s+)?id\s*=\s*(['"])((?:(?!\1)[^\\]|\\.)*)?\1[^>]*>(.*?)<\/span>/gi;
+    let match;
+    
+    spanRegex.lastIndex = 0; // Reset regex state
+    
+    while ((match = spanRegex.exec(line)) !== null) {
+      const spanStart = match.index;
+      const spanEnd = spanStart + match[0].length;
+      
+      // Check if cursor is within this span
+      if (offset >= spanStart && offset < spanEnd) {
+        const spanId = match[2]; // ID is captured in group 2
+        const spanContent = match[3]; // Content is captured in group 3
+        
+        // Remove any nested HTML tags from content
+        const cleanText = spanContent.replace(/<[^>]*>/g, '').trim();
+        
+        return { id: spanId, text: cleanText };
       }
-    });
-
-    if (decorationsCollection) {
-      decorationsCollection.clear();
     }
-    decorationsCollection = editor.createDecorationsCollection(decorations);
+    
+    return null;
   };
 
-  // Debounced version of updateVariantDecorations
-  const debouncedUpdateVariantDecorations = () => {
-    // Clear existing timer
-    if (debounceTimer) {
-      clearTimeout(debounceTimer);
+  // Handle cursor position changes (clicks, keyboard navigation, etc.)
+  const cursorPositionDisposable = editor.onDidChangeCursorPosition((e) => {
+    // Check if showVariants is enabled
+    if (!useAppStore.getState().showVariants) return;
+    
+    const position = e.position;
+    const spanData = findSpanAtPosition(position);
+    
+    if (spanData) {
+      console.log(`Cursor in span with ID: ${spanData.id}, text: "${spanData.text}"`);
     }
-
-    // Set new timer
-    debounceTimer = setTimeout(() => {
-      console.log("Executing debounced variant decoration update...");
-      updateVariantDecorations();
-      debounceTimer = null;
-    }, DEBOUNCE_DELAY);
-  };
-
-  // Initial setup (no debounce needed)
-  updateVariantDecorations();
-
-  // Update decorations when content changes (with debounce)
-  const contentChangeDisposable = editor.onDidChangeModelContent(() => {
-    console.log("Content changed, scheduling decoration update...");
-    debouncedUpdateVariantDecorations();
   });
-  disposables.push(contentChangeDisposable);
+  disposables.push(cursorPositionDisposable);
 
-  // Handle clicks on variant icons
+  // Handle mouse clicks specifically
   const mouseDownDisposable = editor.onMouseDown((e) => {
-    console.log("Mouse click detected, target type:", e.target.type);
-
-    // Check both enum and numeric value since we see target type: 3
-    if (e.target.type === monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN || e.target.type === 3) {
-      console.log("Glyph margin clicked!");
-      const lineNumber = e.target.position?.lineNumber;
-      console.log("Line number:", lineNumber);
-
-      if (lineNumber) {
-        // Use the pre-built map for instant lookup
-        const lineVariants = lineToVariantsMap.get(lineNumber) || [];
-
-        console.log("Found variants on line (from map):", lineVariants);
-        if (lineVariants.length > 0) {
-          console.log("Opening variants for line:", lineNumber, lineVariants);
-          // Pass the first variant and all line variants for navigation
-          onVariantClick(lineVariants[0], lineVariants);
-        } else {
-          console.log("No variants found for line:", lineNumber);
-        }
+    // Check if showVariants is enabled
+    if (!useAppStore.getState().showVariants) return;
+    
+    if (e.target.position) {
+      const spanData = findSpanAtPosition(e.target.position);
+      if (spanData) {
+        console.log(`Clicked on span with ID: ${spanData.id}, text: "${spanData.text}"`);
+        // Set the selected span ID and text in the app store
+        useAppStore.getState().setSelectedSpan(spanData.id, spanData.text);
       }
     }
   });
@@ -155,25 +112,6 @@ export const setupVariantsGutter = (
 
   // Return cleanup function
   return () => {
-    console.log("Cleaning up variant gutter...");
-
-    // Clear any pending debounce timer
-    if (debounceTimer) {
-      clearTimeout(debounceTimer);
-      debounceTimer = null;
-    }
-
-    // Dispose all event listeners
     disposables.forEach((disposable) => disposable.dispose());
-
-    // Clear decorations collection
-    if (decorationsCollection) {
-      decorationsCollection.clear();
-      decorationsCollection = null;
-    }
-
-    // Clear maps
-    variantToLineMap.clear();
-    lineToVariantsMap.clear();
   };
 };
