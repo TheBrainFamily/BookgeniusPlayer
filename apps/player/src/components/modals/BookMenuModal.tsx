@@ -80,10 +80,6 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
   const bookLocation = useRef(getCurrentLocation());
 
-  useEffect(() => {
-    bookLocation.current = getCurrentLocation();
-  }, []);
-
   const handleFontSizePreset = (size: number) => {
     setHideOverlay(true);
     setIsFontSizeChanging(true);
@@ -150,10 +146,6 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
     if (!hideOverlay) {
       setHideOverlay(true);
-    }
-
-    if (overlayTimeoutRef.current) {
-      clearTimeout(overlayTimeoutRef.current);
     }
 
     overlayTimeoutRef.current = setTimeout(() => {
