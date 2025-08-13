@@ -13,7 +13,7 @@ import { activateCharacterInteractions } from "@/helpers/activateCharacterIntera
 import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
 import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
 import { useCharacterModal } from "@/stores/modals/characterModal.store";
-import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
+import { getCurrentLocation, systemNavigateTo } from "@/helpers/paragraphsNavigation";
 
 const AnimatedFontSize: React.FC<{ value: number; isChanging: boolean }> = memo(({ value, isChanging }) => {
   const [currentDisplayValue, setCurrentDisplayValue] = useState(value);
@@ -63,34 +63,6 @@ interface BookMenuModalProps {
 const SLIDER_DELAY = 200;
 const OVERLAY_TIMEOUT = 1500;
 
-const hideNonVisibleParagraphs = (currentChapter: number, currentParagraph: number) => {
-  document.querySelectorAll("[data-chapter]").forEach((chapter: HTMLElement) => {
-    const id = parseInt(chapter.dataset.chapter || "0");
-    if (Math.abs(id - currentChapter) > 0) {
-      chapter.style.display = "none";
-    } else {
-      chapter.style.display = "block";
-    }
-  });
-  console.log(`currentChapter: ${currentChapter}, currentParagraph: ${currentParagraph}`);
-  document.querySelectorAll(`[data-chapter="${currentChapter}"] [data-index]`).forEach((paragraph: HTMLElement) => {
-    const id = parseInt(paragraph.dataset.index || "0");
-    if (id < currentParagraph) {
-      paragraph.style.display = "none";
-    } else {
-      paragraph.style.display = "block";
-    }
-  });
-};
-const displayAllChapters = () => {
-  document.querySelectorAll("[data-chapter]").forEach((chapter: HTMLElement) => {
-    chapter.style.display = "block";
-  });
-  document.querySelectorAll("[data-index]").forEach((paragraph: HTMLElement) => {
-    paragraph.style.display = "block";
-  });
-};
-
 const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, openApiKeyModal, resetFurthestPageLocation }) => {
   const { t } = useTranslation();
   const allVariants = getAllVariants();
@@ -103,9 +75,10 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const [isFontSizeChanging, setIsFontSizeChanging] = useState(false);
   const [isComplexityChanging, setIsComplexityChanging] = useState(false);
 
-  const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const overlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isVisible = useRef(allVariants.length > 0);
-  const hiddenParagraphsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const bookLocation = useRef(getCurrentLocation());
 
   const handleFontSizePreset = (size: number) => {
     setHideOverlay(true);
@@ -136,6 +109,11 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
     }, 1500);
   };
 
+  const handleFontSizePreviewChange = (value: number[]) => {
+    const fontSize = value[0];
+    setCurrentFontSize(fontSize);
+  };
+
   const handleSliderChangeWithOverlay = (callback: () => void) => {
     if (overlayTimeoutRef.current) {
       clearTimeout(overlayTimeoutRef.current);
@@ -161,30 +139,17 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
       clearTimeout(overlayTimeoutRef.current);
     }
 
-    const currentLocation = getCurrentLocation();
-    console.log("location currentChapter", currentLocation.currentChapter);
-    hideNonVisibleParagraphs(currentLocation.currentChapter, currentLocation.currentParagraph);
     setTimeout(() => {
       setCurrentFontSize(fontSize);
+      systemNavigateTo({ currentChapter: bookLocation.current.currentChapter, currentParagraph: bookLocation.current.currentParagraph }, { wait: true });
     }, 200);
 
     if (!hideOverlay) {
       setHideOverlay(true);
     }
 
-    if (hiddenParagraphsTimeoutRef.current) {
-      clearTimeout(hiddenParagraphsTimeoutRef.current);
-    }
-
-    if (overlayTimeoutRef.current) {
-      clearTimeout(overlayTimeoutRef.current);
-    }
-
     overlayTimeoutRef.current = setTimeout(() => {
       setHideOverlay(false);
-    }, 1500);
-    hiddenParagraphsTimeoutRef.current = setTimeout(() => {
-      displayAllChapters();
     }, 1500);
   };
 
@@ -301,7 +266,8 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
               max={1.5}
               step={0.1}
               value={[currentFontSize]}
-              onValueChange={handleFontSizeChange}
+              onValueChange={handleFontSizePreviewChange}
+              onValueCommit={handleFontSizeChange}
               aria-label="Rozmiar tekstu"
               className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
             />
