@@ -452,7 +452,7 @@
         position: relative;
         width: 600px;
         max-width: 100%;
-        margin: 0 auto clamp(2.5em, 2.5vh, 3.5em);
+        margin: 0 auto clamp(3em, 2.5vh, 3.5em);
         gap: clamp(1rem, 2vw, 2rem);
       }
 
@@ -477,7 +477,6 @@
 
       .play-row.didaskalia-row {
         justify-content: center;
-        margin-bottom: 0;
       }
 
       .character-avatar {
@@ -541,7 +540,7 @@
       }
 
       .character-text {
-        flex: 1;
+        flex: 0 0 auto;
         max-width: 70%;
         min-width: 0;
         text-align: left;
@@ -556,12 +555,19 @@
         transform: translateX(22.5%);
       }
 
-      .play-row[data-text-alignment="right"] .character-text {
-        flex: 0 0 auto;
-      }
-
       .play-row[data-text-alignment="right"] .character-avatar {
         transform: rotateY(180deg);
+      }
+
+      .play-row:not(:has(.character-avatar)) {
+        transform: translateX(0) !important;
+      }
+
+      .didaskalia-row,
+      .didaskalia-row[data-text-alignment="left"],
+      .didaskalia-row[data-text-alignment="right"] {
+        transform: translateX(0) !important;
+        padding: 0 !important;
       }
 
       span.inline-avatar-wrapper > div {
@@ -716,7 +722,7 @@
 
   @media (max-width: 625px) {
     #content-container:has(.play-container) {
-      background-size: 375px 100%;
+      background-size: 375x 100%;
 
       .play-container > section > section {
         max-width: 575px;
@@ -729,6 +735,11 @@
 
         .play-row {
           width: 375px;
+          margin-bottom: 5em;
+        }
+
+        .play-row .character-text {
+          max-width: 80%;
         }
 
         .play-row[data-text-alignment="left"] {
@@ -759,6 +770,10 @@
           width: 325px;
         }
 
+        .play-row .character-text {
+          max-width: 75%;
+        }
+
         .play-row[data-text-alignment="left"] {
           transform: translateX(-17.5%);
         }
@@ -785,6 +800,7 @@
 
         .play-row {
           width: 300px;
+          /* margin-bottom: 2rem; */
         }
 
         .play-row[data-text-alignment="left"] {
@@ -979,6 +995,26 @@
     }
   }
 
+  #right-notes.visible {
+    visibility: visible;
+  }
+
+  #right-notes.hide {
+    display: none;
+  }
+
+  /* Notes display */
+  #right-notes-scrollable-container {
+    /* Default state is hidden */
+    display: none;
+  }
+
+  /* Highlight note styles */
+  #right-notes-scrollable-container section.highlight-note {
+    background-color: var(--entity-highlight-bg-light);
+    transition: background-color 0.3s ease-in-out;
+  }
+
   /* --- Loading Indicator --- */
   #loading {
     position: fixed;
@@ -1008,12 +1044,6 @@
     height: 50px;
     animation: spin 1s linear infinite;
     margin-right: 20px;
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
   }
 
   .entity-image-wrapper:hover {
@@ -1163,21 +1193,6 @@
     object-fit: cover;
   }
 
-  /* Add character container and button */
-  .add-play-row {
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
-
-  .add-character-button {
-    padding: 8px 16px;
-    background-color: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
   /* Character selector modal */
   .character-selector-modal {
     display: none;
@@ -1267,17 +1282,6 @@
   pointer-events: none; /* Prevent interaction during fade-out */
 }
 
-/* Highlight note styles - light mode */
-#legacy #right-notes-scrollable-container section.highlight-note {
-  background-color: var(--entity-highlight-bg-light);
-  transition: background-color 0.3s ease-in-out;
-}
-
-/* Highlight note styles - night mode */
-#legacy.night-mode #right-notes-scrollable-container section.highlight-note {
-  background-color: var(--entity-highlight-bg-dark);
-}
-
 h3[data-index="0"] {
   font-size: 2em;
   font-family: serif;
@@ -1300,30 +1304,6 @@ section[data-chapter] [data-index] {
 .active-paragraph {
   background: hsla(219, 60%, 36%, 0);
   transition: all 0.3s ease-in-out;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.15);
-  }
-}
-
-/* --- Keyframes for the zoom animation --- */
-@keyframes zoomInOutEffect {
-  /* Renamed slightly for clarity, ensure it's unique if you had other zoomInOut */
-  0% {
-    transform: scale(1) translateZ(0);
-  }
-  50% {
-    transform: scale(1.2); /* Your desired zoom amount */
-  }
-  100% {
-    transform: scale(1) translateZ(0);
-  }
 }
 
 .character-highlighted-activated {
@@ -1360,14 +1340,6 @@ section[data-chapter] [data-index] {
   animation-timing-function: ease-out;
 }
 
-@keyframes fadeLastWordHighlightEffect {
-  to {
-    background-color: transparent;
-    border: none;
-    border-color: none;
-  }
-}
-
 .textured-bg {
   background:
     radial-gradient(circle at 20% 80%, color-mix(in srgb, var(--book-tertiary-color) 30%, transparent) 0%, transparent 50%),
@@ -1378,16 +1350,6 @@ section[data-chapter] [data-index] {
 .chapter-loading {
   padding: 2rem;
   animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
 }
 
 #book-container span {
@@ -1418,6 +1380,26 @@ section[data-chapter] [data-index] {
       opacity 1000ms ease-in-out,
       transform 1000ms ease-in-out;
   }
+}
+
+/* Selects the book container IF its descendant #content-container 
+  has a child with the class .play-container.
+*/
+#book-container:has(#content-container .play-container) {
+  padding: 0;
+}
+
+/* When in 'play' mode, find and hide the side note containers. */
+#book-container:has(#content-container .play-container) #left-notes,
+#book-container:has(#content-container .play-container) #right-notes {
+  display: none;
+}
+
+/* When in 'play' mode, reset the content container's constraints. */
+#book-container:has(#content-container .play-container) #content-container {
+  /* Resets the flex-grow (sm:flex-3) and max-width (max-w-[900px]) so the play's content can define its own width.  */
+  flex: initial;
+  max-width: initial;
 }
 
 .scrollbar-search {
@@ -1534,5 +1516,79 @@ section[data-chapter] [data-index] {
   }
   .player-left .mb-4 {
     margin-bottom: 0.5rem;
+  }
+}
+
+/* Fade states */
+.faded {
+  opacity: 0;
+}
+
+.fade-in {
+  opacity: 1;
+}
+
+#content-container {
+  transition: opacity 0.5s ease-in-out;
+}
+
+#left-notes {
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* -- KEYFRAMES -- */
+@keyframes shimmerEffect {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeLastWordHighlightEffect {
+  to {
+    background-color: transparent;
+    border: none;
+    border-color: none;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* --- Keyframes for the zoom animation --- */
+@keyframes zoomInOutEffect {
+  /* Renamed slightly for clarity, ensure it's unique if you had other zoomInOut */
+  0% {
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    transform: scale(1.2); /* Your desired zoom amount */
+  }
+  100% {
+    transform: scale(1) translateZ(0);
   }
 }
