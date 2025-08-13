@@ -1,0 +1,27 @@
+# Dockerfile for local development of the 'player' app
+# This file runs the Vite dev server with hot-reloading.
+
+# Start from the official Bun image for a consistent and fast environment.
+FROM oven/bun:1.0
+
+# Set the working directory inside the container.
+WORKDIR /usr/src/app
+
+# --- Dependency Caching Optimization ---
+# Copy all root-level dependency manifests first.
+# This layer is cached by Docker and only re-runs if these files change.
+COPY ./package.json ./pnpm-lock.yaml ./pnpm-workspace.yaml ./
+
+# Copy the app-specific package.json.
+COPY ./apps/player/package.json ./apps/player/
+
+# Install ONLY the dependencies required for the 'player' workspace.
+# This is much faster than installing dependencies for the entire monorepo.
+RUN pnpm install --filter player
+
+# Expose the default port used by the Vite dev server.
+EXPOSE 5173
+
+# Define the command to start the Vite dev server.
+# The '--host' flag is crucial to make the server accessible from outside the container.
+CMD ["pnpm", "--filter", "player", "dev", "--host"]

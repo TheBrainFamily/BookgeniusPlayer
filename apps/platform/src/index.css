@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Victorian Library Design System - Rich, atmospheric, and elegant */
+
+@layer base {
+  :root {
+    /* Base library atmosphere */
+    --background: 15 15% 8%;
+    --foreground: 45 25% 85%;
+
+    /* Card surfaces like book covers and manuscripts */
+    --card: 20 20% 12%;
+    --card-foreground: 45 20% 90%;
+
+    /* Popup elements like tooltips */
+    --popover: 18 25% 10%;
+    --popover-foreground: 45 25% 92%;
+
+    /* Primary gold accents - like gilded book spines */
+    --primary: 45 70% 55%;
+    --primary-foreground: 20 30% 8%;
+
+    /* Secondary mahogany wood tones */
+    --secondary: 15 30% 18%;
+    --secondary-foreground: 45 15% 88%;
+
+    /* Muted surfaces like aged parchment */
+    --muted: 25 15% 15%;
+    --muted-foreground: 40 12% 65%;
+
+    /* Accent deep green like leather book bindings */
+    --accent: 140 40% 25%;
+    --accent-foreground: 45 20% 95%;
+
+    /* Burgundy for important elements */
+    --destructive: 350 60% 45%;
+    --destructive-foreground: 45 15% 95%;
+
+    /* Borders and inputs with warm undertones */
+    --border: 25 20% 20%;
+    --input: 20 25% 15%;
+    --ring: 45 60% 50%;
+
+    --radius: 0.75rem;
+
+    /* Library atmosphere colors */
+    --library-mahogany: 15 35% 15%;
+    --library-walnut: 25 30% 20%;
+    --library-gold: 45 70% 55%;
+    --library-gold-glow: 45 60% 65%;
+    --library-green: 140 40% 25%;
+    --library-burgundy: 350 50% 35%;
+    --library-parchment: 40 25% 85%;
+    
+    /* Atmospheric gradients */
+    --gradient-candlelight: linear-gradient(135deg, hsl(45 60% 50%) 0%, hsl(35 55% 45%) 50%, hsl(25 50% 35%) 100%);
+    --gradient-bookshelf: linear-gradient(180deg, hsl(15 25% 12%) 0%, hsl(20 30% 8%) 100%);
+    --gradient-leather: linear-gradient(135deg, hsl(140 35% 20%) 0%, hsl(130 40% 15%) 100%);
+    --gradient-parchment: linear-gradient(180deg, hsl(40 20% 88%) 0%, hsl(35 15% 82%) 100%);
+
+    /* Sidebar styling for library navigation */
+    --sidebar-background: 18 25% 10%;
+    --sidebar-foreground: 45 20% 85%;
+    --sidebar-primary: 45 60% 50%;
+    --sidebar-primary-foreground: 20 25% 10%;
+    --sidebar-accent: 25 20% 18%;
+    --sidebar-accent-foreground: 45 15% 88%;
+    --sidebar-border: 25 20% 20%;
+    --sidebar-ring: 45 60% 50%;
+  }
+
+  .dark {
+    /* Enhanced dark theme for deeper library atmosphere */
+    --background: 12 20% 6%;
+    --foreground: 45 25% 88%;
+    --card: 18 25% 8%;
+    --card-foreground: 45 20% 92%;
+    --popover: 15 30% 6%;
+    --popover-foreground: 45 25% 94%;
+    --primary: 45 75% 60%;
+    --primary-foreground: 15 30% 6%;
+    --secondary: 12 35% 12%;
+    --secondary-foreground: 45 15% 90%;
+    --muted: 20 20% 10%;
+    --muted-foreground: 40 12% 68%;
+    --accent: 140 45% 20%;
+    --accent-foreground: 45 20% 96%;
+    --destructive: 350 65% 40%;
+    --destructive-foreground: 45 15% 96%;
+    --border: 22 25% 15%;
+    --input: 18 30% 10%;
+    --ring: 45 65% 55%;
+    
+    /* Enhanced sidebar for dark library */
+    --sidebar-background: 15 30% 6%;
+    --sidebar-foreground: 45 20% 88%;
+    --sidebar-primary: 45 70% 55%;
+    --sidebar-primary-foreground: 15 25% 8%;
+    --sidebar-accent: 20 25% 12%;
+    --sidebar-accent-foreground: 45 15% 90%;
+    --sidebar-border: 22 25% 15%;
+    --sidebar-ring: 45 65% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-serif;
+    background-image: 
+      radial-gradient(circle at 20% 20%, hsl(45 40% 15% / 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, hsl(35 35% 12% / 0.4) 0%, transparent 50%),
+      linear-gradient(180deg, hsl(15 20% 8%) 0%, hsl(20 25% 6%) 100%);
+  }
+
+  /* Custom scrollbar for library aesthetic */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--library-gold) / 0.6);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--library-gold) / 0.8);
+  }
+}

@@ -1,180 +1,124 @@
-name: Deploy
+name: Build and Deploy
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
   pull_request:
-    types: [ opened, synchronize, reopened ]
+    types: [opened, synchronize, reopened]
 
 permissions:
-  id-token: write
   contents: read
-  pull-requests: write
+  packages: write
 
 jobs:
-  env-vars:
-    runs-on: ubuntu-latest
-    environment: lucetius
-    outputs:
-      DEPLOY_HOST: ${{ steps.export.outputs.DEPLOY_HOST }}
-      DEPLOY_USER: ${{ steps.export.outputs.DEPLOY_USER }}
-      DEPLOY_DOMAIN: ${{ steps.export.outputs.DEPLOY_DOMAIN }}
-      DEPLOY_ROOT_DIR: ${{ steps.export.outputs.DEPLOY_ROOT_DIR }}
-      DEPLOY_STATUS_DIR: ${{ steps.export.outputs.DEPLOY_STATUS_DIR }}
-      DEPLOY_AWS_ARN: ${{ steps.export.outputs.DEPLOY_AWS_ARN }}
-      DEPLOY_AWS_REGION: ${{ steps.export.outputs.DEPLOY_AWS_REGION }}
-      DEPLOY_AWS_BUCKET: ${{ steps.export.outputs.DEPLOY_AWS_BUCKET }}
-      ssh_key_b64: ${{ steps.export.outputs.ssh_key_b64 }}
+  build-and-deploy:
+    runs-on: self-hosted
+    environment: bookg
     steps:
-      - id: export
-        run: |
-          echo "DEPLOY_HOST=${{ vars.DEPLOY_HOST }}" >> $GITHUB_OUTPUT
-          echo "DEPLOY_USER=${{ vars.DEPLOY_USER }}" >> $GITHUB_OUTPUT
-          echo "DEPLOY_DOMAIN=${{ vars.DEPLOY_DOMAIN }}" >> $GITHUB_OUTPUT
-          echo "DEPLOY_ROOT_DIR=${{ vars.DEPLOY_ROOT_DIR }}" >> $GITHUB_OUTPUT
-          echo "DEPLOY_STATUS_DIR=${{ vars.DEPLOY_STATUS_DIR }}" >> $GITHUB_OUTPUT
-          echo "DEPLOY_AWS_ARN=${{ vars.DEPLOY_AWS_ARN }}" >> $GITHUB_OUTPUT
-          echo "DEPLOY_AWS_REGION=${{ vars.DEPLOY_AWS_REGION }}" >> $GITHUB_OUTPUT
-          echo "DEPLOY_AWS_BUCKET=${{ vars.DEPLOY_AWS_BUCKET }}" >> $GITHUB_OUTPUT
-          echo "ssh_key_b64<<EOF" >> "$GITHUB_OUTPUT"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
-
-  resolve-branch-name:
-    runs-on: ubuntu-latest
-    outputs:
-      branch_name: ${{ steps.set.outputs.branch_name }}
-    steps:
-      - name: Get and sanitize branch name
-        id: set
-        run: |
-          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
-            RAW_BRANCH="${{ github.head_ref }}"
-          else
-            RAW_BRANCH="${{ github.ref_name }}"
-          fi
-
-          SAFE_BRANCH=$(echo "$RAW_BRANCH" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
-
-          echo "Resolved BRANCH_NAME: $SAFE_BRANCH"
-          echo "branch_name=$SAFE_BRANCH" >> "$GITHUB_OUTPUT"
-
-  generate-matrix:
-    needs: resolve-branch-name
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - id: set-matrix
-        run: |
-          set -euo pipefail
-          titles=$(find public_books -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | \
-                    jq -R -s -c 'split("\n") | map(select(length > 0))')
-          echo "Detected titles: $titles"
-          printf 'matrix=%s\n' "$titles" >> "$GITHUB_OUTPUT"
-
-  deploy:
-    needs: [env-vars, resolve-branch-name,generate-matrix]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        title: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
-      fail-fast: false
-
-    env:
-      DEPLOY_HOST: ${{ needs.env-vars.outputs.DEPLOY_HOST }}
-      DEPLOY_USER: ${{ needs.env-vars.outputs.DEPLOY_USER }}
-      DEPLOY_DOMAIN: ${{ needs.env-vars.outputs.DEPLOY_DOMAIN }}
-      DEPLOY_ROOT_DIR: ${{ needs.env-vars.outputs.DEPLOY_ROOT_DIR }}
-      DEPLOY_STATUS_DIR: ${{ needs.env-vars.outputs.DEPLOY_STATUS_DIR }}
-      DEPLOY_AWS_BUCKET: ${{ needs.env-vars.outputs.DEPLOY_AWS_BUCKET }}
-      AWS_REGION: ${{ needs.env-vars.outputs.DEPLOY_AWS_REGION }}
-      BRANCH_NAME: ${{ needs.resolve-branch-name.outputs.branch_name }}
-
-    steps:
-      - name: Checkout repo
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          lfs: false
+          lfs: true
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "pnpm"
 
-      - name: Selective LFS pull
-        if: needs.resolve-branch-name.outputs.branch_name == 'main'
+      - name: Set dynamic environment variables
+        id: set_vars
         run: |
-          set -e
-          git lfs install
-          git lfs pull --include="public_books/${{ matrix.title }}"
-          git lfs pull --include="public"
+          REPOSITORY=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "REPOSITORY=${REPOSITORY}" >> $GITHUB_ENV
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # For Pull Requests
+            BRANCH_NAME=$(echo "${{ github.head_ref }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+            echo "IMAGE_TAG=pr-${{ github.event.number }}-${BRANCH_NAME}" >> $GITHUB_ENV
+            echo "ASSET_CONTEXT=staging/pr-${{ github.event.number }}-${BRANCH_NAME}" >> $GITHUB_ENV
+            echo "IS_PRODUCTION=false" >> $GITHUB_ENV
+          else
+            BRANCH_NAME=$(echo "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+            echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+            echo "ASSET_CONTEXT=production" >> $GITHUB_ENV
+            echo "IS_PRODUCTION=true" >> $GITHUB_ENV
+          fi
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
 
-          echo "Pointers:"
-          grep -r "oid sha256" public_books/${{ matrix.title }} || echo "No pointers"
-
-          echo "LFS files:"
-          git lfs ls-files | grep public_books/${{ matrix.title }} || echo "No LFS files"
-
-          echo "Book dir size:"
-          du -sh public_books/${{ matrix.title }}
-
+      - name: Setup Bun and install dependencies
+        uses: oven-sh/setup-bun@v1
       - run: pnpm install
 
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" | base64 --decode > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
-        env:
-          SSH_PRIVATE_KEY: ${{ needs.env-vars.outputs.ssh_key_b64 }}
+#      - name: Build local artifacts (for S3 upload)
+#        run: pnpm build:docker
 
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v3
+
+      - name: Build
+        run: pnpm build:docker:with-books
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          CI: true
+
+
+      - name: Deploy assets to Hetzner S3
+        env:
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+          ASSET_CONTEXT: ${{ env.ASSET_CONTEXT }}
+          S3_ENDPOINT: ${{ vars.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          S3_BUCKET: ${{ vars.S3_BUCKET }}
+          FORCE: true
+        run: bun run ./tools/scripts/deploy-s3.ts # Your Bun script for uploading
+
+      - name: Delete books from build/player-app
+        run: rm -rf build/player-app/books
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          role-to-assume: ${{ needs.env-vars.outputs.DEPLOY_AWS_ARN }}
-          aws-region: ${{ needs.env-vars.outputs.DEPLOY_AWS_REGION }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run deployment script
-        run: bash scripts/github-actions/build-and-deploy.sh ${{ matrix.title }} ${{ github.run_id }}
-
-  book-links:
-    needs: [env-vars, deploy]
-    runs-on: ubuntu-latest
-    if: always()
-
-    env:
-      DEPLOY_HOST: ${{ needs.env-vars.outputs.DEPLOY_HOST }}
-      DEPLOY_USER: ${{ needs.env-vars.outputs.DEPLOY_USER }}
-      DEPLOY_STATUS_DIR: ${{ needs.env-vars.outputs.DEPLOY_STATUS_DIR }}
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup SSH
+      - name: Build and Push Deployment Docker Images
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" | base64 --decode > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
-        env:
-          SSH_PRIVATE_KEY: ${{ needs.env-vars.outputs.ssh_key_b64 }}
+          docker build -t ghcr.io/${{ env.REPOSITORY }}/gateway:latest --file ./apps/gateway/Dockerfile .
+          docker build -t ghcr.io/${{ env.REPOSITORY }}/webhook:latest --file ./apps/webhook/Dockerfile ./apps/webhook
 
-      - name: Display matrix summary
-        run: bash scripts/github-actions/display-summary.sh ${{ github.run_id }}
+          docker push ghcr.io/${{ env.REPOSITORY }}/gateway:latest
+          docker push ghcr.io/${{ env.REPOSITORY }}/webhook:latest
 
-      - name: Create or update PR comment with deployment summary
-        if: github.event_name == 'pull_request'
-        run: bash scripts/github-actions/comment-pr.sh ${{ github.event.pull_request.number }} ${{ github.repository }}
+      - name: Build and Push Docker Images
+        run: |
+          docker build -t ghcr.io/${{ env.REPOSITORY }}/player:${{ env.IMAGE_TAG }} --file ./apps/player/Dockerfile .
+          docker build -t ghcr.io/${{ env.REPOSITORY }}/platform:${{ env.IMAGE_TAG }} --file ./apps/platform/Dockerfile .
+          docker build -t ghcr.io/${{ env.REPOSITORY }}/core-api:${{ env.IMAGE_TAG }} --file ./apps/core-api/Dockerfile .
+
+          docker push ghcr.io/${{ env.REPOSITORY }}/player:${{ env.IMAGE_TAG }}
+          docker push ghcr.io/${{ env.REPOSITORY }}/platform:${{ env.IMAGE_TAG }}
+          docker push ghcr.io/${{ env.REPOSITORY }}/core-api:${{ env.IMAGE_TAG }}
+
+      - name: Trigger deploy webhook
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WEBHOOK_TOKEN: ${{ secrets.WEBHOOK_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            URL="https://wh.bookg.aws.lucetius.pl/deploy"
+          else
+            URL="https://wh.bookg.aws.lucetius.pl/deploy-main"
+          fi
+
+          payload=$(printf '{"branch":"%s","imageTag":"%s", "assetContext":"%s"}' "${{ env.BRANCH_NAME }}" "${{ env.IMAGE_TAG }}" "${{ env.ASSET_CONTEXT }}")
+
+          curl -sS -X POST "$URL" \
+            -H "x-api-key: ${WEBHOOK_TOKEN}" \
+            -H "content-type: application/json" \
+            -d "$payload"
+

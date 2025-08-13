@@ -1,0 +1,25 @@
+# Dockerfile for local development of the 'platform' app
+# This file runs the Vite dev server with hot-reloading.
+
+# Start from the official Bun image for a consistent and fast environment.
+FROM oven/bun:1.0
+
+# Set the working directory inside the container.
+WORKDIR /usr/src/app
+
+# --- Dependency Caching Optimization ---
+# Copy all root-level dependency manifests first.
+COPY ./package.json ./bun.lockb ./pnpm-lock.yaml ./pnpm-workspace.yaml ./
+
+# Copy the app-specific package.json.
+COPY ./apps/platform/package.json ./apps/platform/
+
+# Install ONLY the dependencies required for the 'platform' workspace.
+RUN pnpm install --filter platform
+
+# Expose the default port used by the Vite dev server.
+EXPOSE 5173
+
+# Define the command to start the Vite dev server.
+# The '--host' flag is crucial to make the server accessible from outside the container.
+CMD ["pnpm", "--filter", "platform", "dev", "--host"]
