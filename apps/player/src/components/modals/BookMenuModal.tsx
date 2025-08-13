@@ -284,7 +284,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             </div>
           </div>
         </div>
-        {isVisible && (
+        {isVisible.current && (
           <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full book-settings-control-box")}>
             <div className="space-y-4 book-settings-control-box-inner">
               <div className="flex items-center gap-2">
