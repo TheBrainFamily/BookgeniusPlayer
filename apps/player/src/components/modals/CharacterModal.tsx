@@ -32,9 +32,6 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   const matchingCharacter = getCharactersData().find((character) => character.slug === characterSlug);
 
   // If character not found, don't render anything
-  if (!matchingCharacter) {
-    return null;
-  }
 
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -42,6 +39,8 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
   // Search for character appearances in the text up to the current location
   useEffect(() => {
+    if (!matchingCharacter) return;
+
     const searchAppearances = () => {
       setIsLoading(true);
       try {
@@ -93,6 +92,10 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
     onClose();
   };
+
+  if (!matchingCharacter) {
+    return null;
+  }
 
   return (
     <ModalUI onClose={onClose} className="bg-transparent pointer-events-none" size="xxl">

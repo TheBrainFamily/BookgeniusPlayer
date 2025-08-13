@@ -7,8 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "lint": "eslint --cache --fix src/",
+    "lint:ci": "eslint --cache src/",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit --incremental",
+    "typecheck:ci": "tsc --noEmit --incremental --pretty false",
+    "prettier:check": "prettier --check src/ --quiet 2>&1 | grep -v 'Ignored unknown option'"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.39.0",
@@ -51,12 +55,12 @@
     "input-otp": "^1.4.2",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
-    "react": "^18.3.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "react-day-picker": "^8.10.1",
-    "react-dom": "^18.3.1",
     "react-hook-form": "^7.61.1",
     "react-resizable-panels": "^2.1.9",
-    "react-router-dom": "^6.30.1",
+    "react-router-dom": "^7.1.2",
     "recharts": "^2.15.4",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.0",
@@ -68,8 +72,6 @@
     "@eslint/js": "^9.32.0",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^22.16.5",
-    "@types/react": "^18.3.23",
-    "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react-swc": "^3.11.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.32.0",
@@ -79,7 +81,7 @@
     "lovable-tagger": "^1.1.8",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.3",
+    "typescript": "5.8.2",
     "typescript-eslint": "^8.38.0",
     "vite": "^5.4.19"
   }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Play, Pause, SkipForward, SkipBack, ListMusic, BookHeadphones, Volume2, VolumeX, Download } from "lucide-react";
-import { motion, AnimatePresence, Variants, Transition } from "motion/react";
+import { motion, AnimatePresence, Variants, Transition, Easing } from "motion/react";
 import useLocalStorageState from "use-local-storage-state";
 import { useTranslation } from "react-i18next";
 
@@ -571,7 +571,7 @@ const transitions = {
     duration: options?.duration ?? 0.25,
     delay: options?.delay ?? 0,
   }),
-  ease: (options?: { duration?: number; ease?: string | string[] }): Transition => ({ duration: options?.duration ?? 0.25, ease: options?.ease ?? "easeInOut" }),
+  ease: (options?: { duration?: number; ease?: Easing | Easing[] }): Transition => ({ duration: options?.duration ?? 0.25, ease: options?.ease ?? "easeInOut" }),
 };
 
 const variants: Record<string, Variants> = {

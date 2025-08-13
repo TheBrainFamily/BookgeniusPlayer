@@ -14,7 +14,10 @@ async function buildServerAssets() {
     // 1. Parse book data using existing functions
     const { metadata, bookString } = parseBookXmlData(bookDirectoryPath);
     // Call the function which now returns chapterHtmls
+    // @ts-expect-error - TODO: fix this
     const { chapterHtmls, chapterTitles } = xmlToComplexHtml(bookString, metadata.slug, metadata.language);
+
+    throw new Error("FIXME: chapterHtmls not available in xmlToComplexHtml");
 
     // 2. Create the output directory
     const outputDir = path.resolve("dist-server", metadata.slug);

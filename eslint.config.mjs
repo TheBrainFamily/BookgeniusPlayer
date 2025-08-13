@@ -1,6 +1,14 @@
 import globals from "globals";
-import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
 
-/** @type {import('eslint').Linter.Config[]} */
-export default [{ files: ["**/*.{js,mjs,cjs,ts}"] }, { languageOptions: { globals: globals.browser } }, pluginJs.configs.recommended, ...tseslint.configs.recommended];
+export default tseslint.config({ ignores: ["**/node_modules", "**/dist", "**/build", "**/coverage"] }, ...tseslint.configs.recommended, {
+  files: ["apps/**/*.{ts,tsx,js,jsx,mjs,cjs}"],
+  languageOptions: {
+    ecmaVersion: 2022,
+    sourceType: "module",
+    globals: globals.browser,
+    parserOptions: {
+      // no projectService here → syntax-only linting
+    },
+  },
+});

@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest-m
     environment: bookg
     steps:
       - name: Checkout Code
@@ -51,9 +51,8 @@ jobs:
         uses: oven-sh/setup-bun@v1
       - run: pnpm install
 
-#      - name: Build local artifacts (for S3 upload)
-#        run: pnpm build:docker
-
+      #      - name: Build local artifacts (for S3 upload)
+      #        run: pnpm build:docker
 
       - name: Build
         run: pnpm build:docker:with-books
@@ -61,7 +60,6 @@ jobs:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           CI: true
-
 
       - name: Deploy assets to Hetzner S3
         env:
@@ -121,4 +119,3 @@ jobs:
             -H "x-api-key: ${WEBHOOK_TOKEN}" \
             -H "content-type: application/json" \
             -d "$payload"
-

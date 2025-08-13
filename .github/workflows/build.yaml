@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-m
 
     steps:
       - uses: actions/checkout@v4
@@ -12,16 +12,28 @@ jobs:
         #   sparse-checkout: |
         #     !apps/player/public_books
         #   sparse-checkout-cone-mode: false
-      - run: ls -al
       - uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1 # match your local pnpm
+          run_install: false
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22.17.1"
           cache: "pnpm"
-      - run: pnpm install
+
+      - run: corepack enable
+
+      - run: pnpm -v && node -v
+
+      - run: pnpm install --frozen-lockfile
       # - run: pnpm test
+      # Show exactly which Radix the player workspace sees
+      # Dump player tsconfig as tsc sees it
+      - run: pnpm -F player exec tsc -v
+      - run: pnpm -F player exec tsc --showConfig > player-tsconfig.json
+      - run: sed -n '1,200p' player-tsconfig.json
       # - run: pnpm typecheck:ci
-      # - run: pnpm lint:ci
+      - run: pnpm lint:ci
       - run: pnpm prettier:check
       # - name: Build project
       #   run: pnpm build public_books/Krolowa-Sniegu
