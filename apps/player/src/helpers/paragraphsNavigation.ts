@@ -67,7 +67,7 @@ interface Bridge {
 let _bridge: Bridge = {
   get: () => DEFAULT_LOCATION,
 
-  set: () => {},
+  set: () => { },
 };
 export const __setLocationBridge = (b: Bridge) => (_bridge = b);
 
@@ -183,7 +183,7 @@ const waitForElementStablePosition = (element: HTMLElement, options: { timeout?:
 /**
  * Navigate to a specific location with a system source (triggers scrolling)
  */
-export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph: number }) => {
+export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph: number }, options: { wait: boolean } = { wait: false }) => {
   if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
     console.error("Invalid location provided to systemNavigateTo:", loc);
     return;
@@ -231,7 +231,7 @@ export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph
     loc.currentParagraph === 0 ? `section[data-chapter="${loc.currentChapter}"]` : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
   const element = document.querySelector(selector) as HTMLElement;
 
-  if (pageWasJustReloaded() && element) {
+  if ((pageWasJustReloaded() || options.wait) && element) {
     waitForElementStablePosition(element).then(() => {
       runGoToParagraph();
     });
