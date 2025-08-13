@@ -63,15 +63,6 @@ interface BookMenuModalProps {
 const SLIDER_DELAY = 200;
 const OVERLAY_TIMEOUT = 1500;
 
-const displayAllChapters = () => {
-  document.querySelectorAll("[data-chapter]").forEach((chapter: HTMLElement) => {
-    chapter.style.display = "block";
-  });
-  document.querySelectorAll("[data-index]").forEach((paragraph: HTMLElement) => {
-    paragraph.style.display = "block";
-  });
-};
-
 let bookLocation = getCurrentLocation();
 
 const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, openApiKeyModal, resetFurthestPageLocation }) => {
@@ -86,9 +77,8 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const [isFontSizeChanging, setIsFontSizeChanging] = useState(false);
   const [isComplexityChanging, setIsComplexityChanging] = useState(false);
 
-  const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const overlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isVisible = useRef(allVariants.length > 0);
-  const hiddenParagraphsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     bookLocation = getCurrentLocation();
@@ -162,19 +152,12 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
       setHideOverlay(true);
     }
 
-    if (hiddenParagraphsTimeoutRef.current) {
-      clearTimeout(hiddenParagraphsTimeoutRef.current);
-    }
-
     if (overlayTimeoutRef.current) {
       clearTimeout(overlayTimeoutRef.current);
     }
 
     overlayTimeoutRef.current = setTimeout(() => {
       setHideOverlay(false);
-    }, 1500);
-    hiddenParagraphsTimeoutRef.current = setTimeout(() => {
-      displayAllChapters();
     }, 1500);
   };
 
