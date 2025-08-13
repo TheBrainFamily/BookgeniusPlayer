@@ -4,7 +4,7 @@ import { devtools } from "zustand/middleware";
 type ModalId = string;
 
 // Base modals that should allow others to open above them on wide screens
-const BASE_MODALS = new Set<ModalId>(["search-modal", "deep-research-modal", "quiz-modal"]);
+const BASE_MODALS = new Set<ModalId>(["search-modal", "deep-research-modal"]);
 
 interface ModalCoordinatorState {
   activeModalIds: Set<ModalId>;

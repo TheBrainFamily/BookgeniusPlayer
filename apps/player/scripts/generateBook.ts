@@ -165,14 +165,6 @@ function generateBookDataFiles(bookDirectoryPath: string, metadata: ReturnType<t
     fs.writeFileSync(path.join(bookOutputPath, "getAllVariants.ts"), getAllVariantsContent, "utf-8");
   }
 
-  const getQuizQuestionsPath = path.join(bookDirectoryPath, "getQuizQuestions.ts");
-  if (fs.existsSync(getQuizQuestionsPath)) {
-    fs.copyFileSync(getQuizQuestionsPath, path.join(bookOutputPath, "getQuizQuestions.ts"), fs.constants.COPYFILE_FICLONE);
-  } else {
-    const getQuizQuestionsContent = `export const getQuizQuestions = () => [];`;
-    fs.writeFileSync(path.join(bookOutputPath, "getQuizQuestions.ts"), getQuizQuestionsContent, "utf-8");
-  }
-
   const getBookStringifiedContent = `const bookStringified = \`<section>${htmlResult}</section>\`;
 
 export const getBookStringified = (): string => {
