@@ -7,7 +7,6 @@ import { loadBookStringified } from "@/genericBookDataGetters/getBookStringified
 import { loadCharactersData } from "@/genericBookDataGetters/getCharactersData";
 import { loadCutScenesForBook } from "@/genericBookDataGetters/getCutScenesForBook";
 import { loadKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles";
-import { loadQuizQuestions } from "@/genericBookDataGetters/getQuizQuestions";
 
 export async function preloadAllBookData(): Promise<void> {
   console.log("Preloading book data...");
@@ -24,7 +23,6 @@ export async function preloadAllBookData(): Promise<void> {
       loadCharactersData(),
       loadCutScenesForBook(),
       loadKnownVideoFiles(),
-      loadQuizQuestions(),
     ]);
 
     console.log("Book data preloaded successfully");

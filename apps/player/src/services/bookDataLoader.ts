@@ -1,5 +1,5 @@
 // Service to dynamically load book data at runtime
-import type { BookData, BackgroundForBook, BackgroundSongSection, CutSceneForBook, CharacterData, AudiobookTracksSection, QuizOutput } from "@/types/book";
+import type { BookData, BackgroundForBook, BackgroundSongSection, CutSceneForBook, CharacterData, AudiobookTracksSection } from "@/types/book";
 import type { Variant } from "@/genericBookDataGetters/getAllVariants";
 import { getBookDataUrl } from "@/utils/assetUrls";
 
@@ -120,11 +120,6 @@ class BookDataLoader {
 
   async getKnownVideoFiles(): Promise<string[]> {
     const getter = await this.loadBookDataFile<() => string[]>("getKnownVideoFiles");
-    return typeof getter === "function" ? getter() : getter;
-  }
-
-  async getQuizQuestions(): Promise<QuizOutput[]> {
-    const getter = await this.loadBookDataFile<() => QuizOutput[]>("getQuizQuestions");
     return typeof getter === "function" ? getter() : getter;
   }
 
