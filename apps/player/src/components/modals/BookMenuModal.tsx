@@ -63,8 +63,6 @@ interface BookMenuModalProps {
 const SLIDER_DELAY = 200;
 const OVERLAY_TIMEOUT = 1500;
 
-let bookLocation = getCurrentLocation();
-
 const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, openApiKeyModal, resetFurthestPageLocation }) => {
   const { t } = useTranslation();
   const allVariants = getAllVariants();
@@ -80,8 +78,10 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const overlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isVisible = useRef(allVariants.length > 0);
 
+  const bookLocation = useRef(getCurrentLocation());
+
   useEffect(() => {
-    bookLocation = getCurrentLocation();
+    bookLocation.current = getCurrentLocation();
   }, []);
 
   const handleFontSizePreset = (size: number) => {
@@ -145,7 +145,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
     setTimeout(() => {
       setCurrentFontSize(fontSize);
-      systemNavigateTo({ currentChapter: bookLocation.currentChapter, currentParagraph: bookLocation.currentParagraph }, { wait: true });
+      systemNavigateTo({ currentChapter: bookLocation.current.currentChapter, currentParagraph: bookLocation.current.currentParagraph }, { wait: true });
     }, 200);
 
     if (!hideOverlay) {
