@@ -8,12 +8,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            !apps/player/public_books
-          sparse-checkout-cone-mode: false
-      - uses: pnpm/action-setup@v4
+        # with:
+        #   sparse-checkout: |
+        #     !apps/player/public_books
+        #   sparse-checkout-cone-mode: false
       - run: ls -al
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
