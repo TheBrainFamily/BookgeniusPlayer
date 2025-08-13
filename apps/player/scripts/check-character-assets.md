@@ -1,5 +1,14 @@
 # Check Character Assets
 
+This script checks both asset completeness and dimensions for character assets in books.
+
+## Asset Requirements:
+
+- **MP4 files** (`character-name-speaks.mp4`, `character-name-listens.mp4`): Should be 480x480
+- **PNG files** (`character-name.png`):
+  - If there's a corresponding `character-name-listens.mp4`: Should be 256x256 or 200x200
+  - If no `character-name-listens.mp4`: Should be 480x480
+
 ## Loop without some books:
 
 ```bash
