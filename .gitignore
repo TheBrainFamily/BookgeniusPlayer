@@ -18,3 +18,5 @@ apps/player/public_books/*/getQuizQuestions.ts
 apps/player/public_books/*/getAllVariants.ts
 .env
 build/
+gateway.zip
+.env.prod

@@ -12,7 +12,7 @@ const MIN_TIMEOUT_MS = Number(process.env.MIN_TIMEOUT_MS ?? 300);
 const MAX_TIMEOUT_MS = Number(process.env.MAX_TIMEOUT_MS ?? 5000);
 
 const repoRoot = path.join(import.meta.dir, "../..");
-const SOURCE_BOOKS_DIR = process.env.SOURCE_BOOKS_DIR ?? path.join(repoRoot, "apps/player/docker-build/books");
+const SOURCE_BOOKS_DIR = process.env.SOURCE_BOOKS_DIR ?? path.join(repoRoot, "build/s3-data/assets/books");
 const BOOK_SUBDIR = process.env.BOOK_SUBDIR ?? "";
 const BUILD_BOOK_CMD = process.env.BUILD_BOOK_CMD ?? "";
 const MERGE_PROD_MANIFEST = (process.env.MERGE_PROD_MANIFEST ?? "false") === "true";
@@ -27,8 +27,7 @@ const sanitize = (s: string) => s.replace(/[^a-zA-Z0-9._-]+/g, "-");
 
 async function getBranchName(): Promise<string> {
   if (process.env.BRANCH_NAME) return process.env.BRANCH_NAME;
-  const out = (await $`git rev-parse --abbrev-ref HEAD`.quiet().text()).trim();
-  return out || "main";
+  throw new Error("BRANCH_NAME variable not set up.")
 }
 
 async function* walk(dir: string): AsyncGenerator<string> {
@@ -68,7 +67,7 @@ function fmtTime(s: number) {
 // ---------- main ----------
 const branchName = await getBranchName();
 const isProduction = branchName === "main";
-const assetContext = isProduction ? "production" : `staging/${branchName}`;
+const assetContext = process.env.ASSET_CONTEXT
 
 const stamp = new Date()
   .toISOString()
@@ -143,7 +142,8 @@ for (const slug of changedBooks) {
   const localRoot = path.join(SOURCE_BOOKS_DIR, slug, BOOK_SUBDIR);
   for await (const filePath of walk(localRoot)) {
     const rel = path.relative(localRoot, filePath);
-    const key = toPosix(`${assetContext}/assets/books/${slug}/${buildVersion}/${rel}`);
+    const relStripped = rel.replace(/^\/?v\d{8}T\d{6}(?:\/|$)/, "");
+    const key = toPosix(`${assetContext}/assets/books/${slug}/${buildVersion}/${relStripped}`);
     const { size } = await stat(filePath);
     jobs.push({ local: filePath, key, size, slug });
   }

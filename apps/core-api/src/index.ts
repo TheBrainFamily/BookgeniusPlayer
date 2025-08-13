@@ -130,7 +130,7 @@ Bun.serve({
         return new Response("Version for book not found", { status: 404 });
       }
 
-      const s3Key = `assets/books/${bookSlug}/${currentVersion}/${assetPath}`;
+      const s3Key = `${assetContext}/assets/books/${bookSlug}/${currentVersion}/${assetPath}`;
 
       console.log(`[Core API] Mapped request to S3 Key: ${s3Key}`);
 
