@@ -5,11 +5,23 @@
 services:
   # --- Hot-Reloading Overrides for Your Applications ---
 
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80" # HTTP port
+      - "443:443" # HTTPS port
+      - "443:443/udp" # Port for HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
   player:
     # Tells Docker to build this service from source for local dev
     build:
       context: .
-      dockerfile: ./apps/player/Dockerfile.dev
+      dockerfile: ./apps/player/Dockerfile
     # Mounts your local source code into the container.
     # Changes you make on your Mac are instantly reflected inside the container.
     volumes:
@@ -22,26 +34,12 @@ services:
   platform:
     build:
       context: .
-      dockerfile: ./apps/platform/Dockerfile.dev
+      dockerfile: ./apps/platform/Dockerfile
     volumes:
       - ./apps/platform:/usr/src/app/apps/platform
       - ./packages:/usr/src/app/packages
     ports:
       - "5174:5173" # Use a different host port to avoid conflicts
-
-  core-api:
-    # Overrides the command to use Bun's --hot flag for automatic restarts
-    command: bun run --hot src/index.ts
-    # Mounts the source code for the API
-    volumes:
-      - ./apps/core-api:/usr/src/app/apps/core-api
-      - ./packages:/usr/src/app/packages
-    # Overrides the production environment to point to local MinIO
-    environment:
-      - S3_ENDPOINT=http://minio:9000
-      - S3_ACCESS_KEY_ID=minioadmin
-      - S3_SECRET_ACCESS_KEY=minioadmin
-      - S3_BUCKET=bookgenius-assets
 
   # --- Development-Only Services (Unchanged) ---
 
@@ -54,8 +52,8 @@ services:
     volumes:
       - minio_data:/data
     environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
+      - MINIO_ROOT_USER=${S3_ACCESS_KEY_ID}
+      - MINIO_ROOT_PASSWORD=${S3_SECRET_ACCESS_KEY}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -68,9 +66,36 @@ services:
       minio:
         condition: service_healthy
     entrypoint: /bin/sh
-    command: -c "mc alias set local http://minio:9000 minioadmin minioadmin && mc mb local/bookgenius-assets --ignore-existing && mc cp --recursive /data/ local/bookgenius-assets/ && echo '✅ MinIO seeding complete.' && exit 0"
+    command: -c "mc alias set local http://minio:9000 ${S3_ACCESS_KEY_ID} ${S3_SECRET_ACCESS_KEY} && mc mb local/bookgenius --ignore-existing && mc cp --recursive /data/ local/bookgenius/production/ && echo '✅ MinIO seeding complete.' && exit 0"
     volumes:
       - ./build/s3-data:/data
 
+  core-api:
+    build:
+      context: .
+      dockerfile: ./apps/core-api/Dockerfile
+    # Overrides the command to use Bun's --hot flag for automatic restarts
+    command: bun run --hot src/index.ts
+    # Mounts the source code for the API
+    volumes:
+      - ./apps/core-api:/usr/src/app/apps/core-api
+      - ./packages:/usr/src/app/packages
+    restart: unless-stopped
+    environment:
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
+      - S3_BUCKET=${S3_BUCKET}
+      # Clerk authentication keys
+      - CLERK_SECRET_KEY=sk_test_Nos0Znu6cKNInDkEd3xQOi3VvM6zROBQSSTsk7VZiL
+      - CLERK_PUBLISHABLE_KEY=pk_test_bGl2aW5nLW5ld3QtODQuY2xlcmsuYWNjb3VudHMuZGV2JA
+      # Snapplify configuration (to be provided during integration)
+      - SNAPPLIFY_JWKS_URL=https://auth.snapplify.com/.well-known/jwks.json
+      - SNAPPLIFY_ISSUER=https://snapplify.com
+      - ASSET_CONTEXT=${ASSET_CONTEXT:-production}
+
+# Define named volumes to persist data
 volumes:
+  caddy_data:
+  caddy_config:
   minio_data:

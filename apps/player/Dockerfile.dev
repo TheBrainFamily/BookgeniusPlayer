@@ -1,8 +1,7 @@
-# Dockerfile for local development of the 'player' app
-# This file runs the Vite dev server with hot-reloading.
-
-# Start from the official Bun image for a consistent and fast environment.
-FROM oven/bun:1.0
+FROM node:20-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 # Set the working directory inside the container.
 WORKDIR /usr/src/app

@@ -19,11 +19,15 @@ services:
     restart: unless-stopped
 
   platform:
-    image: ghcr.io/your-github-org/platform:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: ./apps/platform/Dockerfile.dev
     restart: unless-stopped
 
   core-api:
-    image: ghcr.io/your-github-org/core-api:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: ./apps/core-api/Dockerfile
     restart: unless-stopped
     environment:
       - S3_ENDPOINT=${S3_ENDPOINT}
@@ -37,7 +41,6 @@ services:
       - SNAPPLIFY_JWKS_URL=https://auth.snapplify.com/.well-known/jwks.json
       - SNAPPLIFY_ISSUER=https://snapplify.com
       - ASSET_CONTEXT=${ASSET_CONTEXT:-staging}
-
 
 # Define named volumes to persist data
 volumes:
