@@ -19,3 +19,4 @@ apps/player/public_books/*/getAllVariants.ts
 build/
 gateway.zip
 .env.prod
+Support/

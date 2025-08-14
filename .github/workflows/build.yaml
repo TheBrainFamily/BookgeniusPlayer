@@ -9,9 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         # with:
-        #   sparse-checkout: |
-        #     !apps/player/public_books
-        #   sparse-checkout-cone-mode: false
+        # sparse-checkout: |
+        #   !apps/player/public_books
+        # sparse-checkout-cone-mode: false
       - uses: pnpm/action-setup@v4
         with:
           version: 10.13.1 # match your local pnpm
@@ -27,12 +27,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       # - run: pnpm test
-      # Show exactly which Radix the player workspace sees
-      # Dump player tsconfig as tsc sees it
-      - run: pnpm -F player exec tsc -v
-      - run: pnpm -F player exec tsc --showConfig > player-tsconfig.json
-      - run: sed -n '1,200p' player-tsconfig.json
-      # - run: pnpm typecheck:ci
+      - run: pnpm typecheck:ci
       - run: pnpm lint:ci
       - run: pnpm prettier:check
       # - name: Build project
