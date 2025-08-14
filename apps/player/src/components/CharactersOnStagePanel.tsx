@@ -53,7 +53,7 @@ const CharactersOnStagePanel = () => {
                     animate={{ borderColor: "rgba(255, 255, 255, 0.2)", boxShadow: "0 5px 10px -5px rgba(255, 255, 255, 0.2)" }}
                     transition={{ duration: 0.5, ease: "easeInOut", borderColor: { duration: 0.5 }, boxShadow: { duration: 0.5 } }}
                   >
-                    <CharacterCard entity={characterEntity} currentSpeakers={currentSpeakers} showTitle={false} showHighlight={false} imageOnly />
+                    <CharacterCard entity={characterEntity} currentSpeakers={currentSpeakers} hideTitle disableHighlight imageOnly />
                   </motion.div>
                 </motion.div>
               );
