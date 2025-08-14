@@ -5,6 +5,8 @@ import Backend from "i18next-http-backend";
 
 const viteLang = import.meta.env.VITE_LANG as string | undefined;
 
+const i18nDebug = import.meta.env.VITE_I18N_DEBUG === "true";
+
 i18n
   .use(Backend)
   .use(LanguageDetector)
@@ -12,7 +14,7 @@ i18n
   .init({
     lng: viteLang?.toLowerCase() || "pl",
     fallbackLng: "en",
-    debug: true,
+    debug: i18nDebug,
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
