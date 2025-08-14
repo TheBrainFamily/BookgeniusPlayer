@@ -2,6 +2,7 @@ import { searchParagraphsFromServer } from "./utils/searchParagraphsFromServer";
 import type { Location } from "@/state/LocationContext";
 import { getCharactersData } from "./genericBookDataGetters/getCharactersData";
 import { useBookContentStore } from "./stores/bookContent.store";
+import { getBookData } from "./genericBookDataGetters/getBookData";
 
 export interface SearchResultItemData {
   chapter: number;
@@ -114,6 +115,7 @@ const createContextualSummary = (fullText: string, query: string, maxLength: num
 
 export function performCachedSearch(query: string, currentLocation: Location): SearchResultsData {
   const { textCache, isInitialized } = useBookContentStore.getState();
+  const bookIsPlay = getBookData().metadata.bookForm === "play";
 
   const items: SearchResultItemData[] = [];
   const queryLower = query.toLowerCase();
@@ -143,12 +145,14 @@ export function performCachedSearch(query: string, currentLocation: Location): S
 
       let paragraphText = chapterCache[paragraphNumber];
       if (paragraphText.toLowerCase().includes(queryLower)) {
-        // if the paragraph text has just 1 word we want to append the next paragraph text to show the character next line
-        if (!paragraphText.trim().includes(" ")) {
-          const nextParagraphText = chapterCache[paragraphNumber + 1];
+        if (bookIsPlay) {
+          // if the paragraph text has just 1 word we want to append the next paragraph text to show the character next line
+          if (!paragraphText.trim().includes(" ")) {
+            const nextParagraphText = chapterCache[paragraphNumber + 1];
 
-          if (nextParagraphText) {
-            paragraphText = `${paragraphText}: ${nextParagraphText}`;
+            if (nextParagraphText) {
+              paragraphText = `${paragraphText}: ${nextParagraphText}`;
+            }
           }
         }
 
