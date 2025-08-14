@@ -141,8 +141,17 @@ export function performCachedSearch(query: string, currentLocation: Location): S
         continue;
       }
 
-      const paragraphText = chapterCache[pIndex];
+      let paragraphText = chapterCache[paragraphNumber];
       if (paragraphText.toLowerCase().includes(queryLower)) {
+        // if the paragraph text has just 1 word we want to append the next paragraph text to show the character next line
+        if (!paragraphText.trim().includes(" ")) {
+          const nextParagraphText = chapterCache[paragraphNumber + 1];
+
+          if (nextParagraphText) {
+            paragraphText = `${paragraphText}: ${nextParagraphText}`;
+          }
+        }
+
         items.push({
           chapter: chapterIdNum,
           paragraphNumber: paragraphNumber,
