@@ -57,13 +57,12 @@ class BookDataLoader {
       // Always load fresh with cache busting
       const timestamp = Date.now();
       // Use importPublicModule in vite dev, otherwise use dynamic import
-      // const moduleUrl = `${getBookDataUrl(fileName)}.js?t=${timestamp}`;
       // console.log("Loading module:", moduleUrl);
       let module;
       if (import.meta.env && import.meta.env.DEV) {
         module = await importPublicModule(`${getBookDataUrl(fileName)}.js?t=${timestamp}`);
       } else {
-        module = await import(/* @vite-ignore */ `${getBookDataUrl(fileName)}.js?t=${timestamp}`);
+        module = await import(/* @vite-ignore */ `${getBookDataUrl(fileName)}.js`);
       }
 
       // Extract the default export or the named export matching the file name
