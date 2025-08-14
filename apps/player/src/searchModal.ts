@@ -150,7 +150,7 @@ export function performCachedSearch(query: string, currentLocation: Location): S
       let paragraphText = chapterCache[paragraphNumber];
       if (paragraphText.toLowerCase().includes(queryLower)) {
         if (bookIsPlay) {
-          // if the paragraph text has just 1 word we want to append the next paragraph text to show the character next line
+          // if the paragraph text is just a character name we want to append the next paragraph text to show the character next line
           if (bookCharacters.includes(paragraphText.trim().toLowerCase())) {
             const nextParagraphText = chapterCache[paragraphNumber + 1];
 
