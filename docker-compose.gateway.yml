@@ -1,7 +1,7 @@
 services:
   redis:
     image: redis:7-alpine
-    command: ["redis-server","/usr/local/etc/redis/redis.conf", "--requirepass", "${REDIS_PASSWORD}"]
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "${REDIS_PASSWORD}"]
     volumes:
       - redis:/data
       - ./deployment/templates/redis.conf:/usr/local/etc/redis/redis.conf:ro
@@ -9,7 +9,7 @@ services:
   gateway:
     image: ghcr.io/thebrainfamily/bookgenius-frontend/gateway:latest
     pull_policy: always
-#    build: ./apps/gateway
+    #    build: ./apps/gateway
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -31,7 +31,7 @@ services:
   webhook:
     image: ghcr.io/thebrainfamily/bookgenius-frontend/webhook:latest
     pull_policy: always
-#    build: ./apps/webhook
+    #    build: ./apps/webhook
     environment:
       - API_TOKEN=${WEBHOOK_TOKEN}
       - BASE_DOMAIN=${BASE_DOMAIN}
@@ -56,6 +56,25 @@ services:
       - ./deployment/templates:/templates:ro
       - ./deployment/data:/data
     depends_on: [redis]
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9090"
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    volumes:
+      - type: bind
+        source: /mnt/HC_Volume_103099741/minio-data   # e.g. /Users/you/minio-data or /home/you/minio-data
+        target: /data
+    environment:
+      - MINIO_ROOT_USER=${S3_ACCESS_KEY_ID}
+      - MINIO_ROOT_PASSWORD=${S3_SECRET_ACCESS_KEY}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
 volumes:
   redis:
