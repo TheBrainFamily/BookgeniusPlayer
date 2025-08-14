@@ -9,6 +9,8 @@ import { activateCharacterInteractions } from "@/helpers/activateCharacterIntera
 import { useEditorMode } from "@/hooks/useEditorMode";
 import { useBookData } from "@/context/BookDataContext";
 import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { addPaddingBottomLastChapter } from "@/helpers/addPaddingBottomLastChapter";
+import { addSpaceBetweenChapters } from "@/helpers/addSpaceBetweenChapters";
 
 const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
@@ -36,31 +38,13 @@ export function useBookContent(containerId: string) {
 
   useEffect(() => {
     if (container) {
-      // <<<<<<< HEAD
       const parser = new DOMParser();
       const doc = parser.parseFromString(bookStringified, "text/html");
-      const chapterSections = Array.from(doc.querySelectorAll(".play-container section[data-chapter]"));
+      const chapterSections = Array.from(doc.querySelectorAll("section[data-chapter]"));
 
-      // Add spacers between chapters
-      chapterSections.slice(0, -1).forEach((section) => {
-        const chapterNumber = section.getAttribute("data-chapter");
-        if (chapterNumber) {
-          console.log(`chapterNumber: ${chapterNumber}`);
-          const spacer = doc.createElement("div");
-          spacer.className = "transition-spacer";
-          spacer.setAttribute("data-chapter-end", chapterNumber);
-          spacer.setAttribute("data-next-chapter-start", (parseInt(chapterNumber, 10) + 1).toString());
-          spacer.style.height = "100vh";
-          section.after(spacer);
-        }
-      });
-
-      // Add padding to the end of the last chapter to ensure it can be scrolled fully into view
       if (chapterSections.length > 0) {
-        const lastChapter = chapterSections[chapterSections.length - 1];
-        const finalPadding = doc.createElement("div");
-        finalPadding.style.height = "50vh";
-        lastChapter.appendChild(finalPadding);
+        addSpaceBetweenChapters(doc, chapterSections);
+        addPaddingBottomLastChapter(doc, chapterSections);
       }
 
       container.innerHTML = doc.body.innerHTML;
