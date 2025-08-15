@@ -118,7 +118,7 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 /**
  * Normalizes the src to always be PNG and removes "speaks" or "listens" suffixes
  */
-function normalizeSrcForInlineAvatar(src: string): string {
+export function normalizeSrcForInlineAvatar(src: string): string {
   if (!src) return src;
 
   // Remove "-speaks" or "-listens" (including the dash) that appears before the file extension
@@ -482,7 +482,7 @@ function activateMediaInRange(
               if (characterSlugForDummy) {
                 const talkingSrcForDummy = getTalkingMediaFilePathForName(characterSlugForDummy, bookDataLoader.getCurrentBook());
                 const listeningSrcForDummy = getListeningMediaFilePathForName(characterSlugForDummy, bookDataLoader.getCurrentBook());
-                const placeholderSrcForDummy = normalizeSrcForInlineAvatar((listeningSrcForDummy || talkingSrcForDummy || ""));
+                const placeholderSrcForDummy = normalizeSrcForInlineAvatar(listeningSrcForDummy || talkingSrcForDummy || "");
                 if (placeholderSrcForDummy) {
                   const img = document.createElement("img");
                   img.src = placeholderSrcForDummy;

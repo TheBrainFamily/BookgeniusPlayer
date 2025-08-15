@@ -1,4 +1,7 @@
 import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
+import { bookDataLoader } from "@/services/bookDataLoader";
+import { normalizeSrcForInlineAvatar } from "@/ui/pageObserver";
+import { getListeningMediaFilePathForName } from "@/utils/getFilePathsForName";
 
 export const replaceXmlTagsIntoHtmlTags = (text: string) => {
   const characters = getCharactersData(); // Get characters data once
@@ -32,7 +35,7 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
         return match;
       }
 
-      const newAttributes = { class: "character-highlighted", "data-character": foundCharacter.slug, "data-src-listening": foundCharacter.listeningUrl };
+      const newAttributes = { class: "character-highlighted", "data-character": foundCharacter.slug };
 
       const attributeString = Object.entries(newAttributes)
         .map(([key, value]) => `${key}="${value}"`)
@@ -57,7 +60,6 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
     const newAttributes = {
       class: `character-placeholder character-${attributeName} ${offset === 0 ? "start-of-paragraph" : ""}`,
       "data-character": foundCharacter.slug,
-      [`data-src-${attributeName}`]: foundCharacter.imageUrl,
       [`data-is-${attributeName}`]: "true",
       "data-media-injected": "true",
     };
@@ -66,7 +68,7 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
       .map(([key, value]) => `${key}="${value}"`)
       .join(" ");
 
-    const imgTag = `<img src="${foundCharacter.imageUrl}" class="inline-avatar" data-character="${foundCharacter.slug}" title="${foundCharacter.slug}" />`;
+    const imgTag = `<img src="${normalizeSrcForInlineAvatar(getListeningMediaFilePathForName(foundCharacter.slug, bookDataLoader.getCurrentBook()))}" class="inline-avatar" data-character="${foundCharacter.slug}" title="${foundCharacter.slug}" />`;
 
     return `<span ${attributeString}>${imgTag}</span>`;
   });
