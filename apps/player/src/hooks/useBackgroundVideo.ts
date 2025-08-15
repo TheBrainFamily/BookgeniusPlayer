@@ -24,10 +24,9 @@ export function useBackgroundVideo() {
 
   // For preloading future backgrounds
   useEffect(() => {
-    const preloadStart = performance.now();
     preloadBackgrounds()
       .then(() => {
-        console.log("Preloaded backgrounds, it took:", performance.now() - preloadStart);
+        console.log("Preloaded backgrounds");
       })
       .catch((error) => console.error("Failed to preload backgrounds:", error));
   }, [currentChapter]);
