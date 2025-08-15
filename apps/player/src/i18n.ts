@@ -3,8 +3,6 @@ import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import Backend from "i18next-http-backend";
 
-const viteLang = import.meta.env.VITE_LANG as string | undefined;
-
 const i18nDebug = import.meta.env.VITE_I18N_DEBUG === "true";
 
 i18n
@@ -12,7 +10,6 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    lng: viteLang?.toLowerCase() || "pl",
     fallbackLng: "en",
     debug: i18nDebug,
     interpolation: {
