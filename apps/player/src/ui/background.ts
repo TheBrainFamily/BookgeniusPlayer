@@ -1,4 +1,4 @@
-import { getBookAssetBaseUrl } from "@player/utils/assetUrls";
+import { getBookAssetUrl } from "@player/utils/assetUrls";
 import { getBackgrounds } from "./getBackgrounds";
 import debounce from "lodash.debounce";
 
@@ -113,7 +113,7 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
           transitionState = TransitionState.Idle;
           return;
         }
-        const newSrc = `${getBookAssetBaseUrl()}/${newFile}`;
+        const newSrc = getBookAssetUrl(newFile);
 
         const curType = legacy.dataset.type as "video" | "image";
         const curFrontId = legacy.dataset.front as "a" | "b";

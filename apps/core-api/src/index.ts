@@ -1,9 +1,12 @@
 import { s3 } from "bun";
 import path from "path";
+import { BUNNY_TOKEN_KEY, generateBunnyToken } from "./auth/bunnyToken";
 // We don't need the full authenticator for this step, let's simplify for now
-// import { authenticateRequest } from './auth/authenticator';
+import { authenticateRequest } from "./auth/authenticator";
 
 console.log("🚀 Starting Core API with Versioning...");
+
+const CDN_BASE = process.env.CDN_BASE || "https://bookgenius-b2.b-cdn.net";
 
 // --- In-memory cache for the versions manifest ---
 let versionsCache: Record<string, string> = {};
@@ -39,25 +42,6 @@ async function loadVersions(): Promise<boolean> {
     isLoadingVersions = false;
     return false;
   }
-}
-
-/**
- * Tries to load the initial versions manifest with a retry mechanism.
- */
-async function initialLoadWithRetry(retries = 10, delay = 5000) {
-  for (let i = 1; i <= retries; i++) {
-    console.log(`[Versioning] Initial load attempt ${i}/${retries}...`);
-    const success = await loadVersions();
-    if (success) {
-      console.log("[Versioning] Initial load successful.");
-      return;
-    }
-    if (i < retries) {
-      console.log(`[Versioning] Retrying in ${delay / 1000} seconds...`);
-      await Bun.sleep(delay);
-    }
-  }
-  console.error("[Versioning] CRITICAL: Failed to load versions.json after all retries.");
 }
 
 // Load versions on startup
@@ -150,6 +134,51 @@ Bun.serve({
         console.error("[Core API] Error during S3 operation:", error);
         return new Response("Internal Server Error", { status: 500 });
       }
+    }
+
+    // inside Bun.serve().fetch:
+    if (reqPath.startsWith("/content/resolve/")) {
+      // AUTHORIZE: >>> add your auth check here <<<
+      // e.g. await authorizeRequest(req) which should verify session/purchase before issuing tokens.
+      // For now it is a no-op allow; replace with real auth.
+      const isAuthorized = await authenticateRequest(req); // TODO: replace with real check
+      if (!isAuthorized) return new Response("Forbidden", { status: 403 });
+
+      // ensure manifest is in memory
+      if (Object.keys(versionsCache).length === 0) {
+        const ok = await loadVersions();
+        if (!ok) return new Response("Service Unavailable", { status: 503 });
+      }
+
+      const slug = decodeURIComponent(reqPath.split("/").pop() || "");
+      const version = versionsCache[slug];
+      if (!slug || !version) return new Response("Version not found", { status: 404 });
+
+      // Book folder path (leading slash required for signing)
+      // Matches the path used by the CDN: /<assetContext>/assets/books/<slug>/<version>/
+      const bookFolder = `/${assetContext}/assets/books/${slug}/${version}/`;
+
+      // Generate token scoped to the bookFolder (token_path) with TTL = 6 hours (adjust as needed)
+      const TTL_SECONDS = 6 * 3600;
+      if (!BUNNY_TOKEN_KEY) {
+        console.error("CORE_BUNNY_TOKEN_KEY is not configured; returning unsigned assetBase (not secure).");
+        const assetBase = `${CDN_BASE}${bookFolder}`;
+        return new Response(JSON.stringify({ slug, version, assetBase }), { headers: { "Content-Type": "application/json" } });
+      }
+
+      const { token, expires } = generateBunnyToken(BUNNY_TOKEN_KEY, bookFolder, bookFolder, TTL_SECONDS);
+
+      // Build signed asset base URL that the client will use for all assets under this folder.
+      // We include token, expires and token_path as query params.
+      const signedAssetBase = `${CDN_BASE}${bookFolder}?expires=${expires}&token=${token}&token_path=${encodeURIComponent(bookFolder)}`;
+
+      return new Response(JSON.stringify({ slug, version, signedAssetBase }), {
+        headers: {
+          "Content-Type": "application/json",
+          // edge-cache this tiny response so it’s ~tens of ms after the first POP hit
+          "Cache-Control": "public, max-age=0, s-maxage=60, stale-while-revalidate=86400",
+        },
+      });
     }
 
     // Health check for verification

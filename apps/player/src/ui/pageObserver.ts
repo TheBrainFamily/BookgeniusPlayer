@@ -121,16 +121,39 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 function normalizeSrcForInlineAvatar(src: string): string {
   if (!src) return src;
 
-  // Remove "-speaks" or "-listens" (including the dash) that appears before the file extension
-  let normalizedSrc = src.replace(/-(speaks|listens)(?=\.|$)/, "");
+  // Preserve query/hash separately so we don't mangle them
+  let pathPart = src;
+  let query = "";
+  let hash = "";
 
-  // Ensure it ends with .png
-  if (!normalizedSrc.endsWith(".png")) {
-    // Remove any existing extension and add .png
-    normalizedSrc = normalizedSrc.replace(/\.[^.]*$/, "") + ".png";
+  const hashIdx = src.indexOf("#");
+  if (hashIdx !== -1) {
+    hash = src.slice(hashIdx);
+    pathPart = src.slice(0, hashIdx);
   }
 
-  return normalizedSrc;
+  const qIdx = pathPart.indexOf("?");
+  if (qIdx !== -1) {
+    query = pathPart.slice(qIdx);
+    pathPart = pathPart.slice(0, qIdx);
+  }
+
+  // Split directory + filename
+  const lastSlash = pathPart.lastIndexOf("/");
+  const dir = lastSlash >= 0 ? pathPart.slice(0, lastSlash + 1) : "";
+  let file = lastSlash >= 0 ? pathPart.slice(lastSlash + 1) : pathPart;
+
+  // Remove "-speaks" or "-listens" only when they appear immediately before the final extension or at end
+  file = file.replace(/-(speaks|listens)(?=(\.[^.\/]+$|$))/i, "");
+
+  // Replace final extension with .png, or add .png if none
+  if (/\.[^.\/]+$/.test(file)) {
+    file = file.replace(/\.[^.\/]+$/, ".png");
+  } else {
+    file = `${file}.png`;
+  }
+
+  return `${dir}${file}${query}${hash}`;
 }
 
 /**

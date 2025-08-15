@@ -1,4 +1,4 @@
-import { getBookAssetBaseUrl } from "./assetUrls";
+import { getBookAssetUrl } from "./assetUrls";
 
 export const getFileNameForName = (name: string) => {
   return `${name
@@ -21,16 +21,16 @@ export const getListeningMediaFilePathForName = (name: string, bookSlug: string,
   const listensPath = `${getFileNameForName(name)}-listens.mp4`;
 
   if (forceKnown || knownVideos.includes(listensPath)) {
-    return `${getBookAssetBaseUrl()}/${listensPath}`;
+    return getBookAssetUrl(listensPath);
   }
-  return `${getBookAssetBaseUrl()}/${getPictureFileNameForName(name)}`;
+  return getBookAssetUrl(getPictureFileNameForName(name));
 };
 
 export const getTalkingMediaFilePathForName = (name: string, bookSlug: string, forceKnown = false) => {
   const speaksPath = `${getFileNameForName(name)}-speaks.mp4`;
 
   if (forceKnown || knownVideos.includes(speaksPath)) {
-    return `${getBookAssetBaseUrl()}/${speaksPath}`;
+    return getBookAssetUrl(speaksPath);
   }
   return getListeningMediaFilePathForName(name, bookSlug);
 };
