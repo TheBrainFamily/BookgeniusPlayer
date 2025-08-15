@@ -1,7 +1,7 @@
-import { getBookAssetBaseUrl } from "@/utils/assetUrls";
 import { getBackgrounds } from "./getBackgrounds";
 import debounce from "lodash.debounce";
 import { getPreloadedElement } from "@/preloadBackgrounds";
+import { getFileType, getSourceForFile, loadVideoAsHTMLElement } from "./backgroundUtils";
 
 export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number };
 
@@ -21,27 +21,6 @@ function cancelAllImageZoom(imgA: HTMLDivElement, imgB: HTMLDivElement) {
   imgA.classList.remove("zooming");
   imgB.classList.remove("zooming");
 }
-
-// ---- Helper Function --------------------------------------------------------
-export function getFileType(filename: string): "video" | "image" | "unknown" {
-  const ext = filename.split(".").pop()?.toLowerCase();
-  if (!ext) return "unknown";
-  if (["mp4", "webm", "ogv"].includes(ext)) return "video";
-  if (["png", "jpg", "jpeg", "gif", "webp", "avif", "svg"].includes(ext)) return "image";
-  return "unknown";
-}
-
-// ---- Helper Function --------------------------------------------------------
-export const getSourceForFile = (newFile: string) => {
-  return `${getBookAssetBaseUrl()}/${newFile}`;
-};
-
-// ---- Helper Function --------------------------------------------------------
-export const loadVideoAsHTMLElement = (nextBack: HTMLVideoElement, newSrc: string) => {
-  nextBack.src = newSrc;
-  nextBack.load();
-  return nextBack;
-};
 
 // ---- Constants --------------------------------------------------------------
 const FADE_DURATION_MS = 800; // fallback
