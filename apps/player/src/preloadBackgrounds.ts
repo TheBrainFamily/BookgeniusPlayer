@@ -6,7 +6,6 @@ import { getFileType, getSourceForFile, loadVideoAsHTMLElement } from "@/ui/back
 // Cache to store preloaded elements
 const preloadCache = new Map<string, HTMLVideoElement | HTMLDivElement>();
 
-// Add at top of file, above the `preloadBackgrounds` export
 const MAX_CACHE_SIZE = 20; // Adjust based on typical asset sizes
 
 const evictOldestFromCache = () => {
