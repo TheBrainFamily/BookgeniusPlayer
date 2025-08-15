@@ -27,7 +27,6 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
   let outputText = text;
 
   if (characterTagPattern) {
-    console.log("characterTagPattern", characterTagPattern);
     outputText = outputText.replace(regex, (match, tagName, content) => {
       const foundCharacter = characters.find((char) => char.slug.toLowerCase() === tagName.toLowerCase());
 
@@ -61,6 +60,7 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
     const newAttributes = {
       class: `character-placeholder character-${attributeName} ${offset === 0 ? "start-of-paragraph" : ""}`,
       "data-character": foundCharacter.slug,
+      [`data-is-${attributeName}`]: "true",
       "data-media-injected": "true",
     };
 

@@ -30,7 +30,6 @@ export interface SelfSufficientCharacterMetadata {
   characterName: string;
   bookSlug: string;
   infoPerChapter: InfoPerChapter[];
-  imageUrl: string;
 }
 
 type PureRange = { startChapter: number; endChapter: number; bookSlug: BOOK_SLUGS; startParagraph: number; endParagraph: number };
@@ -179,7 +178,6 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
       return {
         slug: character.slug,
         characterName: character.characterName,
-        imageUrl: character.imageUrl,
         summary: first.summary,
         isTalkingInFirstParagraph: first.isTalking,
         paragraphNumber: first.paragraphNumber,
