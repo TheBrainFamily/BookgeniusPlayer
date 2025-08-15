@@ -1,8 +1,6 @@
-/* global module */
-module.exports = {
+export default {
   plugins: {
-    "postcss-nesting": {},
     "@tailwindcss/postcss": {}, // Tells PostCSS to use the Tailwind plugin
-    autoprefixer: {}, // Optional but recommended for browser compatibility
+    "postcss-nesting": {}, // Enables nesting of CSS rules, similar to Sass
   },
 };

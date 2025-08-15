@@ -1,15 +1,13 @@
-import App from "../../player/src/App";
+import Player from "../../player/src/App";
+import "./player.css";
 
-// import "./styles/globals.css";
-import "../../player/src/styles/styles.css";
-import "../../player/src/styles/modals.css";
-import "../../player/src/styles/inline-avatars.css";
-// import "../../player/src/styles/book-theme.css";
 import "../../player/src/i18n";
-import { useRouteTransition } from "./providers/RouteTransitionProvider";
-import { useSearchParams } from "react-router-dom";
+
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useRouteTransition } from "./providers/RouteTransitionProvider";
 import { bookDataLoader } from "../../player/src/services/bookDataLoader";
+// import ShadowPlayer from "./ShadowPlayer";
 
 export const WrappedApp = () => {
   const [searchParams] = useSearchParams();
@@ -18,7 +16,7 @@ export const WrappedApp = () => {
   const lastBookRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
+    const handleMessage = () => {
       setIsPlayerReady(true);
       // Fade out the overlay (enforces min duration internally)
       finishTransition();
@@ -39,8 +37,9 @@ export const WrappedApp = () => {
 
   //TODO: Possibly we dont need to wrap with the div, I'm leaving it so the mechanism is here
   return (
-    <div className={`w-full h-full border-0 transition-opacity duration-500 ${!isPlayerReady ? "opacity-0" : "opacity-100"}`}>
-      <App />
+    <div className={`w-full h-full transition-opacity duration-500 ${!isPlayerReady ? "opacity-0" : "opacity-100"}`}>
+      {/* <ShadowPlayer hostId="player-root" hostClassName="player-scope" /> */}
+      <Player />
     </div>
   );
 };

@@ -1,13 +1,9 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 
-import App from "./App";
+import "./styles/main.css";
 
-import "./styles/globals.css";
-import "./styles/styles.css";
-import "./styles/modals.css";
-import "./styles/inline-avatars.css";
-import "./styles/book-theme.css";
+import App from "./App";
 import "./i18n";
 
 let container = document.getElementById("root");
