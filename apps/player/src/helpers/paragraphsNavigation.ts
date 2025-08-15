@@ -90,8 +90,12 @@ export const getSavedLocation = (): Location | null => {
 };
 
 export const setSavedLocation = (loc: Location) => {
-  const key = getFurthestLocationKey();
-  localStorage.setItem(key, JSON.stringify(loc));
+  try {
+    const key = getFurthestLocationKey();
+    localStorage.setItem(key, JSON.stringify(loc));
+  } catch (e) {
+    console.warn("Failed to persist saved location", e);
+  }
 };
 
 /* ------------------------------------------------------------------ */
