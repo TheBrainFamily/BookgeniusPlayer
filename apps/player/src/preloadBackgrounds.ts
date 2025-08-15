@@ -114,7 +114,7 @@ export const preloadBackgrounds = async () => {
     const successful = results.filter((result) => result.status === "fulfilled" && result.value === true).length;
     const failed = results.length - successful;
 
-    console.log(`Background preloading complete. Successfully loaded: ${successful}, Failed: ${failed}`);
+    console.log(`Backgrounds preloading complete. Successfully loaded: ${successful}, Failed: ${failed}`);
 
     if (failed > 0) {
       const failedResults = results.filter((result) => result.status === "rejected" || (result.status === "fulfilled" && result.value === false));

@@ -173,8 +173,17 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
               });
           }
         } else {
+          const preloadedImage = getPreloadedElement(newFile) as HTMLDivElement | null;
           const img = nextBack as HTMLDivElement;
-          img.style.backgroundImage = `url('${newSrc}')`;
+
+          if (preloadedImage) {
+            // Use preloaded image data by copying backgroundImage
+            img.style.backgroundImage = preloadedImage.style.backgroundImage;
+            console.log("Using preloaded image:", newFile);
+          } else {
+            // Fallback to normal loading
+            img.style.backgroundImage = `url('${newSrc}')`;
+          }
           img.classList.add("zooming");
         }
 
