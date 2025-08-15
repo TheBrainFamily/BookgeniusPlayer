@@ -33,27 +33,6 @@ export interface SelfSufficientCharacterMetadata {
   imageUrl: string;
 }
 
-export interface SimpleCharacterMetadata {
-  characterName: string;
-  infoPerChapter: { chapter: number; paragraphsWhereSpotted: number[]; paragraphsWhereTalking: number[] }[];
-}
-
-/* -------------------------------------------------------------------------- */
-/*  1. Client‑side fetch wrapper (used when you DO have the API available)    */
-/* -------------------------------------------------------------------------- */
-
-export interface GetParagraphRangeParams {
-  bookSlug: BOOK_SLUGS;
-  startChapter: number;
-  startParagraph: number;
-  endChapter: number;
-  endParagraph: number;
-}
-
-/* -------------------------------------------------------------------------- */
-/*  2. Pure in‑memory implementation (works straight on a JSON dump)          */
-/* -------------------------------------------------------------------------- */
-
 type PureRange = { startChapter: number; endChapter: number; bookSlug: BOOK_SLUGS; startParagraph: number; endParagraph: number };
 
 export const paragraphMetadataServicePure = {
@@ -258,9 +237,9 @@ function createParagraphsWhereSpottedForPlay(
   // Special case: At the start of a chapter, if this character is among the first to enter,
   // we treat them as "spotted" at paragraph 0 so they appear immediately.
   if (startParagraph === 0 && closestEntryInChapter > 0) {
-if (paragraphsWhereEnters.includes(closestEntryInChapter)) {
-  uniqueSpottedParagraphs.add(0);
-}
+    if (paragraphsWhereEnters.includes(closestEntryInChapter)) {
+      uniqueSpottedParagraphs.add(0);
+    }
   }
 
   for (const [intervalStart, intervalEnd] of activeIntervals) {
