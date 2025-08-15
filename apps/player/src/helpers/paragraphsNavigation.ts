@@ -5,6 +5,7 @@
  * as in the original vanilla code.
  */
 import { pageWasJustReloaded } from "@/utils/pageWasJustReloaded";
+import { bookDataLoader } from "@/services/bookDataLoader";
 
 let systemNavigationInProgress = false;
 
@@ -67,22 +68,35 @@ interface Bridge {
 let _bridge: Bridge = {
   get: () => DEFAULT_LOCATION,
 
-  set: () => { },
+  set: () => {},
 };
 export const __setLocationBridge = (b: Bridge) => (_bridge = b);
 
 /* ------------------------------------------------------------------ */
 /*  Furthest‑location helpers                                         */
+export const getFurthestLocationKey = (): string => {
+  const currentBook = bookDataLoader.getCurrentBook();
+  return `furthestLocation_${currentBook}`;
+};
+
 export const getSavedLocation = (): Location | null => {
   try {
-    const raw = localStorage.getItem("furthestLocation");
+    const key = getFurthestLocationKey();
+    const raw = localStorage.getItem(key);
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
 };
 
-export const setSavedLocation = (loc: Location) => localStorage.setItem("furthestLocation", JSON.stringify(loc));
+export const setSavedLocation = (loc: Location) => {
+  try {
+    const key = getFurthestLocationKey();
+    localStorage.setItem(key, JSON.stringify(loc));
+  } catch (e) {
+    console.warn("Failed to persist saved location", e);
+  }
+};
 
 /* ------------------------------------------------------------------ */
 export const getCurrentLocation = (): Location => _bridge.get();
