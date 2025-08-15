@@ -126,7 +126,7 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
           const vid = nextBack as HTMLVideoElement;
           const preloadedElement = getPreloadedElement(newFile);
 
-          if (preloadedElement instanceof HTMLVideoElement && preloadedElement.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+          if (preloadedElement instanceof HTMLVideoElement && preloadedElement.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
             // Use preloaded video data by copying to target element
             vid.src = preloadedElement.src;
             vid.currentTime = 0;

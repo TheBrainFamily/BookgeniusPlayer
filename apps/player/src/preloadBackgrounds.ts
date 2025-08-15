@@ -10,7 +10,7 @@ const preloadCache = new Map<string, HTMLVideoElement | HTMLDivElement>();
 const MAX_CACHE_SIZE = 20; // Adjust based on typical asset sizes
 
 const evictOldestFromCache = () => {
-  if (preloadCache.size <= MAX_CACHE_SIZE) return;
+  if (preloadCache.size < MAX_CACHE_SIZE) return;
 
   // Remove the first (oldest) entry
   const firstKey = preloadCache.keys().next().value;
@@ -20,6 +20,9 @@ const evictOldestFromCache = () => {
     if (element instanceof HTMLVideoElement) {
       element.src = "";
       element.load();
+    }
+    if (element instanceof HTMLDivElement) {
+      element.style.backgroundImage = "none";
     }
     preloadCache.delete(firstKey);
   }
