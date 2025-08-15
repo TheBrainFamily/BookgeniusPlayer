@@ -1,5 +1,5 @@
-import type { BookData } from "@/types/book";
-import { bookDataLoader } from "@/services/bookDataLoader";
+import type { BookData } from "@player/types/book";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
 // This is now an async wrapper that loads data at runtime
 let cachedBookData: BookData | null = null;

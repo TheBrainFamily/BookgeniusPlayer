@@ -1,4 +1,4 @@
-import { highlightCharacter } from "@/ui/pageObserver";
+import { highlightCharacter } from "@player/ui/pageObserver";
 
 export const activateCharacterInteractions = (element: HTMLElement, openCharacterDetailsModal: (characterSlug: string, isTalking: boolean, src: string) => void) => {
   setTimeout(() => {

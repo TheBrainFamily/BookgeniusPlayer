@@ -1,7 +1,7 @@
-import Navigation from "@/components/Navigation";
-import HeroSection from "@/components/HeroSection";
-import BookCollection from "@/components/BookCollection";
-import Footer from "@/components/Footer";
+import Navigation from "@platform/components/Navigation";
+import HeroSection from "@platform/components/HeroSection";
+import BookCollection from "@platform/components/BookCollection";
+import Footer from "@platform/components/Footer";
 
 const Index = () => {
   return (

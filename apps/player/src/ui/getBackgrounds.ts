@@ -1,6 +1,6 @@
-import type { BackgroundForBook } from "@/types/book";
+import type { BackgroundForBook } from "@player/types/book";
 import type { Background } from "./background";
-import { getBackgroundsForBook } from "@/genericBookDataGetters/getBackgroundsForBook";
+import { getBackgroundsForBook } from "@player/genericBookDataGetters/getBackgroundsForBook";
 
 export const getBackgrounds = (): Background[] => {
   // Helper function to process background inputs and set proper end paragraphs

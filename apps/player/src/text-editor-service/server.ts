@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { errorHandler } from "./middleware/errorHandler";
 import { notFoundHandler } from "./middleware/notFoundHandler";
 import textEditorRoutes from "./routes/textEditorRoutes";
-import booksRoutes from "@/text-editor-service/routes/booksRoutes";
+import booksRoutes from "@player/text-editor-service/routes/booksRoutes";
 
 // Load environment variables
 dotenv.config();

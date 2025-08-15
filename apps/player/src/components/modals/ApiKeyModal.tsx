@@ -2,11 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import { BrainCircuit, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@player/components/ui/button";
+import { Input } from "@player/components/ui/input";
+import { Label } from "@player/components/ui/label";
 import ModalUI from "./ModalUI";
-import { setApiKey } from "@/utils/apiKeyManager";
+import { setApiKey } from "@player/utils/apiKeyManager";
 
 interface ApiKeyModalProps {
   onClose: () => void;

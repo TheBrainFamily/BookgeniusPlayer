@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useRouteTransition } from "@/providers/RouteTransitionProvider";
+import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
 
 const ReaderPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -28,9 +28,7 @@ const ReaderPage = () => {
       <iframe
         src={playerUrl}
         title={`Book Player - ${slug}`}
-        className={`w-full h-full border-0 transition-opacity duration-500 ${
-          !isPlayerReady ? "opacity-0" : "opacity-100"
-        }`}
+        className={`w-full h-full border-0 transition-opacity duration-500 ${!isPlayerReady ? "opacity-0" : "opacity-100"}`}
       />
     </div>
   );

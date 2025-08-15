@@ -1,4 +1,4 @@
-import { bookDataLoader } from "@/services/bookDataLoader";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
 let cachedKnownVideoFiles: string[] | null = null;
 

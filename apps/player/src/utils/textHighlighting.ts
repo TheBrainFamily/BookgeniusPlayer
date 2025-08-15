@@ -1,4 +1,4 @@
-import { highlightSearchQuery, removeHighlights } from "@/utils/highlightSearchQuery";
+import { highlightSearchQuery, removeHighlights } from "@player/utils/highlightSearchQuery";
 
 export const highlightSearchInParagraph = (chapter: number, paragraphNumber: number, searchQuery: string, delay: number = 200): void => {
   setTimeout(() => {

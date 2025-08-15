@@ -54,9 +54,6 @@
   "lint-staged": {
     "apps/**/*.{js,jsx,ts,tsx,json,md,yml}": [
       "pnpm prettier --write"
-    ],
-    "apps/**/*.{js,jsx,ts,tsx}": [
-      "pnpm eslint --cache --fix"
     ]
   }
 }

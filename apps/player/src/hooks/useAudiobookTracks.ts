@@ -1,15 +1,15 @@
 import { useEffect } from "react";
 
-import { dealWithAudiobookTracks as impl } from "@/deal-with-audiobook-playback";
-import { stopAllTracks } from "@/audiobook-player";
-import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
+import { dealWithAudiobookTracks as impl } from "@player/deal-with-audiobook-playback";
+import { stopAllTracks } from "@player/audiobook-player";
+import { getCurrentLocation } from "@player/helpers/paragraphsNavigation";
 import useSplashHidden from "./useSplashHidden";
 
 /* We keep a mutable ref so we can swap the implementation on HMR */
 const implRef = { current: impl };
 
 if (import.meta.hot) {
-  import.meta.hot.accept("@/deal-with-audiobook-playback", (mod) => {
+  import.meta.hot.accept("@player/deal-with-audiobook-playback", (mod) => {
     implRef.current = mod.dealWithAudiobookTracks;
     console.info("[HMR] dealWithAudiobookTracks updated");
   });

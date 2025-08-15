@@ -1,12 +1,12 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-import ModalUI from "@/components/modals/ModalUI";
-import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
-import { getChapterTitle } from "@/utils/getChapterTitle";
+import ModalUI from "@player/components/modals/ModalUI";
+import { systemNavigateTo } from "@player/helpers/paragraphsNavigation";
+import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { Button } from "../ui/button";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
-import { useLocationRange } from "@/hooks/useLocationRange";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { useLocationRange } from "@player/hooks/useLocationRange";
 
 interface BookChaptersModalProps {
   onClose: () => void;

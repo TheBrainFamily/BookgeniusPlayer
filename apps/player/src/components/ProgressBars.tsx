@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useReadingProgress } from "@/hooks/useReadingProgress";
-import { getBookStringified } from "@/genericBookDataGetters/getBookStringified";
+import { useReadingProgress } from "@player/hooks/useReadingProgress";
+import { getBookStringified } from "@player/genericBookDataGetters/getBookStringified";
 
 export interface ChapterStructure {
   chapterNumber: number;

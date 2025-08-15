@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { textCacheManager } from "@/logic/TextCacheManager";
+import { textCacheManager } from "@player/logic/TextCacheManager";
 import { useLocationRange } from "./useLocationRange";
 
 export const useTextCacheManager = () => {

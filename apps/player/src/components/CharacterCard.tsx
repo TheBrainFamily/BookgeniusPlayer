@@ -2,12 +2,12 @@ import React, { useRef, useState, useEffect, useMemo, useCallback } from "react"
 import { motion } from "motion/react";
 
 import CharacterMedia from "./CharacterMedia";
-import { ParsedParagraphRange } from "@/fetchers/getParagraphRange";
-import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
-import { bookDataLoader } from "@/services/bookDataLoader";
-import { useCharacterModal } from "@/stores/modals/characterModal.store";
-import { cn } from "@/lib/utils";
-import { useHighlight } from "@/hooks/useHighlight";
+import { ParsedParagraphRange } from "@player/fetchers/getParagraphRange";
+import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@player/utils/getFilePathsForName";
+import { bookDataLoader } from "@player/services/bookDataLoader";
+import { useCharacterModal } from "@player/stores/modals/characterModal.store";
+import { cn } from "@player/lib/utils";
+import { useHighlight } from "@player/hooks/useHighlight";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { useProgressElementVisibility } from "@/stores/elementVisibility.store";
-import { cn } from "@/lib/utils";
+import { useProgressElementVisibility } from "@player/stores/elementVisibility.store";
+import { cn } from "@player/lib/utils";
 
 interface ProgressElementProps {
   children: React.ReactNode;

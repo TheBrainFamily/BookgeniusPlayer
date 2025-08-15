@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
-import { useOptionalElementVisibility, useLastHideReason, useElementVisibilityStore } from "@/stores/elementVisibility.store";
-import { cn } from "@/lib/utils";
+import { useOptionalElementVisibility, useLastHideReason, useElementVisibilityStore } from "@player/stores/elementVisibility.store";
+import { cn } from "@player/lib/utils";
 
 interface OptionalElementProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;

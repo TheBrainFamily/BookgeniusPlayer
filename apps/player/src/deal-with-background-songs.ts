@@ -8,9 +8,9 @@ import {
   isCurrentTrackInSection,
   getCurrentSectionTracks,
 } from "./audio-crossfader";
-import { bookDataLoader } from "@/services/bookDataLoader";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 import { getBackgroundSongsForBook } from "./genericBookDataGetters/getBackgroundSongsForBook";
-import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
+import { getCurrentLocation } from "@player/helpers/paragraphsNavigation";
 import { BackgroundSongSection } from "./types/book";
 
 let isProcessingBackgroundSongs = false; // Module-level flag to prevent re-entrancy

@@ -1,6 +1,6 @@
-import { Search, BookOpen, User, Settings } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Search, BookOpen, Settings } from "lucide-react";
+import { Button } from "@platform/components/ui/button";
+import { Input } from "@platform/components/ui/input";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
 
 const Navigation = () => {

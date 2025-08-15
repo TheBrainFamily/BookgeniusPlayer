@@ -2,14 +2,14 @@ import { useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, Variants } from "motion/react";
 
-import { useCharacterNotes } from "@/hooks/useCharacterNotes";
-import { useCurrentSpeakers } from "@/hooks/useCurrentSpeakers";
-import useSplashHidden from "@/hooks/useSplashHidden";
-import { useLocationRange } from "@/hooks/useLocationRange";
+import { useCharacterNotes } from "@player/hooks/useCharacterNotes";
+import { useCurrentSpeakers } from "@player/hooks/useCurrentSpeakers";
+import useSplashHidden from "@player/hooks/useSplashHidden";
+import { useLocationRange } from "@player/hooks/useLocationRange";
 import CharacterCard from "./CharacterCard";
-import { useLocation } from "@/state/LocationContext";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
-import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
+import { useLocation } from "@player/state/LocationContext";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 
 const target = document.getElementById("left-notes");
 

@@ -1,9 +1,9 @@
 import React from "react";
 import { createPortal } from "react-dom";
-import { useCharacterModal } from "@/stores/modals/characterModal.store";
-import CharacterModal from "@/components/modals/CharacterModal";
-import { useLocationRange } from "@/hooks/useLocationRange";
-import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useCharacterModal } from "@player/stores/modals/characterModal.store";
+import CharacterModal from "@player/components/modals/CharacterModal";
+import { useLocationRange } from "@player/hooks/useLocationRange";
+import { useEscapeKey } from "@player/hooks/useEscapeKey";
 
 export const CharacterModalRenderer: React.FC = () => {
   const { isOpen, slug, isVideo, mediaSrc, closeModal } = useCharacterModal();

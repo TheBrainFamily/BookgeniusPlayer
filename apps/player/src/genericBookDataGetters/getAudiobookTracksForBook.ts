@@ -1,5 +1,5 @@
-import type { AudiobookTracksSection } from "@/types/book";
-import { bookDataLoader } from "@/services/bookDataLoader";
+import type { AudiobookTracksSection } from "@player/types/book";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
 let cachedTracks: AudiobookTracksSection[] | null = null;
 

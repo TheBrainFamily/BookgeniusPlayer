@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useDebounce } from "./useDebounce";
-import type { Location } from "@/state/LocationContext";
-import type { CharacterData } from "@/types/book";
+import type { Location } from "@player/state/LocationContext";
+import type { CharacterData } from "@player/types/book";
 
 /**
  * Custom hook to determine which characters are currently speaking based on the current location

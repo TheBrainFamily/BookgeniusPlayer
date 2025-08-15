@@ -1,5 +1,5 @@
 import React from "react";
-import { HighlightProvider } from "@/context/HighlightContext";
+import { HighlightProvider } from "@player/context/HighlightContext";
 
 interface BookContentWrapperProps {
   children: React.ReactNode;

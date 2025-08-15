@@ -1,21 +1,21 @@
 import { useEffect } from "react";
-import { useCharacterModal } from "@/stores/modals/characterModal.store";
-import { setupPageObserver } from "@/ui/pageObserver";
-import { getBookStringified } from "@/genericBookDataGetters/getBookStringified";
-import { useSentenceModal } from "@/stores/modals/sentenceModal.store";
-import { findSimplifiedSentence } from "@/helpers/findSimplifiedSentence";
-import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
-import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
-import { useEditorMode } from "@/hooks/useEditorMode";
-import { useBookData } from "@/context/BookDataContext";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
-import { addPaddingBottomLastChapter } from "@/helpers/addPaddingBottomLastChapter";
-import { addSpaceBetweenChapters } from "@/helpers/addSpaceBetweenChapters";
+import { useCharacterModal } from "@player/stores/modals/characterModal.store";
+import { setupPageObserver } from "@player/ui/pageObserver";
+import { getBookStringified } from "@player/genericBookDataGetters/getBookStringified";
+import { useSentenceModal } from "@player/stores/modals/sentenceModal.store";
+import { findSimplifiedSentence } from "@player/helpers/findSimplifiedSentence";
+import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHtmlTags";
+import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
+import { useEditorMode } from "@player/hooks/useEditorMode";
+import { useBookData } from "@player/context/BookDataContext";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { addPaddingBottomLastChapter } from "@player/helpers/addPaddingBottomLastChapter";
+import { addSpaceBetweenChapters } from "@player/helpers/addSpaceBetweenChapters";
 
 const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
 if (import.meta.hot) {
-  import.meta.hot.accept("@/helpers/findSimplifiedSentence", (mod) => {
+  import.meta.hot.accept("@player/helpers/findSimplifiedSentence", (mod) => {
     findSimplifiedSentenceRef.current = mod.findSimplifiedSentence;
     console.info("[HMR] findSimplifiedSentence updated");
   });

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { dealWithBackgroundSongs as impl, preloadBackgroundTracks } from "@/deal-with-background-songs";
+import { dealWithBackgroundSongs as impl, preloadBackgroundTracks } from "@player/deal-with-background-songs";
 import { useLocationRange } from "./useLocationRange";
 import useSplashHidden from "./useSplashHidden";
 import { useIsAppReady } from "./useIsAppReady";
@@ -9,7 +9,7 @@ import { useIsAppReady } from "./useIsAppReady";
 const implRef = { current: impl };
 
 if (import.meta.hot) {
-  import.meta.hot.accept("@/deal-with-background-songs", (mod) => {
+  import.meta.hot.accept("@player/deal-with-background-songs", (mod) => {
     implRef.current = mod.dealWithBackgroundSongs;
     console.info("[HMR] useBackgroundSongs updated");
   });

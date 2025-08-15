@@ -1,8 +1,8 @@
 import React from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 
-import { cn } from "@/lib/utils";
-import useSplashHidden from "@/hooks/useSplashHidden";
+import { cn } from "@player/lib/utils";
+import useSplashHidden from "@player/hooks/useSplashHidden";
 
 import MenuButton from "./MenuButton";
 import AudioPlayer from "./AudioPlayer";

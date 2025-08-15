@@ -3,7 +3,7 @@ import { motion, Variants } from "motion/react";
 import { Brain, FileSearch } from "lucide-react";
 
 import ModalUI from "./ModalUI";
-import { LLMAnswerViewer } from "@/ui/MarkdownComponent";
+import { LLMAnswerViewer } from "@player/ui/MarkdownComponent";
 
 interface DeepResearchModalProps {
   onClose: () => void;

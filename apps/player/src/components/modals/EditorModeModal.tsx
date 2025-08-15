@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import ModalUI from "@/components/modals/ModalUI";
+import ModalUI from "@player/components/modals/ModalUI";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { useEditorModeModal } from "@/stores/modals/editorModeModal.store";
-import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
+import { useEditorModeModal } from "@player/stores/modals/editorModeModal.store";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 
 interface EditorModeModalProps {
   onClose: () => void;

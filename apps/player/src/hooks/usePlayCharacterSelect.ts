@@ -1,9 +1,9 @@
 import { useEffect, useMemo } from "react";
 
-import { useLocation } from "@/state/LocationContext";
+import { useLocation } from "@player/state/LocationContext";
 import { useCurrentSpeakers } from "./useCurrentSpeakers";
-import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
 
 function updateInlineAvatarTalkingState(container: HTMLDivElement, isTalking: boolean) {
   if (!container.dataset.hasVideos) return;

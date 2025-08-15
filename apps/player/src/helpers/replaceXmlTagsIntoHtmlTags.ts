@@ -1,4 +1,4 @@
-import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 
 export const replaceXmlTagsIntoHtmlTags = (text: string) => {
   const characters = getCharactersData(); // Get characters data once

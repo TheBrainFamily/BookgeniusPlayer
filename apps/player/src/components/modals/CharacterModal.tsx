@@ -4,15 +4,15 @@ import { FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import ModalUI from "./ModalUI";
-import CharacterMedia from "@/components/CharacterMedia";
-import { CharacterData } from "@/types/book";
-import { findCharacterSentences, SearchResultItemData } from "@/searchModal";
-import { systemNavigateTo } from "@/helpers/paragraphsNavigation";
-import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
-import { highlightSearchInParagraph } from "@/utils/textHighlighting";
-import { useLocationRange } from "@/hooks/useLocationRange";
+import CharacterMedia from "@player/components/CharacterMedia";
+import { CharacterData } from "@player/types/book";
+import { findCharacterSentences, SearchResultItemData } from "@player/searchModal";
+import { systemNavigateTo } from "@player/helpers/paragraphsNavigation";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
+import { useLocationRange } from "@player/hooks/useLocationRange";
 import { DialogEnhanceClose } from "../ui/dialog";
-import { getChapterTitle } from "@/utils/getChapterTitle";
+import { getChapterTitle } from "@player/utils/getChapterTitle";
 
 interface CharacterModalProps {
   onClose: () => void;

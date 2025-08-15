@@ -1,12 +1,12 @@
 import React from "react";
 import { motion, Variants } from "motion/react";
 
-import { useLocationRange } from "@/hooks/useLocationRange";
-import { systemNavigateTo, getSavedLocation } from "@/helpers/paragraphsNavigation";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { useLocationRange } from "@player/hooks/useLocationRange";
+import { systemNavigateTo, getSavedLocation } from "@player/helpers/paragraphsNavigation";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@player/components/ui/tooltip";
+import { cn } from "@player/lib/utils";
 import { ProgressElement } from "./ProgressElement";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
 
 const ProgressIndicator: React.FC = () => {
   const {

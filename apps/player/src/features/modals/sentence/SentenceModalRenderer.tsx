@@ -1,8 +1,8 @@
 import React from "react";
 import { createPortal } from "react-dom";
-import { useEscapeKey } from "@/hooks/useEscapeKey";
-import { useSentenceModal } from "@/stores/modals/sentenceModal.store";
-import SentenceModal from "@/components/modals/SentenceModal";
+import { useEscapeKey } from "@player/hooks/useEscapeKey";
+import { useSentenceModal } from "@player/stores/modals/sentenceModal.store";
+import SentenceModal from "@player/components/modals/SentenceModal";
 
 export const SentenceModalRenderer: React.FC = () => {
   const { isOpen, closeModal, currentSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore } = useSentenceModal();

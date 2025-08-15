@@ -1,7 +1,7 @@
 import { readdir, readFile, writeFile } from "fs/promises";
 import path from "path";
 import { parseStringPromise } from "xml2js";
-import { Variant } from "@/types/book";
+import { Variant } from "@player/types/book";
 
 export class BooksService {
   public async getBooks(): Promise<string[]> {

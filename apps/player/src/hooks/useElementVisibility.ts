@@ -1,9 +1,9 @@
 import { useEffect, useCallback, useRef } from "react";
-import { useElementVisibilityStore } from "@/stores/elementVisibility.store";
+import { useElementVisibilityStore } from "@player/stores/elementVisibility.store";
 import useSplashHidden from "./useSplashHidden";
 
-import { useLocation } from "@/state/LocationContext";
-import { getCurrentLocation } from "@/helpers/paragraphsNavigation";
+import { useLocation } from "@player/state/LocationContext";
+import { getCurrentLocation } from "@player/helpers/paragraphsNavigation";
 
 const SCROLL_HIDE_DELAY = 3000;
 const SCROLL_DEBOUNCE_DELAY = 25;

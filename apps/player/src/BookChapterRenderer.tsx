@@ -2,9 +2,9 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "./state/LocationContext"; // Adjust path
-import { usePageObserver } from "@/hooks/usePageObserver";
-import ChapterLoaderDirect from "@/components/ChapterLoaderDirect";
-import { bookDataLoader } from "@/services/bookDataLoader";
+import { usePageObserver } from "@player/hooks/usePageObserver";
+import ChapterLoaderDirect from "@player/components/ChapterLoaderDirect";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 import { useCharacterModal } from "./stores/modals/characterModal.store";
 import { getBookData } from "./genericBookDataGetters/getBookData";
 

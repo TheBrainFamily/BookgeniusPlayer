@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from "react";
 import { RealtimeClient } from "@openai/realtime-api-beta";
 
-import { WavRecorder, WavStreamPlayer } from "@/lib/wavtools/index.js";
-import { instructions } from "@/utils/conversation_config.js";
-import { getApiKey, createApiKeyListener } from "@/utils/apiKeyManager";
-import { useBookContext } from "@/hooks/useBookContext";
+import { WavRecorder, WavStreamPlayer } from "@player/lib/wavtools/index.js";
+import { instructions } from "@player/utils/conversation_config.js";
+import { getApiKey, createApiKeyListener } from "@player/utils/apiKeyManager";
+import { useBookContext } from "@player/hooks/useBookContext";
 
 // Define the conversation item type
 interface ConversationItem {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getApiKey, createApiKeyListener } from "@/utils/apiKeyManager";
+import { getApiKey, createApiKeyListener } from "@player/utils/apiKeyManager";
 
 /**
  * A simple component to display the current API key status

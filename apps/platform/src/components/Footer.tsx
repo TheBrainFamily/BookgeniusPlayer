@@ -1,5 +1,5 @@
 import { BookOpen, Mail, MapPin, Phone } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@platform/components/ui/button";
 
 const Footer = () => {
   return (

@@ -2,7 +2,7 @@ import DiffMatchPatch from "diff-match-patch";
 
 import { normalise } from "./normalise";
 import type { ParagraphInfo, QuoteHit } from "../MarkdownComponent";
-import { alignTwoStringsAndGivePercentScoreFromZeroToOne } from "@/ui/utils/Needleman-Wunsch";
+import { alignTwoStringsAndGivePercentScoreFromZeroToOne } from "@player/ui/utils/Needleman-Wunsch";
 
 const dmp = new DiffMatchPatch();
 

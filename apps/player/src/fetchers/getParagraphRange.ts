@@ -7,8 +7,8 @@
  * compile without any additional tweaks.
  */
 
-import { BOOK_SLUGS } from "@/consts";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { BOOK_SLUGS } from "@player/consts";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
 
 /* -------------------------------------------------------------------------- */
 /*  Shared types                                                              */
@@ -258,9 +258,9 @@ function createParagraphsWhereSpottedForPlay(
   // Special case: At the start of a chapter, if this character is among the first to enter,
   // we treat them as "spotted" at paragraph 0 so they appear immediately.
   if (startParagraph === 0 && closestEntryInChapter > 0) {
-if (paragraphsWhereEnters.includes(closestEntryInChapter)) {
-  uniqueSpottedParagraphs.add(0);
-}
+    if (paragraphsWhereEnters.includes(closestEntryInChapter)) {
+      uniqueSpottedParagraphs.add(0);
+    }
   }
 
   for (const [intervalStart, intervalEnd] of activeIntervals) {

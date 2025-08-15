@@ -47,7 +47,7 @@ const ChapterLoaderDirect: React.FC<ChapterLoaderDirectProps> = ({ bookSlug, cha
       try {
         console.log(`ChapterLoaderDirect: Importing for slug '${bookSlug}', chapter '${chapterId}'`);
         // IMPORTANT: Adjust the path according to your project structure and how Vite handles dynamic imports.
-        // Using an alias like '@/' for src might be more robust if your bundler is configured for it.
+        // Using an alias like '@player/' for src might be more robust if your bundler is configured for it.
         const module = await import(`../data/books/${bookSlug}/chapters/Chapter${chapterId}.tsx`);
 
         if (!isMounted) return;

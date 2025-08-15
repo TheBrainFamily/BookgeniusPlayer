@@ -1,10 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Star, BookOpen, Clock, Play, Volume2 } from "lucide-react";
-import { books } from "@/books";
+import { Card, CardContent, CardHeader, CardTitle } from "@platform/components/ui/card";
+import { Button } from "@platform/components/ui/button";
+import { Badge } from "@platform/components/ui/badge";
+import { Star, Clock, Play, Volume2 } from "lucide-react";
+import { books } from "@platform/books";
 import { useNavigate } from "react-router-dom";
-import { useRouteTransition } from "@/providers/RouteTransitionProvider";
+import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
 
 const BookCollection = () => {
   const navigate = useNavigate();
@@ -13,20 +13,14 @@ const BookCollection = () => {
   const handleBookClick = (slug: string) => {
     const book = books.find((b) => b.slug === slug);
     const title = book?.title ?? "BookGenius";
-    const phrases =
-      book?.phrases ?? [
-        "Loading...",
-        "Creating the story...",
-        "Waking up the director...",
-        "Warming up the speakers...",
-      ];
+    const phrases = book?.phrases ?? ["Creating the story...", "Waking up the director...", "Warming up the speakers..."];
 
     // Start the unified overlay with BookLoader
     startTransition({ title, phrases, subtitle: "Loading..." });
 
     // Let the overlay paint before route switch for a smooth fade
     requestAnimationFrame(() => {
-      navigate(`/reader/${slug}`);
+      navigate(`/reader/?book=${slug}`);
     });
   };
 

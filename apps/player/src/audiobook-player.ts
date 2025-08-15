@@ -1,5 +1,5 @@
-import { getAudioContext, initAudioContext, getAudiobookGainNode } from "@/audio-crossfader";
-import { bookDataLoader } from "@/services/bookDataLoader";
+import { getAudioContext, initAudioContext, getAudiobookGainNode } from "@player/audio-crossfader";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
 export type AudiobookTrackEvent = {
   timestamp: number; // Time in seconds within the track

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { isMobileOrTablet } from "@/utils/isMobileOrTablet";
+import { isMobileOrTablet } from "@player/utils/isMobileOrTablet";
 
 /**
  * React hook that listens for viewport width changes and orientation changes

@@ -2,8 +2,8 @@ import React, { ReactNode, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 
-import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { cn } from "@player/lib/utils";
+import { Dialog, DialogContent, DialogTitle } from "@player/components/ui/dialog";
 
 export interface ModalUIProps {
   title?: ReactNode;

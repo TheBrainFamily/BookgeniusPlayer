@@ -1,14 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { 
-  Crown, 
-  Heart, 
-  Sword, 
-  Skull, 
-  Compass, 
-  Scroll,
-  ArrowRight 
-} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@platform/components/ui/card";
+import { Button } from "@platform/components/ui/button";
+import { Crown, Heart, Sword, Skull, Compass, Scroll, ArrowRight } from "lucide-react";
 
 const genres = [
   {
@@ -18,7 +10,7 @@ const genres = [
     description: "Timeless works that have shaped the literary world",
     bookCount: "2,500+",
     color: "text-library-gold",
-    bgGradient: "from-library-gold/20 to-library-gold/5"
+    bgGradient: "from-library-gold/20 to-library-gold/5",
   },
   {
     id: 2,
@@ -27,7 +19,7 @@ const genres = [
     description: "Stories of love, passion, and human connection",
     bookCount: "1,800+",
     color: "text-library-burgundy",
-    bgGradient: "from-library-burgundy/20 to-library-burgundy/5"
+    bgGradient: "from-library-burgundy/20 to-library-burgundy/5",
   },
   {
     id: 3,
@@ -36,7 +28,7 @@ const genres = [
     description: "Epic tales of heroism and daring expeditions",
     bookCount: "1,200+",
     color: "text-library-green",
-    bgGradient: "from-library-green/20 to-library-green/5"
+    bgGradient: "from-library-green/20 to-library-green/5",
   },
   {
     id: 4,
@@ -45,7 +37,7 @@ const genres = [
     description: "Dark, mysterious tales of the supernatural",
     bookCount: "800+",
     color: "text-muted-foreground",
-    bgGradient: "from-library-mahogany/20 to-library-mahogany/5"
+    bgGradient: "from-library-mahogany/20 to-library-mahogany/5",
   },
   {
     id: 5,
@@ -54,7 +46,7 @@ const genres = [
     description: "Journeys to distant lands and unknown realms",
     bookCount: "600+",
     color: "text-library-gold",
-    bgGradient: "from-library-walnut/20 to-library-walnut/5"
+    bgGradient: "from-library-walnut/20 to-library-walnut/5",
   },
   {
     id: 6,
@@ -63,8 +55,8 @@ const genres = [
     description: "Chronicles of bygone eras and ancient civilizations",
     bookCount: "1,000+",
     color: "text-library-burgundy",
-    bgGradient: "from-library-parchment/10 to-transparent"
-  }
+    bgGradient: "from-library-parchment/10 to-transparent",
+  },
 ];
 
 const GenreExploration = () => {
@@ -84,32 +76,25 @@ const GenreExploration = () => {
           {genres.map((genre) => {
             const IconComponent = genre.icon;
             return (
-              <Card 
+              <Card
                 key={genre.id}
                 className="bg-card/40 backdrop-blur-sm border-library-walnut hover:border-library-gold transition-all duration-300 hover:scale-105 group cursor-pointer"
               >
                 <CardHeader className="text-center">
-                  <div className={`mx-auto w-16 h-16 rounded-full bg-gradient-to-br ${genre.bgGradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <div
+                    className={`mx-auto w-16 h-16 rounded-full bg-gradient-to-br ${genre.bgGradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
+                  >
                     <IconComponent className={`h-8 w-8 ${genre.color}`} />
                   </div>
-                  <CardTitle className="text-xl font-bold text-foreground group-hover:text-library-gold transition-colors">
-                    {genre.name}
-                  </CardTitle>
+                  <CardTitle className="text-xl font-bold text-foreground group-hover:text-library-gold transition-colors">{genre.name}</CardTitle>
                 </CardHeader>
 
                 <CardContent className="text-center space-y-4">
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {genre.description}
-                  </p>
-                  
-                  <div className="text-library-gold font-semibold">
-                    {genre.bookCount} books
-                  </div>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{genre.description}</p>
 
-                  <Button 
-                    variant="ghost" 
-                    className="w-full text-foreground hover:text-library-gold hover:bg-library-walnut/50 group/btn"
-                  >
+                  <div className="text-library-gold font-semibold">{genre.bookCount} books</div>
+
+                  <Button variant="ghost" className="w-full text-foreground hover:text-library-gold hover:bg-library-walnut/50 group/btn">
                     Explore Collection
                     <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
                   </Button>
@@ -120,10 +105,7 @@ const GenreExploration = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button 
-            size="lg"
-            className="bg-library-gold hover:bg-library-gold-glow text-library-mahogany font-semibold px-8 py-3"
-          >
+          <Button size="lg" className="bg-library-gold hover:bg-library-gold-glow text-library-mahogany font-semibold px-8 py-3">
             View All Genres
           </Button>
         </div>

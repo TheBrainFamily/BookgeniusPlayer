@@ -16,7 +16,7 @@ function highlightNthOccurrence(
 */
 // --- End of function definition assumption ---
 
-import { highlightNthOccurrence } from "@/highlightWord";
+import { highlightNthOccurrence } from "@player/highlightWord";
 
 describe("highlightNthOccurrence", () => {
   const DEFAULT_CLASS = "current-word";

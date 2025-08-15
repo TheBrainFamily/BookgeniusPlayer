@@ -1,12 +1,12 @@
-import { loadBookData } from "@/genericBookDataGetters/getBookData";
-import { loadAllVariants } from "@/genericBookDataGetters/getAllVariants";
-import { loadAudiobookTracksForBook } from "@/genericBookDataGetters/getAudiobookTracksForBook";
-import { loadBackgroundSongsForBook } from "@/genericBookDataGetters/getBackgroundSongsForBook";
-import { loadBackgroundsForBook } from "@/genericBookDataGetters/getBackgroundsForBook";
-import { loadBookStringified } from "@/genericBookDataGetters/getBookStringified";
-import { loadCharactersData } from "@/genericBookDataGetters/getCharactersData";
-import { loadCutScenesForBook } from "@/genericBookDataGetters/getCutScenesForBook";
-import { loadKnownVideoFiles } from "@/genericBookDataGetters/getKnownVideoFiles";
+import { loadBookData } from "@player/genericBookDataGetters/getBookData";
+import { loadAllVariants } from "@player/genericBookDataGetters/getAllVariants";
+import { loadAudiobookTracksForBook } from "@player/genericBookDataGetters/getAudiobookTracksForBook";
+import { loadBackgroundSongsForBook } from "@player/genericBookDataGetters/getBackgroundSongsForBook";
+import { loadBackgroundsForBook } from "@player/genericBookDataGetters/getBackgroundsForBook";
+import { loadBookStringified } from "@player/genericBookDataGetters/getBookStringified";
+import { loadCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { loadCutScenesForBook } from "@player/genericBookDataGetters/getCutScenesForBook";
+import { loadKnownVideoFiles } from "@player/genericBookDataGetters/getKnownVideoFiles";
 
 export async function preloadAllBookData(): Promise<void> {
   console.log("Preloading book data...");

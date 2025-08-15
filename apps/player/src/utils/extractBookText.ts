@@ -1,4 +1,4 @@
-import type { BookContextChunk, BookContextLocation, ExtractedBookText } from "@/types/bookContext";
+import type { BookContextChunk, BookContextLocation, ExtractedBookText } from "@player/types/bookContext";
 
 /**
  * Extract clean text from book paragraphs in the DOM

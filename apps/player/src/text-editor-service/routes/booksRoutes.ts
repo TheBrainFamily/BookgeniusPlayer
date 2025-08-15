@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { BooksController } from "@/text-editor-service/controllers/booksController";
+import { BooksController } from "@player/text-editor-service/controllers/booksController";
 
 const router = Router();
 const booksController = new BooksController();

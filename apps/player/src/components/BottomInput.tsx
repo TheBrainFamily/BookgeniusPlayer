@@ -3,19 +3,19 @@ import { Mic, Send, Telescope, Loader2 } from "lucide-react";
 import { motion, Variants, AnimatePresence } from "motion/react";
 import { useTranslation } from "react-i18next";
 
-import { cn } from "@/lib/utils";
-import { useRealtime } from "@/context/RealtimeContext";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { bookDataLoader } from "@/services/bookDataLoader";
-import { useLocation } from "@/state/LocationContext";
-import { deepResearchCall } from "@/deepResearchCall";
-import { useSearchModal } from "@/stores/modals/searchModal.store";
-import { useDeepResearchModal } from "@/stores/modals/deepResearchModal.store";
+import { cn } from "@player/lib/utils";
+import { useRealtime } from "@player/context/RealtimeContext";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@player/components/ui/tooltip";
+import { bookDataLoader } from "@player/services/bookDataLoader";
+import { useLocation } from "@player/state/LocationContext";
+import { deepResearchCall } from "@player/deepResearchCall";
+import { useSearchModal } from "@player/stores/modals/searchModal.store";
+import { useDeepResearchModal } from "@player/stores/modals/deepResearchModal.store";
 import { OptionalElement } from "./OptionalElement";
-import { useElementVisibilityStore } from "@/stores/elementVisibility.store";
-import { hasApiKey } from "@/utils/apiKeyManager";
-import { useApiKeyModal } from "@/stores/modals/apiKeyModal.store";
-import { Filter } from "@/types/book";
+import { useElementVisibilityStore } from "@player/stores/elementVisibility.store";
+import { hasApiKey } from "@player/utils/apiKeyManager";
+import { useApiKeyModal } from "@player/stores/modals/apiKeyModal.store";
+import { Filter } from "@player/types/book";
 
 interface SubmitMessageData {
   query: string;

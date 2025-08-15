@@ -4,7 +4,7 @@
  * into this component instead of keeping the DOM query logic elsewhere.
  */
 import { useEffect } from "react";
-import { initializeNoteLinkBlinking } from "@/annotationsHandling";
+import { initializeNoteLinkBlinking } from "@player/annotationsHandling";
 
 export default function NoteLinkBlinker() {
   useEffect(() => {

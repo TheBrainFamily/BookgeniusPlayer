@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 
-import { useFootnotes } from "@/hooks/useFootnotes";
+import { useFootnotes } from "@player/hooks/useFootnotes";
 import { FootnoteModal } from "./FootnoteModal";
-import { useLocationRange } from "@/hooks/useLocationRange";
+import { useLocationRange } from "@player/hooks/useLocationRange";
 
 const target = document.getElementById("right-notes");
 

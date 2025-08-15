@@ -1,8 +1,8 @@
-import { setCurrentLocation, isSystemNavigationInProgress } from "@/helpers/paragraphsNavigation";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
-import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
-import { bookDataLoader } from "@/services/bookDataLoader";
-import { pageWasJustReloaded } from "@/utils/pageWasJustReloaded";
+import { setCurrentLocation, isSystemNavigationInProgress } from "@player/helpers/paragraphsNavigation";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@player/utils/getFilePathsForName";
+import { bookDataLoader } from "@player/services/bookDataLoader";
+import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
 import debounce from "lodash.debounce";
 
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
@@ -482,7 +482,7 @@ function activateMediaInRange(
               if (characterSlugForDummy) {
                 const talkingSrcForDummy = getTalkingMediaFilePathForName(characterSlugForDummy, bookDataLoader.getCurrentBook());
                 const listeningSrcForDummy = getListeningMediaFilePathForName(characterSlugForDummy, bookDataLoader.getCurrentBook());
-                const placeholderSrcForDummy = normalizeSrcForInlineAvatar((listeningSrcForDummy || talkingSrcForDummy || ""));
+                const placeholderSrcForDummy = normalizeSrcForInlineAvatar(listeningSrcForDummy || talkingSrcForDummy || "");
                 if (placeholderSrcForDummy) {
                   const img = document.createElement("img");
                   img.src = placeholderSrcForDummy;

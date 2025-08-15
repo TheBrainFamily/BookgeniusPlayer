@@ -1,5 +1,5 @@
 import { searchParagraphsFromServer } from "./utils/searchParagraphsFromServer";
-import type { Location } from "@/state/LocationContext";
+import type { Location } from "@player/state/LocationContext";
 import { getCharactersData } from "./genericBookDataGetters/getCharactersData";
 import { useBookContentStore } from "./stores/bookContent.store";
 import { getBookData } from "./genericBookDataGetters/getBookData";

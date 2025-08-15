@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Location } from "@/state/LocationContext";
+import { Location } from "@player/state/LocationContext";
 
 export interface Footnote {
   id: string;

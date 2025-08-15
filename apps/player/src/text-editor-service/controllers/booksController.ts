@@ -1,4 +1,4 @@
-import { BooksService } from "@/text-editor-service/services/booksService";
+import { BooksService } from "@player/text-editor-service/services/booksService";
 import { RequestHandler } from "express";
 
 export class BooksController {

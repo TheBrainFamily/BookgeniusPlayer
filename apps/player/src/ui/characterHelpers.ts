@@ -1,5 +1,5 @@
-import { BOOK_SLUGS } from "@/consts";
-import { getTalkingMediaFilePathForName } from "@/utils/getFilePathsForName";
+import { BOOK_SLUGS } from "@player/consts";
+import { getTalkingMediaFilePathForName } from "@player/utils/getFilePathsForName";
 
 export function isAppearanceWithinRange(
   appearance: { chapterNumber: number; paragraphNumber: number },
@@ -55,7 +55,7 @@ export function activateCharacters(chapterNum: number, paragraphNum: number, boo
           if (app.isTalkingInParagraph) {
             isTalkingInRange = true;
             break; // Found talking in range, no need to check further appearances for this entity
-          } 
+          }
         }
       }
 

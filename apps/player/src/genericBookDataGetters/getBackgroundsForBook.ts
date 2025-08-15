@@ -1,5 +1,5 @@
-import type { BackgroundForBook } from "@/types/book";
-import { bookDataLoader } from "@/services/bookDataLoader";
+import type { BackgroundForBook } from "@player/types/book";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
 let cachedBackgrounds: BackgroundForBook[] | null = null;
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { preloadAllBookData } from "@/services/bookDataPreloader";
+import { preloadAllBookData } from "@player/services/bookDataPreloader";
 
 interface AppInitializerProps {
   children: React.ReactNode;

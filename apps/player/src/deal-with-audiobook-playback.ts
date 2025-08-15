@@ -2,7 +2,7 @@ import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audi
 import { highlightNthOccurrence } from "./highlightWord";
 import { getAudiobookTracksForBook } from "./genericBookDataGetters/getAudiobookTracksForBook";
 import { AudiobookTracksSection } from "./types/book";
-import { bookDataLoader } from "@/services/bookDataLoader";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
 const AUDIO_SYNC_SHIFT = -0.1;
 

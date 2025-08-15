@@ -10,7 +10,7 @@
     "strict": false,
     "skipLibCheck": true,
     "baseUrl": ".",
-    "paths": { "@/*": ["./src/*"] },
+    "paths": { "@player/*": ["./src/*"] },
     "jsx": "react-jsx",
     "types": ["vite/client", "jest"],
     "allowJs": true,

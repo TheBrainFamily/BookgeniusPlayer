@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
-import { setupPageObserver } from "@/ui/pageObserver";
+import { setupPageObserver } from "@player/ui/pageObserver";
 
 interface UsePageObserverOptions {
   /** Whether the observer should be active */

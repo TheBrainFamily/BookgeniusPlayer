@@ -3,18 +3,6 @@
   "style": "default",
   "rsc": false,
   "tsx": true,
-  "tailwind": {
-    "config": "tailwind.config.ts",
-    "css": "src/index.css",
-    "baseColor": "slate",
-    "cssVariables": true,
-    "prefix": ""
-  },
-  "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
-  }
+  "tailwind": { "config": "tailwind.config.ts", "css": "src/index.css", "baseColor": "slate", "cssVariables": true, "prefix": "" },
+  "aliases": { "components": "@platform/components", "utils": "@platform/lib/utils", "ui": "@platform/components/ui", "lib": "@platform/lib", "hooks": "@platform/hooks" }
 }

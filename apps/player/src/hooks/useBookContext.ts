@@ -1,8 +1,8 @@
 import { useEffect, useRef, useCallback } from "react";
 import { RealtimeClient } from "@openai/realtime-api-beta";
 import { useLocationRange } from "./useLocationRange";
-import { extractBookTextFromLocation, extractBookTextUpToLocation } from "@/utils/extractBookText";
-import type { BookContextState, BookContextLocation, BookContextChunk } from "@/types/bookContext";
+import { extractBookTextFromLocation, extractBookTextUpToLocation } from "@player/utils/extractBookText";
+import type { BookContextState, BookContextLocation, BookContextChunk } from "@player/types/bookContext";
 
 interface UseBookContextProps {
   client: RealtimeClient | null;

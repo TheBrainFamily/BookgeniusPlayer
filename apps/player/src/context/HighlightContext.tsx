@@ -1,6 +1,6 @@
 import React, { useEffect, useState, ReactNode, useMemo } from "react";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
-import { HighlightContext } from "@/hooks/useHighlight";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { HighlightContext } from "@player/hooks/useHighlight";
 
 declare global {
   interface Window {

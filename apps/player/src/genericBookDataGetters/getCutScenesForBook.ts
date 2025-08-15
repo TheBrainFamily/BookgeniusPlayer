@@ -1,5 +1,5 @@
-import type { CutSceneForBook } from "@/types/book";
-import { bookDataLoader } from "@/services/bookDataLoader";
+import type { CutSceneForBook } from "@player/types/book";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
 let cachedCutScenes: CutSceneForBook[] | null = null;
 

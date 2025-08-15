@@ -1,4 +1,4 @@
-import { bookDataLoader } from "@/services/bookDataLoader";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 import { getCutScenesForBook } from "./genericBookDataGetters/getCutScenesForBook";
 import "./styles/cutscene-video.css";
 

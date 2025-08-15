@@ -4,16 +4,16 @@ import { useTranslation } from "react-i18next";
 import useLocalStorageState from "use-local-storage-state";
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
 
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { cn } from "@/lib/utils";
+import { Button } from "@player/components/ui/button";
+import { Label } from "@player/components/ui/label";
+import { Slider } from "@player/components/ui/slider";
+import { cn } from "@player/lib/utils";
 import ModalUI from "./ModalUI";
-import { activateCharacterInteractions } from "@/helpers/activateCharacterInteractions";
-import { replaceXmlTagsIntoHtmlTags } from "@/helpers/replaceXmlTagsIntoHtmlTags";
-import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
-import { useCharacterModal } from "@/stores/modals/characterModal.store";
-import { getCurrentLocation, systemNavigateTo } from "@/helpers/paragraphsNavigation";
+import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
+import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHtmlTags";
+import { getAllVariants } from "@player/genericBookDataGetters/getAllVariants";
+import { useCharacterModal } from "@player/stores/modals/characterModal.store";
+import { getCurrentLocation, systemNavigateTo } from "@player/helpers/paragraphsNavigation";
 
 const AnimatedFontSize: React.FC<{ value: number; isChanging: boolean }> = memo(({ value, isChanging }) => {
   const [currentDisplayValue, setCurrentDisplayValue] = useState(value);

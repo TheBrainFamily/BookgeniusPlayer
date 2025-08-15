@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 
-import { useCharactersOnStage } from "@/hooks/useCharactersOnStage";
-import { useCurrentSpeakers } from "@/hooks/useCurrentSpeakers";
-import { useLocation } from "@/state/LocationContext";
-import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
+import { useCharactersOnStage } from "@player/hooks/useCharactersOnStage";
+import { useCurrentSpeakers } from "@player/hooks/useCurrentSpeakers";
+import { useLocation } from "@player/state/LocationContext";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import CharacterCard from "./CharacterCard";
-import { cn } from "@/lib/utils";
+import { cn } from "@player/lib/utils";
 
 const CharactersOnStagePanel = () => {
   const allCharacters = useMemo(() => getCharactersData(), []);

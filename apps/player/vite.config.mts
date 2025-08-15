@@ -72,7 +72,7 @@ export default defineConfig(async () => {
       }),
     ],
     root: "./",
-    resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
+    resolve: { alias: { "@player": path.resolve(__dirname, "./src") } },
     build: { outDir: "dist", sourcemap: true, emptyOutDir: true },
     server: {
       port: 5173,

@@ -3,9 +3,9 @@ import { AnimatePresence, motion, Variants } from "motion/react";
 import { UndoDot } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { shouldShowReturnButton, systemNavigateTo, getSavedLocation } from "@/helpers/paragraphsNavigation";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useLocationRange } from "@/hooks/useLocationRange";
+import { shouldShowReturnButton, systemNavigateTo, getSavedLocation } from "@player/helpers/paragraphsNavigation";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@player/components/ui/tooltip";
+import { useLocationRange } from "@player/hooks/useLocationRange";
 import { OptionalElement } from "./OptionalElement";
 
 const ReturnToLocationButton = () => {

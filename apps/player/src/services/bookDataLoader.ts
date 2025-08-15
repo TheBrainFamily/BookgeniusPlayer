@@ -1,7 +1,7 @@
 // Service to dynamically load book data at runtime
-import type { BookData, BackgroundForBook, BackgroundSongSection, CutSceneForBook, CharacterData, AudiobookTracksSection } from "@/types/book";
-import type { Variant } from "@/genericBookDataGetters/getAllVariants";
-import { getBookDataUrl } from "@/utils/assetUrls";
+import type { BookData, BackgroundForBook, BackgroundSongSection, CutSceneForBook, CharacterData, AudiobookTracksSection } from "@player/types/book";
+import type { Variant } from "@player/genericBookDataGetters/getAllVariants";
+import { getBookDataUrl } from "@player/utils/assetUrls";
 
 async function importPublicModule(moduleUrl) {
   try {
@@ -60,6 +60,7 @@ class BookDataLoader {
       // console.log("Loading module:", moduleUrl);
       let module;
       if (import.meta.env && import.meta.env.DEV) {
+        console.log("Loading module:", `${getBookDataUrl(fileName)}.js?t=${timestamp}`);
         module = await importPublicModule(`${getBookDataUrl(fileName)}.js?t=${timestamp}`);
       } else {
         module = await import(/* @vite-ignore */ `${getBookDataUrl(fileName)}.js`);

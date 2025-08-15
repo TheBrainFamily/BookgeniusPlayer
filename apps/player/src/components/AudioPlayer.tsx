@@ -18,15 +18,15 @@ import {
   getCurrentTrackId,
   getCurrentTrackIndexInSection,
   transitionToTrack,
-} from "@/audio-crossfader";
-import { stopAudiobook, playAudiobook } from "@/hooks/useAudiobookTracks";
-import { Slider } from "@/components/ui/slider";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+} from "@player/audio-crossfader";
+import { stopAudiobook, playAudiobook } from "@player/hooks/useAudiobookTracks";
+import { Slider } from "@player/components/ui/slider";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@player/components/ui/tooltip";
+import { cn } from "@player/lib/utils";
 import { OptionalElement } from "./OptionalElement";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { CoverArt } from "./CoverArt";
-import { useOptionalElementVisibility } from "@/stores/elementVisibility.store";
+import { useOptionalElementVisibility } from "@player/stores/elementVisibility.store";
 
 const AudioPlayer = () => {
   const { t } = useTranslation();

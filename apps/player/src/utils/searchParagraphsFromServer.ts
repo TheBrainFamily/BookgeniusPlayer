@@ -1,7 +1,7 @@
-import { Location } from "@/state/LocationContext";
-import { QUESTIONS_SERVER_URL } from "@/lib/consts";
-import { bookDataLoader } from "@/services/bookDataLoader";
-import { Filter } from "@/types/book";
+import { Location } from "@player/state/LocationContext";
+import { QUESTIONS_SERVER_URL } from "@player/lib/consts";
+import { bookDataLoader } from "@player/services/bookDataLoader";
+import { Filter } from "@player/types/book";
 
 const extractSummary = (text: string): string => {
   const summaryMatch = text.match(/<Summary>(.*?)<\/Summary>/);

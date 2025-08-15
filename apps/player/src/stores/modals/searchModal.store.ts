@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { useModalCoordinator } from "../modalCoordinator.store";
-import { SearchResultsData } from "@/searchModal";
+import { SearchResultsData } from "@player/searchModal";
 
 const MODAL_ID = "search-modal";
 

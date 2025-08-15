@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange } from "@/fetchers/getParagraphRange";
-import { bookDataLoader } from "@/services/bookDataLoader";
-import { Location } from "@/state/LocationContext";
-import { getCharactersData } from "@/genericBookDataGetters/getCharactersData";
+import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange } from "@player/fetchers/getParagraphRange";
+import { bookDataLoader } from "@player/services/bookDataLoader";
+import { Location } from "@player/state/LocationContext";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 
 /** Very light equality check: same length and same canonicalName order */
 function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {

@@ -1,4 +1,4 @@
-import { ChapterStructure } from "@/components/ProgressBars";
+import { ChapterStructure } from "@player/components/ProgressBars";
 
 /**
  * Unified function to calculate reading progress for any given chapter/paragraph position

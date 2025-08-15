@@ -2,7 +2,7 @@ import * as React from "react";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@player/lib/utils";
 
 const sliderVariants = cva("relative flex w-full touch-none select-none items-center", {
   variants: { variant: { primary: "", secondary: "" } },

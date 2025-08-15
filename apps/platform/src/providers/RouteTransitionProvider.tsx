@@ -1,20 +1,8 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { BookLoader } from "@/components/BookLoader";
+import { BookLoader } from "@platform/components/BookLoader";
 
-type LoaderMeta = {
-  title: string;
-  phrases: string[];
-  subtitle?: string;
-};
+type LoaderMeta = { title: string; phrases: string[]; subtitle?: string };
 
 type Ctx = {
   // starts the overlay with BookLoader, returns a cleanup you generally
@@ -43,10 +31,7 @@ type Props = {
   defaultMinDurationMs?: number; // default 50ms
 };
 
-export const RouteTransitionProvider: React.FC<Props> = ({
-  children,
-  defaultMinDurationMs = 50,
-}) => {
+export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinDurationMs = 50 }) => {
   const [navigating, setNavigating] = useState(false);
   const [meta, setMeta] = useState<LoaderMeta | null>(null);
   const [minDurationMs, setMinDurationMs] = useState(defaultMinDurationMs);
@@ -56,11 +41,7 @@ export const RouteTransitionProvider: React.FC<Props> = ({
   const location = useLocation(); // used to reset if user navigates away quickly
 
   const startTransition = useCallback((m: LoaderMeta) => {
-    setMeta({
-      title: m.title,
-      phrases: m.phrases,
-      subtitle: m.subtitle ?? "Loading...",
-    });
+    setMeta({ title: m.title, phrases: m.phrases, subtitle: m.subtitle ?? "Loading..." });
     startTimeRef.current = performance.now();
     finishRequestedRef.current = false;
     setNavigating(true);
@@ -89,27 +70,14 @@ export const RouteTransitionProvider: React.FC<Props> = ({
     // no-op; location access ensures provider updates on route change
   }, [location]);
 
-  const value = useMemo(
-    () => ({
-      startTransition,
-      finishTransition,
-      navigating,
-      setMinDurationMs,
-    }),
-    [finishTransition, navigating, startTransition]
-  );
+  const value = useMemo(() => ({ startTransition, finishTransition, navigating, setMinDurationMs }), [finishTransition, navigating, startTransition]);
 
   return (
     <RouteTransitionContext.Provider value={value}>
       {children}
 
       {/* Single global overlay with BookLoader */}
-      <div
-        className={`pointer-events-none fixed inset-0 z-40 transition-opacity duration-300 ${
-          navigating ? "opacity-100" : "opacity-0"
-        }`}
-        aria-hidden={!navigating}
-      >
+      <div className={`pointer-events-none fixed inset-0 z-40 transition-opacity duration-300 ${navigating ? "opacity-100" : "opacity-0"}`} aria-hidden={!navigating}>
         <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
         <div className="relative z-10 flex h-full items-center justify-center">
           {meta ? (

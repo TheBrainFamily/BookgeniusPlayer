@@ -2,12 +2,12 @@ import fs from "fs";
 import path from "path";
 import { DOMParser, Document } from "@xmldom/xmldom";
 
-import { BookData } from "@/types/book";
-import { getListeningMediaFilePathForName, getPictureFileNameForName, getTalkingMediaFilePathForName, setKnownVideos } from "@/utils/getFilePathsForName";
+import { BookData } from "@player/types/book";
+import { getListeningMediaFilePathForName, getPictureFileNameForName, getTalkingMediaFilePathForName, setKnownVideos } from "@player/utils/getFilePathsForName";
 import { generateDataFiles, xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterTags } from "./data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
-import { getBookAssetUrl } from "@/utils/assetUrls";
+import { getBookAssetUrl } from "@player/utils/assetUrls";
 
 async function generateBook(bookDirectoryPath: string, bookOutputPath?: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
@@ -103,7 +103,7 @@ function generateAudiobookTracksFile(bookDirectoryPath: string, bookOutputPath: 
     const match = audiobookContent.match(/export\s+const\s+AudiobookTracksDefined\s*=\s*(\[[\s\S]*?\]);/);
     const audiobookData = match ? match[1] : "[]";
 
-    getAudiobookTracksForBookContent = `import { AudiobookTracksSection } from "@/types/book";
+    getAudiobookTracksForBookContent = `import { AudiobookTracksSection } from "@player/types/book";
 
 const AudiobookTracksDefined: AudiobookTracksSection[] = ${audiobookData};
 
@@ -112,7 +112,7 @@ export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
 };
 `;
   } else {
-    getAudiobookTracksForBookContent = `import { AudiobookTracksSection } from "@/types/book";
+    getAudiobookTracksForBookContent = `import { AudiobookTracksSection } from "@player/types/book";
 
 export const getAudiobookTracksForBook = (): AudiobookTracksSection[] => {
   return [];
@@ -178,7 +178,7 @@ export const getBookStringified = (): string => {
 
   // --- Generate getCharactersData.ts ---
   const characterMetadata = generateCharacterMetadata(xmlDoc, bookString, metadata.form, metadata.slug);
-  const getCharactersDataContent = `import type { CharacterData } from "@/types/book";
+  const getCharactersDataContent = `import type { CharacterData } from "@player/types/book";
   
   export const getCharactersData = (): CharacterData[] => ${JSON.stringify(characterMetadata, null, 2)};\n
   `;
@@ -189,7 +189,7 @@ export const getBookStringified = (): string => {
   const hasAudiobook = fs.existsSync(audiobookDataPath);
 
   // --- Generate bookData.ts ---
-  const bookDataContent = `import type { BookData } from "@/types/book";
+  const bookDataContent = `import type { BookData } from "@player/types/book";
 
 export const bookData: BookData = {
   slug: "${metadata.slug}",

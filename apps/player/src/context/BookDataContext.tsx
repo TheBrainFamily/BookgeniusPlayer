@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { reloadBookStringified } from "@/genericBookDataGetters/getBookStringified";
-import { useBookUpdateSSE } from "@/hooks/useBookUpdateSSE";
+import { reloadBookStringified } from "@player/genericBookDataGetters/getBookStringified";
+import { useBookUpdateSSE } from "@player/hooks/useBookUpdateSSE";
 
 interface BookDataContextType {
   textVersion: number;

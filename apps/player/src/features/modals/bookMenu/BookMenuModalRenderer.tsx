@@ -1,11 +1,11 @@
 import React from "react";
 import { createPortal } from "react-dom";
-import { useBookMenuModal } from "@/stores/modals/bookMenuModal.store";
-import { useBookChapterModal } from "@/stores/modals/bookChapterModal.store";
-import { useApiKeyModal } from "@/stores/modals/apiKeyModal.store";
-import BookMenuModal from "@/components/modals/BookMenuModal";
-import { resetFurthestPageLocation } from "@/helpers/reset-furthest-page-location";
-import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useBookMenuModal } from "@player/stores/modals/bookMenuModal.store";
+import { useBookChapterModal } from "@player/stores/modals/bookChapterModal.store";
+import { useApiKeyModal } from "@player/stores/modals/apiKeyModal.store";
+import BookMenuModal from "@player/components/modals/BookMenuModal";
+import { resetFurthestPageLocation } from "@player/helpers/reset-furthest-page-location";
+import { useEscapeKey } from "@player/hooks/useEscapeKey";
 
 export const BookMenuModalRenderer: React.FC = () => {
   const { isOpen, closeModal } = useBookMenuModal();

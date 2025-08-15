@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { handleRemoveCharacter } from "@/text-editor-service/listeners/handleRemoveCharacter";
-import { useEditorModeModal } from "@/stores/modals/editorModeModal.store";
-import { WindowManager } from "@/utils/WindowManager";
+import { handleRemoveCharacter } from "@player/text-editor-service/listeners/handleRemoveCharacter";
+import { useEditorModeModal } from "@player/stores/modals/editorModeModal.store";
+import { WindowManager } from "@player/utils/WindowManager";
 
 export function useEditorMode(container: HTMLElement | null) {
   const { openModal } = useEditorModeModal();

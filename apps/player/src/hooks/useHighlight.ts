@@ -1,4 +1,4 @@
-import type { HighlightContextType } from "@/context/HighlightContext";
+import type { HighlightContextType } from "@player/context/HighlightContext";
 import { createContext, useContext } from "react";
 
 export const HighlightContext = createContext<HighlightContextType | undefined>(undefined);

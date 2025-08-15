@@ -2,11 +2,11 @@ import React from "react";
 import { Book } from "lucide-react";
 import { motion, Variants } from "motion/react";
 
-import { useBookMenuModal } from "@/stores/modals/bookMenuModal.store";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { useBookMenuModal } from "@player/stores/modals/bookMenuModal.store";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@player/components/ui/tooltip";
+import { cn } from "@player/lib/utils";
 import { useTranslation } from "react-i18next";
-import { OptionalElement } from "@/components/OptionalElement";
+import { OptionalElement } from "@player/components/OptionalElement";
 
 const MenuButton = () => {
   const { openModal } = useBookMenuModal();

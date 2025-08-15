@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from "react";
 import debounce from "lodash.debounce";
 
-import { useSearchModal } from "@/stores/modals/searchModal.store";
-import { performCachedSearch, performUnifiedSearch } from "@/searchModal";
-import { Location } from "@/state/LocationContext";
-import { getSavedLocation } from "@/helpers/paragraphsNavigation";
+import { useSearchModal } from "@player/stores/modals/searchModal.store";
+import { performCachedSearch, performUnifiedSearch } from "@player/searchModal";
+import { Location } from "@player/state/LocationContext";
+import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
 
 export const useSearchLogic = () => {
   const { query, isOpen, setResults } = useSearchModal();

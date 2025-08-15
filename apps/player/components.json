@@ -4,6 +4,6 @@
   "rsc": false,
   "tsx": true,
   "tailwind": { "config": "tailwind.config.js", "css": "src/styles/globals.css", "baseColor": "neutral", "cssVariables": true, "prefix": "" },
-  "aliases": { "components": "@/components", "utils": "@/lib/utils", "ui": "@/components/ui", "lib": "@/lib", "hooks": "@/hooks" },
+  "aliases": { "components": "@player/components", "utils": "@player/lib/utils", "ui": "@player/components/ui", "lib": "@player/lib", "hooks": "@player/hooks" },
   "iconLibrary": "lucide"
 }

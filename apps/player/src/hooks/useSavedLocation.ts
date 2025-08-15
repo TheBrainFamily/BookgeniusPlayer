@@ -1,6 +1,6 @@
-import { getSavedLocation } from "@/helpers/paragraphsNavigation";
+import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
 import { useState, useEffect } from "react";
-import { useLocation } from "@/state/LocationContext";
+import { useLocation } from "@player/state/LocationContext";
 
 export const useSavedLocation = () => {
   const { location } = useLocation();

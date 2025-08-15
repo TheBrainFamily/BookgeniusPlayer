@@ -1,4 +1,4 @@
-import { getAllVariants } from "@/genericBookDataGetters/getAllVariants";
+import { getAllVariants } from "@player/genericBookDataGetters/getAllVariants";
 
 export function findSimplifiedSentence(id: string, currentScore: number) {
   const allVariants = getAllVariants();

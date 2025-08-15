@@ -1,4 +1,4 @@
-import { parseHtmlText } from "@/utils/parseHtmlText";
+import { parseHtmlText } from "@player/utils/parseHtmlText";
 
 interface ParsedWord {
   text: string;

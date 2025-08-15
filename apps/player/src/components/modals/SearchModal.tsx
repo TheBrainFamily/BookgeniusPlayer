@@ -3,12 +3,12 @@ import { useTranslation } from "react-i18next";
 import { motion, Variants } from "motion/react";
 import { Search, FileText } from "lucide-react";
 
-import { SearchResultsData, SearchResultItemData, cleanupSearchChapters } from "@/searchModal";
-import { goToParagraph } from "@/helpers/paragraphsNavigation";
+import { SearchResultsData, SearchResultItemData, cleanupSearchChapters } from "@player/searchModal";
+import { goToParagraph } from "@player/helpers/paragraphsNavigation";
 import ModalUI from "./ModalUI";
-import { highlightSearchInParagraph } from "@/utils/textHighlighting";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { getChapterTitle } from "@/utils/getChapterTitle";
+import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@player/components/ui/accordion";
+import { getChapterTitle } from "@player/utils/getChapterTitle";
 
 interface SearchModalProps {
   onClose: () => void;

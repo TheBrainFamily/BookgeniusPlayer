@@ -1,7 +1,7 @@
 import { Location } from "./state/LocationContext";
 import { Filter } from "./types/book";
-import { DEV_SERVER_URL } from "@/lib/consts";
-import { bookDataLoader } from "@/services/bookDataLoader";
+import { DEV_SERVER_URL } from "@player/lib/consts";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
 export async function deepResearchCall(searchQuery: string, location: Location): Promise<string> {
   const baseUrl = "/deepResearch"; // Assuming localhost for now

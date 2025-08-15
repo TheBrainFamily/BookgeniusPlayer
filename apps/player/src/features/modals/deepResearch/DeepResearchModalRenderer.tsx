@@ -1,8 +1,8 @@
 import React from "react";
 import { createPortal } from "react-dom";
-import { useDeepResearchModal } from "@/stores/modals/deepResearchModal.store";
-import DeepResearchModal from "@/components/modals/DeepResearchModal";
-import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useDeepResearchModal } from "@player/stores/modals/deepResearchModal.store";
+import DeepResearchModal from "@player/components/modals/DeepResearchModal";
+import { useEscapeKey } from "@player/hooks/useEscapeKey";
 
 export const DeepResearchModalRenderer: React.FC = () => {
   const { isOpen, content, layoutView, hideOverlay, isLoading, closeModal } = useDeepResearchModal();

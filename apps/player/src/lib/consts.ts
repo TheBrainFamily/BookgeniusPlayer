@@ -1,4 +1,4 @@
-import { bookDataLoader } from "@/services/bookDataLoader";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
 // Function to determine if we're running locally or in production
 function isDevelopment(): boolean {

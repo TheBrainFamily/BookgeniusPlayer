@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 
 import BottomInput from "./BottomInput";
-import { useWebSocket } from "@/context/WebSocketContext";
-import useSplashHidden from "@/hooks/useSplashHidden";
-import { useIsMobileOrTablet } from "@/hooks/useIsMobileOrTablet";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { useWebSocket } from "@player/context/WebSocketContext";
+import useSplashHidden from "@player/hooks/useSplashHidden";
+import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import CharactersOnStagePanel from "./CharactersOnStagePanel";
-import { cn } from "@/lib/utils";
+import { cn } from "@player/lib/utils";
 
 const Footer = () => {
   const { sendMessage } = useWebSocket();

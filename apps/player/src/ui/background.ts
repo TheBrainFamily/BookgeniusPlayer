@@ -1,4 +1,4 @@
-import { getBookAssetBaseUrl } from "@/utils/assetUrls";
+import { getBookAssetBaseUrl } from "@player/utils/assetUrls";
 import { getBackgrounds } from "./getBackgrounds";
 import debounce from "lodash.debounce";
 

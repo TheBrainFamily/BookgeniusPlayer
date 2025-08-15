@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { bookDataLoader } from "@/services/bookDataLoader";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
 interface BookUpdateEvent {
   type: "connected" | "processing-started" | "book-updated" | "processing-error";

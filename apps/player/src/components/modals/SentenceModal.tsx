@@ -4,8 +4,8 @@ import { motion, Variants } from "motion/react";
 import { FileText, CheckCircle, ArrowDownUp } from "lucide-react";
 
 import ModalUI from "./ModalUI";
-import { Button } from "@/components/ui/button";
-import { findSimplifiedSentence } from "@/helpers/findSimplifiedSentence";
+import { Button } from "@player/components/ui/button";
+import { findSimplifiedSentence } from "@player/helpers/findSimplifiedSentence";
 
 const stripHtml = (html: string | undefined): string => {
   if (!html) return "";

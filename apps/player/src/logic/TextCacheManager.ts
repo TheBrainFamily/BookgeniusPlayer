@@ -1,6 +1,6 @@
-import { getBookStringified } from "@/genericBookDataGetters/getBookStringified";
-import { getSavedLocation } from "@/helpers/paragraphsNavigation";
-import { useBookContentStore } from "@/stores/bookContent.store";
+import { getBookStringified } from "@player/genericBookDataGetters/getBookStringified";
+import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
+import { useBookContentStore } from "@player/stores/bookContent.store";
 
 class TextCacheManager {
   private static instance: TextCacheManager;

@@ -4,7 +4,7 @@
  * the *furthest* location logic and the Return button state exactly
  * as in the original vanilla code.
  */
-import { pageWasJustReloaded } from "@/utils/pageWasJustReloaded";
+import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
 
 let systemNavigationInProgress = false;
 
@@ -13,7 +13,7 @@ let systemNavigationInProgress = false;
 export const isSystemNavigationInProgress = (): boolean => systemNavigationInProgress;
 
 /* ------------------------------------------------------------------ */
-import { DEFAULT_LOCATION, Location } from "@/state/LocationContext";
+import { DEFAULT_LOCATION, Location } from "@player/state/LocationContext";
 import debounce from "lodash.debounce";
 
 /* ------------------------------------------------------------------ */
@@ -67,7 +67,7 @@ interface Bridge {
 let _bridge: Bridge = {
   get: () => DEFAULT_LOCATION,
 
-  set: () => { },
+  set: () => {},
 };
 export const __setLocationBridge = (b: Bridge) => (_bridge = b);
 

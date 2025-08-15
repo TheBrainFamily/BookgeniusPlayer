@@ -1,5 +1,5 @@
-import type { CharacterData } from "@/types/book";
-import { bookDataLoader } from "@/services/bookDataLoader";
+import type { CharacterData } from "@player/types/book";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
 let cachedCharactersData: CharacterData[] | null = null;
 

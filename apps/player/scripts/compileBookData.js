@@ -38,7 +38,7 @@ export const compileToJsForBook = (bookDir, destinationDir) => {
       // Remove type imports
       content = content.replace(/^import\s+type\s+.*from\s*['"].*['"];?\s*$/gm, "");
 
-      // Remove @/ imports
+      // Remove @player/ imports
       content = content.replace(/^import\s+.*from\s*['"]@\/.*['"];?\s*$/gm, "");
 
       // Transpile TypeScript to JavaScript

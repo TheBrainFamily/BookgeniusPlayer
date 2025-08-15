@@ -1,9 +1,9 @@
 import React from "react";
 import { createPortal } from "react-dom";
-import { useSearchModal } from "@/stores/modals/searchModal.store";
-import SearchModal from "@/components/modals/SearchModal";
+import { useSearchModal } from "@player/stores/modals/searchModal.store";
+import SearchModal from "@player/components/modals/SearchModal";
 import { useSearchLogic } from "./useSearchLogic";
-import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useEscapeKey } from "@player/hooks/useEscapeKey";
 
 export const SearchModalRenderer: React.FC = () => {
   const { isOpen, results, layoutView, hideOverlay, closeModal } = useSearchModal();

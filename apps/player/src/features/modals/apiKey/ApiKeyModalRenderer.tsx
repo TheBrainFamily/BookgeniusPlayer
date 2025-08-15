@@ -1,8 +1,8 @@
 import React from "react";
 import { createPortal } from "react-dom";
-import { useApiKeyModal } from "@/stores/modals/apiKeyModal.store";
-import ApiKeyModal from "@/components/modals/ApiKeyModal";
-import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useApiKeyModal } from "@player/stores/modals/apiKeyModal.store";
+import ApiKeyModal from "@player/components/modals/ApiKeyModal";
+import { useEscapeKey } from "@player/hooks/useEscapeKey";
 
 export const ApiKeyModalRenderer: React.FC = () => {
   const { isOpen, onSuccess, closeModal } = useApiKeyModal();

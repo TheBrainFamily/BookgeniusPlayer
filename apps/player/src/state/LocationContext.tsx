@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useMemo, useState, useEffect } from "react";
-import { __setLocationBridge, parseLocationFromHash } from "@/helpers/paragraphsNavigation";
+import { __setLocationBridge, parseLocationFromHash } from "@player/helpers/paragraphsNavigation";
 
 /* ------------------------------------------------------------------ */
 export interface Location {

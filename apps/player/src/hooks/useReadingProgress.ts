@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { calculateReadProgress, calculateChapterProgress } from "@/helpers/readProgress";
-import { ChapterStructure } from "@/components/ProgressBars";
-import { useLocation } from "@/state/LocationContext";
+import { calculateReadProgress, calculateChapterProgress } from "@player/helpers/readProgress";
+import { ChapterStructure } from "@player/components/ProgressBars";
+import { useLocation } from "@player/state/LocationContext";
 import { useSavedLocation } from "./useSavedLocation";
 
 export const useReadingProgress = (chaptersStructure: ChapterStructure[], totalParagraphs: number) => {

@@ -1,5 +1,5 @@
-import type { BackgroundSongForBook } from "@/types/book";
-import { bookDataLoader } from "@/services/bookDataLoader";
+import type { BackgroundSongForBook } from "@player/types/book";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
 let cachedBackgroundSongs: BackgroundSongForBook[] | null = null;
 
