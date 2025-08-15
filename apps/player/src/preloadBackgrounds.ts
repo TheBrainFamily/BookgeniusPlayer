@@ -84,7 +84,7 @@ export const preloadBackgrounds = async () => {
         videoElement.preload = "auto";
         videoElement.muted = true; // Required for autoplay policies
 
-        const onLoadedData = () => {
+        const onCanPlay = () => {
           evictOldestFromCache(); // ← evict before adding new
           preloadCache.set(fileName, videoElement);
           cleanup();
@@ -98,11 +98,11 @@ export const preloadBackgrounds = async () => {
         };
 
         const cleanup = () => {
-          videoElement.removeEventListener("loadeddata", onLoadedData);
+          videoElement.removeEventListener("canplay", onCanPlay);
           videoElement.removeEventListener("error", onError);
         };
 
-        videoElement.addEventListener("loadeddata", onLoadedData);
+        videoElement.addEventListener("canplay", onCanPlay);
         videoElement.addEventListener("error", onError);
 
         loadVideoAsHTMLElement(videoElement, newSrc);
