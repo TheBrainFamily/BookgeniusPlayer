@@ -3,7 +3,12 @@ import { Button } from "@platform/components/ui/button";
 import { Input } from "@platform/components/ui/input";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
 
-const Navigation = () => {
+interface NavigationProps {
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+}
+
+const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
   return (
     <nav className="relative z-10 bg-card/90 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4 py-4">
@@ -22,6 +27,8 @@ const Navigation = () => {
             <Input
               placeholder="Search visual novels, authors..."
               className="pl-10 bg-library-mahogany/50 border-library-walnut text-foreground placeholder:text-muted-foreground focus:border-library-gold"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
 
@@ -43,7 +50,12 @@ const Navigation = () => {
         <div className="md:hidden mt-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search novels..." className="pl-10 bg-library-mahogany/50 border-library-walnut text-foreground placeholder:text-muted-foreground" />
+            <Input
+              placeholder="Search novels..."
+              className="pl-10 bg-library-mahogany/50 border-library-walnut text-foreground placeholder:text-muted-foreground"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
           </div>
         </div>
       </div>
