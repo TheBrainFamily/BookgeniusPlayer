@@ -38,10 +38,9 @@ export const getSourceForFile = (newFile) => {
 
 // ---- Helper Function --------------------------------------------------------
 export const loadVideoAsHTMLElement = (nextBack: HTMLVideoElement, newSrc: string) => {
-  const vid = nextBack;
-  vid.src = newSrc;
-  vid.load();
-  return vid;
+  nextBack.src = newSrc;
+  nextBack.load();
+  return nextBack;
 };
 
 // ---- Constants --------------------------------------------------------------
@@ -145,33 +144,26 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
 
         let prep: Promise<void> = Promise.resolve();
         if (newType === "video") {
+          const vid = nextBack as HTMLVideoElement;
           const preloadedVideo = getPreloadedElement(newFile) as HTMLVideoElement | null;
 
-          if (preloadedVideo && preloadedVideo.readyState >= 2) {
+          if (preloadedVideo && preloadedVideo.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
             // Use preloaded video data by copying to target element
-            const vid = nextBack as HTMLVideoElement;
             vid.src = preloadedVideo.src;
             vid.currentTime = 0;
             console.log("Using preloaded video:", newFile);
-
-            prep = vid
-              .play()
-              .then(() => new Promise<void>((ok) => vid.requestVideoFrameCallback(() => ok())))
-              .catch((e) => {
-                console.error("Video play/load error:", e);
-                throw e;
-              });
           } else {
             // Fallback to normal loading
-            const vid = loadVideoAsHTMLElement(nextBack as HTMLVideoElement, newSrc);
-            prep = vid
-              .play()
-              .then(() => new Promise<void>((ok) => vid.requestVideoFrameCallback(() => ok())))
-              .catch((e) => {
-                console.error("Video play/load error:", e);
-                throw e;
-              });
+            loadVideoAsHTMLElement(vid, newSrc);
           }
+
+          prep = vid
+            .play()
+            .then(() => new Promise<void>((ok) => vid.requestVideoFrameCallback(() => ok())))
+            .catch((e) => {
+              console.error("Video play/load error:", e);
+              throw e;
+            });
         } else {
           const preloadedImage = getPreloadedElement(newFile) as HTMLDivElement | null;
           const img = nextBack as HTMLDivElement;
