@@ -22,13 +22,26 @@ function cancelAllImageZoom(imgA: HTMLDivElement, imgB: HTMLDivElement) {
 }
 
 // ---- Helper Function --------------------------------------------------------
-function getFileType(filename: string): "video" | "image" | "unknown" {
+export function getFileType(filename: string): "video" | "image" | "unknown" {
   const ext = filename.split(".").pop()?.toLowerCase();
   if (!ext) return "unknown";
   if (["mp4", "webm", "ogv"].includes(ext)) return "video";
   if (["png", "jpg", "jpeg", "gif", "webp", "avif", "svg"].includes(ext)) return "image";
   return "unknown";
 }
+
+// ---- Helper Function --------------------------------------------------------
+export const getSourceForFile = (newFile) => {
+  return `${getBookAssetBaseUrl()}/${newFile}`;
+};
+
+// ---- Helper Function --------------------------------------------------------
+export const loadVideoAsHTMLElement = (nextBack: HTMLVideoElement, newSrc: string) => {
+  const vid = nextBack;
+  vid.src = newSrc;
+  vid.load();
+  return vid;
+};
 
 // ---- Constants --------------------------------------------------------------
 const FADE_DURATION_MS = 800; // fallback
@@ -113,7 +126,7 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
           transitionState = TransitionState.Idle;
           return;
         }
-        const newSrc = `${getBookAssetBaseUrl()}/${newFile}`;
+        const newSrc = getSourceForFile(newFile);
 
         const curType = legacy.dataset.type as "video" | "image";
         const curFrontId = legacy.dataset.front as "a" | "b";
@@ -131,9 +144,7 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
 
         let prep: Promise<void> = Promise.resolve();
         if (newType === "video") {
-          const vid = nextBack as HTMLVideoElement;
-          vid.src = newSrc;
-          vid.load();
+          const vid = loadVideoAsHTMLElement(nextBack as HTMLVideoElement, newSrc);
           prep = vid
             .play()
             .then(() => new Promise<void>((ok) => vid.requestVideoFrameCallback(() => ok())))
