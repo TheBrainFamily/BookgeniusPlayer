@@ -18,13 +18,11 @@ export function useBackgroundVideo() {
 
   const { currentChapter, currentParagraph } = location;
   useEffect(() => {
-    console.log("PINGWING: 20 before loading background performance.now()", performance.now());
     implRef.current(location);
-    console.log("PINGWING: 22 after loading background performance.now()", performance.now());
 
     const preloadStart = performance.now();
     preloadBackgrounds().then(() => {
-      console.log("PINGWING: 26 Preload background performance.now()", performance.now(), performance.now() - preloadStart);
+      console.log("Preloaded backgrounds, it took:", performance.now() - preloadStart);
     });
   }, [currentChapter, currentParagraph]);
 }

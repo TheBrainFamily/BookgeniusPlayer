@@ -1,6 +1,7 @@
 import { getBookAssetBaseUrl } from "@/utils/assetUrls";
 import { getBackgrounds } from "./getBackgrounds";
 import debounce from "lodash.debounce";
+import { getPreloadedElement } from "@/preloadBackgrounds";
 
 export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number };
 
@@ -144,14 +145,33 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
 
         let prep: Promise<void> = Promise.resolve();
         if (newType === "video") {
-          const vid = loadVideoAsHTMLElement(nextBack as HTMLVideoElement, newSrc);
-          prep = vid
-            .play()
-            .then(() => new Promise<void>((ok) => vid.requestVideoFrameCallback(() => ok())))
-            .catch((e) => {
-              console.error("Video play/load error:", e);
-              throw e;
-            });
+          const preloadedVideo = getPreloadedElement(newFile) as HTMLVideoElement | null;
+
+          if (preloadedVideo && preloadedVideo.readyState >= 2) {
+            // Use preloaded video data by copying to target element
+            const vid = nextBack as HTMLVideoElement;
+            vid.src = preloadedVideo.src;
+            vid.currentTime = 0;
+            console.log("Using preloaded video:", newFile);
+
+            prep = vid
+              .play()
+              .then(() => new Promise<void>((ok) => vid.requestVideoFrameCallback(() => ok())))
+              .catch((e) => {
+                console.error("Video play/load error:", e);
+                throw e;
+              });
+          } else {
+            // Fallback to normal loading
+            const vid = loadVideoAsHTMLElement(nextBack as HTMLVideoElement, newSrc);
+            prep = vid
+              .play()
+              .then(() => new Promise<void>((ok) => vid.requestVideoFrameCallback(() => ok())))
+              .catch((e) => {
+                console.error("Video play/load error:", e);
+                throw e;
+              });
+          }
         } else {
           const img = nextBack as HTMLDivElement;
           img.style.backgroundImage = `url('${newSrc}')`;

@@ -6,6 +6,11 @@ import { getFileType, getSourceForFile, loadVideoAsHTMLElement } from "@/ui/back
 // Cache to store preloaded elements
 const preloadCache = new Map<string, HTMLVideoElement | HTMLDivElement>();
 
+// Export function to get preloaded element if available
+export const getPreloadedElement = (fileName: string): HTMLVideoElement | HTMLDivElement | null => {
+  return preloadCache.get(fileName) || null;
+};
+
 export const preloadBackgrounds = async () => {
   const location = getCurrentLocation();
   const currentChapter = location.currentChapter;
@@ -43,8 +48,6 @@ export const preloadBackgrounds = async () => {
 
   const loadBackground = (fileName: string): Promise<boolean> => {
     return new Promise((resolve) => {
-      console.log("PINGWING: loadBackground starting", fileName, performance.now());
-
       // Skip if already cached
       if (preloadCache.has(fileName)) {
         console.log("Background already cached:", fileName);
@@ -61,7 +64,6 @@ export const preloadBackgrounds = async () => {
         videoElement.muted = true; // Required for autoplay policies
 
         const onLoadedData = () => {
-          console.log("PINGWING: video loaded", fileName, performance.now());
           preloadCache.set(fileName, videoElement);
           cleanup();
           resolve(true);
@@ -86,7 +88,6 @@ export const preloadBackgrounds = async () => {
         const img = new Image();
 
         img.onload = () => {
-          console.log("PINGWING: image loaded", fileName, performance.now());
           const divElement = document.createElement("div");
           divElement.style.backgroundImage = `url('${newSrc}')`;
           preloadCache.set(fileName, divElement);
