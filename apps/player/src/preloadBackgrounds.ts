@@ -3,6 +3,9 @@ import { bookDataLoader } from "@/services/bookDataLoader";
 import { getBackgroundsForBook } from "@/genericBookDataGetters/getBackgroundsForBook";
 import { getFileType, getSourceForFile, loadVideoAsHTMLElement } from "@/ui/background";
 
+// Cache to store preloaded elements
+const preloadCache = new Map<string, HTMLVideoElement | HTMLDivElement>();
+
 export const preloadBackgrounds = async () => {
   const location = getCurrentLocation();
   const currentChapter = location.currentChapter;
@@ -38,44 +41,88 @@ export const preloadBackgrounds = async () => {
 
   console.log(`Preloading ${sectionsToPreload.length} sections...`);
 
-  console.log("PINGWING: 42 sectionsToPreload", sectionsToPreload);
+  const loadBackground = (fileName: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      console.log("PINGWING: loadBackground starting", fileName, performance.now());
 
-  const loadBackground = (fileName: string) => {
-    console.log("PINGWING: 44 loadBackground, performance.now()", fileName, performance.now());
-    const backgroundType = getFileType(fileName); // "video" | "image"
-    const newSrc = getSourceForFile(fileName);
+      // Skip if already cached
+      if (preloadCache.has(fileName)) {
+        console.log("Background already cached:", fileName);
+        resolve(true);
+        return;
+      }
 
-    if (backgroundType === "video") {
-      const temporaryElement = document.createElement("video");
-      loadVideoAsHTMLElement(temporaryElement, newSrc);
-    } else if (backgroundType === "image") {
-      const temporaryElement = document.createElement("div");
-      temporaryElement.style.backgroundImage = `url('${newSrc}')`;
-    } else if (backgroundType === "unknown") {
-      console.error("Unknown file type:", fileName);
-      return;
-    }
-    console.log("PINGWING: 58 loadBackground, performance.now()", fileName, performance.now());
+      const backgroundType = getFileType(fileName);
+      const newSrc = getSourceForFile(fileName);
+
+      if (backgroundType === "video") {
+        const videoElement = document.createElement("video");
+        videoElement.preload = "auto";
+        videoElement.muted = true; // Required for autoplay policies
+
+        const onLoadedData = () => {
+          console.log("PINGWING: video loaded", fileName, performance.now());
+          preloadCache.set(fileName, videoElement);
+          cleanup();
+          resolve(true);
+        };
+
+        const onError = () => {
+          console.error("Failed to load video:", fileName);
+          cleanup();
+          resolve(false);
+        };
+
+        const cleanup = () => {
+          videoElement.removeEventListener("loadeddata", onLoadedData);
+          videoElement.removeEventListener("error", onError);
+        };
+
+        videoElement.addEventListener("loadeddata", onLoadedData);
+        videoElement.addEventListener("error", onError);
+
+        loadVideoAsHTMLElement(videoElement, newSrc);
+      } else if (backgroundType === "image") {
+        const img = new Image();
+
+        img.onload = () => {
+          console.log("PINGWING: image loaded", fileName, performance.now());
+          const divElement = document.createElement("div");
+          divElement.style.backgroundImage = `url('${newSrc}')`;
+          preloadCache.set(fileName, divElement);
+          resolve(true);
+        };
+
+        img.onerror = () => {
+          console.error("Failed to load image:", fileName);
+          resolve(false);
+        };
+
+        img.src = newSrc;
+      } else {
+        console.error("Unknown file type:", fileName);
+        resolve(false);
+      }
+    });
   };
 
-  sectionsToPreload.flatMap((section) => loadBackground(section.file));
-  //
-  // // Wait for all tracks to load in parallel
-  // try {
-  //   const results = await Promise.allSettled(preloadPromises);
-  //   const successful = results.filter((result) => result.status === "fulfilled" && result.value === true).length;
-  //   const failed = results.length - successful;
-  //
-  //   console.log(`Dynamic background tracks preloading complete. Successfully loaded: ${successful}, Failed: ${failed}`);
-  //
-  //   if (failed > 0) {
-  //     const failedResults = results.filter((result) => result.status === "rejected" || (result.status === "fulfilled" && result.value === false));
-  //     console.warn("Some tracks failed to preload:", failedResults);
-  //   }
-  //
-  //   return successful > 0;
-  // } catch (error) {
-  //   console.error("Error during track preloading:", error);
-  //   return false;
-  // }
+  // Wait for all backgrounds to load in parallel
+  try {
+    const preloadPromises = sectionsToPreload.map((section) => loadBackground(section.file));
+    const results = await Promise.allSettled(preloadPromises);
+    const successful = results.filter((result) => result.status === "fulfilled" && result.value === true).length;
+    const failed = results.length - successful;
+
+    console.log(`Background preloading complete. Successfully loaded: ${successful}, Failed: ${failed}`);
+
+    if (failed > 0) {
+      const failedResults = results.filter((result) => result.status === "rejected" || (result.status === "fulfilled" && result.value === false));
+      console.warn("Some backgrounds failed to preload:", failedResults);
+    }
+
+    return successful > 0;
+  } catch (error) {
+    console.error("Error during background preloading:", error);
+    return false;
+  }
 };

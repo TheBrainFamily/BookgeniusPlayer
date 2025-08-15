@@ -22,8 +22,9 @@ export function useBackgroundVideo() {
     implRef.current(location);
     console.log("PINGWING: 22 after loading background performance.now()", performance.now());
 
+    const preloadStart = performance.now();
     preloadBackgrounds().then(() => {
-      console.log("PINGWING: 26 Preload background performance.now()", performance.now());
+      console.log("PINGWING: 26 Preload background performance.now()", performance.now(), performance.now() - preloadStart);
     });
   }, [currentChapter, currentParagraph]);
 }
