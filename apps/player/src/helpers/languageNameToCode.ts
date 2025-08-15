@@ -1,10 +1,5 @@
+const languageMap: Record<string, string> = { polish: "pl", english: "en" };
+
 export const languageNameToCode = (langName: string) => {
-  switch (langName.toLowerCase()) {
-    case "polish":
-      return "pl";
-    case "english":
-      return "en";
-    default:
-      return "en";
-  }
+  return languageMap[langName.toLowerCase()] ?? "en";
 };
