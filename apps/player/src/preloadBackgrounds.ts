@@ -5,6 +5,7 @@ import { getFileType, getSourceForFile, loadVideoAsHTMLElement } from "@/ui/back
 
 // Cache to store preloaded elements
 const preloadCache = new Map<string, HTMLVideoElement | HTMLDivElement>();
+const pendingLoads = new Map<string, Promise<boolean>>();
 
 const MAX_CACHE_SIZE = 20; // Adjust based on typical asset sizes
 
@@ -68,14 +69,18 @@ export const preloadBackgrounds = async () => {
   console.log(`Preloading ${sectionsToPreload.length} sections...`);
 
   const loadBackground = (fileName: string): Promise<boolean> => {
-    return new Promise((resolve) => {
-      // Skip if already cached
-      if (preloadCache.has(fileName)) {
-        console.log("Background already cached:", fileName);
-        resolve(true);
-        return;
-      }
+    // Skip if already cached
+    if (preloadCache.has(fileName)) {
+      console.log("Background already cached:", fileName);
+      return Promise.resolve(true);
+    }
 
+    // Return pending promise if a download is already in progress
+    if (pendingLoads.has(fileName)) {
+      return pendingLoads.get(fileName)!;
+    }
+
+    const loadPromise = new Promise<boolean>((resolve) => {
       const backgroundType = getFileType(fileName);
       const newSrc = getSourceForFile(fileName);
 
@@ -128,6 +133,13 @@ export const preloadBackgrounds = async () => {
         resolve(false);
       }
     });
+
+    pendingLoads.set(fileName, loadPromise);
+    loadPromise.finally(() => {
+      pendingLoads.delete(fileName);
+    });
+
+    return loadPromise;
   };
 
   // Wait for all backgrounds to load in parallel
