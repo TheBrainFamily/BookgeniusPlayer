@@ -17,14 +17,18 @@ export function useBackgroundVideo() {
   const { location } = useLocation();
 
   const { currentChapter, currentParagraph } = location;
+  // For handling the current background
   useEffect(() => {
     implRef.current(location);
+  }, [currentChapter, currentParagraph]);
 
+  // For preloading future backgrounds
+  useEffect(() => {
     const preloadStart = performance.now();
     preloadBackgrounds()
       .then(() => {
         console.log("Preloaded backgrounds, it took:", performance.now() - preloadStart);
       })
       .catch((error) => console.error("Failed to preload backgrounds:", error));
-  }, [currentChapter, currentParagraph]);
+  }, [currentChapter]);
 }

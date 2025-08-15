@@ -145,18 +145,17 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
         let prep: Promise<void> = Promise.resolve();
         if (newType === "video") {
           const vid = nextBack as HTMLVideoElement;
-          const preloadedVideo = getPreloadedElement(newFile) as HTMLVideoElement | null;
+          const preloadedElement = getPreloadedElement(newFile);
 
-          if (preloadedVideo && preloadedVideo.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+          if (preloadedElement instanceof HTMLVideoElement && preloadedElement.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
             // Use preloaded video data by copying to target element
-            vid.src = preloadedVideo.src;
+            vid.src = preloadedElement.src;
             vid.currentTime = 0;
             console.log("Using preloaded video:", newFile);
           } else {
             // Fallback to normal loading
             loadVideoAsHTMLElement(vid, newSrc);
           }
-
           prep = vid
             .play()
             .then(() => new Promise<void>((ok) => vid.requestVideoFrameCallback(() => ok())))
@@ -165,12 +164,12 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
               throw e;
             });
         } else {
-          const preloadedImage = getPreloadedElement(newFile) as HTMLDivElement | null;
           const img = nextBack as HTMLDivElement;
+          const preloadedElement = getPreloadedElement(newFile);
 
-          if (preloadedImage) {
+          if (preloadedElement instanceof HTMLDivElement) {
             // Use preloaded image data by copying backgroundImage
-            img.style.backgroundImage = preloadedImage.style.backgroundImage;
+            img.style.backgroundImage = preloadedElement.style.backgroundImage;
             console.log("Using preloaded image:", newFile);
           } else {
             // Fallback to normal loading
