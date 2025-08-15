@@ -21,8 +21,10 @@ export function useBackgroundVideo() {
     implRef.current(location);
 
     const preloadStart = performance.now();
-    preloadBackgrounds().then(() => {
-      console.log("Preloaded backgrounds, it took:", performance.now() - preloadStart);
-    });
+    preloadBackgrounds()
+      .then(() => {
+        console.log("Preloaded backgrounds, it took:", performance.now() - preloadStart);
+      })
+      .catch((error) => console.error("Failed to preload backgrounds:", error));
   }, [currentChapter, currentParagraph]);
 }

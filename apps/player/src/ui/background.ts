@@ -32,7 +32,7 @@ export function getFileType(filename: string): "video" | "image" | "unknown" {
 }
 
 // ---- Helper Function --------------------------------------------------------
-export const getSourceForFile = (newFile) => {
+export const getSourceForFile = (newFile: string) => {
   return `${getBookAssetBaseUrl()}/${newFile}`;
 };
 

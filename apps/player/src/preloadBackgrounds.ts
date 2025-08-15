@@ -6,6 +6,25 @@ import { getFileType, getSourceForFile, loadVideoAsHTMLElement } from "@/ui/back
 // Cache to store preloaded elements
 const preloadCache = new Map<string, HTMLVideoElement | HTMLDivElement>();
 
+// Add at top of file, above the `preloadBackgrounds` export
+const MAX_CACHE_SIZE = 20; // Adjust based on typical asset sizes
+
+const evictOldestFromCache = () => {
+  if (preloadCache.size <= MAX_CACHE_SIZE) return;
+
+  // Remove the first (oldest) entry
+  const firstKey = preloadCache.keys().next().value;
+  if (firstKey) {
+    const element = preloadCache.get(firstKey);
+    // Clean up video elements to free resources
+    if (element instanceof HTMLVideoElement) {
+      element.src = "";
+      element.load();
+    }
+    preloadCache.delete(firstKey);
+  }
+};
+
 // Export function to get preloaded element if available
 export const getPreloadedElement = (fileName: string): HTMLVideoElement | HTMLDivElement | null => {
   return preloadCache.get(fileName) || null;
@@ -64,6 +83,7 @@ export const preloadBackgrounds = async () => {
         videoElement.muted = true; // Required for autoplay policies
 
         const onLoadedData = () => {
+          evictOldestFromCache(); // ← evict before adding new
           preloadCache.set(fileName, videoElement);
           cleanup();
           resolve(true);
@@ -90,6 +110,7 @@ export const preloadBackgrounds = async () => {
         img.onload = () => {
           const divElement = document.createElement("div");
           divElement.style.backgroundImage = `url('${newSrc}')`;
+          evictOldestFromCache(); // ← evict before adding new
           preloadCache.set(fileName, divElement);
           resolve(true);
         };
