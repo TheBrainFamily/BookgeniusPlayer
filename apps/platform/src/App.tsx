@@ -2,12 +2,13 @@ import { Toaster } from "@platform/components/ui/toaster";
 import { Toaster as Sonner } from "@platform/components/ui/sonner";
 import { TooltipProvider } from "@platform/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import { ClerkProvider } from "@clerk/react-router";
 import { RouteTransitionProvider } from "./providers/RouteTransitionProvider";
 import { WrappedApp } from "./WrappedApp";
+import { UniversalRouter } from "./UniversalRouter";
+import { ClerkProviderSafe } from "@platform/providers/ClerkProviderSafe.tsx";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -22,18 +23,17 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <UniversalRouter>
+        <ClerkProviderSafe publishableKey={PUBLISHABLE_KEY}>
           <RouteTransitionProvider defaultMinDurationMs={50}>
             <Routes>
               <Route path="/" element={<Index />} />
-              {/* <Route path="/reader/:slug" element={<ReaderPage />} /> */}
               <Route path="/reader/" element={<WrappedApp />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </RouteTransitionProvider>
-        </ClerkProvider>
-      </BrowserRouter>
+        </ClerkProviderSafe>
+      </UniversalRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );

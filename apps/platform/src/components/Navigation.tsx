@@ -2,6 +2,8 @@ import { Search, BookOpen, Settings } from "lucide-react";
 import { Button } from "@platform/components/ui/button";
 import { Input } from "@platform/components/ui/input";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
+import { ClientOnly } from "vite-react-ssg";
+import { useClerkReady } from "@platform/providers/ClerkProviderSafe.tsx";
 
 interface NavigationProps {
   searchQuery: string;
@@ -9,6 +11,8 @@ interface NavigationProps {
 }
 
 const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
+  const ready = useClerkReady();
+
   return (
     <nav className="relative z-10 bg-card/90 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4 py-4">
@@ -34,15 +38,23 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
 
           {/* Navigation Links */}
           <div className="flex items-center space-x-4">
-            <SignedOut>
-              <SignInButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-              <Button variant="ghost" size="icon" className="text-foreground hover:text-library-gold hover:bg-library-walnut/50">
-                <Settings className="h-5 w-5" />
-              </Button>
-            </SignedIn>
+            <ClientOnly>
+              {() =>
+                ready ? (
+                  <>
+                    <SignedOut>
+                      <SignInButton />
+                    </SignedOut>
+                    <SignedIn>
+                      <UserButton />
+                      <Button variant="ghost" size="icon" className="text-foreground hover:text-library-gold hover:bg-library-walnut/50">
+                        <Settings className="h-5 w-5" />
+                      </Button>
+                    </SignedIn>
+                  </>
+                ) : null
+              }
+            </ClientOnly>
           </div>
         </div>
 
