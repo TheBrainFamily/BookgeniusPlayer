@@ -8,6 +8,7 @@ import { bookDataLoader } from "@player/services/bookDataLoader";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { cn } from "@player/lib/utils";
 import { useHighlight } from "@player/hooks/useHighlight";
+import { isVideoFile } from "@player/helpers/isVideoFile";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
@@ -65,13 +66,13 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
   }, []);
 
   const mediaSrc = currentMediaSrc || getListeningMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook());
-  const isVideo = imageOnly ? false : mediaSrc.endsWith(".mp4") || mediaSrc.endsWith(".webm");
+  const isVideo = imageOnly ? false : isVideoFile(mediaSrc);
   const modalMediaSrc = imageOnly
     ? isTalkingInCurrentRange
       ? getTalkingMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook())
       : getListeningMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook())
     : mediaSrc;
-  const modalIsVideo = modalMediaSrc.endsWith(".mp4") || modalMediaSrc.endsWith(".webm");
+  const modalIsVideo = isVideoFile(modalMediaSrc);
 
   const commonAttrs = { "data-original-src": mediaSrc, "data-character-name": entity.slug, "data-summary": entity.summary ?? "", className: "w-full h-full object-cover" } as const;
 

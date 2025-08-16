@@ -6,9 +6,9 @@ import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { RouteTransitionProvider } from "./providers/RouteTransitionProvider";
-import { WrappedApp } from "./WrappedApp";
 import { UniversalRouter } from "./UniversalRouter";
 import { ClerkProviderSafe } from "@platform/providers/ClerkProviderSafe.tsx";
+import React, { lazy, Suspense } from "react";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -17,6 +17,8 @@ if (!PUBLISHABLE_KEY) {
 }
 
 const queryClient = new QueryClient();
+
+const LazyWrappedApp = lazy(() => import("./WrappedApp"));
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -28,7 +30,14 @@ const App = () => (
           <RouteTransitionProvider defaultMinDurationMs={50}>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/reader/" element={<WrappedApp />} />
+              <Route
+                path="/reader/"
+                element={
+                  <Suspense fallback={null}>
+                    <LazyWrappedApp />
+                  </Suspense>
+                }
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </RouteTransitionProvider>

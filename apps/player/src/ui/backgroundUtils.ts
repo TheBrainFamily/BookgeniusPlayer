@@ -1,5 +1,3 @@
-import { getBookAssetBaseUrl } from "@player/utils/assetUrls";
-
 // ---- Helper Function --------------------------------------------------------
 export function getFileType(filename: string): "video" | "image" | "unknown" {
   const ext = filename.split(".").pop()?.toLowerCase();
@@ -8,11 +6,6 @@ export function getFileType(filename: string): "video" | "image" | "unknown" {
   if (["png", "jpg", "jpeg", "gif", "webp", "avif", "svg"].includes(ext)) return "image";
   return "unknown";
 }
-
-// ---- Helper Function --------------------------------------------------------
-export const getSourceForFile = (newFile: string) => {
-  return `${getBookAssetBaseUrl()}/${newFile}`;
-};
 
 // ---- Helper Function --------------------------------------------------------
 export const loadVideoAsHTMLElement = (nextBack: HTMLVideoElement, newSrc: string) => {

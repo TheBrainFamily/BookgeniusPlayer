@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { cn } from "@player/lib/utils";
+import { isVideoFile } from "@player/helpers/isVideoFile";
 
 type VideoState = "listens" | "speaks";
 
@@ -26,7 +27,7 @@ const useVideoState = (mediaSrc: string, isVideo: boolean, isTalking?: boolean) 
       setVideoListensSrc(mediaSrc);
 
       // Create talking state video path if possible
-      if (mediaSrc.includes(".mp4")) {
+      if (isVideoFile(mediaSrc)) {
         const talkingSrc = mediaSrc.replace("listens.mp4", "speaks.mp4");
         setVideoSpeaksSrc(talkingSrc);
         setVideoSpeaksLoaded(false);

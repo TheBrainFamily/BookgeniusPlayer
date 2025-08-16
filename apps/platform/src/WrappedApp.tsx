@@ -1,17 +1,11 @@
-import App from "../../player/src/App";
-
-// import "./styles/globals.css";
-import "../../player/src/styles/styles.css";
-import "../../player/src/styles/modals.css";
-import "../../player/src/styles/inline-avatars.css";
-// import "../../player/src/styles/book-theme.css";
-import "../../player/src/i18n";
-import { useRouteTransition } from "./providers/RouteTransitionProvider";
+import React, { useEffect, useRef, useState, Suspense } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useRouteTransition } from "./providers/RouteTransitionProvider";
 import { bookDataLoader } from "../../player/src/services/bookDataLoader";
 
-export const WrappedApp = () => {
+const PlayerApp = React.lazy(() => import("./player/PlayerRoot"));
+
+const WrappedApp = () => {
   const [searchParams] = useSearchParams();
   const [isPlayerReady, setIsPlayerReady] = useState(false);
   const [assetBaseReady, setAssetBaseReady] = useState(false);
@@ -19,50 +13,46 @@ export const WrappedApp = () => {
   const lastBookRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
+    const onReady = () => {
       setIsPlayerReady(true);
-      // Fade out the overlay (enforces min duration internally)
       finishTransition();
       window.dispatchEvent(new CustomEvent("splashHidden"));
     };
-    window.addEventListener("appReady", handleMessage);
-    return () => window.removeEventListener("appReady", handleMessage);
+    window.addEventListener("appReady", onReady);
+    return () => window.removeEventListener("appReady", onReady);
   }, [finishTransition]);
 
-  // Watch the `?book=` query param and reset the player loader if it changes
   useEffect(() => {
-    const bookFromQuery = searchParams.get("book");
-    if (bookFromQuery !== lastBookRef.current) {
-      lastBookRef.current = bookFromQuery;
+    const book = searchParams.get("book");
+    if (book !== lastBookRef.current) {
+      lastBookRef.current = book;
       bookDataLoader.resetCurrentBook();
 
-      if (!bookFromQuery) {
+      if (!book) {
         setAssetBaseReady(false);
         return;
       }
+      bookDataLoader.setCurrentBook(book);
 
-      // ensure book is known to loader
-      bookDataLoader.setCurrentBook(bookFromQuery);
-
-      // resolve once per book: call the API and set assetBase on loader
       let cancelled = false;
       (async () => {
         setAssetBaseReady(false);
         try {
-          const res = await fetch(`/api/core/content/resolve/${encodeURIComponent(bookFromQuery)}`, { cache: "no-store" });
+          const res = await fetch(`/api/core/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
           if (!res.ok) throw new Error("[RESOLVE] resolve failed");
-          const { signedAssetBase } = await res.json();
-          console.log("[RESOLVE] assetBase", signedAssetBase);
+          const { signedAssetBase, assetPrefix, assetQuery } = await res.json();
+
+          // accept either shape; you already parse full URL in setAssetBase
+
           if (cancelled) return;
-          bookDataLoader.setAssetBase(signedAssetBase);
+          bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
           // optional warm HEAD for index.html to reduce first-media latency (fire-and-forget)
           // try { fetch(`${assetBase}index.html`, { method: "HEAD", cache: "no-store" }); } catch (_) {}
           setAssetBaseReady(true);
-        } catch (err) {
-          console.error("[RESOLVE] Failed to resolve assetBase:", err);
-          // fallback: allow app to mount and use the old API endpoints
-          bookDataLoader.setAssetBase(null);
-          setAssetBaseReady(true);
+        } catch (err: unknown) {
+          console.error("[RESOLVE] error:", err);
+          bookDataLoader.setAssetBase(null); // fallback to old API path
+          if (!cancelled) setAssetBaseReady(true);
         }
       })();
       return () => {
@@ -71,5 +61,15 @@ export const WrappedApp = () => {
     }
   }, [searchParams]);
 
-  return <div className={`w-full h-full border-0 transition-opacity duration-500 ${!isPlayerReady ? "opacity-0" : "opacity-100"}`}>{assetBaseReady ? <App /> : null}</div>;
+  return (
+    <div className={`w-full h-full border-0 transition-opacity duration-500 ${!isPlayerReady ? "opacity-0" : "opacity-100"}`}>
+      {assetBaseReady ? (
+        <Suspense fallback={null /* overlay handles UX */}>
+          <PlayerApp />
+        </Suspense>
+      ) : null}
+    </div>
+  );
 };
+
+export default WrappedApp;

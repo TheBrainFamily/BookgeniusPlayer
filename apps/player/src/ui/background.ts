@@ -2,7 +2,7 @@ import { getBookAssetUrl } from "@player/utils/assetUrls";
 import { getBackgrounds } from "./getBackgrounds";
 import debounce from "lodash.debounce";
 import { getPreloadedElement } from "@player/preloadBackgrounds";
-import { getFileType, getSourceForFile, loadVideoAsHTMLElement } from "./backgroundUtils";
+import { getFileType, loadVideoAsHTMLElement } from "./backgroundUtils";
 
 export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number };
 

@@ -1,7 +1,8 @@
 import { getCurrentLocation } from "@player/helpers/paragraphsNavigation";
 import { bookDataLoader } from "@player/services/bookDataLoader";
 import { getBackgroundsForBook } from "@player/genericBookDataGetters/getBackgroundsForBook";
-import { getFileType, getSourceForFile, loadVideoAsHTMLElement } from "@player/ui/backgroundUtils";
+import { getFileType, loadVideoAsHTMLElement } from "@player/ui/backgroundUtils";
+import { getBookAssetUrl } from "./utils/assetUrls";
 
 // Cache to store preloaded elements
 const preloadCache = new Map<string, HTMLVideoElement | HTMLDivElement>();
@@ -82,7 +83,7 @@ export const preloadBackgrounds = async () => {
 
     const loadPromise = new Promise<boolean>((resolve) => {
       const backgroundType = getFileType(fileName);
-      const newSrc = getSourceForFile(fileName);
+      const newSrc = getBookAssetUrl(fileName);
 
       if (backgroundType === "video") {
         const videoElement = document.createElement("video");
