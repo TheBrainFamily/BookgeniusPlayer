@@ -39,7 +39,10 @@
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root-platform"></div>
+
+    <video id="cutscene-video" class="cutscene-video" playsinline></video>
+
     <div id="legacy">
       <video id="bg-video-a" class="bg-element" autoplay muted loop playsinline></video>
       <video id="bg-video-b" class="bg-element faded" autoplay muted loop playsinline></video>
@@ -56,6 +59,8 @@
         </div>
       </div>
     </div>
+
+    <div id="root-player"></div>
 
     <script type="module" src="/src/main.tsx"></script>
   </body>

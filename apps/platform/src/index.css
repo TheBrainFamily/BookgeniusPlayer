@@ -241,3 +241,20 @@ body {
 @utility gradient-parchment {
   background-image: linear-gradient(180deg, hsl(40 20% 88%) 0%, hsl(35 15% 82%) 100%);
 }
+
+#root-player,
+#legacy,
+#cutscene-video,
+#splash-screen {
+  display: none;
+}
+
+body.is-reader #root-player,
+body.is-reader #cutscene-video,
+body.is-reader #splash-screen {
+  display: block;
+}
+
+body.is-reader #legacy {
+  display: flex;
+}

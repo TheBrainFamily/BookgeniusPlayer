@@ -1,17 +1,17 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 
-import "./styles/main.css";
+import "./styles/index.css";
 
 import App from "./App";
 import "./i18n";
 
-let container = document.getElementById("root");
+let container = document.getElementById("root-player");
 
 if (!container) {
   console.log("Root element not found, waiting for 1 second");
   setTimeout(() => {
-    container = document.getElementById("root");
+    container = document.getElementById("root-player");
     if (container) {
       createRoot(container).render(
         <React.StrictMode>
@@ -21,7 +21,7 @@ if (!container) {
     } else {
       console.log("Root element not found again, waiting for 5 second");
       setTimeout(() => {
-        container = document.getElementById("root");
+        container = document.getElementById("root-player");
         if (container) {
           createRoot(container).render(
             <React.StrictMode>

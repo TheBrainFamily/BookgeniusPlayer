@@ -1,13 +1,13 @@
-import Player from "../../player/src/App";
 import "./player.css";
-
+import Player from "../../player/src/App";
 import "../../player/src/i18n";
 
+import { createPortal } from "react-dom";
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
+
 import { useRouteTransition } from "./providers/RouteTransitionProvider";
 import { bookDataLoader } from "../../player/src/services/bookDataLoader";
-// import ShadowPlayer from "./ShadowPlayer";
 
 export const WrappedApp = () => {
   const [searchParams] = useSearchParams();
@@ -18,7 +18,6 @@ export const WrappedApp = () => {
   useEffect(() => {
     const handleMessage = () => {
       setIsPlayerReady(true);
-      // Fade out the overlay (enforces min duration internally)
       finishTransition();
       window.dispatchEvent(new CustomEvent("splashHidden"));
     };
@@ -26,7 +25,6 @@ export const WrappedApp = () => {
     return () => window.removeEventListener("appReady", handleMessage);
   }, [finishTransition]);
 
-  // Watch the `?book=` query param and reset the player loader if it changes
   useEffect(() => {
     const bookFromQuery = searchParams.get("book");
     if (bookFromQuery !== lastBookRef.current) {
@@ -35,11 +33,19 @@ export const WrappedApp = () => {
     }
   }, [searchParams]);
 
-  //TODO: Possibly we dont need to wrap with the div, I'm leaving it so the mechanism is here
-  return (
+  useEffect(() => {
+    document.body.classList.add("is-reader");
+    return () => document.body.classList.remove("is-reader");
+  }, []);
+
+  const mountNode = typeof document !== "undefined" ? document.getElementById("root-player") : null;
+  if (!mountNode) return null;
+
+  const ui = (
     <div className={`w-full h-full transition-opacity duration-500 ${!isPlayerReady ? "opacity-0" : "opacity-100"}`}>
-      {/* <ShadowPlayer hostId="player-root" hostClassName="player-scope" /> */}
       <Player />
     </div>
   );
+
+  return createPortal(ui, mountNode);
 };
