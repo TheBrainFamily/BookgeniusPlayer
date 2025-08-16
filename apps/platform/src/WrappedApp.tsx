@@ -18,6 +18,7 @@ export const WrappedApp = () => {
   useEffect(() => {
     const handleMessage = () => {
       setIsPlayerReady(true);
+      // Fade out the overlay (enforces min duration internally)
       finishTransition();
       window.dispatchEvent(new CustomEvent("splashHidden"));
     };
@@ -25,6 +26,7 @@ export const WrappedApp = () => {
     return () => window.removeEventListener("appReady", handleMessage);
   }, [finishTransition]);
 
+  // Watch the `?book=` query param and reset the player loader if it changes
   useEffect(() => {
     const bookFromQuery = searchParams.get("book");
     if (bookFromQuery !== lastBookRef.current) {
@@ -42,6 +44,7 @@ export const WrappedApp = () => {
   if (!mountNode) return null;
 
   const ui = (
+    //TODO: Possibly we dont need to wrap with the div, I'm leaving it so the mechanism is here
     <div className={`w-full h-full transition-opacity duration-500 ${!isPlayerReady ? "opacity-0" : "opacity-100"}`}>
       <Player />
     </div>
