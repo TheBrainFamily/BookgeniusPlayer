@@ -118,7 +118,7 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 /**
  * Normalizes the src to always be PNG and removes "speaks" or "listens" suffixes
  */
-function normalizeSrcForInlineAvatar(src: string): string {
+export function normalizeSrcForInlineAvatar(src: string): string {
   if (!src) return src;
 
   // Preserve query/hash separately so we don't mangle them

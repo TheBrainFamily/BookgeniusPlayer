@@ -1,7 +1,7 @@
-import { setCurrentLocation, getCurrentLocation } from "./paragraphsNavigation";
+import { setCurrentLocation, getCurrentLocation, getFurthestLocationKey } from "./paragraphsNavigation";
 
 export const resetFurthestPageLocation = () => {
-  localStorage.removeItem("furthestLocation");
+  localStorage.removeItem(getFurthestLocationKey());
   const currentLocation = getCurrentLocation();
   setCurrentLocation(currentLocation);
 

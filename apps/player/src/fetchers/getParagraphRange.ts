@@ -30,29 +30,7 @@ export interface SelfSufficientCharacterMetadata {
   characterName: string;
   bookSlug: string;
   infoPerChapter: InfoPerChapter[];
-  imageUrl: string;
 }
-
-export interface SimpleCharacterMetadata {
-  characterName: string;
-  infoPerChapter: { chapter: number; paragraphsWhereSpotted: number[]; paragraphsWhereTalking: number[] }[];
-}
-
-/* -------------------------------------------------------------------------- */
-/*  1. Client‑side fetch wrapper (used when you DO have the API available)    */
-/* -------------------------------------------------------------------------- */
-
-export interface GetParagraphRangeParams {
-  bookSlug: BOOK_SLUGS;
-  startChapter: number;
-  startParagraph: number;
-  endChapter: number;
-  endParagraph: number;
-}
-
-/* -------------------------------------------------------------------------- */
-/*  2. Pure in‑memory implementation (works straight on a JSON dump)          */
-/* -------------------------------------------------------------------------- */
 
 type PureRange = { startChapter: number; endChapter: number; bookSlug: BOOK_SLUGS; startParagraph: number; endParagraph: number };
 
@@ -200,7 +178,6 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
       return {
         slug: character.slug,
         characterName: character.characterName,
-        imageUrl: character.imageUrl,
         summary: first.summary,
         isTalkingInFirstParagraph: first.isTalking,
         paragraphNumber: first.paragraphNumber,

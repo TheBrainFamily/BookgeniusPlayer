@@ -30,6 +30,9 @@ import ProgressBars from "@player/components/ProgressBars";
 import { usePlayCharacterSelect } from "./hooks/usePlayCharacterSelect";
 import { AppInitializer } from "./components/AppInitializer";
 import { BookDataProvider } from "./context/BookDataContext";
+import { useTranslation } from "react-i18next";
+import { getBookData } from "@/genericBookDataGetters/getBookData";
+import { languageNameToCode } from "@/helpers/languageNameToCode";
 
 function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   setKnownVideos(getKnownVideoFiles());
@@ -50,9 +53,11 @@ function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   useBackgroundSongs();
   useAudiobookTracks();
   usePlayCharacterSelect();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     onShellMounted();
+    void i18n.changeLanguage(languageNameToCode(getBookData().metadata.language));
   }, []);
 
   return (
