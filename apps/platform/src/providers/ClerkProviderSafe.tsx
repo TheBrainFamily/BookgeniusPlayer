@@ -3,11 +3,8 @@ import React, { useEffect, useState, createContext, useContext } from "react";
 const ClerkReadyContext = createContext(false);
 export const useClerkReady = () => useContext(ClerkReadyContext);
 
-export const ClerkProviderSafe: React.FC<{ publishableKey: string; children: React.ReactNode }> = ({ publishableKey, children }) => {
-  // On the server: render children without Clerk (no window access)
-  if (import.meta.env.SSR) return <ClerkReadyContext.Provider value={false}>{children}</ClerkReadyContext.Provider>;
-
-  const [ClerkProvider, setClerkProvider] = useState<React.ComponentType<any> | null>(null);
+const ClerkProviderSafeClient: React.FC<{ publishableKey: string; children: React.ReactNode }> = ({ publishableKey, children }) => {
+  const [ClerkProvider, setClerkProvider] = useState<React.ComponentType<{ publishableKey: string; children: React.ReactNode }> | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -31,5 +28,18 @@ export const ClerkProviderSafe: React.FC<{ publishableKey: string; children: Rea
     <ClerkReadyContext.Provider value={true}>
       <ClerkProvider publishableKey={publishableKey}>{children}</ClerkProvider>
     </ClerkReadyContext.Provider>
+  );
+};
+
+const ClerkProviderSafeServer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // On the server: render children without Clerk (no window access)
+  return <ClerkReadyContext.Provider value={false}>{children}</ClerkReadyContext.Provider>;
+};
+
+export const ClerkProviderSafe: React.FC<{ publishableKey: string; children: React.ReactNode }> = ({ publishableKey, children }) => {
+  return import.meta.env.SSR ? (
+    <ClerkProviderSafeServer>{children}</ClerkProviderSafeServer>
+  ) : (
+    <ClerkProviderSafeClient publishableKey={publishableKey}>{children}</ClerkProviderSafeClient>
   );
 };
