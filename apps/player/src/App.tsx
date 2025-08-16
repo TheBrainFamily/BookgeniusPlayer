@@ -31,8 +31,8 @@ import { usePlayCharacterSelect } from "./hooks/usePlayCharacterSelect";
 import { AppInitializer } from "./components/AppInitializer";
 import { BookDataProvider } from "./context/BookDataContext";
 import { useTranslation } from "react-i18next";
-import { getBookData } from "@/genericBookDataGetters/getBookData";
-import { languageNameToCode } from "@/helpers/languageNameToCode";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { languageNameToCode } from "@player/helpers/languageNameToCode";
 
 function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   setKnownVideos(getKnownVideoFiles());
