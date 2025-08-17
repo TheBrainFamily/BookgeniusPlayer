@@ -43,7 +43,6 @@ export function useBackgroundSongs() {
 
   useEffect(() => {
     if (!isAppReady) return;
-    console.log("PINGWING, preloadCurrentTrack");
     preloadCurrentTrack();
   }, [isAppReady]);
 
