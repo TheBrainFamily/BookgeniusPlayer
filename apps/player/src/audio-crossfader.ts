@@ -306,16 +306,22 @@ function validateImageUrl(url: string): Promise<void> {
  * @param audioData The audio data as a Uint8Array or ArrayBuffer.
  * @param currentTitle The current title, to be used as a fallback.
  * @param currentCoverArtUrl The existing cover art URL, which will be revoked if a new one is created.
- * @returns A promise that resolves to an object with the updated title and coverArtUrl.
+ * @returns A promise that resolves to an object with the updated title, coverArtUrl, and duration.
  */
-async function parseMetadataAndUpdate(audioData: Uint8Array | ArrayBuffer, currentTitle: string, currentCoverArtUrl?: string): Promise<{ title: string; coverArtUrl: string }> {
+async function parseMetadataAndUpdate(
+  audioData: Uint8Array | ArrayBuffer,
+  currentTitle: string,
+  currentCoverArtUrl?: string,
+): Promise<{ title: string; coverArtUrl: string; duration?: number }> {
   let title = currentTitle;
   let coverArtUrl = currentCoverArtUrl || "";
+  let duration: number | undefined;
 
   try {
     const blob = new Blob([audioData], { type: "audio/mpeg" });
-    const { common } = await parseBlob(blob);
+    const { common, format } = await parseBlob(blob);
     title = common.title || title;
+    duration = format.duration;
 
     if (common.picture?.[0]) {
       try {
@@ -351,10 +357,11 @@ async function parseMetadataAndUpdate(audioData: Uint8Array | ArrayBuffer, curre
       }
     }
   } catch (metadataError) {
-    console.warn(`Metadata parsing failed:`, metadataError);
+    console.warn(`Metadata parsing failed for '${currentTitle}':`, metadataError);
+    // If metadata parsing fails, we'll have defaults: title=currentTitle, coverArtUrl=existing, duration=undefined
   }
 
-  return { title, coverArtUrl };
+  return { title, coverArtUrl, duration };
 }
 
 /**
@@ -581,7 +588,8 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
         chunks.push(value);
         totalBytesReceived += value.length;
 
-        // Try to start early playback once we have enough data
+        // Try to start early playback once we have enough data (but only if not in justDownload mode)
+        // For justDownload mode, we'll parse metadata early but continue downloading the full file
         if (!hasStartedPlayback && totalBytesReceived >= STREAMING_FILE_SIZE_THRESHOLD) {
           try {
             // Combine chunks into a single array buffer
@@ -594,32 +602,37 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
 
             /* ── just download mode ───────────────────────────────────── */
             if (justDownload) {
-              // Store the raw array buffer for later decoding
+              // For justDownload mode, parse metadata early but continue downloading
+              // We'll create a partial track state and update it when download completes
               tracks.set(trackId, {
                 coverArtUrl: coverArtUrl || "",
                 title,
-                trackLength: 0,
+                trackLength: metadata.duration || 0,
+                duration: metadata.duration || 0,
                 sourceNode: null,
                 gainNode: null,
-                rawBuffer: combinedArray.buffer,
+                rawBuffer: combinedArray.buffer, // Store partial buffer for now
                 isFullyLoaded: false,
               });
-              console.log(`✅ Downloaded '${trackId}' (${(combinedArray.buffer.byteLength / 1024 / 1024).toFixed(2)} MB) - ready for later decoding`);
-              return true;
-            }
+              console.log(
+                `📋 Metadata parsed for '${trackId}' (${(combinedArray.buffer.byteLength / 1024 / 1024).toFixed(2)} MB partial, continuing download for full file)${metadata.duration ? ` - Duration: ${metadata.duration.toFixed(2)}s` : ""}`,
+              );
+              hasStartedPlayback = true; // Mark as started to avoid re-parsing
+              // Continue downloading the rest of the file
+            } else {
+              // Normal streaming playback mode
+              const audioBuffer = await streamingDecodeAudioData(audioContext, combinedArray.buffer, trackId, title, coverArtUrl || "", transitionPoints, false, knownTotalBytes);
 
-            // Attempt early streaming decode
-            const audioBuffer = await streamingDecodeAudioData(audioContext, combinedArray.buffer, trackId, title, coverArtUrl || "", transitionPoints, false, knownTotalBytes);
+              if (audioBuffer) {
+                hasStartedPlayback = true;
+                console.log(`🎵 Early streaming playback started for '${trackId}' with ${totalBytesReceived} bytes received`);
 
-            if (audioBuffer) {
-              hasStartedPlayback = true;
-              console.log(`🎵 Early streaming playback started for '${trackId}' with ${totalBytesReceived} bytes received`);
-
-              // Continue downloading in the background for the full file
-              downloadRemainingDataInBackground(reader, chunks, trackId, title, coverArtUrl || "", transitionPoints).catch((error) => {
-                console.error(`Error downloading remaining data for '${trackId}':`, error);
-              });
-              return true;
+                // Continue downloading in the background for the full file
+                downloadRemainingDataInBackground(reader, chunks, trackId, title, coverArtUrl || "", transitionPoints).catch((error) => {
+                  console.error(`Error downloading remaining data for '${trackId}':`, error);
+                });
+                return true;
+              }
             }
           } catch (earlyPlaybackError) {
             console.warn(`Early playback failed for '${trackId}':`, earlyPlaybackError);
@@ -634,17 +647,39 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
     const finalArray = combineChunks(chunks);
 
     // Parse metadata if not already done
+    let metadata;
     if (!hasStartedPlayback) {
-      const metadata = await parseMetadataAndUpdate(finalArray, title, coverArtUrl);
+      metadata = await parseMetadataAndUpdate(finalArray, title, coverArtUrl);
       title = metadata.title;
       coverArtUrl = metadata.coverArtUrl;
     }
 
     /* ── just download mode ───────────────────────────────────── */
     if (justDownload) {
-      // Store the raw array buffer for later decoding
-      tracks.set(trackId, { coverArtUrl: coverArtUrl || "", title, trackLength: 0, sourceNode: null, gainNode: null, rawBuffer: finalArray.buffer, isFullyLoaded: false });
-      console.log(`✅ Downloaded '${trackId}' (${(finalArray.buffer.byteLength / 1024 / 1024).toFixed(2)} MB) - ready for later decoding`);
+      // For justDownload mode, update the existing track state with the complete file
+      const existingState = tracks.get(trackId);
+      if (existingState) {
+        // Update the existing state with the complete buffer
+        existingState.rawBuffer = finalArray.buffer;
+        console.log(
+          `✅ Downloaded complete '${trackId}' (${(finalArray.buffer.byteLength / 1024 / 1024).toFixed(2)} MB total) - ready for later decoding${existingState.duration ? ` - Duration: ${existingState.duration.toFixed(2)}s` : ""}`,
+        );
+      } else {
+        // Store the complete raw array buffer for later decoding with metadata duration
+        tracks.set(trackId, {
+          coverArtUrl: coverArtUrl || "",
+          title,
+          trackLength: metadata?.duration || 0,
+          duration: metadata?.duration || 0,
+          sourceNode: null,
+          gainNode: null,
+          rawBuffer: finalArray.buffer,
+          isFullyLoaded: false,
+        });
+        console.log(
+          `✅ Downloaded complete '${trackId}' (${(finalArray.buffer.byteLength / 1024 / 1024).toFixed(2)} MB total) - ready for later decoding${metadata?.duration ? ` - Duration: ${metadata.duration.toFixed(2)}s` : ""}`,
+        );
+      }
       return true;
     }
 
@@ -836,14 +871,25 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
   let coverArtUrl: string | undefined;
   try {
     /* ── 4a metadata (ID3) ───────────────────────────────────────── */
-    const { title, coverArtUrl: newCoverArtUrl } = await parseMetadataAndUpdate(arrayBuffer, trackId);
+    const { title, coverArtUrl: newCoverArtUrl, duration } = await parseMetadataAndUpdate(arrayBuffer, trackId);
     coverArtUrl = newCoverArtUrl;
 
     /* ── 4b just download mode ───────────────────────────────────── */
     if (justDownload) {
-      // Store the raw array buffer for later decoding
-      tracks.set(trackId, { coverArtUrl: coverArtUrl || "", title, trackLength: 0, sourceNode: null, gainNode: null, rawBuffer: arrayBuffer, isFullyLoaded: false });
-      console.log(`✅ Downloaded '${trackId}' (${(arrayBuffer.byteLength / 1024 / 1024).toFixed(2)} MB) - ready for later decoding`);
+      // Store the raw array buffer for later decoding with metadata duration
+      tracks.set(trackId, {
+        coverArtUrl: coverArtUrl || "",
+        title,
+        trackLength: duration || 0,
+        duration: duration || 0,
+        sourceNode: null,
+        gainNode: null,
+        rawBuffer: arrayBuffer,
+        isFullyLoaded: false,
+      });
+      console.log(
+        `✅ Downloaded '${trackId}' (${(arrayBuffer.byteLength / 1024 / 1024).toFixed(2)} MB) - ready for later decoding${duration ? ` - Duration: ${duration.toFixed(2)}s` : ""}`,
+      );
       return true;
     }
 
