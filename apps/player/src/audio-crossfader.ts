@@ -549,11 +549,13 @@ async function streamingDecodeAudioData(
 /**
  * Handles streaming download of audio files, starting playback as soon as enough data is available.
  */
-async function handleStreamingDownload(response: Response, trackId: string, transitionPoints?: number[]): Promise<boolean> {
-  if (!audioContext || !response.body) {
-    console.error("handleStreamingDownload: AudioContext or response body not available");
-    cleanupTrackState(trackId);
-    return false;
+async function handleStreamingDownload(response: Response, trackId: string, transitionPoints?: number[], justDownload: boolean = false): Promise<boolean> {
+  if (!justDownload) {
+    if (!audioContext || !response.body) {
+      console.error("handleStreamingDownload: AudioContext or response body not available");
+      cleanupTrackState(trackId);
+      return false;
+    }
   }
 
   // Extract total file size from Content-Length header if available
@@ -590,6 +592,22 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
             title = metadata.title;
             coverArtUrl = metadata.coverArtUrl;
 
+            /* ── just download mode ───────────────────────────────────── */
+            if (justDownload) {
+              // Store the raw array buffer for later decoding
+              tracks.set(trackId, {
+                coverArtUrl: coverArtUrl || "",
+                title,
+                trackLength: 0,
+                sourceNode: null,
+                gainNode: null,
+                rawBuffer: combinedArray.buffer,
+                isFullyLoaded: false,
+              });
+              console.log(`✅ Downloaded '${trackId}' (${(combinedArray.buffer.byteLength / 1024 / 1024).toFixed(2)} MB) - ready for later decoding`);
+              return true;
+            }
+
             // Attempt early streaming decode
             const audioBuffer = await streamingDecodeAudioData(audioContext, combinedArray.buffer, trackId, title, coverArtUrl || "", transitionPoints, false, knownTotalBytes);
 
@@ -620,6 +638,14 @@ async function handleStreamingDownload(response: Response, trackId: string, tran
       const metadata = await parseMetadataAndUpdate(finalArray, title, coverArtUrl);
       title = metadata.title;
       coverArtUrl = metadata.coverArtUrl;
+    }
+
+    /* ── just download mode ───────────────────────────────────── */
+    if (justDownload) {
+      // Store the raw array buffer for later decoding
+      tracks.set(trackId, { coverArtUrl: coverArtUrl || "", title, trackLength: 0, sourceNode: null, gainNode: null, rawBuffer: finalArray.buffer, isFullyLoaded: false });
+      console.log(`✅ Downloaded '${trackId}' (${(finalArray.buffer.byteLength / 1024 / 1024).toFixed(2)} MB) - ready for later decoding`);
+      return true;
     }
 
     // Process the complete file
@@ -752,7 +778,7 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
   // If we have a raw buffer (from justDownload), we need to decode it first
   if (cached?.rawBuffer && !justDownload) {
     console.log(`🔄 Track '${trackId}' has raw buffer, decoding...`);
-    return await decodeDownloadedTrack(trackId, transitionPoints);
+    await decodeDownloadedTrack(trackId, transitionPoints);
   }
 
   // Check if track is currently being loaded to prevent duplicates
@@ -794,7 +820,7 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
 
     if (canStream) {
       // Start streaming download and early playback
-      return await handleStreamingDownload(res, trackId, transitionPoints);
+      return await handleStreamingDownload(res, trackId, transitionPoints, justDownload);
     } else {
       // Fall back to traditional download for small files or when streaming is disabled
       arrayBuffer = await res.arrayBuffer();
