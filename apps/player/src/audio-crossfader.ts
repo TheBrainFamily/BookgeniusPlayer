@@ -813,7 +813,14 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
   // If we have a raw buffer (from justDownload), we need to decode it first
   if (cached?.rawBuffer && !justDownload) {
     console.log(`🔄 Track '${trackId}' has raw buffer, decoding...`);
-    await decodeDownloadedTrack(trackId, transitionPoints);
+    const decoded = await decodeDownloadedTrack(trackId, transitionPoints);
+    if (decoded) {
+      console.log(`✅ Track '${trackId}' decoded from raw buffer successfully`);
+      return true;
+    } else {
+      console.error(`❌ Failed to decode raw buffer for '${trackId}'`);
+      return false;
+    }
   }
 
   // Check if track is currently being loaded to prevent duplicates
@@ -953,6 +960,9 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
     const trackState = createTrackState(audioBuffer, { title, coverArtUrl: coverArtUrl || "", transitionPoints });
     tracks.set(trackId, trackState);
 
+    // Dispatch trackFullyLoaded event for regular decode path
+    window.dispatchEvent(new CustomEvent("trackFullyLoaded", { detail: { trackId, fullDuration: audioBuffer.duration, totalBytes: arrayBuffer.byteLength } }));
+
     console.log(`✅ Decoded '${trackId}' – ${audioBuffer.duration.toFixed(2)} s` + (transitionPoints ? ` | transitions: ${transitionPoints.join(", ")}` : ""));
     return true;
   } catch (e) {
@@ -989,9 +999,13 @@ export async function decodeDownloadedTrack(trackId: string, transitionPoints?: 
     const updatedTrackState = createTrackState(audioBuffer, { title, coverArtUrl: coverArtUrl || trackState.coverArtUrl, transitionPoints });
 
     // Remove the raw buffer since we no longer need it
+    const rawBufferSize = trackState.rawBuffer.byteLength;
     delete updatedTrackState.rawBuffer;
 
     tracks.set(trackId, updatedTrackState);
+
+    // Dispatch trackFullyLoaded event for decoded downloaded track
+    window.dispatchEvent(new CustomEvent("trackFullyLoaded", { detail: { trackId, fullDuration: audioBuffer.duration, totalBytes: rawBufferSize } }));
 
     console.log(`✅ Decoded downloaded track '${trackId}' – ${audioBuffer.duration.toFixed(2)} s` + (transitionPoints ? ` | transitions: ${transitionPoints.join(", ")}` : ""));
     return true;
