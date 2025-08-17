@@ -11,7 +11,9 @@ export const activateCharacterInteractions = (element: HTMLElement, openCharacte
     if (characterTalkingSpan) {
       const characterSlug = characterTalkingSpan.dataset.character;
       const talkingSrc = characterTalkingSpan.dataset.srcTalking;
-      characterTalkingSpan.addEventListener("click", () => {
+      characterTalkingSpan.addEventListener("pointerup", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         openCharacterDetailsModal(characterSlug, true, talkingSrc);
       });
     }

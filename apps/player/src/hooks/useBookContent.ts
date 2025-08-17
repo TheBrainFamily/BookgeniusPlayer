@@ -51,8 +51,8 @@ export function useBookContent(containerId: string) {
       const observerSetup = setupPageObserver(openCharacterDetailsModal);
 
       // Give the browser a moment to render the injected HTML
-      const handleClick = (event: MouseEvent) => {
-        if (event.metaKey || event.ctrlKey) {
+      const handlePointerUp = (event: PointerEvent) => {
+        if ((event as any).metaKey || (event as any).ctrlKey) {
           return;
         }
         const target = event.target as HTMLElement;
@@ -69,6 +69,8 @@ export function useBookContent(containerId: string) {
         const span = target.closest("span[id^='ch']");
 
         if (span) {
+          event.preventDefault();
+          event.stopPropagation();
           let isCharacterPlaceholder = false;
           if (bookForm === "play") {
             isCharacterPlaceholder = span.children.length === 1 && span.children[0].tagName === "STRONG";
@@ -80,7 +82,7 @@ export function useBookContent(containerId: string) {
 
           const isFirstSimplification = !span.hasAttribute("data-simplified");
 
-          // Store the original sentence only on the first click.
+          // Store the original sentence only on the first tap.
           if (isFirstSimplification) {
             span.setAttribute("data-original-sentence", span.innerHTML);
           }
@@ -126,12 +128,12 @@ export function useBookContent(containerId: string) {
           iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--book-simplified-icon-color, ForestGreen)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>`;
           span.appendChild(iconContainer);
 
-          iconContainer.onclick = (e) => {
+          iconContainer.addEventListener("pointerup", (e) => {
+            e.preventDefault();
             e.stopPropagation();
             const originalSentence = span.getAttribute("data-original-sentence");
-            // The `simplifiedSentence` variable holds the text for the *current* simplified version.
             openSentenceModal(originalSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
-          };
+          });
           // 5. Activate character interactions for newly transformed content
           activateCharacterInteractions(target, openCharacterDetailsModal);
           // openSentenceModal(currentSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
@@ -146,6 +148,7 @@ export function useBookContent(containerId: string) {
           span.style.backgroundColor = "rgba(66, 68, 90, 0.1)";
           span.style.padding = "0.2rem 0";
           span.style.cursor = "pointer";
+          span.style.touchAction = "none";
         }
       };
 
@@ -158,12 +161,12 @@ export function useBookContent(containerId: string) {
         }
       };
 
-      container.addEventListener("click", handleClick);
+      container.addEventListener("pointerup", handlePointerUp);
       container.addEventListener("mouseover", handleMouseOver);
       container.addEventListener("mouseout", handleMouseOut);
 
       return () => {
-        container.removeEventListener("click", handleClick);
+        container.removeEventListener("pointerup", handlePointerUp);
         container.removeEventListener("mouseover", handleMouseOver);
         container.removeEventListener("mouseout", handleMouseOut);
         // Clean up the observer and its event listeners

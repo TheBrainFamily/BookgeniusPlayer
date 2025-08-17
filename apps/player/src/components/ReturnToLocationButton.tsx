@@ -50,7 +50,10 @@ const ReturnToLocationButton = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <motion.button
-                  onClick={onGoBackClick}
+                  onPointerUp={(e) => {
+                    e.preventDefault();
+                    onGoBackClick();
+                  }}
                   className="p-2 my-1 text-sm hover:text-white rounded-full cursor-pointer flex flex-row gap-2 items-center h-8 font-medium"
                   whileHover="hover"
                   whileTap="tap"

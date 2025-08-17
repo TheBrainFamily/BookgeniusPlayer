@@ -221,7 +221,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
         <Button
           variant="ghost"
           className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
-          onClick={() => {
+          onPointerUp={() => {
             openBookChapterModal();
           }}
         >
@@ -231,7 +231,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
         <Button
           variant="ghost"
           className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
-          onClick={() => {
+          onPointerUp={() => {
             resetFurthestPageLocation();
             onClose();
           }}
@@ -242,7 +242,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
         <Button
           variant="ghost"
           className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
-          onClick={() => {
+          onPointerUp={() => {
             openApiKeyModal();
           }}
         >
@@ -284,7 +284,9 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             </div>
           </div>
         </div>
-        {isVisible.current && (
+        {/* 
+        Hide for now for all books
+        {isVisible.current && false && ( 
           <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full book-settings-control-box")}>
             <div className="space-y-4 book-settings-control-box-inner">
               <div className="flex items-center gap-2">
@@ -317,7 +319,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </div>
       <div className="text-xs text-gray-500 mt-4 text-right book-settings-version">
         <span>

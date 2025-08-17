@@ -166,7 +166,11 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                         variants={variants.item}
                         whileHover="hover"
                         whileTap="tap"
-                        onClick={() => handleAppearanceClick(appearance)}
+                        onPointerUp={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleAppearanceClick(appearance);
+                        }}
                         transition={{ delay: index * 0.05 }}
                       >
                         <div className="relative p-4">

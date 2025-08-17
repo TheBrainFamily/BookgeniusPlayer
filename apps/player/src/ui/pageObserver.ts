@@ -253,11 +253,12 @@ function createMediaElement(
     }
   }
 
-  // Add click handler to container
-  container.addEventListener("click", (e) => {
-    if (e.metaKey || e.ctrlKey) {
+  // Add pointer handler to container (works for mouse and touch)
+  container.addEventListener("pointerup", (e) => {
+    if ((e as any).metaKey || (e as any).ctrlKey) {
       return;
     }
+    e.preventDefault();
     e.stopPropagation();
 
     const currentIsTalking = placeholder.dataset.isTalking === "true";
@@ -280,11 +281,13 @@ export function highlightCharacter(character: HTMLSpanElement, openCharacterDeta
 
   let floatingAvatar: HTMLDivElement | null = null;
   character.classList.add("character-highlighted-activated");
-  character.addEventListener("click", (e) => {
-    if (e.metaKey || e.ctrlKey) {
+  character.addEventListener("pointerup", (e) => {
+    if ((e as any).metaKey || (e as any).ctrlKey) {
       floatingAvatar?.remove();
       return;
     }
+    e.preventDefault();
+    e.stopPropagation();
     // Find and remove any floating avatars to prevent them from sticking
     const floatingAvatars = document.querySelectorAll(".floating-avatar");
     floatingAvatars.forEach((avatar) => {
