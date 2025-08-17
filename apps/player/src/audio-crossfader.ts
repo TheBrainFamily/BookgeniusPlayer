@@ -18,6 +18,7 @@ export interface TrackState {
   pausedAt?: number | null; // Position (in seconds) frozen when paused
   fullyLoadedListener?: ((event: CustomEvent) => void) | null; // Reference to the 'trackFullyLoaded' event listener
   isFullyLoaded?: boolean; // Added to indicate if the track is fully decoded
+  rawBuffer?: ArrayBuffer; // Raw buffer for tracks downloaded without decoding
 }
 
 // --- Configuration ---
@@ -717,11 +718,13 @@ async function downloadRemainingDataInBackground(
 }
 
 /* MAIN ------------------------------------------------------------------ */
-export async function loadTrack(trackId: string, transitionPoints?: number[], enableStreaming: boolean = true): Promise<boolean> {
+export async function loadTrack(trackId: string, transitionPoints?: number[], enableStreaming: boolean = true, justDownload: boolean = false): Promise<boolean> {
   /* 1 ▸ make sure AudioContext is alive ---------------------------- */
-  if (!audioContext && !(await initAudioContext())) {
-    console.error("loadTrack: AudioContext could not be initialized.");
-    return false;
+  if (!justDownload) {
+    if (!audioContext && !(await initAudioContext())) {
+      console.error("loadTrack: AudioContext could not be initialized.");
+      return false;
+    }
   }
 
   /* 2 ▸ cache hit? ------------------------------------------------- */
@@ -744,6 +747,12 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
     }
     console.log(`✅ Track '${trackId}' already loaded from cache (partially)`);
     return true;
+  }
+
+  // If we have a raw buffer (from justDownload), we need to decode it first
+  if (cached?.rawBuffer && !justDownload) {
+    console.log(`🔄 Track '${trackId}' has raw buffer, decoding...`);
+    return await decodeDownloadedTrack(trackId, transitionPoints);
   }
 
   // Check if track is currently being loaded to prevent duplicates
@@ -803,6 +812,14 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
     /* ── 4a metadata (ID3) ───────────────────────────────────────── */
     const { title, coverArtUrl: newCoverArtUrl } = await parseMetadataAndUpdate(arrayBuffer, trackId);
     coverArtUrl = newCoverArtUrl;
+
+    /* ── 4b just download mode ───────────────────────────────────── */
+    if (justDownload) {
+      // Store the raw array buffer for later decoding
+      tracks.set(trackId, { coverArtUrl: coverArtUrl || "", title, trackLength: 0, sourceNode: null, gainNode: null, rawBuffer: arrayBuffer, isFullyLoaded: false });
+      console.log(`✅ Downloaded '${trackId}' (${(arrayBuffer.byteLength / 1024 / 1024).toFixed(2)} MB) - ready for later decoding`);
+      return true;
+    }
 
     /* ── 4b streaming decode ─────────────────────────────────────── */
     if (enableStreaming && arrayBuffer.byteLength > STREAMING_FILE_SIZE_THRESHOLD) {
@@ -871,6 +888,53 @@ export async function loadTrack(trackId: string, transitionPoints?: number[], en
     cleanupTrackState(trackId);
     return false;
   }
+}
+
+/**
+ * Decode a track that was previously downloaded with justDownload: true
+ * This function will decode the raw buffer and update the track state
+ */
+export async function decodeDownloadedTrack(trackId: string, transitionPoints?: number[]): Promise<boolean> {
+  const trackState = tracks.get(trackId);
+  if (!trackState?.rawBuffer) {
+    console.error(`No raw buffer found for track '${trackId}'`);
+    return false;
+  }
+
+  if (!audioContext && !(await initAudioContext())) {
+    console.error("decodeDownloadedTrack: AudioContext could not be initialized.");
+    return false;
+  }
+
+  try {
+    // Parse metadata from the raw buffer
+    const { title, coverArtUrl } = await parseMetadataAndUpdate(trackState.rawBuffer, trackId);
+
+    // Decode the audio data
+    const audioBuffer = await audioContext!.decodeAudioData(trackState.rawBuffer);
+
+    // Update the track state with the decoded buffer
+    const updatedTrackState = createTrackState(audioBuffer, { title, coverArtUrl: coverArtUrl || trackState.coverArtUrl, transitionPoints });
+
+    // Remove the raw buffer since we no longer need it
+    delete updatedTrackState.rawBuffer;
+
+    tracks.set(trackId, updatedTrackState);
+
+    console.log(`✅ Decoded downloaded track '${trackId}' – ${audioBuffer.duration.toFixed(2)} s` + (transitionPoints ? ` | transitions: ${transitionPoints.join(", ")}` : ""));
+    return true;
+  } catch (e) {
+    console.error(`❌ Decode error for downloaded track '${trackId}':`, e);
+    return false;
+  }
+}
+
+/**
+ * Check if a track has been downloaded but not yet decoded
+ */
+export function isTrackDownloaded(trackId: string): boolean {
+  const trackState = tracks.get(trackId);
+  return !!(trackState?.rawBuffer && !trackState.audioBuffer);
 }
 
 function playTrack(trackId: string, startTime: number = 0, offset: number = 0, skipStopInternal: boolean = false, initialGain: number = 1.0): boolean {

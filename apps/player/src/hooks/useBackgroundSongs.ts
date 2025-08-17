@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { dealWithBackgroundSongs as impl, preloadBackgroundTracks } from "@player/deal-with-background-songs";
+import { dealWithBackgroundSongs as impl, preloadBackgroundTracks, preloadCurrentTrack } from "@player/deal-with-background-songs";
 import { useLocationRange } from "./useLocationRange";
 import useSplashHidden from "./useSplashHidden";
 import { useIsAppReady } from "./useIsAppReady";
@@ -39,6 +39,12 @@ export function useBackgroundSongs() {
     return () => {
       window.removeEventListener("trackFullyLoaded", handleTrackFullyLoaded);
     };
+  }, [isAppReady]);
+
+  useEffect(() => {
+    if (!isAppReady) return;
+    console.log("PINGWING, preloadCurrentTrack");
+    preloadCurrentTrack();
   }, [isAppReady]);
 
   useEffect(() => {
