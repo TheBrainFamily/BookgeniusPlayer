@@ -1,7 +1,8 @@
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
 import * as crypto from "crypto";
-import type { StreamingBlobPayloadOutputTypes } from "@smithy/types";
+import type { StreamingBlobPayloadOutputTypes, SdkStreamMixin } from "@smithy/types";
+import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 
 const s3 = new S3Client({});
 const sm = new SecretsManagerClient({});
@@ -15,21 +16,17 @@ function hostToBranch(host?: string): string | undefined {
   if (/^pr-/.test(first)) return first;
 }
 
-async function streamToString(stream: any): Promise<string> {
-  return await new Promise((resolve, reject) => {
-    let data = "";
-    stream.setEncoding("utf-8");
-    stream.on("data", (c: string) => (data += c));
-    stream.on("end", () => resolve(data));
-    stream.on("error", reject);
-  });
-}
-
 async function getVersions(ctx: string): Promise<Record<string, string> | null> {
   try {
     const out = await s3.send(new GetObjectCommand({ Bucket: BUCKET!, Key: `${ctx}/versions.json` }));
     if (!out.Body) return null;
-    const txt = await streamToString(out.Body);
+
+    // Body in AWS SDK v3 has the SdkStreamMixin at runtime; cast to use it in TS:
+    const body = out.Body as StreamingBlobPayloadOutputTypes & SdkStreamMixin;
+
+    // Preferred: works in Lambda Node 18/20, browser, etc.
+    const txt = await body.transformToString("utf-8");
+
     return JSON.parse(txt);
   } catch {
     return null;
@@ -48,7 +45,7 @@ function signPolicy(policyJson: string, privateKeyPem: string) {
   return signer.sign(privateKeyPem, "base64").replace(/\+/g, "-").replace(/=/g, "_").replace(/\//g, "~");
 }
 
-export const handler = async (event: any) => {
+export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   try {
     const slug = decodeURIComponent(event.pathParameters?.slug || "");
     if (!slug) return res(400, { error: "slug required" });
@@ -57,8 +54,11 @@ export const handler = async (event: any) => {
     let ctx: string | undefined = qs.ctx; // "prod" or "branches/<branch>"
 
     if (!ctx) {
-      const host = event.headers?.host || event.headers?.Host;
-      const branch = hostToBranch(host);
+        const host =
+            event.requestContext.domainName ??
+            event.headers['host'] ??
+            event.headers['Host'];
+        const branch = hostToBranch(host);
       ctx = branch ? `${VERSIONS_ROOT}/${branch}` : DEFAULT_CTX;
     }
 
