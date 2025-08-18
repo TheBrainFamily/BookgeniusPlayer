@@ -1,0 +1,286 @@
+import * as fs from "fs";
+import * as path from "path";
+import {
+    Stack, StackProps, Duration, RemovalPolicy, CfnOutput,
+    aws_s3 as s3,
+    aws_cloudfront as cf,
+    aws_cloudfront_origins as origins,
+    aws_iam as iam,
+    aws_route53 as route53,
+    aws_route53_targets as targets,
+    aws_certificatemanager as acm,
+    aws_apigateway as apigw,
+    aws_lambda_nodejs as lnode,
+    aws_lambda as lambda
+} from "aws-cdk-lib";
+import {Construct} from "constructs";
+
+export interface WebStackProps extends StackProps {
+    domainProd: string;
+    domainStage?: string;
+    publicKeyFilePath: string;
+    cfPrivateKeySecretName: string;
+    tokenTtlSeconds: number;
+}
+
+export class WebStack extends Stack {
+    constructor(scope: Construct, id: string, props: WebStackProps) {
+        super(scope, id, props);
+
+        // ===== Hosted Zones =====
+        const zoneProd = route53.HostedZone.fromLookup(this, "ZoneProd", {domainName: props.domainProd});
+        const zoneStage = props.domainStage
+            ? route53.HostedZone.fromLookup(this, "ZoneStage", {domainName: props.domainStage})
+            : undefined;
+
+        // ===== Certificates (us-east-1) =====
+        const certAppProd = new acm.DnsValidatedCertificate(this, "AppCertProd", {
+            domainName: props.domainProd,
+            subjectAlternativeNames: [`*.${props.domainProd}`],
+            hostedZone: zoneProd,
+            region: "us-east-1"
+        });
+        const certCdn = new acm.DnsValidatedCertificate(this, "CdnCert", {
+            domainName: `cdn.${props.domainProd}`,
+            hostedZone: zoneProd,
+            region: "us-east-1"
+        });
+        const certApiProd = new acm.DnsValidatedCertificate(this, "ApiCertProd", {
+            domainName: `api.${props.domainProd}`,
+            hostedZone: zoneProd,
+            region: "us-east-1"
+        });
+
+        const certAppStage = zoneStage ? new acm.DnsValidatedCertificate(this, "AppCertStage", {
+            domainName: props.domainStage!,
+            subjectAlternativeNames: [`*.${props.domainStage}`],
+            hostedZone: zoneStage,
+            region: "us-east-1"
+        }) : undefined;
+
+        const certApiStage = zoneStage ? new acm.DnsValidatedCertificate(this, "ApiCertStage", {
+            domainName: `api.${props.domainStage}`,
+            hostedZone: zoneStage,
+            region: "us-east-1"
+        }) : undefined;
+
+        // ===== S3 bucket (private) =====
+        const bucket = new s3.Bucket(this, "ContentBucket", {
+            blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+            encryption: s3.BucketEncryption.S3_MANAGED,
+            enforceSSL: true,
+            removalPolicy: RemovalPolicy.RETAIN
+        });
+
+        // OAIs
+        const oaiAppProd = new cf.OriginAccessIdentity(this, "OaiAppProd");
+        const oaiCdn = new cf.OriginAccessIdentity(this, "OaiCdn");
+        const oaiAppStage = zoneStage ? new cf.OriginAccessIdentity(this, "OaiAppStage") : undefined;
+
+        bucket.addToResourcePolicy(new iam.PolicyStatement({
+            actions: ["s3:GetObject"],
+            resources: [bucket.arnForObjects("*")],
+            principals: [new iam.CanonicalUserPrincipal(oaiAppProd.cloudFrontOriginAccessIdentityS3CanonicalUserId)]
+        }));
+        bucket.addToResourcePolicy(new iam.PolicyStatement({
+            actions: ["s3:GetObject"],
+            resources: [bucket.arnForObjects("*")],
+            principals: [new iam.CanonicalUserPrincipal(oaiCdn.cloudFrontOriginAccessIdentityS3CanonicalUserId)]
+        }));
+        if (oaiAppStage) {
+            bucket.addToResourcePolicy(new iam.PolicyStatement({
+                actions: ["s3:GetObject"],
+                resources: [bucket.arnForObjects("*")],
+                principals: [new iam.CanonicalUserPrincipal(oaiAppStage.cloudFrontOriginAccessIdentityS3CanonicalUserId)]
+            }));
+        }
+
+        // ===== CloudFront Function: Router (loaded from file, compiled to JS) =====
+        const routerFn = new cf.Function(this, "RouterFn", {
+            code: cf.FunctionCode.fromFile({filePath: path.resolve("dist/runtime/router-fn.js")}),
+            runtime: cf.FunctionRuntime.JS_2_0                 // <— modern features enabled
+        });
+
+        // ===== App Distribution (PROD) =====
+        const appDistProd = new cf.Distribution(this, "AppDistProd", {
+            defaultBehavior: {
+                origin: new origins.S3Origin(bucket, {originAccessIdentity: oaiAppProd}),
+                viewerProtocolPolicy: cf.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                functionAssociations: [{function: routerFn, eventType: cf.FunctionEventType.VIEWER_REQUEST}]
+            },
+            priceClass: cf.PriceClass.PRICE_CLASS_100,
+            domainNames: [props.domainProd, `*.${props.domainProd}`],
+            certificate: certAppProd
+        });
+
+        // DNS for PROD app
+        new route53.ARecord(this, "ApexProd", {
+            zone: zoneProd, recordName: props.domainProd,
+            target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(appDistProd))
+        });
+        new route53.ARecord(this, "WildcardProd", {
+            zone: zoneProd, recordName: `*.${props.domainProd}`,
+            target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(appDistProd))
+        });
+
+        // ===== App Distribution (STAGE, optional) =====
+        let appDistStage: cf.Distribution | undefined;
+        if (zoneStage && certAppStage && oaiAppStage) {
+            appDistStage = new cf.Distribution(this, "AppDistStage", {
+                defaultBehavior: {
+                    origin: new origins.S3Origin(bucket, {originAccessIdentity: oaiAppStage}),
+                    viewerProtocolPolicy: cf.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                    functionAssociations: [{function: routerFn, eventType: cf.FunctionEventType.VIEWER_REQUEST}]
+                },
+                priceClass: cf.PriceClass.PRICE_CLASS_100,
+                domainNames: [props.domainStage!, `*.${props.domainStage}`],
+                certificate: certAppStage
+            });
+
+            new route53.ARecord(this, "ApexStage", {
+                zone: zoneStage, recordName: props.domainStage!,
+                target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(appDistStage))
+            });
+            new route53.ARecord(this, "WildcardStage", {
+                zone: zoneStage, recordName: `*.${props.domainStage}`,
+                target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(appDistStage))
+            });
+        }
+
+        // ===== CDN for book assets (Signed URLs; tokens ignored in cache key) =====
+        const pubPem = fs.readFileSync(path.resolve("cf-public-key.pem"), "utf8");
+        const publicKey = new cf.PublicKey(this, "CfPublicKey", {encodedKey: pubPem});
+        const keyGroup = new cf.KeyGroup(this, "CfKeyGroup", {items: [publicKey]});
+
+        const longCacheNoQs = new cf.CachePolicy(this, "LongCacheNoQs", {
+            defaultTtl: Duration.days(365),
+            maxTtl: Duration.days(365),
+            minTtl: Duration.days(1),
+            cookieBehavior: cf.CacheCookieBehavior.none(),
+            headerBehavior: cf.CacheHeaderBehavior.none(),
+            queryStringBehavior: cf.CacheQueryStringBehavior.none(), // IMPORTANT
+            enableAcceptEncodingBrotli: true,
+            enableAcceptEncodingGzip: true
+        });
+
+        const noQsToOrigin = new cf.OriginRequestPolicy(this, "NoQsToOrigin", {
+            queryStringBehavior: cf.OriginRequestQueryStringBehavior.none(),
+            cookieBehavior: cf.OriginRequestCookieBehavior.none(),
+            headerBehavior: cf.OriginRequestHeaderBehavior.none()
+        });
+
+        // CORS for module/script/image fetches from CDN
+        const corsPolicy = new cf.ResponseHeadersPolicy(this, "CdnCors", {
+            corsBehavior: {
+                accessControlAllowCredentials: false,
+                accessControlAllowHeaders: ["*"],
+                accessControlAllowMethods: ["GET", "HEAD", "OPTIONS"],
+                accessControlAllowOrigins: ["*"],
+                accessControlExposeHeaders: ["Content-Length", "Content-Type", "ETag"],
+                originOverride: true
+            }
+        });
+
+        const cdnDist = new cf.Distribution(this, "CdnDist", {
+            defaultBehavior: {
+                origin: new origins.S3Origin(bucket, {originAccessIdentity: oaiCdn}),
+                viewerProtocolPolicy: cf.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                trustedKeyGroups: [keyGroup],
+                cachePolicy: longCacheNoQs,
+                originRequestPolicy: noQsToOrigin,
+                responseHeadersPolicy: corsPolicy
+            },
+            priceClass: cf.PriceClass.PRICE_CLASS_100,
+            domainNames: [`cdn.${props.domainProd}`],
+            certificate: certCdn
+        });
+
+        new route53.ARecord(this, "CdnAlias", {
+            zone: zoneProd, recordName: `cdn.${props.domainProd}`,
+            target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(cdnDist))
+        });
+
+        // ===== /resolve Lambda + APIs (prod + optional stage) =====
+        const resolveFn = new lnode.NodejsFunction(this, "ResolveFn", {
+            entry: path.resolve("dist/runtime/resolve-lambda.js"),
+            runtime: lambda.Runtime.NODEJS_20_X,
+            memorySize: 512,
+            timeout: Duration.seconds(10),
+            environment: {
+                BUCKET: bucket.bucketName,
+                DEFAULT_CTX: "prod",
+                VERSIONS_ROOT: "branches",
+                CDN_DOMAIN: `cdn.${props.domainProd}`,
+                TOKEN_TTL_SECONDS: String(props.tokenTtlSeconds),
+                CF_PRIVATE_KEY_SECRET_NAME: props.cfPrivateKeySecretName
+            }
+        });
+
+        bucket.grantRead(resolveFn,
+            bucket.arnForObjects("prod/versions.json"),
+        );
+        bucket.grantRead(resolveFn,
+            bucket.arnForObjects("branches/*/versions.json")
+        );
+        resolveFn.addToRolePolicy(new iam.PolicyStatement({
+            actions: ["secretsmanager:GetSecretValue"],
+            resources: ["*"] // tighten to that secret ARN later
+        }));
+
+        const apiProd = new apigw.RestApi(this, "CoreApiProd", {
+            restApiName: "core-api-prod",
+            defaultCorsPreflightOptions: {
+                allowOrigins: apigw.Cors.ALL_ORIGINS,
+                allowMethods: ["GET", "OPTIONS"]
+            },
+            deployOptions: {stageName: "prod"},
+            domainName: {
+                domainName: `api.${props.domainProd}`,
+                certificate: certApiProd,
+                endpointType: apigw.EndpointType.EDGE,
+                securityPolicy: apigw.SecurityPolicy.TLS_1_2
+            }
+        });
+        const contentProd = apiProd.root.addResource("content");
+        contentProd.addResource("resolve").addResource("{slug}")
+            .addMethod("GET", new apigw.LambdaIntegration(resolveFn));
+
+        new route53.ARecord(this, "ApiProdAlias", {
+            zone: zoneProd, recordName: `api.${props.domainProd}`,
+            target: route53.RecordTarget.fromAlias(new targets.ApiGateway(apiProd))
+        });
+
+        if (zoneStage && certApiStage) {
+            const apiStage = new apigw.RestApi(this, "CoreApiStage", {
+                restApiName: "core-api-stage",
+                defaultCorsPreflightOptions: {
+                    allowOrigins: apigw.Cors.ALL_ORIGINS,
+                    allowMethods: ["GET", "OPTIONS"]
+                },
+                deployOptions: {stageName: "prod"},
+                domainName: {
+                    domainName: `api.${props.domainStage}`,
+                    certificate: certApiStage,
+                    endpointType: apigw.EndpointType.EDGE,
+                    securityPolicy: apigw.SecurityPolicy.TLS_1_2
+                }
+            });
+            const contentStage = apiStage.root.addResource("content");
+            contentStage.addResource("resolve").addResource("{slug}")
+                .addMethod("GET", new apigw.LambdaIntegration(resolveFn));
+
+            new route53.ARecord(this, "ApiStageAlias", {
+                zone: zoneStage, recordName: `api.${props.domainStage}`,
+                target: route53.RecordTarget.fromAlias(new targets.ApiGateway(apiStage))
+            });
+        }
+
+        // ===== Outputs =====
+        new CfnOutput(this, "BucketName", {value: bucket.bucketName});
+        new CfnOutput(this, "AppProdDomain", {value: props.domainProd});
+        if (props.domainStage) new CfnOutput(this, "AppStageDomain", {value: props.domainStage});
+        new CfnOutput(this, "CdnDomain", {value: `cdn.${props.domainProd}`});
+        new CfnOutput(this, "ApiProd", {value: `api.${props.domainProd}`});
+        if (props.domainStage) new CfnOutput(this, "ApiStage", {value: `api.${props.domainStage}`});
+    }
+}

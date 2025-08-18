@@ -1,0 +1,25 @@
+{
+  "name": "infra",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p . && tsc -p runtime/tsconfig.router.json",
+    "cdk": "cdk",
+    "deploy": "pnpm build && cdk deploy --all",
+    "diff": "pnpm build && cdk diff",
+    "synth": "pnpm build && cdk synth"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.152.0",
+    "constructs": "^10.3.0"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-s3": "^3.864.0",
+    "@aws-sdk/client-secrets-manager": "^3.864.0",
+    "@aws-sdk/types": "^3.862.0",
+    "@smithy/types": "^4.3.2",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.5"
+  }
+}

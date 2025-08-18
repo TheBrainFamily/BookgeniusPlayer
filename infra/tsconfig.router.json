@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "none",
+    "removeComments": true,
+    "outDir": "../dist-cff"
+  },
+  "include": [
+    "runtime/router-fn.ts"
+  ]
+}
