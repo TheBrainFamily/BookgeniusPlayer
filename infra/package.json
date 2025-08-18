@@ -19,6 +19,7 @@
     "@aws-sdk/client-secrets-manager": "^3.864.0",
     "@aws-sdk/types": "^3.862.0",
     "@smithy/types": "^4.3.2",
+    "@types/aws-lambda": "^8.10.152",
     "@types/node": "^20.11.0",
     "typescript": "^5.4.5"
   }
