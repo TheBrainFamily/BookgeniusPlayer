@@ -224,7 +224,7 @@
     width: 8px;
   }
   #platform-scope ::-webkit-scrollbar-track {
-    background: var(--muted);
+    background: var(--color-muted);
   }
   #platform-scope ::-webkit-scrollbar-thumb {
     background: hsl(45 70% 55% / 0.6);
