@@ -1,0 +1,8 @@
+// Loads ONLY when the player route is actually used (or when we prefetch it)
+import "../../../player/src/styles/styles.css";
+import "../../../player/src/styles/modals.css";
+import "../../../player/src/styles/inline-avatars.css";
+import "../../../player/src/i18n";
+
+import App from "../../../player/src/App";
+export default App;

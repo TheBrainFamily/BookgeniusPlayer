@@ -15,6 +15,7 @@ apps/player/public_books/*/getBookStringified.ts
 apps/player/public_books/*/getCharactersData.ts
 apps/player/public_books/*/getKnownVideoFiles.ts
 apps/player/public_books/*/getAllVariants.ts
+apps/player/public_books/*/book.xml
 .env
 build/
 gateway.zip

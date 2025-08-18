@@ -1,9 +1,9 @@
 // Service to dynamically load book data at runtime
 import type { BookData, BackgroundForBook, BackgroundSongSection, CutSceneForBook, CharacterData, AudiobookTracksSection } from "@player/types/book";
 import type { Variant } from "@player/genericBookDataGetters/getAllVariants";
-import { getBookDataUrl } from "@player/utils/assetUrls";
+import { getBookDataModuleUrl } from "@player/utils/getbookDataModuleUrl";
 
-async function importPublicModule(moduleUrl) {
+async function importPublicModule(moduleUrl: string) {
   try {
     const response = await fetch(moduleUrl);
     if (!response.ok) {
@@ -11,7 +11,7 @@ async function importPublicModule(moduleUrl) {
     }
     const text = await response.text();
     const dataUrl = `data:application/javascript;charset=utf-8,${encodeURIComponent(text)}`;
-    return await import(dataUrl);
+    return await import(/* @vite-ignore */ dataUrl);
   } catch (error) {
     console.error("Error importing public module:", error);
     throw error;
@@ -21,6 +21,12 @@ async function importPublicModule(moduleUrl) {
 class BookDataLoader {
   private static instance: BookDataLoader;
   private currentBook: string | null = null;
+
+  // New: split asset base into prefix + tokenQuery for clarity and safe composition
+  // assetPrefix example: "https://cdn.example.com/staging/pr-394-notimestamp/assets/books/1984/v2025..."
+  // assetQuery example: "expires=...&token=...&token_path=%2Fstaging%2F..."
+  private assetPrefix: string | null = null;
+  private assetQuery: string | null = null;
 
   private constructor() {}
 
@@ -49,21 +55,77 @@ class BookDataLoader {
     return book;
   }
 
+  setCurrentBook(slug: string) {
+    this.currentBook = slug;
+  }
+
+  /**
+   * Set asset base.
+   *
+   * Two forms:
+   *  - setAssetBase(null) -> clears
+   *  - setAssetBase(fullUrl) -> parses and splits into prefix + query
+   *  - setAssetBase(prefix, query) -> explicit set
+   *
+   * prefix must not contain a trailing slash (we normalize).
+   * query should be raw (no leading '?').
+   */
+  setAssetBase(prefixOrFull: string | null, query?: string | null) {
+    if (!prefixOrFull) {
+      this.assetPrefix = null;
+      this.assetQuery = null;
+      console.debug("[bookDataLoader] cleared asset base");
+      return;
+    }
+
+    // if caller passed a (prefix, query) explicitly
+    if (typeof query === "string") {
+      this.assetPrefix = (prefixOrFull || "").replace(/\/+$/, "");
+      this.assetQuery = query ? query.replace(/^\?/, "") : null;
+      console.debug("[bookDataLoader] assetPrefix set (explicit)", this.assetPrefix, this.assetQuery);
+      return;
+    }
+
+    // otherwise we got a full URL maybe containing query params -> parse
+    try {
+      const u = new URL(prefixOrFull);
+      const prefixNoSlash = u.origin + u.pathname.replace(/\/+$/, "");
+      // u.search starts with '?', strip it
+      const q = u.search ? u.search.replace(/^\?/, "") : null;
+      this.assetPrefix = prefixNoSlash;
+      this.assetQuery = q;
+      console.debug("[bookDataLoader] assetPrefix set (parsed)", this.assetPrefix, this.assetQuery);
+    } catch (err) {
+      // fallback: treat whole value as prefix (no query)
+      this.assetPrefix = prefixOrFull.replace(/\/+$/, "");
+      this.assetQuery = null;
+      console.debug("[bookDataLoader] assetPrefix set (fallback)", this.assetPrefix);
+    }
+  }
+
+  getAssetPrefix(): string | null {
+    return this.assetPrefix;
+  }
+
+  getAssetQuery(): string | null {
+    return this.assetQuery;
+  }
+
   // Generic loader for any book data file
   async loadBookDataFile<T>(fileName: string): Promise<T> {
     const book = this.getCurrentBook();
 
     try {
-      // Always load fresh with cache busting
+      // Always load fresh in dev (cache-busting)
       const timestamp = Date.now();
-      // Use importPublicModule in vite dev, otherwise use dynamic import
-      // console.log("Loading module:", moduleUrl);
       let module;
       if (import.meta.env && import.meta.env.DEV) {
-        console.log("Loading module:", `${getBookDataUrl(fileName)}.js?t=${timestamp}`);
-        module = await importPublicModule(`${getBookDataUrl(fileName)}.js?t=${timestamp}`);
+        const moduleUrl = getBookDataModuleUrl(fileName, timestamp);
+        console.log("Loading module (dev):", moduleUrl);
+        module = await importPublicModule(moduleUrl);
       } else {
-        module = await import(/* @vite-ignore */ `${getBookDataUrl(fileName)}.js`);
+        const moduleUrl = getBookDataModuleUrl(fileName, null);
+        module = await import(/* @vite-ignore */ moduleUrl);
       }
 
       // Extract the default export or the named export matching the file name
@@ -126,6 +188,8 @@ class BookDataLoader {
   // Reset current book (useful for switching books)
   resetCurrentBook(): void {
     this.currentBook = null;
+    this.assetPrefix = null;
+    this.assetQuery = null;
   }
 }
 

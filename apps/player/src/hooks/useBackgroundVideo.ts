@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 import { useLocation } from "@player/state/LocationContext";
 import { dealWithBackground as impl } from "@player/ui/background";
+import { preloadBackgrounds } from "@player/preloadBackgrounds";
 
 const implRef = { current: impl };
 
@@ -16,7 +17,17 @@ export function useBackgroundVideo() {
   const { location } = useLocation();
 
   const { currentChapter, currentParagraph } = location;
+  // For handling the current background
   useEffect(() => {
     implRef.current(location);
   }, [currentChapter, currentParagraph]);
+
+  // For preloading future backgrounds
+  useEffect(() => {
+    preloadBackgrounds()
+      .then(() => {
+        console.log("Preloaded backgrounds");
+      })
+      .catch((error) => console.error("Failed to preload backgrounds:", error));
+  }, [currentChapter]);
 }

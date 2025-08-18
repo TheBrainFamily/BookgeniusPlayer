@@ -4,6 +4,7 @@ import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from
 import { bookDataLoader } from "@player/services/bookDataLoader";
 import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
 import debounce from "lodash.debounce";
+import { isVideoFile } from "@player/helpers/isVideoFile";
 
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
@@ -118,19 +119,42 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 /**
  * Normalizes the src to always be PNG and removes "speaks" or "listens" suffixes
  */
-function normalizeSrcForInlineAvatar(src: string): string {
+export function normalizeSrcForInlineAvatar(src: string): string {
   if (!src) return src;
 
-  // Remove "-speaks" or "-listens" (including the dash) that appears before the file extension
-  let normalizedSrc = src.replace(/-(speaks|listens)(?=\.|$)/, "");
+  // Preserve query/hash separately so we don't mangle them
+  let pathPart = src;
+  let query = "";
+  let hash = "";
 
-  // Ensure it ends with .png
-  if (!normalizedSrc.endsWith(".png")) {
-    // Remove any existing extension and add .png
-    normalizedSrc = normalizedSrc.replace(/\.[^.]*$/, "") + ".png";
+  const hashIdx = src.indexOf("#");
+  if (hashIdx !== -1) {
+    hash = src.slice(hashIdx);
+    pathPart = src.slice(0, hashIdx);
   }
 
-  return normalizedSrc;
+  const qIdx = pathPart.indexOf("?");
+  if (qIdx !== -1) {
+    query = pathPart.slice(qIdx);
+    pathPart = pathPart.slice(0, qIdx);
+  }
+
+  // Split directory + filename
+  const lastSlash = pathPart.lastIndexOf("/");
+  const dir = lastSlash >= 0 ? pathPart.slice(0, lastSlash + 1) : "";
+  let file = lastSlash >= 0 ? pathPart.slice(lastSlash + 1) : pathPart;
+
+  // Remove "-speaks" or "-listens" only when they appear immediately before the final extension or at end
+  file = file.replace(/-(speaks|listens)(?=(\.[^.\/]+$|$))/i, "");
+
+  // Replace final extension with .png, or add .png if none
+  if (/\.[^.\/]+$/.test(file)) {
+    file = file.replace(/\.[^.\/]+$/, ".png");
+  } else {
+    file = `${file}.png`;
+  }
+
+  return `${dir}${file}${query}${hash}`;
 }
 
 /**
@@ -178,7 +202,7 @@ function createMediaElement(
   placeholderImg.alt = characterSlug;
   container.appendChild(placeholderImg);
 
-  if (isPlayFormat && listeningSrc && listeningSrc.endsWith(".mp4")) {
+  if (isPlayFormat && listeningSrc && isVideoFile(listeningSrc)) {
     // Create listening video
     const listeningVideo = document.createElement("video");
     listeningVideo.src = listeningSrc;
@@ -194,7 +218,7 @@ function createMediaElement(
     container.appendChild(listeningVideo);
 
     // Create speaking video if available
-    if (talkingSrc && talkingSrc.endsWith(".mp4")) {
+    if (talkingSrc && isVideoFile(talkingSrc)) {
       const speakingVideo = document.createElement("video");
       speakingVideo.src = talkingSrc;
       speakingVideo.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
@@ -218,7 +242,7 @@ function createMediaElement(
       listeningVideo.style.display = "none";
     };
 
-    if (talkingSrc && talkingSrc.endsWith(".mp4")) {
+    if (talkingSrc && isVideoFile(talkingSrc)) {
       const speakingVideo = container.querySelector('video[data-state="speaks"]') as HTMLVideoElement;
       if (speakingVideo) {
         speakingVideo.onerror = () => {
@@ -239,7 +263,7 @@ function createMediaElement(
     const currentIsTalking = placeholder.dataset.isTalking === "true";
     const videoSrc = currentIsTalking ? talkingSrc : listeningSrc;
 
-    openCharacterDetailsModal(characterSlug, !!videoSrc && videoSrc.endsWith(".mp4"), videoSrc || "");
+    openCharacterDetailsModal(characterSlug, !!videoSrc && isVideoFile(videoSrc), videoSrc || "");
   });
 
   return container;
@@ -267,7 +291,7 @@ export function highlightCharacter(character: HTMLSpanElement, openCharacterDeta
       document.body.removeChild(avatar);
     });
 
-    openCharacterDetailsModal(characterSlug, !!listeningSrc && listeningSrc.endsWith(".mp4"), listeningSrc);
+    openCharacterDetailsModal(characterSlug, !!listeningSrc && isVideoFile(listeningSrc), listeningSrc);
   });
 
   // Add hover functionality to show floating avatar
@@ -289,16 +313,16 @@ export function highlightCharacter(character: HTMLSpanElement, openCharacterDeta
       const normalizedSrc = normalizeSrcForInlineAvatar(listeningSrc);
 
       let mediaElement: HTMLVideoElement | HTMLImageElement;
-      if (normalizedSrc.toLowerCase().endsWith(".png")) {
-        // Create image element
-        mediaElement = document.createElement("img");
-      } else {
+      if (isVideoFile(normalizedSrc.toLowerCase())) {
         // Create video element
         mediaElement = document.createElement("video");
         mediaElement.autoplay = true;
         mediaElement.loop = true;
         mediaElement.muted = true;
         mediaElement.playsInline = true;
+      } else {
+        // Create image element
+        mediaElement = document.createElement("img");
       }
 
       mediaElement.src = normalizedSrc;

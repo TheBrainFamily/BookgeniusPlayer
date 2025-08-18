@@ -29,6 +29,8 @@
   "packageManager": "pnpm@10.13.1",
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
     "eslint": "^9.33.0",
     "globals": "^16.3.0",
     "husky": "^9.1.7",

@@ -1,59 +1,86 @@
-import "./player.css";
-import Player from "../../player/src/App";
-import "../../player/src/i18n";
-
-import { createPortal } from "react-dom";
-import { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState, Suspense } from "react";
 import { useSearchParams } from "react-router-dom";
-
 import { useRouteTransition } from "./providers/RouteTransitionProvider";
 import { bookDataLoader } from "../../player/src/services/bookDataLoader";
 
-export const WrappedApp = () => {
+const PlayerApp = React.lazy(() => import("./player/PlayerRoot"));
+
+const WrappedApp = () => {
   const [searchParams] = useSearchParams();
   const [isPlayerReady, setIsPlayerReady] = useState(false);
+  const [assetBaseReady, setAssetBaseReady] = useState(false);
   const { finishTransition } = useRouteTransition();
   const lastBookRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const handleMessage = () => {
+    const onReady = () => {
       setIsPlayerReady(true);
-      // Fade out the overlay (enforces min duration internally)
       finishTransition();
       window.dispatchEvent(new CustomEvent("splashHidden"));
     };
-    window.addEventListener("appReady", handleMessage);
-    return () => window.removeEventListener("appReady", handleMessage);
+    window.addEventListener("appReady", onReady);
+    return () => window.removeEventListener("appReady", onReady);
   }, [finishTransition]);
 
-  // Watch the `?book=` query param and reset the player loader if it changes
   useEffect(() => {
-    const bookFromQuery = searchParams.get("book");
-    if (bookFromQuery !== lastBookRef.current) {
-      lastBookRef.current = bookFromQuery;
+    const book = searchParams.get("book");
+    if (book !== lastBookRef.current) {
+      lastBookRef.current = book;
       bookDataLoader.resetCurrentBook();
+
+      if (!book) {
+        setAssetBaseReady(false);
+        return;
+      }
+      bookDataLoader.setCurrentBook(book);
+
+      let cancelled = false;
+      (async () => {
+        setAssetBaseReady(false);
+        try {
+          const res = await fetch(`/api/core/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
+          if (!res.ok) throw new Error("[RESOLVE] resolve failed");
+          const { signedAssetBase, assetPrefix, assetQuery } = await res.json();
+
+          // accept either shape; you already parse full URL in setAssetBase
+
+          if (cancelled) return;
+          bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
+          // optional warm HEAD for index.html to reduce first-media latency (fire-and-forget)
+          // try { fetch(`${assetBase}index.html`, { method: "HEAD", cache: "no-store" }); } catch (_) {}
+          setAssetBaseReady(true);
+        } catch (err: unknown) {
+          console.error("[RESOLVE] error:", err);
+          bookDataLoader.setAssetBase(null); // fallback to old API path
+          if (!cancelled) setAssetBaseReady(true);
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
     }
   }, [searchParams]);
 
   useEffect(() => {
-    if (isPlayerReady) {
-      document.body.id = "player-scope";
-    }
+    const bodyId = assetBaseReady ? "player-scope" : "platform-scope";
+    document.body.id = bodyId;
 
     return () => {
       document.body.id = "platform-scope";
     };
-  }, [isPlayerReady]);
+  }, [assetBaseReady]);
 
-  const mountNode = typeof document !== "undefined" ? document.getElementById("root-player") : null;
-  if (!mountNode) return null;
-
-  const ui = (
-    //TODO: Possibly we dont need to wrap with the div, I'm leaving it so the mechanism is here
-    <div className={`w-full h-full transition-opacity duration-500 ${!isPlayerReady ? "opacity-0" : "opacity-100"}`}>
-      <Player />
+  return (
+    <div className={`w-full h-full border-0 transition-opacity duration-500 ${!isPlayerReady ? "opacity-0" : "opacity-100"}`}>
+      {assetBaseReady ? (
+        <Suspense fallback={null /* overlay handles UX */}>
+          <PlayerApp />
+        </Suspense>
+      ) : null}
     </div>
   );
 
-  return createPortal(ui, mountNode);
+  // return createPortal(ui, mountNode);
 };
+
+export default WrappedApp;

@@ -41,7 +41,7 @@ services:
       - SNAPPLIFY_JWKS_URL=https://auth.snapplify.com/.well-known/jwks.json
       - SNAPPLIFY_ISSUER=https://snapplify.com
       - ASSET_CONTEXT=${ASSET_CONTEXT:-staging}
-
+      - CORE_BUNNY_TOKEN_KEY=${CORE_BUNNY_TOKEN_KEY}
 # Define named volumes to persist data
 volumes:
   caddy_data:

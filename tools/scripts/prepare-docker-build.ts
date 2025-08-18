@@ -57,7 +57,7 @@ async function prepareBuild() {
 
     // --- NEW: Versioning Logic ---
     // Generate a unique, timestamp-based version string for this build run.
-    const buildVersion = 'v' + new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15);
+    const buildVersion = "v" + new Date().toISOString().replace(/[-:.]/g, "").slice(0, 15);
     console.log(`\n--- Generated build version: ${buildVersion} ---`);
     const versionsManifest: Record<string, string> = {};
 
@@ -82,10 +82,9 @@ async function prepareBuild() {
     }
 
     // NEW: Write the versions.json file to the root of our S3 data.
-    const versionsFilePath = path.join(s3DataDir, 'versions.json');
+    const versionsFilePath = path.join(s3DataDir, "versions.json");
     await Bun.write(versionsFilePath, JSON.stringify(versionsManifest, null, 2));
     console.log(`[MANIFEST] Created versions manifest at: "${versionsFilePath}"`);
-
 
     console.log("\n--- Processing and copying application artifacts ---");
     for (const app of apps) {

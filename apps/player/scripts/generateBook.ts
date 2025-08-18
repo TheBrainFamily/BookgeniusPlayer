@@ -3,11 +3,10 @@ import path from "path";
 import { DOMParser, Document } from "@xmldom/xmldom";
 
 import { BookData } from "@player/types/book";
-import { getListeningMediaFilePathForName, getPictureFileNameForName, getTalkingMediaFilePathForName, setKnownVideos } from "@player/utils/getFilePathsForName";
+import { setKnownVideos } from "@player/utils/getFilePathsForName";
 import { generateDataFiles, xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterTags } from "./data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
-import { getBookAssetUrl } from "@player/utils/assetUrls";
 
 async function generateBook(bookDirectoryPath: string, bookOutputPath?: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
@@ -130,13 +129,7 @@ export function generateCharacterMetadata(xmlDoc: Document, bookString: string, 
   const updatedString = bookString.replaceAll(/<span id="ch\d+-p\d+-s\d+">(.*?)<\/span>/g, "$1").replaceAll(/<\/?em[^>]*>/g, "");
   const xmlDocWithoutSpans = parser.parseFromString(updatedString, "text/xml");
 
-  return extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm, bookSlug).map((character) => ({
-    ...character,
-    bookSlug,
-    imageUrl: getBookAssetUrl(getPictureFileNameForName(character.slug)),
-    listeningUrl: getListeningMediaFilePathForName(character.slug, bookSlug),
-    talkingUrl: getTalkingMediaFilePathForName(character.slug, bookSlug),
-  }));
+  return extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm, bookSlug).map((character) => ({ ...character, bookSlug }));
 }
 
 function generateBookDataFiles(bookDirectoryPath: string, metadata: ReturnType<typeof parseBookXmlData>["metadata"], xmlDoc: Document, bookString: string, bookOutputPath: string) {

@@ -11,9 +11,8 @@ import { useLocation } from "@player/state/LocationContext";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 
-const target = document.getElementById("left-notes");
-
 const CharacterNotesPanel = () => {
+  const target = document.getElementById("left-notes");
   const { locationRange } = useLocationRange();
   const isSplashHidden = useSplashHidden();
   const characterNotes = useCharacterNotes(locationRange, true, true);

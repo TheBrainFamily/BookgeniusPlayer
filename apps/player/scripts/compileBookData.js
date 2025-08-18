@@ -39,7 +39,7 @@ export const compileToJsForBook = (bookDir, destinationDir) => {
       content = content.replace(/^import\s+type\s+.*from\s*['"].*['"];?\s*$/gm, "");
 
       // Remove @player/ imports
-      content = content.replace(/^import\s+.*from\s*['"]@\/.*['"];?\s*$/gm, "");
+      content = content.replace(/^import\s+.*from\s*['"]@player\/.*['"];?\s*$/gm, "");
 
       // Transpile TypeScript to JavaScript
       const result = ts.transpileModule(content, { compilerOptions: { module: ts.ModuleKind.ES2020, target: ts.ScriptTarget.ES2020, removeComments: true } });

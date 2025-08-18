@@ -1,6 +1,8 @@
-import { getBookAssetBaseUrl } from "@player/utils/assetUrls";
+import { getBookAssetUrl } from "@player/utils/assetUrls";
 import { getBackgrounds } from "./getBackgrounds";
 import debounce from "lodash.debounce";
+import { getPreloadedElement } from "@player/preloadBackgrounds";
+import { getFileType, loadVideoAsHTMLElement } from "./backgroundUtils";
 
 export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number };
 
@@ -19,15 +21,6 @@ let transitionState: TransitionState = TransitionState.Idle;
 function cancelAllImageZoom(imgA: HTMLDivElement, imgB: HTMLDivElement) {
   imgA.classList.remove("zooming");
   imgB.classList.remove("zooming");
-}
-
-// ---- Helper Function --------------------------------------------------------
-function getFileType(filename: string): "video" | "image" | "unknown" {
-  const ext = filename.split(".").pop()?.toLowerCase();
-  if (!ext) return "unknown";
-  if (["mp4", "webm", "ogv"].includes(ext)) return "video";
-  if (["png", "jpg", "jpeg", "gif", "webp", "avif", "svg"].includes(ext)) return "image";
-  return "unknown";
 }
 
 // ---- Constants --------------------------------------------------------------
@@ -113,7 +106,7 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
           transitionState = TransitionState.Idle;
           return;
         }
-        const newSrc = `${getBookAssetBaseUrl()}/${newFile}`;
+        const newSrc = getBookAssetUrl(newFile);
 
         const curType = legacy.dataset.type as "video" | "image";
         const curFrontId = legacy.dataset.front as "a" | "b";
@@ -132,8 +125,17 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
         let prep: Promise<void> = Promise.resolve();
         if (newType === "video") {
           const vid = nextBack as HTMLVideoElement;
-          vid.src = newSrc;
-          vid.load();
+          const preloadedElement = getPreloadedElement(newFile);
+
+          if (preloadedElement instanceof HTMLVideoElement && preloadedElement.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+            // Use preloaded video data by copying to target element
+            vid.src = preloadedElement.src;
+            vid.currentTime = 0;
+            console.log("Using preloaded video:", newFile);
+          } else {
+            // Fallback to normal loading
+            loadVideoAsHTMLElement(vid, newSrc);
+          }
           prep = vid
             .play()
             .then(() => new Promise<void>((ok) => vid.requestVideoFrameCallback(() => ok())))
@@ -143,7 +145,16 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
             });
         } else {
           const img = nextBack as HTMLDivElement;
-          img.style.backgroundImage = `url('${newSrc}')`;
+          const preloadedElement = getPreloadedElement(newFile);
+
+          if (preloadedElement instanceof HTMLDivElement) {
+            // Use preloaded image data by copying backgroundImage
+            img.style.backgroundImage = preloadedElement.style.backgroundImage;
+            console.log("Using preloaded image:", newFile);
+          } else {
+            // Fallback to normal loading
+            img.style.backgroundImage = `url('${newSrc}')`;
+          }
           img.classList.add("zooming");
         }
 

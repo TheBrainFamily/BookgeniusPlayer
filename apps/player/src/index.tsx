@@ -3,8 +3,8 @@ import { createRoot } from "react-dom/client";
 
 import "./styles/index.css";
 
-import App from "./App";
 import "./i18n";
+import { AppWithResolve } from "@player/AppWithResolve";
 
 let container = document.getElementById("root-player");
 
@@ -15,7 +15,7 @@ if (!container) {
     if (container) {
       createRoot(container).render(
         <React.StrictMode>
-          <App />
+          <AppWithResolve />
         </React.StrictMode>,
       );
     } else {
@@ -25,7 +25,7 @@ if (!container) {
         if (container) {
           createRoot(container).render(
             <React.StrictMode>
-              <App />
+              <AppWithResolve />
             </React.StrictMode>,
           );
         } else {
@@ -37,7 +37,7 @@ if (!container) {
 } else {
   createRoot(container).render(
     <React.StrictMode>
-      <App />
+      <AppWithResolve />
     </React.StrictMode>,
   );
 }

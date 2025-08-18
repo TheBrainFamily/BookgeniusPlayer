@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useMemo, useState, useEffect } from "react";
-import { __setLocationBridge, parseLocationFromHash } from "@player/helpers/paragraphsNavigation";
+import { __setLocationBridge, parseLocationFromHash, getSavedLocation } from "@player/helpers/paragraphsNavigation";
 
 /* ------------------------------------------------------------------ */
 export interface Location {
@@ -24,8 +24,7 @@ export const DEFAULT_LOCATION: Location = { chapter: 1, paragraph: 0, endChapter
 /*  Load the *initial* reader position from LS — nothing more         */
 const loadFromLS = (): Location => {
   try {
-    const raw = localStorage.getItem("furthestLocation");
-    return raw ? JSON.parse(raw) : DEFAULT_LOCATION;
+    return getSavedLocation() || DEFAULT_LOCATION;
   } catch {
     return DEFAULT_LOCATION;
   }
