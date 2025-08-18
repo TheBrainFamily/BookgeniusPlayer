@@ -31,11 +31,14 @@ function handler(event: CloudFrontFunctionsEvent): CloudFrontFunctionsResult {
   const req = event.request;
   const host: string = (req.headers && req.headers.host && req.headers.host.value) || "";
   const qs: Record<string, { value: string }> = req.querystring || {};
-  let uri: string = req.uri || "/";
+  const uri: string = req.uri || "/";
 
   // 🔒 Do not rewrite API calls — let CF path behavior route them to API Gateway
   if (uri.startsWith("/api/")) {
-    // remove '/api' prefix so origin receives '/content/resolve/...' instead of '/api/content/...'
+    // preserve viewer host for branch detection downstream
+    req.headers = req.headers || {};
+    req.headers["x-viewer-host"] = { value: host };
+    // strip prefix for the origin
     req.uri = uri.replace(/^\/api/, "") || "/";
     return req;
   }

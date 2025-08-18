@@ -2,8 +2,10 @@ function handler(event) {
     const req = event.request;
     const host = (req.headers && req.headers.host && req.headers.host.value) || "";
     const qs = req.querystring || {};
-    let uri = req.uri || "/";
+    const uri = req.uri || "/";
     if (uri.startsWith("/api/")) {
+        req.headers = req.headers || {};
+        req.headers["x-viewer-host"] = { value: host };
         req.uri = uri.replace(/^\/api/, "") || "/";
         return req;
     }

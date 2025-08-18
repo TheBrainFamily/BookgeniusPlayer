@@ -4,10 +4,18 @@ import type { StreamingBlobPayloadOutputTypes, SdkStreamMixin } from "@smithy/ty
 import type { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 import { verifyClerkToken } from "./helpers/clerk.strategy.js";
 
-const s3 = new S3Client({});
+const {
+  BUCKET,
+  DEFAULT_CTX = "prod",
+  VERSIONS_ROOT = "branches",
+  CDN_DOMAIN,
+  TOKEN_TTL_SECONDS = "21600",
+  CF_PRIVATE_KEY_PEM,
+  CF_PUBLIC_KEY_ID,
+  BUCKET_REGION = "us-east-1",
+} = process.env;
 
-const { BUCKET, DEFAULT_CTX = "prod", VERSIONS_ROOT = "branches", CDN_DOMAIN, TOKEN_TTL_SECONDS = "21600", CF_PRIVATE_KEY_PEM, CF_PUBLIC_KEY_ID } = process.env;
-
+const s3 = new S3Client({ region: BUCKET_REGION });
 function hostToBranch(host?: string): string | undefined {
   if (!host) return;
   const h = host.split(":")[0];
@@ -74,7 +82,13 @@ function getCookie(headers: Record<string, string | undefined> | undefined, name
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> => {
   try {
-    const slugParam = event.pathParameters?.slug;
+    const slugParam =
+      event.pathParameters?.slug ??
+      (() => {
+        const p = (event as any).rawPath || (event as any).requestContext?.http?.path || "";
+        const m = /\/content\/resolve\/([^\/\?#]+)/.exec(p);
+        return m ? m[1] : undefined;
+      })();
     if (!slugParam) return res(400, { error: "slug required" });
     const slug = decodeURIComponent(slugParam);
 
@@ -82,7 +96,7 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
     let ctx = ctxFromQuery;
 
     if (!ctx) {
-      const host = event.requestContext.domainName || event.headers?.host;
+      const host = event.headers?.["x-viewer-host"] || event.requestContext.domainName || event.headers?.host;
       const branch = hostToBranch(host);
       ctx = branch ? `${VERSIONS_ROOT}/${branch}` : DEFAULT_CTX;
     }

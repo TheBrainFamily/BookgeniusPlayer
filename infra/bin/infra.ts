@@ -3,6 +3,7 @@ import "source-map-support/register.js";
 import "dotenv/config";
 import * as cdk from "aws-cdk-lib";
 import { WebStack } from "../lib/web-stack.js";
+import { ApiEuStack } from "../lib/api-eu-stack.js";
 
 const app = new cdk.App();
 
@@ -28,4 +29,13 @@ new WebStack(app, "WebStack", {
   tokenTtlSeconds: TOKEN_TTL_SECONDS,
   publicKeyFilePath: "cf-public-key.pem",
   clerkSecretKey: process.env.CLERK_SECRET_KEY!,
+});
+
+new ApiEuStack(app, "ApiEuStack", {
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "eu-central-1" },
+  domainProd: process.env.DOMAIN_PROD!, // e.g. bookgenius.eu
+  bucketName: process.env.CONTENT_BUCKET_NAME!, // from your WebStack output
+  cfPrivateKeySecretName: CF_PRIVATE_KEY_SECRET_NAME!, // must exist in eu-central-1
+  clerkSecretKey: process.env.CLERK_SECRET_KEY!,
+  tokenTtlSeconds: Number(process.env.TOKEN_TTL_SECONDS || 21600),
 });

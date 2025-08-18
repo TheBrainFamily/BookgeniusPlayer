@@ -6,6 +6,7 @@ import {
   Duration,
   RemovalPolicy,
   CfnOutput,
+  Fn,
   aws_s3 as s3,
   aws_cloudfront as cf,
   aws_cloudfront_origins as origins,
@@ -104,6 +105,48 @@ export class WebStack extends Stack {
       runtime: cf.FunctionRuntime.JS_2_0, // <— modern features enabled
     });
 
+    // ===== /resolve Lambda (created early for Function URLs) =====
+    const pubPem = fs.readFileSync(path.resolve(props.publicKeyFilePath), "utf8");
+    const publicKey = new cf.PublicKey(this, "CfPublicKey", { encodedKey: pubPem });
+
+    const resolveFn = new lnode.NodejsFunction(this, "ResolveFn", {
+      entry: path.resolve("dist/runtime/resolve-lambda.js"),
+      runtime: lambda.Runtime.NODEJS_20_X,
+      memorySize: 1536,
+      timeout: Duration.seconds(10),
+      environment: {
+        BUCKET: bucket.bucketName,
+        DEFAULT_CTX: "prod",
+        VERSIONS_ROOT: "branches",
+        CDN_DOMAIN: `cdn.${props.domainProd}`,
+        TOKEN_TTL_SECONDS: String(props.tokenTtlSeconds),
+        CF_PRIVATE_KEY_SECRET_NAME: props.cfPrivateKeySecretName,
+        CLERK_SECRET_KEY: props.clerkSecretKey,
+        CF_PUBLIC_KEY_ID: publicKey.publicKeyId,
+      },
+    });
+
+    const cfPriv = secrets.Secret.fromSecretNameV2(this, "CfPrivateKeySecret", props.cfPrivateKeySecretName);
+    resolveFn.addEnvironment("CF_PRIVATE_KEY_PEM", cfPriv.secretValue.unsafeUnwrap());
+    resolveFn.addEnvironment("AWS_NODEJS_CONNECTION_REUSE_ENABLED", "1");
+
+    resolveFn.addToRolePolicy(
+      new iam.PolicyStatement({ actions: ["s3:GetObject"], resources: [bucket.arnForObjects("prod/versions.json"), bucket.arnForObjects("branches/*/versions.json")] }),
+    );
+
+    resolveFn.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ["secretsmanager:GetSecretValue"],
+        resources: ["*"], // tighten to that secret ARN later
+      }),
+    );
+
+    // Function URL to use as /api/* origin
+    const fnUrlProd = resolveFn.addFunctionUrl({ authType: lambda.FunctionUrlAuthType.NONE });
+    // Extract hostname from the Function URL using CloudFormation functions
+    // URL format: https://<url-id>.lambda-url.<region>.on.aws/
+    const fnOriginHostProd = Fn.select(2, Fn.split("/", fnUrlProd.url));
+
     // ===== App Distribution (PROD) =====
     const appDistProd = new cf.Distribution(this, "AppDistProd", {
       defaultBehavior: {
@@ -116,15 +159,11 @@ export class WebStack extends Stack {
       certificate: certAppProd,
     });
 
-    const apiOriginProd = new origins.HttpOrigin(`api.${props.domainProd}`, {
-      protocolPolicy: cf.OriginProtocolPolicy.HTTPS_ONLY,
-      originSslProtocols: [cf.OriginSslPolicy.TLS_V1_2],
-    });
-    appDistProd.addBehavior("/api/*", apiOriginProd, {
-      cachePolicy: cf.CachePolicy.CACHING_DISABLED, // 🔴 no caching for /resolve
-      originRequestPolicy: cf.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
-      // ^ forwards headers/queries but lets CF set Host=api.<domain> so API mapping works
-      allowedMethods: cf.AllowedMethods.ALLOW_ALL, // or .ALLOW_GET_HEAD_OPTIONS
+    const fnOriginProd = new origins.HttpOrigin(fnOriginHostProd, { protocolPolicy: cf.OriginProtocolPolicy.HTTPS_ONLY, originSslProtocols: [cf.OriginSslPolicy.TLS_V1_2] });
+    appDistProd.addBehavior("/api/*", fnOriginProd, {
+      cachePolicy: cf.CachePolicy.CACHING_DISABLED, // This forwards Authorization header
+      originRequestPolicy: cf.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER, // Forwards all headers except Host
+      allowedMethods: cf.AllowedMethods.ALLOW_ALL,
       viewerProtocolPolicy: cf.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       functionAssociations: [{ function: routerFn, eventType: cf.FunctionEventType.VIEWER_REQUEST }],
     });
@@ -151,12 +190,10 @@ export class WebStack extends Stack {
         certificate: certAppStage,
       });
 
-      const apiOriginStage = new origins.HttpOrigin(`api.${props.domainStage}`, {
-        protocolPolicy: cf.OriginProtocolPolicy.HTTPS_ONLY,
-        originSslProtocols: [cf.OriginSslPolicy.TLS_V1_2],
-      });
+      // Use the same Function URL for stage (Lambda functions can only have one Function URL)
+      const fnOriginStage = new origins.HttpOrigin(fnOriginHostProd, { protocolPolicy: cf.OriginProtocolPolicy.HTTPS_ONLY, originSslProtocols: [cf.OriginSslPolicy.TLS_V1_2] });
 
-      appDistStage.addBehavior("/api/*", apiOriginStage, {
+      appDistStage.addBehavior("/api/*", fnOriginStage, {
         cachePolicy: cf.CachePolicy.CACHING_DISABLED,
         originRequestPolicy: cf.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
         allowedMethods: cf.AllowedMethods.ALLOW_ALL,
@@ -177,8 +214,6 @@ export class WebStack extends Stack {
     }
 
     // ===== CDN for book assets (Signed URLs; tokens ignored in cache key) =====
-    const pubPem = fs.readFileSync(path.resolve(props.publicKeyFilePath), "utf8");
-    const publicKey = new cf.PublicKey(this, "CfPublicKey", { encodedKey: pubPem });
     const keyGroup = new cf.KeyGroup(this, "CfKeyGroup", { items: [publicKey] });
 
     const longCacheNoQs = new cf.CachePolicy(this, "LongCacheNoQs", {
@@ -226,43 +261,6 @@ export class WebStack extends Stack {
 
     new route53.ARecord(this, "CdnAlias", { zone: zoneProd, recordName: `cdn.${props.domainProd}`, target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(cdnDist)) });
 
-    // ===== /resolve Lambda + APIs (prod + optional stage) =====
-    const resolveFn = new lnode.NodejsFunction(this, "ResolveFn", {
-      entry: path.resolve("dist/runtime/resolve-lambda.js"),
-      runtime: lambda.Runtime.NODEJS_20_X,
-      memorySize: 1536,
-      timeout: Duration.seconds(10),
-      environment: {
-        BUCKET: bucket.bucketName,
-        DEFAULT_CTX: "prod",
-        VERSIONS_ROOT: "branches",
-        CDN_DOMAIN: `cdn.${props.domainProd}`,
-        TOKEN_TTL_SECONDS: String(props.tokenTtlSeconds),
-        CF_PRIVATE_KEY_SECRET_NAME: props.cfPrivateKeySecretName,
-        CLERK_SECRET_KEY: props.clerkSecretKey,
-        CF_PUBLIC_KEY_ID: publicKey.publicKeyId,
-      },
-    });
-
-    const cfPriv = secrets.Secret.fromSecretNameV2(this, "CfPrivateKeySecret", props.cfPrivateKeySecretName);
-
-    // 2) Inject as env var via CloudFormation dynamic reference (resolved at deploy-time)
-    resolveFn.addEnvironment("CF_PRIVATE_KEY_PEM", cfPriv.secretValue.unsafeUnwrap());
-
-    // (Optional) tiny Node keep-alive
-    resolveFn.addEnvironment("AWS_NODEJS_CONNECTION_REUSE_ENABLED", "1");
-
-    resolveFn.addToRolePolicy(
-      new iam.PolicyStatement({ actions: ["s3:GetObject"], resources: [bucket.arnForObjects("prod/versions.json"), bucket.arnForObjects("branches/*/versions.json")] }),
-    );
-
-    resolveFn.addToRolePolicy(
-      new iam.PolicyStatement({
-        actions: ["secretsmanager:GetSecretValue"],
-        resources: ["*"], // tighten to that secret ARN later
-      }),
-    );
-
     // HTTP API (v2) for PROD
     const apiDomainProd = new apigwv2.DomainName(this, "ApiDomainProd", { domainName: `api.${props.domainProd}`, certificate: certApiProd });
 
@@ -282,10 +280,13 @@ export class WebStack extends Stack {
     });
 
     // Route53 alias for api.<domain>
-    new route53.ARecord(this, "ApiProdAlias", {
-      zone: zoneProd,
-      recordName: `api.${props.domainProd}`,
-      target: route53.RecordTarget.fromAlias(new targets.ApiGatewayv2DomainProperties(apiDomainProd.regionalDomainName, apiDomainProd.regionalHostedZoneId)),
+    new route53.CfnRecordSet(this, "ApiLatencyUs", {
+      hostedZoneId: zoneProd.hostedZoneId,
+      name: `api.${props.domainProd}`,
+      type: "A",
+      setIdentifier: "api-us-east-1",
+      region: "us-east-1",
+      aliasTarget: { dnsName: apiDomainProd.regionalDomainName, hostedZoneId: apiDomainProd.regionalHostedZoneId, evaluateTargetHealth: false },
     });
 
     // HTTP API (v2) for STAGE (optional)
@@ -305,13 +306,6 @@ export class WebStack extends Stack {
         path: "/content/resolve/{slug}",
         methods: [apigwv2.HttpMethod.GET],
         integration: new apigwv2i.HttpLambdaIntegration("ResolveIntegrationStage", resolveFn),
-      });
-
-      // Route53 alias for api.<domain>
-      new route53.ARecord(this, "ApiStageAlias", {
-        zone: zoneStage,
-        recordName: `api.${props.domainStage}`,
-        target: route53.RecordTarget.fromAlias(new targets.ApiGatewayv2DomainProperties(apiDomainStage.regionalDomainName, apiDomainStage.regionalHostedZoneId)),
       });
     }
 

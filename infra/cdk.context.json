@@ -10,5 +10,9 @@
   "acknowledged-issue-numbers": [
     34892,
     34892
-  ]
+  ],
+  "hosted-zone:account=206272344806:domainName=bookgenius.eu:region=eu-central-1": {
+    "Id": "/hostedzone/Z02981652W85KUZPYUP5H",
+    "Name": "bookgenius.eu."
+  }
 }
