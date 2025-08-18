@@ -1,98 +1,100 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Custom variant for dark mode */
-@variant dark (&:where(.dark, .dark *));
-
 /* Victorian Library Design System - Rich, atmospheric, and elegant */
-@theme {
-  /* Base library atmosphere */
-  --color-background: hsl(15 15% 8%);
-  --color-foreground: hsl(45 25% 85%);
+body#platform-scope {
+  @theme {
+    /* Base library atmosphere */
+    --color-background: hsl(15 15% 8%);
+    --color-foreground: hsl(45 25% 85%);
 
-  /* Card surfaces like book covers and manuscripts */
-  --color-card: hsl(20 20% 12%);
-  --color-card-foreground: hsl(45 20% 90%);
+    /* Card surfaces like book covers and manuscripts */
+    --color-card: hsl(20 20% 12%);
+    --color-card-foreground: hsl(45 20% 90%);
 
-  /* Popup elements like tooltips */
-  --color-popover: hsl(18 25% 10%);
-  --color-popover-foreground: hsl(45 25% 92%);
+    /* Popup elements like tooltips */
+    --color-popover: hsl(18 25% 10%);
+    --color-popover-foreground: hsl(45 25% 92%);
 
-  /* Primary gold accents - like gilded book spines */
-  --color-primary: hsl(45 70% 55%);
-  --color-primary-foreground: hsl(20 30% 8%);
+    /* Primary gold accents - like gilded book spines */
+    --color-primary: hsl(45 70% 55%);
+    --color-primary-foreground: hsl(20 30% 8%);
 
-  /* Secondary mahogany wood tones */
-  --color-secondary: hsl(15 30% 18%);
-  --color-secondary-foreground: hsl(45 15% 88%);
+    /* Secondary mahogany wood tones */
+    --color-secondary: hsl(15 30% 18%);
+    --color-secondary-foreground: hsl(45 15% 88%);
 
-  /* Muted surfaces like aged parchment */
-  --color-muted: hsl(25 15% 15%);
-  --color-muted-foreground: hsl(40 12% 65%);
+    /* Muted surfaces like aged parchment */
+    --color-muted: hsl(25 15% 15%);
+    --color-muted-foreground: hsl(40 12% 65%);
 
-  /* Accent deep green like leather book bindings */
-  --color-accent: hsl(140 40% 25%);
-  --color-accent-foreground: hsl(45 20% 95%);
+    /* Accent deep green like leather book bindings */
+    --color-accent: hsl(140 40% 25%);
+    --color-accent-foreground: hsl(45 20% 95%);
 
-  /* Burgundy for important elements */
-  --color-destructive: hsl(350 60% 45%);
-  --color-destructive-foreground: hsl(45 15% 95%);
+    /* Burgundy for important elements */
+    --color-destructive: hsl(350 60% 45%);
+    --color-destructive-foreground: hsl(45 15% 95%);
 
-  /* Borders and inputs with warm undertones */
-  --color-border: hsl(25 20% 20%);
-  --color-input: hsl(20 25% 15%);
-  --color-ring: hsl(45 60% 50%);
+    /* Borders and inputs with warm undertones */
+    --color-border: hsl(25 20% 20%);
+    --color-input: hsl(20 25% 15%);
+    --color-ring: hsl(45 60% 50%);
 
-  /* Sidebar colors */
-  --color-sidebar-background: hsl(18 25% 10%);
-  --color-sidebar-foreground: hsl(45 20% 85%);
-  --color-sidebar-primary: hsl(45 60% 50%);
-  --color-sidebar-primary-foreground: hsl(20 25% 10%);
-  --color-sidebar-accent: hsl(25 20% 18%);
-  --color-sidebar-accent-foreground: hsl(45 15% 88%);
-  --color-sidebar-border: hsl(25 20% 20%);
-  --color-sidebar-ring: hsl(45 60% 50%);
+    /* Sidebar colors */
+    --color-sidebar-background: hsl(18 25% 10%);
+    --color-sidebar-foreground: hsl(45 20% 85%);
+    --color-sidebar-primary: hsl(45 60% 50%);
+    --color-sidebar-primary-foreground: hsl(20 25% 10%);
+    --color-sidebar-accent: hsl(25 20% 18%);
+    --color-sidebar-accent-foreground: hsl(45 15% 88%);
+    --color-sidebar-border: hsl(25 20% 20%);
+    --color-sidebar-ring: hsl(45 60% 50%);
 
-  /* Library atmosphere colors */
-  --color-library-mahogany: hsl(15 35% 15%);
-  --color-library-walnut: hsl(25 30% 20%);
-  --color-library-gold: hsl(45 70% 55%);
-  --color-library-gold-glow: hsl(45 60% 65%);
-  --color-library-green: hsl(140 40% 25%);
-  --color-library-burgundy: hsl(350 50% 35%);
-  --color-library-parchment: hsl(40 25% 85%);
+    /* Library atmosphere colors */
+    --color-library-mahogany: hsl(15 35% 15%);
+    --color-library-walnut: hsl(25 30% 20%);
+    --color-library-gold: hsl(45 70% 55%);
+    --color-library-gold-glow: hsl(45 60% 65%);
+    --color-library-green: hsl(140 40% 25%);
+    --color-library-burgundy: hsl(350 50% 35%);
+    --color-library-parchment: hsl(40 25% 85%);
 
-  /* Border radius values */
-  --radius-xs: 0.125rem;
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
-  --radius-3xl: 2rem;
-  --radius-full: 9999px;
+    /* Border radius values */
+    --radius-xs: 0.125rem;
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    --radius-3xl: 2rem;
+    --radius-full: 9999px;
 
-  /* Font families */
-  --font-family-serif: "Playfair Display", ui-serif, Georgia, serif;
-  --font-family-sans: Inter, system-ui, sans-serif;
+    /* Font families */
+    --font-family-serif: "Playfair Display", ui-serif, Georgia, serif;
+    --font-family-sans: Inter, system-ui, sans-serif;
 
-  /* Spacing scale - extending default */
-  --spacing-18: 4.5rem;
-  --spacing-22: 5.5rem;
+    /* Spacing scale - extending default */
+    --spacing-18: 4.5rem;
+    --spacing-22: 5.5rem;
 
-  /* Container widths */
-  --width-container-2xl: 1400px;
+    /* Container widths */
+    --width-container-2xl: 1400px;
 
-  /* Keyframe animations */
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
-  --animate-candleflicker: candleflicker 3s ease-in-out infinite;
-  --animate-bookglow: bookglow 4s ease-in-out infinite;
-  --animate-float: float 6s ease-in-out infinite;
+    /* Keyframe animations */
+    --animate-accordion-down: accordion-down 0.2s ease-out;
+    --animate-accordion-up: accordion-up 0.2s ease-out;
+    --animate-candleflicker: candleflicker 3s ease-in-out infinite;
+    --animate-bookglow: bookglow 4s ease-in-out infinite;
+    --animate-float: float 6s ease-in-out infinite;
+  }
 }
 
+/* Custom variant for dark mode */
+@variant dark (&:is(#platform-scope.dark *));
+
 /* Dark mode overrides */
-@variant dark {
+body#platform-scope.dark {
   @theme {
     /* Enhanced dark theme for deeper library atmosphere */
     --color-background: hsl(12 20% 6%);
@@ -179,11 +181,11 @@
 }
 
 /* Base styles */
-* {
+#platform-scope * {
   border-color: var(--color-border);
 }
 
-body {
+#platform-scope {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-family-serif);
@@ -249,12 +251,16 @@ body {
   display: none;
 }
 
-body.is-reader #root-player,
-body.is-reader #cutscene-video,
-body.is-reader #splash-screen {
+body#player-scope #root-player,
+body#player-scope #cutscene-video,
+body#player-scope #splash-screen {
   display: block;
 }
 
-body.is-reader #legacy {
+body#player-scope #legacy {
   display: flex;
+}
+
+body#player-scope #root-platform {
+  display: none;
 }

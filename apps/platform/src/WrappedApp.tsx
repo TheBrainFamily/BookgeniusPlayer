@@ -36,9 +36,14 @@ export const WrappedApp = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    document.body.classList.add("is-reader");
-    return () => document.body.classList.remove("is-reader");
-  }, []);
+    if (isPlayerReady) {
+      document.body.id = "player-scope";
+    }
+
+    return () => {
+      document.body.id = "platform-scope";
+    };
+  }, [isPlayerReady]);
 
   const mountNode = typeof document !== "undefined" ? document.getElementById("root-player") : null;
   if (!mountNode) return null;

@@ -1,70 +1,68 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Custom variant for dark mode */
-@variant dark (&:is(.dark *));
+body#player-scope {
+  @theme inline {
+    /* Border radius calculations */
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
 
-/* Theme configuration with inline values */
-@theme inline {
-  /* Border radius calculations */
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+    /* Map CSS variables to Tailwind color system */
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
 
-  /* Map CSS variables to Tailwind color system */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+    /* Chart colors */
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
 
-  /* Chart colors */
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
+    /* Sidebar colors */
+    --color-sidebar-background: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Sidebar colors */
-  --color-sidebar-background: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+    /* Book theme colors */
+    --color-book-primary: var(--book-primary-color);
+    --color-book-secondary: var(--book-secondary-color);
+    --color-book-tertiary: var(--book-tertiary-color);
+    --color-book-quaternary: var(--book-quaternary-color);
+    --color-book-simplified-icon: var(--book-simplified-icon-color);
 
-  /* Book theme colors */
-  --color-book-primary: var(--book-primary-color);
-  --color-book-secondary: var(--book-secondary-color);
-  --color-book-tertiary: var(--book-tertiary-color);
-  --color-book-quaternary: var(--book-quaternary-color);
-  --color-book-simplified-icon: var(--book-simplified-icon-color);
-
-  /* Animation definitions */
-  --animate-pulse-glow: pulseGlow 3s infinite ease-in-out;
-  --animate-search-highlight-fade: searchHighlightFade 4s ease-in-out forwards;
-  --animate-search-highlight-fade-dark: searchHighlightFadeDark 4s ease-in-out forwards;
+    /* Animation definitions */
+    --animate-pulse-glow: pulseGlow 3s infinite ease-in-out;
+    --animate-search-highlight-fade: searchHighlightFade 4s ease-in-out forwards;
+    --animate-search-highlight-fade-dark: searchHighlightFadeDark 4s ease-in-out forwards;
+  }
 }
 
 /* Root variables */
-:root {
+body#player-scope {
   /* Book theme colors */
   --book-primary-color: #e3f2fd;
   --book-secondary-color: #1976d2;
@@ -271,8 +269,11 @@
   --entity-image-wrapper-shadow-dark: rgba(100, 150, 220, 0.4);
 }
 
+/* Custom variant for dark mode */
+@variant dark (&:is(#player-scope.dark *));
+
 /* Dark mode overrides */
-.dark {
+:root:has(body#player-scope).dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -350,40 +351,47 @@
   }
 }
 
-@utility animate-pulse-glow {
-  animation: var(--animate-pulse-glow);
-}
-
-@utility animate-search-highlight-fade {
-  animation: var(--animate-search-highlight-fade);
-}
-
-@utility animate-search-highlight-fade-dark {
-  animation: var(--animate-search-highlight-fade-dark);
-}
-
-@utility textured-bg {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-  background-size: 4px 4px;
+@layer utilities {
+  .animate-search-highlight-fade {
+    animation: var(--animate-search-highlight-fade);
+  }
+  .animate-search-highlight-fade {
+    animation: var(--animate-search-highlight-fade);
+  }
+  .animate-search-highlight-fade-dark {
+    animation: var(--animate-search-highlight-fade-dark);
+  }
+  .animate-pulse-glow {
+    animation: pulseGlow 3s infinite ease-in-out;
+  }
+  .textured-bg {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 4px 4px;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .outline-ring {
+    outline-color: var(--color-ring);
+  }
+  .outline-ring-50 {
+    outline-color: color-mix(in oklab, var(--ring, black) 50%, transparent);
+  }
+  .bg-book-gradient-primary-tertiary {
+    background: linear-gradient(135deg, var(--book-primary-color), var(--book-tertiary-color));
+  }
 }
 
 /* Base layer styles */
 @layer base {
-  * {
+  #player-scope * {
     @apply border-border outline-ring/50;
   }
-
-  body {
+  #player-scope {
     @apply bg-background text-foreground;
-  }
-}
-
-/* Custom utility: no-scrollbar */
-@utility no-scrollbar {
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
   }
 }
 
