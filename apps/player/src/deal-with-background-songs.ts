@@ -15,13 +15,84 @@ import { BackgroundSongSection } from "./types/book";
 
 let isProcessingBackgroundSongs = false; // Module-level flag to prevent re-entrancy
 
+// Helper function to ensure audio context is ready
+const ensureAudioContextReady = async (): Promise<boolean> => {
+  const audioContextReady = await initAudioContext();
+  if (!audioContextReady) {
+    console.warn("Cannot preload tracks, AudioContext not ready.");
+    return false;
+  }
+  return true;
+};
+
+// Helper function to get and validate book songs
+const getValidatedBookSongs = (): BackgroundSongSection[] | null => {
+  const bookSongs = getBackgroundSongsForBook();
+  if (!bookSongs) {
+    console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot preload.`);
+    return null;
+  }
+  return bookSongs;
+};
+
+// Helper function to find applicable background sections for a location
+const findApplicableBackgroundSections = (bookSongs: BackgroundSongSection[], currentChapter: number, currentParagraph: number): BackgroundSongSection[] => {
+  return bookSongs
+    .filter((section: BackgroundSongSection) => {
+      return section.chapter < currentChapter || (section.chapter === currentChapter && section.paragraph <= currentParagraph);
+    })
+    .sort((a: BackgroundSongSection, b: BackgroundSongSection) => {
+      if (b.chapter !== a.chapter) return b.chapter - a.chapter;
+      return b.paragraph - a.paragraph;
+    });
+};
+
+// Helper function to load a single track with error handling
+const loadSingleTrackJustDownload = async (trackId: string, context: string): Promise<boolean> => {
+  try {
+    const loaded = await loadTrack(trackId, undefined, true, true);
+    if (loaded) {
+      console.log(`Successfully preloaded ${context} track: ${trackId}`);
+      return true;
+    } else {
+      console.warn(`Failed to preload ${context} track: ${trackId}`);
+      return false;
+    }
+  } catch (error) {
+    console.error(`Error during ${context} track preloading:`, error);
+    return false;
+  }
+};
+
+// Helper function to load multiple tracks in parallel
+const loadMultipleTracks = async (trackIds: string[], context: string): Promise<boolean> => {
+  console.log(`Preloading ${trackIds.length} ${context} tracks...`);
+  const preloadPromises = trackIds.map((trackId) => loadTrack(trackId));
+
+  try {
+    const results = await Promise.allSettled(preloadPromises);
+    const successful = results.filter((result) => result.status === "fulfilled" && result.value === true).length;
+    const failed = results.length - successful;
+
+    console.log(`${context} tracks preloading complete. Successfully loaded: ${successful}, Failed: ${failed}`);
+
+    if (failed > 0) {
+      const failedResults = results.filter((result) => result.status === "rejected" || (result.status === "fulfilled" && result.value === false));
+      console.warn(`Some ${context} tracks failed to preload:`, failedResults);
+    }
+
+    return successful > 0;
+  } catch (error) {
+    console.error(`Error during ${context} track preloading:`, error);
+    return false;
+  }
+};
+
 // Preload function - can be async if loadTrack is async (it is now)
 export const preloadBackgroundTracks = async () => {
   console.log("Attempting to preload background tracks dynamically...");
 
-  const audioContextReady = await initAudioContext();
-  if (!audioContextReady) {
-    console.warn("Cannot preload tracks, AudioContext not ready.");
+  if (!(await ensureAudioContextReady())) {
     return false;
   }
 
@@ -43,9 +114,8 @@ export const preloadBackgroundTracks = async () => {
   }
   console.log("Preloading tracks for chapters:", chaptersToConsider);
 
-  const bookSongs = getBackgroundSongsForBook();
+  const bookSongs = getValidatedBookSongs();
   if (!bookSongs) {
-    console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot preload.`);
     return false;
   }
 
@@ -56,27 +126,39 @@ export const preloadBackgroundTracks = async () => {
     return false;
   }
 
-  console.log(`Preloading ${sectionsToPreload.length} sections...`);
-  const preloadPromises = sectionsToPreload.flatMap((section) => section.files.map((file) => loadTrack(file.replace(".mp3", ""))));
+  const trackIds = sectionsToPreload.flatMap((section) => section.files.map((file) => file.replace(".mp3", "")));
+  return await loadMultipleTracks(trackIds, "background");
+};
 
-  // Wait for all tracks to load in parallel
-  try {
-    const results = await Promise.allSettled(preloadPromises);
-    const successful = results.filter((result) => result.status === "fulfilled" && result.value === true).length;
-    const failed = results.length - successful;
+// Preload function for just the current track
+export const preloadCurrentTrack = async () => {
+  console.log("Attempting to preload current background track...");
 
-    console.log(`Dynamic background tracks preloading complete. Successfully loaded: ${successful}, Failed: ${failed}`);
+  const location = getCurrentLocation();
+  const currentChapter = location.currentChapter;
+  const currentParagraph = location.currentParagraph;
 
-    if (failed > 0) {
-      const failedResults = results.filter((result) => result.status === "rejected" || (result.status === "fulfilled" && result.value === false));
-      console.warn("Some tracks failed to preload:", failedResults);
-    }
+  console.log(`Preloading track for current location: Chapter ${currentChapter}, Paragraph ${currentParagraph}`);
 
-    return successful > 0;
-  } catch (error) {
-    console.error("Error during track preloading:", error);
+  const bookSongs = getValidatedBookSongs();
+  if (!bookSongs) {
     return false;
   }
+
+  // Find the applicable section for the current location
+  const foundBackgroundSections = findApplicableBackgroundSections(bookSongs, currentChapter, currentParagraph);
+  const currentSection = foundBackgroundSections[0];
+
+  if (!currentSection || !currentSection.files || currentSection.files.length === 0) {
+    console.log("No background track section found for current location.");
+    return false;
+  }
+
+  // Get the first track of the current section
+  const firstTrackId = currentSection.files[0].replace(".mp3", "");
+  console.log(`Preloading current track: ${firstTrackId}`);
+
+  return await loadSingleTrackJustDownload(firstTrackId, "current");
 };
 
 interface DealWithBackgroundSongsParams {
