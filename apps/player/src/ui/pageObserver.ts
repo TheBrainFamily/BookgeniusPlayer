@@ -255,7 +255,7 @@ function createMediaElement(
 
   // Add pointer handler to container (works for mouse and touch)
   container.addEventListener("pointerup", (e) => {
-    if ((e as any).metaKey || (e as any).ctrlKey) {
+    if (e.metaKey || e.ctrlKey) {
       return;
     }
     e.preventDefault();
@@ -282,7 +282,7 @@ export function highlightCharacter(character: HTMLSpanElement, openCharacterDeta
   let floatingAvatar: HTMLDivElement | null = null;
   character.classList.add("character-highlighted-activated");
   character.addEventListener("pointerup", (e) => {
-    if ((e as any).metaKey || (e as any).ctrlKey) {
+    if (e.metaKey || e.ctrlKey) {
       floatingAvatar?.remove();
       return;
     }

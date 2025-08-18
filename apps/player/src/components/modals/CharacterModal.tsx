@@ -171,6 +171,12 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                           e.stopPropagation();
                           handleAppearanceClick(appearance);
                         }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            handleAppearanceClick(appearance);
+                          }
+                        }}
                         transition={{ delay: index * 0.05 }}
                       >
                         <div className="relative p-4">
@@ -210,7 +216,16 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
               </motion.div>
             )}
           </div>
-          <DialogEnhanceClose className="absolute top-4 right-4 cursor-pointer" onPointerUp={onClose} />
+          <DialogEnhanceClose
+            className="absolute top-4 right-4 cursor-pointer"
+            onPointerUp={onClose}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClose();
+              }
+            }}
+          />
         </motion.div>
       </motion.div>
     </ModalUI>

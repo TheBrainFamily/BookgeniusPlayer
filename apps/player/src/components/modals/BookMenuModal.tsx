@@ -224,6 +224,12 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           onPointerUp={() => {
             openBookChapterModal();
           }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openBookChapterModal();
+            }
+          }}
         >
           <List className="mr-2 h-4 w-4" />
           {t("open_chapter")}
@@ -235,6 +241,13 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             resetFurthestPageLocation();
             onClose();
           }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              resetFurthestPageLocation();
+              onClose();
+            }
+          }}
         >
           <RotateCcw className="mr-2 h-4 w-4" />
           {t("reset_reading_position")}
@@ -244,6 +257,12 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
           onPointerUp={() => {
             openApiKeyModal();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openApiKeyModal();
+            }
           }}
         >
           <BrainCircuit className="mr-2 h-4 w-4" />

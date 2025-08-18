@@ -3,7 +3,6 @@ import ModalUI from "@player/components/modals/ModalUI";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { useEditorModeModal } from "@player/stores/modals/editorModeModal.store";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
-import { useTranslation } from "react-i18next";
 
 interface EditorModeModalProps {
   onClose: () => void;
@@ -13,7 +12,6 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
   const { modalType, onSubmit } = useEditorModeModal();
   const [selectedCharacter, setSelectedCharacter] = useState("");
   const [error, setError] = useState("");
-  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,7 +92,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
   };
 
   return (
-    <ModalUI title={t("appearances")} onClose={onClose}>
+    <ModalUI title="Editor Mode" onClose={onClose}>
       <div className="w-80">{renderContent()}</div>
     </ModalUI>
   );

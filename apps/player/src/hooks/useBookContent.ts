@@ -52,7 +52,7 @@ export function useBookContent(containerId: string) {
 
       // Give the browser a moment to render the injected HTML
       const handlePointerUp = (event: PointerEvent) => {
-        if ((event as any).metaKey || (event as any).ctrlKey) {
+        if (event.metaKey || event.ctrlKey) {
           return;
         }
         const target = event.target as HTMLElement;
@@ -129,10 +129,21 @@ export function useBookContent(containerId: string) {
           span.appendChild(iconContainer);
 
           iconContainer.addEventListener("pointerup", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const originalSentence = span.getAttribute("data-original-sentence");
-            openSentenceModal(originalSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
+            iconContainer.tabIndex = 0;
+            iconContainer.setAttribute("role", "button");
+            iconContainer.addEventListener("pointerup", (e: PointerEvent) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const originalSentence = span.getAttribute("data-original-sentence");
+              openSentenceModal(originalSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
+            });
+            iconContainer.addEventListener("keydown", (e: KeyboardEvent) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                const originalSentence = span.getAttribute("data-original-sentence");
+                openSentenceModal(originalSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
+              }
+            });
           });
           // 5. Activate character interactions for newly transformed content
           activateCharacterInteractions(target, openCharacterDetailsModal);
