@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 
 /* Victorian Library Design System - Rich, atmospheric, and elegant */
-body#platform-scope {
+:root:has(body#platform-scope) {
   @theme {
     /* Base library atmosphere */
     --color-background: hsl(15 15% 8%);
@@ -91,10 +91,10 @@ body#platform-scope {
 }
 
 /* Custom variant for dark mode */
-@variant dark (&:is(#platform-scope.dark *));
+@variant dark (#platform-scope.dark *);
 
 /* Dark mode overrides */
-body#platform-scope.dark {
+:root:has(body#platform-scope.dark) {
   @theme {
     /* Enhanced dark theme for deeper library atmosphere */
     --color-background: hsl(12 20% 6%);
@@ -129,7 +129,7 @@ body#platform-scope.dark {
   }
 }
 
-/* Keyframe definitions */
+/* Keyframe animations */
 @keyframes accordion-down {
   from {
     height: 0;
@@ -180,70 +180,62 @@ body#platform-scope.dark {
   }
 }
 
-/* Base styles */
-#platform-scope * {
-  border-color: var(--color-border);
-}
+@layer utilities {
+  #platform-scope .container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 2rem;
+  }
+  @media (width >= 1400px) {
+    #platform-scope .container {
+      max-width: 1400px;
+    }
+  }
 
-#platform-scope {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-family-serif);
-  background-image:
-    radial-gradient(circle at 20% 20%, hsl(45 40% 15% / 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, hsl(35 35% 12% / 0.4) 0%, transparent 50%),
-    linear-gradient(180deg, hsl(15 20% 8%) 0%, hsl(20 25% 6%) 100%);
-}
-
-/* Custom scrollbar for library aesthetic */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--color-muted);
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(45 70% 55% / 0.6);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(45 70% 55% / 0.8);
-}
-
-/* Container utility */
-@utility container {
-  width: 100%;
-  margin-inline: auto;
-  padding-inline: 2rem;
-}
-
-@media (width >= 1400px) {
-  .container {
-    max-width: 1400px;
+  #platform-scope .gradient-candlelight {
+    background-image:
+      radial-gradient(circle at 20% 20%, hsl(45 40% 15% / 0.3), transparent 50%), radial-gradient(circle at 80% 80%, hsl(35 35% 12% / 0.4), transparent 50%),
+      linear-gradient(180deg, hsl(15 20% 8%), hsl(20 25% 6%));
+  }
+  #platform-scope .gradient-bookshelf {
+    background-image: linear-gradient(180deg, hsl(15 25% 12%) 0%, hsl(20 30% 8%) 100%);
+  }
+  #platform-scope .gradient-leather {
+    background-image: linear-gradient(135deg, hsl(140 35% 20%) 0%, hsl(130 40% 15%) 100%);
+  }
+  #platform-scope .gradient-parchment {
+    background-image: linear-gradient(180deg, hsl(40 20% 88%) 0%, hsl(35 15% 82%) 100%);
   }
 }
 
-/* Custom gradient utilities */
-@utility gradient-candlelight {
-  background-image:
-    radial-gradient(circle at 20% 20%, hsl(45 40% 15% / 0.3), transparent 50%), radial-gradient(circle at 80% 80%, hsl(35 35% 12% / 0.4), transparent 50%),
-    linear-gradient(180deg, hsl(15 20% 8%), hsl(20 25% 6%));
+@layer base {
+  #platform-scope * {
+    @apply border-border outline-ring/50;
+  }
+  #platform-scope {
+    @apply bg-background text-foreground;
+    font-family: var(--font-family-serif);
+    background-image:
+      radial-gradient(circle at 20% 20%, hsl(45 40% 15% / 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, hsl(35 35% 12% / 0.4) 0%, transparent 50%),
+      linear-gradient(180deg, hsl(15 20% 8%) 0%, hsl(20 25% 6%) 100%);
+  }
+
+  #platform-scope ::-webkit-scrollbar {
+    width: 8px;
+  }
+  #platform-scope ::-webkit-scrollbar-track {
+    background: var(--muted);
+  }
+  #platform-scope ::-webkit-scrollbar-thumb {
+    background: hsl(45 70% 55% / 0.6);
+    border-radius: 4px;
+  }
+  #platform-scope ::-webkit-scrollbar-thumb:hover {
+    background: hsl(45 70% 55% / 0.8);
+  }
 }
 
-@utility gradient-bookshelf {
-  background-image: linear-gradient(180deg, hsl(15 25% 12%) 0%, hsl(20 30% 8%) 100%);
-}
-
-@utility gradient-leather {
-  background-image: linear-gradient(135deg, hsl(140 35% 20%) 0%, hsl(130 40% 15%) 100%);
-}
-
-@utility gradient-parchment {
-  background-image: linear-gradient(180deg, hsl(40 20% 88%) 0%, hsl(35 15% 82%) 100%);
-}
-
+/* Platform-Player visibility logic */
 #root-player,
 #legacy,
 #cutscene-video,

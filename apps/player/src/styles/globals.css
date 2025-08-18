@@ -227,11 +227,11 @@
   --spinner-color: #3498db;
 }
 
-/* Custom variant for dark mode (Tailwind v4) */
-@variant dark (&:is(#player-scope.dark *));
+/* Custom variant for dark mode */
+@variant dark (#player-scope.dark *);
 
-/* Dark mode overrides (zachowane jak było, bo działa u Ciebie dobrze) */
-body#player-scope.dark {
+/* Dark mode overrides */
+:root:has(body#player-scope.dark) {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -342,65 +342,76 @@ body#player-scope.dark {
     outline-color: color-mix(in oklab, var(--ring, black) 50%, transparent);
   }
 
+  #player-scope .search-highlight {
+    @apply bg-yellow-300 text-black rounded-sm;
+  }
+
+  #player-scope.dark .search-highlight {
+    background-color: var(--highlight-blink-color, #ffff99);
+    color: #000;
+    box-shadow: 0 0 4px rgba(255, 255, 100, 0.4);
+    animation: searchHighlightFadeDark 4s ease-in-out forwards;
+  }
+
   /* Gradients */
-  :is(#player-scope) .bg-book-gradient-primary-tertiary {
+  #player-scope .bg-book-gradient-primary-tertiary {
     background: linear-gradient(135deg, var(--book-primary-color), var(--book-tertiary-color));
   }
-  :is(#player-scope) .bg-book-gradient-secondary-quaternary {
+  #player-scope .bg-book-gradient-secondary-quaternary {
     background: linear-gradient(45deg, var(--book-secondary-color), var(--book-quaternary-color));
   }
-  :is(#player-scope) .bg-book-gradient-shimmer {
+  #player-scope .bg-book-gradient-shimmer {
     background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--book-primary-color) 20%, transparent), transparent);
   }
 
   /* Backgrounds */
-  :is(#player-scope) .bg-book-primary {
+  #player-scope .bg-book-primary {
     background-color: var(--book-primary-color);
   }
-  :is(#player-scope) .bg-book-primary-20 {
+  #player-scope .bg-book-primary-20 {
     background-color: color-mix(in srgb, var(--book-primary-color) 20%, transparent);
   }
-  :is(#player-scope) .bg-book-primary-30 {
+  #player-scope .bg-book-primary-30 {
     background-color: color-mix(in srgb, var(--book-primary-color) 30%, transparent);
   }
-  :is(#player-scope) .bg-book-secondary-20 {
+  #player-scope .bg-book-secondary-20 {
     background-color: color-mix(in srgb, var(--book-secondary-color) 20%, transparent);
   }
-  :is(#player-scope) .bg-book-tertiary-30 {
+  #player-scope .bg-book-tertiary-30 {
     background-color: color-mix(in srgb, var(--book-tertiary-color) 30%, transparent);
   }
-  :is(#player-scope) .bg-book-quaternary-40 {
+  #player-scope .bg-book-quaternary-40 {
     background-color: color-mix(in srgb, var(--book-quaternary-color) 40%, transparent);
   }
 
   /* Border colors */
-  :is(#player-scope) .border-book-primary-20 {
+  #player-scope .border-book-primary-20 {
     border-color: color-mix(in srgb, var(--book-primary-color) 20%, transparent);
   }
-  :is(#player-scope) .border-book-primary-30 {
+  #player-scope .border-book-primary-30 {
     border-color: color-mix(in srgb, var(--book-primary-color) 30%, transparent);
   }
-  :is(#player-scope) .border-book-primary-40 {
+  #player-scope .border-book-primary-40 {
     border-color: color-mix(in srgb, var(--book-primary-color) 40%, transparent);
   }
-  :is(#player-scope) .border-book-secondary-30 {
+  #player-scope .border-book-secondary-30 {
     border-color: color-mix(in srgb, var(--book-secondary-color) 30%, transparent);
   }
-  :is(#player-scope) .border-t-book-primary {
+  #player-scope .border-t-book-primary {
     border-top-color: var(--book-primary-color);
   }
-  :is(#player-scope) .border-t-book-tertiary-50 {
+  #player-scope .border-t-book-tertiary-50 {
     border-top-color: color-mix(in srgb, var(--book-tertiary-color) 50%, transparent);
   }
 
   /* Text / Fill */
-  :is(#player-scope) .text-book-primary {
+  #player-scope .text-book-primary {
     color: var(--book-primary-color);
   }
-  :is(#player-scope) .text-book-tertiary {
+  #player-scope .text-book-tertiary {
     color: var(--book-tertiary-color);
   }
-  :is(#player-scope) .fill-book-primary {
+  #player-scope .fill-book-primary {
     fill: var(--book-primary-color);
   }
 }
@@ -414,25 +425,17 @@ body#player-scope.dark {
   }
 }
 
-:is(#player-scope) .search-highlight {
-  @apply bg-yellow-300 text-black rounded-sm;
-}
-:is(#player-scope.dark) .search-highlight {
-  background-color: #ffff99;
-  color: #000;
-  box-shadow: 0 0 4px rgba(255, 255, 100, 0.4);
-  animation: searchHighlightFadeDark 4s ease-in-out forwards;
-}
-
 #player-scope #left-notes {
   scrollbar-color: transparent transparent;
   scrollbar-width: none !important;
 }
+
 #player-scope .character-notes-custom {
   overflow: visible;
   scrollbar-color: transparent transparent;
   scrollbar-width: none !important;
 }
+
 #player-scope .character-notes-custom > div:last-child {
   padding-bottom: 30px;
 }
