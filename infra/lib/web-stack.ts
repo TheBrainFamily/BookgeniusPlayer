@@ -13,7 +13,8 @@ import {
   aws_route53 as route53,
   aws_route53_targets as targets,
   aws_certificatemanager as acm,
-  aws_apigateway as apigw,
+  aws_apigatewayv2 as apigwv2,
+  aws_apigatewayv2_integrations as apigwv2i,
   aws_lambda_nodejs as lnode,
   aws_lambda as lambda,
 } from "aws-cdk-lib";
@@ -25,6 +26,7 @@ export interface WebStackProps extends StackProps {
   publicKeyFilePath: string;
   cfPrivateKeySecretName: string;
   tokenTtlSeconds: number;
+  clerkSecretKey: string;
 }
 
 export class WebStack extends Stack {
@@ -97,7 +99,7 @@ export class WebStack extends Stack {
 
     // ===== CloudFront Function: Router (loaded from file, compiled to JS) =====
     const routerFn = new cf.Function(this, "RouterFn", {
-      code: cf.FunctionCode.fromFile({ filePath: path.resolve("dist/runtime/router-fn.js") }),
+      code: cf.FunctionCode.fromFile({ filePath: path.resolve("dist-cff/router-fn.js") }),
       runtime: cf.FunctionRuntime.JS_2_0, // <— modern features enabled
     });
 
@@ -111,6 +113,19 @@ export class WebStack extends Stack {
       priceClass: cf.PriceClass.PRICE_CLASS_100,
       domainNames: [props.domainProd, `*.${props.domainProd}`],
       certificate: certAppProd,
+    });
+
+    const apiOriginProd = new origins.HttpOrigin(`api.${props.domainProd}`, {
+      protocolPolicy: cf.OriginProtocolPolicy.HTTPS_ONLY,
+      originSslProtocols: [cf.OriginSslPolicy.TLS_V1_2],
+    });
+    appDistProd.addBehavior("/api/*", apiOriginProd, {
+      cachePolicy: cf.CachePolicy.CACHING_DISABLED, // 🔴 no caching for /resolve
+      originRequestPolicy: cf.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
+      // ^ forwards headers/queries but lets CF set Host=api.<domain> so API mapping works
+      allowedMethods: cf.AllowedMethods.ALLOW_ALL, // or .ALLOW_GET_HEAD_OPTIONS
+      viewerProtocolPolicy: cf.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      functionAssociations: [{ function: routerFn, eventType: cf.FunctionEventType.VIEWER_REQUEST }],
     });
 
     // DNS for PROD app
@@ -133,6 +148,19 @@ export class WebStack extends Stack {
         priceClass: cf.PriceClass.PRICE_CLASS_100,
         domainNames: [props.domainStage!, `*.${props.domainStage}`],
         certificate: certAppStage,
+      });
+
+      const apiOriginStage = new origins.HttpOrigin(`api.${props.domainStage}`, {
+        protocolPolicy: cf.OriginProtocolPolicy.HTTPS_ONLY,
+        originSslProtocols: [cf.OriginSslPolicy.TLS_V1_2],
+      });
+
+      appDistStage.addBehavior("/api/*", apiOriginStage, {
+        cachePolicy: cf.CachePolicy.CACHING_DISABLED,
+        originRequestPolicy: cf.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
+        allowedMethods: cf.AllowedMethods.ALLOW_ALL,
+        viewerProtocolPolicy: cf.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        functionAssociations: [{ function: routerFn, eventType: cf.FunctionEventType.VIEWER_REQUEST }],
       });
 
       new route53.ARecord(this, "ApexStage", {
@@ -210,11 +238,15 @@ export class WebStack extends Stack {
         CDN_DOMAIN: `cdn.${props.domainProd}`,
         TOKEN_TTL_SECONDS: String(props.tokenTtlSeconds),
         CF_PRIVATE_KEY_SECRET_NAME: props.cfPrivateKeySecretName,
+        CLERK_SECRET_KEY: props.clerkSecretKey,
+        CF_PUBLIC_KEY_ID: publicKey.publicKeyId,
       },
     });
 
-    bucket.grantRead(resolveFn, bucket.arnForObjects("prod/versions.json"));
-    bucket.grantRead(resolveFn, bucket.arnForObjects("branches/*/versions.json"));
+    resolveFn.addToRolePolicy(
+      new iam.PolicyStatement({ actions: ["s3:GetObject"], resources: [bucket.arnForObjects("prod/versions.json"), bucket.arnForObjects("branches/*/versions.json")] }),
+    );
+
     resolveFn.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ["secretsmanager:GetSecretValue"],
@@ -222,31 +254,55 @@ export class WebStack extends Stack {
       }),
     );
 
-    const apiProd = new apigw.RestApi(this, "CoreApiProd", {
-      restApiName: "core-api-prod",
-      defaultCorsPreflightOptions: { allowOrigins: apigw.Cors.ALL_ORIGINS, allowMethods: ["GET", "OPTIONS"] },
-      deployOptions: { stageName: "prod" },
-      domainName: { domainName: `api.${props.domainProd}`, certificate: certApiProd, endpointType: apigw.EndpointType.EDGE, securityPolicy: apigw.SecurityPolicy.TLS_1_2 },
+    // HTTP API (v2) for PROD
+    const apiDomainProd = new apigwv2.DomainName(this, "ApiDomainProd", { domainName: `api.${props.domainProd}`, certificate: certApiProd });
+
+    const httpApiProd = new apigwv2.HttpApi(this, "CoreHttpApiProd", {
+      apiName: "core-api-prod",
+      corsPreflight: { allowOrigins: ["*"], allowMethods: [apigwv2.CorsHttpMethod.GET, apigwv2.CorsHttpMethod.OPTIONS], allowHeaders: ["*"] },
     });
-    const contentProd = apiProd.root.addResource("content");
-    contentProd.addResource("resolve").addResource("{slug}").addMethod("GET", new apigw.LambdaIntegration(resolveFn));
 
-    new route53.ARecord(this, "ApiProdAlias", { zone: zoneProd, recordName: `api.${props.domainProd}`, target: route53.RecordTarget.fromAlias(new targets.ApiGateway(apiProd)) });
+    // Map $default stage to the custom domain
+    new apigwv2.ApiMapping(this, "ApiMappingProd", { api: httpApiProd, domainName: apiDomainProd, stage: httpApiProd.defaultStage! });
 
+    // Route: GET /content/resolve/{slug}
+    httpApiProd.addRoutes({
+      path: "/content/resolve/{slug}",
+      methods: [apigwv2.HttpMethod.GET],
+      integration: new apigwv2i.HttpLambdaIntegration("ResolveIntegrationProd", resolveFn),
+    });
+
+    // Route53 alias for api.<domain>
+    new route53.ARecord(this, "ApiProdAlias", {
+      zone: zoneProd,
+      recordName: `api.${props.domainProd}`,
+      target: route53.RecordTarget.fromAlias(new targets.ApiGatewayv2DomainProperties(apiDomainProd.regionalDomainName, apiDomainProd.regionalHostedZoneId)),
+    });
+
+    // HTTP API (v2) for STAGE (optional)
     if (zoneStage && certApiStage) {
-      const apiStage = new apigw.RestApi(this, "CoreApiStage", {
-        restApiName: "core-api-stage",
-        defaultCorsPreflightOptions: { allowOrigins: apigw.Cors.ALL_ORIGINS, allowMethods: ["GET", "OPTIONS"] },
-        deployOptions: { stageName: "prod" },
-        domainName: { domainName: `api.${props.domainStage}`, certificate: certApiStage, endpointType: apigw.EndpointType.EDGE, securityPolicy: apigw.SecurityPolicy.TLS_1_2 },
-      });
-      const contentStage = apiStage.root.addResource("content");
-      contentStage.addResource("resolve").addResource("{slug}").addMethod("GET", new apigw.LambdaIntegration(resolveFn));
+      const apiDomainStage = new apigwv2.DomainName(this, "ApiDomainStage", { domainName: `api.${props.domainStage}`, certificate: certApiStage });
 
+      const httpApiStage = new apigwv2.HttpApi(this, "CoreHttpApiStage", {
+        apiName: "core-api-stage",
+        corsPreflight: { allowOrigins: ["*"], allowMethods: [apigwv2.CorsHttpMethod.GET, apigwv2.CorsHttpMethod.OPTIONS], allowHeaders: ["*"] },
+      });
+
+      // Map $default stage to the custom domain
+      new apigwv2.ApiMapping(this, "ApiMappingStage", { api: httpApiStage, domainName: apiDomainStage, stage: httpApiStage.defaultStage! });
+
+      // Route: GET /content/resolve/{slug}
+      httpApiStage.addRoutes({
+        path: "/content/resolve/{slug}",
+        methods: [apigwv2.HttpMethod.GET],
+        integration: new apigwv2i.HttpLambdaIntegration("ResolveIntegrationStage", resolveFn),
+      });
+
+      // Route53 alias for api.<domain>
       new route53.ARecord(this, "ApiStageAlias", {
         zone: zoneStage,
         recordName: `api.${props.domainStage}`,
-        target: route53.RecordTarget.fromAlias(new targets.ApiGateway(apiStage)),
+        target: route53.RecordTarget.fromAlias(new targets.ApiGatewayv2DomainProperties(apiDomainStage.regionalDomainName, apiDomainStage.regionalHostedZoneId)),
       });
     }
 

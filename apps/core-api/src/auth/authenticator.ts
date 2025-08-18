@@ -2,7 +2,6 @@
 
 import { decodeJwt } from "jose";
 import { verifyClerkToken } from "./clerk.strategy";
-import { verifySnapplifyToken } from "./snapplify.strategy";
 import type { AuthenticatedUser } from "../types";
 
 /**
@@ -56,11 +55,6 @@ export async function authenticateRequest(req: Request): Promise<AuthenticatedUs
   if (issuer?.includes("clerk")) {
     console.log("Authenticating with Clerk strategy...");
     return await verifyClerkToken(token);
-  }
-
-  if (issuer === "https://snapplify.com" || issuer === process.env.SNAPPLIFY_ISSUER) {
-    console.log("Authenticating with Snapplify strategy...");
-    return await verifySnapplifyToken(token);
   }
 
   throw new Error(`Unknown or unsupported token issuer: ${issuer}`);

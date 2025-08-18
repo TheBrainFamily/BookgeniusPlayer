@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import "source-map-support/register";
+import "source-map-support/register.js";
+import "dotenv/config";
 import * as cdk from "aws-cdk-lib";
 import { WebStack } from "../lib/web-stack.js";
 
@@ -26,4 +27,5 @@ new WebStack(app, "WebStack", {
   cfPrivateKeySecretName: CF_PRIVATE_KEY_SECRET_NAME,
   tokenTtlSeconds: TOKEN_TTL_SECONDS,
   publicKeyFilePath: "cf-public-key.pem",
+  clerkSecretKey: process.env.CLERK_SECRET_KEY!,
 });

@@ -38,7 +38,7 @@ const WrappedApp = () => {
       (async () => {
         setAssetBaseReady(false);
         try {
-          const res = await fetch(`/api/core/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
+          const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
           if (!res.ok) throw new Error("[RESOLVE] resolve failed");
           const { signedAssetBase, assetPrefix, assetQuery } = await res.json();
 

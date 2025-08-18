@@ -1,0 +1,14 @@
+{
+  "hosted-zone:account=206272344806:domainName=bookgenius.eu:region=us-east-1": {
+    "Id": "/hostedzone/Z02981652W85KUZPYUP5H",
+    "Name": "bookgenius.eu."
+  },
+  "hosted-zone:account=206272344806:domainName=bookgenius.pl:region=us-east-1": {
+    "Id": "/hostedzone/Z0528798TXSQV0371CZM",
+    "Name": "bookgenius.pl."
+  },
+  "acknowledged-issue-numbers": [
+    34892,
+    34892
+  ]
+}

@@ -2,18 +2,29 @@ import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
 import * as crypto from "crypto";
 import type { StreamingBlobPayloadOutputTypes, SdkStreamMixin } from "@smithy/types";
-import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
+import type { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from "aws-lambda";
+import { verifyClerkToken } from "./helpers/clerk.strategy.js";
 
 const s3 = new S3Client({});
 const sm = new SecretsManagerClient({});
 
-const { BUCKET, DEFAULT_CTX = "prod", VERSIONS_ROOT = "branches", CDN_DOMAIN, TOKEN_TTL_SECONDS = "21600", CF_PRIVATE_KEY_SECRET_NAME } = process.env;
+const { BUCKET, DEFAULT_CTX = "prod", VERSIONS_ROOT = "branches", CDN_DOMAIN, TOKEN_TTL_SECONDS = "21600", CF_PRIVATE_KEY_SECRET_NAME, CF_PUBLIC_KEY_ID } = process.env;
 
 function hostToBranch(host?: string): string | undefined {
   if (!host) return;
   const h = host.split(":")[0];
   const first = h.split(".")[0];
   if (/^pr-/.test(first)) return first;
+}
+
+function getCookieFromEventV2(event: APIGatewayProxyEventV2, name: string): string | null {
+  // HTTP API v2 passes cookies in event.cookies (array of "name=value")
+  if (Array.isArray(event.cookies) && event.cookies.length) {
+    const hit = event.cookies.find((c) => c.startsWith(name + "="));
+    if (hit) return hit.substring(name.length + 1);
+  }
+  // fallback to header parsing if API ever sends Cookie header
+  return getCookie(event.headers, name);
 }
 
 async function getVersions(ctx: string): Promise<Record<string, string> | null> {
@@ -45,24 +56,52 @@ function signPolicy(policyJson: string, privateKeyPem: string) {
   return signer.sign(privateKeyPem, "base64").replace(/\+/g, "-").replace(/=/g, "_").replace(/\//g, "~");
 }
 
-export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  try {
-    const slug = decodeURIComponent(event.pathParameters?.slug || "");
-    if (!slug) return res(400, { error: "slug required" });
+// --- minimal Clerk auth helpers (header first, then __session cookie) ---
+function getBearerFromHeaderV2(headers: Record<string, string | undefined> | undefined): string | null {
+  if (!headers) return null;
+  const h = headers.authorization || headers.Authorization;
+  if (!h) return null;
+  const m = /^Bearer\s+(.+)$/.exec(h);
+  return m ? m[1] : null;
+}
+function getCookie(headers: Record<string, string | undefined> | undefined, name: string): string | null {
+  const raw = headers?.cookie || headers?.Cookie;
+  if (!raw) return null;
+  const hit = raw
+    .split(";")
+    .map((s) => s.trim())
+    .find((x) => x.startsWith(name + "="));
+  return hit ? hit.substring(name.length + 1) : null;
+}
 
-    const qs = event.queryStringParameters || {};
-    let ctx: string | undefined = qs.ctx; // "prod" or "branches/<branch>"
+export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> => {
+  try {
+    const slugParam = event.pathParameters?.slug;
+    if (!slugParam) return res(400, { error: "slug required" });
+    const slug = decodeURIComponent(slugParam);
+
+    const ctxFromQuery = event.queryStringParameters?.ctx;
+    let ctx = ctxFromQuery;
 
     if (!ctx) {
-        const host =
-            event.requestContext.domainName ??
-            event.headers['host'] ??
-            event.headers['Host'];
-        const branch = hostToBranch(host);
+      const host = event.requestContext.domainName || event.headers?.host;
+      const branch = hostToBranch(host);
       ctx = branch ? `${VERSIONS_ROOT}/${branch}` : DEFAULT_CTX;
     }
 
-    const isLoggedIn = !!(event.headers?.authorization || event.headers?.Authorization);
+    // --- verify Clerk token (Authorization: Bearer OR __session cookie) ---
+    let isLoggedIn = false;
+    try {
+      const headerToken = getBearerFromHeaderV2(event.headers);
+      const cookieToken = getCookieFromEventV2(event, "__session");
+      const token = headerToken || cookieToken;
+      if (token) {
+        await verifyClerkToken(token);
+        isLoggedIn = true;
+      }
+    } catch {
+      isLoggedIn = false;
+    }
     const visibility = isLoggedIn ? "full" : "demo";
 
     let versions = await getVersions(ctx!);
@@ -88,8 +127,13 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     const policyB64 = b64url(policyJson);
     const signature = signPolicy(policyJson, privateKeyPem);
 
+    if (!CF_PUBLIC_KEY_ID) {
+      console.error("CF_PUBLIC_KEY_ID not set");
+      return res(500, { error: "signing_key_missing" });
+    }
+
     const assetPrefix = prefixUrl.replace(/\/+$/, "");
-    const assetQuery = `Policy=${policyB64}&Signature=${signature}&Key-Pair-Id=${encodeURIComponent("<Key-Pair-Id>")}`;
+    const assetQuery = `Policy=${policyB64}&Signature=${signature}&Key-Pair-Id=${encodeURIComponent(CF_PUBLIC_KEY_ID!)}`;
     // Note: we do NOT include Key-Pair-Id here; for KeyGroup keys you don't need Key-Pair-Id param.
     // If you prefer explicit param, add a separate env for PublicKeyId and include it.
 
@@ -102,7 +146,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   }
 };
 
-function res(statusCode: number, body: Record<string, unknown>) {
+function res(statusCode: number, body: Record<string, unknown>): APIGatewayProxyStructuredResultV2 {
   return {
     statusCode,
     headers: {

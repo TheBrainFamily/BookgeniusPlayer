@@ -3,16 +3,42 @@
 // Uses modern TS/JS, compiled to plain JS (no module wrapper).
 
 // Type-only import - gets completely stripped during TypeScript compilation
-import type { CloudFrontFunctionsEvent } from "aws-lambda";
+// Inlined CloudFront Functions types (no imports needed)
+interface CloudFrontRequest {
+  uri: string;
+  method: string;
+  querystring?: Record<string, { value: string }>;
+  headers?: Record<string, { value: string }>;
+  cookies?: Record<string, { value: string }>;
+}
+
+interface CloudFrontResponse {
+  statusCode: number;
+  statusDescription?: string;
+  headers?: Record<string, { value: string }>;
+  cookies?: Record<string, { value: string }>;
+}
+
+interface CloudFrontFunctionsEvent {
+  request: CloudFrontRequest;
+  response?: CloudFrontResponse;
+}
 
 // Return type can be either the modified request or a response object
-type CloudFrontFunctionsResult = CloudFrontFunctionsEvent["request"] | CloudFrontFunctionsEvent["response"];
+type CloudFrontFunctionsResult = CloudFrontRequest | CloudFrontResponse;
 
 function handler(event: CloudFrontFunctionsEvent): CloudFrontFunctionsResult {
   const req = event.request;
   const host: string = (req.headers && req.headers.host && req.headers.host.value) || "";
   const qs: Record<string, { value: string }> = req.querystring || {};
   let uri: string = req.uri || "/";
+
+  // 🔒 Do not rewrite API calls — let CF path behavior route them to API Gateway
+  if (uri.startsWith("/api/")) {
+    // remove '/api' prefix so origin receives '/content/resolve/...' instead of '/api/content/...'
+    req.uri = uri.replace(/^\/api/, "") || "/";
+    return req;
+  }
 
   const qsVal = (k: string) => (qs[k] && qs[k].value) || undefined;
   const norm = (u: string) => (!u || u === "" ? "/" : u.charAt(0) === "/" ? u : `/${u}`);

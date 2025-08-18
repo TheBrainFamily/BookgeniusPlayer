@@ -138,10 +138,7 @@ Bun.serve({
 
     // inside Bun.serve().fetch:
     if (reqPath.startsWith("/content/resolve/")) {
-      // AUTHORIZE: >>> add your auth check here <<<
-      // e.g. await authorizeRequest(req) which should verify session/purchase before issuing tokens.
-      // For now it is a no-op allow; replace with real auth.
-      const isAuthorized = await authenticateRequest(req); // TODO: replace with real check
+      const isAuthorized = await authenticateRequest(req);
       if (!isAuthorized) return new Response("Forbidden", { status: 403 });
 
       // ensure manifest is in memory
