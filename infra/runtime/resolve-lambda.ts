@@ -1,14 +1,12 @@
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
 import * as crypto from "crypto";
 import type { StreamingBlobPayloadOutputTypes, SdkStreamMixin } from "@smithy/types";
 import type { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 import { verifyClerkToken } from "./helpers/clerk.strategy.js";
 
 const s3 = new S3Client({});
-const sm = new SecretsManagerClient({});
 
-const { BUCKET, DEFAULT_CTX = "prod", VERSIONS_ROOT = "branches", CDN_DOMAIN, TOKEN_TTL_SECONDS = "21600", CF_PRIVATE_KEY_SECRET_NAME, CF_PUBLIC_KEY_ID } = process.env;
+const { BUCKET, DEFAULT_CTX = "prod", VERSIONS_ROOT = "branches", CDN_DOMAIN, TOKEN_TTL_SECONDS = "21600", CF_PRIVATE_KEY_PEM, CF_PUBLIC_KEY_ID } = process.env;
 
 function hostToBranch(host?: string): string | undefined {
   if (!host) return;
@@ -121,8 +119,12 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
     const prefixUrl = `https://${CDN_DOMAIN}${baseFolder}`.replace(/\/+$/, "/");
 
     // get private key
-    const secret = await sm.send(new GetSecretValueCommand({ SecretId: CF_PRIVATE_KEY_SECRET_NAME! }));
-    const privateKeyPem = secret.SecretString!;
+    const privateKeyPem = CF_PRIVATE_KEY_PEM;
+    if (!privateKeyPem) {
+      console.error("CF_PRIVATE_KEY_PEM not set");
+      return res(500, { error: "signing_key_missing" });
+    }
+
     const policyJson = JSON.stringify(buildPolicy(prefixUrl, expires));
     const policyB64 = b64url(policyJson);
     const signature = signPolicy(policyJson, privateKeyPem);

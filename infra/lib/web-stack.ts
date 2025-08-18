@@ -17,6 +17,7 @@ import {
   aws_apigatewayv2_integrations as apigwv2i,
   aws_lambda_nodejs as lnode,
   aws_lambda as lambda,
+  aws_secretsmanager as secrets,
 } from "aws-cdk-lib";
 import { Construct } from "constructs";
 
@@ -176,7 +177,7 @@ export class WebStack extends Stack {
     }
 
     // ===== CDN for book assets (Signed URLs; tokens ignored in cache key) =====
-    const pubPem = fs.readFileSync(path.resolve("cf-public-key.pem"), "utf8");
+    const pubPem = fs.readFileSync(path.resolve(props.publicKeyFilePath), "utf8");
     const publicKey = new cf.PublicKey(this, "CfPublicKey", { encodedKey: pubPem });
     const keyGroup = new cf.KeyGroup(this, "CfKeyGroup", { items: [publicKey] });
 
@@ -229,7 +230,7 @@ export class WebStack extends Stack {
     const resolveFn = new lnode.NodejsFunction(this, "ResolveFn", {
       entry: path.resolve("dist/runtime/resolve-lambda.js"),
       runtime: lambda.Runtime.NODEJS_20_X,
-      memorySize: 512,
+      memorySize: 1536,
       timeout: Duration.seconds(10),
       environment: {
         BUCKET: bucket.bucketName,
@@ -242,6 +243,14 @@ export class WebStack extends Stack {
         CF_PUBLIC_KEY_ID: publicKey.publicKeyId,
       },
     });
+
+    const cfPriv = secrets.Secret.fromSecretNameV2(this, "CfPrivateKeySecret", props.cfPrivateKeySecretName);
+
+    // 2) Inject as env var via CloudFormation dynamic reference (resolved at deploy-time)
+    resolveFn.addEnvironment("CF_PRIVATE_KEY_PEM", cfPriv.secretValue.unsafeUnwrap());
+
+    // (Optional) tiny Node keep-alive
+    resolveFn.addEnvironment("AWS_NODEJS_CONNECTION_REUSE_ENABLED", "1");
 
     resolveFn.addToRolePolicy(
       new iam.PolicyStatement({ actions: ["s3:GetObject"], resources: [bucket.arnForObjects("prod/versions.json"), bucket.arnForObjects("branches/*/versions.json")] }),
