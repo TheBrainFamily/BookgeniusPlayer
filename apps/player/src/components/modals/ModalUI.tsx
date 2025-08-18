@@ -123,7 +123,18 @@ const ModalUI: React.FC<ModalUIProps> = ({
               <header className="flex justify-between items-center p-4">
                 <div className={titleTextClasses}>{title}</div>
                 {showCloseButton && (
-                  <button type="button" onPointerUp={onClose} className={closeButtonClasses} aria-label="Close modal">
+                  <button
+                    type="button"
+                    onPointerUp={onClose}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onClose();
+                      }
+                    }}
+                    className={closeButtonClasses}
+                    aria-label="Close modal"
+                  >
                     <X size={20} />
                   </button>
                 )}

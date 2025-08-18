@@ -11,9 +11,15 @@ export const activateCharacterInteractions = (element: HTMLElement, openCharacte
     if (characterTalkingSpan) {
       const characterSlug = characterTalkingSpan.dataset.character;
       const talkingSrc = characterTalkingSpan.dataset.srcTalking;
-      characterTalkingSpan.addEventListener("click", () => {
+
+      const handler = (event: PointerEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
         openCharacterDetailsModal(characterSlug, true, talkingSrc);
-      });
+      };
+      characterTalkingSpan.addEventListener("pointerup", handler, { passive: false });
+      // Mark to avoid re-attaching
+      characterTalkingSpan.dataset.clickListenerAttached = "true";
     }
   }, 0);
 };
