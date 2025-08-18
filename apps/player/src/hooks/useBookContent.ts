@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { setupPageObserver } from "@player/ui/pageObserver";
 import { getBookStringified } from "@player/genericBookDataGetters/getBookStringified";
-import { useSentenceModal } from "@player/stores/modals/sentenceModal.store";
 import { findSimplifiedSentence } from "@player/helpers/findSimplifiedSentence";
 import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
@@ -32,7 +31,6 @@ export function useBookContent(containerId: string) {
   } = getBookData();
 
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
-  const { openModal: openSentenceModal } = useSentenceModal();
 
   useEditorMode(isEditorMode ? container : null);
 
@@ -128,26 +126,8 @@ export function useBookContent(containerId: string) {
           iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--book-simplified-icon-color, ForestGreen)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>`;
           span.appendChild(iconContainer);
 
-          iconContainer.addEventListener("pointerup", (e) => {
-            iconContainer.tabIndex = 0;
-            iconContainer.setAttribute("role", "button");
-            iconContainer.addEventListener("pointerup", (e: PointerEvent) => {
-              e.preventDefault();
-              e.stopPropagation();
-              const originalSentence = span.getAttribute("data-original-sentence");
-              openSentenceModal(originalSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
-            });
-            iconContainer.addEventListener("keydown", (e: KeyboardEvent) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                const originalSentence = span.getAttribute("data-original-sentence");
-                openSentenceModal(originalSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
-              }
-            });
-          });
           // 5. Activate character interactions for newly transformed content
           activateCharacterInteractions(target, openCharacterDetailsModal);
-          // openSentenceModal(currentSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore);
           setSentenceAsClicked(currentSentenceId);
         }
       };
