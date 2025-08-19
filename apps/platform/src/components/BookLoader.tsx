@@ -61,7 +61,7 @@ export const BookLoader: React.FC<BookLoaderProps> = ({ title, subtitle, loading
   // The component uses `position: fixed` to cover the whole screen,
   // just like the original HTML version.
   return (
-    <div className={`book-loader-splash ${isHiding ? "hide" : ""}`}>
+    <div className={`book-loader-splash ${isHiding ? "hide" : ""} pointer-events-none`}>
       <div className="text-center">
         {/* Title and Subtitle */}
         <div className="mb-16">
