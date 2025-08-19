@@ -9,6 +9,8 @@ import { RouteTransitionProvider } from "./providers/RouteTransitionProvider";
 import { UniversalRouter } from "./UniversalRouter";
 import { ClerkProviderSafe } from "@platform/providers/ClerkProviderSafe.tsx";
 import { lazy, Suspense } from "react";
+import GenreExploration from "./components/GenreExploration";
+import BookExperience from "./components/BookExperience";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -30,6 +32,8 @@ const App = () => (
           <RouteTransitionProvider defaultMinDurationMs={50}>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/experience/:slug" element={<BookExperience />} />
+              <Route path="/GenreExploration" element={<GenreExploration />} />
               <Route
                 path="/reader/"
                 element={
