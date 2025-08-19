@@ -18,9 +18,12 @@ const WrappedApp = () => {
     const onReady = () => {
       setIsPlayerReady(true);
       finishTransition();
+      console.log("BOOK LOADER App is ready");
+
       window.setTimeout(() => {
+        console.log("BOOK LOADER App is ready, hiding splash screen");
         window.dispatchEvent(new CustomEvent("splashHidden"));
-      }, 500);
+      }, 1000);
     };
 
     window.addEventListener("appReady", onReady);

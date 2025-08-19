@@ -52,6 +52,7 @@ export const BookLoader: React.FC<BookLoaderProps> = ({ title, subtitle, loading
 
   // Effect to handle the final fade-out of the entire screen
   useEffect(() => {
+    console.log("BOOK LOADER IS LOADED:", isLoaded);
     if (isLoaded) {
       setIsHiding(true);
     }

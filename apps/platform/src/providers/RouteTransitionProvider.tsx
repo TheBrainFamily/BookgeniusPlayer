@@ -72,12 +72,14 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
 
   const value = useMemo(() => ({ startTransition, finishTransition, navigating, setMinDurationMs }), [finishTransition, navigating, startTransition]);
 
+  console.log("BOOK LOADER PROVIDER RENDER", { navigating, value });
+
   return (
     <RouteTransitionContext.Provider value={value}>
       {children}
 
       {/* Single global overlay with BookLoader */}
-      <div className={`pointer-events-none fixed inset-0 z-40 transition-opacity duration-300 ${navigating ? "opacity-100" : "opacity-0"}`} aria-hidden={!navigating}>
+      <div className={`pointer-events-none fixed inset-0 z-40 transition-opacity duration-1000 ${navigating ? "opacity-100" : "opacity-0"}`} aria-hidden={!navigating}>
         <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
         <div className="relative z-10 flex h-full items-center justify-center">
           {meta ? (

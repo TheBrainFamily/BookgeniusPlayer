@@ -134,6 +134,8 @@ export const useAppReady = () => {
 
   useEffect(() => {
     if (!ready) return;
+
+    console.log("BOOK LOADER App is ready, dispatching appReady event");
     window.dispatchEvent(new CustomEvent("appReady"));
   }, [ready]);
 };
