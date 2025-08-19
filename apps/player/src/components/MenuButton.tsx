@@ -19,6 +19,12 @@ const MenuButton = () => {
           <TooltipTrigger asChild>
             <motion.button
               onPointerUp={openModal}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  openModal();
+                }
+              }}
               className="p-2 my-1 hover:text-white rounded-full cursor-pointer flex"
               whileHover="hover"
               whileTap="tap"
