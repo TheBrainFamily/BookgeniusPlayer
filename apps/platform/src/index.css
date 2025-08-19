@@ -253,6 +253,6 @@ body#player-scope #legacy {
   display: flex;
 }
 
-body#player-scope #root {
+/* body#player-scope #root {
   display: none;
-}
+} */
