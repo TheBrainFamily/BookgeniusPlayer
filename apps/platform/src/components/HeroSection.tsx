@@ -1,7 +1,8 @@
 import { Button } from "@platform/components/ui/button";
 import { ArrowRight, BookOpen, Sparkles } from "lucide-react";
-import heroImage from "@platform/assets/library-hero.jpg";
+import heroImage from "@platform/assets/library-hero-2.webp";
 
+// for the backgroundImage this color works great, but only once the overlay is loaded backgroundColor: "#8d4214"
 const HeroSection = () => {
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
