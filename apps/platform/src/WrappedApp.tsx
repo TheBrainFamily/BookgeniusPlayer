@@ -71,9 +71,11 @@ const WrappedApp = () => {
     };
   }, [assetBaseReady]);
 
+  console.log("isPlayerReady", isPlayerReady);
+  console.log("assetBaseReady", assetBaseReady);
   return (
     <div className={`w-full h-full border-0 transition-opacity duration-500 ${!isPlayerReady ? "opacity-0" : "opacity-100"}`}>
-      {assetBaseReady ? <Suspense fallback={null /* overlay handles UX */}>{createPortal(<PlayerApp />, document.getElementById("root-player") || document.body)}</Suspense> : null}
+      {assetBaseReady ? <Suspense fallback={null /* overlay handles UX */}>{createPortal(<PlayerApp />, document.getElementById("root-player"))}</Suspense> : null}
     </div>
   );
 };

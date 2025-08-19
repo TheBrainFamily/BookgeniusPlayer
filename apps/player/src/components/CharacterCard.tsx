@@ -35,7 +35,8 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
     if (!cardRef.current) return;
 
     if (imageOnly) {
-      const imageSrc = entity.imageUrl || getListeningMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook()).replace(/-(listens|speaks)\.(mp4|webm)$/, ".png");
+      //TODO do not add this logic all around the frontend, we have a function that does it
+      const imageSrc = entity.imageUrl || getListeningMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook()).replace(/-(listens|speaks)\.(mp4|webm)/, ".png");
       setCurrentMediaSrc(imageSrc);
     } else if (isTalkingInCurrentRange) {
       setCurrentMediaSrc(getTalkingMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook()));
