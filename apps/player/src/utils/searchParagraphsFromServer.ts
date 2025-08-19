@@ -1,5 +1,5 @@
 import { Location } from "@player/state/LocationContext";
-import { QUESTIONS_SERVER_URL } from "@player/lib/consts";
+import { ANSWERS_SERVER_URL } from "@player/lib/consts";
 import { bookDataLoader } from "@player/services/bookDataLoader";
 import { Filter } from "@player/types/book";
 
@@ -35,7 +35,7 @@ export type SearchParagraphsFunctionResponse = { chapter: number; paragraphNumbe
  * @returns A promise that resolves with the search results from the server.
  */
 export async function searchParagraphsFromServer(searchQuery: string, location: Location): Promise<SearchParagraphsFunctionResponse[]> {
-  const baseUrl = `${QUESTIONS_SERVER_URL}/getParagraphsForSearch`;
+  const baseUrl = `${ANSWERS_SERVER_URL}/getParagraphsForSearch`;
   const filter: Filter = {
     chapterFrom: 0, // Assuming 0-based chapter indexing
     chapterTo: location.endChapter,

@@ -1,6 +1,6 @@
 import { Location } from "./state/LocationContext";
 import { Filter } from "./types/book";
-import { DEV_SERVER_URL } from "@player/lib/consts";
+import { ANSWERS_SERVER_URL } from "@player/lib/consts";
 import { bookDataLoader } from "@player/services/bookDataLoader";
 
 export async function deepResearchCall(searchQuery: string, location: Location): Promise<string> {
@@ -14,10 +14,10 @@ export async function deepResearchCall(searchQuery: string, location: Location):
 
   const params = new URLSearchParams({ question: searchQuery, filter: JSON.stringify(filter) });
 
-  let url = `/api/${baseUrl}?${params.toString()}`;
+  let url = `/${baseUrl}?${params.toString()}`;
   const isDev = import.meta.env.MODE === "development";
   if (isDev) {
-    url = `${DEV_SERVER_URL}${url}`;
+    url = `${ANSWERS_SERVER_URL}${url}`;
   }
   console.log(`Fetching deep research from: ${url}`); // Optional: for debugging
   try {
