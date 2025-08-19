@@ -22,4 +22,5 @@ gateway.zip
 .env.prod
 Support/
 apps/player/public_books/**/book.xml
+apps/platform/public/books/
 cdk.out

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, Suspense } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useRouteTransition } from "./providers/RouteTransitionProvider";
 import { bookDataLoader } from "../../player/src/services/bookDataLoader";
+import { createPortal } from "react-dom";
 
 const PlayerApp = React.lazy(() => import("./player/PlayerRoot"));
 
@@ -61,13 +62,18 @@ const WrappedApp = () => {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    const bodyId = assetBaseReady ? "player-scope" : "platform-scope";
+    document.body.id = bodyId;
+
+    return () => {
+      document.body.id = "platform-scope";
+    };
+  }, [assetBaseReady]);
+
   return (
     <div className={`w-full h-full border-0 transition-opacity duration-500 ${!isPlayerReady ? "opacity-0" : "opacity-100"}`}>
-      {assetBaseReady ? (
-        <Suspense fallback={null /* overlay handles UX */}>
-          <PlayerApp />
-        </Suspense>
-      ) : null}
+      {assetBaseReady ? <Suspense fallback={null /* overlay handles UX */}>{createPortal(<PlayerApp />, document.getElementById("root-player") || document.body)}</Suspense> : null}
     </div>
   );
 };

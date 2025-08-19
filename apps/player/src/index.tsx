@@ -1,20 +1,17 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 
-import "./styles/globals.css";
-import "./styles/styles.css";
-import "./styles/modals.css";
-import "./styles/inline-avatars.css";
-import "./styles/book-theme.css";
+import "./styles/index.css";
+
 import "./i18n";
 import { AppWithResolve } from "@player/AppWithResolve";
 
-let container = document.getElementById("root");
+let container = document.getElementById("root-player");
 
 if (!container) {
   console.log("Root element not found, waiting for 1 second");
   setTimeout(() => {
-    container = document.getElementById("root");
+    container = document.getElementById("root-player");
     if (container) {
       createRoot(container).render(
         <React.StrictMode>
@@ -24,7 +21,7 @@ if (!container) {
     } else {
       console.log("Root element not found again, waiting for 5 second");
       setTimeout(() => {
-        container = document.getElementById("root");
+        container = document.getElementById("root-player");
         if (container) {
           createRoot(container).render(
             <React.StrictMode>

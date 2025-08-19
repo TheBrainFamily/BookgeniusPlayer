@@ -21,7 +21,7 @@
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
     <style>
-      body {
+      #platform-scope {
         background-color: #2d2d2d;
       }
 
@@ -38,8 +38,11 @@
     </style>
   </head>
 
-  <body>
+  <body id="platform-scope">
     <div id="root"></div>
+
+    <video id="cutscene-video" class="cutscene-video" playsinline></video>
+
     <div id="legacy">
       <video id="bg-video-a" class="bg-element" autoplay muted loop playsinline></video>
       <video id="bg-video-b" class="bg-element faded" autoplay muted loop playsinline></video>
@@ -56,6 +59,8 @@
         </div>
       </div>
     </div>
+
+    <div id="root-player"></div>
 
     <script type="module" src="/src/main.tsx"></script>
   </body>

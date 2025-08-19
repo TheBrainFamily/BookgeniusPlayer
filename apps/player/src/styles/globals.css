@@ -1,53 +1,75 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+:root:has(body#player-scope) {
+  @theme inline {
+    /* Border radius calculations */
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
 
-@theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+    /* Map CSS variables to Tailwind color system */
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    /* Chart colors */
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+
+    /* Sidebar colors */
+    --color-sidebar-background: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+
+    /* Book theme colors (aliases) */
+    --color-book-primary: var(--book-primary-color);
+    --color-book-secondary: var(--book-secondary-color);
+    --color-book-tertiary: var(--book-tertiary-color);
+    --color-book-quaternary: var(--book-quaternary-color);
+    --color-book-simplified-icon: var(--book-simplified-icon-color);
+
+    /* Animation tokens */
+    --animate-pulse-glow: pulseGlow 3s infinite ease-in-out;
+    --animate-search-highlight-fade: searchHighlightFade 4s ease-in-out forwards;
+    --animate-search-highlight-fade-dark: searchHighlightFadeDark 4s ease-in-out forwards;
+  }
 }
 
-:root {
+:root:has(body#player-scope) {
+  /* Book theme colors */
   --book-primary-color: #e3f2fd;
   --book-secondary-color: #1976d2;
   --book-tertiary-color: #90caf9;
   --book-quaternary-color: #0d47a1;
   --book-simplified-icon-color: #4caf50;
-  /* Main */
+
+  /* Main theme */
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -64,14 +86,19 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+
+  /* Chart colors */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+
+  /* Sidebar */
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -81,12 +108,11 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* Added */
-  --top-solid: 15%; /* mask is fully opaque from here down              */
-  --mid-solid: 50%; /* last row that stays fully opaque                 */
-  --edge-fade: 0%; /* width of the fixed left/right edge soft‑fade     */
+  /* Mask & safe area */
+  --top-solid: 15%;
+  --mid-solid: 50%;
+  --edge-fade: 0%;
 
-  /* Safe Area Insets */
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
   --safe-area-inset-left: env(safe-area-inset-left, 0px);
@@ -94,7 +120,7 @@
 
   /* Colors - Light Mode */
   --bg-light: #f0f0f0;
-  --bg-content-light: #fdfaf4; /* FB2 content bg */
+  --bg-content-light: #fdfaf4;
   --bg-page-light: #f5f5f5;
   --bg-page-active-light: #fff;
   --bg-notes-light: rgba(249, 249, 249, 0.5);
@@ -108,8 +134,8 @@
   --link-note-light: #8e8e8e;
   --link-note-hover-bg-light: #e0e0e0;
   --link-note-hover-text-light: #000;
-  --control-bg-light: #333; /* Controls are dark */
-  --control-text-light: white;
+  --control-bg-light: #333;
+  --control-text-light: #fff;
   --button-bg-light: #555;
   --button-hover-bg-light: #777;
   --button-disabled-bg-light: #444;
@@ -117,26 +143,27 @@
   --button-extra-bg-light: rgba(0, 0, 0, 0.2);
   --button-extra-hover-bg-light: rgba(0, 0, 0, 0.4);
   --modal-overlay-bg: rgba(0, 0, 0, 0.7);
-  --modal-bg-light: white;
-  --modal-text-light: #333; /* Default modal text */
+  --modal-bg-light: #fff;
+  --modal-text-light: #333;
   --modal-header-border-light: #ddd;
   --modal-close-light: #777;
   --char-card-bg-light: rgba(255, 255, 255, 30%);
-  --char-card-border-light: #ddd; /* Mobile strip border */
+  --char-card-border-light: #ddd;
   --mobile-strip-bg-light: rgba(255, 255, 255, 0.95);
   --mobile-strip-horizontal-bg-light: rgba(255, 255, 255, 0.85);
   --highlight-blink-color: rgba(152, 152, 152, 0.5);
 
-  /* RGB versions for transparency */
+  /* RGB helpers */
   --bg-light-rgb: 240, 240, 240;
   --bg-content-light-rgb: 253, 250, 244;
   --bg-notes-light-rgb: 249, 249, 249;
   --modal-bg-light-rgb: 255, 255, 255;
   --mobile-strip-bg-light-rgb: 255, 255, 255;
+  --book-primary-color-rgb: 227, 242, 253;
 
   /* Colors - Dark Mode */
   --bg-dark: #222;
-  --bg-content-dark: #000; /* FB2 content bg */
+  --bg-content-dark: #000;
   --bg-notes-dark: #252525;
   --text-dark: #ddd;
   --text-muted-dark: #999;
@@ -144,7 +171,7 @@
   --border-dark: #555;
   --border-notes-dark: #555;
   --shadow-dark: rgba(0, 0, 0, 0.2);
-  --link-dark: #5fadde; /* Lighter blue for dark mode */
+  --link-dark: #5fadde;
   --link-note-dark: #aaa;
   --link-note-hover-bg-dark: #444;
   --link-note-hover-text-dark: #eee;
@@ -153,10 +180,11 @@
   --modal-header-border-dark: #555;
   --modal-close-dark: #aaa;
   --char-card-bg-dark: #444;
-  --char-card-border-dark: #444; /* Mobile strip border */
+  --char-card-border-dark: #444;
   --mobile-strip-bg-dark: rgba(50, 50, 50, 0.95);
   --mobile-strip-horizontal-bg-dark: rgba(50, 50, 50, 0.85);
-  /* RGB versions for transparency */
+
+  /* RGB helpers (dark) */
   --bg-dark-rgb: 34, 34, 34;
   --bg-content-dark-rgb: 0, 0, 0;
   --bg-notes-dark-rgb: 37, 37, 37;
@@ -164,10 +192,10 @@
   --mobile-strip-bg-dark-rgb: 50, 50, 50;
   --mobile-strip-horizontal-bg-dark-rgb: 50, 50, 50;
 
-  /* Button Colors (Shared) */
+  /* Buttons (shared) */
   --button-primary-bg: #4a90e2;
   --button-primary-hover-bg: #3a7bc8;
-  --button-primary-text: white;
+  --button-primary-text: #fff;
   --button-secondary-bg-light: #e2e2e2;
   --button-secondary-hover-bg-light: #d2d2d2;
   --button-secondary-text-light: #333;
@@ -176,11 +204,11 @@
   --button-secondary-text-dark: #eee;
   --button-danger-bg: #e25c5c;
   --button-danger-hover-bg: #c74545;
-  --button-danger-text: white;
+  --button-danger-text: #fff;
   --return-button-bg: #4a4a4a;
   --return-button-hover-bg: #333;
 
-  /* Font Families */
+  /* Fonts */
   --font-serif: "Georgia", serif;
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono: "Courier New", Courier, monospace;
@@ -197,49 +225,13 @@
   /* Spinner */
   --spinner-bg: #f3f3f3;
   --spinner-color: #3498db;
-
-  /* Highlighting Colors - Light Mode */
-  --highlight-paragraph-bg-light: rgba(217, 133, 30, 0.2);
-  --highlight-paragraph-shadow-light: rgba(217, 133, 30, 0.2);
-  --talking-paragraph-bg-light: rgba(166, 83, 10, 0.2);
-  --talking-paragraph-border-light: rgba(166, 83, 10, 0.8);
-  --talking-paragraph-shadow-light: rgba(255, 200, 100, 0.25);
-  --talking-paragraph-shimmer-light: rgba(255, 215, 140, 0.1);
-
-  --entity-highlight-shadow-light: rgba(120, 120, 120, 0.15);
-  --entity-highlight-bg-light: rgba(250, 239, 197, 0.7);
-  --entity-highlight-border-light: rgba(255, 215, 0, 0.4);
-  --entity-highlight-shadow-accent-light: rgba(255, 215, 0, 0.1);
-
-  --entity-talking-highlight-bg-light: rgba(250, 239, 197, 0.85);
-  --entity-talking-highlight-border-light: rgba(255, 215, 0, 0.6);
-  --entity-talking-highlight-shadow-light: rgba(255, 215, 0, 0.25);
-
-  --entity-image-wrapper-border-light: rgba(255, 215, 0, 0.5);
-  --entity-image-wrapper-shadow-light: rgba(255, 215, 0, 0.4);
-  --entity-image-wrapper-shadow-min-light: rgba(196, 176, 28, 0.3);
-  --entity-image-wrapper-shadow-max-light: rgba(196, 176, 28, 0.6);
-
-  /* Entity Highlighting Colors - Dark Mode */
-  --highlight-paragraph-bg-dark: rgba(70, 70, 90, 0.4);
-  --highlight-paragraph-shadow-dark: rgba(80, 80, 120, 0.2);
-  --talking-paragraph-bg-dark: rgba(80, 80, 110, 0.5);
-  --talking-paragraph-border-dark: rgba(120, 130, 180, 0.8);
-  --talking-paragraph-shadow-dark: rgba(100, 110, 160, 0.25);
-  --talking-paragraph-shimmer-dark: rgba(120, 130, 180, 0.1);
-
-  --entity-highlight-bg-dark: rgba(60, 60, 70, 0.8);
-  --entity-highlight-border-dark: rgba(100, 150, 220, 0.5);
-
-  --entity-talking-highlight-bg-dark: rgba(50, 60, 90, 0.9);
-  --entity-talking-highlight-border-dark: rgba(100, 150, 220, 0.7);
-  --entity-talking-highlight-shadow-dark: rgba(100, 150, 220, 0.25);
-
-  --entity-image-wrapper-border-dark: rgba(100, 150, 220, 0.5);
-  --entity-image-wrapper-shadow-dark: rgba(100, 150, 220, 0.4);
 }
 
-.dark {
+/* Custom variant for dark mode */
+@variant dark (#player-scope.dark *);
+
+/* Dark mode overrides */
+:root:has(body#player-scope.dark) {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -255,14 +247,17 @@
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
+
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
+
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -273,87 +268,174 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Keyframe animations */
+@keyframes pulseGlow {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 7px rgba(var(--book-primary-color-rgb), 0.5));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 10px rgba(var(--book-primary-color-rgb), 0.7)) drop-shadow(0 0 15px rgba(var(--book-primary-color-rgb), 0.4));
+  }
+}
+
+@keyframes searchHighlightFade {
+  0% {
+    background-color: #ffff66;
+    box-shadow: 0 0 4px rgba(255, 255, 0, 0.5);
+  }
+  50% {
+    background-color: #ffff66;
+    box-shadow: 0 0 8px rgba(255, 255, 0, 0.5);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+@keyframes searchHighlightFadeDark {
+  0% {
+    background-color: #ffff99;
+    box-shadow: 0 0 4px rgba(255, 255, 100, 0.4);
+  }
+  50% {
+    background-color: #ffff99;
+    box-shadow: 0 0 8px rgba(255, 255, 100, 0.4);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+/* Utilities */
+@layer utilities {
+  .animate-search-highlight-fade {
+    animation: var(--animate-search-highlight-fade);
+  }
+  .animate-search-highlight-fade-dark {
+    animation: var(--animate-search-highlight-fade-dark);
+  }
+  .animate-pulse-glow {
+    animation: pulseGlow 3s infinite ease-in-out;
+  }
+
+  .textured-bg {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 4px 4px;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .outline-ring {
+    outline-color: var(--color-ring);
+  }
+  .outline-ring-50 {
+    outline-color: color-mix(in oklab, var(--ring, black) 50%, transparent);
+  }
+
+  #player-scope .search-highlight {
+    @apply bg-yellow-300 text-black rounded-sm;
+  }
+
+  #player-scope.dark .search-highlight {
+    background-color: var(--highlight-blink-color, #ffff99);
+    color: #000;
+    box-shadow: 0 0 4px rgba(255, 255, 100, 0.4);
+    animation: searchHighlightFadeDark 4s ease-in-out forwards;
+  }
+
+  /* Gradients */
+  #player-scope .bg-book-gradient-primary-tertiary {
+    background: linear-gradient(135deg, var(--book-primary-color), var(--book-tertiary-color));
+  }
+  #player-scope .bg-book-gradient-secondary-quaternary {
+    background: linear-gradient(45deg, var(--book-secondary-color), var(--book-quaternary-color));
+  }
+  #player-scope .bg-book-gradient-shimmer {
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--book-primary-color) 20%, transparent), transparent);
+  }
+
+  /* Backgrounds */
+  #player-scope .bg-book-primary {
+    background-color: var(--book-primary-color);
+  }
+  #player-scope .bg-book-primary-20 {
+    background-color: color-mix(in srgb, var(--book-primary-color) 20%, transparent);
+  }
+  #player-scope .bg-book-primary-30 {
+    background-color: color-mix(in srgb, var(--book-primary-color) 30%, transparent);
+  }
+  #player-scope .bg-book-secondary-20 {
+    background-color: color-mix(in srgb, var(--book-secondary-color) 20%, transparent);
+  }
+  #player-scope .bg-book-tertiary-30 {
+    background-color: color-mix(in srgb, var(--book-tertiary-color) 30%, transparent);
+  }
+  #player-scope .bg-book-quaternary-40 {
+    background-color: color-mix(in srgb, var(--book-quaternary-color) 40%, transparent);
+  }
+
+  /* Border colors */
+  #player-scope .border-book-primary-20 {
+    border-color: color-mix(in srgb, var(--book-primary-color) 20%, transparent);
+  }
+  #player-scope .border-book-primary-30 {
+    border-color: color-mix(in srgb, var(--book-primary-color) 30%, transparent);
+  }
+  #player-scope .border-book-primary-40 {
+    border-color: color-mix(in srgb, var(--book-primary-color) 40%, transparent);
+  }
+  #player-scope .border-book-secondary-30 {
+    border-color: color-mix(in srgb, var(--book-secondary-color) 30%, transparent);
+  }
+  #player-scope .border-t-book-primary {
+    border-top-color: var(--book-primary-color);
+  }
+  #player-scope .border-t-book-tertiary-50 {
+    border-top-color: color-mix(in srgb, var(--book-tertiary-color) 50%, transparent);
+  }
+
+  /* Text / Fill */
+  #player-scope .text-book-primary {
+    color: var(--book-primary-color);
+  }
+  #player-scope .text-book-tertiary {
+    color: var(--book-tertiary-color);
+  }
+  #player-scope .fill-book-primary {
+    fill: var(--book-primary-color);
+  }
+}
+
 @layer base {
-  * {
+  #player-scope * {
     @apply border-border outline-ring/50;
   }
-  body {
+  #player-scope {
     @apply bg-background text-foreground;
   }
 }
 
-@theme {
-  --animate-pulse-glow: pulseGlow 3s infinite ease-in-out;
-
-  @keyframes pulseGlow {
-    0%,
-    100% {
-      transform: scale(1);
-      filter: drop-shadow(0 0 7px rgba(var(--book-primary-color-rgb), 0.5));
-    }
-    50% {
-      transform: scale(1.1);
-      filter: drop-shadow(0 0 10px rgba(var(--book-primary-color-rgb), 0.7)) drop-shadow(0 0 15px rgba(var(--book-primary-color-rgb), 0.4));
-    }
-  }
-
-  @keyframes searchHighlightFade {
-    0% {
-      background-color: #ffff66;
-      box-shadow: 0 0 4px rgba(255, 255, 0, 0.5);
-    }
-    50% {
-      background-color: #ffff66;
-      box-shadow: 0 0 8px rgba(255, 255, 0, 0.5);
-    }
-    100% {
-      background-color: transparent;
-      box-shadow: none;
-    }
-  }
-
-  @keyframes searchHighlightFadeDark {
-    0% {
-      background-color: #ffff99;
-      box-shadow: 0 0 4px rgba(255, 255, 100, 0.4);
-    }
-    50% {
-      background-color: #ffff99;
-      box-shadow: 0 0 8px rgba(255, 255, 100, 0.4);
-    }
-    100% {
-      background-color: transparent;
-      box-shadow: none;
-    }
-  }
-}
-
-@utility no-scrollbar {
-  @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
-}
-
-.search-highlight {
-  @apply bg-yellow-300 text-black rounded-sm;
-}
-
-.dark .search-highlight {
-  background-color: #ffff99;
-  color: #000;
-  box-shadow: 0 0 4px rgba(255, 255, 100, 0.4);
-  animation: searchHighlightFadeDark 4s ease-in-out forwards;
-}
-
-#left-notes {
+#player-scope #left-notes {
   scrollbar-color: transparent transparent;
   scrollbar-width: none !important;
 }
 
-.character-notes-custom {
+#player-scope .character-notes-custom {
   overflow: visible;
   scrollbar-color: transparent transparent;
   scrollbar-width: none !important;
+}
 
-  & > div:last-child {
-    padding-bottom: 30px;
-  }
+#player-scope .character-notes-custom > div:last-child {
+  padding-bottom: 30px;
 }

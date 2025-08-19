@@ -8,7 +8,7 @@ import NotFound from "./pages/NotFound";
 import { RouteTransitionProvider } from "./providers/RouteTransitionProvider";
 import { UniversalRouter } from "./UniversalRouter";
 import { ClerkProviderSafe } from "@platform/providers/ClerkProviderSafe.tsx";
-import React, { lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
