@@ -13,6 +13,7 @@ export const books = [
     readTime: "12 hrs",
     features: ["English Audio", "Sound Effects", "Animation"],
     language: "en",
+    phrases: ["Installing telescreens...", "Configuring thoughtcrime detection...", "Erasing the past...", "Activating thought police..."],
   },
   {
     id: 3,
@@ -28,6 +29,15 @@ export const books = [
     readTime: "6 hrs",
     features: ["Fantasy Animation", "Whimsical Music", "Character Voices"],
     language: "en",
+    phrases: [
+      "Stretching reality...",
+      "Shrinking logic...",
+      "Resizing hallways...",
+      "Ignoring all known physics...",
+      "Painting the roses red...",
+      "Calibrating curiosity...",
+      "Consulting the Caterpillar...",
+    ],
   },
 
   {
@@ -44,6 +54,7 @@ export const books = [
     readTime: "4 hrs",
     features: ["Ice Magic", "Nordic Music", "Winter Animation"],
     language: "en",
+    phrases: ["Building snow palaces...", "Freezing summer dreams...", "Icing friendships...", "Crafting snowflakes...", "Conjuring frostbite..."],
   },
   {
     id: 6,
@@ -59,6 +70,7 @@ export const books = [
     readTime: "15 hrs",
     features: ["Period Drama", "Classical Music", "Historical Animation"],
     language: "pl",
+    phrases: ["Polishing shop windows...", "Adjusting society gossip...", "Balancing business ledgers...", "Crafting romantic intrigue...", "Negotiating marriage prospects..."],
   },
   {
     id: 7,
@@ -99,6 +111,7 @@ export const books = [
     readTime: "3 hrs",
     features: ["Fairy Magic", "Comedic Voice", "Forest Animation"],
     language: "en",
+    phrases: ["Casting love spells...", "Chasing fairies...", "Taming mischievous spirits...", "Confusing lovers...", "Weaving magical forests..."],
   },
   {
     id: 9,
@@ -114,6 +127,7 @@ export const books = [
     readTime: "3 hrs",
     features: ["Venetian Setting", "Dramatic Audio", "Renaissance Art"],
     language: "en",
+    phrases: ["Planting seeds of jealousy...", "Spinning webs of deceit...", "Perfecting tragic misunderstandings...", "Whispering falsehoods...", "Polishing dramatic irony..."],
   },
   {
     id: 10,
@@ -129,6 +143,20 @@ export const books = [
     readTime: "18 hrs",
     features: ["Ancient Egypt", "Epic Music", "Historical Animation"],
     language: "pl",
+    phrases: [
+      "Building the pyramids...",
+      "Raising the temple of Amun...",
+      "Carving the sphinxes...",
+      "Painting hieroglyphs...",
+      "Setting up the Nile...",
+      "Creating mummies...",
+      "Crowning the pharaoh...",
+      "Building tombs...",
+      "Carving obelisks...",
+      "Painting papyrus...",
+      "Setting up pyramids...",
+      "Creating scarabs...",
+    ],
   },
   {
     id: 11,
@@ -144,6 +172,7 @@ export const books = [
     readTime: "3 hrs",
     features: ["Romantic Music", "Renaissance Art", "Passionate Audio"],
     language: "en",
+    phrases: ["Mixing love potions...", "Arranging secret meetings...", "Avoiding family feuds...", "Balcony climbing practice...", "Sending cryptic love letters..."],
   },
   {
     id: 1,
@@ -159,6 +188,15 @@ export const books = [
     readTime: "12 hrs",
     features: ["Voice Acting", "Ambient Sound", "Animation"],
     language: "pl",
+    phrases: [
+      "Big Brother is watching...",
+      "Rewriting history...",
+      "Monitoring your thoughts...",
+      "Increasing chocolate rations...",
+      "Preparing Room 101...",
+      "Adjusting reality...",
+      "Fighting thoughtcrime...",
+    ],
   },
   {
     id: 5,
@@ -174,6 +212,7 @@ export const books = [
     readTime: "4 hrs",
     features: ["Winter Magic", "Orchestral Music", "Animated Snow"],
     language: "pl",
+    phrases: ["Freezing hearts...", "Shattering mirrors...", "Chilling the air...", "Preparing ice castles...", "Summoning snowflakes..."],
   },
 
   {
@@ -190,5 +229,6 @@ export const books = [
     readTime: "10 hrs",
     features: ["Suspenseful Score", "Period Animation", "Voice Acting"],
     language: "pl",
+    phrases: ["Encrypting secret messages...", "Plotting espionage...", "Shadowing informants...", "Meeting in dark alleys...", "Planting evidence..."],
   },
 ];

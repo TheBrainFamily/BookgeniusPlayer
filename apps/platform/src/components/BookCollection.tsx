@@ -31,10 +31,10 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   const handleBookClick = (slug: string) => {
     const book = books.find((b) => b.slug === slug);
     const title = book?.title ?? "BookGenius";
-    const phrases = book?.phrases ?? ["Creating the story...", "Waking up the director...", "Warming up the speakers..."];
+    const phrases = book?.phrases;
 
     // Start the unified overlay with BookLoader
-    startTransition({ title, phrases, subtitle: "Loading..." });
+    startTransition({ title, phrases, author: book?.author });
 
     // Let the overlay paint before route switch for a smooth fade
     requestAnimationFrame(() => {

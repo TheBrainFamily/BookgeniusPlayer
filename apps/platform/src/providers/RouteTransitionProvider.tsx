@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import { useLocation } from "react-router-dom";
 import { BookLoader } from "@platform/components/BookLoader";
 
-type LoaderMeta = { title: string; phrases: string[]; subtitle?: string };
+type LoaderMeta = { title: string; phrases: string[]; author?: string };
 
 type Ctx = {
   // starts the overlay with BookLoader, returns a cleanup you generally
@@ -41,7 +41,7 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
   const location = useLocation(); // used to reset if user navigates away quickly
 
   const startTransition = useCallback((m: LoaderMeta) => {
-    setMeta({ title: m.title, phrases: m.phrases, subtitle: m.subtitle ?? "Loading..." });
+    setMeta({ title: m.title, phrases: m.phrases, author: m.author ?? "" });
     startTimeRef.current = performance.now();
     finishRequestedRef.current = false;
     setNavigating(true);
@@ -86,7 +86,7 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
             <div className="pointer-events-auto">
               <BookLoader
                 title={meta.title}
-                subtitle={meta.subtitle ?? "Loading..."}
+                author={meta.author}
                 loadingPhrases={meta.phrases}
                 // While overlay is visible, pretend it's not loaded
                 isLoaded={false}
