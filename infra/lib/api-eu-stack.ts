@@ -22,6 +22,7 @@ export interface ApiEuStackProps extends StackProps {
   bucketName: string; // your existing bucket name (from outputs)
   cfPrivateKeySecretName: string; // name of secret with PRIVATE key (replicated to eu-central-1)
   clerkSecretKey: string;
+  jwtPublicKey: string;
   tokenTtlSeconds: number;
 }
 
@@ -49,6 +50,7 @@ export class ApiEuStack extends Stack {
         CDN_DOMAIN: `cdn.${props.domainProd}`,
         TOKEN_TTL_SECONDS: String(props.tokenTtlSeconds),
         CLERK_SECRET_KEY: props.clerkSecretKey,
+        TOKEN_PUBLIC_KEY: props.jwtPublicKey,
         BUCKET_REGION: "us-east-1",
       },
     });

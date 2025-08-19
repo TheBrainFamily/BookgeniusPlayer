@@ -22,10 +22,12 @@
     "@clerk/backend": "^2.6.3",
     "@smithy/types": "^4.3.2",
     "@types/aws-lambda": "^8.10.152",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.11.0",
     "cdk": "^2.1025.0",
     "dotenv": "^16.6.1",
     "esbuild": "^0.25.9",
+    "jsonwebtoken": "^9.0.2",
     "prettier": "^3.6.2",
     "typescript": "^5.4.5"
   }

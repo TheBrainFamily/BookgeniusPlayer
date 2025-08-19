@@ -14,5 +14,10 @@
   "hosted-zone:account=206272344806:domainName=bookgenius.eu:region=eu-central-1": {
     "Id": "/hostedzone/Z02981652W85KUZPYUP5H",
     "Name": "bookgenius.eu."
-  }
+  },
+  "availability-zones:account=206272344806:region=eu-central-1": [
+    "eu-central-1a",
+    "eu-central-1b",
+    "eu-central-1c"
+  ]
 }

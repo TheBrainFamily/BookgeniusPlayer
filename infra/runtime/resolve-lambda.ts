@@ -2,7 +2,8 @@ import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import * as crypto from "crypto";
 import type { StreamingBlobPayloadOutputTypes, SdkStreamMixin } from "@smithy/types";
 import type { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from "aws-lambda";
-import { verifyClerkToken } from "./helpers/clerk.strategy.js";
+// import { verifyClerkToken } from "./helpers/clerk.strategy.js";
+import { verifyGenericToken } from "./helpers/generic.strategy.js";
 
 const {
   BUCKET,
@@ -106,9 +107,11 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
     try {
       const headerToken = getBearerFromHeaderV2(event.headers);
       const cookieToken = getCookieFromEventV2(event, "__session");
-      const token = headerToken || cookieToken;
+      const queryStringToken = event.queryStringParameters?.token;
+      const token = headerToken || cookieToken || queryStringToken;
       if (token) {
-        await verifyClerkToken(token);
+        await verifyGenericToken(token);
+        // await verifyClerkToken(token);
         isLoggedIn = true;
       }
     } catch {

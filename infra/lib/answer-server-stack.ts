@@ -25,6 +25,7 @@ export interface AnswerServerStackProps extends StackProps {
   bucketName?: string;
   s3Region?: string;
   geminiSecret: string;
+  jwtPublicKey: string;
 }
 
 export class AnswerServerStack extends Stack {
@@ -65,7 +66,14 @@ export class AnswerServerStack extends Stack {
         containerPort: 3000,
         enableLogging: true,
         logDriver: ecs.LogDrivers.awsLogs({ logGroup, streamPrefix: "answers" }),
-        environment: { PORT: "3000", WITH_S3: "true", S3_REGION: props.s3Region ?? "us-east-1", AWS_BUCKET_NAME: props.bucketName!, GEMINI_API_KEY: props.geminiSecret },
+        environment: {
+          PORT: "3000",
+          WITH_S3: "true",
+          S3_REGION: props.s3Region ?? "us-east-1",
+          AWS_BUCKET_NAME: props.bucketName!,
+          GEMINI_API_KEY: props.geminiSecret,
+          TOKEN_PUBLIC_KEY: props.jwtPublicKey,
+        },
         // secrets: { GEMINI_API_KEY: ecs.Secret.fromSecretsManager(geminiSecret) },
       },
     });

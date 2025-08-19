@@ -29,6 +29,7 @@ export interface WebStackProps extends StackProps {
   cfPrivateKeySecretName: string;
   tokenTtlSeconds: number;
   clerkSecretKey: string;
+  jwtPublicKey: string;
 }
 
 export class WebStack extends Stack {
@@ -122,6 +123,7 @@ export class WebStack extends Stack {
         TOKEN_TTL_SECONDS: String(props.tokenTtlSeconds),
         CF_PRIVATE_KEY_SECRET_NAME: props.cfPrivateKeySecretName,
         CLERK_SECRET_KEY: props.clerkSecretKey,
+        TOKEN_PUBLIC_KEY: props.jwtPublicKey,
         CF_PUBLIC_KEY_ID: publicKey.publicKeyId,
       },
     });

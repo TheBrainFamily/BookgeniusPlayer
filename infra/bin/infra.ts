@@ -5,6 +5,8 @@ import * as cdk from "aws-cdk-lib";
 import { WebStack } from "../lib/web-stack.js";
 import { ApiEuStack } from "../lib/api-eu-stack.js";
 import { AnswerServerStack } from "../lib/answer-server-stack.js";
+import fs from "fs";
+import path from "path";
 
 const app = new cdk.App();
 
@@ -22,6 +24,11 @@ const TOKEN_TTL_SECONDS = Number(process.env.TOKEN_TTL_SECONDS || 21600);
 if (!DOMAIN_PROD) throw new Error("Set env DOMAIN_PROD");
 if (!CF_PRIVATE_KEY_SECRET_NAME) throw new Error("Set env CF_PRIVATE_KEY_SECRET_NAME");
 
+const jwtPEM = fs.readFileSync(path.resolve("jwt-public-key.pem"), "utf8");
+if (!jwtPEM || jwtPEM.trim() === "") {
+  throw new Error("JWT public key is empty");
+}
+
 new WebStack(app, "WebStack", {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
@@ -33,6 +40,7 @@ new WebStack(app, "WebStack", {
   tokenTtlSeconds: TOKEN_TTL_SECONDS,
   publicKeyFilePath: "cf-public-key.pem",
   clerkSecretKey: process.env.CLERK_SECRET_KEY!,
+  jwtPublicKey: jwtPEM,
 });
 
 new ApiEuStack(app, "ApiEuStack", {
@@ -41,6 +49,7 @@ new ApiEuStack(app, "ApiEuStack", {
   bucketName: process.env.CONTENT_BUCKET_NAME!, // from your WebStack output
   cfPrivateKeySecretName: CF_PRIVATE_KEY_SECRET_NAME!, // must exist in eu-central-1
   clerkSecretKey: process.env.CLERK_SECRET_KEY!,
+  jwtPublicKey: jwtPEM,
   tokenTtlSeconds: Number(process.env.TOKEN_TTL_SECONDS || 21600),
 });
 
@@ -51,4 +60,5 @@ new AnswerServerStack(app, "AnswerServerStack", {
   bucketName: process.env.CONTENT_BUCKET_NAME!,
   geminiSecret: GEMINI_KEY!,
   s3Region: "us-east-1",
+  jwtPublicKey: jwtPEM,
 });
