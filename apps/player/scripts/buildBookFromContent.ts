@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-export function buildBookFromContent(bookDirectoryPath: string): void {
+export function buildBookFromContent(bookDirectoryPath: string, isDemo: boolean = false): void {
   const booksContentPath = path.join(bookDirectoryPath, "booksContent");
   const bookXmlPath = path.join(bookDirectoryPath, "book.xml");
 
@@ -27,8 +27,24 @@ export function buildBookFromContent(bookDirectoryPath: string): void {
 
     const metadataInnerContent = metadataMatch[1].trim();
 
+    // Extract demo chapters if in demo mode
+    let demoChapters: number[] | null = null;
+    if (isDemo) {
+      // Check for DemoChapters in metadata
+      const demoChaptersMatch = metadataContent.match(/<DemoChapters>([^<]+)<\/DemoChapters>/);
+      if (demoChaptersMatch) {
+        demoChapters = demoChaptersMatch[1].split(",").map((num) => parseInt(num.trim()));
+      } else {
+        // Default: 1 chapter for normal books, 2 for plays
+        const formMatch = metadataContent.match(/<Form>([^<]+)<\/Form>/);
+        const isPlay = formMatch && formMatch[1].toLowerCase() === "play";
+        demoChapters = isPlay ? [1, 2] : [1];
+      }
+      console.log(`   Demo mode: Including chapters ${demoChapters.join(", ")}`);
+    }
+
     // Read all chapter files
-    const chapterFiles = fs
+    let chapterFiles = fs
       .readdirSync(booksContentPath)
       .filter((file) => file.startsWith("chapter") && file.endsWith(".xml"))
       .sort((a, b) => {
@@ -37,6 +53,14 @@ export function buildBookFromContent(bookDirectoryPath: string): void {
         const bNum = parseInt(b.match(/chapter(\d+)\.xml/)?.[1] || "0");
         return aNum - bNum;
       });
+
+    // Filter chapters for demo mode
+    if (demoChapters) {
+      chapterFiles = chapterFiles.filter((file) => {
+        const chapterNum = parseInt(file.match(/chapter(\d+)\.xml/)?.[1] || "0");
+        return demoChapters.includes(chapterNum);
+      });
+    }
 
     // Read chapter contents
     const chaptersContent = chapterFiles

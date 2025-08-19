@@ -130,7 +130,7 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
     const version = versions[slug];
     if (!version) return res(404, { error: "version_not_found" });
 
-    const baseFolder = visibility === "demo" ? `/${ctxUsed}/assets/books/${slug}/demo/${version}/` : `/${ctxUsed}/assets/books/${slug}/${version}/`;
+    const baseFolder = visibility === "demo" ? `/${ctxUsed}/assets/books/${slug}-demo/${version}/` : `/${ctxUsed}/assets/books/${slug}/${version}/`;
 
     const expires = Math.floor(Date.now() / 1000) + parseInt(TOKEN_TTL_SECONDS!, 10);
     const prefixUrl = `https://${CDN_DOMAIN}${baseFolder}`.replace(/\/+$/, "/");
