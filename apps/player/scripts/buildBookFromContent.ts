@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { returnDemoChapterNumbers } from "./helpers/returnDemoChapterNumbers";
 
 export function buildBookFromContent(bookDirectoryPath: string, isDemo: boolean = false): void {
   const booksContentPath = path.join(bookDirectoryPath, "booksContent");
@@ -29,19 +30,7 @@ export function buildBookFromContent(bookDirectoryPath: string, isDemo: boolean 
 
     // Extract demo chapters if in demo mode
     let demoChapters: number[] | null = null;
-    if (isDemo) {
-      // Check for DemoChapters in metadata
-      const demoChaptersMatch = metadataContent.match(/<DemoChapters>([^<]+)<\/DemoChapters>/);
-      if (demoChaptersMatch) {
-        demoChapters = demoChaptersMatch[1].split(",").map((num) => parseInt(num.trim()));
-      } else {
-        // Default: 1 chapter for normal books, 2 for plays
-        const formMatch = metadataContent.match(/<Form>([^<]+)<\/Form>/);
-        const isPlay = formMatch && formMatch[1].toLowerCase() === "play";
-        demoChapters = isPlay ? [1, 2] : [1];
-      }
-      console.log(`   Demo mode: Including chapters ${demoChapters.join(", ")}`);
-    }
+    demoChapters = returnDemoChapterNumbers(metadataContent);
 
     // Read all chapter files
     let chapterFiles = fs
@@ -55,7 +44,9 @@ export function buildBookFromContent(bookDirectoryPath: string, isDemo: boolean 
       });
 
     // Filter chapters for demo mode
-    if (demoChapters) {
+    if (isDemo) {
+      console.log(`📚 Creating demo book with chapters: ${demoChapters.join(", ")}`);
+
       chapterFiles = chapterFiles.filter((file) => {
         const chapterNum = parseInt(file.match(/chapter(\d+)\.xml/)?.[1] || "0");
         return demoChapters.includes(chapterNum);

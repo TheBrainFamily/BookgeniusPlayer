@@ -5,6 +5,8 @@ import { generateBook } from "./generateBook";
 import { compileToJsForBook } from "./compileBookData";
 import { buildBookFromContent } from "./buildBookFromContent";
 import { createDemoBook } from "./createDemoBook";
+import { returnDemoChapterNumbers } from "./helpers/returnDemoChapterNumbers";
+import { copyDirectory } from "./helpers/copyDirectory";
 
 const PUBLIC_DIR = path.join(__dirname, "..", "public", "books");
 
@@ -28,26 +30,12 @@ export async function processBook(bookPath: string, destinationDir = PUBLIC_DIR,
 
       // Extract demo chapters from metadata
       const metadataPath = path.join(bookSourcePath, "booksContent", "metadata.xml");
-      let demoChapters: number[] = [1]; // Default
 
-      if (fs.existsSync(metadataPath)) {
-        const metadataContent = fs.readFileSync(metadataPath, "utf8");
-        const demoChaptersMatch = metadataContent.match(/<DemoChapters>([^<]+)<\/DemoChapters>/);
-
-        if (demoChaptersMatch) {
-          demoChapters = demoChaptersMatch[1].split(",").map((num) => parseInt(num.trim()));
-        } else {
-          // Default: 1 chapter for normal books, 2 for plays
-          const formMatch = metadataContent.match(/<Form>([^<]+)<\/Form>/);
-          const isPlay = formMatch && formMatch[1].toLowerCase() === "play";
-          demoChapters = isPlay ? [1, 2] : [1];
-        }
-      }
-
-      console.log(`📚 Creating demo book with chapters: ${demoChapters.join(", ")}`);
+      const metadataContent = fs.readFileSync(metadataPath, "utf8");
+      const demoChapters = returnDemoChapterNumbers(metadataContent);
+      console.log(`📚 Building book.xml with chapters: ${demoChapters.join(", ")}`);
 
       // Step 1: Build filtered book.xml
-      console.log(`0️⃣  Building book.xml from booksContent (demo: chapters ${demoChapters.join(", ")})...`);
       console.time("build-book-from-content");
       buildBookFromContent(bookSourcePath, true);
       console.timeEnd("build-book-from-content");
@@ -82,7 +70,7 @@ export async function processBook(bookPath: string, destinationDir = PUBLIC_DIR,
       // Copy book directory to public/
       console.log(`\n1️⃣  Copying ${bookName} to public directory...`);
       console.time("copyDirectory");
-      copyDirectory(bookSourcePath, bookPublicPath);
+      await copyDirectory(bookSourcePath, bookPublicPath);
       console.timeEnd("copyDirectory");
       console.log(`   ✅ Copied to ${bookPublicPath}`);
 
@@ -104,29 +92,6 @@ export async function processBook(bookPath: string, destinationDir = PUBLIC_DIR,
   } catch (error) {
     console.error(`\n❌ Failed to process ${bookName}:`, error);
     return { book: bookName, error: error as Error, success: false };
-  }
-}
-
-function copyDirectory(src: string, dest: string) {
-  // Create destination directory
-  if (!fs.existsSync(dest)) {
-    fs.mkdirSync(dest, { recursive: true });
-  }
-
-  // Read source directory
-  const entries = fs.readdirSync(src, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-
-    if (entry.isDirectory()) {
-      // Recursively copy subdirectories
-      copyDirectory(srcPath, destPath);
-    } else {
-      // Copy file
-      fs.copyFileSync(srcPath, destPath);
-    }
   }
 }
 

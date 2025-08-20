@@ -1,7 +1,9 @@
 import fs from "fs";
 import path from "path";
-import type { CharacterData, BackgroundSongForBook, AudiobookTracksSection, Variant } from "@player/types/book";
+import { DOMParser } from "@xmldom/xmldom";
+import type { AudiobookTracksSection, BackgroundSongForBook, CharacterData, Variant } from "@player/types/book";
 import { xmlToComplexHtml } from "./data/xmlToComplexHtml";
+import { copyDirectory } from "./helpers/copyDirectory";
 
 type DataWithChapter = { chapter: number; [key: string]: unknown };
 
@@ -14,10 +16,20 @@ async function importCompiledData(fullBookPath: string, fileName: string): Promi
     return null;
   }
 
-  // Dynamic import of the compiled JS file
-  const module = await import(filePath);
-  const functionName = path.basename(fileName, ".js");
-  return module[functionName]?.() || null;
+  try {
+    // Dynamic import of the compiled JS file
+    const module = await import(filePath);
+    const functionName = path.basename(fileName, ".js");
+    const result = module[functionName]?.();
+    if (result === undefined) {
+      console.warn(`   ⚠️ Function ${functionName} not found in ${fileName}`);
+      return null;
+    }
+    return result;
+  } catch (error) {
+    console.error(`   ❌ Failed to import ${fileName}:`, error);
+    return null;
+  }
 }
 
 function filterDataByChapters<T extends DataWithChapter>(data: T[], demoChapters: number[]): T[] {
@@ -82,7 +94,11 @@ export async function createDemoBook(fullBookPath: string, demoBookPath: string,
   if (!fs.existsSync(demoBookPath)) {
     fs.mkdirSync(demoBookPath, { recursive: true });
   }
-
+  const compiledDir = path.join(demoBookPath, "compiled");
+  // Generate JavaScript file with filtered data directly in compiled folder
+  if (!fs.existsSync(compiledDir)) {
+    fs.mkdirSync(compiledDir, { recursive: true });
+  }
   const assetsToInclude = new Set<string>();
 
   // Always include loader
@@ -131,9 +147,18 @@ export async function createDemoBook(fullBookPath: string, demoBookPath: string,
       // Skip processing getKnownVideoFiles - we'll regenerate it based on what's actually copied
       continue; // Don't extract assets from this file
     } else if (baseName === "getAllVariants") {
-      // Filter variants by chapter if they have chapter property
+      // Filter variants by chapter number in their id (e.g., "ch1-p2-s3")
       if (Array.isArray(data)) {
-        filteredData = filterDataByChapters(data as DataWithChapter[], demoChapters);
+        filteredData = (data as Variant[]).filter((variant) => {
+          const match = variant.id.match(/^ch(\d+)/);
+          if (!match) return false;
+          const chapterNum = parseInt(match[1], 10);
+          if (isNaN(chapterNum)) {
+            console.warn(`   ⚠️ Invalid chapter number in variant ID: ${variant.id}`);
+            return false;
+          }
+          return demoChapters.includes(chapterNum);
+        });
       }
     } else {
       // Generic filtering for data with chapter property
@@ -146,23 +171,12 @@ export async function createDemoBook(fullBookPath: string, demoBookPath: string,
     const dataAssets = extractAssetsFromData(filteredData);
     dataAssets.forEach((asset) => assetsToInclude.add(asset));
 
-    // Generate JavaScript file with filtered data directly in compiled folder
-    const compiledDir = path.join(demoBookPath, "compiled");
-    if (!fs.existsSync(compiledDir)) {
-      fs.mkdirSync(compiledDir, { recursive: true });
-    }
     const jsContent = `export const ${baseName} = () => ${JSON.stringify(filteredData, null, 2)};\n`;
     const jsPath = path.join(compiledDir, `${baseName}.js`);
     fs.writeFileSync(jsPath, jsContent, "utf-8");
   }
 
-  // Copy other necessary compiled JS files (except getBookStringified which needs regeneration)
-  const compiledDir = path.join(demoBookPath, "compiled");
-  if (!fs.existsSync(compiledDir)) {
-    fs.mkdirSync(compiledDir, { recursive: true });
-  }
-
-  const compiledFilesToCopy = ["bookData.js", "getAllVariantsFilter.js", "getAllVariantsFiltered.js"];
+  const compiledFilesToCopy = ["bookData.js"];
 
   for (const file of compiledFilesToCopy) {
     const srcPath = path.join(fullBookPath, "compiled", file);
@@ -180,11 +194,26 @@ export async function createDemoBook(fullBookPath: string, demoBookPath: string,
     // Read the filtered book.xml and generate HTML
     const bookString = fs.readFileSync(filteredBookXmlPath, "utf8");
 
-    // Get book metadata - we need to parse it
-    const metadataMatch = bookString.match(/<Slug>([^<]+)<\/Slug>/);
-    const languageMatch = bookString.match(/<Language>([^<]+)<\/Language>/);
-    const bookSlug = metadataMatch ? metadataMatch[1] : "unknown";
-    const bookLanguage = languageMatch ? languageMatch[1].toLowerCase() : "english";
+    // Parse the XML properly using DOM parser
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(bookString, "text/xml");
+
+    // Extract metadata using DOM methods
+    const metadataNode = xmlDoc.getElementsByTagName("BookMetadata")[0];
+    let bookSlug = "unknown";
+    let bookLanguage = "english";
+
+    if (metadataNode) {
+      const slugNode = metadataNode.getElementsByTagName("Slug")[0];
+      const languageNode = metadataNode.getElementsByTagName("Language")[0];
+
+      if (slugNode && slugNode.textContent) {
+        bookSlug = slugNode.textContent.trim();
+      }
+      if (languageNode && languageNode.textContent) {
+        bookLanguage = languageNode.textContent.trim().toLowerCase();
+      }
+    }
 
     // Generate HTML from the filtered book.xml
     const { htmlResult } = xmlToComplexHtml(bookString, bookSlug, bookLanguage, true);
@@ -201,13 +230,13 @@ export const getBookStringified = () => {
 
   // Copy chapters and booksContent directories
   const dirsToCopy = ["chapters", "booksContent"];
-  for (const dir of dirsToCopy) {
-    const srcDir = path.join(fullBookPath, dir);
-    const destDir = path.join(demoBookPath, dir);
-    if (fs.existsSync(srcDir)) {
-      copyDirectory(srcDir, destDir);
-    }
-  }
+  await Promise.all(
+    dirsToCopy.map(async (dir) => {
+      const srcDir = path.join(fullBookPath, dir);
+      const destDir = path.join(demoBookPath, dir);
+      return copyDirectory(srcDir, destDir);
+    }),
+  );
 
   // Copy only the necessary assets
   const srcAssetsDir = path.join(fullBookPath, "assets");
@@ -221,9 +250,6 @@ export const getBookStringified = () => {
     const allAssets = fs.readdirSync(srcAssetsDir);
     let copiedCount = 0;
     const copiedAssets: string[] = [];
-
-    // Always include loader.mp4 as it's needed for the player
-    assetsToInclude.add("loader.mp4");
 
     for (const asset of allAssets) {
       // ONLY copy assets that are explicitly referenced in the filtered data
@@ -246,24 +272,5 @@ export const getBookStringified = () => {
     fs.writeFileSync(path.join(compiledDirFinal, "getKnownVideoFiles.js"), knownVideoContent, "utf-8");
 
     console.log(`   ✂️ Copied ${copiedCount}/${allAssets.length} assets (only referenced files)`);
-  }
-}
-
-function copyDirectory(src: string, dest: string) {
-  if (!fs.existsSync(dest)) {
-    fs.mkdirSync(dest, { recursive: true });
-  }
-
-  const entries = fs.readdirSync(src, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-
-    if (entry.isDirectory()) {
-      copyDirectory(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
   }
 }
