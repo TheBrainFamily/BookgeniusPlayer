@@ -5,7 +5,7 @@ BUCKET=webstack-contentbucket52d4b12c-ho2hl8s0ugjd
 CTX=prod
 
 aws s3 cp build/platform-app/index.html \
-  s3://$BUCKET/app/platform/prod/index.html \
+  s3://$BUCKET/app/platform/${CTX}/index.html \
   --content-type 'text/html; charset=utf-8' \
   --cache-control 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400' \
   --only-show-errors
@@ -27,4 +27,4 @@ if [[ "$*" == *"--with-books"* ]]; then
     --cache-control 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400' 
 fi
 
-aws cloudfront create-invalidation --distribution-id EA1G0X30KGB3M --paths '/app/platform/prod/index.html'
+aws cloudfront create-invalidation --distribution-id EA1G0X30KGB3M --paths "/app/platform/${CTX}/index.html"

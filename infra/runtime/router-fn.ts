@@ -49,23 +49,25 @@ function handler(event: CloudFrontFunctionsEvent): CloudFrontFunctionsResult {
 
   // subdomain detection
   const parts = host.split(".");
-  const sub = parts.length > 2 ? parts[0] : ""; // e.g. pr-394.example.com -> pr-394
-  const reserved: Record<string, true> = { www: true, api: true, cdn: true };
-  const isBranch = /^pr-/.test(sub);
-  const isBookSlugSub = !!sub && !reserved[sub] && !isBranch;
+  const sub = parts.length > 2 ? parts[0] : ""; // <branch>.branches.example.com -> <branch>
+  const second = parts.length > 3 ? parts[1] : ""; // <branch>.branches.example.com -> "branches"
+  const isBranchesDomain = second === "branches";
 
-  // SEO entry: <slug>.<apex> -> 301 to apex /player/?book=<slug>
+  // Branch is any sub on *.branches.<apex>
+  const branch = isBranchesDomain && sub ? sub : "";
+
+  // SEO redirect only on apex (not on branches.*)
+  const reserved: Record<string, true> = { www: true, api: true, cdn: true, branches: true };
+  const isBookSlugSub = !isBranchesDomain && !!sub && !reserved[sub];
   if (isBookSlugSub) {
     const apex = host.replace(new RegExp(`^${sub}\\.`), "");
     return { statusCode: 301, statusDescription: "Moved Permanently", headers: { location: { value: `https://${apex}/player/?book=${encodeURIComponent(sub)}` } }, cookies: {} };
   }
 
-  // Choose platform base (prod or branch)
-  const branch = isBranch ? sub : "";
+  // keep your existing bases EXACTLY the same:
   const platformBase = branch ? `/app/platform/branches/${branch}` : "/app/platform/prod";
 
-  // Choose player build base
-  const playerCtx = qsVal("playerctx"); // ex: "branches/pr-394" or "prod"
+  const playerCtx = qsVal("playerctx");
   let playerBase: string;
   if (playerCtx && /^branches\//.test(playerCtx)) {
     playerBase = `/app/player/${playerCtx}`;

@@ -14,14 +14,15 @@ function handler(event) {
     const hasExt = /\.[A-Za-z0-9]{1,8}(\?|$)/.test(uri);
     const parts = host.split(".");
     const sub = parts.length > 2 ? parts[0] : "";
-    const reserved = { www: true, api: true, cdn: true };
-    const isBranch = /^pr-/.test(sub);
-    const isBookSlugSub = !!sub && !reserved[sub] && !isBranch;
+    const second = parts.length > 3 ? parts[1] : "";
+    const isBranchesDomain = second === "branches";
+    const branch = isBranchesDomain && sub ? sub : "";
+    const reserved = { www: true, api: true, cdn: true, branches: true };
+    const isBookSlugSub = !isBranchesDomain && !!sub && !reserved[sub];
     if (isBookSlugSub) {
         const apex = host.replace(new RegExp(`^${sub}\\.`), "");
         return { statusCode: 301, statusDescription: "Moved Permanently", headers: { location: { value: `https://${apex}/player/?book=${encodeURIComponent(sub)}` } }, cookies: {} };
     }
-    const branch = isBranch ? sub : "";
     const platformBase = branch ? `/app/platform/branches/${branch}` : "/app/platform/prod";
     const playerCtx = qsVal("playerctx");
     let playerBase;
