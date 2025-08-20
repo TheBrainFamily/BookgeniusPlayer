@@ -20,8 +20,16 @@ const ScrollArea = React.forwardRef<React.ElementRef<typeof ScrollAreaPrimitive.
       if (!el || !wheelToHorizontal || orientation !== "horizontal") return;
 
       const onWheel = (e: WheelEvent) => {
-        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-          el.scrollLeft += e.deltaY;
+        if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+
+        const maxScrollLeft = el.scrollWidth - el.clientWidth;
+        if (maxScrollLeft <= 0) return;
+
+        const next = el.scrollLeft + e.deltaY;
+        const clamped = Math.max(0, Math.min(maxScrollLeft, next));
+
+        if (clamped !== el.scrollLeft) {
+          el.scrollLeft = clamped;
           e.preventDefault();
         }
       };
