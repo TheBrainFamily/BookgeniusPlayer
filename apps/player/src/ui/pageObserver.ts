@@ -593,16 +593,10 @@ export function setupPageObserver(
   let currentlyLastActivePageElement: Element | null = null;
   let currentlyActiveParagraph: { chapter: number; paragraph: number } | null = null;
 
-  // We want to skip updating location when we scroll through the transition-spacer between chapters
-  let isTransitioning = false;
-
   // Keep track of observed paragraphs to avoid re-observing
   const observedParagraphs = new Set<Element>();
 
   const processIntersections = () => {
-    if (isTransitioning) {
-      return;
-    }
     const rootRect = observerOptions.root.getBoundingClientRect();
     const topMultiplier = 0.35; // 35vh focus zone start
     let bottomMultiplier = 0.45; // 10vh focus zone height (default)
@@ -1046,8 +1040,6 @@ export function setupPageObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (!isSplashAnimationComplete) return;
-
-        isTransitioning = !!entry.isIntersecting;
 
         const rect = entry.boundingClientRect;
 
