@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { CSSProperties, useMemo } from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 import { ScrollArea } from "@player/components/ui/scroll-area";
 
@@ -37,9 +37,8 @@ const CharactersOnStagePanel = () => {
             initial="hidden"
             animate="visible"
             variants={variants.container}
-            style={{ ["--avatar-size" as any]: AVATAR_SIZE }}
+            style={{ "--avatar-size": AVATAR_SIZE } as CSSProperties}
             role="list"
-            aria-label="Postaci na scenie"
           >
             {charactersOnStage.map((character, index) => {
               const isSpeaking = currentSpeakers.includes(character.slug);
