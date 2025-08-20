@@ -13,7 +13,8 @@ const app = new cdk.App();
 // Required:
 const DOMAIN = process.env.DOMAIN; // e.g. bookgenius.net
 const CF_PRIVATE_KEY_SECRET_NAME = process.env.CF_PRIVATE_KEY_SECRET_NAME || "bookgenius/cf/privateKey";
-
+const isStaging = process.env.DOMAIN?.includes("branches") ?? false;
+const hostedZoneId = process.env.HOSTED_ZONE_ID;
 const GEMINI_KEY = process.env.GEMINI_KEY;
 if (!GEMINI_KEY) throw new Error("Set env GEMINI_KEY");
 
@@ -28,7 +29,7 @@ if (!jwtPEM || jwtPEM.trim() === "") {
   throw new Error("JWT public key is empty");
 }
 
-new WebStack(app, "WebStack", {
+new WebStack(app, `WebStack${isStaging ? "Staging" : ""}`, {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: "us-east-1", // CloudFront certs must be in us-east-1
@@ -39,19 +40,22 @@ new WebStack(app, "WebStack", {
   publicKeyFilePath: "cf-public-key.pem",
   clerkSecretKey: process.env.CLERK_SECRET_KEY!,
   jwtPublicKey: jwtPEM,
+  bucketName: isStaging ? process.env.CONTENT_BUCKET_NAME : undefined,
+  hostedZoneId,
 });
 
-new ApiEuStack(app, "ApiEuStack", {
+new ApiEuStack(app, `ApiEuStack${isStaging ? "Staging" : ""}`, {
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "eu-central-1" },
-  domainProd: DOMAIN, // e.g. bookgenius.eu
+  domain: DOMAIN, // e.g. bookgenius.eu
   bucketName: process.env.CONTENT_BUCKET_NAME!, // from your WebStack output
   cfPrivateKeySecretName: CF_PRIVATE_KEY_SECRET_NAME!, // must exist in eu-central-1
   clerkSecretKey: process.env.CLERK_SECRET_KEY!,
   jwtPublicKey: jwtPEM,
   tokenTtlSeconds: Number(process.env.TOKEN_TTL_SECONDS || 21600),
+  hostedZoneId,
 });
 
-new AnswerServerStack(app, "AnswerServerStack", {
+new AnswerServerStack(app, `AnswerServerStack${isStaging ? "Staging" : ""}`, {
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "eu-central-1" },
   domain: DOMAIN, // e.g. "bookgenius.eu"
   subdomain: "answers",
@@ -59,4 +63,5 @@ new AnswerServerStack(app, "AnswerServerStack", {
   geminiSecret: GEMINI_KEY!,
   s3Region: "us-east-1",
   jwtPublicKey: jwtPEM,
+  hostedZoneId,
 });

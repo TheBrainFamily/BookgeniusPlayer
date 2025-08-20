@@ -16,6 +16,6 @@ export async function verifyGenericToken(token: string) {
 
     return decoded;
   } catch (error) {
-    throw new Error("Invalid token");
+    throw new Error(`Invalid token: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 }

@@ -18,22 +18,24 @@ import {
 import { Construct } from "constructs";
 
 export interface ApiEuStackProps extends StackProps {
-  domainProd: string; // e.g. bookgenius.eu
+  domain: string; // e.g. bookgenius.eu
   bucketName: string; // your existing bucket name (from outputs)
   cfPrivateKeySecretName: string; // name of secret with PRIVATE key (replicated to eu-central-1)
   clerkSecretKey: string;
   jwtPublicKey: string;
   tokenTtlSeconds: number;
+  hostedZoneId?: string;
 }
 
 export class ApiEuStack extends Stack {
   constructor(scope: Construct, id: string, props: ApiEuStackProps) {
     super(scope, id, props);
 
-    const zone = route53.HostedZone.fromLookup(this, "Zone", { domainName: props.domainProd });
+    const apex = props.domain.split(".").slice(-2).join("."); // e.g. "staging.bookgenius.eu" -> "bookgenius.eu"
+    const zone = route53.HostedZone.fromLookup(this, "Zone", { domainName: apex });
 
     // ACM cert in eu-central-1 for api-eu.<domain>
-    const certApiEu = new acm.DnsValidatedCertificate(this, "ApiEuCert", { domainName: `api-eu.${props.domainProd}`, hostedZone: zone, region: "eu-central-1" });
+    const certApiEu = new acm.DnsValidatedCertificate(this, "ApiEuCert", { domainName: `api-eu.${props.domain}`, hostedZone: zone, region: "eu-central-1" });
 
     // Import existing content bucket by name (bucket stays where it is)
 
@@ -47,7 +49,7 @@ export class ApiEuStack extends Stack {
         BUCKET: props.bucketName,
         DEFAULT_CTX: "prod",
         VERSIONS_ROOT: "branches",
-        CDN_DOMAIN: `cdn.${props.domainProd}`,
+        CDN_DOMAIN: `cdn.${props.domain}`,
         TOKEN_TTL_SECONDS: String(props.tokenTtlSeconds),
         CLERK_SECRET_KEY: props.clerkSecretKey,
         TOKEN_PUBLIC_KEY: props.jwtPublicKey,
@@ -69,9 +71,9 @@ export class ApiEuStack extends Stack {
 
     // HTTP API in eu-central-1
     const apiEu = new apigwv2.HttpApi(this, "CoreHttpApiEu", {
-      apiName: "core-api-eu",
+      apiName: `core-api-${props.domain.replace(/\./g, "-")}`,
       corsPreflight: {
-        allowOrigins: [`https://${props.domainProd}`],
+        allowOrigins: [`https://${props.domain}`],
         allowMethods: [apigwv2.CorsHttpMethod.GET, apigwv2.CorsHttpMethod.OPTIONS],
         allowHeaders: ["Authorization", "Content-Type"],
         allowCredentials: true,
@@ -81,20 +83,20 @@ export class ApiEuStack extends Stack {
     apiEu.addRoutes({ path: "/content/resolve/{slug}", methods: [apigwv2.HttpMethod.GET], integration: new apigwv2i.HttpLambdaIntegration("ResolveIntegrationEu", resolveFnEu) });
 
     // Custom domain api-eu.<domain>
-    const apiDomainEu = new apigwv2.DomainName(this, "ApiDomainEu", { domainName: `api-eu.${props.domainProd}`, certificate: certApiEu });
+    const apiDomainEu = new apigwv2.DomainName(this, "ApiDomainEu", { domainName: `api-eu.${props.domain}`, certificate: certApiEu });
 
     new apigwv2.ApiMapping(this, "ApiMappingEu", { api: apiEu, domainName: apiDomainEu, stage: apiEu.defaultStage! });
 
-    const certApiEuMain = new acm.DnsValidatedCertificate(this, "ApiEuMainCert", { domainName: `api.${props.domainProd}`, hostedZone: zone, region: "eu-central-1" });
+    const certApiEuMain = new acm.DnsValidatedCertificate(this, "ApiEuMainCert", { domainName: `api.${props.domain}`, hostedZone: zone, region: "eu-central-1" });
 
-    const apiDomainEuMain = new apigwv2.DomainName(this, "ApiDomainEuMain", { domainName: `api.${props.domainProd}`, certificate: certApiEuMain });
+    const apiDomainEuMain = new apigwv2.DomainName(this, "ApiDomainEuMain", { domainName: `api.${props.domain}`, certificate: certApiEuMain });
 
     new apigwv2.ApiMapping(this, "ApiMappingEuMain", { api: apiEu, domainName: apiDomainEuMain, stage: apiEu.defaultStage! });
 
     // Latency alias record for api.bookgenius.eu -> EU regional API domain
     new route53.CfnRecordSet(this, "ApiLatencyEu", {
       hostedZoneId: zone.hostedZoneId,
-      name: `api.${props.domainProd}`,
+      name: `api.${props.domain}`,
       type: "A",
       setIdentifier: "api-eu-central-1",
       region: "eu-central-1",
@@ -105,7 +107,7 @@ export class ApiEuStack extends Stack {
 
     new route53.ARecord(this, "ApiEuDirectAlias", {
       zone,
-      recordName: `api-eu.${props.domainProd}`,
+      recordName: `api-eu.${props.domain}`,
       target: route53.RecordTarget.fromAlias(new targets.ApiGatewayv2DomainProperties(apiDomainEu.regionalDomainName, apiDomainEu.regionalHostedZoneId)),
     });
 

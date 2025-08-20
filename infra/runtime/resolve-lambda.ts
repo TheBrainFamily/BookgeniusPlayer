@@ -120,7 +120,8 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
         // await verifyClerkToken(token);
         isLoggedIn = true;
       }
-    } catch {
+    } catch (e) {
+      console.error("Token verification failed:", e);
       isLoggedIn = false;
     }
     const visibility = isLoggedIn ? "full" : "demo";

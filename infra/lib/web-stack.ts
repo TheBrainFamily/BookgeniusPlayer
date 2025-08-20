@@ -30,14 +30,16 @@ export interface WebStackProps extends StackProps {
   tokenTtlSeconds: number;
   clerkSecretKey: string;
   jwtPublicKey: string;
+  bucketName?: string;
+  hostedZoneId?: string;
 }
 
 export class WebStack extends Stack {
   constructor(scope: Construct, id: string, props: WebStackProps) {
     super(scope, id, props);
 
-    // ===== Hosted Zones =====
-    const zoneProd = route53.HostedZone.fromLookup(this, "ZoneProd", { domainName: props.domainProd });
+    const apex = props.domainProd.split(".").slice(-2).join("."); // e.g. "staging.bookgenius.eu" -> "bookgenius.eu"
+    const zoneProd = route53.HostedZone.fromLookup(this, "ZoneProd", { domainName: apex });
 
     // ===== Certificates (us-east-1) =====
     const certAppProd = new acm.DnsValidatedCertificate(this, "AppCertProd", {
@@ -50,12 +52,14 @@ export class WebStack extends Stack {
     const certApiProd = new acm.DnsValidatedCertificate(this, "ApiCertProd", { domainName: `api.${props.domainProd}`, hostedZone: zoneProd, region: "us-east-1" });
 
     // ===== S3 bucket (private) =====
-    const bucket = new s3.Bucket(this, "ContentBucket", {
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      encryption: s3.BucketEncryption.S3_MANAGED,
-      enforceSSL: true,
-      removalPolicy: RemovalPolicy.RETAIN,
-    });
+    const bucket = props.bucketName
+      ? s3.Bucket.fromBucketName(this, "ContentBucket", props.bucketName)
+      : new s3.Bucket(this, "ContentBucket", {
+          blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+          encryption: s3.BucketEncryption.S3_MANAGED,
+          enforceSSL: true,
+          removalPolicy: RemovalPolicy.RETAIN,
+        });
 
     // OAIs
     const oaiAppProd = new cf.OriginAccessIdentity(this, "OaiAppProd");
@@ -138,7 +142,7 @@ export class WebStack extends Stack {
     // ===== App Distribution (PROD) =====
     const appDistProd = new cf.Distribution(this, "AppDistProd", {
       defaultBehavior: {
-        origin: new origins.S3Origin(bucket, { originAccessIdentity: oaiAppProd }),
+        origin: origins.S3BucketOrigin.withOriginAccessControl(bucket),
         viewerProtocolPolicy: cf.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         functionAssociations: [{ function: routerFn, eventType: cf.FunctionEventType.VIEWER_REQUEST }],
       },
@@ -196,9 +200,10 @@ export class WebStack extends Stack {
       },
     });
 
+    // TODO possibly do not create in staging (when bucket is passed)
     const cdnDist = new cf.Distribution(this, "CdnDist", {
       defaultBehavior: {
-        origin: new origins.S3Origin(bucket, { originAccessIdentity: oaiCdn }),
+        origin: origins.S3BucketOrigin.withOriginAccessControl(bucket),
         viewerProtocolPolicy: cf.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         trustedKeyGroups: [keyGroup],
         cachePolicy: longCacheNoQs,
@@ -216,7 +221,7 @@ export class WebStack extends Stack {
     const apiDomainProd = new apigwv2.DomainName(this, "ApiDomainProd", { domainName: `api.${props.domainProd}`, certificate: certApiProd });
 
     const httpApiProd = new apigwv2.HttpApi(this, "CoreHttpApiProd", {
-      apiName: "core-api-prod",
+      apiName: `core-api-${props.domainProd.replace(/\./g, "-")}`,
       corsPreflight: { allowOrigins: ["*"], allowMethods: [apigwv2.CorsHttpMethod.GET, apigwv2.CorsHttpMethod.OPTIONS], allowHeaders: ["*"] },
     });
 

@@ -61,7 +61,7 @@ function handler(event: CloudFrontFunctionsEvent): CloudFrontFunctionsResult {
   const isBookSlugSub = !isBranchesDomain && !!sub && !reserved[sub];
   if (isBookSlugSub) {
     const apex = host.replace(new RegExp(`^${sub}\\.`), "");
-    return { statusCode: 301, statusDescription: "Moved Permanently", headers: { location: { value: `https://${apex}/player/?book=${encodeURIComponent(sub)}` } }, cookies: {} };
+    return { statusCode: 301, statusDescription: "Moved Permanently", headers: { location: { value: `https://${apex}/player/?book=${encodeURIComponent(sub)}` } } };
   }
 
   // keep your existing bases EXACTLY the same:

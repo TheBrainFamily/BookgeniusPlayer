@@ -26,6 +26,7 @@ export interface AnswerServerStackProps extends StackProps {
   s3Region?: string;
   geminiSecret: string;
   jwtPublicKey: string;
+  hostedZoneId?: string;
 }
 
 export class AnswerServerStack extends Stack {
@@ -34,7 +35,8 @@ export class AnswerServerStack extends Stack {
 
     // -- rest of your stack (VPC/cluster/etc) --
     const fqdn = `${props.subdomain ?? "answers"}.${props.domain}`;
-    const zone = route53.HostedZone.fromLookup(this, "Zone", { domainName: props.domain });
+    const apex = props.domain.split(".").slice(-2).join("."); // e.g. "staging.bookgenius.eu" -> "bookgenius.eu"
+    const zone = route53.HostedZone.fromLookup(this, "Zone", { domainName: apex });
 
     const vpc = new ec2.Vpc(this, "Vpc", { maxAzs: 2, natGateways: 1 });
     const cluster = new ecs.Cluster(this, "Cluster", { vpc });
