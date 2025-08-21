@@ -13,7 +13,7 @@ async function generateBook(bookDirectoryPath: string, bookOutputPath?: string, 
   const { metadata, xmlDoc, bookString } = parseBookXmlData(bookDirectoryPath);
 
   // Ensure output directory exists
-  bookOutputPath = bookDirectoryPath;
+  bookOutputPath = bookOutputPath || bookDirectoryPath;
   console.log("bookOutputPath", bookOutputPath);
   if (!fs.existsSync(bookOutputPath)) {
     fs.mkdirSync(bookOutputPath, { recursive: true });
