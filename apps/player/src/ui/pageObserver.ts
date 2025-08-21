@@ -393,7 +393,8 @@ function activateMediaInRange(
 
       const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - bufferSize, endChapter, endParagraph + bufferSize);
 
-      const placeholders = p.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+      const playRow = p.closest(".play-row");
+      const placeholders = (playRow ?? p).querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
       const charactersDisplayed = [];
       placeholders.forEach((placeholder) => {
@@ -545,11 +546,29 @@ function activateMediaInRange(
 }
 
 // --- Extract Chapter and Paragraph Info ---
-const getParagraphInfo = (element: Element): { chapter: number | null; paragraph: number | null } => {
-  const paragraphStr = (element as HTMLElement).dataset.index;
-  const chapterElement = element.closest("section[data-chapter]");
-  const chapterStr = chapterElement ? (chapterElement as HTMLElement).dataset.chapter : null;
-  return { chapter: chapterStr ? parseInt(chapterStr) : null, paragraph: paragraphStr ? parseInt(paragraphStr) : null };
+export const getParagraphInfo = (element: Element): { chapter: number | null; paragraph: number | null } => {
+  const el = element as HTMLElement;
+
+  const chapterElement = el.closest("section[data-chapter]") as HTMLElement | null;
+  const chapterStr = chapterElement?.dataset.chapter ?? null;
+
+  // Parse chapter safely
+  const chNum = chapterStr !== null ? Number.parseInt(chapterStr, 10) : NaN;
+  const chapter: number | null = Number.isFinite(chNum) ? chNum : null;
+
+  // Paragraph:
+  // Prefer explicit data-index; otherwise treat H3–H6 within a chapter as paragraph 0.
+  const idxStr = el.dataset.index ?? null;
+  let paragraph: number | null = null;
+
+  if (idxStr !== null) {
+    const idxNum = Number.parseInt(idxStr, 10);
+    paragraph = Number.isFinite(idxNum) ? idxNum : null;
+  } else if (chapter !== null && /^H[3-6]$/.test(el.tagName)) {
+    paragraph = 0;
+  }
+
+  return { chapter, paragraph };
 };
 
 let previousRootRectWidth = 0;
@@ -557,7 +576,13 @@ let previousRootRectWidth = 0;
 export function setupPageObserver(
   openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
 ): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number; cleanup: () => void } | null {
-  const observerOptions = { root: document.getElementById("content-container"), rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
+  const rootEl = document.getElementById("content-container");
+  if (!rootEl) {
+    console.warn("[PageObserver] No #content-container - cannot create observer.");
+    return null;
+  }
+
+  const observerOptions = { root: rootEl, rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
 
   // Initialize development zone visualizers early
   const { activeElementVisualizer, rangeVisualizer } = initializeDevZoneVisualizers();
@@ -568,16 +593,10 @@ export function setupPageObserver(
   let currentlyLastActivePageElement: Element | null = null;
   let currentlyActiveParagraph: { chapter: number; paragraph: number } | null = null;
 
-  // We want to skip updating location when we scroll through the transition-spacer between chapters
-  let isTransitioning = false;
-
   // Keep track of observed paragraphs to avoid re-observing
   const observedParagraphs = new Set<Element>();
 
   const processIntersections = () => {
-    if (isTransitioning) {
-      return;
-    }
     const rootRect = observerOptions.root.getBoundingClientRect();
     const topMultiplier = 0.35; // 35vh focus zone start
     let bottomMultiplier = 0.45; // 10vh focus zone height (default)
@@ -698,7 +717,7 @@ export function setupPageObserver(
       });
     }
 
-    document.querySelectorAll(".active-paragraph").forEach((element) => {
+    rootEl.querySelectorAll(".active-paragraph").forEach((element) => {
       element.classList.remove("active-paragraph");
     });
     chosenElement?.classList.add("active-paragraph");
@@ -958,7 +977,7 @@ export function setupPageObserver(
 
   // Function to observe new paragraphs
   const observeNewParagraphs = (): number => {
-    const allParagraphs = document.querySelectorAll("section[data-chapter] [data-index]");
+    const allParagraphs = rootEl.querySelectorAll("section[data-chapter] > h3, section[data-chapter] [data-index]");
     let newParagraphsCount = 0;
 
     allParagraphs.forEach((paragraph) => {
@@ -1012,19 +1031,15 @@ export function setupPageObserver(
   };
 
   // Initial observation
-  const paragraphsToObserve = document.querySelectorAll("section[data-chapter] [data-index]");
+  const paragraphsToObserve = rootEl.querySelectorAll("section[data-chapter] > h3, section[data-chapter] [data-index]");
 
-  const spacersToObserve = document.querySelectorAll(".transition-spacer");
-  const contentContainer = document.getElementById("content-container");
+  const spacersToObserve = rootEl.querySelectorAll(".transition-spacer");
   console.log("Observing these spacers:", spacersToObserve);
 
   const spacerObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (!isSplashAnimationComplete) return;
-        if (!contentContainer) return;
-
-        isTransitioning = !!entry.isIntersecting;
 
         const rect = entry.boundingClientRect;
 
@@ -1041,7 +1056,7 @@ export function setupPageObserver(
             // Spacer is entering from bottom or fully in view
             if (visibilityPercent <= 0.5) {
               // 0-50% visible: keep full opacity
-              contentContainer.style.opacity = "1";
+              rootEl.style.opacity = "1";
             } else if (visibilityPercent < 1) {
               // 50-99% visible: fade from 1 to 0
               const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
@@ -1056,23 +1071,23 @@ export function setupPageObserver(
               });
 
               const fadePercent = (visibilityPercent - 0.5) * 2;
-              contentContainer.style.opacity = (1 - fadePercent).toString();
+              rootEl.style.opacity = (1 - fadePercent).toString();
             } else {
               // 100% visible: full transparency
-              contentContainer.style.opacity = "0";
+              rootEl.style.opacity = "0";
             }
           } else {
             // Spacer is leaving from top (rect.top < 0)
             if (visibilityPercent >= 0.6) {
               // Still 50% or more visible: keep at 0
-              contentContainer.style.opacity = "0";
+              rootEl.style.opacity = "0";
             } else {
-              contentContainer.style.opacity = "1";
+              rootEl.style.opacity = "1";
             }
           }
         } else {
           // Spacer is completely out of view
-          contentContainer.style.opacity = "1";
+          rootEl.style.opacity = "1";
         }
       });
     },
