@@ -140,6 +140,9 @@ jobs:
             pnpm process-all-books-docker -- --only="$CHANGED_BOOKS"
           fi
 
+      - name: Prepare s3 folder
+        run: pnpm prepare:docker
+
       - name: Deploy assets to S3
         env:
           ASSET_CONTEXT: ${{ env.ASSET_CONTEXT }}
