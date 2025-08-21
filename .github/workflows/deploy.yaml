@@ -54,12 +54,35 @@ jobs:
           echo "base=$BASE" >> $GITHUB_OUTPUT
           echo "head=${{ github.sha }}" >> $GITHUB_OUTPUT
 
+      - name: Set dynamic environment variables
+        id: set_vars
+        run: |
+          REPOSITORY=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "REPOSITORY=${REPOSITORY}" >> $GITHUB_ENV
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # For Pull Requests
+            BRANCH_NAME=$(echo "${{ github.head_ref }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+            echo "ASSET_CONTEXT=branches/${BRANCH_NAME}" >> $GITHUB_ENV
+            echo "IS_PRODUCTION=false" >> $GITHUB_ENV
+          else
+            BRANCH_NAME=$(echo "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+            echo "ASSET_CONTEXT=prod" >> $GITHUB_ENV
+            echo "IS_PRODUCTION=true" >> $GITHUB_ENV
+          fi
+
       - name: Detect changed books / scripts
         id: changed
         run: |
           set -euo pipefail
           BASE="${{ steps.sha.outputs.base }}"
           HEAD="${{ steps.sha.outputs.head }}"
+
+          if [[ "${IS_PRODUCTION}" == "true" ]]; then
+            echo "rebuild_all=1" >> "$GITHUB_OUTPUT"
+            echo "books_csv=" >> "$GITHUB_OUTPUT"
+            echo "prod: forcing REBUILD_ALL"
+            exit 0
+          fi
 
           mapfile -t files < <(git diff --name-only "$BASE" "$HEAD" -- apps/player/public_books/ apps/player/scripts/)
           printf '%s\n' "${files[@]}"
@@ -72,6 +95,7 @@ jobs:
           mapfile -t books < <(printf '%s\n' "${files[@]}" | awk -F'/' '/^apps\/player\/public_books\//{print $4}' | sort -u)
           echo "rebuild_all=$REBUILD_ALL" >> $GITHUB_OUTPUT
           echo "books_csv=$(IFS=, ; echo "${books[*]}")" >> $GITHUB_OUTPUT
+
       - name: Install git-lfs (skip auto smudge)
         run: |
           git lfs install --local
@@ -100,22 +124,6 @@ jobs:
         with:
           node-version: "20"
           cache: "pnpm"
-
-      - name: Set dynamic environment variables
-        id: set_vars
-        run: |
-          REPOSITORY=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          echo "REPOSITORY=${REPOSITORY}" >> $GITHUB_ENV
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            # For Pull Requests
-            BRANCH_NAME=$(echo "${{ github.head_ref }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
-            echo "ASSET_CONTEXT=branches/${BRANCH_NAME}" >> $GITHUB_ENV
-            echo "IS_PRODUCTION=false" >> $GITHUB_ENV
-          else
-            BRANCH_NAME=$(echo "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
-            echo "ASSET_CONTEXT=prod" >> $GITHUB_ENV
-            echo "IS_PRODUCTION=true" >> $GITHUB_ENV
-          fi
 
       - name: Setup Bun and install dependencies
         uses: oven-sh/setup-bun@v1
