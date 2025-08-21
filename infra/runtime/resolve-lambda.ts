@@ -20,8 +20,11 @@ const s3 = new S3Client({ region: BUCKET_REGION });
 function hostToBranch(host?: string): string | undefined {
   if (!host) return;
   const h = host.split(":")[0];
-  const first = h.split(".")[0];
-  if (/^pr-/.test(first)) return first;
+  const labels = h.split(".");
+  const first = labels[0]; // <branch>
+  const second = labels[1]; // "branches"
+  if (second === "branches" && first) return first;
+  return undefined;
 }
 
 function getCookieFromEventV2(event: APIGatewayProxyEventV2, name: string): string | null {
@@ -97,6 +100,9 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
     let ctx = ctxFromQuery;
 
     if (!ctx) {
+      console.log("x-viewer-host", event.headers?.["x-viewer-host"]);
+      console.log("event.requestContext.domainName", event.requestContext.domainName);
+      console.log(" event.headers?.host", event.headers?.host);
       const host = event.headers?.["x-viewer-host"] || event.requestContext.domainName || event.headers?.host;
       const branch = hostToBranch(host);
       ctx = branch ? `${VERSIONS_ROOT}/${branch}` : DEFAULT_CTX;
@@ -114,7 +120,8 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
         // await verifyClerkToken(token);
         isLoggedIn = true;
       }
-    } catch {
+    } catch (e) {
+      console.error("Token verification failed:", e);
       isLoggedIn = false;
     }
     const visibility = isLoggedIn ? "full" : "demo";
