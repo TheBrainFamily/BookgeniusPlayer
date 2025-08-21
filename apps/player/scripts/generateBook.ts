@@ -8,7 +8,7 @@ import { generateDataFiles, xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterTags } from "./data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
 
-async function generateBook(bookDirectoryPath: string, bookOutputPath?: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
+async function generateBook(bookDirectoryPath: string, bookOutputPath?: string, isDemo = false): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
   const { metadata, xmlDoc, bookString } = parseBookXmlData(bookDirectoryPath);
 
@@ -22,7 +22,7 @@ async function generateBook(bookDirectoryPath: string, bookOutputPath?: string):
   // Generate files
   generateKnownVideoFiles(bookDirectoryPath, bookOutputPath);
   generateAudiobookTracksFile(bookDirectoryPath, bookOutputPath);
-  generateBookDataFiles(bookDirectoryPath, metadata, xmlDoc, bookString, bookOutputPath);
+  generateBookDataFiles(bookDirectoryPath, metadata, xmlDoc, bookString, bookOutputPath, isDemo);
 
   // Load and validate generated book data
   console.time("loadAndValidateBookData");
@@ -132,9 +132,16 @@ export function generateCharacterMetadata(xmlDoc: Document, bookString: string, 
   return extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm, bookSlug).map((character) => ({ ...character, bookSlug }));
 }
 
-function generateBookDataFiles(bookDirectoryPath: string, metadata: ReturnType<typeof parseBookXmlData>["metadata"], xmlDoc: Document, bookString: string, bookOutputPath: string) {
+function generateBookDataFiles(
+  bookDirectoryPath: string,
+  metadata: ReturnType<typeof parseBookXmlData>["metadata"],
+  xmlDoc: Document,
+  bookString: string,
+  bookOutputPath: string,
+  isDemo = false,
+) {
   // --- Generate getBookStringified.ts ---
-  const { backgroundsData, audioData, cutSceneData, htmlResult, chapterTitles } = xmlToComplexHtml(bookString, metadata.slug, metadata.language);
+  const { backgroundsData, audioData, cutSceneData, htmlResult, chapterTitles } = xmlToComplexHtml(bookString, metadata.slug, metadata.language, isDemo);
 
   // Check if the required media files exist in the book directory
   const requiredMediaFiles = ["getBackgroundsForBook.ts", "getBackgroundSongsForBook.ts", "getCutScenesForBook.ts"];

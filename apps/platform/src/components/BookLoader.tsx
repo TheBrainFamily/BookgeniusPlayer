@@ -1,78 +1,94 @@
 // src/components/BookLoader.tsx
 import React, { useState, useEffect, useRef } from "react";
-import "./BookLoader.css"; // We'll create this file for animations
+import "./BookLoader.css";
+import { genericPhrases } from "./genericPhrases";
 
-// Define the props the component will accept
 interface BookLoaderProps {
   title: string;
-  subtitle: string;
+  author: string;
   loadingPhrases: string[];
-  isLoaded: boolean; // Control when the loader should hide
+  isLoaded: boolean;
 }
 
-export const BookLoader: React.FC<BookLoaderProps> = ({ title, subtitle, loadingPhrases, isLoaded }) => {
+export const BookLoader: React.FC<BookLoaderProps> = ({ title, author, loadingPhrases, isLoaded }) => {
   const [currentPhrase, setCurrentPhrase] = useState("");
   const [isFading, setIsFading] = useState(false);
   const [isHiding, setIsHiding] = useState(false);
 
-  // Use a ref to keep track of previous phrases without causing re-renders
+  // Tracks every phrase shown in the current cycle (both book + generic)
   const previousPhrases = useRef(new Set<string>());
+  // Tracks which pool we're currently drawing from
+  const usingGenericRef = useRef(false);
 
-  // Effect for cycling through loading phrases
   useEffect(() => {
-    const getRandomPhrase = () => {
-      if (loadingPhrases.length === 0) return "Loading...";
-      // Reset memory if we've used most of the phrases
-      if (previousPhrases.current.size > loadingPhrases.length - 5) {
-        previousPhrases.current.clear();
-      }
-      let phrase;
-      do {
-        phrase = loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)];
-      } while (previousPhrases.current.has(phrase) && loadingPhrases.length > 1);
+    // Reset cycle whenever the book-specific phrases list changes
+    previousPhrases.current.clear();
+    usingGenericRef.current = false;
 
-      previousPhrases.current.add(phrase);
-      return phrase;
+    const getRandomPhrase = () => {
+      const book = (loadingPhrases ?? []).filter(Boolean);
+      const generic = (genericPhrases ?? []).filter(Boolean);
+
+      if (book.length === 0 && generic.length === 0) return "Loading...";
+
+      const used = previousPhrases.current;
+
+      const pickFrom = (arr: string[]) => {
+        const options = arr.filter((p) => !used.has(p));
+        if (options.length === 0) return null;
+        const choice = options[Math.floor(Math.random() * options.length)];
+        used.add(choice);
+        return choice;
+      };
+
+      // 1) Try current pool (book first, then generic)
+      let phrase = usingGenericRef.current ? pickFrom(generic) : pickFrom(book);
+      if (phrase) return phrase;
+
+      // 2) If book is exhausted, switch to generic
+      if (!usingGenericRef.current) {
+        usingGenericRef.current = true;
+        phrase = pickFrom(generic);
+        if (phrase) return phrase;
+      }
+
+      // 3) If generic also exhausted (or started on generic and it's exhausted), reset everything
+      used.clear();
+      usingGenericRef.current = false;
+
+      // Prefer book on a fresh cycle; fall back to generic if book is empty
+      phrase = pickFrom(book) ?? pickFrom(generic);
+      return phrase ?? "Loading...";
     };
 
-    // Set the initial phrase immediately
+    // Initial phrase
     setCurrentPhrase(getRandomPhrase());
 
     const phraseInterval = setInterval(() => {
-      setIsFading(true); // Trigger fade-out animation
+      setIsFading(true);
       setTimeout(() => {
         setCurrentPhrase(getRandomPhrase());
-        setIsFading(false); // Trigger fade-in animation
-      }, 300); // Duration of fade-out animation
-    }, 3000); // Change phrase every 3 seconds
+        setIsFading(false);
+      }, 300);
+    }, 1700);
 
-    // Cleanup function to stop the interval when the component unmounts
     return () => clearInterval(phraseInterval);
   }, [loadingPhrases]);
 
-  // Effect to handle the final fade-out of the entire screen
   useEffect(() => {
-    console.log("BOOK LOADER IS LOADED:", isLoaded);
     if (isLoaded) {
       setIsHiding(true);
     }
   }, [isLoaded]);
 
-  // The component uses `position: fixed` to cover the whole screen,
-  // just like the original HTML version.
   return (
-    <div className={`book-loader-splash ${isHiding ? "hide" : ""}`}>
+    <div className={`book-loader-splash ${isHiding ? "hide" : ""} pointer-events-none`}>
       <div className="text-center">
-        {/* Title and Subtitle */}
         <div className="mb-16">
           <h1 className="splash-title">{title}</h1>
-          <h2 className="splash-subtitle">{subtitle}</h2>
+          <h2 className="splash-subtitle">{author}</h2>
         </div>
-
-        {/* Loading Phrase with fade animation */}
         <div className="h-8">
-          {" "}
-          {/* Container to prevent layout shift */}
           <p className={`splash-loading-text ${isFading ? "fading-out" : "fading-in"}`}>{currentPhrase}</p>
         </div>
       </div>

@@ -1,7 +1,8 @@
 import fs from "fs";
 import path from "path";
+import { returnDemoChapterNumbers } from "./helpers/returnDemoChapterNumbers";
 
-export function buildBookFromContent(bookDirectoryPath: string): void {
+export function buildBookFromContent(bookDirectoryPath: string, isDemo: boolean = false): void {
   const booksContentPath = path.join(bookDirectoryPath, "booksContent");
   const bookXmlPath = path.join(bookDirectoryPath, "book.xml");
 
@@ -27,8 +28,12 @@ export function buildBookFromContent(bookDirectoryPath: string): void {
 
     const metadataInnerContent = metadataMatch[1].trim();
 
+    // Extract demo chapters if in demo mode
+    let demoChapters: number[] | null = null;
+    demoChapters = returnDemoChapterNumbers(metadataContent);
+
     // Read all chapter files
-    const chapterFiles = fs
+    let chapterFiles = fs
       .readdirSync(booksContentPath)
       .filter((file) => file.startsWith("chapter") && file.endsWith(".xml"))
       .sort((a, b) => {
@@ -37,6 +42,16 @@ export function buildBookFromContent(bookDirectoryPath: string): void {
         const bNum = parseInt(b.match(/chapter(\d+)\.xml/)?.[1] || "0");
         return aNum - bNum;
       });
+
+    // Filter chapters for demo mode
+    if (isDemo) {
+      console.log(`📚 Creating demo book with chapters: ${demoChapters.join(", ")}`);
+
+      chapterFiles = chapterFiles.filter((file) => {
+        const chapterNum = parseInt(file.match(/chapter(\d+)\.xml/)?.[1] || "0");
+        return demoChapters.includes(chapterNum);
+      });
+    }
 
     // Read chapter contents
     const chaptersContent = chapterFiles

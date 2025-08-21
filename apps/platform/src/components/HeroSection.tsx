@@ -28,7 +28,16 @@ const HeroSection = () => {
 
           <h1 className="text-5xl md:text-7xl font-bold mb-6 text-foreground leading-tight">
             Experience Literature
-            <span className="block text-transparent bg-gradient-to-r from-library-gold via-library-gold-glow to-library-gold bg-clip-text animate-candleflicker">
+            <span
+              className="
+      block bg-clip-text text-transparent animate-candleflicker
+      [background-color:var(--color-library-gold,hsl(45_70%_55%))]
+      bg-gradient-to-r
+      from-[var(--color-library-gold,hsl(45_70%_55%))]
+      via-[var(--color-library-gold-glow,hsl(45_60%_65%))]
+      to-[var(--color-library-gold,hsl(45_70%_55%))]
+    "
+            >
               Like Never Before
             </span>
           </h1>

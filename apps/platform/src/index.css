@@ -236,10 +236,10 @@
 }
 
 /* Platform-Player visibility logic */
-#root-player,
-#legacy,
-#cutscene-video,
-#splash-screen {
+body#platform-scope #root-player,
+body#platform-scope #legacy,
+body#platform-scope #cutscene-video,
+body#platform-scope #splash-screen {
   display: none;
 }
 

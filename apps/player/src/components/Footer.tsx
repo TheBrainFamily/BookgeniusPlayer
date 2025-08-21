@@ -18,22 +18,10 @@ const Footer = () => {
   } = getBookData();
 
   const [isRightNotesBlankHidden, setIsRightNotesBlankHidden] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
     setIsRightNotesBlankHidden(isMobileOrTablet);
   }, [isMobileOrTablet]);
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
 
   return (
     <AnimatePresence>
@@ -50,9 +38,9 @@ const Footer = () => {
         >
           {bookForm === "play" ? (
             <>
-              <div className="w-full sm:flex-3 max-w-[800px] px-0 flex flex-col sm:px-3 xl:px-2 space-y-3 pointer-events-auto">
-                {isDesktop && <CharactersOnStagePanel />}
-                <BottomInput onSubmit={sendMessage} />
+              <div className="w-full sm:flex-3 px-0 flex flex-col sm:px-3 xl:px-2 space-y-3 items-center pointer-events-auto">
+                <CharactersOnStagePanel />
+                <BottomInput className="max-w-[800px]" onSubmit={sendMessage} />
               </div>
             </>
           ) : (
