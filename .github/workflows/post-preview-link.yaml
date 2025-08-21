@@ -69,9 +69,7 @@ jobs:
 
             // Sticky PR comment
             const marker = '<!-- preview-url -->';
-            const body = `${marker}
-**Preview ready:** ${url}
-${booksSection}`.trim();
+            const body = `${marker}\n**Preview ready:**\n${url}\n${booksSection}`.trim();
 
             const comments = await github.paginate(
               github.rest.issues.listComments, { owner, repo, issue_number: pr.number }
