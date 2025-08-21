@@ -4,14 +4,13 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest-m
+    runs-on: blacksmith-2vcpu-ubuntu-2404
 
     steps:
-      - uses: actions/checkout@v4
-        # with:
-        # sparse-checkout: |
-        #   !apps/player/public_books
-        # sparse-checkout-cone-mode: false
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          lfs: false
       - uses: pnpm/action-setup@v4
         with:
           version: 10.13.1 # match your local pnpm
