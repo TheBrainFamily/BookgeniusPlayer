@@ -110,7 +110,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       {!hideTitle && (
         <div
           className={cn(
-            "max-w-full w-full absolute right-0 bottom-0 rounded-md sm:rounded-lg text-center bg-black/70 textured-bg border shadow-lg sm:shadow-xl box-border z-11",
+            "max-w-full w-full absolute right-0 bottom-0 rounded-md sm:rounded-lg text-center bg-black/70 textured-bg border shadow-lg sm:shadow-xl box-border z-20",
             "border-[1px] sm:border-2",
             isTalkingInCurrentRange ? "border-(--book-primary-color) transition-all duration-300 ease-in-out" : "border-transparent transition-all duration-200 ease-in-out",
           )}
