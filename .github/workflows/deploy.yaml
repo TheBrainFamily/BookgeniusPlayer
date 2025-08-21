@@ -159,3 +159,29 @@ jobs:
           PROD_DISTRIBUTION_ID: ${{ vars.PROD_DISTRIBUTION_ID }}
           IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
         run: bash ./update.sh
+      - name: Emit deployed books list
+        # only when some books were considered (changed or all)
+        if: ${{ env.REBUILD_ALL == '1' || env.CHANGED_BOOKS != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          if [[ "${REBUILD_ALL}" == "1" ]]; then
+            # list all slugs from repo
+            mapfile -t books < <(ls -1 apps/player/public_books | sed '/^\./d' | sort)
+            printf '%s\n' "${books[@]}" \
+              | jq -R . | jq -s '{all:true, books:.}' > out/deployed_books.json
+          else
+            IFS=, read -ra arr <<< "${CHANGED_BOOKS}"
+            printf '%s\n' "${arr[@]}" | sed '/^$/d' \
+              | sort -u | jq -R . | jq -s '{all:false, books:.}' > out/deployed_books.json
+          fi
+          jq . out/deployed_books.json
+
+      - name: Upload deployed-books artifact
+        if: ${{ env.REBUILD_ALL == '1' || env.CHANGED_BOOKS != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployed-books
+          path: out/deployed_books.json
+          retention-days: 7
