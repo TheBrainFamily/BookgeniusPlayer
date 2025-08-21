@@ -12,7 +12,7 @@
     "build": "tsx ./scripts/build.ts",
     "generate-book": "tsx ./scripts/generateBook.ts",
     "process-all-books": "tsx ./scripts/processAllBooks.ts",
-    "process-all-books-docker": "rm -rf public/books || true && tsx ./scripts/processAllBooks.ts --docker",
+    "process-all-books-docker": "rm -rf public/books || true && rm -rf docker-build/ || true && tsx ./scripts/processAllBooks.ts --docker",
     "process-book": "tsx ./scripts/processBook.ts",
     "build-only": "node scripts/setEnv.js --env development vite build",
     "build-for-docker": "node scripts/setEnv.js --env docker vite build && pnpm process-all-books-docker",

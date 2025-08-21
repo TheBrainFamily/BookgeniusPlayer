@@ -150,14 +150,20 @@ export async function createDemoBook(fullBookPath: string, demoBookPath: string,
       // Filter variants by chapter number in their id (e.g., "ch1-p2-s3")
       if (Array.isArray(data)) {
         filteredData = (data as Variant[]).filter((variant) => {
-          const match = variant.id.match(/^ch(\d+)/);
-          if (!match) return false;
-          const chapterNum = parseInt(match[1], 10);
-          if (isNaN(chapterNum)) {
-            console.warn(`   ⚠️ Invalid chapter number in variant ID: ${variant.id}`);
+          try {
+            const match = variant.id.match(/^ch(\d+)/);
+            if (!match) return false;
+            const chapterNum = parseInt(match[1], 10);
+            if (isNaN(chapterNum)) {
+              console.warn(`   ⚠️ Invalid chapter number in variant ID: ${variant.id}`);
+              return false;
+            }
+            return demoChapters.includes(chapterNum);
+          } catch (error) {
+            console.error("GOZDECKI WRONG DATA", data.slice(0, 3), fullBookPath, fileName);
+            console.error("error", error);
             return false;
           }
-          return demoChapters.includes(chapterNum);
         });
       }
     } else {
@@ -229,7 +235,7 @@ export const getBookStringified = () => {
   }
 
   // Copy chapters and booksContent directories
-  const dirsToCopy = ["chapters", "booksContent"];
+  const dirsToCopy = ["booksContent"];
   await Promise.all(
     dirsToCopy.map(async (dir) => {
       const srcDir = path.join(fullBookPath, dir);

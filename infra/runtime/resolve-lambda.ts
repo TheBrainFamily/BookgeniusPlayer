@@ -128,7 +128,7 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 
     let versions = await getVersions(ctx!);
     let ctxUsed = ctx!;
-    if (!versions) {
+    if (!versions || !versions[slug]) {
       versions = await getVersions(DEFAULT_CTX);
       ctxUsed = DEFAULT_CTX;
     }
