@@ -158,4 +158,4 @@ jobs:
           BRANCHES_DISTRIBUTION_ID: ${{ vars.BRANCHES_DISTRIBUTION_ID }}
           PROD_DISTRIBUTION_ID: ${{ vars.PROD_DISTRIBUTION_ID }}
           IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
-        run: bash ./update.sh --with-books
+        run: bash ./update.sh
