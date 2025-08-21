@@ -131,9 +131,9 @@ docker-compose -f docker-compose.yml -f docker-compose.local.yml up --build
 
 #### Service URLs
 
-- Platform app → http://localhost  
-- Player app → http://localhost/player/  
-- MinIO console → http://localhost:9090  
+- Platform app → http://localhost
+- Player app → http://localhost/player/
+- MinIO console → http://localhost:9090
 
 ### Hot-Reloading
 

@@ -33,7 +33,7 @@ jobs:
             if (!prs.data.length) return;
             const pr = prs.data[0];
 
-            const branch = pr.head.ref.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+            const branch = pr.head.ref.toLowerCase().replace(/[^a-z0-9]/g, '');
             const base = process.env.BRANCH_BASE_DOMAIN || 'branches.bookgenius.eu';
             const url = `https://${branch}.${base}/`;
 
