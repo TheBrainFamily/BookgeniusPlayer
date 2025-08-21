@@ -1,13 +1,17 @@
 name: Post Preview Link (Reporter)
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: ["Build and Deploy"]
     types: [completed]
 
 permissions:
+  id-token: write
+  contents: read
   issues: write
   deployments: write
+  pull-requests: write
 
 jobs:
   comment:
@@ -22,10 +26,9 @@ jobs:
             const {owner, repo} = context.repo;
             const run = context.payload.workflow_run;
 
-            // Find the PR for this head SHA
-            const prs = await github.request('GET /repos/{owner}/{repo}/commits/{ref}/pulls', {
-              owner, repo, ref: run.head_sha,
-              mediaType: { previews: ['groot'] }
+            // Find the PR for this commit SHA (works for internal PRs)
+            const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner, repo, commit_sha: run.head_sha
             });
             if (!prs.data.length) return;
             const pr = prs.data[0];
