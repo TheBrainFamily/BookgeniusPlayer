@@ -57,8 +57,8 @@ jobs:
             echo "IS_PRODUCTION=true" >> $GITHUB_ENV
           fi
 
-      # - name: Setup Bun and install dependencies
-      #   uses: oven-sh/setup-bun@v1
+      - name: Setup Bun and install dependencies
+        uses: oven-sh/setup-bun@v1
       - run: pnpm install
 
       #      - name: Build local artifacts (for S3 upload)
