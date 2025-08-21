@@ -44,7 +44,7 @@ jobs:
 
             const branch = pr.head.ref.toLowerCase().replace(/[^a-z0-9]/g, '');
             const base = process.env.BRANCH_BASE_DOMAIN || 'branches.bookgenius.eu';
-            const url = `https://${branch}.${base}/reader/`;
+            const url = `https://${branch}.${base}/`;
 
             // Read deployed books artifact (if present)
             let all = false;
@@ -61,7 +61,8 @@ jobs:
             // Markdown for books
             let booksSection = '';
             if (books.length) {
-              const items = books.map(b => `- [${b}](${url}?book=${encodeURIComponent(b)})`).join('\n');
+              const bookUrl = `${url}reader/?book=${encodeURIComponent(b)}`;
+              const items = books.map(b => `- [${bookUrl}](${bookUrl})`).join('\n');
               booksSection = `\n**Books in this deploy (${all ? 'all' : 'changed'}) — ${books.length}:**\n${items}\n`;
             } else {
               booksSection = `\n_No book assets changed in this run._\n`;
