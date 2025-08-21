@@ -32,7 +32,67 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          lfs: true
+          lfs: false
+          fetch-depth: 1
+
+      - name: Compute base/head SHAs
+        id: sha
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            git fetch --no-tags --depth=1 origin "$BASE"
+          else
+            BASE="${{ github.event.before }}"
+            if [[ -n "$BASE" ]]; then
+              git fetch --no-tags --depth=1 origin "$BASE"
+            else
+              git fetch --no-tags --depth=1 origin main
+              BASE=$(git merge-base HEAD origin/main)
+            fi
+          fi
+          echo "base=$BASE" >> $GITHUB_OUTPUT
+          echo "head=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Detect changed books / scripts
+        id: changed
+        run: |
+          set -euo pipefail
+          BASE="${{ steps.sha.outputs.base }}"
+          HEAD="${{ steps.sha.outputs.head }}"
+
+          mapfile -t files < <(git diff --name-only "$BASE" "$HEAD" -- apps/player/public_books/ apps/player/scripts/)
+          printf '%s\n' "${files[@]}"
+
+          REBUILD_ALL=0
+          if printf '%s\n' "${files[@]}" | grep -q '^apps/player/scripts/'; then
+            REBUILD_ALL=1
+          fi
+
+          mapfile -t books < <(printf '%s\n' "${files[@]}" | awk -F'/' '/^apps\/player\/public_books\//{print $4}' | sort -u)
+          echo "rebuild_all=$REBUILD_ALL" >> $GITHUB_OUTPUT
+          echo "books_csv=$(IFS=, ; echo "${books[*]}")" >> $GITHUB_OUTPUT
+      - name: Install git-lfs (skip auto smudge)
+        run: |
+          git lfs install --local
+          git config --local filter.lfs.smudge "git-lfs smudge --skip -- %f"
+          git config --local filter.lfs.process "git-lfs filter-process --skip"
+
+      - name: Selective git lfs pull
+        if: ${{ steps.changed.outputs.rebuild_all == '1' || steps.changed.outputs.books_csv != '' }}
+        run: |
+          if [[ "${{ steps.changed.outputs.rebuild_all }}" == "1" ]]; then
+            git lfs pull -I "apps/player/public_books/**"
+          else
+            IFS=, read -ra arr <<< "${{ steps.changed.outputs.books_csv }}"
+            include=$(printf 'apps/player/public_books/%s/**,' "${arr[@]}")
+            git lfs pull -I "${include%,}"
+          fi
+
+      - name: Export change set
+        run: |
+          echo "CHANGED_BOOKS=${{ steps.changed.outputs.books_csv }}" >> $GITHUB_ENV
+          echo "REBUILD_ALL=${{ steps.changed.outputs.rebuild_all }}" >> $GITHUB_ENV
 
       - uses: pnpm/action-setup@v4
 
@@ -64,12 +124,21 @@ jobs:
       #      - name: Build local artifacts (for S3 upload)
       #        run: pnpm build:docker
 
-      - name: Build
-        run: pnpm build:docker:with-books
+      - name: Build web apps
+        run: pnpm build:docker:front-only
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           CI: true
+
+      - name: Build books
+        if: ${{ env.REBUILD_ALL == '1' || env.CHANGED_BOOKS != '' }}
+        run: |
+          if [[ "$REBUILD_ALL" == "1" ]]; then
+            pnpm process-all-books-docker
+          else
+            pnpm process-all-books-docker -- --only="$CHANGED_BOOKS"
+          fi
 
       - name: Deploy assets to S3
         env:
@@ -77,4 +146,5 @@ jobs:
           S3_BUCKET: ${{ vars.S3_BUCKET }}
           BRANCHES_DISTRIBUTION_ID: ${{ vars.BRANCHES_DISTRIBUTION_ID }}
           PROD_DISTRIBUTION_ID: ${{ vars.PROD_DISTRIBUTION_ID }}
+          IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
         run: bash ./update.sh --with-books

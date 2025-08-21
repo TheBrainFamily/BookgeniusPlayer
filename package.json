@@ -18,6 +18,7 @@
     "build:docker:front-only": "run-s build:front-parallel prepare:docker",
     "prepare:gateway": "zip -r gateway.zip ./docker-compose.gateway.yml ./apps/gateway/configs ./deployment/templates",
     "prettier:check": "pnpm pnpm -r --if-present prettier:check",
+    "process-all-books-docker": "pnpm --filter player process-all-books-docker",
     "lint": "pnpm pnpm -r --if-present lint",
     "lint:ci": "pnpm pnpm -r --if-present lint:ci",
     "typecheck": "pnpm pnpm -r --if-present typecheck",

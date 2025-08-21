@@ -5,24 +5,23 @@
 #CTX=prod
 #ASSET_CONTEXT=branches/test
 
-aws s3 cp build/platform-app/index.html \
-  s3://$S3_BUCKET/app/platform/${ASSET_CONTEXT}/index.html \
+# apps (always)
+aws s3 cp build/platform-app/index.html "s3://$S3_BUCKET/app/platform/${ASSET_CONTEXT}/index.html" \
   --content-type 'text/html; charset=utf-8' \
   --cache-control 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400' \
   --only-show-errors
 
-aws s3 sync build/platform-app/ s3://$S3_BUCKET/app/platform/${ASSET_CONTEXT}/ \
+aws s3 sync build/platform-app/ "s3://$S3_BUCKET/app/platform/${ASSET_CONTEXT}/" \
   --exclude 'index.html' \
   --cache-control 'public, max-age=31536000, immutable' \
   --only-show-errors --size-only --no-progress --delete
 
-aws s3 cp build/player-app/index.html \
-  s3://$S3_BUCKET/app/player/${ASSET_CONTEXT}/index.html \
+aws s3 cp build/player-app/index.html "s3://$S3_BUCKET/app/player/${ASSET_CONTEXT}/index.html" \
   --content-type 'text/html; charset=utf-8' \
   --cache-control 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400' \
   --only-show-errors
 
-aws s3 sync build/player-app/ s3://$S3_BUCKET/app/player/${ASSET_CONTEXT}/ \
+aws s3 sync build/player-app/ "s3://$S3_BUCKET/app/player/${ASSET_CONTEXT}/" \
   --exclude 'index.html' \
   --cache-control 'public, max-age=31536000, immutable' \
   --only-show-errors --size-only --no-progress --delete
@@ -36,7 +35,25 @@ if [[ "$*" == *"--with-books"* ]]; then
     --cache-control 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400' 
 fi
 
-aws cloudfront create-invalidation --distribution-id $BRANCHES_DISTRIBUTION_ID --paths "/app/platform/${ASSET_CONTEXT}/index.html"
-aws cloudfront create-invalidation --distribution-id $BRANCHES_DISTRIBUTION_ID --paths "/app/player/${ASSET_CONTEXT}/index.html"
-aws cloudfront create-invalidation --distribution-id $PROD_DISTRIBUTION_ID --paths "/app/platform/${ASSET_CONTEXT}/index.html"
-aws cloudfront create-invalidation --distribution-id $PROD_DISTRIBUTION_ID --paths "/app/player/${ASSET_CONTEXT}/index.html"
+if [[ "${REBUILD_ALL:-0}" == "1" || -n "${CHANGED_BOOKS:-}" ]]; then
+  if [[ -d build/s3-data/assets ]]; then
+    # If REBUILD_ALL, this directory will contain all; otherwise just changed books
+    s5cmd --numworkers 256 cp -c 256 --cache-control "public, max-age=31536000, immutable" "build/s3-data/assets/" "s3://$S3_BUCKET/${ASSET_CONTEXT}/assets/"
+  fi
+
+  if [[ -f build/s3-data/versions.json ]]; then
+    # sparse overwrite: only changed books; missing ones fall back to main
+    aws s3 cp build/s3-data/versions.json "s3://$S3_BUCKET/${ASSET_CONTEXT}/versions.json" \
+      --content-type 'application/json; charset=utf-8' \
+      --cache-control 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400' \
+      --only-show-errors
+  fi
+fi
+
+
+# CF invalidations (only index.html)
+if [ "${IS_PRODUCTION:-false}" = "true" ]; then
+    aws cloudfront create-invalidation --distribution-id $PROD_DISTRIBUTION_ID --paths "/app/platform/${ASSET_CONTEXT}/index.html" "/app/player/${ASSET_CONTEXT}/index.html"
+else
+    aws cloudfront create-invalidation --distribution-id $BRANCHES_DISTRIBUTION_ID --paths "/app/platform/${ASSET_CONTEXT}/index.html" "/app/player/${ASSET_CONTEXT}/index.html"
+fi

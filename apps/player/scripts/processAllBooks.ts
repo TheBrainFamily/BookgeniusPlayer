@@ -5,12 +5,28 @@ import { processBook } from "./processBook";
 
 const PUBLIC_BOOKS_DIR = path.join(__dirname, "..", "public_books");
 
-async function processAllBooks(docker: boolean = false) {
+function parseArgs() {
+  const args = new Map<string, string | boolean>();
+  for (const arg of process.argv.slice(2)) {
+    if (arg.startsWith("--only=")) args.set("only", arg.split("=")[1]);
+    else if (arg === "--docker") args.set("docker", true);
+  }
+  return {
+    docker: Boolean(args.get("docker")),
+    only:
+      (args.get("only") as string | undefined)
+        ?.split(",")
+        .map((s) => s.trim())
+        .filter(Boolean) ?? undefined,
+  };
+}
+
+async function processAllBooks(docker: boolean = false, only?: string[]) {
   const DIST_DIR = docker ? path.join(__dirname, "..", "docker-build", "books") : path.join(__dirname, "..", "public", "books");
   const PUBLIC_DIR = docker ? path.join(__dirname, "..", "docker-build", "books") : path.join(__dirname, "..", "public", "books");
 
   // Check if we need to recompile by comparing timestamps
-  if (!docker && fs.existsSync(PUBLIC_DIR)) {
+  if (!docker && fs.existsSync(PUBLIC_DIR) && !only?.length) {
     try {
       const publicBooksStats = fs.statSync(PUBLIC_BOOKS_DIR);
       const publicDirStats = fs.statSync(PUBLIC_DIR);
@@ -44,15 +60,16 @@ async function processAllBooks(docker: boolean = false) {
     }
   }
 
-  console.log("🚀 Starting to process all books...\n");
+  console.log("🚀 Starting to process books...\n");
 
   // Get all directories in public_books
-  const bookDirs = fs
+  const all = fs
     .readdirSync(PUBLIC_BOOKS_DIR, { withFileTypes: true })
     .filter((dirent) => dirent.isDirectory())
     .map((dirent) => dirent.name);
+  const bookDirs = only ? all.filter((n) => only.includes(n)) : all;
 
-  console.log(`📚 Found ${bookDirs.length} books: ${bookDirs.join(", ")}\n`);
+  console.log(`📚 Will process ${bookDirs.length} books: ${bookDirs.join(", ")}`);
 
   let successCount = 0;
   let failCount = 0;
@@ -97,8 +114,8 @@ async function processAllBooks(docker: boolean = false) {
   console.log(`\n🎉 Processing complete!`);
 }
 
-// Run the script
-processAllBooks(process.argv.includes("--docker")).catch((error) => {
-  console.error("Unhandled error:", error);
+const { docker, only } = parseArgs();
+processAllBooks(docker, only).catch((e) => {
+  console.error(e);
   process.exit(1);
 });
