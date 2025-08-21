@@ -166,6 +166,11 @@ export async function createDemoBook(fullBookPath: string, demoBookPath: string,
           }
         });
       }
+    } else if (baseName === "getBackgroundSongsForBook") {
+      if (Array.isArray(data)) {
+        filteredData = filterDataByChapters(data as BackgroundSongForBook[], demoChapters);
+        (filteredData as BackgroundSongForBook[]).forEach((song) => song.files.forEach((file) => assetsToInclude.add(file)));
+      }
     } else {
       // Generic filtering for data with chapter property
       if (Array.isArray(data)) {
