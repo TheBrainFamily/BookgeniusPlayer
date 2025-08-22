@@ -33,6 +33,7 @@ import { BookDataProvider } from "./context/BookDataContext";
 import { useTranslation } from "react-i18next";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { languageNameToCode } from "@player/helpers/languageNameToCode";
+import { usePaywall } from "./hooks/usePaywall";
 
 function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   setKnownVideos(getKnownVideoFiles());
@@ -48,6 +49,8 @@ function Shell({ onShellMounted }: { onShellMounted: () => void }) {
 
   /* app ready hook */
   useAppReady();
+
+  usePaywall();
 
   /* dynamic audio hooks */
   useBackgroundSongs();

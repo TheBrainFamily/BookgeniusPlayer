@@ -1,9 +1,8 @@
 import { Search, BookOpen, Settings } from "lucide-react";
 import { Button } from "@platform/components/ui/button";
 import { Input } from "@platform/components/ui/input";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
 import { ClientOnly } from "vite-react-ssg";
-import { useClerkReady } from "@platform/providers/ClerkProviderSafe.tsx";
+import { useIntegrations } from "@platform/integrations";
 
 interface NavigationProps {
   searchQuery: string;
@@ -11,7 +10,12 @@ interface NavigationProps {
 }
 
 const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
-  const ready = useClerkReady();
+  const { authMod } = useIntegrations();
+
+  if (!authMod) return null;
+
+  const { ready, isSignedIn, openSignIn } = authMod.useAuth();
+  const UserWidget = authMod.useUserWidget?.();
 
   return (
     <nav className="relative z-10 bg-card/90 backdrop-blur-sm border-b border-border">
@@ -39,21 +43,30 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
           {/* Navigation Links */}
           <div className="flex items-center space-x-4">
             <ClientOnly>
-              {() =>
-                ready ? (
-                  <>
-                    <SignedOut>
-                      <SignInButton />
-                    </SignedOut>
-                    <SignedIn>
-                      <UserButton />
+              {() => {
+                if (!ready) return null;
+
+                if (isSignedIn && UserWidget) {
+                  return (
+                    <>
+                      <UserWidget />
                       <Button variant="ghost" size="icon" className="text-foreground hover:text-library-gold hover:bg-library-walnut/50">
                         <Settings className="h-5 w-5" />
                       </Button>
-                    </SignedIn>
-                  </>
-                ) : null
-              }
+                    </>
+                  );
+                }
+
+                if (!isSignedIn) {
+                  return (
+                    <Button onClick={openSignIn} variant="outline">
+                      Sign In
+                    </Button>
+                  );
+                }
+
+                return null;
+              }}
             </ClientOnly>
           </div>
         </div>
