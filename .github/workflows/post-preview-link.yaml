@@ -61,9 +61,11 @@ jobs:
             // Markdown for books
             let booksSection = '';
             if (books.length) {
+              const items = books.map(b => {
               const bookUrl = `${url}reader/?book=${encodeURIComponent(b)}`;
-              const items = books.map(b => `${b} - [${bookUrl}](${bookUrl})`).join('\n');
-              booksSection = `\n**Books in this deploy (${all ? 'all' : 'changed'}) — ${books.length}:**\n${items}\n`;
+              return `${b} - [${bookUrl}](${bookUrl})`
+            }).join('\n');
+            booksSection = `\n**Books in this deploy (${all ? 'all' : 'changed'}) — ${books.length}:**\n${items}\n`;
             } else {
               booksSection = `\n_No book assets changed in this run._\n`;
             }
