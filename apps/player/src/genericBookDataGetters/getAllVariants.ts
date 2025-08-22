@@ -21,3 +21,7 @@ export const loadAllVariants = async (): Promise<Variant[]> => {
   }
   return cachedVariants;
 };
+
+export const clearAllVariantsCache = () => {
+  cachedVariants = null;
+};

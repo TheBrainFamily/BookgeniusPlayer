@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useRouteTransition } from "./providers/RouteTransitionProvider";
 import { bookDataLoader } from "../../player/src/services/bookDataLoader";
 import Paywall from "./components/Paywall";
+import { teardownPlayer } from "../../player/src/teardown";
 
 const PlayerApp = React.lazy(() => import("./player/PlayerRoot"));
 const PAYWALL_FADE_MS = 300;
@@ -108,6 +109,31 @@ const WrappedPlayerApp = () => {
       };
     }
   }, [searchParams]);
+
+  // On unmount (leaving /reader), fully tear down the player environment
+  useEffect(() => {
+    return () => {
+      try {
+        // Hard reset player runtime and legacy DOM/media
+        void teardownPlayer();
+      } catch (e) {
+        console.error("teardownPlayer failed", e);
+      }
+      try {
+        // Reset loader state so a new visit starts clean
+        bookDataLoader.resetCurrentBook();
+      } catch (e) {
+        console.error("bookDataLoader.resetCurrentBook failed", e);
+      }
+      try {
+        // Make sure our local gating is reset
+        setAssetBaseReady(false);
+        lastBookRef.current = null;
+      } catch (e) {
+        console.error("setAssetBaseReady failed", e);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const bodyId = isPlayerReady ? "player-scope" : "platform-scope";

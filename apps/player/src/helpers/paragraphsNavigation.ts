@@ -9,6 +9,17 @@ import { bookDataLoader } from "@player/services/bookDataLoader";
 
 let systemNavigationInProgress = false;
 
+// Helper to set the URL hash using history replace or push without reloading.
+const setUrlHash = (chapter: number, paragraph: number, mode: "push" | "replace" = "replace") => {
+  const url = new URL(window.location.href);
+  url.hash = `${chapter}-${paragraph}`;
+  if (mode === "push") {
+    window.history.pushState(window.history.state, "", url.toString());
+  } else {
+    window.history.replaceState(window.history.state, "", url.toString());
+  }
+};
+
 /* ------------------------------------------------------------------ */
 /*  Export system navigation state checker                           */
 export const isSystemNavigationInProgress = (): boolean => systemNavigationInProgress;
@@ -123,7 +134,8 @@ export const setCurrentLocation = (loc: Location, options: { updateHash?: boolea
       const chapter = Number(loc.currentChapter) || 1;
       const paragraph = Number(loc.currentParagraph) || 0;
 
-      window.location.hash = `${chapter}-${paragraph}`;
+      // Replace hash so passive updates don't create extra history entries
+      setUrlHash(chapter, paragraph, "replace");
     }, 2000);
   }
 
@@ -197,7 +209,10 @@ const waitForElementStablePosition = (element: HTMLElement, options: { timeout?:
 /**
  * Navigate to a specific location with a system source (triggers scrolling)
  */
-export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph: number }, options: { wait: boolean } = { wait: false }) => {
+export const systemNavigateTo = (
+  loc: { currentChapter: number; currentParagraph: number },
+  options: { wait?: boolean; history?: "push" | "replace" } = { wait: false, history: "replace" },
+) => {
   if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
     console.error("Invalid location provided to systemNavigateTo:", loc);
     return;
@@ -229,7 +244,9 @@ export const systemNavigateTo = (loc: { currentChapter: number; currentParagraph
   }
 
   // Update hash immediately for system navigation
-  window.location.hash = `${loc.currentChapter}-${loc.currentParagraph}`;
+  // For system navigation (explicit user jumps), default to push.
+  // Callers can pass history: "replace" for initial load or non-history-affecting moves.
+  setUrlHash(loc.currentChapter, loc.currentParagraph, options.history ?? "replace");
 
   const runGoToParagraph = () => {
     goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior: "instant" })
@@ -392,15 +409,15 @@ export const goToInitialLocationFromHash = () => {
 
   if (locationFromHash) {
     // Use system navigation for the initial load from hash
-    systemNavigateTo({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph });
+    systemNavigateTo({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph }, { history: "replace" });
   } else {
     // Fallback if hash is invalid or missing: go to furthest saved location
     const saved = getSavedLocation();
 
     if (saved) {
-      systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph });
+      systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph }, { history: "replace" });
     } else {
-      systemNavigateTo({ currentChapter: 1, currentParagraph: 0 });
+      systemNavigateTo({ currentChapter: 1, currentParagraph: 0 }, { history: "replace" });
     }
   }
 };

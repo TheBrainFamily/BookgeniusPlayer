@@ -23,3 +23,7 @@ export const reloadBookStringified = async (): Promise<void> => {
 
   console.log("Book stringified data reloaded");
 };
+
+export const clearBookStringifiedCache = () => {
+  cachedBookStringified = null;
+};
