@@ -8,6 +8,7 @@ import { useLocation } from "@player/state/LocationContext";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import CharacterCard from "./CharacterCard";
 import { cn } from "@player/lib/utils";
+import { useOptionalElementVisibility } from "@player/stores/elementVisibility.store";
 
 const AVATAR_SIZE = "clamp(55px, 6.5vw, 90px)";
 
@@ -17,10 +18,17 @@ const CharactersOnStagePanel = () => {
   const { location } = useLocation();
   const currentSpeakers = useCurrentSpeakers(location, allCharacters, true);
 
+  const isOverlayVisible = useOptionalElementVisibility();
+
   if (!location) return null;
 
   return (
-    <div className="characters-on-stage-panel h-full w-full mb-0">
+    <div
+      className={cn(
+        "characters-on-stage-panel flex justify-center items-center h-full transition-opacity duration-300",
+        isOverlayVisible ? "opacity-0 pointer-events-none" : "opacity-100",
+      )}
+    >
       <AnimatePresence mode="sync">
         <ScrollArea
           className="relative w-full h-full"
