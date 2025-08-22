@@ -75,7 +75,12 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
     : mediaSrc;
   const modalIsVideo = isVideoFile(modalMediaSrc);
 
-  const commonAttrs = { "data-original-src": mediaSrc, "data-character-name": entity.slug, "data-summary": entity.summary ?? "", className: "w-full h-full object-cover" } as const;
+  const commonAttrs = {
+    "data-original-src": mediaSrc,
+    "data-character-name": entity.slug,
+    "data-summary": entity.summary ?? "",
+    className: "w-full h-full object-cover block",
+  } as const;
 
   return (
     <div
@@ -85,27 +90,27 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       data-appearances={JSON.stringify(apps)}
       onMouseEnter={() => requestToggle(true)}
       onMouseLeave={() => requestToggle(false)}
-      title={entity.characterName}
       aria-label={entity.characterName}
       onClick={() => openModal(entity.slug, modalIsVideo, modalMediaSrc)}
     >
       <motion.div
         layout
         className={cn(
-          "rounded-full aspect-square",
+          "relative rounded-full overflow-hidden aspect-square isolate",
           disableHighlight
             ? ""
             : isTalkingInCurrentRange
               ? "z-10 shadow-lg border-2 border-(--book-primary-color) animate-pulse-glow"
               : "transition-transform duration-300 ease-in-out hover:scale-110 hover:z-10",
         )}
+        title={entity.characterName}
       >
         <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />
       </motion.div>
       {!hideTitle && (
         <div
           className={cn(
-            "max-w-full w-full absolute right-0 bottom-0 rounded-md sm:rounded-lg text-center bg-black/70 textured-bg border shadow-lg sm:shadow-xl box-border",
+            "max-w-full w-full absolute right-0 bottom-0 rounded-md sm:rounded-lg text-center bg-black/70 textured-bg border shadow-lg sm:shadow-xl box-border z-20",
             "border-[1px] sm:border-2",
             isTalkingInCurrentRange ? "border-(--book-primary-color) transition-all duration-300 ease-in-out" : "border-transparent transition-all duration-200 ease-in-out",
           )}
