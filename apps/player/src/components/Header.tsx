@@ -1,4 +1,3 @@
-import React from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 
 import { cn } from "@player/lib/utils";
