@@ -19,3 +19,7 @@ export const loadBookData = async (): Promise<BookData> => {
   }
   return cachedBookData;
 };
+
+export const clearBookDataCache = () => {
+  cachedBookData = null;
+};

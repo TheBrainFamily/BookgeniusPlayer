@@ -17,3 +17,7 @@ export const loadBackgroundSongsForBook = async (): Promise<BackgroundSongForBoo
   }
   return cachedBackgroundSongs;
 };
+
+export const clearBackgroundSongsCache = () => {
+  cachedBackgroundSongs = null;
+};

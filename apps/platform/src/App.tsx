@@ -7,20 +7,48 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { RouteTransitionProvider } from "./providers/RouteTransitionProvider";
 import { UniversalRouter } from "./UniversalRouter";
-import { ClerkProviderSafe } from "@platform/providers/ClerkProviderSafe.tsx";
+import { IntegrationsProvider, useIntegrations } from "@platform/integrations";
 import { lazy, Suspense } from "react";
 import GenreExploration from "./components/GenreExploration";
 import BookExperience from "./components/BookExperience";
-
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-
-if (!PUBLISHABLE_KEY) {
-  throw new Error("Add your Clerk Publishable Key to the .env file");
-}
+import PaymentSuccess from "./components/PaymentSuccess";
 
 const queryClient = new QueryClient();
 
-const LazyWrappedApp = lazy(() => import("./WrappedApp"));
+const LazyWrappedPlayerApp = lazy(() => import("./WrappedPlayerApp"));
+
+const AppWithAuth = () => {
+  const { authMod, ready } = useIntegrations();
+
+  if (!ready || !authMod) {
+    // Show nothing while modules are loading
+    return null;
+  }
+
+  const { AuthProvider } = authMod;
+
+  return (
+    <AuthProvider>
+      <RouteTransitionProvider defaultMinDurationMs={50}>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/experience/:slug" element={<BookExperience />} />
+          <Route path="/GenreExploration" element={<GenreExploration />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route
+            path="/reader/"
+            element={
+              <Suspense fallback={null}>
+                <LazyWrappedPlayerApp />
+              </Suspense>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </RouteTransitionProvider>
+    </AuthProvider>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -28,24 +56,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <UniversalRouter>
-        <ClerkProviderSafe publishableKey={PUBLISHABLE_KEY}>
-          <RouteTransitionProvider defaultMinDurationMs={50}>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/experience/:slug" element={<BookExperience />} />
-              <Route path="/GenreExploration" element={<GenreExploration />} />
-              <Route
-                path="/reader/"
-                element={
-                  <Suspense fallback={null}>
-                    <LazyWrappedApp />
-                  </Suspense>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </RouteTransitionProvider>
-        </ClerkProviderSafe>
+        <IntegrationsProvider>
+          <AppWithAuth />
+        </IntegrationsProvider>
       </UniversalRouter>
     </TooltipProvider>
   </QueryClientProvider>

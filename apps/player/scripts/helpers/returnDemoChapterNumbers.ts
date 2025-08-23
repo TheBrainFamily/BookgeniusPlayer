@@ -8,7 +8,7 @@ export function returnDemoChapterNumbers(metadataContent: string): number[] {
     // Default: 1 chapter for normal books, 2 for plays
     const formMatch = metadataContent.match(/<Form>([^<]+)<\/Form>/);
     const isPlay = formMatch && formMatch[1].toLowerCase() === "play";
-    demoChapters = isPlay ? [1, 2] : [1];
+    demoChapters = isPlay ? [1, 2, 3] : [1, 2];
   }
   return demoChapters;
 }

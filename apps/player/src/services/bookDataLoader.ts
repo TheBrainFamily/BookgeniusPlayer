@@ -2,7 +2,7 @@
 import type { BookData, BackgroundForBook, BackgroundSongSection, CutSceneForBook, CharacterData, AudiobookTracksSection } from "@player/types/book";
 import type { Variant } from "@player/genericBookDataGetters/getAllVariants";
 import { getBookDataModuleUrl } from "@player/utils/getbookDataModuleUrl";
-
+type Visibility = "full" | "demo";
 async function importPublicModule(moduleUrl: string) {
   try {
     const response = await fetch(moduleUrl);
@@ -27,6 +27,8 @@ class BookDataLoader {
   // assetQuery example: "expires=...&token=...&token_path=%2Fstaging%2F..."
   private assetPrefix: string | null = null;
   private assetQuery: string | null = null;
+
+  private bookVisibility: Visibility | null = null;
 
   private constructor() {}
 
@@ -57,6 +59,18 @@ class BookDataLoader {
 
   setCurrentBook(slug: string) {
     this.currentBook = slug;
+  }
+
+  setBookVisibility(visibility: Visibility) {
+    this.bookVisibility = visibility;
+  }
+
+  getBookVisibility(): Visibility | null {
+    return this.bookVisibility;
+  }
+
+  resetBookVisibility(): void {
+    this.bookVisibility = null;
   }
 
   /**
@@ -190,6 +204,7 @@ class BookDataLoader {
     this.currentBook = null;
     this.assetPrefix = null;
     this.assetQuery = null;
+    this.resetBookVisibility();
   }
 }
 

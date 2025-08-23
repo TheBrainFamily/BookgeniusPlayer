@@ -69,32 +69,16 @@
     },
     "1984": {
       "loading_phrases": [
-        "Building the Ministry of Truth...",
-        "Installing telescreens...",
-        "Creating Newspeak...",
-        "Setting up Big Brother...",
-        "Configuring thoughtcrime...",
-        "Erasing the past...",
-        "Building the Ministry of Love...",
-        "Setting up the Ministry of Peace...",
-        "Configuring the Ministry of Plenty...",
-        "Activating thought police..."
+        "Big Brother is watching...",
+        "Rewriting history...",
+        "Monitoring your thoughts...",
+        "Increasing chocolate rations...",
+        "Preparing Room 101...",
+        "Adjusting reality...",
+        "Fighting thoughtcrime..."
       ]
     },
-    "1984-English": {
-      "loading_phrases": [
-        "Building the Ministry of Truth...",
-        "Installing telescreens...",
-        "Creating Newspeak...",
-        "Setting up Big Brother...",
-        "Configuring thoughtcrime...",
-        "Erasing the past...",
-        "Building the Ministry of Love...",
-        "Setting up the Ministry of Peace...",
-        "Configuring the Ministry of Plenty...",
-        "Activating thought police..."
-      ]
-    },
+    "1984-English": { "loading_phrases": ["Installing telescreens...", "Configuring thoughtcrime detection...", "Erasing the past...", "Activating thought police..."] },
     "Pharaon": {
       "loading_phrases": [
         "Building the pyramids...",
@@ -112,99 +96,42 @@
       ]
     },
     "Conrad-Tajny-Agent": {
-      "loading_phrases": [
-        "Building London...",
-        "Creating the fog...",
-        "Setting up street lamps...",
-        "Painting shop signs...",
-        "Building the docks...",
-        "Creating alleyways...",
-        "Setting up agents...",
-        "Painting ciphers...",
-        "Building conspiracies...",
-        "Creating mysteries...",
-        "Setting up spies...",
-        "Painting intrigues..."
-      ]
+      "loading_phrases": ["Encrypting secret messages...", "Plotting espionage...", "Shadowing informants...", "Meeting in dark alleys...", "Planting evidence..."]
     },
-    "Krolowa-Sniegu": {
-      "loading_phrases": [
-        "Building the ice palace...",
-        "Carving snowflakes...",
-        "Creating snowstorms...",
-        "Painting mirrors...",
-        "Setting up reindeer...",
-        "Building ice bridges...",
-        "Creating snow flowers...",
-        "Painting stars...",
-        "Setting up the north wind...",
-        "Carving hearts of ice...",
-        "Creating snow angels...",
-        "Painting the aurora..."
-      ]
-    },
-    "Snow-Queen": {
-      "loading_phrases": [
-        "Building the ice palace...",
-        "Carving snowflakes...",
-        "Creating snowstorms...",
-        "Painting mirrors...",
-        "Setting up reindeer...",
-        "Building ice bridges...",
-        "Creating snow flowers...",
-        "Painting stars...",
-        "Setting up the north wind...",
-        "Carving hearts of ice...",
-        "Creating snow angels...",
-        "Painting the aurora..."
-      ]
-    },
+    "Krolowa-Sniegu": { "loading_phrases": ["Freezing hearts...", "Shattering mirrors...", "Chilling the air...", "Preparing ice castles...", "Summoning snowflakes..."] },
+    "Snow-Queen": { "loading_phrases": ["Building snow palaces...", "Freezing summer dreams...", "Icing friendships...", "Crafting snowflakes...", "Conjuring frostbite..."] },
     "Lalka": {
       "loading_phrases": [
-        "Building Warsaw...",
-        "Creating shops...",
-        "Painting tenements...",
-        "Setting up theaters...",
-        "Building cafés...",
-        "Creating parks...",
-        "Painting streets...",
-        "Setting up salons...",
-        "Building churches...",
-        "Creating gardens...",
-        "Painting shop windows...",
-        "Setting up carriages..."
+        "Polishing shop windows...",
+        "Adjusting society gossip...",
+        "Balancing business ledgers...",
+        "Crafting romantic intrigue...",
+        "Negotiating marriage prospects..."
       ]
     },
     "Romeo-And-Juliet": {
-      "loading_phrases": [
-        "Building Verona...",
-        "Creating balconies...",
-        "Painting palaces...",
-        "Setting up gardens...",
-        "Building churches...",
-        "Creating piazzas...",
-        "Painting streets...",
-        "Setting up fountains...",
-        "Building theaters...",
-        "Creating terraces...",
-        "Painting stars...",
-        "Setting up the moon..."
-      ]
+      "loading_phrases": ["Mixing love potions...", "Arranging secret meetings...", "Avoiding family feuds...", "Balcony climbing practice...", "Sending cryptic love letters..."]
     },
     "Fatherland": {
       "loading_phrases": [
-        "Building Berlin...",
-        "Creating government buildings...",
-        "Painting flags...",
-        "Setting up checkpoints...",
-        "Building bridges...",
-        "Creating streets...",
-        "Painting signs...",
-        "Setting up borders...",
-        "Building offices...",
-        "Creating documents...",
-        "Painting maps...",
-        "Setting up surveillance..."
+        "Rewriting alternate histories...",
+        "Investigating conspiracies...",
+        "Dodging propaganda...",
+        "Securing classified documents...",
+        "Questioning the official story..."
+      ]
+    },
+    "Macbeth": { "loading_phrases": ["Brewing witchcraft...", "Counting prophecies...", "Polishing daggers...", "Removing bloodstains...", "Summoning ghosts..."] },
+    "Midsummer-Nights-Dream": {
+      "loading_phrases": ["Casting love spells...", "Chasing fairies...", "Taming mischievous spirits...", "Confusing lovers...", "Weaving magical forests..."]
+    },
+    "Othello": {
+      "loading_phrases": [
+        "Planting seeds of jealousy...",
+        "Spinning webs of deceit...",
+        "Perfecting tragic misunderstandings...",
+        "Whispering falsehoods...",
+        "Polishing dramatic irony..."
       ]
     }
   },
