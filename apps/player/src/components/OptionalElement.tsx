@@ -100,7 +100,7 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
       onMouseLeave={handleMouseLeave}
       ref={elementRef}
       className={cn("transition-opacity", className)}
-      style={{ opacity: isElementVisible ? 1 : 0, pointerEvents: isElementVisible ? "auto" : "none" }}
+      style={{ opacity: isElementVisible ? 1 : 0, pointerEvents: isDesktop ? "auto" : isElementVisible ? "auto" : "none" }}
       {...props}
     >
       {children}

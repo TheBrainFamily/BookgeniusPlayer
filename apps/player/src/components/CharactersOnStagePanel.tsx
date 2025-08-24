@@ -1,4 +1,4 @@
-import { CSSProperties, useMemo } from "react";
+import { CSSProperties, useMemo, useState, useEffect } from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 import { ScrollArea } from "@player/components/ui/scroll-area";
 
@@ -20,8 +20,15 @@ const CharactersOnStagePanel = () => {
 
   const isOverlayVisible = useOptionalElementVisibility();
 
-  // Use simple screen width check instead of device detection
-  const isNarrowScreen = window.innerWidth < 1024;
+  // Safe screen width detection for SSR compatibility
+  const [isNarrowScreen, setIsNarrowScreen] = useState(false);
+
+  useEffect(() => {
+    const checkScreenWidth = () => setIsNarrowScreen(window.innerWidth < 1024);
+    checkScreenWidth();
+    window.addEventListener("resize", checkScreenWidth);
+    return () => window.removeEventListener("resize", checkScreenWidth);
+  }, []);
 
   // Desktop (≥1024px): avatars are ALWAYS visible (never hide)
   // Narrow screens (<1024px): hide avatars when overlay is visible
