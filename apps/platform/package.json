@@ -15,8 +15,8 @@
     "prettier:check": "prettier --check src/ --quiet 2>&1 | grep -v 'Ignored unknown option'"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^5.39.0",
-    "@clerk/react-router": "^1.8.10",
+    "@clerk/clerk-react": "^5.43.1",
+    "@clerk/react-router": "^1.9.4",
     "@fontsource/playfair-display": "^5.2.6",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",
@@ -46,6 +46,7 @@
     "@radix-ui/react-toggle": "^1.1.9",
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
+    "@supabase/supabase-js": "^2.55.0",
     "@tailwindcss/vite": "^4.1.12",
     "@tanstack/react-query": "^5.83.0",
     "class-variance-authority": "^0.7.1",
@@ -70,6 +71,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@clerk/types": "^4.73.0",
     "@eslint/js": "^9.32.0",
     "@tailwindcss/postcss": "^4.1.12",
     "@tailwindcss/typography": "^0.5.16",

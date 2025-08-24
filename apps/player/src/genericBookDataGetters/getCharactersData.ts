@@ -16,3 +16,7 @@ export const loadCharactersData = async (): Promise<CharacterData[]> => {
   }
   return cachedCharactersData;
 };
+
+export const clearCharactersDataCache = () => {
+  cachedCharactersData = null;
+};
