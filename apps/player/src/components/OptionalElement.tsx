@@ -41,8 +41,9 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
     if (!isDesktop && isHovered) {
       setIsHovered(false);
       setInputHovered(false);
+      startAllTimers(); // Resume timers when forcibly clearing hover
     }
-  }, [isDesktop, isHovered, setInputHovered]);
+  }, [isDesktop, isHovered, setInputHovered, startAllTimers]);
 
   // Determine if element should be visible
   // Optional elements should only be visible when explicitly shown, NOT during scroll mode
@@ -67,12 +68,10 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
     }
 
     element.style.opacity = shouldBeVisible ? "1" : "0";
-    // Enable pointer events only on desktop screens for hover functionality
-    // On mobile/tablet, disable pointer events to prevent cursor issues when hidden
-    element.style.pointerEvents = isDesktop ? "auto" : "none";
+    // Removed imperative pointer-events setting - will be handled in JSX based on visibility
 
     previousVisibilityRef.current = shouldBeVisible;
-  }, [shouldBeVisible, lastHideReason, isDesktop]);
+  }, [shouldBeVisible, lastHideReason]);
 
   const handleMouseEnter = () => {
     // Only enable hover effects on desktop-width screens
@@ -101,7 +100,7 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
       onMouseLeave={handleMouseLeave}
       ref={elementRef}
       className={cn("transition-opacity", className)}
-      style={{ opacity: isElementVisible ? 1 : 0, pointerEvents: "auto" }}
+      style={{ opacity: isElementVisible ? 1 : 0, pointerEvents: isElementVisible ? "auto" : "none" }}
       {...props}
     >
       {children}
