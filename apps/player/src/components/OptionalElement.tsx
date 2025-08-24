@@ -11,6 +11,7 @@ interface OptionalElementProps extends React.HTMLAttributes<HTMLDivElement> {
 export const OptionalElement: React.FC<OptionalElementProps> = ({ children, className, ...props }) => {
   const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
   const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
+  const setInputHovered = useElementVisibilityStore((state) => state.setInputHovered);
 
   const shouldBeVisible = useOptionalElementVisibility();
   const lastHideReason = useLastHideReason();
@@ -19,6 +20,29 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
 
   // Local state for hover visibility
   const [isHovered, setIsHovered] = React.useState(false);
+  const [isDesktop, setIsDesktop] = React.useState(false);
+
+  // Check if screen is wide enough for hover effects (desktop)
+  const isDesktopWidth = () => window.innerWidth >= 1024;
+
+  // Track desktop/mobile state
+  useEffect(() => {
+    const updateDesktopState = () => {
+      setIsDesktop(isDesktopWidth());
+    };
+
+    updateDesktopState(); // Initial check
+    window.addEventListener("resize", updateDesktopState);
+    return () => window.removeEventListener("resize", updateDesktopState);
+  }, []);
+
+  // Reset hover state when window becomes too narrow
+  useEffect(() => {
+    if (!isDesktop && isHovered) {
+      setIsHovered(false);
+      setInputHovered(false);
+    }
+  }, [isDesktop, isHovered, setInputHovered]);
 
   // Determine if element should be visible
   // Optional elements should only be visible when explicitly shown, NOT during scroll mode
@@ -43,19 +67,28 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
     }
 
     element.style.opacity = shouldBeVisible ? "1" : "0";
-    // Always allow pointer events so hover functionality works even when element is invisible
-    element.style.pointerEvents = "auto";
+    // Enable pointer events only on desktop screens for hover functionality
+    // On mobile/tablet, disable pointer events to prevent cursor issues when hidden
+    element.style.pointerEvents = isDesktop ? "auto" : "none";
 
     previousVisibilityRef.current = shouldBeVisible;
-  }, [shouldBeVisible, lastHideReason]);
+  }, [shouldBeVisible, lastHideReason, isDesktop]);
 
   const handleMouseEnter = () => {
+    // Only enable hover effects on desktop-width screens
+    if (!isDesktop) return;
+
     setIsHovered(true);
+    setInputHovered(true); // Set global state
     pauseAllTimers();
   };
 
   const handleMouseLeave = () => {
+    // Only process mouse leave if we're on desktop-width screens
+    if (!isDesktop) return;
+
     setIsHovered(false);
+    setInputHovered(false); // Unset global state
     startAllTimers();
   };
 

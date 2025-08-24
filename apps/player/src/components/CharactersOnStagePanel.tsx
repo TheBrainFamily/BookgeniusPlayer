@@ -20,15 +20,17 @@ const CharactersOnStagePanel = () => {
 
   const isOverlayVisible = useOptionalElementVisibility();
 
+  // Use simple screen width check instead of device detection
+  const isNarrowScreen = window.innerWidth < 1024;
+
+  // Desktop (≥1024px): avatars are ALWAYS visible (never hide)
+  // Narrow screens (<1024px): hide avatars when overlay is visible
+  const shouldHideAvatars = isNarrowScreen && isOverlayVisible;
+
   if (!location) return null;
 
   return (
-    <div
-      className={cn(
-        "characters-on-stage-panel flex justify-center items-center h-full transition-opacity duration-300",
-        isOverlayVisible ? "opacity-0 pointer-events-none" : "opacity-100",
-      )}
-    >
+    <div className={cn("characters-on-stage-panel flex justify-center items-center h-full transition-opacity duration-300", shouldHideAvatars ? "opacity-0" : "opacity-100")}>
       <AnimatePresence mode="sync">
         <ScrollArea
           className="relative w-full h-full"
