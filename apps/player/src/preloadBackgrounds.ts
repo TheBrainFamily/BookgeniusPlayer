@@ -69,11 +69,13 @@ export const preloadBackgrounds = async () => {
   const sectionsToPreload: BackgroundForBook[] = [];
   if (matchingSection) {
     const matchingSectionIndex = sectionsToConsider.indexOf(matchingSection);
-    const previousSection = sectionsToConsider[matchingSectionIndex - 1];
-    const nextSection = sectionsToConsider[matchingSectionIndex + 1];
+    if (matchingSectionIndex !== -1) {
+      const previousSection = sectionsToConsider[matchingSectionIndex - 1];
+      const nextSection = sectionsToConsider[matchingSectionIndex + 1];
 
-    if (previousSection) sectionsToPreload.push(previousSection);
-    if (nextSection) sectionsToPreload.push(nextSection);
+      if (previousSection) sectionsToPreload.push(previousSection);
+      if (nextSection) sectionsToPreload.push(nextSection);
+    }
   }
 
   if (sectionsToPreload.length === 0) {
