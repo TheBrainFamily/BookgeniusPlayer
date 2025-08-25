@@ -722,8 +722,6 @@
 
   @media (max-width: 625px) {
     #content-container:has(.play-container) {
-      background-size: 375x 100%;
-
       .play-container > section > section {
         max-width: 575px;
 
