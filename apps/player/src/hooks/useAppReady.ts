@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocationRange } from "@player/hooks/useLocationRange";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 
@@ -10,6 +10,11 @@ interface UseVideoReadinessOpts {
   videoTimeoutMs?: number; // fallback to force ready if desired (can disable)
   minSplashMs?: number; // minimum splash display
   postReadyDelayMs?: number; // delay after a video is ready before starting splash
+}
+
+interface UseImageReadinessOpts {
+  imageTimeoutMs?: number; // timeout per image load (default 30000ms)
+  maxConcurrentLoads?: number; // max concurrent image loads (default all at once)
 }
 
 /**
@@ -131,16 +136,13 @@ const useVideoReadiness = ({ videoTimeoutMs = 30000, minSplashMs = 1500, postRea
   return { ready };
 };
 
-interface UseImageReadinessOpts {
-  imageTimeoutMs?: number;
-}
-
-const useImageReadiness = () => {
+const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {}) => {
   const allCharacters = useMemo(() => getCharactersData(), []);
+  const timeoutIdsRef = useRef<Set<TimeoutId>>(new Set());
 
   const { locationRange } = useLocationRange();
 
-  const loadImages = async (): Promise<void> => {
+  const loadImages = useCallback(async (): Promise<void> => {
     const { chapter } = locationRange;
 
     const chapterCharacters = allCharacters.filter((character) => character.infoPerChapter.find((chapterInfo) => chapterInfo.chapter === chapter));
@@ -154,15 +156,36 @@ const useImageReadiness = () => {
         (url) =>
           new Promise<void>((resolve) => {
             const img = new Image();
+            let timeoutId: TimeoutId = null;
+
+            const cleanup = () => {
+              if (timeoutId) {
+                clearTimeout(timeoutId);
+                timeoutIdsRef.current.delete(timeoutId);
+              }
+            };
+
             img.onload = () => {
+              cleanup();
               console.log(`Loaded: ${url}`);
               resolve();
             };
             img.onerror = () => {
+              cleanup();
               console.warn(`Failed to load: ${url}`);
               failedCount++;
               resolve();
             };
+
+            // Set timeout for this image
+            timeoutId = window.setTimeout(() => {
+              cleanup();
+              console.warn(`Timeout loading: ${url}`);
+              failedCount++;
+              resolve();
+            }, imageTimeoutMs);
+
+            timeoutIdsRef.current.add(timeoutId);
             img.src = url;
           }),
       ),
@@ -170,18 +193,27 @@ const useImageReadiness = () => {
 
     if (failedCount > 0) {
       console.warn(`Failed to load ${failedCount} out of ${imageUrls.length} images`);
-      throw new Error(`Failed to load ${failedCount} out of ${imageUrls.length} images`);
     }
 
     console.log("All images processing completed!");
-  };
+  }, [locationRange, imageTimeoutMs]);
+
+  // Cleanup function to clear all pending timeouts
+  useEffect(() => {
+    return () => {
+      timeoutIdsRef.current.forEach((id) => {
+        if (id) clearTimeout(id);
+      });
+      timeoutIdsRef.current.clear();
+    };
+  }, []);
 
   return { loadImages };
 };
 
 export const useAppReady = () => {
   const { ready } = useVideoReadiness({ videoTimeoutMs: 30000, minSplashMs: 1500, postReadyDelayMs: 100 });
-  const { loadImages } = useImageReadiness();
+  const { loadImages } = useImageReadiness({ imageTimeoutMs: 30000 });
 
   useEffect(() => {
     if (!ready) return;
@@ -193,6 +225,7 @@ export const useAppReady = () => {
       })
       .catch((error) => {
         console.error("Failed to load images:", error);
+        window.dispatchEvent(new CustomEvent("appReady"));
       });
-  }, [ready]);
+  }, [ready, loadImages]);
 };
