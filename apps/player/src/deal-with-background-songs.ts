@@ -98,6 +98,7 @@ export const preloadBackgroundTracks = async () => {
 
   const location = getCurrentLocation();
   const currentChapter = location.currentChapter;
+  const currentParagraph = location.currentParagraph;
   const chaptersToPreloadAhead = 2;
 
   // Create array of chapters to consider: 1 behind (if not first chapter), current, and 2 ahead
@@ -112,7 +113,6 @@ export const preloadBackgroundTracks = async () => {
   for (let i = 0; i <= chaptersToPreloadAhead; i++) {
     chaptersToConsider.push(currentChapter + i);
   }
-  console.log("Preloading tracks for chapters:", chaptersToConsider);
 
   const bookSongs = getValidatedBookSongs();
   if (!bookSongs) {
@@ -126,8 +126,28 @@ export const preloadBackgroundTracks = async () => {
     return false;
   }
 
+  // Find the applicable section for the current location
+  const foundBackgroundSections = findApplicableBackgroundSections(bookSongs, currentChapter, currentParagraph);
+  const currentSection = foundBackgroundSections[0];
+
+  if (!currentSection || !currentSection.files || currentSection.files.length === 0) {
+    console.log("No background track section found for current location.");
+    return false;
+  }
+
+  // Get the first track of the current section
+  const firstTrackId = currentSection.files[0].replace(".mp3", "");
+
   const trackIds = sectionsToPreload.flatMap((section) => section.files.map((file) => file.replace(".mp3", "")));
-  return await loadMultipleTracks(trackIds, "background");
+
+  const currentTrackIndex = trackIds.indexOf(firstTrackId);
+  const previousTrackId = trackIds[currentTrackIndex - 1];
+  const nextTrackId = trackIds[currentTrackIndex + 1];
+  const previousAndNextTracksIds: string[] = [];
+  if (previousTrackId) previousAndNextTracksIds.push(previousTrackId);
+  if (nextTrackId) previousAndNextTracksIds.push(nextTrackId);
+
+  return await loadMultipleTracks(previousAndNextTracksIds, "background");
 };
 
 // Preload function for just the current track
@@ -186,15 +206,7 @@ export const dealWithBackgroundSongs = async ({ currentChapter, currentParagraph
       return;
     }
 
-    const foundBackgroundSections = bookSongs
-      .filter((section: BackgroundSongSection) => {
-        return section.chapter < currentChapter || (section.chapter === currentChapter && section.paragraph <= currentParagraph);
-      })
-      .sort((a: BackgroundSongSection, b: BackgroundSongSection) => {
-        if (b.chapter !== a.chapter) return b.chapter - a.chapter;
-        return b.paragraph - a.paragraph;
-      });
-
+    const foundBackgroundSections = findApplicableBackgroundSections(bookSongs, currentChapter, currentParagraph);
     const sectionToApply = foundBackgroundSections[0];
 
     if (sectionToApply && sectionToApply.files && sectionToApply.files.length > 0) {

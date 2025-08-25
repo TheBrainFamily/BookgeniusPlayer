@@ -3,6 +3,7 @@ import { bookDataLoader } from "@player/services/bookDataLoader";
 import { getBackgroundsForBook } from "@player/genericBookDataGetters/getBackgroundsForBook";
 import { getFileType, loadVideoAsHTMLElement } from "@player/ui/backgroundUtils";
 import { getBookAssetUrl } from "./utils/assetUrls";
+import { BackgroundForBook, BackgroundSongSection } from "./types/book";
 
 // Cache to store preloaded elements
 const preloadCache = new Map<string, HTMLVideoElement | HTMLDivElement>();
@@ -37,7 +38,8 @@ export const getPreloadedElement = (fileName: string): HTMLVideoElement | HTMLDi
 export const preloadBackgrounds = async () => {
   const location = getCurrentLocation();
   const currentChapter = location.currentChapter;
-  const chaptersToPreloadAhead = 2;
+  const currentParagraph = location.currentParagraph;
+  const chaptersToPreloadAhead = 1;
 
   // Create array of chapters to consider: 1 behind (if not first chapter), current, and 2 ahead
   const chaptersToConsider: number[] = [];
@@ -47,7 +49,7 @@ export const preloadBackgrounds = async () => {
     chaptersToConsider.push(currentChapter - 1);
   }
 
-  // Add current chapter and 2 ahead
+  // Add current chapter and 1 ahead
   for (let i = 0; i <= chaptersToPreloadAhead; i++) {
     chaptersToConsider.push(currentChapter + i);
   }
@@ -60,7 +62,19 @@ export const preloadBackgrounds = async () => {
     return false;
   }
 
-  const sectionsToPreload = bookBackgrounds.filter((section) => chaptersToConsider.includes(section.chapter));
+  const sectionsToConsider = bookBackgrounds.filter((section) => chaptersToConsider.includes(section.chapter));
+  const matchingSections = sectionsToConsider.filter((section) => section.chapter === currentChapter && section.paragraph <= currentParagraph);
+  const matchingSection = matchingSections[matchingSections.length - 1];
+
+  const sectionsToPreload: BackgroundForBook[] = [];
+  if (matchingSection) {
+    const matchingSectionIndex = sectionsToConsider.indexOf(matchingSection);
+    const previousSection = sectionsToConsider[matchingSectionIndex - 1];
+    const nextSection = sectionsToConsider[matchingSectionIndex + 1];
+
+    if (previousSection) sectionsToPreload.push(previousSection);
+    if (nextSection) sectionsToPreload.push(nextSection);
+  }
 
   if (sectionsToPreload.length === 0) {
     console.log("No backgrounds found for the current chapter range to preload.");
