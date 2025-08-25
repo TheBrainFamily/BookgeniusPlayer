@@ -105,6 +105,7 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
   display: inline-block;
   line-height: 1.75rem;
   transition: color 0.2s ease-in-out;
+  box-decoration-break: clone;
 }
 
 .character-highlighted-activated:hover {
