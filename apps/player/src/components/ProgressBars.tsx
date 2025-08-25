@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { AnimatePresence, motion, Variants } from "motion/react";
+
 import { useReadingProgress } from "@player/hooks/useReadingProgress";
 import { getBookStringified } from "@player/genericBookDataGetters/getBookStringified";
+import useSplashHidden from "@player/hooks/useSplashHidden";
 
 export interface ChapterStructure {
   chapterNumber: number;
   paragraphCount: number;
 }
 
-const PROGRESS_BAR_TRANSITION_TIME = "0.3s";
-
 const ProgressBars: React.FC = () => {
+  const isSplashHidden = useSplashHidden();
+
   const [chaptersStructure, setChaptersStructure] = useState<ChapterStructure[]>([]);
   const [totalParagraphs, setTotalParagraphs] = useState(0);
 
@@ -45,41 +48,45 @@ const ProgressBars: React.FC = () => {
   }
 
   return (
-    <>
-      <div style={{ position: "fixed", top: 0, left: 0, right: 0, height: "10px", backgroundColor: "rgba(139, 69, 19, 0.2)", zIndex: 9999 }}>
-        <div
-          style={{
-            height: "100%",
-            width: `${chapterProgress}%`,
-            background: "linear-gradient(to right, #8B4513, #CD853F)",
-            transition: `width ${PROGRESS_BAR_TRANSITION_TIME} ease`,
-            opacity: 0.7,
-          }}
-        />
-      </div>
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, height: "10px", backgroundColor: "rgba(139, 69, 19, 0.2)", zIndex: 9998 }}>
-        <div
-          style={{
-            height: "100%",
-            width: `${furthestProgress}%`,
-            background: "linear-gradient(to right, #88888830, #bbbbbb30)",
-            transition: `width ${PROGRESS_BAR_TRANSITION_TIME} ease`,
-          }}
-        />
-      </div>
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, height: "10px", backgroundColor: "rgba(139, 69, 19, 0.2)", zIndex: 9999 }}>
-        <div
-          style={{
-            height: "100%",
-            width: `${bookProgress}%`,
-            background: "linear-gradient(to right, #A0522D, #F4A460)",
-            transition: `width ${PROGRESS_BAR_TRANSITION_TIME} ease`,
-            opacity: 0.7,
-          }}
-        />
-      </div>
-    </>
+    <AnimatePresence>
+      {isSplashHidden && (
+        <>
+          <motion.div variants={progressVariants} initial="hidden" animate="visible" className="fixed inset-x-0 top-0 h-[10px] bg-[rgba(139,69,19,0.2)] z-[49] pointer-events-none">
+            <div
+              className="h-full w-full bg-gradient-to-r from-[#8B4513] to-[#CD853F] opacity-70 origin-left transform-gpu transition-transform duration-300 ease-in-out [will-change:transform]"
+              style={{ transform: `scaleX(${chapterProgress / 100})` }}
+            />
+          </motion.div>
+
+          <motion.div
+            variants={progressVariants}
+            initial="hidden"
+            animate="visible"
+            className="fixed inset-x-0 bottom-0 h-[10px] bg-[rgba(139,69,19,0.2)] z-[48] pointer-events-none"
+          >
+            <div
+              className="h-full w-full bg-gradient-to-r from-[#88888830] to-[#bbbbbb30] origin-left transform-gpu transition-transform duration-300 ease-in-out [will-change:transform]"
+              style={{ transform: `scaleX(${furthestProgress / 100})` }}
+            />
+          </motion.div>
+
+          <motion.div
+            variants={progressVariants}
+            initial="hidden"
+            animate="visible"
+            className="fixed inset-x-0 bottom-0 h-[10px] bg-[rgba(139,69,19,0.2)] z-[49] pointer-events-none"
+          >
+            <div
+              className="h-full w-full bg-gradient-to-r from-[#A0522D] to-[#F4A460] opacity-70 origin-left transform-gpu transition-transform duration-300 ease-in-out [will-change:transform]"
+              style={{ transform: `scaleX(${bookProgress / 100})` }}
+            />
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
+
+const progressVariants: Variants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 3, delay: 0.5 } } };
 
 export default ProgressBars;
