@@ -15,3 +15,7 @@ export const loadKnownVideoFiles = async (): Promise<string[]> => {
   }
   return cachedKnownVideoFiles;
 };
+
+export const clearKnownVideoFilesCache = () => {
+  cachedKnownVideoFiles = null;
+};

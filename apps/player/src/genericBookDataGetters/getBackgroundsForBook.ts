@@ -16,3 +16,7 @@ export const loadBackgroundsForBook = async (): Promise<BackgroundForBook[]> => 
   }
   return cachedBackgrounds;
 };
+
+export const clearBackgroundsCache = () => {
+  cachedBackgrounds = null;
+};

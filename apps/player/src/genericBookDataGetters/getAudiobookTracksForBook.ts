@@ -16,3 +16,7 @@ export const loadAudiobookTracksForBook = async (): Promise<AudiobookTracksSecti
   }
   return cachedTracks;
 };
+
+export const clearAudiobookTracksCache = () => {
+  cachedTracks = null;
+};

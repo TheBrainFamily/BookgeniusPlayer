@@ -16,3 +16,7 @@ export const loadCutScenesForBook = async (): Promise<CutSceneForBook[]> => {
   }
   return cachedCutScenes;
 };
+
+export const clearCutScenesCache = () => {
+  cachedCutScenes = null;
+};
