@@ -405,7 +405,7 @@ async function streamingDecodeAudioData(
     const audioOffset = getAudioOffset(arrayBuffer);
 
     if (audioOffset >= fileSize) {
-      console.error(`Audio offset is larger than file size for '${trackId}'. Cannot decode.`);
+      console.log(`ID3 TAG (cover image) is bigger that the available file chunk for '${trackId}'. Cannot decode yet.`);
       return null;
     }
 
