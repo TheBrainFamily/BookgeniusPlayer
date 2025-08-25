@@ -31,6 +31,14 @@ interface CharacterAsset {
   listensSizeCorrect: boolean;
 }
 
+interface UnreferencedAsset {
+  filename: string;
+  type: "png" | "mp4";
+  size?: FileSize;
+  isCharacterAsset: boolean;
+  potentialCharacter?: string;
+}
+
 function getFileDimensions(filePath: string): FileSize | null {
   try {
     const output = execSync(`ffprobe -v quiet -print_format json -show_streams "${filePath}"`, { encoding: "utf8" });
@@ -162,6 +170,62 @@ function checkCharacterAssets(
   };
 }
 
+function findUnreferencedAssets(bookPath: string, characterNames: string[]): UnreferencedAsset[] {
+  const assetsDir = join(bookPath, "assets");
+  if (!existsSync(assetsDir)) {
+    return [];
+  }
+
+  const allFiles = readdirSync(assetsDir);
+  const assetFiles = allFiles.filter((file) => file.endsWith(".png") || file.endsWith(".mp4"));
+
+  const unreferencedAssets: UnreferencedAsset[] = [];
+
+  assetFiles.forEach((filename) => {
+    const isPng = filename.endsWith(".png");
+    const type = isPng ? "png" : "mp4";
+    const nameWithoutExt = filename.replace(isPng ? ".png" : ".mp4", "");
+
+    const isCharacterAsset = characterNames.some((charName) => {
+      const expectedName = getFileNameForName(charName);
+      if (isPng) {
+        return nameWithoutExt === expectedName;
+      }
+      return nameWithoutExt === `${expectedName}-speaks` || nameWithoutExt === `${expectedName}-listens`;
+    });
+
+    const isCharacterAssetWithSuffix =
+      isPng &&
+      characterNames.some((charName) => {
+        const expectedName = getFileNameForName(charName);
+        return nameWithoutExt.startsWith(`${expectedName}-`);
+      });
+
+    const isChapterAsset = /^[a-z-]+-chapter-\d+/.test(nameWithoutExt);
+
+    const isSpecialAsset = /^[a-z-]+-[a-z-]+/.test(nameWithoutExt) && (isPng ? !isCharacterAssetWithSuffix : !isCharacterAsset);
+
+    const isReferenced = isCharacterAsset || (isPng && isCharacterAssetWithSuffix) || isChapterAsset || isSpecialAsset;
+
+    if (!isReferenced) {
+      const potentialCharacter = characterNames.find((charName) => {
+        const expectedName = getFileNameForName(charName);
+        return nameWithoutExt.includes(expectedName) || expectedName.includes(nameWithoutExt);
+      });
+
+      unreferencedAssets.push({
+        filename,
+        type,
+        size: isPng ? getPngDimensions(join(assetsDir, filename)) || undefined : getFileDimensions(join(assetsDir, filename)) || undefined,
+        isCharacterAsset: false,
+        potentialCharacter: potentialCharacter || undefined,
+      });
+    }
+  });
+
+  return unreferencedAssets;
+}
+
 function main(): void {
   const args = process.argv.slice(2);
   if (args.length === 0) {
@@ -236,12 +300,24 @@ function main(): void {
     });
   }
 
+  // Check for unreferenced assets
+  const unreferencedAssets = findUnreferencedAssets(bookPath, characterNames);
+  if (unreferencedAssets.length > 0) {
+    console.log(`\n🔍 Unreferenced Assets: ${unreferencedAssets.length}`);
+    console.log("\n🔍 Assets not in CharactersMaster:");
+    unreferencedAssets.forEach((asset) => {
+      const sizeInfo = asset.size ? ` (${asset.size.width}x${asset.size.height})` : "";
+      const potentialChar = asset.potentialCharacter ? ` [potential: ${asset.potentialCharacter}]` : "";
+      console.log(`  ${asset.filename}${sizeInfo}${potentialChar}`);
+    });
+  }
+
   // Summary
-  const totalIssues = incomplete.length + dimensionIssues.length;
+  const totalIssues = incomplete.length + dimensionIssues.length + unreferencedAssets.length;
   if (totalIssues === 0) {
-    console.log("\n✅ All character assets are complete and properly sized!");
+    console.log("\n✅ All character assets are complete, properly sized, and all assets are referenced!");
   } else {
-    console.log(`\n📊 Summary: ${incomplete.length} missing assets, ${dimensionIssues.length} dimension issues`);
+    console.log(`\n📊 Summary: ${incomplete.length} missing assets, ${dimensionIssues.length} dimension issues, ${unreferencedAssets.length} unreferenced assets`);
   }
 }
 
