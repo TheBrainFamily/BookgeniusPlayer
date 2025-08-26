@@ -92,7 +92,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       onMouseLeave={() => requestToggle(false)}
       aria-label={entity.characterName}
       title={entity.characterName}
-      onClick={() => openModal(entity.slug, modalIsVideo, modalMediaSrc)}
+      onClick={() => openModal({ characterSlug: entity.slug, isVideo: modalIsVideo, mediaSrc: modalMediaSrc })}
     >
       <motion.div
         layout
