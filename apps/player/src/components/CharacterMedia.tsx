@@ -159,7 +159,7 @@ const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, 
     return <img {...commonAttrs} src={mediaSrc || ""} alt={canonicalName} className="rounded-full w-full" />;
   }
 
-  const placeholderSrc = (videoListensSrc || mediaSrc).replace(/-(listens|speaks)\.(mp4|webm)$/, ".png");
+  const placeholderSrc = (videoListensSrc || mediaSrc).replace(/-(listens|speaks)\.(mp4|webm)/, ".png");
   console.log(`164: { ${canonicalName} } DUPA CZY STOJANISKO!`, { videoListensSrc, mediaSrc, placeholderSrc });
   const showListensVideo = isListeningMode && videoListensLoaded;
   const showSpeaksVideo = !isListeningMode && videoSpeaksLoaded;
