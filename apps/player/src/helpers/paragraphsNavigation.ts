@@ -160,7 +160,7 @@ export const setCurrentLocation = (loc: Location, options: { updateHash?: boolea
  * @returns A promise that resolves when the element is stable or when the timeout is reached.
  */
 const waitForElementStablePosition = (element: HTMLElement, options: { timeout?: number; interval?: number; stableThreshold?: number } = {}): Promise<void> => {
-  const { timeout = 2000, interval = 50, stableThreshold = 200 } = options;
+  const { timeout = 3000, interval = 50, stableThreshold = 200 } = options;
 
   return new Promise((resolve) => {
     let lastRect: DOMRect | null = null;
@@ -187,7 +187,15 @@ const waitForElementStablePosition = (element: HTMLElement, options: { timeout?:
       }
       const currentRect = element.getBoundingClientRect();
 
-      if (lastRect && currentRect.top === lastRect.top && currentRect.left === lastRect.left && currentRect.width === lastRect.width && currentRect.height === lastRect.height) {
+      if (currentRect.top === 0) {
+        stableTime = 0;
+      } else if (
+        lastRect &&
+        currentRect.top === lastRect.top &&
+        currentRect.left === lastRect.left &&
+        currentRect.width === lastRect.width &&
+        currentRect.height === lastRect.height
+      ) {
         stableTime += interval;
       } else {
         stableTime = 0;
@@ -415,7 +423,8 @@ export const goToInitialLocationFromHash = () => {
     const saved = getSavedLocation();
 
     if (saved) {
-      systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph }, { history: "replace" });
+      setUrlHash(saved.currentChapter, saved.currentParagraph, "replace");
+      systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph }, { history: "replace", wait: true });
     } else {
       systemNavigateTo({ currentChapter: 1, currentParagraph: 0 }, { history: "replace" });
     }

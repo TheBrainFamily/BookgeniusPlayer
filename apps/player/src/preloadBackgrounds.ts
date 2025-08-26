@@ -3,7 +3,7 @@ import { bookDataLoader } from "@player/services/bookDataLoader";
 import { getBackgroundsForBook } from "@player/genericBookDataGetters/getBackgroundsForBook";
 import { getFileType, loadVideoAsHTMLElement } from "@player/ui/backgroundUtils";
 import { getBookAssetUrl } from "./utils/assetUrls";
-import { BackgroundForBook, BackgroundSongSection } from "./types/book";
+import { BackgroundForBook } from "./types/book";
 
 // Cache to store preloaded elements
 const preloadCache = new Map<string, HTMLVideoElement | HTMLDivElement>();
