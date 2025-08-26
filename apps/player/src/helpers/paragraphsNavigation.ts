@@ -423,7 +423,6 @@ export const goToInitialLocationFromHash = () => {
     const saved = getSavedLocation();
 
     if (saved) {
-      setUrlHash(saved.currentChapter, saved.currentParagraph, "replace");
       systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph }, { history: "replace", wait: true });
     } else {
       systemNavigateTo({ currentChapter: 1, currentParagraph: 0 }, { history: "replace" });
