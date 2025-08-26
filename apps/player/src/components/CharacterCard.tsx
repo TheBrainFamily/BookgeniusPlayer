@@ -9,6 +9,7 @@ import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { cn } from "@player/lib/utils";
 import { useHighlight } from "@player/hooks/useHighlight";
 import { isVideoFile } from "@player/helpers/isVideoFile";
+import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
@@ -36,7 +37,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
 
     if (imageOnly) {
       //TODO do not add this logic all around the frontend, we have a function that does it
-      const imageSrc = entity.imageUrl || getListeningMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook()).replace(/-(listens|speaks)\.(mp4|webm)/, ".png");
+      const imageSrc = getPlaceholderFromVideoUrl(entity.imageUrl || getListeningMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook()));
       setCurrentMediaSrc(imageSrc);
     } else if (isTalkingInCurrentRange) {
       setCurrentMediaSrc(getTalkingMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook()));
@@ -91,19 +92,19 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       onMouseEnter={() => requestToggle(true)}
       onMouseLeave={() => requestToggle(false)}
       aria-label={entity.characterName}
+      title={entity.characterName}
       onClick={() => openModal({ characterSlug: entity.slug, isVideo: modalIsVideo, mediaSrc: modalMediaSrc })}
     >
       <motion.div
         layout
         className={cn(
-          "relative rounded-full overflow-hidden aspect-square isolate",
+          "relative rounded-full aspect-square isolate",
           disableHighlight
             ? ""
             : isTalkingInCurrentRange
               ? "z-10 shadow-lg border-2 border-(--book-primary-color) animate-pulse-glow"
               : "transition-transform duration-300 ease-in-out hover:scale-110 hover:z-10",
         )}
-        title={entity.characterName}
       >
         <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />
       </motion.div>
