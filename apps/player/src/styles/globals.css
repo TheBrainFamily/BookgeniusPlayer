@@ -57,7 +57,6 @@
     /* Animation tokens */
     --animate-pulse-glow: pulseGlow 3s infinite ease-in-out;
     --animate-search-highlight-fade: searchHighlightFade 4s ease-in-out forwards;
-    --animate-search-highlight-fade-dark: searchHighlightFadeDark 4s ease-in-out forwards;
   }
 }
 
@@ -151,7 +150,7 @@
   --char-card-border-light: #ddd;
   --mobile-strip-bg-light: rgba(255, 255, 255, 0.95);
   --mobile-strip-horizontal-bg-light: rgba(255, 255, 255, 0.85);
-  --highlight-blink-color: rgba(152, 152, 152, 0.5);
+  --highlight-blink-color: #ffff66;
 
   /* RGB helpers */
   --bg-light-rgb: 240, 240, 240;
@@ -296,21 +295,6 @@
   }
 }
 
-@keyframes searchHighlightFadeDark {
-  0% {
-    background-color: #ffff99;
-    box-shadow: 0 0 4px rgba(255, 255, 100, 0.4);
-  }
-  50% {
-    background-color: #ffff99;
-    box-shadow: 0 0 8px rgba(255, 255, 100, 0.4);
-  }
-  100% {
-    background-color: transparent;
-    box-shadow: none;
-  }
-}
-
 /* Utilities */
 @layer utilities {
   .animate-search-highlight-fade {
@@ -343,14 +327,10 @@
   }
 
   #player-scope .search-highlight {
-    @apply bg-yellow-300 text-black rounded-sm;
-  }
-
-  #player-scope.dark .search-highlight {
-    background-color: var(--highlight-blink-color, #ffff99);
+    background-color: var(--highlight-blink-color, #ffff66);
     color: #000;
-    box-shadow: 0 0 4px rgba(255, 255, 100, 0.4);
-    animation: searchHighlightFadeDark 4s ease-in-out forwards;
+    box-shadow: 0 0 4px rgba(255, 255, 0, 0.5);
+    animation: searchHighlightFade 4s ease-in-out forwards;
   }
 
   /* Gradients */

@@ -252,7 +252,3 @@ body#player-scope #splash-screen {
 body#player-scope #legacy {
   display: flex;
 }
-
-/* body#player-scope #root {
-  display: none;
-} */
