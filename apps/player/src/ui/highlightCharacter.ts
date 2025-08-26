@@ -169,7 +169,9 @@ export function highlightCharacter(characterEl: HTMLSpanElement, openCharacterDe
     e.stopPropagation();
 
     hideFloatingAvatar();
-    openCharacterDetailsModal({ characterSlug, isVideo: hasListeningMedia && isVideoFile(avatarSrc), mediaSrc: avatarSrc });
+    const mediaSrcForModal = listeningSrc || "";
+    const isVideoForModal = !!mediaSrcForModal && isVideoFile(mediaSrcForModal);
+    openCharacterDetailsModal({ characterSlug, isVideo: isVideoForModal, mediaSrc: mediaSrcForModal });
   });
 
   if (!hasListeningMedia) return;
