@@ -164,7 +164,9 @@ const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, 
 
   return (
     <div className="relative w-full h-full">
-      {placeholderSrc && <img src={placeholderSrc} alt={canonicalName} className="absolute top-0 left-0 w-full h-full object-cover rounded-full" />}
+      {placeholderSrc && (
+        <img src={placeholderSrc} alt={canonicalName} loading="eager" decoding="async" className="absolute top-0 left-0 w-full h-full object-cover rounded-full" />
+      )}
       <VideoPlayer
         state="listens"
         src={videoListensSrc}
