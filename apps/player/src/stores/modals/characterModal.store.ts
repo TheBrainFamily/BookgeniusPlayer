@@ -2,6 +2,12 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { useModalCoordinator } from "../modalCoordinator.store";
 
+export interface CharacterModalParams {
+  characterSlug: string;
+  isVideo: boolean;
+  mediaSrc: string;
+}
+
 const MODAL_ID = "character-modal";
 
 interface CharacterModalState {
@@ -10,7 +16,7 @@ interface CharacterModalState {
   isVideo: boolean;
   mediaSrc: string | null;
 
-  openModal: (slug: string, isVideo: boolean, mediaSrc: string) => void;
+  openModal: (params: CharacterModalParams) => void;
   closeModal: () => void;
 }
 
@@ -22,10 +28,10 @@ export const useCharacterModal = create<CharacterModalState>()(
       isVideo: false,
       mediaSrc: null,
 
-      openModal: (slug, isVideo, mediaSrc) => {
+      openModal: ({ characterSlug, isVideo, mediaSrc }: CharacterModalParams) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
-          set({ isOpen: true, slug, isVideo, mediaSrc });
+          set({ isOpen: true, slug: characterSlug, isVideo, mediaSrc });
         }
       },
 
