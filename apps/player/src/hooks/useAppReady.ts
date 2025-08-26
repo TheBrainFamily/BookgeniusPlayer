@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocationRange } from "@player/hooks/useLocationRange";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { getBookAssetUrl } from "@player/utils/assetUrls";
 
 type TimeoutId = number | null;
 
@@ -147,7 +148,7 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
 
     const chapterCharacters = allCharacters.filter((character) => character.infoPerChapter.find((chapterInfo) => chapterInfo.chapter === chapter));
 
-    const imageUrls = chapterCharacters.map((character) => `/books/${character.bookSlug}/assets/${character.slug.toLowerCase()}.png`);
+    const imageUrls = chapterCharacters.map((character) => getBookAssetUrl(`${character.slug.toLowerCase()}.png`));
 
     let failedCount = 0;
 
