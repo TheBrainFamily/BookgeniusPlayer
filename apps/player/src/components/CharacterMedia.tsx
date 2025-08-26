@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { cn } from "@player/lib/utils";
 import { isVideoFile } from "@player/helpers/isVideoFile";
+import { getNameLocationInGlobalDirectiveComment } from "@typescript-eslint/eslint-plugin/dist/util";
 
 type VideoState = "listens" | "speaks";
 
@@ -159,6 +160,7 @@ const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, 
   }
 
   const placeholderSrc = (videoListensSrc || mediaSrc).replace(/-(listens|speaks)\.(mp4|webm)$/, ".png");
+  console.log(`164: { ${canonicalName} } DUPA CZY STOJANISKO!`, { videoListensSrc, mediaSrc, placeholderSrc });
   const showListensVideo = isListeningMode && videoListensLoaded;
   const showSpeaksVideo = !isListeningMode && videoSpeaksLoaded;
 

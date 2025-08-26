@@ -37,18 +37,11 @@ export const getBookAssetBaseUrl = (): string => {
 };
 
 export const getBookAssetUrl = (assetPath: string): string => {
-  console.log("41: assetPath BANG!", assetPath);
   const rel = assetPath.replace(/^\//, "");
-
-  console.log("44: rel BANG!", rel);
   // ensure we build under the "assets" folder inside the versioned prefix
   const built = buildFromPrefix(joinPath(URL_SEGMENTS.ASSETS, rel));
 
-  console.log("48: built BANG!", built);
-
   if (built) return built;
-
-  console.log("52: `${getBookAssetBaseUrl()}/${rel}` BANG!", `${getBookAssetBaseUrl()}/${rel}`);
 
   return `${getBookAssetBaseUrl()}/${rel}`;
 };
