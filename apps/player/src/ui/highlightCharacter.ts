@@ -184,21 +184,16 @@ export function highlightCharacter(characterEl: HTMLSpanElement, openCharacterDe
     }
   });
 
-  characterEl.addEventListener("pointerleave", () => {
+  const handlePointerOut = () => {
     if (hoverDebounceTimeout) {
       clearTimeout(hoverDebounceTimeout);
       hoverDebounceTimeout = null;
     }
 
     hideFloatingAvatar(characterEl);
-  });
+  };
 
-  characterEl.addEventListener("pointercancel", () => {
-    if (hoverDebounceTimeout) {
-      clearTimeout(hoverDebounceTimeout);
-      hoverDebounceTimeout = null;
-    }
+  characterEl.addEventListener("pointerleave", handlePointerOut);
 
-    hideFloatingAvatar(characterEl);
-  });
+  characterEl.addEventListener("pointercancel", handlePointerOut);
 }
