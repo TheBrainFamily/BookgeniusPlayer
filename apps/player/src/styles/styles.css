@@ -1306,6 +1306,12 @@ section[data-chapter] [data-index] {
   }
 }
 
+@media (max-width: 768px) {
+  section[data-chapter] p[data-index] {
+    margin-bottom: 0.5em !important;
+  }
+}
+
 .active-paragraph {
   background: hsla(219, 60%, 36%, 0);
   transition: all 0.3s ease-in-out;

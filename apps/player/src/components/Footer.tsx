@@ -39,7 +39,9 @@ const Footer = () => {
           {bookForm === "play" ? (
             <>
               <div className="w-full sm:flex-3 px-0 flex flex-col sm:px-3 xl:px-2 space-y-3 items-center pointer-events-auto">
-                <CharactersOnStagePanel />
+                <div className="w-full fixed bottom-0 lg:bottom-12 pointer-events-auto">
+                  <CharactersOnStagePanel />
+                </div>
                 <BottomInput className="max-w-[800px]" onSubmit={sendMessage} />
               </div>
             </>

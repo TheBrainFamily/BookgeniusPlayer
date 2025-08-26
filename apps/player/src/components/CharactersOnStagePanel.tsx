@@ -1,4 +1,4 @@
-import { CSSProperties, useMemo } from "react";
+import { CSSProperties, useMemo, useState, useEffect } from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 import { ScrollArea } from "@player/components/ui/scroll-area";
 
@@ -8,6 +8,7 @@ import { useLocation } from "@player/state/LocationContext";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import CharacterCard from "./CharacterCard";
 import { cn } from "@player/lib/utils";
+import { useOptionalElementVisibility } from "@player/stores/elementVisibility.store";
 
 const AVATAR_SIZE = "clamp(55px, 6.5vw, 90px)";
 
@@ -17,10 +18,26 @@ const CharactersOnStagePanel = () => {
   const { location } = useLocation();
   const currentSpeakers = useCurrentSpeakers(location, allCharacters, true);
 
+  const isOverlayVisible = useOptionalElementVisibility();
+
+  // Safe screen width detection for SSR compatibility
+  const [isNarrowScreen, setIsNarrowScreen] = useState(false);
+
+  useEffect(() => {
+    const checkScreenWidth = () => setIsNarrowScreen(window.innerWidth < 1024);
+    checkScreenWidth();
+    window.addEventListener("resize", checkScreenWidth);
+    return () => window.removeEventListener("resize", checkScreenWidth);
+  }, []);
+
+  // Desktop (≥1024px): avatars are ALWAYS visible (never hide)
+  // Narrow screens (<1024px): hide avatars when overlay is visible
+  const shouldHideAvatars = isNarrowScreen && isOverlayVisible;
+
   if (!location) return null;
 
   return (
-    <div className="characters-on-stage-panel h-full w-full mb-0">
+    <div className={cn("characters-on-stage-panel flex justify-center items-center h-full transition-opacity duration-300", shouldHideAvatars ? "opacity-0" : "opacity-100")}>
       <AnimatePresence mode="sync">
         <ScrollArea
           className="relative w-full h-full"

@@ -11,6 +11,7 @@ interface OptionalElementProps extends React.HTMLAttributes<HTMLDivElement> {
 export const OptionalElement: React.FC<OptionalElementProps> = ({ children, className, ...props }) => {
   const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
   const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
+  const setInputHovered = useElementVisibilityStore((state) => state.setInputHovered);
 
   const shouldBeVisible = useOptionalElementVisibility();
   const lastHideReason = useLastHideReason();
@@ -19,6 +20,30 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
 
   // Local state for hover visibility
   const [isHovered, setIsHovered] = React.useState(false);
+  const [isDesktop, setIsDesktop] = React.useState(false);
+
+  // Check if screen is wide enough for hover effects (desktop)
+  const isDesktopWidth = () => window.innerWidth >= 1024;
+
+  // Track desktop/mobile state
+  useEffect(() => {
+    const updateDesktopState = () => {
+      setIsDesktop(isDesktopWidth());
+    };
+
+    updateDesktopState(); // Initial check
+    window.addEventListener("resize", updateDesktopState);
+    return () => window.removeEventListener("resize", updateDesktopState);
+  }, []);
+
+  // Reset hover state when window becomes too narrow
+  useEffect(() => {
+    if (!isDesktop && isHovered) {
+      setIsHovered(false);
+      setInputHovered(false);
+      startAllTimers(); // Resume timers when forcibly clearing hover
+    }
+  }, [isDesktop, isHovered, setInputHovered, startAllTimers]);
 
   // Determine if element should be visible
   // Optional elements should only be visible when explicitly shown, NOT during scroll mode
@@ -43,19 +68,26 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
     }
 
     element.style.opacity = shouldBeVisible ? "1" : "0";
-    // Always allow pointer events so hover functionality works even when element is invisible
-    element.style.pointerEvents = "auto";
+    // Removed imperative pointer-events setting - will be handled in JSX based on visibility
 
     previousVisibilityRef.current = shouldBeVisible;
   }, [shouldBeVisible, lastHideReason]);
 
   const handleMouseEnter = () => {
+    // Only enable hover effects on desktop-width screens
+    if (!isDesktop) return;
+
     setIsHovered(true);
+    setInputHovered(true); // Set global state
     pauseAllTimers();
   };
 
   const handleMouseLeave = () => {
+    // Only process mouse leave if we're on desktop-width screens
+    if (!isDesktop) return;
+
     setIsHovered(false);
+    setInputHovered(false); // Unset global state
     startAllTimers();
   };
 
@@ -68,7 +100,7 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
       onMouseLeave={handleMouseLeave}
       ref={elementRef}
       className={cn("transition-opacity", className)}
-      style={{ opacity: isElementVisible ? 1 : 0, pointerEvents: "auto" }}
+      style={{ opacity: isElementVisible ? 1 : 0, pointerEvents: isDesktop ? "auto" : isElementVisible ? "auto" : "none" }}
       {...props}
     >
       {children}
