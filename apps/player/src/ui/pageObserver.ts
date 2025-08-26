@@ -5,7 +5,7 @@ import { bookDataLoader } from "@player/services/bookDataLoader";
 import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
 import debounce from "lodash.debounce";
 import { isVideoFile } from "@player/helpers/isVideoFile";
-import { highlightCharacter } from "./highlightCharacter";
+import { highlightCharacter, normalizeSrcForInlineAvatar } from "./highlightCharacter";
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
@@ -116,47 +116,6 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
   }
 
   return false;
-}
-
-/**
- * Normalizes the src to always be PNG and removes "speaks" or "listens" suffixes
- */
-export function normalizeSrcForInlineAvatar(src: string): string {
-  if (!src) return src;
-
-  // Preserve query/hash separately so we don't mangle them
-  let pathPart = src;
-  let query = "";
-  let hash = "";
-
-  const hashIdx = src.indexOf("#");
-  if (hashIdx !== -1) {
-    hash = src.slice(hashIdx);
-    pathPart = src.slice(0, hashIdx);
-  }
-
-  const qIdx = pathPart.indexOf("?");
-  if (qIdx !== -1) {
-    query = pathPart.slice(qIdx);
-    pathPart = pathPart.slice(0, qIdx);
-  }
-
-  // Split directory + filename
-  const lastSlash = pathPart.lastIndexOf("/");
-  const dir = lastSlash >= 0 ? pathPart.slice(0, lastSlash + 1) : "";
-  let file = lastSlash >= 0 ? pathPart.slice(lastSlash + 1) : pathPart;
-
-  // Remove "-speaks" or "-listens" only when they appear immediately before the final extension or at end
-  file = file.replace(/-(speaks|listens)(?=(\.[^.\/]+$|$))/i, "");
-
-  // Replace final extension with .png, or add .png if none
-  if (/\.[^.\/]+$/.test(file)) {
-    file = file.replace(/\.[^.\/]+$/, ".png");
-  } else {
-    file = `${file}.png`;
-  }
-
-  return `${dir}${file}${query}${hash}`;
 }
 
 /**

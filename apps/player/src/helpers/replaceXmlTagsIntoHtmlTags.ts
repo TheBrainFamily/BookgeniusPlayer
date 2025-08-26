@@ -1,6 +1,6 @@
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import { bookDataLoader } from "@player/services/bookDataLoader";
-import { normalizeSrcForInlineAvatar } from "@player/ui/pageObserver";
+import { normalizeSrcForInlineAvatar } from "@player/ui/highlightCharacter";
 import { getListeningMediaFilePathForName } from "@player/utils/getFilePathsForName";
 
 export const replaceXmlTagsIntoHtmlTags = (text: string) => {
