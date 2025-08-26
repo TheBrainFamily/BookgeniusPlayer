@@ -5,6 +5,8 @@ import { bookDataLoader } from "@player/services/bookDataLoader";
 import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
 import debounce from "lodash.debounce";
 import { isVideoFile } from "@player/helpers/isVideoFile";
+import { highlightCharacter } from "./highlightCharacter";
+import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
@@ -176,11 +178,7 @@ function updateVideoState(container: HTMLDivElement, isTalking: boolean) {
 /**
  * Creates a media container element with CharacterMedia-like structure for inline avatars.
  */
-function createMediaElement(
-  placeholder: HTMLSpanElement,
-  openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
-  isPlayFormat: boolean,
-): HTMLDivElement | null {
+function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsModal: (params: CharacterModalParams) => void, isPlayFormat: boolean): HTMLDivElement | null {
   const characterSlug = placeholder.dataset.character;
   const isTalking = placeholder.dataset.isTalking === "true";
   const talkingSrc = getTalkingMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
@@ -264,107 +262,10 @@ function createMediaElement(
     const currentIsTalking = placeholder.dataset.isTalking === "true";
     const videoSrc = currentIsTalking ? talkingSrc : listeningSrc;
 
-    openCharacterDetailsModal(characterSlug, !!videoSrc && isVideoFile(videoSrc), videoSrc || "");
+    openCharacterDetailsModal({ characterSlug, isVideo: !videoSrc && isVideoFile(videoSrc), mediaSrc: videoSrc || "" });
   });
 
   return container;
-}
-
-export function highlightCharacter(character: HTMLSpanElement, openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void) {
-  const characterSlug = character.dataset.character;
-  const listeningSrc = getListeningMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
-
-  // Check if a listener has already been attached
-  if (character.dataset.clickListenerAttached === "true") {
-    return;
-  }
-
-  let floatingAvatar: HTMLDivElement | null = null;
-  character.classList.add("character-highlighted-activated");
-  character.addEventListener("pointerup", (e) => {
-    if (e.metaKey || e.ctrlKey) {
-      floatingAvatar?.remove();
-      return;
-    }
-    e.preventDefault();
-    e.stopPropagation();
-    // Find and remove any floating avatars to prevent them from sticking
-    const floatingAvatars = document.querySelectorAll(".floating-avatar");
-    floatingAvatars.forEach((avatar) => {
-      document.body.removeChild(avatar);
-    });
-
-    openCharacterDetailsModal(characterSlug, !!listeningSrc && isVideoFile(listeningSrc), listeningSrc);
-  });
-
-  // Add hover functionality to show floating avatar
-  character.addEventListener("mouseover", () => {
-    // Create floating avatar container
-    floatingAvatar = document.createElement("div");
-    floatingAvatar.classList.add("floating-avatar");
-    floatingAvatar.style.position = "fixed";
-    floatingAvatar.style.zIndex = "1000";
-    floatingAvatar.style.opacity = "0";
-    floatingAvatar.style.transition = "opacity 500ms ease-in-out";
-
-    // Get trigger element's position
-    const triggerRect = character.getBoundingClientRect();
-
-    // Create media element based on source type
-    if (listeningSrc) {
-      // Normalize the src for consistent PNG format
-      const normalizedSrc = normalizeSrcForInlineAvatar(listeningSrc);
-
-      let mediaElement: HTMLVideoElement | HTMLImageElement;
-      if (isVideoFile(normalizedSrc.toLowerCase())) {
-        // Create video element
-        mediaElement = document.createElement("video");
-        mediaElement.autoplay = true;
-        mediaElement.loop = true;
-        mediaElement.muted = true;
-        mediaElement.playsInline = true;
-      } else {
-        // Create image element
-        mediaElement = document.createElement("img");
-      }
-
-      mediaElement.src = normalizedSrc;
-      mediaElement.classList.add("avatar-preview");
-
-      floatingAvatar.appendChild(mediaElement);
-      document.body.appendChild(floatingAvatar);
-
-      // Position the floating avatar relative to the trigger element
-      const avatarHeight = floatingAvatar.offsetHeight;
-      const avatarWidth = floatingAvatar.offsetWidth;
-      floatingAvatar.style.top = `${triggerRect.top - avatarHeight - 10}px`; // 10px above the trigger
-      floatingAvatar.style.left = `${triggerRect.left + triggerRect.width / 2 - avatarWidth / 2}px`; // Horizontally centered with the trigger
-
-      // Fade in
-      setTimeout(() => {
-        floatingAvatar.style.opacity = "1";
-      }, 10);
-
-      // Handle mouseout
-      const handleMouseOut = () => {
-        // Fade out
-        floatingAvatar.style.opacity = "0";
-
-        // Remove after transition completes
-        setTimeout(() => {
-          document.body.removeChild(floatingAvatar);
-          // document.removeEventListener("mousemove", handleMouseMove);
-        }, 500);
-
-        character.removeEventListener("mouseout", handleMouseOut);
-      };
-
-      character.addEventListener("mouseout", handleMouseOut);
-    }
-  });
-
-  // Mark that a listener has been attached
-  character.dataset.clickListenerAttached = "true";
 }
 
 /**
@@ -375,7 +276,7 @@ function activateMediaInRange(
   startParagraph: number,
   endChapter: number,
   endParagraph: number,
-  openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
+  openCharacterDetailsModal: (params: CharacterModalParams) => void,
   isPlayFormat: boolean,
 ) {
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
@@ -574,7 +475,7 @@ export const getParagraphInfo = (element: Element): { chapter: number | null; pa
 let previousRootRectWidth = 0;
 
 export function setupPageObserver(
-  openCharacterDetailsModal: (characterSlug: string, isVideo: boolean, src: string) => void,
+  openCharacterDetailsModal: (params: CharacterModalParams) => void,
 ): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number; cleanup: () => void } | null {
   const rootEl = document.getElementById("content-container");
   if (!rootEl) {
