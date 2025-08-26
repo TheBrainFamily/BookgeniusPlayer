@@ -819,7 +819,7 @@
     }
   }
 
-  @media screen and (max-height: 480px) and (orientation: landscape) {
+  @media screen and (max-height: 550px) and (orientation: landscape) {
     #content-container:has(.play-container) {
       mask-image: linear-gradient(
         to bottom,
@@ -832,6 +832,20 @@
         transparent 85%,
         transparent 100%
       );
+
+      .play-container > section > section {
+        .play-row[data-text-alignment="left"] {
+          transform: translateX(-17.5%);
+        }
+
+        .play-row[data-text-alignment="right"] {
+          transform: translateX(17.5%);
+        }
+        .character-avatar .inline-avatar {
+          min-width: clamp(65px, 15vw, 120px);
+          min-height: clamp(65px, 15vw, 120px);
+        }
+      }
     }
   }
 
