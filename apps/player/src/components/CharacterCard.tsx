@@ -9,6 +9,7 @@ import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { cn } from "@player/lib/utils";
 import { useHighlight } from "@player/hooks/useHighlight";
 import { isVideoFile } from "@player/helpers/isVideoFile";
+import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
@@ -36,7 +37,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
 
     if (imageOnly) {
       //TODO do not add this logic all around the frontend, we have a function that does it
-      const imageSrc = entity.imageUrl || getListeningMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook()).replace(/-(listens|speaks)\.(mp4|webm)/, ".png");
+      const imageSrc = getPlaceholderFromVideoUrl(entity.imageUrl || getListeningMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook()));
       setCurrentMediaSrc(imageSrc);
     } else if (isTalkingInCurrentRange) {
       setCurrentMediaSrc(getTalkingMediaFilePathForName(entity.slug, bookDataLoader.getCurrentBook()));

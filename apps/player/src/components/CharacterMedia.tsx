@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { cn } from "@player/lib/utils";
 import { isVideoFile } from "@player/helpers/isVideoFile";
+import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
 
 type VideoState = "listens" | "speaks";
 
@@ -158,7 +159,7 @@ const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, 
     return <img {...commonAttrs} src={mediaSrc || ""} alt={canonicalName} className="rounded-full w-full" />;
   }
 
-  const placeholderSrc = (videoListensSrc || mediaSrc).replace(/-(listens|speaks)\.(mp4|webm)/, ".png");
+  const placeholderSrc = getPlaceholderFromVideoUrl(videoListensSrc || mediaSrc);
   const showListensVideo = isListeningMode && videoListensLoaded;
   const showSpeaksVideo = !isListeningMode && videoSpeaksLoaded;
 

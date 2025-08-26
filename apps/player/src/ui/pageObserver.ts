@@ -7,6 +7,7 @@ import debounce from "lodash.debounce";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 import { highlightCharacter, normalizeSrcForInlineAvatar } from "./highlightCharacter";
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
+import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
 
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
@@ -153,7 +154,7 @@ function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsMo
 
   // Create placeholder image (always shown as fallback)
   const placeholderImg = document.createElement("img");
-  const placeholderSrc = (listeningSrc || talkingSrc || "").replace(/-(listens|speaks)\.(mp4|webm)$/, ".png");
+  const placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
   placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
   placeholderImg.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
   placeholderImg.alt = characterSlug;
