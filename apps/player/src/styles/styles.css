@@ -179,6 +179,12 @@
         font-weight: bold;
       }
 
+      h5 {
+        font-size: 1.2em;
+        padding: 0.5rem 3rem;
+        font-weight: bold;
+      }
+
       & > section {
         padding: 35vh 0 70vh;
         width: 100%;
@@ -431,15 +437,23 @@
 
       & > span,
       & > h3,
-      & > h4 {
+      & > h4,
+      & > h5{
         width: 600px;
         margin-left: auto;
         margin-right: auto;
       }
 
-      & > h3,
+      & > h3 {
+        margin-bottom: 3rem;
+      }
+
       & > h4 {
-        margin-bottom: 5rem;
+        margin-bottom: 0rem;
+      }
+
+      & > h5 {
+        margin-bottom: 4rem;
       }
 
       & > span {
@@ -598,7 +612,8 @@
       }
 
       h3,
-      h4 {
+      h4,
+      h5 {
         text-align: center;
         padding-bottom: clamp(0.3em, 1vh, 0.5em);
         font-family: var(--font-eb-garamond);
@@ -673,7 +688,8 @@
 
         & > span,
         & > h3,
-        & > h4 {
+        & > h4,
+        & > h5 {
           width: 500px;
         }
 
@@ -701,7 +717,8 @@
 
         & > span,
         & > h3,
-        & > h4 {
+        & > h4,
+        & > h5 {
           width: 400px;
         }
 
@@ -727,7 +744,8 @@
 
         & > span,
         & > h3,
-        & > h4 {
+        & > h4,
+        & > h5 {
           width: 375px;
         }
 
@@ -760,7 +778,8 @@
 
         & > span,
         & > h3,
-        & > h4 {
+        & > h4,
+        & > h5 {
           width: 325px;
         }
 
@@ -796,7 +815,8 @@
 
         & > span,
         & > h3,
-        & > h4 {
+        & > h4,
+        & > h5 {
           width: 300px;
         }
 
