@@ -69,7 +69,7 @@ export const usePageObserver = ({ enabled, openCharacterDetailsModal }: UsePageO
         legacyRef.current = null;
       }
     };
-  }, [createObserver, enabled, openCharacterDetailsModal]);
+  }, [createObserver, enabled]);
 
   return { observeNewParagraphs, cleanupRemovedParagraphs };
 };
