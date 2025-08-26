@@ -187,7 +187,7 @@ const waitForElementStablePosition = (element: HTMLElement, options: { timeout?:
       }
       const currentRect = element.getBoundingClientRect();
 
-      if (currentRect.top === 0) {
+      if (currentRect.width === 0 || currentRect.height === 0) {
         stableTime = 0;
       } else if (
         lastRect &&
