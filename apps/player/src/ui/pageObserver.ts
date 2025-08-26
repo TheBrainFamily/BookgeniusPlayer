@@ -262,7 +262,7 @@ function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsMo
     const currentIsTalking = placeholder.dataset.isTalking === "true";
     const videoSrc = currentIsTalking ? talkingSrc : listeningSrc;
 
-    openCharacterDetailsModal({ characterSlug, isVideo: !videoSrc && isVideoFile(videoSrc), mediaSrc: videoSrc || "" });
+    openCharacterDetailsModal({ characterSlug, isVideo: !!videoSrc && isVideoFile(videoSrc), mediaSrc: videoSrc || "" });
   });
 
   return container;
