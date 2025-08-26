@@ -91,19 +91,19 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       onMouseEnter={() => requestToggle(true)}
       onMouseLeave={() => requestToggle(false)}
       aria-label={entity.characterName}
+      title={entity.characterName}
       onClick={() => openModal(entity.slug, modalIsVideo, modalMediaSrc)}
     >
       <motion.div
         layout
         className={cn(
-          "relative rounded-full overflow-hidden aspect-square isolate",
+          "relative rounded-full aspect-square isolate",
           disableHighlight
             ? ""
             : isTalkingInCurrentRange
               ? "z-10 shadow-lg border-2 border-(--book-primary-color) animate-pulse-glow"
               : "transition-transform duration-300 ease-in-out hover:scale-110 hover:z-10",
         )}
-        title={entity.characterName}
       >
         <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />
       </motion.div>
