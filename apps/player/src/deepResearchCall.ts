@@ -14,11 +14,8 @@ export async function deepResearchCall(searchQuery: string, location: Location):
 
   const params = new URLSearchParams({ question: searchQuery, filter: JSON.stringify(filter) });
 
-  let url = `/${baseUrl}?${params.toString()}`;
+  const url = `${ANSWERS_SERVER_URL}/${baseUrl}?${params.toString()}`;
   const isDev = import.meta.env.MODE === "development";
-  if (isDev) {
-    url = `${ANSWERS_SERVER_URL}${url}`;
-  }
   console.log(`Fetching deep research from: ${url}`); // Optional: for debugging
   try {
     const response = await fetch(url, { method: "GET", headers: { ...(isDev && { "X-Dev-Token": import.meta.env.VITE_DEV_TOKEN }) } });
