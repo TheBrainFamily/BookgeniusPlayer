@@ -13,7 +13,7 @@ const Footer = () => {
               <h3 className="text-xl font-bold text-foreground">BookGenius</h3>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Experience literature like never before with our immersive visual novels featuring professional voice acting, animations, and atmospheric soundtracks.
+              Experience literature like never before with our immersive visual novels featuring beautiful animations and atmospheric soundtracks.
             </p>
           </div>
 
@@ -47,11 +47,11 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-muted-foreground">
                 <Mail className="h-4 w-4" />
-                <span className="text-sm">support@bookgenius.com</span>
+                <span className="text-sm">{import.meta.env.VITE_SUPPORT_EMAIL}</span>
               </div>
               <div className="flex items-center space-x-3 text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <span className="text-sm">+1 (555) 123-4567</span>
+                <span className="text-sm"></span>
               </div>
               <div className="flex items-center space-x-3 text-muted-foreground">
                 <MapPin className="h-4 w-4" />
