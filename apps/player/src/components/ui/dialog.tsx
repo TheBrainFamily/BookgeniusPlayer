@@ -35,7 +35,7 @@ function DialogOverlay({ className, ...props }: React.ComponentProps<typeof Dial
 
 function DialogContent({ className, children, ...props }: React.ComponentProps<typeof DialogPrimitive.Content>) {
   return (
-    <DialogPortal data-slot="dialog-portal">
+    <DialogPortal data-slot="dialog-portal" container={document.querySelector("#player-scope")!}>
       {/* <DialogOverlay /> */}
       <DialogPrimitive.Content
         data-slot="dialog-content"
