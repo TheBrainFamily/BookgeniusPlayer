@@ -27,18 +27,6 @@ const AppWithResolveProd: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const onReady = () => {
-      try {
-        window.dispatchEvent(new CustomEvent("splashHidden"));
-      } catch {
-        // no-op
-      }
-    };
-    window.addEventListener("appReady", onReady);
-    return () => window.removeEventListener("appReady", onReady);
-  }, []);
-
-  useEffect(() => {
     const book = getBookFromUrl();
     if (book === lastBookRef.current) {
       return;
