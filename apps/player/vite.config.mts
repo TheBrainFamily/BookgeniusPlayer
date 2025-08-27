@@ -4,6 +4,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { createHtmlPlugin } from "vite-plugin-html";
+import tailwind from "@tailwindcss/vite";
 
 export default defineConfig(async () => {
   // Determine environment from command line args or env var
@@ -70,6 +71,7 @@ export default defineConfig(async () => {
         },
         devOptions: { enabled: true },
       }),
+      tailwind(),
     ],
     root: "./",
     resolve: { alias: { "@player": path.resolve(__dirname, "./src") } },
