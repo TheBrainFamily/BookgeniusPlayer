@@ -19,3 +19,10 @@ export async function verifyGenericToken(token: string) {
     throw new Error(`Invalid token: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 }
+
+export function signGenericToken(payload: any, key: string): string {
+  return jwt.sign(payload, key, {
+    algorithm: "RS256",
+    expiresIn: "360000",
+  });
+}
