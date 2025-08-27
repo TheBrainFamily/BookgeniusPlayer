@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BookGenius - Immersive Visual Novels</title>
-    <meta name="description" content="Experience literature like never before with our collection of immersive visual novels featuring dynamic avatars, animations, and soundtracks" />
+    <meta
+      name="description"
+      content="Experience literature like never before with our collection of immersive visual novels featuring dynamic avatars, animations, and soundtracks"
+    />
     <meta name="author" content="Virtual Library" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,6 +22,22 @@
       body {
         background-color: #2d2d2d;
         min-height: 100vh;
+      }
+
+      #player-scope {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease-in-out;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      #player-scope.visible {
+        opacity: 1;
+        pointer-events: auto;
       }
 
       #content-container {

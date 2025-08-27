@@ -4,7 +4,6 @@
 
 /* Styling imports */
 @import "./tailwind.css";
-@import "./styles.css";
 
 /* Scan platform */
 @source "../**/*.{ts,tsx,js,jsx,html}";
