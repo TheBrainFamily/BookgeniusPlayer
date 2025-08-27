@@ -137,13 +137,24 @@ const WrappedPlayerApp = () => {
 
   useEffect(() => {
     const playerScopeElement = document.getElementById("player-scope");
-    if (isPlayerReady && playerScopeElement) {
+    if (!playerScopeElement) return;
+
+    if (isPlayerReady) {
       playerScopeElement.classList.add("visible");
+      playerScopeElement.removeAttribute("inert");
+      playerScopeElement.setAttribute("aria-hidden", "false");
+    } else {
+      playerScopeElement.classList.remove("visible");
+      playerScopeElement.setAttribute("inert", "");
+      playerScopeElement.setAttribute("aria-hidden", "true");
     }
 
     return () => {
       if (!playerScopeElement) return;
+
       playerScopeElement.classList.remove("visible");
+      playerScopeElement.setAttribute("inert", "");
+      playerScopeElement.setAttribute("aria-hidden", "true");
     };
   }, [isPlayerReady]);
 
