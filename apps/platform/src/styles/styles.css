@@ -1,6 +1,5 @@
 /* Platform-Player visibility logic */
-#player-scope,
-#platform-scope {
+#player-scope {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease-in-out;
@@ -11,8 +10,7 @@
   height: 100%;
 }
 
-#player-scope.visible,
-#platform-scope.visible {
+#player-scope.visible {
   opacity: 1;
   pointer-events: auto;
 }
