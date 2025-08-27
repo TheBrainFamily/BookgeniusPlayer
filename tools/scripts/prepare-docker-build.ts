@@ -15,7 +15,9 @@ const apps = [
     booksSourceDir: path.join(projectRoot, "apps", "player", "docker-build", "books"),
     targetDir: path.join(buildDir, "player-app"),
   },
-  { name: "platform", sourceDir: path.join(projectRoot, "apps", "platform", "dist"), targetDir: path.join(buildDir, "platform-app") },
+  { name: "platform-intl", sourceDir: path.join(projectRoot, "apps", "platform", "dist-intl"), targetDir: path.join(buildDir, "platform-app-intl") },
+  { name: "platform-snapplify", sourceDir: path.join(projectRoot, "apps", "platform", "dist-snapplify"), targetDir: path.join(buildDir, "platform-app-snapplify") },
+  { name: "platform-bookgeniusz", sourceDir: path.join(projectRoot, "apps", "platform", "dist"), targetDir: path.join(buildDir, "platform-app") },
 ];
 
 // --- HELPER FUNCTIONS (unchanged) ---
@@ -65,7 +67,7 @@ async function prepareBuild() {
     const playerBooksDir = apps.find((app) => app.name === "player")!.booksSourceDir;
     if (await pathExists(playerBooksDir)) {
       const bookSlugs = await readdir(playerBooksDir);
-      for (const bookSlug of bookSlugs) {
+      await Promise.all(bookSlugs.map(async (bookSlug) => {
         const sourceBookPath = path.join(playerBooksDir, bookSlug);
 
         // NEW: Create a versioned path for each book.
@@ -76,7 +78,7 @@ async function prepareBuild() {
 
         // NEW: Record the new version for this book in our manifest.
         versionsManifest[bookSlug] = buildVersion;
-      }
+      }));
     } else {
       console.log(`[SKIP] No 'books' directory found to version.`);
     }

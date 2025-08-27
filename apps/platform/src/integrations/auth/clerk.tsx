@@ -1,13 +1,14 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
 import type { LoadedClerk, UseUserReturn } from "@clerk/types";
 import type { AuthCtx, AuthModule } from "./types";
+import type { ClerkProviderProps } from "@clerk/react-router";
 
 const Ctx = createContext<AuthCtx>({ ready: false, isSignedIn: false, openSignIn: () => {} });
 
 const WidgetCtx = createContext<React.ComponentType | undefined>(undefined);
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [ClerkProvider, setClerkProvider] = useState<React.ComponentType<{ publishableKey: string; children: React.ReactNode }> | null>(null);
+  const [ClerkProvider, setClerkProvider] = useState<React.ComponentType<ClerkProviderProps> | null>(null);
   const [hooks, setHooks] = useState<{ useUser: () => UseUserReturn; useClerk: () => LoadedClerk; UserButton?: React.ComponentType } | null>(null);
   const [loadingState, setLoadingState] = useState<"loading" | "ready" | "error">("loading");
 
@@ -115,9 +116,21 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     return <Ctx.Provider value={ctx}>{children}</Ctx.Provider>;
   };
 
+  console.log("DWER#4sdffs isSatellite:", import.meta.env.VITE_CLERK_IS_SATELLITE);
+  console.log("domain:", import.meta.env.VITE_CLERK_DOMAIN);
+  console.log("signInUrl:", import.meta.env.VITE_CLERK_SIGN_IN_URL);
+  console.log("signUpUrl:", import.meta.env.VITE_CLERK_SIGN_UP_URL);
+
   return (
     <WidgetCtx.Provider value={hooks.UserButton}>
-      <ClerkProvider publishableKey={publishableKey}>
+      <ClerkProvider
+        publishableKey={publishableKey}
+        domain={import.meta.env.VITE_CLERK_DOMAIN}
+        signInUrl={import.meta.env.VITE_CLERK_SIGN_IN_URL}
+        signUpUrl={import.meta.env.VITE_CLERK_SIGN_UP_URL}
+        isSatellite={import.meta.env.VITE_CLERK_IS_SATELLITE}
+        allowedRedirectOrigins={!import.meta.env.VITE_CLERK_IS_SATELLITE ? ["https://bookgeniusz.pl"] : undefined}
+      >
         <Inner>{children}</Inner>
       </ClerkProvider>
     </WidgetCtx.Provider>

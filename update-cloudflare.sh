@@ -26,25 +26,25 @@ s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
 s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
   --cache-control "$short_cache" \
   --content-type "text/html; charset=utf-8" \
-  build/platform-app/index.html \
+  build/platform-app-intl/index.html \
   "s3://${S3_BUCKET}/app/platform-intl/${ASSET_CONTEXT}/index.html"
 
 s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
   --exclude "index.html" \
   --cache-control "$long_cache" \
-  build/platform-app/ \
+  build/platform-app-intl/ \
   "s3://${S3_BUCKET}/app/platform-intl/${ASSET_CONTEXT}/"
 
 s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
   --cache-control "$short_cache" \
   --content-type "text/html; charset=utf-8" \
-  build/platform-app/index.html \
+  build/platform-app-snapplify/index.html \
   "s3://${S3_BUCKET}/app/platform-snapplify/${ASSET_CONTEXT}/index.html"
 
 s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
   --exclude "index.html" \
   --cache-control "$long_cache" \
-  build/platform-app/ \
+  build/platform-app-snapplify/ \
   "s3://${S3_BUCKET}/app/platform-snapplify/${ASSET_CONTEXT}/"
 
 # --- player app ---
