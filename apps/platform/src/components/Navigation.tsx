@@ -18,8 +18,8 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
   const UserWidget = authMod.useUserWidget?.();
 
   return (
-    <nav className="relative z-10 bg-card/90 backdrop-blur-sm border-b border-border">
-      <div className="container mx-auto px-4 py-4">
+    <nav className="sticky top-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border">
+      <div className="container mx-auto px-6 md:px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-3">

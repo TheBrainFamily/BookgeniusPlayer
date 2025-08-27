@@ -13,7 +13,7 @@ const HeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 text-center">
+      <div className="relative z-10 container mx-auto px-4 text-center py-10">
         <div className="max-w-4xl mx-auto">
           {/* Floating sparkles animation */}
           <div className="absolute -top-8 left-1/4 animate-float">

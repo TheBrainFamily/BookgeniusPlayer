@@ -43,9 +43,9 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   };
 
   return (
-    <section className="py-16 px-4">
-      <div className="container mx-auto">
-        <div className="text-center mb-12">
+    <section className="py-16 px-0 md:px-8">
+      <div className="mx-auto px-0 md:container md:px-8">
+        <div className="text-center mb-12 px-4 md:px-0">
           <h2 className="text-4xl font-bold text-foreground mb-4">
             {searchQuery ? (
               <>
@@ -70,7 +70,7 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
             <p className="text-sm text-muted-foreground mt-2">Try searching for a different title, author, or genre</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 px-4">
             {filteredBooks.map((book) => (
               <Card
                 key={book.id}
@@ -87,10 +87,10 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
                       <Play className="h-12 w-12 text-white/80 opacity-60 drop-shadow-lg" />
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
-                    <Badge className="absolute top-2 right-2 bg-library-gold/90 text-library-mahogany">{book.genre}</Badge>
+                    <Badge className="absolute top-2 right-2 bg-library-gold/90 text-library-mahogany py-1 text-base md:text-sm">{book.genre}</Badge>
                     <div className="absolute bottom-2 left-2 flex items-center space-x-1">
                       <Volume2 className="h-3 w-3 text-white/80" />
-                      <span className="text-xs text-white/80">Audio</span>
+                      <span className="text-sm md:text-xs text-white/80">Audio</span>
                     </div>
                     {book.language === "pl" && (
                       <div className="absolute bottom-2 right-2">
@@ -102,17 +102,17 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
                     )}
                   </div>
 
-                  <CardTitle className="text-lg font-bold text-foreground group-hover:text-library-gold transition-colors line-clamp-2">{book.title}</CardTitle>
-                  <p className="text-library-gold font-medium">{book.author}</p>
+                  <CardTitle className="text-xl md:text-lg font-bold text-foreground group-hover:text-library-gold transition-colors line-clamp-2">{book.title}</CardTitle>
+                  <p className="text-library-gold font-medium text-base md:text-sm">{book.author}</p>
                 </CardHeader>
 
                 <CardContent className="flex flex-col flex-1">
-                  <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 mb-4">{book.description}</p>
+                  <p className="text-muted-foreground text-base md:text-sm leading-relaxed line-clamp-3 mb-4">{book.description}</p>
 
                   <div className="mt-auto space-y-4">
                     <div className="flex flex-wrap gap-1">
                       {book.features.slice(0, 2).map((feature, index) => (
-                        <Badge key={index} variant="outline" className="text-xs border-library-walnut text-muted-foreground">
+                        <Badge key={index} variant="outline" className="text-sm md:text-xs border-library-walnut text-muted-foreground py-1">
                           {feature}
                         </Badge>
                       ))}

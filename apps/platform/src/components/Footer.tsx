@@ -4,7 +4,7 @@ import { Button } from "@platform/components/ui/button";
 const Footer = () => {
   return (
     <footer className="bg-library-mahogany/80 backdrop-blur-sm border-t border-library-walnut">
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-6 md:px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo & Description */}
           <div className="space-y-4">
@@ -66,7 +66,7 @@ const Footer = () => {
           <p className="text-muted-foreground text-sm">© 2025 BookGenius. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((link) => (
-              <Button key={link} variant="ghost" className="p-0 h-auto text-muted-foreground hover:text-library-gold text-sm">
+              <Button key={link} variant="ghost" className="p-0 h-auto text-muted-foreground hover:text-library-gold hover:bg-transparent text-sm">
                 {link}
               </Button>
             ))}
