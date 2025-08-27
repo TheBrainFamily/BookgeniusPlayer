@@ -438,7 +438,7 @@
       & > span,
       & > h3,
       & > h4,
-      & > h5{
+      & > h5 {
         width: 600px;
         margin-left: auto;
         margin-right: auto;
@@ -1625,4 +1625,19 @@ section[data-chapter] [data-index] {
   100% {
     transform: scale(1) translateZ(0);
   }
+}
+
+#left-notes {
+  scrollbar-color: transparent transparent;
+  scrollbar-width: none !important;
+}
+
+.character-notes-custom {
+  overflow: visible;
+  scrollbar-color: transparent transparent;
+  scrollbar-width: none !important;
+}
+
+.character-notes-custom > div:last-child {
+  padding-bottom: 30px;
 }

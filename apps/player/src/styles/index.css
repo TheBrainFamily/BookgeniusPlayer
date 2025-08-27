@@ -1,4 +1,6 @@
-@import "./globals.css";
-@import "./styles.css";
-@import "./modals.css";
-@import "./inline-avatars.css";
+/* Only one tailwind initialization for application */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Import of all other styling files */
+@import "./imports.css";

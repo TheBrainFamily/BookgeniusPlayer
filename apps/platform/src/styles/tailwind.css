@@ -1,8 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
 /* Victorian Library Design System - Rich, atmospheric, and elegant */
-:root:has(body#platform-scope) {
+#platform-scope {
   @theme {
     /* Base library atmosphere */
     --color-background: hsl(15 15% 8%);
@@ -94,7 +91,7 @@
 @variant dark (#platform-scope.dark *);
 
 /* Dark mode overrides */
-:root:has(body#platform-scope.dark) {
+#platform-scope.dark {
   @theme {
     /* Enhanced dark theme for deeper library atmosphere */
     --color-background: hsl(12 20% 6%);
@@ -233,22 +230,4 @@
   #platform-scope ::-webkit-scrollbar-thumb:hover {
     background: hsl(45 70% 55% / 0.8);
   }
-}
-
-/* Platform-Player visibility logic */
-body#platform-scope #root-player,
-body#platform-scope #legacy,
-body#platform-scope #cutscene-video,
-body#platform-scope #splash-screen {
-  display: none;
-}
-
-body#player-scope #root-player,
-body#player-scope #cutscene-video,
-body#player-scope #splash-screen {
-  display: block;
-}
-
-body#player-scope #legacy {
-  display: flex;
 }

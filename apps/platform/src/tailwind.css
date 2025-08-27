@@ -1,7 +1,0 @@
-@import "tailwindcss";
-
-/* scan platform */
-@source "./**/*.{ts,tsx,js,jsx,html}";
-
-/* scan player */
-@source "../../player/src/**/*.{ts,tsx,js,jsx,html}";

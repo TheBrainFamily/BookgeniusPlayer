@@ -136,11 +136,25 @@ const WrappedPlayerApp = () => {
   }, []);
 
   useEffect(() => {
-    const bodyId = isPlayerReady ? "player-scope" : "platform-scope";
-    document.body.id = bodyId;
+    const playerScopeElement = document.getElementById("player-scope");
+    if (!playerScopeElement) return;
+
+    if (isPlayerReady) {
+      playerScopeElement.classList.add("visible");
+      playerScopeElement.removeAttribute("inert");
+      playerScopeElement.setAttribute("aria-hidden", "false");
+    } else {
+      playerScopeElement.classList.remove("visible");
+      playerScopeElement.setAttribute("inert", "");
+      playerScopeElement.setAttribute("aria-hidden", "true");
+    }
 
     return () => {
-      document.body.id = "platform-scope";
+      if (!playerScopeElement) return;
+
+      playerScopeElement.classList.remove("visible");
+      playerScopeElement.setAttribute("inert", "");
+      playerScopeElement.setAttribute("aria-hidden", "true");
     };
   }, [isPlayerReady]);
 

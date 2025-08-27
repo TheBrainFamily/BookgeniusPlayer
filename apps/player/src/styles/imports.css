@@ -1,0 +1,5 @@
+/* All necessary imports for player, they live here for easier import to platform later */
+@import "./tailwind.css";
+@import "./styles.css";
+@import "./modals.css";
+@import "./inline-avatars.css";
