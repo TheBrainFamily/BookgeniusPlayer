@@ -213,7 +213,7 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
 };
 
 export const useAppReady = () => {
-  const { ready } = useVideoReadiness({ videoTimeoutMs: 30000, minSplashMs: 1500, postReadyDelayMs: 100 });
+  const { ready } = useVideoReadiness({ videoTimeoutMs: 30000, minSplashMs: 100, postReadyDelayMs: 100 });
   const { loadImages } = useImageReadiness({ imageTimeoutMs: 30000 });
 
   useEffect(() => {

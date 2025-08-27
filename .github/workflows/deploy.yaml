@@ -163,6 +163,9 @@ jobs:
           BRANCHES_DISTRIBUTION_ID: ${{ vars.BRANCHES_DISTRIBUTION_ID }}
           PROD_DISTRIBUTION_ID: ${{ vars.PROD_DISTRIBUTION_ID }}
           IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
+          AWS_REGION: us-east-1
+          REBUILD_ALL: ${{ env.REBUILD_ALL }}
+          CHANGED_BOOKS: ${{ env.CHANGED_BOOKS }}
         run: bash ./update.sh
       - name: Emit deployed books list
         # only when some books were considered (changed or all)

@@ -24,7 +24,6 @@ export interface ApiEuStackProps extends StackProps {
   clerkSecretKey: string;
   jwtPublicKey: string;
   tokenTtlSeconds: number;
-  hostedZoneId?: string;
 }
 
 export class ApiEuStack extends Stack {

@@ -27,11 +27,12 @@ export interface WebStackProps extends StackProps {
   domainStage?: string;
   publicKeyFilePath: string;
   cfPrivateKeySecretName: string;
+  jwtPrivateKeySecretName: string;
   tokenTtlSeconds: number;
   clerkSecretKey: string;
   jwtPublicKey: string;
-  bucketName?: string;
-  hostedZoneId?: string;
+  bucketName: string;
+  isStaging: boolean;
 }
 
 export class WebStack extends Stack {
@@ -52,9 +53,10 @@ export class WebStack extends Stack {
     const certApiProd = new acm.DnsValidatedCertificate(this, "ApiCertProd", { domainName: `api.${props.domainProd}`, hostedZone: zoneProd, region: "us-east-1" });
 
     // ===== S3 bucket (private) =====
-    const bucket = props.bucketName
+    const bucket = props.isStaging
       ? s3.Bucket.fromBucketName(this, "ContentBucket", props.bucketName)
       : new s3.Bucket(this, "ContentBucket", {
+          bucketName: props.bucketName,
           blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
           encryption: s3.BucketEncryption.S3_MANAGED,
           enforceSSL: true,
@@ -99,6 +101,18 @@ export class WebStack extends Stack {
     // ===== /resolve Lambda (created early for Function URLs) =====
     const pubPem = fs.readFileSync(path.resolve(props.publicKeyFilePath), "utf8");
     const publicKey = new cf.PublicKey(this, "CfPublicKey", { encodedKey: pubPem });
+
+    const authFn = new lnode.NodejsFunction(this, "AuthFn", {
+      entry: path.resolve("dist/runtime/auth-lambda.js"),
+      runtime: lambda.Runtime.NODEJS_20_X,
+      memorySize: 1536,
+      timeout: Duration.seconds(10),
+    });
+    const jwtPriv = secrets.Secret.fromSecretNameV2(this, "JwtPrivateKeySecret", props.jwtPrivateKeySecretName);
+    authFn.addEnvironment("JWT_PRIVATE_KEY_PEM", jwtPriv.secretValue.unsafeUnwrap());
+    authFn.addEnvironment("AWS_NODEJS_CONNECTION_REUSE_ENABLED", "1");
+    const authFnUrlProd = authFn.addFunctionUrl({ authType: lambda.FunctionUrlAuthType.NONE });
+    const authFnOriginHostProd = Fn.select(2, Fn.split("/", authFnUrlProd.url));
 
     const resolveFn = new lnode.NodejsFunction(this, "ResolveFn", {
       entry: path.resolve("dist/runtime/resolve-lambda.js"),
@@ -158,6 +172,20 @@ export class WebStack extends Stack {
       allowedMethods: cf.AllowedMethods.ALLOW_ALL,
       viewerProtocolPolicy: cf.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       functionAssociations: [{ function: routerFn, eventType: cf.FunctionEventType.VIEWER_REQUEST }],
+    });
+
+    const AuthFnOriginProd = new origins.HttpOrigin(authFnOriginHostProd, { protocolPolicy: cf.OriginProtocolPolicy.HTTPS_ONLY, originSslProtocols: [cf.OriginSslPolicy.TLS_V1_2] });
+    appDistProd.addBehavior("/login", AuthFnOriginProd, {
+      cachePolicy: cf.CachePolicy.CACHING_DISABLED, // This forwards Authorization header
+      originRequestPolicy: cf.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER, // Forwards all headers except Host
+      allowedMethods: cf.AllowedMethods.ALLOW_ALL,
+      viewerProtocolPolicy: cf.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+    });
+    appDistProd.addBehavior("/logout", AuthFnOriginProd, {
+      cachePolicy: cf.CachePolicy.CACHING_DISABLED, // This forwards Authorization header
+      originRequestPolicy: cf.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER, // Forwards all headers except Host
+      allowedMethods: cf.AllowedMethods.ALLOW_ALL,
+      viewerProtocolPolicy: cf.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
     });
 
     // DNS for PROD app

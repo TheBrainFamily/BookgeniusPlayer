@@ -26,7 +26,6 @@ export interface AnswerServerStackProps extends StackProps {
   s3Region?: string;
   geminiSecret: string;
   jwtPublicKey: string;
-  hostedZoneId?: string;
 }
 
 export class AnswerServerStack extends Stack {
