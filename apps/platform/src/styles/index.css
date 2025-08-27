@@ -1,0 +1,13 @@
+/* Only one tailwind initialization for application */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Scan platform */
+@source "../**/*.{ts,tsx,js,jsx,html}";
+
+/* Scan player */
+@source "../../../player/src/**/*.{ts,tsx,js,jsx,html}";
+
+/* Styling imports */
+@import "./tailwind.css";
+@import "./styles.css";

@@ -136,11 +136,25 @@ const WrappedPlayerApp = () => {
   }, []);
 
   useEffect(() => {
-    const bodyId = isPlayerReady ? "player-scope" : "platform-scope";
-    document.body.id = bodyId;
+    const playerScopeElement = document.getElementById("player-scope");
+    const platformScopeElement = document.getElementById("platform-scope");
+
+    if (isPlayerReady) {
+      if (playerScopeElement) {
+        playerScopeElement.classList.add("visible");
+      }
+      if (platformScopeElement) {
+        platformScopeElement.classList.remove("visible");
+      }
+    }
 
     return () => {
-      document.body.id = "platform-scope";
+      if (playerScopeElement) {
+        playerScopeElement.classList.remove("visible");
+      }
+      if (platformScopeElement) {
+        platformScopeElement.classList.add("visible");
+      }
     };
   }, [isPlayerReady]);
 

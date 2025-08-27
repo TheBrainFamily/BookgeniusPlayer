@@ -24,8 +24,7 @@
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
     <style>
-      #platform-scope,
-      #player-scope {
+      body {
         background-color: #2d2d2d;
         min-height: 100vh;
       }
@@ -43,29 +42,33 @@
     </style>
   </head>
 
-  <body id="platform-scope">
-    <div id="root"></div>
-
-    <video id="cutscene-video" class="cutscene-video" playsinline></video>
-
-    <div id="legacy">
-      <video id="bg-video-a" class="bg-element" autoplay muted loop playsinline></video>
-      <video id="bg-video-b" class="bg-element faded" autoplay muted loop playsinline></video>
-
-      <div id="bg-image-a" class="bg-element faded"></div>
-      <div id="bg-image-b" class="bg-element faded"></div>
-
-      <p id="cutscene-text"></p>
-      <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 sm:pr-0 xl:px-4 sm:pl-4 max-w-[120rem] w-full">
-        <div id="left-notes" class="hidden sm:block sm:flex-1 max-w-[700px] content-center overflow-y-auto"></div>
-        <div id="content-container" class="sm:flex-3 max-w-[900px]"></div>
-        <div id="right-notes" class="hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none">
-          <div id="right-notes-scrollable-container"></div>
-        </div>
-      </div>
+  <body>
+    <div id="platform-scope" class="visible">
+      <div id="root"></div>
     </div>
 
-    <div id="root-player"></div>
+    <div id="player-scope">
+      <video id="cutscene-video" class="cutscene-video" playsinline></video>
+
+      <div id="legacy">
+        <video id="bg-video-a" class="bg-element" autoplay muted loop playsinline></video>
+        <video id="bg-video-b" class="bg-element faded" autoplay muted loop playsinline></video>
+
+        <div id="bg-image-a" class="bg-element faded"></div>
+        <div id="bg-image-b" class="bg-element faded"></div>
+
+        <p id="cutscene-text"></p>
+        <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 sm:pr-0 xl:px-4 sm:pl-4 max-w-[120rem] w-full">
+          <div id="left-notes" class="hidden sm:block sm:flex-1 max-w-[700px] content-center overflow-y-auto"></div>
+          <div id="content-container" class="sm:flex-3 max-w-[900px]"></div>
+          <div id="right-notes" class="hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none">
+            <div id="right-notes-scrollable-container"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="root-player"></div>
+    </div>
 
     <script type="module" src="/src/main.tsx"></script>
   </body>
