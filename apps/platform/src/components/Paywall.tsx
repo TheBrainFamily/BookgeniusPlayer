@@ -53,7 +53,7 @@ export const PaywallInner: React.FC<PaywallProps> = ({ bookSlug, bookTitle, onCl
 
             <div className="grid md:grid-cols-2 gap-6">
               {/* One-time Purchase */}
-              <Card className="border-2 hover:border-library-gold/50 transition-colors">
+              <Card className="border-2 hover:border-library-gold/50 transition-colors flex flex-col">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <BookOpen className="h-8 w-8 text-library-gold" />
@@ -64,8 +64,8 @@ export const PaywallInner: React.FC<PaywallProps> = ({ bookSlug, bookTitle, onCl
                   <CardTitle className="text-xl">Purchase This Book</CardTitle>
                   <div className="text-3xl font-bold text-library-gold">$9.99</div>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <ul className="space-y-2">
+                <CardContent className="flex flex-col flex-grow space-y-4">
+                  <ul className="space-y-2 flex-grow">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500" />
                       <span className="text-sm">Lifetime access to {bookTitle}</span>
@@ -84,7 +84,7 @@ export const PaywallInner: React.FC<PaywallProps> = ({ bookSlug, bookTitle, onCl
                     </li>
                   </ul>
                   <Button
-                    className="w-full bg-library-walnut hover:bg-library-gold hover:text-library-mahogany"
+                    className="w-full bg-library-walnut hover:bg-library-gold hover:text-library-mahogany mt-auto"
                     onClick={() => handlePayment("one_time", bookSlug)}
                     disabled={!isUserLoggedIn || loading === "one_time"}
                   >
@@ -95,7 +95,7 @@ export const PaywallInner: React.FC<PaywallProps> = ({ bookSlug, bookTitle, onCl
               </Card>
 
               {/* Subscription */}
-              <Card className="border-2 border-library-gold relative">
+              <Card className="border-2 border-library-gold relative flex flex-col">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <Badge className="bg-library-gold text-library-mahogany px-4 py-1">
                     <Crown className="h-3 w-3 mr-1" />
@@ -112,8 +112,8 @@ export const PaywallInner: React.FC<PaywallProps> = ({ bookSlug, bookTitle, onCl
                     $19.99<span className="text-base font-normal text-muted-foreground">/month</span>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <ul className="space-y-2">
+                <CardContent className="flex flex-col flex-grow space-y-4">
+                  <ul className="space-y-2 flex-grow">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500" />
                       <span className="text-sm">Access to entire library</span>
@@ -136,7 +136,7 @@ export const PaywallInner: React.FC<PaywallProps> = ({ bookSlug, bookTitle, onCl
                     </li>
                   </ul>
                   <Button
-                    className="w-full bg-library-gold hover:bg-library-gold/90 text-library-mahogany"
+                    className="w-full bg-library-gold hover:bg-library-gold/90 text-library-mahogany mt-auto"
                     onClick={() => handlePayment("subscription", bookSlug)}
                     disabled={!isUserLoggedIn || loading === "subscription"}
                   >
