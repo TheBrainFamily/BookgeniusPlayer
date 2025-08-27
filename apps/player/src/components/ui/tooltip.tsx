@@ -20,8 +20,13 @@ function TooltipTrigger({ ...props }: React.ComponentProps<typeof TooltipPrimiti
 }
 
 function TooltipContent({ className, sideOffset = 0, children, ...props }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+  const container = React.useMemo<HTMLElement | undefined>(() => {
+    if (typeof window === "undefined") return undefined;
+    return document.getElementById("player-scope") ?? undefined;
+  }, []);
+
   return (
-    <TooltipPrimitive.Portal container={document.querySelector("#player-scope")!}>
+    <TooltipPrimitive.Portal container={container}>
       <TooltipPrimitive.Content
         data-slot="tooltip-content"
         sideOffset={sideOffset}
