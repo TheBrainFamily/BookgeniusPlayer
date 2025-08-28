@@ -211,7 +211,11 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
     } else {
       // Fallback: if no sentence span found, try to get surrounding context
       let context = "";
-      const current = characterElement;
+      let current = characterElement;
+      const currentHasNoWrap = current.closest("span.text-nowrap");
+      if (currentHasNoWrap) {
+        current = currentHasNoWrap;
+      }
 
       // Get up to 10 words before
       let wordsBefore = [];
