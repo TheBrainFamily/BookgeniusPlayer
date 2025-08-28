@@ -235,17 +235,29 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
     filter 0.3s ease,
     transform 0.3s ease;
   transform-origin: center center;
+
+  div,
+  div {
+    width: 100%;
+    padding-bottom: 0;
+
+    .title {
+      padding: 0.2em 0.1em;
+      border: none;
+    }
+
+    div {
+      padding: 0;
+    }
+
+    h4 {
+      font-size: clamp(0.25rem, 1vw, 0.6rem);
+    }
+  }
 }
 
 .characters-on-stage-panel .speaking:hover,
 .characters-on-stage-panel .not-speaking:hover {
   filter: none;
   transform: scale(1.1);
-}
-
-.characters-on-stage-panel .speaking div,
-.characters-on-stage-panel .not-speaking div {
-  width: 100%;
-  height: 100%;
-  padding-bottom: 0;
 }
