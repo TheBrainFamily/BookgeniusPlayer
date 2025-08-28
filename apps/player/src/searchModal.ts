@@ -70,7 +70,7 @@ export async function performUnifiedSearch(
         percentInChapter: calculatePercentInChapter(match.paragraphNumber, totalParagraphsInChapter),
         summary: match.summary,
         text: createContextualSummary(match.text, query, 75),
-        id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}}`,
+        id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}`,
       };
     });
 
