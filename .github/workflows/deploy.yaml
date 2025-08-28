@@ -106,6 +106,7 @@ jobs:
             include=$(printf 'apps/player/public_books/%s/**,' "${arr[@]}")
             git lfs pull -I "${include%,}"
           fi
+          git lfs pull -I "apps/platform/**"
 
       - name: Export change set
         run: |
