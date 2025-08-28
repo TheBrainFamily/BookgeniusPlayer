@@ -145,10 +145,13 @@ jobs:
       - name: Build snapplify platform
         run: pnpm build:platform
         env:
-          VITE_AUTH_PROVIDER: "default"
+          VITE_AUTH_PROVIDER: "snapplify"
           VITE_PAYMENTS_PROVIDER: "default"
-          VITE_SUPPORT_EMAIL: support@snapplify.com
-          CI: true
+          VITE_SUPPORT_EMAIL: "support@snapplify.com"
+          VITE_SNAPPLIFY_CLIENT_ID: "bookgenius.net"
+          VITE_SNAPPLIFY_ISSUER: "https://auth.snapplify.com"
+          VITE_SNAPPLIFY_REDIRECT_URI: "https://bookgenius.snapplify.com/auth/callback"
+          CI: "true"
 
       - name: move snapplify platform to dist
         run: mv apps/platform/dist apps/platform/dist-snapplify
