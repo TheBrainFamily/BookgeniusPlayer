@@ -188,7 +188,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                               </span>
                             </div>
                             <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
-                              {t("paragraph")} {appearance.paragraphNumber}
+                              {appearance.percentInChapter}% {t("of_chapter")}
                             </div>
                           </div>
 

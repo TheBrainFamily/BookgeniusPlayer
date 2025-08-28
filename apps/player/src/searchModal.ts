@@ -7,6 +7,7 @@ import { getBookData } from "./genericBookDataGetters/getBookData";
 export interface SearchResultItemData {
   chapter: number;
   paragraphNumber: number;
+  percentInChapter: number;
   summary: string;
   text?: string;
   id: string; // For React keys
@@ -61,13 +62,17 @@ export async function performUnifiedSearch(
       header = `No matches found for "${query}" (context: Ch. ${currentLocation.chapter}, P. ${currentLocation.paragraph})`;
     }
 
-    const items: SearchResultItemData[] = serverMatches.map((match, index) => ({
-      chapter: match.chapter,
-      paragraphNumber: match.paragraphNumber,
-      summary: match.summary,
-      text: createContextualSummary(match.text, query, 75),
-      id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}}`,
-    }));
+    const items: SearchResultItemData[] = serverMatches.map((match, index) => {
+      const totalParagraphsInChapter = getTotalParagraphsInChapter(match.chapter);
+      return {
+        chapter: match.chapter,
+        paragraphNumber: match.paragraphNumber,
+        percentInChapter: totalParagraphsInChapter > 0 ? Math.round((match.paragraphNumber / totalParagraphsInChapter) * 100) : 0,
+        summary: match.summary,
+        text: createContextualSummary(match.text, query, 75),
+        id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}}`,
+      };
+    });
 
     return { header, items, isLoading: false };
   } catch (error) {
@@ -160,9 +165,12 @@ export function performCachedSearch(query: string, currentLocation: Location): S
           }
         }
 
+        const totalParagraphsInChapter = getTotalParagraphsInChapter(chapterIdNum);
+
         items.push({
           chapter: chapterIdNum,
           paragraphNumber: paragraphNumber,
+          percentInChapter: totalParagraphsInChapter > 0 ? Math.round((paragraphNumber / totalParagraphsInChapter) * 100) : 0,
           summary: createContextualSummary(paragraphText, query),
           id: `cached-search-${chapterIdNum}-${paragraphNumber}}-`,
         });
@@ -182,6 +190,19 @@ export function cleanupSearchChapters(): void {
     searchContainer.remove();
   }
 }
+
+const getTotalParagraphsInChapter = (chapterNumber: number): number => {
+  try {
+    const chapterSection = document.querySelector(`section[data-chapter="${chapterNumber}"]`);
+    if (!chapterSection) {
+      return 0;
+    }
+    return chapterSection.querySelectorAll("[data-index]").length;
+  } catch (error) {
+    console.error(`Error getting paragraph count for chapter ${chapterNumber}:`, error);
+    return 0;
+  }
+};
 
 const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) => {
   // Create a temporary DOM element to properly parse the HTML
@@ -304,6 +325,8 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
       }
 
       knownCharacterHistory.forEach(({ chapter, paragraphs }) => {
+        const totalParagraphsInChapter = getTotalParagraphsInChapter(chapter);
+
         paragraphs.forEach((paragraph) => {
           const paragraphInnerHTML = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`).innerHTML;
 
@@ -317,6 +340,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
             items.push({
               chapter,
               paragraphNumber: paragraph,
+              percentInChapter: totalParagraphsInChapter > 0 ? Math.round((paragraph / totalParagraphsInChapter) * 100) : 0,
               summary: highlightMatchedWords(summaryText, characterSlug),
               text: highlightMatchedWords(displayText, characterSlug),
               id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}}`,
