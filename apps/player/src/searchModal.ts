@@ -172,7 +172,7 @@ export function performCachedSearch(query: string, currentLocation: Location): S
           paragraphNumber: paragraphNumber,
           percentInChapter: totalParagraphsInChapter > 0 ? Math.round((paragraphNumber / totalParagraphsInChapter) * 100) : 0,
           summary: createContextualSummary(paragraphText, query),
-          id: `cached-search-${chapterIdNum}-${paragraphNumber}}-`,
+          id: `cached-search-${chapterIdNum}-${paragraphNumber}`,
         });
       }
     }
