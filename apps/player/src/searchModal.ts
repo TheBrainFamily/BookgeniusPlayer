@@ -67,7 +67,7 @@ export async function performUnifiedSearch(
       return {
         chapter: match.chapter,
         paragraphNumber: match.paragraphNumber,
-        percentInChapter: totalParagraphsInChapter > 0 ? Math.round((match.paragraphNumber / totalParagraphsInChapter) * 100) : 0,
+        percentInChapter: calculatePercentInChapter(match.paragraphNumber, totalParagraphsInChapter),
         summary: match.summary,
         text: createContextualSummary(match.text, query, 75),
         id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}}`,
@@ -143,6 +143,8 @@ export function performCachedSearch(query: string, currentLocation: Location): S
     // Only search up to the current location
     if (chapterIdNum > currentLocation.chapter) continue;
 
+    const totalParagraphsInChapter = getTotalParagraphsInChapter(chapterIdNum);
+
     const chapterCache = textCache[chapterIdNum];
     // Iterate over cached paragraphs
     for (const pIndex in chapterCache) {
@@ -165,12 +167,10 @@ export function performCachedSearch(query: string, currentLocation: Location): S
           }
         }
 
-        const totalParagraphsInChapter = getTotalParagraphsInChapter(chapterIdNum);
-
         items.push({
           chapter: chapterIdNum,
           paragraphNumber: paragraphNumber,
-          percentInChapter: totalParagraphsInChapter > 0 ? Math.round((paragraphNumber / totalParagraphsInChapter) * 100) : 0,
+          percentInChapter: calculatePercentInChapter(paragraphNumber, totalParagraphsInChapter),
           summary: createContextualSummary(paragraphText, query),
           id: `cached-search-${chapterIdNum}-${paragraphNumber}`,
         });
@@ -202,6 +202,13 @@ const getTotalParagraphsInChapter = (chapterNumber: number): number => {
     console.error(`Error getting paragraph count for chapter ${chapterNumber}:`, error);
     return 0;
   }
+};
+
+const calculatePercentInChapter = (paragraphNumber: number, totalParagraphs: number): number => {
+  if (totalParagraphs <= 0) {
+    return 0;
+  }
+  return Math.round((paragraphNumber / totalParagraphs) * 100);
 };
 
 const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) => {
@@ -340,7 +347,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
             items.push({
               chapter,
               paragraphNumber: paragraph,
-              percentInChapter: totalParagraphsInChapter > 0 ? Math.round((paragraph / totalParagraphsInChapter) * 100) : 0,
+              percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
               summary: highlightMatchedWords(summaryText, characterSlug),
               text: highlightMatchedWords(displayText, characterSlug),
               id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
