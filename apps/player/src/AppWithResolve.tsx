@@ -11,6 +11,15 @@ function getBookFromUrl(): string | null {
   }
 }
 
+function getTokenFromUrl(): string | null {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("token");
+  } catch {
+    return null;
+  }
+}
+
 const AppWithResolveProd: React.FC = () => {
   const [assetBaseReady, setAssetBaseReady] = useState(false);
   const [searchKey, setSearchKey] = useState(() => window.location.search);
@@ -24,18 +33,6 @@ const AppWithResolveProd: React.FC = () => {
       window.removeEventListener("popstate", onPopState);
       window.removeEventListener("hashchange", onPopState);
     };
-  }, []);
-
-  useEffect(() => {
-    const onReady = () => {
-      try {
-        window.dispatchEvent(new CustomEvent("splashHidden"));
-      } catch {
-        // no-op
-      }
-    };
-    window.addEventListener("appReady", onReady);
-    return () => window.removeEventListener("appReady", onReady);
   }, []);
 
   useEffect(() => {
@@ -59,7 +56,8 @@ const AppWithResolveProd: React.FC = () => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/core/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
+        const token = getTokenFromUrl();
+        const res = await fetch(`/api/core/content/resolve/${encodeURIComponent(book)}?token=${token}`, { cache: "no-store" });
         if (!res.ok) throw new Error("[RESOLVE] resolve failed");
         const { signedAssetBase, assetPrefix, assetQuery } = await res.json();
 
