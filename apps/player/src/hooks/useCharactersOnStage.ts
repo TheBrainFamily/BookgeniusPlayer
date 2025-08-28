@@ -8,7 +8,7 @@ export function useCharactersOnStage(allCharacters: CharacterData[]): CharacterD
   const charactersOnStage = useMemo(() => {
     if (!location) return [];
 
-    const { chapter: currentChapter, paragraph: currentParagraph } = location;
+    const { currentChapter, currentParagraph } = location;
 
     return allCharacters.filter((character) => {
       const info = character.infoPerChapter.find((info) => info.chapter === currentChapter);
