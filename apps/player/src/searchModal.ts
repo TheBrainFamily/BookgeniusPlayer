@@ -191,18 +191,30 @@ export function cleanupSearchChapters(): void {
   }
 }
 
-const getTotalParagraphsInChapter = (chapterNumber: number): number => {
-  try {
-    const chapterSection = document.querySelector(`section[data-chapter="${chapterNumber}"]`);
-    if (!chapterSection) {
+const getTotalParagraphsInChapter = (() => {
+  const cache = new Map<number, number>();
+
+  return (chapterNumber: number): number => {
+    if (cache.has(chapterNumber)) {
+      return cache.get(chapterNumber)!;
+    }
+
+    try {
+      const chapterSection = document.querySelector(`section[data-chapter="${chapterNumber}"]`);
+      if (!chapterSection) {
+        cache.set(chapterNumber, 0);
+        return 0;
+      }
+      const count = chapterSection.querySelectorAll("[data-index]").length;
+      cache.set(chapterNumber, count);
+      return count;
+    } catch (error) {
+      console.error(`Error getting paragraph count for chapter ${chapterNumber}:`, error);
+      // Don't cache on error to allow for retries.
       return 0;
     }
-    return chapterSection.querySelectorAll("[data-index]").length;
-  } catch (error) {
-    console.error(`Error getting paragraph count for chapter ${chapterNumber}:`, error);
-    return 0;
-  }
-};
+  };
+})();
 
 const calculatePercentInChapter = (paragraphNumber: number, totalParagraphs: number): number => {
   if (totalParagraphs <= 0) {
