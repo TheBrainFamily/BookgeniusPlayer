@@ -343,7 +343,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
               percentInChapter: totalParagraphsInChapter > 0 ? Math.round((paragraph / totalParagraphsInChapter) * 100) : 0,
               summary: highlightMatchedWords(summaryText, characterSlug),
               text: highlightMatchedWords(displayText, characterSlug),
-              id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}}`,
+              id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
             });
           }
         });
