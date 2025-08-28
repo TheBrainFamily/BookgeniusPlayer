@@ -43,7 +43,7 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   };
 
   return (
-    <section className="py-16 px-0 md:px-8">
+    <section className="py-16 px-0 md:px-8 m-auto max-w-[400px] sm:max-w-[1400px]">
       <div className="mx-auto px-0">
         <div className="text-center mb-12 px-4 md:px-0">
           <h2 className="text-4xl font-bold text-foreground mb-4">
@@ -70,7 +70,7 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
             <p className="text-sm text-muted-foreground mt-2">Try searching for a different title, author, or genre</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 px-4 md:px-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 px-4 md:px-0">
             {filteredBooks.map((book) => (
               <Card
                 key={book.id}
