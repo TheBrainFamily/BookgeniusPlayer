@@ -20,6 +20,7 @@ type CharacterCardProps = { entity: ParsedParagraphRange; currentSpeakers: strin
 const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, disableHighlight = false, imageOnly = false, captionMode = "always" }) => {
   const { openModal } = useCharacterModal();
   const { highlightParagraphs, isScrollingLocked } = useHighlight();
+  const bookSlug = bookDataLoader.getCurrentBook();
 
   const cardRef = useRef<HTMLDivElement>(null);
   const rafIdRef = useRef<number | null>(null);
@@ -32,25 +33,23 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
   const isTalkingInCurrentRange = useMemo(() => currentSpeakers.includes(entity.slug), [currentSpeakers, entity.slug]);
 
   const mediaSrc = useMemo(() => {
-    const book = bookDataLoader.getCurrentBook();
     if (imageOnly) {
-      const base = entity.imageUrl || getListeningMediaFilePathForName(entity.slug, book);
+      const base = entity.imageUrl || getListeningMediaFilePathForName(entity.slug, bookSlug);
       return getPlaceholderFromVideoUrl(base);
     }
 
-    return isTalkingInCurrentRange ? getTalkingMediaFilePathForName(entity.slug, book) : getListeningMediaFilePathForName(entity.slug, book);
+    return isTalkingInCurrentRange ? getTalkingMediaFilePathForName(entity.slug, bookSlug) : getListeningMediaFilePathForName(entity.slug, bookSlug);
   }, [imageOnly, entity.imageUrl, entity.slug, isTalkingInCurrentRange]);
 
   const isVideo = imageOnly ? false : isVideoFile(mediaSrc);
 
   const modalMediaSrc = useMemo(() => {
-    const book = bookDataLoader.getCurrentBook();
     if (imageOnly) {
-      return isTalkingInCurrentRange ? getTalkingMediaFilePathForName(entity.slug, book) : getListeningMediaFilePathForName(entity.slug, book);
+      return isTalkingInCurrentRange ? getTalkingMediaFilePathForName(entity.slug, bookSlug) : getListeningMediaFilePathForName(entity.slug, bookSlug);
     }
 
     return mediaSrc;
-  }, [imageOnly, isTalkingInCurrentRange, entity.slug, mediaSrc]);
+  }, [imageOnly, isTalkingInCurrentRange, entity.slug, mediaSrc, bookSlug]);
 
   const modalIsVideo = isVideoFile(modalMediaSrc);
 
