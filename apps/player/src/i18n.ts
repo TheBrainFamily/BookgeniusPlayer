@@ -3,7 +3,7 @@ import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import resourcesToBackend from "i18next-resources-to-backend";
 
-export const i18n: I18nInstance = i18next.createInstance();
+const i18n: I18nInstance = i18next.createInstance();
 
 i18n
   .use(LanguageDetector)
