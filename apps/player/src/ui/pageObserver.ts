@@ -9,7 +9,7 @@ import { CharacterModalParams } from "@player/stores/modals/characterModal.store
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
 import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers, drawElementsUnion } from "./devVisualizers";
 
-const DEV_ZONE_VISUALIZERS_ENABLED = false;
+const DEV_ZONE_VISUALIZERS_ENABLED = true;
 
 // Cache isPlayFormat at module level to avoid repeated getBookData() calls
 let cachedIsPlayFormat: boolean | null = null;
@@ -430,7 +430,7 @@ export function setupPageObserver(
     const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
     const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
 
-    if (DEV_ZONE_VISUALIZERS_ENABLED && rangeVisualizer) {
+    if (DEV_ZONE_VISUALIZERS_ENABLED) {
       drawFocusZone(rangeVisualizer, rootEl, focusZoneTop, focusZoneBottom);
     }
 
@@ -524,8 +524,11 @@ export function setupPageObserver(
     chosenElement?.classList.add("active-paragraph");
 
     if (DEV_ZONE_VISUALIZERS_ENABLED) {
-      if (chosenElement) drawActiveElement(activeElementVisualizer, chosenElement);
-      else hideVisualizer(activeElementVisualizer);
+      if (chosenElement) {
+        drawActiveElement(activeElementVisualizer, chosenElement);
+      } else {
+        hideVisualizer(activeElementVisualizer);
+      }
     }
 
     if (intersectingPages.size > 0) {
@@ -537,7 +540,7 @@ export function setupPageObserver(
       });
 
       if (focusedPages.length > 0) {
-        if (rangeVisualizer && DEV_ZONE_VISUALIZERS_ENABLED) {
+        if (DEV_ZONE_VISUALIZERS_ENABLED) {
           drawElementsUnion(rangeVisualizer, focusedPages);
         }
 
@@ -673,8 +676,9 @@ export function setupPageObserver(
         }
       } else {
         // Handle case where intersecting pages exist, but none are in the focus zone
-        if (rangeVisualizer && DEV_ZONE_VISUALIZERS_ENABLED) {
-          rangeVisualizer.style.opacity = "0";
+        if (DEV_ZONE_VISUALIZERS_ENABLED) {
+          hideVisualizer(rangeVisualizer);
+          hideVisualizer(activeElementVisualizer);
         }
 
         if (currentlyActivePageElement !== null) {
@@ -686,8 +690,9 @@ export function setupPageObserver(
       }
     } else {
       // Handle case where no pages are intersecting the viewport at all
-      if (rangeVisualizer && DEV_ZONE_VISUALIZERS_ENABLED) {
-        rangeVisualizer.style.opacity = "0";
+      if (DEV_ZONE_VISUALIZERS_ENABLED) {
+        hideVisualizer(rangeVisualizer);
+        hideVisualizer(activeElementVisualizer);
       }
 
       if (currentlyActivePageElement !== null) {
@@ -698,6 +703,8 @@ export function setupPageObserver(
   };
 
   const scheduledProcessIntersections = makeRafScheduler(processIntersections);
+  window.addEventListener("resize", scheduledProcessIntersections);
+  window.addEventListener("orientationchange", scheduledProcessIntersections);
 
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
@@ -838,6 +845,8 @@ export function setupPageObserver(
   const cleanup = () => {
     spacerObserver.disconnect();
     observer.disconnect();
+    window.removeEventListener("resize", scheduledProcessIntersections);
+    window.removeEventListener("orientationchange", scheduledProcessIntersections);
 
     if (DEV_ZONE_VISUALIZERS_ENABLED) {
       hideVisualizer(activeElementVisualizer);
