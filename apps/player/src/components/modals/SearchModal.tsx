@@ -116,6 +116,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                                 className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20 bg-gradient-to-br from-book-primary-5 to-book-secondary-5 hover:from-book-primary-10 hover:to-book-secondary-10 transition-all duration-200"
                                 variants={variants.item}
                                 whileTap="tap"
+                                whileHover="hover"
                                 onClick={() => handleSearchResultClick(item)}
                                 transition={{ delay: (chapterIndex * items.length + index) * 0.03 }}
                               >
