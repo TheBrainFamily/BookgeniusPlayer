@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { createPortal } from "react-dom";
 
 import { useRouteTransition } from "./providers/RouteTransitionProvider";
+import { books } from "@platform/books";
 import { bookDataLoader } from "../../player/src/services/bookDataLoader";
 import Paywall from "./components/Paywall";
 import { teardownPlayer } from "../../player/src/teardown";
@@ -18,7 +19,7 @@ const WrappedPlayerApp = () => {
   const [paywallVisible, setPaywallVisible] = useState(false);
   const [bookSlug, setBookSlug] = useState("");
   const [bookTitle, setBookTitle] = useState("");
-  const { finishTransition } = useRouteTransition();
+  const { startTransition, finishTransition, navigating } = useRouteTransition();
   const lastBookRef = useRef<string | null>(null);
   const [paywallMounted, setPaywallMounted] = useState(false);
   const paywallHostRef = useRef<HTMLDivElement | null>(null);
@@ -62,8 +63,20 @@ const WrappedPlayerApp = () => {
     return () => window.removeEventListener("appReady", onReady);
   }, [finishTransition]);
 
+  const book = searchParams.get("book");
+  // Ensure loader shows on direct loads to /reader/?book=...
   useEffect(() => {
-    const book = searchParams.get("book");
+    if (!book) return;
+
+    // If navigation already started elsewhere (e.g., clicking from catalog), don't restart it
+
+    const meta = books.find((b) => b.slug === book);
+    const title = meta?.title ?? "BookGenius";
+    const phrases = meta?.phrases ?? [];
+    startTransition({ title, phrases, author: meta?.author });
+  }, [book, startTransition]);
+
+  useEffect(() => {
     if (book !== lastBookRef.current) {
       lastBookRef.current = book;
       bookDataLoader.resetCurrentBook();
@@ -108,7 +121,7 @@ const WrappedPlayerApp = () => {
         cancelled = true;
       };
     }
-  }, [searchParams]);
+  }, [book]);
 
   // On unmount (leaving /reader), fully tear down the player environment
   useEffect(() => {
