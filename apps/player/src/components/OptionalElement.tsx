@@ -100,6 +100,7 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
       onMouseLeave={handleMouseLeave}
       ref={elementRef}
       className={cn("transition-opacity", className)}
+      aria-hidden={!isElementVisible}
       style={{
         opacity: isElementVisible ? 1 : 0,
         // Always allow pointer events on desktop, and on mobile only disable when truly hidden
