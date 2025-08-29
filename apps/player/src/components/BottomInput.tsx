@@ -211,6 +211,21 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     [updateLastActivity, isSearchModalOpen, isDeepResearchActive, openSearchModal, value],
   );
 
+  const handleInputClick = useCallback(
+    (_e: React.MouseEvent<HTMLInputElement>) => {
+      // Ensure the element is visible before focusing
+      updateLastActivity();
+
+      // Defer focus until after the next repaint to ensure visibility is updated
+      requestAnimationFrame(() => {
+        if (inputRef.current && document.activeElement !== inputRef.current) {
+          inputRef.current.focus();
+        }
+      });
+    },
+    [updateLastActivity],
+  );
+
   return (
     <OptionalElement className={cn("mb-2 transition-all duration-300 ease-out w-full flex justify-center", className)}>
       <motion.div
@@ -245,6 +260,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                   className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-80 pl-7 font-medium" : "")}
                   disabled={isRecording || isThinking}
                   autoComplete="off"
+                  onClick={handleInputClick}
                   onFocus={handleInputFocus}
                   onBlur={() => startAllTimers()}
                 />
