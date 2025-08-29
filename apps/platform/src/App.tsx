@@ -12,6 +12,7 @@ import { lazy, Suspense } from "react";
 import GenreExploration from "./components/GenreExploration";
 import BookExperience from "./components/BookExperience";
 import PaymentSuccess from "./components/PaymentSuccess";
+import AuthCallback from "@platform/pages/AuthCallback.tsx";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const AppWithAuth = () => {
           <Route path="/experience/:slug" element={<BookExperience />} />
           <Route path="/GenreExploration" element={<GenreExploration />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route
             path="/reader/"
             element={

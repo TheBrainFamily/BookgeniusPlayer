@@ -211,11 +211,16 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
     } else {
       // Fallback: if no sentence span found, try to get surrounding context
       let context = "";
-      const current = characterElement;
+      let current = characterElement;
+      const currentHasNoWrap = current.closest("span.text-nowrap");
+      if (currentHasNoWrap) {
+        current = currentHasNoWrap;
+      }
 
       // Get up to 10 words before
-      const wordsBefore = [];
+      let wordsBefore = [];
       let beforeElement = current.previousSibling;
+
       while (beforeElement && wordsBefore.length < 10) {
         if (beforeElement.nodeType === Node.TEXT_NODE || beforeElement.nodeType === Node.ELEMENT_NODE) {
           const words = beforeElement.textContent
@@ -230,7 +235,7 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
       const characterHTML = characterElement.outerHTML;
 
       // Get up to 10 words after
-      const wordsAfter = [];
+      let wordsAfter = [];
       let afterElement = current.nextSibling;
       while (afterElement && wordsAfter.length < 10) {
         if (afterElement.nodeType === Node.TEXT_NODE || afterElement.nodeType === Node.ELEMENT_NODE) {
@@ -243,10 +248,25 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
         afterElement = afterElement.nextSibling;
       }
 
+      let characterSlugMissingPunctuation = "";
+      if (wordsBefore.length === 0 || wordsAfter.length === 0) {
+        const words = tempDiv.textContent
+          .trim()
+          .split(/\s+/)
+          .filter((w) => w);
+
+        const characterSlugIndex = words.findIndex((word) => word.includes(characterSlug));
+        if (characterSlugIndex !== -1) {
+          characterSlugMissingPunctuation = words[characterSlugIndex].replace(characterSlug, "");
+          wordsBefore = words.slice(0, characterSlugIndex);
+          wordsAfter = words.slice(characterSlugIndex + 1);
+        }
+      }
+
       // Combine context
       const before = wordsBefore.slice(-5).join(" ");
       const after = wordsAfter.slice(0, 5).join(" ");
-      context = `${before ? before + " " : ""}${characterHTML}${after ? " " + after : ""}`;
+      context = `${before ? before + " " : ""}${characterHTML}${characterSlugMissingPunctuation}${after ? " " + after : ""}`;
 
       if (context.trim()) {
         results.push(context.trim());
@@ -288,6 +308,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
           const paragraphInnerHTML = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`).innerHTML;
 
           const sentence = getSentenceWithCharacterSpan(paragraphInnerHTML, characterSlug);
+
           if (sentence) {
             const cleanText = sentence.replace(/<[^>]*>/g, "");
             const summaryText = cleanText.length > 300 ? cleanText.substring(0, 300) : cleanText;

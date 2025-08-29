@@ -1,4 +1,4 @@
-import { Search, BookOpen, Settings } from "lucide-react";
+import { Search, BookOpen, Settings, LogOut } from "lucide-react";
 import { Button } from "@platform/components/ui/button";
 import { Input } from "@platform/components/ui/input";
 import { ClientOnly } from "vite-react-ssg";
@@ -14,9 +14,9 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
 
   if (!authMod) return null;
 
-  const { ready, isSignedIn, openSignIn } = authMod.useAuth();
+  const { ready, isSignedIn, openSignIn, signOut } = authMod.useAuth();
   const UserWidget = authMod.useUserWidget?.();
-
+  const SignInWidget = authMod.useSignInWidget?.();
   return (
     <nav className="relative z-10 bg-card/90 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4 py-4">
@@ -46,26 +46,27 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
               {() => {
                 if (!ready) return null;
 
-                if (isSignedIn && UserWidget) {
-                  return (
-                    <>
-                      <UserWidget />
-                      <Button variant="ghost" size="icon" className="text-foreground hover:text-library-gold hover:bg-library-walnut/50">
-                        <Settings className="h-5 w-5" />
+                if (isSignedIn) {
+                  if (UserWidget) {
+                    return (
+                      <>
+                        <UserWidget />
+                        <Button variant="ghost" size="icon" className="text-foreground hover:text-library-gold hover:bg-library-walnut/50">
+                          <Settings className="h-5 w-5" />
+                        </Button>
+                      </>
+                    );
+                  } else {
+                    return (
+                      <Button onClick={() => signOut && signOut()} variant="outline">
+                        Sign Out
+                        <LogOut className="h-5 w-5" />
                       </Button>
-                    </>
-                  );
+                    );
+                  }
+                } else if (SignInWidget) {
+                  return <SignInWidget onClick={openSignIn} />;
                 }
-
-                if (!isSignedIn) {
-                  return (
-                    <Button onClick={openSignIn} variant="outline">
-                      Sign In
-                    </Button>
-                  );
-                }
-
-                return null;
               }}
             </ClientOnly>
           </div>
