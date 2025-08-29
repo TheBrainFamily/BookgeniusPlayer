@@ -215,30 +215,13 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     (_e: React.MouseEvent<HTMLInputElement>) => {
       // Ensure the element is visible before focusing
       updateLastActivity();
-      // Small delay to ensure visibility is updated
 
-      const timerRef = useRef<number>();
-      
-      // Clear any existing timeout before setting a new one
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-      
-      timerRef.current = setTimeout(() => {
+      // Defer focus until after the next repaint to ensure visibility is updated
+      requestAnimationFrame(() => {
         if (inputRef.current && document.activeElement !== inputRef.current) {
           inputRef.current.focus();
         }
-      }, 10);
-      
-      // Add this useEffect somewhere in your component:
-      // useEffect(() => {
-      //   return () => {
-      //     if (timerRef.current) {
-      //       clearTimeout(timerRef.current);
-      //     }
-      //   };
-      // }, []);
-
+      });
     },
     [updateLastActivity],
   );
