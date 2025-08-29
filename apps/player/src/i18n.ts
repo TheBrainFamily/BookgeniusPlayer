@@ -1,28 +1,20 @@
-import i18n from "i18next";
+import i18next, { i18n as I18nInstance } from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-import Backend from "i18next-http-backend";
+import resourcesToBackend from "i18next-resources-to-backend";
 
-const i18nDebug = import.meta.env.VITE_I18N_DEBUG === "true";
+export const i18n: I18nInstance = i18next.createInstance();
 
 i18n
-  .use(Backend)
   .use(LanguageDetector)
   .use(initReactI18next)
+  .use(resourcesToBackend((lng, ns) => import(`./locales/${lng}/${ns}.json`)))
   .init({
     fallbackLng: "en",
-    debug: i18nDebug,
-    interpolation: {
-      escapeValue: false, // not needed for react as it escapes by default
-    },
-    backend: { loadPath: "/locales/{{lng}}/{{ns}}.json" },
-    detection: { order: ["querystring", "localStorage", "navigator", "htmlTag"], lookupQuerystring: "lng", lookupLocalStorage: "i18nextLng", caches: ["localStorage"] },
     supportedLngs: ["en", "pl"],
+    defaultNS: "translation",
+    interpolation: { escapeValue: false },
+    detection: { order: ["querystring", "localStorage", "navigator", "htmlTag"], lookupQuerystring: "lng", caches: ["localStorage"] },
   });
-
-// Expose i18n to the window object for access in index.html
-if (typeof window !== "undefined") {
-  (window as unknown as { i18n: typeof i18n }).i18n = i18n;
-}
 
 export default i18n;

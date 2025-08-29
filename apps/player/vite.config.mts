@@ -24,7 +24,7 @@ export default defineConfig(async () => {
     const langCodeMap: { [key: string]: string } = { polish: "pl", english: "en" };
     const langCode = langCodeMap[bookLang.toLowerCase()] || bookLang;
 
-    const langFilePath = path.resolve(__dirname, `public/locales/${langCode}/translation.json`);
+    const langFilePath = path.resolve(__dirname, `src/locales/${langCode}/translation.json`);
     const langFileContent = JSON.parse(fs.readFileSync(langFilePath, "utf-8"));
 
     const bookSpecificPhrases = langFileContent.books?.[bookSlug]?.loading_phrases;

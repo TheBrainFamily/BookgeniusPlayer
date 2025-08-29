@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client";
 
 import "./styles/index.css";
 
-import "./i18n";
 import { AppWithResolve } from "@player/AppWithResolve";
 
 let container = document.getElementById("root-player");
