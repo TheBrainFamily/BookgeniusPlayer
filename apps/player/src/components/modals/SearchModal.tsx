@@ -98,7 +98,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                 <Accordion type="multiple" defaultValue={Object.keys(groupedResults).map(String)} className="w-full">
                   {Object.entries(groupedResults)
                     .sort(([a], [b]) => Number(a) - Number(b))
-                    .map(([chapter, items]) => (
+                    .map(([chapter, items], chapterIndex) => (
                       <AccordionItem key={chapter} value={chapter} className="border-book-primary-20 rounded-lg mb-3 overflow-hidden">
                         <AccordionTrigger className="px-4 py-3 bg-book-primary-10 hover:bg-book-primary-20 text-book-primary hover:no-underline cursor-pointer">
                           <div className="flex items-center gap-2">
@@ -110,18 +110,16 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                         </AccordionTrigger>
                         <AccordionContent className="px-0 pb-0">
                           <div className="space-y-2 p-3">
-                            {items.map((item: SearchResultItemData) => (
+                            {items.map((item: SearchResultItemData, index: number) => (
                               <motion.div
                                 key={item.id}
-                                className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20 ease-in-out"
-                                onClick={() => handleSearchResultClick(item)}
-                                initial="hidden"
-                                animate="visible"
-                                whileHover="hover"
-                                whileTap="tap"
+                                className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20 bg-gradient-to-br from-book-primary-5 to-book-secondary-5 hover:from-book-primary-10 hover:to-book-secondary-10 transition-all duration-200"
                                 variants={variants.item}
+                                whileTap="tap"
+                                onClick={() => handleSearchResultClick(item)}
+                                transition={{ delay: (chapterIndex * items.length + index) * 0.03 }}
                               >
-                                <div className="relative p-4 select-text antialiased">
+                                <div className="relative p-4">
                                   <div className="flex items-center gap-2 mb-2">
                                     <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
                                       {t("paragraph")} {item.paragraphNumber}
@@ -129,14 +127,16 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                                   </div>
 
                                   {item.text && (
-                                    <div className="mb-2 text-sm italic text-white/70 p-2 rounded-md bg-book-secondary-20">
-                                      <span dangerouslySetInnerHTML={{ __html: item.text }} />
-                                    </div>
+                                    <motion.div className="mb-2 text-sm italic text-white/70 p-2 rounded-md bg-book-secondary-20">
+                                      <div className="flex items-start gap-2">
+                                        <span dangerouslySetInnerHTML={{ __html: item.text }} />
+                                      </div>
+                                    </motion.div>
                                   )}
 
-                                  <div className="text-sm text-white/90 leading-relaxed">
+                                  <motion.div className="text-sm text-white/90 leading-relaxed">
                                     <span dangerouslySetInnerHTML={{ __html: item.summary }} />
-                                  </div>
+                                  </motion.div>
                                 </div>
                               </motion.div>
                             ))}
@@ -173,13 +173,14 @@ const variants: Record<string, Variants> = {
     visible: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: "easeOut", staggerChildren: 0.1 } },
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
   },
-  loading: { initial: { rotate: 0 }, animate: { rotate: 360, transition: { duration: 1, ease: "linear", repeat: Infinity } } },
   item: {
-    hidden: { opacity: 0, boxShadow: "0 0 0 rgba(255,255,255,0)" },
-    visible: { opacity: 1, y: 0, boxShadow: "0 0 0 rgba(255,255,255,0)" },
-    hover: { y: -2, boxShadow: "0 4px 10px rgba(255,255,255,0.1)" },
-    tap: { y: 0, boxShadow: "0 8px 16px rgba(255,255,255,0.15)" },
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
+    hover: { scale: 0.98, transition: { duration: 0.2, ease: "easeInOut" } },
+    tap: { scale: 0.95, transition: { duration: 0.1 } },
   },
+  loading: { initial: { rotate: 0 }, animate: { rotate: 360, transition: { duration: 1, ease: "linear", repeat: Infinity } } },
+  shimmer: { initial: { x: "-100%" }, animate: { x: "100%", transition: { duration: 1.5, ease: "easeInOut", repeat: Infinity, repeatDelay: 0.5 } } },
 };
 
 export default SearchModal;
