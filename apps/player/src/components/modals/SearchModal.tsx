@@ -122,7 +122,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                                 <div className="relative p-4">
                                   <div className="flex items-center gap-2 mb-2">
                                     <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
-                                      {t("paragraph")} {item.paragraphNumber}
+                                      {item.percentInChapter}% {t("of_chapter")}
                                     </div>
                                   </div>
 
