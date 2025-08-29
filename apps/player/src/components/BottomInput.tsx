@@ -216,11 +216,29 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       // Ensure the element is visible before focusing
       updateLastActivity();
       // Small delay to ensure visibility is updated
-      setTimeout(() => {
+
+      const timerRef = useRef<number>();
+      
+      // Clear any existing timeout before setting a new one
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      
+      timerRef.current = setTimeout(() => {
         if (inputRef.current && document.activeElement !== inputRef.current) {
           inputRef.current.focus();
         }
       }, 10);
+      
+      // Add this useEffect somewhere in your component:
+      // useEffect(() => {
+      //   return () => {
+      //     if (timerRef.current) {
+      //       clearTimeout(timerRef.current);
+      //     }
+      //   };
+      // }, []);
+
     },
     [updateLastActivity],
   );
