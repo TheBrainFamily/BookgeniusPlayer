@@ -325,7 +325,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
 
   // Changed return type
   const items: SearchResultItemData[] = [];
-  let resultIndex: 0;
+  let resultIndex: number = 0;
 
   try {
     if (characterData) {
