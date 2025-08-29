@@ -1,9 +1,9 @@
-type RectBox = { left: number; top: number; width: number; height: number };
+export type RectBox = { left: number; top: number; width: number; height: number };
 
-/**
- * Apply a rectangle (in viewport coordinates) to the overlay element.
- * If rect is null -> hide overlay by setting opacity to 0 (kept in DOM to avoid re-creation).
- */
+const ACTIVE_ELEMENT_VISUALIZER_ID = "dev-zone-visualizer";
+const RANGE_VISUALIZER_ID = "dev-zone-visualizer-2";
+
+/** Apply a rectangle (viewport coords) to an overlay. If rect is null, hide. */
 function setRect(el: HTMLDivElement, rect: RectBox | null) {
   if (!el) return;
 
@@ -12,7 +12,7 @@ function setRect(el: HTMLDivElement, rect: RectBox | null) {
     return;
   }
 
-  // Round values to prevent 1px flicker due to sub-pixel scrolling/layout.
+  // Round to reduce sub-pixel flicker
   const left = Math.round(rect.left);
   const top = Math.round(rect.top);
   const width = Math.max(0, Math.round(rect.width));
@@ -25,19 +25,16 @@ function setRect(el: HTMLDivElement, rect: RectBox | null) {
   el.style.opacity = "1";
 }
 
-/** Base, shared overlay styles (fixed to viewport, no pointer events). */
+/** Shared overlay styles. Fixed to viewport, click-through. */
 function applyBaseStyles(el: HTMLDivElement) {
-  el.style.position = "fixed"; // Viewport-based box, independent of page scroll
-  el.style.pointerEvents = "none"; // Click-through
+  el.style.position = "fixed";
+  el.style.pointerEvents = "none";
   el.style.willChange = "width, height, transform, opacity";
-  el.style.opacity = "0"; // Start hidden
+  el.style.opacity = "0";
   el.style.transition = "opacity 0.18s ease-out";
 }
 
-/**
- * Small factory that creates an overlay with given visual style.
- * Keeps the code DRY for active element & focus zone overlays.
- */
+/** Create a visualizer overlay with given style. */
 function createVisualizer(id: string, opts: { zIndex: number; border: string; background: string; borderStyle?: string }): HTMLDivElement {
   const box = document.createElement("div");
   box.id = id;
@@ -47,24 +44,22 @@ function createVisualizer(id: string, opts: { zIndex: number; border: string; ba
   if (opts.borderStyle) box.style.borderStyle = opts.borderStyle;
   box.style.backgroundColor = opts.background;
   document.body.appendChild(box);
+
   return box;
 }
 
-function createActiveElementVisualizer(): HTMLDivElement {
-  return createVisualizer("dev-zone-visualizer", { zIndex: 45, border: "2px solid #ff6b6b", background: "rgba(255, 107, 107, 0.08)" });
+export function createActiveElementVisualizer(): HTMLDivElement {
+  return createVisualizer(ACTIVE_ELEMENT_VISUALIZER_ID, { zIndex: 45, border: "2px solid #ff6b6b", background: "rgba(255, 107, 107, 0.08)" });
 }
 
-function createRangeVisualizer(): HTMLDivElement {
-  return createVisualizer("dev-zone-visualizer-2", { zIndex: 44, border: "2px dashed #4ecdc4", background: "rgba(78, 205, 196, 0.06)", borderStyle: "dashed" });
+export function createRangeVisualizer(): HTMLDivElement {
+  return createVisualizer(RANGE_VISUALIZER_ID, { zIndex: 44, border: "2px dashed #4ecdc4", background: "rgba(78, 205, 196, 0.06)", borderStyle: "dashed" });
 }
 
-/**
- * Initializes (or reuses) the two developer overlays.
- * Returns nulls if visualizers are disabled.
- */
+/** Initialize (or reuse) both overlays. */
 export function initializeDevZoneVisualizers(): { activeElementVisualizer: HTMLDivElement | null; rangeVisualizer: HTMLDivElement | null } {
-  let activeElementVisualizer = document.getElementById("dev-zone-visualizer") as HTMLDivElement | null;
-  let rangeVisualizer = document.getElementById("dev-zone-visualizer-2") as HTMLDivElement | null;
+  let activeElementVisualizer = document.getElementById(ACTIVE_ELEMENT_VISUALIZER_ID) as HTMLDivElement | null;
+  let rangeVisualizer = document.getElementById(RANGE_VISUALIZER_ID) as HTMLDivElement | null;
 
   if (!activeElementVisualizer) activeElementVisualizer = createActiveElementVisualizer();
   if (!rangeVisualizer) rangeVisualizer = createRangeVisualizer();
@@ -72,10 +67,7 @@ export function initializeDevZoneVisualizers(): { activeElementVisualizer: HTMLD
   return { activeElementVisualizer, rangeVisualizer };
 }
 
-/**
- * Computes a "visual" rectangle for an element in viewport coordinates.
- * We include margins so the highlight matches what the eye perceives on screen.
- */
+/** Compute a "visual" rect for an element (includes margins). */
 export function computeElementVisualRect(el: Element): RectBox {
   const r = el.getBoundingClientRect();
   const cs = window.getComputedStyle(el);
@@ -92,34 +84,72 @@ export function computeElementVisualRect(el: Element): RectBox {
   return { left: visualLeft, top: visualTop, width: visualRight - visualLeft, height: visualBottom - visualTop };
 }
 
-/**
- * Draws the full focus-zone overlay.
- * Uses the content container's rect for left/width, and the provided vertical bounds.
- */
+/** Draw the full focus-zone overlay with provided vertical bounds. */
 export function drawFocusZone(rangeVisualizer: HTMLDivElement | null, rootEl: HTMLElement, focusZoneTop: number, focusZoneBottom: number) {
   if (!rangeVisualizer) return;
 
   const rootRect = rootEl.getBoundingClientRect();
   const box: RectBox = { left: rootRect.left, top: focusZoneTop, width: rootRect.width, height: Math.max(0, focusZoneBottom - focusZoneTop) };
-
   setRect(rangeVisualizer, box);
 }
 
-/**
- * Draws the active element overlay (or hides it when `el` is null).
- * Keep this cheap: the heavy lifting (rect calc) is a single getBoundingClientRect.
- */
+/** Draw the active element overlay (or hide when `el` is null). */
 export function drawActiveElement(activeVisualizer: HTMLDivElement | null, el: Element | null) {
   if (!activeVisualizer) return;
+
   if (!el) {
     setRect(activeVisualizer, null);
     return;
   }
+
   setRect(activeVisualizer, computeElementVisualRect(el));
 }
 
-/** Hides the given overlay. */
+/** Hide any overlay. */
 export function hideVisualizer(el: HTMLDivElement | null) {
   if (!el) return;
+
   setRect(el, null);
+}
+
+/**
+ * Compute the union rect (viewport coords) that encompasses all given elements.
+ * Returns null for empty iterables.
+ */
+export function computeElementsUnionRect(elements: Iterable<Element>): RectBox | null {
+  let minTop = Infinity;
+  let maxBottom = -Infinity;
+  let minLeft = Infinity;
+  let maxRight = -Infinity;
+  let any = false;
+
+  for (const el of elements) {
+    const vr = computeElementVisualRect(el);
+    minTop = Math.min(minTop, vr.top);
+    minLeft = Math.min(minLeft, vr.left);
+    maxBottom = Math.max(maxBottom, vr.top + vr.height);
+    maxRight = Math.max(maxRight, vr.left + vr.width);
+    any = true;
+  }
+
+  if (!any) return null;
+
+  const width = Math.max(0, maxRight - minLeft);
+  const height = Math.max(0, maxBottom - minTop);
+
+  return { left: minLeft, top: minTop, width, height };
+}
+
+/**
+ * Draw (immediately) the overlay that encompasses all provided elements.
+ * Hides the visualizer if the collection is empty.
+ * RAF to avoid layout thrash when called from intersection callbacks / scroll handlers
+ */
+export function drawElementsUnion(rangeVisualizer: HTMLDivElement | null, elements: Iterable<Element>) {
+  if (!rangeVisualizer) return;
+
+  requestAnimationFrame(() => {
+    const rect = computeElementsUnionRect(elements);
+    setRect(rangeVisualizer, rect);
+  });
 }

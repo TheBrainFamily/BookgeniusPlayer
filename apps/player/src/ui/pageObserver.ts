@@ -7,7 +7,7 @@ import { isVideoFile } from "@player/helpers/isVideoFile";
 import { highlightCharacter, normalizeSrcForInlineAvatar } from "./highlightCharacter";
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
-import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers } from "./devVisualizers";
+import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers, drawElementsUnion } from "./devVisualizers";
 
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
@@ -537,45 +537,8 @@ export function setupPageObserver(
       });
 
       if (focusedPages.length > 0) {
-        // Update dev-zone-visualizer-2 with focused paragraphs
         if (rangeVisualizer && DEV_ZONE_VISUALIZERS_ENABLED) {
-          const updateRangeVisualizerPosition = () => {
-            requestAnimationFrame(() => {
-              // Calculate the bounding box that encompasses all focused paragraphs
-              let minTop = Infinity;
-              let maxBottom = -Infinity;
-              let minLeft = Infinity;
-              let maxRight = -Infinity;
-
-              focusedPages.forEach((element) => {
-                const rect = element.getBoundingClientRect();
-                const computedStyle = window.getComputedStyle(element);
-                const marginTop = parseFloat(computedStyle.marginTop);
-                const marginBottom = parseFloat(computedStyle.marginBottom);
-                const marginLeft = parseFloat(computedStyle.marginLeft);
-                const marginRight = parseFloat(computedStyle.marginRight);
-
-                const visualTop = rect.top - marginTop;
-                const visualBottom = rect.bottom + marginBottom;
-                const visualLeft = rect.left - marginLeft;
-                const visualRight = rect.right + marginRight;
-
-                minTop = Math.min(minTop, visualTop);
-                maxBottom = Math.max(maxBottom, visualBottom);
-                minLeft = Math.min(minLeft, visualLeft);
-                maxRight = Math.max(maxRight, visualRight);
-              });
-
-              // Position the range visualizer to encompass all focused paragraphs
-              rangeVisualizer.style.left = `${minLeft}px`;
-              rangeVisualizer.style.top = `${minTop}px`;
-              rangeVisualizer.style.width = `${maxRight - minLeft}px`;
-              rangeVisualizer.style.height = `${maxBottom - minTop}px`;
-              rangeVisualizer.style.opacity = "1";
-            });
-          };
-
-          updateRangeVisualizerPosition();
+          drawElementsUnion(rangeVisualizer, focusedPages);
         }
 
         // Sort the focused pages by their viewport top position
@@ -751,7 +714,7 @@ export function setupPageObserver(
 
   // Function to observe new paragraphs
   const observeNewParagraphs = (): number => {
-    const allParagraphs = rootEl.querySelectorAll("section[data-chapter] > h3, section[data-chapter] [data-index]");
+    const allParagraphs = rootEl.querySelectorAll("section[data-chapter] [data-index]");
     let newParagraphsCount = 0;
 
     allParagraphs.forEach((paragraph) => {
@@ -805,7 +768,7 @@ export function setupPageObserver(
   };
 
   // Initial observation
-  const paragraphsToObserve = rootEl.querySelectorAll("section[data-chapter] > h3, section[data-chapter] [data-index]");
+  const paragraphsToObserve = rootEl.querySelectorAll("section[data-chapter] [data-index]");
 
   const spacersToObserve = rootEl.querySelectorAll(".transition-spacer");
   console.log("Observing these spacers:", spacersToObserve);
