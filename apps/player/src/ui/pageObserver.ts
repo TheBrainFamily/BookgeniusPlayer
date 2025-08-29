@@ -9,7 +9,7 @@ import { CharacterModalParams } from "@player/stores/modals/characterModal.store
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
 import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers, drawElementsUnion } from "./devVisualizers";
 
-const DEV_ZONE_VISUALIZERS_ENABLED = true;
+const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
 // Cache isPlayFormat at module level to avoid repeated getBookData() calls
 let cachedIsPlayFormat: boolean | null = null;
@@ -439,7 +439,7 @@ export function setupPageObserver(
     let chosenElement: Element | null = null;
     let foundFullyVisible = false;
     // Minimum overlap threshold in pixels to consider an element
-    const MIN_OVERLAP_THRESHOLD = 20;
+    const MIN_OVERLAP_THRESHOLD = 15;
 
     // First pass: look for fully visible elements
     intersectingPages.forEach((element) => {
