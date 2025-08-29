@@ -6,7 +6,7 @@ export function useCharactersOnStage(allCharacters: CharacterData[]): CharacterD
   const { location } = useLocation();
 
   const charactersOnStage = useMemo(() => {
-    if (!location) return [];
+    if (!location?.currentChapter || !location?.currentParagraph) return [];
 
     const { currentChapter, currentParagraph } = location;
 
