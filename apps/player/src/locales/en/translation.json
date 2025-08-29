@@ -168,6 +168,8 @@
   "chapter_zero": "Chapter Zero",
   "chapters": "Chapters",
   "paragraph": "Paragraph",
+  "chapter_percent": "Chapter Percent",
+  "of_chapter": "of Chapter",
   "book_settings": "Book Settings",
   "open_chapter": "Open Chapter",
   "reset_reading_position": "Reset Reading Position",
