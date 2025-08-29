@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useMemo } from "
 import type { LoadedClerk, UseUserReturn } from "@clerk/types";
 import type { AuthCtx, AuthModule } from "./types";
 import type { ClerkProviderProps } from "@clerk/react-router";
+import { Button } from "@platform/components/ui/button.tsx";
 
 const Ctx = createContext<AuthCtx>({ ready: false, isSignedIn: false, openSignIn: () => {} });
 
@@ -159,7 +160,11 @@ const AuthProviderSafe: React.FC<{ children: React.ReactNode }> = ({ children })
 const useAuth = () => useContext(Ctx);
 
 const useUserWidget = () => useContext(WidgetCtx);
-
-const mod: AuthModule = { AuthProvider: AuthProviderSafe, useAuth, useUserWidget };
+const SignInWidget: React.FC<{ onClick: () => void }> = ({ onClick }) => (
+  <Button onClick={onClick} variant="outline">
+    Sign In
+  </Button>
+);
+const mod: AuthModule = { AuthProvider: AuthProviderSafe, useAuth, useUserWidget, useSignInWidget: () => SignInWidget };
 
 export default mod;

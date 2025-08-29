@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useLocalStorageState from "use-local-storage-state";
 
 import { LocationProvider } from "./state/LocationContext";
@@ -30,10 +30,11 @@ import ProgressBars from "@player/components/ProgressBars";
 import { usePlayCharacterSelect } from "./hooks/usePlayCharacterSelect";
 import { AppInitializer } from "./components/AppInitializer";
 import { BookDataProvider } from "./context/BookDataContext";
-import { useTranslation } from "react-i18next";
+import { I18nextProvider, useTranslation } from "react-i18next";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { languageNameToCode } from "@player/helpers/languageNameToCode";
 import { usePaywall } from "./hooks/usePaywall";
+import i18n from "./i18n";
 
 function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   setKnownVideos(getKnownVideoFiles());
@@ -110,19 +111,21 @@ export default function App() {
   }, [fontSize]);
 
   return (
-    <AppInitializer>
-      <BookDataProvider>
-        <LocationProvider>
-          <RealtimeProvider>
-            <WebSocketProvider>
-              <BookContentWrapper>
-                <Shell onShellMounted={() => setReactDomReady(true)} />
-                <ModalRenderers />
-              </BookContentWrapper>
-            </WebSocketProvider>
-          </RealtimeProvider>
-        </LocationProvider>
-      </BookDataProvider>
-    </AppInitializer>
+    <I18nextProvider i18n={i18n}>
+      <AppInitializer>
+        <BookDataProvider>
+          <LocationProvider>
+            <RealtimeProvider>
+              <WebSocketProvider>
+                <BookContentWrapper>
+                  <Shell onShellMounted={() => setReactDomReady(true)} />
+                  <ModalRenderers />
+                </BookContentWrapper>
+              </WebSocketProvider>
+            </RealtimeProvider>
+          </LocationProvider>
+        </BookDataProvider>
+      </AppInitializer>
+    </I18nextProvider>
   );
 }

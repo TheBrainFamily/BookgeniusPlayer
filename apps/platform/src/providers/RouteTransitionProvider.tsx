@@ -37,18 +37,15 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
   const [minDurationMs, setMinDurationMs] = useState(defaultMinDurationMs);
 
   const startTimeRef = useRef<number | null>(null);
-  const finishRequestedRef = useRef(false);
   const location = useLocation(); // used to reset if user navigates away quickly
 
   const startTransition = useCallback((m: LoaderMeta) => {
     setMeta({ title: m.title, phrases: m.phrases, author: m.author ?? "" });
     startTimeRef.current = performance.now();
-    finishRequestedRef.current = false;
     setNavigating(true);
   }, []);
 
   const finishTransition = useCallback(() => {
-    finishRequestedRef.current = true;
     const now = performance.now();
     const start = startTimeRef.current ?? now;
     const elapsed = now - start;
@@ -58,11 +55,12 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
     const timeout = window.setTimeout(() => {
       setNavigating(false);
       // slight delay to allow fade-out animation before clearing meta
-      window.setTimeout(() => setMeta((prev) => (navigating ? prev : null)), 250);
+      // We think no need to clear meta, leaving this in case someone sees some glitches. Aug 29 2025 lgandecki dstojaniuk
+      // window.setTimeout(() => setMeta((prev) => (navigating ? prev : null)), 250);
     }, remaining);
 
     return () => clearTimeout(timeout);
-  }, [minDurationMs, navigating]);
+  }, [minDurationMs]);
 
   // If the route changes unexpectedly while navigating, keep overlay unless a new
   // startTransition comes in; this helps continuity.
@@ -72,15 +70,12 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
 
   const value = useMemo(() => ({ startTransition, finishTransition, navigating, setMinDurationMs }), [finishTransition, navigating, startTransition]);
 
-  console.log("BOOK LOADER PROVIDER RENDER", { navigating, value });
-
   return (
     <RouteTransitionContext.Provider value={value}>
       {children}
 
       {/* Single global overlay with BookLoader */}
       <div className={`pointer-events-none fixed inset-0 z-40 transition-opacity duration-1000 ${navigating ? "opacity-100" : "opacity-0"}`} aria-hidden={!navigating}>
-        <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
         <div className="relative z-10 flex h-full items-center justify-center">
           {meta ? (
             <div className="pointer-events-auto">
@@ -89,7 +84,7 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
                 author={meta.author}
                 loadingPhrases={meta.phrases}
                 // While overlay is visible, pretend it's not loaded
-                isLoaded={false}
+                isLoaded={!navigating}
               />
             </div>
           ) : null}

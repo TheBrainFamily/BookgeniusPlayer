@@ -3,11 +3,11 @@ import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@player/utils/getFilePathsForName";
 import { bookDataLoader } from "@player/services/bookDataLoader";
 import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
-import debounce from "lodash.debounce";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 import { highlightCharacter, normalizeSrcForInlineAvatar } from "./highlightCharacter";
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
+import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers, drawElementsUnion } from "./devVisualizers";
 
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
@@ -32,73 +32,7 @@ window.addEventListener(
   { once: true },
 );
 
-// --- Development Zone Visualizers ---
-
-/**
- * Creates the main active element visualizer (dev-zone-visualizer)
- * Shows only the single active paragraph/heading
- */
-function createActiveElementVisualizer(): HTMLDivElement {
-  const visualizer = document.createElement("div");
-  visualizer.id = "dev-zone-visualizer";
-  visualizer.style.position = "fixed";
-  visualizer.style.pointerEvents = "none";
-  visualizer.style.zIndex = "45";
-  visualizer.style.border = "2px solid #ff6b6b";
-  visualizer.style.backgroundColor = "rgba(255, 107, 107, 0.1)";
-  visualizer.style.opacity = "0";
-  visualizer.style.transition = "opacity 0.3s ease-in-out";
-  document.body.appendChild(visualizer);
-  return visualizer;
-}
-
-/**
- * Creates the range visualizer (dev-zone-visualizer-2)
- * Shows all paragraphs that overlap with the focus zone
- */
-function createRangeVisualizer(): HTMLDivElement {
-  const visualizer = document.createElement("div");
-  visualizer.id = "dev-zone-visualizer-2";
-  visualizer.style.position = "fixed";
-  visualizer.style.pointerEvents = "none";
-  visualizer.style.zIndex = "44";
-  visualizer.style.border = "2px solid #4ecdc4";
-  visualizer.style.backgroundColor = "rgba(78, 205, 196, 0.1)";
-  visualizer.style.opacity = "0";
-  visualizer.style.transition = "opacity 0.5s ease-in-out";
-  document.body.appendChild(visualizer);
-  return visualizer;
-}
-
-/**
- * Initializes both development zone visualizers
- * Returns references to both visualizers or null if disabled
- */
-function initializeDevZoneVisualizers(): { activeElementVisualizer: HTMLDivElement | null; rangeVisualizer: HTMLDivElement | null } {
-  if (!DEV_ZONE_VISUALIZERS_ENABLED) {
-    return { activeElementVisualizer: null, rangeVisualizer: null };
-  }
-
-  // Check if visualizers already exist to prevent duplicates
-  let activeElementVisualizer = document.getElementById("dev-zone-visualizer") as HTMLDivElement;
-  let rangeVisualizer = document.getElementById("dev-zone-visualizer-2") as HTMLDivElement;
-
-  if (!activeElementVisualizer) {
-    activeElementVisualizer = createActiveElementVisualizer();
-  }
-
-  if (!rangeVisualizer) {
-    rangeVisualizer = createRangeVisualizer();
-  }
-
-  return { activeElementVisualizer, rangeVisualizer };
-}
-
-// --- Helper Functions ---
-
-/**
- * Checks if a given chapter and paragraph index falls within the specified range.
- */
+/** Checks if a given chapter and paragraph index falls within the specified range **/
 function isInRange(currentChapter: number, currentParagraph: number, startChapter: number, startParagraph: number, endChapter: number, endParagraph: number): boolean {
   // Single chapter range
   if (startChapter === endChapter) {
@@ -119,9 +53,7 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
   return false;
 }
 
-/**
- * Updates video opacity based on talking state for inline avatars
- */
+/** Updates video opacity based on talking state for inline avatars **/
 function updateVideoState(container: HTMLDivElement, isTalking: boolean) {
   const listeningVideo = container.querySelector('video[data-state="listens"]') as HTMLVideoElement;
   const speakingVideo = container.querySelector('video[data-state="speaks"]') as HTMLVideoElement;
@@ -135,9 +67,7 @@ function updateVideoState(container: HTMLDivElement, isTalking: boolean) {
   }
 }
 
-/**
- * Creates a media container element with CharacterMedia-like structure for inline avatars.
- */
+/** Creates a media container element with CharacterMedia-like structure for inline avatars */
 function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsModal: (params: CharacterModalParams) => void, isPlayFormat: boolean): HTMLDivElement | null {
   const characterSlug = placeholder.dataset.character;
   const isTalking = placeholder.dataset.isTalking === "true";
@@ -228,9 +158,7 @@ function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsMo
   return container;
 }
 
-/**
- * Manages media loading and playback for paragraphs within the visible range.
- */
+/** Manages media loading and playback for paragraphs within the visible range **/
 function activateMediaInRange(
   startChapter: number,
   startParagraph: number,
@@ -406,7 +334,7 @@ function activateMediaInRange(
   });
 }
 
-// --- Extract Chapter and Paragraph Info ---
+/** Extract Chapter and Paragraph Info **/
 export const getParagraphInfo = (element: Element): { chapter: number | null; paragraph: number | null } => {
   const el = element as HTMLElement;
 
@@ -432,7 +360,19 @@ export const getParagraphInfo = (element: Element): { chapter: number | null; pa
   return { chapter, paragraph };
 };
 
-let previousRootRectWidth = 0;
+/** RAF scheduler to coalesce many requests into one paint */
+function makeRafScheduler(fn: () => void) {
+  let scheduled = false;
+  return () => {
+    if (scheduled) return;
+
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      fn();
+    });
+  };
+}
 
 export function setupPageObserver(
   openCharacterDetailsModal: (params: CharacterModalParams) => void,
@@ -445,8 +385,8 @@ export function setupPageObserver(
 
   const observerOptions = { root: rootEl, rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
 
-  // Initialize development zone visualizers early
-  const { activeElementVisualizer, rangeVisualizer } = initializeDevZoneVisualizers();
+  // Initialize development zone visualizers
+  const { activeElementVisualizer, rangeVisualizer } = DEV_ZONE_VISUALIZERS_ENABLED ? initializeDevZoneVisualizers() : { activeElementVisualizer: null, rangeVisualizer: null };
 
   // --- State for tracking all currently intersecting pages ---
   const intersectingPages = new Set<Element>();
@@ -490,8 +430,8 @@ export function setupPageObserver(
     const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
     const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
 
-    if (rootRect.width !== previousRootRectWidth) {
-      previousRootRectWidth = rootRect.width;
+    if (DEV_ZONE_VISUALIZERS_ENABLED) {
+      drawFocusZone(rangeVisualizer, rootEl, focusZoneTop, focusZoneBottom);
     }
 
     let activeParagraph: { chapter: number | null; paragraph: number | null } | null = null;
@@ -499,7 +439,7 @@ export function setupPageObserver(
     let chosenElement: Element | null = null;
     let foundFullyVisible = false;
     // Minimum overlap threshold in pixels to consider an element
-    const MIN_OVERLAP_THRESHOLD = 20;
+    const MIN_OVERLAP_THRESHOLD = 15;
 
     // First pass: look for fully visible elements
     intersectingPages.forEach((element) => {
@@ -583,36 +523,12 @@ export function setupPageObserver(
     });
     chosenElement?.classList.add("active-paragraph");
 
-    // Update dev-zone-visualizer (single active element)
-    if (chosenElement && activeElementVisualizer && DEV_ZONE_VISUALIZERS_ENABLED) {
-      const updateVisualizerPosition = () => {
-        requestAnimationFrame(() => {
-          // Wait one more frame to ensure layout is completely stable
-          requestAnimationFrame(() => {
-            const elementRect = chosenElement.getBoundingClientRect();
-
-            const computedStyle = window.getComputedStyle(chosenElement);
-            const marginTop = parseFloat(computedStyle.marginTop);
-            const marginBottom = parseFloat(computedStyle.marginBottom);
-            const marginLeft = parseFloat(computedStyle.marginLeft);
-            const marginRight = parseFloat(computedStyle.marginRight);
-
-            const visualTop = elementRect.top - marginTop;
-            const visualBottom = elementRect.bottom + marginBottom;
-            const visualLeft = elementRect.left - marginLeft;
-            const visualWidth = elementRect.width + marginLeft + marginRight;
-            const visualHeight = visualBottom - visualTop;
-
-            activeElementVisualizer.style.left = `${visualLeft}px`;
-            activeElementVisualizer.style.top = `${visualTop}px`;
-            activeElementVisualizer.style.width = `${visualWidth}px`;
-            activeElementVisualizer.style.height = `${visualHeight}px`;
-            activeElementVisualizer.style.opacity = "1";
-          });
-        });
-      };
-
-      updateVisualizerPosition();
+    if (DEV_ZONE_VISUALIZERS_ENABLED) {
+      if (chosenElement) {
+        drawActiveElement(activeElementVisualizer, chosenElement);
+      } else {
+        hideVisualizer(activeElementVisualizer);
+      }
     }
 
     if (intersectingPages.size > 0) {
@@ -624,45 +540,8 @@ export function setupPageObserver(
       });
 
       if (focusedPages.length > 0) {
-        // Update dev-zone-visualizer-2 with focused paragraphs
-        if (rangeVisualizer && DEV_ZONE_VISUALIZERS_ENABLED) {
-          const updateRangeVisualizerPosition = () => {
-            requestAnimationFrame(() => {
-              // Calculate the bounding box that encompasses all focused paragraphs
-              let minTop = Infinity;
-              let maxBottom = -Infinity;
-              let minLeft = Infinity;
-              let maxRight = -Infinity;
-
-              focusedPages.forEach((element) => {
-                const rect = element.getBoundingClientRect();
-                const computedStyle = window.getComputedStyle(element);
-                const marginTop = parseFloat(computedStyle.marginTop);
-                const marginBottom = parseFloat(computedStyle.marginBottom);
-                const marginLeft = parseFloat(computedStyle.marginLeft);
-                const marginRight = parseFloat(computedStyle.marginRight);
-
-                const visualTop = rect.top - marginTop;
-                const visualBottom = rect.bottom + marginBottom;
-                const visualLeft = rect.left - marginLeft;
-                const visualRight = rect.right + marginRight;
-
-                minTop = Math.min(minTop, visualTop);
-                maxBottom = Math.max(maxBottom, visualBottom);
-                minLeft = Math.min(minLeft, visualLeft);
-                maxRight = Math.max(maxRight, visualRight);
-              });
-
-              // Position the range visualizer to encompass all focused paragraphs
-              rangeVisualizer.style.left = `${minLeft}px`;
-              rangeVisualizer.style.top = `${minTop}px`;
-              rangeVisualizer.style.width = `${maxRight - minLeft}px`;
-              rangeVisualizer.style.height = `${maxBottom - minTop}px`;
-              rangeVisualizer.style.opacity = "1";
-            });
-          };
-
-          updateRangeVisualizerPosition();
+        if (DEV_ZONE_VISUALIZERS_ENABLED) {
+          drawElementsUnion(rangeVisualizer, focusedPages);
         }
 
         // Sort the focused pages by their viewport top position
@@ -797,8 +676,9 @@ export function setupPageObserver(
         }
       } else {
         // Handle case where intersecting pages exist, but none are in the focus zone
-        if (rangeVisualizer && DEV_ZONE_VISUALIZERS_ENABLED) {
-          rangeVisualizer.style.opacity = "0";
+        if (DEV_ZONE_VISUALIZERS_ENABLED) {
+          hideVisualizer(rangeVisualizer);
+          hideVisualizer(activeElementVisualizer);
         }
 
         if (currentlyActivePageElement !== null) {
@@ -810,8 +690,9 @@ export function setupPageObserver(
       }
     } else {
       // Handle case where no pages are intersecting the viewport at all
-      if (rangeVisualizer && DEV_ZONE_VISUALIZERS_ENABLED) {
-        rangeVisualizer.style.opacity = "0";
+      if (DEV_ZONE_VISUALIZERS_ENABLED) {
+        hideVisualizer(rangeVisualizer);
+        hideVisualizer(activeElementVisualizer);
       }
 
       if (currentlyActivePageElement !== null) {
@@ -821,7 +702,9 @@ export function setupPageObserver(
     }
   };
 
-  const debouncedProcessIntersections = debounce(processIntersections, 50);
+  const scheduledProcessIntersections = makeRafScheduler(processIntersections);
+  window.addEventListener("resize", scheduledProcessIntersections);
+  window.addEventListener("orientationchange", scheduledProcessIntersections);
 
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
@@ -833,12 +716,12 @@ export function setupPageObserver(
       }
     });
 
-    debouncedProcessIntersections();
+    scheduledProcessIntersections();
   }, observerOptions);
 
   // Function to observe new paragraphs
   const observeNewParagraphs = (): number => {
-    const allParagraphs = rootEl.querySelectorAll("section[data-chapter] > h3, section[data-chapter] [data-index]");
+    const allParagraphs = rootEl.querySelectorAll("section[data-chapter] [data-index]");
     let newParagraphsCount = 0;
 
     allParagraphs.forEach((paragraph) => {
@@ -892,7 +775,7 @@ export function setupPageObserver(
   };
 
   // Initial observation
-  const paragraphsToObserve = rootEl.querySelectorAll("section[data-chapter] > h3, section[data-chapter] [data-index]");
+  const paragraphsToObserve = rootEl.querySelectorAll("section[data-chapter] [data-index]");
 
   const spacersToObserve = rootEl.querySelectorAll(".transition-spacer");
   console.log("Observing these spacers:", spacersToObserve);
@@ -959,6 +842,18 @@ export function setupPageObserver(
     spacerObserver.observe(spacer);
   });
 
+  const cleanup = () => {
+    spacerObserver.disconnect();
+    observer.disconnect();
+    window.removeEventListener("resize", scheduledProcessIntersections);
+    window.removeEventListener("orientationchange", scheduledProcessIntersections);
+
+    if (DEV_ZONE_VISUALIZERS_ENABLED) {
+      hideVisualizer(activeElementVisualizer);
+      hideVisualizer(rangeVisualizer);
+    }
+  };
+
   if (paragraphsToObserve.length === 0) {
     console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
     return null;
@@ -968,6 +863,6 @@ export function setupPageObserver(
       observedParagraphs.add(paragraph);
     });
 
-    return { observer, observeNewParagraphs, cleanupRemovedParagraphs, cleanup: () => observer.disconnect() };
+    return { observer, observeNewParagraphs, cleanupRemovedParagraphs, cleanup };
   }
 }

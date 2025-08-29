@@ -143,9 +143,8 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
 
   const { locationRange } = useLocationRange();
 
+  const { chapter } = locationRange;
   const loadImages = useCallback(async (): Promise<void> => {
-    const { chapter } = locationRange;
-
     const chapterCharacters = allCharacters.filter((character) => character.infoPerChapter.find((chapterInfo) => chapterInfo.chapter === chapter));
 
     const imageUrls = chapterCharacters.map((character) => getBookAssetUrl(`${character.slug.toLowerCase()}.png`));
@@ -197,7 +196,7 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
     }
 
     console.log("All images processing completed!");
-  }, [locationRange, imageTimeoutMs]);
+  }, [chapter, imageTimeoutMs]);
 
   // Cleanup function to clear all pending timeouts
   useEffect(() => {
