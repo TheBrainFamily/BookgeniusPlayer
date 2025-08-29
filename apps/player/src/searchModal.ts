@@ -220,7 +220,7 @@ const calculatePercentInChapter = (paragraphNumber: number, totalParagraphs: num
   if (totalParagraphs <= 0) {
     return 0;
   }
-  return Math.round((paragraphNumber / totalParagraphs) * 100);
+  return Math.max(0, Math.min(100, Math.round((paragraphNumber / totalParagraphs) * 100)));
 };
 
 const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) => {
