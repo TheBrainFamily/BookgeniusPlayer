@@ -236,8 +236,7 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
     transform 0.3s ease;
   transform-origin: center center;
 
-  div,
-  div {
+  & > div {
     width: 100%;
     padding-bottom: 0;
 
