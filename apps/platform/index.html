@@ -20,34 +20,43 @@
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Libre+Caslon+Text&display=swap" rel="stylesheet" />
 
     <style>
-      body,
-      html {
-        background-color: #2d2d2d;
-        min-height: 100vh;
+      html,
+      body {
+        height: 100dvh;
         margin: 0;
-        padding: 0;
+        background: #2d2d2d;
       }
 
-      body:has(#platform-scope.visible) {
-        height: 100svh;
+      #platform-scope {
+        height: 100dvh;
       }
 
       #player-scope {
+        position: absolute;
+        inset: 0;
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
         transition:
           opacity 0.3s ease-in-out,
           visibility 0s linear 0.3s;
-        position: absolute;
-        inset: 0;
       }
 
       #player-scope.visible {
+        position: fixed;
+        inset: 0;
+        height: 100svh;
         opacity: 1;
-        pointer-events: auto;
         visibility: visible;
+        pointer-events: auto;
         transition: opacity 0.3s ease-in-out;
+      }
+
+      body:has(#player-scope.visible) {
+        height: 100svh;
+        min-height: 100svh;
+        overflow: hidden;
+        overscroll-behavior: none;
       }
 
       #content-container {
@@ -64,7 +73,7 @@
   </head>
 
   <body>
-    <div id="platform-scope" class="visible">
+    <div id="platform-scope">
       <div id="root"></div>
     </div>
 
