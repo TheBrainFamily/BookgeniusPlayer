@@ -115,9 +115,15 @@ export async function teardownPlayer(): Promise<void> {
     console.warn("teardownPlayer: clearing caches failed", e);
   }
 
-  // Clear search results so they don't persist when changing books
+  // Clear search results and close search modal when changing books
   try {
-    useSearchModal.getState().clearResults();
+    const searchModal = useSearchModal.getState();
+    if (searchModal.isOpen) {
+      searchModal.closeModal();
+    } else {
+      // If modal is not open, just clear results
+      searchModal.clearResults();
+    }
   } catch (e) {
     console.warn("teardownPlayer: clearing search results failed", e);
   }
