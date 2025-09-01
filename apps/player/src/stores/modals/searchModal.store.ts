@@ -18,6 +18,7 @@ interface SearchModalState {
   setQuery: (query: string) => void;
   setResults: (results: SearchResultsData) => void;
   setLoading: (isLoading: boolean) => void;
+  clearResults: () => void;
 }
 
 export const useSearchModal = create<SearchModalState>()(
@@ -53,6 +54,7 @@ export const useSearchModal = create<SearchModalState>()(
       setQuery: (query) => set({ query }),
       setResults: (results) => set({ results, isLoading: false }),
       setLoading: (isLoading) => set({ isLoading }),
+      clearResults: () => set({ results: null, query: "", isLoading: false }),
     }),
     { name: "search-modal" },
   ),
