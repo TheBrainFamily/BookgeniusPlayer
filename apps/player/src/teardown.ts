@@ -117,13 +117,7 @@ export async function teardownPlayer(): Promise<void> {
 
   // Clear search results and close search modal when changing books
   try {
-    const searchModal = useSearchModal.getState();
-    if (searchModal.isOpen) {
-      searchModal.closeModal();
-    } else {
-      // If modal is not open, just clear results
-      searchModal.clearResults();
-    }
+    useSearchModal.getState().closeModal();
   } catch (e) {
     console.warn("teardownPlayer: clearing search results failed", e);
   }
