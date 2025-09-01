@@ -48,7 +48,7 @@ const getModalContentClasses = (isTransparent: boolean, layoutView: boolean, cla
     !isTransparent && "bg-black/70 textured-bg border border-white/30 shadow-xl text-white",
 
     // Layout view specific styling
-    layoutView && ["max-w-[700px] overflow-hidden max-h-[80vh]", "lg:order-1 lg:max-w-[700px] lg:flex-1", "xl:flex-1 xl:max-w-[700px] xl:order-3"],
+    layoutView && ["max-w-[700px] overflow-hidden max-h-[80vh]", "xl:flex-1 xl:max-w-[700px] xl:order-3"],
 
     // Custom className overrides
     className,
@@ -111,7 +111,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
       {/* Modal Content */}
       <DialogContent className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}>
         <div className={cn("flex flex-row gap-2 justify-center items-center mx-auto p-2 xl:px-4 h-full", sizeConfig.container)}>
-          {layoutView && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none lg:flex lg:order-2 lg:flex-2 lg:max-w-[900px] xl:flex-1 xl:order-1" />}
+          {layoutView && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none xl:flex xl:flex-1 xl:order-1" />}
 
           <motion.div
             className={modalContentClasses}
@@ -150,7 +150,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             </motion.main>
           </motion.div>
 
-          {layoutView && <div id="right-notes-blank" className="hidden max-w-[900px] xl:block xl:flex-2 xl:order-2" />}
+          {layoutView && <div id="right-notes-blank" className="hidden xl:block xl:flex-2 xl:order-2" />}
         </div>
       </DialogContent>
     </Dialog>
