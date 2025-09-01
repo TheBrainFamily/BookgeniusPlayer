@@ -92,24 +92,11 @@ const ModalUI: React.FC<ModalUIProps> = ({
 
   return (
     <Dialog open={true} onOpenChange={handleOpenChange} modal={!layoutView}>
-      {/* Overlay with AnimatePresence */}
-      <AnimatePresence>
-        {!hideOverlay && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
-          />
-        )}
-      </AnimatePresence>
-
       {/* Accessibility */}
       {title ? <DialogTitle className="sr-only">{typeof title === "string" ? title : "Modal"}</DialogTitle> : <DialogTitle className="sr-only">Modal</DialogTitle>}
 
       {/* Modal Content */}
-      <DialogContent className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}>
+      <DialogContent overlayProps={{ useCustomAnimation: true, hideOverlay }} className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}>
         <div className={cn("flex flex-row gap-2 justify-center items-center mx-auto p-2 xl:px-4 h-full", sizeConfig.container)}>
           {layoutView && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none lg:flex lg:order-2 lg:flex-2 lg:max-w-[900px] xl:flex-1 xl:order-1" />}
 
