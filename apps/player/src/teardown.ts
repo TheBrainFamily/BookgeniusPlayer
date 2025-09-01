@@ -8,6 +8,7 @@ import { clearBookStringifiedCache } from "@player/genericBookDataGetters/getBoo
 import { clearCharactersDataCache } from "@player/genericBookDataGetters/getCharactersData";
 import { clearCutScenesCache } from "@player/genericBookDataGetters/getCutScenesForBook";
 import { clearKnownVideoFilesCache } from "@player/genericBookDataGetters/getKnownVideoFiles";
+import { useSearchModal } from "@player/stores/modals/searchModal.store";
 
 /**
  * Completely tear down the player runtime:
@@ -112,5 +113,12 @@ export async function teardownPlayer(): Promise<void> {
     clearKnownVideoFilesCache();
   } catch (e) {
     console.warn("teardownPlayer: clearing caches failed", e);
+  }
+
+  // Clear search results and close search modal when changing books
+  try {
+    useSearchModal.getState().closeModal();
+  } catch (e) {
+    console.warn("teardownPlayer: clearing search results failed", e);
   }
 }
