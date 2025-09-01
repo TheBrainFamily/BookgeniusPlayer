@@ -48,7 +48,7 @@ const getModalContentClasses = (isTransparent: boolean, layoutView: boolean, cla
     !isTransparent && "bg-black/70 textured-bg border border-white/30 shadow-xl text-white",
 
     // Layout view specific styling
-    layoutView && ["max-w-[700px] overflow-hidden max-h-[80vh]", "lg:order-1 lg:max-w-[700px] lg:flex-1", "xl:flex-1 xl:max-w-[700px] xl:order-3"],
+    layoutView && ["max-w-[700px] overflow-hidden max-h-[70vh]", "lg:order-1 lg:max-w-[700px] lg:flex-1", "xl:flex-1 xl:max-w-[700px] xl:order-3"],
 
     // Custom className overrides
     className,
