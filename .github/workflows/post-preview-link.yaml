@@ -26,6 +26,7 @@ jobs:
           run_id: ${{ github.event.workflow_run.id }}
           name: deployed-books
           path: .
+          if_no_artifact_found: ignore
       - uses: actions/github-script@v7
         env:
           BRANCH_BASE_DOMAIN: ${{ vars.BRANCH_BASE_DOMAIN }}
@@ -43,7 +44,7 @@ jobs:
             const pr = prs.data[0];
 
             const branch = pr.head.ref.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const base = process.env.BRANCH_BASE_DOMAIN || 'branches.bookgenius.eu';
+            const base = process.env.BRANCH_BASE_DOMAIN || 'branches.bookgenius.net';
             const url = `https://${branch}.${base}/`;
 
             // Read deployed books artifact (if present)
@@ -85,14 +86,7 @@ jobs:
             }
 
             // Deployment button
-            const dep = await github.rest.repos.createDeployment({
-              owner, repo, ref: pr.head.sha,
-              auto_merge: false, required_contexts: [],
-              environment: `preview-${branch}`,
-              description: 'Preview deployment',
-              transient_environment: true, production_environment: false,
-            });
             await github.rest.repos.createDeploymentStatus({
-              owner, repo, deployment_id: dep.data.id,
+              owner, repo, deployment_id: '8359573672',
               state: 'success', environment_url: url, log_url: url, auto_inactive: true,
             });
