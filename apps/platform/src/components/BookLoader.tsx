@@ -107,7 +107,7 @@ export const BookLoader: React.FC<BookLoaderProps> = ({ title, author, loadingPh
               hover:scale-105 hover:border-white/40 hover:bg-black/30 hover:shadow-white/25
               active:scale-100 active:shadow-white/15
               cursor-pointer
-              ${showStartButton ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}
+              ${showStartButton ? "opacity-100" : "opacity-0 pointer-events-none"}
             `}
             style={{ animation: showStartButton ? "buttonPulse 4s ease-in-out infinite" : "none", willChange: "transform, opacity, box-shadow" }}
           >
