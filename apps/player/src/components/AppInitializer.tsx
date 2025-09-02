@@ -24,22 +24,8 @@ export function AppInitializer({ children }: AppInitializerProps) {
     initializeApp();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="app-loading">
-        <div className="loading-spinner">Loading book data...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="app-error">
-        <h1>Error loading book</h1>
-        <p>{error}</p>
-        <button onClick={() => window.location.reload()}>Reload</button>
-      </div>
-    );
+  if (isLoading || error) {
+    return null;
   }
 
   return <>{children}</>;
