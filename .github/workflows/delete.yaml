@@ -7,35 +7,33 @@ jobs:
   cleanup:
     if: github.event.ref_type == 'branch'
     runs-on: ubuntu-latest
-    environment: lucetius
-
-    env:
-      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
-      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
-      DEPLOY_ROOT_DIR: ${{ vars.DEPLOY_ROOT_DIR }}
-
+    environment: cloudflare
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Set-up s5cmd
+        uses: peak/action-setup-s5cmd@main
+        with:
+          version: v2.3.0
 
       - name: Set branch slug
         id: branch
         run: |
-          RAW_BRANCH="${{ github.event.ref }}"
-          SAFE_BRANCH=$(echo "$RAW_BRANCH" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
-          echo "branch_name=$SAFE_BRANCH" >> "$GITHUB_OUTPUT"
-
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          BRANCH_NAME=$(echo "${{ github.event.ref }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+          echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
+          echo "asset_context=branches/${BRANCH_NAME}" >> "$GITHUB_OUTPUT"
 
       - name: Run cleanup on server
-        run: bash scripts/github-actions/delete-deployment.sh
+        if: ${{ steps.branch.outputs.branch_name != 'main' }}
+        run: bash delete-branch-asset.sh
         env:
           BRANCH_NAME: ${{ steps.branch.outputs.branch_name }}
+          ASSET_CONTEXT: ${{ steps.branch.outputs.asset_context }}
+          S3_BUCKET: ${{ vars.S3_BUCKET }}
+          S3_ENDPOINT_URL: ${{ vars.S3_ENDPOINT_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
