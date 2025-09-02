@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { useModalCoordinator } from "../modalCoordinator.store";
+import { useContentShift } from "../contentShift.store";
 import { SearchResultsData } from "@player/searchModal";
 
 const MODAL_ID = "search-modal";
@@ -33,6 +34,11 @@ export const useSearchModal = create<SearchModalState>()(
       openModal: (layoutView, hideOverlay, query = "") => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
+          // Enable content shift if opening in layout view
+          if (layoutView) {
+            useContentShift.getState().enableContentShift();
+          }
+
           set({
             isOpen: true,
             layoutView,
@@ -45,6 +51,9 @@ export const useSearchModal = create<SearchModalState>()(
       },
 
       closeModal: () => {
+        // Disable content shift when closing modal
+        useContentShift.getState().disableContentShift();
+
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
         set({ isOpen: false, query: "", results: null, isLoading: false });

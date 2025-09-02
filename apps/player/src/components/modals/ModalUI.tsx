@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 
 import { cn } from "@player/lib/utils";
 import { Dialog, DialogContent, DialogTitle } from "@player/components/ui/dialog";
+import { useContentShift } from "@player/stores/contentShift.store";
 
 export interface ModalUIProps {
   title?: ReactNode;
@@ -75,6 +76,8 @@ const ModalUI: React.FC<ModalUIProps> = ({
   showCloseButton = true,
   animateHeight = false,
 }) => {
+  const { isContentShiftedLeft } = useContentShift();
+
   const handleOpenChange = useCallback(
     (open: boolean) => {
       if (!open && !layoutView) {
@@ -110,8 +113,15 @@ const ModalUI: React.FC<ModalUIProps> = ({
 
       {/* Modal Content */}
       <DialogContent className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}>
-        <div className={cn("flex flex-row gap-2 justify-center items-center mx-auto p-2 xl:px-4 h-full", sizeConfig.container)}>
-          {layoutView && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none xl:flex xl:flex-1 xl:order-1" />}
+        <div
+          className={cn(
+            "flex flex-row gap-2 items-center mx-auto p-2 xl:px-4 h-full",
+            sizeConfig.container,
+            // Position modal in the right space when content is shifted left
+            isContentShiftedLeft && layoutView ? "justify-end pr-[5%]" : "justify-center",
+          )}
+        >
+          {layoutView && !isContentShiftedLeft && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none xl:flex xl:flex-1 xl:order-1" />}
 
           <motion.div
             className={modalContentClasses}
@@ -150,7 +160,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             </motion.main>
           </motion.div>
 
-          {layoutView && <div id="right-notes-blank" className="hidden xl:block xl:flex-2 xl:order-2" />}
+          {layoutView && !isContentShiftedLeft && <div id="right-notes-blank" className="hidden xl:block xl:flex-2 xl:order-2" />}
         </div>
       </DialogContent>
     </Dialog>

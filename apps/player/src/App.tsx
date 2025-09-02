@@ -12,6 +12,7 @@ import { RealtimeProvider } from "./context/RealtimeContext";
 import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
 import { BookContentWrapper } from "./components/BookContentWrapper";
 import { useAudiobookTracks } from "@player/hooks/useAudiobookTracks";
+import { ContentShiftWrapper } from "./components/ContentShiftWrapper";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -62,7 +63,7 @@ function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   useEffect(() => {
     onShellMounted();
     void i18n.changeLanguage(languageNameToCode(getBookData().metadata.language));
-  }, []);
+  }, [onShellMounted, i18n]);
 
   return (
     <>
@@ -73,6 +74,7 @@ function Shell({ onShellMounted }: { onShellMounted: () => void }) {
       {/* Not used for now, but can be re-enabled if needed later */}
       {/* <RightNotesPanel /> */}
       <Footer />
+      <ContentShiftWrapper />
       {import.meta.env.VITE_EDITOR === "true" && <EditorMode />}
     </>
   );
