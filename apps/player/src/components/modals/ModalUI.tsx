@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback } from "react";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 
@@ -40,7 +40,7 @@ const getModalSizeConfig = (layoutView: boolean, size: NonNullable<ModalUIProps[
   return layoutView ? LAYOUT_VIEW_SIZE : MODAL_SIZES[size];
 };
 
-const getModalContentClasses = (isTransparent: boolean, layoutView: boolean, className: string): string => {
+const getModalContentClasses = (isTransparent: boolean, layoutView: boolean, className: string, isContentShifted: boolean, isLargeScreen: boolean): string => {
   return cn(
     // Base classes
     "rounded-lg overflow-hidden w-full flex flex-col align-center justify-center h-fit pointer-events-auto",
@@ -49,7 +49,13 @@ const getModalContentClasses = (isTransparent: boolean, layoutView: boolean, cla
     !isTransparent && "bg-black/70 textured-bg border border-white/30 shadow-xl text-white",
 
     // Layout view specific styling
-    layoutView && ["max-w-[700px] overflow-hidden max-h-[80vh]", "xl:flex-1 xl:max-w-[700px] xl:order-3"],
+    layoutView && [
+      "overflow-hidden max-h-[80vh]",
+      // On large screens with content shifted, use narrower width; otherwise use full width
+      isLargeScreen && isContentShifted ? "w-[30vw]" : "max-w-[700px]",
+      // Only apply flex layout on large screens without content shift
+      !isContentShifted && "xl:flex-1 xl:max-w-[700px] xl:order-3",
+    ],
 
     // Custom className overrides
     className,
@@ -77,6 +83,17 @@ const ModalUI: React.FC<ModalUIProps> = ({
   animateHeight = false,
 }) => {
   const { isContentShiftedLeft } = useContentShift();
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsLargeScreen(window.innerWidth >= 1280);
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -89,9 +106,12 @@ const ModalUI: React.FC<ModalUIProps> = ({
 
   const isTransparent = isTransparentModal(transparent, className);
   const sizeConfig = getModalSizeConfig(layoutView, size);
-  const modalContentClasses = getModalContentClasses(isTransparent, layoutView, className);
+  const modalContentClasses = getModalContentClasses(isTransparent, layoutView, className, isContentShiftedLeft, isLargeScreen);
   const titleTextClasses = getTitleClasses(isTransparent);
   const closeButtonClasses = getCloseButtonClasses(isTransparent);
+
+  // Only shift content on large screens
+  const shouldShiftContent = isContentShiftedLeft && isLargeScreen;
 
   return (
     <Dialog open={true} onOpenChange={handleOpenChange} modal={!layoutView}>
@@ -115,13 +135,13 @@ const ModalUI: React.FC<ModalUIProps> = ({
       <DialogContent className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}>
         <div
           className={cn(
-            "flex flex-row gap-2 items-center mx-auto p-2 xl:px-4 h-full",
+            "flex flex-row gap-2 items-center p-2 xl:px-4 h-full",
             sizeConfig.container,
-            // Position modal in the right space when content is shifted left
-            isContentShiftedLeft && layoutView ? "justify-end pr-[5%]" : "justify-center",
+            // Position modal in the right space when content is shifted left on large screens
+            shouldShiftContent && layoutView ? "justify-end pr-[3%] ml-auto mr-0" : "justify-center mx-auto",
           )}
         >
-          {layoutView && !isContentShiftedLeft && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none xl:flex xl:flex-1 xl:order-1" />}
+          {layoutView && !shouldShiftContent && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none xl:flex xl:flex-1 xl:order-1" />}
 
           <motion.div
             className={modalContentClasses}
@@ -160,7 +180,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             </motion.main>
           </motion.div>
 
-          {layoutView && !isContentShiftedLeft && <div id="right-notes-blank" className="hidden xl:block xl:flex-2 xl:order-2" />}
+          {layoutView && !shouldShiftContent && <div id="right-notes-blank" className="hidden xl:block xl:flex-2 xl:order-2" />}
         </div>
       </DialogContent>
     </Dialog>
