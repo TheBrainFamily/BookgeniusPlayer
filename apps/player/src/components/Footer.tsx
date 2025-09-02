@@ -51,7 +51,7 @@ const Footer = () => {
             "px-2 py-3 sm:pr-0 xl:px-4 sm:pl-4",
             bookForm === "play" ? "!px-3" : "",
             // Shift footer left when search modal is open on large screens
-            shouldShiftFooter ? "transform -translate-x-[15%] transition-transform duration-300" : "",
+            shouldShiftFooter ? "transform -translate-x-[14%] transition-transform duration-300" : "",
           )}
         >
           {bookForm === "play" ? (

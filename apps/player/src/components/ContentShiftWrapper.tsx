@@ -22,7 +22,7 @@ export const ContentShiftWrapper: React.FC = () => {
     // Only apply content shift on large screens (≥1280px)
     if (isContentShiftedLeft && isLargeScreen) {
       // Shift content left by adding transform and adjusting layout
-      bookContainer.style.transform = "translateX(-20%)";
+      bookContainer.style.transform = "translateX(-18%)";
       bookContainer.style.transition = "transform 0.3s ease-in-out";
       bookContainer.style.width = "75%";
       bookContainer.style.maxWidth = "calc(120rem * 0.75)";
