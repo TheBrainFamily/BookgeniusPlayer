@@ -86,19 +86,28 @@ jobs:
             }
 
             // Deployment button
-            const deployments = await github.rest.repos.listDeployments({
-              owner,
-              repo,
-              sha: run.head_sha,
-              environment: "cloudflare",
-            });
+            const pickLatest = (items = []) =>
+              items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
 
-            if (deployments.data.length) {
-              const deployment_id = deployments.data[0].id;
+            const bySha = await github.rest.repos.listDeployments({
+              owner, repo, sha: run.head_sha, environment: "cloudflare",
+            });
+            let chosen = pickLatest(bySha.data);
+
+            if (!chosen) {
+              const byRef = await github.rest.repos.listDeployments({
+                owner, repo, ref: pr.head.ref, environment: "cloudflare",
+              });
+              chosen = pickLatest(byRef.data);
+            }
+
+            if (chosen) {
               await github.rest.repos.createDeploymentStatus({
-                owner, repo, deployment_id,
+                owner, repo, deployment_id: chosen.id,
                 state: 'success', environment_url: url, log_url: url, auto_inactive: true,
               });
+            } else {
+              core.info('No matching deployment found for sha or ref; skipping createDeploymentStatus.');
             }
 
 
