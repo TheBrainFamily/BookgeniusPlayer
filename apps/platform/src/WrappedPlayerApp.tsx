@@ -19,7 +19,7 @@ const WrappedPlayerApp = () => {
   const [paywallVisible, setPaywallVisible] = useState(false);
   const [bookSlug, setBookSlug] = useState("");
   const [bookTitle, setBookTitle] = useState("");
-  const { startTransition, finishTransition, navigating } = useRouteTransition();
+  const { startTransition, finishTransition, cancelTransition } = useRouteTransition();
   const lastBookRef = useRef<string | null>(null);
   const [paywallMounted, setPaywallMounted] = useState(false);
   const paywallHostRef = useRef<HTMLDivElement | null>(null);
@@ -129,6 +129,7 @@ const WrappedPlayerApp = () => {
       try {
         // Hard reset player runtime and legacy DOM/media
         void teardownPlayer();
+        cancelTransition();
       } catch (e) {
         console.error("teardownPlayer failed", e);
       }

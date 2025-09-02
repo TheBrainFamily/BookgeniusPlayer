@@ -10,6 +10,8 @@ type Ctx = {
   startTransition: (meta: LoaderMeta) => void;
   // finishes the overlay (e.g., when iframe ready)
   finishTransition: () => void;
+  // cancels the overlay immediately (e.g., on error)
+  cancelTransition: () => void;
   // is overlay visible
   navigating: boolean;
   // configure min visible time
@@ -62,13 +64,19 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
     return () => clearTimeout(timeout);
   }, [minDurationMs]);
 
+  const cancelTransition = useCallback(() => {
+    setNavigating(false);
+    setMeta(null);
+    startTimeRef.current = null;
+  }, []);
+
   // If the route changes unexpectedly while navigating, keep overlay unless a new
   // startTransition comes in; this helps continuity.
   useEffect(() => {
     // no-op; location access ensures provider updates on route change
   }, [location]);
 
-  const value = useMemo(() => ({ startTransition, finishTransition, navigating, setMinDurationMs }), [finishTransition, navigating, startTransition]);
+  const value = useMemo(() => ({ startTransition, finishTransition, cancelTransition, navigating, setMinDurationMs }), [finishTransition, navigating, startTransition]);
 
   return (
     <RouteTransitionContext.Provider value={value}>
