@@ -96,6 +96,9 @@ export const BookLoader: React.FC<BookLoaderProps> = ({ title, author, loadingPh
         <div className="mt-6 sm:mt-8 lg:mt-16 h-12 sm:h-14 lg:h-16 flex items-center justify-center">
           <button
             onClick={onStartClick}
+            disabled={!showStartButton || !onStartClick}
+            aria-hidden={!showStartButton}
+            tabIndex={showStartButton ? 0 : -1}
             className={`
               bg-black/20 backdrop-blur-sm rounded-full border border-white/20 
               text-white font-semibold 
@@ -111,7 +114,7 @@ export const BookLoader: React.FC<BookLoaderProps> = ({ title, author, loadingPh
             `}
             style={{ animation: showStartButton ? "buttonPulse 4s ease-in-out infinite" : "none", willChange: "transform, opacity, box-shadow" }}
           >
-            <div className="play-icon">
+            <div className="play-icon" aria-hidden="true">
               <div className="w-0 h-0 border-l-[10px] sm:border-l-[12px] border-l-white border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent ml-1"></div>
             </div>
             <span className="min-w-[3em] sm:min-w-[4em] text-center transition-opacity duration-300">Start</span>
