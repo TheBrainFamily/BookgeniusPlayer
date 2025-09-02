@@ -44,7 +44,7 @@ jobs:
             const pr = prs.data[0];
 
             const branch = pr.head.ref.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const base = process.env.BRANCH_BASE_DOMAIN || 'branches.bookgenius.net';
+            const base = process.env.BRANCH_BASE_DOMAIN || 'branches.bookgeniusz.pl';
             const url = `https://${branch}.${base}/`;
 
             // Read deployed books artifact (if present)
@@ -86,7 +86,19 @@ jobs:
             }
 
             // Deployment button
-            await github.rest.repos.createDeploymentStatus({
-              owner, repo, deployment_id: '8359573672',
-              state: 'success', environment_url: url, log_url: url, auto_inactive: true,
+            const deployments = await github.rest.repos.listDeployments({
+              owner,
+              repo,
+              sha: run.head_sha,
+              environment: "cloudflare",
             });
+
+            if (deployments.data.length) {
+              const deployment_id = deployments.data[0].id;
+              await github.rest.repos.createDeploymentStatus({
+                owner, repo, deployment_id,
+                state: 'success', environment_url: url, log_url: url, auto_inactive: true,
+              });
+            }
+
+
