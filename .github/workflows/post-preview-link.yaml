@@ -104,7 +104,7 @@ jobs:
             if (chosen) {
               await github.rest.repos.createDeploymentStatus({
                 owner, repo, deployment_id: chosen.id,
-                state: 'success', environment_url: url, log_url: url, auto_inactive: true,
+                state: 'success', environment_url: url, log_url: url, auto_inactive: false,
               });
             } else {
               core.info('No matching deployment found for sha or ref; skipping createDeploymentStatus.');
