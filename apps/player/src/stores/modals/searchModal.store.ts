@@ -16,6 +16,7 @@ interface SearchModalState {
 
   openModal: (layoutView?: boolean, hideOverlay?: boolean, query?: string) => void;
   closeModal: () => void;
+  clearModal: () => void;
   setQuery: (query: string) => void;
   setResults: (results: SearchResultsData) => void;
   setLoading: (isLoading: boolean) => void;
@@ -56,7 +57,11 @@ export const useSearchModal = create<SearchModalState>()(
 
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
-        set({ isOpen: false, query: "", results: null, isLoading: false });
+        set({ isOpen: false, isLoading: false });
+      },
+
+      clearModal: () => {
+        set({ query: "", results: null, isLoading: false });
       },
 
       setQuery: (query) => set({ query }),
