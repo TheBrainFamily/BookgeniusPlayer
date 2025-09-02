@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import { useLocation } from "react-router-dom";
 import { BookLoader } from "@platform/components/BookLoader";
 
-type LoaderMeta = { title: string; phrases: string[]; author?: string };
+type LoaderMeta = { title: string; phrases: string[]; author?: string; showStartButton?: boolean; onStartClick?: () => void };
 
 type Ctx = {
   // starts the overlay with BookLoader, returns a cleanup you generally
@@ -16,6 +16,8 @@ type Ctx = {
   navigating: boolean;
   // configure min visible time
   setMinDurationMs: (ms: number) => void;
+  // whether user has navigated from platform (vs direct to /reader/)
+  hasNavigatedFromPlatform: boolean;
 };
 
 const RouteTransitionContext = createContext<Ctx | null>(null);
@@ -37,14 +39,16 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
   const [navigating, setNavigating] = useState(false);
   const [meta, setMeta] = useState<LoaderMeta | null>(null);
   const [minDurationMs, setMinDurationMs] = useState(defaultMinDurationMs);
+  const [hasNavigatedFromPlatform, setHasNavigatedFromPlatform] = useState(false);
 
   const startTimeRef = useRef<number | null>(null);
   const location = useLocation(); // used to reset if user navigates away quickly
 
   const startTransition = useCallback((m: LoaderMeta) => {
-    setMeta({ title: m.title, phrases: m.phrases, author: m.author ?? "" });
+    setMeta({ title: m.title, phrases: m.phrases, author: m.author ?? "", showStartButton: m.showStartButton, onStartClick: m.onStartClick });
     startTimeRef.current = performance.now();
     setNavigating(true);
+    setHasNavigatedFromPlatform(true);
   }, []);
 
   const finishTransition = useCallback(() => {
@@ -76,7 +80,16 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
     // no-op; location access ensures provider updates on route change
   }, [location]);
 
-  const value = useMemo(() => ({ startTransition, finishTransition, cancelTransition, navigating, setMinDurationMs }), [finishTransition, navigating, startTransition]);
+  useEffect(() => {
+    if (!location.pathname.startsWith("/reader/")) {
+      setHasNavigatedFromPlatform(false);
+    }
+  }, [location]);
+
+  const value = useMemo(
+    () => ({ startTransition, finishTransition, cancelTransition, navigating, setMinDurationMs, hasNavigatedFromPlatform }),
+    [finishTransition, navigating, startTransition, hasNavigatedFromPlatform],
+  );
 
   return (
     <RouteTransitionContext.Provider value={value}>
@@ -93,6 +106,8 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
                 loadingPhrases={meta.phrases}
                 // While overlay is visible, pretend it's not loaded
                 isLoaded={!navigating}
+                showStartButton={meta.showStartButton}
+                onStartClick={meta.onStartClick}
               />
             </div>
           ) : null}

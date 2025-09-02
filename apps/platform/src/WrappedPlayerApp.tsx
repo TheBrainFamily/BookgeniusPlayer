@@ -19,10 +19,18 @@ const WrappedPlayerApp = () => {
   const [paywallVisible, setPaywallVisible] = useState(false);
   const [bookSlug, setBookSlug] = useState("");
   const [bookTitle, setBookTitle] = useState("");
-  const { startTransition, finishTransition, cancelTransition } = useRouteTransition();
+  const [needsUserGesture, setNeedsUserGesture] = useState(false);
+  const { startTransition, finishTransition, cancelTransition, hasNavigatedFromPlatform } = useRouteTransition();
   const lastBookRef = useRef<string | null>(null);
   const [paywallMounted, setPaywallMounted] = useState(false);
   const paywallHostRef = useRef<HTMLDivElement | null>(null);
+
+  // Detect if this is a direct navigation to /reader/
+  useEffect(() => {
+    if (!hasNavigatedFromPlatform) {
+      setNeedsUserGesture(true);
+    }
+  }, [hasNavigatedFromPlatform]);
 
   useEffect(() => {
     const handleShowPaywall = (event: CustomEvent) => {
@@ -30,6 +38,7 @@ const WrappedPlayerApp = () => {
       setBookSlug(event.detail.bookSlug);
       setBookTitle(event.detail.bookTitle);
     };
+
     window.addEventListener("ShowPaywall", handleShowPaywall);
     return () => window.removeEventListener("ShowPaywall", handleShowPaywall);
   }, []);
@@ -49,32 +58,42 @@ const WrappedPlayerApp = () => {
   useEffect(() => {
     const onReady = () => {
       setIsPlayerReady(true);
-      finishTransition();
-      console.log("BOOK LOADER App is ready");
 
-      window.setTimeout(() => {
-        console.log("BOOK LOADER App is ready, hiding splash screen");
-        window.dispatchEvent(new CustomEvent("splashHidden"));
-      }, 1000);
+      // If needsUserGesture is true, we wait for Start button click
+      if (!needsUserGesture) {
+        finishTransition();
+        console.log("BOOK LOADER App is ready");
+
+        window.setTimeout(() => {
+          console.log("BOOK LOADER App is ready, hiding splash screen");
+          window.dispatchEvent(new CustomEvent("splashHidden"));
+        }, 1000);
+      }
     };
 
     window.addEventListener("appReady", onReady);
-
     return () => window.removeEventListener("appReady", onReady);
-  }, [finishTransition]);
+  }, [finishTransition, needsUserGesture]);
+
+  const handleStartClick = () => {
+    setNeedsUserGesture(false);
+    finishTransition();
+
+    window.setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("splashHidden"));
+    }, 1000);
+  };
 
   const book = searchParams.get("book");
   // Ensure loader shows on direct loads to /reader/?book=...
   useEffect(() => {
     if (!book) return;
 
-    // If navigation already started elsewhere (e.g., clicking from catalog), don't restart it
-
     const meta = books.find((b) => b.slug === book);
     const title = meta?.title ?? "BookGenius";
     const phrases = meta?.phrases ?? [];
-    startTransition({ title, phrases, author: meta?.author });
-  }, [book, startTransition]);
+    startTransition({ title, phrases, author: meta?.author, showStartButton: needsUserGesture && isPlayerReady, onStartClick: handleStartClick });
+  }, [book, startTransition, needsUserGesture, isPlayerReady]);
 
   useEffect(() => {
     if (book !== lastBookRef.current) {
