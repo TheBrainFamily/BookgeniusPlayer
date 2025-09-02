@@ -13,10 +13,8 @@
   background-color: black; /* Make container transparent */
   color: var(--text-light);
   width: 100%;
-  height: 100vh; /* Fallback */
-  height: calc(100vh + var(--safe-area-inset-bottom)); /* Extend to include the bottom safe area */
-  min-height: -webkit-fill-available; /* Fill entire height on iOS */
-  max-height: 100svh;
+  height: 100vh;
+  height: 100svh;
   overflow: hidden; /* Hide main overflow, content scrolls */
   display: flex;
   flex-direction: row; /* Arrange items horizontally (book + notes) */
@@ -1636,6 +1634,6 @@ section[data-chapter] [data-index] {
   scrollbar-width: none !important;
 }
 
-.character-notes-custom > div:last-child {
+.character-notes-custom > div:last-child:not(:only-child) {
   padding-bottom: 30px;
 }

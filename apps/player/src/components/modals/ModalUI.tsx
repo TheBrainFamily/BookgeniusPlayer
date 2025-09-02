@@ -50,7 +50,7 @@ const getModalContentClasses = (isTransparent: boolean, layoutView: boolean, cla
 
     // Layout view specific styling
     layoutView && [
-      "overflow-hidden max-h-[80vh]",
+      "overflow-hidden max-h-[70vh]",
       // On large screens with content shifted, use narrower width; otherwise use full width
       isLargeScreen && isContentShifted ? "w-[26vw]" : "max-w-[700px]",
       // Only apply flex layout on large screens without content shift
@@ -115,24 +115,11 @@ const ModalUI: React.FC<ModalUIProps> = ({
 
   return (
     <Dialog open={true} onOpenChange={handleOpenChange} modal={!layoutView}>
-      {/* Overlay with AnimatePresence */}
-      <AnimatePresence>
-        {!hideOverlay && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
-          />
-        )}
-      </AnimatePresence>
-
       {/* Accessibility */}
       {title ? <DialogTitle className="sr-only">{typeof title === "string" ? title : "Modal"}</DialogTitle> : <DialogTitle className="sr-only">Modal</DialogTitle>}
 
       {/* Modal Content */}
-      <DialogContent className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}>
+      <DialogContent overlayProps={{ useCustomAnimation: true, hideOverlay }} className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}>
         <div
           className={cn(
             "flex flex-row gap-2 items-center p-2 xl:px-4 h-full",

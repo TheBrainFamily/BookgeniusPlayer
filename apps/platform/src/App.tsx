@@ -1,14 +1,15 @@
+import { lazy, Suspense } from "react";
+import { Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import { Toaster } from "@platform/components/ui/toaster";
 import { Toaster as Sonner } from "@platform/components/ui/sonner";
 import { TooltipProvider } from "@platform/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { RouteTransitionProvider } from "./providers/RouteTransitionProvider";
 import { UniversalRouter } from "./UniversalRouter";
 import { IntegrationsProvider, useIntegrations } from "@platform/integrations";
-import { lazy, Suspense } from "react";
 import GenreExploration from "./components/GenreExploration";
 import BookExperience from "./components/BookExperience";
 import PaymentSuccess from "./components/PaymentSuccess";

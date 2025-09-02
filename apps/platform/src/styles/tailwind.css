@@ -210,11 +210,7 @@
     @apply border-border outline-ring/50;
   }
   #platform-scope {
-    @apply bg-background text-foreground;
     font-family: var(--font-family-serif);
-    background-image:
-      radial-gradient(circle at 20% 20%, hsl(45 40% 15% / 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, hsl(35 35% 12% / 0.4) 0%, transparent 50%),
-      linear-gradient(180deg, hsl(15 20% 8%) 0%, hsl(20 25% 6%) 100%);
   }
 
   #platform-scope ::-webkit-scrollbar {

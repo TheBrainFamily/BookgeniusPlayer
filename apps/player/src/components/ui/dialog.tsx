@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 
 import { cn } from "@player/lib/utils";
 
@@ -20,7 +21,28 @@ function DialogClose({ ...props }: React.ComponentProps<typeof DialogPrimitive.C
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
-function DialogOverlay({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+function DialogOverlay({
+  className,
+  useCustomAnimation = false,
+  hideOverlay = false,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Overlay> & { useCustomAnimation?: boolean; hideOverlay?: boolean }) {
+  if (useCustomAnimation) {
+    return (
+      <AnimatePresence>
+        {!hideOverlay && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className={cn("absolute inset-0 z-50 bg-black/60 backdrop-blur-sm", className)}
+          />
+        )}
+      </AnimatePresence>
+    );
+  }
+
   return (
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
@@ -33,7 +55,12 @@ function DialogOverlay({ className, ...props }: React.ComponentProps<typeof Dial
   );
 }
 
-function DialogContent({ className, children, ...props }: React.ComponentProps<typeof DialogPrimitive.Content>) {
+function DialogContent({
+  className,
+  children,
+  overlayProps,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Content> & { overlayProps?: React.ComponentProps<typeof DialogOverlay> & { useCustomAnimation?: boolean; hideOverlay?: boolean } }) {
   const container = React.useMemo<HTMLElement | undefined>(() => {
     if (typeof window === "undefined") return undefined;
     return document.getElementById("player-scope") ?? undefined;
@@ -41,7 +68,7 @@ function DialogContent({ className, children, ...props }: React.ComponentProps<t
 
   return (
     <DialogPortal data-slot="dialog-portal" container={container}>
-      {/* <DialogOverlay /> */}
+      <DialogOverlay {...overlayProps} />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(

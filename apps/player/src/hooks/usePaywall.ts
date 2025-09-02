@@ -2,12 +2,16 @@ import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { bookDataLoader } from "@player/services/bookDataLoader";
 import { useLocation } from "@player/state/LocationContext";
 import { useEffect } from "react";
+import useSplashHidden from "./useSplashHidden";
 
 export const usePaywall = () => {
   const { location } = useLocation();
+  const isSplashHidden = useSplashHidden();
 
   const { currentChapter } = location;
   useEffect(() => {
+    if (!isSplashHidden) return;
+
     if (bookDataLoader.getBookVisibility() !== "full") {
       let timeout: ReturnType<typeof setTimeout>;
       if ((getBookData().metadata.bookForm === "play" && currentChapter > 2) || (getBookData().metadata.bookForm === "book" && currentChapter > 1)) {
@@ -17,5 +21,5 @@ export const usePaywall = () => {
       }
       return () => clearTimeout(timeout);
     }
-  }, [currentChapter]);
+  }, [currentChapter, isSplashHidden]);
 };
