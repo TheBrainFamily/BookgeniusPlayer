@@ -88,7 +88,7 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
 
   const value = useMemo(
     () => ({ startTransition, finishTransition, cancelTransition, navigating, setMinDurationMs, hasNavigatedFromPlatform }),
-    [finishTransition, navigating, startTransition, hasNavigatedFromPlatform],
+    [finishTransition, navigating, startTransition, cancelTransition, setMinDurationMs, hasNavigatedFromPlatform],
   );
 
   return (

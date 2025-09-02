@@ -279,11 +279,12 @@
 @keyframes pulseGlow {
   0%,
   100% {
-    transform: scale(1);
+    /* DS: Leaving for now, effect looks jumpy on iOS (transform + filter) */
+    /* transform: scale(1) rotate(0.1deg); */
     filter: drop-shadow(0 0 7px rgba(var(--book-primary-color-rgb), 0.5));
   }
   50% {
-    transform: scale(1.1);
+    /* transform: scale(1.1) rotate(0.1deg); */
     filter: drop-shadow(0 0 10px rgba(var(--book-primary-color-rgb), 0.7)) drop-shadow(0 0 15px rgba(var(--book-primary-color-rgb), 0.4));
   }
 }

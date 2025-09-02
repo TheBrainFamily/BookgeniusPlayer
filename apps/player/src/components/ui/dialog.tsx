@@ -37,7 +37,6 @@ function DialogOverlay({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={cn("absolute inset-0 z-50 bg-black/60 backdrop-blur-sm", className)}
-            // {...props}
           />
         )}
       </AnimatePresence>
