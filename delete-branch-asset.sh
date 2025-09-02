@@ -6,10 +6,6 @@ set -euo pipefail
 
 ENDPOINT_FLAG=( --endpoint-url "$S3_ENDPOINT_URL" )
 
- set -euo pipefail
-
- ENDPOINT_FLAG=( --endpoint-url "$S3_ENDPOINT_URL" )
-
 : "${S3_BUCKET:?S3_BUCKET is required}"
 : "${ASSET_CONTEXT:?ASSET_CONTEXT is required}"
 : "${S3_ENDPOINT_URL:?S3_ENDPOINT_URL is required}"
