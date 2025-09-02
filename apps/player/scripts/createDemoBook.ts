@@ -117,6 +117,7 @@ export async function createDemoBook(fullBookPath: string, demoBookPath: string,
 
   for (const fileName of dataFiles) {
     const baseName = path.basename(fileName, ".js");
+
     const data = await importCompiledData(fullBookPath, fileName);
 
     if (!data) continue;
@@ -258,7 +259,17 @@ export const getBookStringified = () => {
       fs.mkdirSync(destAssetsDir, { recursive: true });
     }
 
-    const allAssets = fs.readdirSync(srcAssetsDir);
+    // Recursively collect all files in srcAssetsDir
+    function walkAbs(dir: string): string[] {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      return entries.flatMap((e) => {
+        const full = path.join(dir, e.name);
+        return e.isDirectory() ? walkAbs(full) : [full];
+      });
+    }
+
+    const allAssets = walkAbs(srcAssetsDir).map((p) => path.relative(srcAssetsDir, p));
+
     let copiedCount = 0;
     const copiedAssets: string[] = [];
 
@@ -267,6 +278,7 @@ export const getBookStringified = () => {
       if (assetsToInclude.has(asset)) {
         const srcPath = path.join(srcAssetsDir, asset);
         const destPath = path.join(destAssetsDir, asset);
+        fs.mkdirSync(path.dirname(destPath), { recursive: true });
         fs.copyFileSync(srcPath, destPath);
         copiedAssets.push(asset);
         copiedCount++;
