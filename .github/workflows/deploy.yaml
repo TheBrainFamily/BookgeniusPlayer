@@ -71,13 +71,6 @@ jobs:
           BASE="${{ steps.sha.outputs.base }}"
           HEAD="${{ steps.sha.outputs.head }}"
 
-          if [[ "${IS_PRODUCTION}" == "true" ]]; then
-            echo "rebuild_all=1" >> "$GITHUB_OUTPUT"
-            echo "books_csv=" >> "$GITHUB_OUTPUT"
-            echo "prod: forcing REBUILD_ALL"
-            exit 0
-          fi
-
           mapfile -t files < <(git diff --name-only "$BASE" "$HEAD" -- apps/player/public_books/ apps/player/scripts/)
           printf '%s\n' "${files[@]}"
 
