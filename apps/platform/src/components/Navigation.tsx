@@ -51,9 +51,9 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
                     return (
                       <>
                         <UserWidget />
-                        <Button variant="ghost" size="icon" className="text-foreground hover:text-library-gold hover:bg-library-walnut/50">
+                        {/* <Button variant="ghost" size="icon" className="text-foreground hover:text-library-gold hover:bg-library-walnut/50">
                           <Settings className="h-5 w-5" />
-                        </Button>
+                        </Button> */}
                       </>
                     );
                   } else {
