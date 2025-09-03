@@ -24,13 +24,11 @@ export const ContentShiftWrapper: React.FC = () => {
     const originalTransition = computedStyles.transition;
 
     // Extract existing opacity transition if present, otherwise use default
-    const hasOpacityTransition = originalTransition.includes("opacity");
-    const opacityTransition = hasOpacityTransition
-      ? originalTransition
-          .split(",")
-          .find((t) => t.trim().startsWith("opacity"))
-          ?.trim() || "opacity 1000ms ease-in-out"
-      : "opacity 1000ms ease-in-out";
+    const opacityTransition =
+      originalTransition
+        .split(",")
+        .find((t) => t.trim().startsWith("opacity"))
+        ?.trim() || "opacity 1000ms ease-in-out";
 
     // Only apply content shift on large screens (≥1280px)
     if (isContentShiftedLeft && isLargeScreen) {
