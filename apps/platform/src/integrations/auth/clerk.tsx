@@ -160,11 +160,7 @@ const AuthProviderSafe: React.FC<{ children: React.ReactNode }> = ({ children })
 const useAuth = () => useContext(Ctx);
 
 const useUserWidget = () => useContext(WidgetCtx);
-const SignInWidget: React.FC<{ onClick: () => void }> = ({ onClick }) => (
-  <Button onClick={onClick} variant="outline">
-    Sign In
-  </Button>
-);
+const SignInWidget: React.FC<{ onClick: () => void }> = ({ onClick }) => <Button onClick={onClick}>Sign In</Button>;
 const mod: AuthModule = { AuthProvider: AuthProviderSafe, useAuth, useUserWidget, useSignInWidget: () => SignInWidget };
 
 export default mod;
