@@ -31,7 +31,7 @@ const AppWithAuth = () => {
 
   return (
     <AuthProvider>
-      <RouteTransitionProvider defaultMinDurationMs={50}>
+      <RouteTransitionProvider>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/experience/:slug" element={<BookExperience />} />
