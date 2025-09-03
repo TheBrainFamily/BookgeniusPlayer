@@ -84,7 +84,7 @@ if [[ "${REBUILD_ALL:-0}" == "1" || -n "${CHANGED_BOOKS:-}" ]]; then
   fi
 
   if [[ "${ASSET_CONTEXT}" == "prod" ]]; then
-    s5cmd "${ENDPOINT_FLAG[@]}" cp "s3://${S3_BUCKET}/prod/versions.json build/s3-data/versions-prod.json" || true
+    s5cmd "${ENDPOINT_FLAG[@]}" cp "s3://${S3_BUCKET}/prod/versions.json" "build/s3-data/versions-prod.json" || true
     if [[ -f build/s3-data/versions-prod.json ]]; then
       pnpm update-prod-versions
     fi
