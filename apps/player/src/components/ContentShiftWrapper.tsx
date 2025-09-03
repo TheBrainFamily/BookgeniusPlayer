@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useContentShift } from "@player/stores/contentShift.store";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
 
 export const ContentShiftWrapper: React.FC = () => {
   const { isContentShiftedLeft } = useContentShift();
   const [isLargeScreen, setIsLargeScreen] = useState(false);
+
+  const bookData = getBookData();
+  const isPlayFormat = bookData.metadata.bookForm === "play";
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -33,11 +37,11 @@ export const ContentShiftWrapper: React.FC = () => {
     // Only apply content shift on large screens (≥1280px)
     if (isContentShiftedLeft && isLargeScreen) {
       // Shift content left by adding transform and adjusting layout
-      bookContainer.style.transform = "translateX(-18%)";
+      bookContainer.style.transform = isPlayFormat ? "translateX(-18%)" : "translateX(-13%)";
       // Preserve opacity transition and add transform transition
       bookContainer.style.transition = `${opacityTransition}, transform 0.3s ease-in-out`;
-      bookContainer.style.width = "75%";
-      bookContainer.style.maxWidth = "calc(120rem * 0.75)";
+      bookContainer.style.width = "80%";
+      bookContainer.style.maxWidth = "calc(120rem * 0.8)";
     } else {
       // Reset to original position for small screens or when not shifted
       bookContainer.style.transform = "translateX(0)";
