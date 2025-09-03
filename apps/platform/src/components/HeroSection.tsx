@@ -14,17 +14,6 @@ const HeroSection = () => {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
-          {/* Floating sparkles animation */}
-          <div className="absolute -top-8 left-1/4 animate-float">
-            <Sparkles className="h-6 w-6 text-library-gold opacity-60" />
-          </div>
-          <div className="absolute -top-4 right-1/3 animate-float" style={{ animationDelay: "2s" }}>
-            <Sparkles className="h-4 w-4 text-library-gold opacity-40" />
-          </div>
-          <div className="absolute top-8 left-3/4 animate-float" style={{ animationDelay: "4s" }}>
-            <Sparkles className="h-5 w-5 text-library-gold opacity-50" />
-          </div>
-
           <h1 className="text-5xl md:text-7xl font-bold mb-6 text-foreground leading-tight">
             Experience Literature
             <span
@@ -60,6 +49,17 @@ const HeroSection = () => {
               <div className="text-3xl font-bold text-library-gold mb-2">HD</div>
               <div className="text-muted-foreground">Productions</div>
             </div>
+          </div>
+
+          {/* Floating sparkles animation */}
+          <div className="absolute -top-8 left-1/4 animate-float -z-10">
+            <Sparkles className="h-6 w-6 text-library-gold opacity-60" />
+          </div>
+          <div className="absolute -top-4 right-1/3 animate-float -z-10" style={{ animationDelay: "2s" }}>
+            <Sparkles className="h-4 w-4 text-library-gold opacity-40" />
+          </div>
+          <div className="absolute top-8 left-3/4 animate-float -z-10" style={{ animationDelay: "4s" }}>
+            <Sparkles className="h-5 w-5 text-library-gold opacity-50" />
           </div>
         </div>
       </div>
