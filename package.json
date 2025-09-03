@@ -19,6 +19,7 @@
     "prepare:gateway": "zip -r gateway.zip ./docker-compose.gateway.yml ./apps/gateway/configs ./deployment/templates",
     "prettier:check": "pnpm pnpm -r --if-present prettier:check",
     "process-all-books-docker": "pnpm --filter player process-all-books-docker",
+    "update-prod-versions": "bun run ./tools/scripts/update-prod-versions.ts",
     "lint": "pnpm pnpm -r --if-present lint",
     "lint:ci": "pnpm pnpm -r --if-present lint:ci",
     "typecheck": "pnpm pnpm -r --if-present typecheck",

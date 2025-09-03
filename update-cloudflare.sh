@@ -83,6 +83,13 @@ if [[ "${REBUILD_ALL:-0}" == "1" || -n "${CHANGED_BOOKS:-}" ]]; then
       "s3://${S3_BUCKET}/${ASSET_CONTEXT}/assets/"
   fi
 
+  if [[ "${ASSET_CONTEXT}" == "prod" ]]; then
+    s5cmd "${ENDPOINT_FLAG[@]}" cp "s3://${S3_BUCKET}/prod/versions.json build/s3-data/versions-prod.json" || true
+    if [[ -f build/s3-data/versions-prod.json ]]; then
+      pnpm update-prod-versions
+    fi
+  fi
+
   if [[ -f build/s3-data/versions.json ]]; then
     s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
       --cache-control "$short_cache" \
