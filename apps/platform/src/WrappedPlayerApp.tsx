@@ -161,7 +161,7 @@ const WrappedPlayerApp = () => {
       };
 
       // Run cleanup but don't await (component is unmounting)
-      cleanup();
+      void cleanup();
     };
   }, [cancelTransition]);
 

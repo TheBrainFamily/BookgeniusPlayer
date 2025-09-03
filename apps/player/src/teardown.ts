@@ -81,6 +81,12 @@ export async function teardownPlayer(): Promise<void> {
       sources.forEach((s) => s.remove());
       v.removeAttribute("src");
       v.srcObject = null;
+      // video state reset across all browsers
+      try {
+        v.load();
+      } catch (loadError) {
+        console.warn(`teardownPlayer: video.load() failed for #${id}`, loadError);
+      }
     } catch (e) {
       console.warn(`teardownPlayer: failed to reset video #${id}`, e);
     }
