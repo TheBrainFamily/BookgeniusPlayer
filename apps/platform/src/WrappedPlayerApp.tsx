@@ -13,24 +13,30 @@ const PAYWALL_FADE_MS = 300;
 
 const WrappedPlayerApp = () => {
   const [searchParams] = useSearchParams();
+  const { startTransition, finishTransition, cancelTransition, navigatedFromPlatform, setNavigatedFromPlatform } = useRouteTransition();
+
+  const book = searchParams.get("book");
+
   const [isPlayerReady, setIsPlayerReady] = useState(false);
   const [assetBaseReady, setAssetBaseReady] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [paywallVisible, setPaywallVisible] = useState(false);
   const [bookSlug, setBookSlug] = useState("");
   const [bookTitle, setBookTitle] = useState("");
-  const [needsUserGesture, setNeedsUserGesture] = useState(false);
-  const { startTransition, finishTransition, cancelTransition, hasNavigatedFromPlatform } = useRouteTransition();
+
   const lastBookRef = useRef<string | null>(null);
   const [paywallMounted, setPaywallMounted] = useState(false);
   const paywallHostRef = useRef<HTMLDivElement | null>(null);
 
-  // Detect if this is a direct navigation to /reader/
-  useEffect(() => {
-    if (!hasNavigatedFromPlatform) {
-      setNeedsUserGesture(true);
-    }
-  }, [hasNavigatedFromPlatform]);
+  const handleStartClick = () => {
+    finishTransition();
+    console.log("BOOK LOADER App is ready");
+
+    window.setTimeout(() => {
+      console.log("BOOK LOADER App is ready, hiding splash screen");
+      window.dispatchEvent(new CustomEvent("splashHidden"));
+    }, 1000);
+  };
 
   useEffect(() => {
     const handleShowPaywall = (event: CustomEvent) => {
@@ -60,31 +66,13 @@ const WrappedPlayerApp = () => {
       setIsPlayerReady(true);
 
       // If needsUserGesture is true, we wait for Start button click
-      if (!needsUserGesture) {
-        finishTransition();
-        console.log("BOOK LOADER App is ready");
-
-        window.setTimeout(() => {
-          console.log("BOOK LOADER App is ready, hiding splash screen");
-          window.dispatchEvent(new CustomEvent("splashHidden"));
-        }, 1000);
-      }
+      if (navigatedFromPlatform) handleStartClick();
     };
 
     window.addEventListener("appReady", onReady);
     return () => window.removeEventListener("appReady", onReady);
-  }, [finishTransition, needsUserGesture]);
+  }, [finishTransition, navigatedFromPlatform]);
 
-  const handleStartClick = () => {
-    setNeedsUserGesture(false);
-    finishTransition();
-
-    window.setTimeout(() => {
-      window.dispatchEvent(new CustomEvent("splashHidden"));
-    }, 1000);
-  };
-
-  const book = searchParams.get("book");
   // Ensure loader shows on direct loads to /reader/?book=...
   useEffect(() => {
     if (!book) return;
@@ -92,8 +80,10 @@ const WrappedPlayerApp = () => {
     const meta = books.find((b) => b.slug === book);
     const title = meta?.title ?? "BookGenius";
     const phrases = meta?.phrases ?? [];
-    startTransition({ title, phrases, author: meta?.author, showStartButton: needsUserGesture && isPlayerReady, onStartClick: handleStartClick });
-  }, [book, startTransition, needsUserGesture, isPlayerReady]);
+    const author = meta?.author ?? "";
+
+    startTransition({ title, phrases, author, showStartButton: !navigatedFromPlatform && isPlayerReady, onStartClick: handleStartClick });
+  }, [book, startTransition, navigatedFromPlatform, isPlayerReady]);
 
   useEffect(() => {
     if (book !== lastBookRef.current) {
@@ -145,28 +135,35 @@ const WrappedPlayerApp = () => {
   // On unmount (leaving /reader), fully tear down the player environment
   useEffect(() => {
     return () => {
-      try {
-        // Hard reset player runtime and legacy DOM/media
-        void teardownPlayer();
-        cancelTransition();
-      } catch (e) {
-        console.error("teardownPlayer failed", e);
-      }
-      try {
-        // Reset loader state so a new visit starts clean
-        bookDataLoader.resetCurrentBook();
-      } catch (e) {
-        console.error("bookDataLoader.resetCurrentBook failed", e);
-      }
-      try {
-        // Make sure our local gating is reset
-        setAssetBaseReady(false);
-        lastBookRef.current = null;
-      } catch (e) {
-        console.error("setAssetBaseReady failed", e);
-      }
+      // Cancel any ongoing transitions first
+      cancelTransition();
+
+      // Reset local state immediately to prevent any race conditions
+      setIsPlayerReady(false);
+      setAssetBaseReady(false);
+      setShowPaywall(false);
+      setPaywallMounted(false);
+      setPaywallVisible(false);
+      setNavigatedFromPlatform(false);
+      lastBookRef.current = null;
+
+      // Cleanup in correct order
+      const cleanup = async () => {
+        try {
+          // 1. First reset the book data loader to stop any ongoing requests
+          bookDataLoader.resetCurrentBook();
+
+          // 2. Then tear down the player runtime
+          await teardownPlayer();
+        } catch (e) {
+          console.error("WrappedPlayerApp: cleanup failed", e);
+        }
+      };
+
+      // Run cleanup but don't await (component is unmounting)
+      void cleanup();
     };
-  }, []);
+  }, [cancelTransition]);
 
   useEffect(() => {
     const playerScopeElement = document.getElementById("player-scope");

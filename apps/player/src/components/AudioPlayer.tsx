@@ -123,25 +123,35 @@ const AudioPlayer = () => {
       console.log("AudioPlayer: Song transition event received", newCurrentTrack);
 
       setCurrentTrackData(newCurrentTrack);
-      setIsPlaying(true);
       setCurrentTrackIdFromState(getCurrentTrackId());
-
       setCurrentTime(0);
+
+      // If not muted, start playing the new track
+      if (!isMuted) {
+        setIsPlaying(true);
+        resumeCurrentTrack();
+
+        if (!isInitialLoad.current) {
+          if (notificationTimer) {
+            clearTimeout(notificationTimer);
+          }
+
+          setShowSongNotification(true);
+
+          notificationTimer = setTimeout(() => {
+            setShowSongNotification(false);
+          }, 6000);
+        }
+      } else {
+        // If muted, keep the track paused
+        pauseCurrentTrack();
+        setIsPlaying(false);
+      }
 
       if (isInitialLoad.current) {
         isInitialLoad.current = false;
         return;
       }
-
-      if (notificationTimer) {
-        clearTimeout(notificationTimer);
-      }
-
-      setShowSongNotification(true);
-
-      notificationTimer = setTimeout(() => {
-        setShowSongNotification(false);
-      }, 6000);
     };
 
     const handleResize = () => {
@@ -171,6 +181,8 @@ const AudioPlayer = () => {
 
     if (newVolume > 0 && isMuted) {
       setIsMuted(false);
+      resumeCurrentTrack();
+      setIsPlaying(true);
     } else if (newVolume === 0 && !isMuted) {
       setIsMuted(true);
       pauseCurrentTrack();
@@ -188,8 +200,12 @@ const AudioPlayer = () => {
   const toggleMute = () => {
     if (isMuted) {
       setMasterVolume(volume);
+      setIsPlaying(true);
+      resumeCurrentTrack();
     } else {
       setMasterVolume(0);
+      pauseCurrentTrack();
+      setIsPlaying(false);
     }
 
     setIsMuted(!isMuted);

@@ -14,10 +14,10 @@ type Ctx = {
   cancelTransition: () => void;
   // is overlay visible
   navigating: boolean;
-  // configure min visible time
-  setMinDurationMs: (ms: number) => void;
   // whether user has navigated from platform (vs direct to /reader/)
-  hasNavigatedFromPlatform: boolean;
+  navigatedFromPlatform: boolean;
+  // set that user has navigated from platform
+  setNavigatedFromPlatform: (fromPlatform: boolean) => void;
 };
 
 const RouteTransitionContext = createContext<Ctx | null>(null);
@@ -32,14 +32,13 @@ export const useRouteTransition = () => {
 
 type Props = {
   children: React.ReactNode;
-  defaultMinDurationMs?: number; // default 50ms
+  minDurationMs?: number; // default 100ms
 };
 
-export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinDurationMs = 50 }) => {
+export const RouteTransitionProvider: React.FC<Props> = ({ children, minDurationMs = 100 }) => {
   const [navigating, setNavigating] = useState(false);
   const [meta, setMeta] = useState<LoaderMeta | null>(null);
-  const [minDurationMs, setMinDurationMs] = useState(defaultMinDurationMs);
-  const [hasNavigatedFromPlatform, setHasNavigatedFromPlatform] = useState(false);
+  const [navigatedFromPlatform, setNavigatedFromPlatform] = useState(false);
 
   const startTimeRef = useRef<number | null>(null);
   const location = useLocation(); // used to reset if user navigates away quickly
@@ -48,7 +47,6 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
     setMeta({ title: m.title, phrases: m.phrases, author: m.author ?? "", showStartButton: m.showStartButton, onStartClick: m.onStartClick });
     startTimeRef.current = performance.now();
     setNavigating(true);
-    setHasNavigatedFromPlatform(true);
   }, []);
 
   const finishTransition = useCallback(() => {
@@ -80,15 +78,9 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, defaultMinD
     // no-op; location access ensures provider updates on route change
   }, [location]);
 
-  useEffect(() => {
-    if (!location.pathname.startsWith("/reader/")) {
-      setHasNavigatedFromPlatform(false);
-    }
-  }, [location]);
-
   const value = useMemo(
-    () => ({ startTransition, finishTransition, cancelTransition, navigating, setMinDurationMs, hasNavigatedFromPlatform }),
-    [finishTransition, navigating, startTransition, cancelTransition, setMinDurationMs, hasNavigatedFromPlatform],
+    () => ({ startTransition, finishTransition, cancelTransition, navigating, navigatedFromPlatform, setNavigatedFromPlatform }),
+    [finishTransition, navigating, startTransition, cancelTransition, navigatedFromPlatform, setNavigatedFromPlatform],
   );
 
   return (
