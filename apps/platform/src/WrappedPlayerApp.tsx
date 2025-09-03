@@ -145,28 +145,35 @@ const WrappedPlayerApp = () => {
   // On unmount (leaving /reader), fully tear down the player environment
   useEffect(() => {
     return () => {
-      try {
-        // Hard reset player runtime and legacy DOM/media
-        void teardownPlayer();
-        cancelTransition();
-      } catch (e) {
-        console.error("teardownPlayer failed", e);
-      }
-      try {
-        // Reset loader state so a new visit starts clean
-        bookDataLoader.resetCurrentBook();
-      } catch (e) {
-        console.error("bookDataLoader.resetCurrentBook failed", e);
-      }
-      try {
-        // Make sure our local gating is reset
-        setAssetBaseReady(false);
-        lastBookRef.current = null;
-      } catch (e) {
-        console.error("setAssetBaseReady failed", e);
-      }
+      // Cancel any ongoing transitions first
+      cancelTransition();
+
+      // Reset local state immediately to prevent any race conditions
+      setIsPlayerReady(false);
+      setAssetBaseReady(false);
+      setShowPaywall(false);
+      setPaywallMounted(false);
+      setPaywallVisible(false);
+      setNeedsUserGesture(false);
+      lastBookRef.current = null;
+
+      // Cleanup in correct order
+      const cleanup = async () => {
+        try {
+          // 1. First reset the book data loader to stop any ongoing requests
+          bookDataLoader.resetCurrentBook();
+
+          // 2. Then tear down the player runtime
+          await teardownPlayer();
+        } catch (e) {
+          console.error("WrappedPlayerApp: cleanup failed", e);
+        }
+      };
+
+      // Run cleanup but don't await (component is unmounting)
+      cleanup();
     };
-  }, []);
+  }, [cancelTransition]);
 
   useEffect(() => {
     const playerScopeElement = document.getElementById("player-scope");
