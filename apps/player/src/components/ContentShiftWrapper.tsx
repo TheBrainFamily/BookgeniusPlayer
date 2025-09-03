@@ -58,7 +58,7 @@ export const ContentShiftWrapper: React.FC = () => {
       bookContainer.style.width = "";
       bookContainer.style.maxWidth = "";
     };
-  }, [isContentShiftedLeft, isLargeScreen]);
+  }, [isContentShiftedLeft, isLargeScreen, isPlayFormat]);
 
   // This component doesn't render anything visible
   return null;
