@@ -13,7 +13,7 @@ interface BookCollectionProps {
 
 const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   const navigate = useNavigate();
-  const { setNavigatedFromPlatform } = useRouteTransition();
+  const { startTransition, setNavigatedFromPlatform } = useRouteTransition();
 
   const filteredBooks = useMemo(() => {
     if (!searchQuery.trim()) return books;
@@ -36,6 +36,9 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
 
     // Indicate user came from platform for proper loader behavior
     setNavigatedFromPlatform(true);
+    // Start the transition overlay with book-specific meta
+    startTransition({ title: title ?? "BookGenius", phrases, author, showStartButton: false, onStartClick: undefined });
+
     // Let the overlay paint before route switch for a smooth fade
     requestAnimationFrame(() => {
       navigate(`/reader?book=${slug}`, { state: { meta: { title, phrases, author } } });

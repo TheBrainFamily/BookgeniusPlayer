@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, Suspense } from "react";
+import React, { useEffect, useRef, useState, Suspense, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { createPortal } from "react-dom";
 
@@ -13,7 +13,7 @@ const PAYWALL_FADE_MS = 300;
 
 const WrappedPlayerApp = () => {
   const [searchParams] = useSearchParams();
-  const { startTransition, finishTransition, cancelTransition, navigatedFromPlatform, setNavigatedFromPlatform } = useRouteTransition();
+  const { startTransition, finishTransition, cancelTransition, navigatedFromPlatform, setNavigatedFromPlatform, updateTransitionMeta, navigating } = useRouteTransition();
 
   const book = searchParams.get("book");
 
@@ -28,7 +28,20 @@ const WrappedPlayerApp = () => {
   const [paywallMounted, setPaywallMounted] = useState(false);
   const paywallHostRef = useRef<HTMLDivElement | null>(null);
 
-  const handleStartClick = () => {
+  // Guards to ensure we finish only once and coordinate "Start" click with app readiness
+  const userInteractedRef = useRef(false);
+  const isPlayerReadyRef = useRef(false);
+  const finishedRef = useRef(false);
+
+  useEffect(() => {
+    isPlayerReadyRef.current = isPlayerReady;
+  }, [isPlayerReady]);
+
+  // Centralized safe finish that cannot fire twice
+  const safeFinish = useCallback(() => {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
+
     finishTransition();
     console.log("BOOK LOADER App is ready");
 
@@ -36,7 +49,13 @@ const WrappedPlayerApp = () => {
       console.log("BOOK LOADER App is ready, hiding splash screen");
       window.dispatchEvent(new CustomEvent("splashHidden"));
     }, 1000);
-  };
+  }, [finishTransition]);
+
+  // When user clicks "Start", remember the interaction and finish if app is already ready
+  const handleStartClick = useCallback(() => {
+    userInteractedRef.current = true;
+    if (isPlayerReadyRef.current) safeFinish();
+  }, [safeFinish]);
 
   useEffect(() => {
     const handleShowPaywall = (event: CustomEvent) => {
@@ -65,30 +84,42 @@ const WrappedPlayerApp = () => {
     const onReady = () => {
       setIsPlayerReady(true);
 
-      // If needsUserGesture is true, we wait for Start button click
-      if (navigatedFromPlatform) handleStartClick();
+      if (navigatedFromPlatform) {
+        safeFinish();
+      } else {
+        updateTransitionMeta({ showStartButton: true, onStartClick: handleStartClick });
+      }
     };
 
     window.addEventListener("appReady", onReady);
     return () => window.removeEventListener("appReady", onReady);
-  }, [finishTransition, navigatedFromPlatform]);
+  }, [safeFinish, navigatedFromPlatform, updateTransitionMeta, handleStartClick]);
 
   // Ensure loader shows on direct loads to /reader/?book=...
-  useEffect(() => {
-    if (!book) return;
-
-    const meta = books.find((b) => b.slug === book);
-    const title = meta?.title ?? "BookGenius";
-    const phrases = meta?.phrases ?? [];
-    const author = meta?.author ?? "";
-
-    startTransition({ title, phrases, author, showStartButton: !navigatedFromPlatform && isPlayerReady, onStartClick: handleStartClick });
-  }, [book, startTransition, navigatedFromPlatform, isPlayerReady]);
-
+  // We now start the transition exactly once per book change (not on isPlayerReady changes)
   useEffect(() => {
     if (book !== lastBookRef.current) {
+      // Reset per-book guards
+      finishedRef.current = false;
+      userInteractedRef.current = false;
+      setIsPlayerReady(false);
+
       lastBookRef.current = book;
       bookDataLoader.resetCurrentBook();
+
+      // If overlay has ALREADY started on the platform, do NOT start it again here.
+      // This avoids double startTransition when navigating from the grid.
+      const shouldStartHere = !!book && !(navigatedFromPlatform && navigating);
+
+      if (shouldStartHere && book) {
+        const meta = books.find((b) => b.slug === book);
+        const title = meta?.title ?? "BookGenius";
+        const phrases = meta?.phrases ?? [];
+        const author = meta?.author ?? "";
+
+        // For direct loads we DO NOT show Start yet; it appears only after appReady.
+        startTransition({ title, phrases, author, showStartButton: false, onStartClick: handleStartClick });
+      }
 
       if (!book) {
         setAssetBaseReady(false);
@@ -103,34 +134,35 @@ const WrappedPlayerApp = () => {
         return;
       }
 
-      let cancelled = false;
+      const controller = new AbortController();
+      const { signal } = controller;
+
       (async () => {
         setAssetBaseReady(false);
         try {
-          const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
+          const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store", signal });
           if (!res.ok) throw new Error("[RESOLVE] resolve failed");
           const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
 
           // accept either shape; you already parse full URL in setAssetBase
-
-          if (cancelled) return;
           bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
           bookDataLoader.setBookVisibility(visibility);
           // optional warm HEAD for index.html to reduce first-media latency (fire-and-forget)
           // try { fetch(`${assetBase}index.html`, { method: "HEAD", cache: "no-store" }); } catch (_) {}
           setAssetBaseReady(true);
-        } catch (err: unknown) {
+        } catch (err: any) {
+          if (err?.name === "AbortError") return;
           console.error("[RESOLVE] error:", err);
           bookDataLoader.setAssetBase(null); // fallback to old API path
-          if (!cancelled) setAssetBaseReady(true);
+          setAssetBaseReady(true);
         }
       })();
 
       return () => {
-        cancelled = true;
+        controller.abort();
       };
     }
-  }, [book]);
+  }, [book, navigatedFromPlatform, navigating, startTransition, handleStartClick]);
 
   // On unmount (leaving /reader), fully tear down the player environment
   useEffect(() => {
@@ -163,7 +195,7 @@ const WrappedPlayerApp = () => {
       // Run cleanup but don't await (component is unmounting)
       void cleanup();
     };
-  }, [cancelTransition]);
+  }, [cancelTransition, setNavigatedFromPlatform]);
 
   useEffect(() => {
     const playerScopeElement = document.getElementById("player-scope");
