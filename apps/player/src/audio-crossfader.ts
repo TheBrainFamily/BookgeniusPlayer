@@ -54,6 +54,10 @@ let currentTrackId: string | null = null;
 let nextTrackId: string | null = null; // Track being faded TO (during active crossfade)
 let isTransitioning = false; // Is a crossfade actively happening?
 
+// Crossfade interruption control
+let currentCrossfadeId = 0; // Monotonically increasing token for active crossfade
+let activeCrossfadeTimeout: ReturnType<typeof setTimeout> | null = null; // Cleanup timer for the active crossfade
+
 let currentSectionTracks: string[] | null = null;
 let currentTrackIndexInSection: number = -1;
 // undefined: no pending change; null: pending clear; string[]: pending set
@@ -1249,6 +1253,7 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
 
         if (tracks.has(trackId)) tracks.get(trackId)!.preemptiveTransitionTimeout = preemptiveTimeoutId;
         console.log(`Scheduled pre-emptive transition for '${trackId}' in ${timeUntilPreemptiveTrigger.toFixed(2)}s.`);
+        dispatchPlaylistChangeEvent([trackId]).catch(console.error);
       } else {
         console.log(
           `Track '${trackId}' is too short or offset too large for a pre-emptive transition starting ${PRE_END_TRANSITION_TRIGGER_SECONDS}s before end and ensuring enough fade time. Effective duration for trigger calc: ${effectiveTrackDurationSecs.toFixed(2)}s. Relies on onended.`,
@@ -1389,6 +1394,10 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
   }
 
   console.log(`Performing crossfade: ${fadeOutId} -> ${fadeInId} scheduled at ${transitionStartTime.toFixed(2)}s`);
+  // Invalidate prior crossfade and assign a new token
+  currentCrossfadeId += 1;
+  const thisCrossfadeId = currentCrossfadeId;
+  // Do not cancel the previous cleanup timer: it will run stale-safe cleanup.
   isTransitioning = true;
   nextTrackId = fadeInId;
 
@@ -1409,8 +1418,11 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
     console.error(`performCrossfade: Failed to ensure ${fadeInId} is loaded. Aborting crossfade.`);
     gOut.cancelScheduledValues(audioContext.currentTime);
     gOut.linearRampToValueAtTime(1, audioContext.currentTime + 0.2);
-    isTransitioning = false;
-    nextTrackId = null;
+    // Abort only if this crossfade is still the active one
+    if (thisCrossfadeId === currentCrossfadeId) {
+      isTransitioning = false;
+      nextTrackId = null;
+    }
     return;
   }
 
@@ -1419,8 +1431,10 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
     console.error(`performCrossfade: Failed to schedule playTrack for fadeInId: ${fadeInId}. Aborting crossfade.`);
     gOut.cancelScheduledValues(audioContext.currentTime);
     gOut.linearRampToValueAtTime(1, audioContext.currentTime + 0.2);
-    isTransitioning = false;
-    nextTrackId = null;
+    if (thisCrossfadeId === currentCrossfadeId) {
+      isTransitioning = false;
+      nextTrackId = null;
+    }
     return;
   }
 
@@ -1430,8 +1444,10 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
     gOut.cancelScheduledValues(audioContext.currentTime);
     gOut.linearRampToValueAtTime(1, audioContext.currentTime + 0.2);
     stopTrackInternal(fadeInId);
-    isTransitioning = false;
-    nextTrackId = null;
+    if (thisCrossfadeId === currentCrossfadeId) {
+      isTransitioning = false;
+      nextTrackId = null;
+    }
     return;
   }
 
@@ -1453,6 +1469,10 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
 
   // ---------- unified clean-up helper ----------
   const finishCrossfade = () => {
+    // Ensure this cleanup corresponds to the still-active crossfade
+    if (thisCrossfadeId !== currentCrossfadeId) {
+      return; // Stale cleanup; a newer crossfade took over
+    }
     if (!isTransitioning) return; // already cleaned once
     // Handle cleanup for same-track vs different-track crossfades
     if (fadeOutId !== fadeInId) {
@@ -1503,17 +1523,25 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
 
     nextTrackId = null;
     isTransitioning = false;
+    // Clear active cleanup timer reference once finished
+    if (activeCrossfadeTimeout) {
+      clearTimeout(activeCrossfadeTimeout);
+      activeCrossfadeTimeout = null;
+    }
     console.log("Crossfade transition fully completed and state updated.");
   };
 
   // 1) call finishCrossfade as soon as the ramp mathematically ends
   const msUntilFadeEnd = Math.max(0, fadeEnd - audioContext.currentTime) * 1000 + 50; // +50 ms cushion
-  setTimeout(finishCrossfade, msUntilFadeEnd);
+  activeCrossfadeTimeout = setTimeout(finishCrossfade, msUntilFadeEnd);
 
   // 2) …and also if the old source ends earlier for any reason
   const sourceNodeToWatch = fadeOutId === fadeInId ? oldSourceNode : fadeOutState.sourceNode;
   if (sourceNodeToWatch) {
-    sourceNodeToWatch.onended = finishCrossfade;
+    // Always attempt cleanup; finishCrossfade will avoid touching globals if stale.
+    sourceNodeToWatch.onended = () => {
+      finishCrossfade();
+    };
   }
 }
 
@@ -1651,14 +1679,9 @@ export async function transitionToTrack(targetId: string): Promise<boolean> {
     return false;
   }
 
-  if (isTransitioning) {
-    if (nextTrackId === targetId) {
-      console.log(`transitionToTrack: Already transitioning to '${targetId}'. Considered successful.`);
-      return true;
-    } else {
-      console.warn(`transitionToTrack: Cannot transition to '${targetId}', another transition (to '${nextTrackId}') is already in progress.`);
-      return false;
-    }
+  if (isTransitioning && nextTrackId === targetId) {
+    console.log(`transitionToTrack: Already transitioning to '${targetId}'. Considered successful.`);
+    return true;
   }
 
   // --- Allow looping/restarting the same track if it's the only one in the playlist ---
@@ -1738,6 +1761,12 @@ export function stopAllPlayback() {
   currentTrackId = null;
   nextTrackId = null;
   isTransitioning = false;
+  // Invalidate any active crossfade and cancel its timer
+  currentCrossfadeId += 1;
+  if (activeCrossfadeTimeout) {
+    clearTimeout(activeCrossfadeTimeout);
+    activeCrossfadeTimeout = null;
+  }
   currentSectionTracks = null;
   currentTrackIndexInSection = -1;
   pendingSectionTracks = undefined;
