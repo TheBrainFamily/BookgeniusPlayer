@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 import { toast } from "@platform/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import type { AuthCtx, AuthModule } from "./types";
+import { Button } from "@platform/components/ui/button";
 
 const OIDC_ISSUER = import.meta.env.VITE_SNAPPLIFY_ISSUER as string;
 const CLIENT_ID = import.meta.env.VITE_SNAPPLIFY_CLIENT_ID as string | undefined;
@@ -166,11 +167,7 @@ const AuthProviderSafe: React.FC<{ children: React.ReactNode }> = ({ children })
 const useAuth = () => useContext(Ctx);
 
 const SignInWidget: React.FC<{ onClick: () => void }> = ({ onClick }) => (
-  <button
-    onClick={onClick}
-    title="Sign in with Snapplify"
-    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-  >
+  <Button onClick={onClick} title="Sign in with Snapplify" variant="secondary">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 225 245" width="18" height="18" className="mr-2">
       <path
         fill="#B7CF3A"
@@ -178,7 +175,7 @@ const SignInWidget: React.FC<{ onClick: () => void }> = ({ onClick }) => (
       />
     </svg>
     Sign In
-  </button>
+  </Button>
 );
 
 const mod: AuthModule = { AuthProvider: AuthProviderSafe, useAuth, useSignInWidget: () => SignInWidget };

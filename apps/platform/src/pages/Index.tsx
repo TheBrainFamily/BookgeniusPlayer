@@ -18,10 +18,12 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navigation searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-      {!searchQuery && <HeroSection />}
-      <BookCollection searchQuery={searchQuery} />
+      <main className="flex flex-col flex-1 align-middle">
+        {!searchQuery && <HeroSection />}
+        <BookCollection searchQuery={searchQuery} />
+      </main>
       <Footer />
     </div>
   );
