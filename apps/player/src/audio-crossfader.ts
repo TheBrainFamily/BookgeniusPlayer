@@ -1651,14 +1651,9 @@ export async function transitionToTrack(targetId: string): Promise<boolean> {
     return false;
   }
 
-  if (isTransitioning) {
-    if (nextTrackId === targetId) {
-      console.log(`transitionToTrack: Already transitioning to '${targetId}'. Considered successful.`);
-      return true;
-    } else {
-      console.warn(`transitionToTrack: Cannot transition to '${targetId}', another transition (to '${nextTrackId}') is already in progress.`);
-      return false;
-    }
+  if (isTransitioning && nextTrackId === targetId) {
+    console.log(`transitionToTrack: Already transitioning to '${targetId}'. Considered successful.`);
+    return true;
   }
 
   // --- Allow looping/restarting the same track if it's the only one in the playlist ---
