@@ -20,6 +20,7 @@
     "prettier:check": "pnpm pnpm -r --if-present prettier:check",
     "process-all-books-docker": "pnpm --filter player process-all-books-docker",
     "update-prod-versions": "bun run ./tools/scripts/update-prod-versions.ts",
+    "cleanup-books-assets": "bun run ./tools/scripts/cleanup-books-assets.ts",
     "lint": "pnpm pnpm -r --if-present lint",
     "lint:ci": "pnpm pnpm -r --if-present lint:ci",
     "typecheck": "pnpm pnpm -r --if-present typecheck",
@@ -30,6 +31,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.13.1",
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.864.0",
     "@eslint/js": "^9.33.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
@@ -43,8 +45,8 @@
     "p-retry": "^6.2.1",
     "prettier": "^3.6.2",
     "react": "^19.1.1",
-    "typescript-eslint": "^8.39.1",
-    "typescript": "5.8.2"
+    "typescript": "5.8.2",
+    "typescript-eslint": "^8.39.1"
   },
   "pnpm": {
     "overrides": {

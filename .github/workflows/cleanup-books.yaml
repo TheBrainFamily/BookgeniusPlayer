@@ -1,0 +1,40 @@
+name: Cleanup Books Assets
+
+on:
+  schedule:
+    - cron: "0 1 * * *" # everyday at 01:00 UTC
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    environment: cloudflare
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Setup Bun and install dependencies
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run cleanup script
+        run: pnpm cleanup-books-assets
+        env:
+          S3_BUCKET: ${{ vars.S3_BUCKET }}
+          S3_ENDPOINT: ${{ vars.S3_ENDPOINT_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          KEEP_VERSIONS: 5
