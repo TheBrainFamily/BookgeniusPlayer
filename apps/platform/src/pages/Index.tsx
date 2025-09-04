@@ -20,7 +20,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navigation searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-      <main className="flex flex-col flex-1 align-middle">
+      <main className="flex flex-col flex-1 justify-center">
         {!searchQuery && <HeroSection />}
         <BookCollection searchQuery={searchQuery} />
       </main>
