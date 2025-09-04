@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
+import type { ClerkProviderProps } from "@clerk/react-router";
 import type { LoadedClerk, UseUserReturn } from "@clerk/types";
 import type { AuthCtx, AuthModule } from "./types";
-import type { ClerkProviderProps } from "@clerk/react-router";
-import { Button } from "@platform/components/ui/button.tsx";
+import { Button } from "@platform/components/ui/button";
 
 const Ctx = createContext<AuthCtx>({ ready: false, isSignedIn: false, openSignIn: () => {} });
 
