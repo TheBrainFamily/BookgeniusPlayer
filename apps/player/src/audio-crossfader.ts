@@ -1253,6 +1253,7 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
 
         if (tracks.has(trackId)) tracks.get(trackId)!.preemptiveTransitionTimeout = preemptiveTimeoutId;
         console.log(`Scheduled pre-emptive transition for '${trackId}' in ${timeUntilPreemptiveTrigger.toFixed(2)}s.`);
+        dispatchPlaylistChangeEvent([trackId]).catch(console.error);
       } else {
         console.log(
           `Track '${trackId}' is too short or offset too large for a pre-emptive transition starting ${PRE_END_TRANSITION_TRIGGER_SECONDS}s before end and ensuring enough fade time. Effective duration for trigger calc: ${effectiveTrackDurationSecs.toFixed(2)}s. Relies on onended.`,
