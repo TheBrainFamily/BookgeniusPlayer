@@ -126,8 +126,14 @@ const AudioPlayer = () => {
       setCurrentTrackIdFromState(getCurrentTrackId());
       setCurrentTime(0);
 
-      // If not muted, start playing the new track
-      if (!isMuted) {
+      // Check if we should auto-play the new track
+      // Don't auto-play if muted OR if music was paused
+      if (isMuted || !isPlaying) {
+        // Keep the track paused
+        pauseCurrentTrack();
+        setIsPlaying(false);
+      } else {
+        // Music was playing and not muted - start the new track
         setIsPlaying(true);
         resumeCurrentTrack();
 
@@ -142,10 +148,6 @@ const AudioPlayer = () => {
             setShowSongNotification(false);
           }, 6000);
         }
-      } else {
-        // If muted, keep the track paused
-        pauseCurrentTrack();
-        setIsPlaying(false);
       }
 
       if (isInitialLoad.current) {
@@ -171,7 +173,7 @@ const AudioPlayer = () => {
         clearTimeout(notificationTimer);
       }
     };
-  }, []);
+  }, [isMuted, isPlaying]);
 
   const handleVolumeChange = (value: number[]) => {
     const newVolume = value[0];

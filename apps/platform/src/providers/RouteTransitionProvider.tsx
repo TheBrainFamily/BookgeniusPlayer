@@ -12,6 +12,8 @@ type Ctx = {
   finishTransition: () => void;
   // cancels the overlay immediately (e.g., on error)
   cancelTransition: () => void;
+  // updates only the meta (e.g., toggle Start button) without restarting the overlay
+  updateTransitionMeta: (partial: Partial<LoaderMeta>) => void;
   // is overlay visible
   navigating: boolean;
   // whether user has navigated from platform (vs direct to /reader/)
@@ -72,6 +74,11 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
     startTimeRef.current = null;
   }, []);
 
+  // Update only parts of the meta without toggling the overlay state
+  const updateTransitionMeta = useCallback((partial: Partial<LoaderMeta>) => {
+    setMeta((prev) => (prev ? { ...prev, ...partial } : prev));
+  }, []);
+
   // If the route changes unexpectedly while navigating, keep overlay unless a new
   // startTransition comes in; this helps continuity.
   useEffect(() => {
@@ -79,8 +86,8 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
   }, [location]);
 
   const value = useMemo(
-    () => ({ startTransition, finishTransition, cancelTransition, navigating, navigatedFromPlatform, setNavigatedFromPlatform }),
-    [finishTransition, navigating, startTransition, cancelTransition, navigatedFromPlatform, setNavigatedFromPlatform],
+    () => ({ startTransition, finishTransition, cancelTransition, updateTransitionMeta, navigating, navigatedFromPlatform, setNavigatedFromPlatform }),
+    [finishTransition, navigating, startTransition, cancelTransition, updateTransitionMeta, navigatedFromPlatform, setNavigatedFromPlatform],
   );
 
   return (
@@ -89,6 +96,8 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
 
       {/* Single global overlay with BookLoader */}
       <div className={`pointer-events-none fixed inset-0 z-40 transition-opacity duration-1000 ${navigating ? "opacity-100" : "opacity-0"}`} aria-hidden={!navigating}>
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#1a1a1a] to-[#2d2d2d]" />
+
         <div className="relative z-10 flex h-full items-center justify-center">
           {meta ? (
             <div className="pointer-events-auto">

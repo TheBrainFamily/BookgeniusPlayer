@@ -1,30 +1,18 @@
-/* src/components/BookLoader.css */
-
-/* Main splash screen styles */
 .book-loader-splash {
-  position: fixed;
+  position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   color: white;
-  z-index: 9999;
-  opacity: 1;
-  visibility: visible;
-  transition:
-    opacity 1s ease-in-out,
-    transform 1s ease-in-out,
-    visibility 0s 1s;
+  will-change: transform, opacity;
+  contain: layout paint; /* isolate for smoother compositing */
 }
 
-/* Class to trigger the hide animation */
 .book-loader-splash.hide {
-  opacity: 0;
-  transform: scale(1.1);
   pointer-events: none;
-  visibility: hidden;
 }
 
 /* Custom font styles matching your HTML */

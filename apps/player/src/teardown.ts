@@ -9,6 +9,7 @@ import { clearCharactersDataCache } from "@player/genericBookDataGetters/getChar
 import { clearCutScenesCache } from "@player/genericBookDataGetters/getCutScenesForBook";
 import { clearKnownVideoFilesCache } from "@player/genericBookDataGetters/getKnownVideoFiles";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
+import { resetBackgroundDebouncer } from "./ui/background";
 
 /**
  * Completely tear down the player runtime:
@@ -17,6 +18,8 @@ import { useSearchModal } from "@player/stores/modals/searchModal.store";
  * - Clear the player portal root
  */
 export async function teardownPlayer(): Promise<void> {
+  resetBackgroundDebouncer();
+
   try {
     // Stop all audio and clear state
     stopAllPlayback();
@@ -81,6 +84,7 @@ export async function teardownPlayer(): Promise<void> {
       sources.forEach((s) => s.remove());
       v.removeAttribute("src");
       v.srcObject = null;
+      v.src = "";
       // video state reset across all browsers
       try {
         v.load();
@@ -104,18 +108,27 @@ export async function teardownPlayer(): Promise<void> {
 
     // Reset background images
     const bgA = document.getElementById("bg-image-a") as HTMLElement | null;
-    const bgB = document.getElementById("bg-image-b") as HTMLElement | null;
     if (bgA) {
       bgA.style.backgroundImage = "";
-      bgA.style.opacity = "0";
       bgA.classList.remove("zooming");
       bgA.classList.add("faded");
     }
+    const bgB = document.getElementById("bg-image-b") as HTMLElement | null;
     if (bgB) {
       bgB.style.backgroundImage = "";
-      bgB.style.opacity = "0";
       bgB.classList.remove("zooming");
       bgB.classList.add("faded");
+    }
+
+    const videoA = document.getElementById("bg-video-a") as HTMLElement | null;
+    if (videoA) {
+      videoA.style.zIndex = "-2";
+      videoA.classList.add("faded");
+    }
+    const videoB = document.getElementById("bg-video-b") as HTMLElement | null;
+    if (videoB) {
+      videoB.style.zIndex = "-2";
+      videoB.classList.add("faded");
     }
 
     // Remove visibility class from book container and reset state
@@ -129,8 +142,8 @@ export async function teardownPlayer(): Promise<void> {
     const legacy = document.getElementById("legacy");
     if (legacy) {
       legacy.dataset.currentFile = "";
-      legacy.dataset.front = "a";
-      legacy.dataset.type = "video";
+      legacy.dataset.front = "";
+      legacy.dataset.type = "";
     }
   } catch (e) {
     console.warn("teardownPlayer: clearing legacy DOM failed", e);
