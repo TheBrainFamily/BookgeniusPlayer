@@ -172,7 +172,10 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
           const pre = getPreloadedElement(newFile);
 
           // Only reuse preloaded video if it points to EXACTLY the same absolute URL and is already buffered.
-          const canReusePreload = pre instanceof HTMLVideoElement && pre.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA && sameUrl(pre.src, newSrc);
+          const canReusePreload =
+            pre instanceof HTMLVideoElement &&
+            pre.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA &&
+            sameUrl(new URL(pre.src, window.location.href).href, new URL(newSrc, window.location.href).href);
 
           if (canReusePreload) {
             vid.src = pre.src;
