@@ -1,5 +1,5 @@
-// src/components/BookLoader.tsx
 import React, { useState, useEffect, useRef } from "react";
+
 import "./BookLoader.css";
 import { genericPhrases } from "./genericPhrases";
 
@@ -21,6 +21,10 @@ export const BookLoader: React.FC<BookLoaderProps> = ({ title, author, loadingPh
   const previousPhrases = useRef(new Set<string>());
   // Tracks which pool we're currently drawing from
   const usingGenericRef = useRef(false);
+
+  // Keep references to timers to prevent dangling timeouts on unmount
+  const phraseIntervalRef = useRef<number | null>(null);
+  const fadeTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     // Reset cycle whenever the book-specific phrases list changes
@@ -66,21 +70,24 @@ export const BookLoader: React.FC<BookLoaderProps> = ({ title, author, loadingPh
     // Initial phrase
     setCurrentPhrase(getRandomPhrase());
 
-    const phraseInterval = setInterval(() => {
+    // Rotate phrases with a small crossfade
+    phraseIntervalRef.current = window.setInterval(() => {
       setIsFading(true);
-      setTimeout(() => {
+      // Short delay to allow fade-out before swapping text
+      fadeTimeoutRef.current = window.setTimeout(() => {
         setCurrentPhrase(getRandomPhrase());
         setIsFading(false);
       }, 300);
     }, 1700);
 
-    return () => clearInterval(phraseInterval);
+    return () => {
+      if (phraseIntervalRef.current) window.clearInterval(phraseIntervalRef.current);
+      if (fadeTimeoutRef.current) window.clearTimeout(fadeTimeoutRef.current);
+    };
   }, [loadingPhrases]);
 
   useEffect(() => {
-    if (isLoaded) {
-      setIsHiding(true);
-    }
+    if (isLoaded) setIsHiding(true);
   }, [isLoaded]);
 
   return (
@@ -90,9 +97,11 @@ export const BookLoader: React.FC<BookLoaderProps> = ({ title, author, loadingPh
           <h1 className="splash-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">{title}</h1>
           <h2 className="splash-subtitle text-sm sm:text-base md:text-lg lg:text-xl mt-2 sm:mt-3">{author}</h2>
         </div>
-        <div className="h-6 sm:h-8 lg:h-10">
+
+        <div className="h-6 sm:h-8 lg:h-10" aria-live="polite">
           <p className={`splash-loading-text text-sm sm:text-base lg:text-lg px-2 sm:px-4 ${isFading ? "fading-out" : "fading-in"}`}>{currentPhrase}</p>
         </div>
+
         <div className="mt-6 sm:mt-8 lg:mt-16 h-12 sm:h-14 lg:h-16 flex items-center justify-center">
           <button
             onClick={onStartClick}
