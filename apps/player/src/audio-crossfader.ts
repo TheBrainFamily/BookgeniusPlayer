@@ -1396,11 +1396,7 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
   // Invalidate prior crossfade and assign a new token
   currentCrossfadeId += 1;
   const thisCrossfadeId = currentCrossfadeId;
-  // Cancel previous cleanup timer if any
-  if (activeCrossfadeTimeout) {
-    clearTimeout(activeCrossfadeTimeout);
-    activeCrossfadeTimeout = null;
-  }
+  // Do not cancel the previous cleanup timer: it will run stale-safe cleanup.
   isTransitioning = true;
   nextTrackId = fadeInId;
 
@@ -1541,9 +1537,8 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
   // 2) …and also if the old source ends earlier for any reason
   const sourceNodeToWatch = fadeOutId === fadeInId ? oldSourceNode : fadeOutState.sourceNode;
   if (sourceNodeToWatch) {
-    // Guard onended with the same token check
+    // Always attempt cleanup; finishCrossfade will avoid touching globals if stale.
     sourceNodeToWatch.onended = () => {
-      if (thisCrossfadeId !== currentCrossfadeId) return;
       finishCrossfade();
     };
   }
