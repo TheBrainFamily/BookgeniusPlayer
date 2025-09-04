@@ -150,8 +150,10 @@ const WrappedPlayerApp = () => {
           // optional warm HEAD for index.html to reduce first-media latency (fire-and-forget)
           // try { fetch(`${assetBase}index.html`, { method: "HEAD", cache: "no-store" }); } catch (_) {}
           setAssetBaseReady(true);
-        } catch (err: any) {
-          if (err?.name === "AbortError") return;
+        } catch (err: unknown) {
+          if (typeof err === "object" && err !== null && "name" in err && (err as { name?: string }).name === "AbortError") {
+            return;
+          }
           console.error("[RESOLVE] error:", err);
           bookDataLoader.setAssetBase(null); // fallback to old API path
           setAssetBaseReady(true);
