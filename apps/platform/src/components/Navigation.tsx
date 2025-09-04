@@ -1,7 +1,8 @@
-import { Search, BookOpen, Settings, LogOut } from "lucide-react";
+import { ClientOnly } from "vite-react-ssg";
+import { Search, BookOpen, LogOut, X } from "lucide-react";
+
 import { Button } from "@platform/components/ui/button";
 import { Input } from "@platform/components/ui/input";
-import { ClientOnly } from "vite-react-ssg";
 import { useIntegrations } from "@platform/integrations";
 
 interface NavigationProps {
@@ -17,6 +18,7 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
   const { ready, isSignedIn, openSignIn, signOut } = authMod.useAuth();
   const UserWidget = authMod.useUserWidget?.();
   const SignInWidget = authMod.useSignInWidget?.();
+
   return (
     <nav className="relative z-10 bg-card/90 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4 py-4">
@@ -34,10 +36,15 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search visual novels, authors..."
-              className="pl-10 bg-library-mahogany/50 border-library-walnut text-foreground placeholder:text-muted-foreground focus:border-library-gold"
+              className="pl-10 pr-10 bg-library-mahogany/50 border-library-walnut text-foreground placeholder:text-muted-foreground focus:border-library-gold"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
             />
+            {searchQuery && (
+              <Button variant="ghost" onClick={() => onSearchChange("")} className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
 
           {/* Navigation Links */}
@@ -78,10 +85,15 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search novels..."
-              className="pl-10 bg-library-mahogany/50 border-library-walnut text-foreground placeholder:text-muted-foreground"
+              className="pl-10 pr-10 bg-library-mahogany/50 border-library-walnut text-foreground placeholder:text-muted-foreground"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
             />
+            {searchQuery && (
+              <Button variant="ghost" onClick={() => onSearchChange("")} className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         </div>
       </div>
