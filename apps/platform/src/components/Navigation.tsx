@@ -58,7 +58,7 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
                     );
                   } else {
                     return (
-                      <Button onClick={() => signOut && signOut()} variant="outline">
+                      <Button onClick={() => signOut && signOut()} variant="secondary">
                         Sign Out
                         <LogOut className="h-5 w-5" />
                       </Button>
