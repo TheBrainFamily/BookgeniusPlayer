@@ -1,7 +1,7 @@
 import { S3Client, ListObjectsV2Command, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 
-const BUCKET_NAME = process.env.S3_BUCKET!;
-const S3_ENDPOINT = process.env.S3_ENDPOINT!;
+const BUCKET_NAME = process.env.S3_BUCKET;
+const S3_ENDPOINT = process.env.S3_ENDPOINT;
 const KEEP_VERSIONS = parseInt(process.env.KEEP_VERSIONS || "5", 10);
 
 if (!BUCKET_NAME) {
@@ -46,8 +46,7 @@ async function cleanupBookVersions() {
     console.log(`Deleting ${toDelete.length} old versions from slug ${slug}`);
 
     for (const version of toDelete) {
-      // await deletePrefix(`${booksPrefix}${slug}${version}`);
-      console.log(`deleting: ${booksPrefix}${slug}${version}`);
+      await deletePrefix(`${booksPrefix}${slug}${version}`);
     }
   }
 }
@@ -94,12 +93,17 @@ async function deletePrefix(prefix: string) {
     const objects = listResp.Contents?.map(obj => ({ Key: obj.Key! })) || [];
 
     if (objects.length > 0) {
-      await s3.send(
+      const deleteResult = await s3.send(
         new DeleteObjectsCommand({
           Bucket: BUCKET_NAME,
           Delete: { Objects: objects },
         })
       );
+
+      if (deleteResult.Errors && deleteResult.Errors.length > 0) {
+        console.error(`Failed to delete some objects in prefix ${prefix}:`);
+        deleteResult.Errors.forEach(error => console.error(`- ${error.Key}: ${error.Message}`));
+      }
     }
 
     continuationToken = listResp.NextContinuationToken;
