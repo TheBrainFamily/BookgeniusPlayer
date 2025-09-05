@@ -137,7 +137,7 @@ const AudioPlayer = () => {
         setIsPlaying(true);
         resumeCurrentTrack();
 
-        if (!isInitialLoad.current || windowWidth > 640) {
+        if (!isInitialLoad.current && windowWidth > 640) {
           if (notificationTimer) {
             clearTimeout(notificationTimer);
           }
