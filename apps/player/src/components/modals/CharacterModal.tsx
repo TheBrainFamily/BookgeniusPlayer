@@ -112,85 +112,87 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
         </motion.div>
 
         <motion.div
-          className="p-4 rounded-xl flex flex-col gap-4 w-full max-w-2xl relative
-          bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[55vh] sm:max-h-[80vh]"
+          className="p-3 sm:p-4 rounded-xl flex flex-col gap-4 w-full max-w-2xl relative
+          bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[55vh] sm:max-h-[80vh] overflow-hidden"
           variants={variants.content}
           onPointerUp={(e) => e.stopPropagation()}
         >
           <div className="relative text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <h4 className=" px-5 text-lg font-bold text-white">{matchingCharacter.characterName}</h4>
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <h4 className="px-5 text-lg font-bold text-white">{matchingCharacter.characterName}</h4>
             </div>
             <p className="text-center text-white/90 text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: latestSummary }} />
           </div>
 
           {characterAppearances.length > 0 && (
-            <motion.div className="mt-2" variants={variants.appearances}>
-              <h5 className="text-md font-semibold text-white mb-4 text-center">{t("appearances")}</h5>
+            <motion.div className="mt" variants={variants.appearances}>
+              <h5 className="text-sm sm:text-md font-semibold text-white mb-2 sm:mb-4 text-center">{t("appearances")}</h5>
 
               {isLoading ? (
                 <motion.div className="flex flex-col items-center justify-center py-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   <div className="relative">
                     <motion.div className="w-8 h-8 border-3 rounded-full border-book-primary-30 border-t-book-primary" variants={variants.loading} />
                   </div>
-                  <motion.div className="mt-2 text-white/90 text-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+                  <motion.div className="mt-2 text-white/90 text-xs sm:text-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
                     {t("searching_appearances")}
                   </motion.div>
                 </motion.div>
               ) : (
-                <motion.div className=" px-1 space-y-3" variants={variants.container}>
-                  {characterAppearances.map((appearance, index) => (
-                    <motion.div
-                      key={appearance.id}
-                      className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20"
-                      variants={variants.item}
-                      transition={{ delay: index * 0.05 }}
-                      whileHover="hover"
-                      whileTap="tap"
-                      onPointerUp={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleAppearanceClick(appearance);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
+                <motion.div className="p-1 space-y-3" variants={variants.container}>
+                  <div className="max-h-45 overflow-y-auto space-y-3 pb-2">
+                    {characterAppearances.map((appearance, index) => (
+                      <motion.div
+                        key={appearance.id}
+                        className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20"
+                        variants={variants.item}
+                        transition={{ delay: index * 0.05 }}
+                        whileHover="hover"
+                        whileTap="tap"
+                        onPointerUp={(e) => {
                           e.preventDefault();
+                          e.stopPropagation();
                           handleAppearanceClick(appearance);
-                        }
-                      }}
-                    >
-                      <div className="relative p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-primary-30 text-book-primary">
-                            <span className="flex items-center gap-1">
-                              <FileText size={12} />
-                              {getChapterTitle(appearance.chapter, t)}
-                            </span>
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            handleAppearanceClick(appearance);
+                          }
+                        }}
+                      >
+                        <div className="relative p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-primary-30 text-book-primary">
+                              <span className="flex items-center gap-1">
+                                <FileText size={12} />
+                                {getChapterTitle(appearance.chapter, t)}
+                              </span>
+                            </div>
+                            <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
+                              {appearance.percentInChapter}% {t("of_chapter")}
+                            </div>
                           </div>
-                          <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
-                            {appearance.percentInChapter}% {t("of_chapter")}
-                          </div>
+
+                          <motion.div
+                            className="text-sm text-white/90 leading-relaxed line-clamp-3"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            dangerouslySetInnerHTML={{ __html: appearance.text }}
+                          />
+
+                          <motion.div
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100"
+                            initial={{ scale: 0, rotate: -90 }}
+                            whileHover={{ scale: 1, rotate: 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <div className="w-2 h-2 rounded-full bg-book-primary" />
+                          </motion.div>
                         </div>
-
-                        <motion.div
-                          className="text-sm text-white/90 leading-relaxed line-clamp-3"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.2 }}
-                          dangerouslySetInnerHTML={{ __html: appearance.text }}
-                        />
-
-                        <motion.div
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100"
-                          initial={{ scale: 0, rotate: -90 }}
-                          whileHover={{ scale: 1, rotate: 0 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <div className="w-2 h-2 rounded-full bg-book-primary" />
-                        </motion.div>
-                      </div>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    ))}
+                  </div>
                 </motion.div>
               )}
             </motion.div>
