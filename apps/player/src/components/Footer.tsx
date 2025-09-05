@@ -64,9 +64,7 @@ const Footer = () => {
                   shouldShiftFooter ? "max-w-[70vw]" : "",
                 )}
               >
-                <div className="w-full fixed bottom-0 lg:bottom-12 pointer-events-auto">
-                  <CharactersOnStagePanel />
-                </div>
+                <CharactersOnStagePanel />
                 <BottomInput className={cn("max-w-[800px]", shouldShiftFooter ? "max-w-[600px]" : "")} onSubmit={sendMessage} />
               </div>
             </>
