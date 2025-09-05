@@ -84,17 +84,19 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   if (!matchingCharacter) return null;
 
   return (
-    <ModalUI onClose={onClose} className="bg-transparent pointer-events-none" size="xxl">
+    <ModalUI onClose={onClose} className="bg-transparent" size="xxl">
       <motion.div
-        className="flex flex-col sm:flex-row items-center pointer-events-none gap-6 mx-auto relative max-h-screen"
+        className="flex flex-col sm:flex-row items-center gap-6 mx-auto relative max-h-screen"
         variants={variants.container}
         initial="hidden"
         animate="visible"
         exit="exit"
+        onPointerUp={onClose}
       >
         <motion.div
           className="w-48 md:w-80 rounded-full overflow-hidden max-h-[30vh] max-w-[30vh] md:max-h-80 md:max-w-80 border shadow-xl border-book-primary-20 aspect-square"
           variants={variants.media}
+          onPointerUp={(e) => e.stopPropagation()}
         >
           <CharacterMedia
             mediaSrc={mediaSrc}
@@ -110,20 +112,21 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
         </motion.div>
 
         <motion.div
-          className="p-4 rounded-xl flex flex-col gap-4 w-full max-w-2xl pointer-events-auto relative
+          className="p-4 rounded-xl flex flex-col gap-4 w-full max-w-2xl relative
           bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[55vh] sm:max-h-[80vh]"
           variants={variants.content}
+          onPointerUp={(e) => e.stopPropagation()}
         >
           <div className="relative text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <h4 className="text-lg font-bold text-white">{matchingCharacter.characterName}</h4>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <h4 className=" px-5 text-lg font-bold text-white">{matchingCharacter.characterName}</h4>
             </div>
             <p className="text-center text-white/90 text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: latestSummary }} />
           </div>
 
           {characterAppearances.length > 0 && (
-            <motion.div className="mt-1" variants={variants.appearances}>
-              <h5 className="text-md font-semibold text-white mb-3 text-center">{t("appearances")}</h5>
+            <motion.div className="mt-2" variants={variants.appearances}>
+              <h5 className="text-md font-semibold text-white mb-4 text-center">{t("appearances")}</h5>
 
               {isLoading ? (
                 <motion.div className="flex flex-col items-center justify-center py-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -135,15 +138,13 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                   </motion.div>
                 </motion.div>
               ) : (
-                <motion.div className="space-y-3" variants={variants.container}>
+                <motion.div className=" px-1 space-y-3" variants={variants.container}>
                   {characterAppearances.map((appearance, index) => (
                     <motion.div
                       key={appearance.id}
                       className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20"
                       variants={variants.item}
                       transition={{ delay: index * 0.05 }}
-                      role="button"
-                      tabIndex={0}
                       whileHover="hover"
                       whileTap="tap"
                       onPointerUp={(e) => {
