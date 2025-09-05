@@ -72,7 +72,7 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
 }
 
 #content-container p {
-  line-height: clamp(1.25em, 5vw, 2.25em);
+  line-height: clamp(2em, 5vw, 2.25em);
   padding: 0 clamp(1.5rem, 4vw, 3rem);
 }
 
