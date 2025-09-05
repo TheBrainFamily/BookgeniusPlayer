@@ -2,9 +2,12 @@
  * Utility to dynamically load optional book-specific color CSS files
  */
 
+import { bookDataLoader } from "@player/services/bookDataLoader";
+
 const loadedBookColorFiles = new Set<string>();
 
-export const loadBookColorsCSS = async (bookSlug: string): Promise<void> => {
+export const loadBookColorsCSS = async (): Promise<void> => {
+  const bookSlug = bookDataLoader.getCurrentBook();
   const cssPath = `/books/${bookSlug}/book-colors.css`;
 
   // Avoid loading the same file multiple times
@@ -28,13 +31,14 @@ export const loadBookColorsCSS = async (bookSlug: string): Promise<void> => {
 
       console.log(`✓ Loaded optional book colors for: ${bookSlug}`);
     }
-  } catch (error) {
+  } catch {
     // Silently fail if the file doesn't exist - it's optional
     console.log(`No custom colors found for book: ${bookSlug}`);
   }
 };
 
-export const unloadBookColorsCSS = (bookSlug: string): void => {
+export const unloadBookColorsCSS = (): void => {
+  const bookSlug = bookDataLoader.getCurrentBook();
   const linkElement = document.getElementById(`book-colors-${bookSlug}`);
   if (linkElement) {
     document.head.removeChild(linkElement);

@@ -3,7 +3,6 @@ import { BOOK_SLUGS } from "@player/consts";
 import { BookThemeColors } from "@player/types/book";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { bookDataLoader } from "@player/services/bookDataLoader";
-import { loadBookColorsCSS } from "@player/utils/loadBookColors";
 
 interface BookThemeContextType {
   bookSlug: BOOK_SLUGS;
@@ -35,11 +34,6 @@ export const BookThemeProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     applyThemeToDocument(themeColors);
   }, [themeColors]);
-
-  useEffect(() => {
-    // Load optional book-specific color CSS file
-    loadBookColorsCSS(bookSlug);
-  }, [bookSlug]);
 
   return <BookThemeContext.Provider value={{ bookSlug, themeColors, setThemeColors }}>{children}</BookThemeContext.Provider>;
 };

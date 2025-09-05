@@ -10,6 +10,7 @@ import { clearCutScenesCache } from "@player/genericBookDataGetters/getCutScenes
 import { clearKnownVideoFilesCache } from "@player/genericBookDataGetters/getKnownVideoFiles";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
 import { resetBackgroundDebouncer } from "./ui/background";
+import { unloadBookColorsCSS } from "./utils/loadBookColors";
 
 /**
  * Completely tear down the player runtime:
@@ -176,6 +177,7 @@ export async function teardownPlayer(): Promise<void> {
     clearCharactersDataCache();
     clearCutScenesCache();
     clearKnownVideoFilesCache();
+    unloadBookColorsCSS();
   } catch (e) {
     console.warn("teardownPlayer: clearing caches failed", e);
   }
