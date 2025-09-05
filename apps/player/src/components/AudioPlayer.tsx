@@ -416,14 +416,14 @@ const AudioPlayer = () => {
                 >
                   <div className="player-left">
                     <motion.div className="flex justify-center pt-4 mb-4" variants={variants.popUpItem} initial="closed" animate="open">
-                      <div className="relative group w-32 h-32">
+                      <div className="relative group w-26 h-26 md:w-32 md:h-32">
                         <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-white/40 shadow-2xl backdrop-blur-sm bg-white/15">
                           <CoverArt src={currentTrackData?.coverArtUrl} />
                         </div>
                       </div>
                     </motion.div>
 
-                    <motion.div className="text-lg mb-4 text-center current-track-title" variants={variants.popUpItem} initial="closed" animate="open">
+                    <motion.div className="text-md md:text-lg mb-4 text-center current-track-title" variants={variants.popUpItem} initial="closed" animate="open">
                       {currentTrackData?.title}
                     </motion.div>
                   </div>
@@ -501,11 +501,14 @@ const AudioPlayer = () => {
 
                     {playlistTracks.length > 0 && (
                       <motion.div className="space-y-2 pb-3" variants={variants.popUpItem} initial="closed" animate="open">
-                        <div className="text-sm font-medium mb-2 playlist-header">Playlist:</div>
+                        <div className="text-xs md:text-sm font-medium mb-2 playlist-header">Playlist:</div>
                         {playlistTracks.map((track) => (
                           <motion.div
                             key={track.id}
-                            className={cn("flex items-center justify-between px-2 py-1 rounded-md cursor-pointer gap-2", currentTrackIdFromState === track.id && "bg-white/10")}
+                            className={cn(
+                              "flex items-center justify-between px-2 py-0 md:py-1 rounded-md cursor-pointer gap-2",
+                              currentTrackIdFromState === track.id && "bg-white/10",
+                            )}
                             variants={variants.trackItemHover}
                             whileHover="hover"
                             onClick={(e) => {
@@ -513,9 +516,7 @@ const AudioPlayer = () => {
                               transitionToTrack(track.id);
                             }}
                           >
-                            <div className="flex items-center gap-2">
-                              <span className={"text-white/70 playlist-item-title"}>{track.title}</span>
-                            </div>
+                            <span className={"text-sm md:text-md text-white/70 playlist-item-title"}>{track.title}</span>
                             <div className="flex items-center gap-2">
                               <span className="text-white/70 playlist-item-duration">{formatTime(track.duration)}</span>
                               <button
