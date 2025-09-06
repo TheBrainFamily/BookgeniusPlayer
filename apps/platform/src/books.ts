@@ -214,7 +214,6 @@ export const books = [
     language: "pl",
     phrases: ["Freezing hearts...", "Shattering mirrors...", "Chilling the air...", "Preparing ice castles...", "Summoning snowflakes..."],
   },
-
   {
     id: 4,
     title: "Tajny Agent",
@@ -229,6 +228,22 @@ export const books = [
     readTime: "10 hrs",
     features: ["Suspenseful Score", "Period Animation", "Voice Acting"],
     language: "pl",
+    phrases: ["Encrypting secret messages...", "Plotting espionage...", "Shadowing informants...", "Meeting in dark alleys...", "Planting evidence..."],
+  },
+  {
+    id: 13,
+    title: "Secret Agent",
+    slug: "Conrad-Secret-Agent",
+    author: "Joseph Conrad",
+    genre: "Thriller",
+    year: "1907",
+    rating: 4.6,
+    description: "A gripping tale of espionage and political intrigue in Victorian London.",
+    video: "/conrad-tajny-agent.mp4?v=1",
+    poster: "/conrad-tajny-agent.webp",
+    readTime: "10 hrs",
+    features: ["Suspenseful Score", "Period Animation", "Voice Acting"],
+    language: "en",
     phrases: ["Encrypting secret messages...", "Plotting espionage...", "Shadowing informants...", "Meeting in dark alleys...", "Planting evidence..."],
   },
 ];
