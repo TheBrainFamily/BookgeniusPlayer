@@ -37,7 +37,12 @@ const CharactersOnStagePanel = () => {
   if (!location) return null;
 
   return (
-    <div className={cn("characters-on-stage-panel flex justify-center items-center h-full transition-opacity duration-300", shouldHideAvatars ? "opacity-0" : "opacity-100")}>
+    <div
+      className={cn(
+        "characters-on-stage-panel flex justify-center items-center transition-opacity duration-300 max-w-full absolute bottom-2 lg:bottom-14 m-0",
+        shouldHideAvatars ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto",
+      )}
+    >
       <AnimatePresence mode="sync">
         <ScrollArea
           className="relative w-full h-full"

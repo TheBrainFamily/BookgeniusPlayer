@@ -137,7 +137,7 @@ const AudioPlayer = () => {
         setIsPlaying(true);
         resumeCurrentTrack();
 
-        if (!isInitialLoad.current) {
+        if (!isInitialLoad.current && windowWidth > 640) {
           if (notificationTimer) {
             clearTimeout(notificationTimer);
           }
@@ -302,11 +302,11 @@ const AudioPlayer = () => {
               <AnimatePresence mode="wait" initial={false}>
                 {isMuted ? (
                   <motion.div key="muted" variants={variants.iconFadeScale}>
-                    <VolumeX className="w-4 h-4 lg:w-5 lg:h-5" />
+                    <VolumeX className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
                   </motion.div>
                 ) : (
                   <motion.div key="unmuted" variants={variants.iconFadeScale}>
-                    <Volume2 className="w-4 h-4 lg:w-5 lg:h-5" />
+                    <Volume2 className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -357,7 +357,7 @@ const AudioPlayer = () => {
                   whileTap="tap"
                   variants={variants.buttonHover}
                 >
-                  <BookHeadphones className="w-4 h-4 lg:w-5 lg:h-5" />
+                  <BookHeadphones className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
                   <motion.div className="absolute bottom-0 right-0">{isPlayingAudioBook ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}</motion.div>
                 </motion.button>
               </TooltipTrigger>
@@ -401,14 +401,14 @@ const AudioPlayer = () => {
               whileTap="tap"
               variants={variants.buttonHover}
             >
-              <ListMusic className="w-4 h-4 lg:w-5 lg:h-5" />
+              <ListMusic className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
             </motion.button>
             {/* Invisible bridge to cover the gap */}
-            {isBigPlayerOpen && <div className="absolute top-full left-0 w-full min-w-xs h-2 z-5" />}
+            {isBigPlayerOpen && <div className="absolute top-full left-0 w-full min-w-[240px] sm:min-w-2xs md:min-w-xs h-2 z-5" />}
             <AnimatePresence>
               {isBigPlayerOpen && (
                 <motion.div
-                  className="player-controls bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-xs player-controls-layout"
+                  className="player-controls bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-4 py-2 absolute top-full left-0 mt-2 z-10 min-w-[240px] sm:min-w-xs player-controls-layout"
                   variants={variants.dropdownContainer}
                   initial="initial"
                   animate="animate"
@@ -416,14 +416,14 @@ const AudioPlayer = () => {
                 >
                   <div className="player-left">
                     <motion.div className="flex justify-center pt-4 mb-4" variants={variants.popUpItem} initial="closed" animate="open">
-                      <div className="relative group w-32 h-32">
+                      <div className="relative group w-26 h-26 md:w-32 md:h-32">
                         <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-white/40 shadow-2xl backdrop-blur-sm bg-white/15">
                           <CoverArt src={currentTrackData?.coverArtUrl} />
                         </div>
                       </div>
                     </motion.div>
 
-                    <motion.div className="text-lg mb-4 text-center current-track-title" variants={variants.popUpItem} initial="closed" animate="open">
+                    <motion.div className="text-md md:text-lg mb-4 text-center current-track-title" variants={variants.popUpItem} initial="closed" animate="open">
                       {currentTrackData?.title}
                     </motion.div>
                   </div>
@@ -452,7 +452,7 @@ const AudioPlayer = () => {
                           variants={variants.navButtonHover}
                           title="Previous track"
                         >
-                          <SkipBack className="w-4 h-4 lg:w-5 lg:h-5" />
+                          <SkipBack className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
                         </motion.button>
                       )}
 
@@ -494,18 +494,21 @@ const AudioPlayer = () => {
                           variants={variants.navButtonHover}
                           title="Next track"
                         >
-                          <SkipForward className="w-4 h-4 lg:w-5 lg:h-5" />
+                          <SkipForward className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
                         </motion.button>
                       )}
                     </motion.div>
 
                     {playlistTracks.length > 0 && (
                       <motion.div className="space-y-2 pb-3" variants={variants.popUpItem} initial="closed" animate="open">
-                        <div className="text-sm font-medium mb-2 playlist-header">Playlist:</div>
+                        <div className="text-xs md:text-sm font-medium mb-2 playlist-header">Playlist:</div>
                         {playlistTracks.map((track) => (
                           <motion.div
                             key={track.id}
-                            className={cn("flex items-center justify-between px-2 py-1 rounded-md cursor-pointer gap-2", currentTrackIdFromState === track.id && "bg-white/10")}
+                            className={cn(
+                              "flex items-center justify-between px-2 py-0 md:py-1 rounded-md cursor-pointer gap-2",
+                              currentTrackIdFromState === track.id && "bg-white/10",
+                            )}
                             variants={variants.trackItemHover}
                             whileHover="hover"
                             onClick={(e) => {
@@ -513,9 +516,7 @@ const AudioPlayer = () => {
                               transitionToTrack(track.id);
                             }}
                           >
-                            <div className="flex items-center gap-2">
-                              <span className={"text-white/70 playlist-item-title"}>{track.title}</span>
-                            </div>
+                            <span className={"text-sm md:text-md text-white/70 playlist-item-title"}>{track.title}</span>
                             <div className="flex items-center gap-2">
                               <span className="text-white/70 playlist-item-duration">{formatTime(track.duration)}</span>
                               <button
@@ -526,7 +527,7 @@ const AudioPlayer = () => {
                                   handleDownloadTrack(track.id, track.title);
                                 }}
                               >
-                                <Download className="w-4 h-4" />
+                                <Download className="w-[14px] h-[14px] md:w-4 md:h-4" />
                               </button>
                             </div>
                           </motion.div>
