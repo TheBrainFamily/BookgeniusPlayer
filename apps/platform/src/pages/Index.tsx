@@ -32,7 +32,7 @@ const Index = () => {
         )}
         <BookCollection searchQuery={trimmedSearchQuery} />
       </main>
-      <Footer />
+      <Footer onSearchQuery={setSearchQuery} />
     </div>
   );
 };

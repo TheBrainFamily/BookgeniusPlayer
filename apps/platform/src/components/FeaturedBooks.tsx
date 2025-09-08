@@ -6,6 +6,7 @@ import { useRouteTransition } from "@platform/providers/RouteTransitionProvider"
 import { Button } from "@platform/components/ui/button";
 import { Badge } from "@platform/components/ui/badge";
 import { books } from "@platform/books";
+import { humanizeBookCardButtonText } from "@platform/utils/humanizeBookCardButtonText";
 
 const featuredBookSlugs = ["1984-English", "Romeo-And-Juliet"];
 const featuredBooks = books.filter((book) => featuredBookSlugs.includes(book.slug));
@@ -43,7 +44,7 @@ const FeaturedBooks = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {featuredBooks.map((book) => (
             <Card
               key={book.id}
@@ -67,7 +68,7 @@ const FeaturedBooks = () => {
 
               <CardHeader className="pb-4">
                 {/* Book Cover */}
-                <div className="w-full h-48 rounded-lg mb-4 relative overflow-hidden group-hover:animate-bookglow">
+                <div className="w-full h-54 rounded-lg mb-4 relative overflow-hidden group-hover:animate-bookglow">
                   <video className="w-full h-full object-cover" autoPlay loop muted playsInline poster={book.poster}>
                     <source src={book.video} type="video/mp4" />
                   </video>
@@ -119,7 +120,7 @@ const FeaturedBooks = () => {
                     }}
                   >
                     <Play className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
-                    Experience Novel
+                    {humanizeBookCardButtonText(book)}
                   </Button>
                 </div>
               </CardContent>

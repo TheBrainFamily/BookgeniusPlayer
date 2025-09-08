@@ -7,6 +7,8 @@ import { useRouteTransition } from "@platform/providers/RouteTransitionProvider"
 import { Button } from "@platform/components/ui/button";
 import { Badge } from "@platform/components/ui/badge";
 import { books } from "@platform/books";
+import { humanizeBookCardButtonText } from "@platform/utils/humanizeBookCardButtonText";
+import { isRunningOnLocalhost } from "@platform/utils/isRunningOnLocalhost";
 
 interface BookCollectionProps {
   searchQuery?: string;
@@ -17,10 +19,11 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   const { startTransition, setNavigatedFromPlatform } = useRouteTransition();
 
   const filteredBooks = useMemo(() => {
-    if (!searchQuery.trim()) return books;
+    const availableBooks = typeof window !== "undefined" && (window.location.hostname.endsWith(".pl") || isRunningOnLocalhost()) ? books : books.filter((b) => b.language !== "pl");
+    if (!searchQuery.trim()) return availableBooks;
 
     const query = searchQuery.toLowerCase();
-    return books.filter(
+    return availableBooks.filter(
       (book) =>
         book.title.toLowerCase().includes(query) ||
         book.author.toLowerCase().includes(query) ||
@@ -141,7 +144,7 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
                       }}
                     >
                       <Play className="mr-2 h-4 w-4 group-hover:scale-110 group-hover/btn:scale-110 transition-transform" />
-                      Experience Novel
+                      {humanizeBookCardButtonText(book)}
                     </Button>
                   </div>
                 </CardContent>
