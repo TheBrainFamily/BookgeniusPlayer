@@ -10,6 +10,7 @@ import { clearCutScenesCache } from "@player/genericBookDataGetters/getCutScenes
 import { clearKnownVideoFilesCache } from "@player/genericBookDataGetters/getKnownVideoFiles";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
 import { resetBackgroundDebouncer } from "./ui/background";
+import { useBookMenuModal } from "./stores/modals/bookMenuModal.store";
 
 /**
  * Completely tear down the player runtime:
@@ -184,6 +185,7 @@ export async function teardownPlayer(): Promise<void> {
   try {
     useSearchModal.getState().closeModal();
     useSearchModal.getState().clearModal();
+    useBookMenuModal.getState().closeModal();
   } catch (e) {
     console.warn("teardownPlayer: clearing search results failed", e);
   }
