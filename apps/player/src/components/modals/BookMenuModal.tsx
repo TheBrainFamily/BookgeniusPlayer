@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, memo } from "react";
-import { List, Type, RotateCcw, BrainCircuit, BarChart3 } from "lucide-react";
+import { List, Type, RotateCcw, BrainCircuit, BarChart3, ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useLocalStorageState from "use-local-storage-state";
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
@@ -66,7 +66,7 @@ const OVERLAY_TIMEOUT = 1500;
 const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, openApiKeyModal, resetFurthestPageLocation }) => {
   const { t } = useTranslation();
   const allVariants = getAllVariants();
-  const { openModal: openCharacterDetailsModal } = useCharacterModal();
+  const { openModal } = useCharacterModal();
 
   const [currentFontSize, setCurrentFontSize] = useLocalStorageState("fontSize", { defaultValue: 1 });
   const [currentComplexity, setCurrentComplexity] = useLocalStorageState("readingComplexity", { defaultValue: 100 });
@@ -185,7 +185,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
         element.dataset.currentScore = bestFit.score.toString();
 
         // 5. Activate character interactions for newly transformed content
-        activateCharacterInteractions(element, openCharacterDetailsModal);
+        activateCharacterInteractions(element, openModal);
       }
     }
   };
@@ -218,6 +218,22 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   return (
     <ModalUI title={t("book_settings")} onClose={onClose} hideOverlay={hideOverlay}>
       <div className="space-y-2 mb-6 book-settings-actions">
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
+          onPointerUp={() => {
+            window.history.back();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              window.history.back();
+            }
+          }}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          {t("back_to_platform")}
+        </Button>
         <Button
           variant="ghost"
           className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
