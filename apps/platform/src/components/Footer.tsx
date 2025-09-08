@@ -1,7 +1,11 @@
 import { BookOpen, Mail, MapPin, Phone } from "lucide-react";
 import { Button } from "@platform/components/ui/button";
 
-const Footer = () => {
+interface FooterProps {
+  onSearchQuery: (query: string) => void;
+}
+
+const Footer = ({ onSearchQuery }: FooterProps) => {
   return (
     <footer className="bg-library-mahogany/80 backdrop-blur-sm border-t border-library-walnut">
       <div className="container mx-auto px-4 py-12">
@@ -34,7 +38,12 @@ const Footer = () => {
             <h4 className="text-lg font-semibold text-library-gold">Featured Authors</h4>
             <div className="space-y-2 flex flex-col">
               {["William Shakespeare", "George Orwell", "Lewis Carroll", "Hans Christian Andersen"].map((author) => (
-                <Button key={author} variant="ghost" className="p-0 h-auto text-muted-foreground hover:text-library-gold hover:bg-transparent text-left justify-start w-fit">
+                <Button
+                  key={author}
+                  variant="ghost"
+                  onClick={() => onSearchQuery(author)}
+                  className="p-0 h-auto text-muted-foreground hover:text-library-gold hover:bg-transparent text-left justify-start w-fit"
+                >
                   {author}
                 </Button>
               ))}

@@ -24,7 +24,7 @@ const Index = () => {
         {!searchQuery && <HeroSection />}
         <BookCollection searchQuery={searchQuery} />
       </main>
-      <Footer />
+      <Footer onSearchQuery={setSearchQuery} />
     </div>
   );
 };
