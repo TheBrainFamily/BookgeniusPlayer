@@ -808,6 +808,10 @@
           top: 0;
         }
 
+        .play-row .character-text {
+          padding-top: 0.5rem;
+        }
+
         .play-row .character-text p:first-child {
           position: absolute;
           top: calc(clamp(65px, 18vw, 150px) / 3);
@@ -828,6 +832,7 @@
             position: absolute;
             left: inherit;
             right: calc(clamp(65px, 18vw, 150px) + 2rem);
+            width: max-content;
           }
         }
 
@@ -838,10 +843,12 @@
 
         .play-row[data-text-alignment="left"] {
           flex-direction: column;
+          padding: 0 1.5rem;
         }
 
         .play-row[data-text-alignment="right"] {
           flex-direction: column;
+          padding: 0 1.5rem;
         }
       }
     }
