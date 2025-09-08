@@ -3,13 +3,13 @@
  */
 
 import { bookDataLoader } from "@player/services/bookDataLoader";
-import { getBookDataUrl } from "./assetUrls";
+import { getBookAssetUrl } from "./assetUrls";
 
 const loadedBookColorFiles = new Set<string>();
 
 export const loadBookColorsCSS = async (): Promise<void> => {
   const bookSlug = bookDataLoader.getCurrentBook();
-  const cssPath = getBookDataUrl("book-colors.css");
+  const cssPath = getBookAssetUrl("book-colors.css");
   console.log("PINGWING", cssPath);
 
   // Avoid loading the same file multiple times
