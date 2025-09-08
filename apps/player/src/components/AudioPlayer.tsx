@@ -45,7 +45,6 @@ const AudioPlayer = () => {
   const [isBigPlayerOpen, setIsBigPlayerOpen] = useState(false);
   const [currentTrackData, setCurrentTrackData] = useState<TrackState | null>(null);
   const [showSongNotification, setShowSongNotification] = useState(false);
-  const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
   const [playlistTracks, setPlaylistTracks] = useState<{ id: string; title: string; duration: number }[]>([]);
   const [currentTrackIdFromState, setCurrentTrackIdFromState] = useState<string | null>(null);
   const areElementsVisible = useOptionalElementVisibility();
@@ -111,11 +110,6 @@ const AudioPlayer = () => {
       setPlaylistTracks(event.detail || []);
     };
 
-    const setInitialWindowWidth = () => {
-      setWindowWidth(window?.innerWidth || 1920);
-    };
-    setInitialWindowWidth();
-
     let notificationTimer: ReturnType<typeof setTimeout> | null = null;
 
     const handleSongTransition = (event: CustomEvent<TrackState | null>) => {
@@ -137,7 +131,7 @@ const AudioPlayer = () => {
         setIsPlaying(true);
         resumeCurrentTrack();
 
-        if (!isInitialLoad.current && windowWidth > 640) {
+        if (!isInitialLoad.current) {
           if (notificationTimer) {
             clearTimeout(notificationTimer);
           }
@@ -156,17 +150,11 @@ const AudioPlayer = () => {
       }
     };
 
-    const handleResize = () => {
-      setWindowWidth(window?.innerWidth || 1920);
-    };
-
     window.addEventListener("songTransition", handleSongTransition);
-    window.addEventListener("resize", handleResize);
     window.addEventListener("playlistChange", handlePlaylistChange);
 
     return () => {
       window.removeEventListener("songTransition", handleSongTransition);
-      window.removeEventListener("resize", handleResize);
       window.removeEventListener("playlistChange", handlePlaylistChange);
 
       if (notificationTimer) {
@@ -427,7 +415,7 @@ const AudioPlayer = () => {
                       {currentTrackData?.title}
                     </motion.div>
                   </div>
-                  <div className="player-right">
+                  <div className="player-right p-1">
                     <motion.div className="mb-2 music-progress-bar" variants={variants.popUpItem} initial="closed" animate="open">
                       <div className="w-full group hover:opacity-100">
                         <Slider value={[currentTime]} min={0} max={currentTrackData?.duration || 100} step={0.1} onValueChange={handleProgressChange} variant="secondary" />
@@ -544,9 +532,9 @@ const AudioPlayer = () => {
 
       {/* Song Notification */}
       <AnimatePresence>
-        {showSongNotification && currentTrackData && windowWidth && (
+        {showSongNotification && currentTrackData && (
           <motion.div
-            className={cn("song-notification fixed z-50 top-5", windowWidth >= 768 ? "right-5 w-80" : "right-3 w-70", windowWidth < 640 && "right-2 w-60")}
+            className={cn("song-notification absolute z-50 top-4 right-2 lg:right-4 w-60 md:w-70 lg:w-80 hidden sm:block")}
             variants={variants.songNotificationTop}
             initial="initial"
             animate="animate"
@@ -556,7 +544,7 @@ const AudioPlayer = () => {
           >
             <div
               className={cn(
-                "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-3 lg:p-4 ",
+                "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 p-4 ",
                 "flex items-center gap-3 lg:gap-4 z-20 max-w-full overflow-hidden",
                 "cursor-pointer",
                 "audio-player",
@@ -564,7 +552,7 @@ const AudioPlayer = () => {
               onClick={() => setShowSongNotification(false)}
             >
               <motion.div variants={variants.notificationContent}>
-                <div className={cn("relative group", "w-20 h-20", windowWidth < 1024 && "w-16 h-16", windowWidth < 640 && "w-14 h-14")}>
+                <div className={cn("relative group", "w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20")}>
                   <div className="relative w-full h-full rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl backdrop-blur-sm bg-white/10">
                     <CoverArt src={currentTrackData.coverArtUrl} />
                   </div>
