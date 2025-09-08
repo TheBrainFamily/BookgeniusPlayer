@@ -78,7 +78,7 @@ export const books: Book[] = [
       "Polerowanie sklepowych witryn...",
       "Kształtowanie towarzyskich opinii...",
       "Bilansowanie ksiąg handlowych...",
-      "Snuciu romantycznych intryg...",
+      "Snucie romantycznych intryg...",
       "Negocjowanie perspektyw małżeńskich...",
     ],
     type: "powieść",
