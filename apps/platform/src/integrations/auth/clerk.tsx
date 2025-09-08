@@ -117,20 +117,38 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     return <Ctx.Provider value={ctx}>{children}</Ctx.Provider>;
   };
 
-  console.log("DWER#4sdffs isSatellite:", import.meta.env.VITE_CLERK_IS_SATELLITE);
-  console.log("domain:", import.meta.env.VITE_CLERK_DOMAIN);
-  console.log("signInUrl:", import.meta.env.VITE_CLERK_SIGN_IN_URL);
-  console.log("signUpUrl:", import.meta.env.VITE_CLERK_SIGN_UP_URL);
+  const isSatellite = import.meta.env.VITE_CLERK_IS_SATELLITE === "true";
+  const clerkDomain = import.meta.env.VITE_CLERK_DOMAIN || undefined;
+
+  let signInUrl = undefined;
+  let signUpUrl = undefined;
+
+  const signInUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_IN_URL;
+  const signUpUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_UP_URL;
+  if (isSatellite && signInUrlEnv && signUpUrlEnv) {
+    const signInUrlObj = new URL(signInUrlEnv);
+    signInUrlObj.searchParams.append('redirect_url', `https://${clerkDomain}`);
+    signInUrl = signInUrlObj.toString();
+
+    const signUpUrlObj = new URL(signUpUrlEnv);
+    signUpUrlObj.searchParams.append('redirect_url', `https://${clerkDomain}`);
+    signUpUrl = signUpUrlObj.toString();
+  }
+
+  console.log("isSatellite:", isSatellite);
+  console.log("domain:", clerkDomain);
+  console.log("signInUrl:", signInUrl);
+  console.log("signUpUrl:", signUpUrl);
 
   return (
     <WidgetCtx.Provider value={hooks.UserButton}>
       <ClerkProvider
         publishableKey={publishableKey}
-        domain={import.meta.env.VITE_CLERK_DOMAIN}
-        signInUrl={import.meta.env.VITE_CLERK_SIGN_IN_URL}
-        signUpUrl={import.meta.env.VITE_CLERK_SIGN_UP_URL}
-        isSatellite={import.meta.env.VITE_CLERK_IS_SATELLITE}
-        allowedRedirectOrigins={!import.meta.env.VITE_CLERK_IS_SATELLITE ? ["https://bookgeniusz.pl"] : undefined}
+        domain={clerkDomain}
+        signInUrl={signInUrl}
+        signUpUrl={signUpUrl}
+        isSatellite={isSatellite}
+        allowedRedirectOrigins={!isSatellite && clerkDomain ? [`https://${clerkDomain}`] : undefined}
       >
         <Inner>{children}</Inner>
       </ClerkProvider>
