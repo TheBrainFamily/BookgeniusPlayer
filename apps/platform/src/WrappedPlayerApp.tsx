@@ -134,13 +134,11 @@ const WrappedPlayerApp = () => {
         return;
       }
 
-      const controller = new AbortController();
-      const { signal } = controller;
-
       (async () => {
         setAssetBaseReady(false);
+
         try {
-          const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store", signal });
+          const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
           if (!res.ok) throw new Error("[RESOLVE] resolve failed");
           const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
 
@@ -159,10 +157,6 @@ const WrappedPlayerApp = () => {
           setAssetBaseReady(true);
         }
       })();
-
-      return () => {
-        controller.abort();
-      };
     }
   }, [book, navigatedFromPlatform, navigating, startTransition, handleStartClick]);
 

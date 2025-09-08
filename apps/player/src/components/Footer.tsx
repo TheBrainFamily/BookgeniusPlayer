@@ -49,8 +49,7 @@ const Footer = () => {
           animate="visible"
           className={cn(
             "fixed bottom-0 inset-x-0 z-50 flex flex-row gap-2 justify-center mx-auto max-w-[120rem] w-full pointer-events-none",
-            "px-2 py-3 sm:pr-0 xl:px-4 sm:pl-4",
-            bookForm === "play" ? "!px-3" : "",
+            "px-2 lg:px-4 pb-4",
             // Shift footer left when search modal is open on large screens
             shouldShiftFooter ? `transform ${footerShiftClass} transition-transform duration-300` : "",
           )}
@@ -64,21 +63,14 @@ const Footer = () => {
                   shouldShiftFooter ? "max-w-[70vw]" : "",
                 )}
               >
-                <div className="w-full fixed bottom-0 lg:bottom-12 pointer-events-auto">
-                  <CharactersOnStagePanel />
-                </div>
+                <CharactersOnStagePanel />
                 <BottomInput className={cn("max-w-[800px]", shouldShiftFooter ? "max-w-[600px]" : "")} onSubmit={sendMessage} />
               </div>
             </>
           ) : (
             <>
               <div id="left-notes-blank" className="hidden sm:block sm:flex-1 max-w-[700px]" />
-              <div
-                className={cn(
-                  "w-full sm:flex-3 max-w-[900px] px-0 flex flex-col sm:ml-2 sm:px-3 xl:ml-0 xl:px-2 space-y-3 pointer-events-auto",
-                  shouldShiftFooter ? "max-w-[70vw]" : "",
-                )}
-              >
+              <div className={cn("w-full sm:flex-3 max-w-[900px] flex flex-col sm:pl-4 pointer-events-auto", shouldShiftFooter ? "max-w-[70vw]" : "")}>
                 <BottomInput onSubmit={sendMessage} />
               </div>
               {!isRightNotesBlankHidden && <div id="right-notes-blank" className="hidden xl:block xl:flex-1 max-w-[700px]" />}

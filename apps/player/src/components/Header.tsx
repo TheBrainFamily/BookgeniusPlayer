@@ -17,7 +17,7 @@ const Header = () => {
           variants={headerVariants}
           initial="hidden"
           animate="visible"
-          className={cn("fixed top-0 left-0 right-0 z-50 flex items-center max-w-[120rem] w-full mx-auto", "gap-2 md:gap-3 lg:gap-4 px-2 p-5")}
+          className={cn("fixed top-0 inset-x-0 z-50 flex items-center max-w-[120rem] w-full mx-auto", "gap-1 md:gap-2 px-2 lg:px-4 pt-4")}
         >
           <MenuButton />
           <AudioPlayer />

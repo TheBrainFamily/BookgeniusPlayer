@@ -1,4 +1,3 @@
-import React from "react";
 import { Book } from "lucide-react";
 import { motion, Variants } from "motion/react";
 
@@ -13,29 +12,27 @@ const MenuButton = () => {
   const { t } = useTranslation();
 
   return (
-    <OptionalElement>
-      <div className={cn("bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center")}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <motion.button
-              onPointerUp={openModal}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  openModal();
-                }
-              }}
-              className="p-2 my-1 hover:text-white rounded-full cursor-pointer flex"
-              whileHover="hover"
-              whileTap="tap"
-              variants={buttonVariants}
-            >
-              <Book className="w-4 h-4 lg:w-5 lg:h-5" />
-            </motion.button>
-          </TooltipTrigger>
-          <TooltipContent>{t("book_menu_button_tooltip")}</TooltipContent>
-        </Tooltip>
-      </div>
+    <OptionalElement className={cn("bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center")}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <motion.button
+            onPointerUp={openModal}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                openModal();
+              }
+            }}
+            className="p-2 my-1 hover:text-white rounded-full cursor-pointer flex"
+            whileHover="hover"
+            whileTap="tap"
+            variants={buttonVariants}
+          >
+            <Book className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
+          </motion.button>
+        </TooltipTrigger>
+        <TooltipContent>{t("book_menu_button_tooltip")}</TooltipContent>
+      </Tooltip>
     </OptionalElement>
   );
 };

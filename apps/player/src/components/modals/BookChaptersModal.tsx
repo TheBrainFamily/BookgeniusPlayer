@@ -31,27 +31,32 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
 
   return (
     <ModalUI title={t("chapters")} onClose={onClose}>
-      <div className="relative">
-        <div className="max-h-[60vh] overflow-y-auto scrollbar-search">
-          <div className="space-y-2 pr-2">
-            {chapters.map((chapter) => {
-              const isCurrentChapter = chapter.id === currentChapter;
-              return (
-                <Button
-                  variant="ghost"
-                  key={chapter.id}
-                  onClick={() => navigateToChapter(chapter.id)}
-                  className={`w-full justify-between text-left hover:bg-white/10 hover:text-white border-white/20 cursor-pointer ${
-                    isCurrentChapter ? "bg-white/20 text-white border-white/40 font-bold " : "text-white"
-                  }`}
+      <div className="container max-h-[60vh] overflow-y-auto scrollbar-search">
+        {chapters.map((chapter) => {
+          const isCurrentChapter = chapter.id === currentChapter;
+
+          return (
+            <Button
+              variant="ghost"
+              key={chapter.id}
+              onClick={() => navigateToChapter(chapter.id)}
+              className={`w-full min-w-0 h-auto !justify-between !items-start text-left px-3 py-2 hover:bg-white/10 hover:text-white border-white/20 ${
+                isCurrentChapter ? "bg-white/20 text-white border-white/40 font-bold" : "text-white"
+              }`}
+            >
+              <div className="grid w-full min-w-0 grid-cols-[1fr_auto] items-start gap-3">
+                <span
+                  className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap sm:whitespace-normal sm:line-clamp-2 leading-snug"
+                  title={chapter.title}
+                  aria-label={chapter.title}
                 >
-                  <div className="flex items-center gap-3 font-medium">{chapter.title}</div>
-                  <span className="text-sm text-muted-foreground">{chapter.page}</span>
-                </Button>
-              );
-            })}
-          </div>
-        </div>
+                  {chapter.title}
+                </span>
+                <span className="shrink-0 text-sm text-muted-foreground tabular-nums">{chapter.page}</span>
+              </div>
+            </Button>
+          );
+        })}
       </div>
     </ModalUI>
   );
