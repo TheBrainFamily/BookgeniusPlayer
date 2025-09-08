@@ -5,7 +5,7 @@ import { Star, Clock, Play, Volume2 } from "lucide-react";
 import { books } from "@platform/books";
 import { useNavigate } from "react-router-dom";
 import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 interface BookCollectionProps {
   searchQuery?: string;
@@ -14,11 +14,10 @@ interface BookCollectionProps {
 const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   const navigate = useNavigate();
   const { startTransition, setNavigatedFromPlatform } = useRouteTransition();
-  const [availableBooks, setAvailableBooks] = useState<typeof books>(() =>
-    location.hostname.endsWith(".pl") || location.hostname === "localhost" ? books : books.filter((b) => b.language !== "pl"),
-  );
 
   const filteredBooks = useMemo(() => {
+    const availableBooks =
+      typeof window !== "undefined" && (window.location.hostname.endsWith(".pl") || window.location.hostname === "localhost") ? books : books.filter((b) => b.language !== "pl");
     if (!searchQuery.trim()) return availableBooks;
 
     const query = searchQuery.toLowerCase();

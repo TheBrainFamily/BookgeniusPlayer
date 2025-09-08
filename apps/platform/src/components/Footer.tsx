@@ -41,9 +41,7 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
                 <Button
                   key={author}
                   variant="ghost"
-                  onClick={() => {
-                    onSearchQuery(author);
-                  }}
+                  onClick={() => onSearchQuery(author)}
                   className="p-0 h-auto text-muted-foreground hover:text-library-gold hover:bg-transparent text-left justify-start w-fit"
                 >
                   {author}
