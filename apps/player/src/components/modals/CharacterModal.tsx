@@ -25,8 +25,6 @@ const findLatestSummaryInRange = (character: CharacterData, endChapter: number) 
   character.infoPerChapter.filter((info) => info.chapter <= endChapter).sort((a, b) => b.chapter - a.chapter)[0]?.summary ?? "";
 
 const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, characterSlug, endChapter }) => {
-  const furthestLocation = getSavedLocation();
-
   const { t } = useTranslation();
 
   const matchingCharacter = useMemo(() => getCharactersData().find((c) => c.slug === characterSlug), [characterSlug]);
@@ -40,7 +38,9 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   useEffect(() => {
     if (!matchingCharacter) return;
 
+    const furthestLocation = getSavedLocation();
     setIsLoading(true);
+
     try {
       const searchResults = findCharacterSentences(characterSlug, furthestLocation);
 
@@ -70,7 +70,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     } finally {
       setIsLoading(false);
     }
-  }, [matchingCharacter, characterSlug, furthestLocation.currentChapter, furthestLocation.currentParagraph]);
+  }, [matchingCharacter, characterSlug]);
 
   const handleAppearanceClick = (appearance: SearchResultItemData) => {
     systemNavigateTo({ currentChapter: appearance.chapter, currentParagraph: appearance.paragraphNumber });
@@ -124,7 +124,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
             <p className="text-center text-white/90 text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: latestSummary }} />
           </div>
 
-          {characterAppearances.length > 0 && (
+          {(isLoading || characterAppearances.length > 0) && (
             <motion.div className="mt" variants={variants.appearances}>
               <h5 className="text-sm sm:text-md font-semibold text-white mb-2 sm:mb-4 text-center">{t("appearances")}</h5>
 
