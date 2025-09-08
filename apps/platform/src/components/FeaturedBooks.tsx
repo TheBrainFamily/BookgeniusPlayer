@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Star, Play, Clock, Volume2, Sparkles, Heart } from "lucide-react";
+import { Star, Play, Clock, Volume2, Sparkles } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@platform/components/ui/card";
 import { Button } from "@platform/components/ui/button";
@@ -48,7 +48,7 @@ const FeaturedBooks = () => {
           {featuredBooks.map((book) => (
             <Card
               key={book.id}
-              className="bg-card/50 backdrop-blur-sm border-library-walnut hover:border-library-gold transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-library-gold/10 group cursor-pointer flex flex-col"
+              className="relative bg-card/50 backdrop-blur-sm border-library-walnut hover:border-library-gold transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-library-gold/10 group cursor-pointer flex flex-col"
               onClick={() => handleBookClick(book.slug)}
             >
               {/* Animated border glow */}
@@ -112,14 +112,14 @@ const FeaturedBooks = () => {
                   </div>
 
                   <Button
-                    className="w-full bg-library-walnut group-hover:bg-library-gold group-hover:text-library-mahogany hover:bg-library-gold hover:text-library-mahogany transition-all duration-300 group/btn"
+                    className="w-full bg-library-walnut group-hover:bg-library-gold group-hover:text-library-mahogany transition-all duration-300 group/btn"
                     variant="secondary"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleBookClick(book.slug);
                     }}
                   >
-                    <Play className="mr-2 h-4 w-4 group-hover:scale-110 group-hover/btn:scale-110 transition-transform" />
+                    <Play className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
                     Experience Novel
                   </Button>
                 </div>
