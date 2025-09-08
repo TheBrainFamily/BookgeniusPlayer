@@ -46,7 +46,7 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   };
 
   return (
-    <section className="py-16 px-4 min-h-[90vh]" id="book-collection">
+    <section className="py-16 px-4 min-h-[90vh] flex items-center justify-center" id="book-collection">
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-foreground mb-4">
