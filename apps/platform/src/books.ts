@@ -1,4 +1,6 @@
-export const books = [
+import type { Book } from "@platform/utils/types.ts";
+
+export const books: Book[] = [
   {
     id: 2,
     title: "1984",
@@ -14,6 +16,7 @@ export const books = [
     features: ["English Audio", "Sound Effects", "Animation"],
     language: "en",
     phrases: ["Installing telescreens...", "Configuring thoughtcrime detection...", "Erasing the past...", "Activating thought police..."],
+    type: "novel",
   },
   {
     id: 3,
@@ -38,6 +41,7 @@ export const books = [
       "Calibrating curiosity...",
       "Consulting the Caterpillar...",
     ],
+    type: "novel",
   },
   {
     id: 12,
@@ -54,22 +58,30 @@ export const books = [
     features: ["Ice Magic", "Nordic Music", "Winter Animation"],
     language: "en",
     phrases: ["Building snow palaces...", "Freezing summer dreams...", "Icing friendships...", "Crafting snowflakes...", "Conjuring frostbite..."],
+    type: "novel",
   },
   {
     id: 6,
     title: "Lalka",
     slug: "Lalka",
     author: "Bolesław Prus",
-    genre: "Realism",
+    genre: "Powieść realistyczna",
     year: "1890",
     rating: 4.5,
-    description: "A masterpiece of Polish literature exploring love, ambition, and social change.",
+    description: "Arcydzieło polskiej literatury zgłębiające miłość, ambicję i zmiany społeczne.",
     video: "/lalka.v1.mp4",
     poster: "/lalka.v1.webp",
-    readTime: "15 hrs",
-    features: ["Period Drama", "Classical Music", "Historical Animation"],
+    readTime: "13 godz. 20 min.",
+    features: ["Dramat kostiumowy", "Muzyka klasyczna", "Animacja historyczna"],
     language: "pl",
-    phrases: ["Polishing shop windows...", "Adjusting society gossip...", "Balancing business ledgers...", "Crafting romantic intrigue...", "Negotiating marriage prospects..."],
+    phrases: [
+      "Polerowanie sklepowych witryn...",
+      "Kształtowanie towarzyskich opinii...",
+      "Bilansowanie ksiąg handlowych...",
+      "Snuciu romantycznych intryg...",
+      "Negocjowanie perspektyw małżeńskich...",
+    ],
+    type: "powieść",
   },
   {
     id: 7,
@@ -95,6 +107,7 @@ export const books = [
       "Assembling the groundlings...",
       "Checking for daggers...",
     ],
+    type: "play",
   },
   {
     id: 8,
@@ -111,6 +124,7 @@ export const books = [
     features: ["Fairy Magic", "Comedic Voice", "Forest Animation"],
     language: "en",
     phrases: ["Casting love spells...", "Chasing fairies...", "Taming mischievous spirits...", "Confusing lovers...", "Weaving magical forests..."],
+    type: "play",
   },
   {
     id: 9,
@@ -127,6 +141,7 @@ export const books = [
     features: ["Venetian Setting", "Dramatic Audio", "Renaissance Art"],
     language: "en",
     phrases: ["Planting seeds of jealousy...", "Spinning webs of deceit...", "Perfecting tragic misunderstandings...", "Whispering falsehoods...", "Polishing dramatic irony..."],
+    type: "play",
   },
   {
     id: 10,
@@ -156,6 +171,7 @@ export const books = [
       "Setting up pyramids...",
       "Creating scarabs...",
     ],
+    type: "novel",
   },
   {
     id: 11,
@@ -172,6 +188,7 @@ export const books = [
     features: ["Romantic Music", "Renaissance Art", "Passionate Audio"],
     language: "en",
     phrases: ["Mixing love potions...", "Arranging secret meetings...", "Avoiding family feuds...", "Balcony climbing practice...", "Sending cryptic love letters..."],
+    type: "play",
   },
   {
     id: 1,
@@ -196,6 +213,7 @@ export const books = [
       "Adjusting reality...",
       "Fighting thoughtcrime...",
     ],
+    type: "novel",
   },
   {
     id: 5,
@@ -212,6 +230,7 @@ export const books = [
     features: ["Winter Magic", "Orchestral Music", "Animated Snow"],
     language: "pl",
     phrases: ["Freezing hearts...", "Shattering mirrors...", "Chilling the air...", "Preparing ice castles...", "Summoning snowflakes..."],
+    type: "novel",
   },
   {
     id: 4,
@@ -228,6 +247,7 @@ export const books = [
     features: ["Suspenseful Score", "Period Animation", "Voice Acting"],
     language: "pl",
     phrases: ["Encrypting secret messages...", "Plotting espionage...", "Shadowing informants...", "Meeting in dark alleys...", "Planting evidence..."],
+    type: "novel",
   },
   {
     id: 13,
@@ -244,5 +264,6 @@ export const books = [
     features: ["Suspenseful Score", "Period Animation", "Voice Acting"],
     language: "en",
     phrases: ["Encrypting secret messages...", "Plotting espionage...", "Shadowing informants...", "Meeting in dark alleys...", "Planting evidence..."],
+    type: "novel",
   },
 ];

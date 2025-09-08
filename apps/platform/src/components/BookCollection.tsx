@@ -6,6 +6,7 @@ import { books } from "@platform/books";
 import { useNavigate } from "react-router-dom";
 import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
 import { useMemo } from "react";
+import { humanizeBookCardButtonText } from "@platform/utils/humanizeBookCardButtonText.ts";
 
 interface BookCollectionProps {
   searchQuery?: string;
@@ -144,7 +145,7 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
                       }}
                     >
                       <Play className="mr-2 h-4 w-4 group-hover/btn:scale-110 transition-transform" />
-                      Experience Novel
+                      {humanizeBookCardButtonText(book)}
                     </Button>
                   </div>
                 </CardContent>
