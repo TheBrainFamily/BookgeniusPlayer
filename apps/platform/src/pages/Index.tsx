@@ -3,6 +3,7 @@ import Navigation from "@platform/components/Navigation";
 import HeroSection from "@platform/components/HeroSection";
 import BookCollection from "@platform/components/BookCollection";
 import Footer from "@platform/components/Footer";
+import FeaturedBooks from "@platform/components/FeaturedBooks";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,7 +22,12 @@ const Index = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navigation searchQuery={searchQuery} onSearchChange={setSearchQuery} />
       <main className="flex flex-col flex-1 justify-center">
-        {!searchQuery && <HeroSection />}
+        {!searchQuery && (
+          <>
+            <HeroSection />
+            <FeaturedBooks />
+          </>
+        )}
         <BookCollection searchQuery={searchQuery} />
       </main>
       <Footer />
