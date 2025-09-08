@@ -3,12 +3,13 @@
  */
 
 import { bookDataLoader } from "@player/services/bookDataLoader";
+import { getBookBaseUrl } from "./assetUrls";
 
 const loadedBookColorFiles = new Set<string>();
 
 export const loadBookColorsCSS = async (): Promise<void> => {
   const bookSlug = bookDataLoader.getCurrentBook();
-  const cssPath = `/books/${bookSlug}/book-colors.css`;
+  const cssPath = `${getBookBaseUrl()}/book-colors.css`;
 
   // Avoid loading the same file multiple times
   if (loadedBookColorFiles.has(cssPath)) {
