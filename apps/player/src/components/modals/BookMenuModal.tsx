@@ -222,12 +222,12 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           variant="ghost"
           className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
           onPointerUp={() => {
-            window.history.back();
+            window.location.href = "/";
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              window.history.back();
+              window.location.href = "/";
             }
           }}
         >
