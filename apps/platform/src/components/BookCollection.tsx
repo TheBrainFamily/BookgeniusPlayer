@@ -46,7 +46,7 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   };
 
   return (
-    <section className="py-16 px-4">
+    <section className="py-16 px-4 min-h-[90vh]" id="book-collection">
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-foreground mb-4">
@@ -132,16 +132,15 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
                       </div>
                       <span className="text-muted-foreground">{book.year}</span>
                     </div>
-
                     <Button
-                      className="w-full bg-library-walnut hover:bg-library-gold hover:text-library-mahogany transition-all duration-300 group/btn"
+                      className="w-full bg-library-walnut group-hover:bg-library-gold group-hover:text-library-mahogany hover:bg-library-gold hover:text-library-mahogany transition-all duration-300 group/btn"
                       variant="secondary"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleBookClick(book.slug);
                       }}
                     >
-                      <Play className="mr-2 h-4 w-4 group-hover/btn:scale-110 transition-transform" />
+                      <Play className="mr-2 h-4 w-4 group-hover:scale-110 group-hover/btn:scale-110 transition-transform" />
                       Experience Novel
                     </Button>
                   </div>
