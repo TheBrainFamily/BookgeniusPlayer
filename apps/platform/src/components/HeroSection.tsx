@@ -1,16 +1,10 @@
 import { ArrowRight, BookOpen, Sparkles } from "lucide-react";
+
 import heroImage from "@platform/assets/library-hero-2.webp";
 import { Button } from "./ui/button";
 
 // for the backgroundImage this color works great, but only once the overlay is loaded backgroundColor: "#8d4214"
 const HeroSection = () => {
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
-
   return (
     <section className="relative min-h-[calc(100vh-128px)] md:min-h-[calc(100vh-72px)] flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
@@ -45,22 +39,26 @@ const HeroSection = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
+              asChild
               size="lg"
               className="bg-library-gold hover:bg-library-gold-glow text-library-mahogany font-semibold px-8 py-3 text-lg group transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-library-gold/25"
-              onClick={() => scrollToSection("featured-books")}
             >
-              Start Reading
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              <a href="#featured-books">
+                Start Reading
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </a>
             </Button>
 
             <Button
+              asChild
               variant="outline"
               size="lg"
               className="border-library-gold text-library-gold hover:bg-library-gold/10 hover:border-library-gold-glow px-8 py-3 text-lg group transition-all duration-300"
-              onClick={() => scrollToSection("book-collection")}
             >
-              <BookOpen className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
-              View Collection
+              <a href="#book-collection">
+                <BookOpen className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
+                View Collection
+              </a>
             </Button>
           </div>
 

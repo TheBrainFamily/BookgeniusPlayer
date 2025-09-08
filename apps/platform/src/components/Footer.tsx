@@ -25,7 +25,10 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-library-gold">Quick Links</h4>
             <div className="space-y-2 flex flex-col">
-              {["View Collection", "My Progress", "Reading History", "Settings"].map((link) => (
+              <Button asChild variant="ghost" className="p-0 h-auto text-muted-foreground hover:text-library-gold text-left hover:bg-transparent justify-start w-fit">
+                <a href="#book-collection">View Collection</a>
+              </Button>
+              {["My Progress", "Reading History", "Settings"].map((link) => (
                 <Button key={link} variant="ghost" className="p-0 h-auto text-muted-foreground hover:text-library-gold text-left hover:bg-transparent justify-start w-fit">
                   {link}
                 </Button>
