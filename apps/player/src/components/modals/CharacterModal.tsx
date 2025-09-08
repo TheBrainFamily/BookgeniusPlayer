@@ -139,7 +139,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                 </motion.div>
               ) : (
                 <motion.div className="p-1 space-y-3" variants={variants.container}>
-                  <div className="max-h-45 overflow-y-auto space-y-3 pb-2">
+                  <div className="max-h-[calc(55vh-200px)] sm:max-h-[calc(80vh-250px)] overflow-y-auto space-y-3 pb-2">
                     {characterAppearances.map((appearance, index) => (
                       <motion.div
                         key={appearance.id}
