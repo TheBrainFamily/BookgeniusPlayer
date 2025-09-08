@@ -130,7 +130,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   const signInUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_IN_URL;
   const signUpUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_UP_URL;
-  if (isSatellite && signInUrlEnv && signUpUrlEnv) {
+  if (isSatellite && signInUrlEnv && signUpUrlEnv && clerkDomain) {
     const clerkDomainUrl = `https://${clerkDomain}`;
     const signInUrlObj = new URL(signInUrlEnv);
     signInUrlObj.searchParams.append('redirect_url', clerkDomainUrl);
