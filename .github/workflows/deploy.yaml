@@ -89,6 +89,9 @@ jobs:
           git config --local filter.lfs.smudge "git-lfs smudge --skip -- %f"
           git config --local filter.lfs.process "git-lfs filter-process --skip"
 
+      - name: Initial git lfs pull for platform files
+        run: git lfs pull -I "apps/platform/**"
+
       - name: Selective git lfs pull
         if: ${{ steps.changed.outputs.rebuild_all == '1' || steps.changed.outputs.books_csv != '' }}
         run: |
@@ -99,7 +102,6 @@ jobs:
             include=$(printf 'apps/player/public_books/%s/**,' "${arr[@]}")
             git lfs pull -I "${include%,}"
           fi
-          git lfs pull -I "apps/platform/**"
 
       - name: Export change set
         run: |
