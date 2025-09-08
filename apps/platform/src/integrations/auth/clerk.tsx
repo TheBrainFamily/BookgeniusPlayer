@@ -118,17 +118,19 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   };
 
   const isSatellite = import.meta.env.VITE_CLERK_IS_SATELLITE === "true";
-  const clerkDomain = import.meta.env.VITE_CLERK_DOMAIN;
+  const clerkDomain = import.meta.env.VITE_CLERK_DOMAIN || undefined;
 
   let signInUrl = undefined;
   let signUpUrl = undefined;
 
-  if (isSatellite) {
-    const signInUrlObj = new URL(import.meta.env.VITE_PUBLIC_CLERK_SIGN_IN_URL);
+  const signInUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_IN_URL;
+  const signUpUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_UP_URL;
+  if (isSatellite && signInUrlEnv && signUpUrlEnv) {
+    const signInUrlObj = new URL(signInUrlEnv);
     signInUrlObj.searchParams.append('redirect_url', `https://${clerkDomain}`);
     signInUrl = signInUrlObj.toString();
 
-    const signUpUrlObj = new URL(import.meta.env.VITE_PUBLIC_CLERK_SIGN_UP_URL);
+    const signUpUrlObj = new URL(signUpUrlEnv);
     signUpUrlObj.searchParams.append('redirect_url', `https://${clerkDomain}`);
     signUpUrl = signUpUrlObj.toString();
   }
@@ -146,7 +148,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         signInUrl={signInUrl}
         signUpUrl={signUpUrl}
         isSatellite={isSatellite}
-        allowedRedirectOrigins={!isSatellite ? [`https://${clerkDomain}`] : undefined}
+        allowedRedirectOrigins={!isSatellite && clerkDomain ? [`https://${clerkDomain}`] : undefined}
       >
         <Inner>{children}</Inner>
       </ClerkProvider>
