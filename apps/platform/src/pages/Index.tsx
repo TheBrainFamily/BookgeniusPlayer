@@ -18,17 +18,19 @@ const Index = () => {
     }
   }, []);
 
+  const trimmedSearchQuery = searchQuery.trim();
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navigation searchQuery={searchQuery} onSearchChange={setSearchQuery} />
       <main className="flex flex-col flex-1 justify-center">
-        {!searchQuery && (
+        {!trimmedSearchQuery && (
           <>
             <HeroSection />
             <FeaturedBooks />
           </>
         )}
-        <BookCollection searchQuery={searchQuery} />
+        <BookCollection searchQuery={trimmedSearchQuery} />
       </main>
       <Footer />
     </div>
