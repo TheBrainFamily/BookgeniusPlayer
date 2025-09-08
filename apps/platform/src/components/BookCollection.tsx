@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
 import { useMemo } from "react";
 import { humanizeBookCardButtonText } from "@platform/utils/humanizeBookCardButtonText.ts";
+import { isRunningOnLocalhost } from "@platform/utils/isRunningOnLocalhost.ts";
 
 interface BookCollectionProps {
   searchQuery?: string;
@@ -17,8 +18,7 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   const { startTransition, setNavigatedFromPlatform } = useRouteTransition();
 
   const filteredBooks = useMemo(() => {
-    const availableBooks =
-      typeof window !== "undefined" && (window.location.hostname.endsWith(".pl") || window.location.hostname === "localhost") ? books : books.filter((b) => b.language !== "pl");
+    const availableBooks = typeof window !== "undefined" && (window.location.hostname.endsWith(".pl") || isRunningOnLocalhost()) ? books : books.filter((b) => b.language !== "pl");
     if (!searchQuery.trim()) return availableBooks;
 
     const query = searchQuery.toLowerCase();
