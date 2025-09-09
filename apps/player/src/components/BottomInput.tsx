@@ -234,9 +234,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
 
       // Defer focus until after the next repaint to ensure visibility is updated
       requestAnimationFrame(() => {
-        if (inputRef.current && document.activeElement !== inputRef.current) {
-          inputRef.current.focus();
-        }
+        requestAnimationFrame(() => {
+          if (inputRef.current && document.activeElement !== inputRef.current) {
+            inputRef.current.focus();
+          }
+        });
       });
     },
     [updateLastActivity],
