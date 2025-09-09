@@ -132,10 +132,12 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     const clerkDomainUrl = `https://${clerkDomain}`;
     const signInUrlObj = new URL(signInUrlEnv);
     signInUrlObj.searchParams.append("redirect_url", clerkDomainUrl);
+    signInUrlObj.searchParams.append("link_domain", clerkDomainUrl);
     signInUrl = signInUrlObj.toString();
 
     const signUpUrlObj = new URL(signUpUrlEnv);
     signUpUrlObj.searchParams.append("redirect_url", clerkDomainUrl);
+    signUpUrlObj.searchParams.append("link_domain", clerkDomainUrl);
     signUpUrl = signUpUrlObj.toString();
 
     allowedRedirectOrigins.push(clerkDomainUrl);
