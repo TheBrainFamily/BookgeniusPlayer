@@ -8,7 +8,7 @@ import { Badge } from "@platform/components/ui/badge";
 import { books } from "@platform/books";
 import { humanizeBookCardButtonText } from "@platform/utils/humanizeBookCardButtonText";
 
-const featuredBookSlugs = ["1984-English", "Romeo-And-Juliet"];
+const featuredBookSlugs = ["1984-English", "Othello"];
 const featuredBooks = books.filter((book) => featuredBookSlugs.includes(book.slug));
 
 const FeaturedBooks = () => {
@@ -44,7 +44,7 @@ const FeaturedBooks = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:gap-8 max-w-4xl mx-auto">
           {featuredBooks.map((book) => (
             <Card
               key={book.id}
@@ -66,7 +66,7 @@ const FeaturedBooks = () => {
                 </div>
               </div>
 
-              <CardHeader className="pb-4">
+              <CardHeader className="pb-2 sm:pb-4 p-4 sm:p-6">
                 {/* Book Cover */}
                 <div className="w-full h-54 rounded-lg mb-4 relative overflow-hidden group-hover:animate-bookglow">
                   <video className="w-full h-full object-cover" autoPlay loop muted playsInline poster={book.poster}>
@@ -87,7 +87,7 @@ const FeaturedBooks = () => {
                 <p className="text-library-gold font-medium">{book.author}</p>
               </CardHeader>
 
-              <CardContent className="flex flex-col flex-1">
+              <CardContent className="flex flex-col flex-1 p-4 sm:p-6">
                 <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 mb-4">{book.description}</p>
 
                 <div className="mt-auto space-y-4">
@@ -99,7 +99,7 @@ const FeaturedBooks = () => {
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between text-sm">
+                  <div className="flex flex-wrap items-center justify-between text-sm gap-2">
                     <div className="flex items-center space-x-1">
                       <Star className="h-4 w-4 text-library-gold fill-current" />
                       <span className="text-foreground font-medium">{book.rating}</span>
@@ -119,7 +119,7 @@ const FeaturedBooks = () => {
                       handleBookClick(book);
                     }}
                   >
-                    <Play className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
+                    <Play className="hidden sm:block mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
                     {humanizeBookCardButtonText(book)}
                   </Button>
                 </div>
