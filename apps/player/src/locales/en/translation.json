@@ -56,6 +56,7 @@
     "Awakening dormant heroes..."
   ],
   "books": {
+    "Wukong": { "loading_phrases": ["Training the monkeys...", "Traveling through the sky...", "Encountering demons...", "Discovering treasures...", "Learning new skills..."] },
     "Alice-Wonderland": {
       "loading_phrases": [
         "Stretching reality...",
