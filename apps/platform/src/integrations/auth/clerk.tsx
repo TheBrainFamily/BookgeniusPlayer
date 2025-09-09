@@ -120,7 +120,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const isSatellite = import.meta.env.VITE_CLERK_IS_SATELLITE === "true";
   const clerkDomain = import.meta.env.VITE_CLERK_DOMAIN || undefined;
 
-  const allowedRedirectOrigins = ["https://bookgenius.net", "https://accounts.bookgenius.net"];
+  const mainClerkDomain = "bookgenius.net";
+  const allowedRedirectOrigins = [`https://${mainClerkDomain}`, `https://accounts.${mainClerkDomain}`];
 
   let signInUrl = undefined;
   let signUpUrl = undefined;
@@ -149,7 +150,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     <WidgetCtx.Provider value={hooks.UserButton}>
       <ClerkProvider
         publishableKey={publishableKey}
-        domain={clerkDomain}
+        domain={mainClerkDomain}
         signInUrl={signInUrl}
         signUpUrl={signUpUrl}
         isSatellite={isSatellite}
