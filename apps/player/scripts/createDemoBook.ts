@@ -103,6 +103,11 @@ export async function createDemoBook(fullBookPath: string, demoBookPath: string,
 
   // Always include loader
   assetsToInclude.add("loader.mp4");
+  // Include book-colors.css if it exists
+  const bookColorsPath = path.join(fullBookPath, "book-colors.css");
+  if (fs.existsSync(bookColorsPath)) {
+    assetsToInclude.add("book-colors.css");
+  }
 
   // Process each data file
   const dataFiles = [
