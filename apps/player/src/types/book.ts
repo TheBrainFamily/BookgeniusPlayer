@@ -27,15 +27,7 @@ export interface Chapter {
   title: string;
 }
 
-export interface BookThemeColors {
-  primaryColor: string;
-  secondaryColor: string;
-  tertiaryColor: string;
-  quaternaryColor: string;
-  simplifiedIconColor?: string;
-}
-
-export type BookData = { slug: string; metadata: BookMetadata; chapters?: Chapter[]; themeColors: BookThemeColors; hasAudiobook: boolean; audioPrompt?: string };
+export type BookData = { slug: string; metadata: BookMetadata; chapters?: Chapter[]; hasAudiobook: boolean; audioPrompt?: string };
 
 export type BackgroundSongSection = { chapter: number; paragraph: number; files: string[] };
 
