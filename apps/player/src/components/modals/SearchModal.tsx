@@ -63,7 +63,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
   );
 
   return (
-    <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
+    <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay} closeOnOverlayClick={true}>
       <motion.div className="flex flex-col h-full relative overflow-hidden" variants={variants.container} initial="hidden" animate="visible" exit="exit">
         {searchResults?.isLoading && (
           <motion.div className="flex flex-col items-center justify-center py-12 px-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
