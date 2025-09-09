@@ -80,10 +80,12 @@ const ModalUI: React.FC<ModalUIProps> = ({
   transparent = false,
   size = "lg",
   showCloseButton = true,
+  closeOnOverlayClick = true,
   animateHeight = false,
 }) => {
   const { isContentShiftedLeft } = useContentShift();
   const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const [justOpened, setJustOpened] = useState(true);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -95,13 +97,22 @@ const ModalUI: React.FC<ModalUIProps> = ({
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
+  // Reset justOpened flag after a short delay to prevent immediate closing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setJustOpened(false);
+    }, 100); // Small delay to allow modal to fully open
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleOpenChange = useCallback(
     (open: boolean) => {
-      if (!open && !layoutView) {
+      if (!open && !justOpened && closeOnOverlayClick !== false && (!layoutView || closeOnOverlayClick === true)) {
         onClose();
       }
     },
-    [onClose, layoutView],
+    [onClose, layoutView, closeOnOverlayClick, justOpened],
   );
 
   const isTransparent = isTransparentModal(transparent, className);
