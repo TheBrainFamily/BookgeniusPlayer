@@ -217,109 +217,115 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
   return (
     <ModalUI title={t("book_settings")} onClose={onClose} hideOverlay={hideOverlay}>
-      <div className="space-y-2 mb-6 book-settings-actions">
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
-          onPointerUp={() => {
-            window.location.href = "/";
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
+      <div className="container max-h-[60vh] overflow-y-auto px-1">
+        <div className="space-y-2 mb-6 book-settings-actions">
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
+            onPointerUp={() => {
               window.location.href = "/";
-            }
-          }}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          {t("back_to_platform")}
-        </Button>
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
-          onPointerUp={() => {
-            openBookChapterModal();
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                window.location.href = "/";
+              }
+            }}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t("back_to_platform")}
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
+            onPointerUp={(e) => {
               e.preventDefault();
+              e.stopPropagation();
+
               openBookChapterModal();
-            }
-          }}
-        >
-          <List className="mr-2 h-4 w-4" />
-          {t("open_chapter")}
-        </Button>
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
-          onPointerUp={() => {
-            resetFurthestPageLocation();
-            onClose();
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                e.stopPropagation();
+
+                openBookChapterModal();
+              }
+            }}
+          >
+            <List className="mr-2 h-4 w-4" />
+            {t("open_chapter")}
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
+            onPointerUp={() => {
               resetFurthestPageLocation();
               onClose();
-            }
-          }}
-        >
-          <RotateCcw className="mr-2 h-4 w-4" />
-          {t("reset_reading_position")}
-        </Button>
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
-          onPointerUp={() => {
-            openApiKeyModal();
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                resetFurthestPageLocation();
+                onClose();
+              }
+            }}
+          >
+            <RotateCcw className="mr-2 h-4 w-4" />
+            {t("reset_reading_position")}
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
+            onPointerUp={() => {
               openApiKeyModal();
-            }
-          }}
-        >
-          <BrainCircuit className="mr-2 h-4 w-4" />
-          {t("set_openai_api_key")}
-        </Button>
-      </div>
-      <div className="flex flex-col gap-2 book-settings-container">
-        <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full book-settings-control-box")}>
-          <div className="space-y-4 book-settings-control-box-inner">
-            <div className="flex items-center gap-2">
-              <Type className="h-4 w-4 text-white" />
-              <Label htmlFor="font-size" className="text-sm font-medium text-white">
-                {t("text_size")}: <AnimatedFontSize value={currentFontSize} isChanging={isFontSizeChanging} />
-              </Label>
-            </div>
-            <Slider
-              id="font-size"
-              variant="secondary"
-              min={0.5}
-              max={1.5}
-              step={0.1}
-              value={[currentFontSize]}
-              onValueChange={handleFontSizePreviewChange}
-              onValueCommit={handleFontSizeChange}
-              aria-label="Rozmiar tekstu"
-              className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
-            />
-            <div className="flex justify-between text-xs text-gray-300">
-              <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(0.5)}>
-                {t("small")}
-              </span>
-              <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(1.0)}>
-                {t("default")}
-              </span>
-              <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(1.5)}>
-                {t("large")}
-              </span>
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                openApiKeyModal();
+              }
+            }}
+          >
+            <BrainCircuit className="mr-2 h-4 w-4" />
+            {t("set_openai_api_key")}
+          </Button>
+        </div>
+        <div className="flex flex-col gap-2 book-settings-container">
+          <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full book-settings-control-box")}>
+            <div className="space-y-4 book-settings-control-box-inner">
+              <div className="flex items-center gap-2">
+                <Type className="h-4 w-4 text-white" />
+                <Label htmlFor="font-size" className="text-sm font-medium text-white">
+                  {t("text_size")}: <AnimatedFontSize value={currentFontSize} isChanging={isFontSizeChanging} />
+                </Label>
+              </div>
+              <Slider
+                id="font-size"
+                variant="secondary"
+                min={0.5}
+                max={1.5}
+                step={0.1}
+                value={[currentFontSize]}
+                onValueChange={handleFontSizePreviewChange}
+                onValueCommit={handleFontSizeChange}
+                aria-label="Rozmiar tekstu"
+                className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
+              />
+              <div className="flex justify-between text-xs text-gray-300">
+                <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(0.5)}>
+                  {t("small")}
+                </span>
+                <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(1.0)}>
+                  {t("default")}
+                </span>
+                <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(1.5)}>
+                  {t("large")}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-        {/* 
+          {/* 
         Hide for now for all books
         {isVisible.current && false && ( 
           <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full book-settings-control-box")}>
@@ -355,11 +361,12 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             </div>
           </div>
         )} */}
-      </div>
-      <div className="text-xs text-gray-500 mt-4 text-right book-settings-version">
-        <span>
-          {t("version")}: {import.meta.env.VITE_BUILD_TIME || "0.0.1"}
-        </span>
+        </div>
+        <div className="text-xs text-gray-500 mt-4 text-right book-settings-version">
+          <span>
+            {t("version")}: {import.meta.env.VITE_BUILD_TIME || "0.0.1"}
+          </span>
+        </div>
       </div>
     </ModalUI>
   );

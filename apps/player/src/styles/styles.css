@@ -1490,7 +1490,7 @@ section[data-chapter] [data-index] {
     flex-direction: row;
     align-items: flex-start;
     gap: 1rem;
-    width: 90vw;
+    width: 80vw;
     max-width: 600px;
   }
 

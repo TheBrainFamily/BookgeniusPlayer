@@ -39,8 +39,21 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
             <Button
               variant="ghost"
               key={chapter.id}
-              onClick={() => navigateToChapter(chapter.id)}
-              className={`w-full min-w-0 h-auto !justify-between !items-start text-left px-3 py-2 hover:bg-white/10 hover:text-white border-white/20 ${
+              onPointerUp={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                navigateToChapter(chapter.id);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  navigateToChapter(chapter.id);
+                }
+              }}
+              className={`w-full min-w-0 h-auto !justify-between !items-start text-left px-3 py-2 hover:bg-white/10 cursor-pointer hover:text-white border-white/20 ${
                 isCurrentChapter ? "bg-white/20 text-white border-white/40 font-bold" : "text-white"
               }`}
             >

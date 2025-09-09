@@ -52,6 +52,7 @@ const AudioPlayer = () => {
   useEffect(() => {
     if (!areElementsVisible) {
       setIsBigPlayerOpen(false);
+      setIsVolumeOpen(false);
     }
   }, [areElementsVisible]);
 
