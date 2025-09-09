@@ -8,7 +8,7 @@ const getPolishType = (type: string) => {
   switch (type.toLowerCase()) {
     case "powieść":
       return "Powieści";
-    case "ztuka":
+    case "sztuka":
       return "Sztuce";
     default:
       return "Powieści";
