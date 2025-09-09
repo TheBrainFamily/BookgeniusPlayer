@@ -152,7 +152,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     <WidgetCtx.Provider value={hooks.UserButton}>
       <ClerkProvider
         publishableKey={publishableKey}
-        domain={mainClerkDomain}
+        domain={clerkDomain}
         signInUrl={signInUrl}
         signUpUrl={signUpUrl}
         isSatellite={isSatellite}
