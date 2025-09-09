@@ -3,7 +3,7 @@
     "bookGenius": "BookGeniusz",
     "title": "Odkryj literaturę",
     "subtitle": "na nowo",
-    "description": "Wejdź do świata powieści wizualnych z niezwykłymi animacjami, głosami postaci i klimatyczną ścieżką dźwiękową. Tu każda historia staje się wyjątkowym doświadczeniem, które ożywia klasyczne dzieła literatury.",
+    "description": "Wejdź do świata powieści wizualnych z niezwykłymi animacjami i klimatyczną ścieżką dźwiękową. Tu każda historia staje się wyjątkowym doświadczeniem, które ożywia klasyczne dzieła literatury.",
     "startReading": "Zacznij Czytać",
     "viewCollection": "Przejrzyj zbiór"
   },
@@ -11,12 +11,12 @@
   "stats": { "visualNovels": "Nowele Wizualne", "immersive": "Angażujący", "productions": "Produkcja" },
   "featured": {
     "featuredMasterpieces": "Wyróżnione arcydzieła",
-    "description": "Doświadcz dwóch legendarnych powieści w zupełnie nowej odsłonie. Każda z nich zawiera nastrojowe efekty wizualne, profesjonalne nagrania głosowe i wciągające efekty dźwiękowe, które sprawiają, że czytanie staje się prawdziwą podróżą sensoryczną."
+    "description": "Doświadcz dwóch legendarnych powieści w zupełnie nowej odsłonie. Każda z nich zawiera nastrojowe efekty wizualne, i wciągające efekty dźwiękowe, które sprawiają, że czytanie staje się prawdziwą podróżą sensoryczną."
   },
   "collection": {
     "ourCollection": "Nasza Kolekcja",
     "searchResults": "Wyniki Wyszukiwania",
-    "description": "Każda powieść wizualna to kompletna produkcja z profesjonalnym dubbingiem, animowanymi scenami i imersyjnymi ścieżkami dźwiękowymi, które ożywiają literaturę.",
+    "description": "Każda powieść wizualna to kompletna produkcja z animowanymi scenami i imersyjnymi ścieżkami dźwiękowymi, które ożywiają literaturę.",
     "searchResultsFor": "Wyniki wyszukiwania dla",
     "noResults": "Nie znaleziono książek pasujących do",
     "noResultsHint": "Spróbuj wyszukać inny tytuł, autora lub gatunek"
