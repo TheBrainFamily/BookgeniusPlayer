@@ -10,7 +10,6 @@ const loadedBookColorFiles = new Set<string>();
 export const loadBookColorsCSS = async (): Promise<void> => {
   const bookSlug = bookDataLoader.getCurrentBook();
   const cssPath = getBookAssetUrl("book-colors.css");
-  console.log("PINGWING", cssPath);
 
   // Avoid loading the same file multiple times
   if (loadedBookColorFiles.has(cssPath)) {
