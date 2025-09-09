@@ -69,7 +69,7 @@ export const books: Book[] = [
     year: "1890",
     rating: 4.5,
     description: "Arcydzieło polskiej literatury zgłębiające miłość, ambicję i zmiany społeczne.",
-    video: "/lalka.v1.mp4",
+    video: "/lalka.v2.mp4",
     poster: "/lalka.v1.webp",
     readTime: "13 godz. 20 min.",
     features: ["Dramat kostiumowy", "Muzyka klasyczna", "Animacja historyczna"],
