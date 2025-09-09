@@ -121,10 +121,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const clerkDomain = import.meta.env.VITE_CLERK_DOMAIN || undefined;
 
   const mainClerkDomain = "bookgenius.net";
-  const allowedRedirectOrigins = [
-    `https://${mainClerkDomain}`,
-    `https://accounts.${mainClerkDomain}`,
-  ];
+  const allowedRedirectOrigins = [`https://${mainClerkDomain}`, `https://accounts.${mainClerkDomain}`];
 
   let signInUrl = undefined;
   let signUpUrl = undefined;
@@ -134,11 +131,11 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   if (isSatellite && signInUrlEnv && signUpUrlEnv && clerkDomain) {
     const clerkDomainUrl = `https://${clerkDomain}`;
     const signInUrlObj = new URL(signInUrlEnv);
-    signInUrlObj.searchParams.append('redirect_url', clerkDomainUrl);
+    signInUrlObj.searchParams.append("redirect_url", clerkDomainUrl);
     signInUrl = signInUrlObj.toString();
 
     const signUpUrlObj = new URL(signUpUrlEnv);
-    signUpUrlObj.searchParams.append('redirect_url', clerkDomainUrl);
+    signUpUrlObj.searchParams.append("redirect_url", clerkDomainUrl);
     signUpUrl = signUpUrlObj.toString();
 
     allowedRedirectOrigins.push(clerkDomainUrl);
