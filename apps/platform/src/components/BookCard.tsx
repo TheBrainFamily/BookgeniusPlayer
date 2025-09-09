@@ -5,19 +5,18 @@ import { Button } from "@platform/components/ui/button";
 import { Badge } from "@platform/components/ui/badge";
 import { books } from "@platform/books";
 import { humanizeBookCardButtonText } from "@platform/utils/humanizeBookCardButtonText";
+import { detectLanguageFromDomain } from "@platform/utils/languageDetection.ts";
+import { LanguageFlagEN } from "@platform/components/LanguageFlagEN.tsx";
+import { LanguageFlagPL } from "@platform/components/LanguageFlagPL.tsx";
+import { useMemo } from "react";
 
 type Book = (typeof books)[number];
 
 type BookCardProps = { book: Book; onClick: (book: Book) => void; variant?: "default" | "featured"; showLanguageFlag?: boolean; className?: string };
 
-const LanguageFlagPL = () => (
-  <svg width="20" height="14" viewBox="0 0 24 16" className="shadow-md" aria-label="Polish language">
-    <rect width="24" height="8" fill="#ffffff" />
-    <rect y="8" width="24" height="8" fill="#dc143c" />
-  </svg>
-);
-
 export default function BookCard({ book, onClick, variant = "default", showLanguageFlag = false, className = "" }: BookCardProps) {
+  const language = useMemo(() => detectLanguageFromDomain(), []);
+
   const isFeatured = variant === "featured";
 
   const cardBase =
@@ -66,16 +65,19 @@ export default function BookCard({ book, onClick, variant = "default", showLangu
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
 
-          <Badge className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-library-gold/90 text-library-mahogany text-xs sm:text-sm py-0.5 sm:py-1">{book.genre}</Badge>
+          <Badge className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-library-gold/90 text-library-mahogany text-xs sm:text-sm py-0.5 sm:py-1">
+            {book.metadata[language].genre}
+          </Badge>
 
           <div className="absolute bottom-1 left-1 sm:bottom-2 sm:left-2 flex items-center space-x-1">
             <Volume2 className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-white/80" />
             <span className="text-xs text-white/80">Audio</span>
           </div>
 
-          {showLanguageFlag && book.language === "pl" && (
+          {showLanguageFlag && language === "pl" && (
             <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2">
-              <LanguageFlagPL />
+              {book.language === "en" && <LanguageFlagEN />}
+              {book.language === "pl" && <LanguageFlagPL />}
             </div>
           )}
         </div>
@@ -85,11 +87,11 @@ export default function BookCard({ book, onClick, variant = "default", showLangu
       </CardHeader>
 
       <CardContent className="flex flex-col flex-1 p-2 sm:p-3 md:p-6 !pt-2">
-        <p className={`text-muted-foreground text-sm leading-relaxed ${descriptionClamp} mb-4`}>{book.description}</p>
+        <p className={`text-muted-foreground text-sm leading-relaxed ${descriptionClamp} mb-4`}>{book.metadata[language].description}</p>
 
         <div className="mt-auto space-y-6 md:space-y-4">
           <div className="flex flex-wrap gap-1">
-            {book.features.slice(0, 2).map((feature, index) => (
+            {book.metadata[language].features.slice(0, 2).map((feature, index) => (
               <Badge key={index} variant="outline" className="text-xs sm:text-sm md:text-xs border-library-walnut text-muted-foreground py-0.5 sm:py-1">
                 {feature}
               </Badge>

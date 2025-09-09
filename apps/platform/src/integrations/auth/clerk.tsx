@@ -3,6 +3,9 @@ import type { ClerkProviderProps } from "@clerk/react-router";
 import type { LoadedClerk, UseUserReturn } from "@clerk/types";
 import type { AuthCtx, AuthModule } from "./types";
 import { Button } from "@platform/components/ui/button";
+import { useTranslation } from "react-i18next";
+import { detectLanguageFromDomain } from "@platform/utils/languageDetection.ts";
+import { enUS, plPL } from "@clerk/localizations";
 
 const Ctx = createContext<AuthCtx>({ ready: false, isSignedIn: false, openSignIn: () => {} });
 
@@ -151,6 +154,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   return (
     <WidgetCtx.Provider value={hooks.UserButton}>
       <ClerkProvider
+        localization={detectLanguageFromDomain() === "pl" ? plPL : enUS}
         publishableKey={publishableKey}
         domain={clerkDomain}
         signInUrl={signInUrl}
@@ -186,11 +190,15 @@ const AuthProviderSafe: React.FC<{ children: React.ReactNode }> = ({ children })
 const useAuth = () => useContext(Ctx);
 
 const useUserWidget = () => useContext(WidgetCtx);
-const SignInWidget: React.FC<{ onClick: () => void }> = ({ onClick }) => (
-  <Button variant="secondary" onClick={onClick}>
-    Sign In
-  </Button>
-);
+const SignInWidget: React.FC<{ onClick: () => void }> = ({ onClick }) => {
+  const { t } = useTranslation();
+
+  return (
+    <Button variant="secondary" onClick={onClick}>
+      {t("navigation.signIn")}
+    </Button>
+  );
+};
 const mod: AuthModule = { AuthProvider: AuthProviderSafe, useAuth, useUserWidget, useSignInWidget: () => SignInWidget };
 
 export default mod;

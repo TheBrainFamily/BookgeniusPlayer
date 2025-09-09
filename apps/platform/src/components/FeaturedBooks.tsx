@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
 import { books } from "@platform/books";
 import BookCard from "./BookCard";
+import { useTranslation } from "react-i18next";
 
 const featuredBookSlugs = ["1984-English", "Othello"];
 const featuredBooks = books.filter((book) => featuredBookSlugs.includes(book.slug));
@@ -10,6 +11,7 @@ const featuredBooks = books.filter((book) => featuredBookSlugs.includes(book.slu
 const FeaturedBooks = () => {
   const navigate = useNavigate();
   const { startTransition, setNavigatedFromPlatform } = useRouteTransition();
+  const { t } = useTranslation();
 
   const handleBookClick = (book: (typeof books)[0]) => {
     const title = book?.title ?? "BookGenius";
@@ -32,12 +34,9 @@ const FeaturedBooks = () => {
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-foreground mb-4">
-            Featured <span className="text-library-gold">Masterpieces</span>
+            {t("featured.featuredMasterpieces").split(" ")[0]} <span className="text-library-gold">{t("featured.featuredMasterpieces").split(" ")[1]}</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Experience two legendary works of literature like never before. Each story features cinematic visuals, professional voice acting, and immersive soundscapes that
-            transform reading into a complete sensory journey.
-          </p>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t("featured.description")}</p>
         </div>
 
         <div className="flex flex-row gap-2 sm:gap-4 md:gap-6 lg:gap-8 max-w-4xl mx-auto items-stretch">

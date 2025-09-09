@@ -3,15 +3,12 @@ export interface Book {
   title: string;
   slug: string;
   author: string;
-  genre: string;
+  metadata: Partial<{ [key in "pl" | "en"]: { genre: string; description: string; features: string[]; phrases: string[] } }>;
   year: string;
   rating: number;
-  description: string;
   video: string;
   poster: string;
   readTime: string;
-  features: string[];
   language: string;
-  phrases: string[];
   type: string;
 }

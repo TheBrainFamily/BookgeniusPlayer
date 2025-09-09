@@ -1,10 +1,12 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
-import { isRunningOnLocalhost } from "@platform/utils/isRunningOnLocalhost";
+import { getBooksByCurrentLanguage } from "@platform/utils/bookLanguageFilter";
 import { books } from "@platform/books";
 import BookCard from "./BookCard";
+import { detectLanguageFromDomain } from "@platform/utils/languageDetection.ts";
 
 interface BookCollectionProps {
   searchQuery?: string;
@@ -13,9 +15,11 @@ interface BookCollectionProps {
 const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   const navigate = useNavigate();
   const { startTransition, setNavigatedFromPlatform } = useRouteTransition();
+  const { t } = useTranslation();
+  const language = useMemo(() => detectLanguageFromDomain(), []);
 
   const filteredBooks = useMemo(() => {
-    const availableBooks = typeof window !== "undefined" && (window.location.hostname.endsWith(".pl") || isRunningOnLocalhost()) ? books : books.filter((b) => b.language !== "pl");
+    const availableBooks = getBooksByCurrentLanguage(books);
     if (!searchQuery.trim()) return availableBooks;
 
     const query = searchQuery.toLowerCase();
@@ -23,14 +27,14 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
       (book) =>
         book.title.toLowerCase().includes(query) ||
         book.author.toLowerCase().includes(query) ||
-        book.genre.toLowerCase().includes(query) ||
-        book.description.toLowerCase().includes(query),
+        book.metadata[language].genre.toLowerCase().includes(query) ||
+        book.metadata[language].description.toLowerCase().includes(query),
     );
   }, [searchQuery]);
 
   const handleBookClick = (book: (typeof books)[0]) => {
     const title = book?.title ?? "BookGenius";
-    const phrases = book?.phrases;
+    const phrases = book?.metadata[language].phrases;
     const author = book?.author;
 
     // Indicate user came from platform for proper loader behavior
@@ -51,25 +55,23 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
           <h2 className="text-4xl font-bold text-foreground mb-4">
             {searchQuery ? (
               <>
-                Search <span className="text-library-gold">Results</span>
+                {t("collection.searchResults").split(" ")[0]} <span className="text-library-gold">{t("collection.searchResults").split(" ")[1]}</span>
               </>
             ) : (
               <>
-                Our <span className="text-library-gold">Collection</span>
+                {t("collection.ourCollection").split(" ")[0]} <span className="text-library-gold">{t("collection.ourCollection").split(" ")[1]}</span>
               </>
             )}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            {searchQuery
-              ? `Showing results for "${searchQuery}"`
-              : "Each visual novel is a complete production featuring professional voice acting, animated scenes, and immersive soundtracks that bring literature to life."}
-          </p>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{searchQuery ? `${t("collection.searchResultsFor")} "${searchQuery}"` : t("collection.description")}</p>
         </div>
 
         {filteredBooks.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-xl text-muted-foreground">No books found matching "{searchQuery}"</p>
-            <p className="text-sm text-muted-foreground mt-2">Try searching for a different title, author, or genre</p>
+            <p className="text-xl text-muted-foreground">
+              {t("collection.noResults")} "{searchQuery}"
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">{t("collection.noResultsHint")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 px-4 md:px-0">
