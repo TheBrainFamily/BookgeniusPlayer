@@ -9,7 +9,7 @@
       content="Experience literature like never before with our collection of immersive visual novels featuring dynamic avatars, animations, and soundtracks"
     />
     <meta name="author" content="Virtual Library" />
-    <link rel="icon" type="image/x-icon" href="/bookgenius-fav.ico">
+    <link rel="icon" type="image/x-icon" href="/bookgenius-fav.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" onload="this.rel='stylesheet'" />
@@ -20,27 +20,48 @@
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Libre+Caslon+Text&display=swap" rel="stylesheet" />
 
     <style>
+      html,
       body {
-        background-color: #2d2d2d;
-        min-height: 100vh;
+        height: 100dvh;
+        margin: 0;
+        background: #2d2d2d;
+        scroll-behavior: smooth;
+      }
+
+      #platform-scope {
+        height: 100dvh;
+      }
+
+      #platform-scope section[id] {
+        scroll-margin-top: 5rem;
       }
 
       #player-scope {
+        position: absolute;
+        inset: 0;
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
         transition:
           opacity 0.3s ease-in-out,
           visibility 0s linear 0.3s;
-        position: absolute;
-        inset: 0;
       }
 
       #player-scope.visible {
+        position: fixed;
+        inset: 0;
+        height: 100svh;
         opacity: 1;
-        pointer-events: auto;
         visibility: visible;
+        pointer-events: auto;
         transition: opacity 0.3s ease-in-out;
+      }
+
+      body:has(#player-scope.visible) {
+        height: 100svh;
+        min-height: 100svh;
+        overflow: hidden;
+        overscroll-behavior: none;
       }
 
       #content-container {
@@ -57,7 +78,7 @@
   </head>
 
   <body>
-    <div id="platform-scope" class="visible">
+    <div id="platform-scope">
       <div id="root"></div>
     </div>
 
@@ -72,7 +93,7 @@
         <div id="bg-image-b" class="bg-element faded"></div>
 
         <p id="cutscene-text"></p>
-        <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto pl-2 pr-2 sm:pr-0 xl:px-4 sm:pl-4 max-w-[120rem] w-full">
+        <div id="book-container" class="flex flex-row gap-2 justify-center mx-auto px-0 max-w-[120rem] w-full">
           <div id="left-notes" class="hidden sm:block sm:flex-1 max-w-[700px] content-center overflow-y-auto"></div>
           <div id="content-container" class="sm:flex-3 max-w-[900px]"></div>
           <div id="right-notes" class="hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none">

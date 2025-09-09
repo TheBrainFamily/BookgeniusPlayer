@@ -24,7 +24,7 @@ export const IntegrationsProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       try {
         const [authModule, paymentsModule] = await Promise.all([
-          AUTH === "clerk" ? import("./auth/clerk") : import("./auth/default"),
+          AUTH === "clerk" ? import("./auth/clerk") : AUTH === "snapplify" ? import("./auth/snapplify") : import("./auth/default"),
           PAY === "supabase" ? import("./payments/supabase") : import("./payments/default"),
         ]);
 

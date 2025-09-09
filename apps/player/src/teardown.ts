@@ -8,6 +8,9 @@ import { clearBookStringifiedCache } from "@player/genericBookDataGetters/getBoo
 import { clearCharactersDataCache } from "@player/genericBookDataGetters/getCharactersData";
 import { clearCutScenesCache } from "@player/genericBookDataGetters/getCutScenesForBook";
 import { clearKnownVideoFilesCache } from "@player/genericBookDataGetters/getKnownVideoFiles";
+import { useSearchModal } from "@player/stores/modals/searchModal.store";
+import { resetBackgroundDebouncer } from "./ui/background";
+import { useBookMenuModal } from "./stores/modals/bookMenuModal.store";
 
 /**
  * Completely tear down the player runtime:
@@ -16,6 +19,8 @@ import { clearKnownVideoFilesCache } from "@player/genericBookDataGetters/getKno
  * - Clear the player portal root
  */
 export async function teardownPlayer(): Promise<void> {
+  resetBackgroundDebouncer();
+
   try {
     // Stop all audio and clear state
     stopAllPlayback();
@@ -47,15 +52,46 @@ export async function teardownPlayer(): Promise<void> {
   const resetVideo = (id: string) => {
     const v = document.getElementById(id) as HTMLVideoElement | null;
     if (!v) return;
+
     try {
-      v.pause();
-      // Remove any sources
-      v.removeAttribute("src");
-      // If there are <source> children, remove them
+      // First, remove any event listeners to prevent errors during cleanup
+      v.onloadstart = null;
+      v.onloadeddata = null;
+      v.oncanplay = null;
+      v.onplay = null;
+      v.onpause = null;
+      v.onended = null;
+      v.onerror = null;
+      v.onabort = null;
+
+      // If video is currently loading or playing, abort it gracefully
+      if (v.readyState > 0) {
+        try {
+          v.pause();
+        } catch (pauseError) {
+          console.warn(`teardownPlayer: failed to pause video #${id}`, pauseError);
+        }
+      }
+
+      // Reset time before removing source to avoid seeking errors
+      try {
+        v.currentTime = 0;
+      } catch {
+        // Ignore - video might not be loaded enough to seek
+      }
+
+      // Remove sources first, then src attribute
       const sources = v.querySelectorAll("source");
       sources.forEach((s) => s.remove());
-      // Force the element to reset its state
-      v.load();
+      v.removeAttribute("src");
+      v.srcObject = null;
+      v.src = "";
+      // video state reset across all browsers
+      try {
+        v.load();
+      } catch (loadError) {
+        console.warn(`teardownPlayer: video.load() failed for #${id}`, loadError);
+      }
     } catch (e) {
       console.warn(`teardownPlayer: failed to reset video #${id}`, e);
     }
@@ -67,18 +103,49 @@ export async function teardownPlayer(): Promise<void> {
     clearEl("left-notes");
     clearEl("right-notes");
     clearEl("right-notes-scrollable-container");
+
     const cutsceneText = document.getElementById("cutscene-text");
     if (cutsceneText) cutsceneText.textContent = "";
 
     // Reset background images
     const bgA = document.getElementById("bg-image-a") as HTMLElement | null;
+    if (bgA) {
+      bgA.style.backgroundImage = "";
+      bgA.classList.remove("zooming");
+      bgA.classList.add("faded");
+    }
     const bgB = document.getElementById("bg-image-b") as HTMLElement | null;
-    if (bgA) bgA.style.backgroundImage = "";
-    if (bgB) bgB.style.backgroundImage = "";
+    if (bgB) {
+      bgB.style.backgroundImage = "";
+      bgB.classList.remove("zooming");
+      bgB.classList.add("faded");
+    }
 
-    // Remove visibility class from book container
+    const videoA = document.getElementById("bg-video-a") as HTMLElement | null;
+    if (videoA) {
+      videoA.style.zIndex = "-2";
+      videoA.classList.add("faded");
+    }
+    const videoB = document.getElementById("bg-video-b") as HTMLElement | null;
+    if (videoB) {
+      videoB.style.zIndex = "-2";
+      videoB.classList.add("faded");
+    }
+
+    // Remove visibility class from book container and reset state
     const bookContainer = document.getElementById("book-container");
-    if (bookContainer) bookContainer.classList.remove("visible");
+    if (bookContainer) {
+      bookContainer.classList.remove("visible");
+      bookContainer.removeAttribute("data-current-book");
+    }
+
+    // Reset legacy background state - this is crucial for reinitializing backgrounds
+    const legacy = document.getElementById("legacy");
+    if (legacy) {
+      legacy.dataset.currentFile = "";
+      legacy.dataset.front = "";
+      legacy.dataset.type = "";
+    }
   } catch (e) {
     console.warn("teardownPlayer: clearing legacy DOM failed", e);
   }
@@ -112,5 +179,14 @@ export async function teardownPlayer(): Promise<void> {
     clearKnownVideoFilesCache();
   } catch (e) {
     console.warn("teardownPlayer: clearing caches failed", e);
+  }
+
+  // Clear search results and close search modal when changing books
+  try {
+    useSearchModal.getState().closeModal();
+    useSearchModal.getState().clearModal();
+    useBookMenuModal.getState().closeModal();
+  } catch (e) {
+    console.warn("teardownPlayer: clearing search results failed", e);
   }
 }

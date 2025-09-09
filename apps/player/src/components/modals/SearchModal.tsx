@@ -116,13 +116,14 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
                                 className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20 bg-gradient-to-br from-book-primary-5 to-book-secondary-5 hover:from-book-primary-10 hover:to-book-secondary-10 transition-all duration-200"
                                 variants={variants.item}
                                 whileTap="tap"
+                                whileHover="hover"
                                 onClick={() => handleSearchResultClick(item)}
                                 transition={{ delay: (chapterIndex * items.length + index) * 0.03 }}
                               >
                                 <div className="relative p-4">
                                   <div className="flex items-center gap-2 mb-2">
                                     <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
-                                      {t("paragraph")} {item.paragraphNumber}
+                                      {item.percentInChapter}% {t("of_chapter")}
                                     </div>
                                   </div>
 

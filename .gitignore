@@ -22,3 +22,5 @@ Support/
 apps/player/public_books/**/book.xml
 apps/platform/public/books/
 cdk.out
+# symlink
+apps/platform/public/books

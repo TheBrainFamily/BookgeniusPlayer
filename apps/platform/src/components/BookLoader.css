@@ -1,30 +1,18 @@
-/* src/components/BookLoader.css */
-
-/* Main splash screen styles */
 .book-loader-splash {
-  position: fixed;
+  position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   color: white;
-  z-index: 9999;
-  opacity: 1;
-  visibility: visible;
-  transition:
-    opacity 1s ease-in-out,
-    transform 1s ease-in-out,
-    visibility 0s 1s;
+  will-change: transform, opacity;
+  contain: layout paint; /* isolate for smoother compositing */
 }
 
-/* Class to trigger the hide animation */
 .book-loader-splash.hide {
-  opacity: 0;
-  transform: scale(1.1);
   pointer-events: none;
-  visibility: hidden;
 }
 
 /* Custom font styles matching your HTML */
@@ -34,6 +22,7 @@
   font-size: clamp(2.5rem, 8vw, 5rem);
   color: #e0e0e0;
   text-shadow: 0 0 15px rgba(255, 223, 186, 0.2);
+  animation: titleGlowPulse 4s ease-in-out infinite;
 }
 
 .splash-subtitle {
@@ -82,4 +71,43 @@
 
 .fading-out {
   animation: textFadeOut 0.3s ease-out forwards;
+}
+
+/* Button pulse animation */
+@keyframes buttonPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0px rgba(255, 255, 255, 0);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* Play icon styles */
+.play-icon {
+  position: relative;
+  width: 0.75rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Title glow pulse animation */
+@keyframes titleGlowPulse {
+  0%,
+  100% {
+    text-shadow:
+      0 0 15px rgba(255, 223, 186, 0.2),
+      0 0 25px rgba(255, 223, 186, 0.1);
+  }
+  50% {
+    text-shadow:
+      0 0 25px rgba(255, 223, 186, 0.4),
+      0 0 35px rgba(255, 223, 186, 0.2),
+      0 0 45px rgba(255, 223, 186, 0.1);
+  }
 }

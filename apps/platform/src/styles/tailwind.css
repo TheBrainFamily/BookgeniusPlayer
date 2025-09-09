@@ -181,7 +181,12 @@
   #platform-scope .container {
     width: 100%;
     margin-inline: auto;
-    padding-inline: 2rem;
+    padding-inline: 0.5rem;
+  }
+  @media (width >= 640px) {
+    #platform-scope .container {
+      padding-inline: 2rem;
+    }
   }
   @media (width >= 1400px) {
     #platform-scope .container {
@@ -210,11 +215,7 @@
     @apply border-border outline-ring/50;
   }
   #platform-scope {
-    @apply bg-background text-foreground;
     font-family: var(--font-family-serif);
-    background-image:
-      radial-gradient(circle at 20% 20%, hsl(45 40% 15% / 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, hsl(35 35% 12% / 0.4) 0%, transparent 50%),
-      linear-gradient(180deg, hsl(15 20% 8%) 0%, hsl(20 25% 6%) 100%);
   }
 
   #platform-scope ::-webkit-scrollbar {

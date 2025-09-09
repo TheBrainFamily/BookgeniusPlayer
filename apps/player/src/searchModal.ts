@@ -7,6 +7,7 @@ import { getBookData } from "./genericBookDataGetters/getBookData";
 export interface SearchResultItemData {
   chapter: number;
   paragraphNumber: number;
+  percentInChapter: number;
   summary: string;
   text?: string;
   id: string; // For React keys
@@ -61,13 +62,17 @@ export async function performUnifiedSearch(
       header = `No matches found for "${query}" (context: Ch. ${currentLocation.chapter}, P. ${currentLocation.paragraph})`;
     }
 
-    const items: SearchResultItemData[] = serverMatches.map((match, index) => ({
-      chapter: match.chapter,
-      paragraphNumber: match.paragraphNumber,
-      summary: match.summary,
-      text: createContextualSummary(match.text, query, 75),
-      id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}}`,
-    }));
+    const items: SearchResultItemData[] = serverMatches.map((match, index) => {
+      const totalParagraphsInChapter = getTotalParagraphsInChapter(match.chapter);
+      return {
+        chapter: match.chapter,
+        paragraphNumber: match.paragraphNumber,
+        percentInChapter: calculatePercentInChapter(match.paragraphNumber, totalParagraphsInChapter),
+        summary: match.summary,
+        text: createContextualSummary(match.text, query, 75),
+        id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}`,
+      };
+    });
 
     return { header, items, isLoading: false };
   } catch (error) {
@@ -138,6 +143,8 @@ export function performCachedSearch(query: string, currentLocation: Location): S
     // Only search up to the current location
     if (chapterIdNum > currentLocation.chapter) continue;
 
+    const totalParagraphsInChapter = getTotalParagraphsInChapter(chapterIdNum);
+
     const chapterCache = textCache[chapterIdNum];
     // Iterate over cached paragraphs
     for (const pIndex in chapterCache) {
@@ -163,8 +170,9 @@ export function performCachedSearch(query: string, currentLocation: Location): S
         items.push({
           chapter: chapterIdNum,
           paragraphNumber: paragraphNumber,
+          percentInChapter: calculatePercentInChapter(paragraphNumber, totalParagraphsInChapter),
           summary: createContextualSummary(paragraphText, query),
-          id: `cached-search-${chapterIdNum}-${paragraphNumber}}-`,
+          id: `cached-search-${chapterIdNum}-${paragraphNumber}`,
         });
       }
     }
@@ -182,6 +190,38 @@ export function cleanupSearchChapters(): void {
     searchContainer.remove();
   }
 }
+
+const getTotalParagraphsInChapter = (() => {
+  const cache = new Map<number, number>();
+
+  return (chapterNumber: number): number => {
+    if (cache.has(chapterNumber)) {
+      return cache.get(chapterNumber)!;
+    }
+
+    try {
+      const chapterSection = document.querySelector(`section[data-chapter="${chapterNumber}"]`);
+      if (!chapterSection) {
+        cache.set(chapterNumber, 0);
+        return 0;
+      }
+      const count = chapterSection.querySelectorAll("[data-index]").length;
+      cache.set(chapterNumber, count);
+      return count;
+    } catch (error) {
+      console.error(`Error getting paragraph count for chapter ${chapterNumber}:`, error);
+      // Don't cache on error to allow for retries.
+      return 0;
+    }
+  };
+})();
+
+const calculatePercentInChapter = (paragraphNumber: number, totalParagraphs: number): number => {
+  if (totalParagraphs <= 0) {
+    return 0;
+  }
+  return Math.max(0, Math.min(100, Math.round((paragraphNumber / totalParagraphs) * 100)));
+};
 
 const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) => {
   // Create a temporary DOM element to properly parse the HTML
@@ -211,11 +251,16 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
     } else {
       // Fallback: if no sentence span found, try to get surrounding context
       let context = "";
-      const current = characterElement;
+      let current = characterElement;
+      const currentHasNoWrap = current.closest("span.text-nowrap");
+      if (currentHasNoWrap) {
+        current = currentHasNoWrap;
+      }
 
       // Get up to 10 words before
-      const wordsBefore = [];
+      let wordsBefore = [];
       let beforeElement = current.previousSibling;
+
       while (beforeElement && wordsBefore.length < 10) {
         if (beforeElement.nodeType === Node.TEXT_NODE || beforeElement.nodeType === Node.ELEMENT_NODE) {
           const words = beforeElement.textContent
@@ -230,7 +275,7 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
       const characterHTML = characterElement.outerHTML;
 
       // Get up to 10 words after
-      const wordsAfter = [];
+      let wordsAfter = [];
       let afterElement = current.nextSibling;
       while (afterElement && wordsAfter.length < 10) {
         if (afterElement.nodeType === Node.TEXT_NODE || afterElement.nodeType === Node.ELEMENT_NODE) {
@@ -243,10 +288,25 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
         afterElement = afterElement.nextSibling;
       }
 
+      let characterSlugMissingPunctuation = "";
+      if (wordsBefore.length === 0 || wordsAfter.length === 0) {
+        const words = tempDiv.textContent
+          .trim()
+          .split(/\s+/)
+          .filter((w) => w);
+
+        const characterSlugIndex = words.findIndex((word) => word.includes(characterSlug));
+        if (characterSlugIndex !== -1) {
+          characterSlugMissingPunctuation = words[characterSlugIndex].replace(characterSlug, "");
+          wordsBefore = words.slice(0, characterSlugIndex);
+          wordsAfter = words.slice(characterSlugIndex + 1);
+        }
+      }
+
       // Combine context
       const before = wordsBefore.slice(-5).join(" ");
       const after = wordsAfter.slice(0, 5).join(" ");
-      context = `${before ? before + " " : ""}${characterHTML}${after ? " " + after : ""}`;
+      context = `${before ? before + " " : ""}${characterHTML}${characterSlugMissingPunctuation}${after ? " " + after : ""}`;
 
       if (context.trim()) {
         results.push(context.trim());
@@ -265,7 +325,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
 
   // Changed return type
   const items: SearchResultItemData[] = [];
-  let resultIndex: 0;
+  let resultIndex: number = 0;
 
   try {
     if (characterData) {
@@ -284,10 +344,13 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
       }
 
       knownCharacterHistory.forEach(({ chapter, paragraphs }) => {
+        const totalParagraphsInChapter = getTotalParagraphsInChapter(chapter);
+
         paragraphs.forEach((paragraph) => {
           const paragraphInnerHTML = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`).innerHTML;
 
           const sentence = getSentenceWithCharacterSpan(paragraphInnerHTML, characterSlug);
+
           if (sentence) {
             const cleanText = sentence.replace(/<[^>]*>/g, "");
             const summaryText = cleanText.length > 300 ? cleanText.substring(0, 300) : cleanText;
@@ -296,9 +359,10 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
             items.push({
               chapter,
               paragraphNumber: paragraph,
+              percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
               summary: highlightMatchedWords(summaryText, characterSlug),
               text: highlightMatchedWords(displayText, characterSlug),
-              id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}}`,
+              id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
             });
           }
         });

@@ -37,7 +37,12 @@ const CharactersOnStagePanel = () => {
   if (!location) return null;
 
   return (
-    <div className={cn("characters-on-stage-panel flex justify-center items-center h-full transition-opacity duration-300", shouldHideAvatars ? "opacity-0" : "opacity-100")}>
+    <div
+      className={cn(
+        "characters-on-stage-panel flex justify-center items-center transition-opacity duration-300 max-w-full absolute bottom-2 lg:bottom-14 m-0",
+        shouldHideAvatars ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto",
+      )}
+    >
       <AnimatePresence mode="sync">
         <ScrollArea
           className="relative w-full h-full"
@@ -89,7 +94,7 @@ const CharactersOnStagePanel = () => {
                     animate={{ borderColor: "rgba(255, 255, 255, 0.2)", boxShadow: "0 5px 10px -5px rgba(255, 255, 255, 0.2)" }}
                     transition={{ duration: 0.5, ease: "easeInOut", borderColor: { duration: 0.5 }, boxShadow: { duration: 0.5 } }}
                   >
-                    <CharacterCard entity={characterEntity} currentSpeakers={currentSpeakers} hideTitle disableHighlight imageOnly />
+                    <CharacterCard entity={characterEntity} currentSpeakers={currentSpeakers} disableHighlight imageOnly captionMode="hover" />
                   </motion.div>
                 </motion.div>
               );
