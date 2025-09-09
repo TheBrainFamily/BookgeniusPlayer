@@ -48,7 +48,7 @@ const Footer = () => {
           initial="hidden"
           animate="visible"
           className={cn(
-            "fixed bottom-0 inset-x-0 z-50 flex flex-row gap-2 justify-center mx-auto max-w-[120rem] w-full pointer-events-none",
+            "fixed bottom-0 inset-x-0 z-40 flex flex-row gap-2 justify-center mx-auto max-w-[120rem] w-full pointer-events-none",
             "px-2 lg:px-4 pb-4",
             // Always apply transition, but only apply transform when shifting
             "transition-transform duration-300",
