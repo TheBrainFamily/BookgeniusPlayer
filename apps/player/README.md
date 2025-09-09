@@ -160,7 +160,6 @@ src/
 │
 ├── context/                  # React Context providers
 │   ├── LocationContext.tsx   # Reading position state
-│   ├── BookThemeContext.tsx  # Theme management
 │   ├── RealtimeContext.tsx   # AI communication
 │   └── WebSocketContext.tsx  # Real-time connections
 │

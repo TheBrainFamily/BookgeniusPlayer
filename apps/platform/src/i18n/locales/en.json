@@ -1,0 +1,42 @@
+{
+  "hero": {
+    "bookGenius": "BookGenius",
+    "title": "Experience Literature",
+    "subtitle": "Like Never Before",
+    "description": "Immerse yourself in fully-produced visual novels with stunning animations, character voices, and atmospheric soundtracks. Each story becomes a living, breathing experience that brings classic literature to vibrant life.",
+    "startReading": "Start Reading",
+    "viewCollection": "View Collection"
+  },
+  "navigation": { "search": "Search visual novels, authors...", "searchMobile": "Search novels...", "signOut": "Sign Out", "signIn": "Sign In" },
+  "stats": { "visualNovels": "Visual Novels", "immersive": "Immersive", "productions": "Productions" },
+  "featured": {
+    "featuredMasterpieces": "Featured Masterpieces",
+    "description": "Experience two legendary works of literature like never before. Each story features cinematic visuals, professional voice acting, and immersive soundscapes that transform reading into a complete sensory journey."
+  },
+  "collection": {
+    "ourCollection": "Our Collection",
+    "searchResults": "Search Results",
+    "description": "Each visual novel is a complete production featuring professional voice acting, animated scenes, and immersive soundtracks that bring literature to life.",
+    "searchResultsFor": "Showing results for",
+    "noResults": "No books found matching",
+    "noResultsHint": "Try searching for a different title, author, or genre"
+  },
+  "footer": {
+    "description": "Experience literature like never before with our immersive visual novels featuring beautiful animations and atmospheric soundtracks.",
+    "quickLinks": {
+      "title": "Quick Links",
+      "viewCollection": "View Collection",
+      "myProgress": "My Progress",
+      "readingHistory": "Reading History",
+      "settings": "Settings",
+      "digitalRealm": "Digital Realm"
+    },
+    "featuredAuthors": "Featured Authors",
+    "contact": "Contact",
+    "allRights": "All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "cookiePolicy": "Cookie Policy"
+  },
+  "common": { "loading": "Loading...", "error": "Error", "retry": "Retry", "close": "Close", "back": "Back", "next": "Next", "previous": "Previous" }
+}

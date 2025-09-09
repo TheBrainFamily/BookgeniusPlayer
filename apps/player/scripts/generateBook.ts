@@ -72,7 +72,6 @@ export function parseBookXmlData(bookDirectoryPath: string) {
     title: getText("Title"),
     author: getText("Author"),
     language: getText("Language", "polish").toLowerCase(),
-    simplifiedIconColor: getText("SimplifiedIconColor", "#4CAF50"),
     form: getText("Form", "book").toLowerCase(),
   };
 
@@ -200,13 +199,6 @@ export const bookData: BookData = {
     bookForm: "${metadata.form}"
   },
   chapters: ${JSON.stringify(chapterTitles, null, 2)},
-  themeColors: {
-    primaryColor: "#E3F2FD",
-    secondaryColor: "#1976D2",
-    tertiaryColor: "#90CAF9",
-    quaternaryColor: "#0D47A1",
-    simplifiedIconColor: "${metadata.simplifiedIconColor}"
-  },
   hasAudiobook: ${hasAudiobook}
 };
 `;

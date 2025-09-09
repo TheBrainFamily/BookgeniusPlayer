@@ -7,6 +7,7 @@ import { loadBookStringified } from "@player/genericBookDataGetters/getBookStrin
 import { loadCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import { loadCutScenesForBook } from "@player/genericBookDataGetters/getCutScenesForBook";
 import { loadKnownVideoFiles } from "@player/genericBookDataGetters/getKnownVideoFiles";
+import { loadBookColorsCSS } from "@player/utils/loadBookColors";
 
 export async function preloadAllBookData(): Promise<void> {
   console.log("Preloading book data...");
@@ -23,6 +24,7 @@ export async function preloadAllBookData(): Promise<void> {
       loadCharactersData(),
       loadCutScenesForBook(),
       loadKnownVideoFiles(),
+      loadBookColorsCSS(),
     ]);
 
     console.log("Book data preloaded successfully");

@@ -14,6 +14,8 @@ import GenreExploration from "./components/GenreExploration";
 import BookExperience from "./components/BookExperience";
 import PaymentSuccess from "./components/PaymentSuccess";
 import AuthCallback from "@platform/pages/AuthCallback.tsx";
+import { I18nextProvider } from "react-i18next";
+import i18n from "@platform/i18n";
 
 const queryClient = new QueryClient();
 
@@ -31,24 +33,26 @@ const AppWithAuth = () => {
 
   return (
     <AuthProvider>
-      <RouteTransitionProvider>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/experience/:slug" element={<BookExperience />} />
-          <Route path="/GenreExploration" element={<GenreExploration />} />
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-          <Route
-            path="/reader/"
-            element={
-              <Suspense fallback={null}>
-                <LazyWrappedPlayerApp />
-              </Suspense>
-            }
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </RouteTransitionProvider>
+      <I18nextProvider i18n={i18n}>
+        <RouteTransitionProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/experience/:slug" element={<BookExperience />} />
+            <Route path="/GenreExploration" element={<GenreExploration />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route
+              path="/reader/"
+              element={
+                <Suspense fallback={null}>
+                  <LazyWrappedPlayerApp />
+                </Suspense>
+              }
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </RouteTransitionProvider>
+      </I18nextProvider>
     </AuthProvider>
   );
 };

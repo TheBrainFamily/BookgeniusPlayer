@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 import { UndoDot } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -60,12 +60,12 @@ const ReturnToLocationButton = () => {
                       onGoBackClick();
                     }
                   }}
-                  className="p-2 my-1 text-sm hover:text-white rounded-full cursor-pointer flex flex-row gap-2 items-center h-8 font-medium"
+                  className="p-2 my-1 leading-none text text-[10px] md:text-sm hover:text-white rounded-full cursor-pointer flex flex-row gap-2 items-center font-medium"
                   whileHover="hover"
                   whileTap="tap"
                   variants={variants.button}
                 >
-                  <UndoDot className="w-4 h-4" />
+                  <UndoDot className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
                   {t("go_back")}
                 </motion.button>
               </TooltipTrigger>

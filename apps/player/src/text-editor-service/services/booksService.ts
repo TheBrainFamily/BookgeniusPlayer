@@ -21,7 +21,7 @@ export class BooksService {
     chapters: Record<string, string>;
     metadata: Record<string, string>;
     characters: Array<{ name: string; display: string; summary: string }>;
-    bookMetadata: { slug?: string; title?: string; author?: string; language?: string; form?: string; simplifiedIconColor?: string };
+    bookMetadata: { slug?: string; title?: string; author?: string; language?: string; form?: string };
     allVariants: {
       id: string;
       analysis: { originalSentence: string; reasoning: string; score: number };
@@ -68,7 +68,7 @@ export class BooksService {
 
       // Parse metadata.xml if it exists to extract characters and book metadata
       const characters: Array<{ name: string; display: string; summary: string }> = [];
-      const bookMetadata: { slug?: string; title?: string; author?: string; language?: string; form?: string; simplifiedIconColor?: string } = {};
+      const bookMetadata: { slug?: string; title?: string; author?: string; language?: string; form?: string } = {};
 
       if (metadata.metadata) {
         try {
@@ -93,7 +93,6 @@ export class BooksService {
             bookMetadata.author = bookMeta.Author;
             bookMetadata.language = bookMeta.Language;
             bookMetadata.form = bookMeta.Form;
-            bookMetadata.simplifiedIconColor = bookMeta.SimplifiedIconColor;
           }
         } catch (xmlError) {
           console.error("Error parsing metadata XML:", xmlError);

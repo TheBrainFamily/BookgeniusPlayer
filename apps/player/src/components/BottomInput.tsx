@@ -60,10 +60,20 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       if ((event.key === "f" || event.key === "F") && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
         updateLastActivity();
-        // Focus the input after a small delay to ensure it's visible
-        setTimeout(() => {
-          if (inputRef.current) inputRef.current.focus();
-        }, 50);
+
+        // Open search modal first if not already open
+        if (!isSearchModalOpen && !isDeepResearchActive) {
+          openSearchModal(true, true, value.trim());
+        }
+
+        // Defer focus until after the modal is opened and DOM is updated
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (inputRef.current && document.activeElement !== inputRef.current) {
+              inputRef.current.focus();
+            }
+          });
+        });
         return;
       }
     };
@@ -72,7 +82,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [updateLastActivity]);
+  }, [updateLastActivity, isSearchModalOpen, isDeepResearchActive, openSearchModal, value]);
 
   useEffect(() => {
     if (response && !isRecording) {
@@ -206,6 +216,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       e.target.select();
       if (!isSearchModalOpen && !isDeepResearchActive) {
         openSearchModal(true, true, value.trim());
+        // Ensure focus is maintained after modal opens
+        requestAnimationFrame(() => {
+          if (inputRef.current && document.activeElement !== inputRef.current) {
+            inputRef.current.focus();
+          }
+        });
       }
     },
     [updateLastActivity, isSearchModalOpen, isDeepResearchActive, openSearchModal, value],
@@ -218,18 +234,23 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
 
       // Defer focus until after the next repaint to ensure visibility is updated
       requestAnimationFrame(() => {
-        if (inputRef.current && document.activeElement !== inputRef.current) {
-          inputRef.current.focus();
-        }
+        requestAnimationFrame(() => {
+          if (inputRef.current && document.activeElement !== inputRef.current) {
+            inputRef.current.focus();
+          }
+        });
       });
     },
     [updateLastActivity],
   );
 
   return (
-    <OptionalElement className={cn("mb-2 transition-all duration-300 ease-out w-full flex justify-center", className)}>
+    <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
       <motion.div
-        className={cn("bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-2 py-1 md:py-[4px] md:px-3", isRecording && "recording-active")}
+        className={cn(
+          "bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-2 py-[2px] md:py-[3px] md:px-3",
+          isRecording && "recording-active",
+        )}
         animate={isRecording ? "recordingContainer" : "idle"}
         initial="idle"
         variants={variants.container}
