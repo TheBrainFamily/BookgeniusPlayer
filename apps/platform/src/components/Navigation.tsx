@@ -20,16 +20,16 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
   const SignInWidget = authMod.useSignInWidget?.();
 
   return (
-    <nav className="relative z-10 bg-card/90 backdrop-blur-sm border-b border-border">
+    <nav className="sticky top-0 z-30 bg-card/90 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
+          <a href="#" className="flex items-center space-x-3">
             <BookOpen className="h-8 w-8 text-library-gold animate-candleflicker" />
             <h1 className="text-2xl font-bold text-foreground">
               Book<span className="text-library-gold">Genius</span>
             </h1>
-          </div>
+          </a>
 
           {/* Search Bar */}
           <div className="hidden md:flex relative max-w-md flex-1 mx-8">

@@ -1,11 +1,14 @@
+import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { Star, Clock, Play, Volume2 } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@platform/components/ui/card";
+import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
 import { Button } from "@platform/components/ui/button";
 import { Badge } from "@platform/components/ui/badge";
-import { Star, Clock, Play, Volume2 } from "lucide-react";
 import { books } from "@platform/books";
-import { useNavigate } from "react-router-dom";
-import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
-import { useMemo } from "react";
+import { humanizeBookCardButtonText } from "@platform/utils/humanizeBookCardButtonText";
+import { isRunningOnLocalhost } from "@platform/utils/isRunningOnLocalhost";
 
 interface BookCollectionProps {
   searchQuery?: string;
@@ -16,10 +19,11 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   const { startTransition, setNavigatedFromPlatform } = useRouteTransition();
 
   const filteredBooks = useMemo(() => {
-    if (!searchQuery.trim()) return books;
+    const availableBooks = typeof window !== "undefined" && (window.location.hostname.endsWith(".pl") || isRunningOnLocalhost()) ? books : books.filter((b) => b.language !== "pl");
+    if (!searchQuery.trim()) return availableBooks;
 
     const query = searchQuery.toLowerCase();
-    return books.filter(
+    return availableBooks.filter(
       (book) =>
         book.title.toLowerCase().includes(query) ||
         book.author.toLowerCase().includes(query) ||
@@ -28,8 +32,7 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
     );
   }, [searchQuery]);
 
-  const handleBookClick = (slug: string) => {
-    const book = books.find((b) => b.slug === slug);
+  const handleBookClick = (book: (typeof books)[0]) => {
     const title = book?.title ?? "BookGenius";
     const phrases = book?.phrases;
     const author = book?.author;
@@ -37,16 +40,16 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
     // Indicate user came from platform for proper loader behavior
     setNavigatedFromPlatform(true);
     // Start the transition overlay with book-specific meta
-    startTransition({ title: title ?? "BookGenius", phrases, author, showStartButton: false, onStartClick: undefined });
+    startTransition({ title, phrases, author, showStartButton: false, onStartClick: undefined });
 
     // Let the overlay paint before route switch for a smooth fade
     requestAnimationFrame(() => {
-      navigate(`/reader?book=${slug}`, { state: { meta: { title, phrases, author } } });
+      navigate(`/reader?book=${book.slug}`, { state: { meta: { title, phrases, author } } });
     });
   };
 
   return (
-    <section className="py-16 px-4">
+    <section className="py-16 px-4 min-h-[90vh] flex items-center justify-center" id="book-collection">
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-foreground mb-4">
@@ -78,7 +81,7 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
               <Card
                 key={book.id}
                 className="bg-card/50 backdrop-blur-sm border-library-walnut hover:border-library-gold transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-library-gold/10 group cursor-pointer flex flex-col"
-                onClick={() => handleBookClick(book.slug)}
+                onClick={() => handleBookClick(book)}
               >
                 <CardHeader className="pb-4">
                   {/* Book Cover */}
@@ -132,17 +135,16 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
                       </div>
                       <span className="text-muted-foreground">{book.year}</span>
                     </div>
-
                     <Button
-                      className="w-full bg-library-walnut hover:bg-library-gold hover:text-library-mahogany transition-all duration-300 group/btn"
+                      className="w-full bg-library-walnut group-hover:bg-library-gold group-hover:text-library-mahogany hover:bg-library-gold hover:text-library-mahogany transition-all duration-300 group/btn"
                       variant="secondary"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleBookClick(book.slug);
+                        handleBookClick(book);
                       }}
                     >
-                      <Play className="mr-2 h-4 w-4 group-hover/btn:scale-110 transition-transform" />
-                      Experience Novel
+                      <Play className="mr-2 h-4 w-4 group-hover:scale-110 group-hover/btn:scale-110 transition-transform" />
+                      {humanizeBookCardButtonText(book)}
                     </Button>
                   </div>
                 </CardContent>
