@@ -8,7 +8,7 @@ export interface Book {
   rating: number;
   video: string;
   poster: string;
-  readTime: string;
+  readTime: number; // in minutes
   language: string;
   type: string;
 }
