@@ -275,13 +275,13 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
       let wordsBefore = [];
       let beforeElement = current.previousSibling;
 
-      while (beforeElement && wordsBefore.length < 10) {
+      while (beforeElement && wordsBefore.length < 12) {
         if (beforeElement.nodeType === Node.TEXT_NODE || beforeElement.nodeType === Node.ELEMENT_NODE) {
           const words = beforeElement.textContent
             .trim()
             .split(/\s+/)
             .filter((w) => w);
-          wordsBefore.unshift(...words.slice(-10));
+          wordsBefore.unshift(...words.slice(-12));
         }
         beforeElement = beforeElement.previousSibling;
       }
@@ -291,13 +291,13 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
       // Get up to 10 words after
       let wordsAfter = [];
       let afterElement = current.nextSibling;
-      while (afterElement && wordsAfter.length < 10) {
+      while (afterElement && wordsAfter.length < 12) {
         if (afterElement.nodeType === Node.TEXT_NODE || afterElement.nodeType === Node.ELEMENT_NODE) {
           const words = afterElement.textContent
             .trim()
             .split(/\s+/)
             .filter((w) => w);
-          wordsAfter.push(...words.slice(0, 10));
+          wordsAfter.push(...words.slice(0, 12));
         }
         afterElement = afterElement.nextSibling;
       }
@@ -318,8 +318,8 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
       }
 
       // Combine context
-      const before = wordsBefore.slice(-5).join(" ");
-      const after = wordsAfter.slice(0, 5).join(" ");
+      const before = wordsBefore.slice(-10).join(" ");
+      const after = wordsAfter.slice(0, 10).join(" ");
       context = `${before ? before + " " : ""}${characterHTML}${characterSlugMissingPunctuation}${after ? " " + after : ""}`;
 
       if (context.trim()) {
