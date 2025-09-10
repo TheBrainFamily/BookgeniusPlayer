@@ -10,14 +10,25 @@ import { LanguageFlagEN } from "@platform/components/LanguageFlagEN.tsx";
 import { LanguageFlagPL } from "@platform/components/LanguageFlagPL.tsx";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { minutesToHours } from "@platform/utils/minutesToHours.ts";
+import { TFunction } from "i18next";
 
 type Book = (typeof books)[number];
 
 type BookCardProps = { book: Book; onClick: (book: Book) => void; variant?: "default" | "featured"; showLanguageFlag?: boolean; className?: string };
 
+const displayReadTime = (t: TFunction, readTime: { h: number; m: number }) => {
+  if (readTime.h > 0) {
+    return `${readTime.h} ${t("common.hours")} ${readTime.m > 0 ? `${readTime.m} ${t("common.minutes")}` : ""}`;
+  }
+  return `${readTime.m} ${t("common.minutes")}`;
+};
+
 export default function BookCard({ book, onClick, variant = "default", showLanguageFlag = false, className = "" }: BookCardProps) {
   const { t } = useTranslation();
   const language = useMemo(() => detectLanguageFromDomain(), []);
+
+  const readTime = minutesToHours(book.readTime);
 
   const isFeatured = variant === "featured";
 
@@ -107,9 +118,7 @@ export default function BookCard({ book, onClick, variant = "default", showLangu
             </div>
             <div className="flex items-center space-x-1 text-muted-foreground">
               <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="text-sm">
-                {book.readTime} {t("common.hours")}
-              </span>
+              <span className="text-sm">{displayReadTime(t, readTime)}</span>
             </div>
             <span className="text-muted-foreground text-sm">{book.year}</span>
           </div>

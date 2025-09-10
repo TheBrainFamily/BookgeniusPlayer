@@ -5,15 +5,17 @@ import { books } from "@platform/books";
 import BookCard from "./BookCard";
 import { useTranslation } from "react-i18next";
 import { featuredBooks } from "@platform/utils/bookLanguageFilter.ts";
+import { detectLanguageFromDomain } from "@platform/utils/languageDetection.ts";
 
 const FeaturedBooks = () => {
   const navigate = useNavigate();
   const { startTransition, setNavigatedFromPlatform } = useRouteTransition();
   const { t } = useTranslation();
+  const language = detectLanguageFromDomain();
 
   const handleBookClick = (book: (typeof books)[0]) => {
     const title = book?.title ?? "BookGenius";
-    const phrases = book?.phrases;
+    const phrases = book?.metadata[language].phrases;
     const author = book?.author;
 
     // Indicate user came from platform for proper loader behavior
