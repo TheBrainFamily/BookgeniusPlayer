@@ -50,6 +50,14 @@ export const ContentShiftWrapper: React.FC = () => {
       bookContainer.style.maxWidth = "120rem";
     };
 
+    const handleTransitionEnd = (e: TransitionEvent) => {
+      if (e.propertyName === "transform") {
+        // After transform finishes, restore full size to avoid percentage re-evaluation jumps
+        setFullSize();
+        bookContainer.removeEventListener("transitionend", handleTransitionEnd as EventListener);
+      }
+    };
+
     if (isLargeScreen) {
       if (isContentShiftedLeft) {
         // Entering shifted state: size first, then transform to avoid jumps
@@ -59,13 +67,6 @@ export const ContentShiftWrapper: React.FC = () => {
         // Leaving shifted state: keep compact size while transform animates back to 0
         if (wasShiftedRef.current) {
           setCompactSize();
-          const handleTransitionEnd = (e: TransitionEvent) => {
-            if (e.propertyName === "transform") {
-              // After transform finishes, restore full size to avoid percentage re-evaluation jumps
-              setFullSize();
-              bookContainer.removeEventListener("transitionend", handleTransitionEnd as EventListener);
-            }
-          };
           bookContainer.addEventListener("transitionend", handleTransitionEnd as EventListener);
           bookContainer.style.transform = "translateX(0)";
         } else {
@@ -87,6 +88,7 @@ export const ContentShiftWrapper: React.FC = () => {
       bookContainer.style.width = "";
       bookContainer.style.maxWidth = "";
       bookContainer.style.willChange = "";
+      bookContainer.removeEventListener("transitionend", handleTransitionEnd);
     };
 
     // Track previous shifted state for sequencing logic
