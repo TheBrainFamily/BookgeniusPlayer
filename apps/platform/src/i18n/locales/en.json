@@ -38,5 +38,6 @@
     "termsOfService": "Terms of Service",
     "cookiePolicy": "Cookie Policy"
   },
-  "common": { "loading": "Loading...", "error": "Error", "retry": "Retry", "close": "Close", "back": "Back", "next": "Next", "previous": "Previous" }
+  "common": { "loading": "Loading...", "error": "Error", "retry": "Retry", "close": "Close", "back": "Back", "next": "Next", "previous": "Previous" },
+  "notFound": { "title": "Page Not Found", "returnHome": "Return to Library", "description": "It seems this page has been lost in the vast library of the internet." }
 }
