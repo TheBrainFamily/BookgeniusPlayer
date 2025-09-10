@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
-import { books } from "@platform/books";
+import type { books } from "@platform/books";
 import BookCard from "./BookCard";
 import { useTranslation } from "react-i18next";
 import { featuredBooks } from "@platform/utils/bookLanguageFilter.ts";
@@ -15,7 +15,7 @@ const FeaturedBooks = () => {
 
   const handleBookClick = (book: (typeof books)[0]) => {
     const title = book?.title ?? "BookGenius";
-    const phrases = book?.metadata[language].phrases;
+    const phrases = book?.metadata?.[language]?.phrases ?? [];
     const author = book?.author;
 
     // Indicate user came from platform for proper loader behavior
