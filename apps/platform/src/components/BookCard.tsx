@@ -9,12 +9,14 @@ import { detectLanguageFromDomain } from "@platform/utils/languageDetection.ts";
 import { LanguageFlagEN } from "@platform/components/LanguageFlagEN.tsx";
 import { LanguageFlagPL } from "@platform/components/LanguageFlagPL.tsx";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 type Book = (typeof books)[number];
 
 type BookCardProps = { book: Book; onClick: (book: Book) => void; variant?: "default" | "featured"; showLanguageFlag?: boolean; className?: string };
 
 export default function BookCard({ book, onClick, variant = "default", showLanguageFlag = false, className = "" }: BookCardProps) {
+  const { t } = useTranslation();
   const language = useMemo(() => detectLanguageFromDomain(), []);
 
   const isFeatured = variant === "featured";
@@ -105,7 +107,9 @@ export default function BookCard({ book, onClick, variant = "default", showLangu
             </div>
             <div className="flex items-center space-x-1 text-muted-foreground">
               <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="text-sm">{book.readTime}</span>
+              <span className="text-sm">
+                {book.readTime} {t("common.hours")}
+              </span>
             </div>
             <span className="text-muted-foreground text-sm">{book.year}</span>
           </div>

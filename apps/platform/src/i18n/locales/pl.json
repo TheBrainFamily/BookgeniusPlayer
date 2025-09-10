@@ -38,5 +38,5 @@
     "termsOfService": "Warunki korzystania z usługi",
     "cookiePolicy": "Polityka plików cookies"
   },
-  "common": { "loading": "Ładowanie...", "error": "Błąd", "retry": "Ponów", "close": "Zamknij", "back": "Wstecz", "next": "Dalej", "previous": "Poprzedni" }
+  "common": { "loading": "Ładowanie...", "error": "Błąd", "retry": "Ponów", "close": "Zamknij", "back": "Wstecz", "next": "Dalej", "previous": "Poprzedni", "hours": "godz." }
 }

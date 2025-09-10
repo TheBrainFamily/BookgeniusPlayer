@@ -38,5 +38,5 @@
     "termsOfService": "Terms of Service",
     "cookiePolicy": "Cookie Policy"
   },
-  "common": { "loading": "Loading...", "error": "Error", "retry": "Retry", "close": "Close", "back": "Back", "next": "Next", "previous": "Previous" }
+  "common": { "loading": "Loading...", "error": "Error", "retry": "Retry", "close": "Close", "back": "Back", "next": "Next", "previous": "Previous", "hours": "hrs" }
 }

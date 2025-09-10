@@ -4,9 +4,7 @@ import { useRouteTransition } from "@platform/providers/RouteTransitionProvider"
 import { books } from "@platform/books";
 import BookCard from "./BookCard";
 import { useTranslation } from "react-i18next";
-
-const featuredBookSlugs = ["1984-English", "Othello"];
-const featuredBooks = books.filter((book) => featuredBookSlugs.includes(book.slug));
+import { featuredBooks } from "@platform/utils/bookLanguageFilter.ts";
 
 const FeaturedBooks = () => {
   const navigate = useNavigate();
@@ -40,9 +38,9 @@ const FeaturedBooks = () => {
         </div>
 
         <div className="flex flex-row gap-2 sm:gap-4 md:gap-6 lg:gap-8 max-w-4xl mx-auto items-stretch">
-          {featuredBooks.map((book) => (
+          {featuredBooks().map((book) => (
             <div key={book.id} className="flex-1 min-w-0 flex">
-              <BookCard book={book} variant="featured" showLanguageFlag={false} onClick={handleBookClick} />
+              <BookCard book={book} variant="featured" showLanguageFlag onClick={handleBookClick} />
             </div>
           ))}
         </div>
