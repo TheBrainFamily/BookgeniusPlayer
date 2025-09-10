@@ -124,7 +124,11 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const clerkDomain = import.meta.env.VITE_CLERK_DOMAIN || undefined;
 
   const mainClerkDomain = "bookgenius.net";
-  const allowedRedirectOrigins = [`https://${mainClerkDomain}`, `https://accounts.${mainClerkDomain}`];
+  const allowedRedirectOrigins = [
+    `https://${mainClerkDomain}`,
+    `https://accounts.${mainClerkDomain}`,
+    "https://testclerk.aws.lucetius.pl",
+  ];
 
   let signInUrl = undefined;
   let signUpUrl = undefined;
