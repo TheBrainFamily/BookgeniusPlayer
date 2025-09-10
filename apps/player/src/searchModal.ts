@@ -233,7 +233,21 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
     return "";
   }
 
-  const results = [];
+  const results: { html: string; offset: number }[] = [];
+
+  // Compute the character offset of the first text inside target relative to the root's text content
+  const getTextOffset = (root: HTMLElement, target: Element): number => {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    let offset = 0;
+    let node: Node | null;
+    while ((node = walker.nextNode())) {
+      if (target.contains(node)) {
+        break;
+      }
+      offset += (node.nodeValue || "").length;
+    }
+    return offset;
+  };
 
   characterElements.forEach((characterElement) => {
     // Find the sentence span that contains this character element
@@ -247,7 +261,7 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
       sentenceHTML = sentenceHTML.replace(/\s*id="[^"]*"/g, "");
       sentenceHTML = sentenceHTML.replace(/\s*style="[^"]*"/g, "");
 
-      results.push(sentenceHTML);
+      results.push({ html: sentenceHTML, offset: getTextOffset(tempDiv, characterElement) });
     } else {
       // Fallback: if no sentence span found, try to get surrounding context
       let context = "";
@@ -309,13 +323,33 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
       context = `${before ? before + " " : ""}${characterHTML}${characterSlugMissingPunctuation}${after ? " " + after : ""}`;
 
       if (context.trim()) {
-        results.push(context.trim());
+        results.push({ html: context.trim(), offset: getTextOffset(tempDiv, characterElement) });
       }
     }
   });
 
-  const uniqueResults = [...new Set(results)];
-  const finalResult = uniqueResults.join(" ");
+  // Filter out very close hits (near-overlapping). Use a small character-distance threshold.
+  const MIN_CHAR_GAP = 60; // roughly "a few words" apart
+  const sortedByOffset = [...results].sort((a, b) => a.offset - b.offset);
+  const filteredByProximity: { html: string; offset: number }[] = [];
+  for (const entry of sortedByOffset) {
+    const last = filteredByProximity[filteredByProximity.length - 1];
+    if (!last || entry.offset - last.offset >= MIN_CHAR_GAP) {
+      filteredByProximity.push(entry);
+    }
+  }
+
+  // Ensure uniqueness by HTML and join
+  const seenHtml = new Set<string>();
+  const uniqueHtmls: string[] = [];
+  for (const entry of filteredByProximity) {
+    if (!seenHtml.has(entry.html)) {
+      seenHtml.add(entry.html);
+      uniqueHtmls.push(entry.html);
+    }
+  }
+
+  const finalResult = uniqueHtmls.join(" ");
 
   return finalResult;
 };
