@@ -34,27 +34,26 @@ export const ContentShiftWrapper: React.FC = () => {
         .find((t) => t.trim().startsWith("opacity"))
         ?.trim() || "opacity 1000ms ease-in-out";
 
+    // Preserve opacity transition and add transform transition
+    bookContainer.style.transition = `${opacityTransition}, transform 0.3s ease-out`;
+
     // Only apply content shift on large screens (≥1280px)
     if (isContentShiftedLeft && isLargeScreen) {
       // Shift content left by adding transform and adjusting layout
       bookContainer.style.transform = isPlayFormat ? "translateX(-18%)" : "translateX(-13%)";
-      // Preserve opacity transition and add transform transition
-      bookContainer.style.transition = `${opacityTransition}, transform 0.3s ease-in-out`;
       bookContainer.style.width = "80%";
       bookContainer.style.maxWidth = "calc(120rem * 0.8)";
     } else {
       // Reset to original position for small screens or when not shifted
       bookContainer.style.transform = "translateX(0)";
-      // Preserve opacity transition and add transform transition
-      bookContainer.style.transition = `${opacityTransition}, transform 0.3s ease-in-out`;
       bookContainer.style.width = "100%";
       bookContainer.style.maxWidth = "120rem";
     }
 
     // Cleanup function to reset on unmount
     return () => {
-      bookContainer.style.transform = "";
       bookContainer.style.transition = "";
+      bookContainer.style.transform = "";
       bookContainer.style.width = "";
       bookContainer.style.maxWidth = "";
     };
