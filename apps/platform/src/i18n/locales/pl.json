@@ -39,10 +39,5 @@
     "cookiePolicy": "Polityka plików cookies"
   },
   "common": { "loading": "Ładowanie...", "error": "Błąd", "retry": "Ponów", "close": "Zamknij", "back": "Wstecz", "next": "Dalej", "previous": "Poprzedni" },
-  "notFound": {
-    "title": "Nie znaleziono strony",
-    "returnHome": "Wróć do biblioteki",
-    "browseCollection": "Zobacz Kolekcję",
-    "description": "Wygląda na to, że ta strona zaginęła w rozległej bibliotece internetu."
-  }
+  "notFound": { "title": "Nie znaleziono strony", "returnHome": "Wróć do biblioteki", "description": "Wygląda na to, że ta strona zaginęła w rozległej bibliotece internetu." }
 }

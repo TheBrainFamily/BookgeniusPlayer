@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { BookOpen, Home, Search, Sparkles } from "lucide-react";
+import { BookOpen, Home, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@platform/components/ui/button";
 import library404Image from "@platform/assets/library-404.png";
@@ -51,12 +51,7 @@ const NotFound = () => {
           {/* Literary-themed error message */}
           <div className="mb-8 space-y-4">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">{t("notFound.title")}</h2>
-            <p className="text-xl text-muted-foreground font-light leading-relaxed">
-              {t(
-                "notFound.description",
-                "It seems this page has been lost in the vast library of the internet. The story you're looking for might have been moved to a different shelf, or perhaps it was never written at all.",
-              )}
-            </p>
+            <p className="text-xl text-muted-foreground font-light leading-relaxed">{t("notFound.description")}</p>
           </div>
 
           {/* Action buttons */}
