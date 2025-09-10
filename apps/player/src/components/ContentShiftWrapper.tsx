@@ -39,14 +39,14 @@ export const ContentShiftWrapper: React.FC = () => {
       // Shift content left by adding transform and adjusting layout
       bookContainer.style.transform = isPlayFormat ? "translateX(-18%)" : "translateX(-13%)";
       // Preserve opacity transition and add transform transition
-      bookContainer.style.transition = `${opacityTransition}, transform 0.3s ease-in-out`;
+      bookContainer.style.transition = `${opacityTransition}, transform 0.3s ease-out`;
       bookContainer.style.width = "80%";
       bookContainer.style.maxWidth = "calc(120rem * 0.8)";
     } else {
       // Reset to original position for small screens or when not shifted
       bookContainer.style.transform = "translateX(0)";
       // Preserve opacity transition and add transform transition
-      bookContainer.style.transition = `${opacityTransition}, transform 0.3s ease-in-out`;
+      bookContainer.style.transition = `${opacityTransition}, transform 0.3s ease-out`;
       bookContainer.style.width = "100%";
       bookContainer.style.maxWidth = "120rem";
     }
