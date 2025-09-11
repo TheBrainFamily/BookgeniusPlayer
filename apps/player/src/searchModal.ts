@@ -317,10 +317,18 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
         }
       }
 
+      console.log("PINGWING wordsBefore", wordsBefore);
+      console.log("PINGWING wordsAfter", wordsAfter);
+      console.log("PINGWING characterHTML", characterHTML);
+      console.log("PINGWING characterSlugMissingPunctuation", characterSlugMissingPunctuation);
+
       // Combine context
       const before = wordsBefore.slice(-10).join(" ");
       const after = wordsAfter.slice(0, 10).join(" ");
       context = `${before ? before + " " : ""}${characterHTML}${characterSlugMissingPunctuation}${after ? " " + after : ""}`;
+
+      // Remove space before punctuation marks
+      context = context.replace(/\s+([.,;:!?])/g, "$1");
 
       if (context.trim()) {
         results.push({ html: context.trim(), offset: getTextOffset(tempDiv, characterElement) });
