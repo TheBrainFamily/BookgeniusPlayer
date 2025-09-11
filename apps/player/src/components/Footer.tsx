@@ -28,7 +28,7 @@ const Footer = () => {
 
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsLargeScreen(window.innerWidth >= 1280);
+      setIsLargeScreen(window.innerWidth >= 1280 && window.innerWidth <= 2000);
     };
 
     checkScreenSize();
@@ -65,7 +65,7 @@ const Footer = () => {
                 )}
               >
                 <CharactersOnStagePanel />
-                <BottomInput className={cn("max-w-[800px]", shouldShiftFooter ? "max-w-[600px]" : "")} onSubmit={sendMessage} />
+                <BottomInput className={cn("max-w-[800px]")} onSubmit={sendMessage} />
               </div>
             </>
           ) : (

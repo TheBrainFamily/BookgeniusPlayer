@@ -1673,7 +1673,7 @@ export async function startFirstTrack(trackId: string): Promise<boolean> {
   }
 }
 
-export async function transitionToTrack(targetId: string): Promise<boolean> {
+export async function transitionToTrack(targetId: string, options?: { manual?: boolean }): Promise<boolean> {
   console.log(`transitionToTrack: Attempting to transition to targetId='${targetId}'. Current: '${currentTrackId}', Transitioning: ${isTransitioning}, Next: '${nextTrackId}'`);
   if (!audioContext) {
     console.error("transitionToTrack: AudioContext not ready.");
@@ -1712,6 +1712,24 @@ export async function transitionToTrack(targetId: string): Promise<boolean> {
     currentTrackId = null;
     currentTrackIndexInSection = -1;
     return await startFirstTrack(targetId);
+  }
+
+  // If this is a user-initiated/manual transition, perform an immediate cut (no crossfade)
+  if (options?.manual === true) {
+    console.log(`transitionToTrack: Manual transition requested. Performing immediate cut to '${targetId}'.`);
+    const oldTrackId = currentTrackId;
+    // Stop current track immediately
+    stopTrackInternal(currentTrackId);
+    currentTrackId = null;
+    currentTrackIndexInSection = -1;
+
+    const started = await startFirstTrack(targetId);
+    if (started) {
+      console.log(`transitionToTrack: Immediate cut from '${oldTrackId}' to '${targetId}' succeeded (manual).`);
+    } else {
+      console.warn(`transitionToTrack: Immediate cut from '${oldTrackId}', but failed to start '${targetId}' (manual).`);
+    }
+    return started;
   }
 
   const transitionPointTime = findNextTransitionPoint(currentTrackId);
