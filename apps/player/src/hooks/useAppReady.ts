@@ -221,7 +221,10 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
       const urlMatch = backgroundImage.match(/url\(['"]?([^'"]+)['"]?\)/);
       if (!urlMatch) return Promise.resolve(false);
 
-      const imageUrl = getBookAssetUrl(urlMatch[1].split("/").pop());
+      const imageUrl = urlMatch[1];
+
+      // console.log('226: urlMatch[1].split("/").pop() BANG!', urlMatch[1].split("/").pop());
+      // console.log("227: imageUrl BANG!", imageUrl);
 
       return new Promise((resolve) => {
         const img = new Image();
