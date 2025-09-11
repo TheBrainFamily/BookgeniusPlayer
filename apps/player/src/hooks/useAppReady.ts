@@ -34,7 +34,7 @@ const useVideoReadiness = ({ videoTimeoutMs = 30000, minSplashMs = 1500, postRea
   const [videoBReady, setVideoBReady] = useState(false);
   const [postReadyDelayElapsed, setPostReadyDelayElapsed] = useState(false);
   const [minSplashElapsed, setMinSplashElapsed] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [videoBackgroundReady, setVideoBackgroundReady] = useState(false);
 
   const videoTimeoutIdRef = useRef<TimeoutId>(null);
   const postReadyDelayTimeoutIdRef = useRef<TimeoutId>(null);
@@ -130,14 +130,15 @@ const useVideoReadiness = ({ videoTimeoutMs = 30000, minSplashMs = 1500, postRea
   useEffect(() => {
     const videosReady = videoAReady || videoBReady;
     if (videosReady && postReadyDelayElapsed && minSplashElapsed) {
-      setReady(true);
+      setVideoBackgroundReady(true);
     }
   }, [videoAReady, videoBReady, postReadyDelayElapsed, minSplashElapsed]);
 
-  return { ready };
+  return { videoBackgroundReady };
 };
 
 const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {}) => {
+  const [imageBackgroundReady, setImageBackgroundReady] = useState(false);
   const allCharacters = useMemo(() => getCharactersData(), []);
   const timeoutIdsRef = useRef<Set<TimeoutId>>(new Set());
 
@@ -208,15 +209,61 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
     };
   }, []);
 
-  return { loadImages };
+  useEffect(() => {
+    const bgImageA = document.getElementById("bg-image-a") as HTMLImageElement | null;
+    const bgImageB = document.getElementById("bg-image-b") as HTMLImageElement | null;
+
+    const isBackgroundImageLoaded = (bgImage: HTMLImageElement | null): Promise<boolean> => {
+      if (!bgImage || !bgImage.style.backgroundImage) return Promise.resolve(false);
+
+      // Extract URL from backgroundImage style (remove url() wrapper and quotes)
+      const backgroundImage = bgImage.style.backgroundImage;
+      const urlMatch = backgroundImage.match(/url\(['"]?([^'"]+)['"]?\)/);
+      if (!urlMatch) return Promise.resolve(false);
+
+      const imageUrl = getBookAssetUrl(urlMatch[1].split("/").pop());
+
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+
+        // Set timeout for image loading
+        const timeoutId = window.setTimeout(() => resolve(false), imageTimeoutMs);
+
+        img.onload = () => {
+          clearTimeout(timeoutId);
+          resolve(true);
+        };
+        img.onerror = () => {
+          clearTimeout(timeoutId);
+          resolve(false);
+        };
+
+        img.src = imageUrl;
+      });
+    };
+
+    const checkImages = async () => {
+      const [isALoaded, isBLoaded] = await Promise.all([isBackgroundImageLoaded(bgImageA), isBackgroundImageLoaded(bgImageB)]);
+
+      if (isALoaded || isBLoaded) {
+        setImageBackgroundReady(true);
+      }
+    };
+
+    checkImages();
+  }, [imageTimeoutMs]);
+
+  return { loadImages, imageBackgroundReady };
 };
 
 export const useAppReady = () => {
-  const { ready } = useVideoReadiness({ videoTimeoutMs: 30000, minSplashMs: 100, postReadyDelayMs: 100 });
-  const { loadImages } = useImageReadiness({ imageTimeoutMs: 30000 });
+  const { videoBackgroundReady } = useVideoReadiness({ videoTimeoutMs: 30000, minSplashMs: 100, postReadyDelayMs: 100 });
+  const { loadImages, imageBackgroundReady } = useImageReadiness({ imageTimeoutMs: 30000 });
 
   useEffect(() => {
-    if (!ready) return;
+    if (!videoBackgroundReady && !imageBackgroundReady) return;
 
     void loadImages()
       .then(() => {
@@ -227,5 +274,5 @@ export const useAppReady = () => {
         console.error("Failed to load images:", error);
         window.dispatchEvent(new CustomEvent("appReady"));
       });
-  }, [ready, loadImages]);
+  }, [videoBackgroundReady, loadImages, imageBackgroundReady]);
 };
