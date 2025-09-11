@@ -330,6 +330,30 @@ function activateMediaInRange(
           highlightCharacter(character, openCharacterDetailsModal);
         }
       });
+
+      // Add click handler to whole paragraph when it's a character line
+      if (p.dataset.isCharacter === "true" && p.dataset.clickListenerAttached !== "true") {
+        const handler = (e: PointerEvent) => {
+          if (e.metaKey || e.ctrlKey) return;
+          e.preventDefault();
+          e.stopPropagation();
+
+          const playRow = p.closest(".play-row") as HTMLElement | null;
+          const placeholder = (playRow ?? p).querySelector<HTMLSpanElement>(".character-placeholder");
+          const characterSlug = placeholder?.dataset.character;
+          if (!characterSlug) return;
+
+          const isTalking = placeholder?.dataset.isTalking === "true";
+          const talkingSrc = getTalkingMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
+          const listeningSrc = getListeningMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
+          const mediaSrc = isTalking ? talkingSrc : listeningSrc;
+
+          openCharacterDetailsModal({ characterSlug, isVideo: !!mediaSrc && isVideoFile(mediaSrc), mediaSrc: mediaSrc || "" });
+        };
+
+        p.addEventListener("pointerup", handler, { passive: false });
+        p.dataset.clickListenerAttached = "true";
+      }
     }
   });
 }
