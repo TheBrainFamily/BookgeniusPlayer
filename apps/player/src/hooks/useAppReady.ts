@@ -223,16 +223,11 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
 
       const imageUrl = urlMatch[1];
 
-      // console.log('226: urlMatch[1].split("/").pop() BANG!', urlMatch[1].split("/").pop());
-      // console.log("227: imageUrl BANG!", imageUrl);
-
       return new Promise((resolve) => {
         const img = new Image();
-        img.onload = () => resolve(true);
-        img.onerror = () => resolve(false);
 
-        // Set timeout for image loading
         const timeoutId = window.setTimeout(() => resolve(false), imageTimeoutMs);
+        timeoutIdsRef.current.add(timeoutId);
 
         img.onload = () => {
           clearTimeout(timeoutId);
@@ -255,7 +250,7 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
       }
     };
 
-    checkImages();
+    void checkImages();
   }, [imageTimeoutMs]);
 
   return { loadImages, imageBackgroundReady };
