@@ -164,6 +164,11 @@ const AudioPlayer = () => {
     };
   }, [isMuted, isPlaying]);
 
+  // Determine current track position within playlist to disable prev/next at boundaries
+  const currentTrackIndexInPlaylist = playlistTracks.findIndex((track) => track.id === currentTrackIdFromState);
+  const isFirstTrack = playlistTracks.length > 0 && currentTrackIndexInPlaylist === 0;
+  const isLastTrack = playlistTracks.length > 0 && currentTrackIndexInPlaylist === playlistTracks.length - 1;
+
   const handleVolumeChange = (value: number[]) => {
     const newVolume = value[0];
 
@@ -227,7 +232,7 @@ const AudioPlayer = () => {
 
     setCurrentTrackIdFromState(nextTrackId);
 
-    await transitionToTrack(nextTrackId);
+    await transitionToTrack(nextTrackId, { manual: true });
   };
 
   const skipToPrevious = async () => {
@@ -244,7 +249,7 @@ const AudioPlayer = () => {
 
     setCurrentTrackIdFromState(prevTrackId);
 
-    await transitionToTrack(prevTrackId);
+    await transitionToTrack(prevTrackId, { manual: true });
   };
 
   const handleDownloadTrack = (id: string, title: string) => {
@@ -433,13 +438,15 @@ const AudioPlayer = () => {
                         <motion.button
                           onClick={(e) => {
                             e.stopPropagation();
+                            if (isFirstTrack) return;
                             skipToPrevious();
                           }}
-                          className="hover:text-white/80 p-2 rounded-full cursor-pointer"
+                          className={cn("hover:text-white/80 p-2 rounded-full", isFirstTrack ? "opacity-40 cursor-not-allowed" : "cursor-pointer")}
                           whileHover="hover"
                           whileTap="tap"
                           variants={variants.navButtonHover}
                           title="Previous track"
+                          disabled={isFirstTrack}
                         >
                           <SkipBack className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
                         </motion.button>
@@ -475,13 +482,15 @@ const AudioPlayer = () => {
                         <motion.button
                           onClick={(e) => {
                             e.stopPropagation();
+                            if (isLastTrack) return;
                             skipToNext();
                           }}
-                          className="hover:text-white/80 p-2 rounded-full cursor-pointer"
+                          className={cn("hover:text-white/80 p-2 rounded-full", isLastTrack ? "opacity-40 cursor-not-allowed" : "cursor-pointer")}
                           whileHover="hover"
                           whileTap="tap"
                           variants={variants.navButtonHover}
                           title="Next track"
+                          disabled={isLastTrack}
                         >
                           <SkipForward className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
                         </motion.button>
@@ -502,7 +511,7 @@ const AudioPlayer = () => {
                             whileHover="hover"
                             onClick={(e) => {
                               e.stopPropagation();
-                              transitionToTrack(track.id);
+                              transitionToTrack(track.id, { manual: true });
                             }}
                           >
                             <span className={"text-sm md:text-md text-white/70 playlist-item-title"}>{track.title}</span>
