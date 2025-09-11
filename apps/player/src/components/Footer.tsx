@@ -65,7 +65,7 @@ const Footer = () => {
                 )}
               >
                 <CharactersOnStagePanel />
-                <BottomInput className={cn("max-w-[800px]", shouldShiftFooter ? "max-w-[600px]" : "")} onSubmit={sendMessage} />
+                <BottomInput className={cn("max-w-[800px]")} onSubmit={sendMessage} />
               </div>
             </>
           ) : (
