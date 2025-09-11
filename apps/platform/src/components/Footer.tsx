@@ -61,7 +61,7 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
             </div>
           </div>
 
-          {/* Contact */}
+          {/* Help Center */}
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-library-gold">{t("footer.helpCenter")}</h4>
             <div className="space-y-2 flex flex-col">
