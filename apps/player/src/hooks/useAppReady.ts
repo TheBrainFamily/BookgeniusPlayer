@@ -231,10 +231,12 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
 
         img.onload = () => {
           clearTimeout(timeoutId);
+          timeoutIdsRef.current.delete(timeoutId);
           resolve(true);
         };
         img.onerror = () => {
           clearTimeout(timeoutId);
+          timeoutIdsRef.current.delete(timeoutId);
           resolve(false);
         };
 
