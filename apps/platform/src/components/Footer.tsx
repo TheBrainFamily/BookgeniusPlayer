@@ -65,14 +65,14 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-library-gold">{t("footer.helpCenter")}</h4>
             <div className="space-y-2 flex flex-col">
-              {[t("footer.privacyPolicy"), t("footer.termsOfService"), t("footer.cookiePolicy")].map((author) => (
+              {["privacyPolicy", "termsOfService", "cookiePolicy"].map((linkKey) => (
                 <Button
-                  key={author}
+                  key={linkKey}
                   variant="ghost"
-                  onClick={() => onSearchQuery(author)}
+                  onClick={() => onSearchQuery(t(`footer.${linkKey}`))}
                   className="p-0 h-auto text-muted-foreground hover:text-library-gold hover:bg-transparent text-left justify-start w-fit"
                 >
-                  {author}
+                  {t(`footer.${linkKey}`)}
                 </Button>
               ))}
             </div>
