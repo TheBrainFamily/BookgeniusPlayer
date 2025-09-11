@@ -1,12 +1,8 @@
 import { useEffect, useCallback, useRef } from "react";
+
 import { useElementVisibilityStore } from "@player/stores/elementVisibility.store";
 import useSplashHidden from "./useSplashHidden";
 
-import { useLocation } from "@player/state/LocationContext";
-import { getCurrentLocation } from "@player/helpers/paragraphsNavigation";
-
-const SCROLL_HIDE_DELAY = 3000;
-const SCROLL_DEBOUNCE_DELAY = 25;
 const TOUCH_MOVE_THRESHOLD = 30;
 const TAP_TIME_THRESHOLD = 500;
 
@@ -43,79 +39,18 @@ export const useElementVisibility = () => {
   const isSplashHidden = useSplashHidden();
 
   // Store actions (these don't change, so they won't cause re-renders)
-  const { showAllElements, handleScrollStart, handleScrollEnd, clearInactivityTimer, resetInactivityTimer } = useElementVisibilityStore();
+  const { showAllElements, clearInactivityTimer, resetInactivityTimer } = useElementVisibilityStore();
 
   const isInitializedRef = useRef(false);
-  const scrollEndDebounceRef = useRef<number | null>(null);
-  const isCurrentlyScrollingRef = useRef(false);
   const rafIdRef = useRef<number | null>(null);
   const lastTapTimeRef = useRef(0);
   const preventClickRef = useRef(false);
-  const { setLocation } = useLocation();
 
   const stateRef = useRef({ areElementsVisible, isScrollMode, touch });
 
   useEffect(() => {
     stateRef.current = { areElementsVisible, isScrollMode, touch };
   }, [areElementsVisible, isScrollMode, touch]);
-
-  const cancelPendingRaf = useCallback(() => {
-    if (rafIdRef.current !== null) {
-      cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = null;
-    }
-  }, []);
-
-  const handleScrollEndForUpdatingPosition = useCallback(() => {
-    try {
-      const currentLocation = getCurrentLocation();
-      if (currentLocation) {
-        // we need to update the lastScrollTimestamp to the current time to avoid the progress bar from jumping
-        setLocation({ ...currentLocation, lastScrollTimestamp: Date.now() });
-      }
-    } catch (error) {
-      console.warn("Failed to update paragraph progress:", error);
-    }
-  }, [setLocation]);
-
-  const handleScroll = useCallback(() => {
-    if (scrollEndDebounceRef.current) {
-      clearTimeout(scrollEndDebounceRef.current);
-    }
-
-    if (!isCurrentlyScrollingRef.current) {
-      clearInactivityTimer();
-      isCurrentlyScrollingRef.current = true;
-
-      // Use requestAnimationFrame to update UI state only once per frame
-      cancelPendingRaf();
-
-      rafIdRef.current = requestAnimationFrame(() => {
-        // Only update the store if we need to change the UI
-        if (!stateRef.current.isScrollMode) {
-          handleScrollStart();
-        }
-        rafIdRef.current = null;
-      });
-    }
-
-    scrollEndDebounceRef.current = window.setTimeout(() => {
-      isCurrentlyScrollingRef.current = false;
-      scrollEndDebounceRef.current = null;
-
-      cancelPendingRaf();
-
-      rafIdRef.current = requestAnimationFrame(() => {
-        handleScrollEnd();
-        // After scroll ends, restart the inactivity timer if elements are visible
-        const currentState = useElementVisibilityStore.getState();
-        if (currentState.areElementsVisible && !currentState.isScrollMode) {
-          resetInactivityTimer();
-        }
-        rafIdRef.current = null;
-      });
-    }, SCROLL_HIDE_DELAY);
-  }, [clearInactivityTimer, cancelPendingRaf, handleScrollStart, handleScrollEnd, resetInactivityTimer]);
 
   useEffect(() => {
     if (isInitializedRef.current || !isSplashHidden) {
@@ -223,18 +158,6 @@ export const useElementVisibility = () => {
     [stableHandleTap],
   );
 
-  const scrollDebounceRef = useRef<number | null>(null);
-  const stableHandleScroll = useCallback(() => {
-    handleScroll();
-
-    if (scrollDebounceRef.current) {
-      clearTimeout(scrollDebounceRef.current);
-    }
-    scrollDebounceRef.current = window.setTimeout(() => {
-      handleScrollEndForUpdatingPosition();
-    }, SCROLL_DEBOUNCE_DELAY);
-  }, [handleScroll, handleScrollEndForUpdatingPosition]);
-
   useEffect(() => {
     if (!isInitializedRef.current) return;
 
@@ -243,25 +166,11 @@ export const useElementVisibility = () => {
     document.addEventListener("touchmove", stableHandleTouchMove, { passive: true });
     document.addEventListener("touchend", stableHandleTouchEnd, true);
 
-    const contentContainer = document.getElementById("content-container");
-    if (contentContainer) {
-      contentContainer.addEventListener("scroll", stableHandleScroll, { passive: true });
-    } else {
-      window.addEventListener("scroll", stableHandleScroll, { passive: true });
-    }
-
     return () => {
       document.removeEventListener("click", stableHandleTap, true);
       document.removeEventListener("touchstart", stableHandleTouchStart);
       document.removeEventListener("touchmove", stableHandleTouchMove);
       document.removeEventListener("touchend", stableHandleTouchEnd, true);
-
-      const contentContainer = document.getElementById("content-container");
-      if (contentContainer) {
-        contentContainer.removeEventListener("scroll", stableHandleScroll);
-      } else {
-        window.removeEventListener("scroll", stableHandleScroll);
-      }
 
       if (rafIdRef.current) {
         cancelAnimationFrame(rafIdRef.current);
@@ -270,18 +179,7 @@ export const useElementVisibility = () => {
 
       clearInactivityTimer();
     };
-  }, [isInitializedRef.current, stableHandleTap, stableHandleTouchStart, stableHandleTouchMove, stableHandleTouchEnd, stableHandleScroll, clearInactivityTimer]);
-
-  useEffect(() => {
-    return () => {
-      if (scrollEndDebounceRef.current) {
-        clearTimeout(scrollEndDebounceRef.current);
-        scrollEndDebounceRef.current = null;
-      }
-
-      clearInactivityTimer();
-    };
-  }, [clearInactivityTimer]);
+  }, [stableHandleTap, stableHandleTouchStart, stableHandleTouchMove, stableHandleTouchEnd, clearInactivityTimer]);
 
   return { areElementsVisible, isScrollMode };
 };
