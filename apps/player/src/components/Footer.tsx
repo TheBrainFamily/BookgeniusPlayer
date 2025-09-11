@@ -28,7 +28,7 @@ const Footer = () => {
 
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsLargeScreen(window.innerWidth >= 1280);
+      setIsLargeScreen(window.innerWidth >= 1280 && window.innerWidth <= 2000);
     };
 
     checkScreenSize();
