@@ -27,6 +27,7 @@ import { OptionalElement } from "./OptionalElement";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { CoverArt } from "./CoverArt";
 import { useOptionalElementVisibility } from "@player/stores/elementVisibility.store";
+import { getBackgroundSongsForBook } from "@player/genericBookDataGetters/getBackgroundSongsForBook";
 
 const AudioPlayer = () => {
   const { t } = useTranslation();
@@ -48,6 +49,7 @@ const AudioPlayer = () => {
   const [playlistTracks, setPlaylistTracks] = useState<{ id: string; title: string; duration: number }[]>([]);
   const [currentTrackIdFromState, setCurrentTrackIdFromState] = useState<string | null>(null);
   const areElementsVisible = useOptionalElementVisibility();
+  const [hasBackgroundSongs, setHasBackgroundSongs] = useState(false);
 
   useEffect(() => {
     if (!areElementsVisible) {
@@ -55,6 +57,17 @@ const AudioPlayer = () => {
       setIsVolumeOpen(false);
     }
   }, [areElementsVisible]);
+
+  useEffect(() => {
+    try {
+      const songs = getBackgroundSongsForBook();
+      const available = Array.isArray(songs) && songs.some((s) => Array.isArray(s.files) && s.files.length > 0);
+      setHasBackgroundSongs(available);
+    } catch {
+      // Not loaded or unavailable
+      setHasBackgroundSongs(false);
+    }
+  }, []);
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -269,8 +282,8 @@ const AudioPlayer = () => {
     document.body.removeChild(link);
   };
 
-  // Hide the audio player UI entirely when there are no background songs
-  if (playlistTracks.length === 0) {
+  // Hide the audio player UI entirely when the book has no background songs
+  if (!hasBackgroundSongs) {
     return null;
   }
 
