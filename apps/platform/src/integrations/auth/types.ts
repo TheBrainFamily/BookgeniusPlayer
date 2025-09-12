@@ -1,4 +1,17 @@
-export type AuthCtx = { ready: boolean; isSignedIn: boolean; openSignIn: () => void; signOut?: () => void; userId?: string; email?: string | null };
+type AuthCtxComponents = {
+  SignIn?: React.ComponentType;
+  SignUp?: React.ComponentType;
+}
+
+export type AuthCtx = {
+  ready: boolean;
+  isSignedIn: boolean;
+  openSignIn: () => void;
+  signOut?: () => void;
+  userId?: string;
+  email?: string | null
+  components?: AuthCtxComponents;
+}
 
 export interface AuthModule {
   AuthProvider: React.ComponentType<{ children: React.ReactNode }>;
