@@ -11,19 +11,30 @@ function updateInlineAvatarTalkingState(container: HTMLDivElement, isTalking: bo
 
   const listeningVideo = container.querySelector('video[data-state="listens"]') as HTMLVideoElement;
   const speakingVideo = container.querySelector('video[data-state="speaks"]') as HTMLVideoElement;
+
   if (!listeningVideo || !speakingVideo) return;
 
-  // Swap opacity
-  const nextL = isTalking ? "0" : "1";
-  const nextS = isTalking ? "1" : "0";
+  const activeVideo = isTalking ? speakingVideo : listeningVideo;
+  const inactiveVideo = isTalking ? listeningVideo : speakingVideo;
+  const activeOpacity = "1";
+  const inactiveOpacity = "0";
 
-  if (listeningVideo.style.opacity !== nextL) listeningVideo.style.opacity = nextL;
-  if (speakingVideo.style.opacity !== nextS) speakingVideo.style.opacity = nextS;
+  if (activeVideo.style.opacity !== activeOpacity) {
+    activeVideo.style.opacity = activeOpacity;
+  }
+  if (inactiveVideo.style.opacity !== inactiveOpacity) {
+    inactiveVideo.style.opacity = inactiveOpacity;
+  }
 
-  // Keep the correct video playing
-  const toPlay = isTalking ? speakingVideo : listeningVideo;
-  if (toPlay.paused) {
-    toPlay.play().catch((e) => console.warn("Video play failed:", e));
+  // play active, pause inactive
+  if (activeVideo.paused) {
+    activeVideo.play().catch((e) => {
+      console.warn("Failed to play active video:", e);
+    });
+  }
+
+  if (!inactiveVideo.paused) {
+    inactiveVideo.pause();
   }
 }
 
@@ -37,13 +48,13 @@ export function usePlayCharacterSelect() {
   const currentSpeakers = useCurrentSpeakers(location, allCharacters, isPlayFormat);
 
   useEffect(() => {
-    if (!isPlayFormat) return;
-    if (!location) return;
+    if (!isPlayFormat || !location) return;
 
     const chapterSelector = `section[data-chapter="${location.currentChapter}"]`;
     const paragraphSelector = `${chapterSelector} [data-index="${location.currentParagraph}"]`;
 
     const settleCharacter = () => {
+      // Find current play row with fallback logic
       let currentPlayRow = document.querySelector(paragraphSelector)?.closest(".play-row");
       if (!currentPlayRow) {
         currentPlayRow = document.querySelector(`${chapterSelector} .active-paragraph`)?.closest(".play-row") || null;
@@ -52,7 +63,8 @@ export function usePlayCharacterSelect() {
       const chapterEl = document.querySelector(chapterSelector);
       if (!chapterEl) return;
 
-      const chapterInlineAvatars = chapterEl.querySelectorAll<HTMLDivElement>(".play-row .inline-avatar");
+      const chapterInlineAvatars = chapterEl.querySelectorAll<HTMLDivElement>(".play-row .inline-avatar[data-character]");
+
       chapterInlineAvatars.forEach((container) => {
         const slug = container.dataset.character;
         if (!slug) return;
@@ -60,15 +72,22 @@ export function usePlayCharacterSelect() {
         const isInCurrentPlayRow = !!currentPlayRow && currentPlayRow.contains(container);
         const isSpeaking = isInCurrentPlayRow && currentSpeakers.includes(slug);
 
-        updateInlineAvatarTalkingState(container, isSpeaking);
+        // prevent one failing avatar from breaking others
+        try {
+          updateInlineAvatarTalkingState(container, isSpeaking);
 
-        const placeholder = container.closest(".character-placeholder") as HTMLSpanElement | null;
-        if (placeholder) placeholder.dataset.isTalking = String(isSpeaking);
+          const placeholder = container.closest(".character-placeholder") as HTMLSpanElement | null;
+          if (placeholder) {
+            placeholder.dataset.isTalking = String(isSpeaking);
+          }
+        } catch (error) {
+          console.warn(`Failed to update avatar state for character ${slug}:`, error);
+        }
       });
     };
 
-    // Use rAF to ensure DOM is updated
-    const raf = requestAnimationFrame(settleCharacter);
-    return () => cancelAnimationFrame(raf);
-  }, [isPlayFormat, location, location.currentChapter, location.currentParagraph, currentSpeakers]);
+    const rafId = requestAnimationFrame(settleCharacter);
+    return () => cancelAnimationFrame(rafId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPlayFormat, location?.currentChapter, location?.currentParagraph, currentSpeakers]);
 }
