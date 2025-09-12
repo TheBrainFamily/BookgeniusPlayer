@@ -547,8 +547,10 @@
           object-fit: cover;
         }
 
-        .inline-avatar:hover {
-          transform: scale(1.25);
+        @media (hover: hover) {
+          .inline-avatar:hover {
+            transform: scale(1.25);
+          }
         }
       }
 

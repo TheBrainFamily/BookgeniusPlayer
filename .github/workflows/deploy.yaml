@@ -164,8 +164,8 @@ jobs:
           VITE_PAYMENTS_PROVIDER: ${{ vars.VITE_PAYMENTS_PROVIDER }}
           VITE_CLERK_DOMAIN: "bookgeniusz.pl"
           VITE_CLERK_IS_SATELLITE: "true"
-          VITE_PUBLIC_CLERK_SIGN_IN_URL: https://accounts.bookgenius.net/sign-in
-          VITE_PUBLIC_CLERK_SIGN_UP_URL: https://accounts.bookgenius.net/sign-up
+          VITE_PUBLIC_CLERK_SIGN_IN_URL: https://bookgenius.net/sign-in
+          VITE_PUBLIC_CLERK_SIGN_UP_URL: https://bookgenius.net/sign-up
           VITE_SUPPORT_EMAIL: support@bookgeniusz.pl
           CI: true
 

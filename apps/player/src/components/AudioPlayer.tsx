@@ -208,6 +208,11 @@ const AudioPlayer = () => {
     const handlePlaylistChange = (event: CustomEvent<{ id: string; title: string; duration: number }[] | null>) => {
       console.log("AudioPlayer: Received playlist change event", event.detail);
       setPlaylistTracks(event.detail || []);
+      if (!event.detail || event.detail.length === 0) {
+        setShowSongNotification(false);
+        setIsBigPlayerOpen(false);
+        setIsVolumeOpen(false);
+      }
     };
 
     let notificationTimer: ReturnType<typeof setTimeout> | null = null;
@@ -362,6 +367,11 @@ const AudioPlayer = () => {
     link.click();
     document.body.removeChild(link);
   };
+
+  // Hide the audio player UI entirely when there are no background songs
+  if (playlistTracks.length === 0) {
+    return null;
+  }
 
   return (
     <>
