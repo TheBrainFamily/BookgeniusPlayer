@@ -38,8 +38,6 @@ interface ElementVisibilityState {
   showAllElements: () => void;
   hideAllElements: (reason?: HideReason) => void;
   handleScreenTap: () => void;
-  handleScrollStart: () => void;
-  handleScrollEnd: () => void;
   pauseAllTimers: () => void;
   startAllTimers: () => void;
   clearInactivityTimer: () => void;
@@ -135,16 +133,6 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
           // If elements are visible and we're not in scroll mode, hide them
           set({ areElementsVisible: false, isScrollMode: false, lastHideReason: "tap" });
         }
-      },
-
-      handleScrollStart: () => {
-        set({ isScrollMode: true });
-      },
-
-      handleScrollEnd: () => {
-        // After scroll ends, exit scroll mode but keep elements in their previous visibility state
-        // This allows elements to show up on tap if they were visible before scrolling
-        set({ isScrollMode: false });
       },
 
       // Selectors for better performance
