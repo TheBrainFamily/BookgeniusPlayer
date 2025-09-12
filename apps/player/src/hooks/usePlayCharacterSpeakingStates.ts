@@ -38,7 +38,7 @@ function updateInlineAvatarTalkingState(container: HTMLDivElement, isTalking: bo
   }
 }
 
-export function usePlayCharacterSelect() {
+export function usePlayCharacterSpeakingStates() {
   const { location } = useLocation();
 
   const bookData = useMemo(() => getBookData(), []);
