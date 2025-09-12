@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Play, Pause, SkipForward, SkipBack, ListMusic, BookHeadphones, Volume2, VolumeX, Download } from "lucide-react";
 import { motion, AnimatePresence, Variants, Transition, Easing } from "motion/react";
 import useLocalStorageState from "use-local-storage-state";
@@ -27,12 +27,15 @@ import { OptionalElement } from "./OptionalElement";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { CoverArt } from "./CoverArt";
 import { useOptionalElementVisibility } from "@player/stores/elementVisibility.store";
+import { isMobileOrTablet } from "@player/utils/isMobileOrTablet";
 
 const AudioPlayer = () => {
   const { t } = useTranslation();
   const { hasAudiobook, slug } = getBookData();
 
   const isInitialLoad = useRef(true);
+  const hideButtonTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const speakerButtonRef = useRef<HTMLDivElement | null>(null);
 
   const [volume, setVolume] = useLocalStorageState("volume", { defaultValue: getMasterVolume() ?? 0.5 });
   const [balance, setBalance] = useLocalStorageState("balance", { defaultValue: 0.5 });
@@ -49,12 +52,108 @@ const AudioPlayer = () => {
   const [currentTrackIdFromState, setCurrentTrackIdFromState] = useState<string | null>(null);
   const areElementsVisible = useOptionalElementVisibility();
 
+  const [showSpeakerButton, setShowSpeakerButton] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
+
   useEffect(() => {
     if (!areElementsVisible) {
       setIsBigPlayerOpen(false);
       setIsVolumeOpen(false);
     }
   }, [areElementsVisible]);
+
+  const hideSpeakerButtonWithFadeOut = useCallback(() => {
+    if (isFadingOut) return;
+
+    const FADE_DURATION = 4;
+
+    setIsFadingOut(true);
+
+    if (speakerButtonRef.current) {
+      speakerButtonRef.current.style.transition = `opacity ${FADE_DURATION}s ease-in-out`;
+      speakerButtonRef.current.style.opacity = "0";
+    }
+
+    const timeoutId = setTimeout(() => {
+      setShowSpeakerButton(false);
+      setIsFadingOut(false);
+    }, FADE_DURATION * 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [isFadingOut]);
+
+  useEffect(() => {
+    const observeVisibility = () => {
+      const playerTabIsFocused = !document.hidden;
+
+      if (isMobileOrTablet()) {
+        if (!playerTabIsFocused) {
+          if (isPlaying) {
+            togglePlay();
+          }
+          setShowSpeakerButton(false);
+        } else {
+          if (!isPlaying) {
+            setShowSpeakerButton(true);
+            setIsFadingOut(false);
+          } else {
+            setShowSpeakerButton(false);
+          }
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", observeVisibility);
+
+    return () => {
+      document.removeEventListener("visibilitychange", observeVisibility);
+    };
+  }, [isPlaying]);
+
+  // Reset opacity when button is shown
+  useEffect(() => {
+    if (showSpeakerButton && speakerButtonRef.current && !isFadingOut) {
+      speakerButtonRef.current.style.transition = "";
+      speakerButtonRef.current.style.opacity = "1";
+    }
+  }, [showSpeakerButton, isFadingOut]);
+
+  useEffect(() => {
+    if (!showSpeakerButton || !isMobileOrTablet()) {
+      if (hideButtonTimeoutRef.current) {
+        clearTimeout(hideButtonTimeoutRef.current);
+        hideButtonTimeoutRef.current = null;
+      }
+      return;
+    }
+
+    const contentContainer = document.getElementById("content-container");
+    if (!contentContainer) {
+      console.warn("content-container not found");
+      return;
+    }
+
+    const initialScrollY = contentContainer.scrollTop;
+
+    const handleScroll = () => {
+      const currentScrollY = contentContainer.scrollTop;
+      const scrolledDown = currentScrollY - initialScrollY;
+
+      if (scrolledDown >= 1000) {
+        hideSpeakerButtonWithFadeOut();
+      }
+    };
+
+    contentContainer.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      contentContainer.removeEventListener("scroll", handleScroll);
+      if (hideButtonTimeoutRef.current) {
+        clearTimeout(hideButtonTimeoutRef.current);
+        hideButtonTimeoutRef.current = null;
+      }
+    };
+  }, [hideSpeakerButtonWithFadeOut, showSpeakerButton]);
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -576,6 +675,52 @@ const AudioPlayer = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Independent Speaker Button - Top Right - Only shows when is met */}
+      {showSpeakerButton && (
+        <div
+          ref={speakerButtonRef}
+          className={cn("fixed top-4 right-4 z-50 bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center")}
+        >
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <motion.button
+                onClick={() => {
+                  togglePlay();
+
+                  if (hideButtonTimeoutRef.current) {
+                    clearTimeout(hideButtonTimeoutRef.current);
+                    hideButtonTimeoutRef.current = null;
+                    return;
+                  }
+
+                  hideButtonTimeoutRef.current = setTimeout(() => {
+                    hideSpeakerButtonWithFadeOut();
+                    hideButtonTimeoutRef.current = null;
+                  }, 3000);
+                }}
+                className="p-2 my-1 hover:text-white rounded-full cursor-pointer flex"
+                whileHover="hover"
+                whileTap="tap"
+                variants={variants.buttonHover}
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  {isPlaying ? (
+                    <motion.div key="playing" variants={variants.iconFadeScale}>
+                      <Volume2 className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
+                    </motion.div>
+                  ) : (
+                    <motion.div key="muted" variants={variants.iconFadeScale}>
+                      <VolumeX className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.button>
+            </TooltipTrigger>
+            <TooltipContent>{isPlaying ? t("pause_music") : t("resume_music")}</TooltipContent>
+          </Tooltip>
+        </div>
+      )}
     </>
   );
 };
