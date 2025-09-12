@@ -44,11 +44,11 @@ const AppWithAuth = () => {
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route
               path="/sign-in"
-              element={ <AuthComponentsWrapper signIn={true} useAuth={useAuth} fallbackComponent={NotFound} /> }
+              element={ <AuthComponentsWrapper componentName="SignIn" useAuth={useAuth} fallbackComponent={NotFound} /> }
             />
             <Route
               path="/sign-up"
-              element={ <AuthComponentsWrapper signUp={true} useAuth={useAuth} fallbackComponent={NotFound} /> }
+              element={ <AuthComponentsWrapper componentName="SignUp" useAuth={useAuth} fallbackComponent={NotFound} /> }
             />
             <Route
               path="/reader/"

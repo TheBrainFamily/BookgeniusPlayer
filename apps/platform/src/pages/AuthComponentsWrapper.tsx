@@ -1,55 +1,40 @@
 import type { AuthCtx } from "@platform/integrations/auth/types";
 
 type AuthComponentsWrapperProps = {
-  signIn?: boolean;
-  signUp?: boolean;
-  useAuth: () => {};
+  componentName: string;
+  useAuth: () => AuthCtx;
   fallbackComponent: React.ComponentType;
 }
 
+const Wrapper = ({ children }) => (
+  <div className="min-h-screen flex items-center justify-center">
+    {children}
+  </div>
+);
+
 const AuthComponentsWrapper = (props: AuthComponentsWrapperProps) => {
-  const { signIn, signUp, useAuth, fallbackComponent: FallbackComponent } = props;
+  const { componentName, useAuth, fallbackComponent: FallbackComponent } = props;
   const Fallback = () => FallbackComponent ? <FallbackComponent /> : null;
-  if (!signIn && !signUp) {
+  const authContext = useAuth();
+
+  if (!componentName) {
     return <Fallback />;
   }
 
-  const authContext = useAuth() as AuthCtx;
   if (!authContext.ready) {
     return null
   }
 
-  const Wrapper = ({ children }) => (
-    <div className="min-h-screen flex items-center justify-center">
-      {children}
-    </div>
-  );
-
-  if (signIn) {
-    if (!authContext.components?.SignIn) {
-      return <Fallback />;
-    }
-    const { SignIn } = authContext.components;
-    return (
-        <Wrapper>
-          <SignIn />
-        </Wrapper>
-      );
+  const ComponentToRender = authContext.components?.[componentName];
+  if (!ComponentToRender) {
+    return <Fallback />;
   }
 
-  if (signUp) {
-    if (!authContext.components?.SignUp) {
-      return <Fallback />;
-    }
-    const { SignUp } = authContext.components;
-    return (
+  return (
       <Wrapper>
-        <SignUp />
+        <ComponentToRender />
       </Wrapper>
     );
-  }
-
-  return null;
 }
 
 export default AuthComponentsWrapper;

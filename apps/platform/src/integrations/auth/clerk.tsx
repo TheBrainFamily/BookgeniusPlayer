@@ -13,8 +13,8 @@ const WidgetCtx = createContext<React.ComponentType | undefined>(undefined);
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [ClerkProvider, setClerkProvider] = useState<React.ComponentType<ClerkProviderProps> | null>(null);
-  const [SignInComponent, setSignInComponent] = useState<React.ComponentType | null>(null);
-  const [SignUpComponent, setSignUpComponent] = useState<React.ComponentType | null>(null);
+  const [SignInComponent, setSignInComponent] = useState<React.ComponentType | undefined>(undefined);
+  const [SignUpComponent, setSignUpComponent] = useState<React.ComponentType | undefined>(undefined);
   const [hooks, setHooks] = useState<{ useUser: () => UseUserReturn; useClerk: () => LoadedClerk; UserButton?: React.ComponentType } | null>(null);
   const [loadingState, setLoadingState] = useState<"loading" | "ready" | "error">("loading");
 
@@ -140,8 +140,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     "https://testclerk.aws.lucetius.pl",
   ];
 
-  let signInUrl = undefined;
-  let signUpUrl = undefined;
+  let signInUrl = "/sign-in";
+  let signUpUrl = "/sign-up";
 
   const signInUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_IN_URL;
   const signUpUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_UP_URL;
@@ -169,7 +169,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       <ClerkProvider
         localization={detectLanguageFromDomain() === "pl" ? plPL : enUS}
         publishableKey={publishableKey}
-        domain={isSatellite ? clerkDomainUrl : undefined}
+        domain={isSatellite ? clerkDomain : undefined}
         signInUrl={signInUrl}
         signUpUrl={signUpUrl}
         isSatellite={isSatellite}
