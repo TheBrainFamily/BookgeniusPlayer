@@ -179,7 +179,7 @@ export const useElementVisibility = () => {
 
       clearInactivityTimer();
     };
-  }, [stableHandleTap, stableHandleTouchStart, stableHandleTouchMove, stableHandleTouchEnd, clearInactivityTimer]);
+  }, [isInitializedRef.current, stableHandleTap, stableHandleTouchStart, stableHandleTouchMove, stableHandleTouchEnd, clearInactivityTimer]);
 
   return { areElementsVisible, isScrollMode };
 };
