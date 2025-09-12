@@ -176,27 +176,31 @@ export function highlightCharacter(characterEl: HTMLSpanElement, openCharacterDe
 
   if (!hasListeningMedia) return;
 
-  characterEl.addEventListener("pointerenter", () => {
-    if (hoverDebounceTimeout) clearTimeout(hoverDebounceTimeout);
-    if (HOVER_DEBOUNCE_MS > 0) {
-      hoverDebounceTimeout = window.setTimeout(() => showFloatingAvatar(characterEl, avatarSrc), HOVER_DEBOUNCE_MS);
-    } else {
-      showFloatingAvatar(characterEl, avatarSrc);
-    }
-  });
+  // Only attach hover behavior on devices that actually support hover
+  const supportsHover = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(hover: hover)").matches;
+  if (supportsHover) {
+    characterEl.addEventListener("pointerenter", () => {
+      if (hoverDebounceTimeout) clearTimeout(hoverDebounceTimeout);
+      if (HOVER_DEBOUNCE_MS > 0) {
+        hoverDebounceTimeout = window.setTimeout(() => showFloatingAvatar(characterEl, avatarSrc), HOVER_DEBOUNCE_MS);
+      } else {
+        showFloatingAvatar(characterEl, avatarSrc);
+      }
+    });
 
-  const handlePointerOut = () => {
-    if (hoverDebounceTimeout) {
-      clearTimeout(hoverDebounceTimeout);
-      hoverDebounceTimeout = null;
-    }
+    const handlePointerOut = () => {
+      if (hoverDebounceTimeout) {
+        clearTimeout(hoverDebounceTimeout);
+        hoverDebounceTimeout = null;
+      }
 
-    hideFloatingAvatar(characterEl);
-  };
+      hideFloatingAvatar(characterEl);
+    };
 
-  characterEl.addEventListener("pointerleave", handlePointerOut);
+    characterEl.addEventListener("pointerleave", handlePointerOut);
 
-  characterEl.addEventListener("pointercancel", handlePointerOut);
+    characterEl.addEventListener("pointercancel", handlePointerOut);
+  }
 }
 
 /**
