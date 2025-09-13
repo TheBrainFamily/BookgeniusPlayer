@@ -10,6 +10,7 @@ import { useBookData } from "@player/context/BookDataContext";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { addPaddingBottomLastChapter } from "@player/helpers/addPaddingBottomLastChapter";
 import { addSpaceBetweenChapters } from "@player/helpers/addSpaceBetweenChapters";
+import { backgroundsForBook } from "@player/ui/backgroundsForBook";
 
 const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
@@ -41,7 +42,9 @@ export function useBookContent(containerId: string) {
       const chapterSections = Array.from(doc.querySelectorAll("section[data-chapter]"));
 
       if (chapterSections.length > 0) {
-        addSpaceBetweenChapters(doc, chapterSections);
+        if (backgroundsForBook.length > 0) {
+          addSpaceBetweenChapters(doc, chapterSections);
+        }
         addPaddingBottomLastChapter(doc, chapterSections);
       }
 

@@ -131,16 +131,9 @@ export function generateCharacterMetadata(xmlDoc: Document, bookString: string, 
   return extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm, bookSlug).map((character) => ({ ...character, bookSlug }));
 }
 
-function generateBookDataFiles(
-  bookDirectoryPath: string,
-  metadata: ReturnType<typeof parseBookXmlData>["metadata"],
-  xmlDoc: Document,
-  bookString: string,
-  bookOutputPath: string,
-  isDemo = false,
-) {
+function generateBookDataFiles(bookDirectoryPath: string, metadata: ReturnType<typeof parseBookXmlData>["metadata"], xmlDoc: Document, bookString: string, bookOutputPath: string) {
   // --- Generate getBookStringified.ts ---
-  const { backgroundsData, audioData, cutSceneData, htmlResult, chapterTitles } = xmlToComplexHtml(bookString, metadata.slug, metadata.language, isDemo);
+  const { backgroundsData, audioData, cutSceneData, htmlResult, chapterTitles } = xmlToComplexHtml(bookString, metadata.slug, metadata.language);
 
   // Check if the required media files exist in the book directory
   const requiredMediaFiles = ["getBackgroundsForBook.ts", "getBackgroundSongsForBook.ts", "getCutScenesForBook.ts"];

@@ -45,7 +45,7 @@ export const paragraphMetadataServicePure = {
       metadata: { bookForm },
     } = getBookData();
 
-    const bookCharacters = data.filter((d) => d.bookSlug === bookSlug);
+    const bookCharacters = data;
 
     // For "play" books, calculate the closest entry paragraph in the start chapter once.
     const chapterEntryParagraphs =
