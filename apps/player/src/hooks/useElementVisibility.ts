@@ -41,7 +41,6 @@ export const useElementVisibility = () => {
   // Store actions (these don't change, so they won't cause re-renders)
   const { showAllElements, clearInactivityTimer, resetInactivityTimer } = useElementVisibilityStore();
 
-  const isInitializedRef = useRef(false);
   const rafIdRef = useRef<number | null>(null);
   const lastTapTimeRef = useRef(0);
   const preventClickRef = useRef(false);
@@ -53,15 +52,11 @@ export const useElementVisibility = () => {
   }, [areElementsVisible, isScrollMode, touch]);
 
   useEffect(() => {
-    if (isInitializedRef.current || !isSplashHidden) {
-      return;
-    }
+    if (!isSplashHidden) return;
 
     clearInactivityTimer();
     showAllElements();
     resetInactivityTimer();
-
-    isInitializedRef.current = true;
   }, [isSplashHidden, showAllElements, resetInactivityTimer, clearInactivityTimer]);
 
   const stableHandleTap = useCallback(
@@ -159,7 +154,7 @@ export const useElementVisibility = () => {
   );
 
   useEffect(() => {
-    if (!isInitializedRef.current) return;
+    if (!isSplashHidden) return;
 
     document.addEventListener("click", stableHandleTap, true);
     document.addEventListener("touchstart", stableHandleTouchStart, { passive: true });
@@ -179,7 +174,7 @@ export const useElementVisibility = () => {
 
       clearInactivityTimer();
     };
-  }, [stableHandleTap, stableHandleTouchStart, stableHandleTouchMove, stableHandleTouchEnd, clearInactivityTimer]);
+  }, [isSplashHidden, stableHandleTap, stableHandleTouchStart, stableHandleTouchMove, stableHandleTouchEnd, clearInactivityTimer]);
 
   return { areElementsVisible, isScrollMode };
 };
