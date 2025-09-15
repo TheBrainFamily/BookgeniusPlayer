@@ -37,6 +37,7 @@ const AudioPlayer = () => {
   const isInitialLoad = useRef(true);
   const hideButtonTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const speakerButtonRef = useRef<HTMLDivElement | null>(null);
+  const fadeOutTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [volume, setVolume] = useLocalStorageState("volume", { defaultValue: getMasterVolume() ?? 0.5 });
   const [balance, setBalance] = useLocalStorageState("balance", { defaultValue: 0.5 });
@@ -64,6 +65,17 @@ const AudioPlayer = () => {
     }
   }, [areElementsVisible]);
 
+  const togglePlay = useCallback(() => {
+    setIsPlaying((prevIsPlaying) => {
+      if (prevIsPlaying) {
+        pauseCurrentTrack();
+      } else {
+        resumeCurrentTrack();
+      }
+      return !prevIsPlaying;
+    });
+  }, []);
+
   const hideSpeakerButtonWithFadeOut = useCallback(() => {
     if (isFadingOut) return;
 
@@ -76,12 +88,14 @@ const AudioPlayer = () => {
       speakerButtonRef.current.style.opacity = "0";
     }
 
-    const timeoutId = setTimeout(() => {
+    if (fadeOutTimeoutRef.current) {
+      clearTimeout(fadeOutTimeoutRef.current);
+    }
+
+    fadeOutTimeoutRef.current = setTimeout(() => {
       setShowSpeakerButton(false);
       setIsFadingOut(false);
     }, FADE_DURATION * 1000);
-
-    return () => clearTimeout(timeoutId);
   }, [isFadingOut]);
 
   useEffect(() => {
@@ -110,7 +124,7 @@ const AudioPlayer = () => {
     return () => {
       document.removeEventListener("visibilitychange", observeVisibility);
     };
-  }, [isPlaying]);
+  }, [isPlaying, togglePlay]);
 
   // Reset opacity when button is shown
   useEffect(() => {
@@ -167,16 +181,6 @@ const AudioPlayer = () => {
       setHasBackgroundSongs(false);
     }
   }, []);
-
-  const togglePlay = () => {
-    if (isPlaying) {
-      pauseCurrentTrack();
-    } else {
-      resumeCurrentTrack();
-    }
-
-    setIsPlaying(!isPlaying);
-  };
 
   const handleProgressChange = (value: number[]) => {
     const newTime = value[0];
@@ -280,6 +284,14 @@ const AudioPlayer = () => {
       }
     };
   }, [isMuted, isPlaying]);
+
+  useEffect(() => {
+    return () => {
+      if (fadeOutTimeoutRef.current) {
+        clearTimeout(fadeOutTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Determine current track position within playlist to disable prev/next at boundaries
   const currentTrackIndexInPlaylist = playlistTracks.findIndex((track) => track.id === currentTrackIdFromState);
