@@ -230,7 +230,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
         initial="idle"
         variants={variants.container}
         ref={containerRef}
-        data-keep-modal-open="true"
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key="expanded" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>

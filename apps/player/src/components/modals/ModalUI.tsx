@@ -115,6 +115,12 @@ const ModalUI: React.FC<ModalUIProps> = ({
     [onClose, layoutView, closeOnOverlayClick, justOpened],
   );
 
+  const shouldKeepOpenOn = useCallback((target: EventTarget | null) => {
+    if (!(target instanceof Element)) return false;
+
+    return !!target.closest('[data-keep-modal-open="true"]');
+  }, []);
+
   const isTransparent = isTransparentModal(transparent, className);
   const sizeConfig = getModalSizeConfig(layoutView, size);
   const modalContentClasses = getModalContentClasses(isTransparent, layoutView, className, isContentShiftedLeft, isLargeScreen);
@@ -130,7 +136,25 @@ const ModalUI: React.FC<ModalUIProps> = ({
       {title ? <DialogTitle className="sr-only">{typeof title === "string" ? title : "Modal"}</DialogTitle> : <DialogTitle className="sr-only">Modal</DialogTitle>}
 
       {/* Modal Content */}
-      <DialogContent overlayProps={{ useCustomAnimation: true, hideOverlay }} className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}>
+      <DialogContent
+        aria-describedby={undefined}
+        overlayProps={{ useCustomAnimation: true, hideOverlay }}
+        className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}
+        onInteractOutside={(e) => {
+          if (closeOnOverlayClick === false) {
+            e.preventDefault();
+            return;
+          }
+          if (shouldKeepOpenOn(e.target)) e.preventDefault();
+        }}
+        onPointerDownOutside={(e) => {
+          if (closeOnOverlayClick === false) {
+            e.preventDefault();
+            return;
+          }
+          if (shouldKeepOpenOn(e.target)) e.preventDefault();
+        }}
+      >
         <div
           className={cn(
             "flex flex-row gap-2 items-center p-2 xl:px-4 h-full",
