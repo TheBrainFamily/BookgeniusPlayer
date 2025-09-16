@@ -12,6 +12,7 @@ import { getCharactersData } from "@player/genericBookDataGetters/getCharactersD
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
 import { DialogEnhanceClose } from "../ui/dialog";
 import { getChapterTitle } from "@player/utils/getChapterTitle";
+import { useContentShift } from "@player/stores/contentShift.store";
 
 interface CharacterModalProps {
   onClose: () => void;
@@ -33,6 +34,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [appearancesClicked, setAppearancesClicked] = useState(false);
 
   // Search for character appearances in the text up to the current location
   useEffect(() => {
@@ -63,7 +65,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
         results = [results[0], ...extras, ...results.slice(1)];
       }
 
-      setCharacterAppearances(results.slice(0, 3));
+      setCharacterAppearances(results);
     } catch (err) {
       console.error("Error searching for character appearances:", err);
       setCharacterAppearances([]);
@@ -78,38 +80,50 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     if (matchingCharacter?.characterName) {
       highlightSearchInParagraph(appearance.chapter, appearance.paragraphNumber, matchingCharacter.characterName);
     }
+    if (window.innerWidth >= 1280) {
+      setAppearancesClicked(true);
+      useContentShift.getState().enableContentShift();
+    } else {
+      onClose();
+    }
+  };
+
+  const handleOnClose = () => {
+    useContentShift.getState().disableContentShift();
     onClose();
   };
 
   if (!matchingCharacter) return null;
 
   return (
-    <ModalUI onClose={onClose} className="bg-transparent" size="xxl">
+    <ModalUI onClose={handleOnClose} className="bg-transparent" size="xxl" layoutView={appearancesClicked} hideOverlay={appearancesClicked}>
       <motion.div
         className="flex flex-col sm:flex-row items-center gap-6 mx-auto relative max-h-screen"
         variants={variants.container}
         initial="hidden"
         animate="visible"
         exit="exit"
-        onPointerUp={onClose}
+        onPointerUp={handleOnClose}
       >
-        <motion.div
-          className="w-48 md:w-80 rounded-full overflow-hidden max-h-[30vh] max-w-[30vh] md:max-h-80 md:max-w-80 border shadow-xl border-book-primary-20 aspect-square"
-          variants={variants.media}
-          onPointerUp={(e) => e.stopPropagation()}
-        >
-          <CharacterMedia
-            mediaSrc={mediaSrc}
-            isVideo={isVideo}
-            canonicalName={matchingCharacter.slug}
-            commonAttrs={{
-              "data-original-src": mediaSrc,
-              "data-character-name": matchingCharacter.characterName,
-              "data-summary": latestSummary,
-              className: "w-full h-full object-cover",
-            }}
-          />
-        </motion.div>
+        {!appearancesClicked && (
+          <motion.div
+            className="w-48 md:w-80 rounded-full overflow-hidden max-h-[30vh] max-w-[30vh] md:max-h-80 md:max-w-80 border shadow-xl border-book-primary-20 aspect-square"
+            variants={variants.media}
+            onPointerUp={(e) => e.stopPropagation()}
+          >
+            <CharacterMedia
+              mediaSrc={mediaSrc}
+              isVideo={isVideo}
+              canonicalName={matchingCharacter.slug}
+              commonAttrs={{
+                "data-original-src": mediaSrc,
+                "data-character-name": matchingCharacter.characterName,
+                "data-summary": latestSummary,
+                className: "w-full h-full object-cover",
+              }}
+            />
+          </motion.div>
+        )}
 
         <motion.div
           className="p-3 sm:p-4 rounded-xl flex flex-col gap-4 w-full max-w-2xl relative
@@ -121,7 +135,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
             <h4 className="px-5 text-lg font-bold text-white">{matchingCharacter.characterName}</h4>
           </div>
 
-          <div className="overflow-y-auto space-y-3 px-1">
+          <div className="overflow-y-hidden space-y-3 px-1">
             <p className="text-center text-white/90 text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: latestSummary }} />
 
             {(isLoading || characterAppearances.length > 0) && (
@@ -138,9 +152,9 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                     </motion.div>
                   </motion.div>
                 ) : (
-                  <motion.div className="p-1 space-y-3" variants={variants.container}>
-                    <div className="space-y-3 pb-2">
-                      {characterAppearances.map((appearance, index) => (
+                  <motion.div className="p-1" variants={variants.container}>
+                    <div className="flex-grow overflow-y-auto pb-4 space-y-3 max-h-[50vh]">
+                      {characterAppearances.slice(0, appearancesClicked ? characterAppearances.length : 3).map((appearance, index) => (
                         <motion.div
                           key={appearance.id}
                           className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20"
@@ -201,12 +215,12 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
             onPointerUp={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              onClose();
+              handleOnClose();
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                onClose();
+                handleOnClose();
               }
             }}
           />
