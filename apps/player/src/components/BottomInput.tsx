@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Mic, Send, Telescope, Loader2 } from "lucide-react";
 import { motion, Variants, AnimatePresence } from "motion/react";
 import { useTranslation } from "react-i18next";
@@ -35,10 +35,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
 
-  const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
-  const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
-  const showAllElements = useElementVisibilityStore((state) => state.showAllElements);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
+  const { pauseAllTimers, startAllTimers, showAllElements } = useElementVisibilityStore();
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
   const { openModal: openDeepResearchModal, setContent: setDeepResearchContent } = useDeepResearchModal();
   const { openModal: openApiKeyModal } = useApiKeyModal();
@@ -47,95 +47,93 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   const { location } = useLocation();
   const { chapter: currentChapter, paragraph: currentParagraph } = location;
 
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const updateLastActivity = useCallback(() => {
+  const handleActivity = useCallback(() => {
     pauseAllTimers();
     showAllElements();
   }, [pauseAllTimers, showAllElements]);
 
+  const openModalWithFocus = useCallback(() => {
+    if (isDeepResearchActive) return;
+
+    if (!isSearchModalOpen) {
+      openSearchModal(true, true, value.trim());
+    }
+
+    try {
+      inputRef.current.focus();
+      const length = inputRef.current.value.length;
+      inputRef.current.setSelectionRange(length, length);
+    } catch {}
+  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value]);
+
   useEffect(() => {
-    // Add keyboard listener for Cmd+F / Ctrl+F
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.key === "f" || event.key === "F") && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
-        updateLastActivity();
 
-        // Open search modal first if not already open
-        if (!isSearchModalOpen && !isDeepResearchActive) {
-          openSearchModal(true, true, value.trim());
-        }
-
-        // Defer focus until after the modal is opened and DOM is updated
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            if (inputRef.current && document.activeElement !== inputRef.current) {
-              inputRef.current.focus();
-            }
-          });
-        });
-        return;
+        handleActivity();
+        openModalWithFocus();
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [updateLastActivity, isSearchModalOpen, isDeepResearchActive, openSearchModal, value]);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleActivity, openModalWithFocus]);
 
   useEffect(() => {
     if (response && !isRecording) {
       setValue(response);
-      updateLastActivity();
-      if (isSearchModalOpen) {
-        setSearchQuery(response);
-      }
-    }
-  }, [response, isRecording, isSearchModalOpen, setSearchQuery, updateLastActivity]);
+      handleActivity();
 
-  const toggleDeepResearch = useCallback(() => {
-    updateLastActivity();
-    const newDeepResearchState = !isDeepResearchActive;
-    setIsDeepResearchActive(newDeepResearchState);
-    if (newDeepResearchState && isSearchModalOpen) {
-      closeSearchModal(); // Close search modal if deep research is activated
+      if (isSearchModalOpen) setSearchQuery(response);
     }
-  }, [closeSearchModal, isDeepResearchActive, isSearchModalOpen, updateLastActivity]);
+  }, [response, isRecording, isSearchModalOpen, setSearchQuery, handleActivity]);
+
+  useEffect(() => {
+    const handleDocumentPointerDown = (e: PointerEvent) => {
+      const target = e.target as Element;
+
+      if (containerRef.current?.contains(target)) return;
+      if (target.closest('[role="dialog"]') || target.closest('[role="tooltip"]')) return;
+
+      startAllTimers();
+    };
+
+    document.addEventListener("pointerdown", handleDocumentPointerDown, true);
+    return () => document.removeEventListener("pointerdown", handleDocumentPointerDown, true);
+  }, [startAllTimers]);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      updateLastActivity();
-      const newVal = e.target.value;
-      setValue(newVal);
+      handleActivity();
+      setValue(e.target.value);
 
       if (isDeepResearchActive) return;
 
-      const trimmedValue = newVal.trim();
-      if (!trimmedValue.length && isSearchModalOpen) {
-        setSearchQuery("");
-        return;
-      }
-
-      if (!isSearchModalOpen) {
-        openSearchModal(true, true, trimmedValue);
-      } else {
-        setSearchQuery(trimmedValue);
-      }
+      const trimmed = e.target.value.trim();
+      setSearchQuery(trimmed);
     },
-    [isDeepResearchActive, isSearchModalOpen, openSearchModal, setSearchQuery, updateLastActivity],
+    [handleActivity, isDeepResearchActive, setSearchQuery],
   );
+
+  const handleInputInteraction = useCallback(() => {
+    handleActivity();
+
+    if (isDeepResearchActive) return;
+
+    openModalWithFocus();
+  }, [handleActivity, isDeepResearchActive, openModalWithFocus]);
 
   const handleSubmit = useCallback(
     (e?: React.FormEvent) => {
       e?.preventDefault();
-      updateLastActivity();
+      handleActivity();
 
-      const trimmedValue = value.trim();
-      if (!trimmedValue) return;
+      const trimmed = value.trim();
+      if (!trimmed) return;
 
       if (isSearchModalOpen) {
-        setSearchQuery(trimmedValue);
+        setSearchQuery(trimmed);
         return;
       }
 
@@ -143,26 +141,22 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
         setIsThinking(true);
         openDeepResearchModal(undefined, true, true);
 
-        deepResearchCall(trimmedValue, location)
-          .then((deepResearchResponse) => {
-            setDeepResearchContent(deepResearchResponse);
-          })
+        deepResearchCall(trimmed, location)
+          .then(setDeepResearchContent)
           .catch((error) => {
             console.error("Deep research failed:", error);
             setDeepResearchContent(t("deep_research_error"));
           })
-          .finally(() => {
-            setIsThinking(false);
-          });
+          .finally(() => setIsThinking(false));
       } else if (onSubmit) {
         onSubmit({
-          query: trimmedValue,
+          query: trimmed,
           filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: bookDataLoader.getCurrentBook() },
         });
       }
     },
     [
-      updateLastActivity,
+      handleActivity,
       value,
       isSearchModalOpen,
       setSearchQuery,
@@ -177,72 +171,53 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     ],
   );
 
-  const handleRecordingStart = useCallback(() => {
-    if (isRecording) return;
+  const toggleDeepResearch = useCallback(() => {
+    handleActivity();
 
-    // Check if API key is set before starting recording
-    if (!hasApiKey()) {
-      openApiKeyModal();
+    const newState = !isDeepResearchActive;
+    setIsDeepResearchActive(newState);
+
+    if (newState && isSearchModalOpen) {
+      closeSearchModal();
+    }
+  }, [handleActivity, isDeepResearchActive, isSearchModalOpen, closeSearchModal]);
+
+  const handleRecordingStart = useCallback(() => {
+    if (isRecording || !hasApiKey()) {
+      if (!hasApiKey()) openApiKeyModal();
       return;
     }
 
-    updateLastActivity();
+    handleActivity();
     setIsRecording(true);
-
     setValue("");
 
-    // Clear search if starting voice input while search modal is open
     if (isSearchModalOpen) setSearchQuery("");
 
     startRecording().catch((error) => {
       console.error("Error starting recording:", error);
       setIsRecording(false);
     });
-  }, [isRecording, startRecording, isSearchModalOpen, setSearchQuery, updateLastActivity, openApiKeyModal]);
+  }, [isRecording, handleActivity, isSearchModalOpen, setSearchQuery, startRecording, openApiKeyModal]);
 
   const handleRecordingEnd = useCallback(() => {
     if (!isRecording) return;
-    updateLastActivity();
+
+    handleActivity();
+
     setTimeout(() => {
       stopRecording()
         .catch((error) => console.error("Error stopping recording:", error))
         .finally(() => setIsRecording(false));
     }, 150);
-  }, [isRecording, stopRecording, updateLastActivity]);
+  }, [isRecording, handleActivity, stopRecording]);
 
-  const handleInputFocus = useCallback(
-    (e: React.FocusEvent<HTMLInputElement>) => {
-      updateLastActivity();
-      e.target.select();
-      if (!isSearchModalOpen && !isDeepResearchActive) {
-        openSearchModal(true, true, value.trim());
-        // Ensure focus is maintained after modal opens
-        requestAnimationFrame(() => {
-          if (inputRef.current && document.activeElement !== inputRef.current) {
-            inputRef.current.focus();
-          }
-        });
-      }
-    },
-    [updateLastActivity, isSearchModalOpen, isDeepResearchActive, openSearchModal, value],
-  );
-
-  const handleInputClick = useCallback(
-    (_e: React.MouseEvent<HTMLInputElement>) => {
-      // Ensure the element is visible before focusing
-      updateLastActivity();
-
-      // Defer focus until after the next repaint to ensure visibility is updated
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (inputRef.current && document.activeElement !== inputRef.current) {
-            inputRef.current.focus();
-          }
-        });
-      });
-    },
-    [updateLastActivity],
-  );
+  const placeholder = useMemo(() => {
+    if (isRecording) return t("listening");
+    if (isThinking) return t("thinking");
+    if (isDeepResearchActive) return t("enter_deep_research");
+    return t("search_or_ask");
+  }, [isRecording, isThinking, isDeepResearchActive, t]);
 
   return (
     <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
@@ -254,6 +229,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
         animate={isRecording ? "recordingContainer" : "idle"}
         initial="idle"
         variants={variants.container}
+        ref={containerRef}
+        data-keep-modal-open="true"
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key="expanded" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
@@ -277,13 +254,13 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                   type="text"
                   value={value}
                   onChange={handleInputChange}
-                  placeholder={isRecording ? t("listening") : isThinking ? t("thinking") : isDeepResearchActive ? t("enter_deep_research") : t("search_or_ask")}
+                  onPointerDown={handleInputInteraction}
+                  onFocus={handleInputInteraction}
+                  onBlur={startAllTimers}
+                  placeholder={placeholder}
                   className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-80 pl-7 font-medium" : "")}
                   disabled={isRecording || isThinking}
                   autoComplete="off"
-                  onClick={handleInputClick}
-                  onFocus={handleInputFocus}
-                  onBlur={() => startAllTimers()}
                 />
               </div>
 
@@ -294,7 +271,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                     <TooltipTrigger asChild>
                       <motion.button
                         type="button"
-                        aria-pressed={isDeepResearchActive}
+                        onPointerDown={toggleDeepResearch}
+                        disabled={isThinking || isRecording}
                         className={cn(
                           "rounded-full p-2 flex items-center justify-center",
                           isDeepResearchActive ? "text-orange-400" : "text-white/70",
@@ -303,8 +281,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                         whileHover={!isThinking ? "hover" : undefined}
                         whileTap={!isThinking ? "tap" : undefined}
                         variants={variants.deepResearchButton}
-                        onClick={toggleDeepResearch}
-                        disabled={isThinking || isRecording}
                       >
                         {isThinking ? <Loader2 size={18} className="animate-spin" /> : <Telescope size={18} />}
                       </motion.button>
@@ -320,12 +296,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                       <TooltipTrigger asChild>
                         <motion.button
                           type="submit"
-                          aria-label="Send message"
+                          disabled={isThinking}
                           className="p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400"
                           whileHover="hover"
                           whileTap="tap"
                           variants={variants.button}
-                          disabled={isThinking}
                         >
                           <Send size={18} />
                         </motion.button>
@@ -339,6 +314,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                       <TooltipTrigger asChild>
                         <motion.button
                           type="button"
+                          disabled={isThinking}
                           className={cn("p-2 rounded-full flex items-center justify-center cursor-pointer", isRecording ? "text-red-400" : "text-white/70")}
                           style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
                           whileHover={!isRecording ? "hover" : undefined}
@@ -346,7 +322,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                           variants={variants.button}
                           initial="idle"
                           animate={isRecording ? "recording" : "idle"}
-                          // onClick={() => {
+                          // onPointerDown={() => {
                           //   if (isRecording) {
                           //     setIsRecording(false);
                           //     handleRecordingEnd();
@@ -376,7 +352,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                           }}
                           onMouseLeave={() => isRecording && handleRecordingEnd()}
                           onContextMenu={(e) => e.preventDefault()}
-                          disabled={isThinking}
                         >
                           <Mic size={18} />
                         </motion.button>
