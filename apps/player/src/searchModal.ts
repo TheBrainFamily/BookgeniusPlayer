@@ -388,10 +388,12 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
         paragraphs.forEach((paragraph) => {
           const paragraphElement = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`);
           const tagName = paragraphElement.tagName.toLowerCase();
+          const isStageDirectory = paragraphElement.querySelector("span em");
 
-          if (tagName === "h3" || tagName === "h4" || tagName === "h5") return;
+          if (tagName === "h3" || tagName === "h4" || tagName === "h5" || isStageDirectory) return;
 
           const paragraphInnerHTML = paragraphElement.innerHTML;
+
           const sentence = filterParagraphByCharacter(paragraphInnerHTML, characterSlug);
 
           if (sentence) {
