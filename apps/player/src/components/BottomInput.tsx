@@ -62,9 +62,17 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     if (inputRef.current == null) return;
 
     try {
-      inputRef.current.focus();
-      const length = inputRef.current.value.length;
-      inputRef.current.setSelectionRange(length, length);
+      const inputEl = inputRef.current;
+      inputEl.focus();
+
+      // Use microtask to ensure DOM is updated before setting selection
+      queueMicrotask(() => {
+        if (!inputEl) return;
+        try {
+          const length = inputEl.value.length;
+          inputEl.setSelectionRange(length, length);
+        } catch {}
+      });
     } catch {}
   }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value]);
 
