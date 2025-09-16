@@ -83,9 +83,47 @@ const ModalUI: React.FC<ModalUIProps> = ({
   closeOnOverlayClick = true,
   animateHeight = false,
 }) => {
-  const { isContentShiftedLeft } = useContentShift();
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   const [justOpened, setJustOpened] = useState(true);
+
+  const { isContentShiftedLeft } = useContentShift();
+  const isTransparent = isTransparentModal(transparent, className);
+  const sizeConfig = getModalSizeConfig(layoutView, size);
+  const modalContentClasses = getModalContentClasses(isTransparent, layoutView, className, isContentShiftedLeft, isLargeScreen);
+  const titleTextClasses = getTitleClasses(isTransparent);
+  const closeButtonClasses = getCloseButtonClasses(isTransparent);
+
+  // Only shift content on large screens
+  const shouldShiftContent = isContentShiftedLeft && isLargeScreen;
+
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open && !justOpened) onClose();
+    },
+    [onClose, justOpened],
+  );
+
+  const shouldKeepOpenOn = useCallback((target: EventTarget | null) => {
+    if (!(target instanceof Element)) return false;
+
+    return !!target.closest('[data-keep-modal-open="true"]');
+  }, []);
+
+  const handleOnInteractOutside = useCallback(
+    (e: Event) => {
+      const target = e.target as HTMLElement | null;
+
+      if (closeOnOverlayClick === false) {
+        e.preventDefault();
+        return;
+      }
+
+      if (shouldKeepOpenOn(target)) {
+        e.preventDefault();
+      }
+    },
+    [closeOnOverlayClick, shouldKeepOpenOn],
+  );
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -106,31 +144,20 @@ const ModalUI: React.FC<ModalUIProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
-  const handleOpenChange = useCallback(
-    (open: boolean) => {
-      if (!open && !justOpened && closeOnOverlayClick !== false && (!layoutView || closeOnOverlayClick === true)) {
-        onClose();
-      }
-    },
-    [onClose, layoutView, closeOnOverlayClick, justOpened],
-  );
-
-  const isTransparent = isTransparentModal(transparent, className);
-  const sizeConfig = getModalSizeConfig(layoutView, size);
-  const modalContentClasses = getModalContentClasses(isTransparent, layoutView, className, isContentShiftedLeft, isLargeScreen);
-  const titleTextClasses = getTitleClasses(isTransparent);
-  const closeButtonClasses = getCloseButtonClasses(isTransparent);
-
-  // Only shift content on large screens
-  const shouldShiftContent = isContentShiftedLeft && isLargeScreen;
-
   return (
     <Dialog open={true} onOpenChange={handleOpenChange} modal={!layoutView}>
       {/* Accessibility */}
       {title ? <DialogTitle className="sr-only">{typeof title === "string" ? title : "Modal"}</DialogTitle> : <DialogTitle className="sr-only">Modal</DialogTitle>}
 
       {/* Modal Content */}
-      <DialogContent overlayProps={{ useCustomAnimation: true, hideOverlay }} className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}>
+      <DialogContent
+        aria-describedby={undefined}
+        overlayProps={{ useCustomAnimation: true, hideOverlay }}
+        className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}
+        onInteractOutside={handleOnInteractOutside}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
         <div
           className={cn(
             "flex flex-row gap-2 items-center p-2 xl:px-4 h-full",
