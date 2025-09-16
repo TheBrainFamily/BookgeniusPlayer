@@ -50,6 +50,8 @@ function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsMo
   const characterSlug = placeholder.dataset.character;
   if (!characterSlug) return null;
 
+  placeholder.dataset.isTalking = "false";
+
   const isTalking = placeholder.dataset.isTalking === "true";
   const talkingSrc = getTalkingMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
   const listeningSrc = getListeningMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
@@ -178,6 +180,7 @@ export function activateMediaInRange(
 
       const charactersDisplayed = [];
       placeholders.forEach((placeholder) => {
+        placeholder.dataset.isTalking = "false";
         const mediaInjected = placeholder.dataset.mediaInjected === "true";
         // Query for either video or image with the class OR the dummy placeholder
         let mediaElement = placeholder.querySelector<HTMLDivElement>("div.inline-avatar");
