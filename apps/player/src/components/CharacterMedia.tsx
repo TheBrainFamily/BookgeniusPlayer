@@ -160,8 +160,31 @@ const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, 
   }
 
   const placeholderSrc = getPlaceholderFromVideoUrl(videoListensSrc || mediaSrc);
-  const showListensVideo = isListeningMode && videoListensLoaded;
-  const showSpeaksVideo = !isListeningMode && videoSpeaksLoaded;
+
+  // Determine video display logic based on new layering requirements
+  const hasBothVideos = videoListensSrc && videoSpeaksSrc && videoListensLoaded && videoSpeaksLoaded;
+  const hasOnlySpeakingVideo = videoSpeaksSrc && videoSpeaksLoaded && (!videoListensSrc || !videoListensLoaded);
+
+  let showListensVideo = false;
+  let showSpeaksVideo = false;
+
+  if (hasBothVideos) {
+    // Both videos available - image underneath, speaking covers listening
+    // Use isTalking prop if provided, otherwise fall back to isListeningMode
+    const currentlyTalking = isTalking !== undefined ? isTalking : !isListeningMode;
+    showListensVideo = !currentlyTalking;
+    showSpeaksVideo = currentlyTalking;
+  } else if (hasOnlySpeakingVideo) {
+    // Only speaking video - image acts as listening state
+    // Show speaking video only when talking, otherwise image shows through
+    const currentlyTalking = isTalking !== undefined ? isTalking : !isListeningMode;
+    showSpeaksVideo = currentlyTalking;
+    showListensVideo = false; // image handles the listening role
+  } else {
+    // Only listening video or fallback to original logic
+    showListensVideo = videoListensLoaded && (isTalking !== undefined ? !isTalking : isListeningMode);
+    showSpeaksVideo = false;
+  }
 
   return (
     <div className="relative w-full h-full">
