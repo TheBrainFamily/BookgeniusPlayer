@@ -357,6 +357,8 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
   return finalResult;
 };
 
+const SUMMARY_TRUNCATE_LENGTH = 210;
+
 export function findCharacterSentences(characterSlug: string, currentLocation: Location) {
   const characterData = getCharactersData().find((character) => character.slug === characterSlug);
 
@@ -389,7 +391,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
 
           if (tagName === "h3" || tagName === "h4" || tagName === "h5") return;
 
-          const paragraphInnerHTML = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`).innerHTML;
+          const paragraphInnerHTML = paragraphElement.innerHTML;
           const sentence = filterParagraphByCharacter(paragraphInnerHTML, characterSlug);
 
           if (sentence) {
@@ -397,8 +399,9 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
 
             let _sentence: string;
 
-            if (removedHtmlTags.length > 210) {
-              _sentence = extractTextAroundMark(sentence);
+            if (removedHtmlTags.length > SUMMARY_TRUNCATE_LENGTH) {
+              const excerpt = extractTextAroundMark(sentence);
+              _sentence = excerpt ?? `${removedHtmlTags.substring(0, SUMMARY_TRUNCATE_LENGTH)}...`;
             } else {
               _sentence = sentence;
             }
@@ -443,21 +446,16 @@ function stripHtmlTags(str) {
 }
 
 function filterParagraphByCharacter(paragraph, characterSlug) {
-  // Tworzymy tymczasowy element DOM do parsowania HTML
   const tempDiv = document.createElement("div");
   tempDiv.innerHTML = paragraph;
 
-  // Znajdujemy wszystkie elementy z atrybutem data-character
   const elementsWithCharacter = tempDiv.querySelectorAll("[data-character]");
 
-  // Przetwarzamy wszystkie elementy z data-character
   elementsWithCharacter.forEach((element) => {
     if (element.getAttribute("data-character") !== characterSlug) {
-      // Zachowujemy zawartość tekstową, ale usuwamy tag
       const textContent = element.textContent;
       element.replaceWith(document.createTextNode(textContent));
     } else {
-      // Zamieniamy pasujący element na <mark> z odpowiednią klasą
       const markElement = document.createElement("mark");
       markElement.className = "bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm";
       markElement.textContent = element.textContent;
@@ -465,108 +463,85 @@ function filterParagraphByCharacter(paragraph, characterSlug) {
     }
   });
 
-  // NOWE: Teraz usuwamy WSZYSTKIE pozostałe tagi HTML oprócz <mark>
   let result = tempDiv.innerHTML;
 
-  // Zachowujemy tagi <mark> tymczasowo
   const markPlaceholder = "___TEMP_MARK___";
   const markTags = result.match(/<mark[^>]*>.*?<\/mark>/g) || [];
   markTags.forEach((tag, index) => {
     result = result.replace(tag, `${markPlaceholder}${index}${markPlaceholder}`);
   });
 
-  // Usuwamy wszystkie pozostałe tagi HTML
   result = result.replace(/<[^>]*>/g, "");
 
-  // Przywracamy tagi <mark>
   markTags.forEach((tag, index) => {
     result = result.replace(`${markPlaceholder}${index}${markPlaceholder}`, tag);
   });
 
-  // Czyścimy dodatkowe rzeczy
-  result = result.replace(/&nbsp;/g, " "); // zamień &nbsp; na zwykłe spacje
-  result = result.replace(/\s+/g, " "); // usuń podwójne spacje
-  result = result.trim(); // usuń spacje na początku i końcu
+  result = result.replace(/&nbsp;/g, " ");
+  result = result.replace(/\s+/g, " ");
+  result = result.trim();
 
   return result;
 }
 
 function extractTextAroundMark(paragraph) {
-  // Check if paragraph contains a <mark> tag
-  if (!paragraph.includes("</mark>")) {
+  const markCloseTag = "</mark>";
+  if (!paragraph.includes(markCloseTag)) {
     return null;
   }
 
-  // Find the position of the <mark> tag (handle attributes)
   const markStart = paragraph.indexOf("<mark");
   if (markStart === -1) {
     return null;
   }
 
-  // Find the end of opening mark tag
   const markOpenEnd = paragraph.indexOf(">", markStart) + 1;
-  const markCloseStart = paragraph.indexOf("</mark>");
-  const markEnd = markCloseStart + 7; // +7 for '</mark>'.length
+  const markCloseStart = paragraph.indexOf(markCloseTag);
+  const markEnd = markCloseStart + markCloseTag.length;
 
-  // Get the text inside the mark tag (this doesn't count toward character limit)
   const markedText = paragraph.substring(markOpenEnd, markCloseStart);
 
-  // We want 210 characters of actual text (excluding the mark tags)
-  const targetTextLength = 210;
+  const targetTextLength = SUMMARY_TRUNCATE_LENGTH;
 
-  // Calculate how much text we can include before and after the marked text
   const beforeChars = Math.floor((targetTextLength - markedText.length) / 2);
   const afterChars = targetTextLength - markedText.length - beforeChars;
 
-  // Find the start position (don't go below 0)
   let startPos = Math.max(0, markStart - beforeChars);
 
-  // Find the end position (don't exceed paragraph length)
   let endPos = Math.min(paragraph.length, markEnd + afterChars);
 
-  // If we have room to extend (less than target), try to use more text
   const currentTextLength = markStart - startPos + markedText.length + (endPos - markEnd);
   if (currentTextLength < targetTextLength) {
     const extraChars = targetTextLength - currentTextLength;
 
-    // Try to extend backwards first
     const canExtendBack = startPos;
     const extendBack = Math.min(canExtendBack, extraChars);
     startPos -= extendBack;
 
-    // Then extend forwards with remaining space
     const remaining = extraChars - extendBack;
     const canExtendForward = paragraph.length - endPos;
     const extendForward = Math.min(canExtendForward, remaining);
     endPos += extendForward;
   }
 
-  // Extract the substring
   let result = paragraph.substring(startPos, endPos);
 
-  // If we truncated from the beginning, ensure we start with a complete word
   if (startPos > 0) {
-    // Find the first space (word boundary) in the result
     const firstSpaceIndex = result.indexOf(" ");
     if (firstSpaceIndex !== -1) {
-      // Remove the partial word at the beginning
       result = result.substring(firstSpaceIndex + 1);
     }
     result = "..." + result;
   }
 
-  // Remove any incomplete HTML tag at the end (like <m, <ma, <mark, <mark class=", etc.)
-  // Find the last < that doesn't have a corresponding >
   const lastOpenBracket = result.lastIndexOf("<");
   if (lastOpenBracket !== -1) {
     const lastCloseBracket = result.lastIndexOf(">");
-    // If the last < comes after the last >, we have an incomplete tag
     if (lastOpenBracket > lastCloseBracket) {
       result = result.substring(0, lastOpenBracket);
     }
   }
 
-  // Add ellipsis only if text doesn't end with proper punctuation
   if (!/[^.][.]$|^[.]$|[!?]+$/.test(result)) {
     if (!result.endsWith("...")) {
       result = result.trim() + "...";
