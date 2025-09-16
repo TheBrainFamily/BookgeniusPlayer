@@ -61,13 +61,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
 
     if (inputRef.current == null) return;
 
-    setTimeout(() => {
-      try {
-        inputRef.current.focus();
-        const length = inputRef.current.value.length;
-        inputRef.current.setSelectionRange(length, length);
-      } catch {}
-    }, 150);
+    try {
+      inputRef.current.focus();
+      const length = inputRef.current.value.length;
+      inputRef.current.setSelectionRange(length, length);
+    } catch {}
   }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value]);
 
   const handleInputChange = useCallback(
@@ -258,7 +256,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                   type="text"
                   value={value}
                   onChange={handleInputChange}
-                  onPointerDown={handleInputInteraction}
                   onFocus={handleInputInteraction}
                   onBlur={startAllTimers}
                   placeholder={placeholder}

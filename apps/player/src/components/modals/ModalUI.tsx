@@ -98,11 +98,9 @@ const ModalUI: React.FC<ModalUIProps> = ({
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
-      if (!open && !justOpened && closeOnOverlayClick !== false && (!layoutView || closeOnOverlayClick === true)) {
-        onClose();
-      }
+      if (!open && !justOpened) onClose();
     },
-    [onClose, layoutView, closeOnOverlayClick, justOpened],
+    [onClose, justOpened],
   );
 
   const shouldKeepOpenOn = useCallback((target: EventTarget | null) => {
@@ -111,13 +109,18 @@ const ModalUI: React.FC<ModalUIProps> = ({
     return !!target.closest('[data-keep-modal-open="true"]');
   }, []);
 
-  const handleOutsideInteraction = useCallback(
+  const handleOnInteractOutside = useCallback(
     (e: Event) => {
+      const target = e.target as HTMLElement | null;
+
       if (closeOnOverlayClick === false) {
         e.preventDefault();
         return;
       }
-      if (shouldKeepOpenOn(e.target)) e.preventDefault();
+
+      if (shouldKeepOpenOn(target)) {
+        e.preventDefault();
+      }
     },
     [closeOnOverlayClick, shouldKeepOpenOn],
   );
@@ -151,8 +154,9 @@ const ModalUI: React.FC<ModalUIProps> = ({
         aria-describedby={undefined}
         overlayProps={{ useCustomAnimation: true, hideOverlay }}
         className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}
-        onInteractOutside={handleOutsideInteraction}
-        onPointerDownOutside={handleOutsideInteraction}
+        onInteractOutside={handleOnInteractOutside}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onCloseAutoFocus={(e) => e.preventDefault()}
       >
         <div
           className={cn(
