@@ -36,7 +36,19 @@
     "allRights": "Wszelkie prawa zastrzeżone.",
     "privacyPolicy": "Polityka Prywatności",
     "termsOfService": "Warunki korzystania z usługi",
-    "cookiePolicy": "Polityka plików cookies"
+    "cookiePolicy": "Polityka plików cookies",
+    "helpCenter": "Centrum pomocy"
   },
-  "common": { "loading": "Ładowanie...", "error": "Błąd", "retry": "Ponów", "close": "Zamknij", "back": "Wstecz", "next": "Dalej", "previous": "Poprzedni" }
+  "common": {
+    "loading": "Ładowanie...",
+    "error": "Błąd",
+    "retry": "Ponów",
+    "close": "Zamknij",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "previous": "Poprzedni",
+    "hours": "godz.",
+    "minutes": "min"
+  },
+  "notFound": { "title": "Nie znaleziono strony", "returnHome": "Wróć do biblioteki", "description": "Wygląda na to, że ta strona zaginęła w rozległej bibliotece internetu." }
 }

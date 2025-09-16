@@ -54,12 +54,14 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
   height: clamp(2em, 5vw, 2.5em);
 }
 
-/* Hover effects */
-.inline-avatar:hover {
-  transform: scale(2);
-  z-index: 1;
-  transition: transform 0.2s ease;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+/* Hover effects (only on devices that support hover) */
+@media (hover: hover) {
+  .inline-avatar:hover {
+    transform: scale(2);
+    z-index: 1;
+    transition: transform 0.2s ease;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  }
 }
 
 /* Different styles for different character types */
@@ -165,7 +167,7 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
 /* Touch device optimizations */
 @media (hover: none) and (pointer: coarse) {
   .inline-avatar:hover {
-    transform: scale(1.8);
+    transform: none;
   }
 }
 

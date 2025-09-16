@@ -1253,7 +1253,8 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
 
         if (tracks.has(trackId)) tracks.get(trackId)!.preemptiveTransitionTimeout = preemptiveTimeoutId;
         console.log(`Scheduled pre-emptive transition for '${trackId}' in ${timeUntilPreemptiveTrigger.toFixed(2)}s.`);
-        dispatchPlaylistChangeEvent([trackId]).catch(console.error);
+        // Ensure playlist UI reflects the full active section, not just the current track
+        dispatchPlaylistChangeEvent().catch(console.error);
       } else {
         console.log(
           `Track '${trackId}' is too short or offset too large for a pre-emptive transition starting ${PRE_END_TRANSITION_TRIGGER_SECONDS}s before end and ensuring enough fade time. Effective duration for trigger calc: ${effectiveTrackDurationSecs.toFixed(2)}s. Relies on onended.`,
@@ -1672,7 +1673,7 @@ export async function startFirstTrack(trackId: string): Promise<boolean> {
   }
 }
 
-export async function transitionToTrack(targetId: string): Promise<boolean> {
+export async function transitionToTrack(targetId: string, options?: { manual?: boolean }): Promise<boolean> {
   console.log(`transitionToTrack: Attempting to transition to targetId='${targetId}'. Current: '${currentTrackId}', Transitioning: ${isTransitioning}, Next: '${nextTrackId}'`);
   if (!audioContext) {
     console.error("transitionToTrack: AudioContext not ready.");
@@ -1711,6 +1712,24 @@ export async function transitionToTrack(targetId: string): Promise<boolean> {
     currentTrackId = null;
     currentTrackIndexInSection = -1;
     return await startFirstTrack(targetId);
+  }
+
+  // If this is a user-initiated/manual transition, perform an immediate cut (no crossfade)
+  if (options?.manual === true) {
+    console.log(`transitionToTrack: Manual transition requested. Performing immediate cut to '${targetId}'.`);
+    const oldTrackId = currentTrackId;
+    // Stop current track immediately
+    stopTrackInternal(currentTrackId);
+    currentTrackId = null;
+    currentTrackIndexInSection = -1;
+
+    const started = await startFirstTrack(targetId);
+    if (started) {
+      console.log(`transitionToTrack: Immediate cut from '${oldTrackId}' to '${targetId}' succeeded (manual).`);
+    } else {
+      console.warn(`transitionToTrack: Immediate cut from '${oldTrackId}', but failed to start '${targetId}' (manual).`);
+    }
+    return started;
   }
 
   const transitionPointTime = findNextTransitionPoint(currentTrackId);

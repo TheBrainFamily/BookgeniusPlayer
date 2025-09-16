@@ -7,6 +7,7 @@ import { Toaster as Sonner } from "@platform/components/ui/sonner";
 import { TooltipProvider } from "@platform/components/ui/tooltip";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import AuthComponentsWrapper from "./pages/AuthComponentsWrapper";
 import { RouteTransitionProvider } from "./providers/RouteTransitionProvider";
 import { UniversalRouter } from "./UniversalRouter";
 import { IntegrationsProvider, useIntegrations } from "@platform/integrations";
@@ -29,7 +30,7 @@ const AppWithAuth = () => {
     return null;
   }
 
-  const { AuthProvider } = authMod;
+  const { AuthProvider, useAuth } = authMod;
 
   return (
     <AuthProvider>
@@ -41,6 +42,14 @@ const AppWithAuth = () => {
             <Route path="/GenreExploration" element={<GenreExploration />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route
+              path="/sign-in"
+              element={ <AuthComponentsWrapper componentName="SignIn" useAuth={useAuth} fallbackComponent={NotFound} /> }
+            />
+            <Route
+              path="/sign-up"
+              element={ <AuthComponentsWrapper componentName="SignUp" useAuth={useAuth} fallbackComponent={NotFound} /> }
+            />
             <Route
               path="/reader/"
               element={

@@ -140,6 +140,8 @@
   "splash_subtitle": "Books reimagined",
   "start_button": "Start",
   "book_menu_button_tooltip": "Open Book Menu",
+  "resume_music": "Resume Music",
+  "pause_music": "Pause Music",
   "volume": "Volume",
   "balance": "Balance",
   "audiobook": "Audiobook",

@@ -28,7 +28,7 @@ const Footer = () => {
 
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsLargeScreen(window.innerWidth >= 1280);
+      setIsLargeScreen(window.innerWidth >= 1280 && window.innerWidth <= 2000);
     };
 
     checkScreenSize();
@@ -48,7 +48,7 @@ const Footer = () => {
           initial="hidden"
           animate="visible"
           className={cn(
-            "fixed bottom-0 inset-x-0 z-50 flex flex-row gap-2 justify-center mx-auto max-w-[120rem] w-full pointer-events-none",
+            "fixed bottom-0 inset-x-0 z-40 flex flex-row gap-2 justify-center mx-auto max-w-[120rem] w-full pointer-events-none",
             "px-2 lg:px-4 pb-4",
             // Always apply transition, but only apply transform when shifting
             "transition-transform duration-300",
@@ -65,7 +65,7 @@ const Footer = () => {
                 )}
               >
                 <CharactersOnStagePanel />
-                <BottomInput className={cn("max-w-[800px]", shouldShiftFooter ? "max-w-[600px]" : "")} onSubmit={sendMessage} />
+                <BottomInput className={cn("max-w-[800px]")} onSubmit={sendMessage} />
               </div>
             </>
           ) : (

@@ -3,10 +3,13 @@ import { useTranslation } from "react-i18next";
 
 import heroImage from "@platform/assets/library-hero-2.webp";
 import { Button } from "./ui/button";
+import { getBooksByCurrentLanguage } from "@platform/utils/bookLanguageFilter.ts";
+import { formatVisualNovelsCount } from "@platform/utils/formatVisualNovelsCount.ts";
 
 // for the backgroundImage this color works great, but only once the overlay is loaded backgroundColor: "#8d4214"
 const HeroSection = () => {
   const { t } = useTranslation();
+  const booksCount = getBooksByCurrentLanguage().length;
 
   return (
     <section className="relative min-h-[calc(100vh-128px)] md:min-h-[calc(100vh-72px)] flex items-center justify-center overflow-hidden">
@@ -70,8 +73,8 @@ const HeroSection = () => {
           {/* Atmospheric stats */}
           <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
             <div className="text-center">
-              <div className="text-3xl font-bold text-library-gold mb-2">12</div>
-              <div className="text-muted-foreground">{t("stats.visualNovels", "Visual Novels")}</div>
+              <div className="text-3xl font-bold text-library-gold mb-2">{booksCount}</div>
+              <div className="text-muted-foreground">{formatVisualNovelsCount(booksCount)}</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-library-gold mb-2">100%</div>

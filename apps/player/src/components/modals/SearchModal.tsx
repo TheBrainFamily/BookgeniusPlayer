@@ -28,10 +28,10 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
   }, []);
 
   const handleSearchResultClick = useCallback((item: SearchResultItemData) => {
-    console.log(`SearchModal: Navigating to chapter ${item.chapter}, paragraph ${item.paragraphNumber}`);
+    //TODO: fix this to get the value directly from bottom input hook or something
+    const inputEl = document.getElementById("bottom-input") as HTMLInputElement | null;
+    const query = inputEl?.value ?? "";
 
-    //TODO: fix this to get the value directly from bottom input hook or so
-    const query = document.querySelector("#bottom-input").getAttribute("value");
     // Update location with 'system' source to trigger scrolling
     goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "smooth" }).catch((error) =>
       console.warn("Failed to scroll to search result:", error),
@@ -63,7 +63,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
   );
 
   return (
-    <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay} closeOnOverlayClick={true}>
+    <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
       <motion.div className="flex flex-col h-full relative overflow-hidden" variants={variants.container} initial="hidden" animate="visible" exit="exit">
         {searchResults?.isLoading && (
           <motion.div className="flex flex-col items-center justify-center py-12 px-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>

@@ -233,7 +233,21 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
     return "";
   }
 
-  const results = [];
+  const results: { html: string; offset: number }[] = [];
+
+  // Compute the character offset of the first text inside target relative to the root's text content
+  const getTextOffset = (root: HTMLElement, target: Element): number => {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    let offset = 0;
+    let node: Node | null;
+    while ((node = walker.nextNode())) {
+      if (target.contains(node)) {
+        break;
+      }
+      offset += (node.nodeValue || "").length;
+    }
+    return offset;
+  };
 
   characterElements.forEach((characterElement) => {
     // Find the sentence span that contains this character element
@@ -247,7 +261,7 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
       sentenceHTML = sentenceHTML.replace(/\s*id="[^"]*"/g, "");
       sentenceHTML = sentenceHTML.replace(/\s*style="[^"]*"/g, "");
 
-      results.push(sentenceHTML);
+      results.push({ html: sentenceHTML, offset: getTextOffset(tempDiv, characterElement) });
     } else {
       // Fallback: if no sentence span found, try to get surrounding context
       let context = "";
@@ -261,13 +275,13 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
       let wordsBefore = [];
       let beforeElement = current.previousSibling;
 
-      while (beforeElement && wordsBefore.length < 10) {
+      while (beforeElement && wordsBefore.length < 14) {
         if (beforeElement.nodeType === Node.TEXT_NODE || beforeElement.nodeType === Node.ELEMENT_NODE) {
           const words = beforeElement.textContent
             .trim()
             .split(/\s+/)
             .filter((w) => w);
-          wordsBefore.unshift(...words.slice(-10));
+          wordsBefore.unshift(...words.slice(-14));
         }
         beforeElement = beforeElement.previousSibling;
       }
@@ -277,13 +291,13 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
       // Get up to 10 words after
       let wordsAfter = [];
       let afterElement = current.nextSibling;
-      while (afterElement && wordsAfter.length < 10) {
+      while (afterElement && wordsAfter.length < 14) {
         if (afterElement.nodeType === Node.TEXT_NODE || afterElement.nodeType === Node.ELEMENT_NODE) {
           const words = afterElement.textContent
             .trim()
             .split(/\s+/)
             .filter((w) => w);
-          wordsAfter.push(...words.slice(0, 10));
+          wordsAfter.push(...words.slice(0, 14));
         }
         afterElement = afterElement.nextSibling;
       }
@@ -304,21 +318,46 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
       }
 
       // Combine context
-      const before = wordsBefore.slice(-5).join(" ");
-      const after = wordsAfter.slice(0, 5).join(" ");
+      const before = wordsBefore.slice(-14).join(" ");
+      const after = wordsAfter.slice(0, 14).join(" ");
       context = `${before ? before + " " : ""}${characterHTML}${characterSlugMissingPunctuation}${after ? " " + after : ""}`;
 
+      // Remove space before punctuation marks
+      context = context.replace(/\s+([.,;:!?])/g, "$1");
+
       if (context.trim()) {
-        results.push(context.trim());
+        results.push({ html: context.trim(), offset: getTextOffset(tempDiv, characterElement) });
       }
     }
   });
 
-  const uniqueResults = [...new Set(results)];
-  const finalResult = uniqueResults.join(" ");
+  // Filter out very close hits (near-overlapping). Use a small character-distance threshold.
+  const MIN_CHAR_GAP = 60; // roughly "a few words" apart
+  const sortedByOffset = [...results].sort((a, b) => a.offset - b.offset);
+  const filteredByProximity: { html: string; offset: number }[] = [];
+  for (const entry of sortedByOffset) {
+    const last = filteredByProximity[filteredByProximity.length - 1];
+    if (!last || entry.offset - last.offset >= MIN_CHAR_GAP) {
+      filteredByProximity.push(entry);
+    }
+  }
+
+  // Ensure uniqueness by HTML and join
+  const seenHtml = new Set<string>();
+  const uniqueHtmls: string[] = [];
+  for (const entry of filteredByProximity) {
+    if (!seenHtml.has(entry.html)) {
+      seenHtml.add(entry.html);
+      uniqueHtmls.push(entry.html);
+    }
+  }
+
+  const finalResult = uniqueHtmls.join(" ");
 
   return finalResult;
 };
+
+const SUMMARY_TRUNCATE_LENGTH = 210;
 
 export function findCharacterSentences(characterSlug: string, currentLocation: Location) {
   const characterData = getCharactersData().find((character) => character.slug === characterSlug);
@@ -347,21 +386,34 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
         const totalParagraphsInChapter = getTotalParagraphsInChapter(chapter);
 
         paragraphs.forEach((paragraph) => {
-          const paragraphInnerHTML = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`).innerHTML;
+          const paragraphElement = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`);
+          const tagName = paragraphElement.tagName.toLowerCase();
+          const isStageDirectory = paragraphElement.querySelector("span em");
 
-          const sentence = getSentenceWithCharacterSpan(paragraphInnerHTML, characterSlug);
+          if (tagName === "h3" || tagName === "h4" || tagName === "h5" || isStageDirectory) return;
+
+          const paragraphInnerHTML = paragraphElement.innerHTML;
+
+          const sentence = filterParagraphByCharacter(paragraphInnerHTML, characterSlug);
 
           if (sentence) {
-            const cleanText = sentence.replace(/<[^>]*>/g, "");
-            const summaryText = cleanText.length > 300 ? cleanText.substring(0, 300) : cleanText;
-            const displayText = summaryText.length > 300 ? summaryText.substring(0, 300) : summaryText;
+            const removedHtmlTags = stripHtmlTags(sentence);
+
+            let _sentence: string;
+
+            if (removedHtmlTags.length > SUMMARY_TRUNCATE_LENGTH) {
+              const excerpt = extractTextAroundMark(sentence);
+              _sentence = excerpt ?? `${removedHtmlTags.substring(0, SUMMARY_TRUNCATE_LENGTH)}...`;
+            } else {
+              _sentence = sentence;
+            }
 
             items.push({
               chapter,
               paragraphNumber: paragraph,
               percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
-              summary: highlightMatchedWords(summaryText, characterSlug),
-              text: highlightMatchedWords(displayText, characterSlug),
+              summary: _sentence,
+              text: _sentence,
               id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
             });
           }
@@ -384,4 +436,119 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
   }
 
   return { header, items, isLoading: false };
+}
+
+function stripHtmlTags(str) {
+  if (!str || typeof str !== "string") {
+    return "";
+  }
+
+  // Remove HTML tags using regex
+  return str.replace(/<[^>]*>/g, "");
+}
+
+function filterParagraphByCharacter(paragraph, characterSlug) {
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = paragraph;
+
+  const elementsWithCharacter = tempDiv.querySelectorAll("[data-character]");
+
+  elementsWithCharacter.forEach((element) => {
+    if (element.getAttribute("data-character") !== characterSlug) {
+      const textContent = element.textContent;
+      element.replaceWith(document.createTextNode(textContent));
+    } else {
+      const markElement = document.createElement("mark");
+      markElement.className = "bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm";
+      markElement.textContent = element.textContent;
+      element.replaceWith(markElement);
+    }
+  });
+
+  let result = tempDiv.innerHTML;
+
+  const markPlaceholder = "___TEMP_MARK___";
+  const markTags = result.match(/<mark[^>]*>.*?<\/mark>/g) || [];
+  markTags.forEach((tag, index) => {
+    result = result.replace(tag, `${markPlaceholder}${index}${markPlaceholder}`);
+  });
+
+  result = result.replace(/<[^>]*>/g, "");
+
+  markTags.forEach((tag, index) => {
+    result = result.replace(`${markPlaceholder}${index}${markPlaceholder}`, tag);
+  });
+
+  result = result.replace(/&nbsp;/g, " ");
+  result = result.replace(/\s+/g, " ");
+  result = result.trim();
+
+  return result;
+}
+
+function extractTextAroundMark(paragraph) {
+  const markCloseTag = "</mark>";
+  if (!paragraph.includes(markCloseTag)) {
+    return null;
+  }
+
+  const markStart = paragraph.indexOf("<mark");
+  if (markStart === -1) {
+    return null;
+  }
+
+  const markOpenEnd = paragraph.indexOf(">", markStart) + 1;
+  const markCloseStart = paragraph.indexOf(markCloseTag);
+  const markEnd = markCloseStart + markCloseTag.length;
+
+  const markedText = paragraph.substring(markOpenEnd, markCloseStart);
+
+  const targetTextLength = SUMMARY_TRUNCATE_LENGTH;
+
+  const beforeChars = Math.floor((targetTextLength - markedText.length) / 2);
+  const afterChars = targetTextLength - markedText.length - beforeChars;
+
+  let startPos = Math.max(0, markStart - beforeChars);
+
+  let endPos = Math.min(paragraph.length, markEnd + afterChars);
+
+  const currentTextLength = markStart - startPos + markedText.length + (endPos - markEnd);
+  if (currentTextLength < targetTextLength) {
+    const extraChars = targetTextLength - currentTextLength;
+
+    const canExtendBack = startPos;
+    const extendBack = Math.min(canExtendBack, extraChars);
+    startPos -= extendBack;
+
+    const remaining = extraChars - extendBack;
+    const canExtendForward = paragraph.length - endPos;
+    const extendForward = Math.min(canExtendForward, remaining);
+    endPos += extendForward;
+  }
+
+  let result = paragraph.substring(startPos, endPos);
+
+  if (startPos > 0) {
+    const firstSpaceIndex = result.indexOf(" ");
+    if (firstSpaceIndex !== -1) {
+      result = result.substring(firstSpaceIndex + 1);
+    }
+    result = "..." + result;
+  }
+
+  const lastOpenBracket = result.lastIndexOf("<");
+  if (lastOpenBracket !== -1) {
+    const lastCloseBracket = result.lastIndexOf(">");
+    if (lastOpenBracket > lastCloseBracket) {
+      result = result.substring(0, lastOpenBracket);
+    }
+  }
+
+  if (!/[^.][.]$|^[.]$|[!?]+$/.test(result)) {
+    if (!result.endsWith("...")) {
+      result = result.trim() + "...";
+    }
+  }
+
+  return result;
 }

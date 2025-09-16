@@ -13,6 +13,8 @@ const WidgetCtx = createContext<React.ComponentType | undefined>(undefined);
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [ClerkProvider, setClerkProvider] = useState<React.ComponentType<ClerkProviderProps> | null>(null);
+  const [SignInComponent, setSignInComponent] = useState<React.ComponentType | undefined>(undefined);
+  const [SignUpComponent, setSignUpComponent] = useState<React.ComponentType | undefined>(undefined);
   const [hooks, setHooks] = useState<{ useUser: () => UseUserReturn; useClerk: () => LoadedClerk; UserButton?: React.ComponentType } | null>(null);
   const [loadingState, setLoadingState] = useState<"loading" | "ready" | "error">("loading");
 
@@ -26,6 +28,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         }
         console.log("[CLERK] ClerkProvider loaded, setting hooks");
         setClerkProvider(() => router.ClerkProvider);
+        setSignInComponent(() => router.SignIn);
+        setSignUpComponent(() => router.SignUp);
         setHooks({ useUser: react.useUser, useClerk: react.useClerk, UserButton: react.UserButton });
         setLoadingState("ready");
       })
@@ -99,6 +103,25 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     );
   }
 
+  const isSatellite = import.meta.env.VITE_CLERK_IS_SATELLITE === "true";
+  const clerkDomain = import.meta.env.VITE_CLERK_DOMAIN || undefined;
+  const clerkDomainUrl = `https://${clerkDomain}`;
+
+  let signInUrl = "/sign-in";
+  let signUpUrl = "/sign-up";
+
+  const signInUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_IN_URL;
+  const signUpUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_UP_URL;
+  if (isSatellite && signInUrlEnv && signUpUrlEnv && clerkDomain) {
+    const signInUrlObj = new URL(signInUrlEnv);
+    signInUrlObj.searchParams.append("redirect_url", clerkDomainUrl);
+    signInUrl = signInUrlObj.toString();
+
+    const signUpUrlObj = new URL(signUpUrlEnv);
+    signUpUrlObj.searchParams.append("redirect_url", clerkDomainUrl);
+    signUpUrl = signUpUrlObj.toString();
+  }
+
   const Inner: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { user, isSignedIn, isLoaded } = hooks.useUser();
     const { openSignIn } = hooks.useClerk();
@@ -107,9 +130,17 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       () => ({
         ready: isLoaded !== false, // Clerk's isLoaded tells us when it's ready
         isSignedIn: !!isSignedIn,
+        components: {
+          SignIn: SignInComponent,
+          SignUp: SignUpComponent,
+        },
         openSignIn: () => {
           console.log("[CLERK] openSignIn");
-          openSignIn();
+          if (!isSatellite) {
+            openSignIn();
+          } else {
+            window.location.href = signInUrl;
+          }
         },
         userId: user?.id,
         email: user?.emailAddresses?.[0]?.emailAddress ?? null,
@@ -120,31 +151,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     return <Ctx.Provider value={ctx}>{children}</Ctx.Provider>;
   };
 
-  const isSatellite = import.meta.env.VITE_CLERK_IS_SATELLITE === "true";
-  const clerkDomain = import.meta.env.VITE_CLERK_DOMAIN || undefined;
-
   const mainClerkDomain = "bookgenius.net";
-  const allowedRedirectOrigins = [`https://${mainClerkDomain}`, `https://accounts.${mainClerkDomain}`];
-
-  let signInUrl = undefined;
-  let signUpUrl = undefined;
-
-  const signInUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_IN_URL;
-  const signUpUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_UP_URL;
-  if (isSatellite && signInUrlEnv && signUpUrlEnv && clerkDomain) {
-    const clerkDomainUrl = `https://${clerkDomain}`;
-    const signInUrlObj = new URL(signInUrlEnv);
-    signInUrlObj.searchParams.append("redirect_url", clerkDomainUrl);
-    signInUrlObj.searchParams.append("link_domain", clerkDomainUrl);
-    signInUrl = signInUrlObj.toString();
-
-    const signUpUrlObj = new URL(signUpUrlEnv);
-    signUpUrlObj.searchParams.append("redirect_url", clerkDomainUrl);
-    signUpUrlObj.searchParams.append("link_domain", clerkDomainUrl);
-    signUpUrl = signUpUrlObj.toString();
-
-    allowedRedirectOrigins.push(clerkDomainUrl);
-  }
+  const allowedRedirectOrigins = [
+    `https://${mainClerkDomain}`,
+    `https://accounts.${mainClerkDomain}`,
+    "https://bookgeniusz.pl",
+    "https://testclerk.aws.lucetius.pl",
+  ];
 
   console.log("isSatellite:", isSatellite);
   console.log("domain:", clerkDomain);
@@ -156,7 +169,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       <ClerkProvider
         localization={detectLanguageFromDomain() === "pl" ? plPL : enUS}
         publishableKey={publishableKey}
-        domain={clerkDomain}
+        domain={isSatellite ? clerkDomain : undefined}
         signInUrl={signInUrl}
         signUpUrl={signUpUrl}
         isSatellite={isSatellite}

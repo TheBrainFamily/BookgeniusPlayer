@@ -98,7 +98,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       <motion.div
         layout
         className={cn(
-          "relative rounded-full aspect-square isolate",
+          "relative rounded-full aspect-square isolate overflow-hidden",
           disableHighlight
             ? ""
             : isTalkingInCurrentRange

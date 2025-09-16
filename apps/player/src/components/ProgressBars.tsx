@@ -10,6 +10,17 @@ export interface ChapterStructure {
   paragraphCount: number;
 }
 
+function useRafNumber(target: number) {
+  const [val, setVal] = useState(target);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setVal(target));
+    return () => cancelAnimationFrame(raf);
+  }, [target]);
+
+  return val;
+}
+
 const ProgressBars: React.FC = () => {
   const isSplashHidden = useSplashHidden();
 
@@ -43,6 +54,10 @@ const ProgressBars: React.FC = () => {
     }
   }, []);
 
+  const chapterTarget = useRafNumber(chapterProgress / 100);
+  const bookTarget = useRafNumber(bookProgress / 100);
+  const furthestTarget = useRafNumber(furthestProgress / 100);
+
   if (chaptersStructure.length === 0) {
     return null;
   }
@@ -52,9 +67,9 @@ const ProgressBars: React.FC = () => {
       {isSplashHidden && (
         <>
           <motion.div variants={progressVariants} initial="hidden" animate="visible" className="fixed inset-x-0 top-0 h-[10px] bg-[rgba(139,69,19,0.2)] z-[49] pointer-events-none">
-            <div
+            <motion.div
               className="h-full w-full bg-gradient-to-r from-[#8B4513] to-[#CD853F] opacity-70 origin-left transform-gpu transition-transform duration-300 ease-in-out [will-change:transform]"
-              style={{ transform: `scaleX(${chapterProgress / 100})` }}
+              animate={{ scaleX: chapterTarget }}
             />
           </motion.div>
 
@@ -64,9 +79,9 @@ const ProgressBars: React.FC = () => {
             animate="visible"
             className="fixed inset-x-0 bottom-0 h-[10px] bg-[rgba(139,69,19,0.2)] z-[48] pointer-events-none"
           >
-            <div
+            <motion.div
               className="h-full w-full bg-gradient-to-r from-[#88888830] to-[#bbbbbb30] origin-left transform-gpu transition-transform duration-300 ease-in-out [will-change:transform]"
-              style={{ transform: `scaleX(${furthestProgress / 100})` }}
+              animate={{ scaleX: furthestTarget }}
             />
           </motion.div>
 
@@ -76,9 +91,9 @@ const ProgressBars: React.FC = () => {
             animate="visible"
             className="fixed inset-x-0 bottom-0 h-[10px] bg-[rgba(139,69,19,0.2)] z-[49] pointer-events-none"
           >
-            <div
+            <motion.div
               className="h-full w-full bg-gradient-to-r from-[#A0522D] to-[#F4A460] opacity-70 origin-left transform-gpu transition-transform duration-300 ease-in-out [will-change:transform]"
-              style={{ transform: `scaleX(${bookProgress / 100})` }}
+              animate={{ scaleX: bookTarget }}
             />
           </motion.div>
         </>
