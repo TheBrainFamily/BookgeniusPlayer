@@ -59,6 +59,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       openSearchModal(true, true, value.trim());
     }
 
+    if (inputRef.current == null) return;
+
     try {
       inputRef.current.focus();
       const length = inputRef.current.value.length;
@@ -296,6 +298,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                       <TooltipTrigger asChild>
                         <motion.button
                           type="submit"
+                          aria-label="Send message"
                           disabled={isThinking}
                           className="p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400"
                           whileHover="hover"
