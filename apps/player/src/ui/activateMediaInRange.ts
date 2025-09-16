@@ -5,6 +5,9 @@ import { getTalkingMediaFilePathForName, getListeningMediaFilePathForName } from
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
 import { normalizeSrcForInlineAvatar, highlightCharacter } from "./highlightCharacter";
 
+// Global flag to ensure we reset all isTalking values only once at the very beginning
+let hasInitializedTalkingStates = false;
+
 /** Checks if a given chapter and paragraph index falls within the specified range **/
 function isInRange(currentChapter: number, currentParagraph: number, startChapter: number, startParagraph: number, endChapter: number, endParagraph: number): boolean {
   // Single chapter range
@@ -49,8 +52,6 @@ function updateVideoState(container: HTMLDivElement, isTalking: boolean) {
 function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsModal: (params: CharacterModalParams) => void, isPlayFormat: boolean): HTMLDivElement | null {
   const characterSlug = placeholder.dataset.character;
   if (!characterSlug) return null;
-
-  placeholder.dataset.isTalking = "false";
 
   const isTalking = placeholder.dataset.isTalking === "true";
   const talkingSrc = getTalkingMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
@@ -160,6 +161,16 @@ export function activateMediaInRange(
   openCharacterDetailsModal: (params: CharacterModalParams) => void,
   isPlayFormat: boolean,
 ) {
+  // Global initialization - reset all isTalking states to "false" only once at the very beginning
+  if (!hasInitializedTalkingStates) {
+    const allPlaceholders = document.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+    allPlaceholders.forEach((placeholder) => {
+      placeholder.dataset.isTalking = "false";
+    });
+
+    hasInitializedTalkingStates = true;
+  }
+
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
 
   const bufferSize = isPlayFormat ? 6 : 10;
@@ -180,7 +191,6 @@ export function activateMediaInRange(
 
       const charactersDisplayed = [];
       placeholders.forEach((placeholder) => {
-        placeholder.dataset.isTalking = "false";
         const mediaInjected = placeholder.dataset.mediaInjected === "true";
         // Query for either video or image with the class OR the dummy placeholder
         let mediaElement = placeholder.querySelector<HTMLDivElement>("div.inline-avatar");
