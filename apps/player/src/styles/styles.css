@@ -536,8 +536,8 @@
         }
 
         .inline-avatar {
-          min-width: clamp(65px, 18vw, 150px);
-          min-height: clamp(65px, 18vw, 150px);
+          min-width: clamp(65px, 16vw, 150px);
+          min-height: clamp(65px, 16vw, 150px);
           border-radius: 50%;
           display: block;
           padding: 0;
@@ -776,7 +776,7 @@
 
         .play-row .character-text {
           max-width: initial;
-          flex: none;
+          flex: 1 0 0;
         }
 
         .play-row[data-text-alignment="left"] {
@@ -816,8 +816,8 @@
 
         .play-row .character-text p:first-child {
           position: absolute;
-          top: calc(clamp(65px, 18vw, 150px) / 3);
-          left: calc(clamp(65px, 18vw, 150px) + 2rem);
+          top: calc(clamp(65px, 16vw, 150px) / 3);
+          left: calc(clamp(65px, 16vw, 150px) + 2rem);
         }
 
         .play-row[data-text-alignment="right"] {
@@ -833,7 +833,7 @@
           .character-text p:first-child {
             position: absolute;
             left: inherit;
-            right: calc(clamp(65px, 18vw, 150px) + 2rem);
+            right: calc(clamp(65px, 16vw, 150px) + 2rem);
             width: max-content;
           }
         }

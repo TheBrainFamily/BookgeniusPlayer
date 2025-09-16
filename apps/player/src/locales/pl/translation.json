@@ -215,6 +215,8 @@
   "splash_subtitle": "Twoja wirtualna biblioteka",
   "start_button": "Start",
   "book_menu_button_tooltip": "Otwórz Menu Książki",
+  "resume_music": "Wznów muzykę",
+  "pause_music": "Zatrzymaj muzykę",
   "volume": "Głośność",
   "balance": "Balans",
   "audiobook": "Audiobook",
