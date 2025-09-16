@@ -165,16 +165,13 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                               <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-primary-30 text-book-primary">
                                 <span className="flex items-center gap-1">
                                   <FileText size={12} />
-                                  {getChapterTitle(appearance.chapter, t)}
+                                  {appearance.percentInChapter}% {t("of_chapter")} {getChapterTitle(appearance.chapter, t)}
                                 </span>
-                              </div>
-                              <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
-                                {appearance.percentInChapter}% {t("of_chapter")}
                               </div>
                             </div>
 
                             <motion.div
-                              className="text-sm text-white/90 leading-relaxed line-clamp-3"
+                              className="text-sm text-white/90 leading-relaxed line-clamp-6 md:line-clamp-3"
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               transition={{ delay: 0.2 }}
