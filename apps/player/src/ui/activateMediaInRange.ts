@@ -28,14 +28,19 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 
 /** Updates video opacity based on talking state for inline avatars **/
 function updateVideoState(container: HTMLDivElement, isTalking: boolean) {
+  const hasVideos = container.dataset.hasVideos;
+  if (!hasVideos || hasVideos === "listening-only") return;
+
   const listeningVideo = container.querySelector('video[data-state="listens"]') as HTMLVideoElement;
   const speakingVideo = container.querySelector('video[data-state="speaks"]') as HTMLVideoElement;
 
-  if (listeningVideo) {
+  if (hasVideos === "true" && listeningVideo && speakingVideo) {
+    // Both videos available - image underneath, speaking covers listening
     listeningVideo.style.opacity = isTalking ? "0" : "1";
-  }
-
-  if (speakingVideo) {
+    speakingVideo.style.opacity = isTalking ? "1" : "0";
+  } else if (hasVideos === "speaking-only" && speakingVideo) {
+    // Only speaking video - image acts as listening state
+    // When talking: show speaking video, when not talking: hide speaking video to show image
     speakingVideo.style.opacity = isTalking ? "1" : "0";
   }
 }
@@ -43,11 +48,11 @@ function updateVideoState(container: HTMLDivElement, isTalking: boolean) {
 /** Creates a media container element with CharacterMedia-like structure for inline avatars */
 function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsModal: (params: CharacterModalParams) => void, isPlayFormat: boolean): HTMLDivElement | null {
   const characterSlug = placeholder.dataset.character;
+  if (!characterSlug) return null;
+
   const isTalking = placeholder.dataset.isTalking === "true";
   const talkingSrc = getTalkingMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
   const listeningSrc = getListeningMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
-
-  if (!characterSlug) return null;
 
   // Create container element similar to CharacterMedia structure
   const container = document.createElement("div");
@@ -57,30 +62,41 @@ function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsMo
 
   // Create placeholder image (always shown as fallback)
   const placeholderImg = document.createElement("img");
+  // Use whichever source is available for placeholder
   const placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
   placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
   placeholderImg.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
   placeholderImg.alt = characterSlug;
   container.appendChild(placeholderImg);
 
-  if (isPlayFormat && listeningSrc && isVideoFile(listeningSrc)) {
-    // Create listening video
-    const listeningVideo = document.createElement("video");
-    listeningVideo.src = listeningSrc;
-    listeningVideo.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
-    listeningVideo.autoplay = true;
-    listeningVideo.loop = true;
-    listeningVideo.muted = true;
-    listeningVideo.playsInline = true;
-    listeningVideo.dataset.state = "listens";
+  if (isPlayFormat && (listeningSrc || talkingSrc)) {
+    let listeningVideo: HTMLVideoElement | null = null;
+    let speakingVideo: HTMLVideoElement | null = null;
 
-    // Initially show listening video
-    listeningVideo.style.opacity = isTalking ? "0" : "1";
-    container.appendChild(listeningVideo);
+    // Create listening video if available
+    if (listeningSrc && isVideoFile(listeningSrc)) {
+      listeningVideo = document.createElement("video");
+      listeningVideo.src = listeningSrc;
+      listeningVideo.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
+      listeningVideo.autoplay = true;
+      listeningVideo.loop = true;
+      listeningVideo.muted = true;
+      listeningVideo.playsInline = true;
+      listeningVideo.dataset.state = "listens";
+
+      listeningVideo.onerror = () => {
+        console.warn(`Failed to load listening video: ${listeningSrc}`);
+        listeningVideo!.style.display = "none";
+      };
+      // Only listening video plays by default, speaking video will be switched in hook usePlayCharacterSpeakingStates
+      listeningVideo.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+
+      container.appendChild(listeningVideo);
+    }
 
     // Create speaking video if available
     if (talkingSrc && isVideoFile(talkingSrc)) {
-      const speakingVideo = document.createElement("video");
+      speakingVideo = document.createElement("video");
       speakingVideo.src = talkingSrc;
       speakingVideo.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
       speakingVideo.autoplay = true;
@@ -89,28 +105,30 @@ function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsMo
       speakingVideo.playsInline = true;
       speakingVideo.dataset.state = "speaks";
 
-      // Show speaking video only when talking
-      speakingVideo.style.opacity = isTalking ? "1" : "0";
-      container.appendChild(speakingVideo);
+      speakingVideo.onerror = () => {
+        console.warn(`Failed to load speaking video: ${talkingSrc}`);
+        speakingVideo!.style.display = "none";
+      };
 
-      // Store references for easy swapping
-      container.dataset.hasVideos = "true";
+      container.appendChild(speakingVideo);
     }
 
-    // Handle video loading errors
-    listeningVideo.onerror = () => {
-      console.warn(`Failed to load listening video: ${listeningSrc}`);
-      listeningVideo.style.display = "none";
-    };
-
-    if (talkingSrc && isVideoFile(talkingSrc)) {
-      const speakingVideo = container.querySelector('video[data-state="speaks"]') as HTMLVideoElement;
-      if (speakingVideo) {
-        speakingVideo.onerror = () => {
-          console.warn(`Failed to load speaking video: ${talkingSrc}`);
-          speakingVideo.style.display = "none";
-        };
-      }
+    // Set initial visibility based on available videos and talking state
+    if (listeningVideo && speakingVideo) {
+      // Both videos available - image underneath, speaking video covers listening video
+      // image is always visible as base layer (opacity 1)
+      listeningVideo.style.opacity = isTalking ? "0" : "1";
+      speakingVideo.style.opacity = isTalking ? "1" : "0";
+      container.dataset.hasVideos = "true";
+    } else if (speakingVideo && !listeningVideo) {
+      // Only speaking video available - image acts as listening state and covers speaking initially
+      // image handles the "listening" role, speaking video starts hidden
+      speakingVideo.style.opacity = isTalking ? "1" : "0";
+      container.dataset.hasVideos = "speaking-only";
+    } else if (listeningVideo && !speakingVideo) {
+      // Only listening video available - always show it over image
+      listeningVideo.style.opacity = "1";
+      container.dataset.hasVideos = "listening-only";
     }
   }
 
@@ -175,14 +193,6 @@ export function activateMediaInRange(
 
               // NOTE: Text was already hidden when media was first injected,
               // and remains hidden while the dummy is shown. No action needed here.
-
-              // Play video if applicable
-              if (newMediaElement) {
-                const videos = newMediaElement.querySelectorAll("video");
-                videos.forEach((video) => {
-                  video.play().catch((e) => console.warn("Video play interrupted or failed:", e));
-                });
-              }
             }
           } else if (!mediaInjected) {
             // No dummy and no media injected yet, inject for the first time
@@ -200,14 +210,6 @@ export function activateMediaInRange(
               }
               placeholder.appendChild(mediaElement); // Append media
               placeholder.dataset.mediaInjected = "true"; // Mark as injected
-
-              // Play video if applicable
-              if (newMediaElement) {
-                const videos = newMediaElement.querySelectorAll("video");
-                videos.forEach((video) => {
-                  video.play().catch((e) => console.warn("Video play interrupted or failed:", e));
-                });
-              }
             }
           } else if (mediaElement) {
             // Media already injected, update talking state and play videos if paused
@@ -217,14 +219,6 @@ export function activateMediaInRange(
             if (mediaElement.dataset.hasVideos === "true") {
               updateVideoState(mediaElement, currentIsTalking);
             }
-
-            // Check for videos and play if paused
-            const videos = mediaElement.querySelectorAll("video");
-            videos.forEach((video) => {
-              if (video.paused) {
-                video.play().catch((e) => console.warn("Video play interrupted or failed:", e));
-              }
-            });
           }
         } else {
           // Out of view
