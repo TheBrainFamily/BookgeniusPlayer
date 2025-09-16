@@ -357,6 +357,8 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
   return finalResult;
 };
 
+const SUMMARY_TRUNCATE_LENGTH = 210;
+
 export function findCharacterSentences(characterSlug: string, currentLocation: Location) {
   const characterData = getCharactersData().find((character) => character.slug === characterSlug);
 
@@ -384,21 +386,34 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
         const totalParagraphsInChapter = getTotalParagraphsInChapter(chapter);
 
         paragraphs.forEach((paragraph) => {
-          const paragraphInnerHTML = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`).innerHTML;
+          const paragraphElement = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`);
+          const tagName = paragraphElement.tagName.toLowerCase();
+          const isStageDirectory = paragraphElement.querySelector("span em");
 
-          const sentence = getSentenceWithCharacterSpan(paragraphInnerHTML, characterSlug);
+          if (tagName === "h3" || tagName === "h4" || tagName === "h5" || isStageDirectory) return;
+
+          const paragraphInnerHTML = paragraphElement.innerHTML;
+
+          const sentence = filterParagraphByCharacter(paragraphInnerHTML, characterSlug);
 
           if (sentence) {
-            const cleanText = sentence.replace(/<[^>]*>/g, "");
-            const summaryText = cleanText.length > 300 ? cleanText.substring(0, 300) : cleanText;
-            const displayText = summaryText.length > 300 ? summaryText.substring(0, 300) : summaryText;
+            const removedHtmlTags = stripHtmlTags(sentence);
+
+            let _sentence: string;
+
+            if (removedHtmlTags.length > SUMMARY_TRUNCATE_LENGTH) {
+              const excerpt = extractTextAroundMark(sentence);
+              _sentence = excerpt ?? `${removedHtmlTags.substring(0, SUMMARY_TRUNCATE_LENGTH)}...`;
+            } else {
+              _sentence = sentence;
+            }
 
             items.push({
               chapter,
               paragraphNumber: paragraph,
               percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
-              summary: highlightMatchedWords(summaryText, characterSlug),
-              text: highlightMatchedWords(displayText, characterSlug),
+              summary: _sentence,
+              text: _sentence,
               id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
             });
           }
@@ -421,4 +436,119 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
   }
 
   return { header, items, isLoading: false };
+}
+
+function stripHtmlTags(str) {
+  if (!str || typeof str !== "string") {
+    return "";
+  }
+
+  // Remove HTML tags using regex
+  return str.replace(/<[^>]*>/g, "");
+}
+
+function filterParagraphByCharacter(paragraph, characterSlug) {
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = paragraph;
+
+  const elementsWithCharacter = tempDiv.querySelectorAll("[data-character]");
+
+  elementsWithCharacter.forEach((element) => {
+    if (element.getAttribute("data-character") !== characterSlug) {
+      const textContent = element.textContent;
+      element.replaceWith(document.createTextNode(textContent));
+    } else {
+      const markElement = document.createElement("mark");
+      markElement.className = "bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm";
+      markElement.textContent = element.textContent;
+      element.replaceWith(markElement);
+    }
+  });
+
+  let result = tempDiv.innerHTML;
+
+  const markPlaceholder = "___TEMP_MARK___";
+  const markTags = result.match(/<mark[^>]*>.*?<\/mark>/g) || [];
+  markTags.forEach((tag, index) => {
+    result = result.replace(tag, `${markPlaceholder}${index}${markPlaceholder}`);
+  });
+
+  result = result.replace(/<[^>]*>/g, "");
+
+  markTags.forEach((tag, index) => {
+    result = result.replace(`${markPlaceholder}${index}${markPlaceholder}`, tag);
+  });
+
+  result = result.replace(/&nbsp;/g, " ");
+  result = result.replace(/\s+/g, " ");
+  result = result.trim();
+
+  return result;
+}
+
+function extractTextAroundMark(paragraph) {
+  const markCloseTag = "</mark>";
+  if (!paragraph.includes(markCloseTag)) {
+    return null;
+  }
+
+  const markStart = paragraph.indexOf("<mark");
+  if (markStart === -1) {
+    return null;
+  }
+
+  const markOpenEnd = paragraph.indexOf(">", markStart) + 1;
+  const markCloseStart = paragraph.indexOf(markCloseTag);
+  const markEnd = markCloseStart + markCloseTag.length;
+
+  const markedText = paragraph.substring(markOpenEnd, markCloseStart);
+
+  const targetTextLength = SUMMARY_TRUNCATE_LENGTH;
+
+  const beforeChars = Math.floor((targetTextLength - markedText.length) / 2);
+  const afterChars = targetTextLength - markedText.length - beforeChars;
+
+  let startPos = Math.max(0, markStart - beforeChars);
+
+  let endPos = Math.min(paragraph.length, markEnd + afterChars);
+
+  const currentTextLength = markStart - startPos + markedText.length + (endPos - markEnd);
+  if (currentTextLength < targetTextLength) {
+    const extraChars = targetTextLength - currentTextLength;
+
+    const canExtendBack = startPos;
+    const extendBack = Math.min(canExtendBack, extraChars);
+    startPos -= extendBack;
+
+    const remaining = extraChars - extendBack;
+    const canExtendForward = paragraph.length - endPos;
+    const extendForward = Math.min(canExtendForward, remaining);
+    endPos += extendForward;
+  }
+
+  let result = paragraph.substring(startPos, endPos);
+
+  if (startPos > 0) {
+    const firstSpaceIndex = result.indexOf(" ");
+    if (firstSpaceIndex !== -1) {
+      result = result.substring(firstSpaceIndex + 1);
+    }
+    result = "..." + result;
+  }
+
+  const lastOpenBracket = result.lastIndexOf("<");
+  if (lastOpenBracket !== -1) {
+    const lastCloseBracket = result.lastIndexOf(">");
+    if (lastOpenBracket > lastCloseBracket) {
+      result = result.substring(0, lastOpenBracket);
+    }
+  }
+
+  if (!/[^.][.]$|^[.]$|[!?]+$/.test(result)) {
+    if (!result.endsWith("...")) {
+      result = result.trim() + "...";
+    }
+  }
+
+  return result;
 }
