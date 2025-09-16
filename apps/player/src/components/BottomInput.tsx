@@ -66,43 +66,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     } catch {}
   }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.key === "f" || event.key === "F") && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault();
-
-        handleActivity();
-        openModalWithFocus();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleActivity, openModalWithFocus]);
-
-  useEffect(() => {
-    if (response && !isRecording) {
-      setValue(response);
-      handleActivity();
-
-      if (isSearchModalOpen) setSearchQuery(response);
-    }
-  }, [response, isRecording, isSearchModalOpen, setSearchQuery, handleActivity]);
-
-  useEffect(() => {
-    const handleDocumentPointerDown = (e: PointerEvent) => {
-      const target = e.target as Element;
-
-      if (containerRef.current?.contains(target)) return;
-      if (target.closest('[role="dialog"]') || target.closest('[role="tooltip"]')) return;
-
-      startAllTimers();
-    };
-
-    document.addEventListener("pointerdown", handleDocumentPointerDown, true);
-    return () => document.removeEventListener("pointerdown", handleDocumentPointerDown, true);
-  }, [startAllTimers]);
-
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       handleActivity();
@@ -219,6 +182,43 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     return t("search_or_ask");
   }, [isRecording, isThinking, isDeepResearchActive, t]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.key === "f" || event.key === "F") && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+
+        handleActivity();
+        openModalWithFocus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleActivity, openModalWithFocus]);
+
+  useEffect(() => {
+    if (response && !isRecording) {
+      setValue(response);
+      handleActivity();
+
+      if (isSearchModalOpen) setSearchQuery(response);
+    }
+  }, [response, isRecording, isSearchModalOpen, setSearchQuery, handleActivity]);
+
+  useEffect(() => {
+    const handleDocumentPointerDown = (e: PointerEvent) => {
+      const target = e.target as Element;
+
+      if (containerRef.current?.contains(target)) return;
+      if (target.closest('[role="dialog"]') || target.closest('[role="tooltip"]')) return;
+
+      startAllTimers();
+    };
+
+    document.addEventListener("pointerdown", handleDocumentPointerDown, true);
+    return () => document.removeEventListener("pointerdown", handleDocumentPointerDown, true);
+  }, [startAllTimers]);
+
   return (
     <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
       <motion.div
@@ -230,6 +230,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
         initial="idle"
         variants={variants.container}
         ref={containerRef}
+        data-keep-modal-open="true"
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key="expanded" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
