@@ -6,35 +6,52 @@ import { getCharactersData } from "@player/genericBookDataGetters/getCharactersD
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 
 function updateInlineAvatarTalkingState(container: HTMLDivElement, isTalking: boolean) {
-  const hasVideos = container.dataset.hasVideos === "true";
-  if (!hasVideos) return;
+  const hasVideos = container.dataset.hasVideos;
+  if (!hasVideos || hasVideos === "listening-only") return;
 
   const listeningVideo = container.querySelector('video[data-state="listens"]') as HTMLVideoElement;
   const speakingVideo = container.querySelector('video[data-state="speaks"]') as HTMLVideoElement;
 
-  if (!listeningVideo || !speakingVideo) return;
+  if (hasVideos === "true" && listeningVideo && speakingVideo) {
+    // Both videos available - image underneath, speaking covers listening
+    const activeVideo = isTalking ? speakingVideo : listeningVideo;
+    const inactiveVideo = isTalking ? listeningVideo : speakingVideo;
+    const activeOpacity = "1";
+    const inactiveOpacity = "0";
 
-  const activeVideo = isTalking ? speakingVideo : listeningVideo;
-  const inactiveVideo = isTalking ? listeningVideo : speakingVideo;
-  const activeOpacity = "1";
-  const inactiveOpacity = "0";
+    if (activeVideo.style.opacity !== activeOpacity) {
+      activeVideo.style.opacity = activeOpacity;
+    }
+    if (inactiveVideo.style.opacity !== inactiveOpacity) {
+      inactiveVideo.style.opacity = inactiveOpacity;
+    }
 
-  if (activeVideo.style.opacity !== activeOpacity) {
-    activeVideo.style.opacity = activeOpacity;
-  }
-  if (inactiveVideo.style.opacity !== inactiveOpacity) {
-    inactiveVideo.style.opacity = inactiveOpacity;
-  }
+    // play active, pause inactive
+    if (activeVideo.paused) {
+      activeVideo.play().catch((e) => {
+        console.warn("Failed to play active video:", e);
+      });
+    }
 
-  // play active, pause inactive
-  if (activeVideo.paused) {
-    activeVideo.play().catch((e) => {
-      console.warn("Failed to play active video:", e);
-    });
-  }
+    if (!inactiveVideo.paused) {
+      inactiveVideo.pause();
+    }
+  } else if (hasVideos === "speaking-only" && speakingVideo) {
+    // Only speaking video - image acts as listening state
+    // When talking: show speaking video (opacity 1), when not talking: hide speaking video (opacity 0) to show image underneath
+    const activeOpacity = isTalking ? "1" : "0";
 
-  if (!inactiveVideo.paused) {
-    inactiveVideo.pause();
+    if (speakingVideo.style.opacity !== activeOpacity) {
+      speakingVideo.style.opacity = activeOpacity;
+    }
+
+    if (isTalking && speakingVideo.paused) {
+      speakingVideo.play().catch((e) => {
+        console.warn("Failed to play speaking video:", e);
+      });
+    } else if (!isTalking && !speakingVideo.paused) {
+      speakingVideo.pause();
+    }
   }
 }
 

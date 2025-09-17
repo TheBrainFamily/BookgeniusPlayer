@@ -38,8 +38,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       return getPlaceholderFromVideoUrl(base);
     }
 
-    return isTalkingInCurrentRange ? getTalkingMediaFilePathForName(entity.slug, bookSlug) : getListeningMediaFilePathForName(entity.slug, bookSlug);
-  }, [imageOnly, entity.imageUrl, entity.slug, isTalkingInCurrentRange]);
+    // Always use listening source as base - CharacterMedia will handle both listening and speaking internally
+    return getListeningMediaFilePathForName(entity.slug, bookSlug);
+  }, [imageOnly, entity.imageUrl, entity.slug, bookSlug]);
 
   const isVideo = imageOnly ? false : isVideoFile(mediaSrc);
 
@@ -98,7 +99,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       <motion.div
         layout
         className={cn(
-          "relative rounded-full aspect-square isolate",
+          "relative rounded-full aspect-square isolate overflow-hidden",
           disableHighlight
             ? ""
             : isTalkingInCurrentRange
