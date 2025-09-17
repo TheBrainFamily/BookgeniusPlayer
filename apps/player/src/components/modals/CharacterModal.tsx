@@ -96,7 +96,14 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   if (!matchingCharacter) return null;
 
   return (
-    <ModalUI onClose={handleOnClose} className="bg-transparent" size="xxl" layoutView={appearancesClicked} hideOverlay={appearancesClicked}>
+    <ModalUI
+      onClose={handleOnClose}
+      className="bg-transparent"
+      size="xxl"
+      layoutView={appearancesClicked}
+      hideOverlay={appearancesClicked}
+      closeOnOverlayClick={!appearancesClicked}
+    >
       <motion.div
         className="flex flex-col sm:flex-row items-center gap-6 mx-auto relative max-h-screen"
         variants={variants.container}
