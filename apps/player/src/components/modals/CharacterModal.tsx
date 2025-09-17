@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion, Variants } from "motion/react";
 import { FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -35,6 +35,21 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [appearancesClicked, setAppearancesClicked] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+
+  const shiftEnableRef = useRef(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => setIsLargeScreen(window.innerWidth >= 1280);
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => {
+      if (shiftEnableRef.current) {
+        useContentShift.getState().disableContentShift();
+      }
+      window.removeEventListener("resize", checkScreenSize);
+    };
+  }, []);
 
   // Search for character appearances in the text up to the current location
   useEffect(() => {
@@ -80,9 +95,10 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     if (matchingCharacter?.characterName) {
       highlightSearchInParagraph(appearance.chapter, appearance.paragraphNumber, matchingCharacter.characterName);
     }
-    if (window.innerWidth >= 1280) {
+    if (isLargeScreen) {
       setAppearancesClicked(true);
       useContentShift.getState().enableContentShift();
+      shiftEnableRef.current = true;
     } else {
       onClose();
     }
@@ -90,6 +106,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
   const handleOnClose = () => {
     useContentShift.getState().disableContentShift();
+    shiftEnableRef.current = false;
     onClose();
   };
 
