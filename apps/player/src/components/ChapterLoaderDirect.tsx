@@ -1,5 +1,6 @@
 // src/components/ChapterLoaderDirect.tsx (adjust path as needed)
 import React, { useEffect, useState, ReactNode } from "react";
+import { goToParagraph } from "@player/helpers/paragraphsNavigation";
 
 interface ChapterLoaderDirectProps {
   bookSlug: string;
@@ -103,41 +104,47 @@ const ChapterLoaderDirect: React.FC<ChapterLoaderDirectProps> = ({ bookSlug, cha
 
       // Function to wait for element and scroll
       const waitAndScroll = () => {
-        // For paragraph 0, scroll to the chapter itself
         const selector = targetParagraph === 0 ? `section[data-chapter="${chapterId}"]` : `section[data-chapter="${chapterId}"] [data-index="${targetParagraph}"]`;
 
         let attempts = 0;
         const maxAttempts = 50; // 5 seconds total
 
-        const checkAndScroll = () => {
+        const tryScroll = () => {
           const element = document.querySelector(selector);
-          if (element) {
-            console.log(`ChapterLoaderDirect: Found ${targetParagraph === 0 ? "chapter" : "paragraph"} element, scrolling to it`);
-            // Use requestAnimationFrame to ensure layout is complete
-            requestAnimationFrame(() => {
-              console.log("GOZDECKI MAY 29 scrollIntoView", element);
-              element.scrollIntoView({ behavior: "instant", block: "start" });
-            });
-            return true;
+          if (!element) {
+            return false;
           }
-          return false;
+
+          console.log(`ChapterLoaderDirect: Found ${targetParagraph === 0 ? "chapter" : "paragraph"} element, scrolling via goToParagraph`);
+          void goToParagraph({ currentChapter: chapterId, currentParagraph: targetParagraph }, { behavior: "instant" }).catch((error) => {
+            console.error(`ChapterLoaderDirect: goToParagraph failed for chapter ${chapterId}, paragraph ${targetParagraph}`, error);
+          });
+          return true;
         };
 
-        // Try immediately first
-        if (checkAndScroll()) return;
-
-        // Then set up interval to keep checking
-        intervalId = setInterval(() => {
+        const attemptScroll = () => {
           attempts++;
-          if (checkAndScroll() || attempts >= maxAttempts) {
+          const success = tryScroll();
+          if (success || attempts >= maxAttempts) {
             if (intervalId) clearInterval(intervalId);
-            if (attempts >= maxAttempts) {
+            if (!success && attempts >= maxAttempts) {
               console.error(
-                `ChapterLoaderDirect: Failed to find ${targetParagraph === 0 ? "chapter" : `paragraph ${targetParagraph}`} in chapter ${chapterId} after ${maxAttempts} attempts`,
+                `ChapterLoaderDirect: Failed to scroll to ${targetParagraph === 0 ? "chapter" : `paragraph ${targetParagraph}`} in chapter ${chapterId} after ${maxAttempts} attempts`,
               );
             }
           }
-        }, 100);
+          return success;
+        };
+
+        const initialSuccess = attemptScroll();
+        if (!initialSuccess) {
+          intervalId = setInterval(() => {
+            const success = attemptScroll();
+            if (success && intervalId) {
+              clearInterval(intervalId);
+            }
+          }, 100);
+        }
       };
 
       // Start the wait and scroll process

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { setupPageObserver } from "@player/ui/pageObserver";
 import { getBookStringified } from "@player/genericBookDataGetters/getBookStringified";
@@ -8,6 +8,8 @@ import { activateCharacterInteractions } from "@player/helpers/activateCharacter
 import { useEditorMode } from "@player/hooks/useEditorMode";
 import { useBookData } from "@player/context/BookDataContext";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { goToParagraph } from "@player/helpers/paragraphsNavigation";
+import { useLocation } from "@player/state/LocationContext";
 import { addPaddingBottomLastChapter } from "@player/helpers/addPaddingBottomLastChapter";
 import { addSpaceBetweenChapters } from "@player/helpers/addSpaceBetweenChapters";
 import { backgroundsForBook } from "@player/ui/backgroundsForBook";
@@ -26,6 +28,9 @@ const isEditorMode = import.meta.env.VITE_EDITOR === "true";
 export function useBookContent(containerId: string) {
   const container = document.getElementById(containerId);
   const { textVersion } = useBookData();
+  const { location } = useLocation();
+  const { currentChapter, currentParagraph } = location;
+  const previousTextVersionRef = useRef(textVersion);
   const bookStringified = getBookStringified();
   const {
     metadata: { bookForm },
@@ -89,7 +94,7 @@ export function useBookContent(containerId: string) {
           }
 
           const currentSentenceId = span.id;
-          const currentSentenceScore = span.getAttribute("data-current-score") || "0";
+          const currentSentenceScore = span.getAttribute("data-current-score") || "100";
           const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentenceRef.current(span.id, parseInt(currentSentenceScore));
 
           if (!simplifiedSentence) {
@@ -172,6 +177,32 @@ export function useBookContent(containerId: string) {
       console.warn(`Container with id '${containerId}' not found for content injection.`);
     }
   }, [bookStringified, containerId, textVersion]); // Rerun if content, ID, or text version changes
+
+  useEffect(() => {
+    const textVersionChanged = previousTextVersionRef.current !== textVersion;
+    previousTextVersionRef.current = textVersion;
+
+    if (!textVersionChanged) {
+      return;
+    }
+
+    if (typeof currentChapter !== "number" || typeof currentParagraph !== "number") {
+      return;
+    }
+
+    const containerElement = document.getElementById(containerId);
+    if (!containerElement) {
+      return;
+    }
+
+    // Re-align the scroll position with the current location after the book
+    // content has been reloaded (e.g. via the editor "Reload Book Data" button).
+    requestAnimationFrame(() => {
+      void goToParagraph({ currentChapter, currentParagraph }, { behavior: "instant" }).catch((error) => {
+        console.error("useBookContent: Failed to restore scroll position after reload", error);
+      });
+    });
+  }, [containerId, currentChapter, currentParagraph, textVersion]);
 }
 
 function setSentenceAsClicked(sentenceId: string) {

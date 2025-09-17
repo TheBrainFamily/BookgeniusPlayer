@@ -70,6 +70,41 @@ const detectScrollEnd = (element: HTMLElement, callback: () => void, timeout: nu
 
 /* ------------------------------------------------------------------ */
 
+// Mirror the focus-zone heuristics that the IntersectionObserver uses so
+// programmatic navigation lands the requested paragraph inside the same area.
+const calculateFocusZone = (containerRect: DOMRect) => {
+  const topMultiplier = 0.35;
+  let bottomMultiplier = 0.45;
+
+  const viewportHeight = window.innerHeight;
+  const viewportWidth = window.innerWidth;
+
+  const landscapeMediaQuery = typeof window.matchMedia === "function" ? window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)") : null;
+  if (landscapeMediaQuery?.matches) {
+    bottomMultiplier = 0.75;
+  }
+
+  if (viewportHeight < 700) {
+    bottomMultiplier = 0.55;
+  }
+
+  if (viewportWidth < 768 && viewportHeight > viewportWidth) {
+    bottomMultiplier = 0.6;
+  }
+
+  if (viewportWidth > 1600) {
+    bottomMultiplier = 0.42;
+  }
+
+  const focusZoneTop = containerRect.height * topMultiplier;
+  const focusZoneBottom = containerRect.height * bottomMultiplier;
+  const focusZoneHeight = Math.max(0, focusZoneBottom - focusZoneTop);
+
+  return { top: focusZoneTop, bottom: focusZoneBottom, height: focusZoneHeight, center: focusZoneTop + focusZoneHeight / 2 } as const;
+};
+
+/* ------------------------------------------------------------------ */
+
 /*  Bridge interface for legacy helpers                               */
 interface Bridge {
   get: () => Location;
@@ -310,27 +345,31 @@ export const goToParagraph = (loc: { currentChapter: number; currentParagraph: n
     const containerRect = contentContainer.getBoundingClientRect();
     const elementRect = element.getBoundingClientRect();
 
-    // The IntersectionObserver's "focus zone" starts at 35% from the top of the container.
-    // To ensure the correct paragraph is detected as "active", we must scroll the element
-    // to this precise position, for both fast and smooth scrolling.
-    const focusZoneOffset = containerRect.height * 0.35;
+    const { center: focusZoneCenter, top: focusZoneTop } = calculateFocusZone(containerRect);
 
     const containerScrollPosition = contentContainer.scrollTop;
-    const goToParagraphPositionTop = elementRect.top;
+    const elementOffsetWithinContainer = elementRect.top - containerRect.top;
 
-    let additionalOffset = 0;
-    if (containerScrollPosition === 0) {
-      // This offset is an empirical value to correct initial scroll position when the scroll container is at the top.
-      // It helps to account for layout factors that are not yet stable on initial load, ensuring the target paragraph
-      // lands correctly in the focus zone.
-      const INITIAL_SCROLL_CORRECTION_FACTOR = 19;
-      additionalOffset = goToParagraphPositionTop / INITIAL_SCROLL_CORRECTION_FACTOR;
+    let zoneAlignedScrollTop: number;
+    if (loc.currentParagraph === 0) {
+      zoneAlignedScrollTop = containerScrollPosition + elementOffsetWithinContainer - focusZoneTop;
+    } else {
+      const elementCenterOffset = elementOffsetWithinContainer + elementRect.height / 2;
+
+      // Align the element's visual center with the focus-zone center so the
+      // observer selects the same paragraph that was requested.
+      zoneAlignedScrollTop = containerScrollPosition + elementCenterOffset - focusZoneCenter;
     }
+    const normalizedScrollTop = (() => {
+      if (!Number.isFinite(zoneAlignedScrollTop)) {
+        return containerScrollPosition;
+      }
 
-    // Calculate the scroll position needed to align the element's top with the focus zone's top.
-    const targetScrollTop = containerScrollPosition + goToParagraphPositionTop - containerRect.top - focusZoneOffset + additionalOffset;
+      const maxScrollTop = contentContainer.scrollHeight - containerRect.height;
+      return Math.min(Math.max(zoneAlignedScrollTop, 0), Math.max(0, maxScrollTop));
+    })();
 
-    contentContainer.scrollTo({ top: targetScrollTop, behavior: options.behavior });
+    contentContainer.scrollTo({ top: normalizedScrollTop, behavior: options.behavior });
 
     if (options.behavior === "instant") {
       // We use a double requestAnimationFrame to wait for the browser to repaint
