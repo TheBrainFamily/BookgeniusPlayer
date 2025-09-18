@@ -9,8 +9,6 @@ const DynamicDocumentTitle = () => {
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
 
-  const baseTitle = t("hero.bookGenius");
-
   const bookSlug = searchParams.get("book");
 
   const bookTitle = useMemo(() => {
@@ -24,13 +22,15 @@ const DynamicDocumentTitle = () => {
   useEffect(() => {
     if (typeof document === "undefined") return;
 
+    const baseTitle = t("hero.bookGenius");
+
     if (bookTitle) {
       document.title = `${baseTitle} - ${bookTitle}`;
       return;
     }
 
     document.title = `${baseTitle} - ${t("title")}`;
-  }, [baseTitle, bookTitle]);
+  }, [bookTitle, t]);
 
   return null;
 };
