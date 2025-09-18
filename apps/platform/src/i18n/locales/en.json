@@ -50,5 +50,6 @@
     "hours": "hrs",
     "minutes": "m"
   },
-  "notFound": { "title": "Page Not Found", "returnHome": "Return to Library", "description": "It seems this page has been lost in the vast library of the internet." }
+  "notFound": { "title": "Page Not Found", "returnHome": "Return to Library", "description": "It seems this page has been lost in the vast library of the internet." },
+  "title": "Immersive Visual Novel"
 }

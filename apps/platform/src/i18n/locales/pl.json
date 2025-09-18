@@ -50,5 +50,6 @@
     "hours": "godz.",
     "minutes": "min"
   },
-  "notFound": { "title": "Nie znaleziono strony", "returnHome": "Wróć do biblioteki", "description": "Wygląda na to, że ta strona zaginęła w rozległej bibliotece internetu." }
+  "notFound": { "title": "Nie znaleziono strony", "returnHome": "Wróć do biblioteki", "description": "Wygląda na to, że ta strona zaginęła w rozległej bibliotece internetu." },
+  "title": "Wciągające powieści wizualne"
 }
