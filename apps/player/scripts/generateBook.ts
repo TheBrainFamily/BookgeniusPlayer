@@ -8,7 +8,7 @@ import { generateDataFiles, xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterTags } from "./data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
 
-async function generateBook(bookDirectoryPath: string, bookOutputPath?: string, isDemo = false): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
+async function generateBook(bookDirectoryPath: string, bookOutputPath?: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
   const { metadata, xmlDoc, bookString } = parseBookXmlData(bookDirectoryPath);
 
@@ -22,7 +22,7 @@ async function generateBook(bookDirectoryPath: string, bookOutputPath?: string, 
   // Generate files
   generateKnownVideoFiles(bookDirectoryPath, bookOutputPath);
   generateAudiobookTracksFile(bookDirectoryPath, bookOutputPath);
-  generateBookDataFiles(bookDirectoryPath, metadata, xmlDoc, bookString, bookOutputPath, isDemo);
+  generateBookDataFiles(bookDirectoryPath, metadata, xmlDoc, bookString, bookOutputPath);
 
   // Load and validate generated book data
   console.time("loadAndValidateBookData");
