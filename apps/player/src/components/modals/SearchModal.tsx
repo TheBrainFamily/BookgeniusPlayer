@@ -1,9 +1,11 @@
-import React, { memo, useCallback, useEffect, useMemo, useDeferredValue } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useDeferredValue, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 
 import { motion, Variants } from "motion/react";
-import { Search, FileText } from "lucide-react";
+import { Search, FileText, Minimize2 } from "lucide-react";
+
+import { Tooltip, TooltipTrigger, TooltipContent } from "@player/components/ui/tooltip";
 
 import { SearchResultsData, SearchResultItemData, cleanupSearchChapters } from "@player/searchModal";
 import { goToParagraph } from "@player/helpers/paragraphsNavigation";
@@ -32,6 +34,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
   const showContent = Boolean(deferredResults) && !showSpinner;
   const hasItems = (deferredResults?.items?.length ?? 0) > 0;
 
+  const [openChapters, setOpenChapters] = useState<string[]>([]);
+
   const groupedResults = useMemo(() => {
     if (!deferredResults?.items) return {};
 
@@ -45,6 +49,18 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
     return groups;
   }, [deferredResults?.items]);
 
+  useEffect(() => {
+    if (hasItems && Object.keys(groupedResults).length > 0) {
+      setOpenChapters(Object.keys(groupedResults));
+    }
+  }, [groupedResults, hasItems]);
+
+  const handleCollapseAll = useCallback(() => {
+    setOpenChapters([]);
+  }, []);
+
+  const areAllCollapsed = openChapters.length === 0;
+
   useEffect(() => () => cleanupSearchChapters(), []);
 
   const modalTitle = (
@@ -54,8 +70,28 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
     </div>
   );
 
+  const headerActions =
+    hasItems && showContent ? (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            onClick={handleCollapseAll}
+            disabled={areAllCollapsed}
+            className={"p-1 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white/70 hover:text-white"}
+            aria-label="Collapse all groups"
+          >
+            <Minimize2 size={18} />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Collapse all</p>
+        </TooltipContent>
+      </Tooltip>
+    ) : null;
+
   return (
-    <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
+    <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay} headerActions={headerActions}>
       <motion.div className="flex flex-col h-full relative overflow-hidden" variants={variants.container} initial="hidden" animate="visible" exit="exit" aria-busy={showSpinner}>
         {showSpinner && (
           <motion.div
@@ -94,7 +130,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
           <motion.div className="flex-grow overflow-y-auto pb-4" variants={variants.content} initial="hidden" animate="visible" key="content">
             {hasItems ? (
               <motion.div className="space-y-3" variants={variants.container} initial="hidden" animate="visible">
-                <Accordion type="multiple" defaultValue={Object.keys(groupedResults)} className="w-full">
+                <Accordion type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
                   {Object.entries(groupedResults)
                     .sort(([a], [b]) => Number(a) - Number(b))
                     .map(([chapter, items]) => (

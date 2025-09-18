@@ -18,6 +18,7 @@ export interface ModalUIProps {
   showCloseButton?: boolean;
   closeOnOverlayClick?: boolean;
   animateHeight?: boolean;
+  headerActions?: ReactNode;
 }
 
 type ModalSize = { content: string; container: string };
@@ -82,6 +83,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
   showCloseButton = true,
   closeOnOverlayClick = true,
   animateHeight = false,
+  headerActions,
 }) => {
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   const [justOpened, setJustOpened] = useState(true);
@@ -177,22 +179,25 @@ const ModalUI: React.FC<ModalUIProps> = ({
             {title && (
               <header className="flex justify-between items-center p-4">
                 <div className={titleTextClasses}>{title}</div>
-                {showCloseButton && (
-                  <button
-                    type="button"
-                    onPointerUp={onClose}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        onClose();
-                      }
-                    }}
-                    className={closeButtonClasses}
-                    aria-label="Close modal"
-                  >
-                    <X size={20} />
-                  </button>
-                )}
+                <div className="flex items-center gap-2">
+                  {headerActions}
+                  {showCloseButton && (
+                    <button
+                      type="button"
+                      onPointerUp={onClose}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onClose();
+                        }
+                      }}
+                      className={closeButtonClasses}
+                      aria-label="Close modal"
+                    >
+                      <X size={20} />
+                    </button>
+                  )}
+                </div>
               </header>
             )}
 
