@@ -38,8 +38,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       return getPlaceholderFromVideoUrl(base);
     }
 
-    return isTalkingInCurrentRange ? getTalkingMediaFilePathForName(entity.slug, bookSlug) : getListeningMediaFilePathForName(entity.slug, bookSlug);
-  }, [imageOnly, entity.imageUrl, entity.slug, isTalkingInCurrentRange]);
+    // Always use listening source as base - CharacterMedia will handle both listening and speaking internally
+    return getListeningMediaFilePathForName(entity.slug, bookSlug);
+  }, [imageOnly, entity.imageUrl, entity.slug, bookSlug]);
 
   const isVideo = imageOnly ? false : isVideoFile(mediaSrc);
 
