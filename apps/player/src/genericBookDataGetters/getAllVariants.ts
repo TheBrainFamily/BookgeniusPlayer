@@ -22,6 +22,10 @@ export const loadAllVariants = async (): Promise<Variant[]> => {
   return cachedVariants;
 };
 
+export const reloadAllVariants = async (): Promise<void> => {
+  cachedVariants = await bookDataLoader.getAllVariants();
+};
+
 export const clearAllVariantsCache = () => {
   cachedVariants = null;
 };

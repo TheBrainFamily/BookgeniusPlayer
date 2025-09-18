@@ -62,12 +62,22 @@ function splitBook(bookFolder: string) {
   }
 }
 
-const publicBooksDir = "public_books";
-fs.readdirSync(publicBooksDir).forEach((folder) => {
-  const bookFolder = path.join(publicBooksDir, folder);
-  const stats = fs.statSync(bookFolder);
-  if (stats.isDirectory()) {
-    console.log(`Processing book: ${folder}`);
+const doIt = () => {
+  if (process.argv[2]) {
+    const bookFolder = path.join(process.cwd(), process.argv[2]);
     splitBook(bookFolder);
+    return;
   }
-});
+
+  const publicBooksDir = "public_books";
+  fs.readdirSync(publicBooksDir).forEach((folder) => {
+    const bookFolder = path.join(publicBooksDir, folder);
+    const stats = fs.statSync(bookFolder);
+    if (stats.isDirectory()) {
+      console.log(`Processing book: ${folder}`);
+      splitBook(bookFolder);
+    }
+  });
+};
+
+doIt();
