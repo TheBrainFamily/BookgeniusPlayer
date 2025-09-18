@@ -24,13 +24,18 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
 
   const deferredResults = useDeferredValue(searchResults);
 
+  const isCurrentlyLoading = Boolean(searchResults?.isLoading);
   const isDeferring = deferredResults !== searchResults;
-  const showSpinner = Boolean(deferredResults?.isLoading) || isDeferring;
+
+  const showSpinner = isCurrentlyLoading || (isDeferring && !deferredResults);
+
   const showContent = Boolean(deferredResults) && !showSpinner;
   const hasItems = (deferredResults?.items?.length ?? 0) > 0;
 
   const groupedResults = useMemo(() => {
-    const items = deferredResults?.items ?? [];
+    if (!deferredResults?.items) return {};
+
+    const items = deferredResults.items;
     const groups: Record<number, SearchResultItemData[]> = {};
 
     for (const it of items) {
@@ -53,7 +58,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
     <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
       <motion.div className="flex flex-col h-full relative overflow-hidden" variants={variants.container} initial="hidden" animate="visible" exit="exit" aria-busy={showSpinner}>
         {showSpinner && (
-          <motion.div className="flex flex-col items-center justify-center py-12 px-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <motion.div className="flex flex-col items-center justify-center py-12 px-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} key="loading">
             <div className="relative">
               <motion.div
                 className="w-12 h-12 border-4 rounded-full border-book-primary-30 border-t-book-primary"
@@ -79,7 +84,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
         )}
 
         {showContent && (
-          <div className="flex-grow overflow-y-auto pb-4">
+          <motion.div className="flex-grow overflow-y-auto pb-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} key="content">
             {hasItems ? (
               <motion.div className="space-y-3" variants={variants.container} initial="hidden" animate="visible">
                 <Accordion type="multiple" defaultValue={Object.keys(groupedResults)} className="w-full">
@@ -104,7 +109,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
                 <p className="text-white/70 text-xs mt-1">{t("try_different_search_terms")}</p>
               </motion.div>
             )}
-          </div>
+          </motion.div>
         )}
       </motion.div>
     </ModalUI>
