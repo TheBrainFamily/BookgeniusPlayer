@@ -75,16 +75,12 @@ export const useSearchLogic = () => {
 
           const remote = await debouncedPerformUnifiedSearch(searchQuery, location);
 
+          /* Only keep the result of the most-recent keystroke batch */
           if (searchId === latestSearchIdRef.current) {
             setResults(remote as SearchResultsData);
           }
         } else {
           // We have local results, so show them immediately
-          setResults(results);
-        }
-
-        /* Only keep the result of the most-recent keystroke batch */
-        if (searchId === latestSearchIdRef.current) {
           setResults(results);
         }
       } catch {
@@ -96,9 +92,9 @@ export const useSearchLogic = () => {
   }, [setResults, debouncedPerformUnifiedSearch]);
 
   /* ------------------------------------------------------------------ *
-   * 3 ️⃣  Debounce typing noise (100 ms) before *starting* a search
+   * 3 ️⃣  Debounce typing noise (150 ms) before *starting* a search - most people writes (~150-250ms per char)
    * ------------------------------------------------------------------ */
-  const debouncedTriggerSearch = useMemo(() => debounce(performSearch, 100), [performSearch]);
+  const debouncedTriggerSearch = useMemo(() => debounce(performSearch, 150), [performSearch]);
 
   /* ------------------------------------------------------------------ *
    * 4 ️⃣  Fire searches when the modal is open & the query changes
