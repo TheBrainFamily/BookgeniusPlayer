@@ -1,6 +1,7 @@
 import { isVideoFile } from "@player/helpers/isVideoFile";
-import { bookDataLoader } from "@player/services/bookDataLoader";
-import { getListeningMediaFilePathForName } from "@player/utils/getFilePathsForName";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { resolveCharacterSnapshot, parseChapterParagraphId } from "@player/utils/characterOverrides";
+import type { CharacterData, ChapterParagraphRef } from "@player/types/book";
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 
 let avatarContainerEl: HTMLDivElement | null = null;
@@ -18,6 +19,44 @@ const HIDE_TRANSITION_MS = 250;
 
 /** Keep track of elements already wired to avoid duplicate listeners */
 const initializedCharacters = new WeakSet<HTMLElement>();
+
+const charactersBySlug = new Map<string, CharacterData>();
+
+function getCharacterDataBySlug(slug: string): CharacterData | undefined {
+  if (!charactersBySlug.has(slug)) {
+    charactersBySlug.clear();
+    getCharactersData().forEach((character) => charactersBySlug.set(character.slug, character));
+  }
+
+  return charactersBySlug.get(slug);
+}
+
+function extractLocationFromCharacterEl(el: HTMLElement): ChapterParagraphRef | null {
+  const sentenceSpan = el.closest<HTMLSpanElement>("span[id^='ch']");
+  const fromId = parseChapterParagraphId(sentenceSpan?.id);
+  if (fromId) {
+    return fromId;
+  }
+
+  const paragraphEl = el.closest<HTMLElement>("[data-index]");
+  if (!paragraphEl) {
+    return null;
+  }
+
+  const chapterSection = paragraphEl.closest<HTMLElement>("section[data-chapter]");
+  if (!chapterSection) {
+    return null;
+  }
+
+  const chapter = Number.parseInt(chapterSection.dataset.chapter ?? "", 10);
+  const paragraph = Number.parseInt(paragraphEl.dataset.index ?? "", 10);
+
+  if (Number.isNaN(chapter) || Number.isNaN(paragraph)) {
+    return null;
+  }
+
+  return { chapter, paragraph };
+}
 
 /** Ensure a single floating avatar container exists */
 function ensureAvatarContainer(): HTMLDivElement {
@@ -151,11 +190,18 @@ export function highlightCharacter(characterEl: HTMLSpanElement, openCharacterDe
   const characterSlug = characterEl.dataset.character;
   if (!characterSlug) return;
 
-  initializedCharacters.add(characterEl);
+  const characterData = getCharacterDataBySlug(characterSlug);
+  if (!characterData) return;
 
-  const listeningSrc = getListeningMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
+  const location = extractLocationFromCharacterEl(characterEl);
+
+  const snapshot = resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+
+  const listeningSrc = snapshot.media.listening;
   const avatarSrc = listeningSrc ? normalizeSrcForInlineAvatar(listeningSrc) : "";
   const hasListeningMedia = Boolean(avatarSrc);
+
+  initializedCharacters.add(characterEl);
 
   characterEl.classList.add("character-highlighted-activated");
 
@@ -171,7 +217,7 @@ export function highlightCharacter(characterEl: HTMLSpanElement, openCharacterDe
     hideFloatingAvatar();
     const mediaSrcForModal = listeningSrc || "";
     const isVideoForModal = !!mediaSrcForModal && isVideoFile(mediaSrcForModal);
-    openCharacterDetailsModal({ characterSlug, isVideo: isVideoForModal, mediaSrc: mediaSrcForModal });
+    openCharacterDetailsModal({ characterSlug, isVideo: isVideoForModal, mediaSrc: mediaSrcForModal, chapter: location?.chapter, paragraph: location?.paragraph });
   });
 
   if (!hasListeningMedia) return;

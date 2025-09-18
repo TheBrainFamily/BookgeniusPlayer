@@ -1,8 +1,10 @@
 import { isVideoFile } from "@player/helpers/isVideoFile";
-import { bookDataLoader } from "@player/services/bookDataLoader";
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
-import { getTalkingMediaFilePathForName, getListeningMediaFilePathForName } from "@player/utils/getFilePathsForName";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
+import type { CharacterData } from "@player/types/book";
+import type { CharacterSnapshot } from "@player/utils/characterOverrides";
 import { normalizeSrcForInlineAvatar, highlightCharacter } from "./highlightCharacter";
 
 // Global flag to ensure we reset all isTalking values only once at the very beginning
@@ -49,34 +51,41 @@ function updateVideoState(container: HTMLDivElement, isTalking: boolean) {
 }
 
 /** Creates a media container element with CharacterMedia-like structure for inline avatars */
-function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsModal: (params: CharacterModalParams) => void, isPlayFormat: boolean): HTMLDivElement | null {
+function createMediaElement(
+  placeholder: HTMLSpanElement,
+  openCharacterDetailsModal: (params: CharacterModalParams) => void,
+  isPlayFormat: boolean,
+  characterData: CharacterData | undefined,
+  location: { chapter: number; paragraph: number } | null,
+  snapshotOverride?: CharacterSnapshot | null,
+): HTMLDivElement | null {
   const characterSlug = placeholder.dataset.character;
-  if (!characterSlug) return null;
+  if (!characterSlug || !characterData) return null;
+
+  const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
 
   const isTalking = placeholder.dataset.isTalking === "true";
-  const talkingSrc = getTalkingMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
-  const listeningSrc = getListeningMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
+  const listeningSrc = snapshot.media.listening;
+  const talkingSrc = snapshot.media.talking;
 
   // Create container element similar to CharacterMedia structure
   const container = document.createElement("div");
   container.classList.add("inline-avatar", "relative", "w-full", "h-full");
   container.dataset.character = characterSlug;
-  container.title = characterSlug;
+  container.title = snapshot.displayName;
 
   // Create placeholder image (always shown as fallback)
   const placeholderImg = document.createElement("img");
-  // Use whichever source is available for placeholder
   const placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
   placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
   placeholderImg.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
-  placeholderImg.alt = characterSlug;
+  placeholderImg.alt = snapshot.displayName;
   container.appendChild(placeholderImg);
 
   if (isPlayFormat && (listeningSrc || talkingSrc)) {
     let listeningVideo: HTMLVideoElement | null = null;
     let speakingVideo: HTMLVideoElement | null = null;
 
-    // Create listening video if available
     if (listeningSrc && isVideoFile(listeningSrc)) {
       listeningVideo = document.createElement("video");
       listeningVideo.src = listeningSrc;
@@ -86,18 +95,14 @@ function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsMo
       listeningVideo.muted = true;
       listeningVideo.playsInline = true;
       listeningVideo.dataset.state = "listens";
-
       listeningVideo.onerror = () => {
         console.warn(`Failed to load listening video: ${listeningSrc}`);
         listeningVideo!.style.display = "none";
       };
-      // Only listening video plays by default, speaking video will be switched in hook usePlayCharacterSpeakingStates
       listeningVideo.play().catch((e) => console.warn("Video play interrupted or failed:", e));
-
       container.appendChild(listeningVideo);
     }
 
-    // Create speaking video if available
     if (talkingSrc && isVideoFile(talkingSrc)) {
       speakingVideo = document.createElement("video");
       speakingVideo.src = talkingSrc;
@@ -107,35 +112,26 @@ function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsMo
       speakingVideo.muted = true;
       speakingVideo.playsInline = true;
       speakingVideo.dataset.state = "speaks";
-
       speakingVideo.onerror = () => {
         console.warn(`Failed to load speaking video: ${talkingSrc}`);
         speakingVideo!.style.display = "none";
       };
-
       container.appendChild(speakingVideo);
     }
 
-    // Set initial visibility based on available videos and talking state
     if (listeningVideo && speakingVideo) {
-      // Both videos available - image underneath, speaking video covers listening video
-      // image is always visible as base layer (opacity 1)
       listeningVideo.style.opacity = isTalking ? "0" : "1";
       speakingVideo.style.opacity = isTalking ? "1" : "0";
       container.dataset.hasVideos = "true";
     } else if (speakingVideo && !listeningVideo) {
-      // Only speaking video available - image acts as listening state and covers speaking initially
-      // image handles the "listening" role, speaking video starts hidden
       speakingVideo.style.opacity = isTalking ? "1" : "0";
       container.dataset.hasVideos = "speaking-only";
     } else if (listeningVideo && !speakingVideo) {
-      // Only listening video available - always show it over image
       listeningVideo.style.opacity = "1";
       container.dataset.hasVideos = "listening-only";
     }
   }
 
-  // Add pointer handler to container (works for mouse and touch)
   container.addEventListener("pointerup", (e) => {
     if (e.metaKey || e.ctrlKey) {
       return;
@@ -143,10 +139,10 @@ function createMediaElement(placeholder: HTMLSpanElement, openCharacterDetailsMo
     e.preventDefault();
     e.stopPropagation();
 
-    const currentIsTalking = placeholder.dataset.isTalking === "true";
-    const videoSrc = currentIsTalking ? talkingSrc : listeningSrc;
+    const preferredSrc = isTalking ? talkingSrc : listeningSrc;
+    const mediaSrc = preferredSrc || listeningSrc || talkingSrc || "";
 
-    openCharacterDetailsModal({ characterSlug, isVideo: !!videoSrc && isVideoFile(videoSrc), mediaSrc: videoSrc || "" });
+    openCharacterDetailsModal({ characterSlug, isVideo: Boolean(mediaSrc) && isVideoFile(mediaSrc), mediaSrc, chapter: location?.chapter, paragraph: location?.paragraph });
   });
 
   return container;
@@ -171,6 +167,11 @@ export function activateMediaInRange(
     hasInitializedTalkingStates = true;
   }
 
+  const charactersBySlug = new Map<string, CharacterData>();
+  getCharactersData().forEach((character) => {
+    charactersBySlug.set(character.slug, character);
+  });
+
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
 
   const bufferSize = isPlayFormat ? 6 : 10;
@@ -191,6 +192,10 @@ export function activateMediaInRange(
 
       const charactersDisplayed = [];
       placeholders.forEach((placeholder) => {
+        const characterSlug = placeholder.dataset.character || null;
+        const characterData = characterSlug ? charactersBySlug.get(characterSlug) : undefined;
+        const locationForPlaceholder = { chapter: currentChapter, paragraph: currentParagraph };
+        const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
         const mediaInjected = placeholder.dataset.mediaInjected === "true";
         // Query for either video or image with the class OR the dummy placeholder
         let mediaElement = placeholder.querySelector<HTMLDivElement>("div.inline-avatar");
@@ -198,7 +203,7 @@ export function activateMediaInRange(
         if (inView) {
           if (dummyPlaceholder) {
             // Found a dummy, replace it with actual media
-            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal, isPlayFormat);
+            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal, isPlayFormat, characterData, locationForPlaceholder, snapshot);
             if (newMediaElement) {
               placeholder.replaceChild(newMediaElement, dummyPlaceholder);
               placeholder.dataset.mediaInjected = "true"; // Mark as injected
@@ -209,7 +214,7 @@ export function activateMediaInRange(
             }
           } else if (!mediaInjected) {
             // No dummy and no media injected yet, inject for the first time
-            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal, isPlayFormat);
+            const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal, isPlayFormat, characterData, locationForPlaceholder, snapshot);
             if (newMediaElement) {
               mediaElement = newMediaElement; // Update mediaElement reference
               // Hide original text content if it's a mention
@@ -275,16 +280,13 @@ export function activateMediaInRange(
               newDummyElement.classList.add("relative");
 
               // Compute and add placeholder image so the avatar never appears empty
-              const characterSlugForDummy = placeholder.dataset.character;
-              if (characterSlugForDummy) {
-                const talkingSrcForDummy = getTalkingMediaFilePathForName(characterSlugForDummy, bookDataLoader.getCurrentBook());
-                const listeningSrcForDummy = getListeningMediaFilePathForName(characterSlugForDummy, bookDataLoader.getCurrentBook());
-                const placeholderSrcForDummy = normalizeSrcForInlineAvatar(listeningSrcForDummy || talkingSrcForDummy || "");
+              if (snapshot) {
+                const placeholderSrcForDummy = normalizeSrcForInlineAvatar(snapshot.media.listening || snapshot.media.talking || "");
                 if (placeholderSrcForDummy) {
                   const img = document.createElement("img");
                   img.src = placeholderSrcForDummy;
                   img.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
-                  img.alt = characterSlugForDummy;
+                  img.alt = snapshot.displayName;
                   newDummyElement.appendChild(img);
                 }
               }
@@ -298,7 +300,9 @@ export function activateMediaInRange(
             }
           }
         }
-        charactersDisplayed.push(placeholder.dataset.character);
+        if (characterSlug) {
+          charactersDisplayed.push(characterSlug);
+        }
       });
       const charactersToHighlight = p.querySelectorAll<HTMLSpanElement>(".character-highlighted");
       const seenCharactersInParentP = new Set<string>();
@@ -324,11 +328,20 @@ export function activateMediaInRange(
           if (!characterSlug) return;
 
           const isTalking = placeholder?.dataset.isTalking === "true";
-          const talkingSrc = getTalkingMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
-          const listeningSrc = getListeningMediaFilePathForName(characterSlug, bookDataLoader.getCurrentBook());
-          const mediaSrc = isTalking ? talkingSrc : listeningSrc;
+          const characterData = charactersBySlug.get(characterSlug);
+          const snapshotForClick = characterData
+            ? resolveCharacterSnapshot(characterData, { location: { chapter: currentChapter, paragraph: currentParagraph }, fallbackDisplayName: characterData.characterName })
+            : null;
 
-          openCharacterDetailsModal({ characterSlug, isVideo: !!mediaSrc && isVideoFile(mediaSrc), mediaSrc: mediaSrc || "" });
+          const mediaSrc = snapshotForClick ? (isTalking ? snapshotForClick.media.talking : snapshotForClick.media.listening) : "";
+
+          openCharacterDetailsModal({
+            characterSlug,
+            isVideo: !!mediaSrc && isVideoFile(mediaSrc),
+            mediaSrc: mediaSrc || "",
+            chapter: currentChapter,
+            paragraph: currentParagraph,
+          });
         };
 
         p.addEventListener("pointerup", handler, { passive: false });

@@ -5,7 +5,7 @@ import { DOMParser, Document } from "@xmldom/xmldom";
 import { BookData } from "@player/types/book";
 import { setKnownVideos } from "@player/utils/getFilePathsForName";
 import { generateDataFiles, xmlToComplexHtml } from "./data/xmlToComplexHtml";
-import { extractCharacterMetadata, getCharacterTags } from "./data/tools/create-book-metadata";
+import { extractCharacterMetadata, getCharacterOverrides, getCharacterTags } from "./data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
 
 async function generateBook(bookDirectoryPath: string, bookOutputPath?: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
@@ -127,8 +127,9 @@ export function generateCharacterMetadata(xmlDoc: Document, bookString: string, 
   // Removes all spans with their id as "chX-pY-sZ" and <em> which is inside the stage direction
   const updatedString = bookString.replaceAll(/<span id="ch\d+-p\d+-s\d+">(.*?)<\/span>/g, "$1").replaceAll(/<\/?em[^>]*>/g, "");
   const xmlDocWithoutSpans = parser.parseFromString(updatedString, "text/xml");
+  const characterOverrides = getCharacterOverrides(xmlDoc);
 
-  return extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm, bookSlug).map((character) => ({ ...character, bookSlug }));
+  return extractCharacterMetadata(xmlDocWithoutSpans, characterTags, bookForm, bookSlug, characterOverrides).map((character) => ({ ...character, bookSlug }));
 }
 
 function generateBookDataFiles(bookDirectoryPath: string, metadata: ReturnType<typeof parseBookXmlData>["metadata"], xmlDoc: Document, bookString: string, bookOutputPath: string) {
