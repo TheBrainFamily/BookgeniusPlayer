@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } from "react";
 import { Mic, Send, Telescope, Loader2 } from "lucide-react";
 import { motion, Variants, AnimatePresence } from "motion/react";
 import { useTranslation } from "react-i18next";
@@ -35,6 +35,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
 
+  const deferredValue = useDeferredValue(value);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +50,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   const { chapter: currentChapter, paragraph: currentParagraph } = location;
 
   const handleActivity = useCallback(() => {
-    pauseAllTimers();
+    pauseAllTimers(true);
     showAllElements();
   }, [pauseAllTimers, showAllElements]);
 
@@ -56,38 +58,25 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     if (isDeepResearchActive) return;
 
     if (!isSearchModalOpen) {
-      openSearchModal(true, true, value.trim());
+      openSearchModal(true, true, deferredValue.trim());
     }
 
     if (inputRef.current == null) return;
 
-    try {
-      const inputEl = inputRef.current;
-      inputEl.focus();
+    const inputEl = inputRef.current;
+    inputEl.focus();
 
-      // Use microtask to ensure DOM is updated before setting selection
-      queueMicrotask(() => {
-        if (!inputEl) return;
-        try {
-          const length = inputEl.value.length;
-          inputEl.setSelectionRange(length, length);
-        } catch {}
-      });
-    } catch {}
-  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value]);
+    // Use microtask to ensure DOM is updated before setting selection
+    queueMicrotask(() => {
+      if (!inputEl) return;
+      const length = inputEl.value.length;
+      inputEl.setSelectionRange(length, length);
+    });
+  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, deferredValue]);
 
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      handleActivity();
-      setValue(e.target.value);
-
-      if (isDeepResearchActive) return;
-
-      const trimmed = e.target.value.trim();
-      setSearchQuery(trimmed);
-    },
-    [handleActivity, isDeepResearchActive, setSearchQuery],
-  );
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  }, []);
 
   const handleInputInteraction = useCallback(() => {
     handleActivity();
@@ -97,12 +86,28 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     openModalWithFocus();
   }, [handleActivity, isDeepResearchActive, openModalWithFocus]);
 
+  const executeDeepResearch = useCallback(
+    (query: string) => {
+      setIsThinking(true);
+      openDeepResearchModal(undefined, true, true);
+
+      deepResearchCall(query, location)
+        .then(setDeepResearchContent)
+        .catch((error) => {
+          console.error("Deep research failed:", error);
+          setDeepResearchContent(t("deep_research_error"));
+        })
+        .finally(() => setIsThinking(false));
+    },
+    [location, setDeepResearchContent, t, openDeepResearchModal],
+  );
+
   const handleSubmit = useCallback(
     (e?: React.FormEvent) => {
       e?.preventDefault();
       handleActivity();
 
-      const trimmed = value.trim();
+      const trimmed = deferredValue.trim();
       if (!trimmed) return;
 
       if (isSearchModalOpen) {
@@ -111,37 +116,13 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       }
 
       if (isDeepResearchActive) {
-        setIsThinking(true);
-        openDeepResearchModal(undefined, true, true);
-
-        deepResearchCall(trimmed, location)
-          .then(setDeepResearchContent)
-          .catch((error) => {
-            console.error("Deep research failed:", error);
-            setDeepResearchContent(t("deep_research_error"));
-          })
-          .finally(() => setIsThinking(false));
+        executeDeepResearch(trimmed);
       } else if (onSubmit) {
-        onSubmit({
-          query: trimmed,
-          filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: bookDataLoader.getCurrentBook() },
-        });
+        const currentBook = bookDataLoader.getCurrentBook();
+        onSubmit({ query: trimmed, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: currentBook } });
       }
     },
-    [
-      handleActivity,
-      value,
-      isSearchModalOpen,
-      setSearchQuery,
-      isDeepResearchActive,
-      openDeepResearchModal,
-      location,
-      setDeepResearchContent,
-      t,
-      onSubmit,
-      currentChapter,
-      currentParagraph,
-    ],
+    [handleActivity, deferredValue, isSearchModalOpen, setSearchQuery, isDeepResearchActive, executeDeepResearch, onSubmit, currentChapter, currentParagraph],
   );
 
   const toggleDeepResearch = useCallback(() => {
@@ -171,7 +152,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       console.error("Error starting recording:", error);
       setIsRecording(false);
     });
-  }, [isRecording, handleActivity, isSearchModalOpen, setSearchQuery, startRecording, openApiKeyModal]);
+  }, [handleActivity, isRecording, isSearchModalOpen, setSearchQuery, startRecording, openApiKeyModal]);
 
   const handleRecordingEnd = useCallback(() => {
     if (!isRecording) return;
@@ -183,7 +164,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
         .catch((error) => console.error("Error stopping recording:", error))
         .finally(() => setIsRecording(false));
     }, 150);
-  }, [isRecording, handleActivity, stopRecording]);
+  }, [handleActivity, isRecording, stopRecording]);
 
   const placeholder = useMemo(() => {
     if (isRecording) return t("listening");
@@ -196,26 +177,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.key === "f" || event.key === "F") && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
-
         handleActivity();
         openModalWithFocus();
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleActivity, openModalWithFocus]);
-
-  useEffect(() => {
-    if (response && !isRecording) {
-      setValue(response);
-      handleActivity();
-
-      if (isSearchModalOpen) setSearchQuery(response);
-    }
-  }, [response, isRecording, isSearchModalOpen, setSearchQuery, handleActivity]);
-
-  useEffect(() => {
     const handleDocumentPointerDown = (e: PointerEvent) => {
       const target = e.target as Element;
 
@@ -225,9 +191,28 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       startAllTimers();
     };
 
+    document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("pointerdown", handleDocumentPointerDown, true);
-    return () => document.removeEventListener("pointerdown", handleDocumentPointerDown, true);
-  }, [startAllTimers]);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("pointerdown", handleDocumentPointerDown, true);
+    };
+  }, [handleActivity, openModalWithFocus, startAllTimers]);
+
+  useEffect(() => {
+    if (response && !isRecording) {
+      setValue(response);
+      handleActivity();
+
+      if (isSearchModalOpen) setSearchQuery(response);
+      return;
+    }
+
+    if (!isDeepResearchActive && !response) {
+      setSearchQuery(deferredValue.trim());
+    }
+  }, [handleActivity, response, isRecording, isSearchModalOpen, setSearchQuery, deferredValue, isDeepResearchActive]);
 
   return (
     <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
@@ -265,7 +250,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
                   value={value}
                   onChange={handleInputChange}
                   onFocus={handleInputInteraction}
-                  onBlur={startAllTimers}
                   placeholder={placeholder}
                   className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-80 pl-7 font-medium" : "")}
                   disabled={isRecording || isThinking}

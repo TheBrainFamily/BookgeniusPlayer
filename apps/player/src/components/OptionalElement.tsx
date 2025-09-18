@@ -11,7 +11,6 @@ interface OptionalElementProps extends React.HTMLAttributes<HTMLDivElement> {
 export const OptionalElement: React.FC<OptionalElementProps> = ({ children, className, ...props }) => {
   const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
   const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
-  const setInputHovered = useElementVisibilityStore((state) => state.setInputHovered);
 
   const shouldBeVisible = useOptionalElementVisibility();
   const lastHideReason = useLastHideReason();
@@ -40,10 +39,9 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
   useEffect(() => {
     if (!isDesktop && isHovered) {
       setIsHovered(false);
-      setInputHovered(false);
       startAllTimers(); // Resume timers when forcibly clearing hover
     }
-  }, [isDesktop, isHovered, setInputHovered, startAllTimers]);
+  }, [isDesktop, isHovered, startAllTimers]);
 
   // Determine if element should be visible
   // Optional elements should only be visible when explicitly shown, NOT during scroll mode
@@ -78,7 +76,6 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
     if (!isDesktop) return;
 
     setIsHovered(true);
-    setInputHovered(true); // Set global state
     pauseAllTimers();
   };
 
@@ -87,7 +84,7 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
     if (!isDesktop) return;
 
     setIsHovered(false);
-    setInputHovered(false); // Unset global state
+
     startAllTimers();
   };
 
