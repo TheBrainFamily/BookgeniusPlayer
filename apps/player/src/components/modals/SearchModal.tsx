@@ -1,5 +1,7 @@
 import React, { memo, useCallback, useEffect, useMemo, useDeferredValue } from "react";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
+
 import { motion, Variants } from "motion/react";
 import { Search, FileText } from "lucide-react";
 
@@ -109,7 +111,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
   );
 };
 
-const ChapterGroup = memo(function ChapterGroup({ chapter, items, t }: { chapter: number; items: SearchResultItemData[]; t: (k: string, opts?: any) => string }) {
+const ChapterGroup = memo(function ChapterGroup({ chapter, items, t }: { chapter: number; items: SearchResultItemData[]; t: TFunction }) {
   const chapterTitle = useMemo(
     () => (
       <div className="flex items-center gap-2">
