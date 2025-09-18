@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useDeferredValue } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, Variants } from "motion/react";
 import { Search, FileText } from "lucide-react";
@@ -17,43 +17,28 @@ interface SearchModalProps {
   searchResults: SearchResultsData | null;
 }
 
-const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults }) => {
+export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults }) => {
   const { t } = useTranslation();
 
-  // Cleanup search chapters when modal unmounts
-  useEffect(() => {
-    return () => {
-      cleanupSearchChapters();
-    };
-  }, []);
+  const deferredResults = useDeferredValue(searchResults);
 
-  const handleSearchResultClick = useCallback((item: SearchResultItemData) => {
-    //TODO: fix this to get the value directly from bottom input hook or something
-    const inputEl = document.getElementById("bottom-input") as HTMLInputElement | null;
-    const query = inputEl?.value ?? "";
+  const isDeferring = deferredResults !== searchResults;
+  const showSpinner = Boolean(deferredResults?.isLoading) || isDeferring;
+  const showContent = Boolean(deferredResults) && !showSpinner;
+  const hasItems = (deferredResults?.items?.length ?? 0) > 0;
 
-    // Update location with 'system' source to trigger scrolling
-    goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "smooth" }).catch((error) =>
-      console.warn("Failed to scroll to search result:", error),
-    );
-    highlightSearchInParagraph(item.chapter, item.paragraphNumber, query);
-  }, []);
+  const groupedResults = useMemo(() => {
+    const items = deferredResults?.items ?? [];
+    const groups: Record<number, SearchResultItemData[]> = {};
 
-  // Group search results by chapter
-  const groupedResults = React.useMemo(() => {
-    if (!searchResults?.items) return {};
+    for (const it of items) {
+      (groups[it.chapter] ??= []).push(it);
+    }
 
-    return searchResults.items.reduce(
-      (acc, item) => {
-        if (!acc[item.chapter]) {
-          acc[item.chapter] = [];
-        }
-        acc[item.chapter].push(item);
-        return acc;
-      },
-      {} as Record<number, SearchResultItemData[]>,
-    );
-  }, [searchResults?.items]);
+    return groups;
+  }, [deferredResults?.items]);
+
+  useEffect(() => () => cleanupSearchChapters(), []);
 
   const modalTitle = (
     <div className="flex items-center gap-2">
@@ -64,18 +49,18 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
 
   return (
     <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
-      <motion.div className="flex flex-col h-full relative overflow-hidden" variants={variants.container} initial="hidden" animate="visible" exit="exit">
-        {searchResults?.isLoading && (
+      <motion.div className="flex flex-col h-full relative overflow-hidden" variants={variants.container} initial="hidden" animate="visible" exit="exit" aria-busy={showSpinner}>
+        {showSpinner && (
           <motion.div className="flex flex-col items-center justify-center py-12 px-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <div className="relative">
               <motion.div
-                className="w-12 h-12 border-3 rounded-full border-book-primary-30 border-t-book-primary"
+                className="w-12 h-12 border-4 rounded-full border-book-primary-30 border-t-book-primary"
                 variants={variants.loading}
                 initial="initial"
                 animate="animate"
               />
               <motion.div
-                className="absolute inset-0 w-12 h-12 border-3 border-transparent rounded-full border-t-book-tertiary-50"
+                className="absolute inset-0 w-12 h-12 border-4 border-transparent rounded-full border-t-book-tertiary-50"
                 variants={variants.loading}
                 initial="initial"
                 animate="animate"
@@ -91,59 +76,15 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
           </motion.div>
         )}
 
-        {searchResults && !searchResults.isLoading && (
+        {showContent && (
           <div className="flex-grow overflow-y-auto pb-4">
-            {searchResults.items.length > 0 ? (
+            {hasItems ? (
               <motion.div className="space-y-3" variants={variants.container} initial="hidden" animate="visible">
-                <Accordion type="multiple" defaultValue={Object.keys(groupedResults).map(String)} className="w-full">
+                <Accordion type="multiple" defaultValue={Object.keys(groupedResults)} className="w-full">
                   {Object.entries(groupedResults)
                     .sort(([a], [b]) => Number(a) - Number(b))
-                    .map(([chapter, items], chapterIndex) => (
-                      <AccordionItem key={chapter} value={chapter} className="border-book-primary-20 rounded-lg mb-3 overflow-hidden">
-                        <AccordionTrigger className="px-4 py-3 bg-book-primary-10 hover:bg-book-primary-20 text-book-primary hover:no-underline cursor-pointer">
-                          <div className="flex items-center gap-2">
-                            <FileText size={16} />
-                            <span className="font-medium">
-                              {getChapterTitle(Number(chapter), t)} ({items.length} {items.length === 1 ? "result" : "results"})
-                            </span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-0 pb-0">
-                          <div className="space-y-2 p-3">
-                            {items.map((item: SearchResultItemData, index: number) => (
-                              <motion.div
-                                key={item.id}
-                                className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20 bg-gradient-to-br from-book-primary-5 to-book-secondary-5 hover:from-book-primary-10 hover:to-book-secondary-10 transition-all duration-200"
-                                variants={variants.item}
-                                whileTap="tap"
-                                whileHover="hover"
-                                onClick={() => handleSearchResultClick(item)}
-                                transition={{ delay: (chapterIndex * items.length + index) * 0.03 }}
-                              >
-                                <div className="relative p-4">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
-                                      {item.percentInChapter}% {t("of_chapter")}
-                                    </div>
-                                  </div>
-
-                                  {item.text && (
-                                    <motion.div className="mb-2 text-sm italic text-white/70 p-2 rounded-md bg-book-secondary-20">
-                                      <div className="flex items-start gap-2">
-                                        <span dangerouslySetInnerHTML={{ __html: item.text }} />
-                                      </div>
-                                    </motion.div>
-                                  )}
-
-                                  <motion.div className="text-sm text-white/90 leading-relaxed">
-                                    <span dangerouslySetInnerHTML={{ __html: item.summary }} />
-                                  </motion.div>
-                                </div>
-                              </motion.div>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
+                    .map(([chapter, items]) => (
+                      <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} />
                     ))}
                 </Accordion>
               </motion.div>
@@ -168,20 +109,90 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
   );
 };
 
+const ChapterGroup = memo(function ChapterGroup({ chapter, items, t }: { chapter: number; items: SearchResultItemData[]; t: (k: string, opts?: any) => string }) {
+  const chapterTitle = useMemo(
+    () => (
+      <div className="flex items-center gap-2">
+        <FileText size={16} />
+        <span className="font-medium">
+          {getChapterTitle(Number(chapter), t)} ({items.length} {items.length === 1 ? "result" : "results"})
+        </span>
+      </div>
+    ),
+    [chapter, items.length, t],
+  );
+
+  return (
+    <AccordionItem value={String(chapter)} className="border-book-primary-20 rounded-lg mb-3 overflow-hidden">
+      <AccordionTrigger className="px-4 py-3 bg-book-primary-10 hover:bg-book-primary-20 text-book-primary hover:no-underline cursor-pointer">{chapterTitle}</AccordionTrigger>
+      <AccordionContent className="px-0 pb-0">
+        <div className="space-y-2 p-3">
+          {items.map((item, idx) => (
+            <ResultCard key={item.id} item={item} appearIndex={idx} />
+          ))}
+        </div>
+      </AccordionContent>
+    </AccordionItem>
+  );
+});
+
+const ResultCard = memo(function ResultCard({ item, appearIndex }: { item: SearchResultItemData; appearIndex: number }) {
+  const handleClick = useCallback(() => {
+    const inputEl = document.getElementById("bottom-input") as HTMLInputElement | null;
+    const query = inputEl?.value ?? "";
+
+    goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "smooth" }).catch((error) =>
+      console.warn("Failed to scroll to search result:", error),
+    );
+    highlightSearchInParagraph(item.chapter, item.paragraphNumber, query);
+  }, [item.chapter, item.paragraphNumber]);
+
+  // Animate only first 25 elements
+  const shouldAnimate = appearIndex < 25;
+  const transition = shouldAnimate ? { delay: appearIndex * 0.015 } : undefined;
+
+  return (
+    <motion.div
+      className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20 bg-gradient-to-br from-book-primary-5 to-book-secondary-5 hover:from-book-primary-10 hover:to-book-secondary-10 transition-all duration-200"
+      variants={variants.item}
+      whileTap="tap"
+      whileHover="hover"
+      onClick={handleClick}
+      transition={transition}
+    >
+      <div className="relative p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">{item.percentInChapter}% of chapter</div>
+        </div>
+
+        {item.text && (
+          <motion.div className="mb-2 text-sm italic text-white/70 p-2 rounded-md bg-book-secondary-20">
+            <div className="flex items-start gap-2">
+              <span dangerouslySetInnerHTML={{ __html: item.text }} />
+            </div>
+          </motion.div>
+        )}
+
+        <motion.div className="text-sm text-white/90 leading-relaxed">
+          <span dangerouslySetInnerHTML={{ __html: item.summary }} />
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+});
+
 const variants: Record<string, Variants> = {
   container: {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: "easeOut", staggerChildren: 0.1 } },
-    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.22, ease: "easeOut", staggerChildren: 0.06 } },
+    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.18 } },
   },
   item: {
-    hidden: { opacity: 0, y: 20, scale: 0.95 },
-    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
-    hover: { scale: 0.98, transition: { duration: 0.2, ease: "easeInOut" } },
-    tap: { scale: 0.95, transition: { duration: 0.1 } },
+    hidden: { opacity: 0, y: 12, scale: 0.98 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.25, ease: "easeOut" } },
+    hover: { scale: 0.985, transition: { duration: 0.15, ease: "easeInOut" } },
+    tap: { scale: 0.97, transition: { duration: 0.08 } },
   },
   loading: { initial: { rotate: 0 }, animate: { rotate: 360, transition: { duration: 1, ease: "linear", repeat: Infinity } } },
   shimmer: { initial: { x: "-100%" }, animate: { x: "100%", transition: { duration: 1.5, ease: "easeInOut", repeat: Infinity, repeatDelay: 0.5 } } },
 };
-
-export default SearchModal;
