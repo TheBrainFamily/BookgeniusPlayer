@@ -58,7 +58,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     if (isDeepResearchActive) return;
 
     if (!isSearchModalOpen) {
-      openSearchModal(true, true, deferredValue.trim());
+      openSearchModal(true, true, value.trim());
     }
 
     if (inputRef.current == null) return;
@@ -72,7 +72,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       const length = inputEl.value.length;
       inputEl.setSelectionRange(length, length);
     });
-  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, deferredValue]);
+  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
