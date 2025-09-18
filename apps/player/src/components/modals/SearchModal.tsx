@@ -58,7 +58,14 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
     <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
       <motion.div className="flex flex-col h-full relative overflow-hidden" variants={variants.container} initial="hidden" animate="visible" exit="exit" aria-busy={showSpinner}>
         {showSpinner && (
-          <motion.div className="flex flex-col items-center justify-center py-12 px-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} key="loading">
+          <motion.div
+            className="flex flex-col items-center justify-center py-12 px-4"
+            variants={variants.loadingContainer}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            key="loading"
+          >
             <div className="relative">
               <motion.div
                 className="w-12 h-12 border-4 rounded-full border-book-primary-30 border-t-book-primary"
@@ -74,17 +81,17 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
                 transition={{ delay: 0.1 }}
               />
             </div>
-            <motion.div className="mt-4 text-white/90 font-medium" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <motion.div className="mt-4 text-white/90 font-medium" variants={variants.loadingText} initial="hidden" animate="visible">
               {t("searching")}
             </motion.div>
-            <motion.div className="mt-2 text-white/60 text-sm" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+            <motion.div className="mt-2 text-white/60 text-sm" variants={variants.loadingSubtext} initial="hidden" animate="visible">
               {t("exploring_chapters")}
             </motion.div>
           </motion.div>
         )}
 
         {showContent && (
-          <motion.div className="flex-grow overflow-y-auto pb-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} key="content">
+          <motion.div className="flex-grow overflow-y-auto pb-4" variants={variants.content} initial="hidden" animate="visible" key="content">
             {hasItems ? (
               <motion.div className="space-y-3" variants={variants.container} initial="hidden" animate="visible">
                 <Accordion type="multiple" defaultValue={Object.keys(groupedResults)} className="w-full">
@@ -96,12 +103,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
                 </Accordion>
               </motion.div>
             ) : (
-              <motion.div
-                className="flex flex-col items-center justify-center py-12 text-center"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
+              <motion.div className="flex flex-col items-center justify-center py-12 text-center" variants={variants.noResults} initial="hidden" animate="visible">
                 <div className="p-4 rounded-full mb-4 backdrop-blur-sm border bg-book-secondary-20 border-book-secondary-30">
                   <Search size={24} />
                 </div>
@@ -173,16 +175,16 @@ const ResultCard = memo(function ResultCard({ item, appearIndex }: { item: Searc
         </div>
 
         {item.text && (
-          <motion.div className="mb-2 text-sm italic text-white/70 p-2 rounded-md bg-book-secondary-20">
+          <div className="mb-2 text-sm italic text-white/70 p-2 rounded-md bg-book-secondary-20">
             <div className="flex items-start gap-2">
               <span dangerouslySetInnerHTML={{ __html: item.text }} />
             </div>
-          </motion.div>
+          </div>
         )}
 
-        <motion.div className="text-sm text-white/90 leading-relaxed">
+        <div className="text-sm text-white/90 leading-relaxed">
           <span dangerouslySetInnerHTML={{ __html: item.summary }} />
-        </motion.div>
+        </div>
       </div>
     </motion.div>
   );
@@ -202,4 +204,9 @@ const variants: Record<string, Variants> = {
   },
   loading: { initial: { rotate: 0 }, animate: { rotate: 360, transition: { duration: 1, ease: "linear", repeat: Infinity } } },
   shimmer: { initial: { x: "-100%" }, animate: { x: "100%", transition: { duration: 1.5, ease: "easeInOut", repeat: Infinity, repeatDelay: 0.5 } } },
+  loadingContainer: { hidden: { opacity: 0 }, visible: { opacity: 1 }, exit: { opacity: 0 } },
+  loadingText: { hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { delay: 0.2 } } },
+  loadingSubtext: { hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { delay: 0.4 } } },
+  content: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.3 } } },
+  noResults: { hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { delay: 0.3 } } },
 };
