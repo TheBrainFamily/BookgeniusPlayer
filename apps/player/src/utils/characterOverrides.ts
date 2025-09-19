@@ -2,7 +2,7 @@ import { CharacterData, CharacterOverride, ChapterParagraphRef } from "@player/t
 import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@player/utils/getFilePathsForName";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
 
-const LOCATION_REGEX = /^ch-?(\d+)-p-?(\d+)/i;
+const LOCATION_REGEX = /^ch(\d+)-p(\d+)$/i;
 
 const hasFileExtension = (value: string) => /\.[a-z0-9]+$/i.test(value);
 
