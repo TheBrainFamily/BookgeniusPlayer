@@ -25,22 +25,22 @@ if (import.meta.hot) {
 }
 
 const isEditorMode = import.meta.env.VITE_EDITOR === "true";
-
-const container = document.getElementById("content-container");
+const containerId = "content-container";
 
 export function useBookContent() {
   const { textVersion } = useBookData();
   const { location } = useLocation();
   const { currentChapter, currentParagraph } = location;
-  const previousTextVersionRef = useRef(textVersion);
   const bookStringified = getBookStringified();
   const {
     metadata: { bookForm },
   } = getBookData();
-
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
 
-  useEditorMode(isEditorMode ? container : null);
+  const previousTextVersionRef = useRef(textVersion);
+  const containerRef = useRef<HTMLElement | null>(null);
+
+  useEditorMode(isEditorMode ? containerRef.current : null);
 
   const handlePointerUp = useCallback(
     (event: PointerEvent) => {
@@ -111,8 +111,14 @@ export function useBookContent() {
   );
 
   useEffect(() => {
+    containerRef.current = document.getElementById(containerId);
+  }, []);
+
+  useEffect(() => {
+    const container = containerRef.current;
+
     if (!container) {
-      console.warn(`Container with id "content-container" not found for content injection.`);
+      console.warn(`Container with id ${containerId} not found for content injection.`);
       return;
     }
 
