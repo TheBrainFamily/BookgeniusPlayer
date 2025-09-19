@@ -233,7 +233,7 @@ export async function createDemoBook(fullBookPath: string, demoBookPath: string,
     }
 
     // Generate HTML from the filtered book.xml
-    const { htmlResult } = xmlToComplexHtml(bookString, bookSlug, bookLanguage, true);
+    const { htmlResult } = xmlToComplexHtml(bookString, bookSlug, bookLanguage);
 
     // Generate getBookStringified.js in compiled folder
     const bookStringifiedContent = `const bookStringified = \`<section>${htmlResult}</section>\`;

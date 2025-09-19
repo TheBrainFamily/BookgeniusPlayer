@@ -67,7 +67,6 @@ const CharactersOnStagePanel = () => {
               const characterEntity = {
                 slug: character.slug,
                 characterName: character.characterName,
-                label: character.characterName,
                 summary: "",
                 imageUrl: "",
                 chapterNumber: location.currentChapter,

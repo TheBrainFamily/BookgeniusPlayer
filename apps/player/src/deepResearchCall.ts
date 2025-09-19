@@ -4,7 +4,6 @@ import { ANSWERS_SERVER_URL } from "@player/lib/consts";
 import { bookDataLoader } from "@player/services/bookDataLoader";
 
 export async function deepResearchCall(searchQuery: string, location: Location): Promise<string> {
-  const baseUrl = "/deepResearch"; // Assuming localhost for now
   const filter: Filter = {
     chapterFrom: 1, // Based on the curl example
     chapterTo: location.chapter,
@@ -14,7 +13,7 @@ export async function deepResearchCall(searchQuery: string, location: Location):
 
   const params = new URLSearchParams({ question: searchQuery, filter: JSON.stringify(filter) });
 
-  const url = `${ANSWERS_SERVER_URL}/${baseUrl}?${params.toString()}`;
+  const url = `${ANSWERS_SERVER_URL}/deepResearch?${params.toString()}`;
   const isDev = import.meta.env.MODE === "development";
   console.log(`Fetching deep research from: ${url}`); // Optional: for debugging
   try {
