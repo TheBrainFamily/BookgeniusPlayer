@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import debounce from "lodash.debounce";
 
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
-import { performCachedSearch, performUnifiedSearch, SearchResultsData } from "@player/searchModal";
+import { performCachedSearch, performUnifiedSearch } from "@player/searchModal";
 import { Location } from "@player/state/LocationContext";
 import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
 
@@ -60,7 +60,7 @@ export const useSearchLogic = () => {
 
       try {
         /* ---------- 2a. local DOM search: runs immediately ---------- */
-        const results = performCachedSearch(searchQuery, location);
+        let results = performCachedSearch(searchQuery, location);
 
         // If the cache is still indexing, it will return isLoading: true
         if (results.isLoading) {
@@ -68,19 +68,15 @@ export const useSearchLogic = () => {
         }
 
         /* ---------- 2b. remote search (only if local came up empty) -- */
-        if (results.items.length === 0) {
-          if (!results.isLoading) {
-            setResults({ header: "Searching…", items: [], isLoading: true });
-          }
+        if (results.items.length === 0 && !results.isLoading) {
+          setResults({ header: "Searching…", items: [], isLoading: true });
 
-          const remote = await debouncedPerformUnifiedSearch(searchQuery, location);
+          // @ts-expect-error(this is wrong typing) TODO fix this if you want?
+          results = await debouncedPerformUnifiedSearch(searchQuery, location);
+        }
 
-          /* Only keep the result of the most-recent keystroke batch */
-          if (searchId === latestSearchIdRef.current) {
-            setResults(remote as SearchResultsData);
-          }
-        } else {
-          // We have local results, so show them immediately
+        /* Only keep the result of the most-recent keystroke batch */
+        if (searchId === latestSearchIdRef.current) {
           setResults(results);
         }
       } catch {
@@ -107,4 +103,10 @@ export const useSearchLogic = () => {
       setResults({ header: "Please enter a search term.", items: [], isLoading: false });
     }
   }, [query, isOpen, debouncedTriggerSearch, setResults]);
+
+  useEffect(() => {
+    return () => {
+      debouncedTriggerSearch.cancel?.();
+    };
+  }, [debouncedTriggerSearch]);
 };

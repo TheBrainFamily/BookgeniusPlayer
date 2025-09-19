@@ -28,9 +28,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
 
   const isCurrentlyLoading = Boolean(searchResults?.isLoading);
   const isDeferring = deferredResults !== searchResults;
-
   const showSpinner = isCurrentlyLoading || (isDeferring && !deferredResults);
-
   const showContent = Boolean(deferredResults) && !showSpinner;
   const hasItems = (deferredResults?.items?.length ?? 0) > 0;
 

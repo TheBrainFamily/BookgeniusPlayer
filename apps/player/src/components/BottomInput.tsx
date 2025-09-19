@@ -92,7 +92,13 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       openDeepResearchModal(undefined, true, true);
 
       deepResearchCall(query, location)
-        .then(setDeepResearchContent)
+        .then((text) => {
+          if (!text || text.trim().length === 0) {
+            setDeepResearchContent(t("deep_research_error"));
+          } else {
+            setDeepResearchContent(text);
+          }
+        })
         .catch((error) => {
           console.error("Deep research failed:", error);
           setDeepResearchContent(t("deep_research_error"));
