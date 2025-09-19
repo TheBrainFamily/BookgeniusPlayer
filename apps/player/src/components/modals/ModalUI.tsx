@@ -153,7 +153,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
       <DialogContent
         aria-describedby={undefined}
         overlayProps={{ useCustomAnimation: true, hideOverlay }}
-        className={cn("bg-transparent border-none shadow-none p-4", sizeConfig.content)}
+        className={cn("bg-transparent border-none shadow-none p-0", sizeConfig.content)}
         onInteractOutside={handleOnInteractOutside}
         onOpenAutoFocus={(e) => e.preventDefault()}
         onCloseAutoFocus={(e) => e.preventDefault()}
