@@ -344,7 +344,12 @@ export function activateMediaInRange(
           });
         };
 
-        p.addEventListener("pointerup", handler, { passive: false });
+        let elementToAddListenerTo = p;
+        const spanInsideParagraph = p.querySelector<HTMLSpanElement>("span");
+        if (spanInsideParagraph) {
+          elementToAddListenerTo = spanInsideParagraph;
+        }
+        elementToAddListenerTo.addEventListener("pointerup", handler, { passive: false });
         p.dataset.clickListenerAttached = "true";
       }
     }
