@@ -39,6 +39,7 @@ export function useBookContent() {
 
   const previousTextVersionRef = useRef(textVersion);
   const containerRef = useRef<HTMLElement | null>(null);
+  const observerSetupRef = useRef<{ cleanup: () => void } | null>(null);
 
   useEditorMode(isEditorMode ? containerRef.current : null);
 
@@ -134,15 +135,16 @@ export function useBookContent() {
     }
 
     container.innerHTML = doc.body.innerHTML;
-    const observerSetup = setupPageObserver(openCharacterDetailsModal);
+    observerSetupRef.current = setupPageObserver(openCharacterDetailsModal);
 
     container.addEventListener("pointerup", handlePointerUp);
 
     return () => {
       container.removeEventListener("pointerup", handlePointerUp);
 
-      if (observerSetup) {
-        observerSetup.cleanup();
+      if (observerSetupRef.current) {
+        observerSetupRef.current.cleanup();
+        observerSetupRef.current = null;
       }
     };
   }, [bookStringified, textVersion, handlePointerUp, openCharacterDetailsModal]);
