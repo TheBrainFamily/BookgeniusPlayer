@@ -7,10 +7,7 @@ export function findSimplifiedSentence(id: string, currentScore: number) {
     return;
   }
 
-  const allVersions = [
-    { score: foundSentence.analysis.score, text: foundSentence.analysis.originalSentence },
-    ...foundSentence.simplifications.map((s) => ({ score: s.score, text: s.sentences.join(" ") })),
-  ];
+  const allVersions = [...foundSentence.simplifications.map((s) => ({ score: s.score, text: s.sentences.join(" ") }))];
 
   if (!currentScore) {
     currentScore = Math.max(...allVersions.map((v) => v.score));

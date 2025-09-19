@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { reloadBookStringified } from "@player/genericBookDataGetters/getBookStringified";
 import { useBookUpdateSSE } from "@player/hooks/useBookUpdateSSE";
+import { reloadAllVariants } from "@player/genericBookDataGetters/getAllVariants";
 
 interface BookDataContextType {
   textVersion: number;
@@ -21,6 +22,23 @@ export function BookDataProvider({ children }: { children: React.ReactNode }) {
     setIsEditorMode(urlParams.get("editor") === "true");
   }, []);
 
+  const reloadVariantsText = async () => {
+    if (isReloading) return;
+
+    setIsReloading(true);
+    console.log("Reloading book text...");
+
+    try {
+      // Reload the data
+      await Promise.all([await reloadAllVariants()]);
+      console.log("Text reloaded, version:", textVersion + 1);
+    } catch (error) {
+      console.error("Failed to reload text:", error);
+    } finally {
+      setIsReloading(false);
+    }
+  };
+
   const reloadText = async () => {
     if (isReloading) return;
 
@@ -29,7 +47,7 @@ export function BookDataProvider({ children }: { children: React.ReactNode }) {
 
     try {
       // Reload the data
-      await reloadBookStringified();
+      await Promise.all([await reloadBookStringified(), await reloadAllVariants()]);
 
       // Increment version to trigger re-renders
       setTextVersion((v) => v + 1);
@@ -52,7 +70,7 @@ export function BookDataProvider({ children }: { children: React.ReactNode }) {
     onBookUpdated: async () => {
       setIsProcessing(false);
       console.log("[BookDataContext] Book updated, auto-reloading...");
-      await reloadText();
+      await reloadVariantsText();
     },
     onProcessingError: (error) => {
       setIsProcessing(false);

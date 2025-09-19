@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocationRange } from "@player/hooks/useLocationRange";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
+import { getBackgroundsForBook } from "@player/genericBookDataGetters/getBackgroundsForBook";
 
 type TimeoutId = number | null;
 
@@ -134,6 +135,11 @@ const useVideoReadiness = ({ videoTimeoutMs = 30000, minSplashMs = 1500, postRea
     }
   }, [videoAReady, videoBReady, postReadyDelayElapsed, minSplashElapsed]);
 
+  useEffect(() => {
+    if (getBackgroundsForBook().length === 0) {
+      setVideoBackgroundReady(true);
+    }
+  }, []);
   return { videoBackgroundReady };
 };
 

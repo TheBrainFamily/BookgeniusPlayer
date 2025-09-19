@@ -9,6 +9,7 @@
 
 import { BOOK_SLUGS } from "@player/consts";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 
 /* -------------------------------------------------------------------------- */
 /*  Shared types                                                              */
@@ -45,7 +46,7 @@ export const paragraphMetadataServicePure = {
       metadata: { bookForm },
     } = getBookData();
 
-    const bookCharacters = data.filter((d) => d.bookSlug === bookSlug);
+    const bookCharacters = data;
 
     // For "play" books, calculate the closest entry paragraph in the start chapter once.
     const chapterEntryParagraphs =
@@ -175,10 +176,17 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
         return null;
       }
 
+      const snapshot = resolveCharacterSnapshot(character, {
+        location: { chapter: first.chapterNumber, paragraph: first.paragraphNumber },
+        baseSummary: first.summary,
+        fallbackDisplayName: character.characterName,
+      });
+
       return {
         slug: character.slug,
-        characterName: character.characterName,
-        summary: first.summary,
+        characterName: snapshot.displayName,
+        summary: snapshot.summary ?? first.summary,
+        imageUrl: snapshot.media.listening,
         isTalkingInFirstParagraph: first.isTalking,
         paragraphNumber: first.paragraphNumber,
         chapterNumber: first.chapterNumber,

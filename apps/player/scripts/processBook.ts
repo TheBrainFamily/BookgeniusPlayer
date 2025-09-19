@@ -77,7 +77,7 @@ export async function processBook(bookPath: string, destinationDir = PUBLIC_DIR,
       // Run generate-book script
       console.log(`\n2️⃣  Running generate-book for ${bookName}...`);
       console.time("generate-book");
-      await generateBook(bookSourcePath, bookPublicPath, false);
+      await generateBook(bookSourcePath, bookPublicPath);
       console.timeEnd("generate-book");
 
       // Compile TypeScript files to JavaScript

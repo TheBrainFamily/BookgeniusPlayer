@@ -6,12 +6,23 @@ import { useLocationRange } from "@player/hooks/useLocationRange";
 import { useEscapeKey } from "@player/hooks/useEscapeKey";
 
 export const CharacterModalRenderer: React.FC = () => {
-  const { isOpen, slug, isVideo, mediaSrc, closeModal } = useCharacterModal();
+  const { isOpen, slug, isVideo, mediaSrc, chapter, paragraph, closeModal } = useCharacterModal();
   const { locationRange } = useLocationRange();
 
   useEscapeKey(isOpen, closeModal);
 
   if (!isOpen || !slug || !mediaSrc) return null;
 
-  return createPortal(<CharacterModal onClose={closeModal} isVideo={isVideo} mediaSrc={mediaSrc} characterSlug={slug} endChapter={locationRange.endChapter} />, document.body);
+  return createPortal(
+    <CharacterModal
+      onClose={closeModal}
+      isVideo={isVideo}
+      mediaSrc={mediaSrc}
+      characterSlug={slug}
+      endChapter={locationRange.endChapter}
+      chapter={chapter ?? locationRange.currentChapter}
+      paragraph={paragraph ?? locationRange.currentParagraph}
+    />,
+    document.body,
+  );
 };
