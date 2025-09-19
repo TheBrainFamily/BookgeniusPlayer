@@ -140,34 +140,11 @@ export function useBookContent(containerId: string) {
         }
       };
 
-      const handleMouseOver = (event: MouseEvent) => {
-        const span = (event.target as HTMLElement).closest("span");
-
-        if (span && /^ch\d+-p\d+-s\d+$/.test(span.id)) {
-          span.style.backgroundColor = "rgba(66, 68, 90, 0.1)";
-          span.style.padding = "0.2rem 0";
-          span.style.cursor = "pointer";
-          span.style.touchAction = "none";
-        }
-      };
-
-      const handleMouseOut = (event: MouseEvent) => {
-        const span = (event.target as HTMLElement).closest("span");
-        if (span && /^ch\d+-p\d+-s\d+$/.test(span.id)) {
-          span.style.backgroundColor = "transparent";
-          span.style.padding = "0";
-          span.style.cursor = "default";
-        }
-      };
-
       container.addEventListener("pointerup", handlePointerUp);
-      container.addEventListener("mouseover", handleMouseOver);
-      container.addEventListener("mouseout", handleMouseOut);
 
       return () => {
         container.removeEventListener("pointerup", handlePointerUp);
-        container.removeEventListener("mouseover", handleMouseOver);
-        container.removeEventListener("mouseout", handleMouseOut);
+
         // Clean up the observer and its event listeners
         if (observerSetup) {
           observerSetup.cleanup();

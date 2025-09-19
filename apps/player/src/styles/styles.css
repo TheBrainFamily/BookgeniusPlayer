@@ -492,6 +492,16 @@
         justify-content: center;
       }
 
+      span[id^="ch"][id*="-p"][id*="-s"] {
+        cursor: pointer;
+        touch-action: none;
+      }
+
+      span[id^="ch"][id*="-p"][id*="-s"]:hover {
+        background-color: rgba(66, 68, 90, 0.1);
+        padding: 0.2rem 0;
+      }
+
       .character-avatar {
         position: sticky;
         top: clamp(25vh, 30vw, 40vh);
