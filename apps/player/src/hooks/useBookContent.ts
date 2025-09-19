@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
+
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { setupPageObserver } from "@player/ui/pageObserver";
 import { getBookStringified } from "@player/genericBookDataGetters/getBookStringified";
@@ -25,8 +26,9 @@ if (import.meta.hot) {
 
 const isEditorMode = import.meta.env.VITE_EDITOR === "true";
 
-export function useBookContent(containerId: string) {
-  const container = document.getElementById(containerId);
+const container = document.getElementById("content-container");
+
+export function useBookContent() {
   const { textVersion } = useBookData();
   const { location } = useLocation();
   const { currentChapter, currentParagraph } = location;
@@ -40,120 +42,104 @@ export function useBookContent(containerId: string) {
 
   useEditorMode(isEditorMode ? container : null);
 
-  useEffect(() => {
-    if (container) {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(bookStringified, "text/html");
-      const chapterSections = Array.from(doc.querySelectorAll("section[data-chapter]"));
+  const handlePointerUp = useCallback(
+    (event: PointerEvent) => {
+      if (event.metaKey || event.ctrlKey) return;
 
-      if (chapterSections.length > 0) {
-        if (backgroundsForBook.length > 0) {
-          addSpaceBetweenChapters(doc, chapterSections);
-        }
-        addPaddingBottomLastChapter(doc, chapterSections);
+      const target = event.target as HTMLElement;
+
+      if (target.closest(".character-highlighted-activated") || target.closest(".simplified-icon")) {
+        return;
       }
 
-      container.innerHTML = doc.body.innerHTML;
-      const observerSetup = setupPageObserver(openCharacterDetailsModal);
+      const span = target.closest("span[id^='ch']") as HTMLElement;
+      if (!span) return;
 
-      // Give the browser a moment to render the injected HTML
-      const handlePointerUp = (event: PointerEvent) => {
-        if (event.metaKey || event.ctrlKey) {
-          return;
-        }
-        const target = event.target as HTMLElement;
+      event.preventDefault();
+      event.stopPropagation();
 
-        if (target.closest(".character-highlighted-activated")) {
-          return;
-        }
+      if (isCharacterPlaceholder(span, bookForm)) return;
 
-        // If the icon was clicked, let its own handler deal with it and don't simplify further.
-        if (target.closest(".simplified-icon")) {
-          return;
-        }
+      const currentSentenceId = span.id;
+      const isFirstSimplification = !span.hasAttribute("data-simplified");
 
-        const span = target.closest("span[id^='ch']");
+      // Store original sentence only on first tap
+      if (isFirstSimplification) {
+        span.setAttribute("data-original-sentence", span.innerHTML);
+      }
 
-        if (span) {
-          event.preventDefault();
-          event.stopPropagation();
-          let isCharacterPlaceholder = false;
-          if (bookForm === "play") {
-            isCharacterPlaceholder = span.children.length === 1 && span.children[0].tagName === "STRONG";
-          } else {
-            isCharacterPlaceholder = span.children.length === 2 && span.children[0].classList.contains("character-placeholder") && span.children[1].tagName === "STRONG";
-          }
+      const currentSentenceScore = span.getAttribute("data-current-score") || "100";
+      const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentenceRef.current(currentSentenceId, parseInt(currentSentenceScore));
 
-          if (isCharacterPlaceholder) return;
+      // Handle case when no further simplification is available
+      if (!simplifiedSentence) {
+        console.warn(`No further simplification available for ${currentSentenceId}`);
 
-          const isFirstSimplification = !span.hasAttribute("data-simplified");
+        // Reset to original sentence
+        const originalSentence = span.getAttribute("data-original-sentence") || "";
+        span.innerHTML = replaceXmlTagsIntoHtmlTags(originalSentence);
+        span.removeAttribute("data-current-score");
+        span.setAttribute("data-simplified", "false");
 
-          // Store the original sentence only on the first tap.
-          if (isFirstSimplification) {
-            span.setAttribute("data-original-sentence", span.innerHTML);
-          }
+        // Clean up old event listeners
+        span.querySelectorAll('[data-click-listener-attached="true"]').forEach((el) => {
+          el.removeAttribute("data-click-listener-attached");
+        });
 
-          const currentSentenceId = span.id;
-          const currentSentenceScore = span.getAttribute("data-current-score") || "100";
-          const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentenceRef.current(span.id, parseInt(currentSentenceScore));
+        activateCharacterInteractions(span, openCharacterDetailsModal);
+        return;
+      }
 
-          if (!simplifiedSentence) {
-            console.warn(`No further simplification available for ${currentSentenceId}`);
-            // We can add a visual cue here later if needed.
+      // Remove existing icon before updating content
+      const existingIcon = span.querySelector(".simplified-icon");
+      existingIcon?.remove();
 
-            span.innerHTML = replaceXmlTagsIntoHtmlTags(span.getAttribute("data-original-sentence") || "");
-            span.removeAttribute("data-current-score");
-            span.setAttribute("data-simplified", "false");
-            span.querySelectorAll('[data-click-listener-attached="true"]').forEach((el) => {
-              el.removeAttribute("data-click-listener-attached");
-            });
+      // Update content
+      span.innerHTML = replaceXmlTagsIntoHtmlTags(simplifiedSentence);
+      span.setAttribute("data-current-score", simplifiedSentenceScore.toString());
+      span.setAttribute("data-simplified", "true");
 
-            activateCharacterInteractions(span as HTMLElement, openCharacterDetailsModal);
+      // Add new simplified icon
+      const iconContainer = createSimplifiedIcon();
+      span.appendChild(iconContainer);
 
-            return;
-          }
+      // Activate character interactions
+      activateCharacterInteractions(span, openCharacterDetailsModal);
+      setSentenceAsClicked(currentSentenceId);
+    },
+    [bookForm, openCharacterDetailsModal],
+  );
 
-          // Remove old icon if it exists before updating innerHTML
-          const existingIcon = span.querySelector(".simplified-icon");
-          if (existingIcon) {
-            span.removeChild(existingIcon);
-          }
-
-          span.innerHTML = replaceXmlTagsIntoHtmlTags(simplifiedSentence);
-          span.setAttribute("data-current-score", simplifiedSentenceScore.toString());
-          span.setAttribute("data-simplified", "true");
-
-          activateCharacterInteractions(span as HTMLElement, openCharacterDetailsModal);
-
-          const iconContainer = document.createElement("span");
-          iconContainer.className = "simplified-icon";
-          iconContainer.style.marginLeft = "5px";
-          iconContainer.style.cursor = "pointer";
-          iconContainer.style.display = "inline-block";
-          iconContainer.style.verticalAlign = "middle";
-          iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--book-simplified-icon-color, ForestGreen)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>`;
-          span.appendChild(iconContainer);
-
-          // 5. Activate character interactions for newly transformed content
-          activateCharacterInteractions(target, openCharacterDetailsModal);
-          setSentenceAsClicked(currentSentenceId);
-        }
-      };
-
-      container.addEventListener("pointerup", handlePointerUp);
-
-      return () => {
-        container.removeEventListener("pointerup", handlePointerUp);
-
-        // Clean up the observer and its event listeners
-        if (observerSetup) {
-          observerSetup.cleanup();
-        }
-      };
-    } else {
-      console.warn(`Container with id '${containerId}' not found for content injection.`);
+  useEffect(() => {
+    if (!container) {
+      console.warn(`Container with id "content-container" not found for content injection.`);
+      return;
     }
-  }, [bookStringified, containerId, textVersion]); // Rerun if content, ID, or text version changes
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(bookStringified, "text/html");
+    const chapterSections = Array.from(doc.querySelectorAll("section[data-chapter]"));
+
+    if (chapterSections.length > 0) {
+      if (backgroundsForBook.length > 0) {
+        addSpaceBetweenChapters(doc, chapterSections);
+      }
+      addPaddingBottomLastChapter(doc, chapterSections);
+    }
+
+    container.innerHTML = doc.body.innerHTML;
+    const observerSetup = setupPageObserver(openCharacterDetailsModal);
+
+    container.addEventListener("pointerup", handlePointerUp);
+
+    return () => {
+      container.removeEventListener("pointerup", handlePointerUp);
+
+      if (observerSetup) {
+        observerSetup.cleanup();
+      }
+    };
+  }, [bookStringified, textVersion, handlePointerUp, openCharacterDetailsModal]);
 
   useEffect(() => {
     const textVersionChanged = previousTextVersionRef.current !== textVersion;
@@ -167,11 +153,6 @@ export function useBookContent(containerId: string) {
       return;
     }
 
-    const containerElement = document.getElementById(containerId);
-    if (!containerElement) {
-      return;
-    }
-
     // Re-align the scroll position with the current location after the book
     // content has been reloaded (e.g. via the editor "Reload Book Data" button).
     requestAnimationFrame(() => {
@@ -179,27 +160,44 @@ export function useBookContent(containerId: string) {
         console.error("useBookContent: Failed to restore scroll position after reload", error);
       });
     });
-  }, [containerId, currentChapter, currentParagraph, textVersion]);
+  }, [currentChapter, currentParagraph, textVersion]);
 }
 
-function setSentenceAsClicked(sentenceId: string) {
-  const clickedSentencesRaw = localStorage.getItem("clickedSentences");
-  let clickedSentences: string[] = [];
+const createSimplifiedIcon = (): HTMLSpanElement => {
+  const iconContainer = document.createElement("span");
+  iconContainer.className = "simplified-icon";
+  iconContainer.style.marginLeft = "5px";
+  iconContainer.style.cursor = "pointer";
+  iconContainer.style.display = "inline-block";
+  iconContainer.style.verticalAlign = "middle";
+  iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--book-simplified-icon-color, ForestGreen)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>`;
+  return iconContainer;
+};
 
-  if (clickedSentencesRaw) {
-    try {
+const setSentenceAsClicked = (sentenceId: string): void => {
+  try {
+    const clickedSentencesRaw = localStorage.getItem("clickedSentences");
+    let clickedSentences: string[] = [];
+
+    if (clickedSentencesRaw) {
       const parsed = JSON.parse(clickedSentencesRaw);
       if (Array.isArray(parsed)) {
         clickedSentences = parsed;
       }
-    } catch (e) {
-      console.error("Failed to parse clickedSentences from localStorage. Starting fresh.", e);
-      clickedSentences = [];
     }
-  }
 
-  if (!clickedSentences.includes(sentenceId)) {
-    clickedSentences.push(sentenceId);
-    localStorage.setItem("clickedSentences", JSON.stringify(clickedSentences));
+    if (!clickedSentences.includes(sentenceId)) {
+      clickedSentences.push(sentenceId);
+      localStorage.setItem("clickedSentences", JSON.stringify(clickedSentences));
+    }
+  } catch (error) {
+    console.error("Failed to update clicked sentences in localStorage:", error);
   }
-}
+};
+
+const isCharacterPlaceholder = (span: HTMLElement, bookForm: string): boolean => {
+  if (bookForm === "play") {
+    return span.children.length === 1 && span.children[0].tagName === "STRONG";
+  }
+  return span.children.length === 2 && span.children[0].classList.contains("character-placeholder") && span.children[1].tagName === "STRONG";
+};
