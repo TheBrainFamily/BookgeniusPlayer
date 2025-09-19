@@ -160,7 +160,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
       >
         <div
           className={cn(
-            "flex flex-row gap-2 items-center p-2 xl:px-4 h-full",
+            "flex flex-row gap-2 items-center h-full",
             sizeConfig.container,
             // Position modal in the right space when content is shifted left on large screens
             shouldShiftContent && layoutView ? "justify-end pr-[3%] ml-auto mr-0" : "justify-center mx-auto",
@@ -170,7 +170,6 @@ const ModalUI: React.FC<ModalUIProps> = ({
 
           <motion.div
             className={modalContentClasses}
-            onClick={(e) => e.stopPropagation()}
             layout={animateHeight}
             transition={animateHeight ? { duration: 0.3, ease: "easeInOut", layout: { duration: 0.3 } } : undefined}
           >
@@ -196,13 +195,18 @@ const ModalUI: React.FC<ModalUIProps> = ({
               </header>
             )}
 
-            <motion.main
-              className="p-4 overflow-y-auto opened-modal scrollbar-search"
+            <motion.div
+              className="p-4 overflow-y-auto opened-modal"
               layout={animateHeight}
               transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  onClose();
+                }
+              }}
             >
               {children}
-            </motion.main>
+            </motion.div>
           </motion.div>
 
           {layoutView && !shouldShiftContent && <div id="right-notes-blank" className="hidden xl:block xl:flex-2 xl:order-2" />}
