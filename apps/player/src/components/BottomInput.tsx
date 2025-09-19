@@ -242,138 +242,136 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
         ref={containerRef}
         data-keep-modal-open="true"
       >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div key="expanded" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-            <form onSubmit={handleSubmit} className="flex items-center space-x-2 min-w-[280px] sm:min-w-[350px]">
-              <div className="relative flex-grow flex items-center">
-                <AnimatePresence>
-                  {isRecording && (
-                    <motion.div
-                      key="recording-indicator"
-                      className="absolute left-2 w-3 h-3 rounded-full bg-red-500"
-                      initial={{ opacity: 0, scale: 0.5 }}
-                      animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.05, 1] }}
-                      exit={{ opacity: 0, scale: 0, transition: { duration: 0.2 } }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    />
-                  )}
-                </AnimatePresence>
-                <input
-                  id="bottom-input"
-                  ref={inputRef}
-                  type="text"
-                  value={value}
-                  onChange={handleInputChange}
-                  onFocus={handleInputInteraction}
-                  onBlur={startAllTimers}
-                  placeholder={placeholder}
-                  className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-80 pl-7 font-medium" : "")}
-                  disabled={isRecording || isThinking}
-                  autoComplete="off"
-                />
-              </div>
+        <motion.div key="expanded" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+          <form onSubmit={handleSubmit} className="flex items-center space-x-2 min-w-[280px] sm:min-w-[350px]">
+            <div className="relative flex-grow flex items-center">
+              <AnimatePresence>
+                {isRecording && (
+                  <motion.div
+                    key="recording-indicator"
+                    className="absolute left-2 w-3 h-3 rounded-full bg-red-500"
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.05, 1] }}
+                    exit={{ opacity: 0, scale: 0, transition: { duration: 0.2 } }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                )}
+              </AnimatePresence>
+              <input
+                id="bottom-input"
+                ref={inputRef}
+                type="text"
+                value={value}
+                onChange={handleInputChange}
+                onFocus={handleInputInteraction}
+                onBlur={startAllTimers}
+                placeholder={placeholder}
+                className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-80 pl-7 font-medium" : "")}
+                disabled={isRecording || isThinking}
+                autoComplete="off"
+              />
+            </div>
 
-              <div className="flex items-center space-x-2">
-                {/* Deep Research Button */}
+            <div className="flex items-center space-x-2">
+              {/* Deep Research Button */}
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <motion.button
+                      type="button"
+                      onPointerDown={toggleDeepResearch}
+                      disabled={isThinking || isRecording}
+                      className={cn(
+                        "rounded-full p-2 flex items-center justify-center",
+                        isDeepResearchActive ? "text-orange-400" : "text-white/70",
+                        isThinking ? "opacity-50 cursor-default" : "cursor-pointer",
+                      )}
+                      whileHover={!isThinking ? "hover" : undefined}
+                      whileTap={!isThinking ? "tap" : undefined}
+                      variants={variants.deepResearchButton}
+                    >
+                      {isThinking ? <Loader2 size={18} className="animate-spin" /> : <Telescope size={18} />}
+                    </motion.button>
+                  </TooltipTrigger>
+                  <TooltipContent>{isThinking ? t("thinking") : t("deep_research")}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              {/* Send/Mic Button */}
+              {value.trim() && !isRecording ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <motion.button
+                        type="submit"
+                        aria-label="Send message"
+                        disabled={isThinking}
+                        className="p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400"
+                        whileHover="hover"
+                        whileTap="tap"
+                        variants={variants.button}
+                      >
+                        <Send size={18} />
+                      </motion.button>
+                    </TooltipTrigger>
+                    <TooltipContent>{t("send_message")}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <motion.button
                         type="button"
-                        onPointerDown={toggleDeepResearch}
-                        disabled={isThinking || isRecording}
-                        className={cn(
-                          "rounded-full p-2 flex items-center justify-center",
-                          isDeepResearchActive ? "text-orange-400" : "text-white/70",
-                          isThinking ? "opacity-50 cursor-default" : "cursor-pointer",
-                        )}
-                        whileHover={!isThinking ? "hover" : undefined}
-                        whileTap={!isThinking ? "tap" : undefined}
-                        variants={variants.deepResearchButton}
+                        disabled={isThinking}
+                        className={cn("p-2 rounded-full flex items-center justify-center cursor-pointer", isRecording ? "text-red-400" : "text-white/70")}
+                        style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
+                        whileHover={!isRecording ? "hover" : undefined}
+                        whileTap={{ scale: 1.2 }}
+                        variants={variants.button}
+                        initial="idle"
+                        animate={isRecording ? "recording" : "idle"}
+                        // onPointerDown={() => {
+                        //   if (isRecording) {
+                        //     setIsRecording(false);
+                        //     handleRecordingEnd();
+                        //   }
+                        //   setIsRecording(true);
+                        //   handleRecordingStart();
+                        // }}
+                        onTouchStart={(e) => {
+                          e.preventDefault();
+                          handleRecordingStart();
+                        }}
+                        onTouchEnd={(e) => {
+                          e.preventDefault();
+                          handleRecordingEnd();
+                        }}
+                        onTouchCancel={(e) => {
+                          e.preventDefault();
+                          handleRecordingEnd();
+                        }}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleRecordingStart();
+                        }}
+                        onMouseUp={(e) => {
+                          e.preventDefault();
+                          handleRecordingEnd();
+                        }}
+                        onMouseLeave={() => isRecording && handleRecordingEnd()}
+                        onContextMenu={(e) => e.preventDefault()}
                       >
-                        {isThinking ? <Loader2 size={18} className="animate-spin" /> : <Telescope size={18} />}
+                        <Mic size={18} />
                       </motion.button>
                     </TooltipTrigger>
-                    <TooltipContent>{isThinking ? t("thinking") : t("deep_research")}</TooltipContent>
+                    <TooltipContent>{isRecording ? t("stop_recording") : t("start_recording")}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-
-                {/* Send/Mic Button */}
-                {value.trim() && !isRecording ? (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <motion.button
-                          type="submit"
-                          aria-label="Send message"
-                          disabled={isThinking}
-                          className="p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400"
-                          whileHover="hover"
-                          whileTap="tap"
-                          variants={variants.button}
-                        >
-                          <Send size={18} />
-                        </motion.button>
-                      </TooltipTrigger>
-                      <TooltipContent>{t("send_message")}</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                ) : (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <motion.button
-                          type="button"
-                          disabled={isThinking}
-                          className={cn("p-2 rounded-full flex items-center justify-center cursor-pointer", isRecording ? "text-red-400" : "text-white/70")}
-                          style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
-                          whileHover={!isRecording ? "hover" : undefined}
-                          whileTap={{ scale: 1.2 }}
-                          variants={variants.button}
-                          initial="idle"
-                          animate={isRecording ? "recording" : "idle"}
-                          // onPointerDown={() => {
-                          //   if (isRecording) {
-                          //     setIsRecording(false);
-                          //     handleRecordingEnd();
-                          //   }
-                          //   setIsRecording(true);
-                          //   handleRecordingStart();
-                          // }}
-                          onTouchStart={(e) => {
-                            e.preventDefault();
-                            handleRecordingStart();
-                          }}
-                          onTouchEnd={(e) => {
-                            e.preventDefault();
-                            handleRecordingEnd();
-                          }}
-                          onTouchCancel={(e) => {
-                            e.preventDefault();
-                            handleRecordingEnd();
-                          }}
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            handleRecordingStart();
-                          }}
-                          onMouseUp={(e) => {
-                            e.preventDefault();
-                            handleRecordingEnd();
-                          }}
-                          onMouseLeave={() => isRecording && handleRecordingEnd()}
-                          onContextMenu={(e) => e.preventDefault()}
-                        >
-                          <Mic size={18} />
-                        </motion.button>
-                      </TooltipTrigger>
-                      <TooltipContent>{isRecording ? t("stop_recording") : t("start_recording")}</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-              </div>
-            </form>
-          </motion.div>
-        </AnimatePresence>
+              )}
+            </div>
+          </form>
+        </motion.div>
       </motion.div>
     </OptionalElement>
   );
@@ -385,7 +383,7 @@ const variants: Record<string, Variants> = {
   button: {
     hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
     tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
-    idle: { scale: 1, backgroundColor: "transparent", boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", color: "rgba(255, 255, 255, 0.7)", transition: { duration: 0.3 } },
+    idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", color: "rgba(255, 255, 255, 0.7)", transition: { duration: 0.3 } },
     recording: {
       scale: [1, 1.1, 1],
       backgroundColor: ["rgba(239, 68, 68, 0.2)", "rgba(239, 68, 68, 0.4)", "rgba(239, 68, 68, 0.2)"],
@@ -396,7 +394,7 @@ const variants: Record<string, Variants> = {
   deepResearchButton: {
     hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
     tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
-    idle: { scale: 1, backgroundColor: "transparent", boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", transition: { duration: 0.3 } },
+    idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", transition: { duration: 0.3 } },
   },
   container: {
     idle: { boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", borderColor: "rgba(255, 255, 255, 0.3)", transition: { duration: 0.3 } },
