@@ -206,8 +206,9 @@ export function activateMediaInRange(
           // Avoid injecting media above the current viewport top to prevent layout shifts that look like backward jumps.
           if (rootRect) {
             const pRect = p.getBoundingClientRect();
-            if (pRect.bottom < rootRect.top) {
-              return; // Skip injection for paragraphs fully above viewport
+            if (pRect.top < rootRect.top) {
+              // Skip injection for paragraphs that are above or even partially above the viewport top
+              return;
             }
           }
           if (dummyPlaceholder) {

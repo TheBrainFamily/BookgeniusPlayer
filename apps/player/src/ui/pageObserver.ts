@@ -70,7 +70,14 @@ function makeRafScheduler(fn: () => void) {
 
 export function setupPageObserver(
   openCharacterDetailsModal: (params: CharacterModalParams) => void,
-): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number; cleanup: () => void } | null {
+): {
+  observer: IntersectionObserver;
+  observeNewParagraphs: () => number;
+  cleanupRemovedParagraphs: () => number;
+  observeNewSpacers: () => number;
+  cleanupRemovedSpacers: () => number;
+  cleanup: () => void;
+} | null {
   const rootEl = document.getElementById("content-container");
   if (!rootEl) {
     console.warn("[PageObserver] No #content-container - cannot create observer.");
@@ -491,11 +498,11 @@ export function setupPageObserver(
           // Spacer is at least partially visible
           if (rect.top >= 0) {
             // Spacer is entering from bottom or fully in view
-            if (visibilityPercent <= 0.5) {
-              // 0-50% visible: keep full opacity
+            if (visibilityPercent <= 0.4) {
+              // 0-40% visible: keep full opacity
               rootEl.style.opacity = "1";
             } else if (visibilityPercent < 1) {
-              // 50-99% visible: fade from 1 to 0
+              // 40-99% visible: fade from 1 to 0
               const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
 
               setCurrentLocation({
@@ -507,7 +514,7 @@ export function setupPageObserver(
                 currentParagraph: 0,
               });
 
-              const fadePercent = (visibilityPercent - 0.5) * 2;
+              const fadePercent = (visibilityPercent - 0.4) * 2;
               rootEl.style.opacity = (1 - fadePercent).toString();
             } else {
               // 100% visible: full transparency
@@ -531,9 +538,44 @@ export function setupPageObserver(
     { threshold: Array.from(Array(51).keys()).map((i) => i / 50) },
   );
 
+  const observedSpacers = new Set<Element>();
   spacersToObserve.forEach((spacer) => {
     spacerObserver.observe(spacer);
+    observedSpacers.add(spacer);
   });
+
+  const observeNewSpacers = (): number => {
+    const spacers = rootEl.querySelectorAll(".transition-spacer");
+    let added = 0;
+    spacers.forEach((spacer) => {
+      if (!observedSpacers.has(spacer)) {
+        spacerObserver.observe(spacer);
+        observedSpacers.add(spacer);
+        added++;
+      }
+    });
+    if (added > 0) {
+      console.log(`[PageObserver] Observed ${added} new spacers. Total: ${observedSpacers.size}`);
+    }
+    return added;
+  };
+
+  const cleanupRemovedSpacers = (): number => {
+    let removed = 0;
+    const toDelete: Element[] = [];
+    observedSpacers.forEach((spacer) => {
+      if (!spacer.isConnected) {
+        spacerObserver.unobserve(spacer);
+        toDelete.push(spacer);
+        removed++;
+      }
+    });
+    toDelete.forEach((s) => observedSpacers.delete(s));
+    if (removed > 0) {
+      console.log(`[PageObserver] Cleaned up ${removed} removed spacers. Total observed: ${observedSpacers.size}`);
+    }
+    return removed;
+  };
 
   const cleanup = () => {
     spacerObserver.disconnect();
@@ -556,6 +598,6 @@ export function setupPageObserver(
       observedParagraphs.add(paragraph);
     });
 
-    return { observer, observeNewParagraphs, cleanupRemovedParagraphs, cleanup };
+    return { observer, observeNewParagraphs, cleanupRemovedParagraphs, observeNewSpacers, cleanupRemovedSpacers, cleanup };
   }
 }

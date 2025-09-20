@@ -37,7 +37,14 @@ export function useBookContent() {
   const previousTextVersionRef = useRef(textVersion);
   const lastInitializedVersionRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLElement | null>(null);
-  const observerSetupRef = useRef<{ observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number; cleanup: () => void } | null>(null);
+  const observerSetupRef = useRef<{
+    observer: IntersectionObserver;
+    observeNewParagraphs: () => number;
+    cleanupRemovedParagraphs: () => number;
+    observeNewSpacers: () => number;
+    cleanupRemovedSpacers: () => number;
+    cleanup: () => void;
+  } | null>(null);
   const currentChapterRef = useRef<number | undefined>(currentChapter);
 
   useEditorMode(isEditorMode ? containerRef.current : null);
@@ -123,6 +130,8 @@ export function useBookContent() {
       // Refresh observed nodes for the existing observer
       observerSetupRef.current.observeNewParagraphs();
       observerSetupRef.current.cleanupRemovedParagraphs();
+      observerSetupRef.current.observeNewSpacers();
+      observerSetupRef.current.cleanupRemovedSpacers();
     } else {
       observerSetupRef.current = setupPageObserver(openCharacterDetailsModal);
     }
