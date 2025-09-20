@@ -442,7 +442,8 @@
       & > span,
       & > h3,
       & > h4,
-      & > h5 {
+      & > h5,
+      .play-row.didaskalia-row {
         width: 600px;
         margin-left: auto;
         margin-right: auto;
@@ -677,8 +678,9 @@
         & > span,
         & > h3,
         & > h4,
-        & > h5 {
-          width: 575px;
+        & > h5,
+        .play-row.didaskalia-row {
+          width: 550px;
         }
 
         .play-row .character-text {
@@ -698,7 +700,8 @@
         & > span,
         & > h3,
         & > h4,
-        & > h5 {
+        & > h5,
+        .play-row.didaskalia-row {
           width: 450px;
         }
 
@@ -719,7 +722,8 @@
         & > span,
         & > h3,
         & > h4,
-        & > h5 {
+        & > h5,
+        .play-row.didaskalia-row {
           width: 100%;
         }
 
