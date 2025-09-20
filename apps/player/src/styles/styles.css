@@ -725,7 +725,6 @@
 
         .play-row .character-text {
           max-width: initial;
-          flex: auto 0 1;
         }
 
         .play-row[data-text-alignment="left"] {
