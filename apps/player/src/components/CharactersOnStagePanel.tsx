@@ -9,6 +9,7 @@ import { getCharactersData } from "@player/genericBookDataGetters/getCharactersD
 import CharacterCard from "./CharacterCard";
 import { cn } from "@player/lib/utils";
 import { useOptionalElementVisibility } from "@player/stores/elementVisibility.store";
+import { Appearance } from "@player/fetchers/getParagraphRange";
 
 const AVATAR_SIZE = "clamp(55px, 6.5vw, 90px)";
 
@@ -90,7 +91,7 @@ interface CharacterAvatarProps {
     chapterNumber: number;
     paragraphNumber: number;
     isTalkingInFirstParagraph: boolean;
-    otherAppearances: any[];
+    otherAppearances: Appearance[];
   };
   currentSpeakers: string[];
   index: number;

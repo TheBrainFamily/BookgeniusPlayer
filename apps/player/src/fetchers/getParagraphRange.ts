@@ -115,6 +115,8 @@ export const paragraphMetadataServicePure = {
 /*  3. UI‑oriented post‑processing                                            */
 /* -------------------------------------------------------------------------- */
 
+export type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
+
 export interface ParsedParagraphRange {
   slug: string;
   characterName: string;
@@ -124,7 +126,7 @@ export interface ParsedParagraphRange {
   isTalkingInFirstParagraph: boolean;
   chapterNumber: number;
   label?: string;
-  otherAppearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[];
+  otherAppearances: Appearance[];
 }
 
 /**

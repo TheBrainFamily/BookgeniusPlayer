@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { setupPageObserver } from "@player/ui/pageObserver";
-import { getBookStringified } from "@player/genericBookDataGetters/getBookStringified";
 import { findSimplifiedSentence } from "@player/helpers/findSimplifiedSentence";
 import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
@@ -11,9 +10,8 @@ import { useBookData } from "@player/context/BookDataContext";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { goToParagraph } from "@player/helpers/paragraphsNavigation";
 import { useLocation } from "@player/state/LocationContext";
-import { addPaddingBottomLastChapter } from "@player/helpers/addPaddingBottomLastChapter";
-import { addSpaceBetweenChapters } from "@player/helpers/addSpaceBetweenChapters";
-import { backgroundsForBook } from "@player/ui/backgroundsForBook";
+import { disposeVirtualizer, ensureChapterWindow, initializeBookContentVirtualizer } from "@player/logic/BookContentVirtualizer";
+import { bookIndex } from "@player/logic/BookIndex";
 
 const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
@@ -31,15 +29,16 @@ export function useBookContent() {
   const { textVersion } = useBookData();
   const { location } = useLocation();
   const { currentChapter, currentParagraph } = location;
-  const bookStringified = getBookStringified();
   const {
     metadata: { bookForm },
   } = getBookData();
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
 
   const previousTextVersionRef = useRef(textVersion);
+  const lastInitializedVersionRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLElement | null>(null);
-  const observerSetupRef = useRef<{ cleanup: () => void } | null>(null);
+  const observerSetupRef = useRef<{ observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number; cleanup: () => void } | null>(null);
+  const currentChapterRef = useRef<number | undefined>(currentChapter);
 
   useEditorMode(isEditorMode ? containerRef.current : null);
 
@@ -116,38 +115,88 @@ export function useBookContent() {
   }, []);
 
   useEffect(() => {
+    currentChapterRef.current = currentChapter;
+  }, [currentChapter]);
+
+  const handleContentChanged = useCallback(() => {
+    if (observerSetupRef.current) {
+      // Refresh observed nodes for the existing observer
+      observerSetupRef.current.observeNewParagraphs();
+      observerSetupRef.current.cleanupRemovedParagraphs();
+    } else {
+      observerSetupRef.current = setupPageObserver(openCharacterDetailsModal);
+    }
+  }, [openCharacterDetailsModal]);
+
+  useEffect(() => {
     const container = containerRef.current;
 
     if (!container) {
-      console.warn(`Container with id ${containerId} not found for content injection.`);
+      console.warn(`Container with id ${containerId} not found for content virtualization.`);
+      return () => {};
+    }
+
+    if (lastInitializedVersionRef.current !== textVersion) {
+      bookIndex.invalidate();
+      lastInitializedVersionRef.current = textVersion;
+    }
+
+    let cancelled = false;
+
+    const initialiseVirtualizer = async () => {
+      try {
+        await initializeBookContentVirtualizer({ container, onContentChanged: handleContentChanged });
+        const initialChapter = typeof currentChapterRef.current === "number" ? currentChapterRef.current : (bookIndex.getFirstChapter() ?? 1);
+        await ensureChapterWindow(initialChapter, { force: true });
+        if (!cancelled) {
+          handleContentChanged();
+        }
+      } catch (error) {
+        console.error("useBookContent: Failed to initialise chapter virtualizer", error);
+      }
+    };
+
+    void initialiseVirtualizer();
+
+    return () => {
+      cancelled = true;
+      if (observerSetupRef.current) {
+        observerSetupRef.current.cleanup();
+        observerSetupRef.current = null;
+      }
+      disposeVirtualizer();
+    };
+  }, [textVersion, handleContentChanged]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (!container) {
       return;
     }
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(bookStringified, "text/html");
-    const chapterSections = Array.from(doc.querySelectorAll("section[data-chapter]"));
-
-    if (chapterSections.length > 0) {
-      if (backgroundsForBook.length > 0) {
-        addSpaceBetweenChapters(doc, chapterSections);
-      }
-      addPaddingBottomLastChapter(doc, chapterSections);
-    }
-
-    container.innerHTML = doc.body.innerHTML;
-    observerSetupRef.current = setupPageObserver(openCharacterDetailsModal);
 
     container.addEventListener("pointerup", handlePointerUp);
 
     return () => {
       container.removeEventListener("pointerup", handlePointerUp);
-
-      if (observerSetupRef.current) {
-        observerSetupRef.current.cleanup();
-        observerSetupRef.current = null;
-      }
     };
-  }, [bookStringified, textVersion, handlePointerUp, openCharacterDetailsModal]);
+  }, [handlePointerUp]);
+
+  useEffect(() => {
+    if (typeof currentChapter !== "number") {
+      return;
+    }
+
+    void (async () => {
+      try {
+        await ensureChapterWindow(currentChapter);
+      } catch (error) {
+        console.error("useBookContent: Failed to update chapter window", error);
+      } finally {
+        handleContentChanged();
+      }
+    })();
+  }, [currentChapter, handleContentChanged]);
 
   useEffect(() => {
     const textVersionChanged = previousTextVersionRef.current !== textVersion;
@@ -161,13 +210,25 @@ export function useBookContent() {
       return;
     }
 
-    // Re-align the scroll position with the current location after the book
-    // content has been reloaded (e.g. via the editor "Reload Book Data" button).
-    requestAnimationFrame(() => {
-      void goToParagraph({ currentChapter, currentParagraph }, { behavior: "instant" }).catch((error) => {
-        console.error("useBookContent: Failed to restore scroll position after reload", error);
-      });
-    });
+    if (observerSetupRef.current) {
+      observerSetupRef.current.cleanup();
+      observerSetupRef.current = null;
+    }
+
+    void (async () => {
+      try {
+        await ensureChapterWindow(currentChapter, { force: true });
+        requestAnimationFrame(() => {
+          void goToParagraph({ currentChapter, currentParagraph }, { behavior: "instant" }).catch((error) => {
+            console.error("useBookContent: Failed to restore scroll position after reload", error);
+          });
+        });
+      } catch (error) {
+        console.error("useBookContent: Failed to remount chapters after reload", error);
+      } finally {
+        observerSetupRef.current = setupPageObserver(openCharacterDetailsModal);
+      }
+    })();
   }, [currentChapter, currentParagraph, textVersion]);
 }
 

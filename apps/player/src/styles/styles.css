@@ -107,7 +107,10 @@
     cursor: default;
     overflow-y: auto;
     height: 100%;
-    scroll-behavior: smooth;
+    /* Keep programmatic smoothness explicit in code (goToParagraph, etc.). */
+    scroll-behavior: auto;
+    /* Allow browser scroll anchoring to stabilize layout changes above */
+    overflow-anchor: auto;
     text-align: justify; /* Default text alignment for content */
     will-change: padding, transform; /* Optimize for animations */
     -webkit-backface-visibility: hidden;

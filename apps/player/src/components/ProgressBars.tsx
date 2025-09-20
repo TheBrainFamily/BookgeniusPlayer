@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 
 import { useReadingProgress } from "@player/hooks/useReadingProgress";
-import { getBookStringified } from "@player/genericBookDataGetters/getBookStringified";
+import { bookIndex } from "@player/logic/BookIndex";
 import useSplashHidden from "@player/hooks/useSplashHidden";
 
 export interface ChapterStructure {
@@ -31,26 +31,14 @@ const ProgressBars: React.FC = () => {
 
   useEffect(() => {
     try {
-      const bookDataString = getBookStringified();
-      const parser = new window.DOMParser();
-      const htmlDoc = parser.parseFromString(bookDataString, "text/html");
-
-      const chapters = Array.from(htmlDoc.querySelectorAll("section[data-chapter]"));
-      const structure: ChapterStructure[] = [];
-      let total = 0;
-
-      chapters.forEach((chapter) => {
-        const chapterNumber = parseInt(chapter.getAttribute("data-chapter") || "0");
-        const paragraphCount = chapter.querySelectorAll("[data-index]").length;
-
-        structure.push({ chapterNumber, paragraphCount });
-        total += paragraphCount;
-      });
+      bookIndex.ensureInitialized();
+      const structure = bookIndex.getChaptersStructure();
+      const total = structure.reduce((sum, entry) => sum + entry.paragraphCount, 0);
 
       setChaptersStructure(structure);
       setTotalParagraphs(total);
     } catch (error) {
-      console.error("❌ Error parsing book data:", error);
+      console.error("❌ Error preparing chapters structure:", error);
     }
   }, []);
 

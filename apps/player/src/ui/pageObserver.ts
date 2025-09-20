@@ -472,7 +472,6 @@ export function setupPageObserver(
   const paragraphsToObserve = rootEl.querySelectorAll("section[data-chapter] [data-index]");
 
   const spacersToObserve = rootEl.querySelectorAll(".transition-spacer");
-  console.log("Observing these spacers:", spacersToObserve);
 
   const spacerObserver = new IntersectionObserver(
     (entries) => {
@@ -529,7 +528,7 @@ export function setupPageObserver(
         }
       });
     },
-    { threshold: Array.from(Array(101).keys()).map((i) => i / 100) },
+    { threshold: Array.from(Array(51).keys()).map((i) => i / 50) },
   );
 
   spacersToObserve.forEach((spacer) => {

@@ -1,10 +1,9 @@
-import { getBookStringified } from "@player/genericBookDataGetters/getBookStringified";
 import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
 import { useBookContentStore } from "@player/stores/bookContent.store";
+import { bookIndex } from "@player/logic/BookIndex";
 
 class TextCacheManager {
   private static instance: TextCacheManager;
-  private inMemoryDoc: Document | null = null;
   private isInitialized = false;
 
   private constructor() {}
@@ -20,9 +19,7 @@ class TextCacheManager {
     if (this.isInitialized) return;
 
     try {
-      const bookHtmlString = getBookStringified();
-      const parser = new DOMParser();
-      this.inMemoryDoc = parser.parseFromString(bookHtmlString, "text/html");
+      bookIndex.ensureInitialized();
       this.isInitialized = true;
       useBookContentStore.getState().setInitialized();
       console.log("TextCacheManager initialized.");
@@ -39,7 +36,7 @@ class TextCacheManager {
   }
 
   public ensureCacheUpto(chapterId: number, paragraphId: number) {
-    if (!this.isInitialized || !this.inMemoryDoc) return;
+    if (!this.isInitialized) return;
 
     const { textCache, addParagraphsToCache } = useBookContentStore.getState();
 
@@ -47,12 +44,9 @@ class TextCacheManager {
       const paragraphsToCache: { [key: number]: string } = {};
       let newParagraphsFound = false;
 
-      const chapterNode = this.inMemoryDoc.querySelector(`section[data-chapter="${c}"]`);
-      if (!chapterNode) continue;
-
       const lastParagraphToCache = c < chapterId ? Infinity : paragraphId;
 
-      const paragraphNodes = chapterNode.querySelectorAll("[data-index]");
+      const paragraphNodes = bookIndex.getParagraphElements(c);
       paragraphNodes.forEach((pNode) => {
         const pIndex = parseInt(pNode.getAttribute("data-index")!, 10);
         if (pIndex <= lastParagraphToCache) {
@@ -67,6 +61,11 @@ class TextCacheManager {
         addParagraphsToCache(c, paragraphsToCache);
       }
     }
+  }
+
+  public reset() {
+    this.isInitialized = false;
+    useBookContentStore.getState().reset();
   }
 }
 
