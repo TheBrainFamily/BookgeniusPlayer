@@ -556,7 +556,7 @@
 
       .character-text {
         flex: 0 0 auto;
-        max-width: 80%;
+        max-width: 70%;
         min-width: 0;
         text-align: left;
         padding-top: 1rem;
@@ -682,7 +682,7 @@
         }
 
         .play-row .character-text {
-          max-width: 85%;
+          max-width: 65%;
         }
       }
     }
@@ -690,10 +690,10 @@
 
   @media (max-width: 820px) {
     #content-container:has(.play-container) {
-      background-size: 450px 100%;
+      background-size: 500px 100%;
 
       .play-container > section > section {
-        max-width: 600px;
+        max-width: 650px;
 
         & > span,
         & > h3,
@@ -701,11 +701,15 @@
         & > h5 {
           width: 450px;
         }
+
+        .play-row .character-text {
+          max-width: 65%;
+        }
       }
     }
   }
 
-  @media (max-width: 625px) {
+  @media (max-width: 650px) {
     #content-container:has(.play-container) {
       background-size: 100%;
 
