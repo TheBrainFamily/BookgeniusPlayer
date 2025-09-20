@@ -445,7 +445,8 @@
       & > span,
       & > h3,
       & > h4,
-      & > h5 {
+      & > h5,
+      .play-row.didaskalia-row {
         width: 600px;
         margin-left: auto;
         margin-right: auto;
@@ -471,9 +472,8 @@
         display: flex;
         align-items: flex-start;
         position: relative;
-        width: 675px;
         max-width: 100%;
-        margin: 0 auto clamp(3em, 2.5vh, 3.5em);
+        margin: 0 0 clamp(3em, 2.5vh, 3.5em);
         gap: clamp(0.5rem, 2vw, 2rem);
       }
 
@@ -481,14 +481,12 @@
         flex-direction: row;
         justify-content: flex-start;
         align-items: flex-start;
-        padding: 0 0 0 clamp(1rem, 3vw, 2rem);
       }
 
       .play-row[data-text-alignment="right"] {
         flex-direction: row-reverse;
         justify-content: flex-start;
         align-items: flex-start;
-        padding: 0 clamp(1rem, 3vw, 2rem) 0 0;
       }
 
       .play-row.didaskalia-row {
@@ -525,6 +523,9 @@
         }
 
         span.character-placeholder {
+          overflow: visible;
+          min-width: clamp(65px, 16vw, 150px);
+          min-height: clamp(65px, 16vw, 150px);
           position: relative;
           margin-top: clamp(-4rem, -8vw, -2rem);
           z-index: 1;
@@ -569,33 +570,20 @@
 
       .character-text {
         flex: 0 0 auto;
-        max-width: 80%;
+        max-width: 70%;
         min-width: 0;
         text-align: left;
         padding-top: 1rem;
-      }
-
-      .play-row[data-text-alignment="left"] {
-        transform: translateX(-22.5%);
-      }
-
-      .play-row[data-text-alignment="right"] {
-        transform: translateX(22.5%);
       }
 
       .play-row[data-text-alignment="right"] .character-avatar {
         transform: rotateY(180deg);
       }
 
-      .play-row:not(:has(.character-avatar)) {
-        transform: translateX(0) !important;
-      }
-
       .didaskalia-row,
       .didaskalia-row[data-text-alignment="left"],
       .didaskalia-row[data-text-alignment="right"] {
-        transform: translateX(0) !important;
-        padding: 0 !important;
+        padding: 0;
       }
 
       span.inline-avatar-wrapper > div {
@@ -703,24 +691,13 @@
         & > span,
         & > h3,
         & > h4,
-        & > h5 {
-          width: 575px;
-        }
-
-        .play-row {
-          width: 575px;
+        & > h5,
+        .play-row.didaskalia-row {
+          width: 550px;
         }
 
         .play-row .character-text {
-          max-width: 85%;
-        }
-
-        .play-row[data-text-alignment="left"] {
-          transform: translateX(-25%);
-        }
-
-        .play-row[data-text-alignment="right"] {
-          transform: translateX(25%);
+          max-width: 65%;
         }
       }
     }
@@ -728,48 +705,27 @@
 
   @media (max-width: 820px) {
     #content-container:has(.play-container) {
-      background-size: 450px 100%;
+      background-size: 500px 100%;
 
       .play-container > section > section {
-        max-width: 600px;
+        max-width: 650px;
 
         & > span,
         & > h3,
         & > h4,
-        & > h5 {
+        & > h5,
+        .play-row.didaskalia-row {
           width: 450px;
         }
 
-        .play-row {
-          width: 450px;
-        }
-
-        .play-row[data-text-alignment="left"] {
-          transform: translateX(-30%);
-        }
-
-        .play-row[data-text-alignment="right"] {
-          transform: translateX(30%);
+        .play-row .character-text {
+          max-width: 65%;
         }
       }
     }
   }
 
-  @media (max-width: 685px) {
-    #content-container:has(.play-container) {
-      .play-container > section > section {
-        .play-row[data-text-alignment="left"] {
-          transform: translateX(-20%);
-        }
-
-        .play-row[data-text-alignment="right"] {
-          transform: translateX(20%);
-        }
-      }
-    }
-  }
-
-  @media (max-width: 600px) {
+  @media (max-width: 650px) {
     #content-container:has(.play-container) {
       background-size: 100%;
 
@@ -779,7 +735,8 @@
         & > span,
         & > h3,
         & > h4,
-        & > h5 {
+        & > h5,
+        .play-row.didaskalia-row {
           width: 100%;
         }
 
@@ -789,7 +746,6 @@
 
         .play-row .character-text {
           max-width: initial;
-          flex: 1 0 0;
         }
 
         .play-row[data-text-alignment="left"] {
@@ -884,13 +840,6 @@
       );
 
       .play-container > section > section {
-        .play-row[data-text-alignment="left"] {
-          transform: translateX(-17.5%);
-        }
-
-        .play-row[data-text-alignment="right"] {
-          transform: translateX(17.5%);
-        }
         .character-avatar .inline-avatar {
           min-width: clamp(65px, 15vw, 120px);
           min-height: clamp(65px, 15vw, 120px);
@@ -1461,6 +1410,7 @@ section[data-chapter] [data-index] {
 }
 
 .scrollbar-search {
+  padding-top: 0 !important;
   scrollbar-color: #aaa transparent;
   scrollbar-width: thin;
   scrollbar-gutter: stable;
@@ -1507,10 +1457,6 @@ section[data-chapter] [data-index] {
     gap: 1rem;
     width: 80vw;
     max-width: 600px;
-  }
-
-  .scrollbar-search {
-    padding-top: 0 !important;
   }
 
   .player-left {
