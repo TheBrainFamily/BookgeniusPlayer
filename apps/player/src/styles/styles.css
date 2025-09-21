@@ -651,10 +651,20 @@
         text-indent: 1.4em;
       }
 
+      p[data-is-character="true"]
+        + p[data-text-alignment="left"][data-is-character="false"]:not(:has(em)) {
+        text-indent: 0;
+      }
+
       p[data-text-alignment="right"][data-is-character="false"]:not(:has(em)) {
         text-align: justify;
         padding: 0.6em;
         text-indent: 1.4em;
+      }
+
+      p[data-is-character="true"]
+        + p[data-text-alignment="right"][data-is-character="false"]:not(:has(em)) {
+        text-indent: 0;
       }
 
       p {
