@@ -570,7 +570,7 @@
 
       .character-text {
         flex: 0 0 auto;
-        max-width: 70%;
+        max-width: 60%;
         min-width: 0;
         text-align: left;
         padding-top: 1rem;
@@ -695,10 +695,6 @@
         .play-row.didaskalia-row {
           width: 550px;
         }
-
-        .play-row .character-text {
-          max-width: 65%;
-        }
       }
     }
   }
@@ -716,10 +712,6 @@
         & > h5,
         .play-row.didaskalia-row {
           width: 450px;
-        }
-
-        .play-row .character-text {
-          max-width: 65%;
         }
       }
     }
@@ -745,17 +737,18 @@
         }
 
         .play-row .character-text {
-          max-width: initial;
+          max-width: fit-content;
+          flex: 1 0 0;
         }
 
         .play-row[data-text-alignment="left"] {
           transform: none;
-          padding: 0 1rem;
+          padding: 0 2rem 0 1rem;
         }
 
         .play-row[data-text-alignment="right"] {
           transform: none;
-          padding: 0 1rem;
+          padding: 0 1rem 0 2rem;
         }
       }
     }
