@@ -6,6 +6,7 @@
  */
 import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
 import { bookDataLoader } from "@player/services/bookDataLoader";
+import { ensureChapterWindow } from "@player/logic/BookContentVirtualizer";
 
 let systemNavigationInProgress = false;
 
@@ -252,7 +253,7 @@ const waitForElementStablePosition = (element: HTMLElement, options: { timeout?:
 /**
  * Navigate to a specific location with a system source (triggers scrolling)
  */
-export const systemNavigateTo = (
+export const systemNavigateTo = async (
   loc: { currentChapter: number; currentParagraph: number },
   options: { wait?: boolean; history?: "push" | "replace" } = { wait: false, history: "replace" },
 ) => {
@@ -300,6 +301,12 @@ export const systemNavigateTo = (
         systemNavigationInProgress = false;
       });
   };
+
+  try {
+    await ensureChapterWindow(loc.currentChapter);
+  } catch (error) {
+    console.error("systemNavigateTo: Failed to ensure chapter window before navigation", error);
+  }
 
   const selector =
     loc.currentParagraph === 0 ? `section[data-chapter="${loc.currentChapter}"]` : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;

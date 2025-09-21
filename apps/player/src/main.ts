@@ -10,8 +10,8 @@
 import { initializeNoteLinkBlinking } from "./annotationsHandling";
 import { dealWithSW } from "./serviceWorker";
 import { setupParagraphHighlighting } from "./ui/paragraphHighlighting";
-import { initPage } from "./ui/pageInit";
 import { toggleBookContainerVisibilityWithShortcut } from "./helpers/hide-interface-shortcut";
+import { goToInitialLocationFromHash } from "./helpers/paragraphsNavigation";
 
 // Call the function immediately so the shortcut is active
 
@@ -28,7 +28,7 @@ export async function runLegacyInit() {
   const loadingIndicator = document.getElementById("loading");
 
   try {
-    await initPage();
+    goToInitialLocationFromHash();
   } catch (error) {
     console.error("Error initializing page:", error);
     if (loadingIndicator) {

@@ -39,7 +39,7 @@ const Footer = () => {
   // Determine if footer should be shifted left
   const shouldShiftFooter = isContentShiftedLeft && isLargeScreen;
 
-  const footerShiftClass = bookForm === "play" ? "-translate-x-[14.5%]" : "-translate-x-[11.5%]";
+  const footerShiftClass = bookForm === "play" || bookForm === "mixed" ? "-translate-x-[14.5%]" : "-translate-x-[11.5%]";
   return (
     <AnimatePresence>
       {isSplashHidden && (
@@ -55,7 +55,7 @@ const Footer = () => {
             shouldShiftFooter ? `transform ${footerShiftClass}` : "",
           )}
         >
-          {bookForm === "play" ? (
+          {bookForm === "play" || bookForm === "mixed" ? (
             <>
               <div
                 className={cn(

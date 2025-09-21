@@ -5,6 +5,7 @@ import { Search, FileText } from "lucide-react";
 
 import { SearchResultsData, SearchResultItemData, cleanupSearchChapters } from "@player/searchModal";
 import { goToParagraph } from "@player/helpers/paragraphsNavigation";
+import { ensureChapterWindow } from "@player/logic/BookContentVirtualizer";
 import ModalUI from "./ModalUI";
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@player/components/ui/accordion";
@@ -27,16 +28,19 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOver
     };
   }, []);
 
-  const handleSearchResultClick = useCallback((item: SearchResultItemData) => {
+  const handleSearchResultClick = useCallback(async (item: SearchResultItemData) => {
     //TODO: fix this to get the value directly from bottom input hook or something
     const inputEl = document.getElementById("bottom-input") as HTMLInputElement | null;
     const query = inputEl?.value ?? "";
 
-    // Update location with 'system' source to trigger scrolling
-    goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "smooth" }).catch((error) =>
-      console.warn("Failed to scroll to search result:", error),
-    );
-    highlightSearchInParagraph(item.chapter, item.paragraphNumber, query);
+    try {
+      // Ensure the chapter window is mounted before attempting to scroll
+      await ensureChapterWindow(item.chapter);
+      await goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "instant" });
+      highlightSearchInParagraph(item.chapter, item.paragraphNumber, query);
+    } catch (error) {
+      console.warn("Failed to scroll to search result:", error);
+    }
   }, []);
 
   // Group search results by chapter

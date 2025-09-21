@@ -107,7 +107,10 @@
     cursor: default;
     overflow-y: auto;
     height: 100%;
-    scroll-behavior: smooth;
+    /* Keep programmatic smoothness explicit in code (goToParagraph, etc.). */
+    scroll-behavior: auto;
+    /* Allow browser scroll anchoring to stabilize layout changes above */
+    overflow-anchor: auto;
     text-align: justify; /* Default text alignment for content */
     will-change: padding, transform; /* Optimize for animations */
     -webkit-backface-visibility: hidden;
@@ -409,6 +412,11 @@
     }
   }
 
+  /* Never anchor to the virtualization spacer */
+  #virtual-top-spacer {
+    overflow-anchor: none;
+  }
+
   #content-container:has(.play-container) {
     width: 100%;
     background-size: 700px 100%;
@@ -488,6 +496,16 @@
 
       .play-row.didaskalia-row {
         justify-content: center;
+      }
+
+      span[id^="ch"][id*="-p"][id*="-s"] {
+        cursor: pointer;
+        touch-action: none;
+      }
+
+      span[id^="ch"][id*="-p"][id*="-s"]:hover {
+        background-color: rgba(66, 68, 90, 0.1);
+        padding: 0.2rem 0;
       }
 
       .character-avatar {
@@ -641,6 +659,7 @@
         margin: clamp(0.05em, 0.25vh, 0.1em) 0 clamp(0.1em, 0.5vh, 0.2em) 0;
       }
 
+      p > strong,
       p > span > strong {
         font-family: var(--font-eb-garamond);
         font-weight: 700;
@@ -1590,4 +1609,23 @@ section[data-chapter] [data-index] {
 
 .character-notes-custom > div:last-child:not(:only-child) {
   padding-bottom: 30px;
+}
+
+#legacy #content-container .play-container.mixed-container {
+  p[data-text-alignment="left"][data-is-character="false"]:not(:has(em)) {
+    padding: 0.6em;
+    text-align: justify;
+    text-indent: 1.4em;
+  }
+  p[data-is-character="true"] + p[data-text-alignment="left"][data-is-character="false"]:not(:has(em)) {
+    text-indent: 0;
+  }
+  p[data-is-character="true"] + p[data-text-alignment="right"][data-is-character="false"]:not(:has(em)) {
+    text-indent: 0;
+  }
+  p[data-text-alignment="right"][data-is-character="false"]:not(:has(em)) {
+    text-align: justify;
+    padding: 0.6em;
+    text-indent: 1.4em;
+  }
 }
