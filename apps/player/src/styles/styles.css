@@ -412,6 +412,11 @@
     }
   }
 
+  /* Never anchor to the virtualization spacer */
+  #virtual-top-spacer {
+    overflow-anchor: none;
+  }
+
   #content-container:has(.play-container) {
     width: 100%;
     background-size: 700px 100%;
@@ -640,11 +645,16 @@
         width: fit-content;
       }
 
+      p[data-text-alignment="left"][data-is-character="false"]:not(:has(em)) {
+        padding: 0.6em;
+        text-align: justify;
+        text-indent: 1.4em;
+      }
+
       p[data-text-alignment="right"][data-is-character="false"]:not(:has(em)) {
-        text-align: left;
-        padding-left: 0;
-        text-indent: 0;
-        margin-left: 0;
+        text-align: justify;
+        padding: 0.6em;
+        text-indent: 1.4em;
       }
 
       p {
@@ -654,6 +664,7 @@
         margin: clamp(0.05em, 0.25vh, 0.1em) 0 clamp(0.1em, 0.5vh, 0.2em) 0;
       }
 
+      p > strong,
       p > span > strong {
         font-family: var(--font-eb-garamond);
         font-weight: 700;
