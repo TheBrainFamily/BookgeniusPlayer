@@ -22,6 +22,8 @@ class ChapterVirtualizer {
     spacer.style.width = "100%";
     spacer.style.pointerEvents = "none";
     spacer.style.flexShrink = "0";
+    // Prevent the spacer from becoming an anchor candidate
+    spacer.style.setProperty("overflow-anchor", "none");
     this.host.insertBefore(spacer, this.host.firstChild);
     return spacer;
   }
@@ -184,14 +186,9 @@ class ChapterVirtualizer {
           if (beforeTop !== null && afterTop !== null) {
             const delta = afterTop - beforeTop; // positive when pushed down
             if (delta !== 0) {
-              const currentTop = this.getTopSpacerHeight();
-              const consume = Math.min(currentTop, delta);
-              if (consume > 0) this.setTopSpacerHeight(currentTop - consume);
-              const remainder = delta - consume;
-              if (contentContainer && remainder > 0) {
-                console.warn("Pushing down content container", remainder);
-                contentContainer.scrollTop = (contentContainer.scrollTop ?? 0) + remainder;
-              }
+              // Adjust only the spacer; rely on browser anchoring for any tiny remainder.
+              const newHeight = this.getTopSpacerHeight() - delta;
+              this.setTopSpacerHeight(newHeight);
             }
           }
         } else {
