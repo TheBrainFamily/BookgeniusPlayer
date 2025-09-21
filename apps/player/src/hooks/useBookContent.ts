@@ -273,8 +273,10 @@ const setSentenceAsClicked = (sentenceId: string): void => {
   }
 };
 
+// TODO this shouldnt rely on things like strong, lets do this right
 const isCharacterPlaceholder = (span: HTMLElement, bookForm: string): boolean => {
-  if (bookForm === "play") {
+  console.log("bookForm", bookForm);
+  if (bookForm === "play" || bookForm === "mixed") {
     return span.children.length === 1 && span.children[0].tagName === "STRONG";
   }
   return span.children.length === 2 && span.children[0].classList.contains("character-placeholder") && span.children[1].tagName === "STRONG";

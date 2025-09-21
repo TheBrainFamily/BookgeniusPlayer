@@ -8,7 +8,7 @@ export const ContentShiftWrapper: React.FC = () => {
   const wasShiftedRef = useRef(false);
 
   const bookData = getBookData();
-  const isPlayFormat = bookData.metadata.bookForm === "play";
+  const isPlayFormat = bookData.metadata.bookForm === "play" || bookData.metadata.bookForm === "mixed";
 
   useEffect(() => {
     const checkScreenSize = () => {

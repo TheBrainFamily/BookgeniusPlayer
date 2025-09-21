@@ -121,7 +121,7 @@ const createContextualSummary = (fullText: string, query: string, maxLength: num
 
 export function performCachedSearch(query: string, currentLocation: Location): SearchResultsData {
   const { textCache, isInitialized } = useBookContentStore.getState();
-  const bookIsPlay = getBookData().metadata.bookForm === "play";
+  const bookIsPlay = getBookData().metadata.bookForm === "play" || getBookData().metadata.bookForm === "mixed";
   let bookCharacters = [];
   if (bookIsPlay) {
     bookCharacters = getCharactersData().map((character) => character.characterName.toLowerCase());

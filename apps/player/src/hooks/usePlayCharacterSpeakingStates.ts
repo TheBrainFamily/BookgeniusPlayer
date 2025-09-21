@@ -60,7 +60,7 @@ export function usePlayCharacterSpeakingStates() {
 
   const bookData = useMemo(() => getBookData(), []);
   const allCharacters = useMemo(() => getCharactersData(), []);
-  const isPlayFormat = useMemo(() => bookData.metadata.bookForm === "play", [bookData]);
+  const isPlayFormat = useMemo(() => bookData.metadata.bookForm === "play" || bookData.metadata.bookForm === "mixed", [bookData]);
 
   const currentSpeakers = useCurrentSpeakers(location, allCharacters, isPlayFormat);
 
