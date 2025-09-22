@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, Variants } from "motion/react";
 
 import BottomInput from "./BottomInput";
-import { useWebSocket } from "@player/context/WebSocketContext";
 import useSplashHidden from "@player/hooks/useSplashHidden";
 import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
@@ -11,7 +10,6 @@ import { useContentShift } from "@player/stores/contentShift.store";
 import { cn } from "@player/lib/utils";
 
 const Footer = () => {
-  const { sendMessage } = useWebSocket();
   const isSplashHidden = useSplashHidden();
   const isMobileOrTablet = useIsMobileOrTablet();
   const { isContentShiftedLeft } = useContentShift();
@@ -65,14 +63,14 @@ const Footer = () => {
                 )}
               >
                 <CharactersOnStagePanel />
-                <BottomInput className={cn("max-w-[800px]")} onSubmit={sendMessage} />
+                <BottomInput className={cn("max-w-[800px]")} />
               </div>
             </>
           ) : (
             <>
               <div id="left-notes-blank" className="hidden sm:block sm:flex-1 max-w-[700px]" />
               <div className={cn("w-full sm:flex-3 max-w-[900px] flex flex-col sm:pl-4 pointer-events-auto", shouldShiftFooter ? "max-w-[70vw]" : "")}>
-                <BottomInput onSubmit={sendMessage} />
+                <BottomInput />
               </div>
               {!isRightNotesBlankHidden && <div id="right-notes-blank" className="hidden xl:block xl:flex-1 max-w-[700px]" />}
             </>

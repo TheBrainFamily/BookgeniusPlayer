@@ -6,6 +6,7 @@ import { getBookData } from "./genericBookDataGetters/getBookData";
 import { bookIndex } from "@player/logic/BookIndex";
 
 export interface SearchResultItemData {
+  score?: number;
   chapter: number;
   paragraphNumber: number;
   percentInChapter: number;
@@ -17,6 +18,7 @@ export interface SearchResultItemData {
 export interface SearchResultsData {
   header: string;
   items: SearchResultItemData[];
+  areEmbeddings?: boolean;
   isLoading?: boolean;
 }
 
@@ -53,6 +55,7 @@ export async function performUnifiedSearch(
 
   try {
     const serverMatches = await searchParagraphsFromServer(query, currentLocation);
+
     const totalServerMatches = serverMatches.length;
 
     let header = "";
@@ -63,19 +66,22 @@ export async function performUnifiedSearch(
       header = `No matches found for "${query}" (context: Ch. ${currentLocation.chapter}, P. ${currentLocation.paragraph})`;
     }
 
-    const items: SearchResultItemData[] = serverMatches.map((match, index) => {
-      const totalParagraphsInChapter = getTotalParagraphsInChapter(match.chapter);
-      return {
-        chapter: match.chapter,
-        paragraphNumber: match.paragraphNumber,
-        percentInChapter: calculatePercentInChapter(match.paragraphNumber, totalParagraphsInChapter),
-        summary: match.summary,
-        text: createContextualSummary(match.text, query, 75),
-        id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}`,
-      };
-    });
+    const items: SearchResultItemData[] = serverMatches
+      .map((match, index) => {
+        const totalParagraphsInChapter = getTotalParagraphsInChapter(match.chapter);
+        return {
+          chapter: match.chapter,
+          paragraphNumber: match.paragraphNumber,
+          percentInChapter: calculatePercentInChapter(match.paragraphNumber, totalParagraphsInChapter),
+          summary: match.summary,
+          text: createContextualSummary(match.text, query, 75),
+          id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}`,
+          score: match.score,
+        };
+      })
+      .sort((a, b) => b.score - a.score);
 
-    return { header, items, isLoading: false };
+    return { header, items, areEmbeddings: true, isLoading: false };
   } catch (error) {
     console.error("Search error in performUnifiedSearch:", error);
     return { header: "Search failed. Please try again.", items: [], isLoading: false };

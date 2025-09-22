@@ -43,9 +43,10 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
 
   // Group search results by chapter
   const groupedResults = useMemo(() => {
-    if (!searchResults?.items) return {};
+    // Use deferred results for consistency with rendering state
+    if (!deferredResults?.items) return {};
 
-    return searchResults.items.reduce(
+    return deferredResults.items.reduce(
       (acc, item) => {
         if (!acc[item.chapter]) {
           acc[item.chapter] = [];
@@ -55,7 +56,20 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
       },
       {} as Record<number, SearchResultItemData[]>,
     );
-  }, [searchResults?.items]);
+  }, [deferredResults?.items]);
+
+  const sortedChapterEntries = useMemo(() => {
+    const entries = Object.entries(groupedResults);
+    if (deferredResults?.areEmbeddings) {
+      return entries.sort(([chapterA, itemsA], [chapterB, itemsB]) => {
+        const maxA = itemsA.reduce((m, i) => Math.max(m, i.score ?? -Infinity), -Infinity);
+        const maxB = itemsB.reduce((m, i) => Math.max(m, i.score ?? -Infinity), -Infinity);
+        if (maxA === maxB) return Number(chapterA) - Number(chapterB);
+        return maxB - maxA;
+      });
+    }
+    return entries.sort(([a], [b]) => Number(a) - Number(b));
+  }, [groupedResults, deferredResults?.areEmbeddings]);
 
   useEffect(() => {
     if (hasItems && Object.keys(groupedResults).length > 0) {
@@ -72,6 +86,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
     </div>
   );
 
+  // Decide chapter ordering based on embeddings or not
   const headerActions =
     hasItems && showContent ? (
       <Tooltip>
@@ -133,11 +148,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
             {hasItems ? (
               <motion.div className="space-y-3" variants={variants.container} initial="hidden" animate="visible">
                 <Accordion type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
-                  {Object.entries(groupedResults)
-                    .sort(([a], [b]) => Number(a) - Number(b))
-                    .map(([chapter, items]) => (
-                      <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} />
-                    ))}
+                  {sortedChapterEntries.map(([chapter, items]) => (
+                    <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} />
+                  ))}
                 </Accordion>
               </motion.div>
             ) : (

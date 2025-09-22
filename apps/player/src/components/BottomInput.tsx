@@ -16,18 +16,13 @@ import { useElementVisibilityStore } from "@player/stores/elementVisibility.stor
 import { hasApiKey } from "@player/utils/apiKeyManager";
 import { useApiKeyModal } from "@player/stores/modals/apiKeyModal.store";
 import { Filter } from "@player/types/book";
-
-interface SubmitMessageData {
-  query: string;
-  filter: Filter;
-}
+import { askCall } from "@player/askCall";
 
 interface BottomInputProps {
-  onSubmit?: (message: SubmitMessageData) => void;
   className?: string;
 }
 
-const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
+const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { t } = useTranslation();
 
   const [value, setValue] = useState("");
@@ -71,6 +66,27 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       inputEl.setSelectionRange(length, length);
     });
   }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value]);
+
+  const handleAsk = useCallback(
+    async (query: string) => {
+      setIsThinking(true);
+      console.log("setting isThinking to true");
+      openDeepResearchModal(undefined, true, true);
+
+      try {
+        const response = await askCall(query, location);
+        console.log("askCall response", response);
+        setDeepResearchContent(response);
+      } catch (error) {
+        console.error("Ask call failed:", error);
+        setDeepResearchContent(t("ask_error"));
+      } finally {
+        console.log("setting isThinking to false");
+        setIsThinking(false);
+      }
+    },
+    [location, openDeepResearchModal, setDeepResearchContent, t],
+  );
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,18 +147,17 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       if (!trimmed) return;
 
       if (isSearchModalOpen) {
-        setSearchQuery(trimmed);
+        closeSearchModal();
+
+        handleAsk(trimmed);
         return;
       }
 
       if (isDeepResearchActive) {
         executeDeepResearch(trimmed);
-      } else if (onSubmit) {
-        const currentBook = bookDataLoader.getCurrentBook();
-        onSubmit({ query: trimmed, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: currentBook } });
       }
     },
-    [handleActivity, value, isSearchModalOpen, setSearchQuery, isDeepResearchActive, executeDeepResearch, onSubmit, currentChapter, currentParagraph],
+    [handleActivity, value, isSearchModalOpen, isDeepResearchActive, executeDeepResearch, handleAsk, closeSearchModal],
   );
 
   const toggleDeepResearch = useCallback(() => {
