@@ -21,7 +21,7 @@ interface ElementVisibilityState {
   areElementsVisible: boolean;
   isScrollMode: boolean;
   lastHideReason: HideReason;
-  isInputHovered: boolean;
+  isTimersPausedSticky: boolean;
   touch: TouchState;
   timers: TimerState;
   // Internal timer refs (not exposed to components)
@@ -29,7 +29,6 @@ interface ElementVisibilityState {
   // Actions
   setElementsVisible: (visible: boolean) => void;
   setScrollMode: (scrollMode: boolean) => void;
-  setInputHovered: (hovered: boolean) => void;
   setTouchStart: (y: number, x: number, time: number) => void;
   setTouchScrolling: (scrolling: boolean) => void;
   setInactivityTimer: (timerId: number | null) => void;
@@ -38,7 +37,7 @@ interface ElementVisibilityState {
   showAllElements: () => void;
   hideAllElements: (reason?: HideReason) => void;
   handleScreenTap: () => void;
-  pauseAllTimers: () => void;
+  pauseAllTimers: (sticky?: boolean) => void;
   startAllTimers: () => void;
   clearInactivityTimer: () => void;
   resetInactivityTimer: () => void;
@@ -55,7 +54,7 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
       areElementsVisible: true,
       isScrollMode: false,
       lastHideReason: null,
-      isInputHovered: false,
+      isTimersPausedSticky: false,
       touch: { startY: 0, startX: 0, startTime: 0, isScrolling: false },
       timers: { inactivityTimerId: null, scrollTimerId: null },
       _internalTimers: { inactivityTimerRef: null, scrollTimerRef: null },
@@ -63,7 +62,6 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
       // Simple actions
       setElementsVisible: (visible) => set({ areElementsVisible: visible }),
       setScrollMode: (scrollMode) => set({ isScrollMode: scrollMode }),
-      setInputHovered: (hovered) => set({ isInputHovered: hovered }),
       setTouchStart: (y, x, time) => set((state) => ({ touch: { ...state.touch, startY: y, startX: x, startTime: time, isScrolling: false } })),
       setTouchScrolling: (scrolling) => set((state) => ({ touch: { ...state.touch, isScrolling: scrolling } })),
       setInactivityTimer: (timerId) => set((state) => ({ timers: { ...state.timers, inactivityTimerId: timerId } })),
@@ -94,7 +92,7 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
         set((state) => ({ _internalTimers: { ...state._internalTimers, inactivityTimerRef: timerId }, timers: { ...state.timers, inactivityTimerId: timerId } }));
       },
 
-      pauseAllTimers: () => {
+      pauseAllTimers: (sticky?: boolean) => {
         const { _internalTimers } = get();
 
         if (_internalTimers.inactivityTimerRef) {
@@ -104,15 +102,20 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
           clearTimeout(_internalTimers.scrollTimerRef);
         }
 
-        set({ _internalTimers: { inactivityTimerRef: null, scrollTimerRef: null }, timers: { inactivityTimerId: null, scrollTimerId: null } });
+        set({ _internalTimers: { inactivityTimerRef: null, scrollTimerRef: null }, timers: { inactivityTimerId: null, scrollTimerId: null }, isTimersPausedSticky: sticky });
       },
 
       startAllTimers: () => {
-        const { areElementsVisible, isScrollMode, resetInactivityTimer } = get();
+        const { areElementsVisible, isScrollMode, resetInactivityTimer, isTimersPausedSticky } = get();
+
+        if (isTimersPausedSticky) {
+          return;
+        }
 
         // Only start timer if elements are visible and not in scroll mode
         if (areElementsVisible && !isScrollMode) {
           resetInactivityTimer();
+          set({ isTimersPausedSticky: false });
         }
       },
 
@@ -148,8 +151,6 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
 );
 
 export const useOptionalElementVisibility = () => useElementVisibilityStore((state) => state.areElementsVisible);
-
-export const useInputHovered = () => useElementVisibilityStore((state) => state.isInputHovered);
 
 export const useLastHideReason = () => useElementVisibilityStore((state) => state.lastHideReason);
 
