@@ -173,6 +173,8 @@ export function activateMediaInRange(
   });
 
   const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
+  const rootEl = document.getElementById("content-container");
+  const rootRect = rootEl?.getBoundingClientRect() ?? null;
 
   const bufferSize = isPlayFormat ? 6 : 10;
 
@@ -201,6 +203,14 @@ export function activateMediaInRange(
         let mediaElement = placeholder.querySelector<HTMLDivElement>("div.inline-avatar");
         const dummyPlaceholder = placeholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
         if (inView) {
+          // Avoid injecting media above the current viewport top to prevent layout shifts that look like backward jumps.
+          if (rootRect) {
+            const pRect = p.getBoundingClientRect();
+            if (pRect.top < rootRect.top) {
+              // Skip injection for paragraphs that are above or even partially above the viewport top
+              return;
+            }
+          }
           if (dummyPlaceholder) {
             // Found a dummy, replace it with actual media
             const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal, isPlayFormat, characterData, locationForPlaceholder, snapshot);

@@ -50,7 +50,7 @@ export const paragraphMetadataServicePure = {
 
     // For "play" books, calculate the closest entry paragraph in the start chapter once.
     const chapterEntryParagraphs =
-      bookForm === "play"
+      bookForm === "play" || bookForm === "mixed"
         ? bookCharacters
             .flatMap((character) => character.infoPerChapter)
             .filter((c) => c.chapter === startChapter)
@@ -85,7 +85,7 @@ export const paragraphMetadataServicePure = {
 
               const paragraphsWhereTalking = c.paragraphsWhereTalking.filter(keep);
               const paragraphsWhereSpotted =
-                bookForm === "play"
+                bookForm === "play" || bookForm === "mixed"
                   ? createParagraphsWhereSpottedForPlay(
                       startParagraph,
                       endParagraph,
@@ -115,6 +115,8 @@ export const paragraphMetadataServicePure = {
 /*  3. UI‑oriented post‑processing                                            */
 /* -------------------------------------------------------------------------- */
 
+export type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
+
 export interface ParsedParagraphRange {
   slug: string;
   characterName: string;
@@ -124,7 +126,7 @@ export interface ParsedParagraphRange {
   isTalkingInFirstParagraph: boolean;
   chapterNumber: number;
   label?: string;
-  otherAppearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[];
+  otherAppearances: Appearance[];
 }
 
 /**

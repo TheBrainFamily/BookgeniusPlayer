@@ -19,7 +19,7 @@ const CharacterNotesPanel = () => {
   const { location } = useLocation();
 
   const bookData = useMemo(() => getBookData(), []);
-  const isPlayFormat = useMemo(() => bookData.metadata.bookForm === "play", [bookData]);
+  const isPlayFormat = useMemo(() => bookData.metadata.bookForm === "play" || bookData.metadata.bookForm === "mixed", [bookData]);
   const allCharacters = useMemo(() => getCharactersData(), []);
 
   const currentSpeakers = useCurrentSpeakers(location, allCharacters, isPlayFormat);

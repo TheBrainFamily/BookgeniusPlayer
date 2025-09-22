@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { reloadBookStringified } from "@player/genericBookDataGetters/getBookStringified";
 import { useBookUpdateSSE } from "@player/hooks/useBookUpdateSSE";
 import { reloadAllVariants } from "@player/genericBookDataGetters/getAllVariants";
+import { bookIndex } from "@player/logic/BookIndex";
+import { textCacheManager } from "@player/logic/TextCacheManager";
 
 interface BookDataContextType {
   textVersion: number;
@@ -48,6 +50,9 @@ export function BookDataProvider({ children }: { children: React.ReactNode }) {
     try {
       // Reload the data
       await Promise.all([await reloadBookStringified(), await reloadAllVariants()]);
+      bookIndex.invalidate();
+      textCacheManager.reset();
+      textCacheManager.initialize();
 
       // Increment version to trigger re-renders
       setTextVersion((v) => v + 1);

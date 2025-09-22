@@ -3,6 +3,7 @@ import type { Location } from "@player/state/LocationContext";
 import { getCharactersData } from "./genericBookDataGetters/getCharactersData";
 import { useBookContentStore } from "./stores/bookContent.store";
 import { getBookData } from "./genericBookDataGetters/getBookData";
+import { bookIndex } from "@player/logic/BookIndex";
 
 export interface SearchResultItemData {
   chapter: number;
@@ -120,7 +121,7 @@ const createContextualSummary = (fullText: string, query: string, maxLength: num
 
 export function performCachedSearch(query: string, currentLocation: Location): SearchResultsData {
   const { textCache, isInitialized } = useBookContentStore.getState();
-  const bookIsPlay = getBookData().metadata.bookForm === "play";
+  const bookIsPlay = getBookData().metadata.bookForm === "play" || getBookData().metadata.bookForm === "mixed";
   let bookCharacters = [];
   if (bookIsPlay) {
     bookCharacters = getCharactersData().map((character) => character.characterName.toLowerCase());
@@ -200,17 +201,12 @@ const getTotalParagraphsInChapter = (() => {
     }
 
     try {
-      const chapterSection = document.querySelector(`section[data-chapter="${chapterNumber}"]`);
-      if (!chapterSection) {
-        cache.set(chapterNumber, 0);
-        return 0;
-      }
-      const count = chapterSection.querySelectorAll("[data-index]").length;
+      bookIndex.ensureInitialized();
+      const count = bookIndex.getParagraphCount(chapterNumber);
       cache.set(chapterNumber, count);
       return count;
     } catch (error) {
       console.error(`Error getting paragraph count for chapter ${chapterNumber}:`, error);
-      // Don't cache on error to allow for retries.
       return 0;
     }
   };
@@ -386,7 +382,11 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
         const totalParagraphsInChapter = getTotalParagraphsInChapter(chapter);
 
         paragraphs.forEach((paragraph) => {
-          const paragraphElement = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`);
+          const paragraphElement = bookIndex.getParagraphElement(chapter, paragraph);
+          if (!paragraphElement) {
+            return;
+          }
+
           const tagName = paragraphElement.tagName.toLowerCase();
           const isStageDirectory = paragraphElement.querySelector("span em");
 

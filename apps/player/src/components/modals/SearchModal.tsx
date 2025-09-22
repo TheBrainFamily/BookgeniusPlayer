@@ -9,6 +9,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@player/components/ui/t
 
 import { SearchResultsData, SearchResultItemData, cleanupSearchChapters } from "@player/searchModal";
 import { goToParagraph } from "@player/helpers/paragraphsNavigation";
+import { ensureChapterWindow } from "@player/logic/BookContentVirtualizer";
 import ModalUI from "./ModalUI";
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@player/components/ui/accordion";
@@ -34,30 +35,33 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
 
   const [openChapters, setOpenChapters] = useState<string[]>([]);
 
+  const handleCollapseAll = useCallback(() => {
+    setOpenChapters([]);
+  }, []);
+
+  const areAllCollapsed = openChapters.length === 0;
+
+  // Group search results by chapter
   const groupedResults = useMemo(() => {
-    if (!deferredResults?.items) return {};
+    if (!searchResults?.items) return {};
 
-    const items = deferredResults.items;
-    const groups: Record<number, SearchResultItemData[]> = {};
-
-    for (const it of items) {
-      (groups[it.chapter] ??= []).push(it);
-    }
-
-    return groups;
-  }, [deferredResults?.items]);
+    return searchResults.items.reduce(
+      (acc, item) => {
+        if (!acc[item.chapter]) {
+          acc[item.chapter] = [];
+        }
+        acc[item.chapter].push(item);
+        return acc;
+      },
+      {} as Record<number, SearchResultItemData[]>,
+    );
+  }, [searchResults?.items]);
 
   useEffect(() => {
     if (hasItems && Object.keys(groupedResults).length > 0) {
       setOpenChapters(Object.keys(groupedResults));
     }
   }, [groupedResults, hasItems]);
-
-  const handleCollapseAll = useCallback(() => {
-    setOpenChapters([]);
-  }, []);
-
-  const areAllCollapsed = openChapters.length === 0;
 
   useEffect(() => () => cleanupSearchChapters(), []);
 
@@ -180,15 +184,35 @@ const ChapterGroup = memo(function ChapterGroup({ chapter, items, t }: { chapter
 });
 
 const ResultCard = memo(function ResultCard({ item, appearIndex }: { item: SearchResultItemData; appearIndex: number }) {
-  const handleClick = useCallback(() => {
+  const handleSearchResultClick = useCallback(async () => {
+    //TODO: fix this to get the value directly from bottom input hook or something
     const inputEl = document.getElementById("bottom-input") as HTMLInputElement | null;
     const query = inputEl?.value ?? "";
 
-    goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "smooth" }).catch((error) =>
-      console.warn("Failed to scroll to search result:", error),
-    );
-    highlightSearchInParagraph(item.chapter, item.paragraphNumber, query);
+    try {
+      // Ensure the chapter window is mounted before attempting to scroll
+      await ensureChapterWindow(item.chapter);
+      await goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "instant" });
+      highlightSearchInParagraph(item.chapter, item.paragraphNumber, query);
+    } catch (error) {
+      console.warn("Failed to scroll to search result:", error);
+    }
   }, [item.chapter, item.paragraphNumber]);
+
+  const handleSearchResultClick2 = useCallback(async (item: SearchResultItemData) => {
+    //TODO: fix this to get the value directly from bottom input hook or something
+    const inputEl = document.getElementById("bottom-input") as HTMLInputElement | null;
+    const query = inputEl?.value ?? "";
+
+    try {
+      // Ensure the chapter window is mounted before attempting to scroll
+      await ensureChapterWindow(item.chapter);
+      await goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "instant" });
+      highlightSearchInParagraph(item.chapter, item.paragraphNumber, query);
+    } catch (error) {
+      console.warn("Failed to scroll to search result:", error);
+    }
+  }, []);
 
   // Animate only first 25 elements
   const shouldAnimate = appearIndex < 25;
@@ -200,7 +224,7 @@ const ResultCard = memo(function ResultCard({ item, appearIndex }: { item: Searc
       variants={variants.item}
       whileTap="tap"
       whileHover="hover"
-      onClick={handleClick}
+      onClick={handleSearchResultClick}
       transition={transition}
     >
       <div className="relative p-4">
