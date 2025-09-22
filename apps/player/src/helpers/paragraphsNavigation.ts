@@ -278,6 +278,10 @@ export const systemNavigateTo = async (
     endParagraph: loc.currentParagraph,
     currentChapter: loc.currentChapter,
     currentParagraph: loc.currentParagraph,
+    earliestVisibleParagraph: loc.currentParagraph,
+    latestVisibleParagraph: loc.currentParagraph,
+    earliestVisibleChapter: loc.currentChapter,
+    latestVisibleChapter: loc.currentChapter,
   };
 
   // Use the bridge to set location with system source
@@ -456,7 +460,18 @@ export const parseLocationFromHash = (): Location | null => {
 
     if (!isNaN(currentChapter) && !isNaN(currentParagraph)) {
       // Create a partial Location object - endChapter/endParagraph aren't in the hash
-      return { chapter: currentChapter, paragraph: currentParagraph, endChapter: currentChapter, endParagraph: currentParagraph, currentChapter, currentParagraph };
+      return {
+        chapter: currentChapter,
+        paragraph: currentParagraph,
+        endChapter: currentChapter,
+        endParagraph: currentParagraph,
+        currentChapter,
+        currentParagraph,
+        earliestVisibleParagraph: currentParagraph,
+        latestVisibleParagraph: currentParagraph,
+        earliestVisibleChapter: currentChapter,
+        latestVisibleChapter: currentChapter,
+      };
     }
   }
   console.warn("Invalid location hash:", hash);

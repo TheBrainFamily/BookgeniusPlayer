@@ -116,7 +116,7 @@ export function setupPageObserver(
   const processIntersections = () => {
     const rootRect = observerOptions.root.getBoundingClientRect();
     const topMultiplier = 0.35; // 35vh focus zone start
-    let bottomMultiplier = 0.45; // 10vh focus zone height (default)
+    let bottomMultiplier = 0.55; // 10vh focus zone height (default)
 
     // Responsive focus zone adjustments
     const viewportHeight = window.innerHeight;
@@ -130,7 +130,7 @@ export function setupPageObserver(
 
     // Adjust for smaller screens (mobile)
     if (viewportHeight < 700) {
-      bottomMultiplier = 0.55; // Larger zone for smaller screens
+      bottomMultiplier = 0.9; // Larger zone for smaller screens
     }
 
     // Adjust for mobile portrait - ensure sufficient zone for chapter detection
@@ -140,7 +140,7 @@ export function setupPageObserver(
 
     // Adjust for very wide screens
     if (viewportWidth > 1600) {
-      bottomMultiplier = 0.42; // Smaller, more precise zone for large screens
+      bottomMultiplier = 0.52; // Smaller, more precise zone for large screens
     }
 
     const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
@@ -337,6 +337,26 @@ export function setupPageObserver(
                 return a.paragraph - b.paragraph;
               });
 
+            const isMobile = viewportHeight < 700 || viewportWidth < 768;
+
+            // On mobile, capture full viewport; on desktop, use 10% to 70% from top
+            const visibilityZoneTop = isMobile ? rootRect.top : rootRect.top + rootRect.height * 0.1;
+            const visibilityZoneBottom = isMobile ? rootRect.bottom : rootRect.top + rootRect.height * 0.7;
+
+            // Filter intersecting paragraphs to only include those within the visibility zone
+            const focusZoneIntersectingParagraphs = Array.from(intersectingPages)
+              .filter((element) => {
+                const elementRect = element.getBoundingClientRect();
+                // Check if element's vertical range overlaps with the visibility zone
+                return elementRect.top < visibilityZoneBottom && elementRect.bottom > visibilityZoneTop;
+              })
+              .map((element) => getParagraphInfo(element))
+              .filter((info) => info.chapter !== null && !isNaN(info.chapter) && info.paragraph !== null && !isNaN(info.paragraph))
+              .sort((a, b) => {
+                if (a.chapter !== b.chapter) return a.chapter - b.chapter;
+                return a.paragraph - b.paragraph;
+              });
+
             const RANGE_PADDING = 1;
             const isPlayFormat = getIsPlayFormat();
 
@@ -362,6 +382,21 @@ export function setupPageObserver(
             }
 
             // Don't update location during system navigation to avoid conflicts with programmatic scrolling
+            setCurrentLocation(
+              {
+                chapter: rangeStartInfo.chapter,
+                paragraph: expandedStartParagraph,
+                endChapter: rangeEndInfo.chapter,
+                endParagraph: expandedEndParagraph,
+                currentChapter: activeParagraph.chapter,
+                currentParagraph: activeParagraph.paragraph,
+                earliestVisibleParagraph: focusZoneIntersectingParagraphs[0]?.paragraph ?? null,
+                latestVisibleParagraph: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.paragraph ?? null,
+                earliestVisibleChapter: focusZoneIntersectingParagraphs[0]?.chapter ?? null,
+                latestVisibleChapter: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.chapter ?? null,
+              },
+              { updateHash: shouldUpdateHash },
+            );
             const nextLoc: MinimalLoc = {
               chapter: rangeStartInfo.chapter,
               paragraph: expandedStartParagraph,
@@ -529,6 +564,10 @@ export function setupPageObserver(
                 endParagraph: 0,
                 currentChapter: parseInt(nextChapterStart, 10),
                 currentParagraph: 0,
+                earliestVisibleParagraph: 0,
+                latestVisibleParagraph: 0,
+                earliestVisibleChapter: parseInt(nextChapterStart, 10),
+                latestVisibleChapter: parseInt(nextChapterStart, 10),
               });
 
               const fadePercent = (visibilityPercent - 0.4) * 2;

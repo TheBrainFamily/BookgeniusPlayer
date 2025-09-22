@@ -22,6 +22,10 @@ export const useLocationRange = (delayMs = 200) => {
       endParagraph: debouncedLocation.endParagraph,
       currentChapter: debouncedLocation.currentChapter,
       currentParagraph: debouncedLocation.currentParagraph,
+      earliestVisibleParagraph: debouncedLocation.earliestVisibleParagraph,
+      latestVisibleParagraph: debouncedLocation.latestVisibleParagraph,
+      earliestVisibleChapter: debouncedLocation.earliestVisibleChapter,
+      latestVisibleChapter: debouncedLocation.latestVisibleChapter,
     }),
     [
       debouncedLocation.chapter,
@@ -30,6 +34,10 @@ export const useLocationRange = (delayMs = 200) => {
       debouncedLocation.endParagraph,
       debouncedLocation.currentChapter,
       debouncedLocation.currentParagraph,
+      debouncedLocation.earliestVisibleParagraph,
+      debouncedLocation.latestVisibleParagraph,
+      debouncedLocation.earliestVisibleChapter,
+      debouncedLocation.latestVisibleChapter,
     ],
   );
 

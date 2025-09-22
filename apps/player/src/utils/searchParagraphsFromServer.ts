@@ -22,11 +22,11 @@ export const parseSearchParagraphsServerResponse = (response: SearchParagraphsSe
   return response.map((r) => {
     const summary = extractSummary(r.text);
     const text = extractText(r.text);
-    return { chapter: r.chapter, paragraphNumber: r.paragraphNumber, text: text, summary: summary };
+    return { chapter: r.chapter, paragraphNumber: r.paragraphNumber, text: text, summary: summary, score: r.score };
   });
 };
-export type SearchParagraphsServerResponse = { chapter: number; paragraphNumber: number; text: string };
-export type SearchParagraphsFunctionResponse = { chapter: number; paragraphNumber: number; text: string; summary: string };
+export type SearchParagraphsServerResponse = { chapter: number; paragraphNumber: number; text: string; score: number };
+export type SearchParagraphsFunctionResponse = { chapter: number; paragraphNumber: number; text: string; summary: string; score: number };
 
 /**
  * Fetches search results from the backend server.
@@ -46,7 +46,6 @@ export async function searchParagraphsFromServer(searchQuery: string, location: 
   const params = new URLSearchParams({ searchQuery: searchQuery, filter: JSON.stringify(filter) });
 
   const url = `${baseUrl}?${params.toString()}`;
-  console.log(`Fetching search results from: ${url}`); // Optional: for debugging
 
   const isDev = import.meta.env.MODE === "development";
   try {
@@ -56,7 +55,6 @@ export async function searchParagraphsFromServer(searchQuery: string, location: 
       throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
     }
     const results = (await response.json()) as SearchParagraphsServerResponse[];
-    console.log("Received results:", results); // Optional: for debugging
     // Parse the response before returning
     return parseSearchParagraphsServerResponse(results);
   } catch (error) {

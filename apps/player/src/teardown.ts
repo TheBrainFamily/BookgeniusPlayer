@@ -12,6 +12,7 @@ import { useSearchModal } from "@player/stores/modals/searchModal.store";
 import { resetBackgroundDebouncer } from "./ui/background";
 import { unloadBookColorsCSS } from "./utils/loadBookColors";
 import { useBookMenuModal } from "./stores/modals/bookMenuModal.store";
+import { useBookContentStore } from "./stores/bookContent.store";
 
 /**
  * Completely tear down the player runtime:
@@ -188,6 +189,7 @@ export async function teardownPlayer(): Promise<void> {
     useSearchModal.getState().closeModal();
     useSearchModal.getState().clearModal();
     useBookMenuModal.getState().closeModal();
+    useBookContentStore.getState().reset();
   } catch (e) {
     console.warn("teardownPlayer: clearing search results failed", e);
   }
