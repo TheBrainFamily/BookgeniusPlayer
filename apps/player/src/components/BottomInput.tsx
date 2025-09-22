@@ -74,16 +74,16 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const next = e.target.value;
-      setValue(next);
+      const newValue = e.target.value;
+      setValue(newValue);
 
       if (isDeepResearchActive) return;
       if (isRecording) return;
 
-      const q = next.trim();
+      const trimmedNewValue = newValue.trim();
       startTransition(() => {
-        if (q.length >= 2) {
-          setSearchQuery(q);
+        if (trimmedNewValue.length >= 2) {
+          setSearchQuery(trimmedNewValue);
         } else {
           setSearchQuery("");
         }
