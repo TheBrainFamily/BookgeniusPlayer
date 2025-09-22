@@ -199,21 +199,6 @@ const ResultCard = memo(function ResultCard({ item, appearIndex }: { item: Searc
     }
   }, [item.chapter, item.paragraphNumber]);
 
-  const handleSearchResultClick2 = useCallback(async (item: SearchResultItemData) => {
-    //TODO: fix this to get the value directly from bottom input hook or something
-    const inputEl = document.getElementById("bottom-input") as HTMLInputElement | null;
-    const query = inputEl?.value ?? "";
-
-    try {
-      // Ensure the chapter window is mounted before attempting to scroll
-      await ensureChapterWindow(item.chapter);
-      await goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "instant" });
-      highlightSearchInParagraph(item.chapter, item.paragraphNumber, query);
-    } catch (error) {
-      console.warn("Failed to scroll to search result:", error);
-    }
-  }, []);
-
   // Animate only first 25 elements
   const shouldAnimate = appearIndex < 25;
   const transition = shouldAnimate ? { delay: appearIndex * 0.015 } : undefined;

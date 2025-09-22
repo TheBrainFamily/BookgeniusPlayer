@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo, startTransition } from "react";
 import { Mic, Send, Telescope, Loader2 } from "lucide-react";
 import { motion, Variants, AnimatePresence } from "motion/react";
 import { useTranslation } from "react-i18next";
@@ -34,8 +34,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
-
-  const deferredValue = useDeferredValue(value);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -74,9 +72,25 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
     });
   }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value]);
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
-  }, []);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const next = e.target.value;
+      setValue(next);
+
+      if (isDeepResearchActive) return;
+      if (isRecording) return;
+
+      const q = next.trim();
+      startTransition(() => {
+        if (q.length >= 2) {
+          setSearchQuery(q);
+        } else {
+          setSearchQuery("");
+        }
+      });
+    },
+    [isDeepResearchActive, isRecording, setSearchQuery],
+  );
 
   const handleInputInteraction = useCallback(() => {
     handleActivity();
@@ -113,7 +127,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       e?.preventDefault();
       handleActivity();
 
-      const trimmed = deferredValue.trim();
+      const trimmed = value.trim();
       if (!trimmed) return;
 
       if (isSearchModalOpen) {
@@ -128,7 +142,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
         onSubmit({ query: trimmed, filter: { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: currentBook } });
       }
     },
-    [handleActivity, deferredValue, isSearchModalOpen, setSearchQuery, isDeepResearchActive, executeDeepResearch, onSubmit, currentChapter, currentParagraph],
+    [handleActivity, value, isSearchModalOpen, setSearchQuery, isDeepResearchActive, executeDeepResearch, onSubmit, currentChapter, currentParagraph],
   );
 
   const toggleDeepResearch = useCallback(() => {
@@ -214,11 +228,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ onSubmit, className }) => {
       if (isSearchModalOpen) setSearchQuery(response);
       return;
     }
-
-    if (!isDeepResearchActive && !response) {
-      setSearchQuery(deferredValue.trim());
-    }
-  }, [handleActivity, response, isRecording, isSearchModalOpen, setSearchQuery, deferredValue, isDeepResearchActive]);
+  }, [handleActivity, response, isRecording, isSearchModalOpen, setSearchQuery]);
 
   return (
     <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
