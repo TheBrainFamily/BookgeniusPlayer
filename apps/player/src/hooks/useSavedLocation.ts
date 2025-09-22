@@ -1,9 +1,8 @@
 import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
 import { useState, useEffect } from "react";
-import { useLocation, type Location } from "@player/state/LocationContext";
+import { type Location } from "@player/state/LocationContext";
 
 export const useSavedLocation = () => {
-  const { location } = useLocation();
   const [savedLocation, setSavedLocation] = useState(() => getSavedLocation());
 
   // Update only when furthest location actually changes (event-driven)
@@ -29,17 +28,5 @@ export const useSavedLocation = () => {
       window.removeEventListener("furthestLocationReset", handleReset);
     };
   }, []);
-
-  useEffect(() => {
-    const handleFurthestLocationReset = () => {
-      setSavedLocation(getSavedLocation());
-    };
-
-    window.addEventListener("furthestLocationReset", handleFurthestLocationReset);
-    return () => {
-      window.removeEventListener("furthestLocationReset", handleFurthestLocationReset);
-    };
-  }, []);
-
-  return { location, savedLocation };
+  return { savedLocation };
 };

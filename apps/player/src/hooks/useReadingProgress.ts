@@ -9,7 +9,8 @@ export const useReadingProgress = (chaptersStructure: ChapterStructure[], totalP
   const { location } = useLocation();
 
   const { currentChapter, currentParagraph } = location;
-  const { currentChapter: savedChapter, currentParagraph: savedParagraph } = savedLocation;
+  const savedChapter = savedLocation?.currentChapter;
+  const savedParagraph = savedLocation?.currentParagraph;
   return useMemo(() => {
     if (chaptersStructure.length === 0 || currentChapter === undefined || currentParagraph === undefined) {
       return { chapterProgress: 0, bookProgress: 0, furthestProgress: 0 };
