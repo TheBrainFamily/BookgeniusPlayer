@@ -5,7 +5,6 @@ import { bookDataLoader } from "./services/bookDataLoader";
 import { ANSWERS_SERVER_URL } from "./lib/consts";
 
 export async function askCall(searchQuery: string, location: Location): Promise<string> {
-  const baseUrl = "/ask"; // Assuming localhost for now
   const filter: Filter = {
     chapterFrom: 1, // Based on the curl example
     chapterTo: location.endChapter,
@@ -23,11 +22,9 @@ The user is looking at the following text:
 
   const params = new URLSearchParams({ question: compiledSearchQuery, filter: JSON.stringify(filter) });
 
-  let url = `${baseUrl}?${params.toString()}`;
+  const url = `${ANSWERS_SERVER_URL}/ask?${params.toString()}`;
   const isDev = import.meta.env.MODE === "development";
-  if (isDev) {
-    url = `${ANSWERS_SERVER_URL}${url}`;
-  }
+
   console.log(`Fetching ask from: ${url}`); // Optional: for debugging
   try {
     const response = await fetch(url, { method: "GET", headers: { ...(isDev && { "X-Dev-Token": import.meta.env.VITE_DEV_TOKEN }) } });
