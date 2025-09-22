@@ -98,6 +98,21 @@ export function setupPageObserver(
   // Keep track of observed paragraphs to avoid re-observing
   const observedParagraphs = new Set<Element>();
 
+  // Prevent redundant location updates when values are equivalent
+  type MinimalLoc = { chapter: number; paragraph: number; endChapter: number; endParagraph: number; currentChapter: number; currentParagraph: number };
+  let lastSentLocation: MinimalLoc | null = null;
+  const isSameLoc = (a: MinimalLoc | null, b: MinimalLoc): boolean => {
+    return (
+      !!a &&
+      a.chapter === b.chapter &&
+      a.paragraph === b.paragraph &&
+      a.endChapter === b.endChapter &&
+      a.endParagraph === b.endParagraph &&
+      a.currentChapter === b.currentChapter &&
+      a.currentParagraph === b.currentParagraph
+    );
+  };
+
   const processIntersections = () => {
     const rootRect = observerOptions.root.getBoundingClientRect();
     const topMultiplier = 0.35; // 35vh focus zone start
@@ -366,22 +381,34 @@ export function setupPageObserver(
               shouldUpdateHash = false;
             }
 
-            // Don't update location during system navigation to avoid conflicts with programmatic scrolling
-            setCurrentLocation(
-              {
-                chapter: rangeStartInfo.chapter,
-                paragraph: expandedStartParagraph,
-                endChapter: rangeEndInfo.chapter,
-                endParagraph: expandedEndParagraph,
-                currentChapter: activeParagraph.chapter,
-                currentParagraph: activeParagraph.paragraph,
-                earliestVisibleParagraph: focusZoneIntersectingParagraphs[0]?.paragraph ?? null,
-                latestVisibleParagraph: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.paragraph ?? null,
-                earliestVisibleChapter: focusZoneIntersectingParagraphs[0]?.chapter ?? null,
-                latestVisibleChapter: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.chapter ?? null,
-              },
-              { updateHash: shouldUpdateHash },
-            );
+            const nextLoc: MinimalLoc = {
+              chapter: rangeStartInfo.chapter,
+              paragraph: expandedStartParagraph,
+              endChapter: rangeEndInfo.chapter,
+              endParagraph: expandedEndParagraph,
+              currentChapter: activeParagraph.chapter,
+              currentParagraph: activeParagraph.paragraph,
+            };
+
+            if (!isSameLoc(lastSentLocation, nextLoc)) {
+              // Don't update location during system navigation to avoid conflicts with programmatic scrolling
+              setCurrentLocation(
+                {
+                  chapter: rangeStartInfo.chapter,
+                  paragraph: expandedStartParagraph,
+                  endChapter: rangeEndInfo.chapter,
+                  endParagraph: expandedEndParagraph,
+                  currentChapter: activeParagraph.chapter,
+                  currentParagraph: activeParagraph.paragraph,
+                  earliestVisibleParagraph: focusZoneIntersectingParagraphs[0]?.paragraph ?? null,
+                  latestVisibleParagraph: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.paragraph ?? null,
+                  earliestVisibleChapter: focusZoneIntersectingParagraphs[0]?.chapter ?? null,
+                  latestVisibleChapter: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.chapter ?? null,
+                },
+                { updateHash: shouldUpdateHash },
+              );
+              lastSentLocation = nextLoc;
+            }
 
             // Media uses viewport range (separate from character notes)
             if (allIntersectingParagraphs.length > 0) {

@@ -140,6 +140,13 @@ export const setSavedLocation = (loc: Location) => {
   try {
     const key = getFurthestLocationKey();
     localStorage.setItem(key, JSON.stringify(loc));
+    // Notify listeners that the furthest saved location advanced
+    try {
+      const evt = new CustomEvent("furthestLocationUpdated", { detail: loc });
+      window.dispatchEvent(evt);
+    } catch {
+      // In very old browsers CustomEvent might fail; ignore.
+    }
   } catch (e) {
     console.warn("Failed to persist saved location", e);
   }
