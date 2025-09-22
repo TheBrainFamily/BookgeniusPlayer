@@ -1,30 +1,57 @@
 /**
  * This utility function checks the user agent string to identify if the device
- * is a mobile or tablet. It uses a combination of user agent detection and
+ * is a mobile device. It uses a combination of user agent detection and
  * device characteristics while being more conservative to avoid false positives
  * on desktop browsers.
  *
- * @returns {boolean} `true` if the device is identified as a mobile or tablet, otherwise `false`.
+ * @returns {boolean} `true` if the device is identified as a mobile device, otherwise `false`.
  */
-export const isMobileOrTablet = (): boolean => {
+export const isMobile = (): boolean => {
   if (typeof window === "undefined") return false;
 
   const userAgent = navigator.userAgent || navigator.vendor || "";
 
-  // First, check for explicit mobile indicators in user agent
+  // Check for explicit mobile indicators in user agent
   const mobileRegex =
     /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i;
+
+  // Check for explicit mobile devices first
+  if (mobileRegex.test(userAgent)) {
+    return true;
+  }
+
+  // For responsive design purposes, also check viewport width but only if touch is available
+  // and we're in a narrow viewport that suggests mobile usage
+  const hasTouchScreen = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  const isNarrowViewport = window.innerWidth <= 768; // More conservative threshold
+
+  // Only consider it mobile if it's both touch-enabled AND narrow
+  // This helps avoid false positives on desktop browsers with touch screens
+  if (hasTouchScreen && isNarrowViewport) {
+    return true;
+  }
+
+  return false;
+};
+
+/**
+ * This utility function checks the user agent string to identify if the device
+ * is a tablet. It uses a combination of user agent detection and
+ * device characteristics while being more conservative to avoid false positives
+ * on desktop browsers.
+ *
+ * @returns {boolean} `true` if the device is identified as a tablet, otherwise `false`.
+ */
+export const isTablet = (): boolean => {
+  if (typeof window === "undefined") return false;
+
+  const userAgent = navigator.userAgent || navigator.vendor || "";
 
   // Check for tablets (but be more specific)
   const androidTabletRegex = /android(?!.*mobile)/i;
   const iPadRegex = /iPad/i;
   const playBookRegex = /PlayBook/i;
   const silkRegex = /Silk/i;
-
-  // Check for explicit mobile devices first
-  if (mobileRegex.test(userAgent)) {
-    return true;
-  }
 
   // Check for known tablet patterns
   if (androidTabletRegex.test(userAgent) || iPadRegex.test(userAgent) || playBookRegex.test(userAgent) || silkRegex.test(userAgent)) {
@@ -50,16 +77,17 @@ export const isMobileOrTablet = (): boolean => {
     return true;
   }
 
-  // For responsive design purposes, also check viewport width but only if touch is available
-  // and we're in a narrow viewport that suggests mobile usage
-  const hasTouchScreen = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-  const isNarrowViewport = window.innerWidth <= 768; // More conservative threshold
-
-  // Only consider it mobile if it's both touch-enabled AND narrow
-  // This helps avoid false positives on desktop browsers with touch screens
-  if (hasTouchScreen && isNarrowViewport) {
-    return true;
-  }
-
   return false;
+};
+
+/**
+ * This utility function checks the user agent string to identify if the device
+ * is a mobile or tablet. It uses a combination of user agent detection and
+ * device characteristics while being more conservative to avoid false positives
+ * on desktop browsers.
+ *
+ * @returns {boolean} `true` if the device is identified as a mobile or tablet, otherwise `false`.
+ */
+export const isMobileOrTablet = (): boolean => {
+  return isMobile() || isTablet();
 };

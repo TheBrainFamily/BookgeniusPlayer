@@ -3,6 +3,7 @@ import { CharacterModalParams } from "@player/stores/modals/characterModal.store
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
+import { isMobile } from "@player/utils/isMobileOrTablet";
 import type { CharacterData } from "@player/types/book";
 import type { CharacterSnapshot } from "@player/utils/characterOverrides";
 import { normalizeSrcForInlineAvatar, highlightCharacter } from "./highlightCharacter";
@@ -82,11 +83,15 @@ function createMediaElement(
   placeholderImg.alt = snapshot.displayName;
   container.appendChild(placeholderImg);
 
-  if (isPlayFormat && (listeningSrc || talkingSrc)) {
+  // Create videos if in play format and we have media sources
+  const shouldCreateVideos = isPlayFormat && (listeningSrc || talkingSrc);
+  if (shouldCreateVideos) {
     let listeningVideo: HTMLVideoElement | null = null;
     let speakingVideo: HTMLVideoElement | null = null;
 
-    if (listeningSrc && isVideoFile(listeningSrc)) {
+    console.log("Checking if device is mobile", isMobile());
+
+    if (listeningSrc && isVideoFile(listeningSrc) && !isMobile()) {
       listeningVideo = document.createElement("video");
       listeningVideo.src = listeningSrc;
       listeningVideo.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
