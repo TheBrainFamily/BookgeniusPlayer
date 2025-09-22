@@ -381,22 +381,6 @@ export function setupPageObserver(
               shouldUpdateHash = false;
             }
 
-            // Don't update location during system navigation to avoid conflicts with programmatic scrolling
-            setCurrentLocation(
-              {
-                chapter: rangeStartInfo.chapter,
-                paragraph: expandedStartParagraph,
-                endChapter: rangeEndInfo.chapter,
-                endParagraph: expandedEndParagraph,
-                currentChapter: activeParagraph.chapter,
-                currentParagraph: activeParagraph.paragraph,
-                earliestVisibleParagraph: focusZoneIntersectingParagraphs[0]?.paragraph ?? null,
-                latestVisibleParagraph: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.paragraph ?? null,
-                earliestVisibleChapter: focusZoneIntersectingParagraphs[0]?.chapter ?? null,
-                latestVisibleChapter: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.chapter ?? null,
-              },
-              { updateHash: shouldUpdateHash },
-            );
             const nextLoc: MinimalLoc = {
               chapter: rangeStartInfo.chapter,
               paragraph: expandedStartParagraph,
@@ -407,7 +391,22 @@ export function setupPageObserver(
             };
 
             if (!isSameLoc(lastSentLocation, nextLoc)) {
-              setCurrentLocation(nextLoc, { updateHash: shouldUpdateHash });
+              // Don't update location during system navigation to avoid conflicts with programmatic scrolling
+              setCurrentLocation(
+                {
+                  chapter: rangeStartInfo.chapter,
+                  paragraph: expandedStartParagraph,
+                  endChapter: rangeEndInfo.chapter,
+                  endParagraph: expandedEndParagraph,
+                  currentChapter: activeParagraph.chapter,
+                  currentParagraph: activeParagraph.paragraph,
+                  earliestVisibleParagraph: focusZoneIntersectingParagraphs[0]?.paragraph ?? null,
+                  latestVisibleParagraph: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.paragraph ?? null,
+                  earliestVisibleChapter: focusZoneIntersectingParagraphs[0]?.chapter ?? null,
+                  latestVisibleChapter: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.chapter ?? null,
+                },
+                { updateHash: shouldUpdateHash },
+              );
               lastSentLocation = nextLoc;
             }
 
