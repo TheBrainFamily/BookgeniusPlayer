@@ -11,6 +11,69 @@ import { normalizeSrcForInlineAvatar, highlightCharacter } from "./highlightChar
 // Global flag to ensure we reset all isTalking values only once at the very beginning
 let hasInitializedTalkingStates = false;
 
+function createVideoElement(src: string, state: "listens" | "speaks", isTalking: boolean): HTMLVideoElement {
+  const video = document.createElement("video");
+  video.src = src;
+  video.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
+  video.autoplay = true;
+  video.loop = true;
+  video.muted = true;
+  video.playsInline = true;
+  video.dataset.state = state;
+
+  // Set opacity based on state and talking status
+  if (state === "listens") {
+    video.style.opacity = isTalking ? "0" : "1";
+  } else {
+    // "speaks"
+    video.style.opacity = isTalking ? "1" : "0";
+  }
+
+  video.onerror = () => {
+    console.warn(`Failed to load ${state} video: ${src}`);
+    video.style.display = "none";
+  };
+  video.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+  return video;
+}
+
+function handleContainerResponsiveVideo(container: HTMLDivElement, listeningSrc: string | null, isTalking: boolean) {
+  const isMobileNow = isMobile(true, 650);
+  const listeningVideo = container.querySelector('video[data-state="listens"]') as HTMLVideoElement | null;
+  const speakingVideo = container.querySelector('video[data-state="speaks"]') as HTMLVideoElement | null;
+
+  if (isMobileNow) {
+    // Mobile: Remove listening video if it exists
+    if (listeningVideo) {
+      listeningVideo.remove();
+
+      // Update hasVideos state
+      if (speakingVideo) {
+        container.dataset.hasVideos = "speaking-only";
+        speakingVideo.style.opacity = isTalking ? "1" : "0";
+      } else {
+        delete container.dataset.hasVideos;
+      }
+    }
+  } else {
+    // Desktop: Add listening video if it doesn't exist but should exist
+    if (!listeningVideo && listeningSrc && isVideoFile(listeningSrc)) {
+      const newListeningVideo = createVideoElement(listeningSrc, "listens", isTalking);
+      container.appendChild(newListeningVideo);
+
+      // Update hasVideos state
+      if (speakingVideo) {
+        container.dataset.hasVideos = "true";
+        newListeningVideo.style.opacity = isTalking ? "0" : "1";
+        speakingVideo.style.opacity = isTalking ? "1" : "0";
+      } else {
+        container.dataset.hasVideos = "listening-only";
+        newListeningVideo.style.opacity = "1";
+      }
+    }
+  }
+}
+
 /** Checks if a given chapter and paragraph index falls within the specified range **/
 function isInRange(currentChapter: number, currentParagraph: number, startChapter: number, startParagraph: number, endChapter: number, endParagraph: number): boolean {
   // Single chapter range
@@ -89,38 +152,13 @@ function createMediaElement(
     let listeningVideo: HTMLVideoElement | null = null;
     let speakingVideo: HTMLVideoElement | null = null;
 
-    console.log("Checking if device is mobile", isMobile());
-
-    if (listeningSrc && isVideoFile(listeningSrc) && !isMobile()) {
-      listeningVideo = document.createElement("video");
-      listeningVideo.src = listeningSrc;
-      listeningVideo.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
-      listeningVideo.autoplay = true;
-      listeningVideo.loop = true;
-      listeningVideo.muted = true;
-      listeningVideo.playsInline = true;
-      listeningVideo.dataset.state = "listens";
-      listeningVideo.onerror = () => {
-        console.warn(`Failed to load listening video: ${listeningSrc}`);
-        listeningVideo!.style.display = "none";
-      };
-      listeningVideo.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+    if (listeningSrc && isVideoFile(listeningSrc) && !isMobile(true, 650)) {
+      listeningVideo = createVideoElement(listeningSrc, "listens", isTalking);
       container.appendChild(listeningVideo);
     }
 
     if (talkingSrc && isVideoFile(talkingSrc)) {
-      speakingVideo = document.createElement("video");
-      speakingVideo.src = talkingSrc;
-      speakingVideo.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
-      speakingVideo.autoplay = true;
-      speakingVideo.loop = true;
-      speakingVideo.muted = true;
-      speakingVideo.playsInline = true;
-      speakingVideo.dataset.state = "speaks";
-      speakingVideo.onerror = () => {
-        console.warn(`Failed to load speaking video: ${talkingSrc}`);
-        speakingVideo!.style.display = "none";
-      };
+      speakingVideo = createVideoElement(talkingSrc, "speaks", isTalking);
       container.appendChild(speakingVideo);
     }
 
@@ -248,8 +286,12 @@ export function activateMediaInRange(
             // Media already injected, update talking state and play videos if paused
             const currentIsTalking = placeholder.dataset.isTalking === "true";
 
+            // Handle responsive video changes (add/remove listening video based on device type)
+            const listeningSrc = snapshot?.media.listening || null;
+            handleContainerResponsiveVideo(mediaElement, listeningSrc, currentIsTalking);
+
             // Update video state based on current talking status
-            if (mediaElement.dataset.hasVideos === "true") {
+            if (mediaElement.dataset.hasVideos === "true" || mediaElement.dataset.hasVideos === "speaking-only") {
               updateVideoState(mediaElement, currentIsTalking);
             }
           }

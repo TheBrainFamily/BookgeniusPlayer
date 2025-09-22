@@ -4,9 +4,11 @@
  * device characteristics while being more conservative to avoid false positives
  * on desktop browsers.
  *
+ * @param {boolean} considerViewportWidth - Whether to consider viewport width in mobile detection
+ * @param {number} mobileMaxWidth - Maximum width to consider as mobile (default: 768px)
  * @returns {boolean} `true` if the device is identified as a mobile device, otherwise `false`.
  */
-export const isMobile = (): boolean => {
+export const isMobile = (considerViewportWidth = false, mobileMaxWidth = 768): boolean => {
   if (typeof window === "undefined") return false;
 
   const userAgent = navigator.userAgent || navigator.vendor || "";
@@ -20,15 +22,18 @@ export const isMobile = (): boolean => {
     return true;
   }
 
-  // For responsive design purposes, also check viewport width but only if touch is available
-  // and we're in a narrow viewport that suggests mobile usage
-  const hasTouchScreen = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-  const isNarrowViewport = window.innerWidth <= 768; // More conservative threshold
-
-  // Only consider it mobile if it's both touch-enabled AND narrow
-  // This helps avoid false positives on desktop browsers with touch screens
-  if (hasTouchScreen && isNarrowViewport) {
+  // For responsive design purposes, also check viewport width if enabled
+  const isNarrowViewport = window.innerWidth <= mobileMaxWidth;
+  if (considerViewportWidth && isNarrowViewport) {
     return true;
+  } else {
+    const hasTouchScreen = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+    // Only consider it mobile if it's both touch-enabled AND narrow
+    // This helps avoid false positives on desktop browsers with touch screens
+    if (hasTouchScreen && isNarrowViewport) {
+      return true;
+    }
   }
 
   return false;
@@ -40,9 +45,12 @@ export const isMobile = (): boolean => {
  * device characteristics while being more conservative to avoid false positives
  * on desktop browsers.
  *
+ * @param {boolean} considerViewportWidth - Whether to consider viewport width in tablet detection
+ * @param {number} tabletMinWidth - Minimum width to consider as tablet (default: 768px)
+ * @param {number} tabletMaxWidth - Maximum width to consider as tablet (default: 1024px)
  * @returns {boolean} `true` if the device is identified as a tablet, otherwise `false`.
  */
-export const isTablet = (): boolean => {
+export const isTablet = (considerViewportWidth = false, tabletMinWidth = 768, tabletMaxWidth = 1024): boolean => {
   if (typeof window === "undefined") return false;
 
   const userAgent = navigator.userAgent || navigator.vendor || "";
@@ -77,6 +85,22 @@ export const isTablet = (): boolean => {
     return true;
   }
 
+  // For responsive design purposes, also check viewport width if enabled
+  const currentWidth = window.innerWidth;
+  const isTabletViewport = currentWidth >= tabletMinWidth && currentWidth <= tabletMaxWidth;
+
+  if (considerViewportWidth && isTabletViewport) {
+    return true;
+  } else {
+    // Only use touch detection when not considering viewport width
+    const hasTouchScreen = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+    // Consider it a tablet if it's touch-enabled AND in tablet width range
+    if (hasTouchScreen && isTabletViewport) {
+      return true;
+    }
+  }
+
   return false;
 };
 
@@ -86,8 +110,12 @@ export const isTablet = (): boolean => {
  * device characteristics while being more conservative to avoid false positives
  * on desktop browsers.
  *
+ * @param {boolean} considerViewportWidth - Whether to consider viewport width in detection
+ * @param {number} mobileMaxWidth - Maximum width to consider as mobile (default: 768px)
+ * @param {number} tabletMinWidth - Minimum width to consider as tablet (default: 768px)
+ * @param {number} tabletMaxWidth - Maximum width to consider as tablet (default: 1024px)
  * @returns {boolean} `true` if the device is identified as a mobile or tablet, otherwise `false`.
  */
-export const isMobileOrTablet = (): boolean => {
-  return isMobile() || isTablet();
+export const isMobileOrTablet = (considerViewportWidth = true, mobileMaxWidth = 768, tabletMinWidth = 768, tabletMaxWidth = 1024): boolean => {
+  return isMobile(considerViewportWidth, mobileMaxWidth) || isTablet(considerViewportWidth, tabletMinWidth, tabletMaxWidth);
 };
