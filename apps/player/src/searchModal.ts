@@ -164,13 +164,38 @@ export function performCachedSearch(query: string, currentLocation: Location): S
       let paragraphText = chapterCache[paragraphNumber];
       if (paragraphText.toLowerCase().includes(queryLower)) {
         if (bookIsPlay) {
-          // if the paragraph text is just a character name we want to append the next paragraph text to show the character next line
-          if (bookCharacters.includes(paragraphText.trim().toLowerCase())) {
-            const nextParagraphText = chapterCache[paragraphNumber + 1];
+          // DOM-based detection: if this paragraph is a character-name line, append the next spoken line
+          try {
+            const paragraphElement = bookIndex.getParagraphElement(chapterIdNum, paragraphNumber);
+            const isCharacterLine = paragraphElement?.getAttribute("data-is-character") === "true";
 
-            if (nextParagraphText) {
-              paragraphText = `${paragraphText}: ${nextParagraphText}`;
+            if (isCharacterLine) {
+              const nextParagraphElement = bookIndex.getParagraphElement(chapterIdNum, paragraphNumber + 1);
+              const nextIsSpoken = nextParagraphElement?.getAttribute("data-is-character") === "false";
+
+              if (nextParagraphElement && nextIsSpoken) {
+                const rawName = (paragraphElement!.textContent || "").replace(/\s+/g, " ").trim();
+                const prettyName = rawName.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+                const nextText = (nextParagraphElement.textContent || "")
+                  .replace(/[\n\r]/g, " ")
+                  .replace(/\s+/g, " ")
+                  .trim();
+
+                if (nextText) {
+                  paragraphText = `${prettyName}: ${nextText}`;
+                }
+              }
+            } else {
+              // Fallback to previous string-based detection if DOM attributes aren't usable
+              if (bookCharacters.includes(paragraphText.trim().toLowerCase())) {
+                const nextParagraphText = chapterCache[paragraphNumber + 1];
+                if (nextParagraphText) {
+                  paragraphText = `${paragraphText}: ${nextParagraphText}`;
+                }
+              }
             }
+          } catch (e) {
+            // If anything goes wrong with DOM access, keep previous behavior silently
           }
         }
 
