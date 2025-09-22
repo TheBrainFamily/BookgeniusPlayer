@@ -10,6 +10,10 @@ export interface Location {
   currentChapter: number;
   currentParagraph: number;
   lastScrollTimestamp?: number;
+  earliestVisibleParagraph: number | null;
+  latestVisibleParagraph: number | null;
+  earliestVisibleChapter: number | null;
+  latestVisibleChapter: number | null;
 }
 
 export interface LocationWithMetadata {
@@ -18,7 +22,18 @@ export interface LocationWithMetadata {
   source: "user" | "system";
 }
 
-export const DEFAULT_LOCATION: Location = { chapter: 1, paragraph: 0, endChapter: 1, endParagraph: 0, currentChapter: 1, currentParagraph: 0 };
+export const DEFAULT_LOCATION: Location = {
+  chapter: 1,
+  paragraph: 0,
+  endChapter: 1,
+  endParagraph: 0,
+  currentChapter: 1,
+  currentParagraph: 0,
+  earliestVisibleParagraph: null,
+  latestVisibleParagraph: null,
+  earliestVisibleChapter: null,
+  latestVisibleChapter: null,
+};
 
 /* ------------------------------------------------------------------ */
 /*  Load the *initial* reader position from LS — nothing more         */

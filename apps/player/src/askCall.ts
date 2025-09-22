@@ -1,14 +1,15 @@
 import { Location } from "./state/LocationContext";
 import { Filter } from "./types/book";
-import { ANSWERS_SERVER_URL } from "@player/lib/consts";
-import { bookDataLoader } from "@player/services/bookDataLoader";
-import { getSurroundingText } from "./utils/getSurroundingText";
+import { getSurroundingText } from "@player/utils/getSurroundingText";
+import { bookDataLoader } from "./services/bookDataLoader";
+import { ANSWERS_SERVER_URL } from "./lib/consts";
 
-export async function deepResearchCall(searchQuery: string, location: Location): Promise<string> {
+export async function askCall(searchQuery: string, location: Location): Promise<string> {
+  const baseUrl = "/ask"; // Assuming localhost for now
   const filter: Filter = {
     chapterFrom: 1, // Based on the curl example
-    chapterTo: location.latestVisibleChapter,
-    paragraphTo: location.latestVisibleParagraph + 1,
+    chapterTo: location.endChapter,
+    paragraphTo: location.endParagraph,
     bookSlug: bookDataLoader.getCurrentBook(),
   };
 
@@ -18,12 +19,16 @@ export async function deepResearchCall(searchQuery: string, location: Location):
 
 The user is looking at the following text:
 <VisibleText>${surroundingText}</VisibleText>`;
+  console.log("compiledSearchQuery", compiledSearchQuery);
 
   const params = new URLSearchParams({ question: compiledSearchQuery, filter: JSON.stringify(filter) });
 
-  const url = `${ANSWERS_SERVER_URL}/deepResearch?${params.toString()}`;
+  let url = `${baseUrl}?${params.toString()}`;
   const isDev = import.meta.env.MODE === "development";
-  console.log(`Fetching deep research from: ${url}`); // Optional: for debugging
+  if (isDev) {
+    url = `${ANSWERS_SERVER_URL}${url}`;
+  }
+  console.log(`Fetching ask from: ${url}`); // Optional: for debugging
   try {
     const response = await fetch(url, { method: "GET", headers: { ...(isDev && { "X-Dev-Token": import.meta.env.VITE_DEV_TOKEN }) } });
     if (!response.ok) {
