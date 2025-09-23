@@ -92,6 +92,9 @@ jobs:
       - name: Initial git lfs pull for platform files
         run: git lfs pull -I "apps/platform/**"
 
+      - name: Initial git lfs pull for wukong files
+        run: git lfs pull -I "apps/wukong/**"
+
       - name: Selective git lfs pull
         if: ${{ steps.changed.outputs.rebuild_all == '1' || steps.changed.outputs.books_csv != '' }}
         run: |
