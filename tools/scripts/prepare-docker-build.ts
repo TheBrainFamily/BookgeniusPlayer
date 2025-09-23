@@ -18,6 +18,7 @@ const apps = [
   { name: "platform-intl", sourceDir: path.join(projectRoot, "apps", "platform", "dist-intl"), targetDir: path.join(buildDir, "platform-app-intl") },
   { name: "platform-snapplify", sourceDir: path.join(projectRoot, "apps", "platform", "dist-snapplify"), targetDir: path.join(buildDir, "platform-app-snapplify") },
   { name: "platform-bookgeniusz", sourceDir: path.join(projectRoot, "apps", "platform", "dist"), targetDir: path.join(buildDir, "platform-app") },
+  { name: "wukong", sourceDir: path.join(projectRoot, "apps", "wukong", "dist"), targetDir: path.join(buildDir, "wukong-app") },
 ];
 
 // --- HELPER FUNCTIONS (unchanged) ---
@@ -67,18 +68,20 @@ async function prepareBuild() {
     const playerBooksDir = apps.find((app) => app.name === "player")!.booksSourceDir;
     if (await pathExists(playerBooksDir)) {
       const bookSlugs = await readdir(playerBooksDir);
-      await Promise.all(bookSlugs.map(async (bookSlug) => {
-        const sourceBookPath = path.join(playerBooksDir, bookSlug);
+      await Promise.all(
+        bookSlugs.map(async (bookSlug) => {
+          const sourceBookPath = path.join(playerBooksDir, bookSlug);
 
-        // NEW: Create a versioned path for each book.
-        const versionedBookTarget = path.join(s3AssetsDir, "books", bookSlug, buildVersion);
+          // NEW: Create a versioned path for each book.
+          const versionedBookTarget = path.join(s3AssetsDir, "books", bookSlug, buildVersion);
 
-        console.log(`[VERSIONING] Moving '${bookSlug}' assets to: "${versionedBookTarget}"`);
-        await copyDirectory(sourceBookPath, versionedBookTarget);
+          console.log(`[VERSIONING] Moving '${bookSlug}' assets to: "${versionedBookTarget}"`);
+          await copyDirectory(sourceBookPath, versionedBookTarget);
 
-        // NEW: Record the new version for this book in our manifest.
-        versionsManifest[bookSlug] = buildVersion;
-      }));
+          // NEW: Record the new version for this book in our manifest.
+          versionsManifest[bookSlug] = buildVersion;
+        }),
+      );
     } else {
       console.log(`[SKIP] No 'books' directory found to version.`);
     }

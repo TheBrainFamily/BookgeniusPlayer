@@ -138,6 +138,19 @@ jobs:
       - name: move bookgenius.net platform to dist-intl
         run: mv apps/platform/dist apps/platform/dist-intl
 
+      - name: Build wukong
+        run: pnpm build:wukong
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_AUTH_PROVIDER: ${{ vars.VITE_AUTH_PROVIDER }}
+          VITE_PAYMENTS_PROVIDER: ${{ vars.VITE_PAYMENTS_PROVIDER }}
+          VITE_SUPPORT_EMAIL: support@bookgenius.net
+          CI: true
+
       - name: Build snapplify platform
         run: pnpm build:platform
         env:
