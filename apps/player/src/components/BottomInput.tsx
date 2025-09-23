@@ -59,6 +59,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
   const { startRecording, stopRecording, response } = useRealtime();
   const { location } = useLocation();
+  const { chapter: currentChapter, paragraph: currentParagraph } = location;
 
   const allCharacters = useMemo(() => {
     try {
