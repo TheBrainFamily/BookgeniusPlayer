@@ -105,6 +105,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   const isSatellite = import.meta.env.VITE_CLERK_IS_SATELLITE === "true";
   const clerkDomain = import.meta.env.VITE_CLERK_DOMAIN || undefined;
+  const shouldUseRedirect = isSatellite || clerkDomain;
   const clerkDomainUrl = `https://${clerkDomain}`;
 
   let signInUrl = "/sign-in";
@@ -112,7 +113,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   const signInUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_IN_URL;
   const signUpUrlEnv = import.meta.env.VITE_PUBLIC_CLERK_SIGN_UP_URL;
-  if (isSatellite && signInUrlEnv && signUpUrlEnv && clerkDomain) {
+  if (shouldUseRedirect && signInUrlEnv && signUpUrlEnv && clerkDomain) {
     const signInUrlObj = new URL(signInUrlEnv);
     signInUrlObj.searchParams.append("redirect_url", clerkDomainUrl);
     signInUrl = signInUrlObj.toString();
@@ -130,13 +131,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       () => ({
         ready: isLoaded !== false, // Clerk's isLoaded tells us when it's ready
         isSignedIn: !!isSignedIn,
-        components: {
-          SignIn: SignInComponent,
-          SignUp: SignUpComponent,
-        },
+        components: { SignIn: SignInComponent, SignUp: SignUpComponent },
         openSignIn: () => {
           console.log("[CLERK] openSignIn");
-          if (!isSatellite) {
+          if (!shouldUseRedirect) {
             openSignIn();
           } else {
             window.location.href = signInUrl;
@@ -157,6 +155,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     `https://accounts.${mainClerkDomain}`,
     "https://bookgeniusz.pl",
     "https://testclerk.aws.lucetius.pl",
+    "https://wukong.bookgenius.net",
   ];
 
   console.log("isSatellite:", isSatellite);
@@ -169,7 +168,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       <ClerkProvider
         localization={detectLanguageFromDomain() === "pl" ? plPL : enUS}
         publishableKey={publishableKey}
-        domain={isSatellite ? clerkDomain : undefined}
+        domain={shouldUseRedirect ? clerkDomain : undefined}
         signInUrl={signInUrl}
         signUpUrl={signUpUrl}
         isSatellite={isSatellite}
