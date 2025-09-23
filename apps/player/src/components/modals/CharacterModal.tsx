@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import ModalUI from "./ModalUI";
 import CharacterMedia from "@player/components/CharacterMedia";
 import { CharacterData } from "@player/types/book";
-import { performCachedSearch, SearchResultItemData } from "@player/searchModal";
+import { findCharacterSentences, performCachedSearch, SearchResultItemData } from "@player/searchModal";
 import { getSavedLocation, systemNavigateTo } from "@player/helpers/paragraphsNavigation";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
@@ -83,7 +83,8 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     setIsLoading(true);
 
     try {
-      const searchResults = performCachedSearch(characterSlug.replaceAll("-", " "), furthestLocation);
+      // const searchResults = performCachedSearch(characterSlug.replaceAll("-", " "), furthestLocation);
+      const searchResults = findCharacterSentences(characterSlug, furthestLocation);
 
       // 1. Unique chapters (first appearance in each chapter)
       const byChapter = new Map<number, SearchResultItemData>();
@@ -233,11 +234,11 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                             </div>
 
                             <motion.div
-                              className="text-sm text-white/90 leading-relaxed line-clamp-6 md:line-clamp-3"
+                              className="text-sm text-white/90 leading-relaxed line-clamp-6 md:line-clamp-3 whitespace-pre-wrap"
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               transition={{ delay: 0.2 }}
-                              dangerouslySetInnerHTML={{ __html: appearance.summary }}
+                              dangerouslySetInnerHTML={{ __html: appearance.text }}
                             />
 
                             <motion.div

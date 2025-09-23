@@ -4,6 +4,7 @@ import { getCharactersData } from "./genericBookDataGetters/getCharactersData";
 import { useBookContentStore } from "./stores/bookContent.store";
 import { getBookData } from "./genericBookDataGetters/getBookData";
 import { bookIndex } from "@player/logic/BookIndex";
+import type { InfoPerChapter } from "@player/fetchers/getParagraphRange";
 
 export interface SearchResultItemData {
   score?: number;
@@ -387,36 +388,47 @@ const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) 
 const SUMMARY_TRUNCATE_LENGTH = 210;
 
 export function findCharacterSentences(characterSlug: string, currentLocation: Location) {
+  const isPlay = getBookData().metadata.bookForm === "play" || getBookData().metadata.bookForm === "mixed";
   const characterData = getCharactersData().find((character) => character.slug === characterSlug);
 
-  // Changed return type
-  const items: SearchResultItemData[] = [];
+  const spottedCharacterItems: SearchResultItemData[] = [];
+  const talkingCharacterItems: SearchResultItemData[] = [];
   let resultIndex: number = 0;
 
   try {
     if (characterData) {
-      const knownCharacterHistory: { chapter: number; paragraphs: number[] }[] = [];
-      const hasHistoryTillCurrentChapter = characterData.infoPerChapter.filter((characterInfo) => characterInfo.chapter <= currentLocation.chapter);
+      const spottedCharacterHistory: { chapter: number; paragraphs: number[] }[] = [];
+      const talkingCharacterHistory: { chapter: number; paragraphs: number[] }[] = [];
+      const historyTillCurrentChapter = characterData.infoPerChapter.filter((characterInfo) => characterInfo.chapter <= currentLocation.chapter);
 
-      if (hasHistoryTillCurrentChapter) {
-        hasHistoryTillCurrentChapter.forEach((infoPerChapter) => {
+      if (historyTillCurrentChapter.length > 0) {
+        historyTillCurrentChapter.forEach((infoPerChapter: InfoPerChapter) => {
           if (infoPerChapter.chapter < currentLocation.chapter) {
-            knownCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: infoPerChapter.paragraphsWhereSpotted });
+            if (infoPerChapter.paragraphsWhereSpotted.length > 0) {
+              spottedCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: infoPerChapter.paragraphsWhereSpotted });
+            }
+            if (infoPerChapter.paragraphsWhereTalking.length > 0) {
+              talkingCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: infoPerChapter.paragraphsWhereTalking });
+            }
           } else {
-            const historyTillCurrentParagraph = infoPerChapter.paragraphsWhereSpotted.filter((paragraph) => paragraph <= currentLocation.paragraph);
-            knownCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: historyTillCurrentParagraph });
+            const spottedHistoryTillCurrentParagraph = infoPerChapter.paragraphsWhereSpotted.filter((paragraph) => paragraph <= currentLocation.paragraph);
+            if (spottedHistoryTillCurrentParagraph.length > 0) {
+              spottedCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: spottedHistoryTillCurrentParagraph });
+            }
+            const talkingHistoryTillCurrentParagraph = infoPerChapter.paragraphsWhereTalking.filter((paragraph) => paragraph <= currentLocation.paragraph);
+            if (talkingHistoryTillCurrentParagraph.length > 0) {
+              talkingCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: talkingHistoryTillCurrentParagraph });
+            }
           }
         });
       }
 
-      knownCharacterHistory.forEach(({ chapter, paragraphs }) => {
+      spottedCharacterHistory.forEach(({ chapter, paragraphs }) => {
         const totalParagraphsInChapter = getTotalParagraphsInChapter(chapter);
 
         paragraphs.forEach((paragraph) => {
           const paragraphElement = bookIndex.getParagraphElement(chapter, paragraph);
-          if (!paragraphElement) {
-            return;
-          }
+          if (!paragraphElement) return;
 
           const tagName = paragraphElement.tagName.toLowerCase();
           const isStageDirectory = paragraphElement.querySelector("span em");
@@ -439,7 +451,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
               _sentence = sentence;
             }
 
-            items.push({
+            spottedCharacterItems.push({
               chapter,
               paragraphNumber: paragraph,
               percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
@@ -450,6 +462,60 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
           }
         });
       });
+
+      talkingCharacterHistory.forEach(({ chapter, paragraphs }) => {
+        const totalParagraphsInChapter = getTotalParagraphsInChapter(chapter);
+
+        paragraphs.forEach((paragraph) => {
+          const paragraphElement = bookIndex.getParagraphElement(chapter, paragraph);
+          if (!paragraphElement) return;
+
+          const playRow = paragraphElement.closest(".play-row");
+
+          if (isPlay && playRow) {
+            const characterDialogue = convertCharacterDialogue(playRow.innerHTML);
+            talkingCharacterItems.push({
+              chapter,
+              paragraphNumber: paragraph,
+              percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
+              summary: characterDialogue,
+              text: characterDialogue,
+              id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
+            });
+          } else {
+            const tagName = paragraphElement.tagName.toLowerCase();
+            const isStageDirectory = paragraphElement.querySelector("span em");
+
+            if (tagName === "h3" || tagName === "h4" || tagName === "h5" || isStageDirectory) return;
+
+            const paragraphInnerHTML = paragraphElement.innerHTML;
+
+            const sentence = filterParagraphByCharacter(paragraphInnerHTML, characterSlug);
+
+            if (sentence) {
+              const removedHtmlTags = stripHtmlTags(sentence);
+
+              let _sentence: string;
+
+              if (removedHtmlTags.length > SUMMARY_TRUNCATE_LENGTH) {
+                const excerpt = extractTextAroundMark(sentence);
+                _sentence = excerpt ?? `${removedHtmlTags.substring(0, SUMMARY_TRUNCATE_LENGTH)}...`;
+              } else {
+                _sentence = sentence;
+              }
+
+              talkingCharacterItems.push({
+                chapter,
+                paragraphNumber: paragraph,
+                percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
+                summary: _sentence,
+                text: _sentence,
+                id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
+              });
+            }
+          }
+        });
+      });
     }
   } catch (error) {
     console.error("Error in performLocalDOMSearch:", error);
@@ -457,6 +523,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
     return { header: `Error performing local search for "${characterSlug}".`, items: [], isLoading: false };
   }
 
+  const items = sortSearchResults(spottedCharacterItems, talkingCharacterItems);
   // Construct SearchResultsData object for successful search
   const totalMatches = items.length;
   let header = "";
@@ -582,4 +649,68 @@ function extractTextAroundMark(paragraph) {
   }
 
   return result;
+}
+
+function convertCharacterDialogue(htmlInput: string): string {
+  // Extract character name from <strong> tags
+  const characterMatch = htmlInput.match(/<strong>(.*?)<\/strong>/);
+  const characterName = characterMatch ? characterMatch[1].trim() : "";
+
+  // Extract all text content by removing HTML tags
+  const textContent = htmlInput
+    .replace(/<[^>]*>/g, "") // Remove all HTML tags
+    .replace(/\s+/g, " ") // Normalize whitespace
+    .trim();
+
+  // Remove the character name from the text
+  let dialogueText = textContent
+    .replace(new RegExp(`^${characterName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "i"), "")
+    .replace(/^\s*,?\s*/, "") // Remove leading comma/whitespace
+    .trim();
+
+  // Generate the output format
+  return `<mark class="bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm">${characterName}</mark>: ${dialogueText}`;
+}
+
+function sortSearchResults(array1: SearchResultItemData[], array2: SearchResultItemData[]): SearchResultItemData[] {
+  // Concatenate the arrays
+  const combined = [...array1, ...array2];
+
+  // Sort by chapter first, then by paragraph number
+  return combined.sort((a, b) => {
+    // Primary sort: by chapter
+    if (a.chapter !== b.chapter) {
+      return a.chapter - b.chapter;
+    }
+
+    // Secondary sort: by paragraph number within the same chapter
+    return a.paragraphNumber - b.paragraphNumber;
+  });
+}
+
+function formatWithHangingIndent(text) {
+  const lines = text.split("\n").filter((line) => line.trim() !== "");
+
+  if (lines.length === 0) return "";
+
+  const firstLine = lines[0];
+  const speakerMatch = firstLine.match(/^([A-Z]+):\s*(.*)$/);
+
+  if (!speakerMatch) return text; // Return original if no speaker format found
+
+  const speaker = speakerMatch[1];
+  const firstDialogue = speakerMatch[2];
+  const indent = " ".repeat(speaker.length + 2); // Speaker name + ": "
+
+  const formattedLines = [`${speaker}: ${firstDialogue}`];
+
+  // Add remaining lines with proper indentation
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line) {
+      formattedLines.push(indent + line);
+    }
+  }
+
+  return formattedLines.join("\n");
 }
