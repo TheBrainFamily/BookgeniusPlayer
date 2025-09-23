@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@player/lib/utils";
 import { useRealtime } from "@player/context/RealtimeContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@player/components/ui/tooltip";
-import { bookDataLoader } from "@player/services/bookDataLoader";
 import { useLocation } from "@player/state/LocationContext";
 import { deepResearchCall } from "@player/deepResearchCall";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
@@ -15,9 +14,26 @@ import { OptionalElement } from "./OptionalElement";
 import { useElementVisibilityStore } from "@player/stores/elementVisibility.store";
 import { hasApiKey } from "@player/utils/apiKeyManager";
 import { useApiKeyModal } from "@player/stores/modals/apiKeyModal.store";
-import { Filter } from "@player/types/book";
+import type { CharacterData, Filter } from "@player/types/book";
 import { askCall } from "@player/askCall";
 import { useBottomInput } from "@player/stores/modals/bottomInput.store";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+
+const hasPlayerMetCharacter = (character: CharacterData, chapter: number, paragraph: number): boolean => {
+  return character.infoPerChapter.some((infoPerChapter) => {
+    const encounteredParagraphs = [...infoPerChapter.paragraphsWhereSpotted, ...infoPerChapter.paragraphsWhereTalking, ...(infoPerChapter.paragraphsWhereEnters ?? [])];
+
+    if (infoPerChapter.chapter < chapter) {
+      return encounteredParagraphs.length > 0;
+    }
+
+    if (infoPerChapter.chapter === chapter) {
+      return encounteredParagraphs.some((encounterParagraph) => encounterParagraph <= paragraph);
+    }
+
+    return false;
+  });
+};
 
 interface BottomInputProps {
   className?: string;
@@ -42,6 +58,50 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { startRecording, stopRecording, response } = useRealtime();
   const { location } = useLocation();
   const { chapter: currentChapter, paragraph: currentParagraph } = location;
+
+  const allCharacters = useMemo(() => {
+    try {
+      return getCharactersData();
+    } catch (error) {
+      console.error("Failed to load characters for mentions:", error);
+      return [];
+    }
+  }, []);
+
+  const availableCharacterNames = useMemo(() => {
+    if (!allCharacters.length) return [];
+    return allCharacters
+      .filter((character) => hasPlayerMetCharacter(character, currentChapter, currentParagraph))
+      .map((character) => character.characterName)
+      .filter(Boolean);
+  }, [allCharacters, currentChapter, currentParagraph]);
+
+  const [mentionState, setMentionState] = useState<{ isActive: boolean; query: string; startIndex: number }>({ isActive: false, query: "", startIndex: -1 });
+  const [highlightedMention, setHighlightedMention] = useState(0);
+  const mentionListRef = useRef<HTMLUListElement | null>(null);
+
+  const updateSearchQueryForInput = useCallback(
+    (inputValue: string) => {
+      if (isDeepResearchActive) return;
+      if (isRecording) return;
+
+      const trimmedValue = inputValue.trim();
+      startTransition(() => {
+        if (trimmedValue.length >= 2) {
+          setSearchQuery(trimmedValue);
+        } else {
+          setSearchQuery("");
+        }
+      });
+    },
+    [isDeepResearchActive, isRecording, setSearchQuery],
+  );
+
+  const filteredCharacters = useMemo(() => {
+    if (!mentionState.isActive) return [];
+    const query = mentionState.query.toLowerCase();
+    return availableCharacterNames.filter((name) => name.toLowerCase().includes(query));
+  }, [availableCharacterNames, mentionState.isActive, mentionState.query]);
 
   const handleActivity = useCallback(() => {
     pauseAllTimers(true);
@@ -93,20 +153,21 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
       setValue(newValue);
+      updateSearchQueryForInput(newValue);
 
-      if (isDeepResearchActive) return;
-      if (isRecording) return;
+      const selectionIndex = e.target.selectionStart ?? newValue.length;
+      const textBeforeCaret = newValue.slice(0, selectionIndex);
+      const mentionMatch = textBeforeCaret.match(/(^|\s)@([^-@\s]*)$/);
 
-      const trimmedNewValue = newValue.trim();
-      startTransition(() => {
-        if (trimmedNewValue.length >= 2) {
-          setSearchQuery(trimmedNewValue);
-        } else {
-          setSearchQuery("");
-        }
-      });
+      if (mentionMatch) {
+        const query = mentionMatch[2];
+        const atIndex = selectionIndex - query.length - 1;
+        setMentionState({ isActive: true, query, startIndex: atIndex });
+      } else if (mentionState.isActive) {
+        setMentionState({ isActive: false, query: "", startIndex: -1 });
+      }
     },
-    [isDeepResearchActive, isRecording, setSearchQuery],
+    [mentionState.isActive, setValue, updateSearchQueryForInput],
   );
 
   const handleInputInteraction = useCallback(() => {
@@ -246,6 +307,81 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     }
   }, [handleActivity, response, isRecording, isSearchModalOpen, setSearchQuery]);
 
+  useEffect(() => {
+    if (!mentionState.isActive) {
+      setHighlightedMention(0);
+    } else {
+      setHighlightedMention(0);
+    }
+  }, [mentionState.isActive, mentionState.query]);
+
+  const closeMentions = useCallback(() => {
+    setMentionState({ isActive: false, query: "", startIndex: -1 });
+    setHighlightedMention(0);
+  }, []);
+
+  const insertMention = useCallback(
+    (name: string) => {
+      if (!mentionState.isActive || mentionState.startIndex < 0) {
+        closeMentions();
+        return;
+      }
+
+      const mentionText = `@${name}`;
+      const before = value.slice(0, mentionState.startIndex);
+      const after = value.slice(mentionState.startIndex + mentionState.query.length + 1);
+      const withMention = `${before}${mentionText} ${after}`;
+
+      console.log("335: withMention BANG!", withMention);
+
+      setValue(withMention);
+      updateSearchQueryForInput(withMention);
+      closeMentions();
+
+      const inputEl = inputRef.current;
+      if (inputEl) {
+        queueMicrotask(() => {
+          const newCaretPosition = `${before}${mentionText} `.length;
+          inputEl.focus();
+          inputEl.setSelectionRange(newCaretPosition, newCaretPosition);
+        });
+      }
+    },
+    [closeMentions, mentionState.isActive, mentionState.query, mentionState.startIndex, setValue, updateSearchQueryForInput, value],
+  );
+
+  useEffect(() => {
+    if (!mentionState.isActive) return;
+    const listElement = mentionListRef.current;
+    if (!listElement) return;
+    const child = listElement.children[highlightedMention] as HTMLElement | undefined;
+    if (child) {
+      child.scrollIntoView({ block: "nearest" });
+    }
+  }, [highlightedMention, mentionState.isActive]);
+
+  const handleInputKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (!mentionState.isActive || filteredCharacters.length === 0) return;
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        setHighlightedMention((prev) => (prev + 1) % filteredCharacters.length);
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        setHighlightedMention((prev) => (prev - 1 + filteredCharacters.length) % filteredCharacters.length);
+      } else if (event.key === "Enter" || event.key === "Tab") {
+        event.preventDefault();
+        const selected = filteredCharacters[highlightedMention];
+        if (selected) insertMention(selected);
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        closeMentions();
+      }
+    },
+    [closeMentions, filteredCharacters, highlightedMention, insertMention, mentionState.isActive],
+  );
+
   return (
     <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
       <motion.div
@@ -274,6 +410,39 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                   />
                 )}
               </AnimatePresence>
+              <AnimatePresence>
+                {mentionState.isActive && (
+                  <motion.ul
+                    key="mention-list"
+                    className="absolute bottom-full left-0 right-0 mb-2 bg-black/85 border border-white/20 rounded-xl shadow-lg overflow-hidden z-50 max-h-56 overflow-y-auto"
+                    ref={(node) => {
+                      mentionListRef.current = node;
+                    }}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 6 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    {filteredCharacters.length > 0 ? (
+                      filteredCharacters.map((characterName, index) => (
+                        <li
+                          key={characterName}
+                          className={cn("px-3 py-2 cursor-pointer text-sm", index === highlightedMention ? "bg-white/15" : "bg-transparent")}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            insertMention(characterName);
+                          }}
+                          onMouseEnter={() => setHighlightedMention(index)}
+                        >
+                          {characterName}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="px-3 py-2 text-sm text-white/70">{t("mentions_no_characters_yet", "No characters have been introduced yet.")}</li>
+                    )}
+                  </motion.ul>
+                )}
+              </AnimatePresence>
               <input
                 id="bottom-input"
                 ref={inputRef}
@@ -281,6 +450,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                 value={value}
                 onChange={handleInputChange}
                 onFocus={handleInputInteraction}
+                onKeyDown={handleInputKeyDown}
                 placeholder={placeholder}
                 className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-80 pl-7 font-medium" : "")}
                 disabled={isRecording || isThinking}

@@ -111,8 +111,9 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     if (matchingCharacter?.characterName) {
       highlightSearchInParagraph(appearance.chapter, appearance.paragraphNumber, matchingCharacter.characterName);
     }
-    setValue(characterSlug);
-    openSearchModal(true, true, characterSlug);
+    const character = `@${characterSlug.replaceAll("-", " ")}`;
+    setValue(character);
+    openSearchModal(true, true, character);
     onClose();
   };
 

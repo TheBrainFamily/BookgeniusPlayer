@@ -62,6 +62,10 @@ export const useSearchLogic = () => {
       try {
         /* ---------- 2a. local DOM search: runs immediately ---------- */
 
+        if (searchQuery.includes("@")) {
+          searchQuery = searchQuery.replace("@", "");
+        }
+
         const character = getCharactersData().find(
           (character) => character.slug.toLowerCase() === searchQuery.toLowerCase() || character.characterName.toLowerCase() === searchQuery.toLowerCase(),
         );
