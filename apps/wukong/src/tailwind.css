@@ -83,6 +83,8 @@
     /* Font families */
     --font-family-serif: "Playfair Display", ui-serif, Georgia, serif;
     --font-family-sans: Inter, system-ui, sans-serif;
+    --font-family-traditional: "Cinzel", "Georgia", serif;
+    --font-family-mystical: "Crimson Text", "Georgia", serif;
 
     /* Spacing scale - extending default */
     --spacing-18: 4.5rem;
@@ -164,6 +166,10 @@
 }
 
 @layer utilities {
+  #platform-scope .font-traditional {
+    font-family: var(--font-family-traditional);
+  }
+
   #platform-scope .container {
     width: 100%;
     margin-inline: auto;
@@ -227,7 +233,7 @@
     @apply border-border outline-ring/50;
   }
   #platform-scope {
-    font-family: var(--font-family-serif);
+    /* font-family: var(--font-family-serif); */
   }
 
   /* Wukong base backdrop and text colors */
