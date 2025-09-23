@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@wukong/components/ui/dialog";
 import { X } from "lucide-react";
 
 interface CharacterModalProps {

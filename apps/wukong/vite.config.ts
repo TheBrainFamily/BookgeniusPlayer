@@ -7,5 +7,5 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   server: { host: "::", port: 8080 },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
-  resolve: { alias: { "@wukong": path.resolve(__dirname, "./src") } },
+  resolve: { alias: { "@wukong": path.resolve(__dirname, "./src"), "@platform": path.resolve(__dirname, "../platform/src"), "@player": path.resolve(__dirname, "../player/src") } },
 }));

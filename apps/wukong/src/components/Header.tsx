@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@wukong/components/ui/button";
+import { Input } from "@wukong/components/ui/input";
 import { Search, BookOpen, User, Info } from "lucide-react";
 import AboutModal from "./AboutModal";
 import SignInModal from "./SignInModal";

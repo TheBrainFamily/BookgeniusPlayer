@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@wukong/components/ui/dialog";
 import { X, Mail, Phone, MapPin } from "lucide-react";
 
 interface ContactModalProps {

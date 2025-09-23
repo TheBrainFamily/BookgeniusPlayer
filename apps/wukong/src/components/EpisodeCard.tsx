@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@wukong/components/ui/button";
+import { Badge } from "@wukong/components/ui/badge";
 import { Play, Clock, Star, Volume2 } from "lucide-react";
 
 interface EpisodeCardProps {
