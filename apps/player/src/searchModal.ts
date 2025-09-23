@@ -435,30 +435,166 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
 
           if (tagName === "h3" || tagName === "h4" || tagName === "h5" || isStageDirectory) return;
 
-          const paragraphInnerHTML = paragraphElement.innerHTML;
+          const playRow = paragraphElement.closest(".play-row");
 
-          const sentence = filterParagraphByCharacter(paragraphInnerHTML, characterSlug);
+          if (isPlay && playRow) {
+            const characterText = playRow.querySelector(".character-text");
 
-          if (sentence) {
-            const removedHtmlTags = stripHtmlTags(sentence);
+            if (characterText) {
+              const characterTextElement = characterText as HTMLElement;
 
-            let _sentence: string;
+              const findNextSpokenParagraph = (start: Element | null): HTMLElement | null => {
+                if (!start) return null;
+                let next = start.nextElementSibling as HTMLElement | null;
 
-            if (removedHtmlTags.length > SUMMARY_TRUNCATE_LENGTH) {
-              const excerpt = extractTextAroundMark(sentence);
-              _sentence = excerpt ?? `${removedHtmlTags.substring(0, SUMMARY_TRUNCATE_LENGTH)}...`;
-            } else {
-              _sentence = sentence;
+                while (next) {
+                  if (next.tagName.toLowerCase() === "p" && next.getAttribute("data-is-character") !== "true") {
+                    return next;
+                  }
+                  next = next.nextElementSibling as HTMLElement | null;
+                }
+
+                return null;
+              };
+
+              const characterTalking = (characterTextElement.querySelector('p[data-is-character="true"]') ?? characterTextElement.firstElementChild) as HTMLElement | null;
+              const characterTalkingIndexAttr = characterTalking?.getAttribute("data-index");
+              const characterTalkingIndex = characterTalkingIndexAttr ? Number(characterTalkingIndexAttr) : NaN;
+
+              let firstParagraph = Number.isFinite(characterTalkingIndex)
+                ? (characterTextElement.querySelector(`p[data-index="${characterTalkingIndex + 1}"]`) as HTMLElement | null)
+                : null;
+
+              if (!firstParagraph) {
+                firstParagraph = findNextSpokenParagraph(characterTalking);
+              }
+
+              const paragraphInnerHTML = paragraphElement.innerHTML;
+              const sentence = filterParagraphByCharacter(paragraphInnerHTML, characterSlug);
+
+              if (sentence) {
+                const removedHtmlTags = stripHtmlTags(sentence);
+
+                let _sentence: string;
+
+                if (removedHtmlTags.length > SUMMARY_TRUNCATE_LENGTH) {
+                  const excerpt = extractTextAroundMark(sentence);
+                  _sentence = excerpt ?? `${removedHtmlTags.substring(0, SUMMARY_TRUNCATE_LENGTH)}...`;
+                } else {
+                  _sentence = sentence;
+                }
+
+                const currentParagraphInRow = (characterTextElement.querySelector(`p[data-index="${paragraph}"]`) as HTMLElement | null) || (paragraphElement as HTMLElement);
+                const currentIndexAttr = currentParagraphInRow?.getAttribute("data-index");
+                const currentIndex = currentIndexAttr ? Number(currentIndexAttr) : paragraph;
+
+                let nextElement = characterTextElement.querySelector(`p[data-index="${currentIndex + 1}"]`) as HTMLElement | null;
+
+                if (!nextElement || nextElement.getAttribute("data-is-character") === "true") {
+                  nextElement = findNextSpokenParagraph(currentParagraphInRow);
+                }
+
+                const speakerName = characterTalking?.textContent?.trim();
+                const firstSpeechText = firstParagraph?.textContent?.trim();
+                const lineEntries: { text: string; type: "speaker" | "current" | "next" | "extra" }[] = [];
+                let currentMergedIntoSpeaker = false;
+
+                if (speakerName && firstSpeechText) {
+                  lineEntries.push({ text: `${speakerName.toUpperCase()}: ${firstSpeechText}`, type: "speaker" });
+                }
+
+                const trimmedSentence = _sentence.trim();
+                if (trimmedSentence) {
+                  const hasGap =
+                    lineEntries.length > 0 && Number.isFinite(characterTalkingIndex) && Number.isFinite(currentIndex) && currentIndex - (characterTalkingIndex + 1) > 1;
+                  const needsEllipsis = hasGap && !trimmedSentence.startsWith("...");
+                  const currentLineText = `${needsEllipsis ? "..." : ""}${trimmedSentence}`;
+
+                  const currentComparable = normalizeForComparison(currentLineText);
+                  const speakerEntry = lineEntries.find((entry) => entry.type === "speaker");
+                  const speakerComparable = speakerEntry ? normalizeForComparison(extractSpeechContentFromLine(speakerEntry.text)) : "";
+
+                  if (speakerEntry && currentComparable && currentComparable === speakerComparable) {
+                    const speakerPrefix = speakerEntry.text.split(":")[0];
+                    speakerEntry.text = speakerPrefix ? `${speakerPrefix}: ${currentLineText}` : currentLineText;
+                    currentMergedIntoSpeaker = true;
+                  } else if (currentComparable) {
+                    lineEntries.push({ text: currentLineText, type: "current" });
+                  }
+                }
+
+                if (nextElement && nextElement.textContent?.trim()) {
+                  const nextText = nextElement.textContent.trim();
+                  const nextComparable = normalizeForComparison(nextText);
+                  const alreadyPresent = lineEntries.some((entry) => {
+                    const entryComparable = entry.type === "speaker" ? normalizeForComparison(extractSpeechContentFromLine(entry.text)) : normalizeForComparison(entry.text);
+                    return entryComparable === nextComparable;
+                  });
+
+                  if (!alreadyPresent && nextComparable) {
+                    lineEntries.push({ text: nextText, type: "next" });
+                  }
+                }
+
+                if (currentMergedIntoSpeaker && nextElement && lineEntries.length < 3) {
+                  const afterNextElement = findNextSpokenParagraph(nextElement);
+                  if (afterNextElement && afterNextElement.textContent?.trim()) {
+                    const afterNextText = afterNextElement.textContent.trim();
+                    const afterNextComparable = normalizeForComparison(afterNextText);
+                    const alreadyPresent = lineEntries.some((entry) => {
+                      const entryComparable = entry.type === "speaker" ? normalizeForComparison(extractSpeechContentFromLine(entry.text)) : normalizeForComparison(entry.text);
+                      return entryComparable === afterNextComparable;
+                    });
+
+                    if (!alreadyPresent && afterNextComparable) {
+                      lineEntries.push({ text: afterNextText, type: "extra" });
+                    }
+                  }
+                }
+
+                if (lineEntries.length > 0) {
+                  const result = lineEntries.map((entry) => entry.text).join("\n");
+                  const formattedResult = formatWithHangingIndent(result.trim());
+
+                  spottedCharacterItems.push({
+                    chapter,
+                    paragraphNumber: paragraph,
+                    percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
+                    summary: formattedResult,
+                    text: formattedResult,
+                    id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
+                  });
+                }
+              }
             }
 
-            spottedCharacterItems.push({
-              chapter,
-              paragraphNumber: paragraph,
-              percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
-              summary: _sentence,
-              text: _sentence,
-              id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
-            });
+            // console.log("439: x BANG!", x);
+          } else {
+            const paragraphInnerHTML = paragraphElement.innerHTML;
+
+            const sentence = filterParagraphByCharacter(paragraphInnerHTML, characterSlug);
+
+            if (sentence) {
+              const removedHtmlTags = stripHtmlTags(sentence);
+
+              let _sentence: string;
+
+              if (removedHtmlTags.length > SUMMARY_TRUNCATE_LENGTH) {
+                const excerpt = extractTextAroundMark(sentence);
+                _sentence = excerpt ?? `${removedHtmlTags.substring(0, SUMMARY_TRUNCATE_LENGTH)}...`;
+              } else {
+                _sentence = sentence;
+              }
+
+              spottedCharacterItems.push({
+                chapter,
+                paragraphNumber: paragraph,
+                percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
+                summary: _sentence,
+                text: _sentence,
+                id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
+              });
+            }
           }
         });
       });
@@ -543,6 +679,20 @@ function stripHtmlTags(str) {
 
   // Remove HTML tags using regex
   return str.replace(/<[^>]*>/g, "");
+}
+
+function normalizeForComparison(text: string): string {
+  if (!text) return "";
+  return stripHtmlTags(text).replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+function extractSpeechContentFromLine(line: string): string {
+  if (!line) return "";
+  const colonIndex = line.indexOf(":");
+  if (colonIndex === -1) {
+    return line;
+  }
+  return line.slice(colonIndex + 1);
 }
 
 function filterParagraphByCharacter(paragraph, characterSlug) {
