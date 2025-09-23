@@ -144,7 +144,7 @@ const WukongLanding = () => {
   const handleBookClick = () => {
     const book = {
       title: "Wukong",
-      slug: "wukong",
+      slug: "Wukong",
       metadata: {
         en: {
           phrases: [
