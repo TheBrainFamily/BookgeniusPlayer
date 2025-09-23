@@ -184,9 +184,9 @@ const ChapterGroup = memo(function ChapterGroup({ chapter, items, t }: { chapter
 
   return (
     <AccordionItem value={String(chapter)} className="border-book-primary-20 rounded-lg mb-3 overflow-hidden">
-      <AccordionTrigger className="px-4 py-3 bg-book-primary-10 hover:bg-book-primary-20 text-book-primary hover:no-underline cursor-pointer">{chapterTitle}</AccordionTrigger>
+      <AccordionTrigger className="px-2 py-3 bg-book-primary-10 hover:bg-book-primary-20 text-book-primary hover:no-underline cursor-pointer">{chapterTitle}</AccordionTrigger>
       <AccordionContent className="px-0 pb-0">
-        <div className="space-y-2 p-3">
+        <div className="space-y-2 py-2">
           {items.map((item, idx) => (
             <ResultCard key={item.id} item={item} appearIndex={idx} />
           ))}

@@ -115,16 +115,14 @@ const ModalUI: React.FC<ModalUIProps> = ({
     (e: Event) => {
       const target = e.target as HTMLElement | null;
 
-      if (closeOnOverlayClick === false) {
+      if (closeOnOverlayClick === false || shouldKeepOpenOn(target)) {
         e.preventDefault();
         return;
       }
 
-      if (shouldKeepOpenOn(target)) {
-        e.preventDefault();
-      }
+      onClose();
     },
-    [closeOnOverlayClick, shouldKeepOpenOn],
+    [closeOnOverlayClick, shouldKeepOpenOn, onClose],
   );
 
   useEffect(() => {
@@ -165,7 +163,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             "flex flex-row gap-2 items-center h-full",
             sizeConfig.container,
             // Position modal in the right space when content is shifted left on large screens
-            shouldShiftContent && layoutView ? "justify-end pr-[3%] ml-auto mr-0" : "justify-center mx-auto",
+            shouldShiftContent && layoutView ? "justify-end pr-[3%] ml-auto mr-0" : "justify-center mx-auto px-4",
           )}
         >
           {layoutView && !shouldShiftContent && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none xl:flex xl:flex-1 xl:order-1" />}
@@ -201,7 +199,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             )}
 
             <motion.div
-              className="p-4 overflow-y-auto opened-modal"
+              className="px-4 overflow-y-auto opened-modal"
               layout={animateHeight}
               transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}
               onClick={(e) => {
