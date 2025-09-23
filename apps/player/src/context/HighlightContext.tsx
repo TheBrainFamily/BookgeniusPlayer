@@ -23,7 +23,7 @@ interface HighlightProviderProps {
 export const HighlightProvider: React.FC<HighlightProviderProps> = ({ children }) => {
   const [isScrollingLocked, setScrollingLocked] = useState(false);
 
-  const isPlayFormat = useMemo(() => getBookData().metadata.bookForm === "play", []);
+  const isPlayFormat = useMemo(() => getBookData().metadata.bookForm === "play" || getBookData().metadata.bookForm === "mixed", []);
 
   const highlightParagraphs = (appearances: Appearance[], enable: boolean): void => {
     // Don't highlight paragraphs for play format books

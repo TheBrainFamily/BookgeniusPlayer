@@ -50,10 +50,11 @@ async function processAllBooks(docker: boolean = false, only?: string[]) {
       }
 
       // If public/books is newer than public_books, skip compilation
-      if (publicDirStats.mtime.getTime() > mostRecentPublicBooks) {
-        console.log("✅ public/books is up to date. Skipping compilation.");
-        return;
-      }
+      // TODO this doesnt work very well, will fix later
+      // if (publicDirStats.mtime.getTime() > mostRecentPublicBooks) {
+      //   console.log("✅ public/books is up to date. Skipping compilation.");
+      //   return;
+      // }
     } catch (error) {
       // If there's any error checking timestamps, just proceed with compilation
       console.log("⚠️ Could not check timestamps, proceeding with compilation...");

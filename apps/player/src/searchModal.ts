@@ -3,8 +3,10 @@ import type { Location } from "@player/state/LocationContext";
 import { getCharactersData } from "./genericBookDataGetters/getCharactersData";
 import { useBookContentStore } from "./stores/bookContent.store";
 import { getBookData } from "./genericBookDataGetters/getBookData";
+import { bookIndex } from "@player/logic/BookIndex";
 
 export interface SearchResultItemData {
+  score?: number;
   chapter: number;
   paragraphNumber: number;
   percentInChapter: number;
@@ -16,6 +18,7 @@ export interface SearchResultItemData {
 export interface SearchResultsData {
   header: string;
   items: SearchResultItemData[];
+  areEmbeddings?: boolean;
   isLoading?: boolean;
 }
 
@@ -52,6 +55,7 @@ export async function performUnifiedSearch(
 
   try {
     const serverMatches = await searchParagraphsFromServer(query, currentLocation);
+
     const totalServerMatches = serverMatches.length;
 
     let header = "";
@@ -62,19 +66,22 @@ export async function performUnifiedSearch(
       header = `No matches found for "${query}" (context: Ch. ${currentLocation.chapter}, P. ${currentLocation.paragraph})`;
     }
 
-    const items: SearchResultItemData[] = serverMatches.map((match, index) => {
-      const totalParagraphsInChapter = getTotalParagraphsInChapter(match.chapter);
-      return {
-        chapter: match.chapter,
-        paragraphNumber: match.paragraphNumber,
-        percentInChapter: calculatePercentInChapter(match.paragraphNumber, totalParagraphsInChapter),
-        summary: match.summary,
-        text: createContextualSummary(match.text, query, 75),
-        id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}`,
-      };
-    });
+    const items: SearchResultItemData[] = serverMatches
+      .map((match, index) => {
+        const totalParagraphsInChapter = getTotalParagraphsInChapter(match.chapter);
+        return {
+          chapter: match.chapter,
+          paragraphNumber: match.paragraphNumber,
+          percentInChapter: calculatePercentInChapter(match.paragraphNumber, totalParagraphsInChapter),
+          summary: match.summary,
+          text: createContextualSummary(match.text, query, 75),
+          id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}`,
+          score: match.score,
+        };
+      })
+      .sort((a, b) => b.score - a.score);
 
-    return { header, items, isLoading: false };
+    return { header, items, areEmbeddings: true, isLoading: false };
   } catch (error) {
     console.error("Search error in performUnifiedSearch:", error);
     return { header: "Search failed. Please try again.", items: [], isLoading: false };
@@ -120,7 +127,7 @@ const createContextualSummary = (fullText: string, query: string, maxLength: num
 
 export function performCachedSearch(query: string, currentLocation: Location): SearchResultsData {
   const { textCache, isInitialized } = useBookContentStore.getState();
-  const bookIsPlay = getBookData().metadata.bookForm === "play";
+  const bookIsPlay = getBookData().metadata.bookForm === "play" || getBookData().metadata.bookForm === "mixed";
   let bookCharacters = [];
   if (bookIsPlay) {
     bookCharacters = getCharactersData().map((character) => character.characterName.toLowerCase());
@@ -157,13 +164,38 @@ export function performCachedSearch(query: string, currentLocation: Location): S
       let paragraphText = chapterCache[paragraphNumber];
       if (paragraphText.toLowerCase().includes(queryLower)) {
         if (bookIsPlay) {
-          // if the paragraph text is just a character name we want to append the next paragraph text to show the character next line
-          if (bookCharacters.includes(paragraphText.trim().toLowerCase())) {
-            const nextParagraphText = chapterCache[paragraphNumber + 1];
+          // DOM-based detection: if this paragraph is a character-name line, append the next spoken line
+          try {
+            const paragraphElement = bookIndex.getParagraphElement(chapterIdNum, paragraphNumber);
+            const isCharacterLine = paragraphElement?.getAttribute("data-is-character") === "true";
 
-            if (nextParagraphText) {
-              paragraphText = `${paragraphText}: ${nextParagraphText}`;
+            if (isCharacterLine) {
+              const nextParagraphElement = bookIndex.getParagraphElement(chapterIdNum, paragraphNumber + 1);
+              const nextIsSpoken = nextParagraphElement?.getAttribute("data-is-character") === "false";
+
+              if (nextParagraphElement && nextIsSpoken) {
+                const rawName = (paragraphElement!.textContent || "").replace(/\s+/g, " ").trim();
+                const prettyName = rawName.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+                const nextText = (nextParagraphElement.textContent || "")
+                  .replace(/[\n\r]/g, " ")
+                  .replace(/\s+/g, " ")
+                  .trim();
+
+                if (nextText) {
+                  paragraphText = `${prettyName}: ${nextText}`;
+                }
+              }
+            } else {
+              // Fallback to previous string-based detection if DOM attributes aren't usable
+              if (bookCharacters.includes(paragraphText.trim().toLowerCase())) {
+                const nextParagraphText = chapterCache[paragraphNumber + 1];
+                if (nextParagraphText) {
+                  paragraphText = `${paragraphText}: ${nextParagraphText}`;
+                }
+              }
             }
+          } catch (e) {
+            // If anything goes wrong with DOM access, keep previous behavior silently
           }
         }
 
@@ -200,17 +232,12 @@ const getTotalParagraphsInChapter = (() => {
     }
 
     try {
-      const chapterSection = document.querySelector(`section[data-chapter="${chapterNumber}"]`);
-      if (!chapterSection) {
-        cache.set(chapterNumber, 0);
-        return 0;
-      }
-      const count = chapterSection.querySelectorAll("[data-index]").length;
+      bookIndex.ensureInitialized();
+      const count = bookIndex.getParagraphCount(chapterNumber);
       cache.set(chapterNumber, count);
       return count;
     } catch (error) {
       console.error(`Error getting paragraph count for chapter ${chapterNumber}:`, error);
-      // Don't cache on error to allow for retries.
       return 0;
     }
   };
@@ -386,7 +413,11 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
         const totalParagraphsInChapter = getTotalParagraphsInChapter(chapter);
 
         paragraphs.forEach((paragraph) => {
-          const paragraphElement = document.querySelector(`section[data-chapter="${chapter}"] [data-index="${paragraph}"]`);
+          const paragraphElement = bookIndex.getParagraphElement(chapter, paragraph);
+          if (!paragraphElement) {
+            return;
+          }
+
           const tagName = paragraphElement.tagName.toLowerCase();
           const isStageDirectory = paragraphElement.querySelector("span em");
 

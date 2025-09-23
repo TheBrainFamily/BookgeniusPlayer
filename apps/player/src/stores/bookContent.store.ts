@@ -13,12 +13,14 @@ interface BookContentState {
   addParagraphsToCache: (chapterId: number, paragraphs: ParagraphCache) => void;
   isInitialized: boolean;
   setInitialized: () => void;
+  reset: () => void;
 }
 
 export const useBookContentStore = create<BookContentState>((set) => ({
   textCache: {},
   isInitialized: false,
   setInitialized: () => set({ isInitialized: true }),
+  reset: () => set({ textCache: {}, isInitialized: false }),
   addParagraphsToCache: (chapterId, newParagraphs) =>
     set((state) => {
       const chapter = state.textCache[chapterId] || {};

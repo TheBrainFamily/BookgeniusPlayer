@@ -39,7 +39,7 @@ import i18n from "./i18n";
 
 function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   setKnownVideos(getKnownVideoFiles());
-  useBookContent("content-container");
+  useBookContent();
   useElementVisibility();
 
   /* text cache manager */

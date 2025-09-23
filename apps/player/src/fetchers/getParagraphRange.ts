@@ -9,6 +9,7 @@
 
 import { BOOK_SLUGS } from "@player/consts";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 
 /* -------------------------------------------------------------------------- */
 /*  Shared types                                                              */
@@ -45,11 +46,11 @@ export const paragraphMetadataServicePure = {
       metadata: { bookForm },
     } = getBookData();
 
-    const bookCharacters = data.filter((d) => d.bookSlug === bookSlug);
+    const bookCharacters = data;
 
     // For "play" books, calculate the closest entry paragraph in the start chapter once.
     const chapterEntryParagraphs =
-      bookForm === "play"
+      bookForm === "play" || bookForm === "mixed"
         ? bookCharacters
             .flatMap((character) => character.infoPerChapter)
             .filter((c) => c.chapter === startChapter)
@@ -84,7 +85,7 @@ export const paragraphMetadataServicePure = {
 
               const paragraphsWhereTalking = c.paragraphsWhereTalking.filter(keep);
               const paragraphsWhereSpotted =
-                bookForm === "play"
+                bookForm === "play" || bookForm === "mixed"
                   ? createParagraphsWhereSpottedForPlay(
                       startParagraph,
                       endParagraph,
@@ -114,6 +115,8 @@ export const paragraphMetadataServicePure = {
 /*  3. UI‑oriented post‑processing                                            */
 /* -------------------------------------------------------------------------- */
 
+export type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
+
 export interface ParsedParagraphRange {
   slug: string;
   characterName: string;
@@ -123,7 +126,7 @@ export interface ParsedParagraphRange {
   isTalkingInFirstParagraph: boolean;
   chapterNumber: number;
   label?: string;
-  otherAppearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[];
+  otherAppearances: Appearance[];
 }
 
 /**
@@ -175,10 +178,17 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
         return null;
       }
 
+      const snapshot = resolveCharacterSnapshot(character, {
+        location: { chapter: first.chapterNumber, paragraph: first.paragraphNumber },
+        baseSummary: first.summary,
+        fallbackDisplayName: character.characterName,
+      });
+
       return {
         slug: character.slug,
-        characterName: character.characterName,
-        summary: first.summary,
+        characterName: snapshot.displayName,
+        summary: snapshot.summary ?? first.summary,
+        imageUrl: snapshot.media.listening,
         isTalkingInFirstParagraph: first.isTalking,
         paragraphNumber: first.paragraphNumber,
         chapterNumber: first.chapterNumber,

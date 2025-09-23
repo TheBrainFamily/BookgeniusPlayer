@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import debounce from "lodash.debounce";
 
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
@@ -8,6 +8,8 @@ import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
 
 export const useSearchLogic = () => {
   const { query, isOpen, setResults } = useSearchModal();
+
+  const latestSearchIdRef = useRef(0);
 
   /* ------------------------------------------------------------------ *
    * 1 ️⃣  Unified-search debounce (1 s, returns a real Promise)
@@ -48,15 +50,13 @@ export const useSearchLogic = () => {
    * 2 ️⃣  Search pipeline (instant local, debounced remote)
    * ------------------------------------------------------------------ */
   const performSearch = useMemo(() => {
-    let latestSearchId = 0;
-
     return async (searchQuery: string, location: Location) => {
       if (!searchQuery.trim()) {
         setResults({ header: "Please enter a search term.", items: [], isLoading: false });
         return;
       }
 
-      const searchId = ++latestSearchId;
+      const searchId = ++latestSearchIdRef.current;
 
       try {
         /* ---------- 2a. local DOM search: runs immediately ---------- */
@@ -76,11 +76,11 @@ export const useSearchLogic = () => {
         }
 
         /* Only keep the result of the most-recent keystroke batch */
-        if (searchId === latestSearchId) {
+        if (searchId === latestSearchIdRef.current) {
           setResults(results);
         }
       } catch {
-        if (searchId === latestSearchId) {
+        if (searchId === latestSearchIdRef.current) {
           setResults({ header: "Search failed. Please try again.", items: [], isLoading: false });
         }
       }
@@ -103,4 +103,10 @@ export const useSearchLogic = () => {
       setResults({ header: "Please enter a search term.", items: [], isLoading: false });
     }
   }, [query, isOpen, debouncedTriggerSearch, setResults]);
+
+  useEffect(() => {
+    return () => {
+      debouncedTriggerSearch.cancel?.();
+    };
+  }, [debouncedTriggerSearch]);
 };

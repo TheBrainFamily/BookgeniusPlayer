@@ -14,7 +14,10 @@ export const usePaywall = () => {
 
     if (bookDataLoader.getBookVisibility() !== "full") {
       let timeout: ReturnType<typeof setTimeout>;
-      if ((getBookData().metadata.bookForm === "play" && currentChapter > 2) || (getBookData().metadata.bookForm === "book" && currentChapter > 1)) {
+      if (
+        (getBookData().metadata.bookForm === "play" && currentChapter > 2) ||
+        ((getBookData().metadata.bookForm === "book" || getBookData().metadata.bookForm === "mixed") && currentChapter > 1)
+      ) {
         timeout = setTimeout(() => {
           window.dispatchEvent(new CustomEvent("ShowPaywall", { detail: { bookSlug: getBookData().slug, bookTitle: getBookData().metadata.title } }));
         }, 2000);

@@ -18,7 +18,11 @@ type InfoPerChapter = {
   paragraphsWhereExits?: number[];
 };
 
-export type CharacterData = { slug: string; characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[] };
+export type ChapterParagraphRef = { chapter: number; paragraph: number };
+
+export type CharacterOverride = { from: ChapterParagraphRef; to?: ChapterParagraphRef; summary?: string; display?: string; avatar?: string };
+
+export type CharacterData = { slug: string; characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; overrides?: CharacterOverride[] };
 
 type BookMetadata = { title: string; author: string; language?: string; bookForm?: string };
 

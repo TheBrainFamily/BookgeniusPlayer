@@ -10,6 +10,10 @@ export interface Location {
   currentChapter: number;
   currentParagraph: number;
   lastScrollTimestamp?: number;
+  earliestVisibleParagraph: number | null;
+  latestVisibleParagraph: number | null;
+  earliestVisibleChapter: number | null;
+  latestVisibleChapter: number | null;
 }
 
 export interface LocationWithMetadata {
@@ -18,7 +22,18 @@ export interface LocationWithMetadata {
   source: "user" | "system";
 }
 
-export const DEFAULT_LOCATION: Location = { chapter: 1, paragraph: 0, endChapter: 1, endParagraph: 0, currentChapter: 1, currentParagraph: 0 };
+export const DEFAULT_LOCATION: Location = {
+  chapter: 1,
+  paragraph: 0,
+  endChapter: 1,
+  endParagraph: 0,
+  currentChapter: 1,
+  currentParagraph: 0,
+  earliestVisibleParagraph: null,
+  latestVisibleParagraph: null,
+  earliestVisibleChapter: null,
+  latestVisibleChapter: null,
+};
 
 /* ------------------------------------------------------------------ */
 /*  Load the *initial* reader position from LS — nothing more         */
@@ -41,6 +56,18 @@ export const LocationContext = createContext<LocationCtx>({ location: DEFAULT_LO
 
 /* ------------------------------------------------------------------ */
 export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const areLocationsEqual = (a: Location, b: Location): boolean => {
+    return (
+      a.chapter === b.chapter &&
+      a.paragraph === b.paragraph &&
+      a.endChapter === b.endChapter &&
+      a.endParagraph === b.endParagraph &&
+      a.currentChapter === b.currentChapter &&
+      a.currentParagraph === b.currentParagraph
+      // Note: intentionally ignoring lastScrollTimestamp to avoid churn
+    );
+  };
+
   // Load initial location from URL hash or localStorage
   const initialLocation = useMemo(() => {
     const hashLocation = parseLocationFromHash();
@@ -51,10 +78,17 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [lastSystemLocation, setLastSystemLocation] = useState<LocationWithMetadata | null>(null);
 
   const setLocation = useCallback((loc: Location, source: "user" | "system" = "user") => {
-    setLocationState(loc);
+    let didChange = false;
 
-    // Track system-driven location changes
-    if (source === "system") {
+    setLocationState((prev) => {
+      if (areLocationsEqual(prev, loc)) {
+        return prev; // no-op if nothing meaningful changed
+      }
+      didChange = true;
+      return loc;
+    });
+
+    if (didChange && source === "system") {
       setLastSystemLocation({ location: loc, timestamp: Date.now(), source: "system" });
     }
   }, []);

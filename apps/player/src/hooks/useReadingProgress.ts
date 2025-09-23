@@ -8,23 +8,23 @@ export const useReadingProgress = (chaptersStructure: ChapterStructure[], totalP
   const { savedLocation } = useSavedLocation();
   const { location } = useLocation();
 
+  const { currentChapter, currentParagraph } = location;
+  const savedChapter = savedLocation?.currentChapter;
+  const savedParagraph = savedLocation?.currentParagraph;
   return useMemo(() => {
-    if (chaptersStructure.length === 0 || !location) {
+    if (chaptersStructure.length === 0 || currentChapter === undefined || currentParagraph === undefined) {
       return { chapterProgress: 0, bookProgress: 0, furthestProgress: 0 };
     }
-
-    const currentChapter = location.currentChapter || 1;
-    const currentParagraph = location.currentParagraph || 0;
 
     // Calculate current progress
     const chapterProgress = calculateChapterProgress(currentChapter);
     const bookProgress = calculateReadProgress(chaptersStructure, currentChapter, currentParagraph, totalParagraphs);
 
     // Calculate the furthest progress (from saved location or current if no saved location)
-    const furthestChapter = savedLocation?.currentChapter ?? currentChapter;
-    const furthestParagraph = savedLocation?.currentParagraph ?? currentParagraph;
+    const furthestChapter = savedChapter ?? currentChapter;
+    const furthestParagraph = savedParagraph ?? currentParagraph;
     const furthestProgress = calculateReadProgress(chaptersStructure, furthestChapter, furthestParagraph, totalParagraphs);
 
     return { chapterProgress, bookProgress, furthestProgress };
-  }, [chaptersStructure, totalParagraphs, location, savedLocation]);
+  }, [chaptersStructure, totalParagraphs, currentChapter, currentParagraph, savedChapter, savedParagraph]);
 };

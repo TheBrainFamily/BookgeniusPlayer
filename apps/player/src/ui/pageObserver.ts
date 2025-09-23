@@ -13,7 +13,7 @@ let cachedIsPlayFormat: boolean | null = null;
 function getIsPlayFormat(): boolean {
   if (cachedIsPlayFormat === null) {
     const bookData = getBookData();
-    cachedIsPlayFormat = bookData.metadata.bookForm === "play";
+    cachedIsPlayFormat = bookData.metadata.bookForm === "play" || bookData.metadata.bookForm === "mixed";
   }
   return cachedIsPlayFormat;
 }
@@ -70,7 +70,14 @@ function makeRafScheduler(fn: () => void) {
 
 export function setupPageObserver(
   openCharacterDetailsModal: (params: CharacterModalParams) => void,
-): { observer: IntersectionObserver; observeNewParagraphs: () => number; cleanupRemovedParagraphs: () => number; cleanup: () => void } | null {
+): {
+  observer: IntersectionObserver;
+  observeNewParagraphs: () => number;
+  cleanupRemovedParagraphs: () => number;
+  observeNewSpacers: () => number;
+  cleanupRemovedSpacers: () => number;
+  cleanup: () => void;
+} | null {
   const rootEl = document.getElementById("content-container");
   if (!rootEl) {
     console.warn("[PageObserver] No #content-container - cannot create observer.");
@@ -91,10 +98,25 @@ export function setupPageObserver(
   // Keep track of observed paragraphs to avoid re-observing
   const observedParagraphs = new Set<Element>();
 
+  // Prevent redundant location updates when values are equivalent
+  type MinimalLoc = { chapter: number; paragraph: number; endChapter: number; endParagraph: number; currentChapter: number; currentParagraph: number };
+  let lastSentLocation: MinimalLoc | null = null;
+  const isSameLoc = (a: MinimalLoc | null, b: MinimalLoc): boolean => {
+    return (
+      !!a &&
+      a.chapter === b.chapter &&
+      a.paragraph === b.paragraph &&
+      a.endChapter === b.endChapter &&
+      a.endParagraph === b.endParagraph &&
+      a.currentChapter === b.currentChapter &&
+      a.currentParagraph === b.currentParagraph
+    );
+  };
+
   const processIntersections = () => {
     const rootRect = observerOptions.root.getBoundingClientRect();
     const topMultiplier = 0.35; // 35vh focus zone start
-    let bottomMultiplier = 0.45; // 10vh focus zone height (default)
+    let bottomMultiplier = 0.55; // 10vh focus zone height (default)
 
     // Responsive focus zone adjustments
     const viewportHeight = window.innerHeight;
@@ -108,7 +130,7 @@ export function setupPageObserver(
 
     // Adjust for smaller screens (mobile)
     if (viewportHeight < 700) {
-      bottomMultiplier = 0.55; // Larger zone for smaller screens
+      bottomMultiplier = 0.9; // Larger zone for smaller screens
     }
 
     // Adjust for mobile portrait - ensure sufficient zone for chapter detection
@@ -118,7 +140,7 @@ export function setupPageObserver(
 
     // Adjust for very wide screens
     if (viewportWidth > 1600) {
-      bottomMultiplier = 0.42; // Smaller, more precise zone for large screens
+      bottomMultiplier = 0.52; // Smaller, more precise zone for large screens
     }
 
     const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
@@ -315,6 +337,26 @@ export function setupPageObserver(
                 return a.paragraph - b.paragraph;
               });
 
+            const isMobile = viewportHeight < 700 || viewportWidth < 768;
+
+            // On mobile, capture full viewport; on desktop, use 10% to 70% from top
+            const visibilityZoneTop = isMobile ? rootRect.top : rootRect.top + rootRect.height * 0.1;
+            const visibilityZoneBottom = isMobile ? rootRect.bottom : rootRect.top + rootRect.height * 0.7;
+
+            // Filter intersecting paragraphs to only include those within the visibility zone
+            const focusZoneIntersectingParagraphs = Array.from(intersectingPages)
+              .filter((element) => {
+                const elementRect = element.getBoundingClientRect();
+                // Check if element's vertical range overlaps with the visibility zone
+                return elementRect.top < visibilityZoneBottom && elementRect.bottom > visibilityZoneTop;
+              })
+              .map((element) => getParagraphInfo(element))
+              .filter((info) => info.chapter !== null && !isNaN(info.chapter) && info.paragraph !== null && !isNaN(info.paragraph))
+              .sort((a, b) => {
+                if (a.chapter !== b.chapter) return a.chapter - b.chapter;
+                return a.paragraph - b.paragraph;
+              });
+
             const RANGE_PADDING = 1;
             const isPlayFormat = getIsPlayFormat();
 
@@ -339,18 +381,34 @@ export function setupPageObserver(
               shouldUpdateHash = false;
             }
 
-            // Don't update location during system navigation to avoid conflicts with programmatic scrolling
-            setCurrentLocation(
-              {
-                chapter: rangeStartInfo.chapter,
-                paragraph: expandedStartParagraph,
-                endChapter: rangeEndInfo.chapter,
-                endParagraph: expandedEndParagraph,
-                currentChapter: activeParagraph.chapter,
-                currentParagraph: activeParagraph.paragraph,
-              },
-              { updateHash: shouldUpdateHash },
-            );
+            const nextLoc: MinimalLoc = {
+              chapter: rangeStartInfo.chapter,
+              paragraph: expandedStartParagraph,
+              endChapter: rangeEndInfo.chapter,
+              endParagraph: expandedEndParagraph,
+              currentChapter: activeParagraph.chapter,
+              currentParagraph: activeParagraph.paragraph,
+            };
+
+            if (!isSameLoc(lastSentLocation, nextLoc)) {
+              // Don't update location during system navigation to avoid conflicts with programmatic scrolling
+              setCurrentLocation(
+                {
+                  chapter: rangeStartInfo.chapter,
+                  paragraph: expandedStartParagraph,
+                  endChapter: rangeEndInfo.chapter,
+                  endParagraph: expandedEndParagraph,
+                  currentChapter: activeParagraph.chapter,
+                  currentParagraph: activeParagraph.paragraph,
+                  earliestVisibleParagraph: focusZoneIntersectingParagraphs[0]?.paragraph ?? null,
+                  latestVisibleParagraph: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.paragraph ?? null,
+                  earliestVisibleChapter: focusZoneIntersectingParagraphs[0]?.chapter ?? null,
+                  latestVisibleChapter: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.chapter ?? null,
+                },
+                { updateHash: shouldUpdateHash },
+              );
+              lastSentLocation = nextLoc;
+            }
 
             // Media uses viewport range (separate from character notes)
             if (allIntersectingParagraphs.length > 0) {
@@ -472,7 +530,6 @@ export function setupPageObserver(
   const paragraphsToObserve = rootEl.querySelectorAll("section[data-chapter] [data-index]");
 
   const spacersToObserve = rootEl.querySelectorAll(".transition-spacer");
-  console.log("Observing these spacers:", spacersToObserve);
 
   const spacerObserver = new IntersectionObserver(
     (entries) => {
@@ -492,11 +549,11 @@ export function setupPageObserver(
           // Spacer is at least partially visible
           if (rect.top >= 0) {
             // Spacer is entering from bottom or fully in view
-            if (visibilityPercent <= 0.5) {
-              // 0-50% visible: keep full opacity
+            if (visibilityPercent <= 0.4) {
+              // 0-40% visible: keep full opacity
               rootEl.style.opacity = "1";
             } else if (visibilityPercent < 1) {
-              // 50-99% visible: fade from 1 to 0
+              // 40-99% visible: fade from 1 to 0
               const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
 
               setCurrentLocation({
@@ -506,9 +563,13 @@ export function setupPageObserver(
                 endParagraph: 0,
                 currentChapter: parseInt(nextChapterStart, 10),
                 currentParagraph: 0,
+                earliestVisibleParagraph: 0,
+                latestVisibleParagraph: 0,
+                earliestVisibleChapter: parseInt(nextChapterStart, 10),
+                latestVisibleChapter: parseInt(nextChapterStart, 10),
               });
 
-              const fadePercent = (visibilityPercent - 0.5) * 2;
+              const fadePercent = (visibilityPercent - 0.4) * 2;
               rootEl.style.opacity = (1 - fadePercent).toString();
             } else {
               // 100% visible: full transparency
@@ -529,12 +590,47 @@ export function setupPageObserver(
         }
       });
     },
-    { threshold: Array.from(Array(101).keys()).map((i) => i / 100) },
+    { threshold: Array.from(Array(51).keys()).map((i) => i / 50) },
   );
 
+  const observedSpacers = new Set<Element>();
   spacersToObserve.forEach((spacer) => {
     spacerObserver.observe(spacer);
+    observedSpacers.add(spacer);
   });
+
+  const observeNewSpacers = (): number => {
+    const spacers = rootEl.querySelectorAll(".transition-spacer");
+    let added = 0;
+    spacers.forEach((spacer) => {
+      if (!observedSpacers.has(spacer)) {
+        spacerObserver.observe(spacer);
+        observedSpacers.add(spacer);
+        added++;
+      }
+    });
+    if (added > 0) {
+      console.log(`[PageObserver] Observed ${added} new spacers. Total: ${observedSpacers.size}`);
+    }
+    return added;
+  };
+
+  const cleanupRemovedSpacers = (): number => {
+    let removed = 0;
+    const toDelete: Element[] = [];
+    observedSpacers.forEach((spacer) => {
+      if (!spacer.isConnected) {
+        spacerObserver.unobserve(spacer);
+        toDelete.push(spacer);
+        removed++;
+      }
+    });
+    toDelete.forEach((s) => observedSpacers.delete(s));
+    if (removed > 0) {
+      console.log(`[PageObserver] Cleaned up ${removed} removed spacers. Total observed: ${observedSpacers.size}`);
+    }
+    return removed;
+  };
 
   const cleanup = () => {
     spacerObserver.disconnect();
@@ -557,6 +653,6 @@ export function setupPageObserver(
       observedParagraphs.add(paragraph);
     });
 
-    return { observer, observeNewParagraphs, cleanupRemovedParagraphs, cleanup };
+    return { observer, observeNewParagraphs, cleanupRemovedParagraphs, observeNewSpacers, cleanupRemovedSpacers, cleanup };
   }
 }

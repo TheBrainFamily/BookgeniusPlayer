@@ -6,13 +6,15 @@ import { useTranslation } from "react-i18next";
 import ModalUI from "./ModalUI";
 import CharacterMedia from "@player/components/CharacterMedia";
 import { CharacterData } from "@player/types/book";
-import { findCharacterSentences, SearchResultItemData } from "@player/searchModal";
+import { performCachedSearch, SearchResultItemData } from "@player/searchModal";
 import { getSavedLocation, systemNavigateTo } from "@player/helpers/paragraphsNavigation";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
 import { DialogEnhanceClose } from "../ui/dialog";
 import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { useContentShift } from "@player/stores/contentShift.store";
+import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
+import { isVideoFile } from "@player/helpers/isVideoFile";
 
 interface CharacterModalProps {
   onClose: () => void;
@@ -20,17 +22,39 @@ interface CharacterModalProps {
   mediaSrc: string;
   characterSlug: string;
   endChapter: number;
+  chapter?: number;
+  paragraph?: number;
 }
 
 const findLatestSummaryInRange = (character: CharacterData, endChapter: number) =>
   character.infoPerChapter.filter((info) => info.chapter <= endChapter).sort((a, b) => b.chapter - a.chapter)[0]?.summary ?? "";
 
-const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, characterSlug, endChapter }) => {
+const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, characterSlug, endChapter, chapter, paragraph }) => {
   const { t } = useTranslation();
 
   const matchingCharacter = useMemo(() => getCharactersData().find((c) => c.slug === characterSlug), [characterSlug]);
-
   const latestSummary = useMemo(() => (matchingCharacter ? findLatestSummaryInRange(matchingCharacter, endChapter) : ""), [matchingCharacter, endChapter]);
+
+  const locationRef = useMemo(() => {
+    if (typeof chapter === "number" && typeof paragraph === "number") {
+      return { chapter, paragraph };
+    }
+    if (matchingCharacter) {
+      return { chapter: endChapter, paragraph: Number.MAX_SAFE_INTEGER };
+    }
+    return null;
+  }, [chapter, paragraph, matchingCharacter, endChapter]);
+
+  const snapshot = useMemo(
+    () =>
+      matchingCharacter
+        ? resolveCharacterSnapshot(matchingCharacter, { location: locationRef, baseSummary: latestSummary, fallbackDisplayName: matchingCharacter.characterName })
+        : null,
+    [matchingCharacter, locationRef, latestSummary],
+  );
+
+  const resolvedMediaSrc = snapshot?.media.listening ?? mediaSrc;
+  const resolvedIsVideo = useMemo(() => (resolvedMediaSrc ? isVideoFile(resolvedMediaSrc) : isVideo), [resolvedMediaSrc, isVideo]);
 
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,7 +83,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     setIsLoading(true);
 
     try {
-      const searchResults = findCharacterSentences(characterSlug, furthestLocation);
+      const searchResults = performCachedSearch(characterSlug.replaceAll("-", " "), furthestLocation);
 
       // 1. Unique chapters (first appearance in each chapter)
       const byChapter = new Map<number, SearchResultItemData>();
@@ -136,13 +160,13 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
             onPointerUp={(e) => e.stopPropagation()}
           >
             <CharacterMedia
-              mediaSrc={mediaSrc}
-              isVideo={isVideo}
+              mediaSrc={resolvedMediaSrc}
+              isVideo={resolvedIsVideo}
               canonicalName={matchingCharacter.slug}
               commonAttrs={{
-                "data-original-src": mediaSrc,
-                "data-character-name": matchingCharacter.characterName,
-                "data-summary": latestSummary,
+                "data-original-src": resolvedMediaSrc,
+                "data-character-name": snapshot?.displayName ?? matchingCharacter.characterName,
+                "data-summary": snapshot?.summary ?? latestSummary,
                 className: "w-full h-full object-cover",
               }}
             />
@@ -156,11 +180,11 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
           onPointerUp={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-center gap-2">
-            <h4 className="px-5 text-lg font-bold text-white">{matchingCharacter.characterName}</h4>
+            <h4 className="px-5 text-lg font-bold text-white">{snapshot?.displayName ?? matchingCharacter.characterName}</h4>
           </div>
 
           <div className="overflow-y-hidden space-y-3 px-1">
-            <p className="text-center text-white/90 text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: latestSummary }} />
+            <p className="text-center text-white/90 text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: snapshot?.summary ?? latestSummary }} />
 
             {(isLoading || characterAppearances.length > 0) && (
               <motion.div className="mt" variants={variants.appearances}>
@@ -213,7 +237,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               transition={{ delay: 0.2 }}
-                              dangerouslySetInnerHTML={{ __html: appearance.text }}
+                              dangerouslySetInnerHTML={{ __html: appearance.summary }}
                             />
 
                             <motion.div

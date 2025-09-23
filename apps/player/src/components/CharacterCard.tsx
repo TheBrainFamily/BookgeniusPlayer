@@ -10,6 +10,8 @@ import { cn } from "@player/lib/utils";
 import { useHighlight } from "@player/hooks/useHighlight";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
@@ -21,6 +23,18 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
   const { openModal } = useCharacterModal();
   const { highlightParagraphs, isScrollingLocked } = useHighlight();
   const bookSlug = bookDataLoader.getCurrentBook();
+
+  const characterData = useMemo(() => getCharactersData().find((character) => character.slug === entity.slug), [entity.slug]);
+
+  const locationRef = useMemo(() => ({ chapter: entity.chapterNumber, paragraph: entity.paragraphNumber }), [entity.chapterNumber, entity.paragraphNumber]);
+
+  const snapshot = useMemo(
+    () => (characterData ? resolveCharacterSnapshot(characterData, { location: locationRef, baseSummary: entity.summary, fallbackDisplayName: entity.characterName }) : null),
+    [characterData, locationRef, entity.summary, entity.characterName],
+  );
+
+  const displayName = snapshot?.displayName ?? entity.characterName;
+  const summary = snapshot?.summary ?? entity.summary;
 
   const cardRef = useRef<HTMLDivElement>(null);
   const rafIdRef = useRef<number | null>(null);
@@ -34,25 +48,27 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
 
   const mediaSrc = useMemo(() => {
     if (imageOnly) {
-      const base = entity.imageUrl || getListeningMediaFilePathForName(entity.slug, bookSlug);
+      const base = snapshot?.media.listening ?? entity.imageUrl ?? getListeningMediaFilePathForName(entity.slug, bookSlug);
       return getPlaceholderFromVideoUrl(base);
     }
 
-    // Always use listening source as base - CharacterMedia will handle both listening and speaking internally
-    return getListeningMediaFilePathForName(entity.slug, bookSlug);
-  }, [imageOnly, entity.imageUrl, entity.slug, bookSlug]);
+    return snapshot?.media.listening ?? getListeningMediaFilePathForName(entity.slug, bookSlug);
+  }, [imageOnly, snapshot, entity.imageUrl, entity.slug, bookSlug]);
 
   const isVideo = imageOnly ? false : isVideoFile(mediaSrc);
 
   const modalMediaSrc = useMemo(() => {
     if (imageOnly) {
+      if (snapshot) {
+        return isTalkingInCurrentRange ? snapshot.media.talking : snapshot.media.listening;
+      }
       return isTalkingInCurrentRange ? getTalkingMediaFilePathForName(entity.slug, bookSlug) : getListeningMediaFilePathForName(entity.slug, bookSlug);
     }
 
-    return mediaSrc;
-  }, [imageOnly, isTalkingInCurrentRange, entity.slug, mediaSrc, bookSlug]);
+    return snapshot?.media.listening ?? mediaSrc;
+  }, [imageOnly, isTalkingInCurrentRange, snapshot, entity.slug, bookSlug, mediaSrc]);
 
-  const modalIsVideo = isVideoFile(modalMediaSrc);
+  const modalIsVideo = useMemo(() => isVideoFile(modalMediaSrc), [modalMediaSrc]);
 
   const requestToggle = useCallback(
     (enable: boolean) => {
@@ -70,12 +86,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
     };
   }, []);
 
-  const commonAttrs = {
-    "data-original-src": mediaSrc,
-    "data-character-name": entity.slug,
-    "data-summary": entity.summary ?? "",
-    className: "w-full h-full object-cover block",
-  } as const;
+  const commonAttrs = { "data-original-src": mediaSrc, "data-character-name": displayName, "data-summary": summary ?? "", className: "w-full h-full object-cover block" } as const;
 
   const captionVisibilityClasses =
     captionMode === "always"
@@ -92,9 +103,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       data-appearances={JSON.stringify(apps)}
       onMouseEnter={() => requestToggle(true)}
       onMouseLeave={() => requestToggle(false)}
-      aria-label={entity.characterName}
-      title={entity.characterName}
-      onClick={() => openModal({ characterSlug: entity.slug, isVideo: modalIsVideo, mediaSrc: modalMediaSrc })}
+      aria-label={displayName}
+      title={displayName}
+      onClick={() => openModal({ characterSlug: entity.slug, isVideo: modalIsVideo, mediaSrc: modalMediaSrc, chapter: entity.chapterNumber, paragraph: entity.paragraphNumber })}
     >
       <motion.div
         layout
@@ -121,9 +132,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
         >
           <div className="py-0.5 px-1 sm:py-1 sm:px-2 md:py-1.5 md:px-3 flex flex-col items-center justify-center">
             <h4 className="w-full whitespace-nowrap overflow-hidden text-ellipsis text-[8px] sm:text-[10px] md:text-xs font-bold text-white tracking-wide uppercase">
-              {entity.label || entity.characterName}
+              {entity.label || displayName}
             </h4>
-            {entity.summary && <p className="w-full whitespace-nowrap overflow-hidden text-ellipsis text-[7px] sm:text-[9px] md:text-xs italic text-gray-200">{entity.summary}</p>}
+            {summary && <p className="w-full whitespace-nowrap overflow-hidden text-ellipsis text-[7px] sm:text-[9px] md:text-xs italic text-gray-200">{summary}</p>}
           </div>
         </div>
       )}

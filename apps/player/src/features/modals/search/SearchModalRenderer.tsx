@@ -1,7 +1,8 @@
 import React from "react";
 import { createPortal } from "react-dom";
+
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
-import SearchModal from "@player/components/modals/SearchModal";
+import { SearchModal } from "@player/components/modals/SearchModal";
 import { useSearchLogic } from "./useSearchLogic";
 import { useEscapeKey } from "@player/hooks/useEscapeKey";
 
