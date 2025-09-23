@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Button } from "@wukong/components/ui/button";
 import { Input } from "@wukong/components/ui/input";
-import { Search, BookOpen, User, Info } from "lucide-react";
+import { Search, BookOpen, User, Info, LogOut } from "lucide-react";
 import AboutModal from "./AboutModal";
 import SignInModal from "./SignInModal";
+import { useIntegrations } from "@platform/integrations";
 
 const Header = () => {
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
@@ -23,10 +24,7 @@ const Header = () => {
               <Info className="h-4 w-4 mr-2" />
               About
             </Button>
-            <Button variant="mystical" size="sm" onClick={() => setIsSignInModalOpen(true)}>
-              <User className="h-4 w-4" />
-              Sign In
-            </Button>
+            <LoginComponent />
           </nav>
         </div>
       </header>
@@ -36,6 +34,39 @@ const Header = () => {
       <SignInModal isOpen={isSignInModalOpen} onClose={() => setIsSignInModalOpen(false)} />
     </>
   );
+};
+
+const LoginComponent = () => {
+  const { authMod } = useIntegrations();
+  if (!authMod) return null;
+
+  const { ready: authReady, isSignedIn, openSignIn, signOut } = authMod.useAuth();
+  const UserWidget = authMod.useUserWidget?.();
+  const SignInWidget = authMod.useSignInWidget?.();
+
+  if (!authReady) return null;
+
+  if (isSignedIn) {
+    if (UserWidget) {
+      return (
+        <>
+          <UserWidget />
+          {/* <Button variant="ghost" size="icon" className="text-foreground hover:text-library-gold hover:bg-library-walnut/50">
+                          <Settings className="h-5 w-5" />
+                        </Button> */}
+        </>
+      );
+    } else {
+      return (
+        <Button onClick={() => signOut && signOut()} variant="mystical">
+          "Sign out"
+          <LogOut className="h-5 w-5" />
+        </Button>
+      );
+    }
+  } else if (SignInWidget) {
+    return <SignInWidget onClick={openSignIn} />;
+  }
 };
 
 export default Header;
