@@ -14,8 +14,9 @@ import { OptionalElement } from "./OptionalElement";
 import { useElementVisibilityStore } from "@player/stores/elementVisibility.store";
 import { hasApiKey } from "@player/utils/apiKeyManager";
 import { useApiKeyModal } from "@player/stores/modals/apiKeyModal.store";
-import type { CharacterData, Filter } from "@player/types/book";
+import type { CharacterData } from "@player/types/book";
 import { askCall } from "@player/askCall";
+import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { useBottomInput } from "@player/stores/modals/bottomInput.store";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 
@@ -52,12 +53,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
   const { pauseAllTimers, startAllTimers, showAllElements } = useElementVisibilityStore();
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
-  const { openModal: openDeepResearchModal, setContent: setDeepResearchContent } = useDeepResearchModal();
+  const { openModal: openDeepResearchModal, setContent: setDeepResearchContent, closeModal: closeDeepResearchModal, isOpen: isDeepResearchModalOpen } = useDeepResearchModal();
+  const { closeModal: closeCharacterModal, isOpen: isCharacterModalOpen } = useCharacterModal();
   const { openModal: openApiKeyModal } = useApiKeyModal();
 
   const { startRecording, stopRecording, response } = useRealtime();
   const { location } = useLocation();
-  const { chapter: currentChapter, paragraph: currentParagraph } = location;
 
   const allCharacters = useMemo(() => {
     try {
@@ -111,6 +112,14 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const openModalWithFocus = useCallback(() => {
     if (isDeepResearchActive) return;
 
+    if (isDeepResearchModalOpen) {
+      closeDeepResearchModal();
+    }
+
+    if (isCharacterModalOpen) {
+      closeCharacterModal();
+    }
+
     if (!isSearchModalOpen) {
       openSearchModal(true, true, value.trim());
     }
@@ -126,7 +135,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       const length = inputEl.value.length;
       inputEl.setSelectionRange(length, length);
     });
-  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value]);
+  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value, isDeepResearchModalOpen, closeDeepResearchModal, isCharacterModalOpen, closeCharacterModal]);
 
   const handleAsk = useCallback(
     async (query: string) => {
@@ -181,6 +190,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const executeDeepResearch = useCallback(
     (query: string) => {
       setIsThinking(true);
+
+      if (isCharacterModalOpen) {
+        closeCharacterModal();
+      }
+
       openDeepResearchModal(undefined, true, true);
 
       deepResearchCall(query, location)
@@ -197,7 +211,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         })
         .finally(() => setIsThinking(false));
     },
-    [location, setDeepResearchContent, t, openDeepResearchModal],
+    [location, setDeepResearchContent, t, openDeepResearchModal, isCharacterModalOpen, closeCharacterModal],
   );
 
   const handleSubmit = useCallback(
@@ -395,7 +409,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         ref={containerRef}
         data-keep-modal-open="true"
       >
-        <motion.div key="expanded" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+        <motion.div key="expanded" variants={variants.expandedContainer} initial="initial" animate="animate" exit="exit">
           <form onSubmit={handleSubmit} className="flex items-center space-x-2 min-w-[280px] sm:min-w-[350px]">
             <div className="relative flex-grow flex items-center">
               <AnimatePresence>
@@ -403,10 +417,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                   <motion.div
                     key="recording-indicator"
                     className="absolute left-2 w-3 h-3 rounded-full bg-red-500"
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.05, 1] }}
-                    exit={{ opacity: 0, scale: 0, transition: { duration: 0.2 } }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    variants={variants.recordingIndicator}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
                   />
                 )}
               </AnimatePresence>
@@ -512,7 +526,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                         className={cn("p-2 rounded-full flex items-center justify-center cursor-pointer", isRecording ? "text-red-400" : "text-white/70")}
                         style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
                         whileHover={!isRecording ? "hover" : undefined}
-                        whileTap={{ scale: 1.2 }}
+                        whileTap="tapMic"
                         variants={variants.button}
                         initial="idle"
                         animate={isRecording ? "recording" : "idle"}
@@ -568,6 +582,7 @@ const variants: Record<string, Variants> = {
   button: {
     hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
     tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
+    tapMic: { scale: 1.2 },
     idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", color: "rgba(255, 255, 255, 0.7)", transition: { duration: 0.3 } },
     recording: {
       scale: [1, 1.1, 1],
@@ -588,5 +603,11 @@ const variants: Record<string, Variants> = {
       borderColor: ["rgba(255, 255, 255, 0.3)", "rgba(239, 68, 68, 0.6)", "rgba(255, 255, 255, 0.3)"],
       transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
     },
+  },
+  expandedContainer: { initial: { opacity: 0 }, animate: { opacity: 1, transition: { duration: 0.2 } }, exit: { opacity: 0, transition: { duration: 0.2 } } },
+  recordingIndicator: {
+    initial: { opacity: 0, scale: 0.5 },
+    animate: { opacity: [0.5, 1, 0.5], scale: [1, 1.05, 1], transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" } },
+    exit: { opacity: 0, scale: 0, transition: { duration: 0.2 } },
   },
 };

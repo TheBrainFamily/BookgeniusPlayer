@@ -12,6 +12,7 @@
     "build:player:docker": "pnpm --filter player build-for-docker",
     "build:player:front": "pnpm --filter player build-for-docker-front",
     "build:platform": "pnpm --filter platform build",
+    "build:wukong": "pnpm --filter wukong build",
     "prepare:docker": "bun run ./tools/scripts/prepare-docker-build.ts",
     "build:front-parallel": "run-p build:player:front build:platform",
     "build:docker:with-books": "run-s build:player:docker build:platform",
