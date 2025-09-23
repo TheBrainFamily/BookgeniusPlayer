@@ -47,7 +47,7 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content,
           </motion.div>
         )}
         {content && !isLoading && (
-          <motion.div className="flex-grow overflow-y-auto pb-4" variants={variants.contentContainer} initial="initial" animate="animate">
+          <motion.div className="flex-grow overflow-y-auto -mt-2 pb-2" variants={variants.contentContainer} initial="initial" animate="animate">
             <motion.div className="relative overflow-hidden px-1" variants={variants.contentInner} initial="initial" animate="animate">
               <div className="prose dark:prose-invert max-w-none text-white/90">
                 <LLMAnswerViewer answerMarkdown={content} />

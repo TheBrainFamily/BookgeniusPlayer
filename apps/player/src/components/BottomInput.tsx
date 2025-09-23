@@ -15,6 +15,7 @@ import { useElementVisibilityStore } from "@player/stores/elementVisibility.stor
 import { hasApiKey } from "@player/utils/apiKeyManager";
 import { useApiKeyModal } from "@player/stores/modals/apiKeyModal.store";
 import { askCall } from "@player/askCall";
+import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 
 interface BottomInputProps {
   className?: string;
@@ -34,6 +35,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { pauseAllTimers, startAllTimers, showAllElements } = useElementVisibilityStore();
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
   const { openModal: openDeepResearchModal, setContent: setDeepResearchContent, closeModal: closeDeepResearchModal, isOpen: isDeepResearchModalOpen } = useDeepResearchModal();
+  const { closeModal: closeCharacterModal, isOpen: isCharacterModalOpen } = useCharacterModal();
   const { openModal: openApiKeyModal } = useApiKeyModal();
 
   const { startRecording, stopRecording, response } = useRealtime();
@@ -51,6 +53,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       closeDeepResearchModal();
     }
 
+    if (isCharacterModalOpen) {
+      closeCharacterModal();
+    }
+
     if (!isSearchModalOpen) {
       openSearchModal(true, true, value.trim());
     }
@@ -66,7 +72,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       const length = inputEl.value.length;
       inputEl.setSelectionRange(length, length);
     });
-  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value, isDeepResearchModalOpen, closeDeepResearchModal]);
+  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value, isDeepResearchModalOpen, closeDeepResearchModal, isCharacterModalOpen, closeCharacterModal]);
 
   const handleAsk = useCallback(
     async (query: string) => {
@@ -120,6 +126,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const executeDeepResearch = useCallback(
     (query: string) => {
       setIsThinking(true);
+
+      if (isCharacterModalOpen) {
+        closeCharacterModal();
+      }
+
       openDeepResearchModal(undefined, true, true);
 
       deepResearchCall(query, location)
@@ -136,7 +147,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         })
         .finally(() => setIsThinking(false));
     },
-    [location, setDeepResearchContent, t, openDeepResearchModal],
+    [location, setDeepResearchContent, t, openDeepResearchModal, isCharacterModalOpen, closeCharacterModal],
   );
 
   const handleSubmit = useCallback(

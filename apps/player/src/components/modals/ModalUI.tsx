@@ -199,7 +199,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             )}
 
             <motion.div
-              className="px-4 overflow-y-auto opened-modal"
+              className="p-4 overflow-y-auto opened-modal"
               layout={animateHeight}
               transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}
               onClick={(e) => {

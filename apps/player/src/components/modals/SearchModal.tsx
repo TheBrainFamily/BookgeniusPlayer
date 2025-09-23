@@ -144,9 +144,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
         )}
 
         {showContent && (
-          <motion.div className="flex-grow overflow-y-auto pb-4" variants={variants.content} initial="hidden" animate="visible" key="content">
+          <motion.div className="flex-grow overflow-y-auto" variants={variants.content} initial="hidden" animate="visible" key="content">
             {hasItems ? (
-              <motion.div className="space-y-3" variants={variants.container} initial="hidden" animate="visible">
+              <motion.div className="space-y-3 -mt-3" variants={variants.container} initial="hidden" animate="visible">
                 <Accordion type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
                   {sortedChapterEntries.map(([chapter, items]) => (
                     <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} />
