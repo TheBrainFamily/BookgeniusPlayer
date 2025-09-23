@@ -2,9 +2,10 @@ import { useEffect, useMemo, useRef } from "react";
 import debounce from "lodash.debounce";
 
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
-import { performCachedSearch, performUnifiedSearch } from "@player/searchModal";
+import { findCharacterSentences, performCachedSearch, performUnifiedSearch } from "@player/searchModal";
 import { Location } from "@player/state/LocationContext";
 import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 
 export const useSearchLogic = () => {
   const { query, isOpen, setResults } = useSearchModal();
@@ -60,7 +61,14 @@ export const useSearchLogic = () => {
 
       try {
         /* ---------- 2a. local DOM search: runs immediately ---------- */
-        let results = performCachedSearch(searchQuery, location);
+
+        const character = getCharactersData().find(
+          (character) => character.slug.toLowerCase() === searchQuery.toLowerCase() || character.characterName.toLowerCase() === searchQuery.toLowerCase(),
+        );
+
+        console.log("67: character BANG!", character);
+
+        let results = character ? findCharacterSentences(character.slug, location) : performCachedSearch(searchQuery, location);
 
         // If the cache is still indexing, it will return isLoading: true
         if (results.isLoading) {

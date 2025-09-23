@@ -17,6 +17,7 @@ import { hasApiKey } from "@player/utils/apiKeyManager";
 import { useApiKeyModal } from "@player/stores/modals/apiKeyModal.store";
 import { Filter } from "@player/types/book";
 import { askCall } from "@player/askCall";
+import { useBottomInput } from "@player/stores/modals/bottomInput.store";
 
 interface BottomInputProps {
   className?: string;
@@ -25,7 +26,7 @@ interface BottomInputProps {
 const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { t } = useTranslation();
 
-  const [value, setValue] = useState("");
+  const { value, setValue } = useBottomInput();
   const [isRecording, setIsRecording] = useState(false);
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
