@@ -151,6 +151,9 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_AUTH_PROVIDER: ${{ vars.VITE_AUTH_PROVIDER }}
           VITE_PAYMENTS_PROVIDER: ${{ vars.VITE_PAYMENTS_PROVIDER }}
+          VITE_CLERK_DOMAIN: "wukong.bookgenius.net"
+          VITE_PUBLIC_CLERK_SIGN_IN_URL: https://bookgenius.net/sign-in
+          VITE_PUBLIC_CLERK_SIGN_UP_URL: https://bookgenius.net/sign-up
           VITE_SUPPORT_EMAIL: support@bookgenius.net
           CI: true
 
