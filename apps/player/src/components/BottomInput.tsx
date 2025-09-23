@@ -19,8 +19,9 @@ import { askCall } from "@player/askCall";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { useBottomInput } from "@player/stores/modals/bottomInput.store";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
 
-const hasPlayerMetCharacter = (character: CharacterData, chapter: number, paragraph: number): boolean => {
+const hasReaderMetCharacter = (character: CharacterData, chapter: number, paragraph: number): boolean => {
   return character.infoPerChapter.some((infoPerChapter) => {
     const encounteredParagraphs = [...infoPerChapter.paragraphsWhereSpotted, ...infoPerChapter.paragraphsWhereTalking, ...(infoPerChapter.paragraphsWhereEnters ?? [])];
 
@@ -59,7 +60,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
   const { startRecording, stopRecording, response } = useRealtime();
   const { location } = useLocation();
-  const { chapter: currentChapter, paragraph: currentParagraph } = location;
+  const furthestLocation = getSavedLocation();
 
   const allCharacters = useMemo(() => {
     try {
@@ -73,10 +74,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const availableCharacterNames = useMemo(() => {
     if (!allCharacters.length) return [];
     return allCharacters
-      .filter((character) => hasPlayerMetCharacter(character, currentChapter, currentParagraph))
+      .filter((character) => hasReaderMetCharacter(character, furthestLocation.chapter, furthestLocation.paragraph))
       .map((character) => character.characterName)
       .filter(Boolean);
-  }, [allCharacters, currentChapter, currentParagraph]);
+  }, [allCharacters, furthestLocation.chapter, furthestLocation.paragraph]);
 
   const [mentionState, setMentionState] = useState<{ isActive: boolean; query: string; startIndex: number }>({ isActive: false, query: "", startIndex: -1 });
   const [highlightedMention, setHighlightedMention] = useState(0);

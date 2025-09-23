@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import ModalUI from "./ModalUI";
 import CharacterMedia from "@player/components/CharacterMedia";
 import { CharacterData } from "@player/types/book";
-import { findCharacterSentences, performCachedSearch, SearchResultItemData, SearchResultsData } from "@player/searchModal";
+import { findCharacterSentences, SearchResultItemData } from "@player/searchModal";
 import { getSavedLocation, systemNavigateTo } from "@player/helpers/paragraphsNavigation";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
