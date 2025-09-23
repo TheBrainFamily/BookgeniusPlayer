@@ -251,140 +251,6 @@ const calculatePercentInChapter = (paragraphNumber: number, totalParagraphs: num
   return Math.max(0, Math.min(100, Math.round((paragraphNumber / totalParagraphs) * 100)));
 };
 
-const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) => {
-  // Create a temporary DOM element to properly parse the HTML
-  const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = paragraph;
-
-  const characterElements = tempDiv.querySelectorAll(`[data-character="${characterSlug}"]`);
-  if (characterElements.length === 0) {
-    return "";
-  }
-
-  const results: { html: string; offset: number }[] = [];
-
-  // Compute the character offset of the first text inside target relative to the root's text content
-  const getTextOffset = (root: HTMLElement, target: Element): number => {
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
-    let offset = 0;
-    let node: Node | null;
-    while ((node = walker.nextNode())) {
-      if (target.contains(node)) {
-        break;
-      }
-      offset += (node.nodeValue || "").length;
-    }
-    return offset;
-  };
-
-  characterElements.forEach((characterElement) => {
-    // Find the sentence span that contains this character element
-    const sentenceSpan = characterElement.closest('span[id^="ch"][id*="-s"]');
-
-    if (sentenceSpan) {
-      // Get the sentence text with HTML intact
-      let sentenceHTML = sentenceSpan.outerHTML;
-
-      // Clean up the sentence HTML - remove the id and style attributes
-      sentenceHTML = sentenceHTML.replace(/\s*id="[^"]*"/g, "");
-      sentenceHTML = sentenceHTML.replace(/\s*style="[^"]*"/g, "");
-
-      results.push({ html: sentenceHTML, offset: getTextOffset(tempDiv, characterElement) });
-    } else {
-      // Fallback: if no sentence span found, try to get surrounding context
-      let context = "";
-      let current = characterElement;
-      const currentHasNoWrap = current.closest("span.text-nowrap");
-      if (currentHasNoWrap) {
-        current = currentHasNoWrap;
-      }
-
-      // Get up to 10 words before
-      let wordsBefore = [];
-      let beforeElement = current.previousSibling;
-
-      while (beforeElement && wordsBefore.length < 14) {
-        if (beforeElement.nodeType === Node.TEXT_NODE || beforeElement.nodeType === Node.ELEMENT_NODE) {
-          const words = beforeElement.textContent
-            .trim()
-            .split(/\s+/)
-            .filter((w) => w);
-          wordsBefore.unshift(...words.slice(-14));
-        }
-        beforeElement = beforeElement.previousSibling;
-      }
-
-      const characterHTML = characterElement.outerHTML;
-
-      // Get up to 10 words after
-      let wordsAfter = [];
-      let afterElement = current.nextSibling;
-      while (afterElement && wordsAfter.length < 14) {
-        if (afterElement.nodeType === Node.TEXT_NODE || afterElement.nodeType === Node.ELEMENT_NODE) {
-          const words = afterElement.textContent
-            .trim()
-            .split(/\s+/)
-            .filter((w) => w);
-          wordsAfter.push(...words.slice(0, 14));
-        }
-        afterElement = afterElement.nextSibling;
-      }
-
-      let characterSlugMissingPunctuation = "";
-      if (wordsBefore.length === 0 || wordsAfter.length === 0) {
-        const words = tempDiv.textContent
-          .trim()
-          .split(/\s+/)
-          .filter((w) => w);
-
-        const characterSlugIndex = words.findIndex((word) => word.includes(characterSlug));
-        if (characterSlugIndex !== -1) {
-          characterSlugMissingPunctuation = words[characterSlugIndex].replace(characterSlug, "");
-          wordsBefore = words.slice(0, characterSlugIndex);
-          wordsAfter = words.slice(characterSlugIndex + 1);
-        }
-      }
-
-      // Combine context
-      const before = wordsBefore.slice(-14).join(" ");
-      const after = wordsAfter.slice(0, 14).join(" ");
-      context = `${before ? before + " " : ""}${characterHTML}${characterSlugMissingPunctuation}${after ? " " + after : ""}`;
-
-      // Remove space before punctuation marks
-      context = context.replace(/\s+([.,;:!?])/g, "$1");
-
-      if (context.trim()) {
-        results.push({ html: context.trim(), offset: getTextOffset(tempDiv, characterElement) });
-      }
-    }
-  });
-
-  // Filter out very close hits (near-overlapping). Use a small character-distance threshold.
-  const MIN_CHAR_GAP = 60; // roughly "a few words" apart
-  const sortedByOffset = [...results].sort((a, b) => a.offset - b.offset);
-  const filteredByProximity: { html: string; offset: number }[] = [];
-  for (const entry of sortedByOffset) {
-    const last = filteredByProximity[filteredByProximity.length - 1];
-    if (!last || entry.offset - last.offset >= MIN_CHAR_GAP) {
-      filteredByProximity.push(entry);
-    }
-  }
-
-  // Ensure uniqueness by HTML and join
-  const seenHtml = new Set<string>();
-  const uniqueHtmls: string[] = [];
-  for (const entry of filteredByProximity) {
-    if (!seenHtml.has(entry.html)) {
-      seenHtml.add(entry.html);
-      uniqueHtmls.push(entry.html);
-    }
-  }
-
-  const finalResult = uniqueHtmls.join(" ");
-
-  return finalResult;
-};
-
 const SUMMARY_TRUNCATE_LENGTH = 210;
 
 export function findCharacterSentences(characterSlug: string, currentLocation: Location) {
@@ -431,7 +297,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
           if (!paragraphElement) return;
 
           const tagName = paragraphElement.tagName.toLowerCase();
-          const isStageDirectory = paragraphElement.querySelector("span em");
+          const isStageDirectory = paragraphElement.getAttribute("data-is-didaskalia") === "true";
 
           if (tagName === "h3" || tagName === "h4" || tagName === "h5" || isStageDirectory) return;
 
@@ -567,8 +433,6 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
                 }
               }
             }
-
-            // console.log("439: x BANG!", x);
           } else {
             const paragraphInnerHTML = paragraphElement.innerHTML;
 
@@ -620,7 +484,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
             });
           } else {
             const tagName = paragraphElement.tagName.toLowerCase();
-            const isStageDirectory = paragraphElement.querySelector("span em");
+            const isStageDirectory = paragraphElement.getAttribute("data-is-didaskalia") === "true";
 
             if (tagName === "h3" || tagName === "h4" || tagName === "h5" || isStageDirectory) return;
 
