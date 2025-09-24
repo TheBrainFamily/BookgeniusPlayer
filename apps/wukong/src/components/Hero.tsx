@@ -1,6 +1,6 @@
 import { Button } from "@wukong/components/ui/button";
 import { Play, BookOpen } from "lucide-react";
-import heroImage from "@wukong/assets/wukong-hero.png";
+import heroImage from "@wukong/assets/wukong-hero.jpg";
 
 const Hero = () => {
   return (

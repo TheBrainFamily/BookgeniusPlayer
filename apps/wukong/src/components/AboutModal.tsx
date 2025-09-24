@@ -14,7 +14,7 @@ const AboutModal = ({ isOpen, onClose }: AboutModalProps) => {
 
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-4xl bg-transparent border-none shadow-none p-0 [&>button]:hidden z-50">
-          <div className="bg-background/95 backdrop-blur-sm border border-accent/20 rounded-lg p-8 relative">
+          <div className="bg-background/95 backdrop-blur-sm border border-accent/20 rounded-lg p-8 relative max-h-[90vh] overflow-y-auto">
             {/* Close Button */}
             <div className="absolute top-4 right-4">
               <button onClick={onClose} className="text-muted-foreground hover:text-accent transition-colors">
