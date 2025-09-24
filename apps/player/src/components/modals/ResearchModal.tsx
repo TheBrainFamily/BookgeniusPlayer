@@ -1,23 +1,24 @@
 import React from "react";
 import { motion, Variants } from "motion/react";
-import { Brain, FileSearch } from "lucide-react";
+import { Brain, FileSearch, TelescopeIcon } from "lucide-react";
 
 import ModalUI from "./ModalUI";
 import { LLMAnswerViewer } from "@player/ui/MarkdownComponent";
 
-interface DeepResearchModalProps {
+interface ResearchModalProps {
   onClose: () => void;
   content?: string;
   layoutView?: boolean;
   hideOverlay?: boolean;
   isLoading?: boolean;
+  state: "deep" | "ask";
 }
 
-const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content, layoutView, hideOverlay, isLoading }) => {
+const ResearchModal: React.FC<ResearchModalProps> = ({ onClose, content, layoutView, hideOverlay, isLoading, state }) => {
   const modalTitle = (
     <div className="flex items-center gap-2">
-      <Brain size={20} className="mb-1" />
-      <span>Deep Research</span>
+      {state === "ask" ? <Brain size={20} /> : <TelescopeIcon size={20} />}
+      <span>{state === "ask" ? "Ask Search" : "Deep Research"}</span>
     </div>
   );
 
@@ -82,4 +83,4 @@ const variants: Record<string, Variants> = {
   noResults: { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0, transition: { delay: 0.3 } } },
 };
 
-export default DeepResearchModal;
+export default ResearchModal;
