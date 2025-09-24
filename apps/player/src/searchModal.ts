@@ -14,7 +14,12 @@ export interface SearchResultItemData {
   summary: string;
   text?: string;
   id: string; // For React keys
-  type?: "spotted" | "talking";
+  type?: SearchType;
+}
+
+enum SearchType {
+  SPOTTED = "Spotted",
+  TALKING = "Talking",
 }
 
 export interface SearchResultsData {
@@ -40,7 +45,7 @@ const highlightMatchedWords = (text: string, query: string): string => {
   const pattern = new RegExp(escapedQuery, "gi");
 
   // Replace matched text with highlighted version using theme-appropriate colors
-  return text.replace(pattern, '<mark class="bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm">$&</mark>');
+  return text.replace(pattern, `<mark class="${CHARACTER_HIGHLIGHT_CLASS}">$&</mark>`);
 };
 
 /**
@@ -253,6 +258,7 @@ const calculatePercentInChapter = (paragraphNumber: number, totalParagraphs: num
 };
 
 const SUMMARY_TRUNCATE_LENGTH = 210;
+const CHARACTER_HIGHLIGHT_CLASS = "bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm";
 
 interface FindCharacterSentencesOptions {
   mode?: "chronological" | "spotlight";
@@ -434,7 +440,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
                     percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
                     summary: formattedResult,
                     id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
-                    type: "spotted",
+                    type: SearchType.SPOTTED,
                   });
                 }
               }
@@ -462,7 +468,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
                 percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
                 summary: _sentence,
                 id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
-                type: "spotted",
+                type: SearchType.SPOTTED,
               });
             }
           }
@@ -479,14 +485,14 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
           const playRow = paragraphElement.closest(".play-row");
 
           if (isPlay && playRow) {
-            const characterDialogue = convertCharacterDialogue(playRow.innerHTML);
+            const characterDialogue = convertCharacterDialogue(playRow);
             talkingCharacterItems.push({
               chapter,
               paragraphNumber: paragraph,
               percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
-              summary: characterDialogue,
+              summary: formatWithHangingIndent(characterDialogue),
               id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
-              type: "talking",
+              type: SearchType.TALKING,
             });
           } else {
             const tagName = paragraphElement.tagName.toLowerCase();
@@ -516,7 +522,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
                 percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
                 summary: _sentence,
                 id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
-                type: "talking",
+                type: SearchType.TALKING,
               });
             }
           }
@@ -587,7 +593,7 @@ function filterParagraphByCharacter(paragraph, characterSlug) {
       element.replaceWith(document.createTextNode(textContent));
     } else {
       const markElement = document.createElement("mark");
-      markElement.className = "bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm";
+      markElement.className = CHARACTER_HIGHLIGHT_CLASS;
       markElement.textContent = element.textContent;
       element.replaceWith(markElement);
     }
@@ -681,25 +687,43 @@ function extractTextAroundMark(paragraph) {
   return result;
 }
 
-function convertCharacterDialogue(htmlInput: string): string {
-  // Extract character name from <strong> tags
-  const characterMatch = htmlInput.match(/<strong>(.*?)<\/strong>/);
-  const characterName = characterMatch ? characterMatch[1].trim() : "";
+function convertCharacterDialogue(playRow: Element): string {
+  if (!(playRow instanceof HTMLElement)) {
+    return "";
+  }
 
-  // Extract all text content by removing HTML tags
-  const textContent = htmlInput
-    .replace(/<[^>]*>/g, "") // Remove all HTML tags
-    .replace(/\s+/g, " ") // Normalize whitespace
-    .trim();
+  const characterText = playRow.querySelector(".character-text") as HTMLElement | null;
+  if (!characterText || !characterText.firstElementChild) {
+    return (playRow.textContent || "").trim();
+  }
 
-  // Remove the character name from the text
-  let dialogueText = textContent
-    .replace(new RegExp(`^${characterName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "i"), "")
-    .replace(/^\s*,?\s*/, "") // Remove leading comma/whitespace
-    .trim();
+  const characterNode = characterText.firstElementChild as HTMLElement;
+  const characterName = (characterNode.textContent || "").trim();
 
-  // Generate the output format
-  return `<mark class="bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm">${characterName}</mark>: ${dialogueText}`;
+  const dialogueLines = Array.from(characterText.children)
+    .slice(1)
+    .map((element) => (element.textContent || "").trim())
+    .filter((line) => line.length > 0);
+
+  const speakerLabel = characterName ? characterName.toUpperCase() : "";
+
+  if (!speakerLabel && dialogueLines.length === 0) {
+    return "";
+  }
+
+  if (!speakerLabel) {
+    return dialogueLines.join("\n");
+  }
+
+  const firstLine = dialogueLines[0] ?? "";
+  const additionalLines = dialogueLines.slice(1);
+
+  const rawBlock = firstLine ? [`${speakerLabel}: ${firstLine}`, ...additionalLines].join("\n") : `${speakerLabel}:`;
+
+  const formatted = formatWithHangingIndent(rawBlock);
+  const highlightedLabel = `<mark class="${CHARACTER_HIGHLIGHT_CLASS}">${speakerLabel}</mark>`;
+
+  return formatted.replace(`${speakerLabel}:`, `${highlightedLabel}:`);
 }
 
 const compareSearchItems = (a: SearchResultItemData, b: SearchResultItemData): number => {

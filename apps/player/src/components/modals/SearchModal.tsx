@@ -241,7 +241,7 @@ const ResultCard = memo(function ResultCard({ item, appearIndex }: { item: Searc
           </div>
         )}
 
-        <div className="text-sm text-white/90 leading-relaxed">
+        <div className="text-sm text-white/90 leading-relaxed whitespace-pre-wrap line-clamp-9 md:line-clamp-6">
           <span dangerouslySetInnerHTML={{ __html: item.summary }} />
         </div>
       </div>

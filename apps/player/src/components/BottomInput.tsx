@@ -348,8 +348,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       const after = value.slice(mentionState.startIndex + mentionState.query.length + 1);
       const withMention = `${before}${mentionText} ${after}`;
 
-      console.log("335: withMention BANG!", withMention);
-
       setValue(withMention);
       updateSearchQueryForInput(withMention);
       closeMentions();

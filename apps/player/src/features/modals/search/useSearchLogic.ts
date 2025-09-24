@@ -70,8 +70,6 @@ export const useSearchLogic = () => {
           (character) => character.slug.toLowerCase() === searchQuery.toLowerCase() || character.characterName.toLowerCase() === searchQuery.toLowerCase(),
         );
 
-        console.log("67: character BANG!", character);
-
         let results = character ? findCharacterSentences(character.slug, location) : performCachedSearch(searchQuery, location);
 
         // If the cache is still indexing, it will return isLoading: true
