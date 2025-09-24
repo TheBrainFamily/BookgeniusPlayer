@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@wukong/components/ui/button";
-import { Input } from "@wukong/components/ui/input";
-import { Search, BookOpen, User, Info, LogOut } from "lucide-react";
+import { BookOpen, Info, LogOut } from "lucide-react";
 import AboutModal from "./AboutModal";
 import SignInModal from "./SignInModal";
 import { useIntegrations } from "@platform/integrations";
@@ -65,7 +64,11 @@ const LoginComponent = () => {
       );
     }
   } else if (SignInWidget) {
-    return <SignInWidget onClick={openSignIn} />;
+    return (
+      <Button variant="mystical">
+        <SignInWidget onClick={openSignIn} />
+      </Button>
+    );
   }
 };
 
