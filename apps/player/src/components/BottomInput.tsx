@@ -88,6 +88,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       if (isDeepResearchActive) return;
       if (isRecording) return;
 
+      if (inputValue.length > 1 && !isSearchModalOpen) {
+        openSearchModal(true, true, inputValue.trim());
+      }
+
       const trimmedValue = inputValue.trim();
       startTransition(() => {
         if (trimmedValue.length >= 2) {
@@ -97,7 +101,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         }
       });
     },
-    [isDeepResearchActive, isRecording, setSearchQuery],
+    [isDeepResearchActive, isRecording, setSearchQuery, isSearchModalOpen],
   );
 
   const filteredCharacters = useMemo(() => {
