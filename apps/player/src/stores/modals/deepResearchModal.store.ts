@@ -11,11 +11,17 @@ interface DeepResearchModalState {
   layoutView?: boolean;
   hideOverlay?: boolean;
   isLoading: boolean;
+  showDiveDeeperCTA: boolean;
+  isDiveDeeperLoading: boolean;
+  diveDeeperHandler?: () => void | Promise<void>;
 
   openModal: (content?: string, layoutView?: boolean, hideOverlay?: boolean) => void;
   closeModal: () => void;
   setContent: (content: string) => void;
   setLoading: (isLoading: boolean) => void;
+  setShowDiveDeeperCTA: (show: boolean) => void;
+  setDiveDeeperLoading: (loading: boolean) => void;
+  setDiveDeeperHandler: (handler?: () => void | Promise<void>) => void;
 }
 
 export const useDeepResearchModal = create<DeepResearchModalState>()(
@@ -26,6 +32,9 @@ export const useDeepResearchModal = create<DeepResearchModalState>()(
       layoutView: false,
       hideOverlay: false,
       isLoading: false,
+      showDiveDeeperCTA: false,
+      isDiveDeeperLoading: false,
+      diveDeeperHandler: undefined,
 
       openModal: (content, layoutView, hideOverlay) => {
         const coordinator = useModalCoordinator.getState();
@@ -41,6 +50,9 @@ export const useDeepResearchModal = create<DeepResearchModalState>()(
             layoutView,
             hideOverlay,
             isLoading: !content, // If no content provided, show loading state
+            showDiveDeeperCTA: false,
+            isDiveDeeperLoading: false,
+            diveDeeperHandler: undefined,
           });
         }
       },
@@ -51,11 +63,14 @@ export const useDeepResearchModal = create<DeepResearchModalState>()(
 
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
-        set({ isOpen: false, content: undefined, isLoading: false });
+        set({ isOpen: false, content: undefined, isLoading: false, showDiveDeeperCTA: false, isDiveDeeperLoading: false, diveDeeperHandler: undefined });
       },
 
       setContent: (content) => set({ content, isLoading: false }),
       setLoading: (isLoading) => set({ isLoading }),
+      setShowDiveDeeperCTA: (show) => set({ showDiveDeeperCTA: show }),
+      setDiveDeeperLoading: (loading) => set({ isDiveDeeperLoading: loading }),
+      setDiveDeeperHandler: (handler) => set({ diveDeeperHandler: handler }),
     }),
     { name: "deep-research-modal" },
   ),

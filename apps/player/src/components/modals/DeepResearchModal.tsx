@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, Variants } from "motion/react";
-import { Brain, FileSearch } from "lucide-react";
+import { Brain, FileSearch, Loader2 } from "lucide-react";
 
 import ModalUI from "./ModalUI";
 import { LLMAnswerViewer } from "@player/ui/MarkdownComponent";
@@ -11,9 +11,12 @@ interface DeepResearchModalProps {
   layoutView?: boolean;
   hideOverlay?: boolean;
   isLoading?: boolean;
+  canDiveDeeper?: boolean;
+  onDiveDeeper?: (() => void) | undefined;
+  isDiveDeeperLoading?: boolean;
 }
 
-const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content, layoutView, hideOverlay, isLoading }) => {
+const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content, layoutView, hideOverlay, isLoading, canDiveDeeper, onDiveDeeper, isDiveDeeperLoading }) => {
   const modalTitle = (
     <div className="flex items-center gap-2">
       <Brain size={20} className="mb-1" />
@@ -52,6 +55,24 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content,
               <div className="prose dark:prose-invert max-w-none text-white/90">
                 <LLMAnswerViewer answerMarkdown={content} />
               </div>
+              {canDiveDeeper && (
+                <div className="mt-6">
+                  <button
+                    type="button"
+                    onClick={onDiveDeeper}
+                    disabled={isDiveDeeperLoading}
+                    className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    Dive deeper
+                  </button>
+                  {isDiveDeeperLoading && (
+                    <div className="flex items-center gap-2 mt-2 text-white/70 text-sm">
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Gathering quotes...</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}
