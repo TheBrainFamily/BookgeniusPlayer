@@ -3,22 +3,23 @@ import { devtools } from "zustand/middleware";
 import { useModalCoordinator } from "../modalCoordinator.store";
 import { useContentShift } from "../contentShift.store";
 
-const MODAL_ID = "deep-research-modal";
+const MODAL_ID = "research-modal";
 
-interface DeepResearchModalState {
+interface ResearchModalState {
   isOpen: boolean;
   content?: string;
   layoutView?: boolean;
   hideOverlay?: boolean;
   isLoading: boolean;
+  state: "deep" | "ask";
 
-  openModal: (content?: string, layoutView?: boolean, hideOverlay?: boolean) => void;
+  openModal: (content?: string, layoutView?: boolean, hideOverlay?: boolean, state?: "deep" | "ask") => void;
   closeModal: () => void;
   setContent: (content: string) => void;
   setLoading: (isLoading: boolean) => void;
 }
 
-export const useDeepResearchModal = create<DeepResearchModalState>()(
+export const useResearchModal = create<ResearchModalState>()(
   devtools(
     (set) => ({
       isOpen: false,
@@ -26,8 +27,9 @@ export const useDeepResearchModal = create<DeepResearchModalState>()(
       layoutView: false,
       hideOverlay: false,
       isLoading: false,
+      state: "ask",
 
-      openModal: (content, layoutView, hideOverlay) => {
+      openModal: (content, layoutView, hideOverlay, state) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
           // Enable content shift if opening in layout view
@@ -41,6 +43,7 @@ export const useDeepResearchModal = create<DeepResearchModalState>()(
             layoutView,
             hideOverlay,
             isLoading: !content, // If no content provided, show loading state
+            state,
           });
         }
       },

@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@playe
 import { useLocation } from "@player/state/LocationContext";
 import { deepResearchCall } from "@player/deepResearchCall";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
-import { useDeepResearchModal } from "@player/stores/modals/deepResearchModal.store";
+import { useResearchModal } from "@player/stores/modals/researchModal.store";
 import { OptionalElement } from "./OptionalElement";
 import { useElementVisibilityStore } from "@player/stores/elementVisibility.store";
 import { hasApiKey } from "@player/utils/apiKeyManager";
@@ -54,7 +54,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
   const { pauseAllTimers, startAllTimers, showAllElements } = useElementVisibilityStore();
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
-  const { openModal: openDeepResearchModal, setContent: setDeepResearchContent, closeModal: closeDeepResearchModal, isOpen: isDeepResearchModalOpen } = useDeepResearchModal();
+  const { openModal: openResearchModal, setContent: setResearchContent, closeModal: closeResearchModal, isOpen: isResearchModalOpen } = useResearchModal();
   const { closeModal: closeCharacterModal, isOpen: isCharacterModalOpen } = useCharacterModal();
   const { openModal: openApiKeyModal } = useApiKeyModal();
 
@@ -114,8 +114,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const openModalWithFocus = useCallback(() => {
     if (isDeepResearchActive) return;
 
-    if (isDeepResearchModalOpen) {
-      closeDeepResearchModal();
+    if (isResearchModalOpen) {
+      closeResearchModal();
     }
 
     if (isCharacterModalOpen) {
@@ -137,27 +137,27 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       const length = inputEl.value.length;
       inputEl.setSelectionRange(length, length);
     });
-  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value, isDeepResearchModalOpen, closeDeepResearchModal, isCharacterModalOpen, closeCharacterModal]);
+  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value, isResearchModalOpen, closeResearchModal, isCharacterModalOpen, closeCharacterModal]);
 
   const handleAsk = useCallback(
     async (query: string) => {
       setIsThinking(true);
       console.log("setting isThinking to true");
-      openDeepResearchModal(undefined, true, true);
+      openResearchModal(undefined, true, true, "ask");
 
       try {
         const response = await askCall(query, location);
         console.log("askCall response", response);
-        setDeepResearchContent(response);
+        setResearchContent(response);
       } catch (error) {
         console.error("Ask call failed:", error);
-        setDeepResearchContent(t("ask_error"));
+        setResearchContent(t("ask_error"));
       } finally {
         console.log("setting isThinking to false");
         setIsThinking(false);
       }
     },
-    [location, openDeepResearchModal, setDeepResearchContent, t],
+    [location, openResearchModal, setResearchContent, t],
   );
 
   const handleInputChange = useCallback(
@@ -197,23 +197,23 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         closeCharacterModal();
       }
 
-      openDeepResearchModal(undefined, true, true);
+      openResearchModal(undefined, true, true, "deep");
 
       deepResearchCall(query, location)
         .then((text) => {
           if (!text || text.trim().length === 0) {
-            setDeepResearchContent(t("deep_research_error"));
+            setResearchContent(t("deep_research_error"));
           } else {
-            setDeepResearchContent(text);
+            setResearchContent(text);
           }
         })
         .catch((error) => {
           console.error("Deep research failed:", error);
-          setDeepResearchContent(t("deep_research_error"));
+          setResearchContent(t("deep_research_error"));
         })
         .finally(() => setIsThinking(false));
     },
-    [location, setDeepResearchContent, t, openDeepResearchModal, isCharacterModalOpen, closeCharacterModal],
+    [location, setResearchContent, t, openResearchModal, isCharacterModalOpen, closeCharacterModal],
   );
 
   const handleSubmit = useCallback(
@@ -239,6 +239,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   );
 
   const toggleDeepResearch = useCallback(() => {
+    if (isThinking) return;
+
     handleActivity();
 
     const newState = !isDeepResearchActive;
@@ -247,7 +249,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     if (newState && isSearchModalOpen) {
       closeSearchModal();
     }
-  }, [handleActivity, isDeepResearchActive, isSearchModalOpen, closeSearchModal]);
+  }, [handleActivity, isDeepResearchActive, isSearchModalOpen, closeSearchModal, isThinking]);
 
   const handleRecordingStart = useCallback(() => {
     if (isRecording || !hasApiKey()) {
@@ -434,10 +436,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                     ref={(node) => {
                       mentionListRef.current = node;
                     }}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 6 }}
-                    transition={{ duration: 0.15 }}
+                    variants={variants.mentionList}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
                   >
                     {filteredCharacters.length > 0 ? (
                       filteredCharacters.map((characterName, index) => (
@@ -490,8 +492,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                       whileHover={!isThinking ? "hover" : undefined}
                       whileTap={!isThinking ? "tap" : undefined}
                       variants={variants.deepResearchButton}
+                      initial="idle"
+                      animate="idle"
                     >
-                      {isThinking ? <Loader2 size={18} className="animate-spin" /> : <Telescope size={18} />}
+                      <Telescope size={18} />
                     </motion.button>
                   </TooltipTrigger>
                   <TooltipContent>{isThinking ? t("thinking") : t("deep_research")}</TooltipContent>
@@ -507,12 +511,14 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                         type="submit"
                         aria-label="Send message"
                         disabled={isThinking}
-                        className="p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400"
+                        className={cn("p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400", isThinking ? "cursor-default" : "cursor-pointer")}
                         whileHover="hover"
                         whileTap="tap"
                         variants={variants.button}
+                        initial="idle"
+                        animate="idle"
                       >
-                        <Send size={18} />
+                        {isThinking ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                       </motion.button>
                     </TooltipTrigger>
                     <TooltipContent>{t("send_message")}</TooltipContent>
@@ -585,7 +591,7 @@ const variants: Record<string, Variants> = {
     hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
     tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
     tapMic: { scale: 1.2 },
-    idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", color: "rgba(255, 255, 255, 0.7)", transition: { duration: 0.3 } },
+    idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(0,0,0,0)", transition: { duration: 0.2 } },
     recording: {
       scale: [1, 1.1, 1],
       backgroundColor: ["rgba(239, 68, 68, 0.2)", "rgba(239, 68, 68, 0.4)", "rgba(239, 68, 68, 0.2)"],
@@ -596,7 +602,7 @@ const variants: Record<string, Variants> = {
   deepResearchButton: {
     hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
     tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
-    idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", transition: { duration: 0.3 } },
+    idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(0,0,0,0)", transition: { duration: 0.2 } },
   },
   container: {
     idle: { boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", borderColor: "rgba(255, 255, 255, 0.3)", transition: { duration: 0.3 } },
@@ -611,5 +617,10 @@ const variants: Record<string, Variants> = {
     initial: { opacity: 0, scale: 0.5 },
     animate: { opacity: [0.5, 1, 0.5], scale: [1, 1.05, 1], transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" } },
     exit: { opacity: 0, scale: 0, transition: { duration: 0.2 } },
+  },
+  mentionList: {
+    initial: { opacity: 0, y: 6, transition: { duration: 0.2 } },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+    exit: { opacity: 0, y: 6, transition: { duration: 0.2 } },
   },
 };
