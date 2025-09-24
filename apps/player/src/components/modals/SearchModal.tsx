@@ -227,7 +227,10 @@ const ResultCard = memo(function ResultCard({ item, appearIndex }: { item: Searc
     >
       <div className="relative p-4">
         <div className="flex items-center gap-2 mb-2">
-          <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">{item.percentInChapter}% of chapter</div>
+          <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-primary-30 text-book-primary">
+            {item.percentInChapter}% of Chapter {item.chapter}
+          </div>
+          {item.type && <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">{item.type}</div>}
         </div>
 
         {item.text && (
@@ -238,7 +241,7 @@ const ResultCard = memo(function ResultCard({ item, appearIndex }: { item: Searc
           </div>
         )}
 
-        <div className="text-sm text-white/90 leading-relaxed">
+        <div className="text-sm text-white/90 leading-relaxed whitespace-pre-wrap line-clamp-9 md:line-clamp-6">
           <span dangerouslySetInnerHTML={{ __html: item.summary }} />
         </div>
       </div>

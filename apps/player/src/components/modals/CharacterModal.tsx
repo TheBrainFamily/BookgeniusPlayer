@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import ModalUI from "./ModalUI";
 import CharacterMedia from "@player/components/CharacterMedia";
 import { CharacterData } from "@player/types/book";
-import { performCachedSearch, SearchResultItemData } from "@player/searchModal";
+import { findCharacterSentences, SearchResultItemData } from "@player/searchModal";
 import { getSavedLocation, systemNavigateTo } from "@player/helpers/paragraphsNavigation";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
@@ -15,6 +15,8 @@ import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { useContentShift } from "@player/stores/contentShift.store";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 import { isVideoFile } from "@player/helpers/isVideoFile";
+import { useBottomInput } from "@player/stores/modals/bottomInput.store";
+import { useSearchModal } from "@player/stores/modals/searchModal.store";
 
 interface CharacterModalProps {
   onClose: () => void;
@@ -31,6 +33,9 @@ const findLatestSummaryInRange = (character: CharacterData, endChapter: number) 
 
 const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, characterSlug, endChapter, chapter, paragraph }) => {
   const { t } = useTranslation();
+
+  const { setValue } = useBottomInput();
+  const { setResults, openModal: openSearchModal } = useSearchModal();
 
   const matchingCharacter = useMemo(() => getCharactersData().find((c) => c.slug === characterSlug), [characterSlug]);
   const latestSummary = useMemo(() => (matchingCharacter ? findLatestSummaryInRange(matchingCharacter, endChapter) : ""), [matchingCharacter, endChapter]);
@@ -58,22 +63,8 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [appearancesClicked, setAppearancesClicked] = useState(false);
-  const [isLargeScreen, setIsLargeScreen] = useState(false);
 
   const shiftEnableRef = useRef(false);
-
-  useEffect(() => {
-    const checkScreenSize = () => setIsLargeScreen(window.innerWidth >= 1280);
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => {
-      if (shiftEnableRef.current) {
-        useContentShift.getState().disableContentShift();
-      }
-      window.removeEventListener("resize", checkScreenSize);
-    };
-  }, []);
 
   // Search for character appearances in the text up to the current location
   useEffect(() => {
@@ -83,28 +74,9 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     setIsLoading(true);
 
     try {
-      const searchResults = performCachedSearch(characterSlug.replaceAll("-", " "), furthestLocation);
-
-      // 1. Unique chapters (first appearance in each chapter)
-      const byChapter = new Map<number, SearchResultItemData>();
-      for (const item of searchResults.items) {
-        if (!byChapter.has(item.chapter)) byChapter.set(item.chapter, item);
-      }
-
-      let results = Array.from(byChapter.values()).sort((a, b) => a.chapter - b.chapter);
-
-      // 2. If we have less than 3 results, try to add more from the first chapter in results
-      if (results.length < 3 && searchResults.items.length > results.length && results[0]) {
-        const firstChapter = results[0].chapter;
-        const firstChapterItems = searchResults.items.filter((i) => i.chapter === firstChapter).sort((a, b) => a.paragraphNumber - b.paragraphNumber);
-
-        const needed = Math.min(3 - results.length, Math.max(0, firstChapterItems.length - 1));
-        const extras = firstChapterItems.slice(1, 1 + needed);
-
-        results = [results[0], ...extras, ...results.slice(1)];
-      }
-
-      setCharacterAppearances(results);
+      const searchResults = findCharacterSentences(characterSlug, furthestLocation, { mode: "spotlight", limit: 3 });
+      setResults(searchResults);
+      setCharacterAppearances(searchResults.items);
     } catch (err) {
       console.error("Error searching for character appearances:", err);
       setCharacterAppearances([]);
@@ -114,18 +86,15 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   }, [matchingCharacter, characterSlug]);
 
   const handleAppearanceClick = (appearance: SearchResultItemData) => {
-    systemNavigateTo({ currentChapter: appearance.chapter, currentParagraph: appearance.paragraphNumber });
+    void systemNavigateTo({ currentChapter: appearance.chapter, currentParagraph: appearance.paragraphNumber });
 
     if (matchingCharacter?.characterName) {
       highlightSearchInParagraph(appearance.chapter, appearance.paragraphNumber, matchingCharacter.characterName);
     }
-    if (isLargeScreen) {
-      setAppearancesClicked(true);
-      useContentShift.getState().enableContentShift();
-      shiftEnableRef.current = true;
-    } else {
-      onClose();
-    }
+    const character = `@${matchingCharacter.characterName}`;
+    setValue(character);
+    openSearchModal(true, true, character);
+    onClose();
   };
 
   const handleOnClose = () => {
@@ -137,14 +106,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   if (!matchingCharacter) return null;
 
   return (
-    <ModalUI
-      onClose={handleOnClose}
-      className="bg-transparent"
-      size="xxl"
-      layoutView={appearancesClicked}
-      hideOverlay={appearancesClicked}
-      closeOnOverlayClick={!appearancesClicked}
-    >
+    <ModalUI onClose={handleOnClose} className="bg-transparent" size="xxl">
       <motion.div
         className="flex flex-col sm:flex-row items-center gap-6 mx-auto relative max-h-screen"
         variants={variants.container}
@@ -153,25 +115,23 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
         exit="exit"
         onPointerUp={handleOnClose}
       >
-        {!appearancesClicked && (
-          <motion.div
-            className="w-48 md:w-80 rounded-full overflow-hidden max-h-[30vh] max-w-[30vh] md:max-h-80 md:max-w-80 border shadow-xl border-book-primary-20 aspect-square"
-            variants={variants.media}
-            onPointerUp={(e) => e.stopPropagation()}
-          >
-            <CharacterMedia
-              mediaSrc={resolvedMediaSrc}
-              isVideo={resolvedIsVideo}
-              canonicalName={matchingCharacter.slug}
-              commonAttrs={{
-                "data-original-src": resolvedMediaSrc,
-                "data-character-name": snapshot?.displayName ?? matchingCharacter.characterName,
-                "data-summary": snapshot?.summary ?? latestSummary,
-                className: "w-full h-full object-cover",
-              }}
-            />
-          </motion.div>
-        )}
+        <motion.div
+          className="w-48 md:w-80 rounded-full overflow-hidden max-h-[30vh] max-w-[30vh] md:max-h-80 md:max-w-80 border shadow-xl border-book-primary-20 aspect-square"
+          variants={variants.media}
+          onPointerUp={(e) => e.stopPropagation()}
+        >
+          <CharacterMedia
+            mediaSrc={resolvedMediaSrc}
+            isVideo={resolvedIsVideo}
+            canonicalName={matchingCharacter.slug}
+            commonAttrs={{
+              "data-original-src": resolvedMediaSrc,
+              "data-character-name": snapshot?.displayName ?? matchingCharacter.characterName,
+              "data-summary": snapshot?.summary ?? latestSummary,
+              className: "w-full h-full object-cover",
+            }}
+          />
+        </motion.div>
 
         <motion.div
           className="p-3 sm:p-4 rounded-xl flex flex-col gap-4 w-full max-w-2xl relative
@@ -202,7 +162,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                 ) : (
                   <motion.div className="p-1" variants={variants.container}>
                     <div className="flex-grow overflow-y-auto pb-4 space-y-3 max-h-[50vh]">
-                      {characterAppearances.slice(0, appearancesClicked ? characterAppearances.length : 3).map((appearance, index) => (
+                      {characterAppearances.slice(0, 3).map((appearance, index) => (
                         <motion.div
                           key={appearance.id}
                           className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20"
@@ -223,17 +183,22 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                           }}
                         >
                           <div className="relative p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-primary-30 text-book-primary">
-                                <span className="flex items-center gap-1">
-                                  <FileText size={12} />
-                                  {appearance.percentInChapter}% {t("of_chapter")} {getChapterTitle(appearance.chapter, t)}
+                            <div className="flex items-center gap-2 mb-2 flex-nowrap overflow-hidden">
+                              <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-primary-30 text-book-primary min-w-0">
+                                <span className="flex items-center gap-1 min-w-0">
+                                  <FileText size={12} className="shrink-0" />
+                                  <span className="truncate whitespace-nowrap">
+                                    {appearance.percentInChapter}% {t("of_chapter")} {getChapterTitle(appearance.chapter, t)}
+                                  </span>
                                 </span>
+                              </div>
+                              <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-tertiary-30 text-book-tertiary whitespace-nowrap">
+                                <span className="flex items-center gap-1 whitespace-nowrap">{appearance.type}</span>
                               </div>
                             </div>
 
                             <motion.div
-                              className="text-sm text-white/90 leading-relaxed line-clamp-6 md:line-clamp-3"
+                              className="text-sm text-white/90 leading-relaxed line-clamp-6 md:line-clamp-3 whitespace-pre-wrap"
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               transition={{ delay: 0.2 }}

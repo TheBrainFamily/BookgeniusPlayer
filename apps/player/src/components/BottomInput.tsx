@@ -9,13 +9,33 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@playe
 import { useLocation } from "@player/state/LocationContext";
 import { deepResearchCall } from "@player/deepResearchCall";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
-import { useDeepResearchModal } from "@player/stores/modals/deepResearchModal.store";
+import { useDeepResearchModal } from "@player/stores/modals/researchModal.store";
 import { OptionalElement } from "./OptionalElement";
 import { useElementVisibilityStore } from "@player/stores/elementVisibility.store";
 import { hasApiKey } from "@player/utils/apiKeyManager";
 import { useApiKeyModal } from "@player/stores/modals/apiKeyModal.store";
+import type { CharacterData } from "@player/types/book";
 import { askStream } from "@player/askStream";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
+import { useBottomInput } from "@player/stores/modals/bottomInput.store";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
+
+const hasReaderMetCharacter = (character: CharacterData, chapter: number, paragraph: number): boolean => {
+  return character.infoPerChapter.some((infoPerChapter) => {
+    const encounteredParagraphs = [...infoPerChapter.paragraphsWhereSpotted, ...infoPerChapter.paragraphsWhereTalking, ...(infoPerChapter.paragraphsWhereEnters ?? [])];
+
+    if (infoPerChapter.chapter < chapter) {
+      return encounteredParagraphs.length > 0;
+    }
+
+    if (infoPerChapter.chapter === chapter) {
+      return encounteredParagraphs.some((encounterParagraph) => encounterParagraph <= paragraph);
+    }
+
+    return false;
+  });
+};
 
 interface BottomInputProps {
   className?: string;
@@ -24,7 +44,7 @@ interface BottomInputProps {
 const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { t } = useTranslation();
 
-  const [value, setValue] = useState("");
+  const { value, setValue } = useBottomInput();
   const [isRecording, setIsRecording] = useState(false);
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
@@ -32,7 +52,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { pauseAllTimers, startAllTimers, showAllElements } = useElementVisibilityStore();
+  const { pauseAllTimers, startAllTimers, showAllElements, setIsTimersPausedSticky } = useElementVisibilityStore();
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
   const {
     openModal: openDeepResearchModal,
@@ -43,17 +63,66 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     setShowDiveDeeperCTA,
     setDiveDeeperLoading,
     setDiveDeeperHandler,
+    setType: setDeepResearchType,
   } = useDeepResearchModal();
   const { closeModal: closeCharacterModal, isOpen: isCharacterModalOpen } = useCharacterModal();
   const { openModal: openApiKeyModal } = useApiKeyModal();
 
   const { startRecording, stopRecording, response } = useRealtime();
   const { location } = useLocation();
+  const saved = getSavedLocation();
+  const furthestLocation = saved ?? location;
+
+  const allCharacters = useMemo(() => {
+    try {
+      return getCharactersData();
+    } catch (error) {
+      console.error("Failed to load characters for mentions:", error);
+      return [];
+    }
+  }, []);
+
+  const availableCharacterNames = useMemo(() => {
+    if (!allCharacters.length) return [];
+    return allCharacters
+      .filter((character) => hasReaderMetCharacter(character, furthestLocation.chapter, furthestLocation.paragraph))
+      .map((character) => character.characterName)
+      .filter(Boolean);
+  }, [allCharacters, furthestLocation.chapter, furthestLocation.paragraph]);
+
+  const [mentionState, setMentionState] = useState<{ isActive: boolean; query: string; startIndex: number }>({ isActive: false, query: "", startIndex: -1 });
+  const [highlightedMention, setHighlightedMention] = useState(0);
+  const mentionListRef = useRef<HTMLUListElement | null>(null);
+
+  const updateSearchQueryForInput = useCallback(
+    (inputValue: string) => {
+      if (isDeepResearchActive) return;
+      if (isRecording) return;
+
+      const trimmedValue = inputValue.trim();
+      startTransition(() => {
+        if (trimmedValue.length >= 2) {
+          openSearchModal(true, true, inputValue);
+          setSearchQuery(trimmedValue);
+        } else {
+          setSearchQuery("");
+        }
+      });
+    },
+    [isDeepResearchActive, isRecording, setSearchQuery, openSearchModal],
+  );
+
+  const filteredCharacters = useMemo(() => {
+    if (!mentionState.isActive) return [];
+    const query = mentionState.query.toLowerCase();
+    return availableCharacterNames.filter((name) => name.toLowerCase().includes(query));
+  }, [availableCharacterNames, mentionState.isActive, mentionState.query]);
 
   const handleActivity = useCallback(() => {
-    pauseAllTimers(true);
+    setIsTimersPausedSticky(true);
+    pauseAllTimers();
     showAllElements();
-  }, [pauseAllTimers, showAllElements]);
+  }, [pauseAllTimers, showAllElements, setIsTimersPausedSticky]);
 
   const openModalWithFocus = useCallback(() => {
     if (isDeepResearchActive) return;
@@ -99,20 +168,21 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
       setValue(newValue);
+      updateSearchQueryForInput(newValue);
 
-      if (isDeepResearchActive) return;
-      if (isRecording) return;
+      const selectionIndex = e.target.selectionStart ?? newValue.length;
+      const textBeforeCaret = newValue.slice(0, selectionIndex);
+      const mentionMatch = textBeforeCaret.match(/(^|\s)@([^-@\s]*)$/);
 
-      const trimmedNewValue = newValue.trim();
-      startTransition(() => {
-        if (trimmedNewValue.length >= 2) {
-          setSearchQuery(trimmedNewValue);
-        } else {
-          setSearchQuery("");
-        }
-      });
+      if (mentionMatch) {
+        const query = mentionMatch[2];
+        const atIndex = selectionIndex - query.length - 1;
+        setMentionState({ isActive: true, query, startIndex: atIndex });
+      } else if (mentionState.isActive) {
+        setMentionState({ isActive: false, query: "", startIndex: -1 });
+      }
     },
-    [isDeepResearchActive, isRecording, setSearchQuery],
+    [mentionState.isActive, setValue, updateSearchQueryForInput],
   );
 
   const handleInputInteraction = useCallback(() => {
@@ -131,7 +201,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         closeCharacterModal();
       }
 
-      openDeepResearchModal(undefined, true, true);
+      setDeepResearchType("deep");
+      openDeepResearchModal(undefined, true, true, "deep");
       setDeepResearchLoading(true);
       setShowDiveDeeperCTA(false);
       setDiveDeeperLoading(false);
@@ -162,6 +233,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       openDeepResearchModal,
       isCharacterModalOpen,
       closeCharacterModal,
+      setDeepResearchType,
     ],
   );
 
@@ -172,6 +244,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     setDiveDeeperLoading(true);
     try {
       const text = await deepResearchCall(query, location);
+      setDeepResearchType("deep");
+
       const finalText = text && text.trim().length > 0 ? text : t("deep_research_error");
       setDeepResearchContent(finalText);
       setShowDiveDeeperCTA(false);
@@ -184,12 +258,13 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     } finally {
       setDiveDeeperLoading(false);
     }
-  }, [location, setDeepResearchContent, setDiveDeeperHandler, setDiveDeeperLoading, setShowDiveDeeperCTA, t]);
+  }, [location, setDeepResearchContent, setDiveDeeperHandler, setDiveDeeperLoading, setShowDiveDeeperCTA, t, setDeepResearchType]);
 
   const handleAsk = useCallback(
     async (query: string) => {
       setIsThinking(true);
-      openDeepResearchModal(undefined, true, true);
+      setDeepResearchType("ask");
+      openDeepResearchModal(undefined, true, true, "ask");
       setDeepResearchLoading(true);
       streamingBufferRef.current = "";
       switchedToDeepResearchRef.current = false;
@@ -269,6 +344,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       t,
       executeDeepResearch,
       handleDiveDeeper,
+      setDeepResearchType,
     ],
   );
 
@@ -295,6 +371,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   );
 
   const toggleDeepResearch = useCallback(() => {
+    if (isThinking) return;
+
     handleActivity();
 
     const newState = !isDeepResearchActive;
@@ -303,7 +381,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     if (newState && isSearchModalOpen) {
       closeSearchModal();
     }
-  }, [handleActivity, isDeepResearchActive, isSearchModalOpen, closeSearchModal]);
+  }, [handleActivity, isDeepResearchActive, isSearchModalOpen, closeSearchModal, isThinking]);
 
   const handleRecordingStart = useCallback(() => {
     if (isRecording || !hasApiKey()) {
@@ -357,6 +435,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       if (containerRef.current?.contains(target)) return;
       if (target.closest('[role="dialog"]') || target.closest('[role="tooltip"]')) return;
 
+      setIsTimersPausedSticky(false);
       startAllTimers();
     };
 
@@ -367,7 +446,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("pointerdown", handleDocumentPointerDown, true);
     };
-  }, [handleActivity, openModalWithFocus, startAllTimers]);
+  }, [handleActivity, openModalWithFocus, startAllTimers, setIsTimersPausedSticky]);
 
   useEffect(() => {
     if (response && !isRecording) {
@@ -379,8 +458,77 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     }
   }, [handleActivity, response, isRecording, isSearchModalOpen, setSearchQuery]);
 
+  useEffect(() => {
+    setHighlightedMention(0);
+  }, [mentionState.isActive, mentionState.query]);
+
+  const closeMentions = useCallback(() => {
+    setMentionState({ isActive: false, query: "", startIndex: -1 });
+    setHighlightedMention(0);
+  }, []);
+
+  const insertMention = useCallback(
+    (name: string) => {
+      if (!mentionState.isActive || mentionState.startIndex < 0) {
+        closeMentions();
+        return;
+      }
+
+      const mentionText = `@${name}`;
+      const before = value.slice(0, mentionState.startIndex);
+      const after = value.slice(mentionState.startIndex + mentionState.query.length + 1);
+      const withMention = `${before}${mentionText} ${after}`;
+
+      setValue(withMention);
+      updateSearchQueryForInput(withMention);
+      closeMentions();
+
+      const inputEl = inputRef.current;
+      if (inputEl) {
+        queueMicrotask(() => {
+          const newCaretPosition = `${before}${mentionText} `.length;
+          inputEl.focus();
+          inputEl.setSelectionRange(newCaretPosition, newCaretPosition);
+        });
+      }
+    },
+    [closeMentions, mentionState.isActive, mentionState.query, mentionState.startIndex, setValue, updateSearchQueryForInput, value],
+  );
+
+  useEffect(() => {
+    if (!mentionState.isActive) return;
+    const listElement = mentionListRef.current;
+    if (!listElement) return;
+    const child = listElement.children[highlightedMention] as HTMLElement | undefined;
+    if (child) {
+      child.scrollIntoView({ block: "nearest" });
+    }
+  }, [highlightedMention, mentionState.isActive]);
+
+  const handleInputKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (!mentionState.isActive || filteredCharacters.length === 0) return;
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        setHighlightedMention((prev) => (prev + 1) % filteredCharacters.length);
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        setHighlightedMention((prev) => (prev - 1 + filteredCharacters.length) % filteredCharacters.length);
+      } else if (event.key === "Enter" || event.key === "Tab") {
+        event.preventDefault();
+        const selected = filteredCharacters[highlightedMention];
+        if (selected) insertMention(selected);
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        closeMentions();
+      }
+    },
+    [closeMentions, filteredCharacters, highlightedMention, insertMention, mentionState.isActive],
+  );
+
   return (
-    <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
+    <OptionalElement className={cn("w-full flex justify-center", className)}>
       <motion.div
         className={cn(
           "bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-2 py-[2px] md:py-[3px] md:px-3",
@@ -407,6 +555,39 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                   />
                 )}
               </AnimatePresence>
+              <AnimatePresence>
+                {mentionState.isActive && (
+                  <motion.ul
+                    key="mention-list"
+                    className="absolute bottom-full left-0 right-0 mb-2 bg-black/85 border border-white/20 rounded-xl shadow-lg overflow-hidden z-50 max-h-56 overflow-y-auto"
+                    ref={(node) => {
+                      mentionListRef.current = node;
+                    }}
+                    variants={variants.mentionList}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                  >
+                    {filteredCharacters.length > 0 ? (
+                      filteredCharacters.map((characterName, index) => (
+                        <li
+                          key={characterName}
+                          className={cn("px-3 py-2 cursor-pointer text-sm", index === highlightedMention ? "bg-white/15" : "bg-transparent")}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            insertMention(characterName);
+                          }}
+                          onMouseEnter={() => setHighlightedMention(index)}
+                        >
+                          {characterName}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="px-3 py-2 text-sm text-white/70">{t("mentions_no_characters_yet", "No characters have been introduced yet.")}</li>
+                    )}
+                  </motion.ul>
+                )}
+              </AnimatePresence>
               <input
                 id="bottom-input"
                 ref={inputRef}
@@ -414,6 +595,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                 value={value}
                 onChange={handleInputChange}
                 onFocus={handleInputInteraction}
+                onKeyDown={handleInputKeyDown}
                 placeholder={placeholder}
                 className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-80 pl-7 font-medium" : "")}
                 disabled={isRecording || isThinking}
@@ -437,8 +619,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                       whileHover={!isThinking ? "hover" : undefined}
                       whileTap={!isThinking ? "tap" : undefined}
                       variants={variants.deepResearchButton}
+                      initial="idle"
+                      animate="idle"
                     >
-                      {isThinking ? <Loader2 size={18} className="animate-spin" /> : <Telescope size={18} />}
+                      <Telescope size={18} />
                     </motion.button>
                   </TooltipTrigger>
                   <TooltipContent>{isThinking ? t("thinking") : t("deep_research")}</TooltipContent>
@@ -454,12 +638,14 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                         type="submit"
                         aria-label="Send message"
                         disabled={isThinking}
-                        className="p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400"
+                        className={cn("p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400", isThinking ? "cursor-default" : "cursor-pointer")}
                         whileHover="hover"
                         whileTap="tap"
                         variants={variants.button}
+                        initial="idle"
+                        animate="idle"
                       >
-                        <Send size={18} />
+                        {isThinking ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                       </motion.button>
                     </TooltipTrigger>
                     <TooltipContent>{t("send_message")}</TooltipContent>
@@ -532,7 +718,7 @@ const variants: Record<string, Variants> = {
     hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
     tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
     tapMic: { scale: 1.2 },
-    idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", color: "rgba(255, 255, 255, 0.7)", transition: { duration: 0.3 } },
+    idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(0,0,0,0)", transition: { duration: 0.2 } },
     recording: {
       scale: [1, 1.1, 1],
       backgroundColor: ["rgba(239, 68, 68, 0.2)", "rgba(239, 68, 68, 0.4)", "rgba(239, 68, 68, 0.2)"],
@@ -543,10 +729,10 @@ const variants: Record<string, Variants> = {
   deepResearchButton: {
     hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
     tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
-    idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", transition: { duration: 0.3 } },
+    idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(0,0,0,0)", transition: { duration: 0.2 } },
   },
   container: {
-    idle: { boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", borderColor: "rgba(255, 255, 255, 0.3)", transition: { duration: 0.3 } },
+    idle: { boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", borderColor: "rgba(255, 255, 255, 0.3)" },
     recordingContainer: {
       boxShadow: ["0px 0px 0px rgba(239, 68, 68, 0.2)", "0px 0px 12px rgba(239, 68, 68, 0.6)", "0px 0px 0px rgba(239, 68, 68, 0.2)"],
       borderColor: ["rgba(255, 255, 255, 0.3)", "rgba(239, 68, 68, 0.6)", "rgba(255, 255, 255, 0.3)"],
@@ -558,5 +744,10 @@ const variants: Record<string, Variants> = {
     initial: { opacity: 0, scale: 0.5 },
     animate: { opacity: [0.5, 1, 0.5], scale: [1, 1.05, 1], transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" } },
     exit: { opacity: 0, scale: 0, transition: { duration: 0.2 } },
+  },
+  mentionList: {
+    initial: { opacity: 0, y: 6, transition: { duration: 0.2 } },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+    exit: { opacity: 0, y: 6, transition: { duration: 0.2 } },
   },
 };

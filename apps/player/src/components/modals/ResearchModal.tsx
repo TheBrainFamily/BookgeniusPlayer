@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, Variants } from "motion/react";
-import { Brain, FileSearch, Loader2 } from "lucide-react";
+import { Brain, FileSearch, Telescope, Loader2 } from "lucide-react";
 
 import ModalUI from "./ModalUI";
 import { LLMAnswerViewer } from "@player/ui/MarkdownComponent";
@@ -11,16 +11,17 @@ interface DeepResearchModalProps {
   layoutView?: boolean;
   hideOverlay?: boolean;
   isLoading?: boolean;
+  type: "deep" | "ask";
   canDiveDeeper?: boolean;
   onDiveDeeper?: (() => void) | undefined;
   isDiveDeeperLoading?: boolean;
 }
 
-const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content, layoutView, hideOverlay, isLoading, canDiveDeeper, onDiveDeeper, isDiveDeeperLoading }) => {
+const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content, layoutView, hideOverlay, isLoading, canDiveDeeper, onDiveDeeper, isDiveDeeperLoading, type }) => {
   const modalTitle = (
     <div className="flex items-center gap-2">
-      <Brain size={20} className="mb-1" />
-      <span>Deep Research</span>
+      {type === "ask" ? <Brain size={20} /> : <Telescope size={20} />}
+      <span>{type === "ask" ? "Quick Question" : "Deep Research"}</span>
     </div>
   );
 

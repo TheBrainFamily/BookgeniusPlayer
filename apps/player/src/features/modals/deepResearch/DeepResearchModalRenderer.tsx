@@ -1,11 +1,11 @@
 import React from "react";
 import { createPortal } from "react-dom";
-import { useDeepResearchModal } from "@player/stores/modals/deepResearchModal.store";
-import DeepResearchModal from "@player/components/modals/DeepResearchModal";
 import { useEscapeKey } from "@player/hooks/useEscapeKey";
+import DeepResearchModal from "@player/components/modals/ResearchModal";
+import { useDeepResearchModal } from "@player/stores/modals/researchModal.store";
 
 export const DeepResearchModalRenderer: React.FC = () => {
-  const { isOpen, content, layoutView, hideOverlay, isLoading, closeModal, showDiveDeeperCTA, isDiveDeeperLoading, diveDeeperHandler } = useDeepResearchModal();
+  const { isOpen, content, layoutView, hideOverlay, isLoading, closeModal, showDiveDeeperCTA, isDiveDeeperLoading, diveDeeperHandler, type } = useDeepResearchModal();
 
   useEscapeKey(isOpen, closeModal);
 
@@ -21,6 +21,7 @@ export const DeepResearchModalRenderer: React.FC = () => {
       canDiveDeeper={showDiveDeeperCTA}
       onDiveDeeper={diveDeeperHandler}
       isDiveDeeperLoading={isDiveDeeperLoading}
+      type={type}
     />,
     document.body,
   );
