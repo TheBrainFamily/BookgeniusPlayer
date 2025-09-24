@@ -4,6 +4,7 @@ import { getCharactersData } from "./genericBookDataGetters/getCharactersData";
 import { useBookContentStore } from "./stores/bookContent.store";
 import { getBookData } from "./genericBookDataGetters/getBookData";
 import { bookIndex } from "@player/logic/BookIndex";
+import type { InfoPerChapter } from "@player/fetchers/getParagraphRange";
 
 export interface SearchResultItemData {
   score?: number;
@@ -13,6 +14,12 @@ export interface SearchResultItemData {
   summary: string;
   text?: string;
   id: string; // For React keys
+  type?: SearchType;
+}
+
+enum SearchType {
+  SPOTTED = "Spotted",
+  TALKING = "Talking",
 }
 
 export interface SearchResultsData {
@@ -38,7 +45,7 @@ const highlightMatchedWords = (text: string, query: string): string => {
   const pattern = new RegExp(escapedQuery, "gi");
 
   // Replace matched text with highlighted version using theme-appropriate colors
-  return text.replace(pattern, '<mark class="bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm">$&</mark>');
+  return text.replace(pattern, `<mark class="${CHARACTER_HIGHLIGHT_CLASS}">$&</mark>`);
 };
 
 /**
@@ -194,7 +201,7 @@ export function performCachedSearch(query: string, currentLocation: Location): S
                 }
               }
             }
-          } catch (e) {
+          } catch {
             // If anything goes wrong with DOM access, keep previous behavior silently
           }
         }
@@ -250,203 +257,274 @@ const calculatePercentInChapter = (paragraphNumber: number, totalParagraphs: num
   return Math.max(0, Math.min(100, Math.round((paragraphNumber / totalParagraphs) * 100)));
 };
 
-const getSentenceWithCharacterSpan = (paragraph: string, characterSlug: string) => {
-  // Create a temporary DOM element to properly parse the HTML
-  const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = paragraph;
-
-  const characterElements = tempDiv.querySelectorAll(`[data-character="${characterSlug}"]`);
-  if (characterElements.length === 0) {
-    return "";
-  }
-
-  const results: { html: string; offset: number }[] = [];
-
-  // Compute the character offset of the first text inside target relative to the root's text content
-  const getTextOffset = (root: HTMLElement, target: Element): number => {
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
-    let offset = 0;
-    let node: Node | null;
-    while ((node = walker.nextNode())) {
-      if (target.contains(node)) {
-        break;
-      }
-      offset += (node.nodeValue || "").length;
-    }
-    return offset;
-  };
-
-  characterElements.forEach((characterElement) => {
-    // Find the sentence span that contains this character element
-    const sentenceSpan = characterElement.closest('span[id^="ch"][id*="-s"]');
-
-    if (sentenceSpan) {
-      // Get the sentence text with HTML intact
-      let sentenceHTML = sentenceSpan.outerHTML;
-
-      // Clean up the sentence HTML - remove the id and style attributes
-      sentenceHTML = sentenceHTML.replace(/\s*id="[^"]*"/g, "");
-      sentenceHTML = sentenceHTML.replace(/\s*style="[^"]*"/g, "");
-
-      results.push({ html: sentenceHTML, offset: getTextOffset(tempDiv, characterElement) });
-    } else {
-      // Fallback: if no sentence span found, try to get surrounding context
-      let context = "";
-      let current = characterElement;
-      const currentHasNoWrap = current.closest("span.text-nowrap");
-      if (currentHasNoWrap) {
-        current = currentHasNoWrap;
-      }
-
-      // Get up to 10 words before
-      let wordsBefore = [];
-      let beforeElement = current.previousSibling;
-
-      while (beforeElement && wordsBefore.length < 14) {
-        if (beforeElement.nodeType === Node.TEXT_NODE || beforeElement.nodeType === Node.ELEMENT_NODE) {
-          const words = beforeElement.textContent
-            .trim()
-            .split(/\s+/)
-            .filter((w) => w);
-          wordsBefore.unshift(...words.slice(-14));
-        }
-        beforeElement = beforeElement.previousSibling;
-      }
-
-      const characterHTML = characterElement.outerHTML;
-
-      // Get up to 10 words after
-      let wordsAfter = [];
-      let afterElement = current.nextSibling;
-      while (afterElement && wordsAfter.length < 14) {
-        if (afterElement.nodeType === Node.TEXT_NODE || afterElement.nodeType === Node.ELEMENT_NODE) {
-          const words = afterElement.textContent
-            .trim()
-            .split(/\s+/)
-            .filter((w) => w);
-          wordsAfter.push(...words.slice(0, 14));
-        }
-        afterElement = afterElement.nextSibling;
-      }
-
-      let characterSlugMissingPunctuation = "";
-      if (wordsBefore.length === 0 || wordsAfter.length === 0) {
-        const words = tempDiv.textContent
-          .trim()
-          .split(/\s+/)
-          .filter((w) => w);
-
-        const characterSlugIndex = words.findIndex((word) => word.includes(characterSlug));
-        if (characterSlugIndex !== -1) {
-          characterSlugMissingPunctuation = words[characterSlugIndex].replace(characterSlug, "");
-          wordsBefore = words.slice(0, characterSlugIndex);
-          wordsAfter = words.slice(characterSlugIndex + 1);
-        }
-      }
-
-      // Combine context
-      const before = wordsBefore.slice(-14).join(" ");
-      const after = wordsAfter.slice(0, 14).join(" ");
-      context = `${before ? before + " " : ""}${characterHTML}${characterSlugMissingPunctuation}${after ? " " + after : ""}`;
-
-      // Remove space before punctuation marks
-      context = context.replace(/\s+([.,;:!?])/g, "$1");
-
-      if (context.trim()) {
-        results.push({ html: context.trim(), offset: getTextOffset(tempDiv, characterElement) });
-      }
-    }
-  });
-
-  // Filter out very close hits (near-overlapping). Use a small character-distance threshold.
-  const MIN_CHAR_GAP = 60; // roughly "a few words" apart
-  const sortedByOffset = [...results].sort((a, b) => a.offset - b.offset);
-  const filteredByProximity: { html: string; offset: number }[] = [];
-  for (const entry of sortedByOffset) {
-    const last = filteredByProximity[filteredByProximity.length - 1];
-    if (!last || entry.offset - last.offset >= MIN_CHAR_GAP) {
-      filteredByProximity.push(entry);
-    }
-  }
-
-  // Ensure uniqueness by HTML and join
-  const seenHtml = new Set<string>();
-  const uniqueHtmls: string[] = [];
-  for (const entry of filteredByProximity) {
-    if (!seenHtml.has(entry.html)) {
-      seenHtml.add(entry.html);
-      uniqueHtmls.push(entry.html);
-    }
-  }
-
-  const finalResult = uniqueHtmls.join(" ");
-
-  return finalResult;
-};
-
 const SUMMARY_TRUNCATE_LENGTH = 210;
+const CHARACTER_HIGHLIGHT_CLASS = "bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm";
 
-export function findCharacterSentences(characterSlug: string, currentLocation: Location) {
+interface FindCharacterSentencesOptions {
+  mode?: "chronological" | "spotlight";
+  limit?: number;
+}
+
+export function findCharacterSentences(characterSlug: string, currentLocation: Location, options: FindCharacterSentencesOptions = {}) {
+  const isPlay = getBookData().metadata.bookForm === "play" || getBookData().metadata.bookForm === "mixed";
   const characterData = getCharactersData().find((character) => character.slug === characterSlug);
 
-  // Changed return type
-  const items: SearchResultItemData[] = [];
+  const spottedCharacterItems: SearchResultItemData[] = [];
+  const talkingCharacterItems: SearchResultItemData[] = [];
   let resultIndex: number = 0;
 
   try {
     if (characterData) {
-      const knownCharacterHistory: { chapter: number; paragraphs: number[] }[] = [];
-      const hasHistoryTillCurrentChapter = characterData.infoPerChapter.filter((characterInfo) => characterInfo.chapter <= currentLocation.chapter);
+      const spottedCharacterHistory: { chapter: number; paragraphs: number[] }[] = [];
+      const talkingCharacterHistory: { chapter: number; paragraphs: number[] }[] = [];
+      const historyTillCurrentChapter = characterData.infoPerChapter.filter((characterInfo) => characterInfo.chapter <= currentLocation.chapter);
 
-      if (hasHistoryTillCurrentChapter) {
-        hasHistoryTillCurrentChapter.forEach((infoPerChapter) => {
+      if (historyTillCurrentChapter.length > 0) {
+        historyTillCurrentChapter.forEach((infoPerChapter: InfoPerChapter) => {
           if (infoPerChapter.chapter < currentLocation.chapter) {
-            knownCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: infoPerChapter.paragraphsWhereSpotted });
+            if (infoPerChapter.paragraphsWhereSpotted.length > 0) {
+              spottedCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: infoPerChapter.paragraphsWhereSpotted });
+            }
+            if (infoPerChapter.paragraphsWhereTalking.length > 0) {
+              talkingCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: infoPerChapter.paragraphsWhereTalking });
+            }
           } else {
-            const historyTillCurrentParagraph = infoPerChapter.paragraphsWhereSpotted.filter((paragraph) => paragraph <= currentLocation.paragraph);
-            knownCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: historyTillCurrentParagraph });
+            const spottedHistoryTillCurrentParagraph = infoPerChapter.paragraphsWhereSpotted.filter((paragraph) => paragraph <= currentLocation.paragraph);
+            if (spottedHistoryTillCurrentParagraph.length > 0) {
+              spottedCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: spottedHistoryTillCurrentParagraph });
+            }
+            const talkingHistoryTillCurrentParagraph = infoPerChapter.paragraphsWhereTalking.filter((paragraph) => paragraph <= currentLocation.paragraph);
+            if (talkingHistoryTillCurrentParagraph.length > 0) {
+              talkingCharacterHistory.push({ chapter: infoPerChapter.chapter, paragraphs: talkingHistoryTillCurrentParagraph });
+            }
           }
         });
       }
 
-      knownCharacterHistory.forEach(({ chapter, paragraphs }) => {
+      spottedCharacterHistory.forEach(({ chapter, paragraphs }) => {
         const totalParagraphsInChapter = getTotalParagraphsInChapter(chapter);
 
         paragraphs.forEach((paragraph) => {
           const paragraphElement = bookIndex.getParagraphElement(chapter, paragraph);
-          if (!paragraphElement) {
-            return;
-          }
+          if (!paragraphElement) return;
 
           const tagName = paragraphElement.tagName.toLowerCase();
-          const isStageDirectory = paragraphElement.querySelector("span em");
+          const isStageDirectory = paragraphElement.getAttribute("data-is-didaskalia") === "true";
 
           if (tagName === "h3" || tagName === "h4" || tagName === "h5" || isStageDirectory) return;
 
-          const paragraphInnerHTML = paragraphElement.innerHTML;
+          const playRow = paragraphElement.closest(".play-row");
 
-          const sentence = filterParagraphByCharacter(paragraphInnerHTML, characterSlug);
+          if (isPlay && playRow) {
+            const characterText = playRow.querySelector(".character-text");
 
-          if (sentence) {
-            const removedHtmlTags = stripHtmlTags(sentence);
+            if (characterText) {
+              const characterTextElement = characterText as HTMLElement;
 
-            let _sentence: string;
+              const findNextSpokenParagraph = (start: Element | null): HTMLElement | null => {
+                if (!start) return null;
+                let next = start.nextElementSibling as HTMLElement | null;
 
-            if (removedHtmlTags.length > SUMMARY_TRUNCATE_LENGTH) {
-              const excerpt = extractTextAroundMark(sentence);
-              _sentence = excerpt ?? `${removedHtmlTags.substring(0, SUMMARY_TRUNCATE_LENGTH)}...`;
-            } else {
-              _sentence = sentence;
+                while (next) {
+                  if (next.tagName.toLowerCase() === "p" && next.getAttribute("data-is-character") !== "true") {
+                    return next;
+                  }
+                  next = next.nextElementSibling as HTMLElement | null;
+                }
+
+                return null;
+              };
+
+              const characterTalking = (characterTextElement.querySelector('p[data-is-character="true"]') ?? characterTextElement.firstElementChild) as HTMLElement | null;
+              const characterTalkingIndexAttr = characterTalking?.getAttribute("data-index");
+              const characterTalkingIndex = characterTalkingIndexAttr ? Number(characterTalkingIndexAttr) : NaN;
+
+              let firstParagraph = Number.isFinite(characterTalkingIndex)
+                ? (characterTextElement.querySelector(`p[data-index="${characterTalkingIndex + 1}"]`) as HTMLElement | null)
+                : null;
+
+              if (!firstParagraph) {
+                firstParagraph = findNextSpokenParagraph(characterTalking);
+              }
+
+              const paragraphInnerHTML = paragraphElement.innerHTML;
+              const sentence = filterParagraphByCharacter(paragraphInnerHTML, characterSlug);
+
+              if (sentence) {
+                const removedHtmlTags = stripHtmlTags(sentence);
+
+                let _sentence: string;
+
+                if (removedHtmlTags.length > SUMMARY_TRUNCATE_LENGTH) {
+                  const excerpt = extractTextAroundMark(sentence);
+                  _sentence = excerpt ?? `${removedHtmlTags.substring(0, SUMMARY_TRUNCATE_LENGTH)}...`;
+                } else {
+                  _sentence = sentence;
+                }
+
+                const currentParagraphInRow = (characterTextElement.querySelector(`p[data-index="${paragraph}"]`) as HTMLElement | null) || (paragraphElement as HTMLElement);
+                const currentIndexAttr = currentParagraphInRow?.getAttribute("data-index");
+                const currentIndex = currentIndexAttr ? Number(currentIndexAttr) : paragraph;
+
+                let nextElement = characterTextElement.querySelector(`p[data-index="${currentIndex + 1}"]`) as HTMLElement | null;
+
+                if (!nextElement || nextElement.getAttribute("data-is-character") === "true") {
+                  nextElement = findNextSpokenParagraph(currentParagraphInRow);
+                }
+
+                const speakerName = characterTalking?.textContent?.trim();
+                const firstSpeechText = firstParagraph?.textContent?.trim();
+                const lineEntries: { text: string; type: "speaker" | "current" | "next" | "extra" }[] = [];
+                let currentMergedIntoSpeaker = false;
+
+                if (speakerName && firstSpeechText) {
+                  lineEntries.push({ text: `${speakerName.toUpperCase()}: ${firstSpeechText}`, type: "speaker" });
+                }
+
+                const trimmedSentence = _sentence.trim();
+                if (trimmedSentence) {
+                  const hasGap =
+                    lineEntries.length > 0 && Number.isFinite(characterTalkingIndex) && Number.isFinite(currentIndex) && currentIndex - (characterTalkingIndex + 1) > 1;
+                  const needsEllipsis = hasGap && !trimmedSentence.startsWith("...");
+                  const currentLineText = `${needsEllipsis ? "..." : ""}${trimmedSentence}`;
+
+                  const currentComparable = normalizeForComparison(currentLineText);
+                  const speakerEntry = lineEntries.find((entry) => entry.type === "speaker");
+                  const speakerComparable = speakerEntry ? normalizeForComparison(extractSpeechContentFromLine(speakerEntry.text)) : "";
+
+                  if (speakerEntry && currentComparable && currentComparable === speakerComparable) {
+                    const speakerPrefix = speakerEntry.text.split(":")[0];
+                    speakerEntry.text = speakerPrefix ? `${speakerPrefix}: ${currentLineText}` : currentLineText;
+                    currentMergedIntoSpeaker = true;
+                  } else if (currentComparable) {
+                    lineEntries.push({ text: currentLineText, type: "current" });
+                  }
+                }
+
+                if (nextElement && nextElement.textContent?.trim()) {
+                  const nextText = nextElement.textContent.trim();
+                  const nextComparable = normalizeForComparison(nextText);
+                  const alreadyPresent = lineEntries.some((entry) => {
+                    const entryComparable = entry.type === "speaker" ? normalizeForComparison(extractSpeechContentFromLine(entry.text)) : normalizeForComparison(entry.text);
+                    return entryComparable === nextComparable;
+                  });
+
+                  if (!alreadyPresent && nextComparable) {
+                    lineEntries.push({ text: nextText, type: "next" });
+                  }
+                }
+
+                if (currentMergedIntoSpeaker && nextElement && lineEntries.length < 3) {
+                  const afterNextElement = findNextSpokenParagraph(nextElement);
+                  if (afterNextElement && afterNextElement.textContent?.trim()) {
+                    const afterNextText = afterNextElement.textContent.trim();
+                    const afterNextComparable = normalizeForComparison(afterNextText);
+                    const alreadyPresent = lineEntries.some((entry) => {
+                      const entryComparable = entry.type === "speaker" ? normalizeForComparison(extractSpeechContentFromLine(entry.text)) : normalizeForComparison(entry.text);
+                      return entryComparable === afterNextComparable;
+                    });
+
+                    if (!alreadyPresent && afterNextComparable) {
+                      lineEntries.push({ text: afterNextText, type: "extra" });
+                    }
+                  }
+                }
+
+                if (lineEntries.length > 0) {
+                  const result = lineEntries.map((entry) => entry.text).join("\n");
+                  const formattedResult = formatWithHangingIndent(result.trim());
+
+                  spottedCharacterItems.push({
+                    chapter,
+                    paragraphNumber: paragraph,
+                    percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
+                    summary: formattedResult,
+                    id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
+                    type: SearchType.SPOTTED,
+                  });
+                }
+              }
             }
+          } else {
+            const paragraphInnerHTML = paragraphElement.innerHTML;
 
-            items.push({
+            const sentence = filterParagraphByCharacter(paragraphInnerHTML, characterSlug);
+
+            if (sentence) {
+              const removedHtmlTags = stripHtmlTags(sentence);
+
+              let _sentence: string;
+
+              if (removedHtmlTags.length > SUMMARY_TRUNCATE_LENGTH) {
+                const excerpt = extractTextAroundMark(sentence);
+                _sentence = excerpt ?? `${removedHtmlTags.substring(0, SUMMARY_TRUNCATE_LENGTH)}...`;
+              } else {
+                _sentence = sentence;
+              }
+
+              spottedCharacterItems.push({
+                chapter,
+                paragraphNumber: paragraph,
+                percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
+                summary: _sentence,
+                id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
+                type: SearchType.SPOTTED,
+              });
+            }
+          }
+        });
+      });
+
+      talkingCharacterHistory.forEach(({ chapter, paragraphs }) => {
+        const totalParagraphsInChapter = getTotalParagraphsInChapter(chapter);
+
+        paragraphs.forEach((paragraph) => {
+          const paragraphElement = bookIndex.getParagraphElement(chapter, paragraph);
+          if (!paragraphElement) return;
+
+          const playRow = paragraphElement.closest(".play-row");
+
+          if (isPlay && playRow) {
+            const characterDialogue = convertCharacterDialogue(playRow);
+            talkingCharacterItems.push({
               chapter,
               paragraphNumber: paragraph,
               percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
-              summary: _sentence,
-              text: _sentence,
+              summary: formatWithHangingIndent(characterDialogue),
               id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
+              type: SearchType.TALKING,
             });
+          } else {
+            const tagName = paragraphElement.tagName.toLowerCase();
+            const isStageDirectory = paragraphElement.getAttribute("data-is-didaskalia") === "true";
+
+            if (tagName === "h3" || tagName === "h4" || tagName === "h5" || isStageDirectory) return;
+
+            const paragraphInnerHTML = paragraphElement.innerHTML;
+
+            const sentence = filterParagraphByCharacter(paragraphInnerHTML, characterSlug);
+
+            if (sentence) {
+              const removedHtmlTags = stripHtmlTags(sentence);
+
+              let _sentence: string;
+
+              if (removedHtmlTags.length > SUMMARY_TRUNCATE_LENGTH) {
+                const excerpt = extractTextAroundMark(sentence);
+                _sentence = excerpt ?? `${removedHtmlTags.substring(0, SUMMARY_TRUNCATE_LENGTH)}...`;
+              } else {
+                _sentence = sentence;
+              }
+
+              talkingCharacterItems.push({
+                chapter,
+                paragraphNumber: paragraph,
+                percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
+                summary: _sentence,
+                id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
+                type: SearchType.TALKING,
+              });
+            }
           }
         });
       });
@@ -457,8 +535,19 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
     return { header: `Error performing local search for "${characterSlug}".`, items: [], isLoading: false };
   }
 
+  const chronologicalItems = sortSearchResults(spottedCharacterItems, talkingCharacterItems);
+  const { mode = "chronological", limit } = options;
+
+  const spotlightLimit = typeof limit === "number" && limit > 0 ? limit : 3;
+  const items =
+    mode === "spotlight"
+      ? buildSpotlightItems(spottedCharacterItems, talkingCharacterItems, chronologicalItems, spotlightLimit)
+      : typeof limit === "number" && limit > 0
+        ? chronologicalItems.slice(0, limit)
+        : chronologicalItems;
+
   // Construct SearchResultsData object for successful search
-  const totalMatches = items.length;
+  const totalMatches = mode === "spotlight" ? chronologicalItems.length : items.length;
   let header = "";
   if (totalMatches > 0) {
     header = `Found ${totalMatches} local match(es) for "${characterSlug}" (context: Ch. ${currentLocation.chapter}, P. ${currentLocation.paragraph})`;
@@ -478,6 +567,20 @@ function stripHtmlTags(str) {
   return str.replace(/<[^>]*>/g, "");
 }
 
+function normalizeForComparison(text: string): string {
+  if (!text) return "";
+  return stripHtmlTags(text).replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+function extractSpeechContentFromLine(line: string): string {
+  if (!line) return "";
+  const colonIndex = line.indexOf(":");
+  if (colonIndex === -1) {
+    return line;
+  }
+  return line.slice(colonIndex + 1);
+}
+
 function filterParagraphByCharacter(paragraph, characterSlug) {
   const tempDiv = document.createElement("div");
   tempDiv.innerHTML = paragraph;
@@ -490,7 +593,7 @@ function filterParagraphByCharacter(paragraph, characterSlug) {
       element.replaceWith(document.createTextNode(textContent));
     } else {
       const markElement = document.createElement("mark");
-      markElement.className = "bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm";
+      markElement.className = CHARACTER_HIGHLIGHT_CLASS;
       markElement.textContent = element.textContent;
       element.replaceWith(markElement);
     }
@@ -582,4 +685,159 @@ function extractTextAroundMark(paragraph) {
   }
 
   return result;
+}
+
+function convertCharacterDialogue(playRow: Element): string {
+  if (!(playRow instanceof HTMLElement)) {
+    return "";
+  }
+
+  const characterText = playRow.querySelector(".character-text") as HTMLElement | null;
+  if (!characterText || !characterText.firstElementChild) {
+    return (playRow.textContent || "").trim();
+  }
+
+  const characterNode = characterText.firstElementChild as HTMLElement;
+  const characterName = (characterNode.textContent || "").trim();
+
+  const dialogueLines = Array.from(characterText.children)
+    .slice(1)
+    .map((element) => (element.textContent || "").trim())
+    .filter((line) => line.length > 0);
+
+  const speakerLabel = characterName ? characterName.toUpperCase() : "";
+
+  if (!speakerLabel && dialogueLines.length === 0) {
+    return "";
+  }
+
+  if (!speakerLabel) {
+    return dialogueLines.join("\n");
+  }
+
+  const firstLine = dialogueLines[0] ?? "";
+  const additionalLines = dialogueLines.slice(1);
+
+  const rawBlock = firstLine ? [`${speakerLabel}: ${firstLine}`, ...additionalLines].join("\n") : `${speakerLabel}:`;
+
+  const formatted = formatWithHangingIndent(rawBlock);
+  const highlightedLabel = `<mark class="${CHARACTER_HIGHLIGHT_CLASS}">${speakerLabel}</mark>`;
+
+  return formatted.replace(`${speakerLabel}:`, `${highlightedLabel}:`);
+}
+
+const compareSearchItems = (a: SearchResultItemData, b: SearchResultItemData): number => {
+  if (a.chapter !== b.chapter) {
+    return a.chapter - b.chapter;
+  }
+
+  return a.paragraphNumber - b.paragraphNumber;
+};
+
+function sortSearchResults(array1: SearchResultItemData[], array2: SearchResultItemData[]): SearchResultItemData[] {
+  // Concatenate the arrays
+  const combined = [...array1, ...array2];
+
+  // Sort by chapter first, then by paragraph number
+  return combined.sort(compareSearchItems);
+}
+
+function getEarliestItem(items: SearchResultItemData[]): SearchResultItemData | undefined {
+  if (items.length === 0) return undefined;
+  return [...items].sort(compareSearchItems)[0];
+}
+
+function buildSpotlightItems(
+  spottedItems: SearchResultItemData[],
+  talkingItems: SearchResultItemData[],
+  chronologicalItems: SearchResultItemData[],
+  limit: number,
+): SearchResultItemData[] {
+  if (limit <= 0) return [];
+
+  const earliestSpotted = getEarliestItem(spottedItems);
+  const earliestTalking = getEarliestItem(talkingItems);
+
+  const results: SearchResultItemData[] = [];
+  const usedIds = new Set<string>();
+
+  const addItem = (item: SearchResultItemData | undefined) => {
+    if (!item) return;
+    if (usedIds.has(item.id)) return;
+    results.push(item);
+    usedIds.add(item.id);
+  };
+
+  let firstType: "spotted" | "talking" | null = null;
+  if (!earliestSpotted && earliestTalking) {
+    addItem(earliestTalking);
+    firstType = "talking";
+  } else if (!earliestTalking && earliestSpotted) {
+    addItem(earliestSpotted);
+    firstType = "spotted";
+  } else if (earliestSpotted && earliestTalking) {
+    if (compareSearchItems(earliestSpotted, earliestTalking) <= 0) {
+      addItem(earliestSpotted);
+      firstType = "spotted";
+    } else {
+      addItem(earliestTalking);
+      firstType = "talking";
+    }
+  }
+
+  if (results.length >= limit) return results;
+
+  if (firstType === "spotted") {
+    addItem(earliestTalking);
+  } else if (firstType === "talking") {
+    addItem(earliestSpotted);
+  }
+
+  if (results.length >= limit) return results.slice(0, limit);
+
+  const remainingChronological = chronologicalItems.filter((item) => !usedIds.has(item.id));
+  if (remainingChronological.length > 0) {
+    const middleStart = Math.floor(remainingChronological.length / 3);
+    const middleEnd = Math.max(middleStart + 1, Math.ceil((remainingChronological.length * 2) / 3));
+    const middleCandidates = remainingChronological.slice(middleStart, middleEnd);
+    const randomPool = middleCandidates.length > 0 ? middleCandidates : remainingChronological;
+    const randomItem = randomPool[Math.floor(Math.random() * randomPool.length)];
+    addItem(randomItem);
+  }
+
+  if (results.length >= limit) return results.slice(0, limit);
+
+  for (const item of chronologicalItems) {
+    if (results.length >= limit) break;
+    addItem(item);
+  }
+
+  return results.slice(0, limit);
+}
+
+function formatWithHangingIndent(text) {
+  const lines = text.split("\n").filter((line) => line.trim() !== "");
+
+  if (lines.length === 0) return "";
+
+  const firstLine = lines[0];
+  const speakerMatch = firstLine.match(/^([A-Z]+):\s*(.*)$/);
+
+  if (!speakerMatch) return text; // Return original if no speaker format found
+
+  const speaker = speakerMatch[1];
+  const firstDialogue = speakerMatch[2];
+  const indent = " ".repeat(speaker.length + 2); // Speaker name + ": "
+
+  const formattedLines = [`${speaker}: ${firstDialogue}`];
+
+  // Add remaining lines with proper indentation
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line) {
+      formattedLines.push(indent + line);
+    }
+  }
+
+  return formattedLines.join("\n");
 }

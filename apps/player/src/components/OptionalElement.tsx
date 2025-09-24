@@ -1,7 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { useOptionalElementVisibility, useLastHideReason, useElementVisibilityStore } from "@player/stores/elementVisibility.store";
-import { cn } from "@player/lib/utils";
 
 interface OptionalElementProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -18,8 +17,8 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
   const previousVisibilityRef = useRef<boolean>(shouldBeVisible);
 
   // Local state for hover visibility
-  const [isHovered, setIsHovered] = React.useState(false);
-  const [isDesktop, setIsDesktop] = React.useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   // Check if screen is wide enough for hover effects (desktop)
   const isDesktopWidth = () => window.innerWidth >= 1024;
@@ -44,32 +43,35 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
   }, [isDesktop, isHovered, startAllTimers]);
 
   // Determine if element should be visible
-  // Optional elements should only be visible when explicitly shown, NOT during scroll mode
-
   useEffect(() => {
     const element = elementRef.current;
     if (!element) return;
 
-    const isBecomingVisible = shouldBeVisible && !previousVisibilityRef.current;
-    const isBecomingHidden = !shouldBeVisible && previousVisibilityRef.current;
+    const currentlyVisible = shouldBeVisible || isHovered;
+    const isBecomingVisible = currentlyVisible && !previousVisibilityRef.current;
+    const isBecomingHidden = !currentlyVisible && previousVisibilityRef.current;
 
-    if (isBecomingVisible) {
+    // Reset animation when hover state changes OR when becoming visible
+    if (isBecomingVisible || (isHovered && !previousVisibilityRef.current)) {
+      // Reset transition first to interrupt any ongoing animation
+      element.style.transition = "none";
+      // Force reflow to apply the reset
+      void element.offsetHeight;
+      // Now set the fast transition for showing
       element.style.transition = `opacity 0.3s ease-in-out`;
     } else if (isBecomingHidden) {
       // Different transition durations based on hide reason
-      if (lastHideReason === "inactivity") {
+      if (lastHideReason === "inactivity" && !isHovered) {
         element.style.transition = `opacity 4s ease-in-out`;
       } else {
-        // Fast hiding for tap or other reasons
+        // Fast hiding for tap or other reasons, or when hover ends
         element.style.transition = `opacity 0.3s ease-in-out`;
       }
     }
 
-    element.style.opacity = shouldBeVisible ? "1" : "0";
-    // Removed imperative pointer-events setting - will be handled in JSX based on visibility
-
-    previousVisibilityRef.current = shouldBeVisible;
-  }, [shouldBeVisible, lastHideReason]);
+    element.style.opacity = currentlyVisible ? "1" : "0";
+    previousVisibilityRef.current = currentlyVisible;
+  }, [shouldBeVisible, lastHideReason, isHovered]);
 
   const handleMouseEnter = () => {
     // Only enable hover effects on desktop-width screens
@@ -96,10 +98,9 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       ref={elementRef}
-      className={cn("transition-opacity", className)}
+      className={className}
       aria-hidden={!isElementVisible}
       style={{
-        opacity: isElementVisible ? 1 : 0,
         // Always allow pointer events on desktop, and on mobile only disable when truly hidden
         pointerEvents: isDesktop ? "auto" : shouldBeVisible || isHovered ? "auto" : "none",
       }}
