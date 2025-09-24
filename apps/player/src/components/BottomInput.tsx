@@ -405,7 +405,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   );
 
   return (
-    <OptionalElement className={cn("transition-all duration-300 ease-out w-full flex justify-center", className)}>
+    <OptionalElement className={cn("w-full flex justify-center", className)}>
       <motion.div
         className={cn(
           "bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-2 py-[2px] md:py-[3px] md:px-3",
@@ -609,7 +609,7 @@ const variants: Record<string, Variants> = {
     idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(0,0,0,0)", transition: { duration: 0.2 } },
   },
   container: {
-    idle: { boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", borderColor: "rgba(255, 255, 255, 0.3)", transition: { duration: 0.3 } },
+    idle: { boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", borderColor: "rgba(255, 255, 255, 0.3)" },
     recordingContainer: {
       boxShadow: ["0px 0px 0px rgba(239, 68, 68, 0.2)", "0px 0px 12px rgba(239, 68, 68, 0.6)", "0px 0px 0px rgba(239, 68, 68, 0.2)"],
       borderColor: ["rgba(255, 255, 255, 0.3)", "rgba(239, 68, 68, 0.6)", "rgba(255, 255, 255, 0.3)"],
