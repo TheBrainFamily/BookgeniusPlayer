@@ -127,7 +127,7 @@ const CharacterAvatar = memo<CharacterAvatarProps>(({ characterEntity, currentSp
         transition={{ duration: 0.3, ease: "easeOut", borderColor: { duration: 0.2 }, boxShadow: { duration: 0.4 } }}
         whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
       >
-        <CharacterCard entity={characterEntity} currentSpeakers={currentSpeakers} disableHighlight imageOnly captionMode="hover" />
+        <CharacterCard entity={characterEntity} currentSpeakers={currentSpeakers} disableHighlight imageOnly captionMode="hover-title" />
       </motion.div>
     </motion.div>
   );

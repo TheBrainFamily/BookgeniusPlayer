@@ -15,7 +15,7 @@ import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
-type CaptionMode = "always" | "hover" | "never";
+type CaptionMode = "always" | "hover" | "hover-title" | "never";
 
 type CharacterCardProps = { entity: ParsedParagraphRange; currentSpeakers: string[]; disableHighlight?: boolean; imageOnly?: boolean; captionMode?: CaptionMode };
 
@@ -93,7 +93,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       ? "opacity-100 translate-y-0"
       : captionMode === "hover"
         ? "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0"
-        : "hidden";
+        : captionMode === "hover-title"
+          ? "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0"
+          : "hidden";
 
   return (
     <div
@@ -134,7 +136,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
             <h4 className="w-full whitespace-nowrap overflow-hidden text-ellipsis text-[8px] sm:text-[10px] md:text-xs font-bold text-white tracking-wide uppercase">
               {entity.label || displayName}
             </h4>
-            {summary && <p className="w-full whitespace-nowrap overflow-hidden text-ellipsis text-[7px] sm:text-[9px] md:text-xs italic text-gray-200">{summary}</p>}
+            {summary && captionMode !== "hover-title" && (
+              <p className="w-full whitespace-nowrap overflow-hidden text-ellipsis text-[7px] sm:text-[9px] md:text-xs italic text-gray-200">{summary}</p>
+            )}
           </div>
         </div>
       )}
