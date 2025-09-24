@@ -60,7 +60,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
   const { startRecording, stopRecording, response } = useRealtime();
   const { location } = useLocation();
-  const furthestLocation = getSavedLocation();
+  const saved = getSavedLocation();
+  const furthestLocation = saved ?? location;
 
   const allCharacters = useMemo(() => {
     try {
@@ -88,20 +89,17 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       if (isDeepResearchActive) return;
       if (isRecording) return;
 
-      if (inputValue.length > 1 && !isSearchModalOpen) {
-        openSearchModal(true, true, inputValue.trim());
-      }
-
       const trimmedValue = inputValue.trim();
       startTransition(() => {
         if (trimmedValue.length >= 2) {
+          openSearchModal(true, true, inputValue);
           setSearchQuery(trimmedValue);
         } else {
           setSearchQuery("");
         }
       });
     },
-    [isDeepResearchActive, isRecording, setSearchQuery, isSearchModalOpen, openSearchModal],
+    [isDeepResearchActive, isRecording, setSearchQuery, openSearchModal],
   );
 
   const filteredCharacters = useMemo(() => {
@@ -332,11 +330,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   }, [handleActivity, response, isRecording, isSearchModalOpen, setSearchQuery]);
 
   useEffect(() => {
-    if (!mentionState.isActive) {
-      setHighlightedMention(0);
-    } else {
-      setHighlightedMention(0);
-    }
+    setHighlightedMention(0);
   }, [mentionState.isActive, mentionState.query]);
 
   const closeMentions = useCallback(() => {

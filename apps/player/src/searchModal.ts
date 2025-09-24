@@ -201,7 +201,7 @@ export function performCachedSearch(query: string, currentLocation: Location): S
                 }
               }
             }
-          } catch (e) {
+          } catch {
             // If anything goes wrong with DOM access, keep previous behavior silently
           }
         }

@@ -63,7 +63,7 @@ export const useSearchLogic = () => {
         /* ---------- 2a. local DOM search: runs immediately ---------- */
 
         if (searchQuery.includes("@")) {
-          searchQuery = searchQuery.replace("@", "");
+          searchQuery = searchQuery.replaceAll("@", "");
         }
 
         const character = getCharactersData().find(
