@@ -10,13 +10,13 @@ import { useRouteTransition } from "@platform/providers/RouteTransitionProvider"
 import { useNavigate } from "react-router-dom";
 
 // Import assets
-import episode1 from "@wukong/assets/episode-1.png";
-import episode2 from "@wukong/assets/episode-2.png";
-import episode3 from "@wukong/assets/episode-3.png";
-import episode4 from "@wukong/assets/episode-4.png";
-import wukongAvatar from "@wukong/assets/wukong-avatar.png";
-import tangAvatar from "@wukong/assets/tang-avatar.png";
-import pigAvatar from "@wukong/assets/pig-avatar.png";
+import episode1 from "@wukong/assets/episode-1.jpg";
+import episode2 from "@wukong/assets/episode-2.jpg";
+import episode3 from "@wukong/assets/episode-3.jpg";
+import episode4 from "@wukong/assets/episode-4.jpg";
+import wukongAvatar from "@wukong/assets/wukong-avatar.jpg";
+import tangAvatar from "@wukong/assets/tang-avatar.jpg";
+import pigAvatar from "@wukong/assets/pig-avatar.jpg";
 
 const WukongLanding = () => {
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
@@ -193,13 +193,13 @@ const WukongLanding = () => {
                   <div className="text-sm text-muted-foreground">596-664 AD</div>
                   <div className="text-xs text-accent/80 mt-1">Historical Journey</div>
                 </div>
-                <div className="text-2xl text-accent font-bold">→</div>
+                <div className="text-2xl text-accent font-bold transform rotate-90 md:rotate-0">→</div>
                 <div className="text-center">
                   <div className="text-lg font-semibold text-foreground">Wu Cheng</div>
                   <div className="text-sm text-muted-foreground">1592 AD</div>
                   <div className="text-xs text-accent/80 mt-1">Literary Masterpiece</div>
                 </div>
-                <div className="text-2xl text-accent font-bold">→</div>
+                <div className="text-2xl text-accent font-bold transform rotate-90 md:rotate-0">→</div>
                 <div className="text-center">
                   <div className="text-lg font-semibold text-accent">BookGenius</div>
                   <div className="text-sm text-muted-foreground">2025 AD</div>
@@ -248,7 +248,7 @@ const WukongLanding = () => {
             </p>
           </div>
 
-          <div className="flex justify-center space-x-12 md:space-x-20">
+          <div className="flex justify-center flex-col md:flex-row space-y-12 md:space-x-20">
             {characters.map((character, index) => (
               <CharacterAvatar key={index} {...character} size="lg" />
             ))}

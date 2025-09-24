@@ -162,7 +162,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   console.log("domain:", clerkDomain);
   console.log("signInUrl:", signInUrl);
   console.log("signUpUrl:", signUpUrl);
-
+  console.log("new version of clerk");
   return (
     <WidgetCtx.Provider value={hooks.UserButton}>
       <ClerkProvider

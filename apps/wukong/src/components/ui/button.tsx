@@ -17,7 +17,8 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         golden:
           "bg-gradient-to-r from-accent to-primary text-primary-foreground font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 animate-golden-pulse",
-        mystical: "bg-card/80 text-accent border-2 border-accent/30 backdrop-blur-sm hover:bg-card hover:border-accent/60 transition-all duration-300",
+        mystical:
+          "bg-card/80 text-accent border-2 border-accent/30 backdrop-blur-sm hover:bg-card hover:border-accent/60 transition-all duration-300 [&>*]:!bg-transparent [&>*]:!border-none [&>*]:!text-accent [&>*]:!hover:bg-transparent [&>*]:!hover:text-accent",
       },
       size: { default: "h-10 px-4 py-2", sm: "h-9 rounded-md px-3", lg: "h-11 rounded-md px-8", icon: "h-10 w-10" },
     },
