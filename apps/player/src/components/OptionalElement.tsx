@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { useOptionalElementVisibility, useLastHideReason, useElementVisibilityStore } from "@player/stores/elementVisibility.store";
 import { cn } from "@player/lib/utils";
@@ -18,8 +18,8 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
   const previousVisibilityRef = useRef<boolean>(shouldBeVisible);
 
   // Local state for hover visibility
-  const [isHovered, setIsHovered] = React.useState(false);
-  const [isDesktop, setIsDesktop] = React.useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   // Check if screen is wide enough for hover effects (desktop)
   const isDesktopWidth = () => window.innerWidth >= 1024;

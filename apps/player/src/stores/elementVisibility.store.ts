@@ -25,7 +25,7 @@ interface ElementVisibilityState {
   touch: TouchState;
   timers: TimerState;
   // Internal timer refs (not exposed to components)
-  _internalTimers: { inactivityTimerRef: number | null; scrollTimerRef: number | null };
+  internalTimers: { inactivityTimerRef: number | null; scrollTimerRef: number | null };
   // Actions
   setElementsVisible: (visible: boolean) => void;
   setScrollMode: (scrollMode: boolean) => void;
@@ -37,8 +37,9 @@ interface ElementVisibilityState {
   showAllElements: () => void;
   hideAllElements: (reason?: HideReason) => void;
   handleScreenTap: () => void;
-  pauseAllTimers: (sticky?: boolean) => void;
+  pauseAllTimers: () => void;
   startAllTimers: () => void;
+  setIsTimersPausedSticky: (sticky: boolean) => void;
   clearInactivityTimer: () => void;
   resetInactivityTimer: () => void;
   // Selectors for better performance
@@ -57,7 +58,7 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
       isTimersPausedSticky: false,
       touch: { startY: 0, startX: 0, startTime: 0, isScrolling: false },
       timers: { inactivityTimerId: null, scrollTimerId: null },
-      _internalTimers: { inactivityTimerRef: null, scrollTimerRef: null },
+      internalTimers: { inactivityTimerRef: null, scrollTimerRef: null },
 
       // Simple actions
       setElementsVisible: (visible) => set({ areElementsVisible: visible }),
@@ -69,55 +70,55 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
 
       // Timer management
       clearInactivityTimer: () => {
-        const { _internalTimers } = get();
-        if (_internalTimers.inactivityTimerRef) {
-          clearTimeout(_internalTimers.inactivityTimerRef);
-          set((state) => ({ _internalTimers: { ...state._internalTimers, inactivityTimerRef: null }, timers: { ...state.timers, inactivityTimerId: null } }));
+        const { internalTimers } = get();
+
+        if (internalTimers.inactivityTimerRef) {
+          clearTimeout(internalTimers.inactivityTimerRef);
+          set((state) => ({ internalTimers: { ...state.internalTimers, inactivityTimerRef: null }, timers: { ...state.timers, inactivityTimerId: null } }));
         }
       },
 
       resetInactivityTimer: () => {
         const store = get();
 
-        if (store._internalTimers.inactivityTimerRef) {
-          clearTimeout(store._internalTimers.inactivityTimerRef);
+        if (store.internalTimers.inactivityTimerRef) {
+          clearTimeout(store.internalTimers.inactivityTimerRef);
         }
 
         const timerId = window.setTimeout(() => {
           const { hideAllElements } = useElementVisibilityStore.getState();
           hideAllElements("inactivity");
-          set((state) => ({ _internalTimers: { ...state._internalTimers, inactivityTimerRef: null }, timers: { ...state.timers, inactivityTimerId: null } }));
+          set((state) => ({ internalTimers: { ...state.internalTimers, inactivityTimerRef: null }, timers: { ...state.timers, inactivityTimerId: null } }));
         }, INACTIVITY_TIMEOUT);
 
-        set((state) => ({ _internalTimers: { ...state._internalTimers, inactivityTimerRef: timerId }, timers: { ...state.timers, inactivityTimerId: timerId } }));
+        set((state) => ({ internalTimers: { ...state.internalTimers, inactivityTimerRef: timerId }, timers: { ...state.timers, inactivityTimerId: timerId } }));
       },
 
-      pauseAllTimers: (sticky?: boolean) => {
-        const { _internalTimers } = get();
+      pauseAllTimers: () => {
+        const { internalTimers } = get();
 
-        if (_internalTimers.inactivityTimerRef) {
-          clearTimeout(_internalTimers.inactivityTimerRef);
+        if (internalTimers.inactivityTimerRef) {
+          clearTimeout(internalTimers.inactivityTimerRef);
         }
-        if (_internalTimers.scrollTimerRef) {
-          clearTimeout(_internalTimers.scrollTimerRef);
+        if (internalTimers.scrollTimerRef) {
+          clearTimeout(internalTimers.scrollTimerRef);
         }
 
-        set({ _internalTimers: { inactivityTimerRef: null, scrollTimerRef: null }, timers: { inactivityTimerId: null, scrollTimerId: null }, isTimersPausedSticky: sticky });
+        set({ internalTimers: { inactivityTimerRef: null, scrollTimerRef: null }, timers: { inactivityTimerId: null, scrollTimerId: null } });
       },
 
       startAllTimers: () => {
         const { areElementsVisible, isScrollMode, resetInactivityTimer, isTimersPausedSticky } = get();
 
-        if (isTimersPausedSticky) {
-          return;
-        }
+        if (isTimersPausedSticky) return;
 
         // Only start timer if elements are visible and not in scroll mode
         if (areElementsVisible && !isScrollMode) {
           resetInactivityTimer();
-          set({ isTimersPausedSticky: false });
         }
       },
+
+      setIsTimersPausedSticky: (sticky) => set({ isTimersPausedSticky: sticky }),
 
       // Complex actions
       showAllElements: () => set({ areElementsVisible: true, isScrollMode: false, lastHideReason: null }),

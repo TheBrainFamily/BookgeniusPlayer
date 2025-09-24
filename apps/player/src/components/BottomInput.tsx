@@ -52,7 +52,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { pauseAllTimers, startAllTimers, showAllElements } = useElementVisibilityStore();
+  const { pauseAllTimers, startAllTimers, showAllElements, setIsTimersPausedSticky } = useElementVisibilityStore();
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
   const { openModal: openResearchModal, setContent: setResearchContent, closeModal: closeResearchModal, isOpen: isResearchModalOpen } = useResearchModal();
   const { closeModal: closeCharacterModal, isOpen: isCharacterModalOpen } = useCharacterModal();
@@ -111,7 +111,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   }, [availableCharacterNames, mentionState.isActive, mentionState.query]);
 
   const handleActivity = useCallback(() => {
-    pauseAllTimers(true);
+    setIsTimersPausedSticky(true);
+    pauseAllTimers();
     showAllElements();
   }, [pauseAllTimers, showAllElements]);
 
@@ -307,6 +308,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       if (containerRef.current?.contains(target)) return;
       if (target.closest('[role="dialog"]') || target.closest('[role="tooltip"]')) return;
 
+      setIsTimersPausedSticky(false);
       startAllTimers();
     };
 
