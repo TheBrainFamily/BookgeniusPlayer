@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, Variants } from "motion/react";
-import { Brain, FileSearch, TelescopeIcon } from "lucide-react";
+import { Brain, FileSearch, Telescope } from "lucide-react";
 
 import ModalUI from "./ModalUI";
 import { LLMAnswerViewer } from "@player/ui/MarkdownComponent";
@@ -17,7 +17,7 @@ interface ResearchModalProps {
 const ResearchModal: React.FC<ResearchModalProps> = ({ onClose, content, layoutView, hideOverlay, isLoading, state }) => {
   const modalTitle = (
     <div className="flex items-center gap-2">
-      {state === "ask" ? <Brain size={20} /> : <TelescopeIcon size={20} />}
+      {state === "ask" ? <Brain size={20} /> : <Telescope size={20} />}
       <span>{state === "ask" ? "Ask Search" : "Deep Research"}</span>
     </div>
   );
