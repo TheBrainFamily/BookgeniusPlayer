@@ -74,29 +74,9 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     setIsLoading(true);
 
     try {
-      const searchResults = findCharacterSentences(characterSlug, furthestLocation);
+      const searchResults = findCharacterSentences(characterSlug, furthestLocation, { mode: "spotlight", limit: 3 });
       setResults(searchResults);
-
-      // 1. Unique chapters (first appearance in each chapter)
-      const byChapter = new Map<number, SearchResultItemData>();
-      for (const item of searchResults.items) {
-        if (!byChapter.has(item.chapter)) byChapter.set(item.chapter, item);
-      }
-
-      let results = Array.from(byChapter.values()).sort((a, b) => a.chapter - b.chapter);
-
-      // 2. If we have less than 3 results, try to add more from the first chapter in results
-      if (results.length < 3 && searchResults.items.length > results.length && results[0]) {
-        const firstChapter = results[0].chapter;
-        const firstChapterItems = searchResults.items.filter((i) => i.chapter === firstChapter).sort((a, b) => a.paragraphNumber - b.paragraphNumber);
-
-        const needed = Math.min(3 - results.length, Math.max(0, firstChapterItems.length - 1));
-        const extras = firstChapterItems.slice(1, 1 + needed);
-
-        results = [results[0], ...extras, ...results.slice(1)];
-      }
-
-      setCharacterAppearances(results);
+      setCharacterAppearances(searchResults.items);
     } catch (err) {
       console.error("Error searching for character appearances:", err);
       setCharacterAppearances([]);
@@ -210,6 +190,9 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                                   {appearance.percentInChapter}% {t("of_chapter")} {getChapterTitle(appearance.chapter, t)}
                                 </span>
                               </div>
+                              <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
+                                <span className="flex items-center gap-1">{appearance.type}</span>
+                              </div>
                             </div>
 
                             <motion.div
@@ -217,7 +200,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               transition={{ delay: 0.2 }}
-                              dangerouslySetInnerHTML={{ __html: appearance.text }}
+                              dangerouslySetInnerHTML={{ __html: appearance.summary }}
                             />
 
                             <motion.div

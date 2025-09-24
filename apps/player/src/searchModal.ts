@@ -14,6 +14,7 @@ export interface SearchResultItemData {
   summary: string;
   text?: string;
   id: string; // For React keys
+  type?: "spotted" | "talking";
 }
 
 export interface SearchResultsData {
@@ -253,7 +254,12 @@ const calculatePercentInChapter = (paragraphNumber: number, totalParagraphs: num
 
 const SUMMARY_TRUNCATE_LENGTH = 210;
 
-export function findCharacterSentences(characterSlug: string, currentLocation: Location) {
+interface FindCharacterSentencesOptions {
+  mode?: "chronological" | "spotlight";
+  limit?: number;
+}
+
+export function findCharacterSentences(characterSlug: string, currentLocation: Location, options: FindCharacterSentencesOptions = {}) {
   const isPlay = getBookData().metadata.bookForm === "play" || getBookData().metadata.bookForm === "mixed";
   const characterData = getCharactersData().find((character) => character.slug === characterSlug);
 
@@ -427,8 +433,8 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
                     paragraphNumber: paragraph,
                     percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
                     summary: formattedResult,
-                    text: formattedResult,
                     id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
+                    type: "spotted",
                   });
                 }
               }
@@ -455,8 +461,8 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
                 paragraphNumber: paragraph,
                 percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
                 summary: _sentence,
-                text: _sentence,
                 id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
+                type: "spotted",
               });
             }
           }
@@ -479,8 +485,8 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
               paragraphNumber: paragraph,
               percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
               summary: characterDialogue,
-              text: characterDialogue,
               id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
+              type: "talking",
             });
           } else {
             const tagName = paragraphElement.tagName.toLowerCase();
@@ -509,8 +515,8 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
                 paragraphNumber: paragraph,
                 percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
                 summary: _sentence,
-                text: _sentence,
                 id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
+                type: "talking",
               });
             }
           }
@@ -523,9 +529,19 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
     return { header: `Error performing local search for "${characterSlug}".`, items: [], isLoading: false };
   }
 
-  const items = sortSearchResults(spottedCharacterItems, talkingCharacterItems);
+  const chronologicalItems = sortSearchResults(spottedCharacterItems, talkingCharacterItems);
+  const { mode = "chronological", limit } = options;
+
+  const spotlightLimit = typeof limit === "number" && limit > 0 ? limit : 3;
+  const items =
+    mode === "spotlight"
+      ? buildSpotlightItems(spottedCharacterItems, talkingCharacterItems, chronologicalItems, spotlightLimit)
+      : typeof limit === "number" && limit > 0
+        ? chronologicalItems.slice(0, limit)
+        : chronologicalItems;
+
   // Construct SearchResultsData object for successful search
-  const totalMatches = items.length;
+  const totalMatches = mode === "spotlight" ? chronologicalItems.length : items.length;
   let header = "";
   if (totalMatches > 0) {
     header = `Found ${totalMatches} local match(es) for "${characterSlug}" (context: Ch. ${currentLocation.chapter}, P. ${currentLocation.paragraph})`;
@@ -686,20 +702,93 @@ function convertCharacterDialogue(htmlInput: string): string {
   return `<mark class="bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm">${characterName}</mark>: ${dialogueText}`;
 }
 
+const compareSearchItems = (a: SearchResultItemData, b: SearchResultItemData): number => {
+  if (a.chapter !== b.chapter) {
+    return a.chapter - b.chapter;
+  }
+
+  return a.paragraphNumber - b.paragraphNumber;
+};
+
 function sortSearchResults(array1: SearchResultItemData[], array2: SearchResultItemData[]): SearchResultItemData[] {
   // Concatenate the arrays
   const combined = [...array1, ...array2];
 
   // Sort by chapter first, then by paragraph number
-  return combined.sort((a, b) => {
-    // Primary sort: by chapter
-    if (a.chapter !== b.chapter) {
-      return a.chapter - b.chapter;
-    }
+  return combined.sort(compareSearchItems);
+}
 
-    // Secondary sort: by paragraph number within the same chapter
-    return a.paragraphNumber - b.paragraphNumber;
-  });
+function getEarliestItem(items: SearchResultItemData[]): SearchResultItemData | undefined {
+  if (items.length === 0) return undefined;
+  return [...items].sort(compareSearchItems)[0];
+}
+
+function buildSpotlightItems(
+  spottedItems: SearchResultItemData[],
+  talkingItems: SearchResultItemData[],
+  chronologicalItems: SearchResultItemData[],
+  limit: number,
+): SearchResultItemData[] {
+  if (limit <= 0) return [];
+
+  const earliestSpotted = getEarliestItem(spottedItems);
+  const earliestTalking = getEarliestItem(talkingItems);
+
+  const results: SearchResultItemData[] = [];
+  const usedIds = new Set<string>();
+
+  const addItem = (item: SearchResultItemData | undefined) => {
+    if (!item) return;
+    if (usedIds.has(item.id)) return;
+    results.push(item);
+    usedIds.add(item.id);
+  };
+
+  let firstType: "spotted" | "talking" | null = null;
+  if (!earliestSpotted && earliestTalking) {
+    addItem(earliestTalking);
+    firstType = "talking";
+  } else if (!earliestTalking && earliestSpotted) {
+    addItem(earliestSpotted);
+    firstType = "spotted";
+  } else if (earliestSpotted && earliestTalking) {
+    if (compareSearchItems(earliestSpotted, earliestTalking) <= 0) {
+      addItem(earliestSpotted);
+      firstType = "spotted";
+    } else {
+      addItem(earliestTalking);
+      firstType = "talking";
+    }
+  }
+
+  if (results.length >= limit) return results;
+
+  if (firstType === "spotted") {
+    addItem(earliestTalking);
+  } else if (firstType === "talking") {
+    addItem(earliestSpotted);
+  }
+
+  if (results.length >= limit) return results.slice(0, limit);
+
+  const remainingChronological = chronologicalItems.filter((item) => !usedIds.has(item.id));
+  if (remainingChronological.length > 0) {
+    const middleStart = Math.floor(remainingChronological.length / 3);
+    const middleEnd = Math.max(middleStart + 1, Math.ceil((remainingChronological.length * 2) / 3));
+    const middleCandidates = remainingChronological.slice(middleStart, middleEnd);
+    const randomPool = middleCandidates.length > 0 ? middleCandidates : remainingChronological;
+    const randomItem = randomPool[Math.floor(Math.random() * randomPool.length)];
+    addItem(randomItem);
+  }
+
+  if (results.length >= limit) return results.slice(0, limit);
+
+  for (const item of chronologicalItems) {
+    if (results.length >= limit) break;
+    addItem(item);
+  }
+
+  return results.slice(0, limit);
 }
 
 function formatWithHangingIndent(text) {
