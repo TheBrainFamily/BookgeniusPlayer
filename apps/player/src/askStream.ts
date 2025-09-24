@@ -8,7 +8,7 @@ type Handlers = {
   onMeta?: (needMore: boolean) => void;
   onChunk?: (delta: string) => void;
   onDone?: (final: { text?: string; needMore: boolean }) => void;
-  onError?: (err: any) => void;
+  onError?: (err: unknown) => void;
 };
 
 export function askStream(query: string, location: Location, handlers: Handlers) {
