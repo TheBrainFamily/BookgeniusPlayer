@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import { useOptionalElementVisibility, useLastHideReason, useElementVisibilityStore } from "@player/stores/elementVisibility.store";
-import { cn } from "@player/lib/utils";
 
 interface OptionalElementProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -57,7 +56,7 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
       // Reset transition first to interrupt any ongoing animation
       element.style.transition = "none";
       // Force reflow to apply the reset
-      element.offsetHeight;
+      void element.offsetHeight;
       // Now set the fast transition for showing
       element.style.transition = `opacity 0.3s ease-in-out`;
     } else if (isBecomingHidden) {

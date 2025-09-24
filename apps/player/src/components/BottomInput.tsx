@@ -101,7 +101,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         }
       });
     },
-    [isDeepResearchActive, isRecording, setSearchQuery, isSearchModalOpen],
+    [isDeepResearchActive, isRecording, setSearchQuery, isSearchModalOpen, openSearchModal],
   );
 
   const filteredCharacters = useMemo(() => {
@@ -114,7 +114,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     setIsTimersPausedSticky(true);
     pauseAllTimers();
     showAllElements();
-  }, [pauseAllTimers, showAllElements]);
+  }, [pauseAllTimers, showAllElements, setIsTimersPausedSticky]);
 
   const openModalWithFocus = useCallback(() => {
     if (isDeepResearchActive) return;
@@ -319,7 +319,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("pointerdown", handleDocumentPointerDown, true);
     };
-  }, [handleActivity, openModalWithFocus, startAllTimers]);
+  }, [handleActivity, openModalWithFocus, startAllTimers, setIsTimersPausedSticky]);
 
   useEffect(() => {
     if (response && !isRecording) {
