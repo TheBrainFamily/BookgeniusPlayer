@@ -88,14 +88,13 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
 
   const commonAttrs = { "data-original-src": mediaSrc, "data-character-name": displayName, "data-summary": summary ?? "", className: "w-full h-full object-cover block" } as const;
 
+  const isHoverish = captionMode === "hover" || captionMode === "hover-title";
   const captionVisibilityClasses =
     captionMode === "always"
       ? "opacity-100 translate-y-0"
-      : captionMode === "hover"
+      : isHoverish
         ? "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0"
-        : captionMode === "hover-title"
-          ? "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0"
-          : "hidden";
+        : "hidden";
 
   return (
     <div
