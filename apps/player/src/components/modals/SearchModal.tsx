@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useMemo, useDeferredValue, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useDeferredValue, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 
@@ -14,15 +14,17 @@ import ModalUI from "./ModalUI";
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@player/components/ui/accordion";
 import { getChapterTitle } from "@player/utils/getChapterTitle";
+import { cn } from "@player/lib/utils";
 
 interface SearchModalProps {
   onClose: () => void;
   layoutView?: boolean;
   hideOverlay?: boolean;
   searchResults: SearchResultsData | null;
+  clickedAppearanceId?: string;
 }
 
-export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults }) => {
+export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults, clickedAppearanceId }) => {
   const { t } = useTranslation();
 
   const deferredResults = useDeferredValue(searchResults);
@@ -38,6 +40,39 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
   const handleCollapseAll = useCallback(() => {
     setOpenChapters([]);
   }, []);
+
+  useEffect(() => {
+    if (!clickedAppearanceId) return;
+
+    const findTarget = () => {
+      const container = document.getElementById("search-modal-accordion");
+      return container?.querySelector<HTMLElement>(`[data-appearance-id="${clickedAppearanceId}"]`);
+    };
+
+    const logAndScroll = () => {
+      const target = findTarget();
+      console.log("SearchModal target element", clickedAppearanceId, target);
+      target?.scrollIntoView({ behavior: "instant", block: "center" });
+    };
+
+    const timeoutHandles: number[] = [];
+    const schedule = (delay: number) => {
+      if (delay === 0) {
+        logAndScroll();
+      } else {
+        timeoutHandles.push(window.setTimeout(logAndScroll, delay));
+      }
+    };
+
+    const rafId = window.requestAnimationFrame(() => {
+      [0, 120, 240].forEach(schedule);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      timeoutHandles.forEach((handle) => window.clearTimeout(handle));
+    };
+  }, [clickedAppearanceId]);
 
   const areAllCollapsed = openChapters.length === 0;
 
@@ -147,9 +182,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
           <motion.div className="flex-grow overflow-y-auto" variants={variants.content} initial="hidden" animate="visible" key="content">
             {hasItems ? (
               <motion.div className="space-y-3 -mt-3" variants={variants.container} initial="hidden" animate="visible">
-                <Accordion type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
+                <Accordion id="search-modal-accordion" type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
                   {sortedChapterEntries.map(([chapter, items]) => (
-                    <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} />
+                    <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} clickedAppearanceId={clickedAppearanceId} />
                   ))}
                 </Accordion>
               </motion.div>
@@ -169,7 +204,17 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
   );
 };
 
-const ChapterGroup = memo(function ChapterGroup({ chapter, items, t }: { chapter: number; items: SearchResultItemData[]; t: TFunction }) {
+const ChapterGroup = memo(function ChapterGroup({
+  chapter,
+  items,
+  t,
+  clickedAppearanceId,
+}: {
+  chapter: number;
+  items: SearchResultItemData[];
+  t: TFunction;
+  clickedAppearanceId?: string;
+}) {
   const chapterTitle = useMemo(
     () => (
       <div className="flex items-center gap-2">
@@ -188,7 +233,7 @@ const ChapterGroup = memo(function ChapterGroup({ chapter, items, t }: { chapter
       <AccordionContent className="px-0 pb-0">
         <div className="space-y-2 py-2 px-1">
           {items.map((item, idx) => (
-            <ResultCard key={item.id} item={item} appearIndex={idx} />
+            <ResultCard key={item.id} item={item} appearIndex={idx} clickedAppearanceId={clickedAppearanceId} />
           ))}
         </div>
       </AccordionContent>
@@ -196,7 +241,27 @@ const ChapterGroup = memo(function ChapterGroup({ chapter, items, t }: { chapter
   );
 });
 
-const ResultCard = memo(function ResultCard({ item, appearIndex }: { item: SearchResultItemData; appearIndex: number }) {
+const ResultCard = memo(function ResultCard({ item, appearIndex, clickedAppearanceId }: { item: SearchResultItemData; appearIndex: number; clickedAppearanceId?: string }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isPulsing, setIsPulsing] = useState(false);
+
+  useEffect(() => {
+    if (!clickedAppearanceId || clickedAppearanceId !== item.id) {
+      setIsPulsing(false);
+      return;
+    }
+
+    setIsPulsing(true);
+
+    const timeoutId = window.setTimeout(() => {
+      setIsPulsing(false);
+    }, 2400);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [clickedAppearanceId, item.id]);
+
   const handleSearchResultClick = useCallback(async () => {
     //TODO: fix this to get the value directly from bottom input hook or something
     const inputEl = document.getElementById("bottom-input") as HTMLInputElement | null;
@@ -215,15 +280,21 @@ const ResultCard = memo(function ResultCard({ item, appearIndex }: { item: Searc
   // Animate only first 25 elements
   const shouldAnimate = appearIndex < 25;
   const transition = shouldAnimate ? { delay: appearIndex * 0.015 } : undefined;
+  const animationStyle = isPulsing ? { animation: "pulse-appearance 1.8s ease-out" } : undefined;
 
   return (
     <motion.div
-      className="group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20 bg-gradient-to-br from-book-primary-5 to-book-secondary-5 hover:from-book-primary-10 hover:to-book-secondary-10 transition-all duration-200"
+      className={cn(
+        "group relative overflow-hidden cursor-pointer rounded-xl border border-book-primary-20 bg-gradient-to-br from-book-primary-5 to-book-secondary-5 hover:from-book-primary-10 hover:to-book-secondary-10 transition-all duration-200",
+      )}
       variants={variants.item}
       whileTap="tap"
       whileHover="hover"
       onClick={handleSearchResultClick}
       transition={transition}
+      data-appearance-id={item.id}
+      ref={cardRef}
+      style={animationStyle}
     >
       <div className="relative p-4">
         <div className="flex items-center gap-2 mb-2">

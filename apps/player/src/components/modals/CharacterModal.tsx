@@ -35,7 +35,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   const { t } = useTranslation();
 
   const { setValue } = useBottomInput();
-  const { setResults, openModal: openSearchModal } = useSearchModal();
+  const { setResults, openModal: openSearchModal, setLastClickedAppearanceId } = useSearchModal();
 
   const matchingCharacter = useMemo(() => getCharactersData().find((c) => c.slug === characterSlug), [characterSlug]);
   const latestSummary = useMemo(() => (matchingCharacter ? findLatestSummaryInRange(matchingCharacter, endChapter) : ""), [matchingCharacter, endChapter]);
@@ -94,6 +94,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     const character = `@${matchingCharacter.characterName}`;
     setValue(character);
     const furthestLocation = getSavedLocation();
+    setLastClickedAppearanceId(appearance.id);
     const searchResults = findCharacterSentences(characterSlug, furthestLocation, { mode: "chronological" });
     openSearchModal(true, true, character, searchResults);
     onClose();

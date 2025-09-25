@@ -1638,3 +1638,22 @@ section[data-chapter] [data-index] {
     text-indent: 1.4em;
   }
 }
+
+
+@keyframes pulse-appearance {
+  0% {
+    transform: scale(1);
+  }
+
+  10% {
+    transform: scale(0.98);
+  }
+
+  30% {
+    transform: scale(1.02);
+  }
+
+  50%, 100% {
+    transform: scale(1);
+  }
+}
