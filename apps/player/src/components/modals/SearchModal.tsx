@@ -204,62 +204,61 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
     </div>
   );
 
+  const searchActions = hasAnyResults && searchResults?.isCharacterResults && (
+    <div className="flex items-center gap-2 px-2">
+      {FILTER_OPTIONS.map((option) => {
+        const isActive = activeFilter === option.id;
+        const isDisabled = option.id !== "all" && !filterAvailability[option.id];
+        const label = t(option.translationKey, { defaultValue: option.defaultLabel });
+        return (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => {
+              if (isDisabled) {
+                return;
+              }
+              setActiveFilter(option.id);
+            }}
+            disabled={isDisabled}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
+              isActive
+                ? "bg-book-primary text-black shadow-sm"
+                : "bg-book-primary-20 text-white/70 hover:text-white hover:bg-book-primary-30 disabled:opacity-40 disabled:hover:bg-book-primary-20 disabled:hover:text-white/70",
+            )}
+            aria-pressed={isActive}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+
   // Decide chapter ordering based on embeddings or not
   const headerActions =
     hasItems && showContent ? (
-      <>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              onClick={handleCollapseAll}
-              disabled={areAllCollapsed}
-              className={"p-1 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white/70 hover:text-white"}
-              aria-label="Collapse all groups"
-            >
-              <Minimize2 size={18} />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Collapse all</p>
-          </TooltipContent>
-        </Tooltip>
-        {hasAnyResults && searchResults?.isCharacterResults && (
-          <div className="flex items-center gap-2 px-2">
-            {FILTER_OPTIONS.map((option) => {
-              const isActive = activeFilter === option.id;
-              const isDisabled = option.id !== "all" && !filterAvailability[option.id];
-              const label = t(option.translationKey, { defaultValue: option.defaultLabel });
-              return (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => {
-                    if (isDisabled) {
-                      return;
-                    }
-                    setActiveFilter(option.id);
-                  }}
-                  disabled={isDisabled}
-                  className={cn(
-                    "px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
-                    isActive
-                      ? "bg-book-primary text-black shadow-sm"
-                      : "bg-book-primary-20 text-white/70 hover:text-white hover:bg-book-primary-30 disabled:opacity-40 disabled:hover:bg-book-primary-20 disabled:hover:text-white/70",
-                  )}
-                  aria-pressed={isActive}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            onClick={handleCollapseAll}
+            disabled={areAllCollapsed}
+            className={"p-1 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white/70 hover:text-white"}
+            aria-label="Collapse all groups"
+          >
+            <Minimize2 size={18} />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Collapse all</p>
+        </TooltipContent>
+      </Tooltip>
     ) : null;
 
   return (
-    <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay} headerActions={headerActions}>
+    <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay} headerActions={headerActions} searchActions={searchActions}>
       <div className="flex flex-col h-full relative overflow-hidden" aria-busy={showSpinner}>
         {showSpinner && (
           <motion.div
@@ -296,7 +295,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
 
         {showContent && (
           <div className="flex-grow overflow-y-auto" key="content">
-            <div className="space-y-3 mt-3">
+            <div className="space-y-3">
               {hasItems ? (
                 <div className="space-y-3">
                   <Accordion id="search-modal-accordion" type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
@@ -409,10 +408,10 @@ const ResultCard = memo(function ResultCard({ item, clickedAppearanceId }: { ite
     >
       <div className="relative p-4">
         <div className="flex items-center gap-2 mb-2">
+          {item.type && <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">{item.type}</div>}
           <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-primary-30 text-book-primary">
             {item.percentInChapter}% of Chapter {item.chapter}
           </div>
-          {item.type && <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">{item.type}</div>}
         </div>
 
         {item.text && (
