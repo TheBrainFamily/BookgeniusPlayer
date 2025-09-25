@@ -135,7 +135,7 @@ export function generateCharacterMetadata(xmlDoc: Document, bookString: string, 
 
 function generateBookDataFiles(bookDirectoryPath: string, metadata: ReturnType<typeof parseBookXmlData>["metadata"], xmlDoc: Document, bookString: string, bookOutputPath: string) {
   // --- Generate getBookStringified.ts ---
-  const { backgroundsData, audioData, cutSceneData, htmlResult, chapterTitles } = xmlToComplexHtml(bookString, metadata.slug, metadata.language);
+  const { htmlResult, chapterTitles } = xmlToComplexHtml(bookString, metadata.slug, metadata.language);
 
   // Check if the required media files exist in the book directory
   const requiredMediaFiles = ["getBackgroundsForBook.ts", "getBackgroundSongsForBook.ts", "getCutScenesForBook.ts"];
@@ -147,8 +147,7 @@ function generateBookDataFiles(bookDirectoryPath: string, metadata: ReturnType<t
       fs.copyFileSync(path.join(bookDirectoryPath, mediaBookFile), path.join(bookOutputPath, mediaBookFile), fs.constants.COPYFILE_FICLONE);
     });
   } else {
-    // If files don't exist, generate them
-    generateDataFiles(backgroundsData, audioData, cutSceneData, metadata.slug);
+    console.error("Required media files do not exist in the book directory");
   }
 
   const getAllVariantsPath = path.join(bookDirectoryPath, "getAllVariants.ts");
