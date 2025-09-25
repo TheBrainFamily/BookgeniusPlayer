@@ -24,6 +24,16 @@ interface SearchModalProps {
   clickedAppearanceId?: string;
 }
 
+type SearchFilter = "all" | "mentioned" | "talking";
+
+const FILTER_OPTIONS: Array<{ id: SearchFilter; translationKey: string; defaultLabel: string }> = [
+  { id: "all", translationKey: "search_filter_all", defaultLabel: "All" },
+  { id: "mentioned", translationKey: "search_filter_mentioned", defaultLabel: "Mentioned" },
+  { id: "talking", translationKey: "search_filter_talking", defaultLabel: "Talking" },
+];
+
+const FILTER_VALUE_MAP: Record<SearchFilter, string | null> = { all: null, mentioned: "Mentioned", talking: "Talking" };
+
 export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults, clickedAppearanceId }) => {
   const { t } = useTranslation();
 
@@ -33,9 +43,24 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
   const isDeferring = deferredResults !== searchResults;
   const showSpinner = isCurrentlyLoading || (isDeferring && !deferredResults);
   const showContent = Boolean(deferredResults) && !showSpinner;
-  const hasItems = (deferredResults?.items?.length ?? 0) > 0;
+
+  const [activeFilter, setActiveFilter] = useState<SearchFilter>("all");
 
   const [openChapters, setOpenChapters] = useState<string[]>([]);
+
+  const hasAnyResults = (deferredResults?.items?.length ?? 0) > 0;
+
+  const filteredItems = useMemo(() => {
+    const items = deferredResults?.items ?? [];
+    const filterValue = FILTER_VALUE_MAP[activeFilter];
+    if (!filterValue) {
+      return items;
+    }
+
+    return items.filter((item) => item.type === filterValue);
+  }, [activeFilter, deferredResults?.items]);
+
+  const hasItems = filteredItems.length > 0;
 
   const handleCollapseAll = useCallback(() => {
     setOpenChapters([]);
@@ -78,10 +103,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
 
   // Group search results by chapter
   const groupedResults = useMemo(() => {
-    // Use deferred results for consistency with rendering state
-    if (!deferredResults?.items) return {};
+    if (!filteredItems.length) return {};
 
-    return deferredResults.items.reduce(
+    return filteredItems.reduce(
       (acc, item) => {
         if (!acc[item.chapter]) {
           acc[item.chapter] = [];
@@ -91,7 +115,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
       },
       {} as Record<number, SearchResultItemData[]>,
     );
-  }, [deferredResults?.items]);
+  }, [filteredItems]);
 
   const sortedChapterEntries = useMemo(() => {
     const entries = Object.entries(groupedResults);
@@ -109,6 +133,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
   useEffect(() => {
     if (hasItems && Object.keys(groupedResults).length > 0) {
       setOpenChapters(Object.keys(groupedResults));
+    } else {
+      setOpenChapters([]);
     }
   }, [groupedResults, hasItems]);
 
@@ -180,23 +206,47 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
 
         {showContent && (
           <motion.div className="flex-grow overflow-y-auto" variants={variants.content} initial="hidden" animate="visible" key="content">
-            {hasItems ? (
-              <motion.div className="space-y-3 -mt-3" variants={variants.container} initial="hidden" animate="visible">
-                <Accordion id="search-modal-accordion" type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
-                  {sortedChapterEntries.map(([chapter, items]) => (
-                    <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} clickedAppearanceId={clickedAppearanceId} />
-                  ))}
-                </Accordion>
-              </motion.div>
-            ) : (
-              <motion.div className="flex flex-col items-center justify-center py-12 text-center" variants={variants.noResults} initial="hidden" animate="visible">
-                <div className="p-4 rounded-full mb-4 backdrop-blur-sm border bg-book-secondary-20 border-book-secondary-30">
-                  <Search size={24} />
+            <div className="space-y-3 mt-3">
+              {hasAnyResults && searchResults?.isCharacterResults && (
+                <div className="flex items-center gap-2 px-2">
+                  {FILTER_OPTIONS.map((option) => {
+                    const isActive = activeFilter === option.id;
+                    const label = t(option.translationKey, { defaultValue: option.defaultLabel });
+                    return (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => setActiveFilter(option.id)}
+                        className={cn(
+                          "px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
+                          isActive ? "bg-book-primary text-black shadow-sm" : "bg-book-primary-20 text-white/70 hover:text-white hover:bg-book-primary-30",
+                        )}
+                        aria-pressed={isActive}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
                 </div>
-                <p className="text-white/80 text-sm">{t("no_results_to_display")}</p>
-                <p className="text-white/70 text-xs mt-1">{t("try_different_search_terms")}</p>
-              </motion.div>
-            )}
+              )}
+              {hasItems ? (
+                <motion.div className="space-y-3" variants={variants.container} initial="hidden" animate="visible">
+                  <Accordion id="search-modal-accordion" type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
+                    {sortedChapterEntries.map(([chapter, items]) => (
+                      <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} clickedAppearanceId={clickedAppearanceId} />
+                    ))}
+                  </Accordion>
+                </motion.div>
+              ) : (
+                <motion.div className="flex flex-col items-center justify-center py-12 text-center" variants={variants.noResults} initial="hidden" animate="visible">
+                  <div className="p-4 rounded-full mb-4 backdrop-blur-sm border bg-book-secondary-20 border-book-secondary-30">
+                    <Search size={24} />
+                  </div>
+                  <p className="text-white/80 text-sm">{t("no_results_to_display")}</p>
+                  <p className="text-white/70 text-xs mt-1">{t("try_different_search_terms")}</p>
+                </motion.div>
+              )}
+            </div>
           </motion.div>
         )}
       </motion.div>
