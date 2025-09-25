@@ -65,7 +65,7 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content,
               <div className="flex-grow overflow-y-auto px-1 no-scrollbar">
                 <AnimatePresence mode="wait">
                   <motion.div
-                    key={content}
+                    key="content-text"
                     className="prose dark:prose-invert max-w-none text-white/90"
                     variants={variants.contentText}
                     initial="hidden"
@@ -134,8 +134,8 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content,
 const variants: Record<string, Variants> = {
   container: {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.22, ease: "easeOut", staggerChildren: 0.06 } },
-    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.18 } },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.25, ease: "easeOut" } },
+    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
   },
   loading: { initial: { rotate: 0 }, animate: { rotate: 360, transition: { duration: 1, ease: "linear", repeat: Infinity } } },
   loadingDelayed: { initial: { rotate: 0 }, animate: { rotate: 360, transition: { duration: 1, ease: "linear", repeat: Infinity, delay: 0.1 } } },
@@ -146,27 +146,35 @@ const variants: Record<string, Variants> = {
   },
   loadingText: { hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { delay: 0.2 } } },
   loadingSubtext: { hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { delay: 0.4 } } },
-  contentContainer: { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut", delay: 0.1 } } },
-  noResults: { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut", delay: 0.1 } } },
+  contentContainer: {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut", delay: 0.05 } },
+    exit: { opacity: 0, y: 10, transition: { duration: 0.05, ease: "easeIn" } },
+  },
+  noResults: {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut", delay: 0.1 } },
+    exit: { opacity: 0, y: 10, transition: { duration: 0.2, ease: "easeIn" } },
+  },
   diveDeeper: {
     hidden: { opacity: 0, scale: 0.95 },
     visible: { opacity: 1, scale: 1, transition: { delay: 0.5, duration: 0.4, ease: "easeOut" } },
-    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.3, ease: "easeIn" } },
+    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.05, ease: "easeIn" } },
   },
   buttonContent: {
     hidden: { opacity: 0, scale: 0.8, y: 5 },
     visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" } },
-    exit: { opacity: 0, scale: 0.8, y: -5, transition: { duration: 0.2, ease: "easeIn" } },
+    exit: { opacity: 0, scale: 0.8, transition: { duration: 0.03, ease: "easeIn" } },
   },
   gatheringText: {
     hidden: { opacity: 0, y: 10, scale: 0.95 },
     visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: "easeOut" } },
-    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
+    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.05 } },
   },
   contentText: {
     hidden: { opacity: 0, scale: 0.98 },
     visible: { opacity: 1, scale: 1, transition: { delay: 0.2, duration: 0.4, ease: "easeOut" } },
-    exit: { opacity: 0, scale: 0.98, transition: { duration: 0.2, ease: "easeIn" } },
+    exit: { opacity: 0, scale: 0.98, transition: { duration: 0.05, ease: "easeIn" } },
   },
 };
 
