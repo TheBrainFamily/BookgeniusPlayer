@@ -61,6 +61,33 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
     return items.filter((item) => item.type === filterValue);
   }, [activeFilter, deferredResults?.items]);
 
+  const filterAvailability = useMemo(() => {
+    const items = deferredResults?.items ?? [];
+
+    const availability: Record<SearchFilter, boolean> = { all: true, mentioned: false, talking: false };
+
+    for (const item of items) {
+      if (!availability.mentioned && item.type === FILTER_VALUE_MAP.mentioned) {
+        availability.mentioned = true;
+      }
+      if (!availability.talking && item.type === FILTER_VALUE_MAP.talking) {
+        availability.talking = true;
+      }
+
+      if (availability.mentioned && availability.talking) {
+        break;
+      }
+    }
+
+    return availability;
+  }, [deferredResults?.items]);
+
+  useEffect(() => {
+    if (!filterAvailability[activeFilter] && activeFilter !== "all") {
+      setActiveFilter("all");
+    }
+  }, [activeFilter, filterAvailability]);
+
   const hasItems = filteredItems.length > 0;
 
   const handleCollapseAll = useCallback(() => {
@@ -201,15 +228,24 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
           <div className="flex items-center gap-2 px-2">
             {FILTER_OPTIONS.map((option) => {
               const isActive = activeFilter === option.id;
+              const isDisabled = option.id !== "all" && !filterAvailability[option.id];
               const label = t(option.translationKey, { defaultValue: option.defaultLabel });
               return (
                 <button
                   key={option.id}
                   type="button"
-                  onClick={() => setActiveFilter(option.id)}
+                  onClick={() => {
+                    if (isDisabled) {
+                      return;
+                    }
+                    setActiveFilter(option.id);
+                  }}
+                  disabled={isDisabled}
                   className={cn(
                     "px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
-                    isActive ? "bg-book-primary text-black shadow-sm" : "bg-book-primary-20 text-white/70 hover:text-white hover:bg-book-primary-30",
+                    isActive
+                      ? "bg-book-primary text-black shadow-sm"
+                      : "bg-book-primary-20 text-white/70 hover:text-white hover:bg-book-primary-30 disabled:opacity-40 disabled:hover:bg-book-primary-20 disabled:hover:text-white/70",
                   )}
                   aria-pressed={isActive}
                 >
