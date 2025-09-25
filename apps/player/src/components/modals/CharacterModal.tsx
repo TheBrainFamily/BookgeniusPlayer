@@ -75,7 +75,6 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
     try {
       const searchResults = findCharacterSentences(characterSlug, furthestLocation, { mode: "spotlight", limit: 3 });
-      setResults(searchResults);
       setCharacterAppearances(searchResults.items);
     } catch (err) {
       console.error("Error searching for character appearances:", err);
