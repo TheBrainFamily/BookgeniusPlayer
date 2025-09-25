@@ -35,7 +35,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   const { t } = useTranslation();
 
   const { setValue } = useBottomInput();
-  const { setResults, openModal: openSearchModal } = useSearchModal();
+  const { openModal: openSearchModal, setLastClickedAppearanceId } = useSearchModal();
 
   const matchingCharacter = useMemo(() => getCharactersData().find((c) => c.slug === characterSlug), [characterSlug]);
   const latestSummary = useMemo(() => (matchingCharacter ? findLatestSummaryInRange(matchingCharacter, endChapter) : ""), [matchingCharacter, endChapter]);
@@ -75,7 +75,6 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
     try {
       const searchResults = findCharacterSentences(characterSlug, furthestLocation, { mode: "spotlight", limit: 3 });
-      setResults(searchResults);
       setCharacterAppearances(searchResults.items);
     } catch (err) {
       console.error("Error searching for character appearances:", err);
@@ -93,7 +92,10 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     }
     const character = `@${matchingCharacter.characterName}`;
     setValue(character);
-    openSearchModal(true, true, character);
+    const furthestLocation = getSavedLocation();
+    setLastClickedAppearanceId(appearance.id);
+    const searchResults = findCharacterSentences(characterSlug, furthestLocation, { mode: "chronological" });
+    openSearchModal(true, true, character, searchResults);
     onClose();
   };
 
@@ -135,7 +137,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
         <motion.div
           className="p-3 sm:p-4 rounded-xl flex flex-col gap-4 w-full max-w-2xl relative
-          bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[60vh] sm:max-h-[80vh] overflow-hidden"
+          bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[60vh] sm:max-h-[80vh] overflow-hidden min-h-0"
           variants={variants.content}
           onPointerUp={(e) => e.stopPropagation()}
         >
@@ -143,11 +145,11 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
             <h4 className="px-5 text-lg font-bold text-white">{snapshot?.displayName ?? matchingCharacter.characterName}</h4>
           </div>
 
-          <div className="overflow-y-hidden space-y-3 px-1">
+          <div className="flex flex-col gap-3 px-1 min-h-0">
             <p className="text-center text-white/90 text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: snapshot?.summary ?? latestSummary }} />
 
             {(isLoading || characterAppearances.length > 0) && (
-              <motion.div className="mt" variants={variants.appearances}>
+              <motion.div className="mt flex flex-col gap-2 min-h-0" variants={variants.appearances}>
                 <h5 className="text-sm sm:text-md font-semibold text-white mb-2 text-center">{t("appearances")}</h5>
 
                 {isLoading ? (
@@ -160,8 +162,8 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                     </motion.div>
                   </motion.div>
                 ) : (
-                  <motion.div className="p-1" variants={variants.container}>
-                    <div className="flex-grow overflow-y-auto pb-4 space-y-3 max-h-[50vh]">
+                  <motion.div className="p-1 flex flex-col min-h-0" variants={variants.container}>
+                    <div className="overflow-y-auto pb-4 pr-1 space-y-3 max-h-[50vh] sm:max-h-[60vh]">
                       {characterAppearances.slice(0, 3).map((appearance, index) => (
                         <motion.div
                           key={appearance.id}
@@ -183,17 +185,17 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                           }}
                         >
                           <div className="relative p-4">
-                            <div className="flex items-center gap-2 mb-2 flex-nowrap overflow-hidden">
-                              <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-primary-30 text-book-primary min-w-0">
+                            <div className="grid auto-cols-[fit,fit] grid-flow-col gap-2 mb-2">
+                              <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
+                                <span>{appearance.type}</span>
+                              </div>
+                              <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-primary-30 text-book-primary overflow-hidden">
                                 <span className="flex items-center gap-1 min-w-0">
-                                  <FileText size={12} className="shrink-0" />
-                                  <span className="truncate whitespace-nowrap">
+                                  <FileText size={12} className="flex-shrink-0" />
+                                  <span className="whitespace-nowrap overflow-hidden text-ellipsis">
                                     {appearance.percentInChapter}% {t("of_chapter")} {getChapterTitle(appearance.chapter, t)}
                                   </span>
                                 </span>
-                              </div>
-                              <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-tertiary-30 text-book-tertiary whitespace-nowrap">
-                                <span className="flex items-center gap-1 whitespace-nowrap">{appearance.type}</span>
                               </div>
                             </div>
 

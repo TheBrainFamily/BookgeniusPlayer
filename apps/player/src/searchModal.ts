@@ -18,7 +18,7 @@ export interface SearchResultItemData {
 }
 
 enum SearchType {
-  SPOTTED = "Spotted",
+  MENTIONED = "Mentioned",
   TALKING = "Talking",
 }
 
@@ -27,6 +27,7 @@ export interface SearchResultsData {
   items: SearchResultItemData[];
   areEmbeddings?: boolean;
   isLoading?: boolean;
+  isCharacterResults?: boolean;
 }
 
 // getCurrentLocation would be sourced from your state management, e.g., useLocation hook
@@ -440,7 +441,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
                     percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
                     summary: formattedResult,
                     id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
-                    type: SearchType.SPOTTED,
+                    type: SearchType.MENTIONED,
                   });
                 }
               }
@@ -468,7 +469,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
                 percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
                 summary: _sentence,
                 id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
-                type: SearchType.SPOTTED,
+                type: SearchType.MENTIONED,
               });
             }
           }
@@ -555,7 +556,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
     header = `No local matches found for "${characterSlug}" (context: Ch. ${currentLocation.chapter}, P. ${currentLocation.paragraph})`;
   }
 
-  return { header, items, isLoading: false };
+  return { header, items, isLoading: false, isCharacterResults: true };
 }
 
 function stripHtmlTags(str) {

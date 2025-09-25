@@ -13,13 +13,15 @@ interface SearchModalState {
   layoutView?: boolean;
   hideOverlay?: boolean;
   isLoading: boolean;
+  lastClickedAppearanceId?: string;
 
-  openModal: (layoutView?: boolean, hideOverlay?: boolean, query?: string) => void;
+  openModal: (layoutView?: boolean, hideOverlay?: boolean, query?: string, results?: SearchResultsData) => void;
   closeModal: () => void;
   clearModal: () => void;
   setQuery: (query: string) => void;
   setResults: (results: SearchResultsData) => void;
   setLoading: (isLoading: boolean) => void;
+  setLastClickedAppearanceId: (appearanceId?: string) => void;
 }
 
 export const useSearchModal = create<SearchModalState>()(
@@ -31,8 +33,9 @@ export const useSearchModal = create<SearchModalState>()(
       layoutView: false,
       hideOverlay: false,
       isLoading: false,
+      lastClickedAppearanceId: undefined,
 
-      openModal: (layoutView, hideOverlay, query = "") => {
+      openModal: (layoutView, hideOverlay, query = "", results = { header: `Searching for "${query}"...`, items: [], isLoading: true }) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
           // Enable content shift if opening in layout view
@@ -40,14 +43,7 @@ export const useSearchModal = create<SearchModalState>()(
             useContentShift.getState().enableContentShift();
           }
 
-          set({
-            isOpen: true,
-            layoutView,
-            hideOverlay,
-            query,
-            isLoading: !!query.trim(),
-            results: query.trim() ? { header: `Searching for "${query}"...`, items: [], isLoading: true } : null,
-          });
+          set({ isOpen: true, layoutView, hideOverlay, query, isLoading: !!query.trim(), results });
         }
       },
 
@@ -57,16 +53,17 @@ export const useSearchModal = create<SearchModalState>()(
 
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
-        set({ isOpen: false, isLoading: false });
+        set({ isOpen: false, isLoading: false, lastClickedAppearanceId: undefined });
       },
 
       clearModal: () => {
-        set({ query: "", results: null, isLoading: false });
+        set({ query: "", results: null, isLoading: false, lastClickedAppearanceId: undefined });
       },
 
       setQuery: (query) => set({ query }),
       setResults: (results) => set({ results, isLoading: false }),
       setLoading: (isLoading) => set({ isLoading }),
+      setLastClickedAppearanceId: (appearanceId) => set({ lastClickedAppearanceId: appearanceId }),
     }),
     { name: "search-modal" },
   ),

@@ -19,6 +19,7 @@ export interface ModalUIProps {
   closeOnOverlayClick?: boolean;
   animateHeight?: boolean;
   headerActions?: ReactNode;
+  searchActions?: ReactNode;
 }
 
 type ModalSize = { content: string; container: string };
@@ -84,6 +85,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
   closeOnOverlayClick = true,
   animateHeight = false,
   headerActions,
+  searchActions,
 }) => {
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   const [justOpened, setJustOpened] = useState(true);
@@ -174,7 +176,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             transition={animateHeight ? { duration: 0.3, ease: "easeInOut", layout: { duration: 0.3 } } : undefined}
           >
             {title && (
-              <header className="flex justify-between items-center p-4 pb-0">
+              <header className={cn("flex justify-between items-center p-4", layoutView && "pb-0")}>
                 <div className={titleTextClasses}>{title}</div>
                 <div className="flex items-center gap-2">
                   {headerActions}
@@ -198,8 +200,10 @@ const ModalUI: React.FC<ModalUIProps> = ({
               </header>
             )}
 
+            {searchActions && <div className="flex justify-between items-center p-4">{searchActions}</div>}
+
             <motion.div
-              className="p-4 overflow-y-auto opened-modal"
+              className="pb-4 pl-4 pr-4 overflow-y-auto opened-modal"
               layout={animateHeight}
               transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}
               onClick={(e) => {

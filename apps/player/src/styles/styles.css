@@ -1657,3 +1657,22 @@ section[data-chapter] [data-index] {
   opacity: 0.8;
   pointer-events: none;
 }
+
+
+@keyframes pulse-appearance {
+  0% {
+    transform: scale(1);
+  }
+
+  10% {
+    transform: scale(0.98);
+  }
+
+  30% {
+    transform: scale(1.02);
+  }
+
+  50%, 100% {
+    transform: scale(1);
+  }
+}
