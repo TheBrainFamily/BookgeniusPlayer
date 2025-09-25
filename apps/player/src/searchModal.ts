@@ -76,12 +76,14 @@ export async function performUnifiedSearch(
     const items: SearchResultItemData[] = serverMatches
       .map((match, index) => {
         const totalParagraphsInChapter = getTotalParagraphsInChapter(match.chapter);
+        const paragraphText = match.summary ? findTextByParagraphAndChapter(match.chapter, match.paragraphNumber) : match.text;
+        const contextualText = createContextualSummary(paragraphText || match.text, query);
         return {
           chapter: match.chapter,
           paragraphNumber: match.paragraphNumber,
           percentInChapter: calculatePercentInChapter(match.paragraphNumber, totalParagraphsInChapter),
-          summary: match.summary,
-          text: createContextualSummary(match.text, query, 75),
+          summary: match.summary ? contextualText : createContextualSummary(findTextByParagraphAndChapter(match.chapter, match.paragraphNumber), query),
+          text: match.summary ? match.summary : contextualText,
           id: `search-result-${match.chapter}-${match.paragraphNumber}-${index}`,
           score: match.score,
         };
@@ -259,6 +261,25 @@ const calculatePercentInChapter = (paragraphNumber: number, totalParagraphs: num
 
 const SUMMARY_TRUNCATE_LENGTH = 210;
 const CHARACTER_HIGHLIGHT_CLASS = "bg-book-secondary-20 text-white font-semibold rounded-sm shadow-sm";
+
+const findTextByParagraphAndChapter = (chapter: number, paragraphNumber: number): string => {
+  try {
+    bookIndex.ensureInitialized();
+    const paragraphElement = bookIndex.getParagraphElement(chapter, paragraphNumber);
+    if (!paragraphElement) {
+      return "";
+    }
+
+    const textContent = paragraphElement.textContent ?? "";
+    return textContent
+      .replace(/[\n\r]+/g, " ") // Replace newlines and carriage returns with spaces
+      .replace(/\s+/g, " ") // Replace multiple spaces with a single space
+      .trim();
+  } catch (error) {
+    console.error(`Error retrieving text for chapter ${chapter}, paragraph ${paragraphNumber}:`, error);
+    return "";
+  }
+};
 
 interface FindCharacterSentencesOptions {
   mode?: "chronological" | "spotlight";
