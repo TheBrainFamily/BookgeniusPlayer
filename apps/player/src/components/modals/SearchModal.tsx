@@ -15,6 +15,7 @@ import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@player/components/ui/accordion";
 import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { cn } from "@player/lib/utils";
+import { findScrollParent } from "@player/utils/findScrollParent";
 
 interface SearchModalProps {
   onClose: () => void;
@@ -33,27 +34,6 @@ const FILTER_OPTIONS: Array<{ id: SearchFilter; translationKey: string; defaultL
 ];
 
 const FILTER_VALUE_MAP: Record<SearchFilter, string | null> = { all: null, mentioned: "Mentioned", talking: "Talking" };
-
-const scrollableOverflowValues = new Set(["auto", "scroll", "overlay"]);
-
-const findScrollParent = (el: HTMLElement | null): HTMLElement | null => {
-  if (typeof window === "undefined" || !el) {
-    return null;
-  }
-
-  let current = el.parentElement;
-
-  while (current) {
-    const style = window.getComputedStyle(current);
-    if (scrollableOverflowValues.has(style.overflowY) && current.scrollHeight > current.clientHeight + 1) {
-      return current;
-    }
-    current = current.parentElement;
-  }
-
-  const scrollingElement = document.scrollingElement;
-  return scrollingElement instanceof HTMLElement ? scrollingElement : document.documentElement;
-};
 
 export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults, clickedAppearanceId }) => {
   const { t } = useTranslation();
@@ -95,7 +75,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
       return container?.querySelector<HTMLElement>(`[data-appearance-id="${clickedAppearanceId}"]`);
     };
 
-    const logAndScroll = () => {
+    const scrollToTarget = () => {
       const target = findTarget();
       if (!target) {
         return;
@@ -103,7 +83,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
 
       const scrollParent = findScrollParent(target);
       if (!scrollParent) {
-        target.scrollIntoView({ behavior: "auto", block: "center" });
+        target.scrollIntoView({ behavior: "instant", block: "center" });
         return;
       }
 
@@ -120,9 +100,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
     const timeoutHandles: number[] = [];
     const schedule = (delay: number) => {
       if (delay === 0) {
-        logAndScroll();
+        scrollToTarget();
       } else {
-        timeoutHandles.push(window.setTimeout(logAndScroll, delay));
+        timeoutHandles.push(window.setTimeout(scrollToTarget, delay));
       }
     };
 
@@ -357,7 +337,7 @@ const ResultCard = memo(function ResultCard({ item, clickedAppearanceId }: { ite
 
     const timeoutId = window.setTimeout(() => {
       setIsPulsing(false);
-    }, 2400);
+    }, 1800);
 
     return () => {
       window.clearTimeout(timeoutId);
