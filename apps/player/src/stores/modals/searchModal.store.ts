@@ -14,7 +14,7 @@ interface SearchModalState {
   hideOverlay?: boolean;
   isLoading: boolean;
 
-  openModal: (layoutView?: boolean, hideOverlay?: boolean, query?: string) => void;
+  openModal: (layoutView?: boolean, hideOverlay?: boolean, query?: string, results?: SearchResultsData) => void;
   closeModal: () => void;
   clearModal: () => void;
   setQuery: (query: string) => void;
@@ -32,7 +32,7 @@ export const useSearchModal = create<SearchModalState>()(
       hideOverlay: false,
       isLoading: false,
 
-      openModal: (layoutView, hideOverlay, query = "") => {
+      openModal: (layoutView, hideOverlay, query = "", results = { header: `Searching for "${query}"...`, items: [], isLoading: true }) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
           // Enable content shift if opening in layout view
@@ -40,14 +40,7 @@ export const useSearchModal = create<SearchModalState>()(
             useContentShift.getState().enableContentShift();
           }
 
-          set({
-            isOpen: true,
-            layoutView,
-            hideOverlay,
-            query,
-            isLoading: !!query.trim(),
-            results: query.trim() ? { header: `Searching for "${query}"...`, items: [], isLoading: true } : null,
-          });
+          set({ isOpen: true, layoutView, hideOverlay, query, isLoading: !!query.trim(), results });
         }
       },
 

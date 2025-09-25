@@ -18,7 +18,7 @@ export interface SearchResultItemData {
 }
 
 enum SearchType {
-  SPOTTED = "Spotted",
+  MENTIONED = "Mentioned",
   TALKING = "Talking",
 }
 
@@ -440,7 +440,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
                     percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
                     summary: formattedResult,
                     id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
-                    type: SearchType.SPOTTED,
+                    type: SearchType.MENTIONED,
                   });
                 }
               }
@@ -468,7 +468,7 @@ export function findCharacterSentences(characterSlug: string, currentLocation: L
                 percentInChapter: calculatePercentInChapter(paragraph, totalParagraphsInChapter),
                 summary: _sentence,
                 id: `local-dom-search-${chapter}-${paragraph}-${resultIndex++}`,
-                type: SearchType.SPOTTED,
+                type: SearchType.MENTIONED,
               });
             }
           }

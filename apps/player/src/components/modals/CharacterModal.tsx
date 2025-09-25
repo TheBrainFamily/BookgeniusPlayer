@@ -93,7 +93,9 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     }
     const character = `@${matchingCharacter.characterName}`;
     setValue(character);
-    openSearchModal(true, true, character);
+    const furthestLocation = getSavedLocation();
+    const searchResults = findCharacterSentences(characterSlug, furthestLocation, { mode: "chronological" });
+    openSearchModal(true, true, character, searchResults);
     onClose();
   };
 
