@@ -81,7 +81,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
 
   const modalTitle = (
     <div className="flex items-center gap-2">
-      <Search size={20} className="mb-1" />
+      <Search size={20} />
       <span>Search Results</span>
     </div>
   );
@@ -146,7 +146,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
         {showContent && (
           <motion.div className="flex-grow overflow-y-auto" variants={variants.content} initial="hidden" animate="visible" key="content">
             {hasItems ? (
-              <motion.div className="space-y-3 -mt-3" variants={variants.container} initial="hidden" animate="visible">
+              <motion.div className="space-y-3" variants={variants.container} initial="hidden" animate="visible">
                 <Accordion type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
                   {sortedChapterEntries.map(([chapter, items]) => (
                     <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} />
