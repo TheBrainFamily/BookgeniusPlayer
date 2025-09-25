@@ -137,7 +137,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
         <motion.div
           className="p-3 sm:p-4 rounded-xl flex flex-col gap-4 w-full max-w-2xl relative
-          bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[60vh] sm:max-h-[80vh] overflow-hidden"
+          bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[60vh] sm:max-h-[80vh] overflow-hidden min-h-0"
           variants={variants.content}
           onPointerUp={(e) => e.stopPropagation()}
         >
@@ -145,11 +145,11 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
             <h4 className="px-5 text-lg font-bold text-white">{snapshot?.displayName ?? matchingCharacter.characterName}</h4>
           </div>
 
-          <div className="overflow-y-hidden space-y-3 px-1">
+          <div className="flex flex-col gap-3 px-1 min-h-0">
             <p className="text-center text-white/90 text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: snapshot?.summary ?? latestSummary }} />
 
             {(isLoading || characterAppearances.length > 0) && (
-              <motion.div className="mt" variants={variants.appearances}>
+              <motion.div className="mt flex flex-col gap-2 min-h-0" variants={variants.appearances}>
                 <h5 className="text-sm sm:text-md font-semibold text-white mb-2 text-center">{t("appearances")}</h5>
 
                 {isLoading ? (
@@ -162,8 +162,8 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                     </motion.div>
                   </motion.div>
                 ) : (
-                  <motion.div className="p-1" variants={variants.container}>
-                    <div className="flex-grow overflow-y-auto pb-4 space-y-3 max-h-[50vh]">
+                  <motion.div className="p-1 flex flex-col min-h-0" variants={variants.container}>
+                    <div className="overflow-y-auto pb-4 pr-1 space-y-3 max-h-[50vh] sm:max-h-[60vh]">
                       {characterAppearances.slice(0, 3).map((appearance, index) => (
                         <motion.div
                           key={appearance.id}
