@@ -167,13 +167,26 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
     return entries.sort(([a], [b]) => Number(a) - Number(b));
   }, [groupedResults, deferredResults?.areEmbeddings]);
 
+  const previousItemsSignatureRef = useRef<string>("");
+
   useEffect(() => {
-    if (hasItems && Object.keys(groupedResults).length > 0) {
-      setOpenChapters(Object.keys(groupedResults));
+    // Only auto-expand chapters when the underlying search results change.
+    const rawItems = deferredResults?.items ?? [];
+    const signature = rawItems.map((item) => String(item.id ?? `${item.chapter}-${item.paragraphNumber}`)).join("|");
+
+    if (signature === previousItemsSignatureRef.current) {
+      return;
+    }
+
+    previousItemsSignatureRef.current = signature;
+
+    if (filteredItems.length > 0) {
+      const chapters = Array.from(new Set(filteredItems.map((item) => String(item.chapter))));
+      setOpenChapters(chapters);
     } else {
       setOpenChapters([]);
     }
-  }, [groupedResults, hasItems]);
+  }, [filteredItems, deferredResults?.items]);
 
   useEffect(() => () => cleanupSearchChapters(), []);
 
@@ -187,22 +200,46 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
   // Decide chapter ordering based on embeddings or not
   const headerActions =
     hasItems && showContent ? (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            type="button"
-            onClick={handleCollapseAll}
-            disabled={areAllCollapsed}
-            className={"p-1 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white/70 hover:text-white"}
-            aria-label="Collapse all groups"
-          >
-            <Minimize2 size={18} />
-          </button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Collapse all</p>
-        </TooltipContent>
-      </Tooltip>
+      <>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={handleCollapseAll}
+              disabled={areAllCollapsed}
+              className={"p-1 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white/70 hover:text-white"}
+              aria-label="Collapse all groups"
+            >
+              <Minimize2 size={18} />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Collapse all</p>
+          </TooltipContent>
+        </Tooltip>
+        {hasAnyResults && searchResults?.isCharacterResults && (
+          <div className="flex items-center gap-2 px-2">
+            {FILTER_OPTIONS.map((option) => {
+              const isActive = activeFilter === option.id;
+              const label = t(option.translationKey, { defaultValue: option.defaultLabel });
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => setActiveFilter(option.id)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
+                    isActive ? "bg-book-primary text-black shadow-sm" : "bg-book-primary-20 text-white/70 hover:text-white hover:bg-book-primary-30",
+                  )}
+                  aria-pressed={isActive}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </>
     ) : null;
 
   return (
@@ -244,28 +281,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
         {showContent && (
           <div className="flex-grow overflow-y-auto" key="content">
             <div className="space-y-3 mt-3">
-              {hasAnyResults && searchResults?.isCharacterResults && (
-                <div className="flex items-center gap-2 px-2">
-                  {FILTER_OPTIONS.map((option) => {
-                    const isActive = activeFilter === option.id;
-                    const label = t(option.translationKey, { defaultValue: option.defaultLabel });
-                    return (
-                      <button
-                        key={option.id}
-                        type="button"
-                        onClick={() => setActiveFilter(option.id)}
-                        className={cn(
-                          "px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
-                          isActive ? "bg-book-primary text-black shadow-sm" : "bg-book-primary-20 text-white/70 hover:text-white hover:bg-book-primary-30",
-                        )}
-                        aria-pressed={isActive}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
               {hasItems ? (
                 <div className="space-y-3">
                   <Accordion id="search-modal-accordion" type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
