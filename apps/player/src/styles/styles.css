@@ -686,11 +686,6 @@
         margin-bottom: clamp(1em, 3vh, 1.5em);
       }
 
-      .play-row .character-text p[data-is-didaskalia="true"] + p[data-is-didaskalia="false"] {
-        margin-top: clamp(1em, 3vh, 1.5em);
-        margin-bottom: clamp(1em, 3vh, 1.5em);
-      }
-
       .play-row .character-text p[data-is-didaskalia="false"]:has(> span:only-child > em.quote:first-child) {
         text-align: center;
         width: 100%;
