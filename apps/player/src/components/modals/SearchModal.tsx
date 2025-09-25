@@ -199,7 +199,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
 
   const modalTitle = (
     <div className="flex items-center gap-2">
-      <Search size={20} className="mb-1" />
+      <Search size={20} />
       <span>Search Results</span>
     </div>
   );

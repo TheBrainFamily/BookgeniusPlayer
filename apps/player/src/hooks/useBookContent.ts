@@ -55,7 +55,7 @@ export function useBookContent() {
 
       const target = event.target as HTMLElement;
 
-      if (target.closest(".character-highlighted-activated") || target.closest(".simplified-icon")) {
+      if (target.closest(".character-highlighted-activated")) {
         return;
       }
 
@@ -97,18 +97,12 @@ export function useBookContent() {
         return;
       }
 
-      // Remove existing icon before updating content
-      const existingIcon = span.querySelector(".simplified-icon");
-      existingIcon?.remove();
-
       // Update content
       span.innerHTML = replaceXmlTagsIntoHtmlTags(simplifiedSentence);
       span.setAttribute("data-current-score", simplifiedSentenceScore.toString());
       span.setAttribute("data-simplified", "true");
 
-      // Add new simplified icon
-      const iconContainer = createSimplifiedIcon();
-      span.appendChild(iconContainer);
+      wrapSimplifiedSentenceTail(span);
 
       // Activate character interactions
       activateCharacterInteractions(span, openCharacterDetailsModal);
@@ -238,19 +232,42 @@ export function useBookContent() {
         observerSetupRef.current = setupPageObserver(openCharacterDetailsModal);
       }
     })();
-  }, [currentChapter, currentParagraph, textVersion]);
+  }, [currentChapter, currentParagraph, textVersion, openCharacterDetailsModal]);
 }
 
-const createSimplifiedIcon = (): HTMLSpanElement => {
-  const iconContainer = document.createElement("span");
-  iconContainer.className = "simplified-icon";
-  iconContainer.style.marginLeft = "5px";
-  iconContainer.style.cursor = "pointer";
-  iconContainer.style.display = "inline-block";
-  iconContainer.style.verticalAlign = "middle";
-  iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--book-simplified-icon-color, ForestGreen)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>`;
-  return iconContainer;
-};
+// Ensure last word (incl. trailing punctuation) and icon stay on same line
+function wrapSimplifiedSentenceTail(root: HTMLElement) {
+  const prev = root.querySelector(":scope > .simplified-tail");
+  if (prev) {
+    while (prev.firstChild) prev.parentNode!.insertBefore(prev.firstChild, prev);
+    prev.remove();
+  }
+
+  const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(n) {
+      return n.textContent!.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+    },
+  });
+  let lastText: Text | null = null;
+  for (let n = tw.nextNode(); n; n = tw.nextNode()) lastText = n as Text;
+  if (!lastText) return;
+
+  lastText.data = lastText.data.replace(/[\s\u00a0]+$/u, "");
+  const m = /(\S+[.,!?;:'")\]]*)$/.exec(lastText.data);
+  if (!m) return;
+
+  const start = lastText.data.length - m[1].length;
+  const tailNode = start > 0 ? lastText.splitText(start) : lastText;
+  const wrap = document.createElement("span");
+  wrap.className = "simplified-tail";
+  tailNode.parentNode!.insertBefore(wrap, tailNode);
+  wrap.appendChild(tailNode);
+
+  const next = wrap.nextSibling;
+  if (next?.nodeType === Node.TEXT_NODE && /^[.,!?;:'")\]]+/.test((next as Text).data)) {
+    wrap.appendChild(next);
+  }
+}
 
 const setSentenceAsClicked = (sentenceId: string): void => {
   try {

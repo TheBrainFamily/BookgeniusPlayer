@@ -176,7 +176,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             transition={animateHeight ? { duration: 0.3, ease: "easeInOut", layout: { duration: 0.3 } } : undefined}
           >
             {title && (
-              <header className="flex justify-between items-center p-4">
+              <header className={cn("flex justify-between items-center p-4", layoutView && "pb-0")}>
                 <div className={titleTextClasses}>{title}</div>
                 <div className="flex items-center gap-2">
                   {headerActions}
