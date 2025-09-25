@@ -23,7 +23,7 @@
     "process-all-books": "tsx ./scripts/processAllBooks.ts",
     "process-all-books-docker": "rm -rf public/books || true && rm -rf docker-build/ || true && tsx ./scripts/processAllBooks.ts --docker",
     "process-book": "tsx ./scripts/processBook.ts",
-    "start": "pnpm process-all-books && node scripts/setEnv.js --env development vite dev",
+    "start": "tsx ./scripts/startDev.ts",
     "test": "jest",
     "typecheck": "tsc --noEmit --incremental",
     "typecheck:ci": "tsc --noEmit --incremental --pretty false"
