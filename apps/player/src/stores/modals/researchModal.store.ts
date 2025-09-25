@@ -3,23 +3,29 @@ import { devtools } from "zustand/middleware";
 import { useModalCoordinator } from "../modalCoordinator.store";
 import { useContentShift } from "../contentShift.store";
 
-const MODAL_ID = "research-modal";
+const MODAL_ID = "deep-research-modal";
 
-interface ResearchModalState {
+interface DeepResearchModalState {
   isOpen: boolean;
   content?: string;
   layoutView?: boolean;
   hideOverlay?: boolean;
   isLoading: boolean;
-  state: "deep" | "ask";
-
-  openModal: (content?: string, layoutView?: boolean, hideOverlay?: boolean, state?: "deep" | "ask") => void;
+  showDiveDeeperCTA: boolean;
+  isDiveDeeperLoading: boolean;
+  diveDeeperHandler?: () => void | Promise<void>;
+  type: "deep" | "ask";
+  openModal: (content?: string, layoutView?: boolean, hideOverlay?: boolean, type?: "deep" | "ask") => void;
   closeModal: () => void;
   setContent: (content: string) => void;
   setLoading: (isLoading: boolean) => void;
+  setShowDiveDeeperCTA: (show: boolean) => void;
+  setDiveDeeperLoading: (loading: boolean) => void;
+  setDiveDeeperHandler: (handler?: () => void | Promise<void>) => void;
+  setType: (type: "deep" | "ask") => void;
 }
 
-export const useResearchModal = create<ResearchModalState>()(
+export const useDeepResearchModal = create<DeepResearchModalState>()(
   devtools(
     (set) => ({
       isOpen: false,
@@ -27,9 +33,12 @@ export const useResearchModal = create<ResearchModalState>()(
       layoutView: false,
       hideOverlay: false,
       isLoading: false,
-      state: "ask",
+      showDiveDeeperCTA: false,
+      isDiveDeeperLoading: false,
+      diveDeeperHandler: undefined,
+      type: "ask",
 
-      openModal: (content, layoutView, hideOverlay, state) => {
+      openModal: (content, layoutView, hideOverlay, modalType) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
           // Enable content shift if opening in layout view
@@ -43,7 +52,10 @@ export const useResearchModal = create<ResearchModalState>()(
             layoutView,
             hideOverlay,
             isLoading: !content, // If no content provided, show loading state
-            state,
+            showDiveDeeperCTA: false,
+            isDiveDeeperLoading: false,
+            diveDeeperHandler: undefined,
+            type: modalType ?? "ask",
           });
         }
       },
@@ -54,11 +66,15 @@ export const useResearchModal = create<ResearchModalState>()(
 
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
-        set({ isOpen: false, content: undefined, isLoading: false });
+        set({ isOpen: false, content: undefined, isLoading: false, showDiveDeeperCTA: false, isDiveDeeperLoading: false, diveDeeperHandler: undefined, type: "ask" });
       },
 
       setContent: (content) => set({ content, isLoading: false }),
       setLoading: (isLoading) => set({ isLoading }),
+      setShowDiveDeeperCTA: (show) => set({ showDiveDeeperCTA: show }),
+      setDiveDeeperLoading: (loading) => set({ isDiveDeeperLoading: loading }),
+      setDiveDeeperHandler: (handler) => set({ diveDeeperHandler: handler }),
+      setType: (type) => set({ type }),
     }),
     { name: "deep-research-modal" },
   ),

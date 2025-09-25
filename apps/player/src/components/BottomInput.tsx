@@ -9,13 +9,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@playe
 import { useLocation } from "@player/state/LocationContext";
 import { deepResearchCall } from "@player/deepResearchCall";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
-import { useResearchModal } from "@player/stores/modals/researchModal.store";
+import { useDeepResearchModal } from "@player/stores/modals/researchModal.store";
 import { OptionalElement } from "./OptionalElement";
 import { useElementVisibilityStore } from "@player/stores/elementVisibility.store";
 import { hasApiKey } from "@player/utils/apiKeyManager";
 import { useApiKeyModal } from "@player/stores/modals/apiKeyModal.store";
 import type { CharacterData } from "@player/types/book";
-import { askCall } from "@player/askCall";
+import { askStream } from "@player/askStream";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { useBottomInput } from "@player/stores/modals/bottomInput.store";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
@@ -54,7 +54,17 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
   const { pauseAllTimers, startAllTimers, showAllElements, setIsTimersPausedSticky } = useElementVisibilityStore();
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
-  const { openModal: openResearchModal, setContent: setResearchContent, closeModal: closeResearchModal, isOpen: isResearchModalOpen } = useResearchModal();
+  const {
+    openModal: openDeepResearchModal,
+    setContent: setDeepResearchContent,
+    setLoading: setDeepResearchLoading,
+    closeModal: closeDeepResearchModal,
+    isOpen: isDeepResearchModalOpen,
+    setShowDiveDeeperCTA,
+    setDiveDeeperLoading,
+    setDiveDeeperHandler,
+    setType: setDeepResearchType,
+  } = useDeepResearchModal();
   const { closeModal: closeCharacterModal, isOpen: isCharacterModalOpen } = useCharacterModal();
   const { openModal: openApiKeyModal } = useApiKeyModal();
 
@@ -117,8 +127,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const openModalWithFocus = useCallback(() => {
     if (isDeepResearchActive) return;
 
-    if (isResearchModalOpen) {
-      closeResearchModal();
+    if (isDeepResearchModalOpen) {
+      closeDeepResearchModal();
     }
 
     if (isCharacterModalOpen) {
@@ -140,28 +150,19 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       const length = inputEl.value.length;
       inputEl.setSelectionRange(length, length);
     });
-  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value, isResearchModalOpen, closeResearchModal, isCharacterModalOpen, closeCharacterModal]);
+  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value, isDeepResearchModalOpen, closeDeepResearchModal, isCharacterModalOpen, closeCharacterModal]);
 
-  const handleAsk = useCallback(
-    async (query: string) => {
-      setIsThinking(true);
-      console.log("setting isThinking to true");
-      openResearchModal(undefined, true, true, "ask");
+  const sseRef = useRef<EventSource | null>(null);
+  const streamingBufferRef = useRef<string>("");
+  const switchedToDeepResearchRef = useRef<boolean>(false);
+  const hasShownFirstChunkRef = useRef<boolean>(false);
+  const lastAskedQueryRef = useRef<string>("");
 
-      try {
-        const response = await askCall(query, location);
-        console.log("askCall response", response);
-        setResearchContent(response);
-      } catch (error) {
-        console.error("Ask call failed:", error);
-        setResearchContent(t("ask_error"));
-      } finally {
-        console.log("setting isThinking to false");
-        setIsThinking(false);
-      }
-    },
-    [location, openResearchModal, setResearchContent, t],
-  );
+  useEffect(() => {
+    return () => {
+      sseRef.current?.close();
+    };
+  }, []);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,23 +201,151 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         closeCharacterModal();
       }
 
-      openResearchModal(undefined, true, true, "deep");
+      setDeepResearchType("deep");
+      openDeepResearchModal(undefined, true, true, "deep");
+      setDeepResearchLoading(true);
+      setShowDiveDeeperCTA(false);
+      setDiveDeeperLoading(false);
+      setDiveDeeperHandler(undefined);
 
       deepResearchCall(query, location)
         .then((text) => {
           if (!text || text.trim().length === 0) {
-            setResearchContent(t("deep_research_error"));
+            setDeepResearchContent(t("deep_research_error"));
           } else {
-            setResearchContent(text);
+            setDeepResearchContent(text);
           }
         })
         .catch((error) => {
           console.error("Deep research failed:", error);
-          setResearchContent(t("deep_research_error"));
+          setDeepResearchContent(t("deep_research_error"));
         })
         .finally(() => setIsThinking(false));
     },
-    [location, setResearchContent, t, openResearchModal, isCharacterModalOpen, closeCharacterModal],
+    [
+      location,
+      setDeepResearchContent,
+      setDeepResearchLoading,
+      setShowDiveDeeperCTA,
+      setDiveDeeperLoading,
+      setDiveDeeperHandler,
+      t,
+      openDeepResearchModal,
+      isCharacterModalOpen,
+      closeCharacterModal,
+      setDeepResearchType,
+    ],
+  );
+
+  const handleDiveDeeper = useCallback(async () => {
+    const query = lastAskedQueryRef.current;
+    if (!query) return;
+
+    setDiveDeeperLoading(true);
+    try {
+      const text = await deepResearchCall(query, location);
+      setDeepResearchType("deep");
+
+      const finalText = text && text.trim().length > 0 ? text : t("deep_research_error");
+      setDeepResearchContent(finalText);
+      setShowDiveDeeperCTA(false);
+      setDiveDeeperHandler(undefined);
+    } catch (error) {
+      console.error("Deep research CTA failed:", error);
+      setDeepResearchContent(t("deep_research_error"));
+      setShowDiveDeeperCTA(true);
+      setDiveDeeperHandler(handleDiveDeeper);
+    } finally {
+      setDiveDeeperLoading(false);
+    }
+  }, [location, setDeepResearchContent, setDiveDeeperHandler, setDiveDeeperLoading, setShowDiveDeeperCTA, t, setDeepResearchType]);
+
+  const handleAsk = useCallback(
+    async (query: string) => {
+      setIsThinking(true);
+      setDeepResearchType("ask");
+      openDeepResearchModal(undefined, true, true, "ask");
+      setDeepResearchLoading(true);
+      streamingBufferRef.current = "";
+      switchedToDeepResearchRef.current = false;
+      hasShownFirstChunkRef.current = false;
+      lastAskedQueryRef.current = query;
+      setShowDiveDeeperCTA(false);
+      setDiveDeeperLoading(false);
+      setDiveDeeperHandler(undefined);
+
+      // cancel any previous stream
+      sseRef.current?.close();
+      sseRef.current = null;
+
+      sseRef.current = askStream(query, location, {
+        onMeta: (needMore) => {
+          setShowDiveDeeperCTA(false);
+          setDiveDeeperHandler(undefined);
+          if (needMore) {
+            sseRef.current?.close();
+            sseRef.current = null;
+            // Hand off to deep research path
+            // Keep loading state; deepResearchCall will update content
+            // and then clear loading on finish
+            switchedToDeepResearchRef.current = true;
+            setDeepResearchLoading(true);
+            executeDeepResearch(query);
+          }
+        },
+        onChunk: (delta) => {
+          streamingBufferRef.current += delta;
+          if (!hasShownFirstChunkRef.current) {
+            setDeepResearchLoading(false);
+            hasShownFirstChunkRef.current = true;
+          }
+          setDeepResearchContent(streamingBufferRef.current);
+        },
+        onDone: (final) => {
+          if (!switchedToDeepResearchRef.current) {
+            const finalText = final?.text ?? streamingBufferRef.current;
+            if (finalText) {
+              setDeepResearchContent(finalText);
+              setShowDiveDeeperCTA(finalText.trim().length > 0);
+              if (finalText.trim().length > 0) {
+                setDiveDeeperHandler(handleDiveDeeper);
+              }
+              setDiveDeeperLoading(false);
+            } else {
+              setDeepResearchLoading(false);
+              setShowDiveDeeperCTA(false);
+            }
+            if (!hasShownFirstChunkRef.current) {
+              setDeepResearchLoading(false);
+            }
+            setIsThinking(false);
+          }
+          sseRef.current = null;
+        },
+        onError: (err) => {
+          console.error("SSE error", err);
+          setIsThinking(false);
+          setDeepResearchContent(t("ask_error"));
+          setDeepResearchLoading(false);
+          setShowDiveDeeperCTA(false);
+          setDiveDeeperHandler(undefined);
+          sseRef.current = null;
+        },
+      });
+    },
+    [
+      location,
+      openDeepResearchModal,
+      setDeepResearchContent,
+      setDeepResearchLoading,
+      setShowDiveDeeperCTA,
+      setDiveDeeperLoading,
+      setDiveDeeperHandler,
+      t,
+      executeDeepResearch,
+      handleDiveDeeper,
+      setDeepResearchType,
+    ],
   );
 
   const handleSubmit = useCallback(
