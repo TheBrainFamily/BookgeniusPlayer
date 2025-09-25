@@ -75,9 +75,17 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content,
                     <LLMAnswerViewer answerMarkdown={content} />
                   </motion.div>
                 </AnimatePresence>
-
+              </div>
+              <AnimatePresence>
                 {canDiveDeeper && (
-                  <motion.div className="mt-8 flex flex-col items-center" variants={variants.diveDeeper} initial="hidden" animate="visible">
+                  <motion.div
+                    className="mt-8 px-1 flex flex-col items-center"
+                    variants={variants.diveDeeper}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    key="dive-deeper-section"
+                  >
                     <Button
                       onClick={onDiveDeeper}
                       disabled={isDiveDeeperLoading}
@@ -107,7 +115,7 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content,
                     </AnimatePresence>
                   </motion.div>
                 )}
-              </div>
+              </AnimatePresence>
             </motion.div>
           ) : (
             <motion.div className="flex flex-col items-center justify-center py-12 text-center" variants={variants.noResults} initial="initial" animate="animate" key="no-results">
@@ -140,7 +148,11 @@ const variants: Record<string, Variants> = {
   loadingSubtext: { hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { delay: 0.4 } } },
   contentContainer: { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut", delay: 0.1 } } },
   noResults: { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut", delay: 0.1 } } },
-  diveDeeper: { hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { delay: 0.5, duration: 0.4, ease: "easeOut" } } },
+  diveDeeper: {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { opacity: 1, scale: 1, transition: { delay: 0.5, duration: 0.4, ease: "easeOut" } },
+    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.3, ease: "easeIn" } },
+  },
   buttonContent: {
     hidden: { opacity: 0, scale: 0.8, y: 5 },
     visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" } },
@@ -149,12 +161,12 @@ const variants: Record<string, Variants> = {
   gatheringText: {
     hidden: { opacity: 0, y: 10, scale: 0.95 },
     visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: "easeOut" } },
-    exit: { opacity: 0, y: -10, scale: 0.95, transition: { duration: 0.2 } },
+    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
   },
   contentText: {
-    hidden: { opacity: 0, scale: 0.98, y: 10 },
-    visible: { opacity: 1, scale: 1, y: 0, transition: { delay: 0.2, duration: 0.4, ease: "easeOut" } },
-    exit: { opacity: 0, scale: 0.98, y: -10, transition: { duration: 0.15, ease: "easeIn" } },
+    hidden: { opacity: 0, scale: 0.98 },
+    visible: { opacity: 1, scale: 1, transition: { delay: 0.2, duration: 0.4, ease: "easeOut" } },
+    exit: { opacity: 0, scale: 0.98, transition: { duration: 0.2, ease: "easeIn" } },
   },
 };
 
