@@ -227,7 +227,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
             }}
             disabled={isDisabled}
             className={cn(
-              "px-3 py-1.5 rounded-full text-xs font-medium transition-colors, cursor-pointer",
+              "px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer",
               isDisabled && "cursor-auto",
               isActive
                 ? "bg-book-primary text-black shadow-sm"
