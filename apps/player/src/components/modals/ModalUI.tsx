@@ -200,10 +200,10 @@ const ModalUI: React.FC<ModalUIProps> = ({
               </header>
             )}
 
-            {searchActions && <div className="flex justify-between items-center p-4">{searchActions}</div>}
+            {searchActions && <div className="flex justify-between items-center px-4 pt-4">{searchActions}</div>}
 
             <motion.div
-              className="pb-4 pl-4 pr-4 overflow-y-auto opened-modal"
+              className="p-4 overflow-y-auto opened-modal"
               layout={animateHeight}
               transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}
               onClick={(e) => {
