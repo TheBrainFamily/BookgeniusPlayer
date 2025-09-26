@@ -186,17 +186,14 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                         >
                           <div className="relative p-4">
                             <div className="flex gap-2 mb-2">
-                              <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-tertiary-30 text-book-tertiary content-center">
+                              <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-tertiary-30 text-book-tertiary items-center">
                                 <span>{appearance.type}</span>
                               </div>
                               <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-primary-30 text-book-primary overflow-hidden">
-                                <span className="flex items-center gap-1 min-w-0 max-w-[100%]">
+                                <span className="flex items-center gap-1 min-w-0">
                                   <FileText size={12} className="flex-shrink-0" />
-                                  <span className="line-clamp-1 hidden min-[380px]:block">
+                                  <span className="line-clamp-1">
                                     {appearance.percentInChapter}% {t("of_chapter")} {getChapterTitle(chapter, t)}
-                                  </span>
-                                  <span className="line-clamp-1 block min-[380px]:hidden">
-                                    {appearance.percentInChapter}% {t("of_chapter")} {chapter}
                                   </span>
                                 </span>
                               </div>
