@@ -4,9 +4,10 @@ import { DOMParser, Document } from "@xmldom/xmldom";
 
 import { BookData } from "@player/types/book";
 import { setKnownVideos } from "@player/utils/getFilePathsForName";
-import { generateDataFiles, xmlToComplexHtml } from "./data/xmlToComplexHtml";
+import { xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterOverrides, getCharacterTags } from "./data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
+import { generateDataFiles } from "./data/generateDataFiles";
 
 async function generateBook(bookDirectoryPath: string, bookOutputPath?: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
@@ -134,7 +135,7 @@ export function generateCharacterMetadata(xmlDoc: Document, bookString: string, 
 
 function generateBookDataFiles(bookDirectoryPath: string, metadata: ReturnType<typeof parseBookXmlData>["metadata"], xmlDoc: Document, bookString: string, bookOutputPath: string) {
   // --- Generate getBookStringified.ts ---
-  const { backgroundsData, audioData, cutSceneData, htmlResult, chapterTitles } = xmlToComplexHtml(bookString, metadata.slug, metadata.language);
+  const { htmlResult, chapterTitles } = xmlToComplexHtml(bookString, metadata.slug, metadata.language);
 
   // Check if the required media files exist in the book directory
   const requiredMediaFiles = ["getBackgroundsForBook.ts", "getBackgroundSongsForBook.ts", "getCutScenesForBook.ts"];
@@ -146,8 +147,7 @@ function generateBookDataFiles(bookDirectoryPath: string, metadata: ReturnType<t
       fs.copyFileSync(path.join(bookDirectoryPath, mediaBookFile), path.join(bookOutputPath, mediaBookFile), fs.constants.COPYFILE_FICLONE);
     });
   } else {
-    // If files don't exist, generate them
-    generateDataFiles(backgroundsData, audioData, cutSceneData, metadata.slug);
+    console.error("Required media files do not exist in the book directory");
   }
 
   const getAllVariantsPath = path.join(bookDirectoryPath, "getAllVariants.ts");
