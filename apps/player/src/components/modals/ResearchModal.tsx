@@ -61,7 +61,7 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content,
               </motion.div>
             </motion.div>
           ) : content ? (
-            <motion.div className="flex-grow flex flex-col pb-2 min-h-0" variants={variants.contentContainer} initial="initial" animate="animate" key="content">
+            <motion.div className="flex-grow flex flex-col pt-4 min-h-0" variants={variants.contentContainer} initial="initial" animate="animate" key="content">
               <div className="flex-grow overflow-y-auto px-1 no-scrollbar">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -79,7 +79,7 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content,
               <AnimatePresence>
                 {canDiveDeeper && (
                   <motion.div
-                    className="mt-8 px-1 flex flex-col items-center"
+                    className="mt-4 px-1 flex flex-col items-center"
                     variants={variants.diveDeeper}
                     initial="hidden"
                     animate="visible"
@@ -172,9 +172,9 @@ const variants: Record<string, Variants> = {
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.05 } },
   },
   contentText: {
-    hidden: { opacity: 0, scale: 0.98 },
+    hidden: { opacity: 0, scale: 0.95 },
     visible: { opacity: 1, scale: 1, transition: { delay: 0.2, duration: 0.4, ease: "easeOut" } },
-    exit: { opacity: 0, scale: 0.98, transition: { duration: 0.05, ease: "easeIn" } },
+    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2, ease: "easeIn" } },
   },
 };
 
