@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 
 import { motion } from "motion/react";
-import { Search, FileText, Minimize2 } from "lucide-react";
+import { Search, FileText, Minimize2, Maximize2 } from "lucide-react";
 
 import { Tooltip, TooltipTrigger, TooltipContent } from "@player/components/ui/tooltip";
 
@@ -161,6 +161,11 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
     );
   }, [filteredItems]);
 
+  const handleExpandAll = useCallback(() => {
+    const allChapterIds = Object.keys(groupedResults);
+    setOpenChapters(allChapterIds);
+  }, [groupedResults]);
+
   const sortedChapterEntries = useMemo(() => {
     const entries = Object.entries(groupedResults);
     if (deferredResults?.areEmbeddings) {
@@ -222,7 +227,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
             }}
             disabled={isDisabled}
             className={cn(
-              "px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
+              "px-3 py-1.5 rounded-full text-xs font-medium transition-colors, cursor-pointer",
+              isDisabled && "cursor-auto",
               isActive
                 ? "bg-book-primary text-black shadow-sm"
                 : "bg-book-primary-20 text-white/70 hover:text-white hover:bg-book-primary-30 disabled:opacity-40 disabled:hover:bg-book-primary-20 disabled:hover:text-white/70",
@@ -243,16 +249,15 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
         <TooltipTrigger asChild>
           <button
             type="button"
-            onClick={handleCollapseAll}
-            disabled={areAllCollapsed}
-            className={"p-1 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white/70 hover:text-white"}
-            aria-label="Collapse all groups"
+            onClick={areAllCollapsed ? handleExpandAll : handleCollapseAll}
+            className={"p-1 rounded-md transition-colors cursor-pointer text-white/70 hover:text-white"}
+            aria-label={areAllCollapsed ? t("expand_all_groups") : t("collapse_all_groups")}
           >
-            <Minimize2 size={18} />
+            {areAllCollapsed ? <Maximize2 size={18} /> : <Minimize2 size={18} />}
           </button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Collapse all</p>
+          <p>{areAllCollapsed ? t("expand_all") : t("collapse_all")}</p>
         </TooltipContent>
       </Tooltip>
     ) : null;
