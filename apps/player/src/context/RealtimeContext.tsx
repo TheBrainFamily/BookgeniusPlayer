@@ -249,14 +249,15 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // Exclude any current-chapter characters from the previous-chapters list
       for (const n of Array.from(inCurrent)) inPrevious.delete(n);
       const format = (s: Set<string>) => (s.size ? Array.from(s).slice(0, 50).join(", ") : "none");
-      const text =
+
+      let text =
         `Help me with the '${getBookData().metadata.title}' by ${getBookData().metadata.author}. By using the get_book_information tool.` +
-          `If I mispronounce a character's name, use following lists to guide you: ` +
-          `Characters in current chapter: ${format(inCurrent)}. ` +
-          format(inPrevious) !==
-        "none"
-          ? `Characters from previous chapters: ${format(inPrevious)}. `
-          : "";
+        `If I mispronounce a character's name, use following lists to guide you: ` +
+        `Characters in current chapter: ${format(inCurrent)}. `;
+
+      if (inPrevious.size > 0) {
+        text += `Characters from previous chapters: ${format(inPrevious)}. `;
+      }
       console.log("text", text);
       session.transport.sendEvent({ type: "conversation.item.create", item: { type: "message", role: "user", content: [{ type: "input_text", text }] } });
     } catch (e) {
