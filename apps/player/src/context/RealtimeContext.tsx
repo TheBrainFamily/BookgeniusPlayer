@@ -56,6 +56,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isRecording, setIsRecording] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const toolTriggeredRef = useRef<boolean>(false);
+  const nextConnectInteractiveRef = useRef<boolean>(false);
 
   // No local API key; tokens are retrieved from ANSWERS_SERVER_URL on connect
 
@@ -142,10 +143,14 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       const resp = await fetch(`${ANSWERS_SERVER_URL}/getRealtimeToken`, { credentials: "include" });
       if (resp.status === 401) {
-        try {
-          window.dispatchEvent(new CustomEvent("ShowAuthModal", { detail: { reason: "realtimeTokenUnauthorized" } }));
-        } catch (_) {
-          // ignore dispatch failures
+        if (nextConnectInteractiveRef.current) {
+          try {
+            window.dispatchEvent(new CustomEvent("ShowAuthModal", { detail: { reason: "realtimeTokenUnauthorized" } }));
+          } catch (_) {
+            // ignore dispatch failures
+          }
+        } else {
+          console.warn("Realtime preconnect unauthorized; deferring auth prompt until interaction");
         }
         throw new Error("Unauthorized: sign in required");
       }
@@ -200,7 +205,12 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const startRecording = useCallback(async () => {
     if (!sessionRef.current || !isConnected) {
-      await connectConversation();
+      nextConnectInteractiveRef.current = true;
+      try {
+        await connectConversation();
+      } finally {
+        nextConnectInteractiveRef.current = false;
+      }
     }
     const session = sessionRef.current!;
     setIsRecording(true);
