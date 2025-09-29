@@ -6,10 +6,12 @@ import { useRouteTransition } from "./providers/RouteTransitionProvider";
 import { books } from "@platform/books";
 import { bookDataLoader } from "../../player/src/services/bookDataLoader";
 import Paywall from "./components/Paywall";
+import AuthRequiredModal from "./components/AuthRequiredModal";
 import { teardownPlayer } from "../../player/src/teardown";
 
 const PlayerApp = React.lazy(() => import("./player/PlayerRoot"));
 const PAYWALL_FADE_MS = 300;
+const AUTH_MODAL_FADE_MS = 300;
 
 const WrappedPlayerApp = () => {
   const [searchParams] = useSearchParams();
@@ -27,6 +29,12 @@ const WrappedPlayerApp = () => {
   const lastBookRef = useRef<string | null>(null);
   const [paywallMounted, setPaywallMounted] = useState(false);
   const paywallHostRef = useRef<HTMLDivElement | null>(null);
+
+  // Auth modal state and host
+  const [showAuth, setShowAuth] = useState(false);
+  const [authVisible, setAuthVisible] = useState(false);
+  const [authMounted, setAuthMounted] = useState(false);
+  const authHostRef = useRef<HTMLDivElement | null>(null);
 
   // Guards to ensure we finish only once and coordinate "Start" click with app readiness
   const userInteractedRef = useRef(false);
@@ -68,6 +76,16 @@ const WrappedPlayerApp = () => {
     return () => window.removeEventListener("ShowPaywall", handleShowPaywall);
   }, []);
 
+  // Listen for auth modal trigger from player
+  useEffect(() => {
+    const handleShowAuth = (event: Event) => {
+      // Optionally inspect (event as CustomEvent).detail?.reason
+      setShowAuth(true);
+    };
+    window.addEventListener("ShowAuthModal", handleShowAuth as EventListener);
+    return () => window.removeEventListener("ShowAuthModal", handleShowAuth as EventListener);
+  }, []);
+
   useEffect(() => {
     if (showPaywall) {
       setPaywallMounted(true); // mount host
@@ -79,6 +97,19 @@ const WrappedPlayerApp = () => {
       return () => clearTimeout(t);
     }
   }, [showPaywall, paywallMounted]);
+
+  // Mount/unmount and fade for auth modal
+  useEffect(() => {
+    if (showAuth) {
+      setAuthMounted(true);
+      setAuthVisible(false);
+      requestAnimationFrame(() => setAuthVisible(true));
+    } else if (authMounted) {
+      setAuthVisible(false);
+      const t = setTimeout(() => setAuthMounted(false), AUTH_MODAL_FADE_MS);
+      return () => clearTimeout(t);
+    }
+  }, [showAuth, authMounted]);
 
   useEffect(() => {
     const onReady = () => {
@@ -224,8 +255,15 @@ const WrappedPlayerApp = () => {
         <div ref={paywallHostRef} className={`fixed inset-0 z-[1000] transition-opacity duration-1000 ${paywallVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`} />
       )}
 
+      {authMounted && (
+        <div ref={authHostRef} className={`fixed inset-0 z-[1000] transition-opacity duration-1000 ${authVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`} />
+      )}
+
       {/* render Paywall INTO the fading host */}
       {showPaywall && paywallHostRef.current && createPortal(<Paywall bookSlug={bookSlug} bookTitle={bookTitle} onClose={() => setShowPaywall(false)} />, paywallHostRef.current)}
+
+      {/* render Auth modal INTO its fading host */}
+      {showAuth && authHostRef.current && createPortal(<AuthRequiredModal onClose={() => setShowAuth(false)} />, authHostRef.current)}
     </div>
   );
 };

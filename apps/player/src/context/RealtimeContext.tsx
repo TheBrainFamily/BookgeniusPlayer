@@ -140,7 +140,18 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Fetch ephemeral realtime token from our backend
     let token = "";
     try {
-      const resp = await fetch(`${ANSWERS_SERVER_URL}/getRealtimeToken`);
+      const resp = await fetch(`${ANSWERS_SERVER_URL}/getRealtimeToken`, { credentials: "include" });
+      if (resp.status === 401) {
+        try {
+          window.dispatchEvent(new CustomEvent("ShowAuthModal", { detail: { reason: "realtimeTokenUnauthorized" } }));
+        } catch (_) {
+          // ignore dispatch failures
+        }
+        throw new Error("Unauthorized: sign in required");
+      }
+      if (!resp.ok) {
+        throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+      }
       token = await resp.text();
     } catch (e) {
       console.error("Failed to fetch realtime token", e);
@@ -174,7 +185,17 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const disconnectConversation = useCallback(async () => {
     setIsConnected(false);
-    sessionRef.current?.close();
+    const session = sessionRef.current;
+    if (!session) return;
+
+    try {
+      const result = session.close?.();
+      if (result && typeof (result as PromiseLike<void>).then === "function") {
+        await result;
+      }
+    } finally {
+      sessionRef.current = null;
+    }
   }, []);
 
   const startRecording = useCallback(async () => {
