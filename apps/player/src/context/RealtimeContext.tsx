@@ -159,7 +159,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
       token = await resp.text();
     } catch (e) {
-      console.error("Failed to fetch realtime token", e);
+      console.warn("Failed to fetch realtime token", e);
       throw e;
     }
     if (!token || typeof token !== "string") throw new Error("Missing realtime token");
@@ -193,14 +193,8 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const session = sessionRef.current;
     if (!session) return;
 
-    try {
-      const result = session.close?.();
-      if (result && typeof (result as PromiseLike<void>).then === "function") {
-        await result;
-      }
-    } finally {
-      sessionRef.current = null;
-    }
+    session.close();
+    sessionRef.current = null;
   }, []);
 
   const startRecording = useCallback(async () => {
