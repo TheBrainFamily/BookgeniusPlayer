@@ -215,7 +215,16 @@ export function activateMediaInRange(
     charactersBySlug.set(character.slug, character);
   });
 
-  const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
+  // const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
+
+  const x = document.querySelectorAll<HTMLElement>(`section[data-chapter="${startChapter}"] [data-index]`);
+
+  const allParagraphs = Array.from(x).filter((paragraph) => {
+    const paragraphIndex = parseInt(paragraph.dataset.index, 10);
+    // console.log("226: paragraphIndex BANG!", paragraphIndex);
+    return paragraphIndex >= startParagraph && paragraphIndex <= endParagraph;
+  });
+
   const rootEl = document.getElementById("content-container");
   const rootRect = rootEl?.getBoundingClientRect() ?? null;
 

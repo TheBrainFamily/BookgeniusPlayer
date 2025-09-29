@@ -55,11 +55,11 @@ const CharactersOnStagePanel = () => {
         shouldHideAvatars ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto",
       )}
     >
-      <ScrollArea
+      <div
         className="relative w-full h-full"
-        orientation="horizontal"
-        wheelToHorizontal
-        hideScrollbar
+        // orientation="horizontal"
+        // wheelToHorizontal
+        // hideScrollbar
         style={{
           WebkitMaskImage: "linear-gradient(to right, transparent 0, black 24px, black calc(100% - 24px), transparent 100%)",
           maskImage: "linear-gradient(to right, transparent 0, black 24px, black calc(100% - 24px), transparent 100%)",
@@ -77,7 +77,7 @@ const CharactersOnStagePanel = () => {
             <CharacterAvatar key={characterEntity.slug} characterEntity={characterEntity} currentSpeakers={currentSpeakers} index={index} />
           ))}
         </motion.div>
-      </ScrollArea>
+      </div>
     </div>
   );
 };
