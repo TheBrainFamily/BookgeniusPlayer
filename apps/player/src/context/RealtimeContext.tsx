@@ -11,7 +11,6 @@ interface RealtimeContextType {
   isConnected: boolean;
   isRecording: boolean;
   isMuted: boolean;
-  response: string;
   connectConversation: () => Promise<void>;
   disconnectConversation: () => Promise<void>;
   startRecording: () => Promise<void>;
@@ -46,7 +45,6 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [response, setResponse] = useState("");
   const toolTriggeredRef = useRef<boolean>(false);
 
   // No local API key; tokens are retrieved from ANSWERS_SERVER_URL on connect
@@ -292,7 +290,6 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     isConnected,
     isRecording,
     isMuted,
-    response,
     connectConversation,
     disconnectConversation,
     startRecording,
