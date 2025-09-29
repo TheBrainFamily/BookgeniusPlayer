@@ -184,7 +184,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       const toDelete = conversationItemsRef.current.map((x) => x.id);
       for (const id of toDelete) {
-        session.transport.sendEvent({ type: "conversation.item.delete", item_id: id } as any);
+        session.transport.sendEvent({ type: "conversation.item.delete", item_id: id });
       }
       if (toDelete.length) {
         conversationItemsRef.current = [];
@@ -200,13 +200,13 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const inCurrent = new Set<string>();
       const inPrevious = new Set<string>();
       for (const c of chars || []) {
-        const name = (c as any)?.characterName as string | undefined;
+        const name = c.characterName;
         if (!name || !name.trim()) continue;
-        const infos = ((c as any)?.infoPerChapter || []) as any[];
+        const infos = c.infoPerChapter || [];
         for (const info of infos) {
-          const ch = info?.chapter as number | undefined;
+          const ch = info.chapter;
           if (!ch || ch > currentChapter) continue;
-          const encountered = [...(info?.paragraphsWhereSpotted || []), ...(info?.paragraphsWhereTalking || []), ...((info?.paragraphsWhereEnters as number[] | undefined) || [])];
+          const encountered = [...(info.paragraphsWhereSpotted || []), ...(info.paragraphsWhereTalking || []), ...(info.paragraphsWhereEnters || [])];
           if (encountered.length === 0) continue;
           if (ch === currentChapter) inCurrent.add(name);
           else if (ch < currentChapter) inPrevious.add(name);
