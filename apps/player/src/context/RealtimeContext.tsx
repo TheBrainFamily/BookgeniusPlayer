@@ -141,6 +141,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Fetch ephemeral realtime token from our backend
     let token = "";
     try {
+      // const resp = await fetch(`http://localhost:30310/getRealtimeToken`);
       const resp = await fetch(`/api/generate-realtime-token`, { credentials: "include" });
       if (resp.status === 401) {
         if (nextConnectInteractiveRef.current) {
@@ -250,15 +251,25 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       for (const n of Array.from(inCurrent)) inPrevious.delete(n);
       const format = (s: Set<string>) => (s.size ? Array.from(s).slice(0, 50).join(", ") : "none");
 
-      let text =
-        `Help me with the '${getBookData().metadata.title}' by ${getBookData().metadata.author}. By using the get_book_information tool.` +
-        `If I mispronounce a character's name, use following lists to guide you: ` +
-        `Characters in current chapter: ${format(inCurrent)}. `;
+      const book = getBookData();
+      const title = book?.metadata?.title ?? "the book";
+      const author = book?.metadata?.author ?? "the author";
+      const segments = [
+        `Help me with "${title}" by ${author}.`,
+        "Use the get_book_information tool for every answer.",
+        "If I mispronounce a character's name, rely on these lists:",
+        `Characters in current chapter: ${format(inCurrent)}.`,
+      ];
 
       if (inPrevious.size > 0) {
-        text += `Characters from previous chapters: ${format(inPrevious)}. `;
+        segments.push(`Characters from previous chapters: ${format(inPrevious)}.`);
       }
-      console.log("text", text);
+
+      segments.push(
+        `Use the users question directly when calling the tool, do not add any other information or the characters, use the list only to guide understanding of the pronounciation`,
+      );
+
+      const text = segments.join(" ");
       session.transport.sendEvent({ type: "conversation.item.create", item: { type: "message", role: "user", content: [{ type: "input_text", text }] } });
     } catch (e) {
       console.warn("Failed to send per-hold priming message", e);

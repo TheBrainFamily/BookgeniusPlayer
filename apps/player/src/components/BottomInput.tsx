@@ -43,7 +43,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { t } = useTranslation();
 
   const { value, setValue } = useBottomInput();
-  const [isRecording, setIsRecording] = useState(false);
+  const [isRealtimeConnecting, setIsRealtimeConnecting] = useState(false);
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
 
@@ -66,7 +66,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { closeModal: closeCharacterModal, isOpen: isCharacterModalOpen } = useCharacterModal();
   // No local API key gating for voice; token fetched server-side
 
-  const { startRecording, stopRecording, setAskHandler } = useRealtime();
+  const { startRecording, stopRecording, setAskHandler, isRecording } = useRealtime();
   const { location } = useLocation();
   const saved = getSavedLocation();
   const furthestLocation = saved ?? location;
@@ -391,19 +391,24 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   }, [handleActivity, isDeepResearchActive, isSearchModalOpen, closeSearchModal, isThinking]);
 
   const handleRecordingStart = useCallback(() => {
-    if (isRecording) return;
+    if (isRecording || isRealtimeConnecting) return;
 
     handleActivity();
-    setIsRecording(true);
+
+    setIsRealtimeConnecting(true);
     setValue("");
 
     if (isSearchModalOpen) setSearchQuery("");
 
-    startRecording().catch((error) => {
-      console.error("Error starting recording:", error);
-      setIsRecording(false);
-    });
-  }, [handleActivity, isRecording, isSearchModalOpen, setSearchQuery, startRecording]);
+    startRecording()
+      .then(() => {
+        setIsRealtimeConnecting(false);
+      })
+      .catch((error) => {
+        console.error("Error starting recording:", error);
+        setIsRealtimeConnecting(false);
+      });
+  }, [handleActivity, isRecording, isRealtimeConnecting, isSearchModalOpen, setSearchQuery, startRecording, setValue]);
 
   const handleRecordingEnd = useCallback(() => {
     if (!isRecording) return;
@@ -411,18 +416,17 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     handleActivity();
 
     setTimeout(() => {
-      stopRecording()
-        .catch((error) => console.error("Error stopping recording:", error))
-        .finally(() => setIsRecording(false));
+      stopRecording().catch((error) => console.error("Error stopping recording:", error));
     }, 150);
   }, [handleActivity, isRecording, stopRecording]);
 
   const placeholder = useMemo(() => {
+    if (isRealtimeConnecting) return t("realtime_connecting", "Connecting…");
     if (isRecording) return t("listening");
     if (isThinking) return t("thinking");
     if (isDeepResearchActive) return t("enter_deep_research");
     return t("search_or_ask");
-  }, [isRecording, isThinking, isDeepResearchActive, t]);
+  }, [isRealtimeConnecting, isRecording, isThinking, isDeepResearchActive, t]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -527,8 +531,9 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         className={cn(
           "bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-2 py-[2px] md:py-[3px] md:px-3",
           isRecording && "recording-active",
+          isRealtimeConnecting && "border-amber-300/70 shadow-[0_0_12px_rgba(250,204,21,0.25)]",
         )}
-        animate={isRecording ? "recordingContainer" : "idle"}
+        animate={isRecording ? "recordingContainer" : isRealtimeConnecting ? "connectingContainer" : "idle"}
         initial="idle"
         variants={variants.container}
         ref={containerRef}
@@ -537,16 +542,31 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         <motion.div key="expanded" variants={variants.expandedContainer} initial="initial" animate="animate" exit="exit">
           <form onSubmit={handleSubmit} className="flex items-center space-x-2 min-w-[280px] sm:min-w-[350px]">
             <div className="relative flex-grow flex items-center">
-              <AnimatePresence>
-                {isRecording && (
+              <AnimatePresence mode="wait">
+                {(isRealtimeConnecting || isRecording) && (
                   <motion.div
-                    key="recording-indicator"
-                    className="absolute left-2 w-3 h-3 rounded-full bg-red-500"
-                    variants={variants.recordingIndicator}
+                    key={isRealtimeConnecting ? "connecting-indicator" : "recording-indicator"}
+                    className={cn("absolute left-2 w-3 h-3 rounded-full", isRealtimeConnecting ? "bg-amber-300" : "bg-red-500")}
+                    variants={isRealtimeConnecting ? variants.connectingIndicator : variants.recordingIndicator}
                     initial="initial"
                     animate="animate"
                     exit="exit"
                   />
+                )}
+              </AnimatePresence>
+              <AnimatePresence mode="wait">
+                {isRealtimeConnecting && (
+                  <motion.div
+                    key="connecting-label"
+                    className="absolute left-6 flex items-center gap-1 text-[11px] uppercase tracking-[0.25em] text-amber-200/90 pointer-events-none"
+                    variants={variants.connectingLabel}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                  >
+                    <Loader2 size={12} className="animate-spin" />
+                    <span>{t("realtime_connecting", "Connecting")}</span>
+                  </motion.div>
                 )}
               </AnimatePresence>
               <AnimatePresence>
@@ -591,8 +611,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                 onFocus={handleInputInteraction}
                 onKeyDown={handleInputKeyDown}
                 placeholder={placeholder}
-                className={cn("flex-grow bg-transparent text-white outline-none px-2 py-1", isRecording ? "opacity-80 pl-7 font-medium" : "")}
-                disabled={isRecording || isThinking}
+                className={cn(
+                  "flex-grow bg-transparent text-white outline-none px-2 py-1",
+                  isRecording ? "opacity-80 pl-7 font-medium" : "",
+                  isRealtimeConnecting ? "opacity-60 pl-7 cursor-wait text-amber-100/80" : "",
+                )}
+                disabled={isRealtimeConnecting || isRecording || isThinking}
                 autoComplete="off"
               />
             </div>
@@ -604,7 +628,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                     <motion.button
                       type="button"
                       onPointerDown={toggleDeepResearch}
-                      disabled={isThinking || isRecording}
+                      disabled={isThinking || isRecording || isRealtimeConnecting}
                       className={cn(
                         "rounded-full p-2 flex items-center justify-center",
                         isDeepResearchActive ? "text-orange-400" : "text-white/70",
@@ -652,9 +676,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                       <motion.button
                         type="button"
                         disabled={isThinking}
-                        className={cn("p-2 rounded-full flex items-center justify-center cursor-pointer", isRecording ? "text-red-400" : "text-white/70")}
+                        className={cn(
+                          "p-2 rounded-full flex items-center justify-center",
+                          isRecording ? "text-red-400 cursor-pointer" : isRealtimeConnecting ? "text-amber-300 cursor-wait animate-pulse" : "text-white/70 cursor-pointer",
+                        )}
                         style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
-                        whileHover={!isRecording ? "hover" : undefined}
+                        whileHover={!isRecording && !isRealtimeConnecting ? "hover" : undefined}
                         whileTap="tapMic"
                         variants={variants.button}
                         initial="idle"
@@ -693,7 +720,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                         <Mic size={18} />
                       </motion.button>
                     </TooltipTrigger>
-                    <TooltipContent>{isRecording ? t("stop_recording") : t("start_recording")}</TooltipContent>
+                    <TooltipContent>{isRecording ? t("stop_recording") : isRealtimeConnecting ? t("realtime_connecting", "Connecting…") : t("start_recording")}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               )}
@@ -727,6 +754,11 @@ const variants: Record<string, Variants> = {
   },
   container: {
     idle: { boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", borderColor: "rgba(255, 255, 255, 0.3)" },
+    connectingContainer: {
+      boxShadow: ["0px 0px 0px rgba(250, 204, 21, 0.2)", "0px 0px 12px rgba(250, 204, 21, 0.4)", "0px 0px 0px rgba(250, 204, 21, 0.2)"],
+      borderColor: ["rgba(255, 255, 255, 0.3)", "rgba(250, 204, 21, 0.65)", "rgba(255, 255, 255, 0.3)"],
+      transition: { duration: 1.2, repeat: Infinity, ease: "easeInOut" },
+    },
     recordingContainer: {
       boxShadow: ["0px 0px 0px rgba(239, 68, 68, 0.2)", "0px 0px 12px rgba(239, 68, 68, 0.6)", "0px 0px 0px rgba(239, 68, 68, 0.2)"],
       borderColor: ["rgba(255, 255, 255, 0.3)", "rgba(239, 68, 68, 0.6)", "rgba(255, 255, 255, 0.3)"],
@@ -739,6 +771,12 @@ const variants: Record<string, Variants> = {
     animate: { opacity: [0.5, 1, 0.5], scale: [1, 1.05, 1], transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" } },
     exit: { opacity: 0, scale: 0, transition: { duration: 0.2 } },
   },
+  connectingIndicator: {
+    initial: { opacity: 0, scale: 0.6 },
+    animate: { opacity: [0.4, 0.9, 0.4], scale: [1, 1.1, 1], transition: { duration: 1.2, repeat: Infinity, ease: "easeInOut" } },
+    exit: { opacity: 0, scale: 0.6, transition: { duration: 0.2 } },
+  },
+  connectingLabel: { initial: { opacity: 0, y: -4 }, animate: { opacity: 1, y: 0, transition: { duration: 0.2 } }, exit: { opacity: 0, y: -4, transition: { duration: 0.15 } } },
   mentionList: {
     initial: { opacity: 0, y: 6, transition: { duration: 0.2 } },
     animate: { opacity: 1, y: 0, transition: { duration: 0.2 } },
