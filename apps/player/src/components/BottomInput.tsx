@@ -12,8 +12,6 @@ import { useSearchModal } from "@player/stores/modals/searchModal.store";
 import { useDeepResearchModal } from "@player/stores/modals/researchModal.store";
 import { OptionalElement } from "./OptionalElement";
 import { useElementVisibilityStore } from "@player/stores/elementVisibility.store";
-import { hasApiKey } from "@player/utils/apiKeyManager";
-import { useApiKeyModal } from "@player/stores/modals/apiKeyModal.store";
 import type { CharacterData } from "@player/types/book";
 import { askStream } from "@player/askStream";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
@@ -66,9 +64,9 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     setType: setDeepResearchType,
   } = useDeepResearchModal();
   const { closeModal: closeCharacterModal, isOpen: isCharacterModalOpen } = useCharacterModal();
-  const { openModal: openApiKeyModal } = useApiKeyModal();
+  // No local API key gating for voice; token fetched server-side
 
-  const { startRecording, stopRecording, response } = useRealtime();
+  const { startRecording, stopRecording, setAskHandler } = useRealtime();
   const { location } = useLocation();
   const saved = getSavedLocation();
   const furthestLocation = saved ?? location;
@@ -370,6 +368,15 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     [handleActivity, value, isSearchModalOpen, isDeepResearchActive, executeDeepResearch, handleAsk, closeSearchModal],
   );
 
+  // Register handleAsk so Realtime tool can trigger the same flow
+  useEffect(() => {
+    setAskHandler((query: string) => {
+      // Behave exactly like submitting from the input
+      handleAsk(query);
+    });
+    return () => setAskHandler(null);
+  }, [handleAsk, setAskHandler]);
+
   const toggleDeepResearch = useCallback(() => {
     if (isThinking) return;
 
@@ -384,10 +391,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   }, [handleActivity, isDeepResearchActive, isSearchModalOpen, closeSearchModal, isThinking]);
 
   const handleRecordingStart = useCallback(() => {
-    if (isRecording || !hasApiKey()) {
-      if (!hasApiKey()) openApiKeyModal();
-      return;
-    }
+    if (isRecording) return;
 
     handleActivity();
     setIsRecording(true);
@@ -399,7 +403,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       console.error("Error starting recording:", error);
       setIsRecording(false);
     });
-  }, [handleActivity, isRecording, isSearchModalOpen, setSearchQuery, startRecording, openApiKeyModal]);
+  }, [handleActivity, isRecording, isSearchModalOpen, setSearchQuery, startRecording]);
 
   const handleRecordingEnd = useCallback(() => {
     if (!isRecording) return;
@@ -447,16 +451,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       document.removeEventListener("pointerdown", handleDocumentPointerDown, true);
     };
   }, [handleActivity, openModalWithFocus, startAllTimers, setIsTimersPausedSticky]);
-
-  useEffect(() => {
-    if (response && !isRecording) {
-      setValue(response);
-      handleActivity();
-
-      if (isSearchModalOpen) setSearchQuery(response);
-      return;
-    }
-  }, [handleActivity, response, isRecording, isSearchModalOpen, setSearchQuery]);
 
   useEffect(() => {
     setHighlightedMention(0);

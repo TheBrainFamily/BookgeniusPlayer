@@ -118,12 +118,10 @@ export default function App() {
         <BookDataProvider>
           <LocationProvider>
             <RealtimeProvider>
-              <WebSocketProvider>
-                <BookContentWrapper>
-                  <Shell onShellMounted={() => setReactDomReady(true)} />
-                  <ModalRenderers />
-                </BookContentWrapper>
-              </WebSocketProvider>
+              <BookContentWrapper>
+                <Shell onShellMounted={() => setReactDomReady(true)} />
+                <ModalRenderers />
+              </BookContentWrapper>
             </RealtimeProvider>
           </LocationProvider>
         </BookDataProvider>
