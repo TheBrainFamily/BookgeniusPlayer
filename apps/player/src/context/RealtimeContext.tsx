@@ -25,6 +25,16 @@ interface RealtimeContextType {
 
 const RealtimeContext = createContext<RealtimeContextType | undefined>(undefined);
 
+type ConversationItemSummary = { id?: string; role?: string; type?: string };
+
+type TransportEvent =
+  | { type: "input_audio_buffer.speech_started" }
+  | { type: "server.input_audio_buffer.speech_started" }
+  | { type: "conversation.item.created"; item?: ConversationItemSummary }
+  | { type: "conversation.item.deleted"; item_id?: string; item?: ConversationItemSummary }
+  | { type: "response.created" }
+  | { type: string; item?: ConversationItemSummary; item_id?: string };
+
 export const useRealtime = () => {
   const context = useContext(RealtimeContext);
   if (!context) throw new Error("useRealtime must be used within a RealtimeProvider");
@@ -81,7 +91,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const session = sessionRef.current;
     if (!session) return;
 
-    const onTransport = (event: any) => {
+    const onTransport = (event: TransportEvent) => {
       // Detect speech activity hints from server
       if (event.type === "input_audio_buffer.speech_started" || event.type === "server.input_audio_buffer.speech_started") {
         audioHeardThisRecordingRef.current = true;
@@ -89,13 +99,12 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       // Track conversation items to clear history between questions
       if (event.type === "conversation.item.created") {
-        const item = event.item as any;
-        if (item?.id) {
-          const entry = { id: item.id as string, role: item.role as string | undefined, type: item.type as string | undefined };
-          conversationItemsRef.current.push(entry);
-        }
+        const item = event.item;
+        const id = item?.id;
+        if (!id) return;
+        conversationItemsRef.current.push({ id, role: item?.role, type: item?.type });
       } else if (event.type === "conversation.item.deleted") {
-        const id = (event.item_id as string) || (event.item?.id as string);
+        const id = event.item_id ?? event.item?.id;
         if (id) {
           conversationItemsRef.current = conversationItemsRef.current.filter((x) => x.id !== id);
         }
@@ -113,8 +122,8 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     session.on("transport_event", onTransport);
     session.on("agent_end", onAgentEnd);
     return () => {
-      session.off("transport_event", onTransport as any);
-      session.off("agent_end", onAgentEnd as any);
+      session.off("transport_event", onTransport);
+      session.off("agent_end", onAgentEnd);
     };
   }, [sessionRef.current]);
 
