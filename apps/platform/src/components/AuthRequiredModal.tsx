@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Lock, X } from "lucide-react";
-import { useIntegrations } from "@platform/integrations";
+import { AuthModule, useIntegrations } from "@platform/integrations";
 
 type Props = { onClose: () => void };
 
-const AuthRequiredModalInner: React.FC<{ onClose: () => void; authMod: any }> = ({ onClose, authMod }) => {
+const AuthRequiredModalInner: React.FC<{ onClose: () => void; authMod: AuthModule }> = ({ onClose, authMod }) => {
   const { ready, isSignedIn, openSignIn } = authMod.useAuth();
   useEffect(() => {
     if (ready && isSignedIn) onClose();
