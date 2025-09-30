@@ -12,6 +12,7 @@ interface RealtimeContextType {
   isRecording: boolean;
   isMuted: boolean;
   isSessionReady: boolean;
+  audioAnalyser: AnalyserNode | null;
   connectConversation: () => Promise<void>;
   disconnectConversation: () => Promise<void>;
   startRecording: () => Promise<void>;
@@ -57,8 +58,11 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isRecording, setIsRecording] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isSessionReady, setIsSessionReady] = useState(false);
+  const [audioAnalyser, setAudioAnalyser] = useState<AnalyserNode | null>(null);
   const toolTriggeredRef = useRef<boolean>(false);
   const nextConnectInteractiveRef = useRef<boolean>(false);
+  const visualizerStreamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   // No local API key; tokens are retrieved from ANSWERS_SERVER_URL on connect
 
@@ -245,10 +249,25 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         nextConnectInteractiveRef.current = false;
       }
     }
+
+    // Create audio analyser for visualization
     try {
-      if (!micPrimedRef.current && typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+      if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach((t) => t.stop());
+        visualizerStreamRef.current = stream;
+
+        if (!audioContextRef.current) {
+          audioContextRef.current = new AudioContext();
+        }
+
+        const analyser = audioContextRef.current.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.8;
+
+        const source = audioContextRef.current.createMediaStreamSource(stream);
+        source.connect(analyser);
+
+        setAudioAnalyser(analyser);
         micPrimedRef.current = true;
       }
     } catch (e) {
@@ -334,6 +353,13 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const session = sessionRef.current;
     if (!session) throw new Error("Realtime session is not initialized");
 
+    // Clean up audio analyser
+    setAudioAnalyser(null);
+    if (visualizerStreamRef.current) {
+      visualizerStreamRef.current.getTracks().forEach((track) => track.stop());
+      visualizerStreamRef.current = null;
+    }
+
     session.mute(true);
     setIsMuted(true);
     try {
@@ -378,6 +404,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     isRecording,
     isMuted,
     isSessionReady,
+    audioAnalyser,
     connectConversation,
     disconnectConversation,
     startRecording,

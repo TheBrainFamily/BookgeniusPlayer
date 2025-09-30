@@ -4,34 +4,24 @@ import { Mic } from "lucide-react";
 
 interface MicrophoneVisualizerProps {
   isActive: boolean;
+  audioAnalyser: AnalyserNode | null;
   onMicReady?: (ready: boolean) => void;
 }
 
-export const MicrophoneVisualizer: React.FC<MicrophoneVisualizerProps> = ({ isActive, onMicReady }) => {
+export const MicrophoneVisualizer: React.FC<MicrophoneVisualizerProps> = ({ isActive, audioAnalyser, onMicReady }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const [volume, setVolume] = useState(0);
   const framesWithDataRef = useRef<number>(0);
   const micReadyRef = useRef<boolean>(false);
 
   useEffect(() => {
-    if (!isActive) {
+    if (!isActive || !audioAnalyser) {
       // Cleanup
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
       }
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-      }
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-      }
-      audioContextRef.current = null;
-      analyserRef.current = null;
-      streamRef.current = null;
       setVolume(0);
       framesWithDataRef.current = 0;
       if (micReadyRef.current) {
@@ -41,101 +31,73 @@ export const MicrophoneVisualizer: React.FC<MicrophoneVisualizerProps> = ({ isAc
       return;
     }
 
-    // Setup audio visualization
-    const setupAudioVisualization = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        streamRef.current = stream;
+    // Setup audio visualization using the provided analyser
+    const bufferLength = audioAnalyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
 
-        const audioContext = new AudioContext();
-        audioContextRef.current = audioContext;
+    const draw = () => {
+      if (!audioAnalyser) return;
 
-        const analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
-        analyser.smoothingTimeConstant = 0.8;
-        analyserRef.current = analyser;
+      audioAnalyser.getByteFrequencyData(dataArray);
 
-        const source = audioContext.createMediaStreamSource(stream);
-        source.connect(analyser);
+      // Calculate average volume
+      const sum = dataArray.reduce((acc, val) => acc + val, 0);
+      const average = sum / bufferLength;
+      const normalizedVolume = Math.min(average / 128, 1); // Normalize to 0-1
 
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
+      setVolume(normalizedVolume);
 
-        const draw = () => {
-          if (!analyserRef.current) return;
-
-          analyserRef.current.getByteFrequencyData(dataArray);
-
-          // Calculate average volume
-          const sum = dataArray.reduce((acc, val) => acc + val, 0);
-          const average = sum / bufferLength;
-          const normalizedVolume = Math.min(average / 128, 1); // Normalize to 0-1
-
-          setVolume(normalizedVolume);
-
-          // Detect microphone readiness - check if we're getting consistent data
-          // Even silence produces data (noise floor), so any non-zero values mean the mic is working
-          const hasData = dataArray.some((val) => val > 0);
-          if (hasData) {
-            framesWithDataRef.current += 1;
-            // Wait for 5 consecutive frames with data to ensure mic is truly ready
-            if (framesWithDataRef.current >= 5 && !micReadyRef.current) {
-              micReadyRef.current = true;
-              console.log("Microphone ready after", framesWithDataRef.current, "frames");
-              onMicReady?.(true);
-            }
-          }
-
-          // Draw waveform on canvas
-          if (canvasRef.current) {
-            const canvas = canvasRef.current;
-            const ctx = canvas.getContext("2d");
-            if (!ctx) return;
-
-            const width = canvas.width;
-            const height = canvas.height;
-
-            ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-            ctx.fillRect(0, 0, width, height);
-
-            const barWidth = (width / bufferLength) * 2.5;
-            let barHeight;
-            let x = 0;
-
-            for (let i = 0; i < bufferLength; i++) {
-              barHeight = (dataArray[i] / 255) * height;
-
-              const hue = (i / bufferLength) * 60 + 180; // Blue to cyan
-              ctx.fillStyle = `hsla(${hue}, 70%, 60%, 0.8)`;
-              ctx.fillRect(x, height - barHeight, barWidth, barHeight);
-
-              x += barWidth + 1;
-            }
-          }
-
-          animationFrameRef.current = requestAnimationFrame(draw);
-        };
-
-        draw();
-      } catch (error) {
-        console.error("Error setting up audio visualization:", error);
+      // Detect microphone readiness - check if we're getting consistent data
+      // Even silence produces data (noise floor), so any non-zero values mean the mic is working
+      const hasData = dataArray.some((val) => val > 0);
+      if (hasData) {
+        framesWithDataRef.current += 1;
+        // Wait for 5 consecutive frames with data to ensure mic is truly ready
+        if (framesWithDataRef.current >= 5 && !micReadyRef.current) {
+          micReadyRef.current = true;
+          console.log("Microphone ready after", framesWithDataRef.current, "frames");
+          onMicReady?.(true);
+        }
       }
+
+      // Draw waveform on canvas
+      if (canvasRef.current) {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        const width = canvas.width;
+        const height = canvas.height;
+
+        ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+        ctx.fillRect(0, 0, width, height);
+
+        const barWidth = (width / bufferLength) * 2.5;
+        let barHeight;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+          barHeight = (dataArray[i] / 255) * height;
+
+          const hue = (i / bufferLength) * 60 + 180; // Blue to cyan
+          ctx.fillStyle = `hsla(${hue}, 70%, 60%, 0.8)`;
+          ctx.fillRect(x, height - barHeight, barWidth, barHeight);
+
+          x += barWidth + 1;
+        }
+      }
+
+      animationFrameRef.current = requestAnimationFrame(draw);
     };
 
-    setupAudioVisualization();
+    draw();
 
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-      }
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-      }
     };
-  }, [isActive]);
+  }, [isActive, audioAnalyser, onMicReady]);
 
   return (
     <AnimatePresence>

@@ -68,7 +68,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { closeModal: closeCharacterModal, isOpen: isCharacterModalOpen } = useCharacterModal();
   // No local API key gating for voice; token fetched server-side
 
-  const { startRecording, stopRecording, setAskHandler, isRecording, isSessionReady } = useRealtime();
+  const { startRecording, stopRecording, setAskHandler, isRecording, isSessionReady, audioAnalyser } = useRealtime();
   const { location } = useLocation();
   const saved = getSavedLocation();
   const furthestLocation = saved ?? location;
@@ -570,7 +570,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
   return (
     <>
-      <MicrophoneVisualizer isActive={isRecording} onMicReady={setIsMicrophoneReady} />
+      <MicrophoneVisualizer isActive={isRecording} audioAnalyser={audioAnalyser} onMicReady={setIsMicrophoneReady} />
       <OptionalElement className={cn("w-full flex justify-center", className)}>
         <motion.div
         className={cn(
