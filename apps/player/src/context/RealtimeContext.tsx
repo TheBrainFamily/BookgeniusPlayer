@@ -99,11 +99,6 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (!session) return;
 
     const onTransport = (event: TransportEvent) => {
-      console.log("onTransport", event);
-      // Detect when session is ready to receive audio
-      // if (event.type === "session.updated") {
-      // }
-
       // Detect speech activity hints from server
       if (event.type === "input_audio_buffer.speech_started" || event.type === "server.input_audio_buffer.speech_started") {
         audioHeardThisRecordingRef.current = true;
@@ -133,14 +128,6 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       awaitingSpeechResponseRef.current = false;
     };
 
-    session.on("audio", (e) => {
-      console.log("audio", e);
-
-      setIsSessionReady(true);
-    });
-    session.on("audio_start", (e) => {
-      console.log("audio_start", e);
-    });
     session.on("transport_event", onTransport);
     session.on("agent_end", onAgentEnd);
     return () => {
