@@ -7,6 +7,7 @@ import { isMobile } from "@player/utils/isMobileOrTablet";
 import type { CharacterData } from "@player/types/book";
 import type { CharacterSnapshot } from "@player/utils/characterOverrides";
 import { normalizeSrcForInlineAvatar, highlightCharacter } from "./highlightCharacter";
+import { getBookAssetUrl } from "@player/utils/assetUrls";
 
 // Global flag to ensure we reset all isTalking values only once at the very beginning
 let hasInitializedTalkingStates = false;
@@ -114,6 +115,27 @@ function updateVideoState(container: HTMLDivElement, isTalking: boolean) {
   }
 }
 
+const onPlayRowCharacterClick = (
+  e: PointerEvent,
+  characterPlaceholder: HTMLSpanElement,
+  snapshot: CharacterSnapshot,
+  location: { chapter: number; paragraph: number },
+  openCharacterDetailsModal: (params: CharacterModalParams) => void,
+) => {
+  if (e.metaKey || e.ctrlKey) return;
+  e.preventDefault();
+  e.stopPropagation();
+
+  const characterSlug = characterPlaceholder?.dataset.character;
+  if (!characterSlug) return;
+
+  const isTalking = characterPlaceholder?.dataset.isTalking === "true";
+
+  const mediaSrc = snapshot ? (isTalking ? snapshot.media.talking : snapshot.media.listening) : "";
+
+  openCharacterDetailsModal({ characterSlug, isVideo: !!mediaSrc && isVideoFile(mediaSrc), mediaSrc: mediaSrc || "", chapter: location.chapter, paragraph: location.paragraph });
+};
+
 /** Creates a media container element with CharacterMedia-like structure for inline avatars */
 function createMediaElement(
   placeholder: HTMLSpanElement,
@@ -191,7 +213,18 @@ function createMediaElement(
   return container;
 }
 
+function createDummyElement(characterPlaceholder: HTMLDivElement) {
+  const dummyElement = document.createElement("span");
+  dummyElement.classList.add("dummy-avatar-placeholder", "inline-avatar");
+  const img = characterPlaceholder.querySelector<HTMLImageElement>("img").cloneNode(true) as HTMLImageElement;
+  if (img) {
+    dummyElement.appendChild(img);
+  }
+  return dummyElement;
+}
+
 const activatedMedia = new Map<string, Element>();
+const activatedCharacterHighlighted = new Map<string, Element>();
 
 /** Manages media loading and playback for paragraphs within the visible range **/
 export function activateMediaInRange(
@@ -209,6 +242,8 @@ export function activateMediaInRange(
       placeholder.dataset.isTalking = "false";
     });
 
+    playRowCharacterClickInit(openCharacterDetailsModal);
+
     hasInitializedTalkingStates = true;
   }
 
@@ -216,8 +251,6 @@ export function activateMediaInRange(
   getCharactersData().forEach((character) => {
     charactersBySlug.set(character.slug, character);
   });
-
-  // const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] [data-index]");
 
   const paragraphs = document.querySelectorAll<HTMLElement>(`section[data-chapter="${startChapter}"] [data-index], section[data-chapter="${endChapter}"] [data-index]`);
 
@@ -241,15 +274,70 @@ export function activateMediaInRange(
   const playRows = [];
 
   paragraphsInRange.forEach((p) => {
-    // const chapterElement = p.closest("section[data-chapter]") as HTMLElement;
-    // const chapterStr = chapterElement?.dataset.chapter;
-    // const paragraphStr = p.dataset.index;
-    // const index = `${chapterStr}-${paragraphStr}`;
+    // --- START ---
 
-    const playRow = p.closest(".play-row");
-    playRows.push(playRow ?? (p as HTMLElement));
+    const charactersToHighlight = p.querySelectorAll<HTMLSpanElement>(".character-highlighted");
 
-    // activatedMedia.set(index, p);
+    Array.from(charactersToHighlight).forEach((character) => {
+      const chapter = character.closest("[data-chapter]")?.getAttribute("data-chapter");
+      const paragraph = character.closest("[data-index]")?.getAttribute("data-index");
+      const index = `${character.dataset.character}-${chapter}-${paragraph}`;
+      if (activatedCharacterHighlighted.has(index)) return;
+      activatedCharacterHighlighted.set(index, character);
+      highlightCharacter(character, openCharacterDetailsModal);
+    });
+
+    // const seenCharactersInParentP = new Set<string>();
+    //
+    // charactersToHighlight.forEach((character) => {
+    //   const charText = character.dataset.character;
+    //   if (charText && !seenCharactersInParentP.has(charText) && !charactersDisplayed.includes(charText)) {
+    //     seenCharactersInParentP.add(charText);
+    //     highlightCharacter(character, openCharacterDetailsModal);
+    //   }
+    // });
+    //
+    // // Add click handler to whole paragraph when it's a character line
+    // if (p.dataset.isCharacter === "true" && p.dataset.clickListenerAttached !== "true") {
+    //   const handler = (e: PointerEvent) => {
+    //     if (e.metaKey || e.ctrlKey) return;
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //
+    //     const playRow = p.closest(".play-row") as HTMLElement | null;
+    //     const placeholder = (playRow ?? p).querySelector<HTMLSpanElement>(".character-placeholder");
+    //     const characterSlug = placeholder?.dataset.character;
+    //     if (!characterSlug) return;
+    //
+    //     const isTalking = placeholder?.dataset.isTalking === "true";
+    //     const characterData = charactersBySlug.get(characterSlug);
+    //     const snapshotForClick = characterData
+    //       ? resolveCharacterSnapshot(characterData, { location: { chapter: currentChapter, paragraph: currentParagraph }, fallbackDisplayName: characterData.characterName })
+    //       : null;
+    //
+    //     const mediaSrc = snapshotForClick ? (isTalking ? snapshotForClick.media.talking : snapshotForClick.media.listening) : "";
+    //
+    //     openCharacterDetailsModal({
+    //       characterSlug,
+    //       isVideo: !!mediaSrc && isVideoFile(mediaSrc),
+    //       mediaSrc: mediaSrc || "",
+    //       chapter: currentChapter,
+    //       paragraph: currentParagraph,
+    //     });
+    //   };
+    //
+    //   let elementToAddListenerTo = p;
+    //   const spanInsideParagraph = p.querySelector<HTMLSpanElement>("span");
+    //   if (spanInsideParagraph) {
+    //     elementToAddListenerTo = spanInsideParagraph;
+    //   }
+    //   elementToAddListenerTo.addEventListener("pointerup", handler, { passive: false });
+    //   p.dataset.clickListenerAttached = "true";
+    // }
+
+    // --- END ---
+
+    playRows.push(p.closest(".play-row") ?? (p as HTMLElement));
   });
 
   const uniquePlayRows = [...new Set(playRows)];
@@ -257,348 +345,86 @@ export function activateMediaInRange(
   uniquePlayRows.forEach((playRow: HTMLElement) => {
     const characterPlaceholder = playRow.querySelector<HTMLSpanElement>(".character-placeholder");
 
-    if (characterPlaceholder) {
-      // --- START ---
-      const characterSlug = characterPlaceholder.dataset.character || null;
+    if (!characterPlaceholder) return;
 
-      const characterText = playRow.querySelector(".character-text");
-      const index = `${characterSlug}-${characterText?.firstElementChild.getAttribute("data-index")}-${characterText?.lastElementChild.getAttribute("data-index")}`;
+    const characterSlug = characterPlaceholder.dataset.character;
 
-      const locationForPlaceholder = { chapter: startChapter, paragraph: startParagraph };
-      const characterData = characterSlug ? charactersBySlug.get(characterSlug) : undefined;
-      const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
-      const mediaInjected = characterPlaceholder.dataset.mediaInjected === "true";
-      let mediaElement = characterPlaceholder.querySelector<HTMLDivElement>("div.inline-avatar");
-      const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
+    if (!characterSlug.trim()) return;
 
+    // needed for indexing the play row in activatedMedia Map
+    const characterText = playRow.querySelector(".character-text");
+    const index = `${characterSlug}-${characterText?.firstElementChild.getAttribute("data-index")}-${characterText?.lastElementChild.getAttribute("data-index")}`;
+
+    if (activatedMedia.has(index)) return;
+
+    const locationForPlaceholder = { chapter: startChapter, paragraph: startParagraph };
+    const characterData = charactersBySlug.get(characterSlug);
+    const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
+    const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
+
+    const newMediaElement = createMediaElement(characterPlaceholder, openCharacterDetailsModal, isPlayFormat, characterData, locationForPlaceholder, snapshot);
+
+    if (newMediaElement) {
       if (dummyPlaceholder) {
-        // Found a dummy, replace it with actual media
-        const newMediaElement = createMediaElement(characterPlaceholder, openCharacterDetailsModal, isPlayFormat, characterData, locationForPlaceholder, snapshot);
-        if (newMediaElement) {
-          characterPlaceholder.replaceChild(newMediaElement, dummyPlaceholder);
-          characterPlaceholder.dataset.mediaInjected = "true"; // Mark as injected
-          mediaElement = newMediaElement; // Update mediaElement reference
-
-          // NOTE: Text was already hidden when media was first injected,
-          // and remains hidden while the dummy is shown. No action needed here.
-        }
-      } else if (!mediaInjected) {
-        // No dummy and no media injected yet, inject for the first time
-        const newMediaElement = createMediaElement(characterPlaceholder, openCharacterDetailsModal, isPlayFormat, characterData, locationForPlaceholder, snapshot);
-        if (newMediaElement) {
-          mediaElement = newMediaElement; // Update mediaElement reference
-          // Hide original text content if it's a mention
-          if (characterPlaceholder.classList.contains("character-mention") && characterPlaceholder.firstChild && characterPlaceholder.firstChild.nodeType === Node.TEXT_NODE) {
-            const textNode = characterPlaceholder.firstChild as Text;
-            const wrapper = document.createElement("span");
-            wrapper.style.display = "none"; // Hide the text
-            wrapper.setAttribute("data-original-text", "true");
-            wrapper.textContent = textNode.textContent;
-            characterPlaceholder.replaceChild(wrapper, textNode);
-          }
-          characterPlaceholder.appendChild(mediaElement); // Append media
-          characterPlaceholder.dataset.mediaInjected = "true"; // Mark as injected
-        }
-      } else if (mediaElement) {
-        // Media already injected, update talking state and play videos if paused
-        const currentIsTalking = characterPlaceholder.dataset.isTalking === "true";
-
-        // Handle responsive video changes (add/remove listening video based on device type)
-        const listeningSrc = snapshot?.media.listening || null;
-        handleContainerResponsiveVideo(mediaElement, listeningSrc, currentIsTalking);
-
-        // Update video state based on current talking status
-        if (mediaElement.dataset.hasVideos === "true" || mediaElement.dataset.hasVideos === "speaking-only") {
-          updateVideoState(mediaElement, currentIsTalking);
-        }
+        characterPlaceholder.replaceChild(newMediaElement, dummyPlaceholder);
+      } else {
+        characterPlaceholder.appendChild(newMediaElement);
       }
-      // --- END ---
-      activatedMedia.set(index, playRow);
+      characterPlaceholder.dataset.mediaInjected = "true";
     }
+    activatedMedia.set(index, playRow);
   });
 
+  // Here we clean up the activated media
   activatedMedia.forEach((playRow, index) => {
     if (!uniquePlayRows.includes(playRow as HTMLElement)) {
       const characterPlaceholder = playRow.querySelector<HTMLSpanElement>(".character-placeholder");
 
       if (characterPlaceholder) {
-        // --- START ---
-        const characterSlug = characterPlaceholder.dataset.character || null;
+        const dummyElement = createDummyElement(characterPlaceholder as HTMLDivElement);
 
-        const locationForPlaceholder = { chapter: startChapter, paragraph: startParagraph };
-        const characterData = characterSlug ? charactersBySlug.get(characterSlug) : undefined;
-        const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
-        const mediaInjected = characterPlaceholder.dataset.mediaInjected === "true";
-        const mediaElement = characterPlaceholder.querySelector<HTMLDivElement>("div.inline-avatar");
-        const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
-
-        if (mediaInjected && mediaElement) {
-          // Create dummy placeholder
-          const dummyElement = document.createElement("span");
-          // Add classes for styling (assuming CSS defines size, display, etc.)
-          dummyElement.classList.add("dummy-avatar-placeholder");
-          // Add inline-avatar if it helps with consistent styling (like margins, alignment)
-          if (mediaElement.classList.contains("inline-avatar")) {
-            dummyElement.classList.add("inline-avatar");
-          }
-          // Ensure necessary styles for sizing and alignment are present, either via CSS or inline
-          dummyElement.style.display = "inline-block"; // Needed to respect width/height
-          dummyElement.style.verticalAlign = mediaElement.style.verticalAlign || "bottom"; // Match original or default
-          dummyElement.title = mediaElement.title || ""; // Preserve title if any
-          dummyElement.classList.add("relative");
-
-          // Try to keep the same placeholder image visible in the dummy
-          const existingImg = mediaElement.querySelector("img");
-          if (existingImg) {
-            const imgClone = existingImg.cloneNode(true) as HTMLImageElement;
-            dummyElement.appendChild(imgClone);
-          }
-
-          // Replace media with dummy
-          characterPlaceholder.replaceChild(dummyElement, mediaElement);
-          delete characterPlaceholder.dataset.mediaInjected; // Mark as not injected (dummy is present)
-
-          // NOTE: Text remains hidden in its wrapper span. No need to restore/re-hide.
-        } else {
-          // We are out of view, and it's NOT (mediaInjected && mediaElement is valid)
-          // `dummyPlaceholder` was queried at the start of the loop for this placeholder.
-          if (!dummyPlaceholder && characterPlaceholder.dataset.isTalking === "true") {
-            const newDummyElement = document.createElement("span");
-            newDummyElement.classList.add("dummy-avatar-placeholder");
-            newDummyElement.classList.add("inline-avatar");
-            newDummyElement.style.display = "inline-block";
-            newDummyElement.style.verticalAlign = "bottom";
-            newDummyElement.classList.add("relative");
-
-            // Compute and add placeholder image so the avatar never appears empty
-            if (snapshot) {
-              const placeholderSrcForDummy = normalizeSrcForInlineAvatar(snapshot.media.listening || snapshot.media.talking || "");
-              if (placeholderSrcForDummy) {
-                const img = document.createElement("img");
-                img.src = placeholderSrcForDummy;
-                img.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
-                img.alt = snapshot.displayName;
-                newDummyElement.appendChild(img);
-              }
-            }
-
-            characterPlaceholder.appendChild(newDummyElement);
-
-            // Ensure mediaInjected is false, as we are showing a dummy or no media was ever injected.
-            if (characterPlaceholder.dataset.mediaInjected === "true") {
-              delete characterPlaceholder.dataset.mediaInjected;
-            }
-          }
-        }
+        characterPlaceholder.replaceChildren(dummyElement);
       }
-
-      // --- END ---
 
       activatedMedia.delete(index);
     }
   });
-
-  console.log("253: activatedMedia BANG!", activatedMedia);
-
-  // const x = document.querySelectorAll<HTMLElement>(`section[data-chapter] [data-index]`);
-  //
-  // const allParagraphs = Array.from(x).filter((paragraph) => {
-  //   const paragraphIndex = parseInt(paragraph.dataset.index, 10);
-  //   // console.log("226: paragraphIndex BANG!", paragraphIndex);
-  //   return paragraphIndex >= startParagraph && paragraphIndex <= endParagraph;
-  // });
-  //
-  // const rootEl = document.getElementById("content-container");
-  // const rootRect = rootEl?.getBoundingClientRect() ?? null;
-
-  // allParagraphs.forEach((p) => {
-  //   const chapterElement = p.closest("section[data-chapter]") as HTMLElement;
-  //   const chapterStr = chapterElement?.dataset.chapter;
-  //   const paragraphStr = p.dataset.index;
-  //
-  //   if (chapterStr && paragraphStr) {
-  //     const currentChapter = parseInt(chapterStr, 10);
-  //     const currentParagraph = parseInt(paragraphStr, 10);
-  //
-  //     const inView = isInRange(currentChapter, currentParagraph, startChapter, startParagraph - bufferSize, endChapter, endParagraph + bufferSize);
-  //
-  //     const playRow = p.closest(".play-row");
-  //     const placeholders = (playRow ?? p).querySelectorAll<HTMLSpanElement>(".character-placeholder");
-  //
-  //     const charactersDisplayed = [];
-  //     placeholders.forEach((placeholder) => {
-  //       const characterSlug = placeholder.dataset.character || null;
-  //       const characterData = characterSlug ? charactersBySlug.get(characterSlug) : undefined;
-  //       const locationForPlaceholder = { chapter: currentChapter, paragraph: currentParagraph };
-  //       const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
-  //       const mediaInjected = placeholder.dataset.mediaInjected === "true";
-  //       // Query for either video or image with the class OR the dummy placeholder
-  //       let mediaElement = placeholder.querySelector<HTMLDivElement>("div.inline-avatar");
-  //       const dummyPlaceholder = placeholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
-  //       if (inView) {
-  //         // Avoid injecting media above the current viewport top to prevent layout shifts that look like backward jumps.
-  //         if (rootRect) {
-  //           const pRect = p.getBoundingClientRect();
-  //           if (pRect.top < rootRect.top) {
-  //             // Skip injection for paragraphs that are above or even partially above the viewport top
-  //             return;
-  //           }
-  //         }
-  //         if (dummyPlaceholder) {
-  //           // Found a dummy, replace it with actual media
-  //           const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal, isPlayFormat, characterData, locationForPlaceholder, snapshot);
-  //           if (newMediaElement) {
-  //             placeholder.replaceChild(newMediaElement, dummyPlaceholder);
-  //             placeholder.dataset.mediaInjected = "true"; // Mark as injected
-  //             mediaElement = newMediaElement; // Update mediaElement reference
-  //
-  //             // NOTE: Text was already hidden when media was first injected,
-  //             // and remains hidden while the dummy is shown. No action needed here.
-  //           }
-  //         } else if (!mediaInjected) {
-  //           // No dummy and no media injected yet, inject for the first time
-  //           const newMediaElement = createMediaElement(placeholder, openCharacterDetailsModal, isPlayFormat, characterData, locationForPlaceholder, snapshot);
-  //           if (newMediaElement) {
-  //             mediaElement = newMediaElement; // Update mediaElement reference
-  //             // Hide original text content if it's a mention
-  //             if (placeholder.classList.contains("character-mention") && placeholder.firstChild && placeholder.firstChild.nodeType === Node.TEXT_NODE) {
-  //               const textNode = placeholder.firstChild as Text;
-  //               const wrapper = document.createElement("span");
-  //               wrapper.style.display = "none"; // Hide the text
-  //               wrapper.setAttribute("data-original-text", "true");
-  //               wrapper.textContent = textNode.textContent;
-  //               placeholder.replaceChild(wrapper, textNode);
-  //             }
-  //             placeholder.appendChild(mediaElement); // Append media
-  //             placeholder.dataset.mediaInjected = "true"; // Mark as injected
-  //           }
-  //         } else if (mediaElement) {
-  //           // Media already injected, update talking state and play videos if paused
-  //           const currentIsTalking = placeholder.dataset.isTalking === "true";
-  //
-  //           // Handle responsive video changes (add/remove listening video based on device type)
-  //           const listeningSrc = snapshot?.media.listening || null;
-  //           handleContainerResponsiveVideo(mediaElement, listeningSrc, currentIsTalking);
-  //
-  //           // Update video state based on current talking status
-  //           if (mediaElement.dataset.hasVideos === "true" || mediaElement.dataset.hasVideos === "speaking-only") {
-  //             updateVideoState(mediaElement, currentIsTalking);
-  //           }
-  //         }
-  //       } else {
-  //         // Out of view
-  //         // Check if actual media is injected (not a dummy)
-  //         if (mediaInjected && mediaElement) {
-  //           // Create dummy placeholder
-  //           const dummyElement = document.createElement("span");
-  //           // Add classes for styling (assuming CSS defines size, display, etc.)
-  //           dummyElement.classList.add("dummy-avatar-placeholder");
-  //           // Add inline-avatar if it helps with consistent styling (like margins, alignment)
-  //           if (mediaElement.classList.contains("inline-avatar")) {
-  //             dummyElement.classList.add("inline-avatar");
-  //           }
-  //           // Ensure necessary styles for sizing and alignment are present, either via CSS or inline
-  //           dummyElement.style.display = "inline-block"; // Needed to respect width/height
-  //           dummyElement.style.verticalAlign = mediaElement.style.verticalAlign || "bottom"; // Match original or default
-  //           dummyElement.title = mediaElement.title || ""; // Preserve title if any
-  //           dummyElement.classList.add("relative");
-  //
-  //           // Try to keep the same placeholder image visible in the dummy
-  //           const existingImg = mediaElement.querySelector("img");
-  //           if (existingImg) {
-  //             const imgClone = existingImg.cloneNode(true) as HTMLImageElement;
-  //             dummyElement.appendChild(imgClone);
-  //           }
-  //
-  //           // Replace media with dummy
-  //           placeholder.replaceChild(dummyElement, mediaElement);
-  //           delete placeholder.dataset.mediaInjected; // Mark as not injected (dummy is present)
-  //
-  //           // NOTE: Text remains hidden in its wrapper span. No need to restore/re-hide.
-  //         } else {
-  //           // We are out of view, and it's NOT (mediaInjected && mediaElement is valid)
-  //           // `dummyPlaceholder` was queried at the start of the loop for this placeholder.
-  //           if (!dummyPlaceholder && placeholder.dataset.isTalking === "true") {
-  //             const newDummyElement = document.createElement("span");
-  //             newDummyElement.classList.add("dummy-avatar-placeholder");
-  //             newDummyElement.classList.add("inline-avatar");
-  //             newDummyElement.style.display = "inline-block";
-  //             newDummyElement.style.verticalAlign = "bottom";
-  //             newDummyElement.classList.add("relative");
-  //
-  //             // Compute and add placeholder image so the avatar never appears empty
-  //             if (snapshot) {
-  //               const placeholderSrcForDummy = normalizeSrcForInlineAvatar(snapshot.media.listening || snapshot.media.talking || "");
-  //               if (placeholderSrcForDummy) {
-  //                 const img = document.createElement("img");
-  //                 img.src = placeholderSrcForDummy;
-  //                 img.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
-  //                 img.alt = snapshot.displayName;
-  //                 newDummyElement.appendChild(img);
-  //               }
-  //             }
-  //
-  //             placeholder.appendChild(newDummyElement);
-  //
-  //             // Ensure mediaInjected is false, as we are showing a dummy or no media was ever injected.
-  //             if (placeholder.dataset.mediaInjected === "true") {
-  //               delete placeholder.dataset.mediaInjected;
-  //             }
-  //           }
-  //         }
-  //       }
-  //       if (characterSlug) {
-  //         charactersDisplayed.push(characterSlug);
-  //       }
-  //     });
-  //     const charactersToHighlight = p.querySelectorAll<HTMLSpanElement>(".character-highlighted");
-  //     const seenCharactersInParentP = new Set<string>();
-  //
-  //     charactersToHighlight.forEach((character) => {
-  //       const charText = character.dataset.character;
-  //       if (charText && !seenCharactersInParentP.has(charText) && !charactersDisplayed.includes(charText)) {
-  //         seenCharactersInParentP.add(charText);
-  //         highlightCharacter(character, openCharacterDetailsModal);
-  //       }
-  //     });
-  //
-  //     // Add click handler to whole paragraph when it's a character line
-  //     if (p.dataset.isCharacter === "true" && p.dataset.clickListenerAttached !== "true") {
-  //       const handler = (e: PointerEvent) => {
-  //         if (e.metaKey || e.ctrlKey) return;
-  //         e.preventDefault();
-  //         e.stopPropagation();
-  //
-  //         const playRow = p.closest(".play-row") as HTMLElement | null;
-  //         const placeholder = (playRow ?? p).querySelector<HTMLSpanElement>(".character-placeholder");
-  //         const characterSlug = placeholder?.dataset.character;
-  //         if (!characterSlug) return;
-  //
-  //         const isTalking = placeholder?.dataset.isTalking === "true";
-  //         const characterData = charactersBySlug.get(characterSlug);
-  //         const snapshotForClick = characterData
-  //           ? resolveCharacterSnapshot(characterData, { location: { chapter: currentChapter, paragraph: currentParagraph }, fallbackDisplayName: characterData.characterName })
-  //           : null;
-  //
-  //         const mediaSrc = snapshotForClick ? (isTalking ? snapshotForClick.media.talking : snapshotForClick.media.listening) : "";
-  //
-  //         openCharacterDetailsModal({
-  //           characterSlug,
-  //           isVideo: !!mediaSrc && isVideoFile(mediaSrc),
-  //           mediaSrc: mediaSrc || "",
-  //           chapter: currentChapter,
-  //           paragraph: currentParagraph,
-  //         });
-  //       };
-  //
-  //       let elementToAddListenerTo = p;
-  //       const spanInsideParagraph = p.querySelector<HTMLSpanElement>("span");
-  //       if (spanInsideParagraph) {
-  //         elementToAddListenerTo = spanInsideParagraph;
-  //       }
-  //       elementToAddListenerTo.addEventListener("pointerup", handler, { passive: false });
-  //       p.dataset.clickListenerAttached = "true";
-  //     }
-  //   }
-  // });
 }
+
+export const playRowCharacterClickInit = (openCharacterDetailsModal: (params: CharacterModalParams) => void) => {
+  const contentContainer = document.querySelector("#content-container");
+  if (!contentContainer) return;
+
+  contentContainer.addEventListener("pointerup", (e) => {
+    const target = e.target as HTMLElement;
+
+    const playRow = target.closest(".play-row");
+
+    if (!playRow) return;
+
+    const characterPlaceholder = playRow.querySelector<HTMLSpanElement>(".character-placeholder");
+    const playRowCharacter = playRow.querySelector<HTMLElement>("[data-is-character='true']");
+
+    if (!playRowCharacter || !characterPlaceholder) return;
+
+    const currentChapter = playRow.closest("[data-chapter]")?.getAttribute("data-chapter");
+    const currentParagraph = playRow.closest("[data-index]")?.getAttribute("data-index");
+
+    const charactersBySlug = new Map<string, CharacterData>();
+    getCharactersData().forEach((character) => {
+      charactersBySlug.set(character.slug, character);
+    });
+
+    const characterSlug = characterPlaceholder.dataset.character;
+
+    const characterData = charactersBySlug.get(characterSlug);
+    const snapshot = characterData
+      ? resolveCharacterSnapshot(characterData, {
+          location: { chapter: parseInt(currentChapter, 10), paragraph: parseInt(currentParagraph, 10) },
+          fallbackDisplayName: characterData.characterName,
+        })
+      : null;
+
+    onPlayRowCharacterClick(e, characterPlaceholder, snapshot, { chapter: parseInt(currentChapter, 10), paragraph: parseInt(currentParagraph, 10) }, openCharacterDetailsModal);
+  });
+};
