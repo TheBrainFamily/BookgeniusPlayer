@@ -337,7 +337,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
 
       segments.push(
-        `Use the users voice question directly when calling the tool, do not add any other information or the characters, use the list only to guide understanding of the pronounciation.`,
+        `Use the user’s voice question directly when calling the tool; do not add any other information or the characters. Use the list only to guide understanding of the pronunciation.`,
       );
 
       const text = segments.join(" ");
