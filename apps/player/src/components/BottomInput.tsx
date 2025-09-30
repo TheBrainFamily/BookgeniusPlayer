@@ -18,6 +18,7 @@ import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { useBottomInput } from "@player/stores/modals/bottomInput.store";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
+import { MicrophoneVisualizer } from "./MicrophoneVisualizer";
 
 const hasReaderMetCharacter = (character: CharacterData, chapter: number, paragraph: number): boolean => {
   return character.infoPerChapter.some((infoPerChapter) => {
@@ -46,6 +47,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const [isRealtimeConnecting, setIsRealtimeConnecting] = useState(false);
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
+  const [isMicrophoneReady, setIsMicrophoneReady] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -66,7 +68,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { closeModal: closeCharacterModal, isOpen: isCharacterModalOpen } = useCharacterModal();
   // No local API key gating for voice; token fetched server-side
 
-  const { startRecording, stopRecording, setAskHandler, isRecording } = useRealtime();
+  const { startRecording, stopRecording, setAskHandler, isRecording, isSessionReady } = useRealtime();
   const { location } = useLocation();
   const saved = getSavedLocation();
   const furthestLocation = saved ?? location;
@@ -390,25 +392,66 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     }
   }, [handleActivity, isDeepResearchActive, isSearchModalOpen, closeSearchModal, isThinking]);
 
-  const handleRecordingStart = useCallback(() => {
+  const micPermissionGrantedRef = useRef<boolean>(false);
+
+  // Check if microphone permission was previously granted
+  useEffect(() => {
+    const checkMicPermission = async () => {
+      if (typeof navigator !== "undefined" && navigator.permissions?.query) {
+        try {
+          const result = await navigator.permissions.query({ name: "microphone" as PermissionName });
+          micPermissionGrantedRef.current = result.state === "granted";
+        } catch (error) {
+          // permissions.query not supported or failed, will check on first click
+        }
+      }
+    };
+    checkMicPermission();
+  }, []);
+
+  const handleRecordingStart = useCallback(async () => {
     if (isRecording || isRealtimeConnecting) return;
 
     handleActivity();
 
+    // Check microphone permissions first
+    if (!micPermissionGrantedRef.current) {
+      try {
+        if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.getTracks().forEach((t) => t.stop());
+          micPermissionGrantedRef.current = true;
+        }
+      } catch (error) {
+        console.error("Microphone permission denied:", error);
+      }
+      // Always return early if permission wasn't already granted - user must click again
+      return;
+    }
+
     setIsRealtimeConnecting(true);
+    setIsMicrophoneReady(false); // Reset mic ready state for new recording
     setValue("");
 
     if (isSearchModalOpen) setSearchQuery("");
 
     startRecording()
       .then(() => {
-        setIsRealtimeConnecting(false);
+        // Connecting state will be cleared by useEffect when both session and mic are ready
       })
       .catch((error) => {
         console.error("Error starting recording:", error);
         setIsRealtimeConnecting(false);
       });
   }, [handleActivity, isRecording, isRealtimeConnecting, isSearchModalOpen, setSearchQuery, startRecording, setValue]);
+
+  // Clear connecting state when both session and microphone are ready
+  useEffect(() => {
+    if (isSessionReady && isMicrophoneReady && isRealtimeConnecting) {
+      setIsRealtimeConnecting(false);
+      console.log("Both session and microphone ready - clearing connecting state");
+    }
+  }, [isSessionReady, isMicrophoneReady, isRealtimeConnecting]);
 
   const handleRecordingEnd = useCallback(() => {
     if (!isRecording) return;
@@ -526,8 +569,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   );
 
   return (
-    <OptionalElement className={cn("w-full flex justify-center", className)}>
-      <motion.div
+    <>
+      <MicrophoneVisualizer isActive={isRecording} onMicReady={setIsMicrophoneReady} />
+      <OptionalElement className={cn("w-full flex justify-center", className)}>
+        <motion.div
         className={cn(
           "bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-2 py-[2px] md:py-[3px] md:px-3",
           isRecording && "recording-active",
@@ -729,6 +774,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         </motion.div>
       </motion.div>
     </OptionalElement>
+    </>
   );
 };
 

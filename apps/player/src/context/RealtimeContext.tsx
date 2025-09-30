@@ -11,6 +11,7 @@ interface RealtimeContextType {
   isConnected: boolean;
   isRecording: boolean;
   isMuted: boolean;
+  isSessionReady: boolean;
   connectConversation: () => Promise<void>;
   disconnectConversation: () => Promise<void>;
   startRecording: () => Promise<void>;
@@ -55,6 +56,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [isSessionReady, setIsSessionReady] = useState(false);
   const toolTriggeredRef = useRef<boolean>(false);
   const nextConnectInteractiveRef = useRef<boolean>(false);
 
@@ -93,13 +95,20 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (!session) return;
 
     const onTransport = (event: TransportEvent) => {
+      console.log("onTransport", event);
+      // Detect when session is ready to receive audio
+      // if (event.type === "session.updated") {
+      // }
+
       // Detect speech activity hints from server
       if (event.type === "input_audio_buffer.speech_started" || event.type === "server.input_audio_buffer.speech_started") {
         audioHeardThisRecordingRef.current = true;
       }
 
       // Track conversation items to clear history between questions
-      if (event.type === "conversation.item.created") {
+      if (event.type === "conversation.item.added") {
+        setIsSessionReady(true);
+
         const item = event.item;
         const id = item?.id;
         if (!id) return;
@@ -120,6 +129,14 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       awaitingSpeechResponseRef.current = false;
     };
 
+    session.on("audio", (e) => {
+      console.log("audio", e);
+
+      setIsSessionReady(true);
+    });
+    session.on("audio_start", (e) => {
+      console.log("audio_start", e);
+    });
     session.on("transport_event", onTransport);
     session.on("agent_end", onAgentEnd);
     return () => {
@@ -134,6 +151,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (!sessionRef.current) {
       sessionRef.current = new RealtimeSession(agentRef.current, {
         model: "gpt-4o-mini-realtime-preview",
+        // config: { outputModalities: ["text"], audio: { input: { turnDetection: null } } },
         config: { outputModalities: ["text"] },
         automaticallyTriggerResponseForMcpToolCalls: false,
       });
@@ -141,8 +159,8 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Fetch ephemeral realtime token from our backend
     let token = "";
     try {
-      // const resp = await fetch(`http://localhost:30310/getRealtimeToken`);
-      const resp = await fetch(`/api/generate-realtime-token`, { credentials: "include" });
+      const resp = await fetch(`http://localhost:30310/getRealtimeToken`);
+      // const resp = await fetch(`/api/generate-realtime-token`, { credentials: "include" });
       if (resp.status === 401) {
         if (nextConnectInteractiveRef.current) {
           try {
@@ -183,10 +201,29 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   // Preconnect when API key becomes available to reduce first-press timing issues
+  // Only preconnect if microphone permission was previously granted
   useEffect(() => {
-    if (!isConnected) {
-      connectConversation().catch((e) => console.warn("Realtime preconnect failed", e));
-    }
+    const attemptPreconnect = async () => {
+      if (isConnected) return;
+
+      // Check if microphone permission was already granted
+      let hasPermission = false;
+      if (typeof navigator !== "undefined" && navigator.permissions?.query) {
+        try {
+          const result = await navigator.permissions.query({ name: "microphone" as PermissionName });
+          hasPermission = result.state === "granted";
+        } catch (error) {
+          // permissions.query not supported or failed, skip preconnect
+          return;
+        }
+      }
+
+      if (hasPermission) {
+        connectConversation().catch((e) => console.warn("Realtime preconnect failed", e));
+      }
+    };
+
+    attemptPreconnect();
   }, [isConnected, connectConversation]);
 
   const disconnectConversation = useCallback(async () => {
@@ -199,6 +236,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   const startRecording = useCallback(async () => {
+    setIsSessionReady(false);
     if (!sessionRef.current || !isConnected) {
       nextConnectInteractiveRef.current = true;
       try {
@@ -207,7 +245,19 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         nextConnectInteractiveRef.current = false;
       }
     }
+    try {
+      if (!micPrimedRef.current && typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach((t) => t.stop());
+        micPrimedRef.current = true;
+      }
+    } catch (e) {
+      console.warn("Microphone permission not granted", e);
+    }
+
     const session = sessionRef.current!;
+    session.mute(false);
+    setIsMuted(false);
     setIsRecording(true);
     recordStartTimeRef.current = Date.now();
     audioHeardThisRecordingRef.current = false;
@@ -218,10 +268,12 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Clear all previous conversation items (ensures independence between questions)
     try {
       const toDelete = conversationItemsRef.current.map((x) => x.id);
+      console.log("toDelete", toDelete);
       for (const id of toDelete) {
         session.transport.sendEvent({ type: "conversation.item.delete", item_id: id });
       }
       if (toDelete.length) {
+        console.log("conversationItemsRef.current ", conversationItemsRef.current);
         conversationItemsRef.current = [];
       }
     } catch (e) {
@@ -255,9 +307,9 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const title = book?.metadata?.title ?? "the book";
       const author = book?.metadata?.author ?? "the author";
       const segments = [
-        `Help me with "${title}" by ${author}.`,
+        `Help the user with "${title}" by ${author}.`,
         "Use the get_book_information tool for every answer.",
-        "If I mispronounce a character's name, rely on these lists:",
+        "If user mispronounces a character's name, rely on these lists:",
         `Characters in current chapter: ${format(inCurrent)}.`,
       ];
 
@@ -266,26 +318,15 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
 
       segments.push(
-        `Use the users question directly when calling the tool, do not add any other information or the characters, use the list only to guide understanding of the pronounciation`,
+        `Use the users voice question directly when calling the tool, do not add any other information or the characters, use the list only to guide understanding of the pronounciation.`,
       );
 
       const text = segments.join(" ");
-      session.transport.sendEvent({ type: "conversation.item.create", item: { type: "message", role: "user", content: [{ type: "input_text", text }] } });
+      session.transport.sendEvent({ type: "conversation.item.create", item: { type: "message", role: "system", content: [{ type: "input_text", text }] } });
     } catch (e) {
       console.warn("Failed to send per-hold priming message", e);
     }
     // Prime mic permission on first use to avoid missing initial speech
-    try {
-      if (!micPrimedRef.current && typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach((t) => t.stop());
-        micPrimedRef.current = true;
-      }
-    } catch (e) {
-      console.warn("Microphone permission not granted", e);
-    }
-    session.mute(false);
-    setIsMuted(false);
   }, [isConnected, connectConversation, location]);
 
   const stopRecording = useCallback(async () => {
@@ -336,6 +377,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     isConnected,
     isRecording,
     isMuted,
+    isSessionReady,
     connectConversation,
     disconnectConversation,
     startRecording,
