@@ -33,7 +33,7 @@
     "@capacitor/filesystem": "^7.1.1",
     "@capawesome/capacitor-asset-manager": "^7.0.0",
     "@journeyapps/domparser": "^0.4.1",
-    "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
+    "@openai/agents-realtime": "^0.1.6",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-label": "^2.1.2",
@@ -71,6 +71,7 @@
     "use-local-storage-state": "^19.5.0",
     "xml2js": "^0.6.2",
     "xmldom": "^0.6.0",
+    "zod": "^3.25.40",
     "zustand": "^5.0.5"
   },
   "devDependencies": {

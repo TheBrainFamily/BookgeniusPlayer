@@ -1,285 +1,406 @@
-import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from "react";
-import { RealtimeClient } from "@openai/realtime-api-beta";
-
-import { WavRecorder, WavStreamPlayer } from "@player/lib/wavtools/index.js";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { instructions } from "@player/utils/conversation_config.js";
-import { getApiKey, createApiKeyListener } from "@player/utils/apiKeyManager";
-import { useBookContext } from "@player/hooks/useBookContext";
-
-// Define the conversation item type
-interface ConversationItem {
-  id: string;
-  type?: string;
-  role?: string;
-  status?: string;
-  formatted: {
-    audio?: Uint8Array | Int16Array;
-    file?: { url: string };
-    text?: string;
-    transcript?: string;
-    tool?: { name: string; arguments: string };
-    output?: string;
-    [key: string]: unknown;
-  };
-}
+import { ANSWERS_SERVER_URL } from "@player/lib/consts";
+import { RealtimeAgent, RealtimeSession, tool } from "@openai/agents-realtime";
+import { loadCharactersData, getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useLocation } from "@player/state/LocationContext";
+import { z } from "zod";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
 
 interface RealtimeContextType {
   isConnected: boolean;
   isRecording: boolean;
   isMuted: boolean;
-  response: string;
+  isSessionReady: boolean;
+  audioAnalyser: AnalyserNode | null;
   connectConversation: () => Promise<void>;
   disconnectConversation: () => Promise<void>;
   startRecording: () => Promise<void>;
   stopRecording: () => Promise<void>;
   toggleMute: () => void;
   sendTextMessage: (message: string) => void;
+  // Allows components (e.g., BottomInput) to register their ask handler so tools can trigger it
+  setAskHandler: (handler: ((query: string) => void) | null) => void;
+  // Programmatically trigger an ask flow
+  triggerAsk: (query: string) => void;
 }
 
 const RealtimeContext = createContext<RealtimeContextType | undefined>(undefined);
 
+type ConversationItemSummary = { id?: string; role?: string; type?: string };
+
+type TransportEvent =
+  | { type: "input_audio_buffer.speech_started" }
+  | { type: "server.input_audio_buffer.speech_started" }
+  | { type: "conversation.item.created"; item?: ConversationItemSummary }
+  | { type: "conversation.item.deleted"; item_id?: string; item?: ConversationItemSummary }
+  | { type: "response.created" }
+  | { type: string; item?: ConversationItemSummary; item_id?: string };
+
 export const useRealtime = () => {
   const context = useContext(RealtimeContext);
-  if (!context) {
-    throw new Error("useRealtime must be used within a RealtimeProvider");
-  }
+  if (!context) throw new Error("useRealtime must be used within a RealtimeProvider");
   return context;
 };
 
 export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // if (import.meta.env.VITE_DEVELOPMENT === "true") {
-  //   return <>{children}</>;
-  // }
-  const [apiKey, setApiKey] = useState<string>("");
-  const clientRef = useRef<RealtimeClient | null>(null);
-  const wavRecorderRef = useRef<WavRecorder>(new WavRecorder({ sampleRate: 24000 }));
-  const wavStreamPlayerRef = useRef<WavStreamPlayer>(new WavStreamPlayer({ sampleRate: 24000 }));
+  const { location } = useLocation();
+  const sessionRef = useRef<RealtimeSession | null>(null);
+  const agentRef = useRef<RealtimeAgent | null>(null);
+  const askHandlerRef = useRef<((query: string) => void) | null>(null);
+  const micPrimedRef = useRef<boolean>(false);
+  const recordStartTimeRef = useRef<number | null>(null);
+  const audioHeardThisRecordingRef = useRef<boolean>(false);
+  const awaitingSpeechResponseRef = useRef<boolean>(false);
+  const conversationItemsRef = useRef<{ id: string; role?: string; type?: string }[]>([]);
 
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [response, setResponse] = useState("");
-  const [, setItems] = useState<ConversationItem[]>([]);
+  const [isSessionReady, setIsSessionReady] = useState(false);
+  const [audioAnalyser, setAudioAnalyser] = useState<AnalyserNode | null>(null);
+  const toolTriggeredRef = useRef<boolean>(false);
+  const nextConnectInteractiveRef = useRef<boolean>(false);
+  const visualizerStreamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
-  // Use the book context hook to manage sending book content to the RealtimeClient
-  useBookContext({ client: clientRef.current, isConnected });
+  // No local API key; tokens are retrieved from ANSWERS_SERVER_URL on connect
 
-  // Initialize API key from localStorage and listen for changes
+  // Initialize Agent + Tool using the new SDK
   useEffect(() => {
-    const loadApiKey = () => {
-      const storedApiKey = getApiKey();
-      setApiKey(storedApiKey);
-
-      if (!storedApiKey) {
-        console.warn("No OpenAI API Key, things will not work");
-      } else {
-        console.log("OpenAI API Key loaded successfully");
-      }
-    };
-
-    // Load initial API key
-    loadApiKey();
-
-    // Set up listeners for API key changes
-    const { addListeners, removeListeners } = createApiKeyListener(loadApiKey);
-    addListeners();
-
-    return removeListeners;
-  }, []);
-
-  // Initialize RealtimeClient when apiKey is available
-  useEffect(() => {
-    if (apiKey) {
-      clientRef.current = new RealtimeClient({ apiKey: apiKey, dangerouslyAllowAPIKeyInBrowser: true });
-    }
-  }, [apiKey]);
-
-  // Set up event handlers for the RealtimeClient
-  useEffect(() => {
-    const client = clientRef.current;
-    const wavStreamPlayer = wavStreamPlayerRef.current;
-
-    if (!client) return;
-
-    // Set initial instructions
-    client.updateSession({ instructions: instructions });
-    // client.addTool(
-    //   {
-    //     name: "get_book_information",
-    //     description: "Answers the questions about the book.",
-    //     parameters: { type: "object", properties: { question: { type: "string", description: "The question to answer." } }, required: ["question"] },
-    //   },
-    //   async ({ question }: { question: string }) => {
-    //     try {
-    //       console.log("question", question);
-
-    //       // Calculate the pageFrom and pageTo based on current page
-    //       // We're using dynamic page range based on current reading position
-    //       // we set the pageTo to the current page so we avoid spoilers
-
-    //       const filter = { chapterFrom: 1, chapterTo: currentChapter, paragraphFrom: 1, paragraphTo: currentParagraph, bookSlug: CURRENT_BOOK };
-    //       console.log("filter", filter);
-    //       const response = await fetch(`${QUESTIONS_SERVER_URL}/ask?question=${encodeURIComponent(question)}&filter=${encodeURIComponent(JSON.stringify(filter))}`);
-    //       const data = await response.text();
-    //       console.log("Response from book information service:", data);
-    //       return data;
-    //     } catch (error) {
-    //       console.log("error");
-    //       return { error: (error as Error).message };
-    //     }
-    //   },
-    // );
-
-    client.on("error", (event: unknown) => console.error(event));
-
-    client.on("conversation.interrupted", async () => {
-      const trackSampleOffset = await wavStreamPlayer.interrupt();
-      if (trackSampleOffset?.trackId) {
-        const { trackId, offset } = trackSampleOffset;
-        await client.cancelResponse(trackId, offset);
-      }
-    });
-
-    client.on("conversation.updated", async ({ item, delta }: { item: ConversationItem; delta: { audio?: Uint8Array | Int16Array; [key: string]: unknown } }) => {
-      const items = client.conversation.getItems() as ConversationItem[];
-
-      if (delta?.audio && !isMuted) {
-        wavStreamPlayer.add16BitPCM(delta.audio as Uint8Array, item.id);
-      }
-
-      if (item.status === "completed" && item.formatted.audio?.length) {
-        const wavFile = await WavRecorder.decode(item.formatted.audio as Uint8Array, 24000, 24000);
-        item.formatted.file = wavFile;
-      }
-
-      setItems(items);
-
-      // Update the response text if this is an assistant message
-      if (item.role === "assistant" && item.formatted.text) {
-        setResponse(item.formatted.text);
-      }
-    });
-
-    return () => {
-      // Cleanup
-      client.reset();
-    };
-  }, [clientRef.current, isMuted]);
-
-  // Connect to conversation
-  const connectConversation = useCallback(async () => {
-    const client = clientRef.current;
-    if (!client) throw new Error("RealtimeClient is not initialized");
-
-    const wavRecorder = wavRecorderRef.current;
-    const wavStreamPlayer = wavStreamPlayerRef.current;
-
-    // Set state
-    setIsConnected(true);
-    setItems(client.conversation.getItems() as ConversationItem[]);
-    console.log("wavRecorder.getStatus()", wavRecorder.getStatus());
-    if (wavRecorder.getStatus() === "ended") {
-      // Connect to microphone
-      await wavRecorder.begin();
-    }
-
-    // console.log("wavStreamPlayer.getStatus()", wavStreamPlayer.getStatus());
-    // if (wavStreamPlayer.getStatus() === "inactive") {
-    // Connect to audio output
-    await wavStreamPlayer.connect();
-    // }
-
-    // Connect to realtime API
-    await client.connect();
-
-    // Send initial message with character context
-    client.realtime.send("conversation.item.create", {
-      item: {
-        type: "message",
-        role: "user",
-        content: [
-          {
-            type: "input_text",
-            text: `Answer questions about this book. I will provide you with the book content as context as I read through it. Use the provided book context and the get_book_information tool when needed. Absolutely no spoilers beyond what I've already read. Characters in the book: Winston, Big Brother, Julia, Parsons, O'Brien. If I mispronounce a character's name, use this list to guide you.`,
-            // text: `Pomóż mi z książką. Odpowiadaj tylko na podstawie tekstu z get_book_information tool. Postacie z ksiazki to: Ksiąze Ramzes, Sara, Herhor, Dagon, Tutmozis i inni.`,
-            // text: `Help me with the book. The characters are: "Chilli", "Harry", "Karen", "Catlett", "Michael", "Leo", "Tommy", "Nicki", "Fay". If I mispronounce a character's name, use this list to guide you. When I ask a question, use the get_book_information tool to answer the question.`,
-          },
-        ],
+    const getBookInformation = tool({
+      name: "get_book_information",
+      description: "Answers the questions about the book.",
+      parameters: z.object({ question: z.string().describe("The question to answer.") }),
+      execute: async ({ question }: { question: string }) => {
+        // Instead of calling the server, trigger our internal ask flow
+        try {
+          console.log("getBookInformation (tool trigger)", question);
+          toolTriggeredRef.current = true;
+          if (awaitingSpeechResponseRef.current) {
+            askHandlerRef.current?.(question);
+          } else {
+            console.warn("Ignoring tool call without preceding user speech");
+          }
+          // Return empty string to avoid populating the input with agent reply
+          return "";
+        } catch (error) {
+          return { error: (error as Error).message };
+        }
       },
     });
+
+    agentRef.current = new RealtimeAgent({ name: "Reader Assistant", instructions, tools: [getBookInformation] });
   }, []);
 
-  // Disconnect from conversation
+  // Attach streaming handlers on the active session
+  useEffect(() => {
+    const session = sessionRef.current;
+    if (!session) return;
+
+    const onTransport = (event: TransportEvent) => {
+      // Detect speech activity hints from server
+      if (event.type === "input_audio_buffer.speech_started" || event.type === "server.input_audio_buffer.speech_started") {
+        audioHeardThisRecordingRef.current = true;
+      }
+
+      // Track conversation items to clear history between questions
+      if (event.type === "conversation.item.added") {
+        setIsSessionReady(true);
+
+        const item = event.item;
+        const id = item?.id;
+        if (!id) return;
+        conversationItemsRef.current.push({ id, role: item?.role, type: item?.type });
+      } else if (event.type === "conversation.item.deleted") {
+        const id = event.item_id ?? event.item?.id;
+        if (id) {
+          conversationItemsRef.current = conversationItemsRef.current.filter((x) => x.id !== id);
+        }
+      }
+
+      if (event.type === "response.created") {
+        // New response turn started; reset streaming buffer
+        toolTriggeredRef.current = false;
+      }
+    };
+    const onAgentEnd = () => {
+      awaitingSpeechResponseRef.current = false;
+    };
+
+    session.on("transport_event", onTransport);
+    session.on("agent_end", onAgentEnd);
+    return () => {
+      session.off("transport_event", onTransport);
+      session.off("agent_end", onAgentEnd);
+    };
+  }, [sessionRef.current]);
+
+  const connectConversation = useCallback(async () => {
+    if (!agentRef.current) throw new Error("Agent not initialized");
+
+    if (!sessionRef.current) {
+      sessionRef.current = new RealtimeSession(agentRef.current, {
+        model: "gpt-4o-mini-realtime-preview",
+        // config: { outputModalities: ["text"], audio: { input: { turnDetection: null } } },
+        config: { outputModalities: ["text"] },
+        automaticallyTriggerResponseForMcpToolCalls: false,
+      });
+    }
+    // Fetch ephemeral realtime token from our backend
+    let token = "";
+    try {
+      // const resp = await fetch(`http://localhost:30310/getRealtimeToken`);
+      const resp = await fetch(`/api/generate-realtime-token`, { credentials: "include" });
+      if (resp.status === 401) {
+        if (nextConnectInteractiveRef.current) {
+          try {
+            window.dispatchEvent(new CustomEvent("ShowAuthModal", { detail: { reason: "realtimeTokenUnauthorized" } }));
+          } catch (_) {
+            // ignore dispatch failures
+          }
+        } else {
+          console.warn("Realtime preconnect unauthorized; deferring auth prompt until interaction");
+        }
+        throw new Error("Unauthorized: sign in required");
+      }
+      if (!resp.ok) {
+        throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+      }
+      token = await resp.text();
+    } catch (e) {
+      console.warn("Failed to fetch realtime token", e);
+      throw e;
+    }
+    if (!token || typeof token !== "string") throw new Error("Missing realtime token");
+
+    const session = sessionRef.current;
+    await session.connect({ apiKey: token });
+
+    // Disable VAD and lock text-only at the server.
+    try {
+      session.transport.sendEvent({
+        type: "session.update",
+        session: { model: "gpt-4o-mini-realtime-preview", type: "realtime", output_modalities: ["text"], audio: { input: { turn_detection: null } } },
+      });
+    } catch {}
+
+    // Start muted so we only stream mic during press-to-talk.
+    session.mute(true);
+    setIsMuted(true);
+    setIsConnected(true);
+  }, []);
+
+  // Preconnect when API key becomes available to reduce first-press timing issues
+  // Only preconnect if microphone permission was previously granted
+  useEffect(() => {
+    const attemptPreconnect = async () => {
+      if (isConnected) return;
+
+      // Check if microphone permission was already granted
+      let hasPermission = false;
+      if (typeof navigator !== "undefined" && navigator.permissions?.query) {
+        try {
+          const result = await navigator.permissions.query({ name: "microphone" as PermissionName });
+          hasPermission = result.state === "granted";
+        } catch (error) {
+          // permissions.query not supported or failed, skip preconnect
+          return;
+        }
+      }
+
+      if (hasPermission) {
+        connectConversation().catch((e) => console.warn("Realtime preconnect failed", e));
+      }
+    };
+
+    attemptPreconnect();
+  }, [isConnected, connectConversation]);
+
   const disconnectConversation = useCallback(async () => {
     setIsConnected(false);
+    const session = sessionRef.current;
+    if (!session) return;
 
-    const client = clientRef.current;
-    if (!client) throw new Error("RealtimeClient is not initialized");
-
-    client.disconnect();
-
-    const wavRecorder = wavRecorderRef.current;
-    await wavRecorder.end();
-
-    const wavStreamPlayer = wavStreamPlayerRef.current;
-    await wavStreamPlayer.interrupt();
+    session.close();
+    sessionRef.current = null;
   }, []);
 
-  // Start recording
   const startRecording = useCallback(async () => {
+    setIsSessionReady(false);
+    if (!sessionRef.current || !isConnected) {
+      nextConnectInteractiveRef.current = true;
+      try {
+        await connectConversation();
+      } finally {
+        nextConnectInteractiveRef.current = false;
+      }
+    }
+
+    // Create audio analyser for visualization
+    try {
+      if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        visualizerStreamRef.current = stream;
+
+        if (!audioContextRef.current) {
+          audioContextRef.current = new AudioContext();
+        }
+
+        const analyser = audioContextRef.current.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.8;
+
+        const source = audioContextRef.current.createMediaStreamSource(stream);
+        source.connect(analyser);
+
+        setAudioAnalyser(analyser);
+        micPrimedRef.current = true;
+      }
+    } catch (e) {
+      console.warn("Microphone permission not granted", e);
+    }
+
+    const session = sessionRef.current!;
+    session.mute(false);
+    setIsMuted(false);
     setIsRecording(true);
+    recordStartTimeRef.current = Date.now();
+    audioHeardThisRecordingRef.current = false;
 
-    const client = clientRef.current;
-    if (!client) throw new Error("RealtimeClient is not initialized");
-
-    // If not connected yet, connect first
-    if (!isConnected || !client.isConnected()) {
-      await client.disconnect();
-      await connectConversation();
+    try {
+      session.transport.sendEvent({ type: "input_audio_buffer.clear" });
+    } catch {}
+    // Clear all previous conversation items (ensures independence between questions)
+    try {
+      const toDelete = conversationItemsRef.current.map((x) => x.id);
+      console.log("toDelete", toDelete);
+      for (const id of toDelete) {
+        session.transport.sendEvent({ type: "conversation.item.delete", item_id: id });
+      }
+      if (toDelete.length) {
+        console.log("conversationItemsRef.current ", conversationItemsRef.current);
+        conversationItemsRef.current = [];
+      }
+    } catch (e) {
+      console.warn("Failed to clear previous conversation items", e);
     }
+    // Send a guidance message every hold with dynamic character list scoped to current chapter
+    try {
+      await loadCharactersData().catch(() => {});
+      const chars = getCharactersData();
+      const currentChapter = location?.chapter ?? location?.currentChapter ?? 1;
+      const inCurrent = new Set<string>();
+      const inPrevious = new Set<string>();
+      for (const c of chars || []) {
+        const name = c.characterName;
+        if (!name || !name.trim()) continue;
+        const infos = c.infoPerChapter || [];
+        for (const info of infos) {
+          const ch = info.chapter;
+          if (!ch || ch > currentChapter) continue;
+          const encountered = [...(info.paragraphsWhereSpotted || []), ...(info.paragraphsWhereTalking || []), ...(info.paragraphsWhereEnters || [])];
+          if (encountered.length === 0) continue;
+          if (ch === currentChapter) inCurrent.add(name);
+          else if (ch < currentChapter) inPrevious.add(name);
+        }
+      }
+      // Exclude any current-chapter characters from the previous-chapters list
+      for (const n of Array.from(inCurrent)) inPrevious.delete(n);
+      const format = (s: Set<string>) => (s.size ? Array.from(s).slice(0, 50).join(", ") : "none");
 
-    const wavRecorder = wavRecorderRef.current;
-    const wavStreamPlayer = wavStreamPlayerRef.current;
+      const book = getBookData();
+      const title = book?.metadata?.title ?? "the book";
+      const author = book?.metadata?.author ?? "the author";
+      const segments = [
+        `Help the user with "${title}" by ${author}.`,
+        "Use the get_book_information tool for every answer.",
+        "If user mispronounces a character's name, rely on these lists:",
+        `Characters in current chapter: ${format(inCurrent)}.`,
+      ];
 
-    const trackSampleOffset = await wavStreamPlayer.interrupt();
-    if (trackSampleOffset?.trackId) {
-      const { trackId, offset } = trackSampleOffset;
-      await client.cancelResponse(trackId, offset);
+      if (inPrevious.size > 0) {
+        segments.push(`Characters from previous chapters: ${format(inPrevious)}.`);
+      }
+
+      segments.push(
+        `Use the user’s voice question directly when calling the tool; do not add any other information or the characters. Use the list only to guide understanding of the pronunciation.`,
+      );
+
+      const text = segments.join(" ");
+      session.transport.sendEvent({ type: "conversation.item.create", item: { type: "message", role: "system", content: [{ type: "input_text", text }] } });
+    } catch (e) {
+      console.warn("Failed to send per-hold priming message", e);
     }
+    // Prime mic permission on first use to avoid missing initial speech
+  }, [isConnected, connectConversation, location]);
 
-    await wavRecorder.record((data) => {
-      client.appendInputAudio(data.mono);
-    });
-  }, [isConnected, connectConversation, disconnectConversation]);
-
-  // Stop recording
   const stopRecording = useCallback(async () => {
     setIsRecording(false);
+    const session = sessionRef.current;
+    if (!session) throw new Error("Realtime session is not initialized");
 
-    const client = clientRef.current;
-    if (!client) throw new Error("RealtimeClient is not initialized");
-
-    const wavRecorder = wavRecorderRef.current;
-    await wavRecorder.pause();
-    client.createResponse();
-  }, []);
-
-  // Toggle mute
-  const toggleMute = useCallback(() => {
-    setIsMuted((prev) => !prev);
-  }, []);
-
-  // Send text message
-  const sendTextMessage = useCallback((message: string) => {
-    const client = clientRef.current;
-    if (!client) throw new Error("RealtimeClient is not initialized");
-
-    if (message.trim()) {
-      client.realtime.send("conversation.item.create", { item: { type: "message", role: "user", content: [{ type: "input_text", text: message.trim() }] } });
+    // Clean up audio analyser
+    setAudioAnalyser(null);
+    if (visualizerStreamRef.current) {
+      visualizerStreamRef.current.getTracks().forEach((track) => track.stop());
+      visualizerStreamRef.current = null;
     }
+
+    session.mute(true);
+    setIsMuted(true);
+    try {
+      session.transport.sendEvent({ type: "input_audio_buffer.commit" });
+    } catch {}
+    // Only allow the upcoming tool call to trigger our ask flow if we actually captured speech
+    const recStart = recordStartTimeRef.current ?? 0;
+    const recDuration = Date.now() - recStart;
+    const hadAudio = audioHeardThisRecordingRef.current || recDuration > 700; // fallback threshold
+    awaitingSpeechResponseRef.current = !!hadAudio;
+    recordStartTimeRef.current = null;
+    audioHeardThisRecordingRef.current = false;
+    session.transport.sendEvent({ type: "response.create", response: { output_modalities: ["text"], tool_choice: "required" } });
   }, []);
 
-  const value = { isConnected, isRecording, isMuted, response, connectConversation, disconnectConversation, startRecording, stopRecording, toggleMute, sendTextMessage };
+  const toggleMute = useCallback(() => {
+    setIsMuted((prev) => {
+      const next = !prev;
+      try {
+        sessionRef.current?.mute(next);
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  const sendTextMessage = useCallback((message: string) => {
+    const session = sessionRef.current;
+    if (!session) throw new Error("Realtime session is not initialized");
+    if (message.trim()) session.sendMessage(message.trim(), {});
+  }, []);
+
+  const setAskHandler = useCallback((handler: ((query: string) => void) | null) => {
+    askHandlerRef.current = handler ?? null;
+  }, []);
+
+  const triggerAsk = useCallback((query: string) => {
+    askHandlerRef.current?.(query);
+  }, []);
+
+  const value: RealtimeContextType = {
+    isConnected,
+    isRecording,
+    isMuted,
+    isSessionReady,
+    audioAnalyser,
+    connectConversation,
+    disconnectConversation,
+    startRecording,
+    stopRecording,
+    toggleMute,
+    sendTextMessage,
+    setAskHandler,
+    triggerAsk,
+  };
 
   return <RealtimeContext.Provider value={value}>{children}</RealtimeContext.Provider>;
 };
