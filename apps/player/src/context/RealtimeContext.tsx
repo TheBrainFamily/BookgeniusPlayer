@@ -159,8 +159,8 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Fetch ephemeral realtime token from our backend
     let token = "";
     try {
-      const resp = await fetch(`http://localhost:30310/getRealtimeToken`);
-      // const resp = await fetch(`/api/generate-realtime-token`, { credentials: "include" });
+      // const resp = await fetch(`http://localhost:30310/getRealtimeToken`);
+      const resp = await fetch(`/api/generate-realtime-token`, { credentials: "include" });
       if (resp.status === 401) {
         if (nextConnectInteractiveRef.current) {
           try {
