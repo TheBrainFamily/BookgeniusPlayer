@@ -116,6 +116,17 @@ export function useBookContent() {
   }, []);
 
   useEffect(() => {
+    const bookContainer = document.getElementById("book-container");
+    if (bookContainer) {
+      if (bookForm === "play" || bookForm === "mixed") {
+        bookContainer.classList.add("play-mode");
+      } else {
+        bookContainer.classList.remove("play-mode");
+      }
+    }
+  }, [bookForm]);
+
+  useEffect(() => {
     currentChapterRef.current = currentChapter;
   }, [currentChapter]);
 
