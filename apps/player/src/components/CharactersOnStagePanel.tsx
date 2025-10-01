@@ -7,10 +7,11 @@ import { useLocation } from "@player/state/LocationContext";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import CharacterCard from "./CharacterCard";
 import { cn } from "@player/lib/utils";
-import { useOptionalElementVisibility } from "@player/stores/elementVisibility.store";
+import { useOptionalElementVisibility, useLastHideReason } from "@player/stores/elementVisibility.store";
 import { Appearance } from "@player/fetchers/getParagraphRange";
 
 const AVATAR_SIZE = "clamp(55px, 6.5vw, 90px)";
+const FADE_OUT_DURATION_MS = 3000;
 
 const CharactersOnStagePanel = () => {
   const allCharacters = useMemo(() => getCharactersData(), []);
@@ -19,9 +20,28 @@ const CharactersOnStagePanel = () => {
   const currentSpeakers = useCurrentSpeakers(location, allCharacters, true);
 
   const isOverlayVisible = useOptionalElementVisibility();
+  const lastHideReason = useLastHideReason();
 
   // Safe screen width detection for SSR compatibility
   const [isNarrowScreen, setIsNarrowScreen] = useState(false);
+  const [isOverlayEffectivelyVisible, setIsOverlayEffectivelyVisible] = useState(isOverlayVisible);
+
+  useEffect(() => {
+    if (isOverlayVisible) {
+      setIsOverlayEffectivelyVisible(true);
+      return;
+    }
+
+    if (lastHideReason === "inactivity" && isNarrowScreen) {
+      const timeout = setTimeout(() => {
+        setIsOverlayEffectivelyVisible(false);
+      }, FADE_OUT_DURATION_MS);
+
+      return () => clearTimeout(timeout);
+    }
+
+    setIsOverlayEffectivelyVisible(false);
+  }, [isOverlayVisible, lastHideReason, isNarrowScreen]);
 
   useEffect(() => {
     const checkScreenWidth = () => setIsNarrowScreen(window.innerWidth < 1024);
@@ -42,8 +62,8 @@ const CharactersOnStagePanel = () => {
   }));
 
   // Desktop (≥1024px): avatars are ALWAYS visible (never hide)
-  // Narrow screens (<1024px): hide avatars when overlay is visible
-  const shouldHideAvatars = isNarrowScreen && isOverlayVisible;
+  // Narrow screens (<1024px): hide avatars while overlay is (effectively) visible
+  const shouldHideAvatars = isNarrowScreen && isOverlayEffectivelyVisible;
 
   if (!location) return null;
 

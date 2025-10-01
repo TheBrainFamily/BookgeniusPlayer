@@ -154,7 +154,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     `https://${mainClerkDomain}`,
     `https://accounts.${mainClerkDomain}`,
     "https://bookgeniusz.pl",
-    "https://testclerk.aws.lucetius.pl",
+    `https://accounts.bookgeniusz.pl`,
     "https://wukong.bookgenius.net",
   ];
 
@@ -162,7 +162,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   console.log("domain:", clerkDomain);
   console.log("signInUrl:", signInUrl);
   console.log("signUpUrl:", signUpUrl);
-  console.log("new version of clerk");
+  console.log("oct 1 version of clerk");
   return (
     <WidgetCtx.Provider value={hooks.UserButton}>
       <ClerkProvider

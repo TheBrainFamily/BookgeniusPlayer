@@ -171,17 +171,13 @@ jobs:
       - name: build bookgeniusz.pl
         run: pnpm build:platform
         env:
-          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_BOOKGENIUSZ_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_BOOKGENIUSZ_SECRET_KEY }}
           VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_AUTH_PROVIDER: ${{ vars.VITE_AUTH_PROVIDER }}
           VITE_PAYMENTS_PROVIDER: ${{ vars.VITE_PAYMENTS_PROVIDER }}
-          VITE_CLERK_DOMAIN: "bookgeniusz.pl"
-          VITE_CLERK_IS_SATELLITE: "true"
-          VITE_PUBLIC_CLERK_SIGN_IN_URL: https://bookgenius.net/sign-in
-          VITE_PUBLIC_CLERK_SIGN_UP_URL: https://bookgenius.net/sign-up
           VITE_SUPPORT_EMAIL: support@bookgeniusz.pl
           CI: true
 

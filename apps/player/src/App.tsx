@@ -7,7 +7,6 @@ import { useBackgroundVideo } from "./hooks/useBackgroundVideo";
 
 import NoteLinkBlinker from "./react-bridge/NoteLinkBlinker";
 import { runLegacyInit } from "./main";
-import { WebSocketProvider } from "./context/WebSocketContext";
 import { RealtimeProvider } from "./context/RealtimeContext";
 import { useBackgroundSongs } from "./hooks/useBackgroundSongs";
 import { BookContentWrapper } from "./components/BookContentWrapper";
@@ -118,12 +117,10 @@ export default function App() {
         <BookDataProvider>
           <LocationProvider>
             <RealtimeProvider>
-              <WebSocketProvider>
-                <BookContentWrapper>
-                  <Shell onShellMounted={() => setReactDomReady(true)} />
-                  <ModalRenderers />
-                </BookContentWrapper>
-              </WebSocketProvider>
+              <BookContentWrapper>
+                <Shell onShellMounted={() => setReactDomReady(true)} />
+                <ModalRenderers />
+              </BookContentWrapper>
             </RealtimeProvider>
           </LocationProvider>
         </BookDataProvider>
