@@ -47,43 +47,6 @@ function createVideoElement(src: string, state: "listens" | "speaks", isTalking:
   return video;
 }
 
-function handleContainerResponsiveVideo(container: HTMLDivElement, listeningSrc: string | null, isTalking: boolean) {
-  const isMobileNow = isMobile(true, 650);
-  const listeningVideo = container.querySelector('video[data-state="listens"]') as HTMLVideoElement | null;
-  const speakingVideo = container.querySelector('video[data-state="speaks"]') as HTMLVideoElement | null;
-
-  if (isMobileNow) {
-    // Mobile: Remove listening video if it exists
-    if (listeningVideo) {
-      listeningVideo.remove();
-
-      // Update hasVideos state
-      if (speakingVideo) {
-        container.dataset.hasVideos = "speaking-only";
-        speakingVideo.style.opacity = isTalking ? "1" : "0";
-      } else {
-        delete container.dataset.hasVideos;
-      }
-    }
-  } else {
-    // Desktop: Add listening video if it doesn't exist but should exist
-    if (!listeningVideo && listeningSrc && isVideoFile(listeningSrc)) {
-      const newListeningVideo = createVideoElement(listeningSrc, "listens", isTalking);
-      container.appendChild(newListeningVideo);
-
-      // Update hasVideos state
-      if (speakingVideo) {
-        container.dataset.hasVideos = "true";
-        newListeningVideo.style.opacity = isTalking ? "0" : "1";
-        speakingVideo.style.opacity = isTalking ? "1" : "0";
-      } else {
-        container.dataset.hasVideos = "listening-only";
-        newListeningVideo.style.opacity = "1";
-      }
-    }
-  }
-}
-
 /** Checks if a given chapter and paragraph index falls within the specified range **/
 function isInRange(currentChapter: number, currentParagraph: number, startChapter: number, startParagraph: number, endChapter: number, endParagraph: number): boolean {
   // Single chapter range
@@ -103,25 +66,6 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
   }
 
   return false;
-}
-
-/** Updates video opacity based on talking state for inline avatars **/
-function updateVideoState(container: HTMLDivElement, isTalking: boolean) {
-  const hasVideos = container.dataset.hasVideos;
-  if (!hasVideos || hasVideos === "listening-only") return;
-
-  const listeningVideo = container.querySelector('video[data-state="listens"]') as HTMLVideoElement;
-  const speakingVideo = container.querySelector('video[data-state="speaks"]') as HTMLVideoElement;
-
-  if (hasVideos === "true" && listeningVideo && speakingVideo) {
-    // Both videos available - image underneath, speaking covers listening
-    listeningVideo.style.opacity = isTalking ? "0" : "1";
-    speakingVideo.style.opacity = isTalking ? "1" : "0";
-  } else if (hasVideos === "speaking-only" && speakingVideo) {
-    // Only speaking video - image acts as listening state
-    // When talking: show speaking video, when not talking: hide speaking video to show image
-    speakingVideo.style.opacity = isTalking ? "1" : "0";
-  }
 }
 
 const onPlayRowCharacterClick = (
@@ -290,54 +234,6 @@ export function activateMediaInRange(
       highlightCharacter(character, openCharacterDetailsModal);
     });
 
-    // const seenCharactersInParentP = new Set<string>();
-    //
-    // charactersToHighlight.forEach((character) => {
-    //   const charText = character.dataset.character;
-    //   if (charText && !seenCharactersInParentP.has(charText) && !charactersDisplayed.includes(charText)) {
-    //     seenCharactersInParentP.add(charText);
-    //     highlightCharacter(character, openCharacterDetailsModal);
-    //   }
-    // });
-    //
-    // // Add click handler to whole paragraph when it's a character line
-    // if (p.dataset.isCharacter === "true" && p.dataset.clickListenerAttached !== "true") {
-    //   const handler = (e: PointerEvent) => {
-    //     if (e.metaKey || e.ctrlKey) return;
-    //     e.preventDefault();
-    //     e.stopPropagation();
-    //
-    //     const playRow = p.closest(".play-row") as HTMLElement | null;
-    //     const placeholder = (playRow ?? p).querySelector<HTMLSpanElement>(".character-placeholder");
-    //     const characterSlug = placeholder?.dataset.character;
-    //     if (!characterSlug) return;
-    //
-    //     const isTalking = placeholder?.dataset.isTalking === "true";
-    //     const characterData = charactersBySlug.get(characterSlug);
-    //     const snapshotForClick = characterData
-    //       ? resolveCharacterSnapshot(characterData, { location: { chapter: currentChapter, paragraph: currentParagraph }, fallbackDisplayName: characterData.characterName })
-    //       : null;
-    //
-    //     const mediaSrc = snapshotForClick ? (isTalking ? snapshotForClick.media.talking : snapshotForClick.media.listening) : "";
-    //
-    //     openCharacterDetailsModal({
-    //       characterSlug,
-    //       isVideo: !!mediaSrc && isVideoFile(mediaSrc),
-    //       mediaSrc: mediaSrc || "",
-    //       chapter: currentChapter,
-    //       paragraph: currentParagraph,
-    //     });
-    //   };
-    //
-    //   let elementToAddListenerTo = p;
-    //   const spanInsideParagraph = p.querySelector<HTMLSpanElement>("span");
-    //   if (spanInsideParagraph) {
-    //     elementToAddListenerTo = spanInsideParagraph;
-    //   }
-    //   elementToAddListenerTo.addEventListener("pointerup", handler, { passive: false });
-    //   p.dataset.clickListenerAttached = "true";
-    // }
-
     playRows.push(p.closest(".play-row") ?? (p as HTMLElement));
   });
 
@@ -397,8 +293,12 @@ export const playRowCharacterClickInit = (openCharacterDetailsModal: (params: Ch
   const contentContainer = document.querySelector("#content-container");
   if (!contentContainer) return;
 
+  const charactersBySlug = getCharactersBySlug();
+
   contentContainer.addEventListener("pointerup", (e) => {
     const target = e.target as HTMLElement;
+
+    if (target.tagName !== "STRONG") return;
 
     const playRow = target.closest(".play-row");
 
@@ -411,11 +311,6 @@ export const playRowCharacterClickInit = (openCharacterDetailsModal: (params: Ch
 
     const currentChapter = playRow.closest("[data-chapter]")?.getAttribute("data-chapter");
     const currentParagraph = playRow.closest("[data-index]")?.getAttribute("data-index");
-
-    const charactersBySlug = new Map<string, CharacterData>();
-    getCharactersData().forEach((character) => {
-      charactersBySlug.set(character.slug, character);
-    });
 
     const characterSlug = characterPlaceholder.dataset.character;
 
