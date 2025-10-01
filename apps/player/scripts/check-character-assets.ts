@@ -74,7 +74,7 @@ function parseCharacterNames(xmlPath: string): string[] {
   const characters: string[] = [];
   for (let i = 0; i < characterElements.length; i++) {
     const element = characterElements[i];
-    if (element.nodeType === 1) {
+    if (element.nodeType === 1 && element.tagName !== "Override") {
       characters.push(element.tagName);
     }
   }
@@ -87,6 +87,7 @@ function checkCharacterAssets(
   characterMetadata: SimpleCharacterMetadata[],
   ignoreIfSpeaksLessFrequentThan: number,
   ignoreIfListensLessFrequentThan: number,
+  skipListens: boolean = false,
 ): CharacterAsset {
   const assetsDir = join(bookPath, "assets");
   // Try different naming variations
@@ -125,7 +126,7 @@ function checkCharacterAssets(
   let listensSizeCorrect = true;
   const listensPath = join(assetsDir, `${name}-listens.mp4`);
   // We ignore the fact that the character does not have the listen video if it listens more than ignoreIfListensLessFrequentThan times
-  if (listensCount <= ignoreIfListensLessFrequentThan) {
+  if (skipListens || listensCount <= ignoreIfListensLessFrequentThan) {
     hasListens = true;
   }
   if (existsSync(listensPath)) {
@@ -229,11 +230,17 @@ function findUnreferencedAssets(bookPath: string, characterNames: string[]): Unr
 function main(): void {
   const args = process.argv.slice(2);
   if (args.length === 0) {
-    console.error("Usage: tsx check-character-assets.ts <book-name>");
+    console.error("Usage: tsx check-character-assets.ts <book-name> [ignoreIfSpeaksLessThan] [ignoreIfListensLessThan] [--skipListens]");
     console.error("Example: tsx check-character-assets.ts Krolowa-Sniegu");
+    console.error("Example: tsx check-character-assets.ts Wukong 4 4 --skipListens");
     process.exit(1);
   }
-  const bookPath = args[0];
+
+  // Filter out flags and get the book path
+  const skipListens = args.includes("--skipListens");
+  const nonFlagArgs = args.filter((arg) => !arg.startsWith("--"));
+  const bookPath = nonFlagArgs[0];
+
   const {
     xmlDoc,
     bookString,
@@ -249,16 +256,21 @@ function main(): void {
   setKnownVideos(videoFiles);
 
   const characterMetadata = generateCharacterMetadata(xmlDoc, bookString, form, slug);
-  const ignoreIfSpeaksLessFrequentThan = parseInt(args[1] || "0", 10);
-  const ignoreIfListensLessFrequentThan = parseInt(args[2] || "0", 10);
+  const ignoreIfSpeaksLessFrequentThan = parseInt(nonFlagArgs[1] || "0", 10);
+  const ignoreIfListensLessFrequentThan = parseInt(nonFlagArgs[2] || "0", 10);
   const xmlPath = join(bookPath, "book.xml");
   if (!existsSync(xmlPath)) {
     throw new Error(`Book XML file not found: ${xmlPath}`);
   }
   console.log(`\n\n\nChecking book: ${bookPath}`);
+  if (skipListens) {
+    console.log("⏭️  Skipping listens.mp4 checks");
+  }
   const characterNames = parseCharacterNames(xmlPath);
   console.log(`\nCharacters found in CharactersMaster (${characterNames.length}):`);
-  const results = characterNames.map((name) => checkCharacterAssets(bookPath, name, characterMetadata, ignoreIfSpeaksLessFrequentThan, ignoreIfListensLessFrequentThan));
+  const results = characterNames.map((name) =>
+    checkCharacterAssets(bookPath, name, characterMetadata, ignoreIfSpeaksLessFrequentThan, ignoreIfListensLessFrequentThan, skipListens),
+  );
 
   // Check for missing assets
   const incomplete = results.filter((r) => !r.isComplete);
@@ -269,7 +281,7 @@ function main(): void {
       const missing = [];
       if (!char.hasPng) missing.push("PNG");
       if (!char.hasSpeaks && char.speaksCount > 0) missing.push(`speaks.mp4 (${char.speaksCount})`);
-      if (!char.hasListens && char.listensCount > 0) missing.push(`listens.mp4 (${char.listensCount})`);
+      if (!skipListens && !char.hasListens && char.listensCount > 0) missing.push(`listens.mp4 (${char.listensCount})`);
       if (missing.length > 0) {
         console.log(`  ${char.name}: Missing: ${missing.join(", ")}`);
       }
