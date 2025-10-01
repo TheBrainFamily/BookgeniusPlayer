@@ -7,10 +7,19 @@ import { isMobile } from "@player/utils/isMobileOrTablet";
 import type { CharacterData } from "@player/types/book";
 import type { CharacterSnapshot } from "@player/utils/characterOverrides";
 import { normalizeSrcForInlineAvatar, highlightCharacter } from "./highlightCharacter";
-import { getBookAssetUrl } from "@player/utils/assetUrls";
 
 // Global flag to ensure we reset all isTalking values only once at the very beginning
 let hasInitializedTalkingStates = false;
+
+let charactersBySlugCache: Map<string, CharacterData> | null = null;
+function getCharactersBySlug() {
+  if (!charactersBySlugCache) {
+    charactersBySlugCache = new Map<string, CharacterData>();
+    getCharactersData().forEach((c) => charactersBySlugCache!.set(c.slug, c));
+  }
+
+  return charactersBySlugCache;
+}
 
 function createVideoElement(src: string, state: "listens" | "speaks", isTalking: boolean): HTMLVideoElement {
   const video = document.createElement("video");
@@ -213,7 +222,7 @@ function createMediaElement(
   return container;
 }
 
-function createDummyElement(characterPlaceholder: HTMLDivElement) {
+function createDummyElement(characterPlaceholder: HTMLSpanElement) {
   const dummyElement = document.createElement("span");
   dummyElement.classList.add("dummy-avatar-placeholder", "inline-avatar");
   const img = characterPlaceholder.querySelector<HTMLImageElement>("img").cloneNode(true) as HTMLImageElement;
@@ -247,10 +256,7 @@ export function activateMediaInRange(
     hasInitializedTalkingStates = true;
   }
 
-  const charactersBySlug = new Map<string, CharacterData>();
-  getCharactersData().forEach((character) => {
-    charactersBySlug.set(character.slug, character);
-  });
+  const charactersBySlug = getCharactersBySlug();
 
   const paragraphs = document.querySelectorAll<HTMLElement>(
     `.content-container section[data-chapter="${startChapter}"] [data-index], section[data-chapter="${endChapter}"] [data-index]`,
@@ -273,8 +279,6 @@ export function activateMediaInRange(
   const playRows = [];
 
   paragraphsInRange.forEach((p) => {
-    // --- START ---
-
     const charactersToHighlight = p.querySelectorAll<HTMLSpanElement>(".character-highlighted");
 
     Array.from(charactersToHighlight).forEach((character) => {
@@ -334,8 +338,6 @@ export function activateMediaInRange(
     //   p.dataset.clickListenerAttached = "true";
     // }
 
-    // --- END ---
-
     playRows.push(p.closest(".play-row") ?? (p as HTMLElement));
   });
 
@@ -381,7 +383,7 @@ export function activateMediaInRange(
       const characterPlaceholder = playRow.querySelector<HTMLSpanElement>(".character-placeholder");
 
       if (characterPlaceholder) {
-        const dummyElement = createDummyElement(characterPlaceholder as HTMLDivElement);
+        const dummyElement = createDummyElement(characterPlaceholder);
 
         characterPlaceholder.replaceChildren(dummyElement);
       }
