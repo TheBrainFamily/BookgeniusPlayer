@@ -484,7 +484,7 @@
         max-width: 100%;
         margin: 0 0 clamp(3em, 2.5vh, 3.5em);
         gap: clamp(0.5rem, 2vw, 2rem);
-        contain: content;
+        /* contain: content; */
       }
 
       .play-row[data-text-alignment="left"] {
@@ -529,7 +529,6 @@
           display: flex;
           justify-content: center;
           position: relative;
-          /* transition: all 0.3s ease-in-out; */
         }
 
         span.character-placeholder {
@@ -566,8 +565,8 @@
           display: block;
           padding: 0;
           margin: 0;
-          /* box-shadow: 0 clamp(2px, 0.5vw, 4px) clamp(8px, 1.5vw, 12px) rgba(0, 0, 0, 0.3); */
-          /* border: clamp(2px, 0.3vw, 3px) solid rgba(255, 255, 255, 0.6); */
+          box-shadow: 0 clamp(2px, 0.5vw, 4px) clamp(8px, 1.5vw, 12px) rgba(0, 0, 0, 0.3);
+          border: clamp(2px, 0.3vw, 3px) solid rgba(255, 255, 255, 0.6);
           object-fit: cover;
         }
 
@@ -633,7 +632,7 @@
         font-weight: 700;
       }
 
-      /* p[data-text-alignment="left"]:not(:has([data-is-didaskalia="true"])) {
+      p[data-text-alignment="left"]:not(:has([data-is-didaskalia="true"])) {
         padding: 0;
         text-align: left;
         max-width: 100%;
@@ -656,7 +655,7 @@
         padding-left: 0;
         text-indent: 0;
         margin-left: 0;
-      } */
+      }
 
       p {
         font-family: var(--font-libre-caslon-text);

@@ -252,7 +252,9 @@ export function activateMediaInRange(
     charactersBySlug.set(character.slug, character);
   });
 
-  const paragraphs = document.querySelectorAll<HTMLElement>(`section[data-chapter="${startChapter}"] [data-index], section[data-chapter="${endChapter}"] [data-index]`);
+  const paragraphs = document.querySelectorAll<HTMLElement>(
+    `.content-container section[data-chapter="${startChapter}"] [data-index], section[data-chapter="${endChapter}"] [data-index]`,
+  );
 
   const bufferSize = isPlayFormat ? 6 : 10;
 
@@ -267,9 +269,6 @@ export function activateMediaInRange(
       return isInRange(currentChapter, currentParagraph, startChapter, startParagraph - bufferSize, endChapter, endParagraph + bufferSize);
     }
   });
-
-  const rootEl = document.getElementById("content-container");
-  const rootRect = rootEl?.getBoundingClientRect() ?? null;
 
   const playRows = [];
 
@@ -372,6 +371,7 @@ export function activateMediaInRange(
       }
       characterPlaceholder.dataset.mediaInjected = "true";
     }
+
     activatedMedia.set(index, playRow);
   });
 
