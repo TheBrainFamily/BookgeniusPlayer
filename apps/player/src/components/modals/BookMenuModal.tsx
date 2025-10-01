@@ -185,7 +185,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
         element.dataset.currentScore = bestFit.score.toString();
 
         // 5. Activate character interactions for newly transformed content
-        activateCharacterInteractions(element, openModal);
+        activateCharacterInteractions(element);
       }
     }
   };

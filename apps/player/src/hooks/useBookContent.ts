@@ -93,7 +93,7 @@ export function useBookContent() {
           el.removeAttribute("data-click-listener-attached");
         });
 
-        activateCharacterInteractions(span, openCharacterDetailsModal);
+        activateCharacterInteractions(span);
         return;
       }
 
@@ -105,15 +105,26 @@ export function useBookContent() {
       wrapSimplifiedSentenceTail(span);
 
       // Activate character interactions
-      activateCharacterInteractions(span, openCharacterDetailsModal);
+      activateCharacterInteractions(span);
       setSentenceAsClicked(currentSentenceId);
     },
-    [bookForm, openCharacterDetailsModal],
+    [bookForm],
   );
 
   useEffect(() => {
     containerRef.current = document.getElementById(containerId);
   }, []);
+
+  useEffect(() => {
+    const bookContainer = document.getElementById("book-container");
+    if (bookContainer) {
+      if (bookForm === "play" || bookForm === "mixed") {
+        bookContainer.classList.add("play-mode");
+      } else {
+        bookContainer.classList.remove("play-mode");
+      }
+    }
+  }, [bookForm]);
 
   useEffect(() => {
     currentChapterRef.current = currentChapter;

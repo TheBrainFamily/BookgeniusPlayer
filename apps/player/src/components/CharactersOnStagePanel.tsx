@@ -1,6 +1,5 @@
 import { CSSProperties, useMemo, useState, useEffect, memo } from "react";
 import { motion, Variants } from "motion/react";
-import { ScrollArea } from "@player/components/ui/scroll-area";
 
 import { useCharactersOnStage } from "@player/hooks/useCharactersOnStage";
 import { useCurrentSpeakers } from "@player/hooks/useCurrentSpeakers";
@@ -75,15 +74,14 @@ const CharactersOnStagePanel = () => {
         shouldHideAvatars ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto",
       )}
     >
-      <ScrollArea
-        className="relative w-full h-full"
-        orientation="horizontal"
-        wheelToHorizontal
-        hideScrollbar
-        style={{
-          WebkitMaskImage: "linear-gradient(to right, transparent 0, black 24px, black calc(100% - 24px), transparent 100%)",
-          maskImage: "linear-gradient(to right, transparent 0, black 24px, black calc(100% - 24px), transparent 100%)",
-        }}
+      <div
+        className="relative w-full h-full overflow-x-auto no-scrollbar"
+        // onWheel={(event) => {
+        //   const container = event.currentTarget;
+        //   if (container.scrollWidth <= container.clientWidth) return;
+        //   event.preventDefault();
+        //   container.scrollLeft += event.deltaY;
+        // }}
       >
         <motion.div
           className={cn("min-w-max flex flex-nowrap justify-center gap-2 py-2 px-3 md:px-4 select-none")}
@@ -97,7 +95,7 @@ const CharactersOnStagePanel = () => {
             <CharacterAvatar key={characterEntity.slug} characterEntity={characterEntity} currentSpeakers={currentSpeakers} index={index} />
           ))}
         </motion.div>
-      </ScrollArea>
+      </div>
     </div>
   );
 };
@@ -137,7 +135,7 @@ const CharacterAvatar = memo<CharacterAvatarProps>(({ characterEntity, currentSp
       animate="visible"
       exit="exit"
       custom={index}
-      className="flex-shrink-0 snap-start first-of-type:pl-3 last-of-type:pr-3"
+      className="flex-shrink-0 snap-start"
       role="listitem"
       layoutId={`character-${characterEntity.slug}`}
     >

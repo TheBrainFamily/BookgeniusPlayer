@@ -43,43 +43,13 @@ function extractLocationFromElement(el: HTMLElement): ChapterParagraphRef | null
   return { chapter, paragraph };
 }
 
-export const activateCharacterInteractions = (element: HTMLElement, openCharacterDetailsModal: (params: CharacterModalParams) => void) => {
+export const activateCharacterInteractions = (element: HTMLElement) => {
   setTimeout(() => {
     const characterSpan = element.querySelector<HTMLSpanElement>('.character-highlighted:not([data-click-listener-attached="true"])');
     const characterTalkingSpan = element.querySelector<HTMLSpanElement>('.character-talking:not([data-click-listener-attached="true"])');
 
     if (characterSpan && !characterTalkingSpan) {
-      highlightCharacter(characterSpan, openCharacterDetailsModal);
-    }
-    if (characterTalkingSpan) {
-      const characterSlug = characterTalkingSpan.dataset.character;
-      if (characterSlug) {
-        const characterData = getCharacterDataBySlug(characterSlug);
-        const location = extractLocationFromElement(characterTalkingSpan);
-        const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName }) : null;
-
-        const mediaSrc = snapshot ? snapshot.media.talking || snapshot.media.listening : characterTalkingSpan.dataset.srcTalking || "";
-
-        const handler = (event: PointerEvent) => {
-          event.preventDefault();
-          event.stopPropagation();
-          openCharacterDetailsModal({
-            characterSlug,
-            isVideo: !!mediaSrc && isVideoFile(mediaSrc),
-            mediaSrc: mediaSrc || "",
-            chapter: location?.chapter,
-            paragraph: location?.paragraph,
-          });
-        };
-
-        characterTalkingSpan.addEventListener("pointerup", handler, { passive: false });
-        // Mark to avoid re-attaching
-        characterTalkingSpan.dataset.clickListenerAttached = "true";
-
-        if (snapshot) {
-          characterTalkingSpan.dataset.srcTalking = snapshot.media.talking;
-        }
-      }
+      highlightCharacter(characterSpan);
     }
   }, 0);
 };
