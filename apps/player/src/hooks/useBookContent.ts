@@ -93,7 +93,7 @@ export function useBookContent() {
           el.removeAttribute("data-click-listener-attached");
         });
 
-        activateCharacterInteractions(span, openCharacterDetailsModal);
+        activateCharacterInteractions(span);
         return;
       }
 
@@ -105,10 +105,10 @@ export function useBookContent() {
       wrapSimplifiedSentenceTail(span);
 
       // Activate character interactions
-      activateCharacterInteractions(span, openCharacterDetailsModal);
+      activateCharacterInteractions(span);
       setSentenceAsClicked(currentSentenceId);
     },
-    [bookForm, openCharacterDetailsModal],
+    [bookForm],
   );
 
   useEffect(() => {

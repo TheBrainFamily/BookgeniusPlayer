@@ -184,7 +184,7 @@ function hideFloatingAvatar(requester?: HTMLElement) {
   removalDelayTimeout = window.setTimeout(removeNow, HIDE_TRANSITION_MS);
 }
 
-export function highlightCharacter(characterEl: HTMLSpanElement, openCharacterDetailsModal: (params: CharacterModalParams) => void) {
+export function highlightCharacter(characterEl: HTMLSpanElement) {
   if (initializedCharacters.has(characterEl)) return;
 
   const characterSlug = characterEl.dataset.character;
@@ -204,21 +204,6 @@ export function highlightCharacter(characterEl: HTMLSpanElement, openCharacterDe
   initializedCharacters.add(characterEl);
 
   characterEl.classList.add("character-highlighted-activated");
-
-  characterEl.addEventListener("pointerup", (e: PointerEvent) => {
-    if (e.metaKey || e.ctrlKey) {
-      hideFloatingAvatar();
-      return;
-    }
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    hideFloatingAvatar();
-    const mediaSrcForModal = listeningSrc || "";
-    const isVideoForModal = !!mediaSrcForModal && isVideoFile(mediaSrcForModal);
-    openCharacterDetailsModal({ characterSlug, isVideo: isVideoForModal, mediaSrc: mediaSrcForModal, chapter: location?.chapter, paragraph: location?.paragraph });
-  });
 
   if (!hasListeningMedia) return;
 

@@ -70,29 +70,20 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 
 const onPlayRowCharacterClick = (
   e: PointerEvent,
-  characterPlaceholder: HTMLSpanElement,
-  snapshot: CharacterSnapshot,
+  characterSlug: string,
+  mediaSrc: string,
   location: { chapter: number; paragraph: number },
   openCharacterDetailsModal: (params: CharacterModalParams) => void,
 ) => {
   if (e.metaKey || e.ctrlKey) return;
   e.preventDefault();
   e.stopPropagation();
-
-  const characterSlug = characterPlaceholder?.dataset.character;
-  if (!characterSlug) return;
-
-  const isTalking = characterPlaceholder?.dataset.isTalking === "true";
-
-  const mediaSrc = snapshot ? (isTalking ? snapshot.media.talking : snapshot.media.listening) : "";
-
   openCharacterDetailsModal({ characterSlug, isVideo: !!mediaSrc && isVideoFile(mediaSrc), mediaSrc: mediaSrc || "", chapter: location.chapter, paragraph: location.paragraph });
 };
 
 /** Creates a media container element with CharacterMedia-like structure for inline avatars */
 function createMediaElement(
   placeholder: HTMLSpanElement,
-  openCharacterDetailsModal: (params: CharacterModalParams) => void,
   isPlayFormat: boolean,
   characterData: CharacterData | undefined,
   location: { chapter: number; paragraph: number } | null,
@@ -149,19 +140,6 @@ function createMediaElement(
       container.dataset.hasVideos = "listening-only";
     }
   }
-
-  container.addEventListener("pointerup", (e) => {
-    if (e.metaKey || e.ctrlKey) {
-      return;
-    }
-    e.preventDefault();
-    e.stopPropagation();
-
-    const preferredSrc = isTalking ? talkingSrc : listeningSrc;
-    const mediaSrc = preferredSrc || listeningSrc || talkingSrc || "";
-
-    openCharacterDetailsModal({ characterSlug, isVideo: Boolean(mediaSrc) && isVideoFile(mediaSrc), mediaSrc, chapter: location?.chapter, paragraph: location?.paragraph });
-  });
 
   return container;
 }
@@ -231,7 +209,7 @@ export function activateMediaInRange(
       const index = `${character.dataset.character}-${chapter}-${paragraph}`;
       if (activatedCharacterHighlighted.has(index)) return;
       activatedCharacterHighlighted.set(index, character);
-      highlightCharacter(character, openCharacterDetailsModal);
+      highlightCharacter(character);
     });
 
     playRows.push(p.closest(".play-row") ?? (p as HTMLElement));
@@ -259,7 +237,7 @@ export function activateMediaInRange(
     const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
     const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
 
-    const newMediaElement = createMediaElement(characterPlaceholder, openCharacterDetailsModal, isPlayFormat, characterData, locationForPlaceholder, snapshot);
+    const newMediaElement = createMediaElement(characterPlaceholder, isPlayFormat, characterData, locationForPlaceholder, snapshot);
 
     if (newMediaElement) {
       if (dummyPlaceholder) {
@@ -296,9 +274,18 @@ export const playRowCharacterClickInit = (openCharacterDetailsModal: (params: Ch
   const charactersBySlug = getCharactersBySlug();
 
   contentContainer.addEventListener("pointerup", (e) => {
+    if (e.metaKey || e.ctrlKey) return;
+
     const target = e.target as HTMLElement;
 
-    if (target.tagName !== "STRONG") return;
+    const isStrongTag = target.tagName === "STRONG";
+    const isInlineAvatar = target.closest(".inline-avatar");
+    const isCharacterHighlighted = target.classList.contains("character-highlighted-activated");
+
+    if (!isStrongTag && !isInlineAvatar && !isCharacterHighlighted) return;
+
+    e.preventDefault();
+    e.stopPropagation();
 
     const playRow = target.closest(".play-row");
 
@@ -309,19 +296,28 @@ export const playRowCharacterClickInit = (openCharacterDetailsModal: (params: Ch
 
     if (!playRowCharacter || !characterPlaceholder) return;
 
-    const currentChapter = playRow.closest("[data-chapter]")?.getAttribute("data-chapter");
-    const currentParagraph = playRow.closest("[data-index]")?.getAttribute("data-index");
+    const currentChapterStr = playRow.closest("[data-chapter]")?.getAttribute("data-chapter");
+    const currentParagraphStr = playRow.querySelector("[data-index]")?.getAttribute("data-index");
 
-    const characterSlug = characterPlaceholder.dataset.character;
+    const currentChapterInt = parseInt(currentChapterStr, 10);
+    const currentParagraphInt = parseInt(currentParagraphStr, 10);
+
+    const characterSlug = isCharacterHighlighted ? target.dataset.character : characterPlaceholder.dataset.character;
+    const isTalking = characterPlaceholder?.dataset.isTalking === "true";
 
     const characterData = charactersBySlug.get(characterSlug);
     const snapshot = characterData
-      ? resolveCharacterSnapshot(characterData, {
-          location: { chapter: parseInt(currentChapter, 10), paragraph: parseInt(currentParagraph, 10) },
-          fallbackDisplayName: characterData.characterName,
-        })
+      ? resolveCharacterSnapshot(characterData, { location: { chapter: currentChapterInt, paragraph: currentParagraphInt }, fallbackDisplayName: characterData.characterName })
       : null;
 
-    onPlayRowCharacterClick(e, characterPlaceholder, snapshot, { chapter: parseInt(currentChapter, 10), paragraph: parseInt(currentParagraph, 10) }, openCharacterDetailsModal);
+    const mediaSrc = snapshot ? (isTalking ? snapshot.media.talking : snapshot.media.listening) : "";
+
+    openCharacterDetailsModal({
+      characterSlug,
+      isVideo: !!mediaSrc && isVideoFile(mediaSrc),
+      mediaSrc: mediaSrc || "",
+      chapter: currentChapterInt,
+      paragraph: currentParagraphInt,
+    });
   });
 };
