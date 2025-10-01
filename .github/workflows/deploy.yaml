@@ -178,7 +178,6 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_AUTH_PROVIDER: ${{ vars.VITE_AUTH_PROVIDER }}
           VITE_PAYMENTS_PROVIDER: ${{ vars.VITE_PAYMENTS_PROVIDER }}
-          VITE_CLERK_DOMAIN: "bookgeniusz.pl"
           VITE_SUPPORT_EMAIL: support@bookgeniusz.pl
           CI: true
 
