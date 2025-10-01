@@ -1401,23 +1401,17 @@ section[data-chapter] [data-index] {
   has a child with the class .play-container.
 */
 
-
-
-/*#book-container:has(#content-container .play-container) {*/
 #book-container.play-mode {
   padding: 0;
 }
 
 /* When in 'play' mode, find and hide the side note containers. */
-/*#book-container:has(#content-container .play-container) #left-notes,*/
-/*#book-container:has(#content-container .play-container) #right-notes {*/
 #book-container.play-mode #left-notes,
 #book-container.play-mode #right-notes {
   display: none;
 }
 
 /* When in 'play' mode, reset the content container's constraints. */
-/*#book-container:has(#content-container .play-container) #content-container {*/
 #book-container.play-mode #content-container {
   /* Resets the flex-grow (sm:flex-3) and max-width (max-w-[900px]) so the play's content can define its own width.  */
   flex: initial;

@@ -147,9 +147,9 @@ function createMediaElement(
 function createDummyElement(characterPlaceholder: HTMLSpanElement) {
   const dummyElement = document.createElement("span");
   dummyElement.classList.add("dummy-avatar-placeholder", "inline-avatar");
-  const img = characterPlaceholder.querySelector<HTMLImageElement>("img").cloneNode(true) as HTMLImageElement;
+  const img = characterPlaceholder.querySelector<HTMLImageElement>("img");
   if (img) {
-    dummyElement.appendChild(img);
+    dummyElement.appendChild(img.cloneNode(true));
   }
   return dummyElement;
 }
@@ -228,7 +228,16 @@ export function activateMediaInRange(
 
     // needed for indexing the play row in activatedMedia Map
     const characterText = playRow.querySelector(".character-text");
-    const index = `${characterSlug}-${characterText?.firstElementChild.getAttribute("data-index")}-${characterText?.lastElementChild.getAttribute("data-index")}`;
+
+    const firstParagraphIndex = characterText?.firstElementChild?.getAttribute("data-index");
+    const lastParagraphIndex = characterText?.lastElementChild?.getAttribute("data-index");
+
+    if (!firstParagraphIndex && !lastParagraphIndex) {
+      console.warn(`Could not generate a unique index for character row: ${characterSlug}`);
+      return;
+    }
+
+    const index = `${characterSlug}-${firstParagraphIndex}-${lastParagraphIndex}`;
 
     if (activatedMedia.has(index)) return;
 
@@ -302,7 +311,12 @@ export const playRowCharacterClickInit = (openCharacterDetailsModal: (params: Ch
     const currentChapterInt = parseInt(currentChapterStr, 10);
     const currentParagraphInt = parseInt(currentParagraphStr, 10);
 
+    if (isNaN(currentChapterInt) || isNaN(currentParagraphInt)) return;
+
     const characterSlug = isCharacterHighlighted ? target.dataset.character : characterPlaceholder.dataset.character;
+
+    if (!characterSlug.trim()) return;
+
     const isTalking = characterPlaceholder?.dataset.isTalking === "true";
 
     const characterData = charactersBySlug.get(characterSlug);
