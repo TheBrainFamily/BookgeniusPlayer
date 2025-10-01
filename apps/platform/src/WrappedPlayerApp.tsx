@@ -8,6 +8,7 @@ import { bookDataLoader } from "../../player/src/services/bookDataLoader";
 import Paywall from "./components/Paywall";
 import AuthRequiredModal from "./components/AuthRequiredModal";
 import { teardownPlayer } from "../../player/src/teardown";
+import { useAuth } from "./hooks/useAuth";
 
 const PlayerApp = React.lazy(() => import("./player/PlayerRoot"));
 const PAYWALL_FADE_MS = 300;
@@ -16,6 +17,7 @@ const AUTH_MODAL_FADE_MS = 300;
 const WrappedPlayerApp = () => {
   const [searchParams] = useSearchParams();
   const { startTransition, finishTransition, cancelTransition, navigatedFromPlatform, setNavigatedFromPlatform, updateTransitionMeta, navigating } = useRouteTransition();
+  const auth = useAuth();
 
   const book = searchParams.get("book");
 
@@ -126,8 +128,7 @@ const WrappedPlayerApp = () => {
     return () => window.removeEventListener("appReady", onReady);
   }, [safeFinish, navigatedFromPlatform, updateTransitionMeta, handleStartClick]);
 
-  // Ensure loader shows on direct loads to /reader/?book=...
-  // We now start the transition exactly once per book change (not on isPlayerReady changes)
+  // Handle book changes and setup/transition logic
   useEffect(() => {
     if (book !== lastBookRef.current) {
       // Reset per-book guards
@@ -158,38 +159,50 @@ const WrappedPlayerApp = () => {
       }
 
       bookDataLoader.setCurrentBook(book);
-
-      if (import.meta.env.DEV) {
-        bookDataLoader.setAssetBase(`/books/${book}/`);
-        setAssetBaseReady(true);
-        return;
-      }
-
-      (async () => {
-        setAssetBaseReady(false);
-
-        try {
-          const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
-          if (!res.ok) throw new Error("[RESOLVE] resolve failed");
-          const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
-
-          // accept either shape; you already parse full URL in setAssetBase
-          bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
-          bookDataLoader.setBookVisibility(visibility);
-          // optional warm HEAD for index.html to reduce first-media latency (fire-and-forget)
-          // try { fetch(`${assetBase}index.html`, { method: "HEAD", cache: "no-store" }); } catch (_) {}
-          setAssetBaseReady(true);
-        } catch (err: unknown) {
-          if (typeof err === "object" && err !== null && "name" in err && (err as { name?: string }).name === "AbortError") {
-            return;
-          }
-          console.error("[RESOLVE] error:", err);
-          bookDataLoader.setAssetBase(null); // fallback to old API path
-          setAssetBaseReady(true);
-        }
-      })();
     }
   }, [book, navigatedFromPlatform, navigating, startTransition, handleStartClick]);
+
+  // Handle asset base resolution - waits for both book and auth to be ready
+  useEffect(() => {
+    if (!book) {
+      return;
+    }
+
+    if (import.meta.env.DEV) {
+      bookDataLoader.setAssetBase(`/books/${book}/`);
+      setAssetBaseReady(true);
+      return;
+    }
+
+    // Wait for auth to be ready before fetching (ensures session cookies are set)
+    if (!auth.ready) {
+      return;
+    }
+
+    (async () => {
+      setAssetBaseReady(false);
+
+      try {
+        const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
+        if (!res.ok) throw new Error("[RESOLVE] resolve failed");
+        const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
+
+        // accept either shape; you already parse full URL in setAssetBase
+        bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
+        bookDataLoader.setBookVisibility(visibility);
+        // optional warm HEAD for index.html to reduce first-media latency (fire-and-forget)
+        // try { fetch(`${assetBase}index.html`, { method: "HEAD", cache: "no-store" }); } catch (_) {}
+        setAssetBaseReady(true);
+      } catch (err: unknown) {
+        if (typeof err === "object" && err !== null && "name" in err && (err as { name?: string }).name === "AbortError") {
+          return;
+        }
+        console.error("[RESOLVE] error:", err);
+        bookDataLoader.setAssetBase(null); // fallback to old API path
+        setAssetBaseReady(true);
+      }
+    })();
+  }, [book, auth.ready]);
 
   // On unmount (leaving /reader), fully tear down the player environment
   useEffect(() => {
