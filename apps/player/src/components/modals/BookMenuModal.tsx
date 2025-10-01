@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, memo } from "react";
-import { List, Type, RotateCcw, BrainCircuit, BarChart3, ArrowLeft } from "lucide-react";
+import { List, Type, RotateCcw, BrainCircuit, BarChart3, ArrowLeft, History, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useLocalStorageState from "use-local-storage-state";
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
@@ -13,7 +13,9 @@ import { activateCharacterInteractions } from "@player/helpers/activateCharacter
 import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHtmlTags";
 import { getAllVariants } from "@player/genericBookDataGetters/getAllVariants";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
-import { getCurrentLocation, systemNavigateTo } from "@player/helpers/paragraphsNavigation";
+import { getCurrentLocation, systemNavigateTo, getSavedLocation } from "@player/helpers/paragraphsNavigation";
+import { getPositionHistory, getCurrentPlatformAndBook } from "@player/services/readingPositionApi";
+import { calculateReadingStats, formatReadingTime } from "@player/helpers/calculateReadingStats";
 
 const AnimatedFontSize: React.FC<{ value: number; isChanging: boolean }> = memo(({ value, isChanging }) => {
   const [currentDisplayValue, setCurrentDisplayValue] = useState(value);
@@ -57,13 +59,14 @@ interface BookMenuModalProps {
   onClose: () => void;
   openBookChapterModal: () => void;
   openApiKeyModal: () => void;
+  openPositionHistoryModal: () => void;
   resetFurthestPageLocation: () => void;
 }
 
 const SLIDER_DELAY = 200;
 const OVERLAY_TIMEOUT = 1500;
 
-const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, openApiKeyModal, resetFurthestPageLocation }) => {
+const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, openApiKeyModal, openPositionHistoryModal, resetFurthestPageLocation }) => {
   const { t } = useTranslation();
   const allVariants = getAllVariants();
   const { openModal } = useCharacterModal();
@@ -79,6 +82,29 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const isVisible = useRef(allVariants.length > 0);
 
   const bookLocation = useRef(getCurrentLocation());
+
+  // Reading stats state
+  const [readingStats, setReadingStats] = useState<{ estimatedTimeRemaining: string; totalReadingTime: string } | null>(null);
+
+  // Load reading stats on mount
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const { platformId, bookSlug } = getCurrentPlatformAndBook();
+        const history = await getPositionHistory(platformId, bookSlug, 100);
+        const saved = getSavedLocation();
+        const currentProgress = saved?.progress ?? null;
+
+        const stats = calculateReadingStats(history, currentProgress);
+
+        setReadingStats({ estimatedTimeRemaining: formatReadingTime(stats.estimatedMinutesRemaining), totalReadingTime: formatReadingTime(stats.totalReadingTimeMinutes) });
+      } catch (error) {
+        console.warn("Failed to load reading stats:", error);
+      }
+    };
+
+    loadStats();
+  }, []);
 
   const handleFontSizePreset = (size: number) => {
     setHideOverlay(true);
@@ -290,7 +316,44 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             <BrainCircuit className="mr-2 h-4 w-4" />
             {t("set_openai_api_key")}
           </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
+            onPointerUp={() => {
+              openPositionHistoryModal();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                openPositionHistoryModal();
+              }
+            }}
+          >
+            <History className="mr-2 h-4 w-4" />
+            {t("position_history") || "Reading History"}
+          </Button>
         </div>
+
+        {/* Reading Stats */}
+        {readingStats && (
+          <div className="mb-4 p-3 rounded-lg bg-black/30 border border-white/10">
+            <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
+              <Clock className="w-3 h-3" />
+              <span>{t("reading_stats") || "Reading Stats"}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm text-white">
+              <div>
+                <div className="text-xs text-gray-400">{t("time_remaining") || "Time Remaining"}</div>
+                <div className="font-medium">{readingStats.estimatedTimeRemaining}</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-400">{t("total_reading_time") || "Total Reading Time"}</div>
+                <div className="font-medium">{readingStats.totalReadingTime}</div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col gap-2 book-settings-container">
           <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full book-settings-control-box")}>
             <div className="space-y-4 book-settings-control-box-inner">

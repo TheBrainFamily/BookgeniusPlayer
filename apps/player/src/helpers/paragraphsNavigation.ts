@@ -120,29 +120,41 @@ let _bridge: Bridge = {
 export const __setLocationBridge = (b: Bridge) => (_bridge = b);
 
 /* ------------------------------------------------------------------ */
+/*  Extended location with timestamp and progress                     */
+export interface ExtendedLocation extends Location {
+  timestamp?: number;
+  progress?: number | null;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Furthest‑location helpers                                         */
 export const getFurthestLocationKey = (): string => {
   const currentBook = bookDataLoader.getCurrentBook();
   return `furthestLocation_${currentBook}`;
 };
 
-export const getSavedLocation = (): Location | null => {
+export const getSavedLocation = (): ExtendedLocation | null => {
   try {
     const key = getFurthestLocationKey();
     const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    // Handle both old format (plain Location) and new format (ExtendedLocation)
+    return parsed;
   } catch {
     return null;
   }
 };
 
-export const setSavedLocation = (loc: Location) => {
+export const setSavedLocation = (loc: Location | ExtendedLocation, progress?: number | null) => {
   try {
     const key = getFurthestLocationKey();
-    localStorage.setItem(key, JSON.stringify(loc));
+    const extended: ExtendedLocation = { ...loc, timestamp: Date.now(), progress: progress ?? (loc as ExtendedLocation).progress ?? null };
+    localStorage.setItem(key, JSON.stringify(extended));
     // Notify listeners that the furthest saved location advanced
     try {
-      const evt = new CustomEvent("furthestLocationUpdated", { detail: loc });
+      const evt = new CustomEvent("furthestLocationUpdated", { detail: extended });
       window.dispatchEvent(evt);
     } catch {
       // In very old browsers CustomEvent might fail; ignore.
@@ -189,6 +201,14 @@ export const setCurrentLocation = (loc: Location, options: { updateHash?: boolea
     const isAhead = loc.currentChapter > saved.currentChapter || (loc.currentChapter === saved.currentChapter && loc.currentParagraph > saved.currentParagraph);
 
     if (isAhead) setSavedLocation(loc);
+  }
+
+  // Track position changes for remote sync (only for user-driven changes, not system navigation)
+  if (!systemNavigationInProgress) {
+    // Import lazily to avoid circular dependencies
+    import("@player/services/readingPositionTracker").then(({ readingPositionTracker }) => {
+      readingPositionTracker.onLocationChange(loc);
+    });
   }
 };
 
@@ -480,11 +500,20 @@ export const parseLocationFromHash = (): Location | null => {
 
 /* ------------------------------------------------------------------ */
 /*  Initial Load from URL Hash                                        */
-export const goToInitialLocationFromHash = () => {
+export const goToInitialLocationFromHash = async () => {
+  // First, reconcile local vs remote position
+  try {
+    const { initializeReadingPosition } = await import("@player/services/initializeReadingPosition");
+    await initializeReadingPosition();
+  } catch (error) {
+    console.warn("Failed to reconcile remote reading position:", error);
+  }
+
   const locationFromHash = parseLocationFromHash();
 
   if (locationFromHash) {
     // Use system navigation for the initial load from hash
+    // But the furthest saved location has been updated by reconciliation
     systemNavigateTo({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph }, { history: "replace" });
   } else {
     // Fallback if hash is invalid or missing: go to furthest saved location

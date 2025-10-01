@@ -7,6 +7,7 @@ import { EditorModeModalRenderer } from "./modals/editorMode/EditorModeModalRend
 import { ApiKeyModalRenderer } from "./modals/apiKey/ApiKeyModalRenderer";
 import { SentenceModalRenderer } from "./modals/sentence/SentenceModalRenderer";
 import { DeepResearchModalRenderer } from "@player/features/modals/deepResearch/DeepResearchModalRenderer";
+import { PositionHistoryModalRenderer } from "./modals/positionHistory/PositionHistoryModalRenderer";
 
 export const ModalRenderers: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ export const ModalRenderers: React.FC = () => {
       <DeepResearchModalRenderer />
       <BookChapterModalRenderer />
       <BookMenuModalRenderer />
+      <PositionHistoryModalRenderer />
       <EditorModeModalRenderer />
       <ApiKeyModalRenderer />
       <SentenceModalRenderer />

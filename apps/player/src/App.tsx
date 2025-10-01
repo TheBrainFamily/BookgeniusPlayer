@@ -35,6 +35,7 @@ import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { languageNameToCode } from "@player/helpers/languageNameToCode";
 import { usePaywall } from "./hooks/usePaywall";
 import i18n from "./i18n";
+import { setupUnloadHandlers } from "./services/setupUnloadHandlers";
 
 function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   setKnownVideos(getKnownVideoFiles());
@@ -110,6 +111,12 @@ export default function App() {
 
     document.documentElement.style.setProperty("--font-size-multiplier", String(fontSize));
   }, [fontSize]);
+
+  // Setup unload handlers for saving reading position
+  useEffect(() => {
+    const cleanup = setupUnloadHandlers();
+    return cleanup;
+  }, []);
 
   return (
     <I18nextProvider i18n={i18n}>
