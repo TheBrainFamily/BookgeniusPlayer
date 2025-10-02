@@ -128,7 +128,7 @@ export function activateMediaInRange(
     `.content-container section[data-chapter="${startChapter}"] [data-index], section[data-chapter="${endChapter}"] [data-index]`,
   );
 
-  const bufferSize = isPlayFormat ? -4 : 10;
+  const bufferSize = isPlayFormat ? 5 : 10;
 
   const paragraphsInRange = Array.from(paragraphs).filter((paragraph) => {
     const chapterElement = paragraph.closest("section[data-chapter]") as HTMLElement;
@@ -188,36 +188,50 @@ export function activateMediaInRange(
     const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
     const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
 
-    if (shouldCreateVideos && snapshot && !isMobile) {
-      // Searching for the active paragraph within the current play row
-      const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
-      const activePlayRow = activeParagraph?.closest(".play-row");
+    if (shouldCreateVideos && snapshot && !isMobile()) {
+      // Check if this play row is in the exact range (without buffer)
+      const playRowChapter = parseInt(playRow.closest("[data-chapter]")?.getAttribute("data-chapter") || "0", 10);
+      const playRowParagraph = parseInt(firstParagraphIndex || "0", 10);
 
-      const isTalking = activePlayRow === playRow;
-      const desiredState = isTalking ? "speaks" : "listens";
-      const videoSrc = isTalking ? snapshot.media.talking : snapshot.media.listening;
+      // Create a narrower range for video (1 paragraph less on each side)
+      const videoStartParagraph = Math.max(0, startParagraph + 1);
+      const videoEndParagraph = Math.max(0, endParagraph - 1);
 
-      const inlineAvatar = characterPlaceholder.querySelector(".inline-avatar");
-      const existingVideo = inlineAvatar?.querySelector("video");
+      // Only check if the narrower range is valid
+      const isValidNarrowRange = videoStartParagraph <= videoEndParagraph;
+      const isInExactRange = isValidNarrowRange && isInRange(playRowChapter, playRowParagraph, startChapter, videoStartParagraph, endChapter, videoEndParagraph);
 
-      if (existingVideo) {
-        const currentState = existingVideo.dataset.state;
-        // Normalize URLs for comparison
-        const currentSrcNormalized = existingVideo.src.split("/").pop() || "";
-        const videoSrcNormalized = videoSrc?.split("/").pop() || "";
+      if (isInExactRange) {
+        // Searching for the active paragraph within the current play row
+        const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
+        const activePlayRow = activeParagraph?.closest(".play-row");
 
-        // Only update if state or source needs to change
-        if (currentState !== desiredState || currentSrcNormalized !== videoSrcNormalized) {
-          if (videoSrc && isVideoFile(videoSrc)) {
-            existingVideo.src = videoSrc;
-            existingVideo.dataset.state = desiredState;
-            existingVideo.play().catch((e) => console.warn("Video play failed:", e));
+        const isTalking = activePlayRow === playRow;
+        const desiredState = isTalking ? "speaks" : "listens";
+        const videoSrc = isTalking ? snapshot.media.talking : snapshot.media.listening;
+
+        const inlineAvatar = characterPlaceholder.querySelector(".inline-avatar");
+        const existingVideo = inlineAvatar?.querySelector("video");
+
+        if (existingVideo) {
+          const currentState = existingVideo.dataset.state;
+          // Normalize URLs for comparison
+          const currentSrcNormalized = existingVideo.src.split("/").pop() || "";
+          const videoSrcNormalized = videoSrc?.split("/").pop() || "";
+
+          // Only update if state or source needs to change
+          if (currentState !== desiredState || currentSrcNormalized !== videoSrcNormalized) {
+            if (videoSrc && isVideoFile(videoSrc)) {
+              existingVideo.src = videoSrc;
+              existingVideo.dataset.state = desiredState;
+              existingVideo.play().catch((e) => console.warn("Video play failed:", e));
+            }
           }
+          // If state and source match - do nothing, let it continue playing
+        } else if (videoSrc && isVideoFile(videoSrc)) {
+          const video = createVideoElement(videoSrc, desiredState);
+          inlineAvatar?.appendChild(video);
         }
-        // If state and source match - do nothing, let it continue playing
-      } else if (videoSrc && isVideoFile(videoSrc)) {
-        const video = createVideoElement(videoSrc, desiredState);
-        inlineAvatar?.appendChild(video);
       }
     }
 
