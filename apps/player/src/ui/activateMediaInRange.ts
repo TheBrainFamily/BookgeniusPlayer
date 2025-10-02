@@ -162,13 +162,10 @@ export function activateMediaInRange(
   const uniquePlayRows = [...new Set(playRows)];
 
   uniquePlayRows.forEach((playRow: HTMLElement) => {
-    const characterPlaceholder = playRow.querySelector<HTMLSpanElement>(".character-placeholder");
+    // Change: Query all character placeholders instead of just one
+    const characterPlaceholders = playRow.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
-    if (!characterPlaceholder) return;
-
-    const characterSlug = characterPlaceholder.dataset.character;
-
-    if (!characterSlug.trim()) return;
+    if (!characterPlaceholders.length) return;
 
     // needed for indexing the play row in activatedMedia Map
     const characterText = playRow.querySelector(".character-text");
@@ -176,94 +173,98 @@ export function activateMediaInRange(
     const firstParagraphIndex = characterText?.firstElementChild?.getAttribute("data-index");
     const lastParagraphIndex = characterText?.lastElementChild?.getAttribute("data-index");
 
-    if (!firstParagraphIndex && !lastParagraphIndex) {
-      console.warn(`Could not generate a unique index for character row: ${characterSlug}`);
-      return;
-    }
+    if (!firstParagraphIndex && !lastParagraphIndex) return;
 
-    const index = `${characterSlug}-${firstParagraphIndex}-${lastParagraphIndex}`;
+    // Iterate through each character placeholder
+    characterPlaceholders.forEach((characterPlaceholder) => {
+      const characterSlug = characterPlaceholder.dataset.character;
 
-    const locationForPlaceholder = { chapter: startChapter, paragraph: startParagraph };
-    const characterData = charactersBySlug.get(characterSlug);
-    const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
-    const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
+      if (!characterSlug?.trim()) return;
 
-    if (shouldCreateVideos && snapshot && !isMobile()) {
-      // Check if this play row is in the exact range (without buffer)
-      const playRowChapter = parseInt(playRow.closest("[data-chapter]")?.getAttribute("data-chapter") || "0", 10);
-      const playRowParagraph = parseInt(firstParagraphIndex || "0", 10);
+      const index = `${characterSlug}-${firstParagraphIndex}-${lastParagraphIndex}`;
 
-      // Create a narrower range for video (1 paragraph less on each side)
-      const videoStartParagraph = Math.max(0, startParagraph + 1);
-      const videoEndParagraph = Math.max(0, endParagraph - 1);
+      const locationForPlaceholder = { chapter: startChapter, paragraph: startParagraph };
+      const characterData = charactersBySlug.get(characterSlug);
+      const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
+      const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
 
-      // Only check if the narrower range is valid
-      const isValidNarrowRange = videoStartParagraph <= videoEndParagraph;
-      const isInExactRange = isValidNarrowRange && isInRange(playRowChapter, playRowParagraph, startChapter, videoStartParagraph, endChapter, videoEndParagraph);
+      if (shouldCreateVideos && snapshot && !isMobile()) {
+        // Check if this play row is in the exact range (without buffer)
+        const playRowChapter = parseInt(playRow.closest("[data-chapter]")?.getAttribute("data-chapter") || "0", 10);
+        const playRowParagraph = parseInt(firstParagraphIndex || "0", 10);
 
-      if (isInExactRange) {
-        // Searching for the active paragraph within the current play row
-        const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
-        const activePlayRow = activeParagraph?.closest(".play-row");
+        // Create a narrower range for video (1 paragraph less on each side)
+        const videoStartParagraph = Math.max(0, startParagraph + 1);
+        const videoEndParagraph = Math.max(0, endParagraph - 1);
 
-        const isTalking = activePlayRow === playRow;
-        const desiredState = isTalking ? "speaks" : "listens";
-        const videoSrc = isTalking ? snapshot.media.talking : snapshot.media.listening;
+        // Only check if the narrower range is valid
+        const isValidNarrowRange = videoStartParagraph <= videoEndParagraph;
+        const isInExactRange = isValidNarrowRange && isInRange(playRowChapter, playRowParagraph, startChapter, videoStartParagraph, endChapter, videoEndParagraph);
 
-        const inlineAvatar = characterPlaceholder.querySelector(".inline-avatar");
-        const existingVideo = inlineAvatar?.querySelector("video");
+        if (isInExactRange) {
+          // Searching for the active paragraph within the current play row
+          const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
+          const activePlayRow = activeParagraph?.closest(".play-row");
 
-        if (existingVideo) {
-          const currentState = existingVideo.dataset.state;
-          // Normalize URLs for comparison
-          const currentSrcNormalized = existingVideo.src.split("/").pop() || "";
-          const videoSrcNormalized = videoSrc?.split("/").pop() || "";
+          const isTalking = activePlayRow === playRow;
+          const desiredState = isTalking ? "speaks" : "listens";
+          const videoSrc = isTalking ? snapshot.media.talking : snapshot.media.listening;
 
-          // Only update if state or source needs to change
-          if (currentState !== desiredState || currentSrcNormalized !== videoSrcNormalized) {
-            if (videoSrc && isVideoFile(videoSrc)) {
-              existingVideo.src = videoSrc;
-              existingVideo.dataset.state = desiredState;
-              existingVideo.play().catch((e) => console.warn("Video play failed:", e));
+          const inlineAvatar = characterPlaceholder.querySelector(".inline-avatar");
+          const existingVideo = inlineAvatar?.querySelector("video");
+
+          if (existingVideo) {
+            const currentState = existingVideo.dataset.state;
+            // Normalize URLs for comparison
+            const currentSrcNormalized = existingVideo.src.split("/").pop() || "";
+            const videoSrcNormalized = videoSrc?.split("/").pop() || "";
+
+            // Only update if state or source needs to change
+            if (currentState !== desiredState || currentSrcNormalized !== videoSrcNormalized) {
+              if (videoSrc && isVideoFile(videoSrc)) {
+                existingVideo.src = videoSrc;
+                existingVideo.dataset.state = desiredState;
+                existingVideo.play().catch((e) => console.warn("Video play failed:", e));
+              }
             }
+            // If state and source match - do nothing, let it continue playing
+          } else if (videoSrc && isVideoFile(videoSrc)) {
+            const video = createVideoElement(videoSrc, desiredState);
+            inlineAvatar?.appendChild(video);
           }
-          // If state and source match - do nothing, let it continue playing
-        } else if (videoSrc && isVideoFile(videoSrc)) {
-          const video = createVideoElement(videoSrc, desiredState);
-          inlineAvatar?.appendChild(video);
         }
       }
-    }
 
-    if (activatedMedia.has(index)) return;
+      if (activatedMedia.has(index)) return;
 
-    const newMediaElement = createMediaElement(characterPlaceholder, characterData, locationForPlaceholder, snapshot);
+      const newMediaElement = createMediaElement(characterPlaceholder, characterData, locationForPlaceholder, snapshot);
 
-    if (newMediaElement) {
-      const existingInlineAvatar = characterPlaceholder.querySelector(".inline-avatar");
-      if (!existingInlineAvatar) {
-        if (dummyPlaceholder) {
-          characterPlaceholder.replaceChild(newMediaElement, dummyPlaceholder);
-        } else {
-          characterPlaceholder.appendChild(newMediaElement);
+      if (newMediaElement) {
+        const existingInlineAvatar = characterPlaceholder.querySelector(".inline-avatar");
+        if (!existingInlineAvatar) {
+          if (dummyPlaceholder) {
+            characterPlaceholder.replaceChild(newMediaElement, dummyPlaceholder);
+          } else {
+            characterPlaceholder.appendChild(newMediaElement);
+          }
+          characterPlaceholder.dataset.mediaInjected = "true";
         }
-        characterPlaceholder.dataset.mediaInjected = "true";
       }
-    }
 
-    activatedMedia.set(index, playRow);
+      activatedMedia.set(index, playRow);
+    });
   });
 
   // Here we clean up the activated media
   activatedMedia.forEach((playRow, index) => {
     if (!uniquePlayRows.includes(playRow as HTMLElement)) {
-      const characterPlaceholder = playRow.querySelector<HTMLSpanElement>(".character-placeholder");
+      // Clean up all character placeholders in this play row
+      const characterPlaceholders = playRow.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
-      if (characterPlaceholder) {
+      characterPlaceholders.forEach((characterPlaceholder) => {
         const dummyElement = createDummyElement(characterPlaceholder);
-
         characterPlaceholder.replaceChildren(dummyElement);
-      }
+      });
 
       activatedMedia.delete(index);
     }
