@@ -1,6 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { instructions } from "@player/utils/conversation_config.js";
-import { ANSWERS_SERVER_URL } from "@player/lib/consts";
 import { RealtimeAgent, RealtimeSession, tool } from "@openai/agents-realtime";
 import { loadCharactersData, getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import { useLocation } from "@player/state/LocationContext";
