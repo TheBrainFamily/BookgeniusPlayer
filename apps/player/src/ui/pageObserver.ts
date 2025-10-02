@@ -55,15 +55,25 @@ const getParagraphInfo = (element: Element): { chapter: number | null; paragraph
 };
 
 /** RAF scheduler to coalesce many requests into one paint */
-function makeRafScheduler(fn: () => void) {
+function makeRafScheduler<Args extends unknown[]>(fn: (...args: Args) => void) {
   let scheduled = false;
-  return () => {
+  let lastArgs: Args | null = null;
+
+  return (...args: Args) => {
+    lastArgs = args;
+
     if (scheduled) return;
 
     scheduled = true;
     requestAnimationFrame(() => {
       scheduled = false;
-      fn();
+      const argsToInvoke = lastArgs;
+      lastArgs = null;
+      if (argsToInvoke) {
+        fn(...argsToInvoke);
+      } else {
+        fn(...([] as unknown as Args));
+      }
     });
   };
 }
@@ -113,7 +123,9 @@ export function setupPageObserver(
     );
   };
 
-  const processIntersections = () => {
+  type ProcessIntersectionsOptions = { shouldCreateVideos?: boolean };
+
+  const processIntersections = ({ shouldCreateVideos = false }: ProcessIntersectionsOptions = {}) => {
     const rootRect = observerOptions.root.getBoundingClientRect();
     const topMultiplier = 0.35; // 35vh focus zone start
     let bottomMultiplier = 0.55; // 10vh focus zone height (default)
@@ -246,7 +258,6 @@ export function setupPageObserver(
         hideVisualizer(activeElementVisualizer);
       }
     }
-
     if (intersectingPages.size > 0) {
       // Filter intersecting pages to find those overlapping the focus zone
       const focusedPages = Array.from(intersectingPages).filter((element) => {
@@ -307,7 +318,7 @@ export function setupPageObserver(
           }
         }
 
-        if (topElementChanged || bottomElementChanged || activeParagraphChanged) {
+        if (topElementChanged || bottomElementChanged || activeParagraphChanged || shouldCreateVideos) {
           // Update persisted state with the NEW DOM element references for the next comparison cycle
           currentlyActivePageElement = topFocusedPageElement;
           currentlyLastActivePageElement = bottomFocusedPageElement;
@@ -414,9 +425,17 @@ export function setupPageObserver(
             if (allIntersectingParagraphs.length > 0) {
               const mediaStartInfo = allIntersectingParagraphs[0];
               const mediaEndInfo = allIntersectingParagraphs[allIntersectingParagraphs.length - 1];
-              activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, openCharacterDetailsModal, isPlayFormat);
+              activateMediaInRange(
+                mediaStartInfo.chapter,
+                mediaStartInfo.paragraph,
+                mediaEndInfo.chapter,
+                mediaEndInfo.paragraph,
+                openCharacterDetailsModal,
+                isPlayFormat,
+                shouldCreateVideos,
+              );
             } else {
-              activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal, isPlayFormat);
+              activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal, isPlayFormat, shouldCreateVideos);
             }
           } else {
             console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {
@@ -454,12 +473,23 @@ export function setupPageObserver(
     }
   };
 
-  const scheduledProcessIntersections = makeRafScheduler(processIntersections);
-  window.addEventListener("resize", scheduledProcessIntersections);
-  window.addEventListener("orientationchange", scheduledProcessIntersections);
+  const scheduledProcessIntersections = makeRafScheduler((options?: ProcessIntersectionsOptions) => {
+    processIntersections(options);
+  });
 
-  // ----------------------------------------------------------
-  const observer = new IntersectionObserver((entries) => {
+  const handleResize = () => scheduledProcessIntersections();
+  const handleOrientationChange = () => scheduledProcessIntersections();
+
+  window.addEventListener("resize", handleResize);
+  window.addEventListener("orientationchange", handleOrientationChange);
+
+  const SCROLL_END_DEBOUNCE_MS = 150;
+  let scrollEndTimeoutId: ReturnType<typeof window.setTimeout> | null = null;
+  // Flag toggled by the scroll-end detector so we log once from the observer callback.
+  let shouldLogAfterScrollEnd = false;
+  let lastObserverEntries: IntersectionObserverEntry[] = [];
+
+  const handleIntersectionEntries = (entries: IntersectionObserverEntry[]) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         intersectingPages.add(entry.target);
@@ -468,8 +498,35 @@ export function setupPageObserver(
       }
     });
 
-    scheduledProcessIntersections();
+    if (shouldLogAfterScrollEnd) {
+      scheduledProcessIntersections({ shouldCreateVideos: true });
+      shouldLogAfterScrollEnd = false;
+      return;
+    } else {
+      scheduledProcessIntersections();
+    }
+  };
+
+  // ----------------------------------------------------------
+  const observer = new IntersectionObserver((entries) => {
+    lastObserverEntries = entries;
+    handleIntersectionEntries(entries);
   }, observerOptions);
+
+  const handleRootScroll = () => {
+    if (scrollEndTimeoutId !== null) {
+      window.clearTimeout(scrollEndTimeoutId);
+    }
+
+    shouldLogAfterScrollEnd = false;
+
+    scrollEndTimeoutId = window.setTimeout(() => {
+      shouldLogAfterScrollEnd = true;
+      handleIntersectionEntries(lastObserverEntries);
+    }, SCROLL_END_DEBOUNCE_MS);
+  };
+
+  rootEl.addEventListener("scroll", handleRootScroll, { passive: true });
 
   // Function to observe new paragraphs
   const observeNewParagraphs = (): number => {
@@ -635,8 +692,17 @@ export function setupPageObserver(
   const cleanup = () => {
     spacerObserver.disconnect();
     observer.disconnect();
-    window.removeEventListener("resize", scheduledProcessIntersections);
-    window.removeEventListener("orientationchange", scheduledProcessIntersections);
+    window.removeEventListener("resize", handleResize);
+    window.removeEventListener("orientationchange", handleOrientationChange);
+    rootEl.removeEventListener("scroll", handleRootScroll);
+
+    if (scrollEndTimeoutId !== null) {
+      window.clearTimeout(scrollEndTimeoutId);
+      scrollEndTimeoutId = null;
+    }
+
+    shouldLogAfterScrollEnd = false;
+    lastObserverEntries = [];
 
     if (DEV_ZONE_VISUALIZERS_ENABLED) {
       hideVisualizer(activeElementVisualizer);
