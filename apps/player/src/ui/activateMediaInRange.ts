@@ -32,12 +32,12 @@ function createVideoElement(src: string, state: "listens" | "speaks", isTalking:
   video.dataset.state = state;
 
   // Set opacity based on state and talking status
-  if (state === "listens") {
-    video.style.opacity = isTalking ? "0" : "1";
-  } else {
-    // "speaks"
-    video.style.opacity = isTalking ? "1" : "0";
-  }
+  // if (state === "listens") {
+  //   video.style.opacity = isTalking ? "0" : "1";
+  // } else {
+  //   // "speaks"
+  //   video.style.opacity = isTalking ? "1" : "0";
+  // }
 
   video.onerror = () => {
     console.warn(`Failed to load ${state} video: ${src}`);
@@ -115,32 +115,32 @@ function createMediaElement(
 
   // Create videos if in play format and we have media sources
   // const shouldCreateVideos = isPlayFormat && (listeningSrc || talkingSrc);
-  // if (shouldCreateVideos) {
-  //   let listeningVideo: HTMLVideoElement | null = null;
-  //   let speakingVideo: HTMLVideoElement | null = null;
-  //
-  //   if (listeningSrc && isVideoFile(listeningSrc) && !isMobile(true, 650)) {
-  //     listeningVideo = createVideoElement(listeningSrc, "listens", isTalking);
-  //     container.appendChild(listeningVideo);
-  //   }
-  //
-  //   if (talkingSrc && isVideoFile(talkingSrc)) {
-  //     speakingVideo = createVideoElement(talkingSrc, "speaks", isTalking);
-  //     container.appendChild(speakingVideo);
-  //   }
-  //
-  //   if (listeningVideo && speakingVideo) {
-  //     listeningVideo.style.opacity = isTalking ? "0" : "1";
-  //     speakingVideo.style.opacity = isTalking ? "1" : "0";
-  //     container.dataset.hasVideos = "true";
-  //   } else if (speakingVideo && !listeningVideo) {
-  //     speakingVideo.style.opacity = isTalking ? "1" : "0";
-  //     container.dataset.hasVideos = "speaking-only";
-  //   } else if (listeningVideo && !speakingVideo) {
-  //     listeningVideo.style.opacity = "1";
-  //     container.dataset.hasVideos = "listening-only";
-  //   }
-  // }
+  if (shouldCreateVideos) {
+    let listeningVideo: HTMLVideoElement | null = null;
+    let speakingVideo: HTMLVideoElement | null = null;
+
+    if (listeningSrc && isVideoFile(listeningSrc) && !isMobile(true, 650)) {
+      listeningVideo = createVideoElement(listeningSrc, "listens", isTalking);
+      container.appendChild(listeningVideo);
+    }
+
+    if (talkingSrc && isVideoFile(talkingSrc)) {
+      speakingVideo = createVideoElement(talkingSrc, "speaks", isTalking);
+      container.appendChild(speakingVideo);
+    }
+
+    if (listeningVideo && speakingVideo) {
+      listeningVideo.style.opacity = isTalking ? "0" : "1";
+      speakingVideo.style.opacity = isTalking ? "1" : "0";
+      container.dataset.hasVideos = "true";
+    } else if (speakingVideo && !listeningVideo) {
+      speakingVideo.style.opacity = isTalking ? "1" : "0";
+      container.dataset.hasVideos = "speaking-only";
+    } else if (listeningVideo && !speakingVideo) {
+      listeningVideo.style.opacity = "1";
+      container.dataset.hasVideos = "listening-only";
+    }
+  }
 
   return container;
 }
@@ -166,22 +166,24 @@ export function activateMediaInRange(
   endParagraph: number,
   openCharacterDetailsModal: (params: CharacterModalParams) => void,
   isPlayFormat: boolean,
+  activeChapter: number,
+  activeParagraph: number,
   shouldCreateVideos: boolean,
 ) {
-  console.log("171: { startChapter, startParagraph, endChapter, endParagraph, isPlayFormat, shouldCreateVideos} BANG!", {
-    startChapter,
-    startParagraph,
-    endChapter,
-    endParagraph,
-    isPlayFormat,
-    shouldCreateVideos,
-  });
+  // console.log("171: { startChapter, startParagraph, endChapter, endParagraph, isPlayFormat, shouldCreateVideos} BANG!", {
+  //   startChapter,
+  //   startParagraph,
+  //   endChapter,
+  //   endParagraph,
+  //   isPlayFormat,
+  //   shouldCreateVideos,
+  // });
   // Global initialization - reset all isTalking states to "false" only once at the very beginning
   if (!hasInitializedTalkingStates) {
-    const allPlaceholders = document.querySelectorAll<HTMLSpanElement>(".character-placeholder");
-    allPlaceholders.forEach((placeholder) => {
-      placeholder.dataset.isTalking = "false";
-    });
+    // const allPlaceholders = document.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+    // allPlaceholders.forEach((placeholder) => {
+    //   placeholder.dataset.isTalking = "false";
+    // });
 
     playRowCharacterClickInit(openCharacterDetailsModal);
 
@@ -194,7 +196,7 @@ export function activateMediaInRange(
     `.content-container section[data-chapter="${startChapter}"] [data-index], section[data-chapter="${endChapter}"] [data-index]`,
   );
 
-  const bufferSize = isPlayFormat ? 6 : 10;
+  const bufferSize = isPlayFormat ? -4 : 10;
 
   const paragraphsInRange = Array.from(paragraphs).filter((paragraph) => {
     const chapterElement = paragraph.closest("section[data-chapter]") as HTMLElement;
@@ -256,11 +258,46 @@ export function activateMediaInRange(
     const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
     const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
 
-    // if (shouldCreateVideos) {
-    //   if (Boolean(characterPlaceholder.querySelector("video"))) return;
-    //   const newMediaElement = createMediaElement(characterPlaceholder, isPlayFormat, characterData, locationForPlaceholder, shouldCreateVideos, snapshot);
-    //   characterPlaceholder.replaceChildren(newMediaElement);
-    // }
+    if (shouldCreateVideos) {
+      // if (Boolean(characterPlaceholder.querySelector("video"))) return;
+      const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
+
+      const playRow = activeParagraph?.closest(".play-row");
+      const _characterPlaceholder = playRow?.querySelector<HTMLSpanElement>(".character-placeholder");
+
+      console.log("268: _characterPlaceholder BANG!", _characterPlaceholder);
+
+      const isTalking = characterPlaceholder.dataset.isTalking === "true";
+      const talkingSrc = snapshot.media.talking;
+      const listeningSrc = snapshot.media.listening;
+
+      const inlineAvatar = characterPlaceholder.querySelector(".inline-avatar");
+
+      console.log("270: { activeChapter, activeParagraph} BANG!", { activeChapter, activeParagraph });
+
+      const videoElement = inlineAvatar?.querySelector("video");
+
+      if (!Boolean(videoElement)) {
+        const video = createVideoElement(isTalking ? talkingSrc : listeningSrc, isTalking ? "speaks" : "listens", isTalking);
+
+        inlineAvatar?.appendChild(video);
+      }
+
+      // console.log("268: characterPlaceholder BANG!", characterPlaceholder);
+      // console.log("268: video BANG!", video);
+
+      // inlineAvatar?.childNodes.forEach((node) => {
+      //   const element = node as HTMLElement;
+      //   const isTalkingNow = element.dataset.state === "speaks";
+      //   if (element.tagName !== "VIDEO") {
+      //
+      //   }
+      // });
+
+      // const newMediaElement = createMediaElement(characterPlaceholder, isPlayFormat, characterData, locationForPlaceholder, shouldCreateVideos, snapshot);
+      // if (!newMediaElement) return;
+      // characterPlaceholder.replaceChildren(newMediaElement);
+    }
 
     if (activatedMedia.has(index)) return;
 

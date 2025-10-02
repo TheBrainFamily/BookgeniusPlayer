@@ -57,7 +57,7 @@ function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   /* dynamic audio hooks */
   useBackgroundSongs();
   useAudiobookTracks();
-  usePlayCharacterSpeakingStates();
+  // usePlayCharacterSpeakingStates();
   const { i18n } = useTranslation();
 
   useEffect(() => {
