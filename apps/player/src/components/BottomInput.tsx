@@ -68,7 +68,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { closeModal: closeCharacterModal, isOpen: isCharacterModalOpen } = useCharacterModal();
   // No local API key gating for voice; token fetched server-side
 
-  const { startRecording, stopRecording, setAskHandler, isRecording, isSessionReady, audioAnalyser } = useRealtime();
+  const { startRecording, stopRecording, setAskHandler, isRecording, isSessionReady, audioAnalyser, primeMicrophone } = useRealtime();
   const { location } = useLocation();
   const saved = getSavedLocation();
   const furthestLocation = saved ?? location;
@@ -392,42 +392,19 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     }
   }, [handleActivity, isDeepResearchActive, isSearchModalOpen, closeSearchModal, isThinking]);
 
-  const micPermissionGrantedRef = useRef<boolean>(false);
-
-  // Check if microphone permission was previously granted
-  useEffect(() => {
-    const checkMicPermission = async () => {
-      if (typeof navigator !== "undefined" && navigator.permissions?.query) {
-        try {
-          const result = await navigator.permissions.query({ name: "microphone" as PermissionName });
-          micPermissionGrantedRef.current = result.state === "granted";
-        } catch (error) {
-          // permissions.query not supported or failed, will check on first click
-        }
-      }
-    };
-    checkMicPermission();
-  }, []);
-
   const handleRecordingStart = useCallback(async () => {
     if (isRecording || isRealtimeConnecting) return;
 
     handleActivity();
 
-    // Check microphone permissions first
-    if (!micPermissionGrantedRef.current) {
-      try {
-        if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          stream.getTracks().forEach((t) => t.stop());
-          micPermissionGrantedRef.current = true;
-        }
-      } catch (error) {
-        console.error("Microphone permission denied:", error);
-      }
-      // Always return early if permission wasn't already granted - user must click again
+    // Prime microphone once (requests permission and warms up analyser on Safari)
+    const primeResult = await primeMicrophone();
+    if (primeResult === "failed") {
+      // User denied or browser failed; nothing else to do here
       return;
     }
+    // Proceed immediately after priming (even first allow),
+    // since we now avoid duplicate getUserMedia and reuse the same AudioContext.
 
     setIsRealtimeConnecting(true);
     setIsMicrophoneReady(false); // Reset mic ready state for new recording
@@ -573,207 +550,207 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       <MicrophoneVisualizer isActive={isRecording} audioAnalyser={audioAnalyser} onMicReady={setIsMicrophoneReady} />
       <OptionalElement className={cn("w-full flex justify-center", className)}>
         <motion.div
-        className={cn(
-          "bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-2 py-[2px] md:py-[3px] md:px-3",
-          isRecording && "recording-active",
-          isRealtimeConnecting && "border-amber-300/70 shadow-[0_0_12px_rgba(250,204,21,0.25)]",
-        )}
-        animate={isRecording ? "recordingContainer" : isRealtimeConnecting ? "connectingContainer" : "idle"}
-        initial="idle"
-        variants={variants.container}
-        ref={containerRef}
-        data-keep-modal-open="true"
-      >
-        <motion.div key="expanded" variants={variants.expandedContainer} initial="initial" animate="animate" exit="exit">
-          <form onSubmit={handleSubmit} className="flex items-center space-x-2 min-w-[280px] sm:min-w-[350px]">
-            <div className="relative flex-grow flex items-center">
-              <AnimatePresence mode="wait">
-                {(isRealtimeConnecting || isRecording) && (
-                  <motion.div
-                    key={isRealtimeConnecting ? "connecting-indicator" : "recording-indicator"}
-                    className={cn("absolute left-2 w-3 h-3 rounded-full", isRealtimeConnecting ? "bg-amber-300" : "bg-red-500")}
-                    variants={isRealtimeConnecting ? variants.connectingIndicator : variants.recordingIndicator}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                  />
-                )}
-              </AnimatePresence>
-              <AnimatePresence mode="wait">
-                {isRealtimeConnecting && (
-                  <motion.div
-                    key="connecting-label"
-                    className="absolute left-6 flex items-center gap-1 text-[11px] uppercase tracking-[0.25em] text-amber-200/90 pointer-events-none"
-                    variants={variants.connectingLabel}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                  >
-                    <Loader2 size={12} className="animate-spin" />
-                    <span>{t("realtime_connecting", "Connecting")}</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              <AnimatePresence>
-                {mentionState.isActive && (
-                  <motion.ul
-                    key="mention-list"
-                    className="absolute bottom-full left-0 right-0 mb-2 bg-black/85 border border-white/20 rounded-xl shadow-lg overflow-hidden z-50 max-h-56 overflow-y-auto"
-                    ref={(node) => {
-                      mentionListRef.current = node;
-                    }}
-                    variants={variants.mentionList}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                  >
-                    {filteredCharacters.length > 0 ? (
-                      filteredCharacters.map((characterName, index) => (
-                        <li
-                          key={characterName}
-                          className={cn("px-3 py-2 cursor-pointer text-sm", index === highlightedMention ? "bg-white/15" : "bg-transparent")}
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            insertMention(characterName);
-                          }}
-                          onMouseEnter={() => setHighlightedMention(index)}
-                        >
-                          {characterName}
-                        </li>
-                      ))
-                    ) : (
-                      <li className="px-3 py-2 text-sm text-white/70">{t("mentions_no_characters_yet", "No characters have been introduced yet.")}</li>
-                    )}
-                  </motion.ul>
-                )}
-              </AnimatePresence>
-              <input
-                id="bottom-input"
-                ref={inputRef}
-                type="text"
-                value={value}
-                onChange={handleInputChange}
-                onFocus={handleInputInteraction}
-                onKeyDown={handleInputKeyDown}
-                placeholder={placeholder}
-                className={cn(
-                  "flex-grow bg-transparent text-white outline-none px-2 py-1",
-                  isRecording ? "opacity-80 pl-7 font-medium" : "",
-                  isRealtimeConnecting ? "opacity-60 pl-7 cursor-wait text-amber-100/80" : "",
-                )}
-                disabled={isRealtimeConnecting || isRecording || isThinking}
-                autoComplete="off"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              {/* Deep Research Button */}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <motion.button
-                      type="button"
-                      onPointerDown={toggleDeepResearch}
-                      disabled={isThinking || isRecording || isRealtimeConnecting}
-                      className={cn(
-                        "rounded-full p-2 flex items-center justify-center",
-                        isDeepResearchActive ? "text-orange-400" : "text-white/70",
-                        isThinking ? "opacity-50 cursor-default" : "cursor-pointer",
-                      )}
-                      whileHover={!isThinking ? "hover" : undefined}
-                      whileTap={!isThinking ? "tap" : undefined}
-                      variants={variants.deepResearchButton}
-                      initial="idle"
-                      animate="idle"
+          className={cn(
+            "bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-2 py-[2px] md:py-[3px] md:px-3",
+            isRecording && "recording-active",
+            isRealtimeConnecting && "border-amber-300/70 shadow-[0_0_12px_rgba(250,204,21,0.25)]",
+          )}
+          animate={isRecording ? "recordingContainer" : isRealtimeConnecting ? "connectingContainer" : "idle"}
+          initial="idle"
+          variants={variants.container}
+          ref={containerRef}
+          data-keep-modal-open="true"
+        >
+          <motion.div key="expanded" variants={variants.expandedContainer} initial="initial" animate="animate" exit="exit">
+            <form onSubmit={handleSubmit} className="flex items-center space-x-2 min-w-[280px] sm:min-w-[350px]">
+              <div className="relative flex-grow flex items-center">
+                <AnimatePresence mode="wait">
+                  {(isRealtimeConnecting || isRecording) && (
+                    <motion.div
+                      key={isRealtimeConnecting ? "connecting-indicator" : "recording-indicator"}
+                      className={cn("absolute left-2 w-3 h-3 rounded-full", isRealtimeConnecting ? "bg-amber-300" : "bg-red-500")}
+                      variants={isRealtimeConnecting ? variants.connectingIndicator : variants.recordingIndicator}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                    />
+                  )}
+                </AnimatePresence>
+                <AnimatePresence mode="wait">
+                  {isRealtimeConnecting && (
+                    <motion.div
+                      key="connecting-label"
+                      className="absolute left-6 flex items-center gap-1 text-[11px] uppercase tracking-[0.25em] text-amber-200/90 pointer-events-none"
+                      variants={variants.connectingLabel}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
                     >
-                      <Telescope size={18} />
-                    </motion.button>
-                  </TooltipTrigger>
-                  <TooltipContent>{isThinking ? t("thinking") : t("deep_research")}</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              {/* Send/Mic Button */}
-              {value.trim() && !isRecording ? (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <motion.button
-                        type="submit"
-                        aria-label="Send message"
-                        disabled={isThinking}
-                        className={cn("p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400", isThinking ? "cursor-default" : "cursor-pointer")}
-                        whileHover="hover"
-                        whileTap="tap"
-                        variants={variants.button}
-                        initial="idle"
-                        animate="idle"
-                      >
-                        {isThinking ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-                      </motion.button>
-                    </TooltipTrigger>
-                    <TooltipContent>{t("send_message")}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              ) : (
+                      <Loader2 size={12} className="animate-spin" />
+                      <span>{t("realtime_connecting", "Connecting")}</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <AnimatePresence>
+                  {mentionState.isActive && (
+                    <motion.ul
+                      key="mention-list"
+                      className="absolute bottom-full left-0 right-0 mb-2 bg-black/85 border border-white/20 rounded-xl shadow-lg overflow-hidden z-50 max-h-56 overflow-y-auto"
+                      ref={(node) => {
+                        mentionListRef.current = node;
+                      }}
+                      variants={variants.mentionList}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                    >
+                      {filteredCharacters.length > 0 ? (
+                        filteredCharacters.map((characterName, index) => (
+                          <li
+                            key={characterName}
+                            className={cn("px-3 py-2 cursor-pointer text-sm", index === highlightedMention ? "bg-white/15" : "bg-transparent")}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              insertMention(characterName);
+                            }}
+                            onMouseEnter={() => setHighlightedMention(index)}
+                          >
+                            {characterName}
+                          </li>
+                        ))
+                      ) : (
+                        <li className="px-3 py-2 text-sm text-white/70">{t("mentions_no_characters_yet", "No characters have been introduced yet.")}</li>
+                      )}
+                    </motion.ul>
+                  )}
+                </AnimatePresence>
+                <input
+                  id="bottom-input"
+                  ref={inputRef}
+                  type="text"
+                  value={value}
+                  onChange={handleInputChange}
+                  onFocus={handleInputInteraction}
+                  onKeyDown={handleInputKeyDown}
+                  placeholder={placeholder}
+                  className={cn(
+                    "flex-grow bg-transparent text-white outline-none px-2 py-1",
+                    isRecording ? "opacity-80 pl-7 font-medium" : "",
+                    isRealtimeConnecting ? "opacity-60 pl-7 cursor-wait text-amber-100/80" : "",
+                  )}
+                  disabled={isRealtimeConnecting || isRecording || isThinking}
+                  autoComplete="off"
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                {/* Deep Research Button */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <motion.button
                         type="button"
-                        disabled={isThinking}
+                        onPointerDown={toggleDeepResearch}
+                        disabled={isThinking || isRecording || isRealtimeConnecting}
                         className={cn(
-                          "p-2 rounded-full flex items-center justify-center",
-                          isRecording ? "text-red-400 cursor-pointer" : isRealtimeConnecting ? "text-amber-300 cursor-wait animate-pulse" : "text-white/70 cursor-pointer",
+                          "rounded-full p-2 flex items-center justify-center",
+                          isDeepResearchActive ? "text-orange-400" : "text-white/70",
+                          isThinking ? "opacity-50 cursor-default" : "cursor-pointer",
                         )}
-                        style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
-                        whileHover={!isRecording && !isRealtimeConnecting ? "hover" : undefined}
-                        whileTap="tapMic"
-                        variants={variants.button}
+                        whileHover={!isThinking ? "hover" : undefined}
+                        whileTap={!isThinking ? "tap" : undefined}
+                        variants={variants.deepResearchButton}
                         initial="idle"
-                        animate={isRecording ? "recording" : "idle"}
-                        // onPointerDown={() => {
-                        //   if (isRecording) {
-                        //     setIsRecording(false);
-                        //     handleRecordingEnd();
-                        //   }
-                        //   setIsRecording(true);
-                        //   handleRecordingStart();
-                        // }}
-                        onTouchStart={(e) => {
-                          e.preventDefault();
-                          handleRecordingStart();
-                        }}
-                        onTouchEnd={(e) => {
-                          e.preventDefault();
-                          handleRecordingEnd();
-                        }}
-                        onTouchCancel={(e) => {
-                          e.preventDefault();
-                          handleRecordingEnd();
-                        }}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          handleRecordingStart();
-                        }}
-                        onMouseUp={(e) => {
-                          e.preventDefault();
-                          handleRecordingEnd();
-                        }}
-                        onMouseLeave={() => isRecording && handleRecordingEnd()}
-                        onContextMenu={(e) => e.preventDefault()}
+                        animate="idle"
                       >
-                        <Mic size={18} />
+                        <Telescope size={18} />
                       </motion.button>
                     </TooltipTrigger>
-                    <TooltipContent>{isRecording ? t("stop_recording") : isRealtimeConnecting ? t("realtime_connecting", "Connecting…") : t("start_recording")}</TooltipContent>
+                    <TooltipContent>{isThinking ? t("thinking") : t("deep_research")}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-              )}
-            </div>
-          </form>
+
+                {/* Send/Mic Button */}
+                {value.trim() && !isRecording ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <motion.button
+                          type="submit"
+                          aria-label="Send message"
+                          disabled={isThinking}
+                          className={cn("p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400", isThinking ? "cursor-default" : "cursor-pointer")}
+                          whileHover="hover"
+                          whileTap="tap"
+                          variants={variants.button}
+                          initial="idle"
+                          animate="idle"
+                        >
+                          {isThinking ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                        </motion.button>
+                      </TooltipTrigger>
+                      <TooltipContent>{t("send_message")}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <motion.button
+                          type="button"
+                          disabled={isThinking}
+                          className={cn(
+                            "p-2 rounded-full flex items-center justify-center",
+                            isRecording ? "text-red-400 cursor-pointer" : isRealtimeConnecting ? "text-amber-300 cursor-wait animate-pulse" : "text-white/70 cursor-pointer",
+                          )}
+                          style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
+                          whileHover={!isRecording && !isRealtimeConnecting ? "hover" : undefined}
+                          whileTap="tapMic"
+                          variants={variants.button}
+                          initial="idle"
+                          animate={isRecording ? "recording" : "idle"}
+                          // onPointerDown={() => {
+                          //   if (isRecording) {
+                          //     setIsRecording(false);
+                          //     handleRecordingEnd();
+                          //   }
+                          //   setIsRecording(true);
+                          //   handleRecordingStart();
+                          // }}
+                          onTouchStart={(e) => {
+                            e.preventDefault();
+                            handleRecordingStart();
+                          }}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handleRecordingEnd();
+                          }}
+                          onTouchCancel={(e) => {
+                            e.preventDefault();
+                            handleRecordingEnd();
+                          }}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            handleRecordingStart();
+                          }}
+                          onMouseUp={(e) => {
+                            e.preventDefault();
+                            handleRecordingEnd();
+                          }}
+                          onMouseLeave={() => isRecording && handleRecordingEnd()}
+                          onContextMenu={(e) => e.preventDefault()}
+                        >
+                          <Mic size={18} />
+                        </motion.button>
+                      </TooltipTrigger>
+                      <TooltipContent>{isRecording ? t("stop_recording") : isRealtimeConnecting ? t("realtime_connecting", "Connecting…") : t("start_recording")}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
+            </form>
+          </motion.div>
         </motion.div>
-      </motion.div>
-    </OptionalElement>
+      </OptionalElement>
     </>
   );
 };

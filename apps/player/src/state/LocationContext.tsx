@@ -37,7 +37,7 @@ export const DEFAULT_LOCATION: Location = {
 
 /* ------------------------------------------------------------------ */
 /*  Load the *initial* reader position from LS — nothing more         */
-const loadFromLS = (): Location => {
+const loadLocationFromLS = (): Location => {
   try {
     return getSavedLocation() || DEFAULT_LOCATION;
   } catch {
@@ -71,7 +71,7 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Load initial location from URL hash or localStorage
   const initialLocation = useMemo(() => {
     const hashLocation = parseLocationFromHash();
-    return hashLocation || loadFromLS() || DEFAULT_LOCATION;
+    return hashLocation || loadLocationFromLS();
   }, []);
 
   const [location, setLocationState] = useState<Location>(initialLocation);

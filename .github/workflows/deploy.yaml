@@ -110,6 +110,7 @@ jobs:
         run: |
           echo "CHANGED_BOOKS=${{ steps.changed.outputs.books_csv }}" >> $GITHUB_ENV
           echo "REBUILD_ALL=${{ steps.changed.outputs.rebuild_all }}" >> $GITHUB_ENV
+          echo "VITE_BUILD_TIME=${{ env.ASSET_CONTEXT }}-$(date +%s)" >> $GITHUB_ENV
 
       - uses: pnpm/action-setup@v4
 
