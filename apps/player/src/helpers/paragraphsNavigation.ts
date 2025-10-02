@@ -126,13 +126,13 @@ export const getSavedLocation = (): ExtendedLocation | null => {
   try {
     const key = getFurthestLocationKey();
     const raw = localStorage.getItem(key);
-    if (!raw) return null;
+    if (!raw) return DEFAULT_LOCATION;
 
     const parsed = JSON.parse(raw);
     // Handle both old format (plain Location) and new format (ExtendedLocation)
     return parsed;
   } catch {
-    return null;
+    return DEFAULT_LOCATION;
   }
 };
 
