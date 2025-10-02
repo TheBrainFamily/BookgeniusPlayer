@@ -10,17 +10,6 @@ import { ensureChapterWindow } from "@player/logic/BookContentVirtualizer";
 
 let systemNavigationInProgress = false;
 
-// Helper to set the URL hash using history replace or push without reloading.
-const setUrlHash = (chapter: number, paragraph: number, mode: "push" | "replace" = "replace") => {
-  const url = new URL(window.location.href);
-  url.hash = `${chapter}-${paragraph}`;
-  if (mode === "push") {
-    window.history.pushState(window.history.state, "", url.toString());
-  } else {
-    window.history.replaceState(window.history.state, "", url.toString());
-  }
-};
-
 /* ------------------------------------------------------------------ */
 /*  Export system navigation state checker                           */
 export const isSystemNavigationInProgress = (): boolean => systemNavigationInProgress;
@@ -171,28 +160,13 @@ export const getCurrentLocation = (): Location => _bridge.get();
  * Update current location + potentially the "furthest" bookmark.
  * Never moves the bookmark backwards.
  */
-export const setCurrentLocation = (loc: Location, options: { updateHash?: boolean } = {}) => {
-  const { updateHash = true } = options;
-
+export const setCurrentLocation = (loc: Location) => {
   if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
     console.error("Invalid location provided to setCurrentLocation:", loc);
     return;
   }
 
   _bridge.set(loc);
-
-  if (updateHash) {
-    setTimeout(() => {
-      if (systemNavigationInProgress) {
-        return;
-      }
-      const chapter = Number(loc.currentChapter) || 1;
-      const paragraph = Number(loc.currentParagraph) || 0;
-
-      // Replace hash so passive updates don't create extra history entries
-      setUrlHash(chapter, paragraph, "replace");
-    }, 2000);
-  }
 
   const saved = getSavedLocation();
   if (!saved) {
@@ -321,7 +295,6 @@ export const systemNavigateTo = async (
   // Update hash immediately for system navigation
   // For system navigation (explicit user jumps), default to push.
   // Callers can pass history: "replace" for initial load or non-history-affecting moves.
-  setUrlHash(loc.currentChapter, loc.currentParagraph, options.history ?? "replace");
 
   const runGoToParagraph = () => {
     goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior: "instant" })
@@ -449,14 +422,11 @@ export const shouldShowReturnButton = (): boolean => {
 
 // Event handler
 const handleResizeOrOrientationChange = debounce(() => {
-  // Re-apply scroll position based on the location stored in the URL hash
-  const locationFromHash = parseLocationFromHash();
+  const location = getSavedLocation();
+  goToParagraph({ currentChapter: location.currentChapter, currentParagraph: location.currentParagraph }, { behavior: "instant" }).catch((error) =>
+    console.warn("Failed to scroll during resize/orientation change:", error),
+  );
 
-  if (locationFromHash) {
-    goToParagraph({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph }, { behavior: "instant" }).catch((error) =>
-      console.warn("Failed to scroll during resize/orientation change:", error),
-    );
-  }
   // If hash is invalid or missing, we probably don't want to scroll unexpectedly.
   // The browser's default reflow behavior will apply.
 }, 400);
