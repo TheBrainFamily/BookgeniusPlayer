@@ -318,7 +318,10 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Enable mic tracks for active hold
     for (const track of micStreamRef.current?.getAudioTracks() ?? []) track.enabled = true;
     //@ts-expect-error(this is correct typing for the navigator.mediaSession.setMicrophoneActive method)
-    navigator.mediaSession.setMicrophoneActive(true);
+    if (typeof navigator.mediaSession?.setMicrophoneActive === "function") {
+      //@ts-expect-error(this is correct typing for the navigator.mediaSession.setMicrophoneActive method)
+      navigator.mediaSession.setMicrophoneActive(true);
+    }
     const session = sessionRef.current!;
     session.mute(false);
     setIsMuted(false);
@@ -402,7 +405,10 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // but disable tracks while idle so no audio is captured.
     for (const track of micStreamRef.current?.getAudioTracks() ?? []) track.enabled = false;
     //@ts-expect-error(this is correct typing for the navigator.mediaSession.setMicrophoneActive method)
-    navigator.mediaSession.setMicrophoneActive(false);
+    if (typeof navigator.mediaSession?.setMicrophoneActive === "function") {
+      //@ts-expect-error(this is correct typing for the navigator.mediaSession.setMicrophoneActive method)
+      navigator.mediaSession.setMicrophoneActive(false);
+    }
     session.mute(true);
     setIsMuted(true);
     try {
