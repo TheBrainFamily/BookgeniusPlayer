@@ -17,6 +17,8 @@ interface RealtimeContextType {
   disconnectConversation: () => Promise<void>;
   startRecording: () => Promise<void>;
   stopRecording: () => Promise<void>;
+  // Prime microphone once (request permission, create analyser, keep stream alive but disabled)
+  primeMicrophone: () => Promise<"already_primed" | "just_primed" | "failed">;
   toggleMute: () => void;
   sendTextMessage: (message: string) => void;
   // Allows components (e.g., BottomInput) to register their ask handler so tools can trigger it
@@ -61,8 +63,29 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [audioAnalyser, setAudioAnalyser] = useState<AnalyserNode | null>(null);
   const toolTriggeredRef = useRef<boolean>(false);
   const nextConnectInteractiveRef = useRef<boolean>(false);
-  const visualizerStreamRef = useRef<MediaStream | null>(null);
+  const micStreamRef = useRef<MediaStream | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const mediaStreamSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+
+  // Reuse app's shared AudioContext from the crossfader to reduce Safari glitches
+  // and avoid creating/resuming multiple contexts when the mic starts.
+  const getSharedAudioContext = useCallback(async () => {
+    try {
+      const mod = await import("@player/audio-crossfader");
+      // Ensure the shared AudioContext exists and is running
+      if (typeof mod.initAudioContext === "function") {
+        await mod.initAudioContext();
+      }
+      if (typeof mod.getAudioContext === "function") {
+        const ctx = mod.getAudioContext();
+        if (ctx) return ctx;
+      }
+    } catch (e) {
+      // Fallback: create a local context if crossfader isn't initialized yet
+    }
+    const Ctx = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    return audioContextRef.current ?? new Ctx();
+  }, []);
 
   // No local API key; tokens are retrieved from ANSWERS_SERVER_URL on connect
 
@@ -191,8 +214,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setIsConnected(true);
   }, []);
 
-  // Preconnect when API key becomes available to reduce first-press timing issues
-  // Only preconnect if microphone permission was previously granted
+  // Optional preconnect: disabled until mic is primed to ensure we attach our MediaStream
   useEffect(() => {
     const attemptPreconnect = async () => {
       if (isConnected) return;
@@ -209,7 +231,8 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
       }
 
-      if (hasPermission) {
+      // Only preconnect if we already have primed mic (so we can pass mediaStream)
+      if (hasPermission && micPrimedRef.current) {
         connectConversation().catch((e) => console.warn("Realtime preconnect failed", e));
       }
     };
@@ -226,6 +249,54 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     sessionRef.current = null;
   }, []);
 
+  // Prime microphone once: request permission, set up analyser, keep stream alive (tracks disabled)
+  const primeMicrophone = useCallback(async (): Promise<"already_primed" | "just_primed" | "failed"> => {
+    if (micPrimedRef.current && micStreamRef.current) return "already_primed";
+    try {
+      if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) return "failed";
+
+      // Request mic. Keep it alive to avoid repeated hardware acquisition/permission prompts.
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      micStreamRef.current = stream;
+
+      // Disable tracks by default when idle (we'll enable during hold-to-speak)
+      for (const track of stream.getAudioTracks()) track.enabled = false;
+
+      // Build or reuse a single analyser using the shared AudioContext
+      const sharedCtx = await getSharedAudioContext();
+      audioContextRef.current = sharedCtx;
+      const analyser = sharedCtx.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.8;
+
+      // Connect the stream to analyser
+      const source = mediaStreamSourceRef.current ?? sharedCtx.createMediaStreamSource(stream);
+      mediaStreamSourceRef.current = source;
+      try {
+        source.connect(analyser);
+      } catch {
+        // ignore if already connected
+      }
+      setAudioAnalyser(analyser);
+
+      micPrimedRef.current = true;
+      // Preconnect the realtime session now so the SDK can allocate audio resources once
+      // (while we're already handling the first Safari drop), keeping mic muted.
+      if (!isConnected) {
+        nextConnectInteractiveRef.current = true;
+        try {
+          await connectConversation();
+        } finally {
+          nextConnectInteractiveRef.current = false;
+        }
+      }
+      return "just_primed";
+    } catch (e) {
+      console.warn("Microphone permission not granted / failed to prime mic", e);
+      return "failed";
+    }
+  }, [getSharedAudioContext, connectConversation, isConnected]);
+
   const startRecording = useCallback(async () => {
     setIsSessionReady(false);
     if (!sessionRef.current || !isConnected) {
@@ -237,30 +308,17 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     }
 
-    // Create audio analyser for visualization
-    try {
-      if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        visualizerStreamRef.current = stream;
-
-        if (!audioContextRef.current) {
-          audioContextRef.current = new AudioContext();
-        }
-
-        const analyser = audioContextRef.current.createAnalyser();
-        analyser.fftSize = 256;
-        analyser.smoothingTimeConstant = 0.8;
-
-        const source = audioContextRef.current.createMediaStreamSource(stream);
-        source.connect(analyser);
-
-        setAudioAnalyser(analyser);
-        micPrimedRef.current = true;
-      }
-    } catch (e) {
-      console.warn("Microphone permission not granted", e);
+    // Ensure mic is primed exactly once; enable tracks for this recording
+    const primeResult = await primeMicrophone();
+    if (primeResult === "failed") {
+      // Do not proceed if we cannot get mic
+      throw new Error("Unable to access microphone");
     }
 
+    // Enable mic tracks for active hold
+    for (const track of micStreamRef.current?.getAudioTracks() ?? []) track.enabled = true;
+    //@ts-expect-error(this is correct typing for the navigator.mediaSession.setMicrophoneActive method)
+    navigator.mediaSession.setMicrophoneActive(true);
     const session = sessionRef.current!;
     session.mute(false);
     setIsMuted(false);
@@ -340,13 +398,11 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const session = sessionRef.current;
     if (!session) throw new Error("Realtime session is not initialized");
 
-    // Clean up audio analyser
-    setAudioAnalyser(null);
-    if (visualizerStreamRef.current) {
-      visualizerStreamRef.current.getTracks().forEach((track) => track.stop());
-      visualizerStreamRef.current = null;
-    }
-
+    // Keep mic stream alive to avoid re-permission and Safari audio glitches,
+    // but disable tracks while idle so no audio is captured.
+    for (const track of micStreamRef.current?.getAudioTracks() ?? []) track.enabled = false;
+    //@ts-expect-error(this is correct typing for the navigator.mediaSession.setMicrophoneActive method)
+    navigator.mediaSession.setMicrophoneActive(false);
     session.mute(true);
     setIsMuted(true);
     try {
@@ -394,6 +450,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     audioAnalyser,
     connectConversation,
     disconnectConversation,
+    primeMicrophone,
     startRecording,
     stopRecording,
     toggleMute,
