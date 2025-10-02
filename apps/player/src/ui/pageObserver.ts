@@ -5,7 +5,7 @@ import { CharacterModalParams } from "@player/stores/modals/characterModal.store
 import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers, drawElementsUnion } from "./devVisualizers";
 import { activateMediaInRange } from "./activateMediaInRange";
 
-const DEV_ZONE_VISUALIZERS_ENABLED = true;
+const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
 // Cache isPlayFormat at module level to avoid repeated getBookData() calls
 let cachedIsPlayFormat: boolean | null = null;
@@ -422,7 +422,6 @@ export function setupPageObserver(
             if (allIntersectingParagraphs.length > 0) {
               const mediaStartInfo = allIntersectingParagraphs[0];
               const mediaEndInfo = allIntersectingParagraphs[allIntersectingParagraphs.length - 1];
-              console.log("428: activeElementVisualizer BANG!", activeElementVisualizer);
               activateMediaInRange(
                 mediaStartInfo.chapter,
                 mediaStartInfo.paragraph,
@@ -430,22 +429,10 @@ export function setupPageObserver(
                 mediaEndInfo.paragraph,
                 openCharacterDetailsModal,
                 isPlayFormat,
-                activeParagraph.chapter,
-                activeParagraph.paragraph,
                 shouldCreateVideos,
               );
             } else {
-              activateMediaInRange(
-                startInfo.chapter,
-                startInfo.paragraph,
-                endInfo.chapter,
-                endInfo.paragraph,
-                openCharacterDetailsModal,
-                isPlayFormat,
-                activeParagraph.chapter,
-                activeParagraph.paragraph,
-                shouldCreateVideos,
-              );
+              activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal, isPlayFormat, shouldCreateVideos);
             }
           } else {
             console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {
@@ -494,7 +481,7 @@ export function setupPageObserver(
   window.addEventListener("orientationchange", handleOrientationChange);
 
   const SCROLL_END_DEBOUNCE_MS = 150;
-  let scrollEndTimeoutId: ReturnType<typeof window.setTimeout> | null = null;
+  let scrollEndTimeoutId: number | null = null;
   // Flag toggled by the scroll-end detector so we log once from the observer callback.
   let shouldLogAfterScrollEnd = false;
   let lastObserverEntries: IntersectionObserverEntry[] = [];

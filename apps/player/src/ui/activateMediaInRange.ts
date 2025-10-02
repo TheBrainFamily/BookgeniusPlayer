@@ -166,8 +166,6 @@ export function activateMediaInRange(
   endParagraph: number,
   openCharacterDetailsModal: (params: CharacterModalParams) => void,
   isPlayFormat: boolean,
-  activeChapter: number,
-  activeParagraph: number,
   shouldCreateVideos: boolean,
 ) {
   // console.log("171: { startChapter, startParagraph, endChapter, endParagraph, isPlayFormat, shouldCreateVideos} BANG!", {
@@ -251,52 +249,42 @@ export function activateMediaInRange(
 
     const index = `${characterSlug}-${firstParagraphIndex}-${lastParagraphIndex}`;
 
-    console.log("252: shouldCreateVideos BANG!", shouldCreateVideos);
-
     const locationForPlaceholder = { chapter: startChapter, paragraph: startParagraph };
     const characterData = charactersBySlug.get(characterSlug);
     const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
     const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
 
-    if (shouldCreateVideos) {
-      // if (Boolean(characterPlaceholder.querySelector("video"))) return;
+    if (shouldCreateVideos && snapshot) {
+      // Searching for the active paragraph within the current play row
       const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
+      const activePlayRow = activeParagraph?.closest(".play-row");
 
-      const playRow = activeParagraph?.closest(".play-row");
-      const _characterPlaceholder = playRow?.querySelector<HTMLSpanElement>(".character-placeholder");
-
-      console.log("268: _characterPlaceholder BANG!", _characterPlaceholder);
-
-      const isTalking = characterPlaceholder.dataset.isTalking === "true";
-      const talkingSrc = snapshot.media.talking;
-      const listeningSrc = snapshot.media.listening;
+      const isTalking = activePlayRow === playRow;
+      const desiredState = isTalking ? "speaks" : "listens";
+      const videoSrc = isTalking ? snapshot.media.talking : snapshot.media.listening;
 
       const inlineAvatar = characterPlaceholder.querySelector(".inline-avatar");
+      const existingVideo = inlineAvatar?.querySelector("video");
 
-      console.log("270: { activeChapter, activeParagraph} BANG!", { activeChapter, activeParagraph });
+      if (existingVideo) {
+        const currentState = existingVideo.dataset.state;
+        // Normalize URLs for comparison
+        const currentSrcNormalized = existingVideo.src.split("/").pop() || "";
+        const videoSrcNormalized = videoSrc?.split("/").pop() || "";
 
-      const videoElement = inlineAvatar?.querySelector("video");
-
-      if (!Boolean(videoElement)) {
-        const video = createVideoElement(isTalking ? talkingSrc : listeningSrc, isTalking ? "speaks" : "listens", isTalking);
-
+        // Only update if state or source needs to change
+        if (currentState !== desiredState || currentSrcNormalized !== videoSrcNormalized) {
+          if (videoSrc && isVideoFile(videoSrc)) {
+            existingVideo.src = videoSrc;
+            existingVideo.dataset.state = desiredState;
+            existingVideo.play().catch((e) => console.warn("Video play failed:", e));
+          }
+        }
+        // If state and source match - do nothing, let it continue playing
+      } else if (videoSrc && isVideoFile(videoSrc)) {
+        const video = createVideoElement(videoSrc, desiredState, isTalking);
         inlineAvatar?.appendChild(video);
       }
-
-      // console.log("268: characterPlaceholder BANG!", characterPlaceholder);
-      // console.log("268: video BANG!", video);
-
-      // inlineAvatar?.childNodes.forEach((node) => {
-      //   const element = node as HTMLElement;
-      //   const isTalkingNow = element.dataset.state === "speaks";
-      //   if (element.tagName !== "VIDEO") {
-      //
-      //   }
-      // });
-
-      // const newMediaElement = createMediaElement(characterPlaceholder, isPlayFormat, characterData, locationForPlaceholder, shouldCreateVideos, snapshot);
-      // if (!newMediaElement) return;
-      // characterPlaceholder.replaceChildren(newMediaElement);
     }
 
     if (activatedMedia.has(index)) return;
@@ -304,12 +292,15 @@ export function activateMediaInRange(
     const newMediaElement = createMediaElement(characterPlaceholder, isPlayFormat, characterData, locationForPlaceholder, shouldCreateVideos, snapshot);
 
     if (newMediaElement) {
-      if (dummyPlaceholder) {
-        characterPlaceholder.replaceChild(newMediaElement, dummyPlaceholder);
-      } else {
-        characterPlaceholder.appendChild(newMediaElement);
+      const existingInlineAvatar = characterPlaceholder.querySelector(".inline-avatar");
+      if (!existingInlineAvatar) {
+        if (dummyPlaceholder) {
+          characterPlaceholder.replaceChild(newMediaElement, dummyPlaceholder);
+        } else {
+          characterPlaceholder.appendChild(newMediaElement);
+        }
+        characterPlaceholder.dataset.mediaInjected = "true";
       }
-      characterPlaceholder.dataset.mediaInjected = "true";
     }
 
     activatedMedia.set(index, playRow);
