@@ -1,10 +1,4 @@
 /* Inline character avatars styling */
-.character-mention {
-  position: relative;
-  display: inline;
-  white-space: nowrap;
-}
-
 .inline-avatar {
   --avatar-size: clamp(2em, 5vw, 2.5em);
   --avatar-border: clamp(1px, 0.2vw, 2px);
@@ -21,6 +15,8 @@
   cursor: pointer;
   will-change: transform;
   transition: transform 0.2s ease;
+  transform-origin: center center;
+  z-index: 1;
 }
 
 .character-talking.start-of-paragraph:first-of-type {
@@ -59,10 +55,10 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
 /* Hover effects (only on devices that support hover) */
 @media (hover: hover) {
   .inline-avatar:hover {
-    transform: scale(2);
-    z-index: 1;
-    /* transition: transform 0.2s ease; */
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    transform: scale(1.9);
+    z-index: 9999;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    isolation: isolate;
   }
 }
 
@@ -124,6 +120,14 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
 }
 
 /* Mobile responsive improvements */
+@media screen and (max-width: 1024px) {
+  @media (hover: hover) {
+    .inline-avatar:hover {
+      transform: scale(1.5);
+    }
+  }
+}
+
 @media screen and (max-width: 768px) {
   .character-talking.start-of-paragraph:first-of-type {
     margin-left: clamp(-3em, -5vw, -2.5em);
