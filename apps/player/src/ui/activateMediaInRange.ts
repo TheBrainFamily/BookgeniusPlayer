@@ -195,30 +195,37 @@ export function activateMediaInRange(
     const rows = getActiveWithSiblingsSkippingDidaskalia(activePlayRow);
 
     rows.forEach(({ row: playRow, state }: { row: Element; state: "speaks" | "listens" }) => {
-      const activeCharacterPlaceholder = playRow?.querySelector<HTMLSpanElement>(".character-placeholder");
-      const characterSlug = activeCharacterPlaceholder?.dataset.character;
-      const characterData = getCharactersBySlug().get(characterSlug);
-      const inlineAvatar = activeCharacterPlaceholder?.querySelector(".inline-avatar");
-      const existingVideo = inlineAvatar?.querySelector("video");
-      const paragraphIndex = playRow?.querySelector<HTMLElement>("[data-index]")?.getAttribute("data-index");
+      const characterPlaceholders = playRow?.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
-      const locationForPlaceholder = { chapter: parseInt(chapterIndex, 10), paragraph: parseInt(paragraphIndex, 10) };
+      characterPlaceholders.forEach((activeCharacterPlaceholder) => {
+        const characterSlug = activeCharacterPlaceholder?.dataset.character;
+        const characterData = getCharactersBySlug().get(characterSlug);
+        const inlineAvatar = activeCharacterPlaceholder?.querySelector(".inline-avatar");
+        const existingVideo = inlineAvatar?.querySelector("video");
+        const paragraphIndex = playRow?.querySelector<HTMLElement>("[data-index]")?.getAttribute("data-index");
 
-      const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
-      const videoSrc = state === "speaks" ? snapshot.media.talking : snapshot.media.listening;
+        const locationForPlaceholder = { chapter: parseInt(chapterIndex, 10), paragraph: parseInt(paragraphIndex, 10) };
 
-      if (existingVideo) {
-        if (existingVideo.dataset.state !== state) {
-          existingVideo.src = videoSrc;
-          existingVideo.dataset.state = state;
+        const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
+        const videoSrc = state === "speaks" ? snapshot?.media.talking : snapshot?.media.listening;
+
+        if (existingVideo) {
+          if (existingVideo.dataset.state !== state) {
+            if (isVideoFile(videoSrc)) {
+              existingVideo.src = videoSrc;
+              existingVideo.dataset.state = state;
+            } else {
+              existingVideo.remove();
+            }
+          }
+        } else if (videoSrc && isVideoFile(videoSrc)) {
+          const video = createVideoElement(videoSrc, state as "listens" | "speaks");
+          activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
+          inlineAvatar?.appendChild(video);
+          const index = `${characterSlug}-${chapterIndex}-${paragraphIndex}`;
+          activatedVideo.set(index, playRow);
         }
-      } else if (videoSrc && isVideoFile(videoSrc)) {
-        const video = createVideoElement(videoSrc, state as "listens" | "speaks");
-        activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
-        inlineAvatar?.appendChild(video);
-        const index = `${characterSlug}-${chapterIndex}-${paragraphIndex}`;
-        activatedVideo.set(index, playRow);
-      }
+      });
     });
 
     activatedVideo.forEach((rowEl) => {
