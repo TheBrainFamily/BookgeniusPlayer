@@ -55,7 +55,7 @@ export function useBookContent() {
 
       const target = event.target as HTMLElement;
 
-      if (target.closest(".character-highlighted-activated")) {
+      if (target.closest(".character-highlighted-activated") || target.closest(".character-placeholder")) {
         return;
       }
 
@@ -157,7 +157,7 @@ export function useBookContent() {
 
     let cancelled = false;
 
-    const initialiseVirtualizer = async () => {
+    const initializeVirtualizer = async () => {
       try {
         await initializeBookContentVirtualizer({ container, onContentChanged: handleContentChanged });
         const initialChapter = typeof currentChapterRef.current === "number" ? currentChapterRef.current : (bookIndex.getFirstChapter() ?? 1);
@@ -166,11 +166,11 @@ export function useBookContent() {
           handleContentChanged();
         }
       } catch (error) {
-        console.error("useBookContent: Failed to initialise chapter virtualizer", error);
+        console.error("useBookContent: Failed to initialize chapter virtualizer", error);
       }
     };
 
-    void initialiseVirtualizer();
+    void initializeVirtualizer();
 
     return () => {
       cancelled = true;
@@ -240,10 +240,10 @@ export function useBookContent() {
       } catch (error) {
         console.error("useBookContent: Failed to remount chapters after reload", error);
       } finally {
-        observerSetupRef.current = setupPageObserver(openCharacterDetailsModal);
+        handleContentChanged();
       }
     })();
-  }, [currentChapter, currentParagraph, textVersion, openCharacterDetailsModal]);
+  }, [currentChapter, currentParagraph, textVersion, handleContentChanged]);
 }
 
 // Ensure last word (incl. trailing punctuation) and icon stay on same line

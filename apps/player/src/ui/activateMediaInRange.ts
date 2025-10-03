@@ -13,7 +13,6 @@ function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
 
   // Get previous sibling
   let prev = element.previousElementSibling;
-  console.log("16: prev BANG!", prev.classList.contains("didaskalia-row"));
   while (prev && prev.classList.contains("didaskalia-row")) {
     prev = prev.previousElementSibling;
   }
@@ -366,21 +365,24 @@ export const playRowCharacterClickInit = (openCharacterDetailsModal: (params: Ch
     if (chapter == null || firstParagraphIndex == null) return;
 
     // Pick the character slug from the activated highlight or from the placeholder
-    let characterSlug = (isCharacterHighlighted ? target.dataset.character : undefined) || "";
+    let characterSlug = "";
     let characterPlaceholder: HTMLSpanElement | null = null;
 
-    if (characterSlug) {
-      characterPlaceholder = rowOrParagraph.querySelector<HTMLSpanElement>(`.character-placeholder[data-character="${characterSlug}"]`);
-    }
-    if (!characterPlaceholder) {
-      // Fallback: take the first placeholder under this row/paragraph
-      characterPlaceholder = rowOrParagraph.querySelector<HTMLSpanElement>(".character-placeholder");
+    if (isCharacterHighlighted) {
+      characterSlug = target.dataset.character || "";
+    } else {
+      // Fallback to placeholder logic for other clicks
+      if (isCharacterPlaceholder) {
+        characterPlaceholder = target.closest<HTMLSpanElement>(".character-placeholder");
+      } else {
+        characterPlaceholder = rowOrParagraph.querySelector<HTMLSpanElement>(".character-placeholder");
+      }
+
       characterSlug = characterPlaceholder?.dataset.character || "";
     }
 
-    if (!characterSlug.trim() || !characterPlaceholder) return;
+    if (!characterSlug.trim()) return;
 
-    // Derive talking state without relying solely on dataset (dataset is still maintained elsewhere)
     const activeParagraph = document.querySelector<HTMLElement>(".active-paragraph");
     const activeRow = activeParagraph?.closest(".play-row") ?? activeParagraph;
     const isTalkingNow = activeRow === rowOrParagraph;
@@ -392,6 +394,13 @@ export const playRowCharacterClickInit = (openCharacterDetailsModal: (params: Ch
 
     const mediaSrc = snapshot ? (isTalkingNow ? snapshot.media.talking : snapshot.media.listening) : "";
 
-    openCharacterDetailsModal({ characterSlug, isVideo: !!mediaSrc && isVideoFile(mediaSrc), mediaSrc: mediaSrc || "", chapter, paragraph: firstParagraphIndex });
+    openCharacterDetailsModal({
+      characterSlug,
+      isVideo: !!mediaSrc && isVideoFile(mediaSrc),
+      mediaSrc: mediaSrc || "",
+      chapter,
+      paragraph: firstParagraphIndex,
+      isTalking: isTalkingNow,
+    });
   });
 };
