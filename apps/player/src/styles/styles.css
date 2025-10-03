@@ -417,15 +417,19 @@
     overflow-anchor: none;
   }
 
-  span[id^="ch"][id*="-p"][id*="-s"] {
-    cursor: pointer;
-    touch-action: none;
-    transition: background-color 0.3s ease;
-  }
+  @media (hover: hover) {
+    span[id^="ch"][id*="-p"][id*="-s"] {
+      cursor: pointer;
+      touch-action: none;
+      transition:
+        background-color 0.3s ease-in-out,
+        padding 0.3s ease-in-out;
+    }
 
-  span[id^="ch"][id*="-p"][id*="-s"]:hover {
-    background-color: rgba(66, 68, 90, 0.1);
-    padding: 0.2rem 0;
+    span[id^="ch"][id*="-p"][id*="-s"]:hover {
+      background-color: rgba(66, 68, 90, 0.1);
+      padding: 0.2rem 0;
+    }
   }
 
   #book-container.play-mode #content-container {
@@ -501,12 +505,22 @@
         flex-direction: row;
         justify-content: flex-start;
         align-items: flex-start;
+
+        .character-text p span {
+          padding-left: 0.3em;
+          padding-right: 0.3em;
+        }
       }
 
       .play-row[data-text-alignment="right"] {
         flex-direction: row-reverse;
         justify-content: flex-start;
         align-items: flex-start;
+
+        .character-text p span {
+          padding-left: 0.3em;
+          padding-right: 0.3rem;
+        }
       }
 
       .play-row.didaskalia-row {
@@ -608,11 +622,14 @@
         height: clamp(60px, 12vw, 80px);
       }
 
-      p[data-is-character="true"] {
+      p[data-is-character="true"] > * {
+        cursor: pointer;
         font-weight: bold;
+        transition: text-shadow 0.3s ease-in-out;
+        background-color: transparent;
 
-        span {
-          background-color: transparent;
+        &:hover {
+          text-shadow: 0 0 clamp(2px, 0.5vw, 4px) rgba(0, 0, 0, 0.3);
         }
       }
 
@@ -1374,10 +1391,6 @@ section[data-chapter] [data-index] {
 .chapter-loading {
   padding: 2rem;
   animation: pulse 1.5s ease-in-out infinite;
-}
-
-#book-container span {
-  transition: opacity 0.2s ease-in-out;
 }
 
 /* Default visible state for iOS (no transform to avoid crashes) */

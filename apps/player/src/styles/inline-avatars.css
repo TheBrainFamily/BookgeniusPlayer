@@ -111,7 +111,7 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
   cursor: pointer;
   display: inline-block;
   line-height: 1.65em;
-  transition: color 0.25s ease-in-out;
+  transition: color 0.3s ease-in-out;
   box-decoration-break: clone;
 }
 
