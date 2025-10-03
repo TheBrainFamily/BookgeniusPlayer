@@ -183,7 +183,7 @@ export function activateMediaInRange(
     hasInitializedTalkingStates = true;
   }
 
-  if (shouldCreateVideos && isPlayFormat) {
+  if (shouldCreateVideos && isPlayFormat && !isMobile()) {
     const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
     const activePlayRow = activeParagraph?.closest(".play-row");
 
