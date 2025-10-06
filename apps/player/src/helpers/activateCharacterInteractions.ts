@@ -44,12 +44,16 @@ function extractLocationFromElement(el: HTMLElement): ChapterParagraphRef | null
 }
 
 export const activateCharacterInteractions = (element: HTMLElement) => {
-  setTimeout(() => {
-    const characterSpan = element.querySelector<HTMLSpanElement>('.character-highlighted:not([data-click-listener-attached="true"])');
-    const characterTalkingSpan = element.querySelector<HTMLSpanElement>('.character-talking:not([data-click-listener-attached="true"])');
+  const characterSpans = element.querySelectorAll<HTMLSpanElement>('.character-highlighted:not([data-click-listener-attached="true"])');
 
-    if (characterSpan && !characterTalkingSpan) {
-      highlightCharacter(characterSpan);
-    }
-  }, 0);
+  const alreadyHighlighted = [];
+
+  characterSpans.forEach((characterSpan) => {
+    const characterSlug = characterSpan.dataset.character;
+
+    if (alreadyHighlighted.includes(characterSlug)) return;
+
+    highlightCharacter(characterSpan);
+    alreadyHighlighted.push(characterSlug);
+  });
 };

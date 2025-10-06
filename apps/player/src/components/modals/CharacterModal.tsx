@@ -26,12 +26,13 @@ interface CharacterModalProps {
   endChapter: number;
   chapter?: number;
   paragraph?: number;
+  isTalking?: boolean;
 }
 
 const findLatestSummaryInRange = (character: CharacterData, endChapter: number) =>
   character.infoPerChapter.filter((info) => info.chapter <= endChapter).sort((a, b) => b.chapter - a.chapter)[0]?.summary ?? "";
 
-const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, characterSlug, endChapter, chapter, paragraph }) => {
+const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, characterSlug, endChapter, chapter, paragraph, isTalking }) => {
   const { t } = useTranslation();
 
   const { setValue } = useBottomInput();
@@ -58,7 +59,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     [matchingCharacter, locationRef, latestSummary],
   );
 
-  const resolvedMediaSrc = snapshot?.media.listening ?? mediaSrc;
+  const resolvedMediaSrc = snapshot?.media.explicitAssetUrl ?? mediaSrc;
   const resolvedIsVideo = useMemo(() => (resolvedMediaSrc ? isVideoFile(resolvedMediaSrc) : isVideo), [resolvedMediaSrc, isVideo]);
 
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
@@ -132,6 +133,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
               "data-summary": snapshot?.summary ?? latestSummary,
               className: "w-full h-full object-cover",
             }}
+            isTalking={isTalking}
           />
         </motion.div>
 

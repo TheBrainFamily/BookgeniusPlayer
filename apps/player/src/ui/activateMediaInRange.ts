@@ -7,12 +7,51 @@ import { isMobile } from "@player/utils/isMobileOrTablet";
 import type { CharacterData } from "@player/types/book";
 import type { CharacterSnapshot } from "@player/utils/characterOverrides";
 import { normalizeSrcForInlineAvatar, highlightCharacter } from "./highlightCharacter";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
 
-// Global flag to ensure we reset all isTalking values only once at the very beginning
-let hasInitializedTalkingStates = false;
+function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
+  const result = [];
+
+  // Get previous sibling
+  let prev = element.previousElementSibling;
+  while (prev && prev.classList.contains("didaskalia-row")) {
+    prev = prev.previousElementSibling;
+  }
+
+  // Get next sibling
+  let next = element.nextElementSibling;
+  while (next && next.classList.contains("didaskalia-row")) {
+    next = next.nextElementSibling;
+  }
+
+  // Add previous element if exists
+  if (prev && prev.classList.contains("play-row")) {
+    result.push({ state: "listens", row: prev });
+  }
+
+  // Add current element
+  result.push({ state: "speaks", row: element });
+
+  // Add next element if exists
+  if (next && next.classList.contains("play-row")) {
+    result.push({ state: "listens", row: next });
+  }
+
+  return result;
+}
 
 let charactersBySlugCache: Map<string, CharacterData> | null = null;
-function getCharactersBySlug() {
+let cachedBookSlug: string | null = null;
+
+function ensureBookScopedState(): Map<string, CharacterData> {
+  const currentBookSlug = getBookData().slug;
+
+  if (cachedBookSlug !== currentBookSlug) {
+    cachedBookSlug = currentBookSlug;
+    charactersBySlugCache = null;
+  }
+
   if (!charactersBySlugCache) {
     charactersBySlugCache = new Map<string, CharacterData>();
     getCharactersData().forEach((c) => charactersBySlugCache!.set(c.slug, c));
@@ -21,7 +60,12 @@ function getCharactersBySlug() {
   return charactersBySlugCache;
 }
 
-function createVideoElement(src: string, state: "listens" | "speaks", isTalking: boolean): HTMLVideoElement {
+function getCharactersBySlug() {
+  return ensureBookScopedState();
+}
+
+/** Lightweight <video> factory with sane defaults (autoplay/muted/loop/inline) */
+function createVideoElement(src: string, state: "listens" | "speaks"): HTMLVideoElement {
   const video = document.createElement("video");
   video.src = src;
   video.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
@@ -31,19 +75,12 @@ function createVideoElement(src: string, state: "listens" | "speaks", isTalking:
   video.playsInline = true;
   video.dataset.state = state;
 
-  // Set opacity based on state and talking status
-  if (state === "listens") {
-    video.style.opacity = isTalking ? "0" : "1";
-  } else {
-    // "speaks"
-    video.style.opacity = isTalking ? "1" : "0";
-  }
-
   video.onerror = () => {
     console.warn(`Failed to load ${state} video: ${src}`);
     video.style.display = "none";
   };
   video.play().catch((e) => console.warn("Video play interrupted or failed:", e));
+
   return video;
 }
 
@@ -68,23 +105,37 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
   return false;
 }
 
-const onPlayRowCharacterClick = (
-  e: PointerEvent,
-  characterSlug: string,
-  mediaSrc: string,
-  location: { chapter: number; paragraph: number },
-  openCharacterDetailsModal: (params: CharacterModalParams) => void,
-) => {
-  if (e.metaKey || e.ctrlKey) return;
-  e.preventDefault();
-  e.stopPropagation();
-  openCharacterDetailsModal({ characterSlug, isVideo: !!mediaSrc && isVideoFile(mediaSrc), mediaSrc: mediaSrc || "", chapter: location.chapter, paragraph: location.paragraph });
-};
+/** Derives chapter and paragraph range for both play and non-play paragraphs */
+function getRowContext(el: HTMLElement): { chapter: number | null; firstParagraphIndex: number | null; lastParagraphIndex: number | null } {
+  const section = el.closest<HTMLElement>("[data-chapter]");
+  const chapter = section ? parseInt(section.dataset.chapter || "", 10) : null;
+
+  // play format: paragraphs are grouped under .character-text with multiple [data-index]
+  const characterText = el.querySelector?.(".character-text") as HTMLElement | null;
+
+  // Try to read indexes from play structure first; fall back to self/first child with [data-index]
+  const firstParagraphIndex =
+    characterText?.firstElementChild?.getAttribute("data-index") ??
+    el.getAttribute?.("data-index") ??
+    el.querySelector?.<HTMLElement>("[data-index]")?.getAttribute("data-index") ??
+    null;
+
+  const lastParagraphIndex =
+    characterText?.lastElementChild?.getAttribute("data-index") ??
+    el.getAttribute?.("data-index") ??
+    el.querySelector?.<HTMLElement>("[data-index]:last-child")?.getAttribute("data-index") ??
+    firstParagraphIndex;
+
+  return {
+    chapter: Number.isFinite(chapter as number) ? (chapter as number) : null,
+    firstParagraphIndex: firstParagraphIndex ? parseInt(firstParagraphIndex, 10) : null,
+    lastParagraphIndex: lastParagraphIndex ? parseInt(lastParagraphIndex, 10) : null,
+  };
+}
 
 /** Creates a media container element with CharacterMedia-like structure for inline avatars */
 function createMediaElement(
   placeholder: HTMLSpanElement,
-  isPlayFormat: boolean,
   characterData: CharacterData | undefined,
   location: { chapter: number; paragraph: number } | null,
   snapshotOverride?: CharacterSnapshot | null,
@@ -94,7 +145,6 @@ function createMediaElement(
 
   const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
 
-  const isTalking = placeholder.dataset.isTalking === "true";
   const listeningSrc = snapshot.media.listening;
   const talkingSrc = snapshot.media.talking;
 
@@ -112,35 +162,6 @@ function createMediaElement(
   placeholderImg.alt = snapshot.displayName;
   container.appendChild(placeholderImg);
 
-  // Create videos if in play format and we have media sources
-  const shouldCreateVideos = isPlayFormat && (listeningSrc || talkingSrc);
-  if (shouldCreateVideos) {
-    let listeningVideo: HTMLVideoElement | null = null;
-    let speakingVideo: HTMLVideoElement | null = null;
-
-    if (listeningSrc && isVideoFile(listeningSrc) && !isMobile(true, 650)) {
-      listeningVideo = createVideoElement(listeningSrc, "listens", isTalking);
-      container.appendChild(listeningVideo);
-    }
-
-    if (talkingSrc && isVideoFile(talkingSrc)) {
-      speakingVideo = createVideoElement(talkingSrc, "speaks", isTalking);
-      container.appendChild(speakingVideo);
-    }
-
-    if (listeningVideo && speakingVideo) {
-      listeningVideo.style.opacity = isTalking ? "0" : "1";
-      speakingVideo.style.opacity = isTalking ? "1" : "0";
-      container.dataset.hasVideos = "true";
-    } else if (speakingVideo && !listeningVideo) {
-      speakingVideo.style.opacity = isTalking ? "1" : "0";
-      container.dataset.hasVideos = "speaking-only";
-    } else if (listeningVideo && !speakingVideo) {
-      listeningVideo.style.opacity = "1";
-      container.dataset.hasVideos = "listening-only";
-    }
-  }
-
   return container;
 }
 
@@ -154,37 +175,76 @@ function createDummyElement(characterPlaceholder: HTMLSpanElement) {
   return dummyElement;
 }
 
-const activatedMedia = new Map<string, Element>();
-const activatedCharacterHighlighted = new Map<string, Element>();
-
 /** Manages media loading and playback for paragraphs within the visible range **/
-export function activateMediaInRange(
-  startChapter: number,
-  startParagraph: number,
-  endChapter: number,
-  endParagraph: number,
-  openCharacterDetailsModal: (params: CharacterModalParams) => void,
-  isPlayFormat: boolean,
-) {
-  // Global initialization - reset all isTalking states to "false" only once at the very beginning
-  if (!hasInitializedTalkingStates) {
-    const allPlaceholders = document.querySelectorAll<HTMLSpanElement>(".character-placeholder");
-    allPlaceholders.forEach((placeholder) => {
-      placeholder.dataset.isTalking = "false";
+export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean, shouldCreateVideos: boolean) {
+  const charactersBySlug = ensureBookScopedState();
+
+  if (shouldCreateVideos && isPlayFormat && !isMobile()) {
+    const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
+    const activePlayRow = activeParagraph?.closest(".play-row");
+
+    if (!activePlayRow) return;
+
+    const chapterElement = activePlayRow?.closest<HTMLElement>("[data-chapter]");
+    const chapterIndex = chapterElement?.dataset.chapter;
+
+    const rows = getActiveWithSiblingsSkippingDidaskalia(activePlayRow);
+
+    rows.forEach(({ row: playRow, state }: { row: Element; state: "speaks" | "listens" }) => {
+      const characterPlaceholders = playRow?.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+
+      characterPlaceholders.forEach((activeCharacterPlaceholder) => {
+        const characterSlug = activeCharacterPlaceholder?.dataset.character;
+        const characterData = characterSlug ? charactersBySlug.get(characterSlug) : undefined;
+        const inlineAvatar = activeCharacterPlaceholder?.querySelector(".inline-avatar");
+        const existingVideo = inlineAvatar?.querySelector("video");
+        const paragraphIndex = playRow?.querySelector<HTMLElement>("[data-index]")?.getAttribute("data-index");
+
+        const locationForPlaceholder = { chapter: parseInt(chapterIndex, 10), paragraph: parseInt(paragraphIndex, 10) };
+
+        const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
+        const videoSrc = state === "speaks" ? snapshot?.media.talking : snapshot?.media.listening;
+
+        if (existingVideo) {
+          if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
+            if (existingVideo.dataset.state !== state || existingVideo.src !== videoSrc) {
+              existingVideo.src = videoSrc;
+              existingVideo.dataset.state = state;
+            }
+            activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
+          } else {
+            activeCharacterPlaceholder.dataset.isTalking = "false";
+            existingVideo.remove();
+          }
+        } else if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
+          const video = createVideoElement(videoSrc, state as "listens" | "speaks");
+          activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
+          inlineAvatar?.appendChild(video);
+          playRow.setAttribute("data-activated-video", "true");
+        }
+      });
     });
 
-    playRowCharacterClickInit(openCharacterDetailsModal);
+    const activatedVideo = document.querySelectorAll<HTMLElement>("[data-activated-video='true']");
 
-    hasInitializedTalkingStates = true;
+    activatedVideo.forEach((rowEl) => {
+      if (rows.map(({ row }) => row).includes(rowEl)) return;
+
+      rowEl.querySelectorAll("video").forEach((video) => {
+        video.remove();
+      });
+
+      rowEl.dataset.activatedVideo = "false";
+    });
+
+    return;
   }
-
-  const charactersBySlug = getCharactersBySlug();
 
   const paragraphs = document.querySelectorAll<HTMLElement>(
     `.content-container section[data-chapter="${startChapter}"] [data-index], section[data-chapter="${endChapter}"] [data-index]`,
   );
 
-  const bufferSize = isPlayFormat ? 6 : 10;
+  const bufferSize = isPlayFormat ? 5 : 10;
 
   const paragraphsInRange = Array.from(paragraphs).filter((paragraph) => {
     const chapterElement = paragraph.closest("section[data-chapter]") as HTMLElement;
@@ -198,140 +258,122 @@ export function activateMediaInRange(
     }
   });
 
-  const playRows = [];
+  const playRowsOrParagraphs: HTMLElement[] = [];
 
   paragraphsInRange.forEach((p) => {
-    const charactersToHighlight = p.querySelectorAll<HTMLSpanElement>(".character-highlighted");
-
-    Array.from(charactersToHighlight).forEach((character) => {
-      const chapter = character.closest("[data-chapter]")?.getAttribute("data-chapter");
-      const paragraph = character.closest("[data-index]")?.getAttribute("data-index");
-      const index = `${character.dataset.character}-${chapter}-${paragraph}`;
-      if (activatedCharacterHighlighted.has(index)) return;
-      activatedCharacterHighlighted.set(index, character);
-      highlightCharacter(character);
-    });
-
-    playRows.push(p.closest(".play-row") ?? (p as HTMLElement));
+    activateCharacterInteractions(p);
+    // Support both play rows and plain paragraphs (non-play)
+    playRowsOrParagraphs.push(p.closest(".play-row") ?? (p as HTMLElement));
   });
 
-  const uniquePlayRows = [...new Set(playRows)];
+  const uniqueRows = [...new Set(playRowsOrParagraphs)];
+  const activatedMedia = document.querySelectorAll<HTMLElement>("[data-activated-media='true']");
 
-  uniquePlayRows.forEach((playRow: HTMLElement) => {
-    const characterPlaceholder = playRow.querySelector<HTMLSpanElement>(".character-placeholder");
+  uniqueRows.forEach((rowEl: HTMLElement) => {
+    const characterPlaceholders = rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+    if (!characterPlaceholders.length) return;
 
-    if (!characterPlaceholder) return;
+    const { chapter: rowChapter, firstParagraphIndex, lastParagraphIndex } = getRowContext(rowEl);
 
-    const characterSlug = characterPlaceholder.dataset.character;
+    if (firstParagraphIndex == null || lastParagraphIndex == null) return;
 
-    if (!characterSlug.trim()) return;
+    characterPlaceholders.forEach((characterPlaceholder) => {
+      const characterSlug = characterPlaceholder.dataset.character;
+      if (!characterSlug?.trim()) return;
 
-    // needed for indexing the play row in activatedMedia Map
-    const characterText = playRow.querySelector(".character-text");
+      const locationForPlaceholder = { chapter: rowChapter ?? startChapter, paragraph: firstParagraphIndex ?? startParagraph };
 
-    const firstParagraphIndex = characterText?.firstElementChild?.getAttribute("data-index");
-    const lastParagraphIndex = characterText?.lastElementChild?.getAttribute("data-index");
+      const characterData = charactersBySlug.get(characterSlug);
+      const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
 
-    if (!firstParagraphIndex && !lastParagraphIndex) {
-      console.warn(`Could not generate a unique index for character row: ${characterSlug}`);
-      return;
-    }
+      const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
 
-    const index = `${characterSlug}-${firstParagraphIndex}-${lastParagraphIndex}`;
+      if (Array.from(activatedMedia).find((_rowEl) => _rowEl === rowEl)) return;
 
-    if (activatedMedia.has(index)) return;
+      const newMediaElement = createMediaElement(characterPlaceholder, characterData, locationForPlaceholder, snapshot);
 
-    const locationForPlaceholder = { chapter: startChapter, paragraph: startParagraph };
-    const characterData = charactersBySlug.get(characterSlug);
-    const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
-    const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
-
-    const newMediaElement = createMediaElement(characterPlaceholder, isPlayFormat, characterData, locationForPlaceholder, snapshot);
-
-    if (newMediaElement) {
-      if (dummyPlaceholder) {
-        characterPlaceholder.replaceChild(newMediaElement, dummyPlaceholder);
-      } else {
-        characterPlaceholder.appendChild(newMediaElement);
+      if (newMediaElement) {
+        const existingInlineAvatar = characterPlaceholder.querySelector(".inline-avatar");
+        if (!existingInlineAvatar) {
+          if (dummyPlaceholder) {
+            characterPlaceholder.replaceChild(newMediaElement, dummyPlaceholder);
+          } else {
+            characterPlaceholder.appendChild(newMediaElement);
+          }
+        }
       }
-      characterPlaceholder.dataset.mediaInjected = "true";
-    }
 
-    activatedMedia.set(index, playRow);
+      rowEl.dataset.activatedMedia = "true";
+    });
   });
 
   // Here we clean up the activated media
-  activatedMedia.forEach((playRow, index) => {
-    if (!uniquePlayRows.includes(playRow as HTMLElement)) {
-      const characterPlaceholder = playRow.querySelector<HTMLSpanElement>(".character-placeholder");
+  activatedMedia.forEach((rowEl) => {
+    if (!uniqueRows.includes(rowEl)) {
+      const characterPlaceholders = rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
-      if (characterPlaceholder) {
+      characterPlaceholders.forEach((characterPlaceholder) => {
         const dummyElement = createDummyElement(characterPlaceholder);
-
         characterPlaceholder.replaceChildren(dummyElement);
-      }
+        characterPlaceholder.dataset.mediaInjected = "false";
+        characterPlaceholder.dataset.isTalking = "false";
+      });
 
-      activatedMedia.delete(index);
+      rowEl.dataset.activatedMedia = "false";
     }
   });
 }
 
-export const playRowCharacterClickInit = (openCharacterDetailsModal: (params: CharacterModalParams) => void) => {
-  const contentContainer = document.querySelector("#content-container");
-  if (!contentContainer) return;
-
+export const openPlayRowCharacterModal = (target: HTMLElement, openCharacterDetailsModal: (params: CharacterModalParams) => void) => {
   const charactersBySlug = getCharactersBySlug();
 
-  contentContainer.addEventListener("pointerup", (e) => {
-    if (e.metaKey || e.ctrlKey) return;
+  const isCharacterHighlighted = target.classList.contains("character-highlighted-activated");
+  const isCharacterPlaceholder = target.closest(".character-placeholder");
 
-    const target = e.target as HTMLElement;
+  // Support both play and non-play: prefer .play-row, else fall back to the nearest [data-index] paragraph
+  const rowOrParagraph = target.closest<HTMLElement>(".play-row") ?? target.closest<HTMLElement>("[data-index]");
+  if (!rowOrParagraph) return;
 
-    const isStrongTag = target.tagName === "STRONG";
-    const isInlineAvatar = target.closest(".inline-avatar");
-    const isCharacterHighlighted = target.classList.contains("character-highlighted-activated");
+  // Determine chapter/paragraph from the element we found
+  const { chapter, firstParagraphIndex } = getRowContext(rowOrParagraph);
+  if (chapter == null || firstParagraphIndex == null) return;
 
-    if (!isStrongTag && !isInlineAvatar && !isCharacterHighlighted) return;
+  // Pick the character slug from the activated highlight or from the placeholder
+  let characterSlug = "";
+  let characterPlaceholder: HTMLSpanElement | null = null;
 
-    e.preventDefault();
-    e.stopPropagation();
+  if (isCharacterHighlighted) {
+    characterSlug = target.dataset.character || "";
+  } else {
+    // Fallback to placeholder logic for other clicks
+    if (isCharacterPlaceholder) {
+      characterPlaceholder = target.closest<HTMLSpanElement>(".character-placeholder");
+    } else {
+      characterPlaceholder = rowOrParagraph.querySelector<HTMLSpanElement>(".character-placeholder");
+    }
 
-    const playRow = target.closest(".play-row");
+    characterSlug = characterPlaceholder?.dataset.character || "";
+  }
 
-    if (!playRow) return;
+  if (!characterSlug.trim()) return;
 
-    const characterPlaceholder = playRow.querySelector<HTMLSpanElement>(".character-placeholder");
-    const playRowCharacter = playRow.querySelector<HTMLElement>("[data-is-character='true']");
+  const activeParagraph = document.querySelector<HTMLElement>(".active-paragraph");
+  const activeRow = activeParagraph?.closest(".play-row") ?? activeParagraph;
+  const isTalkingNow = activeRow === rowOrParagraph;
 
-    if (!playRowCharacter || !characterPlaceholder) return;
+  const characterData = charactersBySlug.get(characterSlug);
+  const snapshot = characterData
+    ? resolveCharacterSnapshot(characterData, { location: { chapter, paragraph: firstParagraphIndex }, fallbackDisplayName: characterData.characterName })
+    : null;
 
-    const currentChapterStr = playRow.closest("[data-chapter]")?.getAttribute("data-chapter");
-    const currentParagraphStr = playRow.querySelector("[data-index]")?.getAttribute("data-index");
+  const mediaSrc = snapshot ? (isTalkingNow ? snapshot.media.talking : snapshot.media.listening) : "";
 
-    const currentChapterInt = parseInt(currentChapterStr, 10);
-    const currentParagraphInt = parseInt(currentParagraphStr, 10);
-
-    if (isNaN(currentChapterInt) || isNaN(currentParagraphInt)) return;
-
-    const characterSlug = isCharacterHighlighted ? target.dataset.character : characterPlaceholder.dataset.character;
-
-    if (!characterSlug.trim()) return;
-
-    const isTalking = characterPlaceholder?.dataset.isTalking === "true";
-
-    const characterData = charactersBySlug.get(characterSlug);
-    const snapshot = characterData
-      ? resolveCharacterSnapshot(characterData, { location: { chapter: currentChapterInt, paragraph: currentParagraphInt }, fallbackDisplayName: characterData.characterName })
-      : null;
-
-    const mediaSrc = snapshot ? (isTalking ? snapshot.media.talking : snapshot.media.listening) : "";
-
-    openCharacterDetailsModal({
-      characterSlug,
-      isVideo: !!mediaSrc && isVideoFile(mediaSrc),
-      mediaSrc: mediaSrc || "",
-      chapter: currentChapterInt,
-      paragraph: currentParagraphInt,
-    });
+  openCharacterDetailsModal({
+    characterSlug,
+    isVideo: !!mediaSrc && isVideoFile(mediaSrc),
+    mediaSrc: mediaSrc || "",
+    chapter,
+    paragraph: firstParagraphIndex,
+    isTalking: isTalkingNow,
   });
 };

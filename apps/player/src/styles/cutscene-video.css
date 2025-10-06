@@ -3,7 +3,7 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100svh;
+  height: 100dvh;
   background-color: black;
   z-index: 999999; /* Ensure it's on top */
   /* Add any other styles you might need, e.g., object-fit */

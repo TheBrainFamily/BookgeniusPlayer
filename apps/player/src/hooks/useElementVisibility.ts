@@ -25,7 +25,6 @@ const INTERACTIVE_SELECTORS = [
   ".inline-avatar",
   "[data-character]",
   ".character-placeholder",
-  ".character-mention",
   ".character-highlighted",
   ".dialog-overlay",
   ".opened-modal",

@@ -41,6 +41,7 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
   const [navigating, setNavigating] = useState(false);
   const [meta, setMeta] = useState<LoaderMeta | null>(null);
   const [navigatedFromPlatform, setNavigatedFromPlatform] = useState(false);
+  const [shouldRenderOverlay, setShouldRenderOverlay] = useState(false);
 
   const startTimeRef = useRef<number | null>(null);
   const location = useLocation(); // used to reset if user navigates away quickly
@@ -48,6 +49,7 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
   const startTransition = useCallback((m: LoaderMeta) => {
     setMeta({ title: m.title, phrases: m.phrases, author: m.author ?? "", showStartButton: m.showStartButton, onStartClick: m.onStartClick });
     startTimeRef.current = performance.now();
+    setShouldRenderOverlay(true);
     setNavigating(true);
   }, []);
 
@@ -60,9 +62,11 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
     // Ensure the overlay is visible at least minDurationMs
     const timeout = window.setTimeout(() => {
       setNavigating(false);
-      // slight delay to allow fade-out animation before clearing meta
-      // We think no need to clear meta, leaving this in case someone sees some glitches. Aug 29 2025 lgandecki dstojaniuk
-      // window.setTimeout(() => setMeta((prev) => (navigating ? prev : null)), 250);
+
+      window.setTimeout(() => {
+        setShouldRenderOverlay(false);
+        setMeta(null);
+      }, 1000);
     }, remaining);
 
     return () => clearTimeout(timeout);
@@ -70,6 +74,7 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
 
   const cancelTransition = useCallback(() => {
     setNavigating(false);
+    setShouldRenderOverlay(false);
     setMeta(null);
     startTimeRef.current = null;
   }, []);
@@ -94,26 +99,27 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
     <RouteTransitionContext.Provider value={value}>
       {children}
 
-      {/* Single global overlay with BookLoader */}
-      <div className={`pointer-events-none fixed inset-0 z-40 transition-opacity duration-1000 ${navigating ? "opacity-100" : "opacity-0"}`} aria-hidden={!navigating}>
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#1a1a1a] to-[#2d2d2d]" />
+      {shouldRenderOverlay && (
+        <div className={`pointer-events-none fixed inset-0 z-40 transition-opacity duration-1000 ${navigating ? "opacity-100" : "opacity-0"}`} aria-hidden={!navigating}>
+          <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#1a1a1a] to-[#2d2d2d]" />
 
-        <div className="relative z-10 flex h-full items-center justify-center">
-          {meta ? (
-            <div className="pointer-events-auto">
-              <BookLoader
-                title={meta.title}
-                author={meta.author}
-                loadingPhrases={meta.phrases}
-                // While overlay is visible, pretend it's not loaded
-                isLoaded={!navigating}
-                showStartButton={meta.showStartButton}
-                onStartClick={meta.onStartClick}
-              />
-            </div>
-          ) : null}
+          <div className="relative z-10 flex h-full items-center justify-center">
+            {meta ? (
+              <div className="pointer-events-auto">
+                <BookLoader
+                  title={meta.title}
+                  author={meta.author}
+                  loadingPhrases={meta.phrases}
+                  // While overlay is visible, pretend it's not loaded
+                  isLoaded={!navigating}
+                  showStartButton={meta.showStartButton}
+                  onStartClick={meta.onStartClick}
+                />
+              </div>
+            ) : null}
+          </div>
         </div>
-      </div>
+      )}
     </RouteTransitionContext.Provider>
   );
 };

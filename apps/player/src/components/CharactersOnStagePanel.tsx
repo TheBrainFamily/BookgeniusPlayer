@@ -1,5 +1,5 @@
 import { CSSProperties, useMemo, useState, useEffect, memo } from "react";
-import { motion, Variants } from "motion/react";
+import { motion, Variants, AnimatePresence } from "motion/react";
 
 import { useCharactersOnStage } from "@player/hooks/useCharactersOnStage";
 import { useCurrentSpeakers } from "@player/hooks/useCurrentSpeakers";
@@ -50,51 +50,38 @@ const CharactersOnStagePanel = () => {
     return () => window.removeEventListener("resize", checkScreenWidth);
   }, []);
 
-  const characterEntities = charactersOnStage.map((character) => ({
-    slug: character.slug,
-    characterName: character.characterName,
-    summary: "",
-    imageUrl: "",
-    chapterNumber: location?.currentChapter || 0,
-    paragraphNumber: location?.currentParagraph || 0,
-    isTalkingInFirstParagraph: currentSpeakers.includes(character.slug),
-    otherAppearances: [],
-  }));
+  const characterEntities = useMemo(() => {
+    if (!location) return [];
 
-  // Desktop (≥1024px): avatars are ALWAYS visible (never hide)
-  // Narrow screens (<1024px): hide avatars while overlay is (effectively) visible
+    return charactersOnStage.map((character) => ({
+      slug: character.slug,
+      characterName: character.characterName,
+      summary: "",
+      imageUrl: "",
+      chapterNumber: location.currentChapter || 0,
+      paragraphNumber: location.currentParagraph || 0,
+      isTalkingInFirstParagraph: currentSpeakers.includes(character.slug),
+      otherAppearances: [],
+    }));
+  }, [charactersOnStage, location, currentSpeakers]);
+
   const shouldHideAvatars = isNarrowScreen && isOverlayEffectivelyVisible;
-
-  if (!location) return null;
 
   return (
     <div
       className={cn(
-        "characters-on-stage-panel flex justify-center items-center transition-opacity duration-300 max-w-full absolute bottom-2 lg:bottom-14 m-0",
+        "characters-on-stage-panel flex justify-center items-center max-w-full absolute bottom-2 lg:bottom-14 m-0",
         shouldHideAvatars ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto",
       )}
     >
-      <div
-        className="relative w-full h-full overflow-x-auto no-scrollbar"
-        // onWheel={(event) => {
-        //   const container = event.currentTarget;
-        //   if (container.scrollWidth <= container.clientWidth) return;
-        //   event.preventDefault();
-        //   container.scrollLeft += event.deltaY;
-        // }}
-      >
-        <motion.div
-          className={cn("min-w-max flex flex-nowrap justify-center gap-2 py-2 px-3 md:px-4 select-none")}
-          initial="hidden"
-          animate="visible"
-          variants={variants.container}
-          style={{ "--avatar-size": AVATAR_SIZE } as CSSProperties}
-          role="list"
-        >
-          {characterEntities.map((characterEntity, index) => (
-            <CharacterAvatar key={characterEntity.slug} characterEntity={characterEntity} currentSpeakers={currentSpeakers} index={index} />
-          ))}
-        </motion.div>
+      <div className="relative w-full h-full overflow-x-auto no-scrollbar">
+        <div className="min-w-max flex flex-nowrap justify-center gap-2 py-2 px-3 md:px-4 select-none" style={{ "--avatar-size": AVATAR_SIZE } as CSSProperties} role="list">
+          <AnimatePresence>
+            {characterEntities.map((characterEntity, index) => (
+              <CharacterAvatar key={characterEntity.slug} characterEntity={characterEntity} isSpeaking={currentSpeakers.includes(characterEntity.slug)} index={index} />
+            ))}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
@@ -111,53 +98,40 @@ interface CharacterAvatarProps {
     isTalkingInFirstParagraph: boolean;
     otherAppearances: Appearance[];
   };
-  currentSpeakers: string[];
+  isSpeaking: boolean;
   index: number;
 }
 
-const CharacterAvatar = memo<CharacterAvatarProps>(({ characterEntity, currentSpeakers, index }) => {
-  const isSpeaking = currentSpeakers.includes(characterEntity.slug);
+const arePropsEqual = (prev: CharacterAvatarProps, next: CharacterAvatarProps) => {
+  return prev.characterEntity.slug === next.characterEntity.slug && prev.isSpeaking === next.isSpeaking && prev.index === next.index;
+};
 
-  const borderStyle = useMemo(
-    () => ({
-      borderColor: isSpeaking ? "rgba(255, 255, 255, 0.8)" : "rgba(255, 255, 255, 0.2)",
-      boxShadow: isSpeaking ? "0 0 10px rgba(255, 255, 255, 0.3), 0 5px 10px -5px rgba(255, 255, 255, 0.4)" : "0 5px 10px -5px rgba(255, 255, 255, 0.1)",
-    }),
-    [isSpeaking],
-  );
-
+const CharacterAvatar = memo<CharacterAvatarProps>(({ characterEntity, isSpeaking, index }) => {
   return (
     <motion.div
-      id={`onstage-${characterEntity.slug}`}
       layout="position"
       variants={variants.character}
       initial="hidden"
       animate="visible"
       exit="exit"
       custom={index}
-      className="flex-shrink-0 snap-start"
       role="listitem"
       layoutId={`character-${characterEntity.slug}`}
     >
-      <motion.div
-        className={cn("w-[var(--avatar-size)] h-[var(--avatar-size)] rounded-full border-2 transition-colors duration-300", isSpeaking ? "speaking" : "not-speaking")}
-        animate={borderStyle}
-        transition={{ duration: 0.3, ease: "easeOut", borderColor: { duration: 0.2 }, boxShadow: { duration: 0.4 } }}
-        whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-      >
-        <CharacterCard entity={characterEntity} currentSpeakers={currentSpeakers} disableHighlight imageOnly captionMode="hover-title" />
-      </motion.div>
+      <div className={cn("w-[var(--avatar-size)] h-[var(--avatar-size)] rounded-full border-2", isSpeaking ? "speaking" : "not-speaking")}>
+        <CharacterCard entity={characterEntity} currentSpeakers={isSpeaking ? [characterEntity.slug] : []} disableHighlight imageOnly captionMode="hover-title" />
+      </div>
     </motion.div>
   );
-});
+}, arePropsEqual);
 
 const variants: { container: Variants; character: Variants } = {
-  container: { visible: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } } },
+  container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.1 } }, exit: { opacity: 0, transition: { duration: 0.3 } } },
   character: {
     hidden: { opacity: 0, scale: 0.8, y: 20 },
-    visible: (i: number) => ({ opacity: 1, scale: 1, y: 0, transition: { delay: i * 0.04, duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] } }),
-    exit: { opacity: 0, scale: 0.7, y: -10, transition: { duration: 0.2, ease: "easeIn" } },
+    visible: (i: number) => ({ opacity: 1, scale: 1, y: 0, transition: { delay: i * 0.03, duration: 0.25, ease: "easeOut" } }),
+    exit: { opacity: 0, scale: 0.7, y: -10, transition: { duration: 0.2 } },
   },
-};
+} as const;
 
 export default CharactersOnStagePanel;

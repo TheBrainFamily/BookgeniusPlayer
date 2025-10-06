@@ -54,7 +54,7 @@
       #player-scope.visible {
         position: fixed;
         inset: 0;
-        height: 100svh;
+
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
@@ -62,8 +62,6 @@
       }
 
       body:has(#player-scope.visible) {
-        height: 100svh;
-        min-height: 100svh;
         overflow: hidden;
         overscroll-behavior: none;
       }

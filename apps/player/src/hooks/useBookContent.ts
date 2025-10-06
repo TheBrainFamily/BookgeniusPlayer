@@ -12,6 +12,7 @@ import { goToParagraph } from "@player/helpers/paragraphsNavigation";
 import { useLocation } from "@player/state/LocationContext";
 import { disposeVirtualizer, ensureChapterWindow, initializeBookContentVirtualizer } from "@player/logic/BookContentVirtualizer";
 import { bookIndex } from "@player/logic/BookIndex";
+import { openPlayRowCharacterModal } from "@player/ui/activateMediaInRange";
 
 const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
@@ -55,27 +56,32 @@ export function useBookContent() {
 
       const target = event.target as HTMLElement;
 
-      if (target.closest(".character-highlighted-activated")) {
-        return;
-      }
+      const isInlineAvatar = target.closest(".inline-avatar");
+      const isCharacterHighlighted = target.classList.contains("character-highlighted-activated");
+      const isCharacterPlaceholder = target.closest(".character-placeholder");
+      const isCharacterText = target.closest(`[data-is-character="true"]`);
 
-      const span = target.closest("span[id^='ch']") as HTMLElement;
-      if (!span) return;
+      const complexitySpan = target.closest("span[id^='ch']") as HTMLElement;
+
+      if (!complexitySpan && !isCharacterText && !isInlineAvatar && !isCharacterHighlighted && !isCharacterPlaceholder) return;
 
       event.preventDefault();
       event.stopPropagation();
 
-      if (isCharacterPlaceholder(span, bookForm)) return;
+      if (isCharacterText || isInlineAvatar || isCharacterHighlighted || isCharacterPlaceholder) {
+        openPlayRowCharacterModal(target, openCharacterDetailsModal);
+        return;
+      }
 
-      const currentSentenceId = span.id;
-      const isFirstSimplification = !span.hasAttribute("data-simplified");
+      const currentSentenceId = complexitySpan.id;
+      const isFirstSimplification = !complexitySpan.hasAttribute("data-simplified");
 
       // Store original sentence only on first tap
       if (isFirstSimplification) {
-        span.setAttribute("data-original-sentence", span.innerHTML);
+        complexitySpan.setAttribute("data-original-sentence", complexitySpan.innerHTML);
       }
 
-      const currentSentenceScore = span.getAttribute("data-current-score") || "100";
+      const currentSentenceScore = complexitySpan.getAttribute("data-current-score") || "100";
       const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentenceRef.current(currentSentenceId, parseInt(currentSentenceScore));
 
       // Handle case when no further simplification is available
@@ -83,32 +89,32 @@ export function useBookContent() {
         console.warn(`No further simplification available for ${currentSentenceId}`);
 
         // Reset to original sentence
-        const originalSentence = span.getAttribute("data-original-sentence") || "";
-        span.innerHTML = replaceXmlTagsIntoHtmlTags(originalSentence);
-        span.removeAttribute("data-current-score");
-        span.setAttribute("data-simplified", "false");
+        const originalSentence = complexitySpan.getAttribute("data-original-sentence") || "";
+        complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(originalSentence);
+        complexitySpan.removeAttribute("data-current-score");
+        complexitySpan.setAttribute("data-simplified", "false");
 
         // Clean up old event listeners
-        span.querySelectorAll('[data-click-listener-attached="true"]').forEach((el) => {
+        complexitySpan.querySelectorAll('[data-click-listener-attached="true"]').forEach((el) => {
           el.removeAttribute("data-click-listener-attached");
         });
 
-        activateCharacterInteractions(span);
+        activateCharacterInteractions(complexitySpan);
         return;
       }
 
       // Update content
-      span.innerHTML = replaceXmlTagsIntoHtmlTags(simplifiedSentence);
-      span.setAttribute("data-current-score", simplifiedSentenceScore.toString());
-      span.setAttribute("data-simplified", "true");
+      complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(simplifiedSentence);
+      complexitySpan.setAttribute("data-current-score", simplifiedSentenceScore.toString());
+      complexitySpan.setAttribute("data-simplified", "true");
 
-      wrapSimplifiedSentenceTail(span);
+      wrapSimplifiedSentenceTail(complexitySpan);
 
       // Activate character interactions
-      activateCharacterInteractions(span);
+      activateCharacterInteractions(complexitySpan);
       setSentenceAsClicked(currentSentenceId);
     },
-    [bookForm],
+    [openCharacterDetailsModal],
   );
 
   useEffect(() => {
@@ -138,9 +144,9 @@ export function useBookContent() {
       observerSetupRef.current.observeNewSpacers();
       observerSetupRef.current.cleanupRemovedSpacers();
     } else {
-      observerSetupRef.current = setupPageObserver(openCharacterDetailsModal);
+      observerSetupRef.current = setupPageObserver();
     }
-  }, [openCharacterDetailsModal]);
+  }, []);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -157,7 +163,7 @@ export function useBookContent() {
 
     let cancelled = false;
 
-    const initialiseVirtualizer = async () => {
+    const initializeVirtualizer = async () => {
       try {
         await initializeBookContentVirtualizer({ container, onContentChanged: handleContentChanged });
         const initialChapter = typeof currentChapterRef.current === "number" ? currentChapterRef.current : (bookIndex.getFirstChapter() ?? 1);
@@ -166,11 +172,11 @@ export function useBookContent() {
           handleContentChanged();
         }
       } catch (error) {
-        console.error("useBookContent: Failed to initialise chapter virtualizer", error);
+        console.error("useBookContent: Failed to initialize chapter virtualizer", error);
       }
     };
 
-    void initialiseVirtualizer();
+    void initializeVirtualizer();
 
     return () => {
       cancelled = true;
@@ -240,10 +246,10 @@ export function useBookContent() {
       } catch (error) {
         console.error("useBookContent: Failed to remount chapters after reload", error);
       } finally {
-        observerSetupRef.current = setupPageObserver(openCharacterDetailsModal);
+        handleContentChanged();
       }
     })();
-  }, [currentChapter, currentParagraph, textVersion, openCharacterDetailsModal]);
+  }, [currentChapter, currentParagraph, textVersion, handleContentChanged]);
 }
 
 // Ensure last word (incl. trailing punctuation) and icon stay on same line
@@ -299,13 +305,4 @@ const setSentenceAsClicked = (sentenceId: string): void => {
   } catch (error) {
     console.error("Failed to update clicked sentences in localStorage:", error);
   }
-};
-
-// TODO this shouldnt rely on things like strong, lets do this right
-const isCharacterPlaceholder = (span: HTMLElement, bookForm: string): boolean => {
-  console.log("bookForm", bookForm);
-  if (bookForm === "play" || bookForm === "mixed") {
-    return span.children.length === 1 && span.children[0].tagName === "STRONG";
-  }
-  return span.children.length === 2 && span.children[0].classList.contains("character-placeholder") && span.children[1].tagName === "STRONG";
 };
