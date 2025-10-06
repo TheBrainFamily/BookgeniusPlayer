@@ -220,15 +220,17 @@ export function activateMediaInRange(
         const videoSrc = state === "speaks" ? snapshot?.media.talking : snapshot?.media.listening;
 
         if (existingVideo) {
-          if (existingVideo.dataset.state !== state) {
-            if (isVideoFile(videoSrc)) {
+          if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
+            if (existingVideo.dataset.state !== state || existingVideo.src !== videoSrc) {
               existingVideo.src = videoSrc;
               existingVideo.dataset.state = state;
-            } else {
-              existingVideo.remove();
             }
+            activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
+          } else {
+            activeCharacterPlaceholder.dataset.isTalking = "false";
+            existingVideo.remove();
           }
-        } else if (videoSrc && isVideoFile(videoSrc)) {
+        } else if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
           const video = createVideoElement(videoSrc, state as "listens" | "speaks");
           activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
           inlineAvatar?.appendChild(video);
