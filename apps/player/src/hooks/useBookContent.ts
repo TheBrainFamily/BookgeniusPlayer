@@ -56,19 +56,19 @@ export function useBookContent() {
 
       const target = event.target as HTMLElement;
 
-      const isStrongTag = target.tagName === "STRONG";
       const isInlineAvatar = target.closest(".inline-avatar");
       const isCharacterHighlighted = target.classList.contains("character-highlighted-activated");
-      const isCharacterPlaceholderElement = target.closest(".character-placeholder");
+      const isCharacterPlaceholder = target.closest(".character-placeholder");
+      const isCharacterText = target.closest(`[data-is-character="true"]`);
 
       const complexitySpan = target.closest("span[id^='ch']") as HTMLElement;
 
-      if (!complexitySpan && !isStrongTag && !isInlineAvatar && !isCharacterHighlighted && !isCharacterPlaceholderElement) return;
+      if (!complexitySpan && !isCharacterText && !isInlineAvatar && !isCharacterHighlighted && !isCharacterPlaceholder) return;
 
       event.preventDefault();
       event.stopPropagation();
 
-      if (isStrongTag || isInlineAvatar || isCharacterHighlighted || isCharacterPlaceholderElement) {
+      if (isCharacterText || isInlineAvatar || isCharacterHighlighted || isCharacterPlaceholder) {
         openPlayRowCharacterModal(target, openCharacterDetailsModal);
         return;
       }

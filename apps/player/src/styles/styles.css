@@ -525,6 +525,10 @@
 
       .play-row.didaskalia-row {
         justify-content: center;
+
+        p {
+          text-align: center;
+        }
       }
 
       .character-avatar {
