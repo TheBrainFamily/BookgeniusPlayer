@@ -173,7 +173,7 @@ function createDummyElement(characterPlaceholder: HTMLSpanElement) {
   return dummyElement;
 }
 
-const activatedMedia = new Map<string, Element>();
+// const activatedMedia = new Map<string, Element>();
 const activatedCharacterHighlighted = new Map<string, Element>();
 const activatedVideo = new Map<string, Element>();
 
@@ -251,104 +251,107 @@ export function activateMediaInRange(
       activatedVideo.delete(index);
     });
 
-    // return;
-  } else {
-    const charactersBySlug = getCharactersBySlug();
+    return;
+  }
 
-    const paragraphs = document.querySelectorAll<HTMLElement>(
-      `.content-container section[data-chapter="${startChapter}"] [data-index], section[data-chapter="${endChapter}"] [data-index]`,
-    );
+  const charactersBySlug = getCharactersBySlug();
 
-    const bufferSize = isPlayFormat ? 5 : 10;
+  const paragraphs = document.querySelectorAll<HTMLElement>(
+    `.content-container section[data-chapter="${startChapter}"] [data-index], section[data-chapter="${endChapter}"] [data-index]`,
+  );
 
-    const paragraphsInRange = Array.from(paragraphs).filter((paragraph) => {
-      const chapterElement = paragraph.closest("section[data-chapter]") as HTMLElement;
-      const chapterStr = chapterElement?.dataset.chapter;
-      const paragraphStr = paragraph.dataset.index;
+  const bufferSize = isPlayFormat ? 5 : 10;
 
-      if (chapterStr && paragraphStr) {
-        const currentChapter = parseInt(chapterStr, 10);
-        const currentParagraph = parseInt(paragraphStr, 10);
-        return isInRange(currentChapter, currentParagraph, startChapter, startParagraph - bufferSize, endChapter, endParagraph + bufferSize);
-      }
+  const paragraphsInRange = Array.from(paragraphs).filter((paragraph) => {
+    const chapterElement = paragraph.closest("section[data-chapter]") as HTMLElement;
+    const chapterStr = chapterElement?.dataset.chapter;
+    const paragraphStr = paragraph.dataset.index;
+
+    if (chapterStr && paragraphStr) {
+      const currentChapter = parseInt(chapterStr, 10);
+      const currentParagraph = parseInt(paragraphStr, 10);
+      return isInRange(currentChapter, currentParagraph, startChapter, startParagraph - bufferSize, endChapter, endParagraph + bufferSize);
+    }
+  });
+
+  const playRowsOrParagraphs: HTMLElement[] = [];
+
+  paragraphsInRange.forEach((p) => {
+    const charactersToHighlight = p.querySelectorAll<HTMLSpanElement>(".character-highlighted");
+
+    Array.from(charactersToHighlight).forEach((character) => {
+      const chapter = character.closest("[data-chapter]")?.getAttribute("data-chapter");
+      const paragraph = character.closest("[data-index]")?.getAttribute("data-index");
+      const index = `${character.dataset.character}-${chapter}-${paragraph}`;
+      if (activatedCharacterHighlighted.has(index)) return;
+      activatedCharacterHighlighted.set(index, character);
+      highlightCharacter(character);
     });
 
-    const playRowsOrParagraphs: HTMLElement[] = [];
+    // Support both play rows and plain paragraphs (non-play)
+    playRowsOrParagraphs.push(p.closest(".play-row") ?? (p as HTMLElement));
+  });
 
-    paragraphsInRange.forEach((p) => {
-      const charactersToHighlight = p.querySelectorAll<HTMLSpanElement>(".character-highlighted");
+  const uniqueRows = [...new Set(playRowsOrParagraphs)];
 
-      Array.from(charactersToHighlight).forEach((character) => {
-        const chapter = character.closest("[data-chapter]")?.getAttribute("data-chapter");
-        const paragraph = character.closest("[data-index]")?.getAttribute("data-index");
-        const index = `${character.dataset.character}-${chapter}-${paragraph}`;
-        if (activatedCharacterHighlighted.has(index)) return;
-        activatedCharacterHighlighted.set(index, character);
-        highlightCharacter(character);
-      });
+  uniqueRows.forEach((rowEl: HTMLElement) => {
+    const characterPlaceholders = rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+    if (!characterPlaceholders.length) return;
 
-      // Support both play rows and plain paragraphs (non-play)
-      playRowsOrParagraphs.push(p.closest(".play-row") ?? (p as HTMLElement));
-    });
+    const { chapter: rowChapter, firstParagraphIndex, lastParagraphIndex } = getRowContext(rowEl);
 
-    const uniqueRows = [...new Set(playRowsOrParagraphs)];
+    if (firstParagraphIndex == null || lastParagraphIndex == null) return;
 
-    uniqueRows.forEach((rowEl: HTMLElement) => {
-      const characterPlaceholders = rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
-      if (!characterPlaceholders.length) return;
+    characterPlaceholders.forEach((characterPlaceholder) => {
+      const characterSlug = characterPlaceholder.dataset.character;
+      if (!characterSlug?.trim()) return;
 
-      const { chapter: rowChapter, firstParagraphIndex, lastParagraphIndex } = getRowContext(rowEl);
+      const locationForPlaceholder = { chapter: rowChapter ?? startChapter, paragraph: firstParagraphIndex ?? startParagraph };
 
-      if (firstParagraphIndex == null || lastParagraphIndex == null) return;
+      const characterData = charactersBySlug.get(characterSlug);
+      const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
 
-      characterPlaceholders.forEach((characterPlaceholder) => {
-        const characterSlug = characterPlaceholder.dataset.character;
-        if (!characterSlug?.trim()) return;
+      const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
 
-        const index = `${characterSlug}-${firstParagraphIndex}-${lastParagraphIndex}`;
+      const activatedMedia = document.querySelectorAll<HTMLElement>(".play-row[data-activated-media='true']");
 
-        const locationForPlaceholder = { chapter: rowChapter ?? startChapter, paragraph: firstParagraphIndex ?? startParagraph };
+      if (Array.from(activatedMedia).find((_rowEl) => _rowEl === rowEl)) return;
 
-        const characterData = charactersBySlug.get(characterSlug);
-        const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
+      const newMediaElement = createMediaElement(characterPlaceholder, characterData, locationForPlaceholder, snapshot);
 
-        const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
-
-        if (activatedMedia.has(index)) return;
-
-        const newMediaElement = createMediaElement(characterPlaceholder, characterData, locationForPlaceholder, snapshot);
-
-        if (newMediaElement) {
-          const existingInlineAvatar = characterPlaceholder.querySelector(".inline-avatar");
-          if (!existingInlineAvatar) {
-            if (dummyPlaceholder) {
-              characterPlaceholder.replaceChild(newMediaElement, dummyPlaceholder);
-            } else {
-              characterPlaceholder.appendChild(newMediaElement);
-            }
-            characterPlaceholder.dataset.mediaInjected = "true";
+      if (newMediaElement) {
+        const existingInlineAvatar = characterPlaceholder.querySelector(".inline-avatar");
+        if (!existingInlineAvatar) {
+          if (dummyPlaceholder) {
+            characterPlaceholder.replaceChild(newMediaElement, dummyPlaceholder);
+          } else {
+            characterPlaceholder.appendChild(newMediaElement);
           }
         }
-        activatedMedia.set(index, rowEl);
-      });
-    });
-
-    // Here we clean up the activated media
-    activatedMedia.forEach((rowEl, index) => {
-      if (!uniqueRows.includes(rowEl as HTMLElement)) {
-        const characterPlaceholders = rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
-
-        characterPlaceholders.forEach((characterPlaceholder) => {
-          const dummyElement = createDummyElement(characterPlaceholder);
-          characterPlaceholder.replaceChildren(dummyElement);
-          characterPlaceholder.dataset.mediaInjected = "false";
-          characterPlaceholder.dataset.isTalking = "false";
-        });
-
-        activatedMedia.delete(index);
       }
+
+      rowEl.dataset.activatedMedia = "true";
     });
-  }
+  });
+
+  // Here we clean up the activated media
+
+  const activatedMedia = document.querySelectorAll<HTMLElement>(".play-row[data-activated-media='true']");
+
+  activatedMedia.forEach((rowEl) => {
+    if (!uniqueRows.includes(rowEl)) {
+      const characterPlaceholders = rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+
+      characterPlaceholders.forEach((characterPlaceholder) => {
+        const dummyElement = createDummyElement(characterPlaceholder);
+        characterPlaceholder.replaceChildren(dummyElement);
+        characterPlaceholder.dataset.mediaInjected = "false";
+        characterPlaceholder.dataset.isTalking = "false";
+      });
+
+      rowEl.dataset.activatedMedia = "false";
+    }
+  });
 }
 
 export const playRowCharacterClickInit = (openCharacterDetailsModal: (params: CharacterModalParams) => void) => {
