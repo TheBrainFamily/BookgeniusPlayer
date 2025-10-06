@@ -8,6 +8,7 @@ import type { CharacterData } from "@player/types/book";
 import type { CharacterSnapshot } from "@player/utils/characterOverrides";
 import { normalizeSrcForInlineAvatar, highlightCharacter } from "./highlightCharacter";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
 
 function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
   const result = [];
@@ -224,7 +225,7 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
       });
     });
 
-    const activatedVideo = document.querySelectorAll<HTMLElement>(".play-row[data-activated-video='true']");
+    const activatedVideo = document.querySelectorAll<HTMLElement>("[data-activated-video='true']");
 
     activatedVideo.forEach((rowEl) => {
       if (rows.map(({ row }) => row).includes(rowEl)) return;
@@ -260,17 +261,13 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
   const playRowsOrParagraphs: HTMLElement[] = [];
 
   paragraphsInRange.forEach((p) => {
-    const charactersToHighlight = p.querySelectorAll<HTMLSpanElement>(".character-highlighted");
-
-    Array.from(charactersToHighlight).forEach((character) => {
-      highlightCharacter(character);
-    });
-
+    activateCharacterInteractions(p);
     // Support both play rows and plain paragraphs (non-play)
     playRowsOrParagraphs.push(p.closest(".play-row") ?? (p as HTMLElement));
   });
 
   const uniqueRows = [...new Set(playRowsOrParagraphs)];
+  const activatedMedia = document.querySelectorAll<HTMLElement>("[data-activated-media='true']");
 
   uniqueRows.forEach((rowEl: HTMLElement) => {
     const characterPlaceholders = rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
@@ -290,8 +287,6 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
       const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
 
       const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
-
-      const activatedMedia = document.querySelectorAll<HTMLElement>(".play-row[data-activated-media='true']");
 
       if (Array.from(activatedMedia).find((_rowEl) => _rowEl === rowEl)) return;
 
@@ -313,9 +308,6 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
   });
 
   // Here we clean up the activated media
-
-  const activatedMedia = document.querySelectorAll<HTMLElement>(".play-row[data-activated-media='true']");
-
   activatedMedia.forEach((rowEl) => {
     if (!uniqueRows.includes(rowEl)) {
       const characterPlaceholders = rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
