@@ -40,24 +40,15 @@ function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
   return result;
 }
 
-// Global flag to ensure we reset all isTalking values only once at the very beginning
-let hasInitializedTalkingStates = false;
-
 let charactersBySlugCache: Map<string, CharacterData> | null = null;
 let cachedBookSlug: string | null = null;
 
-function ensureBookScopedState(openCharacterDetailsModal?: (params: CharacterModalParams) => void): Map<string, CharacterData> {
+function ensureBookScopedState(): Map<string, CharacterData> {
   const currentBookSlug = getBookData().slug;
 
   if (cachedBookSlug !== currentBookSlug) {
     cachedBookSlug = currentBookSlug;
     charactersBySlugCache = null;
-    hasInitializedTalkingStates = false;
-  }
-
-  if (!hasInitializedTalkingStates && openCharacterDetailsModal) {
-    hasInitializedTalkingStates = true;
-    playRowCharacterClickInit(openCharacterDetailsModal);
   }
 
   if (!charactersBySlugCache) {
@@ -184,16 +175,8 @@ function createDummyElement(characterPlaceholder: HTMLSpanElement) {
 }
 
 /** Manages media loading and playback for paragraphs within the visible range **/
-export function activateMediaInRange(
-  startChapter: number,
-  startParagraph: number,
-  endChapter: number,
-  endParagraph: number,
-  openCharacterDetailsModal: (params: CharacterModalParams) => void,
-  isPlayFormat: boolean,
-  shouldCreateVideos: boolean,
-) {
-  const charactersBySlug = ensureBookScopedState(openCharacterDetailsModal);
+export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean, shouldCreateVideos: boolean) {
+  const charactersBySlug = ensureBookScopedState();
 
   if (shouldCreateVideos && isPlayFormat && !isMobile()) {
     const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
@@ -349,72 +332,56 @@ export function activateMediaInRange(
   });
 }
 
-export const playRowCharacterClickInit = (openCharacterDetailsModal: (params: CharacterModalParams) => void) => {
-  const contentContainer = document.querySelector("#content-container");
-  if (!contentContainer) return;
-
+export const openPlayRowCharacterModal = (target: HTMLElement, openCharacterDetailsModal: (params: CharacterModalParams) => void) => {
   const charactersBySlug = getCharactersBySlug();
 
-  contentContainer.addEventListener("pointerup", (e) => {
-    if (e.metaKey || e.ctrlKey) return;
+  const isCharacterHighlighted = target.classList.contains("character-highlighted-activated");
+  const isCharacterPlaceholder = target.closest(".character-placeholder");
 
-    const target = e.target as HTMLElement;
+  // Support both play and non-play: prefer .play-row, else fall back to the nearest [data-index] paragraph
+  const rowOrParagraph = target.closest<HTMLElement>(".play-row") ?? target.closest<HTMLElement>("[data-index]");
+  if (!rowOrParagraph) return;
 
-    const isStrongTag = target.tagName === "STRONG";
-    const isInlineAvatar = target.closest(".inline-avatar");
-    const isCharacterHighlighted = target.classList.contains("character-highlighted-activated");
-    const isCharacterPlaceholder = target.closest(".character-placeholder");
+  // Determine chapter/paragraph from the element we found
+  const { chapter, firstParagraphIndex } = getRowContext(rowOrParagraph);
+  if (chapter == null || firstParagraphIndex == null) return;
 
-    if (!isStrongTag && !isInlineAvatar && !isCharacterHighlighted && !isCharacterPlaceholder) return;
+  // Pick the character slug from the activated highlight or from the placeholder
+  let characterSlug = "";
+  let characterPlaceholder: HTMLSpanElement | null = null;
 
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Support both play and non-play: prefer .play-row, else fall back to the nearest [data-index] paragraph
-    const rowOrParagraph = target.closest<HTMLElement>(".play-row") ?? target.closest<HTMLElement>("[data-index]");
-    if (!rowOrParagraph) return;
-
-    // Determine chapter/paragraph from the element we found
-    const { chapter, firstParagraphIndex } = getRowContext(rowOrParagraph);
-    if (chapter == null || firstParagraphIndex == null) return;
-
-    // Pick the character slug from the activated highlight or from the placeholder
-    let characterSlug = "";
-    let characterPlaceholder: HTMLSpanElement | null = null;
-
-    if (isCharacterHighlighted) {
-      characterSlug = target.dataset.character || "";
+  if (isCharacterHighlighted) {
+    characterSlug = target.dataset.character || "";
+  } else {
+    // Fallback to placeholder logic for other clicks
+    if (isCharacterPlaceholder) {
+      characterPlaceholder = target.closest<HTMLSpanElement>(".character-placeholder");
     } else {
-      // Fallback to placeholder logic for other clicks
-      if (isCharacterPlaceholder) {
-        characterPlaceholder = target.closest<HTMLSpanElement>(".character-placeholder");
-      } else {
-        characterPlaceholder = rowOrParagraph.querySelector<HTMLSpanElement>(".character-placeholder");
-      }
-
-      characterSlug = characterPlaceholder?.dataset.character || "";
+      characterPlaceholder = rowOrParagraph.querySelector<HTMLSpanElement>(".character-placeholder");
     }
 
-    if (!characterSlug.trim()) return;
+    characterSlug = characterPlaceholder?.dataset.character || "";
+  }
 
-    const activeParagraph = document.querySelector<HTMLElement>(".active-paragraph");
-    const activeRow = activeParagraph?.closest(".play-row") ?? activeParagraph;
-    const isTalkingNow = activeRow === rowOrParagraph;
+  if (!characterSlug.trim()) return;
 
-    const characterData = charactersBySlug.get(characterSlug);
-    const snapshot = characterData
-      ? resolveCharacterSnapshot(characterData, { location: { chapter, paragraph: firstParagraphIndex }, fallbackDisplayName: characterData.characterName })
-      : null;
+  const activeParagraph = document.querySelector<HTMLElement>(".active-paragraph");
+  const activeRow = activeParagraph?.closest(".play-row") ?? activeParagraph;
+  const isTalkingNow = activeRow === rowOrParagraph;
 
-    const mediaSrc = snapshot ? (isTalkingNow ? snapshot.media.talking : snapshot.media.listening) : "";
+  const characterData = charactersBySlug.get(characterSlug);
+  const snapshot = characterData
+    ? resolveCharacterSnapshot(characterData, { location: { chapter, paragraph: firstParagraphIndex }, fallbackDisplayName: characterData.characterName })
+    : null;
 
-    openCharacterDetailsModal({
-      characterSlug,
-      isVideo: !!mediaSrc && isVideoFile(mediaSrc),
-      mediaSrc: mediaSrc || "",
-      chapter,
-      paragraph: firstParagraphIndex,
-      isTalking: isTalkingNow,
-    });
+  const mediaSrc = snapshot ? (isTalkingNow ? snapshot.media.talking : snapshot.media.listening) : "";
+
+  openCharacterDetailsModal({
+    characterSlug,
+    isVideo: !!mediaSrc && isVideoFile(mediaSrc),
+    mediaSrc: mediaSrc || "",
+    chapter,
+    paragraph: firstParagraphIndex,
+    isTalking: isTalkingNow,
   });
 };

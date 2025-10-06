@@ -78,9 +78,7 @@ function makeRafScheduler<Args extends unknown[]>(fn: (...args: Args) => void) {
   };
 }
 
-export function setupPageObserver(
-  openCharacterDetailsModal: (params: CharacterModalParams) => void,
-): {
+export function setupPageObserver(): {
   observer: IntersectionObserver;
   observeNewParagraphs: () => number;
   cleanupRemovedParagraphs: () => number;
@@ -381,17 +379,6 @@ export function setupPageObserver(
               expandedStartParagraph = 0;
             }
 
-            // By default, update the hash.
-            let shouldUpdateHash = true;
-
-            // However, if system navigation was in progress, it means this is the
-            // re-evaluation call after the initial scroll. In this case, we've
-            // just landed where we want to be, so we should NOT update the hash
-            // to avoid an unwanted jump (e.g., from 1-0 to 1-1).
-            if (pageWasJustReloaded() || isSystemNavigationInProgress()) {
-              shouldUpdateHash = false;
-            }
-
             const nextLoc: MinimalLoc = {
               chapter: rangeStartInfo.chapter,
               paragraph: expandedStartParagraph,
@@ -422,17 +409,9 @@ export function setupPageObserver(
             if (allIntersectingParagraphs.length > 0) {
               const mediaStartInfo = allIntersectingParagraphs[0];
               const mediaEndInfo = allIntersectingParagraphs[allIntersectingParagraphs.length - 1];
-              activateMediaInRange(
-                mediaStartInfo.chapter,
-                mediaStartInfo.paragraph,
-                mediaEndInfo.chapter,
-                mediaEndInfo.paragraph,
-                openCharacterDetailsModal,
-                isPlayFormat,
-                shouldCreateVideos,
-              );
+              activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, isPlayFormat, shouldCreateVideos);
             } else {
-              activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, openCharacterDetailsModal, isPlayFormat, shouldCreateVideos);
+              activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, isPlayFormat, shouldCreateVideos);
             }
           } else {
             console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {
