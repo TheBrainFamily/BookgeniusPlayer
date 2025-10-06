@@ -29,6 +29,7 @@ import { CoverArt } from "./CoverArt";
 import { useOptionalElementVisibility } from "@player/stores/elementVisibility.store";
 import { isMobileOrTablet } from "@player/utils/isMobileOrTablet";
 import { getBackgroundSongsForBook } from "@player/genericBookDataGetters/getBackgroundSongsForBook";
+import { getBookAssetUrl } from "@player/utils/assetUrls";
 
 const AudioPlayer = () => {
   const { t } = useTranslation();
@@ -384,7 +385,7 @@ const AudioPlayer = () => {
   const handleDownloadTrack = (id: string, title: string) => {
     if (!id) return;
 
-    const trackUrl = `/${slug}/${id}.mp3`;
+    const trackUrl = getBookAssetUrl(`${id}.mp3`);
     const link = document.createElement("a");
     link.href = trackUrl;
     link.download = `${title}.mp3`;
