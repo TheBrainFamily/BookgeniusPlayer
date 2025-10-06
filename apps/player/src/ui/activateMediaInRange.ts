@@ -46,12 +46,18 @@ let hasInitializedTalkingStates = false;
 let charactersBySlugCache: Map<string, CharacterData> | null = null;
 let cachedBookSlug: string | null = null;
 
-function getCharactersBySlug() {
+function ensureBookScopedState(openCharacterDetailsModal?: (params: CharacterModalParams) => void): Map<string, CharacterData> {
   const currentBookSlug = getBookData().slug;
 
   if (cachedBookSlug !== currentBookSlug) {
-    charactersBySlugCache = null;
     cachedBookSlug = currentBookSlug;
+    charactersBySlugCache = null;
+    hasInitializedTalkingStates = false;
+  }
+
+  if (!hasInitializedTalkingStates && openCharacterDetailsModal) {
+    hasInitializedTalkingStates = true;
+    playRowCharacterClickInit(openCharacterDetailsModal);
   }
 
   if (!charactersBySlugCache) {
@@ -60,6 +66,10 @@ function getCharactersBySlug() {
   }
 
   return charactersBySlugCache;
+}
+
+function getCharactersBySlug() {
+  return ensureBookScopedState();
 }
 
 /** Lightweight <video> factory with sane defaults (autoplay/muted/loop/inline) */
@@ -173,10 +183,6 @@ function createDummyElement(characterPlaceholder: HTMLSpanElement) {
   return dummyElement;
 }
 
-// const activatedMedia = new Map<string, Element>();
-const activatedCharacterHighlighted = new Map<string, Element>();
-const activatedVideo = new Map<string, Element>();
-
 /** Manages media loading and playback for paragraphs within the visible range **/
 export function activateMediaInRange(
   startChapter: number,
@@ -187,11 +193,7 @@ export function activateMediaInRange(
   isPlayFormat: boolean,
   shouldCreateVideos: boolean,
 ) {
-  if (!hasInitializedTalkingStates) {
-    // Move initialization of click handler outside of this function - will help reducing passing dependencies (openCharacterDetailsModal)
-    playRowCharacterClickInit(openCharacterDetailsModal);
-    hasInitializedTalkingStates = true;
-  }
+  const charactersBySlug = ensureBookScopedState(openCharacterDetailsModal);
 
   if (shouldCreateVideos && isPlayFormat && !isMobile()) {
     const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
@@ -209,7 +211,7 @@ export function activateMediaInRange(
 
       characterPlaceholders.forEach((activeCharacterPlaceholder) => {
         const characterSlug = activeCharacterPlaceholder?.dataset.character;
-        const characterData = getCharactersBySlug().get(characterSlug);
+        const characterData = characterSlug ? charactersBySlug.get(characterSlug) : undefined;
         const inlineAvatar = activeCharacterPlaceholder?.querySelector(".inline-avatar");
         const existingVideo = inlineAvatar?.querySelector("video");
         const paragraphIndex = playRow?.querySelector<HTMLElement>("[data-index]")?.getAttribute("data-index");
@@ -234,11 +236,12 @@ export function activateMediaInRange(
           const video = createVideoElement(videoSrc, state as "listens" | "speaks");
           activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
           inlineAvatar?.appendChild(video);
-          const index = `${characterSlug}-${chapterIndex}-${paragraphIndex}`;
-          activatedVideo.set(index, playRow);
+          playRow.setAttribute("data-activated-video", "true");
         }
       });
     });
+
+    const activatedVideo = document.querySelectorAll<HTMLElement>(".play-row[data-activated-video='true']");
 
     activatedVideo.forEach((rowEl) => {
       if (rows.map(({ row }) => row).includes(rowEl)) return;
@@ -247,16 +250,11 @@ export function activateMediaInRange(
         video.remove();
       });
 
-      const characterSlug = rowEl.querySelector<HTMLSpanElement>(".character-placeholder")?.dataset.character;
-      const paragraphIndex = rowEl?.querySelector<HTMLElement>("[data-index]")?.getAttribute("data-index");
-      const index = `${characterSlug}-${chapterIndex}-${paragraphIndex}`;
-      activatedVideo.delete(index);
+      rowEl.dataset.activatedVideo = "false";
     });
 
     return;
   }
-
-  const charactersBySlug = getCharactersBySlug();
 
   const paragraphs = document.querySelectorAll<HTMLElement>(
     `.content-container section[data-chapter="${startChapter}"] [data-index], section[data-chapter="${endChapter}"] [data-index]`,
@@ -282,11 +280,6 @@ export function activateMediaInRange(
     const charactersToHighlight = p.querySelectorAll<HTMLSpanElement>(".character-highlighted");
 
     Array.from(charactersToHighlight).forEach((character) => {
-      const chapter = character.closest("[data-chapter]")?.getAttribute("data-chapter");
-      const paragraph = character.closest("[data-index]")?.getAttribute("data-index");
-      const index = `${character.dataset.character}-${chapter}-${paragraph}`;
-      if (activatedCharacterHighlighted.has(index)) return;
-      activatedCharacterHighlighted.set(index, character);
       highlightCharacter(character);
     });
 
