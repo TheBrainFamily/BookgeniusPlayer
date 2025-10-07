@@ -422,13 +422,14 @@
       cursor: pointer;
       touch-action: none;
       transition:
-        background-color 0.3s ease-in-out,
-        padding 0.3s ease-in-out;
+        background-color 0.15s ease-in-out,
+        padding 0.15s ease-in-out;
     }
 
     span[id^="ch"][id*="-p"][id*="-s"]:hover {
       background-color: rgba(66, 68, 90, 0.1);
       padding: 0.2rem 0;
+      transition: none;
     }
   }
 
@@ -505,22 +506,12 @@
         flex-direction: row;
         justify-content: flex-start;
         align-items: flex-start;
-
-        .character-text p span {
-          padding-left: 0.3em;
-          padding-right: 0.3em;
-        }
       }
 
       .play-row[data-text-alignment="right"] {
         flex-direction: row-reverse;
         justify-content: flex-start;
         align-items: flex-start;
-
-        .character-text p span {
-          padding-left: 0.3em;
-          padding-right: 0.3rem;
-        }
       }
 
       .play-row.didaskalia-row {
@@ -629,11 +620,12 @@
       p[data-is-character="true"] > * {
         cursor: pointer;
         font-weight: bold;
-        transition: text-shadow 0.3s ease-in-out;
+        transition: text-shadow 0.15s ease-in-out;
         background-color: transparent;
 
         &:hover {
           text-shadow: 0 0 clamp(2px, 0.5vw, 4px) rgba(0, 0, 0, 0.3);
+          transition: none;
         }
       }
 
