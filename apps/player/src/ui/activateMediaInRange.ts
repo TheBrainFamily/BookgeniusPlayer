@@ -151,6 +151,14 @@ function createDummyElement(characterPlaceholder: HTMLSpanElement) {
   return dummyElement;
 }
 
+function getVideoPathname(src: string): string {
+  try {
+    return new URL(src, window.location.origin).pathname;
+  } catch {
+    return src;
+  }
+}
+
 /** Manages media loading and playback for paragraphs within the visible range **/
 export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean, shouldCreateVideos: boolean) {
   const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
@@ -183,7 +191,10 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
 
         if (existingVideo) {
           if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
-            if (existingVideo.dataset.state !== state || existingVideo.src !== videoSrc) {
+            const videoPathname = getVideoPathname(videoSrc);
+            const existingPathname = getVideoPathname(existingVideo.src);
+
+            if (existingVideo.dataset.state !== state || existingPathname !== videoPathname) {
               existingVideo.src = videoSrc;
               existingVideo.dataset.state = state;
             }
