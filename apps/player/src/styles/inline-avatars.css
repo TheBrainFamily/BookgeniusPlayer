@@ -110,9 +110,10 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
   background-color: rgba(255, 250, 240, 0.5);
   cursor: pointer;
   display: inline-block;
-  line-height: 1.65em;
+  line-height: 1.5em;
   transition: color 0.3s ease-in-out;
   box-decoration-break: clone;
+  vertical-align: baseline;
 }
 
 .character-highlighted-activated:hover {
@@ -162,7 +163,7 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
 }
 
 /* Touch device optimizations */
-@media (hover: none) and (pointer: coarse) {
+/* @media (hover: none) and (pointer: coarse) {
   .inline-avatar {
     transition: none;
   }
@@ -170,7 +171,7 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
   .inline-avatar:active {
     transform: none;
   }
-}
+} */
 
 /* Ultra-small devices */
 @media screen and (max-width: 320px) {
