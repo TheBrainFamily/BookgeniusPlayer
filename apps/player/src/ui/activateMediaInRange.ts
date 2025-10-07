@@ -6,8 +6,7 @@ import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 import { isMobile } from "@player/utils/isMobileOrTablet";
 import type { CharacterData } from "@player/types/book";
 import type { CharacterSnapshot } from "@player/utils/characterOverrides";
-import { normalizeSrcForInlineAvatar, highlightCharacter } from "./highlightCharacter";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { normalizeSrcForInlineAvatar } from "./highlightCharacter";
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
 
 function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
@@ -39,29 +38,6 @@ function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
   }
 
   return result;
-}
-
-let charactersBySlugCache: Map<string, CharacterData> | null = null;
-let cachedBookSlug: string | null = null;
-
-function ensureBookScopedState(): Map<string, CharacterData> {
-  const currentBookSlug = getBookData().slug;
-
-  if (cachedBookSlug !== currentBookSlug) {
-    cachedBookSlug = currentBookSlug;
-    charactersBySlugCache = null;
-  }
-
-  if (!charactersBySlugCache) {
-    charactersBySlugCache = new Map<string, CharacterData>();
-    getCharactersData().forEach((c) => charactersBySlugCache!.set(c.slug, c));
-  }
-
-  return charactersBySlugCache;
-}
-
-function getCharactersBySlug() {
-  return ensureBookScopedState();
 }
 
 /** Lightweight <video> factory with sane defaults (autoplay/muted/loop/inline) */
@@ -177,7 +153,7 @@ function createDummyElement(characterPlaceholder: HTMLSpanElement) {
 
 /** Manages media loading and playback for paragraphs within the visible range **/
 export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean, shouldCreateVideos: boolean) {
-  const charactersBySlug = ensureBookScopedState();
+  const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
 
   if (shouldCreateVideos && isPlayFormat && !isMobile()) {
     const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
@@ -325,7 +301,7 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
 }
 
 export const openPlayRowCharacterModal = (target: HTMLElement, openCharacterDetailsModal: (params: CharacterModalParams) => void) => {
-  const charactersBySlug = getCharactersBySlug();
+  const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
 
   const isCharacterHighlighted = target.classList.contains("character-highlighted-activated");
   const isCharacterPlaceholder = target.closest(".character-placeholder");
