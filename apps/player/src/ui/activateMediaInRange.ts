@@ -6,7 +6,7 @@ import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 import { isMobile } from "@player/utils/isMobileOrTablet";
 import type { CharacterData } from "@player/types/book";
 import type { CharacterSnapshot } from "@player/utils/characterOverrides";
-import { normalizeSrcForInlineAvatar, highlightCharacter } from "./highlightCharacter";
+import { normalizeSrcForInlineAvatar } from "./highlightCharacter";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
 
@@ -175,6 +175,14 @@ function createDummyElement(characterPlaceholder: HTMLSpanElement) {
   return dummyElement;
 }
 
+function getVideoPathname(src: string): string {
+  try {
+    return new URL(src, window.location.origin).pathname;
+  } catch {
+    return src;
+  }
+}
+
 /** Manages media loading and playback for paragraphs within the visible range **/
 export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean, shouldCreateVideos: boolean) {
   const charactersBySlug = ensureBookScopedState();
@@ -207,7 +215,10 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
 
         if (existingVideo) {
           if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
-            if (existingVideo.dataset.state !== state || existingVideo.src !== videoSrc) {
+            const videoPathname = getVideoPathname(videoSrc);
+            const existingPathname = getVideoPathname(existingVideo.src);
+
+            if (existingVideo.dataset.state !== state || existingPathname !== videoPathname) {
               existingVideo.src = videoSrc;
               existingVideo.dataset.state = state;
             }
