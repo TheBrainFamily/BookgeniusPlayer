@@ -106,6 +106,69 @@ export function setupPageObserver(): {
   // Keep track of observed paragraphs to avoid re-observing
   const observedParagraphs = new Set<Element>();
 
+  // Manage delayed scroll indicator visibility
+  let scrollIndicatorTimeoutId: number | null = null;
+  let isScrollIndicatorVisible = false;
+  let scrollIndicatorTargetChapter: number | null = null;
+
+  const clearScrollIndicatorTimeout = () => {
+    if (scrollIndicatorTimeoutId !== null) {
+      window.clearTimeout(scrollIndicatorTimeoutId);
+      scrollIndicatorTimeoutId = null;
+    }
+  };
+
+  const hideScrollIndicator = () => {
+    clearScrollIndicatorTimeout();
+    scrollIndicatorTargetChapter = null;
+    if (isScrollIndicatorVisible) {
+      window.dispatchEvent(new Event("hideScrollIndicator"));
+      isScrollIndicatorVisible = false;
+    }
+  };
+
+  const handleScrollIndicatorClicked = () => {
+    hideScrollIndicator();
+  };
+
+  window.addEventListener("scrollIndicatorClicked", handleScrollIndicatorClicked);
+
+  const scheduleScrollIndicator = (targetChapterStr: string | null) => {
+    if (!targetChapterStr) {
+      return;
+    }
+
+    const nextChapter = Number.parseInt(targetChapterStr, 10);
+    if (!Number.isFinite(nextChapter)) {
+      return;
+    }
+
+    if (isScrollIndicatorVisible && scrollIndicatorTargetChapter === nextChapter) {
+      return;
+    }
+
+    if (scrollIndicatorTimeoutId !== null) {
+      if (scrollIndicatorTargetChapter === nextChapter) {
+        return;
+      }
+      window.clearTimeout(scrollIndicatorTimeoutId);
+      scrollIndicatorTimeoutId = null;
+    }
+
+    scrollIndicatorTargetChapter = nextChapter;
+
+    if (isScrollIndicatorVisible) {
+      window.dispatchEvent(new CustomEvent("showScrollIndicator", { detail: { targetChapter: nextChapter } }));
+      return;
+    }
+
+    scrollIndicatorTimeoutId = window.setTimeout(() => {
+      scrollIndicatorTimeoutId = null;
+      isScrollIndicatorVisible = true;
+      window.dispatchEvent(new CustomEvent("showScrollIndicator", { detail: { targetChapter: nextChapter } }));
+    }, 2000);
+  };
+
   // Prevent redundant location updates when values are equivalent
   type MinimalLoc = { chapter: number; paragraph: number; endChapter: number; endParagraph: number; currentChapter: number; currentParagraph: number };
   let lastSentLocation: MinimalLoc | null = null;
@@ -580,15 +643,17 @@ export function setupPageObserver(): {
         // Determine if spacer is entering from bottom or leaving from top
         if (entry.isIntersecting) {
           // Spacer is at least partially visible
+          const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
           if (rect.top >= 0) {
             // Spacer is entering from bottom or fully in view
+            hideScrollIndicator();
             if (visibilityPercent <= 0.4) {
               // 0-40% visible: keep full opacity
               rootEl.style.opacity = "1";
+            } else if (visibilityPercent > 0.75) {
+              scheduleScrollIndicator(nextChapterStart);
             } else if (visibilityPercent < 1) {
               // 40-99% visible: fade from 1 to 0
-              const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
-
               setCurrentLocation({
                 chapter: parseInt(nextChapterStart, 10),
                 paragraph: 0,
@@ -612,13 +677,16 @@ export function setupPageObserver(): {
             // Spacer is leaving from top (rect.top < 0)
             if (visibilityPercent >= 0.6) {
               // Still 50% or more visible: keep at 0
+              scheduleScrollIndicator(nextChapterStart);
               rootEl.style.opacity = "0";
             } else {
+              hideScrollIndicator();
               rootEl.style.opacity = "1";
             }
           }
         } else {
           // Spacer is completely out of view
+          hideScrollIndicator();
           rootEl.style.opacity = "1";
         }
       });
@@ -671,6 +739,9 @@ export function setupPageObserver(): {
     window.removeEventListener("resize", handleResize);
     window.removeEventListener("orientationchange", handleOrientationChange);
     rootEl.removeEventListener("scroll", handleRootScroll);
+    window.removeEventListener("scrollIndicatorClicked", handleScrollIndicatorClicked);
+
+    hideScrollIndicator();
 
     if (scrollEndTimeoutId !== null) {
       window.clearTimeout(scrollEndTimeoutId);
@@ -688,6 +759,7 @@ export function setupPageObserver(): {
 
   if (paragraphsToObserve.length === 0) {
     console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
+    window.removeEventListener("scrollIndicatorClicked", handleScrollIndicatorClicked);
     return null;
   } else {
     paragraphsToObserve.forEach((paragraph) => {
