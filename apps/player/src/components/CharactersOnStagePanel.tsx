@@ -70,12 +70,12 @@ const CharactersOnStagePanel = () => {
   return (
     <div
       className={cn(
-        "characters-on-stage-panel flex justify-center items-center max-w-full absolute bottom-2 lg:bottom-14 m-0",
-        shouldHideAvatars ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto",
+        "characters-on-stage-panel w-full flex justify-center items-center max-w-full absolute bottom-2 lg:bottom-14 m-0 pointer-events-none",
+        shouldHideAvatars ? "opacity-0" : "opacity-100",
       )}
     >
       <div className="relative w-full h-full overflow-x-auto no-scrollbar">
-        <div className="min-w-max flex flex-nowrap justify-center gap-2 py-2 px-3 md:px-4 select-none" style={{ "--avatar-size": AVATAR_SIZE } as CSSProperties} role="list">
+        <div className="min-w-max flex flex-nowrap justify-center gap-2 py-3 px-3 md:px-4 select-none" style={{ "--avatar-size": AVATAR_SIZE } as CSSProperties} role="list">
           <AnimatePresence>
             {characterEntities.map((characterEntity, index) => (
               <CharacterAvatar key={characterEntity.slug} characterEntity={characterEntity} isSpeaking={currentSpeakers.includes(characterEntity.slug)} index={index} />
@@ -118,7 +118,7 @@ const CharacterAvatar = memo<CharacterAvatarProps>(({ characterEntity, isSpeakin
       role="listitem"
       layoutId={`character-${characterEntity.slug}`}
     >
-      <div className={cn("w-[var(--avatar-size)] h-[var(--avatar-size)] rounded-full border-2", isSpeaking ? "speaking" : "not-speaking")}>
+      <div className={cn("w-[var(--avatar-size)] h-[var(--avatar-size)] rounded-full border-2 pointer-events-auto", isSpeaking ? "speaking" : "not-speaking")}>
         <CharacterCard entity={characterEntity} currentSpeakers={isSpeaking ? [characterEntity.slug] : []} disableHighlight imageOnly captionMode="hover-title" />
       </div>
     </motion.div>
