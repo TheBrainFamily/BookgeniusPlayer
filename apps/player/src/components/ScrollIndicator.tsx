@@ -15,8 +15,11 @@ export const ScrollIndicator = () => {
   const isMobileOrTablet = useIsMobileOrTablet();
 
   useEffect(() => {
-    const handleShow = ((event: Event) => {
-      const detail = (event as CustomEvent<{ targetChapter?: number | null }>).detail;
+    const handleShow: EventListener = (event) => {
+      if (!(event instanceof CustomEvent)) {
+        return;
+      }
+      const detail = event.detail as { targetChapter?: number | null } | undefined;
       const nextTarget = detail?.targetChapter;
       setTargetChapter(typeof nextTarget === "number" && Number.isFinite(nextTarget) ? nextTarget : null);
 
@@ -25,7 +28,7 @@ export const ScrollIndicator = () => {
         hideTimeoutRef.current = null;
       }
       setIsMounted(true);
-    }) as EventListener;
+    };
     const handleHide: EventListener = () => {
       hideTimeoutRef.current = window.setTimeout(() => {
         setIsMounted(false);
@@ -77,14 +80,14 @@ export const ScrollIndicator = () => {
   const MobileScrollIndicator = () => (
     <>
       <ChevronsUp className="w-[2.7rem] h-[2.7rem] pointer-events-none" />
-      <span>{t("scroll_indicator-swipe-up").toUpperCase()}</span>
+      <span className="uppercase">{t("scroll_indicator-swipe-up")}</span>
     </>
   );
 
   const DesktopScrollIndicator = () => (
     <>
       <ChevronsDown className="w-[2.7rem] h-[2.7rem] pointer-events-none" />
-      <span>{t("scroll_indicator-keep-scrolling").toUpperCase()}</span>
+      <span className="uppercase">{t("scroll_indicator-keep-scrolling")}</span>
     </>
   );
 
@@ -92,7 +95,7 @@ export const ScrollIndicator = () => {
     <button
       type="button"
       className={`flex flex-col items-center fixed bottom-40 left-1/2 -translate-x-1/2 text-white cursor-pointer ${isMobileOrTablet ? "scroll-indicator-swipe-up" : "scroll-indicator-keep-scrolling"}`}
-      aria-label="Jump to chapter"
+      aria-label={isMobileOrTablet ? t("scroll_indicator-swipe-up") : t("scroll_indicator-keep-scrolling")}
       onClick={handleClick}
     >
       {isMobileOrTablet ? <MobileScrollIndicator /> : <DesktopScrollIndicator />}

@@ -654,8 +654,6 @@ export function setupPageObserver(): {
               scheduleScrollIndicator(nextChapterStart);
             } else if (visibilityPercent < 1) {
               // 40-99% visible: fade from 1 to 0
-              const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
-
               setCurrentLocation({
                 chapter: parseInt(nextChapterStart, 10),
                 paragraph: 0,

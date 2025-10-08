@@ -1734,3 +1734,10 @@ section[data-chapter] [data-index] {
     transform: translateY(50px);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-indicator-swipe-up,
+  .scroll-indicator-keep-scrolling {
+    animation: none !important;
+  }
+}
