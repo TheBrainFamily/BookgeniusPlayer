@@ -1710,7 +1710,6 @@ section[data-chapter] [data-index] {
 
   30% {
     opacity: 1;
-    transform: translateY(0);
   }
 
   50%, 100% {
