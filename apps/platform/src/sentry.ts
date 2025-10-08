@@ -7,7 +7,7 @@ Sentry.init({
     Sentry.browserTracingIntegration(),
     Sentry.httpClientIntegration({
       // Treat every HTTP 4xx/5xx as an error event
-      failedRequestStatusCodes: [[400, 599]],
+      failedRequestStatusCodes: [400, [402, 599]],
     }),
     Sentry.captureConsoleIntegration({ levels: ["error"] }),
   ],
