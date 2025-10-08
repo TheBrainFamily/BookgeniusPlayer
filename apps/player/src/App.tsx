@@ -36,6 +36,7 @@ import { languageNameToCode } from "@player/helpers/languageNameToCode";
 import { usePaywall } from "./hooks/usePaywall";
 import i18n from "./i18n";
 import { setupUnloadHandlers } from "./services/setupUnloadHandlers";
+import { ScrollIndicator } from "@player/components/ScrollIndicator";
 
 function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   setKnownVideos(getKnownVideoFiles());
@@ -73,6 +74,7 @@ function Shell({ onShellMounted }: { onShellMounted: () => void }) {
       <CharacterNotesPanel />
       {/* Not used for now, but can be re-enabled if needed later */}
       {/* <RightNotesPanel /> */}
+      <ScrollIndicator />
       <Footer />
       <ContentShiftWrapper />
       {import.meta.env.VITE_EDITOR === "true" && <EditorMode />}

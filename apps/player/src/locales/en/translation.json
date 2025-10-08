@@ -214,5 +214,7 @@
   "simplified_version": "Simplified Version",
   "no_further_simplification": "No further simplification available",
   "get_simplified_sentence": "Get Next Simplified Sentence",
-  "undo_simplification": "Undo Simplification"
+  "undo_simplification": "Undo Simplification",
+  "scroll_indicator-swipe-up": "Swipe Up",
+  "scroll_indicator-keep-scrolling": "Keep Scrolling"
 }
