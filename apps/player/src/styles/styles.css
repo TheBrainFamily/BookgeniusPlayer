@@ -543,7 +543,6 @@
           margin: 0;
           display: flex;
           justify-content: center;
-          position: relative;
           overflow: visible;
           min-width: clamp(65px, 16vw, 175px);
           min-height: clamp(65px, 16vw, 175px);
