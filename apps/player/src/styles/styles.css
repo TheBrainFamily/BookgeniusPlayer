@@ -22,7 +22,9 @@
   align-items: stretch; /* Make items fill height by default */
   padding: 0 !important;
   padding-bottom: var(--safe-area-inset-bottom); /* Add padding only for the safe area */
-  transition: background-color var(--transition-medium) var(--transition-timing);
+  transition:
+    background-color var(--transition-medium) var(--transition-timing),
+    color var(--transition-medium) var(--transition-timing);
   position: relative; /* Needed for z-index stacking context */
   z-index: 0; /* Ensure content stays above the ::before pseudo-element */
 
@@ -117,6 +119,7 @@
     backface-visibility: hidden;
     -webkit-perspective: 1000;
     perspective: 1000;
+    transition: color var(--transition-medium) var(--transition-timing);
     /* font-size: 16px; Base content font size */
     scrollbar-width: none;
     &::-webkit-scrollbar {
@@ -132,10 +135,12 @@
 
       background: linear-gradient(
         to bottom,
-        rgba(var(--bg-content-light-rgb), 0) 0%,
-        rgba(var(--bg-content-light-rgb), 0.95) 35%,
-        rgba(var(--bg-content-light-rgb), 0.95) 65%,
-        rgba(var(--bg-content-light-rgb), 0) 100%
+        rgb(from var(--bg-content-light) r g b / 0) 0%,
+        rgb(from var(--bg-content-light) r g b / 0.75) 35%,
+        rgb(from var(--bg-content-light) r g b / 0.85) 45%,
+        rgb(from var(--bg-content-light) r g b / 0.85) 55%,
+        rgb(from var(--bg-content-light) r g b / 0.75) 65%,
+        rgb(from var(--bg-content-light) r g b / 0) 100%
       );
 
       mask-image:

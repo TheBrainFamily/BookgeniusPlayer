@@ -4,7 +4,7 @@ import debounce from "lodash.debounce";
 import { getPreloadedElement } from "@player/preloadBackgrounds";
 import { getFileType, loadVideoAsHTMLElement } from "./backgroundUtils";
 
-export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number };
+export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number; backgroundColor?: string; textColor?: string };
 
 // ---- globals ----------------------------------------------------------------
 
@@ -22,8 +22,27 @@ let transitionState: TransitionState = TransitionState.Idle;
 
 let rafId: number | null = null; // requestAnimationFrame handle
 let fadeTimeoutId: number | null = null; // setTimeout handle for fade completion
+let colorTimeoutId: number | null = null; // setTimeout handle for color change delay
 let bgAbort = new AbortController(); // aborts the current "prepare" phase (logical invalidation)
 let sessionToken = 0; // increments to invalidate stale closures
+
+// ---- color helpers ---------------------------------------------------------
+function applyScopedColors({ backgroundColor, textColor }: { backgroundColor?: string; textColor?: string }) {
+  const scope = document.getElementById("player-scope") as HTMLElement | null;
+  if (!scope) return;
+
+  if (backgroundColor && backgroundColor.trim().length > 0) {
+    scope.style.setProperty("--bg-content-light", backgroundColor.trim());
+  } else {
+    scope.style.removeProperty("--bg-content-light");
+  }
+
+  if (textColor && textColor.trim().length > 0) {
+    scope.style.setProperty("--text-light", textColor.trim());
+  } else {
+    scope.style.removeProperty("--text-light");
+  }
+}
 
 // ---- helpers ----------------------------------------------------------------
 function cancelAllImageZoom(imgA: HTMLDivElement, imgB: HTMLDivElement) {
@@ -64,6 +83,7 @@ function parseTransitionMs(val: string | null): number {
 
 // ---- Constants --------------------------------------------------------------
 const FADE_DURATION_MS = 800; // fallback
+const COLOR_DELAY_MS = 120; // slight delay to let background start appearing first
 
 // ---- Main Function ----------------------------------------------------------
 export const dealWithBackground = ({ currentChapter, currentParagraph }: { currentChapter: number; currentParagraph: number }) => {
@@ -245,6 +265,16 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
             curFront.classList.add("faded");
           });
 
+          // Slightly delay color variable update to align with fade
+          if (colorTimeoutId !== null) {
+            clearTimeout(colorTimeoutId);
+            colorTimeoutId = null;
+          }
+          colorTimeoutId = window.setTimeout(() => {
+            if (signal.aborted || myToken !== sessionToken) return;
+            applyScopedColors({ backgroundColor: found.backgroundColor, textColor: found.textColor });
+          }, COLOR_DELAY_MS);
+
           fadeTimeoutId = window.setTimeout(() => {
             // Guard inside timeout
             if (signal.aborted || myToken !== sessionToken) return;
@@ -316,6 +346,10 @@ export function resetBackgroundDebouncer(): void {
   if (fadeTimeoutId !== null) {
     clearTimeout(fadeTimeoutId);
     fadeTimeoutId = null;
+  }
+  if (colorTimeoutId !== null) {
+    clearTimeout(colorTimeoutId);
+    colorTimeoutId = null;
   }
 
   // Invalidate current async "prepare" phase (logical abort)

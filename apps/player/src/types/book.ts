@@ -1,4 +1,4 @@
-export type BackgroundForBook = { chapter: number; file: string; paragraph: number };
+export type BackgroundForBook = { chapter: number; file: string; paragraph: number; backgroundColor?: string; textColor?: string };
 
 export type BackgroundSongForBook = { chapter: number; files: string[]; paragraph: number };
 
