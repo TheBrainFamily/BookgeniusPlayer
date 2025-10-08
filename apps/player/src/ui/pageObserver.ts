@@ -1,7 +1,5 @@
-import { setCurrentLocation, isSystemNavigationInProgress } from "@player/helpers/paragraphsNavigation";
+import { setCurrentLocation } from "@player/helpers/paragraphsNavigation";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
-import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
-import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers, drawElementsUnion } from "./devVisualizers";
 import { activateMediaInRange } from "./activateMediaInRange";
 
@@ -570,12 +568,14 @@ export function setupPageObserver(): {
         if (!isSplashAnimationComplete) return;
 
         const rect = entry.boundingClientRect;
+        const viewportHeight = window.innerHeight;
 
         // Calculate how much of the spacer is visible
         const visibleTop = Math.max(0, rect.top);
-        const visibleBottom = Math.min(window.innerHeight, rect.bottom);
+        const visibleBottom = Math.min(viewportHeight, rect.bottom);
         const visibleHeight = Math.max(0, visibleBottom - visibleTop);
-        const visibilityPercent = visibleHeight / rect.height;
+        // Visibility as a fraction of the spacer's total height
+        const visibilityPercent = rect.height > 0 ? visibleHeight / rect.height : 0;
 
         // Determine if spacer is entering from bottom or leaving from top
         if (entry.isIntersecting) {
@@ -584,42 +584,49 @@ export function setupPageObserver(): {
             // Spacer is entering from bottom or fully in view
             if (visibilityPercent <= 0.4) {
               // 0-40% visible: keep full opacity
-              rootEl.style.opacity = "1";
-            } else if (visibilityPercent < 1) {
-              // 40-99% visible: fade from 1 to 0
-              const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
+              rootEl.style.setProperty("--gradient-opacity", "1");
+            } else if (visibilityPercent < 1.0) {
+              // 40-100% visible: fade from 1 to 0
+              if (visibilityPercent > 0.8 && visibilityPercent < 1) {
+                const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
 
-              setCurrentLocation({
-                chapter: parseInt(nextChapterStart, 10),
-                paragraph: 0,
-                endChapter: parseInt(nextChapterStart, 10),
-                endParagraph: 0,
-                currentChapter: parseInt(nextChapterStart, 10),
-                currentParagraph: 0,
-                earliestVisibleParagraph: 0,
-                latestVisibleParagraph: 0,
-                earliestVisibleChapter: parseInt(nextChapterStart, 10),
-                latestVisibleChapter: parseInt(nextChapterStart, 10),
-              });
+                setCurrentLocation({
+                  chapter: parseInt(nextChapterStart, 10),
+                  paragraph: 0,
+                  endChapter: parseInt(nextChapterStart, 10),
+                  endParagraph: 0,
+                  currentChapter: parseInt(nextChapterStart, 10),
+                  currentParagraph: 0,
+                  earliestVisibleParagraph: 0,
+                  latestVisibleParagraph: 0,
+                  earliestVisibleChapter: parseInt(nextChapterStart, 10),
+                  latestVisibleChapter: parseInt(nextChapterStart, 10),
+                });
+              }
 
-              const fadePercent = (visibilityPercent - 0.4) * 2;
-              rootEl.style.opacity = (1 - fadePercent).toString();
+              // Map 0.4 -> 1.0 visibility to 1.0 -> 0.0 opacity
+              const fadePercent = (visibilityPercent - 0.4) / 0.6;
+              rootEl.style.setProperty("--gradient-opacity", Math.max(0, 1 - fadePercent).toString());
             } else {
               // 100% visible: full transparency
-              rootEl.style.opacity = "0";
+              rootEl.style.setProperty("--gradient-opacity", "0");
             }
           } else {
             // Spacer is leaving from top (rect.top < 0)
             if (visibilityPercent >= 0.6) {
-              // Still 50% or more visible: keep at 0
-              rootEl.style.opacity = "0";
+              // Still 60% or more visible: keep transparent
+              rootEl.style.setProperty("--gradient-opacity", "0");
+            } else if (visibilityPercent >= 0.3) {
+              // 30-60% visible: fade from 0 to 1
+              // When 60% visible -> opacity = 0
+              // When 30% visible -> opacity = 1
+              const fadePercent = (visibilityPercent - 0.3) / 0.3;
+              rootEl.style.setProperty("--gradient-opacity", (1 - fadePercent).toString());
             } else {
-              rootEl.style.opacity = "1";
+              // Less than 30% visible: full opacity
+              rootEl.style.setProperty("--gradient-opacity", "1");
             }
           }
-        } else {
-          // Spacer is completely out of view
-          rootEl.style.opacity = "1";
         }
       });
     },
