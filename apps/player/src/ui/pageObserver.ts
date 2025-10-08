@@ -132,6 +132,10 @@ export function setupPageObserver(): {
   window.addEventListener("scrollIndicatorClicked", handleScrollIndicatorClicked);
 
   const scheduleScrollIndicator = (nextChapter: number) => {
+    if (!Number.isFinite(nextChapter)) {
+      return;
+    }
+
     if (isScrollIndicatorVisible && scrollIndicatorTargetChapter === nextChapter) {
       return;
     }
@@ -644,7 +648,7 @@ export function setupPageObserver(): {
               rootEl.style.setProperty("--gradient-opacity", "1");
             } else if (visibilityPercent < 1.0) {
               // 40-100% visible: fade from 1 to 0
-              if (visibilityPercent > 0.75 && Number.isFinite(nextChapter)) {
+              if (visibilityPercent > 0.75) {
                 scheduleScrollIndicator(nextChapter);
               }
 
@@ -704,7 +708,7 @@ export function setupPageObserver(): {
               // Leaving from top
               const nextChapterAttr = entry.target.getAttribute("data-next-chapter-start");
               const nextChapter = nextChapterAttr != null ? Number.parseInt(nextChapterAttr, 10) : NaN;
-              if (Number.isFinite(nextChapter)) scheduleScrollIndicator(nextChapter);
+              scheduleScrollIndicator(nextChapter);
               rootEl.style.setProperty("--gradient-opacity", "0");
             }
             return;
