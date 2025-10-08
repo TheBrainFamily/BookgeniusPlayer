@@ -131,16 +131,7 @@ export function setupPageObserver(): {
 
   window.addEventListener("scrollIndicatorClicked", handleScrollIndicatorClicked);
 
-  const scheduleScrollIndicator = (targetChapterStr: string | null) => {
-    if (!targetChapterStr) {
-      return;
-    }
-
-    const nextChapter = Number.parseInt(targetChapterStr, 10);
-    if (!Number.isFinite(nextChapter)) {
-      return;
-    }
-
+  const scheduleScrollIndicator = (nextChapter: number) => {
     if (isScrollIndicatorVisible && scrollIndicatorTargetChapter === nextChapter) {
       return;
     }
@@ -631,19 +622,20 @@ export function setupPageObserver(): {
         if (!isSplashAnimationComplete) return;
 
         const rect = entry.boundingClientRect;
-        const viewportHeight = window.innerHeight;
+        const rootBounds = entry.rootBounds ?? rootEl.getBoundingClientRect();
 
         // Calculate how much of the spacer is visible
-        const visibleTop = Math.max(0, rect.top);
-        const visibleBottom = Math.min(viewportHeight, rect.bottom);
+        const visibleTop = Math.max(rootBounds.top, rect.top);
+        const visibleBottom = Math.min(rootBounds.bottom, rect.bottom);
         const visibleHeight = Math.max(0, visibleBottom - visibleTop);
-        // Visibility as a fraction of the spacer's total height
-        const visibilityPercent = rect.height > 0 ? visibleHeight / rect.height : 0;
+        const visibilityPercent = entry.intersectionRatio > 0 ? entry.intersectionRatio : rect.height > 0 ? visibleHeight / rect.height : 0;
 
         // Determine if spacer is entering from bottom or leaving from top
         if (entry.isIntersecting) {
           // Spacer is at least partially visible
-          const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
+          const nextChapterAttr = entry.target.getAttribute("data-next-chapter-start");
+          const nextChapter = nextChapterAttr != null ? Number.parseInt(nextChapterAttr, 10) : NaN;
+
           if (rect.top >= 0) {
             // Spacer is entering from bottom or fully in view
             hideScrollIndicator();
@@ -652,24 +644,22 @@ export function setupPageObserver(): {
               rootEl.style.setProperty("--gradient-opacity", "1");
             } else if (visibilityPercent < 1.0) {
               // 40-100% visible: fade from 1 to 0
-              if (visibilityPercent > 0.75) {
-                scheduleScrollIndicator(nextChapterStart);
+              if (visibilityPercent > 0.75 && Number.isFinite(nextChapter)) {
+                scheduleScrollIndicator(nextChapter);
               }
 
-              if (visibilityPercent > 0.8 && visibilityPercent < 1) {
-                const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
-
+              if (visibilityPercent > 0.8 && visibilityPercent < 1 && Number.isFinite(nextChapter)) {
                 setCurrentLocation({
-                  chapter: parseInt(nextChapterStart, 10),
+                  chapter: nextChapter,
                   paragraph: 0,
-                  endChapter: parseInt(nextChapterStart, 10),
+                  endChapter: nextChapter,
                   endParagraph: 0,
-                  currentChapter: parseInt(nextChapterStart, 10),
+                  currentChapter: nextChapter,
                   currentParagraph: 0,
                   earliestVisibleParagraph: 0,
                   latestVisibleParagraph: 0,
-                  earliestVisibleChapter: parseInt(nextChapterStart, 10),
-                  latestVisibleChapter: parseInt(nextChapterStart, 10),
+                  earliestVisibleChapter: nextChapter,
+                  latestVisibleChapter: nextChapter,
                 });
               }
 
@@ -684,7 +674,7 @@ export function setupPageObserver(): {
             // Spacer is leaving from top (rect.top < 0)
             if (visibilityPercent >= 0.6) {
               // Still 60% or more visible: keep transparent
-              scheduleScrollIndicator(nextChapterStart);
+              scheduleScrollIndicator(nextChapter);
               rootEl.style.setProperty("--gradient-opacity", "0");
             } else if (visibilityPercent >= 0.3) {
               // 30-60% visible: fade from 0 to 1
@@ -704,7 +694,7 @@ export function setupPageObserver(): {
           // considered non-intersecting but still be partially visible if it's
           // very tall and the user scrolls quickly. To handle this, we check
           // the boundingClientRect to see if it's still partially on screen.
-          if (rect.bottom > 0 && rect.top < viewportHeight) {
+          if (rect.bottom > rootBounds.top && rect.top < rootBounds.bottom) {
             // Still partially visible - handle like intersecting case
             if (rect.top >= 0) {
               // Leaving from bottom
@@ -712,8 +702,9 @@ export function setupPageObserver(): {
               rootEl.style.setProperty("--gradient-opacity", "1");
             } else {
               // Leaving from top
-              const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
-              scheduleScrollIndicator(nextChapterStart);
+              const nextChapterAttr = entry.target.getAttribute("data-next-chapter-start");
+              const nextChapter = nextChapterAttr != null ? Number.parseInt(nextChapterAttr, 10) : NaN;
+              if (Number.isFinite(nextChapter)) scheduleScrollIndicator(nextChapter);
               rootEl.style.setProperty("--gradient-opacity", "0");
             }
             return;
