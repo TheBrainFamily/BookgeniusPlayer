@@ -103,8 +103,10 @@ export function useBookContent() {
         return;
       }
 
+      const sentenceNumber = parseInt(complexitySpan.getAttribute("id")?.split("-s")?.[1] ?? "1");
+      const isFirstSentence = sentenceNumber === 1;
       // Update content
-      complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(simplifiedSentence);
+      complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(simplifiedSentence, isFirstSentence);
       complexitySpan.setAttribute("data-current-score", simplifiedSentenceScore.toString());
       complexitySpan.setAttribute("data-simplified", "true");
 
