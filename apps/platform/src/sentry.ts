@@ -1,6 +1,9 @@
 import * as Sentry from "@sentry/react";
 
 console.log("loading sentry");
+
+console.log("5: import.meta.env.MODE BANG!", import.meta.env.MODE);
+
 Sentry.init({
   dsn: "https://ec8e06caac85f65ed3bab3efcb45d88e@o4510025358311424.ingest.de.sentry.io/4510152806039632",
   integrations: [
@@ -12,6 +15,6 @@ Sentry.init({
     Sentry.captureConsoleIntegration({ levels: ["error"] }),
   ],
   environment: import.meta.env.MODE || "development",
-  enabled: import.meta.env.PROD,
+  enabled: import.meta.env.MODE === "production",
   sendDefaultPii: true,
 });
