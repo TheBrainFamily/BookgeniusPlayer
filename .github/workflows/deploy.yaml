@@ -56,13 +56,11 @@ jobs:
             BRANCH_NAME=$(echo "${{ github.head_ref }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
             echo "ASSET_CONTEXT=branches/${BRANCH_NAME}" >> $GITHUB_ENV
             echo "IS_PRODUCTION=false" >> $GITHUB_ENV
-            echo "MODE=development" >> $GITHUB_ENV
             echo "DOMAIN=${BRANCH_NAME}.branches.bookgenius.net" >> $GITHUB_ENV
           else
             BRANCH_NAME=$(echo "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
             echo "ASSET_CONTEXT=prod" >> $GITHUB_ENV
             echo "IS_PRODUCTION=true" >> $GITHUB_ENV
-            echo "MODE=production" >> $GITHUB_ENV
             echo "DOMAIN=bookgenius.net" >> $GITHUB_ENV
           fi
 
@@ -145,7 +143,7 @@ jobs:
         run: mv apps/platform/dist apps/platform/dist-intl
 
       - name: Build wukong
-        run: pnpm build:wukong --mode ${{ env.MODE }}
+        run: pnpm build:wukong
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
@@ -155,10 +153,11 @@ jobs:
           VITE_AUTH_PROVIDER: ${{ vars.VITE_AUTH_PROVIDER }}
           VITE_PAYMENTS_PROVIDER: ${{ vars.VITE_PAYMENTS_PROVIDER }}
           VITE_SUPPORT_EMAIL: support@bookgenius.net
+          VITE_IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
           CI: true
 
       - name: Build snapplify platform
-        run: pnpm build:platform --mode ${{ env.MODE }}
+        run: pnpm build:platform
         env:
           VITE_AUTH_PROVIDER: "snapplify"
           VITE_PAYMENTS_PROVIDER: "default"
@@ -166,13 +165,14 @@ jobs:
           VITE_SNAPPLIFY_CLIENT_ID: "bookgenius.net"
           VITE_SNAPPLIFY_ISSUER: "https://auth.snapplify.com"
           VITE_SNAPPLIFY_REDIRECT_URI: "https://bookgenius.snapplify.com/auth/callback"
+          VITE_IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
           CI: "true"
 
       - name: move snapplify platform to dist
         run: mv apps/platform/dist apps/platform/dist-snapplify
 
       - name: build bookgeniusz.pl
-        run: pnpm build:platform --mode ${{ env.MODE }}
+        run: pnpm build:platform
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_BOOKGENIUSZ_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_BOOKGENIUSZ_SECRET_KEY }}
@@ -182,6 +182,7 @@ jobs:
           VITE_AUTH_PROVIDER: ${{ vars.VITE_AUTH_PROVIDER }}
           VITE_PAYMENTS_PROVIDER: ${{ vars.VITE_PAYMENTS_PROVIDER }}
           VITE_SUPPORT_EMAIL: support@bookgeniusz.pl
+          VITE_IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
           CI: true
 
       - name: Build books

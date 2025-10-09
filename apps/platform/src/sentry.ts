@@ -12,7 +12,7 @@ Sentry.init({
     }),
     Sentry.captureConsoleIntegration({ levels: ["error"] }),
   ],
-  environment: import.meta.env.MODE || "development",
-  enabled: import.meta.env.MODE === "production",
+  environment: import.meta.env.VITE_IS_PRODUCTION || "development",
+  enabled: import.meta.env.VITE_IS_PRODUCTION === "production",
   sendDefaultPii: true,
 });
