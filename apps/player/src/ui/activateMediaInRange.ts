@@ -346,17 +346,21 @@ export const openPlayRowCharacterModal = (target: HTMLElement, openCharacterDeta
 
   const activeParagraph = document.querySelector<HTMLElement>(".active-paragraph");
   const activeRow = activeParagraph?.closest(".play-row") ?? activeParagraph;
-
-  const currentlyTalking = activeRow?.querySelector("[data-character]")?.getAttribute("data-character");
-
-  const isTalking = currentlyTalking === characterSlug;
+  const isTalkingNow = activeRow === rowOrParagraph;
 
   const characterData = charactersBySlug.get(characterSlug);
   const snapshot = characterData
     ? resolveCharacterSnapshot(characterData, { location: { chapter, paragraph: firstParagraphIndex }, fallbackDisplayName: characterData.characterName })
     : null;
 
-  const mediaSrc = snapshot ? (isTalking ? snapshot.media.talking : snapshot.media.listening) : "";
+  const mediaSrc = snapshot ? (isTalkingNow ? snapshot.media.talking : snapshot.media.listening) : "";
 
-  openCharacterDetailsModal({ characterSlug, isVideo: !!mediaSrc && isVideoFile(mediaSrc), mediaSrc: mediaSrc || "", chapter, paragraph: firstParagraphIndex, isTalking });
+  openCharacterDetailsModal({
+    characterSlug,
+    isVideo: !!mediaSrc && isVideoFile(mediaSrc),
+    mediaSrc: mediaSrc || "",
+    chapter,
+    paragraph: firstParagraphIndex,
+    isTalking: isTalkingNow,
+  });
 };

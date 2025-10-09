@@ -225,7 +225,6 @@ const WrappedPlayerApp = () => {
       const cleanup = async () => {
         try {
           // 1. First reset the book data loader to stop any ongoing requests
-          unloadBookColorsCSS();
           bookDataLoader.resetCurrentBook();
 
           // 2. Then tear down the player runtime
