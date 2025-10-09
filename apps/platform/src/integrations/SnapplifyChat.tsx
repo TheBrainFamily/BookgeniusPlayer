@@ -34,7 +34,7 @@ function initiateCall() {
   initialize(document, "Freshdesk Messaging-js-sdk");
 }
 
-if (import.meta.env.VITE_AUTH_PROVIDER === "snapplify") {
+if (!import.meta.env.SSR && import.meta.env.VITE_AUTH_PROVIDER === "snapplify") {
   console.log("SnapplifyChat initializing");
   window.addEventListener ? window.addEventListener("load", initiateCall, !1) : window.attachEvent("load", initiateCall, !1);
 } else {
