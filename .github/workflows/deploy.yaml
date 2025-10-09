@@ -153,6 +153,7 @@ jobs:
           VITE_AUTH_PROVIDER: ${{ vars.VITE_AUTH_PROVIDER }}
           VITE_PAYMENTS_PROVIDER: ${{ vars.VITE_PAYMENTS_PROVIDER }}
           VITE_SUPPORT_EMAIL: support@bookgenius.net
+          VITE_IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
           CI: true
 
       - name: Build snapplify platform
@@ -164,6 +165,7 @@ jobs:
           VITE_SNAPPLIFY_CLIENT_ID: "bookgenius.net"
           VITE_SNAPPLIFY_ISSUER: "https://auth.snapplify.com"
           VITE_SNAPPLIFY_REDIRECT_URI: "https://bookgenius.snapplify.com/auth/callback"
+          VITE_IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
           CI: "true"
 
       - name: move snapplify platform to dist
@@ -180,6 +182,7 @@ jobs:
           VITE_AUTH_PROVIDER: ${{ vars.VITE_AUTH_PROVIDER }}
           VITE_PAYMENTS_PROVIDER: ${{ vars.VITE_PAYMENTS_PROVIDER }}
           VITE_SUPPORT_EMAIL: support@bookgeniusz.pl
+          VITE_IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
           CI: true
 
       - name: Build books
