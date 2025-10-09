@@ -3,7 +3,7 @@ import { bookDataLoader } from "@player/services/bookDataLoader";
 import { normalizeSrcForInlineAvatar } from "@player/ui/highlightCharacter";
 import { getListeningMediaFilePathForName } from "@player/utils/getFilePathsForName";
 
-export const replaceXmlTagsIntoHtmlTags = (text: string) => {
+export const replaceXmlTagsIntoHtmlTags = (text: string, isFirstSentence: boolean = true) => {
   const characters = getCharactersData(); // Get characters data once
   const characterSlugs = characters.map((char) => char.slug); // Get all valid slugs
 
@@ -58,7 +58,7 @@ export const replaceXmlTagsIntoHtmlTags = (text: string) => {
     const attributeName = attribute.toLowerCase();
 
     const newAttributes = {
-      class: `character-placeholder character-${attributeName} ${offset === 0 ? "start-of-paragraph" : ""}`,
+      class: `character-placeholder character-${attributeName} ${isFirstSentence ? "start-of-paragraph" : ""}`,
       "data-character": foundCharacter.slug,
       [`data-is-${attributeName}`]: "true",
       "data-media-injected": "true",
