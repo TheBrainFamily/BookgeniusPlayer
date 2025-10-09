@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useRouteTransition } from "./providers/RouteTransitionProvider";
 import { books } from "@platform/books";
 import { bookDataLoader } from "../../player/src/services/bookDataLoader";
+import { unloadBookColorsCSS } from "../../player/src/utils/loadBookColors";
 import Paywall from "./components/Paywall";
 import AuthRequiredModal from "./components/AuthRequiredModal";
 import { teardownPlayer } from "../../player/src/teardown";
@@ -137,6 +138,7 @@ const WrappedPlayerApp = () => {
       setIsPlayerReady(false);
 
       lastBookRef.current = book;
+      unloadBookColorsCSS();
       bookDataLoader.resetCurrentBook();
 
       // If overlay has ALREADY started on the platform, do NOT start it again here.

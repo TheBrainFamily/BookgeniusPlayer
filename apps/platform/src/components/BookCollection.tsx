@@ -30,7 +30,11 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
         book.metadata[language].genre.toLowerCase().includes(query) ||
         book.metadata[language].description.toLowerCase().includes(query),
     );
-  }, [searchQuery]);
+  }, [searchQuery, language]);
+
+  const originalOrder = useMemo(() => {
+    return new Map(filteredBooks.map((b, i) => [b.id, i]));
+  }, [filteredBooks]);
 
   const handleBookClick = (book: (typeof books)[0]) => {
     const title = book?.title ?? "BookGenius";
@@ -75,9 +79,17 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 px-4 md:px-0">
-            {filteredBooks.map((book) => (
-              <BookCard key={book.id} book={book} variant="default" showLanguageFlag onClick={handleBookClick} />
-            ))}
+            {filteredBooks
+              .map((book) => <BookCard key={book.id} book={book} variant="default" showLanguageFlag onClick={handleBookClick} />)
+              .sort((a, b) => {
+                const aPref = a.props.book.language === language ? 0 : 1;
+                const bPref = b.props.book.language === language ? 0 : 1;
+                if (aPref !== bPref) return aPref - bPref;
+                // Keep original order when preference is the same
+                const aIdx = originalOrder.get(a.props.book.id) ?? 0;
+                const bIdx = originalOrder.get(b.props.book.id) ?? 0;
+                return aIdx - bIdx;
+              })}
           </div>
         )}
       </div>

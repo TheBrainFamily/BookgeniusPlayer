@@ -79,7 +79,15 @@ export default defineConfig(async () => {
     server: {
       port: 5173,
       open: false,
-      proxy: { "/api": "http://localhost:3000" },
+      proxy: {
+        // match any path starting with /api
+        "^/api": {
+          target: "http://localhost:30310",
+          changeOrigin: true,
+          // remove the /api prefix: /api/get-answers -> /get-answers
+          rewrite: (path) => path.replace(/^\/api/, ""),
+        },
+      },
       watch: { ignored: ["**/src/data/*.xml", "**/public_books/**", "**/src/data/tools/Text-Editor/*.xml", "**/.vscode/**", "**/.cursor/**", "**/public/**"] },
     },
   };

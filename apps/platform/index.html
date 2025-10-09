@@ -68,6 +68,33 @@
         overscroll-behavior: none;
       }
 
+      #fc_frame {
+        position: fixed;
+        bottom: 0 !important;
+        right: 5px !important;
+        width: 65px;
+        height: 65px;
+        opacity: 1;
+        scale: 0.7;
+        transition:
+          opacity 0.15s ease-in-out,
+          scale 0.15s ease-in-out;
+        pointer-events: auto;
+      }
+
+      #fc_widget {
+        width: 100%;
+        height: 100%;
+      }
+
+      @media (max-width: 1280px) {
+        body:has(#bottom-input-container[data-optional-element-visible="true"]) #fc_frame {
+          opacity: 0;
+          scale: 0.5;
+          pointer-events: none;
+        }
+      }
+
       #content-container {
         font-size: calc(16px * var(--font-size-multiplier, 1));
         transition: font-size 0.2s ease-in-out;

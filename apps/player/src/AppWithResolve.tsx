@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import App from "./App";
 import { bookDataLoader } from "@player/services/bookDataLoader";
+import { unloadBookColorsCSS } from "@player/utils/loadBookColors";
 
 function getBookFromUrl(): string | null {
   try {
@@ -42,6 +43,7 @@ const AppWithResolveProd: React.FC = () => {
     }
 
     lastBookRef.current = book ?? null;
+    unloadBookColorsCSS();
     bookDataLoader.resetCurrentBook();
     setAssetBaseReady(false);
 

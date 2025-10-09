@@ -5,45 +5,63 @@
 import { bookDataLoader } from "@player/services/bookDataLoader";
 import { getBookAssetUrl } from "./assetUrls";
 
-const loadedBookColorFiles = new Set<string>();
+const verifiedBookColorPaths = new Map<string, string>();
+const LINK_ID_PREFIX = "book-colors-";
+
+function removeExistingBookColorLinks(): void {
+  const links = Array.from(document.querySelectorAll<HTMLLinkElement>(`link[id^="${LINK_ID_PREFIX}"]`));
+
+  for (const link of links) {
+    const slug = link.dataset.bookSlug ?? link.id.replace(LINK_ID_PREFIX, "");
+    document.head.removeChild(link);
+    console.log(`✓ Unloaded book colors for: ${slug}`);
+  }
+}
+
+function attachBookColorLink(bookSlug: string, cssPath: string): void {
+  const linkElement = document.createElement("link");
+  linkElement.rel = "stylesheet";
+  linkElement.href = cssPath;
+  linkElement.id = `${LINK_ID_PREFIX}${bookSlug}`;
+  linkElement.dataset.bookSlug = bookSlug;
+
+  document.head.appendChild(linkElement);
+  console.log(`✓ Loaded optional book colors for: ${bookSlug}`);
+}
 
 export const loadBookColorsCSS = async (): Promise<void> => {
   const bookSlug = bookDataLoader.getCurrentBook();
-  const cssPath = getBookAssetUrl("book-colors.css");
-
-  // Avoid loading the same file multiple times
-  if (loadedBookColorFiles.has(cssPath)) {
+  if (!bookSlug) {
     return;
   }
 
+  const cssPath = getBookAssetUrl("book-colors.css");
+
+  // Always clear previously injected book colors so they do not bleed into the new book.
+  removeExistingBookColorLinks();
+
   try {
-    // Check if the file exists by attempting to fetch it
+    const verifiedPath = verifiedBookColorPaths.get(bookSlug);
+
+    if (verifiedPath === cssPath) {
+      attachBookColorLink(bookSlug, cssPath);
+      return;
+    }
+
     const response = await fetch(cssPath, { method: "HEAD" });
 
-    if (response.ok) {
-      // Create and append a link element to load the CSS
-      const linkElement = document.createElement("link");
-      linkElement.rel = "stylesheet";
-      linkElement.href = cssPath;
-      linkElement.id = `book-colors-${bookSlug}`;
-
-      document.head.appendChild(linkElement);
-      loadedBookColorFiles.add(cssPath);
-
-      console.log(`✓ Loaded optional book colors for: ${bookSlug}`);
+    if (!response.ok) {
+      console.log(`No custom colors found for book: ${bookSlug}`);
+      return;
     }
+
+    attachBookColorLink(bookSlug, cssPath);
+    verifiedBookColorPaths.set(bookSlug, cssPath);
   } catch {
-    // Silently fail if the file doesn't exist - it's optional
     console.log(`No custom colors found for book: ${bookSlug}`);
   }
 };
 
 export const unloadBookColorsCSS = (): void => {
-  const bookSlug = bookDataLoader.getCurrentBook();
-  const linkElement = document.getElementById(`book-colors-${bookSlug}`);
-  if (linkElement) {
-    document.head.removeChild(linkElement);
-    loadedBookColorFiles.delete(`/books/${bookSlug}/book-colors.css`);
-    console.log(`✓ Unloaded book colors for: ${bookSlug}`);
-  }
+  removeExistingBookColorLinks();
 };

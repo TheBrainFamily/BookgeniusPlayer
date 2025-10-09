@@ -244,8 +244,8 @@ export const books: Book[] = [
   },
   {
     id: 10,
-    title: "Pharaon",
-    slug: "Pharaon",
+    title: "Faraon",
+    slug: "Faraon",
     author: "Bolesław Prus",
     metadata: {
       en: {
