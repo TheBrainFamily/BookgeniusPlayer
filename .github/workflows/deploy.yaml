@@ -56,11 +56,13 @@ jobs:
             BRANCH_NAME=$(echo "${{ github.head_ref }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
             echo "ASSET_CONTEXT=branches/${BRANCH_NAME}" >> $GITHUB_ENV
             echo "IS_PRODUCTION=false" >> $GITHUB_ENV
+            echo "NODE_ENV=development" >> $GITHUB_ENV
             echo "DOMAIN=${BRANCH_NAME}.branches.bookgenius.net" >> $GITHUB_ENV
           else
             BRANCH_NAME=$(echo "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
             echo "ASSET_CONTEXT=prod" >> $GITHUB_ENV
             echo "IS_PRODUCTION=true" >> $GITHUB_ENV
+            echo "NODE_ENV=production" >> $GITHUB_ENV
             echo "DOMAIN=bookgenius.net" >> $GITHUB_ENV
           fi
 
