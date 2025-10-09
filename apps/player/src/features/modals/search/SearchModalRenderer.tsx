@@ -16,13 +16,7 @@ export const SearchModalRenderer: React.FC = () => {
   if (!isOpen) return null;
 
   return createPortal(
-    <SearchModal
-      onClose={closeModal}
-      layoutView={layoutView}
-      hideOverlay={hideOverlay}
-      searchResults={results || { header: "Enter search query...", items: [], isLoading: false }}
-      clickedAppearanceId={lastClickedAppearanceId}
-    />,
+    <SearchModal onClose={closeModal} layoutView={layoutView} hideOverlay={hideOverlay} searchResults={results} clickedAppearanceId={lastClickedAppearanceId} />,
     document.body,
   );
 };

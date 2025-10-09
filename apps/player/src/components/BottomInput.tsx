@@ -53,7 +53,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { pauseAllTimers, startAllTimers, showAllElements, setIsTimersPausedSticky } = useElementVisibilityStore();
-  const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery } = useSearchModal();
+  const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery, clearModal } = useSearchModal();
   const {
     openModal: openDeepResearchModal,
     setContent: setDeepResearchContent,
@@ -105,11 +105,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
           openSearchModal(true, true, inputValue);
           setSearchQuery(trimmedValue);
         } else {
+          clearModal();
           setSearchQuery("");
         }
       });
     },
-    [isDeepResearchActive, isRecording, setSearchQuery, openSearchModal],
+    [isDeepResearchActive, isRecording, setSearchQuery, openSearchModal, clearModal],
   );
 
   const filteredCharacters = useMemo(() => {

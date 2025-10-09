@@ -21,7 +21,7 @@ interface SearchModalProps {
   onClose: () => void;
   layoutView?: boolean;
   hideOverlay?: boolean;
-  searchResults: SearchResultsData | null;
+  searchResults: SearchResultsData;
   clickedAppearanceId?: string;
 }
 

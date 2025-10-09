@@ -106,13 +106,11 @@ export const useSearchLogic = () => {
    * 4 ️⃣  Fire searches when the modal is open & the query changes
    * ------------------------------------------------------------------ */
   useEffect(() => {
-    if (isOpen && query.trim()) {
+    if (query.trim()) {
       const latestLocation = getSavedLocation();
-      debouncedTriggerSearch(query, latestLocation);
-    } else if (isOpen && !query.trim()) {
-      setResults({ header: "Please enter a search term.", items: [], isLoading: false });
+      void debouncedTriggerSearch(query, latestLocation);
     }
-  }, [query, isOpen, debouncedTriggerSearch, setResults]);
+  }, [query, debouncedTriggerSearch, setResults]);
 
   useEffect(() => {
     return () => {

@@ -41,11 +41,6 @@ export const useSearchModal = create<SearchModalState>()(
         const state = get();
         const coordinator = useModalCoordinator.getState();
 
-        if (state.isOpen) {
-          set({ layoutView, hideOverlay });
-          return;
-        }
-
         if (!coordinator.requestModalOpen(MODAL_ID)) return;
 
         if (layoutView) useContentShift.getState().enableContentShift();
