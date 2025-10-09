@@ -51,9 +51,9 @@ export const useSearchModal = create<SearchModalState>()(
         if (layoutView) useContentShift.getState().enableContentShift();
         const trimmedQuery = query.trim();
 
-        const hasCachedResults = trimmedQuery && state.query.trim() === trimmedQuery && state.results.items.length > 0;
+        const hasResults = state.results.items.length;
 
-        set({ isOpen: true, layoutView, hideOverlay, query: trimmedQuery, results: hasCachedResults ? state.results : EMPTY_RESULTS, isLoading: false });
+        set({ isOpen: true, layoutView, hideOverlay, query: trimmedQuery, results: hasResults ? state.results : EMPTY_RESULTS, isLoading: false });
       },
 
       closeModal: () => {
