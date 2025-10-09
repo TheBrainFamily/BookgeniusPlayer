@@ -171,8 +171,8 @@ jobs:
       - name: move snapplify platform to dist
         run: mv apps/platform/dist apps/platform/dist-snapplify
 
-      - name: build bookgeniusz.pl --mode ${{ env.MODE }}
-        run: pnpm build:platform --mode ${{ env.ENV }}
+      - name: build bookgeniusz.pl
+        run: pnpm build:platform --mode ${{ env.MODE }}
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_BOOKGENIUSZ_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_BOOKGENIUSZ_SECRET_KEY }}
