@@ -192,19 +192,25 @@ const WrappedPlayerApp = () => {
         // accept either shape; you already parse full URL in setAssetBase
         bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
         bookDataLoader.setBookVisibility(visibility);
-        // optional warm HEAD for index.html to reduce first-media latency (fire-and-forget)
-        // try { fetch(`${assetBase}index.html`, { method: "HEAD", cache: "no-store" }); } catch (_) {}
         setAssetBaseReady(true);
       } catch (err: unknown) {
-        if (typeof err === "object" && err !== null && "name" in err && (err as { name?: string }).name === "AbortError") {
-          return;
+        console.warn("[RESOLVE] error, retrying:", err);
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        try {
+          await auth.refreshToken?.();
+          const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
+          if (!res.ok) throw new Error("[RESOLVE] resolve failed");
+          const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
+          // accept either shape; you already parse full URL in setAssetBase
+          bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
+          bookDataLoader.setBookVisibility(visibility);
+          setAssetBaseReady(true);
+        } catch (err: unknown) {
+          console.error("[RESOLVE] error second attempt:", err);
         }
-        console.error("[RESOLVE] error:", err);
-        bookDataLoader.setAssetBase(null); // fallback to old API path
-        setAssetBaseReady(true);
       }
     })();
-  }, [book, auth.ready]);
+  }, [book, auth.ready, auth]);
 
   // On unmount (leaving /reader), fully tear down the player environment
   useEffect(() => {

@@ -154,6 +154,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.10.0
         version: 3.10.0(react-hook-form@7.62.0(react@19.1.1))
+      '@intercom/messenger-js-sdk':
+        specifier: ^0.0.18
+        version: 0.0.18
       '@radix-ui/react-accordion':
         specifier: ^1.2.11
         version: 1.2.11(@types/react-dom@19.1.7(@types/react@19.1.10))(@types/react@19.1.10)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -2526,6 +2529,9 @@ packages:
     peerDependenciesMeta:
       '@types/node':
         optional: true
+
+  '@intercom/messenger-js-sdk@0.0.18':
+    resolution: {integrity: sha512-OQbhnNh26cdI0ddIVh67JOGnSTFAHrbKF5atXuOeWpDF2Ups3O7Do1Oz42BrvQA/o0AZF+1Wqaxtc3kq70wc6w==}
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -10739,6 +10745,8 @@ snapshots:
   '@inquirer/type@3.0.8(@types/node@22.17.0)':
     optionalDependencies:
       '@types/node': 22.17.0
+
+  '@intercom/messenger-js-sdk@0.0.18': {}
 
   '@isaacs/cliui@8.0.2':
     dependencies:

@@ -19,6 +19,7 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "@platform/i18n";
 import DynamicDocumentTitle from "./components/DynamicDocumentTitle";
 import "./integrations/SnapplifyChat";
+import { BookgeniusChat } from "./integrations/BookgeniusChat";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,7 @@ const App = () => (
       <UniversalRouter>
         <IntegrationsProvider>
           <AppWithAuth />
+          <BookgeniusChat />
         </IntegrationsProvider>
       </UniversalRouter>
     </TooltipProvider>
