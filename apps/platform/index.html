@@ -105,6 +105,39 @@
           font-size: calc(14px * var(--font-size-multiplier, 1));
         }
       }
+
+      body:has(.book-loader-splash) {
+        .intercom-lightweight-app-launcher,
+        .intercom-launcher-frame {
+          display: none !important;
+        }
+        .intercom-app > div {
+          display: none !important;
+        }
+
+        /*localhost*/
+        .intercom-dfosxs {
+          display: none !important;
+        }
+
+        iframe[name="intercom-notifications-frame"] {
+          display: none !important;
+        }
+      }
+
+      body:has(#player-scope.visible) {
+        @media (max-width: 1280px) {
+          .intercom-lightweight-app-launcher,
+          .intercom-launcher-frame {
+            top: 16px !important;
+            right: 8px !important;
+          }
+          .intercom-app > div {
+            top: 16px !important;
+            right: 8px !important;
+          }
+        }
+      }
     </style>
   </head>
 
