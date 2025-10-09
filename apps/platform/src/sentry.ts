@@ -11,7 +11,7 @@ Sentry.init({
     }),
     Sentry.captureConsoleIntegration({ levels: ["error"] }),
   ],
-  environment: process.env.NODE_ENV || "development",
-  enabled: process.env.NODE_ENV === "production",
+  environment: import.meta.env.MODE || "development",
+  enabled: import.meta.env.PROD,
   sendDefaultPii: true,
 });
