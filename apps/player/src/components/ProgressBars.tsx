@@ -54,34 +54,60 @@ const ProgressBars: React.FC = () => {
     <AnimatePresence>
       {isSplashHidden && (
         <>
-          <motion.div variants={progressVariants} initial="hidden" animate="visible" className="fixed inset-x-0 top-0 h-[10px] bg-[rgba(139,69,19,0.2)] z-[49] pointer-events-none">
-            <motion.div
-              className="h-full w-full bg-gradient-to-r from-[#8B4513] to-[#CD853F] opacity-70 origin-left transform-gpu [will-change:transform]"
-              style={{ scaleX: chapterX }}
-            />
-          </motion.div>
-
+          {/* Chapter Progress - Top Bar */}
           <motion.div
             variants={progressVariants}
             initial="hidden"
             animate="visible"
-            className="fixed inset-x-0 bottom-0 h-[10px] bg-[rgba(139,69,19,0.2)] z-[48] pointer-events-none"
+            className="fixed inset-x-0 top-0 h-[10px] z-[49] pointer-events-none"
+            style={{ backgroundColor: "color-mix(in srgb, var(--bg-content-light, #8B4513) 30%, transparent)" }}
           >
             <motion.div
-              className="h-full w-full bg-gradient-to-r from-[#88888830] to-[#bbbbbb30] origin-left transform-gpu [will-change:transform]"
-              style={{ scaleX: furthestX }}
+              className="h-full w-full origin-left transform-gpu [will-change:transform]"
+              style={{
+                scaleX: chapterX,
+                background:
+                  "linear-gradient(to right, color-mix(in srgb, var(--bg-content-light, #CD853F) 65%, white), color-mix(in srgb, var(--bg-content-light, #F4A460) 75%, white))",
+                opacity: 0.8,
+              }}
             />
           </motion.div>
 
+          {/* Furthest Progress - Bottom Bar (Background) */}
           <motion.div
             variants={progressVariants}
             initial="hidden"
             animate="visible"
-            className="fixed inset-x-0 bottom-0 h-[10px] bg-[rgba(139,69,19,0.2)] z-[49] pointer-events-none"
+            className="fixed inset-x-0 bottom-0 h-[10px] z-[48] pointer-events-none"
+            style={{ backgroundColor: "color-mix(in srgb, var(--bg-content-light, #8B4513) 30%, transparent)" }}
           >
             <motion.div
-              className="h-full w-full bg-gradient-to-r from-[#A0522D] to-[#F4A460] opacity-70 origin-left transform-gpu [will-change:transform]"
-              style={{ scaleX: bookX }}
+              className="h-full w-full origin-left transform-gpu [will-change:transform]"
+              style={{
+                scaleX: furthestX,
+                background:
+                  "linear-gradient(to right, color-mix(in srgb, var(--bg-content-light, #666666) 30%, white), color-mix(in srgb, var(--bg-content-light, #999999) 40%, white))",
+                opacity: 0.5,
+              }}
+            />
+          </motion.div>
+
+          {/* Book Progress - Bottom Bar (Foreground) */}
+          <motion.div
+            variants={progressVariants}
+            initial="hidden"
+            animate="visible"
+            className="fixed inset-x-0 bottom-0 h-[10px] z-[49] pointer-events-none"
+            style={{ backgroundColor: "transparent" }}
+          >
+            <motion.div
+              className="h-full w-full origin-left transform-gpu [will-change:transform]"
+              style={{
+                scaleX: bookX,
+                background:
+                  "linear-gradient(to right, color-mix(in srgb, var(--bg-content-light, #A0522D) 95%, white), color-mix(in srgb, var(--bg-content-light, #CD853F) 80%, white))",
+                opacity: 0.7,
+              }}
             />
           </motion.div>
         </>
