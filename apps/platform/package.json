@@ -8,7 +8,7 @@
     "build:dev": "vite build --mode development",
     "dev": "vite",
     "lint": "eslint --cache --fix src/",
-    "lint:ci": "eslint --cache src/",
+    "lint:ci": "eslint --cache --quiet src/",
     "prettier:check": "prettier --check src/ --quiet 2>&1 | grep -v 'Ignored unknown option'",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit --incremental",
