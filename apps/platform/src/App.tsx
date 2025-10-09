@@ -40,6 +40,7 @@ const AppWithAuth = () => {
       <I18nextProvider i18n={i18n}>
         <RouteTransitionProvider>
           <DynamicDocumentTitle />
+          <BookgeniusChat />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/experience/:slug" element={<BookExperience />} />
@@ -72,7 +73,6 @@ const App = () => (
       <UniversalRouter>
         <IntegrationsProvider>
           <AppWithAuth />
-          <BookgeniusChat />
         </IntegrationsProvider>
       </UniversalRouter>
     </TooltipProvider>
