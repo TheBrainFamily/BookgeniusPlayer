@@ -80,6 +80,7 @@
           opacity 0.15s ease-in-out,
           scale 0.15s ease-in-out;
         pointer-events: auto;
+        transform-origin: bottom right;
       }
 
       #fc_widget {
@@ -88,7 +89,7 @@
       }
 
       @media (max-width: 1280px) {
-        body:has(#bottom-input-container[data-optional-element-visible="true"]) #fc_frame {
+        body:has(#bottom-input-container[data-optional-element-visible="true"]) #fc_frame:not(.fc-open) {
           opacity: 0;
           scale: 0.5;
           pointer-events: none;
