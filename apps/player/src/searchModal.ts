@@ -62,7 +62,8 @@ export async function performUnifiedSearch(
   }
 
   try {
-    const serverMatches = await searchParagraphsFromServer(query, currentLocation);
+    // const serverMatches = await searchParagraphsFromServer(query, currentLocation);
+    const serverMatches = [{ chapter: 1, paragraphNumber: 2, text: "This is an embedding test", summary: "This is an embedding test summary", score: 10 }];
 
     const totalServerMatches = serverMatches.length;
 
