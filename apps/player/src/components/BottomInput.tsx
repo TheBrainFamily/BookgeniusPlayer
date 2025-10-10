@@ -416,11 +416,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
     const newState = !isDeepResearchActive;
     setIsDeepResearchActive(newState);
-
-    // if (newState && isSearchModalOpen) {
-    //   closeSearchModal();
-    // }
-  }, [handleActivity, isDeepResearchActive, isSearchModalOpen, closeSearchModal, isThinking]);
+  }, [handleActivity, isDeepResearchActive, isThinking]);
 
   const handleRecordingStart = useCallback(async () => {
     if (isRecording || isRealtimeConnecting) return;
