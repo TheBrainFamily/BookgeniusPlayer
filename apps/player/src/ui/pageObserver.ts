@@ -1,7 +1,5 @@
-import { setCurrentLocation, isSystemNavigationInProgress } from "@player/helpers/paragraphsNavigation";
+import { isSystemNavigationInProgress, setCurrentLocation } from "@player/helpers/paragraphsNavigation";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
-import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
-import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers, drawElementsUnion } from "./devVisualizers";
 import { activateMediaInRange } from "./activateMediaInRange";
 
@@ -133,12 +131,7 @@ export function setupPageObserver(): {
 
   window.addEventListener("scrollIndicatorClicked", handleScrollIndicatorClicked);
 
-  const scheduleScrollIndicator = (targetChapterStr: string | null) => {
-    if (!targetChapterStr) {
-      return;
-    }
-
-    const nextChapter = Number.parseInt(targetChapterStr, 10);
+  const scheduleScrollIndicator = (nextChapter: number) => {
     if (!Number.isFinite(nextChapter)) {
       return;
     }
@@ -647,61 +640,93 @@ export function setupPageObserver(): {
         if (!isSplashAnimationComplete) return;
 
         const rect = entry.boundingClientRect;
+        const rootBounds = entry.rootBounds ?? rootEl.getBoundingClientRect();
 
         // Calculate how much of the spacer is visible
-        const visibleTop = Math.max(0, rect.top);
-        const visibleBottom = Math.min(window.innerHeight, rect.bottom);
+        const visibleTop = Math.max(rootBounds.top, rect.top);
+        const visibleBottom = Math.min(rootBounds.bottom, rect.bottom);
         const visibleHeight = Math.max(0, visibleBottom - visibleTop);
-        const visibilityPercent = visibleHeight / rect.height;
+        const visibilityPercent = entry.intersectionRatio > 0 ? entry.intersectionRatio : rect.height > 0 ? visibleHeight / rect.height : 0;
 
         // Determine if spacer is entering from bottom or leaving from top
         if (entry.isIntersecting) {
           // Spacer is at least partially visible
-          const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
+          const nextChapterAttr = entry.target.getAttribute("data-next-chapter-start");
+          const nextChapter = nextChapterAttr != null ? Number.parseInt(nextChapterAttr, 10) : NaN;
+
           if (rect.top >= 0) {
             // Spacer is entering from bottom or fully in view
             hideScrollIndicator();
             if (visibilityPercent <= 0.4) {
               // 0-40% visible: keep full opacity
-              rootEl.style.opacity = "1";
-            } else if (visibilityPercent > 0.75) {
-              scheduleScrollIndicator(nextChapterStart);
-            } else if (visibilityPercent < 1) {
-              // 40-99% visible: fade from 1 to 0
-              setCurrentLocation({
-                chapter: parseInt(nextChapterStart, 10),
-                paragraph: 0,
-                endChapter: parseInt(nextChapterStart, 10),
-                endParagraph: 0,
-                currentChapter: parseInt(nextChapterStart, 10),
-                currentParagraph: 0,
-                earliestVisibleParagraph: 0,
-                latestVisibleParagraph: 0,
-                earliestVisibleChapter: parseInt(nextChapterStart, 10),
-                latestVisibleChapter: parseInt(nextChapterStart, 10),
-              });
+              rootEl.style.setProperty("--gradient-opacity", "1");
+            } else if (visibilityPercent < 1.0) {
+              // 40-100% visible: fade from 1 to 0
+              if (visibilityPercent > 0.75) {
+                scheduleScrollIndicator(nextChapter);
+              }
 
-              const fadePercent = (visibilityPercent - 0.4) * 2;
-              rootEl.style.opacity = (1 - fadePercent).toString();
+              if (visibilityPercent > 0.8 && visibilityPercent < 1 && Number.isFinite(nextChapter)) {
+                setCurrentLocation({
+                  chapter: nextChapter,
+                  paragraph: 0,
+                  endChapter: nextChapter,
+                  endParagraph: 0,
+                  currentChapter: nextChapter,
+                  currentParagraph: 0,
+                  earliestVisibleParagraph: 0,
+                  latestVisibleParagraph: 0,
+                  earliestVisibleChapter: nextChapter,
+                  latestVisibleChapter: nextChapter,
+                });
+              }
+
+              // Map 0.4 -> 1.0 visibility to 1.0 -> 0.0 opacity
+              const fadePercent = (visibilityPercent - 0.4) / 0.6;
+              rootEl.style.setProperty("--gradient-opacity", Math.max(0, 1 - fadePercent).toString());
             } else {
               // 100% visible: full transparency
-              rootEl.style.opacity = "0";
+              rootEl.style.setProperty("--gradient-opacity", "0");
             }
           } else {
             // Spacer is leaving from top (rect.top < 0)
             if (visibilityPercent >= 0.6) {
-              // Still 50% or more visible: keep at 0
-              scheduleScrollIndicator(nextChapterStart);
-              rootEl.style.opacity = "0";
+              // Still 60% or more visible: keep transparent
+              scheduleScrollIndicator(nextChapter);
+              rootEl.style.setProperty("--gradient-opacity", "0");
+            } else if (visibilityPercent >= 0.3) {
+              // 30-60% visible: fade from 0 to 1
+              // When 60% visible -> opacity = 0
+              // When 30% visible -> opacity = 1
+              const fadePercent = (visibilityPercent - 0.3) / 0.3;
+              rootEl.style.setProperty("--gradient-opacity", (1 - fadePercent).toString());
             } else {
               hideScrollIndicator();
-              rootEl.style.opacity = "1";
+              // Less than 30% visible: full opacity
+              rootEl.style.setProperty("--gradient-opacity", "1");
             }
           }
         } else {
           // Spacer is completely out of view
-          hideScrollIndicator();
-          rootEl.style.opacity = "1";
+          // For a moment when scrolling from top to bottom, the spacer may be
+          // considered non-intersecting but still be partially visible if it's
+          // very tall and the user scrolls quickly. To handle this, we check
+          // the boundingClientRect to see if it's still partially on screen.
+          if (rect.bottom > rootBounds.top && rect.top < rootBounds.bottom) {
+            // Still partially visible - handle like intersecting case
+            if (rect.top >= 0) {
+              // Leaving from bottom
+              hideScrollIndicator();
+              rootEl.style.setProperty("--gradient-opacity", "1");
+            } else {
+              // Leaving from top
+              const nextChapterAttr = entry.target.getAttribute("data-next-chapter-start");
+              const nextChapter = nextChapterAttr != null ? Number.parseInt(nextChapterAttr, 10) : NaN;
+              scheduleScrollIndicator(nextChapter);
+              rootEl.style.setProperty("--gradient-opacity", "0");
+            }
+            return;
+          }
         }
       });
     },

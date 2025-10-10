@@ -22,7 +22,9 @@
   align-items: stretch; /* Make items fill height by default */
   padding: 0 !important;
   padding-bottom: var(--safe-area-inset-bottom); /* Add padding only for the safe area */
-  transition: background-color var(--transition-medium) var(--transition-timing);
+  transition:
+    background-color var(--transition-medium) var(--transition-timing),
+    color var(--transition-medium) var(--transition-timing);
   position: relative; /* Needed for z-index stacking context */
   z-index: 0; /* Ensure content stays above the ::before pseudo-element */
 
@@ -117,6 +119,7 @@
     backface-visibility: hidden;
     -webkit-perspective: 1000;
     perspective: 1000;
+    transition: color var(--transition-medium) var(--transition-timing);
     /* font-size: 16px; Base content font size */
     scrollbar-width: none;
     &::-webkit-scrollbar {
@@ -132,10 +135,12 @@
 
       background: linear-gradient(
         to bottom,
-        rgba(var(--bg-content-light-rgb), 0) 0%,
-        rgba(var(--bg-content-light-rgb), 0.95) 35%,
-        rgba(var(--bg-content-light-rgb), 0.95) 65%,
-        rgba(var(--bg-content-light-rgb), 0) 100%
+        rgb(from var(--bg-content-light) r g b / 0) 0%,
+        rgb(from var(--bg-content-light) r g b / calc(0.75 * var(--gradient-opacity, 1) * var(--bg-dark-gradient-opacity, 1))) 35%,
+        rgb(from var(--bg-content-light) r g b / calc(0.85 * var(--gradient-opacity, 1) * var(--bg-dark-gradient-opacity, 1))) 45%,
+        rgb(from var(--bg-content-light) r g b / calc(0.85 * var(--gradient-opacity, 1) * var(--bg-dark-gradient-opacity, 1))) 55%,
+        rgb(from var(--bg-content-light) r g b / calc(0.75 * var(--gradient-opacity, 1) * var(--bg-dark-gradient-opacity, 1))) 65%,
+        rgb(from var(--bg-content-light) r g b / 0) 100%
       );
 
       mask-image:
@@ -265,7 +270,6 @@
       blockquote {
         padding: 0 3rem;
         margin: 1.5em 0;
-        color: #333;
 
         .verse {
           padding: 0 2rem;
@@ -421,13 +425,15 @@
     span[id^="ch"][id*="-p"][id*="-s"] {
       cursor: pointer;
       touch-action: none;
-      transition: background-color 0.15s ease-in-out;
+      transition: background-color 0.2s ease-in-out;
+      /* transition: text-shadow 0.2s ease-in-out; */
       padding: 0.2rem 0;
     }
 
     span[id^="ch"][id*="-p"][id*="-s"]:hover {
-      background-color: rgba(66, 68, 90, 0.1);
+      background-color: color-mix(in srgb, var(--text-light, rgba(66, 68, 90, 0.1)) 20%, transparent);
       transition: none;
+      /* text-shadow: 0px 0px 16px color-mix(in srgb, var(--text-light, rgba(0, 0, 0, 0.3)) 80%, transparent); */
     }
   }
 
@@ -461,7 +467,7 @@
 
     .play-container > section > section {
       width: 100%;
-      max-width: 850px;
+      max-width: 900px;
       margin-left: auto;
       margin-right: auto;
 
@@ -531,55 +537,57 @@
         align-items: center;
         gap: clamp(0.15rem, 0.5vw, 0.25rem);
 
-        span {
+        .character-placeholder {
           margin: 0;
           display: flex;
           justify-content: center;
-          position: relative;
-        }
-
-        span.character-placeholder {
           overflow: visible;
-          min-width: clamp(65px, 16vw, 150px);
-          min-height: clamp(65px, 16vw, 150px);
+          min-width: clamp(65px, 16vw, 175px);
+          min-height: clamp(65px, 16vw, 175px);
           position: relative;
-          margin-top: clamp(-4rem, -8vw, -2rem);
+          margin-top: clamp(-6rem, -12vh, -2rem);
+
           z-index: 1;
           transition:
             transform 0.2s ease-in-out,
             z-index 0s;
         }
 
-        span.character-placeholder:first-child {
+        /* Compressing characters when more than 4 */
+        .character-placeholder:nth-child(n + 2):nth-last-child(n + 4),
+        .character-placeholder:nth-child(n + 2):nth-last-child(n + 4) ~ .character-placeholder {
+          margin-top: clamp(-8rem, -16vh, -2rem);
+        }
+
+        .character-placeholder:first-child {
           margin-top: 0;
         }
 
-        span.character-placeholder:not(:first-child) {
+        .character-placeholder:not(:first-child) {
           &::after {
             content: "";
           }
         }
 
-        span.character-placeholder:hover {
+        .character-placeholder:hover {
           z-index: 10;
           transform: scale(1.025);
         }
 
         .inline-avatar {
-          min-width: clamp(65px, 16vw, 150px);
-          min-height: clamp(65px, 16vw, 150px);
+          min-width: clamp(65px, 16vw, 175px);
+          min-height: clamp(65px, 16vw, 175px);
           border-radius: 50%;
           display: block;
           padding: 0;
           margin: 0;
-          box-shadow: 0 clamp(2px, 0.5vw, 4px) clamp(8px, 1.5vw, 12px) rgba(0, 0, 0, 0.3);
-          border: clamp(2px, 0.3vw, 3px) solid rgba(255, 255, 255, 0.6);
-          object-fit: cover;
+          box-shadow: 0 clamp(2px, 0.5vw, 4px) clamp(8px, 1.5vw, 12px) color-mix(in srgb, var(--bg-content-light, #000000) 60%, transparent);
+          border: clamp(2px, 0.3vw, 3px) solid color-mix(in srgb, var(--text-light, #ffffff) 60%, transparent);
         }
 
         @media (hover: hover) {
           .inline-avatar:hover {
-            transform: scale(1.25);
+            transform: scale(1.1);
           }
         }
       }
@@ -618,11 +626,11 @@
       p[data-is-character="true"] > * {
         cursor: pointer;
         font-weight: bold;
-        transition: text-shadow 0.15s ease-in-out;
+        transition: text-shadow 0.2s ease-in-out;
         background-color: transparent;
 
         &:hover {
-          text-shadow: 0 0 clamp(2px, 0.5vw, 4px) rgba(0, 0, 0, 0.3);
+          text-shadow: 2px 4px 8px color-mix(in srgb, var(--text-light, rgba(0, 0, 0, 0.3)) 60%, transparent);
           transition: none;
         }
       }
@@ -726,6 +734,14 @@
         .play-row.didaskalia-row {
           width: 550px;
         }
+
+        /* Compressing characters when more than 4 */
+        .character-avatar {
+          .character-placeholder:nth-child(n + 2):nth-last-child(n + 4),
+          .character-placeholder:nth-child(n + 2):nth-last-child(n + 4) ~ .character-placeholder {
+            margin-top: clamp(-6rem, -16vh, -2rem);
+          }
+        }
       }
     }
   }
@@ -744,11 +760,35 @@
         .play-row.didaskalia-row {
           width: 450px;
         }
+
+        /* Compressing characters when more than 4 */
+        .character-avatar {
+          .character-placeholder {
+            margin-top: clamp(-4rem, -12vh, -2rem);
+          }
+
+          .character-placeholder:nth-child(n + 2):nth-last-child(n + 4),
+          .character-placeholder:nth-child(n + 2):nth-last-child(n + 4) ~ .character-placeholder {
+            margin-top: clamp(-5rem, -16vh, -2rem);
+          }
+        }
       }
     }
   }
 
   @media (max-width: 650px) {
+    #book-container #content-container {
+      background: linear-gradient(
+        to bottom,
+        rgb(from var(--bg-content-light) r g b / 0) 0%,
+        rgb(from var(--bg-content-light) r g b / calc(0.6 * var(--gradient-opacity))) 35%,
+        rgb(from var(--bg-content-light) r g b / calc(0.7 * var(--gradient-opacity))) 45%,
+        rgb(from var(--bg-content-light) r g b / calc(0.7 * var(--gradient-opacity))) 55%,
+        rgb(from var(--bg-content-light) r g b / calc(0.6 * var(--gradient-opacity))) 65%,
+        rgb(from var(--bg-content-light) r g b / 0) 100%
+      );
+    }
+
     #book-container.play-mode #content-container {
       background-size: 100%;
 
@@ -781,6 +821,14 @@
           transform: none;
           padding: 0 1rem 0 2rem;
         }
+
+        /* Compressing characters when more than 4 */
+        .character-avatar {
+          .character-placeholder:nth-child(n + 2):nth-last-child(n + 4),
+          .character-placeholder:nth-child(n + 2):nth-last-child(n + 4) ~ .character-placeholder {
+            margin-top: clamp(-4rem, -16vh, -2rem);
+          }
+        }
       }
     }
   }
@@ -809,8 +857,8 @@
 
         .play-row .character-text p:first-child {
           position: absolute;
-          top: calc(clamp(65px, 16vw, 150px) / 3);
-          left: calc(clamp(65px, 16vw, 150px) + 2rem);
+          top: calc(clamp(65px, 16vw, 175px) / 3);
+          left: calc(clamp(65px, 16vw, 175px) + 2rem);
         }
 
         .play-row[data-text-alignment="right"] {
@@ -826,7 +874,7 @@
           .character-text p:first-child {
             position: absolute;
             left: inherit;
-            right: calc(clamp(65px, 16vw, 150px) + 2rem);
+            right: calc(clamp(65px, 16vw, 175px) + 2rem);
             width: max-content;
           }
         }
@@ -844,6 +892,18 @@
         .play-row[data-text-alignment="right"] {
           flex-direction: column;
           padding: 0 1.5rem;
+        }
+
+        /* Compressing characters when more than 4 */
+        .character-avatar {
+          .character-placeholder {
+            margin-top: clamp(-3rem, -12vh, -2rem);
+          }
+
+          .character-placeholder:nth-child(n + 2):nth-last-child(n + 4),
+          .character-placeholder:nth-child(n + 2):nth-last-child(n + 4) ~ .character-placeholder {
+            margin-top: clamp(-3rem, -16vh, -2rem);
+          }
         }
       }
     }
