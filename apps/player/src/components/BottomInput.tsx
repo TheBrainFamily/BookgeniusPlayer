@@ -51,14 +51,17 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const shouldSelectAllRef = useRef(false);
 
   const { pauseAllTimers, startAllTimers, showAllElements, setIsTimersPausedSticky } = useElementVisibilityStore();
   const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery, clearModal } = useSearchModal();
   const {
     openModal: openDeepResearchModal,
     setContent: setDeepResearchContent,
+    content: deepResearchContent,
     setLoading: setDeepResearchLoading,
     closeModal: closeDeepResearchModal,
+    clearModal: clearDeepResearchModal,
     isOpen: isDeepResearchModalOpen,
     setShowDiveDeeperCTA,
     setDiveDeeperLoading,
@@ -99,6 +102,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       if (isDeepResearchActive) return;
       if (isRecording) return;
 
+      if (isDeepResearchModalOpen) {
+        closeDeepResearchModal();
+        clearDeepResearchModal();
+      }
+
       const trimmedValue = inputValue.trim();
       startTransition(() => {
         if (trimmedValue.length >= 2) {
@@ -110,7 +118,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         }
       });
     },
-    [isDeepResearchActive, isRecording, setSearchQuery, openSearchModal, clearModal],
+    [isDeepResearchActive, isRecording, setSearchQuery, openSearchModal, clearModal, isDeepResearchModalOpen, closeDeepResearchModal, clearDeepResearchModal],
   );
 
   const filteredCharacters = useMemo(() => {
@@ -126,7 +134,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   }, [pauseAllTimers, showAllElements, setIsTimersPausedSticky]);
 
   const openModalWithFocus = useCallback(() => {
-    if (isDeepResearchActive) return;
+    if (isDeepResearchActive && !deepResearchContent) return;
 
     if (isDeepResearchModalOpen) {
       closeDeepResearchModal();
@@ -137,7 +145,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     }
 
     if (!isSearchModalOpen) {
-      openSearchModal(true, true, value.trim());
+      if (deepResearchContent) {
+        openDeepResearchModal(deepResearchContent, true, true, "deep");
+      } else {
+        openSearchModal(true, true, value.trim());
+      }
     }
 
     if (inputRef.current == null) return;
@@ -148,10 +160,25 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     // Use microtask to ensure DOM is updated before setting selection
     queueMicrotask(() => {
       if (!inputEl) return;
-      const length = inputEl.value.length;
-      inputEl.setSelectionRange(length, length);
+      if (shouldSelectAllRef.current) {
+        inputEl.select();
+        shouldSelectAllRef.current = false;
+      } else {
+        const length = inputEl.value.length;
+        inputEl.setSelectionRange(length, length);
+      }
     });
-  }, [isDeepResearchActive, isSearchModalOpen, openSearchModal, value, isDeepResearchModalOpen, closeDeepResearchModal, isCharacterModalOpen, closeCharacterModal]);
+  }, [
+    isDeepResearchActive,
+    isSearchModalOpen,
+    openSearchModal,
+    value,
+    isDeepResearchModalOpen,
+    closeDeepResearchModal,
+    isCharacterModalOpen,
+    closeCharacterModal,
+    deepResearchContent,
+  ]);
 
   const sseRef = useRef<EventSource | null>(null);
   const streamingBufferRef = useRef<string>("");
@@ -189,10 +216,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const handleInputInteraction = useCallback(() => {
     handleActivity();
 
-    if (isDeepResearchActive) return;
+    if (isDeepResearchActive && !deepResearchContent) return;
+
+    if (shouldSelectAllRef.current) return;
 
     openModalWithFocus();
-  }, [handleActivity, isDeepResearchActive, openModalWithFocus]);
+  }, [handleActivity, isDeepResearchActive, openModalWithFocus, deepResearchContent, shouldSelectAllRef]);
 
   const executeDeepResearch = useCallback(
     (query: string) => {
@@ -388,9 +417,9 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     const newState = !isDeepResearchActive;
     setIsDeepResearchActive(newState);
 
-    if (newState && isSearchModalOpen) {
-      closeSearchModal();
-    }
+    // if (newState && isSearchModalOpen) {
+    //   closeSearchModal();
+    // }
   }, [handleActivity, isDeepResearchActive, isSearchModalOpen, closeSearchModal, isThinking]);
 
   const handleRecordingStart = useCallback(async () => {
@@ -454,6 +483,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       if ((event.key === "f" || event.key === "F") && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
         handleActivity();
+        shouldSelectAllRef.current = true;
         openModalWithFocus();
       }
     };
