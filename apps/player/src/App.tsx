@@ -27,7 +27,6 @@ import { setKnownVideos } from "@player/utils/getFilePathsForName";
 import { getKnownVideoFiles } from "@player/genericBookDataGetters/getKnownVideoFiles";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
 import ProgressBars from "@player/components/ProgressBars";
-import { usePlayCharacterSpeakingStates } from "./hooks/usePlayCharacterSpeakingStates";
 import { AppInitializer } from "./components/AppInitializer";
 import { BookDataProvider } from "./context/BookDataContext";
 import { I18nextProvider, useTranslation } from "react-i18next";
@@ -58,7 +57,6 @@ function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   /* dynamic audio hooks */
   useBackgroundSongs();
   useAudiobookTracks();
-  // usePlayCharacterSpeakingStates();
   const { i18n } = useTranslation();
 
   useEffect(() => {
