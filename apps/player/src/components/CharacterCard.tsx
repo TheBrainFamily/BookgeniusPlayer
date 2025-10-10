@@ -114,12 +114,6 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
           "relative rounded-full aspect-square isolate overflow-hidden transition-all duration-300 ease-in-out hover:scale-110 hover:z-10",
           !disableHighlight && isTalkingInCurrentRange && "z-10 animate-pulse-glow",
         )}
-        style={{
-          border: isTalkingInCurrentRange && "clamp(2px, 0.3vw, 3px) solid color-mix(in srgb, var(--text-light, #ffffff) 80%, transparent)",
-          boxShadow:
-            isTalkingInCurrentRange &&
-            "0 clamp(2px, 0.5vw, 4px) clamp(8px, 1.5vw, 12px) color-mix(in srgb, var(--bg-content-light, #000000) 60%, transparent), 0 0 clamp(8px, 1.5vw, 12px) color-mix(in srgb, var(--text-light, #ffffff) 30%, transparent)",
-        }}
       >
         <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />
       </motion.div>
