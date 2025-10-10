@@ -32,12 +32,16 @@ export const useSearchLogic = () => {
     // The wrapper we will actually call from our code
     const wrapped = (q: string, loc: Location) => new Promise((res, rej) => debouncedFn(res, rej, q, loc));
 
+    if (!query.trim()) {
+      wrapped.cancel = debouncedFn.cancel;
+    }
+
     // Re-expose lodash's .cancel for cleanup
     // (Type-ignore because lodash types don't know about it here)
     wrapped.cancel = debouncedFn.cancel;
 
     return wrapped;
-  }, []);
+  }, [query]);
 
   /* Cancel the 1-second timer if this hook unmounts */
   useEffect(
@@ -109,6 +113,8 @@ export const useSearchLogic = () => {
     if (query.trim()) {
       const latestLocation = getSavedLocation();
       void debouncedTriggerSearch(query, latestLocation);
+    } else {
+      debouncedTriggerSearch.cancel?.();
     }
   }, [query, debouncedTriggerSearch, setResults]);
 

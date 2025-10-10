@@ -144,7 +144,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       closeCharacterModal();
     }
 
-    if (!isSearchModalOpen) {
+    if (!isSearchModalOpen && value.length > 2) {
       if (deepResearchContent) {
         openDeepResearchModal(deepResearchContent, true, true, "deep");
       } else {
