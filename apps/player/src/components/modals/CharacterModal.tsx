@@ -17,7 +17,7 @@ import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 import { useBottomInput } from "@player/stores/modals/bottomInput.store";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
-import { FILTER_OPTIONS } from "@player/components/modals/SearchModal";
+import { FILTER_OPTIONS } from "@player/utils/filterOptions";
 
 interface CharacterModalProps {
   onClose: () => void;
