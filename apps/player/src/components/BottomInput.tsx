@@ -19,6 +19,7 @@ import { useBottomInput } from "@player/stores/modals/bottomInput.store";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
 import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
 import { MicrophoneVisualizer } from "./MicrophoneVisualizer";
+import DebugMicPlaybackButton from "./DebugMicPlaybackButton";
 
 const hasReaderMetCharacter = (character: CharacterData, chapter: number, paragraph: number): boolean => {
   return character.infoPerChapter.some((infoPerChapter) => {
@@ -75,6 +76,17 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { location } = useLocation();
   const saved = getSavedLocation();
   const furthestLocation = saved ?? location;
+
+  const showMicDebug = useMemo(() => {
+    // Show in dev builds; allow override via URL ?micDebug=1 in any env
+    if (import.meta.env.DEV) return true;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const v = params.get("micDebug");
+      return v === "1" || v === "true";
+    } catch {}
+    return false;
+  }, []);
 
   const allCharacters = useMemo(() => {
     try {
@@ -419,40 +431,35 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   }, [handleActivity, isDeepResearchActive, isThinking]);
 
   const handleRecordingStart = useCallback(async () => {
+    const t0 = performance.now();
+    console.log("[ptt] press at", t0.toFixed(1));
     if (isRecording || isRealtimeConnecting) return;
 
     handleActivity();
 
-    // Prime microphone once (requests permission and warms up analyser on Safari)
-    const primeResult = await primeMicrophone();
-    if (primeResult === "failed") {
-      // User denied or browser failed; nothing else to do here
-      return;
-    }
-    // Proceed immediately after priming (even first allow),
-    // since we now avoid duplicate getUserMedia and reuse the same AudioContext.
-
+    // Immediately show connecting UI
     setIsRealtimeConnecting(true);
     setIsMicrophoneReady(false); // Reset mic ready state for new recording
     setValue("");
-
     if (isSearchModalOpen) setSearchQuery("");
 
+    console.log("[ptt] calling startRecording() (will prime+connect in parallel)…");
     startRecording()
       .then(() => {
+        console.log("[ptt] startRecording finished in", (performance.now() - t0).toFixed(1), "ms");
         // Connecting state will be cleared by useEffect when both session and mic are ready
       })
       .catch((error) => {
-        console.error("Error starting recording:", error);
+        console.error("[ptt] Error starting recording:", error);
         setIsRealtimeConnecting(false);
       });
-  }, [handleActivity, isRecording, isRealtimeConnecting, isSearchModalOpen, setSearchQuery, startRecording, setValue]);
+  }, [handleActivity, isRecording, isRealtimeConnecting, isSearchModalOpen, setSearchQuery, startRecording, setValue, primeMicrophone]);
 
   // Clear connecting state when both session and microphone are ready
   useEffect(() => {
     if (isSessionReady && isMicrophoneReady && isRealtimeConnecting) {
       setIsRealtimeConnecting(false);
-      console.log("Both session and microphone ready - clearing connecting state");
+      console.log("[ptt] session+mic ready; clearing connecting state at", performance.now().toFixed(1));
     }
   }, [isSessionReady, isMicrophoneReady, isRealtimeConnecting]);
 
@@ -467,7 +474,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   }, [handleActivity, isRecording, stopRecording]);
 
   const placeholder = useMemo(() => {
-    if (isRealtimeConnecting) return t("realtime_connecting", "Connecting…");
+    if (isRealtimeConnecting) return ""; // hide placeholder while connecting to avoid visual overlap
     if (isRecording) return t("listening");
     if (isThinking) return t("thinking");
     if (isDeepResearchActive) return t("enter_deep_research");
@@ -574,7 +581,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
   return (
     <>
-      <MicrophoneVisualizer isActive={isRecording} audioAnalyser={audioAnalyser} onMicReady={setIsMicrophoneReady} />
+      {showMicDebug && <DebugMicPlaybackButton />}
+      <MicrophoneVisualizer isActive={isRecording || isRealtimeConnecting} audioAnalyser={audioAnalyser} onMicReady={setIsMicrophoneReady} />
       <OptionalElement className={cn("w-full flex justify-center", className)} id="bottom-input-container">
         <motion.div
           className={cn(
@@ -592,11 +600,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
             <form onSubmit={handleSubmit} className="flex items-center space-x-2 min-w-[280px] sm:min-w-[350px]">
               <div className="relative flex-grow flex items-center">
                 <AnimatePresence mode="wait">
-                  {(isRealtimeConnecting || isRecording) && (
+                  {isRecording && (
                     <motion.div
-                      key={isRealtimeConnecting ? "connecting-indicator" : "recording-indicator"}
-                      className={cn("absolute left-2 w-3 h-3 rounded-full", isRealtimeConnecting ? "bg-amber-300" : "bg-red-500")}
-                      variants={isRealtimeConnecting ? variants.connectingIndicator : variants.recordingIndicator}
+                      key="recording-indicator"
+                      className={cn("absolute left-2 w-3 h-3 rounded-full", "bg-red-500")}
+                      variants={variants.recordingIndicator}
                       initial="initial"
                       animate="animate"
                       exit="exit"
