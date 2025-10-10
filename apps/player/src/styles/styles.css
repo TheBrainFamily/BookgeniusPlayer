@@ -1687,22 +1687,37 @@ section[data-chapter] [data-index] {
   padding-bottom: 30px;
 }
 
-#legacy #content-container .play-container.mixed-container > section > section {
-  p[data-text-alignment="left"][data-is-character="false"][data-is-didaskalia="false"] {
+#legacy #book-container.play-mode #content-container .play-container.mixed-container > section > section {
+  .character-text p[data-text-alignment="left"][data-is-character="false"][data-is-didaskalia="false"] {
     padding: 0.6em;
     text-align: justify;
     text-indent: 1.4em;
+    margin: 0 0 1em 0;
+    width: auto;
+    display: block;
   }
-  p[data-is-character="true"] + p[data-is-character="false"][data-is-didaskalia="false"],
-  p[data-is-didaskalia="true"] + p[data-is-character="false"][data-is-didaskalia="false"],
+  .character-text p[data-is-character="true"] + p[data-is-character="false"][data-is-didaskalia="false"],
+  .character-text p[data-is-didaskalia="true"] + p[data-is-character="false"][data-is-didaskalia="false"],
   .character-text blockquote + p[data-is-character="false"][data-is-didaskalia="false"] {
     text-indent: 0;
   }
 
-  p[data-text-alignment="right"][data-is-character="false"][data-is-didaskalia="false"] {
+  .character-text p[data-text-alignment="right"][data-is-character="false"][data-is-didaskalia="false"] {
     text-align: justify;
     padding: 0.6em;
     text-indent: 1.4em;
+    margin-left: 0;
+    margin-right: 0;
+    width: auto;
+    display: block;
+  }
+
+  /* Mixed-form: stage-direction blocks should be justified, not centered */
+  .play-row.didaskalia-row .didaskalia-text p[data-is-didaskalia="true"] {
+    text-align: justify;
+    text-indent: 1.4em;
+    padding: 0 clamp(1.5rem, 4vw, 3rem);
+    margin: 0 0 1em 0;
   }
 }
 

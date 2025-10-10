@@ -63,31 +63,36 @@ const detectScrollEnd = (element: HTMLElement, callback: () => void, timeout: nu
 // Mirror the focus-zone heuristics that the IntersectionObserver uses so
 // programmatic navigation lands the requested paragraph inside the same area.
 const calculateFocusZone = (containerRect: DOMRect) => {
-  const topMultiplier = 0.35;
-  let bottomMultiplier = 0.45;
+  const topMultiplier = 0.35; // 35vh focus zone start
+  let bottomMultiplier = 0.55; // 10vh focus zone height (default)
 
+  // Responsive focus zone adjustments
   const viewportHeight = window.innerHeight;
   const viewportWidth = window.innerWidth;
 
-  const landscapeMediaQuery = typeof window.matchMedia === "function" ? window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)") : null;
-  if (landscapeMediaQuery?.matches) {
-    bottomMultiplier = 0.75;
+  // Check media query for landscape mode on smaller wide screens
+  const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
+  if (landscapeMediaQuery.matches) {
+    bottomMultiplier = 0.75; // Use larger focus zone in landscape mode
   }
 
+  // Adjust for smaller screens (mobile)
   if (viewportHeight < 700) {
-    bottomMultiplier = 0.55;
+    bottomMultiplier = 0.9; // Larger zone for smaller screens
   }
 
+  // Adjust for mobile portrait - ensure sufficient zone for chapter detection
   if (viewportWidth < 768 && viewportHeight > viewportWidth) {
-    bottomMultiplier = 0.6;
+    bottomMultiplier = 0.6; // Even larger zone for mobile portrait
   }
 
+  // Adjust for very wide screens
   if (viewportWidth > 1600) {
-    bottomMultiplier = 0.42;
+    bottomMultiplier = 0.52; // Smaller, more precise zone for large screens
   }
 
-  const focusZoneTop = containerRect.height * topMultiplier;
-  const focusZoneBottom = containerRect.height * bottomMultiplier;
+  const focusZoneTop = containerRect.top + containerRect.height * topMultiplier;
+  const focusZoneBottom = containerRect.top + containerRect.height * bottomMultiplier;
   const focusZoneHeight = Math.max(0, focusZoneBottom - focusZoneTop);
 
   return { top: focusZoneTop, bottom: focusZoneBottom, height: focusZoneHeight, center: focusZoneTop + focusZoneHeight / 2 } as const;
@@ -328,6 +333,7 @@ export const systemNavigateTo = async (
 /* ------------------------------------------------------------------ */
 /*  Scroll helper                                                     */
 export const goToParagraph = (loc: { currentChapter: number; currentParagraph: number }, options: ScrollToOptions = { behavior: "smooth" }): Promise<void> => {
+  console.log("CurrentLocation", getCurrentLocation());
   return new Promise((resolve, reject) => {
     const selector =
       loc.currentParagraph === 0 ? `section[data-chapter="${loc.currentChapter}"]` : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
@@ -340,18 +346,18 @@ export const goToParagraph = (loc: { currentChapter: number; currentParagraph: n
     }
 
     const contentContainer = document.getElementById("content-container");
-    if (!contentContainer) {
-      // Fallback for safety, though the container should always exist.
-      element.scrollIntoView({ behavior: options.behavior, block: "start" });
+    // if (!contentContainer) {
+    //   // Fallback for safety, though the container should always exist.
+    //   element.scrollIntoView({ behavior: options.behavior, block: "start" });
 
-      if (options.behavior === "instant") {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      } else {
-        // For smooth scroll without a container, we can't detect the end, so we use a timeout.
-        setTimeout(resolve, 1000);
-      }
-      return;
-    }
+    //   if (options.behavior === "instant") {
+    //     requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    //   } else {
+    //     // For smooth scroll without a container, we can't detect the end, so we use a timeout.
+    //     setTimeout(resolve, 1000);
+    //   }
+    //   return;
+    // }
 
     const containerRect = contentContainer.getBoundingClientRect();
     const elementRect = element.getBoundingClientRect();
@@ -406,6 +412,9 @@ export const goToParagraph = (loc: { currentChapter: number; currentParagraph: n
   });
 };
 
+// @ts-expect-error window.goToParagraph is not typed
+window.goToParagraph = goToParagraph;
+
 /**
  * Determines if the return-to-location button should be shown
  * based on the current location vs. saved location
@@ -420,20 +429,31 @@ export const shouldShowReturnButton = (): boolean => {
 /* ------------------------------------------------------------------ */
 /*  Handle Resize/Orientation Changes                                 */
 
-// Event handler
-const handleResizeOrOrientationChange = debounce(() => {
-  const location = getSavedLocation();
-  goToParagraph({ currentChapter: location.currentChapter, currentParagraph: location.currentParagraph }, { behavior: "instant" }).catch((error) =>
-    console.warn("Failed to scroll during resize/orientation change:", error),
-  );
+// Debounced scroller (leading + trailing):
+// - Leading call: immediate recenter to minimize visible glitch
+// - Trailing call: recenter again after layout settles
+const REFOCUS_WAIT_MS = 200;
+const debouncedScrollToLocation = debounce(
+  (loc: Location) => {
+    // Keep argument-captured location for both leading and trailing calls
+    goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior: "instant" }).catch((error) =>
+      console.warn("Failed to scroll during resize/orientation change:", error),
+    );
+  },
+  REFOCUS_WAIT_MS,
+  { leading: true, trailing: true },
+);
 
-  // If hash is invalid or missing, we probably don't want to scroll unexpectedly.
-  // The browser's default reflow behavior will apply.
-}, 400);
+// Non-debounced event wrappers: capture the location immediately on event
+const onResizeOrOrientationChange = () => {
+  const saved = getCurrentLocation() ?? DEFAULT_LOCATION;
+  // Call once immediately and schedule a trailing recenter ~200ms after events settle
+  debouncedScrollToLocation(saved);
+};
 
 // Add listeners
-window.addEventListener("resize", handleResizeOrOrientationChange);
-window.addEventListener("orientationchange", handleResizeOrOrientationChange);
+window.addEventListener("resize", onResizeOrOrientationChange);
+window.addEventListener("orientationchange", onResizeOrOrientationChange);
 
 /* ------------------------------------------------------------------ */
 /*  URL Hash Helpers                                                  */

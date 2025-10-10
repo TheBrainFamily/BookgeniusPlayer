@@ -70,7 +70,7 @@
 
       #fc_frame {
         position: fixed;
-        bottom: 0 !important;
+        bottom: 5px !important;
         right: 5px !important;
         width: 65px;
         height: 65px;
@@ -80,6 +80,11 @@
           opacity 0.15s ease-in-out,
           scale 0.15s ease-in-out;
         pointer-events: auto;
+        transform-origin: bottom right;
+      }
+
+      #fc_frame.fc-open {
+        scale: 1;
       }
 
       #fc_widget {
@@ -88,7 +93,7 @@
       }
 
       @media (max-width: 1280px) {
-        body:has(#bottom-input-container[data-optional-element-visible="true"]) #fc_frame {
+        body:has(#bottom-input-container[data-optional-element-visible="true"]) #fc_frame:not(.fc-open) {
           opacity: 0;
           scale: 0.5;
           pointer-events: none;
@@ -103,6 +108,39 @@
       @media (max-width: 768px), screen and (max-height: 550px) and (orientation: landscape) {
         #content-container {
           font-size: calc(14px * var(--font-size-multiplier, 1));
+        }
+      }
+
+      body:has(.book-loader-splash) {
+        .intercom-lightweight-app-launcher,
+        .intercom-launcher-frame {
+          display: none !important;
+        }
+        .intercom-app > div {
+          display: none !important;
+        }
+
+        /*localhost*/
+        .intercom-dfosxs {
+          display: none !important;
+        }
+
+        iframe[name="intercom-notifications-frame"] {
+          display: none !important;
+        }
+      }
+
+      body:has(#player-scope.visible) {
+        @media (max-width: 1280px) {
+          .intercom-lightweight-app-launcher,
+          .intercom-launcher-frame {
+            top: 16px !important;
+            right: 8px !important;
+          }
+          .intercom-app > div {
+            top: 16px !important;
+            right: 8px !important;
+          }
         }
       }
     </style>
