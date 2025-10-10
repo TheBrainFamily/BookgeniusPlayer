@@ -218,5 +218,8 @@
   "get_simplified_sentence": "Get Next Simplified Sentence",
   "undo_simplification": "Undo Simplification",
   "scroll_indicator-swipe-up": "Swipe Up",
-  "scroll_indicator-keep-scrolling": "Keep Scrolling"
+  "scroll_indicator-keep-scrolling": "Keep Scrolling",
+  "search_filter_all": "All",
+  "search_filter_mentioned": "Mentioned",
+  "search_filter_talking": "Talking"
 }
