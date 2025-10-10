@@ -100,6 +100,7 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
       ref={elementRef}
       className={className}
       aria-hidden={!isElementVisible}
+      data-optional-element-visible={isElementVisible}
       style={{
         // Always allow pointer events on desktop, and on mobile only disable when truly hidden
         pointerEvents: isDesktop ? "auto" : shouldBeVisible || isHovered ? "auto" : "none",

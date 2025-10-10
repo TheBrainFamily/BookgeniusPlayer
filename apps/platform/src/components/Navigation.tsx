@@ -18,6 +18,7 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
   if (!authMod) return null;
 
   const { ready: authReady, isSignedIn, openSignIn, signOut } = authMod.useAuth();
+  console.log("Navigation: authReady", authReady);
   const UserWidget = authMod.useUserWidget?.();
   const SignInWidget = authMod.useSignInWidget?.();
 

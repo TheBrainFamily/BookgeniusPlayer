@@ -549,7 +549,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   return (
     <>
       <MicrophoneVisualizer isActive={isRecording} audioAnalyser={audioAnalyser} onMicReady={setIsMicrophoneReady} />
-      <OptionalElement className={cn("w-full flex justify-center", className)}>
+      <OptionalElement className={cn("w-full flex justify-center", className)} id="bottom-input-container">
         <motion.div
           className={cn(
             "bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-2 py-[2px] md:py-[3px] md:px-3",

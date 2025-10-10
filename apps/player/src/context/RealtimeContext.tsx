@@ -5,6 +5,11 @@ import { loadCharactersData, getCharactersData } from "@player/genericBookDataGe
 import { useLocation } from "@player/state/LocationContext";
 import { z } from "zod";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { useLocationRange } from "@player/hooks/useLocationRange";
+import { extractBookTextFromLocation, extractBookTextUpToLocation } from "@player/utils/extractBookText";
+import type { BookContextLocation, BookContextChunk } from "@player/types/bookContext";
+import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
+import { getSurroundingText } from "@player/utils/getSurroundingText";
 
 interface RealtimeContextType {
   isConnected: boolean;
@@ -33,6 +38,7 @@ type ConversationItemSummary = { id?: string; role?: string; type?: string };
 type TransportEvent =
   | { type: "input_audio_buffer.speech_started" }
   | { type: "server.input_audio_buffer.speech_started" }
+  | { type: "conversation.item.added"; item?: ConversationItemSummary }
   | { type: "conversation.item.created"; item?: ConversationItemSummary }
   | { type: "conversation.item.deleted"; item_id?: string; item?: ConversationItemSummary }
   | { type: "response.created" }
@@ -46,6 +52,15 @@ export const useRealtime = () => {
 
 export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { location } = useLocation();
+  const { debouncedLocation } = useLocationRange(300);
+  const audioResponses = (() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("audioResponses") === "true";
+    } catch {
+      return false;
+    }
+  })();
   const sessionRef = useRef<RealtimeSession | null>(null);
   const agentRef = useRef<RealtimeAgent | null>(null);
   const askHandlerRef = useRef<((query: string) => void) | null>(null);
@@ -54,6 +69,10 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const audioHeardThisRecordingRef = useRef<boolean>(false);
   const awaitingSpeechResponseRef = useRef<boolean>(false);
   const conversationItemsRef = useRef<{ id: string; role?: string; type?: string }[]>([]);
+
+  // Persistent book context tracking (Option B)
+  const bookContextLastSentRef = useRef<BookContextLocation | null>(null);
+  const isUpdatingBookContextRef = useRef<boolean>(false);
 
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -90,29 +109,30 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Initialize Agent + Tool using the new SDK
   useEffect(() => {
-    const getBookInformation = tool({
-      name: "get_book_information",
-      description: "Answers the questions about the book.",
-      parameters: z.object({ question: z.string().describe("The question to answer.") }),
-      execute: async ({ question }: { question: string }) => {
-        // Instead of calling the server, trigger our internal ask flow
-        try {
-          console.log("getBookInformation (tool trigger)", question);
-          toolTriggeredRef.current = true;
-          if (awaitingSpeechResponseRef.current) {
-            askHandlerRef.current?.(question);
-          } else {
-            console.warn("Ignoring tool call without preceding user speech");
+    let toolsArr: ReturnType<typeof tool>[] = [];
+    if (!audioResponses) {
+      const getBookInformation = tool({
+        name: "get_book_information",
+        description: "Answers the questions about the book.",
+        parameters: z.object({ question: z.string().describe("The question to answer.") }),
+        execute: async ({ question }: { question: string }) => {
+          try {
+            toolTriggeredRef.current = true;
+            if (awaitingSpeechResponseRef.current) {
+              askHandlerRef.current?.(question);
+            } else {
+              console.warn("Ignoring tool call without preceding user speech");
+            }
+            return "";
+          } catch (error) {
+            return { error: (error as Error).message };
           }
-          // Return empty string to avoid populating the input with agent reply
-          return "";
-        } catch (error) {
-          return { error: (error as Error).message };
-        }
-      },
-    });
+        },
+      });
+      toolsArr = [getBookInformation];
+    }
 
-    agentRef.current = new RealtimeAgent({ name: "Reader Assistant", instructions, tools: [getBookInformation] });
+    agentRef.current = new RealtimeAgent({ name: "Reader Assistant", instructions, tools: toolsArr });
   }, []);
 
   // Attach streaming handlers on the active session
@@ -127,7 +147,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
 
       // Track conversation items to clear history between questions
-      if (event.type === "conversation.item.added") {
+      if (event.type === "conversation.item.added" || event.type === "conversation.item.created") {
         setIsSessionReady(true);
 
         const item = event.item;
@@ -163,16 +183,14 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     if (!sessionRef.current) {
       sessionRef.current = new RealtimeSession(agentRef.current, {
-        model: "gpt-4o-mini-realtime-preview",
-        // config: { outputModalities: ["text"], audio: { input: { turnDetection: null } } },
-        config: { outputModalities: ["text"] },
+        model: "gpt-realtime-mini",
+        config: { outputModalities: audioResponses ? ["text", "audio"] : ["text"] },
         automaticallyTriggerResponseForMcpToolCalls: false,
       });
     }
     // Fetch ephemeral realtime token from our backend
     let token = "";
     try {
-      // const resp = await fetch(`http://localhost:30310/getRealtimeToken`);
       const resp = await fetch(`/api/generate-realtime-token`, { credentials: "include" });
       if (resp.status === 401) {
         if (nextConnectInteractiveRef.current) {
@@ -203,7 +221,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       session.transport.sendEvent({
         type: "session.update",
-        session: { model: "gpt-4o-mini-realtime-preview", type: "realtime", output_modalities: ["text"], audio: { input: { turn_detection: null } } },
+        session: { model: "gpt-realtime-mini", type: "realtime", output_modalities: audioResponses ? ["text", "audio"] : ["text"], audio: { input: { turn_detection: null } } },
       });
     } catch {}
 
@@ -211,7 +229,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     session.mute(true);
     setIsMuted(true);
     setIsConnected(true);
-  }, []);
+  }, [audioResponses]);
 
   // Optional preconnect: disabled until mic is primed to ensure we attach our MediaStream
   useEffect(() => {
@@ -239,6 +257,98 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     attemptPreconnect();
   }, [isConnected, connectConversation]);
 
+  // ------------------------------
+  // Persistent Book Context (Option B)
+  // ------------------------------
+  const hasAdvancedBeyond = (a: BookContextLocation | null, b: BookContextLocation): boolean => {
+    if (!a) return true;
+    return b.chapter > a.chapter || (b.chapter === a.chapter && b.paragraph > a.paragraph);
+  };
+
+  const sendBookContext = useCallback(
+    async (chunks: BookContextChunk[], isInitial: boolean) => {
+      if (!isConnected || !sessionRef.current || !chunks.length) return;
+      const session = sessionRef.current;
+      const contextText = chunks.map((c) => c.text).join("\n\n");
+      const header = isInitial ? "Book context so far:" : "Additional book context:";
+      const text = `${header}\n\n${contextText}`;
+      session.transport.sendEvent({ type: "conversation.item.create", item: { type: "message", role: "system", content: [{ type: "input_text", text }] } });
+      const last = chunks[chunks.length - 1];
+      bookContextLastSentRef.current = { chapter: last.chapter, paragraph: last.paragraph };
+    },
+    [isConnected],
+  );
+
+  const sendInitialBookContext = useCallback(async () => {
+    if (!audioResponses) return;
+    console.log("sendInitialBookContext");
+    if (!isConnected || !sessionRef.current || isUpdatingBookContextRef.current) return;
+    console.log("sendInitialBookContext 2");
+    isUpdatingBookContextRef.current = true;
+    try {
+      const current: BookContextLocation = {
+        chapter: debouncedLocation.currentChapter ?? debouncedLocation.chapter,
+        paragraph: debouncedLocation.currentParagraph ?? debouncedLocation.paragraph,
+      };
+      const { chunks } = await extractBookTextUpToLocation(current);
+      if (chunks.length) await sendBookContext(chunks, true);
+    } catch (e) {
+      console.warn("Failed to send initial book context", e);
+    } finally {
+      isUpdatingBookContextRef.current = false;
+    }
+  }, [isConnected, debouncedLocation.currentChapter, debouncedLocation.currentParagraph, debouncedLocation.chapter, debouncedLocation.paragraph, sendBookContext]);
+
+  const sendIncrementalBookContext = useCallback(async () => {
+    if (!audioResponses) return;
+    console.log("sendIncrementalBookContext");
+    if (!isConnected || !sessionRef.current || isUpdatingBookContextRef.current) return;
+    console.log("sendIncrementalBookContext 2");
+    const last = bookContextLastSentRef.current;
+    if (!last) return;
+    console.log("sendIncrementalBookContext 3");
+    const current: BookContextLocation = {
+      chapter: debouncedLocation.currentChapter ?? debouncedLocation.chapter,
+      paragraph: debouncedLocation.currentParagraph ?? debouncedLocation.paragraph,
+    };
+    if (!hasAdvancedBeyond(last, current)) return;
+
+    isUpdatingBookContextRef.current = true;
+    try {
+      const from: BookContextLocation = { chapter: last.chapter, paragraph: last.paragraph + 1 };
+      if (current.chapter > last.chapter) {
+        from.chapter = last.chapter + 1;
+        from.paragraph = 1;
+      }
+      const { chunks } = await extractBookTextFromLocation(from, current);
+      if (chunks.length) await sendBookContext(chunks, false);
+    } catch (e) {
+      console.warn("Failed to send incremental book context", e);
+    } finally {
+      isUpdatingBookContextRef.current = false;
+    }
+  }, [isConnected, debouncedLocation.currentChapter, debouncedLocation.currentParagraph, debouncedLocation.chapter, debouncedLocation.paragraph, sendBookContext]);
+
+  // Kick off initial context once connected
+  useEffect(() => {
+    if (audioResponses && isConnected && !bookContextLastSentRef.current) {
+      const t = setTimeout(() => {
+        void sendInitialBookContext();
+      }, 50);
+      return () => clearTimeout(t);
+    }
+  }, [audioResponses, isConnected, sendInitialBookContext]);
+
+  // Send incremental context as the reader advances
+  useEffect(() => {
+    if (audioResponses && isConnected && bookContextLastSentRef.current) {
+      const t = setTimeout(() => {
+        void sendIncrementalBookContext();
+      }, 350);
+      return () => clearTimeout(t);
+    }
+  }, [audioResponses, isConnected, debouncedLocation.currentChapter, debouncedLocation.currentParagraph, sendIncrementalBookContext]);
+
   const disconnectConversation = useCallback(async () => {
     setIsConnected(false);
     const session = sessionRef.current;
@@ -246,6 +356,8 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     session.close();
     sessionRef.current = null;
+    // Reset book context progress (but we do not purge server-side items)
+    bookContextLastSentRef.current = null;
   }, []);
 
   // Prime microphone once: request permission, set up analyser, keep stream alive (tracks disabled)
@@ -331,20 +443,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       session.transport.sendEvent({ type: "input_audio_buffer.clear" });
     } catch {}
-    // Clear all previous conversation items (ensures independence between questions)
-    try {
-      const toDelete = conversationItemsRef.current.map((x) => x.id);
-      console.log("toDelete", toDelete);
-      for (const id of toDelete) {
-        session.transport.sendEvent({ type: "conversation.item.delete", item_id: id });
-      }
-      if (toDelete.length) {
-        console.log("conversationItemsRef.current ", conversationItemsRef.current);
-        conversationItemsRef.current = [];
-      }
-    } catch (e) {
-      console.warn("Failed to clear previous conversation items", e);
-    }
+    // Do not clear conversation items between requests — keep continuity
     // Send a guidance message every hold with dynamic character list scoped to current chapter
     try {
       await loadCharactersData().catch(() => {});
@@ -374,7 +473,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const author = book?.metadata?.author ?? "the author";
       const segments = [
         `Help the user with "${title}" by ${author}.`,
-        "Use the get_book_information tool for every answer.",
+        ...(audioResponses ? [] : ["Use the get_book_information tool for every answer."]),
         "If user mispronounces a character's name, rely on these lists:",
         `Characters in current chapter: ${format(inCurrent)}.`,
       ];
@@ -383,14 +482,33 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         segments.push(`Characters from previous chapters: ${format(inPrevious)}.`);
       }
 
-      segments.push(
-        `Use the user’s voice question directly when calling the tool; do not add any other information or the characters. Use the list only to guide understanding of the pronunciation.`,
-      );
+      if (!audioResponses) {
+        segments.push(
+          `Use the user’s voice question directly when calling the tool; do not add any other information or the characters or the book information like title, or author unless explicitly specified by the user. Just pass the question from the user. Use the list only to guide understanding of the pronunciation.`,
+        );
+      }
 
       const text = segments.join(" ");
       session.transport.sendEvent({ type: "conversation.item.create", item: { type: "message", role: "system", content: [{ type: "input_text", text }] } });
     } catch (e) {
       console.warn("Failed to send per-hold priming message", e);
+    }
+    // If user is currently looking behind the furthest read location, add a VisibleText context (audio mode only)
+    if (audioResponses) {
+      try {
+        const saved = getSavedLocation();
+        const furthestChapter = saved?.currentChapter ?? location?.currentChapter ?? 1;
+        const furthestParagraph = saved?.currentParagraph ?? location?.currentParagraph ?? 1;
+        const isBehind =
+          (location?.currentChapter ?? 1) < furthestChapter || ((location?.currentChapter ?? 1) === furthestChapter && (location?.currentParagraph ?? 1) < furthestParagraph);
+        if (isBehind) {
+          const visibleText = getSurroundingText(location);
+          const msg = `The user is currently looking at:\n<VisibleText>${visibleText}</VisibleText>`;
+          session.transport.sendEvent({ type: "conversation.item.create", item: { type: "message", role: "system", content: [{ type: "input_text", text: msg }] } });
+        }
+      } catch (e) {
+        console.warn("Failed to send visible text context", e);
+      }
     }
     // Prime mic permission on first use to avoid missing initial speech
   }, [isConnected, connectConversation, location]);
@@ -420,8 +538,11 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     awaitingSpeechResponseRef.current = !!hadAudio;
     recordStartTimeRef.current = null;
     audioHeardThisRecordingRef.current = false;
-    session.transport.sendEvent({ type: "response.create", response: { output_modalities: ["text"], tool_choice: "required" } });
-  }, []);
+    session.transport.sendEvent({
+      type: "response.create",
+      response: { output_modalities: audioResponses ? ["text", "audio"] : ["text"], tool_choice: audioResponses ? "auto" : "required" },
+    });
+  }, [audioResponses]);
 
   const toggleMute = useCallback(() => {
     setIsMuted((prev) => {
