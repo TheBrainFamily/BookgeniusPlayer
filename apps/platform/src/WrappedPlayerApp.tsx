@@ -181,32 +181,34 @@ const WrappedPlayerApp = () => {
       return;
     }
 
+    const resolveBookContent = async () => {
+      const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("[RESOLVE] resolve failed");
+      const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
+      bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
+      bookDataLoader.setBookVisibility(visibility);
+      setAssetBaseReady(true);
+    };
+
     (async () => {
       setAssetBaseReady(false);
 
       try {
-        const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
-        if (!res.ok) throw new Error("[RESOLVE] resolve failed");
-        const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
-
-        // accept either shape; you already parse full URL in setAssetBase
-        bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
-        bookDataLoader.setBookVisibility(visibility);
-        setAssetBaseReady(true);
+        await resolveBookContent();
       } catch (err: unknown) {
-        console.warn("[RESOLVE] error, retrying:", err);
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        console.warn("[RESOLVE] error, will retry after a token refresh:", err);
+        await auth.refreshToken?.();
         try {
-          await auth.refreshToken?.();
-          const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
-          if (!res.ok) throw new Error("[RESOLVE] resolve failed");
-          const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
-          // accept either shape; you already parse full URL in setAssetBase
-          bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
-          bookDataLoader.setBookVisibility(visibility);
-          setAssetBaseReady(true);
+          await resolveBookContent();
         } catch (err: unknown) {
-          console.error("[RESOLVE] error second attempt:", err);
+          console.error("[RESOLVE] error attempt failed after token refresh, will retry in 3 seconds:", err);
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          try {
+            await resolveBookContent();
+          } catch (err: unknown) {
+            console.error("[RESOLVE] error third attempt, reloading app:", err);
+            window.location.reload();
+          }
         }
       }
     })();
