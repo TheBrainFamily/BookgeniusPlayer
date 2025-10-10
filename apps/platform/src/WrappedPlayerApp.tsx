@@ -268,7 +268,7 @@ const WrappedPlayerApp = () => {
         }
       }
     })();
-  }, [book, auth.ready, auth.isSignedIn, auth.refreshToken, auth.getToken]);
+  }, [book, auth.ready, auth.isSignedIn]);
 
   // On unmount (leaving /reader), fully tear down the player environment
   useEffect(() => {
