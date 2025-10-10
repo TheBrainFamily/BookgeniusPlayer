@@ -187,7 +187,6 @@ export function setupPageObserver(): {
   type ProcessIntersectionsOptions = { shouldCreateVideos?: boolean };
 
   const processIntersections = ({ shouldCreateVideos = false }: ProcessIntersectionsOptions = {}) => {
-    const rootRect = observerOptions.root.getBoundingClientRect();
     const topMultiplier = 0.35; // 35vh focus zone start
     let bottomMultiplier = 0.55; // 10vh focus zone height (default)
 
@@ -216,8 +215,10 @@ export function setupPageObserver(): {
       bottomMultiplier = 0.52; // Smaller, more precise zone for large screens
     }
 
+    const rootRect = observerOptions.root.getBoundingClientRect();
     const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
     const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
+    const focusZoneCenter = (focusZoneTop + focusZoneBottom) / 2;
 
     if (DEV_ZONE_VISUALIZERS_ENABLED) {
       drawFocusZone(rangeVisualizer, rootEl, focusZoneTop, focusZoneBottom);
@@ -227,10 +228,11 @@ export function setupPageObserver(): {
     let maxPercentageOverlapRatio = -1;
     let chosenElement: Element | null = null;
     let foundFullyVisible = false;
+    let bestCenterDistance = Number.POSITIVE_INFINITY;
     // Minimum overlap threshold in pixels to consider an element
     const MIN_OVERLAP_THRESHOLD = 15;
 
-    // First pass: look for fully visible elements
+    // First pass: look for fully visible elements; choose the one closest to the focus-zone center
     intersectingPages.forEach((element) => {
       const rect = element.getBoundingClientRect();
 
@@ -245,10 +247,12 @@ export function setupPageObserver(): {
 
       // Check if element is fully contained within the zone and has content
       if (visualTop >= focusZoneTop && visualBottom <= focusZoneBottom && element.textContent?.trim() !== "") {
-        // Element is fully visible in the zone
-        if (!foundFullyVisible) {
-          // This is the first fully visible element found
+        // Element is fully visible in the zone; prefer the one whose center is closest to the focus-zone center
+        const elementCenter = (visualTop + visualBottom) / 2;
+        const centerDistance = Math.abs(elementCenter - focusZoneCenter);
+        if (!foundFullyVisible || centerDistance < bestCenterDistance) {
           foundFullyVisible = true;
+          bestCenterDistance = centerDistance;
           activeParagraph = getParagraphInfo(element);
           chosenElement = element;
           maxPercentageOverlapRatio = 1.0; // 100% visible
@@ -289,18 +293,24 @@ export function setupPageObserver(): {
           currentOverlapRatio = overlap / visualHeight;
         }
 
-        // Use a weighted combination of absolute overlap and percentage overlap
-        // This gives preference to elements that occupy more space in the zone
-        // while still considering how much of the element is visible
+        // Use a weighted combination of absolute overlap and percentage overlap,
+        // with center proximity as a tie-breaker to align with programmatic scrolling
         const ABSOLUTE_WEIGHT = 0.7;
         const PERCENTAGE_WEIGHT = 0.3;
+        const CENTER_WEIGHT = 0.15; // modest bias toward focus-zone center
 
         const zoneHeight = focusZoneBottom - focusZoneTop;
         const normalizedAbsoluteOverlap = overlap / zoneHeight; // Normalize to 0-1 range
         const weightedScore = normalizedAbsoluteOverlap * ABSOLUTE_WEIGHT + currentOverlapRatio * PERCENTAGE_WEIGHT;
 
-        if (weightedScore > maxPercentageOverlapRatio) {
-          maxPercentageOverlapRatio = weightedScore;
+        const elementCenter = (visualTop + visualBottom) / 2;
+        const normalizedCenterDistance = Math.min(1, Math.abs(elementCenter - focusZoneCenter) / (zoneHeight / 2));
+        const centerProximity = 1 - normalizedCenterDistance; // 1 at center, 0 near edges
+
+        const finalScore = weightedScore + centerProximity * CENTER_WEIGHT;
+
+        if (finalScore > maxPercentageOverlapRatio) {
+          maxPercentageOverlapRatio = finalScore;
           activeParagraph = getParagraphInfo(element);
           chosenElement = element;
         }
@@ -452,20 +462,24 @@ export function setupPageObserver(): {
             };
 
             if (!isSameLoc(lastSentLocation, nextLoc)) {
-              // Don't update location during system navigation to avoid conflicts with programmatic scrolling
-              setCurrentLocation({
-                chapter: rangeStartInfo.chapter,
-                paragraph: expandedStartParagraph,
-                endChapter: rangeEndInfo.chapter,
-                endParagraph: expandedEndParagraph,
-                currentChapter: activeParagraph.chapter,
-                currentParagraph: activeParagraph.paragraph,
-                earliestVisibleParagraph: focusZoneIntersectingParagraphs[0]?.paragraph ?? null,
-                latestVisibleParagraph: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.paragraph ?? null,
-                earliestVisibleChapter: focusZoneIntersectingParagraphs[0]?.chapter ?? null,
-                latestVisibleChapter: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.chapter ?? null,
-              });
-              lastSentLocation = nextLoc;
+              // Avoid overriding programmatic navigation mid-scroll
+              if (isSystemNavigationInProgress()) {
+                // Defer location update until system navigation finishes
+              } else {
+                setCurrentLocation({
+                  chapter: rangeStartInfo.chapter,
+                  paragraph: expandedStartParagraph,
+                  endChapter: rangeEndInfo.chapter,
+                  endParagraph: expandedEndParagraph,
+                  currentChapter: activeParagraph.chapter,
+                  currentParagraph: activeParagraph.paragraph,
+                  earliestVisibleParagraph: focusZoneIntersectingParagraphs[0]?.paragraph ?? null,
+                  latestVisibleParagraph: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.paragraph ?? null,
+                  earliestVisibleChapter: focusZoneIntersectingParagraphs[0]?.chapter ?? null,
+                  latestVisibleChapter: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.chapter ?? null,
+                });
+                lastSentLocation = nextLoc;
+              }
             }
 
             // Media uses viewport range (separate from character notes)

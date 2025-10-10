@@ -19,6 +19,7 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "@platform/i18n";
 import DynamicDocumentTitle from "./components/DynamicDocumentTitle";
 import "./integrations/SnapplifyChat";
+import { BookgeniusChat } from "./integrations/BookgeniusChat";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const AppWithAuth = () => {
       <I18nextProvider i18n={i18n}>
         <RouteTransitionProvider>
           <DynamicDocumentTitle />
+          <BookgeniusChat />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/experience/:slug" element={<BookExperience />} />

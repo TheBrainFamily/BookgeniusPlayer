@@ -2,7 +2,6 @@ let listenerSet = false;
 export function toggleBookContainerVisibilityWithShortcut() {
   if (listenerSet) return;
   function onKeyDown(e: KeyboardEvent) {
-    console.log("onKeyDown", e);
     // Check for Shift + H (case-insensitive) and Command (Meta) key on macOS
     const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
     const isCommand = isMac ? e.metaKey : e.ctrlKey; // Use Command on Mac, Ctrl elsewhere

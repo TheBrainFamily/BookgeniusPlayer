@@ -181,27 +181,35 @@ const WrappedPlayerApp = () => {
       return;
     }
 
+    const resolveBookContent = async () => {
+      const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("[RESOLVE] resolve failed");
+      const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
+      bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
+      bookDataLoader.setBookVisibility(visibility);
+      setAssetBaseReady(true);
+    };
+
     (async () => {
       setAssetBaseReady(false);
 
       try {
-        const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
-        if (!res.ok) throw new Error("[RESOLVE] resolve failed");
-        const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
-
-        // accept either shape; you already parse full URL in setAssetBase
-        bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
-        bookDataLoader.setBookVisibility(visibility);
-        // optional warm HEAD for index.html to reduce first-media latency (fire-and-forget)
-        // try { fetch(`${assetBase}index.html`, { method: "HEAD", cache: "no-store" }); } catch (_) {}
-        setAssetBaseReady(true);
+        await resolveBookContent();
       } catch (err: unknown) {
-        if (typeof err === "object" && err !== null && "name" in err && (err as { name?: string }).name === "AbortError") {
-          return;
+        console.warn("[RESOLVE] error, will retry after a token refresh:", err);
+        await auth.refreshToken?.();
+        try {
+          await resolveBookContent();
+        } catch (err: unknown) {
+          console.error("[RESOLVE] error attempt failed after token refresh, will retry in 3 seconds:", err);
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          try {
+            await resolveBookContent();
+          } catch (err: unknown) {
+            console.error("[RESOLVE] error third attempt, reloading app:", err);
+            window.location.reload();
+          }
         }
-        console.error("[RESOLVE] error:", err);
-        bookDataLoader.setAssetBase(null); // fallback to old API path
-        setAssetBaseReady(true);
       }
     })();
   }, [book, auth.ready]);
