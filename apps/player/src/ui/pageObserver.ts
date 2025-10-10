@@ -1,4 +1,4 @@
-import { setCurrentLocation } from "@player/helpers/paragraphsNavigation";
+import { isSystemNavigationInProgress, setCurrentLocation } from "@player/helpers/paragraphsNavigation";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers, drawElementsUnion } from "./devVisualizers";
 import { activateMediaInRange } from "./activateMediaInRange";
