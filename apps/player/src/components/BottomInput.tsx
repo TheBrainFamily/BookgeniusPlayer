@@ -49,6 +49,9 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const [isDeepResearchActive, setIsDeepResearchActive] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [isMicrophoneReady, setIsMicrophoneReady] = useState(false);
+  const [micToastVisible, setMicToastVisible] = useState(false);
+  const [micToastText, setMicToastText] = useState("");
+  const micToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -201,6 +204,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   useEffect(() => {
     return () => {
       sseRef.current?.close();
+      if (micToastTimerRef.current) clearTimeout(micToastTimerRef.current);
     };
   }, []);
 
@@ -437,23 +441,48 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
     handleActivity();
 
-    // Immediately show connecting UI
+    // First ensure mic is primed; if this is the first time (permission prompt), do not start recording yet.
+    try {
+      const prime = await primeMicrophone();
+      const showMicToast = (text: string, duration: number) => {
+        setMicToastText(text);
+        setMicToastVisible(true);
+        if (micToastTimerRef.current) clearTimeout(micToastTimerRef.current);
+        micToastTimerRef.current = setTimeout(() => setMicToastVisible(false), duration);
+      };
+
+      if (prime === "failed") {
+        // Show toast and bail
+        showMicToast(t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."), 2400);
+        return;
+      }
+      if (prime === "just_primed") {
+        // Permission was just granted; ask user to press again to avoid UI glitches
+        showMicToast(t("mic_ready_try_again", "Mic permissions ready. Press and hold again!"), 1800);
+        return;
+      }
+      // already_primed => proceed to real start
+    } catch (e) {
+      console.warn("[ptt] primeMicrophone threw", e);
+      return;
+    }
+
+    // Immediately show connecting UI only when actually starting
     setIsRealtimeConnecting(true);
     setIsMicrophoneReady(false); // Reset mic ready state for new recording
     setValue("");
     if (isSearchModalOpen) setSearchQuery("");
 
-    console.log("[ptt] calling startRecording() (will prime+connect in parallel)…");
+    console.log("[ptt] calling startRecording() (will prime+connect in parallel)");
     startRecording()
       .then(() => {
         console.log("[ptt] startRecording finished in", (performance.now() - t0).toFixed(1), "ms");
-        // Connecting state will be cleared by useEffect when both session and mic are ready
       })
       .catch((error) => {
         console.error("[ptt] Error starting recording:", error);
         setIsRealtimeConnecting(false);
       });
-  }, [handleActivity, isRecording, isRealtimeConnecting, isSearchModalOpen, setSearchQuery, startRecording, setValue, primeMicrophone]);
+  }, [handleActivity, isRecording, isRealtimeConnecting, isSearchModalOpen, setSearchQuery, startRecording, setValue, primeMicrophone, t]);
 
   // Clear connecting state when both session and microphone are ready
   useEffect(() => {
@@ -581,6 +610,18 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
   return (
     <>
+      <AnimatePresence>
+        {micToastVisible && (
+          <motion.div
+            className="fixed bottom-44 right-4 z-50 bg-black/85 border border-white/30 text-white rounded-full px-3 py-2 shadow-xl text-xs"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+          >
+            {micToastText}
+          </motion.div>
+        )}
+      </AnimatePresence>
       {showMicDebug && <DebugMicPlaybackButton />}
       <MicrophoneVisualizer isActive={isRecording || isRealtimeConnecting} audioAnalyser={audioAnalyser} onMicReady={setIsMicrophoneReady} />
       <OptionalElement className={cn("w-full flex justify-center", className)} id="bottom-input-container">

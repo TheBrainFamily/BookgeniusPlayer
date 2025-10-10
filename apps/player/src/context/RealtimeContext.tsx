@@ -676,13 +676,19 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const fromRate = ctx.sampleRate;
         const toRate = 24000;
         const ratio = fromRate / toRate;
+        try {
+          const ua = navigator.userAgent || "";
+          const isSafari = /Safari/.test(ua) && !/Chrome|CriOS|Chromium/.test(ua);
+          warmupSamplesRemainingRef.current = isSafari ? Math.floor(0.3 * toRate) : 0; // ~300ms skip to avoid initial AGC/glitch
+        } catch {
+          warmupSamplesRemainingRef.current = 0;
+        }
 
         resampleBufferRef.current = new Float32Array(0);
         pcmQueueRef.current = new Int16Array(0);
         isStreamingAudioRef.current = true;
 
         const workletReady = await ensureAudioWorklet();
-        warmupSamplesRemainingRef.current = 0;
         if (workletReady && window.AudioWorkletNode) {
           let node = audioWorkletNodeRef.current;
           if (!node) {
