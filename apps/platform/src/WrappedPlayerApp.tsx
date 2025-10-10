@@ -14,6 +14,39 @@ import { useAuth } from "./hooks/useAuth";
 const PlayerApp = React.lazy(() => import("./player/PlayerRoot"));
 const PAYWALL_FADE_MS = 300;
 const AUTH_MODAL_FADE_MS = 300;
+const SESSION_COOKIE_NAMES = ["__session", "_session"] as const;
+
+type ResolveError = Error & { status?: number };
+
+const hasSessionCookie = () => {
+  if (typeof document === "undefined") return false;
+  const rawCookies = document.cookie ? document.cookie.split(";") : [];
+  return SESSION_COOKIE_NAMES.some((name) => rawCookies.some((cookie) => cookie.trim().startsWith(`${name}=`)));
+};
+
+const clearSessionCookies = () => {
+  if (typeof document === "undefined") return;
+
+  const domainsToTry = new Set<string>([""]);
+  if (typeof window !== "undefined") {
+    const parts = window.location.hostname.split(".").filter(Boolean);
+    for (let i = 0; i < parts.length; i += 1) {
+      const domain = parts.slice(i).join(".");
+      if (domain) {
+        domainsToTry.add(domain);
+        domainsToTry.add(`.${domain}`);
+      }
+    }
+  }
+
+  SESSION_COOKIE_NAMES.forEach((name) => {
+    domainsToTry.forEach((domain) => {
+      const domainSegment = domain ? `; domain=${domain}` : "";
+      document.cookie = `${name}=; Max-Age=0; path=/; SameSite=Lax${domainSegment}`;
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax${domainSegment}`;
+    });
+  });
+};
 
 const WrappedPlayerApp = () => {
   const [searchParams] = useSearchParams();
@@ -183,7 +216,11 @@ const WrappedPlayerApp = () => {
 
     const resolveBookContent = async () => {
       const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
-      if (!res.ok) throw new Error("[RESOLVE] resolve failed");
+      if (!res.ok) {
+        const error = new Error(`[RESOLVE] resolve failed with status ${res.status}`);
+        (error as ResolveError).status = res.status;
+        throw error;
+      }
       const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
       bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
       bookDataLoader.setBookVisibility(visibility);
@@ -193,26 +230,45 @@ const WrappedPlayerApp = () => {
     (async () => {
       setAssetBaseReady(false);
 
+      const initialHadSessionCookie = hasSessionCookie();
       try {
         await resolveBookContent();
       } catch (err: unknown) {
-        console.warn("[RESOLVE] error, will retry after a token refresh:", err);
-        await auth.refreshToken?.();
+        console.warn("[RESOLVE] error, evaluating recovery steps:", err);
+        const status = (err as ResolveError)?.status;
+
+        if ((status === 401 || status === 403) && auth.refreshToken) {
+          try {
+            await auth.refreshToken();
+            await resolveBookContent();
+            return;
+          } catch (refreshErr: unknown) {
+            console.warn("[RESOLVE] retry after token refresh failed:", refreshErr);
+          }
+        }
+
+        if ((status === 401 || status === 403) && initialHadSessionCookie && !auth.isSignedIn) {
+          console.warn("[RESOLVE] clearing stale session cookie and retrying.");
+          clearSessionCookies();
+          try {
+            await resolveBookContent();
+            return;
+          } catch (cookieErr: unknown) {
+            console.warn("[RESOLVE] retry after clearing session cookie failed:", cookieErr);
+          }
+        }
+
+        console.error("[RESOLVE] attempting final retry after delay.");
+        await new Promise((resolve) => setTimeout(resolve, 3000));
         try {
           await resolveBookContent();
         } catch (err: unknown) {
-          console.error("[RESOLVE] error attempt failed after token refresh, will retry in 3 seconds:", err);
-          await new Promise((resolve) => setTimeout(resolve, 3000));
-          try {
-            await resolveBookContent();
-          } catch (err: unknown) {
-            console.error("[RESOLVE] error third attempt, reloading app:", err);
-            window.location.reload();
-          }
+          console.error("[RESOLVE] error final attempt failed, reloading app:", err);
+          window.location.reload();
         }
       }
     })();
-  }, [book, auth.ready]);
+  }, [book, auth.ready, auth.isSignedIn, auth.refreshToken]);
 
   // On unmount (leaving /reader), fully tear down the player environment
   useEffect(() => {
