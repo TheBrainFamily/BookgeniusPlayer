@@ -14,39 +14,8 @@ import { useAuth } from "./hooks/useAuth";
 const PlayerApp = React.lazy(() => import("./player/PlayerRoot"));
 const PAYWALL_FADE_MS = 300;
 const AUTH_MODAL_FADE_MS = 300;
-const SESSION_COOKIE_NAMES = ["__session", "_session"] as const;
 
 type ResolveError = Error & { status?: number };
-
-const hasSessionCookie = () => {
-  if (typeof document === "undefined") return false;
-  const rawCookies = document.cookie ? document.cookie.split(";") : [];
-  return SESSION_COOKIE_NAMES.some((name) => rawCookies.some((cookie) => cookie.trim().startsWith(`${name}=`)));
-};
-
-const clearSessionCookies = () => {
-  if (typeof document === "undefined") return;
-
-  const domainsToTry = new Set<string>([""]);
-  if (typeof window !== "undefined") {
-    const parts = window.location.hostname.split(".").filter(Boolean);
-    for (let i = 0; i < parts.length; i += 1) {
-      const domain = parts.slice(i).join(".");
-      if (domain) {
-        domainsToTry.add(domain);
-        domainsToTry.add(`.${domain}`);
-      }
-    }
-  }
-
-  SESSION_COOKIE_NAMES.forEach((name) => {
-    domainsToTry.forEach((domain) => {
-      const domainSegment = domain ? `; domain=${domain}` : "";
-      document.cookie = `${name}=; Max-Age=0; path=/; SameSite=Lax${domainSegment}`;
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax${domainSegment}`;
-    });
-  });
-};
 
 const WrappedPlayerApp = () => {
   const [searchParams] = useSearchParams();
@@ -214,13 +183,40 @@ const WrappedPlayerApp = () => {
       return;
     }
 
-    const resolveBookContent = async () => {
-      const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store" });
+    const resolveBookContent = async (mode: "signed-in" | "anon", { forceFreshToken = false }: { forceFreshToken?: boolean } = {}) => {
+      const headers: Record<string, string> = {};
+      let credentials: RequestCredentials = "omit";
+
+      if (mode === "signed-in") {
+        let token: string | null | undefined = null;
+
+        if (forceFreshToken && auth.refreshToken) {
+          token = await auth.refreshToken().catch(() => null);
+        } else if (auth.getToken) {
+          token = await auth.getToken({ skipCache: forceFreshToken }).catch(() => null);
+        } else if (auth.refreshToken) {
+          token = await auth.refreshToken().catch(() => null);
+        }
+
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        } else {
+          credentials = "same-origin";
+        }
+      }
+
+      if (mode === "anon") {
+        credentials = "omit";
+      }
+
+      const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store", credentials, headers });
+
       if (!res.ok) {
         const error = new Error(`[RESOLVE] resolve failed with status ${res.status}`);
         (error as ResolveError).status = res.status;
         throw error;
       }
+
       const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
       bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
       bookDataLoader.setBookVisibility(visibility);
@@ -230,45 +226,49 @@ const WrappedPlayerApp = () => {
     (async () => {
       setAssetBaseReady(false);
 
-      const initialHadSessionCookie = hasSessionCookie();
       try {
-        await resolveBookContent();
+        await resolveBookContent(auth.isSignedIn ? "signed-in" : "anon");
       } catch (err: unknown) {
         console.warn("[RESOLVE] error, evaluating recovery steps:", err);
         const status = (err as ResolveError)?.status;
 
-        if ((status === 401 || status === 403) && auth.refreshToken) {
+        if ((status === 401 || status === 403) && auth.isSignedIn) {
           try {
-            await auth.refreshToken();
-            await resolveBookContent();
+            await resolveBookContent("signed-in", { forceFreshToken: true });
             return;
           } catch (refreshErr: unknown) {
             console.warn("[RESOLVE] retry after token refresh failed:", refreshErr);
           }
         }
 
-        if ((status === 401 || status === 403) && initialHadSessionCookie && !auth.isSignedIn) {
-          console.warn("[RESOLVE] clearing stale session cookie and retrying.");
-          clearSessionCookies();
+        if ((status === 401 || status === 403) && !auth.isSignedIn) {
+          console.warn("[RESOLVE] retrying without credentials to load demo content.");
           try {
-            await resolveBookContent();
+            await resolveBookContent("anon");
             return;
           } catch (cookieErr: unknown) {
-            console.warn("[RESOLVE] retry after clearing session cookie failed:", cookieErr);
+            console.warn("[RESOLVE] retry without credentials failed:", cookieErr);
           }
         }
 
         console.error("[RESOLVE] attempting final retry after delay.");
         await new Promise((resolve) => setTimeout(resolve, 3000));
         try {
-          await resolveBookContent();
+          if (auth.isSignedIn) {
+            await resolveBookContent("signed-in", { forceFreshToken: true });
+          } else {
+            await resolveBookContent("anon");
+          }
         } catch (err: unknown) {
-          console.error("[RESOLVE] error final attempt failed, reloading app:", err);
-          window.location.reload();
+          console.error("[RESOLVE] error final attempt failed. Keeping splash visible for manual retry.", err);
+          if (auth.isSignedIn) {
+            console.warn("[RESOLVE] prompting auth modal after repeated failures.");
+            setShowAuth(true);
+          }
         }
       }
     })();
-  }, [book, auth.ready, auth.isSignedIn, auth.refreshToken]);
+  }, [book, auth.ready, auth.isSignedIn, auth.refreshToken, auth.getToken]);
 
   // On unmount (leaving /reader), fully tear down the player environment
   useEffect(() => {

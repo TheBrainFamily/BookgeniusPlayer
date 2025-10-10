@@ -152,7 +152,10 @@ const AuthProviderInner: React.FC<{ children: React.ReactNode }> = ({ children }
     };
   }, [navigate]);
 
-  const ctx = useMemo<AuthCtx>(() => ({ ready, isSignedIn: !!idToken, openSignIn, signOut, userId: undefined, email: undefined }), [ready, idToken, openSignIn, signOut]);
+  const ctx = useMemo<AuthCtx>(
+    () => ({ ready, isSignedIn: !!idToken, openSignIn, signOut, userId: undefined, email: undefined, getToken: async () => idToken ?? null }),
+    [ready, idToken, openSignIn, signOut],
+  );
 
   return <Ctx.Provider value={ctx}>{children}</Ctx.Provider>;
 };
