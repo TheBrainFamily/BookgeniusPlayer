@@ -166,9 +166,9 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       closeCharacterModal();
     }
 
-    if (!isSearchModalOpen && value.length > 2) {
+    if (!isSearchModalOpen && (deepResearchContent || value.trim().length >= 2)) {
       if (deepResearchContent) {
-        openDeepResearchModal(deepResearchContent, true, true, "deep");
+        openDeepResearchModal(deepResearchContent, true, true, isDeepResearchActive ? "deep" : "ask");
       } else {
         openSearchModal(true, true, value.trim());
       }
@@ -427,10 +427,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   useEffect(() => {
     setAskHandler((query: string) => {
       // Behave exactly like submitting from the input
-      handleAsk(query);
+      setValue(query);
+      void handleAsk(query);
     });
     return () => setAskHandler(null);
-  }, [handleAsk, setAskHandler]);
+  }, [handleAsk, setAskHandler, setValue]);
 
   const toggleDeepResearch = useCallback(() => {
     if (isThinking) return;
