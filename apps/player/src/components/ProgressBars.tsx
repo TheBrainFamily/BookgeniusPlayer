@@ -60,14 +60,14 @@ const ProgressBars: React.FC = () => {
             initial="hidden"
             animate="visible"
             className="fixed inset-x-0 top-0 h-[10px] z-[49] pointer-events-none"
-            style={{ backgroundColor: "color-mix(in srgb, var(--bg-content-light, #8B4513) 30%, transparent)" }}
+            style={{ backgroundColor: "color-mix(in srgb, var(--bg-content-light, #8B4513) 20%, transparent)" }}
           >
             <motion.div
               className="h-full w-full origin-left transform-gpu [will-change:transform]"
               style={{
                 scaleX: chapterX,
                 background:
-                  "linear-gradient(to right, color-mix(in srgb, var(--bg-content-light, #CD853F) 65%, white), color-mix(in srgb, var(--bg-content-light, #F4A460) 75%, white))",
+                  "linear-gradient(to right, color-mix(in srgb, var(--bg-content-light, #CD853F) 45%, transparent), color-mix(in srgb, var(--bg-content-light, #F4A460) 65%, transparent))",
                 opacity: 0.8,
               }}
             />
@@ -79,14 +79,14 @@ const ProgressBars: React.FC = () => {
             initial="hidden"
             animate="visible"
             className="fixed inset-x-0 bottom-0 h-[10px] z-[48] pointer-events-none"
-            style={{ backgroundColor: "color-mix(in srgb, var(--bg-content-light, #8B4513) 30%, transparent)" }}
+            style={{ backgroundColor: "color-mix(in srgb, var(--bg-content-light, #8B4513) 20%, transparent)" }}
           >
             <motion.div
               className="h-full w-full origin-left transform-gpu [will-change:transform]"
               style={{
                 scaleX: furthestX,
                 background:
-                  "linear-gradient(to right, color-mix(in srgb, var(--bg-content-light, #666666) 30%, white), color-mix(in srgb, var(--bg-content-light, #999999) 40%, white))",
+                  "linear-gradient(to right, color-mix(in srgb, var(--bg-content-light, #666666) 30%, transparent), color-mix(in srgb, var(--bg-content-light, #999999) 40%, transparent))",
                 opacity: 0.5,
               }}
             />
@@ -105,7 +105,7 @@ const ProgressBars: React.FC = () => {
               style={{
                 scaleX: bookX,
                 background:
-                  "linear-gradient(to right, color-mix(in srgb, var(--bg-content-light, #A0522D) 95%, white), color-mix(in srgb, var(--bg-content-light, #CD853F) 80%, white))",
+                  "linear-gradient(to right, color-mix(in srgb, var(--bg-content-light, #A0522D) 45%, transparent), color-mix(in srgb, var(--bg-content-light, #CD853F) 65%, transparent))",
                 opacity: 0.7,
               }}
             />
