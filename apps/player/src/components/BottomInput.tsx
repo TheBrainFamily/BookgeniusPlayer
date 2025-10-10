@@ -53,6 +53,13 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const [micToastText, setMicToastText] = useState("");
   const micToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const showMicToast = useCallback((text: string, duration = 2000) => {
+    setMicToastText(text);
+    setMicToastVisible(true);
+    if (micToastTimerRef.current) clearTimeout(micToastTimerRef.current);
+    micToastTimerRef.current = setTimeout(() => setMicToastVisible(false), duration);
+  }, []);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldSelectAllRef = useRef(false);
@@ -441,30 +448,43 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
     handleActivity();
 
-    // First ensure mic is primed; if this is the first time (permission prompt), do not start recording yet.
-    try {
-      const prime = await primeMicrophone();
-      const showMicToast = (text: string, duration: number) => {
-        setMicToastText(text);
-        setMicToastVisible(true);
-        if (micToastTimerRef.current) clearTimeout(micToastTimerRef.current);
-        micToastTimerRef.current = setTimeout(() => setMicToastVisible(false), duration);
-      };
+    // Inspect permission state (if supported) so we only require a second press when a prompt actually showed.
+    let permissionState: "granted" | "denied" | "prompt" | "unknown" = "unknown";
+    if (typeof navigator !== "undefined" && navigator.permissions?.query) {
+      try {
+        const status = await navigator.permissions.query({ name: "microphone" as PermissionName });
+        permissionState = status.state;
+        if (status.state === "denied") {
+          showMicToast(t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."), 2600);
+          return;
+        }
+      } catch {
+        permissionState = "unknown";
+      }
+    }
 
-      if (prime === "failed") {
-        // Show toast and bail
-        showMicToast(t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."), 2400);
-        return;
-      }
-      if (prime === "just_primed") {
-        // Permission was just granted; ask user to press again to avoid UI glitches
-        showMicToast(t("mic_ready_try_again", "Mic permissions ready. Press and hold again!"), 1800);
-        return;
-      }
-      // already_primed => proceed to real start
+    let primeResult: Awaited<ReturnType<typeof primeMicrophone>>;
+    try {
+      primeResult = await primeMicrophone();
     } catch (e) {
       console.warn("[ptt] primeMicrophone threw", e);
+      showMicToast(t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."), 2600);
       return;
+    }
+
+    if (primeResult === "failed") {
+      showMicToast(t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."), 2600);
+      return;
+    }
+
+    if (primeResult === "just_primed") {
+      const ua = typeof navigator !== "undefined" ? navigator.userAgent || "" : "";
+      const isSafari = /Safari/.test(ua) && !/Chrome|CriOS|Chromium/.test(ua);
+      const shouldPause = permissionState === "prompt" || permissionState === "denied" || (permissionState === "unknown" && isSafari);
+      if (shouldPause) {
+        showMicToast(t("mic_ready_try_again", "Mic permissions ready. Press and hold again!"), 2000);
+        return;
+      }
     }
 
     // Immediately show connecting UI only when actually starting
@@ -482,7 +502,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         console.error("[ptt] Error starting recording:", error);
         setIsRealtimeConnecting(false);
       });
-  }, [handleActivity, isRecording, isRealtimeConnecting, isSearchModalOpen, setSearchQuery, startRecording, setValue, primeMicrophone, t]);
+  }, [handleActivity, isRecording, isRealtimeConnecting, isSearchModalOpen, setSearchQuery, startRecording, setValue, primeMicrophone, t, showMicToast]);
 
   // Clear connecting state when both session and microphone are ready
   useEffect(() => {
