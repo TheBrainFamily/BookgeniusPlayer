@@ -31,7 +31,6 @@ export const useSearchLogic = () => {
 
     // The wrapper we will actually call from our code
     const wrapped = (q: string, loc: Location) => new Promise((res, rej) => debouncedFn(res, rej, q, loc));
-
     // Re-expose lodash's .cancel for cleanup
     // (Type-ignore because lodash types don't know about it here)
     wrapped.cancel = debouncedFn.cancel;
@@ -40,12 +39,15 @@ export const useSearchLogic = () => {
   }, []);
 
   /* Cancel the 1-second timer if this hook unmounts */
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    if (query.trim()) {
       debouncedPerformUnifiedSearch.cancel?.();
-    },
-    [debouncedPerformUnifiedSearch],
-  );
+    }
+
+    return () => {
+      debouncedPerformUnifiedSearch.cancel?.();
+    };
+  }, [query, debouncedPerformUnifiedSearch]);
 
   /* ------------------------------------------------------------------ *
    * 2 ️⃣  Search pipeline (instant local, debounced remote)
@@ -106,13 +108,13 @@ export const useSearchLogic = () => {
    * 4 ️⃣  Fire searches when the modal is open & the query changes
    * ------------------------------------------------------------------ */
   useEffect(() => {
-    if (isOpen && query.trim()) {
+    if (query.trim()) {
       const latestLocation = getSavedLocation();
-      debouncedTriggerSearch(query, latestLocation);
-    } else if (isOpen && !query.trim()) {
-      setResults({ header: "Please enter a search term.", items: [], isLoading: false });
+      void debouncedTriggerSearch(query, latestLocation);
+    } else {
+      debouncedTriggerSearch.cancel?.();
     }
-  }, [query, isOpen, debouncedTriggerSearch, setResults]);
+  }, [query, debouncedTriggerSearch, setResults]);
 
   useEffect(() => {
     return () => {

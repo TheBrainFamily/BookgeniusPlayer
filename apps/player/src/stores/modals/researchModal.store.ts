@@ -23,6 +23,7 @@ interface DeepResearchModalState {
   setDiveDeeperLoading: (loading: boolean) => void;
   setDiveDeeperHandler: (handler?: () => void | Promise<void>) => void;
   setType: (type: "deep" | "ask") => void;
+  clearModal: () => void;
 }
 
 export const useDeepResearchModal = create<DeepResearchModalState>()(
@@ -66,7 +67,11 @@ export const useDeepResearchModal = create<DeepResearchModalState>()(
 
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
-        set({ isOpen: false, content: undefined, isLoading: false, showDiveDeeperCTA: false, isDiveDeeperLoading: false, diveDeeperHandler: undefined, type: "ask" });
+        set({ isOpen: false, isLoading: false, showDiveDeeperCTA: false, isDiveDeeperLoading: false, diveDeeperHandler: undefined, type: "ask" });
+      },
+
+      clearModal: () => {
+        set({ content: undefined, isLoading: false, showDiveDeeperCTA: false, isDiveDeeperLoading: false, diveDeeperHandler: undefined, type: "ask" });
       },
 
       setContent: (content) => set({ content, isLoading: false }),

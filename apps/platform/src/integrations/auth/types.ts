@@ -6,6 +6,7 @@ export type AuthCtx = {
   openSignIn: () => void;
   signOut?: () => void;
   refreshToken?: () => Promise<string>;
+  getToken?: (options?: { skipCache?: boolean }) => Promise<string | null | undefined>;
   userId?: string;
   email?: string | null;
   components?: AuthCtxComponents;

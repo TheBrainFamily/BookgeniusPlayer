@@ -231,6 +231,8 @@
   "send_message": "Wyślij wiadomość",
   "start_recording": "Rozpocznij nagrywanie",
   "stop_recording": "Zatrzymaj nagrywanie",
+  "mic_permission_blocked": "Dostęp do mikrofonu zablokowany. Zezwól i spróbuj ponownie.",
+  "mic_ready_try_again": "Uprawnienia do mikrofonu gotowe. Naciśnij i przytrzymaj ponownie!",
   "listening": "Nasłuchiwanie...",
   "thinking": "Myślę...",
   "deep_research_error": "Przepraszam, deep research nie udało się. Spróbuj ponownie.",

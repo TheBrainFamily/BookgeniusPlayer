@@ -146,6 +146,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         },
         userId: user?.id,
         email: user?.emailAddresses?.[0]?.emailAddress ?? null,
+        getToken: clerkAuth.getToken,
         refreshToken: () => clerkAuth.getToken({ skipCache: true }),
       }),
       [isLoaded, isSignedIn, openSignIn, user?.id, user?.emailAddresses, clerkAuth],

@@ -16,6 +16,8 @@ export const MicrophoneVisualizer: React.FC<MicrophoneVisualizerProps> = ({ isAc
   const micReadyRef = useRef<boolean>(false);
 
   useEffect(() => {
+    // Visualize as soon as we have an analyser and the UI is active
+    // regardless of connection status (we might be prerecording while connecting).
     if (!isActive || !audioAnalyser) {
       // Cleanup
       if (animationFrameRef.current) {
@@ -106,7 +108,7 @@ export const MicrophoneVisualizer: React.FC<MicrophoneVisualizerProps> = ({ isAc
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 20 }}
-          className="fixed bottom-24 right-4 z-50 bg-black/90 border border-white/30 rounded-xl p-4 shadow-2xl"
+          className="fixed bottom-24 right-4 z-50 bg-black/90 border border-white/30 rounded-xl p-4 shadow-2xl relative"
           style={{ width: "280px" }}
         >
           <div className="flex items-center gap-2 mb-2">
@@ -115,7 +117,9 @@ export const MicrophoneVisualizer: React.FC<MicrophoneVisualizerProps> = ({ isAc
           </div>
 
           {/* Canvas for waveform */}
-          <canvas ref={canvasRef} width={248} height={60} className="w-full rounded bg-black/50" />
+          <div className="relative">
+            <canvas ref={canvasRef} width={248} height={60} className="w-full rounded bg-black/50" />
+          </div>
 
           {/* Volume meter */}
           <div className="mt-2">

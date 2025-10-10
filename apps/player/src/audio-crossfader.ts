@@ -1070,15 +1070,25 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
 
   // For partial buffers, listen for the full buffer to be ready and schedule continuation
   const isPartialBuffer = state.audioBuffer && state.trackLength && state.audioBuffer.duration < state.trackLength - 0.5;
+  try {
+    const dbgTrackLen = typeof state.trackLength === "number" ? state.trackLength.toFixed(3) : "n/a";
+    console.log(
+      `[PLAY] '${trackId}': now=${audioContext.currentTime.toFixed(3)} start=${startTime.toFixed(3)} offset=${offset.toFixed(3)} initialGain=${initialGain} | isPartial=${!!isPartialBuffer} bufDur=${state.audioBuffer.duration.toFixed(3)} trackLen=${dbgTrackLen}`,
+    );
+  } catch {}
   if (isPartialBuffer) {
     const partialEndTime = startTime + state.audioBuffer.duration;
     const originalPartialDuration = state.audioBuffer.duration; // Store the original partial duration
     let continuationScheduled = false;
+    console.log(
+      `[CONT] '${trackId}': partial detected. partialEnd=${partialEndTime.toFixed(3)} origPartial=${originalPartialDuration.toFixed(3)} now=${audioContext.currentTime.toFixed(3)}`,
+    );
 
     const scheduleContinuation = () => {
       if (continuationScheduled) return;
 
       const currentState = tracks.get(trackId);
+      console.log(`[CONT] scheduleContinuation invoked for '${trackId}' (now=${audioContext.currentTime.toFixed(3)})`);
       console.log(
         `scheduleContinuation check: trackId=${trackId}, currentTrackId=${currentTrackId}, hasBuffer=${!!currentState?.audioBuffer}, bufferDuration=${currentState?.audioBuffer?.duration}, originalPartialDuration=${originalPartialDuration}`,
       );
@@ -1089,6 +1099,9 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
         const isCurrentTrack = trackId === currentTrackId;
         const hasCorrectSource = tracks.get(trackId)?.sourceNode === source;
 
+        console.log(
+          `[CONT] timing: dt=${timeUntilEnd.toFixed(3)}s | isCurrent=${isCurrentTrack} hasCorrectSource=${hasCorrectSource} partialEnd=${partialEndTime.toFixed(3)} now=${audioContext.currentTime.toFixed(3)}`,
+        );
         console.log(
           `Continuation timing: timeUntilEnd=${timeUntilEnd.toFixed(3)}s, isCurrentTrack=${isCurrentTrack}, hasCorrectSource=${hasCorrectSource}, partialEndTime=${partialEndTime.toFixed(3)}, currentTime=${audioContext.currentTime.toFixed(3)}`,
         );
@@ -1104,9 +1117,10 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
           contSource.loop = false;
           contGainNode.gain.value = 1.0;
 
-          // Connect to the same output
+          // Connect continuation through the SAME track-level gain node so crossfade envelope carries over
+          // Chain: contSource -> contGainNode -> track-level gainNode -> background/master
           contSource.connect(contGainNode);
-          contGainNode.connect(backgroundGainNode || masterGainNode);
+          contGainNode.connect(gainNode);
 
           // Start the continuation slightly before the partial ends with zero volume, then fade in
           const overlapDuration = 0.05; // 50ms overlap
@@ -1114,24 +1128,21 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
           const continuationOffset = Math.max(0, originalPartialDuration - overlapDuration);
 
           console.log(`Starting continuation: startTime=${continuationStartTime.toFixed(3)}, offset=${continuationOffset.toFixed(3)}, with ${overlapDuration}s overlap`);
+          console.log(`[CONT] ramps: contGain 0->1 from ${continuationStartTime.toFixed(3)} to ${partialEndTime.toFixed(3)} | partialGain 1->0 over same interval`);
 
           // Start at zero volume
           contGainNode.gain.value = 0;
           contSource.start(continuationStartTime, continuationOffset);
 
-          // Fade in the continuation as the partial fades out
+          // Fade in the continuation locally (50ms overlap) while preserving track-level envelope
           contGainNode.gain.setValueAtTime(0, continuationStartTime);
           contGainNode.gain.linearRampToValueAtTime(1, partialEndTime);
 
-          // Fade out the partial source at the same time
-          if (gainNode && gainNode.gain) {
-            gainNode.gain.setValueAtTime(1, continuationStartTime);
-            gainNode.gain.linearRampToValueAtTime(0, partialEndTime);
-          }
+          // NOTE: Do NOT manipulate the track-level gainNode here; it controls the overall crossfade envelope.
+          // We avoid fading it to 0 to prevent muting the continuation which also flows through this node.
 
-          // Update track state to point to the continuation
+          // Update track state to point to the continuation source (gainNode remains the same track-level node)
           currentState.sourceNode = contSource;
-          currentState.gainNode = contGainNode;
           currentState.startedAtCtxTime = continuationStartTime;
           currentState.offsetAtStart = continuationOffset;
 
@@ -1184,6 +1195,7 @@ function playTrack(trackId: string, startTime: number = 0, offset: number = 0, s
     // If this was a partial buffer and we scheduled a continuation, don't do normal onended processing
     const wasPartialBuffer = isPartialBuffer;
     if (wasPartialBuffer && trackId === currentTrackId) {
+      console.log(`[CONT] onended reached for partial '${trackId}'`);
       console.log(`Partial buffer ended for '${trackId}', continuation should be playing`);
       return; // Let the continuation handle everything
     }
@@ -1395,6 +1407,7 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
   }
 
   console.log(`Performing crossfade: ${fadeOutId} -> ${fadeInId} scheduled at ${transitionStartTime.toFixed(2)}s`);
+  console.log(`[XFADE] t(now)=${audioContext.currentTime.toFixed(3)} | start=${transitionStartTime.toFixed(3)} | offset=${fadeInOffset.toFixed(3)}`);
   // Invalidate prior crossfade and assign a new token
   currentCrossfadeId += 1;
   const thisCrossfadeId = currentCrossfadeId;
@@ -1403,17 +1416,25 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
   nextTrackId = fadeInId;
 
   const fadeDuration = fadeInOffset > 0 ? MINI_FADE_DURATION_S : FADE_DURATION_SECONDS;
-  const fadeEnd = transitionStartTime + fadeDuration;
+  const now = audioContext.currentTime;
+  const safeStart = Math.max(transitionStartTime, now + 0.02);
+  const fadeEnd = safeStart + fadeDuration;
+  if (safeStart !== transitionStartTime) {
+    console.log(`[XFADE] start clamped: requested=${transitionStartTime.toFixed(3)} -> safeStart=${safeStart.toFixed(3)} (now=${now.toFixed(3)})`);
+  }
+  console.log(`[XFADE] fadeDuration=${fadeDuration.toFixed(3)} | fadeEnd=${fadeEnd.toFixed(3)}`);
 
   // ---------- fade-OUT ramp ----------
   const gOut = fadeOutState.gainNode.gain;
   const oldSourceNode = fadeOutState.sourceNode;
   const oldGainNode = fadeOutState.gainNode;
-  gOut.cancelScheduledValues(audioContext.currentTime);
-  gOut.setValueAtTime(gOut.value, audioContext.currentTime);
+  console.log(`[XFADE] OUT ramp: from=${gOut.value} -> 0 @ ${fadeEnd.toFixed(3)} (now=${now.toFixed(3)})`);
+  gOut.cancelScheduledValues(now);
+  gOut.setValueAtTime(gOut.value, now);
   gOut.linearRampToValueAtTime(0, fadeEnd);
 
   // ---------- fade-IN preparation ----------
+  // Re-enable streaming for fade-in; seam is now handled via shared track-level gain
   const loaded = await loadTrack(fadeInId);
   if (!loaded) {
     console.error(`performCrossfade: Failed to ensure ${fadeInId} is loaded. Aborting crossfade.`);
@@ -1428,7 +1449,8 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
   }
 
   // playTrack creates the new source and gain nodes. We want it to start at 0 volume.
-  if (!playTrack(fadeInId, transitionStartTime, fadeInOffset, fadeOutId === fadeInId, 0)) {
+  console.log(`[XFADE] Scheduling playTrack(fadeInId=${fadeInId}) @ start=${safeStart.toFixed(3)} offset=${fadeInOffset.toFixed(3)} (now=${audioContext.currentTime.toFixed(3)})`);
+  if (!playTrack(fadeInId, safeStart, fadeInOffset, fadeOutId === fadeInId, 0)) {
     console.error(`performCrossfade: Failed to schedule playTrack for fadeInId: ${fadeInId}. Aborting crossfade.`);
     gOut.cancelScheduledValues(audioContext.currentTime);
     gOut.linearRampToValueAtTime(1, audioContext.currentTime + 0.2);
@@ -1455,8 +1477,9 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
   // ---------- fade-IN ramp ----------
   const gIn = fadeInGainNode.gain;
   // Start silent, then ramp up. `setValueAtTime` is crucial for preventing clicks.
-  gIn.setValueAtTime(0, audioContext.currentTime);
-  gIn.linearRampToValueAtTime(0, transitionStartTime);
+  console.log(`[XFADE] IN ramp: from=0 -> 1 | start=${safeStart.toFixed(3)} end=${fadeEnd.toFixed(3)} (now=${audioContext.currentTime.toFixed(3)})`);
+  gIn.setValueAtTime(0, now);
+  gIn.linearRampToValueAtTime(0, safeStart);
   gIn.linearRampToValueAtTime(1, fadeEnd);
 
   // Hand-off immediately so pause / resume target the audible track
