@@ -14,6 +14,7 @@ function BookgeniusChatSafe() {
       Intercom({ app_id: "zo3n2i5p" });
     }
   }, [auth.ready, auth.isSignedIn, auth.userId, auth.email]);
+
   return null;
 }
 
@@ -26,10 +27,12 @@ export function BookgeniusChat() {
       return false;
     }
   })();
+
   if (!showBookgeniusChat) return null;
 
   if (!import.meta.env.SSR && import.meta.env.VITE_AUTH_PROVIDER !== "snapplify") {
     return <BookgeniusChatSafe />;
   }
+
   return <></>;
 }
