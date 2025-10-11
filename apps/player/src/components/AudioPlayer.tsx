@@ -842,9 +842,17 @@ async function downloadFile(fileUrl: string, filename: string) {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const blob = await res.blob();
 
-  if (navigator.canShare && navigator.canShare({ files: [new File([blob], filename, { type: "audio/mpeg" })] })) {
-    await navigator.share({ files: [new File([blob], filename, { type: "audio/mpeg" })], title: filename });
-    return;
+  const file = new File([blob], filename, { type: "audio/mpeg" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: filename });
+      return;
+    } catch (err) {
+      if ((err as DOMException | undefined)?.name === "AbortError") {
+        return;
+      }
+      console.warn("navigator.share failed, falling back to blob download", err);
+    }
   }
 
   const blobUrl = URL.createObjectURL(blob);
