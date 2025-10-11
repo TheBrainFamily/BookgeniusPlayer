@@ -289,5 +289,8 @@
   "get_simplified_sentence": "Pobierz Następne Uproszczone Zdanie",
   "undo_simplification": "Cofnij Uproszczenie",
   "scroll_indicator-swipe-up": "Przesuń w górę",
-  "scroll_indicator-keep-scrolling": "Przewiń w dół"
+  "scroll_indicator-keep-scrolling": "Przewiń w dół",
+  "search_filter_all": "Wszystkie",
+  "search_filter_mentioned": "Wzmianki",
+  "search_filter_talking": "Wypowiedzi"
 }
