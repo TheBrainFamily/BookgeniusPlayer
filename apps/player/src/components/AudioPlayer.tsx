@@ -33,7 +33,11 @@ import { getBookAssetUrl } from "@player/utils/assetUrls";
 
 const AudioPlayer = () => {
   const { t } = useTranslation();
-  const { hasAudiobook, slug } = getBookData();
+  const {
+    hasAudiobook,
+    slug,
+    metadata: { bookForm },
+  } = getBookData();
 
   const isInitialLoad = useRef(true);
   const hideButtonTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -395,6 +399,15 @@ const AudioPlayer = () => {
     }
   };
 
+  const showBookgeniusChat = (() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("showBookgeniusChat") === "true";
+    } catch {
+      return false;
+    }
+  })();
+
   // Hide the audio player UI entirely when the book has no background songs
   if (!hasBackgroundSongs) {
     return null;
@@ -717,7 +730,10 @@ const AudioPlayer = () => {
       {showSpeakerButton && (
         <div
           ref={speakerButtonRef}
-          className={cn("fixed top-4 right-4 z-50 bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center")}
+          className={cn(
+            "fixed top-4 z-50 bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center",
+            showBookgeniusChat ? (bookForm === "play" || bookForm === "mixed" ? "right-13 md:right-15 lg:right-4" : "right-13 md:right-15 lg:right-16 xl:right-4") : "right-4",
+          )}
         >
           <Tooltip>
             <TooltipTrigger asChild>

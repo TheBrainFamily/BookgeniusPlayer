@@ -27,7 +27,6 @@ import { setKnownVideos } from "@player/utils/getFilePathsForName";
 import { getKnownVideoFiles } from "@player/genericBookDataGetters/getKnownVideoFiles";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
 import ProgressBars from "@player/components/ProgressBars";
-import { usePlayCharacterSpeakingStates } from "./hooks/usePlayCharacterSpeakingStates";
 import { AppInitializer } from "./components/AppInitializer";
 import { BookDataProvider } from "./context/BookDataContext";
 import { I18nextProvider, useTranslation } from "react-i18next";
@@ -36,6 +35,7 @@ import { languageNameToCode } from "@player/helpers/languageNameToCode";
 import { usePaywall } from "./hooks/usePaywall";
 import i18n from "./i18n";
 import { setupUnloadHandlers } from "./services/setupUnloadHandlers";
+import { ScrollIndicator } from "@player/components/ScrollIndicator";
 
 function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   setKnownVideos(getKnownVideoFiles());
@@ -57,7 +57,6 @@ function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   /* dynamic audio hooks */
   useBackgroundSongs();
   useAudiobookTracks();
-  // usePlayCharacterSpeakingStates();
   const { i18n } = useTranslation();
 
   useEffect(() => {
@@ -73,6 +72,7 @@ function Shell({ onShellMounted }: { onShellMounted: () => void }) {
       <CharacterNotesPanel />
       {/* Not used for now, but can be re-enabled if needed later */}
       {/* <RightNotesPanel /> */}
+      <ScrollIndicator />
       <Footer />
       <ContentShiftWrapper />
       {import.meta.env.VITE_EDITOR === "true" && <EditorMode />}

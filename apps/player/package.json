@@ -17,7 +17,7 @@
     "dev": "pnpm start",
     "generate-book": "tsx ./scripts/generateBook.ts",
     "lint": "eslint --cache --fix src/",
-    "lint:ci": "eslint --cache src/",
+    "lint:ci": "eslint --cache --quiet src/",
     "post-build": "bun run ../../tools/scripts/prepare-docker-build.ts",
     "prettier:check": "prettier --check src/ --quiet 2>&1 | grep -v 'Ignored unknown option'",
     "process-all-books": "tsx ./scripts/processAllBooks.ts",

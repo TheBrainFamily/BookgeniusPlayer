@@ -111,12 +111,8 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       <motion.div
         layout
         className={cn(
-          "relative rounded-full aspect-square isolate overflow-hidden",
-          disableHighlight
-            ? ""
-            : isTalkingInCurrentRange
-              ? "z-10 shadow-lg border-2 border-(--book-primary-color) animate-pulse-glow"
-              : "transition-transform duration-300 ease-in-out hover:scale-110 hover:z-10",
+          "relative rounded-full aspect-square isolate overflow-hidden transition-all duration-300 ease-in-out hover:scale-110 hover:z-10",
+          !disableHighlight && isTalkingInCurrentRange && "z-10 animate-pulse-glow overflow-visible",
         )}
       >
         <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />
@@ -125,11 +121,15 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       {captionMode !== "never" && (
         <div
           className={cn(
-            "pointer-events-none max-w-full w-full absolute right-0 bottom-0 rounded-md sm:rounded-lg text-center bg-black/70 textured-bg border shadow-lg sm:shadow-xl box-border z-20 title",
-            "border-[1px] sm:border-2 transition-all duration-200 ease-out will-change-transform will-change-opacity",
-            isTalkingInCurrentRange ? "border-(--book-primary-color)" : "border-transparent",
+            "pointer-events-none max-w-full w-full absolute right-0 bottom-0 rounded-md sm:rounded-lg text-center bg-black/70 textured-bg shadow-lg sm:shadow-xl box-border z-20 title",
+            "transition-all duration-200 ease-out will-change-transform will-change-opacity",
             captionVisibilityClasses,
           )}
+          style={{
+            border: isTalkingInCurrentRange
+              ? "clamp(1px, 0.2vw, 2px) solid color-mix(in srgb, var(--text-light, #ffffff) 60%, transparent)"
+              : "clamp(1px, 0.2vw, 2px) solid transparent",
+          }}
         >
           <div className="py-0.5 px-1 sm:py-1 sm:px-2 md:py-1.5 md:px-3 flex flex-col items-center justify-center">
             <h4 className="w-full whitespace-nowrap overflow-hidden text-ellipsis text-[8px] sm:text-[10px] md:text-xs font-bold text-white tracking-wide uppercase">

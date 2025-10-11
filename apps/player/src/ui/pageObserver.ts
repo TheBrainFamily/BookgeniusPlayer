@@ -1,7 +1,5 @@
-import { setCurrentLocation, isSystemNavigationInProgress } from "@player/helpers/paragraphsNavigation";
+import { isSystemNavigationInProgress, setCurrentLocation } from "@player/helpers/paragraphsNavigation";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
-import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
-import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers, drawElementsUnion } from "./devVisualizers";
 import { activateMediaInRange } from "./activateMediaInRange";
 
@@ -106,6 +104,64 @@ export function setupPageObserver(): {
   // Keep track of observed paragraphs to avoid re-observing
   const observedParagraphs = new Set<Element>();
 
+  // Manage delayed scroll indicator visibility
+  let scrollIndicatorTimeoutId: number | null = null;
+  let isScrollIndicatorVisible = false;
+  let scrollIndicatorTargetChapter: number | null = null;
+
+  const clearScrollIndicatorTimeout = () => {
+    if (scrollIndicatorTimeoutId !== null) {
+      window.clearTimeout(scrollIndicatorTimeoutId);
+      scrollIndicatorTimeoutId = null;
+    }
+  };
+
+  const hideScrollIndicator = () => {
+    clearScrollIndicatorTimeout();
+    scrollIndicatorTargetChapter = null;
+    if (isScrollIndicatorVisible) {
+      window.dispatchEvent(new Event("hideScrollIndicator"));
+      isScrollIndicatorVisible = false;
+    }
+  };
+
+  const handleScrollIndicatorClicked = () => {
+    hideScrollIndicator();
+  };
+
+  window.addEventListener("scrollIndicatorClicked", handleScrollIndicatorClicked);
+
+  const scheduleScrollIndicator = (nextChapter: number) => {
+    if (!Number.isFinite(nextChapter)) {
+      return;
+    }
+
+    if (isScrollIndicatorVisible && scrollIndicatorTargetChapter === nextChapter) {
+      return;
+    }
+
+    if (scrollIndicatorTimeoutId !== null) {
+      if (scrollIndicatorTargetChapter === nextChapter) {
+        return;
+      }
+      window.clearTimeout(scrollIndicatorTimeoutId);
+      scrollIndicatorTimeoutId = null;
+    }
+
+    scrollIndicatorTargetChapter = nextChapter;
+
+    if (isScrollIndicatorVisible) {
+      window.dispatchEvent(new CustomEvent("showScrollIndicator", { detail: { targetChapter: nextChapter } }));
+      return;
+    }
+
+    scrollIndicatorTimeoutId = window.setTimeout(() => {
+      scrollIndicatorTimeoutId = null;
+      isScrollIndicatorVisible = true;
+      window.dispatchEvent(new CustomEvent("showScrollIndicator", { detail: { targetChapter: nextChapter } }));
+    }, 2000);
+  };
+
   // Prevent redundant location updates when values are equivalent
   type MinimalLoc = { chapter: number; paragraph: number; endChapter: number; endParagraph: number; currentChapter: number; currentParagraph: number };
   let lastSentLocation: MinimalLoc | null = null;
@@ -124,7 +180,6 @@ export function setupPageObserver(): {
   type ProcessIntersectionsOptions = { shouldCreateVideos?: boolean };
 
   const processIntersections = ({ shouldCreateVideos = false }: ProcessIntersectionsOptions = {}) => {
-    const rootRect = observerOptions.root.getBoundingClientRect();
     const topMultiplier = 0.35; // 35vh focus zone start
     let bottomMultiplier = 0.55; // 10vh focus zone height (default)
 
@@ -153,8 +208,10 @@ export function setupPageObserver(): {
       bottomMultiplier = 0.52; // Smaller, more precise zone for large screens
     }
 
+    const rootRect = observerOptions.root.getBoundingClientRect();
     const focusZoneTop = rootRect.top + rootRect.height * topMultiplier;
     const focusZoneBottom = rootRect.top + rootRect.height * bottomMultiplier;
+    const focusZoneCenter = (focusZoneTop + focusZoneBottom) / 2;
 
     if (DEV_ZONE_VISUALIZERS_ENABLED) {
       drawFocusZone(rangeVisualizer, rootEl, focusZoneTop, focusZoneBottom);
@@ -164,10 +221,11 @@ export function setupPageObserver(): {
     let maxPercentageOverlapRatio = -1;
     let chosenElement: Element | null = null;
     let foundFullyVisible = false;
+    let bestCenterDistance = Number.POSITIVE_INFINITY;
     // Minimum overlap threshold in pixels to consider an element
     const MIN_OVERLAP_THRESHOLD = 15;
 
-    // First pass: look for fully visible elements
+    // First pass: look for fully visible elements; choose the one closest to the focus-zone center
     intersectingPages.forEach((element) => {
       const rect = element.getBoundingClientRect();
 
@@ -182,10 +240,12 @@ export function setupPageObserver(): {
 
       // Check if element is fully contained within the zone and has content
       if (visualTop >= focusZoneTop && visualBottom <= focusZoneBottom && element.textContent?.trim() !== "") {
-        // Element is fully visible in the zone
-        if (!foundFullyVisible) {
-          // This is the first fully visible element found
+        // Element is fully visible in the zone; prefer the one whose center is closest to the focus-zone center
+        const elementCenter = (visualTop + visualBottom) / 2;
+        const centerDistance = Math.abs(elementCenter - focusZoneCenter);
+        if (!foundFullyVisible || centerDistance < bestCenterDistance) {
           foundFullyVisible = true;
+          bestCenterDistance = centerDistance;
           activeParagraph = getParagraphInfo(element);
           chosenElement = element;
           maxPercentageOverlapRatio = 1.0; // 100% visible
@@ -226,18 +286,24 @@ export function setupPageObserver(): {
           currentOverlapRatio = overlap / visualHeight;
         }
 
-        // Use a weighted combination of absolute overlap and percentage overlap
-        // This gives preference to elements that occupy more space in the zone
-        // while still considering how much of the element is visible
+        // Use a weighted combination of absolute overlap and percentage overlap,
+        // with center proximity as a tie-breaker to align with programmatic scrolling
         const ABSOLUTE_WEIGHT = 0.7;
         const PERCENTAGE_WEIGHT = 0.3;
+        const CENTER_WEIGHT = 0.15; // modest bias toward focus-zone center
 
         const zoneHeight = focusZoneBottom - focusZoneTop;
         const normalizedAbsoluteOverlap = overlap / zoneHeight; // Normalize to 0-1 range
         const weightedScore = normalizedAbsoluteOverlap * ABSOLUTE_WEIGHT + currentOverlapRatio * PERCENTAGE_WEIGHT;
 
-        if (weightedScore > maxPercentageOverlapRatio) {
-          maxPercentageOverlapRatio = weightedScore;
+        const elementCenter = (visualTop + visualBottom) / 2;
+        const normalizedCenterDistance = Math.min(1, Math.abs(elementCenter - focusZoneCenter) / (zoneHeight / 2));
+        const centerProximity = 1 - normalizedCenterDistance; // 1 at center, 0 near edges
+
+        const finalScore = weightedScore + centerProximity * CENTER_WEIGHT;
+
+        if (finalScore > maxPercentageOverlapRatio) {
+          maxPercentageOverlapRatio = finalScore;
           activeParagraph = getParagraphInfo(element);
           chosenElement = element;
         }
@@ -389,20 +455,24 @@ export function setupPageObserver(): {
             };
 
             if (!isSameLoc(lastSentLocation, nextLoc)) {
-              // Don't update location during system navigation to avoid conflicts with programmatic scrolling
-              setCurrentLocation({
-                chapter: rangeStartInfo.chapter,
-                paragraph: expandedStartParagraph,
-                endChapter: rangeEndInfo.chapter,
-                endParagraph: expandedEndParagraph,
-                currentChapter: activeParagraph.chapter,
-                currentParagraph: activeParagraph.paragraph,
-                earliestVisibleParagraph: focusZoneIntersectingParagraphs[0]?.paragraph ?? null,
-                latestVisibleParagraph: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.paragraph ?? null,
-                earliestVisibleChapter: focusZoneIntersectingParagraphs[0]?.chapter ?? null,
-                latestVisibleChapter: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.chapter ?? null,
-              });
-              lastSentLocation = nextLoc;
+              // Avoid overriding programmatic navigation mid-scroll
+              if (isSystemNavigationInProgress()) {
+                // Defer location update until system navigation finishes
+              } else {
+                setCurrentLocation({
+                  chapter: rangeStartInfo.chapter,
+                  paragraph: expandedStartParagraph,
+                  endChapter: rangeEndInfo.chapter,
+                  endParagraph: expandedEndParagraph,
+                  currentChapter: activeParagraph.chapter,
+                  currentParagraph: activeParagraph.paragraph,
+                  earliestVisibleParagraph: focusZoneIntersectingParagraphs[0]?.paragraph ?? null,
+                  latestVisibleParagraph: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.paragraph ?? null,
+                  earliestVisibleChapter: focusZoneIntersectingParagraphs[0]?.chapter ?? null,
+                  latestVisibleChapter: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.chapter ?? null,
+                });
+                lastSentLocation = nextLoc;
+              }
             }
 
             // Media uses viewport range (separate from character notes)
@@ -570,56 +640,93 @@ export function setupPageObserver(): {
         if (!isSplashAnimationComplete) return;
 
         const rect = entry.boundingClientRect;
+        const rootBounds = entry.rootBounds ?? rootEl.getBoundingClientRect();
 
         // Calculate how much of the spacer is visible
-        const visibleTop = Math.max(0, rect.top);
-        const visibleBottom = Math.min(window.innerHeight, rect.bottom);
+        const visibleTop = Math.max(rootBounds.top, rect.top);
+        const visibleBottom = Math.min(rootBounds.bottom, rect.bottom);
         const visibleHeight = Math.max(0, visibleBottom - visibleTop);
-        const visibilityPercent = visibleHeight / rect.height;
+        const visibilityPercent = entry.intersectionRatio > 0 ? entry.intersectionRatio : rect.height > 0 ? visibleHeight / rect.height : 0;
 
         // Determine if spacer is entering from bottom or leaving from top
         if (entry.isIntersecting) {
           // Spacer is at least partially visible
+          const nextChapterAttr = entry.target.getAttribute("data-next-chapter-start");
+          const nextChapter = nextChapterAttr != null ? Number.parseInt(nextChapterAttr, 10) : NaN;
+
           if (rect.top >= 0) {
             // Spacer is entering from bottom or fully in view
+            hideScrollIndicator();
             if (visibilityPercent <= 0.4) {
               // 0-40% visible: keep full opacity
-              rootEl.style.opacity = "1";
-            } else if (visibilityPercent < 1) {
-              // 40-99% visible: fade from 1 to 0
-              const nextChapterStart = entry.target.getAttribute("data-next-chapter-start");
+              rootEl.style.setProperty("--gradient-opacity", "1");
+            } else if (visibilityPercent < 1.0) {
+              // 40-100% visible: fade from 1 to 0
+              if (visibilityPercent > 0.75) {
+                scheduleScrollIndicator(nextChapter);
+              }
 
-              setCurrentLocation({
-                chapter: parseInt(nextChapterStart, 10),
-                paragraph: 0,
-                endChapter: parseInt(nextChapterStart, 10),
-                endParagraph: 0,
-                currentChapter: parseInt(nextChapterStart, 10),
-                currentParagraph: 0,
-                earliestVisibleParagraph: 0,
-                latestVisibleParagraph: 0,
-                earliestVisibleChapter: parseInt(nextChapterStart, 10),
-                latestVisibleChapter: parseInt(nextChapterStart, 10),
-              });
+              if (visibilityPercent > 0.8 && visibilityPercent < 1 && Number.isFinite(nextChapter)) {
+                setCurrentLocation({
+                  chapter: nextChapter,
+                  paragraph: 0,
+                  endChapter: nextChapter,
+                  endParagraph: 0,
+                  currentChapter: nextChapter,
+                  currentParagraph: 0,
+                  earliestVisibleParagraph: 0,
+                  latestVisibleParagraph: 0,
+                  earliestVisibleChapter: nextChapter,
+                  latestVisibleChapter: nextChapter,
+                });
+              }
 
-              const fadePercent = (visibilityPercent - 0.4) * 2;
-              rootEl.style.opacity = (1 - fadePercent).toString();
+              // Map 0.4 -> 1.0 visibility to 1.0 -> 0.0 opacity
+              const fadePercent = (visibilityPercent - 0.4) / 0.6;
+              rootEl.style.setProperty("--gradient-opacity", Math.max(0, 1 - fadePercent).toString());
             } else {
               // 100% visible: full transparency
-              rootEl.style.opacity = "0";
+              rootEl.style.setProperty("--gradient-opacity", "0");
             }
           } else {
             // Spacer is leaving from top (rect.top < 0)
             if (visibilityPercent >= 0.6) {
-              // Still 50% or more visible: keep at 0
-              rootEl.style.opacity = "0";
+              // Still 60% or more visible: keep transparent
+              scheduleScrollIndicator(nextChapter);
+              rootEl.style.setProperty("--gradient-opacity", "0");
+            } else if (visibilityPercent >= 0.3) {
+              // 30-60% visible: fade from 0 to 1
+              // When 60% visible -> opacity = 0
+              // When 30% visible -> opacity = 1
+              const fadePercent = (visibilityPercent - 0.3) / 0.3;
+              rootEl.style.setProperty("--gradient-opacity", (1 - fadePercent).toString());
             } else {
-              rootEl.style.opacity = "1";
+              hideScrollIndicator();
+              // Less than 30% visible: full opacity
+              rootEl.style.setProperty("--gradient-opacity", "1");
             }
           }
         } else {
           // Spacer is completely out of view
-          rootEl.style.opacity = "1";
+          // For a moment when scrolling from top to bottom, the spacer may be
+          // considered non-intersecting but still be partially visible if it's
+          // very tall and the user scrolls quickly. To handle this, we check
+          // the boundingClientRect to see if it's still partially on screen.
+          if (rect.bottom > rootBounds.top && rect.top < rootBounds.bottom) {
+            // Still partially visible - handle like intersecting case
+            if (rect.top >= 0) {
+              // Leaving from bottom
+              hideScrollIndicator();
+              rootEl.style.setProperty("--gradient-opacity", "1");
+            } else {
+              // Leaving from top
+              const nextChapterAttr = entry.target.getAttribute("data-next-chapter-start");
+              const nextChapter = nextChapterAttr != null ? Number.parseInt(nextChapterAttr, 10) : NaN;
+              scheduleScrollIndicator(nextChapter);
+              rootEl.style.setProperty("--gradient-opacity", "0");
+            }
+            return;
+          }
         }
       });
     },
@@ -671,6 +778,9 @@ export function setupPageObserver(): {
     window.removeEventListener("resize", handleResize);
     window.removeEventListener("orientationchange", handleOrientationChange);
     rootEl.removeEventListener("scroll", handleRootScroll);
+    window.removeEventListener("scrollIndicatorClicked", handleScrollIndicatorClicked);
+
+    hideScrollIndicator();
 
     if (scrollEndTimeoutId !== null) {
       window.clearTimeout(scrollEndTimeoutId);
@@ -688,6 +798,7 @@ export function setupPageObserver(): {
 
   if (paragraphsToObserve.length === 0) {
     console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
+    window.removeEventListener("scrollIndicatorClicked", handleScrollIndicatorClicked);
     return null;
   } else {
     paragraphsToObserve.forEach((paragraph) => {

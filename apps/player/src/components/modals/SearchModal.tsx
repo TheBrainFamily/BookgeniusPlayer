@@ -16,24 +16,15 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@p
 import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { cn } from "@player/lib/utils";
 import { findScrollParent } from "@player/utils/findScrollParent";
+import { FILTER_OPTIONS, FILTER_VALUE_MAP, SearchFilter } from "@player/utils/filterOptions";
 
 interface SearchModalProps {
   onClose: () => void;
   layoutView?: boolean;
   hideOverlay?: boolean;
-  searchResults: SearchResultsData | null;
+  searchResults: SearchResultsData;
   clickedAppearanceId?: string;
 }
-
-type SearchFilter = "all" | "mentioned" | "talking";
-
-const FILTER_OPTIONS: Array<{ id: SearchFilter; translationKey: string; defaultLabel: string }> = [
-  { id: "all", translationKey: "search_filter_all", defaultLabel: "All" },
-  { id: "mentioned", translationKey: "search_filter_mentioned", defaultLabel: "Mentioned" },
-  { id: "talking", translationKey: "search_filter_talking", defaultLabel: "Talking" },
-];
-
-const FILTER_VALUE_MAP: Record<SearchFilter, string | null> = { all: null, mentioned: "Mentioned", talking: "Talking" };
 
 export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults, clickedAppearanceId }) => {
   const { t } = useTranslation();
@@ -205,7 +196,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
   const modalTitle = (
     <div className="flex items-center gap-2">
       <Search size={20} />
-      <span>Search Results</span>
+      <span>{t("search_results")}</span>
     </div>
   );
 
@@ -366,6 +357,7 @@ const ChapterGroup = memo(function ChapterGroup({
 });
 
 const ResultCard = memo(function ResultCard({ item, clickedAppearanceId }: { item: SearchResultItemData; clickedAppearanceId?: string }) {
+  const { t } = useTranslation();
   const cardRef = useRef<HTMLDivElement>(null);
   const [isPulsing, setIsPulsing] = useState(false);
 
@@ -415,9 +407,13 @@ const ResultCard = memo(function ResultCard({ item, clickedAppearanceId }: { ite
     >
       <div className="relative p-4">
         <div className="flex items-center gap-2 mb-2">
-          {item.type && <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">{item.type}</div>}
+          {item.type && (
+            <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
+              {t(FILTER_OPTIONS.find((option) => option.id.toLowerCase() === item.type.toLowerCase()).translationKey) ?? item.type}
+            </div>
+          )}
           <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-primary-30 text-book-primary">
-            {item.percentInChapter}% of Chapter {item.chapter}
+            {item.percentInChapter}% {t("of_chapter")} {item.chapter}
           </div>
         </div>
 

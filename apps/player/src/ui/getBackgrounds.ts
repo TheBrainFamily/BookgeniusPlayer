@@ -9,11 +9,11 @@ export const getBackgrounds = (): Background[] => {
     const chapterGroups: Record<number, BackgroundForBook[]> = {};
 
     // First, normalize and group by chapter
-    inputs.forEach(({ chapter, file, paragraph = 0 }) => {
+    inputs.forEach(({ chapter, file, paragraph = 0, backgroundColor, textColor }) => {
       if (!chapterGroups[chapter]) {
         chapterGroups[chapter] = [];
       }
-      chapterGroups[chapter].push({ chapter, file, paragraph });
+      chapterGroups[chapter].push({ chapter, file, paragraph, backgroundColor, textColor });
     });
 
     // Process each chapter group
@@ -26,7 +26,15 @@ export const getBackgrounds = (): Background[] => {
       backgrounds.forEach((bg) => {
         const endParagraph = 10_000; // 10,000 for the last bg in chapter
 
-        result.push({ startChapter: bg.chapter, startParagraph: bg.paragraph, file: bg.file, endChapter: 10_000, endParagraph });
+        result.push({
+          startChapter: bg.chapter,
+          startParagraph: bg.paragraph,
+          file: bg.file,
+          endChapter: 10_000,
+          endParagraph,
+          backgroundColor: bg.backgroundColor,
+          textColor: bg.textColor,
+        });
       });
     });
 

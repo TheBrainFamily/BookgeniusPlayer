@@ -4,7 +4,6 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import tailwind from "@tailwindcss/vite";
 
-console.log("resolve", path.resolve(__dirname, "../player/src"));
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: { host: "::", port: 8080, proxy: { "/api": "http://localhost" } },

@@ -68,6 +68,38 @@
         overscroll-behavior: none;
       }
 
+      #fc_frame {
+        position: fixed;
+        bottom: 5px !important;
+        right: 5px !important;
+        width: 65px;
+        height: 65px;
+        opacity: 1;
+        scale: 0.7;
+        transition:
+          opacity 0.15s ease-in-out,
+          scale 0.15s ease-in-out;
+        pointer-events: auto;
+        transform-origin: bottom right;
+      }
+
+      #fc_frame.fc-open {
+        scale: 1;
+      }
+
+      #fc_widget {
+        width: 100%;
+        height: 100%;
+      }
+
+      @media (max-width: 1280px) {
+        body:has(#bottom-input-container[data-optional-element-visible="true"]) #fc_frame:not(.fc-open) {
+          opacity: 0;
+          scale: 0.5;
+          pointer-events: none;
+        }
+      }
+
       #content-container {
         font-size: calc(16px * var(--font-size-multiplier, 1));
         transition: font-size 0.2s ease-in-out;
@@ -76,6 +108,138 @@
       @media (max-width: 768px), screen and (max-height: 550px) and (orientation: landscape) {
         #content-container {
           font-size: calc(14px * var(--font-size-multiplier, 1));
+        }
+      }
+
+      .intercom-lightweight-app-launcher {
+        box-sizing: border-box !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      }
+
+      .intercom-lightweight-app-launcher,
+      .intercom-launcher-frame {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transition:
+          transform 167ms cubic-bezier(0.33, 0, 0, 1),
+          opacity 0.3s ease-in-out !important;
+      }
+
+      body:has(.book-loader-splash) {
+        .intercom-lightweight-app-launcher,
+        .intercom-launcher-frame {
+          opacity: 0 !important;
+          pointer-events: none !important;
+        }
+        .intercom-app > div {
+          opacity: 0 !important;
+          pointer-events: none !important;
+        }
+
+        /*localhost*/
+        .intercom-dfosxs {
+          opacity: 0 !important;
+          pointer-events: none !important;
+        }
+
+        iframe[name="intercom-notifications-frame"] {
+          opacity: 0 !important;
+          pointer-events: none !important;
+        }
+      }
+
+      body:has(#player-scope.visible):not(:has(#book-container.play-mode)) {
+        @media (max-width: 1280px) {
+          .intercom-lightweight-app-launcher,
+          .intercom-lightweight-app-launcher-icon {
+            width: 46px !important;
+            height: 46px !important;
+          }
+
+          .intercom-lightweight-app-launcher,
+          .intercom-launcher-frame {
+            top: 16px !important;
+            right: 8px !important;
+          }
+          .intercom-app > div {
+            top: 15px !important;
+            right: 8px !important;
+            transform-origin: top right 0px;
+          }
+        }
+
+        @media (max-width: 1024px) {
+          .intercom-app > div ~ div {
+            top: 16.5px !important;
+            scale: 0.84;
+          }
+
+          .intercom-lightweight-app-launcher,
+          .intercom-lightweight-app-launcher-icon {
+            width: 42px !important;
+            height: 42px !important;
+          }
+
+          .intercom-lightweight-app-launcher-icon-open svg {
+            width: 20px !important;
+            height: 20px !important;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .intercom-lightweight-app-launcher,
+          .intercom-lightweight-app-launcher-icon {
+            width: 40px !important;
+            height: 40px !important;
+          }
+
+          .intercom-lightweight-app-launcher-icon-open svg {
+            width: 18px !important;
+            height: 18px !important;
+          }
+        }
+      }
+
+      body:has(#player-scope.visible):has(#book-container.play-mode) {
+        @media (max-width: 1024px) {
+          .intercom-lightweight-app-launcher,
+          .intercom-launcher-frame {
+            top: 16px !important;
+            right: 8px !important;
+          }
+          .intercom-app > div {
+            top: 10px !important;
+            right: 8px !important;
+            transform-origin: top right 0px;
+          }
+          .intercom-app > div ~ div {
+            top: 17px !important;
+            scale: 0.84;
+          }
+
+          .intercom-lightweight-app-launcher,
+          .intercom-lightweight-app-launcher-icon {
+            width: 42px !important;
+            height: 42px !important;
+          }
+
+          .intercom-lightweight-app-launcher-icon-open svg {
+            width: 20px !important;
+            height: 20px !important;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .intercom-lightweight-app-launcher,
+          .intercom-lightweight-app-launcher-icon {
+            width: 40px !important;
+            height: 40px !important;
+          }
+
+          .intercom-lightweight-app-launcher-icon-open svg {
+            width: 18px !important;
+            height: 18px !important;
+          }
         }
       }
     </style>

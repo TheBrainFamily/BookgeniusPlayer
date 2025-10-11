@@ -156,6 +156,8 @@
   "send_message": "Send Message",
   "start_recording": "Start Recording",
   "stop_recording": "Stop Recording",
+  "mic_permission_blocked": "Microphone access blocked. Allow mic and try again.",
+  "mic_ready_try_again": "Mic permissions ready. Press and hold again!",
   "listening": "Listening...",
   "thinking": "Thinking...",
   "deep_research_error": "Sorry, deep research failed. Please try again.",
@@ -214,5 +216,10 @@
   "simplified_version": "Simplified Version",
   "no_further_simplification": "No further simplification available",
   "get_simplified_sentence": "Get Next Simplified Sentence",
-  "undo_simplification": "Undo Simplification"
+  "undo_simplification": "Undo Simplification",
+  "scroll_indicator-swipe-up": "Swipe Up",
+  "scroll_indicator-keep-scrolling": "Keep Scrolling",
+  "search_filter_all": "All",
+  "search_filter_mentioned": "Mentioned",
+  "search_filter_talking": "Talking"
 }

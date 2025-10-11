@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
 import type { ClerkProviderProps } from "@clerk/react-router";
-import type { LoadedClerk, UseUserReturn } from "@clerk/types";
+import type { LoadedClerk, UseUserReturn, UseAuthReturn } from "@clerk/types";
 import type { AuthCtx, AuthModule } from "./types";
 import { Button } from "@platform/components/ui/button";
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,9 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [ClerkProvider, setClerkProvider] = useState<React.ComponentType<ClerkProviderProps> | null>(null);
   const [SignInComponent, setSignInComponent] = useState<React.ComponentType | undefined>(undefined);
   const [SignUpComponent, setSignUpComponent] = useState<React.ComponentType | undefined>(undefined);
-  const [hooks, setHooks] = useState<{ useUser: () => UseUserReturn; useClerk: () => LoadedClerk; UserButton?: React.ComponentType } | null>(null);
+  const [hooks, setHooks] = useState<{ useUser: () => UseUserReturn; useClerk: () => LoadedClerk; UserButton?: React.ComponentType; useClerkAuth: () => UseAuthReturn } | null>(
+    null,
+  );
   const [loadingState, setLoadingState] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => {
@@ -30,7 +32,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         setClerkProvider(() => router.ClerkProvider);
         setSignInComponent(() => router.SignIn);
         setSignUpComponent(() => router.SignUp);
-        setHooks({ useUser: react.useUser, useClerk: react.useClerk, UserButton: react.UserButton });
+
+        setHooks({ useUser: react.useUser, useClerk: react.useClerk, UserButton: react.UserButton, useClerkAuth: react.useAuth });
         setLoadingState("ready");
       })
       .catch((e) => {
@@ -126,6 +129,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const Inner: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { user, isSignedIn, isLoaded } = hooks.useUser();
     const { openSignIn } = hooks.useClerk();
+    const clerkAuth = hooks.useClerkAuth();
 
     const ctx = useMemo<AuthCtx>(
       () => ({
@@ -142,8 +146,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         },
         userId: user?.id,
         email: user?.emailAddresses?.[0]?.emailAddress ?? null,
+        getToken: clerkAuth.getToken,
+        refreshToken: () => clerkAuth.getToken({ skipCache: true }),
       }),
-      [isLoaded, isSignedIn, openSignIn, user?.id, user?.emailAddresses],
+      [isLoaded, isSignedIn, openSignIn, user?.id, user?.emailAddresses, clerkAuth],
     );
 
     return <Ctx.Provider value={ctx}>{children}</Ctx.Provider>;
@@ -158,11 +164,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     "https://wukong.bookgenius.net",
   ];
 
-  console.log("isSatellite:", isSatellite);
-  console.log("domain:", clerkDomain);
-  console.log("signInUrl:", signInUrl);
-  console.log("signUpUrl:", signUpUrl);
-  console.log("oct 1 version of clerk");
   return (
     <WidgetCtx.Provider value={hooks.UserButton}>
       <ClerkProvider

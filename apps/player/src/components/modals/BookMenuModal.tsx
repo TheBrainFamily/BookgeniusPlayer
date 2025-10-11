@@ -17,6 +17,7 @@ import { getCurrentLocation, systemNavigateTo, getSavedLocation } from "@player/
 import { getPositionHistory, getCurrentPlatformAndBook } from "@player/services/readingPositionApi";
 import { calculateReadingStats, formatReadingTime } from "@player/helpers/calculateReadingStats";
 import { getReadableBuildInfo } from "@player/helpers/buildInfo";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
 
 const AnimatedFontSize: React.FC<{ value: number; isChanging: boolean }> = memo(({ value, isChanging }) => {
   const [currentDisplayValue, setCurrentDisplayValue] = useState(value);
@@ -73,6 +74,9 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const { t } = useTranslation();
   const allVariants = getAllVariants();
   const { openModal } = useCharacterModal();
+  const {
+    metadata: { bookForm },
+  } = getBookData();
 
   const [currentFontSize, setCurrentFontSize] = useLocalStorageState("fontSize", { defaultValue: 1 });
   const [currentComplexity, setCurrentComplexity] = useLocalStorageState("readingComplexity", { defaultValue: 100 });
@@ -213,7 +217,10 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
       // 3. Compare scores, not HTML strings!
       if (currentScore !== bestFit.score) {
-        element.innerHTML = replaceXmlTagsIntoHtmlTags(textToDisplay);
+        const isPlayFormat = bookForm === "play" || bookForm === "mixed";
+        const sentenceNumber = parseInt(sentenceData.id.split("-s")?.[1] ?? "1", 10);
+        const isFirstSentence = sentenceNumber === 1;
+        element.innerHTML = replaceXmlTagsIntoHtmlTags(textToDisplay, isPlayFormat, isFirstSentence);
 
         // 4. Update the state on the element!
         element.dataset.currentScore = bestFit.score.toString();
