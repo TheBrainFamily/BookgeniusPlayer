@@ -190,9 +190,11 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                         >
                           <div className="relative p-4">
                             <div className="flex gap-2 mb-2">
-                              <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-tertiary-30 text-book-tertiary items-center">
-                                <span>{t(FILTER_OPTIONS.find((option) => option.id.toLowerCase() === appearance.type.toLowerCase()).translationKey) ?? appearance.type}</span>
-                              </div>
+                              {appearance.type && (
+                                <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-tertiary-30 text-book-tertiary items-center">
+                                  <span>{t(FILTER_OPTIONS.find((option) => option.id.toLowerCase() === appearance.type.toLowerCase())?.translationKey) ?? appearance.type}</span>
+                                </div>
+                              )}
                               <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-primary-30 text-book-primary overflow-hidden">
                                 <span className="flex items-center gap-1 min-w-0">
                                   <FileText size={12} className="flex-shrink-0" />
