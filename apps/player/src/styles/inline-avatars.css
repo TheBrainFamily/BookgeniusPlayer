@@ -23,8 +23,9 @@
   margin-left: -3em;
 }
 
-.character-talking + .character-talking {
-  margin-left: -0.5em;
+.character-talking + .character-talking,
+.character-talking.start-of-paragraph ~ span .character-talking.start-of-paragraph {
+  margin-left: -1.75em;
 }
 
 .character-talking {
@@ -107,7 +108,7 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
   border-radius: 0.375rem;
   padding: 0 0.375em;
   text-indent: 0;
-  background-color: color-mix(in srgb, var(--bg-content-light, #f5deb3) 85%, white);
+  background-color: color-mix(in srgb, var(--bg-content-light, #f5deb3) 40%, transparent);
   cursor: pointer;
   display: inline-block;
   line-height: 1.5em;
@@ -121,7 +122,7 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
 
 .character-highlighted-activated:hover {
   color: var(--text-light, #5e5e5e);
-  background-color: color-mix(in srgb, var(--bg-content-light, #f5deb3) 40%, transparent);
+  background-color: color-mix(in srgb, var(--bg-content-light, #f5deb3) 80%, transparent);
   border-color: color-mix(in srgb, var(--text-light, gray) 80%, transparent);
   transition: none;
 }
@@ -227,19 +228,14 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
     border-color 0.3s ease,
     box-shadow 0.3s ease;
   backface-visibility: hidden;
+  border: 2px solid color-mix(in srgb, var(--bg-content-light, #ffffff) 60%, transparent);
 }
 
 .characters-on-stage-panel .speaking {
   filter: grayscale(60%);
-  border-color: color-mix(in srgb, var(--text-light, #ffffff) 80%, transparent);
-  box-shadow:
-    0 clamp(2px, 0.5vw, 4px) clamp(8px, 1.5vw, 12px) color-mix(in srgb, var(--bg-content-light, #000000) 60%, transparent),
-    0 0 clamp(8px, 1.5vw, 12px) color-mix(in srgb, var(--text-light, #ffffff) 30%, transparent);
 }
 
 .characters-on-stage-panel .not-speaking {
-  border-color: color-mix(in srgb, var(--text-light, #ffffff) 40%, transparent);
-  box-shadow: 0 clamp(2px, 0.5vw, 4px) clamp(6px, 1vw, 8px) color-mix(in srgb, var(--bg-content-light, #000000) 40%, transparent);
   opacity: 1;
 }
 
@@ -270,10 +266,6 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
   .characters-on-stage-panel .not-speaking:hover {
     filter: none;
     transform: scale(1.1);
-    border-color: color-mix(in srgb, var(--text-light, #ffffff) 90%, transparent);
-    box-shadow:
-      0 clamp(2px, 0.5vw, 4px) clamp(8px, 1.5vw, 12px) color-mix(in srgb, var(--bg-content-light, #000000) 70%, transparent),
-      0 0 clamp(10px, 2vw, 15px) color-mix(in srgb, var(--text-light, #ffffff) 40%, transparent);
 
     & > div > div {
       scale: none;
