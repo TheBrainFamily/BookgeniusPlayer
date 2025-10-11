@@ -20,7 +20,7 @@ import { getCharactersData } from "@player/genericBookDataGetters/getCharactersD
 import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
 import { MicrophoneVisualizer } from "./MicrophoneVisualizer";
 import DebugMicPlaybackButton from "./DebugMicPlaybackButton";
-import { isMobileOrTablet } from "@player/utils/isMobileOrTablet";
+import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";
 
 const hasReaderMetCharacter = (character: CharacterData, chapter: number, paragraph: number): boolean => {
   return character.infoPerChapter.some((infoPerChapter) => {
@@ -53,6 +53,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const [micToastVisible, setMicToastVisible] = useState(false);
   const [micToastText, setMicToastText] = useState("");
   const micToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isMobileOrTablet = useIsMobileOrTablet();
 
   const showMicToast = useCallback((text: string, duration = 2000) => {
     setMicToastText(text);
@@ -183,7 +184,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     // Use microtask to ensure DOM is updated before setting selection
     queueMicrotask(() => {
       if (!inputEl) return;
-      if (shouldSelectAllRef.current || isMobileOrTablet()) {
+      if (shouldSelectAllRef.current || isMobileOrTablet) {
         inputEl.select();
         shouldSelectAllRef.current = false;
       } else {
@@ -201,7 +202,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     isCharacterModalOpen,
     closeCharacterModal,
     deepResearchContent,
-    isMobileOrTablet,
   ]);
 
   const sseRef = useRef<EventSource | null>(null);
