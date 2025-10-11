@@ -79,6 +79,7 @@ export const isTablet = (considerViewportWidth = false, tabletMinWidth = 768, ta
       (window.screen.width === 834 && window.screen.height === 1112) ||
       (window.screen.width === 1112 && window.screen.height === 834) ||
       (window.screen.width === 1024 && window.screen.height === 1366) ||
+      (window.screen.width === 820 && window.screen.height === 1180) ||
       (window.screen.width === 1366 && window.screen.height === 1024));
 
   if (isModernIPad) {
