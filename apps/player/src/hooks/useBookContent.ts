@@ -50,6 +50,8 @@ export function useBookContent() {
 
   useEditorMode(isEditorMode ? containerRef.current : null);
 
+  const isPlayForm = bookForm === "play" || bookForm === "mixed";
+
   const handlePointerUp = useCallback(
     (event: PointerEvent) => {
       if (event.metaKey || event.ctrlKey) return;
@@ -90,7 +92,7 @@ export function useBookContent() {
 
         // Reset to original sentence
         const originalSentence = complexitySpan.getAttribute("data-original-sentence") || "";
-        complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(originalSentence);
+        complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(originalSentence, isPlayForm);
         complexitySpan.removeAttribute("data-current-score");
         complexitySpan.setAttribute("data-simplified", "false");
 
@@ -106,7 +108,7 @@ export function useBookContent() {
       const sentenceNumber = parseInt(complexitySpan.getAttribute("id")?.split("-s")?.[1] ?? "1", 10);
       const isFirstSentence = sentenceNumber === 1;
       // Update content
-      complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(simplifiedSentence, isFirstSentence);
+      complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(simplifiedSentence, isPlayForm, isFirstSentence);
       complexitySpan.setAttribute("data-current-score", simplifiedSentenceScore.toString());
       complexitySpan.setAttribute("data-simplified", "true");
 
