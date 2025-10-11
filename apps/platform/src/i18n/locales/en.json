@@ -7,7 +7,7 @@
     "startReading": "Start Reading",
     "viewCollection": "View Collection"
   },
-  "navigation": { "search": "Search visual novels, authors...", "searchMobile": "Search novels...", "signOut": "Sign Out", "signIn": "Sign In" },
+  "navigation": { "search": "Search visual novels, authors...", "searchMobile": "Search novels...", "signOut": "Sign Out", "signIn": "Sign In", "signUp": "Sign Up" },
   "stats": { "visualNovels": "Visual Novels", "immersive": "Immersive", "productions": "Productions" },
   "featured": {
     "featuredMasterpieces": "Featured Masterpieces",

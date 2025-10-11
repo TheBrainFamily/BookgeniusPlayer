@@ -16,9 +16,10 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
               <BookOpen className="h-8 w-8 text-library-gold animate-candleflicker" />
-              <h3 className="text-xl font-bold text-foreground">
+              <h3 className="relative text-xl font-bold text-foreground">
                 {t("hero.bookGenius").split(/(?=[A-Z])/)[0]}
                 <span className="text-library-gold">{t("hero.bookGenius").split(/(?=[A-Z])/)[1]}</span>
+                <span className="absolute -right-6 -bottom-2 bg-[#1E2A44] px-2 py-1 text-xs text-library-goldA uppercase rounded-md -skew-4 -rotate-4">Beta</span>
               </h3>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">{t("footer.description")}</p>

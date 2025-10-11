@@ -7,7 +7,13 @@
     "startReading": "Zacznij Czytać",
     "viewCollection": "Przejrzyj zbiór"
   },
-  "navigation": { "search": "Szukaj powieści wizualnych, autorów...", "searchMobile": "Szukaj powieści...", "signOut": "Wyloguj się", "signIn": "Zaloguj się" },
+  "navigation": {
+    "search": "Szukaj powieści wizualnych, autorów...",
+    "searchMobile": "Szukaj powieści...",
+    "signOut": "Wyloguj się",
+    "signIn": "Zaloguj się",
+    "signUp": "Zarejestruj się"
+  },
   "stats": { "visualNovels": "Nowele Wizualne", "immersive": "Angażujący", "productions": "Produkcja" },
   "featured": {
     "featuredMasterpieces": "Wyróżnione arcydzieła",

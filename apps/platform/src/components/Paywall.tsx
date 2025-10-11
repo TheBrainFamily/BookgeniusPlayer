@@ -50,7 +50,7 @@ export const PaywallInner: React.FC<PaywallProps> = ({ bookSlug, bookTitle, onCl
                 <h3 className="text-xl font-semibold">{t("bestAccessAvailable")}</h3>
                 <p className="text-muted-foreground">{t("youreInvited")}</p>
                 <Button onClick={handleSignIn} className="bg-library-gold hover:bg-library-gold/90 text-library-mahogany">
-                  {t("navigation.signIn")} / {t("navigation.signOut")}
+                  {t("navigation.signIn")} / {t("navigation.signUp")}
                 </Button>
               </div>
             )}
