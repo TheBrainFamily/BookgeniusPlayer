@@ -542,8 +542,8 @@
           display: flex;
           justify-content: center;
           overflow: visible;
-          min-width: clamp(65px, 16vw, 175px);
-          min-height: clamp(65px, 16vw, 175px);
+          min-width: clamp(75px, 16vw, 175px);
+          min-height: clamp(75px, 16vw, 175px);
           position: relative;
           margin-top: clamp(-6rem, -12vh, -2rem);
 
@@ -575,14 +575,14 @@
         }
 
         .inline-avatar {
-          min-width: clamp(65px, 16vw, 175px);
-          min-height: clamp(65px, 16vw, 175px);
+          min-width: clamp(75px, 16vw, 175px);
+          min-height: clamp(75px, 16vw, 175px);
           border-radius: 50%;
           display: block;
           padding: 0;
           margin: 0;
-          box-shadow: 0 clamp(2px, 0.5vw, 4px) clamp(8px, 1.5vw, 12px) color-mix(in srgb, var(--bg-content-light, #000000) 60%, transparent);
-          border: clamp(2px, 0.3vw, 3px) solid color-mix(in srgb, var(--text-light, #ffffff) 60%, transparent);
+          box-shadow: 0 clamp(1px, 0.5vw, 2px) clamp(2px, 1.5vw, 4px) color-mix(in srgb, var(--bg-content-light, #000000) 60%, transparent);
+          border: clamp(2px, 0.3vw, 3px) solid color-mix(in srgb, var(--bg-content-light, #ffffff) 60%, transparent);
         }
 
         @media (hover: hover) {
@@ -852,13 +852,13 @@
         }
 
         .play-row .character-text {
-          padding-top: 0.5rem;
+          padding-top: 0.75rem;
         }
 
         .play-row .character-text p:first-child {
           position: absolute;
-          top: calc(clamp(65px, 16vw, 175px) / 3);
-          left: calc(clamp(65px, 16vw, 175px) + 2rem);
+          top: calc(clamp(75px, 16vw, 175px) / 3);
+          left: calc(clamp(75px, 16vw, 175px) + 2rem);
         }
 
         .play-row[data-text-alignment="right"] {
@@ -874,7 +874,7 @@
           .character-text p:first-child {
             position: absolute;
             left: inherit;
-            right: calc(clamp(65px, 16vw, 175px) + 2rem);
+            right: calc(clamp(75px, 16vw, 175px) + 2rem);
             width: max-content;
           }
         }
