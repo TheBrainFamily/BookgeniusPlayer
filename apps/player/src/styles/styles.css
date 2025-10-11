@@ -435,6 +435,11 @@
       transition: none;
       /* text-shadow: 0px 0px 16px color-mix(in srgb, var(--text-light, rgba(0, 0, 0, 0.3)) 80%, transparent); */
     }
+
+    /* Disable hover effect when hovering over character-highlighted-activated */
+    span[id^="ch"][id*="-p"][id*="-s"]:has(.character-highlighted-activated:hover) {
+      background-color: transparent;
+    }
   }
 
   #book-container.play-mode #content-container {
