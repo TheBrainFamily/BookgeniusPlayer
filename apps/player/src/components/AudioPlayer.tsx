@@ -29,6 +29,7 @@ import { CoverArt } from "./CoverArt";
 import { useOptionalElementVisibility } from "@player/stores/elementVisibility.store";
 import { isMobileOrTablet } from "@player/utils/isMobileOrTablet";
 import { getBackgroundSongsForBook } from "@player/genericBookDataGetters/getBackgroundSongsForBook";
+import { getBookAssetUrl } from "@player/utils/assetUrls";
 
 const AudioPlayer = () => {
   const { t } = useTranslation();
@@ -385,16 +386,17 @@ const AudioPlayer = () => {
     await transitionToTrack(prevTrackId, { manual: true });
   };
 
-  const handleDownloadTrack = (id: string, title: string) => {
+  const handleDownloadTrack = async (id: string, title: string) => {
     if (!id) return;
 
-    const trackUrl = `/${slug}/${id}.mp3`;
-    const link = document.createElement("a");
-    link.href = trackUrl;
-    link.download = `${title}.mp3`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const url = getBookAssetUrl(`${id}.mp3`);
+    const name = `${(title || id).replace(/[\/\\:*?"<>|]+/g, "").trim()}.mp3`;
+
+    try {
+      await downloadFile(url, name);
+    } catch {
+      window.open(url, "_blank", "noopener");
+    }
   };
 
   const showBookgeniusChat = (() => {
@@ -834,5 +836,37 @@ const variants: Record<string, Variants> = {
     exit: { opacity: 0, scale: 0.98, x: 5, filter: "blur(1px)" },
   },
 };
+
+async function downloadFile(fileUrl: string, filename: string) {
+  const res = await fetch(fileUrl, { mode: "cors", credentials: "omit" });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const blob = await res.blob();
+
+  const file = new File([blob], filename, { type: "audio/mpeg" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: filename });
+      return;
+    } catch (err) {
+      if ((err as DOMException | undefined)?.name === "AbortError") {
+        return;
+      }
+      console.warn("navigator.share failed, falling back to blob download", err);
+    }
+  }
+
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = blobUrl;
+  a.download = filename;
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+  }, 0);
+}
 
 export default AudioPlayer;
