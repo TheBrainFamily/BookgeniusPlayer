@@ -29,9 +29,10 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
           {/* Logo */}
           <a href="#" className="flex items-center space-x-3">
             <BookOpen className="h-8 w-8 text-library-gold animate-candleflicker" />
-            <h1 className="text-2xl font-bold text-foreground">
+            <h1 className="text-2xl font-bold text-foreground relative">
               {t("hero.bookGenius").split(/(?=[A-Z])/)[0]}
               <span className="text-library-gold">{t("hero.bookGenius").split(/(?=[A-Z])/)[1]}</span>
+              <span className="absolute -right-6 -bottom-2 bg-[#1E2A44] px-2 py-1 text-xs text-library-goldA uppercase rounded-md -skew-4 -rotate-4">Beta</span>
             </h1>
           </a>
 

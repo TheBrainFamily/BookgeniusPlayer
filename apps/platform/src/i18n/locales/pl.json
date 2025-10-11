@@ -51,5 +51,10 @@
     "minutes": "min"
   },
   "notFound": { "title": "Nie znaleziono strony", "returnHome": "Wróć do biblioteki", "description": "Wygląda na to, że ta strona zaginęła w rozległej bibliotece internetu." },
-  "title": "Wciągające powieści wizualne"
+  "title": "Wciągające powieści wizualne",
+  "continueReading": "Czytaj dalej",
+  "reachedFreePreview": "Wykorzystano limit bezpłatnego dostępu.",
+  "bestAccessAvailable": "Wersja beta już jest!",
+  "youreInvited": "Zapraszamy do korzystania z naszej wersji beta całkowicie za darmo aż do końca roku.",
+  "freeAccess": "Darmowy dostęp kończu się 31 Grudnia 2025r."
 }

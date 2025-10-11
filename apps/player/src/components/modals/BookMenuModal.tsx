@@ -558,7 +558,8 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           </div>
         )} */}
           </div>
-          <div className="text-xs text-gray-500 mt-4 text-right book-settings-version">
+          <div className="text-xs text-gray-500 mt-4 text-right book-settings-version flex items-center justify-between gap-2">
+            <span>Beta</span>
             <span>
               {t("version")}: {getReadableBuildInfo(import.meta.env.VITE_BUILD_TIME as string | undefined)}
             </span>

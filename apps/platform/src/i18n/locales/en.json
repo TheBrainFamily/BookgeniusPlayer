@@ -51,5 +51,10 @@
     "minutes": "m"
   },
   "notFound": { "title": "Page Not Found", "returnHome": "Return to Library", "description": "It seems this page has been lost in the vast library of the internet." },
-  "title": "Immersive Visual Novel"
+  "title": "Immersive Visual Novel",
+  "continueReading": "Continue Reading",
+  "reachedFreePreview": "You've reached the end of the free preview.",
+  "bestAccessAvailable": "Best Access Available!",
+  "youreInvited": "You're invited to experience our beta version completely free until the end of the year.",
+  "freeAccess": "Free access ends December 31st, 2025"
 }
