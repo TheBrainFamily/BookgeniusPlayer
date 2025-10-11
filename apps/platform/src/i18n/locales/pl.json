@@ -7,7 +7,13 @@
     "startReading": "Zacznij Czytać",
     "viewCollection": "Przejrzyj zbiór"
   },
-  "navigation": { "search": "Szukaj powieści wizualnych, autorów...", "searchMobile": "Szukaj powieści...", "signOut": "Wyloguj się", "signIn": "Zaloguj się" },
+  "navigation": {
+    "search": "Szukaj powieści wizualnych, autorów...",
+    "searchMobile": "Szukaj powieści...",
+    "signOut": "Wyloguj się",
+    "signIn": "Zaloguj się",
+    "signUp": "Zarejestruj się"
+  },
   "stats": { "visualNovels": "Nowele Wizualne", "immersive": "Angażujący", "productions": "Produkcja" },
   "featured": {
     "featuredMasterpieces": "Wyróżnione arcydzieła",
@@ -51,5 +57,10 @@
     "minutes": "min"
   },
   "notFound": { "title": "Nie znaleziono strony", "returnHome": "Wróć do biblioteki", "description": "Wygląda na to, że ta strona zaginęła w rozległej bibliotece internetu." },
-  "title": "Wciągające powieści wizualne"
+  "title": "Wciągające powieści wizualne",
+  "continueReading": "Czytaj dalej",
+  "reachedFreePreview": "Wykorzystano limit bezpłatnego dostępu.",
+  "bestAccessAvailable": "Wersja beta już jest!",
+  "youreInvited": "Zapraszamy do korzystania z naszej wersji beta całkowicie za darmo aż do końca roku.",
+  "freeAccess": "Darmowy dostęp kończy się 31 grudnia 2025 r."
 }
