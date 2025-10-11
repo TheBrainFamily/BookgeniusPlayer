@@ -60,7 +60,7 @@ const ProgressBars: React.FC = () => {
             initial="hidden"
             animate="visible"
             className="fixed inset-x-0 top-0 h-[10px] z-[49] pointer-events-none"
-            style={{ backgroundColor: "color-mix(in srgb, var(--bg-content-light, #8B4513) 5%, transparent)" }}
+            style={{ backgroundColor: "color-mix(in srgb, var(--bg-content-light, #8B4513) 15%, transparent)" }}
           >
             <motion.div
               className="h-full w-full origin-left transform-gpu [will-change:transform]"
@@ -79,7 +79,7 @@ const ProgressBars: React.FC = () => {
             initial="hidden"
             animate="visible"
             className="fixed inset-x-0 bottom-0 h-[10px] z-[48] pointer-events-none"
-            style={{ backgroundColor: "color-mix(in srgb, var(--bg-content-light, #8B4513) 5%, transparent)" }}
+            style={{ backgroundColor: "color-mix(in srgb, var(--bg-content-light, #8B4513) 15%, transparent)" }}
           >
             <motion.div
               className="h-full w-full origin-left transform-gpu [will-change:transform]"

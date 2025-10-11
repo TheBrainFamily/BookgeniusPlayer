@@ -23,8 +23,9 @@
   margin-left: -3em;
 }
 
-.character-talking + .character-talking {
-  margin-left: -0.5em;
+.character-talking + .character-talking,
+.character-talking.start-of-paragraph ~ span .character-talking.start-of-paragraph {
+  margin-left: -1.75em;
 }
 
 .character-talking {
@@ -227,15 +228,14 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
     border-color 0.3s ease,
     box-shadow 0.3s ease;
   backface-visibility: hidden;
+  border: 2px solid color-mix(in srgb, var(--bg-content-light, #ffffff) 60%, transparent);
 }
 
 .characters-on-stage-panel .speaking {
   filter: grayscale(60%);
-  border: 2px solid color-mix(in srgb, var(--bg-content-light, #ffffff) 60%, transparent);
 }
 
 .characters-on-stage-panel .not-speaking {
-  border: 2px solid color-mix(in srgb, var(--bg-content-light, #ffffff) 60%, transparent);
   opacity: 1;
 }
 
