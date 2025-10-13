@@ -53,17 +53,21 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const [micToastVisible, setMicToastVisible] = useState(false);
   const [micToastText, setMicToastText] = useState("");
   const micToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const micToastDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isMobileOrTablet = useIsMobileOrTablet();
 
   const showMicToast = useCallback((text: string, duration = 2000) => {
     setMicToastText(text);
     setMicToastVisible(true);
     if (micToastTimerRef.current) clearTimeout(micToastTimerRef.current);
-    micToastTimerRef.current = setTimeout(() => setMicToastVisible(false), duration);
+    micToastTimerRef.current = setTimeout(() => {
+      setMicToastVisible(false);
+    }, duration);
   }, []);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const micButtonRef = useRef<HTMLButtonElement>(null);
   const shouldSelectAllRef = useRef(false);
 
   const { pauseAllTimers, startAllTimers, showAllElements, setIsTimersPausedSticky } = useElementVisibilityStore();
@@ -209,11 +213,13 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const switchedToDeepResearchRef = useRef<boolean>(false);
   const hasShownFirstChunkRef = useRef<boolean>(false);
   const lastAskedQueryRef = useRef<string>("");
+  const lastSubmittedValueRef = useRef<string>("");
 
   useEffect(() => {
     return () => {
       sseRef.current?.close();
       if (micToastTimerRef.current) clearTimeout(micToastTimerRef.current);
+      if (micToastDelayRef.current) clearTimeout(micToastDelayRef.current);
     };
   }, []);
 
@@ -315,19 +321,28 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     }
   }, [location, setDeepResearchContent, setDiveDeeperHandler, setDiveDeeperLoading, setShowDiveDeeperCTA, t, setDeepResearchType]);
 
-  const handleAsk = useCallback(
-    async (query: string) => {
+  const prepareAskUI = useCallback(
+    (query?: string) => {
       setIsThinking(true);
       setDeepResearchType("ask");
       openDeepResearchModal(undefined, true, true, "ask");
+      setDeepResearchContent("");
       setDeepResearchLoading(true);
       streamingBufferRef.current = "";
       switchedToDeepResearchRef.current = false;
       hasShownFirstChunkRef.current = false;
-      lastAskedQueryRef.current = query;
+      lastAskedQueryRef.current = query ?? "";
       setShowDiveDeeperCTA(false);
       setDiveDeeperLoading(false);
       setDiveDeeperHandler(undefined);
+    },
+    [openDeepResearchModal, setDeepResearchContent, setDeepResearchLoading, setShowDiveDeeperCTA, setDiveDeeperHandler, setDeepResearchType, setIsThinking],
+  );
+
+  const handleAsk = useCallback(
+    async (query: string) => {
+      prepareAskUI(query);
+      lastSubmittedValueRef.current = query.trim();
 
       // cancel any previous stream
       sseRef.current?.close();
@@ -390,7 +405,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     },
     [
       location,
-      openDeepResearchModal,
+      prepareAskUI,
       setDeepResearchContent,
       setDeepResearchLoading,
       setShowDiveDeeperCTA,
@@ -399,7 +414,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       t,
       executeDeepResearch,
       handleDiveDeeper,
-      setDeepResearchType,
     ],
   );
 
@@ -419,6 +433,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       }
 
       if (isDeepResearchActive) {
+        lastSubmittedValueRef.current = trimmed;
         executeDeepResearch(trimmed);
       }
     },
@@ -451,7 +466,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
     handleActivity();
 
-    // Inspect permission state (if supported) so we only require a second press when a prompt actually showed.
+    // Check permission state (Chromium) to decide if a prompt appeared.
     let permissionState: "granted" | "denied" | "prompt" | "unknown" = "unknown";
     if (typeof navigator !== "undefined" && navigator.permissions?.query) {
       try {
@@ -466,46 +481,58 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       }
     }
 
+    const ua = typeof navigator !== "undefined" ? navigator.userAgent || "" : "";
+    const isSafari = /Safari/.test(ua) && !/Chrome|CriOS|Chromium/.test(ua);
+    const tPrime0 = performance.now();
+
     let primeResult: Awaited<ReturnType<typeof primeMicrophone>>;
     try {
       primeResult = await primeMicrophone();
-    } catch (e) {
-      console.warn("[ptt] primeMicrophone threw", e);
+    } catch (error) {
+      console.warn("[ptt] primeMicrophone threw", error);
       showMicToast(t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."), 2600);
       return;
     }
 
+    const elapsed = performance.now() - tPrime0;
     if (primeResult === "failed") {
       showMicToast(t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."), 2600);
       return;
     }
 
     if (primeResult === "just_primed") {
-      const ua = typeof navigator !== "undefined" ? navigator.userAgent || "" : "";
-      const isSafari = /Safari/.test(ua) && !/Chrome|CriOS|Chromium/.test(ua);
-      const shouldPause = permissionState === "prompt" || permissionState === "denied" || (permissionState === "unknown" && isSafari);
-      if (shouldPause) {
-        showMicToast(t("mic_ready_try_again", "Mic permissions ready. Press and hold again!"), 2000);
+      const promptLikely = permissionState === "prompt" || permissionState === "denied" || (permissionState === "unknown" && isSafari && elapsed > 300);
+      if (promptLikely) {
+        if (micToastDelayRef.current) clearTimeout(micToastDelayRef.current);
+        micToastDelayRef.current = setTimeout(() => {
+          showMicToast(t("mic_ready_try_again", "Mic permissions ready. Press and hold again!"), 2200);
+          micToastDelayRef.current = null;
+        }, 700);
         return;
       }
+      // Else: just primed quickly with already-granted permission → proceed
     }
 
-    // Immediately show connecting UI only when actually starting
-    setIsRealtimeConnecting(true);
+    setIsRealtimeConnecting(false);
     setIsMicrophoneReady(false); // Reset mic ready state for new recording
     setValue("");
     if (isSearchModalOpen) setSearchQuery("");
 
-    console.log("[ptt] calling startRecording() (will prime+connect in parallel)");
-    startRecording()
-      .then(() => {
-        console.log("[ptt] startRecording finished in", (performance.now() - t0).toFixed(1), "ms");
-      })
-      .catch((error) => {
-        console.error("[ptt] Error starting recording:", error);
+    console.log("[ptt] calling startRecording() (will prime+connect in parallel)…");
+    try {
+      const mode = await startRecording();
+      console.log("[ptt] startRecording finished in", (performance.now() - t0).toFixed(1), "ms", "mode:", mode);
+      // Only show connecting UI if we are streaming immediately
+      if (mode === "streaming_now") {
+        setIsRealtimeConnecting(true);
+      } else {
         setIsRealtimeConnecting(false);
-      });
-  }, [handleActivity, isRecording, isRealtimeConnecting, isSearchModalOpen, setSearchQuery, startRecording, setValue, primeMicrophone, t, showMicToast]);
+      }
+    } catch (error) {
+      console.error("[ptt] Error starting recording:", error);
+      setIsRealtimeConnecting(false);
+    }
+  }, [handleActivity, isRecording, isRealtimeConnecting, isSearchModalOpen, setSearchQuery, startRecording, setValue, primeMicrophone, showMicToast, t]);
 
   // Clear connecting state when both session and microphone are ready
   useEffect(() => {
@@ -519,11 +546,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     if (!isRecording) return;
 
     handleActivity();
+    prepareAskUI();
 
     setTimeout(() => {
       stopRecording().catch((error) => console.error("Error stopping recording:", error));
     }, 150);
-  }, [handleActivity, isRecording, stopRecording]);
+  }, [handleActivity, isRecording, prepareAskUI, stopRecording]);
 
   const placeholder = useMemo(() => {
     if (isRealtimeConnecting) return ""; // hide placeholder while connecting to avoid visual overlap
@@ -532,6 +560,9 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     if (isDeepResearchActive) return t("enter_deep_research");
     return t("search_or_ask");
   }, [isRealtimeConnecting, isRecording, isThinking, isDeepResearchActive, t]);
+
+  const trimmedValue = value.trim();
+  const shouldShowSendButton = !isRecording && trimmedValue.length > 0 && trimmedValue !== lastSubmittedValueRef.current;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -769,7 +800,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                 </TooltipProvider>
 
                 {/* Send/Mic Button */}
-                {value.trim() && !isRecording ? (
+                {shouldShowSendButton ? (
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -795,6 +826,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <motion.button
+                          ref={micButtonRef}
                           type="button"
                           disabled={isThinking}
                           className={cn(
@@ -807,35 +839,24 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                           variants={variants.button}
                           initial="idle"
                           animate={isRecording ? "recording" : "idle"}
-                          // onPointerDown={() => {
-                          //   if (isRecording) {
-                          //     setIsRecording(false);
-                          //     handleRecordingEnd();
-                          //   }
-                          //   setIsRecording(true);
-                          //   handleRecordingStart();
-                          // }}
-                          onTouchStart={(e) => {
+                          onPointerDown={(e) => {
                             e.preventDefault();
+                            try {
+                              micButtonRef.current?.setPointerCapture(e.pointerId);
+                            } catch {}
                             handleRecordingStart();
                           }}
-                          onTouchEnd={(e) => {
+                          onPointerUp={(e) => {
+                            e.preventDefault();
+                            try {
+                              micButtonRef.current?.releasePointerCapture(e.pointerId);
+                            } catch {}
+                            handleRecordingEnd();
+                          }}
+                          onPointerCancel={(e) => {
                             e.preventDefault();
                             handleRecordingEnd();
                           }}
-                          onTouchCancel={(e) => {
-                            e.preventDefault();
-                            handleRecordingEnd();
-                          }}
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            handleRecordingStart();
-                          }}
-                          onMouseUp={(e) => {
-                            e.preventDefault();
-                            handleRecordingEnd();
-                          }}
-                          onMouseLeave={() => isRecording && handleRecordingEnd()}
                           onContextMenu={(e) => e.preventDefault()}
                         >
                           <Mic size={18} />

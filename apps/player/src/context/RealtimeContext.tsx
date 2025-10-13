@@ -19,7 +19,7 @@ interface RealtimeContextType {
   audioAnalyser: AnalyserNode | null;
   connectConversation: () => Promise<void>;
   disconnectConversation: () => Promise<void>;
-  startRecording: () => Promise<void>;
+  startRecording: () => Promise<"local_first" | "streaming_now">;
   stopRecording: () => Promise<void>;
   // Prime microphone once (request permission, create analyser, keep stream alive but disabled)
   primeMicrophone: () => Promise<"already_primed" | "just_primed" | "failed">;
@@ -84,6 +84,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isMuted, setIsMuted] = useState(false);
   const [isSessionReady, setIsSessionReady] = useState(false);
   const [audioAnalyser, setAudioAnalyser] = useState<AnalyserNode | null>(null);
+  const analyserPullGainRef = useRef<GainNode | null>(null);
   const toolTriggeredRef = useRef<boolean>(false);
   const nextConnectInteractiveRef = useRef<boolean>(false);
   const micStreamRef = useRef<MediaStream | null>(null);
@@ -105,7 +106,11 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Debug capture of exactly what we send (24k mono Int16)
   const debugInt16CaptureRef = useRef<Int16Array[]>([]);
   const [debugClipUrl, setDebugClipUrl] = useState<string | null>(null);
-  const warmupSamplesRemainingRef = useRef<number>(0);
+  const firstHoldLocalOnlyRef = useRef<boolean>(true);
+  const localRecordingPromiseRef = useRef<Promise<Blob | null> | null>(null);
+  const localRecordingResolveRef = useRef<((blob: Blob | null) => void) | null>(null);
+  const localMediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const localMediaChunksRef = useRef<Blob[]>([]);
 
   // Reuse app's shared AudioContext from the crossfader to reduce Safari glitches
   // and avoid creating/resuming multiple contexts when the mic starts.
@@ -608,6 +613,24 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       } catch {
         // ignore if already connected
       }
+      // Safari quirk: attach a zero-gain sink so analyser continues to pull audio frames
+      try {
+        let pull = analyserPullGainRef.current;
+        if (!pull) {
+          pull = sharedCtx.createGain();
+          pull.gain.value = 0;
+          analyserPullGainRef.current = pull;
+        }
+        try {
+          analyser.disconnect();
+        } catch {}
+        analyser.connect(pull);
+        try {
+          pull.connect(sharedCtx.destination);
+        } catch {}
+      } catch (sinkError) {
+        console.warn("[mic] failed to wire analyser sink", sinkError);
+      }
       setAudioAnalyser(analyser);
 
       micPrimedRef.current = true;
@@ -620,9 +643,103 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [getSharedAudioContext]);
 
-  const startRecording = useCallback(async () => {
+  const startRecording = useCallback(async (): Promise<"local_first" | "streaming_now"> => {
     const tPress = performance.now();
     console.log("[ptt] startRecording invoked at", tPress.toFixed(1));
+
+    if (firstHoldLocalOnlyRef.current) {
+      const primeResult = await primeMicrophone();
+      if (primeResult === "failed") throw new Error("Unable to access microphone");
+
+      const stream = micStreamRef.current;
+      if (!stream) throw new Error("Microphone stream unavailable");
+
+      if (debugClipUrl) {
+        try {
+          URL.revokeObjectURL(debugClipUrl);
+        } catch {}
+        setDebugClipUrl(null);
+      }
+      debugInt16CaptureRef.current = [];
+      localMediaChunksRef.current = [];
+      localRecordingPromiseRef.current = new Promise<Blob | null>((resolve) => {
+        localRecordingResolveRef.current = resolve;
+      });
+
+      for (const track of stream.getAudioTracks()) track.enabled = true;
+      // @ts-expect-error supported browser API
+      if (typeof navigator.mediaSession?.setMicrophoneActive === "function") {
+        // @ts-expect-error supported browser API
+        navigator.mediaSession.setMicrophoneActive(true);
+      }
+
+      setIsMuted(false);
+      setIsRecording(true);
+      if (!isConnected) setIsSessionReady(true);
+      recordStartTimeRef.current = Date.now();
+      audioHeardThisRecordingRef.current = false;
+      awaitingSpeechResponseRef.current = false;
+
+      const pickMimeType = () => {
+        const ua = typeof navigator !== "undefined" ? navigator.userAgent || "" : "";
+        const isSafari = /Safari/.test(ua) && !/Chrome|CriOS|Chromium/.test(ua);
+        if (!("MediaRecorder" in window)) return null;
+        const types = isSafari
+          ? ["audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus"]
+          : ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg;codecs=opus"];
+        for (const type of types) {
+          try {
+            if (MediaRecorder.isTypeSupported(type)) return type;
+          } catch {}
+        }
+        return null;
+      };
+
+      try {
+        const mimeType = pickMimeType();
+        const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+        localMediaChunksRef.current = [];
+        recorder.ondataavailable = (ev) => {
+          if (ev.data && ev.data.size > 0) localMediaChunksRef.current.push(ev.data);
+        };
+        recorder.onstop = () => {
+          const chunks = localMediaChunksRef.current;
+          localMediaChunksRef.current = [];
+          let blob: Blob | null = null;
+          if (chunks.length) {
+            blob = new Blob(chunks, { type: chunks[0]?.type || "audio/webm" });
+            const url = URL.createObjectURL(blob);
+            setDebugClipUrl(url);
+          }
+          localRecordingResolveRef.current?.(blob);
+          localRecordingResolveRef.current = null;
+          for (const track of stream.getAudioTracks()) track.enabled = false;
+          // @ts-expect-error supported browser API
+          if (typeof navigator.mediaSession?.setMicrophoneActive === "function") {
+            // @ts-expect-error supported browser API
+            navigator.mediaSession.setMicrophoneActive(false);
+          }
+          setIsMuted(true);
+          localMediaRecorderRef.current = null;
+        };
+        recorder.onerror = (ev) => {
+          console.warn("[ptt] local MediaRecorder error", ev);
+        };
+        localMediaRecorderRef.current = recorder;
+
+        // Safari stability: avoid timeslice-based start which can auto-stop recordings
+        recorder.start();
+      } catch (err) {
+        console.error("[ptt] Failed to start local MediaRecorder", err);
+        localRecordingResolveRef.current?.(null);
+        localRecordingResolveRef.current = null;
+        localRecordingPromiseRef.current = null;
+        for (const track of stream.getAudioTracks()) track.enabled = false;
+        throw err;
+      }
+      return "local_first";
+    }
+
     if (!isConnected) setIsSessionReady(false);
 
     // Kick off connection and mic priming in parallel
@@ -660,7 +777,6 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     prebufferQueueRef.current = [];
     // Reset debug capture & clip URL
     debugInt16CaptureRef.current = [];
-    warmupSamplesRemainingRef.current = 0;
     if (debugClipUrl) {
       try {
         URL.revokeObjectURL(debugClipUrl);
@@ -676,13 +792,6 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const fromRate = ctx.sampleRate;
         const toRate = 24000;
         const ratio = fromRate / toRate;
-        try {
-          const ua = navigator.userAgent || "";
-          const isSafari = /Safari/.test(ua) && !/Chrome|CriOS|Chromium/.test(ua);
-          warmupSamplesRemainingRef.current = isSafari ? Math.floor(0.3 * toRate) : 0; // ~300ms skip to avoid initial AGC/glitch
-        } catch {
-          warmupSamplesRemainingRef.current = 0;
-        }
 
         resampleBufferRef.current = new Float32Array(0);
         pcmQueueRef.current = new Int16Array(0);
@@ -747,16 +856,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               let offset = 0;
               const CHUNK = 1200;
               while (offset + CHUNK <= mergedPcm.length) {
-                let slice = mergedPcm.subarray(offset, offset + CHUNK);
-                if (warmupSamplesRemainingRef.current > 0) {
-                  const skip = Math.min(warmupSamplesRemainingRef.current, slice.length);
-                  warmupSamplesRemainingRef.current -= skip;
-                  if (skip >= slice.length) {
-                    offset += CHUNK;
-                    continue;
-                  }
-                  slice = slice.subarray(skip);
-                }
+                const slice = mergedPcm.subarray(offset, offset + CHUNK);
                 const session = sessionRef.current;
                 // If prerecording, queue locally; else send immediately
                 if (prerecordingActiveRef.current || !session) {
@@ -848,16 +948,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               let offset = 0;
               const CHUNK = 1200;
               while (offset + CHUNK <= mergedPcm.length) {
-                let slice = mergedPcm.subarray(offset, offset + CHUNK);
-                if (warmupSamplesRemainingRef.current > 0) {
-                  const skip = Math.min(warmupSamplesRemainingRef.current, slice.length);
-                  warmupSamplesRemainingRef.current -= skip;
-                  if (skip >= slice.length) {
-                    offset += CHUNK;
-                    continue;
-                  }
-                  slice = slice.subarray(skip);
-                }
+                const slice = mergedPcm.subarray(offset, offset + CHUNK);
                 const session = sessionRef.current;
                 if (prerecordingActiveRef.current || !session) {
                   if (slice.length) prebufferQueueRef.current.push(slice.slice());
@@ -923,10 +1014,114 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       })
       .catch(() => {});
     // Prime mic permission on first use to avoid missing initial speech
-  }, [isConnected, connectConversation, location, flushPrebufferIfNeeded, sendPerHoldPriming]);
+    return "streaming_now";
+  }, [isConnected, connectConversation, location, flushPrebufferIfNeeded, sendPerHoldPriming, primeMicrophone, debugClipUrl]);
 
   const stopRecording = useCallback(async () => {
     setIsRecording(false);
+
+    if (firstHoldLocalOnlyRef.current) {
+      let blob: Blob | null = null;
+      try {
+        const recorder = localMediaRecorderRef.current;
+        const stopPromise = localRecordingPromiseRef.current ?? Promise.resolve<Blob | null>(null);
+        if (recorder && recorder.state !== "inactive") {
+          recorder.stop();
+        }
+        blob = await stopPromise;
+      } catch (e) {
+        console.warn("[ptt] failed to stop local recorder", e);
+      } finally {
+        localRecordingPromiseRef.current = null;
+      }
+
+      const stream = micStreamRef.current;
+      if (stream) {
+        for (const track of stream.getAudioTracks()) track.enabled = false;
+      }
+      // @ts-expect-error supported browser API
+      if (typeof navigator.mediaSession?.setMicrophoneActive === "function") {
+        // @ts-expect-error supported browser API
+        navigator.mediaSession.setMicrophoneActive(false);
+      }
+      setIsMuted(true);
+
+      if (!blob || blob.size === 0) {
+        firstHoldLocalOnlyRef.current = false;
+        return;
+      }
+
+      try {
+        nextConnectInteractiveRef.current = true;
+        await (connectPromiseRef.current ?? connectConversation());
+      } catch (e) {
+        console.warn("[ptt] connect failed before sending local recording", e);
+        firstHoldLocalOnlyRef.current = false;
+        return;
+      } finally {
+        nextConnectInteractiveRef.current = false;
+      }
+
+      const session = sessionRef.current;
+      if (!session) {
+        firstHoldLocalOnlyRef.current = false;
+        return;
+      }
+
+      try {
+        const ctx = await getSharedAudioContext();
+        const pcm = await decodeBlobToInt16(blob, 24000, ctx);
+        debugInt16CaptureRef.current = pcm.length ? [pcm] : [];
+        try {
+          session.transport.sendEvent({ type: "input_audio_buffer.clear" });
+        } catch {}
+        inputClearedThisHoldRef.current = true;
+        await sendPerHoldPriming().catch(() => {});
+
+        const CHUNK = 1200;
+        let offset = 0;
+        while (offset < pcm.length) {
+          const slice = pcm.subarray(offset, Math.min(offset + CHUNK, pcm.length));
+          const b64 = int16ToBase64(slice);
+          try {
+            session.transport.sendEvent({ type: "input_audio_buffer.append", audio: b64 });
+          } catch (err) {
+            console.warn("[ptt] failed to append chunk from local recording", err);
+            break;
+          }
+          offset += CHUNK;
+        }
+      } catch (e) {
+        console.warn("[ptt] failed to process local recording for upload", e);
+      }
+
+      const heardAudio = debugInt16CaptureRef.current.length > 0 && debugInt16CaptureRef.current[0].length > 0;
+      audioHeardThisRecordingRef.current = heardAudio;
+      awaitingSpeechResponseRef.current = heardAudio;
+      recordStartTimeRef.current = null;
+
+      try {
+        sessionRef.current?.transport.sendEvent({ type: "input_audio_buffer.commit" });
+      } catch (e) {
+        console.warn("[ptt] failed to commit local buffer", e);
+      }
+
+      try {
+        sessionRef.current?.transport.sendEvent({
+          type: "response.create",
+          response: { output_modalities: audioResponses ? ["text", "audio"] : ["text"], tool_choice: audioResponses ? "auto" : "required" },
+        });
+      } catch (e) {
+        console.warn("[ptt] failed to request response after local upload", e);
+      }
+
+      prerecordingActiveRef.current = false;
+      primingSentThisHoldRef.current = false;
+      inputClearedThisHoldRef.current = false;
+      firstHoldLocalOnlyRef.current = false;
+      return;
+    }
+
     const session = sessionRef.current;
 
     // Stop streaming PCM
@@ -1019,7 +1214,6 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     audioHeardThisRecordingRef.current = false;
     inputClearedThisHoldRef.current = false;
     primingSentThisHoldRef.current = false;
-    warmupSamplesRemainingRef.current = 0;
     try {
       session.transport.sendEvent({
         type: "response.create",
@@ -1029,7 +1223,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } catch (e) {
       console.warn("[ptt] failed to send response.create", e);
     }
-  }, [audioResponses, isConnected, flushPrebufferIfNeeded, sendPerHoldPriming]);
+  }, [audioResponses, isConnected, flushPrebufferIfNeeded, sendPerHoldPriming, getSharedAudioContext, connectConversation]);
 
   const toggleMute = useCallback(() => {
     setIsMuted((prev) => {
@@ -1095,6 +1289,41 @@ function int16ToBase64(int16: Int16Array): string {
   }
   // btoa expects binary string
   return btoa(binary);
+}
+
+async function decodeBlobToInt16(blob: Blob, targetSampleRate: number, ctx: AudioContext): Promise<Int16Array> {
+  if (!blob || blob.size === 0) return new Int16Array(0);
+  try {
+    if (ctx.state === "suspended") await ctx.resume();
+  } catch {}
+  const arrayBuffer = await blob.arrayBuffer();
+  const audioBuffer = await ctx.decodeAudioData(arrayBuffer.slice(0));
+  if (audioBuffer.numberOfChannels === 0) return new Int16Array(0);
+  const channelData = audioBuffer.getChannelData(0);
+  const resampled = resampleFloat32(channelData, audioBuffer.sampleRate, targetSampleRate);
+  const pcm = new Int16Array(resampled.length);
+  for (let i = 0; i < resampled.length; i++) {
+    let s = resampled[i];
+    s = Math.max(-1, Math.min(1, s));
+    pcm[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+  }
+  return pcm;
+}
+
+function resampleFloat32(data: Float32Array, fromRate: number, toRate: number): Float32Array {
+  if (!data.length) return new Float32Array(0);
+  if (fromRate === toRate) return new Float32Array(data);
+  const ratio = fromRate / toRate;
+  const newLength = Math.max(1, Math.floor(data.length / ratio));
+  const result = new Float32Array(newLength);
+  for (let i = 0; i < newLength; i++) {
+    const idx = i * ratio;
+    const i0 = Math.floor(idx);
+    const i1 = Math.min(i0 + 1, data.length - 1);
+    const frac = idx - i0;
+    result[i] = data[i0] * (1 - frac) + data[i1] * frac;
+  }
+  return result;
 }
 
 // Utility: encode a mono 16-bit PCM Int16Array into a WAV ArrayBuffer
