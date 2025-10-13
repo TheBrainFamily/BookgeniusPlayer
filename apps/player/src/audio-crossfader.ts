@@ -1558,14 +1558,31 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
       if (currentSectionTracks && currentSectionTracks.length > 0) {
         const isCurrentInSection = currentTrackId ? currentSectionTracks.includes(currentTrackId) : false;
         const hasActiveSource = currentTrackId ? !!tracks.get(currentTrackId)?.sourceNode : false;
+        const currentStateNow = currentTrackId ? tracks.get(currentTrackId) : null;
+        const isUserPaused = !!(currentStateNow && currentStateNow.pausedAt != null && !currentStateNow.sourceNode);
         const needAutoStart = !currentTrackId || !isCurrentInSection || !hasActiveSource;
-        if (needAutoStart) {
+        if (needAutoStart && !isUserPaused) {
           const firstTrackId = currentSectionTracks[0];
           console.log(
             `Auto-start check after crossfade: needStart=${needAutoStart}, current=${currentTrackId}, first='${firstTrackId}', inSection=${isCurrentInSection}, hasSource=${hasActiveSource}`,
           );
           (async () => {
             try {
+              // Re-check state at execution time to avoid races with rapid UI changes
+              if (!currentSectionTracks || currentSectionTracks[0] !== firstTrackId) {
+                console.log("Auto-start aborted: section changed after crossfade.");
+                return;
+              }
+              if (isTransitioning) {
+                console.log("Auto-start aborted: new transition in progress.");
+                return;
+              }
+              const curId = currentTrackId;
+              const curState = curId ? tracks.get(curId) : null;
+              if (curId && curState?.sourceNode) {
+                console.log("Auto-start aborted: playback already active.");
+                return;
+              }
               const started = await startFirstTrack(firstTrackId);
               if (started) {
                 console.log(`Auto-started first track '${firstTrackId}' after crossfade completion.`);
@@ -1581,7 +1598,6 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
     } catch (e) {
       console.error("Auto-start decision error after crossfade:", e);
     }
-
     console.log("Crossfade transition fully completed and state updated.");
   };
 
