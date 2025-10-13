@@ -172,6 +172,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
 
           <motion.div
             className={modalContentClasses}
+            style={{ maxHeight: "calc(var(--vvh, 100dvh) - 32px)" }}
             layout={animateHeight}
             transition={animateHeight ? { duration: 0.3, ease: "easeInOut", layout: { duration: 0.3 } } : undefined}
           >
@@ -204,6 +205,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
 
             <motion.div
               className="p-4 overflow-y-auto opened-modal"
+              style={{ maxHeight: "inherit" }}
               layout={animateHeight}
               transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}
               onClick={(e) => {
