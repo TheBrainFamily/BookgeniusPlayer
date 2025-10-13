@@ -336,7 +336,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       setDiveDeeperLoading(false);
       setDiveDeeperHandler(undefined);
     },
-    [openDeepResearchModal, setDeepResearchContent, setDeepResearchLoading, setShowDiveDeeperCTA, setDiveDeeperLoading, setDiveDeeperHandler, setDeepResearchType, setIsThinking],
+    [openDeepResearchModal, setDeepResearchContent, setDeepResearchLoading, setShowDiveDeeperCTA, setDiveDeeperHandler, setDeepResearchType, setIsThinking],
   );
 
   const handleAsk = useCallback(
