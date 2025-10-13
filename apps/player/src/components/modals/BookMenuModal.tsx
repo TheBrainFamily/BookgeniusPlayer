@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef, memo } from "react";
-import { List, Type, RotateCcw, BrainCircuit, BarChart3, ArrowLeft, History, Clock, Share2, Check } from "lucide-react";
+import React, { useEffect, useState, useRef, memo, useMemo } from "react";
+import { List, Type, RotateCcw, BrainCircuit, BarChart3, ArrowLeft, History, Clock, Share2, Check, Mic, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useLocalStorageState from "use-local-storage-state";
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "motion/react";
@@ -9,6 +9,7 @@ import { Label } from "@player/components/ui/label";
 import { Slider } from "@player/components/ui/slider";
 import { cn } from "@player/lib/utils";
 import ModalUI from "./ModalUI";
+import { useRealtime } from "@player/context/RealtimeContext";
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
 import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHtmlTags";
 import { getAllVariants } from "@player/genericBookDataGetters/getAllVariants";
@@ -81,6 +82,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const [currentFontSize, setCurrentFontSize] = useLocalStorageState("fontSize", { defaultValue: 1 });
   const [currentComplexity, setCurrentComplexity] = useLocalStorageState("readingComplexity", { defaultValue: 100 });
 
+  const { primeMicrophone, connectConversation, isConnected } = useRealtime();
   const [hideOverlay, setHideOverlay] = useState(false);
   const [isFontSizeChanging, setIsFontSizeChanging] = useState(false);
   const [isComplexityChanging, setIsComplexityChanging] = useState(false);
@@ -89,6 +91,16 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [shareJustCopied, setShareJustCopied] = useState(false);
   const shareIconTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isPreparingRealtime, setIsPreparingRealtime] = useState(false);
+  const initialAudioResponses = useMemo(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("audioResponses") === "true";
+    } catch {
+      return false;
+    }
+  }, []);
+  const [audioResponsesEnabled, setAudioResponsesEnabled] = useState(initialAudioResponses);
 
   const overlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isVisible = useRef(allVariants.length > 0);
@@ -320,6 +332,48 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
     }
   };
 
+  const handlePrepareRealtime = async () => {
+    if (isPreparingRealtime) return;
+    setIsPreparingRealtime(true);
+    try {
+      const result = await primeMicrophone();
+      if (result === "failed") {
+        showToast(t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."));
+        return;
+      }
+      if (!isConnected) {
+        await connectConversation();
+      }
+      showToast(t("voice_session_ready", "Microphone primed and realtime session connected"));
+    } catch (error) {
+      console.warn("Failed to prepare realtime session", error);
+      showToast(t("voice_session_failed", "Unable to prepare voice session. Try again."));
+    } finally {
+      setIsPreparingRealtime(false);
+    }
+  };
+
+  const handleToggleAudioResponses = () => {
+    const next = !audioResponsesEnabled;
+    setAudioResponsesEnabled(next);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set("audioResponses", next ? "true" : "false");
+      window.location.replace(url.toString());
+    } catch (error) {
+      console.warn("Failed to update audioResponses query param via URL API", error);
+      try {
+        const params = new URLSearchParams(window.location.search);
+        params.set("audioResponses", next ? "true" : "false");
+        const search = params.toString();
+        const href = `${window.location.origin}${window.location.pathname}${search ? `?${search}` : ""}${window.location.hash}`;
+        window.location.href = href;
+      } catch (fallbackError) {
+        console.warn("Fallback audioResponses toggle failed", fallbackError);
+      }
+    }
+  };
+
   // removed dialog-based share flow
 
   const currentShareableLocation = getCurrentLocation();
@@ -386,21 +440,27 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
               <RotateCcw className="mr-2 h-4 w-4" />
               {t("reset_reading_position")}
             </Button>
+
             <Button
               variant="ghost"
               className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
-              onPointerUp={() => {
-                openApiKeyModal();
+              data-keep-modal-open="true"
+              disabled={isPreparingRealtime}
+              onPointerUp={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                void handlePrepareRealtime();
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  openApiKeyModal();
+                  e.stopPropagation();
+                  void handlePrepareRealtime();
                 }
               }}
             >
-              <BrainCircuit className="mr-2 h-4 w-4" />
-              {t("set_openai_api_key")}
+              {isPreparingRealtime ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mic className="mr-2 h-4 w-4" />}
+              {isPreparingRealtime ? t("preparing_voice_session", "Preparing voice session…") : t("prepare_voice_session", "Warm up voice session")}
             </Button>
             <Button
               variant="ghost"
@@ -465,6 +525,28 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
                 : t("share_link_label", { chapter: currentChapterLabel, paragraph: currentParagraphLabel }) ||
                   `Share link to Chapter: ${currentChapterLabel}, paragraph: ${currentParagraphLabel}`}
             </Button>
+            <div className="flex items-center justify-between gap-4 rounded-lg border border-white/20 bg-black/40 px-3 py-2" data-keep-modal-open="true">
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-white">{t("menu_audio_responses", "Audio responses")}</span>
+                <span className="text-xs text-white/60">{t("menu_audio_responses_hint", "Toggle spoken answers and reload to apply.")}</span>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={audioResponsesEnabled}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleToggleAudioResponses();
+                }}
+                className={cn(
+                  "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60",
+                  audioResponsesEnabled ? "bg-blue-500" : "bg-white/20",
+                )}
+              >
+                <span className={cn("inline-block h-5 w-5 transform rounded-full bg-white transition-transform", audioResponsesEnabled ? "translate-x-5" : "translate-x-1")} />
+              </button>
+            </div>
           </div>
 
           {/* Reading Stats */}
@@ -581,7 +663,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           >
             <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-black/80 border border-white/20 shadow-md text-white text-sm">
               <Check className="w-4 h-4 text-green-400" />
-              <span>{t("link_copied") || toastMessage || "Link copied"}</span>
+              <span>{toastMessage || t("link_copied") || "Link copied"}</span>
             </div>
           </motion.div>
         )}

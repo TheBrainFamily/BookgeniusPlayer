@@ -158,6 +158,7 @@
   "stop_recording": "Stop Recording",
   "mic_permission_blocked": "Microphone access blocked. Allow mic and try again.",
   "mic_ready_try_again": "Mic permissions ready. Press and hold again!",
+  "mic_interrupted_try_again": "Recording interrupted. Press and hold again!",
   "listening": "Listening...",
   "thinking": "Thinking...",
   "deep_research_error": "Sorry, deep research failed. Please try again.",
