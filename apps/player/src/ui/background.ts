@@ -3,6 +3,7 @@ import { getBackgrounds } from "./getBackgrounds";
 import debounce from "lodash.debounce";
 import { getPreloadedElement } from "@player/preloadBackgrounds";
 import { getFileType, loadVideoAsHTMLElement } from "./backgroundUtils";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
 export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number; backgroundColor?: string; textColor?: string };
 
@@ -81,8 +82,26 @@ function applyScopedColors({ backgroundColor, textColor }: { backgroundColor?: s
   if (!scope) return;
 
   if (backgroundColor && backgroundColor.trim().length > 0) {
-    scope.style.setProperty("--bg-content-light", backgroundColor.trim());
     const isDark = isDarkColor(backgroundColor.trim());
+    if (bookDataLoader.getCurrentBook() === "Midsummer-Nights-Dream") {
+      scope.style.setProperty("--bg-content-light", backgroundColor.trim());
+      if (textColor && textColor.trim().length > 0) {
+        scope.style.setProperty("--text-light", textColor.trim());
+      } else {
+        scope.style.removeProperty("--text-light");
+      }
+    } else {
+      if (isDark) {
+        scope.style.setProperty("--bg-content-light", "#000000");
+      } else {
+        scope.style.setProperty("--bg-content-light", "#ffffff");
+      }
+      if (isDark) {
+        scope.style.setProperty("--text-light", "#f2e4c9");
+      } else {
+        scope.style.setProperty("--text-light", "#000000");
+      }
+    }
     if (isDark) {
       scope.style.setProperty("--bg-dark-gradient-opacity", "0.8");
     } else {
@@ -90,12 +109,6 @@ function applyScopedColors({ backgroundColor, textColor }: { backgroundColor?: s
     }
   } else {
     scope.style.removeProperty("--bg-content-light");
-  }
-
-  if (textColor && textColor.trim().length > 0) {
-    scope.style.setProperty("--text-light", textColor.trim());
-  } else {
-    scope.style.removeProperty("--text-light");
   }
 }
 
