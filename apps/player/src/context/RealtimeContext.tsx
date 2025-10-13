@@ -17,6 +17,7 @@ interface RealtimeContextType {
   isMuted: boolean;
   isSessionReady: boolean;
   audioAnalyser: AnalyserNode | null;
+  audioResponses: boolean;
   connectConversation: () => Promise<void>;
   disconnectConversation: () => Promise<void>;
   startRecording: () => Promise<"local_first" | "streaming_now">;
@@ -1244,6 +1245,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     isMuted,
     isSessionReady,
     audioAnalyser,
+    audioResponses,
     connectConversation,
     disconnectConversation,
     primeMicrophone,

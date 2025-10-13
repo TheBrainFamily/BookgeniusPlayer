@@ -97,7 +97,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { closeModal: closeCharacterModal, isOpen: isCharacterModalOpen } = useCharacterModal();
   // No local API key gating for voice; token fetched server-side
 
-  const { startRecording, stopRecording, setAskHandler, isRecording, isSessionReady, audioAnalyser, primeMicrophone } = useRealtime();
+  const { startRecording, stopRecording, setAskHandler, isRecording, isSessionReady, audioAnalyser, primeMicrophone, audioResponses } = useRealtime();
   const { location } = useLocation();
   const saved = getSavedLocation();
   const furthestLocation = saved ?? location;
@@ -331,7 +331,11 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   }, [location, setDeepResearchContent, setDiveDeeperHandler, setDiveDeeperLoading, setShowDiveDeeperCTA, t, setDeepResearchType]);
 
   const prepareAskUI = useCallback(
-    (query?: string) => {
+    (options: { skipModal: boolean }, query?: string) => {
+      if (options.skipModal) {
+        return;
+      }
+
       setIsThinking(true);
       setDeepResearchType("ask");
       openDeepResearchModal(undefined, true, true, "ask");
@@ -345,12 +349,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       setDiveDeeperLoading(false);
       setDiveDeeperHandler(undefined);
     },
-    [openDeepResearchModal, setDeepResearchContent, setDeepResearchLoading, setShowDiveDeeperCTA, setDiveDeeperHandler, setDeepResearchType, setIsThinking],
+    [openDeepResearchModal, setDeepResearchContent, setDeepResearchLoading, setShowDiveDeeperCTA, setDiveDeeperLoading, setDiveDeeperHandler, setDeepResearchType, setIsThinking],
   );
 
   const handleAsk = useCallback(
     async (query: string) => {
-      prepareAskUI(query);
+      prepareAskUI({ skipModal: false }, query);
       lastSubmittedValueRef.current = query.trim();
 
       // cancel any previous stream
@@ -420,6 +424,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       setShowDiveDeeperCTA,
       setDiveDeeperLoading,
       setDiveDeeperHandler,
+      setIsThinking,
       t,
       executeDeepResearch,
       handleDiveDeeper,
@@ -555,12 +560,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     if (!isRecording) return;
 
     handleActivity();
-    prepareAskUI();
+    prepareAskUI({ skipModal: audioResponses });
 
     setTimeout(() => {
       stopRecording().catch((error) => console.error("Error stopping recording:", error));
     }, 150);
-  }, [handleActivity, isRecording, prepareAskUI, stopRecording]);
+  }, [audioResponses, handleActivity, isRecording, prepareAskUI, stopRecording]);
 
   const placeholder = useMemo(() => {
     if (isRealtimeConnecting) return ""; // hide placeholder while connecting to avoid visual overlap
