@@ -320,19 +320,27 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     }
   }, [location, setDeepResearchContent, setDiveDeeperHandler, setDiveDeeperLoading, setShowDiveDeeperCTA, t, setDeepResearchType]);
 
-  const handleAsk = useCallback(
-    async (query: string) => {
+  const prepareAskUI = useCallback(
+    (query?: string) => {
       setIsThinking(true);
       setDeepResearchType("ask");
       openDeepResearchModal(undefined, true, true, "ask");
+      setDeepResearchContent("");
       setDeepResearchLoading(true);
       streamingBufferRef.current = "";
       switchedToDeepResearchRef.current = false;
       hasShownFirstChunkRef.current = false;
-      lastAskedQueryRef.current = query;
+      lastAskedQueryRef.current = query ?? "";
       setShowDiveDeeperCTA(false);
       setDiveDeeperLoading(false);
       setDiveDeeperHandler(undefined);
+    },
+    [openDeepResearchModal, setDeepResearchContent, setDeepResearchLoading, setShowDiveDeeperCTA, setDiveDeeperLoading, setDiveDeeperHandler, setDeepResearchType, setIsThinking],
+  );
+
+  const handleAsk = useCallback(
+    async (query: string) => {
+      prepareAskUI(query);
 
       // cancel any previous stream
       sseRef.current?.close();
@@ -395,7 +403,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     },
     [
       location,
-      openDeepResearchModal,
+      prepareAskUI,
       setDeepResearchContent,
       setDeepResearchLoading,
       setShowDiveDeeperCTA,
@@ -404,7 +412,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       t,
       executeDeepResearch,
       handleDiveDeeper,
-      setDeepResearchType,
     ],
   );
 
@@ -536,11 +543,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     if (!isRecording) return;
 
     handleActivity();
+    prepareAskUI();
 
     setTimeout(() => {
       stopRecording().catch((error) => console.error("Error stopping recording:", error));
     }, 150);
-  }, [handleActivity, isRecording, stopRecording]);
+  }, [handleActivity, isRecording, prepareAskUI, stopRecording]);
 
   const placeholder = useMemo(() => {
     if (isRealtimeConnecting) return ""; // hide placeholder while connecting to avoid visual overlap
