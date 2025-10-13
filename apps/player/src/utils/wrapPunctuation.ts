@@ -31,7 +31,7 @@ const wrapPunctuationInLine = (line: string): string => {
 
   // Pattern: look for </span> followed by punctuation followed by </span> at end
   // This regex captures: (</span>)(punctuation)(</span>)
-  const regex = /(<\/span>)([^\w\s<>]+)(<\/span>)$/;
+  const regex = /(<\/span>)([^\w\s<>&]+)(<\/span>)$/;
   const match = line.match(regex);
 
   if (!match) {
