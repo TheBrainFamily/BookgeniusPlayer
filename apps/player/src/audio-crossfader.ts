@@ -1552,6 +1552,36 @@ async function performCrossfade(fadeOutId: string, fadeInId: string, transitionS
       clearTimeout(activeCrossfadeTimeout);
       activeCrossfadeTimeout = null;
     }
+
+    // Auto-start first track of the newly applied section if nothing is playing or current track not in section
+    try {
+      if (currentSectionTracks && currentSectionTracks.length > 0) {
+        const isCurrentInSection = currentTrackId ? currentSectionTracks.includes(currentTrackId) : false;
+        const hasActiveSource = currentTrackId ? !!tracks.get(currentTrackId)?.sourceNode : false;
+        const needAutoStart = !currentTrackId || !isCurrentInSection || !hasActiveSource;
+        if (needAutoStart) {
+          const firstTrackId = currentSectionTracks[0];
+          console.log(
+            `Auto-start check after crossfade: needStart=${needAutoStart}, current=${currentTrackId}, first='${firstTrackId}', inSection=${isCurrentInSection}, hasSource=${hasActiveSource}`,
+          );
+          (async () => {
+            try {
+              const started = await startFirstTrack(firstTrackId);
+              if (started) {
+                console.log(`Auto-started first track '${firstTrackId}' after crossfade completion.`);
+              } else {
+                console.warn(`Auto-start: Failed to start '${firstTrackId}' after crossfade completion.`);
+              }
+            } catch (e) {
+              console.error(`Auto-start error for '${firstTrackId}' after crossfade:`, e);
+            }
+          })();
+        }
+      }
+    } catch (e) {
+      console.error("Auto-start decision error after crossfade:", e);
+    }
+
     console.log("Crossfade transition fully completed and state updated.");
   };
 
