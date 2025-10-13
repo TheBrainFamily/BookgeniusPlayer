@@ -213,6 +213,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const switchedToDeepResearchRef = useRef<boolean>(false);
   const hasShownFirstChunkRef = useRef<boolean>(false);
   const lastAskedQueryRef = useRef<string>("");
+  const lastSubmittedValueRef = useRef<string>("");
 
   useEffect(() => {
     return () => {
@@ -320,19 +321,28 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     }
   }, [location, setDeepResearchContent, setDiveDeeperHandler, setDiveDeeperLoading, setShowDiveDeeperCTA, t, setDeepResearchType]);
 
-  const handleAsk = useCallback(
-    async (query: string) => {
+  const prepareAskUI = useCallback(
+    (query?: string) => {
       setIsThinking(true);
       setDeepResearchType("ask");
       openDeepResearchModal(undefined, true, true, "ask");
+      setDeepResearchContent("");
       setDeepResearchLoading(true);
       streamingBufferRef.current = "";
       switchedToDeepResearchRef.current = false;
       hasShownFirstChunkRef.current = false;
-      lastAskedQueryRef.current = query;
+      lastAskedQueryRef.current = query ?? "";
       setShowDiveDeeperCTA(false);
       setDiveDeeperLoading(false);
       setDiveDeeperHandler(undefined);
+    },
+    [openDeepResearchModal, setDeepResearchContent, setDeepResearchLoading, setShowDiveDeeperCTA, setDiveDeeperHandler, setDeepResearchType, setIsThinking],
+  );
+
+  const handleAsk = useCallback(
+    async (query: string) => {
+      prepareAskUI(query);
+      lastSubmittedValueRef.current = query.trim();
 
       // cancel any previous stream
       sseRef.current?.close();
@@ -395,7 +405,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     },
     [
       location,
-      openDeepResearchModal,
+      prepareAskUI,
       setDeepResearchContent,
       setDeepResearchLoading,
       setShowDiveDeeperCTA,
@@ -404,7 +414,6 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       t,
       executeDeepResearch,
       handleDiveDeeper,
-      setDeepResearchType,
     ],
   );
 
@@ -424,6 +433,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       }
 
       if (isDeepResearchActive) {
+        lastSubmittedValueRef.current = trimmed;
         executeDeepResearch(trimmed);
       }
     },
@@ -536,11 +546,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     if (!isRecording) return;
 
     handleActivity();
+    prepareAskUI();
 
     setTimeout(() => {
       stopRecording().catch((error) => console.error("Error stopping recording:", error));
     }, 150);
-  }, [handleActivity, isRecording, stopRecording]);
+  }, [handleActivity, isRecording, prepareAskUI, stopRecording]);
 
   const placeholder = useMemo(() => {
     if (isRealtimeConnecting) return ""; // hide placeholder while connecting to avoid visual overlap
@@ -549,6 +560,9 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     if (isDeepResearchActive) return t("enter_deep_research");
     return t("search_or_ask");
   }, [isRealtimeConnecting, isRecording, isThinking, isDeepResearchActive, t]);
+
+  const trimmedValue = value.trim();
+  const shouldShowSendButton = !isRecording && trimmedValue.length > 0 && trimmedValue !== lastSubmittedValueRef.current;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -786,7 +800,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                 </TooltipProvider>
 
                 {/* Send/Mic Button */}
-                {value.trim() && !isRecording ? (
+                {shouldShowSendButton ? (
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
