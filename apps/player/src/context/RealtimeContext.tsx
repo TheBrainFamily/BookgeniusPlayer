@@ -47,6 +47,15 @@ type TransportEvent =
   | { type: "response.created" }
   | { type: string; item?: ConversationItemSummary; item_id?: string };
 
+function setMicActiveSafe(active: boolean) {
+  try {
+    // @ts-expect-error experimental API for iOS
+    navigator.mediaSession?.setMicrophoneActive?.(active);
+  } catch (e) {
+    console.debug("[mic] setMicrophoneActive suppressed:", (e as Error)?.name);
+  }
+}
+
 export const useRealtime = () => {
   const context = useContext(RealtimeContext);
   if (!context) throw new Error("useRealtime must be used within a RealtimeProvider");
@@ -667,11 +676,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       });
 
       for (const track of stream.getAudioTracks()) track.enabled = true;
-      // @ts-expect-error supported browser API
-      if (typeof navigator.mediaSession?.setMicrophoneActive === "function") {
-        // @ts-expect-error supported browser API
-        navigator.mediaSession.setMicrophoneActive(true);
-      }
+      setMicActiveSafe(true);
 
       setIsMuted(false);
       setIsRecording(true);
@@ -714,11 +719,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           localRecordingResolveRef.current?.(blob);
           localRecordingResolveRef.current = null;
           for (const track of stream.getAudioTracks()) track.enabled = false;
-          // @ts-expect-error supported browser API
-          if (typeof navigator.mediaSession?.setMicrophoneActive === "function") {
-            // @ts-expect-error supported browser API
-            navigator.mediaSession.setMicrophoneActive(false);
-          }
+          setMicActiveSafe(false);
           setIsMuted(true);
           localMediaRecorderRef.current = null;
         };
@@ -757,11 +758,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     // Enable mic tracks immediately to start capturing locally and visualize while connecting
     for (const track of micStreamRef.current?.getAudioTracks() ?? []) track.enabled = true;
-    //@ts-expect-error(this is correct typing for the navigator.mediaSession.setMicrophoneActive method)
-    if (typeof navigator.mediaSession?.setMicrophoneActive === "function") {
-      //@ts-expect-error(this is correct typing for the navigator.mediaSession.setMicrophoneActive method)
-      navigator.mediaSession.setMicrophoneActive(true);
-    }
+    setMicActiveSafe(true);
     // Allow a short stabilization window after enabling tracks (non-blocking)
     await new Promise((r) => setTimeout(r, 40));
     // Keep session muted; we stream audio manually via input_audio_buffer.append
@@ -1039,11 +1036,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (stream) {
         for (const track of stream.getAudioTracks()) track.enabled = false;
       }
-      // @ts-expect-error supported browser API
-      if (typeof navigator.mediaSession?.setMicrophoneActive === "function") {
-        // @ts-expect-error supported browser API
-        navigator.mediaSession.setMicrophoneActive(false);
-      }
+      setMicActiveSafe(false);
       setIsMuted(true);
 
       if (!blob || blob.size === 0) {
@@ -1162,11 +1155,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Keep mic stream alive to avoid re-permission and Safari audio glitches,
     // but disable tracks while idle so no audio is captured.
     for (const track of micStreamRef.current?.getAudioTracks() ?? []) track.enabled = false;
-    //@ts-expect-error(this is correct typing for the navigator.mediaSession.setMicrophoneActive method)
-    if (typeof navigator.mediaSession?.setMicrophoneActive === "function") {
-      //@ts-expect-error(this is correct typing for the navigator.mediaSession.setMicrophoneActive method)
-      navigator.mediaSession.setMicrophoneActive(false);
-    }
+    setMicActiveSafe(false);
     try {
       sessionRef.current?.mute(true);
     } catch {}

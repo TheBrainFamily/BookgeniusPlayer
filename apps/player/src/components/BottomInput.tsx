@@ -42,6 +42,15 @@ interface BottomInputProps {
   className?: string;
 }
 
+const setMicActiveFromGesture = (active: boolean) => {
+  try {
+    // @ts-expect-error experimental web API on iOS
+    navigator.mediaSession?.setMicrophoneActive?.(active);
+  } catch (err) {
+    console.debug("[ptt] setMicrophoneActive (gesture) suppressed:", (err as Error)?.name);
+  }
+};
+
 const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { t } = useTranslation();
 
@@ -844,6 +853,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                             try {
                               micButtonRef.current?.setPointerCapture(e.pointerId);
                             } catch {}
+                            setMicActiveFromGesture(true);
                             handleRecordingStart();
                           }}
                           onPointerUp={(e) => {
@@ -851,10 +861,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                             try {
                               micButtonRef.current?.releasePointerCapture(e.pointerId);
                             } catch {}
+                            setMicActiveFromGesture(false);
                             handleRecordingEnd();
                           }}
                           onPointerCancel={(e) => {
                             e.preventDefault();
+                            setMicActiveFromGesture(false);
                             handleRecordingEnd();
                           }}
                           onContextMenu={(e) => e.preventDefault()}
