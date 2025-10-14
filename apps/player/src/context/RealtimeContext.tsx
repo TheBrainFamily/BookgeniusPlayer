@@ -417,20 +417,13 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     // If user is currently looking behind the furthest read location, add a VisibleText context (audio mode only)
     if (audioResponses) {
-      // try {
-      //   const saved = getSavedLocation();
-      //   const furthestChapter = saved?.currentChapter ?? location?.currentChapter ?? 1;
-      //   const furthestParagraph = saved?.currentParagraph ?? location?.currentParagraph ?? 1;
-      //   const isBehind =
-      //     (location?.currentChapter ?? 1) < furthestChapter || ((location?.currentChapter ?? 1) === furthestChapter && (location?.currentParagraph ?? 1) < furthestParagraph);
-      //   if (isBehind) {
-      const visibleText = getSurroundingText(location);
-      const msg = `For context, the user is currently looking at:\n<VisibleText>${visibleText}</VisibleText> Once again. No spoilers, dont mention what happens, dont ask questions, do not say what book this is or by whom - the user already knows!`;
-      session.transport.sendEvent({ type: "conversation.item.create", item: { type: "message", role: "system", content: [{ type: "input_text", text: msg }] } });
-      //   }
-      // } catch (e) {
-      //   console.warn("Failed to send visible text context", e);
-      // }
+      try {
+        const visibleText = getSurroundingText(location, true);
+        const msg = `For context, the user is currently looking at:\n<VisibleText>${visibleText}</VisibleText> Once again. No spoilers, dont mention what happens, dont ask questions, do not say what book this is or by whom - the user already knows!`;
+        session.transport.sendEvent({ type: "conversation.item.create", item: { type: "message", role: "system", content: [{ type: "input_text", text: msg }] } });
+      } catch (e) {
+        console.error("Failed to send visible text context", e);
+      }
     }
   }, [audioResponses, location]);
 
