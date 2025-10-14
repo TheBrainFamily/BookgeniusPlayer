@@ -208,30 +208,29 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
               inlineAvatar?.appendChild(newVideo);
 
               const fallbackTimeout = setTimeout(() => {
-                if (existingVideo.parentElement) {
-                  existingVideo.remove();
-                }
-
                 newVideo.style.opacity = "1";
               }, 3000);
 
-              newVideo.addEventListener(
-                "loadeddata",
-                () => {
-                  clearTimeout(fallbackTimeout);
-                  requestAnimationFrame(() => {
-                    newVideo.style.opacity = "1";
-                    existingVideo.style.opacity = "0";
+              const startCrossfade = () => {
+                clearTimeout(fallbackTimeout);
+                requestAnimationFrame(() => {
+                  newVideo.style.opacity = "1";
+                  existingVideo.style.opacity = "0";
 
-                    setTimeout(() => {
-                      if (existingVideo.parentElement) {
-                        existingVideo.remove();
-                      }
-                    }, 500);
-                  });
-                },
-                { once: true },
-              );
+                  setTimeout(() => {
+                    if (existingVideo.parentElement) {
+                      existingVideo.remove();
+                    }
+                  }, 500);
+                });
+              };
+
+              // Check if already loaded (cached)
+              if (newVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+                startCrossfade();
+              } else {
+                newVideo.addEventListener("loadeddata", startCrossfade, { once: true });
+              }
             }
             activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
           } else {
