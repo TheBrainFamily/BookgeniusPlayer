@@ -9,9 +9,9 @@ export function getSurroundingText(location: Location, expand: boolean = false):
   let earliestParagraphToConsider = earliestVisibleParagraph;
   if (expand) {
     if (bookDataLoader.getCurrentBook() === "play") {
-      earliestParagraphToConsider = earliestVisibleParagraph - 30;
+      earliestParagraphToConsider = Math.max(1, earliestVisibleParagraph - 30);
     } else {
-      earliestParagraphToConsider = earliestVisibleParagraph - 2;
+      earliestParagraphToConsider = Math.max(1, earliestVisibleParagraph - 2);
     }
   }
   console.log("getting surrounding text for location", location);
