@@ -133,6 +133,7 @@
       line-height: 1.6;
       color: var(--text-light);
 
+      --gradient-opacity: 1;
       background: linear-gradient(
         to bottom,
         rgb(from var(--bg-content-light) r g b / 0) 0%,

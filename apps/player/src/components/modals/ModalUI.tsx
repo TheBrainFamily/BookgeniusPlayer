@@ -61,8 +61,8 @@ const getModalContentClasses = (
     layoutView && [
       "overflow-hidden max-h-[70vh]",
       // On large screens with content shifted, use narrower width; otherwise use full width
-      isLargeScreen && isContentShifted ? "w-[26vw]" : "max-w-[700px]",
-      isMediumScreen && isContentShifted ? "w-[33%]" : "max-w-[700px]",
+      isContentShifted && isLargeScreen && "w-[26vw]",
+      isContentShifted && isMediumScreen && "w-[33%]",
       // Only apply flex layout on large screens without content shift
       !isContentShifted && "xl:flex-1 xl:max-w-[700px] xl:order-3",
     ],
