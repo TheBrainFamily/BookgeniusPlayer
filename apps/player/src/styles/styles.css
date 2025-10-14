@@ -104,6 +104,10 @@
 
   /* --- Layout Structure --- */
 
+  #content-container [data-chapter-wrapper] {
+    overflow-anchor: none;
+  }
+
   #content-container {
     display: flex;
     cursor: default;

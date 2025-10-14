@@ -34,7 +34,7 @@ class ChapterVirtualizer {
   }
 
   private setTopSpacerHeight(h: number) {
-    const normalized = Math.max(0, Math.round(h));
+    const normalized = Math.max(0, h);
     this.topSpacer.style.height = `${normalized}px`;
   }
 
@@ -44,6 +44,26 @@ class ChapterVirtualizer {
     const mt = parseFloat(styles.marginTop) || 0;
     const mb = parseFloat(styles.marginBottom) || 0;
     return rect.height + mt + mb;
+  }
+
+  private getScrollContainer(): HTMLElement | Document {
+    const scroller = this.host.closest<HTMLElement>("#content-container");
+    if (scroller) {
+      const overflow = getComputedStyle(scroller).overflowY;
+      if (overflow === "auto" || overflow === "scroll") {
+        return scroller;
+      }
+    }
+    return document;
+  }
+
+  private scrollBy(deltaY: number) {
+    const scroller = this.getScrollContainer();
+    if (scroller instanceof HTMLElement) {
+      scroller.scrollTop += deltaY;
+    } else {
+      window.scrollBy(0, deltaY);
+    }
   }
 
   ensureWindow(targetChapter: number, forceRemount = false): void {
@@ -68,6 +88,11 @@ class ChapterVirtualizer {
 
     const desiredOrder = nextWindow.slice().sort((a, b) => a - b);
     const desiredSet = new Set(desiredOrder);
+    const prevMounted = this.mountedChapters;
+    const prevMin = prevMounted.length ? Math.min(...prevMounted) : null;
+    const prevMax = prevMounted.length ? Math.max(...prevMounted) : null;
+    const bigJump = prevMin !== null && prevMax !== null && (targetChapter < prevMin - 1 || targetChapter > prevMax + 1);
+    const hardRemount = forceRemount || bigJump;
 
     const wrappers = Array.from(this.host.querySelectorAll<HTMLElement>("[data-chapter-wrapper]"));
     const existing = new Map<number, HTMLElement>();
@@ -87,7 +112,7 @@ class ChapterVirtualizer {
       const chapterAttr = wrapper.getAttribute("data-chapter-wrapper");
       const chapterId = chapterAttr ? parseInt(chapterAttr, 10) : NaN;
       if (!Number.isFinite(chapterId)) return;
-      if (forceRemount) {
+      if (hardRemount) {
         wrappersToRemove.push(wrapper);
         existing.delete(chapterId);
         return;
@@ -146,7 +171,9 @@ class ChapterVirtualizer {
     const anchorTopBefore = anchorBefore && containerRect ? anchorBefore.getBoundingClientRect().top - containerRect.top : null;
 
     // Increase top spacer by our estimate first, then remove
-    if (toRemoveAbove.length > 0) {
+    if (hardRemount) {
+      this.setTopSpacerHeight(0);
+    } else if (toRemoveAbove.length > 0) {
       let removedHeight = 0;
       toRemoveAbove.forEach((w) => (removedHeight += this.getOuterHeight(w)));
       this.setTopSpacerHeight(this.getTopSpacerHeight() + removedHeight);
@@ -159,7 +186,14 @@ class ChapterVirtualizer {
       const anchorTopAfter = anchorBefore.getBoundingClientRect().top - containerRect.top;
       const delta = anchorTopAfter - anchorTopBefore; // positive -> content moved down
       if (delta !== 0) {
-        this.setTopSpacerHeight(this.getTopSpacerHeight() - delta);
+        const available = this.getTopSpacerHeight();
+        const newHeight = available - delta;
+        if (newHeight >= 0) {
+          this.setTopSpacerHeight(newHeight);
+        } else {
+          this.setTopSpacerHeight(0);
+          this.scrollBy(-newHeight);
+        }
       }
     }
 
@@ -186,9 +220,14 @@ class ChapterVirtualizer {
           if (beforeTop !== null && afterTop !== null) {
             const delta = afterTop - beforeTop; // positive when pushed down
             if (delta !== 0) {
-              // Adjust only the spacer; rely on browser anchoring for any tiny remainder.
-              const newHeight = this.getTopSpacerHeight() - delta;
-              this.setTopSpacerHeight(newHeight);
+              const available = this.getTopSpacerHeight();
+              const newHeight = available - delta;
+              if (newHeight >= 0) {
+                this.setTopSpacerHeight(newHeight);
+              } else {
+                this.setTopSpacerHeight(0);
+                this.scrollBy(-newHeight);
+              }
             }
           }
         } else {
@@ -197,16 +236,42 @@ class ChapterVirtualizer {
       }
     });
 
-    if (!forceRemount && this.arraysEqual(this.mountedChapters, desiredOrder)) {
+    // Ensure DOM order follows desired order directly after the spacer
+    const firstVisibleAfterSpacer = findAnchorAfterSpacer();
+    const orderAnchorTopBefore = firstVisibleAfterSpacer && containerRect ? firstVisibleAfterSpacer.getBoundingClientRect().top - containerRect.top : null;
+
+    let refNode: ChildNode | null = this.topSpacer.nextSibling;
+    desiredOrder.forEach((id) => {
+      const el = existing.get(id);
+      if (!el) return;
+      if (el !== refNode) {
+        this.host.insertBefore(el, refNode);
+      }
+      refNode = el.nextSibling;
+    });
+
+    if (firstVisibleAfterSpacer && containerRect && orderAnchorTopBefore !== null) {
+      const orderAnchorTopAfter = firstVisibleAfterSpacer.getBoundingClientRect().top - containerRect.top;
+      const shift = orderAnchorTopAfter - orderAnchorTopBefore;
+      if (shift !== 0) {
+        const available = this.getTopSpacerHeight();
+        const newHeight = available - shift;
+        if (newHeight >= 0) {
+          this.setTopSpacerHeight(newHeight);
+        } else {
+          this.setTopSpacerHeight(0);
+          this.scrollBy(-newHeight);
+        }
+      }
+    }
+
+    if (!hardRemount && this.arraysEqual(this.mountedChapters, desiredOrder)) {
       return;
     }
 
     // Update mounted list by reading current DOM order (excluding the top spacer)
     const nowWrappers = Array.from(this.host.querySelectorAll<HTMLElement>("[data-chapter-wrapper]"));
-    this.mountedChapters = nowWrappers
-      .map((w) => parseInt(w.getAttribute("data-chapter-wrapper") || "", 10))
-      .filter((n) => Number.isFinite(n))
-      .sort((a, b) => a - b);
+    this.mountedChapters = nowWrappers.map((w) => parseInt(w.getAttribute("data-chapter-wrapper") || "", 10)).filter((n) => Number.isFinite(n));
 
     this.onContentChanged?.([...this.mountedChapters]);
   }

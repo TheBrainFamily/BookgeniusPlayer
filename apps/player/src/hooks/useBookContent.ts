@@ -28,7 +28,7 @@ const containerId = "content-container";
 
 export function useBookContent() {
   const { textVersion } = useBookData();
-  const { location } = useLocation();
+  const { location, lastSystemLocation } = useLocation();
   const { currentChapter, currentParagraph } = location;
   const {
     metadata: { bookForm },
@@ -47,6 +47,7 @@ export function useBookContent() {
     cleanup: () => void;
   } | null>(null);
   const currentChapterRef = useRef<number | undefined>(currentChapter);
+  const prevChapterRef = useRef<number | null>(null);
 
   useEditorMode(isEditorMode ? containerRef.current : null);
 
@@ -174,6 +175,7 @@ export function useBookContent() {
         const initialChapter = typeof currentChapterRef.current === "number" ? currentChapterRef.current : (bookIndex.getFirstChapter() ?? 1);
         await ensureChapterWindow(initialChapter, { force: true });
         if (!cancelled) {
+          prevChapterRef.current = initialChapter;
           handleContentChanged();
         }
       } catch (error) {
@@ -212,16 +214,21 @@ export function useBookContent() {
       return;
     }
 
+    const previous = prevChapterRef.current;
+    const isBigJump = previous !== null && Math.abs(currentChapter - previous) > 2;
+    const isSystemJump = lastSystemLocation?.location?.currentChapter === currentChapter;
+
     void (async () => {
       try {
-        await ensureChapterWindow(currentChapter);
+        await ensureChapterWindow(currentChapter, { force: isBigJump || Boolean(isSystemJump) });
       } catch (error) {
         console.error("useBookContent: Failed to update chapter window", error);
       } finally {
         handleContentChanged();
+        prevChapterRef.current = currentChapter;
       }
     })();
-  }, [currentChapter, handleContentChanged]);
+  }, [currentChapter, lastSystemLocation, handleContentChanged]);
 
   useEffect(() => {
     const textVersionChanged = previousTextVersionRef.current !== textVersion;
