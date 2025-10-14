@@ -49,12 +49,15 @@ function createVideoElement(src: string, state: "listens" | "speaks"): HTMLVideo
   video.loop = true;
   video.muted = true;
   video.playsInline = true;
+  video.preload = "auto";
   video.dataset.state = state;
 
   video.onerror = () => {
     console.warn(`Failed to load ${state} video: ${src}`);
     video.style.display = "none";
   };
+
+  video.load();
   video.play().catch((e) => console.warn("Video play interrupted or failed:", e));
 
   return video;
@@ -189,11 +192,13 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
         const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
         const videoSrc = state === "speaks" ? snapshot?.media.talking : snapshot?.media.listening;
 
+        // Case 1: Existing video needs update or removal
         if (existingVideo) {
           if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
             const videoPathname = getVideoPathname(videoSrc);
             const existingPathname = getVideoPathname(existingVideo.src);
 
+            // VIDEO → VIDEO transition (state or source change)
             if (existingVideo.dataset.state !== state || existingPathname !== videoPathname) {
               const newVideo = createVideoElement(videoSrc, state as "listens" | "speaks");
               newVideo.style.opacity = "0";
@@ -202,51 +207,73 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
 
               inlineAvatar?.appendChild(newVideo);
 
-              // Crossfade effect
+              const fallbackTimeout = setTimeout(() => {
+                if (existingVideo.parentElement) {
+                  existingVideo.remove();
+                }
+
+                newVideo.style.opacity = "1";
+              }, 3000);
+
               newVideo.addEventListener(
                 "loadeddata",
                 () => {
+                  clearTimeout(fallbackTimeout);
                   requestAnimationFrame(() => {
                     newVideo.style.opacity = "1";
                     existingVideo.style.opacity = "0";
 
                     setTimeout(() => {
-                      existingVideo.remove();
+                      if (existingVideo.parentElement) {
+                        existingVideo.remove();
+                      }
                     }, 500);
                   });
                 },
                 { once: true },
               );
-
-              // Fallback cleanup
-              setTimeout(() => {
-                if (existingVideo.parentElement) {
-                  existingVideo.remove();
-                }
-              }, 1500);
             }
             activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
           } else {
+            // VIDEO → IMG transition (videoSrc is not valid)
             activeCharacterPlaceholder.dataset.isTalking = "false";
+
             existingVideo.style.opacity = "0";
-            setTimeout(() => existingVideo.remove(), 500);
+            existingVideo.style.zIndex = "1";
+            setTimeout(() => {
+              if (existingVideo.parentElement) {
+                existingVideo.remove();
+              }
+            }, 500);
           }
-        } else if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
+        }
+        // Case 2: No existing video, need to add one
+        else if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
+          // IMG → VIDEO transition
           const video = createVideoElement(videoSrc, state as "listens" | "speaks");
           video.style.opacity = "0";
+          video.style.zIndex = "2";
           activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
+
           inlineAvatar?.appendChild(video);
 
-          // Fade in when ready
-          video.addEventListener(
-            "loadeddata",
-            () => {
-              requestAnimationFrame(() => {
-                video.style.opacity = "1";
-              });
-            },
-            { once: true },
-          );
+          const fallbackTimeout = setTimeout(() => {
+            video.style.opacity = "1";
+          }, 3000);
+
+          const showVideo = () => {
+            clearTimeout(fallbackTimeout);
+            requestAnimationFrame(() => {
+              video.style.opacity = "1";
+            });
+          };
+
+          // Check if already loaded (cached)
+          if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+            showVideo();
+          } else {
+            video.addEventListener("loadeddata", showVideo, { once: true });
+          }
 
           playRow.setAttribute("data-activated-video", "true");
         }
