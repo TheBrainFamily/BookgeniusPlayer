@@ -1,3 +1,4 @@
+import debounce from "lodash.debounce";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
@@ -112,6 +113,136 @@ function getRowContext(el: HTMLElement): { chapter: number | null; firstParagrap
   };
 }
 
+const INLINE_MEDIA_DEBOUNCE_MS = 100;
+
+type PlayFormatMediaActivationPayload = { charactersBySlug: Map<string, CharacterData> };
+
+const runPlayFormatMediaActivation = ({ charactersBySlug }: PlayFormatMediaActivationPayload) => {
+  const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
+  const activePlayRow = activeParagraph?.closest(".play-row");
+
+  if (!activePlayRow) return;
+
+  const chapterElement = activePlayRow?.closest<HTMLElement>("[data-chapter]");
+  const chapterIndex = chapterElement?.dataset.chapter;
+
+  const rows = getActiveWithSiblingsSkippingDidaskalia(activePlayRow);
+
+  rows.forEach(({ row: playRow, state }: { row: Element; state: "speaks" | "listens" }) => {
+    const characterPlaceholders = playRow?.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+
+    characterPlaceholders.forEach((activeCharacterPlaceholder) => {
+      const characterSlug = activeCharacterPlaceholder?.dataset.character;
+      const characterData = characterSlug ? charactersBySlug.get(characterSlug) : undefined;
+      const inlineAvatar = activeCharacterPlaceholder?.querySelector(".inline-avatar");
+      const existingVideo = inlineAvatar?.querySelector("video");
+      const paragraphIndex = playRow?.querySelector<HTMLElement>("[data-index]")?.getAttribute("data-index");
+
+      const locationForPlaceholder = { chapter: parseInt(chapterIndex, 10), paragraph: parseInt(paragraphIndex, 10) };
+
+      const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
+      const videoSrc = state === "speaks" ? snapshot?.media.talking : snapshot?.media.listening;
+
+      // Case 1: Existing video needs update or removal
+      if (existingVideo) {
+        if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
+          const videoPathname = getVideoPathname(videoSrc);
+          const existingPathname = getVideoPathname(existingVideo.src);
+
+          // VIDEO → VIDEO transition (state or source change)
+          if (existingVideo.dataset.state !== state || existingPathname !== videoPathname) {
+            const newVideo = createVideoElement(videoSrc, state as "listens" | "speaks");
+            newVideo.style.opacity = "0";
+            newVideo.style.zIndex = "1";
+            existingVideo.style.zIndex = "2";
+
+            inlineAvatar?.appendChild(newVideo);
+
+            const fallbackTimeout = setTimeout(() => {
+              newVideo.style.opacity = "1";
+            }, 3000);
+
+            const startCrossfade = () => {
+              clearTimeout(fallbackTimeout);
+              requestAnimationFrame(() => {
+                newVideo.style.opacity = "1";
+                existingVideo.style.opacity = "0";
+
+                setTimeout(() => {
+                  if (existingVideo.parentElement) {
+                    existingVideo.remove();
+                  }
+                }, 500);
+              });
+            };
+
+            // Check if already loaded (cached)
+            if (newVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+              startCrossfade();
+            } else {
+              newVideo.addEventListener("loadeddata", startCrossfade, { once: true });
+            }
+          }
+          activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
+        } else {
+          // VIDEO → IMG transition (videoSrc is not valid)
+          activeCharacterPlaceholder.dataset.isTalking = "false";
+
+          existingVideo.style.opacity = "0";
+          existingVideo.style.zIndex = "1";
+          setTimeout(() => {
+            if (existingVideo.parentElement) {
+              existingVideo.remove();
+            }
+          }, 500);
+        }
+      }
+      // Case 2: No existing video, need to add one
+      else if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
+        // IMG → VIDEO transition
+        const video = createVideoElement(videoSrc, state as "listens" | "speaks");
+        video.style.opacity = "0";
+        video.style.zIndex = "2";
+        activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
+
+        inlineAvatar?.appendChild(video);
+
+        const fallbackTimeout = setTimeout(() => {
+          video.style.opacity = "1";
+        }, 3000);
+
+        const showVideo = () => {
+          clearTimeout(fallbackTimeout);
+          requestAnimationFrame(() => {
+            video.style.opacity = "1";
+          });
+        };
+
+        // Check if already loaded (cached)
+        if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+          showVideo();
+        } else {
+          video.addEventListener("loadeddata", showVideo, { once: true });
+        }
+
+        playRow.setAttribute("data-activated-video", "true");
+      }
+    });
+  });
+
+  const activatedVideo = document.querySelectorAll<HTMLElement>("[data-activated-video='true']");
+
+  activatedVideo.forEach((rowEl) => {
+    if (rows.map(({ row }) => row).includes(rowEl)) return;
+
+    rowEl.querySelectorAll("video").forEach((video) => {
+      video.remove();
+    });
+
+    rowEl.dataset.activatedVideo = "false";
+  });
+};
+
 /** Creates a media container element with CharacterMedia-like structure for inline avatars */
 function createMediaElement(
   placeholder: HTMLSpanElement,
@@ -162,136 +293,23 @@ function getVideoPathname(src: string): string {
   }
 }
 
+const activatePlayFormatMediaDebounced = debounce(runPlayFormatMediaActivation, INLINE_MEDIA_DEBOUNCE_MS, { leading: true, trailing: true, maxWait: 500 });
+
 /** Manages media loading and playback for paragraphs within the visible range **/
-export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean, shouldCreateVideos: boolean) {
+export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean) {
   const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
 
-  if (shouldCreateVideos && isPlayFormat && !isMobile()) {
+  if (isPlayFormat && !isMobile()) {
     const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
     const activePlayRow = activeParagraph?.closest(".play-row");
 
-    if (!activePlayRow) return;
-
-    const chapterElement = activePlayRow?.closest<HTMLElement>("[data-chapter]");
-    const chapterIndex = chapterElement?.dataset.chapter;
-
-    const rows = getActiveWithSiblingsSkippingDidaskalia(activePlayRow);
-
-    rows.forEach(({ row: playRow, state }: { row: Element; state: "speaks" | "listens" }) => {
-      const characterPlaceholders = playRow?.querySelectorAll<HTMLSpanElement>(".character-placeholder");
-
-      characterPlaceholders.forEach((activeCharacterPlaceholder) => {
-        const characterSlug = activeCharacterPlaceholder?.dataset.character;
-        const characterData = characterSlug ? charactersBySlug.get(characterSlug) : undefined;
-        const inlineAvatar = activeCharacterPlaceholder?.querySelector(".inline-avatar");
-        const existingVideo = inlineAvatar?.querySelector("video");
-        const paragraphIndex = playRow?.querySelector<HTMLElement>("[data-index]")?.getAttribute("data-index");
-
-        const locationForPlaceholder = { chapter: parseInt(chapterIndex, 10), paragraph: parseInt(paragraphIndex, 10) };
-
-        const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
-        const videoSrc = state === "speaks" ? snapshot?.media.talking : snapshot?.media.listening;
-
-        // Case 1: Existing video needs update or removal
-        if (existingVideo) {
-          if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
-            const videoPathname = getVideoPathname(videoSrc);
-            const existingPathname = getVideoPathname(existingVideo.src);
-
-            // VIDEO → VIDEO transition (state or source change)
-            if (existingVideo.dataset.state !== state || existingPathname !== videoPathname) {
-              const newVideo = createVideoElement(videoSrc, state as "listens" | "speaks");
-              newVideo.style.opacity = "0";
-              newVideo.style.zIndex = "1";
-              existingVideo.style.zIndex = "2";
-
-              inlineAvatar?.appendChild(newVideo);
-
-              const fallbackTimeout = setTimeout(() => {
-                newVideo.style.opacity = "1";
-              }, 3000);
-
-              const startCrossfade = () => {
-                clearTimeout(fallbackTimeout);
-                requestAnimationFrame(() => {
-                  newVideo.style.opacity = "1";
-                  existingVideo.style.opacity = "0";
-
-                  setTimeout(() => {
-                    if (existingVideo.parentElement) {
-                      existingVideo.remove();
-                    }
-                  }, 500);
-                });
-              };
-
-              // Check if already loaded (cached)
-              if (newVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-                startCrossfade();
-              } else {
-                newVideo.addEventListener("loadeddata", startCrossfade, { once: true });
-              }
-            }
-            activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
-          } else {
-            // VIDEO → IMG transition (videoSrc is not valid)
-            activeCharacterPlaceholder.dataset.isTalking = "false";
-
-            existingVideo.style.opacity = "0";
-            existingVideo.style.zIndex = "1";
-            setTimeout(() => {
-              if (existingVideo.parentElement) {
-                existingVideo.remove();
-              }
-            }, 500);
-          }
-        }
-        // Case 2: No existing video, need to add one
-        else if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
-          // IMG → VIDEO transition
-          const video = createVideoElement(videoSrc, state as "listens" | "speaks");
-          video.style.opacity = "0";
-          video.style.zIndex = "2";
-          activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
-
-          inlineAvatar?.appendChild(video);
-
-          const fallbackTimeout = setTimeout(() => {
-            video.style.opacity = "1";
-          }, 3000);
-
-          const showVideo = () => {
-            clearTimeout(fallbackTimeout);
-            requestAnimationFrame(() => {
-              video.style.opacity = "1";
-            });
-          };
-
-          // Check if already loaded (cached)
-          if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-            showVideo();
-          } else {
-            video.addEventListener("loadeddata", showVideo, { once: true });
-          }
-
-          playRow.setAttribute("data-activated-video", "true");
-        }
-      });
-    });
-
-    const activatedVideo = document.querySelectorAll<HTMLElement>("[data-activated-video='true']");
-
-    activatedVideo.forEach((rowEl) => {
-      if (rows.map(({ row }) => row).includes(rowEl)) return;
-
-      rowEl.querySelectorAll("video").forEach((video) => {
-        video.remove();
-      });
-
-      rowEl.dataset.activatedVideo = "false";
-    });
-
-    return;
+    if (!activePlayRow) {
+      activatePlayFormatMediaDebounced.cancel();
+      return;
+    }
+    activatePlayFormatMediaDebounced({ charactersBySlug });
+  } else {
+    activatePlayFormatMediaDebounced.cancel();
   }
 
   const paragraphs = document.querySelectorAll<HTMLElement>(
