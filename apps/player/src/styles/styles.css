@@ -117,8 +117,6 @@
     will-change: padding, transform; /* Optimize for animations */
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    -webkit-perspective: 1000;
-    perspective: 1000;
     transition: color var(--transition-medium) var(--transition-timing);
     /* font-size: 16px; Base content font size */
     scrollbar-width: none;
@@ -164,7 +162,6 @@
       }
 
       /* Headings */
-
       h1 {
         font-size: 2.8em;
         text-align: center;
@@ -213,6 +210,9 @@
 
       /* Paragraphs */
       p {
+        --line-height: clamp(2em, 5vw, 2.25em);
+        --padding-x: clamp(1.5rem, 4vw, 3rem);
+
         text-indent: 1.5em;
         margin-top: 0;
         margin-bottom: 1em;
@@ -222,6 +222,8 @@
         -ms-hyphens: auto;
         transition: all 0.3s ease-in-out;
         scale: 1;
+        line-height: var(--line-height);
+        padding: 0 var(--padding-x);
 
         &.talking-paragraph {
           scale: 1.025;
@@ -579,23 +581,6 @@
           z-index: 10;
           transform: scale(1.025);
         }
-
-        .inline-avatar {
-          min-width: clamp(75px, 16vw, 175px);
-          min-height: clamp(75px, 16vw, 175px);
-          border-radius: 50%;
-          display: block;
-          padding: 0;
-          margin: 0;
-          box-shadow: 0 clamp(1px, 0.5vw, 2px) clamp(2px, 1.5vw, 4px) color-mix(in srgb, var(--bg-content-light, #000000) 60%, transparent);
-          border: clamp(2px, 0.3vw, 3px) solid color-mix(in srgb, var(--bg-content-light, #ffffff) 60%, transparent);
-        }
-
-        @media (hover: hover) {
-          .inline-avatar:hover {
-            transform: scale(1.1);
-          }
-        }
       }
 
       .character-text {
@@ -617,18 +602,6 @@
         padding: 0;
       }
 
-      span.inline-avatar-wrapper > div {
-        width: clamp(4em, 8vw, 5em);
-        height: clamp(4em, 8vw, 5em);
-        margin-bottom: clamp(-4em, -8vw, -5em);
-        margin-left: clamp(-4em, -8vw, -5em);
-      }
-
-      img.inline-avatar {
-        width: clamp(60px, 12vw, 80px);
-        height: clamp(60px, 12vw, 80px);
-      }
-
       p[data-is-character="true"] > * {
         cursor: pointer;
         font-weight: bold;
@@ -638,12 +611,6 @@
         &:hover {
           text-shadow: 2px 4px 8px color-mix(in srgb, var(--text-light, rgba(0, 0, 0, 0.3)) 60%, transparent);
           transition: none;
-        }
-      }
-
-      p[data-text-alignment="left"][data-is-character="true"] {
-        img.inline-avatar {
-          margin-left: clamp(-2em, -4vw, -2.5em);
         }
       }
 
@@ -932,63 +899,9 @@
       .play-container > section > section {
         .character-avatar {
           top: 30vh;
-
-          .inline-avatar {
-            min-width: clamp(65px, 12vw, 120px);
-            min-height: clamp(65px, 12vw, 120px);
-          }
         }
       }
     }
-  }
-
-  /* Touch-friendly improvements */
-  /* Remove hover effects on touch devices */
-  @media (hover: none) and (pointer: coarse) {
-    #book-container.play-mode #content-container {
-      .play-container > section > section {
-        .character-avatar {
-          .character-placeholder:hover {
-            transform: none !important;
-
-            .inline-avatar {
-              box-shadow: 0 clamp(2px, 0.5vw, 4px) clamp(8px, 1.5vw, 12px) rgba(0, 0, 0, 0.3);
-              border-color: rgba(255, 255, 255, 0.9);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /* Accessibility - Reduce motion for users who prefer it */
-  @media (prefers-reduced-motion: reduce) {
-    #book-container.play-mode #content-container {
-      .play-container > section > section {
-        .character-avatar {
-          .inline-avatar {
-            transition: none;
-          }
-
-          .character-placeholder {
-            transition: none;
-
-            &:hover {
-              transform: none !important;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /* Add padding bottom when horizontal character strip is visible */
-  &.characters-visible #content-container {
-    padding-bottom: calc(85px + var(--safe-area-inset-bottom));
-  }
-  /* Remove extra padding when horizontal strip is hidden (but keep safe area) */
-  &.characters-hidden #content-container {
-    padding-bottom: var(--safe-area-inset-bottom);
   }
 
   /* --- Page Structure --- */
@@ -1478,10 +1391,6 @@ section[data-chapter] [data-index] {
       transform 1000ms ease-in-out;
   }
 }
-
-/* Selects the book container IF its descendant #content-container
-  has a child with the class .play-container.
-*/
 
 #book-container.play-mode {
   padding: 0;

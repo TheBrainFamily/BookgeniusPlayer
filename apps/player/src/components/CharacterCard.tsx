@@ -112,7 +112,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
         layout
         className={cn(
           "relative rounded-full aspect-square isolate overflow-hidden transition-all duration-300 ease-in-out hover:scale-110 hover:z-10",
-          !disableHighlight && isTalkingInCurrentRange && "z-10 animate-pulse-glow overflow-visible",
+          !disableHighlight && isTalkingInCurrentRange && "z-10 animate-pulse-glow overflow-visible border-2 border-white/30",
         )}
       >
         <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />

@@ -232,6 +232,14 @@
   /* Spinner */
   --spinner-bg: #f3f3f3;
   --spinner-color: #3498db;
+
+  /* Avatar borders and shadows */
+  --avatar-border-width: clamp(1px, 0.2vw, 2px);
+  --avatar-border-color: color-mix(in srgb, var(--text-light, #ddd) 60%, transparent);
+  --avatar-border-width-large: clamp(2px, 0.3vw, 3px);
+  --avatar-border-color-large: color-mix(in srgb, var(--bg-content-light, #ffffff) 60%, transparent);
+  --avatar-box-shadow: 0 clamp(1px, 0.5vw, 2px) clamp(2px, 1.5vw, 4px) color-mix(in srgb, var(--bg-content-light, #000000) 60%, transparent);
+  --floating-avatar-shadow: drop-shadow(0 2px 5px color-mix(in srgb, var(--bg-content-light, rgba(0, 0, 0, 0.3)) 30%, transparent));
 }
 
 /* Custom variant for dark mode */
