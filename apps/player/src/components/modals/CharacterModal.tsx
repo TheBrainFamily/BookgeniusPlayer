@@ -18,6 +18,7 @@ import { isVideoFile } from "@player/helpers/isVideoFile";
 import { useBottomInput } from "@player/stores/modals/bottomInput.store";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
 import { FILTER_OPTIONS } from "@player/utils/filterOptions";
+import { useElementVisibilityStore } from "@player/stores/elementVisibility.store";
 
 interface CharacterModalProps {
   onClose: () => void;
@@ -38,6 +39,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 
   const { setValue } = useBottomInput();
   const { openModal: openSearchModal, setLastClickedAppearanceId, setResults } = useSearchModal();
+  const { pauseAllTimers, showAllElements } = useElementVisibilityStore();
 
   const matchingCharacter = useMemo(() => getCharactersData().find((c) => c.slug === characterSlug), [characterSlug]);
   const latestSummary = useMemo(() => (matchingCharacter ? findLatestSummaryInRange(matchingCharacter, endChapter) : ""), [matchingCharacter, endChapter]);
@@ -99,6 +101,8 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     const searchResults = findCharacterSentences(characterSlug, furthestLocation, { mode: "chronological" });
     setResults(searchResults);
     openSearchModal(true, true, character);
+    pauseAllTimers();
+    showAllElements();
     onClose();
   };
 
