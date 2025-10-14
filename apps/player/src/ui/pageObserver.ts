@@ -177,9 +177,7 @@ export function setupPageObserver(): {
     );
   };
 
-  type ProcessIntersectionsOptions = { shouldCreateVideos?: boolean };
-
-  const processIntersections = ({ shouldCreateVideos = false }: ProcessIntersectionsOptions = {}) => {
+  const processIntersections = () => {
     const topMultiplier = 0.35; // 35vh focus zone start
     let bottomMultiplier = 0.55; // 10vh focus zone height (default)
 
@@ -382,7 +380,7 @@ export function setupPageObserver(): {
           }
         }
 
-        if (topElementChanged || bottomElementChanged || activeParagraphChanged || shouldCreateVideos) {
+        if (topElementChanged || bottomElementChanged || activeParagraphChanged) {
           // Update persisted state with the NEW DOM element references for the next comparison cycle
           currentlyActivePageElement = topFocusedPageElement;
           currentlyLastActivePageElement = bottomFocusedPageElement;
@@ -479,9 +477,9 @@ export function setupPageObserver(): {
             if (allIntersectingParagraphs.length > 0) {
               const mediaStartInfo = allIntersectingParagraphs[0];
               const mediaEndInfo = allIntersectingParagraphs[allIntersectingParagraphs.length - 1];
-              activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, isPlayFormat, shouldCreateVideos);
+              activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, isPlayFormat);
             } else {
-              activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, isPlayFormat, shouldCreateVideos);
+              activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, isPlayFormat);
             }
           } else {
             console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {
@@ -519,21 +517,13 @@ export function setupPageObserver(): {
     }
   };
 
-  const scheduledProcessIntersections = makeRafScheduler((options?: ProcessIntersectionsOptions) => {
-    processIntersections(options);
-  });
+  const scheduledProcessIntersections = makeRafScheduler(processIntersections);
 
   const handleResize = () => scheduledProcessIntersections();
   const handleOrientationChange = () => scheduledProcessIntersections();
 
   window.addEventListener("resize", handleResize);
   window.addEventListener("orientationchange", handleOrientationChange);
-
-  const SCROLL_END_DEBOUNCE_MS = 150;
-  let scrollEndTimeoutId: number | null = null;
-  // Flag toggled by the scroll-end detector so we log once from the observer callback.
-  let shouldLogAfterScrollEnd = false;
-  let lastObserverEntries: IntersectionObserverEntry[] = [];
 
   const handleIntersectionEntries = (entries: IntersectionObserverEntry[]) => {
     entries.forEach((entry) => {
@@ -544,35 +534,13 @@ export function setupPageObserver(): {
       }
     });
 
-    if (shouldLogAfterScrollEnd) {
-      scheduledProcessIntersections({ shouldCreateVideos: true });
-      shouldLogAfterScrollEnd = false;
-      return;
-    } else {
-      scheduledProcessIntersections();
-    }
+    scheduledProcessIntersections();
   };
 
   // ----------------------------------------------------------
   const observer = new IntersectionObserver((entries) => {
-    lastObserverEntries = entries;
     handleIntersectionEntries(entries);
   }, observerOptions);
-
-  const handleRootScroll = () => {
-    if (scrollEndTimeoutId !== null) {
-      window.clearTimeout(scrollEndTimeoutId);
-    }
-
-    shouldLogAfterScrollEnd = false;
-
-    scrollEndTimeoutId = window.setTimeout(() => {
-      shouldLogAfterScrollEnd = true;
-      handleIntersectionEntries(lastObserverEntries);
-    }, SCROLL_END_DEBOUNCE_MS);
-  };
-
-  rootEl.addEventListener("scroll", handleRootScroll, { passive: true });
 
   // Function to observe new paragraphs
   const observeNewParagraphs = (): number => {
@@ -777,18 +745,9 @@ export function setupPageObserver(): {
     observer.disconnect();
     window.removeEventListener("resize", handleResize);
     window.removeEventListener("orientationchange", handleOrientationChange);
-    rootEl.removeEventListener("scroll", handleRootScroll);
     window.removeEventListener("scrollIndicatorClicked", handleScrollIndicatorClicked);
 
     hideScrollIndicator();
-
-    if (scrollEndTimeoutId !== null) {
-      window.clearTimeout(scrollEndTimeoutId);
-      scrollEndTimeoutId = null;
-    }
-
-    shouldLogAfterScrollEnd = false;
-    lastObserverEntries = [];
 
     if (DEV_ZONE_VISUALIZERS_ENABLED) {
       hideVisualizer(activeElementVisualizer);

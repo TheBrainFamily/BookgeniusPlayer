@@ -160,10 +160,10 @@ function getVideoPathname(src: string): string {
 }
 
 /** Manages media loading and playback for paragraphs within the visible range **/
-export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean, shouldCreateVideos: boolean) {
+export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean) {
   const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
 
-  if (shouldCreateVideos && isPlayFormat && !isMobile()) {
+  if (isPlayFormat && !isMobile()) {
     const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
     const activePlayRow = activeParagraph?.closest(".play-row");
 
@@ -223,8 +223,6 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
 
       rowEl.dataset.activatedVideo = "false";
     });
-
-    return;
   }
 
   const paragraphs = document.querySelectorAll<HTMLElement>(
