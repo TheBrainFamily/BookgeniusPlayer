@@ -1,3 +1,4 @@
+import debounce from "lodash.debounce";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
@@ -159,6 +160,77 @@ function getVideoPathname(src: string): string {
   }
 }
 
+const INLINE_MEDIA_DEBOUNCE_MS = 500;
+
+type PlayFormatMediaActivationPayload = { charactersBySlug: Map<string, CharacterData> };
+
+const runPlayFormatMediaActivation = ({ charactersBySlug }: PlayFormatMediaActivationPayload) => {
+  const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
+  const activePlayRow = activeParagraph?.closest(".play-row");
+
+  if (!activePlayRow) {
+    return;
+  }
+
+  const chapterElement = activePlayRow.closest<HTMLElement>("[data-chapter]");
+  const chapterIndex = chapterElement?.dataset.chapter ?? "";
+
+  const rows = getActiveWithSiblingsSkippingDidaskalia(activePlayRow);
+
+  rows.forEach(({ row: playRow, state }: { row: Element; state: "speaks" | "listens" }) => {
+    const characterPlaceholders = playRow?.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+
+    characterPlaceholders.forEach((activeCharacterPlaceholder) => {
+      const characterSlug = activeCharacterPlaceholder?.dataset.character;
+      const characterData = characterSlug ? charactersBySlug.get(characterSlug) : undefined;
+      const inlineAvatar = activeCharacterPlaceholder?.querySelector(".inline-avatar");
+      const existingVideo = inlineAvatar?.querySelector("video");
+      const paragraphIndex = playRow?.querySelector<HTMLElement>("[data-index]")?.getAttribute("data-index");
+
+      const locationForPlaceholder = { chapter: parseInt(chapterIndex, 10), paragraph: parseInt(paragraphIndex ?? "", 10) };
+
+      const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
+      const videoSrc = state === "speaks" ? snapshot?.media.talking : snapshot?.media.listening;
+
+      if (existingVideo) {
+        if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
+          const videoPathname = getVideoPathname(videoSrc);
+          const existingPathname = getVideoPathname(existingVideo.src);
+
+          if (existingVideo.dataset.state !== state || existingPathname !== videoPathname) {
+            existingVideo.src = videoSrc;
+            existingVideo.dataset.state = state;
+          }
+          activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
+        } else {
+          activeCharacterPlaceholder.dataset.isTalking = "false";
+          existingVideo.remove();
+        }
+      } else if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
+        const video = createVideoElement(videoSrc, state as "listens" | "speaks");
+        activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
+        inlineAvatar?.appendChild(video);
+        playRow.setAttribute("data-activated-video", "true");
+      }
+    });
+  });
+
+  const activatedVideo = document.querySelectorAll<HTMLElement>("[data-activated-video='true']");
+  const activeRows = rows.map(({ row }) => row);
+
+  activatedVideo.forEach((rowEl) => {
+    if (activeRows.includes(rowEl)) return;
+
+    rowEl.querySelectorAll("video").forEach((video) => {
+      video.remove();
+    });
+
+    rowEl.dataset.activatedVideo = "false";
+  });
+};
+
+const activatePlayFormatMediaDebounced = debounce(runPlayFormatMediaActivation, INLINE_MEDIA_DEBOUNCE_MS, { leading: true, trailing: true, maxWait: 500 });
+
 /** Manages media loading and playback for paragraphs within the visible range **/
 export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean) {
   const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
@@ -167,62 +239,13 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
     const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
     const activePlayRow = activeParagraph?.closest(".play-row");
 
-    if (!activePlayRow) return;
-
-    const chapterElement = activePlayRow?.closest<HTMLElement>("[data-chapter]");
-    const chapterIndex = chapterElement?.dataset.chapter;
-
-    const rows = getActiveWithSiblingsSkippingDidaskalia(activePlayRow);
-
-    rows.forEach(({ row: playRow, state }: { row: Element; state: "speaks" | "listens" }) => {
-      const characterPlaceholders = playRow?.querySelectorAll<HTMLSpanElement>(".character-placeholder");
-
-      characterPlaceholders.forEach((activeCharacterPlaceholder) => {
-        const characterSlug = activeCharacterPlaceholder?.dataset.character;
-        const characterData = characterSlug ? charactersBySlug.get(characterSlug) : undefined;
-        const inlineAvatar = activeCharacterPlaceholder?.querySelector(".inline-avatar");
-        const existingVideo = inlineAvatar?.querySelector("video");
-        const paragraphIndex = playRow?.querySelector<HTMLElement>("[data-index]")?.getAttribute("data-index");
-
-        const locationForPlaceholder = { chapter: parseInt(chapterIndex, 10), paragraph: parseInt(paragraphIndex, 10) };
-
-        const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
-        const videoSrc = state === "speaks" ? snapshot?.media.talking : snapshot?.media.listening;
-
-        if (existingVideo) {
-          if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
-            const videoPathname = getVideoPathname(videoSrc);
-            const existingPathname = getVideoPathname(existingVideo.src);
-
-            if (existingVideo.dataset.state !== state || existingPathname !== videoPathname) {
-              existingVideo.src = videoSrc;
-              existingVideo.dataset.state = state;
-            }
-            activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
-          } else {
-            activeCharacterPlaceholder.dataset.isTalking = "false";
-            existingVideo.remove();
-          }
-        } else if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
-          const video = createVideoElement(videoSrc, state as "listens" | "speaks");
-          activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
-          inlineAvatar?.appendChild(video);
-          playRow.setAttribute("data-activated-video", "true");
-        }
-      });
-    });
-
-    const activatedVideo = document.querySelectorAll<HTMLElement>("[data-activated-video='true']");
-
-    activatedVideo.forEach((rowEl) => {
-      if (rows.map(({ row }) => row).includes(rowEl)) return;
-
-      rowEl.querySelectorAll("video").forEach((video) => {
-        video.remove();
-      });
-
-      rowEl.dataset.activatedVideo = "false";
-    });
+    if (!activePlayRow) {
+      activatePlayFormatMediaDebounced.cancel();
+      return;
+    }
+    activatePlayFormatMediaDebounced({ charactersBySlug });
+  } else {
+    activatePlayFormatMediaDebounced.cancel();
   }
 
   const paragraphs = document.querySelectorAll<HTMLElement>(
