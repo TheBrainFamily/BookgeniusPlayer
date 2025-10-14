@@ -92,7 +92,6 @@ const WrappedPlayerApp = () => {
   }, []);
 
   useEffect(() => {
-    return;
     if (showPaywall) {
       setPaywallMounted(true); // mount host
       setPaywallVisible(false); // start at 0
