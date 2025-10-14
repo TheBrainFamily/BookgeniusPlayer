@@ -5,6 +5,7 @@ import { getBookData } from "@player/genericBookDataGetters/getBookData";
 export const ContentShiftWrapper: React.FC = () => {
   const { isContentShiftedLeft } = useContentShift();
   const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const [isMediumScreen, setIsMediumScreen] = useState(false);
   const wasShiftedRef = useRef(false);
 
   const bookData = getBookData();
@@ -13,6 +14,7 @@ export const ContentShiftWrapper: React.FC = () => {
   useEffect(() => {
     const checkScreenSize = () => {
       setIsLargeScreen(window.innerWidth >= 1280 && window.innerWidth <= 2000);
+      setIsMediumScreen(window.innerWidth >= 1024 && window.innerWidth < 1280);
     };
 
     checkScreenSize();
@@ -75,6 +77,38 @@ export const ContentShiftWrapper: React.FC = () => {
           setFullSize();
         }
       }
+    } else if (isMediumScreen) {
+      // bookContainer.style.width = "66%";
+
+      const leftNotesBlank = document.getElementById("left-notes-blank");
+      const leftNotest = document.getElementById("left-notes");
+
+      if (isContentShiftedLeft) {
+        // Entering shifted state: size first, then transform to avoid jumps
+        // setCompactSize();
+        bookContainer.style.width = "66%";
+        bookContainer.style.maxWidth = "calc(120rem * 0.8)";
+        bookContainer.style.marginInline = "unset";
+        bookContainer.style.paddingLeft = "4px";
+
+        if (leftNotesBlank) {
+          leftNotesBlank.style.display = "none";
+        }
+
+        if (leftNotest) {
+          leftNotest.style.display = "none";
+        }
+
+        // bookContainer.style.transform = `translateX(${shiftAmount})`;
+      } else {
+        if (leftNotesBlank) {
+          leftNotesBlank.style.display = "block";
+        }
+
+        if (leftNotest) {
+          leftNotest.style.display = "block";
+        }
+      }
     } else {
       // Small screens: never shift
       bookContainer.style.transform = "translateX(0)";
@@ -92,7 +126,7 @@ export const ContentShiftWrapper: React.FC = () => {
     };
 
     // Track previous shifted state for sequencing logic
-  }, [isContentShiftedLeft, isLargeScreen, isPlayFormat]);
+  }, [isContentShiftedLeft, isLargeScreen, isPlayFormat, isMediumScreen]);
 
   useEffect(() => {
     wasShiftedRef.current = isContentShiftedLeft;

@@ -42,7 +42,14 @@ const getModalSizeConfig = (layoutView: boolean, size: NonNullable<ModalUIProps[
   return layoutView ? LAYOUT_VIEW_SIZE : MODAL_SIZES[size];
 };
 
-const getModalContentClasses = (isTransparent: boolean, layoutView: boolean, className: string, isContentShifted: boolean, isLargeScreen: boolean): string => {
+const getModalContentClasses = (
+  isTransparent: boolean,
+  layoutView: boolean,
+  className: string,
+  isContentShifted: boolean,
+  isLargeScreen: boolean,
+  isMediumScreen: boolean,
+): string => {
   return cn(
     // Base classes
     "rounded-lg overflow-hidden w-full flex flex-col align-center justify-center h-fit pointer-events-auto",
@@ -55,6 +62,7 @@ const getModalContentClasses = (isTransparent: boolean, layoutView: boolean, cla
       "overflow-hidden max-h-[70vh]",
       // On large screens with content shifted, use narrower width; otherwise use full width
       isLargeScreen && isContentShifted ? "w-[26vw]" : "max-w-[700px]",
+      isMediumScreen && isContentShifted ? "w-[33%]" : "max-w-[700px]",
       // Only apply flex layout on large screens without content shift
       !isContentShifted && "xl:flex-1 xl:max-w-[700px] xl:order-3",
     ],
@@ -88,12 +96,13 @@ const ModalUI: React.FC<ModalUIProps> = ({
   searchActions,
 }) => {
   const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const [isMediumScreen, setIsMediumScreen] = useState(false);
   const [justOpened, setJustOpened] = useState(true);
 
   const { isContentShiftedLeft } = useContentShift();
   const isTransparent = isTransparentModal(transparent, className);
   const sizeConfig = getModalSizeConfig(layoutView, size);
-  const modalContentClasses = getModalContentClasses(isTransparent, layoutView, className, isContentShiftedLeft, isLargeScreen);
+  const modalContentClasses = getModalContentClasses(isTransparent, layoutView, className, isContentShiftedLeft, isLargeScreen, isMediumScreen);
   const titleTextClasses = getTitleClasses(isTransparent);
   const closeButtonClasses = getCloseButtonClasses(isTransparent);
 
@@ -130,6 +139,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
   useEffect(() => {
     const checkScreenSize = () => {
       setIsLargeScreen(window.innerWidth >= 1280);
+      setIsMediumScreen(window.innerWidth >= 1024 && window.innerWidth < 1280);
     };
 
     checkScreenSize();
@@ -165,7 +175,9 @@ const ModalUI: React.FC<ModalUIProps> = ({
             "flex flex-row gap-2 items-center h-full",
             sizeConfig.container,
             // Position modal in the right space when content is shifted left on large screens
-            shouldShiftContent && layoutView ? "justify-end pr-[3%] ml-auto mr-0" : "justify-center mx-auto px-4",
+            isContentShiftedLeft && (isLargeScreen || isMediumScreen) && layoutView ? "justify-end ml-auto mr-0" : "justify-center mx-auto px-4",
+            isContentShiftedLeft && layoutView && isLargeScreen && "pr-[3%]",
+            isContentShiftedLeft && layoutView && isMediumScreen && "pr-[1%]",
           )}
         >
           {layoutView && !shouldShiftContent && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none xl:flex xl:flex-1 xl:order-1" />}
