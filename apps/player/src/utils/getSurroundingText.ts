@@ -1,10 +1,19 @@
 import type { Location } from "@player/state/LocationContext";
 import { useBookContentStore } from "@player/stores/bookContent.store";
 import { textCacheManager } from "@player/logic/TextCacheManager";
+import { bookDataLoader } from "@player/services/bookDataLoader";
 
-export function getSurroundingText(location: Location): string {
+export function getSurroundingText(location: Location, expand: boolean = false): string {
   const { earliestVisibleParagraph, latestVisibleParagraph, earliestVisibleChapter, latestVisibleChapter } = location;
 
+  let earliestParagraphToConsider = earliestVisibleParagraph;
+  if (expand) {
+    if (bookDataLoader.getCurrentBook() === "play") {
+      earliestParagraphToConsider = earliestVisibleParagraph - 30;
+    } else {
+      earliestParagraphToConsider = earliestVisibleParagraph - 2;
+    }
+  }
   console.log("getting surrounding text for location", location);
   // Ensure cache is populated up to the end location
   textCacheManager.ensureCacheUpto(latestVisibleChapter, latestVisibleParagraph);
@@ -26,11 +35,11 @@ export function getSurroundingText(location: Location): string {
 
     if (chapterId === earliestVisibleChapter && chapterId === latestVisibleChapter) {
       // Same chapter: use the exact paragraph range
-      startPara = earliestVisibleParagraph;
+      startPara = earliestParagraphToConsider;
       endPara = latestVisibleParagraph;
     } else if (chapterId === earliestVisibleChapter) {
       // First chapter: start from the specified paragraph to the end
-      startPara = earliestVisibleParagraph;
+      startPara = earliestParagraphToConsider;
       endPara = Math.max(...Object.keys(chapterCache).map(Number));
     } else if (chapterId === latestVisibleChapter) {
       // Last chapter: from beginning to the specified end paragraph
