@@ -160,7 +160,7 @@ function getVideoPathname(src: string): string {
   }
 }
 
-const INLINE_MEDIA_DEBOUNCE_MS = 500;
+const INLINE_MEDIA_DEBOUNCE_MS = 100;
 
 type PlayFormatMediaActivationPayload = { charactersBySlug: Map<string, CharacterData> };
 
