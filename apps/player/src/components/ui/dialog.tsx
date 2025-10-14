@@ -33,6 +33,7 @@ function DialogOverlay({
       <AnimatePresence>
         {!hideOverlay && (
           <motion.div
+            data-slot="dialog-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

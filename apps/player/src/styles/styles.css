@@ -133,6 +133,7 @@
       line-height: 1.6;
       color: var(--text-light);
 
+      --gradient-opacity: 1;
       background: linear-gradient(
         to bottom,
         rgb(from var(--bg-content-light) r g b / 0) 0%,
@@ -786,10 +787,10 @@
       background: linear-gradient(
         to bottom,
         rgb(from var(--bg-content-light) r g b / 0) 0%,
-        rgb(from var(--bg-content-light) r g b / calc(0.6 * var(--gradient-opacity))) 35%,
-        rgb(from var(--bg-content-light) r g b / calc(0.7 * var(--gradient-opacity))) 45%,
-        rgb(from var(--bg-content-light) r g b / calc(0.7 * var(--gradient-opacity))) 55%,
-        rgb(from var(--bg-content-light) r g b / calc(0.6 * var(--gradient-opacity))) 65%,
+        rgb(from var(--bg-content-light) r g b / calc(0.5 * var(--gradient-opacity))) 35%,
+        rgb(from var(--bg-content-light) r g b / calc(0.6 * var(--gradient-opacity))) 45%,
+        rgb(from var(--bg-content-light) r g b / calc(0.6 * var(--gradient-opacity))) 55%,
+        rgb(from var(--bg-content-light) r g b / calc(0.5 * var(--gradient-opacity))) 65%,
         rgb(from var(--bg-content-light) r g b / 0) 100%
       );
     }

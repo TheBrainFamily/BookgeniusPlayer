@@ -292,15 +292,12 @@
 @keyframes searchHighlightFade {
   0% {
     background-color: var(--highlight-blink-color);
-    box-shadow: 0 0 4px rgba(255, 255, 0, 0.5);
-  }
-  50% {
-    background-color: var(--highlight-blink-color);
-    box-shadow: 0 0 8px rgba(255, 255, 0, 0.5);
+    box-shadow: 0 0 8px var(--highlight-blink-color);
   }
   100% {
     background-color: transparent;
     box-shadow: none;
+    color: inherit;
   }
 }
 
@@ -334,9 +331,10 @@
 
   #player-scope .search-highlight {
     background-color: var(--highlight-blink-color);
-    color: #000;
-    box-shadow: 0 0 4px rgba(255, 255, 0, 0.5);
-    animation: searchHighlightFade 4s ease-in-out forwards;
+    color: var(--text-light);
+    box-shadow: 0 0 8px var(--highlight-blink-color);
+    border-radius: 3px;
+    animation: searchHighlightFade 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
   /* Gradients */

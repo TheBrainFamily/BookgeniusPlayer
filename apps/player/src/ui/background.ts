@@ -72,8 +72,6 @@ function getColorLuminance(hex: string): number {
 }
 
 function isDarkColor(hex: string, threshold: number = 0.5): boolean {
-  console.log("STOJANISKO", { hex, luminance: getColorLuminance(hex), isDark: getColorLuminance(hex) < threshold });
-
   return getColorLuminance(hex) < threshold;
 }
 

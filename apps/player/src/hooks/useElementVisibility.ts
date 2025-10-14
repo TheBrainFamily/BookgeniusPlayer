@@ -26,7 +26,8 @@ const INTERACTIVE_SELECTORS = [
   "[data-character]",
   ".character-placeholder",
   ".character-highlighted",
-  ".dialog-overlay",
+  `[data-slot="dialog-overlay"]`,
+  `[data-slot="dialog-content"]`,
   ".opened-modal",
 ];
 

@@ -24,9 +24,10 @@ interface SearchModalProps {
   hideOverlay?: boolean;
   searchResults: SearchResultsData;
   clickedAppearanceId?: string;
+  searchQuery?: string;
 }
 
-export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults, clickedAppearanceId }) => {
+export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults, clickedAppearanceId, searchQuery }) => {
   const { t } = useTranslation();
 
   const deferredResults = useDeferredValue(searchResults);
@@ -296,7 +297,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
                 <div className="space-y-3">
                   <Accordion id="search-modal-accordion" type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
                     {sortedChapterEntries.map(([chapter, items]) => (
-                      <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} clickedAppearanceId={clickedAppearanceId} />
+                      <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} clickedAppearanceId={clickedAppearanceId} searchQuery={searchQuery} />
                     ))}
                   </Accordion>
                 </div>
@@ -322,11 +323,13 @@ const ChapterGroup = memo(function ChapterGroup({
   items,
   t,
   clickedAppearanceId,
+  searchQuery,
 }: {
   chapter: number;
   items: SearchResultItemData[];
   t: TFunction;
   clickedAppearanceId?: string;
+  searchQuery?: string;
 }) {
   const chapterTitle = useMemo(
     () => (
@@ -348,7 +351,7 @@ const ChapterGroup = memo(function ChapterGroup({
       <AccordionContent className="px-0 pb-0">
         <div className="space-y-2 py-2 px-1">
           {items.map((item) => (
-            <ResultCard key={item.id} item={item} clickedAppearanceId={clickedAppearanceId} />
+            <ResultCard key={item.id} item={item} clickedAppearanceId={clickedAppearanceId} searchQuery={searchQuery} />
           ))}
         </div>
       </AccordionContent>
@@ -356,7 +359,7 @@ const ChapterGroup = memo(function ChapterGroup({
   );
 });
 
-const ResultCard = memo(function ResultCard({ item, clickedAppearanceId }: { item: SearchResultItemData; clickedAppearanceId?: string }) {
+const ResultCard = memo(function ResultCard({ item, clickedAppearanceId, searchQuery }: { item: SearchResultItemData; clickedAppearanceId?: string; searchQuery?: string }) {
   const { t } = useTranslation();
   const cardRef = useRef<HTMLDivElement>(null);
   const [isPulsing, setIsPulsing] = useState(false);
@@ -379,19 +382,17 @@ const ResultCard = memo(function ResultCard({ item, clickedAppearanceId }: { ite
   }, [clickedAppearanceId, item.id]);
 
   const handleSearchResultClick = useCallback(async () => {
-    //TODO: fix this to get the value directly from bottom input hook or something
-    const inputEl = document.getElementById("bottom-input") as HTMLInputElement | null;
-    const query = inputEl?.value ?? "";
+    const parsedSearchQuery = searchQuery.replace("@", "");
 
     try {
       // Ensure the chapter window is mounted before attempting to scroll
       await ensureChapterWindow(item.chapter);
       await goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "instant" });
-      highlightSearchInParagraph(item.chapter, item.paragraphNumber, query);
+      highlightSearchInParagraph(item.chapter, item.paragraphNumber, parsedSearchQuery);
     } catch (error) {
       console.warn("Failed to scroll to search result:", error);
     }
-  }, [item.chapter, item.paragraphNumber]);
+  }, [item.chapter, item.paragraphNumber, searchQuery]);
 
   const animationStyle = isPulsing ? { animation: "pulse-appearance 1.8s ease-out" } : undefined;
 

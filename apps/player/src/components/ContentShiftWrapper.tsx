@@ -2,9 +2,23 @@ import React, { useEffect, useRef, useState } from "react";
 import { useContentShift } from "@player/stores/contentShift.store";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 
+// Helper to toggle notes visibility
+const setNotesVisibility = (visible: boolean) => {
+  const leftNotesBlank = document.getElementById("left-notes-blank");
+  const leftNotes = document.getElementById("left-notes");
+
+  const displayValue = visible ? "" : "none";
+
+  if (leftNotesBlank) leftNotesBlank.style.display = displayValue;
+  if (leftNotes) leftNotes.style.display = displayValue;
+};
+
 export const ContentShiftWrapper: React.FC = () => {
   const { isContentShiftedLeft } = useContentShift();
+
   const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const [isMediumScreen, setIsMediumScreen] = useState(false);
+
   const wasShiftedRef = useRef(false);
 
   const bookData = getBookData();
@@ -12,7 +26,8 @@ export const ContentShiftWrapper: React.FC = () => {
 
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsLargeScreen(window.innerWidth >= 1280 && window.innerWidth <= 2000);
+      setIsLargeScreen(window.innerWidth >= 1280);
+      setIsMediumScreen(window.innerWidth >= 1024 && window.innerWidth < 1280);
     };
 
     checkScreenSize();
@@ -35,69 +50,101 @@ export const ContentShiftWrapper: React.FC = () => {
         .find((t) => t.trim().startsWith("opacity"))
         ?.trim() || "opacity 1000ms ease-in-out";
 
-    // Preserve opacity transition and add transform transition
-    bookContainer.style.transition = `${opacityTransition}, transform 0.3s ease-out`;
-    bookContainer.style.willChange = "transform";
+    // Preserve opacity transition and add transform and width transitions
+    bookContainer.style.transition = `${opacityTransition}, transform 0.3s ease-out, width 0.3s ease-out, max-width 0.3s ease-out`;
+    bookContainer.style.willChange = "transform, width";
 
-    // Only apply content shift on large screens (≥1280px)
     const shiftAmount = isPlayFormat ? "-18%" : "-13%";
+
     const setCompactSize = () => {
       bookContainer.style.width = "80%";
       bookContainer.style.maxWidth = "calc(120rem * 0.8)";
     };
+
     const setFullSize = () => {
       bookContainer.style.width = "100%";
       bookContainer.style.maxWidth = "120rem";
     };
 
+    const resetMarginAndPadding = () => {
+      bookContainer.style.marginInline = "";
+      bookContainer.style.paddingLeft = "";
+    };
+
     const handleTransitionEnd = (e: TransitionEvent) => {
-      if (e.propertyName === "transform") {
-        // After transform finishes, restore full size to avoid percentage re-evaluation jumps
-        setFullSize();
-        bookContainer.removeEventListener("transitionend", handleTransitionEnd as EventListener);
+      if (e.propertyName !== "transform") return;
+
+      setFullSize();
+      bookContainer.removeEventListener("transitionend", handleTransitionEnd as EventListener);
+    };
+
+    const applyLargeScreenLayout = () => {
+      resetMarginAndPadding();
+
+      if (isContentShiftedLeft) {
+        setCompactSize();
+        bookContainer.style.transform = `translateX(${shiftAmount})`;
+        setNotesVisibility(true);
+      } else {
+        bookContainer.style.transform = "translateX(0)";
+
+        if (wasShiftedRef.current) {
+          bookContainer.addEventListener("transitionend", handleTransitionEnd as EventListener);
+          setCompactSize();
+        } else {
+          setFullSize();
+        }
+
+        setNotesVisibility(true);
       }
     };
 
-    if (isLargeScreen) {
+    const applyMediumScreenLayout = () => {
+      bookContainer.style.transform = "translateX(0)";
+
       if (isContentShiftedLeft) {
-        // Entering shifted state: size first, then transform to avoid jumps
-        setCompactSize();
-        bookContainer.style.transform = `translateX(${shiftAmount})`;
+        bookContainer.style.width = "66%";
+        bookContainer.style.maxWidth = "calc(120rem * 0.66)";
+        bookContainer.style.marginInline = "unset";
+        bookContainer.style.paddingLeft = "4px";
+        setNotesVisibility(false);
       } else {
-        // Leaving shifted state: keep compact size while transform animates back to 0
-        if (wasShiftedRef.current) {
-          setCompactSize();
-          bookContainer.addEventListener("transitionend", handleTransitionEnd as EventListener);
-          bookContainer.style.transform = "translateX(0)";
-        } else {
-          // Not previously shifted, ensure full size and no transform
-          bookContainer.style.transform = "translateX(0)";
-          setFullSize();
-        }
+        setFullSize();
+        resetMarginAndPadding();
+        setNotesVisibility(true);
       }
-    } else {
-      // Small screens: never shift
+    };
+
+    const applySmallScreenLayout = () => {
       bookContainer.style.transform = "translateX(0)";
       setFullSize();
+      resetMarginAndPadding();
+      setNotesVisibility(true);
+    };
+
+    // Apply layout based on screen size
+    if (isLargeScreen) {
+      applyLargeScreenLayout();
+    } else if (isMediumScreen) {
+      applyMediumScreenLayout();
+    } else {
+      applySmallScreenLayout();
     }
 
-    // Cleanup function to reset on unmount
+    // Cleanup function to reset styles on unmount
     return () => {
-      bookContainer.style.transition = "";
       bookContainer.style.transform = "";
       bookContainer.style.width = "";
       bookContainer.style.maxWidth = "";
-      bookContainer.style.willChange = "";
+      bookContainer.style.marginInline = "";
+      bookContainer.style.paddingLeft = "";
       bookContainer.removeEventListener("transitionend", handleTransitionEnd);
     };
-
-    // Track previous shifted state for sequencing logic
-  }, [isContentShiftedLeft, isLargeScreen, isPlayFormat]);
+  }, [isContentShiftedLeft, isLargeScreen, isPlayFormat, isMediumScreen]);
 
   useEffect(() => {
     wasShiftedRef.current = isContentShiftedLeft;
   }, [isContentShiftedLeft]);
 
-  // This component doesn't render anything visible
   return null;
 };
