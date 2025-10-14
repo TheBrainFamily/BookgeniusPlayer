@@ -40,7 +40,16 @@ const Footer = () => {
   const shouldShiftFooterLargeScreen = isContentShiftedLeft && isLargeScreen;
   const shouldShiftFooterMediumScreen = isContentShiftedLeft && isMediumScreen;
 
-  const footerShiftClass = bookForm === "play" || bookForm === "mixed" ? "-translate-x-[14.5%]" : "-translate-x-[17.5%]";
+  const getFooterWidthClasses = () => {
+    if (shouldShiftFooterLargeScreen) {
+      return "w-[80%] max-w-[calc(120rem*0.8)] left-0";
+    } else if (shouldShiftFooterMediumScreen) {
+      return "w-[66%] max-w-[calc(120rem*0.8)] left-0";
+    }
+
+    return "w-full max-w-[120rem] inset-x-0";
+  };
+
   return (
     <AnimatePresence>
       {isSplashHidden && (
@@ -49,23 +58,15 @@ const Footer = () => {
           initial="hidden"
           animate="visible"
           className={cn(
-            "fixed bottom-0 inset-x-0 z-40 flex flex-row gap-2 justify-center mx-auto max-w-[120rem] w-full pointer-events-none",
+            "fixed bottom-0 z-40 flex flex-row gap-2 justify-center mx-auto pointer-events-none",
             "px-2 lg:px-4 pb-4",
-            // Always apply transition, but only apply transform when shifting
             "transition-transform duration-300",
-            shouldShiftFooterLargeScreen || shouldShiftFooterMediumScreen ? `transform ${footerShiftClass}` : "",
+            getFooterWidthClasses(),
           )}
         >
           {bookForm === "play" || bookForm === "mixed" ? (
             <>
-              <div
-                className={cn(
-                  "w-full sm:flex-3 px-0 flex flex-col sm:px-3 xl:px-2 space-y-3 items-center pointer-events-auto",
-                  // Adjust width when footer is shifted to avoid modal overlap
-                  shouldShiftFooterLargeScreen && "max-w-[70vw]",
-                  shouldShiftFooterMediumScreen && "max-w-[67%] -translate-x-[4%]",
-                )}
-              >
+              <div className={cn("w-full sm:flex-3 px-0 flex flex-col sm:px-3 xl:px-2 space-y-3 items-center pointer-events-auto")}>
                 <CharactersOnStagePanel />
                 <BottomInput className={cn("max-w-[800px]")} />
               </div>
@@ -73,13 +74,7 @@ const Footer = () => {
           ) : (
             <>
               <div id="left-notes-blank" className="hidden sm:block sm:flex-1 max-w-[700px]" />
-              <div
-                className={cn(
-                  "w-full sm:flex-3 max-w-[900px] flex flex-col sm:pl-4 pointer-events-auto",
-                  shouldShiftFooterLargeScreen && "max-w-[70vw]",
-                  shouldShiftFooterMediumScreen && "max-w-[67%]",
-                )}
-              >
+              <div className={cn("w-full sm:flex-3 max-w-[900px] flex flex-col pointer-events-auto", !shouldShiftFooterLargeScreen && !shouldShiftFooterMediumScreen && "sm:pl-4")}>
                 <BottomInput />
               </div>
               {!isRightNotesBlankHidden && <div id="right-notes-blank" className="hidden xl:block xl:flex-1 max-w-[700px]" />}
