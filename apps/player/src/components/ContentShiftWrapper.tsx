@@ -13,7 +13,7 @@ export const ContentShiftWrapper: React.FC = () => {
 
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsLargeScreen(window.innerWidth >= 1280 && window.innerWidth <= 2000);
+      setIsLargeScreen(window.innerWidth >= 1280);
       setIsMediumScreen(window.innerWidth >= 1024 && window.innerWidth < 1280);
     };
 
@@ -37,9 +37,9 @@ export const ContentShiftWrapper: React.FC = () => {
         .find((t) => t.trim().startsWith("opacity"))
         ?.trim() || "opacity 1000ms ease-in-out";
 
-    // Preserve opacity transition and add transform transition
-    bookContainer.style.transition = `${opacityTransition}, transform 0.3s ease-out`;
-    bookContainer.style.willChange = "transform";
+    // Preserve opacity transition and add transform and width transitions
+    bookContainer.style.transition = `${opacityTransition}, transform 0.3s ease-out, width 0.3s ease-out, max-width 0.3s ease-out`;
+    bookContainer.style.willChange = "transform, width";
 
     // Only apply content shift on large screens (≥1280px)
     const shiftAmount = isPlayFormat ? "-18%" : "-13%";
@@ -51,6 +51,10 @@ export const ContentShiftWrapper: React.FC = () => {
       bookContainer.style.width = "100%";
       bookContainer.style.maxWidth = "120rem";
     };
+    const resetMarginAndPadding = () => {
+      bookContainer.style.marginInline = "";
+      bookContainer.style.paddingLeft = "";
+    };
 
     const handleTransitionEnd = (e: TransitionEvent) => {
       if (e.propertyName === "transform") {
@@ -60,34 +64,52 @@ export const ContentShiftWrapper: React.FC = () => {
       }
     };
 
+    const leftNotesBlank = document.getElementById("left-notes-blank");
+    const leftNotes = document.getElementById("left-notes");
+
     if (isLargeScreen) {
+      resetMarginAndPadding();
+
       if (isContentShiftedLeft) {
-        // Entering shifted state: size first, then transform to avoid jumps
+        // Entering shifted state: resize and shift content left
         setCompactSize();
         bookContainer.style.transform = `translateX(${shiftAmount})`;
+
+        if (leftNotesBlank) {
+          leftNotesBlank.style.display = "block";
+        }
+
+        if (leftNotes) {
+          leftNotes.style.display = "block";
+        }
       } else {
-        // Leaving shifted state: keep compact size while transform animates back to 0
+        // Leaving shifted state: animate back to center and restore full size
+        bookContainer.style.transform = "translateX(0)";
+
         if (wasShiftedRef.current) {
-          setCompactSize();
+          // If was shifted, wait for animation to complete before resizing
           bookContainer.addEventListener("transitionend", handleTransitionEnd as EventListener);
-          bookContainer.style.transform = "translateX(0)";
+          setCompactSize();
         } else {
-          // Not previously shifted, ensure full size and no transform
-          bookContainer.style.transform = "translateX(0)";
+          // Not previously shifted, just ensure full size
           setFullSize();
+        }
+
+        if (leftNotesBlank) {
+          leftNotesBlank.style.display = "block";
+        }
+
+        if (leftNotes) {
+          leftNotes.style.display = "block";
         }
       }
     } else if (isMediumScreen) {
-      // bookContainer.style.width = "66%";
-
-      const leftNotesBlank = document.getElementById("left-notes-blank");
-      const leftNotest = document.getElementById("left-notes");
+      bookContainer.style.transform = "translateX(0)";
 
       if (isContentShiftedLeft) {
-        // Entering shifted state: size first, then transform to avoid jumps
-        // setCompactSize();
+        // Entering shifted state: resize container for medium screens
         bookContainer.style.width = "66%";
-        bookContainer.style.maxWidth = "calc(120rem * 0.8)";
+        bookContainer.style.maxWidth = "calc(120rem * 0.66)";
         bookContainer.style.marginInline = "unset";
         bookContainer.style.paddingLeft = "4px";
 
@@ -95,37 +117,46 @@ export const ContentShiftWrapper: React.FC = () => {
           leftNotesBlank.style.display = "none";
         }
 
-        if (leftNotest) {
-          leftNotest.style.display = "none";
+        if (leftNotes) {
+          leftNotes.style.display = "none";
         }
-
-        // bookContainer.style.transform = `translateX(${shiftAmount})`;
       } else {
+        // Leaving shifted state: restore full size
+        setFullSize();
+        resetMarginAndPadding();
+
         if (leftNotesBlank) {
           leftNotesBlank.style.display = "block";
         }
 
-        if (leftNotest) {
-          leftNotest.style.display = "block";
+        if (leftNotes) {
+          leftNotes.style.display = "block";
         }
       }
     } else {
-      // Small screens: never shift
+      // Small screens: never shift, always full size
       bookContainer.style.transform = "translateX(0)";
       setFullSize();
+      resetMarginAndPadding();
+
+      if (leftNotesBlank) {
+        leftNotesBlank.style.display = "block";
+      }
+
+      if (leftNotes) {
+        leftNotes.style.display = "block";
+      }
     }
 
-    // Cleanup function to reset on unmount
+    // Cleanup function to reset styles on unmount
     return () => {
-      bookContainer.style.transition = "";
       bookContainer.style.transform = "";
       bookContainer.style.width = "";
       bookContainer.style.maxWidth = "";
-      bookContainer.style.willChange = "";
+      bookContainer.style.marginInline = "";
+      bookContainer.style.paddingLeft = "";
       bookContainer.removeEventListener("transitionend", handleTransitionEnd);
     };
-
-    // Track previous shifted state for sequencing logic
   }, [isContentShiftedLeft, isLargeScreen, isPlayFormat, isMediumScreen]);
 
   useEffect(() => {
