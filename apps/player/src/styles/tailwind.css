@@ -291,8 +291,8 @@
 
 @keyframes searchHighlightFade {
   0% {
-    background-color: color-mix(in srgb, var(--text-light) 35%, var(--bg-content-light));
-    box-shadow: 0 0 8px color-mix(in srgb, var(--text-light) 25%, transparent);
+    background-color: var(--highlight-blink-color);
+    box-shadow: 0 0 8px var(--highlight-blink-color);
   }
   100% {
     background-color: transparent;
@@ -330,11 +330,11 @@
   }
 
   #player-scope .search-highlight {
-    background-color: color-mix(in srgb, var(--text-light) 35%, var(--bg-content-light));
-    color: var(--bg-content-light);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--text-light) 25%, transparent);
+    background-color: var(--highlight-blink-color);
+    color: var(--text-light);
+    box-shadow: 0 0 8px var(--highlight-blink-color);
     border-radius: 3px;
-    animation: searchHighlightFade 3.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: searchHighlightFade 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
   /* Gradients */
