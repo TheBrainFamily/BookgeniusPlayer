@@ -44,7 +44,7 @@ function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
 function createVideoElement(src: string, state: "listens" | "speaks"): HTMLVideoElement {
   const video = document.createElement("video");
   video.src = src;
-  video.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-opacity", "duration-300", "ease-in-out");
+  video.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-all", "duration-500", "ease-in-out");
   video.autoplay = true;
   video.loop = true;
   video.muted = true;
@@ -195,18 +195,59 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
             const existingPathname = getVideoPathname(existingVideo.src);
 
             if (existingVideo.dataset.state !== state || existingPathname !== videoPathname) {
-              existingVideo.src = videoSrc;
-              existingVideo.dataset.state = state;
+              const newVideo = createVideoElement(videoSrc, state as "listens" | "speaks");
+              newVideo.style.opacity = "0";
+              newVideo.style.zIndex = "1";
+              existingVideo.style.zIndex = "2";
+
+              inlineAvatar?.appendChild(newVideo);
+
+              // Crossfade effect
+              newVideo.addEventListener(
+                "loadeddata",
+                () => {
+                  requestAnimationFrame(() => {
+                    newVideo.style.opacity = "1";
+                    existingVideo.style.opacity = "0";
+
+                    setTimeout(() => {
+                      existingVideo.remove();
+                    }, 500);
+                  });
+                },
+                { once: true },
+              );
+
+              // Fallback cleanup
+              setTimeout(() => {
+                if (existingVideo.parentElement) {
+                  existingVideo.remove();
+                }
+              }, 1500);
             }
             activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
           } else {
             activeCharacterPlaceholder.dataset.isTalking = "false";
-            existingVideo.remove();
+            existingVideo.style.opacity = "0";
+            setTimeout(() => existingVideo.remove(), 500);
           }
         } else if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
           const video = createVideoElement(videoSrc, state as "listens" | "speaks");
+          video.style.opacity = "0";
           activeCharacterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
           inlineAvatar?.appendChild(video);
+
+          // Fade in when ready
+          video.addEventListener(
+            "loadeddata",
+            () => {
+              requestAnimationFrame(() => {
+                video.style.opacity = "1";
+              });
+            },
+            { once: true },
+          );
+
           playRow.setAttribute("data-activated-video", "true");
         }
       });
