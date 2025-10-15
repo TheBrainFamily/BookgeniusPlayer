@@ -380,6 +380,39 @@ export function setupPageObserver(): {
           }
         }
 
+        // Always calculate the intersecting paragraphs and visible range for media
+        // This ensures media is activated even on initial load without scroll
+        const allIntersectingParagraphs = Array.from(intersectingPages)
+          .map((element) => getParagraphInfo(element))
+          .filter((info) => info.chapter !== null && !isNaN(info.chapter) && info.paragraph !== null && !isNaN(info.paragraph))
+          .sort((a, b) => {
+            if (a.chapter !== b.chapter) return a.chapter - b.chapter;
+            return a.paragraph - b.paragraph;
+          });
+
+        const isMobile = viewportHeight < 700 || viewportWidth < 768;
+
+        // On mobile, capture full viewport; on desktop, use 10% to 70% from top
+        const visibilityZoneTop = isMobile ? rootRect.top : rootRect.top + rootRect.height * 0.1;
+        const visibilityZoneBottom = isMobile ? rootRect.bottom : rootRect.top + rootRect.height * 0.7;
+
+        // Filter intersecting paragraphs to only include those within the visibility zone
+        const focusZoneIntersectingParagraphs = Array.from(intersectingPages)
+          .filter((element) => {
+            const elementRect = element.getBoundingClientRect();
+            // Check if element's vertical range overlaps with the visibility zone
+            return elementRect.top < visibilityZoneBottom && elementRect.bottom > visibilityZoneTop;
+          })
+          .map((element) => getParagraphInfo(element))
+          .filter((info) => info.chapter !== null && !isNaN(info.chapter) && info.paragraph !== null && !isNaN(info.paragraph))
+          .sort((a, b) => {
+            if (a.chapter !== b.chapter) return a.chapter - b.chapter;
+            return a.paragraph - b.paragraph;
+          });
+
+        const RANGE_PADDING = 1;
+        const isPlayFormat = getIsPlayFormat();
+
         if (topElementChanged || bottomElementChanged || activeParagraphChanged) {
           // Update persisted state with the NEW DOM element references for the next comparison cycle
           currentlyActivePageElement = topFocusedPageElement;
@@ -401,38 +434,6 @@ export function setupPageObserver(): {
             endInfo.chapter !== null &&
             endInfo.paragraph !== null
           ) {
-            // This ensures avatars remain visible not only for a current chapter, but previous or next chapter as well
-            const allIntersectingParagraphs = Array.from(intersectingPages)
-              .map((element) => getParagraphInfo(element))
-              .filter((info) => info.chapter !== null && !isNaN(info.chapter) && info.paragraph !== null && !isNaN(info.paragraph))
-              .sort((a, b) => {
-                if (a.chapter !== b.chapter) return a.chapter - b.chapter;
-                return a.paragraph - b.paragraph;
-              });
-
-            const isMobile = viewportHeight < 700 || viewportWidth < 768;
-
-            // On mobile, capture full viewport; on desktop, use 10% to 70% from top
-            const visibilityZoneTop = isMobile ? rootRect.top : rootRect.top + rootRect.height * 0.1;
-            const visibilityZoneBottom = isMobile ? rootRect.bottom : rootRect.top + rootRect.height * 0.7;
-
-            // Filter intersecting paragraphs to only include those within the visibility zone
-            const focusZoneIntersectingParagraphs = Array.from(intersectingPages)
-              .filter((element) => {
-                const elementRect = element.getBoundingClientRect();
-                // Check if element's vertical range overlaps with the visibility zone
-                return elementRect.top < visibilityZoneBottom && elementRect.bottom > visibilityZoneTop;
-              })
-              .map((element) => getParagraphInfo(element))
-              .filter((info) => info.chapter !== null && !isNaN(info.chapter) && info.paragraph !== null && !isNaN(info.paragraph))
-              .sort((a, b) => {
-                if (a.chapter !== b.chapter) return a.chapter - b.chapter;
-                return a.paragraph - b.paragraph;
-              });
-
-            const RANGE_PADDING = 1;
-            const isPlayFormat = getIsPlayFormat();
-
             const rangeStartInfo = startInfo;
             const rangeEndInfo = endInfo;
 
@@ -472,15 +473,6 @@ export function setupPageObserver(): {
                 lastSentLocation = nextLoc;
               }
             }
-
-            // Media uses viewport range (separate from character notes)
-            if (allIntersectingParagraphs.length > 0) {
-              const mediaStartInfo = allIntersectingParagraphs[0];
-              const mediaEndInfo = allIntersectingParagraphs[allIntersectingParagraphs.length - 1];
-              activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, isPlayFormat);
-            } else {
-              activateMediaInRange(startInfo.chapter, startInfo.paragraph, endInfo.chapter, endInfo.paragraph, isPlayFormat);
-            }
           } else {
             console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {
               activePgh: activeParagraph,
@@ -488,6 +480,24 @@ export function setupPageObserver(): {
               endInfo: endInfo,
             });
           }
+        }
+
+        // Always activate media for currently visible paragraphs
+        // This ensures media loads immediately on page load and chapter transitions
+        if (allIntersectingParagraphs.length > 0) {
+          const mediaStartInfo = allIntersectingParagraphs[0];
+          const mediaEndInfo = allIntersectingParagraphs[allIntersectingParagraphs.length - 1];
+          activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, isPlayFormat);
+        } else if (
+          newTopInfo &&
+          newBottomInfo &&
+          newTopInfo.chapter !== null &&
+          newTopInfo.paragraph !== null &&
+          newBottomInfo.chapter !== null &&
+          newBottomInfo.paragraph !== null
+        ) {
+          // Fallback to focus zone range if no intersecting paragraphs found
+          activateMediaInRange(newTopInfo.chapter, newTopInfo.paragraph, newBottomInfo.chapter, newBottomInfo.paragraph, isPlayFormat);
         }
       } else {
         // Handle case where intersecting pages exist, but none are in the focus zone
