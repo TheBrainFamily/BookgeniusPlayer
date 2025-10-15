@@ -695,6 +695,8 @@ export function setupPageObserver(): {
             }
             return;
           }
+
+          hideScrollIndicator();
         }
       });
     },
