@@ -447,6 +447,11 @@
     span[id^="ch"][id*="-p"][id*="-s"]:has(.character-highlighted-activated:hover) {
       background-color: transparent;
     }
+
+    /* Disable hover effect for spans inside character name paragraphs */
+    p[data-is-character="true"] span[id^="ch"][id*="-p"][id*="-s"]:hover {
+      background-color: transparent;
+    }
   }
 
   #book-container.play-mode #content-container {
@@ -606,14 +611,15 @@
         padding: 0;
       }
 
-      p[data-is-character="true"] > * {
+      p[data-is-character="true"] {
+        width: fit-content;
         cursor: pointer;
         font-weight: bold;
         transition: text-shadow 0.2s ease-in-out;
         background-color: transparent;
 
         &:hover {
-          text-shadow: 2px 4px 8px color-mix(in srgb, var(--text-light, rgba(0, 0, 0, 0.3)) 60%, transparent);
+          text-shadow: 0px 4px 8px color-mix(in srgb, var(--text-light, rgba(0, 0, 0, 0.3)) 80%, transparent);
           transition: none;
         }
       }

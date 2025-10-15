@@ -303,18 +303,22 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
     const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
     const activePlayRow = activeParagraph?.closest(".play-row");
 
-    if (!activePlayRow) {
+    if (activePlayRow) {
+      activatePlayFormatMediaDebounced({ charactersBySlug });
+    } else {
       activatePlayFormatMediaDebounced.cancel();
-      return;
     }
-    activatePlayFormatMediaDebounced({ charactersBySlug });
   } else {
     activatePlayFormatMediaDebounced.cancel();
   }
 
-  const paragraphs = document.querySelectorAll<HTMLElement>(
-    `.content-container section[data-chapter="${startChapter}"] [data-index], section[data-chapter="${endChapter}"] [data-index]`,
-  );
+  // Build a proper selector for all chapters in range
+  const chapterSelectors: string[] = [];
+  for (let ch = startChapter; ch <= endChapter; ch++) {
+    chapterSelectors.push(`#content-container section[data-chapter="${ch}"] [data-index]`);
+  }
+  const combinedSelector = chapterSelectors.join(", ");
+  const paragraphs = document.querySelectorAll<HTMLElement>(combinedSelector);
 
   const bufferSize = isPlayFormat ? 5 : 10;
 
