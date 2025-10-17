@@ -59,7 +59,7 @@ const CharacterNotesPanel = () => {
 };
 
 const variants: { container: Variants; character: Variants } = {
-  container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.3, staggerChildren: 0.05 } } },
+  container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 3, delay: 1.5, staggerChildren: 0.05 } } },
   character: { hidden: { opacity: 0, x: -100 }, visible: (i: number) => ({ opacity: 1, x: 0, transition: { delay: i * 0.05 } }) },
 };
 

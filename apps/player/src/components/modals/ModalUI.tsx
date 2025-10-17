@@ -177,7 +177,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             // Position modal in the right space when content is shifted left on large screens
             isContentShiftedLeft && (isLargeScreen || isMediumScreen) && layoutView ? "justify-end ml-auto mr-0" : "justify-center mx-auto px-4",
             isContentShiftedLeft && layoutView && isLargeScreen && "pr-[3%]",
-            isContentShiftedLeft && layoutView && isMediumScreen && "pr-[1%]",
+            isContentShiftedLeft && layoutView && isMediumScreen && "pr-2",
           )}
         >
           {layoutView && !shouldShiftContent && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none xl:flex xl:flex-1 xl:order-1" />}

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useContentShift } from "@player/stores/contentShift.store";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { onResizeOrOrientationChange } from "@player/helpers/paragraphsNavigation";
 
 // Helper to toggle notes visibility
 const setNotesVisibility = (visible: boolean) => {
@@ -131,8 +132,13 @@ export const ContentShiftWrapper: React.FC = () => {
       applySmallScreenLayout();
     }
 
+    const timeoutId = setTimeout(() => {
+      onResizeOrOrientationChange();
+    }, 500);
+
     // Cleanup function to reset styles on unmount
     return () => {
+      clearTimeout(timeoutId);
       bookContainer.style.transform = "";
       bookContainer.style.width = "";
       bookContainer.style.maxWidth = "";

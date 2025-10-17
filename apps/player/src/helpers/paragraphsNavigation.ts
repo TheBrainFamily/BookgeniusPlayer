@@ -445,7 +445,7 @@ const debouncedScrollToLocation = debounce(
 );
 
 // Non-debounced event wrappers: capture the location immediately on event
-const onResizeOrOrientationChange = () => {
+export const onResizeOrOrientationChange = () => {
   const saved = getCurrentLocation() ?? DEFAULT_LOCATION;
   // Call once immediately and schedule a trailing recenter ~200ms after events settle
   debouncedScrollToLocation(saved);
