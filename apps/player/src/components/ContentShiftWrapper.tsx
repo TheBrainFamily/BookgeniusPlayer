@@ -132,12 +132,13 @@ export const ContentShiftWrapper: React.FC = () => {
       applySmallScreenLayout();
     }
 
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       onResizeOrOrientationChange();
     }, 500);
 
     // Cleanup function to reset styles on unmount
     return () => {
+      clearTimeout(timeoutId);
       bookContainer.style.transform = "";
       bookContainer.style.width = "";
       bookContainer.style.maxWidth = "";
