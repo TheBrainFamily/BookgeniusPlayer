@@ -223,8 +223,8 @@ export function useBookContent() {
     const isBigJump = previous !== null && Math.abs(currentChapter - previous) > 2;
     const isPendingSystemJump =
       lastSystemLocation?.location?.currentChapter === currentChapter &&
-      lastSystemLocation.timestamp != null &&
-      pendingSystemJumpTimestampRef.current === lastSystemLocation.timestamp;
+      lastSystemLocation?.timestamp != null &&
+      pendingSystemJumpTimestampRef.current === lastSystemLocation?.timestamp;
 
     void (async () => {
       try {
