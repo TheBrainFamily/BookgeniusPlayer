@@ -48,6 +48,7 @@ export function useBookContent() {
   } | null>(null);
   const currentChapterRef = useRef<number | undefined>(currentChapter);
   const prevChapterRef = useRef<number | null>(null);
+  const pendingSystemJumpTimestampRef = useRef<number | null>(null);
 
   useEditorMode(isEditorMode ? containerRef.current : null);
 
@@ -142,6 +143,10 @@ export function useBookContent() {
     currentChapterRef.current = currentChapter;
   }, [currentChapter]);
 
+  useEffect(() => {
+    pendingSystemJumpTimestampRef.current = lastSystemLocation?.timestamp ?? null;
+  }, [lastSystemLocation?.timestamp]);
+
   const handleContentChanged = useCallback(() => {
     if (observerSetupRef.current) {
       // Refresh observed nodes for the existing observer
@@ -216,11 +221,18 @@ export function useBookContent() {
 
     const previous = prevChapterRef.current;
     const isBigJump = previous !== null && Math.abs(currentChapter - previous) > 2;
-    const isSystemJump = lastSystemLocation?.location?.currentChapter === currentChapter;
+    const isPendingSystemJump =
+      lastSystemLocation?.location?.currentChapter === currentChapter &&
+      lastSystemLocation.timestamp != null &&
+      pendingSystemJumpTimestampRef.current === lastSystemLocation.timestamp;
 
     void (async () => {
       try {
-        await ensureChapterWindow(currentChapter, { force: isBigJump || Boolean(isSystemJump) });
+        const shouldForce = isBigJump || isPendingSystemJump;
+        await ensureChapterWindow(currentChapter, { force: shouldForce });
+        if (isPendingSystemJump) {
+          pendingSystemJumpTimestampRef.current = null;
+        }
       } catch (error) {
         console.error("useBookContent: Failed to update chapter window", error);
       } finally {
