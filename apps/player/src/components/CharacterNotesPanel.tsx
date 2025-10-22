@@ -6,10 +6,10 @@ import { useCharacterNotes } from "@player/hooks/useCharacterNotes";
 import { useCurrentSpeakers } from "@player/hooks/useCurrentSpeakers";
 import useSplashHidden from "@player/hooks/useSplashHidden";
 import { useLocationRange } from "@player/hooks/useLocationRange";
-import CharacterCard from "./CharacterCard";
 import { useLocation } from "@player/state/LocationContext";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookForm } from "@player/hooks/useBookForm";
+import CharacterCard from "./CharacterCard";
 
 const CharacterNotesPanel = () => {
   const target = document.getElementById("left-notes");
@@ -17,11 +17,9 @@ const CharacterNotesPanel = () => {
   const isSplashHidden = useSplashHidden();
   const characterNotes = useCharacterNotes(locationRange, true, true);
   const { location } = useLocation();
+  const { isPlayFormat } = useBookForm();
 
-  const bookData = useMemo(() => getBookData(), []);
-  const isPlayFormat = useMemo(() => bookData.metadata.bookForm === "play" || bookData.metadata.bookForm === "mixed", [bookData]);
   const allCharacters = useMemo(() => getCharactersData(), []);
-
   const currentSpeakers = useCurrentSpeakers(location, allCharacters, isPlayFormat);
 
   if (isPlayFormat || !target) return null;

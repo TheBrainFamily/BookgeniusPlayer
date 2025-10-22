@@ -1380,6 +1380,7 @@ section[data-chapter] [data-index] {
 #book-container {
   overflow-x: visible;
   opacity: 0;
+  box-sizing: border-box;
 }
 
 /* Default visible state for iOS (no transform to avoid crashes) */
@@ -1415,7 +1416,7 @@ section[data-chapter] [data-index] {
 /* When in 'play' mode, reset the content container's constraints. */
 #book-container.play-mode #content-container {
   /* Resets the flex-grow (sm:flex-3) and max-width (max-w-[900px]) so the play's content can define its own width.  */
-  flex: initial;
+  flex: content;
   max-width: initial;
 }
 

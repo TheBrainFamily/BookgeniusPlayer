@@ -1,156 +1,200 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
+
 import { useContentShift } from "@player/stores/contentShift.store";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
-import { onResizeOrOrientationChange } from "@player/helpers/paragraphsNavigation";
+import { useBookForm } from "@player/hooks/useBookForm";
+import { useScreenSize } from "@player/hooks/useScreenSize";
 
-// Helper to toggle notes visibility
-const setNotesVisibility = (visible: boolean) => {
-  const leftNotesBlank = document.getElementById("left-notes-blank");
-  const leftNotes = document.getElementById("left-notes");
+interface DOMElements {
+  bookContainer: HTMLElement;
+  contentContainer: HTMLElement;
+  leftNotes: HTMLElement;
+  leftNotesBlank: HTMLElement;
+  rightNotes: HTMLElement;
+  rightNotesBlank: HTMLElement;
+  bottomInputWrapper: HTMLElement;
+  footer: HTMLElement;
+}
 
-  const displayValue = visible ? "" : "none";
+const getDOMElements = (): DOMElements | null => {
+  const bookContainer = document.getElementById("book-container");
+  const contentContainer = document.getElementById("content-container");
+  const bottomInputWrapper = document.getElementById("bottom-input-wrapper");
+  const footer = document.querySelector("footer") as HTMLElement;
 
-  if (leftNotesBlank) leftNotesBlank.style.display = displayValue;
-  if (leftNotes) leftNotes.style.display = displayValue;
+  if (!bookContainer || !contentContainer || !bottomInputWrapper || !footer) {
+    return null;
+  }
+
+  return {
+    bookContainer,
+    contentContainer,
+    leftNotes: document.getElementById("left-notes") || undefined,
+    leftNotesBlank: document.getElementById("left-notes-blank") || undefined,
+    rightNotes: document.getElementById("right-notes") || undefined,
+    rightNotesBlank: document.getElementById("right-notes-blank") || undefined,
+    bottomInputWrapper,
+    footer,
+  };
+};
+
+const createOrGetBlankElement = (parent: HTMLElement, id: string): HTMLElement => {
+  let element = parent.querySelector(`#${id}`) as HTMLElement | null;
+  if (!element) {
+    element = document.createElement("div");
+    element.id = id;
+    element.className = "hidden";
+    parent.appendChild(element);
+  }
+
+  return element;
+};
+
+const applyTransitions = (elements: DOMElements, isPlayFormat: boolean) => {
+  const duration = isPlayFormat ? "0.3s" : "0.2s";
+
+  elements.bookContainer.style.transition = `${isPlayFormat ? "transform" : "all"} ${duration} ease-out`;
+  elements.footer.style.transition = `${isPlayFormat ? "transform" : "all"} ${duration} ease-out`;
+  elements.contentContainer.style.transition = isPlayFormat ? "max-width 0.3s ease-out, flex 0.3s ease-out" : `all ${duration} ease-out`;
+  elements.bottomInputWrapper.style.transition = isPlayFormat ? "max-width 0.3s ease-out" : `all ${duration} ease-out`;
+
+  if (!isPlayFormat && elements.leftNotes && elements.leftNotesBlank && elements.rightNotes && elements.rightNotesBlank) {
+    elements.leftNotes.style.transition = `all ${duration} ease-out`;
+    elements.leftNotesBlank.style.transition = `all ${duration} ease-out`;
+    elements.rightNotes.style.transition = `all ${duration} ease-out`;
+    elements.rightNotesBlank.style.transition = `all ${duration} ease-out`;
+  }
+};
+
+const handlePlayFormat = (elements: DOMElements, isContentShiftedLeft: boolean, isLargeScreen: boolean, isMediumScreen: boolean) => {
+  const playRightNotesBlank = createOrGetBlankElement(elements.bookContainer, "play-right-notes-blank");
+  const playFooterRightNotesBlank = createOrGetBlankElement(elements.footer, "play-footer-right-notes-blank");
+
+  const resetPlayStyles = () => {
+    playRightNotesBlank.className = "hidden";
+    playFooterRightNotesBlank.className = "hidden";
+    elements.contentContainer.style.flex = "";
+    elements.contentContainer.style.maxWidth = "";
+    elements.bottomInputWrapper.style.maxWidth = "";
+  };
+
+  if (!isContentShiftedLeft) {
+    resetPlayStyles();
+
+    return () => {
+      playRightNotesBlank.remove();
+      playFooterRightNotesBlank.remove();
+    };
+  }
+
+  if (isLargeScreen) {
+    playRightNotesBlank.className = "xl:block xl:flex-1 max-w-[700px]";
+    playRightNotesBlank.style.transition = "all 0.3s ease-out";
+    playFooterRightNotesBlank.className = "xl:block xl:flex-1 max-w-[700px]";
+    playFooterRightNotesBlank.style.transition = "all 0.3s ease-out";
+
+    elements.contentContainer.style.flex = "0 0 auto";
+    elements.contentContainer.style.maxWidth = "900px";
+    elements.bottomInputWrapper.style.maxWidth = "800px";
+  } else if (isMediumScreen) {
+    playRightNotesBlank.className = "lg:block lg:flex-1 max-w-[600px]";
+    playRightNotesBlank.style.transition = "all 0.3s ease-out";
+    playFooterRightNotesBlank.className = "lg:block lg:flex-1 max-w-[600px]";
+    playFooterRightNotesBlank.style.transition = "all 0.3s ease-out";
+
+    elements.contentContainer.style.flex = "0 0 auto";
+    elements.contentContainer.style.maxWidth = "800px";
+    elements.bottomInputWrapper.style.maxWidth = "700px";
+  } else {
+    resetPlayStyles();
+  }
+
+  return () => {
+    playRightNotesBlank.remove();
+    playFooterRightNotesBlank.remove();
+  };
+};
+
+const handleStandardFormat = (elements: DOMElements, isContentShiftedLeft: boolean, isLargeScreen: boolean, isMediumScreen: boolean) => {
+  const { leftNotes, leftNotesBlank, rightNotes, rightNotesBlank } = elements;
+
+  if (!leftNotes || !leftNotesBlank || !rightNotes || !rightNotesBlank) {
+    return;
+  }
+
+  const resetStyles = () => {
+    leftNotes.style.flex = "";
+    leftNotes.style.overflow = "";
+    leftNotes.style.zIndex = "";
+    leftNotes.style.width = "";
+    leftNotes.style.maxWidth = "";
+    leftNotes.style.minWidth = "";
+    leftNotesBlank.style.flex = "";
+    leftNotesBlank.style.width = "";
+    leftNotesBlank.style.maxWidth = "";
+    leftNotesBlank.style.minWidth = "";
+    rightNotes.style.display = "";
+    rightNotes.style.flex = "";
+    rightNotes.style.maxWidth = "";
+    rightNotesBlank.style.maxWidth = "";
+    rightNotesBlank.style.display = "";
+    rightNotesBlank.style.flex = "";
+  };
+
+  if (!isContentShiftedLeft) {
+    resetStyles();
+    return;
+  }
+
+  if (isLargeScreen) {
+    leftNotes.style.flex = "0 0 200px";
+    leftNotes.style.overflow = "visible";
+    leftNotes.style.zIndex = "1";
+    leftNotesBlank.style.flex = "0 0 200px";
+    rightNotes.style.maxWidth = "600px";
+    rightNotesBlank.style.maxWidth = "600px";
+    rightNotesBlank.style.display = "";
+    rightNotesBlank.style.flex = "";
+  } else if (isMediumScreen) {
+    leftNotes.style.transition = "";
+    leftNotesBlank.style.transition = "";
+    leftNotes.style.flex = "0 0 auto";
+    leftNotes.style.width = "0px";
+    leftNotes.style.minWidth = "0px";
+    leftNotes.style.overflow = "hidden";
+    leftNotes.style.zIndex = "";
+    leftNotes.style.maxWidth = "";
+    leftNotesBlank.style.flex = "0 0 auto";
+    leftNotesBlank.style.width = "0px";
+    leftNotesBlank.style.minWidth = "0px";
+    leftNotesBlank.style.maxWidth = "";
+    rightNotes.style.display = "block";
+    rightNotes.style.flex = "1";
+    rightNotes.style.maxWidth = "";
+    rightNotesBlank.style.maxWidth = "";
+    rightNotesBlank.style.display = "block";
+    rightNotesBlank.style.flex = "1";
+  } else {
+    resetStyles();
+  }
 };
 
 export const ContentShiftWrapper: React.FC = () => {
   const { isContentShiftedLeft } = useContentShift();
-
-  const [isLargeScreen, setIsLargeScreen] = useState(false);
-  const [isMediumScreen, setIsMediumScreen] = useState(false);
-
-  const wasShiftedRef = useRef(false);
-
-  const bookData = getBookData();
-  const isPlayFormat = bookData.metadata.bookForm === "play" || bookData.metadata.bookForm === "mixed";
+  const { isLargeScreen, isMediumScreen } = useScreenSize();
+  const { isPlayFormat } = useBookForm();
 
   useEffect(() => {
-    const checkScreenSize = () => {
-      setIsLargeScreen(window.innerWidth >= 1280);
-      setIsMediumScreen(window.innerWidth >= 1024 && window.innerWidth < 1280);
-    };
+    const elements = getDOMElements();
+    if (!elements) return;
 
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
+    applyTransitions(elements, isPlayFormat);
 
-  useEffect(() => {
-    const bookContainer = document.getElementById("book-container");
-    if (!bookContainer) return;
-
-    // Store original transition to preserve it
-    const computedStyles = window.getComputedStyle(bookContainer);
-    const originalTransition = computedStyles.transition;
-
-    // Extract existing opacity transition if present, otherwise use default
-    const opacityTransition =
-      originalTransition
-        .split(",")
-        .find((t) => t.trim().startsWith("opacity"))
-        ?.trim() || "opacity 1000ms ease-in-out";
-
-    // Preserve opacity transition and add transform and width transitions
-    bookContainer.style.transition = `${opacityTransition}, transform 0.3s ease-out, width 0.3s ease-out, max-width 0.3s ease-out`;
-    bookContainer.style.willChange = "transform, width";
-
-    const shiftAmount = isPlayFormat ? "-18%" : "-13%";
-
-    const setCompactSize = () => {
-      bookContainer.style.width = "80%";
-      bookContainer.style.maxWidth = "calc(120rem * 0.8)";
-    };
-
-    const setFullSize = () => {
-      bookContainer.style.width = "100%";
-      bookContainer.style.maxWidth = "120rem";
-    };
-
-    const resetMarginAndPadding = () => {
-      bookContainer.style.marginInline = "";
-      bookContainer.style.paddingLeft = "";
-    };
-
-    const handleTransitionEnd = (e: TransitionEvent) => {
-      if (e.propertyName !== "transform") return;
-
-      setFullSize();
-      bookContainer.removeEventListener("transitionend", handleTransitionEnd as EventListener);
-    };
-
-    const applyLargeScreenLayout = () => {
-      resetMarginAndPadding();
-
-      if (isContentShiftedLeft) {
-        setCompactSize();
-        bookContainer.style.transform = `translateX(${shiftAmount})`;
-        setNotesVisibility(true);
-      } else {
-        bookContainer.style.transform = "translateX(0)";
-
-        if (wasShiftedRef.current) {
-          bookContainer.addEventListener("transitionend", handleTransitionEnd as EventListener);
-          setCompactSize();
-        } else {
-          setFullSize();
-        }
-
-        setNotesVisibility(true);
-      }
-    };
-
-    const applyMediumScreenLayout = () => {
-      bookContainer.style.transform = "translateX(0)";
-
-      if (isContentShiftedLeft) {
-        bookContainer.style.width = "66%";
-        bookContainer.style.maxWidth = "calc(120rem * 0.66)";
-        bookContainer.style.marginInline = "unset";
-        bookContainer.style.paddingLeft = "4px";
-        setNotesVisibility(false);
-      } else {
-        setFullSize();
-        resetMarginAndPadding();
-        setNotesVisibility(true);
-      }
-    };
-
-    const applySmallScreenLayout = () => {
-      bookContainer.style.transform = "translateX(0)";
-      setFullSize();
-      resetMarginAndPadding();
-      setNotesVisibility(true);
-    };
-
-    // Apply layout based on screen size
-    if (isLargeScreen) {
-      applyLargeScreenLayout();
-    } else if (isMediumScreen) {
-      applyMediumScreenLayout();
-    } else {
-      applySmallScreenLayout();
+    if (isPlayFormat) {
+      return handlePlayFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen);
     }
 
-    const timeoutId = setTimeout(() => {
-      onResizeOrOrientationChange();
-    }, 500);
-
-    // Cleanup function to reset styles on unmount
-    return () => {
-      clearTimeout(timeoutId);
-      bookContainer.style.transform = "";
-      bookContainer.style.width = "";
-      bookContainer.style.maxWidth = "";
-      bookContainer.style.marginInline = "";
-      bookContainer.style.paddingLeft = "";
-      bookContainer.removeEventListener("transitionend", handleTransitionEnd);
-    };
-  }, [isContentShiftedLeft, isLargeScreen, isPlayFormat, isMediumScreen]);
-
-  useEffect(() => {
-    wasShiftedRef.current = isContentShiftedLeft;
-  }, [isContentShiftedLeft]);
+    handleStandardFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen);
+  }, [isLargeScreen, isMediumScreen, isContentShiftedLeft, isPlayFormat]);
 
   return null;
 };

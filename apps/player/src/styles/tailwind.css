@@ -6,6 +6,9 @@
     --radius-lg: var(--radius);
     --radius-xl: calc(var(--radius) + 4px);
 
+    /* Breakpoints */
+    --breakpoint-xxl: 90rem;
+
     /* Map CSS variables to Tailwind color system */
     --color-background: var(--background);
     --color-foreground: var(--foreground);
