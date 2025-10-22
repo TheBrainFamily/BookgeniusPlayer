@@ -202,15 +202,15 @@ export const ContentShiftWrapper: React.FC = () => {
     if (!isAppReady) return;
 
     const elements = getDOMElements();
-    if (elements) {
-      applyTransitions(elements, isPlayFormat);
+    if (!elements) return;
 
-      if (isPlayFormat) {
-        handlePlayFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen);
-      } else {
-        handleStandardFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen, isMobileOrTabletDevice);
-      }
+    applyTransitions(elements, isPlayFormat);
+
+    if (isPlayFormat) {
+      return handlePlayFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen);
     }
+
+    handleStandardFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen, isMobileOrTabletDevice);
   }, [isAppReady, isLargeScreen, isMediumScreen, isContentShiftedLeft, isPlayFormat, isMobileOrTabletDevice]);
 
   return null;

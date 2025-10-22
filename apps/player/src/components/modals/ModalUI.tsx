@@ -53,7 +53,7 @@ const getModalContentClasses = (
   isPlayFormat: boolean,
 ): string => {
   return cn(
-    "rounded-lg overflow-hidden w-full flex flex-col align-center justify-center h-fit pointer-events-auto",
+    "rounded-lg overflow-hidden w-full flex flex-col items-center justify-center h-fit pointer-events-auto",
     !isTransparent && "bg-black/70 textured-bg border border-white/30 shadow-xl text-white",
     layoutView && [
       "overflow-hidden max-h-[70vh]",
