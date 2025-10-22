@@ -142,16 +142,16 @@ const handleStandardFormat = (elements: DOMElements, isContentShiftedLeft: boole
     rightNotesBlank.style.flex = "";
   };
 
-  if (isMobileOrTabletDevice) {
-    rightNotes.style.display = "none";
-    rightNotesBlank.style.display = "none";
-    contentContainer.style.maxWidth = "900px";
-    bottomInputWrapper.style.maxWidth = "900px";
-    bookContainer.style.paddingLeft = "0px";
-    bookContainer.style.paddingRight = "0px";
+  // if (isMobileOrTabletDevice) {
+  //   rightNotes.style.display = "none";
+  //   rightNotesBlank.style.display = "none";
+  //   contentContainer.style.maxWidth = "900px";
+  //   bottomInputWrapper.style.maxWidth = "900px";
+  //   bookContainer.style.paddingLeft = "0px";
+  //   bookContainer.style.paddingRight = "0px";
 
-    return;
-  }
+  //   return;
+  // }
 
   if (!isContentShiftedLeft) {
     resetStyles();
@@ -201,23 +201,16 @@ export const ContentShiftWrapper: React.FC = () => {
   useEffect(() => {
     if (!isAppReady) return;
 
-    const observer = new MutationObserver(() => {
-      const elements = getDOMElements();
-      if (elements) {
-        observer.disconnect();
-        applyTransitions(elements, isPlayFormat);
+    const elements = getDOMElements();
+    if (elements) {
+      applyTransitions(elements, isPlayFormat);
 
-        if (isPlayFormat) {
-          handlePlayFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen);
-        } else {
-          handleStandardFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen, isMobileOrTabletDevice);
-        }
+      if (isPlayFormat) {
+        handlePlayFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen);
+      } else {
+        handleStandardFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen, isMobileOrTabletDevice);
       }
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    return () => observer.disconnect();
+    }
   }, [isAppReady, isLargeScreen, isMediumScreen, isContentShiftedLeft, isPlayFormat, isMobileOrTabletDevice]);
 
   return null;
