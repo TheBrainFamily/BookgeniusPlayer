@@ -3,6 +3,8 @@ import React, { useEffect } from "react";
 import { useContentShift } from "@player/stores/contentShift.store";
 import { useBookForm } from "@player/hooks/useBookForm";
 import { useScreenSize } from "@player/hooks/useScreenSize";
+import { isMobileOrTablet } from "@player/utils/isMobileOrTablet";
+import { useIsAppReady } from "@player/hooks/useIsAppReady";
 
 interface DOMElements {
   bookContainer: HTMLElement;
@@ -114,8 +116,8 @@ const handlePlayFormat = (elements: DOMElements, isContentShiftedLeft: boolean, 
   };
 };
 
-const handleStandardFormat = (elements: DOMElements, isContentShiftedLeft: boolean, isLargeScreen: boolean, isMediumScreen: boolean) => {
-  const { leftNotes, leftNotesBlank, rightNotes, rightNotesBlank } = elements;
+const handleStandardFormat = (elements: DOMElements, isContentShiftedLeft: boolean, isLargeScreen: boolean, isMediumScreen: boolean, isMobileOrTabletDevice: boolean) => {
+  const { leftNotes, leftNotesBlank, rightNotes, rightNotesBlank, contentContainer, bottomInputWrapper, bookContainer } = elements;
 
   if (!leftNotes || !leftNotesBlank || !rightNotes || !rightNotesBlank) {
     return;
@@ -139,6 +141,17 @@ const handleStandardFormat = (elements: DOMElements, isContentShiftedLeft: boole
     rightNotesBlank.style.display = "";
     rightNotesBlank.style.flex = "";
   };
+
+  if (isMobileOrTabletDevice) {
+    rightNotes.style.display = "none";
+    rightNotesBlank.style.display = "none";
+    contentContainer.style.maxWidth = "900px";
+    bottomInputWrapper.style.maxWidth = "900px";
+    bookContainer.style.paddingLeft = "0px";
+    bookContainer.style.paddingRight = "0px";
+
+    return;
+  }
 
   if (!isContentShiftedLeft) {
     resetStyles();
@@ -182,19 +195,30 @@ export const ContentShiftWrapper: React.FC = () => {
   const { isContentShiftedLeft } = useContentShift();
   const { isLargeScreen, isMediumScreen } = useScreenSize();
   const { isPlayFormat } = useBookForm();
+  const isMobileOrTabletDevice = isMobileOrTablet();
+  const isAppReady = useIsAppReady();
 
   useEffect(() => {
-    const elements = getDOMElements();
-    if (!elements) return;
+    if (!isAppReady) return;
 
-    applyTransitions(elements, isPlayFormat);
+    const observer = new MutationObserver(() => {
+      const elements = getDOMElements();
+      if (elements) {
+        observer.disconnect();
+        applyTransitions(elements, isPlayFormat);
 
-    if (isPlayFormat) {
-      return handlePlayFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen);
-    }
+        if (isPlayFormat) {
+          handlePlayFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen);
+        } else {
+          handleStandardFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen, isMobileOrTabletDevice);
+        }
+      }
+    });
 
-    handleStandardFormat(elements, isContentShiftedLeft, isLargeScreen, isMediumScreen);
-  }, [isLargeScreen, isMediumScreen, isContentShiftedLeft, isPlayFormat]);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, [isAppReady, isLargeScreen, isMediumScreen, isContentShiftedLeft, isPlayFormat, isMobileOrTabletDevice]);
 
   return null;
 };

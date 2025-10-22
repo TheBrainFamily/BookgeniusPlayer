@@ -19,7 +19,7 @@ const Footer = () => {
           variants={footerVariants}
           initial="hidden"
           animate="visible"
-          className={cn("fixed inset-x-0 bottom-0 z-40", "flex flex-row gap-0 sm:gap-2 justify-center mx-auto px-0 max-w-[120rem] w-full xl:px-2", "pointer-events-none", "pb-4")}
+          className={cn("fixed inset-x-0 bottom-0 z-40", "flex flex-row gap-0 sm:gap-2 justify-center mx-auto px-0 max-w-[120rem] w-full", "pointer-events-none", "pb-4")}
         >
           {isPlayFormat ? (
             <>

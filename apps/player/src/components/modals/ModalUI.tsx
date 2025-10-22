@@ -68,7 +68,7 @@ const getContainerClasses = (shouldShiftContent: boolean, layoutView: boolean, i
   return cn(
     "flex flex-row gap-2 justify-center h-full",
     sizeConfig.container,
-    shouldShiftContent && layoutView && !isPlayFormat && "flex flex-row gap-0 sm:gap-2 justify-center mx-auto px-0 xl:px-2 max-w-[120rem] w-full",
+    shouldShiftContent && layoutView && !isPlayFormat && "flex flex-row gap-0 sm:gap-2 justify-center mx-auto px-0 max-w-[120rem] w-full",
     shouldShiftContent && layoutView && isPlayFormat && "flex flex-row gap-2 mx-auto px-2 max-w-[120rem] w-full",
   );
 };
@@ -79,8 +79,7 @@ const getModalWrapperClasses = (layoutView: boolean, isPlayFormat: boolean, isMe
   if (!isPlayFormat) {
     return cn(
       !isMediumScreen && !isLargeScreen && "xl:flex-1 pointer-events-none max-w-[600px] flex items-center",
-      (isMediumScreen || isLargeScreen) && "lg:flex-1 pointer-events-none max-w-[600px] flex items-center",
-      isMediumScreen && "pr-2",
+      (isMediumScreen || isLargeScreen) && "lg:flex-1 pointer-events-none max-w-[600px] flex items-center pr-2",
     );
   }
 

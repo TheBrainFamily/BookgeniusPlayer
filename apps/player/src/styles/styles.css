@@ -1030,14 +1030,6 @@
     }
   }
 
-  #right-notes.visible {
-    visibility: visible;
-  }
-
-  #right-notes.hide {
-    display: none;
-  }
-
   /* Notes display */
   #right-notes-scrollable-container {
     /* Default state is hidden */
