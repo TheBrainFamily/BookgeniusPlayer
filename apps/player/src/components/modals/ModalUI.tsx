@@ -212,9 +212,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
         shouldTrapNextOutsideTapRef.current = false;
         ignoreNextCloseRef.current = true;
 
-        if (focusedInput === activeTextInputRef.current) {
-          activeTextInputRef.current = null;
-        }
+        activeTextInputRef.current = null;
 
         focusedInput.blur();
         e.preventDefault();
