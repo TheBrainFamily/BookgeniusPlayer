@@ -7,22 +7,36 @@ import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { Button } from "../ui/button";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { useLocationRange } from "@player/hooks/useLocationRange";
+import { bookDataLoader } from "@player/services/bookDataLoader";
+import { Lock, LockOpen } from "lucide-react";
 
 interface BookChaptersModalProps {
   onClose: () => void;
 }
+
+const MAX_DEMO_CHAPTER_PLAY = 3;
+const MAX_DEMO_CHAPTER_DEFAULT = 2;
 
 const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
   const { t } = useTranslation();
   const {
     locationRange: { currentChapter },
   } = useLocationRange();
+  const hasDemoAccess = bookDataLoader.getBookVisibility() === "demo";
 
   const chapters = useMemo(() => {
     const bookData = getBookData();
+    const maxDemoChapter = bookData.metadata.bookForm === "play" ? MAX_DEMO_CHAPTER_PLAY : MAX_DEMO_CHAPTER_DEFAULT;
 
-    return bookData.chapters.map((chapter, index) => ({ id: parseInt(chapter.id), title: getChapterTitle(parseInt(chapter.id), t), page: (index + 1).toString() }));
-  }, [t]);
+    return bookData.chapters.map((chapter, index) => {
+      return {
+        id: parseInt(chapter.id),
+        title: getChapterTitle(parseInt(chapter.id), t),
+        page: (index + 1).toString(),
+        isLocked: hasDemoAccess && parseInt(chapter.id, 10) > maxDemoChapter,
+      };
+    });
+  }, [t, hasDemoAccess]);
 
   const navigateToChapter = (chapterId: number) => {
     systemNavigateTo({ currentChapter: chapterId, currentParagraph: 0 });
@@ -34,10 +48,12 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
       <div className="container max-h-[60vh] overflow-y-auto scrollbar-search">
         {chapters.map((chapter) => {
           const isCurrentChapter = chapter.id === currentChapter;
+          const isLocked = chapter.isLocked;
 
           return (
             <Button
               variant="ghost"
+              disabled={isLocked}
               key={chapter.id}
               onPointerUp={(e) => {
                 e.preventDefault();
@@ -58,13 +74,16 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
               }`}
             >
               <div className="grid w-full min-w-0 grid-cols-[1fr_auto] items-start gap-3">
-                <span
-                  className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap sm:whitespace-normal sm:line-clamp-2 leading-snug"
-                  title={chapter.title}
-                  aria-label={chapter.title}
-                >
-                  {chapter.title}
-                </span>
+                <div className="flex items-center gap-2">
+                  {hasDemoAccess && (isLocked ? <Lock className="w-3 h-3" /> : <LockOpen className="w-3 h-3" />)}
+                  <span
+                    className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap sm:whitespace-normal sm:line-clamp-2 leading-snug"
+                    title={chapter.title}
+                    aria-label={chapter.title}
+                  >
+                    {chapter.title}
+                  </span>
+                </div>
                 <span className="shrink-0 text-sm text-muted-foreground tabular-nums">{chapter.page}</span>
               </div>
             </Button>
