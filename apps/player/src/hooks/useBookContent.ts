@@ -65,6 +65,10 @@ export function useBookContent() {
       const isCharacterPlaceholder = target.closest(".character-placeholder");
       const isCharacterText = target.closest(`[data-is-character="true"]`);
 
+      if (isSelectionActive(target)) {
+        return;
+      }
+
       const complexitySpan = target.closest("span[id^='ch']") as HTMLElement;
 
       if (!complexitySpan && !isCharacterText && !isInlineAvatar && !isCharacterHighlighted && !isCharacterPlaceholder) return;
@@ -330,3 +334,39 @@ const setSentenceAsClicked = (sentenceId: string): void => {
     console.error("Failed to update clicked sentences in localStorage:", error);
   }
 };
+
+function isSelectionActive(target: HTMLElement): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const selection = window.getSelection();
+  if (!selection || selection.isCollapsed) {
+    return false;
+  }
+
+  if (typeof selection.containsNode === "function") {
+    try {
+      if (selection.containsNode(target, true)) {
+        return true;
+      }
+    } catch {
+      // Ignore DOMException when the node is detached between events.
+    }
+  }
+
+  for (let i = 0; i < selection.rangeCount; i += 1) {
+    const range = selection.getRangeAt(i);
+    if (typeof range.intersectsNode === "function") {
+      try {
+        if (range.intersectsNode(target)) {
+          return true;
+        }
+      } catch {
+        // Ignore DOMException when the node is detached between events.
+      }
+    }
+  }
+
+  return false;
+}
