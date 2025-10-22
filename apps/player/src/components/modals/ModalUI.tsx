@@ -1,10 +1,24 @@
-import React, { ReactNode, useCallback, useEffect, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { X } from "lucide-react";
 
 import { cn } from "@player/lib/utils";
 import { Dialog, DialogContent, DialogTitle } from "@player/components/ui/dialog";
 import { useContentShift } from "@player/stores/contentShift.store";
+
+const isTextInputElement = (element: Element | null): element is HTMLElement => {
+  if (!element) return false;
+
+  if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+    return true;
+  }
+
+  if (element instanceof HTMLElement) {
+    return element.isContentEditable || element.getAttribute("role") === "textbox";
+  }
+
+  return false;
+};
 
 export interface ModalUIProps {
   title?: ReactNode;
@@ -100,18 +114,78 @@ const ModalUI: React.FC<ModalUIProps> = ({
   const [justOpened, setJustOpened] = useState(true);
 
   const { isContentShiftedLeft } = useContentShift();
+  const activeTextInputRef = useRef<HTMLElement | null>(null);
+  const shouldTrapNextOutsideTapRef = useRef(false);
+  const ignoreNextCloseRef = useRef(false);
   const isTransparent = isTransparentModal(transparent, className);
   const sizeConfig = getModalSizeConfig(layoutView, size);
   const modalContentClasses = getModalContentClasses(isTransparent, layoutView, className, isContentShiftedLeft, isLargeScreen, isMediumScreen);
   const titleTextClasses = getTitleClasses(isTransparent);
   const closeButtonClasses = getCloseButtonClasses(isTransparent);
 
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const updateTrackingForElement = (element: Element | null) => {
+      if (isTextInputElement(element)) {
+        activeTextInputRef.current = element;
+        shouldTrapNextOutsideTapRef.current = true;
+        ignoreNextCloseRef.current = false;
+      } else {
+        activeTextInputRef.current = null;
+        shouldTrapNextOutsideTapRef.current = false;
+        ignoreNextCloseRef.current = false;
+      }
+    };
+
+    const handleFocusIn = (event: FocusEvent) => {
+      updateTrackingForElement(event.target as HTMLElement | null);
+    };
+
+    const handleFocusOut = (event: FocusEvent) => {
+      const target = event.target as HTMLElement | null;
+
+      if (!isTextInputElement(target)) return;
+
+      if (typeof window === "undefined") return;
+
+      window.setTimeout(() => {
+        if (activeTextInputRef.current === target) {
+          updateTrackingForElement(null);
+        }
+      }, 0);
+    };
+
+    document.addEventListener("focusin", handleFocusIn);
+    document.addEventListener("focusout", handleFocusOut);
+
+    updateTrackingForElement(document.activeElement);
+
+    return () => {
+      document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("focusout", handleFocusOut);
+    };
+  }, []);
+
   // Only shift content on large screens
   const shouldShiftContent = isContentShiftedLeft && isLargeScreen;
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
-      if (!open && !justOpened) onClose();
+      if (!open) {
+        if (ignoreNextCloseRef.current) {
+          ignoreNextCloseRef.current = false;
+          return;
+        }
+
+        if (!justOpened) {
+          onClose();
+        }
+
+        return;
+      }
+
+      ignoreNextCloseRef.current = false;
     },
     [onClose, justOpened],
   );
@@ -126,11 +200,35 @@ const ModalUI: React.FC<ModalUIProps> = ({
     (e: Event) => {
       const target = e.target as HTMLElement | null;
 
-      if (closeOnOverlayClick === false || shouldKeepOpenOn(target)) {
+      if (shouldKeepOpenOn(target)) {
         e.preventDefault();
         return;
       }
 
+      const activeElement = document.activeElement as HTMLElement | null;
+      const focusedInput = isTextInputElement(activeElement) ? activeElement : activeTextInputRef.current;
+
+      if (shouldTrapNextOutsideTapRef.current && isTextInputElement(focusedInput)) {
+        shouldTrapNextOutsideTapRef.current = false;
+        ignoreNextCloseRef.current = true;
+
+        if (focusedInput === activeTextInputRef.current) {
+          activeTextInputRef.current = null;
+        }
+
+        focusedInput.blur();
+        e.preventDefault();
+        return;
+      }
+
+      if (closeOnOverlayClick === false) {
+        e.preventDefault();
+        return;
+      }
+
+      shouldTrapNextOutsideTapRef.current = false;
+      activeTextInputRef.current = null;
+      ignoreNextCloseRef.current = false;
       onClose();
     },
     [closeOnOverlayClick, shouldKeepOpenOn, onClose],
