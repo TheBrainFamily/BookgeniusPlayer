@@ -14,20 +14,29 @@ interface BookChaptersModalProps {
   onClose: () => void;
 }
 
+const MAX_DEMO_CHAPTER_PLAY = 3;
+const MAX_DEMO_CHAPTER_DEFAULT = 2;
+
 const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
   const { t } = useTranslation();
   const {
     locationRange: { currentChapter },
   } = useLocationRange();
-  const bookData = getBookData();
   const hasDemoAccess = bookDataLoader.getBookVisibility() === "demo";
-  const maxDemoChapter = bookData.metadata.bookForm === "play" ? 3 : 2;
 
   const chapters = useMemo(() => {
     const bookData = getBookData();
+    const maxDemoChapter = bookData.metadata.bookForm === "play" ? MAX_DEMO_CHAPTER_PLAY : MAX_DEMO_CHAPTER_DEFAULT;
 
-    return bookData.chapters.map((chapter, index) => ({ id: parseInt(chapter.id), title: getChapterTitle(parseInt(chapter.id), t), page: (index + 1).toString() }));
-  }, [t]);
+    return bookData.chapters.map((chapter, index) => {
+      return {
+        id: parseInt(chapter.id),
+        title: getChapterTitle(parseInt(chapter.id), t),
+        page: (index + 1).toString(),
+        isLocked: hasDemoAccess && parseInt(chapter.id, 10) > maxDemoChapter,
+      };
+    });
+  }, [t, hasDemoAccess]);
 
   const navigateToChapter = (chapterId: number) => {
     systemNavigateTo({ currentChapter: chapterId, currentParagraph: 0 });
@@ -39,7 +48,7 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
       <div className="container max-h-[60vh] overflow-y-auto scrollbar-search">
         {chapters.map((chapter) => {
           const isCurrentChapter = chapter.id === currentChapter;
-          const isLocked = hasDemoAccess && chapter.id > maxDemoChapter;
+          const isLocked = chapter.isLocked;
 
           return (
             <Button
