@@ -7,6 +7,8 @@ import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { Button } from "../ui/button";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { useLocationRange } from "@player/hooks/useLocationRange";
+import { bookDataLoader } from "@player/services/bookDataLoader";
+import { Lock, LockOpen } from "lucide-react";
 
 interface BookChaptersModalProps {
   onClose: () => void;
@@ -17,6 +19,9 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
   const {
     locationRange: { currentChapter },
   } = useLocationRange();
+  const bookData = getBookData();
+  const hasDemoAccess = bookDataLoader.getBookVisibility() === "demo";
+  const maxDemoChapter = bookData.metadata.bookForm === "play" ? 3 : 2;
 
   const chapters = useMemo(() => {
     const bookData = getBookData();
@@ -34,10 +39,12 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
       <div className="container max-h-[60vh] overflow-y-auto scrollbar-search">
         {chapters.map((chapter) => {
           const isCurrentChapter = chapter.id === currentChapter;
+          const isLocked = hasDemoAccess && chapter.id > maxDemoChapter;
 
           return (
             <Button
               variant="ghost"
+              disabled={isLocked}
               key={chapter.id}
               onPointerUp={(e) => {
                 e.preventDefault();
@@ -58,13 +65,16 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
               }`}
             >
               <div className="grid w-full min-w-0 grid-cols-[1fr_auto] items-start gap-3">
-                <span
-                  className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap sm:whitespace-normal sm:line-clamp-2 leading-snug"
-                  title={chapter.title}
-                  aria-label={chapter.title}
-                >
-                  {chapter.title}
-                </span>
+                <div className="flex items-center gap-2">
+                  {hasDemoAccess && (isLocked ? <Lock className="w-3 h-3" /> : <LockOpen className="w-3 h-3" />)}
+                  <span
+                    className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap sm:whitespace-normal sm:line-clamp-2 leading-snug"
+                    title={chapter.title}
+                    aria-label={chapter.title}
+                  >
+                    {chapter.title}
+                  </span>
+                </div>
                 <span className="shrink-0 text-sm text-muted-foreground tabular-nums">{chapter.page}</span>
               </div>
             </Button>
