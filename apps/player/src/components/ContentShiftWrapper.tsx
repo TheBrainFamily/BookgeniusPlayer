@@ -202,6 +202,8 @@ export const ContentShiftWrapper: React.FC = () => {
     if (!isAppReady) return;
 
     const elements = getDOMElements();
+    console.log("ContentShiftWrapper effect triggered", { isAppReady, isLargeScreen, isMediumScreen, isContentShiftedLeft, isPlayFormat, isMobileOrTabletDevice, elements });
+
     if (!elements) return;
 
     applyTransitions(elements, isPlayFormat);
