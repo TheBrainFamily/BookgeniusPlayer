@@ -141,7 +141,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({ title, isTransparent, layoutV
   const closeButtonClasses = cn("p-1 rounded-md transition-colors cursor-pointer", isTransparent ? "text-gray-600 hover:text-black" : "text-white/70 hover:text-white");
 
   return (
-    <header className={cn("flex justify-between items-center p-4", layoutView && "pb-0")}>
+    <header className={cn("flex justify-between items-center p-4 w-full", layoutView && "pb-0")}>
       <div className={titleClasses}>{title}</div>
       <div className="flex items-center gap-2">
         {headerActions}
@@ -257,7 +257,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             >
               <ModalHeader title={title} isTransparent={isTransparent} layoutView={layoutView} showCloseButton={showCloseButton} headerActions={headerActions} onClose={onClose} />
 
-              {searchActions && <div className="flex justify-between items-center px-4 pt-4">{searchActions}</div>}
+              {searchActions && <div className="w-full flex justify-between items-center px-4 pt-4">{searchActions}</div>}
 
               <motion.div
                 className="py-3 px-2 overflow-y-auto opened-modal"
