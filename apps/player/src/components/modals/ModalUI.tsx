@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback } from "react";
+import React, { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { X } from "lucide-react";
 
@@ -7,6 +7,20 @@ import { Dialog, DialogContent, DialogTitle } from "@player/components/ui/dialog
 import { useContentShift } from "@player/stores/contentShift.store";
 import { useBookForm } from "@player/hooks/useBookForm";
 import { useScreenSize } from "@player/hooks/useScreenSize";
+
+const isTextInputElement = (element: Element | null): element is HTMLElement => {
+  if (!element) return false;
+
+  if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+    return true;
+  }
+
+  if (element instanceof HTMLElement) {
+    return element.isContentEditable || element.getAttribute("role") === "textbox";
+  }
+
+  return false;
+};
 
 export interface ModalUIProps {
   title?: ReactNode;
@@ -193,31 +207,114 @@ const ModalUI: React.FC<ModalUIProps> = ({
   const containerClasses = getContainerClasses(shouldShiftContent, layoutView, isPlayFormat, sizeConfig);
   const modalWrapperClasses = getModalWrapperClasses(layoutView, isPlayFormat, isMediumScreen, isLargeScreen, shouldShiftContent);
 
+  const activeTextInputRef = useRef<HTMLElement | null>(null);
+  const shouldTrapNextOutsideTapRef = useRef(false);
+  const ignoreNextCloseRef = useRef(false);
+
+  const maxHeight = `calc(var(--vvh, 100dvh) - ${!isMediumScreen || !isLargeScreen ? 96 : 32}px)`;
+
   const handleOpenChange = useCallback(
     (open: boolean) => {
-      if (!open) onClose();
+      if (!open) {
+        if (ignoreNextCloseRef.current) {
+          ignoreNextCloseRef.current = false;
+          return;
+        }
+
+        onClose();
+        return;
+      }
+
+      ignoreNextCloseRef.current = false;
     },
     [onClose],
   );
 
   const shouldKeepOpenOn = useCallback((target: EventTarget | null) => {
     if (!(target instanceof Element)) return false;
+
     return !!target.closest('[data-keep-modal-open="true"]');
   }, []);
 
   const handleOnInteractOutside = useCallback(
     (e: Event) => {
       const target = e.target as HTMLElement | null;
-      if (closeOnOverlayClick === false || shouldKeepOpenOn(target)) {
+
+      if (shouldKeepOpenOn(target)) {
         e.preventDefault();
         return;
       }
+
+      const activeElement = document.activeElement as HTMLElement | null;
+      const focusedInput = isTextInputElement(activeElement) ? activeElement : activeTextInputRef.current;
+
+      if (shouldTrapNextOutsideTapRef.current && isTextInputElement(focusedInput)) {
+        shouldTrapNextOutsideTapRef.current = false;
+        ignoreNextCloseRef.current = true;
+
+        activeTextInputRef.current = null;
+
+        focusedInput.blur();
+        e.preventDefault();
+        return;
+      }
+
+      if (closeOnOverlayClick === false) {
+        e.preventDefault();
+        return;
+      }
+
+      shouldTrapNextOutsideTapRef.current = false;
+      activeTextInputRef.current = null;
+      ignoreNextCloseRef.current = false;
       onClose();
     },
     [closeOnOverlayClick, shouldKeepOpenOn, onClose],
   );
 
-  const maxHeight = `calc(var(--vvh, 100dvh) - ${!isMediumScreen || !isLargeScreen ? 96 : 32}px)`;
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const updateTrackingForElement = (element: Element | null) => {
+      if (isTextInputElement(element)) {
+        activeTextInputRef.current = element;
+        shouldTrapNextOutsideTapRef.current = true;
+        ignoreNextCloseRef.current = false;
+      } else {
+        activeTextInputRef.current = null;
+        shouldTrapNextOutsideTapRef.current = false;
+        ignoreNextCloseRef.current = false;
+      }
+    };
+
+    const handleFocusIn = (event: FocusEvent) => {
+      updateTrackingForElement(event.target as HTMLElement | null);
+    };
+
+    const handleFocusOut = (event: FocusEvent) => {
+      const target = event.target as HTMLElement | null;
+
+      if (!isTextInputElement(target)) return;
+
+      if (typeof window === "undefined") return;
+
+      window.setTimeout(() => {
+        if (activeTextInputRef.current === target) {
+          updateTrackingForElement(null);
+        }
+      }, 0);
+    };
+
+    document.addEventListener("focusin", handleFocusIn);
+    document.addEventListener("focusout", handleFocusOut);
+
+    updateTrackingForElement(document.activeElement);
+
+    return () => {
+      document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("focusout", handleFocusOut);
+    };
+  }, []);
 
   return (
     <Dialog open={true} onOpenChange={handleOpenChange} modal={!layoutView}>
