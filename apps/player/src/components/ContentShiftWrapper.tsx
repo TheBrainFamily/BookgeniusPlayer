@@ -74,6 +74,8 @@ const handlePlayFormat = (elements: DOMElements, isContentShiftedLeft: boolean, 
   const resetPlayStyles = () => {
     playRightNotesBlank.className = "hidden";
     playFooterRightNotesBlank.className = "hidden";
+    elements.bottomInputWrapper.style.flex = "";
+    elements.bottomInputWrapper.style.margin = "";
     elements.contentContainer.style.flex = "";
     elements.contentContainer.style.margin = "";
   };
@@ -90,10 +92,12 @@ const handlePlayFormat = (elements: DOMElements, isContentShiftedLeft: boolean, 
   if (isLargeScreen) {
     playRightNotesBlank.className = "xl:block xl:flex-1 max-w-[500px] ml-2";
     playRightNotesBlank.style.transition = "all 0.3s ease-out";
-    playFooterRightNotesBlank.className = "xl:block xl:flex-1 max-w-[500px]";
+    playFooterRightNotesBlank.className = "xl:block xl:flex-1 max-w-[500px] ml-2";
     playFooterRightNotesBlank.style.transition = "all 0.3s ease-out";
 
-    elements.contentContainer.style.flex = "0 0 auto";
+    elements.bottomInputWrapper.style.flex = "0 0 900px";
+    elements.bottomInputWrapper.style.margin = "0 0.5rem";
+    elements.contentContainer.style.flex = "0 0 900px";
     elements.contentContainer.style.margin = "0 0.5rem";
   } else if (isMediumScreen) {
     playRightNotesBlank.className = "lg:block lg:flex-1 max-w-[500px]";
@@ -101,7 +105,9 @@ const handlePlayFormat = (elements: DOMElements, isContentShiftedLeft: boolean, 
     playFooterRightNotesBlank.className = "lg:block lg:flex-1 max-w-[500px]";
     playFooterRightNotesBlank.style.transition = "all 0.3s ease-out";
 
-    elements.contentContainer.style.flex = "0 0 auto";
+    elements.bottomInputWrapper.style.flex = "0 0 800px";
+    elements.bottomInputWrapper.style.margin = "0 0.5rem";
+    elements.contentContainer.style.flex = "0 0 800px";
     elements.contentContainer.style.margin = "0 0.5rem";
   } else {
     resetPlayStyles();
@@ -235,7 +241,7 @@ export const ContentShiftWrapper: React.FC = () => {
     const playerScope = document.getElementById("player-scope");
     if (!playerScope) return;
 
-    if (isMobileOrTabletDevice) {
+    if (isMobileOrTabletDevice && !isPlayFormat) {
       playerScope.classList.add("mobileOrTablet");
     } else {
       playerScope.classList.remove("mobileOrTablet");
@@ -244,7 +250,7 @@ export const ContentShiftWrapper: React.FC = () => {
     return () => {
       playerScope.classList.remove("mobileOrTablet");
     };
-  }, [isAppReady, isMobileOrTabletDevice]);
+  }, [isAppReady, isMobileOrTabletDevice, isPlayFormat]);
 
   return null;
 };
