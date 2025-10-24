@@ -678,24 +678,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
   return (
     <>
-      <AnimatePresence>
-        {micToastVisible && (
-          <motion.div
-            className="fixed bottom-44 right-4 z-50 bg-black/85 border border-white/30 text-white rounded-full px-3 py-2 shadow-xl text-xs"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-          >
-            {micToastText}
-          </motion.div>
-        )}
-      </AnimatePresence>
       {showMicDebug && <DebugMicPlaybackButton />}
       <MicrophoneVisualizer isActive={isRecording || isRealtimeConnecting} audioAnalyser={audioAnalyser} onMicReady={setIsMicrophoneReady} />
       <OptionalElement className={cn("w-full flex justify-center", className)} id="bottom-input-container">
         <motion.div
           className={cn(
-            "bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-2 py-[2px] md:py-[3px] md:px-3",
+            "relative bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-2 py-[2px] md:py-[3px] md:px-3",
             isRecording && "recording-active",
             isRealtimeConnecting && "border-amber-300/70 shadow-[0_0_12px_rgba(250,204,21,0.25)]",
           )}
@@ -705,6 +693,18 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
           ref={containerRef}
           data-keep-modal-open="true"
         >
+          <AnimatePresence>
+            {micToastVisible && (
+              <motion.div
+                className="absolute right-0 -top-10 z-50 bg-black/85 border border-white/30 text-white rounded-full px-3 py-2 shadow-xl text-xs"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+              >
+                {micToastText}
+              </motion.div>
+            )}
+          </AnimatePresence>
           <motion.div key="expanded" variants={variants.expandedContainer} initial="initial" animate="animate" exit="exit">
             <form onSubmit={handleSubmit} className="flex items-center space-x-2 min-w-[280px] sm:min-w-[350px]">
               <div className="relative flex-grow flex items-center">
