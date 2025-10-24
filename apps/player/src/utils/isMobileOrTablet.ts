@@ -68,19 +68,16 @@ export const isTablet = (considerViewportWidth = false, tabletMinWidth = 768, ta
 
   // Enhanced iPad detection for modern iPadOS devices that report as desktop Safari
   // Only consider it an iPad if it's MacIntel with touch AND has tablet-like screen dimensions
+  const screenMin = Math.min(window.screen.width, window.screen.height);
+  const screenMax = Math.max(window.screen.width, window.screen.height);
+
   const isModernIPad =
     navigator.platform === "MacIntel" &&
-    navigator.maxTouchPoints > 1 &&
-    window.screen.width >= 768 &&
-    window.screen.height >= 1024 &&
-    // Additional check: iPad typically has these screen dimensions
-    ((window.screen.width === 768 && window.screen.height === 1024) ||
-      (window.screen.width === 1024 && window.screen.height === 768) ||
-      (window.screen.width === 834 && window.screen.height === 1112) ||
-      (window.screen.width === 1112 && window.screen.height === 834) ||
-      (window.screen.width === 1024 && window.screen.height === 1366) ||
-      (window.screen.width === 820 && window.screen.height === 1180) ||
-      (window.screen.width === 1366 && window.screen.height === 1024));
+    navigator.maxTouchPoints >= 1 &&
+    // All modern iPad models (including Mini, Air and Pro) have a shortest side >= 744px in CSS pixels.
+    screenMin >= 744 &&
+    // Longest side for current iPads is 1366px in CSS pixels. Keep a ceiling to avoid false positives.
+    screenMax <= 1366;
 
   if (isModernIPad) {
     return true;
