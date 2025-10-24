@@ -41,6 +41,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
 
   const [openChapters, setOpenChapters] = useState<string[]>([]);
 
+  const [wideScreen, setIsWideScreen] = useState(null);
+
   const hasAnyResults = (deferredResults?.items?.length ?? 0) > 0;
 
   const filteredItems = useMemo(() => {
@@ -73,6 +75,16 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
 
     return availability;
   }, [deferredResults?.items]);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsWideScreen(window.innerWidth >= 1024);
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
   useEffect(() => {
     if (!filterAvailability[activeFilter] && activeFilter !== "all") {
@@ -255,7 +267,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
     ) : null;
 
   return (
-    <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay} headerActions={headerActions} searchActions={searchActions}>
+    <ModalUI title={modalTitle} onClose={onClose} layoutView={wideScreen} hideOverlay={wideScreen} headerActions={headerActions} searchActions={searchActions}>
       <div className="flex flex-col h-full relative overflow-hidden" aria-busy={showSpinner}>
         {showSpinner && (
           <motion.div
