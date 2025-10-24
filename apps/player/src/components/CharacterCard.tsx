@@ -99,7 +99,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
   return (
     <div
       ref={cardRef}
-      className={cn("group w-[clamp(60px,15vw,200px)] max-w-[200px] mx-auto relative pb-4 cursor-pointer")}
+      className={cn("group w-[clamp(60px,20vw,200px)] max-w-[200px] mx-auto relative pb-4 cursor-pointer")}
       data-canonical-name={entity.slug}
       data-appearances={JSON.stringify(apps)}
       onMouseEnter={() => requestToggle(true)}
@@ -109,7 +109,6 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
       onClick={() => openModal({ characterSlug: entity.slug, isVideo: modalIsVideo, mediaSrc: modalMediaSrc, chapter: entity.chapterNumber, paragraph: entity.paragraphNumber })}
     >
       <motion.div
-        layout
         className={cn(
           "relative rounded-full aspect-square isolate overflow-hidden transition-all duration-300 ease-in-out hover:scale-110 hover:z-10",
           !disableHighlight && isTalkingInCurrentRange && "z-10 animate-pulse-glow overflow-visible border-2 border-white/30",

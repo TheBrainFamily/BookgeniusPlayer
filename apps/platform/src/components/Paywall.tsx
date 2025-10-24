@@ -1,11 +1,12 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Crown, BookOpen, Zap, Check, Lock, X } from "lucide-react";
+
+import { useIntegrations } from "@platform/integrations";
+import type { PaymentType } from "@platform/integrations";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { Crown, BookOpen, Zap, Check, Lock, X } from "lucide-react";
-import { useIntegrations } from "@platform/integrations";
-import type { PaymentType } from "@platform/integrations";
-import { useTranslation } from "react-i18next";
 
 interface PaywallProps {
   bookSlug: string;
@@ -19,14 +20,29 @@ interface PaywallProps {
 
 export const PaywallInner: React.FC<PaywallProps> = ({ bookSlug, bookTitle, onClose, openSignIn, isUserLoggedIn, handlePayment, loading }) => {
   const { t } = useTranslation();
+
   const handleSignIn = () => {
     console.log("[PAYWALL] handleSignIn");
     openSignIn();
   };
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleContentClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="relative max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="opened-modal fixed inset-0 bg-black/80 backdrop-blur-sm z-100 flex items-center justify-center p-4" onClick={handleOverlayClick} data-keep-modal-open="true">
+      <div className="relative max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={handleContentClick}>
         <Button variant="ghost" size="icon" className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white" onClick={onClose}>
           <X className="h-5 w-5" />
         </Button>

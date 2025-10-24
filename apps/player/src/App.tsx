@@ -74,7 +74,6 @@ function Shell({ onShellMounted }: { onShellMounted: () => void }) {
       {/* <RightNotesPanel /> */}
       <ScrollIndicator />
       <Footer />
-      <ContentShiftWrapper />
       {import.meta.env.VITE_EDITOR === "true" && <EditorMode />}
     </>
   );
@@ -127,6 +126,7 @@ export default function App() {
               <BookContentWrapper>
                 <Shell onShellMounted={() => setReactDomReady(true)} />
                 <ModalRenderers />
+                <ContentShiftWrapper />
               </BookContentWrapper>
             </RealtimeProvider>
           </LocationProvider>

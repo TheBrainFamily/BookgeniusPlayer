@@ -1,7 +1,5 @@
 // Service worker registration and handling
 
-import { isMobileOrTablet } from "./utils/isMobileOrTablet";
-
 const SW_TIMEOUT_MS = 10000;
 const START_TIME = Date.now();
 
@@ -15,7 +13,6 @@ const logWithTime = (message: string) => {
 
 export const dealWithSW = () => {
   logWithTime("Initializing service worker");
-  updateRightNotesVisibility();
 
   let serviceWorkerHandled = false;
   let swTimeoutId: number | undefined;
@@ -76,31 +73,4 @@ export const dealWithSW = () => {
   }
 
   logWithTime(`Service worker initialization completed: serviceWorkerHandled=${serviceWorkerHandled}`);
-};
-
-const updateRightNotesVisibility = (): void => {
-  if (typeof window === "undefined") return;
-
-  const rightNotesElement = document.getElementById("right-notes");
-  if (!rightNotesElement) {
-    console.warn("Element with id 'right-notes' not found");
-    return;
-  }
-
-  if (isMobileOrTablet()) {
-    rightNotesElement.classList.add("hide");
-  } else {
-    rightNotesElement.classList.remove("hide");
-  }
-
-  const handleResize = () => {
-    if (isMobileOrTablet()) {
-      rightNotesElement.classList.add("hide");
-    } else {
-      rightNotesElement.classList.remove("hide");
-    }
-  };
-
-  window.addEventListener("resize", handleResize);
-  window.addEventListener("orientationchange", handleResize);
 };

@@ -5,6 +5,9 @@ import { X } from "lucide-react";
 import { cn } from "@player/lib/utils";
 import { Dialog, DialogContent, DialogTitle } from "@player/components/ui/dialog";
 import { useContentShift } from "@player/stores/contentShift.store";
+import { useBookForm } from "@player/hooks/useBookForm";
+import { useScreenSize } from "@player/hooks/useScreenSize";
+import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";
 
 const isTextInputElement = (element: Element | null): element is HTMLElement => {
   if (!element) return false;
@@ -46,7 +49,7 @@ const MODAL_SIZES: Record<NonNullable<ModalUIProps["size"]>, ModalSize> = {
   full: { content: "w-full max-w-none", container: "w-full max-w-none" },
 };
 
-const LAYOUT_VIEW_SIZE: ModalSize = { content: "w-full h-full max-w-none pointer-events-none z-50", container: "w-full max-w-none pointer-events-none" };
+const LAYOUT_VIEW_SIZE: ModalSize = { content: "w-full h-full max-w-none pointer-events-none z-40", container: "w-full max-w-none pointer-events-none" };
 
 const isTransparentModal = (transparent: boolean, className: string): boolean => {
   return transparent || className.includes("bg-transparent");
@@ -62,36 +65,123 @@ const getModalContentClasses = (
   className: string,
   isContentShifted: boolean,
   isLargeScreen: boolean,
-  isMediumScreen: boolean,
+  isPlayFormat: boolean,
 ): string => {
   return cn(
-    // Base classes
-    "rounded-lg overflow-hidden w-full flex flex-col align-center justify-center h-fit pointer-events-auto",
-
-    // Default styling (unless transparent)
+    "rounded-lg overflow-hidden w-full flex flex-col items-center justify-center h-fit pointer-events-auto",
     !isTransparent && "bg-black/70 textured-bg border border-white/30 shadow-xl text-white",
-
-    // Layout view specific styling
     layoutView && [
       "overflow-hidden max-h-[70vh]",
-      // On large screens with content shifted, use narrower width; otherwise use full width
-      isContentShifted && isLargeScreen && "w-[26vw]",
-      isContentShifted && isMediumScreen && "w-[33%]",
-      // Only apply flex layout on large screens without content shift
-      !isContentShifted && "xl:flex-1 xl:max-w-[700px] xl:order-3",
+      !isContentShifted && !isPlayFormat && "xl:flex-1 xl:max-w-[700px] xl:order-3",
+      !isContentShifted && isPlayFormat && "w-full max-w-[800px]",
+      isContentShifted && isLargeScreen && isPlayFormat && "max-w-[925px]",
     ],
-
-    // Custom className overrides
     className,
   );
 };
 
-const getTitleClasses = (isTransparent: boolean): string => {
-  return cn("text-lg font-semibold", isTransparent ? "text-black" : "text-white");
+const getContainerClasses = (shouldShiftContent: boolean, layoutView: boolean, isPlayFormat: boolean, sizeConfig: ModalSize): string => {
+  return cn(
+    "flex flex-row justify-center h-full",
+    sizeConfig.container,
+    shouldShiftContent && layoutView && !isPlayFormat && "flex flex-row justify-center mx-auto max-w-[120rem] w-full xl:px-2",
+    shouldShiftContent && layoutView && isPlayFormat && "flex flex-row mx-auto max-w-[120rem] w-full",
+  );
 };
 
-const getCloseButtonClasses = (isTransparent: boolean): string => {
-  return cn("p-1 rounded-md transition-colors cursor-pointer", isTransparent ? "text-gray-600 hover:text-black" : "text-white/70 hover:text-white");
+const getModalWrapperClasses = (layoutView: boolean, isPlayFormat: boolean, isMediumScreen: boolean, isLargeScreen: boolean, shouldShiftContent: boolean): string => {
+  if (!layoutView) return "";
+
+  if (!isPlayFormat) {
+    return cn(
+      !isMediumScreen && !isLargeScreen && "xl:flex-1 pointer-events-none max-w-[600px] flex items-center",
+      (isMediumScreen || isLargeScreen) && "lg:flex-1 pointer-events-none max-w-[600px] flex items-center ml-2",
+      isMediumScreen && "mr-2",
+    );
+  }
+
+  return cn(
+    !isMediumScreen && !isLargeScreen && "pointer-events-none max-w-[800px] mx-auto flex items-center",
+    isLargeScreen && shouldShiftContent && "xl:flex-1 max-w-[500px] pointer-events-none flex items-center mr-3",
+    isMediumScreen && shouldShiftContent && "lg:flex-1 pointer-events-none max-w-[500px] flex items-center mr-2",
+  );
+};
+
+interface SpacerProps {
+  layoutView: boolean;
+  isPlayFormat: boolean;
+  isLargeScreen: boolean;
+  isMediumScreen: boolean;
+  shouldShiftContent: boolean;
+  isMobileOrTablet: boolean;
+}
+
+const LeftSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isLargeScreen, isMediumScreen, isMobileOrTablet }) => {
+  if (!layoutView || isPlayFormat || isMobileOrTablet) return null;
+
+  return (
+    <>
+      {isLargeScreen && <div id="left-notes-blank" className="hidden xl:block [flex:0_0_200px] mr-2" />}
+      {isMediumScreen && <div id="left-notes-blank" className="hidden sm:block [flex:0_1_0%]" />}
+    </>
+  );
+};
+
+const ContentSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isMediumScreen, isLargeScreen, isMobileOrTablet }) => {
+  if (!layoutView) return null;
+
+  if (!isPlayFormat) {
+    return <div className={cn("modal-content max-w-[800px]", (isMediumScreen || isLargeScreen) && "sm:flex-3", !isMobileOrTablet && "xl:max-w-[850px] xxl:max-w-[900px]")} />;
+  }
+
+  return null;
+};
+
+const PlayFormatSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, shouldShiftContent }) => {
+  if (!layoutView || !isPlayFormat || !shouldShiftContent) return null;
+
+  return <div className={cn("sm:flex-3 max-w-[800px] xl:max-w-[850px] xxl:max-w-[900px] xxl:w-[900px] xxl:flex-auto mx-2")} />;
+};
+
+interface ModalHeaderProps {
+  title?: ReactNode;
+  isTransparent: boolean;
+  layoutView: boolean;
+  showCloseButton: boolean;
+  headerActions?: ReactNode;
+  onClose: () => void;
+}
+
+const ModalHeader: React.FC<ModalHeaderProps> = ({ title, isTransparent, layoutView, showCloseButton, headerActions, onClose }) => {
+  if (!title) return null;
+
+  const titleClasses = cn("text-lg font-semibold", isTransparent ? "text-black" : "text-white");
+  const closeButtonClasses = cn("p-1 rounded-md transition-colors cursor-pointer", isTransparent ? "text-gray-600 hover:text-black" : "text-white/70 hover:text-white");
+
+  return (
+    <header className={cn("flex justify-between items-center p-4 w-full", layoutView && "pb-0")}>
+      <div className={titleClasses}>{title}</div>
+      <div className="flex items-center gap-2">
+        {headerActions}
+        {showCloseButton && (
+          <button
+            type="button"
+            onPointerUp={onClose}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClose();
+              }
+            }}
+            className={closeButtonClasses}
+            aria-label="Close modal"
+          >
+            <X size={20} />
+          </button>
+        )}
+      </div>
+    </header>
+  );
 };
 
 const ModalUI: React.FC<ModalUIProps> = ({
@@ -109,66 +199,24 @@ const ModalUI: React.FC<ModalUIProps> = ({
   headerActions,
   searchActions,
 }) => {
-  const [isLargeScreen, setIsLargeScreen] = useState(false);
-  const [isMediumScreen, setIsMediumScreen] = useState(false);
-  const [justOpened, setJustOpened] = useState(true);
-
   const { isContentShiftedLeft } = useContentShift();
+  const { isLargeScreen, isMediumScreen } = useScreenSize();
+  const { isPlayFormat } = useBookForm();
+  const isMobileOrTablet = useIsMobileOrTablet();
+
+  const isTransparent = isTransparentModal(transparent, className);
+  const shouldShiftContent = isContentShiftedLeft && (isLargeScreen || isMediumScreen);
+  const sizeConfig = getModalSizeConfig(layoutView, size);
+
+  const modalContentClasses = getModalContentClasses(isTransparent, layoutView, className, isContentShiftedLeft, isLargeScreen, isPlayFormat);
+  const containerClasses = getContainerClasses(shouldShiftContent, layoutView, isPlayFormat, sizeConfig);
+  const modalWrapperClasses = getModalWrapperClasses(layoutView, isPlayFormat, isMediumScreen, isLargeScreen, shouldShiftContent);
+
   const activeTextInputRef = useRef<HTMLElement | null>(null);
   const shouldTrapNextOutsideTapRef = useRef(false);
   const ignoreNextCloseRef = useRef(false);
-  const isTransparent = isTransparentModal(transparent, className);
-  const sizeConfig = getModalSizeConfig(layoutView, size);
-  const modalContentClasses = getModalContentClasses(isTransparent, layoutView, className, isContentShiftedLeft, isLargeScreen, isMediumScreen);
-  const titleTextClasses = getTitleClasses(isTransparent);
-  const closeButtonClasses = getCloseButtonClasses(isTransparent);
 
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-
-    const updateTrackingForElement = (element: Element | null) => {
-      if (isTextInputElement(element)) {
-        activeTextInputRef.current = element;
-        shouldTrapNextOutsideTapRef.current = true;
-        ignoreNextCloseRef.current = false;
-      } else {
-        activeTextInputRef.current = null;
-        shouldTrapNextOutsideTapRef.current = false;
-        ignoreNextCloseRef.current = false;
-      }
-    };
-
-    const handleFocusIn = (event: FocusEvent) => {
-      updateTrackingForElement(event.target as HTMLElement | null);
-    };
-
-    const handleFocusOut = (event: FocusEvent) => {
-      const target = event.target as HTMLElement | null;
-
-      if (!isTextInputElement(target)) return;
-
-      if (typeof window === "undefined") return;
-
-      window.setTimeout(() => {
-        if (activeTextInputRef.current === target) {
-          updateTrackingForElement(null);
-        }
-      }, 0);
-    };
-
-    document.addEventListener("focusin", handleFocusIn);
-    document.addEventListener("focusout", handleFocusOut);
-
-    updateTrackingForElement(document.activeElement);
-
-    return () => {
-      document.removeEventListener("focusin", handleFocusIn);
-      document.removeEventListener("focusout", handleFocusOut);
-    };
-  }, []);
-
-  // Only shift content on large screens
-  const shouldShiftContent = isContentShiftedLeft && isLargeScreen;
+  const maxHeight = `calc(var(--vvh, 100dvh) - ${!isMediumScreen || !isLargeScreen ? 96 : 32}px)`;
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -178,16 +226,13 @@ const ModalUI: React.FC<ModalUIProps> = ({
           return;
         }
 
-        if (!justOpened) {
-          onClose();
-        }
-
+        onClose();
         return;
       }
 
       ignoreNextCloseRef.current = false;
     },
-    [onClose, justOpened],
+    [onClose],
   );
 
   const shouldKeepOpenOn = useCallback((target: EventTarget | null) => {
@@ -233,31 +278,53 @@ const ModalUI: React.FC<ModalUIProps> = ({
   );
 
   useEffect(() => {
-    const checkScreenSize = () => {
-      setIsLargeScreen(window.innerWidth >= 1280);
-      setIsMediumScreen(window.innerWidth >= 1024 && window.innerWidth < 1280);
+    if (typeof document === "undefined") return;
+
+    const updateTrackingForElement = (element: Element | null) => {
+      if (isTextInputElement(element)) {
+        activeTextInputRef.current = element;
+        shouldTrapNextOutsideTapRef.current = true;
+        ignoreNextCloseRef.current = false;
+      } else {
+        activeTextInputRef.current = null;
+        shouldTrapNextOutsideTapRef.current = false;
+        ignoreNextCloseRef.current = false;
+      }
     };
 
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
+    const handleFocusIn = (event: FocusEvent) => {
+      updateTrackingForElement(event.target as HTMLElement | null);
+    };
 
-  // Reset justOpened flag after a short delay to prevent immediate closing
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setJustOpened(false);
-    }, 100); // Small delay to allow modal to fully open
+    const handleFocusOut = (event: FocusEvent) => {
+      const target = event.target as HTMLElement | null;
 
-    return () => clearTimeout(timer);
+      if (!isTextInputElement(target)) return;
+
+      if (typeof window === "undefined") return;
+
+      window.setTimeout(() => {
+        if (activeTextInputRef.current === target) {
+          updateTrackingForElement(null);
+        }
+      }, 0);
+    };
+
+    document.addEventListener("focusin", handleFocusIn);
+    document.addEventListener("focusout", handleFocusOut);
+
+    updateTrackingForElement(document.activeElement);
+
+    return () => {
+      document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("focusout", handleFocusOut);
+    };
   }, []);
 
   return (
     <Dialog open={true} onOpenChange={handleOpenChange} modal={!layoutView}>
-      {/* Accessibility */}
-      {title ? <DialogTitle className="sr-only">{typeof title === "string" ? title : "Modal"}</DialogTitle> : <DialogTitle className="sr-only">Modal</DialogTitle>}
+      <DialogTitle className="sr-only">{typeof title === "string" ? title : "Modal"}</DialogTitle>
 
-      {/* Modal Content */}
       <DialogContent
         aria-describedby={undefined}
         overlayProps={{ useCustomAnimation: true, hideOverlay }}
@@ -266,67 +333,58 @@ const ModalUI: React.FC<ModalUIProps> = ({
         onOpenAutoFocus={(e) => e.preventDefault()}
         onCloseAutoFocus={(e) => e.preventDefault()}
       >
-        <div
-          className={cn(
-            "flex flex-row gap-2 items-center h-full",
-            sizeConfig.container,
-            // Position modal in the right space when content is shifted left on large screens
-            isContentShiftedLeft && (isLargeScreen || isMediumScreen) && layoutView ? "justify-end ml-auto mr-0" : "justify-center mx-auto px-4",
-            isContentShiftedLeft && layoutView && isLargeScreen && "pr-[3%]",
-            isContentShiftedLeft && layoutView && isMediumScreen && "pr-2",
-          )}
-        >
-          {layoutView && !shouldShiftContent && <div id="left-notes-blank" className="hidden max-w-[700px] pointer-events-none xl:flex xl:flex-1 xl:order-1" />}
+        <div className={containerClasses}>
+          <LeftSpacer
+            layoutView={layoutView}
+            isPlayFormat={isPlayFormat}
+            isLargeScreen={isLargeScreen}
+            isMediumScreen={isMediumScreen}
+            shouldShiftContent={shouldShiftContent}
+            isMobileOrTablet={isMobileOrTablet}
+          />
+          <ContentSpacer
+            layoutView={layoutView}
+            isPlayFormat={isPlayFormat}
+            isLargeScreen={isLargeScreen}
+            isMediumScreen={isMediumScreen}
+            shouldShiftContent={shouldShiftContent}
+            isMobileOrTablet={isMobileOrTablet}
+          />
+          <PlayFormatSpacer
+            layoutView={layoutView}
+            isPlayFormat={isPlayFormat}
+            shouldShiftContent={shouldShiftContent}
+            isLargeScreen={isLargeScreen}
+            isMediumScreen={isMediumScreen}
+            isMobileOrTablet={isMobileOrTablet}
+          />
 
-          <motion.div
-            className={modalContentClasses}
-            style={{ maxHeight: "calc(var(--vvh, 100dvh) - 32px)" }}
-            layout={animateHeight}
-            transition={animateHeight ? { duration: 0.3, ease: "easeInOut", layout: { duration: 0.3 } } : undefined}
-          >
-            {title && (
-              <header className={cn("flex justify-between items-center p-4", layoutView && "pb-0")}>
-                <div className={titleTextClasses}>{title}</div>
-                <div className="flex items-center gap-2">
-                  {headerActions}
-                  {showCloseButton && (
-                    <button
-                      type="button"
-                      onPointerUp={onClose}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          onClose();
-                        }
-                      }}
-                      className={closeButtonClasses}
-                      aria-label="Close modal"
-                    >
-                      <X size={20} />
-                    </button>
-                  )}
-                </div>
-              </header>
-            )}
-
-            {searchActions && <div className="flex justify-between items-center px-4 pt-4">{searchActions}</div>}
-
+          <div className={modalWrapperClasses}>
             <motion.div
-              className="p-4 overflow-y-auto opened-modal"
-              style={{ maxHeight: "inherit" }}
+              className={modalContentClasses}
+              style={{ maxHeight }}
               layout={animateHeight}
-              transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}
-              onClick={(e) => {
-                if (e.target === e.currentTarget) {
-                  onClose();
-                }
-              }}
+              transition={animateHeight ? { duration: 0.3, ease: "easeInOut", layout: { duration: 0.3 } } : undefined}
             >
-              {children}
-            </motion.div>
-          </motion.div>
+              <ModalHeader title={title} isTransparent={isTransparent} layoutView={layoutView} showCloseButton={showCloseButton} headerActions={headerActions} onClose={onClose} />
 
-          {layoutView && !shouldShiftContent && <div id="right-notes-blank" className="hidden xl:block xl:flex-2 xl:order-2" />}
+              {searchActions && <div className="w-full flex justify-between items-center px-4 pt-4">{searchActions}</div>}
+
+              <motion.div
+                className="py-3 px-2 overflow-y-auto opened-modal w-full"
+                style={{ maxHeight: "inherit" }}
+                layout={animateHeight}
+                transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}
+                onClick={(e) => {
+                  if (e.target === e.currentTarget) {
+                    onClose();
+                  }
+                }}
+              >
+                {children}
+              </motion.div>
+            </motion.div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

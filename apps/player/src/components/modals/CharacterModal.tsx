@@ -192,7 +192,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                             }
                           }}
                         >
-                          <div className="relative p-4">
+                          <div className="relative p-3">
                             <div className="flex gap-2 mb-2">
                               {appearance.type && (
                                 <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-tertiary-30 text-book-tertiary items-center">

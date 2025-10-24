@@ -1,3 +1,8 @@
+@theme {
+  /* Breakpoints */
+  --breakpoint-xxl: 90rem;
+}
+
 /* Victorian Library Design System - Rich, atmospheric, and elegant */
 #platform-scope {
   @theme {
