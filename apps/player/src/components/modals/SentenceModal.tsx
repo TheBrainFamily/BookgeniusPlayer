@@ -73,7 +73,7 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
               className="group relative overflow-hidden rounded-xl border border-book-primary-20 bg-gradient-to-r from-book-primary-10 to-book-primary-20"
               variants={variants.item}
             >
-              <div className="relative p-4">
+              <div className="relative p-3">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="px-3 py-1 rounded-full text-xs font-medium bg-book-primary-30 text-book-primary">
                     <span className="flex items-center gap-1">
@@ -102,7 +102,7 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <div className="relative p-4">
+                <div className="relative p-3">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="px-3 py-1 rounded-full text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
                       <span className="flex items-center gap-1">

@@ -19,11 +19,11 @@ const Footer = () => {
           variants={footerVariants}
           initial="hidden"
           animate="visible"
-          className={cn("fixed inset-x-0 bottom-0 z-40", "flex flex-row gap-0 sm:gap-2 justify-center mx-auto px-0 max-w-[120rem] w-full", "pointer-events-none", "pb-4")}
+          className={cn("fixed inset-x-0 bottom-0 z-40", "flex flex-row justify-center mx-auto px-0 max-w-[120rem] w-full", "pointer-events-none", "pb-4")}
         >
           {isPlayFormat ? (
             <>
-              <div id="bottom-input-wrapper" className={cn("w-full sm:flex-3 px-0 flex flex-col sm:px-3 xl:px-2 space-y-3 items-center pointer-events-auto")}>
+              <div id="bottom-input-wrapper" className={cn("w-full sm:flex-3 flex flex-col sm:px-3 space-y-3 items-center pointer-events-auto")}>
                 <CharactersOnStagePanel />
                 <BottomInput className={cn("max-w-[800px]")} />
               </div>
@@ -31,7 +31,10 @@ const Footer = () => {
           ) : (
             <>
               <div id="left-notes-blank" className="w-0 hidden sm:block sm:flex-1 sm:w-auto max-w-[700px] content-center pointer-events-none" />
-              <div id="bottom-input-wrapper" className={cn("sm:flex-3 max-w-[900px] xl:max-w-[800px] xxl:max-w-[900px] pointer-events-auto px-2 sm:px-4 xl:px-0 w-full sm:w-auto")}>
+              <div
+                id="bottom-input-wrapper"
+                className={cn("sm:flex-3 max-w-[800px] xl:max-w-[850px] xxl:max-w-[900px] pointer-events-auto w-full sm:w-auto px-2 sm:px-4 xl:px-0 ")}
+              >
                 <BottomInput />
               </div>
               <div id="right-notes-blank" className={cn("hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none", isMobileOrTablet && "hidden")} />

@@ -406,7 +406,7 @@ const ResultCard = memo(function ResultCard({ item, clickedAppearanceId, searchQ
       ref={cardRef}
       style={animationStyle}
     >
-      <div className="relative p-4">
+      <div className="relative p-3">
         <div className="flex items-center gap-2 mb-2">
           {item.type && (
             <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">

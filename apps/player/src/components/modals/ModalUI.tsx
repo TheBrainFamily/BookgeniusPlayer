@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogTitle } from "@player/components/ui/dialog
 import { useContentShift } from "@player/stores/contentShift.store";
 import { useBookForm } from "@player/hooks/useBookForm";
 import { useScreenSize } from "@player/hooks/useScreenSize";
+import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";
 
 const isTextInputElement = (element: Element | null): element is HTMLElement => {
   if (!element) return false;
@@ -48,7 +49,7 @@ const MODAL_SIZES: Record<NonNullable<ModalUIProps["size"]>, ModalSize> = {
   full: { content: "w-full max-w-none", container: "w-full max-w-none" },
 };
 
-const LAYOUT_VIEW_SIZE: ModalSize = { content: "w-full h-full max-w-none pointer-events-none z-50", container: "w-full max-w-none pointer-events-none" };
+const LAYOUT_VIEW_SIZE: ModalSize = { content: "w-full h-full max-w-none pointer-events-none z-40", container: "w-full max-w-none pointer-events-none" };
 
 const isTransparentModal = (transparent: boolean, className: string): boolean => {
   return transparent || className.includes("bg-transparent");
@@ -73,6 +74,7 @@ const getModalContentClasses = (
       "overflow-hidden max-h-[70vh]",
       !isContentShifted && !isPlayFormat && "xl:flex-1 xl:max-w-[700px] xl:order-3",
       !isContentShifted && isPlayFormat && "w-full max-w-[800px]",
+      isContentShifted && isLargeScreen && isPlayFormat && "max-w-[925px]",
     ],
     className,
   );
@@ -80,10 +82,10 @@ const getModalContentClasses = (
 
 const getContainerClasses = (shouldShiftContent: boolean, layoutView: boolean, isPlayFormat: boolean, sizeConfig: ModalSize): string => {
   return cn(
-    "flex flex-row gap-2 justify-center h-full",
+    "flex flex-row justify-center h-full",
     sizeConfig.container,
-    shouldShiftContent && layoutView && !isPlayFormat && "flex flex-row gap-0 sm:gap-2 justify-center mx-auto px-0 max-w-[120rem] w-full",
-    shouldShiftContent && layoutView && isPlayFormat && "flex flex-row gap-2 mx-auto px-2 max-w-[120rem] w-full",
+    shouldShiftContent && layoutView && !isPlayFormat && "flex flex-row justify-center mx-auto max-w-[120rem] w-full xl:px-2",
+    shouldShiftContent && layoutView && isPlayFormat && "flex flex-row mx-auto max-w-[120rem] w-full",
   );
 };
 
@@ -93,14 +95,15 @@ const getModalWrapperClasses = (layoutView: boolean, isPlayFormat: boolean, isMe
   if (!isPlayFormat) {
     return cn(
       !isMediumScreen && !isLargeScreen && "xl:flex-1 pointer-events-none max-w-[600px] flex items-center",
-      (isMediumScreen || isLargeScreen) && "lg:flex-1 pointer-events-none max-w-[600px] flex items-center pr-2",
+      (isMediumScreen || isLargeScreen) && "lg:flex-1 pointer-events-none max-w-[600px] flex items-center ml-2",
+      isMediumScreen && "mr-2",
     );
   }
 
   return cn(
-    !isMediumScreen && !isLargeScreen && "pointer-events-none max-w-[800px] mx-auto",
-    isLargeScreen && shouldShiftContent && "xl:flex-1 pointer-events-none max-w-[600px] flex items-center",
-    isMediumScreen && shouldShiftContent && "lg:flex-1 pointer-events-none max-w-[600px] flex items-center",
+    !isMediumScreen && !isLargeScreen && "pointer-events-none max-w-[800px] mx-auto flex items-center",
+    isLargeScreen && shouldShiftContent && "xl:flex-1 max-w-[500px] pointer-events-none flex items-center mr-3",
+    isMediumScreen && shouldShiftContent && "lg:flex-1 pointer-events-none max-w-[500px] flex items-center mr-2",
   );
 };
 
@@ -110,24 +113,25 @@ interface SpacerProps {
   isLargeScreen: boolean;
   isMediumScreen: boolean;
   shouldShiftContent: boolean;
+  isMobileOrTablet: boolean;
 }
 
-const LeftSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isLargeScreen, isMediumScreen }) => {
-  if (!layoutView || isPlayFormat) return null;
+const LeftSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isLargeScreen, isMediumScreen, isMobileOrTablet }) => {
+  if (!layoutView || isPlayFormat || isMobileOrTablet) return null;
 
   return (
     <>
-      {isLargeScreen && <div id="left-notes-blank" className="hidden xl:block [flex:0_0_200px]" />}
+      {isLargeScreen && <div id="left-notes-blank" className="hidden xl:block [flex:0_0_200px] mr-2" />}
       {isMediumScreen && <div id="left-notes-blank" className="hidden sm:block [flex:0_1_0%]" />}
     </>
   );
 };
 
-const ContentSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isMediumScreen, isLargeScreen }) => {
+const ContentSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isMediumScreen, isLargeScreen, isMobileOrTablet }) => {
   if (!layoutView) return null;
 
   if (!isPlayFormat) {
-    return <div className={cn("max-w-[900px] xl:max-w-[800px] xxl:max-w-[900px]", (isMediumScreen || isLargeScreen) && "sm:flex-3")} />;
+    return <div className={cn("modal-content max-w-[800px]", (isMediumScreen || isLargeScreen) && "sm:flex-3", !isMobileOrTablet && "xl:max-w-[850px] xxl:max-w-[900px]")} />;
   }
 
   return null;
@@ -136,7 +140,7 @@ const ContentSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isMedi
 const PlayFormatSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, shouldShiftContent }) => {
   if (!layoutView || !isPlayFormat || !shouldShiftContent) return null;
 
-  return <div className="sm:flex-3 max-w-[900px] xl:max-w-[800px] xxl:max-w-[900px] xxl:w-[900px] xxl:flex-auto" />;
+  return <div className={cn("sm:flex-3 max-w-[800px] xl:max-w-[850px] xxl:max-w-[900px] xxl:w-[900px] xxl:flex-auto mx-2")} />;
 };
 
 interface ModalHeaderProps {
@@ -198,6 +202,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
   const { isContentShiftedLeft } = useContentShift();
   const { isLargeScreen, isMediumScreen } = useScreenSize();
   const { isPlayFormat } = useBookForm();
+  const isMobileOrTablet = useIsMobileOrTablet();
 
   const isTransparent = isTransparentModal(transparent, className);
   const shouldShiftContent = isContentShiftedLeft && (isLargeScreen || isMediumScreen);
@@ -329,13 +334,21 @@ const ModalUI: React.FC<ModalUIProps> = ({
         onCloseAutoFocus={(e) => e.preventDefault()}
       >
         <div className={containerClasses}>
-          <LeftSpacer layoutView={layoutView} isPlayFormat={isPlayFormat} isLargeScreen={isLargeScreen} isMediumScreen={isMediumScreen} shouldShiftContent={shouldShiftContent} />
+          <LeftSpacer
+            layoutView={layoutView}
+            isPlayFormat={isPlayFormat}
+            isLargeScreen={isLargeScreen}
+            isMediumScreen={isMediumScreen}
+            shouldShiftContent={shouldShiftContent}
+            isMobileOrTablet={isMobileOrTablet}
+          />
           <ContentSpacer
             layoutView={layoutView}
             isPlayFormat={isPlayFormat}
             isLargeScreen={isLargeScreen}
             isMediumScreen={isMediumScreen}
             shouldShiftContent={shouldShiftContent}
+            isMobileOrTablet={isMobileOrTablet}
           />
           <PlayFormatSpacer
             layoutView={layoutView}
@@ -343,6 +356,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
             shouldShiftContent={shouldShiftContent}
             isLargeScreen={isLargeScreen}
             isMediumScreen={isMediumScreen}
+            isMobileOrTablet={isMobileOrTablet}
           />
 
           <div className={modalWrapperClasses}>
@@ -357,7 +371,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
               {searchActions && <div className="w-full flex justify-between items-center px-4 pt-4">{searchActions}</div>}
 
               <motion.div
-                className="py-3 px-2 overflow-y-auto opened-modal"
+                className="py-3 px-2 overflow-y-auto opened-modal w-full"
                 style={{ maxHeight: "inherit" }}
                 layout={animateHeight}
                 transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}

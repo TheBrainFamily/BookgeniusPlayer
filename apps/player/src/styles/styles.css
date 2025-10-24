@@ -1736,3 +1736,27 @@ section[data-chapter] [data-index] {
     animation: none !important;
   }
 }
+
+#player-scope.mobileOrTablet {
+  #book-container {
+    padding: 0;
+  }
+
+  #content-container,
+  #bottom-input-wrapper {
+    max-width: 900px;
+  }
+
+  #right-notes,
+  #right-notes-blank {
+    flex: 0;
+  }
+
+  @media (max-width: 1200px) {
+    #content-container,
+    #bottom-input-wrapper,
+    .modal-content {
+      max-width: 800px;
+    }
+  }
+}
