@@ -28,7 +28,7 @@ const containerId = "content-container";
 
 export function useBookContent() {
   const { textVersion } = useBookData();
-  const { location, lastSystemLocation } = useLocation();
+  const { location } = useLocation();
   const { currentChapter, currentParagraph } = location;
   const {
     metadata: { bookForm },
@@ -47,8 +47,6 @@ export function useBookContent() {
     cleanup: () => void;
   } | null>(null);
   const currentChapterRef = useRef<number | undefined>(currentChapter);
-  const prevChapterRef = useRef<number | null>(null);
-  const pendingSystemJumpTimestampRef = useRef<number | null>(null);
 
   useEditorMode(isEditorMode ? containerRef.current : null);
 
@@ -64,10 +62,6 @@ export function useBookContent() {
       const isCharacterHighlighted = target.classList.contains("character-highlighted-activated");
       const isCharacterPlaceholder = target.closest(".character-placeholder");
       const isCharacterText = target.closest(`[data-is-character="true"]`);
-
-      if (isSelectionActive(target)) {
-        return;
-      }
 
       const complexitySpan = target.closest("span[id^='ch']") as HTMLElement;
 
@@ -147,10 +141,6 @@ export function useBookContent() {
     currentChapterRef.current = currentChapter;
   }, [currentChapter]);
 
-  useEffect(() => {
-    pendingSystemJumpTimestampRef.current = lastSystemLocation?.timestamp ?? null;
-  }, [lastSystemLocation?.timestamp]);
-
   const handleContentChanged = useCallback(() => {
     if (observerSetupRef.current) {
       // Refresh observed nodes for the existing observer
@@ -184,7 +174,6 @@ export function useBookContent() {
         const initialChapter = typeof currentChapterRef.current === "number" ? currentChapterRef.current : (bookIndex.getFirstChapter() ?? 1);
         await ensureChapterWindow(initialChapter, { force: true });
         if (!cancelled) {
-          prevChapterRef.current = initialChapter;
           handleContentChanged();
         }
       } catch (error) {
@@ -223,28 +212,16 @@ export function useBookContent() {
       return;
     }
 
-    const previous = prevChapterRef.current;
-    const isBigJump = previous !== null && Math.abs(currentChapter - previous) > 2;
-    const isPendingSystemJump =
-      lastSystemLocation?.location?.currentChapter === currentChapter &&
-      lastSystemLocation?.timestamp != null &&
-      pendingSystemJumpTimestampRef.current === lastSystemLocation?.timestamp;
-
     void (async () => {
       try {
-        const shouldForce = isBigJump || isPendingSystemJump;
-        await ensureChapterWindow(currentChapter, { force: shouldForce });
-        if (isPendingSystemJump) {
-          pendingSystemJumpTimestampRef.current = null;
-        }
+        await ensureChapterWindow(currentChapter);
       } catch (error) {
         console.error("useBookContent: Failed to update chapter window", error);
       } finally {
         handleContentChanged();
-        prevChapterRef.current = currentChapter;
       }
     })();
-  }, [currentChapter, lastSystemLocation, handleContentChanged]);
+  }, [currentChapter, handleContentChanged]);
 
   useEffect(() => {
     const textVersionChanged = previousTextVersionRef.current !== textVersion;
@@ -334,39 +311,3 @@ const setSentenceAsClicked = (sentenceId: string): void => {
     console.error("Failed to update clicked sentences in localStorage:", error);
   }
 };
-
-function isSelectionActive(target: HTMLElement): boolean {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  const selection = window.getSelection();
-  if (!selection || selection.isCollapsed) {
-    return false;
-  }
-
-  if (typeof selection.containsNode === "function") {
-    try {
-      if (selection.containsNode(target, true)) {
-        return true;
-      }
-    } catch {
-      // Ignore DOMException when the node is detached between events.
-    }
-  }
-
-  for (let i = 0; i < selection.rangeCount; i += 1) {
-    const range = selection.getRangeAt(i);
-    if (typeof range.intersectsNode === "function") {
-      try {
-        if (range.intersectsNode(target)) {
-          return true;
-        }
-      } catch {
-        // Ignore DOMException when the node is detached between events.
-      }
-    }
-  }
-
-  return false;
-}
