@@ -18,8 +18,8 @@ import AuthCallback from "@platform/pages/AuthCallback.tsx";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@platform/i18n";
 import DynamicDocumentTitle from "./components/DynamicDocumentTitle";
-import "./integrations/SnapplifyChat";
 import { BookgeniusChat } from "./integrations/BookgeniusChat";
+import { SnapplifyChat } from "./integrations/SnapplifyChat";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +41,7 @@ const AppWithAuth = () => {
         <RouteTransitionProvider>
           <DynamicDocumentTitle />
           <BookgeniusChat />
+          <SnapplifyChat />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/experience/:slug" element={<BookExperience />} />
