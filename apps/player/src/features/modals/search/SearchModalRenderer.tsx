@@ -7,7 +7,7 @@ import { useSearchLogic } from "./useSearchLogic";
 import { useEscapeKey } from "@player/hooks/useEscapeKey";
 
 export const SearchModalRenderer: React.FC = () => {
-  const { isOpen, results, layoutView, hideOverlay, closeModal, lastClickedAppearanceId, query } = useSearchModal();
+  const { isOpen, results, layoutView, closeModal, lastClickedAppearanceId, query } = useSearchModal();
 
   // Initialize search logic (handles debounced search)
   useSearchLogic();
@@ -16,14 +16,7 @@ export const SearchModalRenderer: React.FC = () => {
   if (!isOpen) return null;
 
   return createPortal(
-    <SearchModal
-      onClose={closeModal}
-      layoutView={layoutView}
-      hideOverlay={hideOverlay}
-      searchResults={results}
-      clickedAppearanceId={lastClickedAppearanceId}
-      searchQuery={query}
-    />,
+    <SearchModal onClose={closeModal} layoutView={layoutView} searchResults={results} clickedAppearanceId={lastClickedAppearanceId} searchQuery={query} />,
     document.body,
   );
 };

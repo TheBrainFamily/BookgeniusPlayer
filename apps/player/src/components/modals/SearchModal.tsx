@@ -21,13 +21,12 @@ import { FILTER_OPTIONS, FILTER_VALUE_MAP, SearchFilter } from "@player/utils/fi
 interface SearchModalProps {
   onClose: () => void;
   layoutView?: boolean;
-  hideOverlay?: boolean;
   searchResults: SearchResultsData;
   clickedAppearanceId?: string;
   searchQuery?: string;
 }
 
-export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, hideOverlay, searchResults, clickedAppearanceId, searchQuery }) => {
+export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, searchResults, clickedAppearanceId, searchQuery }) => {
   const { t } = useTranslation();
 
   const deferredResults = useDeferredValue(searchResults);
@@ -267,7 +266,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, h
     ) : null;
 
   return (
-    <ModalUI title={modalTitle} onClose={onClose} layoutView={wideScreen} hideOverlay={wideScreen} headerActions={headerActions} searchActions={searchActions}>
+    <ModalUI title={modalTitle} onClose={onClose} layoutView={wideScreen} hideOverlay={true} headerActions={headerActions} searchActions={searchActions}>
       <div className="flex flex-col h-full relative overflow-hidden" aria-busy={showSpinner}>
         {showSpinner && (
           <motion.div
