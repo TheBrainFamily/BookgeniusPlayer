@@ -25,3 +25,4 @@ cdk.out
 # symlink
 apps/platform/public/books
 apps/wukong/public/books
+.vscode/
