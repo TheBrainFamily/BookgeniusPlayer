@@ -47,9 +47,8 @@ export async function searchParagraphsFromServer(searchQuery: string, location: 
 
   const url = `${baseUrl}?${params.toString()}`;
 
-  const isDev = import.meta.env.MODE === "development";
   try {
-    const response = await fetch(url, { method: "GET", headers: { ...(isDev && { "X-Dev-Token": import.meta.env.VITE_DEV_TOKEN }) } });
+    const response = await fetch(url, { method: "GET" });
     if (!response.ok) {
       // Throw an error with status text for better debugging
       throw new Error(`HTTP error ${response.status}: ${response.statusText}`);

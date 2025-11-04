@@ -5,6 +5,8 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { createHtmlPlugin } from "vite-plugin-html";
 import tailwind from "@tailwindcss/vite";
+import { HttpProxy } from "vite";
+import "dotenv/config";
 
 export default defineConfig(async () => {
   // Determine environment from command line args or env var
@@ -80,12 +82,17 @@ export default defineConfig(async () => {
       port: 5173,
       open: false,
       proxy: {
-        // match any path starting with /api
-        "^/api": {
-          target: "http://localhost:30310",
+        "^/api/questions": {
+          target: "https://questions.bookgenius.net",
           changeOrigin: true,
-          // remove the /api prefix: /api/get-answers -> /get-answers
-          rewrite: (path) => path.replace(/^\/api/, ""),
+          // strip the prefix so /api/questions/getParagraphsForSearch -> /getParagraphsForSearch
+          rewrite: (p: string) => p.replace(/^\/api\/questions/, ""),
+          secure: true, // keep TLS verification
+          configure: (proxy: HttpProxy.Server) => {
+            proxy.on("proxyReq", (proxyReq) => {
+              proxyReq.setHeader("x-secret-pass", process.env.ANSWERS_SECRET_PASS || "");
+            });
+          },
         },
       },
       watch: { ignored: ["**/src/data/*.xml", "**/public_books/**", "**/src/data/tools/Text-Editor/*.xml", "**/.vscode/**", "**/.cursor/**", "**/public/**"] },
