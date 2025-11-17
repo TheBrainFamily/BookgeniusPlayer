@@ -24,9 +24,7 @@ function isParagraphInRange(paragraphChapter: number, paragraphIndex: number, ra
 
 export function useFootnotes(range: Location): Footnote[] {
   const [notes, setNotes] = useState<Footnote[]>([]);
-  console.time("getNotes");
   const allNotes = getNotes();
-  console.timeEnd("getNotes");
   /*  watch primitive fields → effect runs only when the *value* changes  */
   useEffect(() => {
     const notesContainer = document.getElementById("right-notes-scrollable-container");
