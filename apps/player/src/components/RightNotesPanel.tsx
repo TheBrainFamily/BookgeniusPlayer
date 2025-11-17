@@ -33,7 +33,7 @@ export const RightNotesPanel: React.FC = () => {
 
   return createPortal(
     <>
-      <div className="py-10 content-center h-full space-y-3 py-10 overflow-x-hidden no-scrollbar" style={{ overflowY: "auto" }}>
+      <div className="py-10 content-center h-full space-y-3 overflow-x-hidden no-scrollbar" style={{ overflowY: "auto" }}>
         {notes.map((n) => (
           <section key={n.id} className="right-note" onClick={() => open(n.html)} dangerouslySetInnerHTML={{ __html: n.html }} style={{ cursor: "pointer" }} />
         ))}
