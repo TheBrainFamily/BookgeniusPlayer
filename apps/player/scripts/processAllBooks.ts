@@ -79,7 +79,15 @@ async function processAllBooks(docker: boolean = false, only?: string[]) {
   // Process all books in parallel
   const resultsFull = await Promise.all(bookDirs.map((bookName) => processBook(path.join(PUBLIC_BOOKS_DIR, bookName), DIST_DIR, false)));
   // Process demo versions - same source, different output
-  const resultsDemo = [];
+  const resultsDemo = await Promise.all(
+    bookDirs.map((bookName) =>
+      processBook(
+        path.join(PUBLIC_BOOKS_DIR, bookName), // Same source as full book
+        DIST_DIR,
+        true, // isDemo flag
+      ),
+    ),
+  );
 
   for (const result of [...resultsFull, ...resultsDemo]) {
     if (result.success) {
