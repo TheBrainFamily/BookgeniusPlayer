@@ -7,7 +7,6 @@ import { setKnownVideos } from "@player/utils/getFilePathsForName";
 import { xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterOverrides, getCharacterTags } from "./data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
-import { generateDataFiles } from "./data/generateDataFiles";
 
 async function generateBook(bookDirectoryPath: string, bookOutputPath?: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
@@ -156,6 +155,14 @@ function generateBookDataFiles(bookDirectoryPath: string, metadata: ReturnType<t
   } else {
     const getAllVariantsContent = `export const getAllVariants = () => [];`;
     fs.writeFileSync(path.join(bookOutputPath, "getAllVariants.ts"), getAllVariantsContent, "utf-8");
+  }
+
+  const getNotesPath = path.join(bookDirectoryPath, "getNotes.ts");
+  if (fs.existsSync(getNotesPath)) {
+    fs.copyFileSync(getNotesPath, path.join(bookOutputPath, "getNotes.ts"), fs.constants.COPYFILE_FICLONE);
+  } else {
+    const getNotesContent = `export const getNotes = () => [];`;
+    fs.writeFileSync(path.join(bookOutputPath, "getNotes.ts"), getNotesContent, "utf-8");
   }
 
   const getBookStringifiedContent = `const bookStringified = \`<section>${htmlResult}</section>\`;

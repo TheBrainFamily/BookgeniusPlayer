@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Location } from "@player/state/LocationContext";
+import { getNotes } from "@player/genericBookDataGetters/getNotes";
 
 export interface Footnote {
   id: string;
@@ -23,7 +24,9 @@ function isParagraphInRange(paragraphChapter: number, paragraphIndex: number, ra
 
 export function useFootnotes(range: Location): Footnote[] {
   const [notes, setNotes] = useState<Footnote[]>([]);
-
+  console.time("getNotes");
+  const allNotes = getNotes();
+  console.timeEnd("getNotes");
   /*  watch primitive fields → effect runs only when the *value* changes  */
   useEffect(() => {
     const notesContainer = document.getElementById("right-notes-scrollable-container");
@@ -58,12 +61,10 @@ export function useFootnotes(range: Location): Footnote[] {
 
     const foundNotes: Footnote[] = [];
     relevantFootnoteIds.forEach((id) => {
-      const noteElement = notesContainer.querySelector<HTMLElement>(`#${id}`);
+      const noteElement = allNotes.find((note) => note.id === id);
       // Ensure the note element exists and is a direct child section of the container
-      if (noteElement && noteElement.parentElement === notesContainer && noteElement.tagName === "SECTION") {
-        foundNotes.push({ id: noteElement.id, html: noteElement.innerHTML });
-      } else if (noteElement) {
-        console.warn(`Footnote element #${id} found, but not a direct child section of the container.`);
+      if (noteElement) {
+        foundNotes.push({ id: noteElement.id, html: noteElement.content });
       } else {
         // This might happen if the href points to a non-existent ID
         console.warn(`Footnote element #${id} referenced in text but not found in notes container.`);

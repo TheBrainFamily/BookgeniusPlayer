@@ -1,5 +1,6 @@
 import { loadBookData } from "@player/genericBookDataGetters/getBookData";
 import { loadAllVariants } from "@player/genericBookDataGetters/getAllVariants";
+import { loadNotes } from "@player/genericBookDataGetters/getNotes";
 import { loadAudiobookTracksForBook } from "@player/genericBookDataGetters/getAudiobookTracksForBook";
 import { loadBackgroundSongsForBook } from "@player/genericBookDataGetters/getBackgroundSongsForBook";
 import { loadBackgroundsForBook } from "@player/genericBookDataGetters/getBackgroundsForBook";
@@ -17,6 +18,7 @@ export async function preloadAllBookData(): Promise<void> {
     await Promise.all([
       loadBookData(),
       loadAllVariants(),
+      loadNotes(),
       loadAudiobookTracksForBook(),
       loadBackgroundSongsForBook(),
       loadBackgroundsForBook(),

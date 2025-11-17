@@ -9,6 +9,7 @@ import type { CharacterData } from "@player/types/book";
 import type { CharacterSnapshot } from "@player/utils/characterOverrides";
 import { normalizeSrcForInlineAvatar } from "./highlightCharacter";
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
+import { activateFootnoteInteractions } from "@player/helpers/activateFootnoteInteractions";
 
 function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
   const result = [];
@@ -338,6 +339,7 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
 
   paragraphsInRange.forEach((p) => {
     activateCharacterInteractions(p);
+    activateFootnoteInteractions(p);
     // Support both play rows and plain paragraphs (non-play)
     playRowsOrParagraphs.push(p.closest(".play-row") ?? (p as HTMLElement));
   });

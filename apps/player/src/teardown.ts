@@ -1,6 +1,7 @@
 import { stopAllPlayback, getAudioContext } from "./audio-crossfader";
 import { clearBookDataCache } from "@player/genericBookDataGetters/getBookData";
 import { clearAllVariantsCache } from "@player/genericBookDataGetters/getAllVariants";
+import { clearNotesCache } from "@player/genericBookDataGetters/getNotes";
 import { clearAudiobookTracksCache } from "@player/genericBookDataGetters/getAudiobookTracksForBook";
 import { clearBackgroundSongsCache } from "@player/genericBookDataGetters/getBackgroundSongsForBook";
 import { clearBackgroundsCache } from "@player/genericBookDataGetters/getBackgroundsForBook";
@@ -172,6 +173,7 @@ export async function teardownPlayer(): Promise<void> {
   try {
     clearBookDataCache();
     clearAllVariantsCache();
+    clearNotesCache();
     clearAudiobookTracksCache();
     clearBackgroundSongsCache();
     clearBackgroundsCache();

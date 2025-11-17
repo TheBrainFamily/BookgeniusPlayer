@@ -11,6 +11,7 @@ import { cn } from "@player/lib/utils";
 import ModalUI from "./ModalUI";
 import { useRealtime } from "@player/context/RealtimeContext";
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
+import { activateFootnoteInteractions } from "@player/helpers/activateFootnoteInteractions";
 import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHtmlTags";
 import { getAllVariants } from "@player/genericBookDataGetters/getAllVariants";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
@@ -239,6 +240,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
         // 5. Activate character interactions for newly transformed content
         activateCharacterInteractions(element);
+        activateFootnoteInteractions(element);
       }
     }
   };
