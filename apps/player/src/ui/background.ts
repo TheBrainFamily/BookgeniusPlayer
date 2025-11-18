@@ -96,8 +96,10 @@ function applyScopedColors({ backgroundColor, textColor }: { backgroundColor?: s
       }
       if (isDark) {
         scope.style.setProperty("--text-light", "#f2e4c9");
+        scope.style.setProperty("--bg-notes-rgb", "0, 0, 0");
       } else {
         scope.style.setProperty("--text-light", "#000000");
+        scope.style.setProperty("--bg-notes-rgb", "249, 249, 249");
       }
     }
     if (isDark) {

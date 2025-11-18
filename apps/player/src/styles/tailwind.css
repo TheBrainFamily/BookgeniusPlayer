@@ -167,6 +167,8 @@
   --bg-light-rgb: 240, 240, 240;
   --bg-content-light-rgb: 253, 250, 244;
   --bg-notes-light-rgb: 249, 249, 249;
+  --bg-notes-rgb: 249, 249, 249;
+  --bg-notes-opacity: 0.3;
   --modal-bg-light-rgb: 255, 255, 255;
   --mobile-strip-bg-light-rgb: 255, 255, 255;
   --book-primary-color-rgb: 227, 242, 253;
