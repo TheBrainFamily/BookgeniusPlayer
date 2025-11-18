@@ -1,5 +1,3 @@
-# pnpm run build:docker:front-only
-
 #S3_BUCKET=webstack-contentbucket52d4b12c-ho2hl8s0ugjd
 #ASSET_CONTEXT=branches/test
 

@@ -15,7 +15,6 @@
     "build:wukong": "pnpm --filter wukong build",
     "prepare:docker": "bun run ./tools/scripts/prepare-docker-build.ts",
     "build:front-parallel": "run-p build:player:front build:platform",
-    "build:docker:front-only": "run-s build:front-parallel prepare:docker",
     "prepare:gateway": "zip -r gateway.zip ./docker-compose.gateway.yml ./apps/gateway/configs ./deployment/templates",
     "prettier:check": "pnpm pnpm -r --if-present prettier:check",
     "process-all-books": "pnpm --filter player process-all-books",

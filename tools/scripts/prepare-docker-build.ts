@@ -9,11 +9,7 @@ const s3DataDir = path.join(buildDir, "s3-data"); // We'll put versions.json her
 const s3AssetsDir = path.join(s3DataDir, "assets");
 const booksSourceDir = path.join(projectRoot, "compiled-books");
 const apps = [
-  {
-    name: "player",
-    sourceDir: path.join(projectRoot, "apps", "player", "dist"),
-    targetDir: path.join(buildDir, "player-app"),
-  },
+  { name: "player", sourceDir: path.join(projectRoot, "apps", "player", "dist"), targetDir: path.join(buildDir, "player-app") },
   { name: "platform-intl", sourceDir: path.join(projectRoot, "apps", "platform", "dist-intl"), targetDir: path.join(buildDir, "platform-app-intl") },
   { name: "platform-snapplify", sourceDir: path.join(projectRoot, "apps", "platform", "dist-snapplify"), targetDir: path.join(buildDir, "platform-app-snapplify") },
   { name: "platform-bookgeniusz", sourceDir: path.join(projectRoot, "apps", "platform", "dist"), targetDir: path.join(buildDir, "platform-app") },
@@ -65,7 +61,8 @@ async function prepareBuild() {
 
     console.log("\n--- Handling and versioning book assets ---");
     if (await pathExists(booksSourceDir)) {
-      const bookSlugs = await readdir(booksSourceDir);
+      const entries = await readdir(booksSourceDir, { withFileTypes: true });
+      const bookSlugs = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
       await Promise.all(
         bookSlugs.map(async (bookSlug) => {
           const sourceBookPath = path.join(booksSourceDir, bookSlug);

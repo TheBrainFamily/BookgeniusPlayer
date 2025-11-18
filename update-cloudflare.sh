@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# pnpm run build:docker:front-only
-
 export AWS_REGION=auto
 
 set -euo pipefail

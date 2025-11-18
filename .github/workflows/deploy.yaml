@@ -127,7 +127,7 @@ jobs:
       #        run: pnpm build:docker
 
       - name: Build web apps
-        run: pnpm build:docker:front-only
+        run: pnpm build:front-parallel
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
