@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 import path from "path";
-import { processBook } from "./processBook";
+import { processBook } from "../../books-generator/src/processBook";
 
 const bookPath = path.join(__dirname, "..", "public_books", "Romeo-And-Juliet-Small");
 const destDir = path.join(__dirname, "..", "public", "books");

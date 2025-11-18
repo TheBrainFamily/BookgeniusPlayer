@@ -1,6 +1,6 @@
 import { execSync } from "child_process";
 
-import { generateBook } from "./generateBook";
+import { generateBook } from "../../books-generator/src/generateBook";
 import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
 
 async function build() {

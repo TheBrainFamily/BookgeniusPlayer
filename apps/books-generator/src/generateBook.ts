@@ -2,12 +2,10 @@ import fs from "fs";
 import path from "path";
 import { DOMParser, Document } from "@xmldom/xmldom";
 
-import { BookData } from "@player/types/book";
-import { setKnownVideos } from "@player/utils/getFilePathsForName";
+import type { BookData } from "@player/src/types/book";
 import { xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterOverrides, getCharacterTags } from "./data/tools/create-book-metadata";
-import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
-import { generateDataFiles } from "./data/generateDataFiles";
+import { validateAndNormalizeBookPath } from "../../player/scripts/validateAndNormalizeBookPath";
 
 async function generateBook(bookDirectoryPath: string, bookOutputPath?: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
@@ -87,7 +85,6 @@ function generateKnownVideoFiles(bookDirectoryPath: string, bookOutputPath: stri
     videoFiles = fs.readdirSync(assetsPath).filter((file) => file.endsWith(".mp4"));
   }
 
-  setKnownVideos(videoFiles);
   const getKnownVideoFiles = `export const getKnownVideoFiles = (): string[] => ${JSON.stringify(videoFiles, null, 2)};\n`;
   fs.writeFileSync(path.join(bookOutputPath, "getKnownVideoFiles.ts"), getKnownVideoFiles, "utf-8");
 }

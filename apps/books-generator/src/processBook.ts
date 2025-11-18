@@ -5,20 +5,20 @@ import { generateBook } from "./generateBook";
 import { compileToJsForBook } from "./compileBookData";
 import { buildBookFromContent } from "./buildBookFromContent";
 import { createDemoBook } from "./createDemoBook";
-import { returnDemoChapterNumbers } from "./helpers/returnDemoChapterNumbers";
+import { returnDemoChapterNumbers } from "./returnDemoChapterNumbers";
 import { copyDirectory } from "./helpers/copyDirectory";
 
-const PUBLIC_DIR = path.join(__dirname, "..", "public", "books");
+const PROJECT_ROOT = path.join(__dirname, "..", "..");
+const DEST_DIR = path.join(PROJECT_ROOT, "compiled-books");
 
-export async function processBook(bookPath: string, destinationDir = PUBLIC_DIR, isDemo = false): Promise<{ success: boolean; book?: string; error?: Error }> {
-  const bookSourcePath = path.join(bookPath);
-  const bookName = path.basename(bookPath);
+export async function processBook(bookSourcePath: string, isDemo = false): Promise<{ success: boolean; book?: string; error?: Error }> {
+  const bookName = path.basename(bookSourcePath);
   const outputBookName = isDemo ? `${bookName}-demo` : bookName;
-  const bookPublicPath = path.join(destinationDir, outputBookName);
-  const fullBookPath = path.join(destinationDir, bookName);
+  const bookPublicPath = path.join(DEST_DIR, outputBookName);
+  const fullBookPath = path.join(DEST_DIR, bookName);
 
   console.log(`\n${"=".repeat(60)}`);
-  console.log(`📖 Processing: ${bookPath}${isDemo ? " (DEMO VERSION)" : ""}`);
+  console.log(`📖 Processing: ${bookSourcePath}${isDemo ? " (DEMO VERSION)" : ""}`);
   console.log(`${"=".repeat(60)}\n`);
 
   try {
@@ -83,7 +83,7 @@ export async function processBook(bookPath: string, destinationDir = PUBLIC_DIR,
       // Compile TypeScript files to JavaScript
       console.log(`\n3️⃣  Compiling TypeScript files for ${bookName}...`);
       console.time("compileBookData");
-      compileToJsForBook(bookName, destinationDir);
+      compileToJsForBook(bookName, DEST_DIR);
       console.timeEnd("compileBookData");
     }
 

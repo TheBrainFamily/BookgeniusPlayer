@@ -1,5 +1,5 @@
 import { generateBook } from "./generateBook";
-import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
+import { validateAndNormalizeBookPath } from "@player/scripts/validateAndNormalizeBookPath";
 
 async function regenerateBook() {
   const args = process.argv.slice(2);

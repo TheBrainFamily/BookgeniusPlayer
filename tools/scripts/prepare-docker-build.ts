@@ -7,12 +7,11 @@ const projectRoot = path.join(import.meta.dir, "..", "..");
 const buildDir = path.join(projectRoot, "build");
 const s3DataDir = path.join(buildDir, "s3-data"); // We'll put versions.json here
 const s3AssetsDir = path.join(s3DataDir, "assets");
-
+const booksSourceDir = path.join(projectRoot, "compiled-books");
 const apps = [
   {
     name: "player",
     sourceDir: path.join(projectRoot, "apps", "player", "dist"),
-    booksSourceDir: path.join(projectRoot, "apps", "player", "docker-build", "books"),
     targetDir: path.join(buildDir, "player-app"),
   },
   { name: "platform-intl", sourceDir: path.join(projectRoot, "apps", "platform", "dist-intl"), targetDir: path.join(buildDir, "platform-app-intl") },
@@ -51,10 +50,10 @@ async function copyDirectory(src: string, dest: string): Promise<void> {
 
 async function prepareBuild() {
   try {
-    console.log("--- Cleaning previous build directory ---");
-    if (await pathExists(buildDir)) {
-      await rm(buildDir, { recursive: true, force: true });
-    }
+    // console.log("--- Cleaning previous build directory ---");
+    // if (await pathExists(buildDir)) {
+    //   await rm(buildDir, { recursive: true, force: true });
+    // }
     await mkdir(buildDir, { recursive: true });
     await mkdir(s3AssetsDir, { recursive: true });
 
@@ -65,12 +64,11 @@ async function prepareBuild() {
     const versionsManifest: Record<string, string> = {};
 
     console.log("\n--- Handling and versioning book assets ---");
-    const playerBooksDir = apps.find((app) => app.name === "player")!.booksSourceDir;
-    if (await pathExists(playerBooksDir)) {
-      const bookSlugs = await readdir(playerBooksDir);
+    if (await pathExists(booksSourceDir)) {
+      const bookSlugs = await readdir(booksSourceDir);
       await Promise.all(
         bookSlugs.map(async (bookSlug) => {
-          const sourceBookPath = path.join(playerBooksDir, bookSlug);
+          const sourceBookPath = path.join(booksSourceDir, bookSlug);
 
           // NEW: Create a versioned path for each book.
           const versionedBookTarget = path.join(s3AssetsDir, "books", bookSlug, buildVersion);
