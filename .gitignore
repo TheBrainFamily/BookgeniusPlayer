@@ -7,19 +7,11 @@ tsconfig.tsbuildinfo
 src/data/tools/Text-Editor/.cursor/
 .claude
 src/books/*
-apps/player/public/books/
-apps/player/docker-build/
-apps/player/public_books/*/bookData.ts
-apps/player/public_books/*/getBookStringified.ts
-apps/player/public_books/*/getCharactersData.ts
-apps/player/public_books/*/getKnownVideoFiles.ts
-apps/player/public_books/*/book.xml
 .env
 build/
 gateway.zip
 .env.prod
 Support/
-apps/player/public_books/**/book.xml
 apps/platform/public/books/
 cdk.out
 # symlink

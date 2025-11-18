@@ -4,8 +4,8 @@ import path from "path";
 import { processBook } from "./processBook";
 
 const projectRoot = path.join(__dirname, "..", "..", "..");
-// const PUBLIC_BOOKS_DIR = path.join(projectRoot, "books");
-const PUBLIC_BOOKS_DIR = path.join(projectRoot, "apps", "player", "public_books");
+export const PUBLIC_BOOKS_DIR = path.join(projectRoot, "books");
+// const PUBLIC_BOOKS_DIR = path.join(projectRoot, "apps", "player", "public_books");
 
 function parseArgs() {
   const args = new Map<string, string | boolean>();
@@ -75,8 +75,10 @@ async function processAllBooks(only?: string[]) {
   console.log(`\n🎉 Processing complete!`);
 }
 
-const { only } = parseArgs();
-processAllBooks(only).catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+if (require.main === module) {
+  const { only } = parseArgs();
+  processAllBooks(only).catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}
