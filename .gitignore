@@ -20,4 +20,4 @@ apps/wukong/public/books
 .vscode/
 apps/player/src/components/ContentShiftWrapperOld.tsx
 .repoprompt/
-compiled-books/
+compiled-books/*/
