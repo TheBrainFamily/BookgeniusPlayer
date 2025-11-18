@@ -113,6 +113,50 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
   border: var(--avatar-border-width-large) solid var(--avatar-border-color-large);
 }
 
+/* --- Floating Footnote Styles --- */
+.floating-footnote {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  max-width: min(400px, 90vw);
+  padding: 0.75rem 1rem;
+  background: var(--bg-content, #faf8f3);
+  border: 1px solid color-mix(in srgb, var(--text-light, gray) 30%, transparent);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(4px) scale(0.98);
+  will-change: opacity, transform;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.floating-footnote.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.floating-footnote emphasis {
+  font-style: italic;
+  font-weight: 600;
+}
+
+/* --- Footnote Link Styles --- */
+.footnote-activated {
+  cursor: pointer;
+  transition:
+    color 0.2s ease-in-out,
+    text-decoration-color 0.2s ease-in-out;
+}
+
+.footnote-activated:hover {
+  color: var(--text-light, #5e5e5e);
+  text-decoration-color: color-mix(in srgb, var(--text-light, gray) 80%, transparent);
+}
+
 /* --- Character Highlighted Styles --- */
 .character-highlighted-activated {
   border: 1px dashed color-mix(in srgb, var(--text-light, gray) 60%, transparent);

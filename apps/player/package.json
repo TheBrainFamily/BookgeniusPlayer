@@ -61,6 +61,7 @@
     "lucide-react": "^0.479.0",
     "motion": "^12.10.5",
     "music-metadata": "^11.2.2",
+    "nanoid": "^5.1.6",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-i18next": "^15.5.2",

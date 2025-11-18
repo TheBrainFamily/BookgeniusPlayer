@@ -164,6 +164,11 @@ class BookDataLoader {
     return typeof getAllVariants === "function" ? getAllVariants() : getAllVariants;
   }
 
+  async getNotes(): Promise<Array<{ id: string; content: string }>> {
+    const getNotes = await this.loadBookDataFile<() => Array<{ id: string; content: string }>>("getNotes");
+    return typeof getNotes === "function" ? getNotes() : getNotes;
+  }
+
   async getAudiobookTracksForBook(): Promise<AudiobookTracksSection[]> {
     const getter = await this.loadBookDataFile<() => AudiobookTracksSection[]>("getAudiobookTracksForBook");
     return typeof getter === "function" ? getter() : getter;

@@ -155,6 +155,17 @@ function generateBookDataFiles(bookDirectoryPath: string, metadata: ReturnType<t
     fs.writeFileSync(path.join(bookOutputPath, "getAllVariants.ts"), getAllVariantsContent, "utf-8");
   }
 
+  const getNotesPath = path.join(bookDirectoryPath, "getNotes.ts");
+  console.log("getNotesPath", getNotesPath);
+  if (fs.existsSync(getNotesPath)) {
+    console.log("copying getNotes.ts");
+    fs.copyFileSync(getNotesPath, path.join(bookOutputPath, "getNotes.ts"), fs.constants.COPYFILE_FICLONE);
+  } else {
+    console.log("writing getNotes.ts");
+    const getNotesContent = `export const getNotes = () => [];`;
+    fs.writeFileSync(path.join(bookOutputPath, "getNotes.ts"), getNotesContent, "utf-8");
+  }
+
   const getBookStringifiedContent = `const bookStringified = \`<section>${htmlResult}</section>\`;
 
 export const getBookStringified = (): string => {

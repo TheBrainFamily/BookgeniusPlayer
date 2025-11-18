@@ -17,6 +17,7 @@ export const isSystemNavigationInProgress = (): boolean => systemNavigationInPro
 /* ------------------------------------------------------------------ */
 import { DEFAULT_LOCATION, Location } from "@player/state/LocationContext";
 import debounce from "lodash.debounce";
+import { setUrlHash } from "./setUrlHash";
 
 /* ------------------------------------------------------------------ */
 
@@ -172,6 +173,15 @@ export const setCurrentLocation = (loc: Location) => {
   }
 
   _bridge.set(loc);
+
+  if (!systemNavigationInProgress) {
+    const chapter = Number(loc.currentChapter) || 1;
+    const paragraph = Number(loc.currentParagraph) || 0;
+    // Replace hash so passive updates don't create extra history entries
+    if (import.meta.env.DEV) {
+      setUrlHash(chapter, paragraph, "replace");
+    }
+  }
 
   const saved = getSavedLocation();
   if (!saved) {

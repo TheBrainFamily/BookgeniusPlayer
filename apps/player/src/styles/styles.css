@@ -1003,9 +1003,10 @@
     section {
       padding: 20px;
       border-radius: 8px;
-      background-color: var(--bg-notes-light);
+      background-color: rgba(var(--bg-notes-rgb), var(--bg-notes-opacity));
       box-shadow: 0 0 8px var(--shadow-light);
       margin-bottom: 1.2rem;
+      transition: background-color 0.2s ease-in-out;
       &:last-child {
         margin-bottom: 0;
       }

@@ -117,6 +117,7 @@ export async function createDemoBook(fullBookPath: string, demoBookPath: string,
     "getCharactersData.js",
     "getAudiobookTracksForBook.js",
     "getAllVariants.js",
+    "getNotes.js",
     "getKnownVideoFiles.js",
   ];
 
@@ -152,6 +153,10 @@ export async function createDemoBook(fullBookPath: string, demoBookPath: string,
     } else if (baseName === "getKnownVideoFiles") {
       // Skip processing getKnownVideoFiles - we'll regenerate it based on what's actually copied
       continue; // Don't extract assets from this file
+    } else if (baseName === "getNotes") {
+      // For demo, copy all notes as-is (no filtering needed)
+      // Notes are referenced by ID in the HTML, so we keep all of them
+      filteredData = data;
     } else if (baseName === "getAllVariants") {
       // Filter variants by chapter number in their id (e.g., "ch1-p2-s3")
       if (Array.isArray(data)) {

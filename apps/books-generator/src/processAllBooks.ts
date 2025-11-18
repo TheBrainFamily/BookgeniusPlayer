@@ -3,9 +3,9 @@ import fs from "fs";
 import path from "path";
 import { processBook } from "./processBook";
 
+const projectRoot = path.join(__dirname, "..", "..", "..");
 // const PUBLIC_BOOKS_DIR = path.join(projectRoot, "books");
-const projectRoot = path.join(__dirname, "..", "..");
-const PUBLIC_BOOKS_DIR = "/Users/lukaszgandecki/projects/bookgenius/fresh-frontend/apps/player/public_books";
+const PUBLIC_BOOKS_DIR = path.join(projectRoot, "apps", "player", "public_books");
 
 function parseArgs() {
   const args = new Map<string, string | boolean>();

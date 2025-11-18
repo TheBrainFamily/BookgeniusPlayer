@@ -91,6 +91,7 @@ export default defineConfig(async () => {
           configure: (proxy: HttpProxy.Server) => {
             proxy.on("proxyReq", (proxyReq) => {
               proxyReq.setHeader("x-secret-pass", process.env.ANSWERS_SECRET_PASS || "");
+              proxyReq.setHeader("x-local-pass", process.env.ANSWERS_SECRET_PASS || "");
             });
           },
         },

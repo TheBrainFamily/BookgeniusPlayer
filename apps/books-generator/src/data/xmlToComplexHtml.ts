@@ -38,7 +38,11 @@ type InlineRenderOptions = { bookSlug: string; includeBookSlugInImgSrc?: boolean
 const renderStandardInlineElement = (element: Element, options: InlineRenderOptions): string => {
   switch (element.tagName) {
     case "note":
-      return `<a href="#fn${element.getAttribute("id")}" class="link-note">${element.textContent || ""}</a>`;
+      if (options.bookSlug === "Lalka") {
+        return `<a href="#fn${element.getAttribute("id")}" class="link-note">${element.textContent || element.getAttribute("id")}</a>`;
+      } else {
+        return "";
+      }
     case "b":
       return `<span class="bold">${element.textContent || ""}</span>`;
     case "i":
@@ -469,15 +473,11 @@ const preprocessMixedChapter = (chapter: Element, characterMap: Map<string, { di
     current = nextSibling;
   }
 
-  const narratorDisplayName = characterMap.get("Narrator")?.display || "Narrator";
   const eligibleRun: Element[] = [];
 
   const flushEligibleRun = () => {
     if (eligibleRun.length === 1) {
       eligibleRun[0].setAttribute("data-mixed-narrator-break", "true");
-    } else if (eligibleRun.length >= 2) {
-      const narratorParagraph = createTalkingLabelParagraph(doc, "Narrator", narratorDisplayName);
-      chapter.insertBefore(narratorParagraph, eligibleRun[0]);
     }
     eligibleRun.length = 0;
   };

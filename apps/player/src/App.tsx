@@ -36,6 +36,7 @@ import { usePaywall } from "./hooks/usePaywall";
 import i18n from "./i18n";
 import { setupUnloadHandlers } from "./services/setupUnloadHandlers";
 import { ScrollIndicator } from "@player/components/ScrollIndicator";
+import { RightNotesPanel } from "./components/RightNotesPanel";
 
 function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   setKnownVideos(getKnownVideoFiles());
@@ -71,7 +72,7 @@ function Shell({ onShellMounted }: { onShellMounted: () => void }) {
       <NoteLinkBlinker />
       <CharacterNotesPanel />
       {/* Not used for now, but can be re-enabled if needed later */}
-      {/* <RightNotesPanel /> */}
+      <RightNotesPanel />
       <ScrollIndicator />
       <Footer />
       {import.meta.env.VITE_EDITOR === "true" && <EditorMode />}

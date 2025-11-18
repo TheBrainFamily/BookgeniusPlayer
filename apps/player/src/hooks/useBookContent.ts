@@ -5,6 +5,7 @@ import { setupPageObserver } from "@player/ui/pageObserver";
 import { findSimplifiedSentence } from "@player/helpers/findSimplifiedSentence";
 import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
+import { activateFootnoteInteractions } from "@player/helpers/activateFootnoteInteractions";
 import { useEditorMode } from "@player/hooks/useEditorMode";
 import { useBookData } from "@player/context/BookDataContext";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
@@ -105,6 +106,7 @@ export function useBookContent() {
         });
 
         activateCharacterInteractions(complexitySpan);
+        activateFootnoteInteractions(complexitySpan);
         return;
       }
 
@@ -117,6 +119,7 @@ export function useBookContent() {
 
       // Activate character interactions
       activateCharacterInteractions(complexitySpan);
+      activateFootnoteInteractions(complexitySpan);
       setSentenceAsClicked(currentSentenceId);
     },
     [openCharacterDetailsModal, isPlayFormat],
