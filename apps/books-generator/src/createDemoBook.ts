@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { DOMParser } from "@xmldom/xmldom";
-import type { AudiobookTracksSection, BackgroundSongForBook, CharacterData, Variant } from "@player/src/types/book";
+import type { AudiobookTracksSection, BackgroundSongForBook, CharacterData, Variant } from "@player/types/book";
 import { xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { copyDirectory } from "./helpers/copyDirectory";
 

@@ -2,7 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
-import { PUBLIC_BOOKS_DIR } from "../../books-generator/src/processAllBooks";
+import { SOURCE_BOOKS_DIR } from "../../books-generator/src/processAllBooks";
 
 function extractSlug(rawPath?: string): string | undefined {
   if (!rawPath) return undefined;
@@ -42,9 +42,9 @@ async function main() {
   }
 
   if (slug) {
-    const target = path.join(PUBLIC_BOOKS_DIR, slug);
+    const target = path.join(SOURCE_BOOKS_DIR, slug);
     if (!fs.existsSync(target)) {
-      console.warn(`⚠️ No book directory found for slug "${slug}" in ${PUBLIC_BOOKS_DIR}. Processing all books instead.`);
+      console.warn(`⚠️ No book directory found for slug "${slug}" in ${SOURCE_BOOKS_DIR}. Processing all books instead.`);
       slugForProcessing = undefined;
     } else {
       console.log(`🔁 Processing only book slug "${slug}" from path "${bookPathArg}".`);

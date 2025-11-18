@@ -189,9 +189,9 @@ jobs:
         if: ${{ env.REBUILD_ALL == '1' || env.CHANGED_BOOKS != '' }}
         run: |
           if [[ "$REBUILD_ALL" == "1" ]]; then
-            pnpm process-all-books-docker
+            pnpm process-all-books
           else
-            pnpm process-all-books-docker -- --only="$CHANGED_BOOKS"
+            pnpm process-all-books -- --only="$CHANGED_BOOKS"
           fi
 
       - name: Prepare s3 folder

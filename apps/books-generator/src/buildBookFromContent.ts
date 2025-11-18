@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { returnDemoChapterNumbers } from "./returnDemoChapterNumbers";
 
-export function buildBookFromContent(bookDirectoryPath: string, isDemo: boolean = false): void {
+export function buildBookFromContent(bookDirectoryPath: string, bookPublicPath: string, isDemo: boolean = false): void {
   const booksContentPath = path.join(bookDirectoryPath, "booksContent");
 
   if (!fs.existsSync(booksContentPath)) {
@@ -79,7 +79,7 @@ ${chaptersContent}
 </ebook>`;
 
     // Write the book.xml file
-    fs.writeFileSync(path.join(bookDirectoryPath, "book.xml"), bookXmlContent, "utf8");
+    fs.writeFileSync(path.join(bookPublicPath, "book.xml"), bookXmlContent, "utf8");
     console.log(`✅ Successfully built book.xml from booksContent files`);
   } catch (error) {
     console.error(`❌ Failed to build book.xml from booksContent:`, error);

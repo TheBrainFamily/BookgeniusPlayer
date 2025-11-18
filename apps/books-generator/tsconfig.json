@@ -11,7 +11,7 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": { "@player/*": ["../player/src/*"] },
-    "types": ["jest"],
+    "types": ["node", "jest"],
     "allowJs": true,
     "resolveJsonModule": true,
     "isolatedModules": true,

@@ -4,7 +4,7 @@ import path from "path";
 import { processBook } from "./processBook";
 
 const projectRoot = path.join(__dirname, "..", "..", "..");
-export const PUBLIC_BOOKS_DIR = path.join(projectRoot, "books");
+export const SOURCE_BOOKS_DIR = path.join(projectRoot, "books");
 // const PUBLIC_BOOKS_DIR = path.join(projectRoot, "apps", "player", "public_books");
 
 function parseArgs() {
@@ -26,7 +26,7 @@ async function processAllBooks(only?: string[]) {
 
   // Get all directories in public_books
   const all = fs
-    .readdirSync(PUBLIC_BOOKS_DIR, { withFileTypes: true })
+    .readdirSync(SOURCE_BOOKS_DIR, { withFileTypes: true })
     .filter((dirent) => dirent.isDirectory())
     .map((dirent) => dirent.name);
   const bookDirs = only ? all.filter((n) => only.includes(n)) : all;
@@ -38,12 +38,12 @@ async function processAllBooks(only?: string[]) {
   const errors: { book: string; error: Error }[] = [];
 
   // Process all books in parallel
-  const resultsFull = await Promise.all(bookDirs.map((bookName) => processBook(path.join(PUBLIC_BOOKS_DIR, bookName), false)));
+  const resultsFull = await Promise.all(bookDirs.map((bookName) => processBook(path.join(SOURCE_BOOKS_DIR, bookName), false)));
   // Process demo versions - same source, different output
   const resultsDemo = await Promise.all(
     bookDirs.map((bookName) =>
       processBook(
-        path.join(PUBLIC_BOOKS_DIR, bookName), // Same source as full book
+        path.join(SOURCE_BOOKS_DIR, bookName), // Same source as full book
         true, // isDemo flag
       ),
     ),

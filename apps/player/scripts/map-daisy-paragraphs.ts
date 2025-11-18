@@ -1,8 +1,8 @@
 /**
  * scripts/map-daisy-paragraphs.ts
  *
- * Usage (make sure you have ts-node or transpile first):
- *   npx ts-node scripts/map-daisy-paragraphs.ts \
+ * Usage:
+ *   tsx scripts/map-daisy-paragraphs.ts \
  *       --html ./src/raw/daisy/Section1.xhtml \
  *       --tracks ./src/data/audiobookTracksDefined.ts \
  *       --out   ./src/data/audiobook-chapters.json
@@ -37,7 +37,7 @@ Required:
   --out    <file>   output json
 
 Example:
-  npx ts-node map-daisy-paragraphs.ts --html ./daisy.xhtml --tracks ./tracks.ts --out ./audiobook-chapters.json
+  tsx map-daisy-paragraphs.ts --html ./daisy.xhtml --tracks ./tracks.ts --out ./audiobook-chapters.json
 `);
     process.exit(1);
   }

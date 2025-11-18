@@ -2,26 +2,19 @@ import fs from "fs";
 import path from "path";
 import { DOMParser, Document } from "@xmldom/xmldom";
 
-import type { BookData } from "@player/src/types/book";
+import type { BookData } from "@player/types/book";
 import { xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterOverrides, getCharacterTags } from "./data/tools/create-book-metadata";
 import { validateAndNormalizeBookPath } from "../../player/scripts/validateAndNormalizeBookPath";
 
-async function generateBook(bookDirectoryPath: string, bookOutputPath?: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
+async function generateBook(sourceBookPath: string, bookOutputPath: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
-  const { metadata, xmlDoc, bookString } = parseBookXmlData(bookDirectoryPath);
-
-  // Ensure output directory exists
-  bookOutputPath = bookOutputPath || bookDirectoryPath;
-  console.log("bookOutputPath", bookOutputPath);
-  if (!fs.existsSync(bookOutputPath)) {
-    fs.mkdirSync(bookOutputPath, { recursive: true });
-  }
+  const { metadata, xmlDoc, bookString } = parseBookXmlData(bookOutputPath);
 
   // Generate files
-  generateKnownVideoFiles(bookDirectoryPath, bookOutputPath);
-  generateAudiobookTracksFile(bookDirectoryPath, bookOutputPath);
-  generateBookDataFiles(bookDirectoryPath, metadata, xmlDoc, bookString, bookOutputPath);
+  generateKnownVideoFiles(sourceBookPath, bookOutputPath);
+  generateAudiobookTracksFile(sourceBookPath, bookOutputPath);
+  generateBookDataFiles(sourceBookPath, metadata, xmlDoc, bookString, bookOutputPath);
 
   // Load and validate generated book data
   console.time("loadAndValidateBookData");
@@ -34,8 +27,8 @@ async function generateBook(bookDirectoryPath: string, bookOutputPath?: string):
   return { bookSlug: bookData.slug, bookTitle: bookData.metadata.title, bookLanguage: metadata.language };
 }
 
-export function parseBookXmlData(bookDirectoryPath: string) {
-  const bookXmlPath = path.join(bookDirectoryPath, "book.xml");
+export function parseBookXmlData(compiledBookPath: string) {
+  const bookXmlPath = path.join(compiledBookPath, "book.xml");
   if (!fs.existsSync(bookXmlPath)) {
     throw new Error(`book.xml not found at ${bookXmlPath}`);
   }
