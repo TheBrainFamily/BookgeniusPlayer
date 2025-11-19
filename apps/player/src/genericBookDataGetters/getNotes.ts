@@ -1,9 +1,6 @@
 import { bookDataLoader } from "@player/services/bookDataLoader";
 
-export type Note = {
-  id: string;
-  content: string;
-};
+export type Note = { id: string; content: string };
 
 let cachedNotes: Note[] | null = null;
 
@@ -28,4 +25,3 @@ export const reloadNotes = async (): Promise<void> => {
 export const clearNotesCache = () => {
   cachedNotes = null;
 };
-

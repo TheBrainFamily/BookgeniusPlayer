@@ -71,15 +71,16 @@ jobs:
           BASE="${{ steps.sha.outputs.base }}"
           HEAD="${{ steps.sha.outputs.head }}"
 
-          mapfile -t files < <(git diff --name-only "$BASE" "$HEAD" -- apps/player/public_books/ apps/player/scripts/)
-          printf '%s\n' "${files[@]}"
+          mapfile -t files < <(git diff --name-only "$BASE" "$HEAD" -- books/ apps/books-generator/)
 
+          echo "Checking for books-generator changes..."
           REBUILD_ALL=0
-          if printf '%s\n' "${files[@]}" | grep -q '^apps/player/scripts/'; then
+          if [ "$(printf '%s\n' "${files[@]}" | grep -c '^apps/books-generator/')" -gt 0 ]; then
+            echo "Rebuilding all books"
             REBUILD_ALL=1
           fi
 
-          mapfile -t books < <(printf '%s\n' "${files[@]}" | awk -F'/' '/^apps\/player\/public_books\//{print $4}' | sort -u)
+          mapfile -t books < <(printf '%s\n' "${files[@]}" | awk -F'/' '/^books\//{print $2}' | sort -u)
           echo "rebuild_all=$REBUILD_ALL" >> $GITHUB_OUTPUT
           echo "books_csv=$(IFS=, ; echo "${books[*]}")" >> $GITHUB_OUTPUT
 
@@ -99,10 +100,10 @@ jobs:
         if: ${{ steps.changed.outputs.rebuild_all == '1' || steps.changed.outputs.books_csv != '' }}
         run: |
           if [[ "${{ steps.changed.outputs.rebuild_all }}" == "1" ]]; then
-            git lfs pull -I "apps/player/public_books/**"
+            git lfs pull -I "books/**"
           else
             IFS=, read -ra arr <<< "${{ steps.changed.outputs.books_csv }}"
-            include=$(printf 'apps/player/public_books/%s/**,' "${arr[@]}")
+            include=$(printf 'books/%s/**,' "${arr[@]}")
             git lfs pull -I "${include%,}"
           fi
 
@@ -127,7 +128,7 @@ jobs:
       #        run: pnpm build:docker
 
       - name: Build web apps
-        run: pnpm build:docker:front-only
+        run: pnpm build:front-parallel
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
@@ -189,9 +190,9 @@ jobs:
         if: ${{ env.REBUILD_ALL == '1' || env.CHANGED_BOOKS != '' }}
         run: |
           if [[ "$REBUILD_ALL" == "1" ]]; then
-            pnpm process-all-books-docker
+            pnpm process-all-books
           else
-            pnpm process-all-books-docker -- --only="$CHANGED_BOOKS"
+            pnpm process-all-books -- --only="$CHANGED_BOOKS"
           fi
 
       - name: Prepare s3 folder
@@ -217,7 +218,7 @@ jobs:
           mkdir -p out
           if [[ "${REBUILD_ALL}" == "1" ]]; then
             # list all slugs from repo
-            mapfile -t books < <(ls -1 apps/player/public_books | sed '/^\./d' | sort)
+            mapfile -t books < <(ls -1 compiled-books | sed '/^\./d' | sort)
             printf '%s\n' "${books[@]}" \
               | jq -R . | jq -s '{all:true, books:.}' > out/deployed_books.json
           else

@@ -2,27 +2,19 @@ import fs from "fs";
 import path from "path";
 import { DOMParser, Document } from "@xmldom/xmldom";
 
-import { BookData } from "@player/types/book";
-import { setKnownVideos } from "@player/utils/getFilePathsForName";
+import type { BookData } from "@player/types/book";
 import { xmlToComplexHtml } from "./data/xmlToComplexHtml";
 import { extractCharacterMetadata, getCharacterOverrides, getCharacterTags } from "./data/tools/create-book-metadata";
-import { validateAndNormalizeBookPath } from "./validateAndNormalizeBookPath";
+import { validateAndNormalizeBookPath } from "../../player/scripts/validateAndNormalizeBookPath";
 
-async function generateBook(bookDirectoryPath: string, bookOutputPath?: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
+async function generateBook(sourceBookPath: string, bookOutputPath: string): Promise<{ bookSlug: string; bookTitle: string; bookLanguage: string }> {
   // Parse book.xml and extract book slug and other data
-  const { metadata, xmlDoc, bookString } = parseBookXmlData(bookDirectoryPath);
-
-  // Ensure output directory exists
-  bookOutputPath = bookOutputPath || bookDirectoryPath;
-  console.log("bookOutputPath", bookOutputPath);
-  if (!fs.existsSync(bookOutputPath)) {
-    fs.mkdirSync(bookOutputPath, { recursive: true });
-  }
+  const { metadata, xmlDoc, bookString } = parseBookXmlData(bookOutputPath);
 
   // Generate files
-  generateKnownVideoFiles(bookDirectoryPath, bookOutputPath);
-  generateAudiobookTracksFile(bookDirectoryPath, bookOutputPath);
-  generateBookDataFiles(bookDirectoryPath, metadata, xmlDoc, bookString, bookOutputPath);
+  generateKnownVideoFiles(sourceBookPath, bookOutputPath);
+  generateAudiobookTracksFile(sourceBookPath, bookOutputPath);
+  generateBookDataFiles(sourceBookPath, metadata, xmlDoc, bookString, bookOutputPath);
 
   // Load and validate generated book data
   console.time("loadAndValidateBookData");
@@ -35,8 +27,8 @@ async function generateBook(bookDirectoryPath: string, bookOutputPath?: string):
   return { bookSlug: bookData.slug, bookTitle: bookData.metadata.title, bookLanguage: metadata.language };
 }
 
-export function parseBookXmlData(bookDirectoryPath: string) {
-  const bookXmlPath = path.join(bookDirectoryPath, "book.xml");
+export function parseBookXmlData(compiledBookPath: string) {
+  const bookXmlPath = path.join(compiledBookPath, "book.xml");
   if (!fs.existsSync(bookXmlPath)) {
     throw new Error(`book.xml not found at ${bookXmlPath}`);
   }
@@ -86,7 +78,6 @@ function generateKnownVideoFiles(bookDirectoryPath: string, bookOutputPath: stri
     videoFiles = fs.readdirSync(assetsPath).filter((file) => file.endsWith(".mp4"));
   }
 
-  setKnownVideos(videoFiles);
   const getKnownVideoFiles = `export const getKnownVideoFiles = (): string[] => ${JSON.stringify(videoFiles, null, 2)};\n`;
   fs.writeFileSync(path.join(bookOutputPath, "getKnownVideoFiles.ts"), getKnownVideoFiles, "utf-8");
 }
@@ -173,7 +164,6 @@ export const getBookStringified = (): string => {
 `;
 
   const pathToOverwrite = path.join(bookOutputPath, "getBookStringified.ts");
-  console.log("pathToOverwrite", pathToOverwrite);
   fs.writeFileSync(pathToOverwrite, getBookStringifiedContent, "utf-8");
 
   // --- Generate getCharactersData.ts ---

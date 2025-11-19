@@ -126,8 +126,8 @@ function main() {
   const args = process.argv.slice(2);
 
   if (args.length === 0) {
-    console.error("Usage: ts-node analyze-character-mentions.ts <path-to-book.xml>");
-    console.error("Example: ts-node analyze-character-mentions.ts public_books/Alice-Wonderland/book.xml");
+    console.error("Usage: tsx analyze-character-mentions.ts <path-to-book.xml>");
+    console.error("Example: tsx analyze-character-mentions.ts public_books/Alice-Wonderland/book.xml");
     process.exit(1);
   }
 

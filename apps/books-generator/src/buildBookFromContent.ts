@@ -1,10 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { returnDemoChapterNumbers } from "./helpers/returnDemoChapterNumbers";
+import { returnDemoChapterNumbers } from "./returnDemoChapterNumbers";
 
-export function buildBookFromContent(bookDirectoryPath: string, isDemo: boolean = false): void {
+export function buildBookFromContent(bookDirectoryPath: string, bookPublicPath: string, isDemo: boolean = false): void {
   const booksContentPath = path.join(bookDirectoryPath, "booksContent");
-  const bookXmlPath = path.join(bookDirectoryPath, "book.xml");
 
   if (!fs.existsSync(booksContentPath)) {
     console.log(`No booksContent directory found at ${booksContentPath}, skipping book.xml generation`);
@@ -80,7 +79,7 @@ ${chaptersContent}
 </ebook>`;
 
     // Write the book.xml file
-    fs.writeFileSync(bookXmlPath, bookXmlContent, "utf8");
+    fs.writeFileSync(path.join(bookPublicPath, "book.xml"), bookXmlContent, "utf8");
     console.log(`✅ Successfully built book.xml from booksContent files`);
   } catch (error) {
     console.error(`❌ Failed to build book.xml from booksContent:`, error);

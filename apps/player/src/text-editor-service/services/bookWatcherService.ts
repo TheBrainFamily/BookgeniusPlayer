@@ -1,7 +1,7 @@
 import { Response } from "express";
 import * as chokidar from "chokidar";
 import path from "path";
-import { processBook } from "../../../scripts/processBook";
+import { processBook } from "../../../../books-generator/src/processBook";
 
 interface SSEClient {
   id: string;

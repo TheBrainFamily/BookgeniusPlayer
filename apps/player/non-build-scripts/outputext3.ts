@@ -1,10 +1,10 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env tsx
 /**
  * strip-xml.ts – convert chapter XML to clean plain text
  *
  * Usage
  *   tsx strip-xml.ts chapter2.xml      # read from a file
- *   cat chapter2.xml | ts-node strip-xml.ts   # read from stdin
+ *   cat chapter2.xml | tsx strip-xml.ts   # read from stdin
  */
 
 import { readFileSync } from "node:fs";

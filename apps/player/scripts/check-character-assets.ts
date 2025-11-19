@@ -7,8 +7,8 @@ import { join } from "path";
 import { execSync } from "child_process";
 import { DOMParser } from "@xmldom/xmldom";
 import { getFileNameForName, setKnownVideos } from "../src/utils/getFilePathsForName";
-import { generateCharacterMetadata, parseBookXmlData } from "./generateBook";
-import { SimpleCharacterMetadata } from "./data/tools/create-book-metadata";
+import { generateCharacterMetadata, parseBookXmlData } from "../../books-generator/src/generateBook";
+import { SimpleCharacterMetadata } from "../../books-generator/src/data/tools/create-book-metadata";
 
 interface FileSize {
   width: number;

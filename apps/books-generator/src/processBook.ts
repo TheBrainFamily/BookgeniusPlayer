@@ -5,28 +5,34 @@ import { generateBook } from "./generateBook";
 import { compileToJsForBook } from "./compileBookData";
 import { buildBookFromContent } from "./buildBookFromContent";
 import { createDemoBook } from "./createDemoBook";
-import { returnDemoChapterNumbers } from "./helpers/returnDemoChapterNumbers";
+import { returnDemoChapterNumbers } from "./returnDemoChapterNumbers";
 import { copyDirectory } from "./helpers/copyDirectory";
 
-const PUBLIC_DIR = path.join(__dirname, "..", "public", "books");
+const PROJECT_ROOT = path.join(__dirname, "..", "..", "..");
+const DEST_DIR = path.join(PROJECT_ROOT, "compiled-books");
 
-export async function processBook(bookPath: string, destinationDir = PUBLIC_DIR, isDemo = false): Promise<{ success: boolean; book?: string; error?: Error }> {
-  const bookSourcePath = path.join(bookPath);
-  const bookName = path.basename(bookPath);
+export async function processBook(bookSourcePath: string, isDemo = false): Promise<{ success: boolean; book?: string; error?: Error }> {
+  const bookName = path.basename(bookSourcePath);
   const outputBookName = isDemo ? `${bookName}-demo` : bookName;
-  const bookPublicPath = path.join(destinationDir, outputBookName);
-  const fullBookPath = path.join(destinationDir, bookName);
+  const compiledBookPath = path.join(DEST_DIR, outputBookName);
+  const fullCompiledbookPath = path.join(DEST_DIR, bookName);
 
   console.log(`\n${"=".repeat(60)}`);
-  console.log(`📖 Processing: ${bookPath}${isDemo ? " (DEMO VERSION)" : ""}`);
+  console.log(`📖 Processing: ${bookSourcePath}${isDemo ? " (DEMO VERSION)" : ""}`);
   console.log(`${"=".repeat(60)}\n`);
 
   try {
     if (isDemo) {
       // For demo books, we need the full book to be compiled first
-      if (!fs.existsSync(fullBookPath) || !fs.existsSync(path.join(fullBookPath, "compiled"))) {
-        throw new Error(`Full book must be compiled first. Missing: ${fullBookPath}/compiled`);
+      if (!fs.existsSync(fullCompiledbookPath) || !fs.existsSync(path.join(fullCompiledbookPath, "compiled"))) {
+        throw new Error(`Full book must be compiled first. Missing: ${fullCompiledbookPath}/compiled`);
       }
+
+      // Step 2: Remove existing demo directory
+      if (fs.existsSync(compiledBookPath)) {
+        fs.rmSync(compiledBookPath, { recursive: true, force: true });
+      }
+      fs.mkdirSync(compiledBookPath, { recursive: true });
 
       // Extract demo chapters from metadata
       const metadataPath = path.join(bookSourcePath, "booksContent", "metadata.xml");
@@ -37,53 +43,50 @@ export async function processBook(bookPath: string, destinationDir = PUBLIC_DIR,
 
       // Step 1: Build filtered book.xml
       console.time("build-book-from-content");
-      buildBookFromContent(bookSourcePath, true);
+      buildBookFromContent(bookSourcePath, compiledBookPath, true);
       console.timeEnd("build-book-from-content");
-
-      // Step 2: Remove existing demo directory
-      if (fs.existsSync(bookPublicPath)) {
-        fs.rmSync(bookPublicPath, { recursive: true, force: true });
-      }
 
       // Step 3: Create demo book with filtered data and assets
       console.log(`\n1️⃣  Creating demo book from full book data...`);
       console.time("create-demo");
       const filteredBookXml = path.join(bookSourcePath, "book.xml");
-      await createDemoBook(fullBookPath, bookPublicPath, demoChapters, filteredBookXml);
+      await createDemoBook(fullCompiledbookPath, compiledBookPath, demoChapters, filteredBookXml);
       console.timeEnd("create-demo");
 
       // No need to compile TypeScript for demo books since we generate JS directly
     } else {
       // Regular book processing (non-demo)
-      console.log(`0️⃣  Building book.xml from booksContent...`);
-      console.time("build-book-from-content");
-      buildBookFromContent(bookSourcePath, false);
-      console.timeEnd("build-book-from-content");
-
       // Remove existing directory if it exists
       console.time("removeDirectory");
-      if (fs.existsSync(bookPublicPath)) {
-        fs.rmSync(bookPublicPath, { recursive: true, force: true });
+      if (fs.existsSync(compiledBookPath)) {
+        fs.rmSync(compiledBookPath, { recursive: true, force: true });
       }
+      fs.mkdirSync(compiledBookPath, { recursive: true });
+
       console.timeEnd("removeDirectory");
+
+      console.log(`0️⃣  Building book.xml from booksContent...`);
+      console.time("build-book-from-content");
+      buildBookFromContent(bookSourcePath, compiledBookPath, false);
+      console.timeEnd("build-book-from-content");
 
       // Copy book directory to public/
       console.log(`\n1️⃣  Copying ${bookName} to public directory...`);
       console.time("copyDirectory");
-      await copyDirectory(bookSourcePath, bookPublicPath);
+      await copyDirectory(bookSourcePath, compiledBookPath);
       console.timeEnd("copyDirectory");
-      console.log(`   ✅ Copied to ${bookPublicPath}`);
+      console.log(`   ✅ Copied to ${compiledBookPath}`);
 
       // Run generate-book script
       console.log(`\n2️⃣  Running generate-book for ${bookName}...`);
       console.time("generate-book");
-      await generateBook(bookSourcePath, bookPublicPath);
+      await generateBook(bookSourcePath, compiledBookPath);
       console.timeEnd("generate-book");
 
       // Compile TypeScript files to JavaScript
       console.log(`\n3️⃣  Compiling TypeScript files for ${bookName}...`);
       console.time("compileBookData");
-      compileToJsForBook(bookName, destinationDir);
+      compileToJsForBook(bookName, DEST_DIR);
       console.timeEnd("compileBookData");
     }
 
