@@ -72,7 +72,6 @@ jobs:
           HEAD="${{ steps.sha.outputs.head }}"
 
           mapfile -t files < <(git diff --name-only "$BASE" "$HEAD" -- books/ apps/books-generator/)
-          # printf '%s\n' "${files[@]}"
 
           echo "Checking for books-generator changes..."
           REBUILD_ALL=0
