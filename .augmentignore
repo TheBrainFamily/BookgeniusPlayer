@@ -3,4 +3,6 @@ public/
 scripts/
 src/booksData/
 data/
-lib/wavtools/
+books/
+build/
+compiled-books/
