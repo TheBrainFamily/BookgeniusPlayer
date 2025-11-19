@@ -49,7 +49,7 @@ export async function processBook(bookSourcePath: string, isDemo = false): Promi
       // Step 3: Create demo book with filtered data and assets
       console.log(`\n1️⃣  Creating demo book from full book data...`);
       console.time("create-demo");
-      const filteredBookXml = path.join(bookSourcePath, "book.xml");
+      const filteredBookXml = path.join(compiledBookPath, "book.xml");
       await createDemoBook(fullCompiledbookPath, compiledBookPath, demoChapters, filteredBookXml);
       console.timeEnd("create-demo");
 
