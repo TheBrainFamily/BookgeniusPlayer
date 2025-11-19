@@ -1,4 +1,0 @@
-{
-  "app": "node dist/bin/infra.js",
-  "requireApproval": "never"
-}
