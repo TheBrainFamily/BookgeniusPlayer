@@ -223,7 +223,6 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
           return;
         }
         if (transitionState !== TransitionState.Idle) {
-          cancelAllImageZoom(imageA, imageB);
           return;
         }
 
