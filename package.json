@@ -7,7 +7,6 @@
   "scripts": {
     "prepare": "husky",
     "dev:player": "pnpm --filter player dev",
-    "dev:core-api": "pnpm --filter core-api dev",
     "dev:editor": "pnpm --filter editor dev",
     "build:player:docker": "pnpm --filter player build-for-docker",
     "build:player:front": "pnpm --filter player build-for-docker-front",
@@ -15,7 +14,6 @@
     "build:wukong": "pnpm --filter wukong build",
     "prepare:docker": "bun run ./tools/scripts/prepare-docker-build.ts",
     "build:front-parallel": "run-p build:player:front build:platform",
-    "prepare:gateway": "zip -r gateway.zip ./docker-compose.gateway.yml ./apps/gateway/configs ./deployment/templates",
     "prettier:check": "pnpm pnpm -r --if-present prettier:check",
     "process-all-books": "pnpm --filter player process-all-books",
     "update-prod-versions": "bun run ./tools/scripts/update-prod-versions.ts",

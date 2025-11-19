@@ -76,7 +76,7 @@ s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
 # --- optional: books/assets + versions.json when explicitly requested ---
 if [[ "$*" == *"--with-books"* ]]; then
   s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
-    --cache-control "public, max-age=31536000, immutable" \
+    --cache-control "$long_cache" \
     build/s3-data/assets/ \
     "s3://${S3_BUCKET}/${ASSET_CONTEXT}/assets/"
 
@@ -91,7 +91,7 @@ fi
 if [[ "${REBUILD_ALL:-0}" == "1" || -n "${CHANGED_BOOKS:-}" ]]; then
   if [[ -d build/s3-data/assets ]]; then
     s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
-      --cache-control "public, max-age=31536000, immutable" \
+      --cache-control "$long_cache" \
       "build/s3-data/assets/" \
       "s3://${S3_BUCKET}/${ASSET_CONTEXT}/assets/"
   fi
