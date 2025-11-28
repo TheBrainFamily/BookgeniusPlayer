@@ -1,219 +1,375 @@
 import { bookIndex } from "@player/logic/BookIndex";
+import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
 
-console.log("[BookContentVirtualizer] [BookContentVirtualizer] BookContentVirtualizer version OCT30");
+console.log("[BookContentVirtualizer] BookContentVirtualizer version NOV28-v3 (refactored)");
+
 type ContentChangedCallback = (mountedChapters: number[]) => void;
 
-class ChapterVirtualizer {
-  private mountedChapters: number[] = [];
-  private topSpacer: HTMLDivElement;
+// ============================================================================
+// Helper: TopSpacer
+// ============================================================================
 
-  constructor(
-    private host: HTMLElement,
-    private onContentChanged?: ContentChangedCallback,
-  ) {
-    this.topSpacer = this.ensureTopSpacer();
+class TopSpacer {
+  private element: HTMLDivElement;
+
+  constructor(host: HTMLElement) {
+    this.element = this.ensureElement(host);
   }
 
-  private ensureTopSpacer(): HTMLDivElement {
-    const existing = this.host.querySelector<HTMLDivElement>("#virtual-top-spacer");
+  private ensureElement(host: HTMLElement): HTMLDivElement {
+    const existing = host.querySelector<HTMLDivElement>("#virtual-top-spacer");
     if (existing) return existing;
+
     const spacer = document.createElement("div");
     spacer.id = "virtual-top-spacer";
     spacer.style.height = "0px";
     spacer.style.width = "100%";
     spacer.style.pointerEvents = "none";
     spacer.style.flexShrink = "0";
-    // Prevent the spacer from becoming an anchor candidate
     spacer.style.setProperty("overflow-anchor", "none");
-    this.host.insertBefore(spacer, this.host.firstChild);
+    host.insertBefore(spacer, host.firstChild);
     return spacer;
   }
 
-  private getTopSpacerHeight(): number {
-    const h = parseFloat(this.topSpacer.style.height || "0");
+  get height(): number {
+    const h = parseFloat(this.element.style.height || "0");
     return Number.isFinite(h) ? h : 0;
   }
 
-  private setTopSpacerHeight(h: number) {
-    const normalized = Math.max(0, Math.round(h));
-    this.topSpacer.style.height = `${normalized}px`;
+  set height(value: number) {
+    const normalized = Math.max(0, Math.round(value));
+    this.element.style.height = `${normalized}px`;
   }
 
-  private getOuterHeight(el: HTMLElement): number {
-    const rect = el.getBoundingClientRect();
-    const styles = window.getComputedStyle(el);
-    const mt = parseFloat(styles.marginTop) || 0;
-    const mb = parseFloat(styles.marginBottom) || 0;
-    return rect.height + mt + mb;
+  adjustBy(delta: number): void {
+    this.height = this.height + delta;
+  }
+
+  get domElement(): HTMLDivElement {
+    return this.element;
+  }
+}
+
+// ============================================================================
+// Helper: DOM Measurement Utilities
+// ============================================================================
+
+function getOuterHeight(el: HTMLElement): number {
+  const rect = el.getBoundingClientRect();
+  const styles = window.getComputedStyle(el);
+  const mt = parseFloat(styles.marginTop) || 0;
+  const mb = parseFloat(styles.marginBottom) || 0;
+  return rect.height + mt + mb;
+}
+
+function getRelativeTop(el: HTMLElement, containerRect: DOMRect): number {
+  return el.getBoundingClientRect().top - containerRect.top;
+}
+
+function parseChapterId(wrapper: HTMLElement): number | null {
+  const attr = wrapper.getAttribute("data-chapter-wrapper");
+  if (!attr) return null;
+  const id = parseInt(attr, 10);
+  return Number.isFinite(id) ? id : null;
+}
+
+// ============================================================================
+// Helper: Scroll Compensation
+// ============================================================================
+
+interface CompensationContext {
+  contentContainer: HTMLElement | null;
+  containerRect: DOMRect | null;
+  topSpacer: TopSpacer;
+}
+
+function compensateForPrepend(ctx: CompensationContext, anchorElement: HTMLElement, beforeTop: number, chapterId: number): void {
+  const { contentContainer, containerRect, topSpacer } = ctx;
+  if (!containerRect) return;
+
+  const afterTop = getRelativeTop(anchorElement, containerRect);
+  const delta = afterTop - beforeTop;
+
+  if (delta === 0) return;
+
+  const currentSpacerHeight = topSpacer.height;
+  const newSpacerHeight = currentSpacerHeight - delta;
+
+  if (newSpacerHeight >= 0) {
+    topSpacer.height = newSpacerHeight;
+    debugLog("compensateForPrepend via spacer", { chapterId, delta, newSpacerHeight });
+    return;
+  }
+
+  // Spacer can't go negative - adjust scroll position directly
+  topSpacer.height = 0;
+  const remainingDelta = delta - currentSpacerHeight;
+
+  if (contentContainer) {
+    const currentScrollTop = contentContainer.scrollTop;
+    const newScrollTop = currentScrollTop + remainingDelta;
+    contentContainer.scrollTop = newScrollTop;
+    debugLog("compensateForPrepend via scroll", { chapterId, delta, currentSpacerHeight, remainingDelta, scrollAdjust: `${currentScrollTop} -> ${newScrollTop}` });
+  }
+}
+
+function compensateForRemoval(ctx: CompensationContext, anchorElement: HTMLElement | null, anchorTopBefore: number | null): void {
+  const { containerRect, topSpacer } = ctx;
+  if (!anchorElement || !containerRect || anchorTopBefore === null) return;
+
+  const anchorTopAfter = getRelativeTop(anchorElement, containerRect);
+  const delta = anchorTopAfter - anchorTopBefore;
+
+  if (delta !== 0) {
+    topSpacer.adjustBy(-delta);
+    debugLog("compensateForRemoval anchor correction", { delta, newSpacerHeight: topSpacer.height });
+  }
+}
+
+// ============================================================================
+// Main Class: ChapterVirtualizer
+// ============================================================================
+
+class ChapterVirtualizer {
+  private mountedChapters: number[] = [];
+  private topSpacer: TopSpacer;
+
+  constructor(
+    private host: HTMLElement,
+    private onContentChanged?: ContentChangedCallback,
+  ) {
+    this.topSpacer = new TopSpacer(host);
   }
 
   ensureWindow(targetChapter: number, forceRemount = false): void {
-    if (!bookIndex.hasChapter(targetChapter)) {
-      const first = bookIndex.getFirstChapter();
-      const last = bookIndex.getLastChapter();
-      if (first === null || last === null) {
-        return;
-      }
-      if (targetChapter < first) {
-        targetChapter = first;
-      } else if (targetChapter > last) {
-        targetChapter = last;
-      } else {
-        // Target chapter missing from index (shouldn't happen), snap to nearest
-        targetChapter = Math.max(first, Math.min(last, targetChapter));
-      }
-    }
+    debugLog("ensureWindow called", { targetChapter, forceRemount, currentMounted: this.mountedChapters });
 
-    const candidates = [targetChapter - 1, targetChapter, targetChapter + 1];
-    const nextWindow = candidates.filter((chapterId) => bookIndex.hasChapter(chapterId));
+    const normalizedTarget = this.normalizeTargetChapter(targetChapter);
+    if (normalizedTarget === null) return;
 
-    const desiredOrder = nextWindow.slice().sort((a, b) => a - b);
-    const desiredSet = new Set(desiredOrder);
-
-    const wrappers = Array.from(this.host.querySelectorAll<HTMLElement>("[data-chapter-wrapper]"));
-    const existing = new Map<number, HTMLElement>();
-    wrappers.forEach((wrapper) => {
-      const chapterAttr = wrapper.getAttribute("data-chapter-wrapper");
-      if (!chapterAttr) return;
-      const chapterId = parseInt(chapterAttr, 10);
-      if (!Number.isFinite(chapterId)) return;
-      existing.set(chapterId, wrapper);
-    });
-
+    const desiredChapters = this.computeDesiredWindow(normalizedTarget);
     const contentContainer = this.host.closest<HTMLElement>("#content-container");
     const containerRect = contentContainer?.getBoundingClientRect() ?? null;
 
-    const wrappersToRemove: HTMLElement[] = [];
-    wrappers.forEach((wrapper) => {
-      const chapterAttr = wrapper.getAttribute("data-chapter-wrapper");
-      const chapterId = chapterAttr ? parseInt(chapterAttr, 10) : NaN;
-      if (!Number.isFinite(chapterId)) return;
-      if (forceRemount) {
-        wrappersToRemove.push(wrapper);
-        existing.delete(chapterId);
-        return;
+    const ctx: CompensationContext = { contentContainer, containerRect, topSpacer: this.topSpacer };
+
+    // Disable browser scroll anchoring during mutations
+    const originalOverflowAnchor = contentContainer?.style.overflowAnchor;
+    if (contentContainer) {
+      contentContainer.style.overflowAnchor = "none";
+    }
+
+    try {
+      const existingWrappers = this.getExistingWrappers();
+      this.removeStaleChapters(ctx, existingWrappers, desiredChapters, forceRemount);
+      this.mountMissingChapters(ctx, existingWrappers, desiredChapters);
+      this.updateMountedState(desiredChapters, forceRemount);
+    } finally {
+      if (contentContainer) {
+        contentContainer.style.overflowAnchor = originalOverflowAnchor ?? "";
       }
+    }
+  }
 
-      if (!desiredSet.has(chapterId)) {
-        // Only remove wrappers that are fully off-screen to avoid visible jumps.
-        if (!containerRect) {
-          // Fallback: if we can't measure, remove as before.
-          wrappersToRemove.push(wrapper);
-          existing.delete(chapterId);
-          return;
-        }
+  private normalizeTargetChapter(targetChapter: number): number | null {
+    if (bookIndex.hasChapter(targetChapter)) {
+      return targetChapter;
+    }
 
-        const rect = wrapper.getBoundingClientRect();
-        const margin = 200; // safety margin to avoid removing near boundary
-        const fullyAbove = rect.bottom <= containerRect.top - margin;
-        const fullyBelow = rect.top >= containerRect.bottom + margin;
+    const first = bookIndex.getFirstChapter();
+    const last = bookIndex.getLastChapter();
 
-        if (fullyAbove || fullyBelow) {
-          wrappersToRemove.push(wrapper);
-          existing.delete(chapterId);
-        }
+    if (first === null || last === null) return null;
+
+    if (targetChapter < first) return first;
+    if (targetChapter > last) return last;
+
+    return Math.max(first, Math.min(last, targetChapter));
+  }
+
+  private computeDesiredWindow(targetChapter: number): number[] {
+    const candidates = [targetChapter - 1, targetChapter, targetChapter + 1];
+    return candidates.filter((id) => bookIndex.hasChapter(id)).sort((a, b) => a - b);
+  }
+
+  private getExistingWrappers(): Map<number, HTMLElement> {
+    const wrappers = Array.from(this.host.querySelectorAll<HTMLElement>("[data-chapter-wrapper]"));
+    const existing = new Map<number, HTMLElement>();
+
+    for (const wrapper of wrappers) {
+      const chapterId = parseChapterId(wrapper);
+      if (chapterId !== null) {
+        existing.set(chapterId, wrapper);
       }
-    });
+    }
 
-    // One-frame mutation: measure then update top spacer and remove
+    return existing;
+  }
+
+  private removeStaleChapters(ctx: CompensationContext, existingWrappers: Map<number, HTMLElement>, desiredChapters: number[], forceRemount: boolean): void {
+    const desiredSet = new Set(desiredChapters);
+    const { toRemoveAbove, toRemoveBelow } = this.categorizeWrappersToRemove(ctx, existingWrappers, desiredSet, forceRemount);
+
+    if (toRemoveAbove.length === 0 && toRemoveBelow.length === 0) return;
+
+    // Find anchor for scroll compensation
+    const removingAboveSet = new Set(toRemoveAbove);
+    const anchor = this.findAnchorWrapper(removingAboveSet);
+
+    scrollCoordinator.forceReflow(this.host);
+
+    const anchorTopBefore = anchor && ctx.containerRect ? getRelativeTop(anchor, ctx.containerRect) : null;
+
+    debugLog("removeStaleChapters", { toRemoveAbove: toRemoveAbove.length, toRemoveBelow: toRemoveBelow.length, anchorTopBefore });
+
+    // Adjust spacer before removing chapters above
+    if (toRemoveAbove.length > 0) {
+      const removedHeight = toRemoveAbove.reduce((sum, w) => sum + getOuterHeight(w), 0);
+      this.topSpacer.adjustBy(removedHeight);
+      debugLog("removeStaleChapters spacer adjusted", { removedHeight, newSpacerHeight: this.topSpacer.height });
+    }
+
+    // Remove elements
+    for (const wrapper of toRemoveAbove) {
+      const id = parseChapterId(wrapper);
+      wrapper.remove();
+      if (id !== null) existingWrappers.delete(id);
+    }
+
+    for (const wrapper of toRemoveBelow) {
+      const id = parseChapterId(wrapper);
+      wrapper.remove();
+      if (id !== null) existingWrappers.delete(id);
+    }
+
+    scrollCoordinator.forceReflow(this.host);
+
+    // Correct any mismatch from removal
+    compensateForRemoval(ctx, anchor, anchorTopBefore);
+  }
+
+  private categorizeWrappersToRemove(
+    ctx: CompensationContext,
+    existingWrappers: Map<number, HTMLElement>,
+    desiredSet: Set<number>,
+    forceRemount: boolean,
+  ): { toRemoveAbove: HTMLElement[]; toRemoveBelow: HTMLElement[] } {
     const toRemoveAbove: HTMLElement[] = [];
     const toRemoveBelow: HTMLElement[] = [];
-    wrappersToRemove.forEach((wrapper) => {
+    const { containerRect } = ctx;
+
+    for (const [chapterId, wrapper] of existingWrappers) {
+      const shouldRemove = forceRemount || !desiredSet.has(chapterId);
+      if (!shouldRemove) continue;
+
       if (!containerRect) {
         toRemoveBelow.push(wrapper);
-        return;
+        continue;
       }
+
       const rect = wrapper.getBoundingClientRect();
-      const fullyAbove = rect.bottom <= containerRect.top;
-      if (fullyAbove) toRemoveAbove.push(wrapper);
-      else toRemoveBelow.push(wrapper);
-    });
+      const margin = 200;
+      const fullyAbove = rect.bottom <= containerRect.top - margin;
+      const fullyBelow = rect.top >= containerRect.bottom + margin;
 
-    // Choose a stable anchor wrapper for removal compensation: the first wrapper after top spacer
-    // that is NOT being removed. We'll keep its visual top unchanged.
-    const removingAboveSet = new Set(toRemoveAbove);
-    const findAnchorAfterSpacer = (): HTMLElement | null => {
-      let node = this.topSpacer.nextElementSibling as HTMLElement | null;
-      while (node) {
-        if (node.hasAttribute && node.hasAttribute("data-chapter-wrapper") && !removingAboveSet.has(node)) {
-          return node;
-        }
-        node = node.nextElementSibling as HTMLElement | null;
-      }
-      return null;
-    };
-
-    const anchorBefore = findAnchorAfterSpacer();
-    const anchorTopBefore = anchorBefore && containerRect ? anchorBefore.getBoundingClientRect().top - containerRect.top : null;
-
-    // Increase top spacer by our estimate first, then remove
-    if (toRemoveAbove.length > 0) {
-      let removedHeight = 0;
-      toRemoveAbove.forEach((w) => (removedHeight += this.getOuterHeight(w)));
-      this.setTopSpacerHeight(this.getTopSpacerHeight() + removedHeight);
-    }
-    toRemoveAbove.forEach((w) => w.remove());
-    toRemoveBelow.forEach((w) => w.remove());
-
-    // Measure actual shift and correct any mismatch
-    if (anchorBefore && containerRect && anchorTopBefore !== null) {
-      const anchorTopAfter = anchorBefore.getBoundingClientRect().top - containerRect.top;
-      const delta = anchorTopAfter - anchorTopBefore; // positive -> content moved down
-      if (delta !== 0) {
-        this.setTopSpacerHeight(this.getTopSpacerHeight() - delta);
-      }
-    }
-
-    // Build or reuse desired wrappers; insert previous chapters after top spacer to preserve scroll position
-    desiredOrder.forEach((chapterId) => {
-      let element = existing.get(chapterId);
-      if (!element) {
-        element = bookIndex.cloneChapterWrapper(chapterId);
-        existing.set(chapterId, element);
-
-        // If this is a prepend case (older than currently smallest mounted), insert after top spacer and adjust scroll
-        const currentMin = this.mountedChapters.length > 0 ? Math.min(...this.mountedChapters) : Infinity;
-        if (chapterId < currentMin) {
-          // Insert previous chapter after top spacer while keeping the next wrapper visually stable.
-          const nextWrapperBefore = this.topSpacer.nextElementSibling as HTMLElement | null;
-          const beforeTop = nextWrapperBefore && containerRect ? nextWrapperBefore.getBoundingClientRect().top - containerRect.top : null;
-
-          // Insert after top spacer
-          const ref = this.topSpacer.nextSibling;
-          this.host.insertBefore(element, ref);
-
-          // Compute actual push applied to the next wrapper and compensate using the top spacer first.
-          const afterTop = nextWrapperBefore && containerRect ? nextWrapperBefore.getBoundingClientRect().top - containerRect.top : null;
-          if (beforeTop !== null && afterTop !== null) {
-            const delta = afterTop - beforeTop; // positive when pushed down
-            if (delta !== 0) {
-              // Adjust only the spacer; rely on browser anchoring for any tiny remainder.
-              const newHeight = this.getTopSpacerHeight() - delta;
-              this.setTopSpacerHeight(newHeight);
-            }
-          }
+      // Only remove if fully off-screen (unless forceRemount)
+      if (forceRemount || fullyAbove || fullyBelow) {
+        if (rect.bottom <= containerRect.top) {
+          toRemoveAbove.push(wrapper);
         } else {
-          this.host.appendChild(element);
+          toRemoveBelow.push(wrapper);
         }
       }
-    });
+    }
 
-    if (!forceRemount && this.arraysEqual(this.mountedChapters, desiredOrder)) {
+    return { toRemoveAbove, toRemoveBelow };
+  }
+
+  private findAnchorWrapper(excludeSet: Set<HTMLElement>): HTMLElement | null {
+    let node = this.topSpacer.domElement.nextElementSibling as HTMLElement | null;
+
+    while (node) {
+      if (node.hasAttribute?.("data-chapter-wrapper") && !excludeSet.has(node)) {
+        return node;
+      }
+      node = node.nextElementSibling as HTMLElement | null;
+    }
+
+    return null;
+  }
+
+  private mountMissingChapters(ctx: CompensationContext, existingWrappers: Map<number, HTMLElement>, desiredChapters: number[]): void {
+    const currentlyInDom = new Set<number>(existingWrappers.keys());
+
+    for (const chapterId of desiredChapters) {
+      if (existingWrappers.has(chapterId)) continue;
+
+      const element = bookIndex.cloneChapterWrapper(chapterId);
+      existingWrappers.set(chapterId, element);
+
+      const insertionPoint = this.findInsertionPoint(currentlyInDom, existingWrappers, chapterId);
+
+      if (insertionPoint) {
+        this.insertWithCompensation(ctx, element, insertionPoint, chapterId);
+      } else {
+        this.host.appendChild(element);
+      }
+
+      currentlyInDom.add(chapterId);
+    }
+  }
+
+  private findInsertionPoint(currentlyInDom: Set<number>, existingWrappers: Map<number, HTMLElement>, chapterId: number): HTMLElement | null {
+    const sortedInDom = Array.from(currentlyInDom).sort((a, b) => a - b);
+    const nextHigherChapter = sortedInDom.find((ch) => ch > chapterId);
+
+    if (nextHigherChapter === undefined) return null;
+
+    return existingWrappers.get(nextHigherChapter) ?? null;
+  }
+
+  private insertWithCompensation(ctx: CompensationContext, element: HTMLElement, insertBefore: HTMLElement, chapterId: number): void {
+    const { containerRect } = ctx;
+
+    scrollCoordinator.forceReflow(this.host);
+
+    const beforeTop = containerRect ? getRelativeTop(insertBefore, containerRect) : null;
+
+    this.host.insertBefore(element, insertBefore);
+
+    scrollCoordinator.forceReflow(this.host);
+
+    if (beforeTop !== null) {
+      compensateForPrepend(ctx, insertBefore, beforeTop, chapterId);
+    }
+  }
+
+  private updateMountedState(desiredChapters: number[], forceRemount: boolean): void {
+    if (!forceRemount && this.arraysEqual(this.mountedChapters, desiredChapters)) {
+      debugLog("ensureWindow no change in mounted chapters");
       return;
     }
 
-    // Update mounted list by reading current DOM order (excluding the top spacer)
     const nowWrappers = Array.from(this.host.querySelectorAll<HTMLElement>("[data-chapter-wrapper]"));
     this.mountedChapters = nowWrappers
-      .map((w) => parseInt(w.getAttribute("data-chapter-wrapper") || "", 10))
-      .filter((n) => Number.isFinite(n))
+      .map((w) => parseChapterId(w))
+      .filter((n): n is number => n !== null)
       .sort((a, b) => a - b);
+
+    debugLog("ensureWindow complete", { mountedChapters: this.mountedChapters, spacerHeight: this.topSpacer.height });
 
     this.onContentChanged?.([...this.mountedChapters]);
   }
 
+  private arraysEqual(a: number[], b: number[]): boolean {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  }
+
   destroy(): void {
-    // Keep host clean including top spacer
     this.host.replaceChildren();
     this.mountedChapters = [];
   }
@@ -221,19 +377,11 @@ class ChapterVirtualizer {
   getMountedChapters(): number[] {
     return [...this.mountedChapters];
   }
-
-  private arraysEqual(a: number[], b: number[]): boolean {
-    if (a.length !== b.length) {
-      return false;
-    }
-    for (let i = 0; i < a.length; i++) {
-      if (a[i] !== b[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
 }
+
+// ============================================================================
+// Module Exports
+// ============================================================================
 
 interface InitializeOptions {
   container: HTMLElement;

@@ -7,12 +7,11 @@
 import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
 import { bookDataLoader } from "@player/services/bookDataLoader";
 import { ensureChapterWindow } from "@player/logic/BookContentVirtualizer";
-
-let systemNavigationInProgress = false;
+import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
 
 /* ------------------------------------------------------------------ */
 /*  Export system navigation state checker                           */
-export const isSystemNavigationInProgress = (): boolean => systemNavigationInProgress;
+export const isSystemNavigationInProgress = (): boolean => scrollCoordinator.isNavigating;
 
 /* ------------------------------------------------------------------ */
 import { DEFAULT_LOCATION, Location } from "@player/state/LocationContext";
@@ -174,7 +173,7 @@ export const setCurrentLocation = (loc: Location) => {
 
   _bridge.set(loc);
 
-  if (!systemNavigationInProgress) {
+  if (!scrollCoordinator.isNavigating) {
     const chapter = Number(loc.currentChapter) || 1;
     const paragraph = Number(loc.currentParagraph) || 0;
     // Replace hash so passive updates don't create extra history entries
@@ -193,7 +192,7 @@ export const setCurrentLocation = (loc: Location) => {
   }
 
   // Track position changes for remote sync (only for user-driven changes, not system navigation)
-  if (!systemNavigationInProgress) {
+  if (!scrollCoordinator.isNavigating) {
     // Import lazily to avoid circular dependencies
     import("@player/services/readingPositionTracker").then(({ readingPositionTracker }) => {
       readingPositionTracker.onLocationChange(loc);
@@ -206,28 +205,31 @@ export const setCurrentLocation = (loc: Location) => {
 
 /**
  * Waits for an element's position and dimensions to be stable for a certain period.
- * This is useful to avoid layout shifts when scrolling to an element shortly after render.
+ * Also checks that the container's scroll position is stable to avoid layout shift issues.
  * @param element The HTML element to monitor.
  * @param options Configuration for timeout, polling interval, and stability threshold.
  * @returns A promise that resolves when the element is stable or when the timeout is reached.
  */
 const waitForElementStablePosition = (element: HTMLElement, options: { timeout?: number; interval?: number; stableThreshold?: number } = {}): Promise<void> => {
   const { timeout = 3000, interval = 50, stableThreshold = 200 } = options;
+  const container = document.getElementById("content-container");
 
   return new Promise((resolve) => {
     let lastRect: DOMRect | null = null;
+    let lastScrollTop: number | null = null;
     let stableTime = 0;
     let checkTimeout: number | null = null;
 
     const resolveAndCleanup = () => {
       clearTimeout(overallTimeout);
       if (checkTimeout) clearTimeout(checkTimeout);
+      debugLog("waitForElementStablePosition resolved", { stableTime });
       resolve();
     };
 
     // Overall timeout for the whole operation
     const overallTimeout = window.setTimeout(() => {
-      console.warn("waitForElementStablePosition timed out waiting for element to stabilize.");
+      debugLog("waitForElementStablePosition timed out");
       if (checkTimeout) clearTimeout(checkTimeout);
       resolve();
     }, timeout);
@@ -237,23 +239,31 @@ const waitForElementStablePosition = (element: HTMLElement, options: { timeout?:
         resolveAndCleanup(); // Element removed from DOM, stop waiting
         return;
       }
+
       const currentRect = element.getBoundingClientRect();
+      const currentScrollTop = container?.scrollTop ?? 0;
+
+      // Check if element rect is stable (allow small floating point differences)
+      const rectStable =
+        lastRect &&
+        Math.abs(currentRect.top - lastRect.top) < 1 &&
+        Math.abs(currentRect.left - lastRect.left) < 1 &&
+        Math.abs(currentRect.width - lastRect.width) < 1 &&
+        Math.abs(currentRect.height - lastRect.height) < 1;
+
+      // Check if scroll position is stable
+      const scrollStable = lastScrollTop !== null && Math.abs(currentScrollTop - lastScrollTop) < 1;
 
       if (currentRect.width === 0 || currentRect.height === 0) {
         stableTime = 0;
-      } else if (
-        lastRect &&
-        currentRect.top === lastRect.top &&
-        currentRect.left === lastRect.left &&
-        currentRect.width === lastRect.width &&
-        currentRect.height === lastRect.height
-      ) {
+      } else if (rectStable && scrollStable) {
         stableTime += interval;
       } else {
         stableTime = 0;
       }
 
       lastRect = currentRect;
+      lastScrollTop = currentScrollTop;
 
       if (stableTime >= stableThreshold) {
         resolveAndCleanup();
@@ -278,7 +288,8 @@ export const systemNavigateTo = async (
     return;
   }
 
-  systemNavigationInProgress = true;
+  debugLog("systemNavigateTo", { loc, options });
+  scrollCoordinator.setNavigating(true);
 
   const fullLocation: Location = {
     chapter: loc.currentChapter,
@@ -311,32 +322,29 @@ export const systemNavigateTo = async (
   // For system navigation (explicit user jumps), default to push.
   // Callers can pass history: "replace" for initial load or non-history-affecting moves.
 
-  const runGoToParagraph = () => {
-    goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior: "instant" })
-      .catch((error) => {
-        console.error("Error during system navigation scroll:", error);
-      })
-      .finally(() => {
-        systemNavigationInProgress = false;
-      });
-  };
-
   try {
     await ensureChapterWindow(loc.currentChapter);
+
+    // Wait for layout to stabilize after chapter mounting
+    await scrollCoordinator.waitForLayoutStability();
+
+    const selector =
+      loc.currentParagraph === 0 ? `section[data-chapter="${loc.currentChapter}"]` : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
+    const element = document.querySelector(selector) as HTMLElement;
+
+    if ((pageWasJustReloaded() || options.wait) && element) {
+      await waitForElementStablePosition(element);
+    }
+
+    await goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior: "instant" });
+
+    // Sync scroll position after navigation to update scroll direction tracking
+    scrollCoordinator.syncScrollPosition();
+    debugLog("systemNavigateTo complete", { loc });
   } catch (error) {
-    console.error("systemNavigateTo: Failed to ensure chapter window before navigation", error);
-  }
-
-  const selector =
-    loc.currentParagraph === 0 ? `section[data-chapter="${loc.currentChapter}"]` : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
-  const element = document.querySelector(selector) as HTMLElement;
-
-  if ((pageWasJustReloaded() || options.wait) && element) {
-    waitForElementStablePosition(element).then(() => {
-      runGoToParagraph();
-    });
-  } else {
-    runGoToParagraph();
+    console.error("systemNavigateTo: Error during navigation", error);
+  } finally {
+    scrollCoordinator.setNavigating(false);
   }
 };
 
@@ -501,28 +509,35 @@ export const parseLocationFromHash = (): Location | null => {
 /* ------------------------------------------------------------------ */
 /*  Initial Load from URL Hash                                        */
 export const goToInitialLocationFromHash = async () => {
+  let reconciledPosition: ExtendedLocation | null = null;
+
   // First, reconcile local vs remote position
   try {
     const { initializeReadingPosition } = await import("@player/services/initializeReadingPosition");
-    await initializeReadingPosition();
+    reconciledPosition = await initializeReadingPosition();
+    debugLog("reconciledPosition", reconciledPosition);
   } catch (error) {
     console.warn("Failed to reconcile remote reading position:", error);
   }
 
   const locationFromHash = parseLocationFromHash();
+  debugLog("locationFromHash", locationFromHash);
 
   if (locationFromHash) {
     // Use system navigation for the initial load from hash
-    // But the furthest saved location has been updated by reconciliation
-    systemNavigateTo({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph }, { history: "replace" });
+    // The furthest saved location has been updated by reconciliation
+    await systemNavigateTo({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph }, { history: "replace" });
+  } else if (reconciledPosition) {
+    // Use the reconciled position (most recent between local and remote)
+    await systemNavigateTo({ currentChapter: reconciledPosition.currentChapter, currentParagraph: reconciledPosition.currentParagraph }, { history: "replace", wait: true });
   } else {
     // Fallback if hash is invalid or missing: go to furthest saved location
     const saved = getSavedLocation();
 
     if (saved) {
-      systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph }, { history: "replace", wait: true });
+      await systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph }, { history: "replace", wait: true });
     } else {
-      systemNavigateTo({ currentChapter: 1, currentParagraph: 0 }, { history: "replace" });
+      await systemNavigateTo({ currentChapter: 1, currentParagraph: 0 }, { history: "replace" });
     }
   }
 };
