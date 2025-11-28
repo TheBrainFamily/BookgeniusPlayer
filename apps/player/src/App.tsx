@@ -37,6 +37,7 @@ import i18n from "./i18n";
 import { setupUnloadHandlers } from "./services/setupUnloadHandlers";
 import { ScrollIndicator } from "@player/components/ScrollIndicator";
 import { RightNotesPanel } from "./components/RightNotesPanel";
+import { DebugLocationOverlay } from "./components/DebugLocationOverlay";
 
 function Shell({ onShellMounted }: { onShellMounted: () => void }) {
   setKnownVideos(getKnownVideoFiles());
@@ -129,6 +130,7 @@ export default function App() {
                 <ModalRenderers />
                 <ContentShiftWrapper />
               </BookContentWrapper>
+              <DebugLocationOverlay />
             </RealtimeProvider>
           </LocationProvider>
         </BookDataProvider>

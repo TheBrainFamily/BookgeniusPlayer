@@ -14,6 +14,7 @@ import { useLocation } from "@player/state/LocationContext";
 import { disposeVirtualizer, ensureChapterWindow, initializeBookContentVirtualizer } from "@player/logic/BookContentVirtualizer";
 import { bookIndex } from "@player/logic/BookIndex";
 import { openPlayRowCharacterModal } from "@player/ui/activateMediaInRange";
+import { scrollCoordinator } from "@player/services/ScrollCoordinator";
 
 const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
@@ -127,6 +128,18 @@ export function useBookContent() {
 
   useEffect(() => {
     containerRef.current = document.getElementById(containerId);
+  }, []);
+
+  // Initialize ScrollCoordinator when container is available
+  useEffect(() => {
+    const container = document.getElementById(containerId);
+    if (container) {
+      scrollCoordinator.initialize(container);
+    }
+
+    return () => {
+      scrollCoordinator.destroy();
+    };
   }, []);
 
   useEffect(() => {

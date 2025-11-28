@@ -2,6 +2,7 @@ import { isSystemNavigationInProgress, setCurrentLocation } from "@player/helper
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers, drawElementsUnion } from "./devVisualizers";
 import { activateMediaInRange } from "./activateMediaInRange";
+import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
 
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
@@ -645,18 +646,28 @@ export function setupPageObserver(): {
               }
 
               if (visibilityPercent > 0.8 && visibilityPercent < 1 && Number.isFinite(nextChapter)) {
-                setCurrentLocation({
-                  chapter: nextChapter,
-                  paragraph: 0,
-                  endChapter: nextChapter,
-                  endParagraph: 0,
-                  currentChapter: nextChapter,
-                  currentParagraph: 0,
-                  earliestVisibleParagraph: 0,
-                  latestVisibleParagraph: 0,
-                  earliestVisibleChapter: nextChapter,
-                  latestVisibleChapter: nextChapter,
-                });
+                // Only trigger chapter transition when scrolling DOWN, not navigating, and cooldown passed
+                const direction = scrollCoordinator.scrollDirection;
+                const canTransition = scrollCoordinator.canTriggerChapterTransition();
+                const isNavigating = scrollCoordinator.isNavigating;
+
+                debugLog("spacer threshold", { visibilityPercent, nextChapter, direction, canTransition, isNavigating });
+
+                if (direction === "down" && canTransition && !isNavigating) {
+                  scrollCoordinator.recordChapterTransition();
+                  setCurrentLocation({
+                    chapter: nextChapter,
+                    paragraph: 0,
+                    endChapter: nextChapter,
+                    endParagraph: 0,
+                    currentChapter: nextChapter,
+                    currentParagraph: 0,
+                    earliestVisibleParagraph: 0,
+                    latestVisibleParagraph: 0,
+                    earliestVisibleChapter: nextChapter,
+                    latestVisibleChapter: nextChapter,
+                  });
+                }
               }
 
               // Map 0.4 -> 1.0 visibility to 1.0 -> 0.0 opacity
