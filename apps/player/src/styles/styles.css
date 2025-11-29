@@ -1761,3 +1761,66 @@ section[data-chapter] [data-index] {
     }
   }
 }
+
+/* Side-panel modal styles - when search/research modal is portaled into column */
+
+/* 2-column mode: modal in left-notes, hide characters */
+#left-notes.side-panel-active {
+  position: relative;
+  height: 100%;
+}
+
+/* Hide all children except the modal (last child) */
+#left-notes.side-panel-active > *:not(.side-panel-modal) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.2s ease-out;
+}
+
+/* 3-column mode: modal in right-notes, characters stay visible */
+#right-notes.side-panel-active {
+  position: relative;
+  height: 100%;
+  /* Enable pointer events for the portaled modal */
+  pointer-events: auto;
+}
+
+/* Position the side-panel modal centered in the column */
+#left-notes.side-panel-active > .side-panel-modal,
+#right-notes.side-panel-active > .side-panel-modal {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+/* Override any inherited text colors for modal in columns */
+#left-notes .side-panel-modal,
+#left-notes .side-panel-modal *,
+#right-notes .side-panel-modal,
+#right-notes .side-panel-modal * {
+  color: white !important;
+}
+
+/* Allow specific color classes to work */
+#left-notes .side-panel-modal .text-white\/70,
+#right-notes .side-panel-modal .text-white\/70 {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+#left-notes .side-panel-modal .text-white\/80,
+#right-notes .side-panel-modal .text-white\/80 {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+#left-notes .side-panel-modal .text-white\/90,
+#right-notes .side-panel-modal .text-white\/90 {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+#left-notes .side-panel-modal .text-white\/60,
+#right-notes .side-panel-modal .text-white\/60 {
+  color: rgba(255, 255, 255, 0.6) !important;
+}

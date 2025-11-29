@@ -80,7 +80,7 @@ const getModalContentClasses = (
   );
 };
 
-const getContainerClasses = (shouldShiftContent: boolean, layoutView: boolean, isPlayFormat: boolean, sizeConfig: ModalSize): string => {
+const getContainerClasses = (shouldShiftContent: boolean, layoutView: boolean, isPlayFormat: boolean, sizeConfig: ModalSize, isLargeScreen: boolean): string => {
   return cn(
     "flex flex-row justify-center h-full",
     sizeConfig.container,
@@ -89,10 +89,26 @@ const getContainerClasses = (shouldShiftContent: boolean, layoutView: boolean, i
   );
 };
 
-const getModalWrapperClasses = (layoutView: boolean, isPlayFormat: boolean, isMediumScreen: boolean, isLargeScreen: boolean, shouldShiftContent: boolean): string => {
+const getModalWrapperClasses = (
+  layoutView: boolean,
+  isPlayFormat: boolean,
+  isMediumScreen: boolean,
+  isLargeScreen: boolean,
+  shouldShiftContent: boolean,
+  isWideScreen: boolean,
+): string => {
   if (!layoutView) return "";
 
   if (!isPlayFormat) {
+    // 2-COLUMN (medium): Modal on LEFT, overlaying the faded left-notes
+    if (isMediumScreen && shouldShiftContent) {
+      return "lg:flex-1 pointer-events-none flex items-center order-first max-w-[400px]";
+    }
+    // 3-COLUMN (large): Modal on RIGHT, fills the right-notes column
+    if (isLargeScreen && shouldShiftContent) {
+      return "pointer-events-none flex items-center";
+    }
+    // Default (no shift)
     return cn(
       !isMediumScreen && !isLargeScreen && "xl:flex-1 pointer-events-none max-w-[600px] flex items-center",
       (isMediumScreen || isLargeScreen) && "lg:flex-1 pointer-events-none max-w-[600px] flex items-center ml-2",
@@ -100,6 +116,7 @@ const getModalWrapperClasses = (layoutView: boolean, isPlayFormat: boolean, isMe
     );
   }
 
+  // Play format positioning
   return cn(
     !isMediumScreen && !isLargeScreen && "pointer-events-none max-w-[800px] mx-auto flex items-center",
     isLargeScreen && shouldShiftContent && "xl:flex-1 max-w-[500px] pointer-events-none flex items-center mr-3",
@@ -114,21 +131,34 @@ interface SpacerProps {
   isMediumScreen: boolean;
   shouldShiftContent: boolean;
   isMobileOrTablet: boolean;
+  isWideScreen: boolean;
+  columnWidths: { leftNotes: number; content: number; rightNotes: number };
 }
 
-const LeftSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isLargeScreen, isMediumScreen, isMobileOrTablet }) => {
+const LeftSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isLargeScreen, isMediumScreen, shouldShiftContent, isMobileOrTablet, columnWidths }) => {
   if (!layoutView || isPlayFormat || isMobileOrTablet) return null;
 
+  // 3-COLUMN (large) with shift: spacer matches actual left-notes column width
+  if (isLargeScreen && shouldShiftContent && columnWidths.leftNotes > 0) {
+    return <div style={{ flex: `0 0 ${columnWidths.leftNotes}px` }} />;
+  }
+
+  // Default spacers (when no shift)
   return (
     <>
-      {isLargeScreen && <div id="left-notes-blank" className="hidden xl:block [flex:0_0_200px] mr-2" />}
-      {isMediumScreen && <div id="left-notes-blank" className="hidden sm:block [flex:0_1_0%]" />}
+      {isLargeScreen && <div className="hidden xl:block [flex:0_0_200px] mr-2" />}
+      {isMediumScreen && <div className="hidden sm:block [flex:0_1_0%]" />}
     </>
   );
 };
 
-const ContentSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isMediumScreen, isLargeScreen, isMobileOrTablet }) => {
+const ContentSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isMediumScreen, isLargeScreen, shouldShiftContent, isMobileOrTablet, columnWidths }) => {
   if (!layoutView) return null;
+
+  // 3-COLUMN (large) with shift: spacer matches actual content column width
+  if (isLargeScreen && shouldShiftContent && !isPlayFormat && columnWidths.content > 0) {
+    return <div style={{ flex: `0 0 ${columnWidths.content}px` }} />;
+  }
 
   if (!isPlayFormat) {
     return <div className={cn("modal-content max-w-[800px]", (isMediumScreen || isLargeScreen) && "sm:flex-3", !isMobileOrTablet && "xl:max-w-[850px] xxl:max-w-[900px]")} />;
@@ -204,19 +234,64 @@ const ModalUI: React.FC<ModalUIProps> = ({
   const { isPlayFormat } = useBookForm();
   const isMobileOrTablet = useIsMobileOrTablet();
 
+  // Track if screen is wide enough that modal fits in right column without squeezing
+  const [isWideScreen, setIsWideScreen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 1500);
+  useEffect(() => {
+    const checkWideScreen = () => setIsWideScreen(window.innerWidth >= 1500);
+    window.addEventListener("resize", checkWideScreen);
+    return () => window.removeEventListener("resize", checkWideScreen);
+  }, []);
+
+  // Measure actual column widths from the book layout
+  const [columnWidths, setColumnWidths] = useState({ leftNotes: 0, content: 0, rightNotes: 0 });
+  useEffect(() => {
+    const measureColumns = () => {
+      const leftNotes = document.getElementById("left-notes");
+      const content = document.getElementById("content-container");
+      const rightNotes = document.getElementById("right-notes");
+
+      setColumnWidths({
+        leftNotes: leftNotes?.getBoundingClientRect().width || 0,
+        content: content?.getBoundingClientRect().width || 0,
+        rightNotes: rightNotes?.getBoundingClientRect().width || 0,
+      });
+    };
+
+    // Measure immediately for initial render
+    measureColumns();
+
+    // Re-measure after transitions complete (ContentShiftWrapper uses 0.3s transitions)
+    const leftNotes = document.getElementById("left-notes");
+    const handleTransitionEnd = (e: TransitionEvent) => {
+      if (e.propertyName === "flex" || e.propertyName === "width") {
+        measureColumns();
+      }
+    };
+    leftNotes?.addEventListener("transitionend", handleTransitionEnd);
+
+    window.addEventListener("resize", measureColumns);
+    return () => {
+      leftNotes?.removeEventListener("transitionend", handleTransitionEnd);
+      window.removeEventListener("resize", measureColumns);
+    };
+  }, [isContentShiftedLeft, isLargeScreen, isMediumScreen, isWideScreen]);
+
   const isTransparent = isTransparentModal(transparent, className);
   const shouldShiftContent = isContentShiftedLeft && (isLargeScreen || isMediumScreen);
   const sizeConfig = getModalSizeConfig(layoutView, size);
 
   const modalContentClasses = getModalContentClasses(isTransparent, layoutView, className, isContentShiftedLeft, isLargeScreen, isPlayFormat);
-  const containerClasses = getContainerClasses(shouldShiftContent, layoutView, isPlayFormat, sizeConfig);
-  const modalWrapperClasses = getModalWrapperClasses(layoutView, isPlayFormat, isMediumScreen, isLargeScreen, shouldShiftContent);
+  const containerClasses = getContainerClasses(shouldShiftContent, layoutView, isPlayFormat, sizeConfig, isLargeScreen);
+  const modalWrapperClasses = getModalWrapperClasses(layoutView, isPlayFormat, isMediumScreen, isLargeScreen, shouldShiftContent, isWideScreen);
 
   const activeTextInputRef = useRef<HTMLElement | null>(null);
   const shouldTrapNextOutsideTapRef = useRef(false);
   const ignoreNextCloseRef = useRef(false);
 
-  const maxHeight = `calc(var(--vvh, 100dvh) - ${!isMediumScreen || !isLargeScreen ? 96 : 32}px)`;
+  // Leave room for header buttons and input bar
+  // Play format and mobile need more padding since modal is centered over content
+  const bottomPadding = isPlayFormat || isMobileOrTablet ? 160 : 96;
+  const maxHeight = `calc(var(--vvh, 100dvh) - ${bottomPadding}px)`;
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -341,6 +416,8 @@ const ModalUI: React.FC<ModalUIProps> = ({
             isMediumScreen={isMediumScreen}
             shouldShiftContent={shouldShiftContent}
             isMobileOrTablet={isMobileOrTablet}
+            isWideScreen={isWideScreen}
+            columnWidths={columnWidths}
           />
           <ContentSpacer
             layoutView={layoutView}
@@ -349,6 +426,8 @@ const ModalUI: React.FC<ModalUIProps> = ({
             isMediumScreen={isMediumScreen}
             shouldShiftContent={shouldShiftContent}
             isMobileOrTablet={isMobileOrTablet}
+            isWideScreen={isWideScreen}
+            columnWidths={columnWidths}
           />
           <PlayFormatSpacer
             layoutView={layoutView}
@@ -357,9 +436,11 @@ const ModalUI: React.FC<ModalUIProps> = ({
             isLargeScreen={isLargeScreen}
             isMediumScreen={isMediumScreen}
             isMobileOrTablet={isMobileOrTablet}
+            isWideScreen={isWideScreen}
+            columnWidths={columnWidths}
           />
 
-          <div className={modalWrapperClasses}>
+          <div className={modalWrapperClasses} style={isLargeScreen && shouldShiftContent && columnWidths.rightNotes > 0 ? { width: columnWidths.rightNotes } : undefined}>
             <motion.div
               className={modalContentClasses}
               style={{ maxHeight }}

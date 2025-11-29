@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 
 import { motion } from "motion/react";
-import { Search, FileText, Minimize2, Maximize2 } from "lucide-react";
+import { Search, FileText, Minimize2, Maximize2, X } from "lucide-react";
 
 import { Tooltip, TooltipTrigger, TooltipContent } from "@player/components/ui/tooltip";
 
@@ -24,9 +24,10 @@ interface SearchModalProps {
   searchResults: SearchResultsData;
   clickedAppearanceId?: string;
   searchQuery?: string;
+  isSidePanel?: boolean;
 }
 
-export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, searchResults, clickedAppearanceId, searchQuery }) => {
+export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, searchResults, clickedAppearanceId, searchQuery, isSidePanel = false }) => {
   const { t } = useTranslation();
 
   const deferredResults = useDeferredValue(searchResults);
@@ -265,66 +266,87 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
       </Tooltip>
     ) : null;
 
+  const content = (
+    <div className="flex flex-col h-full relative overflow-hidden" aria-busy={showSpinner}>
+      {showSpinner && (
+        <motion.div
+          className="flex flex-col items-center justify-center py-12 px-4"
+          variants={variants.loadingContainer}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          key="loading"
+        >
+          <div className="relative">
+            <motion.div className="w-12 h-12 border-4 rounded-full border-book-primary-30 border-t-book-primary" variants={variants.loading} initial="initial" animate="animate" />
+            <motion.div
+              className="absolute inset-0 w-12 h-12 border-4 border-transparent rounded-full border-t-book-tertiary-50"
+              variants={variants.loading}
+              initial="initial"
+              animate="animate"
+              transition={{ delay: 0.1 }}
+            />
+          </div>
+          <motion.div className="mt-4 text-white/90 font-medium" variants={variants.loadingText} initial="hidden" animate="visible">
+            {t("searching")}
+          </motion.div>
+          <motion.div className="mt-2 text-white/60 text-sm" variants={variants.loadingSubtext} initial="hidden" animate="visible">
+            {t("exploring_chapters")}
+          </motion.div>
+        </motion.div>
+      )}
+
+      {showContent && (
+        <div className="flex-grow overflow-y-auto" key="content">
+          <div className="space-y-3">
+            {hasItems ? (
+              <div className="space-y-3">
+                <Accordion id="search-modal-accordion" type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
+                  {sortedChapterEntries.map(([chapter, items]) => (
+                    <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} clickedAppearanceId={clickedAppearanceId} searchQuery={searchQuery} />
+                  ))}
+                </Accordion>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="p-4 rounded-full mb-4 backdrop-blur-sm border bg-book-secondary-20 border-book-secondary-30">
+                  <Search size={24} />
+                </div>
+                <p className="text-white/80 text-sm">{t("no_results_to_display")}</p>
+                <p className="text-white/70 text-xs mt-1">{t("try_different_search_terms")}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  // Side-panel mode: render directly into the column container (no Dialog wrapper)
+  if (isSidePanel) {
+    return (
+      <div className="side-panel-modal w-full flex flex-col pointer-events-auto">
+        <div className="rounded-lg overflow-hidden w-full flex flex-col bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[calc(100vh-10rem)]">
+          <header className="flex justify-between items-center p-4 pb-0">
+            <div className="text-lg font-semibold text-white">{modalTitle}</div>
+            <div className="flex items-center gap-2">
+              {headerActions}
+              <button type="button" onClick={onClose} className="p-1 rounded-md transition-colors cursor-pointer text-white/70 hover:text-white" aria-label="Close modal">
+                <X size={20} />
+              </button>
+            </div>
+          </header>
+          {searchActions && <div className="w-full flex justify-between items-center px-4 pt-4">{searchActions}</div>}
+          <div className="py-3 px-2 overflow-y-auto w-full flex-1">{content}</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Mobile/tablet mode: use ModalUI with Dialog
   return (
     <ModalUI title={modalTitle} onClose={onClose} layoutView={wideScreen} hideOverlay={true} headerActions={headerActions} searchActions={searchActions}>
-      <div className="flex flex-col h-full relative overflow-hidden" aria-busy={showSpinner}>
-        {showSpinner && (
-          <motion.div
-            className="flex flex-col items-center justify-center py-12 px-4"
-            variants={variants.loadingContainer}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            key="loading"
-          >
-            <div className="relative">
-              <motion.div
-                className="w-12 h-12 border-4 rounded-full border-book-primary-30 border-t-book-primary"
-                variants={variants.loading}
-                initial="initial"
-                animate="animate"
-              />
-              <motion.div
-                className="absolute inset-0 w-12 h-12 border-4 border-transparent rounded-full border-t-book-tertiary-50"
-                variants={variants.loading}
-                initial="initial"
-                animate="animate"
-                transition={{ delay: 0.1 }}
-              />
-            </div>
-            <motion.div className="mt-4 text-white/90 font-medium" variants={variants.loadingText} initial="hidden" animate="visible">
-              {t("searching")}
-            </motion.div>
-            <motion.div className="mt-2 text-white/60 text-sm" variants={variants.loadingSubtext} initial="hidden" animate="visible">
-              {t("exploring_chapters")}
-            </motion.div>
-          </motion.div>
-        )}
-
-        {showContent && (
-          <div className="flex-grow overflow-y-auto" key="content">
-            <div className="space-y-3">
-              {hasItems ? (
-                <div className="space-y-3">
-                  <Accordion id="search-modal-accordion" type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
-                    {sortedChapterEntries.map(([chapter, items]) => (
-                      <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} clickedAppearanceId={clickedAppearanceId} searchQuery={searchQuery} />
-                    ))}
-                  </Accordion>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="p-4 rounded-full mb-4 backdrop-blur-sm border bg-book-secondary-20 border-book-secondary-30">
-                    <Search size={24} />
-                  </div>
-                  <p className="text-white/80 text-sm">{t("no_results_to_display")}</p>
-                  <p className="text-white/70 text-xs mt-1">{t("try_different_search_terms")}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+      {content}
     </ModalUI>
   );
 };
