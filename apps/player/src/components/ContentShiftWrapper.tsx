@@ -11,8 +11,8 @@ import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";
  * - 3-COLUMN (≥1280px): Modal portals into #right-notes
  *
  * This component handles:
- * - 2-column: Hide left-notes content, modal replaces it
- * - 3-column narrow (1280-1600px): Collapse left-notes, lock content width, modal in right
+ * - 2-column: Hide left-notes content, modal replaces it, lock width
+ * - 3-column narrow (1280-1600px): Collapse left-notes, modal in right (CSS handles fixed width)
  * - 3-column wide (≥1600px): Characters stay visible, modal in right
  * - Play format: Transform-based shifting (legacy behavior)
  */
@@ -50,7 +50,6 @@ export const ContentShiftWrapper: React.FC = () => {
   useEffect(() => {
     const bookContainer = document.getElementById("book-container");
     const leftNotes = document.getElementById("left-notes");
-    const leftNotesBlank = document.getElementById("left-notes-blank");
     const rightNotes = document.getElementById("right-notes");
     const contentContainer = document.getElementById("content-container");
 
@@ -59,18 +58,10 @@ export const ContentShiftWrapper: React.FC = () => {
     // Reset function - removes all classes and inline styles
     const resetLayout = () => {
       leftNotes?.classList.remove("side-panel-active");
-      leftNotes?.classList.remove("content-hidden");
       leftNotes?.classList.remove("collapsed");
       rightNotes?.classList.remove("side-panel-active");
       contentContainer?.classList.remove("modal-open");
       contentContainer?.style.removeProperty("--content-width");
-      if (leftNotes) {
-        leftNotes.style.flex = "";
-        leftNotes.style.overflow = "";
-      }
-      if (leftNotesBlank) {
-        leftNotesBlank.style.flex = "";
-      }
       bookContainer.style.transform = "";
     };
 
