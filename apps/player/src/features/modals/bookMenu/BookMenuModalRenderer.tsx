@@ -1,5 +1,6 @@
 import React from "react";
 import { createPortal } from "react-dom";
+import { AnimatePresence } from "motion/react";
 import { useBookMenuModal } from "@player/stores/modals/bookMenuModal.store";
 import { useBookChapterModal } from "@player/stores/modals/bookChapterModal.store";
 import { useApiKeyModal } from "@player/stores/modals/apiKeyModal.store";
@@ -31,16 +32,18 @@ export const BookMenuModalRenderer: React.FC = () => {
 
   useEscapeKey(isOpen, closeModal);
 
-  if (!isOpen) return null;
-
   return createPortal(
-    <BookMenuModal
-      onClose={closeModal}
-      openBookChapterModal={handleOpenBookChapterModal}
-      openApiKeyModal={handleOpenApiKeyModal}
-      openPositionHistoryModal={handleOpenPositionHistoryModal}
-      resetFurthestPageLocation={resetFurthestPageLocation}
-    />,
+    <AnimatePresence>
+      {isOpen && (
+        <BookMenuModal
+          onClose={closeModal}
+          openBookChapterModal={handleOpenBookChapterModal}
+          openApiKeyModal={handleOpenApiKeyModal}
+          openPositionHistoryModal={handleOpenPositionHistoryModal}
+          resetFurthestPageLocation={resetFurthestPageLocation}
+        />
+      )}
+    </AnimatePresence>,
     document.body,
   );
 };

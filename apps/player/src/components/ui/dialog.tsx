@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 
 import { cn } from "@player/lib/utils";
 import { useVisualViewport } from "@player/hooks/useVisualViewport";
@@ -29,19 +29,16 @@ function DialogOverlay({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Overlay> & { useCustomAnimation?: boolean; hideOverlay?: boolean }) {
   if (useCustomAnimation) {
+    if (hideOverlay) return null;
+    // No AnimatePresence here - parent AnimatePresence handles exit animation
     return (
-      <AnimatePresence>
-        {!hideOverlay && (
-          <motion.div
-            data-slot="dialog-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className={cn("fixed inset-0 z-50 bg-black/60 backdrop-blur-sm", className)}
-          />
-        )}
-      </AnimatePresence>
+      <motion.div
+        data-slot="dialog-overlay"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1, transition: { duration: 0.2, ease: "easeOut" } }}
+        exit={{ opacity: 0, transition: { duration: 0.25, ease: "easeIn" } }}
+        className={cn("fixed inset-0 z-50 bg-black/60 backdrop-blur-sm", className)}
+      />
     );
   }
 

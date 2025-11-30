@@ -1,5 +1,6 @@
 import React, { useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { AnimatePresence } from "motion/react";
 
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
 import { SearchModal } from "@player/components/modals/SearchModal";
@@ -59,17 +60,19 @@ export const SearchModalRenderer: React.FC = () => {
 
   const container = useMemo(() => getModalContainer(isMobile, isPlayFormat, isLargeScreen, isMediumScreen), [isMobile, isPlayFormat, isLargeScreen, isMediumScreen]);
 
-  if (!isOpen) return null;
-
   return createPortal(
-    <SearchModal
-      onClose={closeModal}
-      layoutView={isSidePanel}
-      searchResults={results}
-      clickedAppearanceId={lastClickedAppearanceId}
-      searchQuery={query}
-      isSidePanel={isSidePanel}
-    />,
+    <AnimatePresence>
+      {isOpen && (
+        <SearchModal
+          onClose={closeModal}
+          layoutView={isSidePanel}
+          searchResults={results}
+          clickedAppearanceId={lastClickedAppearanceId}
+          searchQuery={query}
+          isSidePanel={isSidePanel}
+        />
+      )}
+    </AnimatePresence>,
     container,
   );
 };

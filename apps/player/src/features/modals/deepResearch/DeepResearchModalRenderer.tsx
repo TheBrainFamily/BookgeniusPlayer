@@ -1,5 +1,6 @@
 import React, { useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { AnimatePresence } from "motion/react";
 import { useEscapeKey } from "@player/hooks/useEscapeKey";
 import DeepResearchModal from "@player/components/modals/ResearchModal";
 import { useDeepResearchModal } from "@player/stores/modals/researchModal.store";
@@ -55,21 +56,23 @@ export const DeepResearchModalRenderer: React.FC = () => {
 
   const container = useMemo(() => getModalContainer(isMobile, isPlayFormat, isLargeScreen, isMediumScreen), [isMobile, isPlayFormat, isLargeScreen, isMediumScreen]);
 
-  if (!isOpen) return null;
-
   return createPortal(
-    <DeepResearchModal
-      onClose={closeModal}
-      content={content}
-      layoutView={isSidePanel}
-      hideOverlay={hideOverlay}
-      isLoading={isLoading}
-      canDiveDeeper={showDiveDeeperCTA}
-      onDiveDeeper={diveDeeperHandler}
-      isDiveDeeperLoading={isDiveDeeperLoading}
-      type={type}
-      isSidePanel={isSidePanel}
-    />,
+    <AnimatePresence>
+      {isOpen && (
+        <DeepResearchModal
+          onClose={closeModal}
+          content={content}
+          layoutView={isSidePanel}
+          hideOverlay={hideOverlay}
+          isLoading={isLoading}
+          canDiveDeeper={showDiveDeeperCTA}
+          onDiveDeeper={diveDeeperHandler}
+          isDiveDeeperLoading={isDiveDeeperLoading}
+          type={type}
+          isSidePanel={isSidePanel}
+        />
+      )}
+    </AnimatePresence>,
     container,
   );
 };

@@ -13,7 +13,7 @@ interface CharacterModalProps {
 const CharacterModal = ({ isOpen, onClose, name, image, title, description }: CharacterModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl bg-transparent border-none shadow-none p-0 [&>button]:hidden backdrop-blur-md !animate-none" onPointerDown={onClose}>
+      <DialogContent className="max-w-4xl bg-transparent border-none shadow-none p-0 [&>button]:hidden backdrop-blur-md" onPointerDown={onClose}>
         <div className="flex flex-col md:flex-row items-center">
           {/* Left Column - Avatar */}
           <div className="flex-shrink-0">

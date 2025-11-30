@@ -444,8 +444,10 @@ const ModalUI: React.FC<ModalUIProps> = ({
             <motion.div
               className={modalContentClasses}
               style={{ maxHeight }}
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1, transition: { duration: 0.2, ease: "easeOut" } }}
+              exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.25, ease: "easeIn" } }}
               layout={animateHeight}
-              transition={animateHeight ? { duration: 0.3, ease: "easeInOut", layout: { duration: 0.3 } } : undefined}
             >
               <ModalHeader title={title} isTransparent={isTransparent} layoutView={layoutView} showCloseButton={showCloseButton} headerActions={headerActions} onClose={onClose} />
 

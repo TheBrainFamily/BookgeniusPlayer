@@ -1,5 +1,6 @@
 import React from "react";
 import { createPortal } from "react-dom";
+import { AnimatePresence } from "motion/react";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import CharacterModal from "@player/components/modals/CharacterModal";
 import { useLocationRange } from "@player/hooks/useLocationRange";
@@ -11,18 +12,22 @@ export const CharacterModalRenderer: React.FC = () => {
 
   useEscapeKey(isOpen, closeModal);
 
-  if (!isOpen || !slug || !mediaSrc) return null;
+  const shouldShow = isOpen && slug && mediaSrc;
 
   return createPortal(
-    <CharacterModal
-      onClose={closeModal}
-      isVideo={isVideo}
-      mediaSrc={mediaSrc}
-      characterSlug={slug}
-      endChapter={locationRange.endChapter}
-      chapter={chapter ?? locationRange.currentChapter}
-      paragraph={paragraph ?? locationRange.currentParagraph}
-    />,
+    <AnimatePresence>
+      {shouldShow && (
+        <CharacterModal
+          onClose={closeModal}
+          isVideo={isVideo}
+          mediaSrc={mediaSrc}
+          characterSlug={slug}
+          endChapter={locationRange.endChapter}
+          chapter={chapter ?? locationRange.currentChapter}
+          paragraph={paragraph ?? locationRange.currentParagraph}
+        />
+      )}
+    </AnimatePresence>,
     document.body,
   );
 };
