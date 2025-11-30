@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useContentShift } from "@player/stores/contentShift.store";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
-import { isMobileOrTablet } from "@player/utils/isMobileOrTablet";
+import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";
 
 /**
  * ContentShiftWrapper - Layout management for side-panel modals (Search, DeepResearch)
@@ -11,8 +11,9 @@ import { isMobileOrTablet } from "@player/utils/isMobileOrTablet";
  * - 3-COLUMN (≥1280px): Modal portals into #right-notes
  *
  * This component handles:
- * - 2-column: Adding a class to hide original left-notes content (characters)
- * - 3-column: Optionally squeezing left column on narrower screens
+ * - 2-column: Hide left-notes content, modal replaces it
+ * - 3-column narrow (1280-1600px): Collapse left-notes, lock content width, modal in right
+ * - 3-column wide (≥1600px): Characters stay visible, modal in right
  * - Play format: Transform-based shifting (legacy behavior)
  */
 const getInitialScreenSizes = () => {
@@ -20,7 +21,7 @@ const getInitialScreenSizes = () => {
     return { large: false, medium: false, wide: false };
   }
   const width = window.innerWidth;
-  return { large: width >= 1280, medium: width >= 1024 && width < 1280, wide: width >= 1500 };
+  return { large: width >= 1280, medium: width >= 1024 && width < 1280, wide: width >= 1600 };
 };
 
 export const ContentShiftWrapper: React.FC = () => {
@@ -32,14 +33,14 @@ export const ContentShiftWrapper: React.FC = () => {
 
   const bookData = getBookData();
   const isPlayFormat = bookData.metadata.bookForm === "play" || bookData.metadata.bookForm === "mixed";
-  const isMobileOrTabletDevice = isMobileOrTablet();
+  const isMobileOrTabletDevice = useIsMobileOrTablet();
 
   useEffect(() => {
     const checkScreenSize = () => {
       const width = window.innerWidth;
       setIsLargeScreen(width >= 1280);
       setIsMediumScreen(width >= 1024 && width < 1280);
-      setIsWideScreen(width >= 1500);
+      setIsWideScreen(width >= 1600);
     };
 
     window.addEventListener("resize", checkScreenSize);
@@ -51,6 +52,7 @@ export const ContentShiftWrapper: React.FC = () => {
     const leftNotes = document.getElementById("left-notes");
     const leftNotesBlank = document.getElementById("left-notes-blank");
     const rightNotes = document.getElementById("right-notes");
+    const contentContainer = document.getElementById("content-container");
 
     if (!bookContainer) return;
 
@@ -58,7 +60,10 @@ export const ContentShiftWrapper: React.FC = () => {
     const resetLayout = () => {
       leftNotes?.classList.remove("side-panel-active");
       leftNotes?.classList.remove("content-hidden");
+      leftNotes?.classList.remove("collapsed");
       rightNotes?.classList.remove("side-panel-active");
+      contentContainer?.classList.remove("modal-open");
+      contentContainer?.style.removeProperty("--content-width");
       if (leftNotes) {
         leftNotes.style.flex = "";
         leftNotes.style.overflow = "";
@@ -74,25 +79,32 @@ export const ContentShiftWrapper: React.FC = () => {
       return;
     }
 
+    // Lock content container width - only needed for 2-column layout
+    // where hiding left-notes content could cause flex recalculation
+    const lockContentWidth = () => {
+      if (!contentContainer) return;
+      const { width } = contentContainer.getBoundingClientRect();
+      // Guard against capturing zero width during intermediate layout states
+      if (!width || width <= 0) return;
+      contentContainer.style.setProperty("--content-width", `${width}px`);
+      contentContainer.classList.add("modal-open");
+    };
+
     // 3-COLUMN LAYOUT (large screens ≥1280px)
-    // Modal is portaled into #right-notes - characters stay visible in left-notes
+    // Modal is portaled into #right-notes
     if (isLargeScreen && !isPlayFormat) {
       rightNotes?.classList.add("side-panel-active");
-
-      // On narrower 3-column screens, squeeze left column to give modal more room
+      // On narrower 3-column screens (1280-1600px), hide left column to give modal more room
+      // Don't lock content width here - the collapse/expand should be symmetric
       if (!isWideScreen) {
-        if (leftNotes) {
-          leftNotes.style.flex = "0 0 100px";
-          leftNotes.style.overflow = "hidden";
-        }
-        if (leftNotesBlank) {
-          leftNotesBlank.style.flex = "0 0 100px";
-        }
+        leftNotes?.classList.add("collapsed");
       }
     }
     // 2-COLUMN LAYOUT (medium screens 1024-1279px)
     // Modal is portaled into #left-notes - hide original content via CSS class
+    // Lock width to prevent jump when left column content is hidden
     else if (isMediumScreen && !isPlayFormat) {
+      lockContentWidth();
       leftNotes?.classList.add("side-panel-active");
     }
     // PLAY FORMAT: Use transform-based shifting (legacy behavior)
