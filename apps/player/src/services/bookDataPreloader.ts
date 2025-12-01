@@ -9,6 +9,7 @@ import { loadCharactersData } from "@player/genericBookDataGetters/getCharacters
 import { loadCutScenesForBook } from "@player/genericBookDataGetters/getCutScenesForBook";
 import { loadKnownVideoFiles } from "@player/genericBookDataGetters/getKnownVideoFiles";
 import { loadBookColorsCSS } from "@player/utils/loadBookColors";
+import { initializeReadingPosition } from "./initializeReadingPosition";
 
 export async function preloadAllBookData(): Promise<void> {
   console.log("Preloading book data...");
@@ -30,6 +31,14 @@ export async function preloadAllBookData(): Promise<void> {
     ]);
 
     console.log("Book data preloaded successfully");
+
+    // Reconcile reading position with server (updates localStorage)
+    // Non-blocking: failures fall back to local position
+    try {
+      await initializeReadingPosition();
+    } catch (error) {
+      console.warn("Failed to reconcile reading position:", error);
+    }
   } catch (error) {
     console.error("Failed to preload book data:", error);
     throw error;

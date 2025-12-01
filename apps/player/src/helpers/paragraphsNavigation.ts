@@ -562,29 +562,17 @@ export const parseLocationFromHash = (): Location | null => {
 /* ------------------------------------------------------------------ */
 /*  Initial Load from URL Hash                                        */
 export const goToInitialLocationFromHash = async () => {
-  let reconciledPosition: ExtendedLocation | null = null;
-
-  // First, reconcile local vs remote position
-  try {
-    const { initializeReadingPosition } = await import("@player/services/initializeReadingPosition");
-    reconciledPosition = await initializeReadingPosition();
-    debugLog("reconciledPosition", reconciledPosition);
-  } catch (error) {
-    console.warn("Failed to reconcile remote reading position:", error);
-  }
+  // Reading position has already been reconciled with server in bookDataPreloader.ts
+  // localStorage now contains the correct (most recent) position
 
   const locationFromHash = parseLocationFromHash();
   debugLog("locationFromHash", locationFromHash);
 
   if (locationFromHash) {
     // Use system navigation for the initial load from hash
-    // The furthest saved location has been updated by reconciliation
     await systemNavigateTo({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph }, { history: "replace" });
-  } else if (reconciledPosition) {
-    // Use the reconciled position (most recent between local and remote)
-    await systemNavigateTo({ currentChapter: reconciledPosition.currentChapter, currentParagraph: reconciledPosition.currentParagraph }, { history: "replace", wait: true });
   } else {
-    // Fallback if hash is invalid or missing: go to furthest saved location
+    // Use the saved location (already reconciled with server)
     const saved = getSavedLocation();
 
     if (saved) {
