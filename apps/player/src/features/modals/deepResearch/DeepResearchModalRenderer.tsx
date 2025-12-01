@@ -42,19 +42,23 @@ export const DeepResearchModalRenderer: React.FC = () => {
   // Play format uses centered modal because left/right notes are hidden
   const isSidePanel = !isMobile && !isPlayFormat && (isLargeScreen || isMediumScreen);
 
-  // Enable content shift when modal opens in side-panel mode
+  // Content shift should be enabled for both side-panel mode AND play format on large/medium screens
+  // Play format needs content shift to move the book content left, making room for the modal on the right
+  const shouldUseContentShift = !isMobile && (isLargeScreen || isMediumScreen);
+
+  // Enable content shift when modal opens
   useEffect(() => {
-    if (isOpen && isSidePanel) {
+    if (isOpen && shouldUseContentShift) {
       enableContentShift();
     }
-  }, [isOpen, isSidePanel, enableContentShift]);
+  }, [isOpen, shouldUseContentShift, enableContentShift]);
 
   // Disable content shift after exit animation completes
   const handleExitComplete = useCallback(() => {
-    if (isSidePanel) {
+    if (shouldUseContentShift) {
       disableContentShift();
     }
-  }, [isSidePanel, disableContentShift]);
+  }, [shouldUseContentShift, disableContentShift]);
 
   const container = useMemo(() => getModalContainer(isMobile, isPlayFormat, isLargeScreen, isMediumScreen), [isMobile, isPlayFormat, isLargeScreen, isMediumScreen]);
 
