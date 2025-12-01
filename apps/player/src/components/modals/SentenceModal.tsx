@@ -23,18 +23,17 @@ interface SentenceModalProps {
 
 const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceId, currentSentence, simplifiedSentence, simplifiedSentenceScore }) => {
   const { t } = useTranslation();
-  const [_currentSentence] = useState(currentSentence);
-  const [_simplifiedSentence, setSimplifiedSentence] = useState(simplifiedSentence);
-  const [_simplifiedSentenceScore, setSimplifiedSentenceScore] = useState(simplifiedSentenceScore);
+  const [currentSimplifiedSentence, setSimplifiedSentence] = useState(simplifiedSentence);
+  const [currentSimplifiedScore, setSimplifiedSentenceScore] = useState(simplifiedSentenceScore);
   const [isMoreSimplifiedSentence, setIsMoreSimplifiedSentence] = useState(Boolean(simplifiedSentence));
 
   const handleClick = () => {
-    if (!_simplifiedSentence) return;
-    const { text, score: _score, hasLower } = findSimplifiedSentence(currentSentenceId, _simplifiedSentenceScore);
+    if (!currentSimplifiedSentence) return;
+    const { text, score: newScore, hasLower } = findSimplifiedSentence(currentSentenceId, currentSimplifiedScore);
 
     if (text) {
       setSimplifiedSentence(text);
-      setSimplifiedSentenceScore(_score);
+      setSimplifiedSentenceScore(newScore);
     }
     setIsMoreSimplifiedSentence(hasLower);
   };
@@ -42,7 +41,7 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
   const handleUndo = () => {
     const sentenceElement = document.getElementById(currentSentenceId);
     if (sentenceElement) {
-      sentenceElement.innerHTML = _currentSentence;
+      sentenceElement.innerHTML = currentSentence;
       sentenceElement.removeAttribute("data-simplified");
       sentenceElement.removeAttribute("data-original-sentence");
       sentenceElement.setAttribute("data-current-score", "0");
@@ -89,12 +88,12 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
                   transition={{ delay: 0.1 }}
                   style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
                 >
-                  {stripHtml(_currentSentence)}
+                  {stripHtml(currentSentence)}
                 </motion.div>
               </div>
             </motion.div>
 
-            {_simplifiedSentence && (
+            {currentSimplifiedSentence && (
               <motion.div
                 className="group relative overflow-hidden rounded-xl border border-book-tertiary-20 bg-gradient-to-r from-book-tertiary-10 to-book-tertiary-20"
                 variants={variants.item}
@@ -118,7 +117,7 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
                     transition={{ delay: 0.3 }}
                     style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
                   >
-                    {stripHtml(_simplifiedSentence)}
+                    {stripHtml(currentSimplifiedSentence)}
                   </motion.div>
                 </div>
               </motion.div>
