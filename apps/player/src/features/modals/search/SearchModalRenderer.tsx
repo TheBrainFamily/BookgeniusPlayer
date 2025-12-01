@@ -12,7 +12,9 @@ import { useContentShift } from "@player/stores/contentShift.store";
 import { useBookForm } from "@player/hooks/useBookForm";
 
 const getModalContainer = (isMobile: boolean, isPlayFormat: boolean, isLargeScreen: boolean, isMediumScreen: boolean): HTMLElement => {
-  if (typeof window === "undefined") return document.body;
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return null as unknown as HTMLElement;
+  }
 
   // Mobile or play format: centered modal in body
   if (isMobile || isPlayFormat) return document.body;
