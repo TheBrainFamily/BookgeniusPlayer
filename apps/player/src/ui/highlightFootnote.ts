@@ -1,4 +1,5 @@
 import { getNotes } from "@player/genericBookDataGetters/getNotes";
+import { useFootnoteModal } from "@player/stores/modals/footnoteModal.store";
 
 let footnoteContainerEl: HTMLDivElement | null = null;
 let globalGuardsAttached = false;
@@ -132,9 +133,7 @@ function hideFloatingFootnote(requester?: HTMLElement) {
 
 /** Open the FootnoteModal for click interactions */
 function openFootnoteModal(html: string) {
-  // Create a custom event to trigger the modal
-  const event = new CustomEvent("open-footnote-modal", { detail: { html } });
-  window.dispatchEvent(event);
+  useFootnoteModal.getState().openModal(html);
 }
 
 export function highlightFootnote(linkNoteEl: HTMLAnchorElement) {
