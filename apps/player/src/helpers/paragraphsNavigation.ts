@@ -129,7 +129,7 @@ export const getFurthestLocationKey = (): string => {
   return `furthestLocation_${currentBook}`;
 };
 
-export const getSavedLocation = (): ExtendedLocation | null => {
+export const getSavedLocation = (): ExtendedLocation => {
   try {
     const key = getFurthestLocationKey();
     const raw = localStorage.getItem(key);
@@ -137,7 +137,7 @@ export const getSavedLocation = (): ExtendedLocation | null => {
 
     const parsed = JSON.parse(raw);
     // Handle both old format (plain Location) and new format (ExtendedLocation)
-    return parsed;
+    return parsed as ExtendedLocation;
   } catch {
     return DEFAULT_LOCATION;
   }
@@ -570,15 +570,8 @@ export const goToInitialLocationFromHash = async () => {
 
   if (locationFromHash) {
     // Use system navigation for the initial load from hash
-    await systemNavigateTo({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph }, { history: "replace" });
+    await systemNavigateTo(locationFromHash, { history: "replace" });
   } else {
-    // Use the saved location (already reconciled with server)
-    const saved = getSavedLocation();
-
-    if (saved) {
-      await systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph }, { history: "replace", wait: true });
-    } else {
-      await systemNavigateTo({ currentChapter: 1, currentParagraph: 0 }, { history: "replace" });
-    }
+    await systemNavigateTo(getSavedLocation(), { history: "replace", wait: true });
   }
 };
