@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion, Variants } from "motion/react";
 import { FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -12,7 +12,6 @@ import { getCharactersData } from "@player/genericBookDataGetters/getCharactersD
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
 import { DialogEnhanceClose } from "../ui/dialog";
 import { getChapterTitle } from "@player/utils/getChapterTitle";
-import { useContentShift } from "@player/stores/contentShift.store";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 import { useBottomInput } from "@player/stores/modals/bottomInput.store";
@@ -68,8 +67,6 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const shiftEnableRef = useRef(false);
-
   // Search for character appearances in the text up to the current location
   useEffect(() => {
     if (!matchingCharacter) return;
@@ -107,8 +104,6 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   };
 
   const handleOnClose = () => {
-    useContentShift.getState().disableContentShift();
-    shiftEnableRef.current = false;
     onClose();
   };
 
