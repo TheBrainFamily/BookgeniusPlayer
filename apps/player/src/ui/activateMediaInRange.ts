@@ -244,6 +244,43 @@ const runPlayFormatMediaActivation = ({ charactersBySlug }: PlayFormatMediaActiv
   });
 };
 
+/**
+ * Populates an existing inline-avatar shell with the placeholder image.
+ * Returns true if the shell was populated, false if it already had content.
+ */
+function populateInlineAvatarShell(
+  shell: HTMLElement,
+  characterData: CharacterData | undefined,
+  location: { chapter: number; paragraph: number } | null,
+  snapshotOverride?: CharacterSnapshot | null,
+): boolean {
+  // Skip if already has an image
+  if (shell.querySelector("img")) {
+    return false;
+  }
+
+  const characterSlug = shell.dataset.character;
+  if (!characterSlug || !characterData) return false;
+
+  const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+
+  const listeningSrc = snapshot.media.listening;
+  const talkingSrc = snapshot.media.talking;
+
+  // Update title in case it wasn't set properly
+  shell.title = snapshot.displayName;
+
+  // Create placeholder image (always shown as fallback)
+  const placeholderImg = document.createElement("img");
+  const placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
+  placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
+  placeholderImg.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
+  placeholderImg.alt = snapshot.displayName;
+  shell.appendChild(placeholderImg);
+
+  return true;
+}
+
 /** Creates a media container element with CharacterMedia-like structure for inline avatars */
 function createMediaElement(
   placeholder: HTMLSpanElement,
@@ -368,11 +405,16 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
 
       if (Array.from(activatedMedia).find((_rowEl) => _rowEl === rowEl)) return;
 
-      const newMediaElement = createMediaElement(characterPlaceholder, characterData, locationForPlaceholder, snapshot);
+      const existingInlineAvatar = characterPlaceholder.querySelector<HTMLElement>(".inline-avatar");
 
-      if (newMediaElement) {
-        const existingInlineAvatar = characterPlaceholder.querySelector(".inline-avatar");
-        if (!existingInlineAvatar) {
+      if (existingInlineAvatar) {
+        // Pre-rendered shell exists, populate it with the image
+        populateInlineAvatarShell(existingInlineAvatar, characterData, locationForPlaceholder, snapshot);
+      } else {
+        // No shell exists, create full media element
+        const newMediaElement = createMediaElement(characterPlaceholder, characterData, locationForPlaceholder, snapshot);
+
+        if (newMediaElement) {
           if (dummyPlaceholder) {
             characterPlaceholder.replaceChild(newMediaElement, dummyPlaceholder);
           } else {

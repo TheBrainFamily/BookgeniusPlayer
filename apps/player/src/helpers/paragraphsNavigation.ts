@@ -6,8 +6,10 @@
  */
 import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
 import { bookDataLoader } from "@player/services/bookDataLoader";
-import { ensureChapterWindow } from "@player/logic/BookContentVirtualizer";
+import { ensureChapterWindow, ensureChapterRangeWindow } from "@player/logic/BookContentVirtualizer";
 import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
+import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { activateMediaInRange } from "@player/ui/activateMediaInRange";
 
 /* ------------------------------------------------------------------ */
 /*  Export system navigation state checker                           */
@@ -38,7 +40,7 @@ const detectScrollEnd = (element: HTMLElement, callback: () => void, timeout: nu
       isScrolling = false;
       if (timeoutTimer) clearTimeout(timeoutTimer);
       callback();
-    }, 150); // Detect scroll end after 150ms of no scroll events
+    }, 200); // Detect scroll end after 200ms of no scroll events (increased for reliability)
   };
 
   // Fallback timeout in case scroll events don't fire properly (e.g., instant scroll)
@@ -281,14 +283,29 @@ const waitForElementStablePosition = (element: HTMLElement, options: { timeout?:
  */
 export const systemNavigateTo = async (
   loc: { currentChapter: number; currentParagraph: number },
-  options: { wait?: boolean; history?: "push" | "replace" } = { wait: false, history: "replace" },
+  options: {
+    wait?: boolean;
+    history?: "push" | "replace";
+    /** "instant" preserves old behavior; "smooth" animates scrolling */
+    behavior?: "instant" | "smooth";
+    /**
+     * When true, temporarily mount all chapters between current and target
+     * so smooth scrolling shows the full travel distance.
+     */
+    expandChapterRange?: boolean;
+  } = {},
 ) => {
   if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
     console.error("Invalid location provided to systemNavigateTo:", loc);
     return;
   }
 
-  debugLog("systemNavigateTo", { loc, options });
+  const { wait = false, history = "replace", behavior = "instant", expandChapterRange = false } = options;
+
+  // Capture where we are *before* updating the bridge so we can compute the range.
+  const startingLocation = getCurrentLocation();
+
+  debugLog("systemNavigateTo", { loc, options: { wait, history, behavior, expandChapterRange } });
   scrollCoordinator.setNavigating(true);
 
   const fullLocation: Location = {
@@ -323,28 +340,64 @@ export const systemNavigateTo = async (
   // Callers can pass history: "replace" for initial load or non-history-affecting moves.
 
   try {
-    await ensureChapterWindow(loc.currentChapter);
+    if (expandChapterRange) {
+      const fromChapter = typeof startingLocation.currentChapter === "number" ? startingLocation.currentChapter : loc.currentChapter;
+      await ensureChapterRangeWindow(fromChapter, loc.currentChapter);
+    } else {
+      await ensureChapterWindow(loc.currentChapter);
+    }
 
     // Wait for layout to stabilize after chapter mounting
     await scrollCoordinator.waitForLayoutStability();
 
+    // Pre-populate avatars around the target location so they're visible when scroll completes
+    const bookData = getBookData();
+    const isPlayFormat = bookData.metadata.bookForm === "play" || bookData.metadata.bookForm === "mixed";
+    const targetParagraph = loc.currentParagraph;
+    const bufferSize = 5;
+    activateMediaInRange(loc.currentChapter, Math.max(0, targetParagraph - bufferSize), loc.currentChapter, targetParagraph + bufferSize, isPlayFormat);
+
     const selector =
       loc.currentParagraph === 0 ? `section[data-chapter="${loc.currentChapter}"]` : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
-    const element = document.querySelector(selector) as HTMLElement;
+    const element = document.querySelector(selector) as HTMLElement | null;
 
-    if ((pageWasJustReloaded() || options.wait) && element) {
+    if ((pageWasJustReloaded() || wait) && element) {
       await waitForElementStablePosition(element);
     }
 
-    await goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior: "instant" });
+    // Smooth or instant scroll based on caller's request.
+    await goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior });
+
+    // Force location to the target immediately after scroll completes
+    // This ensures the location state is correct before any chapter window changes
+    _bridge.set(fullLocation, "system");
+
+    // After the smooth "travel" completes, shrink back to a small window
+    // around the target so normal virtualization resumes.
+    if (expandChapterRange) {
+      await ensureChapterWindow(loc.currentChapter);
+    }
 
     // Sync scroll position after navigation to update scroll direction tracking
     scrollCoordinator.syncScrollPosition();
+
+    // Force a final location sync after everything is done
+    // This ensures the observer picks up the correct paragraph when it resumes
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        _bridge.set(fullLocation, "system");
+        resolve();
+      });
+    });
+
     debugLog("systemNavigateTo complete", { loc });
   } catch (error) {
     console.error("systemNavigateTo: Error during navigation", error);
   } finally {
     scrollCoordinator.setNavigating(false);
+    // Trigger observer re-processing to activate media after navigation completes
+    // Must be after setNavigating(false) so the observer doesn't early-exit
+    window.dispatchEvent(new Event("navigationComplete"));
   }
 };
 

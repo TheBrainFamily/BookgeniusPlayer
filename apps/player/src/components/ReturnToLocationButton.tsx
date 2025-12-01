@@ -32,7 +32,16 @@ const ReturnToLocationButton = () => {
 
   const onGoBackClick = () => {
     const savedLocation = getSavedLocation();
-    systemNavigateTo({ currentChapter: savedLocation.currentChapter, currentParagraph: savedLocation.currentParagraph });
+    if (!savedLocation) {
+      return;
+    }
+
+    // Smooth navigation with full chapter range between current and saved.
+    systemNavigateTo(
+      { currentChapter: savedLocation.currentChapter, currentParagraph: savedLocation.currentParagraph },
+      { behavior: "smooth", expandChapterRange: true, history: "push" },
+    );
+
     setIsVisible(false);
   };
 

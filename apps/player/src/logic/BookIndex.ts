@@ -2,6 +2,41 @@ import { addPaddingBottomLastChapter } from "@player/helpers/addPaddingBottomLas
 import { addSpaceBetweenChapters } from "@player/helpers/addSpaceBetweenChapters";
 import { getBackgroundsForBook } from "@player/genericBookDataGetters/getBackgroundsForBook";
 import { getBookStringified } from "@player/genericBookDataGetters/getBookStringified";
+import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+
+/**
+ * Pre-render inline avatar shell divs inside character placeholders.
+ * This prevents layout shift when media is injected later.
+ */
+const addInlineAvatarShells = (doc: Document) => {
+  const charactersData = getCharactersData();
+  const charactersBySlug = new Map(charactersData.map((c) => [c.slug, c]));
+
+  const placeholders = doc.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+
+  placeholders.forEach((placeholder) => {
+    // Skip if already has an inline-avatar
+    if (placeholder.querySelector(".inline-avatar")) {
+      return;
+    }
+
+    const characterSlug = placeholder.dataset.character;
+    if (!characterSlug) {
+      return;
+    }
+
+    const characterData = charactersBySlug.get(characterSlug);
+    const displayName = characterData?.characterName ?? characterSlug;
+
+    // Create the shell div that will hold the media later
+    const shell = doc.createElement("div");
+    shell.className = "inline-avatar relative w-full h-full";
+    shell.dataset.character = characterSlug;
+    shell.title = displayName;
+
+    placeholder.appendChild(shell);
+  });
+};
 
 interface ChapterRecord {
   chapterId: number;
@@ -57,6 +92,8 @@ class BookIndex {
         addSpaceBetweenChapters(doc, chapterSections);
       }
       addPaddingBottomLastChapter(doc, chapterSections);
+      // Pre-render inline avatar shells to prevent layout shift when media is injected
+      addInlineAvatarShells(doc);
     }
 
     // Identify chapter wrappers and container

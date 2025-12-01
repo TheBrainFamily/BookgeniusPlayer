@@ -228,6 +228,12 @@ export function useBookContent() {
       return;
     }
 
+    // During explicit system navigation (search / Go Back), chapter
+    // windows are managed by the navigation helper itself.
+    if (scrollCoordinator.isNavigating) {
+      return;
+    }
+
     void (async () => {
       try {
         await ensureChapterWindow(currentChapter);
