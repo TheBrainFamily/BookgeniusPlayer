@@ -25,20 +25,16 @@ export const initializeReadingPosition = async (): Promise<ExtendedLocation | nu
     // Fetch remote position
     const remotePosition = await getLatestPosition(platformId, bookSlug);
 
-    // Get local position
-    const localPosition = getSavedLocation();
-
-    // If no positions exist anywhere, return null
-    if (!remotePosition && !localPosition) {
-      return null;
+    if (!remotePosition) {
+      return getSavedLocation();
     }
 
-    // If only one exists, use it
-    if (!remotePosition && localPosition) {
-      return localPosition;
-    }
+    // Both exist - compare timestamps
+    const remoteTimestamp = normalizeTimestamp(remotePosition.createdAt);
+    const localTimestamp = normalizeTimestamp(getSavedLocation().timestamp);
 
-    if (remotePosition && !localPosition) {
+    if (remoteTimestamp > localTimestamp) {
+      // Remote is more recent
       const extended: ExtendedLocation = {
         chapter: remotePosition.chapter,
         paragraph: remotePosition.paragraph,
@@ -50,49 +46,18 @@ export const initializeReadingPosition = async (): Promise<ExtendedLocation | nu
         latestVisibleParagraph: remotePosition.paragraph,
         earliestVisibleChapter: remotePosition.chapter,
         latestVisibleChapter: remotePosition.chapter,
-        timestamp: normalizeTimestamp(remotePosition.createdAt),
+        timestamp: remoteTimestamp,
         progress: remotePosition.progress,
       };
 
-      // Update localStorage with remote position
+      // Update localStorage and emit event
       setSavedLocation(extended, remotePosition.progress);
 
       return extended;
+    } else {
+      // Local is more recent or equal
+      return getSavedLocation();
     }
-
-    // Both exist - compare timestamps
-    if (remotePosition && localPosition) {
-      const remoteTimestamp = normalizeTimestamp(remotePosition.createdAt);
-      const localTimestamp = normalizeTimestamp(localPosition.timestamp);
-
-      if (remoteTimestamp > localTimestamp) {
-        // Remote is more recent
-        const extended: ExtendedLocation = {
-          chapter: remotePosition.chapter,
-          paragraph: remotePosition.paragraph,
-          endChapter: remotePosition.chapter,
-          endParagraph: remotePosition.paragraph,
-          currentChapter: remotePosition.chapter,
-          currentParagraph: remotePosition.paragraph,
-          earliestVisibleParagraph: remotePosition.paragraph,
-          latestVisibleParagraph: remotePosition.paragraph,
-          earliestVisibleChapter: remotePosition.chapter,
-          latestVisibleChapter: remotePosition.chapter,
-          timestamp: remoteTimestamp,
-          progress: remotePosition.progress,
-        };
-
-        // Update localStorage and emit event
-        setSavedLocation(extended, remotePosition.progress);
-
-        return extended;
-      } else {
-        // Local is more recent or equal
-        return localPosition;
-      }
-    }
-
-    return null;
   } catch (error) {
     console.warn("Failed to initialize reading position from remote:", error);
     // Fall back to local position

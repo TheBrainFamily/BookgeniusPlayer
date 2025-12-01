@@ -129,7 +129,7 @@ export const getFurthestLocationKey = (): string => {
   return `furthestLocation_${currentBook}`;
 };
 
-export const getSavedLocation = (): ExtendedLocation | null => {
+export const getSavedLocation = (): ExtendedLocation => {
   try {
     const key = getFurthestLocationKey();
     const raw = localStorage.getItem(key);
@@ -137,7 +137,7 @@ export const getSavedLocation = (): ExtendedLocation | null => {
 
     const parsed = JSON.parse(raw);
     // Handle both old format (plain Location) and new format (ExtendedLocation)
-    return parsed;
+    return parsed as ExtendedLocation;
   } catch {
     return DEFAULT_LOCATION;
   }
@@ -562,35 +562,16 @@ export const parseLocationFromHash = (): Location | null => {
 /* ------------------------------------------------------------------ */
 /*  Initial Load from URL Hash                                        */
 export const goToInitialLocationFromHash = async () => {
-  let reconciledPosition: ExtendedLocation | null = null;
-
-  // First, reconcile local vs remote position
-  try {
-    const { initializeReadingPosition } = await import("@player/services/initializeReadingPosition");
-    reconciledPosition = await initializeReadingPosition();
-    debugLog("reconciledPosition", reconciledPosition);
-  } catch (error) {
-    console.warn("Failed to reconcile remote reading position:", error);
-  }
+  // Reading position has already been reconciled with server in bookDataPreloader.ts
+  // localStorage now contains the correct (most recent) position
 
   const locationFromHash = parseLocationFromHash();
   debugLog("locationFromHash", locationFromHash);
 
   if (locationFromHash) {
     // Use system navigation for the initial load from hash
-    // The furthest saved location has been updated by reconciliation
-    await systemNavigateTo({ currentChapter: locationFromHash.currentChapter, currentParagraph: locationFromHash.currentParagraph }, { history: "replace" });
-  } else if (reconciledPosition) {
-    // Use the reconciled position (most recent between local and remote)
-    await systemNavigateTo({ currentChapter: reconciledPosition.currentChapter, currentParagraph: reconciledPosition.currentParagraph }, { history: "replace", wait: true });
+    await systemNavigateTo(locationFromHash, { history: "replace" });
   } else {
-    // Fallback if hash is invalid or missing: go to furthest saved location
-    const saved = getSavedLocation();
-
-    if (saved) {
-      await systemNavigateTo({ currentChapter: saved.currentChapter, currentParagraph: saved.currentParagraph }, { history: "replace", wait: true });
-    } else {
-      await systemNavigateTo({ currentChapter: 1, currentParagraph: 0 }, { history: "replace" });
-    }
+    await systemNavigateTo(getSavedLocation(), { history: "replace", wait: true });
   }
 };
