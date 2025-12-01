@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, Variants, AnimatePresence } from "motion/react";
-import { Brain, FileSearch, Telescope, Loader2 } from "lucide-react";
+import { Brain, FileSearch, Telescope, Loader2, X } from "lucide-react";
 
 import ModalUI from "./ModalUI";
 import { LLMAnswerViewer } from "@player/ui/MarkdownComponent";
@@ -16,9 +16,21 @@ interface DeepResearchModalProps {
   canDiveDeeper?: boolean;
   onDiveDeeper?: (() => void) | undefined;
   isDiveDeeperLoading?: boolean;
+  isSidePanel?: boolean;
 }
 
-const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content, layoutView, hideOverlay, isLoading, canDiveDeeper, onDiveDeeper, isDiveDeeperLoading, type }) => {
+const DeepResearchModal: React.FC<DeepResearchModalProps> = ({
+  onClose,
+  content,
+  layoutView,
+  hideOverlay,
+  isLoading,
+  canDiveDeeper,
+  onDiveDeeper,
+  isDiveDeeperLoading,
+  type,
+  isSidePanel = false,
+}) => {
   const modalTitle = (
     <div className="flex items-center gap-2">
       {type === "ask" ? <Brain size={20} /> : <Telescope size={20} />}
@@ -26,107 +38,136 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ onClose, content,
     </div>
   );
 
-  return (
-    <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
-      <motion.div className="flex flex-col h-full relative overflow-hidden" variants={variants.container} initial="hidden" animate="visible" exit="exit">
-        <AnimatePresence mode="wait">
-          {isLoading ? (
-            <motion.div
-              className="flex flex-col items-center justify-center py-12 px-4"
-              variants={variants.loadingContainer}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              key="loading"
-            >
-              <div className="relative">
-                <motion.div
-                  className="w-12 h-12 border-4 rounded-full border-book-primary-30 border-t-book-primary"
-                  variants={variants.loading}
-                  initial="initial"
-                  animate="animate"
-                />
-                <motion.div
-                  className="absolute inset-0 w-12 h-12 border-4 border-transparent rounded-full border-t-book-tertiary-50"
-                  variants={variants.loadingDelayed}
-                  initial="initial"
-                  animate="animate"
-                />
-              </div>
-              <motion.div className="mt-4 text-white/90 font-medium" variants={variants.loadingText} initial="hidden" animate="visible">
-                {type === "ask" ? "Thinking..." : "Researching..."}
-              </motion.div>
-              <motion.div className="mt-2 text-white/60 text-sm" variants={variants.loadingSubtext} initial="hidden" animate="visible">
-                {type === "ask" ? "Analyzing your question..." : "Exploring the book..."}
-              </motion.div>
+  const mainContent = (
+    <motion.div className="flex flex-col h-full relative overflow-hidden" variants={variants.container} initial="hidden" animate="visible" exit="exit">
+      <AnimatePresence mode="wait">
+        {isLoading ? (
+          <motion.div
+            className="flex flex-col items-center justify-center py-12 px-4"
+            variants={variants.loadingContainer}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            key="loading"
+          >
+            <div className="relative">
+              <motion.div
+                className="w-12 h-12 border-4 rounded-full border-book-primary-30 border-t-book-primary"
+                variants={variants.loading}
+                initial="initial"
+                animate="animate"
+              />
+              <motion.div
+                className="absolute inset-0 w-12 h-12 border-4 border-transparent rounded-full border-t-book-tertiary-50"
+                variants={variants.loadingDelayed}
+                initial="initial"
+                animate="animate"
+              />
+            </div>
+            <motion.div className="mt-4 text-white/90 font-medium" variants={variants.loadingText} initial="hidden" animate="visible">
+              {type === "ask" ? "Thinking..." : "Researching..."}
             </motion.div>
-          ) : content ? (
-            <motion.div className="flex-grow flex flex-col pt-4 min-h-0" variants={variants.contentContainer} initial="initial" animate="animate" key="content">
-              <div className="flex-grow overflow-y-auto px-1 no-scrollbar">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key="content-text"
-                    className="prose dark:prose-invert max-w-none text-white/90"
-                    variants={variants.contentText}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
+            <motion.div className="mt-2 text-white/60 text-sm" variants={variants.loadingSubtext} initial="hidden" animate="visible">
+              {type === "ask" ? "Analyzing your question..." : "Exploring the book..."}
+            </motion.div>
+          </motion.div>
+        ) : content ? (
+          <motion.div className="flex-grow flex flex-col pt-4 min-h-0" variants={variants.contentContainer} initial="initial" animate="animate" key="content">
+            <div className="flex-grow overflow-y-auto px-1 no-scrollbar">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key="content-text"
+                  className="prose dark:prose-invert max-w-none text-white/90"
+                  variants={variants.contentText}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                >
+                  <LLMAnswerViewer answerMarkdown={content} />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            <AnimatePresence>
+              {canDiveDeeper && (
+                <motion.div
+                  className="mt-4 px-1 flex flex-col items-center"
+                  variants={variants.diveDeeper}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  key="dive-deeper-section"
+                >
+                  <Button
+                    onClick={onDiveDeeper}
+                    disabled={isDiveDeeperLoading}
+                    className="rounded-full cursor-pointer bg-gradient-to-r from-book-primary-20 to-book-tertiary-20 border border-book-primary-30 text-white hover:from-book-primary-30 hover:to-book-tertiary-30 hover:border-book-primary-40 disabled:from-book-primary-20 disabled:to-book-tertiary-20 disabled:cursor-not-allowed"
                   >
-                    <LLMAnswerViewer answerMarkdown={content} />
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-              <AnimatePresence>
-                {canDiveDeeper && (
-                  <motion.div
-                    className="mt-4 px-1 flex flex-col items-center"
-                    variants={variants.diveDeeper}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    key="dive-deeper-section"
-                  >
-                    <Button
-                      onClick={onDiveDeeper}
-                      disabled={isDiveDeeperLoading}
-                      className="rounded-full cursor-pointer bg-gradient-to-r from-book-primary-20 to-book-tertiary-20 border border-book-primary-30 text-white hover:from-book-primary-30 hover:to-book-tertiary-30 hover:border-book-primary-40 disabled:from-book-primary-20 disabled:to-book-tertiary-20 disabled:cursor-not-allowed"
-                    >
-                      <AnimatePresence mode="wait">
-                        {isDiveDeeperLoading ? (
-                          <motion.div key="loading" className="flex items-center gap-2" variants={variants.buttonContent} initial="hidden" animate="visible" exit="exit">
-                            <Loader2 size={14} className="animate-spin" />
-                            <span>Diving Deeper...</span>
-                          </motion.div>
-                        ) : (
-                          <motion.div key="idle" className="flex items-center gap-2" variants={variants.buttonContent} initial="hidden" animate="visible" exit="exit">
-                            <Telescope size={14} />
-                            <span>Dive deeper</span>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </Button>
-
-                    <AnimatePresence>
-                      {isDiveDeeperLoading && (
-                        <motion.div className="mt-4 text-white/70 text-sm" variants={variants.gatheringText} initial="hidden" animate="visible" exit="exit">
-                          Gathering detailed quotes...
+                    <AnimatePresence mode="wait">
+                      {isDiveDeeperLoading ? (
+                        <motion.div key="loading" className="flex items-center gap-2" variants={variants.buttonContent} initial="hidden" animate="visible" exit="exit">
+                          <Loader2 size={14} className="animate-spin" />
+                          <span>Diving Deeper...</span>
+                        </motion.div>
+                      ) : (
+                        <motion.div key="idle" className="flex items-center gap-2" variants={variants.buttonContent} initial="hidden" animate="visible" exit="exit">
+                          <Telescope size={14} />
+                          <span>Dive deeper</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          ) : (
-            <motion.div className="flex flex-col items-center justify-center py-12 text-center" variants={variants.noResults} initial="initial" animate="animate" key="no-results">
-              <div className="p-4 rounded-full mb-4 backdrop-blur-sm border bg-book-secondary-20 border-book-secondary-30">
-                <FileSearch size={24} />
-              </div>
-              <p className="text-white/80 text-sm">No research results</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  </Button>
+
+                  <AnimatePresence>
+                    {isDiveDeeperLoading && (
+                      <motion.div className="mt-4 text-white/70 text-sm" variants={variants.gatheringText} initial="hidden" animate="visible" exit="exit">
+                        Gathering detailed quotes...
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        ) : (
+          <motion.div className="flex flex-col items-center justify-center py-12 text-center" variants={variants.noResults} initial="initial" animate="animate" key="no-results">
+            <div className="p-4 rounded-full mb-4 backdrop-blur-sm border bg-book-secondary-20 border-book-secondary-30">
+              <FileSearch size={24} />
+            </div>
+            <p className="text-white/80 text-sm">No research results</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+
+  // Side-panel mode: render directly into the column container (no Dialog wrapper)
+  if (isSidePanel) {
+    return (
+      <motion.div
+        className="side-panel-modal w-full flex flex-col pointer-events-auto"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1, transition: { duration: 0.3, ease: "easeOut" } }}
+        exit={{ opacity: 0, transition: { duration: 0.25, ease: "easeIn" } }}
+      >
+        <div className="rounded-lg overflow-hidden w-full flex flex-col bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[calc(100vh-10rem)]">
+          <header className="flex justify-between items-center p-4 pb-0">
+            <div className="text-lg font-semibold text-white">{modalTitle}</div>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={onClose} className="p-1 rounded-md transition-colors cursor-pointer text-white/70 hover:text-white" aria-label="Close modal">
+                <X size={20} />
+              </button>
+            </div>
+          </header>
+          <div className="py-3 px-2 overflow-y-auto w-full flex-1">{mainContent}</div>
+        </div>
       </motion.div>
+    );
+  }
+
+  // Mobile/tablet mode: use ModalUI with Dialog
+  return (
+    <ModalUI title={modalTitle} onClose={onClose} layoutView={layoutView} hideOverlay={hideOverlay}>
+      {mainContent}
     </ModalUI>
   );
 };

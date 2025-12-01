@@ -5,10 +5,15 @@ export const useEscapeKey = (isOpen: boolean, onEscape: () => void) => {
     if (!isOpen) return;
 
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onEscape();
+      if (e.key === "Escape") {
+        e.stopImmediatePropagation();
+        onEscape();
+      }
     };
 
-    document.addEventListener("keydown", handleEsc);
-    return () => document.removeEventListener("keydown", handleEsc);
+    // Use capture phase so later-registered (topmost) modals get priority
+    // when they stopImmediatePropagation
+    document.addEventListener("keydown", handleEsc, { capture: true });
+    return () => document.removeEventListener("keydown", handleEsc, { capture: true });
   }, [isOpen, onEscape]);
 };

@@ -1540,10 +1540,6 @@ section[data-chapter] [data-index] {
   transition: opacity 0.5s ease-in-out;
 }
 
-#left-notes {
-  transition: opacity 0.5s ease-in-out;
-}
-
 /* -- KEYFRAMES -- */
 @keyframes shimmerEffect {
   0% {
@@ -1760,4 +1756,97 @@ section[data-chapter] [data-index] {
       max-width: 800px;
     }
   }
+}
+
+/* Side-panel modal styles - when search/research modal is portaled into column */
+
+/* 2-column mode: modal in left-notes, hide characters */
+#left-notes.side-panel-active {
+  position: relative;
+}
+
+/* Hide all children except the modal (last child) */
+#left-notes.side-panel-active > *:not(.side-panel-modal) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.2s ease-out;
+}
+
+/* 3-column mode: modal in right-notes, characters stay visible */
+#right-notes.side-panel-active {
+  position: relative;
+  /* Enable pointer events for the portaled modal */
+  pointer-events: auto;
+}
+
+/* Collapse left column on narrower 3-column screens (1280-1600px) to give modal more room */
+/* Slides left and fades out smoothly */
+#left-notes.collapsed {
+  flex: 0 0 0 !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-100%);
+  transition:
+    flex 0.35s ease-out,
+    width 0.35s ease-out,
+    opacity 0.25s ease-out,
+    transform 0.35s ease-out;
+}
+
+/* Ensure left-notes has transition even when not collapsed (for smooth return) */
+#left-notes {
+  transition:
+    flex 0.35s ease-out,
+    width 0.35s ease-out,
+    opacity 0.25s ease-in,
+    transform 0.35s ease-out;
+}
+
+/* Lock content column width when modal is open - prevent any flex recalculation */
+#content-container.modal-open {
+  flex: none !important;
+  width: var(--content-width) !important;
+}
+
+/* Position the side-panel modal centered in the column */
+#left-notes.side-panel-active > .side-panel-modal,
+#right-notes.side-panel-active > .side-panel-modal {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+/* Override any inherited text colors for modal in columns */
+#left-notes .side-panel-modal,
+#left-notes .side-panel-modal *,
+#right-notes .side-panel-modal,
+#right-notes .side-panel-modal * {
+  color: white !important;
+}
+
+/* Allow specific color classes to work */
+#left-notes .side-panel-modal .text-white\/70,
+#right-notes .side-panel-modal .text-white\/70 {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+#left-notes .side-panel-modal .text-white\/80,
+#right-notes .side-panel-modal .text-white\/80 {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+#left-notes .side-panel-modal .text-white\/90,
+#right-notes .side-panel-modal .text-white\/90 {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+#left-notes .side-panel-modal .text-white\/60,
+#right-notes .side-panel-modal .text-white\/60 {
+  color: rgba(255, 255, 255, 0.6) !important;
 }

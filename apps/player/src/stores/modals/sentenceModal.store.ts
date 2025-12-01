@@ -18,7 +18,6 @@ export const useSentenceModal = create<SentenceModalState>()(
   devtools(
     (set) => ({
       isOpen: false,
-      sentence: null,
 
       openModal: (currentSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore) => {
         const coordinator = useModalCoordinator.getState();

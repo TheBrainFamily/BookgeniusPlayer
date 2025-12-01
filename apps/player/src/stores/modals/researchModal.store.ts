@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { useModalCoordinator } from "../modalCoordinator.store";
-import { useContentShift } from "../contentShift.store";
 
 const MODAL_ID = "deep-research-modal";
 
@@ -42,11 +41,7 @@ export const useDeepResearchModal = create<DeepResearchModalState>()(
       openModal: (content, layoutView, hideOverlay, modalType) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
-          // Enable content shift if opening in layout view
-          if (layoutView) {
-            useContentShift.getState().enableContentShift();
-          }
-
+          // Content shift is now handled by DeepResearchModalRenderer
           set({
             isOpen: true,
             content,
@@ -62,9 +57,7 @@ export const useDeepResearchModal = create<DeepResearchModalState>()(
       },
 
       closeModal: () => {
-        // Disable content shift when closing modal
-        useContentShift.getState().disableContentShift();
-
+        // Content shift is now handled by DeepResearchModalRenderer (via onExitComplete)
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
         set({ isOpen: false, isLoading: false, showDiveDeeperCTA: false, isDiveDeeperLoading: false, diveDeeperHandler: undefined, type: "ask" });

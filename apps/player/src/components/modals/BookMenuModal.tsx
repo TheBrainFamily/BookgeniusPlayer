@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, memo, useMemo } from "react";
-import { List, Type, RotateCcw, BrainCircuit, BarChart3, ArrowLeft, History, Clock, Share2, Check, Mic, Loader2 } from "lucide-react";
+import { List, Type, RotateCcw, ArrowLeft, History, Clock, Share2, Check, Mic, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useLocalStorageState from "use-local-storage-state";
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "motion/react";
@@ -10,16 +10,10 @@ import { Slider } from "@player/components/ui/slider";
 import { cn } from "@player/lib/utils";
 import ModalUI from "./ModalUI";
 import { useRealtime } from "@player/context/RealtimeContext";
-import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
-import { activateFootnoteInteractions } from "@player/helpers/activateFootnoteInteractions";
-import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHtmlTags";
-import { getAllVariants } from "@player/genericBookDataGetters/getAllVariants";
-import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { getCurrentLocation, systemNavigateTo, getSavedLocation } from "@player/helpers/paragraphsNavigation";
 import { getPositionHistory, getCurrentPlatformAndBook } from "@player/services/readingPositionApi";
 import { calculateReadingStats, formatReadingTime } from "@player/helpers/calculateReadingStats";
 import { getReadableBuildInfo } from "@player/helpers/buildInfo";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
 
 const AnimatedFontSize: React.FC<{ value: number; isChanging: boolean }> = memo(({ value, isChanging }) => {
   const [currentDisplayValue, setCurrentDisplayValue] = useState(value);
@@ -39,26 +33,6 @@ const AnimatedFontSize: React.FC<{ value: number; isChanging: boolean }> = memo(
   );
 });
 
-const AnimatedComplexity: React.FC<{ value: number; isChanging: boolean }> = memo(({ value, isChanging }) => {
-  const [currentDisplayValue, setCurrentDisplayValue] = useState(value);
-  const motionValue = useMotionValue(currentDisplayValue);
-  const spring = useSpring(motionValue, { stiffness: 50, damping: 15, mass: 1, restDelta: 0.001 });
-  const rounded = useTransform(spring, (latest) => Math.round(latest));
-
-  useEffect(() => {
-    setCurrentDisplayValue(value);
-    motionValue.set(value);
-  }, [value, motionValue]);
-
-  return <motion.span className={`transition-colors duration-300 ${isChanging ? "text-blue-300" : "text-blue-300"}`}>{rounded}</motion.span>;
-});
-
-type SentenceData = {
-  id: string;
-  analysis: { originalSentence: string; reasoning: string; score: number };
-  simplifications: { reasoning: string; score: number; sentences: string[] }[];
-};
-
 interface BookMenuModalProps {
   onClose: () => void;
   openBookChapterModal: () => void;
@@ -67,26 +41,16 @@ interface BookMenuModalProps {
   resetFurthestPageLocation: () => void;
 }
 
-const SLIDER_DELAY = 200;
-const OVERLAY_TIMEOUT = 1500;
-
 // Build version formatting moved to helper
 
 const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, openApiKeyModal, openPositionHistoryModal, resetFurthestPageLocation }) => {
   const { t } = useTranslation();
-  const allVariants = getAllVariants();
-  const { openModal } = useCharacterModal();
-  const {
-    metadata: { bookForm },
-  } = getBookData();
 
   const [currentFontSize, setCurrentFontSize] = useLocalStorageState("fontSize", { defaultValue: 1 });
-  const [currentComplexity, setCurrentComplexity] = useLocalStorageState("readingComplexity", { defaultValue: 100 });
 
   const { primeMicrophone, connectConversation, isConnected } = useRealtime();
   const [hideOverlay, setHideOverlay] = useState(false);
   const [isFontSizeChanging, setIsFontSizeChanging] = useState(false);
-  const [isComplexityChanging, setIsComplexityChanging] = useState(false);
   const [isToastVisible, setIsToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState<string>("");
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -104,7 +68,6 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const [audioResponsesEnabled, setAudioResponsesEnabled] = useState(initialAudioResponses);
 
   const overlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isVisible = useRef(allVariants.length > 0);
 
   const bookLocation = useRef(getCurrentLocation());
 
@@ -145,42 +108,9 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
     }, 1500);
   };
 
-  const handleComplexityPreset = (level: number) => {
-    setHideOverlay(true);
-    setIsComplexityChanging(true);
-
-    setTimeout(() => {
-      setCurrentComplexity(level);
-      updateText(level);
-    }, 100);
-
-    setTimeout(() => {
-      setHideOverlay(false);
-      setIsComplexityChanging(false);
-    }, 1500);
-  };
-
   const handleFontSizePreviewChange = (value: number[]) => {
     const fontSize = value[0];
     setCurrentFontSize(fontSize);
-  };
-
-  const handleSliderChangeWithOverlay = (callback: () => void) => {
-    if (overlayTimeoutRef.current) {
-      clearTimeout(overlayTimeoutRef.current);
-    }
-
-    if (!hideOverlay) {
-      setHideOverlay(true);
-    }
-
-    setTimeout(() => {
-      callback();
-    }, SLIDER_DELAY);
-
-    overlayTimeoutRef.current = setTimeout(() => {
-      setHideOverlay(false);
-    }, OVERLAY_TIMEOUT);
   };
 
   const handleFontSizeChange = (value: number[]) => {
@@ -202,64 +132,6 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
     overlayTimeoutRef.current = setTimeout(() => {
       setHideOverlay(false);
     }, 1500);
-  };
-
-  const handleComplexityChange = (value: number[]) => {
-    const complexity = value[0];
-    handleSliderChangeWithOverlay(() => {
-      setCurrentComplexity(complexity);
-      updateText(complexity);
-    });
-  };
-
-  const updateText = (currentLevel: number) => {
-    for (const sentenceData of allVariants) {
-      const element = document.getElementById(sentenceData.id);
-      if (!element) {
-        continue;
-      }
-
-      // 1. Get the entire best-fit object { score, text }
-      const bestFit = determineCorrectText(currentLevel, sentenceData);
-
-      // In case the variant text is an array of sentences
-      const textToDisplay = bestFit.text;
-
-      // 2. Read the current score from the element's data attribute
-      const currentScore = parseInt(element.dataset.currentScore, 10) || sentenceData.analysis.score;
-
-      // 3. Compare scores, not HTML strings!
-      if (currentScore !== bestFit.score) {
-        const isPlayFormat = bookForm === "play" || bookForm === "mixed";
-        const sentenceNumber = parseInt(sentenceData.id.split("-s")?.[1] ?? "1", 10);
-        const isFirstSentence = sentenceNumber === 1;
-        element.innerHTML = replaceXmlTagsIntoHtmlTags(textToDisplay, isPlayFormat, isFirstSentence);
-
-        // 4. Update the state on the element!
-        element.dataset.currentScore = bestFit.score.toString();
-
-        // 5. Activate character interactions for newly transformed content
-        activateCharacterInteractions(element);
-        activateFootnoteInteractions(element);
-      }
-    }
-  };
-
-  const determineCorrectText = (currentLevel: number, sentenceData: SentenceData) => {
-    const allVersions = [
-      { score: sentenceData.analysis.score, text: sentenceData.analysis.originalSentence },
-      ...sentenceData.simplifications.map((s) => ({ score: s.score, text: s.sentences.join(" ") })),
-    ];
-
-    allVersions.sort((a, b) => b.score - a.score);
-
-    let bestFit = allVersions.find((version) => version.score <= currentLevel);
-
-    if (!bestFit) {
-      bestFit = allVersions[allVersions.length - 1];
-    }
-
-    return bestFit;
   };
 
   useEffect(() => {
@@ -605,42 +477,6 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
                 </div>
               </div>
             </div>
-            {/* 
-        Hide for now for all books
-        {isVisible.current && false && ( 
-          <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full book-settings-control-box")}>
-            <div className="space-y-4 book-settings-control-box-inner">
-              <div className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-white" />
-                <Label htmlFor="complexity-slider" className="text-sm font-medium text-white">
-                  {t("reading_complexity")}: <AnimatedComplexity value={currentComplexity} isChanging={isComplexityChanging} />
-                </Label>
-              </div>
-              <Slider
-                id="complexity-slider"
-                variant="secondary"
-                min={20}
-                max={100}
-                step={1}
-                value={[currentComplexity]}
-                onValueChange={handleComplexityChange}
-                aria-label={t("reading_complexity")}
-                className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
-              />
-              <div className="flex justify-between text-xs text-gray-300">
-                <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleComplexityPreset(20)}>
-                  {t("simple")}
-                </span>
-                <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleComplexityPreset(60)}>
-                  {t("medium")}
-                </span>
-                <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleComplexityPreset(100)}>
-                  {t("complex")}
-                </span>
-              </div>
-            </div>
-          </div>
-        )} */}
           </div>
           <div className="text-xs text-gray-500 mt-4 text-right book-settings-version flex items-center justify-between gap-2">
             <span>Beta</span>
