@@ -23,6 +23,7 @@ class ScrollCoordinator {
   private _scrollDirection: ScrollDirection = "none";
   private _lastScrollTop = 0;
   private _isNavigating = false;
+  private _suppressTracking = false;
   private _lastChapterTransitionTime = 0;
   private _chapterTransitionCooldownMs = 0; // Configurable, default 0
   private _container: HTMLElement | null = null;
@@ -49,6 +50,10 @@ class ScrollCoordinator {
     this._lastScrollTop = container.scrollTop;
 
     this._scrollHandler = () => {
+      // Skip tracking during DOM mutations to avoid inconsistent direction state
+      if (this._suppressTracking) {
+        return;
+      }
       const newScrollTop = container.scrollTop;
       this._scrollDirection = newScrollTop > this._lastScrollTop ? "down" : newScrollTop < this._lastScrollTop ? "up" : "none";
       this._lastScrollTop = newScrollTop;
@@ -87,6 +92,15 @@ class ScrollCoordinator {
     debugLog("setNavigating", value);
   }
 
+  /**
+   * Suppress scroll direction tracking during DOM mutations.
+   * Use when batch-removing chapters to avoid inconsistent direction state.
+   */
+  setSuppressTracking(value: boolean): void {
+    this._suppressTracking = value;
+    debugLog("setSuppressTracking", value);
+  }
+
   recordChapterTransition(): void {
     this._lastChapterTransitionTime = Date.now();
     debugLog("chapterTransition recorded");
@@ -109,18 +123,18 @@ class ScrollCoordinator {
   }
 
   /**
-   * Wait for layout to stabilize using double requestAnimationFrame.
-   * This ensures that pending layout recalculations have completed.
+   * Wait for layout to stabilize using multiple requestAnimationFrame calls.
+   * This ensures that pending layout recalculations have completed, especially
+   * when mounting many chapters for long-distance smooth scrolls.
    */
-  async waitForLayoutStability(): Promise<void> {
-    return new Promise((resolve) => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          debugLog("layoutStability achieved");
-          resolve();
-        });
-      });
-    });
+  async waitForLayoutStability(minFrames: number = 3): Promise<void> {
+    // Wait for multiple frames to ensure layout is complete
+    for (let i = 0; i < minFrames; i++) {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    }
+    // Additional small delay for expensive layouts
+    await new Promise<void>((resolve) => setTimeout(resolve, 16));
+    debugLog("layoutStability achieved", { frames: minFrames });
   }
 
   /**

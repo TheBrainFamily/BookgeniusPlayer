@@ -179,6 +179,11 @@ export function setupPageObserver(): {
   };
 
   const processIntersections = () => {
+    // Skip heavy processing during system navigation - location will be synced at the end
+    if (isSystemNavigationInProgress()) {
+      return;
+    }
+
     const topMultiplier = 0.35; // 35vh focus zone start
     let bottomMultiplier = 0.55; // 10vh focus zone height (default)
 
@@ -532,9 +537,12 @@ export function setupPageObserver(): {
 
   const handleResize = () => scheduledProcessIntersections();
   const handleOrientationChange = () => scheduledProcessIntersections();
+  // Allow navigation to trigger a forced re-process after smooth scroll completes
+  const handleNavigationComplete = () => scheduledProcessIntersections();
 
   window.addEventListener("resize", handleResize);
   window.addEventListener("orientationchange", handleOrientationChange);
+  window.addEventListener("navigationComplete", handleNavigationComplete);
 
   const handleIntersectionEntries = (entries: IntersectionObserverEntry[]) => {
     entries.forEach((entry) => {
@@ -615,6 +623,11 @@ export function setupPageObserver(): {
 
   const spacerObserver = new IntersectionObserver(
     (entries) => {
+      // Skip processing during system navigation to avoid interfering with smooth scroll
+      if (isSystemNavigationInProgress()) {
+        return;
+      }
+
       entries.forEach((entry) => {
         if (!isSplashAnimationComplete) return;
 
@@ -768,6 +781,7 @@ export function setupPageObserver(): {
     observer.disconnect();
     window.removeEventListener("resize", handleResize);
     window.removeEventListener("orientationchange", handleOrientationChange);
+    window.removeEventListener("navigationComplete", handleNavigationComplete);
     window.removeEventListener("scrollIndicatorClicked", handleScrollIndicatorClicked);
 
     hideScrollIndicator();

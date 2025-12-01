@@ -148,6 +148,46 @@ class ChapterVirtualizer {
     if (normalizedTarget === null) return;
 
     const desiredChapters = this.computeDesiredWindow(normalizedTarget);
+    // Normal window mode: keep spacers for proper chapter transitions
+    this.ensureChapters(desiredChapters, forceRemount, { stripSpacers: false });
+  }
+
+  /**
+   * Ensure that *all* chapters in [startChapter, endChapter] are mounted.
+   * Used for long-distance navigations with smooth scrolling so the user
+   * sees continuous content between source and target.
+   */
+  ensureRange(startChapter: number, endChapter: number, forceRemount = false): void {
+    debugLog("ensureRange called", { startChapter, endChapter, forceRemount, currentMounted: this.mountedChapters });
+
+    if (!Number.isFinite(startChapter) || !Number.isFinite(endChapter)) return;
+
+    const first = bookIndex.getFirstChapter();
+    const last = bookIndex.getLastChapter();
+    if (first === null || last === null) return;
+
+    const from = Math.max(Math.min(startChapter, endChapter), first);
+    const to = Math.min(Math.max(startChapter, endChapter), last);
+    if (from > to) return;
+
+    const desiredChapters: number[] = [];
+    for (let chapterId = from; chapterId <= to; chapterId++) {
+      if (bookIndex.hasChapter(chapterId)) {
+        desiredChapters.push(chapterId);
+      }
+    }
+
+    if (desiredChapters.length === 0) return;
+
+    // Range mode: strip spacers from newly mounted chapters to avoid visual gaps during smooth scroll
+    this.ensureChapters(desiredChapters, forceRemount, { stripSpacers: true });
+  }
+
+  /**
+   * Core driver for applying a specific set of chapters to the DOM,
+   * with spacer/scroll compensation. Used by both ensureWindow and ensureRange.
+   */
+  private ensureChapters(desiredChapters: number[], forceRemount: boolean, options: { stripSpacers: boolean } = { stripSpacers: false }): void {
     const contentContainer = this.host.closest<HTMLElement>("#content-container");
     const containerRect = contentContainer?.getBoundingClientRect() ?? null;
 
@@ -162,7 +202,7 @@ class ChapterVirtualizer {
     try {
       const existingWrappers = this.getExistingWrappers();
       this.removeStaleChapters(ctx, existingWrappers, desiredChapters, forceRemount);
-      this.mountMissingChapters(ctx, existingWrappers, desiredChapters);
+      this.mountMissingChapters(ctx, existingWrappers, desiredChapters, options.stripSpacers);
       this.updateMountedState(desiredChapters, forceRemount);
     } finally {
       if (contentContainer) {
@@ -212,40 +252,54 @@ class ChapterVirtualizer {
 
     if (toRemoveAbove.length === 0 && toRemoveBelow.length === 0) return;
 
-    // Find anchor for scroll compensation
-    const removingAboveSet = new Set(toRemoveAbove);
-    const anchor = this.findAnchorWrapper(removingAboveSet);
+    // Suppress scroll direction tracking during DOM mutations to avoid inconsistent state
+    scrollCoordinator.setSuppressTracking(true);
 
-    scrollCoordinator.forceReflow(this.host);
+    try {
+      // Find anchor for scroll compensation - prefer first desired chapter (target) as anchor
+      const preferredAnchorId = desiredChapters[0];
+      let anchor = existingWrappers.get(preferredAnchorId) ?? null;
 
-    const anchorTopBefore = anchor && ctx.containerRect ? getRelativeTop(anchor, ctx.containerRect) : null;
+      // Fallback to finding first non-removed wrapper if preferred anchor not found
+      if (!anchor) {
+        const removingAboveSet = new Set(toRemoveAbove);
+        anchor = this.findAnchorWrapper(removingAboveSet);
+      }
 
-    debugLog("removeStaleChapters", { toRemoveAbove: toRemoveAbove.length, toRemoveBelow: toRemoveBelow.length, anchorTopBefore });
+      scrollCoordinator.forceReflow(this.host);
 
-    // Adjust spacer before removing chapters above
-    if (toRemoveAbove.length > 0) {
-      const removedHeight = toRemoveAbove.reduce((sum, w) => sum + getOuterHeight(w), 0);
-      this.topSpacer.adjustBy(removedHeight);
-      debugLog("removeStaleChapters spacer adjusted", { removedHeight, newSpacerHeight: this.topSpacer.height });
+      const anchorTopBefore = anchor && ctx.containerRect ? getRelativeTop(anchor, ctx.containerRect) : null;
+
+      debugLog("removeStaleChapters", { toRemoveAbove: toRemoveAbove.length, toRemoveBelow: toRemoveBelow.length, anchorTopBefore, preferredAnchorId });
+
+      // Adjust spacer before removing chapters above
+      if (toRemoveAbove.length > 0) {
+        const removedHeight = toRemoveAbove.reduce((sum, w) => sum + getOuterHeight(w), 0);
+        this.topSpacer.adjustBy(removedHeight);
+        debugLog("removeStaleChapters spacer adjusted", { removedHeight, newSpacerHeight: this.topSpacer.height });
+      }
+
+      // Remove elements
+      for (const wrapper of toRemoveAbove) {
+        const id = parseChapterId(wrapper);
+        wrapper.remove();
+        if (id !== null) existingWrappers.delete(id);
+      }
+
+      for (const wrapper of toRemoveBelow) {
+        const id = parseChapterId(wrapper);
+        wrapper.remove();
+        if (id !== null) existingWrappers.delete(id);
+      }
+
+      scrollCoordinator.forceReflow(this.host);
+
+      // Correct any mismatch from removal
+      compensateForRemoval(ctx, anchor, anchorTopBefore);
+    } finally {
+      // Re-enable scroll direction tracking
+      scrollCoordinator.setSuppressTracking(false);
     }
-
-    // Remove elements
-    for (const wrapper of toRemoveAbove) {
-      const id = parseChapterId(wrapper);
-      wrapper.remove();
-      if (id !== null) existingWrappers.delete(id);
-    }
-
-    for (const wrapper of toRemoveBelow) {
-      const id = parseChapterId(wrapper);
-      wrapper.remove();
-      if (id !== null) existingWrappers.delete(id);
-    }
-
-    scrollCoordinator.forceReflow(this.host);
-
-    // Correct any mismatch from removal
-    compensateForRemoval(ctx, anchor, anchorTopBefore);
   }
 
   private categorizeWrappersToRemove(
@@ -258,17 +312,37 @@ class ChapterVirtualizer {
     const toRemoveBelow: HTMLElement[] = [];
     const { containerRect } = ctx;
 
-    for (const [chapterId, wrapper] of existingWrappers) {
-      const shouldRemove = forceRemount || !desiredSet.has(chapterId);
-      if (!shouldRemove) continue;
-
-      if (!containerRect) {
-        toRemoveBelow.push(wrapper);
-        continue;
+    if (!containerRect) {
+      // Fast path: no measurements needed, put all in below
+      for (const [chapterId, wrapper] of existingWrappers) {
+        if (forceRemount || !desiredSet.has(chapterId)) {
+          toRemoveBelow.push(wrapper);
+        }
       }
+      return { toRemoveAbove, toRemoveBelow };
+    }
 
-      const rect = wrapper.getBoundingClientRect();
-      const margin = 200;
+    // Collect all wrappers that need to be removed
+    const toMeasure: Array<[number, HTMLElement]> = [];
+    for (const [chapterId, wrapper] of existingWrappers) {
+      if (forceRemount || !desiredSet.has(chapterId)) {
+        toMeasure.push([chapterId, wrapper]);
+      }
+    }
+
+    if (toMeasure.length === 0) {
+      return { toRemoveAbove, toRemoveBelow };
+    }
+
+    // Batch read all rects in a single pass (single reflow)
+    const rects = toMeasure.map(([_, wrapper]) => wrapper.getBoundingClientRect());
+
+    // Process with cached measurements
+    const margin = 200;
+    for (let i = 0; i < toMeasure.length; i++) {
+      const [_, wrapper] = toMeasure[i];
+      const rect = rects[i];
+
       const fullyAbove = rect.bottom <= containerRect.top - margin;
       const fullyBelow = rect.top >= containerRect.bottom + margin;
 
@@ -298,13 +372,21 @@ class ChapterVirtualizer {
     return null;
   }
 
-  private mountMissingChapters(ctx: CompensationContext, existingWrappers: Map<number, HTMLElement>, desiredChapters: number[]): void {
+  private mountMissingChapters(ctx: CompensationContext, existingWrappers: Map<number, HTMLElement>, desiredChapters: number[], stripSpacers: boolean = false): void {
     const currentlyInDom = new Set<number>(existingWrappers.keys());
 
     for (const chapterId of desiredChapters) {
       if (existingWrappers.has(chapterId)) continue;
 
       const element = bookIndex.cloneChapterWrapper(chapterId);
+
+      // Remove transition spacers from newly mounted chapters during range-based navigation
+      // This prevents 100vh empty gaps from appearing during smooth scroll
+      if (stripSpacers) {
+        const spacer = element.querySelector(".transition-spacer");
+        spacer?.remove();
+      }
+
       existingWrappers.set(chapterId, element);
 
       const insertionPoint = this.findInsertionPoint(currentlyInDom, existingWrappers, chapterId);
@@ -444,6 +526,18 @@ export const ensureChapterWindow = async (chapterId: number, options: { force?: 
   }
 
   virtualizer.ensureWindow(chapterId, options.force ?? false);
+};
+
+export const ensureChapterRangeWindow = async (startChapter: number, endChapter: number, options: { force?: boolean } = {}): Promise<void> => {
+  if (!virtualizer || !chaptersHost) {
+    await ensureInitializationPromise();
+  }
+
+  if (!virtualizer) {
+    throw new Error("[BookContentVirtualizer] ensureChapterRangeWindow called before initialization.");
+  }
+
+  virtualizer.ensureRange(startChapter, endChapter, options.force ?? false);
 };
 
 export const getMountedChapters = (): number[] => {

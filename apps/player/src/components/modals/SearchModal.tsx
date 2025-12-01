@@ -8,8 +8,7 @@ import { Search, FileText, Minimize2, Maximize2, X } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@player/components/ui/tooltip";
 
 import { SearchResultsData, SearchResultItemData, cleanupSearchChapters } from "@player/searchModal";
-import { goToParagraph } from "@player/helpers/paragraphsNavigation";
-import { ensureChapterWindow } from "@player/logic/BookContentVirtualizer";
+import { systemNavigateTo } from "@player/helpers/paragraphsNavigation";
 import ModalUI from "./ModalUI";
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@player/components/ui/accordion";
@@ -420,13 +419,17 @@ const ResultCard = memo(function ResultCard({ item, clickedAppearanceId, searchQ
   }, [clickedAppearanceId, item.id]);
 
   const handleSearchResultClick = useCallback(async () => {
-    const parsedSearchQuery = searchQuery.replace("@", "");
+    const parsedSearchQuery = (searchQuery ?? "").replace("@", "");
 
     try {
-      // Ensure the chapter window is mounted before attempting to scroll
-      await ensureChapterWindow(item.chapter);
-      await goToParagraph({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "instant" });
-      highlightSearchInParagraph(item.chapter, item.paragraphNumber, parsedSearchQuery);
+      await systemNavigateTo({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "smooth", expandChapterRange: true, history: "push" });
+
+      // Defer highlighting to next frame to ensure DOM is stable after navigation
+      if (parsedSearchQuery) {
+        requestAnimationFrame(() => {
+          highlightSearchInParagraph(item.chapter, item.paragraphNumber, parsedSearchQuery);
+        });
+      }
     } catch (error) {
       console.warn("Failed to scroll to search result:", error);
     }
