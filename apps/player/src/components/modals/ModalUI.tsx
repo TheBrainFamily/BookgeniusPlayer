@@ -277,7 +277,8 @@ const ModalUI: React.FC<ModalUIProps> = ({
   }, [isContentShiftedLeft, isLargeScreen, isMediumScreen, isWideScreen]);
 
   const isTransparent = isTransparentModal(transparent, className);
-  const shouldShiftContent = isContentShiftedLeft && (isLargeScreen || isMediumScreen);
+  // Only apply content shift for side-panel modals (layoutView=true), not centered modals
+  const shouldShiftContent = layoutView && isContentShiftedLeft && (isLargeScreen || isMediumScreen);
   const sizeConfig = getModalSizeConfig(layoutView, size);
 
   const modalContentClasses = getModalContentClasses(isTransparent, layoutView, className, isContentShiftedLeft, isLargeScreen, isPlayFormat);
