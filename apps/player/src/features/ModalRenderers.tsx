@@ -8,6 +8,7 @@ import { ApiKeyModalRenderer } from "./modals/apiKey/ApiKeyModalRenderer";
 import { SentenceModalRenderer } from "./modals/sentence/SentenceModalRenderer";
 import { DeepResearchModalRenderer } from "@player/features/modals/deepResearch/DeepResearchModalRenderer";
 import { PositionHistoryModalRenderer } from "./modals/positionHistory/PositionHistoryModalRenderer";
+import { FootnoteModalRenderer } from "./modals/footnote/FootnoteModalRenderer";
 
 export const ModalRenderers: React.FC = () => {
   return (
@@ -21,6 +22,7 @@ export const ModalRenderers: React.FC = () => {
       <EditorModeModalRenderer />
       <ApiKeyModalRenderer />
       <SentenceModalRenderer />
+      <FootnoteModalRenderer />
     </>
   );
 };
