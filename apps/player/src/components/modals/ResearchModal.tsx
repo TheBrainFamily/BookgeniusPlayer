@@ -143,7 +143,12 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({
   // Side-panel mode: render directly into the column container (no Dialog wrapper)
   if (isSidePanel) {
     return (
-      <div className="side-panel-modal w-full flex flex-col pointer-events-auto">
+      <motion.div
+        className="side-panel-modal w-full flex flex-col pointer-events-auto"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1, transition: { duration: 0.3, ease: "easeOut" } }}
+        exit={{ opacity: 0, transition: { duration: 0.25, ease: "easeIn" } }}
+      >
         <div className="rounded-lg overflow-hidden w-full flex flex-col bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[calc(100vh-10rem)]">
           <header className="flex justify-between items-center p-4 pb-0">
             <div className="text-lg font-semibold text-white">{modalTitle}</div>
@@ -155,7 +160,7 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({
           </header>
           <div className="py-3 px-2 overflow-y-auto w-full flex-1">{mainContent}</div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 

@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { useModalCoordinator } from "../modalCoordinator.store";
-import { useContentShift } from "../contentShift.store";
 import { SearchResultsData } from "@player/searchModal";
 
 const MODAL_ID = "search-modal";
@@ -43,16 +42,15 @@ export const useSearchModal = create<SearchModalState>()(
 
         if (!coordinator.requestModalOpen(MODAL_ID)) return;
 
-        if (layoutView) useContentShift.getState().enableContentShift();
+        // Content shift is now handled by SearchModalRenderer
         const trimmedQuery = query.trim();
-
         const hasResults = state.results.items.length;
 
         set({ isOpen: true, layoutView, hideOverlay, query: trimmedQuery, results: hasResults ? state.results : EMPTY_RESULTS, isLoading: false });
       },
 
       closeModal: () => {
-        useContentShift.getState().disableContentShift();
+        // Content shift is now handled by SearchModalRenderer (via onExitComplete)
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
         set({ isOpen: false, isLoading: false, lastClickedAppearanceId: undefined });

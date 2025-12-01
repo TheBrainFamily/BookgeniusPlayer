@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence } from "motion/react";
 
@@ -46,24 +46,27 @@ export const SearchModalRenderer: React.FC = () => {
   // Play format uses centered modal because left/right notes are hidden
   const isSidePanel = !isMobile && !isPlayFormat && (isLargeScreen || isMediumScreen);
 
-  // Enable content shift when modal is open in side-panel mode
+  // Enable content shift when modal opens in side-panel mode
   useEffect(() => {
     if (isOpen && isSidePanel) {
       enableContentShift();
     }
-    return () => {
-      if (isSidePanel) {
-        disableContentShift();
-      }
-    };
-  }, [isOpen, isSidePanel, enableContentShift, disableContentShift]);
+  }, [isOpen, isSidePanel, enableContentShift]);
+
+  // Disable content shift after exit animation completes
+  const handleExitComplete = useCallback(() => {
+    if (isSidePanel) {
+      disableContentShift();
+    }
+  }, [isSidePanel, disableContentShift]);
 
   const container = useMemo(() => getModalContainer(isMobile, isPlayFormat, isLargeScreen, isMediumScreen), [isMobile, isPlayFormat, isLargeScreen, isMediumScreen]);
 
   return createPortal(
-    <AnimatePresence>
+    <AnimatePresence mode="wait" initial={false} onExitComplete={handleExitComplete}>
       {isOpen && (
         <SearchModal
+          key="search-modal"
           onClose={closeModal}
           layoutView={isSidePanel}
           searchResults={results}
