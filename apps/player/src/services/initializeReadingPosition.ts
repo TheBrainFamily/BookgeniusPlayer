@@ -25,41 +25,38 @@ export const initializeReadingPosition = async (): Promise<ExtendedLocation | nu
     // Fetch remote position
     const remotePosition = await getLatestPosition(platformId, bookSlug);
 
-    // If only one exists, use it
     if (!remotePosition) {
       return getSavedLocation();
     }
 
     // Both exist - compare timestamps
-    if (remotePosition && getSavedLocation()) {
-      const remoteTimestamp = normalizeTimestamp(remotePosition.createdAt);
-      const localTimestamp = normalizeTimestamp(getSavedLocation().timestamp);
+    const remoteTimestamp = normalizeTimestamp(remotePosition.createdAt);
+    const localTimestamp = normalizeTimestamp(getSavedLocation().timestamp);
 
-      if (remoteTimestamp > localTimestamp) {
-        // Remote is more recent
-        const extended: ExtendedLocation = {
-          chapter: remotePosition.chapter,
-          paragraph: remotePosition.paragraph,
-          endChapter: remotePosition.chapter,
-          endParagraph: remotePosition.paragraph,
-          currentChapter: remotePosition.chapter,
-          currentParagraph: remotePosition.paragraph,
-          earliestVisibleParagraph: remotePosition.paragraph,
-          latestVisibleParagraph: remotePosition.paragraph,
-          earliestVisibleChapter: remotePosition.chapter,
-          latestVisibleChapter: remotePosition.chapter,
-          timestamp: remoteTimestamp,
-          progress: remotePosition.progress,
-        };
+    if (remoteTimestamp > localTimestamp) {
+      // Remote is more recent
+      const extended: ExtendedLocation = {
+        chapter: remotePosition.chapter,
+        paragraph: remotePosition.paragraph,
+        endChapter: remotePosition.chapter,
+        endParagraph: remotePosition.paragraph,
+        currentChapter: remotePosition.chapter,
+        currentParagraph: remotePosition.paragraph,
+        earliestVisibleParagraph: remotePosition.paragraph,
+        latestVisibleParagraph: remotePosition.paragraph,
+        earliestVisibleChapter: remotePosition.chapter,
+        latestVisibleChapter: remotePosition.chapter,
+        timestamp: remoteTimestamp,
+        progress: remotePosition.progress,
+      };
 
-        // Update localStorage and emit event
-        setSavedLocation(extended, remotePosition.progress);
+      // Update localStorage and emit event
+      setSavedLocation(extended, remotePosition.progress);
 
-        return extended;
-      } else {
-        // Local is more recent or equal
-        return getSavedLocation();
-      }
+      return extended;
+    } else {
+      // Local is more recent or equal
+      return getSavedLocation();
     }
   } catch (error) {
     console.warn("Failed to initialize reading position from remote:", error);
