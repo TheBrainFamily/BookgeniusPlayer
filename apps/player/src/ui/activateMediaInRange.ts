@@ -11,11 +11,6 @@ import { normalizeSrcForInlineAvatar } from "./highlightCharacter";
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
 import { activateFootnoteInteractions } from "@player/helpers/activateFootnoteInteractions";
 
-/** Check if viewport is narrow (single-column book-form layout) */
-const isNarrowViewport = (): boolean => {
-  return typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches;
-};
-
 function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
   const result = [];
 
@@ -42,34 +37,6 @@ function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
   // Add next element if exists
   if (next && next.classList.contains("play-row")) {
     result.push({ state: "listens", row: next });
-  }
-
-  return result;
-}
-
-/** Get active paragraph and its siblings for book-form narrow view */
-function getBookFormActiveWithSiblings(element: Element): Array<{ state: "speaks" | "listens"; paragraph: Element }> {
-  const result: Array<{ state: "speaks" | "listens"; paragraph: Element }> = [];
-
-  // Get prev sibling paragraph (skip non-paragraph elements)
-  let prev = element.previousElementSibling;
-  while (prev && !prev.matches("[data-index]")) {
-    prev = prev.previousElementSibling;
-  }
-  if (prev) {
-    result.push({ state: "listens", paragraph: prev });
-  }
-
-  // Current paragraph (speaks)
-  result.push({ state: "speaks", paragraph: element });
-
-  // Get next sibling paragraph (skip non-paragraph elements)
-  let next = element.nextElementSibling;
-  while (next && !next.matches("[data-index]")) {
-    next = next.nextElementSibling;
-  }
-  if (next) {
-    result.push({ state: "listens", paragraph: next });
   }
 
   return result;
@@ -366,147 +333,6 @@ function getVideoPathname(src: string): string {
 
 const activatePlayFormatMediaDebounced = debounce(runPlayFormatMediaActivation, INLINE_MEDIA_DEBOUNCE_MS, { leading: true, trailing: true, maxWait: 500 });
 
-type BookFormNarrowMediaActivationPayload = { charactersBySlug: Map<string, CharacterData> };
-
-/** Video activation for book-form (non-play) at narrow viewport (<=639px) */
-const runBookFormNarrowMediaActivation = ({ charactersBySlug }: BookFormNarrowMediaActivationPayload) => {
-  const activeParagraph = document.querySelector<HTMLElement>(".active-paragraph");
-  if (!activeParagraph?.matches("[data-index]")) return;
-
-  const chapterElement = activeParagraph.closest<HTMLElement>("[data-chapter]");
-  const chapterIndex = chapterElement?.dataset.chapter;
-  if (!chapterIndex) return;
-
-  const paragraphs = getBookFormActiveWithSiblings(activeParagraph);
-
-  paragraphs.forEach(({ paragraph: paragraphEl, state }) => {
-    const characterPlaceholders = paragraphEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
-    if (!characterPlaceholders.length) return;
-
-    const paragraphIndex = (paragraphEl as HTMLElement).dataset.index;
-    if (!paragraphIndex) return;
-
-    characterPlaceholders.forEach((characterPlaceholder) => {
-      const characterSlug = characterPlaceholder.dataset.character;
-      if (!characterSlug?.trim()) return;
-
-      const characterData = charactersBySlug.get(characterSlug);
-      if (!characterData) return;
-
-      const locationForPlaceholder = { chapter: parseInt(chapterIndex, 10), paragraph: parseInt(paragraphIndex, 10) };
-      const snapshot = resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName });
-      const videoSrc = state === "speaks" ? snapshot.media.talking : snapshot.media.listening;
-
-      const inlineAvatar = characterPlaceholder.querySelector<HTMLElement>(".inline-avatar");
-      if (!inlineAvatar) return;
-
-      const existingVideo = inlineAvatar.querySelector("video");
-
-      // Case 1: Existing video needs update or removal
-      if (existingVideo) {
-        if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
-          const videoPathname = getVideoPathname(videoSrc);
-          const existingPathname = getVideoPathname(existingVideo.src);
-
-          // VIDEO → VIDEO transition (state or source change)
-          if (existingVideo.dataset.state !== state || existingPathname !== videoPathname) {
-            const newVideo = createVideoElement(videoSrc, state);
-            newVideo.style.opacity = "0";
-            newVideo.style.zIndex = "1";
-            existingVideo.style.zIndex = "2";
-
-            inlineAvatar.appendChild(newVideo);
-
-            const fallbackTimeout = setTimeout(() => {
-              newVideo.style.opacity = "1";
-            }, 3000);
-
-            const startCrossfade = () => {
-              clearTimeout(fallbackTimeout);
-              requestAnimationFrame(() => {
-                newVideo.style.opacity = "1";
-                existingVideo.style.opacity = "0";
-
-                setTimeout(() => {
-                  if (existingVideo.parentElement) {
-                    existingVideo.remove();
-                  }
-                }, 500);
-              });
-            };
-
-            if (newVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-              startCrossfade();
-            } else {
-              newVideo.addEventListener("loadeddata", startCrossfade, { once: true });
-            }
-          }
-          characterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
-        } else {
-          // VIDEO → IMG transition (videoSrc is not valid)
-          characterPlaceholder.dataset.isTalking = "false";
-          existingVideo.style.opacity = "0";
-          existingVideo.style.zIndex = "1";
-          setTimeout(() => {
-            if (existingVideo.parentElement) {
-              existingVideo.remove();
-            }
-          }, 500);
-        }
-      }
-      // Case 2: No existing video, need to add one
-      else if (typeof videoSrc === "string" && isVideoFile(videoSrc)) {
-        // IMG → VIDEO transition
-        const video = createVideoElement(videoSrc, state);
-        video.style.opacity = "0";
-        video.style.zIndex = "2";
-        characterPlaceholder.dataset.isTalking = state === "speaks" ? "true" : "false";
-
-        inlineAvatar.appendChild(video);
-
-        const fallbackTimeout = setTimeout(() => {
-          video.style.opacity = "1";
-        }, 3000);
-
-        const showVideo = () => {
-          clearTimeout(fallbackTimeout);
-          requestAnimationFrame(() => {
-            video.style.opacity = "1";
-          });
-        };
-
-        if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-          showVideo();
-        } else {
-          video.addEventListener("loadeddata", showVideo, { once: true });
-        }
-      }
-
-      (paragraphEl as HTMLElement).dataset.activatedNarrowVideo = "true";
-    });
-  });
-
-  // Cleanup: Remove videos from paragraphs no longer in active set
-  const activatedNarrowVideoParagraphs = document.querySelectorAll<HTMLElement>("[data-activated-narrow-video='true']");
-  const activeParagraphSet = new Set(paragraphs.map(({ paragraph }) => paragraph));
-
-  activatedNarrowVideoParagraphs.forEach((paragraphEl) => {
-    if (activeParagraphSet.has(paragraphEl)) return;
-
-    paragraphEl.querySelectorAll<HTMLSpanElement>(".character-placeholder").forEach((placeholder) => {
-      const inlineAvatar = placeholder.querySelector<HTMLElement>(".inline-avatar");
-      if (inlineAvatar) {
-        inlineAvatar.querySelectorAll("video").forEach((video) => video.remove());
-      }
-      placeholder.dataset.isTalking = "false";
-    });
-
-    paragraphEl.dataset.activatedNarrowVideo = "false";
-  });
-};
-
-const activateBookFormNarrowMediaDebounced = debounce(runBookFormNarrowMediaActivation, INLINE_MEDIA_DEBOUNCE_MS, { leading: true, trailing: true, maxWait: 500 });
-
 /** Manages media loading and playback for paragraphs within the visible range **/
 export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean) {
   const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
@@ -522,18 +348,6 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
     }
   } else {
     activatePlayFormatMediaDebounced.cancel();
-  }
-
-  // Book-form narrow viewport video activation (<=639px)
-  if (!isPlayFormat && isNarrowViewport()) {
-    const activeParagraph = document.querySelector<HTMLElement>(".active-paragraph");
-    if (activeParagraph?.matches("[data-index]")) {
-      activateBookFormNarrowMediaDebounced({ charactersBySlug });
-    } else {
-      activateBookFormNarrowMediaDebounced.cancel();
-    }
-  } else if (!isPlayFormat) {
-    activateBookFormNarrowMediaDebounced.cancel();
   }
 
   // Build a proper selector for all chapters in range
