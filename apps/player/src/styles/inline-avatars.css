@@ -258,7 +258,7 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
     }
   }
 }
-
+/* 
 @media screen and (max-width: 768px) {
   .character-talking.start-of-paragraph:first-of-type {
     margin-left: clamp(-3em, -5vw, -2.5em);
@@ -284,7 +284,7 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
   p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)) {
     margin-left: clamp(0.3em, 1vw, 0.5em);
   }
-}
+} */
 
 @media screen and (max-width: 430px) {
   .inline-avatar {
@@ -327,5 +327,148 @@ p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)
   .characters-on-stage-panel .speaking:hover,
   .characters-on-stage-panel .not-speaking:hover {
     transform: none !important;
+  }
+}
+
+.dialogue {
+  position: relative;
+}
+
+.dialogue::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.dialogue-avatar {
+  float: left;
+  width: 4.5rem;
+  height: 4.5rem;
+  margin: 0;
+  shape-outside: circle(50%);
+}
+
+.dialogue-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+  object-fit: cover;
+}
+
+p.dialogue {
+  text-indent: 0em !important;
+}
+
+p.dialogue + p.dialogue {
+  text-indent: 0 !important;
+}
+
+p.dialogue .dialogue-avatar {
+  margin-left: calc(-1 * var(--padding-x) + 0.2rem);
+  margin-right: 0.5rem;
+}
+
+/* Avatar-in-paragraph layout only on small screens */
+@media (max-width: 639px) {
+  /* paragraphs that have media injected */
+  p[data-index] {
+    position: relative;
+    text-indent: 0 !important;
+  }
+
+  /* next dialogue paragraph should also have no indent */
+  p[data-index] + p[data-index] {
+    text-indent: 0 !important;
+  }
+
+  /* clear the floated avatar */
+  p[data-index]::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+
+  /* allow wrapping even though .text-nowrap is present */
+  p[data-index] .text-nowrap {
+    white-space: normal !important;
+  }
+
+  /* the avatar wrapper */
+  p[data-index] .character-placeholder.character-talking.start-of-paragraph .inline-avatar {
+    float: left;
+    width: 4.5rem !important;
+    height: 4.5rem !important;
+    margin-left: calc(-1 * var(--padding-x, 1rem) + 0.2rem);
+    /* margin-right: 0.5rem; */
+    /* optional, for nicer circular wrap */
+    shape-outside: circle(50%);
+    clip-path: circle(50%);
+  }
+
+  /* the avatar image */
+  p[data-index] .character-placeholder.character-talking.start-of-paragraph .inline-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+}
+
+/* Avatar-in-paragraph layout only on small screens */
+@media (max-width: 639px) {
+  /* Treat paragraphs with media as dialogue blocks */
+  p[data-index] {
+    position: relative;
+    text-indent: 0 !important; /* no first-line indent */
+  }
+
+  /* Undo the big negative margins from the desktop inline layout */
+  p[data-index] .character-talking.start-of-paragraph {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  /* The FIRST speaker placeholder becomes the floated avatar wrapper */
+  p[data-index] > .character-placeholder.character-talking.start-of-paragraph {
+    float: left;
+    /* width: 4.5rem;
+    height: 4.5rem; */
+    /* margin-left: calc(-1 * var(--padding-x, 1.5rem) + 0.2rem); */
+    margin-right: 0.5rem;
+    /* optional, nicer curve */
+    shape-outside: circle(50%);
+    /* clip-path: circle(50%); */
+  }
+
+  /* Avatar inside that wrapper */
+  p[data-index] > .character-placeholder.character-talking.start-of-paragraph .inline-avatar {
+    display: block;
+    width: 100%;
+    height: 100%;
+    float: none; /* float is on the wrapper span, not here */
+  }
+
+  /* Actual <img> */
+  p[data-index] > .character-placeholder.character-talking.start-of-paragraph .inline-avatar img {
+    position: static; /* override Tailwind's absolute */
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  /* Allow the dash span to wrap again */
+  p[data-index] .text-nowrap {
+    white-space: normal !important;
+  }
+
+  /* clearfix for the float */
+  p[data-index]::after {
+    content: "";
+    display: block;
+    clear: both;
   }
 }
