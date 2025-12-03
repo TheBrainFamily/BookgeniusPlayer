@@ -389,11 +389,6 @@ p.dialogue .dialogue-avatar {
     clear: both;
   }
 
-  /* allow wrapping even though .text-nowrap is present */
-  p[data-index] .text-nowrap {
-    white-space: normal !important;
-  }
-
   /* the avatar wrapper */
   p[data-index] .character-placeholder.character-talking.start-of-paragraph .inline-avatar {
     float: left;
@@ -458,11 +453,6 @@ p.dialogue .dialogue-avatar {
     height: 100%;
     object-fit: cover;
     border-radius: 50%;
-  }
-
-  /* Allow the dash span to wrap again */
-  p[data-index] .text-nowrap {
-    white-space: normal !important;
   }
 
   /* clearfix for the float */
