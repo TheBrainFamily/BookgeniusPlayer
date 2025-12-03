@@ -37,6 +37,7 @@ export interface ModalUIProps {
   animateHeight?: boolean;
   headerActions?: ReactNode;
   searchActions?: ReactNode;
+  disableHeightConstraint?: boolean;
 }
 
 type ModalSize = { content: string; container: string };
@@ -228,6 +229,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
   animateHeight = false,
   headerActions,
   searchActions,
+  disableHeightConstraint = false,
 }) => {
   const { isContentShiftedLeft } = useContentShift();
   const { isLargeScreen, isMediumScreen } = useScreenSize();
@@ -444,7 +446,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
           <div className={modalWrapperClasses} style={isLargeScreen && shouldShiftContent && columnWidths.rightNotes > 0 ? { width: columnWidths.rightNotes } : undefined}>
             <motion.div
               className={modalContentClasses}
-              style={{ maxHeight }}
+              style={disableHeightConstraint ? undefined : { maxHeight }}
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1, transition: { duration: 0.2, ease: "easeOut" } }}
               exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.25, ease: "easeIn" } }}
@@ -456,7 +458,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
 
               <motion.div
                 className="py-3 px-2 overflow-y-auto opened-modal w-full"
-                style={{ maxHeight: "inherit" }}
+                style={disableHeightConstraint ? undefined : { maxHeight: "inherit" }}
                 layout={animateHeight}
                 transition={animateHeight ? { duration: 0.3, ease: "easeInOut" } : undefined}
                 onClick={(e) => {

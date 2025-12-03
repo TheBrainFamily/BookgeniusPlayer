@@ -110,9 +110,9 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   if (!matchingCharacter) return null;
 
   return (
-    <ModalUI onClose={handleOnClose} className="bg-transparent" size="xxl">
+    <ModalUI onClose={handleOnClose} className="bg-transparent" size="xxl" disableHeightConstraint>
       <motion.div
-        className="flex flex-col sm:flex-row items-center gap-6 mx-auto relative max-h-screen"
+        className="flex flex-col sm:flex-row items-center sm:items-stretch gap-2 sm:gap-6 mx-auto relative"
         variants={variants.container}
         initial="hidden"
         animate="visible"
@@ -120,7 +120,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
         onPointerUp={handleOnClose}
       >
         <motion.div
-          className="w-48 md:w-80 rounded-full overflow-hidden max-h-[30vh] max-w-[30vh] md:max-h-80 md:max-w-80 border shadow-xl border-book-primary-20 aspect-square"
+          className="w-48 sm:w-40 md:w-80 rounded-full overflow-hidden max-h-[30vh] max-w-[30vh] sm:max-h-[50vh] sm:max-w-[50vh] md:max-h-80 md:max-w-80 border shadow-xl border-book-primary-20 aspect-square flex-shrink-0 self-center"
           variants={variants.media}
           onPointerUp={(e) => e.stopPropagation()}
         >
@@ -139,8 +139,8 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
         </motion.div>
 
         <motion.div
-          className="p-3 sm:p-4 rounded-xl flex flex-col gap-4 w-full max-w-2xl relative
-          bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[60vh] sm:max-h-[80vh] overflow-hidden min-h-0"
+          className="p-2 sm:p-4 rounded-xl flex flex-col gap-2 sm:gap-4 w-full max-w-2xl relative
+          bg-black/70 textured-bg border border-white/30 shadow-xl text-white overflow-hidden min-h-0 flex-1"
           variants={variants.content}
           onPointerUp={(e) => e.stopPropagation()}
         >
@@ -166,7 +166,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                   </motion.div>
                 ) : (
                   <motion.div className="p-1 flex flex-col min-h-0" variants={variants.container}>
-                    <div className="overflow-y-auto pb-4 pr-1 space-y-3 max-h-[50vh] sm:max-h-[60vh]">
+                    <div className="overflow-y-auto pb-4 pr-1 space-y-3 max-h-[38vh] sm:max-h-[40vh]">
                       {characterAppearances.slice(0, 3).map((appearance, index) => (
                         <motion.div
                           key={appearance.id}
