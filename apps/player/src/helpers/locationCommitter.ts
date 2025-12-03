@@ -42,6 +42,10 @@ interface CommitterState {
 
 const state: CommitterState = { unstableUntil: 0, candidate: null, candidateSince: 0, lastCommitted: null, timer: null };
 
+// Track whether initCommitter has been called - use slow dwell until initialized
+// to prevent noisy iOS first-paint data from committing too quickly
+let isInitialized = false;
+
 function debugLog(...args: unknown[]): void {
   if (typeof localStorage !== "undefined" && localStorage.getItem("debug_scroll") === "true") {
     console.log("[LocationCommitter]", new Date().toISOString().slice(11, 23), ...args);
@@ -62,7 +66,10 @@ export function markLayoutUnstable(reason: string, ms: number = 800): void {
  * Bigger jumps require longer stability to commit.
  */
 function requiredStableMs(candidate: Location, committed: Location | null): number {
-  if (!committed) return DWELL_MS_FAST; // First location, be quick
+  // If not initialized yet, use slow dwell to be safe against iOS first-paint noise
+  if (!isInitialized) return DWELL_MS_SLOW;
+
+  if (!committed) return DWELL_MS_FAST; // First location after init, be quick
 
   const chapterDiff = Math.abs(candidate.currentChapter - committed.currentChapter);
   const paragraphDiff = Math.abs(candidate.currentParagraph - committed.currentParagraph);
@@ -195,6 +202,7 @@ export function flushCommit(): void {
  */
 export function initCommitter(savedLocation: Location | null): void {
   state.lastCommitted = savedLocation;
+  isInitialized = true;
   debugLog("initCommitter", savedLocation?.currentChapter, savedLocation?.currentParagraph);
 }
 
