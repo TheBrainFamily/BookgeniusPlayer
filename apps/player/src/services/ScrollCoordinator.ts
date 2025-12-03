@@ -157,6 +157,20 @@ class ScrollCoordinator {
       debugLog("syncScrollPosition", { scrollTop: this._lastScrollTop });
     }
   }
+
+  /**
+   * Reset scroll direction to prevent stale "down" from triggering spacer transitions.
+   * Call after resize/orientation compensation completes.
+   *
+   * During orientation changes, the browser may fire scroll events that set direction
+   * to "down" even though the user didn't scroll. This could trigger the spacer
+   * observer's chapter transition logic unexpectedly.
+   */
+  resetDirection(): void {
+    this._scrollDirection = "none";
+    this.syncScrollPosition();
+    debugLog("resetDirection");
+  }
 }
 
 export const scrollCoordinator = ScrollCoordinator.getInstance();

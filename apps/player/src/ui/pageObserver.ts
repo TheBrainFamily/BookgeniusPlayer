@@ -536,7 +536,16 @@ export function setupPageObserver(): {
   const scheduledProcessIntersections = makeRafScheduler(processIntersections);
 
   const handleResize = () => scheduledProcessIntersections();
-  const handleOrientationChange = () => scheduledProcessIntersections();
+  // Don't reprocess if navigation is in progress (resize transaction handler is managing this)
+  // The resize transaction in paragraphsNavigation.ts sets isNavigating=true synchronously
+  // on orientationchange, so this handler should skip to avoid fighting for scroll position.
+  // Observer will be triggered via navigationComplete event after resize handler completes.
+  const handleOrientationChange = () => {
+    if (scrollCoordinator.isNavigating) {
+      return;
+    }
+    scheduledProcessIntersections();
+  };
   // Allow navigation to trigger a forced re-process after smooth scroll completes
   const handleNavigationComplete = () => scheduledProcessIntersections();
 

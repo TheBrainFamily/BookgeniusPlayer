@@ -499,32 +499,125 @@ export const shouldShowReturnButton = (): boolean => {
 
 /* ------------------------------------------------------------------ */
 /*  Handle Resize/Orientation Changes                                 */
+/*  Uses "Resize Transaction" pattern with pixel-based anchor         */
+/*  compensation to prevent position jumps during orientation changes */
 
-// Debounced scroller (leading + trailing):
-// - Leading call: immediate recenter to minimize visible glitch
-// - Trailing call: recenter again after layout settles
-const REFOCUS_WAIT_MS = 200;
-const debouncedScrollToLocation = debounce(
-  (loc: Location) => {
-    // Keep argument-captured location for both leading and trailing calls
-    goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior: "instant" }).catch((error) =>
-      console.warn("Failed to scroll during resize/orientation change:", error),
-    );
-  },
-  REFOCUS_WAIT_MS,
-  { leading: true, trailing: true },
-);
+// Resize/Orientation Transaction State
+type ResizeTransaction = { anchor: HTMLElement | null; beforeOffset: number; loc: Location } | null;
 
-// Non-debounced event wrappers: capture the location immediately on event
+let resizeTxn: ResizeTransaction = null;
+
+/**
+ * Capture anchor SYNCHRONOUSLY when event fires - before observer can run.
+ * This is critical: we must lock and capture state before the debounced
+ * compensation runs, otherwise the observer might update location first.
+ */
+function captureResizeAnchor(): void {
+  if (resizeTxn) return; // Already in transaction
+
+  const container = document.getElementById("content-container");
+  if (!container) return;
+
+  // Prefer .active-paragraph (canonical "what user is reading")
+  const anchor = document.querySelector<HTMLElement>(".active-paragraph") ?? container.querySelector<HTMLElement>("[data-index]");
+
+  const containerRect = container.getBoundingClientRect();
+  const beforeOffset = anchor ? anchor.getBoundingClientRect().top - containerRect.top : 0;
+
+  resizeTxn = { anchor, beforeOffset, loc: getCurrentLocation() };
+
+  // CRITICAL: Lock SYNCHRONOUSLY before debounce - prevents observer/spacer changes
+  scrollCoordinator.setNavigating(true);
+  scrollCoordinator.setSuppressTracking(true);
+}
+
+/**
+ * Apply compensation after layout stabilizes.
+ * Uses pixel-based delta (same technique as BookContentVirtualizer.compensateForPrepend)
+ * rather than focus-zone-based goToParagraph, because focus zone dimensions change
+ * with orientation and would cause a visible re-centering jump.
+ */
+async function applyResizeCompensation(): Promise<void> {
+  const txn = resizeTxn;
+  if (!txn) return;
+
+  const container = document.getElementById("content-container");
+  if (!container) return;
+
+  try {
+    // Wait for orientation/resize layout cascade to settle
+    await scrollCoordinator.waitForLayoutStability(5);
+
+    const containerRect = container.getBoundingClientRect();
+
+    if (txn.anchor && txn.anchor.isConnected) {
+      // Pixel-based compensation (same technique as BookContentVirtualizer)
+      const afterOffset = txn.anchor.getBoundingClientRect().top - containerRect.top;
+      const delta = afterOffset - txn.beforeOffset;
+      if (delta !== 0) {
+        container.scrollTop += delta;
+        debugLog("applyResizeCompensation pixel delta", { delta, scrollTop: container.scrollTop });
+      }
+    } else {
+      // Fallback: anchor disconnected (chapter unloaded), scroll by location
+      debugLog("applyResizeCompensation fallback to location", txn.loc);
+      await ensureChapterWindow(txn.loc.currentChapter);
+      await goToParagraph({ currentChapter: txn.loc.currentChapter, currentParagraph: txn.loc.currentParagraph }, { behavior: "instant" });
+    }
+  } catch (error) {
+    console.warn("Failed to apply resize compensation:", error);
+  } finally {
+    // Normalize scroll state + unlock
+    scrollCoordinator.setSuppressTracking(false);
+    scrollCoordinator.resetDirection(); // Clear stale "down" that could trigger spacer transitions
+    scrollCoordinator.setNavigating(false);
+    resizeTxn = null;
+
+    // Trigger clean observer recompute with stable DOM
+    window.dispatchEvent(new Event("navigationComplete"));
+  }
+}
+
+const applyResizeCompensationDebounced = debounce(() => void applyResizeCompensation(), 150, { leading: true, trailing: true, maxWait: 500 });
+
+// Event handlers - capture SYNCHRONOUSLY, apply debounced
+window.addEventListener("resize", () => {
+  captureResizeAnchor();
+  applyResizeCompensationDebounced();
+});
+
+window.addEventListener("orientationchange", () => {
+  captureResizeAnchor();
+  applyResizeCompensationDebounced();
+});
+
+// Export for testing/debugging
 export const onResizeOrOrientationChange = () => {
-  const saved = getCurrentLocation() ?? DEFAULT_LOCATION;
-  // Call once immediately and schedule a trailing recenter ~200ms after events settle
-  debouncedScrollToLocation(saved);
+  captureResizeAnchor();
+  applyResizeCompensationDebounced();
 };
 
-// Add listeners
-window.addEventListener("resize", onResizeOrOrientationChange);
-window.addEventListener("orientationchange", onResizeOrOrientationChange);
+/* ------------------------------------------------------------------ */
+/*  Safari Background/Foreground Handling                             */
+/*  Safari may fire resize on visibility change; ensure position      */
+/*  is stable when returning from background                          */
+
+const handleVisibilityChange = () => {
+  if (document.visibilityState === "visible") {
+    // Safari may fire resize, but we want to ensure position is stable
+    // Small delay to let Safari's viewport settle
+    setTimeout(() => {
+      if (!scrollCoordinator.isNavigating && !resizeTxn) {
+        const loc = getCurrentLocation();
+        goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior: "instant" }).catch(() => {
+          // Ignore errors - this is a best-effort position restoration
+        });
+      }
+    }, 100);
+  }
+};
+
+document.addEventListener("visibilitychange", handleVisibilityChange);
 
 /* ------------------------------------------------------------------ */
 /*  URL Hash Helpers                                                  */
