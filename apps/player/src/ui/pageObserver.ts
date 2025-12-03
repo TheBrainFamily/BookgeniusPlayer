@@ -179,8 +179,9 @@ export function setupPageObserver(): {
   };
 
   const processIntersections = () => {
-    // Skip heavy processing during system navigation - location will be synced at the end
-    if (isSystemNavigationInProgress()) {
+    // Skip heavy processing during system navigation or viewport stabilization
+    // This covers: systemNavigateTo, resize/orientation transaction, any programmatic scroll
+    if (isSystemNavigationInProgress() || scrollCoordinator.isNavigating) {
       return;
     }
 
@@ -632,8 +633,9 @@ export function setupPageObserver(): {
 
   const spacerObserver = new IntersectionObserver(
     (entries) => {
-      // Skip processing during system navigation to avoid interfering with smooth scroll
-      if (isSystemNavigationInProgress()) {
+      // Skip processing during system navigation or viewport stabilization
+      // This prevents chapter auto-transition during resize/orientation changes
+      if (isSystemNavigationInProgress() || scrollCoordinator.isNavigating) {
         return;
       }
 

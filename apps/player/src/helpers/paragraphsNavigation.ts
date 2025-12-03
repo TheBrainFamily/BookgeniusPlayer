@@ -19,6 +19,7 @@ export const isSystemNavigationInProgress = (): boolean => scrollCoordinator.isN
 import { DEFAULT_LOCATION, Location } from "@player/state/LocationContext";
 import debounce from "lodash.debounce";
 import { setUrlHash } from "./setUrlHash";
+import { offerCandidateLocation, markLayoutUnstable, flushCommit, LAYOUT_UNSTABLE_RESIZE_MS } from "./locationCommitter";
 
 /* ------------------------------------------------------------------ */
 
@@ -184,22 +185,9 @@ export const setCurrentLocation = (loc: Location) => {
     }
   }
 
-  const saved = getSavedLocation();
-  if (!saved) {
-    setSavedLocation(loc);
-  } else {
-    const isAhead = loc.currentChapter > saved.currentChapter || (loc.currentChapter === saved.currentChapter && loc.currentParagraph > saved.currentParagraph);
-
-    if (isAhead) setSavedLocation(loc);
-  }
-
-  // Track position changes for remote sync (only for user-driven changes, not system navigation)
-  if (!scrollCoordinator.isNavigating) {
-    // Import lazily to avoid circular dependencies
-    import("@player/services/readingPositionTracker").then(({ readingPositionTracker }) => {
-      readingPositionTracker.onLocationChange(loc);
-    });
-  }
+  // Offer location to committer - it will persist to localStorage and sync to server
+  // after stability criteria are met (dwell time, scroll idle, layout stable)
+  offerCandidateLocation(loc, { source: "observer" });
 };
 
 /* ------------------------------------------------------------------ */
@@ -515,6 +503,9 @@ let resizeTxn: ResizeTransaction = null;
 function captureResizeAnchor(): void {
   if (resizeTxn) return; // Already in transaction
 
+  // Mark layout unstable for committer (blocks persistence during transition)
+  markLayoutUnstable("resize", LAYOUT_UNSTABLE_RESIZE_MS);
+
   const container = document.getElementById("content-container");
   if (!container) return;
 
@@ -578,7 +569,7 @@ async function applyResizeCompensation(): Promise<void> {
   }
 }
 
-const applyResizeCompensationDebounced = debounce(() => void applyResizeCompensation(), 150, { leading: true, trailing: true, maxWait: 500 });
+const applyResizeCompensationDebounced = debounce(() => void applyResizeCompensation(), 150, { leading: false, trailing: true });
 
 // Event handlers - capture SYNCHRONOUSLY, apply debounced
 window.addEventListener("resize", () => {
@@ -599,25 +590,34 @@ export const onResizeOrOrientationChange = () => {
 
 /* ------------------------------------------------------------------ */
 /*  Safari Background/Foreground Handling                             */
-/*  Safari may fire resize on visibility change; ensure position      */
-/*  is stable when returning from background                          */
+/*  Safari may fire resize on visibility change; use resize           */
+/*  transaction pattern for consistent position stabilization         */
 
 const handleVisibilityChange = () => {
   if (document.visibilityState === "visible") {
-    // Safari may fire resize, but we want to ensure position is stable
-    // Small delay to let Safari's viewport settle
-    setTimeout(() => {
-      if (!scrollCoordinator.isNavigating && !resizeTxn) {
-        const loc = getCurrentLocation();
-        goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior: "instant" }).catch(() => {
-          // Ignore errors - this is a best-effort position restoration
-        });
-      }
-    }, 100);
+    // Use the same resize transaction pattern - Safari often fires resize alongside visibility
+    captureResizeAnchor();
+    applyResizeCompensationDebounced();
   }
 };
 
 document.addEventListener("visibilitychange", handleVisibilityChange);
+
+// Handle Safari bfcache (back-forward cache) restoration
+const handlePageShow = (event: PageTransitionEvent) => {
+  if (event.persisted) {
+    // Page was restored from bfcache - stabilize position
+    captureResizeAnchor();
+    applyResizeCompensationDebounced();
+  }
+};
+
+window.addEventListener("pageshow", handlePageShow);
+
+// Flush commit on pagehide - best-effort save of stable position before leaving
+window.addEventListener("pagehide", () => {
+  flushCommit();
+});
 
 /* ------------------------------------------------------------------ */
 /*  URL Hash Helpers                                                  */
