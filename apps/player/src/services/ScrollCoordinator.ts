@@ -26,6 +26,7 @@ class ScrollCoordinator {
   private _suppressTracking = false;
   private _lastChapterTransitionTime = 0;
   private _chapterTransitionCooldownMs = 0; // Configurable, default 0
+  private _lastScrollEventAt = 0;
   private _container: HTMLElement | null = null;
   private _scrollHandler: (() => void) | null = null;
 
@@ -54,6 +55,7 @@ class ScrollCoordinator {
       if (this._suppressTracking) {
         return;
       }
+      this._lastScrollEventAt = Date.now();
       const newScrollTop = container.scrollTop;
       this._scrollDirection = newScrollTop > this._lastScrollTop ? "down" : newScrollTop < this._lastScrollTop ? "up" : "none";
       this._lastScrollTop = newScrollTop;
@@ -85,6 +87,14 @@ class ScrollCoordinator {
 
   get container(): HTMLElement | null {
     return this._container;
+  }
+
+  /**
+   * Get the timestamp of the last scroll event.
+   * Used by locationCommitter to check scroll idle state before committing.
+   */
+  getLastScrollEventAt(): number {
+    return this._lastScrollEventAt;
   }
 
   setNavigating(value: boolean): void {
@@ -156,6 +166,20 @@ class ScrollCoordinator {
       this._lastScrollTop = this._container.scrollTop;
       debugLog("syncScrollPosition", { scrollTop: this._lastScrollTop });
     }
+  }
+
+  /**
+   * Reset scroll direction to prevent stale "down" from triggering spacer transitions.
+   * Call after resize/orientation compensation completes.
+   *
+   * During orientation changes, the browser may fire scroll events that set direction
+   * to "down" even though the user didn't scroll. This could trigger the spacer
+   * observer's chapter transition logic unexpectedly.
+   */
+  resetDirection(): void {
+    this._scrollDirection = "none";
+    this.syncScrollPosition();
+    debugLog("resetDirection");
   }
 }
 

@@ -10,6 +10,7 @@ import { useEditorMode } from "@player/hooks/useEditorMode";
 import { useBookData } from "@player/context/BookDataContext";
 import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { goToParagraph } from "@player/helpers/paragraphsNavigation";
+import { markLayoutUnstable, LAYOUT_UNSTABLE_VIRTUALIZER_MS } from "@player/helpers/locationCommitter";
 import { useLocation } from "@player/state/LocationContext";
 import { disposeVirtualizer, ensureChapterWindow, initializeBookContentVirtualizer } from "@player/logic/BookContentVirtualizer";
 import { bookIndex } from "@player/logic/BookIndex";
@@ -158,6 +159,10 @@ export function useBookContent() {
   }, [currentChapter]);
 
   const handleContentChanged = useCallback(() => {
+    // Mark layout unstable during virtualizer content changes
+    // Prevents transient observer states from being committed as "furthest"
+    markLayoutUnstable("virtualizer", LAYOUT_UNSTABLE_VIRTUALIZER_MS);
+
     if (observerSetupRef.current) {
       // Refresh observed nodes for the existing observer
       observerSetupRef.current.observeNewParagraphs();

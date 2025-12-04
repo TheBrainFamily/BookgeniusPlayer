@@ -1,5 +1,6 @@
 import { getLatestPosition, getCurrentPlatformAndBook } from "./readingPositionApi";
 import { getSavedLocation, setSavedLocation, type ExtendedLocation } from "@player/helpers/paragraphsNavigation";
+import { initCommitter } from "@player/helpers/locationCommitter";
 
 const normalizeTimestamp = (ts: unknown): number => {
   if (typeof ts === "number" && Number.isFinite(ts)) return ts;
@@ -26,7 +27,10 @@ export const initializeReadingPosition = async (): Promise<ExtendedLocation | nu
     const remotePosition = await getLatestPosition(platformId, bookSlug);
 
     if (!remotePosition) {
-      return getSavedLocation();
+      const savedLoc = getSavedLocation();
+      // Initialize committer with the saved location
+      initCommitter(savedLoc);
+      return savedLoc;
     }
 
     // Both exist - compare timestamps
@@ -53,14 +57,23 @@ export const initializeReadingPosition = async (): Promise<ExtendedLocation | nu
       // Update localStorage and emit event
       setSavedLocation(extended, remotePosition.progress);
 
+      // Initialize committer with the remote location (now saved locally)
+      initCommitter(extended);
+
       return extended;
     } else {
       // Local is more recent or equal
-      return getSavedLocation();
+      const savedLoc = getSavedLocation();
+      // Initialize committer with the local saved location
+      initCommitter(savedLoc);
+      return savedLoc;
     }
   } catch (error) {
     console.warn("Failed to initialize reading position from remote:", error);
     // Fall back to local position
-    return getSavedLocation();
+    const savedLoc = getSavedLocation();
+    // Initialize committer with the local saved location
+    initCommitter(savedLoc);
+    return savedLoc;
   }
 };

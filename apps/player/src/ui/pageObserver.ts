@@ -179,8 +179,9 @@ export function setupPageObserver(): {
   };
 
   const processIntersections = () => {
-    // Skip heavy processing during system navigation - location will be synced at the end
-    if (isSystemNavigationInProgress()) {
+    // Skip heavy processing during system navigation or viewport stabilization
+    // This covers: systemNavigateTo, resize/orientation transaction, any programmatic scroll
+    if (isSystemNavigationInProgress() || scrollCoordinator.isNavigating) {
       return;
     }
 
@@ -536,7 +537,16 @@ export function setupPageObserver(): {
   const scheduledProcessIntersections = makeRafScheduler(processIntersections);
 
   const handleResize = () => scheduledProcessIntersections();
-  const handleOrientationChange = () => scheduledProcessIntersections();
+  // Don't reprocess if navigation is in progress (resize transaction handler is managing this)
+  // The resize transaction in paragraphsNavigation.ts sets isNavigating=true synchronously
+  // on orientationchange, so this handler should skip to avoid fighting for scroll position.
+  // Observer will be triggered via navigationComplete event after resize handler completes.
+  const handleOrientationChange = () => {
+    if (scrollCoordinator.isNavigating) {
+      return;
+    }
+    scheduledProcessIntersections();
+  };
   // Allow navigation to trigger a forced re-process after smooth scroll completes
   const handleNavigationComplete = () => scheduledProcessIntersections();
 
@@ -623,8 +633,9 @@ export function setupPageObserver(): {
 
   const spacerObserver = new IntersectionObserver(
     (entries) => {
-      // Skip processing during system navigation to avoid interfering with smooth scroll
-      if (isSystemNavigationInProgress()) {
+      // Skip processing during system navigation or viewport stabilization
+      // This prevents chapter auto-transition during resize/orientation changes
+      if (isSystemNavigationInProgress() || scrollCoordinator.isNavigating) {
         return;
       }
 
