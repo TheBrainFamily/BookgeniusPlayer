@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { cn } from "@player/lib/utils";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
+import { getSpeaksUrlForListens } from "@player/utils/assetUrls";
 
 type VideoState = "listens" | "speaks";
 
@@ -29,7 +30,9 @@ const useVideoState = (mediaSrc: string, isVideo: boolean, isTalking?: boolean) 
 
       // Create talking state video path if possible
       if (isVideoFile(mediaSrc)) {
-        const talkingSrc = mediaSrc.replace("listens.mp4", "speaks.mp4");
+        // For live mode: look up the speaks URL from the registry
+        // Falls back to string replacement for static mode
+        const talkingSrc = getSpeaksUrlForListens(mediaSrc) || mediaSrc.replace("listens.mp4", "speaks.mp4");
         setVideoSpeaksSrc(talkingSrc);
         setVideoSpeaksLoaded(false);
       }

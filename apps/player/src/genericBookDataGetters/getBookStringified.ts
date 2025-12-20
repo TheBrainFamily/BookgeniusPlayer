@@ -27,3 +27,8 @@ export const reloadBookStringified = async (): Promise<void> => {
 export const clearBookStringifiedCache = () => {
   cachedBookStringified = null;
 };
+
+// For live mode: directly inject book stringified into cache
+export const setBookStringifiedCache = (value: string) => {
+  cachedBookStringified = value;
+};

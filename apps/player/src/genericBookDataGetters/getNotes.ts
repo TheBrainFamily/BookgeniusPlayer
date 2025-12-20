@@ -25,3 +25,8 @@ export const reloadNotes = async (): Promise<void> => {
 export const clearNotesCache = () => {
   cachedNotes = null;
 };
+
+// For live mode: directly inject notes into cache
+export const setNotesCache = (value: Note[]) => {
+  cachedNotes = value;
+};

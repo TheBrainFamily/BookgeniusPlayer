@@ -3,6 +3,7 @@ import { getCharactersData } from "@player/genericBookDataGetters/getCharactersD
 import { resolveCharacterSnapshot, parseChapterParagraphId } from "@player/utils/characterOverrides";
 import type { CharacterData, ChapterParagraphRef } from "@player/types/book";
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
+import { getAvatarUrlForVideo } from "@player/utils/assetUrls";
 
 let avatarContainerEl: HTMLDivElement | null = null;
 let globalGuardsAttached = false;
@@ -235,10 +236,17 @@ export function highlightCharacter(characterEl: HTMLSpanElement) {
 }
 
 /**
- * Normalizes the src to always be PNG and removes "speaks" or "listens" suffixes
+ * Normalizes the src to always be PNG and removes "speaks" or "listens" suffixes.
+ * For live mode Convex URLs, looks up the avatar URL from the registry.
  */
 export function normalizeSrcForInlineAvatar(src: string): string {
   if (!src) return src;
+
+  // For live mode: check if this is a video URL with a mapped avatar
+  const avatarUrl = getAvatarUrlForVideo(src);
+  if (avatarUrl) {
+    return avatarUrl;
+  }
 
   // Preserve query/hash separately so we don't mangle them
   let pathPart = src;

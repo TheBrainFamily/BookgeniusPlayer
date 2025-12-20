@@ -1,5 +1,6 @@
 import { bookIndex } from "@player/logic/BookIndex";
 import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
+import { isVirtualTopSpacerDisabled } from "@player/services/live/liveDataInjector";
 
 console.log("[BookContentVirtualizer] BookContentVirtualizer version NOV28-v3 (refactored)");
 
@@ -37,6 +38,11 @@ class TopSpacer {
   }
 
   set height(value: number) {
+    // When virtual top spacer is disabled for debugging, always keep height at 0
+    if (isVirtualTopSpacerDisabled()) {
+      this.element.style.height = "0px";
+      return;
+    }
     const normalized = Math.max(0, Math.round(value));
     this.element.style.height = `${normalized}px`;
   }

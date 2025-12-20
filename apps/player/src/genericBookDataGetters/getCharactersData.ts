@@ -7,6 +7,7 @@ export const getCharactersData = (): CharacterData[] => {
   if (!cachedCharactersData) {
     throw new Error("Characters data not loaded. Call loadCharactersData() first.");
   }
+  console.log("getCharactersData: Returning cached characters data:", cachedCharactersData);
   return cachedCharactersData;
 };
 
@@ -19,4 +20,9 @@ export const loadCharactersData = async (): Promise<CharacterData[]> => {
 
 export const clearCharactersDataCache = () => {
   cachedCharactersData = null;
+};
+
+// For live mode: directly inject characters data into cache
+export const setCharactersDataCache = (value: CharacterData[]) => {
+  cachedCharactersData = value;
 };

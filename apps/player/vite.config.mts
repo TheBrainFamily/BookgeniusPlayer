@@ -76,7 +76,13 @@ export default defineConfig(async () => {
       tailwind(),
     ],
     root: "./",
-    resolve: { alias: { "@player": path.resolve(__dirname, "./src") } },
+    resolve: {
+      alias: {
+        "@player": path.resolve(__dirname, "./src"),
+        "@books-generator": path.resolve(__dirname, "../books-generator/src"),
+        "@convex": path.resolve(__dirname, "../../convex"),
+      },
+    },
     build: { outDir: "dist", sourcemap: true, emptyOutDir: true },
     server: {
       port: 5173,

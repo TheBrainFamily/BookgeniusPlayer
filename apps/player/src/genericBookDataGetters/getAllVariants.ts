@@ -29,3 +29,8 @@ export const reloadAllVariants = async (): Promise<void> => {
 export const clearAllVariantsCache = () => {
   cachedVariants = null;
 };
+
+// For live mode: directly inject variants into cache
+export const setAllVariantsCache = (value: Variant[]) => {
+  cachedVariants = value;
+};

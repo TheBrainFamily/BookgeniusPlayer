@@ -21,3 +21,5 @@ apps/wukong/public/books
 apps/player/src/components/ContentShiftWrapperOld.tsx
 .repoprompt/
 compiled-books/*/
+.repo_ignore
+.env.local

@@ -10,7 +10,7 @@
     "strict": false,
     "skipLibCheck": true,
     "baseUrl": ".",
-    "paths": { "@player/*": ["./src/*"] },
+    "paths": { "@player/*": ["./src/*"], "@books-generator/*": ["../books-generator/src/*"], "@convex/*": ["../../convex/*"] },
     "jsx": "react-jsx",
     "types": ["vite/client", "jest"],
     "allowJs": true,

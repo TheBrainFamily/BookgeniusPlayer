@@ -83,47 +83,7 @@ export function BookDataProvider({ children }: { children: React.ReactNode }) {
     },
   });
 
-  return (
-    <BookDataContext.Provider value={{ textVersion, reloadText, isEditorMode }}>
-      {children}
-      {isEditorMode && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: "20px",
-            right: "20px",
-            zIndex: 9999,
-            backgroundColor: "white",
-            padding: "10px",
-            borderRadius: "5px",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-            fontFamily: "monospace",
-          }}
-        >
-          <button
-            onClick={reloadText}
-            disabled={isReloading || isProcessing}
-            style={{
-              padding: "8px 16px",
-              backgroundColor: isReloading || isProcessing ? "#ccc" : "#007bff",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: isReloading || isProcessing ? "not-allowed" : "pointer",
-              fontSize: "14px",
-            }}
-          >
-            {isProcessing ? "Processing..." : isReloading ? "Reloading..." : "Reload Book Data"}
-          </button>
-          <div style={{ marginTop: "5px", fontSize: "12px", color: "#666" }}>
-            Version: {textVersion}
-            {isProcessing && <span> (Processing book changes...)</span>}
-          </div>
-          <div style={{ marginTop: "3px", fontSize: "11px", color: "#999" }}>Auto-reload enabled via SSE</div>
-        </div>
-      )}
-    </BookDataContext.Provider>
-  );
+  return <BookDataContext.Provider value={{ textVersion, reloadText, isEditorMode }}>{children}</BookDataContext.Provider>;
 }
 
 export function useBookData() {

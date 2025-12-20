@@ -20,3 +20,8 @@ export const loadCutScenesForBook = async (): Promise<CutSceneForBook[]> => {
 export const clearCutScenesCache = () => {
   cachedCutScenes = null;
 };
+
+// For live mode: directly inject cut scenes into cache
+export const setCutScenesCache = (value: CutSceneForBook[]) => {
+  cachedCutScenes = value;
+};

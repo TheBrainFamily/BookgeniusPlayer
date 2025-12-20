@@ -21,3 +21,8 @@ export const loadBackgroundSongsForBook = async (): Promise<BackgroundSongForBoo
 export const clearBackgroundSongsCache = () => {
   cachedBackgroundSongs = null;
 };
+
+// For live mode: directly inject background songs into cache
+export const setBackgroundSongsCache = (value: BackgroundSongForBook[]) => {
+  cachedBackgroundSongs = value;
+};

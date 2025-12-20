@@ -23,3 +23,8 @@ export const loadBookData = async (): Promise<BookData> => {
 export const clearBookDataCache = () => {
   cachedBookData = null;
 };
+
+// For live mode: directly inject book data into cache
+export const setBookDataCache = (value: BookData) => {
+  cachedBookData = value;
+};

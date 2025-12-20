@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import App from "./App";
+import { LiveModeApp } from "./LiveModeApp";
 import { bookDataLoader } from "@player/services/bookDataLoader";
 import { unloadBookColorsCSS } from "@player/utils/loadBookColors";
 
@@ -18,6 +19,15 @@ function getTokenFromUrl(): string | null {
     return params.get("token");
   } catch {
     return null;
+  }
+}
+
+function isLiveModeEnabled(): boolean {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("live") === "true";
+  } catch {
+    return false;
   }
 }
 
@@ -84,6 +94,16 @@ const AppWithResolveProd: React.FC = () => {
 };
 
 export const AppWithResolve: React.FC = () => {
+  // Check if live mode is enabled (loads from Convex CMS)
+  const liveMode = isLiveModeEnabled();
+  const book = getBookFromUrl();
+
+  if (liveMode) {
+    // In live mode, construct the book path for Convex
+    const bookPath = book ? `books/${book}` : "books/1984-English";
+    return <LiveModeApp bookPath={bookPath} />;
+  }
+
   // This condition is compile-time in Vite; ESLint still sees a conditional,
   // so we keep hooks out of this component entirely.
   return import.meta.env.DEV ? <App /> : <AppWithResolveProd />;

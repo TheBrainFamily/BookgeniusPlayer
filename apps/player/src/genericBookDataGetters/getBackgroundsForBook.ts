@@ -20,3 +20,8 @@ export const loadBackgroundsForBook = async (): Promise<BackgroundForBook[]> => 
 export const clearBackgroundsCache = () => {
   cachedBackgrounds = null;
 };
+
+// For live mode: directly inject backgrounds into cache
+export const setBackgroundsCache = (value: BackgroundForBook[]) => {
+  cachedBackgrounds = value;
+};

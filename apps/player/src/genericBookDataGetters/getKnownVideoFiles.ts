@@ -19,3 +19,8 @@ export const loadKnownVideoFiles = async (): Promise<string[]> => {
 export const clearKnownVideoFilesCache = () => {
   cachedKnownVideoFiles = null;
 };
+
+// For live mode: directly inject known video files into cache
+export const setKnownVideoFilesCache = (value: string[]) => {
+  cachedKnownVideoFiles = value;
+};

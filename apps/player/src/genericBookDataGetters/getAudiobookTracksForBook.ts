@@ -20,3 +20,8 @@ export const loadAudiobookTracksForBook = async (): Promise<AudiobookTracksSecti
 export const clearAudiobookTracksCache = () => {
   cachedTracks = null;
 };
+
+// For live mode: directly inject audiobook tracks into cache
+export const setAudiobookTracksCache = (value: AudiobookTracksSection[]) => {
+  cachedTracks = value;
+};
