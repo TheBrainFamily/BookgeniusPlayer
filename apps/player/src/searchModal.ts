@@ -1,8 +1,7 @@
 import { searchParagraphsFromServer } from "./utils/searchParagraphsFromServer";
 import type { Location } from "@player/state/LocationContext";
-import { getCharactersData } from "./genericBookDataGetters/getCharactersData";
+import { getCharactersData, getBookData } from "@player/state/bookDataStore";
 import { useBookContentStore } from "./stores/bookContent.store";
-import { getBookData } from "./genericBookDataGetters/getBookData";
 import { bookIndex } from "@player/logic/BookIndex";
 import type { InfoPerChapter } from "@player/fetchers/getParagraphRange";
 

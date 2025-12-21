@@ -1,5 +1,5 @@
 import { isSystemNavigationInProgress, setCurrentLocation } from "@player/helpers/paragraphsNavigation";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { getBookData } from "@player/state/bookDataStore";
 import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers, drawElementsUnion } from "./devVisualizers";
 import { activateMediaInRange } from "./activateMediaInRange";
 import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";

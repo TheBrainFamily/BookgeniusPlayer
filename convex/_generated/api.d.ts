@@ -456,6 +456,12 @@ export declare const components: {
         { extra?: any; name?: string; newPath?: string; path: string },
         any
       >;
+      updateVersionExtra: FunctionReference<
+        "mutation",
+        "internal",
+        { extra: any; versionId: string },
+        { extra: any; versionId: string }
+      >;
     };
     signedUrl: {
       getSignedUrl: FunctionReference<

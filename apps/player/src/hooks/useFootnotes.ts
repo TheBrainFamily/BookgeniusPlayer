@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Location } from "@player/state/LocationContext";
-import { getNotes } from "@player/genericBookDataGetters/getNotes";
+import { useBookConvex } from "@player/context/BookConvexContext";
 
 export interface Footnote {
   id: string;
@@ -24,7 +24,7 @@ function isParagraphInRange(paragraphChapter: number, paragraphIndex: number, ra
 
 export function useFootnotes(range: Location): Footnote[] {
   const [notes, setNotes] = useState<Footnote[]>([]);
-  const allNotes = getNotes();
+  const { notes: allNotes } = useBookConvex();
   /*  watch primitive fields → effect runs only when the *value* changes  */
   useEffect(() => {
     const notesContainer = document.getElementById("right-notes-scrollable-container");

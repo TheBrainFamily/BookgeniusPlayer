@@ -1,5 +1,5 @@
 import { getPlatformId } from "@player/utils/getPlatformId";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { getBookData } from "@player/state/bookDataStore";
 
 export interface SavePositionInput {
   platformId: string;

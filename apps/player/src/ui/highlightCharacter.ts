@@ -1,5 +1,5 @@
 import { isVideoFile } from "@player/helpers/isVideoFile";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { getCharactersData } from "@player/state/bookDataStore";
 import { resolveCharacterSnapshot, parseChapterParagraphId } from "@player/utils/characterOverrides";
 import type { CharacterData, ChapterParagraphRef } from "@player/types/book";
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";

@@ -1,5 +1,5 @@
 // utils/assetUrls.ts
-import { bookDataLoader } from "@player/services/bookDataLoader";
+import { getBookSlug } from "@player/state/bookDataStore";
 
 // =============================================================================
 // Live Mode Asset URL Registry
@@ -73,21 +73,19 @@ export function joinPath(...parts: string[]) {
 }
 
 /**
- * Build final URL using prefix+query stored in bookDataLoader.
- * If no assetPrefix is set, returns null (caller should use fallback).
+ * Build final URL using prefix. In Convex mode, we don't use prefixes
+ * since assets come with absolute URLs.
  */
-function buildFromPrefix(relativePath: string): string | null {
-  const prefix = bookDataLoader.getAssetPrefix();
-  if (!prefix) return null;
-
-  const query = bookDataLoader.getAssetQuery();
-  const base = prefix.replace(/\/+$/, "");
-  const rel = relativePath.replace(/^\/+/, "");
-  const url = `${base}/${rel}`;
-  return query ? `${url}?${query}` : url;
+function buildFromPrefix(_relativePath: string): string | null {
+  // In Convex-only mode, we don't use asset prefixes
+  return null;
 }
 
-export const getBookBaseUrl = () => `${API_BASE_URL}books/${bookDataLoader.getCurrentBook()}`;
+export const getBookBaseUrl = () => {
+  const slug = getBookSlug();
+  if (!slug) throw new Error("[assetUrls] Book slug not available - store not initialized");
+  return `${API_BASE_URL}books/${slug}`;
+};
 
 // exported helpers (very small)
 export const getBookAssetBaseUrl = (): string => {

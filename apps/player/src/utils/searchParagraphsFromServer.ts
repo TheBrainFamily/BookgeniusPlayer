@@ -1,6 +1,6 @@
 import { Location } from "@player/state/LocationContext";
 import { ANSWERS_SERVER_URL } from "@player/lib/consts";
-import { bookDataLoader } from "@player/services/bookDataLoader";
+import { getBookSlug } from "@player/state/bookDataStore";
 import { Filter } from "@player/types/book";
 
 const extractSummary = (text: string): string => {
@@ -36,11 +36,14 @@ export type SearchParagraphsFunctionResponse = { chapter: number; paragraphNumbe
  */
 export async function searchParagraphsFromServer(searchQuery: string, location: Location): Promise<SearchParagraphsFunctionResponse[]> {
   const baseUrl = `${ANSWERS_SERVER_URL}/getParagraphsForSearch`;
+  const slug = getBookSlug();
+  if (!slug) throw new Error("[searchParagraphsFromServer] Book slug not available");
+
   const filter: Filter = {
     chapterFrom: 0, // Assuming 0-based chapter indexing
     chapterTo: location.endChapter,
     paragraphTo: location.endParagraph,
-    bookSlug: bookDataLoader.getCurrentBook(),
+    bookSlug: slug,
   };
 
   const params = new URLSearchParams({ searchQuery: searchQuery, filter: JSON.stringify(filter) });

@@ -8,7 +8,7 @@
  */
 
 import { BOOK_SLUGS } from "@player/consts";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { getBookData } from "@player/state/bookDataStore";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 
 /* -------------------------------------------------------------------------- */

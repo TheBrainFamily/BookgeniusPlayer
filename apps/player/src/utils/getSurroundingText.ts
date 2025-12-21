@@ -1,14 +1,14 @@
 import type { Location } from "@player/state/LocationContext";
 import { useBookContentStore } from "@player/stores/bookContent.store";
 import { textCacheManager } from "@player/logic/TextCacheManager";
-import { bookDataLoader } from "@player/services/bookDataLoader";
+import { getBookSlug } from "@player/state/bookDataStore";
 
 export function getSurroundingText(location: Location, expand: boolean = false): string {
   const { earliestVisibleParagraph, latestVisibleParagraph, earliestVisibleChapter, latestVisibleChapter } = location;
 
   let earliestParagraphToConsider = earliestVisibleParagraph;
   if (expand) {
-    if (bookDataLoader.getCurrentBook() === "play") {
+    if (getBookSlug() === "play") {
       earliestParagraphToConsider = Math.max(1, earliestVisibleParagraph - 30);
     } else {
       earliestParagraphToConsider = Math.max(1, earliestVisibleParagraph - 2);

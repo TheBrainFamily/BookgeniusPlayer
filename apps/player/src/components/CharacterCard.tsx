@@ -4,13 +4,12 @@ import { motion } from "motion/react";
 import CharacterMedia from "./CharacterMedia";
 import { ParsedParagraphRange } from "@player/fetchers/getParagraphRange";
 import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@player/utils/getFilePathsForName";
-import { bookDataLoader } from "@player/services/bookDataLoader";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { cn } from "@player/lib/utils";
 import { useHighlight } from "@player/hooks/useHighlight";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
@@ -22,9 +21,10 @@ type CharacterCardProps = { entity: ParsedParagraphRange; currentSpeakers: strin
 const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, disableHighlight = false, imageOnly = false, captionMode = "always" }) => {
   const { openModal } = useCharacterModal();
   const { highlightParagraphs, isScrollingLocked } = useHighlight();
-  const bookSlug = bookDataLoader.getCurrentBook();
+  const { charactersData, bookData } = useBookConvex();
+  const bookSlug = bookData?.slug ?? "";
 
-  const characterData = useMemo(() => getCharactersData().find((character) => character.slug === entity.slug), [entity.slug]);
+  const characterData = useMemo(() => charactersData.find((character) => character.slug === entity.slug), [entity.slug, charactersData]);
 
   const locationRef = useMemo(() => ({ chapter: entity.chapterNumber, paragraph: entity.paragraphNumber }), [entity.chapterNumber, entity.paragraphNumber]);
 

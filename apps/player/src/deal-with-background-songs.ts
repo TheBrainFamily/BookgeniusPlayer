@@ -8,8 +8,7 @@ import {
   isCurrentTrackInSection,
   getCurrentSectionTracks,
 } from "./audio-crossfader";
-import { bookDataLoader } from "@player/services/bookDataLoader";
-import { getBackgroundSongsForBook } from "./genericBookDataGetters/getBackgroundSongsForBook";
+import { getBackgroundSongsForBook, getBookSlug } from "./state/bookDataStore";
 import { getCurrentLocation } from "@player/helpers/paragraphsNavigation";
 import { BackgroundSongSection } from "./types/book";
 
@@ -28,8 +27,8 @@ const ensureAudioContextReady = async (): Promise<boolean> => {
 // Helper function to get and validate book songs
 const getValidatedBookSongs = (): BackgroundSongSection[] | null => {
   const bookSongs = getBackgroundSongsForBook();
-  if (!bookSongs) {
-    console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot preload.`);
+  if (!bookSongs || bookSongs.length === 0) {
+    console.log(`No song definitions found for book ${getBookSlug()}. Cannot preload.`);
     return null;
   }
   return bookSongs;
@@ -200,8 +199,8 @@ export const dealWithBackgroundSongs = async ({ currentChapter, currentParagraph
     console.log(`Calculated consideration point: Chapter ${currentChapter}, Paragraph ${currentParagraph}`);
 
     const bookSongs = getBackgroundSongsForBook();
-    if (!bookSongs) {
-      console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot determine background song.`);
+    if (!bookSongs || bookSongs.length === 0) {
+      console.log(`No song definitions found for book ${getBookSlug()}. Cannot determine background song.`);
       isProcessingBackgroundSongs = false; // Reset flag before early exit
       return;
     }

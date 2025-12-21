@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { reloadBookStringified } from "@player/genericBookDataGetters/getBookStringified";
 import { useBookUpdateSSE } from "@player/hooks/useBookUpdateSSE";
-import { reloadAllVariants } from "@player/genericBookDataGetters/getAllVariants";
 import { bookIndex } from "@player/logic/BookIndex";
 import { textCacheManager } from "@player/logic/TextCacheManager";
 
@@ -13,8 +11,17 @@ interface BookDataContextType {
 
 const BookDataContext = createContext<BookDataContextType>({ textVersion: 0, reloadText: async () => {}, isEditorMode: false });
 
-export function BookDataProvider({ children }: { children: React.ReactNode }) {
-  const [textVersion, setTextVersion] = useState(0);
+interface BookDataProviderProps {
+  children: React.ReactNode;
+  /** External textVersion from Convex - when provided, used instead of internal state */
+  externalTextVersion?: number;
+}
+
+export function BookDataProvider({ children, externalTextVersion }: BookDataProviderProps) {
+  const [internalTextVersion, setInternalTextVersion] = useState(0);
+
+  // Use external version if provided (Convex mode), otherwise internal (legacy mode)
+  const textVersion = externalTextVersion ?? internalTextVersion;
   const [isEditorMode, setIsEditorMode] = useState(false);
   const [isReloading, setIsReloading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -24,40 +31,20 @@ export function BookDataProvider({ children }: { children: React.ReactNode }) {
     setIsEditorMode(urlParams.get("editor") === "true");
   }, []);
 
-  const reloadVariantsText = async () => {
-    if (isReloading) return;
-
-    setIsReloading(true);
-    console.log("Reloading book text...");
-
-    try {
-      // Reload the data
-      await Promise.all([await reloadAllVariants()]);
-      console.log("Text reloaded, version:", textVersion + 1);
-    } catch (error) {
-      console.error("Failed to reload text:", error);
-    } finally {
-      setIsReloading(false);
-    }
-  };
-
+  // Legacy reload functions - now handled by Convex reactivity
+  // Kept for API compatibility with useBookUpdateSSE
   const reloadText = async () => {
     if (isReloading) return;
-
     setIsReloading(true);
-    console.log("Reloading book text...");
+    console.log("[BookDataContext] Legacy reloadText called - now handled by Convex");
 
     try {
-      // Reload the data
-      await Promise.all([await reloadBookStringified(), await reloadAllVariants()]);
+      // In Convex mode, data reloads automatically via reactive queries
+      // This is just for compatibility - invalidate caches to trigger re-render
       bookIndex.invalidate();
       textCacheManager.reset();
       textCacheManager.initialize();
-
-      // Increment version to trigger re-renders
-      setTextVersion((v) => v + 1);
-
-      console.log("Text reloaded, version:", textVersion + 1);
+      setInternalTextVersion((v) => v + 1);
     } catch (error) {
       console.error("Failed to reload text:", error);
     } finally {
@@ -74,8 +61,8 @@ export function BookDataProvider({ children }: { children: React.ReactNode }) {
     },
     onBookUpdated: async () => {
       setIsProcessing(false);
-      console.log("[BookDataContext] Book updated, auto-reloading...");
-      await reloadVariantsText();
+      console.log("[BookDataContext] Book updated - Convex handles reactivity");
+      // In Convex mode, data reloads automatically
     },
     onProcessingError: (error) => {
       setIsProcessing(false);

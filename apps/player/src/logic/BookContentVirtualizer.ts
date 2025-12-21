@@ -1,6 +1,5 @@
 import { bookIndex } from "@player/logic/BookIndex";
 import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
-import { isVirtualTopSpacerDisabled } from "@player/services/live/liveDataInjector";
 
 console.log("[BookContentVirtualizer] BookContentVirtualizer version NOV28-v3 (refactored)");
 
@@ -38,11 +37,6 @@ class TopSpacer {
   }
 
   set height(value: number) {
-    // When virtual top spacer is disabled for debugging, always keep height at 0
-    if (isVirtualTopSpacerDisabled()) {
-      this.element.style.height = "0px";
-      return;
-    }
     const normalized = Math.max(0, Math.round(value));
     this.element.style.height = `${normalized}px`;
   }
@@ -570,4 +564,73 @@ export const reloadVirtualizer = async (): Promise<void> => {
       cachedOptions.onContentChanged(mounted);
     }
   }
+};
+
+/**
+ * Update mounted chapters in-place without removing/re-adding DOM nodes.
+ * This preserves scroll position naturally since the wrapper elements stay in place.
+ * Only the inner section content is replaced.
+ */
+export const updateMountedChaptersInPlace = (): void => {
+  console.log("[Convex:Flow] updateMountedChaptersInPlace called", { chaptersHost: !!chaptersHost, virtualizer: !!virtualizer, currentContainer: !!currentContainer });
+
+  if (!chaptersHost) {
+    console.warn("[BookContentVirtualizer] updateMountedChaptersInPlace called before initialization");
+    return;
+  }
+
+  console.log("[Convex:Flow] chaptersHost element:", chaptersHost.tagName, chaptersHost.id, chaptersHost.className);
+  console.log("[Convex:Flow] chaptersHost children count:", chaptersHost.children.length);
+
+  // Query DOM directly for mounted chapter wrappers (don't rely on virtualizer state)
+  const wrappers = Array.from(chaptersHost.querySelectorAll<HTMLElement>("[data-chapter-wrapper]"));
+  console.log("[Convex:Flow] Found wrappers with [data-chapter-wrapper]:", wrappers.length);
+
+  const mountedChapterIds = wrappers
+    .map((w) => {
+      const attr = w.getAttribute("data-chapter-wrapper");
+      return attr ? parseInt(attr, 10) : null;
+    })
+    .filter((id): id is number => id !== null && Number.isFinite(id));
+
+  if (mountedChapterIds.length === 0) {
+    console.log("[Convex:Flow] No mounted chapters found in DOM");
+    return;
+  }
+
+  console.log("[Convex:Flow] Updating chapters in-place:", mountedChapterIds);
+
+  for (const chapterId of mountedChapterIds) {
+    const existingWrapper = chaptersHost.querySelector<HTMLElement>(`[data-chapter-wrapper="${chapterId}"]`);
+    if (!existingWrapper) continue;
+
+    try {
+      // Get fresh content from bookIndex
+      const freshWrapper = bookIndex.cloneChapterWrapper(chapterId);
+      const freshSection = freshWrapper.querySelector<HTMLElement>("section[data-chapter]");
+      const existingSection = existingWrapper.querySelector<HTMLElement>("section[data-chapter]");
+
+      if (freshSection && existingSection) {
+        // Log first 200 chars of old vs new to detect if content actually changed
+        const oldHtml = existingSection.innerHTML;
+        const newHtml = freshSection.innerHTML;
+        const contentChanged = oldHtml !== newHtml;
+        console.log("[Convex:Flow] Chapter", chapterId, "update:", {
+          contentChanged,
+          oldLength: oldHtml.length,
+          newLength: newHtml.length,
+          oldPreview: oldHtml.slice(0, 150) + "...",
+          newPreview: newHtml.slice(0, 150) + "...",
+        });
+
+        // Replace inner HTML only - wrapper stays in place
+        existingSection.innerHTML = freshSection.innerHTML;
+        console.log("[Convex:Flow] Updated chapter", chapterId, "in-place");
+      }
+    } catch (e) {
+      console.error("[Convex:Flow] Failed to update chapter", chapterId, e);
+    }
+  }
+
+  console.log("[Convex:Flow] In-place update complete");
 };

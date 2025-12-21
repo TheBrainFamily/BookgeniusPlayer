@@ -731,7 +731,12 @@ const getChapterTitles = (chapters: HTMLCollectionOf<Element>): Array<{ id: stri
   const chapterTitles: Array<{ id: string; title: string }> = [];
 
   for (const chapter of Array.from(chapters)) {
-    chapterTitles.push({ id: chapter.getAttribute("id") || "", title: getChapterTitle(chapter) });
+    const chapterId = chapter.getAttribute("id");
+    // Skip chapters with invalid ids (same check as render loop)
+    if (!chapterId || chapterId === "null") {
+      continue;
+    }
+    chapterTitles.push({ id: chapterId, title: getChapterTitle(chapter) });
   }
 
   return chapterTitles;

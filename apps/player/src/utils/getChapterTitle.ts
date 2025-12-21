@@ -1,4 +1,4 @@
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { getBookData } from "@player/state/bookDataStore";
 import { isNumberTitle } from "./isNumberTitle";
 
 export const getTitle = (chapter: number, t: (key: string) => string) => {

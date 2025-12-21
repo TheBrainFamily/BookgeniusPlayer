@@ -668,3 +668,63 @@ export const getBookStats = query({
     };
   },
 });
+
+// =============================================================================
+// Stub Queries (for data not yet in CMS)
+// =============================================================================
+
+/**
+ * List audiobook tracks for a book.
+ * STUB: Returns empty array - audiobook data not yet in CMS.
+ */
+export const listAudiobookTracks = query({
+  args: {
+    bookPath: v.string(),
+  },
+  handler: async () => {
+    // TODO: Implement when audiobook data is added to CMS
+    return [];
+  },
+});
+
+/**
+ * List cut scenes for a book.
+ * STUB: Returns empty array - cut scene data not yet in CMS.
+ */
+export const listCutScenes = query({
+  args: {
+    bookPath: v.string(),
+  },
+  handler: async () => {
+    // TODO: Implement when cut scene data is added to CMS
+    return [];
+  },
+});
+
+/**
+ * List notes for a book.
+ * STUB: Returns empty array - notes data not yet in CMS.
+ */
+export const listNotes = query({
+  args: {
+    bookPath: v.string(),
+  },
+  handler: async () => {
+    // TODO: Implement when notes data is added to CMS
+    return [];
+  },
+});
+
+/**
+ * List text variants for a book.
+ * STUB: Returns empty array - variants data not yet in CMS.
+ */
+export const listVariants = query({
+  args: {
+    bookPath: v.string(),
+  },
+  handler: async () => {
+    // TODO: Implement when variants data is added to CMS
+    return [];
+  },
+});

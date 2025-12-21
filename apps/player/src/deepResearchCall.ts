@@ -1,15 +1,18 @@
 import { Location } from "./state/LocationContext";
 import { Filter } from "./types/book";
 import { ANSWERS_SERVER_URL } from "@player/lib/consts";
-import { bookDataLoader } from "@player/services/bookDataLoader";
+import { getBookSlug } from "./state/bookDataStore";
 import { getSurroundingText } from "./utils/getSurroundingText";
 
 export async function deepResearchCall(searchQuery: string, location: Location): Promise<string> {
+  const slug = getBookSlug();
+  if (!slug) throw new Error("[deepResearchCall] Book slug not available");
+
   const filter: Filter = {
     chapterFrom: 1, // Based on the curl example
     chapterTo: location.latestVisibleChapter,
     paragraphTo: location.latestVisibleParagraph + 1,
-    bookSlug: bookDataLoader.getCurrentBook(),
+    bookSlug: slug,
   };
 
   const surroundingText = getSurroundingText(location);

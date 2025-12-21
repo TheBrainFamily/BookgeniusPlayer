@@ -1069,6 +1069,47 @@ export const publishDraft = mutation({
   },
 });
 
+/**
+ * Update the extra metadata on an existing version.
+ * This allows editing metadata (chapterNumber, title, etc.) without creating a new version.
+ */
+export const updateVersionExtra = mutation({
+  args: {
+    versionId: v.id("assetVersions"),
+    extra: v.any(),
+  },
+  returns: v.object({
+    versionId: v.id("assetVersions"),
+    extra: v.any(),
+  }),
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const actorFields = await getActorFields(ctx);
+
+    // Get the version
+    const version = await ctx.db.get(args.versionId);
+    if (!version) {
+      throw new Error("Version not found");
+    }
+
+    // Update the version's extra field
+    await ctx.db.patch(args.versionId, {
+      extra: args.extra,
+    });
+
+    // Also update the asset's updatedAt timestamp
+    const asset = await ctx.db.get(version.assetId);
+    if (asset) {
+      await ctx.db.patch(asset._id, {
+        updatedAt: now,
+        updatedBy: actorFields.updatedBy,
+      });
+    }
+
+    return { versionId: args.versionId, extra: args.extra };
+  },
+});
+
 export const getPublishedVersion = query({
   args: {
     folderPath: v.string(),

@@ -2,7 +2,7 @@ import debounce from "lodash.debounce";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { getCharactersData } from "@player/state/bookDataStore";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 import { isMobile } from "@player/utils/isMobileOrTablet";
 import type { CharacterData } from "@player/types/book";

@@ -7,7 +7,7 @@ import { useCurrentSpeakers } from "@player/hooks/useCurrentSpeakers";
 import useSplashHidden from "@player/hooks/useSplashHidden";
 import { useLocationRange } from "@player/hooks/useLocationRange";
 import { useLocation } from "@player/state/LocationContext";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { useBookForm } from "@player/hooks/useBookForm";
 import CharacterCard from "./CharacterCard";
 
@@ -19,7 +19,8 @@ const CharacterNotesPanel = () => {
   const { location } = useLocation();
   const { isPlayFormat } = useBookForm();
 
-  const allCharacters = useMemo(() => getCharactersData(), []);
+  const { charactersData } = useBookConvex();
+  const allCharacters = charactersData;
   const currentSpeakers = useCurrentSpeakers(location, allCharacters, isPlayFormat);
 
   if (isPlayFormat || !target) return null;

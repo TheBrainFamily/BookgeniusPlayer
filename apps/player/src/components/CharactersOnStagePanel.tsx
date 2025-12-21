@@ -4,7 +4,7 @@ import { motion, Variants, AnimatePresence } from "motion/react";
 import { useCharactersOnStage } from "@player/hooks/useCharactersOnStage";
 import { useCurrentSpeakers } from "@player/hooks/useCurrentSpeakers";
 import { useLocation } from "@player/state/LocationContext";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import CharacterCard from "./CharacterCard";
 import { cn } from "@player/lib/utils";
 import { useOptionalElementVisibility, useLastHideReason } from "@player/stores/elementVisibility.store";
@@ -14,7 +14,8 @@ const AVATAR_SIZE = "clamp(55px, 6.5vw, 90px)";
 const FADE_OUT_DURATION_MS = 3000;
 
 const CharactersOnStagePanel = () => {
-  const allCharacters = useMemo(() => getCharactersData(), []);
+  const { charactersData } = useBookConvex();
+  const allCharacters = charactersData;
   const charactersOnStage = useCharactersOnStage(allCharacters);
   const { location } = useLocation();
   const currentSpeakers = useCurrentSpeakers(location, allCharacters, true);

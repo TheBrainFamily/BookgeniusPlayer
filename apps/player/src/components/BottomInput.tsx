@@ -16,7 +16,7 @@ import type { CharacterData } from "@player/types/book";
 import { askStream } from "@player/askStream";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { useBottomInput } from "@player/stores/modals/bottomInput.store";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
 import { MicrophoneVisualizer } from "./MicrophoneVisualizer";
 import DebugMicPlaybackButton from "./DebugMicPlaybackButton";
@@ -113,14 +113,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     return false;
   }, []);
 
-  const allCharacters = useMemo(() => {
-    try {
-      return getCharactersData();
-    } catch (error) {
-      console.error("Failed to load characters for mentions:", error);
-      return [];
-    }
-  }, []);
+  const { charactersData } = useBookConvex();
+  const allCharacters = charactersData;
 
   const availableCharacterNames = useMemo(() => {
     if (!allCharacters.length) return [];

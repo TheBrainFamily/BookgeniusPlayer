@@ -201,6 +201,20 @@ export const restoreVersion = mutation({
   },
 });
 
+export const updateVersionExtra = mutation({
+  args: {
+    versionId: v.string(),
+    extra: v.any(),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+    return await ctx.runMutation(
+      components.assetManager.assetManager.updateVersionExtra,
+      { versionId: args.versionId as any, extra: args.extra },
+    );
+  },
+});
+
 // --- Admin Preview (any version state) ---
 
 export const getVersionPreviewUrl = query({

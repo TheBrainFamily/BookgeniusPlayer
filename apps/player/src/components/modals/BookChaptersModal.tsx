@@ -5,9 +5,8 @@ import ModalUI from "@player/components/modals/ModalUI";
 import { systemNavigateTo } from "@player/helpers/paragraphsNavigation";
 import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { Button } from "../ui/button";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { useLocationRange } from "@player/hooks/useLocationRange";
-import { bookDataLoader } from "@player/services/bookDataLoader";
 import { Lock, LockOpen } from "lucide-react";
 
 interface BookChaptersModalProps {
@@ -22,10 +21,13 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
   const {
     locationRange: { currentChapter },
   } = useLocationRange();
-  const hasDemoAccess = bookDataLoader.getBookVisibility() === "demo";
+  const { bookData } = useBookConvex();
+
+  // TODO: Implement proper visibility check from URL or Convex
+  const hasDemoAccess = new URLSearchParams(window.location.search).get("visibility") === "demo";
 
   const chapters = useMemo(() => {
-    const bookData = getBookData();
+    if (!bookData) return [];
     const maxDemoChapter = bookData.metadata.bookForm === "play" ? MAX_DEMO_CHAPTER_PLAY : MAX_DEMO_CHAPTER_DEFAULT;
 
     return bookData.chapters.map((chapter, index) => {
@@ -36,7 +38,7 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
         isLocked: hasDemoAccess && parseInt(chapter.id, 10) > maxDemoChapter,
       };
     });
-  }, [t, hasDemoAccess]);
+  }, [t, hasDemoAccess, bookData]);
 
   const navigateToChapter = (chapterId: number) => {
     systemNavigateTo({ currentChapter: chapterId, currentParagraph: 0 });

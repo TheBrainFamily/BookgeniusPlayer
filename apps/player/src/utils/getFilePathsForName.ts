@@ -1,4 +1,5 @@
 import { getBookAssetUrl } from "./assetUrls";
+import { getKnownVideoFiles } from "@player/state/bookDataStore";
 
 export const getFileNameForName = (name: string) => {
   return `${name
@@ -11,14 +12,14 @@ export const getPictureFileNameForName = (name: string) => {
   return `${getFileNameForName(name)}.png`;
 };
 
-let knownVideos;
-
-export const setKnownVideos = (passedKnownVideos: string[]) => {
-  knownVideos = passedKnownVideos;
+// Legacy setter - no longer needed but kept for backward compatibility
+export const setKnownVideos = (_passedKnownVideos: string[]) => {
+  // No-op: knownVideos now comes from the store
 };
 
-export const getListeningMediaFilePathForName = (name: string, bookSlug: string, forceKnown = false) => {
+export const getListeningMediaFilePathForName = (name: string, _bookSlug: string, forceKnown = false) => {
   const listensPath = `${getFileNameForName(name)}-listens.mp4`;
+  const knownVideos = getKnownVideoFiles();
 
   if (forceKnown || knownVideos.includes(listensPath)) {
     return getBookAssetUrl(listensPath);
@@ -28,6 +29,7 @@ export const getListeningMediaFilePathForName = (name: string, bookSlug: string,
 
 export const getTalkingMediaFilePathForName = (name: string, bookSlug: string, forceKnown = false) => {
   const speaksPath = `${getFileNameForName(name)}-speaks.mp4`;
+  const knownVideos = getKnownVideoFiles();
 
   if (forceKnown || knownVideos.includes(speaksPath)) {
     return getBookAssetUrl(speaksPath);

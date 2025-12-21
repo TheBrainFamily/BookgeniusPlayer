@@ -1,5 +1,5 @@
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { getCharactersData } from "@player/state/bookDataStore";
 import { highlightCharacter } from "@player/ui/highlightCharacter";
 import { resolveCharacterSnapshot, parseChapterParagraphId } from "@player/utils/characterOverrides";
 import type { CharacterData, ChapterParagraphRef } from "@player/types/book";

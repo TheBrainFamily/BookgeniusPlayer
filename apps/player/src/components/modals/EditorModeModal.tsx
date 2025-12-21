@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ModalUI from "@player/components/modals/ModalUI";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { useEditorModeModal } from "@player/stores/modals/editorModeModal.store";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 
 interface EditorModeModalProps {
   onClose: () => void;
@@ -11,6 +11,7 @@ interface EditorModeModalProps {
 const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
   const { modalType, onSubmit } = useEditorModeModal();
   const [selectedCharacter, setSelectedCharacter] = useState("");
+  const { charactersData } = useBookConvex();
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,7 +74,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
                   <SelectValue placeholder="Wybierz postać" />
                 </SelectTrigger>
                 <SelectContent className="max-h-45">
-                  {getCharactersData().map((character) => (
+                  {charactersData.map((character) => (
                     <SelectItem key={character.slug} value={character.slug}>
                       {character.characterName}
                     </SelectItem>

@@ -1,4 +1,4 @@
-import { getNotes } from "@player/genericBookDataGetters/getNotes";
+import { getNotes } from "@player/state/bookDataStore";
 import { useFootnoteModal } from "@player/stores/modals/footnoteModal.store";
 
 let footnoteContainerEl: HTMLDivElement | null = null;

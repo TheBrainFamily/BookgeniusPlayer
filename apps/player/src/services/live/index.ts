@@ -18,8 +18,11 @@ export {
   type CharacterOverrideMetadata,
 } from "./characterExtractor";
 
-// Data Injection
-export { injectLiveData, clearLiveData, isLiveMode, setLiveMode } from "./liveDataInjector";
+// Data Injection - stubs (we're always in Convex/live mode now)
+export const isLiveMode = (): boolean => true;
+export const setLiveMode = (_mode: boolean): void => {};
+export const injectLiveData = (): void => {};
+export const clearLiveData = (): void => {};
 
 // Types
 export * from "./types";

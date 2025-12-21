@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocationRange } from "@player/hooks/useLocationRange";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
-import { getBackgroundsForBook } from "@player/genericBookDataGetters/getBackgroundsForBook";
 
 type TimeoutId = number | null;
 
@@ -135,17 +134,12 @@ const useVideoReadiness = ({ videoTimeoutMs = 30000, minSplashMs = 1500, postRea
     }
   }, [videoAReady, videoBReady, postReadyDelayElapsed, minSplashElapsed]);
 
-  useEffect(() => {
-    if (getBackgroundsForBook().length === 0) {
-      setVideoBackgroundReady(true);
-    }
-  }, []);
-  return { videoBackgroundReady };
+  return { videoBackgroundReady, setVideoBackgroundReady };
 };
 
-const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {}) => {
+const useImageReadiness = ({ imageTimeoutMs = 30000, charactersData }: UseImageReadinessOpts & { charactersData: ReturnType<typeof useBookConvex>["charactersData"] }) => {
   const [imageBackgroundReady, setImageBackgroundReady] = useState(false);
-  const allCharacters = useMemo(() => getCharactersData(), []);
+  const allCharacters = charactersData;
   const timeoutIdsRef = useRef<Set<TimeoutId>>(new Set());
 
   const { locationRange } = useLocationRange();
@@ -265,8 +259,16 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
 };
 
 export const useAppReady = () => {
-  const { videoBackgroundReady } = useVideoReadiness({ videoTimeoutMs: 30000, minSplashMs: 100, postReadyDelayMs: 100 });
-  const { loadImages, imageBackgroundReady } = useImageReadiness({ imageTimeoutMs: 30000 });
+  const { charactersData, backgroundsForBook } = useBookConvex();
+  const { videoBackgroundReady, setVideoBackgroundReady } = useVideoReadiness({ videoTimeoutMs: 30000, minSplashMs: 100, postReadyDelayMs: 100 });
+  const { loadImages, imageBackgroundReady } = useImageReadiness({ imageTimeoutMs: 30000, charactersData });
+
+  // If no backgrounds, mark video as ready immediately
+  useEffect(() => {
+    if (backgroundsForBook.length === 0) {
+      setVideoBackgroundReady(true);
+    }
+  }, [backgroundsForBook, setVideoBackgroundReady]);
 
   useEffect(() => {
     if (!videoBackgroundReady && !imageBackgroundReady) return;

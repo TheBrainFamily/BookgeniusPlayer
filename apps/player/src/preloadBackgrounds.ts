@@ -1,6 +1,5 @@
 import { getCurrentLocation } from "@player/helpers/paragraphsNavigation";
-import { bookDataLoader } from "@player/services/bookDataLoader";
-import { getBackgroundsForBook } from "@player/genericBookDataGetters/getBackgroundsForBook";
+import { getBackgroundsForBook, getBookData } from "@player/state/bookDataStore";
 import { getFileType, loadVideoAsHTMLElement } from "@player/ui/backgroundUtils";
 import { getBookAssetUrl } from "./utils/assetUrls";
 import { BackgroundForBook } from "./types/book";
@@ -57,8 +56,9 @@ export const preloadBackgrounds = async () => {
   console.log("Preloading backgrounds for chapters:", chaptersToConsider);
 
   const bookBackgrounds = getBackgroundsForBook();
-  if (!bookBackgrounds) {
-    console.log(`No backgrounds definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot preload.`);
+  if (!bookBackgrounds || bookBackgrounds.length === 0) {
+    const bookData = getBookData();
+    console.log(`No backgrounds definitions found for book ${bookData?.slug ?? "unknown"}. Cannot preload.`);
     return false;
   }
 

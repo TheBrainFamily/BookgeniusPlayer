@@ -2,7 +2,7 @@
  * Utility to dynamically load optional book-specific color CSS files
  */
 
-import { bookDataLoader } from "@player/services/bookDataLoader";
+import { getBookSlug } from "@player/state/bookDataStore";
 import { getBookAssetUrl } from "./assetUrls";
 
 const verifiedBookColorPaths = new Map<string, string>();
@@ -30,7 +30,7 @@ function attachBookColorLink(bookSlug: string, cssPath: string): void {
 }
 
 export const loadBookColorsCSS = async (): Promise<void> => {
-  const bookSlug = bookDataLoader.getCurrentBook();
+  const bookSlug = getBookSlug();
   if (!bookSlug) {
     return;
   }

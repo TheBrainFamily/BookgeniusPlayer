@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 
 import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange } from "@player/fetchers/getParagraphRange";
-import { bookDataLoader } from "@player/services/bookDataLoader";
 import { Location } from "@player/state/LocationContext";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 
 /** Very light equality check: same length and same canonicalName order */
 function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {
@@ -18,6 +17,9 @@ function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {
  */
 export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphabetically = true): ParsedParagraphRange[] {
   const [notes, setNotes] = useState<ParsedParagraphRange[]>([]);
+  const { charactersData, bookData } = useBookConvex();
+  const bookSlug = bookData?.slug ?? "";
+
   useEffect(() => {
     let cancelled = false;
 
@@ -25,8 +27,8 @@ export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphab
       const { chapter, paragraph, endChapter, endParagraph } = loc;
 
       const raw = paragraphMetadataServicePure.getCharactersMetadataForParagraphRange(
-        { bookSlug: bookDataLoader.getCurrentBook(), startChapter: chapter, startParagraph: paragraph, endChapter, endParagraph },
-        getCharactersData(),
+        { bookSlug, startChapter: chapter, startParagraph: paragraph, endChapter, endParagraph },
+        charactersData,
       );
 
       if (cancelled) return;
@@ -63,7 +65,7 @@ export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphab
     return () => {
       cancelled = true;
     };
-  }, [loc.chapter, loc.paragraph, loc.endChapter, loc.endParagraph, addNewAtEnd, sortAlphabetically]);
+  }, [loc.chapter, loc.paragraph, loc.endChapter, loc.endParagraph, addNewAtEnd, sortAlphabetically, bookSlug, charactersData]);
 
   return notes;
 }

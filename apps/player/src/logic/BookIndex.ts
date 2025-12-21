@@ -1,8 +1,6 @@
 import { addPaddingBottomLastChapter } from "@player/helpers/addPaddingBottomLastChapter";
 import { addSpaceBetweenChapters } from "@player/helpers/addSpaceBetweenChapters";
-import { getBackgroundsForBook } from "@player/genericBookDataGetters/getBackgroundsForBook";
-import { getBookStringified } from "@player/genericBookDataGetters/getBookStringified";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { getBackgroundsForBook, getBookStringified, getCharactersData } from "@player/state/bookDataStore";
 
 /**
  * Pre-render inline avatar shell divs inside character placeholders.
@@ -78,6 +76,10 @@ class BookIndex {
     }
 
     const bookStringified = getBookStringified();
+    if (!bookStringified) {
+      throw new Error("[BookIndex] bookStringified is null - store not initialized. This usually means ensureInitialized was called before BookConvexProvider set the store.");
+    }
+
     const parser = new DOMParser();
     const doc = parser.parseFromString(bookStringified, "text/html");
 

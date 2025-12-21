@@ -1,8 +1,7 @@
 import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audiobook-player";
 import { highlightNthOccurrence } from "./highlightWord";
-import { getAudiobookTracksForBook } from "./genericBookDataGetters/getAudiobookTracksForBook";
+import { getAudiobookTracksForBook, getBookSlug } from "./state/bookDataStore";
 import { AudiobookTracksSection } from "./types/book";
-import { bookDataLoader } from "@player/services/bookDataLoader";
 
 const AUDIO_SYNC_SHIFT = -0.1;
 
@@ -66,9 +65,9 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
   try {
     console.log(`Calculated consideration point: Chapter ${currentChapter}, Paragraph ${currentParagraph}`);
 
-    const bookTracks = await getAudiobookTracksForBook();
-    if (!bookTracks) {
-      console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot determine Audiobook song.`);
+    const bookTracks = getAudiobookTracksForBook() as AudiobookTracksSection[];
+    if (!bookTracks || bookTracks.length === 0) {
+      console.log(`No song definitions found for book ${getBookSlug()}. Cannot determine Audiobook song.`);
       isProcessingAudiobookTracks = false;
       return;
     }
@@ -99,8 +98,8 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
           const sectionsToApply = bookTracks.filter(
             (section: AudiobookTracksSection) => section.chapter === currentChapter || (section.chapter === currentChapter + 1 && section.paragraph <= 1),
           );
-          if (!sectionsToApply) {
-            console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot determine Audiobook song.`);
+          if (!sectionsToApply || sectionsToApply.length === 0) {
+            console.log(`No song definitions found for book ${getBookSlug()}. Cannot determine Audiobook song.`);
             isProcessingAudiobookTracks = false; // Reset flag before early exit
             return;
           }
@@ -150,8 +149,8 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
           const sectionsToApply = bookTracks.filter(
             (section: AudiobookTracksSection) => section.chapter === currentChapter || (section.chapter === currentChapter + 1 && section.paragraph <= 1),
           );
-          if (!sectionsToApply) {
-            console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot determine Audiobook song.`);
+          if (!sectionsToApply || sectionsToApply.length === 0) {
+            console.log(`No song definitions found for book ${getBookSlug()}. Cannot determine Audiobook song.`);
             isProcessingAudiobookTracks = false; // Reset flag before early exit
             return;
           }

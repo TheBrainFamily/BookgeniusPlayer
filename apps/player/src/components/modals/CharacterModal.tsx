@@ -8,7 +8,7 @@ import CharacterMedia from "@player/components/CharacterMedia";
 import { CharacterData } from "@player/types/book";
 import { findCharacterSentences, SearchResultItemData } from "@player/searchModal";
 import { getSavedLocation, systemNavigateTo } from "@player/helpers/paragraphsNavigation";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
 import { DialogEnhanceClose } from "../ui/dialog";
 import { getChapterTitle } from "@player/utils/getChapterTitle";
@@ -39,8 +39,9 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   const { setValue } = useBottomInput();
   const { openModal: openSearchModal, setLastClickedAppearanceId, setResults } = useSearchModal();
   const { pauseAllTimers, showAllElements } = useElementVisibilityStore();
+  const { charactersData } = useBookConvex();
 
-  const matchingCharacter = useMemo(() => getCharactersData().find((c) => c.slug === characterSlug), [characterSlug]);
+  const matchingCharacter = useMemo(() => charactersData.find((c) => c.slug === characterSlug), [characterSlug, charactersData]);
   const latestSummary = useMemo(() => (matchingCharacter ? findLatestSummaryInRange(matchingCharacter, endChapter) : ""), [matchingCharacter, endChapter]);
 
   const locationRef = useMemo(() => {

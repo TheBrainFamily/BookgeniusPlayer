@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useContentShift } from "@player/stores/contentShift.store";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";
 
 /**
@@ -31,8 +31,8 @@ export const ContentShiftWrapper: React.FC = () => {
   const [isMediumScreen, setIsMediumScreen] = useState(() => getInitialScreenSizes().medium);
   const [isWideScreen, setIsWideScreen] = useState(() => getInitialScreenSizes().wide);
 
-  const bookData = getBookData();
-  const isPlayFormat = bookData.metadata.bookForm === "play" || bookData.metadata.bookForm === "mixed";
+  const { bookData } = useBookConvex();
+  const isPlayFormat = bookData?.metadata?.bookForm === "play" || bookData?.metadata?.bookForm === "mixed";
   const isMobileOrTabletDevice = useIsMobileOrTablet();
 
   useEffect(() => {

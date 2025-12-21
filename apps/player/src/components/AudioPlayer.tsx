@@ -24,20 +24,18 @@ import { Slider } from "@player/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@player/components/ui/tooltip";
 import { cn } from "@player/lib/utils";
 import { OptionalElement } from "./OptionalElement";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { CoverArt } from "./CoverArt";
 import { useOptionalElementVisibility } from "@player/stores/elementVisibility.store";
 import { isMobileOrTablet } from "@player/utils/isMobileOrTablet";
-import { getBackgroundSongsForBook } from "@player/genericBookDataGetters/getBackgroundSongsForBook";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
 
 const AudioPlayer = () => {
   const { t } = useTranslation();
-  const {
-    hasAudiobook,
-    slug,
-    metadata: { bookForm },
-  } = getBookData();
+  const { bookData, backgroundSongsForBook } = useBookConvex();
+  const hasAudiobook = bookData?.hasAudiobook ?? false;
+  const slug = bookData?.slug ?? "";
+  const bookForm = bookData?.metadata?.bookForm ?? "prose";
 
   const isInitialLoad = useRef(true);
   const hideButtonTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -177,15 +175,9 @@ const AudioPlayer = () => {
   }, [hideSpeakerButtonWithFadeOut, showSpeakerButton]);
 
   useEffect(() => {
-    try {
-      const songs = getBackgroundSongsForBook();
-      const available = Array.isArray(songs) && songs.some((s) => Array.isArray(s.files) && s.files.length > 0);
-      setHasBackgroundSongs(available);
-    } catch {
-      // Not loaded or unavailable
-      setHasBackgroundSongs(false);
-    }
-  }, []);
+    const available = Array.isArray(backgroundSongsForBook) && backgroundSongsForBook.some((s) => Array.isArray(s.files) && s.files.length > 0);
+    setHasBackgroundSongs(available);
+  }, [backgroundSongsForBook]);
 
   const handleProgressChange = (value: number[]) => {
     const newTime = value[0];

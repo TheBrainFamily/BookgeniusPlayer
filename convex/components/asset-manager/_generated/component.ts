@@ -439,6 +439,13 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         any,
         Name
       >;
+      updateVersionExtra: FunctionReference<
+        "mutation",
+        "internal",
+        { extra: any; versionId: string },
+        { extra: any; versionId: string },
+        Name
+      >;
     };
     signedUrl: {
       getSignedUrl: FunctionReference<

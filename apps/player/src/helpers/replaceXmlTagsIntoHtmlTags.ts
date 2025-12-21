@@ -1,5 +1,4 @@
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
-import { bookDataLoader } from "@player/services/bookDataLoader";
+import { getCharactersData, getBookData } from "@player/state/bookDataStore";
 import { normalizeSrcForInlineAvatar } from "@player/ui/highlightCharacter";
 import { getListeningMediaFilePathForName } from "@player/utils/getFilePathsForName";
 
@@ -69,7 +68,11 @@ export const replaceXmlTagsIntoHtmlTags = (text: string, isPlayFormat: boolean, 
         .map(([key, value]) => `${key}="${value}"`)
         .join(" ");
 
-      const imgTag = `<img src="${normalizeSrcForInlineAvatar(getListeningMediaFilePathForName(foundCharacter.slug, bookDataLoader.getCurrentBook()))}" class="inline-avatar" data-character="${foundCharacter.slug}" title="${foundCharacter.slug}" />`;
+      const bookData = getBookData();
+      if (!bookData) {
+        throw new Error("[replaceXmlTagsIntoHtmlTags] bookData is null - store not initialized");
+      }
+      const imgTag = `<img src="${normalizeSrcForInlineAvatar(getListeningMediaFilePathForName(foundCharacter.slug, bookData.slug))}" class="inline-avatar" data-character="${foundCharacter.slug}" title="${foundCharacter.slug}" />`;
 
       return `<span ${attributeString}>${imgTag}</span>`;
     });

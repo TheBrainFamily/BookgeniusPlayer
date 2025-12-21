@@ -1,7 +1,7 @@
 import { Location } from "./state/LocationContext";
 import { Filter } from "./types/book";
 import { getSurroundingText } from "@player/utils/getSurroundingText";
-import { bookDataLoader } from "./services/bookDataLoader";
+import { getBookSlug } from "./state/bookDataStore";
 import { ANSWERS_SERVER_URL } from "./lib/consts";
 
 type Handlers = {
@@ -12,7 +12,10 @@ type Handlers = {
 };
 
 export function askStream(query: string, location: Location, handlers: Handlers) {
-  const filter: Filter = { chapterFrom: 1, chapterTo: location.endChapter, paragraphTo: location.endParagraph, bookSlug: bookDataLoader.getCurrentBook() };
+  const slug = getBookSlug();
+  if (!slug) throw new Error("[askStream] Book slug not available");
+
+  const filter: Filter = { chapterFrom: 1, chapterTo: location.endChapter, paragraphTo: location.endParagraph, bookSlug: slug };
 
   const surroundingText = getSurroundingText(location);
 

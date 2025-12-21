@@ -7,12 +7,11 @@ import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHt
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
 import { activateFootnoteInteractions } from "@player/helpers/activateFootnoteInteractions";
 import { useEditorMode } from "@player/hooks/useEditorMode";
-import { useBookData } from "@player/context/BookDataContext";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { goToParagraph } from "@player/helpers/paragraphsNavigation";
 import { markLayoutUnstable, LAYOUT_UNSTABLE_VIRTUALIZER_MS } from "@player/helpers/locationCommitter";
 import { useLocation } from "@player/state/LocationContext";
-import { disposeVirtualizer, ensureChapterWindow, initializeBookContentVirtualizer } from "@player/logic/BookContentVirtualizer";
+import { disposeVirtualizer, ensureChapterWindow, initializeBookContentVirtualizer, updateMountedChaptersInPlace } from "@player/logic/BookContentVirtualizer";
 import { bookIndex } from "@player/logic/BookIndex";
 import { openPlayRowCharacterModal } from "@player/ui/activateMediaInRange";
 import { scrollCoordinator } from "@player/services/ScrollCoordinator";
@@ -30,16 +29,15 @@ const isEditorMode = import.meta.env.VITE_EDITOR === "true";
 const containerId = "content-container";
 
 export function useBookContent() {
-  const { textVersion } = useBookData();
+  const { textVersion, bookData, isReady, bookStringified } = useBookConvex();
   const { location } = useLocation();
   const { currentChapter, currentParagraph } = location;
-  const {
-    metadata: { bookForm },
-  } = getBookData();
+  const bookForm = bookData?.metadata?.bookForm || "prose";
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
 
-  const previousTextVersionRef = useRef(textVersion);
-  const lastInitializedVersionRef = useRef<number | null>(null);
+  // Initialize to -1 so the first real version (0 or 1) is always detected as a change
+  // Using textVersion as initial value would miss the first update if component mounts after version change
+  const previousTextVersionRef = useRef(-1);
   const containerRef = useRef<HTMLElement | null>(null);
   const observerSetupRef = useRef<{
     observer: IntersectionObserver;
@@ -174,17 +172,20 @@ export function useBookContent() {
     }
   }, []);
 
+  // Initialize virtualizer ONCE when container AND bookStringified are available
+  // This must NOT depend on textVersion - we want the virtualizer to persist through content updates
+  // Content updates are handled by the separate textVersion effect below
   useEffect(() => {
+    // Wait until we have book content - prevents initialization before store is ready
+    if (!isReady || !bookStringified) {
+      return () => {};
+    }
+
     const container = containerRef.current;
 
     if (!container) {
       console.warn(`Container with id ${containerId} not found for content virtualization.`);
       return () => {};
-    }
-
-    if (lastInitializedVersionRef.current !== textVersion) {
-      bookIndex.invalidate();
-      lastInitializedVersionRef.current = textVersion;
     }
 
     let cancelled = false;
@@ -212,7 +213,7 @@ export function useBookContent() {
       }
       disposeVirtualizer();
     };
-  }, [textVersion, handleContentChanged]);
+  }, [handleContentChanged, isReady, bookStringified]); // Wait for data to be ready
 
   useEffect(() => {
     const container = containerRef.current;
@@ -229,6 +230,11 @@ export function useBookContent() {
   }, [handlePointerUp]);
 
   useEffect(() => {
+    // Wait until we have book content
+    if (!isReady || !bookStringified) {
+      return;
+    }
+
     if (typeof currentChapter !== "number") {
       return;
     }
@@ -248,40 +254,43 @@ export function useBookContent() {
         handleContentChanged();
       }
     })();
-  }, [currentChapter, handleContentChanged]);
+  }, [currentChapter, handleContentChanged, isReady, bookStringified]);
 
   useEffect(() => {
-    const textVersionChanged = previousTextVersionRef.current !== textVersion;
+    const prevVersion = previousTextVersionRef.current;
+    const textVersionChanged = prevVersion !== textVersion;
+
+    console.log("[Convex:Flow] useBookContent textVersion effect", { textVersionChanged, prevVersion, newVersion: textVersion });
+
+    // Only update ref AFTER we've checked for change (fixes React strict mode double-invoke)
+    if (!textVersionChanged) {
+      console.log("[Convex:Flow] No version change, skipping update");
+      return;
+    }
+
+    // Update ref now that we know there's a real change
     previousTextVersionRef.current = textVersion;
 
-    if (!textVersionChanged) {
+    // Skip the initial mount (ref starts at -1, first real version is 1)
+    // Initial load is handled by the virtualizer initialization effect
+    if (prevVersion === -1) {
+      console.log("[Convex:Flow] Initial mount, skipping in-place update");
       return;
     }
 
-    if (typeof currentChapter !== "number" || typeof currentParagraph !== "number") {
-      return;
-    }
+    console.log("[Convex:Flow] Version changed! Doing in-place content update");
 
-    if (observerSetupRef.current) {
-      observerSetupRef.current.cleanup();
-      observerSetupRef.current = null;
-    }
+    // Invalidate bookIndex so it re-parses the new content
+    bookIndex.invalidate();
 
-    void (async () => {
-      try {
-        await ensureChapterWindow(currentChapter, { force: true });
-        requestAnimationFrame(() => {
-          void goToParagraph({ currentChapter, currentParagraph }, { behavior: "instant" }).catch((error) => {
-            console.error("useBookContent: Failed to restore scroll position after reload", error);
-          });
-        });
-      } catch (error) {
-        console.error("useBookContent: Failed to remount chapters after reload", error);
-      } finally {
-        handleContentChanged();
-      }
-    })();
-  }, [currentChapter, currentParagraph, textVersion, handleContentChanged]);
+    // Update mounted chapters in-place (no remount, preserves scroll)
+    updateMountedChaptersInPlace();
+
+    // Refresh observers for the new content
+    handleContentChanged();
+
+    console.log("[Convex:Flow] In-place update complete, scroll preserved");
+  }, [textVersion, handleContentChanged]);
 }
 
 // Ensure last word (incl. trailing punctuation) and icon stay on same line

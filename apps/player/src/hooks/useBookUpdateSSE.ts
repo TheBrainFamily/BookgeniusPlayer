@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { bookDataLoader } from "@player/services/bookDataLoader";
+import { getBookSlug } from "@player/state/bookDataStore";
 
 interface BookUpdateEvent {
   type: "connected" | "processing-started" | "book-updated" | "processing-error";
@@ -41,7 +41,11 @@ export function useBookUpdateSSE({ onBookUpdated, onProcessingStarted, onProcess
     }
 
     const connect = () => {
-      const currentBook = bookDataLoader.getCurrentBook();
+      const currentBook = getBookSlug();
+      if (!currentBook) {
+        console.error("[SSE] Book slug not available, cannot connect");
+        return;
+      }
       const sseUrl = `http://localhost:3000/api/text-editor/sse/book-updates?book=${encodeURIComponent(currentBook)}`;
 
       console.log(`[SSE] Connecting to book updates for: ${currentBook}`);

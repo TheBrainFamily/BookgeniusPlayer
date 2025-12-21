@@ -1,10 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { instructions } from "@player/utils/conversation_config.js";
 import { RealtimeAgent, RealtimeSession, tool } from "@openai/agents-realtime";
-import { loadCharactersData, getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { useLocation } from "@player/state/LocationContext";
 import { z } from "zod";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
 import { useLocationRange } from "@player/hooks/useLocationRange";
 import { extractBookTextFromLocation, extractBookTextUpToLocation } from "@player/utils/extractBookText";
 import type { BookContextLocation, BookContextChunk } from "@player/types/bookContext";
@@ -66,6 +65,7 @@ export const useRealtime = () => {
 export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { location } = useLocation();
   const { debouncedLocation } = useLocationRange(300);
+  const { charactersData, bookData } = useBookConvex();
   const audioResponses = (() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -368,8 +368,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Do not clear conversation items between requests — keep continuity
     // Send a guidance message every hold with dynamic character list scoped to current chapter
     try {
-      await loadCharactersData().catch(() => {});
-      const chars = getCharactersData();
+      const chars = charactersData;
       const currentChapter = location?.chapter ?? location?.currentChapter ?? 1;
       const inCurrent = new Set<string>();
       const inPrevious = new Set<string>();
@@ -390,9 +389,8 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       for (const n of Array.from(inCurrent)) inPrevious.delete(n);
       const format = (s: Set<string>) => (s.size ? Array.from(s).slice(0, 50).join(", ") : "none");
 
-      const book = getBookData();
-      const title = book?.metadata?.title ?? "the book";
-      const author = book?.metadata?.author ?? "the author";
+      const title = bookData?.metadata?.title ?? "the book";
+      const author = bookData?.metadata?.author ?? "the author";
       const segments = [
         `Help the user with "${title}" by ${author}.`,
         ...(audioResponses ? [] : ["Use the get_book_information tool for every answer."]),

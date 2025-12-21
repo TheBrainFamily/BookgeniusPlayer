@@ -5,10 +5,11 @@ import { useSearchModal } from "@player/stores/modals/searchModal.store";
 import { findCharacterSentences, performCachedSearch, performUnifiedSearch } from "@player/searchModal";
 import { Location } from "@player/state/LocationContext";
 import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 
 export const useSearchLogic = () => {
   const { query, isOpen, setResults } = useSearchModal();
+  const { charactersData } = useBookConvex();
 
   const latestSearchIdRef = useRef(0);
 
@@ -68,7 +69,7 @@ export const useSearchLogic = () => {
           searchQuery = searchQuery.replaceAll("@", "");
         }
 
-        const character = getCharactersData().find(
+        const character = charactersData.find(
           (character) => character.slug.toLowerCase() === searchQuery.toLowerCase() || character.characterName.toLowerCase() === searchQuery.toLowerCase(),
         );
 

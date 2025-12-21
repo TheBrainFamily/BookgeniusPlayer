@@ -5,10 +5,9 @@
  * as in the original vanilla code.
  */
 import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
-import { bookDataLoader } from "@player/services/bookDataLoader";
 import { ensureChapterWindow, ensureChapterRangeWindow } from "@player/logic/BookContentVirtualizer";
 import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { getBookData } from "@player/state/bookDataStore";
 import { activateMediaInRange } from "@player/ui/activateMediaInRange";
 
 /* ------------------------------------------------------------------ */
@@ -126,8 +125,11 @@ export interface ExtendedLocation extends Location {
 /* ------------------------------------------------------------------ */
 /*  Furthest‑location helpers                                         */
 export const getFurthestLocationKey = (): string => {
-  const currentBook = bookDataLoader.getCurrentBook();
-  return `furthestLocation_${currentBook}`;
+  const bookData = getBookData();
+  if (!bookData) {
+    throw new Error("[paragraphsNavigation] Cannot get furthest location key - bookData not loaded");
+  }
+  return `furthestLocation_${bookData.slug}`;
 };
 
 export const getSavedLocation = (): ExtendedLocation => {
