@@ -88,8 +88,9 @@ function addInlineAvatarShells(container: HTMLElement): void {
       return;
     }
 
-    // Create the shell div that will hold the media later
-    const shell = document.createElement("div");
+    // Create the shell span that will hold the media later
+    // Must be span (not div) because it's nested inside <p> - div would break out of <p>
+    const shell = document.createElement("span");
     shell.className = "inline-avatar relative w-full h-full";
     shell.dataset.character = characterSlug;
     shell.title = characterSlug;

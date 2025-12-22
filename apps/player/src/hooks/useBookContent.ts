@@ -39,6 +39,7 @@ export function useBookContent() {
   // Using textVersion as initial value would miss the first update if component mounts after version change
   const previousTextVersionRef = useRef(-1);
   const containerRef = useRef<HTMLElement | null>(null);
+  const virtualizerInitializedRef = useRef(false);
   const observerSetupRef = useRef<{
     observer: IntersectionObserver;
     observeNewParagraphs: () => number;
@@ -173,9 +174,14 @@ export function useBookContent() {
   }, []);
 
   // Initialize virtualizer ONCE when container AND bookStringified are available
-  // This must NOT depend on textVersion - we want the virtualizer to persist through content updates
-  // Content updates are handled by the separate textVersion effect below
+  // This must NOT re-run when bookStringified changes - only when initially ready
+  // Content updates are handled by the separate textVersion effect below using updateMountedChaptersInPlace
   useEffect(() => {
+    // Skip if already initialized - prevents re-init on content changes
+    if (virtualizerInitializedRef.current) {
+      return () => {};
+    }
+
     // Wait until we have book content - prevents initialization before store is ready
     if (!isReady || !bookStringified) {
       return () => {};
@@ -196,6 +202,7 @@ export function useBookContent() {
         const initialChapter = typeof currentChapterRef.current === "number" ? currentChapterRef.current : (bookIndex.getFirstChapter() ?? 1);
         await ensureChapterWindow(initialChapter, { force: true });
         if (!cancelled) {
+          virtualizerInitializedRef.current = true;
           handleContentChanged();
         }
       } catch (error) {
@@ -212,8 +219,14 @@ export function useBookContent() {
         observerSetupRef.current = null;
       }
       disposeVirtualizer();
+      virtualizerInitializedRef.current = false;
     };
-  }, [handleContentChanged, isReady, bookStringified]); // Wait for data to be ready
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- bookStringified intentionally excluded
+    // We only want to initialize ONCE when first ready. Content updates are handled
+    // by the textVersion effect using updateMountedChaptersInPlace().
+    // Including bookStringified would cause cleanup to run (disposing virtualizer)
+    // before the next effect run, triggering full re-initialization and scroll loss.
+  }, [handleContentChanged, isReady]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -268,6 +281,12 @@ export function useBookContent() {
       return;
     }
 
+    // Need bookStringified to update content
+    if (!bookStringified) {
+      console.log("[Convex:Flow] No bookStringified available, skipping update");
+      return;
+    }
+
     // Update ref now that we know there's a real change
     previousTextVersionRef.current = textVersion;
 
@@ -280,8 +299,9 @@ export function useBookContent() {
 
     console.log("[Convex:Flow] Version changed! Doing in-place content update");
 
-    // Invalidate bookIndex so it re-parses the new content
-    bookIndex.invalidate();
+    // Initialize bookIndex with the FRESH bookStringified from context (not stale store)
+    // This avoids the race condition where the store hasn't been updated yet
+    bookIndex.initializeWith(bookStringified);
 
     // Update mounted chapters in-place (no remount, preserves scroll)
     updateMountedChaptersInPlace();
@@ -290,7 +310,7 @@ export function useBookContent() {
     handleContentChanged();
 
     console.log("[Convex:Flow] In-place update complete, scroll preserved");
-  }, [textVersion, handleContentChanged]);
+  }, [textVersion, bookStringified, handleContentChanged]);
 }
 
 // Ensure last word (incl. trailing punctuation) and icon stay on same line

@@ -3,8 +3,9 @@ import { addSpaceBetweenChapters } from "@player/helpers/addSpaceBetweenChapters
 import { getBackgroundsForBook, getBookStringified, getCharactersData } from "@player/state/bookDataStore";
 
 /**
- * Pre-render inline avatar shell divs inside character placeholders.
+ * Pre-render inline avatar shell spans inside character placeholders.
  * This prevents layout shift when media is injected later.
+ * Note: Must use span (not div) because these are inside <p> elements.
  */
 const addInlineAvatarShells = (doc: Document) => {
   const charactersData = getCharactersData();
@@ -26,8 +27,9 @@ const addInlineAvatarShells = (doc: Document) => {
     const characterData = charactersBySlug.get(characterSlug);
     const displayName = characterData?.characterName ?? characterSlug;
 
-    // Create the shell div that will hold the media later
-    const shell = doc.createElement("div");
+    // Create the shell span that will hold the media later
+    // Must be span (not div) because it's nested inside <p> - div would break out of <p>
+    const shell = doc.createElement("span");
     shell.className = "inline-avatar relative w-full h-full";
     shell.dataset.character = characterSlug;
     shell.title = displayName;
@@ -70,6 +72,20 @@ class BookIndex {
     this.chapterOrder = [];
   }
 
+  /**
+   * Initialize with explicit bookStringified content.
+   * Use this when you have fresh content and want to avoid the store race condition.
+   */
+  initializeWith(bookStringified: string): void {
+    // Always re-initialize when called with explicit content
+    this.invalidate();
+    this._parseAndInitialize(bookStringified);
+  }
+
+  /**
+   * Ensure initialized using content from store (legacy behavior).
+   * Prefer initializeWith() when you have the content available.
+   */
   ensureInitialized(): void {
     if (this.initialized) {
       return;
@@ -80,6 +96,10 @@ class BookIndex {
       throw new Error("[BookIndex] bookStringified is null - store not initialized. This usually means ensureInitialized was called before BookConvexProvider set the store.");
     }
 
+    this._parseAndInitialize(bookStringified);
+  }
+
+  private _parseAndInitialize(bookStringified: string): void {
     const parser = new DOMParser();
     const doc = parser.parseFromString(bookStringified, "text/html");
 

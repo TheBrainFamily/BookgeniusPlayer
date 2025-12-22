@@ -38,6 +38,10 @@ class TopSpacer {
 
   set height(value: number) {
     const normalized = Math.max(0, Math.round(value));
+    const oldHeight = parseFloat(this.element.style.height || "0");
+    if (Math.abs(normalized - oldHeight) > 1) {
+      console.log("[Spacer] height changed", { from: oldHeight, to: normalized, stack: new Error().stack?.split("\n").slice(2, 5).join(" <- ") });
+    }
     this.element.style.height = `${normalized}px`;
   }
 
@@ -517,6 +521,8 @@ export const initializeBookContentVirtualizer = async (options: InitializeOption
 };
 
 export const ensureChapterWindow = async (chapterId: number, options: { force?: boolean } = {}): Promise<void> => {
+  console.log("[Virtualizer] ensureChapterWindow called", { chapterId, force: options.force, stack: new Error().stack?.split("\n").slice(1, 4).join(" <- ") });
+
   if (!virtualizer || !chaptersHost) {
     await ensureInitializationPromise();
   }

@@ -21,7 +21,7 @@
  *   const { bookStringified, chapters, isReady } = useBookConvex();
  */
 
-import React, { createContext, useContext, useMemo, useState, useEffect, useCallback, useRef } from "react";
+import React, { createContext, useContext, useMemo, useState, useEffect, useLayoutEffect, useCallback, useRef } from "react";
 import { useQuery, useAction } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useDraftMode } from "./DraftModeContext";
@@ -579,7 +579,9 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   );
 
   // Sync to global store for non-React code
-  useEffect(() => {
+  // Using useLayoutEffect so store is updated BEFORE other effects run
+  // This prevents race conditions where effects read stale store data
+  useLayoutEffect(() => {
     setBookDataStore({
       isLoading,
       isReady,

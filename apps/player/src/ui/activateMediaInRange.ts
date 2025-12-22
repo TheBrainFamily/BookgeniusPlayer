@@ -287,7 +287,7 @@ function createMediaElement(
   characterData: CharacterData | undefined,
   location: { chapter: number; paragraph: number } | null,
   snapshotOverride?: CharacterSnapshot | null,
-): HTMLDivElement | null {
+): HTMLSpanElement | null {
   const characterSlug = placeholder.dataset.character;
   if (!characterSlug || !characterData) return null;
 
@@ -297,7 +297,8 @@ function createMediaElement(
   const talkingSrc = snapshot.media.talking;
 
   // Create container element similar to CharacterMedia structure
-  const container = document.createElement("div");
+  // Must be span (not div) because it's nested inside <p> - div would break out of <p>
+  const container = document.createElement("span");
   container.classList.add("inline-avatar", "relative", "w-full", "h-full");
   container.dataset.character = characterSlug;
   container.title = snapshot.displayName;

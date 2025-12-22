@@ -39,7 +39,6 @@ import { useBookContent } from "@player/hooks/useBookContent";
 import { useElementVisibility } from "./hooks/useElementVisibility";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
 import ProgressBars from "@player/components/ProgressBars";
-import { BookDataProvider } from "./context/BookDataContext";
 import { languageNameToCode } from "@player/helpers/languageNameToCode";
 import { setupUnloadHandlers } from "./services/setupUnloadHandlers";
 import { ScrollIndicator } from "@player/components/ScrollIndicator";
@@ -241,18 +240,16 @@ export function LiveModeApp({ bookPath }: LiveModeAppProps) {
         <BookConvexProvider bookPath={bookPath}>
           <I18nextProvider i18n={i18n}>
             <ConvexAppInitializer>
-              <BookDataProvider>
-                <LocationProvider>
-                  <RealtimeProvider>
-                    <BookContentWrapper>
-                      <LiveShell onShellMounted={() => setReactDomReady(true)} />
-                      <ModalRenderers />
-                      <ContentShiftWrapper />
-                    </BookContentWrapper>
-                    <DebugLocationOverlay />
-                  </RealtimeProvider>
-                </LocationProvider>
-              </BookDataProvider>
+              <LocationProvider>
+                <RealtimeProvider>
+                  <BookContentWrapper>
+                    <LiveShell onShellMounted={() => setReactDomReady(true)} />
+                    <ModalRenderers />
+                    <ContentShiftWrapper />
+                  </BookContentWrapper>
+                  <DebugLocationOverlay />
+                </RealtimeProvider>
+              </LocationProvider>
             </ConvexAppInitializer>
           </I18nextProvider>
         </BookConvexProvider>
