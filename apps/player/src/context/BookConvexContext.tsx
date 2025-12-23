@@ -204,7 +204,8 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   // Use draft-aware or published-only queries based on draftMode
   const chaptersQuery = useQuery(draftMode ? api.bookQueries.listChaptersWithDrafts : api.bookQueries.listChapters, { bookPath }) as ChapterQueryItem[] | undefined;
 
-  const charactersQuery = useQuery(draftMode ? api.bookQueries.listCharacterBundlesWithDrafts : api.bookQueries.listCharacterBundlesWithDrafts, { bookPath });
+  //TODO character always use drafts
+  const charactersQuery = useQuery(api.bookQueries.listCharacterBundlesWithDrafts, { bookPath });
 
   const backgroundsQuery = useQuery(draftMode ? api.bookQueries.listBackgroundsWithDrafts : api.bookQueries.listBackgrounds, { bookPath });
 

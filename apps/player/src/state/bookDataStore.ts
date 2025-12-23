@@ -23,11 +23,7 @@ export type { CharacterBundle, BackgroundInfo, MusicInfo, BookMetadata, ChapterI
 
 // Types for stub data (these will come from CMS later)
 export type Note = { id: string; content: string };
-export type Variant = {
-  id: string;
-  analysis: { originalSentence: string; reasoning: string; score: number };
-  simplifications: { reasoning: string; score: number; sentences: string[] }[];
-};
+export type Variant = { id: string; simplifications: { score: number; sentences: string[] }[] };
 
 export interface BookDataStore {
   // Loading states

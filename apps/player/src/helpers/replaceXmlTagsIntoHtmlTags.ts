@@ -1,4 +1,5 @@
 import { getCharactersData } from "@player/state/bookDataStore";
+import { getAvatarSource } from "./svgAvatars";
 
 export const replaceXmlTagsIntoHtmlTags = (text: string, isPlayFormat: boolean, isFirstSentence: boolean = true) => {
   const characters = getCharactersData(); // Get characters data once
@@ -67,7 +68,7 @@ export const replaceXmlTagsIntoHtmlTags = (text: string, isPlayFormat: boolean, 
         .join(" ");
 
       // Use Convex media URLs directly
-      const avatarSrc = foundCharacter.media?.avatarUrl ?? foundCharacter.media?.listensUrl ?? "";
+      const avatarSrc = getAvatarSource(foundCharacter);
       const imgTag = `<img src="${avatarSrc}" class="inline-avatar" data-character="${foundCharacter.slug}" title="${foundCharacter.slug}" />`;
 
       return `<span ${attributeString}>${imgTag}</span>`;

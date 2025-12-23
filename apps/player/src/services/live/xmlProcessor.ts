@@ -29,7 +29,7 @@ const startsWithUppercase = (value: string): boolean => value.charAt(0) === valu
 const getTitleText = (el?: Element | null) => (el ? (el.textContent || "").trim() : "");
 
 const renderStandardInlineElement = (element: Element, options: InlineRenderOptions): string => {
-  const tagName = element.tagName.toLowerCase() === element.tagName ? element.tagName : element.tagName;
+  const tagName = element.tagName.toLowerCase();
   switch (tagName) {
     case "note":
       if (options.bookSlug === "Lalka") {

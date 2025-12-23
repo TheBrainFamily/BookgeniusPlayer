@@ -6,7 +6,7 @@ import { readFileSync, existsSync, readdirSync } from "fs";
 import { join } from "path";
 import { execSync } from "child_process";
 import { DOMParser } from "@xmldom/xmldom";
-import { getFileNameForName, setKnownVideos } from "../src/utils/getFilePathsForName";
+import { getFileNameForName } from "../src/utils/getFilePathsForName";
 import { generateCharacterMetadata, parseBookXmlData } from "../../books-generator/src/generateBook";
 import { SimpleCharacterMetadata } from "../../books-generator/src/data/tools/create-book-metadata";
 
@@ -246,14 +246,6 @@ function main(): void {
     bookString,
     metadata: { form, slug },
   } = parseBookXmlData(bookPath);
-
-  // Set up known videos before generating character metadata
-  const assetsPath = join(bookPath, "assets");
-  let videoFiles: string[] = [];
-  if (existsSync(assetsPath)) {
-    videoFiles = readdirSync(assetsPath).filter((file) => file.endsWith(".mp4"));
-  }
-  setKnownVideos(videoFiles);
 
   const characterMetadata = generateCharacterMetadata(xmlDoc, bookString, form, slug);
   const ignoreIfSpeaksLessFrequentThan = parseInt(nonFlagArgs[1] || "0", 10);
