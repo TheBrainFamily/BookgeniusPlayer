@@ -3,7 +3,6 @@ import { motion } from "motion/react";
 
 import CharacterMedia from "./CharacterMedia";
 import { ParsedParagraphRange } from "@player/fetchers/getParagraphRange";
-import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@player/utils/getFilePathsForName";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { cn } from "@player/lib/utils";
 import { useHighlight } from "@player/hooks/useHighlight";
@@ -21,8 +20,7 @@ type CharacterCardProps = { entity: ParsedParagraphRange; currentSpeakers: strin
 const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, disableHighlight = false, imageOnly = false, captionMode = "always" }) => {
   const { openModal } = useCharacterModal();
   const { highlightParagraphs, isScrollingLocked } = useHighlight();
-  const { charactersData, bookData } = useBookConvex();
-  const bookSlug = bookData?.slug ?? "";
+  const { charactersData } = useBookConvex();
 
   const characterData = useMemo(() => charactersData.find((character) => character.slug === entity.slug), [entity.slug, charactersData]);
 
@@ -47,26 +45,23 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
   const isTalkingInCurrentRange = useMemo(() => currentSpeakers.includes(entity.slug), [currentSpeakers, entity.slug]);
 
   const mediaSrc = useMemo(() => {
+    // Use Convex URLs from snapshot - no legacy fallbacks
+    const listeningUrl = snapshot?.media.listening ?? "";
     if (imageOnly) {
-      const base = snapshot?.media.listening ?? entity.imageUrl ?? getListeningMediaFilePathForName(entity.slug, bookSlug);
-      return getPlaceholderFromVideoUrl(base);
+      return getPlaceholderFromVideoUrl(listeningUrl);
     }
-
-    return snapshot?.media.listening ?? getListeningMediaFilePathForName(entity.slug, bookSlug);
-  }, [imageOnly, snapshot, entity.imageUrl, entity.slug, bookSlug]);
+    return listeningUrl;
+  }, [imageOnly, snapshot]);
 
   const isVideo = imageOnly ? false : isVideoFile(mediaSrc);
 
   const modalMediaSrc = useMemo(() => {
-    if (imageOnly) {
-      if (snapshot) {
-        return isTalkingInCurrentRange ? snapshot.media.talking : snapshot.media.listening;
-      }
-      return isTalkingInCurrentRange ? getTalkingMediaFilePathForName(entity.slug, bookSlug) : getListeningMediaFilePathForName(entity.slug, bookSlug);
+    // Use Convex URLs from snapshot - no legacy fallbacks
+    if (imageOnly && snapshot) {
+      return isTalkingInCurrentRange ? snapshot.media.talking : snapshot.media.listening;
     }
-
-    return snapshot?.media.listening ?? mediaSrc;
-  }, [imageOnly, isTalkingInCurrentRange, snapshot, entity.slug, bookSlug, mediaSrc]);
+    return snapshot?.media.listening ?? "";
+  }, [imageOnly, isTalkingInCurrentRange, snapshot]);
 
   const modalIsVideo = useMemo(() => isVideoFile(modalMediaSrc), [modalMediaSrc]);
 

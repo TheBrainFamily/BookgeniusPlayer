@@ -9,6 +9,7 @@
  */
 
 import { wrapPunctuationAdvanced } from "@books-generator/data/wrapPunctuation";
+import { isElementNode, isTextNode, isLikelyCharacterTag, renderLineBreakSpan, renderEmElement, type InlineRenderOptions } from "@player/services/xmlDomHelpers";
 
 // =============================================================================
 // Types
@@ -24,42 +25,6 @@ export interface ProcessedChapter {
   paragraphCount: number;
   title?: string;
 }
-
-// =============================================================================
-// Helper Functions (adapted from xmlProcessor.ts)
-// =============================================================================
-
-const LINE_BREAK_SPAN = '<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>';
-const renderLineBreakSpan = () => LINE_BREAK_SPAN;
-
-const isElementNode = (node: Node): node is Element => node.nodeType === Node.ELEMENT_NODE;
-const isTextNode = (node: Node): node is Text => node.nodeType === Node.TEXT_NODE;
-
-const isLikelyCharacterTag = (tag: string) => {
-  const first = tag.charAt(0);
-  return first === first.toUpperCase() && /[A-Z]/.test(first);
-};
-
-const renderEmElement = (element: Element): string => {
-  let emInner = "";
-  for (const emChild of Array.from(element.childNodes)) {
-    if (isTextNode(emChild)) {
-      emInner += emChild.textContent || "";
-    } else if (isElementNode(emChild)) {
-      if (emChild.tagName === "LineBreak") {
-        emInner += renderLineBreakSpan();
-      } else {
-        emInner += emChild.textContent || "";
-      }
-    }
-  }
-  if (element.hasAttribute("class")) {
-    return `<em class="${element.getAttribute("class")}">${emInner}</em>`;
-  }
-  return `<em>${emInner}</em>`;
-};
-
-type InlineRenderOptions = { bookSlug: string; includeBookSlugInImgSrc?: boolean };
 
 const renderStandardInlineElement = (element: Element, options: InlineRenderOptions): string => {
   const tagName = element.tagName.toLowerCase() === element.tagName ? element.tagName : element.tagName;

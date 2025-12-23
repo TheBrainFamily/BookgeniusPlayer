@@ -62,7 +62,15 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     [matchingCharacter, locationRef, latestSummary],
   );
 
-  const resolvedMediaSrc = snapshot?.media.explicitAssetUrl ?? mediaSrc;
+  // Use Convex URLs from snapshot - prefer listening unless explicitly talking
+  // explicitAssetUrl is only for character overrides with explicit file paths
+  const resolvedMediaSrc = useMemo(() => {
+    if (!snapshot) return mediaSrc;
+    // Check for explicit override asset first
+    if (snapshot.media.explicitAssetUrl) return snapshot.media.explicitAssetUrl;
+    // Use talking or listening based on state
+    return isTalking ? snapshot.media.talking : snapshot.media.listening;
+  }, [snapshot, mediaSrc, isTalking]);
   const resolvedIsVideo = useMemo(() => (resolvedMediaSrc ? isVideoFile(resolvedMediaSrc) : isVideo), [resolvedMediaSrc, isVideo]);
 
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);

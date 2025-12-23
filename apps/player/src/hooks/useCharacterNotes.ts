@@ -4,9 +4,9 @@ import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange
 import { Location } from "@player/state/LocationContext";
 import { useBookConvex } from "@player/context/BookConvexContext";
 
-/** Very light equality check: same length and same canonicalName order */
-function sameList(a: ParsedParagraphRange[], b: ParsedParagraphRange[]) {
-  return a.length === b.length && a.every((v, i) => v.slug === b[i].slug);
+/** Deep equality check using JSON - compares ALL fields */
+function notesEqual(a: ParsedParagraphRange[], b: ParsedParagraphRange[]): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
 }
 
 /**
@@ -36,27 +36,27 @@ export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphab
       const parsed = parseParagraphRange(raw);
 
       setNotes((prev) => {
-        if (sameList(prev, parsed)) {
-          return prev;
-        }
-
         if (!addNewAtEnd) {
-          return parsed;
+          // Simple mode: return prev if nothing changed, otherwise replace
+          return notesEqual(prev, parsed) ? prev : parsed;
         }
 
         if (prev.length === 0) {
           return sortAlphabetically ? [...parsed].sort((a, b) => a.slug.localeCompare(b.slug)) : parsed;
         }
 
+        // Preserve order for existing characters, append new ones
         const existingNames = new Set(prev.map((ch) => ch.slug));
         const remaining = prev.filter((ch) => parsed.some((p) => p.slug === ch.slug));
         const newChars = parsed.filter((ch) => !existingNames.has(ch.slug));
 
+        // Update with fresh data from parsed (contains new media URLs)
         const updatedRemaining = remaining.map((oldCh) => parsed.find((p) => p.slug === oldCh.slug) || oldCh);
-
         const appended = sortAlphabetically ? [...newChars].sort((a, b) => a.slug.localeCompare(b.slug)) : newChars;
+        const result = [...updatedRemaining, ...appended];
 
-        return [...updatedRemaining, ...appended];
+        // Return prev if nothing changed to preserve reference equality
+        return notesEqual(prev, result) ? prev : result;
       });
     }
 

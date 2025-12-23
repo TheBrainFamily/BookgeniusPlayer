@@ -1,0 +1,56 @@
+/**
+ * Shared DOM helpers for XML processing.
+ *
+ * These helpers are used by both xmlProcessor.ts and chapterProcessor.ts
+ * for consistent XML-to-HTML conversion.
+ */
+
+// =============================================================================
+// Constants
+// =============================================================================
+
+export const LINE_BREAK_SPAN = '<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>';
+
+// =============================================================================
+// Type Guards
+// =============================================================================
+
+export const isElementNode = (node: Node): node is Element => node.nodeType === Node.ELEMENT_NODE;
+
+export const isTextNode = (node: Node): node is Text => node.nodeType === Node.TEXT_NODE;
+
+// =============================================================================
+// Helper Functions
+// =============================================================================
+
+export const renderLineBreakSpan = () => LINE_BREAK_SPAN;
+
+export const isLikelyCharacterTag = (tag: string) => {
+  const first = tag.charAt(0);
+  return first === first.toUpperCase() && /[A-Z]/.test(first);
+};
+
+export const renderEmElement = (element: Element): string => {
+  let emInner = "";
+  for (const emChild of Array.from(element.childNodes)) {
+    if (isTextNode(emChild)) {
+      emInner += emChild.textContent || "";
+    } else if (isElementNode(emChild)) {
+      if (emChild.tagName === "LineBreak") {
+        emInner += renderLineBreakSpan();
+      } else {
+        emInner += emChild.textContent || "";
+      }
+    }
+  }
+  if (element.hasAttribute("class")) {
+    return `<em class="${element.getAttribute("class")}">${emInner}</em>`;
+  }
+  return `<em>${emInner}</em>`;
+};
+
+// =============================================================================
+// Types
+// =============================================================================
+
+export type InlineRenderOptions = { bookSlug: string; includeBookSlugInImgSrc?: boolean };

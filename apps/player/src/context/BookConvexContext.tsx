@@ -25,9 +25,10 @@ import React, { createContext, useContext, useMemo, useState, useEffect, useLayo
 import { useQuery, useAction } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useDraftMode } from "./DraftModeContext";
-import { xmlToComplexHtml } from "@player/services/live/xmlProcessor";
-import { extractCharacterMetadata, getCharacterTags, getCharacterOverrides } from "@player/services/live/characterExtractor";
+import { xmlToComplexHtml, type CharacterBundleInfo } from "@player/services/live/xmlProcessor";
+import { extractCharacterMetadata } from "@player/services/live/characterExtractor";
 import { setBookDataStore, clearBookDataStore, type Note, type Variant } from "@player/state/bookDataStore";
+import { setListensToSpeaksUrls, setLiveAssetUrls } from "@player/utils/assetUrls";
 import type { BackgroundForBook, BackgroundSongSection, CharacterData, BookData, Chapter as ChapterTitle } from "@player/types/book";
 
 // =============================================================================
@@ -184,8 +185,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   const [chaptersData, setChaptersData] = useState<ChapterTitle[]>([]);
   const [charactersData, setCharactersData] = useState<CharacterData[]>([]);
   const [textVersion, setTextVersion] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processingError, setProcessingError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Chapter content cache
   const chapterContentCache = useRef<Map<string, string>>(new Map());
@@ -327,12 +327,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     if (!book) return null;
     const extra = book.extra;
 
-    return {
-      slug: bookSlug,
-      metadata: { title: book.name, author: extra?.author || "Unknown", language: extra?.language || "english", bookForm: extra?.form || "prose" },
-      chapters: chaptersData,
-      hasAudiobook: false,
-    };
+    return { slug: bookSlug, metadata: { title: book.name, author: extra.author, language: extra.language, bookForm: extra.form }, chapters: chaptersData, hasAudiobook: false };
   }, [book, bookSlug, chaptersData]);
 
   // Compute chapter version signature for change detection
@@ -384,8 +379,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
       console.log("[Convex:Flow] Starting chapter processing...", { chaptersCount: chapters.length, charactersCount: characters.length });
       isProcessingRef.current = true;
-      setIsProcessing(true);
-      setProcessingError(null);
+      setError(null);
 
       try {
         // Fetch XML content for each chapter
@@ -400,21 +394,21 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
         const validContents = chapterContents.filter((c): c is string => c !== null);
 
         if (validContents.length === 0) {
-          setProcessingError("No chapter content available");
+          setError("No chapter content available");
           isProcessingRef.current = false;
-          setIsProcessing(false);
           return;
         }
 
-        // Scan for character tags in XML
+        // Build set of known character slugs from Convex bundles (lowercase for matching)
+        const knownCharacterSlugs = new Set<string>();
+        for (const c of characters) {
+          knownCharacterSlugs.add(c.slug.toLowerCase());
+        }
+
+        // Scan for character tags in XML - only include tags that match known characters
         const tempXml = `<Book>${validContents.join("\n")}</Book>`;
         const tempParser = new DOMParser();
         const tempDoc = tempParser.parseFromString(tempXml, "text/xml");
-
-        const isLikelyCharacterTag = (tag: string) => {
-          const first = tag.charAt(0);
-          return first === first.toUpperCase() && /[A-Z]/.test(first);
-        };
 
         const actualCharacterTags = new Set<string>();
         const chaptersElements = tempDoc.getElementsByTagName("Chapter");
@@ -422,55 +416,36 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
           const walker = document.createTreeWalker(chapterEl, NodeFilter.SHOW_ELEMENT);
           let node: Node | null = walker.currentNode;
           while (node) {
-            if (node instanceof Element && isLikelyCharacterTag(node.tagName)) {
+            if (node instanceof Element && knownCharacterSlugs.has(node.tagName.toLowerCase())) {
               actualCharacterTags.add(node.tagName);
             }
             node = walker.nextNode();
           }
         }
 
-        // Build CharactersMaster from detected tags + bundle data
-        // Use characters from closure (captured when this function was created)
-        // This prevents race conditions where characters change mid-processing
-        const currentCharacters = characters;
-        const bundleLookup = new Map<string, { display: string; summary: string }>();
-        for (const char of currentCharacters) {
-          const extra = char.extra;
-          bundleLookup.set(char.slug.toLowerCase(), { display: extra?.displayName || char.name || char.slug, summary: extra?.summary || "" });
-        }
-
-        const escapeXml = (str: string) => str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-        let charactersMasterXml = "";
-        if (actualCharacterTags.size > 0) {
-          const characterElements = Array.from(actualCharacterTags).map((tag) => {
-            const bundleData = bundleLookup.get(tag.toLowerCase());
-            const display = escapeXml(bundleData?.display || tag);
-            const summary = escapeXml(bundleData?.summary || "");
-            return `<${tag} display="${display}" summary="${summary}"/>`;
-          });
-          charactersMasterXml = `<CharactersMaster>${characterElements.join("")}</CharactersMaster>`;
-        }
-
-        // Combine into full XML
-        const combinedXml = `<Book>${charactersMasterXml}${validContents.join("\n")}</Book>`;
+        // Combine chapters into full XML (no CharactersMaster - passed directly to processor)
+        const combinedXml = `<Book>${validContents.join("\n")}</Book>`;
 
         // Get book form and language
         const bookForm = book?.extra?.form || "prose";
         const bookLang = book?.extra?.language || "english";
 
-        // Process XML to HTML
-        const { htmlResult, chapterTitles } = xmlToComplexHtml(combinedXml, bookSlug, bookLang);
+        // Convert character bundles to the format expected by xmlToComplexHtml and extractCharacterMetadata
+        const characterBundles = characters.map((c) => ({ slug: c.slug, name: c.name, extra: c.extra, avatar: c.avatar, listens: c.listens, speaks: c.speaks }));
+
+        // Process XML to HTML - pass character bundles directly (no XML serialization)
+        const { htmlResult, chapterTitles } = xmlToComplexHtml(combinedXml, bookSlug, bookLang, characterBundles);
 
         setBookStringified(htmlResult);
         setChaptersData(chapterTitles.map((ct) => ({ id: ct.id, title: ct.title })));
 
-        // Extract character metadata
+        // Build character metadata directly from Convex bundles + chapter scanning
+        // This replaces the old CharactersMaster XML extraction
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(combinedXml, "text/xml");
-        const charTags = getCharacterTags(xmlDoc);
-        const charOverrides = getCharacterOverrides(xmlDoc);
-        const charMetadata = extractCharacterMetadata(xmlDoc, charTags, bookForm, bookSlug, charOverrides);
+
+        // Extract character metadata with display names and summaries from Convex bundles
+        const charMetadata = extractCharacterMetadata(xmlDoc, actualCharacterTags, bookForm, bookSlug, characterBundles);
         setCharactersData(charMetadata);
 
         // Update tracking
@@ -487,12 +462,10 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
         console.log("[Convex:Flow] Chapter processing complete");
         isProcessingRef.current = false;
-        setIsProcessing(false);
       } catch (e) {
         console.error("[BookConvexContext] Failed to process chapters:", e);
-        setProcessingError(e instanceof Error ? e.message : "Failed to process book content");
+        setError(e instanceof Error ? e.message : "Failed to process book content");
         isProcessingRef.current = false;
-        setIsProcessing(false);
       }
     },
     [chapters, characters, chapterVersionSignature, book, bookSlug, getChapterContent],
@@ -516,14 +489,67 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chaptersQuery, bookMetadata, charactersQuery, chapterVersionSignature]);
 
+  // Sync character metadata when Convex character bundles change (name/summary edits)
+  // This is separate from chapter processing - allows character edits to update instantly
+  // without reprocessing chapter HTML
+  useEffect(() => {
+    if (!characters.length || !initialLoadCompleteRef.current) return;
+
+    // Update charactersData with fresh displayName and summary from Convex bundles
+    // Keep existing infoPerChapter structure (from chapter scanning), just refresh the data
+    setCharactersData((prev) => {
+      if (prev.length === 0) return prev;
+
+      return prev.map((char) => {
+        // Case-insensitive slug matching (XML uses PascalCase, Convex uses lowercase)
+        const bundle = characters.find((c) => c.slug.toLowerCase() === char.slug.toLowerCase());
+        if (!bundle) return char;
+
+        const newSummary = bundle.extra.summary ?? "";
+
+        return {
+          ...char,
+          characterName: bundle.extra.displayName ?? bundle.name,
+          // Update summary in each chapter's info
+          infoPerChapter: char.infoPerChapter.map((chapterInfo) => ({ ...chapterInfo, summary: newSummary })),
+          // Update media URLs from Convex bundles
+          media: { avatarUrl: bundle.avatar?.url, listensUrl: bundle.listens?.url, speaksUrl: bundle.speaks?.url },
+        };
+      });
+    });
+  }, [characters]);
+
+  // Populate URL registries for CharacterMedia and normalizeSrcForInlineAvatar
+  useEffect(() => {
+    if (!characters.length) return;
+
+    // Build listens → speaks URL mapping
+    const listensToSpeaks = new Map<string, string>();
+    // Build video → avatar URL mapping
+    const videoToAvatar = new Map<string, string>();
+
+    for (const char of characters) {
+      if (char.listens?.url && char.speaks?.url) {
+        listensToSpeaks.set(char.listens.url, char.speaks.url);
+      }
+      if (char.listens?.url && char.avatar?.url) {
+        videoToAvatar.set(char.listens.url, char.avatar.url);
+      }
+      if (char.speaks?.url && char.avatar?.url) {
+        videoToAvatar.set(char.speaks.url, char.avatar.url);
+      }
+    }
+
+    setListensToSpeaksUrls(listensToSpeaks);
+    setLiveAssetUrls(new Map(), videoToAvatar);
+  }, [characters]);
+
   // Compute loading state
   const isLoading = bookMetadata === undefined || chaptersQuery === undefined || charactersQuery === undefined || backgroundsQuery === undefined || musicQuery === undefined;
 
   // Ready when initial load complete - don't go back to "not ready" during updates
   // Once we have content, we stay "ready" even while processing updates in the background
   const isReady = !isLoading && bookStringified !== null && initialLoadCompleteRef.current;
-
-  const error = processingError;
 
   const value = useMemo<BookConvexContextType>(
     () => ({

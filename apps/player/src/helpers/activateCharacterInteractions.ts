@@ -5,15 +5,11 @@ import { resolveCharacterSnapshot, parseChapterParagraphId } from "@player/utils
 import type { CharacterData, ChapterParagraphRef } from "@player/types/book";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 
-const charactersBySlug = new Map<string, CharacterData>();
-
+// Get character data by slug - always fresh from store (no stale cache)
 function getCharacterDataBySlug(slug: string): CharacterData | undefined {
-  if (!charactersBySlug.has(slug)) {
-    charactersBySlug.clear();
-    getCharactersData().forEach((character) => charactersBySlug.set(character.slug, character));
-  }
-
-  return charactersBySlug.get(slug);
+  const characters = getCharactersData();
+  // Case-insensitive matching (XML tags may differ in case from Convex slugs)
+  return characters.find((c) => c.slug.toLowerCase() === slug.toLowerCase());
 }
 
 function extractLocationFromElement(el: HTMLElement): ChapterParagraphRef | null {

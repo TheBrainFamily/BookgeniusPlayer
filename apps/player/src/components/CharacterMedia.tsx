@@ -23,30 +23,31 @@ const useVideoState = (mediaSrc: string, isVideo: boolean, isTalking?: boolean) 
   const [isListeningMode, setIsListeningMode] = useState<boolean>(true);
 
   useEffect(() => {
-    if (isVideo && videoListensSrc === null && videoSpeaksSrc === null && mediaSrc !== "") {
-      // Set up idle state video (listening mode)
-      setVideoListensLoaded(false);
-      setVideoListensSrc(mediaSrc);
+    if (!mediaSrc) return;
 
-      // Create talking state video path if possible
-      if (isVideoFile(mediaSrc)) {
-        // For live mode: look up the speaks URL from the registry
-        // Falls back to string replacement for static mode
-        const talkingSrc = getSpeaksUrlForListens(mediaSrc) || mediaSrc.replace("listens.mp4", "speaks.mp4");
-        setVideoSpeaksSrc(talkingSrc);
+    if (isVideo) {
+      // Detect when mediaSrc changed to a new URL (initial load or reactive update)
+      if (mediaSrc !== videoListensSrc) {
+        setVideoListensLoaded(false);
+        setVideoListensSrc(mediaSrc);
+
+        // Look up the speaks URL from the registry
+        const talkingSrc = getSpeaksUrlForListens(mediaSrc);
+        setVideoSpeaksSrc(talkingSrc ?? mediaSrc);
         setVideoSpeaksLoaded(false);
+        setIsListeningMode(true);
       }
-
-      setIsListeningMode(true);
-    } else if (!isVideo && mediaSrc) {
-      // Reset to image state
-      setVideoListensSrc(mediaSrc);
-      setVideoListensLoaded(true);
-      setVideoSpeaksSrc(null);
-      setVideoSpeaksLoaded(false);
-      setIsListeningMode(true);
+    } else {
+      // Image mode
+      if (mediaSrc !== videoListensSrc) {
+        setVideoListensSrc(mediaSrc);
+        setVideoListensLoaded(true);
+        setVideoSpeaksSrc(null);
+        setVideoSpeaksLoaded(false);
+        setIsListeningMode(true);
+      }
     }
-  }, [mediaSrc, isVideo]);
+  }, [mediaSrc, isVideo, videoListensSrc]);
 
   // Handle video source and talking state changes
   useEffect(() => {

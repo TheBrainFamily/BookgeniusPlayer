@@ -12,11 +12,6 @@ export const getPictureFileNameForName = (name: string) => {
   return `${getFileNameForName(name)}.png`;
 };
 
-// Legacy setter - no longer needed but kept for backward compatibility
-export const setKnownVideos = (_passedKnownVideos: string[]) => {
-  // No-op: knownVideos now comes from the store
-};
-
 export const getListeningMediaFilePathForName = (name: string, _bookSlug: string, forceKnown = false) => {
   const listensPath = `${getFileNameForName(name)}-listens.mp4`;
   const knownVideos = getKnownVideoFiles();

@@ -32,6 +32,17 @@ export interface SimpleCharacterMetadata {
   bookSlug: string;
   infoPerChapter: ChapterInfo[];
   overrides?: CharacterOverrideMetadata[];
+  media?: { avatarUrl?: string; listensUrl?: string; speaksUrl?: string };
+}
+
+/** Character bundle info passed from Convex */
+export interface CharacterBundleForExtractor {
+  slug: string;
+  name: string;
+  extra: { displayName?: string; summary?: string };
+  avatar?: { url: string };
+  listens?: { url: string };
+  speaks?: { url: string };
 }
 
 enum ListType {
@@ -160,50 +171,28 @@ export function getCharacterOverrides(doc: Document): Map<string, CharacterOverr
   return overridesMap;
 }
 
-const getSummaryForCharacter = (slug: string, doc: Document): string => {
-  try {
-    const masterElement = doc.getElementsByTagName("CharactersMaster")[0];
-
-    if (!masterElement) {
-      console.warn("Could not find <CharactersMaster> element.");
-      return "FIX ME";
-    }
-
-    for (let i = 0; i < masterElement.childNodes.length; i++) {
-      const node = masterElement.childNodes[i];
-      if (isElementNode(node) && node.tagName === slug) {
-        return node.getAttribute("summary") || "FIX ME";
-      }
-    }
-    console.warn(`Could not find character ${slug} in <CharactersMaster> element.`);
-    return "FIX ME";
-  } catch (error) {
-    console.error("Error parsing CharactersMaster XML:", error);
-    return "FIX ME";
+/**
+ * Get summary for a character from the bundles map.
+ * Uses case-insensitive slug matching since XML tags may differ in case from Convex slugs.
+ */
+const getSummaryForCharacter = (slug: string, bundlesBySlug: Map<string, CharacterBundleForExtractor>): string => {
+  const bundle = bundlesBySlug.get(slug.toLowerCase());
+  if (!bundle) {
+    throw new Error(`Character bundle not found for slug: ${slug}`);
   }
+  return bundle.extra.summary ?? "";
 };
 
-const getDisplayForCharacter = (slug: string, doc: Document): string => {
-  try {
-    const masterElement = doc.getElementsByTagName("CharactersMaster")[0];
-
-    if (!masterElement) {
-      console.warn("Could not find <CharactersMaster> element.");
-      return "FIX ME";
-    }
-
-    for (let i = 0; i < masterElement.childNodes.length; i++) {
-      const node = masterElement.childNodes[i];
-      if (isElementNode(node) && node.tagName === slug) {
-        return node.getAttribute("display") || "FIX ME";
-      }
-    }
-    console.warn(`Could not find character ${slug} in <CharactersMaster> element.`);
-    return "FIX ME";
-  } catch (error) {
-    console.error("Error parsing CharactersMaster XML:", error);
-    return "FIX ME";
+/**
+ * Get display name for a character from the bundles map.
+ * Uses case-insensitive slug matching since XML tags may differ in case from Convex slugs.
+ */
+const getDisplayForCharacter = (slug: string, bundlesBySlug: Map<string, CharacterBundleForExtractor>): string => {
+  const bundle = bundlesBySlug.get(slug.toLowerCase());
+  if (!bundle) {
+    throw new Error(`Character bundle not found for slug: ${slug}`);
   }
+  return bundle.extra.displayName ?? bundle.name;
 };
 
 /**
@@ -216,6 +205,7 @@ const getDisplayForCharacter = (slug: string, doc: Document): string => {
  * @param characterTags - Set of known character tag names
  * @param bookForm - Book format ("play", "mixed", or "prose")
  * @param bookSlug - Book's slug identifier
+ * @param characterBundles - Character bundle data from Convex (for display names and summaries)
  * @param characterOverrides - Optional override data per character
  */
 export function extractCharacterMetadata(
@@ -223,12 +213,26 @@ export function extractCharacterMetadata(
   characterTags: Set<string>,
   bookForm: string,
   bookSlug: string,
+  characterBundles: CharacterBundleForExtractor[],
   characterOverrides?: Map<string, CharacterOverrideMetadata[]>,
 ): SimpleCharacterMetadata[] {
   const resultsMap = new Map<string, SimpleCharacterMetadata>();
 
+  // Build lookup map by lowercase slug for case-insensitive matching
+  const bundlesBySlug = new Map<string, CharacterBundleForExtractor>();
+  for (const bundle of characterBundles) {
+    bundlesBySlug.set(bundle.slug.toLowerCase(), bundle);
+  }
+
   characterTags.forEach((tag) => {
-    const base: SimpleCharacterMetadata = { slug: tag, characterName: getDisplayForCharacter(tag, doc), bookSlug, infoPerChapter: [] };
+    const bundle = bundlesBySlug.get(tag.toLowerCase());
+    const base: SimpleCharacterMetadata = {
+      slug: tag,
+      characterName: getDisplayForCharacter(tag, bundlesBySlug),
+      bookSlug,
+      infoPerChapter: [],
+      media: { avatarUrl: bundle?.avatar?.url, listensUrl: bundle?.listens?.url, speaksUrl: bundle?.speaks?.url },
+    };
 
     const overrides = characterOverrides?.get(tag);
     if (overrides && overrides.length > 0) {
@@ -303,7 +307,7 @@ export function extractCharacterMetadata(
 
             let chapterEntry = data.infoPerChapter.find((info) => info.chapter === chapterId);
             if (!chapterEntry) {
-              chapterEntry = { chapter: chapterId, summary: getSummaryForCharacter(charTag, doc), paragraphsWhereSpotted: [], paragraphsWhereTalking: [] };
+              chapterEntry = { chapter: chapterId, summary: getSummaryForCharacter(charTag, bundlesBySlug), paragraphsWhereSpotted: [], paragraphsWhereTalking: [] };
               if (bookForm === "play" || bookForm === "mixed") {
                 chapterEntry.paragraphsWhereEnters = [];
                 chapterEntry.paragraphsWhereExits = [];

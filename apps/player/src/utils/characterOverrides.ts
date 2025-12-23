@@ -1,5 +1,4 @@
 import { CharacterData, CharacterOverride, ChapterParagraphRef } from "@player/types/book";
-import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@player/utils/getFilePathsForName";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
 
 const LOCATION_REGEX = /^ch(\d+)-p(\d+)$/i;
@@ -85,14 +84,16 @@ export const resolveCharacterSnapshot = (character: CharacterData, { location = 
   let explicitAssetUrl: string | undefined;
 
   if (usesExplicitAsset && avatarValue) {
+    // Override with explicit asset file
     explicitAssetUrl = getBookAssetUrl(avatarValue);
     listening = explicitAssetUrl;
     talking = explicitAssetUrl;
     baseNameUsed = avatarValue;
   } else {
-    baseNameUsed = avatarValue && avatarValue.length > 0 ? avatarValue : character.slug;
-    listening = getListeningMediaFilePathForName(baseNameUsed, character.bookSlug);
-    talking = getTalkingMediaFilePathForName(baseNameUsed, character.bookSlug);
+    // Use Convex URLs directly
+    listening = character.media?.listensUrl ?? character.media?.avatarUrl ?? "";
+    talking = character.media?.speaksUrl ?? character.media?.listensUrl ?? character.media?.avatarUrl ?? "";
+    baseNameUsed = character.slug;
   }
 
   return { displayName, summary, override, media: { listening, talking, usesExplicitAsset: usesExplicitAsset && Boolean(explicitAssetUrl), baseNameUsed, explicitAssetUrl } };

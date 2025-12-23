@@ -1,6 +1,4 @@
-import { getCharactersData, getBookData } from "@player/state/bookDataStore";
-import { normalizeSrcForInlineAvatar } from "@player/ui/highlightCharacter";
-import { getListeningMediaFilePathForName } from "@player/utils/getFilePathsForName";
+import { getCharactersData } from "@player/state/bookDataStore";
 
 export const replaceXmlTagsIntoHtmlTags = (text: string, isPlayFormat: boolean, isFirstSentence: boolean = true) => {
   const characters = getCharactersData(); // Get characters data once
@@ -68,11 +66,9 @@ export const replaceXmlTagsIntoHtmlTags = (text: string, isPlayFormat: boolean, 
         .map(([key, value]) => `${key}="${value}"`)
         .join(" ");
 
-      const bookData = getBookData();
-      if (!bookData) {
-        throw new Error("[replaceXmlTagsIntoHtmlTags] bookData is null - store not initialized");
-      }
-      const imgTag = `<img src="${normalizeSrcForInlineAvatar(getListeningMediaFilePathForName(foundCharacter.slug, bookData.slug))}" class="inline-avatar" data-character="${foundCharacter.slug}" title="${foundCharacter.slug}" />`;
+      // Use Convex media URLs directly
+      const avatarSrc = foundCharacter.media?.avatarUrl ?? foundCharacter.media?.listensUrl ?? "";
+      const imgTag = `<img src="${avatarSrc}" class="inline-avatar" data-character="${foundCharacter.slug}" title="${foundCharacter.slug}" />`;
 
       return `<span ${attributeString}>${imgTag}</span>`;
     });

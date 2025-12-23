@@ -22,7 +22,9 @@ export type ChapterParagraphRef = { chapter: number; paragraph: number };
 
 export type CharacterOverride = { from: ChapterParagraphRef; to?: ChapterParagraphRef; summary?: string; display?: string; avatar?: string };
 
-export type CharacterData = { slug: string; characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; overrides?: CharacterOverride[] };
+export type CharacterMedia = { avatarUrl?: string; listensUrl?: string; speaksUrl?: string };
+
+export type CharacterData = { slug: string; characterName: string; bookSlug: string; infoPerChapter: InfoPerChapter[]; overrides?: CharacterOverride[]; media?: CharacterMedia };
 
 type BookMetadata = { title: string; author: string; language?: string; bookForm?: string };
 

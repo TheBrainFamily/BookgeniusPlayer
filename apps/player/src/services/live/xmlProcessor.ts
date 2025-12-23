@@ -9,6 +9,7 @@
  */
 
 import { wrapPunctuationAdvanced } from "@books-generator/data/wrapPunctuation";
+import { isElementNode, isTextNode, isLikelyCharacterTag, renderLineBreakSpan, renderEmElement, type InlineRenderOptions } from "@player/services/xmlDomHelpers";
 
 // Re-export for convenience
 export { wrapPunctuationAdvanced };
@@ -20,43 +21,12 @@ export { wrapPunctuationAdvanced };
 type CharacterInfo = { display: string };
 
 // =============================================================================
-// Helper Functions (ported from xmlToComplexHtml.ts)
+// Helper Functions
 // =============================================================================
 
-const LINE_BREAK_SPAN = '<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>';
-const renderLineBreakSpan = () => LINE_BREAK_SPAN;
-
-const isElementNode = (node: Node): node is Element => node.nodeType === Node.ELEMENT_NODE;
-const isTextNode = (node: Node): node is Text => node.nodeType === Node.TEXT_NODE;
 const startsWithUppercase = (value: string): boolean => value.charAt(0) === value.charAt(0).toUpperCase();
 
-const isLikelyCharacterTag = (tag: string) => {
-  const first = tag.charAt(0);
-  return first === first.toUpperCase() && /[A-Z]/.test(first);
-};
-
 const getTitleText = (el?: Element | null) => (el ? (el.textContent || "").trim() : "");
-
-const renderEmElement = (element: Element): string => {
-  let emInner = "";
-  for (const emChild of Array.from(element.childNodes)) {
-    if (isTextNode(emChild)) {
-      emInner += emChild.textContent || "";
-    } else if (isElementNode(emChild)) {
-      if (emChild.tagName === "LineBreak") {
-        emInner += renderLineBreakSpan();
-      } else {
-        emInner += emChild.textContent || "";
-      }
-    }
-  }
-  if (element.hasAttribute("class")) {
-    return `<em class="${element.getAttribute("class")}">${emInner}</em>`;
-  }
-  return `<em>${emInner}</em>`;
-};
-
-type InlineRenderOptions = { bookSlug: string; includeBookSlugInImgSrc?: boolean };
 
 const renderStandardInlineElement = (element: Element, options: InlineRenderOptions): string => {
   const tagName = element.tagName.toLowerCase() === element.tagName ? element.tagName : element.tagName;
@@ -554,25 +524,40 @@ const preprocessMixedDocument = (xmlDoc: Document, characterMap: Map<string, Cha
 // Character Map Extraction
 // =============================================================================
 
-const getCharacterMap = (xmlDoc: Document): Map<string, CharacterInfo> => {
-  const charactersMaster = xmlDoc.getElementsByTagName("CharactersMaster")[0];
+/**
+ * Character bundle data from Convex
+ */
+export type CharacterBundleInfo = {
+  slug: string;
+  name: string;
+  extra: { displayName?: string; summary?: string };
+  avatar?: { url: string };
+  listens?: { url: string };
+  speaks?: { url: string };
+};
+
+/**
+ * Build character map from Convex character bundles.
+ * This replaces the old XML-based CharactersMaster extraction.
+ */
+const buildCharacterMapFromBundles = (bundles: CharacterBundleInfo[], xmlDoc: Document): Map<string, CharacterInfo> => {
   const characterMap = new Map<string, CharacterInfo>();
-  if (charactersMaster) {
-    for (let i = 0; i < charactersMaster.childNodes.length; i++) {
-      const node = charactersMaster.childNodes[i];
-      if (isElementNode(node)) {
-        const tagName = node.tagName;
-        const display = node.getAttribute("display") || tagName.replace(/-/g, " ");
-        characterMap.set(tagName, { display });
-      }
-    }
+
+  // Build lookup by lowercase slug for case-insensitive matching
+  const bundleBySlug = new Map<string, CharacterBundleInfo>();
+  for (const bundle of bundles) {
+    bundleBySlug.set(bundle.slug.toLowerCase(), bundle);
   }
 
+  // Scan document for actual character tags used
   const allEls = xmlDoc.getElementsByTagName("*");
   for (let i = 0; i < allEls.length; i++) {
-    const t = allEls[i].tagName;
-    if (isLikelyCharacterTag(t) && !characterMap.has(t)) {
-      characterMap.set(t, { display: t.replace(/-/g, " ") });
+    const tagName = allEls[i].tagName;
+    if (isLikelyCharacterTag(tagName) && !characterMap.has(tagName)) {
+      // Look up display name from Convex bundle (case-insensitive)
+      const bundle = bundleBySlug.get(tagName.toLowerCase());
+      const display = bundle?.extra.displayName ?? bundle?.name ?? tagName.replace(/-/g, " ");
+      characterMap.set(tagName, { display });
     }
   }
 
@@ -829,7 +814,12 @@ const ensureProperPolishTextBreaking = (html: string): string => {
  * @param bookLang - The book's language ("english", "polish", etc.)
  * @returns Object with htmlResult and chapterTitles
  */
-export const xmlToComplexHtml = (xmlString: string, bookSlug: string, bookLang: string): { htmlResult: string; chapterTitles: Array<{ id: string; title: string }> } => {
+export const xmlToComplexHtml = (
+  xmlString: string,
+  bookSlug: string,
+  bookLang: string,
+  characterBundles: CharacterBundleInfo[],
+): { htmlResult: string; chapterTitles: Array<{ id: string; title: string }> } => {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xmlString, "text/xml");
 
@@ -840,7 +830,8 @@ export const xmlToComplexHtml = (xmlString: string, bookSlug: string, bookLang: 
     throw new Error(`XML parse error: ${parseError.textContent}`);
   }
 
-  const characterMap = getCharacterMap(xmlDoc);
+  // Build character map from Convex bundles
+  const characterMap = buildCharacterMapFromBundles(characterBundles, xmlDoc);
 
   const bookForm = xmlDoc.getElementsByTagName("Form")[0];
   const bookFormValue = bookForm ? bookForm.textContent : "";
