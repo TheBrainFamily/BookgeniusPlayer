@@ -8,5 +8,12 @@ import tailwind from "@tailwindcss/vite";
 export default defineConfig(({ mode }) => ({
   server: { host: "::", port: 8080 },
   plugins: [react(), mode === "development" && componentTagger(), tailwind()].filter(Boolean),
-  resolve: { alias: { "@wukong": path.resolve(__dirname, "./src"), "@platform": path.resolve(__dirname, "../platform/src"), "@player": path.resolve(__dirname, "../player/src") } },
+  resolve: {
+    alias: {
+      "@wukong": path.resolve(__dirname, "./src"),
+      "@platform": path.resolve(__dirname, "../platform/src"),
+      "@player": path.resolve(__dirname, "../player/src"),
+      "@convex": path.resolve(__dirname, "../../convex"),
+    },
+  },
 }));
