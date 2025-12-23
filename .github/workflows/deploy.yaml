@@ -96,40 +96,28 @@ jobs:
       - name: Initial git lfs pull for wukong files
         run: git lfs pull -I "apps/wukong/**"
 
-      - name: Selective git lfs pull
-        if: ${{ steps.changed.outputs.rebuild_all == '1' || steps.changed.outputs.books_csv != '' }}
-        run: |
-          if [[ "${{ steps.changed.outputs.rebuild_all }}" == "1" ]]; then
-            git lfs pull -I "books/**"
-          else
-            IFS=, read -ra arr <<< "${{ steps.changed.outputs.books_csv }}"
-            include=$(printf 'books/%s/**,' "${arr[@]}")
-            git lfs pull -I "${include%,}"
-          fi
-
       - name: Export change set
         run: |
-          echo "CHANGED_BOOKS=${{ steps.changed.outputs.books_csv }}" >> $GITHUB_ENV
-          echo "REBUILD_ALL=${{ steps.changed.outputs.rebuild_all }}" >> $GITHUB_ENV
           echo "VITE_BUILD_TIME=${{ env.ASSET_CONTEXT }}-$(date +%s)" >> $GITHUB_ENV
 
-      - uses: pnpm/action-setup@v4
+      # - uses: pnpm/action-setup@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "pnpm"
+      # - uses: actions/setup-node@v4
+      #   with:
+      #     node-version: "20"
+      #     cache: "pnpm"
 
       - name: Setup Bun and install dependencies
         uses: oven-sh/setup-bun@v1
-      - run: pnpm install
+      - run: bun install --frozen-lockfile
 
       #      - name: Build local artifacts (for S3 upload)
       #        run: pnpm build:docker
 
       - name: Build web apps
-        run: pnpm build:front-parallel
+        run: bun build:front-parallel
         env:
+          VITE_CONVEX_URL: ${{ vars.VITE_CONVEX_URL }}
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
@@ -144,8 +132,9 @@ jobs:
         run: mv apps/platform/dist apps/platform/dist-intl
 
       - name: Build wukong
-        run: pnpm build:wukong
+        run: bun build:wukong
         env:
+          VITE_CONVEX_URL: ${{ vars.VITE_CONVEX_URL }}
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
@@ -158,8 +147,9 @@ jobs:
           CI: true
 
       - name: Build snapplify platform
-        run: pnpm build:platform
+        run: bun build:platform
         env:
+          VITE_CONVEX_URL: ${{ vars.VITE_CONVEX_URL }}
           VITE_AUTH_PROVIDER: "snapplify"
           VITE_PAYMENTS_PROVIDER: "default"
           VITE_SUPPORT_EMAIL: "support@snapplify.com"
@@ -173,8 +163,9 @@ jobs:
         run: mv apps/platform/dist apps/platform/dist-snapplify
 
       - name: build bookgeniusz.pl
-        run: pnpm build:platform
+        run: bun build:platform
         env:
+          VITE_CONVEX_URL: ${{ vars.VITE_CONVEX_URL }}
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_BOOKGENIUSZ_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_BOOKGENIUSZ_SECRET_KEY }}
           VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
@@ -186,17 +177,8 @@ jobs:
           VITE_IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
           CI: true
 
-      - name: Build books
-        if: ${{ env.REBUILD_ALL == '1' || env.CHANGED_BOOKS != '' }}
-        run: |
-          if [[ "$REBUILD_ALL" == "1" ]]; then
-            pnpm process-all-books
-          else
-            pnpm process-all-books -- --only="$CHANGED_BOOKS"
-          fi
-
       - name: Prepare s3 folder
-        run: pnpm prepare:docker
+        run: bun prepare:docker
 
       - name: Deploy assets to S3
         env:
@@ -208,30 +190,3 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           DOMAIN: ${{ env.DOMAIN }}
         run: bash ./update-cloudflare.sh
-
-      - name: Emit deployed books list
-        # only when some books were considered (changed or all)
-        if: ${{ env.REBUILD_ALL == '1' || env.CHANGED_BOOKS != '' }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p out
-          if [[ "${REBUILD_ALL}" == "1" ]]; then
-            # list all slugs from repo
-            mapfile -t books < <(ls -1 compiled-books | sed '/^\./d' | sort)
-            printf '%s\n' "${books[@]}" \
-              | jq -R . | jq -s '{all:true, books:.}' > out/deployed_books.json
-          else
-            IFS=, read -ra arr <<< "${CHANGED_BOOKS}"
-            printf '%s\n' "${arr[@]}" | sed '/^$/d' \
-              | sort -u | jq -R . | jq -s '{all:false, books:.}' > out/deployed_books.json
-          fi
-          jq . out/deployed_books.json
-
-      - name: Upload deployed-books artifact
-        if: ${{ env.REBUILD_ALL == '1' || env.CHANGED_BOOKS != '' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: deployed-books
-          path: out/deployed_books.json
-          retention-days: 7
