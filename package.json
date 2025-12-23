@@ -6,22 +6,22 @@
   "main": "index.js",
   "scripts": {
     "prepare": "husky",
-    "dev:player": "pnpm --filter player dev",
-    "dev:editor": "pnpm --filter editor dev",
-    "build:player:docker": "pnpm --filter player build-for-docker",
-    "build:player:front": "pnpm --filter player build-for-docker-front",
-    "build:platform": "pnpm --filter platform build",
-    "build:wukong": "pnpm --filter wukong build",
-    "prepare:docker": "bun run ./tools/scripts/prepare-docker-build.ts",
-    "build:front-parallel": "run-p build:player:front build:platform",
-    "prettier:check": "pnpm pnpm -r --if-present prettier:check",
-    "process-all-books": "pnpm --filter player process-all-books",
-    "update-prod-versions": "bun run ./tools/scripts/update-prod-versions.ts",
-    "cleanup-books-assets": "bun run ./tools/scripts/cleanup-books-assets.ts",
-    "lint": "pnpm pnpm -r --if-present lint",
-    "lint:ci": "pnpm pnpm -r --if-present lint:ci",
-    "typecheck": "pnpm pnpm -r --if-present typecheck",
-    "typecheck:ci": "pnpm pnpm -r --if-present typecheck:ci"
+    "dev:player": "bun --filter player dev",
+    "dev:editor": "bun --filter editor dev",
+    "build:player:docker": "bun --filter player build-for-docker",
+    "build:player:front": "bun --filter player build-for-docker-front",
+    "build:platform": "bun --filter platform build",
+    "build:wukong": "bun --filter wukong build",
+    "prepare:docker": "bun ./tools/scripts/prepare-docker-build.ts",
+    "build:front-parallel": "bun --filter player --filter platform build-for-docker-front build",
+    "prettier:check": "bun --filter '*' prettier:check",
+    "process-all-books": "bun --filter player process-all-books",
+    "update-prod-versions": "bun ./tools/scripts/update-prod-versions.ts",
+    "cleanup-books-assets": "bun ./tools/scripts/cleanup-books-assets.ts",
+    "lint": "bun --filter '*' lint",
+    "lint:ci": "bun --filter '*' lint:ci",
+    "typecheck": "bun --filter '*' typecheck",
+    "typecheck:ci": "bun --filter '*' typecheck:ci"
   },
   "keywords": [],
   "author": "",
@@ -49,14 +49,12 @@
     "typescript-eslint": "^8.39.1",
     "vitest": "^4.0.16"
   },
-  "pnpm": {
-    "overrides": {
-      "typescript": "5.8.2",
-      "react": "19.1.1",
-      "react-dom": "19.1.1",
-      "@types/react": "19.1.10",
-      "@types/react-dom": "19.1.7"
-    }
+  "overrides": {
+    "typescript": "5.8.2",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "@types/react": "19.1.10",
+    "@types/react-dom": "19.1.7"
   },
   "lint-staged": {
     "apps/**/*.{js,jsx,ts,tsx,json,md,yml}": [
@@ -65,5 +63,8 @@
   },
   "dependencies": {
     "@convex-dev/r2": "^0.8.1"
-  }
+  },
+  "workspaces": [
+    "apps/*"
+  ]
 }

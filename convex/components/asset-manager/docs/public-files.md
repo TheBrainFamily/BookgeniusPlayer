@@ -5,6 +5,7 @@ This guide covers serving public files through Cloudflare's CDN for maximum perf
 ## Overview
 
 For public files (no auth required), the asset-manager provides:
+
 - **Direct CDN URLs**: Files served from Cloudflare's edge network
 - **Versioned paths**: Each version has a unique URL for cache invalidation
 - **Reactive queries**: UI updates automatically when files change
@@ -37,6 +38,7 @@ For public files (no auth required), the asset-manager provides:
 ## URL Structure
 
 Public files use this URL pattern:
+
 ```
 https://cdn.yourdomain.com/{r2KeyPrefix}/{intentId}/{filename}
 ```
@@ -46,6 +48,7 @@ https://cdn.yourdomain.com/{r2KeyPrefix}/{intentId}/{filename}
 - **filename**: Original filename (human-readable URLs)
 
 Example:
+
 ```
 https://assets.myapp.com/myapp/k57x9m2n4p/background-music.mp3
 ```
@@ -56,14 +59,11 @@ https://assets.myapp.com/myapp/k57x9m2n4p/background-music.mp3
 
 ```typescript
 // Run once to configure storage backend
-await ctx.runMutation(
-  components.assetManager.assetManager.configureStorageBackend,
-  {
-    backend: "r2",
-    r2PublicUrl: "https://assets.yourdomain.com",
-    r2KeyPrefix: "myapp", // Optional
-  }
-);
+await ctx.runMutation(components.assetManager.assetManager.configureStorageBackend, {
+  backend: "r2",
+  r2PublicUrl: "https://assets.yourdomain.com",
+  r2KeyPrefix: "myapp", // Optional
+});
 ```
 
 ### Step 2: Query for Public File URL
@@ -77,27 +77,21 @@ import { components } from "./_generated/api";
 import { v } from "convex/values";
 
 export const getPublicFile = query({
-  args: {
-    folderPath: v.string(),
-    basename: v.string(),
-  },
+  args: { folderPath: v.string(), basename: v.string() },
   handler: async (ctx, { folderPath, basename }) => {
-    return await ctx.runQuery(
-      components.assetManager.assetManager.getPublishedFile,
-      { folderPath, basename }
-    );
+    return await ctx.runQuery(components.assetManager.assetManager.getPublishedFile, {
+      folderPath,
+      basename,
+    });
   },
 });
 
 export const listPublicFiles = query({
-  args: {
-    folderPath: v.string(),
-  },
+  args: { folderPath: v.string() },
   handler: async (ctx, { folderPath }) => {
-    return await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath }
-    );
+    return await ctx.runQuery(components.assetManager.assetManager.listPublishedFilesInFolder, {
+      folderPath,
+    });
   },
 });
 ```
@@ -192,6 +186,7 @@ The old version (`abc123`) stays cached at CDN but is no longer referenced.
 ### CDN Layer (Cloudflare)
 
 Files at versioned URLs are cached indefinitely:
+
 - URL contains intentId, so content never changes at that URL
 - Cloudflare caches at edge locations globally
 - Cache-Control: `public, max-age=31536000, immutable`
@@ -199,12 +194,14 @@ Files at versioned URLs are cached indefinitely:
 ### Browser Layer
 
 Browsers also cache based on URL:
+
 - New version = new URL = fresh fetch
 - Same version = same URL = served from browser cache
 
 ### Cache Invalidation
 
 You don't need to manually invalidate caches:
+
 - Each new version gets a new intentId
 - New intentId = new URL
 - Old cached content is simply never requested again
@@ -228,39 +225,25 @@ function getR2Config() {
 }
 
 export const startUpload = mutation({
-  args: {
-    folderPath: v.string(),
-    basename: v.string(),
-    filename: v.string(),
-  },
+  args: { folderPath: v.string(), basename: v.string(), filename: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runMutation(
-      components.assetManager.assetManager.startUpload,
-      {
-        ...args,
-        publish: true, // Immediately publish
-        r2Config: getR2Config(),
-      }
-    );
+    return await ctx.runMutation(components.assetManager.assetManager.startUpload, {
+      ...args,
+      publish: true, // Immediately publish
+      r2Config: getR2Config(),
+    });
   },
 });
 
 export const finishUpload = mutation({
-  args: {
-    intentId: v.string(),
-    size: v.number(),
-    contentType: v.string(),
-  },
+  args: { intentId: v.string(), size: v.number(), contentType: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runMutation(
-      components.assetManager.assetManager.finishUpload,
-      {
-        intentId: args.intentId as any,
-        size: args.size,
-        contentType: args.contentType,
-        r2Config: getR2Config(),
-      }
-    );
+    return await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
+      intentId: args.intentId as any,
+      size: args.size,
+      contentType: args.contentType,
+      r2Config: getR2Config(),
+    });
   },
 });
 ```
@@ -269,29 +252,16 @@ export const finishUpload = mutation({
 
 ```typescript
 // lib/upload.ts
-async function uploadPublicFile(
-  file: File,
-  folderPath: string,
-  basename: string
-) {
+async function uploadPublicFile(file: File, folderPath: string, basename: string) {
   // 1. Start upload - get presigned URL
-  const { intentId, uploadUrl, backend } = await convex.mutation(
-    api.uploads.startUpload,
-    {
-      folderPath,
-      basename,
-      filename: file.name,
-    }
-  );
+  const { intentId, uploadUrl, backend } = await convex.mutation(api.uploads.startUpload, {
+    folderPath,
+    basename,
+    filename: file.name,
+  });
 
   // 2. Upload to R2 (use PUT, not POST)
-  await fetch(uploadUrl, {
-    method: "PUT",
-    body: file,
-    headers: {
-      "Content-Type": file.type,
-    },
-  });
+  await fetch(uploadUrl, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
 
   // 3. Finish upload - create version record
   const result = await convex.mutation(api.uploads.finishUpload, {
@@ -342,11 +312,19 @@ function ResponsiveImage({ folderPath, basename }: Props) {
     basename: `${basename}-full`,
   });
 
+  const thumbUrl = thumbnail?.url ?? "";
+  const fullUrl = full?.url ?? "";
+
+  const srcSetParts: string[] = [];
+  if (thumbUrl) srcSetParts.push(`${thumbUrl} 400w`);
+  if (fullUrl) srcSetParts.push(`${fullUrl} 1200w`);
+  const srcSet = srcSetParts.length > 0 ? srcSetParts.join(", ") : undefined;
+
   return (
     <img
-      src={thumbnail?.url}
-      srcSet={`${thumbnail?.url} 400w, ${full?.url} 1200w`}
-      sizes="(max-width: 600px) 400px, 1200px"
+      src={thumbUrl || fullUrl || undefined}
+      srcSet={srcSet}
+      sizes={srcSet ? "(max-width: 600px) 400px, 1200px" : undefined}
       alt=""
     />
   );
@@ -359,25 +337,19 @@ function ResponsiveImage({ folderPath, basename }: Props) {
 function LazyImage({ folderPath, basename }: Props) {
   const file = useQuery(api.publicFiles.getPublicFile, { folderPath, basename });
 
-  return (
-    <img
-      src={file?.url}
-      loading="lazy"
-      alt=""
-    />
-  );
+  return <img src={file?.url} loading="lazy" alt="" />;
 }
 ```
 
 ## Comparison: Public vs Private Files
 
-| Aspect | Public Files | Private Files |
-|--------|-------------|---------------|
-| Auth required | No | Yes |
-| URL type | Direct CDN URL | Signed URL via HTTP endpoint |
-| Caching | CDN + Browser | Browser only (signed URL expires) |
-| Performance | Fastest (edge-cached) | Slight overhead (auth + signing) |
-| Use case | Marketing, public content | User data, premium content |
+| Aspect        | Public Files              | Private Files                     |
+| ------------- | ------------------------- | --------------------------------- |
+| Auth required | No                        | Yes                               |
+| URL type      | Direct CDN URL            | Signed URL via HTTP endpoint      |
+| Caching       | CDN + Browser             | Browser only (signed URL expires) |
+| Performance   | Fastest (edge-cached)     | Slight overhead (auth + signing)  |
+| Use case      | Marketing, public content | User data, premium content        |
 
 ## Next Steps
 
