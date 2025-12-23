@@ -8,7 +8,7 @@
  * DOMParser instantiation adapted for the browser environment.
  */
 
-import { wrapPunctuationAdvanced } from "@books-generator/data/wrapPunctuation";
+import { wrapPunctuationAdvanced } from "../wrapPunctuation";
 import { isElementNode, isTextNode, isLikelyCharacterTag, renderLineBreakSpan, renderEmElement, type InlineRenderOptions } from "@player/services/xmlDomHelpers";
 
 // Re-export for convenience

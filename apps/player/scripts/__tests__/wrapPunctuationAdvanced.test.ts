@@ -1,4 +1,4 @@
-import { wrapPunctuationAdvanced } from "../../../books-generator/src/data/wrapPunctuation";
+import { wrapPunctuationAdvanced } from "../../src/services/wrapPunctuation";
 
 describe("wrapPunctuationAdvanced", () => {
   it("wraps punctuation that directly follows a highlighted character mid-sentence", () => {

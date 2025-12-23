@@ -1,6 +1,6 @@
 import { DOMParser, Element as XMLElement, Document, Element, Node, XMLSerializer, LiveNodeList } from "@xmldom/xmldom";
 
-import { wrapPunctuationAdvanced } from "./wrapPunctuation";
+import { wrapPunctuationAdvanced } from "../../../player/src/services/wrapPunctuation";
 
 const LINE_BREAK_SPAN = '<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>';
 

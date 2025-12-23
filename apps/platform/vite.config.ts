@@ -8,5 +8,5 @@ import tailwind from "@tailwindcss/vite";
 export default defineConfig(({ mode }) => ({
   server: { host: "::", port: 8080, proxy: { "/api": "http://localhost" } },
   plugins: [react(), mode === "development" && componentTagger(), tailwind()].filter(Boolean),
-  resolve: { alias: { "@platform": path.resolve(__dirname, "./src"), "@player": path.resolve(__dirname, "../player/src") } },
+  resolve: { alias: { "@platform": path.resolve(__dirname, "./src"), "@player": path.resolve(__dirname, "../player/src"), "@convex": path.resolve(__dirname, "../../convex") } },
 }));

@@ -8,7 +8,7 @@
  * rather than concatenating all chapters into one big XML document.
  */
 
-import { wrapPunctuationAdvanced } from "@books-generator/data/wrapPunctuation";
+import { wrapPunctuationAdvanced } from "./wrapPunctuation";
 import { isElementNode, isTextNode, isLikelyCharacterTag, renderLineBreakSpan, renderEmElement, type InlineRenderOptions } from "@player/services/xmlDomHelpers";
 
 // =============================================================================

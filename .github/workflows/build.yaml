@@ -11,23 +11,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: false
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.13.1 # match your local pnpm
-          run_install: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22.17.1"
-          cache: "pnpm"
 
       - run: corepack enable
+      - name: Setup Bun and install dependencies
+        uses: oven-sh/setup-bun@v1
 
-      - run: pnpm -v && node -v
-
-      - run: pnpm install --frozen-lockfile
-      # - run: pnpm test
-      - run: pnpm typecheck:ci
-      - run: pnpm lint:ci
-      - run: pnpm prettier:check
-      # - name: Build project
-      #   run: pnpm build public_books/Krolowa-Sniegu
+      - run: bun install --frozen-lockfile
+      - run: bun typecheck:ci
+      - run: bun lint:ci
+      - run: bun prettier:check

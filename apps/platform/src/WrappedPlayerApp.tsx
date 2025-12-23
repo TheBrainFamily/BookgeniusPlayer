@@ -4,7 +4,6 @@ import { createPortal } from "react-dom";
 
 import { useRouteTransition } from "./providers/RouteTransitionProvider";
 import { books } from "@platform/books";
-import { bookDataLoader } from "../../player/src/services/bookDataLoader";
 import { unloadBookColorsCSS } from "../../player/src/utils/loadBookColors";
 import Paywall from "./components/Paywall";
 import AuthRequiredModal from "./components/AuthRequiredModal";
@@ -141,7 +140,7 @@ const WrappedPlayerApp = () => {
 
       lastBookRef.current = book;
       unloadBookColorsCSS();
-      bookDataLoader.resetCurrentBook();
+      // bookDataLoader.resetCurrentBook();
 
       // If overlay has ALREADY started on the platform, do NOT start it again here.
       // This avoids double startTransition when navigating from the grid.
@@ -162,7 +161,7 @@ const WrappedPlayerApp = () => {
         return;
       }
 
-      bookDataLoader.setCurrentBook(book);
+      // bookDataLoader.setCurrentBook(book);
     }
   }, [book, navigatedFromPlatform, navigating, startTransition, handleStartClick]);
 
@@ -173,7 +172,7 @@ const WrappedPlayerApp = () => {
     }
 
     if (import.meta.env.DEV) {
-      bookDataLoader.setAssetBase(`/books/${book}/`);
+      // bookDataLoader.setAssetBase(`/books/${book}/`);
       setAssetBaseReady(true);
       return;
     }
@@ -209,17 +208,17 @@ const WrappedPlayerApp = () => {
         credentials = "omit";
       }
 
-      const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store", credentials, headers });
+      // const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store", credentials, headers });
 
-      if (!res.ok) {
-        const error = new Error(`[RESOLVE] resolve failed with status ${res.status}`);
-        (error as ResolveError).status = res.status;
-        throw error;
-      }
+      // if (!res.ok) {
+      //   const error = new Error(`[RESOLVE] resolve failed with status ${res.status}`);
+      //   (error as ResolveError).status = res.status;
+      //   throw error;
+      // }
 
-      const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
-      bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
-      bookDataLoader.setBookVisibility(visibility);
+      // const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
+      // bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
+      // bookDataLoader.setBookVisibility(visibility);
       setAssetBaseReady(true);
     };
 
@@ -289,7 +288,7 @@ const WrappedPlayerApp = () => {
       const cleanup = async () => {
         try {
           // 1. First reset the book data loader to stop any ongoing requests
-          bookDataLoader.resetCurrentBook();
+          // bookDataLoader.resetCurrentBook();
 
           // 2. Then tear down the player runtime
           await teardownPlayer();
