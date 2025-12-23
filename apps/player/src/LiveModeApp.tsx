@@ -38,6 +38,7 @@ import { ModalRenderers } from "./features/ModalRenderers";
 import { useBookContent } from "@player/hooks/useBookContent";
 import { useElementVisibility } from "./hooks/useElementVisibility";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
+import { useCriticalAssetPreloader } from "./hooks/useCriticalAssetPreloader";
 import ProgressBars from "@player/components/ProgressBars";
 import { languageNameToCode } from "@player/helpers/languageNameToCode";
 import { setupUnloadHandlers } from "./services/setupUnloadHandlers";
@@ -95,6 +96,20 @@ function LiveShell({ onShellMounted }: { onShellMounted: () => void }) {
       {draftMode && <EditorMode />}
     </>
   );
+}
+
+// =============================================================================
+// Critical Asset Preloader (runs before ConvexAppInitializer gate)
+// =============================================================================
+
+/**
+ * Runs useCriticalAssetPreloader to start loading background videos and music
+ * as soon as Convex queries return, BEFORE waiting for chapter processing.
+ * This allows heavy assets to download in parallel with XML processing.
+ */
+function CriticalAssetPreloader() {
+  useCriticalAssetPreloader();
+  return null; // Renders nothing, just runs the hook
 }
 
 // =============================================================================
@@ -238,6 +253,8 @@ export function LiveModeApp({ bookPath }: LiveModeAppProps) {
     <ConvexProvider client={convex}>
       <DraftModeProvider>
         <BookConvexProvider bookPath={bookPath}>
+          {/* Start preloading heavy assets (videos, music) BEFORE chapter processing completes */}
+          <CriticalAssetPreloader />
           <I18nextProvider i18n={i18n}>
             <ConvexAppInitializer>
               <LocationProvider>

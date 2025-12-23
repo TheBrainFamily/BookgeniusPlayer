@@ -4,6 +4,7 @@ import debounce from "lodash.debounce";
 import { getPreloadedElement } from "@player/preloadBackgrounds";
 import { getFileType, loadVideoAsHTMLElement } from "./backgroundUtils";
 import { getBookSlug } from "@player/state/bookDataStore";
+import { getBookFromUrl } from "@player/getBookFromUrl";
 
 export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number; backgroundColor?: string; textColor?: string };
 
@@ -81,7 +82,7 @@ function applyScopedColors({ backgroundColor, textColor }: { backgroundColor?: s
 
   if (backgroundColor && backgroundColor.trim().length > 0) {
     const isDark = isDarkColor(backgroundColor.trim());
-    if (getBookSlug() === "Midsummer-Nights-Dream") {
+    if (getBookFromUrl() === "Midsummer-Nights-Dream") {
       scope.style.setProperty("--bg-content-light", backgroundColor.trim());
       if (textColor && textColor.trim().length > 0) {
         scope.style.setProperty("--text-light", textColor.trim());

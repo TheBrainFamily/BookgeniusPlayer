@@ -61,8 +61,6 @@ export const getSpeaksUrlForListens = (listensUrl: string): string | null => {
   return listensToSpeaksRegistry.get(listensUrl) || null;
 };
 
-const API_BASE_URL = typeof import.meta.env !== "undefined" && import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL : "/api/core/content/assets/";
-
 export const URL_SEGMENTS = { ASSETS: "assets", COMPILED: "compiled", AUDIO_EXT: ".mp3" };
 
 export function joinPath(...parts: string[]) {
@@ -81,17 +79,10 @@ function buildFromPrefix(_relativePath: string): string | null {
   return null;
 }
 
-export const getBookBaseUrl = () => {
-  const slug = getBookSlug();
-  if (!slug) throw new Error("[assetUrls] Book slug not available - store not initialized");
-  return `${API_BASE_URL}books/${slug}`;
-};
-
 // exported helpers (very small)
 export const getBookAssetBaseUrl = (): string => {
   const built = buildFromPrefix(URL_SEGMENTS.ASSETS);
   if (built) return built;
-  return `${getBookBaseUrl()}/${URL_SEGMENTS.ASSETS}`;
 };
 
 export const getBookAssetUrl = (assetPath: string): string => {
@@ -111,8 +102,6 @@ export const getBookAssetUrl = (assetPath: string): string => {
   const built = buildFromPrefix(joinPath(URL_SEGMENTS.ASSETS, rel));
 
   if (built) return built;
-
-  return `${getBookAssetBaseUrl()}/${rel}`;
 };
 
 export const buildAudioUrl = (trackId: string): string => {
@@ -124,11 +113,9 @@ export const buildAudioUrl = (trackId: string): string => {
   const file = `${trackId}${URL_SEGMENTS.AUDIO_EXT}`;
   const built = buildFromPrefix(joinPath(URL_SEGMENTS.ASSETS, file));
   if (built) return built;
-  return `${getBookAssetBaseUrl()}/${file}`;
 };
 export const getBookDataUrl = (fileName: string): string => {
   const rel = joinPath(URL_SEGMENTS.COMPILED, fileName);
   const built = buildFromPrefix(rel);
   if (built) return built;
-  return `${getBookBaseUrl()}/${rel}`;
 };

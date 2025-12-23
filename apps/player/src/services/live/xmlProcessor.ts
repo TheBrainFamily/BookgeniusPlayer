@@ -488,8 +488,8 @@ const preprocessMixedChapter = (chapter: Element, characterMap: Map<string, Char
     const paragraph = current;
     const startsWithTalking = Boolean(
       getFirstSignificantChild(paragraph) &&
-        isElementNode(getFirstSignificantChild(paragraph)!) &&
-        (getFirstSignificantChild(paragraph) as Element).getAttribute("talking") === "true",
+      isElementNode(getFirstSignificantChild(paragraph)!) &&
+      (getFirstSignificantChild(paragraph) as Element).getAttribute("talking") === "true",
     );
     const rawHtml = extractInnerHTML(paragraph);
     const isPureDidaskalia = isDidaskaliaHTML(rawHtml);
@@ -819,6 +819,7 @@ export const xmlToComplexHtml = (
   bookSlug: string,
   bookLang: string,
   characterBundles: CharacterBundleInfo[],
+  bookForm: string,
 ): { htmlResult: string; chapterTitles: Array<{ id: string; title: string }> } => {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xmlString, "text/xml");
@@ -833,8 +834,7 @@ export const xmlToComplexHtml = (
   // Build character map from Convex bundles
   const characterMap = buildCharacterMapFromBundles(characterBundles, xmlDoc);
 
-  const bookForm = xmlDoc.getElementsByTagName("Form")[0];
-  const bookFormValue = bookForm ? bookForm.textContent : "";
+  const bookFormValue = bookForm;
 
   if (bookFormValue === "Mixed") {
     preprocessMixedDocument(xmlDoc, characterMap);

@@ -148,7 +148,7 @@ const useImageReadiness = ({ imageTimeoutMs = 30000, charactersData }: UseImageR
   const loadImages = useCallback(async (): Promise<void> => {
     const chapterCharacters = allCharacters.filter((character) => character.infoPerChapter.find((chapterInfo) => chapterInfo.chapter === chapter));
 
-    const imageUrls = chapterCharacters.map((character) => getBookAssetUrl(`${character.slug.toLowerCase()}.png`));
+    const imageUrls = chapterCharacters.filter((character) => character.media?.avatarUrl).map((character) => getBookAssetUrl(character.media?.avatarUrl));
 
     let failedCount = 0;
 

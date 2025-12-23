@@ -134,6 +134,20 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         { assetId: string; version: number; versionId: string },
         Name
       >;
+      deleteDataBatch: FunctionReference<
+        "mutation",
+        "internal",
+        { batchSize?: number },
+        {
+          deletedAssets: number;
+          deletedEvents: number;
+          deletedFolders: number;
+          deletedIntents: number;
+          deletedVersions: number;
+          hasMore: boolean;
+        },
+        Name
+      >;
       finishUpload: FunctionReference<
         "mutation",
         "internal",

@@ -660,11 +660,25 @@ export const getBookStats = query({
       { folderPath: `${bookPath}/music` }
     );
 
+    // Count notes
+    const notes = await ctx.db
+      .query("notes")
+      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
+      .collect();
+
+    // Count variants
+    const variants = await ctx.db
+      .query("variants")
+      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
+      .collect();
+
     return {
       characterCount: characterFolders.length,
       chapterCount: chapterAssets.length,
       backgroundCount: backgroundAssets.length,
       musicCount: musicAssets.length,
+      noteCount: notes.length,
+      variantCount: variants.length,
     };
   },
 });
@@ -703,28 +717,42 @@ export const listCutScenes = query({
 
 /**
  * List notes for a book.
- * STUB: Returns empty array - notes data not yet in CMS.
+ * Returns all footnotes/annotations for the specified book.
  */
 export const listNotes = query({
   args: {
     bookPath: v.string(),
   },
-  handler: async () => {
-    // TODO: Implement when notes data is added to CMS
-    return [];
+  handler: async (ctx, { bookPath }) => {
+    const notes = await ctx.db
+      .query("notes")
+      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
+      .collect();
+
+    return notes.map((n) => ({
+      id: n.noteId,
+      content: n.content,
+    }));
   },
 });
 
 /**
  * List text variants for a book.
- * STUB: Returns empty array - variants data not yet in CMS.
+ * Returns all sentence simplifications for the specified book.
  */
 export const listVariants = query({
   args: {
     bookPath: v.string(),
   },
-  handler: async () => {
-    // TODO: Implement when variants data is added to CMS
-    return [];
+  handler: async (ctx, { bookPath }) => {
+    const variants = await ctx.db
+      .query("variants")
+      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
+      .collect();
+
+    return variants.map((v) => ({
+      id: v.variantId,
+      simplifications: v.simplifications,
+    }));
   },
 });

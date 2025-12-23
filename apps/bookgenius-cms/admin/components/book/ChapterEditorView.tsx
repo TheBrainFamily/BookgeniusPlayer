@@ -8,13 +8,11 @@
  * - Full-width Monaco editor with character autocomplete
  * - Collapsible and resizable version history sidebar
  * - Chapter metadata display
- * - Save/publish workflow
+ * - Auto-save drafts + Cmd+S to publish workflow
  */
 
 import { useState, useMemo, useCallback } from "react";
-import { useMutation } from "convex/react";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@convex/_generated/api";
 import { queries } from "@/lib/queries";
 import { ChapterEditor } from "../editors/ChapterEditor";
 import { MetadataEditor } from "../editors/MetadataEditor";
@@ -27,7 +25,6 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle, usePanelRef } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 // =============================================================================
 // Types
@@ -58,12 +55,10 @@ function ChapterEditorContent({ folderPath, basename, selectedVersionId, onVersi
     if (panel) {
       if (sidebarCollapsed) {
         panel.expand();
-        // Restore previous size if we have one
         if (sidebarSizeBeforeCollapse !== null) {
           panel.resize(sidebarSizeBeforeCollapse);
         }
       } else {
-        // Save current size before collapsing
         setSidebarSizeBeforeCollapse(panel.getSize().inPixels);
         panel.collapse();
       }
@@ -73,9 +68,6 @@ function ChapterEditorContent({ folderPath, basename, selectedVersionId, onVersi
   // Query asset and versions
   const { data: asset, isLoading: assetLoading } = useQuery(queries.asset(folderPath, basename));
   const { data: versions, isLoading: versionsLoading, refetch: refetchVersions } = useQuery(queries.assetVersions(folderPath, basename));
-
-  // Mutations
-  const publishDraft = useMutation(api.cli.publishDraft);
 
   // Get the selected version (or latest published)
   const selectedVersion = useMemo(() => {
@@ -90,21 +82,24 @@ function ChapterEditorContent({ folderPath, basename, selectedVersionId, onVersi
   // Check if version has content (either Convex storage or R2)
   const hasContent = selectedVersion?.storageId || selectedVersion?.r2Key;
 
-  // Handle publish
-  const handlePublish = useCallback(async () => {
-    try {
-      await publishDraft({ folderPath, basename });
-      toast.success("Draft published successfully");
-      refetchVersions();
-    } catch (error) {
-      toast.error("Failed to publish");
-    }
-  }, [folderPath, basename, publishDraft, refetchVersions]);
+  // Is the version read-only? (archived versions shouldn't be editable)
+  const isReadOnly = selectedVersion?.state === "archived";
 
-  // Handle save complete
+  // Handle save/publish complete (called from ChapterEditor after Cmd+S)
   const handleSaveComplete = useCallback(() => {
+    console.log("[ChapterEditorView] handleSaveComplete called", {
+      versionsCount: versions?.length,
+      currentSelectedVersionId: selectedVersionId,
+      currentSelectedVersion: selectedVersion?._id,
+    });
+
+    // Switch to the published version (which is what we just published)
+    // Setting to null makes selectedVersion default to the "published" version
+    // The content should match what's in the editor, so no reset will occur
+    console.log("[ChapterEditorView] Switching to published version (null) and refetching...");
+    onVersionSelect(null);
     refetchVersions();
-  }, [refetchVersions]);
+  }, [refetchVersions, versions, selectedVersionId, selectedVersion, onVersionSelect]);
 
   // Loading state
   if (assetLoading || versionsLoading) {
@@ -150,13 +145,6 @@ function ChapterEditorContent({ folderPath, basename, selectedVersionId, onVersi
                   v{selectedVersion.version} ({selectedVersion.state})
                 </Badge>
               )}
-              {/* Publish button for drafts */}
-              {versions?.some((v: { state: string }) => v.state === "draft") && (
-                <Button variant="success" size="sm" onClick={handlePublish}>
-                  <CheckCircle className="h-4 w-4 mr-1" />
-                  Publish Draft
-                </Button>
-              )}
               <Button variant="ghost" size="icon" onClick={toggleSidebar} title={sidebarCollapsed ? "Show version history" : "Hide version history"}>
                 {sidebarCollapsed ? <PanelRight className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}
               </Button>
@@ -166,7 +154,7 @@ function ChapterEditorContent({ folderPath, basename, selectedVersionId, onVersi
           {/* Editor */}
           <div className="flex-1 min-h-0">
             {hasContent && selectedVersion ? (
-              <ChapterEditor folderPath={folderPath} basename={basename} versionId={selectedVersion._id} onSaveComplete={handleSaveComplete} />
+              <ChapterEditor folderPath={folderPath} basename={basename} versionId={selectedVersion._id} readOnly={isReadOnly} onSaveComplete={handleSaveComplete} />
             ) : (
               <div className="flex items-center justify-center h-full text-muted-foreground">No content available. Upload a file first.</div>
             )}

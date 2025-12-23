@@ -3,31 +3,27 @@
 /**
  * XmlEditor - Monaco editor wrapper for XML files
  *
- * Features:
- * - XML syntax highlighting
- * - Auto-formatting
- * - Error indicators
- * - Dark/light theme support
- * - Custom completion provider slot (for character autocomplete)
+ * Controlled editor that syncs with value prop, but preserves cursor
+ * when the new value matches what's already in the editor.
  */
 
 import { useRef, useCallback, useEffect, useState } from "react";
 import Editor, { OnMount, OnChange } from "@monaco-editor/react";
-import type { editor, IDisposable, Position, IRange } from "monaco-editor";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Save, RotateCcw, Loader2, AlertCircle } from "lucide-react";
+import type { editor, IDisposable, Position } from "monaco-editor";
+import { Loader2, AlertCircle, Cloud, CloudOff } from "lucide-react";
 
 // =============================================================================
 // Types
 // =============================================================================
 
+type AutoSaveStatus = "idle" | "pending" | "saving" | "saved" | "error";
+
 export interface XmlEditorProps {
-  /** Initial XML content */
+  /** XML content to display */
   value: string;
-  /** Called when content changes (debounced) */
-  onChange?: (value: string) => void;
-  /** Called when save is triggered (Ctrl+S or button) */
+  /** Called for auto-saving drafts (debounced, fires automatically on changes) */
+  onAutoSave?: (value: string) => Promise<void>;
+  /** Called when manual save is triggered (Ctrl+S) - typically saves + publishes */
   onSave?: (value: string) => Promise<void>;
   /** Custom completion items provider */
   completionProvider?: (
@@ -37,31 +33,54 @@ export interface XmlEditorProps {
   ) => import("monaco-editor").languages.CompletionItem[];
   /** Whether the editor is in read-only mode */
   readOnly?: boolean;
-  /** Loading state during save */
+  /** External saving state (for manual save) */
   isSaving?: boolean;
   /** Height of the editor (default: 100%) */
   height?: string;
   /** Minimum height */
   minHeight?: string;
+  /** Auto-save debounce delay in ms (default: 1500) */
+  autoSaveDelay?: number;
 }
 
 // =============================================================================
 // Component
 // =============================================================================
 
-export function XmlEditor({ value, onChange, onSave, completionProvider, readOnly = false, isSaving = false, height = "100%", minHeight = "400px" }: XmlEditorProps) {
+export function XmlEditor({
+  value,
+  onAutoSave,
+  onSave,
+  completionProvider,
+  readOnly = false,
+  isSaving = false,
+  height = "100%",
+  minHeight = "400px",
+  autoSaveDelay = 1500,
+}: XmlEditorProps) {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof import("monaco-editor") | null>(null);
   const disposablesRef = useRef<IDisposable[]>([]);
 
   const [currentValue, setCurrentValue] = useState(value);
-  const [hasChanges, setHasChanges] = useState(false);
+  const [lastPublishedValue, setLastPublishedValue] = useState(value); // What was last published (for Cmd+S check)
   const [parseError, setParseError] = useState<string | null>(null);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<AutoSaveStatus>("idle");
+  const [hasDraftChanges, setHasDraftChanges] = useState(false); // True if there are changes not yet published
+
+  // Refs for auto-save
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingAutoSaveRef = useRef<string | null>(null);
 
   // Refs for values needed in keyboard shortcut callback (avoids stale closure)
   const currentValueRef = useRef(currentValue);
-  const hasChangesRef = useRef(hasChanges);
+  const lastPublishedValueRef = useRef(lastPublishedValue);
+  const hasDraftChangesRef = useRef(hasDraftChanges);
   const onSaveRef = useRef(onSave);
+  const parseErrorRef = useRef(parseError);
+
+  // Calculate if there are unsaved changes (for status display)
+  const hasUnsavedChanges = currentValue !== lastPublishedValue;
 
   // Keep refs in sync
   useEffect(() => {
@@ -69,30 +88,64 @@ export function XmlEditor({ value, onChange, onSave, completionProvider, readOnl
   }, [currentValue]);
 
   useEffect(() => {
-    hasChangesRef.current = hasChanges;
-  }, [hasChanges]);
+    lastPublishedValueRef.current = lastPublishedValue;
+  }, [lastPublishedValue]);
+
+  useEffect(() => {
+    hasDraftChangesRef.current = hasDraftChanges;
+  }, [hasDraftChanges]);
 
   useEffect(() => {
     onSaveRef.current = onSave;
   }, [onSave]);
 
-  // Update when external value changes
   useEffect(() => {
-    if (value !== currentValue && !hasChanges) {
-      setCurrentValue(value);
-    }
-  }, [value, currentValue, hasChanges]);
+    parseErrorRef.current = parseError;
+  }, [parseError]);
 
-  // Validate XML on change
+  // Sync with external value prop changes
+  // Only reset if the new value is different from what we have
+  useEffect(() => {
+    console.log("[XmlEditor] value prop changed", {
+      valueLength: value?.length,
+      currentValueLength: currentValue?.length,
+      valuesMatch: value === currentValue,
+      valuePreview: value?.slice(0, 100),
+      currentValuePreview: currentValue?.slice(0, 100),
+    });
+
+    // If external value matches current editor content, no reset needed
+    if (value === currentValue) {
+      console.log("[XmlEditor] value matches currentValue, updating lastPublishedValue");
+      setLastPublishedValue(value);
+      setHasDraftChanges(false);
+      return;
+    }
+
+    // External value changed and differs from editor - reset editor
+    console.log("[XmlEditor] RESETTING editor to new value");
+    setCurrentValue(value);
+    setLastPublishedValue(value);
+    setHasDraftChanges(false);
+    setAutoSaveStatus("idle");
+    setParseError(null);
+
+    // Clear any pending auto-save
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = null;
+    }
+    pendingAutoSaveRef.current = null;
+  }, [value]); // Only depend on value, not currentValue
+
+  // Validate XML
   const validateXml = useCallback((xml: string): string | null => {
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(xml, "application/xml");
       const errorNode = doc.querySelector("parsererror");
       if (errorNode) {
-        // Extract error message
         const errorText = errorNode.textContent || "XML parse error";
-        // Simplify the error message
         const match = errorText.match(/error on line (\d+)/i);
         if (match) {
           return `Error on line ${match[1]}`;
@@ -100,9 +153,69 @@ export function XmlEditor({ value, onChange, onSave, completionProvider, readOnl
         return errorText.slice(0, 100);
       }
       return null;
-    } catch (e) {
+    } catch {
       return "Invalid XML";
     }
+  }, []);
+
+  // Auto-save function
+  const performAutoSave = useCallback(
+    async (content: string) => {
+      console.log("[XmlEditor] performAutoSave called", { contentLength: content?.length, readOnly, hasOnAutoSave: !!onAutoSave });
+      if (!onAutoSave || readOnly) return;
+
+      // Don't auto-save if there's a parse error
+      const error = validateXml(content);
+      if (error) {
+        console.log("[XmlEditor] performAutoSave skipped - parse error:", error);
+        return;
+      }
+
+      setAutoSaveStatus("saving");
+      try {
+        console.log("[XmlEditor] Calling onAutoSave...");
+        await onAutoSave(content);
+        console.log("[XmlEditor] onAutoSave completed, pendingAutoSaveRef:", pendingAutoSaveRef.current);
+        // Mark that we have draft changes that need publishing
+        // NOTE: We do NOT update lastPublishedValue here - only after publish
+        setHasDraftChanges(true);
+        setAutoSaveStatus("saved");
+        setTimeout(() => setAutoSaveStatus("idle"), 2000);
+      } catch (e) {
+        console.error("[XmlEditor] Auto-save failed:", e);
+        setAutoSaveStatus("error");
+      }
+    },
+    [onAutoSave, readOnly, validateXml],
+  );
+
+  // Schedule auto-save (debounced)
+  const scheduleAutoSave = useCallback(
+    (content: string) => {
+      if (!onAutoSave || readOnly) return;
+
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+
+      pendingAutoSaveRef.current = content;
+      setAutoSaveStatus("pending");
+
+      autoSaveTimerRef.current = setTimeout(() => {
+        pendingAutoSaveRef.current = null;
+        performAutoSave(content);
+      }, autoSaveDelay);
+    },
+    [onAutoSave, readOnly, autoSaveDelay, performAutoSave],
+  );
+
+  // Cleanup auto-save timer on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
   }, []);
 
   const handleEditorMount: OnMount = useCallback(
@@ -110,18 +223,35 @@ export function XmlEditor({ value, onChange, onSave, completionProvider, readOnl
       editorRef.current = editor;
       monacoRef.current = monaco;
 
-      // Configure XML language
       // @ts-ignore
       monaco.languages.xml?.xmlDefaults?.setOptions?.({ format: { splitAttributes: true } });
 
-      // Add keyboard shortcut for save (uses refs to avoid stale closure)
+      // Cmd+S shortcut
       editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-        if (onSaveRef.current && hasChangesRef.current) {
+        const contentChanged = currentValueRef.current !== lastPublishedValueRef.current;
+        const hasDraft = hasDraftChangesRef.current;
+        const shouldSave = contentChanged || hasDraft;
+        console.log("[XmlEditor] Cmd+S pressed", {
+          contentChanged,
+          hasDraft,
+          shouldSave,
+          hasOnSave: !!onSaveRef.current,
+          hasParseError: !!parseErrorRef.current,
+          currentValueLength: currentValueRef.current?.length,
+          lastPublishedValueLength: lastPublishedValueRef.current?.length,
+        });
+        if (onSaveRef.current && shouldSave && !parseErrorRef.current) {
+          console.log("[XmlEditor] Calling onSave...");
+          // Update lastPublishedValue AFTER save completes (in the callback)
+          // For now, just mark that we're publishing
+          setLastPublishedValue(currentValueRef.current);
+          setHasDraftChanges(false);
           onSaveRef.current(currentValueRef.current);
+        } else {
+          console.log("[XmlEditor] NOT calling onSave - conditions not met");
         }
       });
 
-      // Register custom completion provider if provided
       if (completionProvider) {
         const disposable = monaco.languages.registerCompletionItemProvider("xml", {
           triggerCharacters: ["<", " ", '"'],
@@ -133,7 +263,6 @@ export function XmlEditor({ value, onChange, onSave, completionProvider, readOnl
         disposablesRef.current.push(disposable);
       }
 
-      // Focus editor
       editor.focus();
     },
     [completionProvider],
@@ -143,29 +272,17 @@ export function XmlEditor({ value, onChange, onSave, completionProvider, readOnl
     (newValue) => {
       if (newValue !== undefined) {
         setCurrentValue(newValue);
-        setHasChanges(newValue !== value);
         setParseError(validateXml(newValue));
-        onChange?.(newValue);
+
+        // If content differs from last published, schedule auto-save
+        if (newValue !== lastPublishedValueRef.current) {
+          setHasDraftChanges(true); // Mark that we have unpublished changes
+          scheduleAutoSave(newValue);
+        }
       }
     },
-    [value, onChange, validateXml],
+    [validateXml, scheduleAutoSave],
   );
-
-  const handleSave = useCallback(async () => {
-    if (onSave && hasChanges && !parseError) {
-      await onSave(currentValue);
-      setHasChanges(false);
-    }
-  }, [onSave, hasChanges, parseError, currentValue]);
-
-  const handleReset = useCallback(() => {
-    setCurrentValue(value);
-    setHasChanges(false);
-    setParseError(validateXml(value));
-    if (editorRef.current) {
-      editorRef.current.setValue(value);
-    }
-  }, [value, validateXml]);
 
   // Cleanup disposables
   useEffect(() => {
@@ -175,33 +292,80 @@ export function XmlEditor({ value, onChange, onSave, completionProvider, readOnl
     };
   }, []);
 
+  // Status indicator
+  const renderStatus = () => {
+    if (readOnly) {
+      return (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span>Read-only</span>
+        </div>
+      );
+    }
+
+    if (parseError) {
+      return (
+        <div className="flex items-center gap-1.5 text-xs text-destructive">
+          <AlertCircle className="h-3.5 w-3.5" />
+          <span>{parseError}</span>
+        </div>
+      );
+    }
+
+    if (isSaving) {
+      return (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          <span>Publishing...</span>
+        </div>
+      );
+    }
+
+    if (autoSaveStatus === "saving") {
+      return (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          <span>Saving draft...</span>
+        </div>
+      );
+    }
+
+    if (autoSaveStatus === "pending" || hasUnsavedChanges) {
+      return (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <CloudOff className="h-3.5 w-3.5" />
+          <span>Unsaved changes</span>
+        </div>
+      );
+    }
+
+    if (autoSaveStatus === "error") {
+      return (
+        <div className="flex items-center gap-1.5 text-xs text-destructive">
+          <AlertCircle className="h-3.5 w-3.5" />
+          <span>Auto-save failed</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-1.5 text-xs text-success">
+        <Cloud className="h-3.5 w-3.5" />
+        <span>Saved</span>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col h-full" style={{ minHeight }}>
-      {/* Toolbar */}
+      {/* Status bar */}
       <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-surface-1">
-        <div className="flex items-center gap-2">
-          <Badge variant={hasChanges ? "warning" : "muted"} className="text-xs">
-            {hasChanges ? "Modified" : "Saved"}
-          </Badge>
-          {parseError && (
-            <div className="flex items-center gap-1 text-xs text-destructive">
-              <AlertCircle className="h-3 w-3" />
-              <span>{parseError}</span>
-            </div>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {hasChanges && (
-            <Button variant="ghost" size="sm" onClick={handleReset} disabled={isSaving}>
-              <RotateCcw className="h-3 w-3 mr-1" />
-              Reset
-            </Button>
-          )}
-          <Button variant={hasChanges ? "default" : "outline"} size="sm" onClick={handleSave} disabled={!hasChanges || isSaving || !!parseError || readOnly}>
-            {isSaving ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Save className="h-3 w-3 mr-1" />}
-            {isSaving ? "Saving..." : "Save"}
-          </Button>
-        </div>
+        <div className="flex items-center gap-3">{renderStatus()}</div>
+        {!readOnly && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">⌘S</kbd>
+            <span>to publish</span>
+          </div>
+        )}
       </div>
 
       {/* Editor */}

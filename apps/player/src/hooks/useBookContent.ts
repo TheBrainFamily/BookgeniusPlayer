@@ -32,7 +32,7 @@ export function useBookContent() {
   const { textVersion, bookData, isReady, bookStringified } = useBookConvex();
   const { location } = useLocation();
   const { currentChapter, currentParagraph } = location;
-  const bookForm = bookData?.metadata?.bookForm || "prose";
+  const bookForm = bookData?.metadata?.bookForm || "book";
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
 
   // Initialize to -1 so the first real version (0 or 1) is always detected as a change

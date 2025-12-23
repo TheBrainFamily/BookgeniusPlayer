@@ -31,4 +31,30 @@ export default defineSchema({
   })
     .index("by_scenarioPath", ["scenarioPath"])
     .index("by_status", ["status"]),
+
+  // Notes (footnotes/annotations)
+  notes: defineTable({
+    bookPath: v.string(),
+    noteId: v.string(),
+    content: v.string(),
+    chapter: v.number(),
+    paragraph: v.optional(v.number()),
+  })
+    .index("by_book", ["bookPath"])
+    .index("by_book_chapter", ["bookPath", "chapter"]),
+
+  // Variants (sentence simplifications)
+  variants: defineTable({
+    bookPath: v.string(),
+    variantId: v.string(),
+    chapter: v.number(),
+    simplifications: v.array(
+      v.object({
+        score: v.number(),
+        sentences: v.array(v.string()),
+      })
+    ),
+  })
+    .index("by_book", ["bookPath"])
+    .index("by_book_chapter", ["bookPath", "chapter"]),
 });

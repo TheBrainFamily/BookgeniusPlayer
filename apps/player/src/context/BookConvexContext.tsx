@@ -132,8 +132,8 @@ interface BookConvexContextType {
   textVersion: number;
 
   // Actions
-  /** Fetch chapter content by versionId */
-  getChapterContent: (versionId: string) => Promise<string | null>;
+  /** Fetch chapter content by versionId (optionally with direct URL for faster fetch) */
+  getChapterContent: (versionId: string, url?: string) => Promise<string | null>;
   /** Get cached chapter content */
   getCachedChapterContent: (versionId: string) => string | null;
   /** Force reload chapters */
@@ -161,7 +161,7 @@ const defaultContext: BookConvexContextType = {
   bookData: null,
   knownVideoFiles: [],
   textVersion: 0,
-  getChapterContent: async () => null,
+  getChapterContent: async (_versionId, _url) => null,
   getCachedChapterContent: () => null,
   reloadChapters: async () => {},
 };
@@ -221,23 +221,46 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   const getTextContent = useAction(api.cli.getTextContent);
 
   // Fetch chapter content (with caching)
+  // Prefers direct R2 fetch for speed (~50-100ms), falls back to Convex action if CORS fails
   const getChapterContent = useCallback(
-    async (versionId: string): Promise<string | null> => {
+    async (versionId: string, url?: string): Promise<string | null> => {
       // Check cache first
       const cached = chapterContentCache.current.get(versionId);
       if (cached) return cached;
 
-      try {
-        const result = await getTextContent({ versionId });
-        if (result?.content) {
-          chapterContentCache.current.set(versionId, result.content);
-          return result.content;
+      let content: string | null = null;
+
+      // Try direct fetch first (faster - no Convex round-trip)
+      if (url) {
+        try {
+          const response = await fetch(url);
+          if (response.ok) {
+            content = await response.text();
+          } else {
+            console.warn(`[BookConvexContext] Direct fetch failed with status ${response.status}, falling back to action`);
+          }
+        } catch (fetchError) {
+          console.warn("[BookConvexContext] Direct fetch failed (CORS?), falling back to action:", fetchError);
         }
-        return null;
-      } catch (e) {
-        console.error("[BookConvexContext] Failed to fetch chapter content:", e);
-        return null;
       }
+
+      // Fallback to Convex action if direct fetch failed or no URL provided
+      if (!content) {
+        try {
+          const result = await getTextContent({ versionId });
+          content = result?.content ?? null;
+        } catch (e) {
+          console.error("[BookConvexContext] Action fallback also failed:", e);
+          return null;
+        }
+      }
+
+      if (content) {
+        chapterContentCache.current.set(versionId, content);
+        return content;
+      }
+
+      return null;
     },
     [getTextContent],
   );
@@ -328,7 +351,12 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     if (!book) return null;
     const extra = book.extra;
 
-    return { slug: bookSlug, metadata: { title: book.name, author: extra.author, language: extra.language, bookForm: extra.form }, chapters: chaptersData, hasAudiobook: false };
+    return {
+      slug: bookSlug,
+      metadata: { title: book.name, author: extra.author, language: extra.language, bookForm: extra.form?.toLowerCase() },
+      chapters: chaptersData,
+      hasAudiobook: false,
+    };
   }, [book, bookSlug, chaptersData]);
 
   // Compute chapter version signature for change detection
@@ -383,14 +411,16 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       setError(null);
 
       try {
-        // Fetch XML content for each chapter
+        // Fetch XML content for each chapter (parallel, direct from R2 CDN)
+        console.time("getChapterContent");
         const chapterContents = await Promise.all(
           chapters.map(async (chapter) => {
             if (!chapter.versionId) return null;
-            return getChapterContent(chapter.versionId);
+            // Pass URL for direct R2 fetch (faster), with versionId fallback
+            return getChapterContent(chapter.versionId, chapter.url);
           }),
         );
-
+        console.timeEnd("getChapterContent");
         // Filter nulls
         const validContents = chapterContents.filter((c): c is string => c !== null);
 
@@ -400,6 +430,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
           return;
         }
 
+        console.time("build");
         // Build set of known character slugs from Convex bundles (lowercase for matching)
         const knownCharacterSlugs = new Set<string>();
         for (const c of characters) {
@@ -427,15 +458,14 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
         // Combine chapters into full XML (no CharactersMaster - passed directly to processor)
         const combinedXml = `<Book>${validContents.join("\n")}</Book>`;
 
-        // Get book form and language
-        const bookForm = book?.extra?.form || "prose";
-        const bookLang = book?.extra?.language || "english";
-
+        // Get book form and language (required)
+        const bookForm = book?.extra?.form?.toLowerCase() || "book";
+        const bookLang = book?.extra?.language?.toLowerCase() || "english";
         // Convert character bundles to the format expected by xmlToComplexHtml and extractCharacterMetadata
         const characterBundles = characters.map((c) => ({ slug: c.slug, name: c.name, extra: c.extra, avatar: c.avatar, listens: c.listens, speaks: c.speaks }));
 
         // Process XML to HTML - pass character bundles directly (no XML serialization)
-        const { htmlResult, chapterTitles } = xmlToComplexHtml(combinedXml, bookSlug, bookLang, characterBundles);
+        const { htmlResult, chapterTitles } = xmlToComplexHtml(combinedXml, bookSlug, bookLang, characterBundles, bookForm);
 
         setBookStringified(htmlResult);
         setChaptersData(chapterTitles.map((ct) => ({ id: ct.id, title: ct.title })));
@@ -460,6 +490,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
             return v + 1;
           });
         }
+        console.timeEnd("build");
 
         console.log("[Convex:Flow] Chapter processing complete");
         isProcessingRef.current = false;

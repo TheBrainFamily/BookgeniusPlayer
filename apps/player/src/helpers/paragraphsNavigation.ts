@@ -19,6 +19,7 @@ import { DEFAULT_LOCATION, Location } from "@player/state/LocationContext";
 import debounce from "lodash.debounce";
 import { setUrlHash } from "./setUrlHash";
 import { offerCandidateLocation, markLayoutUnstable, flushCommit, LAYOUT_UNSTABLE_RESIZE_MS } from "./locationCommitter";
+import { getBookFromUrl } from "@player/getBookFromUrl";
 
 /* ------------------------------------------------------------------ */
 
@@ -125,23 +126,22 @@ export interface ExtendedLocation extends Location {
 /* ------------------------------------------------------------------ */
 /*  Furthest‑location helpers                                         */
 export const getFurthestLocationKey = (): string => {
-  const bookData = getBookData();
-  if (!bookData) {
-    throw new Error("[paragraphsNavigation] Cannot get furthest location key - bookData not loaded");
-  }
-  return `furthestLocation_${bookData.slug}`;
+  return `furthestLocation_${getBookFromUrl()}`;
 };
 
 export const getSavedLocation = (): ExtendedLocation => {
+  console.log("[paragraphsNavigation] getSavedLocation");
   try {
     const key = getFurthestLocationKey();
     const raw = localStorage.getItem(key);
+    console.log("[paragraphsNavigation] getSavedLocation raw", raw);
     if (!raw) return DEFAULT_LOCATION;
 
     const parsed = JSON.parse(raw);
     // Handle both old format (plain Location) and new format (ExtendedLocation)
     return parsed as ExtendedLocation;
-  } catch {
+  } catch (e) {
+    console.warn("[paragraphsNavigation] getSavedLocation error", e);
     return DEFAULT_LOCATION;
   }
 };

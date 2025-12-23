@@ -19,7 +19,10 @@ import type * as generateUploadUrl from "../generateUploadUrl.js";
 import type * as http from "../http.js";
 import type * as importHelpers from "../importHelpers.js";
 import type * as kanban from "../kanban.js";
+import type * as notes from "../notes.js";
 import type * as prompts_storyContext from "../prompts/storyContext.js";
+import type * as reset from "../reset.js";
+import type * as variants from "../variants.js";
 
 import type {
   ApiFromModules,
@@ -39,7 +42,10 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   importHelpers: typeof importHelpers;
   kanban: typeof kanban;
+  notes: typeof notes;
   "prompts/storyContext": typeof prompts_storyContext;
+  reset: typeof reset;
+  variants: typeof variants;
 }>;
 
 /**
@@ -169,6 +175,19 @@ export declare const components: {
           storageId: string;
         },
         { assetId: string; version: number; versionId: string }
+      >;
+      deleteDataBatch: FunctionReference<
+        "mutation",
+        "internal",
+        { batchSize?: number },
+        {
+          deletedAssets: number;
+          deletedEvents: number;
+          deletedFolders: number;
+          deletedIntents: number;
+          deletedVersions: number;
+          hasMore: boolean;
+        }
       >;
       finishUpload: FunctionReference<
         "mutation",

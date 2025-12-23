@@ -6,14 +6,15 @@
  * This component:
  * 1. Fetches the XML content using a Convex action (bypasses CORS)
  * 2. Displays it in Monaco with character tag autocomplete
- * 3. Saves changes as new draft versions
+ * 3. Auto-saves drafts as you type (debounced)
+ * 4. Cmd+S saves and publishes in one step
  *
  * The character autocomplete suggests tags like:
  * - <WinstonSmith talking="true"/>
  * - <Julia talking="false"/>
  */
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useMutation, useAction } from "convex/react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@convex/_generated/api";
@@ -41,9 +42,9 @@ interface ChapterEditorProps {
   basename: string;
   /** Version ID to fetch content from (uses Convex action to bypass CORS) */
   versionId: string;
-  /** Whether the editor is read-only */
+  /** Whether the editor is read-only (e.g., for archived versions) */
   readOnly?: boolean;
-  /** Called when a save is completed */
+  /** Called when a save/publish is completed */
   onSaveComplete?: () => void;
 }
 
@@ -53,7 +54,7 @@ interface ChapterEditorProps {
 
 function useXmlContent(versionId: string) {
   const [content, setContent] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Use the wrapper action from cli.ts (bypasses CORS by fetching server-side)
@@ -61,26 +62,34 @@ function useXmlContent(versionId: string) {
 
   useEffect(() => {
     let cancelled = false;
+    console.log("[useXmlContent] Effect triggered, fetching for versionId:", versionId);
 
     async function fetchContent() {
-      setIsLoading(true);
       setError(null);
 
       try {
+        console.log("[useXmlContent] Calling getTextContent...");
         const result = await getTextContent({ versionId });
         if (!result) {
           throw new Error("Content not found");
         }
         if (!cancelled) {
-          setContent(result.content);
+          console.log("[useXmlContent] Got content", { contentLength: result.content?.length, prevContentLength: content?.length, contentChanged: content !== result.content });
+          // Only update content if it actually changed (prevents cursor jump)
+          setContent((prev) => {
+            const changed = prev !== result.content;
+            console.log("[useXmlContent] setContent called", { changed, prevLength: prev?.length, newLength: result.content?.length });
+            return changed ? result.content : prev;
+          });
         }
       } catch (e) {
         if (!cancelled) {
+          console.error("[useXmlContent] Error fetching content:", e);
           setError(e instanceof Error ? e.message : "Failed to load content");
         }
       } finally {
         if (!cancelled) {
-          setIsLoading(false);
+          setIsInitialLoad(false);
         }
       }
     }
@@ -91,6 +100,9 @@ function useXmlContent(versionId: string) {
       cancelled = true;
     };
   }, [versionId, getTextContent]);
+
+  // Only show loading on initial load when we have no content yet
+  const isLoading = isInitialLoad && content === null;
 
   return { content, isLoading, error };
 }
@@ -166,6 +178,9 @@ export function ChapterEditor({ folderPath, basename, versionId, readOnly = fals
 
   const [isSaving, setIsSaving] = useState(false);
 
+  // Track the last auto-saved content to avoid redundant saves
+  const lastAutoSavedContentRef = useRef<string | null>(null);
+
   // Fetch versions to get the current version's extra metadata
   const { data: versions } = useQuery(queries.assetVersions(folderPath, basename));
 
@@ -193,46 +208,95 @@ export function ChapterEditor({ folderPath, basename, versionId, readOnly = fals
     return createCharacterCompletionProvider(characters);
   }, [characters]);
 
-  // Handle save
+  // Helper: Upload content and create a draft
+  const uploadDraft = useCallback(
+    async (xmlContent: string) => {
+      const { intentId, backend, uploadUrl } = await startUpload({
+        folderPath,
+        basename,
+        publish: false, // Save as draft
+        label: `Edited chapter`,
+        extra: currentVersionExtra, // Preserve chapterNumber, title, etc.
+      });
+
+      const contentType = "application/xml";
+      const blob = new Blob([xmlContent], { type: contentType });
+
+      const response = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": contentType }, body: blob });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status}`);
+      }
+
+      const uploadResponse = backend === "convex" ? await response.json() : undefined;
+      await finishUpload({ intentId, uploadResponse, size: blob.size, contentType });
+    },
+    [folderPath, basename, startUpload, finishUpload, currentVersionExtra],
+  );
+
+  // Auto-save handler (silent, no toast, debounced by XmlEditor)
+  const handleAutoSave = useCallback(
+    async (xmlContent: string) => {
+      console.log("[ChapterEditor] handleAutoSave called", {
+        contentLength: xmlContent?.length,
+        lastAutoSavedLength: lastAutoSavedContentRef.current?.length,
+        isSameContent: xmlContent === lastAutoSavedContentRef.current,
+      });
+
+      // Skip if content hasn't changed since last auto-save
+      if (xmlContent === lastAutoSavedContentRef.current) {
+        console.log("[ChapterEditor] handleAutoSave skipped - same content");
+        return;
+      }
+
+      try {
+        console.log("[ChapterEditor] Uploading draft...");
+        await uploadDraft(xmlContent);
+        lastAutoSavedContentRef.current = xmlContent;
+        console.log("[ChapterEditor] Draft uploaded, lastAutoSavedContentRef updated");
+      } catch (e) {
+        console.error("[ChapterEditor] Auto-save failed:", e);
+      }
+    },
+    [uploadDraft],
+  );
+
+  // Manual save handler (Cmd+S) - saves and publishes in one step
   const handleSave = useCallback(
     async (xmlContent: string) => {
+      console.log("[ChapterEditor] handleSave called (Cmd+S)", {
+        contentLength: xmlContent?.length,
+        lastAutoSavedLength: lastAutoSavedContentRef.current?.length,
+        needsUpload: xmlContent !== lastAutoSavedContentRef.current,
+      });
+
       setIsSaving(true);
 
       try {
-        // 1. Start upload - IMPORTANT: preserve extra metadata from current version
-        const { intentId, backend, uploadUrl } = await startUpload({
-          folderPath,
-          basename,
-          publish: false, // Save as draft first
-          label: `Edited chapter`,
-          extra: currentVersionExtra, // Preserve chapterNumber, title, etc.
-        });
-
-        // 2. Upload content
-        const contentType = "application/xml";
-        const blob = new Blob([xmlContent], { type: contentType });
-
-        const response = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": contentType }, body: blob });
-
-        if (!response.ok) {
-          throw new Error(`Upload failed: ${response.status}`);
+        // If content changed since last auto-save, save it first
+        if (xmlContent !== lastAutoSavedContentRef.current) {
+          console.log("[ChapterEditor] Content differs from last auto-save, uploading...");
+          await uploadDraft(xmlContent);
+          lastAutoSavedContentRef.current = xmlContent;
+        } else {
+          console.log("[ChapterEditor] Content same as last auto-save, skipping upload");
         }
 
-        // 3. Finish upload
-        const uploadResponse = backend === "convex" ? await response.json() : undefined;
+        // Publish the draft
+        console.log("[ChapterEditor] Publishing draft...", { folderPath, basename });
+        await publishDraft({ folderPath, basename });
+        console.log("[ChapterEditor] Draft published!");
 
-        await finishUpload({ intentId, uploadResponse, size: blob.size, contentType });
-
-        toast.success("Chapter saved as draft");
+        toast.success("Chapter published");
         onSaveComplete?.();
       } catch (e) {
-        console.error("Save failed:", e);
-        toast.error(e instanceof Error ? e.message : "Failed to save chapter");
+        console.error("[ChapterEditor] Save failed:", e);
+        toast.error(e instanceof Error ? e.message : "Failed to publish chapter");
       } finally {
         setIsSaving(false);
       }
     },
-    [folderPath, basename, startUpload, finishUpload, onSaveComplete, currentVersionExtra],
+    [folderPath, basename, uploadDraft, publishDraft, onSaveComplete],
   );
 
   // Loading state
@@ -276,7 +340,7 @@ export function ChapterEditor({ folderPath, basename, versionId, readOnly = fals
 
       {/* Editor */}
       <div className="flex-1">
-        <XmlEditor value={content} onSave={handleSave} completionProvider={completionProvider} readOnly={readOnly} isSaving={isSaving} />
+        <XmlEditor value={content} onAutoSave={handleAutoSave} onSave={handleSave} completionProvider={completionProvider} readOnly={readOnly} isSaving={isSaving} />
       </div>
     </div>
   );
@@ -294,6 +358,7 @@ export function ChapterEditor({ folderPath, basename, versionId, readOnly = fals
 export function StandaloneChapterEditor(props: ChapterEditorProps) {
   const { content, isLoading, error } = useXmlContent(props.versionId);
   const [isSaving, setIsSaving] = useState(false);
+  const lastAutoSavedContentRef = useRef<string | null>(null);
 
   // Fetch versions to get the current version's extra metadata
   const { data: versions } = useQuery(queries.assetVersions(props.folderPath, props.basename));
@@ -307,43 +372,65 @@ export function StandaloneChapterEditor(props: ChapterEditorProps) {
 
   const startUpload = useMutation(api.generateUploadUrl.startUpload);
   const finishUpload = useMutation(api.generateUploadUrl.finishUpload);
+  const publishDraft = useMutation(api.cli.publishDraft);
+
+  const uploadDraft = useCallback(
+    async (xmlContent: string) => {
+      const { intentId, backend, uploadUrl } = await startUpload({
+        folderPath: props.folderPath,
+        basename: props.basename,
+        publish: false,
+        label: `Edited chapter`,
+        extra: currentVersionExtra,
+      });
+
+      const contentType = "application/xml";
+      const blob = new Blob([xmlContent], { type: contentType });
+
+      const response = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": contentType }, body: blob });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status}`);
+      }
+
+      const uploadResponse = backend === "convex" ? await response.json() : undefined;
+      await finishUpload({ intentId, uploadResponse, size: blob.size, contentType });
+    },
+    [props.folderPath, props.basename, startUpload, finishUpload, currentVersionExtra],
+  );
+
+  const handleAutoSave = useCallback(
+    async (xmlContent: string) => {
+      if (xmlContent === lastAutoSavedContentRef.current) return;
+      try {
+        await uploadDraft(xmlContent);
+        lastAutoSavedContentRef.current = xmlContent;
+      } catch (e) {
+        console.error("Auto-save failed:", e);
+      }
+    },
+    [uploadDraft],
+  );
 
   const handleSave = useCallback(
     async (xmlContent: string) => {
       setIsSaving(true);
-
       try {
-        const { intentId, backend, uploadUrl } = await startUpload({
-          folderPath: props.folderPath,
-          basename: props.basename,
-          publish: false,
-          label: `Edited chapter`,
-          extra: currentVersionExtra, // Preserve chapterNumber, title, etc.
-        });
-
-        const contentType = "application/xml";
-        const blob = new Blob([xmlContent], { type: contentType });
-
-        const response = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": contentType }, body: blob });
-
-        if (!response.ok) {
-          throw new Error(`Upload failed: ${response.status}`);
+        if (xmlContent !== lastAutoSavedContentRef.current) {
+          await uploadDraft(xmlContent);
+          lastAutoSavedContentRef.current = xmlContent;
         }
-
-        const uploadResponse = backend === "convex" ? await response.json() : undefined;
-
-        await finishUpload({ intentId, uploadResponse, size: blob.size, contentType });
-
-        toast.success("Chapter saved as draft");
+        await publishDraft({ folderPath: props.folderPath, basename: props.basename });
+        toast.success("Chapter published");
         props.onSaveComplete?.();
       } catch (e) {
         console.error("Save failed:", e);
-        toast.error(e instanceof Error ? e.message : "Failed to save chapter");
+        toast.error(e instanceof Error ? e.message : "Failed to publish chapter");
       } finally {
         setIsSaving(false);
       }
     },
-    [props.folderPath, props.basename, startUpload, finishUpload, props.onSaveComplete, currentVersionExtra],
+    [props.folderPath, props.basename, uploadDraft, publishDraft, props.onSaveComplete],
   );
 
   if (isLoading) {
@@ -362,5 +449,5 @@ export function StandaloneChapterEditor(props: ChapterEditorProps) {
     );
   }
 
-  return <XmlEditor value={content} onSave={handleSave} readOnly={props.readOnly} isSaving={isSaving} />;
+  return <XmlEditor value={content} onAutoSave={handleAutoSave} onSave={handleSave} readOnly={props.readOnly} isSaving={isSaving} />;
 }

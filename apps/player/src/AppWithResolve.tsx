@@ -1,14 +1,6 @@
 import React from "react";
 import { LiveModeApp } from "./LiveModeApp";
-
-function getBookFromUrl(): string | null {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("book");
-  } catch {
-    return null;
-  }
-}
+import { getBookFromUrl } from "./getBookFromUrl";
 
 /**
  * App entry point - ALL modes use Convex now.
