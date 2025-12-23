@@ -836,18 +836,18 @@ export const xmlToComplexHtml = (
 
   const bookFormValue = bookForm;
 
-  if (bookFormValue === "Mixed") {
+  if (bookFormValue === "mixed") {
     preprocessMixedDocument(xmlDoc, characterMap);
   }
 
-  const isPlayFormat = bookFormValue === "Play" || bookFormValue === "Mixed";
+  const isPlayFormat = bookFormValue === "play" || bookFormValue === "mixed";
 
   let htmlResult = "";
 
   // Play/Mixed formats get a container div
-  if (bookFormValue === "Play") {
+  if (bookFormValue === "play") {
     htmlResult += `\n    <div class="play-container">`;
-  } else if (bookFormValue === "Mixed") {
+  } else if (bookFormValue === "mixed") {
     htmlResult += `\n    <div class="play-container mixed-container">`;
   }
 
