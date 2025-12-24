@@ -17,7 +17,6 @@ if (import.meta.hot) {
 
 export function useBackgroundVideo() {
   const { location } = useLocation();
-  console.log("useBackgroundVideo LOCATION", location);
   const isSplashHidden = useSplashHidden();
   const isAppReady = useIsAppReady();
 

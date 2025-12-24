@@ -130,11 +130,9 @@ export const getFurthestLocationKey = (): string => {
 };
 
 export const getSavedLocation = (): ExtendedLocation => {
-  console.log("[paragraphsNavigation] getSavedLocation");
   try {
     const key = getFurthestLocationKey();
     const raw = localStorage.getItem(key);
-    console.log("[paragraphsNavigation] getSavedLocation raw", raw);
     if (!raw) return DEFAULT_LOCATION;
 
     const parsed = JSON.parse(raw);

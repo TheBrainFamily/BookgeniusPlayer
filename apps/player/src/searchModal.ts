@@ -237,13 +237,21 @@ const getTotalParagraphsInChapter = (() => {
 
   return (chapterNumber: number): number => {
     if (cache.has(chapterNumber)) {
-      return cache.get(chapterNumber)!;
+      const cached = cache.get(chapterNumber)!;
+      if (cached > 0) {
+        return cached;
+      }
     }
 
     try {
       bookIndex.ensureInitialized();
       const count = bookIndex.getParagraphCount(chapterNumber);
-      cache.set(chapterNumber, count);
+      if (count <= 0) {
+        console.log("[SearchPercent] missing paragraph count", { chapterNumber, count });
+      }
+      if (count > 0) {
+        cache.set(chapterNumber, count);
+      }
       return count;
     } catch (error) {
       console.error(`Error getting paragraph count for chapter ${chapterNumber}:`, error);

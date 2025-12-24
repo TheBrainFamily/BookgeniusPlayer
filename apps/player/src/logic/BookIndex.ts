@@ -75,17 +75,23 @@ class BookIndex {
 
   setParagraphCountOverrides(structure: ChaptersStructureEntry[]): void {
     this.paragraphCountOverrides = new Map(structure.map((entry) => [entry.chapterNumber, entry.paragraphCount]));
+    const missing = structure.filter((entry) => entry.paragraphCount <= 0).map((entry) => entry.chapterNumber);
 
     if (!this.initialized) {
+      console.log("[BookIndex] paragraph overrides set (deferred)", { chapters: structure.length, missingCount: missing.length, missingSample: missing.slice(0, 5) });
       return;
     }
 
+    let updated = 0;
     for (const [chapterNumber, paragraphCount] of this.paragraphCountOverrides) {
       const record = this.chapters.get(chapterNumber);
       if (record) {
         record.paragraphCount = paragraphCount;
+        updated += 1;
       }
     }
+
+    console.log("[BookIndex] paragraph overrides applied", { chapters: structure.length, updated, missingCount: missing.length, missingSample: missing.slice(0, 5) });
   }
 
   /**

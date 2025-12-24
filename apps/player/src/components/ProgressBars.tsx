@@ -4,6 +4,7 @@ import { AnimatePresence, motion, Variants, useSpring } from "motion/react";
 import { useReadingProgress } from "@player/hooks/useReadingProgress";
 import { bookIndex } from "@player/logic/BookIndex";
 import useSplashHidden from "@player/hooks/useSplashHidden";
+import { useBookConvex } from "@player/context/BookConvexContext";
 
 export interface ChapterStructure {
   chapterNumber: number;
@@ -12,6 +13,7 @@ export interface ChapterStructure {
 
 const ProgressBars: React.FC = () => {
   const isSplashHidden = useSplashHidden();
+  const { bookStringified, textVersion } = useBookConvex();
 
   const [chaptersStructure, setChaptersStructure] = useState<ChapterStructure[]>([]);
   const [totalParagraphs, setTotalParagraphs] = useState(0);
@@ -20,16 +22,21 @@ const ProgressBars: React.FC = () => {
 
   useEffect(() => {
     try {
-      bookIndex.ensureInitialized();
+      if (!bookStringified) {
+        return;
+      }
+      bookIndex.initializeWith(bookStringified);
       const structure = bookIndex.getChaptersStructure();
       const total = structure.reduce((sum, entry) => sum + entry.paragraphCount, 0);
+
+      console.log("[BookProgress] progress structure", { chapters: structure.length, totalParagraphs: total, first: structure[0], last: structure[structure.length - 1] });
 
       setChaptersStructure(structure);
       setTotalParagraphs(total);
     } catch (error) {
       console.error("❌ Error preparing chapters structure:", error);
     }
-  }, []);
+  }, [bookStringified, textVersion]);
 
   // Smooth springs for progress values (avoid CSS transform transitions)
   const chapterX = useSpring(chapterProgress / 100, { stiffness: 200, damping: 30 });

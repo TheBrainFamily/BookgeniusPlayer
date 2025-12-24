@@ -451,6 +451,9 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   useEffect(() => {
     if (draftMode || chapterStructure.length === 0) return;
     bookIndex.setParagraphCountOverrides(chapterStructure);
+    const totalParagraphs = chapterStructure.reduce((sum, entry) => sum + entry.paragraphCount, 0);
+    const missing = chapterStructure.filter((entry) => entry.paragraphCount <= 0).map((entry) => entry.chapterNumber);
+    console.log("[BookProgress] paragraph overrides", { chapters: chapterStructure.length, totalParagraphs, missingCount: missing.length, missingSample: missing.slice(0, 5) });
   }, [draftMode, chapterStructure]);
 
   // Transform characters (raw from Convex)
@@ -630,6 +633,11 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       if (requested.length === 0) return;
 
       lastRequestedCompiledChaptersRef.current = requested;
+
+      const missingEntries = requested.filter((chapterNumber) => !compiledChaptersByNumber.get(chapterNumber));
+      if (missingEntries.length > 0) {
+        console.log("[BookProgress] missing compiled chapter metadata", { missing: missingEntries.slice(0, 5), totalMissing: missingEntries.length });
+      }
 
       const toFetch = requested.filter((chapterNumber) => {
         const entry = compiledChaptersByNumber.get(chapterNumber);
