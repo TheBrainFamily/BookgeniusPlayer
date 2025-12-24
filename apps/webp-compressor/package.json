@@ -1,0 +1,20 @@
+{
+  "name": "webp-compressor",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@jsquash/png": "^3.0.0",
+    "@jsquash/jpeg": "^1.6.0",
+    "@jsquash/webp": "^1.4.0",
+    "@jsquash/resize": "^1.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.99.0"
+  }
+}
