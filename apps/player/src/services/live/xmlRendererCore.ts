@@ -23,7 +23,11 @@ export type CharacterBundleInfo = {
 
 type CharacterInfo = { display: string };
 
-export type XmlSerializerLike = { serializeToString: (node: Node, nodeFilter?: ((node: Node) => boolean) | undefined) => string };
+import type { Node as XmlDomNode } from "@xmldom/xmldom";
+
+type AnyNode = Node | XmlDomNode;
+
+export type XmlSerializerLike = { serializeToString(node: AnyNode, nodeFilter?: (node: AnyNode) => boolean): string };
 
 export type RenderOptions = { bookSlug: string; bookLang: string; bookForm: string; characterBundles: CharacterBundleInfo[]; serializer: XmlSerializerLike };
 
