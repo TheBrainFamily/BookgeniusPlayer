@@ -178,7 +178,7 @@ const ensureProperPolishTextBreaking = (html: string): string => {
  * @param chapterId - The chapter ID number
  * @param bookSlug - The book's slug (e.g., "1984-English")
  * @param bookLang - The book's language (e.g., "english", "polish")
- * @param bookForm - The book's form (e.g., "prose", "play", "mixed")
+ * @param bookForm - The book's form (e.g., "book", "play", "mixed")
  */
 export function processChapterXml(
   chapterXml: string,
@@ -186,7 +186,7 @@ export function processChapterXml(
   chapterId: number,
   bookSlug: string,
   bookLang: string = "english",
-  bookForm: string = "prose",
+  bookForm: string = "book",
 ): ProcessedChapter {
   const parser = new DOMParser();
 

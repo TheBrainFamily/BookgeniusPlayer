@@ -207,9 +207,10 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   //TODO character always use drafts
   const charactersQuery = useQuery(api.bookQueries.listCharacterBundlesWithDrafts, { bookPath });
 
-  const backgroundsQuery = useQuery(draftMode ? api.bookQueries.listBackgroundsWithDrafts : api.bookQueries.listBackgrounds, { bookPath });
+  // Use new cue-based queries (supports video/music reuse across chapters)
+  const backgroundsQuery = useQuery(draftMode ? api.backgroundCues.listForPlayerWithDrafts : api.backgroundCues.listForPlayer, { bookPath });
 
-  const musicQuery = useQuery(draftMode ? api.bookQueries.listMusicWithDrafts : api.bookQueries.listMusic, { bookPath });
+  const musicQuery = useQuery(draftMode ? api.musicCues.listForPlayerWithDrafts : api.musicCues.listForPlayer, { bookPath });
 
   // Stub queries (return empty arrays)
   const audiobookTracksQuery = useQuery(api.bookQueries.listAudiobookTracks, { bookPath });
@@ -305,35 +306,49 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     }));
   }, [charactersQuery]);
 
-  // Transform backgrounds (raw from Convex)
+  // Transform backgrounds (from cue-based queries)
+  // New query format: { startChapter, startParagraph, file, url, backgroundColor, textColor }
   const backgrounds = useMemo<BackgroundInfo[]>(() => {
     if (!backgroundsQuery) return [];
     return backgroundsQuery.map((b) => ({
-      path: b.path,
-      basename: b.basename,
+      path: "", // Not available in cue format
+      basename: b.file,
       url: b.url,
-      chapter: b.chapter,
-      paragraph: b.paragraph,
+      chapter: b.startChapter,
+      paragraph: b.startParagraph,
       backgroundColor: b.backgroundColor,
       textColor: b.textColor,
     }));
   }, [backgroundsQuery]);
 
-  // Transform music (raw from Convex)
+  // Transform music (from cue-based queries)
+  // New query format: { chapter, paragraph, files }
   const music = useMemo<MusicInfo[]>(() => {
     if (!musicQuery) return [];
-    return musicQuery.map((m) => ({ path: m.path, basename: m.basename, url: m.url, chapter: m.chapter, paragraph: m.paragraph }));
+    return musicQuery.map((m) => ({
+      path: "", // Not available in cue format
+      basename: m.files[0]?.split("/").pop() ?? "",
+      url: m.files[0],
+      chapter: m.chapter,
+      paragraph: m.paragraph,
+    }));
   }, [musicQuery]);
 
   // Transform backgrounds to player format
+  // Cue queries already return player-compatible format
   const backgroundsForBook = useMemo<BackgroundForBook[]>(() => {
-    return backgrounds.filter((b) => b.url).map((b) => ({ chapter: b.chapter, paragraph: b.paragraph, file: b.url!, backgroundColor: b.backgroundColor, textColor: b.textColor }));
-  }, [backgrounds]);
+    if (!backgroundsQuery) return [];
+    return backgroundsQuery
+      .filter((b) => b.url)
+      .map((b) => ({ chapter: b.startChapter, paragraph: b.startParagraph, file: b.url!, backgroundColor: b.backgroundColor, textColor: b.textColor }));
+  }, [backgroundsQuery]);
 
   // Transform music to player format
+  // Cue queries already return player-compatible format
   const backgroundSongsForBook = useMemo<BackgroundSongSection[]>(() => {
-    return music.filter((m) => m.url).map((m) => ({ chapter: m.chapter, paragraph: m.paragraph, files: [m.url!] }));
-  }, [music]);
+    if (!musicQuery) return [];
+    return musicQuery.filter((m) => m.files.length > 0 && m.files[0]);
+  }, [musicQuery]);
 
   // Derive known video files from characters
   const knownVideoFiles = useMemo<string[]>(() => {

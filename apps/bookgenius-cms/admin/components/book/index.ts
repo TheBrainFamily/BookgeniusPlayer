@@ -5,3 +5,5 @@ export { CharacterDetailView } from "./CharacterDetailView";
 export { ChaptersView, ChaptersViewSkeleton } from "./ChaptersView";
 export { BookAwareAssetList, BookAwareAssetListSkeleton } from "./BookAwareAssetList";
 export { ChapterEditorView } from "./ChapterEditorView";
+export { BackgroundCuesView, BackgroundCuesViewSkeleton } from "./BackgroundCuesView";
+export { MusicCuesView, MusicCuesViewSkeleton } from "./MusicCuesView";

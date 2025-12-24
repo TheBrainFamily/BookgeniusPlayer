@@ -49,20 +49,8 @@ interface ChapterExtra {
   title: string;
 }
 
-interface BackgroundExtra {
-  type: "background";
-  chapter: number;
-  paragraph: number;
-  backgroundColor?: string;
-  textColor?: string;
-}
-
-interface MusicExtra {
-  type: "music";
-  chapter: number;
-  paragraph: number;
-  order: number;
-}
+// Note: Background and music cue points are now stored in separate tables
+// (backgroundCues, musicCues) rather than as file extra metadata.
 
 // =============================================================================
 // Configuration
@@ -345,6 +333,7 @@ async function step4_ImportBackgrounds(): Promise<number> {
 
   console.log(`  Found ${backgrounds.length} background entries`);
 
+  // Step 1: Upload unique files (no cue metadata on file - cues go in separate table)
   const uploadedFiles = new Set<string>();
 
   for (const bg of backgrounds) {
@@ -356,14 +345,31 @@ async function step4_ImportBackgrounds(): Promise<number> {
       continue;
     }
 
-    const extra: BackgroundExtra = { type: "background", chapter: bg.chapter, paragraph: bg.paragraph, backgroundColor: bg.backgroundColor, textColor: bg.textColor };
-
-    await uploadFile(backgroundsPath, bg.file, filePath, extra);
+    // Upload file without extra - cue points stored separately
+    await uploadFile(backgroundsPath, bg.file, filePath);
     uploadedFiles.add(bg.file);
   }
 
   console.log(`  Uploaded ${uploadedFiles.size} unique background files`);
-  return uploadedFiles.size;
+
+  // Step 2: Create cue points for ALL entries (supports reuse)
+  const cues = backgrounds
+    .filter((bg) => uploadedFiles.has(bg.file))
+    .map((bg) => ({
+      bookPath: BOOK_PATH,
+      fileBasename: bg.file,
+      chapter: bg.chapter,
+      paragraph: bg.paragraph,
+      backgroundColor: bg.backgroundColor || undefined,
+      textColor: bg.textColor || undefined,
+    }));
+
+  if (cues.length > 0) {
+    await client.mutation(api.backgroundCues.bulkCreate, { cues });
+    console.log(`  Created ${cues.length} background cue points`);
+  }
+
+  return cues.length;
 }
 
 async function step5_ImportMusic(): Promise<number> {
@@ -383,12 +389,11 @@ async function step5_ImportMusic(): Promise<number> {
 
   console.log(`  Found ${musicTracks.length} music entries`);
 
+  // Step 1: Upload unique files (no cue metadata on file - cues go in separate table)
   const uploadedFiles = new Set<string>();
-  let uploadCount = 0;
 
   for (const track of musicTracks) {
-    for (let i = 0; i < track.files.length; i++) {
-      const file = track.files[i];
+    for (const file of track.files) {
       // Extract just the filename (handles nested paths like "music/1-0.mp3")
       const basename = path.basename(file);
 
@@ -400,16 +405,33 @@ async function step5_ImportMusic(): Promise<number> {
         continue;
       }
 
-      const extra: MusicExtra = { type: "music", chapter: track.chapter, paragraph: track.paragraph, order: i };
-
-      await uploadFile(musicPath, basename, filePath, extra);
+      // Upload file without extra - cue points stored separately
+      await uploadFile(musicPath, basename, filePath);
       uploadedFiles.add(basename);
-      uploadCount++;
     }
   }
 
-  console.log(`  Uploaded ${uploadCount} unique music files`);
-  return uploadCount;
+  console.log(`  Uploaded ${uploadedFiles.size} unique music files`);
+
+  // Step 2: Create cue points for ALL entries (supports reuse)
+  // Each track entry can have multiple files, create one cue per file
+  const cues: { bookPath: string; fileBasename: string; chapter: number; paragraph: number }[] = [];
+
+  for (const track of musicTracks) {
+    for (const file of track.files) {
+      const basename = path.basename(file);
+      if (uploadedFiles.has(basename)) {
+        cues.push({ bookPath: BOOK_PATH, fileBasename: basename, chapter: track.chapter, paragraph: track.paragraph });
+      }
+    }
+  }
+
+  if (cues.length > 0) {
+    await client.mutation(api.musicCues.bulkCreate, { cues });
+    console.log(`  Created ${cues.length} music cue points`);
+  }
+
+  return cues.length;
 }
 
 async function step6_ImportNotes(): Promise<number> {

@@ -22,6 +22,8 @@ import { BookDashboard } from "./BookDashboard";
 import { CharacterGrid } from "./CharacterGrid";
 import { CharacterDetailView } from "./CharacterDetailView";
 import { ChaptersView } from "./ChaptersView";
+import { BackgroundCuesView } from "./BackgroundCuesView";
+import { MusicCuesView } from "./MusicCuesView";
 import { AssetList, AssetListSkeleton } from "../AssetList";
 
 interface BookAwareAssetListProps {
@@ -94,9 +96,43 @@ export function BookAwareAssetList(props: BookAwareAssetListProps) {
       return <AssetList {...props} />;
 
     case "backgrounds-container":
+      // Backgrounds folder - show cue sheet view with file toggle
+      if (bookInfo) {
+        return (
+          <BookProvider bookPath={bookInfo.bookPath}>
+            <BackgroundCuesView
+              folderPath={folderPath}
+              onAssetSelect={props.onAssetSelect}
+              onFolderSelect={onFolderSelect}
+              onUploadNew={props.onUploadNew}
+              onUploadAsset={props.onUploadAsset}
+              onCreateAsset={props.onCreateAsset}
+              onCreateFolder={props.onCreateFolder}
+              onShowSnippet={props.onShowSnippet}
+            />
+          </BookProvider>
+        );
+      }
+      return <AssetList {...props} />;
+
     case "music-container":
-      // These could have specialized views later
-      // For now, use regular asset list
+      // Music folder - show cue sheet view with file toggle
+      if (bookInfo) {
+        return (
+          <BookProvider bookPath={bookInfo.bookPath}>
+            <MusicCuesView
+              folderPath={folderPath}
+              onAssetSelect={props.onAssetSelect}
+              onFolderSelect={onFolderSelect}
+              onUploadNew={props.onUploadNew}
+              onUploadAsset={props.onUploadAsset}
+              onCreateAsset={props.onCreateAsset}
+              onCreateFolder={props.onCreateFolder}
+              onShowSnippet={props.onShowSnippet}
+            />
+          </BookProvider>
+        );
+      }
       return <AssetList {...props} />;
 
     default:

@@ -57,4 +57,56 @@ export default defineSchema({
   })
     .index("by_book", ["bookPath"])
     .index("by_book_chapter", ["bookPath", "chapter"]),
+
+  // Background cue points (links backgrounds/ files to chapter/paragraph positions)
+  backgroundCues: defineTable({
+    bookPath: v.string(),
+    fileBasename: v.string(),
+    chapter: v.number(),
+    paragraph: v.number(),
+    backgroundColor: v.optional(v.string()),
+    textColor: v.optional(v.string()),
+  })
+    .index("by_book", ["bookPath"])
+    .index("by_book_position", ["bookPath", "chapter", "paragraph"]),
+
+  // Music cue points (links music/ files to chapter/paragraph positions)
+  musicCues: defineTable({
+    bookPath: v.string(),
+    fileBasename: v.string(),
+    chapter: v.number(),
+    paragraph: v.number(),
+    order: v.optional(v.number()), // Order within same chapter/paragraph group (0-indexed)
+  })
+    .index("by_book", ["bookPath"])
+    .index("by_book_position", ["bookPath", "chapter", "paragraph"]),
+
+  // Music file metadata (extracted from ID3 tags at upload time)
+  musicFileMetadata: defineTable({
+    bookPath: v.string(),
+    fileBasename: v.string(), // "intro.mp3"
+    coverBasename: v.optional(v.string()), // "intro.jpg" in music-covers/
+    title: v.optional(v.string()), // From ID3 tag
+    artist: v.optional(v.string()), // From ID3 tag
+    duration: v.optional(v.number()), // Seconds
+    extractedAt: v.number(), // Timestamp
+  }).index("by_book_file", ["bookPath", "fileBasename"]),
+
+  // Background file metadata (preview generation status + thumbnails)
+  backgroundFileMetadata: defineTable({
+    bookPath: v.string(),
+    fileBasename: v.string(), // "castle.mp4" or "forest.png"
+    fileType: v.union(v.literal("video"), v.literal("image")),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("processing"),
+      v.literal("completed"),
+      v.literal("failed")
+    ),
+    previewMp4Basename: v.optional(v.string()), // "castle_preview.mp4" (video only)
+    previewWebpBasename: v.optional(v.string()), // "castle_preview.webp"
+    error: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_book_file", ["bookPath", "fileBasename"]),
 });

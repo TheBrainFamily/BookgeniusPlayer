@@ -12,7 +12,7 @@
  *     characterContext,
  *     bookSlug: "1984-English",
  *     bookLang: "english",
- *     bookForm: "prose",
+ *     bookForm: "book",
  *   });
  *   container.appendChild(element);
  */
@@ -51,7 +51,7 @@ export interface RenderedChapter {
  * - All paragraphs with data-index attributes for IntersectionObserver
  */
 export function renderChapterToElement(options: RenderChapterOptions): RenderedChapter {
-  const { chapterId, chapterXml, characterContext, bookSlug, bookLang = "english", bookForm = "prose" } = options;
+  const { chapterId, chapterXml, characterContext, bookSlug, bookLang = "english", bookForm = "book" } = options;
 
   // Process XML to HTML
   const { html, paragraphCount, title } = processChapterXml(chapterXml, characterContext, chapterId, bookSlug, bookLang, bookForm);

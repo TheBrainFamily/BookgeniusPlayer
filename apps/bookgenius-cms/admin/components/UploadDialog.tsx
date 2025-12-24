@@ -106,8 +106,8 @@ export function UploadDialog({ open, onOpenChange, folderPath, existingBasename 
       // 3. Parse response - Convex returns JSON with storageId, R2 returns empty
       const uploadResponse = backend === "convex" ? await res.json() : undefined;
 
-      // 4. Finish the upload with file metadata
-      await finishUpload({ intentId, uploadResponse, size: file.size, contentType: file.type });
+      // 4. Finish the upload with file metadata (include folderPath/basename for post-upload hooks)
+      await finishUpload({ intentId, uploadResponse, size: file.size, contentType: file.type, folderPath, basename: finalBasename });
 
       toast.success(`File uploaded${publishImmediately ? " and published" : " as draft"}`);
 

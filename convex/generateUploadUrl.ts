@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { mutation, internalMutation, query, action } from "./_generated/server";
-import { components } from "./_generated/api";
+import { internal, components } from "./_generated/api";
 import { requireAuth } from "./authHelpers";
 
 /**
@@ -140,6 +140,9 @@ export const finishUpload = mutation({
     // Client-provided file metadata (required for R2)
     size: v.optional(v.number()),
     contentType: v.optional(v.string()),
+    // For post-upload hooks (e.g., music metadata extraction)
+    folderPath: v.optional(v.string()),
+    basename: v.optional(v.string()),
   },
   returns: v.object({
     assetId: v.string(),
@@ -148,7 +151,7 @@ export const finishUpload = mutation({
   }),
   handler: async (ctx, args) => {
     await requireAuth(ctx);
-    return await ctx.runMutation(
+    const result = await ctx.runMutation(
       components.assetManager.assetManager.finishUpload,
       {
         intentId: args.intentId as any,
@@ -158,6 +161,42 @@ export const finishUpload = mutation({
         contentType: args.contentType,
       },
     );
+
+    // Schedule music metadata extraction for MP3 files in music/ folder
+    if (
+      args.contentType === "audio/mpeg" &&
+      args.folderPath?.endsWith("/music") &&
+      args.basename
+    ) {
+      const bookPath = args.folderPath.replace(/\/music$/, "");
+      await ctx.scheduler.runAfter(0, internal.musicMetadata.extractFromFile, {
+        bookPath,
+        fileBasename: args.basename,
+      });
+    }
+
+    // Schedule preview generation for background files (videos and images)
+    if (args.folderPath?.endsWith("/backgrounds") && args.basename) {
+      const bookPath = args.folderPath.replace(/\/backgrounds$/, "");
+      const isVideo = args.contentType?.startsWith("video/");
+      const isImage = args.contentType?.startsWith("image/");
+
+      if (isVideo) {
+        await ctx.scheduler.runAfter(
+          0,
+          internal.backgroundMetadata.generateVideoPreview,
+          { bookPath, fileBasename: args.basename },
+        );
+      } else if (isImage) {
+        await ctx.scheduler.runAfter(
+          0,
+          internal.backgroundMetadata.generateImagePreview,
+          { bookPath, fileBasename: args.basename },
+        );
+      }
+    }
+
+    return result;
   },
 });
 

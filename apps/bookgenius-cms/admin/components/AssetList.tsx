@@ -170,8 +170,8 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
         // 3. Parse response - Convex returns JSON, R2 returns empty
         const uploadResponse = backend === "convex" ? await res.json() : undefined;
 
-        // 4. Finish upload with file metadata
-        await finishUpload({ intentId, uploadResponse, size: item.file.size, contentType: item.file.type });
+        // 4. Finish upload with file metadata (include folderPath/basename for post-upload hooks)
+        await finishUpload({ intentId, uploadResponse, size: item.file.size, contentType: item.file.type, folderPath: item.targetFolder, basename: item.file.name });
 
         setUploadQueue((q) => q.map((i) => (i.id === item.id ? { ...i, status: "done" } : i)));
       } catch (error) {

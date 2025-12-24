@@ -1,1 +1,1 @@
-export { BookProvider, useBook, useBookMetadata, useCharacters, useChapters, useBookStats, useBooks } from "./BookContext";
+export { BookProvider, useBook, useBookMetadata, useCharacters, useChapters, useBookStats, useBooks, useBackgroundCues, useMusicCues } from "./BookContext";

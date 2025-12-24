@@ -161,6 +161,28 @@ export function useBookStats() {
   return { stats, isLoading };
 }
 
+/**
+ * Get background cues for the current book.
+ */
+export function useBackgroundCues() {
+  const { bookPath } = useBook();
+  const { data: cues, isLoading } = useQuery(convexQuery(api.backgroundCues.listByBook, { bookPath }));
+  const { data: files, isLoading: filesLoading } = useQuery(convexQuery(api.backgroundCues.listFiles, { bookPath }));
+
+  return { cues, files, isLoading: isLoading || filesLoading };
+}
+
+/**
+ * Get music cues for the current book.
+ */
+export function useMusicCues() {
+  const { bookPath } = useBook();
+  const { data: cues, isLoading } = useQuery(convexQuery(api.musicCues.listByBook, { bookPath }));
+  const { data: files, isLoading: filesLoading } = useQuery(convexQuery(api.musicCues.listFiles, { bookPath }));
+
+  return { cues, files, isLoading: isLoading || filesLoading };
+}
+
 // =============================================================================
 // Standalone hook (doesn't require BookProvider)
 // =============================================================================
