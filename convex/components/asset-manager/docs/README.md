@@ -37,25 +37,21 @@ export default app;
 // Upload a file
 const { intentId, uploadUrl } = await ctx.runMutation(
   components.assetManager.assetManager.startUpload,
-  {
-    folderPath: "images",
-    basename: "hero",
-    filename: "hero.png",
-    publish: true,
-  }
+  { folderPath: "images", basename: "hero", filename: "hero.png", publish: true },
 );
 
 // Upload to the URL, then finish
-await ctx.runMutation(
-  components.assetManager.assetManager.finishUpload,
-  { intentId, size: file.size, contentType: file.type }
-);
+await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
+  intentId,
+  size: file.size,
+  contentType: file.type,
+});
 
 // Query the file
-const file = await ctx.runQuery(
-  components.assetManager.assetManager.getPublishedFile,
-  { folderPath: "images", basename: "hero" }
-);
+const file = await ctx.runQuery(components.assetManager.assetManager.getPublishedFile, {
+  folderPath: "images",
+  basename: "hero",
+});
 
 console.log(file.url); // Direct URL to the file
 ```
@@ -69,6 +65,7 @@ Built-in storage, no configuration needed. Good for getting started and smaller 
 ### Cloudflare R2
 
 For production workloads with:
+
 - Global CDN distribution
 - Lower egress costs
 - Custom domains
@@ -81,6 +78,7 @@ See [Setting Up R2](./setup-r2.md) for configuration.
 ### Public Files
 
 For content that doesn't require authentication:
+
 - Marketing assets, public images, audio/video
 - Served directly from CDN
 - Maximum caching and performance
@@ -95,6 +93,7 @@ See [Public Files with CDN](./public-files.md) for details.
 ### Private Files
 
 For content that requires authentication:
+
 - User uploads, premium content, sensitive documents
 - Time-limited signed URLs
 - Auth checked on each request
@@ -108,24 +107,28 @@ See [Private Files with Signed URLs](./private-files.md) for details.
 
 ## Documentation
 
-| Guide | Description |
-|-------|-------------|
-| [Setting Up R2](./setup-r2.md) | Configure Cloudflare R2 storage and CORS |
-| [Public Files](./public-files.md) | Serve files through CDN |
-| [Private Files](./private-files.md) | Auth-protected file access |
-| [Example Apps Plan](./example-apps-plan.md) | Roadmap for demo applications |
+| Guide                                                   | Description                                    |
+| ------------------------------------------------------- | ---------------------------------------------- |
+| [Setting Up R2](./setup-r2.md)                          | Configure Cloudflare R2 storage and CORS       |
+| [Public Files](./public-files.md)                       | Serve files through CDN                        |
+| [Private Files](./private-files.md)                     | Auth-protected file access                     |
+| [WebP - Pure Convex](./webp-pure-convex.md)             | Convert images to WebP in Convex actions       |
+| [WebP - Cloudflare Worker](./webp-cloudflare-worker.md) | High-performance WebP conversion via CF Worker |
+| [Example Apps Plan](./example-apps-plan.md)             | Roadmap for demo applications                  |
 
 ## Concepts
 
 ### Assets and Versions
 
 An **asset** is identified by `folderPath` + `basename`:
+
 ```
 images/hero        → Asset
 sounds/intro       → Asset
 ```
 
 Each asset can have multiple **versions**:
+
 ```
 images/hero
   ├── v1 (archived)
@@ -135,11 +138,11 @@ images/hero
 
 ### Version States
 
-| State | Description |
-|-------|-------------|
-| `draft` | Work in progress, not publicly visible |
-| `published` | Current live version |
-| `archived` | Previous versions, kept for history |
+| State       | Description                            |
+| ----------- | -------------------------------------- |
+| `draft`     | Work in progress, not publicly visible |
+| `published` | Current live version                   |
+| `archived`  | Previous versions, kept for history    |
 
 ### Upload Flow
 
@@ -155,31 +158,31 @@ startUpload() → Upload to URL → finishUpload()
 
 ### Mutations
 
-| Function | Description |
-|----------|-------------|
-| `configureStorageBackend` | Set storage backend (convex/r2) |
-| `startUpload` | Begin an upload, get presigned URL |
-| `finishUpload` | Complete upload, create version |
-| `createFolderByPath` | Create a folder |
-| `publishDraft` | Publish a draft version |
-| `restoreVersion` | Restore a previous version |
-| `moveAsset` | Move asset to different folder |
-| `renameAsset` | Rename an asset |
+| Function                  | Description                        |
+| ------------------------- | ---------------------------------- |
+| `configureStorageBackend` | Set storage backend (convex/r2)    |
+| `startUpload`             | Begin an upload, get presigned URL |
+| `finishUpload`            | Complete upload, create version    |
+| `createFolderByPath`      | Create a folder                    |
+| `publishDraft`            | Publish a draft version            |
+| `restoreVersion`          | Restore a previous version         |
+| `moveAsset`               | Move asset to different folder     |
+| `renameAsset`             | Rename an asset                    |
 
 ### Queries
 
-| Function | Description |
-|----------|-------------|
-| `getPublishedFile` | Get published version with URL |
+| Function                     | Description                        |
+| ---------------------------- | ---------------------------------- |
+| `getPublishedFile`           | Get published version with URL     |
 | `listPublishedFilesInFolder` | List all published files in folder |
-| `getAssetVersions` | Get all versions of an asset |
-| `listFolders` | List subfolders |
-| `getFolder` | Get folder by path |
+| `getAssetVersions`           | Get all versions of an asset       |
+| `listFolders`                | List subfolders                    |
+| `getFolder`                  | Get folder by path                 |
 
 ### Actions
 
-| Function | Description |
-|----------|-------------|
+| Function       | Description                                  |
+| -------------- | -------------------------------------------- |
 | `getSignedUrl` | Generate time-limited URL for private access |
 
 ## Architecture
