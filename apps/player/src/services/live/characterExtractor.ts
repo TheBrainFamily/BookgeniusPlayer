@@ -56,7 +56,7 @@ enum ListType {
 // Helper Functions
 // =============================================================================
 
-const isElementNode = (node: Node): node is Element => node.nodeType === Node.ELEMENT_NODE;
+const isElementNode = (node: Node): node is Element => node.nodeType === 1;
 
 const OVERRIDE_REF_REGEX = /^ch(\d+)-p(\d+)$/i;
 
@@ -97,7 +97,7 @@ const collectOverridesFromCharacterElement = (element: Element): CharacterOverri
       continue;
     }
 
-    const toRef = parseChapterParagraphRef(node.getAttribute("to"));
+    const toRef = parseChapterParagraphRef(node.getAttribute("to")) ?? undefined;
     const summary = node.getAttribute("summary") || undefined;
     const display = node.getAttribute("display") || undefined;
     const avatar = node.getAttribute("avatar") || undefined;
@@ -243,7 +243,7 @@ export function extractCharacterMetadata(
   });
 
   try {
-    const parseError = doc.querySelector("parsererror");
+    const parseError = doc.getElementsByTagName("parsererror")[0];
     if (parseError) {
       console.error("Error parsing generated chapter XML:", parseError.textContent);
       return [];

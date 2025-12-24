@@ -2,7 +2,7 @@
 import { v } from "convex/values";
 import { query, mutation, action } from "./_generated/server";
 // Import the registered components entry point
-import { components } from "./_generated/api";
+import { components, internal } from "./_generated/api";
 import { requireAuth } from "./authHelpers";
 
 // --- Folder Operations ---
@@ -180,10 +180,45 @@ export const publishDraft = mutation({
   },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
-    return await ctx.runMutation(
+    const result = await ctx.runMutation(
       components.assetManager.assetManager.publishDraft,
       args,
     );
+    if (args.folderPath.endsWith("/chapters")) {
+      const bookPath = args.folderPath.replace(/\/chapters$/, "");
+      await ctx.scheduler.runAfter(0, internal.chapterCompiler.processPublishedChapter, {
+        bookPath,
+        chapterBasename: args.basename,
+        versionId: result.versionId,
+      });
+    }
+    return result;
+  },
+});
+
+/**
+ * Backfill compiled chapter HTML and character fragments for a book.
+ */
+export const backfillCompiledChapters = mutation({
+  args: {
+    bookPath: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
+    const chapters = await ctx.runQuery(components.assetManager.assetManager.listPublishedFilesInFolder, {
+      folderPath: `${args.bookPath}/chapters`,
+    });
+
+    for (const chapter of chapters) {
+      await ctx.scheduler.runAfter(0, internal.chapterCompiler.processPublishedChapter, {
+        bookPath: args.bookPath,
+        chapterBasename: chapter.basename,
+        versionId: chapter.versionId,
+      });
+    }
+
+    return { scheduled: chapters.length };
   },
 });
 

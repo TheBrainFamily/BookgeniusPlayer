@@ -39,6 +39,7 @@ import { useBookContent } from "@player/hooks/useBookContent";
 import { useElementVisibility } from "./hooks/useElementVisibility";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
 import { useCriticalAssetPreloader } from "./hooks/useCriticalAssetPreloader";
+import { usePostReadyPrefetch } from "./hooks/usePostReadyPrefetch";
 import ProgressBars from "@player/components/ProgressBars";
 import { languageNameToCode } from "@player/helpers/languageNameToCode";
 import { setupUnloadHandlers } from "./services/setupUnloadHandlers";
@@ -70,6 +71,7 @@ function LiveShell({ onShellMounted }: { onShellMounted: () => void }) {
   useCutScene();
   useBackgroundVideo();
   useAppReady();
+  usePostReadyPrefetch();
   useBackgroundSongs();
 
   const { i18n: i18nInstance } = useTranslation();

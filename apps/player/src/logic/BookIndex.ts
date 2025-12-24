@@ -56,6 +56,7 @@ class BookIndex {
   private chapters = new Map<number, ChapterRecord>();
   private chapterOrder: number[] = [];
   private chaptersContainerSelector = "[data-chapters-container='true']";
+  private paragraphCountOverrides = new Map<number, number>();
 
   static getInstance(): BookIndex {
     if (!BookIndex.instance) {
@@ -70,6 +71,21 @@ class BookIndex {
     this.rootTemplates = [];
     this.chapters.clear();
     this.chapterOrder = [];
+  }
+
+  setParagraphCountOverrides(structure: ChaptersStructureEntry[]): void {
+    this.paragraphCountOverrides = new Map(structure.map((entry) => [entry.chapterNumber, entry.paragraphCount]));
+
+    if (!this.initialized) {
+      return;
+    }
+
+    for (const [chapterNumber, paragraphCount] of this.paragraphCountOverrides) {
+      const record = this.chapters.get(chapterNumber);
+      if (record) {
+        record.paragraphCount = paragraphCount;
+      }
+    }
   }
 
   /**
@@ -135,7 +151,8 @@ class BookIndex {
 
       wrapper.setAttribute("data-chapter-wrapper", String(chapterId));
 
-      const paragraphCount = section.querySelectorAll("[data-index]").length;
+      const derivedCount = section.querySelectorAll("[data-index]").length;
+      const paragraphCount = this.paragraphCountOverrides.get(chapterId) ?? derivedCount;
 
       this.chapters.set(chapterId, { chapterId, wrapper, section, paragraphCount });
       this.chapterOrder.push(chapterId);
@@ -207,7 +224,11 @@ class BookIndex {
 
   getChaptersStructure(): ChaptersStructureEntry[] {
     this.ensureInitialized();
-    return this.chapterOrder.map((chapterNumber) => ({ chapterNumber, paragraphCount: this.chapters.get(chapterNumber)!.paragraphCount }));
+    return this.chapterOrder.map((chapterNumber) => {
+      const record = this.chapters.get(chapterNumber);
+      const override = this.paragraphCountOverrides.get(chapterNumber);
+      return { chapterNumber, paragraphCount: override ?? record?.paragraphCount ?? 0 };
+    });
   }
 
   getParagraphCount(chapterId: number): number {
@@ -216,7 +237,7 @@ class BookIndex {
     if (!record) {
       return 0;
     }
-    return record.paragraphCount;
+    return this.paragraphCountOverrides.get(chapterId) ?? record.paragraphCount;
   }
 
   getParagraphElements(chapterId: number): HTMLElement[] {

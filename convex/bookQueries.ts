@@ -220,6 +220,99 @@ export const listChapters = query({
 });
 
 // =============================================================================
+// Compiled Chapter HTML Queries
+// =============================================================================
+
+/**
+ * List compiled chapter HTML for a book, sorted by chapter number.
+ */
+export const listChapterHtml = query({
+  args: {
+    bookPath: v.string(),
+  },
+  handler: async (ctx, { bookPath }) => {
+    const htmlPath = `${bookPath}/chapters-html`;
+
+    const files = await ctx.runQuery(
+      components.assetManager.assetManager.listPublishedFilesInFolder,
+      { folderPath: htmlPath }
+    );
+
+    const assets = await ctx.runQuery(
+      components.assetManager.assetManager.listPublishedAssetsInFolder,
+      { folderPath: htmlPath }
+    );
+
+    const chapters = files.map((file) => {
+      const asset = assets.find((a) => a.basename === file.basename);
+      const extra = asset?.extra as { chapterNumber?: number; title?: string; sourceVersionId?: string; paragraphCount?: number } | undefined;
+
+      return {
+        path: `${htmlPath}/${file.basename}`,
+        basename: file.basename,
+        url: file.url,
+        versionId: file.versionId as string,
+        contentType: file.contentType,
+        size: file.size,
+        publishedAt: file.publishedAt,
+        chapterNumber: extra?.chapterNumber ?? extractChapterNumber(file.basename),
+        title: extra?.title,
+        sourceVersionId: extra?.sourceVersionId,
+        paragraphCount: extra?.paragraphCount,
+      };
+    });
+
+    return chapters.sort((a, b) => a.chapterNumber - b.chapterNumber);
+  },
+});
+
+/**
+ * List per-chapter character data fragments for a book.
+ */
+export const listCharacterDataFragments = query({
+  args: {
+    bookPath: v.string(),
+  },
+  handler: async (ctx, { bookPath }) => {
+    const dataPath = `${bookPath}/characters-data`;
+
+    const files = await ctx.runQuery(
+      components.assetManager.assetManager.listPublishedFilesInFolder,
+      { folderPath: dataPath }
+    );
+
+    const assets = await ctx.runQuery(
+      components.assetManager.assetManager.listPublishedAssetsInFolder,
+      { folderPath: dataPath }
+    );
+
+    const jsonFiles = files.filter((file) => file.basename.endsWith(".json"));
+    const selectedFiles = jsonFiles.length > 0 ? jsonFiles : files.filter((file) => file.basename.endsWith(".json") || file.basename.endsWith(".html"));
+    const selectedBasenames = new Set(selectedFiles.map((file) => file.basename));
+    const assetByBasename = new Map(assets.filter((asset) => selectedBasenames.has(asset.basename)).map((asset) => [asset.basename, asset]));
+
+    const fragments = selectedFiles.map((file) => {
+      const asset = assetByBasename.get(file.basename);
+      const extra = asset?.extra as { chapterNumber?: number; sourceVersionId?: string } | undefined;
+
+      return {
+        path: `${dataPath}/${file.basename}`,
+        basename: file.basename,
+        url: file.url,
+        versionId: file.versionId as string,
+        contentType: file.contentType,
+        size: file.size,
+        publishedAt: file.publishedAt,
+        chapterNumber: extra?.chapterNumber ?? extractChapterNumber(file.basename),
+        sourceVersionId: extra?.sourceVersionId,
+      };
+    });
+
+    return fragments.sort((a, b) => a.chapterNumber - b.chapterNumber);
+  },
+});
+
+// =============================================================================
 // Background Queries
 // =============================================================================
 

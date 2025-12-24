@@ -15,9 +15,9 @@ export const LINE_BREAK_SPAN = '<span style="display:block; height:0; margin:0; 
 // Type Guards
 // =============================================================================
 
-export const isElementNode = (node: Node): node is Element => node.nodeType === Node.ELEMENT_NODE;
+export const isElementNode = (node: Node): node is Element => node.nodeType === 1;
 
-export const isTextNode = (node: Node): node is Text => node.nodeType === Node.TEXT_NODE;
+export const isTextNode = (node: Node): node is Text => node.nodeType === 3;
 
 // =============================================================================
 // Helper Functions

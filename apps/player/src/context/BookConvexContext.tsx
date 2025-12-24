@@ -29,7 +29,8 @@ import { xmlToComplexHtml, type CharacterBundleInfo } from "@player/services/liv
 import { extractCharacterMetadata } from "@player/services/live/characterExtractor";
 import { setBookDataStore, clearBookDataStore, type Note, type Variant } from "@player/state/bookDataStore";
 import { setListensToSpeaksUrls, setLiveAssetUrls } from "@player/utils/assetUrls";
-import type { BackgroundForBook, BackgroundSongSection, CharacterData, BookData, Chapter as ChapterTitle } from "@player/types/book";
+import type { BackgroundForBook, BackgroundSongSection, CharacterData, CharacterMedia, BookData, Chapter as ChapterTitle } from "@player/types/book";
+import { bookIndex } from "@player/logic/BookIndex";
 
 // =============================================================================
 // Types
@@ -48,6 +49,36 @@ export interface ChapterInfo {
 
 /** Raw chapter data from Convex queries (listChapters / listChaptersWithDrafts) */
 type ChapterQueryItem = { path: string; basename: string; versionId: string; chapterNumber: number; title?: string; url?: string; state?: string; hasDraft?: boolean };
+
+/** Compiled chapter HTML data from Convex (listChapterHtml) */
+type ChapterHtmlQueryItem = {
+  path: string;
+  basename: string;
+  versionId: string;
+  chapterNumber: number;
+  title?: string;
+  url?: string;
+  contentType?: string;
+  size?: number;
+  publishedAt?: number;
+  sourceVersionId?: string;
+  paragraphCount?: number;
+};
+
+/** Per-chapter character data fragments (listCharacterDataFragments) */
+type CharacterDataFragmentQueryItem = {
+  path: string;
+  basename: string;
+  versionId: string;
+  chapterNumber: number;
+  url?: string;
+  contentType?: string;
+  size?: number;
+  publishedAt?: number;
+  sourceVersionId?: string;
+};
+
+type CharacterDataFragmentPayload = { chapterNumber: number; characters: CharacterData[] };
 
 export interface CharacterBundle {
   path: string;
@@ -83,6 +114,87 @@ export interface BookMetadata {
   name: string;
   extra: { title?: string; author?: string; language?: string; form?: string };
 }
+
+type ChapterHtmlEntry = { chapterNumber: number; html?: string };
+
+const buildChapterPlaceholderHtml = (chapterNumber: number): string => {
+  return `\n      <section><section data-chapter="${chapterNumber}"></section></section>`;
+};
+
+const buildBookHtmlFromChapters = (chapters: ChapterHtmlEntry[], bookForm: string): string => {
+  let html = chapters.map((chapter) => chapter.html ?? buildChapterPlaceholderHtml(chapter.chapterNumber)).join("");
+  const form = bookForm.toLowerCase();
+
+  if (form === "play") {
+    html = `\n    <div class="play-container">${html}\n    </div>`;
+  } else if (form === "mixed") {
+    html = `\n    <div class="play-container mixed-container">${html}\n    </div>`;
+  }
+
+  return `<section>${html.trim()}</section>`;
+};
+
+const parseCharacterFragmentPayload = (content: string, fallbackChapterNumber: number): CharacterDataFragmentPayload | null => {
+  try {
+    const parsed = JSON.parse(content) as CharacterDataFragmentPayload | CharacterData[] | null;
+    if (Array.isArray(parsed)) {
+      return { chapterNumber: fallbackChapterNumber, characters: parsed };
+    }
+    if (parsed && Array.isArray(parsed.characters)) {
+      return { chapterNumber: parsed.chapterNumber ?? fallbackChapterNumber, characters: parsed.characters };
+    }
+  } catch (error) {
+    console.warn("[BookConvexContext] Failed to parse character fragment", error);
+  }
+  return null;
+};
+
+const mergeCharacterDataFragments = (fragments: CharacterDataFragmentPayload[], bookSlug: string, mediaBySlug?: Map<string, CharacterMedia>): CharacterData[] => {
+  const merged = new Map<string, CharacterData>();
+
+  for (const fragment of fragments) {
+    for (const character of fragment.characters) {
+      const slugKey = character.slug.toLowerCase();
+      const mediaOverride = mediaBySlug?.get(slugKey);
+      const existing = merged.get(character.slug);
+      const base: CharacterData = existing ?? {
+        slug: character.slug,
+        characterName: character.characterName,
+        bookSlug: character.bookSlug || bookSlug,
+        infoPerChapter: [],
+        overrides: character.overrides,
+        media: character.media,
+      };
+
+      const info = character.infoPerChapter ?? [];
+      const nextInfo = [...base.infoPerChapter];
+      for (const entry of info) {
+        const idx = nextInfo.findIndex((i) => i.chapter === entry.chapter);
+        if (idx >= 0) {
+          nextInfo[idx] = entry;
+        } else {
+          nextInfo.push(entry);
+        }
+      }
+
+      nextInfo.sort((a, b) => a.chapter - b.chapter);
+
+      const mergedMedia = { ...character.media, ...base.media, ...mediaOverride };
+      const hasMedia = Boolean(mergedMedia.avatarUrl || mergedMedia.listensUrl || mergedMedia.speaksUrl);
+
+      merged.set(character.slug, {
+        ...base,
+        characterName: character.characterName || base.characterName,
+        bookSlug: character.bookSlug || base.bookSlug,
+        infoPerChapter: nextInfo,
+        overrides: base.overrides ?? character.overrides,
+        media: hasMedia ? mergedMedia : undefined,
+      });
+    }
+  }
+
+  return Array.from(merged.values());
+};
 
 interface BookConvexContextType {
   // Loading states
@@ -138,6 +250,14 @@ interface BookConvexContextType {
   getCachedChapterContent: (versionId: string) => string | null;
   /** Force reload chapters */
   reloadChapters: () => Promise<void>;
+  /** Ensure compiled chapter HTML is loaded for the given chapter numbers */
+  ensureCompiledChaptersLoaded: (chapterNumbers: number[]) => Promise<void>;
+  /** Ensure character fragments are loaded for the given chapter numbers */
+  ensureCharacterFragmentsLoaded: (chapterNumbers: number[]) => Promise<void>;
+  /** Prefetch compiled chapter HTML up to a chapter number */
+  prefetchChaptersUpTo: (chapterNumber: number) => Promise<void>;
+  /** Prefetch character fragments up to a chapter number */
+  prefetchCharacterFragmentsUpTo: (chapterNumber: number) => Promise<void>;
 }
 
 const defaultContext: BookConvexContextType = {
@@ -164,6 +284,10 @@ const defaultContext: BookConvexContextType = {
   getChapterContent: async (_versionId, _url) => null,
   getCachedChapterContent: () => null,
   reloadChapters: async () => {},
+  ensureCompiledChaptersLoaded: async () => {},
+  ensureCharacterFragmentsLoaded: async () => {},
+  prefetchChaptersUpTo: async () => {},
+  prefetchCharacterFragmentsUpTo: async () => {},
 };
 
 const BookConvexContext = createContext<BookConvexContextType>(defaultContext);
@@ -189,11 +313,18 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
   // Chapter content cache
   const chapterContentCache = useRef<Map<string, string>>(new Map());
+  // Compiled chapter HTML cache (keyed by chapter number)
+  const compiledHtmlCacheRef = useRef<Map<number, { versionId: string; html: string }>>(new Map());
+  // Character fragment cache (keyed by chapter number)
+  const characterFragmentCacheRef = useRef<Map<number, { versionId: string; payload: CharacterDataFragmentPayload }>>(new Map());
 
-  // Track previous chapter versionIds to detect actual content changes
-  const prevChapterVersionIdsRef = useRef<string>("");
+  // Track previous content signatures to detect actual changes
+  const prevContentSignatureRef = useRef<string>("");
+  const prevCharacterSignatureRef = useRef<string>("");
   const initialLoadCompleteRef = useRef(false);
   const isProcessingRef = useRef(false);
+  const lastRequestedCompiledChaptersRef = useRef<number[]>([]);
+  const lastRequestedCharacterChaptersRef = useRef<number[]>([]);
 
   // Extract book slug from path
   const bookSlug = useMemo(() => bookPath.split("/").pop() || "", [bookPath]);
@@ -203,6 +334,10 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
   // Use draft-aware or published-only queries based on draftMode
   const chaptersQuery = useQuery(draftMode ? api.bookQueries.listChaptersWithDrafts : api.bookQueries.listChapters, { bookPath }) as ChapterQueryItem[] | undefined;
+
+  // Compiled chapter HTML and per-chapter character fragments (published-only)
+  const chapterHtmlQuery = useQuery(api.bookQueries.listChapterHtml, { bookPath }) as ChapterHtmlQueryItem[] | undefined;
+  const characterDataFragmentsQuery = useQuery(api.bookQueries.listCharacterDataFragments, { bookPath }) as CharacterDataFragmentQueryItem[] | undefined;
 
   //TODO character always use drafts
   const charactersQuery = useQuery(api.bookQueries.listCharacterBundlesWithDrafts, { bookPath });
@@ -292,6 +427,32 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     }));
   }, [chaptersQuery]);
 
+  const chapterOrder = useMemo(() => chapters.map((c) => c.chapterNumber), [chapters]);
+
+  const compiledChapters = useMemo<ChapterHtmlQueryItem[]>(() => chapterHtmlQuery ?? [], [chapterHtmlQuery]);
+  const compiledChaptersByNumber = useMemo(() => new Map(compiledChapters.map((c) => [c.chapterNumber, c])), [compiledChapters]);
+  const compiledChaptersOrdered = useMemo(() => {
+    if (chapters.length === 0) return [];
+    return chapters.map((c) => compiledChaptersByNumber.get(c.chapterNumber)).filter((c): c is ChapterHtmlQueryItem => Boolean(c));
+  }, [chapters, compiledChaptersByNumber]);
+
+  const chapterStructure = useMemo(
+    () => chapters.map((chapter) => ({ chapterNumber: chapter.chapterNumber, paragraphCount: compiledChaptersByNumber.get(chapter.chapterNumber)?.paragraphCount ?? 0 })),
+    [chapters, compiledChaptersByNumber],
+  );
+
+  const characterDataFragments = useMemo<CharacterDataFragmentQueryItem[]>(() => characterDataFragmentsQuery ?? [], [characterDataFragmentsQuery]);
+  const characterFragmentsByNumber = useMemo(() => new Map(characterDataFragments.map((c) => [c.chapterNumber, c])), [characterDataFragments]);
+  const characterFragmentsOrdered = useMemo(() => {
+    if (chapters.length === 0) return [];
+    return chapters.map((c) => characterFragmentsByNumber.get(c.chapterNumber)).filter((c): c is CharacterDataFragmentQueryItem => Boolean(c));
+  }, [chapters, characterFragmentsByNumber]);
+
+  useEffect(() => {
+    if (draftMode || chapterStructure.length === 0) return;
+    bookIndex.setParagraphCountOverrides(chapterStructure);
+  }, [draftMode, chapterStructure]);
+
   // Transform characters (raw from Convex)
   const characters = useMemo<CharacterBundle[]>(() => {
     if (!charactersQuery) return [];
@@ -374,13 +535,205 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     };
   }, [book, bookSlug, chaptersData]);
 
-  // Compute chapter version signature for change detection
-  const chapterVersionSignature = useMemo(() => {
+  // Compute content signatures for change detection
+  const xmlChapterSignature = useMemo(() => {
     return chapters.map((c) => c.versionId).join("|");
   }, [chapters]);
 
-  // Process chapters: fetch XMLs, convert to HTML, extract metadata
-  const processChapters = useCallback(
+  const compiledChaptersReady = !draftMode && chapters.length > 0 && compiledChaptersOrdered.length === chapters.length;
+  const characterFragmentsReady = !draftMode && chapters.length > 0 && characterFragmentsOrdered.length === chapters.length;
+
+  const chapterOrderSet = useMemo(() => new Set(chapterOrder), [chapterOrder]);
+
+  const getChaptersUpTo = useCallback(
+    (endChapter: number): number[] => {
+      if (chapterOrder.length === 0) return [];
+      return chapterOrder.filter((chapterNumber) => chapterNumber <= endChapter);
+    },
+    [chapterOrder],
+  );
+
+  const normalizeRequestedChapters = useCallback(
+    (chapterNumbers: number[]): number[] => {
+      if (chapterNumbers.length === 0 || chapterOrderSet.size === 0) return [];
+      const unique = Array.from(new Set(chapterNumbers)).filter((chapterNumber) => chapterOrderSet.has(chapterNumber));
+      unique.sort((a, b) => a - b);
+      return unique;
+    },
+    [chapterOrderSet],
+  );
+
+  const buildCompiledChapterEntries = useCallback((): ChapterHtmlEntry[] => {
+    return chapterOrder.map((chapterNumber) => {
+      const cached = compiledHtmlCacheRef.current.get(chapterNumber);
+      return { chapterNumber, html: cached?.html };
+    });
+  }, [chapterOrder]);
+
+  const buildCompiledSignature = useCallback((): string => {
+    if (chapterOrder.length === 0) return "";
+    return chapterOrder.map((chapterNumber) => compiledHtmlCacheRef.current.get(chapterNumber)?.versionId ?? "missing").join("|");
+  }, [chapterOrder]);
+
+  const buildCharacterSignature = useCallback((): string => {
+    if (chapterOrder.length === 0) return "";
+    return chapterOrder.map((chapterNumber) => characterFragmentCacheRef.current.get(chapterNumber)?.versionId ?? "missing").join("|");
+  }, [chapterOrder]);
+
+  const updateCompiledBookHtml = useCallback(() => {
+    if (compiledHtmlCacheRef.current.size === 0) return;
+
+    const signature = buildCompiledSignature();
+    if (signature === prevContentSignatureRef.current && bookStringified) {
+      return;
+    }
+
+    const bookForm = book?.extra?.form?.toLowerCase() || "book";
+    const htmlResult = buildBookHtmlFromChapters(buildCompiledChapterEntries(), bookForm);
+
+    setBookStringified(htmlResult);
+    prevContentSignatureRef.current = signature;
+
+    if (!initialLoadCompleteRef.current) {
+      initialLoadCompleteRef.current = true;
+    }
+
+    setTextVersion((v) => {
+      console.log("[Convex:Flow] Incrementing textVersion", v, "->", v + 1);
+      return v + 1;
+    });
+  }, [book, bookStringified, buildCompiledChapterEntries, buildCompiledSignature]);
+
+  const updateCharactersFromCache = useCallback(() => {
+    if (characterFragmentCacheRef.current.size === 0) return;
+
+    const signature = buildCharacterSignature();
+    if (signature === prevCharacterSignatureRef.current) {
+      return;
+    }
+
+    const fragments = Array.from(characterFragmentCacheRef.current.values()).map((entry) => entry.payload);
+    const mediaBySlug = new Map<string, CharacterMedia>();
+    for (const char of characters) {
+      mediaBySlug.set(char.slug.toLowerCase(), { avatarUrl: char.avatar?.url, listensUrl: char.listens?.url, speaksUrl: char.speaks?.url });
+    }
+
+    setCharactersData(mergeCharacterDataFragments(fragments, bookSlug, mediaBySlug));
+    prevCharacterSignatureRef.current = signature;
+  }, [bookSlug, buildCharacterSignature, characters]);
+
+  const ensureCompiledChaptersLoaded = useCallback(
+    async (chapterNumbers: number[]) => {
+      if (draftMode || !compiledChaptersReady) return;
+
+      const requested = normalizeRequestedChapters(chapterNumbers);
+      if (requested.length === 0) return;
+
+      lastRequestedCompiledChaptersRef.current = requested;
+
+      const toFetch = requested.filter((chapterNumber) => {
+        const entry = compiledChaptersByNumber.get(chapterNumber);
+        if (!entry?.versionId) return false;
+        const cached = compiledHtmlCacheRef.current.get(chapterNumber);
+        return !cached || cached.versionId !== entry.versionId;
+      });
+
+      if (toFetch.length > 0) {
+        setError(null);
+        const results = await Promise.all(
+          toFetch.map(async (chapterNumber) => {
+            const entry = compiledChaptersByNumber.get(chapterNumber);
+            if (!entry?.versionId) return null;
+            const html = await getChapterContent(entry.versionId, entry.url);
+            if (!html) return null;
+            return { chapterNumber, versionId: entry.versionId, html };
+          }),
+        );
+
+        const successful = results.filter((result): result is { chapterNumber: number; versionId: string; html: string } => Boolean(result));
+        if (successful.length === 0 && compiledHtmlCacheRef.current.size === 0) {
+          setError("No compiled chapter HTML available");
+          return;
+        }
+
+        for (const result of successful) {
+          compiledHtmlCacheRef.current.set(result.chapterNumber, { versionId: result.versionId, html: result.html });
+        }
+      }
+
+      updateCompiledBookHtml();
+    },
+    [bookStringified, compiledChaptersByNumber, compiledChaptersReady, draftMode, getChapterContent, normalizeRequestedChapters, updateCompiledBookHtml],
+  );
+
+  const ensureCharacterFragmentsLoaded = useCallback(
+    async (chapterNumbers: number[]) => {
+      if (draftMode || !characterFragmentsReady) return;
+
+      const requested = normalizeRequestedChapters(chapterNumbers);
+      if (requested.length === 0) return;
+
+      lastRequestedCharacterChaptersRef.current = requested;
+
+      const toFetch = requested.filter((chapterNumber) => {
+        const entry = characterFragmentsByNumber.get(chapterNumber);
+        if (!entry?.versionId) return false;
+        const cached = characterFragmentCacheRef.current.get(chapterNumber);
+        return !cached || cached.versionId !== entry.versionId;
+      });
+
+      if (toFetch.length > 0) {
+        const results = await Promise.all(
+          toFetch.map(async (chapterNumber) => {
+            const entry = characterFragmentsByNumber.get(chapterNumber);
+            if (!entry?.versionId) return null;
+            const content = await getChapterContent(entry.versionId, entry.url);
+            if (!content) return null;
+            const parsed = parseCharacterFragmentPayload(content, chapterNumber);
+            if (!parsed) return null;
+            return { chapterNumber, versionId: entry.versionId, payload: parsed };
+          }),
+        );
+
+        const successful = results.filter((result): result is { chapterNumber: number; versionId: string; payload: CharacterDataFragmentPayload } => Boolean(result));
+
+        if (successful.length === 0 && characterFragmentCacheRef.current.size === 0) {
+          setCharactersData([]);
+          return;
+        }
+
+        for (const result of successful) {
+          characterFragmentCacheRef.current.set(result.chapterNumber, { versionId: result.versionId, payload: result.payload });
+        }
+      }
+
+      updateCharactersFromCache();
+    },
+    [characterFragmentsByNumber, characterFragmentsReady, draftMode, getChapterContent, normalizeRequestedChapters, updateCharactersFromCache],
+  );
+
+  const prefetchChaptersUpTo = useCallback(
+    async (chapterNumber: number) => {
+      if (chapterNumber <= 0) return;
+      const chaptersToFetch = getChaptersUpTo(chapterNumber);
+      if (chaptersToFetch.length === 0) return;
+      await ensureCompiledChaptersLoaded(chaptersToFetch);
+    },
+    [ensureCompiledChaptersLoaded, getChaptersUpTo],
+  );
+
+  const prefetchCharacterFragmentsUpTo = useCallback(
+    async (chapterNumber: number) => {
+      if (chapterNumber <= 0) return;
+      const chaptersToFetch = getChaptersUpTo(chapterNumber);
+      if (chaptersToFetch.length === 0) return;
+      await ensureCharacterFragmentsLoaded(chaptersToFetch);
+    },
+    [ensureCharacterFragmentsLoaded, getChaptersUpTo],
+  );
+
+  // Process chapters from XML (draft mode or fallback)
+  const processChaptersFromXml = useCallback(
     async (forceReprocess = false) => {
       if (chapters.length === 0) {
         console.log("[Convex:Flow] Skipping - no chapters");
@@ -394,12 +747,12 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       }
 
       // Check if chapters actually changed by comparing full signatures
-      const prevSig = prevChapterVersionIdsRef.current;
-      const newSig = chapterVersionSignature;
+      const prevSig = prevContentSignatureRef.current;
+      const newSig = xmlChapterSignature;
       const signaturesMatch = prevSig === newSig;
       const chaptersChanged = !signaturesMatch;
 
-      console.log("[Convex:Flow] processChapters called", {
+      console.log("[Convex:Flow] processChaptersFromXml called", {
         chaptersChanged,
         signaturesMatch,
         forceReprocess,
@@ -495,7 +848,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
         setCharactersData(charMetadata);
 
         // Update tracking
-        prevChapterVersionIdsRef.current = chapterVersionSignature;
+        prevContentSignatureRef.current = xmlChapterSignature;
         initialLoadCompleteRef.current = true;
 
         // Increment version on chapter changes
@@ -515,26 +868,90 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
         isProcessingRef.current = false;
       }
     },
-    [chapters, characters, chapterVersionSignature, book, bookSlug, getChapterContent],
+    [chapters, characters, xmlChapterSignature, book, bookSlug, getChapterContent],
   );
 
   // Reload function
   const reloadChapters = useCallback(async () => {
     // Clear cache and reset tracking
     chapterContentCache.current.clear();
-    prevChapterVersionIdsRef.current = "";
-    await processChapters(true);
-  }, [processChapters]);
+    compiledHtmlCacheRef.current.clear();
+    characterFragmentCacheRef.current.clear();
+    prevContentSignatureRef.current = "";
+    prevCharacterSignatureRef.current = "";
 
-  // Process chapters when queries complete
-  // NOTE: processChapters is intentionally NOT in the dependency array to prevent
-  // infinite loops. The function checks chapterVersionSignature internally.
-  useEffect(() => {
-    if (chaptersQuery !== undefined && bookMetadata !== undefined && charactersQuery !== undefined) {
-      void processChapters();
+    if (!draftMode && compiledChaptersReady && characterFragmentsReady) {
+      if (lastRequestedCompiledChaptersRef.current.length > 0) {
+        await ensureCompiledChaptersLoaded(lastRequestedCompiledChaptersRef.current);
+      }
+      if (lastRequestedCharacterChaptersRef.current.length > 0) {
+        await ensureCharacterFragmentsLoaded(lastRequestedCharacterChaptersRef.current);
+      }
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chaptersQuery, bookMetadata, charactersQuery, chapterVersionSignature]);
+
+    await processChaptersFromXml(true);
+  }, [draftMode, compiledChaptersReady, characterFragmentsReady, ensureCompiledChaptersLoaded, ensureCharacterFragmentsLoaded, processChaptersFromXml]);
+
+  // Reset cached signatures when switching modes or books
+  useEffect(() => {
+    chapterContentCache.current.clear();
+    compiledHtmlCacheRef.current.clear();
+    characterFragmentCacheRef.current.clear();
+    prevContentSignatureRef.current = "";
+    prevCharacterSignatureRef.current = "";
+    initialLoadCompleteRef.current = false;
+    lastRequestedCompiledChaptersRef.current = [];
+    lastRequestedCharacterChaptersRef.current = [];
+    setBookStringified(null);
+    setChaptersData([]);
+    setCharactersData([]);
+  }, [draftMode, bookPath]);
+
+  // Process chapters when queries complete (draft mode or fallback)
+  useEffect(() => {
+    if (chaptersQuery === undefined || bookMetadata === undefined || charactersQuery === undefined) {
+      return;
+    }
+
+    if (!draftMode && (chapterHtmlQuery === undefined || characterDataFragmentsQuery === undefined)) {
+      return;
+    }
+
+    if (!draftMode && compiledChaptersReady && characterFragmentsReady) {
+      return;
+    }
+
+    void processChaptersFromXml();
+  }, [
+    chaptersQuery,
+    bookMetadata,
+    charactersQuery,
+    compiledChaptersReady,
+    characterFragmentsReady,
+    xmlChapterSignature,
+    draftMode,
+    chapterHtmlQuery,
+    characterDataFragmentsQuery,
+    processChaptersFromXml,
+  ]);
+
+  // Keep chapter titles in sync for compiled mode (metadata only)
+  useEffect(() => {
+    if (draftMode || !compiledChaptersReady) return;
+    if (chapters.length === 0) {
+      setChaptersData([]);
+      return;
+    }
+
+    const chapterTitleFallback = new Map(chapters.map((c) => [c.chapterNumber, c.title]));
+    setChaptersData(
+      chapterOrder.map((chapterNumber) => ({
+        id: String(chapterNumber),
+        title: compiledChaptersByNumber.get(chapterNumber)?.title ?? chapterTitleFallback.get(chapterNumber) ?? "",
+      })),
+    );
+  }, [draftMode, compiledChaptersReady, chapters, chapterOrder, compiledChaptersByNumber]);
 
   // Sync character metadata when Convex character bundles change (name/summary edits)
   // This is separate from chapter processing - allows character edits to update instantly
@@ -592,7 +1009,13 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   }, [characters]);
 
   // Compute loading state
-  const isLoading = bookMetadata === undefined || chaptersQuery === undefined || charactersQuery === undefined || backgroundsQuery === undefined || musicQuery === undefined;
+  const isLoading =
+    bookMetadata === undefined ||
+    chaptersQuery === undefined ||
+    charactersQuery === undefined ||
+    backgroundsQuery === undefined ||
+    musicQuery === undefined ||
+    (!draftMode && (chapterHtmlQuery === undefined || characterDataFragmentsQuery === undefined));
 
   // Ready when initial load complete - don't go back to "not ready" during updates
   // Once we have content, we stay "ready" even while processing updates in the background
@@ -623,6 +1046,10 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       getChapterContent,
       getCachedChapterContent,
       reloadChapters,
+      ensureCompiledChaptersLoaded,
+      ensureCharacterFragmentsLoaded,
+      prefetchChaptersUpTo,
+      prefetchCharacterFragmentsUpTo,
     }),
     [
       isLoading,
@@ -648,6 +1075,10 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       getChapterContent,
       getCachedChapterContent,
       reloadChapters,
+      ensureCompiledChaptersLoaded,
+      ensureCharacterFragmentsLoaded,
+      prefetchChaptersUpTo,
+      prefetchCharacterFragmentsUpTo,
     ],
   );
 

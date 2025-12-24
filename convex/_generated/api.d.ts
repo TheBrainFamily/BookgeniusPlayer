@@ -14,6 +14,7 @@ import type * as backgroundCues from "../backgroundCues.js";
 import type * as backgroundMetadata from "../backgroundMetadata.js";
 import type * as backgroundPreviewHttp from "../backgroundPreviewHttp.js";
 import type * as bookQueries from "../bookQueries.js";
+import type * as chapterCompiler from "../chapterCompiler.js";
 import type * as cli from "../cli.js";
 import type * as comicGeneration from "../comicGeneration.js";
 import type * as comicSubmissions from "../comicSubmissions.js";
@@ -43,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   backgroundMetadata: typeof backgroundMetadata;
   backgroundPreviewHttp: typeof backgroundPreviewHttp;
   bookQueries: typeof bookQueries;
+  chapterCompiler: typeof chapterCompiler;
   cli: typeof cli;
   comicGeneration: typeof comicGeneration;
   comicSubmissions: typeof comicSubmissions;

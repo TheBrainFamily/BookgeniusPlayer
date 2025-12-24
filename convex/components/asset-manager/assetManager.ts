@@ -42,9 +42,7 @@ function isStoredOnConvex(
   return ref.storageId !== undefined;
 }
 
-function isStoredOnR2(
-  ref: StorageReference,
-): ref is StorageReference & { r2Key: string } {
+function isStoredOnR2(ref: StorageReference): ref is StorageReference & { r2Key: string } {
   return ref.r2Key !== undefined;
 }
 
@@ -52,9 +50,7 @@ function isStoredOnR2(
  * Get the current storage backend configuration.
  * Defaults to "convex" if no configuration exists.
  */
-async function getStorageBackend(
-  ctx: QueryCtx | MutationCtx,
-): Promise<"convex" | "r2"> {
+async function getStorageBackend(ctx: QueryCtx | MutationCtx): Promise<"convex" | "r2"> {
   const config = await getStorageConfig(ctx);
   return config.backend;
 }
@@ -62,9 +58,7 @@ async function getStorageBackend(
 /**
  * Get the full storage configuration including R2 public URL.
  */
-async function getStorageConfig(
-  ctx: QueryCtx | MutationCtx,
-): Promise<StorageConfig> {
+async function getStorageConfig(ctx: QueryCtx | MutationCtx): Promise<StorageConfig> {
   const config = await ctx.db
     .query("storageConfig")
     .withIndex("by_singleton", (q) => q.eq("singleton", "storageConfig"))
@@ -81,15 +75,10 @@ async function getStorageConfig(
  * Uses the configured r2PublicUrl from storageConfig.
  * Requires r2PublicUrl to be configured - no fallback to signed URLs.
  */
-async function getR2PublicUrl(
-  ctx: QueryCtx | MutationCtx,
-  r2Key: string,
-): Promise<string | null> {
+async function getR2PublicUrl(ctx: QueryCtx | MutationCtx, r2Key: string): Promise<string | null> {
   const config = await getStorageConfig(ctx);
   if (!config.r2PublicUrl) {
-    console.error(
-      "R2 public URL not configured. Call configureStorageBackend with r2PublicUrl.",
-    );
+    console.error("R2 public URL not configured. Call configureStorageBackend with r2PublicUrl.");
     return null;
   }
   // Remove trailing slash if present, then append key
@@ -240,9 +229,7 @@ export const startUpload = mutation({
       }
       // Build R2 key: {prefix/}{intentId}/{filename}
       const filename = args.filename ?? args.basename;
-      const prefix = storageConfig.r2KeyPrefix
-        ? `${storageConfig.r2KeyPrefix}/`
-        : "";
+      const prefix = storageConfig.r2KeyPrefix ? `${storageConfig.r2KeyPrefix}/` : "";
       r2Key = `${prefix}${intentId}/${filename}`;
 
       // Update intent with the r2Key
@@ -256,12 +243,7 @@ export const startUpload = mutation({
       uploadUrl = await ctx.storage.generateUploadUrl();
     }
 
-    return {
-      intentId,
-      backend,
-      uploadUrl,
-      r2Key,
-    };
+    return { intentId, backend, uploadUrl, r2Key };
   },
 });
 
@@ -327,9 +309,7 @@ export const finishUpload = mutation({
       // Convex backend - extract storageId from uploadResponse
       const responseStorageId = args.uploadResponse?.storageId;
       if (!responseStorageId) {
-        throw new Error(
-          "uploadResponse.storageId is required for Convex backend uploads",
-        );
+        throw new Error("uploadResponse.storageId is required for Convex backend uploads");
       }
       storageId = responseStorageId as Id<"_storage">;
 
@@ -414,10 +394,7 @@ export const finishUpload = mutation({
       });
 
       // Update asset timestamp
-      await ctx.db.patch(assetId, {
-        updatedAt: now,
-        updatedBy: actorFields.updatedBy,
-      });
+      await ctx.db.patch(assetId, { updatedAt: now, updatedBy: actorFields.updatedBy });
     } else {
       // Create new version (either publishing or no existing draft)
       assetId = asset._id;
@@ -489,11 +466,7 @@ export const finishUpload = mutation({
 // =============================================================================
 
 export const createFolderByPath = mutation({
-  args: {
-    path: v.string(),
-    name: v.optional(v.string()),
-    extra: v.optional(v.any()),
-  },
+  args: { path: v.string(), name: v.optional(v.string()), extra: v.optional(v.any()) },
   returns: v.id("folders"),
   handler: async (ctx, args) => {
     const newFolderPath = normalizeFolderPath(args.path);
@@ -529,11 +502,7 @@ function joinPath(parent: string, segment: string): string {
 }
 
 export const createFolderByName = mutation({
-  args: {
-    parentPath: v.string(),
-    name: v.string(),
-    extra: v.optional(v.any()),
-  },
+  args: { parentPath: v.string(), name: v.string(), extra: v.optional(v.any()) },
   returns: v.id("folders"),
   handler: async (ctx, args) => {
     const normalizedParentPath = normalizeFolderPath(args.parentPath);
@@ -542,18 +511,12 @@ export const createFolderByName = mutation({
 
     const existing = await ctx.db
       .query("folders")
-      .withIndex("by_path", (q) =>
-        q.eq("path", joinPath(normalizedParentPath, slugifiedName)),
-      )
+      .withIndex("by_path", (q) => q.eq("path", joinPath(normalizedParentPath, slugifiedName)))
       .first();
 
     if (existing) {
       if (args.name !== existing.name) {
-        const segment = await allocateFolderSegment(
-          ctx,
-          normalizedParentPath,
-          slugifiedName,
-        );
+        const segment = await allocateFolderSegment(ctx, normalizedParentPath, slugifiedName);
         newFolderPath = joinPath(normalizedParentPath, segment);
       } else {
         throw new Error("Folder already exists");
@@ -594,15 +557,11 @@ const SUFFIX = "\uffff";
 
 const depth = (path: string): number => path.split("/").length;
 export const listFolders = query({
-  args: {
-    parentPath: v.optional(v.string()),
-  },
+  args: { parentPath: v.optional(v.string()) },
   returns: v.array(v.object(folderFields)),
   handler: async (ctx, args) => {
     const parentPath =
-      args.parentPath === undefined
-        ? ROOT_PARENT
-        : normalizeFolderPath(args.parentPath);
+      args.parentPath === undefined ? ROOT_PARENT : normalizeFolderPath(args.parentPath);
     const parentPrefix = parentPath ? `${parentPath}/` : "";
     const end = `${parentPrefix}${SUFFIX}`;
     const candidates = await ctx.db
@@ -610,9 +569,7 @@ export const listFolders = query({
       .withIndex("by_path", (q) => q.gte("path", parentPrefix).lt("path", end))
       .order("asc")
       .collect();
-    return candidates.filter(
-      (candidate) => depth(candidate.path) === depth(parentPrefix),
-    );
+    return candidates.filter((candidate) => depth(candidate.path) === depth(parentPrefix));
   },
 });
 
@@ -701,11 +658,7 @@ export const updateFolder = mutation({
 // });
 
 export const createAsset = mutation({
-  args: {
-    folderPath: v.string(),
-    basename: v.string(),
-    extra: v.optional(v.any()),
-  },
+  args: { folderPath: v.string(), basename: v.string(), extra: v.optional(v.any()) },
   returns: v.id("assets"),
   handler: async (ctx, args) => {
     const folderPath = normalizeFolderPath(args.folderPath);
@@ -752,9 +705,7 @@ export const getAsset = query({
     const asset = await ctx.db
       .query("assets")
       .withIndex("by_folder_basename", (q) =>
-        q
-          .eq("folderPath", normalizedFolderPath)
-          .eq("basename", normalizedBasename),
+        q.eq("folderPath", normalizedFolderPath).eq("basename", normalizedBasename),
       )
       .first();
     return asset ?? null;
@@ -769,9 +720,7 @@ export const listAssets = query({
 
     const assets = await ctx.db
       .query("assets")
-      .withIndex("by_folder_basename", (q) =>
-        q.eq("folderPath", normalizedFolderPath),
-      )
+      .withIndex("by_folder_basename", (q) => q.eq("folderPath", normalizedFolderPath))
       .order("asc")
       .collect();
     return assets;
@@ -782,10 +731,7 @@ export const getFolderWithAssets = query({
   args: { path: v.string() },
   returns: v.union(
     v.null(),
-    v.object({
-      folder: v.object(folderFields),
-      assets: v.array(v.object(assetFields)),
-    }),
+    v.object({ folder: v.object(folderFields), assets: v.array(v.object(assetFields)) }),
   ),
   handler: async (ctx, args) => {
     const folderPath = normalizeFolderPath(args.path);
@@ -833,9 +779,7 @@ export const commitVersion = mutation({
     const asset = await ctx.db
       .query("assets")
       .withIndex("by_folder_basename", (q) =>
-        q
-          .eq("folderPath", normalizedFolderPath)
-          .eq("basename", normalizedBasename),
+        q.eq("folderPath", normalizedFolderPath).eq("basename", normalizedBasename),
       )
       .first();
 
@@ -873,9 +817,7 @@ export const commitVersion = mutation({
       extra: args.extra,
       createdAt: now,
       ...actorFields,
-      ...(publish
-        ? { publishedAt: now, publishedBy: actorFields.createdBy }
-        : {}),
+      ...(publish ? { publishedAt: now, publishedBy: actorFields.createdBy } : {}),
     });
 
     if (publish) {
@@ -1011,10 +953,7 @@ export const createVersionFromStorageId = mutation({
       });
 
       // Update asset timestamp
-      await ctx.db.patch(assetId, {
-        updatedAt: now,
-        updatedBy: actorFields.updatedBy,
-      });
+      await ctx.db.patch(assetId, { updatedAt: now, updatedBy: actorFields.updatedBy });
     } else {
       // Create new version (either publishing or no existing draft)
       assetId = asset._id;
@@ -1077,10 +1016,7 @@ export const createVersionFromStorageId = mutation({
 });
 
 export const getAssetVersions = query({
-  args: {
-    folderPath: v.string(),
-    basename: v.string(),
-  },
+  args: { folderPath: v.string(), basename: v.string() },
   returns: v.array(v.object(assetVersionFields)),
   handler: async (ctx, args) => {
     const normalizedFolderPath = normalizeFolderPath(args.folderPath);
@@ -1107,10 +1043,7 @@ export const getAssetVersions = query({
 });
 
 export const publishDraft = mutation({
-  args: {
-    folderPath: v.string(),
-    basename: v.string(),
-  },
+  args: { folderPath: v.string(), basename: v.string() },
   handler: async (ctx, args) => {
     const normalizedFolderPath = normalizeFolderPath(args.folderPath);
     const now = Date.now();
@@ -1125,9 +1058,7 @@ export const publishDraft = mutation({
       .first();
 
     if (!asset) {
-      throw new Error(
-        `Asset not found: ${normalizedFolderPath}/${args.basename}`,
-      );
+      throw new Error(`Asset not found: ${normalizedFolderPath}/${args.basename}`);
     }
 
     // Check that asset has a draft version
@@ -1176,14 +1107,8 @@ export const publishDraft = mutation({
  * This allows editing metadata (chapterNumber, title, etc.) without creating a new version.
  */
 export const updateVersionExtra = mutation({
-  args: {
-    versionId: v.id("assetVersions"),
-    extra: v.any(),
-  },
-  returns: v.object({
-    versionId: v.id("assetVersions"),
-    extra: v.any(),
-  }),
+  args: { versionId: v.id("assetVersions"), extra: v.any() },
+  returns: v.object({ versionId: v.id("assetVersions"), extra: v.any() }),
   handler: async (ctx, args) => {
     const now = Date.now();
     const actorFields = await getActorFields(ctx);
@@ -1195,17 +1120,12 @@ export const updateVersionExtra = mutation({
     }
 
     // Update the version's extra field
-    await ctx.db.patch(args.versionId, {
-      extra: args.extra,
-    });
+    await ctx.db.patch(args.versionId, { extra: args.extra });
 
     // Also update the asset's updatedAt timestamp
     const asset = await ctx.db.get(version.assetId);
     if (asset) {
-      await ctx.db.patch(asset._id, {
-        updatedAt: now,
-        updatedBy: actorFields.updatedBy,
-      });
+      await ctx.db.patch(asset._id, { updatedAt: now, updatedBy: actorFields.updatedBy });
     }
 
     return { versionId: args.versionId, extra: args.extra };
@@ -1213,10 +1133,7 @@ export const updateVersionExtra = mutation({
 });
 
 export const getPublishedVersion = query({
-  args: {
-    folderPath: v.string(),
-    basename: v.string(),
-  },
+  args: { folderPath: v.string(), basename: v.string() },
   handler: async (ctx, args) => {
     const normalizedFolderPath = normalizeFolderPath(args.folderPath);
 
@@ -1257,10 +1174,7 @@ export const getPublishedVersion = query({
  * v1 (initial) → v2 (newer) → v3 (restored from v1)
  */
 export const restoreVersion = mutation({
-  args: {
-    versionId: v.id("assetVersions"),
-    label: v.optional(v.string()),
-  },
+  args: { versionId: v.id("assetVersions"), label: v.optional(v.string()) },
   returns: v.object({
     assetId: v.id("assets"),
     versionId: v.id("assetVersions"),
@@ -1337,10 +1251,7 @@ export const restoreVersion = mutation({
 });
 
 export const getPublishedFile = query({
-  args: {
-    folderPath: v.string(),
-    basename: v.string(),
-  },
+  args: { folderPath: v.string(), basename: v.string() },
   returns: v.union(
     v.null(),
     v.object({
@@ -1411,9 +1322,7 @@ export const getPublishedFile = query({
 });
 
 export const listPublishedFilesInFolder = query({
-  args: {
-    folderPath: v.string(),
-  },
+  args: { folderPath: v.string() },
   returns: v.array(
     v.object({
       folderPath: v.string(),
@@ -1431,35 +1340,36 @@ export const listPublishedFilesInFolder = query({
   handler: async (ctx, args) => {
     const folderPath = normalizeFolderPath(args.folderPath);
 
+    console.time("getting assets by_folder_basename");
     const assets = await ctx.db
       .query("assets")
       .withIndex("by_folder_basename", (q) => q.eq("folderPath", folderPath))
       .collect();
+    console.timeEnd("getting assets by_folder_basename");
 
-    const results = [];
-
-    for (const asset of assets) {
-      if (!asset.publishedVersionId) continue;
+    const assetPromises = assets.map(async (asset) => {
+      if (!asset.publishedVersionId) return null;
       const version = await ctx.db.get(asset.publishedVersionId);
       if (!version || version.state !== "published") {
-        continue;
+        return null;
       }
 
       // Need either storageId (Convex) or r2Key (R2)
       if (!version.storageId && !version.r2Key) {
-        continue;
+        return null;
       }
 
       // Get URL based on storage backend
+      console.time("getting url for " + asset.basename);
       let url: string | null = null;
       if (version.r2Key) {
         url = await getR2PublicUrl(ctx, version.r2Key);
       } else if (version.storageId) {
         url = await ctx.storage.getUrl(version.storageId);
       }
-      if (!url) continue;
-
-      results.push({
+      console.timeEnd("getting url for " + asset.basename);
+      if (!url) return null;
+      return {
         folderPath,
         basename: asset.basename,
         version: version.version,
@@ -1470,17 +1380,18 @@ export const listPublishedFilesInFolder = query({
         contentType: version.contentType,
         size: version.size,
         publishedAt: version.publishedAt,
-      });
-    }
+      };
+    });
 
-    return results;
+    console.time("waiting for all promises");
+    const assetResults = await Promise.all(assetPromises);
+    console.timeEnd("waiting for all promises");
+    return assetResults.filter((result) => result !== null);
   },
 });
 
 export const listPublishedAssetsInFolder = query({
-  args: {
-    folderPath: v.string(),
-  },
+  args: { folderPath: v.string() },
   returns: v.array(
     v.object({
       folderPath: v.string(),
@@ -1538,11 +1449,7 @@ export const listPublishedAssetsInFolder = query({
 });
 
 export const moveAsset = mutation({
-  args: {
-    fromFolderPath: v.string(),
-    basename: v.string(),
-    toFolderPath: v.string(),
-  },
+  args: { fromFolderPath: v.string(), basename: v.string(), toFolderPath: v.string() },
   returns: v.object({
     assetId: v.id("assets"),
     fromFolderPath: v.string(),
@@ -1568,9 +1475,7 @@ export const moveAsset = mutation({
     // Check for conflict at destination
     const conflict = await ctx.db
       .query("assets")
-      .withIndex("by_folder_basename", (q) =>
-        q.eq("folderPath", to).eq("basename", args.basename),
-      )
+      .withIndex("by_folder_basename", (q) => q.eq("folderPath", to).eq("basename", args.basename))
       .first();
 
     if (conflict) {
@@ -1599,16 +1504,8 @@ export const moveAsset = mutation({
 });
 
 export const renameAsset = mutation({
-  args: {
-    folderPath: v.string(),
-    basename: v.string(),
-    newBasename: v.string(),
-  },
-  returns: v.object({
-    assetId: v.id("assets"),
-    oldBasename: v.string(),
-    newBasename: v.string(),
-  }),
+  args: { folderPath: v.string(), basename: v.string(), newBasename: v.string() },
+  returns: v.object({ assetId: v.id("assets"), oldBasename: v.string(), newBasename: v.string() }),
   handler: async (ctx, args) => {
     const folderPath = normalizeFolderPath(args.folderPath);
     const now = Date.now();
@@ -1640,9 +1537,7 @@ export const renameAsset = mutation({
       .first();
 
     if (conflict) {
-      throw new Error(
-        `Asset already exists at ${folderPath}/${args.newBasename}`,
-      );
+      throw new Error(`Asset already exists at ${folderPath}/${args.newBasename}`);
     }
 
     // Update asset basename
@@ -1662,19 +1557,12 @@ export const renameAsset = mutation({
       createdBy: actorFields.createdBy,
     });
 
-    return {
-      assetId: asset._id,
-      oldBasename: args.basename,
-      newBasename: args.newBasename,
-    };
+    return { assetId: asset._id, oldBasename: args.basename, newBasename: args.newBasename };
   },
 });
 
 export const listAssetEvents = query({
-  args: {
-    folderPath: v.string(),
-    basename: v.string(),
-  },
+  args: { folderPath: v.string(), basename: v.string() },
   returns: v.array(
     v.object({
       type: v.string(),
@@ -1722,9 +1610,7 @@ export const listAssetEvents = query({
  * Used for development reset - does NOT delete files from R2/storage.
  */
 export const deleteDataBatch = mutation({
-  args: {
-    batchSize: v.optional(v.number()),
-  },
+  args: { batchSize: v.optional(v.number()) },
   returns: v.object({
     deletedFolders: v.number(),
     deletedAssets: v.number(),
@@ -1748,7 +1634,14 @@ export const deleteDataBatch = mutation({
       deletedVersions++;
     }
     if (versions.length === batchSize) {
-      return { deletedFolders, deletedAssets, deletedVersions, deletedEvents, deletedIntents, hasMore: true };
+      return {
+        deletedFolders,
+        deletedAssets,
+        deletedVersions,
+        deletedEvents,
+        deletedIntents,
+        hasMore: true,
+      };
     }
 
     // Delete asset events (foreign key to assets)
@@ -1758,7 +1651,14 @@ export const deleteDataBatch = mutation({
       deletedEvents++;
     }
     if (events.length === batchSize) {
-      return { deletedFolders, deletedAssets, deletedVersions, deletedEvents, deletedIntents, hasMore: true };
+      return {
+        deletedFolders,
+        deletedAssets,
+        deletedVersions,
+        deletedEvents,
+        deletedIntents,
+        hasMore: true,
+      };
     }
 
     // Delete assets (foreign key to folders)
@@ -1768,7 +1668,14 @@ export const deleteDataBatch = mutation({
       deletedAssets++;
     }
     if (assets.length === batchSize) {
-      return { deletedFolders, deletedAssets, deletedVersions, deletedEvents, deletedIntents, hasMore: true };
+      return {
+        deletedFolders,
+        deletedAssets,
+        deletedVersions,
+        deletedEvents,
+        deletedIntents,
+        hasMore: true,
+      };
     }
 
     // Delete folders
@@ -1778,7 +1685,14 @@ export const deleteDataBatch = mutation({
       deletedFolders++;
     }
     if (folders.length === batchSize) {
-      return { deletedFolders, deletedAssets, deletedVersions, deletedEvents, deletedIntents, hasMore: true };
+      return {
+        deletedFolders,
+        deletedAssets,
+        deletedVersions,
+        deletedEvents,
+        deletedIntents,
+        hasMore: true,
+      };
     }
 
     // Delete upload intents
