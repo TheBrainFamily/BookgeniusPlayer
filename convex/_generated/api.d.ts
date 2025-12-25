@@ -27,6 +27,7 @@ import type * as kanban from "../kanban.js";
 import type * as musicCues from "../musicCues.js";
 import type * as musicMetadata from "../musicMetadata.js";
 import type * as notes from "../notes.js";
+import type * as paragraphEditor from "../paragraphEditor.js";
 import type * as prompts_storyContext from "../prompts/storyContext.js";
 import type * as reset from "../reset.js";
 import type * as variants from "../variants.js";
@@ -57,6 +58,7 @@ declare const fullApi: ApiFromModules<{
   musicCues: typeof musicCues;
   musicMetadata: typeof musicMetadata;
   notes: typeof notes;
+  paragraphEditor: typeof paragraphEditor;
   "prompts/storyContext": typeof prompts_storyContext;
   reset: typeof reset;
   variants: typeof variants;

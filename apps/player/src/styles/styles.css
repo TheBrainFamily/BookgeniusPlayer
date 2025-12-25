@@ -1329,6 +1329,19 @@ section[data-chapter] [data-index] {
   }
 }
 
+section[data-chapter] [data-index].edit-hover {
+  transform: scale(1.01);
+  transform-origin: left center;
+  box-shadow: 0 0 0 2px rgba(147, 112, 219, 0.4);
+  cursor: pointer;
+  background: rgba(147, 112, 219, 0.08);
+  border-radius: 4px;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
 .active-paragraph {
   background: hsla(219, 60%, 36%, 0);
   transition: all 0.3s ease-in-out;

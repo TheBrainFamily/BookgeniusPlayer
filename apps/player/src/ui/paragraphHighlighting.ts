@@ -1,9 +1,29 @@
 import { getBookSlug } from "@player/state/bookDataStore";
 import { activateCharacters } from "./characterHelpers";
+import { getGlobalEditModeActive } from "@player/context/EditModeContext";
 
-// Variables to track scrolling state
 let isScrolling = false;
 let scrollDebounce: NodeJS.Timeout;
+let currentEditHoverElement: HTMLElement | null = null;
+
+export type OpenTalkingCharacterModalFn = (chapterNumber: number, paragraphIndex: number, currentSpeaker: string | null) => void;
+let openTalkingCharacterModalFn: OpenTalkingCharacterModalFn | null = null;
+
+export function setOpenTalkingCharacterModal(fn: OpenTalkingCharacterModalFn): void {
+  openTalkingCharacterModalFn = fn;
+}
+
+function clearEditHover(): void {
+  if (currentEditHoverElement) {
+    currentEditHoverElement.classList.remove("edit-hover");
+    currentEditHoverElement = null;
+  }
+}
+
+function extractCurrentSpeaker(paragraph: HTMLElement): string | null {
+  const talkingSpan = paragraph.querySelector<HTMLElement>('[data-is-talking="true"]');
+  return talkingSpan?.dataset.character || null;
+}
 
 export function setupParagraphHighlighting() {
   const contentContainer = document.getElementById("content-container");
@@ -25,6 +45,12 @@ export function setupParagraphHighlighting() {
         const paragraphNum = parseInt(paragraphNumber);
         activateCharacters(chapterNum, paragraphNum, getBookSlug() || undefined);
       }
+
+      if (getGlobalEditModeActive() && paragraph !== currentEditHoverElement) {
+        clearEditHover();
+        paragraph.classList.add("edit-hover");
+        currentEditHoverElement = paragraph;
+      }
     }
   });
 
@@ -38,10 +64,8 @@ export function setupParagraphHighlighting() {
       entityNotes.forEach((note) => {
         note.classList.remove("highlighted-entity", "highlighted-talking-entity");
 
-        // Revert image to original PNG
         const imageElement = note.querySelector<HTMLImageElement>(".entity-image");
         if (imageElement && imageElement.dataset.originalSrc) {
-          // Extract just the filenames for comparison
           const currentSrcFilename = imageElement.src.split("/").pop();
           const originalSrcFilename = imageElement.dataset.originalSrc.split("/").pop();
 
@@ -51,11 +75,37 @@ export function setupParagraphHighlighting() {
         }
       });
     }
+
+    const relatedTarget = event.relatedTarget as HTMLElement | null;
+    const stillInParagraph = relatedTarget?.closest<HTMLElement>("section[data-chapter] [data-index]");
+    if (!stillInParagraph || stillInParagraph !== currentEditHoverElement) {
+      clearEditHover();
+    }
   });
 
-  // --- Add Click Listener for Mobile Note Modals ---
   contentContainer.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
+
+    if (getGlobalEditModeActive()) {
+      const paragraph = target.closest<HTMLElement>("section[data-chapter] [data-index]");
+      if (paragraph) {
+        const section = paragraph.closest<HTMLElement>("section[data-chapter]");
+        if (section) {
+          const chapterNumber = parseInt(section.dataset.chapter || "0");
+          const paragraphIndex = parseInt(paragraph.dataset.index || "0");
+          const currentSpeaker = extractCurrentSpeaker(paragraph);
+
+          if (openTalkingCharacterModalFn) {
+            event.preventDefault();
+            event.stopPropagation();
+            clearEditHover();
+            openTalkingCharacterModalFn(chapterNumber, paragraphIndex, currentSpeaker);
+            return;
+          }
+        }
+      }
+    }
+
     const linkNote = target.classList.contains("link-note") ? target : (target.closest(".link-note") as HTMLElement | null);
 
     if (linkNote) {
@@ -129,7 +179,6 @@ export function setupParagraphHighlighting() {
   });
   // --- End Click Listener ---
 
-  // Set up scroll event listener
   contentContainer.addEventListener("scroll", () => {
     if (scrollDebounce) clearTimeout(scrollDebounce);
     isScrolling = true;
@@ -138,5 +187,11 @@ export function setupParagraphHighlighting() {
       isScrolling = false;
       (window as unknown as { __sidebarScrollingLock: boolean }).__sidebarScrollingLock = false;
     }, 400);
+  });
+
+  window.addEventListener("keyup", (event) => {
+    if (event.key === "Meta" || event.key === "Control") {
+      clearEditHover();
+    }
   });
 }

@@ -13,6 +13,7 @@
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { BookConvexProvider, useBookConvex } from "@player/context/BookConvexContext";
 import { DraftModeProvider } from "@player/context/DraftModeContext";
+import { EditModeProvider } from "@player/context/EditModeContext";
 import React, { useEffect, useState } from "react";
 import { I18nextProvider, useTranslation } from "react-i18next";
 import i18n from "./i18n";
@@ -35,6 +36,7 @@ import useSplashHidden from "./hooks/useSplashHidden";
 import { initAudioContext } from "./audio-crossfader";
 import CharacterNotesPanel from "./components/CharacterNotesPanel";
 import { ModalRenderers } from "./features/ModalRenderers";
+import { ParagraphEditConnector } from "./features/ParagraphEditConnector";
 import { useBookContent } from "@player/hooks/useBookContent";
 import { useElementVisibility } from "./hooks/useElementVisibility";
 import { useTextCacheManager } from "./hooks/useTextCacheManager";
@@ -254,24 +256,26 @@ export function LiveModeApp({ bookPath }: LiveModeAppProps) {
   return (
     <ConvexProvider client={convex}>
       <DraftModeProvider>
-        <BookConvexProvider bookPath={bookPath}>
-          {/* Start preloading heavy assets (videos, music) BEFORE chapter processing completes */}
-          <CriticalAssetPreloader />
-          <I18nextProvider i18n={i18n}>
-            <ConvexAppInitializer>
-              <LocationProvider>
-                <RealtimeProvider>
-                  <BookContentWrapper>
-                    <LiveShell onShellMounted={() => setReactDomReady(true)} />
-                    <ModalRenderers />
-                    <ContentShiftWrapper />
-                  </BookContentWrapper>
-                  <DebugLocationOverlay />
-                </RealtimeProvider>
-              </LocationProvider>
-            </ConvexAppInitializer>
-          </I18nextProvider>
-        </BookConvexProvider>
+        <EditModeProvider>
+          <BookConvexProvider bookPath={bookPath}>
+            <CriticalAssetPreloader />
+            <ParagraphEditConnector />
+            <I18nextProvider i18n={i18n}>
+              <ConvexAppInitializer>
+                <LocationProvider>
+                  <RealtimeProvider>
+                    <BookContentWrapper>
+                      <LiveShell onShellMounted={() => setReactDomReady(true)} />
+                      <ModalRenderers />
+                      <ContentShiftWrapper />
+                    </BookContentWrapper>
+                    <DebugLocationOverlay />
+                  </RealtimeProvider>
+                </LocationProvider>
+              </ConvexAppInitializer>
+            </I18nextProvider>
+          </BookConvexProvider>
+        </EditModeProvider>
       </DraftModeProvider>
     </ConvexProvider>
   );
