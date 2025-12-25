@@ -35,10 +35,9 @@ import { components } from "./_generated/api";
 export const listBooks = query({
   args: {},
   handler: async (ctx) => {
-    const folders = await ctx.runQuery(
-      components.assetManager.assetManager.listFolders,
-      { parentPath: "books" }
-    );
+    const folders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
+      parentPath: "books",
+    });
 
     return folders.map((folder) => ({
       path: folder.path,
@@ -55,14 +54,11 @@ export const listBooks = query({
  * Get metadata for a specific book.
  */
 export const getBookMetadata = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
-    const folder = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: bookPath }
-    );
+    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: bookPath,
+    });
 
     if (!folder) return null;
 
@@ -86,16 +82,13 @@ export const getBookMetadata = query({
  * Returns character folders with their metadata.
  */
 export const listCharacters = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const charactersPath = `${bookPath}/characters`;
 
-    const folders = await ctx.runQuery(
-      components.assetManager.assetManager.listFolders,
-      { parentPath: charactersPath }
-    );
+    const folders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
+      parentPath: charactersPath,
+    });
 
     return folders.map((folder) => ({
       path: folder.path,
@@ -113,22 +106,19 @@ export const listCharacters = query({
  * Returns the character's folder.extra plus URLs for avatar, speaks, listens.
  */
 export const getCharacterBundle = query({
-  args: {
-    characterPath: v.string(),
-  },
+  args: { characterPath: v.string() },
   handler: async (ctx, { characterPath }) => {
     // Get character folder metadata
-    const folder = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: characterPath }
-    );
+    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: characterPath,
+    });
 
     if (!folder) return null;
 
     // Get published files in the character folder
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: characterPath }
+      { folderPath: characterPath },
     );
 
     // Build bundle with typed asset references
@@ -138,6 +128,7 @@ export const getCharacterBundle = query({
       name: string;
       extra: unknown;
       avatar?: { url: string; versionId: string; contentType?: string };
+      avatarLarge?: { url: string; versionId: string; contentType?: string };
       speaks?: { url: string; versionId: string; contentType?: string };
       listens?: { url: string; versionId: string; contentType?: string };
     } = {
@@ -156,7 +147,9 @@ export const getCharacterBundle = query({
         contentType: file.contentType,
       };
 
-      if (basename.startsWith("avatar.")) {
+      if (basename.startsWith("avatar-large.")) {
+        bundle.avatarLarge = assetInfo;
+      } else if (basename.startsWith("avatar.")) {
         bundle.avatar = assetInfo;
       } else if (basename.startsWith("speaks.")) {
         bundle.speaks = assetInfo;
@@ -178,22 +171,20 @@ export const getCharacterBundle = query({
  * Chapter number comes from version.extra.chapterNumber.
  */
 export const listChapters = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const chaptersPath = `${bookPath}/chapters`;
 
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: chaptersPath }
+      { folderPath: chaptersPath },
     );
 
     // We need the version.extra for chapter metadata
     // listPublishedFilesInFolder doesn't return extra, so we need to use listPublishedAssetsInFolder
     const assets = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedAssetsInFolder,
-      { folderPath: chaptersPath }
+      { folderPath: chaptersPath },
     );
 
     // Join files with assets to get both URLs and extra
@@ -227,25 +218,30 @@ export const listChapters = query({
  * List compiled chapter HTML for a book, sorted by chapter number.
  */
 export const listChapterHtml = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const htmlPath = `${bookPath}/chapters-html`;
 
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: htmlPath }
+      { folderPath: htmlPath },
     );
 
     const assets = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedAssetsInFolder,
-      { folderPath: htmlPath }
+      { folderPath: htmlPath },
     );
 
     const chapters = files.map((file) => {
       const asset = assets.find((a) => a.basename === file.basename);
-      const extra = asset?.extra as { chapterNumber?: number; title?: string; sourceVersionId?: string; paragraphCount?: number } | undefined;
+      const extra = asset?.extra as
+        | {
+            chapterNumber?: number;
+            title?: string;
+            sourceVersionId?: string;
+            paragraphCount?: number;
+          }
+        | undefined;
 
       return {
         path: `${htmlPath}/${file.basename}`,
@@ -270,30 +266,39 @@ export const listChapterHtml = query({
  * List per-chapter character data fragments for a book.
  */
 export const listCharacterDataFragments = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const dataPath = `${bookPath}/characters-data`;
 
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: dataPath }
+      { folderPath: dataPath },
     );
 
     const assets = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedAssetsInFolder,
-      { folderPath: dataPath }
+      { folderPath: dataPath },
     );
 
     const jsonFiles = files.filter((file) => file.basename.endsWith(".json"));
-    const selectedFiles = jsonFiles.length > 0 ? jsonFiles : files.filter((file) => file.basename.endsWith(".json") || file.basename.endsWith(".html"));
+    const selectedFiles =
+      jsonFiles.length > 0
+        ? jsonFiles
+        : files.filter(
+            (file) => file.basename.endsWith(".json") || file.basename.endsWith(".html"),
+          );
     const selectedBasenames = new Set(selectedFiles.map((file) => file.basename));
-    const assetByBasename = new Map(assets.filter((asset) => selectedBasenames.has(asset.basename)).map((asset) => [asset.basename, asset]));
+    const assetByBasename = new Map(
+      assets
+        .filter((asset) => selectedBasenames.has(asset.basename))
+        .map((asset) => [asset.basename, asset]),
+    );
 
     const fragments = selectedFiles.map((file) => {
       const asset = assetByBasename.get(file.basename);
-      const extra = asset?.extra as { chapterNumber?: number; sourceVersionId?: string } | undefined;
+      const extra = asset?.extra as
+        | { chapterNumber?: number; sourceVersionId?: string }
+        | undefined;
 
       return {
         path: `${dataPath}/${file.basename}`,
@@ -321,30 +326,25 @@ export const listCharacterDataFragments = query({
  * Sorted by chapter, then paragraph.
  */
 export const listBackgrounds = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const backgroundsPath = `${bookPath}/backgrounds`;
 
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: backgroundsPath }
+      { folderPath: backgroundsPath },
     );
 
     const assets = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedAssetsInFolder,
-      { folderPath: backgroundsPath }
+      { folderPath: backgroundsPath },
     );
 
     const backgrounds = files.map((file) => {
       const asset = assets.find((a) => a.basename === file.basename);
-      const extra = asset?.extra as {
-        chapter?: number;
-        paragraph?: number;
-        backgroundColor?: string;
-        textColor?: string;
-      } | undefined;
+      const extra = asset?.extra as
+        | { chapter?: number; paragraph?: number; backgroundColor?: string; textColor?: string }
+        | undefined;
 
       return {
         path: `${backgroundsPath}/${file.basename}`,
@@ -380,28 +380,23 @@ export const listBackgrounds = query({
  * Sorted by chapter, then paragraph.
  */
 export const listMusic = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const musicPath = `${bookPath}/music`;
 
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: musicPath }
+      { folderPath: musicPath },
     );
 
     const assets = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedAssetsInFolder,
-      { folderPath: musicPath }
+      { folderPath: musicPath },
     );
 
     const music = files.map((file) => {
       const asset = assets.find((a) => a.basename === file.basename);
-      const extra = asset?.extra as {
-        chapter?: number;
-        paragraph?: number;
-      } | undefined;
+      const extra = asset?.extra as { chapter?: number; paragraph?: number } | undefined;
 
       return {
         path: `${musicPath}/${file.basename}`,
@@ -435,25 +430,22 @@ export const listMusic = query({
  * For live preview mode - shows latest version being edited.
  */
 export const listChaptersWithDrafts = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const chaptersPath = `${bookPath}/chapters`;
 
     // Get all assets (not just published)
-    const assets = await ctx.runQuery(
-      components.assetManager.assetManager.listAssets,
-      { folderPath: chaptersPath }
-    );
+    const assets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+      folderPath: chaptersPath,
+    });
 
     // For each asset, get the best version (draft > published)
     const chapters = await Promise.all(
       assets.map(async (asset) => {
-        const versions = await ctx.runQuery(
-          components.assetManager.assetManager.getAssetVersions,
-          { folderPath: chaptersPath, basename: asset.basename }
-        );
+        const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+          folderPath: chaptersPath,
+          basename: asset.basename,
+        });
 
         // Prefer draft, then published, then latest
         const draftVersion = versions.find((v) => v.state === "draft");
@@ -465,7 +457,7 @@ export const listChaptersWithDrafts = query({
         // Get URL for the version
         const urlInfo = await ctx.runQuery(
           components.assetManager.assetFsHttp.getVersionPreviewUrl,
-          { versionId: bestVersion._id }
+          { versionId: bestVersion._id },
         );
 
         const extra = asset.extra as { chapterNumber?: number; title?: string } | undefined;
@@ -481,7 +473,7 @@ export const listChaptersWithDrafts = query({
           title: extra?.title,
           hasDraft: !!draftVersion,
         };
-      })
+      }),
     );
 
     // Filter nulls and sort by chapter number
@@ -495,23 +487,20 @@ export const listChaptersWithDrafts = query({
  * List backgrounds preferring draft over published.
  */
 export const listBackgroundsWithDrafts = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const backgroundsPath = `${bookPath}/backgrounds`;
 
-    const assets = await ctx.runQuery(
-      components.assetManager.assetManager.listAssets,
-      { folderPath: backgroundsPath }
-    );
+    const assets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+      folderPath: backgroundsPath,
+    });
 
     const backgrounds = await Promise.all(
       assets.map(async (asset) => {
-        const versions = await ctx.runQuery(
-          components.assetManager.assetManager.getAssetVersions,
-          { folderPath: backgroundsPath, basename: asset.basename }
-        );
+        const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+          folderPath: backgroundsPath,
+          basename: asset.basename,
+        });
 
         const draftVersion = versions.find((v) => v.state === "draft");
         const publishedVersion = versions.find((v) => v.state === "published");
@@ -521,16 +510,13 @@ export const listBackgroundsWithDrafts = query({
 
         const urlInfo = await ctx.runQuery(
           components.assetManager.assetFsHttp.getVersionPreviewUrl,
-          { versionId: bestVersion._id }
+          { versionId: bestVersion._id },
         );
 
         // Extra metadata is on the version, not the asset
-        const extra = bestVersion.extra as {
-          chapter?: number;
-          paragraph?: number;
-          backgroundColor?: string;
-          textColor?: string;
-        } | undefined;
+        const extra = bestVersion.extra as
+          | { chapter?: number; paragraph?: number; backgroundColor?: string; textColor?: string }
+          | undefined;
 
         return {
           path: `${backgroundsPath}/${asset.basename}`,
@@ -545,7 +531,7 @@ export const listBackgroundsWithDrafts = query({
           textColor: extra?.textColor,
           hasDraft: !!draftVersion,
         };
-      })
+      }),
     );
 
     return backgrounds
@@ -561,23 +547,20 @@ export const listBackgroundsWithDrafts = query({
  * List music preferring draft over published.
  */
 export const listMusicWithDrafts = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const musicPath = `${bookPath}/music`;
 
-    const assets = await ctx.runQuery(
-      components.assetManager.assetManager.listAssets,
-      { folderPath: musicPath }
-    );
+    const assets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+      folderPath: musicPath,
+    });
 
     const music = await Promise.all(
       assets.map(async (asset) => {
-        const versions = await ctx.runQuery(
-          components.assetManager.assetManager.getAssetVersions,
-          { folderPath: musicPath, basename: asset.basename }
-        );
+        const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+          folderPath: musicPath,
+          basename: asset.basename,
+        });
 
         const draftVersion = versions.find((v) => v.state === "draft");
         const publishedVersion = versions.find((v) => v.state === "published");
@@ -587,14 +570,11 @@ export const listMusicWithDrafts = query({
 
         const urlInfo = await ctx.runQuery(
           components.assetManager.assetFsHttp.getVersionPreviewUrl,
-          { versionId: bestVersion._id }
+          { versionId: bestVersion._id },
         );
 
         // Extra metadata is on the version, not the asset
-        const extra = bestVersion.extra as {
-          chapter?: number;
-          paragraph?: number;
-        } | undefined;
+        const extra = bestVersion.extra as { chapter?: number; paragraph?: number } | undefined;
 
         return {
           path: `${musicPath}/${asset.basename}`,
@@ -607,7 +587,7 @@ export const listMusicWithDrafts = query({
           paragraph: extra?.paragraph ?? 0,
           hasDraft: !!draftVersion,
         };
-      })
+      }),
     );
 
     return music
@@ -623,24 +603,20 @@ export const listMusicWithDrafts = query({
  * Get character bundles with draft-aware asset URLs.
  */
 export const listCharacterBundlesWithDrafts = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const charactersPath = `${bookPath}/characters`;
 
-    const characterFolders = await ctx.runQuery(
-      components.assetManager.assetManager.listFolders,
-      { parentPath: charactersPath }
-    );
+    const characterFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
+      parentPath: charactersPath,
+    });
 
     const bundles = await Promise.all(
       characterFolders.map(async (folder) => {
         // Get assets in this character folder
-        const assets = await ctx.runQuery(
-          components.assetManager.assetManager.listAssets,
-          { folderPath: folder.path }
-        );
+        const assets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+          folderPath: folder.path,
+        });
 
         const bundle: {
           path: string;
@@ -648,6 +624,7 @@ export const listCharacterBundlesWithDrafts = query({
           name: string;
           extra: unknown;
           avatar?: { url: string; versionId: string; contentType?: string };
+          avatarLarge?: { url: string; versionId: string; contentType?: string };
           speaks?: { url: string; versionId: string; contentType?: string };
           listens?: { url: string; versionId: string; contentType?: string };
         } = {
@@ -661,7 +638,7 @@ export const listCharacterBundlesWithDrafts = query({
         for (const asset of assets) {
           const versions = await ctx.runQuery(
             components.assetManager.assetManager.getAssetVersions,
-            { folderPath: folder.path, basename: asset.basename }
+            { folderPath: folder.path, basename: asset.basename },
           );
 
           const draftVersion = versions.find((v) => v.state === "draft");
@@ -672,7 +649,7 @@ export const listCharacterBundlesWithDrafts = query({
 
           const urlInfo = await ctx.runQuery(
             components.assetManager.assetFsHttp.getVersionPreviewUrl,
-            { versionId: bestVersion._id }
+            { versionId: bestVersion._id },
           );
 
           if (!urlInfo?.url) continue;
@@ -684,7 +661,9 @@ export const listCharacterBundlesWithDrafts = query({
           };
 
           const basename = asset.basename.toLowerCase();
-          if (basename.startsWith("avatar.")) {
+          if (basename.startsWith("avatar-large.")) {
+            bundle.avatarLarge = assetInfo;
+          } else if (basename.startsWith("avatar.")) {
             bundle.avatar = assetInfo;
           } else if (basename.startsWith("speaks.")) {
             bundle.speaks = assetInfo;
@@ -694,7 +673,7 @@ export const listCharacterBundlesWithDrafts = query({
         }
 
         return bundle;
-      })
+      }),
     );
 
     return bundles;
@@ -725,33 +704,27 @@ function extractChapterNumber(basename: string): number {
  * Get summary stats for a book (character count, chapter count, etc.)
  */
 export const getBookStats = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     // Count characters
-    const characterFolders = await ctx.runQuery(
-      components.assetManager.assetManager.listFolders,
-      { parentPath: `${bookPath}/characters` }
-    );
+    const characterFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
+      parentPath: `${bookPath}/characters`,
+    });
 
     // Count chapters
-    const chapterAssets = await ctx.runQuery(
-      components.assetManager.assetManager.listAssets,
-      { folderPath: `${bookPath}/chapters` }
-    );
+    const chapterAssets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+      folderPath: `${bookPath}/chapters`,
+    });
 
     // Count backgrounds
-    const backgroundAssets = await ctx.runQuery(
-      components.assetManager.assetManager.listAssets,
-      { folderPath: `${bookPath}/backgrounds` }
-    );
+    const backgroundAssets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+      folderPath: `${bookPath}/backgrounds`,
+    });
 
     // Count music
-    const musicAssets = await ctx.runQuery(
-      components.assetManager.assetManager.listAssets,
-      { folderPath: `${bookPath}/music` }
-    );
+    const musicAssets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+      folderPath: `${bookPath}/music`,
+    });
 
     // Count notes
     const notes = await ctx.db
@@ -785,9 +758,7 @@ export const getBookStats = query({
  * STUB: Returns empty array - audiobook data not yet in CMS.
  */
 export const listAudiobookTracks = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async () => {
     // TODO: Implement when audiobook data is added to CMS
     return [];
@@ -799,9 +770,7 @@ export const listAudiobookTracks = query({
  * STUB: Returns empty array - cut scene data not yet in CMS.
  */
 export const listCutScenes = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async () => {
     // TODO: Implement when cut scene data is added to CMS
     return [];
@@ -813,19 +782,14 @@ export const listCutScenes = query({
  * Returns all footnotes/annotations for the specified book.
  */
 export const listNotes = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const notes = await ctx.db
       .query("notes")
       .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
       .collect();
 
-    return notes.map((n) => ({
-      id: n.noteId,
-      content: n.content,
-    }));
+    return notes.map((n) => ({ id: n.noteId, content: n.content }));
   },
 });
 
@@ -834,18 +798,13 @@ export const listNotes = query({
  * Returns all sentence simplifications for the specified book.
  */
 export const listVariants = query({
-  args: {
-    bookPath: v.string(),
-  },
+  args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const variants = await ctx.db
       .query("variants")
       .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
       .collect();
 
-    return variants.map((v) => ({
-      id: v.variantId,
-      simplifications: v.simplifications,
-    }));
+    return variants.map((v) => ({ id: v.variantId, simplifications: v.simplifications }));
   },
 });

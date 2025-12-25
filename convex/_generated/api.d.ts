@@ -10,11 +10,13 @@
 
 import type * as auth from "../auth.js";
 import type * as authHelpers from "../authHelpers.js";
+import type * as avatarGeneration from "../avatarGeneration.js";
 import type * as backgroundCues from "../backgroundCues.js";
 import type * as backgroundMetadata from "../backgroundMetadata.js";
 import type * as backgroundPreviewHttp from "../backgroundPreviewHttp.js";
 import type * as bookQueries from "../bookQueries.js";
 import type * as chapterCompiler from "../chapterCompiler.js";
+import type * as characterPromptGeneration from "../characterPromptGeneration.js";
 import type * as cli from "../cli.js";
 import type * as comicGeneration from "../comicGeneration.js";
 import type * as comicSubmissions from "../comicSubmissions.js";
@@ -42,11 +44,13 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   authHelpers: typeof authHelpers;
+  avatarGeneration: typeof avatarGeneration;
   backgroundCues: typeof backgroundCues;
   backgroundMetadata: typeof backgroundMetadata;
   backgroundPreviewHttp: typeof backgroundPreviewHttp;
   bookQueries: typeof bookQueries;
   chapterCompiler: typeof chapterCompiler;
+  characterPromptGeneration: typeof characterPromptGeneration;
   cli: typeof cli;
   comicGeneration: typeof comicGeneration;
   comicSubmissions: typeof comicSubmissions;

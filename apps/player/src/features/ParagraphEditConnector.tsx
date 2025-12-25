@@ -31,10 +31,10 @@ export function ParagraphEditConnector() {
   );
 
   const handleCreateCharacter = useCallback(
-    async (characterName: string) => {
+    async (characterName: string, chapterNumber: number, paragraphIndex: number) => {
       const bookPath = book?.path;
       if (!bookPath) throw new Error("Book path not available");
-      const result = await createCharacterAction({ bookPath, characterName });
+      const result = await createCharacterAction({ bookPath, characterName, chapterNumber, paragraphIndex });
       return { slug: result.slug, displayName: result.displayName };
     },
     [book?.path, createCharacterAction],

@@ -84,8 +84,9 @@ export interface CharacterBundle {
   path: string;
   slug: string;
   name: string;
-  extra: { displayName?: string; summary?: string; aiPrompt?: string };
+  extra: { displayName?: string; summary?: string; aiPrompt?: string; avatarGenerationState?: "generating" | "ready" | "error" | "none"; avatarProposalUrls?: string[] };
   avatar?: { url: string; versionId: string; contentType?: string };
+  avatarLarge?: { url: string; versionId: string; contentType?: string };
   speaks?: { url: string; versionId: string; contentType?: string };
   listens?: { url: string; versionId: string; contentType?: string };
 }
@@ -465,6 +466,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       name: c.name,
       extra: c.extra as CharacterBundle["extra"],
       avatar: c.avatar,
+      avatarLarge: c.avatarLarge,
       speaks: c.speaks,
       listens: c.listens,
     }));

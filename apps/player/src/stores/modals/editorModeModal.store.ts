@@ -6,7 +6,7 @@ const MODAL_ID = "editor-mode-modal";
 
 type EditorModalType = "edit-paragraph" | "add-character" | "remove-character" | "set-talking-character" | "edit-character-tag" | "wrap-with-character";
 
-type CreateCharacterFn = (characterName: string) => Promise<{ slug: string; displayName: string }>;
+type CreateCharacterFn = (characterName: string, chapterNumber: number, paragraphIndex: number) => Promise<{ slug: string; displayName: string }>;
 
 interface EditorModeModalState {
   isOpen: boolean;

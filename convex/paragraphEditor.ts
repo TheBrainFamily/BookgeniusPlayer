@@ -581,9 +581,14 @@ export const wrapTextWithCharacter = action({
 });
 
 export const createCharacter = action({
-  args: { bookPath: v.string(), characterName: v.string() },
+  args: {
+    bookPath: v.string(),
+    characterName: v.string(),
+    chapterNumber: v.optional(v.number()),
+    paragraphIndex: v.optional(v.number()),
+  },
   returns: v.object({ slug: v.string(), displayName: v.string(), characterPath: v.string() }),
-  handler: async (ctx, { bookPath, characterName }) => {
+  handler: async (ctx, { bookPath, characterName, chapterNumber, paragraphIndex }) => {
     const displayName = characterName.trim();
     if (!displayName) {
       throw new Error("Character name is required");
@@ -608,6 +613,16 @@ export const createCharacter = action({
         throw new Error(`Character "${displayName}" already exists`);
       }
       throw error;
+    }
+
+    if (chapterNumber !== undefined && paragraphIndex !== undefined) {
+      await ctx.scheduler.runAfter(0, internal.characterPromptGeneration.generateCharacterPrompt, {
+        bookPath,
+        characterSlug: slug,
+        characterName: displayName,
+        chapterNumber,
+        paragraphIndex,
+      });
     }
 
     return { slug, displayName, characterPath };

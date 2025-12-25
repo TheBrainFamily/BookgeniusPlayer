@@ -48,6 +48,7 @@ import { setupUnloadHandlers } from "./services/setupUnloadHandlers";
 import { ScrollIndicator } from "@player/components/ScrollIndicator";
 import { RightNotesPanel } from "./components/RightNotesPanel";
 import { DebugLocationOverlay } from "./components/DebugLocationOverlay";
+import { AvatarGenerationBadge } from "./components/AvatarGenerationBadge";
 import { useDraftMode } from "@player/context/DraftModeContext";
 
 // =============================================================================
@@ -267,6 +268,7 @@ export function LiveModeApp({ bookPath }: LiveModeAppProps) {
                     <BookContentWrapper>
                       <LiveShell onShellMounted={() => setReactDomReady(true)} />
                       <ModalRenderers />
+                      <AvatarGenerationBadge />
                       <ContentShiftWrapper />
                     </BookContentWrapper>
                     <DebugLocationOverlay />

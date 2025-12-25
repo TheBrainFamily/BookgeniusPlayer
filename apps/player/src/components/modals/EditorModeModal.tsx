@@ -1,9 +1,11 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { useAction } from "convex/react";
+import { api } from "@convex/_generated/api";
 import ModalUI from "@player/components/modals/ModalUI";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { useEditorModeModal } from "@player/stores/modals/editorModeModal.store";
 import { useBookConvex } from "@player/context/BookConvexContext";
-import { getAvatarSource, getInitials, getColorFromSlug } from "@player/helpers/svgAvatars";
+import { getAvatarSource } from "@player/helpers/svgAvatars";
 
 interface EditorModeModalProps {
   onClose: () => void;
@@ -20,7 +22,8 @@ interface CharacterWithStats {
 const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
   const { modalType, onSubmit, onCreateCharacter, chapterNumber, paragraphIndex, currentSpeaker, currentCharacterSlug, currentTextContent, selectedText } = useEditorModeModal();
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
-  const { charactersData, characters } = useBookConvex();
+  const { charactersData, characters, book } = useBookConvex();
+  const startAvatarGeneration = useAction(api.avatarGeneration.startAvatarGeneration);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAddNew, setShowAddNew] = useState(false);
@@ -82,13 +85,31 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
     setShowAddNew(false);
   };
 
+  const [createdCharacterSlug, setCreatedCharacterSlug] = useState<string | null>(null);
+  const [editablePrompt, setEditablePrompt] = useState<string>("");
+  const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false);
+
+  const createdCharacter = useMemo(() => {
+    if (!createdCharacterSlug) return null;
+    return characters.find((c) => c.slug.toLowerCase() === createdCharacterSlug.toLowerCase());
+  }, [characters, createdCharacterSlug]);
+
+  const aiPromptFromCharacter = createdCharacter?.extra?.aiPrompt;
+
+  useEffect(() => {
+    if (aiPromptFromCharacter && isGeneratingPrompt) {
+      setEditablePrompt(aiPromptFromCharacter);
+      setIsGeneratingPrompt(false);
+    }
+  }, [aiPromptFromCharacter, isGeneratingPrompt]);
+
   const handleCreateAndUse = async () => {
     const trimmedName = newCharacterName.trim();
     if (!trimmedName) {
       setError("Please enter a character name");
       return;
     }
-    if (!onCreateCharacter) {
+    if (!onCreateCharacter || chapterNumber === null || paragraphIndex === null) {
       setError("Cannot create character");
       return;
     }
@@ -97,15 +118,31 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
     setError("");
 
     try {
-      const { slug } = await onCreateCharacter(trimmedName);
-      onSubmit?.(slug);
-      onClose();
+      const { slug } = await onCreateCharacter(trimmedName, chapterNumber, paragraphIndex);
+      setCreatedCharacterSlug(slug);
+      setIsGeneratingPrompt(true);
+      setIsCreating(false);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to create character";
       setError(message);
-    } finally {
       setIsCreating(false);
     }
+  };
+
+  const handleAcceptPrompt = async () => {
+    if (!createdCharacterSlug || !book?.path || !editablePrompt.trim()) return;
+
+    const createdChar = characters.find((c) => c.slug.toLowerCase() === createdCharacterSlug.toLowerCase());
+    const displayName = createdChar?.extra?.displayName || createdCharacterSlug;
+
+    try {
+      await startAvatarGeneration({ bookPath: book.path, characterSlug: createdCharacterSlug, characterDisplayName: displayName, visualPrompt: editablePrompt.trim() });
+    } catch (err) {
+      console.error("[EditorModeModal] Failed to start avatar generation:", err);
+    }
+
+    onSubmit?.(createdCharacterSlug);
+    onClose();
   };
 
   const generateNewCharacterAvatar = (name: string) => {
@@ -117,7 +154,62 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
     return getAvatarSource({ slug, characterName: name, bookSlug: "", infoPerChapter: [] });
   };
 
+  const renderPromptEditor = () => {
+    if (!createdCharacterSlug) return null;
+
+    if (isGeneratingPrompt) {
+      return (
+        <div className="flex flex-col items-center gap-4 py-8">
+          <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+          <div className="text-zinc-400">Generating character description...</div>
+          <div className="text-zinc-500 text-sm">This may take a few seconds</div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="text-center">
+          <div className="text-lg font-medium text-white mb-1">Character Description</div>
+          <div className="text-sm text-zinc-400">Review and edit the AI-generated description</div>
+        </div>
+
+        <textarea
+          value={editablePrompt}
+          onChange={(e) => setEditablePrompt(e.target.value)}
+          className="w-full h-40 bg-zinc-900 border border-zinc-600 rounded-lg px-3 py-2 text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 resize-none"
+          placeholder="Character description..."
+        />
+
+        <div className="flex gap-3">
+          <button
+            onClick={() => {
+              setCreatedCharacterSlug(null);
+              setEditablePrompt("");
+              setShowAddNew(false);
+              setNewCharacterName("");
+            }}
+            className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer transition-colors"
+          >
+            Back
+          </button>
+          <button
+            onClick={handleAcceptPrompt}
+            disabled={!editablePrompt.trim()}
+            className="flex-1 bg-green-600 text-white hover:bg-green-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Accept & Use Character
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const renderContent = () => {
+    if (createdCharacterSlug) {
+      return renderPromptEditor();
+    }
+
     if (!modalType) return null;
 
     switch (modalType) {
