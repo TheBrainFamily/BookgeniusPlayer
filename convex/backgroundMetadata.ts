@@ -229,8 +229,8 @@ export const generateImagePreview = internalAction({
         status: "processing",
       });
 
-      // 4. Resize image to WebP
-      const result = await ctx.runAction(internal.imageProcessing.resizeToWebp, {
+      // 4. Resize image to WebP via Cloudflare Worker
+      const result = await ctx.runAction(internal.imageProcessing.resizeToWebpViaWorker, {
         sourceUrl: file.url,
         maxWidth: 400,
         quality: 80,
@@ -238,7 +238,7 @@ export const generateImagePreview = internalAction({
 
       // 5. Upload the preview to background-thumbnails/
       const baseName = fileBasename.replace(/\.[^.]+$/, "");
-      const previewBasename = `${baseName}_preview.jpg`;
+      const previewBasename = `${baseName}_preview.webp`;
       const thumbnailsPath = `${bookPath}/background-thumbnails`;
 
       // Convert base64 back to blob
