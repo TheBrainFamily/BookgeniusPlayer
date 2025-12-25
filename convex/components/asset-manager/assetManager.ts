@@ -1340,12 +1340,10 @@ export const listPublishedFilesInFolder = query({
   handler: async (ctx, args) => {
     const folderPath = normalizeFolderPath(args.folderPath);
 
-    console.time("getting assets by_folder_basename");
     const assets = await ctx.db
       .query("assets")
       .withIndex("by_folder_basename", (q) => q.eq("folderPath", folderPath))
       .collect();
-    console.timeEnd("getting assets by_folder_basename");
 
     const assetPromises = assets.map(async (asset) => {
       if (!asset.publishedVersionId) return null;
@@ -1360,14 +1358,12 @@ export const listPublishedFilesInFolder = query({
       }
 
       // Get URL based on storage backend
-      console.time("getting url for " + asset.basename);
       let url: string | null = null;
       if (version.r2Key) {
         url = await getR2PublicUrl(ctx, version.r2Key);
       } else if (version.storageId) {
         url = await ctx.storage.getUrl(version.storageId);
       }
-      console.timeEnd("getting url for " + asset.basename);
       if (!url) return null;
       return {
         folderPath,
@@ -1383,9 +1379,7 @@ export const listPublishedFilesInFolder = query({
       };
     });
 
-    console.time("waiting for all promises");
     const assetResults = await Promise.all(assetPromises);
-    console.timeEnd("waiting for all promises");
     return assetResults.filter((result) => result !== null);
   },
 });

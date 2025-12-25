@@ -5,12 +5,70 @@ import { getGlobalEditModeActive } from "@player/context/EditModeContext";
 let isScrolling = false;
 let scrollDebounce: NodeJS.Timeout;
 let currentEditHoverElement: HTMLElement | null = null;
+let currentHoveredParagraph: HTMLElement | null = null;
 
 export type OpenTalkingCharacterModalFn = (chapterNumber: number, paragraphIndex: number, currentSpeaker: string | null) => void;
 let openTalkingCharacterModalFn: OpenTalkingCharacterModalFn | null = null;
 
 export function setOpenTalkingCharacterModal(fn: OpenTalkingCharacterModalFn): void {
   openTalkingCharacterModalFn = fn;
+}
+
+export type OpenEditCharacterTagModalFn = (chapterNumber: number, paragraphIndex: number, characterSlug: string, textContent: string) => void;
+let openEditCharacterTagModalFn: OpenEditCharacterTagModalFn | null = null;
+
+export function setOpenEditCharacterTagModal(fn: OpenEditCharacterTagModalFn): void {
+  openEditCharacterTagModalFn = fn;
+}
+
+export type OpenWrapWithCharacterModalFn = (chapterNumber: number, paragraphIndex: number, selectedText: string, occurrenceIndex: number) => void;
+let openWrapWithCharacterModalFn: OpenWrapWithCharacterModalFn | null = null;
+
+export function setOpenWrapWithCharacterModal(fn: OpenWrapWithCharacterModalFn): void {
+  openWrapWithCharacterModalFn = fn;
+}
+
+function getSelectionInfo(): { chapterNumber: number; paragraphIndex: number; selectedText: string; occurrenceIndex: number } | null {
+  const selection = window.getSelection();
+  if (!selection || selection.isCollapsed || !selection.toString().trim()) {
+    return null;
+  }
+
+  const selectedText = selection.toString().trim();
+  const range = selection.getRangeAt(0);
+  const container = range.commonAncestorContainer;
+
+  const element = container.nodeType === Node.TEXT_NODE ? container.parentElement : (container as HTMLElement);
+  if (!element) return null;
+
+  const paragraph = element.closest<HTMLElement>("section[data-chapter] [data-index]");
+  const section = paragraph?.closest<HTMLElement>("section[data-chapter]");
+
+  if (!paragraph || !section) return null;
+
+  const chapterNumber = parseInt(section.dataset.chapter || "0");
+  const paragraphIndex = parseInt(paragraph.dataset.index || "0");
+
+  // Calculate which occurrence of the selected text this is
+  const paragraphText = paragraph.textContent || "";
+  let occurrenceIndex = 0;
+
+  // Get the text offset of the selection start within the paragraph
+  const preSelectionRange = document.createRange();
+  preSelectionRange.selectNodeContents(paragraph);
+  preSelectionRange.setEnd(range.startContainer, range.startOffset);
+  const selectionStartOffset = preSelectionRange.toString().length;
+
+  // Count how many times the selected text appears before this position
+  let searchPos = 0;
+  while (searchPos < selectionStartOffset) {
+    const foundPos = paragraphText.indexOf(selectedText, searchPos);
+    if (foundPos === -1 || foundPos >= selectionStartOffset) break;
+    occurrenceIndex++;
+    searchPos = foundPos + 1;
+  }
+
+  return { chapterNumber, paragraphIndex, selectedText, occurrenceIndex };
 }
 
 function clearEditHover(): void {
@@ -34,6 +92,8 @@ export function setupParagraphHighlighting() {
     const target = event.target as HTMLElement;
     const paragraph = target.closest<HTMLElement>("section[data-chapter] [data-index]");
     if (paragraph) {
+      currentHoveredParagraph = paragraph;
+
       const section = paragraph.closest<HTMLElement>("section[data-chapter]");
       if (!section) return;
 
@@ -78,6 +138,9 @@ export function setupParagraphHighlighting() {
 
     const relatedTarget = event.relatedTarget as HTMLElement | null;
     const stillInParagraph = relatedTarget?.closest<HTMLElement>("section[data-chapter] [data-index]");
+    if (!stillInParagraph) {
+      currentHoveredParagraph = null;
+    }
     if (!stillInParagraph || stillInParagraph !== currentEditHoverElement) {
       clearEditHover();
     }
@@ -87,6 +150,30 @@ export function setupParagraphHighlighting() {
     const target = event.target as HTMLElement;
 
     if (getGlobalEditModeActive()) {
+      const selection = window.getSelection();
+      const hasTextSelection = selection && !selection.isCollapsed && selection.toString().trim().length > 0;
+      if (hasTextSelection) {
+        return;
+      }
+
+      const characterSpan = target.closest<HTMLElement>("[data-character]:not([data-is-talking])");
+      if (characterSpan && openEditCharacterTagModalFn) {
+        const paragraph = characterSpan.closest<HTMLElement>("section[data-chapter] [data-index]");
+        const section = paragraph?.closest<HTMLElement>("section[data-chapter]");
+        if (paragraph && section) {
+          const chapterNumber = parseInt(section.dataset.chapter || "0");
+          const paragraphIndex = parseInt(paragraph.dataset.index || "0");
+          const characterSlug = characterSpan.dataset.character || "";
+          const textContent = characterSpan.textContent || "";
+
+          event.preventDefault();
+          event.stopPropagation();
+          clearEditHover();
+          openEditCharacterTagModalFn(chapterNumber, paragraphIndex, characterSlug, textContent);
+          return;
+        }
+      }
+
       const paragraph = target.closest<HTMLElement>("section[data-chapter] [data-index]");
       if (paragraph) {
         const section = paragraph.closest<HTMLElement>("section[data-chapter]");
@@ -189,9 +276,27 @@ export function setupParagraphHighlighting() {
     }, 400);
   });
 
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Meta" || event.key === "Control") {
+      if (currentHoveredParagraph && currentHoveredParagraph !== currentEditHoverElement) {
+        clearEditHover();
+        currentHoveredParagraph.classList.add("edit-hover");
+        currentEditHoverElement = currentHoveredParagraph;
+      }
+    }
+  });
+
   window.addEventListener("keyup", (event) => {
     if (event.key === "Meta" || event.key === "Control") {
       clearEditHover();
+
+      if (openWrapWithCharacterModalFn) {
+        const selectionInfo = getSelectionInfo();
+        if (selectionInfo) {
+          openWrapWithCharacterModalFn(selectionInfo.chapterNumber, selectionInfo.paragraphIndex, selectionInfo.selectedText, selectionInfo.occurrenceIndex);
+          window.getSelection()?.removeAllRanges();
+        }
+      }
     }
   });
 }

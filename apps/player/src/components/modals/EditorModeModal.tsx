@@ -17,17 +17,19 @@ interface CharacterWithStats {
 }
 
 const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
-  const { modalType, onSubmit, chapterNumber, paragraphIndex, currentSpeaker } = useEditorModeModal();
+  const { modalType, onSubmit, chapterNumber, paragraphIndex, currentSpeaker, currentCharacterSlug, currentTextContent, selectedText } = useEditorModeModal();
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
   const { charactersData, characters } = useBookConvex();
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const currentCharacterForSort = modalType === "edit-character-tag" ? currentCharacterSlug : currentSpeaker;
+
   const sortedCharacters = useMemo<CharacterWithStats[]>(() => {
     const withStats = charactersData.map((charData) => {
       const bundle = characters.find((c) => c.slug.toLowerCase() === charData.slug.toLowerCase());
       const talkingCount = charData.infoPerChapter.reduce((sum, info) => sum + (info.paragraphsWhereTalking?.length || 0), 0);
-      const isCurrentSpeaker = currentSpeaker?.toLowerCase() === charData.slug.toLowerCase();
+      const isCurrentSpeaker = currentCharacterForSort?.toLowerCase() === charData.slug.toLowerCase();
 
       return { slug: charData.slug, name: charData.characterName, avatarUrl: bundle?.avatar?.url, talkingCount, isCurrentSpeaker };
     });
@@ -37,13 +39,16 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
       if (!a.isCurrentSpeaker && b.isCurrentSpeaker) return 1;
       return b.talkingCount - a.talkingCount;
     });
-  }, [charactersData, characters, currentSpeaker]);
+  }, [charactersData, characters, currentCharacterForSort]);
 
   useEffect(() => {
     if (currentSpeaker && modalType === "set-talking-character") {
       setSelectedCharacter(currentSpeaker);
     }
-  }, [currentSpeaker, modalType]);
+    if (currentCharacterSlug && modalType === "edit-character-tag") {
+      setSelectedCharacter(currentCharacterSlug);
+    }
+  }, [currentSpeaker, currentCharacterSlug, modalType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -236,6 +241,140 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
           </form>
         );
 
+      case "edit-character-tag":
+        return (
+          <div className="flex flex-col gap-4">
+            <div className="text-sm text-zinc-400 text-center">
+              Chapter {chapterNumber}, Paragraph {paragraphIndex}
+            </div>
+
+            <div className="bg-zinc-800 rounded-lg p-3 text-center">
+              <div className="text-xs text-zinc-500 mb-1">Text wrapped with character:</div>
+              <div className="text-white font-medium">"{currentTextContent}"</div>
+            </div>
+
+            {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+
+            <div className="bg-zinc-900 rounded-lg border border-zinc-700 overflow-hidden">
+              <div className="max-h-80 overflow-y-auto">
+                {sortedCharacters.map((character) => {
+                  const isSelected = selectedCharacter === character.slug;
+                  return (
+                    <div
+                      key={character.slug}
+                      onClick={() => handleCharacterClick(character.slug)}
+                      className={`
+                        flex items-center gap-4 p-3 cursor-pointer transition-colors
+                        ${isSelected ? "bg-purple-600/30 border-l-4 border-l-purple-500" : "border-l-4 border-l-transparent hover:bg-zinc-800"}
+                        ${character.isCurrentSpeaker && !isSelected ? "bg-zinc-800/50" : ""}
+                      `}
+                    >
+                      {character.avatarUrl ? (
+                        <img src={character.avatarUrl} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-lg text-zinc-400 flex-shrink-0">{character.name.charAt(0)}</div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-white truncate">{character.name}</div>
+                        <div className="text-xs text-zinc-500">{character.talkingCount > 0 ? `${character.talkingCount} speaking lines` : "No speaking lines yet"}</div>
+                      </div>
+                      {character.isCurrentSpeaker && <div className="text-xs text-purple-400 bg-purple-500/20 px-2 py-1 rounded">Current</div>}
+                      {isSelected && !character.isCurrentSpeaker && <div className="w-3 h-3 rounded-full bg-purple-500" />}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={onClose}
+                disabled={isSubmitting}
+                className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSetSpeaker}
+                disabled={isSubmitting || !selectedCharacter || selectedCharacter === currentCharacterSlug}
+                className="flex-1 bg-purple-600 text-white hover:bg-purple-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isSubmitting ? "Saving..." : "Change Character"}
+              </button>
+            </div>
+
+            <button
+              onClick={handleRemoveSpeaker}
+              disabled={isSubmitting}
+              className="w-full bg-red-600/20 text-red-400 border border-red-600/30 hover:bg-red-600/30 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
+            >
+              {isSubmitting ? "Removing..." : "Remove Character Tag"}
+            </button>
+          </div>
+        );
+
+      case "wrap-with-character":
+        return (
+          <div className="flex flex-col gap-4">
+            <div className="text-sm text-zinc-400 text-center">
+              Chapter {chapterNumber}, Paragraph {paragraphIndex}
+            </div>
+
+            <div className="bg-zinc-800 rounded-lg p-3 text-center">
+              <div className="text-xs text-zinc-500 mb-1">Selected text to wrap:</div>
+              <div className="text-white font-medium">"{selectedText}"</div>
+            </div>
+
+            {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+
+            <div className="bg-zinc-900 rounded-lg border border-zinc-700 overflow-hidden">
+              <div className="max-h-80 overflow-y-auto">
+                {sortedCharacters.map((character) => {
+                  const isSelected = selectedCharacter === character.slug;
+                  return (
+                    <div
+                      key={character.slug}
+                      onClick={() => handleCharacterClick(character.slug)}
+                      className={`
+                        flex items-center gap-4 p-3 cursor-pointer transition-colors
+                        ${isSelected ? "bg-purple-600/30 border-l-4 border-l-purple-500" : "border-l-4 border-l-transparent hover:bg-zinc-800"}
+                      `}
+                    >
+                      {character.avatarUrl ? (
+                        <img src={character.avatarUrl} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-lg text-zinc-400 flex-shrink-0">{character.name.charAt(0)}</div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-white truncate">{character.name}</div>
+                        <div className="text-xs text-zinc-500">{character.talkingCount > 0 ? `${character.talkingCount} speaking lines` : "No speaking lines yet"}</div>
+                      </div>
+                      {isSelected && <div className="w-3 h-3 rounded-full bg-purple-500" />}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={onClose}
+                disabled={isSubmitting}
+                className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSetSpeaker}
+                disabled={isSubmitting || !selectedCharacter}
+                className="flex-1 bg-purple-600 text-white hover:bg-purple-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isSubmitting ? "Wrapping..." : "Wrap with Character"}
+              </button>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -245,11 +384,17 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
     if (modalType === "set-talking-character") {
       return "Set Speaking Character";
     }
+    if (modalType === "edit-character-tag") {
+      return "Edit Character Tag";
+    }
+    if (modalType === "wrap-with-character") {
+      return "Wrap Text with Character";
+    }
     return "Editor Mode";
   };
 
   const getWidth = () => {
-    if (modalType === "set-talking-character") {
+    if (modalType === "set-talking-character" || modalType === "edit-character-tag" || modalType === "wrap-with-character") {
       return "w-96";
     }
     return "w-80";
