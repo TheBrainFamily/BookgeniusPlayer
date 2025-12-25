@@ -28,6 +28,7 @@ import type * as musicCues from "../musicCues.js";
 import type * as musicMetadata from "../musicMetadata.js";
 import type * as notes from "../notes.js";
 import type * as paragraphEditor from "../paragraphEditor.js";
+import type * as prompts_promptForSingleUserDescription from "../prompts/promptForSingleUserDescription.js";
 import type * as prompts_storyContext from "../prompts/storyContext.js";
 import type * as reset from "../reset.js";
 import type * as variants from "../variants.js";
@@ -59,6 +60,7 @@ declare const fullApi: ApiFromModules<{
   musicMetadata: typeof musicMetadata;
   notes: typeof notes;
   paragraphEditor: typeof paragraphEditor;
+  "prompts/promptForSingleUserDescription": typeof prompts_promptForSingleUserDescription;
   "prompts/storyContext": typeof prompts_storyContext;
   reset: typeof reset;
   variants: typeof variants;

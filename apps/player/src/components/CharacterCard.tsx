@@ -10,6 +10,7 @@ import { isVideoFile } from "@player/helpers/isVideoFile";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
+import { getAvatarSource } from "@player/helpers/svgAvatars";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
@@ -44,24 +45,26 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
 
   const isTalkingInCurrentRange = useMemo(() => currentSpeakers.includes(entity.slug), [currentSpeakers, entity.slug]);
 
+  const svgFallback = useMemo(() => getAvatarSource({ slug: entity.slug, characterName: displayName, bookSlug: "", infoPerChapter: [] }), [entity.slug, displayName]);
+
   const mediaSrc = useMemo(() => {
-    // Use Convex URLs from snapshot - no legacy fallbacks
     const listeningUrl = snapshot?.media.listening ?? "";
     if (imageOnly) {
-      return getPlaceholderFromVideoUrl(listeningUrl);
+      const placeholder = getPlaceholderFromVideoUrl(listeningUrl);
+      return placeholder || svgFallback;
     }
-    return listeningUrl;
-  }, [imageOnly, snapshot]);
+    return listeningUrl || svgFallback;
+  }, [imageOnly, snapshot, svgFallback]);
 
   const isVideo = imageOnly ? false : isVideoFile(mediaSrc);
 
   const modalMediaSrc = useMemo(() => {
-    // Use Convex URLs from snapshot - no legacy fallbacks
     if (imageOnly && snapshot) {
-      return isTalkingInCurrentRange ? snapshot.media.talking : snapshot.media.listening;
+      const url = isTalkingInCurrentRange ? snapshot.media.talking : snapshot.media.listening;
+      return url || svgFallback;
     }
-    return snapshot?.media.listening ?? "";
-  }, [imageOnly, isTalkingInCurrentRange, snapshot]);
+    return snapshot?.media.listening || svgFallback;
+  }, [imageOnly, isTalkingInCurrentRange, snapshot, svgFallback]);
 
   const modalIsVideo = useMemo(() => isVideoFile(modalMediaSrc), [modalMediaSrc]);
 

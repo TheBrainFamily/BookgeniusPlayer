@@ -6,10 +6,13 @@ const MODAL_ID = "editor-mode-modal";
 
 type EditorModalType = "edit-paragraph" | "add-character" | "remove-character" | "set-talking-character" | "edit-character-tag" | "wrap-with-character";
 
+type CreateCharacterFn = (characterName: string) => Promise<{ slug: string; displayName: string }>;
+
 interface EditorModeModalState {
   isOpen: boolean;
   modalType: EditorModalType | null;
   onSubmit: ((characterSlug?: string) => Promise<void>) | null;
+  onCreateCharacter: CreateCharacterFn | null;
 
   chapterNumber: number | null;
   paragraphIndex: number | null;
@@ -20,13 +23,20 @@ interface EditorModeModalState {
   occurrenceIndex: number | null;
 
   openModal: (modalType: EditorModalType, onSubmit: (characterSlug?: string) => Promise<void>) => void;
-  openTalkingCharacterModal: (chapterNumber: number, paragraphIndex: number, currentSpeaker: string | null, onSubmit: (characterSlug?: string) => Promise<void>) => void;
+  openTalkingCharacterModal: (
+    chapterNumber: number,
+    paragraphIndex: number,
+    currentSpeaker: string | null,
+    onSubmit: (characterSlug?: string) => Promise<void>,
+    onCreateCharacter: CreateCharacterFn,
+  ) => void;
   openEditCharacterTagModal: (
     chapterNumber: number,
     paragraphIndex: number,
     characterSlug: string,
     textContent: string,
     onSubmit: (newCharacterSlug?: string) => Promise<void>,
+    onCreateCharacter: CreateCharacterFn,
   ) => void;
   openWrapWithCharacterModal: (
     chapterNumber: number,
@@ -34,6 +44,7 @@ interface EditorModeModalState {
     selectedText: string,
     occurrenceIndex: number,
     onSubmit: (characterSlug?: string) => Promise<void>,
+    onCreateCharacter: CreateCharacterFn,
   ) => void;
   closeModal: () => void;
 }
@@ -44,6 +55,7 @@ export const useEditorModeModal = create<EditorModeModalState>()(
       isOpen: false,
       modalType: null,
       onSubmit: null,
+      onCreateCharacter: null,
       chapterNumber: null,
       paragraphIndex: null,
       currentSpeaker: null,
@@ -59,6 +71,7 @@ export const useEditorModeModal = create<EditorModeModalState>()(
             isOpen: true,
             modalType,
             onSubmit,
+            onCreateCharacter: null,
             chapterNumber: null,
             paragraphIndex: null,
             currentSpeaker: null,
@@ -70,7 +83,7 @@ export const useEditorModeModal = create<EditorModeModalState>()(
         }
       },
 
-      openTalkingCharacterModal: (chapterNumber, paragraphIndex, currentSpeaker, onSubmit) => {
+      openTalkingCharacterModal: (chapterNumber, paragraphIndex, currentSpeaker, onSubmit, onCreateCharacter) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
           set({
@@ -84,11 +97,12 @@ export const useEditorModeModal = create<EditorModeModalState>()(
             selectedText: null,
             occurrenceIndex: null,
             onSubmit,
+            onCreateCharacter,
           });
         }
       },
 
-      openEditCharacterTagModal: (chapterNumber, paragraphIndex, characterSlug, textContent, onSubmit) => {
+      openEditCharacterTagModal: (chapterNumber, paragraphIndex, characterSlug, textContent, onSubmit, onCreateCharacter) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
           set({
@@ -102,11 +116,12 @@ export const useEditorModeModal = create<EditorModeModalState>()(
             selectedText: null,
             occurrenceIndex: null,
             onSubmit,
+            onCreateCharacter,
           });
         }
       },
 
-      openWrapWithCharacterModal: (chapterNumber, paragraphIndex, selectedText, occurrenceIndex, onSubmit) => {
+      openWrapWithCharacterModal: (chapterNumber, paragraphIndex, selectedText, occurrenceIndex, onSubmit, onCreateCharacter) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
           set({
@@ -120,6 +135,7 @@ export const useEditorModeModal = create<EditorModeModalState>()(
             selectedText,
             occurrenceIndex,
             onSubmit,
+            onCreateCharacter,
           });
         }
       },
@@ -131,6 +147,7 @@ export const useEditorModeModal = create<EditorModeModalState>()(
           isOpen: false,
           modalType: null,
           onSubmit: null,
+          onCreateCharacter: null,
           chapterNumber: null,
           paragraphIndex: null,
           currentSpeaker: null,

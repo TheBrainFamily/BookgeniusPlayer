@@ -8,6 +8,39 @@ import type {
   Node as XmlDomNode,
 } from "@xmldom/xmldom";
 
+function slugify(name: string): string {
+  const polishMap: { [key: string]: string } = {
+    ą: "a",
+    ć: "c",
+    ę: "e",
+    ł: "l",
+    ń: "n",
+    ó: "o",
+    ś: "s",
+    ź: "z",
+    ż: "z",
+    Ą: "A",
+    Ć: "C",
+    Ę: "E",
+    Ł: "L",
+    Ń: "N",
+    Ó: "O",
+    Ś: "S",
+    Ź: "Z",
+    Ż: "Z",
+  };
+  let tagName = name
+    .replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g, (char) => polishMap[char] || char)
+    .replace(/[,()]/g, "")
+    .replace(/\s+/g, "-")
+    .trim();
+  tagName = tagName.replace(/[^a-zA-Z0-9\-_.:]/g, "");
+  if (!/^[a-zA-Z_]/.test(tagName)) {
+    tagName = "_" + tagName;
+  }
+  return tagName || "Character";
+}
+
 type ChapterExtra = { chapterNumber?: number; title?: string };
 
 function findElementByDataIndex(chapter: XmlDomElement, targetIndex: number): XmlDomElement | null {
@@ -544,5 +577,39 @@ export const wrapTextWithCharacter = action({
     });
 
     return { success: true, versionId: uploadResult.versionId, characterSlug };
+  },
+});
+
+export const createCharacter = action({
+  args: { bookPath: v.string(), characterName: v.string() },
+  returns: v.object({ slug: v.string(), displayName: v.string(), characterPath: v.string() }),
+  handler: async (ctx, { bookPath, characterName }) => {
+    const displayName = characterName.trim();
+    if (!displayName) {
+      throw new Error("Character name is required");
+    }
+
+    const slug = slugify(displayName);
+    if (!slug) {
+      throw new Error("Could not generate valid slug from character name");
+    }
+
+    const characterPath = `${bookPath}/characters/${slug}`;
+
+    try {
+      await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+        path: characterPath,
+        name: displayName,
+        extra: { type: "character", displayName, summary: "" },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (message.includes("Folder already exists")) {
+        throw new Error(`Character "${displayName}" already exists`);
+      }
+      throw error;
+    }
+
+    return { slug, displayName, characterPath };
   },
 });

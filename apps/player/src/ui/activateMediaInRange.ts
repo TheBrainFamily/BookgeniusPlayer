@@ -10,6 +10,7 @@ import type { CharacterSnapshot } from "@player/utils/characterOverrides";
 import { normalizeSrcForInlineAvatar } from "./highlightCharacter";
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
 import { activateFootnoteInteractions } from "@player/helpers/activateFootnoteInteractions";
+import { getAvatarSource } from "@player/helpers/svgAvatars";
 
 function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
   const result = [];
@@ -244,44 +245,50 @@ const runPlayFormatMediaActivation = ({ charactersBySlug }: PlayFormatMediaActiv
   });
 };
 
-/**
- * Populates an existing inline-avatar shell with the placeholder image.
- * Returns true if the shell was populated, false if it already had content.
- */
+function generateFallbackAvatarUrl(characterSlug: string, displayName?: string): string {
+  const name = displayName || characterSlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return getAvatarSource({ slug: characterSlug, characterName: name, bookSlug: "", infoPerChapter: [] });
+}
+
 function populateInlineAvatarShell(
   shell: HTMLElement,
   characterData: CharacterData | undefined,
   location: { chapter: number; paragraph: number } | null,
   snapshotOverride?: CharacterSnapshot | null,
 ): boolean {
-  // Skip if already has an image
   if (shell.querySelector("img")) {
     return false;
   }
 
   const characterSlug = shell.dataset.character;
-  if (!characterSlug || !characterData) return false;
+  if (!characterSlug) return false;
 
-  const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+  let displayName = characterSlug;
+  let placeholderSrc = "";
 
-  const listeningSrc = snapshot.media.listening;
-  const talkingSrc = snapshot.media.talking;
+  if (characterData) {
+    const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+    displayName = snapshot.displayName;
+    const listeningSrc = snapshot.media.listening;
+    const talkingSrc = snapshot.media.talking;
+    placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
+  }
 
-  // Update title in case it wasn't set properly
-  shell.title = snapshot.displayName;
+  if (!placeholderSrc) {
+    placeholderSrc = generateFallbackAvatarUrl(characterSlug, displayName);
+  }
 
-  // Create placeholder image (always shown as fallback)
+  shell.title = displayName;
+
   const placeholderImg = document.createElement("img");
-  const placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
   placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
   placeholderImg.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
-  placeholderImg.alt = snapshot.displayName;
+  placeholderImg.alt = displayName;
   shell.appendChild(placeholderImg);
 
   return true;
 }
 
-/** Creates a media container element with CharacterMedia-like structure for inline avatars */
 function createMediaElement(
   placeholder: HTMLSpanElement,
   characterData: CharacterData | undefined,
@@ -289,26 +296,32 @@ function createMediaElement(
   snapshotOverride?: CharacterSnapshot | null,
 ): HTMLSpanElement | null {
   const characterSlug = placeholder.dataset.character;
-  if (!characterSlug || !characterData) return null;
+  if (!characterSlug) return null;
 
-  const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+  let displayName = characterSlug;
+  let placeholderSrc = "";
 
-  const listeningSrc = snapshot.media.listening;
-  const talkingSrc = snapshot.media.talking;
+  if (characterData) {
+    const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+    displayName = snapshot.displayName;
+    const listeningSrc = snapshot.media.listening;
+    const talkingSrc = snapshot.media.talking;
+    placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
+  }
 
-  // Create container element similar to CharacterMedia structure
-  // Must be span (not div) because it's nested inside <p> - div would break out of <p>
+  if (!placeholderSrc) {
+    placeholderSrc = generateFallbackAvatarUrl(characterSlug, displayName);
+  }
+
   const container = document.createElement("span");
   container.classList.add("inline-avatar", "relative", "w-full", "h-full");
   container.dataset.character = characterSlug;
-  container.title = snapshot.displayName;
+  container.title = displayName;
 
-  // Create placeholder image (always shown as fallback)
   const placeholderImg = document.createElement("img");
-  const placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
   placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
   placeholderImg.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
-  placeholderImg.alt = snapshot.displayName;
+  placeholderImg.alt = displayName;
   container.appendChild(placeholderImg);
 
   return container;
@@ -510,8 +523,6 @@ export function hydrateInlineAvatarsInSection(section: HTMLElement): void {
     if (!characterSlug) return;
 
     const characterData = charactersBySlug.get(characterSlug);
-    if (!characterData) return;
-
     const paragraphEl = shell.closest<HTMLElement>("[data-index]");
     const paragraphIndex = paragraphEl?.dataset.index ? parseInt(paragraphEl.dataset.index, 10) : 0;
     const location = { chapter: chapterNumber, paragraph: paragraphIndex };

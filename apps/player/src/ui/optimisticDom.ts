@@ -1,8 +1,4 @@
-/**
- * Optimistic DOM manipulation utilities for in-player editing.
- * These modify the DOM immediately before server confirmation,
- * providing instant feedback. The server response will overwrite these changes.
- */
+import { getAvatarSource } from "@player/helpers/svgAvatars";
 
 type RevertFunction = () => void;
 
@@ -131,6 +127,11 @@ export function optimisticModifyCharacterTag(
   }
 }
 
+function generateFallbackAvatarUrl(characterSlug: string): string {
+  const displayName = characterSlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return getAvatarSource({ slug: characterSlug, characterName: displayName, bookSlug: "", infoPerChapter: [] });
+}
+
 export function optimisticSetTalkingCharacter(chapterNumber: number, paragraphIndex: number, characterSlug: string | undefined, avatarUrl?: string): RevertFunction | null {
   const paragraph = findParagraphElement(chapterNumber, paragraphIndex);
   if (!paragraph) return null;
@@ -139,6 +140,8 @@ export function optimisticSetTalkingCharacter(chapterNumber: number, paragraphIn
   const originalSlug = existingTalking?.dataset.character;
 
   if (characterSlug) {
+    const resolvedAvatarUrl = avatarUrl || generateFallbackAvatarUrl(characterSlug);
+
     if (existingTalking) {
       const inlineAvatar = existingTalking.querySelector<HTMLElement>(".inline-avatar");
       const originalAvatarUrl = inlineAvatar?.querySelector<HTMLImageElement>("img")?.src;
@@ -146,10 +149,10 @@ export function optimisticSetTalkingCharacter(chapterNumber: number, paragraphIn
       existingTalking.dataset.character = characterSlug;
       existingTalking.dataset.optimistic = "true";
 
-      if (inlineAvatar && avatarUrl) {
+      if (inlineAvatar) {
         inlineAvatar.dataset.character = characterSlug;
         const img = inlineAvatar.querySelector<HTMLImageElement>("img");
-        if (img) img.src = avatarUrl;
+        if (img) img.src = resolvedAvatarUrl;
       }
 
       return () => {
@@ -173,13 +176,11 @@ export function optimisticSetTalkingCharacter(chapterNumber: number, paragraphIn
       inlineAvatar.dataset.character = characterSlug;
       inlineAvatar.title = characterSlug;
 
-      if (avatarUrl) {
-        const img = document.createElement("img");
-        img.src = avatarUrl;
-        img.className = "absolute top-0 left-0 w-full h-full object-cover rounded-full";
-        img.alt = characterSlug;
-        inlineAvatar.appendChild(img);
-      }
+      const img = document.createElement("img");
+      img.src = resolvedAvatarUrl;
+      img.className = "absolute top-0 left-0 w-full h-full object-cover rounded-full";
+      img.alt = characterSlug;
+      inlineAvatar.appendChild(img);
 
       talkingSpan.appendChild(inlineAvatar);
       paragraph.insertBefore(talkingSpan, paragraph.firstChild);
