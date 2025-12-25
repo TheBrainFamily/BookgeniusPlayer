@@ -1,5 +1,7 @@
 import { bookIndex } from "@player/logic/BookIndex";
 import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
+import { hydrateInlineAvatarsInSection } from "@player/ui/activateMediaInRange";
+import { highlightCharacter } from "@player/ui/highlightCharacter";
 
 console.log("[BookContentVirtualizer] BookContentVirtualizer version NOV28-v3 (refactored)");
 
@@ -631,6 +633,11 @@ export const updateMountedChaptersInPlace = (): void => {
 
         // Replace inner HTML only - wrapper stays in place
         existingSection.innerHTML = freshSection.innerHTML;
+
+        // Immediately hydrate avatars and character highlights before browser paints
+        hydrateInlineAvatarsInSection(existingSection);
+        existingSection.querySelectorAll<HTMLSpanElement>(".character-highlighted").forEach(highlightCharacter);
+
         console.log("[Convex:Flow] Updated chapter", chapterId, "in-place");
       }
     } catch (e) {

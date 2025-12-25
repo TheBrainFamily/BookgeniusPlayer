@@ -5,15 +5,24 @@ import { useEditorModeModal } from "@player/stores/modals/editorModeModal.store"
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { setOpenTalkingCharacterModal, setOpenEditCharacterTagModal, setOpenWrapWithCharacterModal } from "@player/ui/paragraphHighlighting";
 import { useEditModeGlobalSync } from "@player/context/EditModeContext";
+import { optimisticWrapTextWithCharacter, optimisticModifyCharacterTag, optimisticSetTalkingCharacter } from "@player/ui/optimisticDom";
 
 export function ParagraphEditConnector() {
   useEditModeGlobalSync();
 
   const { openTalkingCharacterModal, openEditCharacterTagModal, openWrapWithCharacterModal } = useEditorModeModal();
-  const { book } = useBookConvex();
+  const { book, characters } = useBookConvex();
   const setParagraphSpeaker = useAction(api.paragraphEditor.setParagraphSpeaker);
   const modifyCharacterTag = useAction(api.paragraphEditor.modifyCharacterTag);
   const wrapTextWithCharacter = useAction(api.paragraphEditor.wrapTextWithCharacter);
+
+  const getAvatarUrl = useCallback(
+    (characterSlug: string): string | undefined => {
+      const character = characters.find((c) => c.slug.toLowerCase() === characterSlug.toLowerCase());
+      return character?.avatar?.url;
+    },
+    [characters],
+  );
 
   const handleOpenTalkingModal = useCallback(
     (chapterNumber: number, paragraphIndex: number, currentSpeaker: string | null) => {
@@ -24,10 +33,17 @@ export function ParagraphEditConnector() {
       }
 
       openTalkingCharacterModal(chapterNumber, paragraphIndex, currentSpeaker, async (characterSlug?: string) => {
-        await setParagraphSpeaker({ bookPath, chapterNumber, paragraphIndex, characterSlug: characterSlug || undefined });
+        const avatarUrl = characterSlug ? getAvatarUrl(characterSlug) : undefined;
+        const revert = optimisticSetTalkingCharacter(chapterNumber, paragraphIndex, characterSlug, avatarUrl);
+        try {
+          await setParagraphSpeaker({ bookPath, chapterNumber, paragraphIndex, characterSlug: characterSlug || undefined });
+        } catch (error) {
+          revert?.();
+          throw error;
+        }
       });
     },
-    [book?.path, openTalkingCharacterModal, setParagraphSpeaker],
+    [book?.path, openTalkingCharacterModal, setParagraphSpeaker, getAvatarUrl],
   );
 
   const handleOpenEditCharacterTagModal = useCallback(
@@ -39,7 +55,13 @@ export function ParagraphEditConnector() {
       }
 
       openEditCharacterTagModal(chapterNumber, paragraphIndex, characterSlug, textContent, async (newCharacterSlug?: string) => {
-        await modifyCharacterTag({ bookPath, chapterNumber, paragraphIndex, currentCharacterSlug: characterSlug, textContent, newCharacterSlug: newCharacterSlug || undefined });
+        const revert = optimisticModifyCharacterTag(chapterNumber, paragraphIndex, characterSlug, textContent, newCharacterSlug);
+        try {
+          await modifyCharacterTag({ bookPath, chapterNumber, paragraphIndex, currentCharacterSlug: characterSlug, textContent, newCharacterSlug: newCharacterSlug || undefined });
+        } catch (error) {
+          revert?.();
+          throw error;
+        }
       });
     },
     [book?.path, openEditCharacterTagModal, modifyCharacterTag],
@@ -55,7 +77,13 @@ export function ParagraphEditConnector() {
 
       openWrapWithCharacterModal(chapterNumber, paragraphIndex, selectedText, occurrenceIndex, async (characterSlug?: string) => {
         if (!characterSlug) return;
-        await wrapTextWithCharacter({ bookPath, chapterNumber, paragraphIndex, textToWrap: selectedText, occurrenceIndex, characterSlug });
+        const revert = optimisticWrapTextWithCharacter(chapterNumber, paragraphIndex, selectedText, occurrenceIndex, characterSlug);
+        try {
+          await wrapTextWithCharacter({ bookPath, chapterNumber, paragraphIndex, textToWrap: selectedText, occurrenceIndex, characterSlug });
+        } catch (error) {
+          revert?.();
+          throw error;
+        }
       });
     },
     [book?.path, openWrapWithCharacterModal, wrapTextWithCharacter],

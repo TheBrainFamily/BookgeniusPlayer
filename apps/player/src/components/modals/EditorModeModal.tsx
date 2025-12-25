@@ -58,38 +58,18 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
     }
   };
 
-  const handleSetSpeaker = async () => {
+  const handleSetSpeaker = () => {
     if (!selectedCharacter) {
       setError("Please select a character first");
       return;
     }
-    setIsSubmitting(true);
-    setError("");
-    try {
-      if (onSubmit) {
-        await onSubmit(selectedCharacter);
-        onClose();
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to set speaker");
-    } finally {
-      setIsSubmitting(false);
-    }
+    onSubmit?.(selectedCharacter);
+    onClose();
   };
 
-  const handleRemoveSpeaker = async () => {
-    setIsSubmitting(true);
-    setError("");
-    try {
-      if (onSubmit) {
-        await onSubmit(undefined);
-        onClose();
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to remove speaker");
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleRemoveSpeaker = () => {
+    onSubmit?.(undefined);
+    onClose();
   };
 
   const handleCharacterClick = (slug: string) => {

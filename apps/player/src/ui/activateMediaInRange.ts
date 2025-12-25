@@ -498,3 +498,24 @@ export const openPlayRowCharacterModal = (target: HTMLElement, openCharacterDeta
     isTalking: isTalkingNow,
   });
 };
+
+export function hydrateInlineAvatarsInSection(section: HTMLElement): void {
+  const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
+  const chapterAttr = section.dataset.chapter;
+  const chapterNumber = chapterAttr ? parseInt(chapterAttr, 10) : 0;
+
+  const shells = section.querySelectorAll<HTMLElement>(".inline-avatar:not(:has(img))");
+  shells.forEach((shell) => {
+    const characterSlug = shell.dataset.character;
+    if (!characterSlug) return;
+
+    const characterData = charactersBySlug.get(characterSlug);
+    if (!characterData) return;
+
+    const paragraphEl = shell.closest<HTMLElement>("[data-index]");
+    const paragraphIndex = paragraphEl?.dataset.index ? parseInt(paragraphEl.dataset.index, 10) : 0;
+    const location = { chapter: chapterNumber, paragraph: paragraphIndex };
+
+    populateInlineAvatarShell(shell, characterData, location);
+  });
+}
