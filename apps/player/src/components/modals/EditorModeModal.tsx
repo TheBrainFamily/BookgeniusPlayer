@@ -27,9 +27,10 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
   const startAvatarGeneration = useAction(api.avatarGeneration.startAvatarGeneration);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showAddNew, setShowAddNew] = useState(false);
   const [newCharacterName, setNewCharacterName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [activeTab, setActiveTab] = useState<"existing" | "new">("existing");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const currentCharacterForSort = modalType === "edit-character-tag" ? currentCharacterSlug : currentSpeaker;
 
@@ -51,6 +52,12 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
       return b.talkingCount - a.talkingCount;
     });
   }, [charactersData, characters, currentCharacterForSort, optimisticAvatars]);
+
+  const filteredCharacters = useMemo(() => {
+    if (!searchQuery.trim()) return sortedCharacters;
+    const query = searchQuery.toLowerCase();
+    return sortedCharacters.filter((c) => c.name.toLowerCase().includes(query) || c.slug.toLowerCase().includes(query));
+  }, [sortedCharacters, searchQuery]);
 
   useEffect(() => {
     if (currentSpeaker && modalType === "set-talking-character") {
@@ -86,7 +93,6 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
   const handleCharacterClick = (slug: string) => {
     setSelectedCharacter(slug);
     setError("");
-    setShowAddNew(false);
   };
 
   const [createdCharacterSlug, setCreatedCharacterSlug] = useState<string | null>(null);
@@ -192,8 +198,8 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
             onClick={() => {
               setCreatedCharacterSlug(null);
               setEditablePrompt("");
-              setShowAddNew(false);
               setNewCharacterName("");
+              setActiveTab("existing");
             }}
             className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer transition-colors"
           >
@@ -228,121 +234,144 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
 
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
 
-            <div className="bg-zinc-900 rounded-lg border border-zinc-700 overflow-hidden">
-              <div className="max-h-80 overflow-y-auto">
-                {sortedCharacters.map((character) => {
-                  const isSelected = selectedCharacter === character.slug;
-                  return (
-                    <div
-                      key={character.slug}
-                      onClick={() => handleCharacterClick(character.slug)}
-                      className={`
-                        flex items-center gap-4 p-3 cursor-pointer transition-colors
-                        ${isSelected ? "bg-purple-600/30 border-l-4 border-l-purple-500" : "border-l-4 border-l-transparent hover:bg-zinc-800"}
-                        ${character.isCurrentSpeaker && !isSelected ? "bg-zinc-800/50" : ""}
-                      `}
-                    >
-                      {character.avatarUrl ? (
-                        <img src={character.avatarUrl} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-lg text-zinc-400 flex-shrink-0">{character.name.charAt(0)}</div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-white truncate">{character.name}</div>
-                        <div className="text-xs text-zinc-500">{character.talkingCount > 0 ? `${character.talkingCount} speaking lines` : "No speaking lines yet"}</div>
-                      </div>
-                      {character.isCurrentSpeaker && <div className="text-xs text-purple-400 bg-purple-500/20 px-2 py-1 rounded">Current</div>}
-                      {isSelected && !character.isCurrentSpeaker && <div className="w-3 h-3 rounded-full bg-purple-500" />}
-                    </div>
-                  );
-                })}
+            {onCreateCharacter && (
+              <div className="flex gap-1 p-1 bg-zinc-800 rounded-lg">
+                <button
+                  onClick={() => {
+                    setActiveTab("existing");
+                    setNewCharacterName("");
+                    setError("");
+                  }}
+                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === "existing" ? "bg-purple-600 text-white" : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  Existing
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveTab("new");
+                    setSelectedCharacter(null);
+                    setSearchQuery("");
+                    setError("");
+                  }}
+                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === "new" ? "bg-purple-600 text-white" : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  New
+                </button>
+              </div>
+            )}
 
-                {onCreateCharacter && (
-                  <div className="border-t border-zinc-700">
-                    {!showAddNew ? (
-                      <button
-                        onClick={() => {
-                          setShowAddNew(true);
-                          setSelectedCharacter(null);
-                        }}
-                        className="w-full flex items-center gap-4 p-3 text-left hover:bg-zinc-800 transition-colors"
-                      >
-                        <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-2xl text-zinc-400 flex-shrink-0">+</div>
-                        <div className="font-medium text-zinc-400">Add New Character</div>
-                      </button>
+            {activeTab === "existing" ? (
+              <>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search characters..."
+                  autoFocus
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500"
+                />
+
+                <div className="bg-zinc-900 rounded-lg border border-zinc-700 overflow-hidden">
+                  <div className="max-h-64 overflow-y-auto">
+                    {filteredCharacters.length === 0 ? (
+                      <div className="p-4 text-center text-zinc-500">No characters found</div>
                     ) : (
-                      <div className="p-3 bg-zinc-800/50">
-                        <div className="flex items-center gap-3">
-                          {newCharacterName.trim() ? (
-                            <img src={generateNewCharacterAvatar(newCharacterName)} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
-                          ) : (
-                            <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-2xl text-zinc-400 flex-shrink-0">+</div>
-                          )}
-                          <input
-                            type="text"
-                            value={newCharacterName}
-                            onChange={(e) => {
-                              setNewCharacterName(e.target.value);
-                              setError("");
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && newCharacterName.trim()) {
-                                handleCreateAndUse();
-                              }
-                              if (e.key === "Escape") {
-                                setShowAddNew(false);
-                                setNewCharacterName("");
-                              }
-                            }}
-                            placeholder="Character name..."
-                            autoFocus
-                            disabled={isCreating}
-                            className="flex-1 bg-zinc-900 border border-zinc-600 rounded-lg px-3 py-2 text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 disabled:opacity-50"
-                          />
-                        </div>
-                        <div className="flex gap-2 mt-3">
-                          <button
-                            onClick={() => {
-                              setShowAddNew(false);
-                              setNewCharacterName("");
-                              setError("");
-                            }}
-                            disabled={isCreating}
-                            className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-9 px-3 py-1 rounded-lg text-sm cursor-pointer disabled:opacity-50 transition-colors"
+                      filteredCharacters.map((character) => {
+                        const isSelected = selectedCharacter === character.slug;
+                        return (
+                          <div
+                            key={character.slug}
+                            onClick={() => handleCharacterClick(character.slug)}
+                            className={`flex items-center gap-4 p-3 cursor-pointer transition-colors ${
+                              isSelected ? "bg-purple-600/30 border-l-4 border-l-purple-500" : "border-l-4 border-l-transparent hover:bg-zinc-800"
+                            } ${character.isCurrentSpeaker && !isSelected ? "bg-zinc-800/50" : ""}`}
                           >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={handleCreateAndUse}
-                            disabled={isCreating || !newCharacterName.trim()}
-                            className="flex-1 bg-green-600 text-white hover:bg-green-500 h-9 px-3 py-1 rounded-lg text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                          >
-                            {isCreating ? "Creating..." : "Create & Use"}
-                          </button>
-                        </div>
-                      </div>
+                            {character.avatarUrl ? (
+                              <img src={character.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-lg text-zinc-400 flex-shrink-0">
+                                {character.name.charAt(0)}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-white truncate">{character.name}</div>
+                              <div className="text-xs text-zinc-500">{character.talkingCount > 0 ? `${character.talkingCount} speaking lines` : "No speaking lines yet"}</div>
+                            </div>
+                            {character.isCurrentSpeaker && <div className="text-xs text-purple-400 bg-purple-500/20 px-2 py-1 rounded">Current</div>}
+                            {isSelected && !character.isCurrentSpeaker && <div className="w-3 h-3 rounded-full bg-purple-500" />}
+                          </div>
+                        );
+                      })
                     )}
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={onClose}
-                disabled={isSubmitting || isCreating}
-                className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSetSpeaker}
-                disabled={isSubmitting || isCreating || !selectedCharacter}
-                className="flex-1 bg-purple-600 text-white hover:bg-purple-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isSubmitting ? "Saving..." : "Set Speaker"}
-              </button>
-            </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={onClose}
+                    disabled={isSubmitting}
+                    className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSetSpeaker}
+                    disabled={isSubmitting || !selectedCharacter}
+                    className="flex-1 bg-purple-600 text-white hover:bg-purple-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isSubmitting ? "Saving..." : "Set Speaker"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3">
+                  {newCharacterName.trim() ? (
+                    <img src={generateNewCharacterAvatar(newCharacterName)} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-2xl text-zinc-400 flex-shrink-0">+</div>
+                  )}
+                  <input
+                    type="text"
+                    value={newCharacterName}
+                    onChange={(e) => {
+                      setNewCharacterName(e.target.value);
+                      setError("");
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && newCharacterName.trim()) {
+                        handleCreateAndUse();
+                      }
+                    }}
+                    placeholder="Character name..."
+                    autoFocus
+                    disabled={isCreating}
+                    className="flex-1 bg-zinc-900 border border-zinc-600 rounded-lg px-3 py-2 text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 disabled:opacity-50"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={onClose}
+                    disabled={isCreating}
+                    className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleCreateAndUse}
+                    disabled={isCreating || !newCharacterName.trim()}
+                    className="flex-1 bg-green-600 text-white hover:bg-green-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isCreating ? "Creating..." : "Create & Use"}
+                  </button>
+                </div>
+              </>
+            )}
 
             {currentSpeaker && (
               <button
@@ -441,121 +470,144 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
 
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
 
-            <div className="bg-zinc-900 rounded-lg border border-zinc-700 overflow-hidden">
-              <div className="max-h-80 overflow-y-auto">
-                {sortedCharacters.map((character) => {
-                  const isSelected = selectedCharacter === character.slug;
-                  return (
-                    <div
-                      key={character.slug}
-                      onClick={() => handleCharacterClick(character.slug)}
-                      className={`
-                        flex items-center gap-4 p-3 cursor-pointer transition-colors
-                        ${isSelected ? "bg-purple-600/30 border-l-4 border-l-purple-500" : "border-l-4 border-l-transparent hover:bg-zinc-800"}
-                        ${character.isCurrentSpeaker && !isSelected ? "bg-zinc-800/50" : ""}
-                      `}
-                    >
-                      {character.avatarUrl ? (
-                        <img src={character.avatarUrl} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-lg text-zinc-400 flex-shrink-0">{character.name.charAt(0)}</div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-white truncate">{character.name}</div>
-                        <div className="text-xs text-zinc-500">{character.talkingCount > 0 ? `${character.talkingCount} speaking lines` : "No speaking lines yet"}</div>
-                      </div>
-                      {character.isCurrentSpeaker && <div className="text-xs text-purple-400 bg-purple-500/20 px-2 py-1 rounded">Current</div>}
-                      {isSelected && !character.isCurrentSpeaker && <div className="w-3 h-3 rounded-full bg-purple-500" />}
-                    </div>
-                  );
-                })}
+            {onCreateCharacter && (
+              <div className="flex gap-1 p-1 bg-zinc-800 rounded-lg">
+                <button
+                  onClick={() => {
+                    setActiveTab("existing");
+                    setNewCharacterName("");
+                    setError("");
+                  }}
+                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === "existing" ? "bg-purple-600 text-white" : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  Existing
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveTab("new");
+                    setSelectedCharacter(null);
+                    setSearchQuery("");
+                    setError("");
+                  }}
+                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === "new" ? "bg-purple-600 text-white" : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  New
+                </button>
+              </div>
+            )}
 
-                {onCreateCharacter && (
-                  <div className="border-t border-zinc-700">
-                    {!showAddNew ? (
-                      <button
-                        onClick={() => {
-                          setShowAddNew(true);
-                          setSelectedCharacter(null);
-                        }}
-                        className="w-full flex items-center gap-4 p-3 text-left hover:bg-zinc-800 transition-colors"
-                      >
-                        <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-2xl text-zinc-400 flex-shrink-0">+</div>
-                        <div className="font-medium text-zinc-400">Add New Character</div>
-                      </button>
+            {activeTab === "existing" ? (
+              <>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search characters..."
+                  autoFocus
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500"
+                />
+
+                <div className="bg-zinc-900 rounded-lg border border-zinc-700 overflow-hidden">
+                  <div className="max-h-64 overflow-y-auto">
+                    {filteredCharacters.length === 0 ? (
+                      <div className="p-4 text-center text-zinc-500">No characters found</div>
                     ) : (
-                      <div className="p-3 bg-zinc-800/50">
-                        <div className="flex items-center gap-3">
-                          {newCharacterName.trim() ? (
-                            <img src={generateNewCharacterAvatar(newCharacterName)} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
-                          ) : (
-                            <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-2xl text-zinc-400 flex-shrink-0">+</div>
-                          )}
-                          <input
-                            type="text"
-                            value={newCharacterName}
-                            onChange={(e) => {
-                              setNewCharacterName(e.target.value);
-                              setError("");
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && newCharacterName.trim()) {
-                                handleCreateAndUse();
-                              }
-                              if (e.key === "Escape") {
-                                setShowAddNew(false);
-                                setNewCharacterName("");
-                              }
-                            }}
-                            placeholder="Character name..."
-                            autoFocus
-                            disabled={isCreating}
-                            className="flex-1 bg-zinc-900 border border-zinc-600 rounded-lg px-3 py-2 text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 disabled:opacity-50"
-                          />
-                        </div>
-                        <div className="flex gap-2 mt-3">
-                          <button
-                            onClick={() => {
-                              setShowAddNew(false);
-                              setNewCharacterName("");
-                              setError("");
-                            }}
-                            disabled={isCreating}
-                            className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-9 px-3 py-1 rounded-lg text-sm cursor-pointer disabled:opacity-50 transition-colors"
+                      filteredCharacters.map((character) => {
+                        const isSelected = selectedCharacter === character.slug;
+                        return (
+                          <div
+                            key={character.slug}
+                            onClick={() => handleCharacterClick(character.slug)}
+                            className={`flex items-center gap-4 p-3 cursor-pointer transition-colors ${
+                              isSelected ? "bg-purple-600/30 border-l-4 border-l-purple-500" : "border-l-4 border-l-transparent hover:bg-zinc-800"
+                            } ${character.isCurrentSpeaker && !isSelected ? "bg-zinc-800/50" : ""}`}
                           >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={handleCreateAndUse}
-                            disabled={isCreating || !newCharacterName.trim()}
-                            className="flex-1 bg-green-600 text-white hover:bg-green-500 h-9 px-3 py-1 rounded-lg text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                          >
-                            {isCreating ? "Creating..." : "Create & Use"}
-                          </button>
-                        </div>
-                      </div>
+                            {character.avatarUrl ? (
+                              <img src={character.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-lg text-zinc-400 flex-shrink-0">
+                                {character.name.charAt(0)}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-white truncate">{character.name}</div>
+                              <div className="text-xs text-zinc-500">{character.talkingCount > 0 ? `${character.talkingCount} speaking lines` : "No speaking lines yet"}</div>
+                            </div>
+                            {character.isCurrentSpeaker && <div className="text-xs text-purple-400 bg-purple-500/20 px-2 py-1 rounded">Current</div>}
+                            {isSelected && !character.isCurrentSpeaker && <div className="w-3 h-3 rounded-full bg-purple-500" />}
+                          </div>
+                        );
+                      })
                     )}
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={onClose}
-                disabled={isSubmitting || isCreating}
-                className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSetSpeaker}
-                disabled={isSubmitting || isCreating || !selectedCharacter || selectedCharacter === currentCharacterSlug}
-                className="flex-1 bg-purple-600 text-white hover:bg-purple-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isSubmitting ? "Saving..." : "Change Character"}
-              </button>
-            </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={onClose}
+                    disabled={isSubmitting}
+                    className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSetSpeaker}
+                    disabled={isSubmitting || !selectedCharacter || selectedCharacter === currentCharacterSlug}
+                    className="flex-1 bg-purple-600 text-white hover:bg-purple-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isSubmitting ? "Saving..." : "Change Character"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3">
+                  {newCharacterName.trim() ? (
+                    <img src={generateNewCharacterAvatar(newCharacterName)} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-2xl text-zinc-400 flex-shrink-0">+</div>
+                  )}
+                  <input
+                    type="text"
+                    value={newCharacterName}
+                    onChange={(e) => {
+                      setNewCharacterName(e.target.value);
+                      setError("");
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && newCharacterName.trim()) {
+                        handleCreateAndUse();
+                      }
+                    }}
+                    placeholder="Character name..."
+                    autoFocus
+                    disabled={isCreating}
+                    className="flex-1 bg-zinc-900 border border-zinc-600 rounded-lg px-3 py-2 text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 disabled:opacity-50"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={onClose}
+                    disabled={isCreating}
+                    className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleCreateAndUse}
+                    disabled={isCreating || !newCharacterName.trim()}
+                    className="flex-1 bg-green-600 text-white hover:bg-green-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isCreating ? "Creating..." : "Create & Use"}
+                  </button>
+                </div>
+              </>
+            )}
 
             <button
               onClick={handleRemoveSpeaker}
@@ -581,119 +633,143 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
 
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
 
-            <div className="bg-zinc-900 rounded-lg border border-zinc-700 overflow-hidden">
-              <div className="max-h-80 overflow-y-auto">
-                {sortedCharacters.map((character) => {
-                  const isSelected = selectedCharacter === character.slug;
-                  return (
-                    <div
-                      key={character.slug}
-                      onClick={() => handleCharacterClick(character.slug)}
-                      className={`
-                        flex items-center gap-4 p-3 cursor-pointer transition-colors
-                        ${isSelected ? "bg-purple-600/30 border-l-4 border-l-purple-500" : "border-l-4 border-l-transparent hover:bg-zinc-800"}
-                      `}
-                    >
-                      {character.avatarUrl ? (
-                        <img src={character.avatarUrl} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-lg text-zinc-400 flex-shrink-0">{character.name.charAt(0)}</div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-white truncate">{character.name}</div>
-                        <div className="text-xs text-zinc-500">{character.talkingCount > 0 ? `${character.talkingCount} speaking lines` : "No speaking lines yet"}</div>
-                      </div>
-                      {isSelected && <div className="w-3 h-3 rounded-full bg-purple-500" />}
-                    </div>
-                  );
-                })}
+            {onCreateCharacter && (
+              <div className="flex gap-1 p-1 bg-zinc-800 rounded-lg">
+                <button
+                  onClick={() => {
+                    setActiveTab("existing");
+                    setNewCharacterName("");
+                    setError("");
+                  }}
+                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === "existing" ? "bg-purple-600 text-white" : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  Existing
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveTab("new");
+                    setSelectedCharacter(null);
+                    setSearchQuery("");
+                    setError("");
+                  }}
+                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === "new" ? "bg-purple-600 text-white" : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  New
+                </button>
+              </div>
+            )}
 
-                {onCreateCharacter && (
-                  <div className="border-t border-zinc-700">
-                    {!showAddNew ? (
-                      <button
-                        onClick={() => {
-                          setShowAddNew(true);
-                          setSelectedCharacter(null);
-                        }}
-                        className="w-full flex items-center gap-4 p-3 text-left hover:bg-zinc-800 transition-colors"
-                      >
-                        <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-2xl text-zinc-400 flex-shrink-0">+</div>
-                        <div className="font-medium text-zinc-400">Add New Character</div>
-                      </button>
+            {activeTab === "existing" ? (
+              <>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search characters..."
+                  autoFocus
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500"
+                />
+
+                <div className="bg-zinc-900 rounded-lg border border-zinc-700 overflow-hidden">
+                  <div className="max-h-64 overflow-y-auto">
+                    {filteredCharacters.length === 0 ? (
+                      <div className="p-4 text-center text-zinc-500">No characters found</div>
                     ) : (
-                      <div className="p-3 bg-zinc-800/50">
-                        <div className="flex items-center gap-3">
-                          {newCharacterName.trim() ? (
-                            <img src={generateNewCharacterAvatar(newCharacterName)} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
-                          ) : (
-                            <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-2xl text-zinc-400 flex-shrink-0">+</div>
-                          )}
-                          <input
-                            type="text"
-                            value={newCharacterName}
-                            onChange={(e) => {
-                              setNewCharacterName(e.target.value);
-                              setError("");
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && newCharacterName.trim()) {
-                                handleCreateAndUse();
-                              }
-                              if (e.key === "Escape") {
-                                setShowAddNew(false);
-                                setNewCharacterName("");
-                              }
-                            }}
-                            placeholder="Character name..."
-                            autoFocus
-                            disabled={isCreating}
-                            className="flex-1 bg-zinc-900 border border-zinc-600 rounded-lg px-3 py-2 text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 disabled:opacity-50"
-                          />
-                        </div>
-                        <div className="flex gap-2 mt-3">
-                          <button
-                            onClick={() => {
-                              setShowAddNew(false);
-                              setNewCharacterName("");
-                              setError("");
-                            }}
-                            disabled={isCreating}
-                            className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-9 px-3 py-1 rounded-lg text-sm cursor-pointer disabled:opacity-50 transition-colors"
+                      filteredCharacters.map((character) => {
+                        const isSelected = selectedCharacter === character.slug;
+                        return (
+                          <div
+                            key={character.slug}
+                            onClick={() => handleCharacterClick(character.slug)}
+                            className={`flex items-center gap-4 p-3 cursor-pointer transition-colors ${
+                              isSelected ? "bg-purple-600/30 border-l-4 border-l-purple-500" : "border-l-4 border-l-transparent hover:bg-zinc-800"
+                            }`}
                           >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={handleCreateAndUse}
-                            disabled={isCreating || !newCharacterName.trim()}
-                            className="flex-1 bg-green-600 text-white hover:bg-green-500 h-9 px-3 py-1 rounded-lg text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                          >
-                            {isCreating ? "Creating..." : "Create & Use"}
-                          </button>
-                        </div>
-                      </div>
+                            {character.avatarUrl ? (
+                              <img src={character.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-lg text-zinc-400 flex-shrink-0">
+                                {character.name.charAt(0)}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-white truncate">{character.name}</div>
+                              <div className="text-xs text-zinc-500">{character.talkingCount > 0 ? `${character.talkingCount} speaking lines` : "No speaking lines yet"}</div>
+                            </div>
+                            {isSelected && <div className="w-3 h-3 rounded-full bg-purple-500" />}
+                          </div>
+                        );
+                      })
                     )}
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={onClose}
-                disabled={isSubmitting || isCreating}
-                className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSetSpeaker}
-                disabled={isSubmitting || isCreating || !selectedCharacter}
-                className="flex-1 bg-purple-600 text-white hover:bg-purple-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isSubmitting ? "Wrapping..." : "Wrap with Character"}
-              </button>
-            </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={onClose}
+                    disabled={isSubmitting}
+                    className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSetSpeaker}
+                    disabled={isSubmitting || !selectedCharacter}
+                    className="flex-1 bg-purple-600 text-white hover:bg-purple-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isSubmitting ? "Wrapping..." : "Wrap with Character"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3">
+                  {newCharacterName.trim() ? (
+                    <img src={generateNewCharacterAvatar(newCharacterName)} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-2xl text-zinc-400 flex-shrink-0">+</div>
+                  )}
+                  <input
+                    type="text"
+                    value={newCharacterName}
+                    onChange={(e) => {
+                      setNewCharacterName(e.target.value);
+                      setError("");
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && newCharacterName.trim()) {
+                        handleCreateAndUse();
+                      }
+                    }}
+                    placeholder="Character name..."
+                    autoFocus
+                    disabled={isCreating}
+                    className="flex-1 bg-zinc-900 border border-zinc-600 rounded-lg px-3 py-2 text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 disabled:opacity-50"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={onClose}
+                    disabled={isCreating}
+                    className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleCreateAndUse}
+                    disabled={isCreating || !newCharacterName.trim()}
+                    className="flex-1 bg-green-600 text-white hover:bg-green-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isCreating ? "Creating..." : "Create & Use"}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         );
 
