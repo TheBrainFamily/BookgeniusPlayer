@@ -13,10 +13,15 @@ interface AvatarPickerModalProps {
 const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ character, onClose }) => {
   const { book } = useBookConvex();
   const confirmAvatarSelection = useAction(api.avatarGeneration.confirmAvatarSelection);
-  const { setOptimisticAvatar, clearOptimisticAvatar } = useAvatarGenerationStore();
+  const startAvatarGeneration = useAction(api.avatarGeneration.startAvatarGeneration);
+  const { setOptimisticAvatar, clearOptimisticAvatar, startOptimisticGeneration } = useAvatarGenerationStore();
   const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
+  const [showPromptEditor, setShowPromptEditor] = useState(false);
+  const [editablePrompt, setEditablePrompt] = useState(character.extra?.aiPrompt || "");
+  const [isRegenerating, setIsRegenerating] = useState(false);
 
   const proposalUrls = character.extra?.avatarProposalUrls || [];
+  const displayName = character.extra?.displayName || character.name;
 
   const handleConfirm = () => {
     if (!selectedUrl || !book?.path) return;
@@ -37,13 +42,27 @@ const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ character, onClos
       });
   };
 
+  const handleRegenerate = async () => {
+    if (!book?.path || !editablePrompt.trim()) return;
+
+    setIsRegenerating(true);
+    startOptimisticGeneration(character.slug, displayName);
+    onClose();
+
+    try {
+      await startAvatarGeneration({ bookPath: book.path, characterSlug: character.slug, characterDisplayName: displayName, visualPrompt: editablePrompt.trim() });
+    } catch (err) {
+      console.error("Failed to start regeneration:", err);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-zinc-900 rounded-xl border border-zinc-700 p-6 max-w-md w-full mx-4 shadow-2xl">
         <h2 className="text-xl font-semibold text-white mb-2">Choose Avatar</h2>
-        <p className="text-zinc-400 text-sm mb-4">Select an avatar for {character.extra?.displayName || character.name}</p>
+        <p className="text-zinc-400 text-sm mb-4">Select an avatar for {displayName}</p>
 
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-4 mb-4">
           {proposalUrls.map((url, index) => (
             <button
               key={index}
@@ -62,6 +81,33 @@ const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ character, onClos
               )}
             </button>
           ))}
+        </div>
+
+        <div className="mb-4">
+          <button onClick={() => setShowPromptEditor(!showPromptEditor)} className="flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-300 transition-colors">
+            <svg className={`w-4 h-4 transition-transform ${showPromptEditor ? "rotate-90" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            Edit prompt to regenerate
+          </button>
+
+          {showPromptEditor && (
+            <div className="mt-3 space-y-3">
+              <textarea
+                value={editablePrompt}
+                onChange={(e) => setEditablePrompt(e.target.value)}
+                placeholder="Character description..."
+                className="w-full h-28 bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 resize-none"
+              />
+              <button
+                onClick={handleRegenerate}
+                disabled={isRegenerating || !editablePrompt.trim()}
+                className="w-full bg-amber-600 text-white hover:bg-amber-500 h-10 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+              >
+                {isRegenerating ? "Starting..." : "Regenerate Avatars"}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3">
