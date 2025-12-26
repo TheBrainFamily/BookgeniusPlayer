@@ -573,6 +573,121 @@ export const listFolders = query({
   },
 });
 
+export const listFoldersWithAssets = query({
+  args: { parentPath: v.string(), preferDraft: v.optional(v.boolean()) },
+  returns: v.array(
+    v.object({
+      folder: v.object(folderFields),
+      assets: v.array(
+        v.object({
+          basename: v.string(),
+          url: v.string(),
+          versionId: v.id("assetVersions"),
+          contentType: v.optional(v.string()),
+          size: v.optional(v.number()),
+        }),
+      ),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const parentPath = normalizeFolderPath(args.parentPath);
+    const parentPrefix = parentPath ? `${parentPath}/` : "";
+    const end = `${parentPrefix}${SUFFIX}`;
+    const preferDraft = args.preferDraft ?? false;
+
+    const folders = await ctx.db
+      .query("folders")
+      .withIndex("by_path", (q) => q.gte("path", parentPrefix).lt("path", end))
+      .order("asc")
+      .collect();
+    const directChildren = folders.filter((f) => depth(f.path) === depth(parentPrefix));
+
+    if (directChildren.length === 0) {
+      return [];
+    }
+
+    const allAssets = await ctx.db
+      .query("assets")
+      .withIndex("by_folder_basename", (q) =>
+        q.gte("folderPath", parentPrefix).lt("folderPath", end),
+      )
+      .collect();
+
+    const directChildPaths = new Set(directChildren.map((f) => f.path));
+    const assetsInDirectChildren = allAssets.filter((a) => directChildPaths.has(a.folderPath));
+
+    const versionIdsToFetch = new Set<Id<"assetVersions">>();
+    for (const asset of assetsInDirectChildren) {
+      const versionId = preferDraft
+        ? asset.draftVersionId || asset.publishedVersionId
+        : asset.publishedVersionId || asset.draftVersionId;
+      if (versionId) versionIdsToFetch.add(versionId);
+    }
+
+    const versionsMap = new Map<
+      string,
+      { r2Key?: string; storageId?: Id<"_storage">; contentType?: string; size?: number }
+    >();
+    for (const versionId of versionIdsToFetch) {
+      const version = await ctx.db.get(versionId);
+      if (version) {
+        versionsMap.set(versionId, {
+          r2Key: version.r2Key,
+          storageId: version.storageId,
+          contentType: version.contentType,
+          size: version.size,
+        });
+      }
+    }
+
+    const storageConfig = await getStorageConfig(ctx);
+    const r2BaseUrl = storageConfig.r2PublicUrl?.replace(/\/+$/, "");
+
+    const urlsMap = new Map<string, string>();
+    for (const [versionId, version] of versionsMap) {
+      if (version.r2Key && r2BaseUrl) {
+        urlsMap.set(versionId, `${r2BaseUrl}/${version.r2Key}`);
+      } else if (version.storageId) {
+        const url = await ctx.storage.getUrl(version.storageId);
+        if (url) urlsMap.set(versionId, url);
+      }
+    }
+
+    const assetsByFolder = new Map<string, typeof assetsInDirectChildren>();
+    for (const asset of assetsInDirectChildren) {
+      const existing = assetsByFolder.get(asset.folderPath) || [];
+      existing.push(asset);
+      assetsByFolder.set(asset.folderPath, existing);
+    }
+
+    return directChildren.map((folder) => {
+      const folderAssets = assetsByFolder.get(folder.path) || [];
+      const assetsWithUrls = folderAssets
+        .map((asset) => {
+          const versionId = preferDraft
+            ? asset.draftVersionId || asset.publishedVersionId
+            : asset.publishedVersionId || asset.draftVersionId;
+          if (!versionId) return null;
+
+          const url = urlsMap.get(versionId);
+          if (!url) return null;
+
+          const version = versionsMap.get(versionId);
+          return {
+            basename: asset.basename,
+            url,
+            versionId: versionId,
+            contentType: version?.contentType,
+            size: version?.size,
+          };
+        })
+        .filter((a): a is NonNullable<typeof a> => a !== null);
+
+      return { folder, assets: assetsWithUrls };
+    });
+  },
+});
+
 export const updateFolder = mutation({
   args: {
     path: v.string(),

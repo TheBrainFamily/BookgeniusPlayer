@@ -58,7 +58,7 @@ export const generateAvatarOptions = internalAction({
           const result = await openai.images.generate({
             model: "gpt-image-1.5",
             prompt: finalPrompt,
-            quality: "medium",
+            quality: "low",
             size: "1024x1024",
           });
 
@@ -182,17 +182,23 @@ export const selectAvatar = internalAction({
   args: { bookPath: v.string(), characterSlug: v.string(), selectedOptionUrl: v.string() },
   returns: v.object({ success: v.boolean(), error: v.optional(v.string()) }),
   handler: async (ctx, { bookPath, characterSlug, selectedOptionUrl }) => {
+    const startTime = Date.now();
+    const log = (step: string) =>
+      console.log(`[selectAvatar] ${step}: ${Date.now() - startTime}ms`);
+
     try {
       const characterPath = `${bookPath}/characters/${characterSlug}`;
-      const proposalsPath = `${bookPath}/${PROPOSALS_FOLDER}/${characterSlug}`;
+      log("start");
 
       const response = await fetch(selectedOptionUrl);
       if (!response.ok) {
         return { success: false, error: "Failed to fetch selected image" };
       }
+      log("fetched proposal image");
 
       const imageBuffer = await response.arrayBuffer();
       const imageBytes = new Uint8Array(imageBuffer);
+      log(`image buffer ready (${imageBuffer.byteLength} bytes)`);
 
       const {
         intentId: largeIntentId,
@@ -203,6 +209,7 @@ export const selectAvatar = internalAction({
         basename: "avatar-large.png",
         publish: true,
       });
+      log("got large upload URL");
 
       const largeUploadRes = await fetch(largeUploadUrl, {
         method: largeBackend === "r2" ? "PUT" : "POST",
@@ -213,6 +220,7 @@ export const selectAvatar = internalAction({
       if (!largeUploadRes.ok) {
         return { success: false, error: "Failed to upload avatar-large" };
       }
+      log("uploaded avatar-large");
 
       const largeUploadResponse =
         largeBackend === "convex" ? await largeUploadRes.json() : undefined;
@@ -223,6 +231,7 @@ export const selectAvatar = internalAction({
         size: imageBuffer.byteLength,
         contentType: "image/png",
       });
+      log("finished avatar-large upload");
 
       const largeUrlInfo = await ctx.runQuery(
         components.assetManager.assetFsHttp.getVersionPreviewUrl,
@@ -239,12 +248,14 @@ export const selectAvatar = internalAction({
       if (!largeUrlInfo?.url) {
         return { success: false, error: "Failed to get avatar-large URL" };
       }
+      log("got avatar-large URL");
 
       const resizeResult = await ctx.runAction(internal.imageProcessing.resizeToWebpViaWorker, {
         sourceUrl: largeUrlInfo.url,
         maxWidth: 400,
         quality: 80,
       });
+      log(`resized to webp (worker timing: ${JSON.stringify(resizeResult.timing)})`);
 
       const webpBinary = Uint8Array.from(atob(resizeResult.data), (c) => c.charCodeAt(0));
       const webpBlob = new Blob([webpBinary], { type: "image/webp" });
@@ -258,6 +269,7 @@ export const selectAvatar = internalAction({
         basename: "avatar.webp",
         publish: true,
       });
+      log("got small upload URL");
 
       const smallUploadRes = await fetch(smallUploadUrl, {
         method: smallBackend === "r2" ? "PUT" : "POST",
@@ -268,6 +280,7 @@ export const selectAvatar = internalAction({
       if (!smallUploadRes.ok) {
         return { success: false, error: "Failed to upload avatar.webp" };
       }
+      log("uploaded avatar.webp");
 
       const smallUploadResponse =
         smallBackend === "convex" ? await smallUploadRes.json() : undefined;
@@ -278,14 +291,18 @@ export const selectAvatar = internalAction({
         size: webpBlob.size,
         contentType: "image/webp",
       });
+      log("finished avatar.webp upload");
 
       await ctx.runMutation(internal.avatarGeneration.updateCharacterAvatarState, {
         characterPath,
         state: "none",
         proposalUrls: undefined,
       });
+      log("updated state to none");
 
-      console.log(`[selectAvatar] Successfully set avatar for ${characterSlug}`);
+      console.log(
+        `[selectAvatar] Successfully completed for ${characterSlug} in ${Date.now() - startTime}ms`,
+      );
       return { success: true };
     } catch (error) {
       console.error("[selectAvatar] Error:", error);

@@ -598,85 +598,58 @@ export const listMusicWithDrafts = query({
       });
   },
 });
-
 /**
  * Get character bundles with draft-aware asset URLs.
+ * Uses bulk query to fetch all folders and assets in a single operation.
  */
 export const listCharacterBundlesWithDrafts = query({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const charactersPath = `${bookPath}/characters`;
 
-    const characterFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
-      parentPath: charactersPath,
-    });
-
-    const bundles = await Promise.all(
-      characterFolders.map(async (folder) => {
-        // Get assets in this character folder
-        const assets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
-          folderPath: folder.path,
-        });
-
-        const bundle: {
-          path: string;
-          slug: string;
-          name: string;
-          extra: unknown;
-          avatar?: { url: string; versionId: string; contentType?: string };
-          avatarLarge?: { url: string; versionId: string; contentType?: string };
-          speaks?: { url: string; versionId: string; contentType?: string };
-          listens?: { url: string; versionId: string; contentType?: string };
-        } = {
-          path: folder.path,
-          slug: folder.path.split("/").pop()!,
-          name: folder.name,
-          extra: folder.extra,
-        };
-
-        // Get best version for each asset type
-        for (const asset of assets) {
-          const versions = await ctx.runQuery(
-            components.assetManager.assetManager.getAssetVersions,
-            { folderPath: folder.path, basename: asset.basename },
-          );
-
-          const draftVersion = versions.find((v) => v.state === "draft");
-          const publishedVersion = versions.find((v) => v.state === "published");
-          const bestVersion = draftVersion || publishedVersion || versions[0];
-
-          if (!bestVersion) continue;
-
-          const urlInfo = await ctx.runQuery(
-            components.assetManager.assetFsHttp.getVersionPreviewUrl,
-            { versionId: bestVersion._id },
-          );
-
-          if (!urlInfo?.url) continue;
-
-          const assetInfo = {
-            url: urlInfo.url,
-            versionId: bestVersion._id,
-            contentType: urlInfo.contentType,
-          };
-
-          const basename = asset.basename.toLowerCase();
-          if (basename.startsWith("avatar-large.")) {
-            bundle.avatarLarge = assetInfo;
-          } else if (basename.startsWith("avatar.")) {
-            bundle.avatar = assetInfo;
-          } else if (basename.startsWith("speaks.")) {
-            bundle.speaks = assetInfo;
-          } else if (basename.startsWith("listens.")) {
-            bundle.listens = assetInfo;
-          }
-        }
-
-        return bundle;
-      }),
+    const foldersWithAssets = await ctx.runQuery(
+      components.assetManager.assetManager.listFoldersWithAssets,
+      { parentPath: charactersPath, preferDraft: true },
     );
 
-    return bundles;
+    return foldersWithAssets.map(({ folder, assets }) => {
+      const bundle: {
+        path: string;
+        slug: string;
+        name: string;
+        extra: unknown;
+        avatar?: { url: string; versionId: string; contentType?: string };
+        avatarLarge?: { url: string; versionId: string; contentType?: string };
+        speaks?: { url: string; versionId: string; contentType?: string };
+        listens?: { url: string; versionId: string; contentType?: string };
+      } = {
+        path: folder.path,
+        slug: folder.path.split("/").pop()!,
+        name: folder.name,
+        extra: folder.extra,
+      };
+
+      for (const asset of assets) {
+        const basename = asset.basename.toLowerCase();
+        const assetInfo = {
+          url: asset.url,
+          versionId: asset.versionId,
+          contentType: asset.contentType,
+        };
+
+        if (basename.startsWith("avatar-large.")) {
+          bundle.avatarLarge = assetInfo;
+        } else if (basename.startsWith("avatar.")) {
+          bundle.avatar = assetInfo;
+        } else if (basename.startsWith("speaks.")) {
+          bundle.speaks = assetInfo;
+        } else if (basename.startsWith("listens.")) {
+          bundle.listens = assetInfo;
+        }
+      }
+
+      return bundle;
+    });
   },
 });
 

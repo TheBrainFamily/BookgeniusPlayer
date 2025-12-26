@@ -405,6 +405,31 @@ export declare const components: {
           updatedBy?: string;
         }>
       >;
+      listFoldersWithAssets: FunctionReference<
+        "query",
+        "internal",
+        { parentPath: string; preferDraft?: boolean },
+        Array<{
+          assets: Array<{
+            basename: string;
+            contentType?: string;
+            size?: number;
+            url: string;
+            versionId: string;
+          }>;
+          folder: {
+            _creationTime: number;
+            _id: string;
+            createdAt: number;
+            createdBy?: string;
+            extra?: any;
+            name: string;
+            path: string;
+            updatedAt: number;
+            updatedBy?: string;
+          };
+        }>
+      >;
       listPublishedAssetsInFolder: FunctionReference<
         "query",
         "internal",

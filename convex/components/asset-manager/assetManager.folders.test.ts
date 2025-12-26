@@ -538,3 +538,155 @@ test("createFolderByPath sets createdBy/updatedBy from identity", async () => {
   expect(folder?.createdBy).toBe("user-123");
   expect(folder?.updatedBy).toBe("user-123");
 });
+
+describe("listFoldersWithAssets", () => {
+  it("returns empty array when no child folders exist", async () => {
+    const t = convexTest(schema, modules);
+
+    const result = await t.query(api.assetManager.listFoldersWithAssets, {
+      parentPath: "nonexistent",
+    });
+
+    expect(result).toHaveLength(0);
+  });
+
+  it("returns folders with their assets grouped correctly", async () => {
+    const t = convexTest(schema, modules);
+
+    await t.mutation(api.assetManager.createFolderByPath, {
+      path: "characters/alice",
+      name: "Alice",
+      extra: { displayName: "Alice" },
+    });
+    await t.mutation(api.assetManager.createFolderByPath, {
+      path: "characters/bob",
+      name: "Bob",
+      extra: { displayName: "Bob" },
+    });
+
+    await t.mutation(api.assetManager.commitVersion, {
+      folderPath: "characters/alice",
+      basename: "avatar.png",
+      publish: true,
+    });
+    await t.mutation(api.assetManager.commitVersion, {
+      folderPath: "characters/alice",
+      basename: "speaks.mp4",
+      publish: true,
+    });
+    await t.mutation(api.assetManager.commitVersion, {
+      folderPath: "characters/bob",
+      basename: "avatar.png",
+      publish: true,
+    });
+
+    const result = await t.query(api.assetManager.listFoldersWithAssets, {
+      parentPath: "characters",
+    });
+
+    expect(result).toHaveLength(2);
+
+    const alice = result.find((r) => r.folder.path === "characters/alice");
+    const bob = result.find((r) => r.folder.path === "characters/bob");
+
+    expect(alice).toBeDefined();
+    expect(bob).toBeDefined();
+    expect(alice?.folder.name).toBe("Alice");
+    expect(bob?.folder.name).toBe("Bob");
+  });
+
+  it("does not return nested folders (only direct children)", async () => {
+    const t = convexTest(schema, modules);
+
+    await t.mutation(api.assetManager.createFolderByPath, {
+      path: "parent/child",
+    });
+    await t.mutation(api.assetManager.createFolderByPath, {
+      path: "parent/child/grandchild",
+    });
+
+    const result = await t.query(api.assetManager.listFoldersWithAssets, {
+      parentPath: "parent",
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].folder.path).toBe("parent/child");
+  });
+
+  it("preferDraft=true returns draft version over published", async () => {
+    const t = convexTest(schema, modules);
+
+    await t.mutation(api.assetManager.createFolderByPath, {
+      path: "items/item1",
+    });
+
+    await t.mutation(api.assetManager.commitVersion, {
+      folderPath: "items/item1",
+      basename: "data.json",
+      publish: true,
+      label: "published-v1",
+    });
+
+    await t.mutation(api.assetManager.commitVersion, {
+      folderPath: "items/item1",
+      basename: "data.json",
+      publish: false,
+      label: "draft-v2",
+    });
+
+    const asset = await t.query(api.assetManager.getAsset, {
+      folderPath: "items/item1",
+      basename: "data.json",
+    });
+
+    expect(asset?.publishedVersionId).toBeDefined();
+    expect(asset?.draftVersionId).toBeDefined();
+    expect(asset?.publishedVersionId).not.toBe(asset?.draftVersionId);
+  });
+
+  it("excludes assets without any version", async () => {
+    const t = convexTest(schema, modules);
+
+    await t.mutation(api.assetManager.createFolderByPath, {
+      path: "test/folder1",
+    });
+
+    await t.mutation(api.assetManager.createAsset, {
+      folderPath: "test/folder1",
+      basename: "no-version.txt",
+    });
+
+    const result = await t.query(api.assetManager.listFoldersWithAssets, {
+      parentPath: "test",
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].assets).toHaveLength(0);
+  });
+
+  it("returns folder extra metadata", async () => {
+    const t = convexTest(schema, modules);
+
+    await t.mutation(api.assetManager.createFolderByPath, {
+      path: "books/mybook/characters/hero",
+      name: "Hero Character",
+      extra: { displayName: "The Hero", summary: "A brave warrior" },
+    });
+
+    await t.mutation(api.assetManager.commitVersion, {
+      folderPath: "books/mybook/characters/hero",
+      basename: "avatar.png",
+      publish: true,
+    });
+
+    const result = await t.query(api.assetManager.listFoldersWithAssets, {
+      parentPath: "books/mybook/characters",
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].folder.extra).toEqual({
+      displayName: "The Hero",
+      summary: "A brave warrior",
+    });
+  });
+});
