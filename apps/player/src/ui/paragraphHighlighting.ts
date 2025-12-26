@@ -156,21 +156,25 @@ export function setupParagraphHighlighting() {
         return;
       }
 
-      const characterSpan = target.closest<HTMLElement>("[data-character]:not([data-is-talking])");
-      if (characterSpan && openEditCharacterTagModalFn) {
-        const paragraph = characterSpan.closest<HTMLElement>("section[data-chapter] [data-index]");
-        const section = paragraph?.closest<HTMLElement>("section[data-chapter]");
-        if (paragraph && section) {
-          const chapterNumber = parseInt(section.dataset.chapter || "0");
-          const paragraphIndex = parseInt(paragraph.dataset.index || "0");
-          const characterSlug = characterSpan.dataset.character || "";
-          const textContent = characterSpan.textContent || "";
+      // Skip inline avatars - they should trigger set-talking-character, not edit-character-tag
+      const isInlineAvatarClick = target.closest(".inline-avatar");
+      if (!isInlineAvatarClick) {
+        const characterSpan = target.closest<HTMLElement>("[data-character]:not([data-is-talking])");
+        if (characterSpan && openEditCharacterTagModalFn) {
+          const paragraph = characterSpan.closest<HTMLElement>("section[data-chapter] [data-index]");
+          const section = paragraph?.closest<HTMLElement>("section[data-chapter]");
+          if (paragraph && section) {
+            const chapterNumber = parseInt(section.dataset.chapter || "0");
+            const paragraphIndex = parseInt(paragraph.dataset.index || "0");
+            const characterSlug = characterSpan.dataset.character || "";
+            const textContent = characterSpan.textContent || "";
 
-          event.preventDefault();
-          event.stopPropagation();
-          clearEditHover();
-          openEditCharacterTagModalFn(chapterNumber, paragraphIndex, characterSlug, textContent);
-          return;
+            event.preventDefault();
+            event.stopPropagation();
+            clearEditHover();
+            openEditCharacterTagModalFn(chapterNumber, paragraphIndex, characterSlug, textContent);
+            return;
+          }
         }
       }
 
