@@ -12,15 +12,9 @@ export function getColorFromSlug(slug: string) {
   return AVATAR_COLORS[index];
 }
 
-// Extract up to 2 initials
 export function getInitials(name: string) {
   const parts = name.trim().split(/\s+/);
-
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[1][0]).toUpperCase();
-  }
-
-  return parts[0][0]?.toUpperCase() || "?";
+  return parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0][0]?.toUpperCase() || "?";
 }
 
 /**

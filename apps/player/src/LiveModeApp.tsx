@@ -50,6 +50,7 @@ import { RightNotesPanel } from "./components/RightNotesPanel";
 import { DebugLocationOverlay } from "./components/DebugLocationOverlay";
 import { AvatarGenerationBadge } from "./components/AvatarGenerationBadge";
 import { useDraftMode } from "@player/context/DraftModeContext";
+import { useInlineAvatarSync } from "@player/hooks/useInlineAvatarSync";
 
 // =============================================================================
 // Convex Client
@@ -76,6 +77,7 @@ function LiveShell({ onShellMounted }: { onShellMounted: () => void }) {
   useAppReady();
   usePostReadyPrefetch();
   useBackgroundSongs();
+  useInlineAvatarSync();
 
   const { i18n: i18nInstance } = useTranslation();
   const { bookData } = useBookConvex();

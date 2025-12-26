@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { useEditorModeModal } from "@player/stores/modals/editorModeModal.store";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { getAvatarSource } from "@player/helpers/svgAvatars";
+import { useAvatarGenerationStore } from "@player/stores/avatarGeneration.store";
 
 interface EditorModeModalProps {
   onClose: () => void;
@@ -32,13 +33,16 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
 
   const currentCharacterForSort = modalType === "edit-character-tag" ? currentCharacterSlug : currentSpeaker;
 
+  const { optimisticAvatars } = useAvatarGenerationStore();
+
   const sortedCharacters = useMemo<CharacterWithStats[]>(() => {
     const withStats = charactersData.map((charData) => {
       const bundle = characters.find((c) => c.slug.toLowerCase() === charData.slug.toLowerCase());
       const talkingCount = charData.infoPerChapter.reduce((sum, info) => sum + (info.paragraphsWhereTalking?.length || 0), 0);
       const isCurrentSpeaker = currentCharacterForSort?.toLowerCase() === charData.slug.toLowerCase();
+      const optimisticAvatar = optimisticAvatars[charData.slug.toLowerCase()];
 
-      return { slug: charData.slug, name: charData.characterName, avatarUrl: bundle?.avatar?.url, talkingCount, isCurrentSpeaker };
+      return { slug: charData.slug, name: charData.characterName, avatarUrl: optimisticAvatar || bundle?.avatar?.url, talkingCount, isCurrentSpeaker };
     });
 
     return withStats.sort((a, b) => {
@@ -46,7 +50,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
       if (!a.isCurrentSpeaker && b.isCurrentSpeaker) return 1;
       return b.talkingCount - a.talkingCount;
     });
-  }, [charactersData, characters, currentCharacterForSort]);
+  }, [charactersData, characters, currentCharacterForSort, optimisticAvatars]);
 
   useEffect(() => {
     if (currentSpeaker && modalType === "set-talking-character") {
@@ -135,14 +139,16 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
     const createdChar = characters.find((c) => c.slug.toLowerCase() === createdCharacterSlug.toLowerCase());
     const displayName = createdChar?.extra?.displayName || createdCharacterSlug;
 
+    useAvatarGenerationStore.getState().startOptimisticGeneration(createdCharacterSlug, displayName);
+
+    onSubmit?.(createdCharacterSlug);
+    onClose();
+
     try {
       await startAvatarGeneration({ bookPath: book.path, characterSlug: createdCharacterSlug, characterDisplayName: displayName, visualPrompt: editablePrompt.trim() });
     } catch (err) {
       console.error("[EditorModeModal] Failed to start avatar generation:", err);
     }
-
-    onSubmit?.(createdCharacterSlug);
-    onClose();
   };
 
   const generateNewCharacterAvatar = (name: string) => {

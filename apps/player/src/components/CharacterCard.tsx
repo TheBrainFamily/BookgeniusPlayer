@@ -11,6 +11,7 @@ import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVide
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 import { getAvatarSource } from "@player/helpers/svgAvatars";
+import { useAvatarGenerationStore } from "@player/stores/avatarGeneration.store";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
@@ -22,6 +23,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
   const { openModal } = useCharacterModal();
   const { highlightParagraphs, isScrollingLocked } = useHighlight();
   const { charactersData } = useBookConvex();
+  const optimisticAvatar = useAvatarGenerationStore((state) => state.optimisticAvatars[entity.slug.toLowerCase()]);
 
   const characterData = useMemo(() => charactersData.find((character) => character.slug === entity.slug), [entity.slug, charactersData]);
 
@@ -48,23 +50,25 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
   const svgFallback = useMemo(() => getAvatarSource({ slug: entity.slug, characterName: displayName, bookSlug: "", infoPerChapter: [] }), [entity.slug, displayName]);
 
   const mediaSrc = useMemo(() => {
+    if (optimisticAvatar) return optimisticAvatar;
     const listeningUrl = snapshot?.media.listening ?? "";
     if (imageOnly) {
       const placeholder = getPlaceholderFromVideoUrl(listeningUrl);
       return placeholder || svgFallback;
     }
     return listeningUrl || svgFallback;
-  }, [imageOnly, snapshot, svgFallback]);
+  }, [imageOnly, snapshot, svgFallback, optimisticAvatar]);
 
   const isVideo = imageOnly ? false : isVideoFile(mediaSrc);
 
   const modalMediaSrc = useMemo(() => {
+    if (optimisticAvatar) return optimisticAvatar;
     if (imageOnly && snapshot) {
       const url = isTalkingInCurrentRange ? snapshot.media.talking : snapshot.media.listening;
       return url || svgFallback;
     }
     return snapshot?.media.listening || svgFallback;
-  }, [imageOnly, isTalkingInCurrentRange, snapshot, svgFallback]);
+  }, [imageOnly, isTalkingInCurrentRange, snapshot, svgFallback, optimisticAvatar]);
 
   const modalIsVideo = useMemo(() => isVideoFile(modalMediaSrc), [modalMediaSrc]);
 

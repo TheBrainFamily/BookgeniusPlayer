@@ -631,10 +631,36 @@ export const updateMountedChaptersInPlace = (): void => {
           newPreview: newHtml.slice(0, 150) + "...",
         });
 
+        // Save existing avatar state before replacing content
+        const savedAvatars = new Map<string, { src: string; alt: string; title: string }>();
+        existingSection.querySelectorAll<HTMLElement>(".inline-avatar").forEach((shell) => {
+          const slug = shell.dataset.character;
+          const img = shell.querySelector<HTMLImageElement>("img");
+          if (slug && img?.src) {
+            savedAvatars.set(slug, { src: img.src, alt: img.alt || slug, title: shell.title || slug });
+          }
+        });
+
         // Replace inner HTML only - wrapper stays in place
         existingSection.innerHTML = freshSection.innerHTML;
 
-        // Immediately hydrate avatars and character highlights before browser paints
+        // Restore saved avatars to shells that exist in new content
+        if (savedAvatars.size > 0) {
+          existingSection.querySelectorAll<HTMLElement>(".inline-avatar").forEach((shell) => {
+            const slug = shell.dataset.character;
+            if (slug && savedAvatars.has(slug) && !shell.querySelector("img")) {
+              const saved = savedAvatars.get(slug)!;
+              const img = document.createElement("img");
+              img.src = saved.src;
+              img.alt = saved.alt;
+              img.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
+              shell.title = saved.title;
+              shell.appendChild(img);
+            }
+          });
+        }
+
+        // Hydrate any remaining shells that weren't restored
         hydrateInlineAvatarsInSection(existingSection);
         existingSection.querySelectorAll<HTMLSpanElement>(".character-highlighted").forEach(highlightCharacter);
 

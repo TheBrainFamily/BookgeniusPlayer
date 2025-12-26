@@ -263,16 +263,15 @@ function populateInlineAvatarShell(
   const characterSlug = shell.dataset.character;
   if (!characterSlug) return false;
 
-  let displayName = characterSlug;
-  let placeholderSrc = "";
-
-  if (characterData) {
-    const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
-    displayName = snapshot.displayName;
-    const listeningSrc = snapshot.media.listening;
-    const talkingSrc = snapshot.media.talking;
-    placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
+  if (!characterData) {
+    return false;
   }
+
+  const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+  const displayName = snapshot.displayName;
+  const listeningSrc = snapshot.media.listening;
+  const talkingSrc = snapshot.media.talking;
+  let placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
 
   if (!placeholderSrc) {
     placeholderSrc = generateFallbackAvatarUrl(characterSlug, displayName);
@@ -298,16 +297,15 @@ function createMediaElement(
   const characterSlug = placeholder.dataset.character;
   if (!characterSlug) return null;
 
-  let displayName = characterSlug;
-  let placeholderSrc = "";
-
-  if (characterData) {
-    const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
-    displayName = snapshot.displayName;
-    const listeningSrc = snapshot.media.listening;
-    const talkingSrc = snapshot.media.talking;
-    placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
+  if (!characterData) {
+    return null;
   }
+
+  const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+  const displayName = snapshot.displayName;
+  const listeningSrc = snapshot.media.listening;
+  const talkingSrc = snapshot.media.talking;
+  let placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
 
   if (!placeholderSrc) {
     placeholderSrc = generateFallbackAvatarUrl(characterSlug, displayName);

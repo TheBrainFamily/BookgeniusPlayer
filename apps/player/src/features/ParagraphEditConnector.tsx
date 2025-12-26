@@ -7,12 +7,14 @@ import { setOpenTalkingCharacterModal, setOpenEditCharacterTagModal, setOpenWrap
 import { useEditModeGlobalSync } from "@player/context/EditModeContext";
 import { optimisticWrapTextWithCharacter, optimisticModifyCharacterTag, optimisticSetTalkingCharacter } from "@player/ui/optimisticDom";
 import { getAvatarSource } from "@player/helpers/svgAvatars";
+import { useAvatarGenerationStore } from "@player/stores/avatarGeneration.store";
 
 export function ParagraphEditConnector() {
   useEditModeGlobalSync();
 
   const { openTalkingCharacterModal, openEditCharacterTagModal, openWrapWithCharacterModal } = useEditorModeModal();
   const { book, characters } = useBookConvex();
+  const { optimisticAvatars } = useAvatarGenerationStore();
   const setParagraphSpeaker = useAction(api.paragraphEditor.setParagraphSpeaker);
   const modifyCharacterTag = useAction(api.paragraphEditor.modifyCharacterTag);
   const wrapTextWithCharacter = useAction(api.paragraphEditor.wrapTextWithCharacter);
@@ -20,14 +22,20 @@ export function ParagraphEditConnector() {
 
   const getAvatarUrl = useCallback(
     (characterSlug: string, characterName?: string): string | undefined => {
+      const optimisticAvatar = optimisticAvatars[characterSlug.toLowerCase()];
+      if (optimisticAvatar) {
+        return optimisticAvatar;
+      }
       const character = characters.find((c) => c.slug.toLowerCase() === characterSlug.toLowerCase());
-      if (character?.avatar?.url) return character.avatar.url;
+      if (character?.avatar?.url) {
+        return character.avatar.url;
+      }
       if (characterName) {
         return getAvatarSource({ slug: characterSlug, characterName, bookSlug: book?.slug || "", infoPerChapter: [] });
       }
       return undefined;
     },
-    [characters, book?.slug],
+    [characters, book?.slug, optimisticAvatars],
   );
 
   const handleCreateCharacter = useCallback(

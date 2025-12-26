@@ -54,6 +54,27 @@ export const generateCharacterPrompt = internalAction({
     { bookPath, characterSlug, characterName, chapterNumber, paragraphIndex },
   ) => {
     try {
+      if (process.env.DISABLE_AI === "true") {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        const aiPrompt = `A mysterious figure known as ${characterName}. Medium build, weathered features, wearing period-appropriate attire.`;
+
+        const characterPath = `${bookPath}/characters/${characterSlug}`;
+        const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+          path: characterPath,
+        });
+
+        if (folder) {
+          const existingExtra = (folder.extra as Record<string, unknown>) || {};
+          await ctx.runMutation(components.assetManager.assetManager.updateFolder, {
+            path: characterPath,
+            extra: { ...existingExtra, aiPrompt },
+          });
+        }
+
+        console.log(`[generateCharacterPrompt] DISABLE_AI: Using mock prompt for ${characterName}`);
+        return { success: true, aiPrompt };
+      }
+
       const chaptersPath = `${bookPath}/chapters`;
       const chapterBasename = `chapter${chapterNumber}.xml`;
 
