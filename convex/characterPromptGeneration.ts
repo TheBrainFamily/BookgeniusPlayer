@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { internalAction } from "./_generated/server";
-import { components } from "./_generated/api";
+import { internal, components } from "./_generated/api";
 import { promptForSingleUserDescription } from "./prompts/promptForSingleUserDescription";
 import { DOMParser } from "@xmldom/xmldom";
 import type { Element as XmlDomElement } from "@xmldom/xmldom";
@@ -189,6 +189,17 @@ export const generateCharacterPrompt = internalAction({
       console.log(
         `[generateCharacterPrompt] Generated prompt for ${characterName}: ${aiPrompt.substring(0, 100)}...`,
       );
+
+      // Automatically trigger avatar generation with the generated prompt
+      await ctx.scheduler.runAfter(0, internal.avatarGeneration.generateAvatarOptions, {
+        bookPath,
+        characterSlug,
+        characterDisplayName: characterName,
+        visualPrompt: aiPrompt,
+      });
+
+      console.log(`[generateCharacterPrompt] Scheduled avatar generation for ${characterName}`);
+
       return { success: true, aiPrompt };
     } catch (error) {
       console.error("[generateCharacterPrompt] Error:", error);
