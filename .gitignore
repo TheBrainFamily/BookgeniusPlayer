@@ -23,5 +23,4 @@ apps/player/src/components/ContentShiftWrapperOld.tsx
 compiled-books/*/
 .repo_ignore
 .env.local
-backend
 

@@ -1,0 +1,63 @@
+import { z } from "zod";
+
+export const StepEnum = z.enum([
+  "import_epub",
+  "create_settings",
+  "generate_reference_cards",
+  "rewrite_paragraphs",
+  "generate_graphical_style",
+  "generate_backgrounds",
+  "generate_entity_pictures",
+  "make_chapter_summaries",
+  "map_summaries_to_paragraphs",
+  "complete",
+  "failed",
+]);
+
+export type Step = z.infer<typeof StepEnum>;
+
+export const StepLabels: Record<Step, string> = {
+  import_epub: "Import EPUB",
+  create_settings: "Create Settings",
+  generate_reference_cards: "Generate Reference Cards",
+  rewrite_paragraphs: "Rewrite Paragraphs",
+  generate_graphical_style: "Generate Graphical Style",
+  generate_backgrounds: "Generate Backgrounds",
+  generate_entity_pictures: "Generate Character Pictures",
+  make_chapter_summaries: "Make Chapter Summaries",
+  map_summaries_to_paragraphs: "Map Summaries to Paragraphs",
+  complete: "Complete",
+  failed: "Failed",
+};
+
+export const JobStatusSchema = z.object({
+  jobId: z.string(),
+  slug: z.string(),
+  currentStep: StepEnum,
+  steps: z.array(
+    z.object({
+      step: StepEnum,
+      status: z.enum(["pending", "running", "done", "error"]),
+      startedAt: z.number().optional(),
+      endedAt: z.number().optional(),
+      message: z.string().optional(),
+    }),
+  ),
+  logs: z.array(z.string()).optional(),
+  error: z.string().optional(),
+  downloadUrl: z.string().optional(),
+  packagePath: z.string().optional(),
+});
+
+export type JobStatus = z.infer<typeof JobStatusSchema>;
+
+export const StartPipelineInput = z.object({
+  // Absolute or repo-relative path to uploaded epub (optional when starting from existing FB2)
+  epubPath: z.string().optional(),
+  // Absolute or repo-relative path to an FB2 file (CLI or server-initiated)
+  fb2Path: z.string().optional(),
+  // Optional slug; if omitted and epubPath given, it's derived from filename
+  slug: z.string().optional(),
+});
+
+export type StartPipelineInputType = z.infer<typeof StartPipelineInput>;

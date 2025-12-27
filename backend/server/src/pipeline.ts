@@ -1,0 +1,462 @@
+import fs from "fs";
+import path from "path";
+import { spawn } from "child_process";
+import { v4 as uuidv4 } from "uuid";
+import { Step, StepLabels } from "../../shared/pipelineTypes";
+import { convertBook } from "../../src/tools/fb2-converter/index";
+import { extractInlineImages } from "../../.scripts/extract-inline-images";
+import { createBookSettings } from "../../src/helpers/createBookSettings";
+import { checkIfBookDataExists } from "../../src/shared-books-data/getBooksData";
+import { setCurrentBook } from "../../src/helpers/getCurrentBook";
+import { getReferenceCardsForWholeBook } from "../../src/tools/new-tooling/get-reference-cards-for-whole-book";
+import { writeBookFile } from "../../src/helpers/writeBookFile";
+import { FILE_TYPE, getFilePath } from "../../src/helpers/filesHelpers";
+import { readBookFile } from "../../src/helpers/readBookFile";
+import { identifyCharactersAndRewriteParagraphs } from "../../src/tools/identifyEntityAndRewriteParagraphs";
+import { generatePicturesForEntities } from "../../src/tools/new-tooling/generate-pictures-for-entities";
+import { makeRollingChapterSummaries } from "../../src/tools/new-tooling/get-chapter-by-chapter-summary";
+import { turnChapterSummariesIntoBulletPointsMappedToParagraphs } from "../../src/tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
+import type { NewReferenceCardsResponse } from "../../src/types";
+import { generateBackgrounds } from "../../src/tools/new-tooling/generate-prompts-for-backgrounds";
+import { createGraphicalStyle } from "../../src/tools/new-tooling/create-graphical-style";
+import { getBookSettings } from "../../src/helpers/getBookSettings";
+import { generateTagName } from "../../src/helpers/generateTagName";
+import { initProgress, markStepStarted, markStepComplete, markStepError, getStepIndex, getStepOrder } from "./pipeline-progress";
+import { convex } from "./convex-client";
+
+export type Job = {
+  id: string;
+  slug: string;
+  bookPath: string;
+  status: "pending" | "running" | "done" | "error";
+  currentStep: Step;
+  steps: { step: Step; status: "pending" | "running" | "done" | "error"; startedAt?: number; endedAt?: number; message?: string }[];
+  logs: string[];
+  error?: string;
+};
+
+export const jobs = new Map<string, Job>();
+
+const DEFAULT_EBOOK_CONVERT = "/Applications/calibre.app/Contents/MacOS/ebook-convert";
+
+function slugify(input: string): string {
+  return input
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function ensureDir(dirPath: string) {
+  if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
+}
+
+async function runEbookConvert(bin: string, inputPath: string, outputPath: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(bin, [inputPath, outputPath], { stdio: "inherit" });
+    child.on("error", reject);
+    child.on("exit", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`ebook-convert exited with code ${code}`));
+    });
+  });
+}
+
+function setBookArg(slug: string) {
+  const bookArg = path.join("books-data", slug);
+  try {
+    setCurrentBook(bookArg);
+  } catch (_) {
+    process.argv[2] = bookArg;
+  }
+}
+
+function getRepoRoot(): string {
+  return path.resolve(__dirname, "../../");
+}
+
+function addLog(job: Job, message: string) {
+  const ts = new Date().toISOString();
+  job.logs.push(`[${ts}] ${message}`);
+  console.log(`[${job.slug}] ${message}`);
+}
+
+function getContentType(filename: string): string {
+  const ext = path.extname(filename).toLowerCase();
+  const types: Record<string, string> = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".webp": "image/webp",
+    ".mp4": "video/mp4",
+    ".webm": "video/webm",
+    ".mp3": "audio/mpeg",
+    ".xml": "application/xml",
+    ".json": "application/json",
+  };
+  return types[ext] || "application/octet-stream";
+}
+
+async function runStep(job: Job, step: Step, fn: () => Promise<void>) {
+  const s = job.steps.find((x) => x.step === step)!;
+
+  if (s.status === "done") {
+    addLog(job, `⏭ ${StepLabels[step]} (skipped - already done)`);
+    return;
+  }
+
+  s.status = "running";
+  s.startedAt = Date.now();
+  job.currentStep = step;
+  addLog(job, `▶ ${StepLabels[step]}`);
+
+  markStepStarted(job.slug, step);
+  await convex.reportProgress({ bookPath: job.bookPath, step, status: "running" }).catch((e) => {
+    addLog(job, `⚠ Failed to report progress to Convex: ${e.message}`);
+  });
+
+  try {
+    await fn();
+    s.status = "done";
+    s.endedAt = Date.now();
+    addLog(job, `✔ ${StepLabels[step]} done`);
+
+    markStepComplete(job.slug, step, s.startedAt!, s.endedAt);
+    await convex.reportProgress({ bookPath: job.bookPath, step, status: "done" }).catch((e) => {
+      addLog(job, `⚠ Failed to report progress to Convex: ${e.message}`);
+    });
+  } catch (e: unknown) {
+    s.status = "error";
+    s.endedAt = Date.now();
+    job.status = "error";
+    job.currentStep = "failed";
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    job.error = errorMessage;
+    const stack = e instanceof Error ? e.stack : String(e);
+    addLog(job, `✖ ${StepLabels[step]} failed: ${job.error}`);
+    addLog(job, stack || "");
+
+    markStepError(job.slug, step, job.error, s.startedAt!, s.endedAt);
+    await convex.reportProgress({ bookPath: job.bookPath, step, status: "error", error: errorMessage }).catch(() => {});
+    await convex.markFailed({ bookPath: job.bookPath, error: errorMessage }).catch(() => {});
+
+    console.error(`Step ${step} failed:`, e);
+    throw e;
+  }
+}
+
+async function uploadChaptersToConvex(job: Job, tempOutputDir: string) {
+  const files = fs.readdirSync(tempOutputDir).filter((f) => f.match(/^rewritten-paragraphs-for-chapter-\d+\.xml$/));
+
+  for (const file of files) {
+    const match = file.match(/chapter-(\d+)/);
+    if (!match) continue;
+
+    const chapterNumber = parseInt(match[1], 10);
+    const filePath = path.join(tempOutputDir, file);
+    const content = fs.readFileSync(filePath);
+    const basename = `chapter-${chapterNumber}.xml`;
+
+    addLog(job, `Uploading chapter ${chapterNumber} to Convex...`);
+
+    try {
+      await convex.uploadFile({
+        folderPath: `${job.bookPath}/chapters`,
+        basename,
+        content,
+        contentType: "application/xml",
+        publish: true,
+        extra: { type: "chapter", chapterNumber, title: `Chapter ${chapterNumber}` },
+      });
+      addLog(job, `✔ Chapter ${chapterNumber} uploaded`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      addLog(job, `⚠ Failed to upload chapter ${chapterNumber}: ${msg}`);
+    }
+  }
+}
+
+async function uploadCharactersToConvex(job: Job, referenceCards: NewReferenceCardsResponse, outputDir: string) {
+  for (const character of referenceCards.characters) {
+    const characterSlug = generateTagName(character.name).toLowerCase();
+
+    await convex.ensureCharacterFolder({ bookPath: job.bookPath, characterSlug, displayName: character.name, summary: character.referenceCard });
+
+    const avatarExtensions = [".png", ".jpg", ".jpeg", ".webp"];
+    for (const ext of avatarExtensions) {
+      const avatarPath = path.join(outputDir, "characters", `${characterSlug}${ext}`);
+      if (fs.existsSync(avatarPath)) {
+        addLog(job, `Uploading avatar for ${character.name}...`);
+        try {
+          const content = fs.readFileSync(avatarPath);
+          await convex.uploadFile({
+            folderPath: `${job.bookPath}/characters/${characterSlug}`,
+            basename: `avatar-large${ext}`,
+            content,
+            contentType: getContentType(avatarPath),
+            publish: true,
+          });
+          await convex.markCharacterAvatarState({ characterPath: `${job.bookPath}/characters/${characterSlug}`, state: "ready" });
+          addLog(job, `✔ Avatar uploaded for ${character.name}`);
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e);
+          addLog(job, `⚠ Failed to upload avatar for ${character.name}: ${msg}`);
+        }
+        break;
+      }
+    }
+  }
+}
+
+async function uploadBackgroundsToConvex(job: Job, outputDir: string) {
+  const backgroundsDir = path.join(outputDir, "backgrounds");
+  if (!fs.existsSync(backgroundsDir)) return;
+
+  const files = fs.readdirSync(backgroundsDir).filter((f) => /\.(png|jpg|jpeg|webp|mp4|webm)$/i.test(f));
+
+  for (const file of files) {
+    const filePath = path.join(backgroundsDir, file);
+    const content = fs.readFileSync(filePath);
+
+    addLog(job, `Uploading background ${file}...`);
+
+    try {
+      await convex.uploadFile({ folderPath: `${job.bookPath}/backgrounds`, basename: file, content, contentType: getContentType(file), publish: true });
+
+      const match = file.match(/(\d+)-(\d+)/);
+      if (match) {
+        const chapter = parseInt(match[1], 10);
+        const paragraph = parseInt(match[2], 10);
+        await convex.upsertBackgroundCue({ bookPath: job.bookPath, chapter, paragraph, fileBasename: file });
+      }
+
+      addLog(job, `✔ Background ${file} uploaded`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      addLog(job, `⚠ Failed to upload background ${file}: ${msg}`);
+    }
+  }
+}
+
+async function uploadGraphicalStyleToConvex(job: Job, tempOutputDir: string) {
+  const stylePath = path.join(tempOutputDir, "graphicalStyle.json");
+  if (!fs.existsSync(stylePath)) return;
+
+  try {
+    const styleData = JSON.parse(fs.readFileSync(stylePath, "utf-8"));
+    await convex.updateGraphicalStyle({
+      bookPath: job.bookPath,
+      backgroundStyle: styleData.backgroundStyle,
+      periodStyle: styleData.periodStyle,
+      avatarStyle: styleData.avatarStyle,
+    });
+    addLog(job, `✔ Graphical style uploaded to Convex`);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    addLog(job, `⚠ Failed to upload graphical style: ${msg}`);
+  }
+}
+
+export async function startPipeline(input: { epubPath?: string; fb2Path?: string; slug?: string; ebookConvertBin?: string; fromStep?: Step }) {
+  const { epubPath, fb2Path, slug: providedSlug, ebookConvertBin, fromStep } = input;
+  const baseName = epubPath ? path.basename(epubPath, path.extname(epubPath)) : providedSlug || "book";
+  const slug = slugify(providedSlug || baseName);
+  const bookPath = `books/${slug}`;
+
+  initProgress(slug);
+
+  const stepOrder = getStepOrder();
+  const fromStepIndex = fromStep ? getStepIndex(fromStep) : -1;
+
+  const job: Job = {
+    id: uuidv4(),
+    slug,
+    bookPath,
+    status: "running",
+    currentStep: fromStep || "import_epub",
+    logs: [],
+    steps: stepOrder.map((step) => {
+      const stepIndex = getStepIndex(step);
+      if (fromStepIndex > 0 && stepIndex < fromStepIndex) {
+        return { step, status: "done" as const };
+      }
+      return { step, status: "pending" as const };
+    }),
+  };
+  jobs.set(job.id, job);
+
+  if (fromStep) {
+    addLog(job, `Resuming pipeline from step: ${StepLabels[fromStep]}`);
+  }
+
+  const repoRoot = getRepoRoot();
+  const bookRoot = path.join(repoRoot, "books-data", slug);
+  const inputDir = path.join(bookRoot, "input");
+  const outputDir = path.join(bookRoot, "output");
+  const tempOutputDir = path.join(bookRoot, "temporary-output");
+
+  const run = async () => {
+    try {
+      process.chdir(repoRoot);
+      addLog(job, `cwd -> ${process.cwd()}`);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      addLog(job, `Failed to chdir to repo root: ${msg}`);
+    }
+
+    addLog(job, `Initializing book structure in Convex...`);
+    try {
+      await convex.ensureBookStructure({ jobId: job.id, bookSlug: slug });
+      addLog(job, `✔ Book structure created in Convex`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      addLog(job, `⚠ Failed to create book structure: ${msg}`);
+    }
+
+    await runStep(job, "import_epub", async () => {
+      addLog(job, `Ensuring dirs exist → ${inputDir}, ${outputDir}, ${tempOutputDir}`);
+      ensureDir(inputDir);
+      ensureDir(outputDir);
+      ensureDir(tempOutputDir);
+      ensureDir(path.join(outputDir, "characters"));
+      ensureDir(path.join(outputDir, "backgrounds"));
+
+      const fb2Target = path.join(inputDir, `${slug}.fb2`);
+      const richPath = path.join(inputDir, "rich.xml");
+
+      if (fs.existsSync(richPath)) {
+        addLog(job, `Using existing rich.xml at ${richPath}`);
+      } else if (epubPath) {
+        const bin = ebookConvertBin || process.env.EBOOK_CONVERT_BIN || DEFAULT_EBOOK_CONVERT;
+        if (!fs.existsSync(bin)) throw new Error(`ebook-convert not found at ${bin}`);
+        addLog(job, `Converting EPUB to FB2 → ${fb2Target}`);
+        await runEbookConvert(bin, epubPath, fb2Target);
+        if (!fs.existsSync(fb2Target)) throw new Error(`FB2 not created: ${fb2Target}`);
+        setBookArg(slug);
+        convertBook(slug, 1, 0);
+        await extractInlineImages({ slug });
+      } else if (fb2Path) {
+        const absFb2 = path.isAbsolute(fb2Path) ? fb2Path : path.join(repoRoot, fb2Path);
+        if (!fs.existsSync(absFb2)) throw new Error(`FB2 not found: ${absFb2}`);
+        addLog(job, `Copying FB2 → ${fb2Target}`);
+        fs.copyFileSync(absFb2, fb2Target);
+        setBookArg(slug);
+        convertBook(slug, 1, 0);
+        await extractInlineImages({ slug });
+      } else {
+        if (!fs.existsSync(fb2Target)) throw new Error(`FB2 missing: ${fb2Target}`);
+        setBookArg(slug);
+        convertBook(slug, 1, 0);
+        await extractInlineImages({ slug });
+      }
+    });
+
+    await runStep(job, "create_settings", async () => {
+      setBookArg(slug);
+      checkIfBookDataExists();
+      createBookSettings();
+
+      const settings = getBookSettings();
+      await convex.updateBookMetadata({ bookPath: job.bookPath, metadata: { title: settings.title, author: settings.author, language: settings.language } }).catch((e) => {
+        addLog(job, `⚠ Failed to update book metadata: ${e.message}`);
+      });
+    });
+
+    let referenceCards: NewReferenceCardsResponse;
+
+    await runStep(job, "generate_reference_cards", async () => {
+      setBookArg(slug);
+      const fileName = "single-summary-per-person.json";
+      const filePath = getFilePath(fileName, FILE_TYPE.PERMANENT);
+
+      if (fs.existsSync(filePath)) {
+        referenceCards = JSON.parse(readBookFile(fileName, FILE_TYPE.PERMANENT)) as NewReferenceCardsResponse;
+        addLog(job, "Using existing reference cards");
+      } else {
+        referenceCards = await getReferenceCardsForWholeBook();
+        writeBookFile(fileName, JSON.stringify(referenceCards, null, 2), FILE_TYPE.PERMANENT);
+      }
+
+      const count = referenceCards.characters?.length;
+      if (typeof count === "number") addLog(job, `Generated ${count} reference cards`);
+
+      for (const character of referenceCards.characters) {
+        const characterSlug = generateTagName(character.name).toLowerCase();
+        await convex.ensureCharacterFolder({ bookPath: job.bookPath, characterSlug, displayName: character.name, summary: character.referenceCard }).catch((e) => {
+          addLog(job, `⚠ Failed to create character folder for ${character.name}: ${e.message}`);
+        });
+      }
+    });
+
+    await runStep(job, "rewrite_paragraphs", async () => {
+      setBookArg(slug);
+      referenceCards = JSON.parse(readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT)) as NewReferenceCardsResponse;
+      await identifyCharactersAndRewriteParagraphs(referenceCards);
+
+      await uploadChaptersToConvex(job, tempOutputDir);
+    });
+
+    await runStep(job, "generate_graphical_style", async () => {
+      setBookArg(slug);
+      await createGraphicalStyle(slug);
+
+      await uploadGraphicalStyleToConvex(job, tempOutputDir);
+    });
+
+    await runStep(job, "generate_backgrounds", async () => {
+      setBookArg(slug);
+      await generateBackgrounds();
+
+      await uploadBackgroundsToConvex(job, outputDir);
+    });
+
+    await runStep(job, "generate_entity_pictures", async () => {
+      setBookArg(slug);
+      referenceCards = JSON.parse(readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT)) as NewReferenceCardsResponse;
+      await generatePicturesForEntities(referenceCards);
+
+      await uploadCharactersToConvex(job, referenceCards, outputDir);
+    });
+
+    if (process.env.QUICK_MODE !== "true") {
+      await runStep(job, "make_chapter_summaries", async () => {
+        setBookArg(slug);
+        await makeRollingChapterSummaries();
+      });
+
+      await runStep(job, "map_summaries_to_paragraphs", async () => {
+        setBookArg(slug);
+        await turnChapterSummariesIntoBulletPointsMappedToParagraphs();
+      });
+    }
+
+    job.status = "done";
+    job.currentStep = "complete";
+
+    await convex.markCompleted(job.bookPath).catch((e) => {
+      addLog(job, `⚠ Failed to mark as completed in Convex: ${e.message}`);
+    });
+
+    addLog(job, `✔ Pipeline complete! Book available at ${job.bookPath}`);
+  };
+
+  run().catch((e) => {
+    const j = jobs.get(job.id);
+    if (j) {
+      j.status = "error";
+      j.currentStep = "failed";
+      j.error = e?.message || String(e);
+    }
+    console.error("Pipeline job failed:", e);
+  });
+
+  return job;
+}
+
+if (require.main === module) {
+  (async () => {
+    const slug = process.argv[2] || "test-book";
+    const job = await startPipeline({ slug });
+    console.log(job);
+  })();
+}

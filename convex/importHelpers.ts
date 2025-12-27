@@ -1,10 +1,19 @@
 // convex/importHelpers.ts
-// Unauthenticated helpers for one-off import scripts
-// DELETE THIS FILE after import is complete!
+// Unauthenticated helpers for import scripts and generator pipeline
 
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
-import { components } from "./_generated/api";
+import { components, internal } from "./_generated/api";
+
+function getR2Config() {
+  if (!process.env.R2_BUCKET) return undefined;
+  return {
+    R2_BUCKET: process.env.R2_BUCKET,
+    R2_ENDPOINT: process.env.R2_ENDPOINT!,
+    R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID!,
+    R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY!,
+  };
+}
 
 const storageBackendValidator = v.union(v.literal("convex"), v.literal("r2"));
 
@@ -25,29 +34,67 @@ export const startUpload = mutation({
     r2Key: v.optional(v.string()),
   }),
   handler: async (ctx, args) => {
-    return await ctx.runMutation(
-      components.assetManager.assetManager.startUpload,
-      args
-    );
+    return await ctx.runMutation(components.assetManager.assetManager.startUpload, {
+      ...args,
+      r2Config: getR2Config(),
+    });
   },
 });
 
-// Unauthenticated version of finishUpload for import
 export const finishUpload = mutation({
   args: {
     intentId: v.string(),
     storageId: v.optional(v.id("_storage")),
+    uploadResponse: v.optional(v.any()),
+    size: v.optional(v.number()),
+    contentType: v.optional(v.string()),
+    folderPath: v.optional(v.string()),
+    basename: v.optional(v.string()),
   },
-  returns: v.object({
-    assetId: v.string(),
-    versionId: v.string(),
-    version: v.number(),
-  }),
+  returns: v.object({ assetId: v.string(), versionId: v.string(), version: v.number() }),
   handler: async (ctx, args) => {
-    return await ctx.runMutation(
-      components.assetManager.assetManager.finishUpload,
-      { ...args, intentId: args.intentId as any }
-    );
+    const result = await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
+      intentId: args.intentId as any,
+      uploadResponse: args.uploadResponse,
+      r2Config: getR2Config(),
+      size: args.size,
+      contentType: args.contentType,
+    });
+
+    if (args.folderPath?.endsWith("/chapters") && args.basename) {
+      const bookPath = args.folderPath.replace(/\/chapters$/, "");
+      await ctx.scheduler.runAfter(0, internal.chapterCompiler.processPublishedChapter, {
+        bookPath,
+        chapterBasename: args.basename,
+        versionId: result.versionId,
+      });
+    }
+
+    if (args.folderPath?.endsWith("/backgrounds") && args.basename) {
+      const bookPath = args.folderPath.replace(/\/backgrounds$/, "");
+      const isVideo = args.contentType?.startsWith("video/");
+      const isImage = args.contentType?.startsWith("image/");
+
+      if (isVideo) {
+        await ctx.scheduler.runAfter(0, internal.backgroundMetadata.generateVideoPreview, {
+          bookPath,
+          fileBasename: args.basename,
+        });
+      } else if (isImage) {
+        await ctx.scheduler.runAfter(0, internal.backgroundMetadata.generateImagePreview, {
+          bookPath,
+          fileBasename: args.basename,
+        });
+      }
+    }
+
+    if (args.folderPath?.includes("/characters/") && args.basename?.startsWith("avatar-large.")) {
+      await ctx.scheduler.runAfter(2000, internal.avatarGeneration.processUploadedAvatarLarge, {
+        characterPath: args.folderPath,
+      });
+    }
+
+    return result;
   },
 });
 
@@ -62,29 +109,20 @@ export const createVersionFromStorageId = mutation({
     label: v.optional(v.string()),
     extra: v.optional(v.any()),
   },
-  returns: v.object({
-    assetId: v.string(),
-    versionId: v.string(),
-    version: v.number(),
-  }),
+  returns: v.object({ assetId: v.string(), versionId: v.string(), version: v.number() }),
   handler: async (ctx, args) => {
     return await ctx.runMutation(
       components.assetManager.assetManager.createVersionFromStorageId,
-      args
+      args,
     );
   },
 });
 
 // Unauthenticated folder creation for import
 export const createFolderByPath = mutation({
-  args: {
-    path: v.string(),
-  },
+  args: { path: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runMutation(
-      components.assetManager.assetManager.createFolderByPath,
-      args
-    );
+    return await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, args);
   },
 });
 
@@ -105,15 +143,12 @@ export const updateCharacterMetadata = mutation({
 
     // Use commitVersion which handles both creating new assets
     // and updating existing ones, with immediate publish
-    await ctx.runMutation(
-      components.assetManager.assetManager.commitVersion,
-      {
-        folderPath,
-        basename: "metadata.json",
-        publish: true,
-        extra: args.metadata,
-      }
-    );
+    await ctx.runMutation(components.assetManager.assetManager.commitVersion, {
+      folderPath,
+      basename: "metadata.json",
+      publish: true,
+      extra: args.metadata,
+    });
 
     return { success: true };
   },
@@ -128,7 +163,7 @@ export const createOrUpdateScenario = mutation({
       description: v.string(),
       characterImages: v.record(
         v.string(),
-        v.union(v.literal("comic"), v.literal("superhero"), v.literal("both"))
+        v.union(v.literal("comic"), v.literal("superhero"), v.literal("both")),
       ),
       frames: v.array(
         v.object({
@@ -137,7 +172,7 @@ export const createOrUpdateScenario = mutation({
           speaker: v.string(),
           dialogue: v.string(),
           imageType: v.union(v.literal("comic"), v.literal("superhero")),
-        })
+        }),
       ),
     }),
   },
@@ -147,25 +182,21 @@ export const createOrUpdateScenario = mutation({
 
     // Ensure folder exists
     try {
-      await ctx.runMutation(
-        components.assetManager.assetManager.createFolderByPath,
-        { path: folderPath }
-      );
+      await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+        path: folderPath,
+      });
     } catch {
       // Folder might exist
     }
 
     // Use commitVersion which handles both creating new assets
     // and updating existing ones, with immediate publish
-    await ctx.runMutation(
-      components.assetManager.assetManager.commitVersion,
-      {
-        folderPath,
-        basename,
-        publish: true,
-        extra: args.scenario,
-      }
-    );
+    await ctx.runMutation(components.assetManager.assetManager.commitVersion, {
+      folderPath,
+      basename,
+      publish: true,
+      extra: args.scenario,
+    });
 
     return { success: true };
   },

@@ -332,6 +332,160 @@ export const confirmAvatarSelection = action({
   },
 });
 
+const MAX_AVATAR_RETRIES = 3;
+const AVATAR_RETRY_DELAYS = [2000, 5000, 10000]; // 2s, 5s, 10s
+
+export const processUploadedAvatarLarge = internalAction({
+  args: { characterPath: v.string(), retryCount: v.optional(v.number()) },
+  returns: v.object({ success: v.boolean(), error: v.optional(v.string()) }),
+  handler: async (ctx, { characterPath, retryCount = 0 }) => {
+    try {
+      const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+        folderPath: characterPath,
+        basename: "avatar-large.png",
+      });
+
+      if (!versions.length) {
+        if (retryCount < MAX_AVATAR_RETRIES) {
+          const delay = AVATAR_RETRY_DELAYS[retryCount] || 10000;
+          console.log(
+            `[processUploadedAvatarLarge] avatar-large.png not found for ${characterPath}, scheduling retry ${retryCount + 1}/${MAX_AVATAR_RETRIES} in ${delay}ms`,
+          );
+          await ctx.scheduler.runAfter(
+            delay,
+            internal.avatarGeneration.processUploadedAvatarLarge,
+            { characterPath, retryCount: retryCount + 1 },
+          );
+          return {
+            success: false,
+            error: `Retry scheduled (${retryCount + 1}/${MAX_AVATAR_RETRIES})`,
+          };
+        }
+        console.error(
+          `[processUploadedAvatarLarge] avatar-large.png not found after ${MAX_AVATAR_RETRIES} retries: ${characterPath}`,
+        );
+        return { success: false, error: "avatar-large.png not found after max retries" };
+      }
+
+      const largeUrlInfo = await ctx.runQuery(
+        components.assetManager.assetFsHttp.getVersionPreviewUrl,
+        { versionId: versions[0]?._id as any },
+      );
+
+      if (!largeUrlInfo?.url) {
+        return { success: false, error: "Failed to get avatar-large URL" };
+      }
+
+      const resizeResult = await ctx.runAction(internal.imageProcessing.resizeToWebpViaWorker, {
+        sourceUrl: largeUrlInfo.url,
+        maxWidth: 400,
+        quality: 80,
+      });
+
+      const webpBinary = Uint8Array.from(atob(resizeResult.data), (c) => c.charCodeAt(0));
+      const webpBlob = new Blob([webpBinary], { type: "image/webp" });
+
+      const { intentId, uploadUrl, backend } = await ctx.runMutation(
+        internal.generateUploadUrl.startUploadInternal,
+        { folderPath: characterPath, basename: "avatar.webp", publish: true },
+      );
+
+      const uploadRes = await fetch(uploadUrl, {
+        method: backend === "r2" ? "PUT" : "POST",
+        body: webpBlob,
+        headers: { "Content-Type": "image/webp" },
+      });
+
+      if (!uploadRes.ok) {
+        return { success: false, error: "Failed to upload avatar.webp" };
+      }
+
+      const uploadResponse = backend === "convex" ? await uploadRes.json() : undefined;
+
+      await ctx.runMutation(internal.generateUploadUrl.finishUploadInternal, {
+        intentId,
+        uploadResponse,
+        size: webpBlob.size,
+        contentType: "image/webp",
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error("[processUploadedAvatarLarge] Error:", error);
+      return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+    }
+  },
+});
+
+export const repairMissingAvatarWebp = internalAction({
+  args: { bookPath: v.string() },
+  returns: v.object({
+    repaired: v.array(v.string()),
+    skipped: v.array(v.string()),
+    failed: v.array(v.string()),
+  }),
+  handler: async (ctx, { bookPath }) => {
+    const charactersPath = `${bookPath}/characters`;
+    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: charactersPath,
+    });
+
+    if (!folder) {
+      console.log(`[repairMissingAvatarWebp] Characters folder not found: ${charactersPath}`);
+      return { repaired: [], skipped: [], failed: [] };
+    }
+
+    const characterFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
+      parentPath: charactersPath,
+    });
+    const repaired: string[] = [];
+    const skipped: string[] = [];
+    const failed: string[] = [];
+
+    for (const charFolder of characterFolders) {
+      const characterPath = charFolder.path;
+      const characterSlug = characterPath.split("/").pop() || "";
+
+      const avatarLargeVersions = await ctx.runQuery(
+        components.assetManager.assetManager.getAssetVersions,
+        { folderPath: characterPath, basename: "avatar-large.png" },
+      );
+
+      if (!avatarLargeVersions.length) {
+        skipped.push(`${characterSlug} (no avatar-large.png)`);
+        continue;
+      }
+
+      const avatarWebpVersions = await ctx.runQuery(
+        components.assetManager.assetManager.getAssetVersions,
+        { folderPath: characterPath, basename: "avatar.webp" },
+      );
+
+      if (avatarWebpVersions.length) {
+        skipped.push(`${characterSlug} (already has avatar.webp)`);
+        continue;
+      }
+
+      console.log(`[repairMissingAvatarWebp] Processing ${characterSlug}...`);
+      const result = await ctx.runAction(internal.avatarGeneration.processUploadedAvatarLarge, {
+        characterPath,
+        retryCount: 0,
+      });
+
+      if (result.success) {
+        repaired.push(characterSlug);
+      } else {
+        failed.push(`${characterSlug}: ${result.error}`);
+      }
+    }
+
+    console.log(
+      `[repairMissingAvatarWebp] Done. Repaired: ${repaired.length}, Skipped: ${skipped.length}, Failed: ${failed.length}`,
+    );
+    return { repaired, skipped, failed };
+  },
+});
+
 export const updateBookGraphicalStyle = mutation({
   args: {
     bookPath: v.string(),

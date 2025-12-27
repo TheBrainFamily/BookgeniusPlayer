@@ -15,7 +15,7 @@ export default defineSchema({
       v.literal("pending"),
       v.literal("processing"),
       v.literal("completed"),
-      v.literal("failed")
+      v.literal("failed"),
     ),
     progress: v.optional(v.number()),
     progressMessage: v.optional(v.string()),
@@ -48,12 +48,7 @@ export default defineSchema({
     bookPath: v.string(),
     variantId: v.string(),
     chapter: v.number(),
-    simplifications: v.array(
-      v.object({
-        score: v.number(),
-        sentences: v.array(v.string()),
-      })
-    ),
+    simplifications: v.array(v.object({ score: v.number(), sentences: v.array(v.string()) })),
   })
     .index("by_book", ["bookPath"])
     .index("by_book_chapter", ["bookPath", "chapter"]),
@@ -101,7 +96,7 @@ export default defineSchema({
       v.literal("pending"),
       v.literal("processing"),
       v.literal("completed"),
-      v.literal("failed")
+      v.literal("failed"),
     ),
     previewMp4Basename: v.optional(v.string()), // "castle_preview.mp4" (video only)
     previewWebpBasename: v.optional(v.string()), // "castle_preview.webp"
@@ -109,4 +104,46 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_book_file", ["bookPath", "fileBasename"]),
+
+  // Book generation jobs (tracks pipeline progress from generator server)
+  bookGenerationJobs: defineTable({
+    jobId: v.string(), // UUID from generator server
+    bookPath: v.string(), // "books/{slug}"
+    bookSlug: v.string(), // Just the slug for convenience
+    status: v.union(
+      v.literal("pending"),
+      v.literal("generating"),
+      v.literal("paused"),
+      v.literal("failed"),
+      v.literal("completed"),
+    ),
+    currentStep: v.optional(v.string()), // Current pipeline step name
+    steps: v.array(
+      v.object({
+        step: v.string(),
+        status: v.union(
+          v.literal("pending"),
+          v.literal("running"),
+          v.literal("done"),
+          v.literal("error"),
+          v.literal("skipped"),
+        ),
+        startedAt: v.optional(v.number()),
+        endedAt: v.optional(v.number()),
+        message: v.optional(v.string()),
+      }),
+    ),
+    // Progress tracking
+    totalChapters: v.optional(v.number()),
+    readyChapters: v.optional(v.number()), // Chapters with compiled HTML
+    // Error tracking
+    error: v.optional(v.string()),
+    // Timestamps
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    lastHeartbeatAt: v.optional(v.number()),
+  })
+    .index("by_jobId", ["jobId"])
+    .index("by_bookPath", ["bookPath"])
+    .index("by_status", ["status"]),
 });

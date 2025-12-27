@@ -781,3 +781,58 @@ export const listVariants = query({
     return variants.map((v) => ({ id: v.variantId, simplifications: v.simplifications }));
   },
 });
+
+// =============================================================================
+// Generation Status Queries
+// =============================================================================
+
+/**
+ * Get the current generation status for a book.
+ * Used by player/CMS to show progress and determine what's readable.
+ */
+export const getGenerationStatus = query({
+  args: { bookPath: v.string() },
+  handler: async (ctx, { bookPath }) => {
+    const job = await ctx.db
+      .query("bookGenerationJobs")
+      .withIndex("by_bookPath", (q) => q.eq("bookPath", bookPath))
+      .first();
+
+    if (!job) return null;
+
+    return {
+      jobId: job.jobId,
+      status: job.status,
+      currentStep: job.currentStep,
+      steps: job.steps,
+      totalChapters: job.totalChapters,
+      readyChapters: job.readyChapters,
+      error: job.error,
+      createdAt: job.createdAt,
+      updatedAt: job.updatedAt,
+    };
+  },
+});
+
+/**
+ * List all books currently being generated.
+ */
+export const listGeneratingBooks = query({
+  args: {},
+  handler: async (ctx) => {
+    const jobs = await ctx.db
+      .query("bookGenerationJobs")
+      .withIndex("by_status", (q) => q.eq("status", "generating"))
+      .collect();
+
+    return jobs.map((job) => ({
+      bookPath: job.bookPath,
+      bookSlug: job.bookSlug,
+      currentStep: job.currentStep,
+      totalChapters: job.totalChapters,
+      readyChapters: job.readyChapters,
+      createdAt: job.createdAt,
+      updatedAt: job.updatedAt,
+    }));
+  },
+});

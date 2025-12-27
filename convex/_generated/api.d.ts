@@ -22,6 +22,7 @@ import type * as comicGeneration from "../comicGeneration.js";
 import type * as comicSubmissions from "../comicSubmissions.js";
 import type * as comics from "../comics.js";
 import type * as generateUploadUrl from "../generateUploadUrl.js";
+import type * as generator from "../generator.js";
 import type * as http from "../http.js";
 import type * as imageProcessing from "../imageProcessing.js";
 import type * as importHelpers from "../importHelpers.js";
@@ -56,6 +57,7 @@ declare const fullApi: ApiFromModules<{
   comicSubmissions: typeof comicSubmissions;
   comics: typeof comics;
   generateUploadUrl: typeof generateUploadUrl;
+  generator: typeof generator;
   http: typeof http;
   imageProcessing: typeof imageProcessing;
   importHelpers: typeof importHelpers;
