@@ -1,201 +1,66 @@
-import fs from "fs";
 import path from "path";
-import { callClaude, callGeminiWrapper } from "../../src/callClaude";
-import { callGpt5 } from "../../src/callO3";
-import { callGrok } from "../../src/callGrok";
-import { compareXmlTextContent, restoreOriginalText } from "../../src/tools/new-tooling/compare-chapters-xml";
-import { generateTagName } from "../../src/helpers/generateTagName";
-import { needsChunking, chunkParagraphs, combineChunks, type Paragraph, type ChapterChunk } from "../../src/tools/chapterChunker";
+import fs from "fs";
+import { setCurrentBook } from "../../src/helpers/getCurrentBook";
+import { FILE_TYPE, getFilePath } from "../../src/helpers/filesHelpers";
+import { readBookFile, doesBookFileExist } from "../../src/helpers/readBookFile";
+import { writeBookFile } from "../../src/helpers/writeBookFile";
+import { identifyAndRewriteParagraphs } from "../../src/tools/identifyEntityAndRewriteParagraphs";
 import { convex, getChapterXml, getCharacterReferenceCards } from "./convex-client";
 import { stripCharacterTags, parseXmlToParagraphs } from "./chapter-xml-helpers";
 
-interface Character {
-  name: string;
-  summary: string;
+function getRepoRoot(): string {
+  return path.resolve(__dirname, "../../");
 }
 
-const PROMPTS_DIR = path.resolve(__dirname, "../../src/tools");
+function ensureBookDataDir(slug: string): string {
+  const bookDataDir = path.join(getRepoRoot(), "books-data", slug);
+  const inputDir = path.join(bookDataDir, "input");
+  const outputDir = path.join(bookDataDir, "output");
+  const tempDir = path.join(bookDataDir, "temporary-output");
 
-function loadPromptTemplate(type: "book" | "play" | "chunked"): string {
-  const filename = type === "play" ? "RewriteParagraphsPromptPlay.md" : type === "chunked" ? "RewriteParagraphsPromptBookChunked.md" : "RewriteParagraphsPromptBook.md";
-  return fs.readFileSync(path.join(PROMPTS_DIR, filename), "utf8");
-}
-
-function buildXmlCharacters(characters: Character[]): string {
-  return characters
-    .map((entity) => {
-      const tagName = generateTagName(entity.name.trim(), true);
-      const displayName = entity.name.trim().replace(/"/g, "&quot;");
-      const summaryText = entity.summary.trim().replace(/"/g, "&quot;");
-      return `<${tagName} display="${displayName}" summary="${summaryText}" />`;
-    })
-    .join("\n");
-}
-
-function buildChunkXml(chapterId: number, paragraphs: Paragraph[]): string {
-  const paragraphsXml = paragraphs.map((p) => `<${p.elementType}>${p.text.trim().replace(/"/g, "'")}</${p.elementType}>`).join("\n");
-  return `<Chapter id="${chapterId}">${paragraphsXml}</Chapter>`;
-}
-
-function buildChunkedPrompt(paragraphs: Paragraph[], chapterId: number, xmlCharacters: string, previousChunkOutput: string | null): string {
-  const prompt = loadPromptTemplate("chunked");
-  const paragraphsXml = `<Chapter id="${chapterId}">${paragraphs.map((p) => `<${p.elementType}>${p.text.trim().replace(/"/g, "'")}</${p.elementType}>`).join("\n")}</Chapter>`;
-
-  let previousContextSection = "";
-  let outputOnlyInstruction = "";
-
-  if (previousChunkOutput) {
-    previousContextSection = `
-## CONTEXT FROM PREVIOUS SECTION
-
-The following is the PREVIOUS section of this chapter. Use it ONLY as context to understand who is speaking and character references. DO NOT include this section in your output.
-
-<PreviousContext>
-${previousChunkOutput}
-</PreviousContext>
-
-**IMPORTANT:** Your output should ONLY contain the paragraphs from the "Paragraphs to Process" section below. Do NOT include any paragraphs from the PreviousContext section.
-`;
-    outputOnlyInstruction = `
-**OUTPUT ONLY THE "Paragraphs to Process" SECTION. Do NOT include the PreviousContext in your output.**
-`;
+  for (const dir of [bookDataDir, inputDir, outputDir, tempDir]) {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
   }
 
-  return prompt
-    .replace("{{paragraphs}}", paragraphsXml)
-    .replace("{{characters}}", xmlCharacters)
-    .replace("{{previousContextSection}}", previousContextSection)
-    .replace("{{outputOnlyInstruction}}", outputOnlyInstruction);
+  return bookDataDir;
 }
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-const llmProviders = [callGeminiWrapper, callGrok, callClaude, callGpt5];
-
-async function processChunk(
-  chapterId: number,
-  chunkIndex: number,
-  chunk: ChapterChunk,
-  xmlCharacters: string,
-  previousChunkOutput: string | null,
-  allCharacterTagNames: string[],
-  attempt: number = 0,
-): Promise<string> {
-  if (attempt > 0) {
-    await sleep(10000 * attempt * attempt);
-  }
-  if (attempt > 4) {
-    throw new Error(`Too many attempts for chapter ${chapterId} chunk ${chunkIndex}`);
-  }
-
-  const compiledPrompt = buildChunkedPrompt(chunk.paragraphs, chapterId, xmlCharacters, previousChunkOutput);
-  const originalChunkXml = buildChunkXml(chapterId, chunk.paragraphs);
-
-  const selectedProvider = llmProviders[attempt % llmProviders.length];
-  console.log(`[chunk ${chunkIndex}] Using provider: ${selectedProvider.name}`);
-
+function setBookArg(slug: string) {
+  const bookArg = path.join("books-data", slug);
   try {
-    const response = (await selectedProvider(compiledPrompt, undefined, 1)) as string;
-    const clearedResponse = response.replace(/```xml\n/, "").replace(/\n```$/, "");
+    setCurrentBook(bookArg);
+  } catch (_) {
+    process.argv[2] = bookArg;
+  }
+}
 
-    let restored: string | undefined;
-    try {
-      restored = restoreOriginalText(originalChunkXml, clearedResponse, allCharacterTagNames);
-    } catch (e) {
-      console.error(`[chunk ${chunkIndex}] Error restoring original text:`, e);
-    }
+function deleteExistingChapterFiles(chapter: number): string[] {
+  const deletedFiles: string[] = [];
 
-    if (restored && compareXmlTextContent(originalChunkXml, restored)) {
-      console.log(`✅ Chunk ${chunkIndex} validated for chapter ${chapterId}`);
-      return restored;
+  const mainFile = getFilePath(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY);
+  if (fs.existsSync(mainFile)) {
+    fs.unlinkSync(mainFile);
+    deletedFiles.push(mainFile);
+  }
+
+  for (let chunkIndex = 0; chunkIndex < 20; chunkIndex++) {
+    const chunkFile = getFilePath(`rewritten-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}.xml`, FILE_TYPE.TEMPORARY);
+    if (fs.existsSync(chunkFile)) {
+      fs.unlinkSync(chunkFile);
+      deletedFiles.push(chunkFile);
     } else {
-      console.log(`❌ Validation failed for chapter ${chapterId} chunk ${chunkIndex}, retrying...`);
-      return processChunk(chapterId, chunkIndex, chunk, xmlCharacters, previousChunkOutput, allCharacterTagNames, attempt + 1);
+      break;
     }
-  } catch (e) {
-    console.error(`[chunk ${chunkIndex}] Error:`, e);
-    return processChunk(chapterId, chunkIndex, chunk, xmlCharacters, previousChunkOutput, allCharacterTagNames, attempt + 1);
-  }
-}
-
-async function processChunkedChapter(chapterId: number, paragraphs: Paragraph[], characters: Character[], allCharacterTagNames: string[]): Promise<string> {
-  const xmlCharacters = buildXmlCharacters(characters);
-  const chunks = chunkParagraphs(paragraphs);
-
-  console.log(`📦 Processing chapter ${chapterId} in ${chunks.length} chunks`);
-
-  const processedChunks: string[] = [];
-
-  for (let i = 0; i < chunks.length; i++) {
-    const chunk = chunks[i];
-    const previousChunkOutput = i > 0 ? processedChunks[i - 1] : null;
-
-    console.log(`📦 Processing chapter ${chapterId} chunk ${i + 1}/${chunks.length} (${chunk.tokenCount} tokens)`);
-
-    const result = await processChunk(chapterId, i, chunk, xmlCharacters, previousChunkOutput, allCharacterTagNames);
-    processedChunks.push(result);
   }
 
-  const combined = combineChunks(chapterId, processedChunks);
-  console.log(`✅ Chapter ${chapterId} complete (${chunks.length} chunks combined)`);
-  return combined;
-}
-
-async function processSingleChapter(chapterId: number, paragraphs: Paragraph[], characters: Character[], allCharacterTagNames: string[], attempt: number = 0): Promise<string> {
-  if (attempt > 0) {
-    await sleep(10000 * attempt * attempt);
-  }
-  if (attempt > 4) {
-    throw new Error(`Too many attempts for chapter ${chapterId}`);
-  }
-
-  const xmlCharacters = buildXmlCharacters(characters);
-  const paragraphsForPage = `<Chapter id="${chapterId}">${paragraphs.map((p) => `<${p.elementType}>${p.text.trim().replace(/"/g, "'")}</${p.elementType}>`).join("\n")}</Chapter>`;
-
-  const prompt = loadPromptTemplate("book");
-  const compiledPrompt = prompt.replace("{{paragraphs}}", paragraphsForPage).replace("{{characters}}", xmlCharacters);
-
-  const selectedProvider = llmProviders[attempt % llmProviders.length];
-  console.log(`Using provider: ${selectedProvider.name}`);
-
-  try {
-    const response = (await selectedProvider(compiledPrompt, undefined, 1)) as string;
-    const clearedResponse = response.replace(/```xml\n/, "").replace(/\n```$/, "");
-
-    let restored: string | undefined;
-    try {
-      restored = restoreOriginalText(paragraphsForPage, clearedResponse, allCharacterTagNames);
-    } catch (e) {
-      console.error(`Error restoring original text for chapter ${chapterId}:`, e);
-    }
-
-    if (restored && compareXmlTextContent(paragraphsForPage, restored)) {
-      console.log(`✅ Chapter ${chapterId} validated`);
-      return restored;
-    } else {
-      console.log(`❌ Validation failed for chapter ${chapterId}, retrying...`);
-      return processSingleChapter(chapterId, paragraphs, characters, allCharacterTagNames, attempt + 1);
-    }
-  } catch (e) {
-    console.error(`Error for chapter ${chapterId}:`, e);
-    return processSingleChapter(chapterId, paragraphs, characters, allCharacterTagNames, attempt + 1);
-  }
-}
-
-export async function rewriteParagraphsWithCharacterTags(chapterId: number, paragraphs: Paragraph[], characters: Character[]): Promise<string> {
-  const allCharacterTagNames = characters.map((c) => generateTagName(c.name, true)) as string[];
-
-  if (needsChunking(paragraphs)) {
-    console.log(`📦 Chapter ${chapterId} exceeds token limit, using chunked processing`);
-    return processChunkedChapter(chapterId, paragraphs, characters, allCharacterTagNames);
-  }
-
-  return processSingleChapter(chapterId, paragraphs, characters, allCharacterTagNames);
+  return deletedFiles;
 }
 
 export async function regenerateChapterFromConvex(bookPath: string, chapterNumber: number): Promise<{ success: boolean; error?: string; newXml?: string }> {
+  const slug = bookPath.replace(/^books\//, "");
+
   console.log(`[regenerateChapterFromConvex] Starting for ${bookPath} chapter ${chapterNumber}`);
 
   const chapterXml = await getChapterXml(bookPath, chapterNumber);
@@ -204,31 +69,52 @@ export async function regenerateChapterFromConvex(bookPath: string, chapterNumbe
   }
   console.log(`[regenerateChapterFromConvex] Fetched chapter XML (${chapterXml.length} chars)`);
 
-  const strippedXml = stripCharacterTags(chapterXml);
-  const { paragraphs, chapterId } = parseXmlToParagraphs(strippedXml);
-  console.log(`[regenerateChapterFromConvex] Parsed ${paragraphs.length} paragraphs from chapter ${chapterId}`);
-
-  if (paragraphs.length === 0) {
-    return { success: false, error: "No paragraphs found in chapter XML" };
-  }
-
   const characterCards = await getCharacterReferenceCards(bookPath);
   if (characterCards.length === 0) {
     return { success: false, error: "No character reference cards found in Convex" };
   }
   console.log(`[regenerateChapterFromConvex] Found ${characterCards.length} character reference cards`);
 
-  const characters: Character[] = characterCards.map((c) => ({ name: c.name, summary: c.summary }));
+  const repoRoot = getRepoRoot();
+  process.chdir(repoRoot);
 
-  let newXml: string;
+  ensureBookDataDir(slug);
+  setBookArg(slug);
+
+  const strippedXml = stripCharacterTags(chapterXml);
+  const { paragraphs } = parseXmlToParagraphs(strippedXml);
+  console.log(`[regenerateChapterFromConvex] Parsed ${paragraphs.length} paragraphs`);
+
+  const richXmlContent = `<Book>\n${strippedXml}\n</Book>`;
+  writeBookFile("rich.xml", richXmlContent, FILE_TYPE.INPUT);
+  console.log(`[regenerateChapterFromConvex] Wrote rich.xml to input folder`);
+
+  const referenceCardsJson = { characters: characterCards.map((c) => ({ name: c.name, referenceCard: c.summary })) };
+  writeBookFile("single-summary-per-person.json", JSON.stringify(referenceCardsJson, null, 2), FILE_TYPE.PERMANENT);
+  console.log(`[regenerateChapterFromConvex] Wrote reference cards JSON`);
+
+  const deletedFiles = deleteExistingChapterFiles(chapterNumber);
+  console.log(`[regenerateChapterFromConvex] Deleted ${deletedFiles.length} existing chapter files`);
+
+  const charactersForChapter = characterCards.map((c) => ({ name: c.name, summary: c.summary }));
+
   try {
-    newXml = await rewriteParagraphsWithCharacterTags(chapterId, paragraphs, characters);
+    await identifyAndRewriteParagraphs(chapterNumber, charactersForChapter);
+    console.log(`[regenerateChapterFromConvex] ✅ identifyAndRewriteParagraphs completed`);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return { success: false, error: `LLM processing failed: ${msg}` };
   }
 
-  console.log(`[regenerateChapterFromConvex] Uploading new XML to Convex...`);
+  const outputFileName = `rewritten-paragraphs-for-chapter-${chapterNumber}.xml`;
+  if (!doesBookFileExist(outputFileName, FILE_TYPE.TEMPORARY)) {
+    return { success: false, error: "Output file was not created" };
+  }
+
+  const newXml = readBookFile(outputFileName, FILE_TYPE.TEMPORARY);
+  console.log(`[regenerateChapterFromConvex] Read output (${newXml.length} chars)`);
+
+  console.log(`[regenerateChapterFromConvex] Uploading to Convex...`);
   try {
     await convex.uploadFile({
       folderPath: `${bookPath}/chapters`,
@@ -252,7 +138,7 @@ if (require.main === module) {
 
   if (args.length < 2) {
     console.log("Usage: tsx regenerate-chapter-from-convex.ts <book-path> <chapter-number>");
-    console.log("Example: tsx regenerate-chapter-from-convex.ts books/1766836328269-the-king-in-yellow 3");
+    console.log("Example: tsx regenerate-chapter-from-convex.ts books/1766836328269-the-king-in-yellow 1");
     process.exit(1);
   }
 
