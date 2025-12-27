@@ -110,6 +110,7 @@ export const generateBackgrounds = async () => {
       Do not include any plot details, any information about people in the scene, nothing about whats happening.
       Do not include any characters in the scene.
       Do not make it overly detailed. Make it generic, backgroundy, paintely, possibly abstract, atmospheric.
+      Describe only ONE scene, if the chapter has multiple scenes, describe the first one.
       Reply with a 2-3 sentences per scene. 
       Chapter Text: <chapter>${chapter.content}</chapter>
 

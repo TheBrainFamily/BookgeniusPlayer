@@ -75,7 +75,8 @@ export const callGeminiWithThinking = async (prompt: string) => {
       timeout: 15 * 60 * 1000, // 15 minutes in milliseconds
     },
   };
-  const model = "gemini-3-flash-preview";
+  // const model = "gemini-3-flash-preview";
+  const model = "gemini-3-pro-preview";
 
   const contents = [{ role: "user", parts: [{ text: prompt }] }];
   const safetySettings = [

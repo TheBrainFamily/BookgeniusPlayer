@@ -17,7 +17,7 @@ const callClaudeWithStreamAndThinking = async (prompt: string, thinkingTokens: n
     let result = "";
     try {
       const stream = anthropic.messages.stream({
-        model: "claude-sonnet-4-5-20250929",
+        model: "claude-opus-4-5-20251101",
         max_tokens: 40000,
         temperature: 1,
         messages: [{ role: "user", content: [{ type: "text", text: prompt }] }],

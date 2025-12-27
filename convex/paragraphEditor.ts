@@ -270,7 +270,7 @@ export const setParagraphSpeaker = action({
     // await requireAuth(ctx);
 
     const chaptersPath = `${bookPath}/chapters`;
-    const chapterBasename = `chapter${chapterNumber}.xml`;
+    const chapterBasename = `chapter-${chapterNumber}.xml`;
 
     const asset = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
       folderPath: chaptersPath,

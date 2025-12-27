@@ -22,7 +22,7 @@ export const callSonnet45 = async <T = string>(prompt: string[], schema?: z.ZodS
       const chatCompletion = await generateObject({
         // model: google("gemini-3-pro-preview"),
         // model: openai("gpt-5"),
-        model: anthropic("claude-sonnet-4-5-20250929"),
+        model: anthropic("claude-opus-4-5-20251101"),
         messages: prompt.map((p) => ({ role: "user", content: [{ type: "text", text: p }] })),
         // @ts-expect-error(weird zod typing)
         schema: schema,

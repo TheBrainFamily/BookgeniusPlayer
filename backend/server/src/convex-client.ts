@@ -96,4 +96,43 @@ export const convex = {
   },
 };
 
+export interface CharacterReferenceCard {
+  name: string;
+  slug: string;
+  summary: string;
+}
+
+export async function getChapterXml(bookPath: string, chapterNumber: number): Promise<string | null> {
+  const versions = await client.query(api.cli.getAssetVersions, { folderPath: `${bookPath}/chapters`, basename: `chapter-${chapterNumber}.xml` });
+
+  if (!versions || versions.length === 0) {
+    return null;
+  }
+
+  const publishedVersion = versions.find((v) => v.publishedAt != null);
+  if (!publishedVersion) {
+    return null;
+  }
+
+  const result = await client.action(api.cli.getTextContent, { versionId: publishedVersion._id });
+
+  return result?.content ?? null;
+}
+
+export async function getCharacterReferenceCards(bookPath: string): Promise<CharacterReferenceCard[]> {
+  const folders = await client.query(api.cli.listFolders, { parentPath: `${bookPath}/characters` });
+
+  if (!folders || folders.length === 0) {
+    return [];
+  }
+
+  return folders
+    .filter((f) => f.extra?.summary)
+    .map((f) => {
+      const pathParts = f.path.split("/");
+      const slug = pathParts[pathParts.length - 1];
+      return { name: f.name || slug || "Unknown", slug: slug || f.name || "unknown", summary: (f.extra as { summary?: string })?.summary || "" };
+    });
+}
+
 export { client as convexClient };

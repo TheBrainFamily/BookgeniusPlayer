@@ -111,7 +111,7 @@ async function processChunk(
   const compiledPrompt = buildChunkedPrompt(chunk.paragraphs, chapter, xmlCharacters, previousChunkOutput);
   writeBookFile(`compiled-prompt-for-chapter-${chapter}-chunk-${chunkIndex}.md`, compiledPrompt);
 
-  const llmProviders = [callGeminiWrapper, callGrok, callClaude, callGpt5];
+  const llmProviders = [callClaude, callGeminiWrapper, callGpt5, callGrok];
 
   try {
     const selectedProvider = llmProviders[attempt % llmProviders.length];
