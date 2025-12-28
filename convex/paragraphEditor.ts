@@ -1,33 +1,12 @@
 import { v } from "convex/values";
 import { action, ActionCtx } from "./_generated/server";
 import { components, internal } from "./_generated/api";
-import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
-import type {
-  Element as XmlDomElement,
-  Document as XmlDomDocument,
-  Node as XmlDomNode,
-} from "@xmldom/xmldom";
+import { DOMParser, XMLSerializer, Document as XmlDocument, Element as XmlElement, Node as XmlNode } from "@xmldom/xmldom";
 
 function slugify(name: string): string {
   const polishMap: { [key: string]: string } = {
-    ą: "a",
-    ć: "c",
-    ę: "e",
-    ł: "l",
-    ń: "n",
-    ó: "o",
-    ś: "s",
-    ź: "z",
-    ż: "z",
-    Ą: "A",
-    Ć: "C",
-    Ę: "E",
-    Ł: "L",
-    Ń: "N",
-    Ó: "O",
-    Ś: "S",
-    Ź: "Z",
-    Ż: "Z",
+    ą: "a", ć: "c", ę: "e", ł: "l", ń: "n", ó: "o", ś: "s", ź: "z", ż: "z",
+    Ą: "A", Ć: "C", Ę: "E", Ł: "L", Ń: "N", Ó: "O", Ś: "S", Ź: "Z", Ż: "Z",
   };
   let tagName = name
     .replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g, (char) => polishMap[char] || char)
@@ -43,182 +22,75 @@ function slugify(name: string): string {
 
 type ChapterExtra = { chapterNumber?: number; title?: string };
 
-function findElementByDataIndex(chapter: XmlDomElement, targetIndex: number): XmlDomElement | null {
-  const childNodes = chapter.childNodes;
-  let currentIndex = 0;
-
-  for (let i = 0; i < childNodes.length; i++) {
-    const node = childNodes[i];
+function findParagraphByIndex(doc: XmlDocument, index: number): XmlElement | null {
+  const sections = doc.getElementsByTagName("section");
+  if (sections.length === 0) return null;
+  
+  const section = sections[0];
+  let elementIndex = 0;
+  
+  for (let i = 0; i < section.childNodes.length; i++) {
+    const node = section.childNodes[i];
     if (node.nodeType === 1) {
-      if (currentIndex === targetIndex) {
-        return node as XmlDomElement;
+      if (elementIndex === index) {
+        return node as XmlElement;
       }
-      currentIndex++;
+      elementIndex++;
     }
   }
-
   return null;
 }
 
-function findCharacterElement(
-  paragraph: XmlDomElement,
-  characterSlug: string,
-  textContent: string,
-): XmlDomElement | null {
-  const queue: XmlDomNode[] = [paragraph];
-
-  while (queue.length > 0) {
-    const node = queue.shift()!;
-    if (node.nodeType === 1) {
-      const element = node as XmlDomElement;
-      if (
-        element.tagName.toLowerCase() === characterSlug.toLowerCase() &&
-        (element.textContent || "").trim() === textContent.trim()
-      ) {
-        return element;
-      }
-      for (let i = 0; i < element.childNodes.length; i++) {
-        queue.push(element.childNodes[i]);
-      }
+function findSpanByDataC(parent: XmlElement, slug: string, text: string): XmlElement | null {
+  const spans = parent.getElementsByTagName("span");
+  for (let i = 0; i < spans.length; i++) {
+    const span = spans[i];
+    if (span.getAttribute("data-c") === slug && (span.textContent || "").trim() === text.trim()) {
+      return span;
     }
   }
-
   return null;
 }
 
-function replaceCharacterTag(
-  doc: XmlDomDocument,
-  oldElement: XmlDomElement,
-  newCharacterSlug: string,
-): void {
-  const newElement = doc.createElement(newCharacterSlug);
-
-  for (let i = 0; i < oldElement.attributes.length; i++) {
-    const attr = oldElement.attributes[i];
-    newElement.setAttribute(attr.name, attr.value);
-  }
-
-  while (oldElement.firstChild) {
-    newElement.appendChild(oldElement.firstChild);
-  }
-
-  oldElement.parentNode?.replaceChild(newElement, oldElement);
-}
-
-function removeCharacterTag(oldElement: XmlDomElement): void {
-  const parent = oldElement.parentNode;
-  if (!parent) return;
-
-  while (oldElement.firstChild) {
-    parent.insertBefore(oldElement.firstChild, oldElement);
-  }
-  parent.removeChild(oldElement);
-}
-
-function findTextNodeWithOccurrence(
-  paragraph: XmlDomElement,
-  searchText: string,
-  occurrenceIndex: number,
-): { textNode: XmlDomNode; startOffset: number } | null {
+function findTextNode(parent: XmlElement, searchText: string, occurrenceIndex: number): { node: XmlNode; offset: number } | null {
   let currentOccurrence = 0;
-  let accumulatedText = "";
-
-  const walkTextNodes = (
-    node: XmlDomNode,
-  ): { textNode: XmlDomNode; startOffset: number } | null => {
+  
+  function walk(node: XmlNode): { node: XmlNode; offset: number } | null {
     if (node.nodeType === 3) {
-      const textContent = node.nodeValue || "";
+      const text = node.nodeValue || "";
       let searchStart = 0;
-
       while (true) {
-        const localIndex = textContent.indexOf(searchText, searchStart);
-        if (localIndex === -1) break;
-
+        const idx = text.indexOf(searchText, searchStart);
+        if (idx === -1) break;
         if (currentOccurrence === occurrenceIndex) {
-          return { textNode: node, startOffset: localIndex };
+          return { node, offset: idx };
         }
         currentOccurrence++;
-        searchStart = localIndex + 1;
+        searchStart = idx + 1;
       }
-      accumulatedText += textContent;
     } else if (node.nodeType === 1) {
       for (let i = 0; i < node.childNodes.length; i++) {
-        const result = walkTextNodes(node.childNodes[i]);
+        const result = walk(node.childNodes[i]);
         if (result) return result;
       }
     }
     return null;
-  };
-
-  return walkTextNodes(paragraph);
+  }
+  
+  return walk(parent);
 }
 
-function wrapTextInNode(
-  doc: XmlDomDocument,
-  textNode: XmlDomNode,
-  startOffset: number,
-  textToWrap: string,
-  characterSlug: string,
-): void {
-  const parent = textNode.parentNode;
-  if (!parent) return;
-
-  const originalText = textNode.nodeValue || "";
-  const beforeText = originalText.substring(0, startOffset);
-  const afterText = originalText.substring(startOffset + textToWrap.length);
-
-  const wrapperElement = doc.createElement(characterSlug);
-  wrapperElement.appendChild(doc.createTextNode(textToWrap));
-
-  if (beforeText) {
-    parent.insertBefore(doc.createTextNode(beforeText), textNode);
-  }
-  parent.insertBefore(wrapperElement, textNode);
-  if (afterText) {
-    parent.insertBefore(doc.createTextNode(afterText), textNode);
-  }
-  parent.removeChild(textNode);
-}
-
-function removeExistingTalkingElement(paragraph: XmlDomElement): void {
-  const childNodes = paragraph.childNodes;
-  for (let i = 0; i < childNodes.length; i++) {
-    const node = childNodes[i];
-    if (node.nodeType === 1) {
-      const element = node as XmlDomElement;
-      if (element.getAttribute("talking") === "true") {
-        paragraph.removeChild(element);
-        return;
-      }
-    }
-  }
-}
-
-function insertTalkingElement(
-  doc: XmlDomDocument,
-  paragraph: XmlDomElement,
-  characterSlug: string,
-): void {
-  removeExistingTalkingElement(paragraph);
-
-  const talkingElement = doc.createElement(characterSlug);
-  talkingElement.setAttribute("talking", "true");
-
-  if (paragraph.firstChild) {
-    paragraph.insertBefore(talkingElement, paragraph.firstChild);
-  } else {
-    paragraph.appendChild(talkingElement);
-  }
-}
-
-async function uploadAndPublishXml(
+async function uploadAndPublishContent(
   ctx: ActionCtx,
   folderPath: string,
   basename: string,
   content: string,
+  contentType: string,
   label: string,
   extra: ChapterExtra,
 ): Promise<{ versionId: string }> {
+  console.log("[upload] to:", folderPath, basename, "length:", content.length);
+
   const uploadIntent = await ctx.runMutation(internal.generateUploadUrl.startUploadInternal, {
     folderPath,
     basename,
@@ -228,12 +100,16 @@ async function uploadAndPublishXml(
     extra,
   });
 
+  console.log("[upload] intent:", uploadIntent.intentId, "backend:", uploadIntent.backend);
+
   const encoded = new TextEncoder().encode(content);
   const response = await fetch(uploadIntent.uploadUrl, {
     method: uploadIntent.backend === "r2" ? "PUT" : "POST",
-    headers: { "Content-Type": "application/xml" },
+    headers: { "Content-Type": contentType },
     body: encoded,
   });
+
+  console.log("[upload] response:", response.status);
 
   if (!response.ok) {
     throw new Error(`Upload failed: ${response.status}`);
@@ -245,9 +121,10 @@ async function uploadAndPublishXml(
     intentId: uploadIntent.intentId,
     uploadResponse,
     size: encoded.byteLength,
-    contentType: "application/xml",
+    contentType,
   });
 
+  console.log("[upload] done, versionId:", finishResult.versionId);
   return { versionId: finishResult.versionId };
 }
 
@@ -265,12 +142,10 @@ export const setParagraphSpeaker = action({
     characterSlug: v.union(v.string(), v.null()),
   }),
   handler: async (ctx, { bookPath, chapterNumber, paragraphIndex, characterSlug }) => {
-    // TODO: Add auth check here when ready
-    // import { requireAuth } from "./authHelpers";
-    // await requireAuth(ctx);
+    const chaptersPath = `${bookPath}/chapters-source`;
+    const chapterBasename = `chapter-${chapterNumber}.html`;
 
-    const chaptersPath = `${bookPath}/chapters`;
-    const chapterBasename = `chapter-${chapterNumber}.xml`;
+    console.log("[setParagraphSpeaker] path:", chaptersPath, chapterBasename, "index:", paragraphIndex);
 
     const asset = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
       folderPath: chaptersPath,
@@ -291,65 +166,58 @@ export const setParagraphSpeaker = action({
       throw new Error(`No published version for chapter: ${chapterBasename}`);
     }
 
-    const xmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
+    const htmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
       versionId: publishedVersion._id,
     });
 
-    if (!xmlResult?.content) {
-      throw new Error(`Failed to fetch XML content for ${chapterBasename}`);
+    if (!htmlResult?.content) {
+      throw new Error(`Failed to fetch HTML content for ${chapterBasename}`);
     }
+
+    console.log("[setParagraphSpeaker] HTML length:", htmlResult.content.length);
 
     const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xmlResult.content, "text/xml");
-
-    const parseError = xmlDoc.getElementsByTagName("parsererror")[0];
-    if (parseError) {
-      throw new Error(`XML parse error: ${parseError.textContent || "unknown error"}`);
-    }
-
-    const chapter = xmlDoc.getElementsByTagName("Chapter")[0] as XmlDomElement;
-    if (!chapter) {
-      throw new Error("Chapter element not found in XML");
-    }
-
-    const paragraph = findElementByDataIndex(chapter, paragraphIndex);
+    const doc = parser.parseFromString(htmlResult.content, "text/xml");
+    
+    const paragraph = findParagraphByIndex(doc, paragraphIndex);
+    console.log("[setParagraphSpeaker] found paragraph:", !!paragraph, "tagName:", paragraph?.tagName);
+    
     if (!paragraph) {
       throw new Error(`Paragraph at index ${paragraphIndex} not found`);
     }
 
+    console.log("[setParagraphSpeaker] before:", paragraph.getAttribute("data-speaker"));
+
     if (characterSlug) {
-      insertTalkingElement(xmlDoc, paragraph, characterSlug);
+      paragraph.setAttribute("data-speaker", characterSlug);
     } else {
-      removeExistingTalkingElement(paragraph);
+      paragraph.removeAttribute("data-speaker");
     }
 
+    console.log("[setParagraphSpeaker] after:", paragraph.getAttribute("data-speaker"));
+
     const serializer = new XMLSerializer();
-    const modifiedXml = serializer.serializeToString(xmlDoc);
+    const modifiedHtml = serializer.serializeToString(doc);
+    
+    console.log("[setParagraphSpeaker] modified length:", modifiedHtml.length);
 
     const versionExtra = (publishedVersion?.extra ?? {}) as ChapterExtra;
     const label = characterSlug ? `Set speaker: ${characterSlug}` : "Removed speaker";
 
-    const uploadResult = await uploadAndPublishXml(
+    const uploadResult = await uploadAndPublishContent(
       ctx,
       chaptersPath,
       chapterBasename,
-      modifiedXml,
+      modifiedHtml,
+      "text/html",
       label,
       versionExtra,
     );
 
-    await ctx.scheduler.runAfter(0, internal.chapterCompiler.processPublishedChapter, {
-      bookPath,
-      chapterBasename,
-      versionId: uploadResult.versionId,
-    });
-
-    const actionType = characterSlug ? ("set" as const) : ("removed" as const);
-
     return {
       success: true,
       versionId: uploadResult.versionId,
-      action: actionType,
+      action: characterSlug ? "set" as const : "removed" as const,
       characterSlug: characterSlug || null,
     };
   },
@@ -370,21 +238,9 @@ export const modifyCharacterTag = action({
     action: v.union(v.literal("changed"), v.literal("removed")),
     newCharacterSlug: v.union(v.string(), v.null()),
   }),
-  handler: async (
-    ctx,
-    {
-      bookPath,
-      chapterNumber,
-      paragraphIndex,
-      currentCharacterSlug,
-      textContent,
-      newCharacterSlug,
-    },
-  ) => {
-    // TODO: Add auth check here when ready
-
-    const chaptersPath = `${bookPath}/chapters`;
-    const chapterBasename = `chapter${chapterNumber}.xml`;
+  handler: async (ctx, { bookPath, chapterNumber, paragraphIndex, currentCharacterSlug, textContent, newCharacterSlug }) => {
+    const chaptersPath = `${bookPath}/chapters-source`;
+    const chapterBasename = `chapter-${chapterNumber}.html`;
 
     const asset = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
       folderPath: chaptersPath,
@@ -405,74 +261,59 @@ export const modifyCharacterTag = action({
       throw new Error(`No published version for chapter: ${chapterBasename}`);
     }
 
-    const xmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
+    const htmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
       versionId: publishedVersion._id,
     });
 
-    if (!xmlResult?.content) {
-      throw new Error(`Failed to fetch XML content for ${chapterBasename}`);
+    if (!htmlResult?.content) {
+      throw new Error(`Failed to fetch HTML content for ${chapterBasename}`);
     }
 
     const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xmlResult.content, "text/xml");
-
-    const parseError = xmlDoc.getElementsByTagName("parsererror")[0];
-    if (parseError) {
-      throw new Error(`XML parse error: ${parseError.textContent || "unknown error"}`);
-    }
-
-    const chapter = xmlDoc.getElementsByTagName("Chapter")[0] as XmlDomElement;
-    if (!chapter) {
-      throw new Error("Chapter element not found in XML");
-    }
-
-    const paragraph = findElementByDataIndex(chapter, paragraphIndex);
+    const doc = parser.parseFromString(htmlResult.content, "text/xml");
+    
+    const paragraph = findParagraphByIndex(doc, paragraphIndex);
     if (!paragraph) {
       throw new Error(`Paragraph at index ${paragraphIndex} not found`);
     }
 
-    const characterElement = findCharacterElement(paragraph, currentCharacterSlug, textContent);
-    if (!characterElement) {
-      throw new Error(
-        `Character element "${currentCharacterSlug}" with text "${textContent}" not found in paragraph`,
-      );
+    const charSpan = findSpanByDataC(paragraph, currentCharacterSlug, textContent);
+    if (!charSpan) {
+      throw new Error(`Character "${currentCharacterSlug}" with text "${textContent}" not found`);
     }
 
     if (newCharacterSlug) {
-      replaceCharacterTag(xmlDoc, characterElement, newCharacterSlug);
+      charSpan.setAttribute("data-c", newCharacterSlug);
     } else {
-      removeCharacterTag(characterElement);
+      const parent = charSpan.parentNode;
+      if (parent) {
+        const textNode = doc.createTextNode(textContent);
+        parent.replaceChild(textNode, charSpan);
+      }
     }
 
     const serializer = new XMLSerializer();
-    const modifiedXml = serializer.serializeToString(xmlDoc);
+    const modifiedHtml = serializer.serializeToString(doc);
 
     const versionExtra = (publishedVersion?.extra ?? {}) as ChapterExtra;
     const label = newCharacterSlug
       ? `Changed character: ${currentCharacterSlug} → ${newCharacterSlug}`
       : `Removed character tag: ${currentCharacterSlug}`;
 
-    const uploadResult = await uploadAndPublishXml(
+    const uploadResult = await uploadAndPublishContent(
       ctx,
       chaptersPath,
       chapterBasename,
-      modifiedXml,
+      modifiedHtml,
+      "text/html",
       label,
       versionExtra,
     );
 
-    await ctx.scheduler.runAfter(0, internal.chapterCompiler.processPublishedChapter, {
-      bookPath,
-      chapterBasename,
-      versionId: uploadResult.versionId,
-    });
-
-    const actionType = newCharacterSlug ? ("changed" as const) : ("removed" as const);
-
     return {
       success: true,
       versionId: uploadResult.versionId,
-      action: actionType,
+      action: newCharacterSlug ? "changed" as const : "removed" as const,
       newCharacterSlug: newCharacterSlug || null,
     };
   },
@@ -488,12 +329,11 @@ export const wrapTextWithCharacter = action({
     characterSlug: v.string(),
   },
   returns: v.object({ success: v.boolean(), versionId: v.string(), characterSlug: v.string() }),
-  handler: async (
-    ctx,
-    { bookPath, chapterNumber, paragraphIndex, textToWrap, occurrenceIndex, characterSlug },
-  ) => {
-    const chaptersPath = `${bookPath}/chapters`;
-    const chapterBasename = `chapter${chapterNumber}.xml`;
+  handler: async (ctx, { bookPath, chapterNumber, paragraphIndex, textToWrap, occurrenceIndex, characterSlug }) => {
+    const chaptersPath = `${bookPath}/chapters-source`;
+    const chapterBasename = `chapter-${chapterNumber}.html`;
+
+    console.log("[wrapText] looking for:", textToWrap, "occurrence:", occurrenceIndex, "in paragraph:", paragraphIndex);
 
     const asset = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
       folderPath: chaptersPath,
@@ -514,67 +354,59 @@ export const wrapTextWithCharacter = action({
       throw new Error(`No published version for chapter: ${chapterBasename}`);
     }
 
-    const xmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
+    const htmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
       versionId: publishedVersion._id,
     });
 
-    if (!xmlResult?.content) {
-      throw new Error(`Failed to fetch XML content for ${chapterBasename}`);
+    if (!htmlResult?.content) {
+      throw new Error(`Failed to fetch HTML content for ${chapterBasename}`);
     }
 
     const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xmlResult.content, "text/xml");
-
-    const parseError = xmlDoc.getElementsByTagName("parsererror")[0];
-    if (parseError) {
-      throw new Error(`XML parse error: ${parseError.textContent || "unknown error"}`);
-    }
-
-    const chapter = xmlDoc.getElementsByTagName("Chapter")[0] as XmlDomElement;
-    if (!chapter) {
-      throw new Error("Chapter element not found in XML");
-    }
-
-    const paragraph = findElementByDataIndex(chapter, paragraphIndex);
+    const doc = parser.parseFromString(htmlResult.content, "text/xml");
+    
+    const paragraph = findParagraphByIndex(doc, paragraphIndex);
     if (!paragraph) {
       throw new Error(`Paragraph at index ${paragraphIndex} not found`);
     }
 
-    const textLocation = findTextNodeWithOccurrence(paragraph, textToWrap, occurrenceIndex);
+    const textLocation = findTextNode(paragraph, textToWrap, occurrenceIndex);
     if (!textLocation) {
-      throw new Error(
-        `Text "${textToWrap}" (occurrence ${occurrenceIndex}) not found in paragraph`,
-      );
+      throw new Error(`Text "${textToWrap}" (occurrence ${occurrenceIndex}) not found`);
     }
 
-    wrapTextInNode(
-      xmlDoc,
-      textLocation.textNode,
-      textLocation.startOffset,
-      textToWrap,
-      characterSlug,
-    );
+    const { node: textNode, offset } = textLocation;
+    const originalText = textNode.nodeValue || "";
+    const before = originalText.substring(0, offset);
+    const after = originalText.substring(offset + textToWrap.length);
+
+    const wrapper = doc.createElement("span");
+    wrapper.setAttribute("data-c", characterSlug);
+    wrapper.appendChild(doc.createTextNode(textToWrap));
+
+    const parent = textNode.parentNode!;
+    if (before) parent.insertBefore(doc.createTextNode(before), textNode);
+    parent.insertBefore(wrapper, textNode);
+    if (after) parent.insertBefore(doc.createTextNode(after), textNode);
+    parent.removeChild(textNode);
 
     const serializer = new XMLSerializer();
-    const modifiedXml = serializer.serializeToString(xmlDoc);
+    const modifiedHtml = serializer.serializeToString(doc);
+    
+    console.log("[wrapText] modified contains data-c?:", modifiedHtml.includes(`data-c="${characterSlug}"`));
 
     const versionExtra = (publishedVersion?.extra ?? {}) as ChapterExtra;
     const label = `Wrapped text with character: ${characterSlug}`;
 
-    const uploadResult = await uploadAndPublishXml(
+    const uploadResult = await uploadAndPublishContent(
       ctx,
       chaptersPath,
       chapterBasename,
-      modifiedXml,
+      modifiedHtml,
+      "text/html",
       label,
       versionExtra,
     );
-
-    await ctx.scheduler.runAfter(0, internal.chapterCompiler.processPublishedChapter, {
-      bookPath,
-      chapterBasename,
-      versionId: uploadResult.versionId,
-    });
 
     return { success: true, versionId: uploadResult.versionId, characterSlug };
   },

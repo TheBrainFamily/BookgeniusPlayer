@@ -75,8 +75,8 @@ export const generateCharacterPrompt = internalAction({
         return { success: true, aiPrompt };
       }
 
-      const chaptersPath = `${bookPath}/chapters`;
-      const chapterBasename = `chapter${chapterNumber}.xml`;
+      const chaptersPath = `${bookPath}/chapters-source`;
+      const chapterBasename = `chapter-${chapterNumber}.html`;
 
       const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
         folderPath: chaptersPath,
@@ -97,23 +97,23 @@ export const generateCharacterPrompt = internalAction({
 
       if (!xmlResult?.content) {
         console.error(
-          `[generateCharacterPrompt] Failed to fetch XML content for ${chapterBasename}`,
+          `[generateCharacterPrompt] Failed to fetch HTML content for ${chapterBasename}`,
         );
         return { success: false };
       }
 
       const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xmlResult.content, "text/xml");
+      const doc = parser.parseFromString(xmlResult.content, "text/xml");
 
-      const chapter = xmlDoc.getElementsByTagName("Chapter")[0] as XmlDomElement;
-      if (!chapter) {
-        console.error("[generateCharacterPrompt] Chapter element not found in XML");
+      const section = doc.getElementsByTagName("section")[0] as XmlDomElement;
+      if (!section) {
+        console.error("[generateCharacterPrompt] Section element not found in HTML");
         return { success: false };
       }
 
       const startIndex = Math.max(0, paragraphIndex - 10);
       const endIndex = paragraphIndex + 10;
-      const bookContext = getTextFromParagraphs(chapter, startIndex, endIndex);
+      const bookContext = getTextFromParagraphs(section, startIndex, endIndex);
 
       if (!bookContext.trim()) {
         console.error("[generateCharacterPrompt] No context extracted from paragraphs");
