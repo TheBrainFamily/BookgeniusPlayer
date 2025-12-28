@@ -135,4 +135,43 @@ export async function getCharacterReferenceCards(bookPath: string): Promise<Char
     });
 }
 
+export interface CharacterFolder {
+  path: string;
+  slug: string;
+  displayName: string;
+  summary: string;
+  aiPrompt?: string;
+  avatarGenerationState?: "generating" | "ready" | "error" | "none";
+}
+
+export async function getCharacterFolders(bookPath: string): Promise<CharacterFolder[]> {
+  const folders = await client.query(api.cli.listFolders, { parentPath: `${bookPath}/characters` });
+
+  if (!folders || folders.length === 0) {
+    return [];
+  }
+
+  return folders.map((f) => {
+    const pathParts = f.path.split("/");
+    const slug = pathParts[pathParts.length - 1];
+    const extra = f.extra as { displayName?: string; summary?: string; aiPrompt?: string; avatarGenerationState?: "generating" | "ready" | "error" | "none" } | undefined;
+    return {
+      path: f.path,
+      slug: slug || "",
+      displayName: extra?.displayName || f.name || slug || "Unknown",
+      summary: extra?.summary || "",
+      aiPrompt: extra?.aiPrompt,
+      avatarGenerationState: extra?.avatarGenerationState,
+    };
+  });
+}
+
+export async function getPublishedFilesInFolder(folderPath: string): Promise<{ basename: string; versionId: string }[]> {
+  return await client.query(api.cli.listPublishedFilesInFolder, { folderPath });
+}
+
+export async function updateCharacterFolder(args: { bookPath: string; characterSlug: string; displayName: string; summary?: string; aiPrompt?: string }) {
+  return await client.mutation(api.generator.ensureCharacterFolder, args);
+}
+
 export { client as convexClient };

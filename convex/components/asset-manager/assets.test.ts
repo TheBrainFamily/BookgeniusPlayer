@@ -55,10 +55,7 @@ describe("assets (logical layer)", () => {
   it("createAsset throws on duplicate (same folderPath + basename)", async () => {
     const t = convexTest(schema, modules);
 
-    await t.mutation(api.assetManager.createAsset, {
-      folderPath: "",
-      basename: "cover.jpg",
-    });
+    await t.mutation(api.assetManager.createAsset, { folderPath: "", basename: "cover.jpg" });
 
     await expect(
       t.mutation(api.assetManager.createAsset, {
@@ -110,10 +107,7 @@ describe("assets (logical layer)", () => {
     const t = convexTest(schema, modules);
 
     // Create asset
-    await t.mutation(api.assetManager.createAsset, {
-      folderPath: "",
-      basename: "test-draft.txt",
-    });
+    await t.mutation(api.assetManager.createAsset, { folderPath: "", basename: "test-draft.txt" });
 
     // Commit a draft version
     const result = await t.mutation(api.assetManager.commitVersion, {
@@ -137,20 +131,11 @@ describe("assets (logical layer)", () => {
     const t = convexTest(schema, modules);
 
     // root assets
-    await t.mutation(api.assetManager.createAsset, {
-      folderPath: "",
-      basename: "root-a.txt",
-    });
-    await t.mutation(api.assetManager.createAsset, {
-      folderPath: "",
-      basename: "root-b.txt",
-    });
+    await t.mutation(api.assetManager.createAsset, { folderPath: "", basename: "root-a.txt" });
+    await t.mutation(api.assetManager.createAsset, { folderPath: "", basename: "root-b.txt" });
 
     // kanban/backlog assets
-    await t.mutation(api.assetManager.createFolderByName, {
-      parentPath: "",
-      name: "Kanban",
-    });
+    await t.mutation(api.assetManager.createFolderByName, { parentPath: "", name: "Kanban" });
     await t.mutation(api.assetManager.createFolderByName, {
       parentPath: "kanban",
       name: "backlog",
@@ -172,15 +157,11 @@ describe("assets (logical layer)", () => {
       basename: "board-settings.json",
     });
 
-    const rootAssets = await t.query(api.assetManager.listAssets, {
-      folderPath: "",
-    });
+    const rootAssets = await t.query(api.assetManager.listAssets, { folderPath: "" });
     const backlogAssets = await t.query(api.assetManager.listAssets, {
       folderPath: "kanban/backlog",
     });
-    const kanbanAssets = await t.query(api.assetManager.listAssets, {
-      folderPath: "kanban",
-    });
+    const kanbanAssets = await t.query(api.assetManager.listAssets, { folderPath: "kanban" });
 
     const rootNames = rootAssets.map((a) => a.basename).sort();
     const backlogNames = backlogAssets.map((a) => a.basename).sort();
@@ -216,9 +197,7 @@ describe("assets (logical layer)", () => {
     });
 
     // List assets and verify publishedVersionId is included
-    const assets = await t.query(api.assetManager.listAssets, {
-      folderPath: "",
-    });
+    const assets = await t.query(api.assetManager.listAssets, { folderPath: "" });
 
     expect(assets).toHaveLength(1);
     const asset = assets[0];
@@ -250,9 +229,7 @@ describe("assets (logical layer)", () => {
     });
 
     // List assets and verify draftVersionId is included
-    const assets = await t.query(api.assetManager.listAssets, {
-      folderPath: "",
-    });
+    const assets = await t.query(api.assetManager.listAssets, { folderPath: "" });
 
     expect(assets).toHaveLength(1);
     const asset = assets[0];
@@ -268,9 +245,7 @@ describe("getFolderWithAssets", () => {
   it("returns null for non-existent folder", async () => {
     const t = convexTest(schema, modules);
 
-    const result = await t.query(api.assetManager.getFolderWithAssets, {
-      path: "non-existent",
-    });
+    const result = await t.query(api.assetManager.getFolderWithAssets, { path: "non-existent" });
 
     expect(result).toBeNull();
   });
@@ -278,9 +253,7 @@ describe("getFolderWithAssets", () => {
   it("returns null for empty path when no root folder exists", async () => {
     const t = convexTest(schema, modules);
 
-    const result = await t.query(api.assetManager.getFolderWithAssets, {
-      path: "",
-    });
+    const result = await t.query(api.assetManager.getFolderWithAssets, { path: "" });
 
     expect(result).toBeNull();
   });
@@ -288,13 +261,9 @@ describe("getFolderWithAssets", () => {
   it("returns folder with empty assets array when folder exists but has no assets", async () => {
     const t = convexTest(schema, modules);
 
-    await t.mutation(api.assetManager.createFolderByPath, {
-      path: "empty-folder",
-    });
+    await t.mutation(api.assetManager.createFolderByPath, { path: "empty-folder" });
 
-    const result = await t.query(api.assetManager.getFolderWithAssets, {
-      path: "empty-folder",
-    });
+    const result = await t.query(api.assetManager.getFolderWithAssets, { path: "empty-folder" });
 
     expect(result).not.toBeNull();
     expect(result!.folder.path).toBe("empty-folder");
@@ -322,9 +291,7 @@ describe("getFolderWithAssets", () => {
       extra: { type: "api-docs" },
     });
 
-    const result = await t.query(api.assetManager.getFolderWithAssets, {
-      path: "project/docs",
-    });
+    const result = await t.query(api.assetManager.getFolderWithAssets, { path: "project/docs" });
 
     expect(result).not.toBeNull();
     expect(result!.folder.path).toBe("project/docs");
@@ -345,9 +312,7 @@ describe("getFolderWithAssets", () => {
   it("normalizes folder path correctly", async () => {
     const t = convexTest(schema, modules);
 
-    await t.mutation(api.assetManager.createFolderByPath, {
-      path: "test/folder",
-    });
+    await t.mutation(api.assetManager.createFolderByPath, { path: "test/folder" });
 
     await t.mutation(api.assetManager.createAsset, {
       folderPath: "test/folder",
@@ -355,19 +320,13 @@ describe("getFolderWithAssets", () => {
     });
 
     // Test with trailing slash
-    const result1 = await t.query(api.assetManager.getFolderWithAssets, {
-      path: "test/folder/",
-    });
+    const result1 = await t.query(api.assetManager.getFolderWithAssets, { path: "test/folder/" });
 
     // Test with leading slash
-    const result2 = await t.query(api.assetManager.getFolderWithAssets, {
-      path: "/test/folder",
-    });
+    const result2 = await t.query(api.assetManager.getFolderWithAssets, { path: "/test/folder" });
 
     // Test with both
-    const result3 = await t.query(api.assetManager.getFolderWithAssets, {
-      path: "/test/folder/",
-    });
+    const result3 = await t.query(api.assetManager.getFolderWithAssets, { path: "/test/folder/" });
 
     expect(result1).not.toBeNull();
     expect(result2).not.toBeNull();
@@ -434,10 +393,7 @@ describe("renameAsset", () => {
   it("renames an asset's basename within the same folder", async () => {
     const t = convexTest(schema, modules);
 
-    await t.mutation(api.assetManager.createAsset, {
-      folderPath: "",
-      basename: "old-name.txt",
-    });
+    await t.mutation(api.assetManager.createAsset, { folderPath: "", basename: "old-name.txt" });
 
     await t.mutation(api.assetManager.renameAsset, {
       folderPath: "",
@@ -464,10 +420,7 @@ describe("renameAsset", () => {
   it("preserves asset versions and published state after rename", async () => {
     const t = convexTest(schema, modules);
 
-    await t.mutation(api.assetManager.createAsset, {
-      folderPath: "",
-      basename: "versioned.txt",
-    });
+    await t.mutation(api.assetManager.createAsset, { folderPath: "", basename: "versioned.txt" });
 
     // Commit a published version
     const result = await t.mutation(api.assetManager.commitVersion, {
@@ -501,46 +454,37 @@ describe("renameAsset", () => {
         folderPath: "",
         basename: "non-existent.txt",
         newBasename: "new-name.txt",
-      })
+      }),
     ).rejects.toThrow(/not found/i);
   });
 
   it("throws when new basename already exists in the same folder", async () => {
     const t = convexTest(schema, modules);
 
-    await t.mutation(api.assetManager.createAsset, {
-      folderPath: "",
-      basename: "file-a.txt",
-    });
+    await t.mutation(api.assetManager.createAsset, { folderPath: "", basename: "file-a.txt" });
 
-    await t.mutation(api.assetManager.createAsset, {
-      folderPath: "",
-      basename: "file-b.txt",
-    });
+    await t.mutation(api.assetManager.createAsset, { folderPath: "", basename: "file-b.txt" });
 
     await expect(
       t.mutation(api.assetManager.renameAsset, {
         folderPath: "",
         basename: "file-a.txt",
         newBasename: "file-b.txt",
-      })
+      }),
     ).rejects.toThrow(/already exists/i);
   });
 
   it("throws when new basename contains a slash", async () => {
     const t = convexTest(schema, modules);
 
-    await t.mutation(api.assetManager.createAsset, {
-      folderPath: "",
-      basename: "file.txt",
-    });
+    await t.mutation(api.assetManager.createAsset, { folderPath: "", basename: "file.txt" });
 
     await expect(
       t.mutation(api.assetManager.renameAsset, {
         folderPath: "",
         basename: "file.txt",
         newBasename: "folder/file.txt",
-      })
+      }),
     ).rejects.toThrow(/cannot contain/i);
   });
 
@@ -582,10 +526,7 @@ describe("renameAsset", () => {
   it("logs a rename event", async () => {
     const t = convexTest(schema, modules);
 
-    await t.mutation(api.assetManager.createAsset, {
-      folderPath: "docs",
-      basename: "readme.md",
-    });
+    await t.mutation(api.assetManager.createAsset, { folderPath: "docs", basename: "readme.md" });
 
     await t.mutation(api.assetManager.renameAsset, {
       folderPath: "docs",
@@ -607,9 +548,7 @@ describe("renameAsset", () => {
   it("allows renaming in nested folders", async () => {
     const t = convexTest(schema, modules);
 
-    await t.mutation(api.assetManager.createFolderByPath, {
-      path: "deep/nested/folder",
-    });
+    await t.mutation(api.assetManager.createFolderByPath, { path: "deep/nested/folder" });
 
     await t.mutation(api.assetManager.createAsset, {
       folderPath: "deep/nested/folder",
@@ -630,5 +569,211 @@ describe("renameAsset", () => {
     expect(asset).not.toBeNull();
     expect(asset?.folderPath).toBe("deep/nested/folder");
     expect(asset?.basename).toBe("new.txt");
+  });
+});
+
+describe("getR2KeysByPathPrefix", () => {
+  it("returns empty array when no assets exist", async () => {
+    const t = convexTest(schema, modules);
+
+    const keys = await t.query(api.assetManager.getR2KeysByPathPrefix, {
+      pathPrefix: "nonexistent/path",
+    });
+
+    expect(keys).toEqual([]);
+  });
+
+  it("returns r2Keys for assets in the path prefix", async () => {
+    const t = convexTest(schema, modules);
+
+    await t.mutation(api.assetManager.createFolderByPath, { path: "books/test-book" });
+
+    await t.run(async (ctx) => {
+      const assetId = await ctx.db.insert("assets", {
+        folderPath: "books/test-book",
+        basename: "chapter1.xml",
+        versionCounter: 1,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+
+      await ctx.db.insert("assetVersions", {
+        assetId,
+        version: 1,
+        state: "published",
+        r2Key: "bookgenius/abc123/chapter1.xml",
+        createdAt: Date.now(),
+      });
+    });
+
+    const keys = await t.query(api.assetManager.getR2KeysByPathPrefix, {
+      pathPrefix: "books/test-book",
+    });
+
+    expect(keys).toEqual(["bookgenius/abc123/chapter1.xml"]);
+  });
+
+  it("returns keys from nested folders", async () => {
+    const t = convexTest(schema, modules);
+
+    await t.mutation(api.assetManager.createFolderByPath, { path: "books/test-book" });
+    await t.mutation(api.assetManager.createFolderByPath, { path: "books/test-book/characters" });
+
+    await t.run(async (ctx) => {
+      const assetId = await ctx.db.insert("assets", {
+        folderPath: "books/test-book/characters",
+        basename: "avatar.png",
+        versionCounter: 1,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+
+      await ctx.db.insert("assetVersions", {
+        assetId,
+        version: 1,
+        state: "published",
+        r2Key: "bookgenius/def456/avatar.png",
+        createdAt: Date.now(),
+      });
+    });
+
+    const keys = await t.query(api.assetManager.getR2KeysByPathPrefix, {
+      pathPrefix: "books/test-book",
+    });
+
+    expect(keys).toEqual(["bookgenius/def456/avatar.png"]);
+  });
+});
+
+describe("deleteByPathPrefixBatch", () => {
+  it("deletes main folder and all child folders", async () => {
+    const t = convexTest(schema, modules);
+
+    await t.mutation(api.assetManager.createFolderByPath, { path: "books/test-book" });
+    await t.mutation(api.assetManager.createFolderByPath, { path: "books/test-book/chapters" });
+    await t.mutation(api.assetManager.createFolderByPath, { path: "books/test-book/characters" });
+
+    const result = await t.mutation(api.assetManager.deleteByPathPrefixBatch, {
+      pathPrefix: "books/test-book",
+    });
+
+    expect(result.deletedFolders).toBe(3);
+    expect(result.hasMore).toBe(false);
+
+    const mainFolder = await t.query(api.assetManager.getFolder, { path: "books/test-book" });
+    expect(mainFolder).toBeNull();
+
+    const chaptersFolder = await t.query(api.assetManager.getFolder, {
+      path: "books/test-book/chapters",
+    });
+    expect(chaptersFolder).toBeNull();
+  });
+
+  it("deletes assets and their versions", async () => {
+    const t = convexTest(schema, modules);
+
+    await t.mutation(api.assetManager.createFolderByPath, { path: "books/test-book" });
+    await t.mutation(api.assetManager.createAsset, {
+      folderPath: "books/test-book",
+      basename: "cover.jpg",
+    });
+    await t.mutation(api.assetManager.commitVersion, {
+      folderPath: "books/test-book",
+      basename: "cover.jpg",
+      publish: true,
+    });
+
+    const result = await t.mutation(api.assetManager.deleteByPathPrefixBatch, {
+      pathPrefix: "books/test-book",
+    });
+
+    expect(result.deletedAssets).toBe(1);
+    expect(result.deletedVersions).toBe(1);
+    expect(result.deletedFolders).toBe(1);
+
+    const asset = await t.query(api.assetManager.getAsset, {
+      folderPath: "books/test-book",
+      basename: "cover.jpg",
+    });
+    expect(asset).toBeNull();
+  });
+
+  it("does not delete folders outside the prefix", async () => {
+    const t = convexTest(schema, modules);
+
+    await t.mutation(api.assetManager.createFolderByPath, { path: "books/book-a" });
+    await t.mutation(api.assetManager.createFolderByPath, { path: "books/book-b" });
+    await t.mutation(api.assetManager.createFolderByPath, { path: "other-folder" });
+
+    await t.mutation(api.assetManager.deleteByPathPrefixBatch, { pathPrefix: "books/book-a" });
+
+    const bookA = await t.query(api.assetManager.getFolder, { path: "books/book-a" });
+    expect(bookA).toBeNull();
+
+    const bookB = await t.query(api.assetManager.getFolder, { path: "books/book-b" });
+    expect(bookB).not.toBeNull();
+
+    const otherFolder = await t.query(api.assetManager.getFolder, { path: "other-folder" });
+    expect(otherFolder).not.toBeNull();
+  });
+
+  it("returns hasMore=true when batch limit is reached", async () => {
+    const t = convexTest(schema, modules);
+
+    await t.mutation(api.assetManager.createFolderByPath, { path: "books/big-book" });
+    for (let i = 0; i < 5; i++) {
+      await t.mutation(api.assetManager.createAsset, {
+        folderPath: "books/big-book",
+        basename: `file-${i}.txt`,
+      });
+    }
+
+    const result = await t.mutation(api.assetManager.deleteByPathPrefixBatch, {
+      pathPrefix: "books/big-book",
+      batchSize: 3,
+    });
+
+    expect(result.deletedAssets).toBe(3);
+    expect(result.hasMore).toBe(true);
+
+    const result2 = await t.mutation(api.assetManager.deleteByPathPrefixBatch, {
+      pathPrefix: "books/big-book",
+      batchSize: 3,
+    });
+
+    expect(result2.deletedAssets).toBe(2);
+    expect(result2.deletedFolders).toBe(1);
+    expect(result2.hasMore).toBe(false);
+  });
+
+  it("returns empty result when prefix does not exist", async () => {
+    const t = convexTest(schema, modules);
+
+    const result = await t.mutation(api.assetManager.deleteByPathPrefixBatch, {
+      pathPrefix: "nonexistent/path",
+    });
+
+    expect(result.deletedFolders).toBe(0);
+    expect(result.deletedAssets).toBe(0);
+    expect(result.deletedVersions).toBe(0);
+    expect(result.hasMore).toBe(false);
+  });
+
+  it("does not delete main folder twice (no duplicate error)", async () => {
+    const t = convexTest(schema, modules);
+
+    await t.mutation(api.assetManager.createFolderByPath, { path: "books/solo-book" });
+    await t.mutation(api.assetManager.createAsset, {
+      folderPath: "books/solo-book",
+      basename: "readme.txt",
+    });
+
+    const result = await t.mutation(api.assetManager.deleteByPathPrefixBatch, {
+      pathPrefix: "books/solo-book",
+    });
+
+    expect(result.deletedFolders).toBe(1);
+    expect(result.deletedAssets).toBe(1);
+    expect(result.hasMore).toBe(false);
   });
 });

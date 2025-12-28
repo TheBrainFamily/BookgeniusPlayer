@@ -6,6 +6,14 @@ import { useBookConvex } from "@player/context/BookConvexContext";
 import { getAvatarSource } from "@player/helpers/svgAvatars";
 import { useAvatarGenerationStore } from "@player/stores/avatarGeneration.store";
 
+const capitalizeWords = (str: string): string => {
+  return str
+    .trim()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
 interface EditorModeModalProps {
   onClose: () => void;
 }
@@ -58,12 +66,14 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
 
   useEffect(() => {
     if (currentSpeaker && modalType === "set-talking-character") {
-      setSelectedCharacter(currentSpeaker);
+      const matchingChar = sortedCharacters.find((c) => c.slug.toLowerCase() === currentSpeaker.toLowerCase());
+      setSelectedCharacter(matchingChar?.slug || currentSpeaker);
     }
     if (currentCharacterSlug && modalType === "edit-character-tag") {
-      setSelectedCharacter(currentCharacterSlug);
+      const matchingChar = sortedCharacters.find((c) => c.slug.toLowerCase() === currentCharacterSlug.toLowerCase());
+      setSelectedCharacter(matchingChar?.slug || currentCharacterSlug);
     }
-  }, [currentSpeaker, currentCharacterSlug, modalType]);
+  }, [currentSpeaker, currentCharacterSlug, modalType, sortedCharacters]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +103,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
   };
 
   const handleCreateAndUse = async () => {
-    const trimmedName = newCharacterName.trim();
+    const trimmedName = capitalizeWords(newCharacterName);
     if (!trimmedName) {
       setError("Please enter a character name");
       return;
@@ -160,6 +170,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
                   onClick={() => {
                     setActiveTab("new");
                     setSelectedCharacter(null);
+                    setNewCharacterName(capitalizeWords(searchQuery));
                     setSearchQuery("");
                     setError("");
                   }}
@@ -396,6 +407,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
                   onClick={() => {
                     setActiveTab("new");
                     setSelectedCharacter(null);
+                    setNewCharacterName(capitalizeWords(searchQuery));
                     setSearchQuery("");
                     setError("");
                   }}
@@ -559,6 +571,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
                   onClick={() => {
                     setActiveTab("new");
                     setSelectedCharacter(null);
+                    setNewCharacterName(capitalizeWords(searchQuery));
                     setSearchQuery("");
                     setError("");
                   }}

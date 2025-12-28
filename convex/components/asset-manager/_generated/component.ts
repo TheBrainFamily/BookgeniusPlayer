@@ -134,6 +134,20 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         { assetId: string; version: number; versionId: string },
         Name
       >;
+      deleteByPathPrefixBatch: FunctionReference<
+        "mutation",
+        "internal",
+        { batchSize?: number; pathPrefix: string },
+        {
+          deletedAssets: number;
+          deletedEvents: number;
+          deletedFolders: number;
+          deletedVersions: number;
+          hasMore: boolean;
+          r2KeysToDelete: Array<string>;
+        },
+        Name
+      >;
       deleteDataBatch: FunctionReference<
         "mutation",
         "internal",
@@ -292,6 +306,13 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         "internal",
         { basename: string; folderPath: string },
         any,
+        Name
+      >;
+      getR2KeysByPathPrefix: FunctionReference<
+        "query",
+        "internal",
+        { pathPrefix: string },
+        Array<string>,
         Name
       >;
       getStorageBackendConfig: FunctionReference<

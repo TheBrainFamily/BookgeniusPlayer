@@ -49,7 +49,7 @@ describe("folders: path-first + label-first APIs", () => {
     await expect(
       t.mutation(api.assetManager.createFolderByPath, {
         path: "",
-      }),
+      })
     ).rejects.toThrow(/cannot be empty/i);
   });
 
@@ -63,11 +63,11 @@ describe("folders: path-first + label-first APIs", () => {
 
     const folder = await t.query(api.assetManager.getFolder, {
       // structural path is slugified
-      path: "other-stuff",
+      path: "Other-Stuff",
     });
 
     expect(folder?._id).toEqual(id);
-    expect(folder?.path).toBe("other-stuff");
+    expect(folder?.path).toBe("Other-Stuff");
     // human-facing label is exactly what was passed
     expect(folder?.name).toBe("Other Stuff");
   });
@@ -82,17 +82,17 @@ describe("folders: path-first + label-first APIs", () => {
     });
 
     const qAndAId = await t.mutation(api.assetManager.createFolderByName, {
-      parentPath: "kanban",
+      parentPath: "Kanban",
       name: "Q&A",
     });
 
     const folder = await t.query(api.assetManager.getFolder, {
       // structural path uses slugified segment
-      path: "kanban/q-a",
+      path: "Kanban/QA",
     });
 
     expect(folder?._id).toEqual(qAndAId);
-    expect(folder?.path).toBe("kanban/q-a");
+    expect(folder?.path).toBe("Kanban/QA");
     expect(folder?.name).toBe("Q&A");
   });
 
@@ -108,7 +108,7 @@ describe("folders: path-first + label-first APIs", () => {
       t.mutation(api.assetManager.createFolderByName, {
         parentPath: "",
         name: "Kanban",
-      }),
+      })
     ).rejects.toThrow(/already exists/i);
   });
 
@@ -173,19 +173,19 @@ describe("folders: path-first + label-first APIs", () => {
     });
 
     const id1 = await t.mutation(api.assetManager.createFolderByName, {
-      parentPath: "kanban",
+      parentPath: "Kanban",
       name: "Q&A", // base slug: "q-a"
     });
 
     const id2 = await t.mutation(api.assetManager.createFolderByName, {
-      parentPath: "kanban",
+      parentPath: "Kanban",
       name: "Q/A", // same base slug "q-a", different label
     });
 
     expect(id2).not.toEqual(id1);
 
     const children = await t.query(api.assetManager.listFolders, {
-      parentPath: "kanban",
+      parentPath: "Kanban",
     });
 
     const byPath: Record<string, { name: string }> = {};
@@ -196,13 +196,11 @@ describe("folders: path-first + label-first APIs", () => {
     const paths = Object.keys(byPath).sort();
 
     // First folder gets the plain slug
-    expect(paths).toContain("kanban/q-a");
-    expect(byPath["kanban/q-a"]?.name).toBe("Q&A");
+    expect(paths).toContain("Kanban/QA");
+    expect(byPath["Kanban/QA"]?.name).toBe("Q&A");
 
     // Second folder should get a suffixed slug like "q-a-2"
-    const suffixed = paths.find(
-      (p) => p !== "kanban/q-a" && p.startsWith("kanban/q-a-"),
-    );
+    const suffixed = paths.find((p) => p !== "Kanban/QA" && p.startsWith("Kanban/QA-"));
     expect(suffixed).toBeDefined();
     if (suffixed) {
       expect(byPath[suffixed].name).toBe("Q/A");
@@ -224,21 +222,21 @@ describe("folders: path-first + label-first APIs", () => {
 
     // children of Kanban
     await t.mutation(api.assetManager.createFolderByName, {
-      parentPath: "kanban",
+      parentPath: "Kanban",
       name: "backlog",
     });
     await t.mutation(api.assetManager.createFolderByName, {
-      parentPath: "kanban",
+      parentPath: "Kanban",
       name: "doing",
     });
     await t.mutation(api.assetManager.createFolderByName, {
-      parentPath: "kanban",
+      parentPath: "Kanban",
       name: "review",
     });
 
     // deeper nested child (should NOT appear as direct child of "kanban")
     await t.mutation(api.assetManager.createFolderByName, {
-      parentPath: "kanban/backlog",
+      parentPath: "Kanban/backlog",
       name: "inner",
     });
 
@@ -248,23 +246,19 @@ describe("folders: path-first + label-first APIs", () => {
 
     const rootPaths = rootChildren.map((f) => f.path).sort();
 
-    expect(rootPaths).toEqual(["kanban", "other-stuff"]);
+    expect(rootPaths).toEqual(["Kanban", "Other-Stuff"]);
     const kanbanChildren = await t.query(api.assetManager.listFolders, {
-      parentPath: "kanban", // direct children of "kanban" (depth = 2)
+      parentPath: "Kanban", // direct children of "Kanban" (depth = 2)
     });
     const kanbanPaths = kanbanChildren.map((f) => f.path).sort();
 
     // root: only first-level folders
 
     // kanban: only second-level folders under "kanban"
-    expect(kanbanPaths).toEqual([
-      "kanban/backlog",
-      "kanban/doing",
-      "kanban/review",
-    ]);
+    expect(kanbanPaths).toEqual(["Kanban/backlog", "Kanban/doing", "Kanban/review"]);
 
     // and *not* the deeper child
-    expect(kanbanPaths).not.toContain("kanban/backlog/inner");
+    expect(kanbanPaths).not.toContain("Kanban/backlog/inner");
   });
 });
 
@@ -279,19 +273,19 @@ describe("createFolderByName slug + collision behaviour", () => {
     });
 
     const id1 = await t.mutation(api.assetManager.createFolderByName, {
-      parentPath: "kanban",
+      parentPath: "Kanban",
       name: "Q&A", // base slug: "q-a"
     });
 
     const id2 = await t.mutation(api.assetManager.createFolderByName, {
-      parentPath: "kanban",
+      parentPath: "Kanban",
       name: "Q/A", // same base slug "q-a", different label
     });
 
     expect(id2).not.toEqual(id1);
 
     const children = await t.query(api.assetManager.listFolders, {
-      parentPath: "kanban",
+      parentPath: "Kanban",
     });
 
     const byPath: Record<string, { name: string }> = {};
@@ -302,13 +296,11 @@ describe("createFolderByName slug + collision behaviour", () => {
     const paths = Object.keys(byPath).sort();
 
     // First folder gets the plain slug
-    expect(paths).toContain("kanban/q-a");
-    expect(byPath["kanban/q-a"]?.name).toBe("Q&A");
+    expect(paths).toContain("Kanban/QA");
+    expect(byPath["Kanban/QA"]?.name).toBe("Q&A");
 
     // Second folder should get a suffixed slug like "q-a-2"
-    const suffixed = paths.find(
-      (p) => p !== "kanban/q-a" && p.startsWith("kanban/q-a-"),
-    );
+    const suffixed = paths.find((p) => p !== "Kanban/QA" && p.startsWith("Kanban/QA-"));
     expect(suffixed).toBeDefined();
     if (suffixed) {
       expect(byPath[suffixed].name).toBe("Q/A");
@@ -347,7 +339,7 @@ test("createFolderByPath throws when same path already exist", async () => {
   await expect(
     t.mutation(api.assetManager.createFolderByPath, {
       path: "kanban",
-    }),
+    })
   ).rejects.toThrow(/already exists/i);
 });
 
@@ -358,7 +350,7 @@ test("updateFolder throws when folder does not exist", async () => {
     t.mutation(api.assetManager.updateFolder, {
       path: "kanban",
       name: "Kanban",
-    }),
+    })
   ).rejects.toThrow(/does not exist/i);
 });
 
@@ -411,7 +403,7 @@ test("fails if trying to update a folder to a path that already exists", async (
     t.mutation(api.assetManager.updateFolder, {
       path: "test",
       newPath: "other/place",
-    }),
+    })
   ).rejects.toThrow(/already exists/i);
 });
 
@@ -508,11 +500,11 @@ describe("folders: path-first + label-first APIs", () => {
     }
 
     // Both children should be root-level, no leading slashes
-    expect(paths).toContain("q-a");
-    const suffixedRoot = paths.find((p) => p !== "q-a" && p.startsWith("q-a-"));
+    expect(paths).toContain("QA");
+    const suffixedRoot = paths.find((p) => p !== "QA" && p.startsWith("QA-"));
     expect(suffixedRoot).toBeDefined();
 
-    expect(byPath["q-a"]?.name).toBe("Q&A");
+    expect(byPath["QA"]?.name).toBe("Q&A");
     if (suffixedRoot) {
       expect(byPath[suffixedRoot].name).toBe("Q/A");
     }

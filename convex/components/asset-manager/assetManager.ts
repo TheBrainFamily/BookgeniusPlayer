@@ -1821,3 +1821,147 @@ export const deleteDataBatch = mutation({
     };
   },
 });
+
+const PATH_SUFFIX = "\uffff";
+
+export const getR2KeysByPathPrefix = query({
+  args: { pathPrefix: v.string() },
+  returns: v.array(v.string()),
+  handler: async (ctx, args) => {
+    const prefix = normalizeFolderPath(args.pathPrefix);
+    const childPrefix = `${prefix}/`;
+    const end = `${childPrefix}${PATH_SUFFIX}`;
+    const r2Keys: string[] = [];
+
+    const mainFolder = await ctx.db
+      .query("folders")
+      .withIndex("by_path", (q) => q.eq("path", prefix))
+      .first();
+
+    const childFolders = await ctx.db
+      .query("folders")
+      .withIndex("by_path", (q) => q.gte("path", childPrefix).lt("path", end))
+      .collect();
+
+    const allFolders = [...(mainFolder ? [mainFolder] : []), ...childFolders];
+
+    for (const folder of allFolders) {
+      const assets = await ctx.db
+        .query("assets")
+        .withIndex("by_folder_basename", (q) => q.eq("folderPath", folder.path))
+        .collect();
+
+      for (const asset of assets) {
+        const versions = await ctx.db
+          .query("assetVersions")
+          .withIndex("by_asset", (q) => q.eq("assetId", asset._id))
+          .collect();
+
+        for (const version of versions) {
+          if (version.r2Key) {
+            r2Keys.push(version.r2Key);
+          }
+        }
+      }
+    }
+
+    return r2Keys;
+  },
+});
+
+export const deleteByPathPrefixBatch = mutation({
+  args: { pathPrefix: v.string(), batchSize: v.optional(v.number()) },
+  returns: v.object({
+    deletedFolders: v.number(),
+    deletedAssets: v.number(),
+    deletedVersions: v.number(),
+    deletedEvents: v.number(),
+    r2KeysToDelete: v.array(v.string()),
+    hasMore: v.boolean(),
+  }),
+  handler: async (ctx, args) => {
+    const batchSize = args.batchSize ?? 100;
+    const prefix = normalizeFolderPath(args.pathPrefix);
+    const childPrefix = `${prefix}/`;
+    const end = `${childPrefix}${PATH_SUFFIX}`;
+
+    let deletedVersions = 0;
+    let deletedEvents = 0;
+    let deletedAssets = 0;
+    let deletedFolders = 0;
+    const r2KeysToDelete: string[] = [];
+
+    const mainFolder = await ctx.db
+      .query("folders")
+      .withIndex("by_path", (q) => q.eq("path", prefix))
+      .first();
+
+    const childFolders = await ctx.db
+      .query("folders")
+      .withIndex("by_path", (q) => q.gte("path", childPrefix).lt("path", end))
+      .collect();
+
+    const allFolders = [...(mainFolder ? [mainFolder] : []), ...childFolders];
+    const folderPaths = allFolders.map((f) => f.path);
+
+    for (const folderPath of folderPaths) {
+      const assets = await ctx.db
+        .query("assets")
+        .withIndex("by_folder_basename", (q) => q.eq("folderPath", folderPath))
+        .take(batchSize);
+
+      for (const asset of assets) {
+        const versions = await ctx.db
+          .query("assetVersions")
+          .withIndex("by_asset", (q) => q.eq("assetId", asset._id))
+          .collect();
+
+        for (const version of versions) {
+          if (version.r2Key) {
+            r2KeysToDelete.push(version.r2Key);
+          }
+          await ctx.db.delete(version._id);
+          deletedVersions++;
+        }
+
+        const events = await ctx.db
+          .query("assetEvents")
+          .withIndex("by_asset", (q) => q.eq("assetId", asset._id))
+          .collect();
+
+        for (const event of events) {
+          await ctx.db.delete(event._id);
+          deletedEvents++;
+        }
+
+        await ctx.db.delete(asset._id);
+        deletedAssets++;
+      }
+
+      if (assets.length === batchSize) {
+        return {
+          deletedFolders,
+          deletedAssets,
+          deletedVersions,
+          deletedEvents,
+          r2KeysToDelete,
+          hasMore: true,
+        };
+      }
+    }
+
+    for (const folder of allFolders) {
+      await ctx.db.delete(folder._id);
+      deletedFolders++;
+    }
+
+    return {
+      deletedFolders,
+      deletedAssets,
+      deletedVersions,
+      deletedEvents,
+      r2KeysToDelete,
+      hasMore: false,
+    };
+  },
+});

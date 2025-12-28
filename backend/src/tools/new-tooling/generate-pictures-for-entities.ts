@@ -38,7 +38,7 @@ Propaganda posters for their graphic boldness and limited color palette.
 
 `;
 
-const sanitizePromptForModeration = async (prompt: string): Promise<string> => {
+export const sanitizePromptForModeration = async (prompt: string): Promise<string> => {
   const sanitizationPrompt = `You are a prompt sanitizer. The following image generation prompt was rejected by a safety system for sexual content violations.
 
 Original prompt:
@@ -62,13 +62,23 @@ Reply ONLY with the sanitized prompt, no explanations or preamble.`;
   return sanitizedPrompt || prompt;
 };
 
-const generateCharacterImageWithOpenAI = async (
+// const generateCharacterImageWithGemini = async ()
+//   prompt: string,
+//   characterName: string,
+//   generalPrompt: string,
+//   attempt = 1,
+//   useSanitizedPrompt = false,
+// ) => {
+//   const response = await callGeminiWithThinkingAndSchemaAndParsed(prompt, CharactersSchema);
+// };
+
+export const generateCharacterImageWithOpenAI = async (
   prompt: string,
   characterName: string,
   generalPrompt: string,
   attempt = 1,
   useSanitizedPrompt = false,
-) => {
+): Promise<Buffer | null> => {
   const openai = new OpenAI();
 
   console.log(
@@ -83,6 +93,7 @@ const generateCharacterImageWithOpenAI = async (
       prompt: finalPrompt,
       quality: "medium",
       size: "1024x1024",
+      moderation: "low",
     });
   } catch (e: unknown) {
     const error = e as { code?: string };
@@ -94,7 +105,7 @@ const generateCharacterImageWithOpenAI = async (
       return await generateCharacterImageWithOpenAI(sanitizedPrompt, characterName, generalPrompt, 1, true);
     }
 
-    if (attempt < 5) {
+    if (attempt < 3) {
       const waitTime = attempt * 30000 - 15000;
       console.log(`Failed to generate image after ${attempt} attempts, waiting ${waitTime} ms`, JSON.stringify(e));
       await sleep(waitTime);
@@ -106,21 +117,31 @@ const generateCharacterImageWithOpenAI = async (
         useSanitizedPrompt,
       );
     } else {
-      logger.error("Failed to generate image after 5 attempts");
+      logger.error("Failed to generate image after 3 attempts");
       return null;
     }
   }
-  // Save the image to a file
+
   if (!result?.data?.[0]?.b64_json) {
     logger.error("No image data found");
-    return;
+    return null;
   }
-  const image_base64 = result.data[0].b64_json;
-  const image_bytes = Buffer.from(image_base64, "base64");
+
+  return Buffer.from(result.data[0].b64_json, "base64");
+};
+
+const generateAndSaveCharacterImage = async (
+  prompt: string,
+  characterName: string,
+  generalPrompt: string,
+): Promise<void> => {
+  const imageBuffer = await generateCharacterImageWithOpenAI(prompt, characterName, generalPrompt);
+  if (!imageBuffer) return;
+
   const originalFilePath = getPictureFileNameForName(characterName);
   const filePath = `characters/${originalFilePath}`;
   console.log(`filePath: ${filePath}`);
-  writeBookFile(filePath, image_bytes, FILE_TYPE.PERMANENT);
+  writeBookFile(filePath, imageBuffer, FILE_TYPE.PERMANENT);
   logger.info(`Image successfully saved to: ${filePath}`);
 };
 
@@ -226,8 +247,7 @@ Propaganda posters for their graphic boldness and limited color palette.
           const image = await generateFluxImage(prompt.visualGuide, prompt.name, generalPrompt, "avatar");
           console.log(`image: ${image}`);
         } else {
-          const imageOpenAi = await generateCharacterImageWithOpenAI(prompt.visualGuide, prompt.name, generalPrompt);
-          console.log(`imageOpenAi: ${imageOpenAi}`);
+          await generateAndSaveCharacterImage(prompt.visualGuide, prompt.name, generalPrompt);
         }
       }
     }),

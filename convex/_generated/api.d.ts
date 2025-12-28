@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as admin_regenerateAvatarWebp from "../admin/regenerateAvatarWebp.js";
 import type * as auth from "../auth.js";
 import type * as authHelpers from "../authHelpers.js";
 import type * as avatarGeneration from "../avatarGeneration.js";
@@ -43,6 +44,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "admin/regenerateAvatarWebp": typeof admin_regenerateAvatarWebp;
   auth: typeof auth;
   authHelpers: typeof authHelpers;
   avatarGeneration: typeof avatarGeneration;
@@ -200,6 +202,19 @@ export declare const components: {
         },
         { assetId: string; version: number; versionId: string }
       >;
+      deleteByPathPrefixBatch: FunctionReference<
+        "mutation",
+        "internal",
+        { batchSize?: number; pathPrefix: string },
+        {
+          deletedAssets: number;
+          deletedEvents: number;
+          deletedFolders: number;
+          deletedVersions: number;
+          hasMore: boolean;
+          r2KeysToDelete: Array<string>;
+        }
+      >;
       deleteDataBatch: FunctionReference<
         "mutation",
         "internal",
@@ -351,6 +366,12 @@ export declare const components: {
         "internal",
         { basename: string; folderPath: string },
         any
+      >;
+      getR2KeysByPathPrefix: FunctionReference<
+        "query",
+        "internal",
+        { pathPrefix: string },
+        Array<string>
       >;
       getStorageBackendConfig: FunctionReference<
         "query",

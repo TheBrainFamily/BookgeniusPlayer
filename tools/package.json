@@ -4,5 +4,9 @@
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.958.0",
+    "dotenv": "^17.2.3"
   }
 }
